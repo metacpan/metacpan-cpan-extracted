@@ -1,0 +1,7 @@
+Revision history for Perl extension iodbc.
+
+0.01  Mon Jul  1 16:54:06 1996
+	- original version; created by h2xs 1.16
+0.10  Fri Jul 26 12:00:00 1996
+	- First release; created by J. Michael Mahan
+

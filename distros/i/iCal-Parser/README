@@ -1,0 +1,190 @@
+NAME
+    iCal::Parser - Parse iCalendar files into a data structure
+
+SYNOPSIS
+      use iCal::Parser
+
+      my $parser=iCal::Parser->new();
+      my $hash=$parser->parse($file);
+
+      $parser->parse($another_file);
+      my $combined=$parser->calendar;
+
+      my $combined=iCal::Parser->new->parse(@files);
+      my $combined=iCal::Parser->new->parse_files(@files);
+      my $combined=iCal::Parser->new->parse_strings(@strings);
+
+DESCRIPTION
+    This module processes iCalendar (vCalendar 2.0) files as specified in
+    RFC 2445 into a data structure. It handles recurrences (`RRULE's),
+    exclusions (`EXDATE's), event updates (events with a `RECURRENCE-ID'),
+    and nested data structures (`ATTENDEES' and `VALARM's). It currently
+    ignores the `VTIMEZONE', `VJOURNAL' and `VFREEBUSY' entry types.
+
+    The data structure returned is a hash like the following:
+
+        {
+          calendars=>[\%cal, ...],
+          events=>{yyyy=>{mm=>{dd}=>{UID=>\%event}}
+          todos=>[\%todo, ...]
+        }
+
+    That is, it contains an array of calendar hashes, a hash of events key
+    by `year=>month=>day=>eventUID', and an array of todos.
+
+    Calendars, events and todos are "rolled up" version os the hashes
+    returned from Text::vFile::asData, with dates replaced by `DateTime'
+    objects.
+
+    During parsing, events in the input calendar are expanded out into
+    multiple events, one per day covered by the event, as follows:
+
+    *   If the event is a one day "all day" event (in ical, the event is
+        24hrs long, starts at midnight on the day and ends a midnight of the
+        next day), it contains no `hour' field and the `allday' field is set
+        to `1'.
+
+    *   If the event is a recurrence (`RRULE'), one event per day is created
+        as per the `RRULE' specification.
+
+    *   If the event spans more than one day (the start and end dates are on
+        different days, but does not contain an `RRULE'), it is expanded
+        into multiple events, the first events end time is set to midnight,
+        subsequent events are set to start at midnight and end at midnight
+        the following day (same as an "allday" event, but the `allday' field
+        is not set), and the last days event is set to run from midnight to
+        the end time of the original multi-day event.
+
+    *   If the event is an update (it contains a `RECURRENCE-ID'), the
+        original event is updated. If the referenced event does not exist
+        (e.g., it was deleted after the update), then the event is added as
+        a new event.
+
+    An example of each hash is below.
+
+  Calendar Hash
+        {
+            'X-WR-CALNAME' => 'Test',
+            'index' => 1,
+            'X-WR-RELCALID' => '7CCE8555-3516-11D9-8A43-000D93C45D90',
+            'PRODID' => '-//Apple Computer\\, Inc//iCal 1.5//EN',
+            'CALSCALE' => 'GREGORIAN',
+            'X-WR-TIMEZONE' => 'America/New_York',
+            'X-WR-CALDESC' => 'My Test Calendar',
+            'VERSION' => '2.0'
+        }
+
+  Event Hash
+    Note that `hours' and `allday' are mutually exclusive in the actual
+    data. The `idref' field contains the `id' of the calendar the event came
+    from, which is useful if the hash was created from multiple calendars.
+
+        {
+            'SUMMARY' => 'overnight',
+            'hours' => '15.00',
+            'allday' => 1,
+            'UID' => '95CCBF98-3685-11D9-8CA5-000D93C45D90',
+            'idref' => '7CCE8555-3516-11D9-8A43-000D93C45D90',
+            'DTSTAMP' => \%DateTime,
+            'DTEND' => \%DateTime,
+            'DTSTART' => \%DateTime
+            'ATTENDEE' => [
+               {
+                  'CN' => 'Jay',
+                  'value' => 'mailto:jayl@my.server'
+               },
+              ],
+              'VALARM' => [
+                {
+                  'when' => \%DateTime,
+                  'SUMMARY' => 'Alarm notification',
+                  'ACTION' => 'EMAIL',
+                  'DESCRIPTION' => 'This is an event reminder',
+                  'ATTENDEE' => [
+                     {
+                       'value' => 'mailto:cpan@my.server'
+                     }
+                  ]
+               }
+             ],
+        }
+
+  Todo Hash
+        {
+            'URL' => 'mailto:me',
+            'SUMMARY' => 'todo 1',
+            'UID' => 'B78E68F2-35E7-11D9-9E64-000D93C45D90',
+            'idref' => '7CCE8555-3516-11D9-8A43-000D93C45D90',
+            'STATUS' => 'COMPLETED',
+            'COMPLETED' => \%DateTime,
+            'DTSTAMP' => \%DateTime,
+            'PRIORITY' => '9',
+            'DTSTART' => \%DateTime,
+            'DUE' => \%DateTime,
+            'DESCRIPTION' => 'not much',
+            'VALARM' => [
+               {
+                  'when' => \%DateTime,
+                  'ATTACH' => 'file://localhost/my-file',
+                  'ACTION' => 'PROCEDURE'
+               }
+            ],
+        },
+
+Methods
+  new(%opt_args)
+    Optional Arguments
+    start {yyymmdd|DateTime}
+        Only include events on or after `yyymmdd'. Defaults to Jan of this
+        year.
+
+    end {yyyymmdd|DateTime}
+        Only include events before `yyymmdd'.
+
+    no_events
+        Don't include events in the output (todos only).
+
+    no_todos
+        Don't include todos in the output (events only).
+
+    months n
+        DateTime::Sets (used for calculating recurrences) are limited to
+        approximately 200 entries. If an `end' date is not specified, the
+        `to' date is set to the `start' date plus this many months. The
+        default is 60.
+
+    tz (string|DateTime::TimeZone)
+        Use tz as timezone for date values. The default is 'local', which
+        will adjust the parsed dates to the current timezone.
+
+    debug
+        Set to non-zero for some debugging output during processing.
+
+  parse({file|file_handle}+)
+    Parse the input files or opened file handles and return the generated
+    hash.
+
+    This function can be called mutitple times and the calendars will be
+    merge into the hash, each event tagged with the unique id of its
+    calendar.
+
+  parse_files({file|file_handle}+)
+    Alias for `parse()'
+
+  parse_strings(string+)
+    Parse the input strings (each assumed to be a valid iCalendar) and
+    return the generated hash.
+
+AUTHOR
+    Rick Frankel, cpan@rickster.com
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    Text::vFile::asData, DateTime::Set, DateTime::Span, iCal::Parser::SAX
+

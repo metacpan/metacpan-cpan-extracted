@@ -1,0 +1,69 @@
+2016-12-08  Cedric Cellier  <rixed-cpan@happyleptic.org>
+
+	* lib/iCal/Parser.pm: various fixes of some reported or
+	unreported bugs.
+
+2006-10-19  Rick Frankel  <rick@gg5.local>
+
+	* lib/iCal/Parser.pm (update_recurrences): fix problem with
+	replacement event (recurrence-id) prior to rrule event
+	in file.
+
+2006-09-10  Rick Frankel  <rick@gg5.local>
+
+	* lib/iCal/Parser.pm (VEVENT): fix problems with alarms on
+	recurring events
+	
+2005-07-02  Rick Frankel  <rick@gg5.local>
+
+	* lib/iCal/Parser.pm (convert_value): fix handling of lists of
+	dates (EXDATE)
+
+2005-03-28  Rick Frankel  <rick@gg5.local>
+
+	* t/calendars/04recurrence.ics (BEGIN): added test for empty set
+	fix.
+
+	* lib/iCal/Parser.pm (VEVENT): handle recurrence generating sets
+	with no entries.
+
+2005-02-08  Rick Frankel  <rick@gg5.local>
+
+	* Build.PL: build_require freeze/thaw, latest version of
+	Test::More (is_deeply comparison problems).
+
+	* t/02parse.t: change from using Data::Dumper to freeze/thaw for
+	saving/comparing parsing output.
+
+2005-02-04  Rick Frankel  <rick@gg5.local>
+
+	* t/02parse.t: force explicit timezone for tests.
+
+2005-02-01  Rick Frankel  <rick@gg5.local>
+
+	* lib/iCal/Parser.pm: change date handling. added tz
+	argument. Default now "local" instead of "floating". This is
+	consistent w/ iCal's handling of dates.
+
+2005-01-09  Rick Frankel  <rick@pb.local>
+
+	* lib/iCal/Parser.pm (parse_strings): added parse_strings
+	(suggested by Bob Goldstein), and, for consistency parse_files
+	alias for parse.
+
+2005-01-04  Rick Frankel  <rick@gg5.local>
+
+	* t/02parse.t: make tests independent of current year 
+
+	* t/01args.t: ditto
+
+2004-12-31  Rick Frankel  <rick@gg5.local>
+
+	* lib/iCal/Parser.pm (VCALENDAR): change default name of calendar
+	to basename of file from "Calendar $idx" if possible.
+
+2004-12-23  Rick Frankel  <rick@gg5.local>
+
+	* Parser.pm (_convert_value): deal with mozilla's negative dates
+	in todos
+

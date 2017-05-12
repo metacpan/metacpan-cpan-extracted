@@ -1,0 +1,60 @@
+import
+
+This is the import module for perl, which imports all modules 
+with the same package prefix, aliasing it away.
+
+'import' acts as a pragma that performs a 'use' on all modules that can be 
+found with the given package prefix. Any modules found have a 'use' statement 
+performed, and the fully qualified package name is aliased to one without the 
+given prefix. The functionality is similar to Java's 'import' statement.
+
+
+Michael King
+
+To see the latest changes to the module, see the 'Changes' file.
+
+To see how you can help make this a better module, see the 'TODO' file.
+
+To see any special installation notes, see the 'INSTALL' file.
+
+To install these modules, cd to the directory that this README file is
+in and type the following:
+
+	perl Makefile.PL
+	make
+	make install
+
+Documentation for these modules is part of the files themselves using
+the pod (Plain Old Documentation) format, and can be read using the
+perldoc program that comes with perl.
+
+To manually convert them into manual page format, type something like
+the following:
+
+	pod2man import.pod > import.man
+
+To manually convert them into HTML format, type:
+
+	pod2html import.pm
+
+(pod2html creates an HTML file named import.pm.html)
+
+Online documentation of these modules can be found at:
+
+	http://walden.mo.net/~mike808/import_pm
+
+First released to CPAN: Sun Oct 10 22:59:23 CDT 1999
+
+Michael King
+<mike808@mo.net>
+http://walden.mo.net/~mike808
+
+Please send any reports of problems or bugs to mike808@mo.net. I wouldn't
+mind a short note to know that you're using this. Suggestions and knowing
+how many others are using this will help promote its upkeep.
+
+This package is copyright (c) 1997 by Michael King (mike808@mo.net) and is
+made available to the Perl public under terms of the Artistic License used to
+cover Perl itself. See the file Artistic in the distribution  of Perl 5.002 or
+later for details of copy and distribution terms.
+

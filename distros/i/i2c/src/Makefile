@@ -1,0 +1,49 @@
+# Makfile i2c 
+# Erzeugt Librarys f. seriellen und parallen Port
+# 5.11.00 / Ingo Gerlach  
+#
+# Wichtig: HDIR muss angepasst werden !!!!
+#
+
+CC=gcc
+LINK = $(CC)
+CFLAGS = -O2 -pipe -m386 -Wall 
+
+HDIR=		/opt/i2c/
+LIBFILES=	$(HDIR)lcd/lcd.o $(HDIR)pcf8591/pcf8591.o $(HDIR)/pcf8574/pcf8574.o \
+		$(HDIR)/sda3302/sda3302.o $(HDIR)/tsa6057/tsa6057.o 
+
+LIBSER=		$(HDIR)i2c_ser/i2c_ser.o $(LIBFILES)
+LIBPAR=		$(HDIR)i2c_lpt/i2c_lpt.o $(LIBFILES)
+
+OUTSER=		$(HDIR)lib/libi2c_ser.so
+OUTPAR=		$(HDIR)lib/libi2c_lpt.so
+PERLSE=		$(HDIR)perl/i2c_ser/lib/i2c_ser.a
+PERLPA=         $(HDIR)perl/i2c_lpt/lib/i2c_lpt.a 
+
+default:	
+		echo "make i2c_ser i2c_par all clean"
+
+i2c_ser:	$(LIBSER) 
+		ar rvus $(OUTSER) $(LIBSER) 
+
+i2c_par:	$(LIBPAR)
+		ar rvus $(OUTPAR) $(LIBPAR)
+
+perl_pa:        $(LIBPAR)
+		ar rvus $(PERLPA) $(LIBPAR)
+
+perl_se:        $(LIBSER)
+		ar rvus $(PERLSE) $(LIBSER)
+
+all:		i2c_ser i2c_par perl_pa perl_se
+
+clean:
+		rm *.a *.o *~ core > /dev/null 2>&1
+
+lcd.o:		$(HDIR)lcd/lcd.c $(HDIR)lcd/lcd.h 
+pcf8591.o:	$(HDIR)pcf8591/pcf8591.c $(HDIR)pcf8591/pcf8591.h
+pcf8574.o:	$(HDIR)pcf8574/pcf8574.c $(HDIR)pcf8574/pcf8574.h
+sda3302.o:	$(HDIR)sda3302/sda3302.c $(HDIR)sda3302/sda3302.h
+tsa6057.o:	$(HDIR)tsa6057/tsa6057.c $(HDIR)tsa6057/tsa6057.h
+

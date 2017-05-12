@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+i2c_ser.pm
+i2c_ser.xs
+test.pl
+lib/i2c_ser.a
+

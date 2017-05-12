@@ -1,0 +1,114 @@
+NAME
+    i18n - Perl Internationalization Pragma
+
+VERSION
+    This document describes version 0.10 of i18n, released October 14, 2007.
+
+SYNOPSIS
+    In one-liners:
+
+        % export LANG=sp
+        % perl -Mi18n=/path/to/po-files/ -le 'print ~~"Hello, world"';
+        Hola, mundo
+
+    In your module:
+
+        use i18n "/path/to/po-files";
+        my $place = ~~'world';
+        print ~~"Hello, $world";
+
+DESCRIPTION
+    Internationalization (abbreviated "i18n") is the process of designing an
+    application so that it can be adapted to various languages and regions.
+    The most basic task is to let your program know which strings are meant
+    for human consumption and which strings are intended for the computer.
+
+    Strings for humans need to get localized (translated to the language of
+    the human using your program) and strings for computers must not get
+    translated.
+
+  Syntax
+    The "i18n" module gives you a remarkably simple way to mark strings that
+    are intended for humans. All you do is put two tilde signs ("~~") in
+    front of every string that is intended to be translated. That's it. All
+    the other details of localization are handled outside the program. Here
+    are some examples:
+
+        my $str1 = ~~'The time is now';
+        my $str2 = ~~"$str1 for having a cow";
+        my $str3 = ~~qq{Wow! $str2};
+        my $str4 = ~~<<END;
+        How now.
+        Brown cow.
+        END
+
+    Think of the tilde signs as an indicator that you are looking for things
+    that approximates the string in the user's language. To turn off the
+    magic of "~~" lexically, just say:
+
+        no i18n;
+
+    One nice thing about this particular markup, is that you can completely
+    turn off internationalization, by simply removing the "use i18n;"
+    statement. The "~~" signs are actually valid Perl that just happen to
+    not do anything in this context, and thus are constant-optimized away at
+    compile time.
+
+  Implementation
+    When you say:
+
+        my $string = ~~"Bob is your uncle";
+
+    then $string really is an "i18n::string" object that is overloaded to
+    stringify as a localized translation.
+
+    Currently, the magic is just a thin wrapper on
+    "Locale::Maketext::Simple", which makes it equivalent to this call:
+
+        my $string = loc("Bob is your uncle");
+
+    Similarly, this line:
+
+        my $string = ~~"$person is your uncle";
+
+    will be turned into this at runtime:
+
+        my $string = loc("[_1] is your uncle", $person);
+
+CAVEATS
+    The authors of this module are not linguists. If you would like to help
+    us define suitable "i18n" magic for your language, please send us an
+    email.
+
+SEE ALSO
+    Locale::Maketext::Simple, Locale::Maketext::Lexicon
+
+AUTHORS
+    Audrey Tang <cpan@audreyt.org>, Ingy döt Net <INGY@cpan.org>.
+
+COPYRIGHT
+    Copyright 2004, 2005, 2006, 2007 by Audrey Tang <cpan@audreyt.org>, Ingy
+    döt Net <INGY@cpan.org>.
+
+    This software is released under the MIT license cited below.
+
+  The "MIT" License
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+

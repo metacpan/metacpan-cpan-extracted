@@ -1,0 +1,6 @@
+Revision history for inc-latest
+
+0.500     2014-12-05 23:43:12-05:00 America/New_York
+
+    - Split out from Module::Build into an independent package
+

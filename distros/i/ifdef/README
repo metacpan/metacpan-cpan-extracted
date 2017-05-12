@@ -1,0 +1,23 @@
+README for ifdef
+
+The "ifdef" pragma allows you to conditionally enable code within pod
+sections depending on the value of uppercase environment variables,
+either set directly or through using this module.
+
+Copyright (c) 2004, 2007 Elizabeth Mattijsen <liz@dijkmat.nl>. All rights
+reserved.  This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+Required Modules:
+ Filter::Util::Call (any)
+ IO::File (any)
+
+Version:
+ 0.09
+
+The build is standard:
+
+perl Makefile.PL
+make
+make test
+make install

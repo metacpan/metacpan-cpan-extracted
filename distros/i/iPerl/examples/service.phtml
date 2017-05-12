@@ -1,0 +1,143 @@
+<html>
+<head>
+   <title>Service Directory</title>
+<body>
+<script runat=server language=perl>
+
+my %In_House = (
+    5 => 'LT',
+    4 => RMS,
+    3 => DP,
+    2 => SMN,
+    1 => TBL,
+    53 - 100 => MA,
+    52 - 100 => LW
+);
+
+my %On_Call = (
+    10 => SMN,
+    9 => RMS,
+    8 => MA,
+    7 => TBL,
+    6 => DP,
+    5 => 'LT',
+    4 => RMS,
+    3 => SMN,
+    2 => DP,
+    1 => TBL,
+    53 - 100 => DP,
+    52 - 100 => LW
+);
+
+
+
+my %Name = (
+    DP  => 'Daniel Pheiffer',
+    LT  => 'Linus Topwalt',
+    LW  => 'Larry Walk',
+    MA  => 'Mark Andersen',
+    RMS => 'Richard M. Stallberg',
+    SMN => 'Scott McNoly',
+    TBL => 'Tim Berners Lear'
+);
+
+my %Phone = (
+    DP  => '1234-5678',
+    LT  => '1357-2468',
+    LW  => '5678-1234',
+    MA  => '2143-6587',
+    RMS => '4321-8765',
+    SMN => '8765-4321',
+    TBL => '6587-2143'
+);
+
+my %Email = (
+    DP  => 'dani@ei.poerl.de',
+    LT  => 'lto@lie.knucks.net',
+    LW  => 'onion@camel.org',
+    MA  => 'anders@mozilla.gov',
+    RMS => 'rms@gnu.com',
+    SMN => 'scott@sunny.com',
+    TBL => 'tim@www.net'
+);
+
+my $Days_of_first_week = 4;
+
+</script>
+<h1>Service Directory</h1>
+
+<p>Shows who is on duty in house and on call during off hours for the last few
+and the next few calendar weeks.  Sometimes both services are assumed by the
+same person.</p>
+
+<table border cellspacing=0 cellpadding=5>
+<tr><th>Week</th><th>In House</th><th>On Call</th></tr>
+<script runat=server language=perl>
+
+  foreach( keys %Email ) {
+    $Name{$_} =
+	"<a href='mailto:$Email{$_}'>$Name{$_}</a>, <i>$Phone{$_}</i>";
+  }
+
+  $Name{''} = '<i>N.N.</i>';
+
+  my( $WDay, $YDay ) = (localtime)[6,7];
+  $WDay ||= 7;
+  my $week = ($YDay - $WDay + 2) / 7;
+  $week = int( $week ) + ($week > int $week);
+  $week += (($YDay - $WDay + 1) % 7) >= $Days_of_first_week;
+  my %Farbe = ($week => " bgcolor='#33dddd'");
+  my %done_it;
+  foreach( sort { $a <=> $b } keys %In_House, keys %On_Call ) {
+    next if $done_it{$_}++
+</script>
+  <tr &<$Farbe{$_ % 100}>;><th> &<$_ % 100>;</th>
+  <script runat=server language=perl>
+    if( $In_House{$_} eq $On_Call{$_} ) {
+  </script>
+    <td colspan=2>              &<$Name{$In_House{$_}}>;</td></tr>
+  <script runat=server language=perl> } else { </script>
+    <td> &<$Name{$In_House{$_}}>;</td>
+    <td> &<$Name{$On_Call{$_}}>;</td></tr>
+<script runat=server language=perl>
+    }
+  }
+</script>
+</table>
+</html>
+<!--
+
+=head1 NAME
+
+service.phtml - display directory of colleagues on service
+generated from hashes
+
+=head1 SYNOPSIS
+
+On a L<web-iPerl> enabled server copy to some directory accesible by the
+web-server.  Displays a three-column table showing who is active in two related
+categories of service.
+
+=head1 DESCRIPTION
+
+Bits of Perl in this document are marked up in style sgml.
+
+The first Perl-section associates the initials of people providing the two
+services to calendar weeks via two hashes.  The name, mailaddress and
+phonenumber is assigned to the initials via three more hashes.
+
+When a new year approaches 100 can be subtracted from the old weeks to
+preserve order.  A variable sets how many days the first week of the year must
+have to count as such.  Here a value of 4 reflects the german rule.
+
+This is a true application of L<web-iPerl> used in the author's company.
+
+
+=head1 SEE ALSO
+
+L<Text::iPerl>, L<iperl>, L<web-iPerl>, L<iPerl.el>, L<perl>,
+http://beam.to/iPerl/
+
+=cut
+
+-->

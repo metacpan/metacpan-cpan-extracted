@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+i2c_lpt.pm
+i2c_lpt.xs
+test.pl
+lib/i2c_lpt.a
+

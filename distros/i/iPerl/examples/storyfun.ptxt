@@ -1,0 +1,75 @@
+!{ # -*- iPerl-style: "bang" -*-
+
+=head1 NAME
+
+storyfun.ptxt - template fill-in story
+
+
+=head1 SYNOPSIS
+
+  iperl storyfun.ptxt
+
+or
+
+  iperl storyfun.ptxt </dev/null
+
+
+=head1 DESCRIPTION
+
+Bits of Perl in this document are marked up in style bang.
+
+A certain number of words in a little story have been left open.  For each
+missing word a default is randomly selected by category and you are prompted
+for your choice.  These are then interpolated into the story by means of
+C<!E<lt>...E<gt>!>.  All three variants are used:  an empty one for $_,
+integers as indexes into @_ and Perl expressions.
+
+
+=head1 CREDITS
+
+Inspired by an April 2000 L<http://www.sysadminmag.com/> article by Randal
+L. Schwartz, (see L<http://www.rahul.net/jeffrey/> for his ongoing scary
+story) in turn based on L<http://www.mit.edu/storyfun/list>.
+
+
+=head1 SEE ALSO
+
+L<Text::iPerl>, L<iperl>, L<web-iPerl>, L<iPerl.el>, L<perl>, http://beam.to/iPerl/
+
+=cut
+
+
+srand;
+sub ask($@) {
+    my $default = $_[1 + int rand $#_];
+    local $| = 1;
+    print STDERR "$_[0]: (default: $default) "
+	if -t;
+    my $reply = <>;
+    chomp $reply;
+    return $reply || $default;
+}
+
+foreach( 0..3 ) {
+    push @_, ask Adjective => qw'big small wild narrow fast slow red green blue
+	soft thick surprising frightening beautiful astonished';
+}
+$_ = ask Adverb => qw'very rather extremely somewhat sadly';
+$place = ask Place => qw'Chinatown Suburbia Africa heaven hell paradise';
+$verb_ing = ask 'Verb ending in -ing' => qw'running drinking driving sleeping';
+$verb_past = ask 'Verb in past tense' => qw'looked searched breathed poked';
+$plants = ask 'Plural plant' => qw'shrubs trees bushes herbs willows tulips';
+$verb_ed = ask 'Verb ending in -ed' => qw'relieved exasperated';
+$animals = ask 'Plural animal' => qw'cats rats chipmunks kangaroos penguins';
+$noun = ask 'Noun' => qw'wallet corner tree path highway';
+$nouns = ask 'Plural noun' => qw'fingers feet clothes glasses friends';
+
+}!I went for a walk
+
+Yesterday, I went out walking, and somehow ended up in !<$place>!.  I saw
+!<$plants>! and !<$animals>! -- it was !<0>!!  But I started getting
+!<>! hungry, and needed to find my way home.  But no matter where I
+!<$verb_past>!, I couldn't see the path.  I decided to go around the !<3>!
+!<$noun>! up ahead, and discovered that it led back home!  I was !<$verb_ed>!.
+At dinner, when I told my !<2>! story, my !<$nouns>! looked at me with !<1>!
+expressions.  Then they forbade me from ever !<$verb_ing>! again.

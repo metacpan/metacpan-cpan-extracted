@@ -1,0 +1,30 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 6abaa3122a6349269cd72808aaa595a6aee1947a MANIFEST
+SHA1 ddb918d4e02cc06f4b9fe77adeca65403f8fdd56 MANIFEST.SKIP
+SHA1 6b7977fae0ef92acf12713c1f517611f7a7255d5 META.yml
+SHA1 beec392d705b431401a2535d15005730e95f785c Makefile.PL
+SHA1 b1a2b0efb87bf38caac21240be9c8f1acef64556 lib/iPod/Squish.pm
+SHA1 275dfc6b8f324432d542b2fc976b44260df5ba22 script/isquish
+SHA1 c130ac19272c44b08ca47d038dcae3097b961d95 t/01_use.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (Darwin)
+
+iD8DBQFHxyCkVCwRwOvSdBgRAgTsAJ0bMnVZc+1KhExsvSGR4D3BZsEErgCfStwe
+0OjlxovaQNFyGS+uX3qpmiY=
+=peCx
+-----END PGP SIGNATURE-----

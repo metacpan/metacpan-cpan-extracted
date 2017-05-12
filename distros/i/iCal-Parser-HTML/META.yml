@@ -1,0 +1,23 @@
+---
+name: iCal-Parser-HTML
+version: 1.07
+author:
+  - 'Rick Frankel, cpan@rickster.com'
+abstract: Generate HTML calendars from iCalendars
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  XML::LibXML: 1.58
+  XML::LibXSLT: 1.57
+  iCal::Parser::SAX: 1.05
+build_requires:
+  Test::More: 0.47
+provides:
+  iCal::Parser::HTML:
+    file: lib/iCal/Parser/HTML.pm
+    version: 1.07
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

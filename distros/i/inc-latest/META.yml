@@ -1,0 +1,53 @@
+---
+abstract: 'use modules bundled in inc/ if they are newer than installed ones'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+  - 'Eric Wilhelm <ewilhelm@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.142690'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: inc-latest
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  inc::latest:
+    file: lib/inc/latest.pm
+    version: '0.500'
+  inc::latest::private:
+    file: lib/inc/latest/private.pm
+    version: '0.500'
+requires:
+  Carp: '0'
+  ExtUtils::Installed: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  IO::File: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/inc-latest/issues
+  homepage: https://github.com/dagolden/inc-latest
+  repository: https://github.com/dagolden/inc-latest.git
+version: '0.500'
+x_authority: cpan:DAGOLDEN

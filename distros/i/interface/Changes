@@ -1,0 +1,6 @@
+Revision history for Perl extension interface.
+
+0.01  Tue Jul 16 07:43:59 2002
+	- original version; created by h2xs 1.22 with options
+		-X -A -n interface
+

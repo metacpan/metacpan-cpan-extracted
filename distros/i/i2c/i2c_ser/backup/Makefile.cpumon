@@ -1,0 +1,12 @@
+CC=gcc
+LINK = $(CC)
+CFLAGS = -O2 -pipe -m386 -Wall 
+LDFLAGS = -s
+
+
+cpumon:		cpumon.o i2c_ser.o lcd.o pcf8574.o
+		$(LINK) -o cpumon cpumon.o i2c_ser.o lcd.o pcf8574.o $(CFLAGS) 
+
+clean:
+	rm *.a *.o *~ core > /dev/null 2>&1
+

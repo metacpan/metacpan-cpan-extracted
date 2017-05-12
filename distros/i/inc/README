@@ -1,0 +1,181 @@
+NAME
+    inc - Smart @INC Processing
+
+SYNOPSIS
+        use inc <smart-object-spec-list>;
+
+    or:
+
+        perl -Minc=<smart-object-spec-list> …
+
+    or:
+
+        PERL5OPT='-Minc=<smart-object-spec-list>' prove -v t/
+
+DESCRIPTION
+    The "inc" module redefines @INC to a list of predefined *smart objects*.
+    These objects are really just code refs for handy lookup techniques. For
+    example, only finding modules that were core in Perl 5.8.1, or only
+    finding non-core modules that are declared prerequisites of some module.
+
+    A real example is testing a module that you are releasing to CPAN. You
+    can use this to make sure that only predeclared prerequisite modules get
+    loaded:
+
+        PERL5OPT='-Minc=dist.ini:core=5.8.1:lib' prove -v t/
+
+    Each smart object object can have an argument list:
+
+        use inc 'core=5.8.1';
+
+    In this example "core" is the name of the smart object (code ref) and
+    '5.8.1' is an argument. Multiple arguments are separated by commas.
+
+    The list of objects can be a real list or a single string separated by
+    colons. This is to allow easy usage loading "inc" using "-M":
+
+        perl -Minc=lib:core …
+
+SMART OBJECTS
+    This is a list of the smart objects that are predefined by the "inc"
+    module (in alpha order):
+
+    "blib"
+        Use the path values that "blib.pm" would add.
+
+    "cache"
+        Some of the smart objects can take long time to get their
+        information. They might need to fetch information from the internet,
+        for example. This object will save all the state into a file called
+        "./.perl-inc-cache". You can override this filename by passing a
+        value of your own as an argument.
+
+        If the cache file exists it will be used. If not, values will be
+        stored to it. To refresh the cache, simply delete the file.
+
+    "core"
+        Only finds the modules that are in core for the version of Perl that
+        is running. You can give this a Perl version argument, and modules
+        will be limited to the ones that were core for that version.
+
+    "cwd"
+        Adds the absolute path of the current directory.
+
+    "deps"
+        Only finds modules that are known prereqs of a module. Defaults to
+        the module from which it was called. You can pass in the names of
+        one or more modules to use.
+
+    "dot"
+        Adds "File::Spec->curdir". (Usually ".").
+
+    "dzil"
+        Use Dist::Zilla's "dzil listdeps" to find prereqs. Only find these
+        modules.
+
+    "inc"
+        Expands to the value on @INC prior to the execution of "use inc …".
+
+    "INC"
+        Expands to the perl's default @INC.
+
+    "LC"
+        Lancaster Core. Alias for "core=5.8.1"
+
+    "lib"
+        Expands to an absolute path of "./lib".
+
+    "meta"
+        Only find modules listed as prereqs in "META.json" or "META.yaml".
+        Also finds modules that are prereqs of those modules.
+
+    "none"
+        Use this to set @INC to the empty list. The "use inc …" statement
+        requires at least one object, so this is needed to make it empty.
+
+    "not=<regex>"
+        Removes paths that match the regex.
+
+    "ok=<regex>"
+        If the name of the module being loaded matches the regex, it will be
+        loaded from the original @INC.
+
+    "perl5lib"
+        Expands to the paths in the PERL5LIB environment variable.
+
+    "priv"
+        Adds "privlib" and "archlib" paths from the Config module.
+
+    "-priv"
+        Removes "privlib" and "archlib" paths from the Config module.
+
+    "show"
+        This is for debugging. Prints the @INC values that have been
+        assembled so far.
+
+    "site"
+        Adds "sitelib" and "sitearch" paths from the Config module.
+
+    "-site"
+        Removes "sitelib" and "sitearch" paths from the Config module.
+
+    "zild"
+        Use Zilla::Dist's "zild listdeps" to find prereqs. Only find these
+        modules.
+
+    Directory Paths
+        Any list value containing a '/' in the name, is a real filesystem
+        path. That means you can do something like:
+
+            use inc 'foo', @INC, 'bar';
+
+    "::Foo" (Plugins)
+        Use the "inc::Plugin::Foo" module to look for smart objects. Objects
+        will be searched in plugins first, then "inc.pm".
+
+USE WITHOUT "USE"
+    If you just want to get the list of real values the "inc" would create
+    from a usage list, do this:
+
+        require inc;
+        my @inc = inc->list(<smart-object-spec-list>);
+
+    This can be used to have more control and set @INC yourself.
+
+"INC" PLUGINS
+    You can define your own "inc" plugin by making a module called
+    "inc::Plugin::Mine":
+
+        package inc::Plugin::Mine;
+        sub inc_this {
+          …
+        }
+
+    People can use it like this:
+
+        use inc qw'::Mine this=arg1,arg2';
+
+    Plugins are searched in the reverse order they are loaded in. For
+    example:
+
+        use inc qw'this ::His that ::Hers other';
+
+    The "this" object will only be looked for in "inc". The "that" object
+    will be looked for in "inc::Plugin::His" then "inc". The "that" object
+    will be looked for in "inc::Plugin::Hers", then "inc::Plugin::His" then
+    "inc".
+
+EXAMPLE USAGES
+    … coming soon …
+
+AUTHOR
+    Ingy döt Net <ingy@cpan.org>
+
+COPYRIGHT
+    Copyright 2014. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

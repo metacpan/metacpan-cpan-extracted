@@ -1,0 +1,10 @@
+#!/bin/ksh
+cd src
+make all
+cd ..
+cd perl
+mperl_lib.sh
+cd ..
+echo "Installation beendet"
+echo "Siehe man i2c_lpt bzw. i2c_ser"
+

@@ -1,0 +1,37 @@
+---
+abstract: 'API interface to the panel iRedMail (http://www.iredmail.org)'
+author:
+  - 'Lucas Tiago de Moraes <lucastiagodemoraes@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: iRedAdmin
+provides:
+  iRedAdmin:
+    file: lib/iRedAdmin.pm
+    version: '0.04'
+  iRedAdmin::Admin:
+    file: lib/iRedAdmin/Admin.pm
+  iRedAdmin::Domain:
+    file: lib/iRedAdmin/Domain.pm
+  iRedAdmin::User:
+    file: lib/iRedAdmin/User.pm
+requires:
+  Email::Valid: '0'
+  Encode: '0'
+  HTTP::Cookies: '0'
+  Moo: '0'
+  WWW::Mechanize: '0'
+resources:
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+  bugtracker: https://github.com/lucas1/Perl-iRedAdmin/issues
+  homepage: https://github.com/lucas1/Perl-iRedAdmin
+  repository: git://github.com/lucas1/Perl-iRedAdmin.git  
+version: '0.04'

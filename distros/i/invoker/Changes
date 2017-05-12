@@ -1,0 +1,26 @@
+Revision history for Perl extension invoker
+
+0.34      Mon Feb 18 10:34:46 CST 2013
+        - dist fixes
+
+0.33      Sat Feb 16 17:49:12 CST 2013
+        - upgrade Module::Install
+
+0.32      Thu Apr 26 21:56:54 CST 2012
+        - remove alpha-code warnings.
+
+0.31      Sun Oct  2 01:06:56 CST 2011
+        - fix compatibility with 5.15.1+
+
+0.30      Mon May 30 18:06:04 CST 2011
+        - make $self from package var (when used with selfvars) work as well.
+        - switch to devel::declare since B::Hooks::Parser is broken for 5.14.
+
+0.29_003  Sun Jan 16 02:11:31 CST 2011
+        - a saner implementation that works on more complicated statements.
+
+0.29_002  Sat Jan 15 23:42:13 CST 2011
+        - Fix compiling on threaded perl
+
+0.29_001  Sat Jan 15 21:25:29 CST 2011
+        - original version

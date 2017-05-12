@@ -1,0 +1,69 @@
+0.09	4 April 2012
+	Change in the test-suite so that tests should also run ok on Windows
+	with Strawberry Perl.
+
+0.08    31 March 2012
+	Brought code up to current code esthetics standards.  Fixed bug in
+	test-suite that was causing segfault.  Bug fixed by moving tests to
+	a separate file.  Don't want to spend the time to find out what is
+	causing the segfault in the test-suite.
+
+	Made sure that debug output is not compiled in if not set.
+
+0.07	17 March 2004
+	Fixed bug in process() that would cause eval's to fail with an
+	external autoloader such as "load" when a sub was found in an
+	activating section (block would be opened, but not closed).
+	Added some tests for this situation.
+
+	Added "MODULE RATING" section to the pod, with information on how
+	this module is rated.
+
+0.06	14 March 2004
+	Added further support needed for external autoloaders: specifically
+	you can now call the "ifdef" code reference stored in @INC with a
+	single parameter (module name) to obtain the underlying absolute path
+	from which the module was actually loaded.  This was needed to support
+	"load.pm".  Added some tests for this here as well.
+
+0.05	13 March 2004
+	Added patches submitted by Konstantin Tokar.  Fixes problem with empty
+	code blocks.  Removed using the "all" flag for inline comments: there's
+	just too much code out there that would be activated unintentionally.
+
+	Made checks for activation triggers a little more strict by adding a
+	word boundary check at the end.  
+
+0.04	5 March 2004
+	Added functionality for doing one line activating comments.  Idea
+	courtesy of Nick Kostirya.  Added documentation for it and some extra
+	tests.
+
+	28 January 2004
+	Made sure test-suite cleans up even on multi-versioned systems.
+
+0.03	25 January 2004
+	Moved the conversion logic to a subroutine.  It will have some effect
+	on performance at the expense of better maintainability.  Sorry guys.
+	This should allow for a more extensive functionality.
+
+	Added an official API for AUTOLOADing modules: the "process", "reset"
+	and "oneline" subroutines.
+
+	Changed name to "ifdef" after a discussion on Perl Monks.  Seemed
+	more in line with what it does.
+
+	Fixed several issues, particularly with =end and extra =pod sections.
+	Thanks to Perl Monks Mr. Muskrat and dbwiz for pointing this out.
+
+0.02	24 January 2004
+	You figure you have a nice test-suite.  But then you miss that each
+	module loaded clears out the associated @INC entry  ;-(  Fixed now.
+	Extra test now added.
+
+	Added some more documentation.  Fixed problem with newlines being
+	lost if there was a match on =begin WWWWW but without the code
+	actually being activated.
+
+0.01	24 January 2004
+	First public version of begin.pm.

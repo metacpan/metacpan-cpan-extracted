@@ -1,0 +1,102 @@
+#!/usr/local/bin/perl -w
+use strict;
+
+use iCal::Parser::HTML;
+use DateTime;
+use Getopt::Std;
+
+our $VERSION=sprintf("%d.%02d", q$Revision: 1.3 $ =~ /(\d+)\.(\d+)/);
+
+our %opts=(z=>'local');
+our $opts='d:l:z:wymh';
+our $usage=q{usage: $0 {$opts} file ...
+  -d YYYYMMDD date to generate calendar (default today)
+  -z tz       timezone to use (e.g., "America/New_York"
+  -l base_url generate links in output html
+  -w          weekly calendar
+  -m          monthly calendar
+  -y          yearly calendar
+
+The default is to generate a 1 day calendar for today in the local timezone. 
+If w,m or y option is specfied, the calendar will be for the week, month or 
+year containing the date and the date only needs to be specfied to the
+relevant level of precision.
+
+If the -l option is specified, links of the form 
+href="$base_url;type=type;date=yymmdd" will be generated as appropriate
+in the html output.
+
+};
+getopts($opts,\%opts) || die $usage;
+print $usage and exit 0 if $opts{h};
+die $usage unless @ARGV;
+
+unless($opts{d}) {
+    my @t=localtime;
+    $t[5]+=1900;
+    $t[4]++;
+    $opts{d}=sprintf('%4d%02d%02d',@t[5,4,3]);
+}
+my $type = $opts{w} ? 'week' : $opts{m} ? 'month' : $opts{y} ? 'year' : 'day';
+
+print iCal::Parser::HTML->new->parse(type=>$type,start=>$opts{d},tz=>$opts{z},
+				     base_url=>$opts{l},files=>[@ARGV]);
+
+exit 0;
+
+=head1 NAME
+
+ical2html - Convert iCalendar files to HTML
+
+=head1 SYNOPSIS
+
+    ical2html [options] file.ics ..
+
+=head1 DESCRIPTION
+
+This program uses L<iCal::Parser::HTML> to convert iCalendar files to HTML.
+
+Mutlple input files are merged into a single HTML calendar.
+
+=head1 OPTIONS
+
+=over 4
+
+=item -d yyyy[mm[dd]]
+
+The date to output events for. If no date specified, uses today.
+
+=item -w
+
+Output one week calendar for the week containing the date specified above.
+
+=item -m
+
+Output one month calendar for the month containing the date specified above.
+
+=item -y
+
+Output one year calendar for the year containing the date specified above.
+
+=item -h
+
+the ususal
+
+=back
+
+=head1 AUTHOR
+
+Rick Frankel, cpan@rickster.com
+
+=head1 COPYRIGHT
+
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+
+
+=head1 SEE ALSO
+
+L<iCal::Parser::HTML>

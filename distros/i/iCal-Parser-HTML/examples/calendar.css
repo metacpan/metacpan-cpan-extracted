@@ -1,0 +1,114 @@
+body { font-family: sans-serif; font-size: 10pt; }
+h1 { font-size: 1.25em; margin-bottom: 0; text-align: center;}
+h2 { font-size: 1.0em; margin-top: 1.5em; }
+div.sidebar h2 { margin-bottom: .1em; }
+
+.calendar-1 {color: #3F4BC0;}
+.calendar-2 {color: #6C006C;}
+.calendar-3 {color: #333333;}
+.calendar-4 {color: #FC7B00;}
+.calendar-5 {color: #538100;}
+.calendar-6 {color: #CBB200;}
+.calendar-6 {color: #BA0000;}
+.calendar-8 {color: #5B8383;}
+.calendar-9 {color: #5C2E00;}
+.calendar-10 {color: #919191;}
+
+/* daily/weeky calendar */
+td.calendar-1 {background-color: #3F4BC0 !important; color: white}
+td.calendar-2 {background-color: #6C006C !important; color: white}
+td.calendar-3 {background-color: #333333 !important; color: white}
+td.calendar-4 {background-color: #FC7B00 !important; color: white}
+td.calendar-5 {background-color: #538100 !important; color: white}
+td.calendar-6 {background-color: #CBB200 !important; color: white}
+td.calendar-6 {background-color: #BA0000 !important; color: white}
+td.calendar-8 {background-color: #5B8383 !important; color: white}
+td.calendar-9 {background-color: #5C2E00 !important; color: white}
+td.calendar-10 {background-color: #919191 !important; color: white}
+
+/* the day/week rows are id'ed by "'H'hhmm" value
+   you can hide them as follows by specifying their display attr 
+   note that you should only hide from the bottom (2330) up
+   or the layout will break as any event starting in that row
+   will not be rendered. e.g.:
+   #H2300, #H2330, #H2200,#H2230, #H2130, #H2100 { display: none; }
+   will hide everything after 9pm
+*/
+
+.all-day { font-style: italic; }
+.COMPLETED {text-decoration: line-through;}
+td { overflow: hidden; font-size: .9em; }
+table.month-calendar td { vertical-align: top;
+                          height:100px; background-color: #eee; 
+                          font-size: .9em; }
+table.year-calendar td { text-align: center; height: 25px; 
+                         background-color: #eee; }
+table.year td { vertical-align: top; }
+table.year td.year { border: 1px solid #ddd; padding: .25em; margin: .5em; }
+table.year h2 { margin-left: 1.5em; margin-bottom: .25em; margin-top: .25em;}
+td.ignore {background-color: #ddd; border: solid thin white;}
+table.month-calendar p { margin: 0em; padding: 0em; }
+col.week-legend { width: 1.25em; }
+td.week { font-size: .9em; background-color: white !important; 
+          vertical-align: middle !important; }
+td.today { border: solid thin red; }
+p.daynum { font-size: .9em; border: 1px white; text-align: right; 
+           color: #999; font-weight: bold;
+           vertical-align: top;  margin: 0em;}
+div.sidebar-calendar p.daynum { color: inherit; font-weight: inherit; }
+td.ignore p.daynum { color: #ddd; }
+a {color: inherit; text-decoration: none;}
+.organizer { text-decoration: underline; }
+.organizer, .attendee { font-size: .9em; }
+p.location { font-size: .92em; }
+div.nav a { text-decoration: none; color: inherit; }
+a:hover { color: #e80 !important; }
+div.nav { text-align: right; }
+div.calendar { width: 80%; }
+div.sidebar { position: absolute;  margin-left: 79%; margin-right: 3px;}
+
+div.calendar table { width: 100%; }
+div.month-calendar h2 { font-size: 1.25em; }
+div.sidebar-calendar-group { padding-left: 1em;}
+div.sidebar-calendar-group h2,tr.day-names { font-size:.9em; }
+table.day,table.month-calendar,table.week { table-layout: fixed;
+              background-color: #eee;
+              border-bottom: solid thin #ddd; 
+              border-collapse: collapse; }
+table.month-calendar, table.year-calendar { border-collapse: separate; 
+                                            border-bottom: none; 
+                                            background-color: white; 
+                                            white-space: nowrap; }
+td.summary {}
+col.due { white-space: nowrap; width: 5em;}
+div.sidebar div { margin-bottom: 1em;}
+div.legend {  }
+div.sidebar-calendar { font-size: .9em;}
+table.sidebar-calendar { table-layout: fixed; border-collapse: collapse; }
+table.sidebar-calendar td { text-align: right; }
+table.sidebar-calendar td.ignore {background-color: inherit; }
+tr.this-week { background-color: #eee; }
+td.this-day  { background-color: #ccc; }
+th.day-legend { background-color: white; padding: .25em; white-space: nowrap;
+                border-right: solid thin #ddd; }
+th.hour-legend { vertical-align: middle; border-right: solid thin white;
+                 border-top: solid thin white;
+                 text-align: right; padding-right: .5em; }
+td.half-hour00, td.half-hour30 { vertical-align: top;
+                                 border-right: solid thin white; }
+td.half-hour00 { border-top: solid thin white; }
+td.half-hour30 { border-top: dashed thin white; }
+col.hour-legend {width: 4em; }
+th.hour-legend, td.half-hour { font-size: 1em;}
+th.night { color: white; background-color: #666;}
+tr.all-day { vertical-align: middle; background-color: #eee;}
+td.all-day { border: solid thin white; }
+tr.all-day-sep { height: 3px; background-color: white; }
+table.day p { margin: .1em 0; }
+p.description { font-size: .75em; }
+p.summary { margin-top: 2px;}
+div.event-time { color: white; 
+                 border-bottom: dotted thin grey; padding-top:1px; }
+p.legend { margin: 0em; padding-left: 1em; }
+table.todo { table-layout: fixed; border-collapse: collapse; font-size: .9em; }
+td.priority { text-align: right; }

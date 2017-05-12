@@ -1,0 +1,18 @@
+0.06 Sun Dec 14 13:30:59 PST 2014
+ - Accidentally shipped with XXX
+
+0.05 Sun Dec 14 13:17:05 PST 2014
+ - Add LC object
+ - Fix some broken objects
+
+0.04 Fri Nov 28 18:19:24 PST 2014
+ - Implement more objects
+ - Write more tests
+
+0.03 Thu Nov 27 01:05:51 PST 2014
+ - Implement the 'core' object
+ - Implement 'list' object
+
+0.02 Wed Nov 26 23:24:58 PST 2014
+ - First version.
+

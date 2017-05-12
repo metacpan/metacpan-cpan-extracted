@@ -1,0 +1,900 @@
+<?xml version="1.0"?>
+<ical>
+  <calendar calscale="GREGORIAN" x-wr-timezone="America/New_York" version="2.0" name="Test" description="My Test Calendar" prodid="-//Apple Computer, Inc//iCal 1.5//EN" index="1" id="7CCE8555-3516-11D9-8A43-000D93C45D90"/>
+  <events>
+    <year year="2004">
+      <month month="11">
+        <week week="45">
+          <day date="2004-11-01"/>
+          <day date="2004-11-02"/>
+          <day date="2004-11-03"/>
+          <day date="2004-11-04"/>
+          <day date="2004-11-05"/>
+          <day date="2004-11-06"/>
+          <day date="2004-11-07">
+            <event uid="AA403AC0-35CD-11D9-8110-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90" all-day="1">
+              <summary>span</summary>
+              <dtstamp>2004-12-08T19:47:11</dtstamp>
+              <dtend>2004-11-08T00:00:00</dtend>
+              <dtstart>2004-11-07T00:00:00</dtstart>
+            </event>
+          </day>
+        </week>
+        <week week="46">
+          <day date="2004-11-08">
+            <event uid="AA403AC0-35CD-11D9-8110-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90" all-day="1">
+              <summary>span</summary>
+              <dtstamp>2004-12-08T19:47:11</dtstamp>
+              <dtend>2004-11-09T00:00:00</dtend>
+              <dtstart>2004-11-08T00:00:00</dtstart>
+            </event>
+            <event uid="783BF902-35CD-11D9-8110-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>long1</summary>
+              <location>here</location>
+              <hours>5.00</hours>
+              <dtstamp>2004-11-14T15:24:30</dtstamp>
+              <dtend>2004-11-09T00:00:00</dtend>
+              <dtstart>2004-11-08T19:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-11-09">
+            <event uid="AA403AC0-35CD-11D9-8110-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90" all-day="1">
+              <summary>span</summary>
+              <dtstamp>2004-12-08T19:47:11</dtstamp>
+              <dtend>2004-11-10T00:00:00</dtend>
+              <dtstart>2004-11-09T00:00:00</dtstart>
+            </event>
+            <event uid="783BF902-35CD-11D9-8110-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>long1</summary>
+              <location>here</location>
+              <hours>24.00</hours>
+              <dtstamp>2004-11-14T15:24:30</dtstamp>
+              <dtend>2004-11-10T00:00:00</dtend>
+              <dtstart>2004-11-09T00:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-11-10">
+            <event uid="CC534437-4977-11D9-B3AD-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90" all-day="1">
+              <summary>overlapping span</summary>
+              <dtstamp>2004-12-08T19:47:03</dtstamp>
+              <dtend>2004-11-11T00:00:00</dtend>
+              <dtstart>2004-11-10T00:00:00</dtstart>
+            </event>
+            <event uid="AA403AC0-35CD-11D9-8110-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90" all-day="1">
+              <summary>span</summary>
+              <dtstamp>2004-12-08T19:47:11</dtstamp>
+              <dtend>2004-11-11T00:00:00</dtend>
+              <dtstart>2004-11-10T00:00:00</dtstart>
+            </event>
+            <event uid="783BF902-35CD-11D9-8110-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>long1</summary>
+              <hours>20.00</hours>
+              <location>here</location>
+              <dtstamp>2004-11-14T15:24:30</dtstamp>
+              <dtend>2004-11-10T20:00:00</dtend>
+              <dtstart>2004-11-10T00:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-11-11">
+            <event uid="CC534437-4977-11D9-B3AD-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90" all-day="1">
+              <summary>overlapping span</summary>
+              <dtstamp>2004-12-08T19:47:03</dtstamp>
+              <dtend>2004-11-12T00:00:00</dtend>
+              <dtstart>2004-11-11T00:00:00</dtstart>
+            </event>
+            <event uid="95CCBF98-3685-11D9-8CA5-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>overnight</summary>
+              <hours>15.00</hours>
+              <dtstamp>2004-11-14T16:42:58</dtstamp>
+              <dtend>2004-11-12T00:00:00</dtend>
+              <dtstart>2004-11-11T09:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-11-12" conflict="1">
+            <event uid="CC534437-4977-11D9-B3AD-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90" all-day="1">
+              <summary>overlapping span</summary>
+              <dtstamp>2004-12-08T19:47:03</dtstamp>
+              <dtend>2004-11-13T00:00:00</dtend>
+              <dtstart>2004-11-12T00:00:00</dtstart>
+            </event>
+            <event uid="95CCBF98-3685-11D9-8CA5-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>overnight</summary>
+              <hours>14.00</hours>
+              <dtstamp>2004-11-14T16:42:58</dtstamp>
+              <dtend>2004-11-12T14:00:00</dtend>
+              <dtstart>2004-11-12T00:00:00</dtstart>
+            </event>
+            <event uid="A29A6C78-4A34-11D9-B3AD-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90" conflict-number="1">
+              <summary>mid-overlap</summary>
+              <hours>1.50</hours>
+              <dtstamp>2004-12-09T17:49:56</dtstamp>
+              <dtend>2004-11-12T04:30:00</dtend>
+              <dtstart>2004-11-12T03:00:00</dtstart>
+            </event>
+            <event uid="FFB5DD62-4991-11D9-B3AD-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90" conflict-number="1">
+              <summary>third overlap</summary>
+              <hours>4.75</hours>
+              <dtstamp>2004-12-08T22:28:45</dtstamp>
+              <dtend>2004-11-12T15:45:00</dtend>
+              <dtstart>2004-11-12T11:00:00</dtstart>
+            </event>
+            <event uid="40E3266B-4A36-11D9-B3AD-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>another</summary>
+              <hours>1.00</hours>
+              <dtstamp>2004-12-09T18:02:32</dtstamp>
+              <dtend>2004-11-12T17:00:00</dtend>
+              <dtstart>2004-11-12T16:00:00</dtstart>
+            </event>
+            <event uid="823732B9-3516-11D9-8A43-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <url>http://foo</url>
+              <summary>1 hr event</summary>
+              <hours>1.00</hours>
+              <status>TENTATIVE</status>
+              <dtstamp>2004-11-13T17:06:34</dtstamp>
+              <dtend>2004-11-12T22:00:00</dtend>
+              <valarms count="1">
+                <valarm>
+                  <when>2004-11-12T20:45:00</when>
+                  <action>DISPLAY</action>
+                  <description>Event reminder</description>
+                </valarm>
+              </valarms>
+              <organizer>
+                <cn>Rick Frankel</cn>
+                <value>mailto:rick</value>
+              </organizer>
+              <description>this is a note
+line 2
+and a longer line for line three. make it wrap</description>
+              <x-wr-itipstatusml>UNCLEAN</x-wr-itipstatusml>
+              <dtstart>2004-11-12T21:00:00</dtstart>
+              <attendees count="3">
+                <attendee>
+                  <cn>Lindsey Biel</cn>
+                  <value>mailto:lindsey</value>
+                </attendee>
+                <attendee>
+                  <cn>Jay Frankel</cn>
+                  <value>mailto:jayfrankel</value>
+                </attendee>
+                <attendee>
+                  <cn>someone else</cn>
+                  <value>invalid:nomail</value>
+                </attendee>
+              </attendees>
+            </event>
+          </day>
+          <day date="2004-11-13">
+            <event uid="4D97CFCB-3687-11D9-8CA5-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>short overnight</summary>
+              <hours>7.00</hours>
+              <dtstamp>2004-11-14T16:51:37</dtstamp>
+              <dtend>2004-11-14T00:00:00</dtend>
+              <dtstart>2004-11-13T17:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-11-14">
+            <event uid="4D97CFCB-3687-11D9-8CA5-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>short overnight</summary>
+              <hours>16.50</hours>
+              <dtstamp>2004-11-14T16:51:37</dtstamp>
+              <dtend>2004-11-14T16:30:00</dtend>
+              <dtstart>2004-11-14T00:00:00</dtstart>
+            </event>
+          </day>
+        </week>
+        <week week="47">
+          <day date="2004-11-15">
+            <event uid="A4E57872-3516-11D9-8A43-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90" all-day="1">
+              <summary>all day</summary>
+              <dtstamp>2004-11-12T20:52:26</dtstamp>
+              <dtend>2004-11-16T00:00:00</dtend>
+              <dtstart>2004-11-15T00:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-11-16">
+            <event uid="B347D452-3516-11D9-8A43-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>weekly</summary>
+              <hours>1.00</hours>
+              <dtstamp>2004-11-30T17:46:44</dtstamp>
+              <dtend>2004-11-16T22:00:00</dtend>
+              <organizer>
+                <cn>Frankel Rick</cn>
+                <value>mailto:rick</value>
+              </organizer>
+              <x-wr-itipstatusml>UNCLEAN</x-wr-itipstatusml>
+              <dtstart>2004-11-16T21:00:00</dtstart>
+              <attendees count="2">
+                <attendee>
+                  <cn>Biel Lindsey</cn>
+                  <value>mailto:lindsey</value>
+                </attendee>
+                <attendee>
+                  <cn>Frankel Jay</cn>
+                  <value>mailto:jayfrankel</value>
+                </attendee>
+              </attendees>
+            </event>
+          </day>
+          <day date="2004-11-17">
+            <event uid="D5EEE785-3516-11D9-8A43-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>daily</summary>
+              <hours>1.00</hours>
+              <status>CONFIRMED</status>
+              <dtstamp>2004-11-26T17:07:30</dtstamp>
+              <dtend>2004-11-17T22:00:00</dtend>
+              <valarms count="1">
+                <valarm>
+                  <summary>Alarm notification</summary>
+                  <when>2004-11-16T21:00:00</when>
+                  <action>EMAIL</action>
+                  <description>This is an event reminder</description>
+                  <attendees count="1">
+                    <attendee>
+                      <value>mailto:rick</value>
+                    </attendee>
+                  </attendees>
+                </valarm>
+              </valarms>
+              <organizer>
+                <cn>Rick Frankel</cn>
+                <value>mailto:rick</value>
+              </organizer>
+              <x-wr-itipstatusml>UNCLEAN</x-wr-itipstatusml>
+              <attendees count="1">
+                <attendee>
+                  <cn>Lindsey Biel</cn>
+                  <value>mailto:lindsey</value>
+                </attendee>
+              </attendees>
+              <dtstart>2004-11-17T21:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-11-18">
+            <event uid="D5EEE785-3516-11D9-8A43-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>daily</summary>
+              <hours>2.00</hours>
+              <status>CANCELLED</status>
+              <dtstamp>2004-11-13T15:33:54</dtstamp>
+              <dtend>2004-11-18T23:00:00</dtend>
+              <organizer>
+                <cn>Rick Frankel</cn>
+                <value>mailto:rick</value>
+              </organizer>
+              <x-wr-itipstatusml>UNCLEAN</x-wr-itipstatusml>
+              <attendees count="1">
+                <attendee>
+                  <cn>Lindsey Biel</cn>
+                  <value>mailto:lindsey</value>
+                </attendee>
+              </attendees>
+              <dtstart>2004-11-18T21:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-11-19">
+            <event uid="D5EEE785-3516-11D9-8A43-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>daily</summary>
+              <hours>1.00</hours>
+              <dtstamp>2004-11-16T21:49:41</dtstamp>
+              <dtend>2004-11-19T22:00:00</dtend>
+              <organizer>
+                <cn>Rick Frankel</cn>
+                <value>mailto:rick</value>
+              </organizer>
+              <x-wr-itipstatusml>UNCLEAN</x-wr-itipstatusml>
+              <dtstart>2004-11-19T21:00:00</dtstart>
+              <attendees count="1">
+                <attendee>
+                  <cn>Lindsey Biel</cn>
+                  <value>mailto:lindsey</value>
+                </attendee>
+              </attendees>
+            </event>
+          </day>
+          <day date="2004-11-20">
+            <event uid="D5EEE785-3516-11D9-8A43-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>daily</summary>
+              <hours>1.00</hours>
+              <dtstamp>2004-11-16T21:49:41</dtstamp>
+              <dtend>2004-11-20T22:00:00</dtend>
+              <organizer>
+                <cn>Rick Frankel</cn>
+                <value>mailto:rick</value>
+              </organizer>
+              <x-wr-itipstatusml>UNCLEAN</x-wr-itipstatusml>
+              <dtstart>2004-11-20T21:00:00</dtstart>
+              <attendees count="1">
+                <attendee>
+                  <cn>Lindsey Biel</cn>
+                  <value>mailto:lindsey</value>
+                </attendee>
+              </attendees>
+            </event>
+          </day>
+          <day date="2004-11-21"/>
+        </week>
+        <week week="48">
+          <day date="2004-11-22"/>
+          <day date="2004-11-23">
+            <event uid="B347D452-3516-11D9-8A43-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>weekly</summary>
+              <hours>1.00</hours>
+              <dtstamp>2004-11-30T17:46:44</dtstamp>
+              <dtend>2004-11-23T22:00:00</dtend>
+              <organizer>
+                <cn>Frankel Rick</cn>
+                <value>mailto:rick</value>
+              </organizer>
+              <x-wr-itipstatusml>UNCLEAN</x-wr-itipstatusml>
+              <dtstart>2004-11-23T21:00:00</dtstart>
+              <attendees count="2">
+                <attendee>
+                  <cn>Biel Lindsey</cn>
+                  <value>mailto:lindsey</value>
+                </attendee>
+                <attendee>
+                  <cn>Frankel Jay</cn>
+                  <value>mailto:jayfrankel</value>
+                </attendee>
+              </attendees>
+            </event>
+          </day>
+          <day date="2004-11-24">
+            <event uid="E7E912A0-3516-11D9-8A43-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90" all-day="1">
+              <summary>all day repeat</summary>
+              <dtstamp>2004-11-13T11:28:20</dtstamp>
+              <dtend>2004-11-25T00:00:00</dtend>
+              <dtstart>2004-11-24T00:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-11-25">
+            <event uid="E7E912A0-3516-11D9-8A43-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90" all-day="1">
+              <summary>all day repeat</summary>
+              <dtstamp>2004-11-13T11:28:20</dtstamp>
+              <dtend>2004-11-26T00:00:00</dtend>
+              <dtstart>2004-11-25T00:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-11-26">
+            <event uid="E7E912A0-3516-11D9-8A43-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90" all-day="1">
+              <summary>all day repeat</summary>
+              <dtstamp>2004-11-13T11:28:20</dtstamp>
+              <dtend>2004-11-27T00:00:00</dtend>
+              <dtstart>2004-11-26T00:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-11-27">
+            <event uid="EE9B2B93-35CC-11D9-8110-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>another weekly</summary>
+              <hours>1.00</hours>
+              <dtstamp>2004-11-13T19:20:37</dtstamp>
+              <dtend>2004-11-27T20:00:00</dtend>
+              <dtstart>2004-11-27T19:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-11-28"/>
+        </week>
+        <week week="49">
+          <day date="2004-11-29">
+            <event uid="4F2C757A-431A-11D9-B3AF-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90" all-day="1">
+              <summary>monday</summary>
+              <dtstamp>2004-11-30T16:53:51</dtstamp>
+              <dtend>2004-11-30T00:00:00</dtend>
+              <dtstart>2004-11-29T00:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-11-30">
+            <event uid="0C86E2CB-3DCC-11D9-A9BF-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90" all-day="1">
+              <summary>eom allday</summary>
+              <location>here</location>
+              <dtstamp>2004-11-30T18:12:46</dtstamp>
+              <dtend>2004-12-01T00:00:00</dtend>
+              <description>this is &lt; a note</description>
+              <dtstart>2004-11-30T00:00:00</dtstart>
+            </event>
+            <event uid="B347D452-3516-11D9-8A43-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>weekly</summary>
+              <hours>1.00</hours>
+              <dtstamp>2004-11-30T17:46:44</dtstamp>
+              <dtend>2004-11-30T22:00:00</dtend>
+              <organizer>
+                <cn>Frankel Rick</cn>
+                <value>mailto:rick</value>
+              </organizer>
+              <x-wr-itipstatusml>UNCLEAN</x-wr-itipstatusml>
+              <dtstart>2004-11-30T21:00:00</dtstart>
+              <attendees count="2">
+                <attendee>
+                  <cn>Biel Lindsey</cn>
+                  <value>mailto:lindsey</value>
+                </attendee>
+                <attendee>
+                  <cn>Frankel Jay</cn>
+                  <value>mailto:jayfrankel</value>
+                </attendee>
+              </attendees>
+            </event>
+          </day>
+          <day date="2004-12-01">
+            <event uid="1C98FD62-35C6-11D9-8110-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>mon/wed-changed</summary>
+              <hours>1.00</hours>
+              <dtstamp>2004-11-13T21:45:27</dtstamp>
+              <dtend>2004-12-01T19:00:00</dtend>
+              <dtstart>2004-12-01T18:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-12-02">
+            <event uid="5A4E636A-35E7-11D9-9E64-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>weird</summary>
+              <hours>1.00</hours>
+              <dtstamp>2004-11-16T21:37:08</dtstamp>
+              <dtend>2004-12-02T01:00:00</dtend>
+              <valarms count="2">
+                <valarm>
+                  <when>2004-12-01T23:45:00</when>
+                  <action>DISPLAY</action>
+                  <description>Event reminder</description>
+                </valarm>
+                <valarm>
+                  <when>2004-12-01T23:30:00</when>
+                  <action>DISPLAY</action>
+                  <description>Event reminder</description>
+                </valarm>
+              </valarms>
+              <dtstart>2004-12-02T00:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-12-03">
+            <event uid="5A4E636A-35E7-11D9-9E64-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>weird</summary>
+              <hours>1.00</hours>
+              <dtstamp>2004-11-16T21:37:08</dtstamp>
+              <dtend>2004-12-03T01:00:00</dtend>
+              <valarms count="2">
+                <valarm>
+                  <when>2004-12-02T23:45:00</when>
+                  <action>DISPLAY</action>
+                  <description>Event reminder</description>
+                </valarm>
+                <valarm>
+                  <when>2004-12-02T23:30:00</when>
+                  <action>DISPLAY</action>
+                  <description>Event reminder</description>
+                </valarm>
+              </valarms>
+              <dtstart>2004-12-03T00:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-12-04"/>
+          <day date="2004-12-05"/>
+        </week>
+      </month>
+      <month month="12">
+        <week week="49">
+          <day date="2004-11-29">
+            <event uid="4F2C757A-431A-11D9-B3AF-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90" all-day="1">
+              <summary>monday</summary>
+              <dtstamp>2004-11-30T16:53:51</dtstamp>
+              <dtend>2004-11-30T00:00:00</dtend>
+              <dtstart>2004-11-29T00:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-11-30">
+            <event uid="0C86E2CB-3DCC-11D9-A9BF-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90" all-day="1">
+              <summary>eom allday</summary>
+              <location>here</location>
+              <dtstamp>2004-11-30T18:12:46</dtstamp>
+              <dtend>2004-12-01T00:00:00</dtend>
+              <description>this is &lt; a note</description>
+              <dtstart>2004-11-30T00:00:00</dtstart>
+            </event>
+            <event uid="B347D452-3516-11D9-8A43-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>weekly</summary>
+              <hours>1.00</hours>
+              <dtstamp>2004-11-30T17:46:44</dtstamp>
+              <dtend>2004-11-30T22:00:00</dtend>
+              <organizer>
+                <cn>Frankel Rick</cn>
+                <value>mailto:rick</value>
+              </organizer>
+              <x-wr-itipstatusml>UNCLEAN</x-wr-itipstatusml>
+              <dtstart>2004-11-30T21:00:00</dtstart>
+              <attendees count="2">
+                <attendee>
+                  <cn>Biel Lindsey</cn>
+                  <value>mailto:lindsey</value>
+                </attendee>
+                <attendee>
+                  <cn>Frankel Jay</cn>
+                  <value>mailto:jayfrankel</value>
+                </attendee>
+              </attendees>
+            </event>
+          </day>
+          <day date="2004-12-01">
+            <event uid="1C98FD62-35C6-11D9-8110-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>mon/wed-changed</summary>
+              <hours>1.00</hours>
+              <dtstamp>2004-11-13T21:45:27</dtstamp>
+              <dtend>2004-12-01T19:00:00</dtend>
+              <dtstart>2004-12-01T18:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-12-02">
+            <event uid="5A4E636A-35E7-11D9-9E64-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>weird</summary>
+              <hours>1.00</hours>
+              <dtstamp>2004-11-16T21:37:08</dtstamp>
+              <dtend>2004-12-02T01:00:00</dtend>
+              <valarms count="2">
+                <valarm>
+                  <when>2004-12-01T23:45:00</when>
+                  <action>DISPLAY</action>
+                  <description>Event reminder</description>
+                </valarm>
+                <valarm>
+                  <when>2004-12-01T23:30:00</when>
+                  <action>DISPLAY</action>
+                  <description>Event reminder</description>
+                </valarm>
+              </valarms>
+              <dtstart>2004-12-02T00:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-12-03">
+            <event uid="5A4E636A-35E7-11D9-9E64-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>weird</summary>
+              <hours>1.00</hours>
+              <dtstamp>2004-11-16T21:37:08</dtstamp>
+              <dtend>2004-12-03T01:00:00</dtend>
+              <valarms count="2">
+                <valarm>
+                  <when>2004-12-02T23:45:00</when>
+                  <action>DISPLAY</action>
+                  <description>Event reminder</description>
+                </valarm>
+                <valarm>
+                  <when>2004-12-02T23:30:00</when>
+                  <action>DISPLAY</action>
+                  <description>Event reminder</description>
+                </valarm>
+              </valarms>
+              <dtstart>2004-12-03T00:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-12-04"/>
+          <day date="2004-12-05"/>
+        </week>
+        <week week="50">
+          <day date="2004-12-06">
+            <event uid="1C98FD62-35C6-11D9-8110-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>mon/wed</summary>
+              <hours>1.00</hours>
+              <dtstamp>2004-11-13T21:45:27</dtstamp>
+              <dtend>2004-12-06T19:00:00</dtend>
+              <dtstart>2004-12-06T18:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-12-07"/>
+          <day date="2004-12-08">
+            <event uid="1C98FD62-35C6-11D9-8110-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>mon/wed</summary>
+              <hours>1.00</hours>
+              <dtstamp>2004-11-13T21:45:27</dtstamp>
+              <dtend>2004-12-08T19:00:00</dtend>
+              <dtstart>2004-12-08T18:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-12-09">
+            <event uid="5A4E636A-35E7-11D9-9E64-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>weird</summary>
+              <hours>1.00</hours>
+              <dtstamp>2004-11-16T21:37:08</dtstamp>
+              <dtend>2004-12-09T01:00:00</dtend>
+              <valarms count="2">
+                <valarm>
+                  <when>2004-12-08T23:45:00</when>
+                  <action>DISPLAY</action>
+                  <description>Event reminder</description>
+                </valarm>
+                <valarm>
+                  <when>2004-12-08T23:30:00</when>
+                  <action>DISPLAY</action>
+                  <description>Event reminder</description>
+                </valarm>
+              </valarms>
+              <dtstart>2004-12-09T00:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-12-10">
+            <event uid="5A4E636A-35E7-11D9-9E64-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>weird</summary>
+              <hours>1.00</hours>
+              <dtstamp>2004-11-16T21:37:08</dtstamp>
+              <dtend>2004-12-10T01:00:00</dtend>
+              <valarms count="2">
+                <valarm>
+                  <when>2004-12-09T23:45:00</when>
+                  <action>DISPLAY</action>
+                  <description>Event reminder</description>
+                </valarm>
+                <valarm>
+                  <when>2004-12-09T23:30:00</when>
+                  <action>DISPLAY</action>
+                  <description>Event reminder</description>
+                </valarm>
+              </valarms>
+              <dtstart>2004-12-10T00:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-12-11">
+            <event uid="EE9B2B93-35CC-11D9-8110-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>another weekly</summary>
+              <hours>1.00</hours>
+              <dtstamp>2004-11-13T19:20:37</dtstamp>
+              <dtend>2004-12-11T20:00:00</dtend>
+              <dtstart>2004-12-11T19:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-12-12">
+            <event uid="A94F4AE4-431A-11D9-9399-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>sunday</summary>
+              <hours>1.00</hours>
+              <dtstamp>2004-11-30T16:56:23</dtstamp>
+              <dtend>2004-12-12T18:00:00</dtend>
+              <dtstart>2004-12-12T17:00:00</dtstart>
+            </event>
+          </day>
+        </week>
+        <week week="51">
+          <day date="2004-12-13">
+            <event uid="1C98FD62-35C6-11D9-8110-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>mon/wed</summary>
+              <hours>1.00</hours>
+              <dtstamp>2004-11-13T21:45:27</dtstamp>
+              <dtend>2004-12-13T19:00:00</dtend>
+              <dtstart>2004-12-13T18:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-12-14"/>
+          <day date="2004-12-15">
+            <event uid="1C98FD62-35C6-11D9-8110-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>mon/wed</summary>
+              <hours>1.00</hours>
+              <dtstamp>2004-11-13T21:45:27</dtstamp>
+              <dtend>2004-12-15T19:00:00</dtend>
+              <dtstart>2004-12-15T18:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-12-16">
+            <event uid="5A4E636A-35E7-11D9-9E64-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>weird</summary>
+              <hours>1.00</hours>
+              <dtstamp>2004-11-16T21:37:08</dtstamp>
+              <dtend>2004-12-16T01:00:00</dtend>
+              <valarms count="2">
+                <valarm>
+                  <when>2004-12-15T23:45:00</when>
+                  <action>DISPLAY</action>
+                  <description>Event reminder</description>
+                </valarm>
+                <valarm>
+                  <when>2004-12-15T23:30:00</when>
+                  <action>DISPLAY</action>
+                  <description>Event reminder</description>
+                </valarm>
+              </valarms>
+              <dtstart>2004-12-16T00:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-12-17">
+            <event uid="5A4E636A-35E7-11D9-9E64-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>weird</summary>
+              <hours>1.00</hours>
+              <dtstamp>2004-11-16T21:37:08</dtstamp>
+              <dtend>2004-12-17T01:00:00</dtend>
+              <valarms count="2">
+                <valarm>
+                  <when>2004-12-16T23:45:00</when>
+                  <action>DISPLAY</action>
+                  <description>Event reminder</description>
+                </valarm>
+                <valarm>
+                  <when>2004-12-16T23:30:00</when>
+                  <action>DISPLAY</action>
+                  <description>Event reminder</description>
+                </valarm>
+              </valarms>
+              <dtstart>2004-12-17T00:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-12-18"/>
+          <day date="2004-12-19"/>
+        </week>
+        <week week="52">
+          <day date="2004-12-20">
+            <event uid="1C98FD62-35C6-11D9-8110-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>mon/wed</summary>
+              <hours>1.00</hours>
+              <dtstamp>2004-11-13T21:45:27</dtstamp>
+              <dtend>2004-12-20T19:00:00</dtend>
+              <dtstart>2004-12-20T18:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-12-21"/>
+          <day date="2004-12-22"/>
+          <day date="2004-12-23">
+            <event uid="5A4E636A-35E7-11D9-9E64-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>weird</summary>
+              <hours>1.00</hours>
+              <dtstamp>2004-11-16T21:37:08</dtstamp>
+              <dtend>2004-12-23T01:00:00</dtend>
+              <valarms count="2">
+                <valarm>
+                  <when>2004-12-22T23:45:00</when>
+                  <action>DISPLAY</action>
+                  <description>Event reminder</description>
+                </valarm>
+                <valarm>
+                  <when>2004-12-22T23:30:00</when>
+                  <action>DISPLAY</action>
+                  <description>Event reminder</description>
+                </valarm>
+              </valarms>
+              <dtstart>2004-12-23T00:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-12-24">
+            <event uid="5A4E636A-35E7-11D9-9E64-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>weird</summary>
+              <hours>1.00</hours>
+              <dtstamp>2004-11-16T21:37:08</dtstamp>
+              <dtend>2004-12-24T01:00:00</dtend>
+              <valarms count="2">
+                <valarm>
+                  <when>2004-12-23T23:45:00</when>
+                  <action>DISPLAY</action>
+                  <description>Event reminder</description>
+                </valarm>
+                <valarm>
+                  <when>2004-12-23T23:30:00</when>
+                  <action>DISPLAY</action>
+                  <description>Event reminder</description>
+                </valarm>
+              </valarms>
+              <dtstart>2004-12-24T00:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-12-25">
+            <event uid="EE9B2B93-35CC-11D9-8110-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>another weekly</summary>
+              <hours>1.00</hours>
+              <dtstamp>2004-11-13T19:20:37</dtstamp>
+              <dtend>2004-12-25T20:00:00</dtend>
+              <dtstart>2004-12-25T19:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-12-26"/>
+        </week>
+        <week week="53">
+          <day date="2004-12-27"/>
+          <day date="2004-12-28"/>
+          <day date="2004-12-29"/>
+          <day date="2004-12-30">
+            <event uid="5A4E636A-35E7-11D9-9E64-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>weird</summary>
+              <hours>1.00</hours>
+              <dtstamp>2004-11-16T21:37:08</dtstamp>
+              <dtend>2004-12-30T01:00:00</dtend>
+              <valarms count="2">
+                <valarm>
+                  <when>2004-12-29T23:45:00</when>
+                  <action>DISPLAY</action>
+                  <description>Event reminder</description>
+                </valarm>
+                <valarm>
+                  <when>2004-12-29T23:30:00</when>
+                  <action>DISPLAY</action>
+                  <description>Event reminder</description>
+                </valarm>
+              </valarms>
+              <dtstart>2004-12-30T00:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2004-12-31">
+            <event uid="D97AFD6E-3DCB-11D9-A9BF-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90" all-day="1">
+              <summary>eoy  all</summary>
+              <dtstamp>2004-11-23T22:52:46</dtstamp>
+              <dtend>2005-01-01T00:00:00</dtend>
+              <dtstart>2004-12-31T00:00:00</dtstart>
+            </event>
+            <event uid="5A4E636A-35E7-11D9-9E64-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+              <summary>weird</summary>
+              <hours>1.00</hours>
+              <dtstamp>2004-11-16T21:37:08</dtstamp>
+              <dtend>2004-12-31T01:00:00</dtend>
+              <valarms count="2">
+                <valarm>
+                  <when>2004-12-30T23:45:00</when>
+                  <action>DISPLAY</action>
+                  <description>Event reminder</description>
+                </valarm>
+                <valarm>
+                  <when>2004-12-30T23:30:00</when>
+                  <action>DISPLAY</action>
+                  <description>Event reminder</description>
+                </valarm>
+              </valarms>
+              <dtstart>2004-12-31T00:00:00</dtstart>
+            </event>
+          </day>
+          <day date="2005-01-01"/>
+          <day date="2005-01-02"/>
+        </week>
+      </month>
+    </year>
+  </events>
+  <todos>
+    <todo uid="B78E68F2-35E7-11D9-9E64-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+      <summary>todo 1</summary>
+      <url>mailto:me</url>
+      <completed>2004-11-13T00:00:00</completed>
+      <status>COMPLETED</status>
+      <dtstamp>2004-11-13T21:49:52</dtstamp>
+      <priority>9</priority>
+      <dtstart>2004-11-13T00:00:00</dtstart>
+    </todo>
+    <todo uid="BC83F9D2-35E7-11D9-9E64-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+      <summary>todo 2</summary>
+      <dtstamp>2004-12-10T23:02:10</dtstamp>
+      <valarms count="2">
+        <valarm>
+          <when>2004-11-13T00:02:00</when>
+          <attach>file://localhost/Applications/iCal.app/</attach>
+          <action>PROCEDURE</action>
+        </valarm>
+        <valarm>
+          <summary>Alarm notification</summary>
+          <when>2004-11-12T23:45:00</when>
+          <action>EMAIL</action>
+          <description>This is an event reminder</description>
+          <attendees count="1">
+            <attendee>
+              <value>mailto:rick</value>
+            </attendee>
+          </attendees>
+        </valarm>
+      </valarms>
+      <priority>1</priority>
+      <due>2004-11-20T00:00:00</due>
+      <dtstart>2004-11-13T00:00:00</dtstart>
+    </todo>
+    <todo uid="0BC74A86-35E9-11D9-9E64-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+      <summary>todo 3</summary>
+      <dtstamp>2004-11-16T21:19:21</dtstamp>
+      <valarms count="2">
+        <valarm>
+          <when>2004-11-11T23:45:00</when>
+          <attach>file://localhost/Users/rick/Documents/businesscard.bcard</attach>
+          <action>PROCEDURE</action>
+        </valarm>
+        <valarm>
+          <when>2004-11-11T23:45:00</when>
+          <action>DISPLAY</action>
+          <description>Event reminder</description>
+        </valarm>
+      </valarms>
+      <priority>5</priority>
+      <due>2004-11-14T00:00:00</due>
+      <dtstart>2004-11-12T00:00:00</dtstart>
+    </todo>
+    <todo uid="FF6841B4-35ED-11D9-98FE-000D93C45D90" idref="7CCE8555-3516-11D9-8A43-000D93C45D90">
+      <summary>todo 4</summary>
+      <dtstamp>2004-11-13T22:34:28</dtstamp>
+      <priority>99</priority>
+      <description>not much</description>
+      <dtstart>2004-11-13T00:00:00</dtstart>
+    </todo>
+  </todos>
+</ical>

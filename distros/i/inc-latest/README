@@ -1,0 +1,161 @@
+NAME
+    inc::latest - use modules bundled in inc/ if they are newer than
+    installed ones
+
+VERSION
+    version 0.500
+
+SYNOPSIS
+      # in Makefile.PL or Build.PL
+      use inc::latest 'Some::Configure::Prereq';
+
+DESCRIPTION
+    WARNING -- THIS IS AN EXPERIMENTAL MODULE. It was originally bundled (as
+    an experiment) with Module::Build and has been split out for more
+    general use.
+
+    The "inc::latest" module helps bootstrap configure-time dependencies for
+    CPAN distributions. These dependencies get bundled into the "inc"
+    directory within a distribution and are used by Makefile.PL or Build.PL.
+
+    Arguments to "inc::latest" are module names that are checked against
+    both the current @INC array and against specially-named directories in
+    "inc". If the bundled version is newer than the installed one (or the
+    module isn't installed, then, the bundled directory is added to the
+    start of @INC and the module is loaded from there.
+
+    There are actually two variations of "inc::latest" -- one for authors
+    and one for the "inc" directory. For distribution authors, the
+    "inc::latest" installed in the system will record modules loaded via
+    "inc::latest" and can be used to create the bundled files in "inc",
+    including writing the second variation as "inc/latest.pm".
+
+    This second "inc::latest" is the one that is loaded in a distribution
+    being installed (e.g. from Makefile.PL or Build.PL). This bundled
+    "inc::latest" is the one that determines which module to load.
+
+  Special notes on bundling
+    The "inc::latest" module creates bundled directories based on the
+    packlist file of an installed distribution. Even though "inc::latest"
+    takes module name arguments, it is better to think of it as bundling and
+    making available entire *distributions*. When a module is loaded through
+    "inc::latest", it looks in all bundled distributions in "inc/" for a
+    newer module than can be found in the existing @INC array.
+
+    Thus, the module-name provided should usually be the "top-level" module
+    name of a distribution, though this is not strictly required.
+    "inc::latest" has a number of heuristics to discover module names,
+    allowing users to do things like this:
+
+      use inc::latest 'Devel::AssertOS::Unix';
+
+    even though Devel::AssertOS::Unix is contained within the Devel-CheckOS
+    distribution.
+
+    At the current time, packlists are required. Thus, bundling dual-core
+    modules may require a 'forced install' over versions in the latest
+    version of perl in order to create the necessary packlist for bundling.
+
+  Managing dependency chains
+    Before bundling a distribution you must ensure that all prerequisites
+    are also bundled and load in the correct order.
+
+    For example, if you need "Wibble", but "Wibble" depends on "Wobble", and
+    you have bundled "Module::Build", your Build.PL might look like this:
+
+      use inc::latest 'Wobble';
+      use inc::latest 'Wibble';
+      use inc::latest 'Module::Build';
+
+      Module::Build->new(
+        module_name => 'Foo::Bar',
+        license => 'perl',
+      )->create_build_script;
+
+    Authors are strongly suggested to limit the bundling of additional
+    dependencies if at all possible and to carefully test their distribution
+    tarballs before uploading to CPAN.
+
+USAGE
+  As bundled in inc/
+    Using "Author-mode", a special stub module will be created in your
+    distribute directory as inc/latest.pm. In your Makefile.PL or Build.PL,
+    you can then load "inc::latest" to load bundled modules.
+
+    When calling "use", the bundled "inc::latest" takes a single module name
+    and optional arguments to pass to that module's own import method.
+
+      use inc::latest 'Foo::Bar' qw/foo bar baz/;
+
+    The implementation is private. Only the "import" method is public.
+
+  Author-mode
+    When you have inc::latest installed from CPAN, then you are in
+    author-mode if any of the Author-mode methods are available. For
+    example:
+
+      if ( inc::latest->can('write') ) {
+        inc::latest->write('inc');
+      }
+
+    Using author-mode, you can create the stub inc/latest.pm and bundle
+    modules into inc.
+
+    loaded_modules()
+          my @list = inc::latest->loaded_modules;
+
+        This takes no arguments and always returns a list of module names
+        requested for loading via "use inc::latest 'MODULE'", regardless of
+        whether the load was successful or not.
+
+    write()
+          inc::latest->write( 'inc' );
+
+        This writes the bundled version of inc::latest to the directory name
+        given as an argument. It almost all cases, it should be '"inc"'.
+
+    bundle_module()
+          for my $mod ( inc::latest->loaded_modules ) {
+            inc::latest->bundle_module($mod, $dir);
+          }
+
+        If $mod corresponds to a packlist, then this function creates a
+        specially-named directory in $dir and copies all .pm files from the
+        modlist to the new directory (which almost always should just be
+        'inc'). For example, if Foo::Bar is the name of the module, and $dir
+        is 'inc', then the directory would be 'inc/inc_Foo-Bar' and contain
+        files like this:
+
+          inc/inc_Foo-Bar/Foo/Bar.pm
+
+        Currently, $mod must have a packlist. If this is not the case (e.g.
+        for a dual-core module), then the bundling will fail. You may be
+        able to create a packlist by forced installing the module on top of
+        the version that came with core Perl.
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/inc-latest/issues>. You will be notified
+    automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/inc-latest>
+
+      git clone https://github.com/dagolden/inc-latest.git
+
+AUTHORS
+    *   David Golden <dagolden@cpan.org>
+
+    *   Eric Wilhelm <ewilhelm@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2009 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

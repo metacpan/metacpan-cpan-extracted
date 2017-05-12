@@ -1,0 +1,405 @@
+#! /usr/local/bin/perl
+#
+# Commandline Frontend to Inverse Perl Preprocessor for Arbitrary Documents
+#
+my $Copyright = '
+Copyright © 1999, 2000, Daniel Pfeiffer <occitan@esperanto.org>
+
+iPerl may be copied only under the terms of either the Artistic License or
+the GNU General Public License, which may be found in the Perl 5.0 source kit.
+
+Info and latest version are at http://beam.to/iPerl/
+';
+
+use Text::iPerl $VERSION = 0.6;
+
+package Text::iPerl;
+
+set_style $1
+    if $0 =~ /\b(?:cpp|m4)$/;
+
+use Getopt::Long;
+Getopt::Long::config qw( bundling no_getopt_compat permute );
+
+
+my( $output_rule, $include_pipe, $include_string ) =
+    (0, 0, '', '');
+sub _include(;$) {
+    if( $output_rule ) {
+	local $_ = $_[0];
+	s/^\s*<?\s*(.*)\s*/$1/;
+	if( ! defined or /^-$/ ) {
+	    $_ = 'stdin.out';
+	} elsif( /\|$/ ) {
+	    $_ = 'pipe' . $include_pipe++ . '.out';
+	} elsif( /\.p(?:[hlms]|db|[bgnp]m|hp[1-4]?)$|\.[ch]pp$/ ) {
+	    # where p in *.p* or *.*p doesn't mean iPerl
+	    $_ .= '.out';
+	} else {
+	    s/^\s*<?(.*\.)(?:p([^.]*)|([^.]*)p)$/$1$+/ or
+		$_ .= '.out';
+	}
+	open STDOUT, ">$_";
+    }
+    package main;
+    include $_[0];
+}
+
+
+
+unshift @ARGV, split ' ', $ENV{IPERL}
+    if defined $ENV{IPERL};
+
+GetOptions
+#      'b|blank-line|blank_line|blank-lines|blank_lines:i' => sub {
+#  	if( $_[0] eq '-' ) {
+#  	    undef $blank_lines;
+#  	} else {
+#  	    $blank_lines = $_[0] || 1;
+#  	}
+#      },
+
+    'A|auto|autostyle' => sub { $style = 'auto' },
+
+
+    'B|bang|unix' => sub { set_style 'bang' },
+
+
+    'c|cache:i' => sub { $cache = $_[1] + 0 },
+
+
+    'C|comment-level|comment_level:i' => sub { $comment_level = $_[1] + 0 },
+
+
+    'control|control-chars|control_chars|ctrl' => sub { set_style 'control' },
+
+
+    'd|debug=s' => sub {
+	foreach( split '', $_[1] ) {
+	    $Text::iPerl::debug{$_} = 1;
+	}
+    },
+
+
+    'D|define=s' => sub {
+	my( $opt, $opt_arg ) = split '=', $_[1], 2;
+	define $opt, $opt_arg || 1;
+    },
+
+
+    'e|eval=s' => sub {
+	package main;
+	eval qq{#line 1 "--eval"\n$_[1]};
+	die $@ if $@;
+    },
+
+
+    'E|cpp' => sub { set_style 'cpp' },
+
+
+    'f|file|include=s' => sub { _include $_[1] },
+
+
+    'G|generic=s' => sub {
+	set_style generic =>
+	    split quotemeta substr( $_[1], 0, 1 ), substr( $_[1], 1, -1 );
+    },
+
+
+    'i|include-string|include_string=s' => sub {
+	open STDOUT, '> include-string' . $include_string++ . '.out'
+	    if $output_rule;
+	package main;
+	include_string $_[1], '<COMMANDLINE>';
+    },
+
+
+    'I|include-dirs|include_dirs=s@' => \@opt_I,
+
+
+    'M|m4' => sub { set_style 'm4' },
+
+
+    'o|output=s' => sub {
+	$output_rule = 0;
+	$_[1] = ">$_[1]" unless $_[1] =~ /^\s*[>|]/;
+	open STDOUT, $_[1];
+    },
+
+
+#	:s is unusable since it swallows the next arg if nothing is given
+#    'O|output-rule|output_rule:s' => sub {
+#	if( $_[1] ) {
+#	    my $rule = $_[1];
+#	    $rule =~ s/\\/\\\\/g;
+#	    $output_rule = eval q! sub {
+#		$_[0] =~ s/^<?\s*(.*?)\s*\|?$/$1/;
+#		$_[0] =~ s! . $rule . q!;
+#		print STDERR $_[0];
+#		$_[0];
+#	    }!;
+#	    if( $@ ) {
+#		$@ =~ s/\(eval [0-9]+\) line [0-9]+/option --output_rule/;
+#		die $@;
+#	    }
+#	} else {
+#	    $output_rule = sub {
+#		my( $name, $suffix ) =
+#		    $_[0] =~ /^<?\s*(.*?)(?:\.([^\/.]+)|\s*\|)?$/;
+#		if( $suffix ) {
+#		    $suffix =~ s/^p(.+)|(.+)p$/$1$2/;
+#		} else {
+#		    $suffix = 'out';
+#		}
+#		print STDERR "$name.$suffix";
+#		"$name.$suffix";
+#	    }
+#	}
+#    },
+
+
+    'O|output-rule|output_rule' => sub { $output_rule = ! $output_rule },
+
+
+    'P|pod:i' => sub { set_style pod => $_[1] + 0 },
+
+
+    't|trace=s' => sub { $trace{$_[1]} = 1 },
+
+
+    'U|undefine=s' => sub { undefine $_[1] },
+
+
+    'v|version' => sub {
+	print "This is iperl version $main::VERSION, using ";
+	print "Text::iPerl $VERSION and "
+	    if $main::VERSION != $VERSION;
+	print "Perl $].\n", $Copyright;
+	exit;
+    },
+
+
+    'X|xml|html|sgml|markup-language|markup_language' =>
+	sub { set_style 'xml' },
+
+
+    (($Getopt::Long::VERSION >= 2.17) ? 'help|?' : 'help') => sub {
+	print "usage: $0\[ option|file] ...\n", <<\EOF, $Copyright;
+  -A, --auto, --autostyle
+  -B, --bang, --unix
+  -c, --cache[ {01}]
+  -C, --comment-level[ {0123}]
+      --control, --control-chars, --ctrl
+  -d, --debug {acefptV}
+  -D, --define <macro>[=<definition>]
+  -e, --eval <expr>
+  -E, --cpp
+  -f, --file, --include <file>
+  -G, --generic /<comment>/<print>/<printend>/<perl>/<perlend>/
+  -i, --include-string <string>
+  -I, --include-dirs <directory>
+  -M, --m4
+  -o, --output <file>
+  -O, --output-rule
+  -P, --pod[ {01}]
+  -t, --trace <macro>
+  -U, --undefine <macro>
+  -v, --version
+  -X, --xml, --html, --sgml, --markup-language
+EOF
+	exit;
+    },
+
+
+    '<>' => sub { _include $_[0] };
+
+
+_include unless $documents;
+
+__END__
+
+=head1 NAME
+
+iperl - bring any text documents alive
+with bits of embedded Perl
+
+
+=head1 USAGE
+
+iperlC<[> I<option>C<|>I<file>C<]> ...
+
+Options may be repeated and are processed in the order specified.  This means
+that while processing a I<file>, all options encountered further left are
+applied.  Multiword option-names may be separated by an underscore instead of
+a dash.
+
+If present, the environment variable C<$IPERL> is processed as though the
+parameters in it were given at the beginning of the command-line.  No Shell
+syntax is parsed, except that it is split on spaces.
+
+The vitamins -- I<ahem!> -- options C<-C>, C<-d>, C<-D>, C<-E>, C<-I>, C<-o>
+and C<-U> are like in the C compiler or m4 macro processor.
+
+=over
+
+=item -A, --auto, --autostyle
+
+Revert to autostyle-detection.
+
+
+=item -B, --bang, --unix
+
+Set style useful among others for typical Unix files, i.e. comment-lines begin
+with C<#>, lines of Perl begin with C<!>, C<!{...}!> is for bits of Perl,
+C<!E<lt>...E<gt>!> for printing bits of Perl and an optional leading C<&> for
+macro invocations.
+
+
+=item -c, --cache[ I<flag>]
+
+If flag is C<1> cache all files given on the command line or in include
+directives, such that they are not reread and recompiled when included again.
+
+
+=item -C, --comment-level[ I<flag>]
+
+Without flag do not discard comments.  If I<flag> is 2, discard even if there
+is whitespace before or after the comment.  If it is 3, discard all comments.
+
+
+=item --control, --control-chars, --ctrl
+
+Set style based on control characters, i.e. lines of Perl begin with C<^A>,
+C<^B...^E> is for bits of Perl and C<^P...^E> for printing bits of Perl.
+
+
+=item -d, --debug I<flags>
+
+B<Output the generated intermediate programme, rather than executing it.>
+
+
+=item -D, --define I<macro>[=I<definition>]
+
+Define I<macro> as I<definition> or as 1 if none.
+
+
+=item -e, --eval I<expr>
+
+Evaluate I<expr> as a Perl programme.
+
+
+=item -E, --cpp (default when called as cpp)
+
+Set style as in C preprocessor, i.e. lines of Perl begin with C<#> and
+defined macros have no syntactic sugar.
+
+
+=item -f, --file, --include I<file>
+
+Same as a I<file> argument without option.  This is useful when I<file> starts
+with a C<->.
+
+
+=item -G, --generic /I<comment>/I<print>/I<printend>/I<perl>/I<perlend>/
+
+Defines a simple style.  Takes 5 regexps delimited by any character, C</>
+here.  The style swallows anything that matches I<comment>.  Anything between
+I<print> and I<printend> is a printing bit of Perl, while anything between
+I<perl> and I<perlend> is simple Perl.
+
+
+=item -i, --include-string I<string>
+
+Allows directly providing a document on the commandline.  The variable
+C<@documents> contains the string C<'E<lt>COMMANDLINEE<gt>'> in this case.
+
+
+=item -I, --include-dirs I<string>
+
+Appends to the list of directories where C<include> first searches for files not
+found in the current directory.
+
+
+=item -M, --m4 (default when called as m4)
+
+Set style as in m4 preprocessor, i.e.  C<perl({...})> is for bits of Perl,
+C<perl(E<lt>...E<gt>)> for printing bits of Perl and many m4-macros are
+available.
+
+
+=item -o, --output I<file>
+
+Redirect output for the following documents to I<file>, which may be any valid
+argument to C<open> for output.  An initial C<E<gt>> is however optional.
+
+
+=item -O, --output-rule
+
+When reading from stdin, a pipe or an C<--include-string> document, the output
+is directed to a file named F<stdin.out>, F<pipe.out> or
+F<include-string.out>.  A number I<n> is added before the dot and then
+incremented when in the same invocation another pipe or C<--include-string>
+document is encountered, regardless whether such a file already exists.
+
+When reading from a normal file, the output is directed to a file named
+similarly.  If the filename has a suffix other than C<p[hlms]>, C<pdb>,
+C<p[bgnp]m>, C<php>, C<php[1-4]> or C<[ch]pp> starting or else ending with a
+C<p> that letter is eliminated.  Otherwise C<.out> is appended.
+
+This option remains in effect until given again or an option C<--output>
+overrides it.
+
+
+=item -P, --pod[ I<flag>]
+
+If flag is C<1> remove any pod from document.  Else if flag is not present or
+C<0> set style suitable for pod, i.e. paragraphs of Perl start with C<=for
+perl> or are surrounded by C<=begin perl> and C<=end perl>, within paragraphs
+C<PE<lt>{...}E<gt>> is for bits of Perl, C<PE<lt>...E<gt>> for printing bits
+of Perl and defined macros are called as C<ME<lt>macroE<gt>> or C<ME<lt>macro(
+arg, ... )E<gt>>.
+
+
+=item -S, --sgml, --html, --xml, --markup-language
+
+Set style suitable for SGML based languages such as HTML or XML.  Bits of Perl
+are embedded in C<E<lt>perlE<gt>...E<lt>/perlE<gt>> or
+C<E<lt>serverE<gt>...E<lt>/serverE<gt>> or C<E<lt>script
+runat=serverE<gt>...E<lt>/scriptE<gt>>.  Printing bits of Perl (entities) are
+C<&E<lt>...E<gt>;> or C<`...`> and macro entities are C<&macro;> or C<&macro(
+arg, ... );>.
+
+
+=item -t, --trace I<macro>
+
+Trace I<macro> when it will be defined.
+
+
+=item -U, --undefine I<macro>
+
+=item -v, --version
+
+=item -?, --help
+
+=back
+
+
+An argument I<file> may be any valid argument to C<open> for input.  If no
+I<file> is given, nor an C<-f> or C<-i> option, standard input is read.
+
+
+=head1 DESCRIPTION
+
+This is the commandline frontend of an inverse Perl interpreter, where normal
+text gets printed as is, while Perl statements have to be specially marked as
+such.  Loop or conditional blocks can surround normal text.
+
+If no style is explicitly set, it is automatically determined from either an
+Emacs kind of local variables specification for C<iPerl-style>, or the
+file-name if any, or by looking at the document-contents for constructs
+specific to some style.
+
+
+=head1 SEE ALSO
+
+L<Text::iPerl>, L<web-iPerl>, L<iPerl.el>, L<perl>, http://beam.to/iPerl/

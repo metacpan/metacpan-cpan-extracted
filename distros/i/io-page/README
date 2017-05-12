@@ -1,0 +1,2 @@
+This module allows developers to easily redirect their output through
+a pager such as less.

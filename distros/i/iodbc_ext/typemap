@@ -1,0 +1,34 @@
+#**********************************************************************
+#              typemap   The perl iODBC extension 0.1                 *
+#**********************************************************************
+#              Copyright (C) 1996 J. Michael Mahan and                *
+#                  Rose-Hulman Institute of Technology                *
+#**********************************************************************
+#    This package is free software; you can redistribute it and/or    *
+# modify it under the terms of the GNU General Public License or      *
+# Larry Wall's "Artistic License".                                    *
+#**********************************************************************
+#    This package is distributed in the hope that it will be useful,  *
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of     *
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  *
+#  General Public License for more details.                           *
+#**********************************************************************
+
+SSHOR		T_IV
+WORD		T_IV
+DWORD		T_IV
+LPARAM		T_IV
+WPARAM		T_IV
+HWND		T_PTR
+BOOL		T_IV
+UCHAR		T_U_CHAR
+UCHAR *		unsigned char *
+SDWORD		T_IV
+SWORD		T_IV
+UDWORD		T_IV
+UWORD		T_IV
+PTR		T_PTR
+HENV		T_PTR
+HDBC		T_PTR
+HSTMT		T_PTR
+RETCODE		T_IV

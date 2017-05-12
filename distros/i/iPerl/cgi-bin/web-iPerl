@@ -1,0 +1,231 @@
+#! /usr/local/bin/perl
+#
+# Web Frontend to Inverse Perl Preprocessor for Arbitrary Documents
+#
+# Copyright © 1999, 2000, Daniel Pfeiffer <occitan@esperanto.org>
+#
+# iPerl may be copied only under the terms of either the Artistic License or
+# the GNU General Public License, which may be found in the Perl 5.0 source kit.
+#
+# Info and latest version are at http://beam.to/iPerl/
+
+use Text::iPerl $VERSION = 0.6;
+
+package Text::iPerl;
+
+use CGI qw':standard';
+
+=head1 NAME
+
+web-iPerl - bring Web-documents alive
+with bits of embedded Perl
+
+
+=head1 DESCRIPTION
+
+This is the webserver frontend of an inverse Perl interpreter, where HTML,
+XML, SGML, PostScript or plain text gets passed to the browser as is, while
+specially marked Perl statements are executed on the server-side.  Loop or
+conditional blocks can surround normal text.  The MIME-type is recognized
+by the file suffix according to the following table:
+
+=over
+
+=item text/html
+
+C<html>, C<phtml>, C<htmlp> and C<pht>, C<htp>
+
+=item text/css
+
+C<css>, C<pcss>, C<cssp> and C<pcs>, C<csp>
+
+=item text/plain
+
+All not found elsewhere, including C<txt>, C<ptxt>, C<txtp> and C<ptx>, C<txp>
+
+=item text/plain; charset=UTF-8
+
+C<utxt>, C<putxt>, C<utxtp> and C<put>, C<utp>
+
+=item text/sgml
+
+C<sgml>, C<psgml>, C<sgmlp> and C<psg>, C<sgp>
+
+=item text/vnd.wap.wml
+
+C<wml>, C<pwml>, C<wmlp> and C<pwm>, C<wmp>
+
+=item text/xml
+
+C<xml>, C<pxml>, C<xmlp> and C<pxm>, C<xmp>
+
+=item application/postscript
+
+C<ps>, C<pps>, C<psp>, C<eps>, C<peps>, C<epsp> and C<pep>, C<epp>
+
+=item image/x-xbitmap
+
+C<xbm>, C<pxbm>, C<xbmp> and C<pxb>, C<xbp>
+
+=item image/x-xpixmap
+
+C<xpm>, C<pxpm>, C<xpmp> and C<pxp>, C<xpp> (not understood by most browsers)
+
+=back
+
+=cut
+
+
+my @autotype_by_name;
+
+BEGIN {
+    CGI::nph( 1 )
+	  if $0 =~ m:^(.*/)*nph-[^/]*$:;
+
+    @autotype_by_name =
+	# allow p? optionally followed by .\w+ after each suffix
+	grep { ref() ? $_ : $_ && $_ . 'p?(?:\.[\w.]+)?$' }
+	    'ht(?:ml)?' =>	[],
+	    'xml?' =>		[-type => 'text/xml'],
+	    'css?' =>		[-type => 'text/css'],
+	    'wml?' =>		[-type => 'text/vnd.wap.wml'],
+	    'sgm?l?' =>		[-type => 'text/sgml'],
+	    'utx?t?' =>		[-type => 'text/plain; charset=UTF-8'],
+	    'ps' =>		[-type => 'application/postscript'],
+	    'xbm?' =>		[-type => 'image/x-xbitmap'],
+	    'xpm?' =>		[-type => 'image/x-xpixmap'],
+	    '' =>		[-type => 'text/plain'];
+}
+
+
+my( $directory, $file ) = split m!/(?=[^/]*$)!, $ENV{PATH_TRANSLATED};
+
+@type = (@{_case $file, @autotype_by_name},
+	 -X_Powered_By => "Text::iPerl/$VERSION <http://beam.to/iPerl>");
+
+$header = header @type;
+
+local @autostyle_by_contents = @autostyle_by_contents;
+local @autostyle_by_name = @autostyle_by_name;
+local @include = @include;
+local @opt_I = @opt_I;
+local( %debug, %trace ) = ( %debug, %trace );
+local( $defines, %defines ) = ( $defines, %defines );
+local( $max_macro_growth, $max_macro_expansions ) =
+    ( $max_macro_growth, $max_macro_expansions );
+local( $cache, $comment_level, $joiner, $printfer ) =
+    ( $cache, $comment_level, $joiner, $printfer );
+
+chdir $directory;
+include $file;
+
+=pod
+
+The first plain text flushed out by C<web-iPerl> is preceded by the value
+C<$header>, which has been set for you.  This means that if your document
+starts with a bit of Perl, the variable contains the HTTP-header and may be
+modified.  Or you can unset it and write the header right after the Perl
+section - B<no newline> in between though!  Inversely you should not C<print>
+any output before the header has been printed.  Processing occurs in the
+directory where the file was found.
+
+If you call any system-commands (beware of passing uncontrolled arguments from
+the query!) you should first turn on autoflushing (C<$| = 1>) to ensure that
+output order is preserved.
+
+
+=head1 VARIABLES
+
+=over
+
+=item $header
+
+Normally the empty string.  Is output and reset every time iPerl wants to
+output a bit of plain text.
+
+
+=item @type
+
+Holds the list of arguments to CGI function header.  This can help you change
+the header more easily, by adding you own options.
+
+  $header = header @type, ...;
+
+=back
+
+
+=head1 INSTALLATION
+
+The file-suffixes are freely electable as listed above.  For Apache these are
+attributed to an internal MIME-type, which is then correlated to the
+C<web-iPerl> interpreter by the action module, which must be installed in
+Apache.  On these lines, which are the same for the three following
+alternatives, put all the suffixes you expect to use among those found above,
+under L<DESCRIPTION>:
+
+  AddType application/x-web-iPerl pcss phtml pps ptxt putxt pps
+  DirectoryIndex index.html index.htm index.phtml index.pht
+
+The installation depends on what you have, and what you want:
+
+=over
+
+=item mod_perl
+
+If you have mod_perl installed (which you should for remarkable performance
+gains!), this is the necessary configuration.  The first part is possibly
+already done for you.
+
+  <Location /perl/>
+    SetHandler perl-script
+    PerlHandler Apache::Registry
+    Options ExecCGI
+    PerlSendHeader On
+  </Location>
+
+You must copy F<web-iperl> to the F<perl>-directory in your web-server tree.
+Then you add the following line to your configuration:
+
+  Action application/x-web-iPerl /perl/web-iPerl
+
+=item CGI
+
+This is the classical mode of operation.  You must copy F<web-iperl> to the
+F<cgi-bin>-directory in your web-server tree, which we assume to have been set
+up.  Then you add the following line to your configuration:
+
+  Action application/x-web-iPerl /cgi-bin/web-iPerl
+
+Warning: Due to the way the CGI mechanism works, this method can cause failure
+when running under full load.  If the server already has as many processes
+running as one user is allowed by the system to spawn, starting this script
+will fail, making some page temporarily inservable.  This means that the MAXUP
+kernel parameter should be somewhat higher than the maximum number of
+connections served.
+
+=item NPH
+
+This is another classical mode of operation.  Unlike the preceding one, the
+server doesn't look at your output.  The C<header> funtion takes this into
+account by adding a HTTP-response line.  On the downside, you yourself are
+responsible for everything else you want, like keep-alive negotiation.
+
+You must copy F<web-iperl> to the F<cgi-bin>-directory in your web-server
+tree, which we assume to have been set up, and rename (as hard-wired in
+Apache) it to F<nph-iperl>.  Then you add the following line to your
+configuration:
+
+  Action application/x-web-iPerl /cgi-bin/nph-iPerl
+
+Warning: Same as for CGI, just above.
+
+=back
+
+
+=head1 SEE ALSO
+
+L<Text::iPerl>, L<iperl>, L<iPerl.el>, L<perl>, L<apache>, L<mod_perl>,
+http://beam.to/iPerl/
+
+
+=cut necessary for mod_perl

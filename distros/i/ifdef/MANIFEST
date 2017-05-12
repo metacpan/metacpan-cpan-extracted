@@ -1,0 +1,17 @@
+MANIFEST
+CHANGELOG
+README
+TODO
+Makefile.PL
+lib/ifdef.pm
+t/ifdef01.t
+t/ifdef02.t
+t/ifdef03.t
+t/ifdef04.t
+t/ifdef05.t
+t/ifdef05a.t
+t/ifdef05b.t
+t/ifdef05c.t
+t/ifdef06.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

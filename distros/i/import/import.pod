@@ -1,0 +1,149 @@
+# SCCS INFO: @(#) import.pod 1.01 99/10/10
+#  RCS INFO: $Id: import.pm,v 1.01 1999/10/10 mak Exp $
+#
+# Copyright (C) 1999 Michael King (mike808@mo.net)
+# Saint Louis, MO USA.
+#
+# This module is free software; you can redistribute it and/or
+# modify it under the same terms as Perl itself.
+
+=head1 NAME
+
+import - import all modules with the same package prefix, aliasing it away.
+
+'import' acts as a pragma that performs a 'use' on all modules that can be 
+found with the given package prefix. Any modules found have a 'use' statement 
+performed, and the fully qualified package name is aliased to one without the 
+given prefix. The functionality is similar to Java's 'import' statement.
+
+=head1 SYNOPSIS
+
+    use import qw( org::w3c::dom );  # Loads all .pm's in org/w3c/dom/*
+
+    my $e1 = Entity->new();          # Aliased org::w3c::dom::Entity
+    my $e2 = org::w3c::dom::Entity->new(); # Same thing.
+    my $a1 = Attr->new();            # Wow, this one too.
+    my $er = EntityReference->new(); # Hey, all the classes are here.
+    
+This next example assumes a different program, since it would have 
+already been 'use'd from the first example.
+
+    use import qw( org::w3c::dom::Text ); # loads only this module
+    my $e3 = Text->new();                 # Aliased org::w3c::dom::Text
+
+=head1 DESCRIPTION
+
+'import' is a Perl pragma that performs a 'use' statement on all modules
+that can be found within the given package prefix. The primary intended use of
+the pragma is to make typing easier for people who are porting Java code to
+Perl. Java has the ability to import all classes defined within
+a class' own package, as well as a notation to import all classes defined with
+some external package. While there is an equivalent mechanism for doing so in
+Perl, the 'use' operator, it is limited to importing a single class at a time,
+and the class must be explicitly specified.
+
+This pragma provides Perl with a friendly syntax for performing importing
+oodles of modules without the oodles of 'use' statements previous Perl
+programmers had to endure. In addition, you were required to know in advance
+the names of any modules you would be importing. Thus, Laziness was the
+primary motivation for writing this module.
+
+Since it isn't really a module or class that is imported into your code, but
+rather a "helper" for the <C>use</C> operator, Hubris demanded this be developed
+as a "pragma" type of module. Pragmas are a rare and pretty special type of 
+module, and writing of them occurs after much discussion over their necessity
+and they are usually authored by the perl-porters. I got Impatient waiting for 
+one of them to see the need and write this module.
+
+=head1 METHODS
+
+=head2 Public Package Methods
+
+This module defines only one method, import(), as this is the module you
+are technically 'use'ing in your code.
+
+=head2 Internal Package Methods
+
+No internal methods are defined.
+
+=head2 Exported Package Variables
+
+No variables are exported.
+
+=head2 Internal Package Variables
+
+No internal variables are defined.
+
+=head1 RETURN VALUE
+
+The value returned by executing the package is 1 (or true).
+
+=head1 ENVIRONMENT
+
+=head1 FILES
+
+=head1 ERRORS
+
+=head1 WARNINGS
+
+=head1 DIAGNOSTICS
+
+=head1 BUGS
+
+=head1 RESTRICTIONS
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 CPAN DEPENDENCIES
+
+=head1 LOCAL DEPENDENCIES
+
+=head1 SEE ALSO
+
+Carp, DirHandle
+
+=head1 NOTES
+
+This pragma removes itself from the %INC hash, allowing it to be 'use'd again.
+
+=head1 ACKNOWLEDGEMENTS
+
+=head1 AUTHORZ<>(S)
+
+mak - Michael King ( mike808@mo.net )
+
+=head1 HISTORY
+
+ import.pm
+ v1.01 10/10/99 mak
+
+=head1 CHANGE LOG
+
+ 1.01 first posting to CPAN
+
+=head1 MODIFICATIONS
+
+=head1 COPYRIGHT
+
+ Copyright (C) 1997,1998 Michael King ( mike808@mo.net )
+ Saint Louis, MO USA.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+This module is copyright (c) 1997,1998 by Michael King ( mike808@mo.net ) and is
+made available to the Perl public under terms of the Artistic License used to
+cover Perl itself. See the file Artistic in the distribution  of Perl 5.002 or
+later for details of copy and distribution terms.
+
+=head1 AVAILABILITY
+
+The latest version of this module is likely to be available from:
+
+ http://walden.mo.net/~mike808/LogCarp
+
+The best place to discuss this code is via email with the author.
+
+=cut
+1;

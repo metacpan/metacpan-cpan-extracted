@@ -1,0 +1,152 @@
+NAME
+    interface - simple compile time interface checking for OO Perl
+
+SYNOPSIS
+      package Foo;
+
+      use interface 'Iterator', 'Generator', 'Clonable', 'DBI::DBD';
+
+ABSTRACT
+    Compile-time interface complaince testing. Inspects the methods defined
+    in your module, and compares them against the methods defined in the
+    modules you list. Requires no special or additional syntax.
+
+    Should you fail to implement any method contained in any of the listed
+    classes, compile will abort with an error message.
+
+DESCRIPTION
+    An "interface" may need some explaination. It's an Object Orientation
+    idea, also known as polymorphism, that says that you should be able to
+    use interchangeable objects interchangably. Thank heavens the OO people
+    came and showed us the light!
+
+    The flip side of polymorphism is type safety. In Perl, ->isa() lets you
+    check to make sure something is derived from a base class. The logic
+    goes that if its derived from a base class, and we're looking for an
+    object that fills the need of the base class, then the subclass will
+    work just as well, and we can accept it. Extending objects is done by
+    subclassing base classes and passing off the subclasses as versions of
+    the original.
+
+    While this OO rote might almost have you convinced that the world works
+    this way, this turns out to be almostly completely useless. In the real
+    world, there are only a few reasons that one object is used in place of
+    another: Someone wrote some really horrible code, and you want to swap
+    out their object with a better version of the same thing. You're
+    switching to an object that does the same thing but in a different way,
+    for example using a database store instead of a flat file store. You're
+    making some minor changes to an existing object and you want to be able
+    to extend the base class in other directions in the future. Only in the
+    last case is inherited code with subclassing even useful. In fact, there
+    is a move towards using composition (has-a) instead of inheritance
+    (is-a) accrost the whole industry, mainly because they got tired of
+    people pointing out that OO sucks because inheritance only serves to
+    make a great big mess of otherwise clean code.
+
+    Seperating the interface from the implementation lets you make multiple
+    implementations of an idea. They can share code with each other, but
+    they don't have to. The programmer has assured us that their module does
+    what is required by stating that it implements the interface. While this
+    isn't proof that the code works, climaing to implement an interface is a
+    kind of contract. The programmer knows what work is required of him and
+    she has agreed to deliver on it.
+
+    The interface definition can be a package full of stub methods that
+    don't do anything, or it could be an actual working implementation of an
+    object you're striving for compatability with. The first case is
+    cleanist, and the package full of stubs serves as good documentation.
+    The second case can be handy in cases where the first case wasn't done
+    but someone ignored the Wisdom of the Interface and wrote a package
+    anyway.
+
+    The Wisdom of the Interface says to write an interface for each new kind
+    of object that could have multiple implementations. The interfaces
+    serves as a contract for the minimum features needed to implement an
+    object of that type. When working with objects - creating them, checking
+    types when you accept them, etc - always work with the interface type,
+    never the type of an individual implementation. This keeps your code
+    generic.
+
+    In order to do the composition thing (has-a), you contain one or more
+    objects that you need to do your work, you implement an interface that
+    dispatches method calls to those objects. Perhaps your new() method
+    creates those objects and stores them in instance variables.
+
+  EXPORT
+    None. EXPORT is silly. You stay in your namespace, I'll stay in mine.
+
+DIAGNOSTICS
+    Failing to implement a required method will generate a fatal similar to
+    the following:
+
+    Baz is missing methods: bar from Stub, and import from your, and import
+    from ImplicitThis at interface.pm line 47. BEGIN failed--compilation
+    aborted at Baz.pm line 5.
+
+  AGNOSTICS
+    Hear the one about the insomniac dyslexic agnostic? He stayed up all
+    night wondering if there was a Dog.
+
+SEE ALSO
+    See http://www.slowass.net/wiki/ for more on Perl OO, including
+    information about how and why to use interfaces.
+
+    Damian Conway. Speaking of Damian, this is a cheap knockoff of his
+    Class::Contract module. However, we have no special syntax!
+
+    Speaking of speaking of Damian Conway, if you ever get a chance to see
+    him talk, you should go.
+
+    NEXT.pm, by Damian Conway.
+
+    ImplicitThis.pm, also by myself.
+
+BUGS
+    Yes.
+
+    This will very likely break highly introspective code, for example,
+    anything Damian Conway might write.
+
+    Does not work with packages not stored in a file where "use" can find
+    them. This bug applies to programs run from "perl -e" and in subpackages
+    burried in other packages.
+
+    It should be an error to use two different interfaces that both declare
+    a method of the same name, as it would be ambigious which you are
+    intending to implement. I haven't decided. Perhaps I'll just make this
+    warning.
+
+    When implementing an interface, interface.pm searches only that case -
+    not the classes listed in @ISA. This leads to incomplete interface
+    requirements when using a subclass as the interface.
+
+    This module was done in pragma-style without permission. I'm interested
+    on feedback on how to handle this.
+
+    Another arrangement worth considering is to create a Class::Interface
+    thing that the interface uses, not your code. When you use that
+    interface, the code is awaken, and import() inspects your code without
+    exporting anything. This would just move the logic around. Interfaces
+    would be marked interfaces rather than the people who use the interfaces
+    making them as interfaces. Once again, thoughts and suggestions
+    encouraged.
+
+    The code is frightening.
+
+    There are spelling and grammar errors in this POD documentation.
+
+    My wiki is really slow because my computer is slow, doesn't have much
+    memory, and its 4000 lines of code. I need to trim that down. I think I
+    could do it in about 400 lines.
+
+AUTHOR
+    Scott Walters, SWALTERS, Root of all Evil, <scott@slowass.net>
+
+COPYRIGHT AND LICENSE
+    Copyright 2002 by Scott Walters
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. If you don't believe in free
+    software, just remember that free software programmers are gnome-like. I
+    wouldn't want to be visited by gnomes.
+

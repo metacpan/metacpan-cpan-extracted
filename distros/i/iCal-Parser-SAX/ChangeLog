@@ -1,0 +1,35 @@
+2005-06-19  Rick Frankel  <rick@gg5.local>
+
+	* lib/iCal/Parser/SAX.pm (process_day): fix issue with 0 hour events
+
+2005-06-11  Rick Frankel  <rick@gg5.local>
+
+	* lib/iCal/Parser/SAX.pm (process_events): fix bad (string)
+	sorting of months/years.
+
+2005-02-01  Rick Frankel  <rick@gg5.local>
+
+	* lib/iCal/Parser/SAX.pm (process_day): subtract 1 second from
+	end of each event to avoid end->start intersection (conflict)
+	problem.
+
+	* t/01parse.t: fix timezone to 'America/New_York' so tests won't
+	fail in other locales.
+
+	* scripts/ical2xml: added support for -z tz argument to support updated
+	iCal::Parser.
+
+2005-01-04  Rick Frankel  <rick@gg5.local>
+
+	* t/01parse.t: fix current year dependency
+
+2004-12-27  Rick Frankel  <rick@pb.local>
+
+	* lib/iCal/Parser/SAX.pm (process_component): only add uid, idref
+	if they exists (fixes empty uid, idref on valarm, attendee)
+
+2004-12-18  Rick Frankel  <rick@gg5.local>
+
+	* lib/iCal/Parser/SAX.pm (pod): fix bad link
+
+	* ical2xml: change -e to -E for consistency, fix documentation

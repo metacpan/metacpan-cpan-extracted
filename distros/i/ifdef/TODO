@@ -1,0 +1,4 @@
+Add support for: =if =ifdef =ifndef =else =endif
+
+Once things are stable, rewrite "oneline" in C using XS, with the current
+"oneline" as a PurePerl backup.

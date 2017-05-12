@@ -1,0 +1,85 @@
+**********************************************
+*    iodbc.pm  The perl iODBC extension 0.1  *
+**********************************************
+*  Copyright (C) 1996 J. Michael Mahan and   *
+*  Rose-Hulman Institute of Technology       *
+**********************************************
+*    This package is free software; you can  *
+* redistribute it and/or modify it under the *
+* terms of the GNU General Public License or *
+* Larry Wall's "Artistic License".           *
+**********************************************
+*    This package is distributed in the hope *
+* that it will be useful, but WITHOUT ANY    *
+* WARRANTY; without even the implied warranty*
+* of MERCHANTABILITY or FITNESS FOR A        *
+* PARTICULAR PURPOSE.  See the GNU General   *
+* Public License for more details.           *
+**********************************************
+
+This extension provides the core ODBC API to perl.
+
+You will need the following configured correctly on your system:
+
+	An iODBC Driver Manager
+	A Data Source Driver
+	Perl 5.003
+
+You should have a grasp of the ODBC API before using this extension.
+The documentation included with perl iODBC is limited to the syntax
+ of the perl implementation.
+
+
+To build do the following:
+
+Edit the Makefile.PL so it is consistent with your system.
+Also edit t/methods.t as follows.
+
+from: 
+my($dsn)="";
+my($uid)="";
+my($pwd)="";
+
+To what they would need to be to connect to your data source.
+
+for example:
+my($dsn)="datasource";
+my($uid)="user";
+my($pwd)="password";
+
+If you need to use SQLDriverConnect() to connect to your
+datasource your out of luck with this version.  You could
+add it yourself our wait for the next major release which
+should have iODBC level 1 support. 
+
+
+
+next type:
+  perl Makefile.PL
+  make test
+
+and if that goes smoothly--
+type as root:
+  make install
+
+If it doesn't go smoothly the package may still work for what you 
+want to do.  Check to see where it failed and why.  For example.
+Mine fails because of either the driver manager or the database drivers. 
+
+I included a sample program called example.pl.  It takes sql commands
+and prints the results.
+
+To view the man pages for the extension type man iodbc.
+
+I tested the extension on GNU Linux 2.07 using iODBC driver manager
+version 2.12.0 by Jin, Ke.  The Driver was Openlink's Postgres 95 Database
+Agent (beta).  The isql.h included with 2.12.0 does not include all the
+defined constants.  Also Openlink's driver did not work for repeated 
+SQLExecute.  I would really like to hear how the extension works for 
+anyone using a different driver or driver manager.  
+
+
+This is the first release so there will probably be problems.  Please 
+send bugs/questions to:
+mahanm@nextwork.rose-hulman.edu
+

@@ -1,0 +1,100 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+{
+	package iPod::Squish::LogConfig;
+
+	use base qw(Log::Dispatch::Configurator);
+
+	sub new {
+		bless {
+			global => {
+				dispatchers => [qw(screen)],
+			},
+			screen => {
+				class     => 'Log::Dispatch::Screen',
+				min_level => 'notice',
+				stderr    => 1,
+				format    => "%m\n",
+			},
+		}, shift;
+	}
+
+	sub get_attrs {
+		my ( $self, $name ) = @_;
+		$self->{$name};
+	}
+
+	sub get_attrs_global {
+		my $self = shift;
+		$self->{global};
+	}
+
+	sub needs_reload { return }
+
+	use Log::Dispatch::Config;
+
+	Log::Dispatch::Config->configure( __PACKAGE__->new );
+}
+
+use iPod::Squish;
+
+use Memoize;
+use DB_File;
+use File::HomeDir;
+use Path::Class;
+
+$SIG{INT} = sub { exit 1 }; # for DB_File to close nicely
+
+memoize(
+	'iPod::Squish::get_bitrate',
+	NORMALIZER => sub {
+		my ( $self, $file ) = @_;
+		return join ( ":", $file->stringify, -s $file );
+	},
+	SCALAR_CACHE => [ TIE => "DB_File", dir(File::HomeDir->my_home)->file(".isquish_cache")->stringify ],
+	LIST_CACHE   => 'MERGE',
+);
+
+my $ipod = shift;
+
+unless ( $ipod ) {
+	my @ipods = map { dir($_)->parent } glob("/Volumes/*/iPod_Control");
+
+	if ( @ipods == 1 ) {
+		$ipod = $ipods[0];
+	} else {
+		die "Please specify which iPod you'd like to squish.";
+	}
+}
+
+chdir $ipod; # force it to stay mounted
+
+
+Log::Dispatch::Config->instance->notice("squishing $ipod");
+
+{ iPod::Squish->new( volume => $ipod )->run && redo }; # FIXME MooseX::Getopt?
+
+__END__
+
+=pod
+
+=head1 NAME
+
+isquish - squish your ipod
+
+=head1 SYNOPSIS
+
+	% isquish "/Volumes/My iPod"
+
+=head1 DESCRIPTION
+
+This script uses L<iPod::Squish> to reencode MP3s on an ipod.
+
+MP3 bitrate info will be cached in a file called C<.isquish_cache> in your home
+directory. This is done using L<Memoize> and L<DB_File>.
+
+If no iPod is specified and exactly one is found in /Volumes then that iPod
+will be squished by default.

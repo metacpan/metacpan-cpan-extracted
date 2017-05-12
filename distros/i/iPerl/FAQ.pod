@@ -1,0 +1,125 @@
+=head1 What is iPerl?
+
+Perl-programmes may contain bits of string to be output, whereas inversely
+iPerl-documents consist of any kind of text to be output, and bits of
+specially marked Perl that control the document with conditionals or loops
+spanning text, subdocument-includes and macro definitions. This is comparable
+to, but far more powerful than the C preprocessor or the m4 macro processor,
+but can also be seen as a template-mechanism.
+
+
+=head1 What can iPerl do?
+
+Various styles are provided by the library Text::iPerl and the command-line
+tool iperl, one resembling the C preprocessor, one the m4 macro processor and
+new ones for arbitrary documents and for example SGML-documents. The useful
+Perl-feature of embedding documentation into the programme (POD) is not only
+brought alive, but can be used in all kinds of documents.
+
+These styles are also used by web-iPerl, a CGI-frontend to Perl-server-pages,
+which can generate (data-base-driven) tables in HTML- or XML-pages for
+example, or autoprocess forms.
+
+
+=head1 Why is it called inverse Perl?
+
+Perl programmes follow a well defined syntax, and may contain bits of
+arbitrary text called strings which might get output.  Here it is the other
+way round: everything is arbitrary text to be output, unless it is specially
+marked up as being Perl.
+
+
+=head1 What is markup?
+
+Flat files are simpy a sequence of characters or bytes.  While the human
+reader will likely class these into words, lines and paragraphs, a programme
+needs rules on how to distinguish various parts of the file.  For example, to
+set off arbitrary text from the code, Perl uses string markup such as C<'>,
+C<">, C<q!> or C<qq!>.  The same thing happens here, only that the markup goes
+around bits of Perl instead and varies with the style.
+
+
+=head1 Which style should I use?
+
+This is partly a question of taste, since all styles are functionally
+equivalent.  Almost at least, e.g. style cpp cannot embed bits of Perl in the
+middle of lines.  There's a tradeoff between styles that interfere least with
+any character sequences that might occur in the host document and thus offer
+minimal comfort on the one hand, and those that give you flexible ways of
+embedding Perl on the other.
+
+When it comes to interacting with other programmes, there might be some
+restrictions.  An HTML-editor for example will be happiest with the verbose
+variant of style xml.  A syntax-based editor for C++ will best accomodate
+style cpp.
+
+
+=head1 Can I use iPerl in sendmail configuration?
+
+All m4 files used for this would have to be converted to Perl-syntax.  E.g.
+
+  ifdef(`confFROM_HEADER',, `define(`confFROM_HEADER', <$g>)')dnl
+
+becomes
+
+  ifdef('confFROM_HEADER', '', q{define(confFROM_HEADER => '<\$g>')})dnl
+
+Note how C<q{}> is suggestively used to quote a string containing a macro,
+i.e. Perl code, and how the C<$> is escaped in the definition since this
+string will be double quoted every time the macro gets expanded.
+
+
+=head1 Can I use iPerl in C or C++?
+
+The first problem is that modern compilers no longer call an external
+programme called F<cpp> for preprocessing.  So you have to call it yourself and
+pass the result off to the compiler.
+
+Then, the preprocessor syntax has been arbitrarily used for the C<#pragma>
+directive.  So you need a function C<pragma> that prints the corresponding
+directive back into the output.
+
+Lastly all include files you use would also have to be converted to
+Perl-syntax, e.g. C<#ifdef LINUX> becomes C<#if( defined macro 'LINUX' ) {>
+and C<#endif> becomes C<#}>.
+
+
+=head1 Why don't C<#define> and C<#include> work like in cpp?
+
+The C preprocessor has two facets: markup consisting of a C<#> in the first
+column for one thing and a fairly primitive language residing on lines thus
+marked up for another.  Style cpp of iPerl uses only the markup of the C
+preprocessor.  The language residing on these lines, however, is full-fledged
+Perl including cpp-similar functions provided by iPerl, like C<define> and
+C<include>.  Hence the semantics are close to cpp, but the syntax is plain
+Perl.
+
+
+=head1 Why don't C<define()> and C<include()> work like in m4?
+
+Macros in style m4 are all mapped to calls of Perl functions, including
+m4-similar functions provided by iPerl, like C<define> and C<include>.  Hence
+the semantics are close to m4, but the syntax of the arguments is plain Perl.
+
+
+=head1 Where are my included functions?
+
+Unlike cpp, which does simple one-pass text inclusion, C<include()> is a
+run-time function in iPerl.  The included document gets compiled to an
+individual Perl programme, which is then executed separately.  Hence any
+functions in the inner document are only known I<after> the outer document has
+been compiled.
+
+Perl has solved the same problem with C<use> instead of C<require>, but this
+is magic in the interpreter inaccessible to us.  The same effect can be
+achieved by explicitly placing the C<include()> in a C<BEGIN { ... }> block.
+Or, if it affects just the odd function call, you can mark it as such with an
+ampersand or parens.
+
+
+=head1 How well tested is it?
+
+Apart from being used variously, there is a quite extensive test-suite each
+release has to go through.  For every style a test-document using each feature
+and each corrected bug is matched against a carefully analyzed reference
+output.  And that is done with each of Perl 5.004_05, 5.005_03 and 5.6.0.

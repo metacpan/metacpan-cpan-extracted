@@ -1,0 +1,46 @@
+----------------------------------------------------------------------
+    This is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+ 
+    This software is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+	Please send any reports of problems or bugs to mike808@mo.net.
+	I wouldn't mind a short note to know that you're using this.
+	Suggestions and knowing how many others are using this will help
+	promote its upkeep.
+
+	This package is copyright (c) 1997 by Michael King (mike808@mo.net)
+	and is made available to the Perl public under terms of the
+	Artistic License used to cover Perl itself.
+	See the file Artistic in the distribution  of Perl 5.002 or
+	later for details of copy and distribution terms.
+
+----------------------------------------------------------------------
+
+To install the import module for Perl 5, proceed as follows:
+
+1. Unpack the source archive into a suitable directory with
+
+	gunzip -cf import-x.xx.tar.gz | tar xvf -
+
+2. Go into the newly created directory with
+
+	cd import-x.xx
+
+3. Build the module as usual :
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+See the file 'README' for general notes on import.
+
+See the file 'Changes' for change notes on import.
+
+Michael King
+<mike808@mo.net>
+http://walden.mo.net/~mike808

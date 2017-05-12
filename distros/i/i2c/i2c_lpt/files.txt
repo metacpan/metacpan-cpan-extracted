@@ -1,0 +1,16 @@
+total 104
+drwxr-xr-x   2 ingo     root         4096 Nov  2 11:59 .
+drwxr-xr-x   5 ingo     root         4096 Oct 30 19:59 ..
+-rw-------   1 ingo     root          223 Oct 29 21:07 Makefile
+-rw-------   1 ingo     root          230 Oct 29 21:02 Makefile.i2c_test
+-rwxr-xr-x   1 ingo     root        19385 Nov  2 10:30 cpumon
+-rw-r--r--   1 ingo     root         5244 Nov  2 10:36 cpumon.c
+-rw-r--r--   1 ingo     root            0 Nov  2 11:59 files.txt
+-rw-r--r--   1 ingo     root        10150 Nov  2 10:39 i2c_lpt.c
+-rw-r--r--   1 ingo     root         1560 Oct 28 14:16 i2c_lpt.h
+-rwxr-xr-x   1 ingo     root        17512 Oct 29 21:03 i2c_test
+-rw-r--r--   1 ingo     root         2696 Oct 29 20:43 i2c_test.c
+-rw-r--r--   1 ingo     root         5393 Oct 29 20:42 lcd.c
+-rw-r--r--   1 ingo     root         2240 Oct 29 19:48 lcd.h
+-rw-r--r--   1 ingo     root         1399 Oct 28 18:39 pcf8574.c
+-rw-r--r--   1 ingo     root         1150 Oct 29 13:29 pcf8574.h

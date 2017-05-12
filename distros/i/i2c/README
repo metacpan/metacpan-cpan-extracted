@@ -1,0 +1,22 @@
+**** I2C-Device-Library ****
+Version 0.1  / 2.12.2000 
+Ingo Gerlach (DH1AAD)
+
+Installation 
+
+1. Verzeichnis anlegen /opt/i2c
+2. Die Datei i2c-0.1.tar.gz dorthin kopieren
+3. gzip -d i2c-0.1.tar.gz
+4. tar -xvf i2c-0.1.tar
+5. INSTALL aufrufen.
+
+
+Um die Perl Erweiterrung benutzen zu können, 
+muss Perl installiert sein
+
+Wichtig !
+
+Wird ein anderes Verzeichnis als /opt/i2c verwendet ,
+muss dies im src/Makefile eingetragen werden.
+
+

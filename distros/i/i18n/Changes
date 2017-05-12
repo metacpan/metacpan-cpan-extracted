@@ -1,0 +1,33 @@
+[Changes for 0.12 - 2016-08-17]
+
+* Fix building; no functional changes.
+
+[Changes for 0.11 - 2016-08-10]
+
+* Fix PAUSE indexing; no functional changes.
+
+[Changes for 0.10 - 2007-10-14]
+
+* LICENSING CHANGE: This compilation and all individual files in it
+  (except for the bundled libsyck code) are now under the permissive
+  "MIT" license.
+* Tidy up source code and test files.
+
+[Changes for 0.07 - 2004-11-04]
+
+* Chia-Liang Kao reported that undecorated strings were stringified
+  into REF() forms, instead of their contents.
+
+[Changes for 0.06 - 2004-08-01]
+
+* Fix reblessing of constants triggered by "IO::Handle".
+
+[Changes for 0.05 - 2004-07-22]
+
+* Make sure we have Perl 5.6.0 for now.
+* Work around Test::Builder bug that makes it unable to deal with overloaded
+  string constants in test names, by appending |'' to all such strings.
+
+[Changes for 0.04 - 2004-07-19]
+
+* First CPAN release.

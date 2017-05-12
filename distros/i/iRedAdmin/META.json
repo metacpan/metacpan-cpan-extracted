@@ -1,0 +1,67 @@
+{
+   "abstract" : "API interface to the panel iRedMail (http://www.iredmail.org)",
+   "author" : [
+      "Lucas Tiago de Moraes <lucastiagodemoraes@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "iRedAdmin",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Email::Valid" : "0",
+            "Encode" : "0",
+            "HTTP::Cookies" : "0",
+            "Moo" : "0",
+            "WWW::Mechanize" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "iRedAdmin" : {
+         "file" : "lib/iRedAdmin.pm",
+         "version" : "0.04"
+      },
+      "iRedAdmin::Admin" : {
+         "file" : "lib/iRedAdmin/Admin.pm"
+      },
+      "iRedAdmin::Domain" : {
+         "file" : "lib/iRedAdmin/Domain.pm"
+      },
+      "iRedAdmin::User" : {
+         "file" : "lib/iRedAdmin/User.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license-2.0.php"
+      ],      
+      "bugtracker" : {
+         "web" : "https://github.com/lucas1/Perl-iRedAdmin/issues"
+      },
+      "homepage" : "https://github.com/lucas1/Perl-iRedAdmin",
+      "repository" : {
+         "url" : "git://github.com/lucas1/Perl-iRedAdmin.git",
+         "web" : "https://github.com/lucas1/Perl-iRedAdmin"
+      }
+   },   
+   "version" : "0.04"
+}

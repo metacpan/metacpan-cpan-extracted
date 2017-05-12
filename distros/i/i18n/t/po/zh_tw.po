@@ -1,0 +1,20 @@
+# Chinese localization catalog for Request Tracker (RT)
+msgid ""
+msgstr ""
+"Last-Translator: Autrijus Tang <autrijus@autrijus.org>\n"
+"Language-Team: Chinese <members@ourinet.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "This is a %1"
+msgstr "這是個%1"
+
+msgid "This is a %1 of %2"
+msgstr "這是個%2的%1"
+
+msgid "test"
+msgstr "測試"
+
+msgid "i18n"
+msgstr "國際化"

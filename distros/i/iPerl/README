@@ -1,0 +1,71 @@
+This is iPerl (inverse Perl) version 0.6
+
+Copyright © 1999, Daniel Pfeiffer <occitan@esperanto.org>
+
+iPerl may be copied only under the terms of either the Artistic License or
+the GNU General Public License, which may be found in the Perl 5.0 source kit.
+
+Info and latest version are at http://beam.to/iPerl/
+
+
+NEWS
+
+Supports mod_perl and has a nifty debugger.
+Macro names no longer must be on word boundaries, but still are by default.
+Style xml renames sgml.
+Various bugs corrected.
+Useful file examples/cgi-test.phtml added.
+
+This is still alpha beacause there is no Makefile.pl and line numbers of error
+messages are grossly misleading.  But the documented features are well tested.
+
+
+DESCRIPTION
+
+Perl-programmes may contain bits of string to be output, whereas inversely
+iPerl-documents consist of any kind of text to be output, and bits of
+specially marked Perl that control the document with conditionals or loops
+spanning text, subdocument-includes and macro definitions.  This is comparable
+to, yet far more powerful than the C preprocessor or the m4 macro processor,
+but can also be seen as a template-mechanism.
+
+How you mark Perl depends on you taste.  Various styles are available
+including those of the two above-mentioned preprocessors.  Not only is there
+also a style for bringing PODs alive, but it can also strip them from a
+document allowing you to document anything with POD.
+
+
+INSTALLATION
+
+Copy Text/iPerl.pm to the Text subdirectory in one of the directories shown as
+@INC in the output of perl -V.
+
+Copy bin/iPerl to some directory shown by echo $PATH.
+
+Copy lisp/iPerl.elc to some directory shown by Emacs with F1 v load-path,
+preferably one ending in site-lisp.
+
+Copy cgi-bin/web-iPerl to the perl or cgi-bin directory of your web-server and
+instruct it to pass files with a special ending (e.g. *.phtml) to that script.
+For Apache this can be achieved by putting into conf/httpd.conf the following
+lines:
+
+  AddType application/x-web-iPerl phtml psgml pxml ptxt putxt pps
+  AddType application/x-web-iPerl pht psg pxm ptx put
+  DirectoryIndex index.html index.htm index.phtml index.pht
+
+For mod_perl operation:
+
+  Action application/x-web-iPerl /perl/web-iPerl
+
+For CGI operation:
+
+  Action application/x-web-iPerl /cgi-bin/web-iPerl
+
+For NPH operation (requires renaming script):
+
+  Action application/x-web-iPerl /cgi-bin/nph-iPerl
+
+For further information extract the documentation with pod2text or pod2html
+from the three files or study the examples.  The doc can also be read on the
+web-site.

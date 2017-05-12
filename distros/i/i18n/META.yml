@@ -1,0 +1,32 @@
+---
+abstract: 'Perl Internationalization Pragma'
+author:
+  - 'Audrey Tang <cpan@audreyt.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: i18n
+no_index:
+  directory:
+    - inc
+    - t
+provides:
+  i18n:
+    file: lib/i18n.pm
+    version: '0.12'
+requires:
+  Locale::Maketext: 0
+  Locale::Maketext::Lexicon: 0
+  Locale::Maketext::Simple: 0
+  perl: 5.6.0
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+version: '0.12'

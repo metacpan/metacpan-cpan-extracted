@@ -1,0 +1,53 @@
+NAME
+    invoker - implicit invoker, sort of
+
+SYNOPSIS
+      use invoker;
+
+      sub foo {
+        my $self = shift;
+        $->bar; # calls $self->bar;
+      }
+
+      use methods-invoker;
+      method {
+        $->bar # ditto
+      }
+
+DESCRIPTION
+    The invoker pragma enables the "$->" syntax for invoking methods on
+    $self , inspired by Perl6's "$.method" invocation.
+
+    The module does not inject the $self variable for you. you are
+    encouraged to use it in conjunction with self, selfvars,
+    <Method::Signatures::Simple>, or other similar modules.
+
+    The following syntax works:
+
+    $->foo( .. args ...)
+    $->foo
+    $->$method_name
+    $->$method_name( .. args ...)
+
+CAVEATS
+    Regular hash access must still be written as "$self->{attr}" instead of
+    "$->{attr}".
+
+    Internally, the module installs a parser hook to replace "$->" ($- and
+    the gt operator) with $--> (an invocation on the $- perlvar. It also
+    injects an "entersub" hook to replace $- with $self.
+
+BUGS
+TODO
+    custom invoker name with "use invoker '$this'"
+
+AUTHOR
+    Chia-liang Kao <clkao@clkao.org> Audrey Tang <audreyt@audreyt.org>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    methods
+

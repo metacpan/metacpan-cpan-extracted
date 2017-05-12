@@ -1,0 +1,17 @@
+Build.PL
+Changes
+ignore.txt
+lib/iRedAdmin.pm
+lib/iRedAdmin/Admin.pm
+lib/iRedAdmin/Domain.pm
+lib/iRedAdmin/User.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t

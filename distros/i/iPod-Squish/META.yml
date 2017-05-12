@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name:                iPod-Squish
+version:             0.02
+abstract:            ~
+license:             ~
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    FFmpeg::Command:               0
+    File::Which:                   0
+    Moose:                         0
+    MooseX::LogDispatch:           1.1001
+    MooseX::Types::Path::Class:    0
+    MP3::Info:                     0
+    Number::Bytes::Human:          0
+    Parallel::ForkManager:         0
+    Test::use::ok:                 0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

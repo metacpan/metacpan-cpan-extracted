@@ -1,0 +1,100 @@
+#local $display_header = $header	# -*- iPerl-style: "cpp" -*-
+<html>
+<head>
+
+// printing prevents reparsing, where a parameter may contain the word PERL
+#define PERL => sub { print $_[0]; '' }
+
+#sub htmlify(;$) { \
+    for( $_[0] or $_ ) { \
+	s/&/&amp;/g; \
+	s/</&lt;/g; \
+	s/>/&gt;/g; \
+	s/  / &nbsp;/g; \
+	s/\n/<br>/g; \
+	return $_; \
+    } \
+}
+
+#define MENU => sub {
+<select name=select><option>a<option>b<option>c</select>
+#}
+
+#define FORM => sub { \
+    local( $method, $button ) = @_
+<tr><td>
+<form method=PERL( $method )>
+  <textarea align=left cols=10 rows=2 name=textarea></textarea><br>
+  <input type=text name=text><br>
+  MENU MENU MENU <input type=submit value=" PERL( $button || $method ) ">
+</form>
+</td></tr>
+#}
+
+<title>CGI Environment</title>
+
+<body>
+<pre>PERL( htmlify $display_header )</pre>
+
+<table align=right cellpadding=5 border>
+FORM( 'get' )
+FORM( 'post' )
+FORM( 'post enctype="multipart/form-data"', 'multipart post' )
+</table>
+
+<h1>CGI Environment</h1>
+
+<h2>param()</h2>
+<dl>
+#foreach( sort { $a cmp $b } param ) { \
+    local @values = map htmlify, param( $_ ); \
+    local $" = '<li>' if $#values
+<dt><i>param( '<b>PERL( htmlify )</b>' )</i>
+<dd>PERL( $" . "@values" )
+#}
+</dl>
+<hr>
+<h2>%ENV</h2>
+#foreach( sort { $a cmp $b } keys %ENV ) {
+<dt><i>$ENV{ '<b>PERL( htmlify )</b>' }</i>
+<dd>PERL( htmlify $ENV{$_} )
+#}
+</dl>
+</html>
+
+#if( 0 ) {
+
+=head1 NAME
+
+cgi-test.phtml - display and try CGI environment
+
+
+=head1 SYNOPSIS
+
+On a L<web-iPerl> enabled server copy to some web-directory.  Call its URL
+with your favourite browser.
+
+
+=head1 DESCRIPTION
+
+First it displays the value of C<$header> as set by C<header @type>.  Under
+mod_perl this is empty.  As normal CGI this contains the header fields.  And
+if you are set up for NPH, this additionally contains an HTTP-response line.
+
+Then on the left hand side it contains the return values of all possible calls
+to C<param( ... )> in alphabetical order.  These depend on how you call the
+page.  For multivalued parameters you get list-bullets.  Under that you get
+all entries of C<%ENV> in alphabetical order.
+
+On the right hand side it contains three forms whose values get sent back to
+this page.  That way you can see how your environment reacts.
+
+
+=head1 SEE ALSO
+
+L<Text::iPerl>, L<iperl>, L<web-iPerl>, L<iPerl.el>, L<perl>,
+http://beam.to/iPerl/
+
+=cut
+
+#}

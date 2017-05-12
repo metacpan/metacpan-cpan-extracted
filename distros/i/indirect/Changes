@@ -1,0 +1,307 @@
+Revision history for indirect
+
+0.37    2016-07-12 16:40 UTC
+        + Chg : A large chunk of boilerplate XS code, which is also used in
+                other XS modules, has been factored out of the main .xs file
+                to a collection of .h files in the xsh subdirectory.
+        + Fix : [RT #115392] : Intermittent segfaults with heredocs
+                Heredocs should now be handled correctly.
+                Thanks Graham Knop for reporting.
+
+0.36    2015-07-17 22:15 UTC
+        + Fix : [RT #104312] : fatal hides perl errors in modules
+                no indirect 'fatal' will no longer hide compilation errors
+                occurring before indirect constructs.
+                Thanks Lukas Mai for reporting.
+
+0.35    2015-04-06 22:20 UTC
+        + Fix : The module could end being disabled in one thread if it was
+                first loaded in another thread and that thread was immediately
+                terminated. This is now fixed and should address test failures
+                of t//09-load-threads.t and t/42-threads-global.t.
+
+0.34    2015-04-02 19:50 UTC
+        + Chg : The new environment variable to enable thread tests on older
+                perls is PERL_FORCE_TEST_THREADS. Note that this variable
+                should only be turned on by authors.
+        + Fix : [RT #100068] : add link to historical tchrist post
+                The link has been added to the documentation. Thanks Olivier
+                Mengué for reporting.
+        + Fix : Segfaults when the module is loaded by several threads (or
+                Windows emulated processes) ran in parallel.
+        + Fix : Update the Windows ActivePerl + gcc 3.4 workaround for
+                ExtUtils::MakeMaker 7.04. Thanks Christian Walde for reporting
+                and feedback on this issue.
+        + Fix : Be really compatible with the optional OP_PARENT feature.
+        + Tst : $ENV{$Config{ldlibpthname}} is now preserved on all platforms,
+                which will address failures of t/41-threads-teardown.t and
+                t/50-external.t with unusual compilers (like icc) that link all
+                their compiled objects to their own libraries.
+
+0.33    2014-09-29 20:20 UTC
+        + Fix : [RT #99083] : Breaks eval in an END block in Win32 pseudo-forks.
+                Thanks Graham Knop for reporting.
+        + Fix : Segfaults during global destruction of a thread or a
+                pseudo-fork.
+
+0.32    2014-09-21 20:15 UTC
+        + Add : Support for the PERL_OP_PARENT optional feature introduced in
+                perl 5.21.2.
+        + Fix : [RT #92806] : Tests that use run_perl() fail on Android
+                Thanks Brian Fraser for the patch.
+        + Fix : indirect constructs will no longer segfault while inside
+                the empty package on perl 5.8.x. This fix may also prevent
+                some segfaults during global destruction.
+
+0.31    2013-09-05 16:45 UTC
+        + Fix : [RT #88428] : no indirect in eval can trigger for direct calls
+                on __PACKAGE__
+                Thanks Graham Knop for reporting.
+        + Tst : Author tests are no longer bundled with this distribution.
+                They are only made available to authors in the git repository.
+
+0.30    2013-05-16 15:55 UTC
+        + Fix : [RT #83806] : false positives with Devel::Declare
+                [RT #83839] : false positive using ? : syntax
+                Thanks Andrew Main for the patch.
+                However, please note that the reason this patch seems to fix
+                thinks has not been explained.
+        + Fix : [RT #84649] : incorrect RT link in metadata
+                Thanks Karen Etheridge for reporting.
+
+0.29    2013-03-05 01:30 UTC
+        + Fix : [RT #83659] : false positives
+                Proper method calls in string-like environments (like
+                "@{[ $x->new ]}" will no longer be reported as indirect.
+                This was a regression in 0.28.
+                Thanks Andrew Main for reporting.
+        + Fix : Broken linkage on Windows with gcc 3.4, which appears in
+                particular when using ActivePerl's default compiler suite.
+                For those setups, the indirect shared library will now be
+                linked against the perl dll directly (instead of the import
+                library).
+
+0.28    2013-02-26 17:05 UTC
+        + Fix : [RT #83450] : newlines confuse indirect
+                Perl sometimes resets the line buffer between the object and
+                the method name (e.g. for "sort Class\n->method" outside of
+                eval), and this could cause direct method calls to be reported
+                as indirect.
+                Thanks Gianni Ceccarelli for reporting.
+        + Fix : Check functions are now replaced and restored in a thread-safe
+                manner, either by using the wrap_op_checker() function from perl
+                when it is available (starting from perl 5.16) or by taking the
+                OP_REFCNT mutex on older perls.
+
+0.27    2013-01-30 19:00 UTC
+        + Fix : [RT #82562] : indirect/Devel::CallParser interaction
+                indirect has been taught to play nicely with Devel::CallParser.
+                Thanks Andrew Main for the patch.
+        + Tst : Author tests overhaul.
+
+0.26    2011-10-23 14:25 UTC
+        + Add : "no indirect 'global'" enables the pragma for the whole program,
+                except for lexical scopes that "use indirect" explicitely.
+        + Chg : Passing both the 'fatal' and 'hook' options to unimport() is
+                now considered an error, and will result in an exception.
+                unimport() used to consider only the first passed option of
+                those two, and silently ignored the other.
+        + Tst : Test failures of t/41-threads-teardown.t and t/50-external.t on
+                Cygwin should have been addressed.
+        + Tst : Threads tests will not fail anymore if resources constraints
+                prevent the system from creating all the required threads.
+
+0.25    2011-08-24 15:40 UTC
+        + Fix : RT #69291 is now also fixed for perl 5.8. The pragma will no
+                longer vivify the "indirect" entry in the hints hash %^H on
+                perl 5.8.
+        + Tst : Attempt to make t/50-external.t pass on Cygwin.
+
+0.24    2011-07-17 23:15 UTC
+        + Fix : [RT #64521] : "no indirect" leaking into eval.
+                This is currently only fixed for perl 5.10 (perl 5.12 and
+                higher were never affected). It was caused by a very stupid
+                mistake of mine that was introduced in indirect version 0.23.
+                Thanks Michael G Schwern for reporting.
+        + Fix : [RT #69291] : indirect.pm breaks %^H.
+                This was caused by the same mistake as for the previous bug,
+                and as such it is also only fixed for perl 5.10 (and never
+                affected perl 5.12).
+                Thanks Andrew Main for reporting.
+        + Doc : C++ compilers are officially NOT supported.
+
+0.23    2010-10-03 00:15 UTC
+        + Fix : Some indirect constructs could be incorrectly reported when
+                several modules were used in the same scope. This caused
+                t/30-scope.t to fail randomly.
+        + Tst : Threads tests are now only run on perl 5.13.4 and higher.
+                They could segfault randomly because of what seems to be an
+                internal bug of Perl, which has been addressed in 5.13.4.
+                There is also an environment variable that allows you to
+                forcefully run those tests, but it should be set only for
+                author testing and not for end users.
+
+0.22    2010-08-16 16:00 UTC
+        + Add : Indirect constructs are now reported for code interpolated
+                in quote-like environments, like "${\( ... )}", "@{[ ... ]}",
+                s/pattern/ ... /e, qr/(?{ ... })/ or qr/(??{ ... })/.
+        + Add : You can now make the pragma lethal by passing anything matching
+                /^:?fatal$/i to import(), including "FATAL" and ":Fatal".
+        + Fix : [RT #60378] : segmentation fault on indirect_ck_method.
+                This caused constructs like "@{[ $obj->$meth ]}" to segfault
+                when $meth was a lexical.
+                Thanks Tokuhiro Matsuno for reporting.
+
+0.21    2010-05-31 23:10 UTC
+        + Chg : perl 5.8.1 is now required (instead of 5.8.0).
+        + Fix : [RT #57699] : indirect fail with 64-bit int on 5.13.1.
+                It was actually a problem with thread destructors segfaulting
+                because they weren't called at the right time anymore.
+                Thanks Andrew Main for reporting.
+        + Tst : A few more regression tests about the scope leak bug.
+
+0.20    2010-04-18 21:25 UTC
+        + Fix : [RT #50570] : "indirect" leaking into LWP.
+                Thanks Andrew Main for reporting.
+                More generally, the require propagation workaround on 5.8-5.10.0
+                has been overhauled, and other scope leaks should be fixed.
+        + Fix : Test failures with 5.12 on Windows where Strawberry Perl crashes
+                because the SystemRoot environment variable is missing.
+        + Fix : Work around Kwalitee test misfailures.
+
+0.19    2009-08-28 18:40 UTC
+        + Add : The new constant I_FORKSAFE can be tested to know whether the
+                module will behave nicely when fork()ing. It's currently always
+                true except on Windows where you need perl 5.10.1 for it to be
+                true.
+        + Fix : I_THREADSAFE and I_FORKSAFE ought to be true when
+                PERL_INDIRECT_PM_DISABLE is set.
+        + Fix : The pragma could still leak if you passed to the "hook" option
+                a reference to the same (named) subroutine from two different
+                require scopes. The fix also provides a better solution for
+                RT #47902.
+        + Fix : Segfaults when indirect is loaded for the first time from
+                inside a thread.
+        + Fix : Leaks of memory associated with the root interpreter.
+        + Opt : Less memory will be used for non-threaded perls version 5.10.0
+                and below, and for threaded perls from version 5.10.1.
+
+0.18    2009-08-23 16:15 UTC
+        + Add : When set, the PERL_INDIRECT_PM_DISABLE environment variable
+                disables the pragma globally.
+
+0.17    2009-07-16 12:10 UTC
+        + Fix : [RT #47902] : "no indirect" leaking again.
+                This actually turned out to be a bug in how the hook coderefs
+                were stored in the hints hash.
+                Thanks Andrew Main for reporting once again.
+        + Fix : t/80-regressions.t failing on Windows.
+        + Tst : Yet more cleanups.
+
+0.16    2009-07-14 16:50 UTC
+        + Add : Indirect calls on blocks are now reported. For those, '{' is
+                passed to the hook as the object description.
+        + Add : The new indirect::msg() function publicizes the default
+                warning/exception message.
+        + Fix : [RT #47866] : Segfault with UTF-8 regexps.
+                Thanks Andrew Main for reporting.
+        + Tst : Cleanups.
+
+0.15    2009-07-08 22:55 UTC
+        + Fix : Invalid constructs with the same method and package name were
+                not reported.
+        + Fix : The error line number used to point to the end of the expression
+                instead of its beginning.
+
+0.14    2009-06-04 21:55 UTC
+        + Fix : Prevent bogus invalid syntaxes caused by reallocated memory
+                chunks. Thanks Andrew Main for reporting with a reproducible
+                test case.
+
+0.13    2009-05-24 18:50 UTC
+        + Add : The hook now receives the file name and the line where the
+                error happened in respectively $_[2] and $_[3].
+        + Fix : Pass mortalized copies of the method name and object to the
+                hook. This seems to fix some rare crashes.
+        + Fix : Work around a bug in perl 5.10.0 and lower. Thanks Andrew Main
+                for teaching me about this issue.
+        + Fix : Report the correct file in error messages (a regression from the
+                previous version).
+
+0.12    2009-05-03 14:30 UTC
+        + Add : You can specify the action to execute for each indirect
+                construct encountered with the new "hook => $coderef" unimport()
+                option.
+        + Chg : A ptable is now used internally for the op => position mapping.
+        + Fix : The pragma is now built with thread safety features enabled
+                whenever possible (a notable exception is perl 5.8.x on Win32,
+                as something seems wrong with its context handling).
+                The new indirect::I_THREADSAFE() constant reflects this.
+        + Fix : A negation precedence nit in indirect_ck_entersub().
+        + Tst : "use/no indirect" while parsing an indirect construct.
+        + Tst : Thread safety.
+
+0.11    2009-02-08 18:35 UTC
+        + Fix : Potential collisions by hashing pointers with a wrong format.
+        + Upd : Resources in META.yml.
+
+0.10    2009-01-17 12:40 UTC
+        Re-release 0.09_01 as stable.
+
+0.09_01 2008-12-08 17:55 UTC
+        + Fix : Invalid memory read with "${\(new Foo)}" constructs. The
+                corresponding test is turned back on.
+        + Tst : Refinements in t/30-scope.t
+
+0.09    2008-12-05 20:35 UTC
+        + Add : Support for perl 5.8.
+        + Tst : Skip a test in t/10-good.t that randomly segfaults for (I guess)
+                systems stricter than linux in the way they manage their memory.
+
+0.08    2008-10-22 14:45 UTC
+        + Fix : A rare edge case for package whose names are prefix of 'main'.
+        + Tst : Test $$ as variable and state variables.
+
+0.07_03 2008-10-17 20:10 UTC
+        + Add : Support and tests for variables with spaces after the sigil.
+        + Upd : META.yml spec updated to 1.4.
+
+0.07_02 2008-10-15 21:10 UTC
+        + Add : Support and tests for package variables.
+        + Tst : Coverage improved by removing dead code.
+
+0.07_01 2008-10-15 16:00 UTC
+        + Fix : [RT #40055] : Not handling RV2SV => GV(SV) correctly, which
+                could cause 'no indirect; print' segfaults. Thanks Goro Fuji for
+                reporting.
+
+0.06    2008-10-11 16:45 UTC
+        + Doc : Nits.
+        + Tst : Test "no indirect 'anything'", "foo Class->bar", and indirect
+                uses of exec() and system().
+
+0.05    2008-10-02 14:40 UTC
+        + Chg : Now the old check function is always called before storing an op
+                into the map.
+        + Fix : Misc code and docs refinements.
+
+0.04    2008-08-30 19:00 UTC
+        + Fix : Clean up the op->src hash when we're done with an entersub.
+        + Tst : No longer fork for testing. IPC::Cmd isn't required anymore.
+
+0.03    2008-08-12 15:25 UTC
+        This release is kindly supported by Copenhagen Hotel Centrum WiFi.
+        + Fix : Tests used not to pass PERL5OPTS to their kids. This lead to
+                failures under CPAN. I think.
+        + Tst : Refinements.
+
+0.02    2008-08-11 15:55 UTC
+        + Fix : Some building failures with old gcc versions that didn't seem to
+                like the ((hint == 2) ? croak : warn)(msg) construct. I think.
+        + Rem : Unused cruft from a previous implementation.
+        + Tst : Fail more gracefully when we can't capture buffers or when the
+                child returned an error.
+
+0.01    2008-08-10 20:40 UTC
+        First version, released on an unsuspecting world.
+

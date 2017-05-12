@@ -1,0 +1,29 @@
+---
+name: iCal-Parser-SAX
+version: 1.09
+author:
+  - 'Rick Frankel, cpan@rickster.com'
+abstract: Generate SAX events from an iCalendar
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  DateTime: 0.22
+  IO::File: 1.1
+  IO::String: 1.05
+  XML::SAX::Base: 1.04
+  XML::SAX::Writer: 0.44
+  iCal::Parser: 1.07
+build_requires:
+  Test::More: 0.47
+  Test::XML: 0.06
+recommends:
+  LWP::UserAgent: 2.032
+provides:
+  iCal::Parser::SAX:
+    file: lib/iCal/Parser/SAX.pm
+    version: 1.09
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

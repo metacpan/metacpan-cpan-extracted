@@ -1,0 +1,8 @@
+Revision history for Perl extension i2c_lpt.
+
+0.01  Fri Nov 24 18:07:19 2000
+	- original version; created by h2xs 1.19
+
+0.1   Sun Nov 26 22:00:00 2000
+	- i2c devices added
+
