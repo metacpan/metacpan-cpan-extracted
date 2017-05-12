@@ -1,0 +1,60 @@
+(create index pointers based on parsing XS)
+
+proper XS parsing to get the package right?
+
+RadioBox needs s/point/pos/
+
+wxEmptyString is not exported
+wxButtonNameStr and etc as well
+wxT("treeCtrl") too :-(
+ListCtrl := TreeCtrl
+
+Wizard has no id
+
+########################################################################
+# the goal is to create a convention like:
+Foo->new($parent, $arg1, $arg2, param => $val);
+
+id can be a named parameter, but is otherwised assumed to be -1
+
+# docURL
+http://wxwidgets.org/manuals/stable/wx_wxcheckbox.html#wxcheckboxctor
+http://wxwidgets.org/manuals/stable/wx_THINGY.html#THINGYctor
+########################################################################
+
+my @args = shift(@_);
+my $opts;
+for my $arg (@argpos) {
+  unless(exists($defaults->{$arg})) {
+    push(@args, shift(@_));
+  }
+  else {
+    $opts ||= {@_}; # oops, how to error-check?
+  }
+}
+
+########################################################################
+# try again
+my $class = shift;
+my @args = shift(@_);
+while(my $arg = shift(@argpos)) {
+  exists($defaults->{$arg}) and last;
+  push(@args, shift(@_));
+}
+
+(@_ % 2) and croak("odd number of elements in options list");
+my %opts = @_;
+foreach my $arg (@argpos) { # these all have defaults
+  %opts or last;
+  push(@args, (exists($opts{$arg}) ?
+    delete($opts{$arg}) : $defaults->{$arg}));
+}
+$class->$super_method(@args);
+########################################################################
+########################################################################
+
+Aside:  will the choices arrayref get deref'd?  Looks like maybe
+wxPli_av_2_stringarray does that.
+
+# vim:ts=2:sw=2:et:sta
+

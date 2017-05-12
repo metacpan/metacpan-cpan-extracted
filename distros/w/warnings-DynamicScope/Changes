@@ -1,0 +1,29 @@
+Revision history for Perl extension warnings::DynamicScope.
+$Id: Changes,v 1.9 2005/08/15 15:53:59 kay Exp $
+
+1.04  Wed Aug 15 2005
+    - Added Test::Warn to PREREQ_PM in Makefile.PL
+
+1.03  Wed Aug 10 2005
+    - Fixed a bug the value of $^W was not set properly in
+      BEGIN block.
+
+1.02  Sun Aug 07 2005
+    - Defined new package variable named "$DYNAMIC_W_BITS".
+      The tied hash "%^W" no longer accesses to the variable
+      "${^WARNING_BITS}" unless it is accessed in BEGIN block.
+    - Now the hash "%^W" accepts keyword "FATAL" as value.
+      If the value is set to "FATAL", it returns 2 as value.
+    - Added "DEAD BIT", "BEGIN BLOCK", and "$^W AND %W" section
+      in POD document.
+    - Improved handling of the variable "$^W". It's value is always
+      synchronized with the value of "$^W{all}".
+    - Made "%^W" realize "-W" and "-X" command line switches.
+
+1.01  Thu Aug  04 2005
+    - Modefied POD document.
+    - Added a few tests.
+
+1.00  Thu Aug  04 2005
+    - original version.
+

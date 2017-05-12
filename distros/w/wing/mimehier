@@ -1,0 +1,29 @@
+#!/usr/bin/perl
+#
+# Utility to show the hierarchy of a multipart MIME message
+#
+use Mail::Cclient;
+
+sub show_mime_struct {
+    my ($prefix, $body) = @_;
+    if ($body->type eq "MULTIPART") {
+	my $nested = $body->nested;
+	my $count = scalar @$nested;
+	$prefix .= "." if $prefix;
+	for (my $i = 1; $i <= $count; $i++) {
+	    show_mime_struct("$prefix$i", $nested->[$i - 1]);
+	}
+    } else {
+	printf "%-6.6s %-32.32s %-6.6s %-24.24s [%s]\n",
+	    $prefix, $body->description, sprintf("(%d)", $body->lines),
+	    lc($body->type)."/".lc($body->subtype), lc($body->encoding);
+    }
+}
+
+if (@ARGV != 2) {
+    print STDERR "Usage: mimehier mailbox msgno\n";
+    exit 2;
+}
+my $mc = Mail::Cclient->new($ARGV[0]) or die "Mail::Cclient->new failed\n";
+my ($e, $body) = $mc->fetchstructure($ARGV[1]) or die "fetchstructure failed\n";
+show_mime_struct("", $body);

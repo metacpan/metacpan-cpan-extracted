@@ -1,0 +1,31 @@
+NAME
+
+warnings::method - Produces warnings if methods are called as functions
+
+SYNOPSIS
+
+	use warnings::method;  # installs the check routine as 'syntax'
+	use warnings 'syntax'; # enables  the check routine
+
+	Or, try "perl -Mblib example/synopsis.pl" after "make test".
+
+INSTALLATION
+
+	To install this module, run the following commands:
+
+		perl Makefile.PL
+		make
+		make test
+		make install
+
+DEPENDENCIES
+
+	Perl 5.8.1 or later, and a C compiler.
+
+COPYRIGHT AND LICENCE
+
+	Copyright (C) 2008, Goro Fuji <gfuji(at)cpan.org>, Some rights reversed.
+
+	This library is free software; you can redistribute it and/or modify
+	it under the same terms as Perl itself.
+

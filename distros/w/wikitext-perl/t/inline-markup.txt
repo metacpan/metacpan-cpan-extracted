@@ -1,0 +1,39 @@
+There are four types of text formattings defined in WikiText (<--
+camelcaps do not indicate a link).  These are /emphasis/, *strong*,
+_underline_, -strikethrough- and {typewriter font}.
+
+These text formattings must obey certain rules.  They must enclose the
+surrounded text without whitespace: { some text } is not typewriter
+font, but "some text" in curly braces.  Use {some text} to generate
+typewriter font.
+
+*This disambiguates* inline markup at the start of a paragraph from
+environment / paragraph types / (useless slash to confuse the parser).
+
+Text formatting markup can contain _multiple words_ *and even line
+breaks*.  The markup characters may only follow/precede special
+characters, such as whitespace and sentence characters (*bold* vs
+not_underlined_).
+
+Mathematical formulas can also confuse the parser:
+
+  a * b * c = c*b*a (nothings bold here)
+
+  a *b* c = c /b/ a (this is markup ... but who'd write like this and
+                     not mean it)
+
+Don't even think about doing inline markups with some s///g
+expressions.  The verbatim inline tag doesn't like it. {{*this* is not
+bold but <b>this</b> is}}.
+
+Links are simple: [http://google.com/|google-fu] or
+[heise.de]. [dont@bother.me] is a mailto: link.
+
+Force image links to be inlined by using [=nothing.png] or
+[=nothing.png|an image showing nothing].
+
+With [#google.com] you can generate section links, even if the target
+looks like something else.  With [>localhost] you can generate
+external links, even if the target doesn't seem to be.
+
+Links and verbatim obey the same rules as the text formatting markups.

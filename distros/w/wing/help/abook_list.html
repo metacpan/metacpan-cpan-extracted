@@ -1,0 +1,112 @@
+<!-- This file is auto-included as embedded HTML and is only a "body" -->
+<h2 align="center">Help for address book list screen</h2>
+The address book list screen looks something like this:
+<hr>
+<table>
+<tr>
+<td><img src="/icons/back.gif" border=0 alt="Back"></td>
+<td><img src="/wing-icons/help.gif" border=0 alt="Help"></td>
+<td><img src="/wing-icons/address-search.gif" border=0 alt="Address Search"></td>
+<td><img src="/wing-icons/logout.gif" border=0 alt="Logout"></td>
+</tr>
+</table>
+<h2 align="center">Address books</h2>
+<table>
+<tr>
+<td><img src="/wing-icons/plus.gif" border=0 alt="+"> </td>
+<td>personal</td>
+<td><img src="/wing-icons/arrow-up-inactive.gif" alt="&nbsp;&nbsp;" border=0></td>
+<td><img src="/wing-icons/arrow-down.gif" alt="Down" border=0></td>
+<td><img src="/wing-icons/permissions.gif" border=0 alt="Permissions"></td>
+<td><img src="/wing-icons/delete.gif" border=0 alt="Delete"></td>
+</tr>
+<tr>
+<td><img src="/wing-icons/minus.gif" border=0 alt="+"> </td>
+<td>friends</td>
+<td><img src="/wing-icons/arrow-up.gif" alt="&nbsp;&nbsp;" border=0></td>
+<td><img src="/wing-icons/arrow-down.gif" alt="Down" border=0></td>
+<td><img src="/wing-icons/permissions.gif" border=0 alt="Permissions"></td>
+<td><img src="/wing-icons/delete.gif" border=0 alt="Delete"></td>
+</tr>
+<tr>
+<td><img src="/wing-icons/minus.gif" border=0 alt="+"> </td>
+<td>shared</td>
+<td><img src="/wing-icons/arrow-up.gif" alt="&nbsp;&nbsp;" border=0></td>
+<td><img src="/wing-icons/arrow-down.gif" alt="Down" border=0></td>
+<td><img src="/wing-icons/permissions.gif" border=0 alt="Permissions"></td>
+<td><img src="/wing-icons/delete.gif" border=0 alt="Delete"></td>
+</tr>
+<tr>
+<td><img src="/wing-icons/plus.gif" border=0 alt="+"> </td>
+<td>fred/public</td>
+<td><img src="/wing-icons/arrow-up.gif" alt="&nbsp;&nbsp;" border=0></td>
+<td><img src="/wing-icons/arrow-down-inactive.gif" alt="&nbsp;&nbsp;&nbsp;&nbsp;" border=0></td>
+<td><img src="/wing-icons/drop.gif" border=0 alt="Drop"></td>
+</tr>
+</table>
+<form>
+<input type="submit" name="update_save" value="Update for future sessions">
+<br>
+Address book <input name="abook">
+<input type="submit" name="create_add" value="Create/Add to list">
+<br>
+Quick search for alias <input name="alias">
+<input type="submit" name="search" value="Search">
+</form>
+<hr>
+<h3>The table of address books</h3>
+<ul>
+<li>The table lists your own address books and any address books
+belonging to other users which you have explicitly added. Address
+books belonging to other users are listed in the form
+"username/address_book_name".
+<li>The <img src="/wing-icons/plus.gif" border=0 align="absmiddle" alt="+">
+and
+<img src="/wing-icons/minus.gif" border=0 align="absmiddle" alt="-">
+markers indicate whether or not a given address book
+is included in your default list of address books to search.
+Click on the marker to toggle inclusion/exclusion.</li>
+<li>Click on the
+<img src="/wing-icons/arrow-up.gif" border=0 align="absmiddle" alt="Up">
+/
+<img src="/wing-icons/arrow-down.gif" border=0 align="absmiddle" alt="Down">
+arrows to move the given address book up/down the ordered list.</li>
+<li>Click on
+<img src="/wing-icons/drop.gif" border=0 align="absmiddle" alt="Drop">
+to drop an address book owned by another user from the list.</li>
+<li> Any of the above adjustments to the list take effect immediately
+and last for the rest of the login session. Pressing the
+"Update for future sessions" button saves the current list as the
+default for all future sessions.
+<li>Click on
+<img src="/wing-icons/permissions.gif" border=0 align="absmiddle" alt="Permissions">
+to grant/revoke permissions for other users to access an address book
+that you own.</li>
+<li>Click on
+<img src="/wing-icons/delete.gif" border=0 align="absmiddle" alt="Delete">
+to delete an address book that you own.
+Note that there is no confirmation request and the data in a deleted
+address book cannot be recovered. You cannot delete your original
+"personal" address book.</li>
+</ul>
+<h3>Creating/adding address books to the list</h3>
+<ul>
+<li>To create a new address book, enter a name for it in the "Address book"
+field and press the "Create/Add to list" button.
+Address book names must be between 1 and 63 characters. Legal characters
+are alphanumeric (A-Z, a-z, 0-9), spaces or those in the set
+"!$%^*()+=;@~#?.,-" (quotes excluded).</li>
+<li>To include an address book owned by another user in the above table,
+enter its full name in the "Address book" field in the form
+<tt>username/address_book_name</tt> and press the "Create/Add to list"
+button. Note that the owner of the address book must have used the
+above-mentioned "Permissions" button to grant you access.</li>
+</ul>
+<h3>Short-cut for quick searches</h3>
+From this page you can also perform a short-cut search for a given
+alias by typing it into the "Quick search for alias" field and pressing
+the "Search" button. The search is carried out for an exact match of the
+alias in your default search list. It is equivalent to going to the
+"Address Search" screen with "Search in" set to "default list" and the
+condition fields set to "alias is ...".
+</body></html>

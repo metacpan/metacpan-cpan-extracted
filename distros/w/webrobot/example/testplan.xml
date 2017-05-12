@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!--
+FREE VARIABLES
+application
+-->
+
+<!--
+# Test:
+#  1. Login mit Kunde (koester,xxx)
+#  2. koester: Anzeigen der Bestelliste mit den Datensätzen 400000,400001 und 400002
+#  3. Login mit OrderManagementService (orderrequest,xxx)
+#  4. orderrequest: Abruf der letzten Bestellungen
+#  2. koester: Anzeigen der Bestelliste mit den Datensätzen 400000,400001 und 400002
+#
+# @version 0.1
+# @author uwalker
+-->
+
+<plan>
+
+
+    <request>
+        <method value='GET'/>
+        <url value='http://s3www.s3.abas.de/s3extern'/>
+        <description value='s3www home, 1 redirect'/>
+    </request>
+
+    <request>
+        <method value='GET'/>
+        <url value='http://s3www.s3.abas.de/s3extern'/>
+        <description value='s3www home, 1 redirect, timout=0'/>
+        <assert>
+            <WWW.Webrobot.Assert>
+                <and>
+                    <timeout value='0.0'/>
+                    <xpath xpath='//title/text()' value='Willkommen im abas-Webshop!'/>
+                </and>
+            </WWW.Webrobot.Assert>
+        </assert>
+    </request>
+
+    <request>
+        <method value='GET'/>
+        <url value='{application}/tree.do?id=3&amp;a=1&amp;treeId=troja.mainmenu.id'/>
+        <description value='Aufruf 1'/>
+    </request>
+
+    <request>
+        <method value='GET'/>
+        <url value='{application}/tree.do?id=3&amp;a=1&amp;treeId=troja.mainmenu.id'/>
+        <description value='Aufruf 2'/>
+    </request>
+
+    <request>
+        <method value='GET'/>
+        <url value='{application}/login.do'/>
+        <assert>
+            <WWW.Webrobot.Assert>
+                <and>
+                    <status value='2'/>
+                    <regex value='Anmeldung'/>
+                    <regex value='Zugangs-Name'/>
+                    <regex value='Passwort'/>
+                    <timeout value='0.1'/>
+                </and>
+            </WWW.Webrobot.Assert>
+        </assert>
+        <useragent value='koester'/>
+    </request>
+
+    <request>
+        <method value='POST'/>
+        <url value='{application}/authentification/login/j_security_check'/>
+        <data>
+            <parm name='j_username' value='koester'/>
+            <parm name='login' value='Anmelden'/>
+            <parm name='j_password' value='xxx'/>
+            <parm name='encoding' value='(aa,bb) prozent %'/>
+        </data>
+        <assert>
+            <WWW.Webrobot.Assert>
+                <and>
+                    <status value='2'/>
+                    <regex value='Abmelden'/>
+                </and>
+            </WWW.Webrobot.Assert>
+        </assert>
+        <description value='Anmelden: Benutzername=koester, Passwort=xxx. Rolle=Customer'/>
+        <useragent value='koester'/>
+    </request>
+
+    <request>
+        <method value='GET'/>
+        <url value='{application}/order/management/secure/showOrderList.do'/>
+        <assert>
+            <WWW.Webrobot.Assert>
+                <and>
+                    <status value='2'/>
+                    <regex value='Liste Ihrer Bestellungen'/>
+                    <regex value='400000'/>
+                    <regex value='400001'/>
+                    <regex value='400002'/>
+                </and>
+            </WWW.Webrobot.Assert>
+        </assert>
+        <description value='Auf korrekte Bestellliste testen.'/>
+        <useragent value='koester'/>
+    </request>
+
+    <request>
+        <method value='GET'/>
+        <url value='{application}/login.do'/>
+        <assert>
+            <WWW.Webrobot.Assert>
+                <and>
+                    <status value='2'/>
+                    <regex value='Anmeldung'/>
+                    <regex value='Zugangs-Name'/>
+                    <regex value='Passwort'/>
+                </and>
+            </WWW.Webrobot.Assert>
+        </assert>
+        <description value=' '/>
+        <useragent value='orderrequest'/>
+    </request>
+
+    <request>
+        <method value='POST'/>
+        <url value='{application}/authentification/login/j_security_check'/>
+        <data>
+            <parm name='j_username' value='orderrequest'/>
+            <parm name='login' value='Anmelden'/>
+            <parm name='j_password' value='xxx'/>
+        </data>
+        <assert>
+            <WWW.Webrobot.Assert>
+                <and>
+                    <status value='2'/>
+                    <regex value='Abmelden'/>
+                </and>
+            </WWW.Webrobot.Assert>
+        </assert>
+        <description value='Anmelden: Benutzername=orderrequest, Passwort=xxx. Rolle=OrderManagementService'/>
+        <useragent value='orderrequest'/>
+    </request>
+
+    <request>
+        <method value='GET'/>
+        <url value='{application}/getOrderRequest'/>
+        <useragent value='orderrequest'/>
+    </request>
+
+    <request>
+        <method value='GET'/>
+        <url value='{application}/order/management/secure/showOrderList.do'/>
+        <useragent value='koester'/>
+        <assert>
+            <WWW.Webrobot.Assert>
+                <and>
+                    <status value='2'/>
+                    <regex value='Liste Ihrer Bestellungen'/>
+                    <regex value='Ihre Anmerkungen'/>
+                    <regex value='400000'/>
+                    <regex value='400001'/>
+                    <regex value='400002'/>
+                </and>
+            </WWW.Webrobot.Assert>
+        </assert>
+        <description value='Bestellliste anzeigen!'/>
+    </request>
+</plan>

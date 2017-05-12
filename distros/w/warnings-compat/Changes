@@ -1,0 +1,33 @@
+Revision history for warnings-compat
+
+0.07    2008.09.11  (SAPER)
+        [DOC] CPAN-RT#39170: Corrected the main description. Thanks to 
+        Michael Schwern for noting the outdated part.
+        [DOC] CPAN-RT#37740: Small pod typo, found by Slaven Rezic.
+
+0.06    2008.01.12  (SAPER)
+        [DOC] CPAN-RT#29654 (follow-up): Added another way to list the module 
+        as prereq, but only on old Perls. Suggested by Slaven Rezic.
+
+0.05    2008.01.04  (SAPER)
+        [DOC] CPAN-RT#29654: Explain how to list this module as a prereq.
+        Thanks to Alexandr Ciornii.
+        [DOC] Updated links to go to the module RT queue instead of the form.
+
+0.04    2007.07.02  (SAPER)
+        [BUGFIX] CPAN-RT#27908: Restore installation of warnings/compat.pm 
+        and only this one on modern Perl (5.6+). Thanks to Michael Schwern
+        for the patch.
+
+0.03    2006.11.13  (SAPER)
+        [BUGFIX] CPAN-RT#23117: Prevent installation of the modules on recent
+        Perls because the real modules can be deleted by UNINST=1 (plus a few
+        other minor fixes). Thanks to Michael Schwern for the patch.
+
+0.02    2006.10.11  (SAPER)
+        [FEATURE] Added warnings::compat.
+        [DOC] Fixed a few typos.
+
+0.01    2006.10.04  (SAPER)
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/warnings.pm
+lib/warnings/compat.pm
+lib/warnings/register.pm
+eg/warnings.pl
+eg/warnings-register.pl
+t/00-load.t
+t/distchk.t
+t/podcover.t
+t/pod.t
+t/portfs.t
+t/warnings.t

@@ -1,0 +1,846 @@
+=head1 NAME
+
+WWW::Webrobot::pod::Testplan - How to write a test plan for L<webrobot>
+
+=head1 SYNOPSIS
+
+ <?xml version="1.0" encoding="iso-8859-1"?>
+ <plan>
+
+    <request>
+        <method value='GET'/>
+        <url value='http://google.de/'/>
+    </request>
+
+    <include file='a-file-name'>
+        <parm name='application' value='${application}'/>
+        <parm name='username' value='koester'/>
+    </include>
+
+    <plan action="shuffle">
+
+        <request>
+            <method value='GET'/>
+            <url value='http://google.de/'/>
+            <description value='Visit Google'/>
+            <assert>
+                <and>
+                    <status value='200'/>
+                    <regex value='Erweiterte Suche'/>
+                    <not>
+                        <regex value='Sprachtools'/>
+                    </not>
+                    <timeout value='2.5'/>
+                </and>
+            </assert>
+        </request>
+
+        <request>
+            <method value='POST'/>
+            <url value='http://yourserver.com'/>
+            <data>
+                <parm name='username' value='me'/>
+                <parm name='password' value='secret'/>
+            </data>
+            <description value='Login at yourserver.com'/>
+        </request>
+
+    </plan>
+
+    <cookies value='clear'/>
+
+    <referrer value='on'/>
+
+    <request>
+        <method value='GET'/>
+        <url value='http://google.de/'/>
+    </request>
+
+
+ </plan>
+
+
+
+=head1 DESCRIPTION
+
+A test plan is a list of elements.
+An element itself may be a C<request>, a (sub) test C<plan>,
+an C<include> or a C<cookie> control command.
+
+While processing a plan will be flattened and
+all requests are executed in sequence.
+This ist the top level structure of a test plan:
+
+ <?xml version="1.0" encoding="iso-8859-1"?>
+ <plan>
+        ... request ...
+        ... include ...
+        ... (sub)plan ...
+ </plan>
+
+
+
+
+=head1 Tag <plan>
+
+Besides structure the main purpose of this tag is to shuffle
+its containing requests with a pseudo random generator.
+
+Attributes:
+
+        action='shuffle'
+
+=head1 Tag <include>
+
+This tag includes another test plan.
+
+Attributes:
+
+        file='filename'
+
+<include> tags may define names local to the file included.
+This is a way to parameterise a files content.
+See section L<Names (Variables)>.
+
+Example:
+
+        <include file='a file name'>
+            <parm name='application' value='${application}'/>
+            <parm name='username' value='mary'/>
+            <parm name='useragent' value='marysagent'/>
+        </include>
+
+=head1 Tag <cookies>
+
+By default cookies are C<on>.
+You can switch cookies C<off> or you can just C<clear> the cookies.
+While C<clear> will clear all cookies,
+C<clear_temporary> will clear only temporary cookies.
+A browser must clear all temporary cookies when it will be closed.
+
+Example:
+
+        <cookies value='on'/>
+        <cookies value='off'/>
+        <cookies value='clear'/>
+        <cookies value='clear_temporary'/>
+
+=head1 Tag <referrer>
+
+By default no http referrers will be sent.
+You can switch this behaviour on or off or you can just clear the referrer.
+If you want referrers to be switched on,
+then place the <referrer> tag at least before the request that must be referred to.
+
+Example:
+
+        <referrer value='on'/>
+        <referrer value='off'/>
+        <referrer value='clear'/>
+
+
+=head1 Tag <config>
+
+Read more config variables.
+These variables must be in a name/value format (similar to java.util.Properties).
+The name/value pairs may be read from a file (use attribute "filename") or
+from a program (use attribute "script").
+
+Example:
+
+        <config filename='example-filename.cfg'/>
+        <config script='example-script.sh'/>
+
+Example for the properties format:
+
+        name=value
+        another_name=anothervalue
+
+
+=head1 Tag <request>
+
+This tag denotes a single request (however, see the C<< <recurse> >> tag).
+A request must define a B<method> and an B<url>.
+All other tags are optional.
+The child elements of B<request> are shown below.
+
+
+=head2 Request <method>
+
+The http method of the request, usually GET or POST.
+
+        <method value='GET'/>
+
+Values: GET, HEAD, POST, PUT.
+
+POST and PUT may be feeded by the C<<data>> section.
+Note that there are other uses of GET and POST that are currently not supported.
+
+=head2 Request <url>
+
+The requested url.
+
+        <url value="http://google.de"/>
+
+=head2 Request <description>
+
+A free form description of this request.
+
+        <description value="Visit google"/>
+
+=head2 Request <useragent>
+
+This tag is used to have different useragents each with its own cookies
+within one testplan.
+You can control the access sequence of different users.
+You can effectivly simulate multiple users.
+The type is string and it defaults to the empty string.
+
+This tag is usefull for test plans containing interwoven
+but serialized requests of multiple users.
+Useragents are created behind the scene,
+so you need not declare anything, just use it.
+If you do not specify a useragent you implicitly specified the default user.
+
+        <useragent value="first user"/>
+
+The value of this attribute is concatenated to the
+HTTP header attribute 'user_agent'.
+So you can easily determine which user caused the request,
+see HTML output.
+
+=head2 Request <http-header>
+
+Specify HTTP headers.
+These headers are set in this request only.
+Specify HTTP headers in the config file
+if you want to set HTTP headers for any request.
+
+        <http-header name="User-Agent" value="overwrites the user agent"/>
+        <http-header name="A-New-Name" value="a new value"/>
+
+
+=head2 Request <data>
+
+For web forms you need to transmit the form data.
+This is done with the data tag:
+
+        <data>
+            <parm name='login' value='mary'/>
+            <parm name='password' value='secret'/>
+        </data>
+
+The data tag will work for the GET and POST method.
+For the GET method this is equivalent to adding the parameters:
+C<< <url value='http://.../?login=yourself&amp;password=secret'/> >>
+For the POST method the data is transmitted as the content of the request.
+
+B<RESTRICTION:> Currently there is only support for the
+C<application/x-www-form-urlencoded> content type.
+
+
+
+=head2 Request <assert>
+
+Assertions are somewhat different to the other tags.
+The only element within an <assert> tag
+is a tag that denotes a class name.
+This class is dynamically loaded (C<require>).
+
+Currently the only available element is C<< <WWW.Webrobot.Assert> >>
+which denotes the class C<WWW::Webrobot::Assert>.
+
+The class will get the child elements as input.
+This means that the syntax within C<< <WWW.Webrobot.Assert> >> is dependant
+on C<WWW::Webrobot::Assert>.
+Consider this behaviour in case you want to supply your own class.
+
+Now look at the syntax within C<< <WWW.Webrobot.Assert> >>:
+It contains an expression which is
+
+=over
+
+=item *
+
+a simple predicate.
+
+=item *
+
+an C<< <and> >> tag containing at least one expression.
+
+=item *
+
+an C<< <or> >> tag containing at least one expression.
+
+=item *
+
+a C<< <not> >> tag containing exactly one expression.
+
+=back
+
+The predicates yield a boolean value.
+The tags C<< <and> >>, C<< <or> >> and C<< <not> >>
+do the designated boolean operation.
+
+B<Predicates> itself are tags, too:
+
+=over
+
+=item <status>
+
+This checks the HTTP status code of the response.
+If requests are redirected the last response is taken,
+so there should usually be no HTTP response code 3xx
+(but see C<< <recurse> >> tag).
+
+If the C<value> is a I<three digit number>
+then the predicate does an exact string compare to the status code.
+
+If the C<value> is a I<one digit number>
+then the predicate compares to the error class,
+i.e. value B<4> matches all HTTP errors B<4xx>.
+
+=item <string>
+
+This predicate matches whether the C<value> is in the content.
+
+=item <file>
+
+Like <string> but matches against the content of the file denoted by the value attribute.
+
+=item <regex>
+
+This predicate matches the C<value> against the returned content
+(which is often HTML).
+The value is a regular expression.
+
+=item <xpath>
+
+This predicate converts the returned content to XML.
+Then it applies the C<xpath> expression and matches the result
+to the C<value>.
+
+A useful way of usage is:
+
+=over
+
+=item *
+
+Get your desired page with an <xpath> in your assertion
+to enforce the XML conversion (XML conversion is done lazy).
+
+=item *
+
+Figure out your desired xpath expression with L<xpath-shell>
+and add it to your test plan.
+
+=item *
+
+Run your testplan again.
+
+=back
+
+B<Note:>
+This predicate is B<very> time consuming.
+That XML stuff isn't that efficient,
+better use <regex> if you can.
+
+B<BUG:>
+The returned content must be of type I<text/html>,
+otherwise the behavior is undefined.
+
+=item <timout>
+
+The predicate is true if the request takes no more than C<value> seconds.
+
+=item <header>
+
+This predicate tests whether a header field C<name> contains the value C<value>.
+Example:
+
+        <header name="Content-type" value="text/html"/>
+
+=back
+
+B<Note 1:>
+A toplevel C<and> operator may be left out.
+
+B<Note 2:>
+The class name C<WWW.Webrobot.Assert> may be left out.
+Class names must start with a capital letter and must contain a period,
+while operators and predicates don't.
+
+
+B<Example> where toplevel C<and> and class name C<WWW.Webrobot.Assert> is left out:
+
+        <assert>
+            <status value='2'/>
+            <or>
+                <string value='Login'/>
+                <regex value='Log(out|off)'/>
+            </or>
+            <not>
+                <string value='Error'/>
+            </not>
+            <xpath xpath='//title/text()' value='Welcome'/>
+            <timeout value='2.7'/>
+        </assert>
+
+B<Complete example> doing the same:
+
+        <assert>
+            <WWW.Webrobot.Assert>
+                <and>
+                    <status value='2'/>
+                    <or>
+                        <string value='Login'/>
+                        <regex value='Log(out|off)'/>
+                    </or>
+                    <not>
+                        <string value='Error'/>
+                    </not>
+                    <xpath xpath='//title/text()' value='Welcome'/>
+                    <timeout value='2.7'/>
+                </and>
+            </WWW.Webrobot.Assert>
+        </assert>
+
+ 
+The built-in default assertion (if you do not annotate any assertion) is
+C<< <status value='2'/> >>.
+
+B<Tag content>:
+
+Instead of defining a 'value' attribute you may define a value
+as content of a tag.
+Leading and trailing white space including new line characters
+will be skipped.
+This allows for smart formatting in the test plan.
+Note that any other white space must be precisely adhered to.
+See the leading white space of '<head>'.
+
+        <string>
+            <![CDATA[
+        <html>
+            <head>
+                <title>A_Static_Html_Page</title>
+            </head>
+            <body>
+                A simple text.
+            </body>
+        </html>
+            ]]>
+        </string>
+
+
+=head2 Request <recurse>
+
+The recurse tag follows the same logic as the assert tag.
+Its purpose is to add some request to the original request.
+The procedure is simple (and you may write your own class):
+
+=over
+
+=item 1.
+
+Do the first request.
+
+=item 2.
+
+Call the C<next> method of the class with the last request as a parameter.
+
+=item 3.
+
+If the C<next> method returns (undef,undef) then finish
+(goto the next step in the test plan).
+Otherwise apply (2) with the value returned by C<next>.
+
+=back
+
+For more information see L<WWW::Webrobot::pod::Recur>.
+
+The dependant requests (i.e. which do not appear in the testplan,
+but come into play by the C<recurse> tag)
+show different in many output filters.
+Usually there are some preceding dots (...).
+Currently there are two classes available:
+
+B<WWW.Webrobot.Recur.Browser>:
+
+This class does what a usual http browser does when you hit an url:
+It loads the url, any images and frames.
+This class takes no arguments.
+
+        <recurse>
+            <WWW.Webrobot.Recur.Browser/>
+        </recurse>
+
+B<WWW.Webrobot.Recur.LinkChecker>:
+
+This class will do nearly the same as <WWW.Webrobot.Recur.Browser>,
+but it additionally follows HTML links.
+This makes it a link checker.
+
+This class accepts a parameter to restrict the links to be visited.
+The argument language is the same as with C<assert>,
+but the predicates are different.
+
+This feature is among others usefull
+
+=over
+
+=item *
+
+to restrict the linkchecker to your site
+
+=item *
+
+to prevent it from logout (if you did a login before)
+
+=item *
+
+to prohibit a language switch
+
+=back
+
+        <recurse>
+            <WWW.Webrobot.Recur.LinkChecker>
+                <and>
+                    <url value="^http://myserver.org"/>
+                    <scheme value="http"/>
+                    <not><url value="logout\.jsp"/></not>
+                    <not><url value="logout\.do"/></not>
+                    <not><url value="setUserLocale.do"/></not>
+                </and>
+            </WWW.Webrobot.Recur.LinkChecker>
+        </recurse>
+
+B<Note:>
+You do not want to linkcheck the entire WWW,
+so carefully define which links to visit.
+B<Do not harass public websites.>
+
+I added an example for any predicate.
+Let the example url be C<http://www.myhost.org:4321/show/page.html>.
+The predicates are:
+
+=over
+
+=item <url>
+
+The C<value> is a regular expression.
+It matches against the entire url.
+I<Example:> C<http://www.myhost.org:4321/show/page.html>
+
+=item <scheme>
+
+The C<value> is a regular expression.
+It matches against the scheme part of the url.
+I<Example:> C<http>
+
+=item <host>
+
+The C<value> is a regular expression.
+It matches against the host part of the url.
+I<Example:> C<www.myhost.org>
+
+=item <port>
+
+The C<value> is a regular expression.
+It matches against the port part of the url.
+I<Example:> C<4321>
+
+=item <host:port>
+
+The C<value> is a regular expression.
+It matches against the host:port part of url.
+I<Example:> C<www.myhost.org:4321>
+
+=back
+
+B<Note:>
+Say you want to exclude the logout link,
+but your website may have menu links redirected to the logout link.
+It is sufficient to forbid the logout link,
+all redirected menu links are aborted
+as soon as they redirect to the logout link.
+I think this is the only case
+where a request ends up in a HTTP I<3xx> response code.
+
+
+=head2 Request <property>
+
+The property tag is used to define new properties.
+It must have a I<name> Attribute that defines the name of the new property.
+It must also have a second attribute that defines the value of the property.
+The value attribute must be one of the following:
+
+=over
+
+=item value
+
+This attribute defines the value of the property to be a simple string.
+
+=item regex
+
+This attribute matches the HTTP response against a regular expression.
+The regular expression B<must> contain a pair of parenthesis that denote the result.
+
+=item xpath
+
+This attribute applies an XPath expression to the HTTP response and
+assigns the result to the property.
+
+=item header
+
+This attribute extract the designated HTTP response header value.
+
+=item status
+
+This attribute is applied to the HTTP response status line.
+Possible values are
+
+=over
+
+=item code
+
+for the HTTP response code (e.g. '200').
+
+=item message
+
+for the HTTP response message (e.g. 'Ok').
+
+=item protocol
+
+for the HTTP response protocol (usually 'HTTP/1.0' or 'HTTP/1.1').
+
+=back
+
+=item random
+
+This attribute yields a random number with the number of digits
+designated by its value.  C<rand='5'> gives a 5 digit random number.
+The maximum number of digits is limited to 15.
+
+=back
+
+
+I<Examples:>
+
+        <property name='a_name' value='a_value'/>
+        <property name='a_name' regex='any(value)matched'/>
+        <property name='a_name' xpath='//title/text()'/>
+        <property name='a_name' header='Content-type'/>
+        <property name='a_name' status='code'/>
+        <property name='a_name' random='5'/>
+
+
+
+=head1 Tag <global-assertion>
+
+This assertion is executed for any request
+(from the point on where you define it).
+Name substitution takes place when the calling request is executed,
+so this assertion my expand different during the execution of the test.
+
+An assertion of a request is true
+if both the global assertion is true B<and>
+and the assertion of the request is true.
+
+The build-in assertion will only be executed
+if there is neither a global assertion nor an assertion specific to a request.
+
+I<Example:>
+
+        <global-assertion mode='new'>
+            <assert>
+                <status value='500'/>
+                <timeout value='2.7'/>
+            </assert>
+        </global-assertion>
+
+The B<mode> value may be
+
+ new
+    New global assertion. Invalidates previous global assertion
+ add (default)
+    accumulate global assertion (AND conjunction)
+
+
+=head1 Names (Variables)
+
+If you defined names in a corresponding config file,
+see L<WWW::Webrobot::pod::Config>.
+You can use a name in your test plan
+by using the perl like syntax C<${myhost}>.
+Though - this is no perl variable, it just looks like one.
+Example:
+
+In a C<config.prop> file define
+
+    names=host=www.myserver.de
+    names=port=4321
+
+This maps to an internal data structure
+
+    host => www.myserver.de
+    port => 4321
+
+In your C<testplan.xml> plan use 
+
+    <request>
+        <method value='GET'/>
+        <url value='http://${host}:${port}/'/>
+    </request>
+
+
+=head2 Predefined names
+
+=over
+
+=item _id
+
+This name is "1" if used with webrobot.
+
+It takes a value out of [1, 2, ... load.number_of_clients] if used with webrobot-load.
+It is a unique id for any child process.
+
+This is especially usefull if you want to use different logins for each client,
+see the C<< <config> >> tag.
+
+=back
+
+
+
+=head1 BUGS
+
+=over
+
+=item charset
+
+The internal representation of XML is utf-8 and
+independent of your XML's charset.
+Some strings are internally converted to iso-latin (for output only),
+so you might encounter problems in the output
+if you rely on anything else but iso-latin.
+
+=back
+
+
+=head1 NOTE
+
+=over
+
+=item *
+
+In XML C<&> must be coded C<&amp;> and C<< < >> must be coded C<&lt;> 
+
+=back
+
+
+=head1 SEE ALSO
+
+L<WWW::Webrobot::pod::Config>
+
+L<WWW::Webrobot>
+
+L<WWW::Webrobot::Assert>
+
+
+=head1 RFCs
+
+=over
+
+=item RFC 2616
+
+L<http://www.faqs.org/rfcs/rfc2616.html>
+HTTP/1.1
+
+=item RFC 1945
+
+L<http://www.faqs.org/rfcs/rfc1945.html>
+HTTP/1.0 
+
+=item RFC 2818
+
+http://www.faqs.org/rfcs/rfc2818.html
+HTTPS
+
+=item RFC 2617
+
+L<http://www.faqs.org/rfcs/rfc2617.html>:
+HTTP Authentication: Basic and Digest Access Authentication
+
+=item RFC 2965
+
+L<http://www.faqs.org/rfcs/rfc2965.html>
+HTTP State Management Mechanism
+
+
+=item RFC 2109
+
+L<http://www.faqs.org/rfcs/rfc2109.html>
+Cookies: HTTP State Management Mechanism
+
+=item RFC 1521
+
+L<http://www.faqs.org/rfcs/rfc1521.html>
+MIME
+
+=back
+
+
+=head1 Tutorials
+
+=over
+
+=item *
+
+L<http://www.research.att.com/~bala/papers/h0vh1.html>:
+Key Differences between HTTP/1.0 and HTTP/1.1
+
+=item *
+
+L<http://www.ibiblio.org/mdma-release/http-prob.html>:
+Analysis of HTTP Performance problems
+
+=item *
+
+L<http://www.jmarshall.com/easy/http/>:
+HTTP Made Really Easy
+
+=item *
+
+L<http://www.rad.co.il/networks/1999/http/index.htm>:
+The Hypertext Transfer Protocol (HTTP/1.1)
+
+=item *
+
+L<http://www.netscape.com/newsref/std/cookie_spec.html>: Netscape Cookies
+
+=item *
+
+L<http://www.cookiecentral.com/faq/>:
+The Unofficial Cookie FAQ
+
+=item *
+
+L<http://www.isi.edu/in-notes/iana/assignments/media-types/media-types>:
+Media Types
+
+=back
+
+
+=head1 AUTHOR
+
+Stefan Trcek
+
+=head1 COPYRIGHT
+
+Copyright(c) 2004 ABAS Software AG
+
+This software is licensed under the perl license, see LICENSE file.
+
+=cut
+
+1;

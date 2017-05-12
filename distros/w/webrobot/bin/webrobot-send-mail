@@ -1,0 +1,81 @@
+#!/usr/bin/perl -w
+use strict;
+use warnings;
+
+# Author: Stefan Trcek
+# Copyright(c) 2004 ABAS Software AG
+
+#use diagnostics
+
+use Getopt::Long;
+use WWW::Webrobot;
+use WWW::Webrobot::SendMail;
+
+
+my $USAGE = <<EOF;
+USAGE: webrobot [options]
+--help                 this message
+--version              version
+--cfg config           (mandatory) test configuration
+--define name=value    define additional properties
+                       (like the one in the config file)
+EOF
+
+my $cfg_name;
+my $testplan_name;
+my %properties = ();
+GetOptions(
+           help => sub {print $USAGE; exit},
+           version => sub {print "Webrobot version: $WWW::Webrobot::VERSION\n"; exit},
+           "cfg=s" => \$cfg_name,
+           "define=s" => \%properties,
+          ) || die $USAGE;
+
+MAIN: {
+    my @cmd_param = map { [$_, $properties{$_}] } keys %properties;
+    my $webrobot = WWW::Webrobot -> new(\$cfg_name, \@cmd_param);
+    $webrobot->{cfg}->{output} = []; # ??? Hier sollte der Import von Test::More verhindert werden.
+    my $exit = WWW::Webrobot::SendMail::send_mail($webrobot->cfg()->{mail});
+    print STDERR $exit if $exit;
+    exit 1 if $exit;
+}
+
+1;
+
+=head1 NAME
+
+webrobot-send-mail - send mail
+
+=head1 SYNOPSIS
+
+ webrobot-send-mail --cfg example/cfg.prop
+
+=head1 DESCRIPTION
+
+This command sends mail.
+It takes one mandatory parameter.
+
+=over
+
+=item --help
+
+Display this help.
+
+=item --version
+
+Print the version number.
+It is taken from WWW::Webrobot.pm
+
+=item --cfg config_filename
+
+This is the configuration file,
+see L<WWW::Webrobot::pod::Config>.
+
+=item --define property=value
+
+Define some property/value pairs.
+This overwrites properties defined in the config file.
+
+=back
+
+=cut

@@ -1,0 +1,31 @@
+---
+abstract: 'a way of ensuring consistent global warning settings'
+author:
+  - 'Sam Kington <skington@cpan.org>'
+build_requires:
+  English: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '1.08'
+  lib::abs: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: warnings-everywhere
+requires:
+  Carp: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/skington/warnings_everywhere
+  repository: https://github.com/skington/warnings_everywhere.git
+version: '0.030'
+x_serialization_backend: 'YAML::Tiny version 1.69'

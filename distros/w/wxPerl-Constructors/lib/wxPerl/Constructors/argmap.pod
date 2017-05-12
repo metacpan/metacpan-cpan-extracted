@@ -1,0 +1,36 @@
+#                                                   vim:ts=2:sw=2:et:sta
+########################################################################
+
+=pod
+
+=head1 NAME
+
+WxPerl::Constructors::argmap - auto-generated argument-map data
+
+=head1 USAGE
+
+  use Wx ();
+  use WxPerl::Constructors::argmap;
+  my $argpos = WxPerl::Constructors::argmap->ARGPOS;
+  my $defaults = WxPerl::Constructors::argmap->DEFAULTS; 
+
+Take care not to break the innards of the references.
+
+=head1 Data
+
+Both hashrefs are keyed by the $foo part of the Wx::$foo classnames
+(i.e. without the leading "Wx::" part.)
+
+=head2 ARGPOS
+
+Each value is an array reference with the ordered arguments, starting
+with 'id'.
+
+=head2 DEFAULTS
+
+Each value is a hash reference of the argument defaults.
+
+NOTE:  No default for 'name' is included (as it needs values which are
+not bound and doesn't matter because it is always last.)
+
+=cut

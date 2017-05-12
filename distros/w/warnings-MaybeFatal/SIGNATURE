@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 a0dd403e000a096246e03875a74b41ebd462b0bc COPYRIGHT
+SHA1 55d0201a5e270701c2809accb8f84838da8fb587 CREDITS
+SHA1 b00533dce11e3ee19805ff23f448c5f118a42450 Changes
+SHA1 40983b821ede7c9ec6918fde0f2250e2e3a8da0c INSTALL
+SHA1 c4c1e6c578edcfd14d13eadebc8f56dd9ca46821 LICENSE
+SHA1 dc9a4a532163e97afe4eadf0c393476acac8b4ee MANIFEST
+SHA1 3703a1b3977539037d090423929608c3d03385e8 META.json
+SHA1 2645146dbbafc4c3362c74ddf70b84959c579757 META.yml
+SHA1 ec49a3efb426d8c58d0a71aee6f266d2bad622e1 Makefile.PL
+SHA1 12958a8a9518cbd3a13e49839f472c88cf06ed2a README
+SHA1 b3370fae777ffa2501ea9f4cde3b81c6e1984b3b dist.ini
+SHA1 792e74a4f31cb075836bd26cf779e3d88121bc9b doap.ttl
+SHA1 b9e55b7d970429ab32eb925440a834d78ed7d17a lib/warnings/MaybeFatal.pm
+SHA1 490e7d18d700947946bd464d96e3f4319c2ea6b3 t/01basic.t
+SHA1 d878770fd56237bce381df4eb57d5f17ac965ce6 t/02indirect.t
+SHA1 61f2963da65d450206abfa1cc0177be8c7634289 t/03multiple.t
+SHA1 6addf4e06760e3de34ef25cf8e34db3d148a3c7d t/lib/LoadsThisShouldDie.pm
+SHA1 ca9d6befd6d21a41b326a1fc9dbdadd79be76876 t/lib/LoadsThisShouldWarn.pm
+SHA1 7dae8d48cb59511cd00e17c8d789784581fe668b t/lib/MultiWarnings.pm
+SHA1 c45dbca5edb39e90aabcaf823d1001801a3d9dd1 t/lib/ThisShouldDie.pm
+SHA1 9086bdaa0b1843ce11b65c14b87b87b8d55eb2d9 t/lib/ThisShouldDieToo.pm
+SHA1 447ca3cc44e0736ef831c97f0567e64b4111bb3d t/lib/ThisShouldWarn.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAliUevcACgkQzr+BKGoqfTnkpACeKlX2VGtQ3OwOmK9FI6WIbRRI
+XIMAnjyjfkVo+EJxROV5kkhEepxVPkby
+=Cgvw
+-----END PGP SIGNATURE-----

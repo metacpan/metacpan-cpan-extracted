@@ -1,0 +1,6 @@
+<html>
+    <body>
+        Confuse perl regular expressions: [a-z]
+        HTMLish&nbsp;text
+    </body>
+</html>

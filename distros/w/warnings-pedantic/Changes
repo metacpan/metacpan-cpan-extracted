@@ -1,0 +1,9 @@
+Revision history for warnings-pedantic
+
+0.01    2014-06-26T14:23:11:+0100
+        First version, released on an unsuspecting world.
+
+0.02    2014-06-27T16:05:27:+0100
+        Warning when assigning an arrayref to an array.
+        Properly functioning warning categories.
+

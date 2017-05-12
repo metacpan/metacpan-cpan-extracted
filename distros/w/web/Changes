@@ -1,0 +1,199 @@
+
+RCS file: RCS/web.pm,v
+Working file: web.pm
+head: 1.44
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 42;	selected revisions: 42
+description:
+start.
+dieses modul soll allgemeine funktionen enthalten, welche fuer das
+RRZE und darueber hinaus nuetzlich sind.
+die funktionen sind zum teil aus eigener hand oder aus diversen anderen
+modulen wie CGI.pm genommen und abgeaendert um sie an die
+Beduerfnisse des RRZE eher anzupassen.
+----------------------------
+revision 1.44
+date: 2002/09/12 09:38:13;  author: unrzc9;  state: Exp;  lines: +2 -0
+Small bugfix.
+----------------------------
+revision 1.43
+date: 2002/09/12 09:36:43;  author: unrzc9;  state: Exp;  lines: +54 -83
+Improvements in calculation of isleapYear and GetWeekDay() / GetYearDay()
+----------------------------
+revision 1.42
+date: 2001/04/14 12:39:28;  author: unrzc9;  state: Exp;  lines: +10 -7
+bugfix
+----------------------------
+revision 1.41
+date: 2001/04/14 12:30:18;  author: unrzc9;  state: Exp;  lines: +16 -10
+modifikationen/.
+----------------------------
+revision 1.40
+date: 2001/04/12 16:09:55;  author: unrzc9;  state: Exp;  lines: +78 -32
+Codebereinigung.
+----------------------------
+revision 1.39
+date: 2001/02/05 19:08:07;  author: unrzc9;  state: Exp;  lines: +7 -5
+Cookiesetzung bei PrintHeader verbessert.
+Trotzdem gibt es noch Probleme beim Setzen von Cookies wo die Domain besetzt ist.
+Nach RFC sonstwie ist alles korrekt; Trotzdem setzt Netscape das Cookie fuer die Domain
+als Pfad ein.
+----------------------------
+revision 1.38
+date: 2001/02/05 18:15:01;  author: unrzc9;  state: Exp;  lines: +19 -9
+bugfix
+----------------------------
+revision 1.35
+date: 2000/08/17 10:00:22;  author: unrzc9;  state: Exp;  lines: +66 -10
+Neue Funktionen und Verbesserungen
+----------------------------
+revision 1.34
+date: 2000/08/02 07:50:10;  author: unrzc9;  state: Exp;  lines: +35 -7
+New function: GetPassedDaysbyMonth
+----------------------------
+revision 1.33
+date: 2000/05/17 13:36:44;  author: unrzc9;  state: Exp;  lines: +7 -6
+VERSION wieder eingebaut fuer CPAN/Makefile
+----------------------------
+revision 1.32
+date: 2000/05/17 13:19:16;  author: unrzc9;  state: Exp;  lines: +24 -12
+kleiner feghler in Add_Days_to_Date() / GetYDay repoariert
+----------------------------
+revision 1.31
+date: 2000/05/17 12:34:40;  author: unrzc9;  state: Exp;  lines: +69 -19
+neue sub isIP
+kleine aenderung bei web-parameter
+neue datums-variablen
+----------------------------
+revision 1.30
+date: 2000/01/21 16:51:17;  author: unrzc9;  state: Exp;  lines: +8 -7
+neue Variable $VERSION fuer CPAN eingebaut
+----------------------------
+revision 1.29
+date: 1999/11/22 09:33:16;  author: unrzc9;  state: Exp;  lines: +27 -16
+Redirect() eingebaut
+----------------------------
+revision 1.28
+date: 1999/11/08 13:34:08;  author: unrzc9;  state: Exp;  lines: +94 -8
+Neue Routinen:
+HtmlTop
+HtmlBot
+Add_Days_to_Date
+----------------------------
+revision 1.27
+date: 1999/11/04 14:41:23;  author: unrzc9;  state: Exp;  lines: +14 -7
+Aenderung in Fehlermeldung()
+----------------------------
+revision 1.26
+date: 1999/10/27 07:51:28;  author: unrzc9;  state: Exp;  lines: +27 -2
+IsLeapYear korrigiert
+----------------------------
+revision 1.25
+date: 1999/10/26 15:05:08;  author: unrzc9;  state: Exp;  lines: +7 -6
+ReadParse verbessert
+----------------------------
+revision 1.24
+date: 1999/10/07 11:49:20;  author: unrzc9;  state: Exp;  lines: +58 -11
+OS wird nun erkannt
+----------------------------
+revision 1.23
+date: 1999/10/06 11:17:42;  author: unrzc9;  state: Exp;  lines: +51 -8
+isLeapYear eingebaut
+----------------------------
+revision 1.22
+date: 1999/09/23 13:04:09;  author: unrzc9;  state: Exp;  lines: +97 -7
+diverse neue funktionen.
+----------------------------
+revision 1.21
+date: 1999/09/21 13:43:39;  author: unrzc9;  state: Exp;  lines: +13 -8
+GetSentence verbessert
+----------------------------
+revision 1.20
+date: 1999/09/21 12:52:03;  author: unrzc9;  state: Exp;  lines: +54 -6
+GetSentence eingebaut.
+----------------------------
+revision 1.19
+date: 1999/09/16 09:00:51;  author: unrzc9;  state: Exp;  lines: +2 -2
+jo steht top bei den credits :)
+----------------------------
+revision 1.18
+date: 1999/09/16 08:59:41;  author: unrzc9;  state: Exp;  lines: +88 -88
+typos aus dem englischen korrigiert...vielen dank an Johannes Schritz
+----------------------------
+revision 1.17
+date: 1999/09/15 13:27:26;  author: unrzc9;  state: Exp;  lines: +337 -5
+erste final mit dok
+----------------------------
+revision 1.16
+date: 1999/09/10 10:45:38;  author: unrzc9;  state: Exp;  lines: +24 -6
+Neue Funktion GetYearDay -> liefert die TAgeszahleines Datums
+----------------------------
+revision 1.15
+date: 1999/09/07 15:44:13;  author: unrzc9;  state: Exp;  lines: +11 -8
+Typo in GetWeekDay korrigiert...
+----------------------------
+revision 1.14
+date: 1999/09/07 15:12:41;  author: unrzc9;  state: Exp;  lines: +26 -5
+wochentage eingebaut und die funktion GetWekkDay
+----------------------------
+revision 1.13
+date: 1999/09/07 14:27:04;  author: unrzc9;  state: Exp;  lines: +7 -6
+fehler in NLock mit der Zuweisung von $web::jahr korrigiert.
+----------------------------
+revision 1.12
+date: 1999/09/06 14:27:22;  author: unrzc9;  state: Exp;  lines: +5 -5
+numercally -> &numercally
+----------------------------
+revision 1.11
+date: 1999/09/02 12:17:47;  author: unrzc9;  state: Exp;  lines: +1 -0
+$web::tage_im_monat[] eingebaut.
+----------------------------
+revision 1.10
+date: 1999/09/02 12:10:52;  author: unrzc9;  state: Exp;  lines: +6 -6
+warning beseitigt/
+----------------------------
+revision 1.9
+date: 1999/09/01 13:31:18;  author: unrzc9;  state: Exp;  lines: +21 -16
+upload-mechanismus bverbessert.
+----------------------------
+revision 1.8
+date: 1999/09/01 13:15:46;  author: unrzc9;  state: Exp;  lines: +12 -11
+typos korrirgiert sowie den y2k bug beseitigt.
+ausserdem chop-> chomp.
+----------------------------
+revision 1.7
+date: 1999/08/12 13:56:52;  author: unrzc9;  state: Exp;  lines: +6 -8
+diverses.
+----------------------------
+revision 1.6
+date: 1999/08/12 13:09:18;  author: unrzc9;  state: Exp;  lines: +22 -2
+lock-funktionen fertigf.
+----------------------------
+revision 1.5
+date: 1999/08/12 12:32:17;  author: unrzc9;  state: Exp;  lines: +29 -39
+Datei-Locking-Funktion geaendert. Die Locking-Funktion arbeitet nurn
+mit symbolischen Links. Diese arbeiten atomar.
+Aber ACHTUNG: Bei Systemen, auf denen Symlinks nicht arbeiten
+kloommt es beim Aufruf der Funktion symlink zu einen Fatal Error.
+Deswegen ist web.pm nurmehr fuer Linux/Unix-Systeme geeignet.
+----------------------------
+revision 1.4
+date: 1999/08/11 15:33:15;  author: unrzc9;  state: Exp;  lines: +3 -3
+$VERSION => $web::VERSION
+----------------------------
+revision 1.3
+date: 1999/08/11 15:28:16;  author: unrzc9;  state: Exp;  lines: +53 -5
+perldoc-statements eingebaut
+----------------------------
+revision 1.2
+date: 1999/08/11 15:14:14;  author: unrzc9;  state: Exp;  lines: +23 -22
+rcs-header eingebaut.
+----------------------------
+revision 1.1
+date: 1999/08/11 14:52:40;  author: unrzc9;  state: Exp;
+Initial revision
+=============================================================================

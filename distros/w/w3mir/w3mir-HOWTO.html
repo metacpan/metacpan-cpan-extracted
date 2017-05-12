@@ -1,0 +1,943 @@
+<!doctype html public "-//W3C//DTD HTML 4.0//EN">
+<html>
+<head>
+<title>W3MIR HOWTO</title>
+<style type="text/css">
+<!--
+  body { background-color: white }
+  h1, h2, h3, b { font-family: sans-serif }
+  .red { color: red }
+-->
+</style>
+<body>
+<h1>W3MIR HOWTO</h1>
+
+<p><b>Corresponding to w3mir version 1.0.2 and above</b>
+
+<p>W3mir is an all purpose WWW copying and mirroring program.  Its
+main focus is copying complete directory structures keeping your copy
+browseable through a web server, or directly off a disk or CDROM if
+you want.  W3mir will fix URLs that are redirected and everything else
+that needs to be fixed to make your copy browseable.  But it also does
+odd jobs, retrieving single documents, batch getting several documents
+and more.  You may tell w3mir not to change anything in the retrieved
+documents.  W3mir has been in development quite a long time so you
+find options to do a lot of things needed when copying things off the
+web.
+
+<p>With w3mir you may copy the entire contents a web server.  Or just
+a directory hierarchy, or several related hierarchies off as many
+servers as you like.  They don't even have to be related.
+
+<p>W3mir supports HTML4, and has partial support for CSS, Java,
+ActiveX and Adobe Acrobat (PDF) files.  And it works on Win32
+machines.
+
+<p><b>Warning:</b> W3mir enables you to copy a lot of things off the
+Web, but remember, the things you retrieve might be copyrighted and
+the copy you make with w3mir might in fact be illegal to make and
+posses.
+
+<hr>
+
+<h2><a name="contents">Contents</a></h2>
+
+<p><a href="#intro">README</a> (You want to read this!  <b
+class="red">Really!</b>)
+
+<p><b>How do I...</b>
+<ol>
+  <li><p><a href="#copy">copy a file?</a>
+  <li><p><a href="#recurse">copy a directory hierarchy?</a>
+  <li><p><a href="#resources">copy the needed resource files from another
+    directory hierarchy?</a>
+  <li><p><a href="#ignore">avoid copying files I don't want or copy only
+    files I want?</a>
+  <li><p><a href="#rm">remove the files that are no longer on the
+    original site from the mirror?</a>
+  <li><p><a href="#depth">limit how deep w3mir will recurse?</a>
+  <li><p><a href="#memory">limit w3mirs memory usage?</a>
+  <li><p><a href="#multi">copy files from multiple sites?</a>
+  <li><p><a href="#alias">copy files from one server with several names?</a>
+  <li><p><a href="#aborted">restart a mirror process after stopping it
+    prematurely?</a>
+  <li><p><a href="#enlarge">enlarge or prune an established mirror?</a>
+  <li><p><a href="#cat">'cat' a file?</a>
+  <li><p><a href="#list">list URLs in a document?</a>
+  <li><p><a href="#robots">disable robots.txt obedience?</a>
+  <li><p><a href="#corrupt">stop w3mir from corrupting binary files?</a>
+  <li><p><a href="#auth">copy a site that wants user-name and password?</a>
+  <li><p><a href="#mauth">access a site that wants several different
+    user-names and passwords?</a>
+  <li><p><a href="#proxy">use a proxy server?</a>
+  <li><p><a href="#pauth">authenticate myself to a proxy server?</a>
+  <li><p><a href="#proxytweak">ensure that the proxy server ...?</a>
+  <li><p><a href="#batchget">batch get files with w3mir?</a>
+  <li><p><a href="#cgi">handle CGI?</a>
+  <li><p><a href="#imap">handle server side image-maps?</a>
+  <li><p><a href="#java">handle Java and ActiveX?</a>
+  <li><p><a href="#script">handle java-script and other script languages?</a>
+  <li><p><a href="#css">handle the other things with 'partial support'?</a>
+  <li><p><a href="#anon">keep my identity secret?</a>
+  <li><p><a href="#ns">pretend that I'm using Netscape, Internet
+    Explorer or Lynx?</a>
+  <li><p><a href="#other">do other things?</a>
+</ol>
+
+<hr>
+
+<h2><a name="intro">README</a></h2>
+
+<p>W3mir may be used in two, main, ways:
+
+<ul>
+  <li><p>To copy something random once.
+  <li><p>To keep a local mirror of some remote site
+</ul>
+
+<p>To copy something random once there is a high likeliness you can
+just start w3mir with some simple options and it will do the job you
+want it to.  Providing that the remote site is not too complex and
+your expectations of the copy aren't high :-) This is what wget, the
+gnu w3 mirroring program, does and is good at.
+
+<h3>Configuration file</h3>
+
+<p>Once you want to keep a copy of a remote site up-to-date over time,
+mirror something with server side image-maps, redirects or
+authentication you have to write a configuration file for w3mir.  This
+is what w3mir is good at, compared to wget.  Writing the file is not
+hard, and there are two example files in the w3mir distribution.  It
+will also be explained here.  The configuration file is typically
+called <tt>.w3mirc</tt> (<tt>w3mir.ini</tt> on win32 machines), and
+can be written with a simple text editor.  It is kept in the top
+directory of the mirror, where w3mir will find it when it starts.
+Please refer to the <a href="#contents">contents</a> for how to handle
+a specific problem with a configuration file.
+
+<hr>
+
+<h2>The answers:</h2>
+
+<hr>
+
+<h3><a name="copy">How do I copy a file?</a></h3>
+
+<p>To copy the top page off www.starwars.com:
+
+<p><tt>w3mir http://www.starwars.com/</tt>
+
+<p><b>Note:</b> it is <em>important</em> that you give the trailing
+slash for server names and directories.
+
+<hr>
+
+<h3><a name="recurse">How to I copy a directory hierarchy?</a></h3>
+
+<p>To copy the entire stuff about episode I from www.starwars.com
+which is stored in <tt>http://www.starwars.com/episode-i/</tt> (I don't
+recommend this, it's quite a lot of data):
+
+<p><tt>w3mir -r http://www.starwars.com/episode-i/</tt>
+
+<p>The corresponding configuration file is simple:
+
+<pre>
+Options: recurse
+URL: http://www.starwars.com/episode-i/
+Fixup: run
+</pre>
+
+<p>The <tt>-r</tt> option makes w3mir recurse down from the starting
+point.  It will only copy all the documents under
+http://www.starwars.com/episode-i/ that it sees referenced from those
+same documents.  W3mir will <em>not</em> retrieve documents from
+http://www.starwars.com/ because it is considered to be 'over' the
+starting point.
+
+<p>The command-line will get you a copy that is definitely browseable
+via a WEB server, and possibly browseable directly from a CDROM or
+hard-disk.  To ensure that it is browseable from CDROM and disk you
+need to use a configuration file with the <tt>Fixup: run</tt> line in.
+It causes w3mir to edit anything that needs editing after the mirror
+has completed, including fixing URLs that caused redirects.  The dirty
+work is done by w3mirs helper program w3mfix.  The directive will
+cause w3mfix to be run each time w3mir completes the mirror.
+
+<p><b>Note:</b> it is <em>important</em> that you give the trailing
+slash after the directory name.  Specifying
+<tt>http://www.starwars.com/episode-i</tt> and
+<tt>http://www.starwars.com/episode-i/</tt> is quite different in
+w3mirs eyes.  In the former case episode-i is considered to be a
+document within the / (top) directory of www.starwars.com and w3mir
+will recurse from /, which is a lot more than you wanted.  In the
+latter case w3mir understands that episode-i is a directory and will
+consider that directory to be the staring point, which is what you
+wanted.
+
+<hr>
+
+<h3><a name="resources">How do I copy the needed resource files from
+another directory hierarchy?</a></h3>
+
+<p>Some sites store their documents in one place, and puts their
+banners, icons and such in a separate directory called
+<tt>/images</tt>, <tt>/banners</tt>, <tt>/icons</tt>,
+<tt>/resources</tt> or some such.  Unless you retrieve these as well as
+the documents things will probably not be too colorful.  So, imagine
+that the starwars site stored all the images in one holding directory
+called <tt>/imagery</tt> and you want to copy all the stuff in it that
+the episode-i pages need.  Then you do this:
+
+<pre>
+Options: recurse
+URL: http://www.starwars.com/episode-i/ episode-i
+Also: http://www.starwars.com/imagery/ imagery
+Fixup: run
+</pre>
+
+<p>There are two changes here compared to the simpler file we started
+with: There is an extra argument at the end of the URL directive.  It
+tells w3mir to store everything gotten from
+<tt>http://www.starwars.com/episode-i/</tt> in the subdirectory
+<tt>episode-i</tt>.  The directory can be omitted, but I think its
+neater this way.  Then the new directive 'Also:'.  It tells w3mir that
+you also want whatever the documents under
+<tt>http://www.starwars.com/episode-i/</tt> references under
+<tt>http://www.starwars.com/imagery/</tt>.
+
+<p><b>Note:</b> this will only get stuff that was used by the
+documents under <tt>http://www.starwars.com/episode-i/</tt>, anything
+stored under <tt>http://www.starwars.com/imagery/</tt> which is not
+used will not be retrieved. If you want everything under
+<tt>imagery</tt> to be retrived use the <tt>Also-quene:</tt>
+directive.
+
+<hr>
+
+<h3><a name="ignore">How do I avoid copying files I don't want or copy
+only files I want?</a></h3>
+
+<p>To control what files w3mir copies you can use the
+<tt>Ignore:</tt>, <tt>Fetch:</tt>, <tt>Ignore-RE:</tt> and
+<tt>Fetch-RE:</tt> directives in the configuration file.  The embeded
+references to any file you chose to ignore, i.e., not copy, will point
+at the original site, <em>not</em> to the mirror.  This means that the
+mirror user may still get ahold of the file from the original source
+by simply clicking if she so desires.
+
+<p>If a site contains huge .wav audio files that you are not
+interested in you put
+
+<pre>
+Ignore: *.wav
+</pre>
+
+<p>in the configuration file.  You may ignore as many different
+filename patterns as you want.  If you are mirroring a site you want
+very few, specific files from, say all HTML (named
+<em>something</em><tt>.html</tt>) and all Mpeg video files (named
+<em>something</em><tt>.mpg</tt>) you can write this:
+
+<pre>
+Fetch: *.html
+Fetch: *.mpg
+Ignore: *
+</pre>
+
+<p>W3mir will test each filename against each Fetch/Ignore rule in
+sequence.  A html file will match the first line and be fetched.  Any
+mpg file will match the second line and be fetched.  All other files
+will match the third line, and be ignored.  This last line is needed
+because the default is to get any files which are not ignored.  By
+arranging fetch and ignore rules carefully you may retrieve exactly
+the filename patterns you want and not retrieve anything else.
+
+<p>If you decide you also want all Mpeg Layer 3 audio files
+(<em>something.</em><tt>mp3</tt>) from the site, after the mirror has
+been established.  Then you add this:
+
+<pre>
+Fetch: *.mp3
+</pre>
+
+<p>as the third line, making the <tt>Ignore: *</tt> line the forth and
+last.  Then you must fix all references to .mp3 files within the
+mirror by running w3mfix thus:
+
+<pre>
+w3mfix -editref .mp3
+</pre>
+
+<p>which will edit all references to .mp3 files, pointing them the
+right place, on your disk. Ditto when you remove a fetch rule, or add
+or remove an ignore rule. See the answer about <a
+href="#enlarge">enlarging and pruning</a> mirrors for more examples of
+using <tt>w3mfix -editme ...</tt>
+
+<p><b>Note:</b> when retrieving only a very limited set of files, as
+in the example above, you <em>must</em> retrieve the html files,
+because how else will w3mir find URLs of files to retrieve? Only html
+files contain links to other files.
+
+<p>Similarly, you may chose to not mirror whole branches of the
+original site.  If you for example mirror my home-pages, and you decide
+not to mirror the comics pages you can put
+
+<pre>
+Ignore: /ts/
+</pre>
+
+<p>or more precisely
+
+<pre>
+Ignore: http://www.ifi.uio.no/~janl/ts/
+</pre>
+
+<p>in the configuration file.  If you do this after having established
+the mirror you use w3mfix to fix the references:
+
+<pre>
+w3mfix -editref /ts/
+</pre>
+
+<p><tt>Fetch:</tt> and <tt>Ignore:</tt> rules can only use a very
+limited subset of the Unix wild-cards.  w3mir understands only '?',
+'*', and '[a-z]' ranges.
+
+<p><tt>Ignore-RE:</tt> and <tt>Fetch-RE:</tt> are the same as
+<tt>Fetch:</tt> and <tt>Ignore:</tt> except that they give you access
+to the full power of Regular Expressions to make rules for that to get
+or not to get. They support perls superset of the normal Unix regular
+expression syntax.  They must be completely specified, including the
+prefixed m, a delimiter of your choice (except the paired delimiters:
+parenthesis, brackets and braces), and any of the RE modifiers. I.e.,
+
+<pre>
+Ignore-RE: m/.gif$/i
+</pre>
+
+<p>or
+
+<pre>
+Ignore-RE: m~/.*/.*/.*/~
+</pre>
+
+<p>and so on.  "#" cannot be used as delimiter as it is the comment
+character in the configuration file.
+
+<p>There are some traps when using <tt>Ignore-RE</tt> and
+<tt>Fetch-RE</tt>, please see their documentation in <tt>mandoc
+w3mir</tt> for a more complete explanation.
+
+<hr>
+
+<h3><a name="depth">How do I limit how deep w3mir will recurse?</a></h3>
+
+<p>W3mir has no explicit mechanism to limit the depth of recursion,
+but the same result can be achieved with a simple <tt>Ignore</tt> rule:
+
+<pre>
+Ignore: /*/*/*/*/*/*/
+</pre>
+
+<p>This will ignore any URLs that contain at least 7 slashes ("/").
+Note that a URL contains three slashes that does not have anything to
+do with depth:
+
+<pre>
+http://www.ifi.uio.no/
+</pre>
+
+<p>so only the surplus slashes are used for depth in this match.  In the
+example above the limit is 4 levels from the top.  The
+<tt>Ignore:</tt> rule that is used to limit recursion depth must be
+listed before any <tt>Fetch:</tt> rules to be effective.
+
+<hr>
+
+<h3><a name="memory">How do I limit w3mirs memory usage?</a></h3>
+
+<p>In a mirror consisting of <em>many</em> files, such as a archive of
+an active mailinglist w3mir will build a very large referer table, in
+part for w3mir to use in the <tt>Referer:</tt> header and in part for
+w3mfix to use in fixing references.
+
+<p>If you disable both the <tt>Referer:</tt> header and don't use
+w3mfix w3mir will not build a referer table.  You do this in the
+configuration file:
+
+<pre>
+Disable-headers: referer
+Fixup: off
+</pre>
+
+<p>Please note the potential problems of turning off fixup described
+earlier in this howto.  There are normaly no problems associated with
+simple sites, but if there are redirects fixup <em>is</em> needed for
+a consistent mirror.
+
+<hr>
+
+<h3><a name="rm">How do I remove the files are no longer on the
+original site from the mirror?</a></h3>
+
+<p>Over time the site you mirror will add files, and quite possibly
+remove files.  Or you might introduce new <tt>Ignore:</tt> rules after
+establishing the mirror that reduces the files wanted in the mirror.
+
+<p>By default w3mir will not delete such old files, some people might
+want to keep the files even if they are removed from the original
+site.  To remove the old/unwanted files you add 'remove' to the
+<tt>Options:</tt> line.
+
+<hr>
+
+<h3><a name="multi">How do I copy files from multiple sites?</a></h3>
+
+<p>In the answer to the previous question we see how to mirror several
+related sites.  For example, say you want to mirror all my home-pages
+into one mirror:
+
+<pre>
+Option: recurse
+URL: http://www.math.uio.no/~janl/ math/janl
+Also: http://www.math.uio.no/drift/personer/ math/drift
+Also: http://www.ifi.uio.no/~janl/ ifi/janl
+Also: http://www.mi.uib.no/~nicolai/ math-uib/nicolai
+</pre>
+
+<p>As in the previous example this will only get documents that are
+referenced.  Any documents that are stored at these location but to
+which w3mir finds no references will not be retrieved.  So this will
+fail if the sites are not in any way related, or if you wanted
+<em>everything</em> stored at each site.
+
+<p>To mirror unrelated sites, or get it all you may specify that the
+given URL should be considered a starting-point as well:
+
+<pre>
+Also-quene: http://www.math.uio.no/drift/personer/ math/drift
+</pre>
+
+<p>and, if you want to add an additional starting-point within a already
+named site:
+
+<pre>
+Quene: http://www.math.uio.no/drift/personer/foo.html
+</pre>
+
+<p>Armed with that you should be able to get pretty much anything you
+like.
+
+<hr>
+
+<h3><a name="alias">How do I copy files from one server with several
+names?</a></h3>
+
+<p>Simple, the same way you mirror several servers with different
+names. The math department at University of Oslo has a web server
+known under two names: math-www.uio.no and www.math.uio.no, and both
+names are used in documents stored on it. To copy the whole server,
+one time only, give these URL and Also lines:
+
+<pre>
+URL: http://www.math.uio.no/ .
+Also: http://math-www.uio.no/ .
+</pre>
+
+<p>Note the period/dot (.) at the end of each line.  It means that
+w3mir will store the files in the current directory, i.e. documents
+from both servers will be stored in the same place.  But since w3mir
+asks to only get documents that are newer than the ones it already has
+any document gotten from the server under the www.math.uio.no name
+will not be gotten from the math-www.uio.no name as well.  ... w3mir
+will ask for the document, but the server will tell w3mir that its
+copy is current and there will be no additional transfer of the
+document.
+
+<hr>
+
+<h3><a name="enlarge">How do I enlarge or prune an established
+mirror?</a></h3>
+
+<p>This only works if you use a configuration file.
+
+<p>If you want to add a site or directory to a mirror you simply add
+the needed <tt>Also:</tt> or <tt>Also-Quene:</tt> to the configuration
+file and then you run w3mfix manually, with the -editref option.  If,
+you for example have established a mirror of my home-pages, but want to
+add my wife's home-page you add this
+
+<pre>
+Also: http://www.ifi.uio.no/~annen/ ifi/annen
+</pre>
+
+<p>to the configuration shown earlier.  Then you run w3mfix, and you want
+it to fix all URLs referencing her home-page, the distinguishing
+characteristic is the name 'annen':
+
+<pre>
+w3mfix -editref annen
+</pre>
+
+<p>but 
+
+<pre>
+w3mirx -editref http://www.ifi.uio.no/~annen/
+</pre>
+
+<p>would work too, but it's a lot more to type.  This fixes all the
+references to her home-page so that they point to the mirror instead of
+the original pages.
+
+<p>To prune (cut out something) a mirror you do the same.  Make the
+change in the configuration file and run 'w3mfix -editme ...' to fix
+the references to that which you removed.
+
+<hr>
+
+<h3><a name="cat">How do I 'cat' a file?</a></h3>
+
+<p>W3mir will output the fetched document to its standard output
+(normally your screen/window) if you specify the '-s' command line
+option.  The corresponding configuration file directive is 
+
+<pre>
+File-Disposition: stdout
+</pre>
+
+<hr>
+
+<h3><a name="list">How do I list URLs in a document?</a></h3>
+
+<p>To list the URLs in http://www.math.uio.no/:
+
+<pre>
+w3mir -q -f -l http://www.math.uio.no/
+</pre>
+
+<p>The <tt>-q</tt> switch causes w3mir to produce no other output
+which would disturb the URL listing.  The <tt>-f</tt> switch tells
+w3mir to forget the document once it has been analyzed, i.e., not save
+it on disk.  And finally, the <tt>-l</tt> switch makes w3mir list the
+URLs in the document.  You may combine <tt>-l</tt> with <tt>-r</tt>
+and you need not use it with <tt>-f</tt>.
+
+<p>In the configuration file you put <tt>list</tt> on the
+<tt>Options:</tt> line.
+
+<hr>
+
+<h3><a name="aborted">How to I restart a mirror process after stopping
+it prematurely?</a></h3>
+
+<p>You may just rerun the same command once more.  But that makes
+w3mir request all the documents you have already once more to see if a
+more recent version is available on the server.  You can save time by
+using the <tt>-fs</tt> (Fetch Some) option.  This makes w3mir only
+request documents it does not find on your disk.  E.g.:
+
+<p><tt>w3mir -fs -r http://www.starwars.com/</tt>
+
+<p>This is not something you would normally put in the configuration
+file, but you can, by adding 'only-nonexistent' on the 'Options:' line.
+
+<hr>
+
+<h3><a name="robots">How do I disable robots.txt obedience?</a></h3>
+
+<p>Normally w3mir will read and obey each sites robots.txt file,
+because w3mir wants to be a nice tool. However robots.txt was designed
+with something slightly different than the normal use of w3mir in
+mind, so if you want w3mir to disregard the robot rules you can use
+<tt>-drr</tt> (Disable Robot Rules) on the command-line, or the line
+
+<pre>
+Robot-Rules: off
+</pre>
+
+<p>in the configuration file.  The robot exclusion standard is
+described in <a
+href="http://info.webcrawler.com/mak/projects/robots/norobots.html">http://info.webcrawler.com/mak/projects/robots/norobots.htm</a>.
+
+<hr>
+
+<h3><a name="corrupt">How do I stop w3mir from corrupting binary
+files?</a></h3>
+     
+<p>During the normal course of events w3mir converts the newline
+format of fetched HTML documents to your systems native newline
+format. On Unix a newline consists of a single ASCII LF character, on
+Macintoshes it's a single ASCII CR character and on Dos/Windows it's a
+ASCII CR/LF pair. W3mir understands all these and all HTML files are
+saved in the format your operating system prefers.
+
+<p>If, and this is very unlikely, a web server identifies a binary
+file as HTML w3mir will very likely corrupt the file. If you discover
+a file which is obviously ruined in the mirror, but is not ruined when
+you view it on the original site do this:
+
+<ol>
+
+<li>Notify the webmaster on the original site that the file has the
+wrong MIME type
+
+<li>Use the <tt>-nnc</tt> (No Newline Conversion) option on the
+command line, or
+
+<pre>
+Options: no-newline-conv
+</pre>
+
+in the configuration file.
+
+<li>Remove the corrupt file(s).
+
+<li>Run "<tt>w3mir -fs</tt>...", to fetch only the deleted file(s)
+again.
+
+</ol>
+
+<hr>
+
+<h3><a name="auth">How do I copy a site that wants user-name and
+password?</a></h3>
+
+<p>This can only be done with a configuration file.  Being able to
+give this on the command-line would give the user-name and password away
+to other users of the system, so the ability to give authentication
+information that way has not been put in w3mir.
+
+<p>In the configuration file you put:
+
+<pre>
+Auth-domain: */*
+Auth-user: me
+Auth-passwd: my-password
+</pre>
+
+<p>This will cause w3mir to give the user-name and password each time
+the server asks.  There is no way to make w3mir give the user-name and
+password each time no matter if the server asks or not.
+
+<hr>
+
+<h3><a name="mauth">How do I access a site that wants several
+different user-names and passwords?</a></h3>
+
+<p>If you have several user-names and passwords across
+the server(s) that are copied you need a slightly more advanced
+version of this that associates each user-name/password with a
+authentication "domain".  "Domain" is a HTTP concept.  It is simply a
+grouping of files and documents within a "realm".  One file or a whole
+directory hierarchy can belong to a realm.  One server may have many
+realms.  A user may have separate passwords for each realm, or the
+same password for all the realms the user has access to.  A
+combination of a server name, server port and a realm is called a
+domain.
+
+<pre>
+Auth-domain: theserver:theport/therealm
+Auth-user: me
+Auth-passwd: my-password
+
+Auth-domain: theserver:theport/otherrealm
+Auth-user: other-me
+Auth-password: other-password
+</pre>
+
+W3mir will tell you what the name of the realm is if it is unable to
+authenticate itself with the server. You may also use '*' as the realm
+name if you only copy documents from one realm on that server.
+
+<hr>
+
+<h3><a name="proxy">How do I use a proxy server?</a></h3>
+
+<p>On some secured sites you have to access the Internet through proxy
+servers to get out of the internal network.
+
+<p>A proxy server has a host name, and a port you must use. On the
+command line you simply specify <tt>-P proxy-host-name:proxy-port</tt>. In
+the configuration file you put this:
+
+<pre>
+HTTP-Proxy: proxy-host-name:proxyport
+</pre>
+
+<p>The main advantage of working through proxy servers other than
+security is that you take advantage of any caching the proxy server
+which can speed up retrievals enormously.
+
+<p>Another use of the proxy option is to "prime" the proxy servers
+cache.  I.e. you can use w3mir to fetch the documents through the proxy
+server to ensure that the documents are cached there later when you
+want to read them with your browser.  If you also specify 
+
+<pre>
+File-Disposition: forget
+</pre>
+
+<p>it won't even use any space on your disk, w3mir will just process
+the documents looking for URLs and then <em>not</em> save them.
+
+<hr>
+
+<h3><a name="pauth">How do I authenticate myself to a proxy
+server?</a></h3>
+
+<p>Some proxy servers demands a user-name and password to let you use
+them.  W3mir does not support the domain concept in connection with
+proxy authentication because the author cannot imagine that it will be
+needed.  You need to put this in your configuration file:
+
+<pre>
+HTTP-Proxy-user: proxy-username
+HTTP-Proxy-passwd: proxy-password
+</pre>
+
+<hr>
+
+<h3><a name="proxytweak">How do I ensure that the proxy server
+...?</a></h3>
+
+<p>HTTP/1.0 proxy servers may be told to not use its current copy of
+a document if you specify the <tt>-pflush</tt> command-line option.  Or 
+
+<pre>
+Proxy-Options: refresh
+</pre>
+
+<p>in the configuration file.  This is useful if the proxy has an old
+copy of some document and does not realize that a newer version exists
+on the origin site.  W3mir uses the HTTP/1.0 version of this command
+by default.  You can force w3mir to use the HTTP/1.1 version by adding
+<tt>no-pragma</tt> to the line.  If you do this it will not work at
+all as you want unless the server knows the HTTP/1.1 protocol.
+
+
+<p>HTTP/1.1 proxy servers can be manipulated in a few more ways.  The
+configuration file <tt>Proxy-Options:</tt> directive also takes
+<tt>revalidate</tt> and <tt>no-store</tt> options.  The former tells
+the proxy server to check if there is any newer version available.
+This is, in principle, more network friendly than the <tt>refresh</tt>
+option since it will only cause a copy if there is a newer file
+available.  The <tt>no-store</tt> option tells the proxy server to not
+store the documents you transfer.  This might be useful if the
+documents are 'sensitive' or something like that, but if the proxy
+server does not understand HTTP/1.1 it will not obey this option, and
+it might store the document anyway because the functionality is not
+implemented, so you should not count on this to work.
+
+<hr>
+
+<h3><a name="batchget">How do I batch get files with w3mir?</a></h3>
+
+<p>Normally when fetching files w3mir will process each html (and PDF)
+file to find URLs in them for further retrievals.  This is
+time-consuming, and not always wanted.  Sometimes you simply want to
+get a file, or more, and save it, untouched:
+
+<pre>
+w3mir -B http://www.starwars.com/ http://www.ifi.uio.no/~janl/
+</pre>
+
+<p>There is a companion switch for <tt>-B</tt>, namely <tt>-I</tt>, it
+makes w3mir read URLs from its standard input, one pr. line.  Thus you
+can use w3mir in a pipe to batch get several files whose URLs you find
+in some way.  This is a stupid example:
+
+<pre>
+w3mir -q -l -f http://www.ifi.uio.no/ | w3mir -I -B
+</pre>
+
+<p><tt>-B</tt> may also be used with <tt>-r</tt>, but the only effect
+it will have then is to save the html files unchanged on disk, because
+to recurse w3mir <em>has</em> to examine all the html the documents
+for URLs.
+
+<p><b>Please note</b> that using <tt>-B</tt> combined with <tt>-r</tt>
+for mirroring will probably lead to a unstable mirror, because w3mir
+does not get a chance to manipulate the URLs in the documents as it
+needs to be able to maintain a mirror later, and most important of
+all, w3mir needs all html files to contain a &lt;HTML&gt; tag to be
+able to recognize a HTML file as a HTML file. When running with the
+<tt>-B</tt> switch w3mir will not ensure the presence of this and thus
+we must rely on the original documents author to be nice. This is a
+bad bet. In other words, <b>don't use <tt>-B</tt> for recursive
+mirroring</b>, only for batch copying/mirroring of single documents.
+
+<hr>
+
+<h3><a name="cgi">How do I handle CGI?</a></h3>
+
+<p>There is no way w3mir can duplicate the process that happens on the
+Web server when it comes to CGI.  For some CGI programs w3mir can
+simply copy the output and store on disk.  For other CGI programs this
+is not possible, and the only way out is to make w3mir not get the
+involved files using Ignore rules in the configuration file.  These
+will avoid a lot of cgi programs:
+
+<pre>
+Ignore: *.cgi
+Ignore: *-cgi
+</pre>
+
+<p>You might have to add other/more rules for some sites if they have
+other naming conventions or if it's simply impossible to tell from the
+file-name if it's a CGI or not.
+
+<p>When you add ignore rules this causes two things:
+
+<ol>
+<li><p>W3mir will not retrieve documents matching the rules
+<li><p>W3mir will make all references to matching documents point to
+  the site you mirrored from instead of pointing to a non-existent
+  file in the mirror.
+</ol>
+
+<hr>
+
+<h3><a name="imap">How do I handle server side image-maps?</a></h3>
+
+<p>Server side image-maps is yet another thing it's impossible for
+w3mir to relate to.  w3mir simply cannot handle them.  Put ignore
+rules in the configuration file:
+
+<pre>
+Ignore: *.map
+</pre>
+
+<p>W3mir has full support for client side image-maps though.
+
+<hr>
+
+<h3><a name="java">How do I handle Java and ActiveX?</a></h3>
+
+<p>Java and Active X objects are are included in html pages with a
+<tt>&lt;OBJECT&gt;</tt> or <tt>&lt;APPLET&gt;</tt> tag.  W3mir can
+handle these on one condition: The CODEBASE attribute names the
+directory where the program stores its resources (such as
+subprograms, graphic files, sound, text, and so on) and w3mir must
+have read access to this directory.  Otherwise w3mir is without hope,
+it's impossible to extract the name of the resources the program needs
+in any reliable way.
+
+<p>HTML4 supports a attribute that enumerates the resources the
+program needs, w3mir is not able to use this yet.
+
+<hr>
+
+<h3><a name="script">How do I handle java-script and other script
+languages?</a></h3>
+
+<p>W3mir does its best to pass scripts (java-script, perl-script,
+etc...) embedded in the HTML undamaged.  It cannot, however, extract
+any URLs the script generates and the browser would cause the document
+to refer to or embed in a page. 
+
+<p>It will however work if the script generates relative references
+and there is some other way for w3mir to access the referenced file in
+some other manner.  Or if the script generates absolute references and
+the person browsing the mirror has access to the site named, then the
+user will be able to browse the referenced documents via that other
+server.
+
+<hr>
+
+<h3><a name="css">How to I handle the other things with 'partial
+support'</a></h3>
+
+<p>W3mir has partial support for CSS.  This means that
+<tt>&lt;style&gt</tt> tags and the enclosed style data are passed
+undamaged by w3mir.  W3mir will also retrieve the external CSSes named
+in HTML documents.  But w3mir will <em>not</em> (yet) analyze the
+CSSes data to find URLs of other resources (such as fonts) named in
+these.
+
+<p>W3mir also has partial support for Adobe Acrobat (PDF) files.  This
+means that w3mir can extract URLs from PDF files, and get the named
+documents if you want them.  But w3mir cannot edit those URLs so that
+the PDF files point to the mirror instead of wherever on the original
+site they were pointing.  If the PDF files contain absolute URLs they
+will continue pointing to where they were pointing before.  However,
+if the PDF files contain relative references things will work out.
+
+<p>The reason that URLs in PDF files cannot be edited is that they are
+binary and contain byte pointers.  If the URLs length is changed the
+byte pointers will point to the wrong place in the document.  Writing
+code to correct these pointers would be quite complex.  But if you
+write it I will use it.
+
+<hr>
+
+<h3><a name="anon">How do I keep my identity secret?</a></h3>
+
+<p>The HTTP protocol has a header, <tt>User:</tt> which is recommended
+to use by robots, such as w3mir.  Another way to track you is looking
+at the 'Referer:' header w3mir gives in HTTP requests.  Both can be
+disabled:
+
+<pre>
+Disable-headers: referer, user
+</pre>
+
+<p>If you in addition use a proxy server that many other users use
+there is little probability you can be tracked (easily) by the server
+you are copying things from.  You are however much easier to track
+from the logs in the proxy server.  And a court order is quite likely
+to get you tracked in spite of any precautions you take.  
+
+<p>W3mir does not support cookies and thus you cannot be tracked with
+the help of that mechanism.
+
+<hr>
+
+<h3><a name="ns">How do I pretend that I'm using Netscape, Internet
+Explorer or Lynx?</a></h3>
+
+<p>Some web sites give you different documents when you ask for a
+specific URL based on what browser you use, or even what OS you appear
+to be using.  w3mir identifies itself with a string that looks like
+this:
+
+<p><tt>w3mir/<em>version</em>-<em>release-date</em></tt>
+
+<p>Netscape identifies itself with strings that look something like
+this:
+
+<p><tt>Mozilla/3.01 (X11; I; Linux 2.0.30 i586)</tt>
+
+<p>and Internet Explorer says it's something like this:
+
+<p><tt>Mozilla/2.0 (compatible; MSIE 3.02; Windows NT)</tt>
+
+<p>and Lynx says something like this
+
+<p><tt>Lynx/2.6  libwww-FM/2.14</tt>
+
+<p>You can change w3mirs identification with <tt>-agent 'string'</tt>
+on the command line.  In the configuration file you put
+
+<pre>
+Agent: Mozilla/3.01 (X11; I; Linux 2.0.30 i586)
+</pre>
+
+<p>to pretend w3mir is netscape 3.01.
+
+<hr>
+
+<h3><a name="other">How do I do other things?</a></h3>
+
+<p>This document is by no means a complete list of the things you can
+do with w3mir.  The w3mir man page (<tt>man w3mir</tt> or <tt>perldoc
+w3mir</tt> lists more things, and goes into more detail of how things
+work so you can use the knowledge to do neat things.  There are
+several things mentioned only in the man-page that helps you with
+tricky multi-server mirroring, and gives you better control of what to
+get and not to get and under what name to save it on disk.  And a
+couple of other things...
+
+<hr>
+<address>Nicolai Langfeldt 9/7/1998</address>

@@ -1,0 +1,22 @@
+---
+abstract: 'Produces warnings if methods are called as functions'
+author:
+  - 'Goro Fuji <gfuji(at)cpan.org>'
+configure_requires:
+  ExtUtils::MakeMaker: 6.44
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: warnings-method
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.10

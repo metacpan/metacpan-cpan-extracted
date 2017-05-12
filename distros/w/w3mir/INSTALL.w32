@@ -1,0 +1,91 @@
+This file contains installation instructions for two different ports
+of Perl to win32.  One port is known as the 'ActivePerl' port, the
+other is known as 'the GS port'.
+
+********************************* ActivePerl **********************************
+
+This was written and submitted by Roland Bauer.  Thanks.  I have
+edited them slightly.
+
+How to install w3mir on Win95/AS-port (April 1999):
+===================================================
+
++ get and install winzip from http://www.winzip.com/
++ get and install ActivePerl (now Build 509) from http://www.activestate.com/
++ get nmake.exe from 
+  ftp://ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe
+  (or set switch make=nmake to make=dmake in Config.pm
+  and get dmake from GS port)
+
++ perl makefile.pl
++ nmake
++ nmake install
+
++ perl w3mir -h
++ perl w3mir http://xx.zz.zz/dir/
+
+
+Caveats:
+========
+
++ archive 1.0.6 from CPAN seems to be corrupted
+
++ &mkdir does not seem to work with dos-paths
+like 'D:/DIR1/DIR2' (so it is not possible to save to another harddisk)
+
+*********************************** GS Perl ***********************************
+
+These win32 installation instructions were written by Paul Hsiao and
+slightly edited by me. My thanks to Paul. It was current as of
+22-May-1998.
+
+
+WINZIP DOWNLOAD INSTRUCTIONS
+
+    The WinZip program can be accessed from the "Start" button, if the
+    program came with your system.  This software can be obtained from:
+ 
+                http://www.winzip.com/
+ 
+    Follow the installation instructions for the WinZip software as needed.
+
+ 
+PERL DOWNLOAD INSTRUCTIONS
+ 
+    The w3mir code will need access to version 5.003 or higher of the 
+    Perl interpreter and LWP library extensions in order for it to run. 
+    This software can be obtained from:
+ 
+                ftp://sunsite.uio.no/pub/languages/perl/CPAN/ports/win32/Standard
+ 
+    From this URL, select perl5.00402-bindist04-bc.tar.gz and download
+    to your PC into a folder of your choice.  In the folder, run WinZip
+    on this file.  For MS Windows 95, you need to update the registration: 
+    open C:\autoexec.bat  and add a line
+
+                path %path%;C:\Perl\bin;       
+    (C:\Perl\ is the path of the perl folder)  
+
+
+W3MIR DOWNLOAD AND INSTALLATION INSTRUCTIONS
+
+    You already have w3mir. Right? Unpack the .tar.gz file with
+    winzip.
+ 
+    Open a DOS prompt screen and go to the w3mir folder:
+ 
+        cd C:\w3mir-1.0.3
+ 
+    Type the install command for w3mir:
+ 
+        perl.exe Makefile.PL
+        make
+        make install
+ 
+    To test w3mir, type:
+ 
+    perl w3mir -h
+ 
+    If the screen displays all options (about 25 options), then 
+    w3mir is installed correctly.
+

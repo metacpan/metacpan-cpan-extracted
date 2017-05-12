@@ -1,0 +1,186 @@
+=head1 NAME
+
+WWW::Webrobot::pod::README - *** START HERE ***: INTRODUCTION
+
+=head1 What is WebRobot
+
+WebRobot is a data driven http client heavily based on L<LWP>.
+It can be used
+
+=over
+
+=item *
+
+for automating http requests
+
+=item *
+
+for a kind of web based unit tests
+
+=item *
+
+for (limited) stress tests of web servers
+
+=item *
+
+for analyzing http communication
+
+=back
+
+
+=head1 How to use it
+
+=over
+
+=item *
+
+You define your requests in an XML file,
+possibly with additional information like a description or an assertion.
+This is called to be a test plan.
+See L<WWW::Webrobot::pod::Testplan>.
+
+=item *
+
+You configure WebRobot (proxies, authentification, ...)
+with a simple properties file.
+See L<WWW::Webrobot::pod::Config>.
+
+=item *
+
+You run L<webrobot> with your test plan and configuration file.
+
+=item *
+
+You inspect the output in text or html form depending on the output listeners in use.
+See L<WWW::Webrobot::pod::OutputListeners>.
+
+
+=back
+
+
+=head1 Some features
+
+=over
+
+=item *
+
+The test plan format is XML.
+The plan to be processed includes a list of http/https requests.
+POST requests will be feeded with data.
+
+=item *
+
+Display of http request/response header.
+
+=item *
+
+Assertions for http responses: Some predicates and boolean operators (extendable).
+
+=item *
+
+Multiple requests out of a single one,
+eg. additionally request the images and frames (extendable).
+
+=item *
+
+Linkchecker included (a special module for I<multiple request>).
+Predicates and boolean operators for the links to be followed.
+
+=item *
+
+Output listeners (extendable): HTML, Text, Test::Harness
+
+=item *
+
+Property file for the client configuration
+(proxy, basic authentification, http header, timeout, ...)
+
+=item *
+
+Cookie behaviour control (on, off, clear)
+
+=item *
+
+Including test plans: For better maintainability a plan can include any other plans.
+
+=item *
+
+Plans are parameter enabled (names).
+The names are set by the calling plan or the config file.
+
+=item *
+
+Single client instance emulating multiple users (deterministic access).
+
+=item *
+
+Multiple client instances for load test (unix like operating systems only).
+
+=item *
+
+Sending mail when the execution of the plan is terminated.
+
+=back
+
+
+=head1 BUGS
+
+Most bug descriptions are annotated at the desired place.
+
+
+=head1 DEVELOPMENT STAGE
+
+The software runs pretty stable and is in use for quality assurance.
+
+Some interfaces or formats have recently changed and may change in the future.
+I try to avoid incompatible changes or at least I'll document incompatibilities.
+See the I<Changes> file in the distribution.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<http://webrobot.abas.de>
+
+The Webrobot support page.
+It contains screenshots, tutorials, documentation and downloads.
+
+
+=item L<WWW::Webrobot::pod::Config>
+
+How do you configure Webrobot? It is similar to any web browser.
+An example is in the distribution F<t/example/cfg.prop>.
+
+=item L<WWW::Webrobot::pod::Testplan>
+
+What is the format of a test plan?
+An example is in the distribution F<t/example/testplan.xml>.
+
+=item L<WWW::Webrobot::pod::OutputListeners>
+
+How do you configure the output of Webrobot?
+You may use one of the delivered packages or write your own (very simple).
+
+=item L<WWW::Webrobot::pod::Recur>
+
+How can you make multiple requests out of one?
+You may use one of the delivered packages or write your own (not that simple).
+An example how to use the linkchecker module
+is in the distribution F<t/example/linkchecker.xml>.
+
+=back
+
+
+=head1 AUTHOR
+
+Stefan Trcek
+
+=head1 COPYRIGHT
+
+Copyright(c) 2004 ABAS Software AG
+
+This software is licensed under the perl license, see LICENSE file.
+
+=cut
+
+1;

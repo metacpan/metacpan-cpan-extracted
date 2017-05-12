@@ -1,0 +1,53 @@
+load.number_of_clients=2
+load.base=1.77827941003892
+load.scale=40
+load.output_file=WEBROBOT_OUT
+
+names=server=erbse.s3.abas.de
+names=port=7080
+names=application=http://erbse.s3.abas.de:7080/troja
+names=www=www.abas.de
+names=s3www=s3www.abas.de
+
+# auth.basic=,Website,login-id,secret-password
+# auth.basic=|Website|login-id|secret-password
+# auth.basic=/Website/login-id/secret-password
+
+#output=WWW::Webrobot::Print::MakeTestplan
+#output=WWW::Webrobot::Print::Text
+output=WWW::Webrobot::Print::Test
+output.1=WWW::Webrobot::Print::Html
+#output=WWW::Webrobot::Print::File 'dir' => 'diff_new', 'diff_mode' => 'diff_orig'
+#output=WWW::Webrobot::Print::File 'dir' => 'diff_orig'
+
+timeout=500
+client_302_bug=1
+#delay=1
+
+http_header=Accept-Language=de
+http_header=new-header-element=irgendwas
+
+proxy=http=http://sgate.s3.abas.de:8000
+proxy=https=http://sgate.s3.abas.de:8000
+proxy=ftp=http://sgate.s3.abas.de:8000
+
+no_proxy=localhost
+no_proxy=s3.abas.de
+no_proxy=s3www
+no_proxy=erbse
+
+mail.condition=never
+mail.server=sgate.s3.abas.de
+mail.timeout=60
+mail.Return-Path=st@abas.de
+mail.From=webrobot
+mail.To=trcek@abas.de
+mail.Reply-To=st@abas.de
+mail.Cc=some@other.com, some@more.com
+mail.Bcc=some@other.com, some@more.com
+mail.Subject=Webrobot: Perl test mail Ümläüte
+mail.Type=text/plain
+mail.Encoding=quoted-printable
+mail.Data=blabla\n\
+Das ist der Body äöü\n\
+der testmail\n

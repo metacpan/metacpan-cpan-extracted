@@ -1,0 +1,59 @@
+NAME
+    Win32::Guidgen - Perl extension that generates GUID strings.
+
+SYNOPSIS
+            use strict;
+            use Win32::Guidgen;
+
+            my $guid = Win32::Guidgen::create();
+            print "New GUID is $guid\n";
+
+DESCRIPTION
+    Win32::Guidgen generate Generates Globally Unique Identifiers (GUIDs).
+
+    It exposes 3 methods: C<create()>, C<gen()> and C<generate()>, which 
+	all return a string formatted like the following sample:
+
+    {c200e360-38c5-11ce-ae62-08002b2b79ef}
+
+    where the successive fields break the GUID into the form
+    `DWORD'-`WORD'-`WORD'-`WORD'-`WORD'.`DWORD' covering the 128-bit GUID.
+    The string includes enclosing braces, which are an OLE convention.
+
+  EXPORT
+
+    None by default.
+
+INSTALLATION
+    You install `Win32::Guidgen', as you would install any perl module
+    library, by running these commands:
+
+            perl Makefile.PL
+            make
+            make test
+            make install
+
+AUTHOR
+    `Win32::Guidgen' was written by Joe P. Hayes
+    *<joephayes@_NOSPAM_yahoo.com>* (Take out '_NOSPAM_', to send) in 2001.
+	
+	Neil Hunt *<neilh@_NOSPAM_thehunts.id.au>* (Take out '_NOSPAM_', to send)
+	contributed a new version of the GUID generator in 2004.
+
+LICENSE
+    The `Win32::Guidgen' module is Copyright (c) 2001 Joe P. Hayes. All
+    Rights Reserved.
+
+    You may distribute under the terms of either the GNU General Public
+    License or the Artistic License, as specified in the Perl README file.
+
+SUPPORT / WARRANTY
+    The `Win32::Guidgen' module is free software.
+
+    IT COMES WITHOUT WARRANTY OF ANY KIND.
+
+    Commercial support for Perl can be arranged via The Perl Clinic. For
+    more details visit:
+
+      http://www.perlclinic.com
+

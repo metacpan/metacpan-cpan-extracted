@@ -1,0 +1,30 @@
+0.20 Sat Aug 16 14:27:39 PDT 2014
+ - Remove =travis section
+
+0.19 Sat Aug 16 12:54:25 PDT 2014
+ - Meta 0.0.2
+
+0.18 Sat Aug 16 03:07:18 PDT 2014
+ - Eliminate File::Basename from test/
+
+0.17 Fri Aug 15 21:01:30 PDT 2014
+ - Add t/000-compile-modules.t
+
+0.16 Mon Aug  4 00:45:49 PDT 2014
+ - Remove (c) from Copyright
+
+0.15 Wed Jul 30 16:20:27 PDT 2014
+ - Switch IRC to '#pkg'
+
+0.14 Thu Jul 24 10:11:24 PDT 2014
+ - Fix email in Meta
+
+0.12 Mon Jul 21 17:13:19 PDT 2014
+ - Switch to Zilla-Dist
+
+0.11 Sun Jun 12 15:17:45 EST 2011
+ - Changed tests for more recent Module::Compile
+
+0.10 Mon Jun 26 09:55:12 CDT 2006
+ - Maiden voyage
+

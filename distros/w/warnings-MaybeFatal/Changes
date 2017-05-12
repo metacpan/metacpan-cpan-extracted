@@ -1,0 +1,44 @@
+warnings-MaybeFatal
+===================
+
+Created:      2014-01-30
+Home page:    <https://metacpan.org/release/warnings-MaybeFatal>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=warnings-MaybeFatal>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.005	2017-02-03
+
+ - Die a horrible, gruesome death if you try to use the pure Perl
+   implementation of B::Hooks::EndOfScope.
+   <http://purl.org/NET/cpan-uri/rt/ticket/117895>
+
+0.004	2014-02-06
+
+ - warnings::MaybeFatal no longer dies as soon as a warning is issued.
+   Instead, it allows the code to keep compiling, and only dies at the end
+   of the compile if there were any warnings issued.
+   Dagfinn Ilmari Mannsåker++
+   Damien Krotkine++
+   <http://purl.org/NET/cpan-uri/rt/ticket/92718>
+
+0.003	2014-02-05
+
+ [ Test Suite ]
+ - Test that a module using warnings::MaybeFatal is able to load another
+   module using warnings::MaybeFatal. (This test fails on Perl < 5.8.4.)
+   Graham Knop++
+
+ [ Other ]
+ - Raise Perl version dependency from 5.8.1 to 5.8.4.
+
+0.002	2014-02-05
+
+ - Depend on Lexical::SealRequireHints for Perl 5.8.x and 5.10.x.
+   Graham Knop++
+   <http://purl.org/NET/cpan-uri/rt/ticket/92719>
+ - No longer depend on Devel::Pragma for Perl 5.8.x.
+   Graham Knop++
+   <http://purl.org/NET/cpan-uri/rt/ticket/92719>
+ - Reduce Perl version dependency from 5.8.3 to 5.8.1.
+
+0.001	2014-02-01	Initial release

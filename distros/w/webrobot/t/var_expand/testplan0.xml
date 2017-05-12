@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!--
+FREE VARIABLES
+application
+-->
+
+<plan>
+
+    <request>
+        <method value='NOP'/>
+        <description value='Barney first name is ${barneys_firstname}'/>
+    </request>
+
+    <request>
+        <method value='NOP'/>
+        <description value='Barney second name is ${barneys_surname}'/>
+    </request>
+
+
+</plan>

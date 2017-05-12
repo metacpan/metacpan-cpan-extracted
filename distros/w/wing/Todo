@@ -1,0 +1,8 @@
+LDAP integration
+Auto-timeout of sessions integrated with IMAP timeouts.
+
+Possible Enhancements
+    Sorting mailboxes
+    Add tagged messages
+    Limit mailbox lists by constraints
+    Search mailboxes with the IMAP "SEARCH" primitive

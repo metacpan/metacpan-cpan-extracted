@@ -1,0 +1,32 @@
+This package contains the 'webchatpp' program, with its support
+modules WWW::Chat, WWW::Chat::Processor and HTML::Form.
+
+The 'webchatpp' program is a preprocessor that turns chat scripts into
+plain perl scripts using libwww-perl.  When the script created by
+webchatpp is feed to perl it will perform the chatting.  Chat scripts
+are useful for setting up test suites for web applications or just to
+automate dialogues with web applications.
+
+This is an example of a simple chat script:
+
+  GET http://www.altavista.com
+  EXPECT OK
+  F q=Gisle
+  CLICK
+  EXPECT OK && /Gisle Aas/
+
+You can run it like this (assuming script found in file 'av.wc'):
+
+  webchatpp av.wc | perl
+
+Installation as usual; 'perl Makefile.PL; make install', and further
+documentation is embedded in the modules and the webchatpp script.
+
+The preprocessing is performed by WWW::Chat::Processor::parse 
+function and as such you can use this to parse scripts within 
+your own scripts and modules and eval them inline. 
+
+This module is now maintained by Simon Wistow.
+
+Original Copyright 1998 Gisle Aas.  This is free software; you can
+redistribute it and/or modify it under the same terms as Perl itself.

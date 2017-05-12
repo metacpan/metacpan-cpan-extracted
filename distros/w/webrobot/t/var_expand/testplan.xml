@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!--
+FREE VARIABLES
+application
+-->
+
+<plan>
+
+    <request>
+        <method value='NOP'/>
+        <description value='some text'/>
+    </request>
+
+    <request>
+        <method value='NOP'/>
+        <description value='${Fred} and ${Barney}'/>
+    </request>
+
+    <request>
+        <method value='NOP'/>
+        <description value='${fred} and ${barney}'/>
+    </request>
+
+    <include file='t/var_expand/testplan0.xml'>
+        <parm name='barneys_firstname' value='Barney'/>
+        <parm name='barneys_surname' value='${Barney}'/>
+    </include>
+
+    <request>
+        <method value='NOP'/>
+        <description value='${barneys_firstname} and ${barneys_surname} must not be expanded'/>
+    </request>
+
+    <include file='t/var_expand/testplan0.xml'>
+        <parm name='barneys_firstname' value='little-Barney'/>
+        <parm name='barneys_surname' value='little-${Barney}'/>
+    </include>
+
+
+    <include file='t/var_expand/testplan1.xml'>
+        <parm name='freds_firstname' value='little-Fred'/>
+        <parm name='freds_surname' value='little-${Fred}'/>
+    </include>
+
+</plan>

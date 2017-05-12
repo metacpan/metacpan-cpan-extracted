@@ -1,0 +1,145 @@
+Changes from 0.8 to 0.9
+
+Support https connections (for secure access) and port 81 connections
+(to avoid the enforced proxying via multiple IP addresses done by
+some ISPs).
+
+Add explicit Date header to outgoing mail in maild otherwise a copy
+saved in sent-mail won't have a Date header.
+
+Fixed potential deadlock if /dev/urandom is unreadable.
+
+Handle base64 and quoted-printable decoding transparently ourselves.
+
+Send message/delivery-status MIME parts as text/plain since most
+browsers don't know what to do with them.
+
+Fold header continuation lines so that they don't get lost.
+
+Add explicit action attributes to all <form> tags for the sake of
+browsers which need them.
+
+
+
+Changes from 0.7 to 0.8
+
+Anonymised Oxford-specific stuff in Wing/Shared.pm for public release.
+
+
+
+Changes from 0.5.2 to 0.7
+
+Fixed numerous bugs in address books.
+
+Support import of (Pine format) address books via browser upload.
+
+Added per-user links files with folding view.
+
+Added "portal" view.
+
+A few bug fixes.
+
+
+
+Changes from 0.5.1 to 0.5.2
+
+Changed abooklist separator to /:/ and changed address book help page
+to remove ":" from list of legal address book name characters.
+
+
+
+Changes from 0.5 to 0.5.1
+
+Mailboxes screen was missing Help button.
+
+maild failed to cope with messages without any sender: it bombed out of
+list() and made client hang.
+
+Removed remnants of address book debugging aids in maild.
+
+Wing/Abook was allowing spaces in address book names but also using
+space to separate the abooklist options field. Removed ":" from list
+of legal abook name characters, made the field parser split on /[ :]/
+and changed update_save to separate them with ":".
+When all abooklist rows are updated, we can change that to /:/.
+
+Attempting to create an address book with an illegal name now
+includes the syntax rules in the error message.
+
+Improved Wing/Admin "stat" command.
+
+
+
+Changes from 0.4 to 0.5
+
+Full address book support (including ACL controlled multiple books) added.
+
+Added "du" and "finger" commands to Wing/Admin interface.
+
+Message list says "To: ..." for outgoing messages.
+
+Outgoing messages can be copied to the sent-mail mailbox.
+
+Current mailbox can be exported in Berkeley format from
+the "Manage" screen.
+
+Message display screen default headers now include Cc rather than
+Message-Id.
+
+Cleanup of maild/httpd variable interaction: everything now
+consistently uses maild_set/maild_get.
+
+Button placing on the Compose screen has been changed.
+
+Disk Usage screen summarises usage, quota and remaining space.
+
+Icons for up and down arrow buttons have changed.
+
+Off-by-one-pixel problem with GIF buttons tracked down to a
+browser HTML rendering oddity and fixed.
+
+
+Changes from 0.3 to 0.4
+
+Clients are now less likely to hang if you hit "Stop".
+
+base64 and quoted-printable MIME attachments are now displayed
+even on browsers which don't handle the decoding themselves.
+Additional HTTP headers are sent while displaying MIME attachments
+to help browsers (as far as possible) to display them correctly.
+
+Non-plaintext attachments are not now displayed in a newly-created
+window even with browsers that support it: too many people were
+confused by the extra window (or couldn't find it).
+
+Client filenames are now URL-(en/de)coded automatically so, for
+example, filenames with spaces appear properly instead of
+containing "%20" sequences.
+
+MIME attachments are uploaded correctly (before, attachments over
+16K were corrupted). The MIME type of any uploaded attachment is
+displayed in the "MIME Attachments" list. (Note: it is totally
+dependent on what MIME type the client tells the server.)
+
+Uploaded "Include" files are now placed before any sig indicator
+line ("-- ") instead of right at the end of the current message body.
+
+There is now a link to information on OUCS password policy from the
+"Change password" screen.
+
+The body of displayed mail messages is now escaped to avoid HTML any
+HTML markup at all and anything that looks reasonably like an URL is
+made into a hot link.
+
+In the "Manage account" screen, cmd_manage wasn't initialising the
+displayed versions of the forwarding address and vacation message
+properly. They would appear correct immediately after the relevant
+button was pressed but would appear blank on re-entry to the screen
+(although the saved settings were stored and functioning correctly).
+
+Successful logout forcibly expires session cookie to prevent future
+failed logins from presenting stale cookie. When that happened, the
+client saw a "bad session" error message instead of "login incorrect".
+
+Removed stub "set address book search path" and "set bcc to self"
+options in cmd_options.

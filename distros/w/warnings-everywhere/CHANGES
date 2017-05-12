@@ -1,0 +1,110 @@
+0.030 15-02-2017
+	[Feature]
+		Thwarting modules that import compile-time warnings was a bad idea.
+		Source filters are bad, full stop.
+		Also, I didn't properly understand how warnings were being turned
+		back on; there's a simpler way of avoiding e.g. experimental
+		warnings being turned back on, which has now been documented.
+
+0.024 07-10-2016
+	[Feature]
+		Also thwart Test::Class::Moose
+
+	[Pod]
+		Say C<<warnings->import>>, not C<warnings->import>.
+		Thanks to Philippe Bruhat (BooK) for this spot!
+
+0.023 30-10-2015
+	[Bugfix]
+		Use a more portable way of specifying the name of the Perl
+		executable. This was RT 108201 - thanks to Slaven Rezic SREZIC
+		for the spot.
+
+0.022 30-09-2015
+	[Bugfix]
+		Make the code brittler, but more reliable (symbols are correctly
+		exported now).
+
+0.021 29-09-2015
+	[Bugfix]
+		Cope with passing multiple modules to thwart_module like the
+		documentation suggested, and actually test all of this functionality
+		even if you didn't have Moose, Moo, Dancer or Dancer2 installed.
+
+0.020 29-09-2015
+
+	[Feature]
+		Now allows you to thwart modules such as Moose, Moo, Dancer and
+		Dancer2 that import warnings - which has the side-effect of turning
+		on compile-time warnings that you'd previously turned off.
+		It's clever but it's not pretty.
+
+0.010 26-12-2014
+
+	[Test bugs]
+		Perl 5.8.8 triggered a warning for the previous test code
+		at compile time. Switched to a more necessarily run-time
+		warning.
+
+0.009 22-12-2014
+
+    [Test bugs]
+		Perl 5.21.2 introduced a new warning, redundant, which
+		fired when sprintf was being called with too many arguments.
+		Cope with this warning, and switch the printf test to test
+		something that won't also fire a redundant warning.
+
+		Thanks to Slaven Rezic for reminding me of this failure.
+
+0.008 25-06-2014
+
+	[Test bugs]
+		Perl 5.8.9 didn't think a dodgy unpack warranted a warning, so
+		switched to something that all perls agree is dodgy.
+
+0.007 30-05-2014
+
+    [Test bugs]
+        Removed an unnecessary test as it was more trouble than it was
+        worth.
+
+    [Documentation]
+		Added a note about not being able to disable compile-time
+		warnings like experimental::smartmatch.
+		
+        Very minor typo fix.
+
+0.006 20-02-2013
+
+	[Test bugs]
+		Fixed test failures with Pod::Coverage <= 0.21.
+
+		Beefed up the warnings and categories tests, often by removing
+		some category tests that were in practice difficult to carry out
+		reliably across all versions and platforms.
+
+0.005 20-01-2013
+
+	[Meta]
+		Added link to github repository.
+
+0.004 20-01-2013
+
+	[Documentation]
+		Document problems with Dancer, and anything that messes with $^W.
+
+0.003 20-01-2013
+
+	[Documentation]
+		Some sections were duplicated.
+
+0.002 20-01-2013
+
+	[Bugs]
+		no warnings::anywhere and no goddamn::warnings::anywhere
+		weren't working if you hadn't imported warnings::everywhere
+		first.
+
+0.001 20-01-2013
+
+	Initial release.

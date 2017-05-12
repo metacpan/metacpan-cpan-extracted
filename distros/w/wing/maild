@@ -1,0 +1,953 @@
+#!/usr/bin/perl
+#
+# WING - Web-IMAP/NNTP Gateway
+#
+# maild
+#
+# Author: Malcolm Beattie, mbeattie@sable.ox.ac.uk
+#
+# This program may be distributed under the GNU General Public License (GPL)
+#
+# 25 Aug 1998  Copied from development system to main cluster.
+# 23 Feb 1999  Release version 0.5
+# 17 Jun 1999  Add explicit Date header in sub sendmail
+#
+use IO::Socket;
+use Mail::Cclient qw(set_callback);
+use Wing::Shared;
+use Mail::Address;	# for parsing sender address in sub list
+use strict;
+
+sub daemon;
+sub handle;
+
+my $imap_error = "";	# holds the last error message from the IMAP server
+my $imap_info = "";	# holds the last info message from the IMAP server
+
+my @day_name = qw(Sun Mon Tue Wed Thu Fri Sat);
+my @month_name = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+
+open(PID_FILE, ">$MAILD_SOCKET_DIR/maild.pid");
+print PID_FILE "$$\n";
+close(PID_FILE);
+
+unlink($MAILD_SOCKET_PATH);
+setpgrp; # while debugging, we're running in the foreground so
+	 # do this to stop current daemons getting keyboard interrupts
+
+$| = 1; # while debugging, flush out debug messages straight away
+
+my $s = IO::Socket->new(Domain => AF_UNIX,
+			Type => SOCK_STREAM,
+			Listen => 5,
+			Local => $MAILD_SOCKET_PATH)
+    or die "failed to prepare socket: $!\n";
+
+while (my $ns = $s->accept) {
+#    print "got connection\n";
+    my $child = fork;
+    if (!defined($child)) {
+	warn "child fork failed: $!\n";
+    } else {
+	if ($child == 0) {
+	    my $grandchild = fork;
+	    if (!defined($grandchild)) {
+		warn "grandchild fork failed: $!\n";
+		exit(1);
+	    } elsif ($grandchild) {
+		exit(0);
+	    }
+	    my $rc = daemon($ns);
+	    exit($rc);
+	}
+	waitpid($child, 0);
+    }
+    $ns->close;
+}
+
+sub daemon {
+    my $s = shift;
+    chomp(my $version = <$s>);
+    chomp(my $session = <$s>);
+    chomp(my $username = <$s>);
+    chomp(my $password = <$s>);
+    chomp(my $client_ip = <$s>);
+    chomp(my $mailbox = <$s>);
+#    print "pid $$ version=$version, session=$session, username=$username, client_ip=$client_ip, mailbox=$mailbox\n"; # debug
+    $0 = "maild ($username)";
+    set_callback
+	login => sub {
+	    my ($netmbx, $trial) = @_;
+	    print "login {$netmbx->{host}}$netmbx->{mailbox} as $username\n"; # debug
+	    return ($username, $password);
+	},
+	"log" => sub {
+	    my ($string, $type) = @_;
+	    if ($type eq "info") {
+		$imap_info = $string;
+	    } elsif ($type eq "error") {
+		$imap_error = $string;
+	    }
+	    my $time = substr(localtime, 4, 15);
+	    print "$time $type: $string\n"; # debug
+	};
+
+    #
+    # Prepare to create the mailclient handle.
+    # If $session is "*authonly" then we're only being asked to
+    # authenticate the user, not open a complete connection. So for
+    # *authonly, we use the "halfopen" option so that it cannot
+    # harm any other connections that happen to be present.
+    #
+    # First, set some global parameters: prevent rsh attempts and
+    # decrease the maximum number of login trials to 1.
+    #
+    Mail::Cclient::parameters(undef, RSHTIMEOUT => 0, MAXLOGINTRIALS => 1);
+    my $mc;
+    my @options;
+    push(@options, "halfopen") if $session eq "*authonly";
+    $mc = Mail::Cclient->new($mailbox, @options);
+    if (!defined($mc)) {
+	warn "pid $$ session $session failed to open mailbox $mailbox\n"; #debug
+	print $s "NO\n";
+        return;
+    }
+    if ($session eq "*authonly") {
+	print $s "$$\n";	# Telling the client our PID indicates success
+	# That's all folks
+	$mc->close;
+	return 0;
+    }
+
+    my $sockname = make_session_socket($username, $session);
+    my $sock = IO::Socket->new(
+	Domain => AF_UNIX,
+	Type => SOCK_STREAM,
+	Listen => 5,
+	Local => $sockname
+    );
+    if (!$sock) {
+	warn "pid $$ failed to bind new socket: $!\n";
+	print $s "NO\n";
+	return;
+    }
+
+    print "pid $$ session $session started mailbox $mailbox OK\n";#debug
+    #
+    # Create a secure temporary directory for holding the body of draft
+    # messages and MIME attachments.
+    # Note this is idempotent so it's OK if two concurrent sessions get
+    # to this point.
+    #
+    my $tmpdir = "$MAILD_TMPDIR/$username";
+    mkdir($tmpdir, 0700);
+    if ((stat($tmpdir))[4] != $> || (stat(_))[2] & 077 != 0) {
+	warn "pid $$ session $session failed to create secure tmpdir $tmpdir\n";
+	print $s "NO\n";
+	return 0;
+    }
+    my ($host, $protocol, $folder) = $mailbox =~ m(
+	^(?:			# leading optional {host} or {host/protocol}
+	    {
+		( [^/}]+ )	# host part...
+		(?:
+		    / ( [^}]+ ) # ...and optional /protocol
+		)?
+	    }
+	)?
+	(.*)$			# the rest is the mailbox folder name
+    )x;
+    #
+    # Find the canonical FQDN of $host otherwise changing folders won't
+    # reuse the same IMAP connection.
+    #
+    $protocol ||= "imap";
+    $host = gethostbyaddr(gethostbyname($host), AF_INET);
+    if (!$host) {
+	print $s "NO\n";
+	return 0;
+    }
+
+    my $host_spec = "{$host/$protocol}";
+
+    my $conn = bless {
+	session => $session,
+	mc => $mc,
+	username => $username,
+	host_spec => $host_spec,
+	host => $host,
+	client_ip => $client_ip,
+	protocol => $protocol,
+	folder => $folder,
+	top_of_page => 1,
+	opt_sender => "$username\@$SENDMAIL_FROM_HOSTNAME",
+	opt_cwd => $DEFAULT_CWD,
+	opt_list_size => $DEFAULT_LINES_PER_PAGE,
+	opt_compose_headers => $DEFAULT_COMPOSE_HEADERS,
+	attachments => [],
+	attach_next => 1,
+	tmpdir => $tmpdir,
+	start => time,
+	sockname => $sockname,
+    }, "Wing::Connection";
+
+    #
+    # We finally can tell the client that login is complete by telling
+    # them our PID.
+    #
+    print $s "$$\n";	# Telling the client our PID indicates success
+    $s->close;
+    while (my $client = $sock->accept) {
+#	print "pid $$ session $session accepted new client\n";#debug
+	$conn->{client} = $client;
+	$conn->handle;
+	$client->close;
+	last if $conn->{logout};
+    }
+    unlink(make_session_socket($username, $session));
+#    print "pid $$ session $session logout\n";
+    return 0;
+}
+
+package Wing::Connection;
+use Wing::Shared;
+use Mail::Cclient qw(set_callback);
+use MIME::Entity;
+use Fcntl;
+use IO::Socket;
+
+sub handle {
+    my $conn = shift;
+    my $client = $conn->{client};
+    while(defined(my $cmd = <$client>)) {
+        chomp $cmd;
+#	print "pid $$ session $conn->{session} got command '$cmd'\n";
+	my ($method, @args) = split(' ', $cmd);
+
+	#
+	# Update the atime on the socket so that admin tools can easily
+	# determine timeouts. Keep the mtime the same so that it
+	# indicates start of session.
+	#
+	utime(time, $conn->{start}, $conn->{sockname});
+
+	#
+	# Invoke the requested command
+	#
+	eval {
+	    $conn->$method(@args);
+	};
+	last if $conn->{logout};
+	if ($@) {
+	    warn "command failed with error message: $@\n";
+	}
+    }
+}
+
+sub check_client_ip {
+    my ($conn, $client_ip) = @_;
+    my $client = $conn->{client};
+    if ($conn->{client_ip} eq $client_ip) {
+	print $client "OK\n";
+    } else {
+	warn "Security alert: connection to session of $conn->{username} "
+	    ."from $client_ip instead of $conn->{client_ip}\n";
+	print $client "NO\n";
+    }
+}
+
+sub zap_draft {
+    my $conn = shift;
+    my $tmpdir = $conn->{tmpdir};
+    unlink("$tmpdir/body");
+    unlink("$tmpdir/include");
+    foreach my $a (@{$conn->{attachments}}) {
+	unlink("$tmpdir/attach.$a->[0]");
+    }
+    $conn->{attachments} = [];
+    $conn->{next_attach} = 1;
+    my @header_keys = grep(/^opt_hdr_/, keys %$conn);
+    delete @$conn{@header_keys};
+}
+
+sub logout {
+    my $conn = shift;
+#    print "pid $$ session $conn->{session} about to logout\n";
+    my $client = $conn->{client};
+    #
+    # (Try to) clean up any leftover draft body and MIME attachment files.
+    # We ignore any failures.
+    #
+    $conn->zap_draft;
+    rmdir($conn->{tmpdir});
+
+    print $client "OK\n";
+    $conn->{logout} = 1;
+}
+
+sub username {
+    my $conn = shift;
+    my $client = $conn->{client};
+    my $username = $conn->{username};
+    print $client $username, "\n";
+}
+
+sub tmpdir {
+    my $conn = shift;
+    my $client = $conn->{client};
+    my $tmpdir = $conn->{tmpdir};
+    print $client $tmpdir, "\n";
+}
+
+sub set {
+    my ($conn, $attr, $value) = @_;
+    $conn->{"opt_$attr"} = maild_decode($value);
+}
+
+sub add_address {
+    my ($conn, $hdr, $address) = @_;
+    my $key = "opt_hdr_$hdr";
+    $address = canon_decode($address);
+    if ($conn->{$key} eq "") {
+	$conn->{$key} = $address;
+    } else {
+	$conn->{$key} .= ", $address";
+    }
+    my @headers = split(' ', $conn->{opt_compose_headers});
+    grep { $_ eq $hdr } @headers
+	or $conn->{opt_compose_headers} = "@headers $hdr";
+}
+
+sub get {
+    my ($conn, $attr) = @_;
+    my $client = $conn->{client};
+    print $client maild_encode($conn->{"opt_$attr"}), "\n";
+}
+    
+sub unset {
+    my ($conn, $attr) = @_;
+    delete $conn->{"opt_$attr"};
+}
+
+#
+# Get a human-readable non-blank (if possible) representation
+# from an Address object.
+# We don't cope with at-domain-lists/source routes.
+#
+sub _get_name_from {
+    my $addr = shift;
+    return undef unless ref $addr;
+    my $name = $addr->personal;
+    if (!$name) {
+	$name = $addr->mailbox;
+	my $host = $addr->host;
+	$name .= "\@$host" unless $host eq ".MISSING-HOST-NAME.";
+    }
+    return $name;
+}
+
+sub _format_size {
+    my ($size, $even_tinies) = @_;
+    if ($size > 1024*1024 - 513) {
+	$size = int($size/(1024*1024) + 0.5) . "M";
+    } elsif ($size > 1024) {
+	$size = int($size/1024 + 0.5) . "K";
+    } else {
+	$size = $even_tinies ? "$size bytes" : "";
+    }
+    return $size;
+}
+
+sub list {
+    my ($conn, $from) = @_;
+    my $mc = $conn->{mc};
+    $mc->ping; # prod the server so we find out about new mail
+    my $nmsgs = $mc->nmsgs;
+    my $count = $conn->{opt_list_size} || $nmsgs;
+    if ($from eq "") {
+	$from = $conn->{top_of_page};
+    } elsif ($from eq "prev") {
+	$from = $conn->{top_of_page} - $count;
+    } elsif ($from eq "next") {
+	$from = $conn->{top_of_page} + $count;
+    } elsif ($from eq "first") {
+	$from = 1;
+    } elsif ($from eq "last") {
+	$from = $nmsgs - $count + 1;
+    }
+    my $max = $nmsgs - $count + 1;
+    $max = 1 if $max < 1;
+    if ($from < 1) {
+	$from = 1;
+    } elsif ($from > $max) {
+	$from = $max;
+    }
+    my $to = $from + $count - 1;
+    $to = $nmsgs if $to > $nmsgs;
+    $conn->{top_of_page} = $from;
+    my $poss_flags = "";
+    my $protocol = $conn->{protocol};
+    #
+    # D means can delete messages
+    # S means can save messages (in a server-visible folder)
+    #
+    $poss_flags .= "D" unless $protocol eq "nntp";
+    $poss_flags .= "S" unless $protocol eq "nntp" || $protocol eq "pop3";
+
+    my ($sender) = Mail::Address->parse($conn->{opt_sender});
+    $sender = $sender->address if defined $sender;
+	
+    my $client = $conn->{client};
+    print $client $conn->{folder}, "\n",
+		"$from $to $nmsgs", "\n",
+		$poss_flags, "\n";
+    for (my $i = $from; $count-- && $i <= $nmsgs; $i++) {
+	my $env = $mc->fetchstructure($i);
+	my $elt = $mc->elt($i);
+	my $flags = "@{$elt->flags}";
+	my $size = _format_size($elt->rfc822_size);
+	my $date = $env->date;
+	$date =~ s/^(\w+)\s*,\s*//; # strip optional leading day name
+	if ($date =~ /^(\d+)\s+(\w+)/) {
+	    $date = "$2 $1";
+	}
+	$date =~ s/0(\d)/$1/g; # strip leading zeroes
+	my $display_address;
+	my $from = $env->from->[0];
+	if ($from && $from->mailbox . '@' . $from->host eq $sender) {
+	    my $to = _get_name_from($env->to->[0]);
+	    $display_address = $to ? "To $to" : "To (unknown recipient)";
+	} else {
+	    $display_address = _get_name_from($from) 
+				|| _get_name_from($env->sender->[0])
+				|| "(Unknown sender)";
+	}
+	print $client $i, "\n",
+		      $mc->uid($i), "\n",
+		      $date, "\n",
+		      $display_address, "\n",
+		      $size, "\n",
+		      $flags, "\n",
+		      $env->subject, "\n";
+    }
+    print $client ".\n";
+}
+
+sub headers {
+    my ($conn, $msg, @opts) = @_;
+    my $client = $conn->{client};
+    my $mc = $conn->{mc};
+    my $hdr;
+    if ($opts[0] eq "all") {
+	$hdr = $mc->fetchheader($msg);
+    } elsif (@opts) {
+	$hdr = $mc->fetchheader($msg, \@opts);
+    } else {
+	my $headers = $conn->{optlist_headers} || \@DEFAULT_DISPLAY_HEADERS;
+	$hdr = $mc->fetchheader($msg, $headers);
+    }
+    print $client length($hdr), "\n", $hdr;
+}
+
+sub body {
+    my ($conn, $msg, $part) = @_;
+    my $client = $conn->{client};
+    my $mc = $conn->{mc};
+    my $body;
+    if ($part) {
+	$body = $mc->fetchbody($msg, $part);
+    } else {
+	$body = $mc->fetchtext($msg);
+    }
+    print $client length($body), "\n", $body;
+}
+
+sub set_body {
+    my ($conn, $msg) = @_;
+    my $mc = $conn->{mc};
+    $conn->{opt_body} = $mc->fetchbody($msg, 1);
+}
+
+sub _output_structure {
+    my ($client, $id, $body) = @_;
+    my $type = lc($body->type);
+#    print "_output_structure called with body of type $type\n";#debug
+    if ($type eq "multipart") {
+	$id .= "." if $id;
+	my $nested = $body->nested;
+	my $count = @$nested;
+#	print "+\n";#debug
+	print $client "+\n";
+	for (my $i = 1; $i <= $count; $i++) {
+	    _output_structure($client, "$id$i", $nested->[$i - 1]);
+	}
+#	print ".\n";#debug
+	print $client ".\n";
+    } else {
+	my @raw_params = @{$body->parameter};
+	my @params;
+	while (my ($key, $value) = splice(@raw_params, 0, 2)) {
+	    push(@params, qq($key="$value")); # XXX quote value better?
+	}
+	#
+	# XXX We probably ought to extract any recommended filename
+	# (name="...") from the params at our end and send it to the
+	# Wing client so that it doesn't have to reparse.
+	#
+
+#	print $id, "\n",
+#		$type, "/", lc($body->subtype), "\n",
+#		$body->description, "\n",
+#		$body->lines, "\n"; # debug
+	#
+	# Find the size in lines if possible, otherwise bytes.
+	# Whichever we get: format it nicely.
+	#
+	my $size = $body->lines;
+	if ($size > 0) {
+	    $size = "$size " . ($size == 1 ? "line" : "lines");
+	} else {
+	    $size = _format_size($body->bytes, 1);
+	}
+	    
+	print $client $id, "\n",
+		$type, "/", lc($body->subtype), "\n",
+		$body->description, "\n",
+		$size, "\n",
+		$body->encoding, "\n",
+		join("; ", @params), "\n"
+    }
+}
+
+sub structure {
+    my ($conn, $msg) = @_;
+    my ($e, $body) = $conn->{mc}->fetchstructure($msg);
+    _output_structure($conn->{client}, "", $body);
+}
+
+
+sub ls {
+    my ($conn, $pat) = @_;
+    $pat = maild_decode($pat);
+    my ($host_spec, $cwd, $client, $mc, $protocol)
+	= @{$conn}{"host_spec", "opt_cwd", "client", "mc", "protocol"};
+    #
+    # NNTP introduces duplicates which we filter out with %seen.
+    # We also filter out any name starting with a ".".
+    #
+    my %seen;
+    set_callback "list" => sub {
+	shift; # drop mailstream argument
+	shift; # drop separator character
+	my $name = shift;
+	$name =~ s/^.*}//;
+	return if substr($name, 0, 1) eq "." || $seen{$name}++;
+#	print join(" ", canon_encode($name, @_)), "\n"; # debug
+	print $client join(" ", canon_encode($name, @_)), "\n";
+    };
+#    print "ls: ref=$host_spec, pat=$pat\n"; # debug
+    $pat =~ tr(/)(.) if $protocol eq "nntp";
+    $mc->list($host_spec, $pat);
+#    print ".\n"; # debug
+    print $client ".\n";
+}
+
+sub save {
+    my ($conn, $type, $seq, $folder) = @_;
+#    print "save $seq $folder\n"; # debug
+    my ($client, $mc, $host_spec) = @{$conn}{"client", "mc", "host_spec"};
+    $folder = maild_decode($folder);
+#    print "saving sequence $seq to folder $folder\n"; # debug
+    my $result;
+    if ($type ne "move") {
+	$type = "copy";
+    }
+    $result = $mc->$type($seq, $folder);
+    if ($result) {
+	print $client "OK\n";
+	return;
+    }
+    #
+    # See if the IMAP server suggests we try creating it
+    #
+    if ($imap_error =~ /^\[TRYCREATE\]/) {
+	#
+	# Try to create it and, if it that works, retry the save
+	#
+	$result = $mc->create("$host_spec$folder") && $mc->$type($seq, $folder);
+    }
+    if ($result) {
+	print $client "OK\n";
+	return;
+    }
+    printf $client "NO %s\n", maild_encode($imap_error);
+}
+
+sub setflag {
+    my ($conn, $seq, $flag) = @_;
+    $conn->{mc}->setflag($seq, $flag);
+}
+
+sub clearflag {
+    my ($conn, $seq, $flag) = @_;
+    $conn->{mc}->clearflag($seq, $flag);
+}
+
+sub flags {
+    my ($conn, $msgno) = @_;
+    my ($client, $mc) = @{$conn}{"client", "mc"};
+    my $elt = $mc->elt($msgno);
+    print $client "@{$elt->flags}\n";
+}
+
+sub expunge {
+    my $conn = shift;
+    $conn->{mc}->expunge;
+}
+
+sub nmsgs {
+    my $conn = shift;
+    my ($client, $mc) = @{$conn}{"client", "mc"};
+    print $client $mc->nmsgs, "\n";
+}
+
+sub prev_next {
+    my ($conn, $msgno) = @_;
+    my ($client, $mc) = @{$conn}{"client", "mc"};
+    my ($prev_uid, $prev_msgno, $next_uid, $next_msgno);
+    my $nmsgs = $mc->nmsgs;
+    if ($msgno < 1 || $msgno > $nmsgs) {
+	print $client "\n";
+	return;
+    }
+    if ($msgno == 1) {
+	$prev_msgno = $prev_uid = 0;
+    } else {
+	$prev_msgno = $msgno - 1;
+	$prev_uid = $mc->uid($prev_msgno);
+    }
+    if ($msgno == $nmsgs) {
+	$next_msgno = $next_uid = 0;
+    } else {
+	$next_msgno = $msgno + 1;
+	$next_uid = $mc->uid($next_msgno);
+    }
+    print $client "$prev_uid $prev_msgno $next_uid $next_msgno\n";
+}
+
+sub change {
+    my ($conn, $folder) = @_;
+    my ($client, $mc, $host_spec) = @{$conn}{"client", "mc", "host_spec"};
+    my $old_folder = $mc->{folder};
+    $folder = maild_decode($folder);
+    #
+    # Disallow opening any files beginning with "."
+    #
+    if ($folder =~ m{(^|/)\.}) {
+	print $client "NO\n";
+	return;
+    }
+#    print qq{doing open("$host_spec$folder")\n}; # debug
+    $imap_error = "";
+    if ($mc->open("$host_spec$folder") && !$imap_error) {
+	print $client "OK\n";
+	$conn->{top_of_page} = 1;
+	$conn->{folder} = $folder;
+    } else {
+	my $error = $imap_error || "open failed";
+	# try to recover
+	$imap_error = "";
+	if ($mc->open("${host_spec}INBOX") && !$imap_error) {
+	    $conn->{folder} = "INBOX";
+	    $conn->{top_of_page} = 1;
+	}
+	printf $client "NO %s\n", maild_encode($error);
+    }
+}
+
+#
+# See "attach" below for how attachments are stored. lsattach lists
+# out the associated comments with filesize appended, one per line
+# (and the client can deduce the logical number of each from this).
+#
+sub lsattach {
+    my $conn = shift;
+    my $client = $conn->{client};
+    my $tmpdir = $conn->{"tmpdir"};
+    foreach my $a (@{$conn->{attachments}}) {
+	my $size = _format_size((stat("$tmpdir/attach.$a->[0]"))[7], 1);
+	my $comment = $a->[1];
+	$comment .= " ($size)" if $size;
+	$comment .= " of type $a->[2]";
+	print $client maild_encode($comment), "\n";
+    }
+    print $client ".\n";
+}
+
+#
+# Prepare to attach a file. We figure out the appropriate filename,
+# create a new zero length file (or truncate an existing one) and
+# then tell the client
+#     relnum filename
+# We set up a default comment of "Attachment $i" which can be
+# changed by the client, as can the MIME type and filename fields.
+# If something goes wrong, we send the client "." instead.
+# $conn->{attachments} is a ref to an array of attachments, each
+# of which is an array ref
+#     [$n, $comment, $mime_type, $client_filename]
+# meaning that the filename is "$conn->{tmpdir}/attach.$n" with an
+# associated Content-Description of $comment, MIME type of $mime_type
+# (which can be undef) and client filename (which can also be undef).
+# $conn->{attach_next} gives the next free number for attachments
+# (starts at 1).
+#
+sub attach {
+    my ($conn, $relnum, $field, $data) = @_;
+    my ($client, $a, $tmpdir) = @{$conn}{"client", "attachments", "tmpdir"};
+    if (defined($relnum)) {
+	#
+	# alter a data field of an existing MIME attachment
+	#
+	my $attach = $a->[$relnum - 1];
+	$data = maild_decode($data);
+	if ($attach) {
+	    if ($field eq "comment") {
+		$attach->[1] = $data;
+	    } elsif ($field eq "type") {
+		$attach->[2] = $data;
+	    } elsif ($field eq "filename") {
+		$attach->[3] = $data;
+	    } else {
+		warn "bad field in attach: $relnum $field $data\n";
+	    }
+	} else {
+	    warn "bad attachment number: $relnum\n";
+	}
+    }
+    else {
+	#
+	# create a new attachment file and tell the client the filename
+	#
+	my $n = $conn->{attach_next}++;
+	my $filename = "$tmpdir/attach.$n";
+	local(*ATTACH);
+	if (sysopen(ATTACH, $filename, O_RDWR|O_CREAT|O_TRUNC, 0600)) {
+	    close(ATTACH);
+	    push(@$a, [$n, "Attachment $n", undef, undef]);
+	    print $client scalar(@$a), " $filename\n";
+	}
+	else {
+	    warn "pid $$ failed to create $filename\n";
+	    print $client ".\n";
+	}
+    }
+}
+
+sub detach {
+    my ($conn, $relnum) = @_;
+    my $det = splice(@{$conn->{attachments}}, $relnum - 1, 1);
+    if ($det) {
+	my $filename = "$conn->{'tmpdir'}/attach.$det->[0]";
+	unlink($filename) or warn "failed to unlink $filename: $!\n";
+    }
+}
+
+sub sendmail {
+    my $conn = shift;
+    my ($client, $attachments, $tmpdir, $username, $mc, $host_spec) =
+	@{$conn}{"client", "attachments", "tmpdir", "username",
+		 "mc", "host_spec"};
+    my @header_keys = grep(/^opt_hdr_/, keys %$conn);
+    #
+    # MIME::Entity->new wants a list of headers and values where the
+    # header names include a trailing ":" (so that any non-standard
+    # headers get recognised as header options).
+    #
+    my @headers = map {
+	my $val = $conn->{$_};
+	s/^opt_hdr_//;
+	("$_:" => $val);
+    } @header_keys;
+    #
+    # Add our own Date header. Without this, the MTA will add its own
+    # but we won't have one to save if copy_outgoing is on.
+    # The tricky bit is calculating the timezone offset.
+    #
+    my $sign = "+";
+    my $tweve_hours = 60 * 60 * 12;
+    my @loc = localtime($tweve_hours);
+    my @utc = gmtime($tweve_hours);
+    my $dmin = $loc[1] - $utc[1];
+    my $dhour = $loc[2] - $utc[2];
+    if ($dmin < 0) {
+	$dhour--;
+	$dmin += 60;
+    }
+    if ($dhour < 0) {
+	$sign = "-";
+	$dhour = -$dhour;
+    }
+    my ($sec, $min, $hour, $mday, $mon, $year, $wday) = localtime;
+    my $date = sprintf("%s, %02d %s %04d %02d:%02d:%02d %s%02d%02d",
+		       $day_name[$wday], $mday, $month_name[$mon],
+		       $year + 1900, $hour, $min, $sec, $sign, $dhour, $dmin);
+    my $entity = MIME::Entity->build(Path => "$tmpdir/body",
+				     Filename => undef,
+				     Type => "text/plain",
+				     From => $conn->{opt_sender},
+				     "Date:" => $date,
+				     @headers);
+    foreach my $a (@$attachments) {
+	my @args = (Path => "$tmpdir/attach.$a->[0]",
+		    Disposition => "attachment",
+		    Encoding => "-SUGGEST",
+		    Filename => $a->[3]);
+	push(@args, Description => "$a->[1]") if defined $a->[1];
+	push(@args, Type => $a->[2]) if defined $a->[2];
+	$entity->attach(@args);
+    }
+
+    #
+    # Fire up sendmail and send the message out
+    #
+    local(*SENDMAIL);
+    my $pid = open(SENDMAIL,
+		   "|$SENDMAIL_COMMAND -f $username\@$SENDMAIL_FROM_HOSTNAME");
+    if (!defined($pid)) {
+	warn "failed to start sendmail: $!\n";
+	print $client "NO\n";
+	return;
+    }
+    $entity->print(\*SENDMAIL);
+    if (!close(SENDMAIL)) {
+	warn "sendmail failed to complete OK: $!\n";
+	print $client "NO\n";
+	return;
+    }
+    my $response = "OK Message has been sent";
+    #
+    # Save copy in outgoing mailbox if necessary
+    #
+    if ($conn->{opt_copy_outgoing}) {
+	my $text = $entity->as_string;
+	$text =~ s/\n/\r\n/g; # CRLF termination mandatory for mbx format
+	my $result = $mc->append("$host_spec$SENT_MAIL_MAILBOX", $text);
+	if (!$result) {
+	    #
+	    # Failed to append--maybe we just need to create it first
+	    #
+	    if ($imap_error =~ /^\[TRYCREATE\]/) {
+		$result = $mc->create("$host_spec$SENT_MAIL_MAILBOX")
+			&& $mc->append("$host_spec$SENT_MAIL_MAILBOX", $text);
+	    }
+	}
+	if (!$result) {
+	    $response = "OK Message has been sent but attempt to save a "
+			. "copy in mailbox $SENT_MAIL_MAILBOX failed";
+	}
+    }
+    $entity->purge;
+    $conn->zap_draft;
+    print $client "$response\n";
+}
+
+sub create {
+    my ($conn, $imap_name) = @_;
+    my ($client, $mc, $host_spec) = @{$conn}{"client", "mc", "host_spec"};
+    $imap_name = maild_decode($imap_name);
+    #
+    # Sanity check length of name
+    #
+    if (length($imap_name) > 1024) {
+	print $client "NO Mailbox name too long\n";
+	return;
+    }
+    my $result = $mc->create("$host_spec$imap_name");
+    if ($result) {
+	print $client "OK\n";
+    } else {
+	printf $client "NO %s\n", maild_encode($imap_error);
+    }
+}
+
+sub rm {
+    my ($conn, $imap_name) = @_;
+    my ($client, $mc, $host_spec) = @{$conn}{"client", "mc", "host_spec"};
+    $imap_name = maild_decode($imap_name);
+    my $result = $mc->delete("$host_spec$imap_name");
+    if ($result) {
+	print $client "OK\n";
+    } else {
+	printf $client "NO %s\n", maild_encode($imap_error);
+    }
+}
+
+sub move {
+    my ($conn, $imap_oldname, $imap_newname) = @_;
+    my ($client, $mc, $host_spec) = @{$conn}{"client", "mc", "host_spec"};
+    $imap_oldname = maild_decode($imap_oldname);
+    $imap_newname = maild_decode($imap_newname);
+    my $result = $mc->rename("$host_spec$imap_oldname",
+			     "$host_spec$imap_newname");
+    if ($result) {
+	print $client "OK\n";
+    } else {
+	printf $client "NO %s\n", maild_encode($imap_error);
+    }
+}
+
+sub copy {
+    my ($conn, $imap_oldname, $imap_newname) = @_;
+    my ($client, $mc, $host_spec) = @{$conn}{"client", "mc", "host_spec"};
+    $imap_oldname = maild_decode($imap_oldname);
+    $imap_newname = maild_decode($imap_newname);
+
+    printf $client "NO %s\n", maild_encode("not yet implemented");
+}
+
+#
+# Address book support.
+# $conn->{abooks} is a ref to a list of abooks, each of the form
+#     [$id, $flags, $name]
+# ($flags & ABOOK_ACTIVE) indicates the abook is in the (active) search path
+# ($flags & ABOOK_OWNED) indicates that the client owns the abook.
+#
+sub abook_add {
+    my ($conn, $id, $flags, $name) = @_;
+    push(@{$conn->{abooks}}, [maild_decode($id, $flags, $name)]);
+}
+
+sub abook_drop {
+    my ($conn, $ix) = @_;
+    print "abook_drop $ix\n"; # debug
+    splice(@{$conn->{abooks}}, $ix, 1);
+}
+
+# deprecated
+sub abook_update {
+    my ($conn, $ix, $id, $flags, $name) = @_;
+    $conn->{abooks}->[$ix] = [maild_decode($id, $flags, $name)];
+}
+
+sub abook_flags {
+    my ($conn, $ix, $flags) = @_;
+    $conn->{abooks}->[$ix]->[1] = $flags;
+}
+
+sub abook_reposition {
+    my ($conn, $oldpos, $newpos) = @_;
+    my $abooks = $conn->{abooks};
+    my $abook = splice(@$abooks, $oldpos, 1);
+    splice(@$abooks, $newpos, 0, $abook);
+}
+
+sub lsabooks {
+    my $conn = shift;
+    my $abooks = $conn->{abooks};
+    my $client = $conn->{client};
+    foreach my $abook (@{$conn->{abooks}}) {
+	my ($id, $flags, $name) = @$abook;
+	printf $client "%s %d %s\n", maild_encode($id, $flags, $name);
+    }
+    print $client ".\n";
+}

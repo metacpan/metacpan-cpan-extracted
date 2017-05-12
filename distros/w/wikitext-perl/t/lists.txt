@@ -1,0 +1,98 @@
+= Lists =
+
+
+== Simple ==
+
+* item one
+
+* item two
+
+* item three
+
+# item one
+
+# item two
+
+# item three
+
+:class a: simple
+
+:class b: not that simple
+
+:class omega: guess what
+
+
+== Compact ==
+
+# item alpha
+# item beta
+# item gamma
+
+o item alpha
+o item beta
+o item gamma
+
+:class a: simple
+:class b: not that simple
+:class omega: guess what
+
+
+== Nested ==
+
+- item a
+  o item a-1
+  o item a-2
+
+- item b
+  o item b-1
+    # item b-1-alpha
+    # item b-1-beta
+
+  # item b-a
+  # item b-b
+
+- item c
+
+
+== Complex ==
+
+  o Something Complex::
+    There's a lot to say about this item.
+
+    (code)
+    pseudo code illustrating the problem
+    (end)
+
+    > quotation from a famous person
+
+  o Something Even More Complex::
+
+    | let's go right to the code
+
+    A list of possible solutions
+
+    # suggestions number one
+
+      | pseudo code
+
+      - problems with this solution
+      - yet another problem
+
+    # another suggestion
+
+      > another famous person once suggested
+      >
+      > | solution proposed by famous person
+
+      - drawbacks
+
+Discussion of the proposed solutions (not part of the bullet list).
+
+:long term:
+  description in
+
+  multiple paragraphs
+
+:short term:
+
+who knows, maybe not

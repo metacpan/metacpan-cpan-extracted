@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!--
+FREE VARIABLES
+application
+-->
+<!-- 
+    ACHTUNG: derzeit findet innerhalb <WebRobot.Recur.LinkChecker>
+             keine Variablenexpansion statt.
+-->
+
+<plan>
+
+    <request>
+        <method value='GET'/>
+        <url value='{application}/welcome.do'/>
+        <recurse>
+            <WWW.Webrobot.Recur.LinkChecker>
+                <and>
+                    <url value="{application}"/>
+                    <scheme value="http"/>
+                    <not><url value="logout\.jsp"/></not>
+                    <not><url value="logout\.do"/></not>
+                    <not><url value="setUserLocale.do"/></not>
+                </and>
+            </WWW.Webrobot.Recur.LinkChecker>
+        </recurse>
+        <assert>
+            <status value='2'/>
+            <not><regex value='Ein Fehler ist aufgetreten!'/></not>
+            <not><regex value='ServletException'/></not>
+            <not><regex value='ServiceException'/></not>
+        </assert>
+        <description value='Linkchecking für den Shop mit Anmeldung'/>
+    </request>
+
+</plan>

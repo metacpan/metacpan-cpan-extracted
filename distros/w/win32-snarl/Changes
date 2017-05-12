@@ -1,0 +1,15 @@
+Revision history for Perl extension Win32::Snarl.
+
+0.01  Thu Aug 16 20:26:16 2007
+	- original version
+
+0.02  Mon Aug 20 14:20:14 2007
+	- Documentation updates
+
+0.03  Mon Aug 20 14:47:43 2007
+	- Documentation updates
+	
+1.01  Fri Jun 04 15:17:49 2009
+	- Added OO Interface
+	- More Documentation
+	- Fixed warning with Win32::GUI

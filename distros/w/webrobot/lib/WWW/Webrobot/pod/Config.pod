@@ -1,0 +1,318 @@
+=head1 NAME
+
+WWW::Webrobot::pod::Config - How to configure Webrobot
+
+=head1 SYNOPSIS
+
+ names=server=google.de
+ names=port=4321
+ names=application=http://${server}:${port}/app
+
+ # alternate forms
+ auth_basic=,site-authentification,mylogin,secretpassword
+ auth_basic=|site-authentification|mylogin|secretpassword
+ auth_basic=/site-authentification/mylogin/secretpassword
+
+ #output=WWW::Webrobot::Print::MakeTestplan
+ #output=WWW::Webrobot::Print::Text
+ output=WWW::Webrobot::Print::Test
+ output.1=WWW::Webrobot::Print::Html
+ #output=WWW::Webrobot::Print::File 'dir' => 'diff_new', 'diff_mode' => 'diff_orig'
+ #output=WWW::Webrobot::Print::File 'dir' => 'diff_orig'
+
+ timeout=500
+ client_302_bug=1
+ #delay=1
+ referrer_bug=1
+
+ http_header=Accept-Language=de
+ http_header=new-header-element=something else
+
+ proxy=http=http://httpproxy.server.org:8888
+ proxy=https=http://httpproxy.server.org:8888
+
+ no_proxy=localhost
+ no_proxy=127.0.0.1
+ no_proxy=subnet.server.org
+
+ load.number_of_clients=2
+ load.base=1.77827941003892
+ load.scale=40
+ load.output_file=WEBROBOT_OUT
+
+ mail.condition=never
+ mail.server=mailserver.server.org
+ mail.timeout=60
+ mail.Return-Path=me@mail.org
+ mail.From=webrobot
+ mail.To=me@mail.org
+ mail.Reply-To=me@mail.org
+ mail.Cc=some@other.com, some@more.com
+ mail.Bcc=some@other.com, some@more.com
+ mail.Subject=Webrobot: Perl test mail Ümläüte
+ mail.Type=text/plain
+ mail.Encoding=quoted-printable
+ mail.Data=blabla\n\
+ This is the body of the test mail\n\
+ umlauts are äöü\n
+ mail.Attach=|text/plain|filename.txt
+
+
+
+
+=head1 DESCRIPTION
+
+You must spend Webrobot a config file.
+The config file may define proxies, HTTP header, names for a testplan and much more.
+It's just like configuring your WWW browser.
+
+
+=head1 CONFIGURATION FILE FORMAT
+
+All properties obey the syntax
+
+        property_name=property_value
+        property_name: property_value
+
+There may be blanks or tabs around the delimiters C<=> and C<:>.
+Lines ending in '\' are joined with the next line.
+Lines containing white space are ignored.
+Lines starting in '#' are comments.
+
+The C<property_value> itself is typed.
+The types are:
+
+=over
+
+=item value
+
+a plain string (see C<timout>)
+
+=item key-value
+
+a C<key=value> pair (see C<names>)
+
+=item multivalue
+
+a list: The first character is the delimiter (see C<auth_basic>).
+
+=back
+
+All C<property_name>s that are marked C<@> accept listmode
+(see C<auth_basic>, C<proxy>).
+This means you can define multiple C<property_name>s.
+Non-listmode C<property_name>s should be defined only once.
+
+
+
+=head1 CONFIGURATION ATTRIBUTES
+
+=over
+
+=item names (@key-value)
+
+The C<key> defines a name, the C<value> its value.
+The key can be used within a testplan as C<${key}>
+and will be substituted as C<value>.
+
+Names can be used immediately in the C<names> section.
+
+        names = host=google.de
+        application: http://${host}:9999/app
+
+=item auth_basic (@multivalue)
+
+Define authorization data.
+Webrobot can authorize at a webserver.
+
+Select an authorized page in any browser.
+Then a popup window will appear,
+saying something like C<site-authentification> and
+showing a form with login and password fields.
+Thats the date to put into the configuration file.
+
+        auth_basic=|site-authentification|mylogin|secretpassword
+
+=item output (@value)
+
+Define output listeners.
+Each listener will be called for any http request.
+The most popular listeners are L<WWW::Webrobot::Print::Test> for Test::Harness output
+and L<WWW::Webrobot::Print::Html> for HTML output.
+
+        output=WWW::Webrobot::Print::Test
+        output=WWW::Webrobot::Print::Html
+
+See L<WWW::Webrobot::pod::OutputListeners>
+
+=item timeout (value)
+
+A request will be tried C<timeout> seconds.
+Any request will fail, if timed out.
+Default as in LWP::UserAgent.
+
+        timeout=500
+
+=item client_302_bug (value)
+
+This option emulates a very common bug of popular www browsers concerning http response 302.
+This bug is so common that even many servers rely on it.
+If you do not set this value you are HTTP compliant,
+if you set it you are compliant to popular browsers.
+
+        client_302_bug=1
+
+see L<WWW::Webrobot::MyUserAgent/client_302_bug>
+
+=item delay (value)
+
+Webrobot will sleep between request for C<delay> seconds.
+If this option is missing Webrobot won't sleep at all.
+
+        delay=1
+
+=item referrer_bug (value)
+
+When sending http referrers the url to be sent must be normalized
+according to the HTTP spec,
+see the C<HTTP::Headers::referer>.
+However - many clients (e.g. Firefox) don't do that right
+but send the unnormalized url.
+Set this option if you want Webrobot to behave in the same way.
+
+        referrer_bug=1
+
+=item http_header (@value)
+
+Set additional HTTP headers.
+You may write '_' instead of '-' as in C<user_agent> instead of C<user-agent>.
+
+        http_header=Accept-Language=de
+        user_agent=Webrobot 9.7 Platin limited
+
+=item proxy (@value)
+
+Define your proxy servers.
+
+        proxy=http=http://httpproxy.server.org:8888
+
+=item no_proxy (@value)
+
+Define servers or domains that mustn't be requested via proxies.
+
+        no_proxy=localhost
+        no_proxy=localnet.com
+
+=item load.number (value)
+
+The C<load.*> properties are evaluated in L<webrobot-load> only.
+C<load.number> is the number of emulated clients.
+Each client is one process and processes the same test plan.
+
+        load.number_of_clients=2
+
+=item load.base (value)
+
+Logarithmic base for x-axis for histogram.
+Load tests show an ASCII art histogram.
+All response times are categorized into an intervall.
+The intervalls are logarithmic and increase by a factor C<load.base>.
+Popular values of C<load.base> are C<2>, C<sqrt(2)>, C<sqrt(sqrt(10))>
+(Float numbers only, no expressions).
+
+        load.base=1.77827941003892
+
+=item load.scale (value)
+
+Y-axis scale of the histogram, should be smaller than your xterm width
+
+        load.scale=40
+
+=item load.output (value)
+
+If you specify C<load.output> than any output will additionally
+written to the named file
+
+        load.output_file=WEBROBOT_OUT
+
+=item mail.condition (value)
+
+The condition that triggers writing mail.
+Values are
+
+ fail (default)
+ success
+ ever
+ never (default if no mail.* attribute is given)
+
+        mail.condition=never
+
+=item mail.server (value)
+
+The name of the mail server
+
+        mail.server=my.mail.server.org
+
+=item mail.timeout (value)
+
+Timeout in seconds when sending mail
+
+        mail.timeout=60
+
+No attempt is made to resend the mail if sending mail fails.
+
+=item mail.Attach (@multivalue)
+
+Attach files to the mail, multiple attachments are ok.
+
+        mail.Attach=|text/plain|filename.txt
+        mail.Attach=|text/html|anotherfilename.html
+
+=item mail.*
+
+Additional parameters for sending mail.
+All parameters are of type (value)
+See L</SYNOPSIS> or L<MIME::Lite> if you feel it is not self explanatory.
+
+ # fields for MIME::Lite, ignores case on left hand side
+ mail.Return-Path
+ mail.From
+ mail.To
+ mail.Reply-To
+ mail.Cc
+ mail.Bcc
+ mail.Subject
+ mail.Type
+ mail.Encoding
+ mail.Data
+
+=item max_errors (value)
+
+The maximum number of errors (originated from assertions) where Webrobot should exit.
+No effekt if "0", "" or missing.
+
+=back
+
+
+=head1 SEE ALSO
+
+L<WWW::Webrobot::pod::Testplan>
+
+L<WWW::Webrobot::pod::OutputListeners>
+
+L<WWW::Webrobot>
+
+
+=head1 AUTHOR
+
+Stefan Trcek
+
+=head1 COPYRIGHT
+
+Copyright(c) 2004 ABAS Software AG
+
+This software is licensed under the perl license, see LICENSE file.
+
+=cut
+
+1;

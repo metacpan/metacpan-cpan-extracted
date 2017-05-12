@@ -1,0 +1,9 @@
+Changes
+Build.PL
+MANIFEST
+README
+t/Win32-Snarl.t
+lib/Win32/Snarl.pm
+lib/Win32/Snarl/Application.pm
+lib/Win32/Snarl/Message.pm
+META.yml

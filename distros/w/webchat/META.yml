@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               webchat
+version:            0.65
+abstract:           ~
+author:  []
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Data::Dump:    0.01
+    HTML::Parser:  2.21
+    LWP:           5.47
+    URI:           1.00
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

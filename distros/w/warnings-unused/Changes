@@ -1,0 +1,36 @@
+Revision history for warnings::unused
+
+TODO:
+	* to be based on PL_peepp?
+
+0.06 2013-05-05 22:16:22
+    - Restore this module to CPAN again (github issue #1)
+
+0.05
+    - Deprecate this module and remove it from CPAN
+
+0.04 Sun Mar  1 11:29:06 2009
+	- fix RT #43716, reported by Kevin Ryde
+
+0.03 Thu Feb 26 16:22:31 2009
+	- fix a multi-scope problem (RT #41639, reported by Kevin Ryde)
+	- update ppport.h
+
+0.021 Sat Oct  4 15:03:44 2008
+	- re-packageing
+	- no code change
+
+0.02 Fri Sep 26 13:14:44 2008
+	- change to work as a lexical pragma (RT #39508, reported by Slaven Rezic)
+	- fix a segv (RT #39563, reported by Kevin Ryde)
+
+0.01 Mon Sep 22 09:09:07 2008
+	- change the warning category from 'unused' to 'once'
+	- fix many bugs
+	- add LIMITATIONS section to the pod
+	- add more tests
+	- internal cleanup
+
+0.001 Sat Sep 20 11:48:25 2008
+	- original version; created by Module::Starter
+

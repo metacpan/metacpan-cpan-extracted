@@ -1,0 +1,153 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+# Author: Stefan Trcek
+# Copyright(c) 2004 ABAS Software AG
+
+BEGIN {
+    die "Operating system '$^O' not supported" if $^O eq "MSWin32";
+}
+
+use Getopt::Long;
+use Time::HiRes;
+use WWW::Webrobot::WebrobotLoad;
+use WWW::Webrobot::StatisticSummary;
+
+
+my $USAGE = <<EOF;
+USAGE: webrobot [options]
+--help                 this message
+--version              version
+--cfg config           (mandatory) test configuration
+--testplan testplan    (mandatory) test plan file name
+--define name=value    define additional properties
+                       (like the one in the config file)
+
+BUG: This program will probably work on unixoid systems only.
+EOF
+
+my $cfg_name;
+my $testplan_name;
+my %properties = ();
+GetOptions(
+           help => sub {print $USAGE; exit},
+           version => sub {print "Webrobot version: $WWW::Webrobot::VERSION\n"; exit},
+           "cfg=s" => \$cfg_name,
+           "testplan=s" => \$testplan_name,
+           "define=s" => \%properties,
+          ) || die $USAGE;
+
+MAIN: {
+    my @cmd_param = map { [$_, $properties{$_}] } keys %properties;
+    push @cmd_param, ["output", "WWW::Webrobot::Print::ChildSend"];
+
+    my $wrl = WWW::Webrobot::WebrobotLoad->new(\$cfg_name, \@cmd_param);
+
+    # start processes
+    my ($sec, $usec) = Time::HiRes::gettimeofday();
+    my ($statistic, $histogram, $url_statistic, $http_errcode, $assert_ok, $all_exit_status) =
+        $wrl -> run(\$testplan_name);
+    
+    my $elaps = Time::HiRes::tv_interval([$sec, $usec], [ Time::HiRes::gettimeofday() ]);
+    $statistic->{total_time} = $elaps;
+
+
+    my $out_file = $wrl->cfg->{load}->{output_file};
+    my $scale = $wrl->cfg->{load}->{scale} || 40;
+
+    my $old_filehandle = select;
+    my @write_to = (*STDOUT);
+    my @written_to = ();
+    push(@write_to, ">".$out_file) if defined $out_file;
+    foreach (@write_to) {
+        my $FH;
+        if (/^>/) {
+            open(FILE, $_) or warn("Can't open $_"), next;
+            (my $filename = $_) =~ s/^>//;
+            push @written_to, $filename;
+            $FH = *FILE;
+        }
+        select($FH || $_);
+        WWW::Webrobot::StatisticSummary::url_statistic($url_statistic, "\n=== URL Statistic ===");
+        WWW::Webrobot::StatisticSummary::statistic($statistic, "\n=== Statistic ===\nNumber of clients: " . $wrl->cfg->{load}->{number_of_clients});
+        WWW::Webrobot::StatisticSummary::histogram($histogram, 0, $scale, "\n=== Histogram (x-axis logarithmic) ===");
+        WWW::Webrobot::StatisticSummary::histogram($histogram, 1, $scale, "\n=== Histogram (both axis logarithmic) ===");
+        WWW::Webrobot::StatisticSummary::http_errcodes($http_errcode, "\n=== HTTP Error Codes ===\ncode  count");
+        WWW::Webrobot::StatisticSummary::assert_codes($assert_ok, "\n=== Assert codes ===");
+        close $FH if defined $FH;
+    }
+    select $old_filehandle;
+    print "Written to ", join(" ", @written_to), "\n" if @written_to;
+
+    wait;
+
+    my @exit = grep {$_} values %$all_exit_status;
+    my $exit_status = scalar @exit ? 1 : 0;
+
+    exit $exit_status;
+}
+
+
+1;
+
+=head1 NAME
+
+webrobot-load - run a testplan in multiple client mode
+
+=head1 SYNOPSIS
+
+ webrobot-load cfg=example/cfg.prop testplan=example/testplan.xml
+
+=head1 DESCRIPTION
+
+This command runs multiple clients.
+Each client runs a testplan.
+The results will be printed on STDOUT and the file WEBROBOT_OUT.
+
+This command takes two parameters,
+both are mandatory:
+
+=over
+
+=item --help
+
+Display this help.
+
+=item --version
+
+Print the version number.
+It is taken from WWW::Webrobot.pm
+
+=item --cfg config_filename
+
+This is the configuration file,
+see L<WWW::Webrobot::pod::Config>.
+
+=item --testplan testplan_filename
+
+This is the testplan to run,
+see L<WWW::Webrobot::pod::Testplan>.
+
+=item --define property=value
+
+Define some property/value pairs.
+This overwrites properties defined in the config file.
+
+=back
+
+B<NOTE:>
+Although it may seem that C<webrobot-load> is
+a superset of C<webrobot> this is not true.
+Use C<webrobot> for single client tests.
+
+B<LIMITATION:>
+This script will work on unixoid systems only.
+It uses the magic C<open($HANDLE, "-|")> in L<WWW::Webrobot/Forker> which uses fork.
+
+
+=head1 SEE ALSO
+
+L<webrobot>
+
+=cut

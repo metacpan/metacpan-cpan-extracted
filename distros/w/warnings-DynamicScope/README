@@ -1,0 +1,71 @@
+warnings-DynamicScope version 1.04
+==========================================================================
+ $Id: README,v 1.6 2005/08/15 15:53:59 kay Exp $
+===========================================================================
+
+NAME
+    warnings::DynamicScope - Provides warning categories in dynamic scope.
+
+
+DESCRIPTION
+    This module provides warning categories in dynamic scope through the
+    variable "%^W".
+
+    You can use it like special variable "$^W":
+
+     require warnings::DynamicScope;
+
+     package MyPkg;
+     use warnings::register;
+ 
+     sub my_func {
+         if ($^W{MyPkg}) {
+             print "Don't do it!!\n";
+         } else {
+             print "That's fine\n";
+         }
+     }
+ 
+     package main;
+     $^W = 1;
+
+     {
+         local $^W{MyPkg} = 0;
+         MyPkg::my_func();
+     }
+     MyPkg::my_func();
+
+    This code prints:
+
+     That's fine.
+     Don't do it!!
+
+    That's all.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+    Perl, version 5.8 or more
+    Symbol::Values, version 1.03 or more
+    Test::Expansion, version 2.0 or more
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2005 by Keitaro Miyazaki
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+

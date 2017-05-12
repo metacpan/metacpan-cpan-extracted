@@ -1,0 +1,19 @@
+#!/usr/bin/perl
+#
+# Test client for talking to maild daemons manually
+#
+use IO::Socket;
+use strict;
+
+sub MAILD_SOCKET_DIR () { "/var/lib/maild" }
+
+my $session = shift @ARGV;
+my $s = IO::Socket->new(Domain => AF_UNIX,
+			Type => SOCK_STREAM,
+			Peer => MAILD_SOCKET_DIR . "/sessions/$session")
+    or die "failed to create/connect socket: $!\n";
+print $s "@ARGV\n";
+print "sent command OK, results:\n";
+while (defined(my $line = <$s>)) {
+    print $line;
+}

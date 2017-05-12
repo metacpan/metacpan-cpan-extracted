@@ -1,0 +1,148 @@
+#!/usr/bin/perl
+
+# WikiText convertor script, Copyright (C) 2006 Mikhael Goikhman, Enno Cramer
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the Perl Artistic License or the GNU General
+# Public License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use Text::WikiText;
+use Getopt::Long qw(:config no_ignore_case require_order bundling);
+
+my %options = (
+	format => 'HTML',
+	full_page => 0,
+	title => 'WikiText Converted Page',
+	author => 'Unknown',
+
+	no_verbatim => 0,
+	heading_offset => 0,
+
+	flat_lists => 0,
+);
+
+sub show_usage (;$) {
+	my $is_error = shift || 0;
+	my $out = $is_error ? \*STDERR : \*STDOUT;
+	my $usage = qq{
+		Convert WikiText to HTML or another format.
+
+		Usage: $0 [OPTIONS] [file ...]
+		Options:
+			-h --help              show this usage
+			-f --format NAME       specify format (default: $options{format})
+
+			-F --full-page         form standard page, i.e. <html>...</html>
+			-t --title NAME        set title (default: $options{title})
+			-a --author NAME       set author (default: $options{author})
+
+			-V --no-verbatim       do not include verbatim blocks in output
+			-H --heading-offset N  set heading offset (default: 0)
+
+			-l --flat-lists        use <li>...</li> instead of <li><p>...</p></li>
+	};
+	$usage =~ s/^\n//; $usage =~ s/^\t\t?//mg;
+	print $out $usage;
+	exit $is_error;
+}
+
+GetOptions(
+	'h|help'             => sub { show_usage(0) },
+	'f|format=s'         => \$options{format},
+
+	'F|full-page'        => \$options{full_page},
+	't|title=s'          => \$options{title},
+	'a|author=s'         => \$options{author},
+
+	'V|no-verbatim'      => \$options{no_verbatim},
+	'H|heading-offset=i' => \$options{heading_offset},
+
+	'l|flat-lists'       => \$options{flat_lists},
+) or show_usage(1);
+
+print Text::WikiText->new->convert(\*ARGV, %options);
+
+__END__
+
+=head1 NAME
+
+wikitext-convert - convert WikiText to other formats
+
+=head1 SYNOPSIS
+
+	wikitext-convert --help
+
+	wikitext-convert [OPTIONS] [FILE ...]
+
+=head1 DESCRIPTION
+
+By default, the given wikitext is converted to HTML.  To process whole
+documents, use --full-page option.
+
+If no files are specified the input is taken from the standard input.
+
+=head1 OPTIONS
+
+=over 4
+
+=item -h --help
+
+show this usage
+
+=item -f --format NAME
+
+specify format (HTML, Latex, Pod)
+
+=item -F --full-page
+
+form standard page, i.e. <html>...</html>
+
+=item -t --title NAME
+
+set title (default: "WikiText Converted Page")
+
+=item -a --author NAME
+
+set author (default: "Unknown")
+
+=item -V --no-verbatim
+
+do not include verbatim blocks in output
+
+=item -H --heading-offset N
+
+set heading offset (default: 0)
+
+=item -l --flat-lists
+
+use <li>...</li> instead of <li><p>...</p></li>
+
+=back
+
+=head1 AUTHORS
+
+Mikhael Goikhman, Enno Cramer
+
+=head1 SEE ALSO
+
+L<Text::WikiText>.
+
+L<http://podius.wox.org/documentation/wikitext-spec.html>
+
+=cut

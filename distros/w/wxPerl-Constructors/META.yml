@@ -1,0 +1,23 @@
+---
+name: wxPerl-Constructors
+version: v0.0.4
+author:
+  - 'Eric Wilhelm @ <ewilhelm at cpan dot org>'
+abstract: parameterized constructors
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Module::Build: 0.26
+  Test::More: 0
+  Wx: 0.27
+provides:
+  wxPerl::Constructors:
+    file: lib/wxPerl/Constructors.pm
+    version: v0.0.4
+  wxPerl::Constructors::argmap:
+    file: lib/wxPerl/Constructors/argmap.pm
+generated_by: Module::Build version 0.2807
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

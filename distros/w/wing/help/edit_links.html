@@ -1,0 +1,68 @@
+<!-- This file is auto-included as embedded HTML and is only a "body" -->
+<h2 align="center">Help for Edit Links screen</h2>
+The Edit Links screen looks something like this:
+<hr>
+<table>
+<tr>
+<td><img src="/icons/back.gif" border=0 alt="Back"></td>
+<td><img src="/wing-icons/help.gif" border=0 alt="Help"></td>
+<td><img src="/wing-icons/logout.gif" border=0 alt="Logout"></td>
+</tr>
+</table>
+<h2 align="center">Edit Links</h2>
+<form>
+<textarea name="links" rows="24" cols="80">
+Web search
+. AltaVista http://www.altavista.com/
+. Google http://www.google.com/
+. Dejanews http://www.deja.com/
+Mirror sites
+. Sunsite UK http://sunsite.doc.ic.ac.uk/
+. Hensa UK http://www.hensa.ac.uk/
+. Security
+. . http://www.replay.com/
+. . ftp://ftp.ox.ac.uk/pub/comp/security/
+. . ftp://ftp.ox.ac.uk/pub/crypto/
+</textarea>
+<br>
+<input type="submit" name="ok" value="OK">
+<input type="reset" name="done_links" value="Reset">
+</form>
+<hr>
+
+These are your personal links (like bookmarks). If you logged into
+WING using the portal view, the "OK" button will make changes
+immediately to the links that appear down the left hand
+side of your browser. If you are not logged in with the portal view
+then the "OK" button will return you to the Links screen so that you
+can see the effect of your changes.
+
+The <img src="/icons/back.gif" border=0 align="absmiddle" alt="Back">
+button takes you back to the Mail messages list (if you are using the
+portal view) or to the Links screen (if not).
+<p>
+Each line entered will appear in the Links frame/screen as a "link",
+preceded by a bullet, a plus or a minus. The plus or minus is used
+to indicate lines which introduce sub-lists (those whose succeeding
+lines are prefixed with an additional dot character). On the Links
+frame/screen the plus/minus characters are hot links which
+expand/collapse the associated sub-list.
+<p>
+When typing in link lines: each line can have an
+optional description followed by an optional URL (don't forget the
+leading tag such as <tt>http://</tt>). If the line is a sub-entry
+in a higher-level list, prefix the line with one more dot character
+than the parent has. See the example above for how this looks.
+<p>
+A line consisting of a single "-" character produces a horizontal rule
+across the links frame/screen.
+You can also simply include raw HTML as a link by making sure the
+line starts with an HTML tag &lt;...&gt;.
+<p>
+Advanced users familiar with HTML may wish to know that a leading
+"=" can be used to start a line which is included verbatim, without
+even the surrounding table row/column tags. If you use this, you'll
+want to include table row/columns tags of your own or end and
+restart the table environment with &lt;/table&gt;...&lt;table&gt;
+or else the browser may well render your HTML outside the links table.
+</body></html>

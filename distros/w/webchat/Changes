@@ -1,0 +1,69 @@
+2012-09-17   Simon Wistow <simon@thegestalt.org>
+  Release 0.65
+
+  Fix image maps (thanks John Sequeira)
+
+2001-12-11   Simon Wistow <simon@thegestalt.org>
+
+  Release 0.64 
+
+  Documentation patch that tells you how to do
+  basic HTTP authentication.
+
+2001-11-06   Simon Wistow <simon@thegestalt.org>
+
+  Release 0.63
+
+  Must have forgotten to up a version number 
+  somewhere. This fixes a bug and should make it 
+  easier to install from CPAN and improve
+  interoperability with Inline::Webchat
+
+
+
+2001-10-16   Simon Wistiw <simon@thegestalt.org>
+
+  Release 0.61
+
+  Fixed it so it wouldn't interfere with Test::More 
+  anymore thanks to a heads up from Skud.
+
+2001-10-05   Simon Wistow <simon@thegestalt.org>
+
+   Release 0.6
+
+   Upped the version number to sort some issues out.
+   Don't ask.
+
+
+2001-08-10   Simon Wistow <simon@thegestalt.org>
+   
+   Release ???
+   
+   Patched WWW::Chat to require params to passed to make 
+   it package safe although it will default to searching 
+   the main:: namespace. Wrote WWW::Chat::Processor to 
+   perform the job of webchatpp in a more portable way
+   and rewrote webchatpp.PL (which generates webchatpp)
+   to take this into account. Wrote some automatic tests
+   and some ones to be run manually.
+
+
+
+1999-11-16   Gisle Aas <gisle@aas.no>
+
+   Release 0.05
+
+   Moved HTML::Form to LWP.  Require LWP-5.47 to get it back.
+
+
+
+1998-11-30   Gisle Aas <gisle@aas.no>
+
+   Release 0.04
+
+
+
+1998-11-21   Gisle Aas <gisle@aas.no>
+
+   Release 0.01 (unreleased)

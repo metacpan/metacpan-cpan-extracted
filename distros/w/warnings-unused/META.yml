@@ -1,0 +1,35 @@
+---
+abstract: 'Produces warnings when unused variables are detected'
+author:
+  - 'Goro Fuji <gfuji(at)cpan.org>'
+build_requires:
+  Devel::PPPort: 3.19
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.62
+  Test::Warn: 0.11
+configure_requires:
+  Devel::PPPort: 3.19
+  ExtUtils::MakeMaker: 6.59
+  ExtUtils::ParseXS: 2.21
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: warnings::unused
+name: warnings-unused
+no_index:
+  directory:
+    - example
+    - inc
+    - t
+    - xt
+requires:
+  XSLoader: 0.06
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/gfx/p5-warnings-unused.git
+version: 0.06

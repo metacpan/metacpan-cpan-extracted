@@ -1,0 +1,53 @@
+NAME
+    warnings::MaybeFatal - make warnings FATAL at compile-time only
+
+SYNOPSIS
+       use strict;
+       use warnings qw(all);
+       use warnings::MaybeFatal;
+   
+       # Use of uninitialized value.
+       # Run-time warning, so this is non-fatal.
+       print join(undef, "a", "b");
+   
+       # Useless use of constant in void context.
+       # Compile-time warning, so this is fatalized.
+       "Hello world"; 1;
+
+DESCRIPTION
+    Because it's kind of annoying if a warning stops your program from being
+    compiled, but it's *really* annoying if it breaks your program part way
+    through actually executing.
+
+    This lexically scoped pragma will make all warnings (including custom
+    warnings emitted with the `warn` keyword) FATAL during compile time. It
+    does not enable or disable any warnings in its own right. It just makes
+    any warnings that happen to be enabled FATAL during the compile.
+
+    (Note that the compile phase and execute phase are not as cleanly divided
+    in Perl as they are in, say, C. If module X loads module Y at run-time,
+    then module Y's compile time happens during module X's run-time. In this
+    situation, a warning that is triggered while compiling Y will be FATAL,
+    even though from module X's perspective, this is at run-time.)
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=warnings-MaybeFatal>.
+
+SEE ALSO
+    warnings.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2014, 2017 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

@@ -1,0 +1,58 @@
+= Hello, World =
+
+This is a -new- wiki text. You may put *bold words*, /italic words/,
+_underlined words_ and more.
+Paragraphs are delimited by an empty line.
+
+See [http://memfrob.de/~memfrob/wikitext/wikitext-spec.html] for exact
+syntax rules. [>radomurl$~^]
+
+Some random characters: !"§$%&/()= ,;.:-_#'+*~'`?\<>|
+
+== More examples ==
+
+This is {item} list:
+
+ * one
+ * two
+ * three
+
+or {numbered} list:
+
+ # one
+ # two
+ # three
+
+> quotations go like this
+>
+> # one
+> # two
+
+whoever said this?
+
+{
+    preformatted text
+  as is
+}
+
+This is a simple [http://google.com|link].
+
++--------+-----+--------+
+| Tables | are | simple |
++--------+-----+--------+
+| 1      | 2   | 3      |
+| 4      || two columns |
+| 5      | 6   | 7      |
++--------+-----+--------+
+
++------+-------+
+| HTTP | codes |
++------+-------+
+301|Moved
+302|Found
+403|Forbidden
+404|Not found
+500|Internal Error
+
+That's all, folks::
+Have a fun.

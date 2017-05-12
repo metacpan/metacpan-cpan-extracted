@@ -1,0 +1,38 @@
+win version 0.03
+================
+
+The goal of win, the Perl Win32 programming tool, is to make 
+Perl Win32 programming simpler, quicker, and less of a hassle. 
+The win tool seeks to achieve its goal by:
+
+1. Addressing the integration of Win32 modules.
+2. Addressing Win32 idiosyncrasies.
+
+You can call other Win32 modules via win and if your system 
+doesn't have the module, win is polite enough to download and 
+install the module for you (using PPM). 
+
+By default, win also enables a few useful Win32 modules, 
+specifically Win32::Autoglob and Win32::Die. You can think of 
+win as a broom that sweeps the idiosyncrasies of Windows under
+the rug. It is good to know what those idiosyncrasies are, but 
+sometimes you don't want to deal with them. If that's ever the 
+case, then win is for you.
+
+INSTALLATION 
+
+It's all pure Perl, so just put the .pm file in its appropriate 
+local Perl subdirectory. 
+
+DEPENDENCIES 
+
+This module requires these other modules and libraries: 
+
+Win32::Autoglob, Win32::Die, File::Which
+
+COPYRIGHT AND LICENCE 
+
+Copyright (c) 2003 Mike Accardo <mikeaccardo@yahoo.com> 
+
+This library is free software; you can redistribute it and/or
+ modify it under the same terms as Perl itself. 

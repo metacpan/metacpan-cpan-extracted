@@ -1,0 +1,133 @@
+<!-- This file is auto-included as embedded HTML and is only a "body" -->
+<h2 align="center">Help for mailboxes screen</h2>
+The mailboxes screen looks something like this:
+<hr>
+<table>
+<tr>
+<td><img src="/icons/back.gif" border=0 alt="Back"></td>
+<td><img src="/icons/blank.gif" alt=" | "></td>
+<td><img src="/wing-icons/logout.gif" border=0 alt="Logout"></td>
+</tr>
+</table>
+
+<h2 align="center">Mailboxes</h2>
+<form>
+  Directory <input name="cwd" size="32" value="">
+  Filter <input name="filter" size="12" value="">
+  <input type="submit" value="Open">
+</form>
+<br>
+
+</table>
+<br>
+<table>
+<tr>
+  <td><img src="/wing-icons/left-inactive.gif" border=0 alt="[up] "></td>
+  <td>Parent directory</td>
+</tr>
+<tr>
+<td>
+  <img src="/icons/dir.gif" border=0 alt="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;">
+</td>
+<td>
+INBOX
+</td>
+</tr>
+<tr><td>
+  <img src="/wing-icons/right.gif" border=0 alt="[dir]">
+</td>
+<td>
+old-messages
+</td>
+<td>
+    <img src="/wing-icons/rename.gif" border=0 alt="Rename">
+</td>
+<td>
+    <img src="/wing-icons/delete.gif" border=0 alt="Delete">
+</td>
+</tr>
+<tr><td>
+  <img src="/icons/dir.gif" border=0 alt="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;">
+</td>
+<td>
+saved-messages
+</td>
+<td>
+    <img src="/wing-icons/rename.gif" border=0 alt="Rename">
+</td>
+<td>
+    <img src="/wing-icons/delete.gif" border=0 alt="Delete">
+</td>
+</tr>
+<tr><td>
+  <img src="/icons/dir.gif" border=0 alt="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;">
+</td>
+<td>
+sent-mail  
+</td>
+<td>
+    <img src="/wing-icons/rename.gif" border=0 alt="Rename">
+</td>
+<td>
+    <img src="/wing-icons/delete.gif" border=0 alt="Delete">
+</td>
+
+</table><br>
+
+<hr>
+<form>
+Create
+<select name="type" size=1>
+  <option value="mailbox" selected>mailbox</option>
+  <option value="directory" selected>directory</option>
+</select>
+with name
+<input name="name">
+<input type="submit" name="create" value="Create">
+</form>
+<hr>
+<ul>
+<li>Click on a mailbox (indicated with the icon
+<img src="/icons/dir.gif" border=0 align="absmiddle"
+  alt="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;">)
+to make it your current mailbox. It will be opened and its messages
+listed. Incoming mail is always delivered to the special mailbox
+called "INBOX" (which cannot be deleted or renamed).</li>
+<li>Click on a subdirectory (indicated with the icon
+<img src="/wing-icons/right.gif" border=0 align="absmiddle" alt="[dir]">)
+to open that subdirectory and see any mailboxes and subdirectories
+within.</li>
+<li>To rename a mailbox or subdirectory (including the possibility of
+moving it elsewhere in the hierarchy) click the rename button next to
+it. If you want to leave it in the same directory, type the desired
+new name into the "New name" field which will have appeared and then
+press the "Rename" button. (You can instead press the "Cancel" button
+to abort the rename sequence.) If you want to rename the mailbox or
+subdirectory into a different directory, then click directory names
+until you find the desired directory and then type in the new name.</li>
+<li>To create a new mailbox or subdirectory, choose "Create mailbox"
+or "Create directory" as appropriate from the menu. Then type the
+desired name into the "with name" field and press the "Create" button.
+Mailbox and directory names may contain any character except "/". The
+IMAP server will place some restriction on the length of the name and
+of the whole path but those limits will allow any reasonable length
+(e.g. hundreds of characters, not tens).</li>
+<li>You can also enter the full pathname of a directory explicitly
+in the "Directory" field and click on the "Open" button to take you
+directly to a given directory. Separate elements of the path with
+the "/" character. For example, <tt>private/foosoc/old</tt>. If
+you also fill in the "Filter" field, then clicking Open opens the
+directory but only shows those mailboxes and subdirectories whose name
+matches the given filter pattern. You can use "*" to match any sequence
+of zero or more characaters and "?" to match any single character. For
+example, "*new*" will only show mailboxes and subdirectories of the
+given directory which contain the characters "new" in their names.</li>
+<li>To delete a mailbox or directory, click on the
+<img src="/wing-icons/delete.gif" border=0 align="absmiddle" alt="Delete">
+button next to its name. There will be no confirmation request.
+Deleting a mailbox will delete all its contents which cannot then be
+recovered. Deleting a subdirectory is only possible if it is empty
+(i.e. contains no mailboxes or further subdirectories).</li>
+</ul>
+</body></html>
+

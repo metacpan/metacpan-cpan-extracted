@@ -1,0 +1,8 @@
+Text::WikiText may be installed like many other CPAN modules:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Optionally, the first command accepts PREFIX=/home/joe/perl option.

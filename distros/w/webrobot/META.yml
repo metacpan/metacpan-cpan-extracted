@@ -1,0 +1,17 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         webrobot
+version:      0.81
+version_from: lib/WWW/Webrobot.pm
+installdirs:  site
+requires:
+    Bundle::LWP:                   0
+    HTML::TreeBuilder:             0
+    Test::More:                    0
+    Time::HiRes:                   0
+    Unicode::Lite:                 0
+    XML::Parser:                   0
+    XML::XPath:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

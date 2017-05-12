@@ -1,0 +1,16 @@
+Revision history for Perl extension win.
+
+_________________________________________________
+0.03  Sat Jan 10 15:00:06 2004
+- NOTE: Version 0.03 exists due to a problem with PAUSE. I will spare you the details. 
+_________________________________________________
+0.02  Mon Dec 22 15:00:06 2003
+	- Rewrote entire module.
+	- Dumped Win32 module.
+	- Fixed Win32::Die bug.
+	- Updated POD.
+_________________________________________________
+0.01  Sun Aug 10 00:24:06 2003
+	- original version; created by h2xs 1.21 with options
+		-X -n win
+

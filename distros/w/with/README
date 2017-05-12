@@ -1,0 +1,140 @@
+NAME
+    with - Lexically call methods with a default object.
+
+VERSION
+    Version 0.02
+
+SYNOPSIS
+        package Deuce;
+
+        sub new { my $class = shift; bless { id = > shift }, $class }
+
+        sub hlagh { my $self = shift; print "Deuce::hlagh $self->{id}\n" }
+
+        package Pants;
+
+        sub hlagh { print "Pants::hlagh\n" }
+
+        our @ISA;
+        push @ISA, 'Deuce';
+        my $deuce = new Deuce 1;
+
+        hlagh;         # Pants::hlagh
+
+        {
+         use with \$deuce;
+         hlagh;        # Deuce::hlagh 1
+         Pants::hlagh; # Pants::hlagh
+ 
+         {
+          use with \Deuce->new(2);
+          hlagh;       # Deuce::hlagh 2
+         }
+
+         hlagh;        # Deuce::hlagh 1
+
+         no with;
+         hlagh;        # Pants::hlagh
+        }
+
+        hlagh;         # Pants::hlagh
+
+DESCRIPTION
+    This pragma lets you define a default object against with methods will
+    be called in the current scope when possible. It is enabled by the "use
+    with \$obj" idiom (note that you must pass a reference to the object).
+    If you "use with" several times in the current scope, the default object
+    will be the last specified one.
+
+HOW DOES IT WORK
+    The main problem to address is that lexical scoping and source
+    modification can only occur at compile time, while object creation and
+    method resolution happen at run-time.
+
+    The "use with \$obj" statement stores an address to the variable $obj in
+    the "with" field of the hints hash "%^H". It also starts a source filter
+    that replaces function calls with calls to "with::defer", passing the
+    name of the original function as the first argument. When the replaced
+    function has a prototype or is part of the core, the call is deferred to
+    a corresponding wrapper generated in the "with" namespace. Some keywords
+    that couldn't possibly be replaced are also completely skipped. "no
+    with" undefines the hint and deletes the source filter, stopping any
+    subsequent modification in the current scope.
+
+    When the script is executed, deferred calls first fetch the default
+    object back from the address stored into the hint. If the object "->can"
+    the original function name, a method call is issued. If not, the calling
+    namespace is inspected for a subroutine with the proper name, and if
+    it's present the program "goto"s into it. If that fails too, the core
+    function with the same name is recalled if possible, or an "Undefined
+    subroutine" error is thrown.
+
+IGNORED KEYWORDS
+    A call will never be dispatched to a method whose name is one of :
+
+        my our local sub do eval goto return
+        if else elsif unless given when or and 
+        while until for foreach next redo last continue
+        eq ne lt gt le ge cmp
+        map grep system exec sort print say
+        new
+        STDIN STDOUT STDERR
+
+EXPORT
+    No function or constant is exported by this pragma.
+
+CAVEATS
+    Most likely slow. Almost surely non thread-safe. Contains source
+    filters, hence brittle. Messes with the dreadful prototypes. Crazy. Will
+    have bugs.
+
+    Don't put anything on the same line of "use with \$obj" or "no with".
+
+    When there's a function in the caller namespace that has a core function
+    name, and when no method with the same name is present, the ambiguity is
+    resolved in favor of the caller namespace. That's different from the
+    usual perl semantics where "sub push; push @a, 1" gets resolved to
+    CORE::push.
+
+    If a method has the same name as a prototyped function in the caller
+    namespace, and if a called is deferred to the method, it will have its
+    arguments passed by value.
+
+DEPENDENCIES
+    perl 5.9.4.
+
+    Carp (core module since perl 5).
+
+    Filter::Util::Call, Scalar::Util and Text::Balanced (core since 5.7.3).
+
+    Sub::Prototype::Util 0.08.
+
+AUTHOR
+    Vincent Pit, "<perl at profvince.com>", <http://www.profvince.com>.
+
+    You can contact me by mail or on #perl @ FreeNode (vincent or
+    Prof_Vince).
+
+BUGS
+    Please report any bugs or feature requests to "bug-with at rt.cpan.org",
+    or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=with>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc with
+
+ACKNOWLEDGEMENTS
+    A fair part of this module is widely inspired from Filter::Simple
+    (especially "FILTER_ONLY"), but a complete integration was needed in
+    order to add hints support and more placeholder patterns.
+
+COPYRIGHT & LICENSE
+    Copyright 2008 Vincent Pit, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,281 @@
+		   WING - Web IMAP/NNTP Gateway, version 0.9
+
+		  Copyright (C) 1998, 1999 by Malcolm Beattie
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 1, or (at your option)
+    any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License or the Artistic License for more details.
+
+    You should have received a copy of the GNU General Public License in
+    the file named "Copying". If not, you can get one by writing to the
+    Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+
+DESCRIPTION
+
+WING is an Open Source Apache/mod_perl based system which allows users
+to access email held on an IMAP server via any web browser.
+
+WING provides a gateway so that users can access email held on an
+IMAP server via any web browser. See
+    http://users.ox.ac.uk/~mbeattie/wing/
+
+Some features of WING are:
+
+ * The browser does not need to support Java, JavaScript or frames
+   but table and cookie support are preferable.
+ * Users can create a hierarchy of multiple mailboxes and browse and
+   move messages between them.
+ * Messages with MIME attachments can be displayed nicely.
+ * Per user defaults (such as screen size and mail signature) can be
+   set and saved between sessions.
+ * Files local to the client browser can be included in composed
+   messages or MIME attached to them.
+ * Arbitrary headers can be added to composed messages except that the
+   "From:" header cannot be changed or forged for outgoing messages
+   from WING.
+ * WING is scalable up to thousands and tens of thousands of users.
+ * Users can import address books by uploading them via their browser
+   (only Pine format address books supported in this version).
+ * Users can create their own links (bookmarks), presented in a
+   hierarchical list which can be folded/unfolded.
+ * Users can login using a "portal" view which provides a frame down
+   the left hand side of the browser containing site-configurable
+   links along with their personal links. This is the only part of
+   WING which requires frame support from the browser.
+
+When integrated with a mail cluster similar to the one we have here
+at Oxford University, WING also has these features:
+
+ * Users can manage their account via the WING interface. This includes
+   changing passwords, querying disk usage of mailboxes and disk quota
+   an setting mail forwarding and "vacation" messages.
+ * Users can create address books which can be browsed, searched and
+   shared in an ACL controlled manner with chosen lists of other
+   users and groups.
+ * WING server nodes can be added or removed transparently and can be
+   taken down for upgrades without affecting user service.
+ * There are a few web-based admin tools for querying the status of
+   the WING cluster and its users.
+
+
+REQUIREMENTS
+
+In its current state, WING requires many other pieces of software to
+function. Future versions may be easier to install, configure and
+maintain but this one requires the attention of an experienced system
+administrator familiar with Apache/mod_perl, Perl and SQL databases.
+
+It was also developed primarily for Linux. Although almost all of it
+is portable, if you're running it on something other than Linux you'll
+at least need to edit Wing/Login.pm and write a new version of
+make_session_id() that gets *cryptographically* strongly random numbers
+by some other means than simply reading /dev/urandom. (Don't just use
+rand() or a PRNG--that sort of randomness isn't suitable. If you don't
+understand why not, get someone else to do the port. Getting it wrong
+will open up a security hole.)
+
+For configuring a mail cluster and its associated features, the
+administrator will also need to know about network configuration,
+firewalling, NFS, automount, named and exim. You have been warned.
+
+
+AVAILABILITY
+
+Wing is available from your favourite CPAN site as a tar ball
+    modules/by-authors/Malcolm_Beattie/wing-0.9.tar.gz
+its home site in tar.gz form
+    ftp://ftp.ox.ac.uk/pub/perl/Wing-0.9.tar.gz
+or source RPM form
+    ftp://ftp.ox.ac.uk/pub/linux/SRPMS/wing-0.9-1.src.rpm
+or "binary" (noarch) RPM form for Red Hat 5.x Linux
+    ftp://ftp.ox.ac.uk/pub/linux/RPMS/noarch/wing-0.9-1.noarch.rpm
+
+
+INSTALLATION
+
+These instructions are probably woefully incomplete and inaccurate.
+I'll assume there are three logically separate hosts: a frontend, an
+IMAP server and a WING server. If necessary, those can all be the
+same physical host (or there can be multiple hosts in each class).
+If they are all the same host then WING will, in the current
+configuration, still access user mailboxes by using loopback IMAP
+connection to itself. It is possible to make WING access mail files
+directly in this case but it needs changes to WING which I won't go
+into here. Now start installing things:
+
+On the frontend and the WING server install Apache, mod_perl,
+Perl 5.004_04 (or later) and the following Perl modules:
+  DBD-Pg
+  DBI
+  Data-Dumper
+  Net-Telnet
+  Apache-DBI
+  MD5
+  MIME-Base64
+  Term-ReadKey
+  HTML-Parser
+  Term-ReadLine-Perl
+  libnet
+  IO-stringy
+  CrackLib
+  Mail-Cclient
+  libwww
+  MailTools
+  MIME-tools
+  Net-DNS
+  SQL
+
+Most of these are standard CPAN modules, a couple are modules
+I've written but not officially released yet (CrackLib and SQL).
+All are available in RPM form at
+    ftp://ftp.ox.ac.uk/pub/linux/SRPMS/
+for the source RPMs and
+    ftp://ftp.ox.ac.uk/pub/linux/RPMS/i386
+for binary RPMs built on Red Hat 5.x for x86. Those who can't cope
+directly with RPMs will, for the moment, have to get rpm2cpio and
+build them themselves. I will get around to releasing these modules
+to CPAN sometime. SQL has bugs involving string/number quoting but
+should work OK the way WING uses it.
+
+On the frontend, install PostgreSQL. You may be able to use another
+SQL database, but
+ (1) it must support transactions (this rules out MySQL unless
+     someone rewrites Wing::Login in a way which doesn't require
+     transactions).
+ (2) it must support using ident lookups for authentication (or else
+     you will have to tweak the DBI connection setup).
+
+Create a database for wing. I'll assume that Apache runs under the
+username "httpd". Create database users "httpd" and "root". Note
+that PostgreSQL user root really is root (uid 0) and *not* the
+PostgreSQL "superuser" username (often "postgres"). 
+
+Initialise the necessary database tables with the SQL from
+    wing-init.sql (run as username httpd)
+    abook-init.sql (run as username httpd)
+    users-init.sql (run as username root)
+Each user who wants to use wing should have a row in the users
+table which includes their username, uid, gid and sender. The
+"sender" field is what WING will put in the "From: " header of
+outgoing messages that the user sends with WING. If using
+PostgreSQL, after adding a number of users to the users table
+don't forget to "vacuum analyze users" so that it realises it
+should make use of index lookups. Also, give each user a personal
+address book
+    insert into abook_ids (username, tag) values ('fred', 'personal');
+
+Start up the maild daemon under the httpd username. An appropriate
+init.d boot time script is wing.init which can be copied to
+/etc/rc.d/init.d/maild (or wherever you keep boot time scripts). If
+you don't have a SysV flavoured boot configuration, tweak it yourself.
+
+Install Wing. If you use the RPM, fine. If you're not you'll have to:
+ * copy Wing.pm Outline.pm Wing/*.pm to your Perl site_perl directory
+ * copy wing-icons/* to the wing-icons subdirectory of your Apache
+   root directory
+ * copy help/* to the wing-help subdirectory of your Apache root
+ * install maild in /usr/sbin (or wherever your boot time script
+   wants to find it)
+ * create directories /var/lib/maild and /var/lib/maild/sessions,
+   owned by httpd and mode 700.
+
+Now the difficult part: edit .../site_perl/Wing/Shared.pm and go
+through changing things to refer to your own hostnames, domains and
+environment. Some things will need changing, most won't. The various
+variables are reasonably well commented.
+
+Edit your Apache httpd.conf and check you're running under user httpd
+and group httpd. On the WING server only edit access.conf and add
+
+  PerlModule Wing
+
+  <Location /wing>
+  SetHandler perl-script
+  PerlHandler Wing
+  </Location>
+
+  <Location /wing/login>
+  SetHandler perl-script
+  PerlHandler Wing::Login
+  </Location>
+
+  Alias /wing-icons/ /home/httpd/wing-icons/
+
+On the frontend, edit access.conf and add
+
+  PerlModule Wing::Balance
+
+  #
+  # Using <Location /> below means the root directory of this web
+  # server (or, typically, virtual host) brings up a login screen
+  # for wing. This means users can just type a simple hostname into
+  # their browser for wing access. If you don't want this and can't
+  # spare a virtual host, change it to something like
+  # <Location /wing-login> so that they have to type
+  # http://foo.bar.baz/wing-login into their browsers to get at WING.
+  #
+  <Location />
+      SetHandler perl-script
+      PerlHandler Wing::Balance
+  </Location>
+
+  <Location /wing/admin>
+  #
+  # *** Add auth restrictions here to limit the people who can
+  # *** use the admin interface to query wing.
+  #
+  SetHandler perl-script
+  PerlHandler Wing::Admin
+  </Location>
+
+Now create a file called /etc/wing.live on the frontend and put in
+it, one per line, the hostnames of each WING server. You can comment
+out lines by putting "#" at the beginning of the line.
+
+Restart Apache on the frontend and WING server(s).
+
+Right, that might just about be it. Try using a browser to
+connect to http://yourfrontend.example.org/ (or .../wing-login
+if you chose that Location above) and see what happens. If something
+goes wrong, investigate and try to fix it. Don't mail me directly.
+Some of the features (those above that I mentioned required the
+extra cluster configuration) may not work. I don't yet have
+instructions yet for how to set all that up but you can always look
+at the source and figure it out for yourself if you're adventurous.
+
+SUPPORT
+
+There isn't any official support. There is however a mailing list
+called "wing-admin" where those who use WING or want to set up WING
+can discuss things. I monitor that mailing list and help where I can.
+The list is a majordomo list. To subscribe, send the following message
+*body* (the subject line is irrelevant and ignored)
+    subscribe wing-admin
+to majordomo@maillist.ox.ac.uk. To unsubscribe again send the message
+body "unsubscribe wing-admin" to the same address. To send messages to
+the list, mail to wing-admin@maillist.ox.ac.uk.
+
+Good luck. You'll need it. It is rather good when it all works though.
+
+
+AUTHOR
+
+Malcolm Beattie
+mbeattie@sable.ox.ac.uk
+
+
+Version 0.6, first public release
+5 February 1999
+
+Version 0.8, second public release
+1 June 1999
+
+Version 0.9
+3 August 1999

@@ -1,0 +1,158 @@
+=head1 NAME
+
+WWW::Webrobot::pod::OutputListeners - Interface for the family of output listeners
+
+=head1 SYNOPSIS
+
+Usage within a config file:
+
+ output=WWW::Webrobot::Print::MakeTestplan
+ output=WWW::Webrobot::Print::Text
+ output=WWW::Webrobot::Print::Test
+ output=WWW::Webrobot::Print::Html
+ 
+ # Caveat: What follows "File" is really perl syntax (eval'ed)
+ output=WWW::Webrobot::Print::File 'dir' => 'diff_new', 'diff_mode' => 'diff_orig'
+ output=WWW::Webrobot::Print::File 'dir' => 'diff_orig'
+
+For writing your own class please study the source of
+L<WWW::Webrobot::Print::Text> or L<WWW::Webrobot::Print::Test>.
+
+
+=head1 DESCRIPTION
+
+Output listeners are defined within a config file,
+see L</SYNOPSIS> and L<WWW::Webrobot::pod::Config>.
+They are called in sequence if you instantiate more than one listener.
+
+B<Note:> Output will look funny
+if you define more than one output listener that prints to STDOUT.
+
+
+=head1 METHODS
+
+If you want to implement an output listener
+you must implement the following methods:
+
+=over
+
+=item $obj -> global_start ()
+
+This method is called once for a testplan before further processing is done.
+You may use it to open files, etc.
+
+=item $obj -> global_end ()
+
+This method is called once for a testplan after all processing is done.
+You may use it to close files, etc.
+
+=item $obj -> item_pre ($arg)
+
+This method is called before any request is done.
+The argument is a hash that defines the values for this single request.
+This hash is defined within the testplan,
+see the XML representation of C<< <request> >> in L<WWW::Webrobot::pod::Testplan>
+or dump it.
+
+        use Data::Dumper; print Dumper $arg;
+
+=item $obj -> item_post($r, $arg)
+
+This method is called after any request has completed.
+
+B<$r> is a L<HTTP::Response> object.
+It contains the both the request and the response.
+
+There may be situations where your testplan request results in a
+authentification or redirecting response
+(got a 401 authenticate response or 3xx redirect response).
+
+In this case Webrobot does the necessary follow up requests
+as defined in L<LWP::UserAgent>.
+You may access any chaining requests via the C<_previous> Attribute.
+
+B<$arg> is the same as in C<item_pre>
+
+
+=begin comment
+
+=item $obj -> item_post_change ($r, $arg, $index)
+
+[EXPERIMENTAL]
+This method is only required in conjunction with L<Print::FilterHTTP>
+for the use with HttpSniffer.pl.
+It is not required for output filters within the config file.
+
+This method is called if a request needs an update.
+See  L<Print::FilterHTTP> for details.
+
+B<$r> and B<$arg> are the same as in C<item_post>.
+B<$index> is the index to be updated.
+
+=end comment
+
+=back
+
+
+=head1 IMPLEMENTING CLASSES
+
+=over
+
+=item L<WWW::Webrobot::Print::Test>
+
+This listener produces output for L<Test::Harness> on STDOUT.
+Preferred listener for terminal output.
+
+=item L<WWW::Webrobot::Print::Html>
+
+This listener generates a bunch of HTML files to be viewed with a web browser.
+No output to STDOUT.
+
+=begin comment
+
+This is the only one that supports C<item_post_change>.
+
+=end comment
+
+=item L<WWW::Webrobot::Print::Text>
+
+This listener produces output as plain text on STDOUT.
+Still working but no longer maintained, use L<WWW::Webrobot::Print::Test> instead.
+
+=item L<WWW::Webrobot::Print::File>
+
+Write response content to the file system
+and diff to a previous run.
+Prints to STDOUT in diff-mode only.
+
+=item L<WWW::Webrobot::Print::MakeTestplan>
+
+Write out all visited urls.
+This is usefull
+if you run L<WWW::Webrobot::Recur::LinkChecker> or
+L<WWW::Webrobot::Recur::Browser> where additional urls are visited.
+The output format is suitable for L<webrobot-gen-plan>.
+
+=back
+
+
+=head1 SEE ALSO
+
+L<WWW::Webrobot::pod::Config>
+
+L<WWW::Webrobot>
+
+
+=head1 AUTHOR
+
+Stefan Trcek
+
+=head1 COPYRIGHT
+
+Copyright(c) 2004 ABAS Software AG
+
+This software is licensed under the perl license, see LICENSE file.
+
+=cut
+
+1;

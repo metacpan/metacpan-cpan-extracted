@@ -1,0 +1,24 @@
+Revision history for Perl extension Win32::Guidgen.
+
+0.04 Mon Apr 12 23:31:00 2004
+	- added "gen" and "generate" methods.
+	- Neil Hunt <neilh@_NOSPAM_thehunts.id.au> 
+		(Take out '_NOSPAM_', to send) contributed a new 
+		version of the GUID generating code which eliminiates
+		the OLE32.DLL dependency. The code now calls
+		the RPC function UuidCreate() directly.
+
+0.03 Mon Apr 12 22:51:00 2004
+	- updated email address. Fixed doc typo.
+
+0.02  Wed Aug 01 14:34:37 2001
+	- forgot to strip trailing NULL from output. Thanks to
+		Steve Heckt <stevehec@_NOSPAM_wrq.com> 
+		(Take out '_NOSPAM_', to send) for pointing it out
+		and suggesting a fix.
+
+0.01  Thu Jul 26 23:26:48 2001
+	- original version; created by h2xs 1.20 with options
+		-XA -n Win32::Guidgen
+
+

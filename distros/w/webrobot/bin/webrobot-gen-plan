@@ -1,0 +1,198 @@
+#!/usr/bin/perl -w
+use strict;
+
+# Author: Stefan Trcek
+# Copyright(c) 2004 ABAS Software AG
+
+use Getopt::Long;
+use CGI;
+
+my $USAGE = <<'EOF';
+USAGE: webrobot-gen-plan [options] [files]
+Options:
+--help              give help
+--prefix=path       Prefixes any url with path
+--encode=url        encode url values according CGI (%xx notion)
+        data        encode form data values according CGI (%xx notion)
+--output=xml        (default) output testplan in WebRobot xml format
+        text        output in simple text format (filter)
+--data              (default) Parameters in GET will be shown as <data>
+                    section (as in POST)
+--nodata            Parameters in GET are untouched
+EOF
+
+my $USAGE_EXTENDED = $USAGE . <<'EOF';
+
+Converts line based testplans to xml testplans.
+
+>>> FORMAT
+        [protocol] url [data] (regular_expressions)*
+protocol:
+        GET | POST | HEAD | PUT | DELETE
+url:
+        check this url, -prefix is prepended
+data:
+        (POST only) data to be sent, name-value pairs
+regular_expression:
+        asserts that the resulting page matches these regular expressions
+
+>>> Examples (format)
+        /abc
+        GET /abc
+        POST /abc name1=value1&name2=value2
+        GET /abc expression1 expression2
+        POST /abc name1=value1&name2=value2 expression1 expression2
+
+>>> Examples (usage)
+        find . | webrobot-gen-plan -prefix='http://www/'
+EOF
+
+my $prefix;
+my @encode = ();
+my $output = "xml";
+my $get_data = 1;
+
+GetOptions(
+           help => sub {print $USAGE_EXTENDED; exit},
+           "prefix=s" => \$prefix,
+           "encode=s" => \@encode,
+           "output=s" => \$output,
+           "data!" => \$get_data,
+          ) || die $USAGE;
+my %encode = map {$_ => 1} @encode;
+my %METHOD = map {$_ => 1} qw(GET HEAD POST DELETE PUT); # ignore TRACE CONNECT
+
+MAIN: {
+    my $i = 0;
+    print qq{<?xml version="1.0" encoding="ISO-8859-1"?>\n}, "<plan>\n\n" if $output eq "xml";
+
+    while (<>) {
+        chomp;
+        s/^\s+//;
+        s/\s+$//;
+        next if /^#/ || /^$/;
+        my ($method, $url, $data, $assert) = split_line($_, $get_data);
+        $url = $prefix . $url if defined $prefix;
+
+        if ($encode{url}) {
+            my ($start, $ende) = split /\?/, $url, 2;
+            if ($ende) {
+                $ende = join "&",
+                    map {"$_->[0]=$_->[1]"}
+                    map {[ CGI::escape($_->[0]), CGI::escape($_->[1]) ]}
+                    cgi_parse($ende);
+            }
+            $url = "$start";
+            $url .= "?$ende" if defined $ende;
+        }
+        if ($encode{data} && $data) {
+            my @list = cgi_parse($data);
+            $data = join "&",
+                map {"$_->[0]=$_->[1]"}
+                map {[ CGI::escape($_->[0]), CGI::escape($_->[1]) ]}
+                @list;
+        }
+
+        if ($output eq "text") {
+            print "$method $url",
+                 defined($data) ? " $data" : "",
+                 $assert && @$assert ? " " . join(" ", @$assert) : "",
+                 "\n";
+        }
+        elsif ($output eq "xml") {
+            my $xml = "";
+            if ($data) {
+                my @list = cgi_parse($data);
+                my $parameter = join "",
+                    map {qq{    <parm name="$_->[0]" value="$_->[1]"/>\n}}
+                        map {[ html_encode($_->[0]), html_encode($_->[1]) ]}
+                            @list;
+                $xml .= "<data>\n$parameter</data>\n";
+            }
+            if ($assert && @$assert) {
+                $xml .= qq{<assert>\n};
+                $xml .= qq{    <status value="2"/>\n};
+                $xml .= join "", map {qq{    <regex value="$_"/>\n}} @$assert;
+                $xml .= "</assert>\n";
+            }
+            $url = html_encode($url) if $output eq "xml";
+            (my $comment_url = $_) =~ s/-+/-/g;
+            $xml =~ s/^/    /gm if $xml;
+            print <<EOF;
+<request>
+    <!-- $comment_url -->
+    <method value="$method"/>
+    <url value="$url"/>
+    <description value="$i"/>
+$xml</request>
+
+EOF
+        }
+        $i++;
+    }
+
+    print "</plan>\n" if $output eq "xml";
+}
+
+
+sub split_line {
+    my ($line, $get_data) = @_;
+
+    my ($method, $rest) = split /\s+/, $_, 2;
+    ($method, $rest) = ("GET", $method) if ! $METHOD{$method}; # insert missing GET
+    (my $url, $rest) = split /\s+/, $rest, 2;
+    my $data;
+    if ($method eq "POST") {
+        ($data, $rest) = split /\s+/, $rest, 2;
+    }
+    elsif ($method eq "GET" && $get_data) {
+        ($url, $data) = split /\?/, $url, 2;
+    }
+    my @assert = split /\s+/, ($rest || "");
+    return ($method, $url, $data, \@assert);
+
+}
+
+sub cgi_parse {
+    my ($data) = @_;
+    my $cgi = CGI->new($data);
+    my @str = ();
+    foreach (keys %{$cgi->Vars}) {
+        push @str, [$_, $cgi->param($_)];
+    }
+    return @str;
+}
+
+sub html_encode {
+    my ($parm) = @_;
+    $parm =~ s/&/&amp;/g;
+    $parm =~ s/</&lt;/g;
+    $parm =~ s/"/&quot;/g;
+    #$parm =~ s/\'/&#39;/g;
+    return $parm;
+}
+
+1;
+
+=head1 NAME
+
+webrobot-gen-plan - Generate an XML testplan from a simple ASCII format
+
+=head1 SYNOPSIS
+
+ webrobot-gen-plan --help
+
+=head1 DESCRIPTION
+
+Given an ASCII file
+This command runs a testplan.
+It takes two parameters,
+both are mandatory:
+
+
+=head1 SEE ALSO
+
+L<webrobot>
+
+
+=cut

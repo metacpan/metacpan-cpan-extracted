@@ -1,0 +1,101 @@
+#!/usr/bin/perl -w
+use strict;
+use warnings;
+
+# Author: Stefan Trcek
+# Copyright(c) 2004 ABAS Software AG
+
+#use diagnostics
+#$SIG{__DIE__} = \&Carp::confess;
+#$SIG{__WARN__} = \&Carp::cluck;
+
+use Getopt::Long;
+use WWW::Webrobot;
+
+
+my $USAGE = <<EOF;
+USAGE: webrobot [options]
+--help                 this message
+--version              version
+--cfg config           (mandatory) test configuration
+--testplan testplan    (mandatory) test plan file name
+--define name=value    define additional properties
+                       (like the one in the config file)
+EOF
+
+my $cfg_name;
+my $testplan_name;
+my %properties = ();
+GetOptions(
+           help => sub {print $USAGE; exit},
+           version => sub {print "Webrobot version: $WWW::Webrobot::VERSION\n"; exit},
+           "cfg=s" => \$cfg_name,
+           "testplan=s" => \$testplan_name,
+           "define=s" => \%properties,
+          ) || die $USAGE;
+
+MAIN: {
+    my @cmd_param = map { [$_, $properties{$_}] } keys %properties;
+    my $webrobot = defined $cfg_name
+        ? WWW::Webrobot -> new(\$cfg_name, \@cmd_param)
+        : WWW::Webrobot -> new("output=WWW::Webrobot::Print::Test\n", \@cmd_param);
+    my $exit = $webrobot -> run(\$testplan_name);
+
+    exit $exit;
+}
+
+1;
+
+=head1 NAME
+
+webrobot - run a testplan
+
+=head1 SYNOPSIS
+
+ webrobot --cfg example/cfg.prop --testplan example/testplan.xml
+
+=head1 DESCRIPTION
+
+This command runs a testplan.
+It takes two parameters,
+both are mandatory:
+
+=over
+
+=item --help
+
+Display this help.
+
+=item --version
+
+Print the version number.
+It is taken from WWW::Webrobot.pm
+
+=item --cfg config_filename
+
+This is the configuration file,
+see L<WWW::Webrobot::pod::Config>.
+This parameter is optional and will do a standard test output if missing.
+
+=item --testplan testplan_filename
+
+This is the testplan to run,
+see L<WWW::Webrobot::pod::Testplan>.
+
+=item --define property=value
+
+Define some property/value pairs.
+This overwrites properties defined in the config file.
+
+=back
+
+B<Change example/testplan.xml to your needs.>
+It is just an example and won't run successfully
+because it is taken from an intranet environment!
+
+=head1 SEE ALSO
+
+L<webrobot-load>
+
+
+=cut

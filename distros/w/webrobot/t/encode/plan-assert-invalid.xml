@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<plan>
+
+    <!--
+    The server is assumed to return UTF-8 and
+    it expects the POST encoded data in UTF-8
+    -->
+
+    <request>
+        <method value='GET'/>
+        <url value='${application}/html_as_utf8/t/encode/invalid.html'/>
+        <description value='Get HTML file with invalid encoding'/>
+        <assert>
+            <WWW.Webrobot.Assert>
+                <and>
+                    <status value='200'/>
+                    <not>
+                        <and>
+                            <string value="title"/>
+                            <regex value="A Title"/>
+                            <xpath xpath="//title/text()" value="A Title"/>
+                        </and>
+                    </not>
+                 </and>
+            </WWW.Webrobot.Assert>
+        </assert>
+   </request>
+
+    <request>
+        <method value='GET'/>
+        <url value='${application}/url/'/>
+        <description value='Get url with parameters with invalid encoding'/>
+        <assert>
+            <WWW.Webrobot.Assert>
+                <and>
+                    <status value='200'/>
+                    <not>
+                        <regex value='url'/>
+                    </not>
+                 </and>
+            </WWW.Webrobot.Assert>
+        </assert>
+        <data>
+            <parm name='first' value='firstvalue'/>
+        </data>
+   </request>
+
+</plan>

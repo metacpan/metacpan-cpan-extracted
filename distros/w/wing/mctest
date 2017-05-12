@@ -1,0 +1,173 @@
+#!/usr/bin/perl
+#
+# mctest - interactive testing of Mail::Cclient library
+# Copyright (C) 1998 by Malcolm Beattie
+#
+use Mail::Cclient qw(set_callback);
+use Term::ReadLine;
+use Term::ReadKey;
+use IO::Handle;
+
+if (@ARGV) {
+    print STDERR "Usage: mctest\n";
+    exit 2;
+}
+my $term = Term::ReadLine->new("Mail::Cclient test");
+
+set_callback
+	login => sub {
+	    my ($netmbx, $trial) = @_;
+	    print "Login trial #$trial\n";
+	    my $user = $netmbx->{user} || $term->readline("login: ");
+	    print "Password for $user: ";
+	    STDOUT->flush;
+	    ReadMode "noecho";
+	    chomp(my $password = <STDIN>);
+	    ReadMode "restore";
+	    print "\n";
+	    return ($user, $password);
+	},
+	"log" => sub {
+	    my ($str, $type) = @_;
+	    print "$type: $str\n";
+	},
+	dlog => sub { print "debug: $_[0]\n" },
+	list => sub {
+	    shift;
+	    print "list: @_\n";
+	},
+	status => sub {
+	    my ($stream, $mailbox, @attrs) = @_;
+	    print "status of mailbox $mailbox:\n";
+	    while (my ($key, $value) = splice(@attrs, 0, 2)) {
+		print "$key: $value\n";
+	    }
+	};
+
+my $mc;
+my $mailbox = "<none>";
+
+while (defined($_ = $term->readline("mctest> "))) {
+    $term->addhistory($_) if /\S/;
+    eval {
+	if (/^open (.*)/) {
+	    my $f = $1;
+	    print "opening mailbox $f...\n";
+	    $mc = defined($mc) ? $mc->open($f) : Mail::Cclient->new($f);
+	    if (defined($mc)) {
+		$mailbox = $f;
+		print "mailbox $mailbox: open OK\n";
+	    } else {
+		$mailbox = "<none>";
+		print "mailbox $mailbox: open failed\n";
+	    }
+	}
+	elsif (/^close/) {
+	    $mc->close;
+	    undef $mc;
+	    print "close mailbox $mailbox\n";
+	    $mailbox = "<none>";
+	}
+	elsif (/^expunge/) {
+	    $mc->expunge;
+	    print "expunged mailbox $mailbox\n";
+	}
+	elsif (/^flags (\d+)/) {
+	    my $msgno = $1;
+	    $mc->fetchstructure($msgno);
+	    $elt = $mc->elt($msgno);
+	    print join(", ", @{$elt->flags}), "\n";
+	}
+	elsif (my ($seq, $flag) = /^setflag (.*?) (.*)/) {
+	    $mc->setflag($seq, $flag);
+	}
+	elsif (my ($seq, $flag) = /^clearflag (.*?) (.*)/) {
+	    $mc->clearflag($seq, $flag);
+	}
+	elsif (my ($mailbox, $rest) = /^status (\S+)(.*)/) {
+	    $rest ||= "messages recent unseen uidvalidity uidnext";
+	    my @attrs = split(' ', $rest);
+	    $mc->status($mailbox, @attrs);
+	} elsif (/^stat/) {
+	    print $mc->nmsgs, " messages in mailbox $mailbox, ",
+		  $mc->recent, " recent\n";
+	    my @flags;
+	    push(@flags, "perm_seen") if $mc->perm_seen;
+	    push(@flags, "perm_deleted") if $mc->perm_deleted;
+	    push(@flags, "perm_flagged") if $mc->perm_flagged;
+	    push(@flags, "perm_answered") if $mc->perm_answered;
+	    push(@flags, "perm_draft") if $mc->perm_draft;
+	    push(@flags, "kwd_create") if $mc->kwd_create;
+	    push(@flags, "perm_user_flags") if $mc->perm_user_flags;
+	    print "mailbox flags: ", join(", ", @flags), "\n";
+	}
+	elsif (/^head (\d+)/) {
+	    my $msgno = $1;
+	    print $mc->fetchheader($msgno);
+	}
+	elsif (/^text (\d+)/) {
+	    my $msgno = $1;
+	    print $mc->fetchtext($msgno);
+	}
+	elsif (my ($msgno, $part) = /^body (\d+) (\d+)/) {
+	    print $mc->fetchbody($msgno, $part);
+	}
+	elsif (my ($seq, $mailbox) = /^move (.*?) (.*)/) {
+	    print $mc->move($seq, $mailbox) ? "OK\n" : "failed\n";
+	}
+	elsif (my ($seq, $mailbox) = /^copy (.*?) (.*)/) {
+	    print $mc->copy($seq, $mailbox) ? "OK\n" : "failed\n";
+	}
+	elsif (my ($mailbox) = /^create (.*)/) {
+	    print $mc->create($mailbox) ? "OK\n" : "failed\n";
+	}
+	elsif (/^size (\d+)/) {
+	    my $msgno = $1;
+	    my ($e, $body) = $mc->fetchstructure($msgno);
+	    print $body->lines, " lines, ", $body->bytes, " bytes\n";
+	}
+	elsif (my ($ref, $pat) = /^list (.*?) (.*)/) {
+	    $mc->list($ref, $pat);
+	}
+	elsif (my ($mailbox, $file) = /^append (.*?) (.*)/) {
+	    my $msg = `cat $file`;
+	    $mc->append($mailbox, $msg);
+	}
+	elsif (my ($file) = /^>\s*(.*)/) {
+	    my $filespec = $file;
+	    $filespec = ">>$file" unless $file =~ /^\|/;
+	    if (open(OUT, $filespec)) {
+		print "Switched output to $file\n";
+		select(OUT);
+	    } else {
+		print "Failed to switch output to $file\n";
+	    }
+	}
+	else {
+	    warn "bad command: $_\n" unless /^\?/ || /^help/;
+	    print <<'EOT';
+Commands:
+open mailbox
+close
+expunge
+flags msgno
+setflag seq flag
+clearflag seq flag
+status mailbox [attr ...]
+stat
+head msgno
+body msgno part
+text msgno
+move seq mailbox
+copy seq mailbox
+create mailbox
+size msgno
+list
+append mailbox file
+> file
+EOT
+	}
+    };
+    print "command died with error: $@\n" if $@;
+}
+

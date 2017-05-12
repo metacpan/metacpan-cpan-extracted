@@ -1,0 +1,128 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+# Author: Stefan Trcek
+# Copyright(c) 2004 ABAS Software AG
+
+use WWW::Webrobot::UseXPath;
+#use XML::Twig;
+
+my $PROMPT = "xpath> ";
+my $USAGE = <<EOF;
+USAGE: xpath-shell xml-filename [ xpath-expression ]
+Program goes into interactive mode if missing argument 'xpath-expression'.
+EOF
+
+my $HELP = <<'EOF';
+---- For the complete XPath reference visit http://www.w3.org/TR/xpath
+COMMAND        DESCRIPTION
+h help ?       this page
+quit q ^D      exit
+---- Any other terms are considered to be XPath expressions.
+SHORT SYNTAX   LONG SYNTAX    DESCRIPTION
+foo            element::foo   An element named foo
+/                             The root node
+/*                            Any node
+//foo                         An element <foo> at any level
+.                             This element
+..                            The parent element
+*                             Any element
+@foo           attribute::foo An attribute named foo
+@*                            Any attribute
+node()                        Any node
+text()                        A text node
+----
+FUNCTION       DESCRIPTION
+name(...)      Name of an attribute
+string(...)    Value of an attribute
+---- EXAMPLE
+//item[@id='222']/note/text()
+        find <item> tags at any level with attribute id='222', find the
+        direct child elemente <note>, show the contents of this <note>
+EOF
+
+MAIN: {
+    my ($filename, $xpath_string) = @ARGV;
+    die "$USAGE" if !defined $filename;
+    die "$USAGE" if ! (1 <= @ARGV && @ARGV < 3);
+
+    open XML, "<$filename" or die "Can't open file=$filename";
+    my $xml = join "", <XML>;
+    close XML;
+    my $xpath = WWW::Webrobot::UseXPath -> new($xml);
+    if (defined $xpath_string) { # batch mode
+        print $xpath -> extract($xpath_string), "\n";
+    }
+    else { # interactive mode
+        print "XPath shell, use 'quit' or EOF (^D) to terminate.\n";
+        print $PROMPT;
+        my $print_eol = 1;
+        LOOP: while (my $line = <STDIN>) {
+            chomp $line;
+            $line =~ s/^ *//;
+            $line =~ s/ *$//;
+            my ($cmd, $args) = split /\s+/, $line, 2;
+            SWITCH: foreach ($cmd) {
+                /^$/ and do {
+                    last SWITCH;
+                };
+                /^quit$/ || /^q$/ and do {
+                    $print_eol = 0;
+                    last LOOP;
+                };
+                /^save$/ and do {
+                    print "NOT IMPLEMENTED\n";
+                    #print "Writing to file=$filename\n";
+                    #open FILE, ">$filename" or die "Can't open file=$filename";
+                    #print FILE $xml->as_XML();
+                    #close FILE;
+                    last SWITCH
+                };
+                /^help$/ || /^h$/ || /^\?$/ and do {
+                    print $HELP;
+                    last SWITCH;
+                };
+                eval {
+                    if (my $result = $xpath -> extract($line)) {
+                        print "$result\n";
+                    }
+                };
+                print $@ if $@;
+            }
+            print $PROMPT;
+        }
+        print "\n" if $print_eol;
+    }
+}
+
+1;
+
+=head1 NAME
+
+xpath-shell - evaluate XPath expressions according to an XML file
+
+=head1 SYNOPSIS
+
+ xpath-shell xml-filename [xpath-expression]
+
+=head1 DESCRIPTION
+
+This program is used to evaluate XPath expressions.
+It can be used in two modes:
+
+=over
+
+=item batch mode
+
+Just give C<xpath-expression> a value.
+Consider using single quotes to prevent shell expansion.
+
+=item interactive mode
+
+If missing C<xpath-expression> the program goes into interactive mode.
+Press C<?> for help
+
+=back
+
+=cut

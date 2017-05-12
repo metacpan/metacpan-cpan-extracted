@@ -1,0 +1,143 @@
+This is how you install w3mir on a Unix system. Please see the file
+INSTALL.w32 for install instructions for win32 systems.
+
+INSTALLING PREREQUISITES:
+
+The prerequisites are the perl packages libwww-perl, and MIME-Base64.
+The w3mir install procedure will check for their presence and complain
+if they are not there, so if you are unsure what you have you might
+skip this part for now.
+
+- Get libwww-perl from CPAN 
+  (http://www.perl.com/CPAN/modules/by-module/WWW/).  W3mir now works
+  with LWP 5.40 and later versions, but any version after 5.08 should
+  be ok (though perhaps buggy).
+
+- Unpack it:
+
+    gzip -dc libwww-perl-*.tar.gz | tar xvBf -
+
+- Install it.  W3mir does not require the whole libwww-perl package and
+  all the packages that goes with it to work so you may follow these
+  install instructions instead of the libwww-perl install instructions
+  to get an easier install which will work with w3mir.
+
+    cd libwww-perl-*
+
+  Are you going to install it in the standard perl place (you need to
+  be the system administrator to do this)? If so:
+
+    perl Makefile.PL
+
+  If not (if you are a user):
+
+    perl Makefile.PL PREFIX=/some/dir
+
+  /some/dir could be ~ (as in your home directory).
+
+  IF you are installing an old LWP just for w3mir you can install both
+  the old LWP, the Base64 module and w3mir in a special PREFIX
+  separate from your usual install PREFIX.  This ensures that w3mir will
+  access the older version of LWP and that other software will access
+  the newer version.  If you do this make sure you install all of LWP,
+  Base64 and w3mir with the same PREFIX.
+
+  This step might produce some complaints;  A standard perl
+  installation will typically get messages about missing these
+  modules: IO::Socket, NET::FTP and MD5.  None of these need be
+  installed to run w3mir and so any error messages about these may
+  safely be ignored.
+
+    make
+    make test      (robot/ua and local/http might fail, that's OK)
+    make install
+
+  Now libwww-perl should be installed and working.
+
+- If you installed libwww-perl 5.40 or later you also need the URI
+  package (http://www.perl.com/CPAN-local/modules/by-module/URI/)
+
+- Unpack it:
+
+    gzip -dc URI-*.tar.gz | tar xvBf -
+
+- Install it:
+
+    cd URI-*
+
+  Then as above, either
+
+    perl Makefile.PL
+
+  or
+
+    perl Makefile.PL PREFIX=/some/dir
+
+  and then
+
+    make
+    make test
+    make install
+
+  Now URI should be installed and working.
+
+- You also have to get the MIME-Base64 package
+  (http://www.perl.com/CPAN/modules/by-module/MIME/)
+
+- Unpack it:
+
+    gzip -dc MIME-Base64-*.tar.gz | tar xvBf -
+
+- Install it:
+
+    cd MIME-Base64-*
+
+  Then, as above, either
+
+    perl Makefile.PL
+
+  or
+
+    perl Makefile.PL PREFIX=/some/dir
+
+  Continue:
+
+    make
+    make test      (it should print 'All tests successful.')
+    make install
+
+  Now MIME-Base64 should be installed and working.
+
+INSTALLING W3MIR:
+
+- Get w3mir (http://www.math.uio.no/~janl/w3mir/ or from CPAN)
+
+- Unpack it:
+
+     gzip -dc w3mir-*.tar.gz | tar xvBf -
+
+- Install it:
+
+     cd w3mir-*
+
+  Are you going to install it in the standard perl place? (You
+  probably need to be the system administrator to do this.)  If so:
+
+    perl Makefile.PL
+
+  If not (if you're a user):
+
+    perl Makefile.PL PREFIX=/some/dir
+
+  /some/dir could be ~ (as in your home directory).
+
+  then
+
+     make
+     make install
+
+w3mir should now be installed correctly.  And if it's installed in
+your path you can even run it.  If you use csh or tcsh you want to run
+'rehash' before the shell will find it.
+
+2000/01/15 - Nicolai Langfeldt

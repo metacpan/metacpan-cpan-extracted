@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!--
+FREE VARIABLES
+application
+-->
+
+<plan>
+
+    <request>
+        <method value='NOP'/>
+        <description value='Now doubled: Fred is ${double_fred_first} is ${double_fred_second}'/>
+    </request>
+
+</plan>

@@ -1,0 +1,45 @@
+Use of Webrobot on Perl 5.6.1
+=============================
+
+NOTE: It is STRONGLY RECOMMENDED to use Perl 5.8.0 or later.
+If you insist to use Perl 5.6.1, know what you do and accept
+less functionality read on.
+
+
+What to change?
+===============
+
+In Makefile.pl
+    require 5.006_001;
+instead of 5.8.0. Then install.
+
+Known tests to be failed:
+- t/encode*.t      # most of them
+- t/xhtml.t
+
+
+What you will miss
+==================
+
+You will miss character conversion. Although there is some support
+with MIME::Lite (that can be improved) you will encounter problems
+in decoding HTTP responses and matching against some predicates.
+You will also encounter warnings concerning encoding.
+
+
+How to make it usefull anyway
+=============================
+
+Use ASCII expressions only in <assertions> and <property>.
+
+
+How to improve Perl 5.6.1 compatibility
+=======================================
+
+Implement a better 'legacy_mode'.  See files
+        lib/WWW/Webrobot/MyEncode.pm
+        lib/WWW/Webrobot/UserAgentConnection.pm
+        lib/WWW/Webrobot/Html2XHtml.pm
+Make sure it will also run on Perl 5.8.0 and send me the patch.
+
+=== EOF ===============================================================

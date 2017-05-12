@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!--
+FREE VARIABLES
+application
+-->
+
+<!--
+# Test: cookies
+-->
+
+<plan>
+
+
+    <request>
+        <method value='GET'/>
+        <url value='${application}/tree.do?id=3&amp;a=1&amp;treeId=troja.mainmenu.id'/>
+        <description value='Request 1'/>
+    </request>
+
+    <request>
+        <method value='GET'/>
+        <url value='${application}/tree.do?id=3&amp;a=1&amp;treeId=troja.mainmenu.id'/>
+        <description value='Request 2'/>
+    </request>
+
+    <request>
+        <method value='GET'/>
+        <url value='${application}/tree.do?id=3&amp;a=1&amp;treeId=troja.mainmenu.id'/>
+        <description value='Request 3'/>
+    </request>
+    
+    <cookies value='off'/>
+
+    <request>
+        <method value='GET'/>
+        <url value='${application}/tree.do?id=3&amp;a=1&amp;treeId=troja.mainmenu.id'/>
+        <description value='Request 4'/>
+    </request>
+
+    <request>
+        <method value='GET'/>
+        <url value='${application}/tree.do?id=3&amp;a=1&amp;treeId=troja.mainmenu.id'/>
+        <description value='Request 5'/>
+    </request>
+
+    <cookies value='ON'/>
+
+    <request>
+        <method value='GET'/>
+        <url value='${application}/tree.do?id=3&amp;a=1&amp;treeId=troja.mainmenu.id'/>
+        <description value='Request 6'/>
+    </request>
+
+    <request>
+        <method value='GET'/>
+        <url value='${application}/tree.do?id=3&amp;a=1&amp;treeId=troja.mainmenu.id'/>
+        <description value='Request 7'/>
+    </request>
+
+    <cookies value='clear'/>
+
+    <request>
+        <method value='GET'/>
+        <url value='${application}/tree.do?id=3&amp;a=1&amp;treeId=troja.mainmenu.id'/>
+        <description value='Request 8'/>
+    </request>
+
+    <request>
+        <method value='GET'/>
+        <url value='${application}/tree.do?id=3&amp;a=1&amp;treeId=troja.mainmenu.id'/>
+        <description value='Request 9'/>
+    </request>
+
+    <cookies value='clear_temporary'/>
+
+    <request>
+        <method value='GET'/>
+        <url value='${application}/tree.do?id=3&amp;a=1&amp;treeId=troja.mainmenu.id'/>
+        <description value='Request 10'/>
+    </request>
+
+</plan>

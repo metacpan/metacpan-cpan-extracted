@@ -1,0 +1,51 @@
+Fixes in 1.0.6:
+- -f works with binary files
+- w3mir will no longer use 'Referer: (commandline)' when a URL is derived
+  from the commandline/config file.
+- More errormessage fixes
+- Fixed install instructions to warn against LWP 5.40.
+
+Fixes in 1.0.5: 
+- Better error-messaged in -quiet mode 
+- Fixed quoting. Both " and ' quotes in documents are accepted. 
+- Fixed timeout handling. 
+- Fixed broken connection handling. Incomplete documents are 
+  deleted and retried.
+- Fixed URL mangling problem. In 1.0.3 URLs like ``foo.html#bar'' would
+  be rewritten to ``#bar''. This is quite bad and makes a lot of mirrors
+  un-useable. 
+- -v now prints LWPs version as well as w3mirs version
+
+Features/bugs in 1.0.5 
+- As earlier, w3mir does not support cookies. I have received a patch for
+  basic cookie support but have not yet incorporated it due to
+  time-restraints.
+- There actually exists web servers that break the HTTP standard rather
+  thoroughly by not sending a Content-type header (this is mandatory in
+  the standard). W3mir will not discover that a HTML file is HTML in this
+  case and will not extract URLs from it.
+- If you rewrite the ending filename URLs with Apply rules (as in 
+  index.htm -> index.html) and there are links to index.htm#foo the link
+  will be incorrect after mirroring. The solution is to avoid those
+  kinds of rules. This was meant to be fixed in 1.0.3 (which broke it as
+  described above), I will fix it when I get more time. The fix is to
+  remove the #fragment part of URLs when they pass thru the apply
+  machinery. Patches accepted. 
+
+Fixes in 1.0.3: 
+- The -R/remove option to remove files is no longer more destructive
+  than intended.
+- Files with 'unsafe' characters in their filename is now saved as
+  "foo bar" instead of "foo%20bar" 
+- The -B switch works once again. 
+
+Fixes in 1.0.2: 
+- W3mir now only newline converts HTML files, all other files are handled
+  as binary. This should ensure file-integrety even when working with
+   mis-configured servers. 
+
+Fixes in 1.0.1: 
+-fa option and corresponding configuration file directive works again. 
+- Added -nnc option and a corresponding configuration file directive. It
+  disables newline conversions, which could corrupt files the Webserver
+  mis-declares. The HOWTO explains the uses of -nnc 

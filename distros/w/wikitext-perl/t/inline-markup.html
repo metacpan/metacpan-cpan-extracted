@@ -1,0 +1,39 @@
+<p>There are four types of text formattings defined in WikiText (&lt;--
+camelcaps do not indicate a link).  These are <em>emphasis</em>, <strong>strong</strong>,
+<u>underline</u>, <strike>strikethrough</strike> and <tt>typewriter font</tt>.</p>
+
+<p>These text formattings must obey certain rules.  They must enclose the
+surrounded text without whitespace: { some text } is not typewriter
+font, but &quot;some text&quot; in curly braces.  Use <tt>some text</tt> to generate
+typewriter font.</p>
+
+<p><strong>This disambiguates</strong> inline markup at the start of a paragraph from
+environment / paragraph types / (useless slash to confuse the parser).</p>
+
+<p>Text formatting markup can contain <u>multiple words</u> <strong>and even line
+breaks</strong>.  The markup characters may only follow/precede special
+characters, such as whitespace and sentence characters (<strong>bold</strong> vs
+not_underlined_).</p>
+
+<p>Mathematical formulas can also confuse the parser:</p>
+
+<p>a * b * c = c*b*a (nothings bold here)</p>
+
+<p>a <strong>b</strong> c = c <em>b</em> a (this is markup ... but who'd write like this and
+                   not mean it)</p>
+
+<p>Don't even think about doing inline markups with some s///g
+expressions.  The verbatim inline tag doesn't like it. *this* is not
+bold but <b>this</b> is.</p>
+
+<p>Links are simple: <a href="http://google.com/">google-fu</a> or
+<a href="http://heise.de/">heise.de</a>. <a href="mailto:dont@bother.me">dont@bother.me</a> is a mailto: link.</p>
+
+<p>Force image links to be inlined by using <img src="nothing.png" alt="nothing.png" /> or
+<img src="nothing.png" alt="an image showing nothing" />.</p>
+
+<p>With <a href="#google.com">google.com</a> you can generate section links, even if the target
+looks like something else.  With <a href="localhost">localhost</a> you can generate
+external links, even if the target doesn't seem to be.</p>
+
+<p>Links and verbatim obey the same rules as the text formatting markups.</p>

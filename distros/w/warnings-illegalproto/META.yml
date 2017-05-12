@@ -1,0 +1,22 @@
+---
+abstract: 'Disable illegal prototype warnings on old Perls'
+author:
+  - 'Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>'
+build_requires:
+  Test::More: '0.92'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: warnings-illegalproto
+requires:
+  strictures: '1'
+resources:
+  bugtracker: https://github.com/frioux/warnings-illegalproto/issues
+  homepage: https://github.com/frioux/warnings-illegalproto
+  repository: https://github.com/frioux/warnings-illegalproto.git
+version: '0.001003'

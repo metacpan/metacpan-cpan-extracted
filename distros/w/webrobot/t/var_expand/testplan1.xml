@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!--
+FREE VARIABLES
+application
+-->
+
+<plan>
+
+    <request>
+        <method value='NOP'/>
+        <description value='Fred is ${freds_firstname} is ${freds_surname}'/>
+    </request>
+
+    <include file='t/var_expand/testplan2.xml'>
+        <parm name='double_fred_first' value='double-${freds_firstname}'/>
+        <parm name='double_fred_second' value='double-${freds_surname}'/>
+    </include>
+
+</plan>

@@ -1,0 +1,178 @@
+0.81 2006-11-13
+        - Bug on <recurse> fixed and new tests. This feature had been lost in
+          one of the previous versions.
+        - webrobot (command line): --cfg is now optional.
+          It uses standard test output if missing
+
+0.80 2006-03-27
+        NOTE: (*) may brake old behaviour
+
+        Commands
+        * webrobot, webrobot-load, webrobot-send-mail:
+          The command line syntax has changed, all parameters now by GetOpt::Long
+          Example:
+            $ webrobot --cfg config --testplan testplan
+        - webrobot-load (webrobot is OS independant):
+          Die if operation system is MSWin32.
+          This is due to magic open for creating child processes.
+        - webrobot-load: Better output
+
+        <config> tag:
+        * <config> no longer supports a <description> tag inside
+        - <config> now supports <property> tags inside (definition of properties)
+          Now you can easily set properties without doing a HTTP request.
+
+        <request> tag:
+        - <http-header>: set specific HTTP headers per request
+
+        Assertions
+        - If assertion fails then print output source of assertion in
+          WWW::Webrobot::Print::Test::Test.pm and WWW::Webrobot::Print::Test::Html.pm
+        - Assertions: new <header> assertion for HTTP header fields
+        - Allow tag content instead of 'value' attribute. E.g.:
+          <string>something</string>   instead of
+          <string value="something"/>
+        - new predicate <file>, like <string> but reads from file
+        - Global assertion: These assertions will be executed for any request.
+          Two modes: new or add (for multiple global assertions).
+
+        Others
+        - update example code
+        - some warnings repaired (no harm).
+        - webrobot-gen-plan: new option --data (default)
+          Parameters in GET will be created as <data> section
+
+0.70 2005-03-14
+        - <assert>
+          Two reasonable defaults are introduced:
+          - the <WWW.Webrobot.Assert> tag is optional
+          - multiple top level predicates are allowed. The default
+            is a top level <and> operation.
+          This simplifies assertions.
+        - you may clear temporary cookies (aka close and reopen browser)
+        - exit when assertions encountered 'max_errors' (defined in the
+          config file) errors.
+        - WWW::Webrobot::Print::TestSimple: more output
+
+0.62 2004-12-07
+        - Sending mail: there is now a separate program 'webrobot-send-mail'.
+          It uses the same config file.
+          Sending mail by program 'webrobot' is deprecated.
+        - New output class WWW::Webrobot::Print::TestSimple
+          Contrary to WWW::Webrobot::Print::Test it doesn't output form data.
+
+0.61 2004-12-02
+        - Maintainance release to make it work on SunOS-5.7
+          The output of HTML::TreeBuilder::as_XML is quite different on Sun,
+          and I will be permissive now. Though the tests succeed a warning
+              "Parsing of undecoded UTF-8 will give garbage ..."
+          remains on some tests that handle asian characters.
+          (but this has nothing to do with the TreeBuilder fix).
+        - Some additional features (that I forgot) have been documented in v0.60
+        - This release was tested on Linux, SunOS-5.7, Win2000, AIX-5.1
+
+0.60 2004-11-29
+        NOTE: This version requires Perl 5.8.0 or later due to 'Encode'.
+        This was necessary for Unicode and MIME support.
+        See INSTALL.PERL-561 how to use it on Perl 5.6.1 (not recommended).
+
+        Unicode and MIME types: this should now work correctly,
+        tests are t/encode*.t, currently for iso-latin1 and utf-8.
+        TESTS FOR OTHER LANGUAGES/MIME-TYPES ARE HIGHLY WELCOME.
+
+        - HTTP response data are interpreted according its MIME type.
+        - FIXED: testplan input (XML file) is now true utf-8
+        - Parser HTML to XML: support for MIME types and utf-8
+        - HTTP-POST/GET with parameters:
+          The charset of the "content-type" header field of the previous
+          request is choosen as base for the %xx encoding. This mimics
+          usual web browser behaviour.
+
+        Properties/variables
+        - New properties from HTTP status line
+        - Property assigned with random number
+        - Display assigned properties in HTML and text output
+
+        WWW::Webrobot::Print::Html
+        - Display runtime-assigned properties
+        - display of non-HTTP actions (e.g. SLEEP, COOKIES) improved
+
+        WWW::Webrobot::Print::Test
+        - More (better) output in case of 'Not ok'
+        - Nicer output: Multibyte characters display \x{....}
+
+        Others
+        - Many new installation tests
+        - Version info for 'webrobot' and 'webrobot-load', '-v'
+        - Sending Mail: Attachments supported: You may redirect output to
+          a file and mail this file.
+        - FIXED: XML encoding (&entity;) in 'webrobot-gen-plan' produced
+          invalid testplans.
+        - FIXED: Some minor bugs, mostly display of text.
+
+0.51 2004-09-29
+        - Sleep tag in test plans: <sleep value="5"/>
+        - Dynamic properties are now also evaluated in assertions.
+        - Fix docs
+        - Tests improved
+
+0.50 2004-09-14   (*) break old test plans or configuration files
+        - Properties and configuration:
+          * Syntax for properties is ${property} "instead" of "{property}"
+          - Reading (dynamic) properties from file and from output of
+            external scripts. There are now static properties (evaluated when
+            test plan is read) from configuration file and dynamic properties
+            (evaluated when test plan is run) read from a file or script.
+          - Defining properties by means of a http response (also dynamic):
+            New properties can be defined when a request was done.
+            This include the returned header fields, regular expression
+            and XPath to the response content.
+          - Dynamic properties are now true variables and can be overwritten
+          - System property "unique id ${_id} in test plans
+            (most usefull for webrobot-load)
+          - Allow use of recently defined names within the configuration:
+                names=server=myhost 
+                names=application=http://${server}/app
+            In the last version these names worked within test plans only.
+
+        - Referrer:
+          - <referrer value='on'/> tag to enable referrers in HTTP requests
+          - In the config file: "referrer_bug=1"
+            to emulate a common browser bug when using referrers
+
+        - Output (WWW::Webrobot::Print::*)
+          - Show name/value pairs when using <config>
+          - Show value of XPath expression in ::Html
+          - ::Html: Better frame handling, some browser had been confused
+          - ::Test: Better output
+
+        - Test plan:
+          - GET request: <data> section as in POST. The url will be rewritten in
+            http://url?parm1=value1&parm2=value2
+          - New assertion predicate: <string value="..."/>
+          * <regex .../> in assertions had double "\" escapes, now normal regex.
+
+        - Others:
+          - httpd for tests during installation
+          - more tests
+          - API: WWW::Webrobot: Reading configuration and test plan from
+            variables, (was file read only)
+
+0.13 2004-05-24
+        - webrobot-load didn't work, fixed
+        - Minor bug fixes mainly concerning output
+
+0.12 2004-03-18
+        - Fix docs
+        - annotate copyright / COPYRIGHT
+        - Changes file corrected (date and version number)
+        - Clean up and some refactoring
+
+0.11 2004-03-12
+        - Fix for libwww-perl-5.76
+          (interface of LWP::UserAgent::redirect_ok has changed)
+        - Fix docs
+        - Some refactoring
+
+0.10 2004-03-11
+        - Initially published revision

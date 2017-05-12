@@ -1,0 +1,133 @@
+PROPAGANDA:
+
+See http://www.math.uio.no/~janl/w3mir/ for propaganda.
+
+--------------------------------------------------------------------------
+Q: Where can I get a new version of w3mir?
+A: The w3mir homepage is at http://www.math.uio.no/~janl/w3mir/.
+   W3mir is also distributed on CPAN: http://www.perl.com/
+
+Q: Are there any mailing lists?
+A: Yes, see below.
+
+Q: Should I subscribe to any of the mailinglists?
+A: Yes, if you use w3mir at all you should subscribe to 
+   w3mir-info@usit.uio.no, send e-mail to janl@math.uio.no to be
+   subscribed.
+
+Q: I found a bug!
+A: See below.
+
+Q: How do it...
+A: There is a w3mir-HOWTO.html file in the distribution.  Read it.
+
+--------------------------------------------------------------------------
+BUGS:
+
+- -lc switch does not work too well.
+
+Please see below for how to report bugs.
+
+--------------------------------------------------------------------------
+FEATURES (NOT bugs):
+
+- URLs with two /es ('//') in the path component does not work
+  as some might expect.  According to my reading of the http/url spec.
+  it is an illegal construct, which is a Good Thing, because I don't
+  know how to handle it if it's legal.
+- If you start at http://foo/bar/ then index.html might be gotten twice.
+- Some documents point to a point above the server root, i.e.,
+  http://some.server/../stuff.html.  Netscape, and other browsers, in
+  defiance of the URL standard documents will change the URL to
+  http://some.server/stuff.html.  W3mir will not.
+
+--------------------------------------------------------------------------
+MAIL LISTS, REPORTING BUGS:
+
+Please send ideas (see todo lists further down please) and bug reports
+to w3mir-core@usit.uio.no, please include URL and command line/config
+file that triggered the bug. w3mir-info@usit.uio.no is mainly used for
+announcing new versions or bugs to w3mir users. You will get more
+information following that list than anywhere else. And it's very low
+volume. To subscribe to these lists email janl@math.uio.no. The
+w3mir-core list is intended for w3mir hackers only.
+
+--------------------------------------------------------------------------
+COPYRIGTHS:
+
+w3mir, w3http.pm, w3pdfuri.pm and htmlop.pm are free but it is
+Copyrighted by the various involved hackers.  If you want to copy,
+hack or distribte w3mir you can do that providing you comply with the
+'Artistic License' enclosed in the w3mir distribution in the file
+named Artistic.
+
+--------------------------------------------------------------------------
+CREDITS:
+
+- Oscar Nierstrasz: Wrote htget
+- Gorm Haug Eriksen: Started w3mir on the foundations of htget,
+	contributed code later.
+- Nicolai Langfeldt: Learning from Oscar and Gorms mistakes, rewrote
+  everything.
+- Chris Szurgot: Adapting to win32, good ideas and code contribs, 
+  Debugging.  And criticism.
+- Rik Faith: Uses w3mir extensively, not shy about complaining and
+  commenting and suggesting.  
+- The libwww-perl author(s) that made adding some new featres
+  ridicolously easy.
+
+--------------------------------------------------------------------------
+TODO LIST:
+
+* TODO, version 1.1:
+
+Some of these are speculative, some others are very useful.
+
+- CSS parsing/support at the same level as HTML
+- Full support for APPLETS/OBJECT tags.
+- Alias rules.  These would enable w3mir to map ukoln.bath.ac.uk and 
+  bubl.bath.ac.uk to www.ukoln.ac.uk and know that the objects contained
+  in these are all the same.  Another use would be to mirror from a mirror
+  instead of the _real_ site, since the original site to which you have
+  references are on a slow link while the mirror is on a fast link.
+- FTP support (easy if through a http style ftp proxy, but is that what
+  we want?)
+- SHTTP/SSL support
+- Add a 3rd argument to URL/Also that denotes the depth of documents to
+  be retrived under each, this would autimatically generate fetch/ignore
+  rules.  How well these work would be dependent on the order of the
+  URL/Also directives though.  Must be documented.
+- Retrive recursively until N-th order links are reached.  This
+  differs siginificantly from directory recursion which we do now.  When
+  this is done w3mir should also know the difference between inline and
+  external links, inline links should always be retrived.  Trivia question:
+  What order is needed to reach every findable document on the web from
+  Yahoo?
+- Integrate with cvs or rcs (or other version controll system) to make
+  retriver able to reproduce mirrored site for any given date.
+- Some text processing:  Adding and removing text/sgml comments when suitable
+  options and tags are found.
+- Put retrival date-stamps as comments in html files, to document the when
+  and how of how this document was retrived.
+- Example: If you're mirroring a site primarily to get to the papers, but
+  the site has n versions of each paper: foo.ps.gz, foo.ps.Z, foo.dvi.gz
+  foo.dvi.Z, foo.tar.gz, foo.zip and you only need one version.  Implement
+  a way to get only one version of documents provided in multipele versions,
+  something like multi axis preference list to get only the most attractive
+  version of the doc.
+- Logging of retrivals to file, need to change every print to a functioncall.
+- Your suggestion here.
+
+* TODO, http related
+- Use Keep-alive.  Then we should probably stop using 30 second pauses
+  between document retrivals.
+- HTTP/1.1?  HTTP/1.1 servers should do keep-alive even with 1.0 requests.
+- Separate quenes for each server, interleave requests.
+- Authentication is only done if challenged now.  If a document in a
+  directory needs authentication it is very likely that all other documents
+  in that directory and subdirectories require authentication.
+
+* If perl gets threads:
+- Make the retrival and analysis engines separate threads, and have each
+  one retrival thread pr. method/server/port and do paralell retrivals.
+- This makes http/1.1 easier too.

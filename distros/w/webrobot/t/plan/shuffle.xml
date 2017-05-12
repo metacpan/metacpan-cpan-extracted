@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!--
+FREE VARIABLES
+application
+-->
+
+<!--
+# Test:
+#  - <entry>
+#  - <include>
+#  - <plan action="shuffle">
+-->
+
+
+<plan>
+
+    <include file='test_shop/anmelden2_de.xml'>
+        <parm name='application' value='{application}'/>
+        <parm name='username' value='bachmann'/>
+        <parm name='password' value='xxx'/>
+        <parm name='useragent' value=''/>
+    </include>
+
+    <entry>
+        <method value='GET'/>
+        <url value='{application}/shop/showProductGroup.do'/>
+        <assert>
+            <WebRobot.Assert>
+                <and>
+                    <status value='2'/>
+                    <regex value='Gruppenauswahl'/>
+                    <regex value='Abas Play-Shop'/>
+                    <regex value='Schmalz Play-Shop'/>
+                    <regex value='Hoesch Play-Shop'/>
+                </and>
+            </WebRobot.Assert>
+        </assert>
+        <description value='Produktkatalog Hauptseite'/>
+        <useragent value='koester'/>
+    </entry>
+
+    <plan action='shuffle'>
+
+        <entry>
+            <method value='GET'/>
+            <url value='{application}/shop/showProductGroup.do?productGroup=101'/>
+            <description value='Produkt 101'/>
+            <useragent value='koester'/>
+        </entry>
+
+        <entry>
+            <method value='GET'/>
+            <url value='{application}/shop/showProductGroup.do?productGroup=2015'/>
+            <assert>
+                <WebRobot.Assert>
+                    <and>
+                        <status value='2'/>
+                        <regex value='Abas Play-Shop'/>
+                        <regex value='Gruppenauswahl'/>
+                    </and>
+                </WebRobot.Assert>
+            </assert>
+            <description value='Produkt 2015'/>
+            <useragent value='koester'/>
+        </entry>
+
+        <entry>
+            <method value='GET'/>
+            <url value='{application}/shop/showProductGroup.do?productGroup=2053'/>
+            <assert>
+                <WebRobot.Assert>
+                    <and>
+                        <status value='2'/>
+                        <regex value='Abas Play-Shop'/>
+                        <regex value='Gruppenauswahl'/>
+                    </and>
+                </WebRobot.Assert>
+            </assert>
+            <description value='Produkt 205'/>
+            <useragent value='koester'/>
+        </entry>
+
+    </plan>
+
+    <entry>
+        <method value='GET'/>
+        <url value='{application}/shop/showProductGroup.do?productGroup=2012'/>
+        <assert>
+            <WebRobot.Assert>
+                <and>
+                    <status value='2'/>
+                    <regex value='Abas Play-Shop'/>
+                    <regex value='Gruppenauswahl'/>
+                </and>
+            </WebRobot.Assert>
+        </assert>
+        <description value='Produktkatalog abas-Shop'/>
+        <useragent value='koester'/>
+    </entry>
+
+    <include file='test_shop/abmelden_de.xml'>
+        <parm name='application' value='{application}'/>
+        <parm name='useragent' value=''/>
+    </include>
+
+</plan>

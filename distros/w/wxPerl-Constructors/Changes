@@ -1,0 +1,24 @@
+Revision history for wxPerl-Constructors
+
+v0.0.4 2007-04-22
+
+  * 'Build' ne 'build', but the toy computers of the world don't seem to
+    comprehend that whole "A is not a" thing, so I get to build a new
+    distribution and try to make an appropriate changelog entry without
+    using the select portion of the English language which more
+    correctly expresses my opinions of proprietary operating systems
+    designed by incompetent luddites.
+
+v0.0.3 2007-04-19
+
+  * added new classes (those matching /Class::new(parent, id/)
+
+v0.0.2 2007-04-08
+
+  * fixed bug in handling optional arguments
+
+v0.0.1 2007-04-04
+
+  * First Public Release
+
+# vim:ts=2:sw=2:et:sta

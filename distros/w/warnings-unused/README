@@ -1,0 +1,29 @@
+NAME
+
+warnings::unused - Produces warnings when unused variables are detected
+
+SYNOPSIS
+
+	use warnings::unused; # installs the check routine as 'once'
+	use warnings 'once';  # enables  the check routine
+
+INSTALLATION
+
+	To install this module, run the following commands:
+
+		perl Makefile.PL
+		make
+		make test
+		make install
+
+DEPENDENCIES
+
+	Perl 5.8.1 or later, and a C compiler.
+
+COPYRIGHT AND LICENCE
+
+	Copyright (C) 2008, Goro Fuji <gfuji(at)cpan.org>, Some rights reversed.
+
+	This library is free software; you can redistribute it and/or modify
+	it under the same terms as Perl itself.
+

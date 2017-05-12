@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/warnings-DynamicScope.t
+lib/warnings/DynamicScope.pm
+META.yml                                 Module meta-data (added by MakeMaker)

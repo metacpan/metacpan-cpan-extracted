@@ -1,0 +1,18 @@
+Revision history for method
+
+0.10
+	*** IMCOMPATIBLE CHANGES **
+	- change the interface to be compatible with warnings::unused
+	- support "-lexical" and "-global" subdirective
+
+0.03 Tue Sep 16 09:28:00 2008
+	- change reported method names to the original names
+	- using kGVOP_gv to get gv
+	- add t/03_with_ck_pragma.t
+
+0.02 Tue Sep  9 09:24:38 2008
+	- fix SEGV on perls without threads
+
+0.01  Fri Sep  5 22:09:00 2008
+	- original version; created by Module::Starter
+

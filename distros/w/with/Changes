@@ -1,0 +1,17 @@
+Revision history for with
+
+0.02    2008-05-14 21:40 UTC
+        + Doc : Added a few caveats.
+        + Doc : POD quirks.
+        + Fix : scripts/func.pl wasn't printing all the functions it found, so
+                all those core functions were not listed (and hence handled) :
+                  chomp dbmopen endprotoent flock gethostbyaddr getnetent
+                  getprotobynumber getservbyport index local my printf recv
+                  rmdir sethostent setsockopt socketpair symlink tied untie
+        + Fix : Missing 'cmp' operator in the exclude list.
+        + Fix : A wrapped core function call wrongly resulted into a method call
+                when repeated at least two times.
+
+0.01    2008-05-08 22:35 UTC
+        First version, released on an unsuspecting world.
+

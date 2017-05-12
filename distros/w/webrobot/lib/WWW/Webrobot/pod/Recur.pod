@@ -1,0 +1,110 @@
+=head1 NAME
+
+WWW::Webrobot::pod::Recur - Interface for traversing a site / generating multiple urls
+
+=head1 SYNOPSIS
+
+Usage in a test plan:
+
+    <request>
+        <method value='GET'/>
+        <url value='http://server.org/start.html'/>
+        <recurse>
+            <WWW.Webrobot.Recur.LinkChecker>
+                <and>
+                    <url value="http://server.org/"/>
+                    <scheme value="http"/>
+                    <not><url value="logout\.jsp"/></not>
+                    <not><url value="logout\.do"/></not>
+                    <not><url value="setUserLocale.do"/></not>
+                </and>
+            </WWW.Webrobot.Recur.LinkChecker>
+        </recurse>
+        <description value='Check site'/>
+    </request>
+
+For writing your own class please study the source of
+L<WWW::Webrobot::Recur::Browser> or L<WWW::Webrobot::Recur::LinkChecker>.
+
+
+=head1 DESCRIPTION
+
+This interface allows you to visit new urls
+starting from an url given in a testplan.
+
+
+=head1 METHODS
+
+If you want to write a recursion class you must implement
+the following methods:
+
+=over
+
+=item $obj -> next ($url)
+
+Synopsis: 
+
+ ($newurl, $caller_pages) = $recurse -> next($r);
+
+C<$newurl> is the next url to visit and
+C<$caller_pages> is a list of values.
+This list should indicate where C<$newurl> has been found.
+
+If you want to stop traversing than return
+C<(undef, undef)>.
+
+
+=item $obj -> allowed ($url)
+
+It takes a string url as argument and must return B<1>
+if this url is allowed and B<0> if it is not allowed.
+
+If you wonder why this method is needed - here is an explanation:
+Returning allowed URLs by C<next> is not sufficient
+because URLs may be redirected via 3xx codes.
+This redirection is done automatically by L<WWW::Webrobot>
+via L<HTTP::UserAgent> and must therefore be savely excluded in
+L<HTTP::UserAgent>.
+That's where the C<allowed> method is used.
+
+=back
+
+
+=head1 IMPLEMENTING CLASSES
+
+=over
+
+=item L<WWW::Webrobot::Recur::Browser>
+
+Follow all frames and images.
+
+=item L<WWW::Webrobot::Recur::LinkChecker>
+
+Follow all frames, images and links you can get.
+
+=item L<WWW::Webrobot::Recur::RandomBrowser> B<[EXPERIMENTAL]>
+
+Follow links randomly.
+
+=back
+
+
+
+=head1 SEE ALSO
+
+L<WWW::Webrobot::pod::Testplan>
+
+
+=head1 AUTHOR
+
+Stefan Trcek
+
+=head1 COPYRIGHT
+
+Copyright(c) 2004 ABAS Software AG
+
+This software is licensed under the perl license, see LICENSE file.
+
+=cut
+
+1;

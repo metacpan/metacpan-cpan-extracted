@@ -1,0 +1,48 @@
+#!/bin/sh
+#
+# wing       Start/stop wing daemon (maild) and tune file-max and inode-max
+#
+# chkconfig: 345 8 99
+# description: Starts/stops wing daemon (maild) and tunes file-max and inode-max
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+[ -x /usr/sbin/maild ] || exit 0
+
+PATH=/usr/local/sbin:/usr/local/bin:$PATH
+export PATH
+
+# See how we were called.
+case "$1" in
+  start)
+	echo -n "Starting maild: "
+	su httpd -c "sh -c 'exec /usr/sbin/maild >> /var/lib/maild/maild.log 2>&1' &" 
+	echo -n "maild"
+	#
+	# Tune /proc. This isn't the best place to put this but there's
+	# nowhere else particularly suitable so it'll do for now.
+	#
+	echo 24576 > /proc/sys/kernel/inode-max
+	echo 8192 > /proc/sys/kernel/file-max
+
+        touch /var/lock/subsys/maild
+	echo
+        ;;
+  stop)
+	echo -n "Stopping maild: "
+	kill `cat /var/lib/maild/maild.pid`
+	echo "maild"
+        ;;
+  restart)
+	$0 stop
+	$0 start
+	;;
+  *)
+        echo "Usage: maild {start|stop|restart}"
+        exit 1
+esac
+
+exit 0
+
+

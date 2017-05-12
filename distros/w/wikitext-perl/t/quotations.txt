@@ -1,0 +1,36 @@
+= Quotations =
+
+
+== Simple ==
+
+> This space intentionally has nothing but text explaining why this
+> space has nothing but text explaining that this space would
+> otherwise have been left blank, and would otherwise have been left
+> blank.
+
+
+== Multiple Paragraphs ==
+
+> At the source of every error which is blamed on the computer, you will
+> find at least two human errors, one of which is the error of blaming
+> it on the computer.
+>
+> -- unknown
+
+
+== Nested ==
+
+> | Pluto Neptune Uranus Saturn Jupiter Mars Earth Venus Mercury Sun
+  |  .      o      o      o      O      .     .     .      .    /\
+  |                                           ^                 \/
+  |                                           -- You are here
+
+
+== Complex ==
+
+> The two rules of optimization:
+>
+>   # Don't do it
+>   # (for experts only) Don't do it yet
+>
+> -- M. A. Jackson (Principles of Program Design)

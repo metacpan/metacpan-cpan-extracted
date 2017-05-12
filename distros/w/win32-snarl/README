@@ -1,0 +1,23 @@
+Win32::Snarl version 1.01
+=========================
+
+Perl interface to Snarl <http://www.fullphat.net/>
+
+To install this module type the following:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+This module requires these other modules and libraries:
+
+    Win32::GUI 1.03
+
+Copyright (C) 2010 by Alan Berndt
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

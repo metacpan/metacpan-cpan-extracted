@@ -1,0 +1,84 @@
+Requirements
+============
+
+- perl-5.8.0 or later. See INSTALL-561 if you insist installing it on Perl 5.6.1.
+
+- a bunch of modules, see Makefile.PL
+
+- Expat http://www.jclark.com/xml/expat.html and http://expat.sourceforge.net/
+  You need to install expat *before* you install this module because
+  XML::Parser requires Expat.
+
+- [optional] If you wish https support you must install OpenSSL
+  http://www.openssl.org/ and Crypt::SSLeay
+  You may install it later. Follow the installation instructions in
+  Crypt::SSLeay if your OS comes with OpenSSL installed, but you encounter
+  problems (that is, install it again in in the preferred location).
+
+- [optional] If you wish to send e-mail install MIME::Lite.
+
+
+Installation
+============
+
+It's all pure Perl, but you need a bunch of modules from CPAN.  The
+easiest way to install this distribution is using the CPAN shell.
+
+    perl -MCPAN -e shell
+    install WWW::Webrobot
+
+Of course you may use the traditional canon (after you installed all
+required modules, see Makefile.PL):
+             
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Installation problems
+=====================
+
+I suggest the following order
+
+- Install Perl
+- Install expat http://sourceforge.net/projects/expat/
+- Install Webrobot via cpan shell
+- [optional] Install MIME::Lite (for sending mails)
+- [optional] Install OpenSSL (for usage by  Crypt::SSLeay)
+- [optional] Install Crypt::SSLeay (for https support)
+
+Although expat is installed in many operating systems it may be
+in another destination as XML::Parser will expect it.
+If you fail installing Webrobot then I suggest this order:
+
+- install LWP
+- install expat into the standard directories
+- XML::Parser
+- again install Webrobot via cpan shell
+
+
+Installation on Windows
+=======================
+
+If you are on a windows box you probably should use 'nmake' rather than 'make'.
+If you can't install perl yourself you may
+
+- use the ActiveState distribution http://activestate.com/
+
+- use the Perl version on http://webrobot.abas.de/download.html
+  It contains all necessary modules, but doesn't contain webrobot itself.
+  - Unpack it to c:/perl or anywhere else
+  - set PATH to find perl (e.g. c:/perl/bin)
+  - unpack webrobot*.tgz into <WEBROBOT>
+  - set PERL5LIB=<WEBROBOT>/lib
+
+
+LICENSE
+=======
+
+AUTHOR: Stefan Trcek
+
+COPYRIGHT: Copyright(c) 2004 ABAS Software AG
+
+LICENSE: This software is licensed under the Perl license, see LICENSE file.

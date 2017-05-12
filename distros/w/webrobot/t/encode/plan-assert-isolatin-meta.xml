@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<plan>
+
+    <!--
+    The server is assumed to return iso-8859-1 and
+    it expects the POST encoded data in iso-8859-1
+    -->
+
+    <request>
+        <method value='GET'/>
+        <url value='${application}/html_as_utf8/t/encode/isolatin-meta.html'/>
+        <description value='Get HTML file as iso-latin, check umlaut-a'/>
+        <property name='umlaut_sym_value' value="ä"/>
+        <property name='umlaut_sym_xpath' xpath="string(//meta[@name='description']/@content)"/>
+        <assert>
+            <WWW.Webrobot.Assert>
+                <and>
+                    <status value='200'/>
+                    <string value='ä'/>
+                    <string value='&lt;meta name="description" content="ä">'/>
+                 </and>
+            </WWW.Webrobot.Assert>
+        </assert>
+   </request>
+
+    <request>
+        <method value='GET'/>
+        <url value='${application}/html_as_utf8/t/encode/isolatin-meta.html'/>
+        <description value='Get same HTML file as iso-latin, check variables are ok'/>
+        <assert>
+            <WWW.Webrobot.Assert>
+                <and>
+                    <status value='200'/>
+                    <string value='${umlaut_sym_value}'/>
+                    <string value='${umlaut_sym_xpath}'/>
+                    <xpath xpath='//title/text()' value='ä'/>
+                 </and>
+            </WWW.Webrobot.Assert>
+        </assert>
+   </request>
+
+</plan>

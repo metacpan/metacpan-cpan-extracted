@@ -1,0 +1,23 @@
+---
+abstract: 'Perl extension for Snarl notifications'
+author:
+  - 'Alan Berndt, E<lt>alan@eatabrick.orgE<gt>'
+configure_requires:
+  Module::Build: 0.36
+dynamic_config: 0
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Win32-Snarl
+provides:
+  Win32::Snarl:
+    file: lib/Win32/Snarl.pm
+    version: 1.01
+requires:
+  Win32::GUI: 1.03
+  perl: v5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.04

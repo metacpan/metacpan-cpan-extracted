@@ -1,0 +1,64 @@
+There are different types of paragraphs.  Ordinary paragraphs, blocks
+of preformatted text, blocks of verbatim html markup and text, and
+code blocks.
+
+{ /Blocks of preformatted/ text are delimited with single curly
+braces.
+
+All paragraphs that contain preformatted text *can contain empty
+lines*, that are normally used to separate distinct paragraph.
+Preformatted paragraphs are exempted from this rule. }
+
+{{
+
+  <p><em>Verbatim blocks</em> are an escape route, if the WikiText markup is
+  not enough.  Don't confuse verbatim blocks with verbatim inline
+  markup.  Verbatim blocks, in contrast to ordinary paragraphs with
+  inline verbatim content, don't force paragraph (&lt;p&gt;) context
+  on their content.</p>
+
+}}
+
+| Code blocks are like preformatted blocks, but also suppress the
+| normal WikiText markup substitution.  This allows the writer to
+| include arbitrary text (like sourcecode, quotations, etc), without
+| needing to escape any characters.
+
+(code)
+With the (code) ... (end) syntax, the text doesn't need to be
+specially indented.  Just make sure there's no line in the text that
+contains only the string "(end)".  It might be mistaken for the end of
+the paragraph.
+
+Remember: Don't terminate on empty lines.
+(end)
+
+Indentation is measured on the second line of a paragraph, if
+possible.  This allows the first line to be indented further than the
+rest of the paragraph, which is common practice in some countries.
+
+Special Note::
+Ordinary paragraphs can contain a heading.  It is marked with a pair
+of colons, on the first line.
+
+Special Note #2:: Paragraph headings don't necessarily stand alone on
+the first line.
+
+No extraneous newline::
+
+         -----------------------------------------------------
+
+(comment)
+There's an <hr> above.  This comment won't make it into the output.
+(end)
+
+{{ <p><b>Proposition to parsing</b></p> }}
+
+Read a single line, store indentation.  Determine paragraph type from
+first few characters and select end-of-paragraph predicate (based on
+line content and line indentation).  End all environments with higher
+indentation than current paragraph.  Read lines until
+end-of-paragraph, stripping leading whitespace.
+
+Run whole paragraph through inline markup substitution (or other
+processing), if applicable, and output the paragraph.

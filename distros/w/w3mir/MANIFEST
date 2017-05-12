@@ -1,0 +1,15 @@
+Artistic
+Changes
+INSTALL
+INSTALL.w32
+MANIFEST
+Makefile.PL
+README
+example.cfg
+htmlop.pm
+multiscope.cfg
+w3http.pm
+w3mfix.PL
+w3mir-HOWTO.html
+w3mir.PL
+w3pdfuri.pm

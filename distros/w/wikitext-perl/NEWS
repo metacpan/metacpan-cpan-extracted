@@ -1,0 +1,5 @@
+wikitext-1.01 (10-Feb-2007)
+
+* The first official version after a year of usage inside Podius CMS.
+* Nearly full support for output formats: HTML, Latex, Pod.
+* Specification at: http://podius.wox.org/documentation/wikitext-spec.html

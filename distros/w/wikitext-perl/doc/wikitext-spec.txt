@@ -1,0 +1,470 @@
+= Motivation =
+
+WikiText is an attempt to specify a very simple text markup protocol,
+that retains readability and adheres to formatting conventions
+commonly found in text based communication, such as email or irc.
+
+WikiText formatted documents strive to be easily readable by humans,
+judiciously using whitespace and special characters for formatting,
+and not cluttering the text with an abundance of markup tags.
+
+WikiText documents can be converted to other formats, such as HTML or
+Latex, with relative ease.
+
+
+= Document Structure =
+
+A WikiText document consists of sections, environments, and
+paragraphs.  Sections define the coarsest structure of the document,
+and can contain environments and paragraphs.  Environments define the
+finer structure of the document, and can contain other environments
+and paragraphs.  Paragraphs are the basic elements of a document, and
+contain the actual text, associated with a certain meaning.
+
+A document is divided into sections.  Each section consists of a
+heading and a list of environments or paragraphs.  A section extends
+from its heading to the beginning of the next section, or the end of
+the document.
+
+Environments further subdivide the sections of the document.
+Environments can nest, thus forming a tree structure.  Nesting is
+controlled by indentation.  Environments are nested into the last
+opened environment with less indentation.  Paragraphs are nested into
+the last opened environment with less or equal indentation.
+
+Four different environments are defined:
+
+  o Quotations,
+  o Listings,
+  o Enumerations, and
+  o Descriptions.
+
+Three types of paragraphs, and three types of special, paragraph-like
+blocks are defined:
+
+  o Normal paragraphs,
+  o Preformatted text blocks, and
+  o Code blocks.
+
+The three special blocks are
+
+  o Tables,
+  o Horizontal rules, and
+  o Verbatim blocks.
+
+Text in normal paragraphs and preformatted text blocks can be
+formatted with inline markup.  Inline markup is defined for
+
+  o Emphasis,
+  o Strong,
+  o Underline,
+  o Strikeout, and
+  o Typewriter font.
+
+
+= Inline Markup =
+
+== Text Formatting ==
+
+Text formatting tags must enclose the formatted text without
+intermediate whitespace.  The opening character must be preceded by
+whitespace, an opening senctence character ("(", "¿", etc) or the
+beginning-of-paragraph, the closing character must be followed by
+whitespace, a closing sentence character (".", "!", "?", ",", ":",
+";", etc) or the end-of-paragraph.
+
+Valid inline formatting tags are "/" for emphasis, "*" for strong, "_"
+for underline, "-" for strikeout, and "{}" for typewriter font.
+
+Note:: Underline and strikeout are not allowed in strict variants of
+HTML.  Strikeout in Latex output requires the {sout} package.
+External links in Latex require the {url} and optionally the
+{hyperref} package.
+
+Example::
+
+  | A -big- /small/ sample paragraph with *simple* text _formatting_
+  | and a bit of {typewriter} font.
+
+Output::
+
+  > A -big- /small/ sample paragraph with *simple* text _formatting_
+  > and a bit of {typewriter} font.
+
+
+== Links ==
+
+Links are denoted by enclosing the link target in square brackets ("["
+and "]").  A link can point to other sections in the same document
+(see also section [#Sections]), external objects, and images.  If the
+type of the link is not mentioned explicitly, it is determined from
+the link target.
+
+The type of the link can be set explicitly by adding a control
+character after the opening bracket.  A greater-than character
+("[>url]") indicates an external link, a hash-mark ("[#section]")
+indicates an internal link, and an equal-sign ("[=image]") includes
+the linked object directly.
+
+A link or image description can be specified by adding a vertical bar
+and the description after the link target ("[url|title]").  If no link
+description is given, the target will be used.
+
+Incomplete link targets are automatically completed by adding
+"http://" or "mailto:".
+
+Example::
+
+  | This is a simple [http://nowhere.org/|link].  Another link to
+  | [podius.wox.org].
+
+Output::
+
+  > This is a simple [http://nowhere.org/|link].  Another link to
+  > [podius.wox.org].
+
+
+== Verbatim Text ==
+
+A section of text enclosed in a double pair of curly braces is copied
+verbatim to the output, without replacing markup or HTML control
+characters.
+
+Example::
+
+  | <em>substituted</em> and {{<em>verbatim *stuff*</em>}}
+
+
+= Paragraphs and Paragraph-like Blocks =
+
+There are different types of paragraphs.  The type of each paragraph
+can be determined from its first line.
+
+
+== Ordinary Paragraphs ==
+
+Text in ordinary paragraphs is subject to automatic line breaking, and
+may be formatted using inline markup.  Ordinary paragraphs can
+optionally contain a paragraph heading.
+
+Paragraphs end with a single empty line, or when a line with less
+indentation than the paragraph is encountered.
+
+If the first line of a paragraph contains two colons in a row ("::"),
+the text before is taken to be the paragraph heading.
+
+Example::
+
+  | First simple paragraph.
+  |
+  | Heading::
+  | A lot of text in the second paragraph.
+
+Output::
+
+  > First simple paragraph.
+  >
+  > Heading::
+  > A lot of text in the second paragraph.
+
+
+== Preformatted Blocks ==
+
+Text in preformatted blocks in not subject automatic line breaking and
+is set using a typewriter font.  It can, however, still be formatted
+using inline markup.
+
+Preformatted blocks start with a single curly, opening brace ("{"),
+followed by a space or line break, and end with a single curly,
+closing brace ("}"), followed by a line break.
+
+Contained lines must be indented at least as far as the opening brace.
+
+Example::
+
+  | {
+  | Hi there!
+  |         ^-- *exclamation mark*
+  | }
+
+Output::
+
+  > {
+  > Hi there!
+  >         ^-- *exclamation mark*
+  > }
+
+
+== Code Blocks ==
+
+Code blocks contain material like source code or shell session
+records.  The content is not subject to automatic line breaking, and
+inline markup is not recognized.  The output is set using a typewriter
+font.
+
+Code blocks are indented with vertical bars ("|") or exclamation marks
+("!").  The indentation can be omitted if the text block is introduced
+by "(code)" and terminated by "(end)", each on a line by itself.
+
+Example::
+
+  | | +------+
+  | | | w00t |
+  | | +------+
+
+
+Output::
+
+  > | +------+
+  > | | w00t |
+  > | +------+
+
+
+== Tables ==
+
+Tabular material is delimited by a line containing only plus- ("+") and
+minus-signs ("-") at the front, and an empty line at the end.  The
+starting line must start and end with a plus-sign.
+
+Every line (except for separator lines) corresponds to a single table
+row.  Table cells are separated by vertical bars ("|").  Cells spanning
+multiple columns can be specified by repeating the delimiter.
+
+The table can optionally include separator lines, consisting of only
+plus- and minus-signs.  A trailing separator line (if any) is discarded
+entirely.  Separator lines inside the table mark the previous row as a
+table heading.  The separator line itself is still discarded.
+
+Example::
+
+  | +---------------+--------------+
+  | | Effect        | Markup       |
+  | +---------------+--------------+
+  | | Emphasis      | /some words/ |
+  | | Strong        | *some words* |
+  | | Typewriter    | {some words} |
+  | | Underline     | _some words_ |
+  | | Strikeout     | -some words- |
+  | +---------------+--------------+
+
+Output::
+
+  > +---------------+--------------+
+  > | Effect        | Markup       |
+  > +---------------+--------------+
+  > | Emphasis      | /some words/ |
+  > | Strong        | *some words* |
+  > | Typewriter    | {some words} |
+  > | Underline     | _some words_ |
+  > | Strikeout     | -some words- |
+  > +---------------+--------------+
+
+
+== Horizontal Rules ==
+
+A line consisting of three or more dashes ("-"), followed immediately
+by a newline, generates a horizontal rule.
+
+Example::
+
+  | ---
+
+Output::
+
+  > ---
+
+
+== Verbatim Blocks ==
+
+Verbatim blocks are used to encapsulate code already in the output
+format.  The complete block is copied verbatim to the output.
+
+Verbatim blocks start with two curly, opening braces ("{{"), followend
+by a space or line break, and end with two curly, closing braces
+("}}"), followed by a line break.
+
+Contained lines must be indented at least as far as the opening
+braces.
+
+Example::
+
+  | {{
+  |   <address>Me, Myself and I, no@whe.re</address>
+  | }}
+
+
+== Alternative Block Syntax ==
+
+All paragraph-like blocks can also be written using a unified syntax.
+
+A block begins with the block type, optionally preceded by the word
+"begin" and a list of modifier words, written in parentheses ("(" and
+")") on a line by itself.  A block ends with the word "end",
+optionally followed by the block type, in parentheses on a line by
+itself.
+
+Thus
+
+  | (code)
+  | void* memfrob(void* s, size_t n);
+  | (end)
+
+is equivalent to
+
+  | | void* memfrob(void* s, size_t n);
+
+Comment blocks are only available using this alternative syntax.
+Comments are skipped completely when converting to the output format.
+
+Example::
+
+  | (comment)
+  | business secret in here
+  | (end)
+
+
+= Environments =
+
+Environment markup is only recognized at the beginning of a new
+paragraph.  The environment markup must be separated from the
+paragraph text by at least one space or line break.  This is necessary
+to disambiguate certain environments from inline markup, and is
+required for all environments for consistency.
+
+List markup is handled a bit differently to faciliate compact lists of
+short items. If the previous paragraph was part of a list environment
+of the same type, the paragraph separating empty line may be omitted.
+
+
+== Quotations ==
+
+A paragraph starting with a greater-than sign (">") introduces a
+quotation.  Subsequent paragraphs belong to the same item as long as
+they don't introduce another environment and are indented (at least)
+as far as the starting paragraph.
+
+Quotations can contain all types of paragraphs and other environments.
+
+Contrasting to other environments, the markup character can be
+repeated on every line of the quoted text.
+
+Example::
+
+  | > A language that doesn't affect the way you think about
+  | > programming, is not worth knowing.
+  |
+  | -- Alan Perlis
+
+Output::
+
+  > > A language that doesn't affect the way you think about
+  > > programming, is not worth knowing.
+  >
+  > -- Alan Perlis
+
+
+== Bullet Lists ==
+
+A paragraph starting with an asterisk ("*"), a dash ("-") or a small O
+("o"), followed by a space or line break, starts a new bullet list
+item.  Subsequent paragraphs belong to the same item as long as they
+don't introduce another environment and are indented (at least) as far
+as the starting paragraph.
+
+Two bullet list paragraphs that both introduce a new list item, do not
+need to be separated by two line breaks in a row.
+
+All item in a bullet list must use the same bullet character.
+
+Example::
+
+  | * If you think you are beaten, you are.
+  | * If you think you dare not, you don't.
+
+Output::
+
+  > * If you think you are beaten, you are.
+  > * If you think you dare not, you don't.
+
+
+== Numbered Lists ==
+
+A paragraph starting with a hash mark ("#") followed by a space or
+line break, starts a new numbered list item.  Subsequent paragraphs
+belong to the same item as long as they don't introduce another
+environment and are indented (at least) as far as the starting
+paragraph.
+
+Instead of a hash mark, a numbered list item may also be introduced
+with a number, followed by a closing parenthesis (")"), or a dot
+(".").
+
+Two numbered list paragraphs that both introduce a new list item, do
+not need to be separated by two line breaks in a row.
+
+Example::
+
+  | # tweak
+  | # twiddle
+  | # frob
+
+Output::
+
+  > # tweak
+  > # twiddle
+  > # frob
+
+
+== Definition Lists ==
+
+A paragraph starting with a colon (":") starts a new definition list
+item.  The term and the definition text are separated by another
+colon, followed by a space or linebreak.  Subsequent paragraphs belong
+to the same item as long as they don't introduce another environment
+and are indented (at least) as far as the starting paragraph.
+
+Two definition list paragraphs that both introduce a new list item, do
+not need to be separated by two line breaks in a row.
+
+Example::
+
+  | :foo: A generic name.
+  | :bar: Another generic name.
+  |   Much the same as "foo".
+  | :baz, quu, quuz, quux:
+  |   The rest of the bunch.
+
+Output::
+
+  > :foo: A generic name.
+  > :bar: Another generic name.
+  >   Much the same as "foo".
+  > :baz, quu, quuz, quux:
+  >   The rest of the bunch.
+
+
+= Sections =
+
+Sections consist of a heading, followed by a list of environments or
+paragraphs.
+
+The heading begins with one or more equal-signs ("=") and ends with an
+empty line, or the same number of equal-signs at the end of a line.
+The number of equal-signs indicates the level of the section.
+
+Headings are automatically available as link targets.
+
+Example::
+
+  | = heading level 1 =
+  |
+  | == heading level 2 ==
+
+
+= See Also =
+
+[http://podius.wox.org/documentation/wikitext-spec.txt|
+The source of this specification] in WikiText format.
+
+[http://podius.wox.org/|Podius Content Management System] uses WikiText
+for its rich text property.

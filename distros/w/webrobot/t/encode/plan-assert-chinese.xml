@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<plan>
+
+    <!--
+    The server is assumed to return UTF-8 and
+    it expects the POST encoded data in UTF-8
+    -->
+
+    <request>
+        <method value='GET'/>
+        <url value='${application}/html_as_utf8/t/encode/chinese.html'/>
+        <description value='Get HTML file as utf-8, check umlaut-a and chinese-sym'/>
+        <property name='chinese_sym' xpath="string(//title)"/>
+        <property name='umlaut_sym' xpath="string(//meta[@name='description']/@content)"/>
+        <assert>
+            <WWW.Webrobot.Assert>
+                <and>
+                    <status value='200'/>
+                    <string value='ä'/>
+                    <string value="目"/>
+                    <string value='content="ä'/>
+                    <string value="&lt;title>目&lt;/title>"/>
+                 </and>
+            </WWW.Webrobot.Assert>
+        </assert>
+   </request>
+
+    <request>
+        <method value='GET'/>
+        <url value='${application}/html_as_utf8/t/encode/chinese.html'/>
+        <description value='Get same HTML file as utf-8, check variables are ok'/>
+        <assert>
+            <WWW.Webrobot.Assert>
+                <and>
+                    <status value='200'/>
+                    <string value='${umlaut_sym}'/>
+                    <string value="${chinese_sym}"/>
+                 </and>
+            </WWW.Webrobot.Assert>
+        </assert>
+   </request>
+
+    <request>
+        <method value='GET'/>
+        <url value='${application}/html_as_utf8/t/encode/chinese.html'/>
+        <description value='Get same HTML file as utf-8, check all assert predicates'/>
+        <assert>
+            <WWW.Webrobot.Assert>
+                <and>
+                    <status value='200'/>
+                    <string value="${chinese_sym}"/>
+                    <regex value="${chinese_sym}"/>
+                    <xpath xpath="//title/text()" value="${chinese_sym}"/>
+                 </and>
+            </WWW.Webrobot.Assert>
+        </assert>
+   </request>
+
+</plan>
