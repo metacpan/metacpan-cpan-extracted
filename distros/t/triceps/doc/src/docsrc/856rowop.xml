@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_rowop">
+		<title>Rowop reference</title>
+
+		<indexterm>
+			<primary>Rowop</primary>
+		</indexterm>
+		<para>
+		The Rowop class is defined in <pre>sched/Rowop.h</pre> though usually
+		there is no need to include it directly, just include <pre>sched/Unit.h</pre>
+		which will pull in the rest of the scheduling classes.
+		</para>
+
+		<para>
+		The Rowop in &Cpp; consists of all the same parts as in Perl API: a
+		label, a row, and opcode.
+		</para>
+
+		<para>
+		It has one more item that's not really visible in the Perl API, the
+		enqueueing mode, but it's semi-hidden in the &Cpp; API as well. The only
+		place where it's used is in <pre>Unit::enqueueDelayedTray()</pre>. This
+		allows to build a tray of rowops, each with its own enqueueing mode,
+		and then enqueue all of them appropriately in one go. This feature is
+		kind of historic and will be removed somewhere soon.
+		</para>
+
+		<para>
+		The Rowop class inherits from Starget, usable in one thread only. Since
+		it refers to the Labels, that are by definition single-threaded, this
+		makes sense. A consequence is that you can't simply pass the Rowops
+		between the threads. The passing-between-threads is handled by the
+		Nexuses, performing the translation of the Labels along the way.
+		</para>
+
+		<para>
+		The opcodes are defined in the enum Rowop::Opcode, so you normally use
+		them as <pre>Rowop::OP_INSERT</pre> etc. The opcodes actually
+		contain a bitmap of individual flags, defined in the enum
+		Rowop::OpcodeFlags: <pre>Rowop::OCF_INSERT</pre> and <pre>Rowop::OCF_DELETE</pre>. You don't
+		really need to use these flags directly unless you really, really want
+		to.
+		</para>
+
+		<indexterm>
+			<primary>Opcode</primary>
+		</indexterm>
+		<para>
+		Besides the 3 already described opcodes (OP_NOP, OP_INSERT and
+		OP_DELETE) there is another one, OP_BAD. It's a special value returned
+		by the string-to-opcode conversion method instead of the -1 returned by
+		the other similar method. The reason is that OP_BAD is specially
+		formatted to be understood by all the normal opcode type checks as NOP
+		(i.e. both flags OCF_INSERT and OCF_DELETE are reset in it),
+		while -1 would be seen as a combination of INSERT and DELETE. So if you
+		miss checking the result of conversion on a bad string, at least you
+		would get a NOP and not some mysterious operation. The reason why
+		OP_BAD is not exported to Perl is that in Perl an <pre>undef</pre> is used as the
+		indication of the invalid value, and works even better.
+		</para>
+
+		<para>
+		There is a pretty wide variety of Rowop constructors:
+		</para>
+
+<pre>
+Rowop(const Label *label, Opcode op, const Row *row);
+Rowop(const Label *label, Opcode op, const Rowref &row);
+
+Rowop(const Label *label, Opcode op, const Row *row, int enqMode);
+Rowop(const Label *label, Opcode op, const Rowref &row, int enqMode);
+
+Rowop(const Rowop &orig);
+Rowop(const Label *label, const Rowop *orig);
+</pre>
+
+		<para>
+		The constructors with the explicit <pre>enqMode</pre> are best not be used outside
+		of the Triceps internals, and will eventually be obsoleted. The last
+		two are the copy constructor, and the adoption constructor which
+		underlies <pre>Label::adopt()</pre> and can as well be used directly.
+		</para>
+
+		<para>
+		Once a rowop is constructed, its components can not be changed any
+		more, only read.
+		</para>
+
+<pre>
+Opcode getOpcode() const;
+const Label *getLabel() const;
+const Row *getRow() const;
+int getEnqMode() const;
+</pre>
+
+		<para>
+		Read back the components of the Rowop. Again, the <pre>getEnqMode()</pre> is on
+		the way to obsolescence. And if you need to check the opcode for being
+		an insert or delete, the better way is to use the explicit test
+		methods, rather than getting the opcode and comparing it for equality:
+		</para>
+
+<pre>
+bool isInsert() const;
+bool isDelete() const;
+bool isNop() const;
+</pre>
+
+		<para>
+		Check whether the opcode requests an insert or delete (or neither).
+		</para>
+
+		<para>
+		The same checks are available as static methods that can be used on the
+		opcode values:
+		</para>
+
+<pre>
+static bool isInsert(int op);
+static bool isDelete(int op);
+static bool isNop(int op);
+</pre>
+
+		<para>
+		And the final part is the conversion between the strings and integer values for
+		the Opcode and OpcodeFlags enums:
+		</para>
+
+<pre>
+static const char *opcodeString(int code);
+static int stringOpcode(const char *op);
+static const char *ocfString(int flag, const char *def = "???");
+static int stringOcf(const char *flag);
+</pre>
+
+		<para>
+		As mentioned above, <pre>stringOpcode()</pre> returns OP_BAD for the unknown strings, not -1. 
+		</para>
+	</sect1>

@@ -1,0 +1,6 @@
+MANIFEST
+META.yml
+README
+Makefile.PL
+lib/Tie/MultiKeyInsertOrderHash.pm
+t/1_basic.t

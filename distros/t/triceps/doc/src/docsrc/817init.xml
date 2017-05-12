@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_init">
+		<title>Initialization templates</title>
+
+		<indexterm>
+			<primary>error handling</primary>
+			<secondary>in &Cpp;</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>initialization</primary>
+		</indexterm>
+		<para>
+		Triceps has the common approach for building the complex objects in stages
+		by the chained mehod calls (demonstrated here on a fictional class Object):
+		</para>
+
+<pre>
+Autoref<Object> o = Object::make()->addOption1(arg)->addOption2(arg);
+</pre>
+
+		<para>
+		Here <pre>Object::make()</pre> is a convenience wrapper for <pre>new Object</pre>, 
+		because the operator <pre>new</pre> has an inconvenient
+		priority. The <pre>new</pre> or <pre>make()</pre> returns a pointer to
+		the newly constructed object, and then each method in the chain returns
+		the same pointer (<pre>this</pre>, from its standpoint) to facilitate
+		the chaining.
+		</para>
+
+		<para>
+		While the chain executes, the pointer stays a simple pointer, not a
+		reference. So the methods in the chain can't throw any exceptions, or
+		the memory will leak. Instead they collect the error messages in an
+		Errors object that has to be checked afterwards, like:
+		</para>
+
+<pre>
+if (o->getErrors()->hasError()) ...
+</pre>
+
+		<para>
+		Note that a reference to the object gets created first, so that on
+		an error the object would be properly destroyed.
+		</para>
+
+		<para>
+		The convenience template <pre>checkOrThrow()</pre> allows to do the check along
+		with the chain, and if an error is found, convert it to an Exception:
+		</para>
+
+		<indexterm>
+			<primary>Exception</primary>
+		</indexterm>
+<pre>
+Autoref<Object> o = checkOrThrow(
+	Object::make()->addOption1(arg)->addOption2(arg)
+);
+</pre>
+
+		<para>
+		It does all the right things with the references.
+		</para>
+
+		<para>
+		Some objects  need to be initialized after all the options have been
+		set, since it's much easier to check things once and get the
+		interaction of the options right rather than check on every option. And
+		since the initialization might create the references to the object, to
+		get it right, it has to be done after the <quote>main</quote> reference is created.
+		</para>
+
+<pre>
+Autoref<Object> o = Object::make()->addOption1(arg)->addOption2(arg);
+o->initialize();
+</pre>
+
+		<para>
+		The template <pre>initialize()</pre> allows to do it in one expression:
+		</para>
+
+<pre>
+Autoref<Object> o = initialize(
+	Object::make()->addOption1(arg)->addOption2(arg)
+);
+</pre>
+
+		<para>
+		For some objects the initialization can't fail (nor any other errors
+		can be created by the options). For the others, the errors needs to be
+		checked afterwards, in the same way as shown above. 
+		The template <pre>initializeOrThrow()</pre> takes care of the whole sequence of
+		the initialization, the check, and Exception throwing on errors:
+		</para>
+
+<pre>
+Autoref<Object> o = initializeOrThrow(
+	Object::make()->addOption1(arg)->addOption2(arg)
+);
+</pre>
+
+		<para>
+		That's basically it. All these templates are defined in <pre>common/Initialize.h</pre>. 
+		</para>
+	</sect1>

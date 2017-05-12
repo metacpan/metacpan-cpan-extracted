@@ -1,0 +1,3425 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+<chapter id="ch_strf" xmlns:xi="http://www.w3.org/2001/XInclude">
+	<title>Streaming functions</title>
+
+	<sect1 id="sc_strf_intro">
+		<title>Introduction to streaming functions</title>
+
+		<indexterm>
+			<primary>streaming function</primary>
+		</indexterm>
+		<indexterm>
+			<primary>function</primary>
+		</indexterm>
+		<indexterm>
+			<primary>macro</primary>
+		</indexterm>
+
+		<para>
+		The streaming functions are a cool and advanced
+		concept. I've never seen it anywhere before, and for all I know I have
+		invented it.
+		</para>
+
+		<para>
+		First let's look at the differences between the common functions and
+		macros (or templates and such), shown in
+		<xref linkend="fig_strf_fmac" xrefstyle="select: label nopage"/>&xrsp;.
+		</para>
+
+		<figure id="fig_strf_fmac" >
+			<title>The difference between the function and macro calls.</title>
+			<xi:include href="file:///FIGS/func-010-fmac.xml"/> 
+		</figure>
+
+		<para>
+		What happens during a function call? Some code
+		(marked with the light bluish color) is happily zooming along when it
+		decides to call a function. It prepares some arguments and jumps to the
+		function code (reddish). The function executes, computes its result and
+		jumps back to the point right after it has been called from. Then the
+		original code continues from there (the slightly darker bluish color).
+		</para>
+
+		<para>
+		What happens during a macro (or template) invocation? It starts with
+		some code zooming along in the same way, however when the macro call
+		time comes, it prepares the arguments and then does nothing. It gets
+		away with it because the compiler has done the work: it has placed the
+		macro code right where it's called, so there is no need for jumps.
+		After the macro is done, again it does nothing: the compiler has placed
+		the next code to execute right after it, so it just continues on its
+		way.
+		</para>
+
+		<para>
+		So far it's pretty equivalent. An interesting difference happens when
+		the function or macro is called from more than one place. With a macro,
+		another copy of the macro is created, inserted between its call and
+		return points. That's why in the figure the macro is shown twice. But
+		with the function, the same function code is executed every time, and then returns
+		back to the caller. That's why in the figure there are two function
+		callers with their paths through the same function. But how does the
+		function know, where should it jump on return? The caller tells it by
+		pushing the return address onto the stack. When the function is done,
+		it pops this address from the stack and jumps there.
+		</para>
+
+		<para>
+		Still, it looks all the same. A macro call is a bit more efficient,
+		except when a large complex macro is called from many places, then it
+		becomes more efficient as a function. However there is another
+		difference if the function or macro holds some context (say, a static
+		variable): each invocation of the macro will get its own context but
+		all the function calls will share the same context. The only way to
+		share the context with a macro is to pass some global context as its
+		argument (or you can use a separately defined global variable if you're
+		willing to dispense with some strict modularity).
+		</para>
+
+		<indexterm>
+			<primary>Sybase</primary>
+		</indexterm>
+		<indexterm>
+			<primary>StreamBase</primary>
+		</indexterm>
+		<indexterm>
+			<primary>template</primary>
+		</indexterm>
+
+		<para>
+		Now let's switch to the CEP world. The Sybase or StreamBase modules are
+		essentially macros, and so are the Triceps templates. When such a macro
+		gets instantiated, a whole new copy of it gets created with its
+		tables/windows and streams/labels. Its input and output streams/labels
+		get all connected in a fixed way. The limitation is that if the macro
+		contains any tables, each instantiation gets another copy of them. Well, in
+		Triceps you can use a table as an argument to a template. In the other
+		systems I think you still can't, so if you want to work with a common
+		table in a module, you have to make up the query-response patterns,
+		like the one described in
+		<xref linkend="sc_template_intro" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<para>
+		In a query-response pattern there is some common sub-model, with a
+		stream (in Triceps terms, a label, but here we're talking the other
+		systems) for the queries to come in and a stream for the results to
+		come out (both sides might have not only one but multiple streams).
+		There are multiple inputs connected, from all the request sources, and
+		the outputs are connected back to all the request sources. All the
+		request sources (i.e. callers) get back the whole output of the
+		pattern, so they need to identify, what output came from their input,
+		and ignore the rest. They do this by adding the unique ids to their
+		queries, and filter the results. In the end, it looks <i>almost</i>
+		like a function but with much pain involved.
+		</para>
+
+		<para>
+		To make it look quite like a function, one thing is needed: the
+		selective connection of the result streams (or, returning to the
+		Triceps terminology, labels) to the caller. Connect the output labels,
+		send some input, have it processed and send the result through the
+		connection, disconnect the output labels. And what you get is a
+		streaming function. It's very much like a common function but working
+		on the streaming data arguments and results.
+		</para>
+
+		<para>
+		The 
+		<xref linkend="fig_strf_query" xrefstyle="select: label nopage"/>&xrsp;
+		highlights the similarity and differences between the
+		query patterns and the streaming functions.
+		</para>
+
+		<figure id="fig_strf_query" >
+			<title>The query patterns and streaming functions.</title>
+			<xi:include href="file:///FIGS/func-020-query.xml"/> 
+		</figure>
+
+		<para>
+		The thick lines show where the data goes
+		during one concrete call. The thin lines show the connections that do
+		exist but without the data going through them at the moment (they will
+		be used during the other calls, from these other callers). The dashed
+		thin line shows the connection that doesn't exist at the moment. It
+		will be created when needed (and at that time the thick arrow from the
+		streaming function to what is now the current return would disappear).
+		</para>
+
+		<para>
+		The particular beauty of the streaming functions for Triceps is that
+		the other callers don't even need to exist yet. They can be created
+		and connected dynamically, do their job, call the function, use its
+		result, and then be disposed of. The calling side in Triceps doesn't
+		have to be streaming either: it could as well be procedural.  
+		</para>
+	</sect1>
+
+	<sect1 id="sc_strf_collapse">
+		<title>Streaming functions by example, another version of Collapse</title>
+
+		<para>
+		The streaming functions have proved quite useful in Triceps,
+		in particular the inter-thread communications use an interface
+		derived from them. But the ironic part is that
+		coming up with the good examples of the streaming function usage in
+		Triceps is surprisingly difficult. The flexibility of
+		Triceps is the problem. If all you have is SQL, the streaming functions
+		become pretty much a must. But if you can write the procedural code,
+		most things are easier that way, with the normal procedural functions. 
+		For a streaming function to become
+		beneficial, it has to be written in SQLy primitives (such as tables,
+		joins) and not be easily reducible to the procedural code.
+		The streaming function examples that aren't big enough for their own file
+		are collected in <pre>t/xFn.t</pre>.
+		</para>
+
+		<indexterm>
+			<primary>streaming function</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Collapse</primary>
+		</indexterm>
+		<para>
+		The most distilled example I've come up with is for the implementation of
+		Collapse. The original implementation of Collapse is described in 
+		<xref linkend="sc_other_collapse" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		The <pre>flush()</pre> there goes in a loop
+		deleting the all rows from the state tables and sending them as rowops
+		to the output.
+		</para>
+
+		<para>
+		The deletion of all the rows can nowadays be done easier with the Table
+		method <pre>clear()</pre>. However by itself it doesn't solve the problem of
+		sending the output. It sends the deleted rows to the table's output
+		label but we can't just connect the output of the state tables to the
+		Collapse output: then it would also pick up all the intermediate
+		changes! The data needs to be picked up from the tables output
+		selectively, only in <pre>flush()</pre>.
+		</para>
+
+		<para>
+		This makes it a good streaming function: the body of the function
+		consists of running <pre>clear()</pre> on the state tables, and its result is
+		whatever comes on the output labels of the tables.
+		</para>
+
+		<para>
+		Since most of the logic remains unchanged, I've implemented this new
+		version of Collapse in <pre>t/xFn.t</pre> as a subclass that extends and replaces some of the
+		code with its own:
+		</para>
+
+<!-- t/xFn.t FnCollapse -->
+<pre>
+package FnCollapse;
+
+sub CLONE_SKIP { 1; }
+
+our @ISA=qw(Triceps::Collapse);
+
+sub new # ($class, $optName => $optValue, ...)
+{
+	my $class = shift;
+	my $self = $class->SUPER::new(@_);
+	# Now add an FnReturn to the output of the dataset's tables.
+	# One return is enough for both.
+	# Also create the bindings for sending the data.
+	foreach my $dataset (values %{$self->{datasets}}) {
+		my $fret = Triceps::FnReturn->new(
+			name => $self->{name} . "." . $dataset->{name} . ".retTbl",
+			labels => [
+				del => $dataset->{tbDelete}->getOutputLabel(),
+				ins => $dataset->{tbInsert}->getOutputLabel(),
+			],
+		);
+		$dataset->{fret} = $fret;
+
+		# these variables will be compiled into the binding snippets
+		my $lbOut = $dataset->{lbOut};
+		my $unit = $self->{unit};
+		my $OP_INSERT = &Triceps::OP_INSERT;
+		my $OP_DELETE = &Triceps::OP_DELETE;
+
+		my $fbind = Triceps::FnBinding->new(
+			name => $self->{name} . "." . $dataset->{name} . ".bndTbl",
+			on => $fret,
+			unit => $unit,
+			labels => [
+				del => sub {
+					if ($_[1]->isDelete()) {
+						$unit->call($lbOut->adopt($_[1]));
+					}
+				},
+				ins => sub {
+					if ($_[1]->isDelete()) {
+						$unit->call($lbOut->makeRowop($OP_INSERT, $_[1]->getRow()));
+					}
+				},
+			],
+		);
+		$dataset->{fbind} = $fbind;
+	}
+	bless $self, $class;
+	return $self;
+}
+
+# Override the base-class flush with a different implementation.
+sub flush # ($self)
+{
+	my $self = shift;
+	foreach my $dataset (values %{$self->{datasets}}) {
+		# The binding takes care of producing and directing
+		# the output. AutoFnBind will unbind when the block ends.
+		my $ab = Triceps::AutoFnBind->new(
+			$dataset->{fret} => $dataset->{fbind}
+		);
+		$dataset->{tbDelete}->clear();
+		$dataset->{tbInsert}->clear();
+	}
+}
+</pre>
+
+		<indexterm>
+			<primary>FnReturn</primary>
+		</indexterm>
+		<indexterm>
+			<primary>FnBinding</primary>
+		</indexterm>
+		<para>
+		<pre>new()</pre> adds the streaming function elements in each data set. They
+		consist of two parts: FnReturn defines the return value of a streaming
+		function (there is no formal definition of the body or the entry point
+		since they are quite flexible), and FnBinding defines a call of the
+		streaming function. In this case the function is called in only one
+		place, so one FnBinding is defined. If called from multiple places,
+		there would be multiple FnBindings.
+		</para>
+
+		<para>
+		When a normal procedural function is called, the return address
+		provides the connection to get the result back from it to the caller.
+		In a streaming function, the FnBinding connects the result labels to
+		the caller's further processing of the returned data. Unlike the
+		procedural functions, the data is not returned in one step (run the
+		function, compute the value, return it). Instead the return value of a
+		streaming function is a stream of rowops. As each of them is sent to a
+		return label, it goes through the binding and to the caller's further
+		processing. Then the streaming function continues, producing the next
+		rowop, and so on.
+		</para>
+
+		<para>
+		If this sounds complicated, please realize that here we're dealing with
+		the assembly language equivalent for streaming functions. I expect that
+		over time the more high-level primitives will be developed and it 
+		will become easier.
+		</para>
+
+		<para>
+		The second source of complexity is that the arguments of a streaming
+		function are not computed in one step either. You don't normally have a
+		full set of rows to send to a streaming function in one go. Instead you
+		set up the streaming call to bind the result, then you pump the argument rowops
+		to the function's input, creating them in whatever way you wish.
+		</para>
+
+		<para>
+		Getting back to the definition of a streaming function, FnReturn
+		defines a set of labels, each with a logical name. In this case the
+		names are <quote>del</quote> and <quote>ins</quote>. The labels inside FnReturn are a special
+		variety of dummy labels, but they are chained to some real labels that
+		send the result of the function. The snippet
+		</para>
+
+<pre>
+del => $dataset->{tbDelete}->getOutputLabel(),
+</pre>
+
+		<para>
+		says <quote>create a return label named <quote>del</quote> and chain it from the
+		tbDelete's output label</quote>. The FnReturn normally does its chaining
+		with <pre>chainFront()</pre>, unless the option <pre>chainFront => 0</pre>
+		tells it otherwise. But in this particular case the chaining order wouldn't matter.
+		There are more details to the naming and label
+		creation but let's not get bogged in them now.
+		</para>
+
+		<para>
+		The FnBinding defines a matching set of labels, with the same logical
+		names. It's like a receptacle and a plug: you put the plug into the
+		receptacle and get the data flowing, you unplug it and the data flow
+		stops. The Perl version of FnBinding provides a convenience: when it
+		gets a code reference instead of a label, it automatically creates a
+		label with that code for its handler.
+		</para>
+
+		<para>
+		In this case both binding labels forward the data to the Collapse's
+		output label. Only the one for the Insert table has to change the
+		opcodes to OP_INSERT. The check
+		</para>
+
+<pre>
+if ($_[1]->isDelete()) ...
+</pre>
+
+		<para>
+		is really redundant, to be on the safe side, since we know that when
+		the data will be flowing, all of it will be coming from the table
+		clearing and have the opcodes of OP_DELETE.
+		</para>
+
+		<indexterm>
+			<primary>AutoFnBind</primary>
+		</indexterm>
+		<indexterm>
+			<primary>binding</primary>
+		</indexterm>
+		<para>
+		The actual call happens in <pre>flush()</pre>: Triceps::AutoFnBind is a constructor
+		of the scope object that does the <quote>plug into receptable</quote>
+		thing, with automatic unplugging when the object returned by it gets
+		destroyed on leaving the block scope. If you want to do things
+		manually, FnReturn has the methods <pre>push()</pre> and
+		<pre>pop()</pre> but the scoped binding is safer and easier.  Once the
+		binding is done, the data is sent through the function by calling
+		<pre>clear()</pre> on both tables. And then the block ends,
+		<pre>$ab</pre> get destroyed, AutoFnBind destructor undoes the binding, and 
+		thus the streaming function call completes.
+		</para>
+
+		<para>
+		The result produced by this version of Collapse is exactly the same as
+		by the original version. And even when we get down to grits, it's
+		produced with the exact same logical sequence: the rows are sent out as
+		they are deleted from the state tables. But it's structured
+		differently: instead of the procedural deletion and sending of the
+		rows, the internal machinery of the tables gets invoked, and the
+		results of that machinery are then converted to the form suitable for
+		the collapse results and propagated to the output.
+		</para>
+
+		<para>
+		Philosophically, it could be argued, what is the body of this function?
+		Is it just the internal logic of the table delection, that gets
+		triggered by <pre>clear()</pre> in the caller? Or are the <pre>clear()</pre> calls also a
+		part of the function body? But it practice it just doesn't matter,
+		whatever. 
+		</para>
+	</sect1>
+
+	<sect1 id="sc_strf_keyed_collapse">
+		<title>Collapse with grouping by key with streaming functions</title>
+
+		<indexterm>
+			<primary>streaming function</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Collapse</primary>
+		</indexterm>
+		<para>
+		The Collapse as shown before sends all the collected deletes before all
+		the collected inserts. For example, if it has collected the updates for
+		four rows, the output will be (assuming that the Collapse element is
+		named <pre>collapse</pre> and the data set in it is named <pre>idata</pre>):
+		</para>
+
+<!-- t/xFn.t doCollapse1 -->
+<exdump>
+collapse.idata.out OP_DELETE local_ip="3.3.3.3" remote_ip="7.7.7.7" bytes="100"
+collapse.idata.out OP_DELETE local_ip="2.2.2.2" remote_ip="6.6.6.6" bytes="100"
+collapse.idata.out OP_DELETE local_ip="4.4.4.4" remote_ip="8.8.8.8" bytes="100"
+collapse.idata.out OP_DELETE local_ip="1.1.1.1" remote_ip="5.5.5.5" bytes="100"
+collapse.idata.out OP_INSERT local_ip="3.3.3.3" remote_ip="7.7.7.7" bytes="300"
+collapse.idata.out OP_INSERT local_ip="2.2.2.2" remote_ip="6.6.6.6" bytes="300"
+collapse.idata.out OP_INSERT local_ip="4.4.4.4" remote_ip="8.8.8.8" bytes="300"
+collapse.idata.out OP_INSERT local_ip="1.1.1.1" remote_ip="5.5.5.5" bytes="300"
+</exdump>
+
+		<para>
+		What if you want the updates produced as deletes immediately followed
+		by the matching inserts with the same key?  Like this:
+		</para>
+
+<!-- t/xFn.t doCollapse2 -->
+<exdump>
+collapse.idata.out OP_DELETE local_ip="3.3.3.3" remote_ip="7.7.7.7" bytes="100"
+collapse.idata.out OP_INSERT local_ip="3.3.3.3" remote_ip="7.7.7.7" bytes="300"
+collapse.idata.out OP_DELETE local_ip="2.2.2.2" remote_ip="6.6.6.6" bytes="100"
+collapse.idata.out OP_INSERT local_ip="2.2.2.2" remote_ip="6.6.6.6" bytes="300"
+collapse.idata.out OP_DELETE local_ip="4.4.4.4" remote_ip="8.8.8.8" bytes="100"
+collapse.idata.out OP_INSERT local_ip="4.4.4.4" remote_ip="8.8.8.8" bytes="300"
+collapse.idata.out OP_DELETE local_ip="1.1.1.1" remote_ip="5.5.5.5" bytes="100"
+collapse.idata.out OP_INSERT local_ip="1.1.1.1" remote_ip="5.5.5.5" bytes="300"
+</exdump>
+
+		<para>
+		With the procedural version it would have required doing a look-up in the Insert
+		table after processing each row in the Delete table and handling it if
+		found. So I've left it out to avoid complicating that example. But in
+		the streaming function form it becomes easy, just change the binding 
+		of the <quote>del</quote> label a little bit:
+		</para>
+
+<!-- t/xFn.t FnCollapseClose, selected lines -->
+<pre>
+		my $lbInsInput = $dataset->{tbInsert}->getInputLabel();
+
+		my $fbind = Triceps::FnBinding->new(
+			name => $self->{name} . "." . $dataset->{name} . ".bndTbl",
+			on => $fret,
+			unit => $unit,
+			labels => [
+				del => sub {
+					if ($_[1]->isDelete()) {
+						$unit->call($lbOut->adopt($_[1]));
+						# If the INSERT is available after this DELETE, this
+						# will produce it.
+						$unit->call($lbInsInput->adopt($_[1]));
+					}
+				},
+				ins => sub {
+					if ($_[1]->isDelete()) {
+						$unit->call($lbOut->makeRowop($OP_INSERT, $_[1]->getRow()));
+					}
+				},
+			],
+		);
+</pre>
+
+		<para>
+		The <quote>del</quote> binding first sends the result out as usual and then forwards
+		the DELETE rowop to the Insert table's input. Which then causes the
+		INSERT rowop to be sent if a match is found. Mind you, the look-up and
+		conditional processing still happens. But now it all happens inside the
+		table machinery, all you need to do is add one more line to invoke it.
+		</para>
+
+		<para>
+		Let's talk through in a little more detail, what happens when the clearing of
+		the Delete table deletes the row with <pre>(local_ip="3.3.3.3" remote_ip="7.7.7.7")</pre>.
+		</para>
+
+		<orderedlist>
+			<listitem>
+			The Delete table sends a rowop with this row and OP_DELETE to its
+			output label <pre>collapse.idata.tbDelete.out</pre>.
+			</listitem>
+			<listitem>
+			Which then gets forwarded to a chained label in the FnReturn,
+			<pre>collapse.idata.retTbl.del</pre>.
+			</listitem>
+			<listitem>
+			FnReturn has an FnBinding pushed into it, so the rowop passes to the
+			matching label in the binding, <pre>collapse.idata.bndTbl.del</pre>.
+			</listitem>
+			<listitem>
+			The Perl handler of that label gets called, first forwards the
+			rowop to the Collapse output label <pre>collapse.idata.out</pre>, and then to
+			the Insert table's input label <pre>collapse.idata.tbInsert.in</pre>.
+			</listitem>
+			<listitem>
+			The Insert table looks up the row by the key, finds it, removes it
+			from the table, and sends an OP_DELETE rowop to its output label
+			<pre>collapse.idata.tbInsert.out</pre>.
+			</listitem>
+			<listitem>
+			Which then gets forwarded to a chained label in the FnReturn,
+			<pre>collapse.idata.retTbl.ins</pre>.
+			</listitem>
+			<listitem>
+			FnReturn has an FnBinding pushed into it, so the rowop passes to the
+			matching label in the binding, <pre>collapse.idata.bndTbl.ins</pre>.
+			</listitem>
+			<listitem>
+			The Perl handler of that label gets called and sends the rowop with
+			the opcode changed to OP_INSERT to the Collapse output label
+			<pre>collapse.idata.out</pre>.
+			</listitem>
+		</orderedlist>
+
+		<para>
+		It's a fairly complicated sequence but all you needed to do was to add
+		one line of code. The downside of course is that if something goes not
+		the way you expected, you'd have to trace and understand the whole
+		long sequence (that's the typical trouble with the SQL-based systems).
+		</para>
+
+		<para>
+		When the INSERTs are sent after DELETEs, their rows are removed
+		from the Insert table too, so the following <pre>clear()</pre> of the Insert table
+		won't find them any more and won't send any duplicates; it will send
+		only the inserts for which there were no matching deletes.
+		</para>
+
+		<para>
+		And of course if there is only a DELETE collected for a certain
+		key, not an update, there will be no matching row in the Insert
+		table, so the forwarded DELETE request will have no effect
+		and produce no output from the Insert table.
+		</para>
+
+		<para>
+		You may notice that the code in the <quote>del</quote> handler only forwards the
+		rows around, and that can be replaced by a chaining:
+		</para>
+
+<!-- t/xFn.t FnCollapseClose3, selected lines -->
+<pre>
+		my $lbDel = $unit->makeDummyLabel(
+			$dataset->{tbDelete}->getOutputLabel()->getRowType(), 
+			$self->{name} . "." . $dataset->{name} . ".lbDel");
+		$lbDel->chain($lbOut);
+		$lbDel->chain($lbInsInput);
+
+		my $fbind = Triceps::FnBinding->new(
+			name => $self->{name} . "." . $dataset->{name} . ".bndTbl",
+			on => $fret,
+			unit => $unit,
+			labels => [
+				del => $lbDel,
+				ins => sub {
+					$unit->call($lbOut->makeRowop($OP_INSERT, $_[1]->getRow()));
+				},
+			],
+		);
+</pre>
+
+		<indexterm>
+			<primary>FnBinding</primary>
+		</indexterm>
+		<para>
+		This shows another way of label definition in FnBinding: an actual
+		label is created first and then given to the FnBinding, instead of letting
+		it automatically create a label from the code. The condition
+		<quote><pre>if ($_[1]->isDelete())</pre></quote> has been removed 
+		from the <quote>ins</quote> part, since
+		it's really redundant and the <quote>del</quote> part with its chaining doesn't do
+		this check anyway.
+		</para>
+
+		<para>
+		This code works just as well and even more efficiently than the
+		previous version, since no Perl code needs to be invoked for <quote>del</quote>, it
+		all propagates internally through the chaining. However the price is
+		that the DELETE rowops coming out of the output label will have the
+		head-of-the-chain label in them:
+		</para>
+
+<!-- t/xFn.t doCollapse3 -->
+<exdump>
+collapse.idata.lbDel OP_DELETE local_ip="3.3.3.3" remote_ip="7.7.7.7" bytes="100"
+collapse.idata.out OP_INSERT local_ip="3.3.3.3" remote_ip="7.7.7.7" bytes="300"
+collapse.idata.lbDel OP_DELETE local_ip="2.2.2.2" remote_ip="6.6.6.6" bytes="100"
+collapse.idata.out OP_INSERT local_ip="2.2.2.2" remote_ip="6.6.6.6" bytes="300"
+collapse.idata.lbDel OP_DELETE local_ip="4.4.4.4" remote_ip="8.8.8.8" bytes="100"
+collapse.idata.out OP_INSERT local_ip="4.4.4.4" remote_ip="8.8.8.8" bytes="300"
+collapse.idata.lbDel OP_DELETE local_ip="1.1.1.1" remote_ip="5.5.5.5" bytes="100"
+collapse.idata.out OP_INSERT local_ip="1.1.1.1" remote_ip="5.5.5.5" bytes="300"
+</exdump>
+
+		<para>
+		The <quote>ins</quote> side can't be handled just by chaining because it has to
+		replace the opcode in the rowops. Another potential way to handle
+		this would be to define various preprogrammed label types in &Cpp; for many primitive
+		operations, like replacing the opcode, and then build the models by combining
+		them.
+		</para>
+
+		<indexterm>
+			<primary>recursion</primary>
+		</indexterm>
+		<para>
+		The final item is that the code shown in this section involved a recursive
+		call of the streaming function. Its output from the <quote>del</quote> label got fed
+		back to the function, producing more output on the <quote>ins</quote> label. This
+		worked because it invoked a different code path in the streaming
+		function than the one that produced the <quote>del</quote> data. If it were to form
+		a topological loop back to the same path with the same labels, that
+		would have been an error. The more advanced use of recursion is
+		possible and will be discussed in more detail later. 
+		</para>
+	</sect1>
+
+	<sect1 id="sc_strf_translation">
+		<title>Table-based translation with streaming functions</title>
+
+		<para>
+		Next I want to show an example that is in its essence kind of dumb. The
+		same thing is easier to do in Triceps with templates. And the whole
+		premise is not exactly great either. But it provides an opportunity to
+		show more of the streaming functions, in a set-up that is closer to the
+		SQL-based systems.
+		</para>
+
+		<indexterm>
+			<primary>RIC</primary>
+		</indexterm>
+		<indexterm>
+			<primary>ISIN</primary>
+		</indexterm>
+		<para>
+		The background is as follows: There happen to be multiple ways to
+		identify the securities (stock shares and such). <i>RIC</i> is the identifier
+		used by Reuters (and quite often by the other data suppliers too),
+		consisting of the ticker symbol on an exchange, a dot, and the coded name of the
+		exchange (such as <quote>L</quote> for the London stock exchange or 
+		<quote>N</quote> for the New York stock exchange). 
+		<i>ISIN</i> is the international standard alphanumeric identifier. A security
+		(and some of its creative equivalents) might happen to be listed on
+		multiple exchanges, each listing having its own RIC. And if you wonder,
+		the ticker names are allocated separately by each exchange and may differ.
+		But all of these RICs refer
+		to the same security, thus translating to the
+		same ISIN (there might be multiple ISINs too but that's another story).
+		A large financial company would want to track a security all around the
+		world. To aggregate the data on the security worldwide, it has to
+		identify it by ISIN, but the data feed might be coming in as RIC only.
+		The translation of RIC to ISIN is then done by the table during
+		processing. The RIC is not thrown away either, it shows the detail of
+		what and where had happened. But ISIN is added for the aggregation on it.
+		</para>
+
+		<para>
+		The data might be coming from multiple feeds, and there are multiple
+		kinds of data: trades, quotes, lending quotes and so on, each with its
+		own schema and its own aggregations. However the step of RIC-to-ISIN
+		translation is the same for all of them, is done by the same table, and
+		can be done in one place. Of course, multithreading can add more
+		twists here but for now we're talking about a simple single-threaded
+		example.
+		</para>
+
+		<para>
+		An extra complexity is that in the real world the translation table
+		might be incomplete. However some feeds might provide both RICs and
+		ISINs in their records, so the pairs that aren't in the reference table
+		yet, can be inserted there and used for the following translations.
+		This is actually not such a great idea, because it means that there
+		might be previous records that went through before the translation
+		became available. A much better way would be to do the translation as a
+		join, where the update to a reference table would update any previous
+		records as well. But then there would not be much use for a streaming
+		function in it. As I've said before, it's a rather dumb example.
+		</para>
+
+		<para>
+		The streaming function will work like this: It will get an argument
+		pair of (RIC, ISIN) from an incoming record. Either component of this
+		pair might be empty. Since the rest of the record is wildly different
+		for different feeds, the rest of the record is left off at this point,
+		and the uniform argument of (RIC, ISIN) is given to the function. The
+		function will consult its table, see if it can add more information
+		from there, or add more information from the argument into the table,
+		and return the hopefully enriched pair (RIC, ISIN) with an empty ISIN
+		field replaced by the right value, to the caller.
+		</para>
+
+		<para>
+		The function is defined like this:
+		</para>
+
+<!-- t/xFn.t doSymbology part -->
+<pre>
+my $rtIsin = Triceps::RowType->new(
+	ric => "string",
+	isin => "string",
+);
+
+my $ttIsin = Triceps::TableType->new($rtIsin)
+	->addSubIndex("byRic", Triceps::IndexType->newHashed(key => [ "ric" ])
+); 
+$ttIsin->initialize();
+
+my $tIsin = $unit->makeTable($ttIsin, "tIsin");
+
+# the results will come from here
+my $fretLookupIsin = Triceps::FnReturn->new(
+	name => "fretLookupIsin",
+	unit => $unit,
+	labels => [
+		result => $rtIsin,
+	],
+);
+
+# The function argument: the input data will be sent here.
+my $lbLookupIsin = $unit->makeLabel($rtIsin, "lbLookupIsin", undef, sub {
+	my $row = $_[1]->getRow();
+	if ($row->get("ric")) {
+		my $argrh = $tIsin->makeRowHandle($row);
+		my $rh = $tIsin->find($argrh);
+		if ($rh->isNull()) {
+			if ($row->get("isin")) {
+				$tIsin->insert($argrh);
+			}
+		} else {
+			$row = $rh->getRow();
+		}
+	}
+	$unit->call($fretLookupIsin->getLabel("result")->makeRowop("OP_INSERT", $row));
+});
+</pre>
+
+		<para>
+		The <pre>$fretLookupIsin</pre> is the function result, <pre>$lbLookupIsin</pre> is the
+		function input. In this example the result label in FnReturn is defined
+		differently than in the previous ones: not by a source label but by a
+		row type. This label doesn't get chained to anything, instead the
+		procedural code in the function finds it as <pre>$fretLookupIsin->getLabel("result")</pre> and
+		calls it directly.
+		</para>
+
+		<para>
+		Then the ISIN translation code for some trades feed would look as
+		follows (remember, supposedly there would be many feeds, each one with its
+		own schema, but for the example I show only one):
+		</para>
+
+<!-- t/xFn.t doSymbology part -->
+<pre>
+my $rtTrade = Triceps::RowType->new(
+	ric => "string",
+	isin => "string",
+	size => "float64",
+	price => "float64",
+);
+
+my $lbTradeEnriched = $unit->makeDummyLabel($rtTrade, "lbTradeEnriched");
+my $lbTrade = $unit->makeLabel($rtTrade, "lbTrade", undef, sub {
+	my $rowop = $_[1];
+	my $row = $rowop->getRow();
+	Triceps::FnBinding::call(
+		name => "callTradeLookupIsin",
+		on => $fretLookupIsin,
+		unit => $unit,
+		rowop => $lbLookupIsin->makeRowopHash("OP_INSERT", 
+			ric => $row->get("ric"),
+			isin => $row->get("isin"),
+		),
+		labels => [
+			result => sub { # a label will be created from this sub
+				$unit->call($lbTradeEnriched->makeRowop($rowop->getOpcode(),
+					$row->copymod(
+						isin => $_[1]->getRow()->get("isin")
+					)
+				));
+			},
+		],
+	);
+});
+</pre>
+
+		<para>
+		The label <pre>$lbTrade</pre> receives the incoming trades, calls the streaming
+		function to enrich them with the ISIN data, and forwards the enriched
+		data to the label <pre>$lbTradeEnriched</pre>. The function call is done
+		differently in this example. Rather than create a FnBinding object and
+		then use it with a scoped AutoFnBind, it uses the convenience function
+		<pre>FnBinding::call()</pre> that wraps all that logic. It's simpler to use,
+		without all these extra objects, but the price is the efficiency: it
+		ends up creating a new FnBinding object for every call. That's where a
+		compiler would be very useful, it could take a call like this,
+		translate it to the internal objects once, and then keep reusing them.
+		</para>
+
+		<indexterm>
+			<primary>streaming function</primary>
+		</indexterm>
+		<indexterm>
+			<primary>FnBinding::call</primary>
+		</indexterm>
+		<para>
+		The <pre>FnBinding::call()</pre> option <quote>name</quote> gives a 
+		name that is used for the error messages and
+		also to produce the names of the temporary objects it creates. The option <quote>on</quote>
+		tells, which streaming function is being called (by specifying its
+		FnReturn). The option <quote>rowop</quote> gives the arguments of the streaming
+		functions. There are multiple ways to do that: option <quote>rowop</quote> for a
+		single rowop, <quote>rowops</quote> for an array of rowops, <quote>tray</quote> for a tray, and
+		<quote>code</quote> for a procedural code snippet that would send the inputs
+		to the streaming function. And
+		<quote>labels</quote> as usual connects the results of the function, either to the
+		existing labels, or by creating labels automatically from the snippets of code.
+		</para>
+
+		<indexterm>
+			<primary>join</primary>
+			<secondary>implicit</secondary>
+		</indexterm>
+		<para>
+		The result handling in this example demonstrates the technique that I call the
+		<quote>implicit join</quote>: The function gets a portion of data from an original
+		row, does some transformation and returns the data back. This data is
+		then joined with the original row. The code knows, what this original
+		row was, it gets remembered in the variable <pre>$row</pre>. The semantics of the
+		call guarantees that nothing else has happened during the function
+		call, and that <pre>$row</pre> is still the current row. Then the function result
+		gets joined with <pre>$row</pre>, and the produced data is sent further on its
+		way. The variable <pre>$row</pre> could be either a global one, or as shown here a
+		scoped variable that gets embedded into a closure function.
+		</para>
+
+		<para>
+		The rest of the example, the dispatcher part, is:
+		</para>
+
+<!-- t/xFn.t doSymbology part -->
+<pre>
+# print what is going on
+my $lbPrintIsin = makePrintLabel("printIsin", $tIsin->getOutputLabel());
+my $lbPrintTrade = makePrintLabel("printTrade", $lbTradeEnriched);
+
+# the main loop
+my %dispatch = (
+	isin => $tIsin->getInputLabel(),
+	trade => $lbTrade,
+);
+
+while(&readLine) {
+	chomp;
+	my @data = split(/,/); # starts with a command, then string opcode
+	my $type = shift @data;
+	my $lb = $dispatch{$type};
+	my $rowop = $lb->makeRowopArray(@data);
+	$unit->call($rowop);
+	$unit->drainFrame(); # just in case, for completeness
+}
+</pre>
+
+		<para>
+		And an example of running, with the input lines shown in bold:
+		</para>
+
+<!-- t/xFn.t doSymbology -->
+<exdump>
+> isin,OP_INSERT,ABC.L,US0000012345
+tIsin.out OP_INSERT ric="ABC.L" isin="US0000012345"
+> isin,OP_INSERT,ABC.N,US0000012345
+tIsin.out OP_INSERT ric="ABC.N" isin="US0000012345"
+> isin,OP_INSERT,DEF.N,US0000054321
+tIsin.out OP_INSERT ric="DEF.N" isin="US0000054321"
+> trade,OP_INSERT,ABC.L,,100,10.5
+lbTradeEnriched OP_INSERT ric="ABC.L" isin="US0000012345" size="100" price="10.5"
+> trade,OP_DELETE,ABC.N,,200,10.5
+lbTradeEnriched OP_DELETE ric="ABC.N" isin="US0000012345" size="200" price="10.5"
+> trade,OP_INSERT,GHI.N,,300,10.5
+lbTradeEnriched OP_INSERT ric="GHI.N" isin="" size="300" price="10.5"
+> trade,OP_INSERT,,XX0000012345,400,10.5
+lbTradeEnriched OP_INSERT ric="" isin="XX0000012345" size="400" price="10.5"
+> trade,OP_INSERT,GHI.N,XX0000012345,500,10.5
+tIsin.out OP_INSERT ric="GHI.N" isin="XX0000012345"
+lbTradeEnriched OP_INSERT ric="GHI.N" isin="XX0000012345" size="500" price="10.5"
+> trade,OP_INSERT,GHI.N,,600,10.5
+lbTradeEnriched OP_INSERT ric="GHI.N" isin="XX0000012345" size="600" price="10.5"
+</exdump>
+
+		<para>
+		The table gets pre-populated with a few translations, and the first few
+		trades use them. Then goes the example of a non-existing translation,
+		which gets eventually added from the incoming data (see that the trade
+		with <pre>(GHI.N, XX0000012345)</pre> both updates the ISIN table and sends through
+		the trade record), and the following trades can then use this newly
+		added translation but obviously the older ones do not get updated. 
+		</para>
+	</sect1>
+
+	<sect1 id="sc_strf_loops">
+		<title>Streaming functions and loops</title>
+
+		<indexterm>
+			<primary>streaming function</primary>
+		</indexterm>
+		<indexterm>
+			<primary>topological loop</primary>
+		</indexterm>
+		<indexterm>
+			<primary>loop</primary>
+			<secondary>topological</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>loop</primary>
+			<secondary>streaming function</secondary>
+		</indexterm>
+		<para>
+		The streaming functions can be used to replace the topological loops
+		(where the connection between the labels go in circles) with the
+		procedural ones. Just make the body of the loop into a streaming
+		function and connect its output with its own input (and of course also
+		to the loop results). Then call this function in a procedural
+		while-loop until the data stop circulating.
+		</para>
+
+		<para>
+		The way the streaming functions have been described so far, there is a
+		catch, even two of them: First, with such a connection, the output of
+		the streaming function would immediately circulate to its input, and
+		would try to keep circulating until the loop is done, with no need for
+		a while-loop. Second, as soon as it attempts to circulate, the
+		scheduler will detect a recursive call and die (unless you change
+		the recursion settings, however this is not a good reason to change them).
+		</para>
+
+		<para>
+		But there is also a solution that has not been described yet: an
+		FnBinding can collect the incoming rowops in a tray instead of
+		immediately forwarding them. This tray can be called later, after the
+		original function call completes. This way the iteration has its data collected, 
+		the function completes, and then the next iteration of the while-loop starts,
+		sending the data from the previous iteration. When there is nothing to
+		send any more, the loop completes.
+		</para>
+
+		<indexterm>
+			<primary>tray</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Fibonacci</primary>
+		</indexterm>
+		<para>
+		Using this logic, let's rewrite the Fibonacci example with the
+		streaming function loops. Its original version and description of the
+		logic can be found in 
+		<xref linkend="sc_sched_topo_loops" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<para>
+		The new version is:
+		</para>
+
+<!-- t/xFn.t doFibFn1 -->
+<pre>
+my $uFib = Triceps::Unit->new("uFib");
+
+###
+# A streaming function that computes one step of a
+# Fibonacci number, will be called repeatedly.
+
+# Type of its input and output.
+my $rtFib = Triceps::RowType->new(
+	iter => "int32", # number of iterations left to do
+	cur => "int64", # current number
+	prev => "int64", # previous number
+);
+
+# Input: 
+#   $lbFibCompute: request to do a step. iter will be decremented,
+#     cur moved to prev, new value of cur computed.
+# Output (by FnReturn labels):
+#   "next": data to send to the next step, if the iteration
+#     is not finished yet (iter in the produced row is >0).
+#   "result": the result data if the iretaion is finished
+#     (iter in the produced row is 0).
+# The opcode is preserved through the computation.
+
+my $frFib = Triceps::FnReturn->new(
+	name => "Fib",
+	unit => $uFib,
+	labels => [
+		next => $rtFib,
+		result => $rtFib,
+	],
+);
+
+my $lbFibCompute = $uFib->makeLabel($rtFib, "FibCompute", undef, sub {
+	my $row = $_[1]->getRow();
+	my $prev = $row->get("cur");
+	my $cur = $prev + $row->get("prev");
+	my $iter = $row->get("iter") - 1;
+	$uFib->makeHashCall($frFib->getLabel($iter > 0? "next" : "result"), $_[1]->getOpcode(),
+		iter => $iter,
+		cur => $cur,
+		prev => $prev,
+	);
+});
+
+# End of streaming function
+###
+
+my $lbPrint = $uFib->makeLabel($rtFib, "Print", undef, sub {
+	&send($_[1]->getRow()->get("cur"));
+});
+
+# binding to run the Triceps steps in a loop
+my $fbFibLoop = Triceps::FnBinding->new(
+	name => "FibLoop",
+	on => $frFib,
+	withTray => 1,
+	labels => [
+		next => $lbFibCompute,
+		result => $lbPrint,
+	],
+);
+
+my $lbMain = $uFib->makeLabel($rtFib, "Main", undef, sub {
+	my $row = $_[1]->getRow();
+	{
+		my $ab = Triceps::AutoFnBind->new($frFib, $fbFibLoop);
+
+		# send the request into the loop
+		$uFib->makeHashCall($lbFibCompute, $_[1]->getOpcode(),
+			iter => $row->get("iter"),
+			cur => 0, # the "0-th" number
+			prev => 1,
+		);
+
+		# now keep cycling the loop until it's all done
+		while (!$fbFibLoop->trayEmpty()) {
+			$fbFibLoop->callTray();
+		}
+	}
+	&send(" is Fibonacci number ", $row->get("iter"), "\n");
+});
+
+while(&readLine) {
+	chomp;
+	my @data = split(/,/);
+	$uFib->makeArrayCall($lbMain, @data);
+	$uFib->drainFrame(); # just in case, for completeness
+}
+</pre>
+
+		<para>
+		It produces the same output as before (as usual,
+		the lines in bold are the input lines):
+		</para>
+
+<!-- t/xFn.t doFibFn1 -->
+<exdump>
+> OP_INSERT,1
+1 is Fibonacci number 1
+> OP_DELETE,2
+1 is Fibonacci number 2
+> OP_INSERT,5
+5 is Fibonacci number 5
+> OP_INSERT,6
+8 is Fibonacci number 6
+</exdump>
+
+		<para>
+		The option <quote>withTray</quote> of FnBind is what makes it collect the rowops in
+		a tray. The rowops are not the original incoming ones but already
+		translated to call the FnBinding's output labels. The method <pre>callTray()</pre>
+		swaps the tray with a fresh one and then calls the original tray with
+		the collected rowops. There are more methods for the tray control:
+		<pre>swapTray()</pre> swaps the tray with a fresh one and returns the original
+		one, which can then be read or called; <pre>traySize()</pre> returns not just the
+		emptiness condition but the whole size of the tray.
+		</para>
+
+		<para>
+		The whole loop runs in one binding scope, because it doesn't change
+		with the iterations. The first row primes the loop, and then it
+		continues while there is anything to circulate.
+		</para>
+
+		<para>
+		This example sent both the next iteration rows and the result rows
+		through the binding. But for the result rows it doesn't have to. They
+		can be sent directly out of the loop:
+		</para>
+
+<!-- t/xFn.t doFibFn2 -->
+<pre>
+my $lbFibCompute = $uFib->makeLabel($rtFib, "FibCompute", undef, sub {
+	my $row = $_[1]->getRow();
+	my $prev = $row->get("cur");
+	my $cur = $prev + $row->get("prev");
+	my $iter = $row->get("iter") - 1;
+	$uFib->makeHashCall($iter > 0? $frFib->getLabel("next") : $lbPrint, $_[1]->getOpcode(),
+		iter => $iter,
+		cur => $cur,
+		prev => $prev,
+	);
+});
+</pre>
+
+		<para>
+		The printed result is exactly the same as in the previous example. 
+		</para>
+	</sect1>
+
+	<sect1 id="sc_strf_pipelines">
+		<title>Streaming functions and pipelines</title>
+
+		<indexterm>
+			<primary>streaming function</primary>
+		</indexterm>
+		<indexterm>
+			<primary>pipeline</primary>
+		</indexterm>
+		<para>
+		The streaming functions can be arranged into a pipeline by binding the
+		result of one function to the input of another one. Fundamentally, the
+		pipelines in the world of streaming functions are analogs of the nested
+		calls with the common functions. For example, a pipeline (written for
+		shortness in the Unix way)
+		</para>
+
+<pre>
+a | b | c
+</pre>
+
+		<para>
+		is an analog of the common function calls
+		</para>
+
+<pre>
+c(b(a()))
+</pre>
+
+		<para>
+		Of course, if the pipeline is fixed, it can as well be connected
+		directly with the label chaining and then stay like this. A more
+		interesting case is when the pipeline needs to be reconfigured
+		dynamically based on the user requests.
+
+		An interesting example of pipeline usage comes from the data security.
+		A client may connect to a CEP model element in a clear-text or
+		encrypted way. In the encrypted way the data received from the client
+		needs to be decrypted, then processed, and then the results encrypted
+		before sending them back:
+		</para>
+
+<pre>
+receive | decrypt | process | encrypt | send
+</pre>
+
+		<para>
+		In the clear-text mode the pipeline becomes shorter:
+		</para>
+
+<pre>
+receive | process | send
+</pre>
+
+		<para>
+		Let's make an example around this idea: To highlight the flexibility,
+		the configuration will be selectable for each input line. If the input
+		starts with a <quote>+</quote>, it will be considered encrypted, otherwise
+		clear-text. Since the actual security is not important for the example, it will be
+		simulated by encoding the text in hex (each byte of data becomes two
+		hexadecimal digits). The real encryption, such as SSL, would of course
+		require the key negotiation, but this little example just skips over
+		this part, since it has no key.
+
+		First, define the input and output (receive and send) endpoints:
+		</para>
+
+<!-- t/xFn.x doEncPipeline part -->
+<pre>
+# All the input and output gets converted through an intermediate
+# format of a row with one string field.
+my $rtString = Triceps::RowType->new(
+	s => "string"
+);
+
+# All the input gets sent here.
+my $lbReceive = $unit->makeDummyLabel($rtString, "lbReceive");
+my $retReceive = Triceps::FnReturn->new(
+	name => "retReceive",
+	labels => [
+		data => $lbReceive,
+	],
+);
+
+# The binding that actually prints the output.
+my $bindSend = Triceps::FnBinding->new(
+	name => "bindSend",
+	on => $retReceive, # any matching return will do
+	unit => $unit,
+	labels => [
+		data => sub {
+			&send($_[1]->getRow()->get("s"), "\n");
+		},
+	],
+);
+</pre>
+
+		<indexterm>
+			<primary>FnReturn</primary>
+			<secondary>matching</secondary>
+		</indexterm>
+		<para>
+		The same row type <pre>$rtString</pre> will be used for the whole pipeline,
+		sending through the arbitrary strings of text. The binding <pre>$bindSend</pre> is
+		defined on <pre>$retReceive</pre>, so they can actually be short-circuited
+		together. But they don't have to. <pre>$bindSend</pre> can be bound to any
+		matching return. The matching return is defined as having the same
+		number of labels in it, with matching row types. The names of the
+		labels don't matter but their order does. It's a bit tricky: when a
+		binding is created, the labels in it get connected to the return on
+		which it's defined by name. But at this point each of them gets
+		assigned a number, in order the labels went in that original return.
+		After that only this number matters: if this binding gets connected to
+		another matching return, it will get the data from the return's label
+		with the same number, not the same name.
+		</para>
+
+		<para>
+		Next step, define the endpoints for the processing: the dispatcher and
+		the output label. All of them use the same row type and matching
+		returns. The actual processing will eventually be hard-connected
+		between these endpoints.
+		</para>
+
+<!-- t/xFn.x doEncPipeline part -->
+<pre>
+my %dispatch; # the dispatch table will be set here
+
+# The binding that dispatches the input data
+my $bindDispatch = Triceps::FnBinding->new(
+	name => "bindDispatch",
+	on => $retReceive,
+	unit => $unit,
+	labels => [
+		data => sub {
+			my @data = split(/,/, $_[1]->getRow()->get("s")); # starts with a command, then string opcode
+			my $type = shift @data;
+			my $lb = $dispatch{$type};
+			my $rowop = $lb->makeRowopArray(@data);
+			$unit->call($rowop);
+		},
+	],
+);
+
+# All the output gets converted to rtString and sent here.
+my $lbOutput = $unit->makeDummyLabel($rtString, "lbOutput");
+my $retOutput = Triceps::FnReturn->new(
+	name => "retOutput",
+	labels => [
+		data => $lbOutput,
+	],
+);
+</pre>
+
+		<para>
+		And now the filters for encryption and decryption. Each of them has a
+		binding for its input and a return for its output. The actual
+		pseudo-encryption transformation is done with Perl functions <pre>unpack()</pre>
+		and <pre>pack()</pre>.
+		</para>
+
+<!-- t/xFn.x doEncPipeline part -->
+<pre>
+# The encryption pipeline element.
+my $retEncrypt = Triceps::FnReturn->new(
+	name => "retEncrypt",
+	unit => $unit,
+	labels => [
+		data => $rtString,
+	],
+);
+my $lbEncrypt = $retEncrypt->getLabel("data");
+my $bindEncrypt = Triceps::FnBinding->new(
+	name => "bindEncrypt",
+	on => $retReceive,
+	unit => $unit,
+	labels => [
+		data => sub {
+			my $s = $_[1]->getRow()->get("s");
+			$unit->makeArrayCall($lbEncrypt, "OP_INSERT", unpack("H*", $s));
+		},
+	],
+);
+
+# The decryption pipeline element.
+my $retDecrypt = Triceps::FnReturn->new(
+	name => "retDecrypt",
+	unit => $unit,
+	labels => [
+		data => $rtString,
+	],
+);
+my $lbDecrypt = $retDecrypt->getLabel("data");
+my $bindDecrypt = Triceps::FnBinding->new(
+	name => "bindDecrypt",
+	on => $retReceive,
+	unit => $unit,
+	labels => [
+		data => sub {
+			my $s = $_[1]->getRow()->get("s");
+			$unit->makeArrayCall($lbDecrypt, "OP_INSERT", pack("H*", $s));
+		},
+	],
+);
+</pre>
+
+		<para>
+		Then goes the body of the model. It defines the actual row types for
+		the data that gets parsed from strings and the business logic (which is
+		pretty simple, increasing an integer field). The dispatch table
+		connects the dispatcher with the business logic, and the conversion
+		from the data rows to the plain text rows is done with template
+		<pre>makePipePrintLabel()</pre>. This template is very similar to the template
+		<pre>makePrintLabel()</pre> that was shown in 
+		<xref linkend="sc_template_wrapper" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+<!-- t/xFn.x makePipePrintLabel && doEncPipeline part -->
+<pre>
+sub makePipePrintLabel($$$) # ($print_label_name, $parent_label, $out_label)
+{
+	my $name = shift;
+	my $lbParent = shift;
+	my $lbOutput = shift;
+	my $unit = $lbOutput->getUnit();
+	my $lb = $lbParent->getUnit()->makeLabel($lbParent->getType(), $name,
+		undef, sub { # (label, rowop)
+			$unit->makeArrayCall(
+				$lbOutput, "OP_INSERT", $_[1]->printP());
+		});
+	$lbParent->chain($lb);
+	return $lb;
+}
+
+# The body of the model: pass through the name, increase the count.
+my $rtData = Triceps::RowType->new(
+	name => "string",
+	count => "int32",
+);
+
+my $lbIncResult = $unit->makeDummyLabel($rtData, "result");
+my $lbInc = $unit->makeLabel($rtData, "inc", undef, sub {
+	my $row = $_[1]->getRow();
+	$unit->makeHashCall($lbIncResult, $_[1]->getOpcode(),
+		name  => $row->get("name"),
+		count => $row->get("count") + 1,
+	);
+});
+makePipePrintLabel("printResult", $lbIncResult, $lbOutput);
+
+%dispatch = (
+	inc => $lbInc,
+);
+</pre>
+
+		<para>
+		Finally, the main loop. It will check the input lines for the leading
+		<quote>+</quote> and construct one or the other pipeline for processing. Of course,
+		the pipelines don't have to be constructed in the main loop. They could
+		have been constructed in the handler of <pre>$lbReceive</pre> just as well (then
+		it would need a separate label to send its result to, and to include
+		into <pre>$retReceive</pre>).
+		</para>
+
+<!-- t/xFn.x doEncPipeline part -->
+<pre>
+while(&readLine) {
+	my $ab;
+	chomp;
+	if (/^\+/) {
+		$ab = Triceps::AutoFnBind->new(
+			$retReceive => $bindDecrypt,
+			$retDecrypt => $bindDispatch,
+			$retOutput => $bindEncrypt,
+			$retEncrypt => $bindSend,
+		);
+		$_ = substr($_, 1);
+	} else {
+		$ab = Triceps::AutoFnBind->new(
+			$retReceive => $bindDispatch,
+			$retOutput => $bindSend,
+		);
+	};
+	$unit->makeArrayCall($lbReceive, "OP_INSERT", $_);
+	$unit->drainFrame();
+}
+</pre>
+
+		<indexterm>
+			<primary>AutoFnBind</primary>
+		</indexterm>
+		<para>
+		The constructor of AutoFnBind can accept
+		multiple return-binding pairs. It will bind them all, and unbind them
+		back on its object destruction. It's the same thing as creating
+		multiple AutoFnBind objects, one for each pair, only more efficient.
+
+		And here is an example of a run (as usual the input lines are in bold,
+		and the long lines get wrapped):
+		</para>
+
+<!-- t/xFn.x doEncPipeline manual line wrap -->
+<exdump>
+> inc,OP_INSERT,abc,1
+result OP_INSERT name="abc" count="2"
+> inc,OP_DELETE,def,100
+result OP_DELETE name="def" count="101"
+> +696e632c4f505f494e534552542c6162632c32
+726573756c74204f505f494e53455254206e616d653d226162632220636f756e743d2
+  2332220
+> +696e632c4f505f44454c4554452c6465662c313031
+726573756c74204f505f44454c455445206e616d653d226465662220636f756e743d2
+  23130322220
+</exdump>
+
+		<para>
+		What is in the encrypted data? The input lines have been produced by
+		running a Perl expression manually:
+		</para>
+
+<!-- t/xFn.x doEncPipeline uncommented -->
+<exdump>
+$ perl -e 'print((unpack "H*", "inc,OP_INSERT,abc,2"), "\n");'
+696e632c4f505f494e534552542c6162632c32
+$ perl -e 'print((unpack "H*", "inc,OP_DELETE,def,101"), "\n");'
+696e632c4f505f44454c4554452c6465662c313031
+</exdump>
+
+		<para>
+		They and their results can be decoded by running another Perl expression:
+		</para>
+
+<!-- t/xFn.x doEncPipeline uncommented, manual line wrap -->
+<exdump>
+$ perl -e 'print((pack "H*", "726573756c74204f505f494e53455254206e616
+  d653d226162632220636f756e743d22332220"), "\n");'
+result OP_INSERT name="abc" count="3"
+$ perl -e 'print((pack "H*", "726573756c74204f505f44454c455445206e616
+  d653d226465662220636f756e743d223130322220"), "\n");'
+result OP_DELETE name="def" count="102" 
+</exdump>
+	</sect1>
+
+	<sect1 id="sc_strf_tables">
+		<title>Streaming functions and tables</title>
+
+		<indexterm>
+			<primary>streaming function</primary>
+		</indexterm>
+		<indexterm>
+			<primary>table</primary>
+			<secondary>FnReturn</secondary>
+		</indexterm>
+
+		<para>
+		Sometimes you might want to collect a table's reaction to
+		an operation on it and process it manually afterwards.
+		Triceps 1.0 had a special feature called <quote>copy tray</quote>
+		to support that but starting with the version 2.0 the
+		streaming functions solve this problem much better, replacing
+		the copy trays.
+		</para>
+
+		<para>
+		If you connect the table's output to a FnReturn and then
+		push a binding with a tray onto it, the table's output
+		will be collected on that tray. There is even a Table
+		method that creates this FnReturn:
+		</para>
+
+<pre>
+$fret = $table->fnReturn();
+</pre>
+
+		<para>
+		The return contains the labels <quote>pre</quote>, <quote>out</quote>, <quote>dump</quote> (more
+		on that one below) and the named labels for
+		all aggregators. The FnReturn object is created on the first call of
+		this method and is kept in the table. All the following calls return
+		the same object. This has some interesting consequences for the <quote>pre</quote>
+		label: the rowop for the <quote>pre</quote> label doesn't get created at all if
+		there is nothing chained from that label. But when the FnReturn gets
+		created, one of its labels gets chained from the <quote>pre</quote> label. Which
+		means that once you call <pre>$table->fnReturn()</pre> for the first time, you
+		will see that table's <quote>pre</quote> label called in all the traces. It's not a
+		huge extra overhead, but still something to keep in mind and not be
+		surprised when calling <pre>fnReturn()</pre> changes all your traces.
+		</para>
+
+		<para>
+		The following code demonstrates the use of an FnReturn to collect
+		the changes done to a table on insert:
+		</para>
+
+<!-- t/Table.t CopyTray1 -->
+<pre>
+my $fret1 = $t1->fnReturn();
+my $fbind1 = Triceps::FnBinding->new(
+    unit => $unit,
+    name => "fbind1",
+    on => $fret1,
+    withTray => 1,
+    labels => [
+        out => sub { }, # another way to make a dummy
+    ],
+);
+
+$fret1->push($fbind1);
+$t1->insert($row1);
+$fret1->pop($fbind1);
+
+# $tray contains the rowops produced by the update
+my $tray = $fbind1->swapTray(); # get the updates on an insert
+my @rowops = $tray->toArray();
+</pre>
+
+		<para>
+		And then you could for example check if any rowop has the DELETE opcode,
+		this meaning that an old row was displaced by this insert. Of course,
+		this is not the most efficient way. Placing the check into the label handler
+		would be a better approach. And you don't even have to collect the rowops
+		in a tray, you can as well compute the result on the fly:
+		</para>
+
+<!-- t/Table.t CopyTray2 -->
+<pre>
+my $seenDelete;
+
+my $fret1 = $t1->fnReturn();
+my $fbind1 = Triceps::FnBinding->new(
+    unit => $unit,
+    name => "fbind1",
+    on => $fret1,
+    labels => [
+        out => sub {
+			$seenDelete = 1 if ($_[1]->isDelete());
+		}
+    ],
+);
+
+$fret1->push($fbind1);
+$seenDelete = 0;
+$t1->insert($row1);
+$fret1->pop($fbind1);
+
+if ($seenDelete) {
+	# there was a displacement
+}
+</pre>
+		<!-- XXX this might be a good example for the onPush handlers -->
+
+		<para>
+		The variable <pre>$seenDelete</pre> is remembered in the closure function
+		that handles the <quote>out</quote> label and sets it accordingly.
+		</para>
+
+		<para>
+		In both examples the binding doesn't have to be created from scratch
+		each time. Creating it once and then reusing as needed would be more
+		efficient.
+		</para>
+
+		<para>
+		And of course the use of an FnReturn doesn't preclude you from connecting
+		the table outputs as usual.
+		</para>
+
+		<indexterm>
+			<primary>table</primary>
+			<secondary>dump</secondary>
+		</indexterm>
+		<para>
+		Another feature where the tables and streaming functions intersect is the table
+		dumping. It allows to iterate on a table in a functional manner.
+		</para>
+
+		<para>
+		The label <quote>dump</quote> is present in the table and its FnReturn. Whenever the
+		method <pre>Table::dumpAll()</pre> is called, it sends the whole contents of the table to
+		that label. Then you can set a binding on the table's FnReturn, call
+		<pre>dumpAll()</pre>, and the binding will iterate through the whole table's
+		contents.
+		</para>
+
+		<para>
+		If you want to get the dump label explicitly, you can do it with
+		</para>
+
+<pre>
+my $dlab = $table->getDumpLabel();
+</pre>
+
+		<para>
+		Normally the only reason to do that would be to add it to another
+		FnReturn (besides the table's FnReturn). Chaining anything else
+		directly to this label would not make much sense, because the dump of
+		the table can be called from many places, and the directly chained
+		label will receive data every time the dump is called.
+		</para>
+
+		<para>
+		The grand plan is also to add the dumping by a a condition that selects
+		a sub-index, but it's not implemented yet. You can select an index for
+		an alternative ordering but all the rows get dumped in any case.
+		</para>
+
+		<para>
+		The method <pre>dumpAllIdx()</pre> is the one that
+		sends the rows in the order of a chosen index, rather than the default first
+		leaf index:
+		</para>
+
+<pre>
+$table->dumpAll();
+$table->dumpAllIdx($indexType);
+</pre>
+
+		<para>
+		As usual, the index type must belong to the exact type of this table. For example:
+		</para>
+
+<pre>
+$table->dumpAllIdx($table->getType()->findIndexPath("cb"), "OP_NOP");
+</pre>
+
+		<para>
+		The typical usage looks like this:
+		</para>
+
+<!-- from t/Table.t, with renamed variables and shifted -->
+<pre>
+Triceps::FnBinding::call(
+	name => "iterate",
+	on => $table->fnReturn(),
+	unit => $unit,
+	labels => [
+		dump => sub { ... },
+	],
+	code => sub {
+		$table->dumpAll();
+	},
+);
+</pre>
+
+		<para>
+		It's less efficient than the normal iteration but sometimes comes
+		handy.
+		</para>
+
+		<para>
+		Normally the rowops are sent with the opcode OP_INSERT. But the opcode
+		can also be specified explicitly:
+		</para>
+
+<pre>
+$table->dumpAll($opcode);
+$table->dumpAllIdx($indexType, $opcode);
+</pre>
+
+		<para>
+		And some more interesting examples will be forthcoming in
+		<xref linkend="sc_strf_units" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;
+		and
+		<xref linkend="sc_tql_join_internals" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_strf_templates">
+		<title>Streaming functions and template results</title>
+
+		<indexterm>
+			<primary>streaming function</primary>
+		</indexterm>
+		<indexterm>
+			<primary>template</primary>
+		</indexterm>
+
+		<para>
+		The same way as the FnReturns can be used to get back the direct
+		results of the operations on the tables, they can be also used on the
+		templates in general. Indeed, it's a good idea to have a method that
+		would create an FnReturn in all the templates. So I went ahead and
+		added it to the LookupJoin, JoinTwo and Collapse.
+		</para>
+
+		<indexterm>
+			<primary>LookupJoin</primary>
+		</indexterm>
+		<indexterm>
+			<primary>JoinTwo</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Collapse</primary>
+		</indexterm>
+		<para>
+		For the joins, the resulting FnReturn has one label <quote>out</quote>. It's created
+		similarly to the table's:
+		</para>
+
+<pre>
+my $fret = $join->fnReturn();
+</pre>
+
+		<para>
+		And then it can be used as usual. The implementation of this method is
+		fairly simple:
+		</para>
+
+<!-- lib/Triceps/JoinTwo.pm fragment -->
+<pre>
+sub fnReturn # (self)
+{
+	my $self = shift;
+	if (!defined $self->{fret}) {
+		$self->{fret} = Triceps::FnReturn->new(
+			name => $self->{name} . ".fret",
+			labels => [
+				out => $self->{outputLabel},
+			],
+		);
+	}
+	return $self->{fret};
+}
+</pre>
+
+		<para>
+		All this makes the method <pre>lookup()</pre> of LookupJoin essentially redundant,
+		since now pretty much all the same can be done with the streaming
+		function API, and even better, because it provides the opcodes on
+		rowops, can handle the full processing, and calls the rowops one by one
+		without necessarily creating an array. But it could happen yet that the
+		<pre>lookup()</pre> has some more convenient uses too, so I didn't remove it yet.
+		</para>
+
+		<para>
+		For Collapse the interface is a little more complicated: the FnReturn
+		contains a label for each data set, named the same as the data set. The
+		order of labels follows the order of the data set definitions (though
+		right now it's kind of moot, because only one data set is supported).
+		The implementation is:
+		</para>
+
+<!-- lib/Triceps/Collapse.pm fragment -->
+<pre>
+sub fnReturn # (self)
+{
+	my $self = shift;
+	if (!defined $self->{fret}) {
+		my @labels;
+		for my $n (@{$self->{dsetnames}}) {
+			push @labels, $n, $self->{datasets}{$n}{lbOut};
+		}
+		$self->{fret} = Triceps::FnReturn->new(
+			name => $self->{name} . ".fret",
+			labels => \@labels,
+		);
+	}
+	return $self->{fret};
+}
+</pre>
+
+		<para>
+		Use these examples to write the <pre>fnReturn()</pre> in your templates. 
+		</para>
+	</sect1>
+
+	<sect1 id="sc_strf_recursion">
+		<title>Streaming functions and recursion</title>
+
+		<indexterm>
+			<primary>streaming function</primary>
+		</indexterm>
+		<indexterm>
+			<primary>recursion</primary>
+		</indexterm>
+		<para>
+		Let's look again at the pipeline example. Suppose we want to do the
+		encryption twice (you know, maybe we have a secure channel to a
+		semi-trusted intermediary who can can read the envelopes and forward
+		the encrypted messages he can't read to the final destination). The
+		pipeline becomes
+		</para>
+
+<pre>
+decrypt | decrypt | process | encrypt | encrypt
+</pre>
+
+		<para>
+		Or if you want to think about it in a more function-like notation,
+		rather than a pipeline, the logic can also be expressed as:
+		</para>
+
+<pre>
+encrypt(encrypt(process(decrypt(decrypt(data)))))
+</pre>
+
+		<para>
+		However it would not work directly: a decrypt function has only one
+		output and it can not have two bindings at the same time, it would not
+		know which one to use at any particular time.
+		</para>
+
+		<para>
+		Instead you can make decrypt into a template, instantiate it twice, and
+		connect into a pipeline. It's very much like what the Unix shell does:
+		it instantiates a new process for each part of its pipeline.
+		</para>
+
+		<para>
+		But there is also another possibility: instead of assembling the whole
+		pipeline in advance, do it in steps.
+		</para>
+
+		<para>
+		Start by adding this option in every binding:
+		</para>
+
+<pre>
+withTray => 1,
+</pre>
+
+		<para>
+		This will make all the bindings collect the result on a tray instead of
+		sending it on immediately. Then modify the main loop:
+		</para>
+
+<!-- t/xFn.t doRecursivePipeline, $variant == 1 -->
+<pre>
+while(&readLine) {
+	chomp;
+
+	# receive
+	my $abReceive = Triceps::AutoFnBind->new(
+		$retReceive => $bindDecrypt,
+	);
+	$unit->makeArrayCall($lbReceive, "OP_INSERT", $_);
+
+	# 1st decrypt
+	my $abDecrypt1 = Triceps::AutoFnBind->new(
+		$retDecrypt => $bindDecrypt,
+	);
+	$bindDecrypt->callTray();
+
+	# 2nd decrypt
+	my $abDecrypt2 = Triceps::AutoFnBind->new(
+		$retDecrypt => $bindDispatch,
+	);
+	$bindDecrypt->callTray();
+
+	# processing
+	my $abProcess = Triceps::AutoFnBind->new(
+		$retOutput => $bindEncrypt,
+	);
+	$bindDispatch->callTray();
+
+	# 1st encrypt
+	my $abEncrypt1 = Triceps::AutoFnBind->new(
+		$retEncrypt => $bindEncrypt,
+	);
+	$bindEncrypt->callTray();
+
+	# 2nd encrypt
+	my $abEncrypt2 = Triceps::AutoFnBind->new(
+		$retEncrypt => $bindSend,
+	);
+	$bindEncrypt->callTray();
+
+	# send
+	$bindSend->callTray();
+}
+</pre>
+
+		<para>
+		Here I've dropped the encrypted-or-unencrypted choice to save the
+		space, the data is always encrypted twice. The <pre>drainFrame()</pre> call has
+		been dropped because with the way the function calls work here 
+		there is no chance that it could be useful. The rest of the code stays the same.
+		</para>
+
+		<para>
+		The bindings have been split in stages. The next binding
+		is set in each stage, and the data from the previous binding gets sent into it. The
+		binding method <pre>callTray()</pre> replaces the tray in the binding with an
+		empty one, and then calls all the rowops collected on the old tray (and
+		if you wonder what then happens to the old tray, it gets discarded).
+		Because of this the first decryption stage with binding
+		</para>
+
+<pre>
+my $abDecrypt1 = Triceps::AutoFnBind->new(
+	$retDecrypt => $bindDecrypt,
+);
+</pre>
+
+		<para>
+		doesn't send the data circling forever. It just does one pass through
+		the decryption and prepares for the second pass.
+		</para>
+
+		<para>
+		Every time <pre>AutoFnBind->new()</pre> runs, it doesn't replace the binding of
+		the FnReturn but pushes a new binding onto the FnReturn's stack. Each
+		FnReturn has its own stack of bindings (this way it's easier to manage
+		than a single stack). When an AutoFnBind gets destroyed, it pops the
+		binding from the return's stack. And yes, if you specify multiple
+		bindings in one AutoFnBind, all of them get pushed on construction and
+		popped on destruction. In this case all the auto-binds are in the same
+		block, so they will all be destroyed at the end of block in the
+		opposite order. Which means that in effect the code is equivalent to
+		the nested blocks. And the version with explicit nexted blocks
+		might be easier for you to think of:
+		</para>
+
+<!-- t/xFn.t doRecursivePipeline, $variant == 2 -->
+<pre>
+while(&readLine) {
+	chomp;
+
+	# receive
+	my $abReceive = Triceps::AutoFnBind->new(
+		$retReceive => $bindDecrypt,
+	);
+	$unit->makeArrayCall($lbReceive, "OP_INSERT", $_);
+
+	{
+		# 1st decrypt
+		my $abDecrypt1 = Triceps::AutoFnBind->new(
+			$retDecrypt => $bindDecrypt,
+		);
+		$bindDecrypt->callTray();
+
+		{
+			# 2nd decrypt
+			my $abDecrypt1 = Triceps::AutoFnBind->new(
+				$retDecrypt => $bindDispatch,
+			);
+			$bindDecrypt->callTray();
+
+			{
+				# processing
+				my $abProcess = Triceps::AutoFnBind->new(
+					$retOutput => $bindEncrypt,
+				);
+				$bindDispatch->callTray();
+
+				{
+					# 1st encrypt
+					my $abEncrypt1 = Triceps::AutoFnBind->new(
+						$retEncrypt => $bindEncrypt,
+					);
+					$bindEncrypt->callTray();
+
+					{
+						# 2nd encrypt
+						my $abEncrypt1 = Triceps::AutoFnBind->new(
+							$retEncrypt => $bindSend,
+						);
+						$bindEncrypt->callTray();
+
+						# send
+						$bindSend->callTray();
+					}
+				}
+			}
+		}
+	}
+}
+</pre>
+
+		<para>
+		An interesting consequence of all this nesting, pushing and popping is
+		that you can put the inner calls into the procedural loops if you wish.
+		For example, if you want to process every input line thrice:
+		</para>
+
+<!-- t/xFn.t doRecursivePipeline, $variant == 4 -->
+<pre>
+while(&readLine) {
+	chomp;
+
+	# receive
+	my $abReceive = Triceps::AutoFnBind->new(
+		$retReceive => $bindDecrypt,
+	);
+
+	for (my $i = 0; $i < 3; $i++) {
+		$unit->makeArrayCall($lbReceive, "OP_INSERT", $_);
+
+		{
+			# 1st decrypt
+			my $abDecrypt1 = Triceps::AutoFnBind->new(
+				$retDecrypt => $bindDecrypt,
+			);
+			$bindDecrypt->callTray();
+
+			{
+				# 2nd decrypt
+				my $abDecrypt1 = Triceps::AutoFnBind->new(
+					$retDecrypt => $bindDispatch,
+				);
+				$bindDecrypt->callTray();
+
+				{
+					# processing
+					my $abProcess = Triceps::AutoFnBind->new(
+						$retOutput => $bindEncrypt,
+					);
+					$bindDispatch->callTray();
+
+					{
+						# 1st encrypt
+						my $abEncrypt1 = Triceps::AutoFnBind->new(
+							$retEncrypt => $bindEncrypt,
+						);
+						$bindEncrypt->callTray();
+
+						{
+							# 2nd encrypt
+							my $abEncrypt1 = Triceps::AutoFnBind->new(
+								$retEncrypt => $bindSend,
+							);
+							$bindEncrypt->callTray();
+
+							# send
+							$bindSend->callTray();
+						}
+					}
+				}
+			}
+		}
+	}
+}
+</pre>
+
+		<para>
+		This code will run the whole pipeline three times for each input line,
+		and print out three output lines. The following example of the
+		output has both the input and the output lines wrapped, since
+		they are hugely long:
+		</para>
+
+<!-- t/xFn.t doRecursivePipeline(4), manual wrapping -->
+<exdump>
+> 363936653633326334663530356634393465353334353532353432633631363236
+>   3332633332
+373236353733373536633734323034663530356634393465353334353532353432
+  3036653631366436353364323236313632363332323230363336663735366537
+  3433643232333332323230
+373236353733373536633734323034663530356634393465353334353532353432
+  3036653631366436353364323236313632363332323230363336663735366537
+  3433643232333332323230
+373236353733373536633734323034663530356634393465353334353532353432
+  3036653631366436353364323236313632363332323230363336663735366537
+  3433643232333332323230
+</exdump>
+
+		<para>
+		If you wonder, what is the meaning of these lines, they are the same as
+		before. The input is :
+		</para>
+
+<!-- t/xFn.t -->
+<exdump>
+inc,OP_INSERT,abc,2
+</exdump>
+
+		<para>
+		And each line of output is:
+		</para>
+
+<!-- t/xFn.t -->
+<exdump>
+result OP_INSERT name="abc" count="3"
+</exdump>
+
+		<para>
+		I suppose, it would be more entertaining if the processing weren't just
+		incrementing a value in the input data but incrementing some static
+		counter, then the three output lines would be different.
+		</para>
+
+		<para>
+		However this is not the only way to do the block nesting. The contents
+		of the FnBinding's tray is not affected in any way by the binding being
+		pushed or popped. It stays there throughout, until it's explicitly
+		flushed by <pre>callTray()</pre>. So it could use the blocks formed in a more
+		pipeline-like fashion (as opposed to the more function-call-like fashion
+		shown before):
+		</para>
+
+<!-- t/xFn.t doRecursivePipeline, $variant == 3 -->
+<pre>
+while(&readLine) {
+	chomp;
+
+	# receive
+	{
+		my $abReceive = Triceps::AutoFnBind->new(
+			$retReceive => $bindDecrypt,
+		);
+		$unit->makeArrayCall($lbReceive, "OP_INSERT", $_);
+	}
+
+	# 1st decrypt
+	{
+		my $abDecrypt1 = Triceps::AutoFnBind->new(
+			$retDecrypt => $bindDecrypt,
+		);
+		$bindDecrypt->callTray();
+	}
+
+	# 2nd decrypt
+	{
+		my $abDecrypt1 = Triceps::AutoFnBind->new(
+			$retDecrypt => $bindDispatch,
+		);
+		$bindDecrypt->callTray();
+	}
+
+	# processing
+	{
+		my $abProcess = Triceps::AutoFnBind->new(
+			$retOutput => $bindEncrypt,
+		);
+		$bindDispatch->callTray();
+	}
+
+	# 1st encrypt
+	{
+		my $abEncrypt1 = Triceps::AutoFnBind->new(
+			$retEncrypt => $bindEncrypt,
+		);
+		$bindEncrypt->callTray();
+	}
+
+	# 2nd encrypt
+	{
+		my $abEncrypt1 = Triceps::AutoFnBind->new(
+			$retEncrypt => $bindSend,
+		);
+		$bindEncrypt->callTray();
+	}
+
+	# send
+	$bindSend->callTray();
+}
+</pre>
+
+		<para>
+		After each stage, its binding is popped but the tray is carried through
+		to the next stage.
+		</para>
+
+		<para>
+		Which way of blocking is better? I'd say they're pretty equivalent in
+		functionality, and your preference would depend on what style you
+		prefer to express. 
+		</para>
+	</sect1>
+
+	<sect1 id="sc_strf_more_recursion">
+		<title>Streaming functions and more recursion</title>
+
+		<indexterm>
+			<primary>streaming function</primary>
+		</indexterm>
+		<indexterm>
+			<primary>recursion</primary>
+		</indexterm>
+		<para>
+		There are great many slightly different ways to use recursion with
+		the streaming functions. This section goes through them with examples
+		of the Fibonacci numbers computed in all these ways. You can as well
+		skip over this section if you're not particularly interested in
+		the details of recursive execution.
+		</para>
+
+		<para>
+		All the examples from this section (and most of others from this chapter)
+		are locates in <pre>t/xFn.t</pre>.
+		The first example uses the dumb recursive calls.
+		It's a real dumb recursive way, with two recursive calls and thus the
+		exponential execution time, just to show
+		how they can be done. This simplest and most straightforward way goes 
+		as follows:
+		</para>
+
+<!-- t/xFn.t doFibFn3 -->
+<pre>
+my $uFib = Triceps::Unit->new("uFib");
+$uFib->setMaxRecursionDepth(100);
+
+# Type the data going into the function
+my $rtFibArg = Triceps::RowType->new(
+	idx => "int32", # the index of Fibonacci number to generate
+);
+
+# Type of the function result
+my $rtFibRes = Triceps::RowType->new(
+	idx => "int32", # the index of Fibonacci number
+	fib => "int64", # the generated Fibonacci number
+);
+
+###
+# A streaming function that computes a Fibonacci number.
+
+# Input: 
+#   $lbFibCompute: request to compute the number.
+# Output (by FnReturn labels):
+#   "result": the computed value.
+# The opcode is preserved through the computation.
+
+my $frFib = Triceps::FnReturn->new(
+	name => "Fib",
+	unit => $uFib,
+	labels => [
+		result => $rtFibRes,
+	],
+);
+
+my $lbFibResult = $frFib->getLabel("result");
+
+my $lbFibCompute; # must be defined before assignment, for recursion
+$lbFibCompute = $uFib->makeLabel($rtFibArg, "FibCompute", undef, sub {
+	my $row = $_[1]->getRow();
+	my $op = $_[1]->getOpcode();
+	my $idx = $row->get("idx");
+	my $res;
+
+	if ($idx < 1) {
+		$res = 0;
+	} elsif($idx == 1) {
+		$res = 1;
+	} else {
+		my ($prev1, $prev2);
+		Triceps::FnBinding::call(
+			name => "FibCompute.call1",
+			on => $frFib,
+			unit => $uFib,
+			labels => [
+				result => sub {
+					$prev1 = $_[1]->getRow()->get("fib");
+				}
+			],
+			rowop => $lbFibCompute->makeRowopHash($op, 
+				idx => $idx - 1,
+			),
+		);
+		Triceps::FnBinding::call(
+			name => "FibCompute.call2",
+			on => $frFib,
+			unit => $uFib,
+			labels => [
+				result => sub {
+					$prev2 = $_[1]->getRow()->get("fib");
+				}
+			],
+			rowop => $lbFibCompute->makeRowopHash($op, 
+				idx => $idx - 2,
+			),
+		);
+		$res = $prev1 + $prev2;
+	}
+	$uFib->makeHashCall($frFib->getLabel("result"), $op,
+		idx => $idx,
+		fib => $res,
+	);
+});
+
+# End of streaming function
+###
+
+# binding to call the Fibonacci function and print the result
+my $fbFibCall = Triceps::FnBinding->new(
+	name => "FibCall",
+	on => $frFib,
+	unit => $uFib,
+	labels => [
+		result => sub {
+			my $row = $_[1]->getRow();
+			&send($row->get("fib"), " is Fibonacci number ", $row->get("idx"), "\n");
+		}
+	],
+);
+
+while(&readLine) {
+	chomp;
+	my @data = split(/,/);
+	$uFib->callBound(
+		$lbFibCompute->makeRowopArray(@data),
+		$frFib => $fbFibCall,
+	);
+	$uFib->drainFrame(); # just in case, for completeness
+}
+</pre>
+
+		<para>
+		The calling sequence had become different than in the looping version
+		but the produced result is exactly the same.  The streaming function
+		now receives an argument row and produces a result row. The unit's
+		recursion depth limit had to be adjusted to permit the recursion.
+		</para>
+
+		<para>
+		The recursive calls are done through the <pre>FnBinding::call()</pre>, with a
+		closure for the result handling label. That closure can access the
+		scope of its creator and place the result into its local variable.
+		After both intermediate results are computed, the final result
+		computation takes place and sends out the result row. 
+		</para>
+
+		<para>
+		The <pre>FnBinding::call()</pre> creates a brand new binding
+		for each call. So no matter how deep is the recursion, each
+		function call will get a separate binding that knows how to
+		put the results into the correct place.
+		</para>
+
+		<para>
+		If the streaming function were to return more than one
+		rowop, the closure would have to collect them all into
+		a variable. The further processing can not be done until
+		the function completes. The bindings with trays cannot
+		be used because <pre>FnBinding::call()</pre> disposes of
+		the binding before it returns, so there is no chance to
+		extract the tray from the binding. Perhaps this can be improved
+		in the future. But there is another way to use trays that
+		will be shown below.
+		</para>
+
+		<para>
+		And just to show yet another technique, the main loop is also different:
+		instead of creating an AutoFnBind manually, it uses the Unit's
+		method <pre>callBound()</pre> that is more compact to write and
+		slightly more efficient. It's a great method if you have all the
+		rowops for the call available upfront. It's first argument is a rowop
+		or a tray or a reference to an array of rowops. The rest are the pairs
+		of FnReturns and FnBindings. The bindings are pushed onto the FnReturns,
+		then the rowops are called, then the bindings are popped. It replaces
+		a whole block that would contain an AutoFnBind and the calls.
+		</para>
+
+		<para>
+		<pre>FnBinding:call()</pre> with closures is easy to use but it creates a closure
+		and an FnBinding object on each run. Can things be rearranged to reuse
+		the same objects? With some effort, they can:
+		</para>
+
+<!-- t/xFn.t doFibFn5 -->
+<pre>
+###
+# A streaming function that computes a Fibonacci number.
+
+# Input: 
+#   $lbFibCompute: request to compute the number.
+# Output (by FnReturn labels):
+#   "result": the computed value.
+# The opcode is preserved through the computation.
+
+my @stackFib; # stack of the function states
+my $stateFib; # The current state
+
+my $frFib = Triceps::FnReturn->new(
+	name => "Fib",
+	unit => $uFib,
+	labels => [
+		result => $rtFibRes,
+	],
+	onPush => sub { push @stackFib, $stateFib; $stateFib = { }; },
+	onPop => sub { $stateFib = pop @stackFib; },
+);
+
+my $lbFibResult = $frFib->getLabel("result");
+
+# Declare the label & binding variables in advance, to define them sequentially.
+my ($lbFibCompute, $fbFibPrev1, $fbFibPrev2);
+$lbFibCompute = $uFib->makeLabel($rtFibArg, "FibCompute", undef, sub {
+	my $row = $_[1]->getRow();
+	my $op = $_[1]->getOpcode();
+	my $idx = $row->get("idx");
+
+	if ($idx <= 1) {
+		$uFib->makeHashCall($frFib->getLabel("result"), $op,
+			idx => $idx,
+			fib => $idx < 1 ? 0 : 1,
+		);
+	} else {
+		$stateFib->{op} = $op;
+		$stateFib->{idx} = $idx;
+
+		$frFib->push($fbFibPrev1);
+		$uFib->makeHashCall($lbFibCompute, $op, 
+			idx => $idx - 1,
+		);
+	}
+});
+$fbFibPrev1 = Triceps::FnBinding->new(
+	unit => $uFib,
+	name => "FibPrev1",
+	on => $frFib,
+	labels => [
+		result => sub {
+			$frFib->pop($fbFibPrev1);
+
+			$stateFib->{prev1} = $_[1]->getRow()->get("fib");
+
+			# must prepare before pushing new state and with it new $stateFib
+			my $rop = $lbFibCompute->makeRowopHash($stateFib->{op}, 
+				idx => $stateFib->{idx} - 2,
+			);
+
+			$frFib->push($fbFibPrev2);
+			$uFib->call($rop);
+		},
+	],
+);
+$fbFibPrev2 = Triceps::FnBinding->new(
+	unit => $uFib,
+	on => $frFib,
+	name => "FibPrev2",
+	labels => [
+		result => sub {
+			$frFib->pop($fbFibPrev2);
+
+			$stateFib->{prev2} = $_[1]->getRow()->get("fib");
+			$uFib->makeHashCall($frFib->getLabel("result"), $stateFib->{op},
+				idx => $stateFib->{idx},
+				fib => $stateFib->{prev1} + $stateFib->{prev2},
+			);
+		},
+	],
+);
+
+# End of streaming function
+###
+</pre>
+
+		<para>
+		The rest of the code stays the same, so I won't copy it here.
+		</para>
+
+		<para>
+		The computation still needs to keep the intermediate results of two
+		recursive calls. With no closures, these results have to be kept in a
+		global object <pre>$stateFib</pre> (which refers to a hash that keeps multiple values).
+		</para>
+
+		<para>
+		But it can't just be a single object! The recursive calls would
+		overwrite it. So it has to be built into a stack of objects, a new one
+		pushed for each call and popped after it. This pushing and popping can
+		be tied to the pushing and popping of the bindings on an FnReturn. When
+		the FnReturn is defined, the options <quote>onPush</quote> and <quote>onPop</quote> define the custom
+		Perl code to execute, which is used here for the management of the
+		state stack.
+		</para>
+
+		<para>
+		The whole logic is then split into the sections around the calls:
+		</para>
+
+		<itemizedlist>
+		<listitem>
+		before the first call;
+		</listitem>
+		<listitem>
+		between the first and second call;
+		</listitem>
+		<listitem>
+		after the second call.
+		</listitem>
+		</itemizedlist>
+
+		<para>
+		The first section goes as a normal label and the rest are done as
+		bindings.
+		</para>
+
+		<para>
+		A tricky moment is that a simple scoped AutoFnBind can't be used here.
+		The pushing of the binding happens in the calling label (such as
+		FibCompute) but then the result is processed in another label (such as
+		FibPrev1.result). The procedural control won't return to FibCompute
+		until after FibPrev1.result has been completed. But FibPrev1.result
+		needs the state popped before it can do its work! So the pushing and
+		popping of the binding is done explicitly in two split steps: <pre>push()</pre>
+		called in FibCompute and <pre>pop()</pre> called in FibPrev1.result. And of
+		course then after FibPrev1.result saves the result, it pushes the next
+		binding, which then gets popped in FibPrev2.result.
+		</para>
+
+		<para>
+		The popping can also be done without arguments, as simply <pre>pop()</pre>, but if it's
+		given an argument, it will check that the binding popped is the same as
+		its argument. This is helpful for detecting the call stack corruptions.
+		</para>
+
+		<para>
+		Now, can you guess, what depth of the unit call stack is required to
+		compute and print the 2nd Fibonacci number? It's 7. If the tracing is
+		enabled, it will produce this trace:
+		</para>
+
+<!-- t/xFn.t doFibFn5 trace from OP_DELETE,2 -->
+<exdump>
+unit 'uFib' before label 'FibCompute' op OP_DELETE {
+unit 'uFib' before label 'FibCompute' op OP_DELETE {
+unit 'uFib' before label 'Fib.result' op OP_DELETE {
+unit 'uFib' before label 'FibPrev1.result' (chain 'Fib.result') op OP_DELETE {
+unit 'uFib' before label 'FibCompute' op OP_DELETE {
+unit 'uFib' before label 'Fib.result' op OP_DELETE {
+unit 'uFib' before label 'FibPrev2.result' (chain 'Fib.result') op OP_DELETE {
+unit 'uFib' before label 'Fib.result' op OP_DELETE {
+unit 'uFib' before label 'FibCall.result' (chain 'Fib.result') op OP_DELETE {
+unit 'uFib' after label 'FibCall.result' (chain 'Fib.result') op OP_DELETE }
+unit 'uFib' after label 'Fib.result' op OP_DELETE }
+unit 'uFib' after label 'FibPrev2.result' (chain 'Fib.result') op OP_DELETE }
+unit 'uFib' after label 'Fib.result' op OP_DELETE }
+unit 'uFib' after label 'FibCompute' op OP_DELETE }
+unit 'uFib' after label 'FibPrev1.result' (chain 'Fib.result') op OP_DELETE }
+unit 'uFib' after label 'Fib.result' op OP_DELETE }
+unit 'uFib' after label 'FibCompute' op OP_DELETE }
+unit 'uFib' after label 'FibCompute' op OP_DELETE }
+</exdump>
+
+		<para>
+		9 labels get called in a sequence, all the way from the initial call to
+		the result printing. And only then the whole sequence unrolls back. 3
+		of them are chained through the bindings, so they don't push the stack
+		frames onto the stack, and there is always the outermost stack frame,
+		with the resulting stack depth of 9-3+1 = 7.  This number grows fast. For the 6th
+		number the number of labels becomes 75 and the frame count 51.
+		</para>
+
+		<para>
+		It happens because all the calls get unrolled into a single sequence,
+		like what I've warned against in 
+		<xref linkend="sc_sched_topo_loops" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		The function
+		return does unroll its FnReturn stack but doesn't unroll the unit call
+		stack, it just goes even deeper by calling the label that processes it.
+		</para>
+
+		<para>
+		There are ways to improve it. The simplest one is to use the FnBinding
+		with a tray, and call this tray after the function completely returns.
+		This works out quite conveniently in two other ways too: First,
+		AutoFnBind with its scoped approach can be used again. And second, it
+		allows to handle the situations where a function returns not just one
+		row but multiple of them. That will be the next example: 
+		</para>
+
+<!-- t/xFn.t doFibFn6 -->
+<pre>
+###
+# A streaming function that computes a Fibonacci number.
+
+# Input: 
+#   $lbFibCompute: request to compute the number.
+# Output (by FnReturn labels):
+#   "result": the computed value.
+# The opcode is preserved through the computation.
+
+my @stackFib; # stack of the function states
+my $stateFib; # The current state
+
+my $frFib = Triceps::FnReturn->new(
+	name => "Fib",
+	unit => $uFib,
+	labels => [
+		result => $rtFibRes,
+	],
+	onPush => sub { push @stackFib, $stateFib; $stateFib = { }; },
+	onPop => sub { $stateFib = pop @stackFib; },
+);
+
+my $lbFibResult = $frFib->getLabel("result");
+
+# Declare the label & binding variables in advance, to define them sequentially.
+my ($lbFibCompute, $fbFibPrev1, $fbFibPrev2);
+$lbFibCompute = $uFib->makeLabel($rtFibArg, "FibCompute", undef, sub {
+	my $row = $_[1]->getRow();
+	my $op = $_[1]->getOpcode();
+	my $idx = $row->get("idx");
+
+	if ($idx <= 1) {
+		$uFib->makeHashCall($frFib->getLabel("result"), $op,
+			idx => $idx,
+			fib => $idx < 1 ? 0 : 1,
+		);
+	} else {
+		$stateFib->{op} = $op;
+		$stateFib->{idx} = $idx;
+
+		{
+			my $ab = Triceps::AutoFnBind->new(
+				$frFib => $fbFibPrev1
+			);
+			$uFib->makeHashCall($lbFibCompute, $op, 
+				idx => $idx - 1,
+			);
+		}
+		$fbFibPrev1->callTray();
+	}
+});
+$fbFibPrev1 = Triceps::FnBinding->new(
+	unit => $uFib,
+	name => "FibPrev1",
+	on => $frFib,
+	withTray => 1,
+	labels => [
+		result => sub {
+			$stateFib->{prev1} = $_[1]->getRow()->get("fib");
+
+			# must prepare before pushing new state and with it new $stateFib
+			my $rop = $lbFibCompute->makeRowopHash($stateFib->{op}, 
+				idx => $stateFib->{idx} - 2,
+			);
+
+			{
+				my $ab = Triceps::AutoFnBind->new(
+					$frFib => $fbFibPrev2
+				);
+				$uFib->call($rop);
+			}
+			$fbFibPrev2->callTray();
+		},
+	],
+);
+$fbFibPrev2 = Triceps::FnBinding->new(
+	unit => $uFib,
+	on => $frFib,
+	name => "FibPrev2",
+	withTray => 1,
+	labels => [
+		result => sub {
+			$stateFib->{prev2} = $_[1]->getRow()->get("fib");
+			$uFib->makeHashCall($frFib->getLabel("result"), $stateFib->{op},
+				idx => $stateFib->{idx},
+				fib => $stateFib->{prev1} + $stateFib->{prev2},
+			);
+		},
+	],
+);
+
+# End of streaming function
+###
+</pre>
+
+		<para>
+		The stack depth is now greatly reduced because the unit stack pops the
+		frames before pushing more of them. For the 2nd Fibonacci number the
+		trace is:
+		</para>
+
+<!-- t/xFn.t doFibFn6 trace from OP_DELETE,2 -->
+<exdump>
+unit 'uFib' before label 'FibCompute' op OP_DELETE {
+unit 'uFib' before label 'FibCompute' op OP_DELETE {
+unit 'uFib' before label 'Fib.result' op OP_DELETE {
+unit 'uFib' after label 'Fib.result' op OP_DELETE }
+unit 'uFib' after label 'FibCompute' op OP_DELETE }
+unit 'uFib' before label 'FibPrev1.result' op OP_DELETE {
+unit 'uFib' before label 'FibCompute' op OP_DELETE {
+unit 'uFib' before label 'Fib.result' op OP_DELETE {
+unit 'uFib' after label 'Fib.result' op OP_DELETE }
+unit 'uFib' after label 'FibCompute' op OP_DELETE }
+unit 'uFib' before label 'FibPrev2.result' op OP_DELETE {
+unit 'uFib' before label 'Fib.result' op OP_DELETE {
+unit 'uFib' before label 'FibCall.result' (chain 'Fib.result') op OP_DELETE {
+unit 'uFib' after label 'FibCall.result' (chain 'Fib.result') op OP_DELETE }
+unit 'uFib' after label 'Fib.result' op OP_DELETE }
+unit 'uFib' after label 'FibPrev2.result' op OP_DELETE }
+unit 'uFib' after label 'FibPrev1.result' op OP_DELETE }
+unit 'uFib' after label 'FibCompute' op OP_DELETE }
+</exdump>
+
+		<para>
+		The maximal call stack depth is reduced to 5.
+		For the 6th number the maximal required stack depth now gets reduced to
+		only 9 instead of 51. 
+		</para>
+
+		<indexterm>
+			<primary>fork</primary>
+		</indexterm>
+		<para>
+		And there is also a way to run the recursive calls without even the
+		need to increase the recursion depth limit. It can be left at the
+		default 1, without <pre>setMaxRecursionDepth()</pre>. The secret is to fork the
+		argument rowops to the functions instead of calling them.
+		</para>
+
+<pre>
+###
+# A streaming function that computes a Fibonacci number.
+
+# Input: 
+#   $lbFibCompute: request to compute the number.
+# Output (by FnReturn labels):
+#   "result": the computed value.
+# The opcode is preserved through the computation.
+
+my @stackFib; # stack of the function states
+my $stateFib; # The current state
+
+my $frFib = Triceps::FnReturn->new(
+	name => "Fib",
+	unit => $uFib,
+	labels => [
+		result => $rtFibRes,
+	],
+	onPush => sub { push @stackFib, $stateFib; $stateFib = { }; },
+	onPop => sub { $stateFib = pop @stackFib; },
+);
+
+my $lbFibResult = $frFib->getLabel("result");
+
+# Declare the label & binding variables in advance, to define them sequentially.
+my ($lbFibCompute, $fbFibPrev1, $fbFibPrev2);
+$lbFibCompute = $uFib->makeLabel($rtFibArg, "FibCompute", undef, sub {
+	my $row = $_[1]->getRow();
+	my $op = $_[1]->getOpcode();
+	my $idx = $row->get("idx");
+
+	if ($idx <= 1) {
+		$uFib->fork($frFib->getLabel("result")->makeRowopHash($op,
+			idx => $idx,
+			fib => $idx < 1 ? 0 : 1,
+		));
+	} else {
+		$stateFib->{op} = $op;
+		$stateFib->{idx} = $idx;
+
+		$frFib->push($fbFibPrev1);
+		$uFib->fork($lbFibCompute->makeRowopHash($op, 
+			idx => $idx - 1,
+		));
+	}
+});
+$fbFibPrev1 = Triceps::FnBinding->new(
+	unit => $uFib,
+	name => "FibPrev1",
+	on => $frFib,
+	labels => [
+		result => sub {
+			$frFib->pop($fbFibPrev1);
+
+			$stateFib->{prev1} = $_[1]->getRow()->get("fib");
+
+			# must prepare before pushing new state and with it new $stateFib
+			my $rop = $lbFibCompute->makeRowopHash($stateFib->{op}, 
+				idx => $stateFib->{idx} - 2,
+			);
+
+			$frFib->push($fbFibPrev2);
+			$uFib->fork($rop);
+		},
+	],
+);
+$fbFibPrev2 = Triceps::FnBinding->new(
+	unit => $uFib,
+	on => $frFib,
+	name => "FibPrev2",
+	labels => [
+		result => sub {
+			$frFib->pop($fbFibPrev2);
+
+			$stateFib->{prev2} = $_[1]->getRow()->get("fib");
+			$uFib->fork($frFib->getLabel("result")->makeRowopHash($stateFib->{op},
+				idx => $stateFib->{idx},
+				fib => $stateFib->{prev1} + $stateFib->{prev2},
+			));
+		},
+	],
+);
+
+# End of streaming function
+###
+</pre>
+
+		<para>
+		This is a variation of the pre-previous example, with the split push and
+		pop. The split is required for the fork to work: when the forked rowop
+		executes, the calling label has already returned, so obviously the
+		scoped approach won't work.
+		</para>
+
+		<para>
+		In this version the unit stack depth required to compute the 6th (and
+		any) Fibonacci number reduces to 2: it's really only one level on top
+		of the outermost frame. 
+		</para>
+
+		<para>
+		If you were to attempt taking the advantage of the techniques from
+		both of the last two examples (the one with the trays
+		and the one with the forks) at the same time,
+		that combination won't work. They could be combined but
+		the combination just doesn't work right.
+		</para>
+
+		<para>
+		The problem is that the example with trays relies on the recursive
+		function being completed before the tray gets called. But if the recursive
+		functions are forked, things break. Looking at why
+		they break provides another insight into the works of recursion. The
+		example would look approximately like this in pseudo-code:
+		</para>
+
+<pre>
+Compute:
+	if (idx <= 1) {
+		call FrFib Result;
+	} else {
+		push FibPrev1 to FrFib;
+		fork Compute for n-1;
+		fork Followup1;
+	}
+
+Followup1:
+	fork tray of FibPrev1;
+	
+FibPrev1.result:
+	pop FibPrev1 from FrFib;
+	push FibPrev2 to FrFib;
+	fork Compute for n-2;
+	fork Followup2;
+	
+Followup2:
+	fork tray of FibPrev2;
+
+FibPrev2.result:
+	pop FibPrev2 from FrFib;
+	call FrFib Result;
+</pre>
+
+		<para>
+		The Followup labels are required because the trays with the intermediate
+		results won't call themselves. They need to be called (or in this case,
+		forked) by something else. The FnBinding has no method <pre>forkTray()</pre>
+		but it can be done manually by first swapping the tray and then
+		forking the result. The result FnReturn has to be called, not forked,
+		so that it would immediately deposit the result rowop into the
+		bound tray.
+		</para>
+
+		<para>
+		If there were only one recursive call, it would still work because the
+		execution frame after the label <pre>Compute(n)</pre> returns would then look like this:
+		</para>
+
+<pre>
+Compute(n-1)
+Followup1(n)
+</pre>
+
+		<para>
+		The rowop <pre>Compute(n-1)</pre> would be the argument for the recursive function
+		call, and <pre>Followup1(n)</pre> would be the follow-up rowop.
+		When the execution time comes,
+		the rowop <pre>Compute(n-1)</pre> executes, places the result into the tray.
+		Then the rowop <pre>Followup1(n)</pre>
+		executes and forks the tray, with the next rowop <pre>FibPrev1.result(n)</pre> 
+		then executing in order. So far so good.
+		</para>
+
+		<para>
+		Now let's trace the recursion to the depth of two. The first level starts the
+		same:
+		</para>
+
+<pre>
+Compute(n-1)
+Followup1(n)
+</pre>
+
+		<para>
+		Then <pre>Compute(n-1)</pre> executes and forks the second level of recursion,
+		the frame becoming:
+		</para>
+
+<pre>
+Followup1(n)
+Compute(n-1-1)
+Followup1(n-1)
+</pre>
+
+		<para>
+		Do you see what went wrong? The unit execution frames are FIFO. So the
+		second level of recursion got queued after the follow-up of the first
+		level. That rowop <pre>Followup1(n)</pre> executes next, doesn't get any return 
+		values, and everything goes downhill from there. 
+		</para>
+	</sect1>
+
+	<sect1 id="sc_strf_units">
+		<title>Streaming functions and unit boundaries</title>
+
+		<indexterm>
+			<primary>streaming function</primary>
+		</indexterm>
+		<indexterm>
+			<primary>unit</primary>
+		</indexterm>
+		<indexterm>
+			<primary>TQL</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Sybase</primary>
+		</indexterm>
+		<indexterm>
+			<primary>StreamBase</primary>
+		</indexterm>
+		<para>
+		One of the examples-as-future-standard-modules I've come up with, is TQL:
+		the Triceps Trivial Query Language (or should that be TTQL?) along
+		with a server to execute it. A TQL server is kind of like the
+		Sybase or StreamBase CEP server in the way that it encapsulates
+		the CEP logic, handles the client network connections with inputs and
+		outputs, and also lets the clients define the ad-hoc queries against 
+		the tables of both the one-time and streaming varieties. The ad-hoc
+		capabilities of TQL are probably better than those of Sybase and
+		StreamBase, at least comparing to the last time I've looked at them
+		up close. TQL will be described in detail in
+		<xref linkend="ch_tql" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;
+		but right now
+		I want to look at only one aspect of its implementation.
+		</para>
+
+		<para>
+		When you're building the execution model of an ad-hoc query, you'd 
+		obviously need to take it apart after its work is done. The easy way
+		to do so is by building it in its own unit. Then this unit can
+		be disposed of as, well, a unit, and guarantee that nothing will leak.
+		By the way, that is the
+		answer to the question of why would someone want to use multiple units
+		in the same thread: for modular disposal.
+		So far so good, but it means that the data sources in the 
+		<quote>main</quote> unit need to be connected with the processing
+		labels in the units of the ad-hoc queries.
+		</para>
+
+		<para>
+		But the labels in the main unit and the query unit can't be directly
+		connected. A direct connection would create the stable references, and
+		the disposal won't work. That's where the streaming function interface
+		comes to the rescue: it provides a temporary connection. Build the
+		query unit, build a binding for it, push the binding onto the FnReturn
+		of the main unit, run the query, pop the binding, dispose of the query
+		unit.
+		</para>
+
+		<para>
+		And the special capacity (or if you will, superpower) of the streaming
+		functions that allows all that is that the FnReturn and FnBinding don't
+		have to be of the same unit. They may be of the different units and
+		will still work together fine.
+		</para>
+
+		<para>
+		TQL was really developed as a showcase of this feature but it has
+		gained a life of its own and I don't want to go into all details here.
+		Instead lets have a high-level overview and then dive straight into the
+		part that uses the streaming functions.
+		</para>
+
+		<para>
+		To start a TQL server, you build a Triceps model as usual, and then
+		create an object of class Triceps::X::Tql using the endpoints of that
+		model (inputs, outputs, queryable tables) as arguments. After that
+		the object runs the server and handles the clients until it's asked to stop.
+		</para>
+
+		<para>
+		The TQL queries are pipelines. You read the data from a table, then
+		select, project, join (in any order, and possibly repeatedly) and
+		eventually print the result (that is, send it back to the client
+		over the socket).
+		</para>
+
+		<para>
+		The reading from a table is done through its dump label.
+		When the Tql object is created, it builds an FnReturn with the
+		dump labels of all the tables given to it. When an ad-hoc query is created,
+		its head of the pipeline gets a matching FnBinding that is then pushed 
+		onto the FnReturn, the table gets dumped and flows through the binding
+		into the query.
+		</para>
+
+		<para>
+		Now let's take a look at the code. I'll be
+		skipping over the code that is less interesting, you can find the full
+		version in the source code in <pre>lib/Triceps/X/Tql.pm</pre> as
+		always. The constructor is one of these things to be skipped. The
+		initialization part is more interesting. I've cut out the part that
+		supports the multi-threaded logic, and the remaining single-threaded
+		version goes as follows:
+		</para>
+
+<!-- lib/Triceps/X/Tql.pm with multithreaded fragment removed -->
+<pre>
+sub initialize # ($self)
+{
+	my $myname = "Triceps::X::Tql::initialize";
+	my $self = shift;
+
+	return if ($self->{initialized});
+
+	my $owner = $self->{trieadOwner};
+	if (defined $owner) {
+		# ... multithreaded version ...
+	} else {
+		my %dispatch;
+		my @labels;
+		for (my $i = 0; $i <= $#{$self->{tables}}; $i++) {
+			my $name = $self->{tableNames}[$i]; 
+			my $table = $self->{tables}[$i];
+
+			confess "$myname: found a duplicate table name '$name', all names are: "
+					. join(", ", @{$self->{tableNames}})
+				if (exists $dispatch{$name});
+
+			$dispatch{$name} = $table;
+			push @labels, $name, $table->getDumpLabel();
+		}
+
+		$self->{dispatch} = \%dispatch;
+		$self->{fret} = Triceps::FnReturn->new(
+			name => $self->{name} . ".fret",
+			labels => \@labels,
+		);
+	}
+
+	$self->{initialized} = 1;
+}
+</pre>
+
+		<para>
+		It creates a dispatch hash of name-to-table and also an FnReturn that
+		contains the dump labels of all the tables.
+		</para>
+
+		<para>
+		The method <pre>compileQuery()</pre> then handles the creation of the
+		separate unit with its contents (<quote>facet</quote> is a term from the
+		multithreading support, just ignore it for now):
+		</para>
+
+<!-- lib/Triceps/X/Tql.pm with 3X-es removed -->
+<pre>
+# The common query compilation for the single-threaded and multi-threaded versions.
+#
+# The options are:
+#
+# qid => $id
+# (optional) The query id that will be used to report any service information
+# such as errors, end of dump portion and such.
+# Default: ''.
+#
+# qname => $name
+# The query name that will be used as a label name for all the
+# produced data, and for the service information too.
+#
+# nxprefix => $name
+# (optional) Prefix for the created unit name.
+# Default: ''.
+#
+# text => $query_text
+# Text of the query, in the braced format.
+#
+# subError => \&error($id, $qname, $msg, $error_code, $error_val)
+# The function that will handle the error reporting. The args are:
+#   $id and $qname as received in the options
+#   $msg - the full human-readable message
+#   $error_code - the string identifying the error
+#   $error_val - the particular value that caused the error
+#
+# tables => { $name => $table, ... }
+# The tables list for the single-threaded version.
+# Not used with the multithreaded version.
+#
+# fretDumps => $fnReturn
+# The FnReturn object for dumps in the single-threaded version.
+# Not used with the multithreaded version.
+#
+# faOut => $facet
+# The facet used to send the data to the Tql thread.
+# Not used with the single-threaded version.
+#
+# faRqDump => $facet
+# The facet used to send the table dump requests back to the app core.
+# Not used with the single-threaded version.
+#
+# subPrint => \&print($text)
+# The function that prints the text back to the socket.
+# Not used with the single-threaded version.
+#
+# @return - undef on error, the compiled context object on success
+#           (see the definition of its contents inside the function)
+sub compileQuery # (@opts)
+{
+	my $myname = "Triceps::X::Tql::compileQuery";
+	my $opts = {};
+	&Triceps::Opt::parse("chatSockWriteT", $opts, {
+		qid => [ '', undef ],
+		qname => [ undef, \&Triceps::Opt::ck_mandatory ],
+		nxprefix => [ '', undef ],
+		text => [ undef, \&Triceps::Opt::ck_mandatory ],
+		subError => [ undef, sub { &Triceps::Opt::ck_mandatory; &Triceps::Opt::ck_ref(@_, "CODE"); } ],
+		tables => [ undef, sub { &Triceps::Opt::ck_ref(@_, "HASH", "Triceps::Table"); } ],
+		fretDumps => [ undef, sub { &Triceps::Opt::ck_ref(@_, "Triceps::FnReturn"); } ],
+		faOut => [ undef, sub { &Triceps::Opt::ck_ref(@_, "Triceps::Facet"); } ],
+		faRqDump => [ undef, sub { &Triceps::Opt::ck_ref(@_, "Triceps::Facet"); } ],
+		subPrint => [ undef, sub { &Triceps::Opt::ck_ref(@_, "CODE"); } ],
+	}, @_);
+
+	my $q = $opts->{qname}; # the name of the query itself
+
+	my @cmds = split_braced($opts->{text});
+	if ($opts->{text} ne '') {
+		&{$opts->{subError}}($opts->{qid}, $q, "mismatched braces in the trailing " . $opts->{text},
+			'query_syntax', $opts->{text});
+		return undef;
+	}
+
+	# The context for the commands to build up an execution of a query.
+	# Unlike $self, the context is created afresh for every query.
+	my $ctx = {};
+	$ctx->{qid} = $opts->{qid};
+	$ctx->{qname} = $opts->{qname};
+
+	$ctx->{tables} = $opts->{tables};
+	$ctx->{fretDumps} = $opts->{fretDumps};
+	$ctx->{actions} = []; # code that will run the pipeline
+
+	$ctx->{faOut} = $opts->{faOut};
+	$ctx->{faRqDump} = $opts->{faRqDump};
+	$ctx->{subPrint} = $opts->{subPrint};
+	$ctx->{requests} = []; # dump and subscribe requests that will run the pipeline
+	$ctx->{copyTables} = []; # the tables created in this query
+		# (have to keep references to the tables or they will disappear)
+
+	# The query will be built in a separate unit
+	$ctx->{u} = Triceps::Unit->new($opts->{nxprefix} . "${q}.unit");
+	$ctx->{prev} = undef; # will contain the output of the previous command in the pipeline
+	$ctx->{id} = 0; # a unique id for auto-generated objects
+	# deletion of the context will cause the unit in it to clean
+	$ctx->{cleaner} = $ctx->{u}->makeClearingTrigger();
+
+	if (! eval {
+		foreach my $cmd (@cmds) {
+			my @args = split_braced($cmd);
+			my $argv0 = bunescape(shift @args);
+			# The rest of @args do not get unquoted here!
+			die "No such TQL command '$argv0'\n" unless exists $tqlDispatch{$argv0};
+			# do something better with the errors, show the failing command...
+			$ctx->{id}++;
+			&{$tqlDispatch{$argv0}}($ctx, @args);
+			# Each command must set its result label (even if an undef) into
+			# $ctx->{next}.
+			die "Internal error in the command $argv0: missing result definition\n"
+				unless (exists $ctx->{next});
+			$ctx->{prev} = $ctx->{next};
+			delete $ctx->{next};
+		}
+		if (defined $ctx->{prev}) {
+			# implicitly print the result of the pipeline, no options
+			&{$tqlDispatch{"print"}}($ctx);
+		}
+
+		1; # means that everything went OK
+	}) {
+		&{$opts->{subError}}($opts->{qid}, $q, "query error: $@", 'bad_query', '');
+		return undef;
+	}
+
+	return $ctx;
+}
+</pre>
+
+		<para>
+		Each TQL command is defined as its own method, all of them collected in
+		the <pre>%tqlDispatch</pre>. <pre>compileQuery()</pre> splits the pipeline and then lets each
+		command build its part of the query, connecting them through <pre>$ctx</pre>. A
+		command may also register an action to be run later. After everything
+		is built, the actions run and produce the result.
+		</para>
+
+		<indexterm>
+			<primary>Braced</primary>
+		</indexterm>
+		<para>
+		The TQL syntax uses braces for the grouping in the pipeline.
+		The functions <pre>split_braced()</pre> and <pre>bunescape()</pre> are imported from the
+		package Triceps::Braced that handles the parsing of the braced
+		nested lists. They are described in detail in
+		<xref linkend="sc_ref_braced" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<para>
+		The option <quote>subError</quote> defines a function that reports
+		the errors back to the user. Since everything is returned back as
+		a stream, the errors are reported as rowops on the special label
+		<quote>+ERROR</quote>. 
+		</para>
+
+		<para>
+		And the final part of the puzzle, here is the <quote>read</quote> 
+		command handler that creates the head of the query pipeline:
+		</para>
+
+<!-- lib/Triceps/X/Tql.pm with multithreaded fragment removed -->
+<pre>
+# "read" command. Defines a table to read from and starts the command pipeline.
+# Options:
+# table - name of the table to read from.
+sub _tqlRead # ($ctx, @args)
+{
+	my $ctx = shift;
+	die "The read command may not be used in the middle of a pipeline.\n" 
+		if (defined($ctx->{prev}));
+	my $opts = {};
+	&Triceps::Opt::parse("read", $opts, {
+		table => [ undef, \&Triceps::Opt::ck_mandatory ],
+	}, @_);
+
+	my $tabname = bunescape($opts->{table});
+	my $unit = $ctx->{u};
+
+	if ($ctx->{faOut}) {
+		# ... multithreaded version ...
+	} else {
+		my $fret = $ctx->{fretDumps};
+
+		die ("Read found no such table '$tabname'\n")
+			unless (exists $ctx->{tables}{$tabname});
+		my $table = $ctx->{tables}{$tabname};
+		my $lab = $unit->makeDummyLabel($table->getRowType(), "lb" . $ctx->{id} . "read");
+		$ctx->{next} = $lab;
+
+		my $code = sub {
+			Triceps::FnBinding::call(
+				name => "bind" . $ctx->{id} . "read",
+				unit => $unit,
+				on => $fret,
+				labels => [
+					$tabname => $lab,
+				],
+				code => sub {
+					$table->dumpAll();
+				},
+			);
+		};
+		push @{$ctx->{actions}}, $code;
+	}
+}
+</pre>
+
+		<para>
+		It's the only command that registers an action, which sends data into
+		the query unit. The rest of commands just add more handlers to the
+		pipeline in the unit, and get the data that flows from <quote>read</quote>. The
+		action sets up a binding and calls the table dump, to send the data
+		into that binding.
+		</para>
+
+		<para>
+		The reading of the tables could have also been done without the
+		bindings, and without the need to bind the units at all: just iterate
+		through the table procedurally in the action. But this whole example
+		has been built largely to showcase that the bindings can be used in
+		this way, so naturally it uses bindings.
+		</para>
+
+		<para>
+		The bindings come more useful when the query logic has to react to the
+		normal logic of the main unit, such as in the subscriptions: set up the
+		query, read its initial state, and then keep reading as the state gets
+		updated. But guess what, the subscriptions can't be done with the
+		FnReturns as shown because the FnReturn only sends its data to the last
+		binding pushed onto it. This means, if multiple subscriptions get set
+		up, only the last one will be getting the data. This problem gets
+		solved only in the multithreaded implementation of Tql that will
+		be discussed in
+		<xref linkend="sc_tql_join_internals" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		There each client runs in its own thread,
+		and each of its queries runs in its own unit;
+		the inter-thread communications are used to subscribe to the
+		updates.
+		</para>
+	</sect1>
+
+
+	<sect1 id="sc_strf_call">
+		<title>The ways to call a streaming function</title>
+
+		<indexterm>
+			<primary>streaming function</primary>
+		</indexterm>
+		<para>
+		The examples in this chapter have shown many ways to call
+		a streaming function. Here is a recap of them all:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+			Manually push the FnBinding onto the FnReturn, send the argument rowops
+			to the streaming function, pop the FnBinding.
+			</listitem>
+
+			<listitem>
+			Use an AutoFnBind to handle the pushing and popping in a scoped fashion.
+			A single AutoFnBind can control multiple pairs of FnBinding and FnReturn,
+			so it can build in one go not only a single streaming function call but
+			even a whole pipeline. In the &Cpp; API a more low-level object
+			ScopedFnBind can also be used in a similar way.
+			</listitem>
+
+			<listitem>
+			Use <pre>Unit::callBound()</pre> that takes care of creating both the
+			AutoFnBind object and a scope around of it in a more efficient way.
+			</listitem>
+
+			<listitem>
+			Use <pre>FnBinding::call()</pre> to create an FnBinding object dynamically,
+			do a call with it, and dispose of it.
+			</listitem>
+		</itemizedlist>
+
+		<para>
+		The most convenient way depends on the situation.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_strf_scheduling">
+		<title>The gritty details of streaming functions scheduling</title>
+
+		<indexterm>
+			<primary>streaming function</primary>
+		</indexterm>
+		<indexterm>
+			<primary>scheduling</primary>
+			<secondary>streaming function</secondary>
+		</indexterm>
+		<para>
+		If you've read carefully about all the gritty details of scheduling,
+		you might wonder, what exactly happens when a label in an FnBinding gets
+		called through an FnReturn? The answer is, they are executed
+		like the chained labels, reusing the frame of the parent label
+		(that is, of the matching label on the FnReturn side). They
+		even show in the traces as the chained labels.
+		This lets the bound labels to easily fork a rowop to the frame of its parent.
+		</para>
+
+		<para>
+		The only exception is when the FnReturn and FnBinding are in the different units.
+		Then the bound label is properly called with its own frame in the unit
+		where it belongs. 
+		</para>
+
+		<para>
+		And of course the rowops collected in a tray are another exception,
+		since they are not called in the binding, they are only collected.
+		When the tray gets called, they get properly called with their
+		own frames, just as when calling any other tray.
+		</para>
+	</sect1>
+</chapter>

@@ -1,0 +1,105 @@
+typesafety version 0.04
+=======================
+
+typesafety.pm - compile-time type usage static analysis 
+
+In other words, perform heuristics on your program before it is run, with a goal
+of insuring that object oriented types are used consistently - the correct class
+(or a subclass of it) is returned in the right places, provided in method call
+argument lists in the right places, only assigned to the right variables, and
+so on.
+
+This software is beta! Critical things seem to work, but it needs more testing
+(for bugs and usability) from the public before I can call it "1.0". The API
+is subject to change (and has already changed with each version so far).
+
+SYNOPSIS:
+
+         package main;
+         use typesafety; # 'summary', 'debug';
+
+         my FooBar $foo;            # establish type-checked variables
+         my FooBar $bar;            # FooBar is the base class of references $bar will hold
+         my BazQux $baz;
+
+         $foo = new FooBar;         # this is okey, because $foo holds FooBars
+         $bar = $foo;               # this is okey, because $bar also holds FooBars
+         # $foo = 10;               # this would throw an error - 10 is not a FooBar
+         # $baz = $foo;             # not allowed - FooBar isn't a BazQux
+         $foo = $baz;               # is allowed -  BazQux is a FooBar because of inheritance
+         $bar = $foo->foo($baz, 1); # this is okey, as FooBar::foo() returns FooBars also
+
+         typesafety::check();   # perform type check static analysis
+
+         #
+
+         package FooBar;
+         use typesafety;
+
+         # unneeded - new() defaults to prototype to return same type as package
+         # proto 'new', returns => 'FooBar';
+
+         sub new {
+           bless [], $_[0];
+           # or: bless whatever, __PACKAGE__;
+           # or: bless whatever, 'FooBar';
+           # or: my $type = shift; bless whatever, $type;
+           # or: my $type = shift; $type = ref $type if ref $type; bless whatever, $type;
+         }
+
+         sub foo (FooBar; BazQux, undef) { my $me = shift; return $me->new(); }
+
+         # or: proto 'foo', returns => 'FooBar'; sub foo { my $me = shift; return $me->new(); }
+
+         #
+
+         package BazQux;
+         use typesafety;
+         @ISA = 'FooBar';
+
+
+DESCRIPTION:
+
+Prevents you from mistakenly bathing cats.
+
+Failure to keep track what kind of data is in a given variable or returned 
+from a given method is an epic source of confusion and frustration during
+debugging. 
+
+Given a ->get_pet() method, you might try to bathe the output. If it always
+a dog during testing, everything is fine, but sooner or later, you're
+going to get a cat, and that can be rather bloody.
+
+Welcome to Type Safety. Type Safety means knowing what kind of data you
+have (atleast in general - it may be a subclass of the type you know
+you have). Because you always know what kind of data it is, you see in
+advance when you try to use something too generic (like a pet) where you
+want something more specific (like a dog, or atleast a pet that implements
+the "washable" interface).
+
+Think of Type Safety as a new kind of variable scoping -
+instead of scoping where the variables can be seen from, you're scoping
+what kind of data they might contain.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  B::Generate
+
+COPYRIGHT AND LICENCE
+
+Distribute under the same terms as Perl itself.
+
+Copyright (C) 2003 Scott Walters, scott@slowass.net
+

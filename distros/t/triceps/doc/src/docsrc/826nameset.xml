@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_nameset">
+		<title>NameSet reference</title>
+
+		<indexterm>
+			<primary>NameSet</primary>
+		</indexterm>
+		<indexterm>
+			<primary>HashedIndexType</primary>
+		</indexterm>
+		<para>
+		NameSet is a helper class used as an argument for construction of
+		other classes, most notably HashedIndexType. It's an Mtarget.
+		</para>
+
+		<para>
+		NameSet is fundamentally a reference-counted vector of strings that
+		allows to construct them with a chain of calls. It's used to
+		construct such things as field list for the index key. 
+		Properly, the names in the set should be different
+		but NameSet itself doesn't check for that.
+		The order of values in it usually matters. So its class name is slightly
+		misleading: it's not really a set, it's a vector, but the name has been
+		applied historically. And in the future it might include the set
+		functionality too, by adding a quick look up of index by name.
+		</para>
+
+		<para>
+		It's defined in <pre>type/NameSet.h</pre> as
+		</para>
+
+<pre>
+class NameSet : public Mtarget, public vector<string> { ... }
+</pre>
+
+		<para>
+		The typical usage is like this:
+		</para>
+
+<pre>
+HashedIndexType::make(NameSet::make()->add("a")->add("e"))
+</pre>
+
+		<para>
+		The factory method <pre>make()</pre> gives the
+		more convenient operator priority than <pre>new()</pre>.
+		The varieties of constructors and <pre>make()</pre> are:
+		</para>
+
+<pre>
+NameSet();
+NameSet(const vector<string> *other);
+NameSet(const vector<string> &other);
+static NameSet *make();
+static NameSet *make(const vector<string> *other);
+static NameSet *make(const vector<string> &other);
+</pre>
+
+		<para>
+		This approach to the copy constructors allows to
+		construct from a plain vector, and since NameSet is its
+		subclass, that works as a real copy constructor too. 
+		The constructor from a pointer makes the use of Autorefs more
+		convenient, such as:
+		</para>
+
+<pre>
+Autoref<NameSet> ns1 = NameSet::make()->add("a")->add("b");
+Autoref<NameSet> ns2 = NameSet::make(ns1)->add("c");
+</pre>
+
+		<para>
+		All the vector methods are directly accessible, plus the ones
+		added in NameSet.
+		</para>
+
+<pre>
+NameSet *add(const string &s);
+</pre>
+
+		<para>
+		The method for the chained construction, adds a name to the vector
+		and returns back the same NameSet object.
+		</para>
+
+<pre>
+bool equals(const NameSet *other) const;
+</pre>
+
+		<para>
+		Comparison for equality. Returns true if both the name vectors
+		are equal.
+		</para>
+	</sect1>

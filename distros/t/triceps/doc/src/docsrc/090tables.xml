@@ -1,0 +1,3240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+<chapter id="ch_tables" xmlns:xi="http://www.w3.org/2001/XInclude">
+	<title>Tables</title>
+
+	<sect1 id="sc_table_hello">
+		<title>Hello, tables!</title>
+
+		<indexterm>
+			<primary>table</primary>
+		</indexterm>
+
+		<para>
+		The tables are the fundamental elements of state-keeping in Triceps. 
+		Let's start with a basic example:
+		</para>
+
+		<indexterm>
+			<primary>table</primary>
+			<secondary>insert</secondary>
+		</indexterm>
+
+<!-- t/xHelloTable.t helloWorldDirect reduced, shifted left -->
+<pre>
+my $hwunit = Triceps::Unit->new("hwunit");
+my $rtCount = Triceps::RowType->new(
+	address => "string",
+	count => "int32",
+);
+
+my $ttCount = Triceps::TableType->new($rtCount)
+	->addSubIndex("byAddress", 
+		Triceps::IndexType->newHashed(key => [ "address" ])
+	)
+;
+$ttCount->initialize();
+
+my $tCount = $hwunit->makeTable($ttCount, "tCount");
+
+while(&readLine) {
+	chomp;
+	my @data = split(/\W+/);
+
+	# the common part: find if there already is a count for this address
+	my $rhFound = $tCount->findBy(
+		address => $data[1]
+	);
+	my $cnt = 0;
+	if (!$rhFound->isNull()) {
+		$cnt = $rhFound->getRow()->get("count");
+	}
+
+	if ($data[0] =~ /^hello$/i) {
+		my $new = $rtCount->makeRowHash(
+			address => $data[1],
+			count => $cnt+1,
+		);
+		$tCount->insert($new);
+	} elsif ($data[0] =~ /^count$/i) {
+		&send("Received '", $data[1], "' ", $cnt + 0, " times\n");
+	} else {
+		&send("Unknown command '$data[0]'\n");
+	}
+}
+</pre>
+
+		<para>
+		What happens here? The main loop reads the lines from standard input, splits
+		into words and uses
+		the first word as a command and the second word as a key. Note that
+		it's not CSV format, it's words with the non-alphanumeric characters separating
+		the words. <quote>Hello, table!</quote>, <quote>hello world</quote>, <quote>count world</quote> are examples
+		of the valid inputs. For someting different, the commands are compared
+		with their case ignored (but the case matters for the key).
+		</para>
+
+		<para>
+		The example counts,
+		how many times each key has been <pre>hello</pre>-ed, and prints this count back
+		on the command <pre>count</pre>. Here is a sample, with the input
+		lines printed in bold:
+		</para>
+
+<exdump>
+> Hello, table!
+> Hello, world!
+> Hello, table!
+> count world
+Received 'world' 1 times
+> Count table
+Received 'table' 2 times
+</exdump>
+
+		<indexterm>
+			<primary>table</primary>
+			<secondary>procedural API</secondary>
+		</indexterm>
+		<para>
+		In this example the table is read and modified using the direct procedural calls.
+		As you can see, there isn't even any need for unit scheduling and
+		such. There is a scheduler-based interface to the tables too, it will be shown
+		soon. But in many cases the direct access is easier. Indeed,
+		this particular example could have been implemented with the plain Perl
+		hashes. Nothing wrong with that either. Well, the Perl tables provide
+		many more intersting ways of indexing the data. But if you don't need them,
+		they don't matter. And at some future point the
+		tables will be supporting the on-disk persistence, but no reason to
+		bother much about that now: things are likely to change a dozen times
+		yet before that happens. Feel free to just use the Perl data structures
+		if they make the code easier.
+		</para>
+
+		<para>
+		A table is created through a table type. This allows to stamp out
+		duplicate tables of the same type, which can get handy when the
+		multithreading will be added. A table is local to a thread. A table
+		type can be shared between threads. To look up
+		something in another thread's table, you'd either have to ask it
+		through a request-reply protocol or to keep a local copy of the table.
+		Such a copy can be easily done by creating a copy table from the same type.
+		</para>
+
+		<para>
+		In reality, right now all the business with table types separated from
+		the tables is more pain than gain. It not only adds extra steps but
+		also makes difficult to define a template that acts on a table by
+		defining extra features on it. Something will be done about it, I have
+		a few ideas.
+		</para>
+
+		<para>
+		The table type gets first created and configured, then initialized.
+		After a table type is initialized, it can not be changed any more.
+		That's the point of the initialization call: tell the type that all
+		the configuration has been done, and it can go immutable now. 
+		Fundamentally, configuting a table type just makes it collect
+		bits and pieces. Nothing but the most gross errors can be detected
+		at that point. At initialization time everything comes together
+		and everything gets checked for consistency.  A table
+		type must be fully initialized in one thread before it can be shared
+		with other threads. The historic reason for this API is that it mirrors
+		the &Cpp; API, which has turned out not to look that good in Perl. It's
+		another candidate for a change. 
+		</para>
+
+		<indexterm>
+			<primary>index</primary>
+			<secondary>hashed</secondary>
+		</indexterm>
+		<para>
+		A table type gets the row type and at least one index. Here it's a
+		hashed index by the key field <pre>address</pre>. "Hashed" means that
+		you can look up the rows by the key value but there are no promises
+		about any specific row order. And the hashing is used to make the
+		key comparisons more efficient. The key of a hashed index may
+		consist of multiple fields.
+		</para>
+
+		<para>
+		The table is then created from the table type, and given a name.
+		</para>
+
+		<indexterm>
+			<primary>table</primary>
+			<secondary>replacement</secondary>
+		</indexterm>
+		<para>
+		The rows can then be inserted into the table (and removed too, not
+		shown in this example yet). The default behavior of the hashed index is to
+		replace the old row if a new row with the same key is inserted.
+		</para>
+
+		<indexterm>
+			<primary>table</primary>
+			<secondary>find</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>RowHandle</primary>
+		</indexterm>
+		<para>
+		The search in the table is done by the method <pre>findBy()</pre> with 
+		the key fields of the index.  Which returns a RowHandle
+		object. A RowHandle is essentially an iterator in the table. Even if
+		the row is not found, a RowHandle will be still returned but it will be
+		NULL, which is checked for by <pre>$rh->isNull()</pre>.
+		</para>
+
+		<para>
+		No matter which command will be used, it's always useful to look up
+		the previous row for the key: its contents would be either printed
+		or provide the previous value for the increase. So the model does
+		it first and gets the count from it. If it's not found, then the 
+		count is set to 0. 
+		</para>
+
+		<para>
+		Then it looks at the command and does what it's been told.
+		Updating the count amounts to creating a new row with the new
+		values and inserting it into the table. It replaces the previous one.
+		</para>
+
+		<para>
+		This is just the tip of the iceberg. The tables in Triceps have a lot
+		more features.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_table_label">
+		<title>Tables and labels</title>
+
+		<indexterm>
+			<primary>label</primary>
+		</indexterm>
+
+		<para>
+		A table does not have to be operated in a procedural way. It can be
+		plugged into the the scheduler machinery. Whenever a table is created,
+		three labels are created with it.
+		</para>
+
+		<indexterm>
+			<primary>label</primary>
+			<secondary>table</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>table</primary>
+			<secondary>label API</secondary>
+		</indexterm>
+		<itemizedlist>
+		<listitem>
+		The input label is for sending the modification rowops to the
+		table. The table provides the handler for it that applies the
+		incoming rowops to the table. 
+		</listitem>
+		<listitem>
+		The output label propagates the
+		modifications done to the table. It is a dummy label, and does
+		nothing by itself. It's there for chaining the other labels to it. The
+		output rowop comes quite handy to propagate the table's modifications
+		to the rest of the state.
+		</listitem>
+		<indexterm>
+			<primary>tracing</primary>
+		</indexterm>
+		<listitem>
+		The pre-modification label is also a dummy label, for chaining other
+		labels to it. It sends the rowops right before they are applied
+		to the table. This comes very handy for the elements that need to
+		act depending on the previous state of the table, such as joins.
+		The pre-modification label doesn't simply mirror the input label.
+		The rows received on the input label may trigger the automatic changes
+		to the table, such as an old row being deleted when a new row with
+		the same key is inserted. All these modifications, be they automatic
+		or explicit, will be reported to the pre-modification label.
+		Since the pre-modification label is used relatively rarely, it contains
+		a special optimization: if there is no label chained to it, no rowop
+		will be sent to it in the first place. Don't be surprised if you
+		enable the tracing and don't see it in the trace.
+		</listitem>
+		</itemizedlist>
+
+		<indexterm>
+			<primary>table</primary>
+			<secondary>replacement</secondary>
+		</indexterm>
+		<para>
+		Again, the rowops coming through these labels aren't necessarily
+		the same. If a DELETE rowop comes to the input label, referring to a
+		row that is not in the table, it will not propagate anywhere. If an INSERT rowop
+		comes in and causes another row to be replaced, the replaced row will
+		be sent to the pre-modification and output labels as a DELETE rowop first.
+		</para>
+
+		<para>
+		Anf of course the table may be modified through the procedural
+		interface. These modifications also produce rowops on the
+		pre-modification and output labels.
+		</para>
+
+		<para>
+		The labels of the table have names. They are produced by adding
+		suffixes to the table name. They are "tablename.in", "tablename.pre"
+		and "tablename.out".
+		</para>
+
+		<indexterm>
+			<primary>scheduling</primary>
+			<secondary>recursion</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>scheduling</primary>
+			<secondary>loop</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>loop</primary>
+			<secondary>scheduling</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>recursion</primary>
+		</indexterm>
+		<indexterm>
+			<primary>bundling</primary>
+		</indexterm>
+		<para>
+		In the <quote>no bundling</quote> spirit, a rowop is sent to the pre-modification
+		label right before it's applied to the table, and to the output label
+		right after it's applied. If the labels executed from there need to read the table,
+		they can, and will find the table in the exact state with no intervening
+		modifications. However, they can't modify the table neither directly nor
+		by calling its input label. When these labels are called, the table is in
+		the middle of a modification and it can't accept another one. Such attempts
+		are treated as recursive modifications, forbidden, and the program 
+		will die on them. If you need to modify
+		the table, use <pre>schedule()</pre> or <pre>loopAt()</pre> to have the next modification done
+		later. However there are no guarantees about other modifications getting
+		done in between. When the looped rowop executes, it might need to check the state
+		of the table again and decide if its operation still makes sense.
+		</para>
+
+		<para>
+		So, let's make a version of <quote>Hello, table</quote> example that passes the
+		modification requests as rowops through the labels. It will print the information about
+		the updates to the table as they happen, so there is no more use having a
+		separate command for that. But for another demonstration let's add a
+		command that would clear the counter of hellos.  Here is its code:
+		</para>
+
+<!-- t/xHelloTable.t helloWorldLabels shifted left -->
+<pre>
+my $hwunit = Triceps::Unit->new("hwunit");
+my $rtCount = Triceps::RowType->new(
+	address => "string",
+	count => "int32",
+);
+
+my $ttCount = Triceps::TableType->new($rtCount)
+	->addSubIndex("byAddress", 
+		Triceps::IndexType->newHashed(key => [ "address" ])
+	)
+;
+$ttCount->initialize();
+
+my $tCount = $hwunit->makeTable($ttCount, "tCount");
+
+my $lbPrintCount = $hwunit->makeLabel($tCount->getRowType(),
+	"lbPrintCount", undef, sub { # (label, rowop)
+		my ($label, $rowop) = @_;
+		my $row = $rowop->getRow();
+		&send(&Triceps::opcodeString($rowop->getOpcode), " '", 
+			$row->get("address"), "', count ", $row->get("count"), "\n");
+	} );
+$tCount->getOutputLabel()->chain($lbPrintCount);
+
+# the updates will be sent here, for the tables to process
+my $lbTableInput = $tCount->getInputLabel();
+
+while(&readLine) {
+	chomp;
+	my @data = split(/\W+/);
+
+	# the common part: find if there already is a count for this address
+	my $rhFound = $tCount->findBy(
+		address => $data[1]
+	);
+	my $cnt = 0;
+	if (!$rhFound->isNull()) {
+		$cnt = $rhFound->getRow()->get("count");
+	}
+
+	if ($data[0] =~ /^hello$/i) {
+		$hwunit->makeHashSchedule($lbTableInput, "OP_INSERT",
+			address => $data[1],
+			count => $cnt+1,
+		);
+	} elsif ($data[0] =~ /^clear$/i) {
+		$hwunit->makeHashSchedule($lbTableInput, "OP_DELETE",
+			address => $data[1]
+		);
+	} else {
+		&send("Unknown command '$data[0]'\n");
+	}
+	$hwunit->drainFrame();
+}
+</pre>
+
+		<para>
+		The table creation is the same as last time. 
+		The row finding in the table is also the same.
+		</para>
+
+		<para>
+		The printing of the modifications to the table is done with <pre>$lbPrintCount</pre>,
+		which is connected to the table's output label. It prints the opcode,
+		the address of the greeting, and the count of greetings. It will
+		show us what is happening to the table as soon as it happens.
+		An unit trace could be used instead but a custom printout contains
+		less noise.
+		The pre-modification label is of no interest here, so it's not used.
+		</para>
+
+		<para>
+		The references to the labels of a table are gotten with:
+		</para>
+
+<pre>
+$label = $table->getInputLabel();
+$label = $table->getPreLabel();
+$label = $table->getOutputLabel();
+</pre>
+
+		<para>
+		The deletion does not require an exact row to be sent in. All it needs
+		is a row with the keys for deletion, the rest of the fields in it
+		are ignored. So the <quote>clear</quote> command puts only the key field in it.
+		</para>
+
+		<para>
+		Here is an example of input (in bold) and output:
+		</para>
+
+<exdump>
+> Hello, table!
+OP_INSERT 'table', count 1
+> Hello, world!
+OP_INSERT 'world', count 1
+> Hello, table!
+OP_DELETE 'table', count 1
+OP_INSERT 'table', count 2
+> clear, table
+OP_DELETE 'table', count 2
+> Hello, table!
+OP_INSERT 'table', count 1
+</exdump>
+
+		<para>
+		An interesting thing happens after the second <quote>Hello, table!</quote>: the code
+		send only an <pre>OP_INSERT</pre> but the output shows an <pre>OP_DELETE</pre> and <pre>OP_INSERT</pre>.
+		The <pre>OP_DELETE</pre> for the old row gets automatically generated when a
+		row with repeated key is inserted. 
+		Now, depending on what you want, just sending in the first place the consequent inserts of
+		rows with the same keys, and relying on the table's internal
+		consistency to turn them into updates, might be a good thing or not.
+		Overall it's a dirty way to write but sometimes it comes convenient.
+		The clean way is to send the explicit deletes first. When the data
+		goes through the table, it gets automatically cleaned.
+		The subscribers to the table's output and pre-modification labels
+		get the clean and consistent picture: a row never gets simply replaced, they
+		always see an <pre>OP_DELETE</pre> first and only then an <pre>OP_INSERT</pre>.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_table_iteration">
+		<title>Basic iteration through the table</title>
+
+		<para>
+		Let's add a dump of the table contents to the "Hello, table" example,
+		either version of it. For that, the code needs to go through every record
+		in the table:
+		</para>
+
+<!-- t/xHelloTable.t helloWorldDirect fragment, shifted left -->
+<pre>
+	elsif ($data[0] =~ /^dump$/i) {
+		for (my $rhi = $tCount->begin(); !$rhi->isNull(); $rhi = $rhi->next()) {
+			&send($rhi->getRow->printP(), "\n");
+		}
+	}
+</pre>
+
+		<indexterm>
+			<primary>table</primary>
+			<secondary>iteration</secondary>
+		</indexterm>
+		<para>
+		As you can see, the row handle works kind of like an STL iterator.
+		Only the end of iteration is detected by receiving a NULL row handle.
+		Calling <pre>next()</pre> on a NULL row handle is OK but it would just return
+		another NULL handle.
+		And there is no decrementing the iterator, you can only go forward
+		with <pre>next()</pre>. The backwards iteration is in the plans but
+		not implemented yet.
+		</para>
+
+		<para>
+		An example of this fragment's output would be:
+		</para>
+
+<!-- t/xHelloTable.t helloWorldDirect fragment, removed backslashes -->
+<exdump>
+> Hello, table!
+> Hello, world!
+> Hello, table!
+> count world
+Received 'world' 1 times
+> Count table
+Received 'table' 2 times
+> dump
+address="world" count="1" 
+address="table" count="2" 
+</exdump>
+
+		<para>
+		The order of the rows in the printout is the same as the order of rows
+		in the table's index. Which is no particular order, since it's a hashed
+		index. As long as you stay with the same 64-bit AMD64 architecture
+		(with LSB-first byte order), it will stay the same on consecutive runs.
+		But switching to a 32-bit machine or to an MSB-first byte order (such
+		as a SPARC, if you can still find one) will change the hash
+		calculation, and with it the resulting row order. There are the
+		ordered indexes as well, they will be described later.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_table_delete">
+		<title>Deleting a row</title>
+
+		<para>
+		Deleting a row from a table through the input label is simple: send a
+		rowop with <pre>OP_DELETE</pre>, it will find the row with the matching key 
+		and delete it, as was shown above.
+		In the procedural way the same can be done with the method
+		<pre>deleteRow()</pre>. The added row deletion code for the main loop of 
+		<quote>Hello, table</quote> (either version, but particularly relevant
+		for the one from
+		<xref linkend="sc_table_hello" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;)
+		is:
+		</para>
+
+<!-- t/xHelloTable.t helloWorldDirect fragment, shifted left -->
+<pre>
+	elsif ($data[0] =~ /^delete$/i) {
+		my $res = $tCount->deleteRow($rtCount->makeRowHash(
+			address => $data[1],
+		));
+		&send("Address '", $data[1], "' is not found\n") unless $res;
+	}
+</pre>
+
+		<indexterm>
+			<primary>error handling</primary>
+		</indexterm>
+		<indexterm>
+			<primary>table</primary>
+			<secondary>procedural API</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>table</primary>
+			<secondary>remove row</secondary>
+		</indexterm>
+		<para>
+		The result allows to differentiate between the situations when the 
+		row was found and deleted and the row was not found.
+		On any error the call confesses.
+		</para>
+
+		<para>
+		However we already find the row handle in advance in <pre>$rhFound</pre>. For this case a more
+		efficient form is available, and it can be added to the example as:
+		</para>
+
+<!-- t/xHelloTable.t helloWorldDirect fragment, shifted left -->
+<pre>
+		elsif ($data[0] =~ /^remove$/i) {
+			if (!$rhFound->isNull()) {
+				$tCount->remove($rhFound);
+			} else {
+				&send("Address '", $data[1], "' is not found\n");
+			}
+		}
+</pre>
+
+		<para>
+		It removes a specific row handle from the table. In whichever way you
+		find it, you can remove it. An attempt to remove a NULL handle would be
+		an error and cause a confession.
+		</para>
+
+		<para>
+		The reason why <pre>remove()</pre> is more efficient than <pre>deleteRow()</pre> is
+		that <pre>deleteRow()</pre> amounts to finding the row handle by key and then
+		removing it. And the <pre>OP_DELETE</pre> rowop sent to the input label
+		calls <pre>deleteRow()</pre>.
+		</para>
+
+		<para>
+		<pre>deleteRow()</pre> never deletes more than one row, even if multiple
+		rows match (yes, the indexes don't have to be unique).
+		There isn't any method to delete multiple rows at once. Every row has
+		to be deleted by itself.
+		As an example, here is the implementation of the command <quote>clear</quote> for
+		<quote>Hello, table</quote> that clears all the table contents by
+		iterating through it:
+		</para>
+
+<!-- t/xHelloTable.t helloWorldDirect fragment, shifted left -->
+<pre>
+	elsif ($data[0] =~ /^clear$/i) {
+		my $rhi = $tCount->begin(); 
+		while (!$rhi->isNull()) {
+			my $rhnext = $rhi->next();
+			$tCount->remove($rhi);
+			$rhi = $rhnext;
+		}
+	}
+</pre>
+
+		<indexterm>
+			<primary>table</primary>
+			<secondary>iteration</secondary>
+		</indexterm>
+		<para>
+		After a handle is removed from the table, it continues to exist, as
+		long as there are references to it. It could even be inserted back into
+		the table. However until (and unless) it's inserted back, it can not be
+		used for iteration any more. Calling <pre>next()</pre> on a handle that
+		is not in the table would just return a NULL handle. So the next row has
+		to be found before removing the current one.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_table_RowHandle">
+		<title>A closer look at the RowHandles</title>
+
+		<indexterm>
+			<primary>RowHandle</primary>
+		</indexterm>
+		<para>
+		A few uses of the RowHandles have been shown by now. So, what is a
+		RowHandle? As Captain Obvious would say, RowHandle is a class (or
+		package, in Perl terms) implementing a row handle.
+		</para>
+
+		<para>
+		A row handle keeps a table's service information (including the index
+		data) for a single data row, including of course a reference to the row
+		itself. Each row is stored in the table through its handle. 
+		The row handle is also an iterator in the table, and a special one:
+		it's an iterator for <i>all</i> the table's indexes at once.
+		For you SQLy people, an iterator is essentially a cursor on an index.
+		For you Java people, an iterator can be used to do more than step
+		sequentially through rows.
+		So far only the table types with one index have been shown, but
+		in reality multiple indexes are supported, potentially with quite
+		complicated arrangements. More on the indexes later, for now just keep
+		it in mind.  A row handle can be found through one index and then used
+		to iterate through another one. Or you can iterate through one index,
+		find a certain row handle and continue iterating through another index
+		starting from that handle. If you remember a reference on a particular
+		row handle, you can always continue iteration from that point later.
+		(unless the row handle gets removed from the table).
+		</para>
+
+		<para>
+		A RowHandle
+		always belongs to a particular table, the RowHandles can not be shared
+		nor moved between two tables, even if the tables are of the same type.
+		Since the tables are single-threaded, obviously the RowHandles may not
+		be shared between the threads either.
+		</para>
+
+		<para>
+		However a RowHandle may exist without being inserted into a table. In
+		this case it still has a spiritual connection to that table but is not
+		included in the index (the iteration attempts with it would just return 
+		<quote>end of the index</quote>), and will be destroyed as soon as all the
+		references to it disappear.
+		</para>
+
+		<para>
+		The insertion of a row into a table actually happens in two steps:
+		</para>
+
+		<orderedlist>
+		<listitem>
+		A RowHandle is created for a row.
+		</listitem>
+		<listitem>
+		This new handle is inserted into the table.
+		</listitem>
+		</orderedlist>
+
+		<para>
+		This is done with the following code:
+		</para>
+
+<pre>
+$rh = $table->makeRowHandle($row);
+$table->insert($rh);
+</pre>
+
+		<indexterm>
+			<primary>table</primary>
+			<secondary>insert</secondary>
+		</indexterm>
+		<para>
+		Only it just so happens that to make life easier, the method
+		<pre>insert()</pre> has been made to accept either a row handle or
+		directly a row. If it finds a row, it makes a handle for it behind the
+		curtains and then proceeds with the insertion of that handle. Passing a
+		row directly is also more efficient (if you don't have a handle already
+		created for it for some other reason) because the row handle creation
+		then happens entirely in the &Cpp; code, without surfacing into Perl.
+		</para>
+
+		<para>
+		A handle can be created for any row of a type matching the table's
+		row type. For a while it was accepting only equal types but that
+		was not consistent with what the labels are doing, so I've changed it.
+		</para>
+
+		<indexterm>
+			<primary>error handling</primary>
+		</indexterm>
+		<indexterm>
+			<primary>table</primary>
+			<secondary>replacement</secondary>
+		</indexterm>
+		<para>
+		The method <pre>insert()</pre> has a return value. It's often ignored but occasionally
+		comes handy.  1 means that the row has been inserted successfully, and
+		0 means that the row has been rejected. On errors it confesses.
+		An attempt to insert a NULL handle or a handle that is already in the
+		table will cause a rejection, not an error.
+		Also the table's index may reject a row with duplicate key (though
+		right now this option is not implemented, and the hash index silently
+		replaces the old row with the new one).
+		</para>
+
+		<para>
+		There is a method to find out if a row handle is in the table or not:
+		</para>
+
+<pre>
+$result = $rh->isInTable();
+</pre>
+
+		<para>
+		Though it's used mostly for debugging, when some strange things start going on.
+		</para>
+
+		<indexterm>
+			<primary>table</primary>
+			<secondary>find</secondary>
+		</indexterm>
+		<para>
+		The searching for rows in the table by key has been previously shown with the
+		method <pre>findBy()</pre>. Which happens to be a wrapper over a more general method
+		<pre>find()</pre>: it constructs a row from its argument fields and then calls
+		<pre>find()</pre> with that row as a sample of data to find.
+		The method <pre>find()</pre> is similar to <pre>insert()</pre> in the
+		handling of its arguments: the <quote>proper</quote> way is to give
+		it a row handle argument, but the more efficient way is to give it a 
+		row argument, and it will create the handle for it as needed before
+		performing a search.
+		</para>
+
+		<para>
+		Now you might wonder: huh, <pre>find()</pre> takes a row handle and returns a row
+		handle? What's the point? Why not just use the first row handle? Well,
+		those are different handles:
+		</para>
+
+		<itemizedlist>
+		<listitem>
+		The argument handle is normally not in the table. It's created brand
+		new from a row that contains the keys that you want to find, just for
+		the purpose of searching.
+		</listitem>
+		<listitem>
+		The returned handle is always in the table (of course, unless it's
+		NULL). It can be further used to extract back the row data, and/or for
+		iteration.
+		</listitem>
+		</itemizedlist>
+
+		<para>
+		Though nothing really prevents you from searching for a handle that is
+		already in the table. You'll just get back the same handle, after
+		gratuitously spending some CPU time. (There are exceptions to this,
+		with the more complex indexes that will be described later).
+		</para>
+
+		<para>
+		Why do you need to create new a row handle just for the search? Due to
+		the internal mechanics of the implementation. A handle stores the
+		helper information for the index. For example, the hash index
+		calculates the hash value of all the row's key fields once and
+		stores it in the row handle. Despite it being called a hash index, it
+		really stores the data in a tree, with the hash value used to speed up
+		the comparisons for the tree order. It's much easier to make both the
+		<pre>insert()</pre> and <pre>find()</pre> work with the hash value and row reference
+		stored in the same way in a handle than to implement them differently. Because of
+		this, <pre>find()</pre> uses the exactly same row handle argument format as
+		<pre>insert()</pre>.
+		</para>
+
+		<para>
+		Can you create multiple row handles referring to the same row? Sure,
+		knock yourself out. From the table's perspective it's the same thing as
+		multiple row handles for multiple copies of the row with the same values
+		in them, only using less memory.
+		</para>
+
+		<para>
+		There is more to the row handles than has been touched upon yet. It
+		will all be revealed when more of the table features are described.
+		The internal structure of the row handles will be described in the
+		<xref linkend="sc_table_indextree" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_table_fifo">
+		<title>A window is a FIFO</title>
+
+		<indexterm>
+			<primary>window</primary>
+		</indexterm>
+		<indexterm>
+			<primary>FIFO</primary>
+		</indexterm>
+
+		<para>
+		A fairly typical situation in the CEP world is when a model needs to
+		keep a limited history of events. For a simple example, let's discuss,
+		how to remember the last two trades per stock symbol. The size of two
+		has been chosen to keep the sample input and outputs small.
+		</para>
+
+		<para>
+		This is normally called a window logic, with a sliding window. You can
+		think of it in a mechanical analogy: as the trades become available,
+		they get printed on a long tape. However the tape is covered with a
+		masking plate. The plate has a window cut in it that lets you see only
+		the last two trades.
+		</para>
+
+		<indexterm>
+			<primary>Coral8</primary>
+		</indexterm>
+		<para>
+		Some CEP systems have the special data structures that implement this
+		logic, that are called windows. Triceps has a feature on a table
+		instead that makes a table work as a window. It's not unique in this
+		department: for example Coral8 does the opposite, calls everything a
+		window, even if some windows are really tables in every regard but
+		name.
+		</para>
+
+		<para>
+		Here is a Triceps example of keeping the window for the last two trades
+		and iteration over it:
+		</para>
+
+<!-- t/xWindow.t doWindow -->
+<pre>
+our $uTrades = Triceps::Unit->new("uTrades");
+our $rtTrade = Triceps::RowType->new(
+	id => "int32", # trade unique id
+	symbol => "string", # symbol traded
+	price => "float64",
+	size => "float64", # number of shares traded
+);
+
+our $ttWindow = Triceps::TableType->new($rtTrade)
+	->addSubIndex("bySymbol", 
+		Triceps::IndexType->newHashed(key => [ "symbol" ])
+			->addSubIndex("last2",
+				Triceps::IndexType->newFifo(limit => 2)
+			)
+	)
+;
+$ttWindow->initialize();
+our $tWindow = $uTrades->makeTable($ttWindow, "tWindow");
+
+# remember the index type by symbol, for searching on it
+our $itSymbol = $ttWindow->findSubIndex("bySymbol");
+# remember the FIFO index, for finding the start of the group
+our $itLast2 = $itSymbol->findSubIndex("last2");
+
+# print out the changes to the table as they happen
+our $lbWindowPrint = $uTrades->makeLabel($rtTrade, "lbWindowPrint",
+	undef, sub { # (label, rowop)
+		&send($_[1]->printP(), "\n"); # print the change
+	});
+$tWindow->getOutputLabel()->chain($lbWindowPrint);
+
+while(&readLine) {
+	chomp;
+	my $rTrade = $rtTrade->makeRowArray(split(/,/));
+	my $rhTrade = $tWindow->makeRowHandle($rTrade);
+	$tWindow->insert($rhTrade);
+	# There are two ways to find the first record for this
+	# symbol. Use one way for the symbol AAA and the other for the rest.
+	my $rhFirst;
+	if ($rTrade->get("symbol") eq "AAA") {
+		$rhFirst = $tWindow->findIdx($itSymbol, $rTrade);
+	} else  {
+		# $rhTrade is now in the table but it's the last record
+		$rhFirst = $rhTrade->firstOfGroupIdx($itLast2);
+	}
+	my $rhEnd = $rhFirst->nextGroupIdx($itLast2);
+	&send("New contents:\n");
+	for (my $rhi = $rhFirst; 
+			!$rhi->same($rhEnd); $rhi = $rhi->nextIdx($itLast2)) {
+		&send("  ", $rhi->getRow()->printP(), "\n");
+	}
+}
+</pre>
+
+		<para>
+		This example reads the trade records in CSV format, inserts them into
+		the table, and then prints the actual modifications reported by the
+		table and the new state of the window for this symbol. And here is a sample
+		log, with the input lines in bold:
+		</para>
+
+<exdump>
+> 1,AAA,10,10
+tWindow.out OP_INSERT id="1" symbol="AAA" price="10" size="10" 
+New contents:
+  id="1" symbol="AAA" price="10" size="10" 
+> 2,BBB,100,100
+tWindow.out OP_INSERT id="2" symbol="BBB" price="100" size="100" 
+New contents:
+  id="2" symbol="BBB" price="100" size="100" 
+> 3,AAA,20,20
+tWindow.out OP_INSERT id="3" symbol="AAA" price="20" size="20" 
+New contents:
+  id="1" symbol="AAA" price="10" size="10" 
+  id="3" symbol="AAA" price="20" size="20" 
+> 4,BBB,200,200
+tWindow.out OP_INSERT id="4" symbol="BBB" price="200" size="200" 
+New contents:
+  id="2" symbol="BBB" price="100" size="100" 
+  id="4" symbol="BBB" price="200" size="200" 
+> 5,AAA,30,30
+tWindow.out OP_DELETE id="1" symbol="AAA" price="10" size="10" 
+tWindow.out OP_INSERT id="5" symbol="AAA" price="30" size="30" 
+New contents:
+  id="3" symbol="AAA" price="20" size="20" 
+  id="5" symbol="AAA" price="30" size="30" 
+> 6,BBB,300,300
+tWindow.out OP_DELETE id="2" symbol="BBB" price="100" size="100" 
+tWindow.out OP_INSERT id="6" symbol="BBB" price="300" size="300" 
+New contents:
+  id="4" symbol="BBB" price="200" size="200" 
+  id="6" symbol="BBB" price="300" size="300" 
+</exdump>
+
+		<indexterm>
+			<primary>index</primary>
+			<secondary>group</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>table</primary>
+			<secondary>replacement</secondary>
+		</indexterm>
+		<para>
+		You can see that the window logic works: at no time is there
+		more than two rows in each group. As more rows are inserted,
+		the oldest rows get deleted.
+		</para>
+
+		<indexterm>
+			<primary>type</primary>
+			<secondary>table</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>type</primary>
+			<secondary>index</secondary>
+		</indexterm>
+		<para>
+		Now let's dig into the code.
+		The first thing to notice is that the table type has two
+		indexes (strictly speaking, index types, but most of the time
+		they can be called indexes without creating a confusion) in it. Unlike
+		your typical database, the indexes in this example are nested.
+		</para>
+
+<pre>
+TableType
++-IndexType Hash "bySymbol"
+  +-IndexType Fifo "last2"
+</pre>
+
+		<para>
+		If you follow the nesting, you can see, that the first call <pre>addSubIndex()</pre>
+		adds an index type to the table type, while the textually second
+		<pre>addSubIndex()</pre> adds an index to the previous index.
+		</para>
+
+		<para>
+		The same can also be written out in multiple separate calls,
+		with the intermediate results stored in the variables:
+		</para>
+
+<pre>
+$itLast2 = Triceps::IndexType->newFifo(limit => 2);
+$itSymbol = Triceps::IndexType->newHashed(key => [ "symbol" ]);
+$itSymbol->addSubIndex("last2", $itLast2);
+$ttWindow = Triceps::TableType->new($rtTrade);
+$ttWindow->addSubIndex("bySymbol", $itSymbol);
+</pre>
+
+		<para>
+		I'm not perfectly happy with the way the table types are constructed
+		with the index types right now, since the parenthesis levels have
+		turned out a bit hard to track. This is another example of following
+		the &Cpp; API in Perl that didn't work out too well, and it will change
+		in the future. But for now please bear with it.
+		</para>
+
+		<para>
+		The index nesting is kind of intuitively clear, but the details may
+		take some time to get your head wrapped around them. You can think of
+		it as the inner index type creating the miniature tables that hold the
+		rows, and then the outer index holding not individual rows but those
+		miniature tables. So, to find the rows in the table you go through two
+		levels of indexes: first through the outer index, and then through the
+		inner one. The table takes care of these details and makes them
+		transparent, unless you want to stop your search at an intermediate
+		level: such as, to find <i>all</i> the transactions with a given
+		symbol, you need to do a search in the outer index, but then from that
+		point iterate through all rows in the found inner index. For this you
+		obviously have to tell the table, where do you want to stop in
+		the search.
+		</para>
+
+		<indexterm>
+			<primary>index</primary>
+			<secondary>FIFO</secondary>
+		</indexterm>
+		<para>
+		The outer index is the hash index that we've seen before, the inner
+		index is a FIFO index. A FIFO index doesn't have any key, it just keeps
+		the rows in the order they were inserted. You can search in a FIFO
+		index but most of the time it's not the best idea: since it has no
+		keys, it searches linearly through all its rows until it finds an exact
+		match (or runs out of rows). It's a reasonable last-resort way but it's
+		not fast and in many cases not what you want. This also sends
+		a few ripples through the row deletion. Remember that the method
+		<pre>deleteRow()</pre> and sending the <pre>OP_DELETE</pre> to the table's input label invoke
+		<pre>find()</pre>, which would cause the linear search on the FIFO indexes. So
+		when you use a FIFO index, it's usually better to find the row handle
+		you want to delete in some other way and then call <pre>remove()</pre> on it, or
+		use another approach that will be shown later. Or just keep inserting
+		the rows and never delete them, like this example does.
+		</para>
+
+		<para>
+		A FIFO index may contain multiple copies of an exact same
+		row. It doesn't care, it just keeps whatever rows were given to it in
+		whatever order they were given. 
+		</para>
+
+		<para>
+		By default a FIFO index just keeps whatever rows come to it. However it
+		may have a few options. Setting the option <pre>limit</pre> limits the number of
+		rows stored in the index (not per the whole table but per one of those
+		<quote>miniature tables</quote>). When you try to insert one row too many, the oldest
+		row gets thrown out, and the limit stays unbroken. That's what creates
+		the window behavior: keep the most recent N rows.
+		</para>
+
+		<para>
+		If you look at the sample output, you can see that inserting the rows
+		with ids 1-4 generates only the insert events on the table. But the
+		rows 5 and 6 start overflowing their FIFO indexes, and cause the oldest
+		row to be automatically deleted before completing the insert of the new
+		one.
+		</para>
+
+		<para>
+		A FIFO index doesn't have to be nested inside a hash index. If you put
+		a FIFO index at the top level, it will control the whole table. So it
+		would be not two last record per key but two last records inserted in the
+		whole table.
+		</para>
+
+		<indexterm>
+			<primary>index</primary>
+			<secondary>initialization</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>type</primary>
+			<secondary>index</secondary>
+		</indexterm>
+		<para>
+		Continuing with the example, the table gets created, and then the index
+		types get extracted back from the table type. Now, why not just write
+		out the table type creation with intermediate variables 
+		as shown above and remember the index
+		references? At some point in the past this actually would have worked
+		but not any more. It has to do with the way the table type and its
+		index types are connected. It's occasionally convenient to create one
+		index type and then reuse it in multiple table types. However for the
+		whole thing to work, the index type must be tied to its particular
+		table type. This tying together happens when the table type is
+		initialized. If you put the same index type into two table types, then when
+		the first table type is initialized, the index type will get tied to
+		it. The second table type would then fail to initialize because an
+		index in it is already tied elsewhere. To get around this
+		dilemma, now when you call <pre>addSubIndex()</pre>, it doesn't connect the
+		original index type, instead it makes a copy of it. That copy then gets
+		tied with the table type and later gets returned back with <pre>findSubIndex()</pre>.
+		</para>
+
+		<para>
+		The table methods that take an index type argument
+		absolutely require that the index type must be tied to that table's type. If
+		you try to pass a seemingly the same index type that has not been tied,
+		or has been tied to a different table type, that is an error. 
+		</para>
+
+		<para>
+		One last note on this subject: there is
+		no interdependency between the methods <pre>makeTable()</pre> and <pre>findSubIndex()</pre>,
+		they can be done in either order.
+		</para>
+
+		<para>
+		The example output comes from two sources. The running updates on the table's
+		modifications (the lines with <pre>OP_INSERT</pre> and <pre>OP_DELETE</pre>) are printed from the label
+		<pre>$lbWindowPrint</pre>. The new window contents is printed from the main loop.
+		</para>
+
+		<para>
+		The main loop reads the trade records in the simple
+		CSV format without the opcode, and for simplicity inserts directly 
+		into the table with the procedural API, bypassing
+		the scheduler. After the row is inserted, the contents of its index
+		group (that <quote>miniature table</quote>) gets printed. The insertion could as
+		well have been done with passing directly the row reference, without
+		explicitly creating a handle. But that handle will be used to
+		demonstrate an interesting point.
+		</para>
+
+		<indexterm>
+			<primary>table</primary>
+			<secondary>iteration</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>index</primary>
+			<secondary>group</secondary>
+		</indexterm>
+		<para>
+		To print the contents of an index group, we need to find its
+		boundaries. In Triceps these boundaries are expressed as the first row
+		handle of the group, and as the row handle right after the group. There
+		is an internal logic to that, and it will be explained later, but for
+		now just take it on faith.
+		</para>
+
+		<para>
+		With the information we have, there are two ways to find the first row of the group:
+		</para>
+
+		<indexterm>
+			<primary>table</primary>
+			<secondary>find</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>index</primary>
+			<secondary>find</secondary>
+		</indexterm>
+		<itemizedlist>
+		<listitem>
+		With the table's method <pre>findIdx()</pre>. It's very much like <pre>find()</pre>, only it
+		has an extra argument of a specific index type. If the index type given
+		has no further nesting in it, <pre>findIdx()</pre> works exactly like <pre>find()</pre>. In
+		fact, <pre>find()</pre> is exactly such a special case of <pre>findIdx()</pre> with an
+		automatically chosen index type. If you use an index type with further nesting
+		under it, <pre>findIdx()</pre> will return the handle of the first row in the
+		group under it (or the usual NULL row handle if not found).
+		</listitem>
+		<indexterm>
+			<primary>RowHandle</primary>
+		</indexterm>
+		<listitem>
+		If we create the row handle explicitly before inserting it into the
+		table, as was done in the example, that will be the exact row handle
+		inserted into the table. Not a copy or anything but this particular row
+		handle. After a row handle gets inserted into the table, it knows its
+		position in the indexes. It knows, in which group it is.
+		And we still have a reference to it. So then
+		we can use this knowledge to navigate within the group, 
+		jump to the first row handle in the group
+		with <pre>firstOfGroupIdx()</pre>. It also takes an index type but in this case
+		it's the type that controls the group, the FIFO index in out case.
+		</listitem>
+		</itemizedlist>
+
+		<para>
+		The example shows both ways. As a demonstration, it uses the first way
+		if the symbol is <quote>AAA</quote> and the second way for all the other symbols.
+		</para>
+
+		<indexterm>
+			<primary>table</primary>
+			<secondary>iteration</secondary>
+		</indexterm>
+		<para>
+		The end boundary is found by calling <pre>nextGroupIdx()</pre> on the first row's
+		handle. The handle of the newly inserted row could have also been used for
+		<pre>nextGroupIdx()</pre>, or any other handle in the group. For any
+		handle belonging to the same group, the result is exactly the same.
+		</para>
+
+		<para>
+		And finally, after the iteration boundaries have been found,
+		the iteration on the group can run. The end
+		condition comparison is done with <pre>same()</pre>, to compare the row
+		handle references and not just their Perl-level wrappers. The stepping
+		is done with <pre>nextIdx()</pre>, with is exactly like <pre>next()</pre> but according to a
+		particular index, the FIFO one. This has actually been done purely to
+		show off this method. In this particular case the result produced by
+		<pre>next()</pre>, <pre>nextIdx()</pre> on the FIFO index type and <pre>nextIdx()</pre> on 
+		the outer hash index type is exactly the same. We'll come to the reasons of
+		that yet.
+		</para>
+
+		<indexterm>
+			<primary>aggregation</primary>
+		</indexterm>
+		<para>
+		Looking forward, as you iterate through the group, you could do some manual aggregation
+		along the way. For example, find the average price of the last two
+		trades, and then do something useful with it.
+		</para>
+
+		<para>
+		There is also a piece of information that you can find without iteration:
+		the size of the group.
+		</para>
+
+		<indexterm>
+			<primary>index</primary>
+			<secondary>group size</secondary>
+		</indexterm>
+<pre>
+$size = $table->groupSizeIdx($idxType, $row_or_rh);
+</pre>
+
+		<para>
+		This information is important for the joins, and iterating every time through the
+		group is inefficient if all you want to get is the group size. Since when you need
+		this data you usually have the row and not the row handle, this operation
+		accepts either and implicitly performs a <pre>findIdx()</pre> on the row to find the
+		row handle. Moreover, even if it receives the argument of a row handle that
+		is not in the table, it will also automatically perform a <pre>findIdx()</pre> on it
+		(though calling it for a row handle in
+		the table is more efficient because the group would not need to be
+		looked up first). 
+		</para>
+
+		<para>
+		If there is no such group in the table, the result will be 0. 
+		</para>
+
+		<para>
+		The <pre>$idxType</pre> argument is the non-leaf parent index of the group. (Using a
+		leaf index type is not an error but it always returns 0, because there
+		are no groups under it). It's basically the same index type as you
+		would use in <pre>findIdx()</pre> to find the first row of the group
+		or in <pre>firstOfGroupIdx()</pre> or <pre>nextGroupIdx()</pre> to find the boundaries
+		of thr group.
+		Remember, a non-leaf
+		index type defines the groups, and the nested index types under it
+		define the order in those groups (and possibly further break them down
+		into sub-groups).
+		</para>
+
+		<para>
+		It's a bit confusing, so let's recap with another example.
+		If you have a table type defined as:
+		</para>
+
+<!-- from t/xJoin.t -->
+<pre>
+our $ttPosition = Triceps::TableType->new($rtPosition)
+	->addSubIndex("primary",
+		Triceps::IndexType->newHashed(key => [ "date", "customer", "symbol" ])
+	)
+	->addSubIndex("currencyLookup", # for joining with currency conversion
+		Triceps::IndexType->newHashed(key => [ "date", "currency" ])
+		->addSubIndex("grouping", Triceps::IndexType->newFifo())
+	)
+	->addSubIndex("byDate", # for cleaning by date
+		Triceps::SimpleOrderedIndex->new(date => "ASC")
+		->addSubIndex("grouping", Triceps::IndexType->newFifo())
+	)
+;
+</pre>
+
+		<para>
+		then it would make sense to call <pre>groupSizeIdx()</pre>, 
+		<pre>firstOfGroupIdx()</pre> and <pre>nextGroupIdx()</pre>
+		with the indexes
+		<quote>currencyLookup</quote> or <quote>byDate</quote> 
+		but not with <quote>primary</quote>,
+		<quote>currencyLookup/grouping</quote> nor <quote>byDate/grouping</quote>.  You can call
+		<pre>findIdx()</pre> with any index, but for
+		<quote>currencyLookup</quote> or <quote>byDate</quote> it would return the first row of the group
+		while for
+		<quote>primary</quote>, <quote>currencyLookup/grouping</quote> or <quote>byDate/grouping</quote>
+		it would return the only matching row. On the other hand, for iteration in a group, it makes
+		sense to call <pre>nextIdx()</pre> only on 
+		<quote>primary</quote>, <quote>currencyLookup/grouping</quote> or <quote>byDate/grouping</quote>.
+		Calling <pre>nextIdx()</pre> on the non-leaf index types is not an error
+		but it would in effect resolve to the same thing as using their
+		first leaf sub-indexes.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_table_secondary">
+		<title>Secondary indexes</title>
+
+		<para>
+		The last example dealt only with the row inserts, because it could not
+		handle the deletions that well. What if the trades may get cancelled
+		and have to be removed from the table? There is a solution to this
+		problem: add one more index. Only this time not nested but in parallel.
+		The indexes in the table type become tree-formed:
+		</para>
+
+		<indexterm>
+			<primary>index</primary>
+			<secondary>hashed</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>index</primary>
+			<secondary>secondary</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>index</primary>
+			<secondary>tree</secondary>
+		</indexterm>
+<pre>
+TableType
++-IndexType Hash "byId" (id)
++-IndexType Hash "bySymbol" (symbol)
+  +-IndexType Fifo "last2"
+</pre>
+
+		<para>
+		It's very much like the common relational databases where you can
+		define multiple indexes on the same table. Both indexes <pre>byId</pre> and
+		<pre>bySymbol</pre> (together with its nested sub-index) refer to the same
+		set of rows stored in the table. Only <pre>byId</pre> allows to easily find
+		the records by the unique id, while <pre>bySymbol</pre> is responsible for
+		keeping then grouped by the symbol, in FIFO order. It could be said
+		that <pre>byId</pre> is the primary index (since it has a unique key) and
+		<pre>bySymbol</pre> is a secondary one (since it does the grouping) but
+		from the Triceps'es standpoint they are pretty much equal and parallel
+		to each other.
+		</para>
+
+		<indexterm>
+			<primary>aggregation</primary>
+			<secondary>manual</secondary>
+		</indexterm>
+		<para>
+		To illustrate the point, here is a modified version of the previous
+		example. Not only does it manage the deletes but also computes the
+		average price of the collected transactions as it iterates through
+		the group, thus performing a manual aggregation.
+		</para>
+
+<!-- t/xWindow.t doSecondary -->
+<pre>
+our $uTrades = Triceps::Unit->new("uTrades");
+our $rtTrade = Triceps::RowType->new(
+	id => "int32", # trade unique id
+	symbol => "string", # symbol traded
+	price => "float64",
+	size => "float64", # number of shares traded
+);
+
+our $ttWindow = Triceps::TableType->new($rtTrade)
+	->addSubIndex("byId", 
+		Triceps::IndexType->newHashed(key => [ "id" ])
+	)
+	->addSubIndex("bySymbol", 
+		Triceps::IndexType->newHashed(key => [ "symbol" ])
+			->addSubIndex("last2",
+				Triceps::IndexType->newFifo(limit => 2)
+			)
+	)
+;
+$ttWindow->initialize();
+our $tWindow = $uTrades->makeTable($ttWindow, "tWindow");
+
+# remember the index type by symbol, for searching on it
+our $itSymbol = $ttWindow->findSubIndex("bySymbol");
+# remember the FIFO index, for finding the start of the group
+our $itLast2 = $itSymbol->findSubIndex("last2");
+
+# remember, which was the last row modified
+our $rLastMod;
+our $lbRememberLastMod = $uTrades->makeLabel($rtTrade, "lbRememberLastMod",
+	undef, sub { # (label, rowop)
+		$rLastMod = $_[1]->getRow();
+	});
+$tWindow->getOutputLabel()->chain($lbRememberLastMod);
+
+# Print the average price of the symbol in the last modified row
+sub printAverage # (row)
+{
+	return unless defined $rLastMod;
+	my $rhFirst = $tWindow->findIdx($itSymbol, $rLastMod);
+	my $rhEnd = $rhFirst->nextGroupIdx($itLast2);
+	&send("Contents:\n");
+	my $avg;
+	my ($sum, $count);
+	for (my $rhi = $rhFirst; 
+			!$rhi->same($rhEnd); $rhi = $rhi->nextIdx($itLast2)) {
+		&send("  ", $rhi->getRow()->printP(), "\n");
+		$count++;
+		$sum += $rhi->getRow()->get("price");
+	}
+	if ($count) {
+		$avg = $sum/$count;
+	}
+	&send("Average price: ", (defined $avg? $avg: "Undefined"), "\n");
+}
+
+while(&readLine) {
+	chomp;
+	my @data = split(/,/);
+	$uTrades->makeArrayCall($tWindow->getInputLabel(), @data);
+	&printAverage();
+	undef $rLastMod; # clear for the next iteration
+	$uTrades->drainFrame(); # just in case, for completeness
+}
+</pre>
+
+		<para>
+		And an example of its work, with the input lines shown in bold:
+		</para>
+
+<exdump>
+> OP_INSERT,1,AAA,10,10
+Contents:
+  id="1" symbol="AAA" price="10" size="10" 
+Average price: 10
+> OP_INSERT,2,BBB,100,100
+Contents:
+  id="2" symbol="BBB" price="100" size="100" 
+Average price: 100
+> OP_INSERT,3,AAA,20,20
+Contents:
+  id="1" symbol="AAA" price="10" size="10" 
+  id="3" symbol="AAA" price="20" size="20" 
+Average price: 15
+> OP_INSERT,4,BBB,200,200
+Contents:
+  id="2" symbol="BBB" price="100" size="100" 
+  id="4" symbol="BBB" price="200" size="200" 
+Average price: 150
+> OP_INSERT,5,AAA,30,30
+Contents:
+  id="3" symbol="AAA" price="20" size="20" 
+  id="5" symbol="AAA" price="30" size="30" 
+Average price: 25
+> OP_INSERT,6,BBB,300,300
+Contents:
+  id="4" symbol="BBB" price="200" size="200" 
+  id="6" symbol="BBB" price="300" size="300" 
+Average price: 250
+> OP_DELETE,3
+Contents:
+  id="5" symbol="AAA" price="30" size="30" 
+Average price: 30
+> OP_DELETE,5
+Contents:
+Average price: Undefined
+</exdump>
+
+		<para>
+		The input has changed: now an extra column is prepended to it,
+		containing the opcode for the row. The updates to the table are not
+		printed any more, but the calculated average price is printed after the
+		new contents of the group.
+		</para>
+
+		<para>
+		In the code, the first obvious addition is the extra index in the table
+		type. The label that used to print the updates is gone, and replaced
+		with another one, that remembers the last modified row in a global
+		variable.
+		</para>
+
+		<para>
+		That last modified row is then used in the function <pre>printAverage()</pre>
+		to find the group for iteration.
+		Why? Could not we just remember the symbol from the input data? Not always.
+		As you can see from the last two input rows with <pre>OP_DELETE</pre>, the
+		trade id is the only field required to find and delete a row using the
+		index <pre>byId</pre>. So these trade cancellation rows take a shortcut and
+		only provide the trade id, not the rest of the fields. If we try to
+		remember the symbol fields from them, we'd remember an <pre>undef</pre>.
+		Can we just look up the row by id after the incoming rowop has been processed?
+		Not after the deletion.
+		If we try to find the symbol by looking up the row
+		after the deletion, we will find nothing, because the row will already
+		be deleted. We could look up the row in the table before the deletion,
+		and remember it, and afterwards do the look-up of the group by
+		it. But since on deletion the row with will come to the table's
+		output label anyway, we can just ride the wave and remember it instead
+		of doing the manual look-up. And this also spares the need of creating
+		a row with the last symbol for searching: we get a ready pre-made row
+		with the right symbol in it.
+		</para>
+
+		<para>
+		Note that in this example, unlike the previous one, there are no two
+		ways of finding the group any more: after deletion the row handle will
+		not be in the table any more, and could not be used to jump directly to
+		the beginning of its group. <pre>findIdx()</pre> has to be used to find the group.
+		</para>
+
+		<para>
+		By the time <pre>printAverage()</pre> executes, it could happen that all the rows with that symbol
+		will be gone, and the group will disappear. This situation is handled
+		nicely in an automatic way: <pre>findIdx()</pre> will return a NULL row handle, for which then
+		<pre>nextGroupIdx()</pre> will also return a NULL row handle. The for-loop will
+		immediately satisfy the condition of <pre>$rhi->same($rhEnd)</pre>, it will
+		make no iterations, the <pre>$count</pre> and <pre>$avg</pre> will be left undefined.
+		In result no rows will be printed and the average value will be printed
+		as <quote>Undefined</quote>, as you can see in the reaction to the last input row
+		in the sample output.
+		</para>
+
+		<para>
+		The main loop becomes reduced to reading the input, splitting the line,
+		separating the opcode, calling the table's input label, and printing
+		the average. The auto-conversion from the opcode name is used when
+		constructing the rowop. Normally it's not a good practice, since the
+		program will die if it finds a bad rowop in the input, but good enough
+		for a small example. The direct use of <pre>$uTrades->call()</pre> 
+		guarantees that by the time it returns, the last modified row
+		will be remembered in <pre>$rLastMod</pre>, available for <pre>printAverage()</pre>
+		to use.
+		</para>
+
+		<para>
+		After the average is calculated, <pre>$rLastMod</pre> is reset to prevent it from
+		accidentally affecting the next row. If the next row is an attempt to
+		delete a trade id that is not in the table any more, the DELTE operation
+		will have no effect on the table, and nothing will be sent from the
+		table's output label. <pre>$rLastMod</pre> will stay undefined, and
+		<pre>printAverage()</pre> will check it and immediately return.
+		An attempt to pass an <pre>undef</pre> argument to <pre>findIdx()</pre> would be an error.
+		</para>
+
+		<para>
+		The final <pre>$uTrades->drainFrame()</pre> is there purely for
+		completeness. In this case we know that nothing will be scheduled by
+		the labels downstream from the table, and there will be nothing to
+		drain.
+		</para>
+
+		<indexterm>
+			<primary>table</primary>
+			<secondary>find</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>index</primary>
+			<secondary>default</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>index</primary>
+			<secondary>order</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>index</primary>
+			<secondary>primary</secondary>
+		</indexterm>
+		<para>
+		Now, an interesting question is: how does the table know, that to
+		delete a row, it has to find it using the field <pre>id</pre>? Or, since
+		the deletion internally uses <pre>find()</pre>, the more precise question is: how
+		does <pre>find()</pre> know that it has to use the index <pre>byId</pre>? It doesn't
+		use any magic. It simply goes by the first index defined in the table.
+		That's why the index <pre>byId</pre> has been very carefully placed before
+		<pre>bySymbol</pre>. The same principle applies to all the other functions
+		like <pre>next()</pre>, that use an index but don't receive one as an argument:
+		the first index is always the default index. There is a bit more detail to
+		it, but that's the rough principle.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_table_sorted">
+		<title>Sorted index</title>
+
+		<para>
+		The hashed index provides a way to store rows indexed by a key. It is fast
+		but it has a price to pay for that speed: when iterating through it,
+		the records come in an unpredictable (though repeatable, within a
+		particular machine architecture) order determined by the hash function.
+		If the order doesn't matter, that's fine. But often the order does
+		matter, and is desirable even at the tradeoff of the reduced performance.
+		</para>
+
+		<indexterm>
+			<primary>index</primary>
+			<secondary>sorted</secondary>
+		</indexterm>
+		<para>
+		The sorted index provides a solution for this problem. It is created
+		with:
+		</para>
+
+<pre>
+$it = Triceps::IndexType->newPerlSorted($sortName,
+  $initFunc, $compareFunc, @args);
+</pre>
+
+		<para>
+		The <quote>Perl</quote> in <quote>newPerlSorted</quote> refers to the
+		fact that the sorting order is specified as a Perl comparison function.
+		</para>
+
+		<para>
+		<pre>$sortName</pre> is just a symbolic name for printouts. It's used when you
+		call <pre>$it->print()</pre> (directly or as a recursive call from the table
+		type print) to let you know what kind of index type it is, since it
+		can't print the compiled comparison function. It is also used in the
+		error messages if something dies inside the comparison function: the
+		comparison is executed from deep inside the &Cpp; code, and by that time
+		the <pre>$sortName</pre> is the only way to identify the source of the problems.
+		It's not the same name as used to connect the index type into the table
+		type hierarchy with <pre>addSubIndex()</pre>. As usual, an index type may be
+		reused in multiple hierarchies, with different names, but in all cases
+		it will also keep the same <pre>$sortName</pre>. This may be easier to show with an
+		example:
+		</para>
+
+<!-- t/SortedIndexType.t -->
+<pre>
+$rt1 = Triceps::RowType->new(
+	a => "int32",
+	b => "string",
+);
+
+$it1 = Triceps::IndexType->newPerlSorted("basic", undef, \&compBasic);
+
+$tt1 = Triceps::TableType->new($rt1)
+	->addSubIndex("primary", $it1)
+; 
+
+$tt2 = Triceps::TableType->new($rt1)
+	->addSubIndex("first", $it1)
+; 
+
+print $tt1->print(), "\n";
+print $tt2->print(), "\n";
+</pre>
+
+		<para>
+		The print calls in it will produce:
+		</para>
+
+<pre>
+table (
+  row {
+    int32 a,
+    string b,
+  }
+) {
+  index PerlSortedIndex(basic) primary,
+}
+table (
+  row {
+    int32 a,
+    string b,
+  }
+) {
+  index PerlSortedIndex(basic) first,
+}
+</pre>
+
+		<para>
+		Both the name of the index type in the table type and the name of
+		the sorted index type are printed, but in different spots.
+		</para>
+
+		<para>
+		The <pre>$initFunc</pre> and/or <pre>$compareFunc</pre> function references 
+		(or, as usual, they may be specified as source code strings) specify the sorting order.
+		One of them may be left undefined but not both. <pre>@args</pre> are the optional
+		arguments that will be passed to both functions.
+		</para>
+
+		<para>
+		The easiest but least flexible way is to just use the
+		<pre>$compareFunc</pre>. It gets two Rows (not RowHandles!) as arguments, plus
+		whatever is specified in <pre>@args</pre>. It returns the usual Perl-style
+		<quote>&lt;=&gt;</quote> result. For example:
+		</para>
+
+<pre>
+sub compBasic # ($row1, $row2)
+{
+	return $_[0]->get("a") <=> $_[1]->get("a");
+}
+</pre>
+
+		<para>
+		Don't forget to use <quote>&lt;=&gt;</quote> for the numbers and <quote>cmp</quote> for the
+		strings. The typical Perl idiom for sorting by more than one field is
+		to connect them by <quote>||</quote>.
+		</para>
+
+		<para>
+		Or, if we want to specify the field names as arguments, we could define
+		a sort function that sorts first by a numeric field in ascending order,
+		then by a string field in descending order:
+		</para>
+
+<pre>
+sub compAscDesc # ($row1, $row2, $numFldAsc, $strFldDesc)
+{
+	my ($row1, $row2, $numf, $strf) = @_;
+	return $row1->get($numf) <=> $row2->get($numf)
+		|| $row2->get($strf) cmp $row1->get($strf); # backwards for descending
+}
+
+my $sit = Triceps::IndexType->newPerlSorted("by_a_b", undef,
+	\&compAscDesc, "a", "b");
+</pre>
+
+		<indexterm>
+			<primary>sticky error</primary>
+		</indexterm>
+		<para>
+		This assumes that the row type will have a numeric field <quote>a</quote> and a
+		string field <quote>b</quote>. If it doesn't then this will not
+		be discovered until you create a table and try to insert some rows into
+		it, which will finally call the comparison function. At which point
+		the attempt to get a non-existing field will confess, this error
+		will be caught by the table and set the sticky error in it. The insert
+		operation will confess with this error, and any future operations
+		on the table will also confess with this error (this is the meaning of
+		<quote>sticky</quote>), the table will become
+		unusable.
+		</para>
+
+		<para>
+		The <pre>$initFunc</pre> provides a way to do that check and more up front.
+		It is called at the table type initialization time. By this time all
+		this extra information is known, and it gets the references to the
+		table type, index type (itself, but with the class stripped back to
+		Triceps::IndexType), row type, and whatever extra arguments that were
+		passed. It can do all the checks once.
+		</para>
+
+		<para>
+		The init function's return value is kind of backwards to everything
+		else: on success it returns <pre>undef</pre>, on error it returns the error
+		message. It could die too, but simply returning an error message is
+		somewhat nicer. The returned error messages may contain multiple 
+		lines separated by <quote>\n</quote>, so it should try to collect all the error
+		information it can.
+		</para>
+
+		<para>
+		The init function that would check the arguments for the
+		last example can be defined as:
+		</para>
+
+<!-- t/xSnippets.t IndexType init -->
+<pre>
+sub initNumStr # ($tabt, $idxt, $rowt, @args)
+{
+	my ($tabt, $idxt, $rowt, @args) = @_;
+	my %def = $rowt->getdef(); # the field definition
+	my $errors; # collect as many errors as possible
+	my $t;
+
+	if ($#args != 1) {
+		$errors .= "Received " . ($#args + 1) . " arguments, must be 2.\n"
+	} else {
+		$t = $def{$args[0]};
+		if ($t !~ /int32$|int64$|float64$/) {
+			$errors .= "Field '" . $args[0] . "' is not of numeric type.\n"
+		}
+		$t = $def{$args[1]};
+		if ($t !~ /string$|uint8/) {
+			$errors .= "Field '" . $args[1] . "' is not of string type.\n"
+		}
+	}
+
+	if (defined $errors) {
+		# help with diagnostics, append the row type to the error listing
+		$errors .= "the row type is:\n";
+		$errors .= $rowt->print();
+	}
+	return $errors;
+}
+
+my $sit = Triceps::IndexType->newPerlSorted("by_a_b", \&initNumStr,
+	\&compAscDesc, "a", "b");
+</pre>
+
+		<para>
+		The init function can do even better: it can create and set
+		the comparison function. It's done with:
+		</para>
+
+<pre>
+$idxt->setComparator($compareFunc);
+</pre>
+
+		<para>
+		When the init function sets the comparator,
+		the compare function argument in <pre>newPerlSorted()</pre>
+		can be left undefined, because <pre>setComparator()</pre> would override
+		it anyway. But one way or the other, the compare function
+		must be set, or the index type initialization and with it
+		the table type initialization will fail.
+		</para>
+
+		<indexterm>
+			<primary>aggregation</primary>
+		</indexterm>
+		<para>
+		By the way, the sorted index type init function is <b>not</b> of the
+		same kind as the aggregator type init function. The aggregator type
+		could use an init function of this kind too, but at the time it looked
+		like too much extra complexity. It probably will be added in the
+		future. But more about aggregators later.
+		</para>
+
+		<para>
+		A fancier example of the init function will be shown in the next
+		section.
+		</para>
+
+		<indexterm>
+			<primary>index</primary>
+			<secondary>hashed</secondary>
+		</indexterm>
+		<para>
+		Internally the implementation of the sorted index shares much
+		with the hashed index. They both are implemented as trees but they
+		compare the rows in different ways. The hashed index is aimed
+		for speed, the sorted index for flexibility. The common implementation
+		means that they share certain traits. Both kinds have the unique keys,
+		there can not be two rows with the same key in an index of either kind.
+		Both kinds allow to nest other indexes in them.
+		</para>
+
+		<indexterm>
+			<primary>error handling</primary>
+		</indexterm>
+		<para>
+		The handling of the fatal errors (as in <pre>die()</pre>) in the initialization 
+		and especially comparison functions is an interesting subject.
+		The errors propagate properly through the table,
+		and the table operations confess with the Perl handler's error message.
+		But since an error in the comparison function means that things are going
+		very, very wrong, after that the table becomes inoperative and will die
+		on all the subsequent operations as well. You need to be very careful
+		in writing these functions.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_table_ordered">
+		<title>Ordered index</title>
+
+		<indexterm>
+			<primary>index</primary>
+			<secondary>ordered</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>template</primary>
+		</indexterm>
+		<indexterm>
+			<primary>code generation</primary>
+		</indexterm>
+		<para>
+		To specify the sorting order in a more SQL-like fashion, Triceps
+		has the class SimpleOrderedIndex. It's implemented entirely in Perl, on
+		top of the sorted index. Besides being useful by itself, it shows off
+		two concepts: the initialization function of the sorted index, and the
+		template with code generation on the fly.
+		</para>
+
+		<para>
+		First, how to create an ordered index:
+		</para>
+
+<pre>
+$it = Triceps::SimpleOrderedIndex->new($fieldName => $order, ...);
+</pre>
+
+		<para>
+		The arguments are the key fields. <pre>$order</pre> is one of
+		<pre>"ASC"</pre> for ascending and <pre>"DESC"</pre> for descending.
+		Here is an example of a table with this index:
+		</para>
+
+<pre>
+my $tabType = Triceps::TableType->new($rowType)
+	->addSubIndex("sorted", 
+		Triceps::SimpleOrderedIndex->new(
+			a => "ASC",
+			b => "DESC",
+		)
+	);
+</pre>
+
+		<para>
+		When it gets translated into a sorted index, the comparison function
+		gets generated automatically. It's smart enough to generate the string
+		comparisons for the <pre>string</pre> and <pre>uint8</pre> fields, and the numeric
+		comparisons for the numeric fields. It's not smart enough to do the
+		locale-specific comparisons for the strings and locale-agnostic for the
+		<pre>uint8</pre>, it just uses whatever you have set up in <pre>cmp</pre> for both. It
+		treats the NULL field values as numeric 0 or empty strings. It doesn't
+		handle the array fields at all but can at least detect such attempts
+		and flag them as errors.
+		</para>
+
+		<para>
+		A weird artifact of the boundary between &Cpp; and Perl is that when you
+		get the index type back from the table type like
+		</para>
+
+<pre>
+$sortIdx = $tabType->findSubIndex("sorted");
+</pre>
+
+		<para>
+		the reference stored in <pre>$sortIdx</pre> will be of the base type
+		Triceps::IndexType. That's because the &Cpp; internals of the TableType
+		object know nothing about any derived Perl types. But it's no big deal,
+		since there are no other useful methods for SimpleOrderedIndex anyway.
+		For the future, I have an idea of a workaround, but it has to wait
+		for the future.
+		</para>
+
+		<para>
+		If you call <pre>$sortIdx->print()</pre>, it will give you an idea of how it
+		was constructed:
+		</para>
+
+<pre>
+PerlSortedIndex(SimpleOrder a ASC, b DESC, )
+</pre>
+
+		<para>
+		The contents of the parenthesis is a sort name from the sorted index'es
+		standpoint. It's an arbitrary string. But when the ordered index
+		prepares this string to pass to the sorted index, it puts its
+		arguments into it.
+		</para>
+
+		<para>
+		Now the interesting part, I want to show the implementation of the
+		ordered index. It's not too big and it shows the flexibility and the
+		extensibility of Triceps:
+		</para>
+
+<!-- lib/Triceps/SimpleOrderedIndex.pm with "XXX" lines dropped  -->
+<pre>
+package Triceps::SimpleOrderedIndex;
+
+our @ISA = qw(Triceps::IndexType);
+
+# Create a new ordered index. The order is specified
+# as pairs of (fieldName, direction) where direction is a string
+# "ASC" or "DESC".
+sub new # ($class, $fieldName => $direction...)
+{
+	my $class = shift;
+	my @args = @_; # save a copy
+
+	# build a descriptive sortName
+	my $sortName = 'SimpleOrder ';
+	while ($#_ >= 0) {
+		my $fld = shift;
+		my $dir = shift;
+		$sortName .= quotemeta($fld) . ' ' . quotemeta($dir) . ', ';
+	}
+
+	$self = Triceps::IndexType->newPerlSorted(
+		$sortName, '&Triceps::SimpleOrderedIndex::init(@_)', undef, @args
+	);
+	bless $self, $class;
+	return $self;
+}
+
+# The initialization function that actually parses the args.
+sub init # ($tabt, $idxt, $rowt, @args)
+{
+	my ($tabt, $idxt, $rowt, @args) = @_;
+	my %def = $rowt->getdef(); # the field definition
+	my $errors; # collect as many errors as possible
+	my $compare = ""; # the generated comparison function
+	my $connector = "return"; # what goes between the comparison operators
+
+	while ($#args >= 0) {
+		my $f = shift @args;
+		my $dir = uc(shift @args);
+
+		my ($left, $right); # order the operands depending on sorting direction
+		if ($dir eq "ASC") {
+			$left = 0; $right = 1;
+		} elsif ($dir eq "DESC") {
+			$left = 1; $right = 0;
+		} else {
+			$errors .= "unknown direction '$dir' for field '$f', use 'ASC' or 'DESC'\n";
+			# keep going, may find more errors
+		}
+	
+		my $type = $def{$f};
+		if (!defined $type) {
+			$errors .= "no field '$f' in the row type\n";
+			next;
+		}
+
+		my $cmp = "<=>"; # the comparison operator
+		if ($type eq "string"
+		|| $type =~ /^uint8.*/) {
+			$cmp = "cmp"; # string version
+		} elsif($type =~ /\]$/) {
+			$errors .= "can not order by the field '$f', it has an array type '$type', not supported yet\n";
+			next;
+		}
+
+		my $getter = "->get(\"" . quotemeta($f) . "\")";
+
+		$compare .= "  $connector \$_[$left]$getter $cmp \$_[$right]$getter\n";
+
+		$connector = "||";
+	}
+
+	$compare .= "  ;\n";
+
+	if (defined $errors) {
+		# help with diagnostics, append the row type to the error listing
+		$errors .= "the row type is:\n";
+		$errors .= $rowt->print();
+	} else {
+		# set the comparison as source code
+		#print STDERR "DEBUG Triceps::SimpleOrderedIndex::init: comparison function:\n$compare\n";
+		$idxt->setComparator($compare);
+	}
+	return $errors;
+}
+</pre>
+
+		<para>
+		The class constructor simply builds the sort name from the arguments
+		and offloads the rest of logic to the init function. It can't really do
+		much more: when the index type object is constructed, it doesn't know
+		yet, where it will be used and what row type it will get. It tries to
+		enquote nicely the weird characters in the arguments when they go into
+		the sort name. Not that much use is coming from it at the moment: the
+		&Cpp; code that prints the table type information doesn't do the same, so
+		there still is a chance of misbalanced quotes in the result. But
+		perhaps the &Cpp; code will be fixed at some point too.
+		</para>
+
+		<para>
+		The init function is called at the table type initialization time
+		with all the needed information.
+		It goes through all the arguments, looks up the fields in the row type,
+		and checks them for correctness. It tries to collect as much of the
+		error information as possible. The returned error messages may contain
+		multiple lines separated by <quote>\n</quote>, and the ordered index makes use of
+		it. The error messages get propagated back to the table type level,
+		nicely indented and returned from the table initialization. If the init
+		function finds any errors, it appends the printout of the row type too,
+		to make finding what went wrong easier. A result of a particularly bad
+		call to a table type initialization may look like this:
+		</para>
+
+<!-- t/SimpleOrderedIndex.t errors -->
+<pre>
+index error:
+  nested index 1 'sorted':
+    unknown direction 'XASC' for field 'z', use 'ASC' or 'DESC'
+    no field 'z' in the row type
+    can not order by the field 'd', it has an array type 'float64[]', not supported yet
+    the row type is:
+    row {
+      uint8 a,
+      uint8[] b,
+      int64 c,
+      float64[] d,
+      string e,
+    }
+</pre>
+
+		<para>
+		Also as the init goes through the arguments, it constructs the text of
+		the compare function in the variable <pre>$compare</pre>. Here the use of
+		<pre>quotemeta()</pre> for the user-supplied strings is important to avoid the
+		syntax errors in the generated code. If no errors are found in the
+		arguments, the compare function gets compiled with <pre>eval</pre>. There
+		should not be any errors, but it's always better to check. Finally the
+		compiled compare function is set in the sorted index with
+		</para>
+
+<pre>
+$idxt->setComparator($cmpfunc)
+</pre>
+
+		<para>
+		If you uncomment the debugging printout line (and run <quote><pre>make</pre></quote>, and maybe
+		<quote><pre>make install</pre></quote> afterwards), you can see the auto-generated code printed
+		on stderr when you use the simple ordered index. It will look somewhat
+		like this:
+		</para>
+
+<pre>
+sub {
+	return $_[0]-&gt;get("a") cmp $_[1]-&gt;get("a")
+	|| $_[1]-&gt;get("c") &lt;=&gt; $_[0]-&gt;get("c")
+	|| $_[0]-&gt;get("b") cmp $_[1]-&gt;get("b")
+	;
+}
+</pre>
+
+		<para>
+		That's it! An entirely new piece of functionality added in a smallish Perl
+		snippet. This is your typical Triceps template: collect the arguments,
+		use them to build Perl code, and compile it. Of course, if you don't
+		want to deal with the code generation and compilation, you can just
+		call your class methods and whatnot to interpret the arguments. But if
+		the code will be reused, the compilation is more efficient.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_table_indextree">
+		<title>The index tree</title>
+
+		<indexterm>
+			<primary>index</primary>
+			<secondary>leaf</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>index</primary>
+			<secondary>non-leaf</secondary>
+		</indexterm>
+		<para>
+		The index types in a table type can form a pretty much arbitrary tree.
+		Following the common tree terminology, the index types that have no
+		other index types nested in them, are called the <i>leaf</i> index
+		types. Since there seems to be no good one-word naming for the index
+		types that have more index types nested in them ("inner"? "nested" is
+		too confusing), I simply call them <i>non-leaf</i>.
+		</para>
+
+		<para>
+		At the moment the Hashed, Sorted and Ordered index types can be used
+		only in both leaf and non-leaf positions. The FIFO index types must
+		always be in the leaf position, they don't allow the further nesting.
+		</para>
+
+		<para>
+		Now is the time to look deeper into what is going on inside a table.
+		Note that I've been very carefully talking about <quote>index types</quote> and not
+		<quote>indexes</quote>. In this section the difference matters. The index types are in
+		the table type, the indexes are in the table. One index type may
+		generate multiple indexes.
+		</para>
+
+		<para>
+		This will become clearer after you see the illustrations. 
+		First, the legend in the
+		<xref linkend="fig_idx_legend" xrefstyle="select: label nopage"/>&xrsp;.
+		</para>
+
+		<figure id="fig_idx_legend" >
+			<title>Drawings legend.</title>
+			<xi:include href="file:///FIGS/idx-000-legend.xml"/> 
+		</figure>
+
+		<indexterm>
+			<primary>RowHandle</primary>
+		</indexterm>
+		<para>
+		The nodes belonging to the table type are shown in red, the nodes
+		belonging to the table are shown in blue, and the contents of the
+		RowHandle is shown separately in yellow. The lines on the drawings
+		represent not exactly pointers as such but more of the logical
+		connections that may be more complicated than the simple pointers.
+		</para>
+
+		<para>
+		The lines in the RowHandle don't mean anything at all, they just show
+		that the parts go together. In reality a RowHandle is a chunk of
+		memory, with various elements placed in that memory. As far as indexes
+		are concerned, the RowHandle contains an iterator for every index where
+		it belongs. This lets it know its position in the table, to iterate
+		along every index, and, most importantly, to be removed quickly from
+		every index. A RowHandle belongs to one index of each index type, and
+		contains the matching number of iterators in it.
+		</para>
+
+		<para>
+		The table type is shown as a normal flat tree. But the table itself is
+		more complex and becomes 3-dimensional. Its <quote>view from above</quote> matches
+		the table type's tree but the data grows <quote>up</quote> in the third dimension.
+		</para>
+
+		<para>
+		Let's start with the simplest case: a table type with only one index
+		type. Whether the index type is hash or FIFO, doesn't matter here.
+		</para>
+
+<pre>
+TableType
++-IndexType "A"
+</pre>
+
+		<para>
+		<xref linkend="fig_idx_one" xrefstyle="select: label nopage"/>&xrsp;
+		shows the table structure.
+		</para>
+
+		<figure id="fig_idx_one" >
+			<title>One index type.</title>
+			<xi:include href="file:///FIGS/idx-010-one.xml"/> 
+		</figure>
+
+		<indexterm>
+			<primary>index</primary>
+			<secondary>root</secondary>
+		</indexterm>
+		<para>
+		The table here always contains exactly one index, matching the one
+		defined index type, and the root index. The root index is very dumb,
+		its only purpose is to tie together the multiple top-level indexes into
+		a tree.
+		</para>
+
+		<para>
+		The only index of type A provides an ordering of the records, and this
+		ordering is used for the iteration on the table.
+		</para>
+
+		<para>
+		For the next example let's look at the straight nesting in
+		<xref linkend="fig_idx_nested" xrefstyle="select: label nopage"/>&xrsp;.
+		</para>
+
+<pre>
+TableType
++-IndexType "A"
+  +-IndexType "B"
+</pre>
+
+		<figure id="fig_idx_nested" >
+			<title>Straight nesting.</title>
+			<xi:include href="file:///FIGS/idx-020-nested.xml"/> 
+		</figure>
+
+		<para>
+		The stack of row references is shown visually divided to match the
+		indexing, but in reality there is no special division. This was done
+		purely to make the picture easier to read.
+		</para>
+
+		<indexterm>
+			<primary>index</primary>
+			<secondary>group</secondary>
+		</indexterm>
+		<para>
+		There is still only one index of type A. And this is always the case
+		with the top-level indexes, there is only one of them. This index
+		divides the rows into 3 <i>groups</i>. Just like the rows in a leaf
+		index, the groups in a non-leaf index are ordered in some 
+		index-specific way.
+		</para>
+
+		<para>
+		Each group then has its own second-level index of type B. Which then
+		defines an order for the rows in it. To reiterate: the index of type A
+		splits the rows by groups, then the group's index of type B defines the
+		order of the rows in the group.
+		</para>
+
+		<indexterm>
+			<primary>table</primary>
+			<secondary>iteration</secondary>
+		</indexterm>
+		<para>
+		So what happens when we iterate through the table and ask for the next
+		row handle? The current row handle contains the iterators in the
+		indexes of types A and B. The easy thing is to advance the iterator of
+		type B. Yeah, but in <i>which</i> index? The 
+		<xref linkend="fig_idx_nested" xrefstyle="select: label nopage"/>&xrsp;
+		shows three indexes of
+		type B, let's call them B1, B2 and B3. The iterator of type B in the
+		row handle tells the relative position in the index, but it doesn't
+		tell, which index it is. We need to step back and look at the index
+		type A. It's the top-level index type, so there is always only one
+		index for it. Then we take the iterator of type A and find this row's
+		group in the index A. The group contains the index of type B, say B1.
+		We can then take this index B1, take the iterator of type B from the
+		row handle, and advance this iterator in this index. If the advance
+		succeeded, then great, we've got the next row handle. But if the
+		current row was the last row in B1, we need to step back to the index A
+		again, advance the current row handle's iterator of type A there, find
+		its index B2, and pick the first row handle of B2.
+		</para>
+
+		<indexterm>
+			<primary>index</primary>
+			<secondary>default</secondary>
+		</indexterm>
+		<para>
+		This process is what happens when we use <pre>$rh->nextIdx($itB)</pre>. 
+		The iteration goes by the leaf
+		index type B, however it relies on all the index types in the path from
+		the table type to B. If we do <pre>$rh->next()</pre>, the result is the same
+		because the <i>first leaf</i> index type is used as the default index type for
+		the iteration.
+		</para>
+
+		<para>
+		If we do <pre>$rh->next($itA)</pre>, the semantics is still the same:
+		return the next row handle (not the next group). There is no way to get
+		to the row handle without going all the way through a leaf index. So
+		when a non-leaf index type is used for the iteration, it gets
+		implicitly extended to its first nested leaf index type. 
+		</para>
+
+		<indexterm>
+			<primary>table</primary>
+			<secondary>insert</secondary>
+		</indexterm>
+		<para>
+		What would happen if a new row gets inserted, and the index type A
+		determines that it does not belong to any of the existing groups? A new
+		group will be created and inserted in the appropriate position in A's
+		order. This group will have a new index of type B created, and the new
+		row inserted in that index.
+		</para>
+
+		<para>
+		What would happen if both rows in B1 are removed? B1 will become empty
+		and will be collapsed. The index A will delete the B1's group and B1
+		itself, and will remain with only two groups. The effect propagates
+		upwards: if all the rows are removed, the last index of type B will
+		collapse, then the index A will become empty and also collapse and be
+		deleted. The only thing left will be the root index that stays in the
+		existence no matter what.
+		</para>
+
+		<para>
+		When a table is first created, it has only the root index. The rest of
+		the indexes pop into the existence as the rows get inserted. If you
+		wonder, yes, this does apply to a table type with only one index type
+		as well. Just this point has not been brought up until now.
+		</para>
+
+		<para>
+		Among all this froth of creation and collapse the iterators stay
+		stable. Once a row is inserted, the indexes leading to it are not going
+		anywhere (at least until that row gets removed). But since other rows
+		and groups may be inserted around it, the notion of what row is next,
+		will change over time.
+		</para>
+
+		<para>
+		Let's go through how the other index-related operations work.
+		</para>
+
+		<indexterm>
+			<primary>table</primary>
+			<secondary>iteration</secondary>
+		</indexterm>
+		<para>
+		The iteration through the whole table starts with <pre>begin()</pre> or
+		<pre>beginIdx()</pre>, the first being a form of the second that always uses the
+		first leaf index type. <pre>beginIdx()</pre> is fairly straightforward: it just
+		follows the path from the root to the leaf, picking the first position
+		in each index along the way, until it hits the RowHandle, as is shown in
+		<xref linkend="fig_idx_nested_begin" xrefstyle="select: label nopage"/>&xrsp;.
+		That found RowHandle becomes its result. If the table is
+		empty, it returns the NULL row handle.
+		</para>
+
+		<figure id="fig_idx_nested_begin" >
+			<title><pre>begin()</pre>, <pre>beginIdx($itA)</pre> and <pre>beginIdx($itB)</pre> work the same for this table.</title>
+			<xi:include href="file:///FIGS/idx-021-nested-begin.xml"/> 
+		</figure>
+
+		<indexterm>
+			<primary>table</primary>
+			<secondary>find</secondary>
+		</indexterm>
+		<para>
+		The next pair is <pre>find()</pre> and <pre>findIdx()</pre> (and
+		<pre>findBy()</pre> and <pre>findIdxBy()</pre> are wrappers around those). 
+		As usual, <pre>find()</pre> is the same
+		thing as <pre>findIdx()</pre> on the table's first leaf index type. It also
+		follows the path from the root to the target index type. On each step
+		it tries to find a matching position in the current index. If the
+		position could not be found, the search fails and a NULL row handle is
+		returned. If found, it is used to progress to the next index.
+		</para>
+
+		<para>
+		As has been mentioned in
+		<xref linkend="sc_table_RowHandle" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;, 
+		the search always works internally on a
+		RowHandle argument. If a plain Row is used as an argument, a new
+		temporary RowHandle will be created for it, searched, and then freed
+		after the search. This works well for two reasons. First, the indexes
+		already have the functions for comparing two row handles to build their
+		ordering. The same functions are reused for the search. Second, the row
+		handles contain not only the index iterators but also the cached
+		information from the rows, to make the comparisons faster. The exact
+		kind of cached information varies by the index type. The FIFO,
+		Sorted and Ordered indexes
+		use none. The Hashed indexes calculate a hash of the key field values,
+		that will be used as a quick differentiator for the search. This
+		information gets created when the row handle gets created. Whether the
+		row handle is then used to insert into the table or to search in it,
+		the hash is then used in the same way, to speed up the comparisons.
+		</para>
+
+		<para>
+		In <pre>findIdx()</pre>, the non-leaf index type arguments behave differently
+		than the leaf ones: up to and including the index of the target type,
+		the search works as usual. But then at the next level the logic
+		switches to the same as in <pre>beginIdx()</pre>, going for the first row handle
+		of the first leaf sub-index. This lets you find the first row handle of
+		the matching group under the target index type.
+		</para>
+
+		<para>
+		If you use <pre>$table->findIdx($itA, $rh)</pre>, on 
+		<xref linkend="fig_idx_nested_findidx" xrefstyle="select: label nopage"/>&xrsp;
+		it will go through
+		the root index to the index A. There it will try to find the matching
+		position. If none is found, the search ends and returns a NULL row
+		handle. If the position is found, the search progresses towards the
+		first leaf sub-index type. Which is the index type B, and which
+		conveniently sits in this case right under A. The position in the index
+		A determines, which index of type B will be used for the next step.
+		Suppose it's the second position, so the second index of type B is
+		used. Since we're now past the target index A, the logic used is the
+		same as for <pre>beginIdx()</pre>, and the first position in B2 is picked. Which
+		then leads to the first row handle of the second sub-stack of handles.
+		</para>
+
+		<figure id="fig_idx_nested_findidx" >
+			<title><pre>findIdx($itA, $rh)</pre> goes through A and then switches to the <pre>beginIdx()</pre> logic.</title>
+			<xi:include href="file:///FIGS/idx-022-nested-findidx.xml"/> 
+		</figure>
+
+		<para>
+		The method <pre>firstOfGroupIdx()</pre> allows to navigate within a group, to jump
+		from some row somewhere in the group to the first one, and then from
+		there iterate through the group. The example in
+		<xref linkend="sc_table_fifo" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;
+		made use of it.
+		</para>
+
+		<para>
+		The 
+		<xref linkend="fig_idx_nested_firstOfGroupIdx" xrefstyle="select: label nopage"/>&xrsp;
+		shows an example of <pre>$table->firstOfGroupIdx($itB, $rh)</pre>,
+		where <pre>$rh</pre> is pointing to the third record in B2. What it needs to do is
+		go back to B2, and then execute the <pre>begin()</pre> logic from there on.
+		However, remember, the row handle does not have a pointer to the
+		indexes in the path, it only has the iterators. So, to find B2, the
+		method does not really back up from the original row. It has to start
+		all the way back from the root and follow the path to B2 using the iterators in
+		<pre>$rh</pre>. Since it uses the ready iterators, this works fast and requires no
+		row comparisons. But logically it's equivalent to backing up by one level,
+		and I'll continue calling it that for simpicity.
+		Once B2 (an index of type B) is reached, the <pre>begin()</pre> logic goes for
+		the first row in there.
+		</para>
+
+		<para>
+		<pre>firstOfGroupIdx()</pre> works on both leaf and non-leaf index type arguments
+		in the same way: it backs up from the reference row to the index of
+		that type and executes the <pre>begin()</pre> logic from there. Obviously, if you
+		use it on a non-leaf index type, the <pre>begin()</pre>-like part will follow its
+		first leaf index type.
+		</para>
+
+		<figure id="fig_idx_nested_firstOfGroupIdx" >
+			<title><pre>firstOfGroupIdx($itB, $rh)</pre>.</title>
+			<xi:include href="file:///FIGS/idx-023-nested-firstOfGroupIdx.xml"/> 
+		</figure>
+
+		<para>
+		The method <pre>nextGroupIdx()</pre> jumps to the first row of the next group,
+		according to the argument index type. To do that, it has to retrace one
+		level higher than <pre>firstOfGroupIdx()</pre>. 
+		<xref linkend="fig_idx_nested_nextGroupIdx" xrefstyle="select: label nopage"/>&xrsp;
+		shows that
+		<pre>$table->nextGroupIdx($itB, $rh)</pre> that starts from the same row handle
+		as in
+		<xref linkend="fig_idx_nested_firstOfGroupIdx" xrefstyle="select: label nopage"/>&xrsp;,
+		has to logically back up to the index A, go to the next
+		iterator there, and then follow to the first row of B3.
+		</para>
+
+		<figure id="fig_idx_nested_nextGroupIdx" >
+			<title><pre>nextGroupIdx($itB, $rh)</pre>.</title>
+			<xi:include href="file:///FIGS/idx-024-nested-nextGroupIdx.xml"/> 
+		</figure>
+
+		<para>
+		As before, in reality there is no backing up, just the path is retraced
+		from the root using the iterators in the row handle. Once the parent of
+		index type B is reached (which is the index of type A), the path
+		follows not the iterator from the row handle but the next one (yes,
+		copied from the row handle, increased, followed). This gives the index
+		of type B that contains the next group. And from there the same
+		<pre>begin()</pre>-like logic finds its first row.
+		</para>
+
+		<para>
+		Same as <pre>firstOfGroupIdx()</pre>, <pre>nextGroupIdx()</pre> may be used on both the leaf
+		and non-leaf indexes, with the same logic.
+		</para>
+
+		<para>
+		It's kind of annoying that <pre>firstOfGroupIdx()</pre> and <pre>nextGroupIdx()</pre> take
+		the index type inside the group while <pre>findIdx()</pre> uses takes the parent
+		index type to act on the same group. But as you can see, each of them
+		follows its own internal logic, and I'm not sure if they can be
+		reconciled to be more consistent.
+		</para>
+
+		<para>
+		At the moment the only navigation is forward. There is no matching
+		<pre>last()</pre>, <pre>prev()</pre> or <pre>lastGroupIdx()</pre> or <pre>prevGroupIdx()</pre>. They are in the
+		plan, but so far they are the victims of corner-cutting. Though there is a version of
+		<pre>last()</pre> in the AggregatorContext, since it happens to be particularly important
+		for the aggregation.
+		</para>
+
+		<para>
+		Continuing our excursion into the index nesting topologies, the next
+		example is of two parallel leaf index types:
+		</para>
+
+<pre>
+TableType
++-IndexType A
++-IndexType B
+</pre>
+
+		<para>
+		The resulting internal arrangement is shown in
+		<xref linkend="fig_idx_2pri" xrefstyle="select: label nopage"/>&xrsp;.
+		</para>
+
+		<figure id="fig_idx_2pri" >
+			<title>Two top-level index types.</title>
+			<xi:include href="file:///FIGS/idx-030-2pri.xml"/> 
+		</figure>
+
+		<para>
+		Each index type produces exactly one index under the root (since the
+		top-level index types always produce one index). Both indexes contain
+		the same number of rows, and exactly the same rows. When a row is added
+		to the table, it's added to all the leaf index types (one actual index
+		of each type). When a row is deleted from the table, it's deleted from
+		all the leaf index types. So the total is always the same. However the
+		order of rows in the indexes may differ. The drawing shows the row
+		references stacked in the same order as the index A because the index A
+		is of the first leaf index type, and as such is the default one for the
+		iteration.
+		</para>
+
+		<para>
+		The row handle contains the iterators for both paths, A and B. It's
+		pretty normal to find a row through one index type and then iterate
+		from there using the other index type.
+		</para>
+
+		<para>
+		The next example in
+		<xref linkend="fig_idx_prisec" xrefstyle="select: label nopage"/>&xrsp;
+		has a <quote>primary</quote> index with a unique key and a 
+		<quote>secondary</quote> index that groups the records:
+		</para>
+
+<pre>
+TableType
++-IndexType A
++-IndexType B
+  +-IndexType C
+</pre>
+
+		<figure id="fig_idx_prisec" >
+			<title>A <quote>primary</quote> and <quote>secondary</quote> index type.</title>
+			<xi:include href="file:///FIGS/idx-040-prisec.xml"/> 
+		</figure>
+
+		<para>
+		The index type A still produces one index and references all the rows
+		directly. The index of type B produces the groups, with each group
+		getting an index of type C. The total set of rows referrable through A
+		and through B is still the same but through B they are split into
+		multiple groups.
+		</para>
+
+		<para>
+		And 
+		<xref linkend="fig_idx_nestfork" xrefstyle="select: label nopage"/>&xrsp;
+		shows two leaf index types nested under one non-leaf.
+		</para>
+
+<pre>
+TableType
++-IndexType A
+  +-IndexType B
+  +-IndexType C
+</pre>
+
+		<figure id="fig_idx_nestfork" >
+			<title>Two index types nested under one.</title>
+			<xi:include href="file:///FIGS/idx-050-nestfork.xml"/> 
+		</figure>
+
+		<para>
+		As usual, there is only one index of type A, and it splits the rows
+		into groups. The new item in this picture is that each group has two
+		indexes in it: one of type B and one of type C. Both indexes in the
+		group contain the same rows. They don't decide, which rows they get.
+		The index A decides, which rows go into which group. Then if the group
+		1 contains two rows, indexes B1 and C1, would both contain two rows
+		each, the exact same set. The stack of row references has been visually
+		split by groups to make this point more clear.
+		</para>
+
+		<para>
+		This happens to be a pretty useful arrangement: for example, B might be
+		a hash index type, or a sorted index type, allowing to
+		find the records by the key (and for the sorted index, to iterate in
+		the order of keys), while C might be a FIFO index, keeping the
+		insertion order, and maybe keeping the window size limited.
+		</para>
+
+		<para>
+		That's pretty much it for the basic index topologies. Some much more
+		complex index trees can be created, but they would be the combinations
+		of the examples shown. Also, don't forget that every extra index type
+		adds overhead in both memory and CPU time, so avoid adding indexes that
+		are not needed.
+		</para>
+
+		<indexterm>
+			<primary>table</primary>
+			<secondary>replacement</secondary>
+		</indexterm>
+		<para>
+		One more fine point has to do with the replacement policies. Consider
+		that we have a table that contains the rows with a single field:
+		</para>
+
+<pre>
+id int32
+</pre>
+
+		<para>
+		And the table type has two indexes:
+		</para>
+
+<pre>
+TableType
++-IndexType "A" HashIndex key=(id)
++-IndexType "B" FifoIndex limit=3
+</pre>
+
+		<para>
+		And we send there the rowops:
+		</para>
+
+<pre>
+INSERT id=1
+INSERT id=2
+INSERT id=3
+INSERT id=2
+</pre>
+
+		<para>
+		The last rowop that inserts the row with id=2 for the second time
+		triggers the replacement policy in both index
+		types. In the index A it is a duplicate key and will cause the removal
+		of the previous row with id=2. In the index B it overflows the limit
+		and pushes out the oldest row, the one with id=1. If both records get
+		deleted, the resulting table contents will be 2 rows (shown in FIFO
+		order):
+		</para>
+
+<pre>
+id=3
+id=2
+</pre>
+
+		<para>
+		Which is probably not the best outcome. It might be tolerable with a
+		FIFO index and a hashed index but gets even more annoying if there are
+		two FIFO index types in the table: one top-level limiting the total
+		number of rows, another one nested under a hashed index, limiting the
+		number of rows per group, and they start conflicting this way with each
+		other.
+		</para>
+
+		<para>
+		The Triceps FIFO index is actually smart enough to avoid such problems: it
+		looks at what the preceding indexes have decided to remove, checks if
+		any of these rows belong to its group, and adjusts its calculation
+		accordingly. In this example the index B will find out that the row
+		with id=2 is already displaced by the index A. That leaves only 2 rows
+		in the index B, so adding a new one will need no displacement. The
+		resulting table contents will be
+		</para>
+
+<pre>
+id=1
+id=3
+id=2
+</pre>
+
+		<para>
+		However here the order of index types is important. If the table were
+		to be defined as
+		</para>
+
+<pre>
+TableType
++-IndexType "B" FifoIndex limit=3
++-IndexType "A" HashIndex key=(id)
+</pre>
+
+		<para>
+		then the replacement policy of the index type B would run first, find
+		that nothing has been displaced yet, and displace the row id=1. After
+		that the replacement policy of the index type A will run, and being a
+		hashed index, it doesn't have a choice, it has to replace the row id=2.
+		And both rows end up displaced.
+		</para>
+
+		<para>
+		If the situations with automatic replacement of rows by the keyed
+		indexes may arise, always make sure to put the keyed leaf index types
+		before the FIFO leaf index types. However if you always diligently send
+		a DELETE before the INSERT of the new version of the recond, then this
+		problem won't occur and the order of index types will not matter.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_table_idx_intro">
+		<title>Table and index type introspection</title>
+
+		<para>
+		A lot of information about a table type and the index types in it 
+		can be read back from them.
+		</para>
+
+<pre>
+$result = $tabType->isInitialized();
+$result = $idxType->isInitialized();
+</pre>
+
+		<para>
+		return whether a table or index type has been initialized.
+		The index type gets initialized when the table type where it belongs
+		gets initialized.  After a table or index type has been initialized, it can not
+		be changed any more, and any methods that change it will return an
+		error.
+		When an index type becomes initialized, it becomes tied to a particular
+		table type. This table type can be read with:
+		</para>
+
+<pre>
+$tabType = $idxType->getTabtype();
+$tabType = $idxType->getTabtypeSafe();
+</pre>
+
+		<para>
+		The difference between these methods is what happens if the index type
+		was not set into a table type yet. <pre>getTabtype()</pre> would
+		confess while <pre>getTabtypeSafe()</pre> would return an <pre>undef</pre>.
+		Which method to use, depends on the circumstances: if this situation
+		is valid and you're ready to check for it and handle it, use
+		<pre>getTabtypeSafe()</pre>, otherwise use <pre>getTabtype()</pre>.
+		</para>
+
+		<indexterm>
+			<primary>index</primary>
+			<secondary>copy</secondary>
+		</indexterm>
+		<para>
+		Even though an initialized index type can't be tied to another table,
+		when you add it to another table or index type, a deep copy with
+		all its sub-indexes will be made automatically, and that copy will 
+		be uninitialized. So it will be able to get initialized and tied to 
+		the new table. However if you want to add more sub-indexes to it,
+		do a manual copy first:
+		</para>
+
+<pre>
+$idxTypeCopy = $idxType->copy();
+</pre>
+
+		<para>
+		The information about the nested indexes can be found with:
+		</para>
+
+<pre>
+$itSub = $tabType->findSubIndex("indexName");
+$itSub = $tabType->findSubIndexSafe("indexName");
+@itSubs = $tabType->getSubIndexes();
+
+$itSub = $idxType->findSubIndex("indexName");
+$itSub = $idxType->findSubIndexSafe("indexName");
+@itSubs = $idxType->getSubIndexes();
+</pre>
+
+		<para>
+		The <pre>findSubIndex()</pre> has been already shown in
+		<xref linkend="sc_table_secondary" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		It allows to find the index types on the next level of nesting, starting
+		down from the table, and going recursively into the sub-indexes.
+		The <pre>Safe</pre> versions return <pre>undef</pre> if the index is not
+		found, instead of confessing.
+		<pre>getSubIndexes()</pre> returns the information about the index types of the
+		next level at once, as the name => value pairs. The result array
+		can be placed into a hash but that would lose the order
+		of the sub-indexes, and the order is important for the logic.
+		</para>
+
+		<para>
+		This finds the index types step by step. An easier way to find an index
+		type in a table type by the <quote>path of the index</quote> is with
+		</para>
+
+<pre>
+$idxType = $tabType->findIndexPath(\@idxNames);
+</pre>
+
+		<indexterm>
+			<primary>index</primary>
+			<secondary>path</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>error handling</primary>
+		</indexterm>
+		<para>
+		The arguments in the array form a path of names in the index type tree. If the path
+		is not found, the function would confess.
+		An empty path is also illegal and would cause the same result.
+		Yes, the argument is not an array but a reference to array. This
+		array is used essentially as a path object. For example the
+		index from the
+		<xref linkend="sc_table_secondary" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;
+		could be found as:
+		</para>
+
+<pre>
+$itLast2 = $ttWindow->findIndexPath([ "bySymbol", "last2" ]);
+</pre>
+
+		<indexterm>
+			<primary>index</primary>
+			<secondary>key</secondary>
+		</indexterm>
+		<para>
+		The key (the set of fields that uniquely identify the rows) of the index type 
+		can be found with
+		</para>
+
+<pre>
+@keys = $it->getKey();
+</pre>
+
+		<para>
+		It can be used on any kind of index types but actually returns the data
+		only for the Hashed index types.  On the other index types it returns an 
+		empty array, though a better support will be available for the 
+		Sorted and Ordered indexes in the future.
+		</para>
+
+		<para>
+		A fairly common need is to find an index by its name path, and also all the
+		key fields that are used by all the indexes in this path. It's used
+		for such purposes as joins, and it allows to treat a nested index
+		pretty much as a composition of all the indexes in its path.
+		The method
+		</para>
+
+<pre>
+($idxType, @keys) = $tabType->findIndexKeyPath(\@path);
+</pre>
+
+		<para>
+		solves this problem and
+		finds by path an index type that allows the direct look-up by key
+		fields. It requires that every index type in the path returns a
+		non-empty array of fields in <pre>getKey()</pre>. In practice it means that every
+		index in the path must be a Hashed index. Otherwise the method
+		confesses. When the Sorted and maybe other index types will support
+		<pre>getKey()</pre>, they will be usable with this method too.
+		</para>
+
+		<para>
+		Besides checking that each index type in the path works by keys, this
+		method builds and returns the list of all the key fields required for a
+		look-up in this index. Note that <pre>@keys</pre> is an actual array and not a
+		reference to array. The return protocol of this method is a little
+		weird: it returns an array of values, with the first value being the
+		reference to the index type, and the rest of them the names of the key
+		fields. If the table type were defined as
+		</para>
+
+<pre>
+$tt = Triceps::TableType->new($rt)
+	->addSubIndex("byCcy1",
+		Triceps::IndexType->newHashed(key => [ "ccy1" ])
+		->addSubIndex("byCcy12",
+			Triceps::IndexType->newHashed(key => [ "ccy2" ])
+		)
+	)
+	->addSubIndex("byCcy2",
+		Triceps::IndexType->newHashed(key => [ "ccy2" ])
+		->addSubIndex("grouping", Triceps::IndexType->newFifo())
+	)
+;
+</pre>
+
+		<para>
+		then <pre>$tt->findIndexKeyPath([ "byCcy1", "byCcy12" ])</pre> would return 
+		<pre>($ixtref, "ccy1", "ccy2")</pre>, 
+		where <pre>$ixtref</pre> is the reference to the index type. When
+		assigned to <pre>($ixt, @keys)</pre>, <pre>$ixtref</pre> would go into <pre>$ixt</pre>, and 
+		<pre>("ccy1", "ccy2")</pre> would go into <pre>@keys</pre>.
+		</para>
+
+		<para>
+		The key field names in the result go in the order they occurred in the
+		definition, from the outermost to the innermost index. The key fields
+		must not duplicate.  It's possible to define the index types where the
+		key fields duplicate in the path, say:
+		</para>
+
+<pre>
+$tt = Triceps::TableType->new($rt)
+	->addSubIndex("byCcy1",
+		Triceps::IndexType->newHashed(key => [ "ccy1" ])
+		->addSubIndex("byCcy12",
+			Triceps::IndexType->newHashed(key => [ "ccy2", "ccy1" ])
+		)
+	)
+;
+</pre>
+
+		<para>
+		And they would even work fine, with just a little extra overhead from
+		duplication. But <pre>findIndexKeyPath()</pre> will refuse such indexes and
+		confess.
+		</para>
+
+		<para>
+		Yet another way to find an index is by the keys. Think of an SQL
+		query: having a WHERE condition, you would want to find if there
+		is an index on the fields in the condition, allowing to find the
+		records quickly. Triceps is not quite up to this level of automatic
+		query planning yet but it does some for the joins.
+		If you know, by which fields you want to join,
+		it's nice to find the correct index automatically. 
+		The finding of an index by key is done with the method:
+		</para>
+
+<pre>
+@idxPath = $tableType->findIndexPathForKeys(@keyFields);
+</pre>
+
+		<para>
+		It returns the array that represents the path to an index type that
+		matches these key fields. And then having the path you can find the
+		index type as such. The index type and all the types in the path
+		still have to be of the Hashed variety. If the correct index cannot
+		be found, an empty array is returned. If you specify the fields that
+		aren't present in the row type in the first place, this is simply
+		treated the same as being unable to find an index for these fields.
+		If more that one index would match, the first one found in the direct
+		order of the index tree walk is returned.
+		</para>
+
+		<indexterm>
+			<primary>index</primary>
+			<secondary>type id</secondary>
+		</indexterm>
+		<para>
+		The kind of the index type is also known as the type id. It can be found
+		for an index type with
+		</para>
+
+<pre>
+$id = $idxType->getIndexId();
+</pre>
+
+		<para>
+		It's an integer constant, matching one of the values:
+		</para>
+
+		<indexterm>
+			<primary>constants</primary>
+		</indexterm>
+		<itemizedlist>
+		<listitem>
+		<pre>&Triceps::IT_HASHED</pre>
+		</listitem>
+		<listitem>
+		<pre>&Triceps::IT_FIFO</pre>
+		</listitem>
+		<listitem>
+		<pre>&Triceps::IT_SORTED</pre>
+		</listitem>
+		</itemizedlist>
+
+		<para>
+		There is no different id for the ordered index, because it's
+		built on top of the sorted index, and would return <pre>&Triceps::IT_SORTED</pre>.
+		</para>
+
+		<para>
+		The conversion between the strings and constants for index type ids is done with
+		</para>
+
+<pre>
+$intId = &Triceps::stringIndexId($stringId);
+$stringId = &Triceps::indexIdString($intId);
+</pre>
+
+		<para>
+		If an invalid value is supplied, the conversion functions will return <pre>undef</pre>.
+		</para>
+
+		<para>
+		There is also a way to find the first index type of a particular kind.
+		It's called somewhat confusingly
+		</para>
+
+<pre>
+$itSub = $idxType->findSubIndexById($indexTypeId);
+</pre>
+
+		<para>
+		where <pre>$indexTypeId</pre> is one of either of Triceps constants or the
+		matching strings <pre>"IT_HASHED"</pre>, <pre>"IT_FIFO"</pre>, <pre>"IT_SORTED"</pre>.
+		</para>
+
+		<para>
+		Technically, there is also IT_ROOT but it's of little use for this
+		situation since it's the root of the index type tree hidden inside the
+		table type, and would never be a sub-index type. It's possible to
+		iterate through all the possible index type ids as
+		</para>
+
+<pre>
+for ($i = 0; $i < &Triceps::IT_LAST; $i++) { ... }
+</pre>
+
+		<indexterm>
+			<primary>index</primary>
+			<secondary>default</secondary>
+		</indexterm>
+		<para>
+		The first leaf sub-index type, that is the default for iteration,
+		can be found explicitly as
+		</para>
+
+<pre>
+$itSub = $tabType->getFirstLeaf();
+$itSub = $idxType->getFirstLeaf();
+</pre>
+
+		<para>
+		If an index is already a leaf, <pre>getFirstLeaf()</pre> on it
+		will return itself.
+		The <quote>leaf-ness</quote> of an index type can be found with:
+		</para>
+
+<pre>
+$result = $idxType->isLeaf();
+</pre>
+
+		<para>
+		The usual reference comparison methods are:
+		</para>
+
+<pre>
+$result = $tabType1->same($tabType2);
+$result = $tabType1->equals($tabType2);
+$result = $tabType1->match($tabType2); 
+
+$result = $idxType1->same($idxType2);
+$result = $idxType1->equals($idxType2);
+$result = $idxType1->match($idxType2); 
+</pre>
+
+		<indexterm>
+			<primary>TableType</primary>
+			<secondary>equals</secondary>
+		</indexterm>
+		<para>
+		Two table types are considered equal when they have the equal row types,
+		and exactly the same set of index types, with the same names.
+		</para>
+
+		<indexterm>
+			<primary>TableType</primary>
+			<secondary>match</secondary>
+		</indexterm>
+		<para>
+		Two table types are considered matching when they have the matching row types,
+		and matching set of index types, although the names of the index types
+		may be different.
+		</para>
+
+		<indexterm>
+			<primary>IndexType</primary>
+			<secondary>equals</secondary>
+		</indexterm>
+		<para>
+		Two index types are considered equal when they are of the same kind
+		(type id), their type-specific parameters are equal, they have the
+		same number of sub-indexes, with the same names, and equal pair-wise.
+		They must also have the equal aggregators, which will be described in
+		detail in the 
+		<xref linkend="ch_aggregation" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<indexterm>
+			<primary>IndexType</primary>
+			<secondary>match</secondary>
+		</indexterm>
+		<para>
+		Two index types are considered matching when they are of the same kind,
+		have matching type-specific parameters, they have the same number of
+		sub-indexes, which are matching pair-wise, and the matching aggregators.
+		The names of the sub-indexes may differ.
+		As far as the type-specific parameters are concerned, it depends on the
+		kind of the index type. The FIFO type considers any parameters matching.
+		For a Hashed index the key fields must be the same. For a Sorted index
+		the sorted condition must also be the same, and by extension this
+		means the same condition for the Ordered index.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_table_copy_tray">
+		<title>The copy tray</title>
+
+		<para>
+		The table methods <pre>insert()</pre>, <pre>remove()</pre> and <pre>deleteRow()</pre> have an extra
+		optional argument: the copy tray.
+		</para>
+
+		<indexterm>
+			<primary>copy tray</primary>
+		</indexterm>
+		<indexterm>
+			<primary>tray</primary>
+		</indexterm>
+		<para>
+		If used, it will put a copy of all the rowops produced during the
+		operation (including the output of the aggregators, which will be
+		described in 
+		<xref linkend="ch_aggregation" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;
+		) into that tray. The
+		idea here is to use it in cases if you don't want to connect the output
+		labels of the table directly, but instead collect and process the rows
+		from the tray manually afterwards. Like this:
+		</para>
+
+<pre>
+$ctr = $unit->makeTray();
+$table->insert($row, $ctr);
+foreach my $rop ($ctr->toArray()) {
+	...
+}
+</pre>
+
+		<para>
+		However in reality it didn't work out so well. The processing loop
+		would have to have all the lengthy if-else sequences to branch first by
+		the label (if there are any aggregators) and then by opcode. It looks
+		too difficult. Well, it could work in the simple situations but not
+		more than that.
+		</para>
+
+		<para>
+		In the future this feature will likely be deprecated unless it proves
+		itself useful, and I already have a better idea. Because of this, I see
+		no point in going into the more extended examples.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_table_wrapup">
+		<title>Table wrap-up</title>
+
+		<para>
+		Not all of the table's features have been shown yet. The table
+		class is the cornerstone of Triceps, and everything is connected
+		to it.  The aggregators
+		work with the tables and are a whole separate big subject with their
+		own 
+		<xref linkend="ch_aggregation" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		The features that take advantage of the streaming functions are
+		described in 
+		<xref linkend="sc_strf_tables" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		There also are many more options and small methods that
+		haven't been touched upon yet. They are enumerated in the reference
+		chapter, please refer there.
+		</para>
+	</sect1>
+
+</chapter>

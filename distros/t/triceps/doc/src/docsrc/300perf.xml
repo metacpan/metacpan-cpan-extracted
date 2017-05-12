@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+<chapter id="ch_perf" xmlns:xi="http://www.w3.org/2001/XInclude">
+	<title>Performance</title>
+
+		<indexterm>
+			<primary>performance</primary>
+		</indexterm>
+		<para>
+		Obviously, the performance depends on the machine on which Triceps runs.
+		One of the Perl unit tests, <pre>t/Perf.t</pre> allows you to measure the Triceps performace
+		on your own machine.  By default it runs only one thousand iterations,
+		to be fast and not delay the run of the full tests suite. But the
+		number can be increased by setting an environment variable, such as:
+		</para>
+
+<pre>
+$ TRICEPS_PERF_COUNT=100000 perl t/Perf.t
+Performance test, 100000 iterations, real time.
+Empty Perl loop 0.006801 s, 14702927.05 per second.
+Empty Perl function of 5 args 0.031918 s, 3133046.99 per second.
+Empty Perl function of 10 args 0.027418 s, 3647284.30 per second.
+Row creation from array and destruction 0.277232 s, 360708.19 per second.
+Row creation from hash and destruction 0.498189 s, 200727.04 per second.
+Rowop creation and destruction 0.155996 s, 641043.69 per second.
+Calling a dummy label 0.098480 s, 1015437.21 per second.
+Calling a chained dummy label 0.110546 s, 904601.83 per second.
+  Pure chained call 0.012066 s, 8287664.25 per second.
+Calling a Perl label 0.512559 s, 195099.61 per second.
+Row handle creation and destruction 0.195778 s, 510781.66 per second.
+Repeated table insert (single hashed idx, direct) 0.772934 s, 129377.12 per second.
+Repeated table insert (single hashed idx, direct & Perl construct) 1.109781 s, 90107.89 per second.
+  RowHandle creation overhead in Perl 0.336847 s, 296871.05 per second.
+Repeated table insert (single sorted idx, direct) 2.122350 s, 47117.59 per second.
+Repeated table insert (single hashed idx, call) 0.867846 s, 115227.88 per second.
+Table insert makeRowArray (single hashed idx, direct) 1.224588 s, 81660.14 per second.
+  Excluding makeRowArray 0.947355 s, 105557.02 per second.
+Table insert makeRowArray (double hashed idx, direct) 1.443053 s, 69297.51 per second.
+  Excluding makeRowArray 1.165821 s, 85776.47 per second.
+  Overhead of second index 0.218466 s, 457738.04 per second.
+Table insert makeRowArray (single sorted idx, direct) 29.880962 s, 3346.61 per second.
+  Excluding makeRowArray 29.603730 s, 3377.95 per second.
+Table lookup (single hashed idx) 0.287407 s, 347938.44 per second.
+Table lookup (single sorted idx) 9.160540 s, 10916.39 per second.
+Lookup join (single hashed idx) 3.940388 s, 25378.21 per second.
+Nexus pass (1 row/flush) 0.578993 s, 172713.78 per second.
+Nexus pass (10 rows/flush) 2.266709 s, 441168.31 per row per second.
+  Overhead of each row 0.187524 s, 533265.07 per second.
+  Overhead of flush 0.391469 s, 255448.33 per second.
+</pre>
+
+		<para>
+		An important caveat, the test is of the Perl interface, so it includes
+		all the overhead of constructing the Perl objects. I've tried to
+		structure it so that some of the underlying performance can be deduced,
+		but it's still approximate. I haven't done the performance testing of
+		just the underlying &Cpp; implementation yet, it will be better.
+		</para>
+
+		<para>
+		The computations are done with the real elapsed time, so if the machine
+		is not idle, the time of the other processes will get still counted
+		against the tests, and the results will show slower than they really
+		are.
+		</para>
+
+		<para>
+		The numbers above are from my old-ish laptop (dual-CPU Intel
+		Core2 T9900 3GHz). The time in seconds printed for each
+		value is for the whole test loop of 100K iterations. The <quote>per second</quote>
+		number shows the opposite, how many loop iterations were done per second.
+		</para>
+
+		<para>
+		I've had an opportunity to run the performance tests on a few more
+		laptops. Al of the same Core2 generation, but with the different CPU
+		frequencies. The 2GHz version showed expectedly an about 30% lower
+		performance proportionally. A 2.2GHz CPU also showed an about proportional
+		change, except for the inter-thread communication through the
+		nexus, it went down more than proportional.
+		I'm not sure, what was up with the 2.2GHz CPU, maybe
+		the timing worked out just wrong to add more overhead.
+		</para>
+
+		<para>
+		Here is the row-by-row description of the measurements:
+		</para>
+
+<pre>
+Performance test, 100000 iterations, real time.
+</pre>
+
+		<para>
+		The first thing it prints is the iteration count, to set the
+		expectations for the run length and precision. The shorter
+		runs tend to include more randomness.
+		</para>
+
+<pre>
+Empty Perl loop 0.006801 s, 14702927.05 per second.
+Empty Perl function of 5 args 0.031918 s, 3133046.99 per second.
+Empty Perl function of 10 args 0.027418 s, 3647284.30 per second.
+</pre>
+
+		<para>
+		A calibration to see, how much overhead is added by the execution of
+		the loop itself. As it turns out, not much. The Perl function
+		calls add more but still don't dominate the numbers.
+		</para>
+
+<pre>
+Row creation from array and destruction 0.277232 s, 360708.19 per second.
+</pre>
+
+		<para>
+		The <pre>makeRowArray()</pre> for a row of 5 fields. Each created row gets
+		destroyed before the next one gets created.
+		</para>
+
+<pre>
+Row creation from hash and destruction 0.498189 s, 200727.04 per second.
+</pre>
+
+		<para>
+		The <pre>makeRowHash()</pre> for a row of 5 fields.
+		</para>
+
+<pre>
+Rowop creation and destruction 0.155996 s, 641043.69 per second.
+</pre>
+
+		<para>
+		The <pre>makeRowop()</pre> from an existing row. Same thing, each rowop gets
+		destroyed before constructing the next one.
+		</para>
+
+<pre>
+Calling a dummy label 0.098480 s, 1015437.21 per second.
+</pre>
+
+		<para>
+		Repeated calls of a dummy label with the same rowop object.
+		This can be thought of as the basic overhead of a &Cpp;
+		label call, with a limited amount (25-30% or so) of the Perl overhead mixed in.
+		</para>
+
+<pre>
+Calling a chained dummy label 0.110546 s, 904601.83 per second.
+  Pure chained call 0.012066 s, 8287664.25 per second.
+</pre>
+
+		<para>
+		Repeated calls of a dummy label that has another dummy label chained to
+		it. The <quote>pure</quote> part is the difference from the previous case that gets
+		added by appending another chained dummy label.
+		</para>
+
+<pre>
+Calling a Perl label 0.512559 s, 195099.61 per second.
+</pre>
+
+		<para>
+		Repeated calls of a Perl label with the same rowop object. The Perl
+		label has an empty <pre>sub</pre> but that empty <pre>sub</pre> still gets executed, along
+		with all the support functionality.
+		</para>
+
+<pre>
+Row handle creation and destruction 0.195778 s, 510781.66 per second.
+</pre>
+
+		<para>
+		The creation of a table's row handle from a single row, including the
+		creation of the Perl wrapper for the row handle object.
+		</para>
+
+<pre>
+Repeated table insert (single hashed idx, direct) 0.772934 s, 129377.12 per second.
+</pre>
+
+		<para>
+		Insert of the same row into a table. Since the row is the same, it
+		keeps replacing the previous one, and the table size stays at 1 row.
+		The code is <pre>$tSingleHashed->insert($row1)</pre>.
+		Even though the row is the same, a new row handle gets constructed for
+		it every time by the table. 
+		<quote>Single hashed idx</quote> means that the table has a single Hashed index, on
+		an <pre>int32</pre> field. <quote>Direct</quote> means the direct <pre>insert()</pre> call, as opposed to
+		using the table's input label.
+		</para>
+
+<pre>
+Repeated table insert (single hashed idx, direct & Perl construct) 1.109781 s, 90107.89 per second.
+  RowHandle creation overhead in Perl 0.336847 s, 296871.05 per second.
+</pre>
+
+		<para>
+		The same, only the row handles are constructed in Perl before inserting
+		them: <pre>$tSingleHashed->insert($tSingleHashed->makeRowHandle($row1))</pre>. And
+		the second line shows that the overhead of wrapping the row handles for
+		Perl is pretty noticeable (it's the difference from the previous test
+		case).
+		</para>
+
+<pre>
+Repeated table insert (single sorted idx, direct) 2.122350 s, 47117.59 per second.
+</pre>
+
+		<para>
+		The same thing, only for a table that uses a Sorted index that executes
+		a Perl comparison on the same <pre>int32</pre> field. As you can see, it gets 
+		almost 3 times slower.
+		</para>
+
+<pre>
+Repeated table insert (single hashed idx, call) 0.867846 s, 115227.88 per second.
+</pre>
+
+		<para>
+		The same thing, again the table with a single Hashed index, but this
+		time by sending the rowops to its input label.
+		</para>
+
+<pre>
+Table insert makeRowArray (single hashed idx, direct) 1.224588 s, 81660.14 per second.
+  Excluding makeRowArray 0.947355 s, 105557.02 per second.
+</pre>
+
+		<para>
+		Now the different rows get inserted into the table, each row having a
+		different key. At the end of this test the table contains 100K rows (or
+		however many were requested by the environment variable). Naturally,
+		this is slower than the repeated insertions of the same row, since the
+		tree of the table's index becomes deeper and requires more comparisons
+		and rebalancing. This performance will be lower in the tests with more
+		rows, since the index will become deeper and will create more overhead.
+		Since the rows are all different, they are created on the fly, so this
+		row creation overhead needs to be excluded to get the actual Table's
+		performance.
+		</para>
+
+<pre>
+Table insert makeRowArray (double hashed idx, direct) 1.443053 s, 69297.51 per second.
+  Excluding makeRowArray 1.165821 s, 85776.47 per second.
+  Overhead of second index 0.218466 s, 457738.04 per second.
+</pre>
+
+		<para>
+		Similar to previous one but on a table that has two Hashed indexes (both on
+		the same <pre>int32</pre> field). The details here also compute the overhead
+		contributed by the second index.
+		</para>
+
+<pre>
+Table insert makeRowArray (single sorted idx, direct) 29.880962 s, 3346.61 per second.
+  Excluding makeRowArray 29.603730 s, 3377.95 per second.
+</pre>
+
+		<para>
+		Similar but for a table with a Sorted index with a Perl expression. As
+		you can see, with the makeRowArray overhead excluded it's about 30 times
+		slower (and it gets even worse for the larger row sets).
+		</para>
+
+<pre>
+Table lookup (single hashed idx) 0.287407 s, 347938.44 per second.
+</pre>
+
+		<para>
+		Finding a row in a table of 100K (or however many iterations
+		requested) rows by a hashed index.
+		</para>
+
+<pre>
+Table lookup (single sorted idx) 9.160540 s, 10916.39 per second.
+</pre>
+
+		<para>
+		Finding a row in a table of 100K (or however many iterations
+		requested) rows by a Perl sorted index. Just like row insertion,
+		it's 30-odd times slower than a hashed index.
+		</para>
+
+<pre>
+Lookup join (single hashed idx) 3.940388 s, 25378.21 per second.
+</pre>
+
+		<para>
+		Joins in the LookupJoin template (and the performance of the JoinTwo
+		template will be the same, since it consists of two LookupJoins).
+		It performs essentially the same table lookup, only with the added
+		overhead of constructing the new combined rows, and the general
+		overhead of the extra Perl label calls.
+		</para>
+
+<pre>
+Nexus pass (1 row/flush) 0.578993 s, 172713.78 per second.
+Nexus pass (10 rows/flush) 2.266709 s, 441168.31 per row per second.
+  Overhead of each row 0.187524 s, 533265.07 per second.
+  Overhead of flush 0.391469 s, 255448.33 per second.
+</pre>
+
+		<para>
+		The passing of the rows between threads through a Nexus.
+		The time also includes the draining and stopping of the app, so
+		it's a little pessimistic, and gets more pessimistic for the short runs.
+		Both cases pass 100K of transactions, so the second one passes
+		10 times more rows.
+		The difference in performance of different transaction sizes allows
+		to compute the overhead of the transaction passing (i.e. flushes)
+		versus the overhead of adding extra rows to transactions.
+		</para>
+</chapter>

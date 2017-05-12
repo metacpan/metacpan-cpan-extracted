@@ -1,0 +1,130 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-bugs: <http://ontologi.es/doap-bugs#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/thanks/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=thanks>;
+	doap:created         "2012-09-07"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/thanks>;
+	doap:homepage        <https://metacpan.org/release/thanks>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "thanks";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/thanks/v_0-001>, <http://purl.org/NET/cpan-uri/dist/thanks/v_0-002>, <http://purl.org/NET/cpan-uri/dist/thanks/v_0-003>, <http://purl.org/NET/cpan-uri/dist/thanks/v_0-004>, <http://purl.org/NET/cpan-uri/dist/thanks/v_0-005>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-thanks>;
+	];
+	doap:shortdesc       "inline packages easily".
+
+<http://purl.org/NET/cpan-uri/dist/thanks/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "thanks-0.001"^^xsd:string;
+	dc:issued            "2012-09-07"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/thanks-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/thanks/v_0-002>
+	a                    doap:Version;
+	rdfs:label           "Ten Four";
+	dc:identifier        "thanks-0.002"^^xsd:string;
+	dc:issued            "2012-10-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Allow old-style Foo'Bar'Baz package names.";
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/corion>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/thanks-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/thanks/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "thanks-0.003"^^xsd:string;
+	dc:issued            "2012-10-25"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Clarify purpose of the module.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Reduce required Perl version.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/thanks-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/thanks/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "thanks-0.004"^^xsd:string;
+	dc:issued            "2013-01-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Eliminate warnings when Perl is run with non-lexical warnings.";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/82757>;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/arfreitas>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/thanks-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/thanks/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "thanks-0.005"^^xsd:string;
+	dc:issued            "2013-11-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Further improvements to documentation.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Change thanks.pm abstract.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "use Dist::Inkt";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/thanks-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/arfreitas>
+	a                    foaf:Person;
+	foaf:nick            "ARFREITAS";
+	foaf:page            <https://metacpan.org/author/ARFREITAS>.
+
+<http://purl.org/NET/cpan-uri/person/corion>
+	a                    foaf:Person;
+	foaf:nick            "CORION";
+	foaf:page            <https://metacpan.org/author/CORION>.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/82757>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "82757"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=82757>.
+

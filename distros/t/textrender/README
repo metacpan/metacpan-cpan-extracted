@@ -1,0 +1,80 @@
+
+================================================================================
+
+textrender - Turn stdin into rendered text graphics.
+
+DESCRIPTION
+    This allows you to make very nice renders of text for web reasons,
+    without using photoshop/firewors, etc. The advantage is that since it's
+    via the cli, you can save text and parameters to a file and use that as
+    configuration!
+
+    See textrender, the parent package.
+
+USAGE
+    textrender [OPTION]..
+
+       -p number       pointsize, default 11
+       -f hex          color, such as ddffee
+       -b hex          background color, such as ddffee
+       -n string       font name or path
+       -o path         out filename
+       -g string       gravity, default is west
+       -d              debug, show the commands
+       -s              drop shadow, off by default
+       -S [1-100]      shadow opacity, default is 80 (sets -s to on)
+
+    If no out filename path is provided, a temporary file is chosen- such as
+    /tmp/textrender.2323525252.png and this path is printed to stdout.
+
+    If you provide a path argument, this is not printed to stdout.
+
+  USAGE EXAMPLES
+       echo 'Leo Charre' | textrender -o /tmp/leocharre.png
+
+       textrender ./file-with.text
+
+CAVEATS
+    In development, contact AUTHOR with any suggestions, etc. I strive to
+    make software on par with unix philosophy, if I have erred, please let
+    me know.
+
+AUTHOR
+    Leo Charre leocharre at cpan dot org
+
+LICENSE
+    This package is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, i.e., under the terms of the
+    "Artistic License" or the "GNU General Public License".
+
+DISCLAIMER
+    This package is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+    See the "GNU General Public License" for more details.
+
+
+--------------------------------------------------------------------------------
+
+
+
+REQUIRES
+
+Cache::File: 2.04
+Carp: 1
+Cwd: 3
+Exporter: 5
+Getopt::Std::Strict: 1.01
+Smart::Comments: 1
+String::ShellQuote: 1.03
+Test::Simple: 0
+
+
+INSTALL
+
+   perl Makefile.PL
+   make install
+
+
+

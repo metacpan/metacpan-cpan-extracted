@@ -1,0 +1,24 @@
+---
+abstract: 'Enable taint mode lexically'
+author:
+  - 'Steven Haryanto <stevenharyanto@gmail.com>'
+build_requires:
+  Module::Build: 0.3601
+  Module::Load: 0.18
+  Test::Exception: 0.31
+  Test::More: 0.98
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: tainting
+requires:
+  Taint::Runtime: 0.03
+resources:
+  homepage: http://metacpan.org/dist/tainting
+  repository: http://github.com/sharyanto/perl-tainting
+version: 0.01

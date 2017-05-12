@@ -1,0 +1,3728 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+<chapter id="ch_scheduling" xmlns:xi="http://www.w3.org/2001/XInclude">
+	<title>Scheduling</title>
+
+	<sect1 id="sc_sched_intro">
+		<title>Introduction to the scheduling</title>
+
+		<indexterm>
+			<primary>scheduling</primary>
+		</indexterm>
+		<indexterm>
+			<primary>model</primary>
+		</indexterm>
+		<para>
+		The scheduling determines, in which order the row operations are
+		processed. If there are multiple operations available, which one
+		should be processed first?  The scheduler keeps a queue of the operations
+		and selects, which one to execute next.  This has a major effect on the
+		logic of a CEP model.  
+		</para>
+
+		<para>
+		The Triceps approach to scheduling varied over time. Initially it
+		looked like the purely procedural execution will be enough, with the
+		order determined by the order of the procedural execution, and no
+		explicit scheduling would be needed.  This has proved to have its own
+		limitations, and thus the labels and their scheduling were born. Then
+		it had turned out that the most typical thing to do with a label is to
+		call it, again in the purely procedural order.
+		</para>
+
+		<para>
+		So for the most part you don't need to think about scheduling in Triceps.
+		It just works as expected: when you call a label with a rowop, the call 
+		returns after the label's work is all done.
+		You can pretty much skip over the section
+		with the low-level details altogether, just read the high-level sections. 
+		The only important exception is the topological loops,
+		where the rowops go repeatedly through a closed loop of the labels.
+		But even for them the Perl API provides the high-level methods that
+		take care of the details under the hood. And there is another way to 
+		deal with the loops by using the streaming functions and procedural loops.
+		</para>
+
+		<para>
+		If you want to understand the loop scheduling better, skim over
+		the sections with the details. You'd also need to do this if you plan
+		to write the Triceps models in &Cpp;, since as of version 2.0 the &Cpp; API 
+		does not provide the high-level methods for building the loops yet.
+		</para>
+
+		<para>
+		Only if you are a serious CEP
+		affictionado and want to understand how everything really works,
+		you need to seriously read all the details.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_sched_compar">
+		<title>Comparative scheduling in the various CEP systems</title>
+
+		<indexterm>
+			<primary>Aleri</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Coral8</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Sybase</primary>
+		</indexterm>
+		<indexterm>
+			<primary>StreamBase</primary>
+		</indexterm>
+		<para>
+		There are multiple approaches to scheduling employed by different
+		CEP systems. The classic Aleri CEP essentially didn't
+		have any, except for the flow control between threads, because each its
+		element is a separate thread. Coral8 had an intricate scheduling
+		algorithm. Sybase R5.1 has the same logic as Coral8 inside each thread.
+		StreamBase presumably also has some.
+		</para>
+
+		<para>
+		The scheduling logic in Triceps is different from the other CEP
+		systems. The Coral8 logic looks at first like the only reasonable way
+		to go, but could not be used in Triceps for three reasons: First, it's a trade
+		secret, so it can't be simply reused. If I'd never seen it, that would
+		not be an issue but I've worked on it and implemented its version for
+		R5.1. Second, it relies on the properties that the compiler computes from
+		the model graph analysis. Triceps has no compiler, and could not do
+		this. Third, in reality it simply doesn't work that well. There are
+		quite a few cases when the Coral8 scheduler comes up with a strange and
+		troublesome execution order.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_sched_unit_basics">
+		<title>Execution unit basics</title>
+
+		<indexterm>
+			<primary>unit</primary>
+		</indexterm>
+		<para>
+		An execution unit (often called simply <quote>unit</quote>) 
+		keeps the state of the Triceps execution for one
+		thread. Each thread running Triceps must have its own execution unit.
+		</para>
+
+		<para>
+		It's perfectly possible to have multiple execution units in the
+		same thread. This is typically done when there is some permanent
+		model plus some small intermittent sub-models created on demand to handle
+		the user requests. These small sub-models would be created in the
+		separate units, to be destroyed when their work is done. But this is
+		a somewhat advanced usage, more examples will be shown in
+		<xref linkend="sc_strf_units" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		The TQL implementation also does this, as described in
+		<xref linkend="ch_tql" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<para>
+		This section describes the basic methods of the units, the most
+		often used ones. The more advanced ones are described in the following
+		sections, and the full reference is located in
+		<xref linkend="sc_ref_unit" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<para>
+		A unit is created with:
+		</para>
+
+<pre>
+$myUnit = Triceps::Unit->new("name");
+</pre>
+
+		<para>
+		The name argument will be used in the error messages, making easier
+		to find, which exact part of the model is having troubles.
+		By convention the name should be the same as the name of the unit variable
+		(<quote>myUnit</quote> in this case). 
+		</para>
+
+		<para>
+		The name can be read back:
+		</para>
+
+<pre>
+$name = $myUnit->getName();
+</pre>
+
+		<para>
+		Also, as usual, the variable <pre>$myUnit</pre> here contains a reference to the
+		actual unit object, and two references can be compared for whether they
+		refer to the same object:
+		</para>
+
+<pre>
+$result = $unit1->same($unit2);
+</pre>
+
+		<para>
+		A unit also keeps an empty row type (one with no fields), primarily for the
+		creation of the clearing labels (discussed in
+		<xref linkend="sc_memory_labels" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;
+		and
+		<xref linkend="sc_Label_construction" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;),
+		but you can use it for any other purposes
+		too. You can get it with the method:
+		</para>
+
+<pre>
+$rt = $unit->getEmptyRowType();
+</pre>
+
+		<para>
+		Each unit has its own instance of an empty row type. Its purely for
+		the conveniece of memory management, they are all equivalent.
+		</para>
+
+		<para>
+		The labels are called with:
+		</para>
+
+<pre>
+$unit->call($rowop, ...);
+</pre>
+
+		<para>
+		The identity of the label being called is embedded in the row operation.
+		The <quote>...</quote> shows that multiple rowops may be passed as arguments.
+		So the real signature of this method is:
+		</para>
+
+<pre>
+$unit->call(@rowops);
+</pre>
+
+		<indexterm>
+			<primary>tray</primary>
+		</indexterm>
+		<para>
+		But this way it looks more confusing. A call with multiple
+		arguments produces the same result as doing multiple calls with 
+		one argument at a time. Not only
+		rowops but also <i>trays</i> (to be discussed later) of rowops can be
+		used as arguments.
+		</para>
+
+		<para>
+		There also are the convenience methods that create the rowops
+		from the field values and immediately call them:
+		</para>
+
+<pre>
+$unit->makeHashCall($label, $opcode, 
+	$fieldName => $fieldValue, ...);
+$unit->makeArrayCall($label, $opcode, @fieldValues);
+</pre>
+
+		<para>
+		The methods for creation of labels have been already discussed in
+		<xref linkend="sc_Label_construction" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		Here is their recap along with the similar methods for creation of
+		tables and trays that will be discussed later:
+		</para>
+
+<pre>
+$label = $unit->makeDummyLabel($rowType, "name");
+
+$label = $unit->makeLabel($rowType, "name",
+	$clearSub, $execSub, @args);
+
+$label = $unit->makeClearingLabel("name", @args);
+
+$table = $unit->makeTable($tableType, "name");
+
+$tray = $unit->makeTray(@rowops); 
+</pre>
+
+		<indexterm>
+			<primary>label</primary>
+			<secondary>clearing</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>memory management</primary>
+		</indexterm>
+		<para>
+		A special thing about the labels is that when a unit creates
+		a label, it keeps a reference to it, for clearing. A label keeps a pointer
+		back to the unit but not a reference (if you call <pre>getUnit()</pre>
+		on a label, the returned value becomes a reference). For a table
+		or a tray, the unit doesn't keep a reference to them. Instead,
+		they keep a reference to the unit. 
+		The references are at the &Cpp; level, not Perl level.
+		</para>
+
+		<para>
+		With the tables, the references can get
+		pretty involved: A table has labels associated with it.
+		When a table is created, it also creates these labels.
+		The unit keeps references of these labels. The table also
+		keeps references of these labels. The table keeps a reference
+		of the unit. The labels 
+		have pointers to the unit and the
+		table but not references, to avoid the reference cycles.
+		</para>
+
+		<para>
+		See more on the memory management and label clearing in the
+		<xref linkend="ch_memory" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_sched_tray">
+		<title>Trays</title>
+
+		<para>
+		The easiest way to store a sequence of rowops is to put them into the Perl arrays,
+		like:
+		</para>
+
+<pre>
+my @ops = ($rowop1, $rowop2);
+push @ops, $rowop3;
+</pre>
+
+		<indexterm>
+			<primary>tray</primary>
+		</indexterm>
+		<para>
+		However the &Cpp; internals of Triceps do not know about the Perl
+		arrays. And some of them can work directly with the sequences of rowops. So
+		Triceps defines an internal sort-of-equivalent of Perl array for
+		rowops, called a <i>Tray</i>.
+		</para>
+
+		<indexterm>
+			<primary>streaming function</primary>
+		</indexterm>
+		<para>
+		The trays have first been used to <quote>catch</quote> the side effects of
+		operations on the stateful elements, so the name <quote>tray</quote> came from the
+		metaphor <quote>put a tray under it to catch the drippings</quote>.
+		The new and better approach for catching the results in a tray
+		catches the results of streaming functions.
+		</para>
+
+		<para>
+		The trays get created as:
+		</para>
+
+<pre>
+$tray = $unit->makeTray(@rowops);
+</pre>
+
+		<para>
+		A tray always stores rowops for only one unit. It can be only used in
+		one thread. A tray can be used in all the calling/enqueueing methods,
+		just like the direct rowops (the details of the enqueueing methods will be
+		described later in 
+		<xref linkend="sc_sched_detail" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;
+		and in
+		<xref linkend="sc_ref_unit" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;).
+		</para>
+
+<pre>
+$unit->call($tray);
+$unit->fork($tray);
+$unit->schedule($tray);
+$unit->enqueue($mode, $tray);
+$unit->loopAt($mark, $tray);
+</pre>
+
+		<para>
+		Moreover, multiple trays may be passed, and the loose rowops and trays
+		can be mixed in the arguments of these functions, for example:
+		</para>
+
+<pre>
+$unit->call($rowopStartPkg, $tray, $rowopEndPkg);
+</pre>
+
+		<indexterm>
+			<primary>protocol</primary>
+		</indexterm>
+		<para>
+		A tray may contain the rowops of any types
+		mixed in any order. This is by design, and it's an important feature
+		that allows to build the protocol blocks out of rowops and perform an
+		orderly data exchange. This feature is an absolute necessity for proper
+		inter-process and inter-thread communication.
+		</para>
+
+		<indexterm>
+			<primary>Coral8</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Aleri</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Sybase</primary>
+		</indexterm>
+		<para>
+		The ability to send the rows of multiple types through the same channel
+		in order is a must, and its lack makes the communication with some
+		other CEP systems exceedingly difficult. Coral8 supports only one
+		stream per connection. Aleri (and I believe Sybase R5) allows to send
+		multiple streams through the same connection but has no guarantees of
+		order between them. I don't know about the others, check yourself.
+		</para>
+
+		<para>
+		To iterate on a tray in the Perl code, it can be converted to a Perl array:
+		</para>
+
+<pre>
+@array = $tray->toArray();
+</pre>
+
+		<para>
+		The size of the tray (the count of rowops in it) can be found directly
+		without a conversion, and the unit can be read back too:
+		</para>
+
+<pre>
+$size = $tray->size();
+$traysUnit = $tray->getUnit();
+</pre>
+
+		<para>
+		Another way to create a tray is by copying an existing one:
+		</para>
+
+<pre>
+$tray2 = $tray1->copy();
+</pre>
+
+		<para>
+		This copies the contents (which is the references to the rowops) and
+		does not create any ties between the trays. The copying is really just
+		a more efficient way to do an equivalent of:
+		</para>
+
+<pre>
+$tray2 = $tray1->getUnit()->makeTray($tray1->toArray());
+</pre>
+
+		<para>
+		The tray references can be compared for whether they point to the same
+		tray object:
+		</para>
+
+<pre>
+$result = $tray1->same($tray2);
+</pre>
+
+		<para>
+		The contents of a tray may be cleared. Which is more convenient and
+		more efficient than discarding a tray and creating another one:
+		</para>
+
+<pre>
+$tray->clear();
+</pre>
+
+		<para>
+		The data may be added to the back of a tray:
+		</para>
+
+<pre>
+$tray->push(@rowops);
+</pre>
+
+		<para>
+		Multiple rowops can be pushed in a single call. There are no other
+		Perl-like operations on a tray: it's either create from a set of
+		rowops, push, or convert to a Perl array.
+		</para>
+
+		<para>
+		Note that the trays are mutable, unlike the rows and rowops. Multiple
+		references to a tray will see the same contents. If a tray is changed
+		through one reference, the others will see the changes too.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_sched_unwind">
+		<title>Error handling during the execution</title>
+
+		<indexterm>
+			<primary>error handling</primary>
+		</indexterm>
+		<para>
+		The basics of error handling have been described in
+		<xref linkend="sc_confessions" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		Now let's look more in-depth.
+		When the labels execute, they may produce errors in one of two ways:
+		</para>
+
+		<itemizedlist>
+		<listitem>
+		The Perl code in the label might die.
+		</listitem>
+		<listitem>
+		The call topology might violate the rules.
+		</listitem>
+		</itemizedlist>
+
+		<para>
+		The rules are basically that by default you can't make the recursive calls.
+		A label may not make calls directly or through other labels to itself.
+		The idea is to catch the call sequences that are likely to go into 
+		the deep recursion and overflow the stack. It catches them early,
+		on the first attempt of recursion. If you need to do the recursion,
+		the best way is to use instead
+		<pre>schedule()</pre> or <pre>loopAt()</pre> or the streaming
+		functions with trays. That way you avoid overrunning the stack.
+		</para>
+
+		<para>
+		It's also possible to relax the recursion checks by specifying
+		higher limits for the recursion count and stack depth. 
+		How to do it is described in
+		<xref linkend="sc_sched_recursion" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		It comes useful in some special cases, as described in
+		<xref linkend="sc_strf_recursion" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		However such higher limits best be avoided unless really needed.
+		</para>
+
+		<para>
+		What particular stack is meant here? The execution of Triceps in Perl has
+		three stacks:
+		</para>
+
+		<itemizedlist>
+		<listitem>
+		The system stack used by the underlying Triceps &Cpp; code and
+		by the internal functions of the Perl interpreter.
+		</listitem>
+		<listitem>
+		The Perl call stack, keeping the call history of the Perl code.
+		</listitem>
+		<listitem>
+		The Triceps call stack, keeping the call history of the Triceps
+		labels in a Unit.
+		</listitem>
+		</itemizedlist>
+
+		<para>
+		The answer is <quote>all three of these stacks</quote>.
+		As the calls are made, frames are pushed onto all these stacks,
+		logically intermingling.
+		</para>
+
+		<indexterm>
+			<primary>XS</primary>
+		</indexterm>
+		<indexterm>
+			<primary>draining</primary>
+		</indexterm>
+		<indexterm>
+			<primary>stack</primary>
+			<secondary>unwinding</secondary>
+		</indexterm>
+		<para>
+		Whichever way the error is detected, it causes the stacks to be unwound,
+		undoing the intermingling in the opposite order. 
+		The Perl error messages from <pre>die</pre> or <pre>confess</pre>
+		and the Triceps tracing (in the &Cpp; code) of the rowop calls and label chainings get
+		combined into a common stack trace as the stacks are being unwound. When the code gets back to
+		Perl, the XS code triggers a <pre>confess</pre> with the message containing the
+		unwound stack trace up to this point. If that happens to be in the
+		handler of another label, it continues the hybrid stack
+		unwinding. If not caught by <pre>eval</pre>, it keeps going to the topmost Triceps Unit
+		<pre>call()</pre> or <pre>drainFrame()</pre> and causes the whole program to die,
+		printing the stack trace. In a multithreaded Triceps model there is also
+		a step of interrupting all the threads in the model, but in the end
+		it still ends up dying and printing the stack trace along with the
+		information, what thread caused it.
+		Which is a reasonable reaction most of the time.
+		</para>
+
+		<para>
+		Remember, the root cause is a serious error that is likely to leave the
+		model in an inconsistent state, and it should usually be considered
+		fatal.  
+		</para>
+
+		<para>
+		If you want to catch the errors, nip them in the bud
+		by wrapping your Perl code in <pre>eval</pre>. Then you can handle
+		the errors before they have a chance to propagate.
+		</para>
+
+		<para>
+		In case if the program runs multiple models (multiple Units, or
+		multiple multithreaded Apps) in it, it can
+		also wrap the outermost call in <pre>eval</pre>, and discard just this
+		one erroneous model while leaving the other models running.
+		If the erroneous units get properly cleared, they will free
+		their memory and cause no leaks.
+		</para>
+
+		<para>
+		What happens to the rowops that were
+		enqueued in the Triceps stack frames when the stack gets unwound? They
+		get thrown away. The memory gets collected thanks to the reference
+		counting, but the rowops and their sequence order get thrown out
+		of the stack.
+		The reason is basically that there may be no catching of the
+		errors until unwinding to the outermost call. The choice is to either
+		throw away everything after the first error or keep trying to
+		execute the following rowops, collecting the errors. And that
+		might become a lot of errors. I've taken the choice of stopping
+		as early as possible, because the state of the model will probably
+		be corrupted anyway and nothing but garbage would be coming out
+		(if anything would be coming at all and not be stuck in an
+		endless loop).
+		</para>
+	</sect1>
+
+	<sect1 id="sc_sched_no_bundling">
+		<title>No bundling</title>
+
+		<indexterm>
+			<primary>bundling</primary>
+		</indexterm>
+		<para>
+		The most important principle of Triceps scheduling is: No Bundling.
+		Every rowop is for itself. 
+		</para>
+
+		<para>
+		I've seen the most damage done by bundling in the Coral8/Sybase R4
+		scheduling, so I'll refer to it when explaining the dangers of
+		bundling.
+		</para>
+
+		<para>
+		What is a bundle? It's a set of records that go through the execution
+		together. If you have a model consisting of two functional elements F1
+		and F2 connected in a sequential fashion 
+		</para>
+
+<pre>
+F1->F2 
+</pre>
+
+		<para>
+		and a few loose records R1, R2, R3, the
+		normal execution order without bundling will be:
+		</para>
+
+<pre>
+F1(R1), F2(R1), F1(R2), F2(R2), F1(R3), F2(R3)
+</pre>
+
+		<para>
+		Each row goes through the whole model (a real simple one in this case)
+		before the next one is touched. This allows F2 to take into
+		accont the state of F1 exactly as it was right after processing
+		the same record, without any interventions in between.
+		</para>
+
+		<indexterm>
+			<primary>tray</primary>
+		</indexterm>
+		<para>
+		Even though the trays in Triceps store multiple rowops, they are not
+		bundles.  When a tray is called, it works exactly as if every rowop
+		from it were called separately in order. The first rowop fully
+		propagates, then the second one, and so on.  The ordered storage in the
+		trays only provides the order for that future execution or for a manual
+		iteration over the rowops.
+		</para>
+
+		<para>
+		If the same records are placed in a bundle (R1, R2, R3), the execution
+		order will be different:
+		</para>
+
+<pre>
+F1(R1), F1(R2), F1(R3), F2(R1), F2(R2), F2(R3)
+</pre>
+
+		<para>
+		The whole bundle goes through F1 before the rows go to F2.
+		</para>
+
+		<indexterm>
+			<primary>Coral8</primary>
+		</indexterm>
+		<indexterm>
+			<primary>CCL</primary>
+		</indexterm>
+		<para>
+		That would not always be a problem, and even could be occasionally useful, if
+		the bundles were always created explicitly. In the reality of Coral8/Sybase R4 scheduling,
+		every time a statement produces multiple rows from a single one
+		(think of a join that picks multiple rows from another side), it
+		creates a bundle and messes up all the logic after it. Some logic gets
+		affected so badly that a few statements in CCL (the Sybase modeling language),
+		such as <quote>ON UPDATE</quote>, had to
+		be designated to always ignore the bundles, otherwise they would not
+		work at all. At my past work I wrote a CCL pattern for breaking up the bundles.
+		It's rather heavyweight and thus could not be used all over the place
+		but provides a generic solution for the most unpleasant cases.
+		</para>
+
+		<para>
+		Worse yet, the bundles may get created in Coral8 absolutely
+		accidentally: if two rows happen to have the same timestamp, for all
+		practical purposes they would act as a bundle. In the models that were
+		designed without the appropriate guards, this leads to the time-based
+		bugs that are hard to catch and debug. Writing these guards correctly
+		is hard, and testing them is even harder. 
+		</para>
+
+		<para>
+		Another issue with bundles is that they make the large queries slower.
+		Suppose you do a query from a window that returns a million
+		rows. All of them will be collected in a bundle, then the
+		bundle will be sent to the interface gateway that would build one huge
+		protocol packet, which will then be sent to the client, which will
+		receive the whole packet and then finally iterate on the rows in it.
+		Assuming that nothing runs out of memory along the way, it will be a
+		long time until the client sees the first row. Very, very
+		annoying.
+		</para>
+
+		<indexterm>
+			<primary>Aleri</primary>
+		</indexterm>
+		<para>
+		The Aleri CEP also had its own version of bundles, called transactions, but a
+		more smart one. Aleri always relied on the primary keys. The condition
+		for a transaction is that it must never contain multiple modification
+		for the same primary key. Since there are no execution order guarantees
+		between the functional elements, in this respect the transactions work
+		in the same way as loose records, only with a more efficient
+		communication between threads. Still, if the primary key changes in an
+		element (say, an aggregator), the condition does not propagate through
+		it. Such elements have to internally collapse the outgoing transactions
+		along the new key, adding overhead.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_sched_topo_loops">
+		<title>Topological loops</title>
+
+		<indexterm>
+			<primary>scheduling</primary>
+			<secondary>loop</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>loop</primary>
+			<secondary>scheduling</secondary>
+		</indexterm>
+		<para>
+		The easiest and most efficient way to schedule the loops is to do it
+		procedurally, something like this:
+		</para>
+
+<pre>
+foreach my $row (@rowset) {
+	$unit->call($lbA->makeRowop(&Triceps::OP_INSERT, $row)); 
+}
+</pre>
+
+		<indexterm>
+			<primary>topological loop</primary>
+		</indexterm>
+		<indexterm>
+			<primary>loop</primary>
+			<secondary>topological</secondary>
+		</indexterm>
+		<para>
+		However it requires that all the rowops to loop over are known in
+		advance. In some situations this might not be true, but instead
+		the rowop entering a loop iteration gets produced by the previous
+		iteration. These situations are better served by the topological
+		loops, formed by connecting the labels in a loop as shown in
+		<xref linkend="fig_sched_loop" xrefstyle="select: label nopage"/>&xrsp;.
+		</para>
+
+		<figure id="fig_sched_loop" >
+			<title>Labels forming a topological loop.</title>
+			<xi:include href="file:///FIGS/label-010-loop.xml"/> 
+		</figure>
+
+		<para>
+		However if the labels are simplemindedly doing the calls through
+		a topology like this, the loop becomes a recursion: each label
+		ends up indirectly calling itself for the next iteration of the
+		loop, which repeats the same thing again ang again. This arrangement
+		would quickly use up the stack and crash, so Triceps normally
+		prohibits the recursive calls.
+		</para>
+
+		<para>
+		There are two ways to get around that problem. The first one is
+		to use the trays and streaming functions as described in
+		<xref linkend="sc_strf_loops" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		It might be the more powerful alternative of the two,
+		however the concept of streaming functions takes a fair amount of explaining
+		and thus is placed later in the manual.
+		The second way is to use the
+		more advanced scheduling capabilities of the
+		Triceps units, which is described here.
+		</para>
+
+		<para>
+		The detailed explanation of
+		how it all works is somewhat complicated, split into a separate
+		section
+		<xref linkend="sc_sched_loop" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;
+		for those interested. But there are the easy methods that cover
+		up all the complexity.
+		</para>
+
+		<para>
+		The first part is done by creating the first label of the loop
+		(such as the label A in
+		<xref linkend="fig_sched_loop" xrefstyle="select: nolabel nopage"/>&xrsp;)
+		through a special wrapper. This can be done in one of two ways:
+		</para>
+
+<pre>
+my ($lbFirst, $mark) = $unit->makeLoopHead($rowType, "name", $clearSub,
+	$execSub, @args);
+my ($lbFirst, $mark) = $unit->makeLoopAround("name", $lbToWrap);
+</pre>
+
+		<para>
+		<pre>makeLoopHead()</pre> is the way to use if you're creating a new Perl
+		label to be the first one in the loop. It has the exact same arguments
+		as <pre>makeLabel()</pre>, which is described in
+		<xref linkend="sc_Label_construction" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		It will put an appropriate wrapper directly into the Perl code, that
+		would do all the required magic before your code executes.
+		</para>
+
+		<para>
+		<pre>makeLoopAround()</pre> is the way to use if you want to start the loop
+		with some existing label (such as an input label of a table). It will
+		create a new label that does the necessary magic, then chain its 
+		argument label from the new one. Nothing really stops you from
+		creating a Perl label manually and then wrapping it in 
+		<pre>makeLoopAround()</pre> but <pre>makeLoopHead()</pre> produces
+		a slightly more efficient code.
+		</para>
+
+		<indexterm>
+			<primary>frame mark</primary>
+		</indexterm>
+		<para>
+		Either way, two values are returned: the newly created label and
+		a special FrameMark object.
+		</para>
+
+		<para>
+		When you send the rows into the loop, you absolutely must send them to
+		this newly created label, <b>not</b> directly to the underlying wrapped label!
+		Otherwise the magic won't work.
+		</para>
+
+		<para>
+		The FrameMark is a special opaque object that is used to remember the state
+		of the Triceps call stack at the start of the loop, to get back to it
+		on the next iterations. It will be used when sending the rowops to the
+		next iteration of the loop. Naturally, this object must be made accessible
+		in the label handlers that do this sending.
+		</para>
+
+		<para>
+		The name argument will become the name of the created label. The FrameMark
+		object also has a name, useful for diagnostics, that gets created by adding
+		a suffix to the argument: <quote><i>name</i>.mark</quote>.
+		</para>
+
+		<para>
+		The second part, whenever you need to send a rowop back to the start of the loop,
+		such as in the label C in 
+		<xref linkend="fig_sched_loop" xrefstyle="select: nolabel nopage"/>&xrsp;,
+		don't call it but use a special method:
+		</para>
+
+<pre>
+$unit->loopAt($mark, @rowops_or_trays);
+</pre>
+
+		<para>
+		This will remember this rowop for the future. When the processing of the
+		current iteration is all done, the scheduler in the unit will pick up
+		the next remembered looped rowop and will feed it into the next iteration,
+		until there are no more remembered rowops.  Only after that will the
+		first call of the first label in the loop return to its caller.
+		In 
+		<xref linkend="fig_sched_loop" xrefstyle="select: nolabel nopage"/>&xrsp;
+		the said caller will be the label X.
+		</para>
+
+		<para>
+		The rowops sent back must always be for the label <pre>$lbFirst</pre>, returned
+		by the <pre>makeLoop*()</pre>.
+		</para>
+
+		<para>
+		It's perfectly fine to send multiple rowops back from a single iteration
+		of the loop, each of these rowops will be processed in its own iteration
+		in the order they were sent.
+		</para>
+
+		<para>
+		It's also perfectly fine to have the nested loops, as long as each loop
+		uses its own frame mark object and starts from a separate label (add an
+		empty label if needed).
+		</para>
+
+		<para>
+		There also are the convenience methods that create a rowop and
+		loop it back in one go, just like <pre>makeHashCall()/makeArrayCall()</pre>:
+		</para>
+
+<pre>
+$unit->makeHashLoopAt($mark, $lbFirst, $opcode, 
+	$fieldName => $fieldValue, ...);
+$unit->makeArrayLoopAt($mark, $lbFirst, $opcode, @fieldValues);
+</pre>
+
+		<para>
+		Now with all this knowledge let's write an example. It will compute
+		the Fibonacci numbers.
+		It's a real overcomplicated and perverse way of
+		calculating the Fibonacci numbers. But it also is a great 
+		fit to the type of problems that get solved with the
+		topological loop, one of a simple kind.
+		</para>
+
+		<indexterm>
+			<primary>Fibonacci</primary>
+		</indexterm>
+		<para>
+		First, a quick reminder of what is a Fibonacci number.
+		Historically it's a solution to the problem of breeding
+		the spherical rabbits in a vacuum. But in the mathematical
+		reality it's the sequence of numbers where each number
+		is a sum of the two previous ones. Two initial elements
+		are defined to be equal to 1, and it goes from there:
+		</para>
+
+		<para>
+		F<subscript><i>i</i></subscript> = F<subscript><i>i</i>-1</subscript> + F<subscript><i>i</i>-2</subscript>
+		</para>
+
+		<para>
+		F<subscript>1</subscript> = 1; F<subscript>2</subscript> = 1
+		</para>
+
+		<para>
+		The Fibonacci numbers are often used as an example of recursive
+		computations in the beginner's books on programming. The computation
+		of the <i>n</i>-th Fibonacci number is usually shown like this:
+		</para>
+
+<!-- t/xSnippets.t -->
+<pre>
+sub fib1 # ($n)
+{
+	my $n = shift;
+	if ($n <= 2) {
+		return 1;
+	} else {
+		return &fib1($n-1) + &fib1($n-2);
+	}
+}
+</pre>
+
+		<para>
+		However that's not a good way to compute in the real world.
+		When a function calls itself recursively once, its complexity
+		is linear, O(<i>n</i>). When a function calls itself twice or more,
+		its complexity becomes exponential, O(e<superscript><i>n</i></superscript>).
+		At first you might think that it's only quadratic O(<i>n</i><superscript>2</superscript>)
+		because it forks two ways on each step. But these two ways keep forking
+		and forking on each step, and it compounds to exponential. Which is
+		a real bad thing.
+		</para>
+
+		<para>
+		To think of it, it's a huge waste, since the (<i>n</i>-2)-th
+		number is calculated anyway for the (<i>n</i>-1)-th number.
+		Why calculate it separately the second time? We could as well have saved
+		and reused it. The Lisp people have figured this
+		out a long time ago, and the Lisp books (if you can read Finnish or
+		Russian, <biblioref linkend="Hyvonen86"/> is a classical one)
+		are full of examples that
+		do exactly that. However I'm too lazy to explain how they work, so we're
+		going to skip it together with the conversion of a tail recursion
+		into a loop and get directly to the loop version. I find the loop
+		version more natural and easier to write than a recursion anyway.
+		</para>
+
+<!-- t/xSnippets.t -->
+<pre>
+sub fibStep2 # ($prev, $preprev)
+{
+	return ($_[0] + $_[1], $_[0]);
+}
+
+sub fib2 # ($n)
+{
+	my $n = shift;
+	my @prev = (1, 0); # n and n-1
+
+	while ($n > 1) {
+		@prev = &fibStep2(@prev);
+		$n--;
+	}
+	return $prev[0];
+}
+</pre>
+
+		<para>
+		The split into two functions is not mandatory for the loop
+		version, it just does the clean separation of the loop counter
+		logic and of the computation of the next step of the function.
+		(But for the recursion version if would be mandatory).
+		</para>
+
+		<para>
+		I'm going to take this procedural loop version and transform
+		it into a topological loop. It actually happens to be a real
+		good match for the topological loop. In a topological loop
+		a record keeps traveling through it and being transformed
+		until it satisfies the loop exit condition. Here
+		<pre>@prev</pre> is the record contents, and the iteration count
+		will be added to them to keep track of the exit condition.
+		</para>
+
+<!-- t/FrameMark.t doFibHead -->
+<pre>
+$uFib = Triceps::Unit->new("uFib");
+
+my $rtFib = Triceps::RowType->new(
+	iter => "int32", # iteration number
+	cur => "int64", # current number
+	prev => "int64", # previous number
+);
+
+my $lbPrint = $uFib->makeLabel($rtFib, "Print", undef, sub {
+	&send($_[1]->getRow()->get("cur"));
+});
+
+my $lbCompute; # will fill in later
+
+my ($lbNext, $markFib) = $uFib->makeLoopHead(
+	$rtFib, "Fib", undef, sub {
+		my $iter = $_[1]->getRow()->get("iter");
+		if ($iter <= 1) {
+			$uFib->call($lbPrint->adopt($_[1]));
+		} else {
+			$uFib->call($lbCompute->adopt($_[1]));
+		}
+	}
+);
+
+$lbCompute = $uFib->makeLabel($rtFib, "Compute", undef, sub {
+	my $row = $_[1]->getRow();
+	my $cur = $row->get("cur");
+	$uFib->makeHashLoopAt($markFib, $lbNext, $_[1]->getOpcode(),
+		iter => $row->get("iter") - 1,
+		cur => $cur + $row->get("prev"),
+		prev => $cur,
+	);
+});
+
+my $lbMain = $uFib->makeLabel($rtFib, "Main", undef, sub {
+	my $row = $_[1]->getRow();
+	$uFib->makeHashCall($lbNext, $_[1]->getOpcode(),
+		iter => $row->get("iter"),
+		cur => 1,
+		prev => 0,
+	);
+	&send(" is Fibonacci number ", $row->get("iter"), "\n");
+});
+
+while(&readLine) {
+	chomp;
+	my @data = split(/,/);
+	$uFib->makeArrayCall($lbMain, @data);
+	$uFib->drainFrame(); # just in case, for completeness
+}
+</pre>
+
+		<para>
+		You can see that it has grown quite a bit. That's why the procedural
+		loops are generally a better idea. However if the computation involves
+		a lot of the SQLy logic, the topological loops are still beneficial.
+		</para>
+
+		<para>
+		The main loop reads the CSV lines with opcodes (which aren't
+		really used here, just passed through and then thrown away
+		before printing) and calls <pre>$lbMain</pre>. Here is an example
+		of an input and output as they would intermix if the input
+		was typed from the keyboard. As in the rest of this manual,
+		the input lines are shown in bold.
+		</para>
+
+<!-- t/FrameMark.t doFibHead -->
+<exdump>
+> OP_INSERT,1
+1 is a Fibonacci number 1
+> OP_DELETE,2
+1 is a Fibonacci number 2
+> OP_INSERT,5
+5 is a Fibonacci number 5
+> OP_INSERT,6
+8 is a Fibonacci number 6
+</exdump>
+
+		<para>
+		The input lines contain the values only for the field <pre>iter</pre>, 
+		which intentionally happens to be the first field in the row type. The
+		other fields will be reset anyway in <pre>$lbMain</pre>, so they are left as NULL.
+		</para>
+
+		<para>
+		The point of <pre>$lbMain</pre> is to call the loop begin label <pre>$lbBegin</pre> and then
+		print the message about which Fibonacci number was requested. The value
+		of the computed number is printed at the end of the loop, so when the
+		words <quote>is a Fibonacci number</quote> are printed after it, that demonstrates that the
+		execution of <pre>$lbMain</pre> continues only after the loop is completed.
+		</para>
+
+		<para>
+		Just to rub it in a bit more, <pre>$lbMain</pre> itself doesn't get
+		back the result of the computation, because
+		the Triceps <pre>call()</pre> has no way to return any results.
+		The intermediate states circle through the loop until the computation
+		is completed, and the results are forwarded out of the loop to
+		<pre>$lbPrint()</pre>. All this time <pre>$lbMain</pre> sits and waits
+		for its call to complete. After the execution gets back to <pre>$lbMain</pre>,
+		it knows that <pre>$lbPrint()</pre> already ran and printed the result,
+		so it prints more detail after it. Another option would be for the loop
+		result label to put the result value into some static variable, letting
+		<pre>$lbMain</pre> read it and print the whole message in one statement.
+		</para>
+
+		<para>
+		The loop logic is split into two labels <pre>$lbNext</pre> and <pre>$lbCompute</pre> purely
+		to show that it can be split like this. <pre>$lbNext</pre> handles the loop termination
+		condition, and <pre>$lbCompute</pre> does essentially the work of <pre>fibStep2()</pre>. After
+		the loop terminates, it passes the result row to <pre>$lbPrint</pre> for the priniting
+		of the value. 
+		</para>
+
+		<para>
+		When the code for <pre>$lbNext</pre> is created, it contains the call of <pre>$lbCompute</pre>.
+		However the label <pre>$lbCompute</pre> has not been created at this time yet! Not a problem,
+		creating in advance an empty variable <pre>$lbCompute</pre> is enough. The closure in <pre>$lbNext</pre> will keep
+		a reference to that variable, and the variable will be filled with the reference
+		to the label later (but before the main loop executes).
+		</para>
+
+		<para>
+		And here is the version with <pre>makeLoopAround()</pre>:
+		</para>
+
+<!-- t/FrameMark.t doFibAround part -->
+<pre>
+my ($lbNext, $markFib); # will fill in later
+
+$lbCompute = $uFib->makeLabel($rtFib, "Compute", undef, sub {
+	my $row = $_[1]->getRow();
+	my $cur = $row->get("cur");
+	my $iter = $row->get("iter");
+	if ($iter <= 1) {
+		$uFib->call($lbPrint->adopt($_[1]));
+	} else {
+		$uFib->makeHashLoopAt($markFib, $lbNext, $_[1]->getOpcode(),
+			iter => $row->get("iter") - 1,
+			cur => $cur + $row->get("prev"),
+			prev => $cur,
+		);
+	}
+});
+
+($lbNext, $markFib) = $uFib->makeLoopAround(
+	"Fib", $lbCompute
+);
+</pre>
+
+		<para>
+		The unit, row type, <pre>$lbPrint</pre>, <pre>$lbMain</pre> and 
+		the main loop have stayed the same,
+		so they are omitted from this example. The whole loop logic, both
+		the termination condition and the computation step, have been 
+		collected into one label <pre>$lbCompute</pre>, to show that it can be done this
+		way too. Then the loop head is created around <pre>$lbCompute</pre>.
+		</para>
+
+		<para>
+		Since both <pre>$lbNext</pre> and <pre>$markFib</pre> need to be accessible
+		inside <pre>$lbCompute</pre>, they are created in advance and become
+		visible in the closure scope. But the values are placed into these
+		variables only after <pre>$lbCompute</pre> is already defined (since
+		<pre>$lbCompute</pre> is an argument to build these values).
+		</para>
+
+		<para>
+		For the more curious, let's dig a little into what happens inside
+		the <pre>makeLoop*()</pre> methods. The same effect can be (and in &Cpp; API
+		has to be) achieved by calling the slightly lower-level methods.
+		</para>
+
+		<para>
+		The frame mark is created as follows:
+		</para>
+
+<pre>
+my $mark = Triceps::FrameMark->new("markName");
+</pre>
+
+		<para>
+		It has to be remembered and then used in the first label of the
+		loop to remember the state of the Triceps call stack:
+		</para>
+
+<pre>
+$unit->setMark($mark);
+</pre>
+
+		<para>
+		This is normally the first thing done in the first label's handler.
+		Yes, it will be remembered on every iteration of the loop. However
+		the trick of the arrangement is that the call stack will be returned
+		to the same state before each iteration, so on the second and following
+		iterations this call will become a no-op.
+		</para>
+
+		<para>
+		The <pre>makeLoop*()</pre> methods just do this for you, their
+		implementation is fairly simple:
+		</para>
+
+<!-- lib/Triceps/Unit.pm -->
+<pre>
+sub makeLoopHead # ($self, $rt, $name, $clearSub, $execSub, @args)
+{
+	my ($self, $rt, $name, $clear, $exec, @args) = @_;
+
+	my $mark = Triceps::FrameMark->new($name . ".mark");
+
+	my $label = $self->makeLabel($rt, $name, $clear, sub {
+		$self->setMark($mark);
+		&$exec(@_);
+	}, @args);
+
+	return ($label, $mark);
+}
+
+sub makeLoopAround # ($self, $name, $lbFirst)
+{
+	my ($self, $name, $lbFirst) = @_;
+	my $rt = $lbFirst->getRowType();
+
+	my $mark = Triceps::FrameMark->new($name . ".mark");
+
+	my $lbWrap = $self->makeLabel($rt, $name, undef, sub {
+		$self->setMark($mark);
+	});
+	$lbWrap->chain($lbFirst);
+
+	return ($lbWrap, $mark);
+}
+</pre>
+
+		<para>
+		</para>
+	</sect1>
+
+	<sect1 id="sc_sched_mainloop">
+		<title>The main loop</title>
+
+		<indexterm>
+			<primary>main loop</primary>
+		</indexterm>
+		<indexterm>
+			<primary>loop</primary>
+			<secondary>main</secondary>
+		</indexterm>
+		<para>
+		The examples above had already shown the <quote>main loop</quote>, now
+		let's look at it up close and discuss, what and why is it doing.
+		The point of the main loop is to get the execution of the model going:
+		accept some rowops from the outside world, shovel them into the
+		Triceps model and process them, sending some result rowops back into
+		the outside world. The sending back is done from inside the label handlers,
+		so as long as the model runs, nothing else is needed for them.
+		</para>
+
+		<para>
+		By the time the program enters the main loop, the model should be all
+		constructed and ready to run.
+		The simplest main loop may look like this:
+		</para>
+
+<pre>
+while ($rowop = &readRowop()) { # reads with some user-defined function
+	$unit->call($rowop);
+} 
+</pre>
+
+		<para>
+		This loop will read the incoming rowops as long as they're available,
+		and call them. When <pre>$unit->call()</pre> returns, the processing
+		of the rowop in the model is done, including all the nested calls
+		it caused.
+		</para>
+
+		<para>
+		However there is also a way to request the post-processing.
+		It's somewhat similar to the Tcl concept of <quote>idletasks</quote>.
+		An example of post-processing might be the flushing of the output
+		buffer: the normal processing may collect a number of the output
+		rowops in the buffer, and after everything is done, the buffer
+		would be serialized and sent out.
+		This post-processing needs to happen after the initial call returns.
+		</para>
+
+		<para>
+		The rowops are scheduled for post-processing with the method:
+		</para>
+
+<pre>
+$unit->schedule(@rowops_or_trays); 
+</pre>
+
+		<indexterm>
+			<primary>schedule</primary>
+		</indexterm>
+		<para>
+		The model keeps a queue of the post-processing requests, and
+		<pre>schedule()</pre> adds to this queue.
+		</para>
+
+		<para>
+		However the simplest main loop shown above won't run the
+		postprocessing. The queue would just keep growing.
+		The postprocessing is done by the method
+		</para>
+
+<pre>
+$unit->drainFrame();
+</pre>
+
+		<para>
+		It calls all the collected post-processing rowops in order.
+		Their handling may keep scheduling more rowops, and the draining
+		won't stop until all of them are processed. So they should not
+		keep schduling more rowops forever, or the draining will never end.
+		To handle the postprocessing properly, the main loop
+		should be:
+		</para>
+
+<pre>
+while ($rowop = &readRowop()) { # reads with some user-defined function
+	$unit->call($rowop);
+	$unit->drainFrame();
+} 
+</pre>
+
+		<para>
+		You can even write it in a slightly different form:
+		</para>
+
+<pre>
+while ($rowop = &readRowop()) { # reads with some user-defined function
+	$unit->schedule($rowop);
+	$unit->drainFrame();
+} 
+</pre>
+
+		<para>
+		In this version the incoming rowop gets added to the queue, and then
+		<pre>drainFrame()</pre> calls it and any of its after-effects.
+		Historically, this has been the intended way but then it had turned
+		out that there is no point in first placing the incoming rowop
+		onto the queue and then reading it from the queue, so calling
+		it directly is slightly more efficient.
+		</para>
+
+		<para>
+		What if you decide in some label handler deep in the call tree
+		that now is the good time to run the schduled rowops, similar
+		to Tcl's <quote>update idletasks</quote> and call <pre>drainFrame()</pre>?
+		First of all, this is a very bad idea. The CEP models are usually
+		very sensitive to the particular execution order, and inserting
+		some random rowops in the middle tends to break things.
+		Second, it won't work. It might execute <i>some</i> rowops
+		(which ones exactly is a long story, described in 
+		<xref linkend="sc_sched_detail" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;)
+		but none of the scheduled ones. In short, there is a reason to
+		why the method is called <pre>drainFrame()</pre>: the queue
+		is organized in frames that are pushed stack-wise as the
+		labels are called, and popped after the calls complete.
+		<pre>DrainFrame()</pre> drains the current frame. 
+		<pre>Schedule()</pre> puts the rowops onto the outermost frame
+		that becomes accessible for draining only when the model is idle.
+		</para>
+
+		<para>
+		It is possible to find out whether there are the post-processing
+		rowops scheduled and to run them one by one:
+		</para>
+
+<pre>
+while ($rowop = &readRowop()) { # reads with some user-defined function
+	$unit->call($rowop);
+	while (!$unit->empty()) {
+		$unit->callNext();
+	}
+} 
+</pre>
+
+		<para>
+		But of course a Perl loop is less efficient than the &Cpp; loop
+		in <pre>drainFrame()</pre>.
+		</para>
+
+		<para>
+		Another straightforward idea is to read and execute the input
+		as it comes in but delay the post-processing until the input
+		becomes idle, exacly like the Tcl <quote>idletasks</quote> do.
+		Somewhat like this:
+		</para>
+
+<pre>
+while (1) {
+	if (!$unit->empty()) {
+		$rowop = &readRowopNoWait();
+		if ($rowop) {
+			$unit->call($rowop);
+		} else {
+			$unit->callNext();
+		}
+	} else {
+		$rowop = &readRowop();
+		last if (!$rowop); # no more input
+		$unit->call($rowop);
+	}
+} 
+</pre>
+
+		<indexterm>
+			<primary>bundling</primary>
+		</indexterm>
+		<para>
+		It might even be useful sometimes but most of the time this turns
+		out to be nothing but pain. The problem is that the exact order
+		of execution becomes dependent on the timing of the data arrival,
+		and the repeatable testing becomes next to impossible. It's
+		another case of the bundling problem.
+		</para>
+
+		<para>
+		If the data arrives bundled with multiple rowops per packet,
+		you have a choice whether to drain the frame after each rowop
+		or after each packet. Which approach is better depends on the
+		needs of the application and on whether the bundling of the
+		rowops into packets is predictable and repeatable. If there are
+		no defined boundaries between packets but the grouping is
+		done simply by timeout or buffer size, such bundles are
+		much better off being broken up into the individual rowops.
+		</para>
+
+		<para>
+		Now let's look at yet another aspect: the main loop may need
+		to exit not only when there is no more input available
+		but also after processing some requests. This can be done
+		by adding a global stop flag, with label handlers setting it
+		when they need to request the exit:
+		</para>
+
+<pre>
+$stop = 0;
+while (!$stop && ($rowop = &readRowop())) {
+	$unit->call($rowop);
+	$unit->drainFrame();
+} 
+</pre>
+
+		<para>
+		The examples in this manual tend to read the input data
+		as plain text lines, convert them to rowops and execute.
+		They are simple-minded, so they don't do any error checking,
+		they would just fail randomly on the incorrect input.
+		Their main loop usually goes along the
+		following lines (with variations, to fit the examples, and as the
+		main loop was refined over time):
+		</para>
+
+<pre>
+while(&readLine) {
+	chomp;
+	my @data = split(/,/); # starts with a command, then string opcode
+	my $type = shift @data;
+	if ($type eq "lbCur") {
+		$unit->makeArrayCall($lbCur, @data);
+	} elsif ($type eq "lbPos") {
+		$unit->makeArrayCall($lbPos, @data);
+	}
+	$unit->drainFrame();
+}
+</pre>
+
+		<para>
+		It reads the CSV (Comma-Separated Values) data from stdin,
+		with the label name in the first column, the opcode in the
+		second, and the data fields in the rest. Then dispatches
+		according to the label.
+		</para>
+
+		<para>
+		Many variations are possible. It can be generalized to look up
+		the labels from the hash:
+		</para>
+
+<pre>
+while(&readLine) {
+	chomp;
+	my @data = split(/,/); # starts with a command, then string opcode
+	my $type = shift @data;
+	$unit->makeArrayCall($labels{$type}, @data);
+	$unit->drainFrame();
+}
+</pre>
+
+		<para>
+		Or call the procedural functions for some types:
+		</para>
+
+<pre>
+while(&readLine) {
+	chomp;
+	my @data = split(/,/); # starts with a command, then string opcode
+	my $type = shift @data;
+	if ($type eq "lbCur") {
+		$unit->makeArrayCall($lbCur, @data);
+	} elsif ($type eq "lbPos") {
+		$unit->makeArrayCall($lbPos, @data);
+	} elsif ($type eq "clear") { # clear the previous day
+		&clearByDate($tPosition, @data);
+	}
+	$unit->drainFrame();
+}
+</pre>
+
+		<para>
+		Once again, none of these small examples are production-ready. 
+		They have no error handling, and
+		their parsing of the CSV data is primitive. It
+		can't handle the quoting properly and can't parse the data
+		with commas in it.
+		A better ready way to parse the data will be provided in the future.
+		For now, make your own.
+		</para>
+
+		<para>
+		The multithreaded models have their own special needs for the
+		main loops. These will be discussed in 
+		<xref linkend="sc_mt_dynamic_server" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_sched_mainloop_socket">
+		<title>Main loop with a socket</title>
+
+		<indexterm>
+			<primary>main loop</primary>
+		</indexterm>
+		<indexterm>
+			<primary>loop</primary>
+			<secondary>main</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>socket</primary>
+		</indexterm>
+		<indexterm>
+			<primary>SimpleServer</primary>
+		</indexterm>
+		<para>
+		A fairly typical situation is when a CEP model has to run in a daemon
+		process, receiving and sending data through the network sockets.
+		Here goes an example that does this. It's not production-ready, it's
+		only of an example quality, and thus is located in an X-package.
+		It still has the issue with the parsing of the CSV data, its
+		handling of the errors is not well-tested, and it makes a few
+		simplifying assumptions about the buffering (more on this below). 
+		Other than that, it's a decent starting point.
+		You can import this package as Triceps::X::SimpleServer,
+		its source code found in 
+		<pre>lib/Triceps/X/SimpleServer.pm</pre>.
+		</para>
+
+<!-- t/lib/Triceps/SimpleServer.pm -->
+<pre>
+package Triceps::X::SimpleServer;
+
+sub CLONE_SKIP { 1; }
+
+our $VERSION = 'v2.0.0';
+
+use Carp;
+use Errno qw(EINTR EAGAIN);
+use IO::Poll qw(POLLIN POLLOUT POLLHUP);
+use IO::Socket;
+use IO::Socket::INET;
+
+our @ISA = qw(Exporter);
+
+our %EXPORT_TAGS = ( 'all' => [ qw(
+	outBuf outCurBuf mainLoop startServer makeExitLabel makeServerOutLabel
+) ] );
+
+our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
+
+# For whatever reason, Linux signals SIGPIPE when writing on a closed
+# socket (and it's not a pipe). So intercept it.
+sub interceptSigPipe
+{
+	if (!$SIG{PIPE}) {
+		$SIG{PIPE} = sub {};
+	}
+}
+
+# and intercept SIGPIPE by default on import
+&interceptSigPipe();
+</pre>
+
+		<para>
+		The package starts with the usual imports and exports. The CLONE_SKIP
+		is required to make sure that the package interacts properly with
+		the multithreading (any objects of this package won't be cloned
+		into the new threads, and since the cloning tends to not work right
+		anyway, I'm not sure why it's not the default).
+		</para>
+
+		<para>
+		Then it intercepts and ignores the SIGPIPE signal for the reasons
+		described in the comment. It's very inconvenient to have your
+		server die on a signal when the other side decides to drop the connection.
+		Any server dealing with sockets on Linux must intercept SIGPIPE.
+		Intercepting it with an empty handler looks like a better idea than
+		ignoring it altogether, to make extra-sure that the writer won't
+		be stuck in that write forever, but perhaps ignoring it would be just as good.
+		The interception is placed into a function which gets called on the
+		package import and can be called again later in case if something
+		else resets the handler to default.
+		</para>
+
+<!-- t/lib/Triceps/SimpleServer.pm -->
+<pre>
+# the socket and buffering control for the main loop;
+# they are all indexed by a unique id
+our %clients; # client sockets
+our %inbufs; # input buffers, collecting the whole lines
+our %outbufs; # output buffers
+our $poll; # the poll object
+our $cur_cli; # the id of the current client being processed
+our $srv_exit; # exit when all the client connections are closed
+
+# Writing to the output buffers. Will also trigger the polling to
+# actually send the output data to the client's socket.
+#
+# @param id - the client id, as generated on the client connection
+#        (if the client already disconnected, this call will 
+#        have no effect)
+# @param string - the string to write
+sub outBuf # ($id, $string)
+{
+	my $id = shift;
+	my $line = shift;
+	if (exists $clients{$id}) {
+		$outbufs{$id} .= $line;
+		# If there is anything to write on a buffer, stop reading from it.
+		$poll->mask($clients{$id} => POLLOUT);
+	}
+}
+
+# Write to the output buffer of the current client (as set in $cur_cli
+# by the main loop).
+#
+# @param string - the string to write
+sub outCurBuf # ($string)
+{
+	outBuf($cur_cli, @_);
+}
+
+# Close the client connection. This doesn't flush the ouput buffer,
+# so it must be called only after the flush is done, or if the flush
+# can not be done (such as, if the client has dropped the connection).
+# It does delete all the client-related data.
+#
+# @param id - the client id, as generated on the client connection
+# @param h - the socket handle of the client
+sub _closeClient # ($id, $h)
+{
+	my $id = shift;
+	my $h = shift;
+	$poll->mask($h, 0);
+	$h->close();
+	delete $clients{$id}; # OK per Perl manual even when iterating
+	delete $inbufs{$id};
+	delete $outbufs{$id};
+}
+
+# The server main loop. Runs with the specified server socket.
+# Accepts the connections from it, then polls the connections for
+# input, reads the data in CSV and dispatches it using the labels hash.
+#
+# XXX Caveats:
+# The way this works, if there is no '\n' before EOF,
+# the last line won't be processed.
+# Also, the whole output for all the input will be buffered
+# before it can be sent.
+#
+# @param srvsock - the server socket handle
+# @param labels - Reference to the label hash, that contains the
+#        mappings used to dispatch the input, in either of formats:
+#          name => label_object
+#          name => code_reference
+#        The input from the clients is parsed as CSV with the 1st field
+#        containing the label name.  Then if the looked up dispatch is an
+#        actual label, the rest of CSV fields are: the 2nd the opcode, and the rest
+#        the data fields in the order of the label's row type. If the
+#        looked up dispatch is a Perl sub reference, just the whole input
+#        line is passed to it as an argument.
+sub mainLoop # ($srvsock, $%labels)
+{
+	my $srvsock = shift;
+	my $labels = shift;
+
+	my $client_id = 0; # unique strings
+	our $poll = IO::Poll->new();
+
+	$srvsock->blocking(0);
+	$poll->mask($srvsock => POLLIN);
+	$srv_exit = 0;
+
+	while(!$srv_exit || keys %clients != 0) {
+		my $r = $poll->poll();
+		confess "poll failed: $!" if ($r < 0 && ! $!{EAGAIN} && ! $!{EINTR});
+
+		if ($poll->events($srvsock)) {
+			while(1) {
+				my $client = $srvsock->accept();
+				if (defined $client) {
+					$client->blocking(0);
+					$clients{++$client_id} = $client;
+					# &send("Accepted client $client_id\n");
+					$poll->mask($client => (POLLIN|POLLHUP));
+				} elsif($!{EAGAIN} || $!{EINTR}) {
+					last;
+				} else {
+					confess "accept failed: $!";
+				}
+			}
+		}
+
+		my ($id, $h, $mask, $n, $s);
+		while (($id, $h) = each %clients) {
+			no warnings; # or in tests prints a lot of warnings about undefs
+
+			$cur_cli = $id;
+			$mask = $poll->events($h);
+			if (($mask & POLLHUP) && !defined $outbufs{$id}) {
+				# &send("Lost client $client_id\n");
+				_closeClient($id, $h);
+				next;
+			}
+			if ($mask & POLLOUT) {
+				$s = $outbufs{$id};
+				$n = $h->syswrite($s);
+				if (defined $n) {
+					if ($n >= length($s)) {
+						delete $outbufs{$id};
+						# now can accept more input
+						$poll->mask($h => (POLLIN|POLLHUP));
+					} else {
+						substr($outbufs{$id}, 0, $n) = '';
+					}
+				} elsif(! $!{EAGAIN} && ! $!{EINTR}) {
+					warn "write to client $id failed: $!";
+					_closeClient($id, $h);
+					next;
+				}
+			}
+			if ($mask & POLLIN) {
+				$n = $h->sysread($s, 10000);
+				if ($n == 0) {
+					# &send("Lost client $client_id\n");
+					_closeClient($id, $h);
+					next;
+				} elsif ($n > 0) {
+					$inbufs{$id} .= $s;
+				} elsif(! $!{EAGAIN} && ! $!{EINTR}) {
+					warn "read from client $id failed: $!";
+					_closeClient($id, $h);
+					next;
+				}
+			}
+			# The way this works, if there is no '\n' before EOF,
+			# the last line won't be processed.
+			# Also, the whole output for all the input will be buffered
+			# before it can be sent.
+			while($inbufs{$id} =~ s/^(.*)\n//) {
+				my $line = $1;
+				chomp $line;
+				{
+					local $/ = "\r"; # take care of a possible CR-LF in this block
+					chomp $line;
+				}
+				my @data = split(/,/, $line);
+				my $lname = shift @data;
+				my $label = $labels->{$lname};
+				if (defined $label) {
+					if (ref($label) eq 'CODE') {
+						&$label($line);
+					} else {
+						my $unit = $label->getUnit();
+						confess "label '$lname' received from client $id has been cleared"
+							unless defined $unit;
+						eval {
+							$unit->makeArrayCall($label, @data);
+							$unit->drainFrame();
+						};
+						warn "input data error: $@\nfrom data: $line\n" if $@;
+					}
+				} else {
+					warn "unknown label '$lname' received from client $id: $line "
+				}
+			}
+		}
+	}
+}
+</pre>
+
+		<indexterm>
+			<primary>dispatch table</primary>
+		</indexterm>
+		<para>
+		The general outline follows the single-threaded multiplexing server described in
+		<biblioref linkend="Babkin10"/>. <pre>mainLoop()</pre> gets the server socket
+		and a dispatch table of labels or functions as its arguments. It then proceeds 
+		with waiting for connections. 
+		</para>
+
+		<para>
+		Once a connection is received, it gets added to the set of
+		active connections, to get included in the waiting for the input data.
+		The input data is read as simplified CSV (no commas in the middle of values,
+		and no way to reprsent the NULL values othar than for those omitted at the end
+		of the line).
+		It's expected to have the format:
+		</para>
+
+<exdump>
+> name,opcode,data...
+</exdump>
+
+		<para>
+		Such as:
+		</para>
+
+<exdump>
+> window,OP_INSERT,5,AAA,30,30
+> window.query,OP_INSERT
+> exit,OP_NOP
+</exdump>
+
+		<para>
+		The name part is then used to find a label in the dispatch table. The
+		rest of the data is used to create a rowop for that label and execute it.
+		As you can see, a row must contain at least the label name and opcode,
+		or the execution will print an error message on the server's standard error
+		and return no response to the client in the socket.
+		</para>
+
+		<para>
+		If the dispatch table contains not a label but a simple function reference
+		for some name, the rest of the row is not even parsed, the function gets
+		called without any arguments. If the exit is implemented as a function
+		in the dispatch table, the following would also work:
+		</para>
+
+<exdump>
+> exit
+</exdump>
+
+		<para>
+		The data is sent back to the client through buffering. To send some data
+		to a client, use 
+		</para>
+
+<pre>
+&outBuf($id, $text);
+</pre>
+
+		<para>
+		The <pre>$id</pre> is the unique id of the client. How do you find, what is the id
+		of the client you want to send the data to? When an input line is processed,
+		the main loop knows, from what client it was received. It puts the id of that
+		client in the global variable <pre>$Triceps::X::SimpleServer::cur_cli</pre>. 
+		You can take it from there and remember.
+		If you want to reply to the current client, you don't need to bother yourself
+		with the id at all, just call
+		</para>
+
+<pre>
+&outCurBuf($text);
+</pre>
+
+		<para>
+		If you remember an id for the future use, and the client disconnects before
+		you call <pre>outBuf()</pre>, the call will have no effect.
+		In any case, if a client has disconnected, the further processing of its requests
+		should usually be stopped, and thus checking if the client is still connected
+		is a good idea anyway:
+		</para>
+
+<pre>
+if (exists $clients{$id}) {
+	# ... prepare the data for it ...
+	&outBuf($id, $text);
+} else {
+	# ... stop sending the data to this client ...
+}
+</pre>
+
+		<para>
+		The client ids are not reused, so this check is
+		always safe.
+		</para>
+
+		<indexterm>
+			<primary>Aleri</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Coral8</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Sybase</primary>
+		</indexterm>
+		<indexterm>
+			<primary>StreamBase</primary>
+		</indexterm>
+		<para>
+		Once some output is buffered to send to a client, the further input from that
+		client stops being accepted until the output buffer drains. But the processing
+		in the Triceps unit scheduler keeps running until it runs out of things to do
+		before it returns to the main loop. All this time the output buffer keeps
+		collecting data without sending it to the client.  Also, the input
+		buffer might happen to already contain multiple lines. Then all these lines
+		will be processed before the data from the output buffer starts being sent
+		to the client. If a request produces a large amount of data, all this data
+		will be buffered first. It's a simplification but really the commercial
+		CEP systems aren't doing a whole lot better: when asked for the contents of
+		a table/window/materliaized view, Coral8 and Aleri and Sybase (don't know
+		about StreamBase but it might be not different either) would make a copy
+		of it first before sending the data. In some cases the copy is more efficient
+		because it references the rows rather than copying the whole byte data, but
+		in the grand scheme of things it's all the same.
+		</para>
+
+		<para>
+		Internally the information about the client sockets and their buffers is
+		kept in the global hashes <pre>%clients</pre>, <pre>%inbufs</pre>, <pre>%outbufs</pre>.
+		It could be done a a single hash of objects but this was simpler.
+		</para>
+
+		<para>
+		The loop exits when the global variable <pre>$Triceps::X::SimpleServer::srv_exit</pre> gets set 
+		(synchronously, i.e. by one of the label handlers) to 1 and all the 
+		clients disconnect. The requirement for disconnection of all the clients
+		makes sure that all the output buffers get flushed before exit, and
+		that was the easiest way to achieve this goal.
+		</para>
+
+		<para>
+		<pre>mainLoop()</pre> relies on the listening socket being already created,
+		bound and given to it as a parameter.  The creation of the socket and
+		forking of a separate server process is wrapped in another function:
+		</para>
+
+<!-- t/lib/Triceps/SimpleServer.pm -->
+<pre>
+# The server start function that creates the server socket,
+# remembers its port number, then forks and
+# starts the main loop in the child process. The parent
+# process then returns the pair (port number, child PID).
+#
+# @param port - the port number to use; 0 will cause a unique free
+#        port number to be auto-assigned
+# @param labels - reference to the label hash, to be passed to mainLoop()
+# @return - pair (port number, child PID) that can then be used to connect
+#        to and control the server in the child process
+sub startServer # ($port, $%labels)
+{
+	my $port = shift;
+	my $labels = shift;
+
+	my $srvsock = IO::Socket::INET->new(
+		Proto => "tcp",
+		LocalPort => $port,
+		Listen => 10,
+	) or confess "socket failed: $!";
+	# Read back the port, since the port 0 will cause a free port
+	# to be auto-assigned.
+	$port = $srvsock->sockport() or confess "sockport failed: $!";
+	my $pid = fork();
+	confess "fork failed: $!" unless defined $pid;
+	if ($pid) {
+		# parent
+		$srvsock->close();
+	} else {
+		# child
+		&mainLoop($srvsock, $labels);
+		exit(0);
+	}
+	return ($port, $pid);
+}
+</pre>
+
+		<para>
+		You can specify the server port 0 to request that the OS bind it to
+		a randum unused port. The port number is then read back with <pre>sockport()</pre>.
+		The pair of the port numer and the server's child process id is then returned
+		as the result. The process where the server runs is in this case
+		just a child process, it's not properly daemonized.
+		</para>
+
+		<para>
+		For a simple complete example, let's make an echo server that would print
+		back the rows it receives, as found in <pre>t/xQuery.t</pre>:
+		</para>
+
+		<indexterm>
+			<primary>dispatch table</primary>
+		</indexterm>
+<!-- t/xQuery.t, combined rtTrade definition -->
+<pre>
+our $rtTrade = Triceps::RowType->new(
+	id => "int32", # trade unique id
+	symbol => "string", # symbol traded
+	price => "float64",
+	size => "float64", # number of shares traded
+);
+
+use Triceps::X::SimpleServer qw(:all);
+
+my $uEcho = Triceps::Unit->new("uEcho");
+my $lbEcho = $uEcho->makeLabel($rtTrade, "echo", undef, sub {
+	&outCurBuf($_[1]->printP() . "\n");
+});
+my $lbEcho2 = $uEcho->makeLabel($rtTrade, "echo2", undef, sub {
+	&outCurBuf(join(",", "echo", &Triceps::opcodeString($_[1]->getOpcode()),
+		$_[1]->getRow()->toArray()) . "\n");
+});
+my $lbExit = $uEcho->makeLabel($rtTrade, "exit", undef, sub {
+	$Triceps::X::SimpleServer::srv_exit = 1;
+});
+
+my %dispatch;
+$dispatch{"echo"} = $lbEcho;
+$dispatch{"echo2"} = $lbEcho2;
+$dispatch{"exit"} = $lbExit;
+
+my ($port, $pid) = &Triceps::X::SimpleServer::startServer(0, \%dispatch);
+print STDERR "port=$port pid=$pid\n";
+waitpid($pid, 0);
+exit(0);
+</pre>
+
+		<para>
+		It starts the server and waits for it to exit. <pre>waitpid()</pre> is used here
+		in a simplified way too, it should properly be done in a loop until
+		it succeeds or an error other than <pre>EINTR</pre> is returned.
+		</para>
+
+		<para>
+		<pre>$rtTrade</pre> is the row type for the expected data. 
+		Two labels, <quote>echo</quote>
+		and <quote>echo2</quote> differ in the way they print the data back:
+		<quote>echo</quote> prints it in the symbolic form while <quote>echo2</quote>
+		prints in CSV. The label <quote>exit</quote> sets the exit flag.
+		Here is a small session log from the client side (46651 is the port
+		that got picked at random and printed by the server on the start):
+		</para>
+
+<exdump>
+> $ telnet localhost 46651
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
+> echo,OP_INSERT,1,a,2,3.4
+echo OP_INSERT id="1" symbol="a" price="2" size="3.4" 
+> echo2,OP_INSERT,1,a,2,3.4
+echo,OP_INSERT,1,a,2,3.4
+> exit,OP_NOP
+> ^]
+> telnet> q
+Connection closed.
+</exdump>
+
+		<para>
+		The names in the dispatch table don't have to be the same as the names of
+		the labels. It's often convenient to have them the same but not mandatory.
+		</para>
+
+		<para>
+		The exit label was created manually in this example but SimpleServer
+		also provides the functions that create an exit label or an exit
+		function, either of which can be placed into a dispatch table:
+		</para>
+
+<!-- t/lib/Triceps/SimpleServer.pm -->
+<pre>
+# A dispatch function, sending anything to which will exit the server.
+# The server will not flush the outputs before exit.
+#
+# Use like:
+#   $dispatch{"exit"} = \&Triceps::X::SimpleServer::exitFunc;
+#
+# In this way the input line doesn't have to contain the opcode.
+# The alternative way is through makeExitLabel().
+sub exitFunc # ($line)
+{
+		$srv_exit = 1;
+}
+
+# Create a label, sending anything to which will exit the server.
+# The server will not flush the outputs before exit.
+#
+# Use like:
+#   $dispatch{"exit"} = &Triceps::X::SimpleServer::makeExitLabel($uTrades, "exit");
+#
+# In this way the input line has to contain at least the opcode.
+# The alternative way is through exitFunc().
+#
+# @param unit - the unit in which to create the label
+# @param name - the label name
+# @return - the newly created label object
+sub makeExitLabel # ($unit, $name)
+{
+	my $unit = shift;
+	my $name = shift;
+	return $unit->makeLabel($unit->getEmptyRowType(), $name, undef, sub {
+		$srv_exit = 1;
+	});
+}
+</pre>
+
+		<para>
+		<pre>makeExitLabel()</pre> is quite simple, it creates a label with hardcoded
+		function of setting the flag <pre>$srv_exit</pre>. Even its row type
+		is hardcoded to the empty rows. <pre>exitFunc()</pre> sets the same flag
+		directly.
+		</para>
+
+		<para>
+		There is also a function for making the labels that output
+		their rows to the client in CSV format (as usual, no commas in the
+		values, the same as is expected by the socket server):
+		</para>
+
+<!-- t/lib/Triceps/SimpleServer.pm -->
+<pre>
+# Create a label that will print the data in CSV format to the server output
+# (to the current client).
+#
+# @param fromLabel - the new label will be chained to this one and get the
+#        data from it
+# @param printName - if present, overrides the label name printed
+# @return - the newly created label object
+sub makeServerOutLabel # ($fromLabel [, $printName])
+{
+	no warnings; # or in tests prints a lot of warnings about undefs
+	my $fromLabel = shift;
+	my $printName = shift;
+	my $unit = $fromLabel->getUnit();
+	my $fromName = $fromLabel->getName();
+	if (!$printName) {
+		$printName = $fromName;
+	}
+	my $lbOut = $unit->makeLabel($fromLabel->getType(), 
+		$fromName . ".serverOut", undef, sub {
+			&outCurBuf(join(",", $printName, 
+				&Triceps::opcodeString($_[1]->getOpcode()),
+				$_[1]->getRow()->toArray()) . "\n");
+		});
+	$fromLabel->chain($lbOut);
+	return $lbOut;
+}
+</pre>
+
+		<para>
+		<pre>makeServerOutLabel()</pre> finds the
+		unit and row type from the parent label, creates the printing label
+		and chains it off the parent label. The newly created label is returned.
+		The return value can be kept in a variable or immediately discarded;
+		since the created label is already chained, it won't disappear.
+		Tha name of the new label is produced from the name of the parent
+		label by appending <quote>.serverOut</quote> to it.
+		</para>
+
+		<indexterm>
+			<primary>DumbClient</primary>
+		</indexterm>
+		<para>
+		Running the automated tests of the servers requires the clients
+		to be started automatically too, feed the input, receive the
+		results, and then compare them to the expected results.
+		The package Triceps::X::DumbClient from <pre>lib/Triceps/X/DumbClient.pm</pre>
+		does exactly that. The server code gets created as usual,
+		only instead of starting the server, the dispatch table is
+		given to the DumbClient method that takes care of starting
+		the server, feeding the input, collecting the results,
+		and waiting for the server to stop.
+		</para>
+
+		<para>
+		For example, the same echo example is run like this with
+		DumbClient:
+		</para>
+
+<!-- t/xQuery.t echo server through DumbClient -->
+<pre>
+use Triceps::X::SimpleServer qw(:all);
+
+my $uEcho = Triceps::Unit->new("uEcho");
+my $lbEcho = $uEcho->makeLabel($rtTrade, "echo", undef, sub {
+	&outCurBuf($_[1]->printP() . "\n");
+});
+my $lbEcho2 = $uEcho->makeLabel($rtTrade, "echo2", undef, sub {
+	&outCurBuf(join(",", "echo", &Triceps::opcodeString($_[1]->getOpcode()),
+		$_[1]->getRow()->toArray()) . "\n");
+});
+my $lbExit = $uEcho->makeLabel($rtTrade, "exit", undef, sub {
+	$Triceps::X::SimpleServer::srv_exit = 1;
+});
+
+my %dispatch;
+$dispatch{"echo"} = $lbEcho;
+$dispatch{"echo2"} = $lbEcho2;
+$dispatch{"exit"} = $lbExit;
+
+my @inputQuery = (
+"echo,OP_INSERT,1,a,2,3.4\n",
+"echo2,OP_INSERT,1,a,2,3.4\n",
+);
+my $expectQuery = 
+'> echo,OP_INSERT,1,a,2,3.4
+> echo2,OP_INSERT,1,a,2,3.4
+echo OP_INSERT id="1" symbol="a" price="2" size="3.4" 
+echo,OP_INSERT,1,a,2,3.4
+';
+
+Triceps::X::TestFeed::setInputLines(@inputQuery);
+Triceps::X::DumbClient::run(\%dispatch);
+
+ok(&Triceps::X::TestFeed::getResultLines(), $expectQuery);
+</pre>
+
+		<indexterm>
+			<primary>TestFeed</primary>
+		</indexterm>
+		<para>
+		DumbClient works in symbiosis with the TestFeed module that
+		handles the recorded inputs and outputs. Note that the
+		<quote>exit</quote> line is not there, DumbClient
+		adds it implicitly at the end of the input.
+		</para>
+
+		<para>
+		The input lines are also included by TestFeed in the output
+		with the <quote>&gt; </quote> prepended to them. DumbClient
+		feeds all the inputs first and then reads all the results,
+		relying on the TCP buffering to avoid deadlocking on the
+		flow control. This works only for the small amounts of
+		input but is good enough for the small tests.
+		</para>
+
+		<para>
+		And the implementation of DumbClient is fairly small, there
+		is only one method:
+		</para>
+
+<pre>
+sub run # ($labels)
+{
+	my $labels = shift;
+
+	my ($port, $pid) = Triceps::X::SimpleServer::startServer(0, $labels);
+	my $sock = IO::Socket::INET->new(
+		Proto => "tcp",
+		PeerAddr => "localhost",
+		PeerPort => $port,
+	) or confess "socket failed: $!";
+	while(& readLine) {
+		$sock->print($_);
+		$sock->flush();
+	}
+	$sock->print("exit,OP_INSERT\n");
+	$sock->flush();
+	$sock->shutdown(1); # SHUT_WR
+	while(<$sock>) {
+		& send($_);
+	}
+	waitpid($pid, 0);
+}
+</pre>
+
+		<para>
+		As mentioned before in 
+		<xref linkend="sc_perl_libex" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;,
+		the methods <pre>readLine</pre> and <pre>send</pre> are imported from the
+		TestFeed module.
+		</para>
+
+	</sect1>
+
+	<sect1 id="sc_sched_tracing">
+		<title>Tracing the execution</title>
+
+		<indexterm>
+			<primary>tracing</primary>
+		</indexterm>
+
+		<para>
+		When developing the CEP models, there always comes the question: WTF
+		had just happened? How did it manage get this result? Followed by
+		subscribing to many intermediate results and trying to piece together
+		the execution order.
+		</para>
+
+		<para>
+		Triceps provides two solutions for this situation: First, the
+		procedural approach should make the logic much easier to follow.
+		Second, it has a ready way to trace the execution and then read the
+		trace in one piece. It can also be used to analyze any variables on the
+		fly, and possibly stop the execution and enter some manual mode.
+		</para>
+
+		<para>
+		The idea here is simple: provide the Unit with a method that will be
+		called:
+		</para>
+
+		<itemizedlist>
+		<listitem>
+		before a label executes,
+		</listitem>
+		<listitem>
+		before the chained labels execute,
+		</listitem>
+		<listitem>
+		after the chained labels execute,
+		</listitem>
+		<listitem>
+		after the label executes,
+		</listitem>
+		<listitem>
+		before the label's frame is drained (and thus the forked rowops
+		execute, see the details of that in
+		<xref linkend="sc_sched_detail" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;
+		),
+		</listitem>
+		<listitem>
+		after the frame is drained.
+		</listitem>
+		</itemizedlist>
+
+		<para>
+		The calls around the chaining and around the draining are done only if there
+		are the chained labels to call or forked rowops to drain accordingly. Otherwise these
+		pairs are skipped. 
+		</para>
+
+		<para>
+		The tracing calls happen in the order shown above.
+		The call after the label executes goes after the chained calls (if any),
+		enveloping them. However the draining calls happen after that (and no matter
+		how many rowops were forked onto that frame, there will be only one
+		after-draining call per frame, still referring to the original label).
+		</para>
+
+		<para>
+		For the simple tracing, a small simple tracer is provided. It
+		actually executes directly as compiled in &Cpp; so it's quite
+		efficient:
+		</para>
+
+<pre>
+$tracer = Triceps::UnitTracerStringName(option => $value, ...);
+</pre>
+
+		<para>
+		The arguments are specified as the option name-value pairs.
+		</para>
+
+		<para>
+		The only option supported is <quote>verbose</quote>, which may be 0 (default) or
+		non-0. If it's 0 (false), the tracer will record a message only before
+		executing each label. If true, it will record a message on each
+		stage. The class is named UnitTracerStringName because it records the
+		execution trace in the string format, including the names of the
+		labels. The tracer is set into the unit:
+		</para>
+
+		<indexterm>
+			<primary>unit</primary>
+		</indexterm>
+		<indexterm>
+			<primary>tracing</primary>
+		</indexterm>
+<pre>
+$unit->setTracer($tracer); 
+</pre>
+		
+		<para>
+		The unit's current tracer can also be read back:
+		</para>
+
+<pre>
+$oldTracer = $unit->getTracer();
+</pre>
+
+		<para>
+		If no tracer was previously set, <pre>getTracer()</pre> will return <pre>undef</pre>.
+		And <pre>undef</pre> can also be used as an argument of <pre>setTracer()</pre>, to
+		cancel any previously set tracing. 
+		</para>
+
+		<para>
+		The tracer references can be compared for whether they refer to the
+		same underlying object:
+		</para>
+
+<pre>
+$result = $tracer1->same($tracer2);
+</pre>
+
+		<para>
+		There are multiple kinds of tracer objects, and <pre>same()</pre> can
+		be called safely for either kind of tracer, including mixing them
+		together. Of course, the tracers of different kinds definitely would
+		not be the same tracer object.
+		</para>
+
+		<para>
+		As the unit runs, the tracing information gets collected in the tracer
+		object. It can be extracted back with:
+		</para>
+
+<pre>
+$data = $tracer->print();
+</pre>
+
+		<para>
+		This does not reset the trace. To reset it, use:
+		</para>
+
+<pre>
+$tracer->clearBuffer();
+</pre>
+
+		<para>
+		Here is a code sequence designed to produce a fairly involved trace:
+		</para>
+
+<!-- t/Unit.t, test the chaining, with ok() removed -->
+<pre>
+$sntr = Triceps::UnitTracerStringName->new(verbose => 1);
+$u1->setTracer($sntr);
+
+$c_lab1 = $u1->makeDummyLabel($rt1, "lab1");
+$c_lab2 = $u1->makeDummyLabel($rt1, "lab2");
+$c_lab3 = $u1->makeDummyLabel($rt1, "lab3");
+
+$c_op1 = $c_lab1->makeRowop(&Triceps::OP_INSERT, $row1);
+$c_op2 = $c_lab1->makeRowop(&Triceps::OP_DELETE, $row1);
+
+$c_lab1->chain($c_lab2);
+$c_lab1->chain($c_lab3);
+$c_lab2->chain($c_lab3);
+
+$u1->schedule($c_op1);
+$u1->schedule($c_op2);
+
+$u1->drainFrame();
+</pre>
+
+		<para>
+		The trace is:
+		</para>
+
+<!-- extracted form strings to plain text -->
+<exdump>
+unit 'u1' before label 'lab1' op OP_INSERT {
+unit 'u1' before-chained label 'lab1' op OP_INSERT {
+unit 'u1' before label 'lab2' (chain 'lab1') op OP_INSERT {
+unit 'u1' before-chained label 'lab2' (chain 'lab1') op OP_INSERT {
+unit 'u1' before label 'lab3' (chain 'lab2') op OP_INSERT {
+unit 'u1' after label 'lab3' (chain 'lab2') op OP_INSERT }
+unit 'u1' after-chained label 'lab2' (chain 'lab1') op OP_INSERT }
+unit 'u1' after label 'lab2' (chain 'lab1') op OP_INSERT }
+unit 'u1' before label 'lab3' (chain 'lab1') op OP_INSERT {
+unit 'u1' after label 'lab3' (chain 'lab1') op OP_INSERT }
+unit 'u1' after-chained label 'lab1' op OP_INSERT }
+unit 'u1' after label 'lab1' op OP_INSERT }
+unit 'u1' before label 'lab1' op OP_DELETE {
+unit 'u1' before-chained label 'lab1' op OP_DELETE {
+unit 'u1' before label 'lab2' (chain 'lab1') op OP_DELETE {
+unit 'u1' before-chained label 'lab2' (chain 'lab1') op OP_DELETE {
+unit 'u1' before label 'lab3' (chain 'lab2') op OP_DELETE {
+unit 'u1' after label 'lab3' (chain 'lab2') op OP_DELETE }
+unit 'u1' after-chained label 'lab2' (chain 'lab1') op OP_DELETE }
+unit 'u1' after label 'lab2' (chain 'lab1') op OP_DELETE }
+unit 'u1' before label 'lab3' (chain 'lab1') op OP_DELETE {
+unit 'u1' after label 'lab3' (chain 'lab1') op OP_DELETE }
+unit 'u1' after-chained label 'lab1' op OP_DELETE }
+unit 'u1' after label 'lab1' op OP_DELETE }
+</exdump>
+
+		<para>
+		The print-out is not indented because the execution of real models
+		tends to involve some quite long call chains, which would result
+		in some extremely wide indenting. Instead the curly braces at the
+		end of each line help to find the matching pair. You can always
+		use the <pre>vi</pre> command <pre>%</pre> to jump to the matching
+		brace, or a similar feature in the other editors.
+		</para>
+
+		<para>
+		In non-verbose mode the same trace would be:
+		</para>
+
+<exdump>
+unit 'u1' before label 'lab1' op OP_INSERT
+unit 'u1' before label 'lab2' (chain 'lab1') op OP_INSERT
+unit 'u1' before label 'lab3' (chain 'lab2') op OP_INSERT
+unit 'u1' before label 'lab3' (chain 'lab1') op OP_INSERT
+unit 'u1' before label 'lab1' op OP_DELETE
+unit 'u1' before label 'lab2' (chain 'lab1') op OP_DELETE
+unit 'u1' before label 'lab3' (chain 'lab2') op OP_DELETE
+unit 'u1' before label 'lab3' (chain 'lab1') op OP_DELETE
+</exdump>
+
+		<para>
+		The non-verbose trace doesn't have the curly braces because
+		there are no matching pairs of lines.
+		</para>
+
+		<para>
+		The actual contents of the rows is not printed in either case. This
+		is basically because the tracer is implemented in &Cpp;, and I've been
+		trying to keep the knowledge of the meaning of the simple data types
+		out of the &Cpp; code as much as possible for now. But it can be
+		implemented with a Perl tracer.
+		</para>
+
+		<para>
+		A Perl tracer is created with:
+		</para>
+
+<pre>
+$tracer = Triceps::UnitTracerPerl->new($sub, @args);
+</pre>
+
+		<para>
+		The arguments are a reference to a function, and optionally arguments
+		for it. The resulting tracer can be used in the unit's <pre>setTracer()</pre> as
+		usual.
+		A source code string may be used instead of the function reference, see
+		<xref linkend="sc_code" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;. 
+		</para>
+
+		<para>
+		The function of the Perl tracer gets called as:
+		</para>
+
+<pre>
+&$sub($unit, $label, $fromLabel, $rowop, $when, @args)
+</pre>
+
+		<para>
+		The arguments are:
+		</para>
+
+		<itemizedlist>
+		<listitem>
+		<pre>$unit</pre> is the usual unit reference.
+		</listitem>
+		<listitem>
+		<pre>$label</pre> is the current label being traced.
+		</listitem>
+		<listitem>
+		<pre>$fromLabel</pre> is the parent label in the chaining (would be
+		<pre>undef</pre> if the current label is called directly, without
+		chaining from anything).
+		</listitem>
+		<listitem>
+		<pre>$rowop</pre> is the current row operation.
+		</listitem>
+		<listitem>
+		<pre>$when</pre> is an integer constant showing the point when the
+		tracer is being called. It's value may be one of
+		<pre>&Triceps::TW_BEFORE</pre>, 
+		<pre>&Triceps::TW_AFTER</pre>, 
+		<pre>&Triceps::TW_BEFORE_DRAIN</pre>,
+		<pre>&Triceps::TW_AFTER_DRAIN</pre>,
+		<pre>&Triceps::TW_BEFORE_CHAINED</pre>, 
+		<pre>&Triceps::TW_AFTER_CHAINED</pre>; 
+		the prefix <pre>TW</pre> stands for <quote>tracer when</quote>.
+		</listitem>
+		<listitem>
+		<pre>@args</pre> are the extra arguments passed from the tracer creation.
+		</listitem>
+		</itemizedlist>
+
+		<indexterm>
+			<primary>constants</primary>
+		</indexterm>
+		<para>
+		The <pre>TW_*</pre> constants can as usual be converted to and from
+		strings with the calls
+		</para>
+
+<pre>
+$string = &Triceps::tracerWhenString($value);
+$value = &Triceps::stringTracerWhen($string);
+$string = &Triceps::tracerWhenStringSafe($value);
+$value = &Triceps::stringTracerWhenSafe($string);
+</pre>
+
+		<para>
+		There also are the conversion functions with strings more suitable for
+		the human-readable messages: 
+		<quote>before</quote>, 
+		<quote>after</quote>, 
+		<quote>before-chained</quote>,
+		<quote>after-chained</quote>,
+		<quote>before-drain</quote>, 
+		<quote>after-drain</quote>. 
+		These are actually the conversions used in the
+		UnitTracerStringName. The functions for them are:
+		</para>
+
+<pre>
+$string = &Triceps::tracerWhenHumanString($value);
+$value = &Triceps::humanStringTracerWhen($string);
+$string = &Triceps::tracerWhenHumanStringSafe($value);
+$value = &Triceps::humanStringTracerWhenSafe($string);
+</pre>
+
+		<para>
+		Now that the constants have been mentioned, the order of tracing calls
+		for a single executing rowop on a single label is:
+		</para>
+
+<pre>
+TW_BEFORE
+TW_BEFORE_CHAINED
+TW_AFTER_CHAINED
+TW_AFTER
+TW_BEFORE_DRAIN
+TW_AFTER_DRAIN
+</pre>
+
+		<para>
+		There is also a general way to find, if the <pre>$when</pre>
+		refers to a <quote>before</quote> or <quote>after</quote>
+		situation:
+		</para>
+
+<pre>
+$result = &Triceps::tracerWhenIsBefore($when);
+$result = &Triceps::tracerWhenIsAfter($when);
+</pre>
+
+		<para>
+		Their typical usage in a trace function, to append an opening or closing brace, looks like:
+		</para>
+
+<pre>
+if (Triceps::tracerWhenIsBefore($when)) {
+	$msg .= " {";
+} elsif (Triceps::tracerWhenIsAfter($when)) {
+	$msg .= " }";
+}
+</pre>
+
+
+		<para>
+		More trace points that are neither <quote>before</quote> or <quote>after</quote> could get added
+		in the future, so a good practice is to use an elsif with both
+		conditions rather than a simple if/else with one condition.
+		</para>
+
+		<para>
+		The Perl tracers allow to execute any arbitrary actions when tracing.
+		They can act as breakpoints by looking for certain conditions and
+		opening a debugging session when those are met.
+		</para>
+
+		<para>
+		For an example of a Perl tracer, let's start with a
+		tracer function that works like UnitTracerStringName:
+		</para>
+
+<!-- t/Unit.t x_Unit_A -->
+<pre>
+sub tracerCb() # unit, label, fromLabel, rop, when, extra
+{
+	my ($unit, $label, $from, $rop, $when, @extra) = @_;
+	our $history;
+
+	my $msg = "unit '" . $unit->getName() . "' " 
+		. Triceps::tracerWhenHumanString($when) . " label '" 
+		. $label->getName() . "' ";
+	if (defined $fromLabel) {
+		$msg .= "(chain '" . $fromLabel->getName() . "') ";
+	}
+	$msg .= "op " . Triceps::opcodeString($rop->getOpcode());
+	if (Triceps::tracerWhenIsBefore($when)) {
+		$msg .= " {";
+	} elsif (Triceps::tracerWhenIsAfter($when)) {
+		$msg .= " }";
+	}
+	$msg .= "\n";
+	$history .= $msg;
+}
+
+undef $history;
+$ptr = Triceps::UnitTracerPerl->new(\&tracerCb);
+$u1->setTracer($ptr);
+</pre>
+
+		<para>
+		It's slightly different, in the way that it always produces the
+		verbose trace, and that it collects the trace in the global
+		variable <pre>$history</pre>. But the resulting text is the same as
+		with UnitTracerStringName.
+		</para>
+
+		<para>
+		Now let's improve on it by printing the
+		whole rowop contents too. In a <quote>proper</quote> way this advanced
+		tracer would be defined as a class constructing the tracer objects.
+		But to reduce the amount of code let's just make it a standalone
+		function to be used with the Perl tracer constructor. 
+		</para>
+
+		<para>
+		And for something different let's make the result indented, with two spaces
+		per indenting level. As mentioned before, the indenting
+		is actually not such a great idea.
+		But for the small short examples it works well.
+		The function would take 3 extra arguments:
+		</para>
+
+		<itemizedlist>
+		<listitem>
+		Verbosity, a boolean value.
+		</listitem>
+		<listitem>
+		Reference to an array variable where to append the text of the trace.
+		This is more flexible than the fixed <pre>$history</pre>. The array will contain
+		the lines of the trace as its elements. And appending to an array
+		should be more efficient than appending to the end of a potentially
+		very long string.
+		</listitem>
+		<listitem>
+		Reference to a scalar variable that would be used to keep the indenting level.
+		The value of that variable will be updated as the tracing happens. Its
+		initial value will determine the initial indenting level. 
+		</listitem>
+		</itemizedlist>
+
+<!-- t/Unit.t x_Unit_B -->
+<pre>
+sub traceStringRowop
+{
+	my ($unit, $label, $fromLabel, $rowop, $when, 
+		$verbose, $rlog, $rnest) = @_;
+
+	if ($verbose) {
+		${$rnest}-- if (Triceps::tracerWhenIsAfter($when));
+	} else {
+		return if ($when != &Triceps::TW_BEFORE);
+	}
+
+	my $msg =  "unit '" . $unit->getName() . "' " 
+		. Triceps::tracerWhenHumanString($when) . " label '"
+		. $label->getName() . "' ";
+	if (defined $fromLabel) {
+		$msg .= "(chain '" . $fromLabel->getName() . "') ";
+	}
+	my $tail = "";
+	if (Triceps::tracerWhenIsBefore($when)) {
+		$tail = " {";
+	} elsif (Triceps::tracerWhenIsAfter($when)) {
+		$tail = " }";
+	}
+	push (@{$rlog}, ("  " x ${$rnest}) . $msg . "op " 
+		. $rowop->printP() . $tail);
+
+	if ($verbose) {
+		${$rnest}++ if (Triceps::tracerWhenIsBefore($when));
+	}
+}
+
+undef @history;
+my $tnest =  0; # keeps track of the tracing nesting level
+$ptr = Triceps::UnitTracerPerl->new(\&traceStringRowop, 1, \@history, \$tnest);
+$u1->setTracer($ptr);
+</pre>
+
+		<para>
+		For the same call sequence as before, the output will be as follows
+		(I've tried to wrap the long lines in a logically consistent way
+		but it still spoils the effect of indenting a bit):
+		</para>
+
+<exdump>
+unit 'u1' before label 'lab1' op lab1 OP_INSERT a="123" b="456" c="789" d="3.14" e="text"  {
+  unit 'u1' before-chained label 'lab1' op lab1 OP_INSERT a="123" b="456" c="789" d="3.14" e="text"  {
+    unit 'u1' before label 'lab2' (chain 'lab1') op lab1 OP_INSERT a="123" b="456" c="789" d="3.14" e="text"  {
+      unit 'u1' before-chained label 'lab2' (chain 'lab1') op lab1 OP_INSERT a="123" b="456" c="789" d="3.14" e="text"  {
+        unit 'u1' before label 'lab3' (chain 'lab2') op lab1 OP_INSERT a="123" b="456" c="789" d="3.14" e="text"  {
+        unit 'u1' after label 'lab3' (chain 'lab2') op lab1 OP_INSERT a="123" b="456" c="789" d="3.14" e="text"  }
+      unit 'u1' after-chained label 'lab2' (chain 'lab1') op lab1 OP_INSERT a="123" b="456" c="789" d="3.14" e="text"  }
+    unit 'u1' after label 'lab2' (chain 'lab1') op lab1 OP_INSERT a="123" b="456" c="789" d="3.14" e="text"  }
+    unit 'u1' before label 'lab3' (chain 'lab1') op lab1 OP_INSERT a="123" b="456" c="789" d="3.14" e="text"  {
+    unit 'u1' after label 'lab3' (chain 'lab1') op lab1 OP_INSERT a="123" b="456" c="789" d="3.14" e="text"  }
+  unit 'u1' after-chained label 'lab1' op lab1 OP_INSERT a="123" b="456" c="789" d="3.14" e="text"  }
+unit 'u1' after label 'lab1' op lab1 OP_INSERT a="123" b="456" c="789" d="3.14" e="text"  }
+unit 'u1' before label 'lab1' op lab1 OP_DELETE a="123" b="456" c="789" d="3.14" e="text"  {
+  unit 'u1' before-chained label 'lab1' op lab1 OP_DELETE a="123" b="456" c="789" d="3.14" e="text"  {
+    unit 'u1' before label 'lab2' (chain 'lab1') op lab1 OP_DELETE a="123" b="456" c="789" d="3.14" e="text"  {
+      unit 'u1' before-chained label 'lab2' (chain 'lab1') op lab1 OP_DELETE a="123" b="456" c="789" d="3.14" e="text"  {
+        unit 'u1' before label 'lab3' (chain 'lab2') op lab1 OP_DELETE a="123" b="456" c="789" d="3.14" e="text"  {
+        unit 'u1' after label 'lab3' (chain 'lab2') op lab1 OP_DELETE a="123" b="456" c="789" d="3.14" e="text"  }
+      unit 'u1' after-chained label 'lab2' (chain 'lab1') op lab1 OP_DELETE a="123" b="456" c="789" d="3.14" e="text"  }
+    unit 'u1' after label 'lab2' (chain 'lab1') op lab1 OP_DELETE a="123" b="456" c="789" d="3.14" e="text"  }
+    unit 'u1' before label 'lab3' (chain 'lab1') op lab1 OP_DELETE a="123" b="456" c="789" d="3.14" e="text"  {
+    unit 'u1' after label 'lab3' (chain 'lab1') op lab1 OP_DELETE a="123" b="456" c="789" d="3.14" e="text"  }
+  unit 'u1' after-chained label 'lab1' op lab1 OP_DELETE a="123" b="456" c="789" d="3.14" e="text"  }
+unit 'u1' after label 'lab1' op lab1 OP_DELETE a="123" b="456" c="789" d="3.14" e="text"  }
+</exdump>
+
+		<para>
+		As mentioned before, each label produces two levels of indenting: one
+		for everything after <quote>before</quote>, another one for the nested
+		labels.
+		</para>
+
+		<para>
+		Eventually this tracing should become another standard class in Triceps.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_sched_detail">
+		<title>The gritty details of Triceps scheduling</title>
+
+		<para>
+		There are four ways of executing a rowop in Triceps:
+		</para>
+
+		<indexterm>
+			<primary>unit</primary>
+		</indexterm>
+		<indexterm>
+			<primary>row operation</primary>
+		</indexterm>
+		<variablelist>
+			<varlistentry>
+				<term>Call:</term>
+				<listitem>
+				<indexterm>
+					<primary>call</primary>
+				</indexterm>
+				<para>
+				Execute the label right now, including all the nested calls.
+				When the call returns, the execution is completed. This is
+				the most typical way, and the only one described in detail so far.
+				</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>Schedule:</term>
+				<listitem>
+				<indexterm>
+					<primary>schedule</primary>
+				</indexterm>
+				<para>
+				Execute the label after everything else is done.
+				</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>Fork:</term>
+				<listitem>
+				<indexterm>
+					<primary>fork</primary>
+				</indexterm>
+				<para>
+				Execute the label after the current label returns but
+				before its caller gets the control back or
+				anything else is done. Obviously, if multiple labels are
+				forked, they will execute in the order they were forked.
+				The forked labels can be seen as <quote>little siblings</quote> of the
+				current label. Forking is currently not used much, other
+				than for the special case of looping.
+				</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>Loop:</term>
+				<listitem>
+				<indexterm>
+					<primary>topological loop</primary>
+				</indexterm>
+				<indexterm>
+					<primary>loop</primary>
+					<secondary>topological</secondary>
+				</indexterm>
+				<para>
+				Execute the label as the start of the next iteration of the
+				topological loop, after the current iteration is fully
+				completed. This is a special case of fork, essentially
+				forking at the level of the loop's first label.
+				</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+
+		<indexterm>
+			<primary>enqueue</primary>
+		</indexterm>
+		<para>
+		The common term encompassing all of them is <quote>enqueue</quote>.
+		<quote>Enqueue</quote> is an ugly word but since I've already used the
+		word <quote>schedule</quote> for a specific purpose, I needed another word to name
+		all these operations together. Hence <quote>enqueue</quote>.
+		</para>
+
+		<para>
+		The meaning is kind of intuitively straightforward but the details might sometimes
+		be a bit surprising. So let us look in detail at how it works inside
+		on an example of a fairly convoluted scheduling sequence.
+		</para>
+
+		<indexterm>
+			<primary>queue</primary>
+		</indexterm>
+		<indexterm>
+			<primary>frame</primary>
+		</indexterm>
+		<indexterm>
+			<primary>stack</primary>
+		</indexterm>
+		<indexterm>
+			<primary>draining</primary>
+		</indexterm>
+		<para>
+		A scheduler in the execution unit keeps not just a single queue but 
+		a stack of queues that contain
+		the rowops to be executed. The rowops get into the queues when they are
+		forked or looped or scheduled.  Each queue
+		is essentially a stack frame, so I'll be using the terms <i>queue</i> and
+		<i>frame</i> interchangeably. The stack always contains at least one
+		queue, which is called the <b>outermost</b> stack frame.
+		</para>
+
+		<para>
+		When the new rowops arrive from the outside world, they can be added with the method
+		<pre>schedule()</pre> to that stack frame. That's what <pre>schedule()</pre> does: always
+		adds rowops to the outermost stack frame, no matter how many frames
+		might be pushed on top of it. If rowops 1, 2 and 3 are
+		added, the stack looks like this (the brackets denote a stack frame):
+		</para>
+
+<pre>
+[1, 2, 3]
+</pre>
+
+		<para>
+		The unit method <pre>drainFrame()</pre> is then used to run the
+		scheduler and process the rowops. It makes the unit call each rowop on
+		the innermost frame (which is initially the same as outermost
+		frame, since there is only one frame) in order.
+		</para>
+
+		<para>
+		First it calls the rowop 1. It's removed from the queue, then a new
+		frame is pushed onto the stack:
+		</para>
+
+<pre>
+[ ] ~1
+[2, 3]
+</pre>
+
+		<para>
+		This new frame is the rowop 1's frame, which is marked on the diagram
+		by <quote>~1</quote>. The diagram shows the most recently pushed, innermost,
+		frame on top, and the oldest, outermost frame on the bottom. The
+		concepts of <quote>innermost</quote> and <quote>outermost</quote>
+		come from the nested calls: the most recent call is nested the deepest
+		in the middle and is the innermost one.
+		</para>
+
+		<para>
+		Then the rowop 1 executes. If it
+		calls rowop 4, another frame is pushed onto the stack for it:
+		</para>
+
+<pre>
+[ ] ~4
+[ ] ~1
+[2, 3]
+</pre>
+
+		<para>
+		Then the rowop 4 executes. The rowop 4 never gets onto any of the queues.
+		The call just pushes a new frame and executes the rowop right away.
+		The identity of rowop being processed is kept in the call context. A
+		call also involves a direct &Cpp; call on the thread stack, and if any
+		Perl code is involved, a Perl call too. Because of this, if you nest
+		the calls too deeply, you may run out of the thread stack space and
+		get it to crash.
+		</para>
+
+		<para>
+		After the rowop 4 is finished (not calling any other
+		rowops), the innermost empty frame is popped before the execution of
+		rowop 1 continues. The queue stack reverts to the previous state.
+		</para>
+
+<pre>
+[ ] ~1
+[2, 3]
+</pre>
+
+		<para>
+		Suppose then rowop 1 forks rowops 5 and 6 by calling the Unit method
+		<pre>fork()</pre>. They are appended to the
+		innermost frame in the order they are forked.
+		</para>
+
+<pre>
+[5, 6] ~1
+[2, 3]
+</pre>
+
+		<para>
+		If rowop 1 then calls rowop 7, again a frame is pushed onto the stack
+		before it executes:
+		</para>
+
+<pre>
+[ ] ~7
+[5, 6] ~1
+[2, 3]
+</pre>
+
+		<para>
+		The rowops 5 and 6 still don't execute, they keep sitting on the queue
+		until the rowop 1 would return.
+		After the call of rowop 7 completes, the scheduler stack returns to
+		the previous state.
+		</para>
+
+		<indexterm>
+			<primary>draining</primary>
+		</indexterm>
+		<para>
+		Suppose now the execution of rowop 1 completes. But its stack frame can
+		not be popped yet, because it is not empty. Now is the time to execute
+		the rowops from it. It's also called <quote>frame draining</quote>
+		but if works somewhat differently in the case of the forked rowops.
+		The first rowop gets picked from the frame and called, but in a special way.
+		It doesn't get its own frame. Instead, it takes over the frame of its
+		parent rowop. The frame that was marked <quote>~1</quote> now changes
+		its marking to <quote>~5</quote> because of that take-over:
+		</para>
+
+<pre>
+[6] ~5
+[2, 3]
+</pre>
+
+		<para>
+		If the rowop 5 forks rowop 8, the stack becomes:
+		</para>
+
+<pre>
+[6, 8] ~5
+[2, 3]
+</pre>
+
+		<para>
+		Since the frame was inherited from the parent rowop 1, the rowop 8
+		just gets appended to the end of it after rowop 6. The rowops forked
+		in the same frame are executed in the order they were forked.
+		Unlike the calls, there is no nesting involved in forking.
+		</para>
+
+		<para>
+		When the execution of rowop 5 returns, the execution of the forked
+		rowops from the innermost frame continues. The rowop 6 gets picked
+		from the front of the frame and takes over the frame ownership:
+		</para>
+
+<pre>
+[8] ~6
+[2, 3]
+</pre>
+
+		<para>
+		Suppose the rowop 6 doesn't call or fork anything else and returns.
+		Then the rowop 8 starts executing and takes over the frame:
+		</para>
+
+<pre>
+[ ] ~8
+[2, 3]
+</pre>
+
+
+		<para>
+		Suppose rowop 8 calls <pre>schedule()</pre> of rowop 9. Rowop 9 is then
+		added to the outermost queue:
+		</para>
+
+<pre>
+[ ] ~8
+[2, 3, 9]
+</pre>
+
+		<para>
+		Rowop 8 then returns, its queue is empty, so it's popped and its call completes.
+		</para>
+
+<pre>
+[2, 3, 9]
+</pre>
+
+		<para>
+		The method <pre>drainFrame()</pre> keeps running on the outermost
+		frame, now taking the rowop 2 and executing it, and so on, until the
+		outermost queue becomes empty, and <pre>drainFrame()</pre> returns.
+		</para>
+
+		<indexterm>
+			<primary>label</primary>
+			<secondary>chaining</secondary>
+		</indexterm>
+		<para>
+		An interesting question is, what happens with the chained labels?
+		Where do they fit in the order of execution? They turn out to be
+		similar to a <pre>fork()</pre>.
+		The presence of chaining gets checked after the original label completes its execution 
+		but before executing any of the forked labels from its frame.
+		If any chained labels are found, they are called one by one.
+		They take over the frame of the parent, just like the forked labels.
+		Any of the chained labels may also call <pre>fork()</pre>, adding
+		more labels to the frame. The next forked label (if any) gets
+		executed only after all the labels chained from the current
+		one are done.
+		</para>
+
+		<para>
+		What would happen if <pre>drainFrame()</pre> is called not from outside
+		the model but from inside some label handler? It will drain the
+		innermost frame. Suppose that the queue stack was in the following
+		state, with rowop 5 executing:
+		</para>
+
+<pre>
+[6, 8] ~5
+[2, 3]
+</pre>
+
+		<para>
+		If the label handler of the rowop 5 calls <pre>drainFrame()</pre>
+		now, <pre>drainFrame()</pre> will do its usual job: pick the
+		rowops one by one from the innermost frame, create the nested
+		frames for them and execute. So first it will pick up the rowop 6:
+		</para>
+
+<pre>
+[ ] ~6
+[8] ~5
+[2, 3]
+</pre>
+
+		<para>
+		After the rowop 6 completes, its frame gets popped:
+		</para>
+
+<pre>
+[8] ~5
+[2, 3]
+</pre>
+
+		<para>
+		But <pre>drainFrame()</pre> continues running, and now picks the rowop 8:
+		</para>
+
+<pre>
+[ ] ~8
+[ ] ~5
+[2, 3]
+</pre>
+
+		<para>
+		After the rowop 8 completes, its frame gets also popped:
+		</para>
+
+<pre>
+[ ] ~5
+[2, 3]
+</pre>
+
+		<para>
+		At this point the innermost frame becomes empty and <pre>drainFrame()</pre>
+		returns. The label handler of rowop 5 continues its execution.
+		</para>
+
+		<para>
+		If you haven't forked anything, the innermost frame will be empty, and
+		<pre>drainFrame()</pre> will do nothing. If you did fork some rowops,
+		<pre>drainFrame()</pre> looks like a convenient way to call them now
+		and then continue. However note that in this case the semantics is
+		different from the normal forking. The rowops from the frame will
+		be called in the nested frames, not taking over the original frame.
+		So if say rowop 6 refers to the same label as rowop 5, this nested
+		execution will be considered a recursive call of the same label.
+		Thus <pre>drainFrame()</pre> is best used only with the outermost
+		frame.
+		</para>
+
+		<para>
+		What if the rowop 1 weren't scheduled and then drained but was just
+		directly called? The outermost frame will remain empty, while a new
+		frame will be pushed for the rowop 1 as usual:
+		</para>
+
+<pre>
+[ ] ~1
+[ ]
+</pre>
+
+		<para>
+		If the rowop 1 executed the same code as before, after the call it
+		will leave the rowop 9 scheduled on the outermost frame:
+		</para>
+
+<pre>
+[9]
+</pre>
+
+		<para>
+		To execute the rowop 9, call <pre>drainFrame()</pre>, or it will be
+		stuck there forever.
+		</para>
+
+		<para>
+		Note that the execution order differs depending on whether the
+		incoming rowops were scheduled or directly called, and on when
+		the <pre>drainFrame()</pre> is called. If the three rowops were
+		scheduled and then drained, the execution order will be
+		1, 2, 3, 9. If they were called directly with draining the
+		frame after each one, the order will be 1, 9, 2, 3. And if they
+		were called directly but with draining only after the last
+		one, it would be again 1, 2, 3, 9. 
+		</para>
+
+		<para>
+		The loop scheduling is a whole big separate subject that will
+		be discussed in the next section.
+		</para>
+
+	</sect1>
+
+	<sect1 id="sc_sched_loop">
+		<title>The gritty details of Triceps loop scheduling</title>
+
+		<indexterm>
+			<primary>scheduling</primary>
+			<secondary>loop</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>loop</primary>
+			<secondary>scheduling</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>topological loop</primary>
+		</indexterm>
+		<indexterm>
+			<primary>loop</primary>
+			<secondary>topological</secondary>
+		</indexterm>
+		<para>
+		Now it's time to look at what is really going on when a
+		topological loop gets executed. Let's continue looking at
+		the loop example that was already shown in
+		<xref linkend="fig_sched_loop" xrefstyle="select: label page"/>&xrsp;.
+		<!-- the figure here is with a page reference! -->
+		</para>
+
+		<para>
+		If the loop were handled simple-mindedly, with all the execution
+		done by calls, it could use a lot of stack space.
+		Suppose some rowop X1 is scheduled for label X, and causes the loop
+		to be executed twice, with rowops X1, A2, B3, C4, A5, B6, C7, Y8. If each
+		operation is done as a <pre>call()</pre>, the stack grows like this: It starts with
+		X1 called, creating its own execution frame (marked as such for clarity):
+		</para>
+
+<pre>
+[ ] ~X1
+[ ]
+</pre>
+
+		<para>
+		Which then calls A2:
+		</para>
+
+<pre>
+[ ] ~A2
+[ ] ~X1
+[ ]
+</pre>
+
+		<para>
+		Which then continues the calls in sequence.
+		By the time the execution comes to Y8, the stack looks like this:
+		</para>
+
+<pre>
+[ ] ~Y8
+[ ] ~C7
+[ ] ~B6
+[ ] ~A5
+[ ] ~C4
+[ ] ~B3
+[ ] ~A2
+[ ] ~X1
+[ ]
+</pre>
+
+		<para>
+		The loop has been converted into recursion, and the whole length of
+		execution is the depth of the recursion. If the loop executes a million
+		times, the stack will be three million levels deep. Worse yet, it's not
+		just the Triceps scheduler stack that grows, it's also the process
+		(&Cpp; and Perl) stack.
+		</para>
+
+		<indexterm>
+			<primary>scheduling</primary>
+			<secondary>recursion</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>recursion</primary>
+		</indexterm>
+
+		<para>
+		Which is why this kind of recursive calls is forbidden by default
+		in Triceps. If you try to do it, on the first recursive call the
+		execution will die with an error. You can enable the recursion
+		but this only lets the stack grow and doesn't prevent the growth.
+		</para>
+
+		<para>
+		Would things be better with <pre>fork()</pre> instead of
+		<pre>call()</pre> used throughout the loop? It starts the same way:
+		</para>
+
+<pre>
+[X1]
+</pre>
+
+		<para>
+		Then X1 executes, gets its own frame and forks A2:
+		</para>
+
+<pre>
+[A2] ~X1
+[ ]
+</pre>
+
+		<para>
+		Then A2 inherits the stack frame and executes, forks B3:
+		</para>
+
+<pre>
+[B3] ~A2
+[ ]
+</pre>
+
+		<para>
+		On each step the frame will be inherited by the next label,
+		and if Y8 is also eventually forked, at the end the stack will
+		be:
+		</para>
+
+<pre>
+[ ] ~Y8
+[ ]
+</pre>
+
+		<para>
+		Problem solved, no matter how many iterations were done by the loop,
+		the stack will stay limited. 
+		</para>
+
+		<para>
+		The catch though is that <i>every</i>
+		operation inside the loop must be done with a <pre>fork()</pre>.
+		If there is even one <pre>call()</pre> occuring in the loop, the
+		stack will grow by a frame for each <pre>call()</pre> and may
+		become quite deep again. The problem is that <pre>call()</pre> is
+		hardcoded in many primitives, such as Tables, and is fairly typically
+		used in the templates as well. The historic solution for that
+		was to specify for each table, how it should handle its results,
+		call them or fork them or even schedule them. And the templates
+		could use a similar approach.
+		</para>
+
+		<para>
+		The practice had quickly showed that not only all this explicit
+		choice is quite cumbersome and easy to miss, but also the
+		semantics of <pre>fork()</pre> is different from <pre>call()</pre>
+		in a very annoying way. If some label wants to do something,
+		call some other label, then do something more using the result of the call, doing it with
+		<pre>call()</pre> is simple: just execute all this procedurally
+		in sequence. After <pre>call()</pre> returns, its work is
+		guaranteed to be done and any global state to be updated.
+		Not so with <pre>fork()</pre> that just puts the rowop onto
+		a queue, there just isn't any way to get the second half
+		of the original label's code to execute only after all the
+		effects from the forked rowop had propagated.
+		(Historically <pre>fork()</pre> worked differently in
+		Triceps 1.0 and did allow to reproduce the call semantics
+		through some minor contortions but then it kept growing
+		the stack on every fork, just as the calls do).
+		</para>
+
+		<para>
+		The solution, even back in the version 1.0 days, was to add a special
+		method for the loop scheduling.
+		</para>
+
+		<indexterm>
+			<primary>frame mark</primary>
+		</indexterm>
+		<para>
+		It starts with the concept of the frame mark. A <i>frame mark</i> is a token
+		object, completely opaque to the program. It can be used only in two
+		operations:
+		</para>
+
+		<itemizedlist>
+		<listitem>
+		<pre>setMark()</pre> remembers the  position in the frame stack, just
+		outside the current frame.
+		</listitem>
+		<listitem>
+		<pre>loopAt()</pre> enqueues a rowop at the marked frame.
+		</listitem>
+		</itemizedlist>
+
+		<para>
+		Then the loop wold have its mark object M. The label A will execute
+		<pre>setMark(M)</pre>, and the label C will execute <pre>loopAt(M, rowop(A))</pre>. The rest
+		of the execution can as well use <pre>call()</pre>, as shown in
+		<xref linkend="fig_sched_loop" xrefstyle="select: label nopage"/>&xrsp;.
+		</para>
+
+		<figure id="fig_sched_mark" >
+			<title>Proper calls in a loop.</title>
+			<xi:include href="file:///FIGS/label-011-mark.xml"/> 
+		</figure>
+
+		<para>
+		When the label A executes the rowop A2, first things it does is
+		calling setMark(M). After that the stack will look like this:
+		</para>
+
+<pre>
+[ ] ~A2, mark M
+[ ] ~X1
+[ ]
+</pre>
+
+		<para>
+		The mark M remembers the current frame. The stack
+		at the end of C4, after it has called <pre>loopAt(M, A5)</pre>, is:
+		</para>
+
+<pre>
+[ ] ~C4
+[ ] ~B3
+[A5] ~A2, mark M
+[ ] ~X1
+[ ]
+</pre>
+
+		<para>
+		The stack then unwinds until A5 starts its execution:
+		</para>
+
+<pre>
+[ ] ~A5, mark M
+[ ] ~X1
+[ ]
+</pre>
+
+		<para>
+		When A5 inherits the stack frame from A2, the mark M stays put.
+		The label A would normally call <pre>setMark(M)</pre> again anyway,
+		but it will just put the mark onto the same frame, so effectively
+		it's a no-operation.
+		</para>
+
+		<para>
+		Thus each iteration starts with a fresh stack, and the stack depth is
+		limited to one iteration. The nested loops can also be properly
+		executed.
+		</para>
+
+		<para>
+		After Y8 completes, the stack will unroll back, and X1
+		can continue its execution:
+		</para>
+
+<pre>
+[ ] ~X1
+[ ]
+</pre>
+
+		<para>
+		To reiterate, when the control returns back to X1, the whole loop
+		is done.
+		</para>
+
+		<para>
+		What happens after the stack unwinds past the mark? The mark gets
+		unset. When someone calls <pre>loopAt()</pre> with an unset mark, the rowop is
+		enqueued in the outermost frame, having the same effect as <pre>schedule()</pre>.
+		</para>
+
+		<para>
+		It's possible to use this handling of an unset mark to some creative
+		effects. It allows the loops to take a pause in the middle.
+		Suppose the label B finds that it can't process
+		the rowop B3 until some other data has arrived. What it can do then is remember
+		B3 somewhere in the thread state and return. The loop has not completed but
+		it can't progress either, so the call unrolls until it becomes empty.
+		In this case the code of label X must be prepared to find that the
+		loop hadn't completed yet after the call of A2 returns.
+		Since the frame of X1 is popped off the stack, the mark M gets unset. 
+		The knowledge that the loop needs to be continued stays remembered
+		in the state.
+		</para>
+
+		<para>
+		After some time that awaited data arrives, as some other rowop. When that
+		rowop gets processed, it will find that remembered state with B3 and will make
+		it continue, maybe by calling <pre>call(B3)</pre> again. So now the
+		logic in B finds all the data it needs and continues with the loop,
+		calling C4. C4 will do its job and call <pre>loopAt(M, A5)</pre>.
+		But the mark M has been unset a while ago!  Scheduling A5 at the outermost
+		frame seems to be a logical thing to do at this point. Then whatever
+		current processing will complete and unwind, and the loop will continue
+		after it. When the rowop A5 gets executed, the label A will call
+		<pre>setMark(M)</pre> again, thus setting the mark on its new frame,
+		and making the loop run as far as it can before executing any other
+		scheduled rowops.
+		</para>
+
+		<para>
+		Overall, pausing and then restarting a loop like this is not such
+		a good idea. The caller of the loop normally expects that it can wait
+		for the loop to complete, and that when the loop returns, it's all done.
+		If a loop may decide to bail out now and continue later, the
+		effects may be quite unexpected.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_sched_recursion">
+		<title>Recursion control</title>
+
+		<indexterm>
+			<primary>recursion</primary>
+		</indexterm>
+		<para>
+		Historically, the recursive calls (when a
+		label calls itself, directly or indirectly) have been forbidden in
+		Triceps. Mind you, the recursive calling could still be done even
+		then with the help of trays and forking.
+		And it's probably the best way too from the
+		standpoint of correctness. However it's not the most straightforward
+		way, and the real recursion still comes handy once in a while.
+		</para>
+
+		<para>
+		Now the recursion is allowed in its direct way. Especially
+		that it doesn't have to be all-or-nothing, it can be done in a
+		piecemeal and controlled fashion.
+		</para>
+
+		<para>
+		It's controlled per-unit. Each unit has two adjustable limits:
+		</para>
+
+		<indexterm>
+			<primary>topological loop</primary>
+		</indexterm>
+		<indexterm>
+			<primary>loop</primary>
+			<secondary>topological</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>streaming function</primary>
+		</indexterm>
+		<variablelist>
+			<varlistentry>
+				<term>Maximal stack depth:</term>
+				<listitem>
+				<para>
+				Limits the total depth of the unit's call stack. That's the
+				maximal length of the call chain, whether it goes straight or
+				in loops.
+				</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>Maximal recursion depth:</term>
+				<listitem>
+				<para>
+				Limits the number of times each particular label may appear on
+				the call stack. So if you have a recursive code fragment
+				(a simple-minded loop or a recursive streaming function), this
+				is the limit on its recursive reentrances.
+				</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+
+		<para>
+		Both these limits accept the 0 and negative values to mean <quote>unlimited</quote>.
+		</para>
+
+		<para>
+		The default is as it has been before: unlimited stack depth, recursion
+		depth of 1 (which means that each label may be called once but it may
+		not call itself). But now you can change them with the calls:
+		</para>
+
+<pre>
+$unit->setMaxStackDepth($n);
+$unit->setMaxRecursionDepth($n);
+</pre>
+
+		<para>
+		You can change them at any time, even when the unit is running (but
+		they will be enforced only on the next attempt to execute a rowop).
+		</para>
+
+		<para>
+		You can also read the current values:
+		</para>
+
+<pre>
+$n = $unit->maxStackDepth();
+$n = $unit->maxRecursionDepth();
+</pre>
+
+		<para>
+		Another thing about the limits is that even if you set them to
+		<quote>unlimited</quote> or to some very large values, there still are the system
+		limits. The calls use the &Cpp; process (or thread) stack and the Perl stack, and if you
+		make too many of them, the stack will overflow and the whole process
+		will crash and possibly dump core. Keeping the call depths within
+		reason is still a good idea.
+		</para>
+
+		<indexterm>
+			<primary>table</primary>
+		</indexterm>
+		<para>
+		Now you can do the direct recursion. However as with the procedural
+		code, not all the labels are reentrant. Some of them may work with the
+		static data structures that can't be modified in a nested fashion.
+		Think for example of a table: when you modify a table, it sends rowops
+		to its <quote>pre</quote> and <quote>out</quote> labels. You can connect the other labels there,
+		and react to the table modifications. However these labels can't
+		attempt to modify the same table, because the table is already in the
+		middle of a modification, and it's not reentrant.
+		</para>
+
+		<para>
+		The table still has a separate logic to check for non-reentrance, and
+		no matter what is the unit's general recursion depth limit, for the
+		table it always stays at 1. Moreover, the table enforces it across both
+		the input label interface and the procedural interface.
+		</para>
+
+		<indexterm>
+			<primary>reentrance</primary>
+		</indexterm>
+		<para>
+		If you make your own non-reentrant labels, Triceps can make this check
+		for you. Just mark the first label of the non-reentrant sequence with
+		</para>
+
+<pre>
+$label->setNonReentrant();
+</pre>
+
+		<para>
+		It will have its own private recursion limit of 1. Any time it's
+		attempted to execute recursively, it will confess. There is no way to
+		unset this flag: when a label is known to be non-reentrant, it can not
+		suddenly become reentrant until its code is rewritten.
+		</para>
+
+		<para>
+		You can read this flag with
+		</para>
+
+<pre>
+$val = $label->isNonReentrant();
+</pre>
+	</sect1>
+
+</chapter>

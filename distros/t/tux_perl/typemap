@@ -1,0 +1,26 @@
+# This code is a part of tux_perl, and is released under the GPL.
+# Copyright 2002 by Yale Huang<mailto:yale@sdf-eu.org>.
+# See README and COPYING for more information, or see
+#   http://tux-perl.sourceforge.net/.
+#
+# $Id: typemap,v 1.2 2002/11/11 11:15:25 yaleh Exp $
+
+TYPEMAP
+const char *    T_PV
+Tux		T_TUXOBJ
+
+OUTPUT
+
+T_TUXOBJ
+	sv_setref_pv($arg, \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\",
+		(void*)$var);
+
+INPUT
+
+T_TUXOBJ
+	if (sv_derived_from($arg, \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\")) {
+        	IV tmp = SvIV((SV*)SvRV($arg));
+                $var = ($type) tmp;
+        }else
+                croak(\"$var is not of type ${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\")
+

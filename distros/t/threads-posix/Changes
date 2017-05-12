@@ -1,0 +1,12 @@
+Revision history for threads-posix
+
+0.003     2016-07-03 22:18:43+02:00 Europe/Amsterdam
+          Add a -global option to importer
+          Use base instead of parent
+
+0.002     2012-02-07 19:32:15 Europe/Amsterdam
+          Check for threads and Unix before continuing to configure
+          Avoid hanging in tests
+
+0.001     2012-02-04 17:39:34 Europe/Amsterdam
+          First release

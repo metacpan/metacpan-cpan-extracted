@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_app">
+		<title>App reference</title>
+
+		<indexterm>
+			<primary>App</primary>
+		</indexterm>
+		<para>
+		As usual, I won't be repeating the descriptions from the Perl
+		reference, but just point out the methods and differences of the &Cpp;
+		version. And there are more detailed descriptions directly in the
+		header files. The App class is defined in <pre>cpp/app/App.h</pre>.
+		Naturally, it's an Mtarget.
+		</para>
+
+		<para>
+		The static part of the API is:
+		</para>
+
+<pre>
+static Onceref<App> make(const string &name);
+static Onceref<App> find(const string &name);
+static void drop(Onceref<App> app);
+
+typedef map<string, Autoref<App> > Map;
+static void listApps(Map &ret);
+</pre>
+
+		<para>
+		The App constructor is private, and the Apps get constructed with
+		<pre>make()</pre>. <pre>make()</pre> throws an Exception if an App with this name already
+		exists, <pre>find()</pre> throws an exception if an App with this name does not
+		exist, and <pre>drop()</pre> just does nothing if its argument App had already
+		been dropped.
+		</para>
+
+		<para>
+		All the operations on the global list of apps are internally
+		synchronized and thread-safe. <pre>listApps()</pre> clears its argument map and
+		fills it with the copy of the current list. Of course, after it returns
+		and releases the mutex, other threads may create or delete apps, so the
+		returned list (well, map) may immediately become obsolete. But since it
+		all is done with the reference counters, the App objects will continue
+		to exist and be operable as long as the references to them exist.
+		</para>
+
+		<para>
+		The App instance API is as follows. It's also all internally
+		synchronized.
+		</para>
+
+<pre>
+const string &getName() const;
+</pre>
+
+		<para>
+		Get the name of the App.
+		</para>
+
+<pre>
+Onceref<TrieadOwner> makeTriead(const string &tname, const string &fragname = "");
+</pre>
+
+		<indexterm>
+			<primary>Triead</primary>
+		</indexterm>
+		<para>
+		Define a new Triead. This method is called either from the OS thread
+		where the Triead will run or from its parent thread (unlike Perl, in
+		&Cpp; it's perfectly possible to pass the reference to the TrieadOwner
+		from a parent OS thread to the thread that will run it). Either way,
+		the OS thread that will run this Triead ends up with the TrieadOwner
+		object reference, and no other thread must have it. The arguments are
+		the thread name and fragment name, and the empty fragment name means
+		that this thread won't belong to any fragment.
+		</para>
+
+		<para>
+		And just to reiterate, this does not create the OS thread. Creating the
+		OS thread is your responsibility (although Triceps provides the
+		helper classes for the Posix threads). This call only creates the Triceps
+		Triead management structures to put it under control of the App.
+		</para>
+
+		<para>
+		If a thread with this name has already been defined, or if the thread
+		name is empty, throws an Exception.
+		</para>
+
+<pre>
+void declareTriead(const string &tname);
+</pre>
+
+		<para>
+		Declare a new thread. 
+		Declaring a thread more than once, or declaring a thread that has
+		been already defined, is perfectly OK.
+		</para>
+
+<pre>
+void defineJoin(const string &tname, Onceref<TrieadJoin> j);
+</pre>
+
+		<indexterm>
+			<primary>TrieadJoin</primary>
+		</indexterm>
+		<para>
+		This is a call without an analog in the Perl API. This defines a way
+		for the harvester to join the thread. The Perl API happens to be
+		hardcoded to join the Perl threads. But the &Cpp; API can deal with any
+		threads: POSIX ones, Perl ones, whatever. If a thread wants to be
+		properly joined by the harvester, it must define its join interface,
+		done as a TrieadJoin object. Each kind of threads will define its own
+		subclass of TrieadJoin.
+		</para>
+
+		<para>
+		If there is no join defined for a Triead, then when it exits, the
+		harvester will just update the state and manage the Triead object
+		properly but won't do any joining. Which is useful in case if the OS
+		thread is detached (not the best idea but doable) or if the Triead is
+		created from the parent OS thread, and then the actual OS thread
+		creation fails and there is nothing to join.
+		</para>
+
+		<para>
+		If the thread is not declared nor defined yet, <pre>defineJoin()</pre> throws an
+		exception.
+		</para>
+
+		<para>
+		It's possible (though unusual) to call this method multiple times for
+		the same thread. That would just replace the joiner object. The joiner
+		is a reference-counted object, so the old object will just have itse
+		reference count decreased. It's possible to pass the joiner as NULL,
+		that would just drop the existing joiner, if any was defined.
+		</para>
+
+<pre>
+typedef map<string, Autoref<Triead> > TrieadMap;
+void getTrieads(TrieadMap &ret) const;
+</pre>
+
+		<para>
+		List the Trieads in this App. Same as with listing the Apps, the
+		argument map gets cleared and then filled with the current contents.
+		</para>
+
+<pre>
+void harvester(bool throwAbort = true);
+bool harvestOnce();
+void waitNeedHarvest();
+</pre>
+
+		<para>
+		The harvester API is very similar to Perl, with confession replaced by
+		Exception. The only difference is how the argument specifies the throwing of an
+		Exception on detecting the App abort (the Exception will still be thrown
+		only after joining all the App's threads).
+		</para>
+
+		<para>
+		The result of <pre>harvestOnce()</pre> is <pre>true</pre> if the App is dead. The Exceptions
+		in <pre>harvestOnce()</pre> originate from the <pre>TrieadJoin::join()</pre> method that
+		performs the actual joining. All the caveats apply in the same way as
+		in Perl.
+		</para>
+
+<pre>
+bool isDead();
+</pre>
+
+		<para>
+		Returns <pre>true</pre> if the App is dead.
+		</para>
+
+<pre>
+void waitDead();
+</pre>
+
+		<para>
+		Wait for the App to become dead.
+		</para>
+
+<pre>
+bool isAborted() const;
+</pre>
+
+		<para>
+		Returns <pre>true</pre> if the App is aborted.
+		</para>
+
+<pre>
+string getAbortedBy() const;
+string getAbortedMsg() const;
+</pre>
+
+		<para>
+		Get the thread name and message that caused the abort. If the App is
+		not aborted, will return the empty strings.
+		</para>
+
+<pre>
+void abortBy(const string &tname, const string &msg);
+</pre>
+
+		<para>
+		Abort the app, by the thread tname, with the error message msg.
+		</para>
+
+<pre>
+bool isShutdown();
+</pre>
+
+		<para>
+		Returns true if the App has been requested to shut down.
+		</para>
+
+<pre>
+void shutdown();
+</pre>
+
+		<para>
+		Request the App to shut down. This involves interrupting all the
+		threads in case if they are sleeping.  The interruption is another
+		functionality of the TrieadJoin object. It's possible for the
+		TrieadJoin interruptor to encounter an error and throw an Exception. If
+		this happens, <pre>shutdown()</pre> will still go through all the Trieads and
+		interrupt them, and then repackage the error messages from all the
+		received Exceptions into one Exception and re-throw it.
+		</para>
+
+		<para>
+		Technically, this means that in the Perl API the shutdown might also
+		confess, when its underlying &Cpp; call returns an Exception. This should
+		theoretically never happen, but practically you never know.
+		</para>
+
+<pre>
+void shutdownFragment(const string &fragname);
+</pre>
+
+		<para>
+		Shut down a fragment. All the logic described in the Perl API applies.
+		Again, this involves interruption of all the threads in the fragment,
+		and if any of them throw Exceptions, these will be re-thrown as a
+		single Exception.
+		</para>
+
+<pre>
+enum {
+    DEFAULT_TIMEOUT = 30,
+};
+void setTimeout(int sec, int fragsec = -1);
+</pre>
+
+		<para>
+		Set the readiness timeouts (main and fragment), in seconds. If the
+		fragment timeout argument is <pre><0</pre>, it gets set to the same value as the
+		main timeout.
+		</para>
+
+<pre>
+void setDeadline(const timespec &dl);
+</pre>
+
+		<para>
+		Set the deadline (unlike timeout, with fractional seconds) for the main
+		readiness.
+		</para>
+
+<pre>
+void refreshDeadline();
+</pre>
+
+		<para>
+		Explicitly refresh the deadline, using the fragment timeout.
+		</para>
+
+<pre>
+void requestDrain();
+</pre>
+
+		<para>
+		Request a shared drain.
+		</para>
+
+<pre>
+void requestDrainExclusive(TrieadOwner *to);
+</pre>
+
+		<para>
+		Request an exclusive drain, with the argument TrieadOwner. Unlike Perl
+		API, the &Cpp; API supports the methods for requesting the exclusive
+		drain on both App and TrieadOwner classes (the TrieadOwner method is
+		really a wrapper for the App method). In general, using the TrieadOwner
+		method for this purpose probably looks nicer.
+		</para>
+
+		<para>
+		Since the TrieadOwner reference is really private to the OS thread that
+		runs it, this method can be called only from that OS thread. Of course,
+		in &Cpp; you could pass it around to the other threads, but don't,
+		TrieadOwner is not thread-safe internally and any operations on it must
+		be done from one thread only.
+		</para>
+
+<pre>
+void waitDrain();
+</pre>
+
+		<para>
+		Wait for the drain (either shared or exclusive) to complete.
+		</para>
+
+<pre>
+void drain();
+</pre>
+
+		<para>
+		A combination of <pre>requestDrain()</pre> and <pre>waitDrain()</pre>.
+		</para>
+
+<pre>
+void drainExclusive(TrieadOwner *to);
+</pre>
+
+		<para>
+		A combination of <pre>requestDrainExclusive()</pre> and <pre>waitDrain()</pre>.
+		</para>
+
+<pre>
+bool isDrained();
+</pre>
+
+		<para>
+		Quickly check if the App is currently drained (should be used only if
+		the App is known to be requested to drain).
+		</para>
+
+<pre>
+void undrain();
+</pre>
+
+		<para>
+		End the drain sequence.
+		</para>
+
+		<para>
+		The file descriptor store/load API is really of not much use in &Cpp; as
+		such, in &Cpp; it's easy to pass and share the file descriptors and file
+		objects between the threads as-is. It has been built into the App class
+		for the benefit of Perl and possibly other interpreted languages.
+		</para>
+
+<pre>
+void storeFd(const string &name, int fd);
+void storeFd(const string &name, int fd, const string &className);
+</pre>
+
+		<para>
+		Store a file descriptor. Unlike the Perl API, the file descriptor is
+		<b>not</b> dupped before storing. It's stored as is, and if you want dupping,
+		you have to do it yourself. The class name argument is optional,
+		if not specified, it's set to an empty string.
+		Throws an Exception if a file descriptor
+		with this name is already stored.
+		</para>
+
+<pre>
+int loadFd(const string &name, string *className = NULL) const;
+</pre>
+
+		<para>
+		Load back the file descriptor. Again, no dupping, returns the stored
+		value as-is. If the name is unknown, returns -1. If the class name
+		argument is not NULL, it will be filled with the stored class name.
+		</para>
+
+<pre>
+bool forgetFd(const string &name);
+</pre>
+
+		<para>
+		Forget the file descriptor. Returns true if this name was known and
+		became forgotten, or false if it wasn't known. Normally, you would load
+		the descriptor, take over its ownership, and then tell the App to
+		forget it.
+		</para>
+
+<pre>
+bool closeFd(const string &name);
+</pre>
+
+		<para>
+		Close the file descriptor (if it was known) and then forget it. Returns
+		true if this name was known and became forgotten, or false if it wasn't
+		known.
+		</para>
+
+		<para>
+		The rest of the Perl App methods have no analogs in &Cpp;. They are just
+		purely Perl convenience wrappers. 
+		</para>
+	</sect1>

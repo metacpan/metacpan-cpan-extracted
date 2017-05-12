@@ -1,0 +1,750 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_row">
+		<title>Row and Rowref reference</title>
+
+		<indexterm>
+			<primary>Row</primary>
+		</indexterm>
+		<indexterm>
+			<primary>RowType</primary>
+		</indexterm>
+		<para>
+		The class Row implements a data row and is fundamentally
+		an opaque buffer. You can't do anything with it directly other than
+		having a pointer to it. You can't even delete a Row object using that
+		pointer. To do anything with a Row, you have to go through that row's
+		RowType. There are some helper classes, like
+		CompactRow, but you don't need to concern yourself with them: they are
+		helpers for the appropriate row types and are never used directly.
+		</para>
+
+		<para>
+		That opaque buffer is internally wired for the reference counting, of
+		the Mtarget multithreaded variety. The rows can be passed and shared
+		freely between the threads. No locks are needed for that (other than in
+		the reference counter), the thread safety is achieved by the rows being
+		immutable. Once a row is created, it stays the same. If you need to
+		change a row, just create a new row with the new contents. Basically,
+		it's the same rules as in the Perl API.
+		</para>
+
+		<indexterm>
+			<primary>Rowref</primary>
+		</indexterm>
+		<para>
+		The tricky part in the &Cpp; API is that you can't simply use an
+		<pre>Autoref<Row></pre> for rows. As described above, it won't know how to
+		destroy the Row when its reference counter goes to zero. Instead you
+		use a special variety of it called Rowref, defined in <pre>type/RowType.h</pre>.
+		It holds a reference both to the Row (that keeps the data) and to the RowType (that knows
+		how to work with the Row). The RowType must be correct for the Row.
+		It's possible to combine the completely unrelated Row and RowType, and
+		the result will be at least some garbage data, or at most a program
+		crash. The Perl wrapper goes to great lengths to make sure that this
+		doesn't happen. In the &Cpp; API you're on your own. You gain the
+		efficiency at the price of higher responsibility.
+		</para>
+
+		<para>
+		The general rule is that it's safe to combine a Row and RowType if this
+		RowType matches the RowType used to create that row. The matching
+		RowTypes may have different names of the fields but the same substance.
+		The methods described here do no type checking, and it's your responsibility
+		to make sure that the types are matching.
+		</para>
+
+		<indexterm>
+			<primary>Fdata</primary>
+		</indexterm>
+		<indexterm>
+			<primary>FdataVec</primary>
+		</indexterm>
+		<para>
+		A Row is created similarly to a RowType: build a vector describing the
+		values in the row, call the constructor, you get the row. The vector
+		type is FdataVec, and its element type is Fdata. Both of them are
+		top-level (i.e. Triceps::FdataVec and Triceps::Fdata), not inside some
+		other class, and both are defined in <pre>type/RowType.h</pre>.
+		</para>
+
+		<para>
+		An Fdata describes the data for one field. It tells whether the field
+		is not NULL, and if so, where to find the data to place into that
+		field. It doesn't know anything about the field types or such. It deals
+		with the raw bytes: the pointer to the first byte of the value, and the
+		number of bytes. As a special case, if you want the field to be filled
+		with zeroes, set the data pointer to NULL. It is possible to specify an
+		incorrect number of bytes, such as to create an int64 field of 3
+		bytes. This data will be garbage, and if it happens to be at the end of
+		the row, might cause a crash when read. It's your responsibility to store the
+		correct data. The same goes for the string fields: it's your
+		responsibility to make sure that the data is terminated with a <quote>\0</quote>,
+		and that <quote>\0</quote> is included into the length of the data. On the other
+		hand, the <b>uint8[]</b> array fields don't need a <quote>\0</quote> at the end, all the bytes
+		included into them are a part of the value.
+		</para>
+
+		<para>
+		The data vector gets constructed similarly to the field vector: either
+		start with an empty vector and push pack the elements, or allocate one
+		of the right size and set the elements. The relevant Fdata constructors
+		and methods are:
+		</para>
+
+<pre>
+Fdata();
+Fdata(bool notNull, const void *data, intptr_t len);
+void setPtr(bool notNull, const void *data, intptr_t len);
+void setNull();
+</pre>
+
+		<para>
+		If the argument <pre>notNull</pre> is false, the values of <pre>data</pre> and <pre>len</pre>
+		don't matter. The default constructor sets the <pre>notNull</pre> to false,
+		and thus can be used to create the NULL fields.
+		<pre>setNull()</pre> is also a shortcut of <pre>setPtr()</pre> that sets the <pre>notNull</pre> to false
+		and ignores the other fields. 
+		</para>
+		
+		<para>
+		The construction itself is done with the factory method <pre>RowType::makeRow()</pre>, and typically
+		the result it stored in a Rowref. Or there is a convenience constructor of Rowref
+		directly from an FdataVec.
+		It calls <pre>makeRow()</pre> internally so both forms provide the same result.
+		For example:
+		</para>
+
+<pre>
+uint8_t v_uint8[10] = "123456789"; // just a convenient representation
+int32_t v_int32 = 1234;
+int64_t v_int64 = 0xdeadbeefc00c;
+double v_float64 = 9.99e99;
+char v_string[] = "hello world";
+
+FdataVec fd1;
+fd1.push_back(Fdata(true, &v_uint8, sizeof(v_uint8)-1)); // exclude \0
+fd1.push_back(Fdata(true, &v_int32, sizeof(v_int32)));
+fd1.push_back(Fdata()); // a NULL field
+fd1.push_back(Fdata(false, NULL, 0)); // another NULL field
+fd1.push_back(Fdata(true, &v_float64, sizeof(v_float64)));
+fd1.push_back(Fdata(true, &v_string, sizeof(v_string)));
+
+Rowref r1(rt1,  rt1->makeRow(fd1));
+Rowref r2(rt1,  fd1);
+
+FdataVec fd2(3);
+fd2[0].setPtr(true, &v_uint8, sizeof(v_uint8)-1); // exclude \0
+fd2[1].setNull();
+fd2[2].setFrom(r1.getType(), r1.get(), 2); // copy from r1 field 2
+
+Rowref r3(rt1,  fd2);
+</pre>
+
+		<para>
+		The field fd2[2] shows yet another feature, copying the data from a
+		field of another row. It sets the data pointer to the location inside
+		the original row, and the data will be copied when the new row gets
+		created. So make sure to not release the reference to the original row
+		until the new row is created (Fdata has a helper field for that,
+		it will be shown later).  The prototype is:
+		</para>
+
+<pre>
+void setFrom(const RowType *rtype, const Row *row, int nf);
+</pre>
+
+		<para>
+		In the example above the vector fd2 is smaller than the number of fields in the row. The
+		rest of fields are then filled with NULLs. They actually are literally
+		filled with NULLs in fd2: if the size of the argument vector for
+		<pre>makeRow()</pre> is smaller than the number of fields in the row type, the
+		vector gets extended with the NULL values before anything is done with
+		it. It's no accident that the argument of the <pre>RowType::makeRow()</pre> is not
+		const, and the same applies to the Rowref constructor and assignment
+		from FdataVec:
+		</para>
+
+<pre>
+class RowType {
+	virtual Row *makeRow(FdataVec &data) const;
+};
+
+class Rowref {
+	Rowref(const RowType *t, FdataVec &data);
+	Rowref &operator=(FdataVec &data);
+};
+</pre>
+
+		<para>
+		It's also possible to have more elements in the FdataVec than in the
+		row type. In this case the extra arguments are considered the
+		<quote>overrides</quote>: the <quote>main</quote> elements set the size and
+		initial contents of the fields while the
+		overrides copy the data fragments over that. 
+		Remember, setting the <pre>data</pre> argument of Fdata methods to NULL makes the elements
+		initially set to all zeroes.
+		</para>
+
+		<indexterm>
+			<primary>override</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Row</primary>
+			<secondary>override</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>Fdata</primary>
+			<secondary>override</secondary>
+		</indexterm>
+		<para>
+		There is a special form of constructor and a setting method to build the
+		override fields:
+		</para>
+
+<pre>
+Fdata(int nf, intptr_t off, const void *data, intptr_t len);
+void setOverride(int nf, intptr_t off, const void *data, intptr_t len);
+</pre>
+
+		<para>
+		Here <pre>nf</pre> is the number (AKA index) of the field (starting from 0) whose 
+		contents is to be overridden, <pre>off</pre> is
+		the byte offset in it where the override will start, 
+		and <pre>data</pre> and <pre>len</pre> point to the location to copy
+		from as usual. 
+		</para>
+		
+		<para>
+		The overrides are a convenient way to
+		assemble the array fields from the fragments. The following
+		example shows the various permutations:
+		</para>
+
+<pre>
+RowType::FieldVec fields4;
+fields4.push_back(RowType::Field("a", Type::r_int64, RowType::Field::AR_VARIABLE));
+
+Autoref<RowType> rt4 = checkOrThrow(new CompactRowType(fields4));
+
+FdataVec fd4;
+Fdata fdtmp;
+
+// allocate space for 10 int64s, initially all 0s
+fd4.push_back(Fdata(true, NULL, sizeof(v_float64)*10)); 
+
+// override an element at index 2
+fd4.push_back(Fdata(0, sizeof(v_int64)*2, &v_int64, sizeof(v_int64)));
+
+// fill a temporary element with setOverride and apply it at index 4
+fdtmp.setOverride(0, sizeof(v_int64)*4, &v_int64, sizeof(v_int64));
+fd4.push_back(fdtmp);
+
+// manually copy an element from r1 to the index 5
+fdtmp.nf_ = 0;
+fdtmp.off_ = sizeof(v_int64)*5;
+r1.getType()->getField(r1.get(), 2, fdtmp.data_, fdtmp.len_);
+fd4.push_back(fdtmp);
+
+Rowref r4(rt4,  fd4);
+</pre>
+
+		<para>
+		This creates a row type from a single field <quote>a</quote> at index 0, an array of
+		int64. The data vector  fd4 has the 0th element define the space for 10
+		elements in the array, filled by default with zeroes. It doesn't have
+		to zero them, it could have copied the data from some location in memory. I've
+		just done the zeroing here to show how it can be done.
+		</para>
+
+		<para>
+		The rest of elements are the overrides constructed in different ways.
+		</para>
+
+		<para>
+		The first override sets the 2nd element (counting from 0) of the
+		array with the value from v_int64.
+		</para>
+
+		<para>
+		The second override uses the method <pre>setOverride()</pre> for the same purpose
+		on the 4th element.
+		It sets a temporary Fdata which then gets appended (copied) to the
+		vector. 
+		</para>
+
+		<para>
+		The third override shows a more involved way.
+		It copies the value from the row r1. Since there is no
+		ready method for this purpose (perhaps there should be?), it goes about
+		its way manually, setting the fields explicitly. <pre>nf_</pre> is the same as <pre>nf</pre>
+		in the methods, the field number to override. <pre>off_</pre> is the offset. And
+		the location and length get filled into <pre>data_</pre> and <pre>len_</pre> by <pre>getField()</pre>,
+		which takes the data from the row r1, field 2.
+		</para>
+
+		<para>
+		But wait, the field 2 of r1 has been set to NULL! Should not the NULL
+		indication be set in the copy as well? As it turns out, no. The NULL
+		indication (the field <pre>notNull_</pre> being set to false) is ignored by
+		<pre>makeRow()</pre> in the override elements. However <pre>getField()</pre> will set the
+		length to 0, so nothing will get copied. The value at index 5 will be
+		left as it was initially set, which happens to be 0.
+		</para>
+
+		<para>
+		So in the end the values in the field <quote>a</quote> array at indexes 2 and 4 will
+		be set to the same as v_int64, and at the other indexes 0...9 to 0.
+		</para>
+
+		<para>
+		If multiple overrides specify the overlapping ranges, they will just
+		sequentially overwrite each other, and the last one will win.
+		</para>
+
+		<para>
+		If an override attempts to specify writing past the end of the
+		originally reserved area of the field, it will be quietly ignored. Just
+		don't do this. If the field was originally set to NULL, its reserved
+		area will be zero bytes, so any overrides attempting to write into it
+		will be silently ignored.
+		</para>
+
+		<para>
+		The summary is: the overrides allow to build the array values
+		efficiently from the disjointed areas of memory, but if they are used,
+		they have to be used with care.
+		</para>
+
+		<para>
+		And for the reference the fields of Fdata that can be accessed directly:
+		</para>
+
+<pre>
+Rowref row_; // in case if data comes from another row, can be used
+	// to keep a hold on it, but doesn't have to 
+	// if the row won't be deleted anyway
+const char *data_; // data to store, may be NULL to just zero-fill
+intptr_t len_; // length of data to store
+intptr_t off_; // for overrides only: offset into the field
+int nf_; // for overrides only: index of field to fill
+bool notNull_; // this field is not null (only for non-overrides)
+</pre>
+
+		<para>
+		The field <pre>row_</pre> has been mentioned before. It's a convenience placeholder
+		for copying data from another row (and possibly replacing some of the
+		fields). You don't have to use it if you know that a reference to
+		the original row is kept somewhere until the construction of the new
+		row is completed. But sometimes this is difficult to do while
+		keeping the scopes straight. Then you can make <pre>row_</pre> refer to the
+		original row, and it's guaranteed to stay valid. Of course, if
+		you want to copy the fields from more than one original row,
+		you really have to keep the references to them in some other way.
+		</para>
+
+		<indexterm>
+			<primary>RowType</primary>
+		</indexterm>
+		<para>
+		As has been said at the start of this section, all the operations
+		on the rows are done through the RowType's methods. Let's take a closer
+		look at them. And to reiterate once again, the row must be created
+		with a matching type.
+		</para>
+
+<pre>
+bool isFieldNull(const Row *row, int nf) const;
+</pre>
+
+		<para>
+		Check whether a field is NULL, <pre>nf</pre> is the number (AKA index) of the field
+		starting from 0.
+		</para>
+
+<pre>
+bool getField(const Row *row, int nf, const char *&ptr, intptr_t &len) const;
+</pre>
+
+		<para>
+		Get a field's data, <pre>nf</pre> is the index (AKA <quote>number</quote>) of the field starting from
+		0.  The returned value will be true if the field is not NULL.  The
+		values at arguments <pre>ptr</pre> and <pre>len</pre> will be populated with
+		the pointer to the field's data in the row and its length information.
+		If the field is NULL, they will be set to NULL and 0.
+		</para>
+
+		<para>
+		The returned data pointer type is constant, to remind that the rows are
+		immutable and the data in them must not be changed.
+		However for the most types you can't refer by this pointer and get the
+		desired value directly, because the data might not be aligned right for
+		that data type. Because of this the returned pointer is a <pre>char*</pre> and not
+		<pre>void*</pre>. If you have an int64 field, you can't just do:
+		</para>
+
+<pre>
+int64_t *data;
+intptr_t len;
+if (getField(myrow, myfield, data, len)) {
+	int64_t val = *data; // WRONG!
+}
+</pre>
+
+		<para>
+		Fortunately, the type checks will catch this usage attempt right at the
+		call of <pre>getField()</pre>. But there also are the convenience functions that
+		return the values of particular types. They are implemented over
+		<pre>getField()</pre> and take care of the alignment issue.
+		</para>
+
+<pre>
+uint8_t getUint8(const Row *row, int nf, int pos = 0) const;
+int32_t getInt32(const Row *row, int nf, int pos = 0) const;
+int64_t getInt64(const Row *row, int nf, int pos = 0) const;
+double getFloat64(const Row *row, int nf, int pos = 0) const;
+const char *getString(const Row *row, int nf) const;
+</pre>
+
+		<para>
+		The convenience wrappers for getting the values of specific types.
+		The <pre>getString()</pre> returns only the pointer to the start of the
+		string, not the length, expecting that you will treat it like a C
+		string and rely on the <quote>\0</quote> at the end. Obviously,
+		if a string contains <quote>\0</quote> in the middle, that would
+		not work very well, and if you care about that, use <pre>getField()</pre>
+		directly instead.
+		</para>
+
+		<para>
+		If the field is NULL, these methods return the value of 0 for the numeric types,
+		and an empty string (<quote></quote>) for the string type, thus
+		simulating the Perl semantics of undefined values. If you care
+		about the field being NULL, check it separately:
+		</para>
+
+<pre>
+if (!rt1->isFieldNull(r1, nf)) {
+	int64_t val = rt1->getInt64(r1, nf);
+	...
+}
+</pre>
+
+		<para>
+		The field <pre>pos</pre> is the position in an array field. 
+		It's an array index, not a byte offset.
+		These methods don't
+		care very much about the differentiation of scalars and arrays, from
+		their standpoint a scalar is the same thing as an array of length 1.
+		So the default value <pre>pos</pre> = 0 works well for the scalars. For the arrays,
+		if pos is beyond the end of the array, the result is the same as
+		for a NULL field. Even more so, a NULL field is considered the same 
+		thing as an array of length 0, and it's really just a specific case
+		of the general rule: for a NULL field any <pre>pos</pre> value is considered
+		to be beyond the end of the array.
+		</para>
+
+		<para>
+		For a side note, the arguments of these calls are Row*, not Rowref.
+		It's cheaper, and OK for memory management because it's expected that
+		the row would be held in a Rowref variable anyway while the data is
+		extracted from it. Don't construct an anonymous rowref object and
+		immediately try to extract a value from it!
+		</para>
+
+<pre>
+int64_t val = rt1->getInt64(Rowref(rt1, datavec), nf); // WRONG!
+</pre>
+
+		<para>
+		However if you have an Fdata vector, there is no point in constructing a
+		row to extract back the same data in the first place.
+		</para>
+
+		<para>
+		The Rowref has the same-named convenience methods to access the
+		row stored in it, using the type stored in it. They are described in
+		detail below.
+		</para>
+
+<pre>
+void splitInto(const Row *row, FdataVec &data) const;
+</pre>
+
+		<para>
+		A convenience for copying the rows with modification of some fields.
+		Does the first part of the copying: splits the original row into the
+		field data references which can then be modified (the Fdata entries,
+		not the data itself) to change some fields. The vector referred by
+		the <pre>data</pre> argument will be resized to the number of fields in this row
+		type and filled with the information. This method <b>does not</b>
+		modify <pre>data.row_</pre> in any way, if you want to put a reference to
+		the original row in there, you have to do it manually.
+		</para>
+
+<pre>
+Row *makeRow(FdataVec &data) const;
+</pre>
+
+		<para>
+		Create a row from the data vector, as described above. If the size of
+		<pre>data</pre> is less than the number of fields in this row type, the vector
+		will be extended with the NULL fields before creating the row. If the
+		vector size is larger, the rest of fields will be treated as overrides.
+		</para>
+
+<pre>
+void destroyRow(Row *row) const;
+</pre>
+
+		<para>
+		The destructor for the rows. Normally is should never be called manually,
+		instead use Rowref to maintain the proper reference count and do the
+		destruction when the reference count goes to 0.
+		</para>
+
+<pre>
+Row *copyRow(const RowType *rtype, const Row *row) const;
+</pre>
+
+		<para>
+		Copy a row, essentially a combination of <pre>splitInto()</pre> and <pre>makeRow()</pre>.
+		Here the current row type and the <pre>rtype</pre> argument (which is
+		the type of the argument <pre>row</pre>) don't have to
+		be completely matching, the restriction is more loose:
+		one of them has to be a matching prefix of the other.
+		In other words, one of the types may have extra fields.
+		This method automatically takes care of either cutting these
+		extra fields if the result type is shorter or adding extra NULL fields
+		if the result type is longer.
+		</para>
+
+<pre>
+static void fillFdata(FdataVec &v, int nf);
+</pre>
+
+		<para>
+		Fill an FdataVec, extending it with NULL fields to the size <pre>nf</pre>.
+		If the vector is of an already the same length or longer, it is left
+		unchanged. Note that this method is static. There is practically no
+		need to call it manually, <pre>makeRow()</pre> calls it for you automatically.
+		</para>
+
+<pre>
+bool equalRows(const Row *row1, const Row *row2) const;
+</pre>
+
+		<indexterm>
+			<primary>IndexType</primary>
+			<secondary>FIFO</secondary>
+		</indexterm>
+		<para>
+		Check two rows for an absolute equality. Returns true if the rows are
+		equal, otherwise false. This is the method used by the FIFO indexes
+		to find the equal rows by value.
+		Right now it's defined to work only on the rows of the same type,
+		including the same representation (but since only one CompactRowType
+		representation is available, this is not a problem). When more
+		representations become available, it will likely be extended.
+		</para>
+
+<pre>
+bool isRowEmpty(const Row *row) const;
+</pre>
+
+		<para>
+		Check the row for emptiness. Returns true if all the fields in the
+		row are NULL.
+		</para>
+
+<pre>
+void hexdumpRow(string &dest, const Row *row, const string &indent="") const;
+</pre>
+
+		<para>
+		Dump the bytes of the row in a hexadecimal format, appending to the
+		destination string <pre>dest</pre>. This method is rarely needed in practice,
+		only to investigate some strange data corruptions. Since the Row object
+		is opaque, the length of its data is hidden. This method finds the
+		length and then passes the data to <pre>hexdump()</pre>, described in
+		<xref linkend="sc_cpp_string" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<indexterm>
+			<primary>Rowref</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Autoref</primary>
+		</indexterm>
+		<para>
+		And finally, as promised at the start of the section, a reference of Rowref,
+		defined in <pre>type/RowType.h</pre>.
+		Overall, it's a variety of Autoref, so all the Autoref methods (except constructors)
+		work unchanged, and a few more methods are added.
+		</para>
+
+		<para>
+		First, let's dig into some more details of why it is needed.
+		The rows in Triceps aren't necessarily just blobs of memory.
+		This feature isn't used anywhere yet, but the rows in Triceps are designed to be
+		able to contain references to the other rows and in general to the other
+		objects.  So they can't be destroyed by just freeing the memory. The
+		destructor must know, how to release the references to these nested
+		objects first. And knowing where these references are depends on the
+		type of the row. And rows may be of different types. This calls for a
+		virtual destructor.
+		</para>
+
+		<para>
+		But having a virtual destructor requires that every object has a
+		pointer to the table of virtual functions. That adds an overhead of 8
+		bytes per row, and the rows are likely to be kept by the million, and
+		that overhead adds up. So I've made the decision to save these 8 bytes
+		and split that knowledge. It might turn out to be a premature optimization,
+		but since it's something that would be difficult to change later, I've
+		got it in early.
+		</para>
+
+		<para>
+		The knowledge of how to destroy a row (and also how to copy the row and
+		to access the elements in it) is kept in the row type object. So a
+		reference to a row needs to know two things: the row and the row's
+		type. It's still the same extra 8 bytes of a pointer, but there are only a
+		few row references active at a time (the tables don't use the common
+		row references to keep the rows, instead they are implemented as a
+		special case and have one single row type for all the rows they store).
+		</para>
+
+		<para>
+		The constructor puts both these items into a Rowref:
+		</para>
+
+<pre>
+Rowref();
+Rowref(const RowType *t, Row *r = NULL);
+Rowref(const Rowref &ar);
+</pre>
+
+		<para>
+		The RowType will be referred from the new Rowref through an Autoref. So after
+		you've created the Rowref, feel free to discard any other references to the
+		RowType, the Rowref will keep it alive.
+		</para>
+
+		<para>
+		The RowType may be NULL if the Row is NULL.
+		</para>
+
+		<para>
+		The default constructor sets them both to NULL. Which is dangerous: make
+		sure to assign a proper RowType when you assign a Row, or your program
+		will crash on a NULL pointer. In fact, initially this class had no default
+		constructor because of this danger. But eventually the convenience of the
+		default constructor had outweighed the danger. Just be careful.
+		</para>
+
+<pre>
+Rowref(const RowType *t, FdataVec &data);
+</pre>
+
+		<para>
+		The convenience constructor that wraps the making of the Row from FdataVec.
+		</para>
+
+<pre>
+Rowref &operator=(const Rowref &ar);
+</pre>
+
+		<para>
+		Assign from another Rowref, copying both the RowType and Row.
+		</para>
+
+<pre>
+void assign(const RowType *t, Row *r);
+</pre>
+
+		<para>
+		Assign the explicit RowType and Row. The Row may be NULL. The RowType might
+		also be NULL, but only if the Row is NULL.
+		</para>
+
+<pre>
+Rowref &operator=(Row *r);
+</pre>
+
+		<para>
+		Assign just the Row, preserving the RowType. Make sure that the previously set
+		type is not NULL and matches the row!
+		</para>
+
+<pre>
+Rowref &operator=(FdataVec &data)
+</pre>
+
+		<para>
+		A convenience wrapper: make the Row from FdataVec and assign it. Rowref's
+		current RowType is used to construct the Row, so it must be not NULL.
+		</para>
+
+<pre>
+Rowref &copyRow(const RowType *rtype, const Row *row);
+Rowref &copyRow(const Rowref &ar);
+</pre>
+
+		<para>
+		More convenience wrappers: make a copy of a Row and assign it. The usual
+		caveats of copying and assignment apply. And the original row must not be NULL.
+		</para>
+
+<pre>
+Row *get() const;
+const RowType *getType() const;
+</pre>
+
+		<para>
+		Get the row an the type back. 
+		</para>
+
+		<para>
+		The usual conversion to a Row pointer and
+		the operator <pre>-></pre> on it also work automatically, and <pre>isNull()</pre>
+		checks if the Row is NULL. The operators <pre>==</pre> and <pre>!=</pre> check for the
+		equality of the Row pointer, ignoring the RowType pointer.
+		</para>
+
+<pre>
+bool isRowEmpty() const
+</pre>
+
+		<para>
+		Another convenience wrapper for checking if all the fields in the Row are NULL.
+		The Row pointer itself must not be NULL.
+		</para>
+
+<pre>
+uint8_t getUint8(int nf, int pos = 0) const;
+int32_t getInt32(int nf, int pos = 0) const;
+int64_t getInt64(int nf, int pos = 0) const;
+double getFloat64(int nf, int pos = 0) const;
+const char *getString(int nf) const;
+</pre>
+
+		<para>
+		These convenience wrappers work exactly the same as the methods of the RowType.
+		The Row must not be NULL.
+		</para>
+
+	</sect1>
+

@@ -1,0 +1,502 @@
+#!/usr/bin/perl -w
+
+#$id: $
+
+eval 'exec /usr/bin/perl -w -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
+require 5.004;
+
+use Tk 800.000;
+use Tk::Zinc;   # only for getting $Tk::Zinc::VERSION
+use lib Tk->findINC('demos/widget_lib');
+use Tk::widgets qw/Dialog ErrorDialog ROText/;
+use WidgetDemo;
+use subs qw/invoke lsearch see_code see_vars show_stat view_widget_code/;
+use vars qw/$MW $FONT $WIDTRIB/;
+use vars qw/$CODE $CODE_RERUN $CODE_TEXT $VARS $VIEW $VIEW_TEXT/;
+use vars qw/$BRAKES $LIGHTS $OIL $SOBER $TRANS $WIPERS/;
+use vars qw/$COLOR $FONT_STYLE $POINT_SIZE $DEMO_FILE %DEMO_DESCRIPTION/;
+use strict;
+
+use vars qw( $VERSION );
+($VERSION) = sprintf("%d.%02d", q$Revision: 1.27 $ =~ /(\d+)\.(\d+)/);
+
+my $version = $Tk::Zinc::VERSION;
+print "Tkzinc version: $version\n";
+
+$MW = Tk::MainWindow->new;
+$MW->configure(-menu => my $menubar = $MW->Menu);
+
+{
+    package WidgetWrap;
+    @WidgetWrap::ISA = qw/Tk::MainWindow/;
+
+    # This magic conspires with widget's AUTOLOAD subroutine to make user
+    # contributed demonstrations that don't use WidgetDemo embed properly.
+    # The trick works because widget creates a superclass of Tk::MainWindow
+    # which invokes WidgetDemo() implicitly. You loose if you bypass the
+    # inheritance mechanism and call Tk::MainWindow directly.
+
+    sub new {
+	my ($name) = $::DEMO_FILE =~ m#([^/]+).pl$#;
+	$::MW->WidgetDemo(-name => $name, -text => $::DEMO_DESCRIPTION{$name} || "" );
+    }
+}
+
+@MainWindow::ISA = 'WidgetWrap';
+
+$MW->title('TkZinc Perl demonstrations');
+$FONT = '-*-Helvetica-Medium-R-Normal--*-140-*-*-*-*-*-*';
+my $widget_lib = Tk->findINC('demos/widget_lib');
+# the previous simple statement $zinc_lib = Tk->findINC('demos/zinc_lib');
+# found in some cases such old directory empty (e.g. after a previous package de-installation)
+# So now, we look for a non-empty demos/zinc_lib directory (ie containing one of the demo!)
+my $zinc_lib = Tk->findINC('demos/zinc_lib/tiger.pl');
+($zinc_lib) = $zinc_lib =~ /(.*)\/tiger\.pl/;
+my $wd = "$widget_lib/WidgetDemo.pm";
+$WIDTRIB = Tk->findINC('demos/zinc_contrib_lib/README');
+($WIDTRIB) = $WIDTRIB =~ /(.*)\/README/;
+unless (Tk::tainting) {
+    $WIDTRIB = $ENV{WIDTRIB} if defined $ENV{WIDTRIB};
+    $WIDTRIB = $ARGV[0] if defined $ARGV[0];
+}
+
+# The code below creates the main window, consisting of a menu bar
+# and a text widget that explains how to use the program, plus lists
+# all of the demos as hypertext items.
+
+my $file = $menubar->cascade(qw/-label File -underline 0 -menuitems/ =>
+    [
+      [cascade    => '~View', -menuitems =>
+        [
+          [command  => '~zinc-demos', -command => [\&view_widget_code, __FILE__]],
+          [command  => '~WidgetDemo', -command => [\&view_widget_code, $wd]],
+        ], # end cascade menuitems
+      ], # end view cascade
+      '',
+      [command    => '~Quit', -command => [\&exit]],
+    ]);
+
+my $help = $menubar->cascade(qw/-label Help -underline 0 -menuitems/ =>
+    [
+      [command    => '~About'],
+    ]);
+
+my $T = $MW->Scrolled('ROText',
+    -scrollbars => 'e',		
+    -wrap       => 'word',
+    -width      => 60,
+    -height     => 30,
+    -font       => $FONT,
+    -setgrid    => 1,
+)->grid(qw/-sticky nsew/);
+$MW->gridRowconfigure(   0, -weight => 1); # allow expansion in both ...
+$MW->gridColumnconfigure(0, -weight => 1); # ... X and Y dimensions
+
+my $STATUS_VAR;
+my $status = $MW->Label(-textvariable => \$STATUS_VAR, qw/-anchor w/);
+$status->grid(qw/-sticky ew/);
+
+# Create a bunch of tags to use in the text widget, such as those for
+# section titles and demo descriptions.  Also define the bindings for
+# tags.
+
+$T->tagConfigure(qw/title -font -*-Helvetica-Bold-R-Normal--*-180-*-*-*-*-*-*/);
+$T->tagConfigure(qw/demo -lmargin1 1c -lmargin2 1c -foreground blue/);
+
+if ($MW->depth  == 1) {
+    $T->tagConfigure(qw/hot -background black -foreground white/);
+    $T->tagConfigure(qw/visited -lmargin1 1c -lmargin2 1c -underline 1/);
+} else {
+    $T->tagConfigure(qw/hot -relief raised -borderwidth 1 -foreground red/);
+    $T->tagConfigure(qw/visited -lmargin1 1c -lmargin2 1c -foreground/ =>
+	    '#303080');
+}
+
+$T->tagBind(qw/demo <ButtonRelease-1>/ => \&invoke);
+my $last_line = '';
+$T->tagBind(qw/demo <Enter>/ => [sub {
+	my($text, $sv) = @_;
+	my $e = $text->XEvent;
+	my($x, $y) = ($e->x, $e->y);
+	$last_line = $text->index("\@$x,$y linestart");
+	$text->tagAdd('hot', $last_line, "$last_line lineend");
+	$text->configure(qw/-cursor hand2/);
+	show_stat $sv, $text, $text->index('current');
+    }, \$STATUS_VAR]
+);
+$T->tagBind(qw/demo <Leave>/ => [sub {
+	my($text, $sv) = @_;
+	$text->tagRemove(qw/hot 1.0 end/);
+	$text->configure(qw/-cursor xterm/);
+	$$sv = '';
+    }, \$STATUS_VAR]
+);
+$T->tagBind(qw/demo <Motion>/ => [sub {
+	my($text, $sv) = @_;
+	my $e = $text->XEvent;
+	my($x, $y) = ($e->x, $e->y);
+	my $new_line = $text->index("\@$x,$y linestart");
+	if ($new_line ne $last_line) {
+	    $text->tagRemove(qw/hot 1.0 end/);
+	    $last_line = $new_line;
+	    $text->tagAdd('hot', $last_line, "$last_line lineend");
+	}
+	show_stat $sv, $text, $text->index('current');
+    }, \$STATUS_VAR]
+);
+
+# Create the text for the text widget.
+
+$T->insert('end', "TkZinc perl Demonstrations ($version)\n", 'title');
+$T->insert('end',
+"\nThis application provides a front end for several short scripts in perl/Tk that demonstrate what you can do with the TkZinc widget.  Each of the numbered lines below describes a demonstration;  you can click on it to invoke the demonstration.  Once the demonstration window appears, you can click the \"See Code\" button to see the Perl/Tk code that created the demonstration.\n");
+
+$T->insert('end', "\n", '', "Small applications\n", 'title');
+$T->insert('end', "1. A simple animated application \"the Wheel of Fortune\".\n", [qw/demo demo-wheelOfFortune/]);
+$T->insert('end', "2. A simple radar display.\n", [qw/demo demo-simpleradar/]);
+$T->insert('end', "3. Zetris a clone of the famous tetris game (requires openGL.)\n", [qw/demo demo-Zetris/]);
+$T->insert('end', "4. ATC sample fake electronic strips (nicer with openGL.)\n", [qw/demo demo-groups_in_ATC_strips/]);
+$T->insert('end', "5. The famous tiger using the X11 shape extension. (nicer with openGL)\n", [qw/demo demo-tiger/]);
+$T->insert('end', "6. A magic lens based on Graphics.pm. (nicer with openGL)\n", [qw/demo demo-MagicLens/]);
+
+
+$T->insert('end', "\n", '', "All Items\n", 'title');
+$T->insert('end', "1. Examples of all items.\n", [qw/demo demo-items/]);
+$T->insert('end', "2. All items options (and their types).\n", [qw/demo demo-all_options/]);
+$T->insert('end', "3. Examples of line style and line termination.\n", [qw/demo demo-lines/]);
+$T->insert('end', "4. Curves with multiple contours.\n", [qw/demo demo-contours/]);
+$T->insert('end', "5. Examples of labelformat.\n", [qw/demo demo-labelformat/]);
+$T->insert('end', "6. Use of mapinfos.\n", [qw/demo demo-mapinfo/]);
+$T->insert('end', "7. Curves with cubic bezier control points.\n", [qw/demo demo-curve_bezier/]);
+$T->insert('end', "8. Curves with multiple contours and various fillrule.\n", [qw/demo demo-fillrule/]);
+
+
+$T->insert('end', "\n", '', "Groups, Priority, Clipping and PathTags\n", 'title');
+$T->insert('end', "1. Groups and Priorities.\n", [qw/demo demo-groups_priority/]);
+$T->insert('end', "2. Clipping examples (with simple or multiple contours).\n", [qw/demo demo-clipping/]);
+$T->insert('end', "3. Group atomicity.\n", [qw/demo demo-atomic-groups/]);
+$T->insert('end', "4. \"Windows\" with four glasses using curve with multiple contours.\n", [qw/demo demo-window-contours/]);
+$T->insert('end', "5. A counter quite impossible to do without clipping (requires openGL).\n", [qw/demo demo-counter/]);
+$T->insert('end', "6. Using pathTags.\n", [qw/demo demo-path_tags/]);
+
+$T->insert('end', "\n", '', "Interactions\n", 'title');
+$T->insert('end', "1. Simple interaction on a track.\n", [qw/demo demo-simple_interaction_track/]);
+$T->insert('end', "2. Text input in a text item and a track item.\n", [qw/demo demo-textInput/]);
+
+
+$T->insert('end', "\n", '', "Transformation\n", 'title');
+$T->insert('end', "1. Translating.\n", [qw/demo demo-translation/]);
+$T->insert('end', "2. Rotating.\n",    [qw/demo demo-rotation/]);
+$T->insert('end', "3. Zooming.\n",     [qw/demo demo-zoom/]);
+$T->insert('end', "4. Transformation testbed.\n",     [qw/demo demo-transforms/]);
+$T->insert('end', "5. Zooming/Rotating icon and text. (even without openGL)\n",     [qw/demo demo-icon_zoom_resize/]);
+
+$T->insert('end', "\n", '', "Use of openGL\n", 'title');
+$T->insert('end', "1. A zoomable/rotatable TkZinc Logo (better with openGL).\n",  [qw/demo demo-tkZincLogo/]);
+$T->insert('end', "2. Axial color variation on the X axis (requires openGL).\n", [qw/demo demo-color-x/]);
+$T->insert('end', "3. Axial color variation on the Y axis (requires openGL).\n", [qw/demo demo-color-y/]);
+$T->insert('end', "4. Circular color variation (requires openGL).\n", [qw/demo demo-color-circular/]);
+$T->insert('end', "5. Path and Conical color variations (requires openGL).\n", [qw/demo demo-color-path-and-conic/]);
+$T->insert('end', "6. The triangles item (requires openGL).\n",  [qw/demo demo-triangles/]);
+$T->insert('end', "7. A set of demos based on Graphics.pm module (really better with openGL).\n",  [qw/demo demo-testGraphics/]);
+
+
+
+$T->insert('end', "\n", '', "User Contributed Demonstrations\n", 'title');
+opendir(C, $WIDTRIB) or warn "Cannot open $WIDTRIB: $!";
+my(@dirent) = grep /^.+\.pl$/, sort(readdir C);
+closedir C;
+unshift @dirent, 'TEMPLATE.pl';	# I want it first
+my $i = 0;
+while ($_ = shift @dirent) {
+    next if /TEMPLATE\.pl/ and $i != 0;
+    unless (open(C, "$WIDTRIB/$_")) {
+	warn "Cannot open $_: $!" unless /TEMPLATE\.pl/;
+	next;
+    }
+    my($name) = /^(.*)\.pl$/;
+    $_ = <C>; $_ = <C>; 
+    my($title) = /^#\s*(.*)$/;
+    $DEMO_DESCRIPTION{$name} = $title;
+    close C;
+    $T->insert('end', ++$i . ". $title\n", ['demo', "demo-$name"]);
+}
+
+# Create all the dialogs required by this demonstration.
+
+my $DIALOG_ABOUT = $MW->Dialog(
+    -title          => 'About zinc-demos',
+    -bitmap         => 'info',
+    -default_button => 'OK',
+    -buttons        => ['OK'],
+    -text           => "TkZinc Perl demonstrations\n\nPerl Version $]" .
+		       "\nTk Version $Tk::VERSION" .
+                       "\nTkZinc Version $Tk::Zinc::VERSION\n",
+);
+$help->cget(-menu)->entryconfigure('About',
+    -command => [$DIALOG_ABOUT => 'Show'],
+);
+
+my $DIALOG_ICON = $MW->Dialog(
+    -title          => 'Bitmap Menu Entry',
+    -bitmap         => undef,
+    -default_button => 'OK',
+    -buttons        => ['OK'],
+    -text           => 'The menu entry you invoked displays a bitmap rather than a text string.  Other than this, it is just like any other menu entry.',
+);
+$DIALOG_ICON->configure(-bitmap => undef); # keep -w from complaining
+
+MainLoop;
+
+sub AUTOLOAD {
+
+    # This routine handles the loading of most demo methods.
+
+    my($demo) = @_;
+
+    $T->Busy;
+    {
+	$DEMO_FILE = "$WIDTRIB/${demo}.pl" if -f "$WIDTRIB/${demo}.pl";
+	$DEMO_FILE = "$zinc_lib/${demo}.pl" if -f "$zinc_lib/${demo}.pl";
+	if (defined $DEMO_FILE) {
+	    do $DEMO_FILE ;
+	} else { warn "No such demo: $demo.pl in either $WIDTRIB/ or $zinc_lib/\n"; }
+	warn $@ if $@;
+    }
+    $T->Unbusy;
+    goto &$::AUTOLOAD if defined &$::AUTOLOAD;
+
+} # end AUTOLOAD
+
+sub invoke {
+
+    # This procedure is called when the user clicks on a demo description.
+
+    my($text) = @_;
+
+    my $index = $text->index('current');
+    my @tags = $T->tagNames($index);
+    my $i = lsearch('demo\-.*', @tags);
+    return if $i < 0;
+    my($demo) = $tags[$i] =~ /demo-(.*)/;
+    $T->tagAdd('visited', "$index linestart", "$index lineend");
+    {
+	no strict 'refs';
+	&$demo($demo);
+    }
+
+} # end invoke
+
+sub lsearch {
+
+    # Search the list using the supplied regular expression and return it's
+    # ordinal, or -1 if not found.
+
+    my($regexp, @list) = @_;
+    my($i);
+
+    for ($i=0; $i<=$#list; $i++) {
+        return $i if $list[$i] =~ /$regexp/;
+    }
+    return -1;
+
+} # end lsearch
+
+sub see_code {
+
+    # This procedure creates a toplevel window that displays the code for
+    # a demonstration and allows it to be edited and reinvoked.
+
+    my($demo) = @_;
+
+    my $file = "${demo}.pl";
+    if (not Exists $CODE) {
+	$CODE = $MW->Toplevel;
+	my $code_buttons = $CODE->Frame;
+	$code_buttons->pack(qw/-side bottom -fill x/);
+	my $code_buttons_dismiss = $code_buttons->Button(
+            -text    => 'Dismiss',
+            -command => [$CODE => 'withdraw'],
+	);
+	$CODE_RERUN = $code_buttons->Button(-text => 'Rerun Demo');
+	$CODE_TEXT = $CODE->Scrolled('Text',
+				     qw/-scrollbars e -height 40 -setgrid 1/);
+	$code_buttons_dismiss->pack(qw/-side left -expand 1/);
+	$CODE_RERUN->pack(qw/-side left -expand 1/);
+	$CODE_TEXT->pack(qw/-side left -expand 1 -fill both/);
+    } else {
+	$CODE->deiconify;
+	$CODE->raise;
+    }
+    $CODE_RERUN->configure(-command => sub {
+	eval $CODE_TEXT->get(qw/1.0 end/);
+	{
+	    no strict 'refs';
+	    &$demo($demo);
+	}
+    });
+    $CODE->iconname($file);
+    $file = "$WIDTRIB/${demo}.pl" if -f "$WIDTRIB/${demo}.pl";
+    $file = "$zinc_lib/${demo}.pl" if -f "$zinc_lib/${demo}.pl";
+    $CODE->title("Demo code: $file");
+    $CODE_TEXT->delete(qw/1.0 end/);
+    open(CODE, "<$file") or warn "Cannot open demo file $file: $!";
+    {
+	local $/ = undef;
+	$CODE_TEXT->insert('1.0', <CODE>);
+    }
+    close CODE;
+    $CODE_TEXT->markSet(qw/insert 1.0/);
+
+} # end see_code
+
+sub see_vars {
+
+    # Create a top-level window that displays a bunch of global variable values
+    # and keeps the display up-to-date even when the variables change value.
+    # $args is a pointer to a list of list of 2:
+    #
+    #   ["variable description", \$VAR]
+    #
+    # The old trick of passing a string to serve as the description and a soft
+    # reference to the variable no longer works with lexicals and use strict.
+
+    my($parent, $args) = @_;
+
+    $VARS->destroy if Exists($VARS);
+    $VARS = $parent->Toplevel;
+    $VARS->geometry('+300+300');
+    $VARS->title('Variable Values');
+    $VARS->iconname('Variables');
+
+    my $title = $VARS->Label(
+        -text   => 'Variable Values:',
+        -width  => 20,
+        -anchor => 'center',
+        -font   => '-*-helvetica-medium-r-normal--*-180-*-*-*-*-*-*',
+    );
+    $title->pack(qw/-side top -fill x/);
+    my($label, $var);
+    foreach my $i (@$args) {
+	($label, $var) = @$i;
+	my $wf = $VARS->Frame->pack(qw/-anchor w/);
+	$wf->Label(-text => "$label: ")->pack(qw/-side left/);
+	$wf->Label(-textvariable => $var)->pack(qw/-side left/);
+    }
+    $VARS->Button(-text => 'OK', -command => [$VARS => 'destroy'])->
+        pack(qw/-side bottom -pady 2/);
+
+} # end see_vars
+
+sub show_stat {
+
+    # Display name of current demonstration.  $sv is a reference to the
+    # status Label -textvariable, $text is the Text widget reference and
+    # $index is the demonstration index in the Text widget.
+
+    my($sv, $text, $index) = @_;
+
+    my @tags = $text->tagNames($index);
+    my $i = lsearch('demo\-.*', @tags);
+    return if $i < 0;
+    my($demo) = $tags[$i] =~ /demo-(.*)/;
+    $$sv = "Click Button-1 to run the \"$demo\" demonstration.";
+
+} # end show_stat
+
+sub view_widget_code {
+
+    # Expose a file's innards to the world too, but only for viewing.
+
+    my($widget) = @_;
+
+    if (not Exists $VIEW) {
+	$VIEW = $MW->Toplevel;
+	$VIEW->iconname('widget');
+	my $view_buttons = $VIEW->Frame;
+	$view_buttons->pack(qw/-side bottom -expand 1 -fill x/);
+	my $view_buttons_dismiss = $view_buttons->Button(
+            -text    => 'Dismiss',
+            -command => [$VIEW => 'withdraw'],
+	);
+	$view_buttons_dismiss->pack(qw/-side left -expand 1/);
+	$VIEW_TEXT = $VIEW->Scrolled('Text',
+				     qw/-scrollbars e -height 40 -setgrid 1/);
+	$VIEW_TEXT->pack(qw/-side left -expand 1 -fill both/);
+    } else {
+	$VIEW->deiconify;
+	$VIEW->raise;
+    }
+    $VIEW->title("Demo code: $widget");
+    $VIEW_TEXT->configure(qw/-state normal/);
+    $VIEW_TEXT->delete(qw/1.0 end/);
+    open(VIEW, "<$widget") or warn "Cannot open demo file $widget: $!";
+    {
+	local $/ = undef;
+	$VIEW_TEXT->insert('1.0', <VIEW>);
+    }
+    close VIEW;
+    $VIEW_TEXT->markSet(qw/insert 1.0/);
+    $VIEW_TEXT->configure(qw/-state disabled/);
+
+} # end view_widget_code
+
+__END__
+
+=head1 NAME
+
+zinc-demos - Demonstration of TkZinc widget functionnality
+
+=head1 SYNOPSYS
+
+  zinc-demos [ directory ]
+
+=head1 DESCRIPTION
+
+This script demonstrates the various functions offered by Tk Zinc widget.
+This file only contains code to
+generate the main window for the application, which invokes individual
+demonstrations.  The code for the actual demonstrations is contained in
+separate ".pl" files in the "zinc_lib" directory, which are autoloaded
+by this script as needed.
+
+widget looks in the directory specified on the command line to load user
+contributed demonstrations.  If no directory name is specified when widget is
+invoked and the environment variable WIDTRIB is defined then demonstrations
+are loaded from the WIDTRIB directory. If WIDTRIB is undefined then widget
+defaults to the released user contributed directory, "zinc_contrib_lib".
+
+=head2 History
+
+ #
+ # Stephen O. Lidie, LUCC, 96/03/11.  lusol@Lehigh.EDU
+ # Stephen O. Lidie, LUCC, 97/01/01.  lusol@Lehigh.EDU
+ # Stephen O. Lidie, LUCC, 97/02/11.  lusol@Lehigh.EDU
+ # Stephen O. Lidie, LUCC, 97/06/07.  lusol@Lehigh.EDU
+ #     Update for Tk402.00x.  Total revamp:  WidgetDemo, Scrolled, released
+ #     composites, -menuitems, qw//, etcetera.  Perl 5.004 required.
+ # Stephen O. Lidie, LUCC, 98/03/10.  lusol@Lehigh.EDU
+ #     Update for Tk8.
+ # Stephen O. Lidie, LUCC, 98/06/26.  Stephen.O.Lidie@Lehigh.EDU
+ #     Add Common Dialogs for Tk800.007.
+ # Stephen.O.Lidie@Lehigh.EDU, 1999/11/29, Lehigh University.
+ #     Demo some "dash patch" changes.
+ # Stephen.O.Lidie@Lehigh.EDU, 2000/01/11, Lehigh University.
+ #     Update menubar to Tk 8, fix color palette Menubutton demo.
+ # Stephen.O.Lidie@Lehigh.EDU, 2000/07/06, Lehigh University.
+ #     Remove inswt() from widget and styles.pl to show the proper Perl/Tk
+ #     idiom for inserting Text tags.  Various and sundry cleanups.
+ # Christophe Mertz <mertz@cena.fr>, 2002/03/06, CENA fr
+ #     adaptation for zinc demos purposes.
+
+=head1 AUTHOR
+
+Steve Lidie <Stephen.O.Lidie@Lehigh.EDU> and slight adaptation by Christophe Mertz <mertz@cena.fr>
+
+=head1 SEE ALSO
+
+The zinc documentation is available as a pdf file refman.pdf and as an html pages refman/index.html
+
+=cut

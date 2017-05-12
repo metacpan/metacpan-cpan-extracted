@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_fnbind">
+		<title>FnBinding reference</title>
+
+		<indexterm>
+			<primary>FnBinding</primary>
+		</indexterm>
+		<para>
+		FnBinding is defined in <pre>sched/FnBinding.h</pre>, and substantially matches
+		the Perl version. It inherits from Starget, and can be used in only one
+		thread.
+		</para>
+
+		<para>
+		Like many other classes, it has the constructor and the static <pre>make()</pre>
+		function:
+		</para>
+
+<pre>
+FnBinding(const string &name, FnReturn *fn);
+static FnBinding *make(const string &name, FnReturn *fn);
+</pre>
+
+		<para>
+		The binding is constructed on a specific FnReturn and obtains (references)
+		the RowSetType from it. The FnReturn must be initialized before it can
+		be used to create the bindings. Later the FnBinding can be pushed onto any matching
+		FnReturn, not just the one it was constructed with.
+		</para>
+
+		<para>
+		It's generally constructed in a chain fashion:
+		</para>
+
+<pre>
+Autoref<FnBinding> bind = FnBinding::make(fn)
+	->addLabel("lb1", lb1, true)
+	->addLabel("lb2", lb2, false);
+</pre>
+
+		<para>
+		Each method in the chain returns the same FnBinding object. The method
+		<pre>addLabel()</pre> adds one concrete label that gets connected to the
+		FnReturn's label by name. The other chainable method is <pre>withTray()</pre>
+		which switches the mode of collecting the resulting rowops in a tray
+		rather than calling them immediately.
+		</para>
+
+		<para>
+		The errors encountered during the chained construction are remembered
+		and can be read later with the method:
+		</para>
+
+<pre>
+Erref getErrors() const;
+</pre>
+
+		<para>
+		You must check the bindings for errors before using it. A binding with
+		errors may not be used.
+		</para>
+
+		<para>
+		Or you can use the <pre>checkOrThrow()</pre> wrapper from <pre>common/Initialize.h</pre> to
+		automatically convert any detected errors to an Exception:
+		</para>
+
+<pre>
+Autoref<FnBinding> bind = checkOrThrow(FnBinding::make(fn)
+	->addLabel("lb1", lb1, true)
+	->addLabel("lb2", lb2, false)
+	->withTray(true)
+);
+</pre>
+
+		<para>
+		Continuing with the details of chainable methods:
+		</para>
+
+<pre>
+FnBinding *addLabel(const string &name, Autoref<Label> lb, bool autoclear);
+</pre>
+
+		<para>
+		Adds a label to the binding. The name must match a name from the
+		FnReturn, and there may be only one label bound to a name (some names
+		from the return may be left unbound, and the rowops coming to them
+		will be ignored). The label must have a type
+		matching the named FnReturn's label. The autoclear flag enables the
+		automatic clearing of the label (and also forgetting it in the Unit)
+		when the binding gets destroyed. This allows to create and destroy the
+		bindings dynamically as needed. So, basically, if you've created a
+		label just for the binding, use <pre>autoclear==true</pre>. If you do a binding to
+		a label that exists in the model by itself and can be used without the
+		binding, use <pre>autoclear==false</pre>.
+		</para>
+
+		<para>
+		In principle, nothing stops you from adding more labels later (though
+		you can't remove nor replace the labels that are already added). Just
+		make sure that their types match the expected ones.
+		</para>
+
+		<para>
+		The labels in the FnBinding may belong to a different Unit than the
+		FnReturn. This allows to use the FnReturn/FnBinding coupling to connect
+		the units.
+		</para>
+
+<pre>
+FnBinding *withTray(bool on);
+</pre>
+
+		<para>
+		Changes the tray collection mode, the argument <pre>on==true</pre> enables it, 
+		<pre>on==false</pre>
+		disables. Can be done at any time, not just at construction. Disabling
+		the tray mode discards the current tray. If the tray mode is enabled,
+		whenever the binding is pushed onto a return and the rowops come into
+		it, the labels in this binding won't be called immediately but they
+		would adopt the incoming rowops, and the result will be queued into a
+		tray, to be executed later.
+		</para>
+
+<pre>
+Onceref<Tray> swapTray();
+</pre>
+
+		<para>
+		Used with the tray collection mode, normally after some rowops have
+		been collected in the tray. Returns the current tray and replaces it in
+		the binding with a new clean tray. You can call the returned tray
+		afterwards. If the tray mode is not enabled, will return NULL, and
+		won't create a new tray.
+		</para>
+
+<pre>
+Tray *getTray() const;
+</pre>
+
+		<para>
+		Get the current tray. You can use and modify the tray contents in any
+		usual way.  If the tray mode is not enabled, will return NULL.
+		</para>
+
+<pre>
+void callTray();
+</pre>
+
+		<para>
+		A convenience combination method that swaps the tray and calls it. This
+		method is smart about the labels belonging to different units. Each
+		rowop in the tray is called with its proper unit, that is found from
+		the rowop's label. Mixing the labels of multiple units in one binding
+		is probably still not such a great idea, but it works anyway.
+		</para>
+
+<pre>
+const string &getName() const;
+</pre>
+
+		<para>
+		Get back the binding's name.
+		</para>
+
+<pre>
+RowSetType *getType() const;
+</pre>
+
+		<para>
+		Get the type of the binding. It will be the same row set type object as
+		created in the FnReturn that was used to construct this FnBinding.
+		</para>
+
+<pre>
+int size() const;
+</pre>
+
+		<para>
+		Get the number of labels in the row set type (of all available labels,
+		not just the ones that have been added).
+		</para>
+
+<pre>
+const RowSetType::NameVec &getLabelNames() const;
+const RowSetType::RowTypeVec &getRowTypes() const;
+const string *getLabelName(int idx) const;
+RowType *getRowType(const string &name) const;
+RowType *getRowType(int idx) const;
+</pre>
+
+		<para>
+		The convenience wrappers that translate to the same methods in the
+		RowSetType.
+		</para>
+
+<pre>
+Label *getLabel(const string &name) const;
+int findLabel(const string &name) const;
+Label *getLabel(int idx) const;
+</pre>
+
+		<para>
+		Methods similar to FnReturn that allow to translate the names to
+		indexes and get the labels by name or index. The same return values,
+		the index -1 is returned for an unknown name, and a NULL label pointer
+		is returned for an unknown name, an incorrect index and an undefined label
+		at a correct name or index.
+		</para>
+
+<pre>
+typedef vector<Autoref<Label> > LabelVec;
+const LabelVec &getLabels() const;
+</pre>
+
+		<para>
+		Return all the labels as a vector. This is an internal vector of the
+		class, so only a const reference is returned. The elements for
+		undefined labels will contain NULLs.
+		</para>
+
+<pre>
+typedef vector<bool> BoolVec;
+const BoolVec &getAutoclear() const;
+</pre>
+
+		<para>
+		Return the vector of the autoclear flags for the labels.
+		</para>
+
+<pre>
+bool isAutoclear(const string &name) const;
+</pre>
+
+		<para>
+		Get the autoclear flag for a label by name. If the name is unknown,
+		will quietly return <pre>false</pre>.
+		</para>
+
+<pre>
+bool equals(const FnReturn *t) const;
+bool match(const FnReturn *t) const;
+bool equals(const FnBinding *t) const;
+bool match(const FnBinding *t) const;
+</pre>
+
+		<para>
+		Similarly to the FnReturn, the convenience methods that compare the
+		types between the FnReturns and FnBindings. They really translate to
+		the same methods on the types of the returns or bindings. 
+		</para>
+	</sect1>

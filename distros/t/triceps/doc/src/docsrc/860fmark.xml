@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_framemark">
+		<title>FrameMark reference</title>
+
+		<indexterm>
+			<primary>frame mark</primary>
+		</indexterm>
+		<para>
+		The FrameMark (defined in <pre>sched/FrameMark.h</pre>) marks the unit's frame at
+		the start of the loop, to fork there the rowops for the next iterations
+		of the loop. It's pretty simple:
+		</para>
+
+<pre>
+FrameMark(const string &name);
+</pre>
+
+		<para>
+		The constructor. It gives the mark a name. A FrameMark is an Starget,
+		so it may be used only in one thread.
+		</para>
+
+<pre>
+const string &getName() const;
+</pre>
+
+		<para>
+		Read back the name.
+		</para>
+
+<pre>
+Unit *getUnit() const;
+</pre>
+
+		<para>
+		This method is different from <pre>getUnit()</pre> on most of the other classes.
+		It returns the pointer to the unit, on which it has been set. A freshly
+		created FrameMark would return NULL. Internally a FrameMark doesn't
+		keep a reference to the unit, it's just a pointer, and a way for the
+		Unit to check in <pre>loopAt()</pre> that the mark has been indeed set on this
+		unit (it would refuse to fork the rowops there otherwise). 
+		And you can use it for the entertainment purposes too. Normally
+		when the frame marked with this mark gets popped from the Unit's stack,
+		the mark becomes unset, and its <pre>getUnit()</pre> will return NULL.
+		</para>
+
+		<para>
+		All the actions on the FrameMark are done by passing it to the
+		appropriate methods of the Unit. When a mark is set on a frame, the
+		frame has a reference to it, so the mark won't be destroyed until the
+		frame is freed. 
+		</para>
+	</sect1>

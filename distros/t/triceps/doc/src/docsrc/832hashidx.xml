@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_hashidx">
+		<title>HashedIndexType reference</title>
+
+		<indexterm>
+			<primary>HashedIndexType</primary>
+		</indexterm>
+		<para>
+		The HashedIndexType is defined in <pre>type/HashedIndexType.h</pre>. It also
+		allows to specify its only argument, the selection of the key fields,
+		in the constructor, or set it later with a chainable call:
+		</para>
+
+<pre>
+HashedIndexType(NameSet *key = NULL);
+static HashedIndexType *make(NameSet *key = NULL);
+HashedIndexType *setKey(NameSet *key);
+</pre>
+
+		<para>
+		One way or the other, the key has to be set, or a missing key will be
+		detected as an error at the initialization time. Obviously, all the
+		conditions described in the Perl API apply: the key fields must be
+		present in the table's row type, and so on.
+		</para>
+
+		<para>
+		The key can be read back using the parent class method
+		<pre>IndexType::getKey()</pre>. The value returned there is a
+		<pre>const NameSet*</pre>, telling you that the key NameSet must not be
+		changed afterward.
+		</para>
+
+		<para>
+		The check for <pre>equals()</pre> requires that the key fields are the same
+		(not the exact same NameSet object, but its contents being the same).
+		The check for <pre>match()</pre> is more tricky and depends on whether
+		the index type has been initialized. The match check of initialized types
+		is correct, while for the uninitialized types it's simplified.
+		This may lead to slightly surprising effects when the two indexes match
+		inside the initialized table types but their uninitialized copies
+		don't.  However the comparison of the uninitialized index types is
+		probably not that usable anyway.
+		</para>
+
+		<para>
+		The simplified <pre>match()</pre> check is the same as <pre>equals()</pre>:
+		the list of key fields must be the same.
+		However this has a tricky effect: if two table types have matching row
+		types with different field names, and the same Hashed indexes differing
+		only in the key field names (following the difference in the row
+		types), these table types will be considered non-matching because their
+		hashed indexes are non-matching.
+		</para>
+
+		<para>
+		After the indexes are initialized, they can do a better match check.
+		They can find their table types, and from there the
+		row types. And then compare if the keys refer to the matching fields or
+		not, even if their names are different. The condition then becomes that
+		the key fields are matching in the row type, even if their names are not.
+		</para>
+
+	</sect1>

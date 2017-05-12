@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_file_interrupt">
+		<title>FileInterrupt reference</title>
+
+		<indexterm>
+			<primary>FileInterrupt</primary>
+		</indexterm>
+		<para>
+		FileInterrupt is the class that keeps track of a bunch of file
+		descriptors and revokes them on demand, hopefully interrupting any
+		ongoing operations on them (and if that doesn't do the job, a
+		separately sent signal will). It's not visible in Perl, being
+		intergrated into the TrieadOwner methods, but in &Cpp; it's a separate
+		class. It's defined in <pre>app/FileInterrupt.h</pre>, and is an Mtarget, since
+		the descriptors are registered and revoked from different threads.
+		</para>
+
+<pre>
+FileInterrupt();
+</pre>
+
+		<indexterm>
+			<primary>TrieadJoin</primary>
+		</indexterm>
+		<para>
+		The constructor, absolutely plain. Normally you would not want to
+		construct it directly but use the object already constructed in
+		TrieadJoin. The object keeps the state, whether the interruption had
+		happened, and is obviously initialized to the non-interrupted state.
+		</para>
+
+<pre>
+void trackFd(int fd);
+</pre>
+
+		<para>
+		Add a file descriptor to the tracked interruptable set. If the
+		interruption was already done, the descriptor will instead be revoked
+		right away by dupping over from <pre>/dev/null</pre>. If the attempt to open
+		<pre>/dev/null</pre> fails, it will throw an Exception.
+		</para>
+
+<pre>
+void forgetFd(int fd);
+</pre>
+
+		<para>
+		Remove a file descriptor to the tracked interruptable set. You must do
+		it before closing the descriptor, or a race leading to the corruption
+		of random file descriptors may occur. If this file descriptor was not
+		registered, the call will be silently ignored.
+		</para>
+
+<pre>
+void interrupt();
+</pre>
+
+		<para>
+		Perform the revocation of all the registered file descriptors by
+		dupping over them from <pre>/dev/null</pre>. If the attempt to open <pre>/dev/null</pre>
+		fails, it will throw an Exception.
+		</para>
+
+		<para>
+		This marks the FileInterrupt object state as interrupted, and any
+		following <pre>trackFd()</pre> calls will lead to the immediate revocation of the
+		file descriptors in them, thus preventing any race conditions.
+		</para>
+
+<pre>
+bool isInterrupted() const;
+</pre>
+
+		<para>
+		Check whether this object has been interrupted. 
+		</para>
+	</sect1>

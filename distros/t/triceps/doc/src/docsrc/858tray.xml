@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_tray">
+		<title>Tray reference</title>
+
+		<indexterm>
+			<primary>tray</primary>
+		</indexterm>
+		<para>
+		A Tray in &Cpp;, defined in <pre>shed/Tray.h</pre>, is simply a deque of Rowop
+		references, plus an Starget, so that it can be reference-counted like the
+		rest of Triceps classes:
+		</para>
+
+<pre>
+class Tray : public Starget, public deque< Autoref<Rowop> >
+</pre>
+
+		<para>
+		All it really defines is the constructors:
+		</para>
+
+<pre>
+Tray();
+Tray(const Tray &orig);
+</pre>
+
+		<para>
+		The operations on the Tray are just the usual deque operations.
+		</para>
+
+		<para>
+		Yes, you can copy the trays by constructing a new one from an old one:
+		</para>
+
+<pre>
+Autoref<Tray> t1 = new Tray;
+t1->push_back(op1);
+
+Autoref<Tray> t3 = new Tray(*t1);
+</pre>
+
+		<para>
+		Afterwards <pre>t3</pre> will contain references to the same rowops as <pre>t1</pre> (but
+		will be a different Tray than <pre>t1</pre>!).
+		</para>
+
+		<para>
+		The assignments (<pre>operator=</pre>) happen to just work out of the box because
+		the <pre>operator=</pre> implementation in Starget does the smart thing and avoids
+		the corruption of the reference counter. So you can do things like
+		</para>
+
+<pre>
+*t3 = *t1;
+</pre>
+
+		<para>
+		It's worth noting once more that unlike Rows and Rowops, the Trays
+		are mutable. If you have multiple references to the same Tray,
+		modifying the Tray will make the new contents visible through all
+		the references!
+		</para>
+
+		<para>
+		An important difference from the Perl API is that in &Cpp; the Tray is
+		not associated with a Unit. It's constructed simply by calling its
+		constructor, and there is no Unit involved. It's possible to create a
+		tray that contains a mix of rowops for different units. If you combine
+		the &Cpp; and Perl code, and then create such mixes in the &Cpp; part, the
+		Perl part of your code won't be happy.
+		</para>
+
+		<para>
+		And there is actually a way to create the mixed-unit trays even in the
+		Perl code, in the tray of FnBinding. But this situation would be caught
+		when trying to get the tray from FnBinding into the Perl level, and the workaround 
+		for handling them is to use the method <pre>FnBinding:callTray()</pre>.
+		</para>
+
+		<para>
+		The reason why Perl associates the trays with a unit is to make the
+		check of enqueueing a tray easy: just check that the tray belongs to
+		the right unit, and it's all guaranteed to be right. At the &Cpp; level
+		no such checks are made. If you enqueue the rowops on labels belonging
+		to a wrong unit, they will be enqueued quietly, will attempt to
+		execute, and from there everything will likely go very wrong. So be
+		disciplined. And maybe I'll think of a better way for keeping the unit
+		consistency in the future. 
+		</para>
+
+	</sect1>

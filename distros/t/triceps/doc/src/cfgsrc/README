@@ -1,0 +1,4 @@
+See the hard and symbolic links in fop/lib, for the jai support
+and for the hyphenations.
+
+The settings file has been modified to add the catalog resolver.

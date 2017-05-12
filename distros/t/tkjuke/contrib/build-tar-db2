@@ -1,0 +1,127 @@
+#!/usr/local/bin/perl -w
+#
+# This code assists the daily backup program by reading tar's stdout and
+# generating a consise database of filenames and which tape and file
+# number the files reside. It's smart enough to see tape volume changes.
+# 
+# @ARGV:
+#  0 = STDERR path name
+#  1 = tape VSN:file#
+#  2 = file system list
+#  3 = DTE
+
+use File::Basename;
+use POSIX;
+use subs qw/fin ini print_report sys/;
+use strict;
+
+our ($DB, %DB, $FILENO, $VSN, @VSNS);
+
+my $pid = fork;
+if ($pid) {			# parent
+    exit;
+} elsif (not defined $pid) {
+    die "fork() failed: $?";
+}
+
+ini;
+
+my $n = 0;
+
+while (<STDIN>) {
+    next if /^$?/ or /^\s*$/;
+    next if /^Unloading Data Transfer Element/;
+    if ( /^tar:/ ) {
+	print ERR $_;
+	next;
+    }
+    if (/^  Storage Changer/) {
+	my( $ndrives ) = /(\d+) Drives/;
+	my( $nslots ) = /(\d+) Slots/;
+	my @dtes;
+	push @dtes, ( $_ = <STDIN> ) for 1 .. $ndrives;
+	($VSN) = $dtes[ $ARGV[ 3 ] ] =~ /VolumeTag = (\S+)/;
+	$VSN = uc $VSN;
+	push @VSNS, $VSN;
+	<STDIN> for 1 .. $nslots;
+	next;
+    }
+    last if /^Total bytes written/;
+
+    # Save stat info.
+    
+    $n++;
+    chomp;
+
+    my (@s) = lstat "/$_";
+
+    #  0 dev      device number of filesystem
+    #  1 ino      inode number
+    #  2 mode     file mode  (type and permissions)
+    #  3 nlink    number of (hard) links to the file
+    #  4 uid      numeric user ID of file's owner
+    #  5 gid      numeric group ID of file's owner
+    #  6 rdev     the device identifier (special files only)
+    #  7 size     total size of file, in bytes
+    #  8 atime    last access time in seconds since the epoch
+    #  9 mtime    last modify time in seconds since the epoch
+    # 10 ctime    inode change time (NOT creation time!)
+    # 11 blksize  preferred block size for file system I/O
+    # 12 blocks   actual number of blocks allocated
+
+    if ( not defined $s[7] ) {	# assume special chars > 255
+	while ( 1 ) {
+	    my ($sc) = /(\\\d+)/;
+	    last unless defined $sc;
+	    $sc =~ s/\\//;
+	    my $ch = chr oct($sc);
+	    s/\\\d+/$ch/;
+	}
+	@s = lstat "/$_";
+    }
+
+    if ( not defined $s[7] ) {	# assume escaped Win32 backslashes
+	s/\\\\/\\/g;
+	@s = lstat "/$_";
+    }
+	
+    print STDERR "UNDEF=$_, s=@s!\n" unless defined $s[7];
+    $DB{$_} = "$VSN:$FILENO " . scalar(localtime($s[9])) . " $s[7]";
+}
+
+print_report $_;
+
+fin;
+
+sub fin {
+    print DB "\nBackup complete, ", `date`;
+    close DB;
+    close ERR;
+}
+
+sub ini {
+    open ERR, ">>$ARGV[0]" or die "Cannot write $ARGV[0]: $?";
+    $VSN = uc $ARGV[1];
+    ( $VSN, $FILENO ) = $VSN =~ /(\S+):(\d+)/;
+    push @VSNS, $VSN;
+    $DB = "/root/admin/backup/db/$VSN:$FILENO.gz";
+    open DB, "| /bin/gzip > $DB " or die "DB open failed: $!";
+    print DB "Backup start,    ", `date`;
+    %DB = ();
+}
+
+sub print_report {
+
+    print DB "\nDatabase report for file $FILENO, tape(s) @VSNS - ", `date`, "\n";
+    print DB "backup_list = ", $ARGV[2], "\n";
+    foreach my $file (sort keys %DB) {
+	printf DB "%-72s = %s\n", $file, $DB{$file};
+    }
+    print DB "\n$_[0]";
+}
+
+sub sys {
+    my $cmd = shift;
+    system $cmd;
+    die "Failed : '$cmd' : $?" if $?;
+}

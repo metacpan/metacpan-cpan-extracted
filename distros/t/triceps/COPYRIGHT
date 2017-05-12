@@ -1,0 +1,53 @@
+(C) Copyright 2011-2014 Sergey A. Babkin.
+
+The Triceps project is dual-licensed under 2 licenses:
+  1. GNU LGPL v3 (Triceps version), as specified in the file LGPL
+  2. If LGPL is not good enough for you, a Custom license issued by Sergey Babkin.
+  To obtain a Custom license, contact Sergey Babkin at <babkin@users.sf.net>.
+
+Any third-party contributions to the project must also be licensed under a dual license:
+  1. GNU LGPL v3 (Triceps version), as specified in the file LGPL
+  2. A BSD-style license. The intent is to permit the inclusion of the contributions
+  with the Custom licensed version.
+
+The intent of the Triceps version of LGPL v3 is to close the loophole of
+someone making a thin wrapper around the library and reselling it as a
+commercial product.  LGPL v3 Triceps version specifies that any general Complex
+Event Processing engines based on Triceps are considered direct derived works
+of Triceps and fall under full GPL provisions (or a Custom license), unlike the
+end-user applications. This kind of loophole has been known to be abused
+between the commercial companies in the past.
+
+The difference between the text of the original LGPL version 3 and the Triceps
+version is as follows:
+
+  An "Application" is any work that makes use of an interface provided
+by the Library, but which is not otherwise based on the Library.
+An Application solves a particular user task and does not provide a 
+general Complex Event Processing functionality.
+Defining a subclass of a class defined by the Library is deemed a mode
+of using an interface provided by the Library, if this subclass does not
+provide direct access to the Library interface from outside of the
+Application.
+
+Parts of this package have been included from other packages, and are covered by
+their own license. Such code includes:
+    * Pthreads Wrapper library
+
+The GNU LGPL (Triceps version) license statement is:
+
+    Triceps is available as free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, version 3 of the License, as modified by
+    the Triceps version.
+
+    Triceps is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    (Triceps version) along with Triceps in the file LGPL.
+
+The Custom license is to be negotiated individually and may exist in 
+multiple versions.

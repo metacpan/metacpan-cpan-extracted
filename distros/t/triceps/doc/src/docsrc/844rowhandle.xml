@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_rowhandle">
+		<title>RowHandle and Rhref reference</title>
+
+		<indexterm>
+			<primary>RowHandle</primary>
+		</indexterm>
+		<para>
+		RowHandle is a mostly opaque class. It's defined in <pre>table/RowHandle.h</pre>
+		but you never need to include that file directly: when you include
+		<pre>table/Table.h</pre>, that takes care of it. If you look at the class
+		definition, there are two public sections. The first one is really public,
+		the second one is really for the internal use, I just didn't want to mess
+		too much with the lists of friend classes. The really-public part is
+		quite small:
+		</para>
+
+<pre>
+const Row *getRow() const;
+bool isInTable() const;
+</pre>
+
+		<para>
+		The meaning of these methods is the same as in Perl, get the row contained
+		in the handle, and check whether this handle has been inserted into its table.
+		</para>
+
+		<para>
+		The constructor of RowHandle is private. It's constructed with a factory method
+		in the Table, but normally a better approach is to use the wrapper constructor
+		of Rhref, as described below. For the record, that Table factory method is:
+		</para>
+
+<pre>
+RowHandle *makeRowHandle(const Row *row) const;
+</pre>
+
+		<para>
+		There is also a side API that allows the indexes and aggregators to place their sections into
+		the RowHandles. It's not a part of the RowHandle class as such, which is quite
+		dumb and only knows how to carry the bytes of the data. The smart part of the
+		RowHandle construction is contained in the API between the Table and its indexes
+		and aggregators, and is outlined in 
+		<xref linkend="sc_cpp_sortidx" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<indexterm>
+			<primary>Rhref</primary>
+		</indexterm>
+		<para>
+		The row handles have the requirements very similar to the rows. They
+		get created by the million, so the efficiency is important. In addition, they
+		may contain the user data that has to be properly destroyed, the index and aggregator
+		state mentioned above. For example, when an
+		additive Perl aggregator stores its last state, it's stored in a row
+		handle.
+		</para>
+
+		<indexterm>
+			<primary>Table</primary>
+		</indexterm>
+		<para>
+		So the row handle references are handled similarly to the rows. They don't have a virtual
+		destructor but rely on the Table that owns them to destroy them right.
+		The special reference type for them is Rhref, defined in <pre>mem/Rhref.h</pre>.
+		</para>
+
+		<para>
+		It follows in the exact same mold as Rowref, only uses the Table
+		instead of a RowType:
+		</para>
+
+<pre>
+Rhref(Table *t, RowHandle *r = NULL);
+void assign(Table *t, RowHandle *r);
+</pre>
+
+		<indexterm>
+			<primary>Rowref</primary>
+		</indexterm>
+		<para>
+		The rest of comparisons, assignments etc. work the same as with Rowref.
+		</para>
+
+		<para>
+		The RowHandle pointer may be NULL, creating an Rhref to a yet unknown
+		handle in a known table. The Table pointer may be NULL too (of course,
+		only if the RowHandle is NULL), creating a completely NULL reference.
+		As usual in the &Cpp; API, these rules are not checked in the functions, 
+		so if you assign the incorrect NULLs, the program will crash.
+		</para>
+
+		<para>
+		As with Rowrefs, if the Table is not NULL, a RowHandle can be assigned
+		into the Rowref through the assignment operator, but if the Table was not
+		set, or if assigning a row handle from another table, the <pre>assign()</pre>
+		method must be used to set both.
+		</para>
+
+		<para>
+		An important point is that an Rhref contains an Autoref to the Table,
+		safely holding the table in place while the Rhref is alive, it's the same
+		as the relation between the Rowref and RowType.
+		</para>
+
+		<para>
+		To find out the table of a Rhref, use:
+		</para>
+
+<pre>
+Table *t = rhr.getTable();
+</pre>
+
+		<para>
+		Why is the value returned a simple pointer to the table and not an
+		Autoref or Onceref? Basically, because it's the cheapest way and
+		because the row handle is not likely to go anywhere. Nobody is likely
+		to construct a RowHandle only to get the table from it and have it
+		immediately destroyed. And even if someone does something of the sort
+		</para>
+
+<pre>
+Autoref<Table> t = Rhref(t_orig, rh).getTable();
+</pre>
+
+		<para>
+		then the table itself is likely to not go anywhere, there is still
+		likely to be another reference to the table that will still hold it in
+		place. If there isn't then of course all bets are off, and it will end
+		up with a dead reference to corrupted memory. Just exercise a little
+		care, and everything will be fine. The same reasoning was used for the
+		argument of the RowHandle constructor being also a table pointer, not
+		an Autoref or Onceref.
+		</para>
+
+		<para>
+		An Rhref constructor may also be conveniently used to construct a RowHandle for a
+		Row or directly from the field data:
+		</para>
+
+<pre>
+Rhref(Table *t, Row *row);
+Rhref(Table *t, FdataVec &data);
+</pre>
+
+		<para>
+		In fact, this is the recommended way to construct a RowHandle, immediately
+		holding it in a reference, instead of doing all the intermediate calls
+		manually.
+		</para>
+
+	</sect1>

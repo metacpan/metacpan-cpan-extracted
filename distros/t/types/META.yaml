@@ -1,0 +1,12 @@
+--- #YAML:1.0
+conflicts: {}
+distribution_type: module
+dynamic_config: 1
+license: unknown
+name: types
+recommends: {}
+requires:
+  B::Generate: 1.06
+  optimize: 0.02
+  perl: 5.8
+version: 0.05

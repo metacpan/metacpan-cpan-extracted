@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_ref_table"  xmlns:xi="http://www.w3.org/2001/XInclude">
+		<title>Table reference</title>
+
+		<indexterm>
+			<primary>Table</primary>
+		</indexterm>
+
+		<para>
+		The Table provides the structured data storage in Triceps.
+		</para>
+
+<pre>
+$t = $unit->makeTable($tabType, "tableName");
+</pre>
+
+		<para>
+		Creates a table of a given table type.
+		The table type must be initialized before it can be used to create
+		tables. The tables are strictly single-threaded.
+		</para>
+
+		<para>
+		The table name is used for the error messages and as a base for the names of
+		the table labels.
+		</para>
+
+		<indexterm>
+			<primary>sticky error</primary>
+		</indexterm>
+		<para>
+		A word needs to be said about the handling of the fatal errors (as in <pre>die()</pre>)
+		in the custom Perl functions provided in the user elements of the table,
+		such as the PerlSortedIndex and aggregators.
+		The errors propagate properly through the table,
+		and the table operations confess with the Perl handler's error message.
+		But since an error in these functions means that things are going
+		very, very wrong, after that the table becomes inoperative and will die
+		on all the subsequent operations as well.
+		This is known as a <quote>sticky error</quote>.  You need to be very careful
+		in writing these functions.
+		</para>
+
+<pre>
+$result = $t1->same($t2);
+</pre>
+
+		<para>
+		The usual comparison for sameness. (There is no comparison for equality
+		and mathicng, use the table type for that; nor printing, use the table
+		name and/or table type for that).
+		</para>
+
+<pre>
+$lb = $t->getInputLabel();
+$lb = $t->getPreLabel();
+$lb = $t->getOutputLabel();
+$lb = $t->getDumpLabel();
+$lb = $t->getAggregatorLabel("aggName");
+</pre>
+
+		<para>
+		Get the labels that are creates as a part of the table. With an invalid
+		name for an argument, <pre>getAggregatorLabel()</pre> returns an <pre>undef</pre>.
+		</para>
+
+<pre>
+$tt = $t->getType();
+$u = $t->getUnit();
+$rt = $t->getRowType();
+$name = $t->getName();
+</pre>
+
+		<para>
+		Get back the information about the table configuration.
+		</para>
+
+<pre>
+$result = $t->size();
+</pre>
+
+		<para>
+		Returns the number of rows in the table.
+		</para>
+
+<pre>
+$rh = $t->makeRowHandle($row);
+$rh = $t->makeNullRowHandle();
+</pre>
+
+		<para>
+		Create the row handles.  The row must be of a matching type, and it will
+		be cast to the table's row type: when read back from the row handle,
+		the row will have the table's row type as its type. The casting does
+		not involve any copying or modification of the row, it's still shared
+		by reference counting. And the original row as it was would still
+		return the same type. Basically, the row itself is untyped, its type
+		is determined by the container where it is stored. The requirement
+		for the matching types ensures that when a row is passed between the
+		containers, they have a compatible notion of the row type.
+		</para>
+
+		<para>
+		A NULL row
+		handle is a handle without a row in it. It can not be placed into a
+		table but this kind of row handle gets returned by table operations to
+		indicate things not found. In case if you want to fool some of your
+		code by slipping it a NULL handle, <pre>makeNullRowHandle()</pre> provides a way
+		to do it. The row handles belong to a particular table and can not be
+		mixed between them, even if the tables are of the same type.
+		</para>
+
+		<para>
+		The table operations can be done by either sending the rowops to the
+		table's input label or by calling the operations directly.
+		</para>
+
+<pre>
+$result = $t->insert($row_or_rh);
+</pre>
+
+		<para>
+		Inserts a row or row handle into the table. The row handle must
+		not be in the table before the call, it may be either freshly created
+		or previously removed from the table. If a row is used as an argument,
+		it is internally wrapped in a fresh row handle, and then that row
+		handle inserted. An insert may trigger the replacement policy in the
+		table's indexes and have some rows removed before the insert is done.
+		Returns 1 on success, 0 if the insert can not be done (the row handle is already in
+		the table or NULL).
+		</para>
+
+<pre>
+$result = $t->remove($rh);
+</pre>
+
+		<para>
+		Removes a row handle from the table. The row handle must be previously
+		inserted in the table, and either found in it or a reference to it
+		remembered from before. An attempt to remove a newly created row handle
+		will have no effect. 
+		The result is 1 on success (even if the row handle was not in the table).
+		</para>
+
+<pre>
+$result= $t->deleteRow($row);
+</pre>
+
+		<para>
+		Finds the handle of the matching row by the table's first leaf index
+		and removes it. Returns 1 on success, 0 if the row was not found.
+		Unlike <pre>insert()</pre>, the
+		deletion methods for a row handle and a row are named differently to
+		emphasize their difference. The method <pre>remove()</pre> must get a reference to
+		the exactly same row handle that was previously inserted. The method
+		<pre>deleteRow()</pre> does not have to get the same row as was previously
+		inserted, instead it will find a row handle of the row that has the
+		same key as the argument, according to the first leaf index.
+		<pre>deleteRow()</pre> never deletes more than one row. If the index contains
+		multiple matching rows (for example, if the first leaf is a FIFO
+		index), only one of them will be removed, usually the first one (the
+		exact choice depends on what row gets found by the index).
+		</para>
+
+<pre>
+$rh = $t->find($row_or_rh);
+$rh = $t->findIdx($idxType, $row_or_rh);
+</pre>
+
+		<para>
+		Find the row handle the table by indexes.  If the row is not found,
+		return a NULL row handle. If the row is of an incorrect type or the
+		index type is incorrect, confesses. The index type must be exactly
+		the one belonging to the type of this table (not its copy nor the
+		original from which it was copied into the table's type), so the
+		only way to get it is to find it in the table's type after it
+		has been constructed.
+		The default <pre>find()</pre> works
+		using the first leaf index type, i.e. the following two are equivalent:
+		</para>
+
+<pre>
+$t->find($r);
+$t->findIdx($t->getType()->getFirstLeaf(), $r);
+</pre>
+
+		<para>
+		but the <pre>find()</pre> version is slightly more efficient because it handles
+		the index types inside the &Cpp; code and does not create the Perl
+		wrappers for them.
+		</para>
+
+		<para>
+		The <pre>find()</pre> operation is also used internally by <pre>deleteRow()</pre> and to
+		process the rowops received at the table's input label.
+		</para>
+
+		<para>
+		If a row is used as an argument for <pre>find</pre>, a temporary row handle is
+		internally created for it, and then the find is performed on it. Note
+		that if you have a row handle that is already in the table, there is
+		generally no use calling <pre>find</pre> on it, you will just get the same row
+		handle back (well, except for the case of multi-valued indexes, then
+		you will get back some matching row handle, usually the first one,
+		which may be the same or not). 
+		</para>
+
+		<para>
+		A <pre>findIdx()</pre> with a non-leaf index argument is a special case: it
+		returns the first row handle of the group that has the key matching the
+		argument. The order of <quote>first</quote> in this case is defined according to
+		that index'es first leaf sub-index.
+		</para>
+
+<pre>
+$rh = $t->findBy("fieldName" => $fieldValue, ...);
+$rh = $t->findIdxBy($idxType, "fieldName" => $fieldValue, ...);
+</pre>
+
+		<para>
+		Convenience methods that construct a row from the field arguments and then find it.
+		They confess on incorrect arguments.
+		</para>
+
+<pre>
+$rh = $t->begin();
+$rh = $t->next($rh); 
+$rh = $t->beginIdx($idxType);
+$rh = $t->nextIdx($idxType, $rh);
+</pre>
+
+		<para>
+		Iteration on the table. The methods <pre>next()</pre> and <pre>nextIdx()</pre> are equivalent
+		to the same methods of the row handle.
+		As usual, the versions without an explicit index type use the first
+		leaf index type. The <pre>begin</pre> methods return the first row handle
+		according to an index'es order, the <pre>next</pre> methods advance to the next
+		row handle. When the end of the table is reached, these methods return
+		a NULL row handle. The <pre>next</pre> methods also return a NULL row handle if their
+		argument row handle is a NULL or not in the table. So, if you iterate
+		and remove the row handles, make sure to advance the iterator first and
+		only then remove the current row handle.
+		</para>
+
+		<para>
+		If the index argument is non-leaf, it's equivalent to its first leaf. 
+		</para>
+
+<pre>
+$endrh = $t->nextGroupIdx($subIdxType, $rh_in_group);
+</pre>
+
+		<para>
+		Finds the first row handle of the next group, where <pre>$subIdxType</pre> is the
+		first index inside the group (not its parent index!).  Confesses on errors.
+		The result also works as the end marker handle of the current group. 
+		</para>
+
+		<para>
+		To iterate through only a group, use <pre>findIdx()</pre> on the parent index type
+		of the group to find the first row of the group. Then things become
+		tricky: take the first index type one level below it to determine the
+		iteration order (a group may have multiple indexes in it, defining
+		different iteration orders, the first one will give the group's default
+		order).  Use that index type with <pre>nextGroupIdx()</pre> to find the
+		first row handle past the end of the group, and with the usual
+		<pre>nextIdx()</pre> to advance the iterator. 
+		However the end of the group will not be signaled by a NULL row handle. 
+		It will be signaled by <pre>nextIdx()</pre> returning the same row
+		handle as previously returned by <pre>nextGroupIdx()</pre>
+		(compare them with <pre>$endrh->same($itrh)</pre>).
+		</para>
+
+		<para>
+		The value returned by <pre>nextGroupIdx()</pre> is actually the first row handle of the next group, so
+		it can also be used to jump quickly to the next group, and essentially
+		iterate by groups. After the last group, <pre>nextGroupIdx()</pre> will return a
+		NULL row handle. Which is OK for iteration, because at the end of the
+		last group <pre>nextIdx()</pre> will also return a NULL row handle.
+		</para>
+
+		<para>
+		What if a group has a whole sub-tree of indexes in it, and you want to
+		iterate it by the order of not the first sub-index? Still use <pre>findIdx()</pre>
+		in the same way to find a row handle in the desired group. But then
+		convert it to the first row handle in the desired order:
+		</para>
+
+<pre>
+$beginrh = $t->firstOfGroupIdx($subIdxType, $rh);
+</pre>
+
+		<para>
+		The <pre>$subIdxType</pre> is the same as used in <pre>nextGroupIdx()</pre>.
+		After that proceed as before: get the end marker with <pre>nextGroupIdx()</pre> on
+		the same sub-index, and iterate with <pre>nextIdx()</pre> on it.
+		</para>
+
+		<para>
+		This group iteration is somewhat messy and tricky, and maybe something
+		better can be done with it in the future. If you look closely, you can
+		also see that it doesn't allow to iterate the groups in every possible
+		order. For example, if you have an index type hierarchy
+		</para>
+
+<pre>
+A
++-B
+| +-D
+| | +-G
+| | +-H 
+| +-E 
++-C
+</pre>
+
+		<para>
+		and you want to iterate on the group inside B, you can go in the order
+		of D or G (which is the same as D, since G is the first leaf of D) or
+		of E, but you can not go in the order of H. But for most of the
+		practical purposes it should be good enough.
+		</para>
+
+<pre>
+$size = $table->groupSizeIdx($idxType, $row_or_rh);
+</pre>
+
+		<para>
+		Finds the size of a group without iteration on it. <pre>$idxType</pre>
+		is the parent index of the group (the same as would be used with
+		<pre>findIdx()</pre>).  Naturally, it must be a non-leaf index. (Using
+		a non-leaf index type is not an error but it always returns 0, because
+		there are no groups under it).  Confesses on errors. The argument may
+		be a row or row handle that identifies any row in the group.  If the
+		argument is a row, it gets handled similarly to <pre>findIdx()</pre>: a
+		temporary row handle gets created, used to find the result, and then
+		destroyed.  If there is no such group in the table, the result will be
+		0.  If the argument is a row handle, that handle may be in the table or
+		not in the table, either will be handled transparently (though calling
+		it for a row handle that is in the table is more efficient because the
+		group would not need to be found first). 
+		</para>
+
+<pre>
+$table->clear();
+$table->clear($limit);
+</pre>
+
+		<para>
+		Deletes the rows from the table.
+		If <pre>$limit</pre> is absent or 0, the whole table gets cleared. If it's greater
+		than 0, no more than this number of rows will be deleted. A negative
+		limit is an error. The deletion happens in the usual order of the first
+		leaf index, and the rowops are sent to the table's output label as
+		usual. It's really the same thing as running a loop over all the row
+		handles and removing them, only with a &Cpp; imnplementation it's more
+		efficient than in Perl. There is no return value, the errors cause a
+		confession.
+		</para>
+
+<pre>
+$fret = $table->fnReturn();
+</pre>
+
+		<para>
+		Returns an FnReturn object connected to the output of this table.
+		The FnReturn contains the labels <quote>pre</quote>, <quote>out</quote>, 
+		<quote>dump</quote> (used with <pre>dumpAll</pre> methods) and the named labels for
+		all aggregators.  The FnReturn object is created on the first call of
+		this method and is kept in the table.  All the following calls return
+		the same object. 
+		This has some interesting consequences for the <quote>pre</quote>
+		label: the rowop for the <quote>pre</quote> label doesn't get created at all if
+		there is nothing chained from that label. But when the FnReturn gets
+		created, one of its labels gets chained from the <quote>pre</quote> label. Which
+		means that once you call <pre>$table->fnReturn()</pre> for the first time, you
+		will see that table's <quote>pre</quote> label called in all the traces. It's not a
+		huge extra overhead, but still something to keep in mind and not be
+		surprised when calling <pre>fnReturn()</pre> changes all your traces.
+		See more detail in
+		<xref linkend="sc_strf_tables" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+<pre>
+$table->dumpAll();
+$table->dumpAll($opcode);
+</pre>
+
+		<para>
+		Sends all the table's rows in their default order to the label <quote>dump</quote>.
+		The opcode for the created rowops is OP_INSERT by default, or can be specified
+		explicitly as an argument. The typical usage is to push a binding on the table's
+		FnReturn to process these dumped rowops.
+		</para>
+
+<pre>
+$table->dumpAllIdx($indexType);
+$table->dumpAllIdx($indexType, $opcode);
+</pre>
+
+		<para>
+		Similar to <pre>dumpAll()</pre>, only allows to send the rows in an order
+		specified by another index type.
+		As usual, the index type must belong to the exact type of this table.
+		</para>
+	</sect1>
+

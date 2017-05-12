@@ -1,0 +1,133 @@
+# Valgrind suppressions for the data that Perl parser leaves unfreed.
+# Your luck may vary with your version of Perl, you may need to define
+# your own suppressions by copying them from test.vg.
+# Replace more of the stack with "*" to make it more generic.
+
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:calloc
+   fun:*
+   fun:Perl_yyparse
+   obj:*
+   fun:*
+   fun:*
+   fun:*
+   fun:*
+   obj:*
+   fun:*
+   fun:*
+   fun:*
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:calloc
+   fun:*
+   fun:Perl_yylex
+   fun:*
+   obj:*
+   fun:*
+   fun:*
+   fun:*
+   obj:*
+   fun:*
+   fun:*
+   fun:*
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:calloc
+   obj:*
+   fun:*
+   fun:Perl_yyparse
+   obj:*
+   fun:*
+   fun:*
+   fun:*
+   obj:*
+   fun:*
+   fun:*
+   fun:*
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:calloc
+   fun:*
+   obj:*
+   fun:Perl_yylex
+   fun:Perl_yyparse
+   obj:*
+   fun:*
+   fun:*
+   fun:*
+   obj:*
+   fun:*
+   fun:*
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:calloc
+   fun:*
+   fun:*
+   fun:Perl_yyparse
+   obj:*
+   fun:*
+   fun:*
+   fun:*
+   fun:*
+   obj:*
+   fun:*
+   fun:*
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:calloc
+   obj:*
+   obj:*
+   fun:Perl_re_compile
+   fun:*
+   fun:Perl_yyparse
+   obj:*
+   fun:*
+   fun:*
+   fun:*
+   fun:*
+   obj:*
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:calloc
+   fun:*
+   fun:*
+   fun:*
+   fun:Perl_yyparse
+   obj:*
+   fun:*
+   fun:*
+   fun:*
+   fun:*
+   obj:*
+   fun:*
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:*
+   fun:*
+   fun:*
+   fun:*
+   fun:*
+   fun:Perl_yyparse
+   obj:*
+   fun:*
+   fun:*
+   fun:*
+   fun:*
+   obj:*
+}

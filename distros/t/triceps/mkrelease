@@ -1,0 +1,79 @@
+#!/bin/bash
+#
+# (C) Copyright 2011-2014 Sergey A. Babkin.
+# This file is a part of Triceps.
+# See the file COPYRIGHT for the copyright notice and license information
+#
+#
+# Building of a release package.
+set -o pipefail
+
+PRODUCT=triceps
+INFO=`svn info .` || exit 1
+URL=`echo "$INFO" | sed -n 's/^URL: //p'`
+[ -n "$URL" ] || { echo "Could not find SVN URL" >&2; exit 1; }
+VERSION=`basename "$URL"`
+
+DRYRUN=N
+
+while [ $# -gt 0 ]
+do {
+	case "$1" in
+	-v)
+		shift
+		VERSION="$1"
+		;;
+	--dryrun)
+		DRYRUN=Y
+		;;
+	*)
+		echo "Unknown option '$1'" >&2
+		exit 1;
+		;;
+	esac
+	shift
+} done
+
+echo "Building for version: $VERSION. To override, use the option -v."
+
+# do a quick check before exporting stuff
+( cd "$DIR" && bash ./ckversion "$VERSION"; ) || exit 1
+
+DIR="$PRODUCT-$VERSION"
+[ -r "$DIR" ] && {
+	rm -rf "$DIR" || exit 1
+}
+
+svn export "$URL" "$DIR" || exit 1
+
+# check once more in the exported code
+( cd "$DIR" && bash ./ckversion "$VERSION"; ) || exit 1
+
+# check the Perl MANIFEST
+
+( cd "$DIR/perl/Triceps" && find . -type f ! -path '*/.svn/*' | cut -c3- | LANG=C sort; ) > "perl/Triceps/MANIFEST.proto" || exit 1
+LANG=C sort <perl/Triceps/MANIFEST >perl/Triceps/MANIFEST.sorted || exit 1
+diff perl/Triceps/MANIFEST.sorted perl/Triceps/MANIFEST.proto || {
+	echo "Found incorrect perl/Triceps/MANIFEST, the correct one is prepared in perl/Triceps/MANIFEST.proto" >&2
+	exit 1
+}
+
+[ Y = "$DRYRUN"  ] && exit 0
+
+echo
+echo "Building the documentation..."
+rm -rf "$DIR/doc/blog" "$DIR/doc/web" || exit 1
+# This is my directory with docbook tools, to avoid downnloading them into the release.
+export TRICEPS_TOOLS_BASE=$HOME/arch/docbook
+if [ ! -d "$TRICEPS_TOOLS_BASE" ]; then {
+	TRICEPS_TOOLS_BASE=
+	make -C "$DIR/doc/dbtools" all || exit 1
+} fi
+make -C "$DIR/doc/src" all || exit 1
+make -C "$DIR/doc/src" cleanwork || exit 1
+
+tar czvf "$DIR.tgz" "$DIR" || exit 1
+
+echo
+echo "Building the exported code to make sure..."
+make -C "$DIR" all test || exit 1

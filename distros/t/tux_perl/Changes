@@ -1,0 +1,6 @@
+Revision history for Perl extension Tux.
+
+0.01  Sun Nov  3 20:24:36 2002
+	- original version; created by h2xs 1.22 with options
+		-O -n Tux ./Tux/xs/Tux.h
+

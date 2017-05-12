@@ -1,0 +1,100 @@
+
+
+		   tkjuke Installation Instructions
+
+
+*****
+***** PREREQUISITES:
+*****
+
+This software requires Perl/Tk, and obviously, mtx.  
+
+- mtx
+
+  Tested with mtx versions 1.2.9, 1.2.10, 1.2.15 and 1.2.17, 1.2.18rel.
+
+- Perl
+
+  Perl is likely already installed on your system.  If not, you can
+  fetch it from:
+
+	http://www.cpan.org/src/stable.tar.gz
+
+  Briefly, installation goes like this:
+
+	tar -zxvpf stable.tar.gz
+	cd perl-5.8.2
+	sh Configure -des -Dprefix=/usr/local
+	make
+	make test
+	make install
+
+- Perl/Tk (using the perl executable from above in /usr/local/bin)
+
+  Get it from:
+
+	http://search.cpan.org/~ni-s/Tk-804.027/
+
+  Briefly, installation goes like this:
+
+	tar -zxvpf Tk804.027.tar.gz
+	cd Tk804.027
+	/usr/local/bin/perl Makefile.PL
+	make
+	make test
+	make install
+
+- Proc::ProcessTable, Tk::ExecuteCommand and Tk::CollapsableFrame modules
+
+  Fetch from CPAN and install in the standard manner:
+
+	/usr/local/bin/perl Makefile.PL
+	make
+	make test
+	make install
+
+*****
+***** INSTALLATION OF TKJUKE FOLLOWS THE PERL IDIOM. AFTER UNPACKING:
+*****
+
+perl Makefile.PL
+make 
+make test
+make install
+
+At this point, edit tkjuke.config and make entries for your jukeboxes
+using the example entries as a guide - tkjuke will auto-connect to the
+listed machines.  If you have not setup either host-based or key
+authentication the you'll need to enter the root passwords in the
+window from which tkjuke was started. 
+
+*****
+***** NOTE
+***** NOTE
+***** NOTE
+*****
+
+  The program "wait-tape-ready" defines a system command that ensures media is
+  ready after it has been loaded into a DTE. The basic idea is to
+  status the drive until it is ready.
+
+  IFF you experience tape-not-ready errors, or long delays after a
+  "juke load" or "juke next" command, you must inspect this code
+  and make appropriate changes. The code comments in "wait-tape-ready"
+  tell you what to do. Please, send any changes to sol0@lehigh.edu.
+
+*****
+***** INSTALLATION COMPLETE.
+*****
+
+  OK, juke/tkjuke installation and configuration is complete.  Have the
+  appropriate amount of fun.
+
+Steve Lidie
+Lehigh University Computing Center
+sol0@lehigh.edu
+
+2004/01/14
+2006/03/21
+2007/07/20
+

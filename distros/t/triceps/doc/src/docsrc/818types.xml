@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_types">
+		<title>Types reference</title>
+
+		<indexterm>
+			<primary>type</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Type</primary>
+		</indexterm>
+		<para>
+		Fundamentally, Triceps is a language, even though it is piggybacking on
+		the other languages. And as in pretty much any programming language,
+		pretty much anything in it has a type. Only the tip of that type system
+		is exposed in the Perl API, as the RowType and TableType. But the &Cpp;
+		API has the whole depth. The types go all the way down to the simple
+		types of the fields.
+		</para>
+
+		<para>
+		The classes for types are generally defined in the subdirectory <pre>type/</pre>.
+		The class Type, defined in <pre>type/Type.h</pre> is the common base class,
+		inheriting from Mtarget. The types are gererally fullly constructed in one thread,
+		and then they become read-only and accessible from multiple threads.
+		</para>
+
+		<indexterm>
+			<primary>TypeId</primary>
+		</indexterm>
+		<para>
+		The base class has a field that identifies, which kind of a type it is.
+		Each subclass, every kind of type has its entry in the enum TypeId:
+		</para>
+
+<pre>
+TT_VOID, // no value
+TT_UINT8, // unsigned 8-bit integer (byte)
+TT_INT32, // 32-bit integer
+TT_INT64,
+TT_FLOAT64, // 64-bit floating-point, what C calls "double"
+TT_STRING, // a string: a special kind of byte array
+TT_ROW, // a row of a table
+TT_RH, // row handle: item through which all indexes in the table own a row
+TT_TABLE, // data store of rows (AKA "window")
+TT_INDEX, // a table contains one or more indexes for its rows
+TT_AGGREGATOR, // user piece of code that does aggregation on the indexes
+TT_ROWSET, // an ordered set of row types
+</pre>
+
+		<indexterm>
+			<primary>FnReturn</primary>
+		</indexterm>
+		<indexterm>
+			<primary>FnBinding</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Nexus</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Facet</primary>
+		</indexterm>
+		<para>
+		Most of it is straightforward, and maps directly to the types described
+		in the Perl API. TT_ROWSET is not directly exported to Perl, but
+		internally and in the &Cpp; API it's the underlying type for anything
+		that uses a set of row types: an FnReturn, FnBinding, Nexus or Facet.
+		TT_VOID is pretty much a placeholder, in case if a void type
+		would be needed later. 
+		</para>
+
+		<para>
+		The TypeId gets hardcoded in the constructor of
+		every Type subclass. It can be obtained back with the method
+		</para>
+
+<pre>
+TypeId getTypeId() const;
+</pre>
+
+		<para>
+		Another method finds out if the type is the simple type of a field:
+		</para>
+
+<pre>
+bool isSimple() const;
+</pre>
+
+		<para>
+		It would be true for the types of ids TT_VOID, TT_UINT8,  TT_INT32,
+		TT_INT64, TT_FLOAT64, TT_STRING.
+		</para>
+
+		<indexterm>
+			<primary>SimpleType</primary>
+		</indexterm>
+		<para>
+		Generally, you can check the TypeId and then cast the Type pointer to
+		its subclass. All the simple types have the common base class
+		SimpleType, which is described in
+		<xref linkend="sc_cpp_types_simple" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<para>
+		There is also a static Type method that finds a simple type object by
+		the type name (like "int32", "string" etc.):
+		</para>
+
+<pre>
+static Onceref<const SimpleType> findSimpleType(const char *name);
+</pre>
+
+		<para>
+		If the type name is incorrect and the type is not found,
+		<pre>findSimpleType()</pre> will return NULL.
+		</para>
+
+		<para>
+		There is not a whole lot of point in having many copies
+		of the simple type objects (though if you want, you can). So there is
+		one common copy of each simple type that can be found by name with
+		<pre>findSimpleType()</pre>. If the type is known at the compilation time of the
+		&Cpp; program, you can even avoid the look-up and refer to these
+		objects directly:
+		</para>
+
+<pre>
+static Autoref<const SimpleType> r_void;
+static Autoref<const SimpleType> r_uint8;
+static Autoref<const SimpleType> r_int32;
+static Autoref<const SimpleType> r_int64;
+static Autoref<const SimpleType> r_float64;
+static Autoref<const SimpleType> r_string;
+</pre>
+
+		<para>
+		All of them are defined in the class Type, so you refer to them like
+		<pre>Type::r_string</pre>.
+		</para>
+
+		<indexterm>
+			<primary>error handling</primary>
+			<secondary>in &Cpp;</secondary>
+		</indexterm>
+		<para>
+		The type construction may cause errors. The construction is usually done either by a
+		single constructor call with all the needed arguments, or a simple
+		constructor, then additional methods to add the information in bits and
+		pieces, then an initialization method. In both cases there is a problem
+		of how to report the errors. They're not easy to return from a
+		constructor and a pain to check in the bit-by-bit construction.
+		</para>
+
+		<para>
+		Instead the error information gets internally collected in an Errors
+		object, and can be read after the construction and/or initialization is
+		completed:
+		</para>
+
+<pre>
+virtual Erref getErrors() const;
+</pre>
+
+		<indexterm>
+			<primary>Exception</primary>
+		</indexterm>
+		<indexterm>
+			<primary>initialization</primary>
+		</indexterm>
+		<para>
+		There also are the convenience templates that do the initialization,
+		check the errors and throw an Exception on failure. They are described in
+		<xref linkend="sc_cpp_init" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<para>
+		A type with errors may not be used for anything other than reading the
+		errors (and of course it can be destroyed by deleting all the references
+		to it). Its behavior for anything else is undefined and may cause a crash.
+		</para>
+
+		<para>
+		The rest of the common virtual methods has to do with the type
+		comparison and print-outs. The comparison methods essentially check if
+		two type objects are aliases for each other:
+		</para>
+
+<pre>
+virtual bool equals(const Type *t) const;
+virtual bool match(const Type *t) const;
+</pre>
+
+		<indexterm>
+			<primary>type</primary>
+			<secondary>equals</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>type</primary>
+			<secondary>match</secondary>
+		</indexterm>
+		<para>
+		The concept has been previously described with the Perl API in
+		<xref linkend="sc_RowTypesEquiv" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;,
+		but it really applies not only to the row types but to any types.
+		The equal
+		types are exactly the same. The matching types are the same except for
+		the names of their elements, so it's generally safe to pass the values
+		between these types.
+		</para>
+
+		<para>
+		<pre>equals()</pre> is also available as <pre>operator==</pre>.
+		</para>
+
+		<para>
+		The print methods create a string representation of a type, used mostly
+		for the error messages. There is no method to parse this string
+		representation back, at least not yet.
+		</para>
+
+<pre>
+virtual void printTo(string &res, const string &indent = "", const string &subindent = "  ") const = 0;
+string print(const string &indent = "", const string &subindent = "  ") const;
+</pre>
+
+		<para>
+		<pre>printTo()</pre> appends the information to an existing string. <pre>print()</pre>
+		returns a new string with the message. <pre>print()</pre> is a wrapper around
+		<pre>printTo()</pre> that creates an empty string, does <pre>printTo()</pre> into it and
+		returns it.
+		</para>
+
+		<para>
+		The printing is normally done in a multi-line format, nicely indented,
+		and the arguments <pre>indent</pre> and <pre>subindent</pre> define the initial indent level
+		and the additional indentation for every level.
+		</para>
+
+		<indexterm>
+			<primary>NOINDENT</primary>
+		</indexterm>
+		<para>
+		There is also a way to print everything in one line: pass the special
+		constant NOINDENT (defined in <pre>common/StringUtil.h</pre>) in the argument
+		<pre>indent</pre>. This is similar to using an <b>undef</b> for the same purpose in the
+		Perl API.
+		</para>
+
+		<indexterm>
+			<primary>Type</primary>
+			<secondary>all types</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>AllTypes</primary>
+		</indexterm>
+		<para>
+		The definitions of all the types are collected together in
+		<pre>type/AllTypes.h</pre>. 
+		</para>
+	</sect1>
+

@@ -1,0 +1,25 @@
+# lines in format:
+# file-base-name width-in-pdf suffix-in-pdf
+# (the suffix in html is always "lowres.png")
+#
+# For example:
+samplesdraw 4in svg
+func-010-fmac 6in svg
+func-020-query 6in svg
+label-000-chain 5in svg
+label-010-loop 5in svg
+label-011-mark 5in svg
+idx-000-legend 6in svg
+idx-010-one 6in svg
+idx-020-nested 6in svg
+idx-021-nested-begin 6in svg
+idx-022-nested-findidx 6in svg
+idx-023-nested-firstOfGroupIdx 6in svg
+idx-024-nested-nextGroupIdx 6in svg
+idx-030-2pri 6in svg
+idx-040-prisec 6in svg
+idx-050-nestfork 6in svg
+diamond-000 6in svg
+thread-010-over 6in svg
+thread-020-chat 6in svg
+tql-010-mt-over 6in svg

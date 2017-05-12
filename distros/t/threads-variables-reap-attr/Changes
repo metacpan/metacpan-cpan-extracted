@@ -1,0 +1,22 @@
+Revision history for threads-variables-reap
+
+0.06	2013-09-17
+    - move repository to github
+    - removing author tests from distribution but
+      make them mandatory for developers
+
+0.05    2010-04-27 12:30 UTC
+    - moving threads::variable::reap::attr into separate module
+    - increase parallelism of basic test
+
+0.03    2010-04-10 17:45 UTC
+    - don't suppress warning about reserved word conflict in t:v:r:a
+    - add documentation about the bugs with lexical attributes
+    - move warning suppression to the only test which tests attributes
+
+0.02    2010-04-08  7:30 UTC
+    - Fix errors in thread-dependend test (code taken from threads::shared)
+
+0.01    2010-04-07 19:00 UTC
+    - First version, released on an unsuspecting world.
+

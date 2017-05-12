@@ -1,0 +1,13 @@
+MANIFEST
+README
+Makefile.PL
+bin/findfont
+bin/imgtile
+bin/textrender
+lib/LEOCHARRE/FontFind.pm
+t/00.t
+t/01.t
+t/text-01.txt
+t/text-02.txt
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

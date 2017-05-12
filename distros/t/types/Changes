@@ -1,0 +1,30 @@
+Revision history for Perl extension types.
+
+0.05   - Added compile argument type checking, cleaned up code
+       - Added support for CORE::int returning type int
+
+0.03	
+	- Added support for return values.	
+	- Added lexical scoping support
+	- Added check for redefinition of subroutines
+	- Expressions get return values
+
+0.02 
+	- Added support for numbers and strings (James Duncan)
+	- Allow implicit casts of
+		int to float
+		int to number
+		number to int
+		number to float
+		float to number
+	with a fatal exception if you try to cast float to int
+	- Allow casting all numbers to string but not back from string
+	- constants get types
+
+0.01  Thu Jun 27 20:16:27 2002
+	- added support for int and float
+        - added detection of sassign
+	- original version; created by h2xs 1.22 with options
+		-n types -X
+
+

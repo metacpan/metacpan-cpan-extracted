@@ -1,0 +1,30 @@
+Text-Highlight version 0.04
+===========================
+
+Text::Highlight is a flexible and extensible tool for highlighting the syntax in programming code. The markup used and languages supported are completely customizable. It can output highlighted code for embedding in HTML, terminal escapes for an ANSI-capable display, or even posting on an online forum. Bundled support includes C/C++, CSS, HTML, Java, Perl, PHP and SQL.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES (optional)
+
+This module can use these other modules and libraries:
+
+  HTML::Parser, HTML::SyntaxHighlighter (for better highlighting of HTML code)
+  Term::ANSIColor (if you want terminal escapes)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Andrew Flerchinger
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

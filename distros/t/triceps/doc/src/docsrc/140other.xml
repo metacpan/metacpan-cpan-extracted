@@ -1,0 +1,1364 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+<chapter id="ch_other" xmlns:xi="http://www.w3.org/2001/XInclude">
+	<title>The other templates and solutions</title>
+
+	<sect1 id="sc_other_diamond">
+		<title>The dreaded diamond</title>
+
+		<indexterm>
+			<primary>diamond</primary>
+		</indexterm>
+		<indexterm>
+			<primary>fork-join</primary>
+		</indexterm>
+
+		<para>
+		The <quote>diamond</quote> is a particular topology of the data flow, when the
+		computation separates based on some condition and then merges again.
+		Like in
+		<xref linkend="fig_other_diamond" xrefstyle="select: label nopage"/>&xrsp;.
+		It is also known as <quote>fork-join</quote> (the <quote>join</quote> here has nothing to do with
+		the SQL join, it just means that the arrows merge to the same block).
+		</para>
+
+		<figure id="fig_other_diamond" >
+			<title>The diamond topology.</title>
+			<xi:include href="file:///FIGS/diamond-000.xml"/> 
+		</figure>
+
+		<indexterm>
+			<primary>execution order</primary>
+		</indexterm>
+		<para>
+		This topology is a known source of two problems. The first problem is
+		about the execution order.  To make things easier to see, let's
+		consider a simple example.  Suppose the rows come into the block A with
+		the schema:
+		</para>
+
+<pre>
+key => string,
+value => int32,
+</pre>
+
+		<para>
+		And come out of the blocks B and C into D with schema
+		</para>
+
+<pre>
+key => string,
+value => int32,
+negative => int32,
+</pre>
+
+		<para>
+		With the logic in the blocks being:
+		</para>
+
+<pre>
+A:
+	if value < 0 then B else C
+B:
+	negative = 1
+C: 
+	negative = 0
+</pre>
+
+		<para>
+		Yes, this is a very dumb example that can usually be handled by a
+		conditional expression in a single block. But that's to keep it
+		small and simple. A real example would often include some SQL joins, with
+		different joins done on condition.
+		</para>
+
+		<para>
+		Suppose A then gets the input, in CSV form:
+		</para>
+
+<exdump>
+INSERT,key1,10
+DELETE,key1,10
+INSERT,key1,20
+DELETE,key1,20
+INSERT,key1,-1
+</exdump>
+
+		<para>
+		What arrives at D should be 
+		</para>
+
+<exdump>
+INSERT,key1,10,0
+DELETE,key1,10,0
+INSERT,key1,20,0
+DELETE,key1,20,0
+INSERT,key1,-1,1
+</exdump>
+
+		<para>
+		And with the first four rows this is not a problem: they follow the
+		same path and are queued sequentially, so the order is preserved. But
+		the last row follows a different path. And the last two rows logically
+		represent a single update and would likely arrive closely together. The
+		last row might happen to overtake the one before it, and D would see
+		the incorrect result:
+		</para>
+
+<exdump>
+INSERT,key1,10,0
+DELETE,key1,10,0
+INSERT,key1,20,0
+INSERT,key1,-1,1
+DELETE,key1,20,0
+</exdump>
+
+		<para>
+		If all these input rows arrive closely one after another, the last row
+		might overtake even more of them and produce an even more disturbing
+		result like
+		</para>
+
+<exdump>
+INSERT,key1,-1,1
+INSERT,key1,10,0
+DELETE,key1,10,0
+INSERT,key1,20,0
+DELETE,key1,20,0
+</exdump>
+
+		<para>
+		Such misorderings may also happen between the rows with different keys.
+		Those are usually less of a problem, because usually if D keeps a
+		table, the rows with different keys may be updated in any order without
+		losing the meaning. But in case if D keeps a FIFO index (say, for
+		a window based on a row count), and the two keys fall into the same
+		FIFO bucket, their misordering would also affect the logic.
+		</para>
+
+		<para>
+		The reasons for this can be subdivided further into two classes:
+		</para>
+
+		<itemizedlist>
+		<listitem>
+		asynchronous execution,
+		</listitem>
+
+		<listitem>
+		incorrect scheduling in the synchronous execution.
+		</listitem>
+		</itemizedlist>
+
+		<indexterm>
+			<primary>Aleri</primary>
+		</indexterm>
+		<para>
+		If each block executes asynchronously in its own thread, there is no
+		way to predict, in which order they will actually execute. If some data
+		is sent to B and C at about the same time, it becomes a race between
+		them. One of the paths might also be longer than the other, making one
+		alternative always win the race. This kind of problems is fairly common
+		for the Aleri system that is highly multithreaded. But this is the
+		problem of absolutely any CEP engine if you split the execution by
+		multiple threads or processes.
+		</para>
+
+		<para>
+		But the single-threaded execution is not necessarily a cure either.
+		Then the order of execution is up to the scheduler. And if the
+		scheduler gets all these rows close together, and then decides to
+		process all the input of A, then all the input of B, of C and of D,
+		then D will receive the rows in the order:
+		</para>
+
+<exdump>
+INSERT,key1,-1,1
+INSERT,key1,10,0
+DELETE,key1,10,0
+INSERT,key1,20,0
+DELETE,key1,20,0
+</exdump>
+
+		<indexterm>
+			<primary>bundling</primary>
+		</indexterm>
+		<para>
+		Which is typical for, say, Coral8 if all the input rows arrive in a
+		single bundle (see also the 
+		<xref linkend="sc_sched_no_bundling" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;).
+		</para>
+
+		<para>
+		The multithreaded case in Triceps will be discussed separately in
+		<xref linkend="sc_mt_main_reorder" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<para>
+		When the single-threaded scheduling is concerned, Triceps provides two
+		answers.
+		</para>
+
+		<para>
+		First, the conditional logic can often be expressed procedurally:
+		</para>
+
+<pre>
+if ($a->get("value") < 0) {
+	D($rtD->makeRowHash($a->toHash(), negative => 1));
+} else {
+	D($rtD->makeRowHash($a->toHash(), negative => 0));
+}
+</pre>
+
+		<para>
+		The procedural if-else logic can easily handle not only the simple
+		expressions but things like look-ups and modifications in the tables.
+		</para>
+
+		<para>
+		Second, if the logic is broken into the separate labels, the label call
+		semantics provides the same ordering as well:
+		</para>
+
+<pre>
+$lbA = $unit->makeLabel($rtA, "A", undef, sub {
+	my $rop = $_[1]; 
+	my $op = $rop->getOpcode(); my $a = $rop->getRow();
+	if ($a->get("value") < 0) {
+		$unit->call($lbB->makeRowop($op, $a));
+	} else {
+		$unit->call($lbC->makeRowop($op, $a));
+	}
+});
+
+$lbB = $unit->makeLabel($rtA, "B", undef, sub {
+	my $rop = $_[1]; 
+	my $op = $rop->getOpcode(); my $a = $rop->getRow();
+	$unit->makeHashCall($lbD, $op, $a->toHash(), negative => 1);
+});
+
+$lbC = $unit->makeLabel($rtA, "C", undef, sub {
+	my $rop = $_[1]; 
+	my $op = $rop->getOpcode(); my $a = $rop->getRow();
+	$unit->makeHashCall($lbD, $op, $a->toHash(), negative => 0);
+});
+</pre>
+
+		<indexterm>
+			<primary>scheduling</primary>
+		</indexterm>
+		<para>
+		When the label A calls the label B or C, which calls the label D, A
+		does not get to see its next input row until the whole chain of calls
+		to D and beyond completes. B and C may be replaced with the label
+		chains of arbitrary complexity, including loops, without disturbing the
+		logic.
+		</para>
+
+		<para>
+		The second problem with the diamond topology
+		happens when the blocks B and C keep the state, and the
+		input data gets updated by simply re-sending a record with the same
+		key. This kind of updates is typical for the systems that do not have
+		the concept of opcodes.
+		</para>
+
+		<para>
+		Consider a CCL example (approximate, since I can't test it) that gets
+		the reports about borrowing and loaning securities, using the sign of
+		the quantity to differentiate between borrows (-) and loans (+).
+		It then sums up the borrows and loans separately:
+		</para>
+
+		<indexterm>
+			<primary>CCL</primary>
+		</indexterm>
+<pre>
+create schema s_A (
+	id integer, 
+	symbol string,
+	quantity long
+);
+create input stream i_A schema s_A;
+
+create schema s_D (
+	symbol string,
+	borrowed boolean, // flag: loaned or borrowed
+	quantity long
+);
+// aggregated data
+create public window w_D schema s_D
+keep last per symbol, borrowed;
+
+// collection of borrows
+create public window w_B schema s_A keep last per id;
+// collection of loans
+create public window w_C schema s_A keep last per id;
+
+insert when quantity < 0
+	then w_B
+	else w_C
+select * from i_A; 
+
+// borrows aggregation
+insert into w_D
+select
+	symbol,
+	true,
+	sum(quantity)
+group by symbol
+from w_B;
+
+// loans aggregation
+insert into w_D
+select
+	symbol,
+	false,
+	sum(quantity)
+group by symbol 
+from w_C;
+</pre>
+
+		<para>
+		It works OK until a row with the same id gets updated to a different
+		sign of quantity:
+		</para>
+
+<pre>
+1,AAA,100
+....
+1,AAA,-100
+</pre>
+
+		<para>
+		If the quantity kept the same sign, the new row would simply replace
+		the old one in w_B or w_C, and the aggregation result would be right
+		again. But when the sign changes, the new row goes into a different
+		direction than the previous one. Now it ends up with both w_B and w_C
+		having rows with the same id: one old and one new!
+		</para>
+
+		<para>
+		In this case really the problem is at the <quote>fork</quote> part of the <quote>diamond</quote>,
+		the merging part of it is just along for the ride, carrying the
+		incorrect results.
+		</para>
+
+		<para>
+		This problem does not happen in the systems that have both inserts and
+		deletes. Then the data sequence becomes
+		</para>
+
+<pre>
+INSERT,1,AAA,100
+....
+DELETE,1,AAA,100
+INSERT,1,AAA,-100
+</pre>
+
+		<para>
+		The DELETE goes along the same branch as the first insert and undoes
+		its effect, then the second INSERT goes into the other branch.
+		</para>
+
+		<para>
+		Since Triceps has both INSERT and DELETE opcodes, it's immune to this
+		problem, as long as the input data has the correct DELETEs in it.
+		</para>
+
+		<para>
+		If you wonder, the CCL example can be fixed too but in a more
+		round-about way, by adding a couple of statements before the
+		<quote>insert-when</quote> statement:
+		</para>
+
+<pre>
+on w_A
+delete from w_B
+	where w_A.id = w_B.id;
+
+on w_A
+delete from w_C
+	where w_A.id = w_C.id;
+</pre>
+
+		<para>
+		This generates the matching DELETEs. Of course, if you want, you can
+		use this way with Triceps too.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_other_collapse">
+		<title>Collapsed updates</title>
+
+		<indexterm>
+			<primary>Collapse</primary>
+		</indexterm>
+		<para>
+		First, a note: the collapse described here has nothing to do with the collapsing
+		of the aggregation groups. It's just the same word reused for a different
+		purpose.
+		</para>
+
+		<indexterm>
+			<primary>CCL</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Aleri</primary>
+		</indexterm>
+		<indexterm>
+			<primary>batch</primary>
+		</indexterm>
+		<para>
+		Sometimes the exact sequence of how a row at a particular key was
+		updated does not matter, the only interesting part is the end result.
+		Like the <pre>OUTPUT EVERY</pre> statement in CCL or the pulsed subscription in
+		Aleri. It doesn't have to be time-driven either: if the data comes in
+		as batches, it makes sense to collapse the modifications from the whole
+		batch into one, and send it at the end of the batch.
+		</para>
+
+		<para>
+		To do this in Triceps, I've made a template. Here is an example of its
+		use with interspersed commentary: 
+		</para>
+
+<!-- t/Collapse.t -->
+<pre>
+our $rtData = Triceps::RowType->new(
+	# mostly copied from the traffic aggregation example
+	local_ip => "string",
+	remote_ip => "string",
+	bytes => "int64",
+);
+</pre>
+
+		<para>
+		The meaning of the rows is not particularly important for this example.
+		It just uses a pair of the IP addresses as the collapse key. The
+		collapse absolutely needs a primary key, since it has to track and
+		collapse multiple updates to the same row.
+		</para>
+
+<!-- t/Collapse.t testExplicitRowType -->
+<pre>
+my $unit = Triceps::Unit->new("unit");
+
+my $collapse = Triceps::Collapse->new(
+	unit => $unit,
+	name => "collapse",
+	data => [
+		name => "idata",
+		rowType => $rtData,
+		key => [ "local_ip", "remote_ip" ],
+	],
+);
+</pre>
+
+		<para>
+		Most of the options are self-explanatory. The dataset is defined with
+		nested options to make the API extensible, to allow multiple datasets
+		to be defined in the future. But at the moment only one is allowed. A
+		dataset collapses the data at one label: an input label and an output
+		label get defined for it, just as for the table. The data arrives at
+		the input label, gets collapsed by the primary key, and then stays in
+		the Collapse until the flush. When the Collapse gets flushed, the data
+		is sent out of its output label. After the flush, the Collapse has no
+		data in it, and starts collecting the updates again from scratch. The
+		labels gets named by connecting the names of the Collapse element, of
+		the dataset, and <quote>in</quote> or <quote>out</quote>. For this Collapse, the label names will
+		be <quote>collapse.idata.in</quote> and <quote>collapse.idata.out</quote>.
+		</para>
+
+		<para>
+		Note that the dataset options are specified in a referenced array, not
+		a hash! If you try to use a hash, it will fail. When specifying the
+		dataset options, put the <quote>name</quote> first. It's used in the error
+		messages about any issues in the dataset, and the code really expects
+		the name to go first.
+		</para>
+
+		<para>
+		Like with the other shown templates, if something goes wrong, Collapse
+		will confess.
+		</para>
+
+<!-- t/Collapse.t testExplicitRowType -->
+<pre>
+my $lbPrint = makePrintLabel("print", $collapse->getOutputLabel("idata"));
+</pre>
+
+		<para>
+		The print label gets connected to the Collapse's output
+		label. The method to get the collapse's output label is very much like
+		table's. Only it gets the dataset name as an argument.
+		</para>
+
+<!-- t/Collapse.t, assembled from main loop and testExplicitRowType -->
+<pre>
+sub mainloop($$$) # ($unit, $datalabel, $collapse)
+{
+	my $unit = shift;
+	my $datalabel = shift;
+	my $collapse = shift;
+	while(&readLine) {
+		chomp;
+		my @data = split(/,/); # starts with a command, then string opcode
+		my $type = shift @data;
+		if ($type eq "data") {
+			my $rowop = $datalabel->makeRowopArray(@data);
+			$unit->call($rowop);
+			$unit->drainFrame(); # just in case, for completeness
+		} elsif ($type eq "flush") {
+			$collapse->flush();
+		}
+	}
+}
+
+&mainloop($unit, $collapse->getInputLabel($collapse->getDatasets()), $collapse);
+</pre>
+
+		<para>
+		There will be a second example, so I've placed the main loop into a
+		function. It works in the same way as in the examples before: extracts
+		the data from the CSV format and sends it to a label. The first column
+		contains the command: <quote>data</quote> sends the data, and <quote>flush</quote> performs the
+		flush from the Collapse. The flush marks the end of the batch. Here is
+		an example of a run, with the input lines shown as usual in bold:
+		</para>
+
+<!-- t/Collapse.t testExplicitRowType -->
+<exdump>
+> data,OP_INSERT,1.2.3.4,5.6.7.8,100
+> data,OP_INSERT,1.2.3.4,6.7.8.9,1000
+> data,OP_DELETE,1.2.3.4,6.7.8.9,1000
+> flush
+collapse.idata.out OP_INSERT local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="100" 
+</exdump>
+
+		<para>
+		The row for (1.2.3.4, 5.6.7.8) gets plainly inserted, and goes through
+		on the flush. The row for (1.2.3.4, 6.7.8.9) gets first inserted and then
+		deleted, so by the flush time it becomes a no-operation.
+		</para>
+
+<!-- t/Collapse.t testExplicitRowType -->
+<exdump>
+> data,OP_DELETE,1.2.3.4,5.6.7.8,100
+> data,OP_INSERT,1.2.3.4,5.6.7.8,200
+> data,OP_INSERT,1.2.3.4,6.7.8.9,2000
+> flush
+collapse.idata.out OP_DELETE local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="100" 
+collapse.idata.out OP_INSERT local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="200" 
+collapse.idata.out OP_INSERT local_ip="1.2.3.4" remote_ip="6.7.8.9" bytes="2000" 
+</exdump>
+
+		<para>
+		The original row for (1.2.3.4, 5.6.7.8) gets modified, and the modification
+		goes through. The new row for (1.2.3.4, 6.7.8.9) gets inserted now,
+		and also goes through.
+		</para>
+
+<!-- t/Collapse.t testExplicitRowType -->
+<exdump>
+> data,OP_DELETE,1.2.3.4,6.7.8.9,2000
+> data,OP_INSERT,1.2.3.4,6.7.8.9,3000
+> data,OP_DELETE,1.2.3.4,6.7.8.9,3000
+> data,OP_INSERT,1.2.3.4,6.7.8.9,4000
+> data,OP_DELETE,1.2.3.4,6.7.8.9,4000
+> flush
+collapse.idata.out OP_DELETE local_ip="1.2.3.4" remote_ip="6.7.8.9" bytes="2000" 
+</exdump>
+
+		<para>
+		The row for (1.2.3.4, 6.7.8.9) now gets modified twice, and after that
+		deleted. After collapse it becomes the deletion of the original row,
+		the one that was inserted before the previous flush.
+		</para>
+
+		<para>
+		The Collapse also allows to specify the row type and the input
+		connection for a dataset in a different way:
+		</para>
+
+<!-- t/Collapse.t testFromLabel, skipping tests -->
+<pre>
+my $lbInput = $unit->makeDummyLabel($rtData, "lbInput");
+
+my $collapse = Triceps::Collapse->new(
+	name => "collapse",
+	data => [
+		name => "idata",
+		fromLabel => $lbInput,
+		key => [ "local_ip", "remote_ip" ],
+	],
+);
+
+&mainloop($unit, $lbInput, $collapse);
+</pre>
+
+		<para>
+		Normally <pre>$lbInput</pre> would be not a dummy label but the output label of
+		some element. The dataset option <quote>fromLabel</quote> tells that the dataset input will
+		be coming from that label. So the Collapse can automatically both copy
+		its row type for the dataset, and also chain the dataset's input label
+		to that label. And also allowing to skip the option <quote>unit</quote>
+		at the main level.
+		It's a pure convenience, allowing to skip the manual
+		steps. In the future a Collapse dataset should probably take a whole list of source
+		labels and chain itself to all of them, but for now only one.
+		</para>
+
+		<para>
+		This example produces exactly the same output as the previous one, so
+		there is no use in copying it again.
+		</para>
+
+		<para>
+		Another item that hasn't been shown yet, you can get the list of
+		dataset names (well, currently only one name):
+		</para>
+
+<pre>
+@names = $collapse->getDatasets();
+</pre>
+
+		<para>
+		The Collapse implementation is reasonably small, and is another worthy
+		example to show. It's a common template, with no code
+		generation whatsoever, just a combination of ready components. As with
+		SimpleAggregator, the current Collapse is quite simple and will grow
+		more features over time, so I've copied the original simple version
+		into <pre>t/xCollapse.t</pre> to stay there unchanged.
+		</para>
+
+		<para>
+		The most notable thing about Collapse is that it took just about an
+		hour to write the first version of it and another three or so hours to
+		test it. Which is a lot less than the similar code in the Aleri or
+		Coral8 code base took. The reason for this is that Triceps provides the
+		fairly flexible base data structures that can be combined easily
+		directly in a scripting language. There is no need to re-do a lot from
+		scratch every time, just take something and add a little bit on top.
+		</para>
+
+		<para>
+		So here it is, with the interspersed commentary.
+		</para>
+
+<!-- lib/Triceps/Collapse.pm -->
+<pre>
+sub new # ($class, $optName => $optValue, ...)
+{
+	my $class = shift;
+	my $self = {};
+
+	&Triceps::Opt::parse($class, $self, {
+		unit => [ undef, sub { &Triceps::Opt::ck_ref(@_, "Triceps::Unit") } ],
+		name => [ undef, \&Triceps::Opt::ck_mandatory ],
+		data => [ undef, sub { &Triceps::Opt::ck_mandatory(@_); &Triceps::Opt::ck_ref(@_, "ARRAY") } ],
+	}, @_);
+
+	# Keeps the names of the datasets in the order they have been defined
+	# (since the hash loses the order).
+	$self->{dsetnames} = [];
+	
+	# parse the data element
+	my %data_unparsed = @{$self->{data}};
+	my $dataset = {};
+	&Triceps::Opt::parse("$class data set (" . ($data_unparsed{name} or 'UNKNOWN') . ")", $dataset, {
+		name => [ undef, \&Triceps::Opt::ck_mandatory ],
+		key => [ undef, sub { &Triceps::Opt::ck_mandatory(@_); &Triceps::Opt::ck_ref(@_, "ARRAY", "") } ],
+		rowType => [ undef, sub { &Triceps::Opt::ck_ref(@_, "Triceps::RowType"); } ],
+		fromLabel => [ undef, sub { &Triceps::Opt::ck_ref(@_, "Triceps::Label"); } ],
+	}, @{$self->{data}});
+</pre>
+
+		<para>
+		The options parsing goes as usual. The option <quote>data</quote> is parsed again
+		for the options inside it, and those are placed into the hash
+		<pre>%$dataset</pre>.
+		</para>
+
+<!-- lib/Triceps/Collapse.pm -->
+<pre>
+	# save the dataset for the future
+	push @{$self->{dsetnames}}, $dataset->{name};
+	$self->{datasets}{$dataset->{name}} = $dataset;
+	# check the options
+	&Triceps::Opt::handleUnitTypeLabel("Triceps::Collapse data set (". $dataset->{name} . ")",
+		"unit at the main level", \$self->{unit}, 
+		"rowType", \$dataset->{rowType}, 
+		"fromLabel", \$dataset->{fromLabel});
+	my $lbFrom = $dataset->{fromLabel};
+</pre>
+
+		<para>
+		If <quote>fromLabel</quote> is used, the row type and possibly unit are found from it
+		by <pre>Triceps::Opt::handleUnitTypeLabel()</pre>. Or if the unit was specified
+		explicitly, it gets checked for consistency with the label's unit. See
+		<xref linkend="sc_template_options" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;
+		for more detail. The early version of Collapse in <pre>t/xCollapse.t</pre> actually
+		pre-dates <pre>Triceps::Opt::handleUnitTypeLabel()</pre>, and there the similar
+		functionality is done manually.
+		</para>
+
+<!-- lib/Triceps/Collapse.pm -->
+<pre>
+	# create the tables
+	$dataset->{tt} = Triceps::TableType->new($dataset->{rowType})
+		->addSubIndex("primary", 
+			Triceps::IndexType->newHashed(key => $dataset->{key})
+		);
+	Triceps::wrapfess 
+		"$myname: Collapse table type creation error for dataset '" . $dataset->{name} . "':",
+		sub { $dataset->{tt}->initialize(); };
+
+	Triceps::wrapfess 
+		"$myname: Collapse internal error: insert table creation for dataset '" . $dataset->{name} . "':",
+		sub { $dataset->{tbInsert} = $self->{unit}->makeTable($dataset->{tt}, $self->{name} . "." . $dataset->{name} . ".tbInsert"); };
+
+	Triceps::wrapfess 
+		"$myname: Collapse internal error: delete table creation for dataset '" . $dataset->{name} . "':",
+		sub { $dataset->{tbDelete} = $self->{unit}->makeTable($dataset->{tt}, $self->{name} . "." . $dataset->{name} . ".tbDelete"); };
+</pre>
+
+		<para>
+		The state is kept in two tables. The reason for their existence is that after
+		collapsing, the Collapse may send for each key one of:
+		<para>
+
+		<itemizedlist>
+		<listitem>
+		a single INSERT rowop, if the row was not there before and became inserted, 
+		</listitem>
+
+		<listitem>
+		a DELETE rowop if the row was there before and then became deleted, 
+		</listitem>
+
+		<listitem>
+		a DELETE followed by an INSERT if the row was there but then changed its value,
+		</listitem>
+
+		<listitem>
+		or nothing if the row was not there before, and then was inserted and deleted,
+		or if there was no change to the row.
+		</listitem>
+		</itemizedlist>
+
+		</para>
+		Accordingly, this state is kept in two tables: one contains the DELETE
+		part, another the INSERT part for each key, and either part may be
+		empty (or both, if the row at that key has not been changed). After
+		each flush both tables become empty, and then start collecting the
+		modifications again.
+		</para>
+
+<!-- lib/Triceps/Collapse.pm -->
+<pre>
+	# create the labels
+	Triceps::wrapfess 
+		"$myname: Collapse internal error: input label creation for dataset '" . $dataset->{name} . "':",
+		sub { $dataset->{lbIn} = $self->{unit}->makeLabel($dataset->{rowType}, $self->{name} . "." . $dataset->{name} . ".in", 
+			undef, \&_handleInput, $self, $dataset); };
+
+	Triceps::wrapfess 
+		"$myname: Collapse internal error: output label creation for dataset '" . $dataset->{name} . "':",
+		sub { $dataset->{lbOut} = $self->{unit}->makeDummyLabel($dataset->{rowType}, $self->{name} . "." . $dataset->{name} . ".out"); };
+</pre>
+
+		<para>
+		The input and output labels get created. The input label has the
+		function with the processing logic set as its handler. The output label
+		is just a dummy. Note that the tables don't get connected anywhere,
+		they are just used as storage, without any immediate reactions to their
+		modifications.
+		</para>
+
+<!-- lib/Triceps/Collapse.pm -->
+<pre>
+	# chain the input label, if any
+	if (defined $lbFrom) {
+		Triceps::wrapfess 
+			"$myname: Collapse internal error: input label chaining for dataset '" . $dataset->{name} . "' to '" . $lbFrom->getName() . "' failed:",
+			sub { $lbFrom->chain($dataset->{lbIn}); };
+		delete $dataset->{fromLabel}; # no need to keep the reference any more, avoid a reference cycle
+	}
+</pre>
+
+		<para>
+		And if the <quote>fromLabel</quote> was used, the Collapse gets connected to it. After
+		that there is no good reason to keep a separate reference to that
+		label, especially considering that it creates a reference loop
+		that would not be cleaned until the input label get cleaned by the unit. 
+		So it gets deleted early instead.
+		</para>
+
+<!-- lib/Triceps/Collapse.pm -->
+<pre>
+	bless $self, $class;
+	return $self;
+}
+</pre>
+
+		<para>
+		The final blessing is boilerplate. The constructor creates the data
+		structures but doesn't implement any logic. The logic goes next:
+		</para>
+
+<!-- lib/Triceps/Collapse.pm -->
+<pre>
+# (protected)
+# handle one incoming row on a dataset's input label
+sub _handleInput # ($label, $rop, $self, $dataset)
+{
+	my $label = shift;
+	my $rop = shift;
+	my $self = shift;
+	my $dataset = shift;
+
+	if ($rop->isInsert()) {
+		# Simply add to the insert table: the effect is the same, independently of
+		# whether the row was previously deleted or not. This also handles correctly
+		# multiple inserts without a delete between them, even though this kind of
+		# input is not really expected.
+		$dataset->{tbInsert}->insert($rop->getRow());
+</pre>
+
+		<para>
+		The Collapse object knows nothing about the data that went through it
+		before. After each flush it starts again from scratch. It expects
+		that the stream of rows is self-consistent, and makes the conclusions
+		about the previous data based on the new data it sees. An INSERT rowop
+		may mean one of two things: either there was no previous record with
+		this key, or there was a previous record with this key and then it got
+		deleted. The Delete table can be used to differentiate between these situations:
+		if there was a row that was then deleted, the Delete table would
+		contain that row. But for the INSERT it doesn't matter: in either case
+		it just inserts the new row into the Insert table. If there was no such
+		row before, it would be the new INSERT. If there was such a row before,
+		it would be an INSERT following a DELETE.
+		</para>
+
+<!-- lib/Triceps/Collapse.pm -->
+<pre>
+	} elsif($rop->isDelete()) {
+		# If there was a row in the insert table, delete that row (undoing the previous insert).
+		# Otherwise it means that there was no previous insert seen in this round, so this must be a
+		# deletion of a row inserted in the previous round, so insert it into the delete table.
+		if (! $dataset->{tbInsert}->deleteRow($rop->getRow())) {
+			$dataset->{tbDelete}->insert($rop->getRow());
+		}
+	}
+}
+</pre>
+
+		<para>
+		The DELETE case is more interesting. If we see a DELETE rowop, this
+		means that either there was an INSERT sent before the last flush and
+		now that INSERT becomes undone, or that there was an INSERT after the
+		flush, which also becomes undone. The actions for these cases are
+		different: if the INSERT was before the flush, this row should go into
+		the Delete table, and eventually propagate as a DELETE during the next
+		flush. If the last INSERT was after the flush, then its row would be
+		stored in the Insert table, and now we just need to delete that row and
+		pretend that it has never been.
+		</para>
+
+		<para>
+		That's what the logic does: first it tries to remove from the Insert
+		table. If succeeded, then it was an INSERT after the flush, that became
+		undone now, and there is nothing more to do. If there was no row to
+		delete, this means that the INSERT must have happened before the last
+		flush, and we need to remember this row in the Delete table and pass it
+		on in the next flush.
+		</para>
+
+		<para>
+		This logic is not resistant to the incorrect data sequences. If there
+		ever are two DELETEs for the same key in a row (which should never
+		happen in a correct sequence), the second DELETE will end up in the
+		Delete table.
+		</para>
+
+<!-- lib/Triceps/Collapse.pm -->
+<pre>
+# Unlatch and flush the collected data, then latch again.
+sub flush # ($self)
+{
+	my $self = shift;
+	my $unit = $self->{unit};
+	my $OP_INSERT = &Triceps::OP_INSERT;
+	my $OP_DELETE = &Triceps::OP_DELETE;
+	foreach my $dataset (values %{$self->{datasets}}) {
+		my $tbIns = $dataset->{tbInsert};
+		my $tbDel = $dataset->{tbDelete};
+		my $lbOut = $dataset->{lbOut};
+		my $next;
+		# send the deletes always before the inserts
+		for (my $rh = $tbDel->begin(); !$rh->isNull(); $rh = $next) {
+			$next = $rh->next(); # advance the irerator before removing
+			$tbDel->remove($rh);
+			$unit->call($lbOut->makeRowop($OP_DELETE, $rh->getRow()));
+		}
+		for (my $rh = $tbIns->begin(); !$rh->isNull(); $rh = $next) {
+			$next = $rh->next(); # advance the irerator before removing
+			$tbIns->remove($rh);
+			$unit->call($lbOut->makeRowop($OP_INSERT, $rh->getRow()));
+		}
+	}
+}
+</pre>
+
+		<para>
+		The flushing is fairly straightforward: first it sends on all the
+		DELETEs, then all the INSERTs, clearing the tables along the way. At
+		first I've though of matching the DELETEs and INSERTs together, sending
+		them next to each other in case if both are available for some key.
+		It's not that difficult to do. But then I've realized that it doesn't
+		matter and just did it the simple way.
+		</para>
+
+<!-- lib/Triceps/Collapse.pm -->
+<pre>
+# Get the input label of a dataset.
+# Confesses on error.
+sub getInputLabel($$) # ($self, $dsetname)
+{
+	my ($self, $dsetname) = @_;
+	confess "Unknown dataset '$dsetname'"
+		unless exists $self->{datasets}{$dsetname};
+	return $self->{datasets}{$dsetname}{lbIn};
+}
+
+# Get the output label of a dataset.
+# Confesses on error.
+sub getOutputLabel($$) # ($self, $dsetname)
+{
+	my ($self, $dsetname) = @_;
+	confess "Unknown dataset '$dsetname'"
+		unless exists $self->{datasets}{$dsetname};
+	return $self->{datasets}{$dsetname}{lbOut};
+}
+
+# Get the lists of datasets (currently only one).
+sub getDatasets($) # ($self)
+{
+	my $self = shift;
+	return @{$self->{dsetnames}};
+}
+</pre>
+
+		<para>
+		The getter functions are fairly simple. The only catch is that the code
+		has to check for <pre>exists</pre> before it reads the value of
+		<pre>$self->{datasets}{$dsetname}{lbOut}</pre>. Otherwise, if an
+		incorrect <pre>$dsetname</pre> is used, the reading would return an <pre>undef</pre>
+		but along the way would create an unpopulated
+		<pre>$self->{datasets}{$dsetname}</pre>. Which would then cause a crash when
+		<pre>flush()</pre> tries to iterate through it and finds the dataset options
+		missing.
+		</para>
+
+		<para>
+		That's it, Collapse in a nutshell! Another way to do the collapse will
+		be shown in
+		<xref linkend="sc_strf_collapse" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		And one more piece to it is shown in
+		<xref linkend="sc_strf_templates" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_other_chunks_del">
+		<title>Large deletes in small chunks</title>
+
+		<indexterm>
+			<primary>chunks</primary>
+		</indexterm>
+		<indexterm>
+			<primary>table</primary>
+			<secondary>remove row</secondary>
+		</indexterm>
+		<para>
+		If you have worked with Coral8 and similar CEP systems, you should be
+		familiar with the situation when you ask it to delete a million rows
+		from the table and the model goes into self-contemplation for half an
+		hour, not reacting to any requests. It starts responding again only
+		when the deletes are finished. That's because the execution is
+		single-threaded, and deleting a million rows takes time.
+		</para>
+
+		<para>
+		Triceps is succeptible to the same issue. So, how to avoid it? Even
+		better, how to make the deletes work <quote>in the background</quote>, at a low
+		priority, kicking in only when there is no other pending requests?
+		</para>
+
+		<para>
+		The solution is do do it in smaller chunks. Delete a few rows (say, a
+		thousand or so) then check if there are any other requests. Keep
+		processing these other request until the model becomes idle. Then
+		continue with deleting the next chunk of rows.
+		</para>
+
+		<para>
+		Let's make a small example of it. First, let's make a table.
+		</para>
+
+<!-- t/xClear.t doClearChunks -->
+<pre>
+our $uChunks = Triceps::Unit->new("uChunks");
+
+# data is just some dumb easily-generated filler
+our $rtData = Triceps::RowType->new(
+	s => "string",
+	i => "int32",
+);
+
+# the data is auto-generated by a sequence
+our $seq = 0;
+
+our $ttData = Triceps::TableType->new($rtData)
+	->addSubIndex("fifo", Triceps::IndexType->newFifo())
+;
+$ttData->initialize();
+our $tData = $uChunks->makeTable($ttData, "tJoin1");
+makePrintLabel("lbPrintData", $tData->getOutputLabel());
+</pre>
+
+		<para>
+		The data in the table is completely silly, just something to put in
+		there. Even the index is a simple FIFO, just something to keep the
+		table together. 
+		</para>
+
+		<para>
+		Next, the clearing logic.
+		</para>
+
+<!-- t/xClear.t doClearChunks -->
+<pre>
+# notifications about the clearing
+our $rtNote = Triceps::RowType->new(
+	text => "string",
+);
+
+# rowops to run when the model is otherwise idle
+our $trayIdle = $uChunks->makeTray();
+
+our $lbReportNote = $uChunks->makeDummyLabel($rtNote, "lbReportNote"
+);
+makePrintLabel("lbPrintNote", $lbReportNote);
+
+# code that clears the table in small chunks
+our $lbClear = $uChunks->makeLabel($rtNote, "lbClear", undef, sub {
+	$tData->clear(2); # no more than 2 rows deleted per run
+	if ($tData->size() > 0) {
+		$trayIdle->push($_[0]->adopt($_[1])); 
+	} else {
+		$uChunks->makeHashCall($lbReportNote, "OP_INSERT",
+			text => "done clearing",
+		);
+	}
+});
+</pre>
+
+		<para>
+		We want to get a notification when the clearing is done. This
+		notification will be sent as a rowop with row type <pre>$rtNote</pre> to the
+		label <pre>$lbReportNote</pre>. Which then just gets printed, so that we can
+		see it. In a production system it would be sent back to the
+		requestor.
+		</para>
+
+		<para>
+		The clearing is initiated by sending a row (of the same type <pre>$rtNote</pre>) to
+		the label <pre>$lbClear</pre>. Which does the job and then sends the notification of completion.
+		In the real world not the whole table would probably be erased but only
+		the old data, from before a certain date, like was shown in the
+		<xref linkend="sc_joins_jointwo_inputfilter" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		Here for simplicity all the data get wiped out.
+		</para>
+
+		<indexterm>
+			<primary>label</primary>
+			<secondary>chaining</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>label</primary>
+			<secondary>adoption</secondary>
+		</indexterm>
+		<para>
+		But the method <pre>clear()</pre> stops after the number of deleted rows reaches the limit.
+		Since it's real inconvenient to play with a million rows, we'll play
+		with just a few rows. And so the chunk size limit is also set smaller,
+		to just two rows instead of a thousand. When the limit is reached and there
+		still are rows left in the table, the
+		code pushes the command row into the idle tray for later rescheduling and
+		returns. The adoption part is not strictly necessary, and this small
+		example would work fine without it. But it's a safeguard for the more
+		complicated programs that may have the labels chained, with our
+		clearing label being just one link in a chain. If the incoming rowop
+		gets rescheduled as is, the whole chain will get executed again. which
+		might not be desirable. Re-adopting it to our label will cause only our
+		label (okay, and everything chained from it) to be executed.
+		</para>
+
+		<para>
+		How would the rowops in the idle tray get executed? In the real world,
+		the main loop logic would be like this pseudocode:
+		</para>
+
+<pre>
+while(1) {
+	if (idle tray is empty)
+		timeout = infinity;
+	else
+		timeout = 0;
+	poll(file descriptors, timeout);
+	if (poll timed out)
+		run the idle tray;
+	else
+		process the incoming data;
+}
+</pre>
+
+		<para>
+		The example from
+		<xref linkend="sc_sched_mainloop_socket" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;
+		can be extended to work like this.
+		But it's hugely inconvenient for a toy demonstration, getting the
+		timing right would be a major pain. So instead let's just add the
+		command <quote>idle</quote> to the main loop, to trigger the idle logic at will.
+		The main loop of the example is:
+		</para>
+
+<!-- t/xClear.t doClearChunks -->
+<pre>
+while(&readLine) {
+	chomp;
+	my @data = split(/,/); # starts with a command, then string opcode
+	my $type = shift @data;
+	if ($type eq "data") {
+		my $count = shift @data;
+		for (; $count > 0; $count--) {
+			++$seq;
+			$uChunks->makeHashCall($tData->getInputLabel(), "OP_INSERT",
+				s => ("data_" . $seq),
+				i => $seq,
+			);
+		}
+	} elsif ($type eq "dump") {
+		for (my $rhit = $tData->begin(); !$rhit->isNull(); $rhit = $rhit->next()) {
+			&send("dump: ", $rhit->getRow()->printP(), "\n");
+		}
+		for my $r ($trayIdle->toArray()) {
+			&send("when idle: ", $r->printP(), "\n");
+		}
+	} elsif ($type eq "clear") {
+		$uChunks->makeHashCall($lbClear, "OP_INSERT",
+			text => "clear",
+		);
+	} elsif ($type eq "idle") {
+		$uChunks->schedule($trayIdle);
+		$trayIdle->clear();
+	}
+	$uChunks->drainFrame(); # just in case, for completeness
+}
+</pre>
+
+		<para>
+		The data is put into the table by the main loop in a silly way:
+		When we send the command like <quote><pre>data,3</pre></quote>, the mail loop will insert 3 new
+		rows into the table. The contents is generated with sequential numbers,
+		so the rows can be told apart. As the table gets changed, the updates
+		get printed by the label <pre>lbPrintData</pre>. 
+		</para>
+
+		<para>
+		The command <quote>dump</quote> dumps the contents of both the
+		table and of the idle tray.
+		</para>
+
+		<para>
+		The command <quote>clear</quote> issues a clearing request by calling
+		the label <pre>$lbClear</pre>. The first chunk gets cleared right away
+		but then the control returns back to the main loop. If not all the data
+		were cleared, an idle rowop will be placed into the idle tray.
+		</para>
+
+		<para>
+		The command <quote>idle</quote> that simulates the input idleness will
+		then pick up that rowop from the idle tray and reschedule it.
+		</para>
+
+		<para>
+		All the pieces have been put together, let's run the code. The commentary
+		are interspersed, and as usual, the input lines are shown in bold:
+		</para>
+
+<!-- t/xClear.t doClearChunks -->
+<exdump>
+> data,1
+tJoin1.out OP_INSERT s="data_1" i="1" 
+> clear
+tJoin1.out OP_DELETE s="data_1" i="1" 
+lbReportNote OP_INSERT text="done clearing" 
+</exdump>
+
+		<para>
+		This is pretty much a dry run: put in one row (less than the chunk
+		size), see it deleted on clearing. And see the completion reported
+		afterwards.
+		</para>
+
+<!-- t/xClear.t doClearChunks -->
+<exdump>
+> data,5
+tJoin1.out OP_INSERT s="data_2" i="2" 
+tJoin1.out OP_INSERT s="data_3" i="3" 
+tJoin1.out OP_INSERT s="data_4" i="4" 
+tJoin1.out OP_INSERT s="data_5" i="5" 
+tJoin1.out OP_INSERT s="data_6" i="6" 
+</exdump>
+
+		<para>
+		Add more data, which will be enough for three chunks.
+		</para>
+
+<!-- t/xClear.t doClearChunks -->
+<exdump>
+> clear
+tJoin1.out OP_DELETE s="data_2" i="2" 
+tJoin1.out OP_DELETE s="data_3" i="3" 
+</exdump>
+
+		<para>
+		Now the clearing does one chunk and stops, waiting for the idle condition.
+		</para>
+
+<!-- t/xClear.t doClearChunks -->
+<exdump>
+> dump
+dump: s="data_4" i="4" 
+dump: s="data_5" i="5" 
+dump: s="data_6" i="6" 
+when idle: lbClear OP_INSERT text="clear" 
+</exdump>
+
+		<para>
+		See what's inside: the remaining 3 rows, and a row in the idle tray
+		saying that the clearing is in progress. 
+		</para>
+
+<!-- t/xClear.t doClearChunks -->
+<exdump>
+> idle
+tJoin1.out OP_DELETE s="data_4" i="4" 
+tJoin1.out OP_DELETE s="data_5" i="5" 
+</exdump>
+
+		<para>
+		The model goes idle once more, one more chunk of two rows gets deleted. 
+		</para>
+
+<!-- t/xClear.t doClearChunks -->
+<exdump>
+> data,1
+tJoin1.out OP_INSERT s="data_7" i="7" 
+> dump
+dump: s="data_6" i="6" 
+dump: s="data_7" i="7" 
+when idle: lbClear OP_INSERT text="clear" 
+</exdump>
+
+		<para>
+		What will happen if we add more data in between the chunks of clearing?
+		Let's see, let's add one more row. It shows up in the table as usual.
+		</para>
+
+<!-- t/xClear.t doClearChunks -->
+<exdump>
+> idle
+tJoin1.out OP_DELETE s="data_6" i="6" 
+tJoin1.out OP_DELETE s="data_7" i="7" 
+lbReportNote OP_INSERT text="done clearing" 
+> dump
+> idle
+</exdump>
+
+		<para>
+		On the next idle condition the clearing picks up whatever was in
+		the table for the next chunk. Since there were only two rows left, it's
+		the last chunk, and the clearing reports a successful completion. And a
+		dump shows that there is nothing left in the table nor in the idle
+		tray. The next idle condition does nothing, because the idle tray
+		is empty.
+		</para>
+
+		<para>
+		The deletion could also be interrupted and cancelled, by removing
+		the row from the idle tray. That would involve converting the tray
+		to an array, finding and deleting the right rowop, and converting the
+		array back into the tray. Overall it's fairly straightforward.
+		The search in the array is linear but there should not be that
+		many idle requests, so it should be quick enough.
+		</para>
+
+		<para>
+		The delete-by-chunks logic can be made into a template, just I'm not
+		sure yet what is the best way to do it. It would have to have a lot of
+		configurable parts.
+		</para>
+
+		<para>
+		On another subject, scheduling the things to be done on idle adds an
+		element of unpredictability to the model. It's impossible to predict
+		the exact timing of the incoming requests, and the idle work may get
+		inserted between any of them. Presumably it's OK because the data being
+		deleted should not be participating in any logic at this time any more.
+		For repeatability in the unit tests, make the chunk size adjustable and
+		adjust it to a size larger than the biggest amount of data used in the
+		unit tests.
+		</para>
+
+		<para>
+		A similar logic can also be used in querying the data. But it's more
+		difficult. For deletion the continuation is easy: just take the first
+		row in the index, and it will be the place to continue (because the
+		index is ordered correctly, and because the previous rows are getting
+		deleted). For querying you would have to remember the next row handle
+		and continue from it. Which is OK if it can not get deleted in the
+		meantime. But if it can get deleted, you'll have to keep track of that
+		too, and advance to the next row handle when this happens. And if you
+		want to receive a full snapshot with the following subscription to all
+		updates, you'd have to check whether the modified rows are before or
+		after the marked handle, and pass them through if they are before it,
+		letting the user see the updates to the data already received. And
+		since the data is being sent to the user, filling up the output buffer
+		and stopping would stop the whole model too, and not restart until the
+		user reads the buffered data. So there has to be a flow control logic
+		that would stop the query when output buffer fills up, return to the
+		normal operation, and then reschedule the idle job for the query only
+		when the output buffer drains down. I've kind of started on doing an
+		example of the chunked query too, but then because of all these
+		complications decided to leave it for later.
+		</para>
+	</sect1>
+
+</chapter>
+<!-- updated the examples for 2.0 2014-03-16 -->

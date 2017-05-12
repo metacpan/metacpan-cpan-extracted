@@ -1,0 +1,5 @@
+The classes that build an application out of multiple threads.
+Of course, the C++ applications can ignore these tools and build their
+multithreading directly in whatever way they please. But this 
+infrastructure provides certain niceties, and of course is required
+to bring the multithreading support into Perl.

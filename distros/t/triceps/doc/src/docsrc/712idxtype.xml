@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_ref_index_type"  xmlns:xi="http://www.w3.org/2001/XInclude">
+		<title>IndexType reference</title>
+
+		<indexterm>
+			<primary>IndexType</primary>
+		</indexterm>
+
+		<para>
+		The IndexType is a part of TableType and defines the structuring
+		of rows in the table. It provides the order of rows and optionally
+		a way to find them quickly by the key. The configuration of the
+		index type defines the parameters for each index instance, i.e.
+		each row group in an index of this type, not for the whole table.
+		The difference between indexes and index types is explained in the
+		<xref linkend="sc_table_indextree" xrefstyle="select: label nopage"/>&xrsp;.
+		The index types are connected in a table type to form a tree.
+		</para>
+
+		<para>
+		The index types in Triceps are available in the following kinds:
+		</para>
+
+		<variablelist>
+		<varlistentry>
+			<term>Hashed</term>
+			<listitem>
+			Provides quick random access based on the key formed from the
+			fields of the row in the table. May be leaf or non-leaf. The order
+			of the rows in the index will be repeatable between the runs of the
+			same program on the same machine architecture, but not easily
+			predictable. Internally the rows are stored in a tree but the
+			comparisons of the rows are accelerated by pre-calculating a hash
+			value from the key fields and keeping it in the row handle.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term>FIFO</term>
+			<listitem>
+			Keeps the rows in the order they were received. There is no
+			efficient way to find a particular row in this index, the search in
+			it works by going through all the rows sequentially and comparing
+			the rows for exact equality. It provides the expiration policies
+			based on the row count. It may only be a leaf.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term>PerlSorted</term>
+			<listitem>
+			Provides random access based on the key field comparison, expressed
+			as a Perl function. This results in a predictable order of rows but
+			the execution of the Perl code makes it slower than the Hashed
+			index. May be leaf or non-leaf. Often also called simply <quote>Sorted</quote>.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term>SimpleOrdered</term>
+			<listitem>
+			A Perl template on top of the PerlSorted index,
+			that allows to specify the keys in a more convenient way. 
+			Often also called simply <quote>Ordered</quote>.
+			</listitem>
+		</varlistentry>
+		</variablelist>
+
+<pre>
+$it = Triceps::IndexType->newHashed($optionName => $optionValue, ...);
+</pre>
+
+		<para>
+		Creates a Hashed index type.  The only available and mandatory option is:
+		</para>
+		
+		<variablelist>
+		<varlistentry>
+			<term><pre>key => [ @fields ]</pre></term>
+			<listitem>
+			The argument is a reference to an array of strings
+			that specify the names of the key fields (<pre>key => ["f1", "f2"]</pre>).
+			</listitem>
+		</varlistentry>
+		</variablelist>
+
+
+<pre>
+$it = Triceps::IndexType->newFifo($optionName => $optionValue, ...);
+</pre>
+
+		<para>
+		Creates a FIFO index type.  The options are:
+		</para>
+
+		<variablelist>
+		<varlistentry>
+			<term><pre>limit => $limit</pre></term>
+			<listitem>
+			Sets the limit value for the replacement policy. Once the number of
+			rows attempts to grow beyond this value, the older records get
+			removed. Setting it to 0 disables the replacement policy.
+			Don't try to set it to negative values, they will be
+			treated as unsigned, and thus become some very large positive
+			ones. Optional. Default: 0.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>jumping => 0/1</pre></term>
+			<listitem>
+			Determines the variation of the replacement policy in effect. If
+			set to 0, implements the sliding window policy, removing
+			the older rows one by one. If non-0, implements the jumping window
+			policy, removing all the older rows when a new row causes the limit
+			overflow. Optional. Default: 0.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>reverse => 0/1</pre></term>
+			<listitem>
+			Defines the iteration order. If non-0, the iteration on this index
+			goes in the reverse order. However the expiration policy still
+			works in the direct order! Optional. Default: 0.
+			</listitem>
+		</varlistentry>
+		</variablelist>
+
+<pre>
+$it = Triceps::IndexType->newPerlSorted($sortName, $initFunc,
+	$compareFunc, @args...);
+</pre>
+
+		<para>
+		Creates a PerlSorted index type. The arguments are:
+		</para>
+
+		<variablelist>
+		<varlistentry>
+			<term><pre>$sortName</pre></term>
+			<listitem>
+			a string describing the sorting order, used in <pre>print()</pre>
+			and error messages. 
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>$initFunc</pre></term>
+			<listitem>
+			a function reference that can be used
+			to generate the comparison function dynamically at the table type
+			initialization time (or use <pre>undef</pre> with a fixed comparison
+			function). 
+			A source code string may be used instead of the function reference, see
+			<xref linkend="sc_code" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;. 
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>$compareFunc</pre></term>
+			<listitem>
+			a function reference to the fixed comparison function, if preferred
+			(or use <pre>undef</pre> if it will be generated dynamically by the init
+			function). 
+			A source code string may be used instead of the function reference, see
+			<xref linkend="sc_code" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;. 
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>@args</pre></term>
+			<listitem>
+			optional extra arguments for the
+			initialization and/or comparison function.
+			</listitem>
+		</varlistentry>
+		</variablelist>
+
+		<para>
+		See the details in
+		<xref linkend="sc_table_sorted" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<para>
+		The handling of the fatal errors (as in <pre>die()</pre>) in the initialization 
+		and especially comparison functions is an interesting subject.
+		The errors propagate properly through the table,
+		and the table operations confess with the Perl handler's error message.
+		But since an error in the comparison function means that things are going
+		very, very wrong, after that the table becomes inoperative and will die
+		on all the subsequent operations as well. You need to be very careful
+		in writing these functions.
+		</para>
+
+<pre>
+$it = Triceps::SimpleOrderedIndex->new($fieldName => $order, ...);
+</pre>
+
+		<para>
+		Creates a SimpleOrdered index type.
+		The arguments are the key fields. <pre>$order</pre> is one of
+		the constants <pre>"ASC"</pre> for ascending or <pre>"DESC"</pre> for
+		descending.
+		</para>
+
+<pre>
+$indexType2->addSubIndex("indexName", $indexType1);
+</pre>
+
+		<para>
+		Attaches the nested <pre>$indexType1</pre> under <pre>$indexType2</pre>.
+		More exactly, attaches an uninitialized deep copy of <pre>$indexType1</pre>,
+		the same as when adding an index type under a table type.
+		It returns the reference to the same <pre>$indexType2</pre>, so these calls can be
+		conveniently chained, to add multiple sub-indexes under it. If
+		<pre>$indexType2</pre> can not be non-leaf, the call will fail.
+		</para>
+
+<pre>
+$itSub = $it->findSubIndex("indexName");
+$itSub = $it->findSubIndexSafe("indexName");
+$itSub = $it->findSubIndexById($indexTypeId);
+
+@itSubs = $it->getSubIndexes();
+$itSub = $it->getFirstLeaf();
+</pre>
+
+		<para>
+		Perform the same actions as the same-named methods in the TableType.
+		If the index type is already a leaf, <pre>getFirstLeaf()</pre> will return itself.
+		</para>
+
+<pre>
+$it->setAggregator($aggType);
+</pre>
+
+		<para>
+		Sets an aggregator type on an index type.  It will create aggregators that run on the
+		rows stored withing the indexes of this type.
+		The value returned is the same index type reference <pre>$it</pre>, allowing the
+		chaining calls, along with the <pre>addSubIndex()</pre>. Only one aggregator type
+		is allowed on an index type. Calling <pre>setAggregator()</pre> repeatedly will
+		replace the aggregator type. 
+		</para>
+
+<pre>
+$aggType = $it->getAggregator();
+</pre>
+
+		<para>
+		Returns the aggregator type set on this index type.
+		The returned value may be <pre>undef</pre> if no
+		aggregator type has been set.
+		</para>
+
+<pre>
+$result = $it->isInitialized();
+</pre>
+
+		<para>
+		Returns, whether this type has been initialized.
+		The index type gets initialized when the table type where it belongs
+		gets initialized. After an index type has been initialized, it can not
+		be changed any more, and any methods that change it will return an
+		error.
+		</para>
+
+<pre>
+$itCopy = $it->copy();
+</pre>
+
+		<para>
+		Creates a copy of the index type.
+		The copy reverts to the un-initialized state. It's always a deep copy,
+		with all the nested index and aggregator types copied. All of these
+		copies are un-initialized.
+		</para>
+
+<pre>
+$itCopy = $it->flatCopy();
+</pre>
+
+		<para>
+		Creates a copy of the index type object 
+		itself, without any connected object hierarchies such as the nested
+		indexes or aggregators.
+		</para>
+
+<pre>
+$tabType = $it->getTabtype();
+$tabType = $it->getTabtypeSafe();
+</pre>
+
+		<para>
+		Returns the table type, to which this index type is tied.
+		When an index type becomes initialized, it becomes tied to a particular table type.
+		If the index type is not initialized yet,
+		<pre>getTabtype()</pre> would confess while <pre>getTabtypeSafe()</pre> would 
+		return an <pre>undef</pre>.
+		Which method to use, depends on the circumstances: if this situation
+		is valid and you're ready to check for it and handle it, use
+		<pre>getTabtypeSafe()</pre>, otherwise use <pre>getTabtype()</pre>.
+		</para>
+
+<pre>
+$result = $it1->same($it2);
+$result = $it1->equals($it2); 
+$result = $it1->match($it2);
+$result = $it->print();
+</pre>
+
+		<para>
+		The usual sameness comparisons and print methods.
+		</para>
+
+		<para>
+		Two index types are considered equal when they are of the same kind
+		(type id), their type-specific parameters are equal, they have the
+		same number of sub-indexes, with the same names, and equal pair-wise.
+		They must also have the equal aggregators.
+		</para>
+
+		<para>
+		Two index types are considered matching when they are of the same kind,
+		have matching type-specific parameters, they have the same number of
+		sub-indexes, which are matching pair-wise, and the matching aggregators.
+		The names of the sub-indexes may differ.
+		As far as the type-specific parameters are concerned, it depends on the
+		kind of the index type. The FIFO type considers any parameters matching.
+		For a Hashed index the key fields must be the same. For a Sorted index
+		the sorted condition must also be the same, and by extension this
+		means the same condition for the Ordered index.
+		</para>
+
+<pre>
+$result = $it->isLeaf();
+</pre>
+
+		<para>
+		Returns 1 if the index type is a leaf, 0 if not.
+		</para>
+
+<pre>
+@keys = $it->getKey();
+</pre>
+
+		<para>
+		Returns the array of field names forming the key of this index. 
+		Currently works only on the Hashed index types. On the other index
+		types it returns an empty array, though probably a better support would
+		be available for the PerlSorted/SimpleOrdered indexes in the future.
+		</para>
+
+<pre>
+$it->setComparator($compareFunc, @args...);
+</pre>
+
+		<para>
+		A special method that works only on the PerlSorted index types.
+		Sets an auto-generated comparator function and its optional
+		arguments from an initializer function at the table initialization
+		time. On success it returns 1. For all other index types this method
+		confesses.
+		A source code string may be used instead of the function reference, see
+		<xref linkend="sc_code" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;. 
+		</para>
+
+	</sect1>

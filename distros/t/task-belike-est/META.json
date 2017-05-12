@@ -1,0 +1,133 @@
+{
+   "abstract" : "A list of CPAN modules that I use regularly.",
+   "author" : [
+      "Eddy Eddy"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.036, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "task-belike-est",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.15",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::cpanoutdated" : "0",
+            "Attempt" : "0",
+            "CLDR::Number" : "0",
+            "CPAN::Mini" : "0",
+            "CPAN::Mini::Inject" : "0",
+            "Carp::Always" : "0",
+            "Carton" : "0",
+            "Config::ZOMG" : "0",
+            "Const::Fast" : "0",
+            "DB::Color" : "0",
+            "DB::Skip" : "0",
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "DBIx::Class" : "0",
+            "DBIx::Connector" : "0",
+            "Data::GUID" : "0",
+            "Data::Printer" : "0",
+            "Data::Show" : "0",
+            "Email::MIME" : "0",
+            "Email::Sender::Simple" : "0",
+            "Email::Stuffer" : "0",
+            "Email::Valid" : "0",
+            "File::AtomicWrite" : "0",
+            "File::Serialize" : "0",
+            "File::chdir" : "0",
+            "IO::All" : "0",
+            "IPC::ConcurrencyLimit" : "0",
+            "IPC::ConcurrencyLimit::Lock::NFS" : "0",
+            "IPC::System::Simple" : "0",
+            "Import::Into" : "0",
+            "JSON" : "0",
+            "JSON::MaybeXS" : "0",
+            "Kavorka" : "0",
+            "List::AllUtils" : "0",
+            "Log::Log4perl" : "0",
+            "MCE" : "0",
+            "Mojolicious" : "0",
+            "Moo" : "2.000001",
+            "PSGI" : "0",
+            "Parallel::ForkManager" : "0",
+            "Path::Tiny" : "0",
+            "Perl::Tidy" : "0",
+            "Plack" : "0",
+            "Regexp::Common" : "0",
+            "Regexp::Debugger" : "0",
+            "Safe::Isa" : "0",
+            "Test::Deep" : "0",
+            "Test::Pretty" : "0",
+            "Text::CSV_XS" : "0",
+            "Text::Xslate" : "0",
+            "Tie::StoredOrderHash" : "0",
+            "Time::Moment" : "0",
+            "XML::LibXML" : "0",
+            "XML::Toolkit" : "0",
+            "XML::Twig" : "0",
+            "YAML" : "0",
+            "YAML::Tiny" : "0",
+            "YAML::XS" : "0",
+            "boolean" : "0",
+            "failures" : "0",
+            "namespace::autoclean" : "0.25",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "Task::BeLike::EST" : {
+         "file" : "lib/Task/BeLike/EST.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/eddy/perl-task-belike-est/issues"
+      },
+      "homepage" : "https://github.com/eddy/perl-task-belike-est",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/eddy/perl-task-belike-est.git",
+         "web" : "https://github.com/eddy/perl-task-belike-est"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [
+      "Eddy Tan <eddy.net@gmail.com>"
+   ]
+}
+

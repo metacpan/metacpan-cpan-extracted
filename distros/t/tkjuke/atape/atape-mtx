@@ -1,0 +1,324 @@
+#!/usr/local/bin/perl -w
+#
+# An mtx <=> atape conversion layer.
+#
+# Steve Lidie, sol0@lehigh.edu, 2004/02/27
+#    Version 1.0, for AIX Atape.driver 8.4.1.0.
+# Steve Lidie, sol0@lehigh.edu, 2006/07/20
+#    Version 1.1, for AIX Atape.driver 9.7.3.0.
+#      $tape and $changer were hardcoded, now get them from Jukebox.pm / %JUKE_CONFIG.
+#      The tapeutil output changed for an SE, the word "Valid" was added.
+
+use lib '/usr/local/tkjuke/2.2.1';
+use Jukebox;
+use Tie::Hash::Indexed;
+
+use subs qw/ drives fini flnp init load main robots slots status transfer trim /;
+use strict;
+
+my $tape    = $JUKE_CONFIG{ TAPE };
+my $changer = $JUKE_CONFIG{ CHANGER };
+
+my %robots;     my $robotc     =  0;
+my %drives;     my $drivec     = -1;
+my %slots;      my $slotc      =  0;
+my %mail_slots; my $mail_slotc =  0;
+
+my $version = '1.1';
+
+init;
+main;
+fini;
+
+sub fini {
+}
+
+sub init {
+
+  do {
+    print <<"HELP-END";
+
+atape-mtx $version
+
+This command is a thin interface between IBM's atape commands and the OSS
+robotic tape library software mtx.  Specifically, is translates juke commands
+to atape commands for compatibility with the Perl tkjuke package.  See:
+
+http://search.cpan.org/~lusol/tkjuke-2.2.1
+
+Currently only a subset of juke commands are supported.
+
+Usage:
+
+  atape-mtx -f CHANGER OPERATION
+
+  CHANGER is nominally obtained via Jukebox.pm (juke.config)
+
+  OPERATION is the tape / jukebox operation to perform
+    
+    next    [DTE#]                    - unload current media, load next
+
+    [invert] load   [SE#] [DTE#]      - load media from jukebox, may be inverted
+    [invert] unload [SE#] [DTE#]      - return media to jukebox, may be inverted
+
+    [eepos eepos#] transfer SE# SE#   - transfer media or bump mail slot
+
+HELP-END
+    exit;
+  } if not defined @ARGV or "@ARGV" =~ /^-h/;
+
+  tie %robots,     'Tie::Hash::Indexed';
+  tie %drives,     'Tie::Hash::Indexed';
+  tie %slots,      'Tie::Hash::Indexed';
+  tie %mail_slots, 'Tie::Hash::Indexed';
+
+  $/ = "\n\n";
+
+  my( @tu ) = `/usr/bin/tapeutil -f $changer inven`;
+  die $? if $?;
+
+  foreach ( @tu ) {
+
+    next if /^Reading element status/;
+    chomp;
+    my( $name, $num ) = /(.*)\s+(\d+)/;
+    robots     $num, $_ if $name =~ /^Robot Address/;
+    slots      $num, $_ if $name =~ /^Import.Export/;
+    drives     $num, $_ if $name =~ /^Drive Address/;
+    slots      $num, $_ if $name =~ /^Slot Address/;
+    
+  } # whilend
+
+  foreach my $mail_slot ( keys %mail_slots ) { # Append mail slots to normal slot list
+    $slotc++;
+    $mail_slots{$mail_slot}->[0] = $slotc;
+    $slots{$mail_slot} = $mail_slots{$mail_slot};
+  }
+  
+} # end init
+
+sub robots {
+
+  my( $num, $s ) = @_;
+
+  $robotc++;
+  $robots{$num} = [ $robotc, $s ];
+
+} # end robots
+
+sub drives {
+
+  my( $num, $s ) = @_;
+
+  $drivec++;
+  $drives{$num} = [ $drivec, $s ];
+
+} # end drives
+
+sub slots {
+
+  my( $num, $s ) = @_;
+
+  if( $s =~ /Import.Export/ ) {
+    $mail_slotc++;
+    $mail_slots{$num} = [ $mail_slotc, $s ];
+  } else {
+    $slotc++;
+    $slots{$num} = [ $slotc, $s ];
+  }
+
+} # end slots
+
+sub main {
+
+  # Check for 'invert' or 'eepos' arguments and save and remove them from 
+  # the argument vector for later processing.
+
+  my $invert = 0;
+  my $eepos  = undef;
+  my @argv = @ARGV;
+  @ARGV = ();
+  foreach( my $i = 0; $i <= $#argv; $i++ ) {
+    $_ = $argv[$i];
+    if( /^invert$/ ) {
+      $invert = 1;
+      next;
+    }
+    if( /^eepos$/ ) {
+      $eepos = $argv[$i + 1];
+      $i++;
+      next;
+    }
+    push @ARGV, $_;		# keep this option for later processing
+  }
+
+  my $op = shift @ARGV;			# drop -f
+  die "atape-mtx: op != -f.\n" unless $op eq '-f';
+  $changer = shift @ARGV;
+  if( $ARGV[0] eq 'status' ) {
+    status;
+  } elsif( $ARGV[0] =~ /^load|unload$/ ) {
+    load;
+  } elsif( $ARGV[0] eq 'transfer' ) {
+    transfer;
+  } elsif( $ARGV[0] =~ /^first|last|next|previous$/ ) {
+    flnp;
+  } else {
+    die "atape-mtx: unimplemented command '@ARGV'.\n";
+  }
+
+} # end main
+
+sub flnp {
+
+  my $f   = shift @ARGV;	# function
+  my $se  = undef;
+  my $dte = shift @ARGV;	# drive ordinal
+  $dte = 0 unless defined $dte;
+
+  if( $f eq 'next' ) {
+
+    foreach my $drive ( keys %drives ) {
+      my( $ord, $s ) =( $drives{$drive}->[0], $drives{$drive}->[1] );
+      next unless $ord == $dte;
+      ( $se ) = $s =~ /Source Element Address \.+ (.*)/;
+      $se = $slots{$se}->[0] if defined $se;
+      last;
+    }
+    die "atape-mtx: no tape loaded in DTE $dte." unless defined $se;
+    @ARGV = ( 'unload', $se, $dte );
+    load;
+    @ARGV = ( 'load', $se + 1, $dte );
+    load;
+
+  } else {
+    die "atape-mtx: function '$f' not implemented.";
+  } # ifend next
+
+} # end flnp
+
+sub load {
+
+  my $f = shift @ARGV;		# load/unload function
+  my $se = shift @ARGV;		# slot ordinal
+  my $dte = shift @ARGV;	# drive ordinal
+  $dte = 0 unless $dte;
+
+  my $drive_address = 0;
+  foreach my $drive ( keys %drives ) {
+    if( $dte == $drives{$drive}->[0] ) {
+      $drive_address = $drive;
+      last;
+    }
+  }
+  die "atape-mtx: unknown DTE $dte.\n" unless $drive_address;
+
+  my $slot_address = 0;
+  if( $f eq 'unload' and not defined $se ) { # find SE # for DTE $dte
+    foreach my $drive ( keys %drives ) {
+      my( $ord, $s ) =( $drives{$drive}->[0], $drives{$drive}->[1] );
+      next unless $ord == $dte;
+      ( $se ) = $s =~ /Source Element Address \.+ (.*)/;
+      $se = $slots{$se}->[0] if defined $se;
+      last;
+    }
+    die "atape-mtx: no tape loaded in DTE $dte." unless defined $se;
+  }
+  foreach my $slot ( keys %slots ) {
+    if( $se == $slots{$slot}->[0] ) {
+      $slot_address = $slot;
+      last;
+    }
+  }
+  die "atape-mtx: unknown SE $se.\n" unless $slot_address;
+
+  if( $f eq 'load' ) {
+    system "/usr/bin/tapeutil -f $changer move $slot_address $drive_address";
+    die $? if $?;
+    system "/usr/bin/tapeutil -f $tape load";
+    die $? if $?;
+  } elsif( $f eq 'unload' ) {
+    system "/usr/bin/tapeutil -f $tape unload";
+    die $? if $?;
+    system "/usr/bin/tapeutil -f $changer move $drive_address $slot_address";
+    die $? if $?;
+  }
+
+} # end load
+
+sub status {
+
+  print "  Storage Changer $changer:", $drivec + 1, " Drives, ", $slotc, " Slots ( ", 
+    $mail_slotc, " Import/Export )\n";
+
+  foreach my $drive ( keys %drives ) {
+    my( $ord, $s ) =( $drives{$drive}->[0], $drives{$drive}->[1] );
+    my( $dstate ) = $s =~ /Drive State \.+ (.*)/;
+    my( $full )   = $s =~ /Media Present \.+ (.*)/;
+    my( $se )     = $s =~ /Source Element Address \.+ (.*)/;
+    my( $vt )     = $s =~ /Volume Tag \.+ (.*)/;
+    $vt = '' unless $vt;
+    trim \$vt;
+    $se = $slots{$se}->[0] if defined $se;
+    if( $dstate eq 'Abnormal' ) {
+      $dstate = 'Normal';
+      $vt .= '?';
+    }
+    $full = ( $full eq 'Yes' and $dstate eq 'Normal' ) ? "Full (Storage Element $se Loaded):VolumeTag = $vt" : 'Empty';
+    print "Data Transfer Element $ord:$full\n";
+  }
+
+  foreach my $slot ( keys %slots ) {
+    my( $ord, $s ) = ( $slots{$slot}->[0], $slots{$slot}->[1] );
+    my( $sstate ) = $s =~ /t State \.+ (.*)/;
+    my( $full )   = $s =~ /Media Present \.+ (.*)/;
+    my( $se )     = $s =~ /Source Element Address Valid \.+ (.*)/;
+    my( $vt )     = $s =~ /Volume Tag \.+ (.*)/;
+    $vt = '' unless $vt;
+    trim \$vt;
+    $se = $slots{$se}->[0] if defined $se;
+    my $mail_slot = $s =~ /Import.Export/;
+    $mail_slot = $mail_slot ? ' IMPORT/EXPORT' : '';
+    if( $sstate eq 'Abnormal' ) {
+      $sstate = 'Normal';
+      $vt .= '?';
+    }
+    $full = ( $full eq 'Yes' and $sstate eq 'Normal' ) ? "Full :VolumeTag=$vt" : 'Empty';
+    print "      Storage Element $ord${mail_slot}:$full\n";
+  }
+
+} # end status
+
+sub transfer {
+
+  my $src = undef;
+  foreach my $slot ( keys %slots ) {
+    my( $ord, $s ) = ( $slots{$slot}->[0], $slots{$slot}->[1] );
+    if( $ord == $ARGV[1] ) {
+      $src = $slot;
+      last;
+    }
+  }
+  die "atape-mtx: invalid source SE $ARGV[1]." unless defined $src;
+
+  my $dest = undef;
+  foreach my $slot ( keys %slots ) {
+    my( $ord, $s ) = ( $slots{$slot}->[0], $slots{$slot}->[1] );
+    if( $ord == $ARGV[2] ) {
+      $dest = $slot;
+      last;
+    }
+  }
+  die "atape-mtx: invalid destination SE $ARGV[2]." unless defined $dest;
+
+  system "/usr/bin/tapeutil -f $changer move $src $dest\n";
+  die $? if $?;
+
+} # end transfer
+
+sub trim {
+ 
+  my $r = shift;
+  $$r =~ s/^\s+//;
+  $$r =~ s/\s+$//;
+} # end trim

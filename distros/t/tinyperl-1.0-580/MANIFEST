@@ -1,0 +1,14 @@
+lib.zip
+MANIFEST
+perl58.dll
+README
+tinyperl.exe
+lib/Config.pm
+lib/LibZip.pm
+lib/LibZip/Info.pm
+lib/LibZip/MyArchZip.pm
+lib/LibZip/MyFile.pm
+lib/LibZip/MyZlib.pm
+lib/LibZip/ScanPack.pm
+lib/auto/Compress/Zlib/Zlib.dll
+

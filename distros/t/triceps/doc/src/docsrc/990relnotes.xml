@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+<chapter id="ch_relnotes" xmlns:xi="http://www.w3.org/2001/XInclude">
+	<title>Release Notes</title>
+
+<!--
+	<sect1 id="sc_notes_N">
+		<title>Release N</title>
+
+		<itemizedlist>
+			<listitem>
+			</listitem>
+		</itemizedlist>
+	</sect1>
+
+-->
+
+	<sect1 id="sc_notes_2_0_1">
+		<title>Release 2.0.1</title>
+
+		<itemizedlist>
+			<listitem>
+			Fixed the version information that was left incorrect (at 0.99).
+			</listitem>
+
+			<listitem>
+			Used a more generic pattern in tests for Perl error messages that have 
+			changed in the more recent versions of Perl (per CPAN report #99268).
+			</listitem>
+
+			<listitem>
+			Added the more convenient way to wrap the error reports in Perl,
+			<pre>Triceps::nestfess()</pre> and <pre>Triceps::wrapfess()</pre>.
+			</listitem>
+
+			<listitem>
+			Added functions for the nicer printing of auto-generated code,
+			<pre>Triceps::alignsrc()</pre> and <pre>Triceps::numalign()</pre>.
+			</listitem>
+
+			<listitem>
+			In the doc chapter on the templates, fixed the output of the examples:
+			properly interleaved the inputs and outputs.
+			</listitem>
+		</itemizedlist>
+	</sect1>
+
+	<sect1 id="sc_notes_2_0_0">
+		<title>Release 2.0.0</title>
+
+		<para>
+		Major:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+			Documentation for the &Cpp; API.
+			</listitem>
+
+			<listitem>
+			Streaming functions.
+			</listitem>
+
+			<listitem>
+			Multithreading.
+			</listitem>
+
+			<listitem>
+			TQL.
+			</listitem>
+		</itemizedlist>
+
+		<para>
+		Minor:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+			No more copy trays in the tables, they've got replaced by treating the table
+			as a streaming function (the automatically generated FnReturn in a Table).
+			</listitem>
+
+			<listitem>
+			When a hashed index type is initialized, its <pre>match()</pre> method 
+			takes the field name-to-index translation into account, and matches
+			even if the key field names are different but translating to the
+			same indexes.
+			</listitem>
+
+			<listitem>
+			The recusrion is now permitted, and the limits on it can be adjusted
+			per-unit (the defaults still forbid it). The labels can be marked
+			non-re-entrant to forbid the recursion on them.
+			</listitem>
+
+			<listitem>
+			The execution of rowops enqueued by <pre>fork()</pre> and <pre>loopAt()</pre> has changed:
+			now they reuse the parent's stack frame. This changed the looping
+			logic: the marks are now set on the current, not parent's frame,
+			and the <pre>makeLoop*</pre> calls don't need, don't create and don't return
+			the begin label.
+			</listitem>
+
+			<listitem>
+			The change in the execution of forked rowops led to the different
+			trace sequence, and a modified set of TraceWhen states. The 
+			<quote>before</quote> and <quote>after</quote> states now always come in pairs, and there
+			are methods to generally differentiate between them.
+			</listitem>
+
+			<listitem>
+			The Labels are marked as cleared before their subclass clearing function
+			is called, not after it. The repeated calls to clear them are ignored.
+			</listitem>
+
+			<listitem>
+			In Table added <pre>clear()</pre>, sticky error methods, fixed the handling
+			of errors in the index comparators to produce the sticky errors.
+			</listitem>
+
+			<listitem>
+			The Unit ignores the attempts to remember, forget or clear labels while
+			it's already clearing labels.
+			</listitem>
+
+			<listitem>
+			In Unit added <pre>isFrameEmpty</pre>, <pre>isInOuterFrame()</pre>.
+			</listitem>
+
+			<listitem>
+			In Rowop added an optional argument to <pre>printP()</pre>.
+			</listitem>
+
+			<listitem>
+			Added handling of the broken Perl versions that return spurious errors on
+			the command execution.
+			</listitem>
+
+			<listitem>
+			Better &Cpp; NameSet constructors.
+			</listitem>
+
+			<listitem>
+			The &Cpp; API always throws Exceptions instead of direct <pre>abort()</pre>.
+			</listitem>
+
+			<listitem>
+			In the &Cpp; API AggregatorType accept the NULL result row type until
+			the initialization is completed.
+			</listitem>
+
+			<listitem>
+			In the &Cpp; API AggregatorGadget added the <pre>typeAs()</pre> template, the
+			version of <pre>sendDelayed()</pre> that constructs the row from the fields,
+			and <pre>getIndexType()</pre>.
+			</listitem>
+
+			<listitem>
+			In &Cpp; added a Rhref constructor directly from a FdataVec argument.
+			</listitem>
+
+			<listitem>
+			In &Cpp; added the method <pre>Label::adopt()</pre>, making it easier
+			to remember.
+			</listitem>
+
+			<listitem>
+			The <pre>Label::adopt()</pre> in Perl now allows the cross-unit adoption.
+			</listitem>
+
+			<listitem>
+			Out-of-the-box compilation with a wider range of GCC compiler versions.
+			</listitem>
+
+			<listitem>
+			The default constructor of Fdata sets the value to NULL.
+			</listitem>
+
+			<listitem>
+			In &Cpp; addded the convenience <pre>get*</pre> methods on Rowref.
+			</listitem>
+
+			<listitem>
+			In &Cpp; addded the <pre>initializeOrThrow()</pre>, <pre>checkOrThrow()</pre> templates.
+			</listitem>
+
+			<listitem>
+			The tables no longer have an enqueuing mode associated with them.
+			</listitem>
+
+			<listitem>
+			The potentially reusable examples have been exported in the packages
+			under Triceps::X.
+			</listitem>
+
+			<listitem>
+			The <pre>Triceps::X::SimpleServer::outBuf()</pre> now checks for the client
+			disconnection before sending data to it.
+			</listitem>
+
+			<listitem>
+			The <quote>dump</quote> label added to the tables.
+			</listitem>
+
+			<listitem>
+			The <pre>chainFront()</pre> method added in the Label in the Perl API
+			and an extra argument with the same meaning added to <pre>chain</pre>
+			in the &Cpp; API.
+			</listitem>
+
+			<listitem>
+			The <pre>*Safe()</pre> methods added to the Perl API.
+			</listitem>
+
+			<listitem>
+			Finiding an index by its keys with <pre>TableType::findIndexPathForKeys()</pre>.
+			</listitem>
+
+			<listitem>
+			Passing through of arbitrary options, and manipulation of the option lists.
+			</listitem>
+
+			<listitem>
+			A fast way to check whether a row is empty.
+			</listitem>
+		</itemizedlist>
+	</sect1>
+
+	<sect1 id="sc_notes_1_0_1">
+		<title>Release 1.0.1</title>
+
+		<itemizedlist>
+			<listitem>
+			Fixed the version information that was left incorrect, as 0.99.
+			</listitem>
+
+			<listitem>
+			Added the scripts to check the version and Perl MANIFEST before
+			doing a release, script to set the version (ckversion, setversion),
+			explicit version option -v to mkrelease.
+			</listitem>
+
+			<listitem>
+			Added the Release Notes.
+			</listitem>
+		</itemizedlist>
+	</sect1>
+
+	<sect1 id="sc_notes_1_0_0">
+		<title>Release 1.0.0</title>
+
+		<itemizedlist>
+			<listitem>
+			The first official release with full documentation.
+			</listitem>
+
+			<listitem>
+			Many additional examples, code clean-ups and small features
+			resulting from the experience of writing the documentation.
+			</listitem>
+		</itemizedlist>
+	</sect1>
+
+	<sect1 id="sc_notes_0.99">
+		<title>Release 0.99</title>
+
+		<itemizedlist>
+			<listitem>
+			The first published pre-release. Basic functionality, no documentation.
+			</listitem>
+		</itemizedlist>
+	</sect1>
+
+</chapter>

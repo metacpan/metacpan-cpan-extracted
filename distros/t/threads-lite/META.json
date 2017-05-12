@@ -1,0 +1,77 @@
+{
+   "abstract" : "Actor model threading for Perl",
+   "author" : [
+      "Leon Timmermans <leont@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "keywords" : [
+      "threads",
+      "channels"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "threads-lite",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "Module::Build" : "0",
+            "Scalar::Util" : "0",
+            "Test::Differences" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Time::HiRes" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "5.57",
+            "Storable" : "2.05",
+            "experimental" : "0.003",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "provides" : {
+      "threads::lite" : {
+         "file" : "lib/threads/lite.pm",
+         "version" : "0.034"
+      },
+      "threads::lite::list" : {
+         "file" : "lib/threads/lite/list.pm",
+         "version" : "0.034"
+      },
+      "threads::lite::queue" : {
+         "file" : "lib/threads/lite/queue.pm",
+         "version" : "0.034"
+      },
+      "threads::lite::tid" : {
+         "file" : "lib/threads/lite/tid.pm",
+         "version" : "0.034"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=threads-lite"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/Leont/threads-lite/tree"
+      }
+   },
+   "version" : "0.034"
+}

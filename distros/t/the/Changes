@@ -1,0 +1,33 @@
+---
+version: 0.15
+date:    Sun Jun  1 23:42:45 PDT 2008
+changes:
+- Work on Mooseless machines.
+---
+version: 0.14
+date:    Sun Jun  1 23:16:45 PDT 2008
+changes:
+- Support no.
+- Added more.
+- no more Moose;
+---
+version: 0.13
+date:    Sat May 31 06:13:08 PDT 2008
+changes:
+- Make it work with inherited imports (rt.cpan.35986)
+- Tanks to teh Adriano Ferreira
+---
+version: 0.12
+date:    Sun May 18 13:20:42 JST 2008
+changes:
+- Remove teh Moose dependency.
+- Refactor the code.
+- More tests.
+---
+version: 0.11
+date:    Sat May 17 23:22:17 JST 2008
+changes: Add a and an. Thanks Dan Kogai.
+---
+version: 0.10
+date:    Sat May 17 22:41:22 JST 2008
+changes: Initial Release

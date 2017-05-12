@@ -1,0 +1,42 @@
+Revision history for Perl extension Text::Highlight.
+
+Legenda: + = new feature, ! = updated feature/bug fix, - = removed feature
+0.04  Tue May 12 22:47:00 2005
+	+ get_styntax() has returned to take syntax from text grammar files from 
+	  either EditPlus or UltraEdit. These custom grammars will override any
+	  built-in support for the language specified.
+	- import method dropped, as the loaded grammar hash is now only for custom
+	  grammars loaded with get_syntax, which cannot be run at import time
+	+ Added 'options' parameter to highlight() that will be passed on to the 
+	  package's highlight method for any custom configuration
+	! All public methods can take a hash parameter list in addition to a 
+	  simple flat list.
+	! Bad parameters to configure now cluck with an error instead of just ignored
+	! Updated forum default settings
+	! Filled out an initial chunk of the POD
+	! Added a default syntax hash to T::H::HTML and changed the structure of 
+	  the reparsing.
+	! Altered HTML test to work without external modules
+0.03  Tue May 04 18:00:00 2004
+	! Removed HTML::SyntaxHighlighter dependency in Makefile.PL [Enrico]
+	! Removed use of Exporter (not used) [Enrico]
+	+ Added import method to T::H in order to preload all bundled grammars with
+	  use Text::Highlight 'preload'; [Enrico]
+	+ Text::Highlight::HTML backs to _highlight standard method 
+	  if require of HTML::SyntaxHighlighter fails [Enrico]
+	+ Added initial POD (simple skeleton with some descrtiptions)
+
+0.02  Sun May 02 17:02:11 2004
+	! dropped the get_syntax method, going to make a stand-alone script to
+	  generate the Text::Highlight:: sub-modules
+	+ wrote Text::Highlight::HTML as a wrapper around HTML::SyntaxHighlighter,
+	  which is now a prerequisite module
+	+ bundled languages now include C++, CSS, HTML, Java, Perl, PHP, and SQL
+	+ added a short hello-world-ish test for each bundled language
+	! other small changes (this early in the module's life, there's bound to be
+	  plenty)
+
+0.01  Thu Apr 22 19:32:23 2004
+	+ original version; created by h2xs 1.23 with options
+		-X -A -n Text::Highlight
+

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_ref_simple_agg"  xmlns:xi="http://www.w3.org/2001/XInclude">
+		<title>SimpleAggregator reference</title>
+
+		<indexterm>
+			<primary>SimpleAggregator</primary>
+		</indexterm>
+		<para>
+		SimpleAggregator provides an easier way to describe aggregations with
+		the SQL-like aggregation functions. It also supports the user-defined
+		aggregation functions.
+		</para>
+
+		<para>
+		The table types with SimpleAggregator cannot be currently exported
+		between threads through a nexus, see
+		<xref linkend="sc_mt_objects" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;
+		for more detail.
+		</para>
+
+<pre>
+$tabType = Triceps::SimpleAggregator::make($optName => $optValue, ...);
+</pre>
+
+		<para>
+		Creates an aggregator type from the high-level description and
+		sets it on an index type in the table type. Returns back the
+		table type passed as an option argument. Confesses on errors.
+		This is <b>not</b> a class constructor. It creates a common
+		AggregatorType with the automatically generated code for the
+		initialization and handler functions.
+		</para>
+
+		<para>
+		Most of the options are mandatory, unless noted otherwise.
+		The options are:
+		</para>
+
+		<variablelist>
+		<varlistentry>
+			<term><pre>name => $name</pre></term>
+			<listitem>
+			The aggregator type name.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>tabType => $tabType</pre></term>
+			<listitem>
+			Table type to put the aggregator on. It must be un-initialized yet.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>idxPath => [ @path ]</pre></term>
+			<listitem>
+			A reference to an array of index names, forming the path to the
+			index where the aggregator type will be set. For example,
+			<pre>["index", "subIndex"]</pre>.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>result => [ [fieldName => $type, $funcName, $argFunc], ... ]</pre></term>
+			<listitem>
+			<para>
+			A reference to an array defining the result of the aggregation.
+			It consists of the repeating groups of four elements:
+			</para>
+
+<pre>
+fieldName => $type, $funcName, $argFunc,
+</pre>
+
+			<para>
+			Here <pre>$type</pre> is the field type name, <pre>$funcName</pre> is the name of the
+			aggregtion function (case-sensitive, see the list in
+			<xref linkend="sc_aggregation_simple" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;),
+			and 
+			<pre>$argFunc</pre> is the code reference that computes the argument of the aggregation function.
+			It's a function that receives the current row being aggregated
+			as <pre>$_[0]</pre> and computes a value from its fields. These values
+			from all the rows in the group then get fed to the aggregation function.
+			If the aggregation function requires no argument, <pre>argFunc</pre> must be
+			<pre>undef</pre>.
+			For example:
+			</para>
+
+<pre>
+	result => [
+		symbol => "string", "last", sub {$_[0]->get("symbol");},
+		count => "int32", "count_star", undef,
+		cost => "float64", "sum", sub {$_[0]->get("size") * $_[0]->get("price")];},
+		vwap => "float64", "nth_simple", sub { [1, $_[0]->get("price")];},
+	],
+</pre>
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>saveRowTypeTo => \$rt</pre></term>
+			<listitem>
+			Optional. A reference to a scalar where to save the result row type. It will be
+			available when <pre>Triceps::SimpleAggregator::make()</pre> returns.
+			Later when a table with this aggregator type gets constructed,
+			its result row type may also be found with
+			<pre>$table->getAggregatorLabel("aggName")->getRowType()</pre>.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>saveInitTo => \$code</pre></term>
+			<listitem>
+			Optional. A reference to a scalar where to save the auto-generated source
+			code of the initialization function for diagnostics.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>saveComputeTo => \$code</pre></term>
+			<listitem>
+			Optional. A reference to a scalar where to save the auto-generated source
+			code of the handler function for diagnostics.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>functions => { %definitions }</pre></term>
+			<listitem>
+			Optional. The additional user-defined aggregation functions. See
+			the description of their structure in 
+			<xref linkend="sc_aggregation_simple" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+			</listitem>
+		</varlistentry>
+		</variablelist>
+
+		<para>
+		The aggregator types produced by the SimpleAggregator would be equal
+		and matching only if they have been produced by copying (you can
+		also copy a table type or index type with an AggregatorType in it).
+		</para>
+
+	</sect1>
+

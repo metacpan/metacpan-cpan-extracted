@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_ref_fnreturn">
+		<title>FnReturn reference</title>
+
+		<indexterm>
+			<primary>FnReturn</primary>
+		</indexterm>
+		<para>
+		The FnReturn represents the return value of a streaming function.
+		The return value consists of a stream of rowops, and gets processed
+		by sending them to the labels through a binding.
+		</para>
+
+<pre>
+$fret = Triceps::FnReturn->new($optName => $optValue, ...);
+</pre>
+
+		<para>
+		Construct an FnReturn object. The options are:
+		</para>
+
+		<variablelist>
+		<varlistentry>
+			<term><pre>name => $name</pre></term>
+			<listitem>
+			Name of this object. Will be used to create the names of the labels in it.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>unit => $unit</pre></term>
+			<listitem>
+			The unit where this object belongs.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>labels => [ @definitions ]</pre></term>
+			<listitem>
+			<para>
+			Definition of the labels in the FnReturn, where the results of the
+			streaming function will be sent.
+			The full names of these labels will be
+			<quote>return_name.label_name</quote>. The label names within a 
+			return must be unique.
+			The value for this option is an array
+			reference, with the labels defined as name-value pairs in the array, in
+			one of two forms:
+			</para>
+
+<pre>
+labels => [
+	$name1 => $rowType1,
+	$name2 => $fromLabel2,
+	...
+]
+</pre>
+
+			<para>
+			If the second element in the pair is a row type, a label of that row type
+			will be created in the FnReturn.
+			</para>
+
+			<para>
+			If the second element in the pair is a label, its row type will be used
+			to create a label in FnReturn and that new label will also be automatically
+			chained off the specified one. This is convenient if you already have
+			the logic of the function defined and just want to forward the result
+			data from an existing label into the FnReturn. The chaining is normally
+			done with <pre>chainFront()</pre>, unless the option <pre>chainFront => 0</pre>
+			tells otherwise. 
+			The front chaining is convenient if you want to pass both
+			the original request and the result into the return. Usually you
+			would define the result computation and then define the return.
+			With the chaining at the back, this would lead to the computation
+			chained off the input label first and the return going after it.
+			This would lead to the result coming out before the argument,
+			and special contortions would be needed to avoid it. With chaining
+			at the front, the return will go in the chain before the computation,
+			even if the return was defined last.
+			</para>
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>chainFront => 0/1</pre></term>
+			<listitem>
+			Flag: Determines whether the FnReturn labels built by chaining off the other
+			labels will be chained at the back (if 0) or at the front (if 1).
+			Optional. Default: 1.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>onPush => $code</pre></term>
+			<listitem>
+			The code to execute whenever an FnBinding is pushed onto this FnReturn.
+			This is useful to maintain the extended call contexts for the streaming
+			function.
+			Its argument can be specified in one of two forms: either just a code
+			reference, or a reference to an array containing the code reference and
+			the extra arguments for it. I.e. either <pre>onPush => $code</pre> or
+			<pre>onPush => [ $code, @args ]</pre>. The first argument of the function
+			will always be the FnReturn object itself, with extra arguments going
+			after it: <pre>&$code($thisFnReturn, @optional_args)</pre>.
+			As usual, a source code string may be used instead of the function reference.
+			Optional.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>onPop => $code</pre></term>
+			<listitem>
+			The code to execute whenever an FnBinding is popped from this FnReturn.
+			This is useful to maintain the extended call contexts for the streaming
+			function.
+			Its argument can be specified in one of two forms: either just a code
+			reference, or a reference to an array containing the code reference and
+			the extra arguments for it. I.e. either <pre>onPop => $code</pre> or
+			<pre>onPop => [ $code, @args ]</pre>. The first argument of the function
+			will always be the FnReturn object itself, with extra arguments going
+			after it: <pre>&$code($thisFnReturn, @optional_args)</pre>.
+			As usual, a source code string may be used instead of the function reference.
+			Optional.
+			</listitem>
+		</varlistentry>
+		</variablelist>
+
+		<para>
+		The FnReturn has a concept of clearing: and once any of the labels owned
+		by the FnReturn gets cleared, the FnReturn is also cleared. The
+		clearing drops the onPush and onPop handlers, thus breaking any
+		reference cycles they might be engaged in.
+		</para>
+
+		<para>
+		Also, when an FnReturn gets destroyed, it clears and disconnects from 
+		the Unit all the labels defined in that FnReturn. The reason for that
+		is that the labels in FnReturn cannot work without the FnReturn object
+		anyway, and cannot hold a reference to it either (to avoid the
+		cyclical references).
+		</para>
+
+<pre>
+$name = $fret->getName();
+</pre>
+
+		<para>
+		Get back the object's name.
+		</para>
+
+<pre>
+$res = $fret->size();
+</pre>
+
+		<para>
+		Get the number of labels in the return.
+		</para>
+
+<pre>
+@names = $fret->getLabelNames();
+</pre>
+
+		<para>
+		Get an array of label names, in the same order as they were defined
+		(the order of the label definitions is important).
+		</para>
+
+<pre>
+@labels = $fret->getLabels();
+</pre>
+
+		<para>
+		Get an array of references to the FnReturn's internal labels, in the
+		same order as they were defined.
+		</para>
+
+<pre>
+%labels = $fret->getLabelHash();
+</pre>
+
+		<para>
+		Get the interspersed list of label names and references, suitable
+		to initialize a hash.
+		</para>
+
+<pre>
+%namemap = $fret->getLabelMapping();
+</pre>
+
+		<para>
+		Get the interspersed list of label names and their indexes in order
+		starting from 0, suitable to initialize a hash.
+		</para>
+
+<pre>
+$label = $fret->getLabel($name);
+</pre>
+
+		<para>
+		Get a label by name. Will confess if this name was not defined.
+		</para>
+
+<pre>
+$label = $fret->getLabelAt($idx);
+</pre>
+
+		<para>
+		Get a label by index, starting from 0. Will confess if the index is out of range.
+		</para>
+
+<pre>
+$idx = $fret->findLabel($name);
+</pre>
+
+		<para>
+		Translate a label name to index. Will confess if this name was not defined.
+		</para>
+
+<pre>
+%rts = $fret->getRowTypeHash();
+</pre>
+
+		<para>
+		Get the interspersed list of label names and references to their row types, suitable
+		to initialize a hash. In Perl, this is the closest thing to the &Cpp; API's
+		RowSetType.
+		</para>
+
+<pre>
+$res = $fret->equals($fret2);
+$res = $fret->equals($fbind2);
+$res = $fret->match($fret2);
+$res = $fret->match($fbind2);
+</pre>
+
+		<para>
+		Compare the equality or match of types with an FnReturn or FnBinding.
+		Since their type objects are not directly visible in the Perl API,
+		the comparison has to be done on the FnReturns and FnBindings themselves.
+		The types are considered equal if they contain the equal row
+		types with equal names going in the same order. They are considered
+		matching if they contain matching row types going in the same order,
+		with any names. If the match condition seems surprising to you, think
+		of it as <quote>nothing will break if one type is substituted for another at
+		execution time</quote>.
+		</para>
+
+<pre>
+$res = $fret->same($fret2);
+</pre>
+
+		<para>
+		The usual check for two references referring to the same FnReturn object.
+		</para>
+
+<pre>
+$fret->push($fbind);
+</pre>
+
+		<para>
+		Push a binding on the return stack. The binding must be of a matching type.
+		The reference to the binding will be kept in the FnReturn until it's popped.
+		</para>
+
+<pre>
+$fret->pop($fbind);
+$fret->pop();
+</pre>
+
+		<para>
+		Pop a binding from the return stack. The binding argument specifies,
+		which binding is expected to be popped. Without argument, pops any
+		binding. The call with argument is recommended since it
+		allows to catch any mess-ups with the return stack early. If the stack
+		is empty or the top binding is not the same as the argument, will confess.
+		</para>
+
+<pre>
+$res = $fret->bindingStackSize();
+</pre>
+
+		<para>
+		Get the current size of the return stack (AKA the stack of bindings). Useful
+		for debugging.
+		</para>
+
+<pre>
+@names = $fret->bindingStackNames();
+</pre>
+
+		<para>
+		Get the names of all the bindings on the return stack. Useful for debugging.
+		The top of stack is on the right.
+		</para>
+
+<pre>
+$res = fret->isFaceted();
+</pre>
+
+		<indexterm>
+			<primary>Facet</primary>
+		</indexterm>
+		<para>
+		Returns 1 if this FnReturn object is a part of a Facet.
+		</para>
+	</sect1>

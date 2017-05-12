@@ -1,0 +1,503 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_ref_fnbinding">
+		<title>FnBinding reference</title>
+
+		<indexterm>
+			<primary>FnBinding</primary>
+		</indexterm>
+		<para>
+		An FnBinding represents a single call of a streaming function.
+		It forwards the stream of rowops coming out of an FnReturn to the
+		logic in the caller.
+		</para>
+
+<pre>
+$fbind = Triceps::FnBinding->new($optName => $optValue, ...);
+</pre>
+
+		<para>
+		Construct an FnBinding object. The object may be reused for multiple
+		calls. It's very much like a function call in a procedural language:
+		present once in the program text but can be executed many times.
+		The options are:
+		</para>
+
+		<variablelist>
+		<varlistentry>
+			<term><pre>name => $name</pre></term>
+			<listitem>
+			Name of this object. Will be used to create the names of the labels in it.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>unit => $unit</pre></term>
+			<listitem>
+			The unit where the labels specified as Perl inline code will be created.
+			If no labels are specified in this format, this option is not required.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>on => $fret</pre></term>
+			<listitem>
+			The FnReturn on which this binding is defined. It determines what labels
+			are available for binding. The created FnBinding may be used not only with that
+			particular FnReturn but also with any FnReturn of a matching type.
+			If that other FnReturn has not an equal but only a matching type, the 
+			labels will be connected by the order in which they were defined in their
+			respective FnReturns.
+			It's a bit tricky: when an FnBinding is created, the labels in it get
+			connected to the FnReturn on which it's defined by name. But at this
+			point each of them gets assigned a number, in order the labels went
+			in that original FnReturn. After that only this number matters: if
+			this FnBinding gets connected to another matching FnReturn, it will get
+			the data from the FnReturn's label with the same number, not the same
+			name.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>labels => [ @definitions ]</pre></term>
+			<listitem>
+			<para>
+			Definition of the labels in the FnBinding, that will be connected to the
+			labels in FnReturn when the FnBinding is pushed on the FnReturn.
+			The label names within an
+			FnBinding must match the names from FnReturn. They may go in any order
+			but internally will be reordered to match the label order from FnReturn.
+			The value for this option is an array
+			reference, with the labels defined as name-value pairs in the array, in
+			one of two forms:
+			</para>
+
+<pre>
+labels => [
+	$name1 => $label1,
+	$name2 => sub { ... },
+	...
+]
+</pre>
+
+			<para>
+			If the second element in the pair is a function reference
+			or a source code snippet in a string, a label will be automatically created using the unit from the
+			option <quote>unit</quote>, the row type from the matching label in
+			FnReturn, and the provided function as the label's code. It's a 
+			convenient way to make your code shorter.  The full names of these created
+			labels will be <quote>binding_name.label_name</quote>. 
+			</para>
+
+		<indexterm>
+			<primary>Unit</primary>
+		</indexterm>
+			<para>
+			The labels in an FnBinding may belong to a different unit than
+			the labels of the FnReturn. The FnReturn-FnBinding pair is an official
+			way to connect two units.
+			</para>
+
+			<para>
+			It's also possible to include labels from multiple units into a single
+			FnBinding. It's not particularly recommended but it happens to work.
+			It creates complications when dealing with trays.
+			</para>
+
+			<para>
+			The details of the label execution in a binding are described in
+			<xref linkend="sc_strf_scheduling" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+			</para>
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>withTray => 0/1</pre></term>
+			<listitem>
+			Flag: Determines, whether the rowops coming into the FnBinding will be executed
+			immediately (<pre>withTray => 0</pre>) or collected in a tray
+			(<pre>withTray => 1</pre>). Optional, 0 by default.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>clearLabels => 0/1</pre></term>
+			<listitem>
+			<para>
+			Flag: Determines whether the labels in FnBinding will be automatically cleared
+			and forgotten in their unit when the FnBinding gets destroyed. This allows
+			to create the temporary FnBindings dynamically and destroy them after the use,
+			without leaking the labels. This option applies only to the labels specified
+			as the label objects. The labels created by the FnBinding from the code
+			references are always cleared and forgotten.
+			</para>
+
+			<para>
+			Unlike the &Cpp; API, there is no way to set this option separately for
+			each label, it's all or none. But normally all the labels need the same
+			treatment anyway, so it just makes things easier.
+			</para>
+
+			<para>
+			Optional, 0 by default. Even for the dynamically created and destroyed
+			FnBindings, this option is usually best left at 0, since usually the Label objects
+			given to it will not be dynamically created, they would stay fixed between
+			their uses. The only exception is if you create the labels along with the
+			FnBinding and destroy them together as well. If you're doing that, probably
+			you'd be better off having FnBinding create the labels for you from the
+			code snippets, and those are always cleared and forgotten after the FnBinding
+			destruction, no matter what this option is set to.
+			</para>
+			</listitem>
+		</varlistentry>
+		</variablelist>
+
+		<indexterm>
+			<primary>FnBinding::call</primary>
+		</indexterm>
+<pre>
+Triceps::FnBinding::call($optName => $optValue, ...);
+</pre>
+
+		<para>
+		A convenience function to create an FnBinding dynamically, do a single streaming
+		function call with it, and destroy the FnBinding. This is not the most efficient
+		way, since the FnBinding objects and its labels are constructed and destoryed
+		on every call, but easy to use.
+		</para>
+
+		<para>
+		The options largely match the FnBinding constructor, with the addition of
+		the options that do the streaming function call.
+		</para>
+
+		<variablelist>
+		<varlistentry>
+			<term><pre>name => $name</pre></term>
+			<listitem>
+			Name of the FnBinding object that will be constructed and destoryed for
+			this call. Will be used to create the names of the labels in it.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>unit => $unit</pre></term>
+			<listitem>
+			The unit where the labels specified as Perl inline code will be created.
+			If no labels are specified in this format, this option is not required.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>on => $fret</pre></term>
+			<listitem>
+			The FnReturn on which this binding is defined (see mode details on
+			that in the description of FnBinding constructor) and also the FnReturn
+			on which the call will be performed.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>labels => [ @definitions ]</pre></term>
+			<listitem>
+			<para>
+			Definition of the labels in the FnBinding, that will be connected to the
+			labels in FnReturn when the FnBinding is pushed on the FnReturn.
+			The format and meaning is the same as in the FnBinding constructor:
+			</para>
+
+<pre>
+labels => [
+	$name1 => $label1,
+	$name2 => sub { ... },
+	...
+]
+</pre>
+
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>delayed => 0/1</pre></term>
+			<listitem>
+			Flag: An analog of option <quote>withTray</quote> of the FnBinding constructor.
+			Determines, whether the rowops coming into the FnBinding will be executed
+			immediately (<pre>delayed => 0</pre>) or collected in a tray and the
+			tray executed after the FnBinding is popped from FnReturn (but before FnBinding
+			is destroyed). Since the FnBinding
+			is created and destroyed inside the call, there is no way to get the tray
+			out of it, instead the tray gets automatically executed.
+			Optional, 0 by default.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>clearLabels => 0/1</pre></term>
+			<listitem>
+			Flag: Determines whether the labels in FnBinding will be automatically cleared
+			and forgotten in their unit when the FnBinding gets destroyed. The details
+			are described with the constructor.
+			Optional, 0 by default, and highly unlikely to be used.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>rowop => $rowop</pre></term>
+			<listitem>
+			A reference to rowop to execute as the argument to the streaming function.
+			Exactly one of options <quote>rowop</quote>, <quote>rowops</quote>,
+			<quote>tray</quote>, <quote>code</quote> must be used.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>rowops => [ @rowops ]</pre></term>
+			<listitem>
+			A reference to an array of rowops (<pre>rowops => [ @rowops ]</pre>) to execute as the argument to the
+			streaming function. This is just a convenient way to inline multiple
+			rowops without constructing a Tray.
+			Exactly one of options <quote>rowop</quote>, <quote>rowops</quote>,
+			<quote>tray</quote>, <quote>code</quote> must be used.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>tray => $tray</pre></term>
+			<listitem>
+			A reference to tray to execute as the argument to the streaming function.
+			Exactly one of options <quote>rowop</quote>, <quote>rowops</quote>,
+			<quote>tray</quote>, <quote>code</quote> must be used.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>code => $code</pre></term>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>code => [ $code, @args ]</pre></term>
+			<listitem>
+			A code reference or snippet to execute that sends the arguments to the streaming function.
+			The source code snippet in a string also works. This option may also specify
+			a function reference (or, again, its source code) together with its arguments.
+			In this case the value would be an array reference: <pre>code => [ $code, @args ]</pre>.
+			Exactly one of options <quote>rowop</quote>, <quote>rowops</quote>,
+			<quote>tray</quote>, <quote>code</quote> must be used.
+			</listitem>
+		</varlistentry>
+		</variablelist>
+
+<pre>
+$res = $fbind->same($fbind2);
+</pre>
+
+		<para>
+		The usual check for two references referring to the same FnBinding object.
+		</para>
+
+<pre>
+$res = $fbind->equals($fret2);
+$res = $fbind->equals($fbind2);
+$res = $fbind->match($fret2);
+$res = $fbind->match($fbind2);
+</pre>
+
+		<para>
+		Compare the equality or match of types with an FnReturn or FnBinding.
+		Since their type objects are not directly visible in the Perl API,
+		the comparison has to be done on the FnReturns and FnBindings themselves.
+		The types are considered equal if they contain the equal row
+		types with equal names going in the same order. They are considered
+		matching if they contain matching row types going in the same order,
+		with any names. If the match condition seems surprising to you, think
+		of it as <quote>nothing will break if one type is substituted for another at
+		execution time</quote>.
+		</para>
+
+<pre>
+$name = $fbind->getName();
+</pre>
+
+		<para>
+		Get back the name of the binding.
+		</para>
+
+<pre>
+$res = $fbind->size();
+</pre>
+
+		<para>
+		Get the number of labels in the underlying FnReturn. That is, not just of the
+		labels actually used in the binding but of all the labels that could be
+		potentially used in it.
+		</para>
+
+<pre>
+@names = $fbind->getLabelNames();
+</pre>
+
+		<para>
+		Get an array of label names, in the same order as they were defined in 
+		the underlying FnReturn.  This will include all the possible labels from
+		the FnReturn, even those that were not used in FnBinding.
+		</para>
+
+<pre>
+@names = $fbind->getDefinedLabelNames();
+</pre>
+
+		<para>
+		Get an array of label names that are actually used in the FnBinding.
+		The order is still the same as they were defined in FnReturn, only
+		the ones not mentioned in FnBinding are skipped.
+		</para>
+
+<pre>
+@labels = $fret->getLabels();
+</pre>
+
+		<para>
+		Get an array of references to the FnBinding's labels, in the
+		order they were defined in the FnReturn. 
+		If some label name was defined
+		in FnReturn but not used in FnBinding, that position will contain an
+		<pre>undef</pre>.
+		</para>
+
+<pre>
+%labels = $fret->getLabelHash();
+</pre>
+
+		<para>
+		Get the interspersed list of label names and references, suitable
+		to initialize a hash.  If some label name was defined
+		in FnReturn but not used in FnBinding,  the reference for it will
+		be <pre>undef</pre>.
+		</para>
+
+<pre>
+%namemap = $fret->getLabelMapping();
+</pre>
+
+		<para>
+		Get the interspersed list of label names and their indexes in order
+		starting from 0, suitable to initialize a hash. 
+		This includes all the labels from FnReturn.
+		</para>
+
+<pre>
+$label = $fret->getLabel($name);
+</pre>
+
+		<para>
+		Get a label by name. Will confess if this name was not defined in FnReturn.
+		If a label was defined in FnReturn but not used in FnBinding, returns
+		an <pre>undef</pre>.
+		</para>
+
+<pre>
+$label = $fret->getLabelAt($idx);
+</pre>
+
+		<para>
+		Get a label by index, starting from 0. The index range is as defined in the
+		underlying FnReturn.  Will confess if the index is out of range.
+		If a label was defined in FnReturn but not used in FnBinding, returns
+		an <pre>undef</pre>.
+		</para>
+
+<pre>
+$idx = $fret->findLabel($name);
+</pre>
+
+		<para>
+		Translate a label name to index. Will confess if this name was not defined.
+		</para>
+
+<pre>
+%rts = $fret->getRowTypeHash();
+</pre>
+
+		<para>
+		Get the interspersed list of label names and references to their row types, suitable
+		to initialize a hash.  This includes all the label names from FnReturn, even if
+		they weren't used in the FnBinding.
+		In Perl, this is the closest thing to the &Cpp; API's RowSetType.
+		</para>
+
+<pre>
+$res = $fbind->withTray();
+$res = $fbind->withTray($on);
+</pre>
+
+		<para>
+		Get back or change the value of <quote>withTray</quote> option. If the argument
+		<pre>$on</pre> is used, it sets the new value.  The change
+		can be done at any time. Either form returns the previous value of the option.
+		Disabling the tray mode discards the current tray.
+		</para>
+
+<pre>
+$res = $fbind->traySize();
+</pre>
+
+		<para>
+		Get the size of the currently collected tray. If the tray is disabled, returns 0.
+		</para>
+
+<pre>
+$res = $fbind->trayEmpty();
+</pre>
+
+		<para>
+		Check whether the tray is currently empty. Also returns 1 is the tray is disabled.
+		</para>
+
+<pre>
+$tray = $fbind->swapTray();
+</pre>
+
+		<para>
+		Get the current tray out of the FnBinding, and replace it with an empty tray.
+		If the tray contains a mix of rowops for different units (which might happen
+		if the FnBinding refers to labels from different units), it will be detected
+		at this point and the metod will confess. The Perl API doesn't support dealing
+		with such mixed trays. It's still possible to deal with this situation in Perl
+		by using <pre>callTray()</pre>. This method will also detect and confess if
+		any of the rowops in the tray are destined for the cleared labels. Normally
+		such rowops are simply ignored but this is a special case. It reduces the
+		surprise if you accidentally clear the labels and then wonder why is the
+		binding not working right.
+		</para>
+
+<pre>
+$res = $fbind->traySize();
+</pre>
+
+		<para>
+		Get the size of the currently collected tray. If the tray is disabled, returns 0.
+		</para>
+
+<pre>
+$fbind->callTray();
+</pre>
+
+		<para>
+		Logically, a combination of <pre>swapTray()</pre> and the call of that returned tray.
+		However this method also does the correct handling of the trays that contain
+		a mix of rowops for different units. Each rowop will be called in its proper unit.
+		</para>
+
+	</sect1>

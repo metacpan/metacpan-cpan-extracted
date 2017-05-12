@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_rowset">
+		<title>RowSetType reference</title>
+
+		<indexterm>
+			<primary>RowSetType</primary>
+		</indexterm>
+		<para>
+		RowSetType, defined in <pre>types/RowSetType.h</pre>, is another item that is not
+		visible in Perl. Maybe it will be in the future but at the moment
+		things look good enough without it. It 
+		expresses the type (<quote>return type</quote> if you want to be precise) of a
+		streaming function (FnReturn and FnBinding classes). Naturally, it's a
+		sequence of the row types, and despite the word <quote>set</quote>, the order
+		of its elements matters.
+		</para>
+
+		<para>
+		A RowSetType is one of these objects that get assembled from many
+		parts and then initialized, like this:
+		</para>
+
+<pre>
+Autoref<RowSetType> rst = initializeOrThrow(RowSetType::make()
+	->addRow("name1", rt1)
+	->addRow("name2", rt2)
+);
+</pre>
+
+		<para>
+		Of course, nothing stops you from adding the row types one by one, in a
+		loop or in some other way, and then calling <pre>initialize()</pre> manually. And
+		yes, of course you can keep a reference to a row set type as soon as it
+		has been constructed, not waiting for initialization. You could do
+		instead:
+		</para>
+
+<pre>
+Autoref<RowSetType> rst = new RowSetType();
+rst->addRow("name1", rt1);
+rst->addRow("name2", rt2);
+rst->initialize();
+if (rst->getErrors()->hasError()) {
+	...
+}
+</pre>
+
+		<para>
+		You could use the <pre>initializeOrThrow()</pre> template after the
+		piecemeal construction as well, just I
+		also wanted to show the way for the manual handling of the errors. And
+		you can use the <pre>new</pre> or <pre>make()</pre> interchangeably.
+		</para>
+
+		<para>
+		All that the initialization does is fixate the row set, forbid the
+		addition of the further row types to it. Which makes sense at
+		the moment but I'm not so sure about the future, in the future the
+		dynamically expandable row sets might come useful. We'll see when we
+		get there.
+		</para>
+
+<pre>
+RowSetType();
+static RowSetType *make();
+</pre>
+
+		<para>
+		Construct a row set type. The method <pre>make()</pre> is just a wrapper around
+		the constructor that is more convenient to use with the following
+		<pre>->addRow()</pre>, because of the way the operator priorities work in &Cpp;.
+		Like any other type, RowSetType is unnamed by itself, and takes no
+		constructor arguments. Like any other type, RowSetType is an Mtarget
+		and can be shared between multiple threads after it has been
+		initialized.
+		</para>
+
+<pre>
+RowSetType *addRow(const string &rname, const_Autoref<RowType>rtype);
+</pre>
+
+		<para>
+		Add a row type to the set. All the row types are named, and all the
+		names must be unique within the set. The order of the addition matters
+		too. See the further explanation of why it does in the description of
+		the FnReturn in
+		<xref linkend="sc_cpp_fnreturn" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		If this method detects an error (such as duplicate
+		names), it will append the error to the internal Errors object, that
+		can be read later by <pre>getErrors()</pre>. A type with errors must not be used.
+		</para>
+
+		<para>
+		The row types may not be added after the row set type has been
+		initialized.
+		</para>
+
+<pre>
+void initialize();
+</pre>
+
+		<para>
+		Initialize the type. Any detected errors can be read afterwards with
+		<pre>getErrors()</pre>. The repeated calls of <pre>initialize()</pre> are ignored.
+		</para>
+
+<pre>
+bool isInitialized() const;
+</pre>
+
+		<para>
+		Check whether the type has been initialized.
+		</para>
+
+<pre>
+typedef vector<string> NameVec;
+const NameVec &getRowNames() const;
+typedef vector<Autoref<RowType> > RowTypeVec;
+const RowTypeVec &getRowTypes() const;
+</pre>
+
+		<para>
+		Read back the contents of the type. The elements will go in the order
+		they were added.
+		</para>
+
+<pre>
+int size() const;
+</pre>
+
+		<para>
+		Read the number of row types in the set.
+		</para>
+
+<pre>
+int findName(const string &name) const;
+</pre>
+
+		<para>
+		Translate the row type name to index (i.e. the order in which it was
+		added, starting from 0). Returns -1 on an invalid name.
+		</para>
+
+<pre>
+RowType *getRowType(const string &name) const;
+</pre>
+
+		<para>
+		Find the type by name. Returns NULL on an invalid name.
+		</para>
+
+<pre>
+const string *getRowTypeName(int idx) const;
+RowType *getRowType(int idx) const;
+</pre>
+
+		<para>
+		Read the data by index. These methods check that the index is in the
+		valid range, and otherwise return NULL.
+		</para>
+
+		<para>
+		The usual methods inherited from Type also work: <pre>getErrors()</pre>, <pre>equals()</pre>,
+		<pre>match()</pre>, <pre>printTo()</pre>.
+		</para>
+
+		<para>
+		The row set types are considered equal if they contain the equal row
+		types with equal names going in the same order. They are considered
+		matching if they contain matching row types going in the same order,
+		with any names. If the match condition seems surprising to you, think
+		of it as <quote>nothing will break if one type is substituted for another at
+		execution time</quote>.
+		</para>
+
+<pre>
+void addError(const string &msg);
+Erref appendErrors();
+</pre>
+
+		<para>
+		The ways to add extra errors to the type's errors. It's for convenience
+		of the users of this type, the thinking being that since we already
+		have one Errors object, we can as well use it for everything, and also
+		keep all the errors reported in the order of the fields, rather than
+		first all the errors from the type then all the errors from its user.
+		The FnReturn and FnBinding use it. 
+		</para>
+	</sect1>

@@ -1,0 +1,46 @@
+NAME
+    tainting - Enable taint mode lexically
+
+VERSION
+    version 0.01
+
+SYNOPSIS
+    To enable tainting in a lexical block:
+
+     {
+         use tainting;
+         # tainting is enabled
+     }
+     # tainting is disabled again
+
+    To disable tainting in a lexical block:
+
+     use tainting;
+     {
+         no tainting;
+         # tainting is disabled
+     }
+     # tainting is enabled again
+
+DESCRIPTION
+    This module provides a simpler interface to Taint::Runtime. The idea is
+    so that there is no functions or variables to import. Just "use" or
+    "no", like warnings or strict. Tainting of %ENV will be done one time
+    automatically the first time this module is used.
+
+    Please (PLEASE) read Taint::Runtime's documentation first about the
+    pro's and con's of enabling/disabling tainting at runtime. TL;DR: Use -T
+    if you can.
+
+SEE ALSO
+    Taint::Runtime
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

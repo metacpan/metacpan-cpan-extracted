@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+<chapter id="ch_cpp_ref" xmlns:xi="http://www.w3.org/2001/XInclude">
+	<title>Triceps &Cpp; API Reference</title>
+
+	<sect1 id="sc_cpp_intro">
+		<title>&Cpp; API Introduction</title>
+
+		<indexterm>
+			<primary>C++</primary>
+		</indexterm>
+		<para>
+		Fundamentally, the &Cpp; and Perl APIs are shaped similarly. So I won't
+		be making a version of all the examples in &Cpp;. Please read the
+		Perl-based documentation first to understand the spirit and usage of
+		Triceps. The &Cpp;-based documentation is more of the reference type and
+		concentrates on the low-level specifics and differences from Perl
+		necessitated by this specifics.
+		</para>
+
+		<para>
+		In many cases just reading the descriptions of the methods in the <pre>.h</pre>
+		files should be enough to understand the details and be able to use the
+		API. However in some cases the class hierarchies differ, with the Perl
+		API covering the complexities exposed in the &Cpp; API.
+		</para>
+
+		<para>
+		Writing directly in &Cpp; is significantly harder than in Perl, so I
+		highly recommend sticking with the Perl API unless you have a good
+		reason to do otherwise. Even when the performance is important, it's
+		usually enough to write a few critical elements in &Cpp; and then bind
+		them together in Perl. (If you wonder about Java, and why I didn't use
+		it instead, the answer is that Java successfully combines the drawbacks
+		of both and adds some of its own).
+		</para>
+
+		<para>
+		The &Cpp; Triceps API is much more sensitive to the errors. The Perl API
+		checks all the arguments for consistency, it's principle is that the
+		interpreter must never crash. The &Cpp; API is geared towards the
+		efficiency of execution. It checks for errors when constructing the
+		major elements but then does almost no checks at run time. The
+		expectation is that the caller knows what he is doing. If the caller
+		sends bad data, mislays the pointers etc., the program will crash. The
+		idea here is that most likely the &Cpp; API will be used from another
+		layer: either an interpreted one (like Perl) or a compiled one (like a
+		possible future custom language). Either way that layer is responsible
+		for detecting the user errors at either interpretation or compile time.
+		By the time the data gets to the &Cpp; code, it's already checked and
+		there is no need to check it again. Of course, if you write the
+		programs manually in &Cpp;, that checking is upon you.
+		</para>
+
+		<para>
+		The more high-level features are currently available only in Perl. For
+		example, there are no joins in the &Cpp; API. If you want to do the joins
+		in &Cpp;, you have to code your own. This will change over time, as these
+		features will solidify and move to a &Cpp; implementation to become more
+		efficient and available through all the APIs. But it's much easier to
+		experiment with the initial implementations in Perl.
+		</para>
+
+		<para>
+		The &Cpp; code is located in the <pre>cpp/</pre> subdirectory, and all
+		the further descriptions refer to the subdirectories under it.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_cpp_const">
+		<title>The const-ness in &Cpp;</title>
+
+		<indexterm>
+			<primary>const</primary>
+		</indexterm>
+
+		<para>
+		I've been using the <pre>const</pre> keyword for two purposes:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+			To let the compiler optimize a little better the methods that do not
+			change the state of the objects.
+			</listitem>
+
+			<listitem>
+			To mark the fragments of the read-only object internal state returned
+			by the methods. This is much more efficient than making copies of them.
+			</listitem>
+		</itemizedlist>
+
+		<para>
+		So if you get a <pre>const vector<> &</pre> returned from a method, this is a
+		gentle reminder that you should not be modifying this vector. Of
+		course, nothing can stop a determined programmer from doing a type cast
+		and modifying it anyway, but be aware that such inconsistent
+		modifications will likely cause the program to crash in the future. And
+		if the vector contains references to other objects, these objects
+		usually should not be modified either, even they might not be marked
+		with const.
+		</para>
+
+		<indexterm>
+			<primary>const_iterator</primary>
+		</indexterm>
+		<para>
+		However all this <pre>const</pre> stuff is not all rainbows and unicorns but also
+		produces a sizable amount of suffering. One consequence is that you can
+		not use the normal iterators on the <pre>const</pre> vectors, you have to use the
+		const_iterators. Another is that once in a while you get something like
+		a <pre>(const RowType *)</pre> from one method and need to pass it as an argument
+		to another method that takes a <pre>(RowType *)</pre>. In this case make sure that
+		you know what you are doing and then proceed boldly with using a
+		<pre>const_cast</pre>. There is just no way to get all the const-ness
+		self-consistent without ripping it out altogether. 
+		</para>
+	</sect1>
+
+	<xi:include href="file:///DOCS/810autoref.xml"/>
+	<xi:include href="file:///DOCS/811copy.xml"/>
+	<xi:include href="file:///DOCS/812string.xml"/>
+	<xi:include href="file:///DOCS/813perl.xml"/>
+	<xi:include href="file:///DOCS/814errors.xml"/>
+	<xi:include href="file:///DOCS/816exception.xml"/>
+	<xi:include href="file:///DOCS/817init.xml"/>
+
+	<xi:include href="file:///DOCS/818types.xml"/>
+	<xi:include href="file:///DOCS/81801simple.xml"/>
+
+	<xi:include href="file:///DOCS/820rowtype.xml"/>
+	<xi:include href="file:///DOCS/822row.xml"/>
+	<xi:include href="file:///DOCS/824tabtype.xml"/>
+	<xi:include href="file:///DOCS/826nameset.xml"/>
+	<xi:include href="file:///DOCS/828idxtype.xml"/>
+	<xi:include href="file:///DOCS/829idx.xml"/>
+	<xi:include href="file:///DOCS/830fifoidx.xml"/>
+	<xi:include href="file:///DOCS/832hashidx.xml"/>
+	<xi:include href="file:///DOCS/834sortidx.xml"/>
+	<xi:include href="file:///DOCS/840gadget.xml"/>
+	<xi:include href="file:///DOCS/842table.xml"/>
+	<xi:include href="file:///DOCS/844rowhandle.xml"/>
+	<xi:include href="file:///DOCS/848agg.xml"/>
+	<xi:include href="file:///DOCS/850unit.xml"/>
+	<xi:include href="file:///DOCS/852tracer.xml"/>
+	<xi:include href="file:///DOCS/854label.xml"/>
+	<xi:include href="file:///DOCS/856rowop.xml"/>
+	<xi:include href="file:///DOCS/858tray.xml"/>
+	<xi:include href="file:///DOCS/860fmark.xml"/>
+	<xi:include href="file:///DOCS/862rowset.xml"/>
+	<xi:include href="file:///DOCS/864fnreturn.xml"/>
+	<xi:include href="file:///DOCS/866fnbind.xml"/>
+	<xi:include href="file:///DOCS/868autofn.xml"/>
+	<xi:include href="file:///DOCS/880app.xml"/>
+	<xi:include href="file:///DOCS/882triead.xml"/>
+	<xi:include href="file:///DOCS/884towner.xml"/>
+	<xi:include href="file:///DOCS/886nexus.xml"/>
+	<xi:include href="file:///DOCS/888facet.xml"/>
+	<xi:include href="file:///DOCS/890autodrain.xml"/>
+	<xi:include href="file:///DOCS/892sigusr2.xml"/>
+	<xi:include href="file:///DOCS/894tjoin.xml"/>
+	<xi:include href="file:///DOCS/896fileint.xml"/>
+	<xi:include href="file:///DOCS/898basicpt.xml"/>
+
+</chapter>

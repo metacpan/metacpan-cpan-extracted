@@ -1,0 +1,11 @@
+TYPEMAP
+perl_tbb_init*	O_OBJECT
+perl_tbb_blocked_int*	O_OBJECT
+perl_concurrent_item* O_OBJECT
+perl_concurrent_vector* O_CONTAINER
+perl_concurrent_hash* O_CONTAINER
+perl_concurrent_hash_writer* O_CONTAINER
+perl_concurrent_hash_reader* O_CONTAINER
+perl_for_int_array_func* O_OBJECT
+perl_for_int_method* O_OBJECT
+std::string	T_STRING

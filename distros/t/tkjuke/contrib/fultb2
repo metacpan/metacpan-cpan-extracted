@@ -1,0 +1,192 @@
+#!/usr/local/bin/perl -w
+
+# 07 Jul 2003 JCE Add e-i filesystems
+# 07 Jan 2003 JCE Rmv "--atime-preserve" from tar command
+#
+# 2006/03/07, SOL Make the backup multi-DTE, multi-file aware.
+#                 It's already multi-volume aware, just clean
+#                 up the code some.
+
+use Carp;
+use Getopt::EvaP;
+use strict;
+use subs qw/fini init main sys/;
+use strict;
+
+our( @PDT, @MM, %OPT );		# evaluate parameters
+our( 
+     $bc,			# barcode
+     $dte,			# data transfer element
+     $dt,			# date
+     $err,			# tar error pathname
+     @fs,			# list of filesystems
+     $juke,			# juke pathname
+     $mt,			# mt rewind pathname
+     $mtnr,			# mt norewind pathname
+     $nrtape,			# norewind device, DTE specific
+     $out,			# tar output pathname
+     $rep,			# repquota output pathname
+     $rt,			# backup listing root pathname
+     $tape,			# rewind device, DTE specific
+     $sum,			# backup summary pathname
+);
+
+init;
+main;
+fini;
+
+sub fini {
+
+    my @ttb;			# total tape bytes
+    foreach ( 1 .. $#fs ) {
+        my $DB = "$rt/db/" . uc( $bc ) . ":" . ( $_ + 1 ) . ".gz";
+	sys "/bin/echo -e \"\n\n\" >> $sum";
+        sys "/bin/zcat $DB | /usr/bin/head -10 >>  $sum";
+	sys "/bin/echo -e \" ...\" >> $sum";
+        sys "/bin/zcat $DB | /usr/bin/tail -10 >> $sum";
+        push @ttb, `/bin/zcat $DB | /bin/egrep '^Total bytes written'`;
+    }
+ 
+    sys "/bin/egrep 'tar: $nrtape' $err >> $sum", 'warn';
+    
+    sys "/root/bin/wait-tape-ready $dte", 'warn';
+    chomp( my $next_vsn = `$juke loaded $dte` );
+    open S, ">>$sum" or warn "Cannot open summary file: $!";
+
+    my $ttb = 0;
+    foreach ( @ttb ) {
+	my( $tb ) = /Total bytes written:\s+(\d+)/;
+	$ttb += $tb;
+    }
+    $_ = $ttb;
+    1 while s/^([-+]?\d+)(\d{3})/$1,$2/;
+    print S "\n\n$_ total tape bytes written.\n";
+
+    if ( $next_vsn ne "''" ) {
+	print S "\nThe starting VSN for tomorrow's backup appears to be $next_vsn.\n";
+    } else {
+	print S "\n*** There seems to be no tape available for tomorrow's " .
+	    "backup. Reload the magazine, please. ***\n";
+    }
+    close S;
+
+    sys "/usr/bin/Mail -s 'Rain backup summary $dt, tape \'$bc\'' sol0\@lehigh.edu < $sum";
+    sys "/usr/bin/Mail -s 'Rain backup summary $dt, tape \'$bc\'' luops\@lehigh.edu < $sum";
+
+} # end fini
+
+sub init {
+
+    @MM = split /\n/, <<'end-of-MM';
+full-tar-backup2, fultb2
+
+        Mail server backup program using multiple tape drives (DTEs).
+
+          Examples:
+            
+            full-tar-backup2 -data_transfer_element 0 -backup_list backup_list_0
+            fultb2 -dte 1 -bl bl1
+            fultb2 -dte 1 -bl bl0
+.backup_list
+        A keyword identifier specifying which backup list of files to backup.
+        There is a backup list for each DTE, so we can do simultaneous backups.
+        The union of all the backup lists should describe exactly what you want
+        backed up.
+.backup_list_0
+        The backup list for DTE 0, nominally. Of course, any DTE can backup any
+        backup list. A backup list is a list of strings: each element becomes a
+        separate tape file.  Tape file one is the tape's VSN, the first backup
+        list entry is tape file 2, the second list entry tape file 3, etc.
+.backup_list_1
+        The backup list for DTE 1, nominally. Of course, any DTE can backup any
+        backup list. A backup list is a list of strings: each element becomes a
+        separate tape file.  Tape file one is the tape's VSN, the first backup
+        list entry is tape file 2, the second list entry tape file 3, etc.
+.data_transfer_element
+        An integer identifying the DTE to use for this backup.
+.debug
+        Debug does stuff dependant upon what I'm doing.
+end-of-MM
+
+    @PDT = split /\n/, <<'end-of-pdt';
+PDT full-tar-backup2
+    backup_list, bl: key backup_list_0, bl0, backup_list_1, bl1, keyend = $required
+    backup_list_0, bl0: list of string = ( '. ./boot ./var ./local ./home', './e', './f', './g', './h', './i' )
+    backup_list_1, bl1: list of string = ( './var/spool/mail', './j', './k', './l', './m', './n' )
+    data_transfer_element, dte: key 0, 1, keyend = $required
+    debug, d: boolean = false
+PDTEND no_file_list
+end-of-pdt
+
+    EvaP \@PDT, \@MM, \%OPT;    # evaluate parameters
+    $OPT{bl0} = $OPT{backup_list_0};
+    $OPT{bl1} = $OPT{backup_list_1};
+
+    chomp($dt = `date +%Y%m%d`);# YYYYMMDD
+
+    @fs = ( 'skip-VSN-skip' );	# first tape file is the VSN
+    push @fs, @{ $OPT{ $OPT{backup_list} } }; # each list element is a separate tar file
+
+    $dte = $OPT{data_transfer_element};
+    $tape = '/dev/st' . $dte;
+    $nrtape = '/dev/nst' . $dte;
+    $mt = "/bin/mt -f $tape";
+    $mtnr = "/bin/mt -f $nrtape";
+    $juke = '/root/bin/juke';
+    $rt = '/root/admin/backup';
+
+    chomp( $bc = `$juke loaded $dte` );
+    $bc =~ s/'//g;
+
+    $out = "$rt/output/bs-$dt-$dte"; # e.g. bs-20060312-0
+    $err = "$out.err";
+    $rep = "$out.rep";
+    $sum = "$out.sum";
+    $out .= ".out";
+    unlink $err;
+    unlink $out;
+    unlink $rep;
+    unlink $sum;
+
+    my $label = `/root/bin/tlabelr $nrtape`;
+    chomp $label;
+    die "Backup tape missing label." unless $label ne '';
+    die "Backup tape label '$label' not equal to tape barcode '$bc'." if uc( $label ) ne uc( $bc );
+
+    # Delete the DB files, we're just about to recreate them.
+
+    my $db = uc $bc;
+    sys "/bin/rm $rt/db/$db:*.gz > /dev/null 2>&1", 'warn';
+
+} # end init
+
+sub main {
+
+    sys "/usr/sbin/repquota -a > $rep" unless $OPT{debug};
+
+    sys "$mtnr rewind";
+    sys "$mtnr fsf 1";
+    
+    foreach ( 1 .. $#fs ) {	# skip file 1, the VSN
+	my $fs = $fs[ $_ ];
+	my $file = $_ + 1;
+	sys "cd /; tar -f $nrtape -cvp --one-file-system --totals -b 512 -M --new-volume-script '/root/bin/media-change $dte' --exclude ./proc --exclude /proc $fs 2>&1 | /usr/bin/tee --append $out | /root/bin/build-tar-db2 $err $bc:$file '$fs' $dte", 1;
+    }
+
+    sys "/root/bin/media-change $dte", 1 unless $OPT{debug};
+    sys "/bin/kill -HUP `/bin/cat /tmp/tkjuke-slave-sch0.pid`";
+
+} # end main
+
+sub sys {
+
+    my $cmd = shift;
+    my $no_die = shift;
+    system $cmd;
+    if (defined $no_die) {
+	carp "Failed (warn) : '$cmd' : $?" if $?;
+	return;
+    }	
+    croak "Failed (die) : '$cmd' : $?" if $?;
+
+} # end sys

@@ -1,0 +1,73 @@
+TYPEMAP
+
+WrapRowType *	O_WRAP_OBJECT
+WrapRow *	O_WRAP_OBJECT
+WrapIndexType *	O_WRAP_OBJECT
+WrapTableType *	O_WRAP_OBJECT
+
+WrapUnit *	O_WRAP_OBJECT
+WrapUnitTracer *	O_WRAP_OBJECT
+WrapUnitClearingTrigger *	O_WRAP_OBJECT
+WrapTray *	O_WRAP_OBJECT
+WrapLabel *	O_WRAP_OBJECT
+WrapGadget *	O_WRAP_OBJECT
+WrapRowop *	O_WRAP_OBJECT
+WrapFrameMark *	O_WRAP_OBJECT
+WrapFnReturn *	O_WRAP_OBJECT
+WrapFnBinding *	O_WRAP_OBJECT
+WrapAutoFnBind *	O_WRAP_OBJECT
+
+WrapTable *	O_WRAP_OBJECT
+WrapIndex *	O_WRAP_OBJECT
+WrapRowHandle *	O_WRAP_OBJECT
+
+WrapAggregatorType *	O_WRAP_OBJECT
+WrapAggregatorContext *	O_WRAP_INVALIDABLE_OBJECT
+
+WrapApp *	O_WRAP_OBJECT
+WrapTrieadOwner *	O_WRAP_OBJECT
+WrapTriead *	O_WRAP_OBJECT
+WrapFacet *	O_WRAP_OBJECT
+WrapNexus *	O_WRAP_OBJECT
+WrapAutoDrain *	O_WRAP_OBJECT
+
+WrapPerlValue *	O_WRAP_OBJECT
+WrapTrackedFile *	O_WRAP_OBJECT
+
+OUTPUT
+# The Perl object is blessed into 'CLASS', which should be a
+# char* having the name of the package for the blessing.
+O_WRAP_OBJECT
+	sv_setref_pv( $arg, CLASS, (void*)$var );
+
+O_WRAP_INVALIDABLE_OBJECT
+	sv_setref_pv( $arg, CLASS, (void*)$var );
+
+# The roundabout way to croak provides the stack trace, like confess().
+# This still doesn't solve the problem with the other code auto-generated
+# by XS, such as for checking the argument count or converting char*,
+# but those are pretty crude errors, and something is better than
+# nothing.
+INPUT
+O_WRAP_OBJECT
+	if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) ) {
+		$var = ($type)SvIV((SV*)SvRV( $arg ));
+		if ($var == 0 || $var->badMagic()) {
+			croakWithMsg( \"${Package}::$func_name(): $var has an incorrect magic for $ntype\" );
+		}
+	} else{
+		croakWithMsg( \"${Package}::$func_name(): $var is not a blessed SV reference to $ntype\" );
+	}
+
+O_WRAP_INVALIDABLE_OBJECT
+	if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) ) {
+		$var = ($type)SvIV((SV*)SvRV( $arg ));
+		if ($var == 0 || $var->badMagic()) {
+			croakWithMsg( \"${Package}::$func_name(): $var has an incorrect magic for $ntype\" );
+		}
+		if (!$var->isValid()) {
+			croakWithMsg( \"${Package}::$func_name(): $var has been already invalidated\" );
+		}
+	} else{
+		croakWithMsg( \"${Package}::$func_name(): $var is not a blessed SV reference to $ntype\" );
+	}

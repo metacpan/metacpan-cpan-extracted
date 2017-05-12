@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_ref_lookupjoin"  xmlns:xi="http://www.w3.org/2001/XInclude">
+		<title>LookupJoin reference</title>
+
+		<indexterm>
+			<primary>LookupJoin</primary>
+		</indexterm>
+
+		<para>
+		LookupJoin receives the incoming rows and looks up the matches for them
+		from a table, producing the joined rows.
+		</para>
+
+<pre>
+$joiner = Triceps::LookupJoin->new(optionName => optionValue, ...);
+</pre>
+
+		<para>
+		Constructs the LookupJoin template. Confesses on any errors.
+		The options are:
+		</para>
+
+		<variablelist>
+		<varlistentry>
+			<term><pre>unit => $unit</pre></term>
+			<listitem>
+			Scheduling unit object where this template belongs. 
+			May be skipped if <quote>leftFromLabel</quote> is used.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>name => $name</pre></term>
+			<listitem>
+			Name of this LookupJoin object. Will be used as a prefix to create
+			the names of internal objects. The input label will be named
+			<quote>name.in</quote> and the output label <quote>name.out</quote>.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>leftRowType => $rt</pre></term>
+			<listitem>
+			Type of the rows that will be coming in at the left side of the
+			join, and will be used for lookup.  Mutually exclusive with
+			<quote>leftFromLabel</quote>, one must be present.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>leftFromLabel => $label</pre></term>
+			<listitem>
+			Source of rows for the left side of the join; implies their type
+			and the scheduling unit where this object belongs.  Mutually
+			exclusive with <quote>leftRowType</quote>, one must be present.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>rightTable => $table</pre></term>
+			<listitem>
+			Table object where to do the look-ups.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>rightIdxPath => [ @path ]</pre></term>
+			<listitem>
+			Array reference containing the path name of index type in table
+			used for the look-up. 
+			The index absolutely must be a Hash (leaf or non-leaf), not of any
+			other kind. Optional.
+			Default: automatically found by the set of key fields. Whether
+			explicitly specified or automatically found, the index must be available
+			in the table.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>leftFields => [ @patterns ]</pre></term>
+			<listitem>
+			Reference to an array of patterns for the left-side fields to pass
+			through. Syntax as described in <pre>Triceps::Fields::filter()</pre>. 
+			Optional. If not defined then pass everything.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>rightFields => [ @patterns ]</pre></term>
+			<listitem>
+			Reference to an array of patterns for the right-side fields to pass
+			through. Syntax as described in <pre>Triceps::Fields::filter()</pre>. Optional.
+			If not defined then pass everything (which is probably a bad idea since it
+			would include the second copy of the key fields, so better
+			override at least one of the <quote>leftFields</quote> or <quote>rightFields</quote>).
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>fieldsLeftFirst => 0/1</pre></term>
+			<listitem>
+			Flag: in the resulting rows put the fields from the left side
+			first, then from right side. If 0, then opposite. 
+			Optional. Default: 1.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>fieldsMirrorKey => 0/1</pre></term>
+			<listitem>
+			Flag: even if the join is an outer join and the row on one side is
+			absent, when generating the result row, the key fields in it will
+			still be present by mirroring them from the other side. Used by
+			JoinTwo. Optional. Default: 0.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>fieldsDropRightKey => 0/1</pre></term>
+			<listitem>
+			Flag: remove the key fields on the right side from the result.
+			Convenient to avoid their duplication, especially if the key
+			fields are named the same on both sides.
+			Optional. Default: 0.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>by => [ @fields ]</pre></term>
+			<listitem>
+			Reference to an array containing pairs of field names used for
+			look-up, <pre>[leftFld1, rightFld1, leftFld2, rightFld2, ...]</pre>.
+			The set of right-side fields must match the keys of the index path
+			from the option <quote>rightIdxPath</quote>, though possibly in a different order.
+			Mutually exclusive with <quote>byLeft</quote>, one must be present.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>byLeft => [ @patterns ]</pre></term>
+			<listitem>
+			Reference to an array containing the patterns in the syntax of
+			<pre>Triceps::Fields::filter()</pre>. It gets applied to the left-side fields,
+			the fields that pass through become the key fields, and their
+			translations are the names of the matching fields on the right
+			side. The set of right-side fields must match the keys of the index
+			path from  the option <pre>rightIdxPath</pre>, though possibly in a different
+			order.
+			Mutually exclusive with <quote>by</quote>, one must be present.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>isLeft => 0/1</pre></term>
+			<listitem>
+			Flag: 1 for left outer join, 0 for inner join. Optional. Default: 1.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>limitOne => 0/1</pre></term>
+			<listitem>
+			Flag: 1 to return no more than one row even
+			if multiple rows have been found by the look-up, 0 to return all
+			the found matches. 
+			Optional. Default: 0 for the non-leaf right index, 1 for
+			leaf right index. If the right index is leaf, this option will be
+			always automatically set to 1, even if the user specified
+			otherwise, since there is no way to look up more than one matching
+			row in it.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>automatic => 0/1</pre></term>
+			<listitem>
+			Flag: 1 means that the manual <pre>lookup()</pre> method will never be called.
+			This allows to optimize the label handler code and always
+			take the opcode into account when processing the rows. 0 means that
+			<pre>lookup()</pre> will be used. Optional. Default: 1.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>oppositeOuter => 0/1</pre></term>
+			<listitem>
+			Flag: 1 for the right outer join, 0 for inner join. If both options
+			<quote>isLeft</quote> and <quote>oppositeOuter</quote> are set to 1, then this is a full outer
+			join. If set to 1, each update that finds a match in the right
+			table, may produce a DELETE-INSERT sequence that keeps the state of
+			the right or full outer join consistent. The full outer or right
+			outer join logic makes sense only if this LookupJoin is one of a
+			pair in a bigger JoinTwo object. Each of these LookupJoins thinks
+			of itself as <quote>left</quote> and of the other one as <quote>right</quote>, 
+			while JoinTwo presents a consistent whole picture to the user.
+			Used by JoinTwo.  May be used only when <quote>automatic</quote> is 1. 
+			Optional. Default: 0.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>groupSizeCode => $func</pre></term>
+			<listitem>
+			<para>
+			Reference to a function that would compute the group size for this
+			side's table.  Optional, used only when <quote>oppositeOuter</quote> is 1.
+			</para>
+			
+			<para>
+			The group size together with the opcode is then used
+			to decide if a DELETE-INSERT sequence needs to be produced instead
+			of a plain INSERT or DELETE. It is needed when this side's index
+			(not visible here in LookupJoin but visible in the JoinTwo that
+			envelopes it) is non-leaf, so multiple rows on this side
+			may match each row on the other side. The DELETE-INSERT pair
+			needs to be generated only if the current rowop was a deletion of
+			the last matching row or insertion of the first matching row
+			on this side. If <quote>groupSizeCode</quote> is not defined, the
+			DELETE-INSERT pair is always generated (which is appropriate if
+			this side's index is leaf, and every row is the last or first
+			one). If <quote>groupSizeCode</quote> is defined, it should return the group
+			size in the left table by the left index for the input row. If
+			the operation is INSERT, the size of 1 would mean that
+			the DELETE-INSERT pair needs to be generated. If the operation
+			is DELETE, the size of 0  would mean that the DELETE-INSERT
+			pair needs to be generated. Called as:
+			</para>
+			
+<pre>
+&$groupSizeCode($opcode, $leftRow)
+</pre>
+
+			<para>
+			The default undefined <quote>groupSizeCode</quote> is equivalent to
+			</para>
+			
+<pre>
+sub { &Triceps::isInsert($_[0]); }
+</pre>
+
+			<para>
+			but leaving it undefined is more efficient since allows to hardcode
+			this logic at compile time instead of calling the function for
+			every rowop.
+			</para>
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>saveJoinerTo => \$code</pre></term>
+			<listitem>
+			Reference to a scalar where to save a copy of the joiner function
+			source code.  Optional.
+			</listitem>
+		</varlistentry>
+		</variablelist>
+
+<pre>
+@rows = $joiner->lookup($leftRow);
+</pre>
+
+		<para>
+		Looks up the matches for the <pre>$leftRow</pre> and return the array of the result
+		rows. If the option <quote>isLeft</quote> is 0, the array may be empty. If the
+		option <quote>limitOne</quote> is 1, the array will contain no more than one row,
+		and may be assigned directly to a scalar. May be used only when the option
+		<quote>automatic</quote> is 0.
+		</para>
+
+		<para>
+		This method has become largely obsolete since addition of <pre>fnReturn()</pre>
+		as described in
+		<xref linkend="sc_strf_templates" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;
+		but is still present in case if it comes useful.
+		</para>
+
+<pre>
+$rt = $joiner->getResultRowType();
+</pre>
+
+		<para>
+		Returns the row type of the join result.
+		</para>
+
+<pre>
+$lb = $joiner->getInputLabel();
+</pre>
+
+		<para>
+		Returns the input label of the joiner. The rowops sent there will be
+		processed as coming on the left side of the join. The result will be
+		produced on the output label.
+		</para>
+
+<pre>
+$lb = $joiner->getOutputLabel();
+</pre>
+
+		<para>
+		Returns the output label of the joiner. The results from processing of the
+		input rowops come out here. Note that the results of the <pre>lookup()</pre> calls
+		do not come out at the output label, they are only returned to the
+		caller.
+		</para>
+
+<pre>
+$fret = $joiner->fnReturn();
+</pre>
+
+		<para>
+		Returns an FnReturn object connected to the output of this joiner.
+		The FnReturn contains one label <quote>out</quote>.
+		The FnReturn is created on the first call of
+		this method and is kept in the joiner object.  All the following calls return
+		the same object. 
+		See more detail in
+		<xref linkend="sc_strf_templates" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+<pre>
+$res = $joiner->getUnit();
+$res = $joiner->getName(); 
+$res = $joiner->getLeftRowType(); 
+$res = $joiner->getRightTable(); 
+$res = $joiner->getRightIdxPath(); 
+$res = $joiner->getLeftFields(); 
+$res = $joiner->getRightFields(); 
+$res = $joiner->getFieldsLeftFirst(); 
+$res = $joiner->getFieldsMirrorKey(); 
+$res = $joiner->getBy(); 
+$res = $joiner->getByLeft(); 
+$res = $joiner->getIsLeft(); 
+$res = $joiner->getLimitOne(); 
+$res = $joiner->getAutomatic(); 
+$res = $joiner->getOppositeOuter(); 
+$res = $joiner->getGroupSizeCode(); 
+</pre>
+
+		<para>
+		Get back the values of the options use to construct the object. 
+		If such an option was not set,
+		returns the default value, or the automatically calculated value.
+		Sometimes an automatically calculated value may even override the
+		user-specified value. There is no way to get back <quote>leftFromLabel</quote>, it
+		is discarded after the LookupJoin is constructed and chained.
+		</para>
+
+	</sect1>

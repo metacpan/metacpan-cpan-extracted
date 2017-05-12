@@ -1,0 +1,1071 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+<chapter id="ch_time" xmlns:xi="http://www.w3.org/2001/XInclude">
+	<title>Time processing</title>
+
+	<sect1 id="sc_time_limited">
+		<title>Time-limited propagation</title>
+
+		<indexterm>
+			<primary>aggregation</primary>
+		</indexterm>
+		<indexterm>
+			<primary>time</primary>
+		</indexterm>
+		<para>
+		When aggregating data, often the results of the aggregation stay
+		relevant longer than the original data.
+		</para>
+
+		<para>
+		For example, in the financials the data gets collected and aggregated
+		for the current business day. After the day is closed, the day's
+		detailed data are not interesting any more, and can be deleted in
+		preparation for the next day. However the daily results stay
+		interesting for a long time, and may even be archived for years.
+		</para>
+
+		<para>
+		This is not limited to the financials. A long time ago, in the times of
+		slow and expensive Internet connections, I've done a traffic accounting
+		system. It did the same: as the time went by, less and less detail was
+		kept about the traffic usage. The modern accounting of the
+		click-through advertisement also works in a similar way.
+		</para>
+
+		<indexterm>
+			<primary>filter</primary>
+		</indexterm>
+		<para>
+		An easy way to achieve this result is to put a filter on the way of the
+		aggregation results. It would compare the current idea of time and the
+		time in the rows going by, and throw away the rows that are too old.
+		This can be done as a label that gets the data from the aggregator and
+		then forwards or doesn't forward the data to the real destination,
+		and has been already shown. This solves the
+		propagation problem but as the obsolete original data gets deleted, the
+		aggregator will still be churning and producing the updates, only to
+		have them thrown away at the filter. A more efficient way is to stop
+		the churn by placing the filter right into the aggregator.
+		</para>
+
+		<indexterm>
+			<primary>traffic accounting</primary>
+		</indexterm>
+		<para>
+		The next example demonstrates such an aggregator, in a simplified
+		version of that traffic accounting system that I've once done. The
+		example is actually about more than just stopping the data propagation.
+		That stopping accounts for about three lines in it. But I also want to show
+		a simple example of traffic accounting as such. And to show that the
+		lack of the direct time support in Triceps does not stop you from doing
+		any time-based processing. Because of this I'll show the whole example
+		and not just snippets from it. But since the example is biggish, I'll
+		paste it into the text in pieces with commentaries for each piece.
+		</para>
+
+<!-- x/xTrafficAgg.t doHourly -->
+<pre>
+our $uTraffic = Triceps::Unit->new("uTraffic");
+
+# one packet's header
+our $rtPacket = Triceps::RowType->new(
+	time => "int64", # packet's timestamp, microseconds
+	local_ip => "string", # string to make easier to read
+	remote_ip => "string", # string to make easier to read
+	local_port => "int32", 
+	remote_port => "int32",
+	bytes => "int32", # size of the packet
+);
+
+# an hourly summary
+our $rtHourly = Triceps::RowType->new(
+	time => "int64", # hour's timestamp, microseconds
+	local_ip => "string", # string to make easier to read
+	remote_ip => "string", # string to make easier to read
+	bytes => "int64", # bytes sent in an hour
+);
+</pre>
+	
+		<para>
+		The router to the ISP forwards us the packet header
+		information from all the packets that go though the outside link. The
+		<pre>local_ip</pre> is always the address of a machine on our network, <pre>remote_ip</pre>
+		outside our network, no matter in which direction the packet went. With
+		a slow and expensive connection, we want to know two things: First,
+		that the provider's billing at the end of the month is correct. Second,
+		to be able to find out the high traffic users, when was the traffic
+		used, and then maybe look at the remote addresses and decide
+		whether that traffic was used for the business purposes or not.
+		This example goes up to aggregation of the hourly summaries and then
+		stops, since the further aggregation by days and months is
+		straightforward to do.
+		</para>
+
+		<indexterm>
+			<primary>time synchronization</primary>
+		</indexterm>
+		<para>
+		If there is no traffic for a while, the router is expected to
+		periodically communicate its changing idea of time as the same kind of
+		records but with the non-timestamp fields as NULLs. That by the way is
+		the right way to communicate the time-based information between two
+		machines: do not rely on any local synchronization and timeouts but
+		have the master send the periodic time updates to the slave even if it
+		has no data to send. The logic is then driven by the time reported by
+		the master. A nice side effect is that the logic can also easily be
+		replayed later, using these timestamps and without any concern of the
+		real time. If there are multiple masters, the slave would have to order
+		the data coming from them according to the timestamps, thus
+		synchronizing them together.
+		</para>
+
+		<para>
+		The hourly data drops the port information, and sums up the traffic
+		between two addresses in the hour. It still has the timestamp but now
+		this timestamp is rounded to the start of the hour:
+		</para>
+
+<!-- x/xTrafficAgg.t doHourly -->
+<pre>
+# compute an hour-rounded timestamp
+sub hourStamp # (time)
+{
+	return $_[0]  - ($_[0] % (1000*1000*3600));
+}
+</pre>
+	
+		<para>
+		Next, to the aggregation. The SimpleAggregator has no provision
+		for filtering in it, the aggregation has to be done raw.
+		</para>
+
+<!-- x/xTrafficAgg.t doHourly -->
+<pre>
+# the current hour stamp that keeps being updated
+our $currentHour;
+
+# aggregation handler: recalculate the summary for the last hour
+sub computeHourly # (table, context, aggop, opcode, rh, state, args...)
+{
+	my ($table, $context, $aggop, $opcode, $rh, $state, @args) = @_;
+	our $currentHour;
+
+	# don't send the NULL record after the group becomes empty
+	return if ($context->groupSize()==0
+		|| $opcode == &Triceps::OP_NOP);
+
+	my $rhFirst = $context->begin();
+	my $rFirst = $rhFirst->getRow();
+	my $hourstamp = &hourStamp($rFirst->get("time"));
+
+	return if ($hourstamp < $currentHour);
+
+	if ($opcode == &Triceps::OP_DELETE) {
+		$context->send($opcode, $$state);
+		return;
+	}
+		
+	my $bytes = 0;
+	for (my $rhi = $rhFirst; !$rhi->isNull(); 
+			$rhi = $context->next($rhi)) {
+		$bytes += $rhi->getRow()->get("bytes");
+	}
+
+	my $res = $context->resultType()->makeRowHash(
+		time => $hourstamp,
+		local_ip => $rFirst->get("local_ip"), 
+		remote_ip => $rFirst->get("remote_ip"), 
+		bytes => $bytes,
+	);
+	${$state} = $res;
+	$context->send($opcode, $res);
+}
+
+sub initHourly #  (@args)
+{
+	my $refvar;
+	return \$refvar;
+}
+</pre>
+	
+		<para>
+		The aggregation doesn't try to optimize by being additive, to keep the
+		example simpler. The model keeps the notion of the current hour. As
+		soon as the hour stops being current, the aggregation for it stops. The
+		result of that aggregation will then be kept unchanged in the hourly
+		result table, no matter what happens to the original data.
+		</para>
+
+		<para>
+		The tables are defined and connected thusly:
+		</para>
+
+<!-- x/xTrafficAgg.t doHourly -->
+<pre>
+# the full stats for the recent time
+our $ttPackets = Triceps::TableType->new($rtPacket)
+	->addSubIndex("byHour", 
+		Triceps::IndexType->newPerlSorted("byHour", undef, sub {
+			return &hourStamp($_[0]->get("time")) <=> &hourStamp($_[1]->get("time"));
+		})
+		->addSubIndex("byIP", 
+			Triceps::IndexType->newHashed(key => [ "local_ip", "remote_ip" ])
+			->addSubIndex("group",
+				Triceps::IndexType->newFifo()
+				->setAggregator(Triceps::AggregatorType->new(
+					$rtHourly, "aggrHourly", \&initHourly, \&computeHourly)
+				)
+			)
+		)
+	)
+;
+
+$ttPackets->initialize();
+our $tPackets = $uTraffic->makeTable($ttPackets, "tPackets");
+
+# the aggregated hourly stats, kept longer
+our $ttHourly = Triceps::TableType->new($rtHourly)
+	->addSubIndex("byAggr", 
+		Triceps::SimpleOrderedIndex->new(
+			time => "ASC", local_ip => "ASC", remote_ip => "ASC")
+	)
+;
+
+$ttHourly->initialize();
+our $tHourly = $uTraffic->makeTable($ttHourly, "tHourly");
+
+# connect the tables
+$tPackets->getAggregatorLabel("aggrHourly")->chain($tHourly->getInputLabel());
+</pre>
+	
+		<para>
+		The table of incoming packets has a 3-level index: it starts with being
+		sorted by the hour part of the timestamp, then goes by the ip addresses
+		to complete the aggregation key, and then a FIFO for each aggregation
+		group. Arguably, maybe it would have been better to include the ip
+		addresses straight into the top-level sorting index, I don't know, and
+		it doesn't seem worth measuring. The top-level ordering by the hour is
+		important, it will be used to delete the rows that have become old.
+		</para>
+
+		<indexterm>
+			<primary>index</primary>
+			<secondary>ordered</secondary>
+		</indexterm>
+		<para>
+		The table of hourly aggregated stats uses the same kind of index, only
+		now there is no need for a FIFO because there is only one row per this
+		key. And the timestamp is already rounded to the hour right in the
+		rows, so a SimpleOrderedIndex can be used without writing a manual
+		comparison function, and the ip fields have been merged into it too.
+		</para>
+
+		<para>
+		The output of the aggregator on the packets table is connected to the
+		input of the hourly table.
+		</para>
+
+<!-- x/xTrafficAgg.t doHourly, dropped makePrintLabel() -->
+<pre>
+# label to print the changes to the detailed stats
+makePrintLabel("lbPrintPackets", $tPackets->getOutputLabel());
+# label to print the changes to the hourly stats
+makePrintLabel("lbPrintHourly", $tHourly->getOutputLabel());
+
+# dump a table's contents
+sub dumpTable # ($table)
+{
+	my $table = shift;
+	for (my $rhit = $table->begin(); !$rhit->isNull(); $rhit = $rhit->next()) {
+		&send($rhit->getRow()->printP(), "\n");
+	}
+}
+
+# how long to keep the detailed data, hours
+our $keepHours = 2;
+
+# flush the data older than $keepHours from $tPackets
+sub flushOldPackets
+{
+	my $earliest = $currentHour - $keepHours * (1000*1000*3600);
+	my $next;
+	# the default iteration of $tPackets goes in the hour stamp order
+	for (my $rhit = $tPackets->begin(); !$rhit->isNull(); $rhit = $next) {
+		last if (&hourStamp($rhit->getRow()->get("time")) >= $earliest);
+		$next = $rhit->next(); # advance before removal
+		$tPackets->remove($rhit);
+	}
+}
+</pre>
+	
+		<para>
+		The print labels generate the debugging output that shows what is going
+		on with both tables.  Next go a couple of helper functions.
+		</para>
+
+		<para>
+		The <pre>dumpTable()</pre> is a straightforward iteration through a table and
+		print. It can be used on any table, <pre>printP()</pre> takes care of any
+		differences.
+		</para>
+
+		<para>
+		The flushing goes through the packets table and deletes the rows that
+		belong to an older hour than the current one or <pre>$keepHours</pre> before it.
+		For this to work right, the rows must go in the order of the hour
+		stamps, which the outer index <quote>byHour</quote> takes care of.
+		</para>
+
+		<para>
+		All the time-related logic expects that the time never goes backwards.
+		This is a simplification to make the example shorter, a production code
+		can not assume this.
+		</para>
+
+<!-- x/xTrafficAgg.t doHourly -->
+<pre>
+while(&readLine) {
+	chomp;
+	my @data = split(/,/); # starts with a command, then string opcode
+	my $type = shift @data;
+	if ($type eq "new") {
+		my $rowop = $tPackets->getInputLabel()->makeRowopArray(@data);
+		# update the current notion of time (simplistic)
+		$currentHour = &hourStamp($rowop->getRow()->get("time"));
+		if (defined($rowop->getRow()->get("local_ip"))) {
+			$uTraffic->call($rowop);
+		}
+		&flushOldPackets(); # flush the packets
+		$uTraffic->drainFrame(); # just in case, for completeness
+	} elsif ($type eq "dumpPackets") {
+		&dumpTable($tPackets);
+	} elsif ($type eq "dumpHourly") {
+		&dumpTable($tHourly);
+	}
+}
+</pre>
+
+		<para>
+		The final part is the main loop.
+		The input comes in the CSV form as a command followed by more data. If
+		the command is <quote>new</quote> then the data is the opcode and data fields, as it
+		would be sent by the router. The commands <quote>dumpPackets</quote> and
+		<quote>dumpHourly</quote> are used to print the contents of the tables, to see, what
+		is going on in them.
+		</para>
+
+		<para>
+		In an honest implementation there would be a separate label that would
+		differentiate between a reported packet and just a time update from the
+		router. Here for simplicity this logic is placed right into the main
+		loop. On each input record it updates the model's idea of the current
+		timestamp, then if there is a packet data, it gets processed, and
+		finally the rows that have become too old for the new timestamp get
+		flushed.
+		</para>
+
+		<para>
+		Now a run of the model. Its printout is also broken up into the
+		separately commented pieces. Of course, it's not like a real run, it
+		just contains one or two packets per hour to show how things work.
+		</para>
+
+<!-- x/xTrafficAgg.t doHourly -->
+<exdump>
+> new,OP_INSERT,1330886011000000,1.2.3.4,5.6.7.8,2000,80,100
+tPackets.out OP_INSERT time="1330886011000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" local_port="2000" remote_port="80" bytes="100" 
+tHourly.out OP_INSERT time="1330884000000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="100" 
+> new,OP_INSERT,1330886012000000,1.2.3.4,5.6.7.8,2000,80,50
+tHourly.out OP_DELETE time="1330884000000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="100" 
+tPackets.out OP_INSERT time="1330886012000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" local_port="2000" remote_port="80" bytes="50" 
+tHourly.out OP_INSERT time="1330884000000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="150" 
+</exdump>
+
+		<para>
+		The two input rows in the first hour refer to the same connection, so
+		they go into the same group and get aggregated together in the hourly
+		table. The rows for the current hour in the hourly table get updated
+		immediately as more data comes in. The <pre>tHourly.out OP_DELETE</pre>
+		comes out even before <pre>tPackets.out OP_INSERT</pre> because it's
+		driven by the output of the aggregator on <pre>$tPackets</pre>, and the operation
+		<pre>AO_BEFORE_MOD</pre> on the aggregator that drives the deletion
+		is executed before <pre>$tPackets</pre> gets modified.
+		</para>
+
+<!-- x/xTrafficAgg.t doHourly -->
+<exdump>
+> new,OP_INSERT,1330889811000000,1.2.3.4,5.6.7.8,2000,80,300
+tPackets.out OP_INSERT time="1330889811000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" local_port="2000" remote_port="80" bytes="300" 
+tHourly.out OP_INSERT time="1330887600000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="300" 
+</exdump>
+
+		<para>
+		Only one packet arrives in the next hour. 
+		</para>
+
+<!-- x/xTrafficAgg.t doHourly -->
+<exdump>
+> new,OP_INSERT,1330894211000000,1.2.3.5,5.6.7.9,3000,80,200
+tPackets.out OP_INSERT time="1330894211000000" local_ip="1.2.3.5" remote_ip="5.6.7.9" local_port="3000" remote_port="80" bytes="200" 
+tHourly.out OP_INSERT time="1330891200000000" local_ip="1.2.3.5" remote_ip="5.6.7.9" bytes="200" 
+> new,OP_INSERT,1330894211000000,1.2.3.4,5.6.7.8,2000,80,500
+tPackets.out OP_INSERT time="1330894211000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" local_port="2000" remote_port="80" bytes="500" 
+tHourly.out OP_INSERT time="1330891200000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="500" 
+</exdump>
+
+		<para>
+		And two more packets in the next hour. They are for the different
+		connections, so they do not get summed together in the aggregation.
+		When the hour changes again, the old data will start being deleted
+		(because of <pre>$keepHours = 2</pre>, which ends up keeping the
+		current hour and two before it), so
+		let's take a snapshot of the tables' contents.
+		</para>
+
+<!-- x/xTrafficAgg.t doHourly -->
+<exdump>
+> dumpPackets
+time="1330886011000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" local_port="2000" remote_port="80" bytes="100" 
+time="1330886012000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" local_port="2000" remote_port="80" bytes="50" 
+time="1330889811000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" local_port="2000" remote_port="80" bytes="300" 
+time="1330894211000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" local_port="2000" remote_port="80" bytes="500" 
+time="1330894211000000" local_ip="1.2.3.5" remote_ip="5.6.7.9" local_port="3000" remote_port="80" bytes="200" 
+> dumpHourly
+time="1330884000000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="150" 
+time="1330887600000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="300" 
+time="1330891200000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="500" 
+time="1330891200000000" local_ip="1.2.3.5" remote_ip="5.6.7.9" bytes="200" 
+</exdump>
+
+		<para>
+		The packets table shows all the 5 packets received so far, and the
+		hourly aggregation results for all 3 hours (with two separate
+		aggregation groups in the same last hour, for different ip pairs).
+		</para>
+
+<!-- x/xTrafficAgg.t doHourly -->
+<exdump>
+> new,OP_INSERT,1330896811000000,1.2.3.5,5.6.7.9,3000,80,10
+tPackets.out OP_INSERT time="1330896811000000" local_ip="1.2.3.5" remote_ip="5.6.7.9" local_port="3000" remote_port="80" bytes="10" 
+tHourly.out OP_INSERT time="1330894800000000" local_ip="1.2.3.5" remote_ip="5.6.7.9" bytes="10" 
+tPackets.out OP_DELETE time="1330886011000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" local_port="2000" remote_port="80" bytes="100" 
+tPackets.out OP_DELETE time="1330886012000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" local_port="2000" remote_port="80" bytes="50" 
+</exdump>
+
+		<para>
+		When the next hour's packet arrives, it gets processed as usual, but
+		then the removal logic finds the packet rows that have become too old
+		to keep. It kicks in and deletes them. But notice that the deletions
+		affect only the packets table, the aggregator ignores this activity as
+		too old and does not propagate it to the hourly table. 
+		</para>
+
+<!-- x/xTrafficAgg.t doHourly -->
+<exdump>
+> new,OP_INSERT,1330900411000000,1.2.3.4,5.6.7.8,2000,80,40
+tPackets.out OP_INSERT time="1330900411000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" local_port="2000" remote_port="80" bytes="40" 
+tHourly.out OP_INSERT time="1330898400000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="40" 
+tPackets.out OP_DELETE time="1330889811000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" local_port="2000" remote_port="80" bytes="300" 
+</exdump>
+
+		<para>
+		One more hour's packet, flushes out the data for another hour. 
+		</para>
+
+<!-- x/xTrafficAgg.t doHourly -->
+<exdump>
+> new,OP_INSERT,1330904011000000
+tPackets.out OP_DELETE time="1330894211000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" local_port="2000" remote_port="80" bytes="500" 
+tPackets.out OP_DELETE time="1330894211000000" local_ip="1.2.3.5" remote_ip="5.6.7.9" local_port="3000" remote_port="80" bytes="200" 
+</exdump>
+
+		<para>
+		And just a time update for another hour, when no packets have been
+		received. The removal logic still kicks in and works the same
+		way, deleting raw data for one more hour. After all this activity let's
+		dump the tables again:
+		</para>
+
+<!-- x/xTrafficAgg.t doHourly -->
+<exdump>
+> dumpPackets
+time="1330896811000000" local_ip="1.2.3.5" remote_ip="5.6.7.9" local_port="3000" remote_port="80" bytes="10" 
+time="1330900411000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" local_port="2000" remote_port="80" bytes="40" 
+> dumpHourly
+time="1330884000000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="150" 
+time="1330887600000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="300" 
+time="1330891200000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="500" 
+time="1330891200000000" local_ip="1.2.3.5" remote_ip="5.6.7.9" bytes="200" 
+time="1330894800000000" local_ip="1.2.3.5" remote_ip="5.6.7.9" bytes="10" 
+time="1330898400000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="40" 
+</exdump>
+
+		<para>
+		The packets table only has the data for the last 3 hours (there are no
+		rows for the last hour because none have arrived). But the hourly table
+		contains all the history. The rows weren't getting deleted here.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_time_periodic">
+		<title>Periodic updates</title>
+
+		<indexterm>
+			<primary>aggregation</primary>
+			<secondary>manual</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>time</primary>
+		</indexterm>
+		<para>
+		In the previous example if we keep aggregating the data from hours to days
+		and the days to months, then the arrival of each new packet will update
+		the whole chain. Sometimes that's what we want, sometimes it isn't. The
+		daily stats might be fed into some complicated computation, with nobody
+		looking at the results until the next day. In this situation each
+		packet will trigger these complicated computations, for no good reason,
+		since nobody cares for them until the day is closed.
+		</para>
+
+		<para>
+		These unnecessary computations can be prevented by disconnecting the
+		daily data from the hourly data, and performing the manual aggregation
+		only when the day changes. Then these complicated computations would
+		happen only once a day, not many times per second.
+		</para>
+
+		<para>
+		Here is how the last example gets amended to produce the once-a-day
+		daily summaries of all the traffic (as before, in multiple snippets,
+		this time showing only the added or changed code):
+		</para>
+
+<!-- x/xTrafficAgg.t doDaily -->
+<pre>
+# an hourly summary, now with the day extracted
+our $rtHourly = Triceps::RowType->new(
+	time => "int64", # hour's timestamp, microseconds
+	day => "string", # in YYYYMMDD
+	local_ip => "string", # string to make easier to read
+	remote_ip => "string", # string to make easier to read
+	bytes => "int64", # bytes sent in an hour
+);
+
+# a daily summary: just all traffic for that day
+our $rtDaily = Triceps::RowType->new(
+	day => "string", # in YYYYMMDD
+	bytes => "int64", # bytes sent in an hour
+);
+</pre>
+	
+		<para>
+		The hourly rows get an extra field, for convenient aggregation by day.
+		And the daily rows are introduced.
+		The notion of the day is calculated as:
+		</para>
+
+<!-- x/xTrafficAgg.t doDaily -->
+<pre>
+# compute the date of a timestamp, a string YYYYMMDD
+sub dateStamp # (time)
+{
+	my @ts = gmtime($_[0]/1000000); # microseconds to seconds
+	return sprintf("%04d%02d%02d", $ts[5]+1900, $ts[4]+1, $ts[3]);
+}
+
+# the current hour stamp that keeps being updated
+our $currentHour = undef;
+# the current day stamp that keeps being updated
+our $currentDay = undef;
+</pre>
+	
+		<para>
+		The calculation is done in GMT, so that the code produces the same
+		result all around the world. If you're doing this kind of project for
+		real, you may want to use the local time zone instead (but be careful
+		with the changing daylight saving time).
+		</para>
+
+		<para>
+		And the model keeps a global notion of the current day in addition to
+		the current hour.
+		</para>
+
+<!-- x/xTrafficAgg.t doDaily, reduced -->
+<pre>
+# aggregation handler: recalculate the summary for the last hour
+sub computeHourlywDay # (table, context, aggop, opcode, rh, state, args...)
+{
+...
+	my $res = $context->resultType()->makeRowHash(
+		time => $hourstamp,
+		day => &dateStamp($hourstamp),
+		local_ip => $rFirst->get("local_ip"), 
+		remote_ip => $rFirst->get("remote_ip"), 
+		bytes => $bytes,
+	);
+	${$state} = $res;
+	$context->send($opcode, $res);
+}
+</pre>
+	
+		<para>
+		The packets-to-hour aggregation function now populates this extra field,
+		the rest of it stays the same.
+		</para>
+
+<!-- x/xTrafficAgg.t doDaily, with lines skipped -->
+<pre>
+# the aggregated hourly stats, kept longer
+our $ttHourly = Triceps::TableType->new($rtHourly)
+	->addSubIndex("byAggr", 
+		Triceps::SimpleOrderedIndex->new(
+			time => "ASC", local_ip => "ASC", remote_ip => "ASC")
+	)
+	->addSubIndex("byDay", 
+		Triceps::IndexType->newHashed(key => [ "day" ])
+		->addSubIndex("group",
+			Triceps::IndexType->newFifo()
+		)
+	)
+;
+
+$ttHourly->initialize();
+our $tHourly = $uTraffic->makeTable($ttHourly, "tHourly");
+
+# remember the daily secondary index type
+our $idxHourlyByDay = $ttHourly->findSubIndex("byDay");
+our $idxHourlyByDayGroup = $idxHourlyByDay->findSubIndex("group");
+</pre>
+	
+		<para>
+		The hourly table type grows an extra secondary index for the manuall
+		aggregation into the daily data.
+		</para>
+
+<!-- x/xTrafficAgg.t doDaily with lines skipped -->
+<pre>
+# the aggregated daily stats, kept even longer
+our $ttDaily = Triceps::TableType->new($rtDaily)
+	->addSubIndex("byDay", 
+		Triceps::IndexType->newHashed(key => [ "day" ])
+	)
+;
+
+$ttDaily->initialize();
+our $tDaily = $uTraffic->makeTable($ttDaily, "tDaily");
+
+# label to print the changes to the daily stats
+makePrintLabel("lbPrintDaily", $tDaily->getOutputLabel());
+</pre>
+
+		<para>
+		And a table for the daily data is created but not connected to any
+		other tables.
+		</para>
+	
+		<para>
+		Instead it gets updated manually with the function that performs the
+		manual aggregation of the hourly data:
+		</para>
+
+<!-- x/xTrafficAgg.t doDaily -->
+<pre>
+# the manual aggregation of a day's data
+sub computeDay # ($dateStamp)
+{
+	our $uTraffic;
+	my $bytes = 0;
+
+	my $rhFirst = $tHourly->findIdxBy($idxHourlyByDay, day => $_[0]);
+	my $rhEnd = $rhFirst->nextGroupIdx($idxHourlyByDayGroup);
+	for (my $rhi = $rhFirst; 
+			!$rhi->same($rhEnd); $rhi = $rhi->nextIdx($idxHourlyByDay)) {
+		$bytes += $rhi->getRow()->get("bytes");
+	}
+	$uTraffic->makeHashCall($tDaily->getInputLabel(), "OP_INSERT",
+		day => $_[0],
+		bytes => $bytes,
+	);
+}
+</pre>
+	
+		<para>
+		This logic doesn't check whether any data for that day existed. If none
+		did, it would just produce a row with traffic of 0 bytes anyway. This
+		is different from the normal aggregation but here may actually be
+		desirable: it shows for sure that yes, the aggregation for that day
+		really did happen.
+		</para>
+
+<!-- x/xTrafficAgg.t doDaily -->
+<pre>
+while(&readLine) {
+	chomp;
+	my @data = split(/,/); # starts with a command, then string opcode
+	my $type = shift @data;
+	if ($type eq "new") {
+		my $rowop = $tPackets->getInputLabel()->makeRowopArray(@data);
+		# update the current notion of time (simplistic)
+		$currentHour = &hourStamp($rowop->getRow()->get("time"));
+		my $lastDay = $currentDay;
+		$currentDay = &dateStamp($currentHour);
+		if (defined($rowop->getRow()->get("local_ip"))) {
+			$uTraffic->call($rowop);
+		}
+		&flushOldPackets(); # flush the packets
+		if (defined $lastDay && $lastDay ne $currentDay) {
+			&computeDay($lastDay); # manual aggregation
+		}
+		$uTraffic->drainFrame(); # just in case, for completeness
+	} elsif ($type eq "dumpPackets") {
+		&dumpTable($tPackets);
+	} elsif ($type eq "dumpHourly") {
+		&dumpTable($tHourly);
+	} elsif ($type eq "dumpDaily") {
+		&dumpTable($tDaily);
+	}
+}
+</pre>
+
+		<para>
+		The main loop gets extended with the day-keeping logic and with the
+		extra command to dump the daily data.
+		It now maintains the current day, and after the packet computation is
+		done, looks, whether the day has changed. If it did, it calls the
+		manual aggregation of the last day.
+		</para>
+
+		<para>
+		And here is an example of its work:
+		</para>
+
+<!-- x/xTrafficAgg.t doDaily -->
+<exdump>
+> new,OP_INSERT,1330886011000000,1.2.3.4,5.6.7.8,2000,80,100
+tPackets.out OP_INSERT time="1330886011000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" local_port="2000" remote_port="80" bytes="100" 
+tHourly.out OP_INSERT time="1330884000000000" day="20120304" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="100" 
+> new,OP_INSERT,1330886012000000,1.2.3.4,5.6.7.8,2000,80,50
+tHourly.out OP_DELETE time="1330884000000000" day="20120304" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="100" 
+tPackets.out OP_INSERT time="1330886012000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" local_port="2000" remote_port="80" bytes="50" 
+tHourly.out OP_INSERT time="1330884000000000" day="20120304" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="150" 
+> new,OP_INSERT,1330889811000000,1.2.3.4,5.6.7.8,2000,80,300
+tPackets.out OP_INSERT time="1330889811000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" local_port="2000" remote_port="80" bytes="300" 
+tHourly.out OP_INSERT time="1330887600000000" day="20120304" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="300" 
+</exdump>
+
+		<para>
+		So far all the 3 packets are for the same day, and nothing new has
+		happened. 
+		</para>
+
+<!-- x/xTrafficAgg.t doDaily -->
+<exdump>
+> new,OP_INSERT,1330972411000000,1.2.3.5,5.6.7.9,3000,80,200
+tPackets.out OP_INSERT time="1330972411000000" local_ip="1.2.3.5" remote_ip="5.6.7.9" local_port="3000" remote_port="80" bytes="200" 
+tHourly.out OP_INSERT time="1330970400000000" day="20120305" local_ip="1.2.3.5" remote_ip="5.6.7.9" bytes="200" 
+tPackets.out OP_DELETE time="1330886011000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" local_port="2000" remote_port="80" bytes="100" 
+tPackets.out OP_DELETE time="1330886012000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" local_port="2000" remote_port="80" bytes="50" 
+tPackets.out OP_DELETE time="1330889811000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" local_port="2000" remote_port="80" bytes="300" 
+tDaily.out OP_INSERT day="20120304" bytes="450" 
+</exdump>
+
+		<para>
+		When a packet for the next day arrives, it has three effects: 
+		</para>
+
+		<orderedlist>
+		<listitem>
+		inserts the packet data as usual, 
+		</listitem>
+
+		<listitem>
+		finds that the previous packet data is obsolete and flushes it (without
+		upsetting the hourly summaries), and 
+		</listitem>
+
+		<listitem>
+		finds that the day has changed and performs the
+		manual aggregation of last day's hourly data into daily.
+		</listitem>
+		</orderedlist>
+
+<!-- x/xTrafficAgg.t doDaily -->
+<exdump>
+> new,OP_INSERT,1331058811000000
+tPackets.out OP_DELETE time="1330972411000000" local_ip="1.2.3.5" remote_ip="5.6.7.9" local_port="3000" remote_port="80" bytes="200" 
+tDaily.out OP_INSERT day="20120305" bytes="200" 
+</exdump>
+
+		<para>
+		A time update for the yet next day flushes out the previous day's
+		detailed packets and again builds the daily summary of that day.
+		</para>
+
+<!-- x/xTrafficAgg.t doDaily -->
+<exdump>
+> new,OP_INSERT,1331145211000000
+tDaily.out OP_INSERT day="20120306" bytes="0" 
+</exdump>
+
+		<para>
+		Yet another day's time roll now has no old data to delete (since none
+		arrived in the previous day) but still produces the daily summary of 0
+		bytes.
+		</para>
+
+<!-- x/xTrafficAgg.t doDaily -->
+<exdump>
+> dumpDaily
+day="20120305" bytes="200" 
+day="20120304" bytes="450" 
+day="20120306" bytes="0" 
+</exdump>
+
+		<para>
+		This shows the eventual contents of the daily summaries. The order of
+		the rows is fairly random, because of the hashed index. Note that the
+		hourly summaries weren't flushed either, they are all still there too.
+		If you want them eventually deleted after some time, you would need to
+		provide more of the manual logic for that.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_time_issues">
+		<title>The general issues of time processing</title>
+
+		<indexterm>
+			<primary>time</primary>
+		</indexterm>
+		<para>
+		After a couple of examples, it's time to do some generalizations.
+		What these examples did manually, with the data expiration
+		by time, the more mature CEP systems do internally, using the
+		statements for the time-based work.
+		</para>
+
+		<para>
+		Which isn't always better though. The typical issues are with:
+		</para>
+
+		<itemizedlist>
+		<listitem>
+		fast replay of data,
+		</listitem>
+
+		<listitem>
+		order of execution,
+		</listitem>
+
+		<listitem>
+		synchronization between modules.
+		</listitem>
+		</itemizedlist>
+
+		<indexterm>
+			<primary>Coral8</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Aleri</primary>
+		</indexterm>
+		<indexterm>
+			<primary>StreamBase</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Esper</primary>
+		</indexterm>
+		<para>
+		The problem with the fast replay is that those time based-statements
+		use the real time and not the timestamps from the incoming rows. Sure,
+		in Coral8 you can use the incoming row timestamps but they still are
+		expected to have the time generally synchronized with the local clock
+		(they are an attempt to solve the inter-module synchronization problem,
+		not fast replay). You can't run them fast. And considering the Coral8
+		fashion of dropping the data when the input buffer overflows, you don't
+		want to feed the data into it too fast to start with. In the Aleri
+		system you can accelerate the time but it's by a fixed factor. You can
+		run the logical time there say 10 times faster and feed the data 10
+		times faster but there are no timestamps in the input rows, and you
+		simply can't feed the data precisely enough to reproduce the exact
+		timing. And 10 times faster is not the same thing as just as fast as
+		possible. I don't know for sure what the StreamBase does, it seems to
+		have the time acceleration by a fixed rate too. Esper apparently
+		allows the full control over timing, but I don't know much about it.
+		</para>
+
+		<para>
+		Your typical problem with fast replay in Coral8/CCL is this: you create
+		a time limited window
+		</para>
+
+<pre>
+create window ... keep 3 hours;
+</pre>
+
+		<para>
+		and then feed the data for a couple of days in say 20 minutes. Provided
+		that you don't feed it too fast and none of it gets dropped, all of the
+		data ends up in the window and none of it expires, since the window
+		goes by the physical time, and the physical time was only 20 minutes.
+		The first issue is that you may not have enough memory to store the
+		data for two days, and everything would run out of memory and crash.
+		The second issue is that if you want to do some time-based aggregation
+		relying on the window expiration, you're out of luck.
+		</para>
+
+		<para>
+		Why would you want to feed the data so fast in the first place? Two reasons:
+		</para>
+
+		<orderedlist>
+		<listitem>
+		Testing. When you test your time-based logic, you don't want your unit
+		test to take 3 hours, let alone multiple days. You also want your unit
+		tests to be fully repeatable, without any fuzz.
+		</listitem>
+
+		<indexterm>
+			<primary>persistence</primary>
+		</indexterm>
+		<indexterm>
+			<primary>restart</primary>
+		</indexterm>
+		<listitem>
+		State restoration after a planned shutdown or crash. No matter what
+		everyone says, the built-in persistence features work right only for a
+		small subset of the simple models. Getting the persistence work for the
+		more complex models is difficult, and for all I know nobody has
+		bothered to get it working right. The best approach in reality is to
+		preserve a subset of the state, and get the rest of it by replaying the
+		recent input data after restart. The faster you re-feed the data, the
+		faster your model comes back online. (Incidentally, that's what Aleri
+		does with the <quote>persistent source streams</quote>, only losing all the timing
+		information of the rows and having the same above-mentioned issue as
+		CCL).
+		</listitem>
+		</orderedlist>
+
+		<indexterm>
+			<primary>execution order</primary>
+		</indexterm>
+		<para>
+		Next issue, the execution order. The last example was relying on
+		<pre>$currentHour</pre> being updated before <pre>flushOldPackets()</pre> runs. Otherwise the
+		deletions would propagate through the aggregator where they should
+		not. In a system like Aleri with each element running in its own
+		thread there is no way to ensure any particular timing between the
+		threads. In a system with single-threaded logic, like Coral8/Sybase or
+		StreamBase, there is a way. But getting the order right is tricky. It
+		depends on what the compiler and scheduler decide, and may require a
+		few attempts to get the order right. 
+		Well, technically, Aleri can control the time too: you can run in
+		artificial time, setting and stopping it. So you can stop the time, set
+		to record timestamp, feed the record, wait for processing to complete,
+		advance time, wait for any time-based processing to complete, and so
+		on. I'm not sure if it made to Sybase R5, but it definitely worked on
+		Aleri. However there was no tool that did it for you easily, and also
+		all these synchronous calls present a pretty high overhead.
+		</para>
+
+		<para>
+		The procedural execution makes things much more straightforward.
+		</para>
+
+		<para>
+		Now, the synchronization between modules. When the data is passed
+		between multiple threads or processes, there is always a jigger in the
+		way the data goes through the inter-process communications and even
+		more so through the network. Relying on the timing of the data after it
+		arrives is usually a bad idea if you want to get any repeatability and
+		precision. Instead the data has to be timestamped by the sender and
+		then these timestamps used by the receiver instead of the real time.
+		</para>
+
+		<para>
+		And Coral8 allows you to do so. But what if there is no data coming?
+		What do you do with the time-based processing? The Coral8 approach is
+		to allow some delay and then proceed at the rate of the local clock.
+		Note that the logical time is not exactly the same as the local clock,
+		it generally gets behind the local clock by no more than the delay
+		amount, or might go faster if the sender's clock goes faster. The
+		question is, what delay amount do you choose? If you make it too short,
+		the small hiccups in the data flow throw the timing off, the local
+		clock runs ahead, and then the incoming data gets thrown away because
+		it's too old. If you make it too long, you potentially add a large
+		amount of latency. As it turns out, no reasonable amount of delay works
+		well with Coral8. To get things working at least sort of reliably, you
+		need horrendous delays, on the order of 10 seconds or more. Even then
+		the sender may get hit by a long-running request and the connection
+		would go haywire anyway. 
+		</para>
+
+		<para>
+		The only reliable solution is to drive the time completely by the
+		sender. Even if there is no data to send, it must still send the
+		periodic time updates, and the receiver must use the incoming
+		timestamps for its time-based processing. Sending one or even ten
+		time-update packets per second is not a whole lot of overhead, and sure
+		works much better than the 10-second delays. And along the way it gives
+		the perfect repeatability and fast replay for the unit testing. So
+		unless your CEP system can be controlled in this way, getting any
+		decent distributed timing control requires doing it manually. The
+		reality is that Aleri can't, Coral8 can't, the Sybase R4/R5 descended
+		from them can't, and I could not find anything related to the time
+		control in the StreamBase documentation, so my guess is that it can't
+		either.
+		</para>
+
+		<para>
+		And if you have to control the time-based processing manually, doing it
+		in the procedural way is at least easier.
+		</para>
+
+		<para>
+		An interesting side subject is the relation of the logical time to the
+		real time. If the input data arrives faster than the CEP model can
+		process it, the logical time will be getting behind the real time. Or
+		if the data is fed at the artificially accelerated rate, the logical
+		time will be getting ahead of the real time. There could even be a
+		combination thereof: making the "real" time also artificial (driven by
+		the sender) and artificially make the data get behind it for the
+		testing purposes. The getting-behind can be detected and used to change
+		the algorithm. For example, if we aggregate the traffic data in
+		multiple stages, to the hour, to the day and to the month, the whole
+		chain does not have to be updated on every packet Just update the first
+		level on every packet, and then propagate further when the traffic
+		burst subsides and gives the model a breather.
+		</para>
+
+		<para>
+		So far the major CEP systems don't seem to have a whole lot of direct
+		support for it. There are ways to reduce the load by reducing the
+		update frequency to a fixed period (like the <pre>OUTPUT EVERY</pre> statement in
+		CCL, or periodic subscription in Aleri), but not much of the load-based
+		kind. If the system provides ways to get both the real time and logical
+		time of the row, the logic can be implemented manually. But the
+		optimizations of the time-reading, like in Coral8, might make it
+		unstable.
+		</para>
+
+		<para>
+		The way to do it in Triceps is by handling it in the Perl (or &Cpp;) code
+		of the main event loop. When it has no data to read, it can create an
+		<quote>idle</quote> row that would push through the results as a more efficient
+		batch.
+		</para>
+	</sect1>
+
+</chapter>

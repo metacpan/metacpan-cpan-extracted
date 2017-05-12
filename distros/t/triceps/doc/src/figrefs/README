@@ -1,0 +1,3 @@
+The figures have to be included in different formats for the printed and
+HTML versions of the text, so the references to them are placed into separate
+files that are auto-generated depending on the result data type.

@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_basic_pthread">
+		<title>BasicPthread reference</title>
+
+		<indexterm>
+			<primary>BasicPthread</primary>
+		</indexterm>
+		<para>
+		Building a new Triead is
+		a serious business, containing many moving part. Doing it every time
+		from scratch would be hugely annoying and error prone. The class
+		BasicPthread, defined in <pre>app/BasicPthread.h</pre>,  takes care of wrapping
+		all that complicated logic.
+		</para>
+
+		<para>
+		It originated as a subclass of pw::pwthread, and even though it ended
+		up easier to copy and modify the code (okay, maybe this means that
+		pwthread can be made more flexible), the usage is still very similar to
+		it. You define a new subclass of BasicPthread, and define the virtual
+		function <pre>execute()</pre> in it. Then you instantiate the object and call the
+		method <pre>start()</pre> with the App argument.
+		</para>
+
+		<para>
+		For a very simple example:
+		</para>
+
+<!-- cpp/app/t_RunApp.cpp modified -->
+<pre>
+class MainLoopPthread : public BasicPthread
+{
+public:
+	MainLoopPthread(const string &name):
+		BasicPthread(name)
+	{ }
+
+	// overrides BasicPthread::execute
+	virtual void execute(TrieadOwner *to)
+	{
+		to->readyReady();
+		to->mainLoop();
+	}
+};
+
+...
+
+Autoref<MainLoopPthread> pt3 = new MainLoopPthread("t3");
+pt3->start(myapp);
+</pre>
+
+		<para>
+		It will properly create the Triead, TrieadOwner, register the thread
+		joiner and start the execution. The TrieadOwner will pass through to
+		the <pre>execute()</pre> method, and its field <pre>fi_</pre> will contain the reference to
+		the FileInterrupt object. After <pre>execute()</pre> returns, it will take care of
+		marking the thread as dead.
+		</para>
+
+		<para>
+		It also wraps the call of <pre>execute()</pre> into a try/catch block, so any
+		Exceptions thrown will be caught and cause the App to abort. In short,
+		it's very similar to the Triead management in Perl.
+		</para>
+
+		<para>
+		You don't need to keep the reference to the thread object afterwards,
+		you can even do the construction and start in one go:
+		</para>
+
+<pre>
+(new MainLoopPthread("t3"))->start(myapp);
+</pre>
+
+		<para>
+		The internals of BasicPthread will make sure that the object will be
+		dereferenced (and thus, in the absence of other references, destroyed)
+		after the thread gets joined by the harvester.
+		</para>
+
+		<para>
+		Of course, if you need to pass more arguments to the thread, you can
+		define them as fields in your subclass, set them in the constructor (or
+		by other means between constructing the object and calling <pre>start()</pre>),
+		and then <pre>execute()</pre> can access them. Remember, <pre>execute()</pre> is a method, so
+		it receives not only the TrieadObject as an argument but also the
+		BasicPthread object as <pre>this</pre>.
+		</para>
+
+		<para>
+		BasicPthread is implemented as a subclass of TrieadJoin, and thus is an
+		Mtarget. It provides the concrete implementation of the joiner's
+		virtual methods, <pre>join()</pre> and <pre>interrupt()</pre>. <pre>Interrupt()</pre> calls the method
+		of the base class, then sends the signal <pre>SIGUSR2</pre> to the target thread.
+		</para>
+
+		<para>
+		And finally the actual reference:
+		</para>
+
+<pre>
+BasicPthread(const string &name);
+</pre>
+
+		<para>
+		Constructor. The name of the thread is passed through to
+		<pre>App::makeTriead()</pre>. The Triead will be constructed in <pre>start()</pre>, the
+		BasicPthread constructor just collects together the arguments.
+		</para>
+
+<pre>
+void start(Autoref<App> app);
+</pre>
+
+		<para>
+		Construct the Triead, create the POSIX thread, and start the execution
+		there.
+		</para>
+
+<pre>
+void start(Autoref<TrieadOwner> to);
+</pre>
+
+		<para>
+		Similar to the other version of <pre>start()</pre> but uses a pre-constructed
+		TrieadOwner object. This version is useful mostly for the tests, and
+		should not be used much in the real life.
+		</para>
+
+<pre>
+virtual void execute(TrieadOwner *to);
+</pre>
+
+		<para>
+		Method that must be redefined by the subclass, containing the threads's
+		logic.
+		</para>
+
+<pre>
+virtual void join();
+virtual void interrupt();
+</pre>
+
+		<para>
+		Methods inherited from TrieadJoin, providing the proper implementations
+		for the POSIX threads.
+		</para>
+	</sect1>

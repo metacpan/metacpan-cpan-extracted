@@ -1,0 +1,18 @@
+Triceps is an innovative CEP (Complex Event Processing) engine. It implements
+the event stream processing as a library embeddable in C++ and Perl.
+
+For the build instructions, see BUILD.
+
+For the documentation see doc/pdf and doc/html (if you didn't download the
+release but checked out from SVN, these directories will be empty and the
+documentation would have to be built from the docbook sources; see BUILD
+for instructions).
+
+The documentation of the latest features that haven't been collected into
+an official release yet is written up as a blog at
+http://babkin-cep.blogspot.com/ .
+
+To contact the author, write to babkin@users.sf.net or sab123@hotmail.com.
+
+The project home at SourceForge is located at 
+http://sourceforge.net/projects/triceps/

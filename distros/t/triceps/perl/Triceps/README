@@ -1,0 +1,29 @@
+Triceps
+=======
+
+Triceps is a Complex Event Processing engine, embeddable into the
+scripting language. At the moment the only language supported is Perl
+(and of course the native C++).
+
+More details will be added later as the features become available.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Carp (standard part of the recent Perl versions)
+
+COPYRIGHT AND LICENCE
+
+(C) Copyright 2011-2014 Sergey A. Babkin.
+
+See the COPYRIGHT file for the full licensing information.

@@ -1,0 +1,26 @@
+#!/bin/bash
+# Set the version in the files.
+
+VERSION="$1"
+shift
+
+[ -n "$VERSION" ] || {
+	echo "Use: setversion VERSION"
+	exit 1
+} >&2
+
+echo "Setting version '$VERSION'"
+
+for f in `find perl/Triceps/lib ! -path '*/.svn/*' -name '*.pm'`
+do {
+	sed -i "s/^our \$VERSION = 'v.*'/our \$VERSION = 'v$VERSION'/" $f || exit 1
+} done
+
+echo "All the changes:"
+echo
+svn diff -x -a --diff-cmd diff
+echo
+echo "Don't forget to run './ckversion $VERSION' and 'svn ci'!"
+
+exit 0
+

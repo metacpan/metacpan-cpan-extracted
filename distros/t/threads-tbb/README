@@ -1,0 +1,36 @@
+threads::tbb version 0.04
+=========================
+
+This is a very early alpha wrapper for the Intel Threading Building
+Blocks® C++ library for Perl 5.  It hopes to add data parallelism and
+easy-to-use pipelining API to Perl 5.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make -j
+   make test
+   make install
+
+See the installed perldoc for L<threads::tbb> for information on how
+to use the library.
+
+Currently you might experience some intermittent failures with test
+t/08-refcounter.t; this will hopefully be fixed in a later release.
+
+DEPENDENCIES
+
+This module requires the TBB library be installed and system headers
+in the appropriate place.  For debian/ubuntu users, you will need the
+"libtbb-dev" package.  Instructions for other distributions and
+operating systems will hopefully end up here eventually!
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 Open Parallel.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.

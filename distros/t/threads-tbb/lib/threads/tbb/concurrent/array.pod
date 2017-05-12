@@ -1,0 +1,93 @@
+
+=head1 NAME
+
+threads::tbb::concurrent::array - shared array variable via tbb::concurrent_vector
+
+=head1 SYNOPSIS
+
+  use threads::tbb;
+
+  #my @array :concurrent;  # TODO
+  tie my @array, "threads::tbb::concurrent::array";
+
+  push @array, @items;   # safe
+  my $item = $array[0];  # safe
+  $array[0] = $item;     # safe
+
+  # THREAD-UNSAFE but implemented:
+  print $#array;
+  $#array = 7;
+
+  # never:
+  $array[0]->mutate;
+
+=head1 DESCRIPTION
+
+The concurrent vector is an array that multiple threads can read to
+and write from.  It also provides the advantage of using cache-aligned
+array slots, so threads don't conflict on nearby access with each
+other.
+
+Implementation of basic array primitives is incomplete; stick with the
+concurrent API and you will be fine.  Patches welcome!
+
+The thread-safe operations on this type are (see L<perltie> for
+specifics on the API of these methods):
+
+These are:
+
+=over
+
+=item FETCH & STORE
+
+Tied access to the array contents.  If you are using index ranges from
+a L<threads::tbb::blocked_int>, this is safe.
+
+=item PUSH
+
+Tied access to pushing to the end of the array.  Adding an item or
+list of items to the end of the list.  There is no concurrent POP or
+SHIFT; see L<threads::tbb::concurrent::queue#TODO> for that.
+
+=back
+
+=head2 THREAD UNSAFE OPERATIONS
+
+These functions return information which can get out of date.  None of
+them are safe, because you'd need to hold an exclusive lock on the
+array to safely use them.
+
+=over
+
+=item FETCHSIZE
+
+Get the length of the array.
+
+=item STORESIZE
+
+Supported, calls grow_to_at_least and the grow_by.  Does not permit
+shrinking the array.
+
+=back
+
+=head2 UNSUPPORTED OPERATIONS
+
+=over
+
+=item CLEAR
+
+Not implemented; so currently C<@array = @foo> doesn't work
+
+=item Array with contents
+
+Currently the TIEARRAY method doesn't respect tieing to an array with
+existing contents.
+
+=back
+
+=head1 SEE ALSO
+
+L<threads::tbb::concurrent>, L<threads::tbb>
+
+=cut
+

@@ -1,0 +1,1186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_aggregator">
+		<title>Aggregator classes reference</title>
+
+	<sect2 id="sc_cpp_aggregator_type">
+		<title>AggregatorType reference</title>
+
+		<indexterm>
+			<primary>AggregatorType</primary>
+		</indexterm>
+		<para>
+		The AggregatorType is a base class from which you derive the concrete
+		aggregator types, similarly to how it's done for the index types.
+		It's defined in <pre>type/AggregatorType.h</pre>.
+		It has a chunk of functionality common for all the aggregator types and
+		the virtual functions that create the aggregator objects.
+		</para>
+
+<pre>
+AggregatorType(const string &name, const RowType *rt);
+</pre>
+
+		<para>
+		The constructor provides a name and the result row type. Remember, that
+		AggregatorType is an abstract class,  and will never be instantiated
+		directly. Instead your subclass that performs a concrete aggregation
+		will invoke this constructor as a part of its constructor.
+		</para>
+
+		<para>
+		As has been described in the Perl part of the manual, the aggregator
+		type is unique in the fact that it has a name.  And it's a bit weird
+		name: each aggregator type is kind of by itself and can be reused in
+		multiple table types, but all the aggregator types in a table type must
+		have different names. This is the name that is used to generate the
+		name of the aggregator's output label in a table:
+		<quote><i>table_name.aggregator_type_name</i></quote>. Fundamentally, the aggregator
+		type itself should not have a name, it should be given a name when
+		connected to an index in the table type. But at the time the current
+		idea looked good enough, it's easy, convenient for error messages, and
+		doesn't get much in the way.
+		</para>
+
+		<para>
+		The result row type might not be known at the time of the aggregator
+		type creation. All the constructor does with it is place the value into
+		a reference field, so if the right type is not known, just use NULL,
+		then change later at the initialization time.
+		If it's still NULL after initialization, this will be reported as an 
+		initialization error.
+		</para>
+
+<pre>
+AggregatorType(const AggregatorType &agg);
+virtual AggregatorType *copy() const;
+AggregatorType(const AggregatorType &agg, HoldRowTypes *holder);
+virtual AggregatorType *deepCopy(HoldRowTypes *holder) const;
+</pre>
+
+		<para>
+		An aggregator type must provide the copy constructors 
+		and the virtual methods that invoke them. 
+		Both kinds of copies are deep but <pre>deepCopy()</pre> is even deeper,
+		copying even the row types.
+		See 
+		<xref linkend="sc_cpp_copy" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;
+		for details.
+		</para>
+
+		<para>
+		The basic copy is the same as
+		with the index types: when an agggregator type gets connected into a
+		table type, it gets actually copied, and the copy must always be
+		uninitialized.
+		</para>
+
+		<para>
+		The virtual methods are typically defined in the subclasses as follows:
+		</para>
+
+<pre>
+AgregatorType *MyAggregatorType::copy() const
+{
+	return new MyAggregatorType(*this);
+}
+
+AgregatorType *MyAggregatorType::deepCopy(HoldRowTypes *holder) const
+{
+	return new MyAggregatorType(*this, holder);
+}
+</pre>
+
+		<para>
+		Some of the fields in the AggregatorType are directly usable
+		by the subclasses:
+		</para>
+
+<pre>
+const_Autoref<RowType> rowType_; // row type of result
+Erref errors_; // errors from initialization
+string name_; // name inside the table's dotted namespace
+int pos_; // a table has a flat vector of AggregatorGadgets in it, this is the index for this one (-1 if not set)
+bool initialized_; // flag: already initialized, no future changes
+</pre>
+
+		<variablelist>
+			<varlistentry>
+				<term>rowType_</term>
+				<listitem>
+				<para>
+				is the row type of the result. The constructor puts
+				the argument value there but it can be changed at any time
+				(until the initialization is completed) later.
+				</para>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term>errors_</term>
+				<listitem>
+				<para>
+				is a place to put the errors during initialization. It
+				comes set to NULL, so if you want to report any errors, you
+				have to create an Errors object first, there are the
+				helper functions for that.
+				</para>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term>name_</term>
+				<listitem>
+				<para>
+				is where the aggregator name is kept. Generally, don't change it,
+				treat it as read-only.
+				</para>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term>pos_</term>
+				<listitem>
+				<para>
+				has to do with management of the aggregator types in a
+				table type. Before initialization it's -1, after initialization
+				each aggregator type (that becomes tied to its table type) will
+				be assigned a sequential number. Again, treat it as read-only,
+				and you probably would never need to even read it.
+				</para>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term>initialized_</term>
+				<listitem>
+				<para>
+				shows that the initialization has already
+				happened. Your initialization should call the initialization
+				of the base class, which would set this flag. No matter if the
+				initialization succeesed or failed, this flag gets set. It
+				never gets reset in the original AggregatorType object, it gets
+				reset only in the copies.
+				</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+
+<pre>
+const string &getName() const;
+const RowType *getRowType() const;
+bool isInitialized() const;
+virtual Erref getErrors() const;
+</pre>
+
+		<para>
+		The convenience getter functions that return the data from the fields.
+		You can override <pre>getErrors()</pre> but there probably is no point to it.
+		</para>
+
+<pre>
+virtual bool equals(const Type *t) const;
+virtual bool match(const Type *t) const;
+</pre>
+
+		<para>
+		The equality and match comparisons are as usual. The defaults provided
+		in the base AggregatorType check that the result row type is equal or
+		matching (or that both result row types are NULL), and
+		that the &Cpp; typeid of both are the same. So if your aggregator type has no
+		parameters, this is good enough and you don't need to redefine these
+		methods. If you do have parameters, you call the base class method
+		first, if it returns false, you return false, otherwise you check the
+		parameters. Like this:
+		</para>
+
+<pre>
+bool MyAggregatorType::equals(const Type *t) const
+{
+     if (!AggregatorType::equals(t))
+        return false;
+
+    // the typeid matched, so safe to cast
+    const MyAggregatorType *at = static_cast<const MyAggregatorType *>(t);
+    // ... check the type-specific parameters ...
+}
+</pre>
+
+		<para>
+		The other method that you can re-define or leave alone is <pre>printTo()</pre>:
+		</para>
+
+<pre>
+virtual void printTo(string &res, const string &indent = "", const string &subindent = "  ") const;
+</pre>
+
+		<para>
+		The default one prints <quote>aggregator (<i>result row type</i>) <i>name</i></quote>. If you
+		want to print more information, such as the name of the aggregator
+		class and its arguments, you can define your own.
+		</para>
+
+<pre>
+virtual void initialize(TableType *tabtype, IndexType *intype);
+</pre>
+
+		<para>
+		This method is called at the TableType initialization time, as it goes through
+		all the components. This is the place where the aggregator type parses its
+		arguments, matches them up with the information about the table type and produces
+		any parsed internal representations. It may also compute the
+		aggregation result type if that was not done earlier. The <pre>initialize()</pre>
+		method in the subclass must always call the method in the parent class,
+		to let it do its part. If any errors are found, they must be reported by
+		setting an Errors object in the field <pre>errors_</pre>. If the aggregator
+		type has no parameters, and its result type was set in the constructor,
+		it doesn't have to define the <pre>initialize()</pre> method.
+		</para>
+
+		<para>
+		Finally, there are methods that will produce objects that do the actual
+		work:
+		</para>
+
+<pre>
+virtual AggregatorGadget *makeGadget(Table *table, IndexType *intype) const;
+virtual Aggregator *makeAggregator(Table *table, AggregatorGadget *gadget);
+</pre>
+
+		<indexterm>
+			<primary>BasicAggregatorType</primary>
+		</indexterm>
+		<indexterm>
+			<primary>IndexType</primary>
+		</indexterm>
+		<indexterm>
+			<primary>SortedIndexType</primary>
+		</indexterm>
+		<para>
+		This exposes quite a bit of the inherent complexity of the aggregators.
+		For the simpler cases you can use the subclass BasicAggregatorType that
+		handles most of this complexity for you and just skip these <quote>make</quote>
+		methods. By the way, the IndexType has a <quote>make</quote> method of this kind too
+		but it was not discussed because unless you define a completely new
+		IndexType, you don't need to worry about it: it just happens under the
+		hood. The SortedIndexType just asks you to define a condition and takes
+		care of the rest, like the BasicAggregatorType for aggregators.
+		</para>
+	</sect2>
+
+	<sect2 id="sc_cpp_aggregator_gadget">
+		<title>AggregatorGadget reference</title>
+
+		<para>
+		The Gadget concept is discussed in
+		<xref linkend="sc_cpp_gadget" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		Each aggregator in a table is a gadget. So whenever a table is
+		created from a table type, each aggregator type in that table type is
+		called to produce its gadget, and these gadgets are collected in the
+		table. When you call <pre>table->getAggregatorLabel("name")</pre>, you get the
+		output label from the appropriate gadget.
+		</para>
+
+		<para>
+		The short summary: one AggregatorGadget per table per aggregator type.
+		</para>
+
+		<indexterm>
+			<primary>AggregatorGadget</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Gadget</primary>
+		</indexterm>
+		<para>
+		The AggregatorGadget is a subclass of Gadget that keeps the extra
+		information typically needed by all the aggregator types. It's defined in
+		<pre>sched/AggregatorGadget.h</pre>. 
+		The original grand plan was that the different aggregator types may
+		define their own subclasses of AggregatorGadget but in reality there
+		appears no need to. So far all the aggregators happily live with the
+		base AggregatorGadget.  It's constructed as:
+		</para>
+
+<pre>
+AggregatorGadget(const AggregatorType *type, Table *table, IndexType *intype);
+</pre>
+
+		<para>
+		The arguments are pretty much a pass-through from the <pre>makeGadget()</pre>.
+		The AggregatorGadget will keep references to the AggregatorType and
+		to the IndexType, and a pointer to the Table, for the future use.
+		The reason why the Table is not referenced is that it would create
+		cyclic references, because the table already references
+		all its aggregator gadgets. There is normally no need to worry that the
+		table will disappear: when the table is destroyed, it will never call
+		the aggregator gadget again. And that would remove the references
+		to the Aggregator and AggregatorGadget, thus likely causing them
+		to be destroyed too (unless you hold another reference to
+		AggregatorGadget from outside Aggregator, which you normally should
+		not).
+		</para>
+
+		<para>
+		This information can be obtained back from the AggregatorGadget with:
+		</para>
+
+<pre>
+Table *getTable() const;
+const AggregatorType *getType() const;
+template<class C> const C *typeAs() const;
+const IndexType *getIndexType() const;
+</pre>
+
+		<para>
+		The AggregatorType can be extracted in two ways, as a plain base
+		class pointer with <pre>getType()</pre> and with the template <pre>typeAs()</pre> that
+		casts it to the appropriate subclass. For example:
+		</para>
+
+<pre>
+MyAggregatorType *agt = gadget->typeAs<MyAggregatorType>();
+</pre>
+
+		<para>
+		Of course, the subclasses can also read the fields directly.
+		</para>
+
+		<para>
+		The AggregatorGadget also publicly exports the method <pre>sendDelayed()</pre>
+		of the Gadget (which is normally protected) and provides
+		a convenience wrapper that constructs a row from fields data
+		and sends it:
+		</para>
+
+<pre>
+void sendDelayed(Tray *dest, const Row *row, Rowop::Opcode opcode) const
+void sendDelayed(Tray *dest, FdataVec &data, Rowop::Opcode opcode) const;
+</pre>
+
+		<para>
+		The Gadget method <pre>send()</pre> is not exported, and is even marked as
+		private. The rows are always sent from the aggregators in the delayed
+		fashion. The reasons for that are partially historic, having to do with
+		the per-Gadget enqueueing modes, but the bigger reason is that it also helps with the error
+		handling inside the Table and Aggregator code, separating the errors in
+		the Aggregators themselves from the errors in the labels called by
+		them.
+		</para>
+	</sect2>
+
+	<sect2 id="sc_cpp_aggregator_obj">
+		<title>Aggregator reference</title>
+
+		<para>
+		Unlike AggregatorGadget, an Aggergator represents a concrete aggregation 
+		group, on a concrete index (not on an index type, on an index!). Whenever an index
+		of some type is created, an aggregator of its connected type is created
+		with it. Remember, an index contains a single aggregation group. A table with nested indexes can have
+		lots of aggregators of a single type. The difference between an index
+		type and an index is explained in detail in
+		<xref linkend="sc_table_indextree" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;,
+		and the available Index methods are enumerated in
+		<xref linkend="sc_cpp_idx" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<para>
+		The way it works, whenever some row in the table gets deleted or
+		inserted, the table determines for each index type, which actual index
+		in the tree (i.e. which group) got changed. Then for aggregation
+		purposes, if that index has an aggegator on it, that aggregator is
+		called to do its work on the group. It produces an output row or two
+		(or maybe none, or it can get creative and produce many rows) 
+		for that group and sends it to the aggregator gadget of
+		the same type.
+		</para>
+
+		<para>
+		The short summary: one Aggregator object per group, produces
+		the updates when asked, sends them to the single common gadget.
+		</para>
+
+		<para>
+		The pointers to the Table and Gadget are passed to the <pre>makeAggregator()</pre>  method
+		for convenience, the Aggergator object doesn't need to remember them. Whenever
+		it will be called, it will also be given these pointers as arguments.
+		This is done in an attempt to reduce the amount of data stored per
+		aggregator. 
+		</para>
+
+		<indexterm>
+			<primary>Aggregator</primary>
+		</indexterm>
+		<para>
+		The Aggregator class (defined in <pre>table/Aggregator.h</pre>) is the
+		base class for the per-aggregation-group objects. Its main purpose
+		is in the handler method:
+		</para>
+
+		<indexterm>
+			<primary>Aggregator</primary>
+			<secondary>handler</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>AggOp</primary>
+		</indexterm>
+<pre>
+virtual void handle(Table *table, AggregatorGadget *gadget, Index *index,
+	const IndexType *parentIndexType, GroupHandle *gh, Tray *dest,
+	AggOp aggop, Rowop::Opcode opcode, RowHandle *rh);
+</pre>
+
+		<para>
+		In retrospect, this method might be better off belonging to the
+		AggregatorType class, but for now it is what it is.
+		</para>
+
+		<para>
+		You would create a subclass that would get instantiated for every
+		aggregation group. Then the handler would be called every time
+		this group gets modified, exactly as it was described for the
+		Perl API. The arguments are fundamentally the same as in Perl,
+		just structured differently: they're passed directly instead of
+		being hidden in an aggregation context. The &Cpp;  programmers are
+		expected to behave responsibly and not try to mess with these
+		parameters outside of the call scope, or prepare to meet the dire
+		consequences.
+		</para>
+
+		<para>
+		Before digging more into the arguments, a few more words about the
+		subclass structure.  The subclass may define any additional fields to
+		keep its aggregation state.  If you're doing an additive aggregation,
+		it allows you to keep the previous results. If you're doing the
+		optimization of the deletes, it allows you to keep the previous sent
+		row.
+		</para>
+
+		<para>
+		What if your aggregator keeps no state? You still have to make a
+		separate Aggregator object for every group, and no, you can't just
+		return NULL from <pre>makeAggregator()</pre>, and no, the Aggregators
+		are not reference-countable, so you have to make a new copy of it for
+		every group. This looks decidedly sub-optimal, and eventually I'll get
+		around to straighten it out. The good news though is that most of the
+		real aggerators keep the state anyway, so it doesn't matter much.  
+		</para>
+
+		<para>
+		Now getting back to the arguments. Probably the easiest way is to
+		start with showing how the Perl AggregatorContext calls translate
+		to the &Cpp; API.
+		</para>
+
+		<indexterm>
+			<primary>AggregatorContext</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Index</primary>
+		</indexterm>
+		<indexterm>
+			<primary>GroupHandle</primary>
+		</indexterm>
+		<variablelist>
+			<varlistentry>
+				<term><pre>$result = $ctx->groupSize();</pre></term>
+				<listitem>
+<pre>
+size_t sz = parentIndexType->groupSize(gh);
+</pre>
+				<para>
+				Get the size of the group. The result is of the type size_t.
+				This is pretty much the only method of the IndexType base class that should be
+				called directly, and only in the aggregation; and also pretty much the
+				only use of the arguments <pre>parentIndexType</pre> and <pre>gh</pre>. 
+				The rest of the IndexType methods should be accessed through the similar
+				methods in the Table, and I won't even document them. However
+				if you really, really want to, you can find the description of
+				the other methods in <pre>type/IndexType.h</pre> and call them in the
+				aggregation as well.
+				</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><pre>$rowType = $ctx->resultType();</pre></term>
+				<listitem>
+<pre>
+const RowType *rt = gadget->getLabel()->getType();
+</pre>
+				<para>
+				</para>
+				Get the result row type.
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><pre>$rh = $ctx->begin();</pre></term>
+				<listitem>
+<pre>
+RowHandle *rhi = index->begin();
+</pre>
+				<para>
+				Get the first row handle of the group, in the order of the index
+				(or technically, if it's not a leaf index, of its first leaf sub-index).
+				As usual, it would return NULL if the group is empty.
+				The aggregators are a weird place where the Index methods are
+				called directly and not through the Table API. You <i>could</i>
+				use the Table API as well, by getting the index type with
+				<pre>index->getType()</pre>, and then using it in the table API,
+				but then you would also need to supply a sample row from the group
+				to the Table API, and getting that sample is also done through
+				<pre>index->begin()</pre>, so there is no way around it. Note that
+				you can't just use the <pre>rh</pre> argument, since it might be
+				the handle that had already been deleted from the table.
+				Besides, going directly to the index is slightly more efficient,
+				since it skips the step of finding the index by its type and
+				a sample row.
+				</para>
+				<para>
+				It's fine to use a pointer to RowHandle instead of a reference here,
+				since the handles are already held in the table which is guaranteed not
+				to change while the iterators run.
+				</para>
+				<para>
+				Just as in Perl's AggregatorContext, there is no <pre>index->end()</pre>.
+				When the end of the group is reached, the iteration will return a NULL
+				handle.
+				</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><pre>$rh = $ctx->next($rh);</pre></term>
+				<listitem>
+<pre>
+rhi = index->next(rhi);
+</pre>
+				<para>
+				Get the handle of the next row (or NULL if that was the last
+				one) in the order of the index. The NULL argument produces the NULL
+				result.
+				</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><pre>$rh = $ctx->last();</pre></term>
+				<listitem>
+<pre>
+RowHandle *rhi = index->last();
+</pre>
+				<para>
+				Get the handle of the last row in the group in the default order.
+				Returns NULL if the group is empty.
+				</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<!-- 
+				 # the automatic expansion leaves line breaks between <term> and <programlisting>
+				 # that mess up the formatting, so the expanded version is inserted here manually
+				<term>
+<pre>
+$rh = $ctx->beginIdx($idxType);
+$rh = $ctx->endIdx($idxType);
+$rh = $ctx->lastIdx($idxType);
+</pre>
+				</term>
+				-->
+				<term><programlisting>$rh = $ctx-&gt;beginIdx($idxType);
+$rh = $ctx-&gt;endIdx($idxType);
+$rh = $ctx-&gt;lastIdx($idxType);</programlisting></term>
+				<listitem>
+<pre>
+RowHandle *sample = index->begin();
+RowHandle *rhend =  table->nextGroupIdx(otherIndexType, sample);
+for (RowHandle *rhit = table->firstOfGroupIdx(otherIndexType, sample); rhit != rhend; rhit = table->nextIdx(otherIndexType, rhit)) {
+  ...
+}
+</pre>
+				<para>
+				Unlike the Perl API of AggregatorContext, there are no direct
+				analogs of <pre>beginIdx()</pre> and such in the &Cpp; API. To get them in
+				&Cpp;, you need to translate the iteration to another index type
+				through the Table (and of course, just like in Perl, you would
+				need somehow to get the reference or pointer to another index type into
+				your aggregator, and that index type better be in the subtree
+				of the <pre>parentIndexType</pre>). To translate through the Table, you
+				take any row from the group, usually the first one, and use it
+				with the table methods that accept a sample row.
+				</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><pre>$ctx->send($opcode, $row);</pre></term>
+				<listitem>
+<pre>
+gadget->sendDelayed(dest, row, opcode);
+</pre>
+				<para>
+				In Perl I've named this method just <pre>send()</pre> but in &Cpp;
+				it comes with its proper name of <pre>sendDelayed()</pre>.
+				</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><pre>$ctx->makeHashSend($opcode, $fieldName => $fieldValue, ...);</pre></term>
+				<listitem>
+<pre>
+gadget->sendDelayed(dest, fields, opcode);
+</pre>
+				<para>
+				This is a convenience wrapper that builds the row from the fields
+				and sends it on.
+				</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+
+		<para>
+		And here goes the honest description of the handler arguments:
+		</para>
+
+		<indexterm>
+			<primary>Aggregator</primary>
+			<secondary>handler</secondary>
+		</indexterm>
+		<variablelist>
+			<varlistentry>
+				<term><pre>Table *table</pre></term>
+				<listitem>
+				<para>
+				Table where this Aggregator belongs.
+				</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><pre>AggregatorGadget *gadget</pre></term>
+				<listitem>
+				<para>
+				The Gadget where this Aggregator sends its results.
+				</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><pre>Index *index</pre></term>
+				<listitem>
+				<para>
+				Index that defines the group on which this Aggregator runs.
+				</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><pre>const IndexType *parentIndexType</pre></term>
+				<listitem>
+				<para>
+				The IndexType of the parent Index, one level above the <pre>index</pre>
+				argument. It's needed mostly because the group size is kept at that
+				level.
+				</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><pre>GroupHandle *gh</pre></term>
+				<listitem>
+				<para>
+				This is an opaque object that can be used as an argument to the
+				<pre>parentIndexType</pre> methods. It's an internal object that
+				ties together all the indexes in the group under the parent index.
+				</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><pre>Tray *dest</pre></term>
+				<listitem>
+				<para>
+				The tray where the results will be collected. This tray is created and
+				then processed by the Table logic.
+				</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><pre>AggOp aggop</pre></term>
+				<listitem>
+				<para>
+				The aggregation operation, with the same meaning as described for Perl in 
+				<xref linkend="sc_aggregation_manual" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+				The <pre>enum AggOp</pre> is defined in the Aggregator class
+				and contains the elemends AO_BEFORE_MOD, AO_AFTER_DELETE,
+				AO_AFTER_INSERT, AO_COLLAPSE.
+				</para>
+		<indexterm>
+			<primary>AggOp</primary>
+		</indexterm>
+		<indexterm>
+			<primary>aggregation</primary>
+			<secondary>operation</secondary>
+		</indexterm>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><pre>Rowop::Opcode opcode</pre></term>
+				<listitem>
+				<para>
+				The suggested opcode for the result rowops. The meaning is also as in Perl.
+				</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><pre>RowHandle *rh</pre></term>
+				<listitem>
+				<para>
+				The handle that is about to or had just been inserted or removed, depending
+				on the <pre>aggop</pre>. It may be NULL for the operation AO_COLLAPSE.
+				</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+
+		<para>
+		The methods to convert the <pre>AO_*</pre> constants to and from the strings
+		are also defined in the Aggregator class:
+		</para>
+
+<pre>
+static const char *aggOpString(int code, const char *def = "???");
+static int stringAggOp(const char *code);
+</pre>
+
+		<para>
+		They work in the same way as the other constant conversion methods.
+		</para>
+
+	</sect2>
+
+	<sect2 id="sc_cpp_aggregator_basic">
+		<title>BasicAggregatorType reference</title>
+
+		<indexterm>
+			<primary>BasicAggregatorType</primary>
+		</indexterm>
+		<para>
+		In many cases a simple stateless aggregation is good enough.
+		For that, you don't need to define the whole set of classes
+		for your aggregation, you can use the BasicAggregatorType 
+		(defined in <pre>type/BasicAggregatorType.h</pre>)
+		instead.
+		</para>
+
+		<para>
+		You just define a simple C-style function to compute the aggregation
+		and pass it to the BasicAggregatorType constructor:
+		</para>
+
+<pre>
+BasicAggregatorType(const string &name, const RowType *rt, Callback *cb);
+</pre>
+
+		<para>
+		This function has all the arguments of Aggregator::handle forwarded to it:
+		</para>
+
+<pre>
+typedef void Callback(Table *table, AggregatorGadget *gadget, Index *index,
+	const IndexType *parentIndexType, GroupHandle *gh, Tray *dest,
+	Aggregator::AggOp aggop, Rowop::Opcode opcode, RowHandle *rh, Tray *copyTray);
+</pre>
+
+		<para>
+		BasicAggregatorType takes care of the rest of the infrastructure:
+		gadgets, aggregators etc. 
+		</para>
+
+		<para>
+		If you need to pass some additional information to this function,
+		you do it by extending the BasicAggregatorType class. Add your
+		extra fields to your subclass, and then the callback function
+		can find the type object from the gadget, and read the values
+		from there.
+		</para>
+	</sect2>
+
+	<sect2 id="sc_cpp_aggregator_example">
+		<title>Aggegator example</title>
+
+		<para>
+		Since the aggregator classes are somewhat convoluted and substantially
+		different from the Perl version, I've decided to provide not just 
+		the reference but also a couple of small examples.  The full text can be found in
+		the unit test file <pre>table/test/t_Aggr.cpp</pre>.
+		</para>
+
+		<para>
+		First, if your aggregator is truly stateless and fully hardcoded, the
+		easier way to do it as by defining a plain function with the same
+		handler arguments and building a BasicAggregatorType with it. And here
+		is one that sums the values of an int64 field (the test case
+		<pre>aggBasicSum</pre>):
+		</para>
+
+		<indexterm>
+			<primary>BasicAggregatorType</primary>
+		</indexterm>
+
+<!-- table/test/t_Aggr.cpp UTESTCASE aggBasicSum -->
+<pre>
+void sumC(Table *table, AggregatorGadget *gadget, Index *index,
+	const IndexType *parentIndexType, GroupHandle *gh, Tray *dest,
+	Aggregator::AggOp aggop, Rowop::Opcode opcode, RowHandle *rh)
+{
+	// don't send the NULL record after the group becomes empty
+	if (opcode == Rowop::OP_NOP || parentIndexType->groupSize(gh) == 0)
+		return;
+	
+	int64_t sum = 0;
+	for (RowHandle *rhi = index->begin(); rhi != NULL; rhi = index->next(rhi)) {
+		sum += table->getRowType()->getInt64(rhi->getRow(), 2, 0); // field c at idx 2
+	}
+
+	// pick the rest of fields from the last row of the group
+	RowHandle *lastrh = index->last();
+
+	// build the result row; relies on the aggregator result being of the
+	// same type as the rows in the table
+	FdataVec fields;
+	table->getRowType()->splitInto(lastrh->getRow(), fields);
+	fields[2].setPtr(true, &sum, sizeof(sum)); // set the field c from the sum
+
+	// could use the table row type again, but to exercise a different code,
+	// use the aggregator's result type:
+	// gadget()->getType()->getRowType() and gadget->getLabel()->getType()
+	// are equivalent
+	Rowref res(gadget->getLabel()->getType(), fields);
+	gadget->sendDelayed(dest, res, opcode);
+}
+
+...
+	Autoref<TableType> tt = TableType::make(rt1)
+		->addSubIndex("Hashed", HashedIndexType::make( // will be the default index
+				(new NameSet())->add("e")
+			)->addSubIndex("Fifo", FifoIndexType::make()
+				->setAggregator(new BasicAggregatorType("aggr", rt1, sumC))
+			)
+		);
+...
+</pre>
+
+		<para>
+		As described above, you create the BasicAggregatorType by giving it
+		the aggregator name, aggregator result row type, and the handler
+		function.
+		</para>
+
+		<para>
+		In this case the handler function is completely hardcoded. It works on
+		the int64 field at index 2. The row type I used in this example is:
+		</para>
+
+<pre>
+row {
+	uint8[10] a,
+	int32[] b,
+	int64 c,
+	float64 d,
+	string e,
+}
+</pre>
+
+		<para>
+		So the field is actually named <quote>c</quote>, and that's why the aggregator
+		function is named <quote>sumC</quote>.  But since in this case everything is known
+		in advance, to make it more efficient, the look-up of the field by name
+		has been skipped, and the field index has been pre-computed and hardcoded
+		into the function.
+		</para>
+
+		<para>
+		The general outline of the aggregator is exactly the same as in Perl:
+		check for an empty group, then iterate through all the rows in the
+		group and compute a the sum, fill the rest of the fields from the last
+		row, and send the result. The difference is that there is no
+		AggregatorContext, and the calls are done directly on the bits and
+		pieces received as arguments.
+		</para>
+
+		<para>
+		The input row type for reading the rows from the group is found as:
+		</para>
+
+<pre>
+table->getRowType()
+</pre>
+
+		<para>
+		The result row is built in this example by copying the last row and
+		replacing one field. The data from the last row is split into FdataVec
+		(the data itself is not copied at this point but the data descriptors
+		in the construction vector are made to point to the data in the
+		original row). Then the descriptor for the field <quote>c</quote> is changed to
+		point to the computed sum. Then the new row is built from the
+		descriptor.
+		</para>
+
+		<para>
+		In this particular case the type of the input rows and of the result
+		rows is the same, so either could have been used to construct the
+		result rows.  There are two ways to find the result type:
+		</para>
+
+<pre>
+gadget->getType()->getRowType()
+gadget->getLabel()->getType()
+</pre>
+
+		<para>
+		They are exactly the same, just there are two paths leading to the same
+		object.
+		</para>
+
+		<para>
+		Finally, the constructed row is sent. <pre>sendDelayed()</pre> takes care of
+		constructing the rowop from the components. The version of <pre>sendDelayed()</pre> 
+		that also constructs the row from the fields is shown in the next example.
+		</para>
+
+		<para>
+		And now on to the next example.
+		</para>
+
+		<para>
+		Doing a proper custom aggregator is more involved, and requires making
+		subclasses of both Aggregator and AggregatorType. The test case <pre>aggSum</pre>
+		shows an example of aggregator that can sum any 64-bit field.
+		It still could be done with subclassing the BasicAggregatorType, since
+		it still doesn't keep any group state, but I wanted to show a
+		full-size example as well.
+		</para>
+
+		<para>
+		The subclass of Aggregator contains only one method that is very
+		similar to the BasicAggregator handler shown before:
+		</para>
+
+<!-- table/test/t_Aggr.cpp UTESTCASE aggSum -->
+<pre>
+class MySumAggregator: public Aggregator
+{
+public:
+	// same as sumC but finds the field from the type
+	virtual void handle(Table *table, AggregatorGadget *gadget, Index *index,
+		const IndexType *parentIndexType, GroupHandle *gh, Tray *dest,
+		Aggregator::AggOp aggop, Rowop::Opcode opcode, RowHandle *rh);
+};
+
+void MySumAggregator::handle(Table *table, AggregatorGadget *gadget, Index *index,
+	const IndexType *parentIndexType, GroupHandle *gh, Tray *dest,
+	Aggregator::AggOp aggop, Rowop::Opcode opcode, RowHandle *rh)
+{
+	// don't send the NULL record after the group becomes empty
+	if (opcode == Rowop::OP_NOP || parentIndexType->groupSize(gh) == 0)
+		return;
+
+	int fidx = gadget->typeAs<MySumAggregatorType>()->fieldIdx();
+	
+	int64_t sum = 0;
+	for (RowHandle *rhi = index->begin(); rhi != NULL; rhi = index->next(rhi)) {
+		sum += table->getRowType()->getInt64(rhi->getRow(), fidx, 0);
+	}
+
+	// pick the rest of fields from the last row of the group
+	RowHandle *lastrh = index->last();
+
+	// build the result row; relies on the aggregator result being of the
+	// same type as the rows in the table
+	FdataVec fields;
+	table->getRowType()->splitInto(lastrh->getRow(), fields);
+	fields[fidx].setPtr(true, &sum, sizeof(sum));
+
+	// use the convenience wrapper version
+	gadget->sendDelayed(dest, fields, opcode);
+}
+</pre>
+
+		<para>
+		The difference is that the field index is not hardcoded but taken from
+		the aggregator type. The aggregator type is found with
+		</para>
+
+<pre>
+gadget->typeAs<MySumAggregatorType>()
+</pre>
+
+		<para>
+		The method <pre>fieldIdx()</pre> is a custom addition to
+		the MySumAggregatorType, not inherited from any base class.
+		</para>
+
+		<para>
+		The version of <pre>AggregatorGadget::sendDelayed()</pre> used here
+		takes care of constructing the row from the fields and then
+		sends it on.
+		</para>
+
+		<para>
+		Then the aggregator type needs to be defined with a fixed set of
+		inherited virtual methods plus any needed custom parts.
+		</para>
+
+<pre>
+class MySumAggregatorType: public AggregatorType
+{
+public:
+	// @param fname - field name to sum on
+	MySumAggregatorType(const string &name, const string &fname):
+		AggregatorType(name, NULL),
+		fname_(fname),
+		fidx_(-1)
+	{ }
+	// the copy constructor works fine
+	// (might set the non-NULL row type, but it will be overwritten 
+	// during initialization)
+	
+	// constructor for deep copy
+	// (might set the non-NULL row type, but it will be overwritten 
+	// during initialization)
+	MySumAggregatorType(const MySumAggregatorType &agg, HoldRowTypes *holder):
+		AggregatorType(agg, holder),
+		fname_(agg.fname_),
+		fidx_(agg.fidx_)
+	{ }
+
+	virtual AggregatorType *copy() const
+	{
+		return new MySumAggregatorType(*this);
+	}
+
+	virtual AggregatorType *deepCopy(HoldRowTypes *holder) const
+	{
+		return new MySumAggregatorType(*this, holder);
+	}
+
+	virtual bool equals(const Type *t) const
+	{
+		if (this == t)
+			return true; // self-comparison, shortcut
+
+		if (!AggregatorType::equals(t))
+			return false;
+		
+		const MySumAggregatorType *sumt = static_cast<const MySumAggregatorType *>(t);
+
+		if (fname_ != sumt->fname_)
+			return false;
+
+		return true;
+	}
+
+	virtual bool match(const Type *t) const
+	{
+		if (this == t)
+			return true; // self-comparison, shortcut
+
+		if (!AggregatorType::match(t))
+			return false;
+		
+		const MySumAggregatorType *sumt = static_cast<const MySumAggregatorType *>(t);
+
+		if (fname_ != sumt->fname_)
+			return false;
+
+		return true;
+	}
+
+	virtual AggregatorGadget *makeGadget(Table *table, IndexType *intype) const
+	{
+		return new AggregatorGadget(this, table, intype);
+	}
+
+	virtual Aggregator *makeAggregator(Table *table, AggregatorGadget *gadget) const
+	{
+		return new MySumAggregator;
+	}
+
+	virtual void initialize(TableType *tabtype, IndexType *intype)
+	{
+		const RowType *rt = tabtype->rowType();
+		setRowType(rt); // the result has the same type as the argument
+		fidx_ = rt->findIdx(fname_);
+		if (fidx_ < 0)
+			errors_.fAppend(new Errors(rt->print()), "Unknown field '%s' in the row type:", fname_.c_str());
+		else {
+			if (rt->fields()[fidx_].arsz_ != RowType::Field::AR_SCALAR
+			|| rt->fields()[fidx_].type_->getTypeId() != Type::TT_INT64)
+				errors_.fAppend(new Errors(rt->print()), 
+					"Field '%s' is not an int64 scalar in the row type:", fname_.c_str());
+		}
+		AggregatorType::initialize(tabtype, intype);
+	}
+
+	// called from the handler
+	int fieldIdx() const
+	{
+		return fidx_;
+	}
+	
+protected:
+	string fname_; // name of the field to sum, must be an int64
+	int fidx_; // index of field named fname_
+};
+</pre>
+
+		<para>
+		The constructor accepts the aggregator name and the name of the field
+		on which it will sum. The field name will be translated to field index
+		during initialization, and made available to the
+		<pre>MySumAggregator::handler()</pre> via the method <pre>fieldIdx()</pre>. The aggregator
+		type starts with the result row type of NULL, with the actual row type
+		set during initialization.  The idea here is
+		that the result row type of this aggregator is always equal to the
+		input row type, so rather than specifying the result type explicitly
+		and then having to check it for compatibility, why not just take the
+		table's row type when it becomes available? And it works beautifully.
+		</para>
+
+		<para>
+		The copy constructor and the constructor with HoldRowTypes are the
+		implementations of the virtual methods <pre>copy()</pre> and <pre>deepCopy()</pre>. The
+		<pre>deepCopy()</pre> is used in the multithreaded support for passing the
+		table types through the nexus.
+		See 
+		<xref linkend="sc_cpp_copy" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;
+		and
+		<xref linkend="sc_mt_objects" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;
+		for details.
+		</para>
+
+		<para>
+		The methods <pre>match()</pre> and <pre>equals()</pre> follow the same general shape as
+		everywhere else. <pre>makeGadget()</pre> creates a generic gadget, and
+		<pre>makeAggregator()</pre> creates an instance of aggregator for each group.
+		</para>
+
+		<para>
+		The interesting stuff starts happening in the initialization. The row
+		type gets found from the table and set as the result type. Then the
+		aggregation field is found in the row type and checked for being of the
+		proper type. Its index is remembered for the later use.
+		</para>
+
+		<para>
+		<pre>errors_.fAppend()</pre> makes the error
+		construction more convenient. It is smart enough to check the reference
+		for NULL and allocate a new Errors if so, then append a
+		printf-formatted message and nested errors to it. 
+		</para>
+	</sect2>
+
+	</sect1>

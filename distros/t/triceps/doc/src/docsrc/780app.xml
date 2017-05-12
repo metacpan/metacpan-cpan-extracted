@@ -1,0 +1,1004 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_ref_app">
+		<title>App reference</title>
+
+		<indexterm>
+			<primary>App</primary>
+		</indexterm>
+
+		<para>
+		An App represents a complete multithreaded Triceps application.
+		There may be multiple applications running in the same process.
+		</para>
+
+	<sect2 id="sc_ref_app_inst_management">
+		<title>App instance management</title>
+
+		<para>
+		The first part of the App API keeps track of all the
+		App instances in the program, and allows to list and find them.
+		It's global by necessity.
+		</para>
+
+<pre>
+@apps = Triceps::App::listApps();
+</pre>
+
+		<para>
+		Returns the array of name-value pairs, values containing the App
+		references, listing all the Apps in the program (more exactly, in this
+		Triceps library, if you compile multiple Triceps libraries together by
+		renaming them, each of them will have its own Apps list). The returned
+		array can be placed into a hash.
+		</para>
+
+<pre>
+$app = Triceps::App::find($name);
+</pre>
+
+		<para>
+		Find an App by name. If an App with such a name does not exist, it will
+		confess.
+		</para>
+
+<pre>
+$app = Triceps::App:make($name);
+</pre>
+
+		<para>
+		Create a new App, give it the specified name, and put it on the list.
+		The names must not be duplicate with the other existing Apps, or the
+		method will confess.
+		</para>
+
+<pre>
+Triceps::App::drop($app);
+Triceps::App::drop($appName);
+</pre>
+
+		<para>
+		Drop the app, by reference or by name, from the list. The App is as
+		usual reference-counted and will exist while there are references to
+		it. The global list provides one of these references, so an App is
+		guaranteed to exist while it's still on the list. When dropped, it will
+		still be accessible through the existing references, but obviously will
+		not be listed any more and could not be found by name.
+		</para>
+
+		<para>
+		Moreover, a new App with the same name can be added to the list.
+		Because of this, dropping an App by name requires some care in case if
+		there could be a new App created again with the same name: it creates a
+		potential for a race, and you might end up dropping the new App instead
+		of the old one. Of course, if it's the same thread that drops the old
+		one and creates the new one, then there is no race. Dropping an
+		application by name that doesn't exist at the moment is an error and
+		will confess.
+		</para>
+
+		<para>
+		Dropping the App by reference theoretically allows to avoid the race: a
+		specific object gets dropped, and if it already has been dropped, the
+		call has no effect. Theoretically. However in practice Perl has a
+		limitation on passing the object values between threads, and thus
+		whenever each thread starts, first thing it does is finding its App by
+		name. It's a very similar kind of race and is absolutely unavoidable
+		except by making sure that all the App's threads have exited and joined
+		(i.e. harvesting them). So make sure to complete the App's thread
+		harvesting before dropping the App in the harvester thread, and by then
+		it doesn't matter a whole lot if the App is dropped by name or by
+		reference.
+		</para>
+	</sect2>
+
+	<sect2 id="sc_ref_app_resolution">
+		<title>App resolution</title>
+
+		<para>
+		Many (but not all) of the App methods allow to specify the App either
+		by reference or by name, and they automatically sort it out, doing the
+		internal look-up by name if necessary. So the same method could be used
+		as either of:
+		</para>
+
+<pre>
+$app->method(...);
+Triceps::App::method($app, ...);
+Triceps::App::method($appName, ...);
+</pre>
+
+		<para>
+		Obviously, you cannot use the <quote><pre>-></pre></quote> syntax with a name, and obviously
+		if the name is not in the app list, the method will confess. Below I'll
+		show the calls that allow the dual formats as
+		<pre>Triceps::App::method($appOrName, ...)</pre> but keep in mind that you can use
+		the <quote><pre>-></pre></quote> form of them too with a reference.
+		</para>
+
+<pre>
+$app = Triceps::App::resolve($appOrName); 
+</pre>
+
+		<para>
+		Do just the
+		automatically-sorting-out part: gets a reference or name and returns a
+		reference either way. A newly created reference is returned in either
+		case (not the argument reference). You can use this resolver before the
+		methods that accept only a reference.
+		</para>
+	</sect2>
+
+	<sect2 id="sc_ref_app_introspection">
+		<title>App introspection</title>
+
+<pre>
+$result = $app->same($app2);
+</pre>
+
+		<para>
+		Check if two references are for the same App object. Here they both
+		must be references and not names.
+		</para>
+
+<pre>
+$name = $app->getName();
+</pre>
+
+		<para>
+		Get the name of the App, from a reference.
+		</para>
+
+<pre>
+Triceps::App::declareTriead($appOrName, $trieadName);
+</pre>
+
+		<para>
+		Declare a Triead (Triceps thread) in advance. Any attempts to look up
+		the nexuses in that thread will then wait for the thread to become
+		ready. (Attempts to look up in an undeclared and undefined thread are
+		errors). This is necessary to prevent a race at the thread creation
+		time.  For the most part, the method <pre>Triead::start()</pre> just does the
+		right thing by calling this method automatically and you don't need the
+		use it manually, except in some very special circumstances.
+		Declaring a thread with the same name more than once or declaring an already
+		defined thread is perfectly all right.
+		</para>
+
+<pre>
+%trieads = Triceps::App::getTrieads($appOrName);
+</pre>
+
+		<para>
+		Get the list of currently defined Trieads in the App, as name-value pairs. Keep in
+		mind that the other threads may be modifying the list of Trieads, so if
+		you do this call multiple times, you may get different results. However
+		the Trieads are returned as references, so they are guaranteed to stay
+		alive and readable even if they get removed from the App, or even if
+		the App gets dropped.
+		</para>
+	</sect2>
+
+	<sect2 id="sc_ref_app_harvester">
+		<title>App harvester control</title>
+
+		<para>
+		The harvester logic is a necessary part of an App. It manages the
+		collection of the Trieads that died and allows the rest of the
+		program find out when the App terminates. It runs in a designated
+		thread (an OS/Perl thread, not a Triead, though in some special
+		cases it may use a thread left over from a Triead).
+		</para>
+
+		<para>
+		Normally the harvester thread runs in parallel with the rest of the
+		App logic. To wait for the App's exit, wait for the harvester's thread
+		to exit. In case of the small programs (such as the unit tests),
+		the App's <quote>main Triead</quote> may share the thread with the
+		harvester: first the main Triead method would run, and after it
+		returns, the harvester. This obviously means that the threads that
+		have exited will be sitting in the zombie state during the life
+		of the App, until the harvester has a chance to run.
+		</para>
+
+		<para>
+		The harvesting is an absolutely necessary part of the App life cycle,
+		however in most of the usage patterns (such as with <pre>Triead::startHere()</pre>
+		or <pre>App::build()</pre>) the harvester is called implicitly from the wrapping
+		library functions, so you don't need to care about it.
+		</para>
+
+<pre>
+$app->harvester(@options);
+</pre>
+
+		<para>
+		Run the harvester in the current thread. The harvester gets
+		notifications from the threads when they are about to exit, and joins
+		them.  After all the threads have been joined, it automatically drops
+		the App, and returns.
+		</para>
+		 
+		<para>
+		Note that if you're running the harvester manually, you must call
+		it only after the first thread has been defined or at least declared.
+		Otherwise it will find no threads in the App, consider it dead and
+		immediately drop it.
+		</para>
+
+		<para>
+		If the App was aborted, the harvester will normally confess after if
+		had joined all the threads and disposed of the App, unless the option
+		<quote>die_on_abort</quote> (see below) has been set to 0. This propagates the error
+		to the caller. However there is a catch: if some of the threads don't
+		react properly by exiting on an abort indication, the program will be
+		stuck and you will see no error message until these threads get
+		unstuck, possibly forever.
+		</para>
+
+		<para>
+		Options:
+		</para>
+
+		<variablelist>
+		<varlistentry>
+			<term><pre>die_on_abort => 0/1</pre></term>
+			<listitem>
+			Flag: If the App was aborted, the harvester will normally
+			confess after if had joined all the threads and disposed of the
+			App.  Setting this option to 0 will make the aborts silently
+			ignored. This option does not affect the errors in joining the
+			threads: if any of those are detected, harvester will still confess
+			after it had disposed of the app. Optional. Default: 1.
+			</listitem>
+		</varlistentry>
+		</variablelist>
+
+
+<pre>
+$dead = $app->harvestOnce();
+</pre>
+
+		<para>
+		Do one run of the harvesting.  Joins all the threads that have exited
+		since its last call. If no threads have exited since then, returns
+		immediately. Returns 1 if all the threads have exited (and thus the App
+		is dead), 0 otherwise.  If a thread join fails, immediately confesses
+		(if multiple threads were ready for joining, the ones queued after the
+		failed one won't be joined, call <pre>harvestOnce()</pre> once more to join them).
+		</para>
+
+<pre>
+$app->waitNeedHarvest();
+</pre>
+
+		<para>
+		Wait for at least one thread to become ready for harvesting. If the App
+		is already dead (i.e. all its threads have exited), returns
+		immediately.
+		</para>
+
+		<para>
+		These two methods allow to write the custom harvesters if you're not
+		happy with the default one. The basic harvester logic can be written
+		as:
+		</para>
+
+<pre>
+do {
+  $app->waitNeedHarvest()
+} while(!$app->harvestOnce());
+$app->drop();
+</pre>
+
+		<para>
+		However the real harvester also does some smarter things around the
+		error handling. You can look it up in the source code in
+		<pre>cpp/app/App.cpp</pre>.
+		</para>
+	</sect2>
+
+	<sect2 id="sc_ref_app_state">
+		<title>App state management</title>
+
+<pre>
+$res = Triceps::App::isDead($appOrName);
+</pre>
+
+		<para>
+		Returns 1 if the App is dead (i.e. it has no alive Trieads, all the
+		defined and declared threads have exited). Right after the App is
+		created, before the first Triead is created, the App is also considered
+		dead, and becomes alive when the first Triead is declared or defined.
+		If an App becomes dead later, when all the Trieads exit, it can still
+		be brought back alive by creating more Trieads. But this is considered
+		bad practice, and will cause a race with the harvester (if you want to
+		do this, you have to make your own custom harvester).
+		</para>
+
+		<para>
+		Calling this method with a name for the argument is probably a bad
+		idea, since the App may be dropped quickly quickly after it
+		becomes dead, and you may end up with this method confessing when it
+		could not find the dropped App.
+		</para>
+
+<pre>
+$res = Triceps::App::isShutdown($appOrName);
+</pre>
+
+		<para>
+		Returns 1 if the App has been requested to shut down, either normally
+		or by being aborted.  The Trieads might
+		still run for some time, until they properly detect and process the
+		shutdown, and exit. So this condition is not equivalent to Dead,
+		althouh they are connected. If any new Trieads get started, they will
+		be shut down right away and won't run.
+		</para>
+
+		<para>
+		To reiterate: if all the Trieads just exit by themselves, the App
+		becomes dead but not shut down. You could still start more Trieads and
+		bring the App back alive. If the App had been shut down, it won't
+		become immediately dead, but it will send the shutdown indication to
+		all the Trieads, and after all of them eventually exit, the App will
+		become dead too. And after shutdown there is no way to bring the App
+		back alive, since any new Trieads will be shut down right away.
+		There might be a short period until they detect the shutdown, so the
+		App could spike as alive for a short time, but then will become dead
+		again.
+		</para>
+
+<pre>
+$res = Triceps::App::isAborted($appOrName);
+</pre>
+
+		<para>
+		Returns 1 if the App has been aborted. The App may be aborted
+		explicitly by calling the method <pre>abortBy()</pre>, or the thread wrapper logic
+		automatically converts any unexpected deaths in the App's threads to
+		the aborts. If any thread dies, this aborts the App, which in turn
+		requests the other threads to die on their next thread-related call.
+		Eventually the harvester collects them all and confesses, normally
+		making the whole program die with an error.
+		</para>
+
+<pre>
+($tname, $message) = Triceps::App::getAborted($appOrName);
+</pre>
+
+		<para>
+		Get the App abort information: name of the thread that caused the
+		abort, and its error message.
+		</para>
+
+<pre>
+Triceps::App::abortBy($appOrName, $tname, $msg);
+</pre>
+
+		<para>
+		Abort the application. The thread name and message will be remembered,
+		and returned later by <pre>getAborted()</pre> or in the harvester. If <pre>abortBy()</pre> is
+		called multiple times, only the first pair of thread name and message
+		gets remembered. The reason is that on abort all the threads get
+		interrupted in a fairly rough manner (all their ongoing and following
+		calls to the threading API die), which typically causes them to call
+		<pre>abortBy()</pre> as well, and there is no point in collecting these spurious
+		messages.
+		</para>
+
+		<para>
+		The thread name here doesn't have to be the name of the actual thread
+		that reports the issue. For example, if the thread creation as such
+		fails (maybe because of the OS limit on the thread count) that gets
+		detected by the parent thread but reported in the name of the thread
+		whose creation has failed. And in general you can pass just any string
+		as the thread name, App itself doesn't care, just make it something
+		that makes sense to you.
+		</para>
+
+<pre>
+Triceps::App::waitDead($appOrName);
+</pre>
+
+		<para>
+		Will wait for the App to become dead and return after that. Make sure
+		to not call <pre>waitDead()</pre> from any of App's Trieads: that would cause a
+		deadlock.
+		</para>
+
+<pre>
+Triceps::App::shutdown($appOrName);
+</pre>
+
+		<para>
+		Shut down the App. The shutdown state is sticky, so any repeated calls
+		will have no effect. The call returns immediately and doesn't wait for
+		the App to die. If you want to wait, call <pre>waitDead()</pre> afterwards. Make
+		sure to not call <pre>waitDead()</pre> from a Triead: that would cause a deadlock.
+		</para>
+
+<pre>
+Triceps::App::shutdownFragment($appOrName, $fragName);
+</pre>
+
+		<para>
+		Shut down a named fragment. This does not shut down the whole App, it
+		just selectively shuts down the Trieads belonging to this fragment.
+		See the explanation of the fragments in
+		<xref linkend="sc_mt_dynamic_server" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		The fragment shutdown is not sticky: after a fragment has been shut
+		down, it's possible to create another fragment with the same name. To
+		avoid races, a fragment may be shut down only after all its Trieads are
+		ready. So the caller Triead must call <pre>readyReady()</pre> before it calls
+		<pre>shutdownFragment()</pre>. If any of the fragment's Trieads are not ready, the
+		call will confess.
+		</para>
+	</sect2>
+
+	<sect2 id="sc_ref_app_drain">
+		<title>App drain control</title>
+
+		<para>
+		The next few methods have to do with the drains. Generally, using the
+		AutoDrain class to automatically limit the scope of the drains is a
+		better idea. But if the automatic scoping is not desired, the App
+		methods can be used directly.
+		</para>
+
+<pre>
+Triceps::App::requestDrain($appOrName);
+</pre>
+
+		<para>
+		Request a shared drain. Does not wait for the drain to complete. This
+		method may be called repeatedly, potentially from multiple threads,
+		which will keep the drain active and increase the recursion count. The
+		drain will be released when <pre>undrain()</pre> is called the matching number of
+		times.
+		</para>
+
+		<para>
+		If an exclusive drain by another thread is active when <pre>requestDrain()</pre>
+		is called, the call will be stuck until the exclusive drain becomes
+		released (and potentially more exclusive drains might be queued up
+		before the shared drain, using the POSIX read-write-lock
+		implementation). Otherwise the call will set the appropriate state and
+		return immediately.
+		</para>
+
+		<para>
+		If this thread has requested an exclusive drain previously (and didn't
+		release it yet), an attempt to get a shared drain in the same thread
+		will likely deadlock. The same applies in the opposite order as well.
+		</para>
+
+		<para>
+		Once the shared drain is requested, the input-only threads will be
+		blocked from sending more data (any their attempts to flush their write
+		facets will get stuck until release), and the rest of the threads will
+		continue churning through the data buffered in the nexuses until all
+		the nexuses are empty and there is no more data to process (yes, these
+		threads will continue writing to their write facets).
+		</para>
+
+		<para>
+		It is important to not request a shared drain from an input-only thread
+		and then try to write more data into an output facet, that would
+		deadlock. The whole concept is doable, but an exclusive drain must be
+		used instead (<quote>exclusive</quote> means that a designated input-only thread is
+		excluded from blocking).
+		</para>
+
+		<para>
+		If the new Trieads are
+		created while a drain is active, these Trieads will be notified of the
+		drain. This means that the input-only Trieads won't be able to send any
+		data until the drain is released. However the Trieads in the middle of
+		the model will follow the normal protocol for such threads: the drain
+		will become incomplete after the Triead is marked as ready and until it
+		blocks on the following <pre>TrieadOwner::nextXtray()</pre>. Normally this should be a very
+		short amount of time. However such Trieads should take care to 
+		check <pre>TrieadOwner::isRdDrain()</pre> and never
+		send any rowops on their own before reading from <pre>nextXtray()</pre> if they
+		find that <pre>isRdDrain()</pre> returns true. Otherwise they may
+		introduce the data into the model at a very inconvenient moment, when
+		some logic expects that no data is changing, and cause a corruption.
+		This is the same caveat as for using <pre>nextXtray()</pre> varieties with the
+		timeouts: if you want to send data on a timeout, always check
+		<pre>isRqDrain()</pre>, and never send any data on timeouts if <pre>isRqDrain()</pre> returns
+		true.
+		</para>
+
+<pre>
+Triceps::App::waitDrain($appOrName);
+</pre>
+
+		<para>
+		Wait for the requested shared drain to complete. This means that all
+		the queues in all the nexuses have become empty.
+		</para>
+
+		<para>
+		The effect of <pre>waitDrain()</pre> without a preceding <pre>requestDrain()</pre> is
+		undefined. If you definitely know that some other thread has requested
+		a drain and didn't release yet, it will work as normal, so you can have
+		any number of threads wait for drain in parallel. (And the semantics,
+		shared or exclusive, will match that currently active request). If no
+		thread requested a drain, it might either return immediately
+		irrespective of the state of the nexuses or might wait for some other
+		thread to request a drain and succeed.
+		</para>
+
+		<para>
+		This call may also be used with an exclusive (or shared) drain
+		requested through a TrieadOwner or any drain requested through an
+		AutoDrain (though a better style is to use the same object as used for
+		requesting the drain).
+		</para>
+
+<pre>
+Triceps::App::drain($appOrName);
+</pre>
+
+		<para>
+		A combination of <pre>requestDrain()</pre> and <pre>waitDrain()</pre> in one call.
+		</para>
+
+<pre>
+Triceps::App::undrain($appOrName);
+</pre>
+
+		<para>
+		Release the drain and let the normal processing continue. Make sure to
+		call it exactly the same number of times as the <pre>requestDrain()</pre>.
+		</para>
+
+		<para>
+		This call may also be used with a drain requested through a TrieadOwner
+		(though a better style is to use the same object as used for requesting
+		the drain).
+		</para>
+
+<pre>
+$result = Triceps::App::isDrained($appOrName);
+</pre>
+
+		<para>
+		Check whether the App is currently drained (i.e. all the nexuses are
+		empty), without waiting for it. Returns 1 if drained, 0 if not. If no
+		drain is active during this call, the result is undefined, not even in
+		the <quote>best effort</quote> sense: it may return 1 even if there are millions of
+		records queued up. The only reliable way is to request a drain first.
+		</para>
+
+		<para>
+		This call may also be used with a drain requested through a TrieadOwner
+		or through an AutoDrain.
+		</para>
+	</sect2>
+
+	<sect2 id="sc_ref_app_start_timeout">
+		<title>App start timeout</title>
+
+		<para>
+		Even though Triceps is quite eager in
+		watching for deadlocks in the threads topology, it's still possible to
+		get some threads, and with them the whole program, stuck during
+		initialization. For example, if you declare a thread and then never
+		define it. These situations are very unpleasant because you start the
+		program and expect it to work but it doesn't, without any indication to
+		why. So Triceps imposes an initialization timeout. The App (and thus
+		all its threads) must become ready within the timeout after the
+		definition or declaration of the last Triead. If not, the App will be
+		aborted (and the error message will tell, which thread did not
+		initialize in time). The same applies to the creation of Trieads
+		(usually in the fragments) after the App is already running: all the
+		threads must become ready within the timeout since the last thread has
+		been defined or declared.
+		</para>
+
+<pre>
+Triceps::App::setTimeout($appOrName, $main_to_sec);
+Triceps::App::setTimeout($appOrName, $main_to_sec, $frag_to_sec);
+</pre>
+
+		<para>
+		Set the readiness timeout.
+		</para>
+
+		<para>
+		The default timeout is 30 seconds, or symbolically
+		</para>
+
+<pre>
+&Triceps::App::DEFAULT_TIMEOUT
+</pre>
+
+		<para>
+		(subject to possible changes of the exact value in the future).
+		</para>
+
+		<para>
+		But the timeout can be changed. Technically, there are two timeouts:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+			one starts when the App is created
+			</listitem>
+
+			<listitem>
+			one restarts when any Triead is defined or declared
+			</listitem>
+		</itemizedlist>
+
+		<para>
+		For the App to be aborted, both timeouts must expire. By default they
+		are set to the same length, so only the second timeout really matters,
+		since it will always be the last one to start and last one to end. But
+		if you set the first timeout to be longer, you can allow for a longer
+		initialization period at the App start (<quote>main timeout</quote>) than later when
+		more threads are added to a running App (<quote>fragment timeout</quote>, since the
+		threads added later are typically the threads in fragments).
+		</para>
+
+		<para>
+		The one-argument form of <pre>setTimeout()</pre> sets both timeouts to the same
+		value, the two-argument form sets these timeouts separately.
+		</para>
+
+		<para>
+		The timeouts may be set only before the first thread has been created.
+		This is largely due to the historical reasons of implementation, with
+		the current implementation it should actually be safe to allow changing
+		the timeouts at a later point as well, and this limitation may be
+		removed in the future.
+		</para>
+
+		<para>
+		The timeout values are represented as integer whole seconds.
+		</para>
+
+		<para>
+		Note that it's still possible to get the initialization stuck without
+		any indication if it gets stuck in the other libraries. The reason is
+		that the harvester waits for all the threads to be joined before it
+		propagates the error, so if a thread doesn't get aborted properly
+		and doesn't get joined, the harvester
+		will be stuck. For example, if you open a file on NFS as a part of
+		Triead initialization, and the NFS server doesn't respond, this thread
+		will be stuck for a long time if not forever. The App will detect a
+		timeout and try to interrupt the threads but the NFS operations are
+		often not interruptable, so the harvester will wait for this thread to
+		complete this operation and exit before it propagates the error, and
+		thus the whole program will be silently stuck forever (and to avoid
+		this, the NFS mounts should be done in the <quote>soft</quote> mode but it's a
+		separate story). This will likely be improved in the future but it
+		needs more thinking about how to do it right.
+		</para>
+
+<pre>
+Triceps::App::setDeadline($appOrName, $deadline_sec);
+</pre>
+
+		<para>
+		Set the <quote>main</quote> timeout in the form of an absolute deadline. This is
+		actually closer to the way it works internally: the limit is expressed
+		as a deadline, and <pre>setTimeout()</pre> just adds the timeout value to the
+		current time to compute the deadline, while <pre>setDeadline()</pre> sets it
+		straight. Like <pre>setTimeout()</pre>, this may be called only before any Trieads
+		were created.
+		</para>
+
+		<indexterm>
+			<primary>now</primary>
+		</indexterm>
+		<para>
+		The time is represented as floating-point seconds since epoch.
+		<pre>Triceps::now()</pre> can be used to get the current time with the fractional
+		seconds (or if you don't care about the fractional seconds, you can
+		always use the stock <pre>time()</pre>).
+		</para>
+
+<pre>
+Triceps::App::refreshDeadline($appOrName);
+</pre>
+
+		<para>
+		Restart the <quote>fragment</quote> timeout. Same as when a Triead is defined or
+		declared, only without involving a Triead. 
+		This method can be called at any time.
+		</para>
+	</sect2>
+
+	<sect2 id="sc_ref_app_fd">
+		<title>File descriptor transfer through an App</title>
+
+		<para>
+		Perl doesn't allow the sharing or transfers of the file handles
+		between the threads. So Triceps works around this limitation
+		by passing the underlying file descriptors through the App.
+		After that the receiving Triead may construct a new file
+		handle from the descriptor.
+		</para>
+
+		<para>
+		The concepts are described in detail in
+		<xref linkend="sc_mt_files" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;,
+		this is just a short reference. This API works under the hood
+		of <pre>TrieadOwner::trackGetFile()</pre> and friends
+		but can also be used directly.
+		</para>
+
+<pre>
+Triceps::App::storeFd($appOrName, $name, $fd, $fileClassName);
+</pre>
+
+		<para>
+		Store a file descriptor in the App object, allowing to load it into
+		other threads, and thus pass it around between the threads. $name is
+		the name for this descriptor that will later be used to get the file
+		descriptor back (generally, you want to generate a unique name for each
+		file descriptor stored to avoid confusion, and then pass this name to
+		the target thread). <pre>$fd</pre> is the file descriptor, an integer number,
+		normally received from <pre>fileno()</pre>. The file descriptor is dupped before
+		it gets stored, so the original will continue to exist, and if you have
+		no other use for it, you should close it. 
+		</para>
+
+		<para>
+		The <pre>$fileClassName</pre> allows to pass through the information
+		about the class of the Perl file handle (such as IO::Handle or
+		IO::Socket::INET) that owned this descriptor originally, and re-create
+		the correct object later when loading the descriptor back. It's a plain
+		string, and an empty string can be used for the plain files.
+		</para>
+
+		<para>
+		If a file descriptor with this name already exists in the App, this
+		call will confess.
+		</para>
+
+<pre>
+($fd, $fileClassName) = Triceps::App::loadFd($appOrName, $name);
+</pre>
+
+		<para>
+		Load back the file descriptor that was previously stored. The file handle
+		class name is loaded back along with it.  If no
+		descriptor with such a name is stored in the App, it will confess. The
+		descriptor will keep existing in the App, so to keep things consistent,
+		there are two options:
+		</para>
+
+		<para>
+		One is to let your code take over the ownership of the file descriptor,
+		and tell the App to forget about it with <pre>forgetFd()</pre>.
+		</para>
+
+		<para>
+		The other one is to never close the received descriptor in your code (a
+		good example would be to dup it right away for the future use and then
+		leave the original alone), and let App keep its ownership.
+		</para>
+
+<pre>
+($fd, $fileClassName) = Triceps::App::loadDupFd($appOrName, $name);
+</pre>
+
+		<para>
+		Very much the same as <pre>loadFd()</pre>, only does the dupping for you and
+		returns the dupped descriptor. In this case your code is responsible
+		for closing that descriptor. Which method is more suitable, <pre>loadFd()</pre> or
+		<pre>loadDupFd()</pre>, depends on the nature of the code that will use the file
+		descriptor and whether you want to leave the descriptor in the App for
+		more threads to load.
+		</para>
+
+<pre>
+Triceps::App::forgetFd($appOrName, $name);
+</pre>
+
+		<para>
+		Forget the file descriptor in the App. It doesn't get closed, so
+		closing it becomes your responsibility, or it will leak. If no
+		descriptor with this name exists, the call will confess.
+		</para>
+
+<pre>
+Triceps::App::closeFd($appOrName, $name);
+</pre>
+
+		<para>
+		Close and forget the file descriptor in the App. If no descriptor with
+		this name exists, the call will confess.
+		</para>
+
+<pre>
+Triceps::App::storeFile($appOrName, $name, FILE);
+</pre>
+
+		<para>
+		A convenience wrapper for <pre>closeFd()</pre>, calls <pre>fileno()</pre> on the file and
+		stores the resulting file descriptor. The name of the class of the
+		file handle is stored along with the descriptor.
+		</para>
+
+<pre>
+Triceps::App::storeCloseFile($appOrName, $name, FILE);
+</pre>
+
+		<para>
+		Stores the file descriptor extracted from the file, and closes the
+		original file (since the file descriptor gets dupped on store, that
+		copy continues to exist in the App).
+		</para>
+
+<pre>
+$file = Triceps::App::loadDupFile($appOrName, $name, $mode);
+</pre>
+
+		<para>
+		Load a file descriptor and build a file handle object from it,
+		using the stored file handle class name.
+		The mode string may be specified in either the <pre>open()</pre> format
+		(<pre></>/>>/+</+>/+>></pre>) or the C stdio format (<pre>r/w/a/r+/w+/a+</pre>). Note that
+		the mode must match or be a subset of the mode used to originally open
+		the file descriptor. If you open a file read-only, store its
+		descriptor, and load back as a write-only file, you will have a bad
+		time.
+		</para>
+
+		<para>
+		There is no corresponding <pre>loadFile()</pre>, since <pre>loadFd()</pre> is a more
+		dangerous method that is useful for the low-level operations but
+		doesn't make much sense for the higher level.
+		</para>
+
+<pre>
+$file = Triceps::App::loadDupFileClass($appOrName, $name, $mode, $fileClassName);
+</pre>
+
+		<para>
+		Load a file descriptor and build an arbitrary handle object from it,
+		overriding the stored class name. The
+		class (specified by its name) should normally be a subclass of
+		IO::Handle, or at the very least must implement the method
+		<pre>new_from_fd()</pre> similar to IO::Handle.
+		</para>
+	</sect2>
+
+	<sect2 id="sc_ref_app_build">
+		<title>App build</title>
+		<para>
+		There are multiple ways to build an App:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+			Create the App manually with <pre>App::make()</pre>, then manually
+			create its Trieads and start the harvester. To wait for the app
+			completion, wait for the harvester thread to exit.
+			</listitem>
+
+			<listitem>
+			Create the App with <pre>App::build()</pre>, as described below.
+			The Trieads get constructed from the function that is passed as an
+			argument to <pre>build()</pre>. After running the thread construction,
+			<pre>build()</pre> runs the harvester automatically, and returns after the harvester
+			exits. 
+			</listitem>
+
+			<listitem>
+			Create the App with <pre>Triead::startHere()</pre>. It's very much like
+			<pre>App::build()</pre>, except that the code started from it is an
+			actual Triead, running in the context of the current thread. This is
+			convenient for running the short-lived Apps that get started, run for 
+			a short time and then need to return the results back to the calling
+			thread. The harvester also runs automatically by <pre>Triead::startHere()</pre>
+			but only after the the <quote>main</quote> Triead exits.
+			</listitem>
+		</itemizedlist>
+
+<pre>
+Triceps::App::build($name, $builder);
+</pre>
+
+		<para>
+		Build an App instance. It creates the App instance, then the builder
+		function is called to create the App's nexuses and threads, then the
+		harvester is executed, that eventually destroys the App object after
+		collecting all its threads. For a very basic example:
+		</para>
+
+<!-- t/App.t -->
+<pre>
+Triceps::App::build "a1", sub {
+	Triceps::App::globalNexus(
+		name => "types",
+		rowTypes => [
+			rt1 => $rt1,
+		],
+	);
+	Triceps::Triead::start(
+		app => $Triceps::App::name,
+		thread => "t1",
+		main => sub {
+			my $opts = {};
+			&Triceps::Opt::parse("t1 main", $opts, {@Triceps::Triead::opts}, @_);
+			my $to = $opts->{owner};
+			$to->importNexus(
+				from => "global/types",
+				import => "writer", # if importing just for the types, use "writer"!
+			);
+			$to->readyReady();
+		},
+	);
+};
+</pre>
+
+		<para>
+		The builder function runs in the current Perl thread, however from the
+		logical standpoint it runs in the App's first Triead named <quote>global</quote>
+		(this Triead name is hardcoded in <pre>build()</pre>). This frees you from the
+		worry about the App being technically dead until the first Triead is
+		created: by the time the builder function is called, the first Triead
+		is already created. However it also means that you can't change the
+		readiness timeouts. After the builder function returns, the global
+		Triead exits, and the harvester starts in the same current Perl thread.
+		</para>
+
+		<para>
+		The builder has access to a few global variables:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+			<pre>$Triceps::App::name</pre> is the App name, from the <pre>build()</pre> first argument.
+			</listitem>
+
+			<listitem>
+			<pre>$Triceps::App::app</pre> is the reference to the App object.
+			</listitem>
+
+			<listitem>
+			<pre>$Triceps::App::global</pre> is the reference to the TrieadOwner object of the global Triead.
+			</listitem>
+		</itemizedlist>
+
+		<para>
+		After the builder function exits, these variables become undefined.
+		</para>
+
+<pre>
+Triceps::App::globalNexus(@nexusOptions);
+</pre>
+
+		<para>
+		Creates a nexus with the import mode of <quote>none</quote>, on the global Triead.
+		The arguments are the same options as for the normal nexus creation.
+		This is a simple convenience wrapper for the nexus creation. Since the
+		global thread is supposed to exit immediately, there is no point in
+		importing this nexus into it.
+		</para>
+
+		<para>
+		The global thread is found by this function from <pre>$Triceps::App::global</pre>,
+		so this method can only be used from inside the builder function of
+		<pre>build()</pre>. 
+		</para>
+	</sect2>
+	</sect1>

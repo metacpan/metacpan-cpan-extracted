@@ -1,0 +1,12 @@
+export CHANGER=/dev/sch0
+export EEPOS_OPEN=1
+export EEPOS_SHUT=2
+export EJECT_BEFORE_UNLOAD=rewind
+export JUKE=/usr/local/tkjuke/2.2.0/juke
+export LOADERINFO=/usr/local/sbin/loaderinfo
+export MT=/bin/mt
+export MTX=/usr/local/sbin/mtx
+export NRTAPE=/dev/nst0 /dev/nst1
+export TAPE=/dev/st0 /dev/st1
+export VERSION=2.2.0
+export WAIT_TAPE_READY=/usr/local/tkjuke/2.2.0/wait-tape-ready

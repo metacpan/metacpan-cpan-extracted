@@ -1,0 +1,11 @@
+export CHANGER=/dev/sch0
+export EEPOS_OPEN=0
+export EEPOS_SHUT=1
+export EJECT_BEFORE_UNLOAD=0
+export JUKE=/usr/local/tkjuke/2.0.1/juke
+export LOADERINFO=/usr/local/sbin/loaderinfo
+export MT=/bin/mt
+export MTX=/usr/local/sbin/mtx
+export NRTAPE=/dev/nst0
+export TAPE=/dev/st0
+export VERSION=2.0.1

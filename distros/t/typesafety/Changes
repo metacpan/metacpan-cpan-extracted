@@ -1,0 +1,8 @@
+Revision history for Perl extension typesafety.
+
+Ahh, heck, Just read the notes in the source code.
+
+0.01  Fri Jul 25 14:23:54 2003
+	- original version; created by h2xs 1.21 with options
+		-AX -n typesafety
+

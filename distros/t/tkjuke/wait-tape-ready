@@ -1,0 +1,100 @@
+#!PERL -w
+
+# After a media is loaded, there's a time period in which it's not ready,
+# due to mechanical delays, or perhaps because the media is rewinding. 
+# The logic is often dependant upon the operating system and physical device.
+# Several methods are shown below. The default, set in init() just happens
+# to be what I was using last and may not be appropriate in your environment.
+#
+# Note that this command can also be used by your own backup scripts, see
+# juke for an example.
+# 
+# S. O. Lidie, 2006/03/21, sol0@lehigh.edu
+
+use lib 'JUKE_ROOT';
+use Carp;
+use Jukebox;
+use strict;
+use subs qw/ init main /;
+
+our ( $dte, $juke, @mt, $wait_tape_ready );
+
+die "Usage: wait-tape-ready DTE" unless $#ARGV == 0;
+
+# A selection of subroutines that wait for a tape to become ready.
+# Modify init() to select the one you want, and send me any changes
+# or additions.
+
+my $wait_load1 = sub {
+
+    # I use this on many Linux systems.
+
+    my( $dte ) = @_;
+    for( my $n = 1; $n <= 30; $n++ ) {
+	system "$mt[ $dte ] rewind > /dev/null 2>&1";
+	exit( 0 ) if $? == 0;
+	sleep 5;
+    }
+
+}; # end $wait_load1
+
+my $wait_load2 = sub {
+
+    # I use this on IRIX systems.
+
+    my( $dte ) = @_;
+    my $out = '';
+    for( my $n = 1; $n <= 30; $n++ ) {
+	open M, "$mt[ $dte ] status 2>&1 |" or die $!;
+	while( $_ = <M> ) {
+	    $out .= $_;
+	}
+	close M or die $!;
+	exit( 0 ) if $out =~ /Media : READY/s;
+	sleep 5;
+    }
+
+}; # end $wait_load2
+
+my $wait_load3 = sub {
+
+    # I use this on a recent Linux 2.6.x kernel with tape devices
+    # that hang for many minutes when attempting a rewind with no
+    # media present.
+
+    my( $dte ) = @_;
+    
+    my $stat = `$mt[ $dte ]  status`;
+    exit( 0 ) if $stat =~ /File number=-1/; # if no tape in drive
+    
+    for( my $n = 1; $n <= 30; $n++ ) {
+	system "$mt[ $dte ] rewind > /dev/null 2>&1";
+	exit( 0 ) if $? == 0;
+	sleep 5;
+    }
+
+}; # end $wait_load3
+
+init;
+main;
+
+sub main {
+
+    &$wait_tape_ready( $dte );
+    croak "juke: wait-tape-ready $dte timeout.";
+
+} # end main
+
+sub init {
+
+    $dte = $ARGV[ 0 ];
+ 
+    # Pathname for the "mt" command + the rewind tape device name(s).
+
+    foreach my $mt ( split ' ', $JUKE_CONFIG{TAPE} ) {
+	push @mt, "$JUKE_CONFIG{MT} -f $mt";
+    }
+
+    $wait_tape_ready = $wait_load3; # select your custom code here
+
+} # end init

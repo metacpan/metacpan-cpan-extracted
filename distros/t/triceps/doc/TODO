@@ -1,0 +1,149 @@
+Things that need to be done:
+* make a Triceps version of confess() - see blog 255*, 256*
+* check the labels for belonging to a right unit when enqueueing?
+* in Rowop construction replace asserts with exceptions
+* remove the enqueueing mode in Rowops, and in Unit::enqueueDelayedTray(), and in table output
+* SimpleAggregator multithreading support - requires adding the init function that runs at
+  TableType init time for aggrgators in general - see sc_mt_objects
+* more features for the SimpleAggregator
+ ** standard deviation can be done in one pass
+ ** median and percentiles on sorted indexes
+ ** multi-stage functions
+* keys() in ordered indexes
+* index introspection: getOrder() (for each field A or D, or maybe 1 and -1, and 0 for un-ordered)
+* in RowHandle add getTable()
+* add the row contents access methods directly on a row handle?
+* in Row add the array index argument in get(), a version of get by index
+* add get() and friends directly on Rowop
+* iteration backwards
+* identify a group for iteration by the pair (parent index type, leaf index type)
+* an encapsulation of iteration range: begin, end, direction, maybe level of the step, group
+* add $unit->makeLabelFrom() - a computational block with input and output labels,
+  input chained from another label
+* add option fromLabel throughout templates
+* change options to capitalized
+* add a Sequence template, that calls its multiple output labels in order
+* a pseudo-table that keeps only the state of the additive aggregations, without actual data
+  (the data just passes through and gets immediately aggregated)
+* option in labels, tracers etc. to not rethrow the Perl errors but just print them
+* replace the exceptions with returning error bufs?
+* replace all direct Perl_croak() with a smart stack unroll
+* in Table, do something about collapsing empty groups on exception?
+* in FIFO index, add options to match on exact or on first, or never match,
+  and by default throw an exception
+* snapshot queries in small portions (would need a comparison per key)
+* should it throw from Unit::clearLabels(), and if called from a destructor, 
+  catch it there?
+* for basic persistence, add dump of tables, quick disconnect of results on reload
+* in Tray handle the undefs and NULLs better (see XXX)
+* rewrite makeLoop* with a Loop object
+* make the Perl tracer with row contents a standard Triceps object
+* support the row printing in Unit::Tracer in Perl similar to C++
+* in Perl move the print() and such to the base tracer
+* add the Perl interface for Errors?
+* in the C++-underlying-Perl objects have a place to keep $self,
+  with $obj->getSelf()->{CLASS} containing the blessing.
+* when printing table types and such, make sure to \-escape the funny characters
+* in Triceps::Fields::makeTranslation take the filter specs as arguments, and the caller's name
+* in Type add a generic checkOrThrow(), maybe a template for initializeOrThrow()?
+* in Type::Fields add parsing of the type names including the array indicators
+* add the "distclean" to include the cleaning of docs
+* in Types: make initialize() return an Onceref, make initializeOrThrow() and
+  checkOrThrow() templates. In RowSetType change freeze() to initialize().
+* instead of giving names to aggregator types themselves, give them names
+  inside a table (like to indexes)
+* initialize aggregators after all the indexes have been initialized
+* examples for streaming functions: RIC/SEDOL/ISIN lookup,
+  a TCP implementation?, queries from multiple sources, then filtering,
+  join results (iterating over results of LookupJoin),
+  queue with multiple readers; in Collapse group the deletes with inserts
+  by forking a delete row to an insert table on flush
+* Expand pattern: when the result of a join contains everything from the left
+  side plus some from the right side, there is no need to keep the original
+  pre-join left side (and the join result table can be used to generate the
+  correct updates to send into the left side of the joib)
+* for rows containing token-value pairs (array of token names, array of values),
+  an index on tokens.
+* make the Aggregator object optional, with NULL used in case if it's
+  not needed (and could save an spot in GroupHandle too). Call the method
+  handle() in the AggregatorType. BasicAggregator doesn't need gadget_.
+* in JoinTwo require that only the input labels are of the same unit,
+  tables may be different unit
+* aggregation: add an option for mandatory keeping of the last row,
+  and a way to find and iterate them (thus avoiding a separate table)
+* in Perl FnReturn add the argument
+  handler, and pass the args directly in push(), like [$fbind, @args...].
+* A more strict handling of frame marks?
+* add table dumping by condition
+* add callAsChained in Perl
+* in FnReturn add an option to act as a local nexus
+* in JoinTwo add a mode that would allow to compute the initial join of two
+  pre-existing tables, then disable thsi mode and continue with the subscription
+* add an override of the printed label name in print(), printP() and code 
+  that constructs labels around it
+* in BasicAggregator add a storage for one previous result row (or make a separate
+  type with it)
+* export the AggregatorType::setRowType() to Perl initialization
+* transient thread: after it exits, delete it and its nexuses
+* adopt a nexus from another app, for inter-app communication
+* when a thread in a fragment aborts, shut down and abort only that fragment
+* get rid of periods at the end of error messages
+* support arbitrary Perl interruptors for the threads
+* a structured option-based way to build a Table
+* a structured option-based way to build a Label (or maybe better a Compute
+  element with an input and output Label)
+* generalize a way to describe the building of a row type from other
+  row types, like the joins do, to be shared by Joins and Compute
+* maybe there is a point to import nexuses for neither reading nor writing,
+  purely for type definitions (currently they are imported as writers)
+* finish implementing Perl AggregatorType::make, setRowType, setConstructor, setHandler
+* in all placess allow the source code snippets instead of the Perl function references
+* T::Reflector - forwards all data from one nexus to another, a way to have a shared
+  bus that is read-writable to all the threads; or maybe add a special case for
+  importing a reverse facet for both reading and writing
+* in TrieadOwner::nextXtray allow a timeout
+* in ThreadedClient allow a timeout, and return 0 on expect on unexpected EOF
+  or timeout
+* a row type that also holds an arbitrary Perl value
+* should the unit keep track of the tables? as-is it creates a reference loop,
+  but think of some better way: maybe split the "table wrap", "table core" and
+  input labeli(s). The table wrap will reference the unit, table core and input
+  label. The core will reference all the output labels. The unit will reference
+  the labels as usual and the table core.
+* allow to assign a name to the computed key of an index, and have getkey()
+  return both the assigned name and the source fields from which it is computed;
+  allow to select the index for joins by that assigned name (and the source
+  fields still would have to be provided from the other side of the join
+  to compute the index value); the assigned name must not conflict with the
+  field names of the row type
+* makeTable() in C++ and Perl is inconsistent: on TableType in C++, on Unit in Perl
+* with the abolishment of the enqueueing mode in Table, Gadget became kind of useless
+* add the index lookup in the TableType and IndexType that returns undef if not found
+* in C++ add next() and such on Rhref
+* change the aggregator types to not have an own name, but to be named in a table type
+* provide a default AggregatorType::makeGadget() that makes the generic AggregatorGadget
+* add an option to adopt the rowop during the label chaining
+* add callAdopted() that combines $unit->call($label->adopt($rowop))
+* in FnBinding::call() allow to get back the tray (see "Streaming functions and more recursion")
+* add a C++ version of scoped FileInterrupt registration, like Perl TrackedFile
+* in nexuses with unicast capability, add the identity of a receiver facet as an address
+  (string or int) and specify it in the BEGIN row as a string or int or int array field
+* in harvester, if an abort is detected, limit the waiting time for the thread exit;
+  propagate the error if timing out (see the Perl App reference, app timeout)
+* docbook: make it not access http://docbook.sourceforge.net/release/images/draft.png
+* nested rows/records
+* Perl values in fields of Triceps rows/records
+
+* doc: reference for all the X classes in Perl
+* doc: for all Perl examples, show in the text the file that contains them
+* doc: a better "Hello, world"
+
+App ideas:
+* queries on CSV files - already done in DBD::CSV?
+* distributed cron
+* data cache
+* the challenges from http://www.orgs.ttu.edu/debs2013/
+* look at the use with RabbitMQ
+
+tangent 144, 157, 191, 197, 199, 204, 206, 271, 272, 274, 277, 279, 286, 292-294
+*** next 297

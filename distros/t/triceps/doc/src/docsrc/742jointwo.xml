@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_ref_jointwo"  xmlns:xi="http://www.w3.org/2001/XInclude">
+		<title>JoinTwo reference</title>
+
+		<indexterm>
+			<primary>JoinTwo</primary>
+		</indexterm>
+
+		<para>
+		JoinTwo is a template that joins two tables. As the tables are modified,
+		the updates propagate through the join. The join itself keeps no state
+		(other than the state of its input tables), so if it needs to be kept,
+		it has to be saved into another table. There is no requirement of a
+		primary key on either the input tables nor the join result. However if
+		the result is saved into a table, that table would have to have a primary
+		key, so by extension the join would have to produce the result with
+		a primary key, or the table contents will become incorrect.
+		The JoinTwo is internally implemented as a pair of LookupJoins.
+		</para>
+
+<pre>
+$joiner = Triceps::JoinTwo->new(optionName => optionValue, ...);
+</pre>
+
+		<para>
+		Creates the JoinTwo object. Confesses on any errors.
+		The options are:
+		</para>
+
+		<variablelist>
+		<varlistentry>
+			<term><pre>name => $name</pre></term>
+			<listitem>
+			Name of this object. Will be used to create the names of internal objects.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>leftTable => $table</pre></term>
+			<listitem>
+			Table object to join, for the left side. Both tables must be of the same unit.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>rightTable => $table</pre></term>
+			<listitem>
+			Table object to join, for the right side. Both tables must be of the same unit.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>leftFromLabel => $label</pre></term>
+			<listitem>
+			<para>
+			The label from which to receive the rows on
+			the left side. 
+			Optional. Default: the Output label of <quote>leftTable</quote> unless it's
+			a self-join; for a self-join the Pre label of <quote>leftTable</quote>. 
+			</para>
+
+			<para>
+			Can be used to introduce a label that would filter out some of the input. THIS IS
+			DANGEROUS! To preserve consistency, always filter by the key
+			field(s) only, and apply the same condition on the left and right.
+			</para>
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>rightFromLabel => $label</pre></term>
+			<listitem>
+			<para>
+			The label from which to receive the rows on the right side. 
+			Optional. Default: the Output label of <quote>rightTable</quote>.
+			</para>
+
+			<para>
+			Can be used to introduce a label that would filter out some of the input. THIS IS
+			DANGEROUS! To preserve consistency, always filter by the key
+			field(s) only, and apply the same condition on the left and right.
+			</para>
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>leftIdxPath => [ @path ]</pre></term>
+			<listitem>
+			An array reference containing the path name of an index type in the
+			left table used for look-up. The index absolutely must be a Hash
+			(leaf or not), not of any other kind. The number and order of key
+			fields in the left and right indexes must match, since indexes define
+			the fields used for the join. The types of key fields have to
+			match exactly unless the auto-casting is allowed by the option 
+			<quote>overrideKeyTypes</quote> being set to 1.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>rightIdxPath => [ @path ]</pre></term>
+			<listitem>
+			An array reference containing the path name of an index type in the
+			right table used for look-up. The index absolutely must be a Hash
+			(leaf or not), not of any other kind. The number and order of key
+			fields in the left and right indexes must match, since indexes define
+			the fields used for the join. The types of key fields have to
+			match exactly unless the auto-casting is allowed by the option 
+			<quote>overrideKeyTypes</quote> being set to 1.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>leftFields => [ @patterns ]</pre></term>
+			<listitem>
+			Reference to an array of patterns for the left-side fields to pass
+			through to the result rows, with the syntax of
+			<pre>Triceps::Fields::filter()</pre>. Optional. If not defined then pass everything.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>rightFields => [ @patterns ]</pre></term>
+			<listitem>
+			Reference to an array of patterns for the right-side fields to pass
+			through to the result rows, with the syntax of
+			<pre>Triceps::Fields::filter()</pre>. Optional. If not defined then pass everything.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>fieldsLeftFirst => 0/1</pre></term>
+			<listitem>
+			Flag: if 1, in the result rows put the fields from the left side
+			first, then from the right side; if 0, then in the opposite order.
+			Optional. Default: 1.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>fieldsUniqKey => $enum</pre></term>
+			<listitem>
+			<para>
+			Controls the logic that prevents the duplication of the key fields
+			in the result rows (since by definition their originals are present
+			in both the left and right tables). Optional.
+			</para>
+
+			<para>
+			This is done by setting the
+			option <quote>fieldsMirrorKey</quote> of the underlying LookupJoins to 1 and by
+			manipulating the left/rightFields options: one side is
+			left unchanged, and thus lets the user pass the key fields as
+			usual, while the other side gets <pre>'!key'</pre> specs prepended to the
+			front of it for each key field, thus blocking these fields
+			and removing the duplication.
+			</para>
+
+			<para>
+			The enumerated values of this option are one of: 
+			</para>
+
+			<variablelist>
+			<varlistentry>
+				<term><quote>none</quote></term>
+				<listitem>
+				Do not change either of the <quote>left/rightFields</quote>,
+				and do not enable the key mirroring at all.
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><quote>manual</quote></term>
+				<listitem>
+				Enable the key mirroring; do not change either of the
+				<quote>left/rightFields</quote>, leaving the full control to
+				the user.
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><quote>left</quote></term>
+				<listitem>
+				Enable the key mirroring; do not change <quote>leftFields</quote> (and thus
+				pass the key fields in there), block the keys from
+				<quote>rightFields</quote>.
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><quote>right</quote></term>
+				<listitem>
+				Enable the key mirroring; do not change <quote>rightFields</quote> (and thus
+				pass the key fields in there), block the keys from
+				<quote>leftFields</quote>.
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><quote>first</quote></term>
+				<listitem>
+				The default value. Enable the key mirroring; do not change
+				whatever side goes first according to the option
+				<quote>fieldsLeftFirst</quote> (and thus pass the key in there), block the
+				keys from the other side.
+				</listitem>
+			</varlistentry>
+			</variablelist>
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>by => [ @fields ]</pre></term>
+			<listitem>
+			Reference to an array containing pairs of field names
+			used for look-up, <pre>[leftFld1, rightFld1, leftFld2, rightFld2, ...]</pre>. 
+			Optional.
+			The options <quote>by</quote> and <quote>byLeft</quote> are mutually exclusive. If none of
+			them is used, by default the field lists are taken from the
+			index type keys, matched up in the order they appear in the
+			indexes. But if a different order is desired, this option can be
+			used to override it. The fields must still be the same, just
+			the order may change. 
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>byLeft => [ @patterns ]</pre></term>
+			<listitem>
+			Reference to an array containing the patterns in the syntax of
+			<pre>Triceps::Fields::filter()</pre>. It gets applied to the left-side fields,
+			the fields that pass through  become the key fields, and their
+			translations are the names of the  matching fields on the right
+			side.
+			Optional.
+			The options <quote>by</quote> and <quote>byLeft</quote> are mutually exclusive. If none of
+			them is used, by default the field lists are taken from the
+			index type keys, matched up in the order they appear in the
+			indexes. But if a different order is desired, this option can be
+			used to override it. The fields must still be the same, just
+			the order may change. 
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>type => $enum</pre></term>
+			<listitem>
+			The type of join from the inner/outer classification, one of:
+			<quote>inner</quote>, <quote>left</quote> for left outer, 
+			<quote>right</quote> for right outer, <quote>outer</quote>
+			for full outer. Optional. Default: <quote>inner</quote>.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>leftSaveJoinerTo => \$code</pre></term>
+			<listitem>
+			Reference to a scalar where to save a copy of the joiner
+			function source code for the left side. Optional.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>rightSaveJoinerTo => \$code</pre></term>
+			<listitem>
+			Reference to a scalar where to save a copy of the joiner
+			function source code for the right side. Optional.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>overrideSimpleMinded => 0/1</pre></term>
+			<listitem>
+			Flag: if 1, do not try to create the correct DELETE-INSERT sequence
+			for the updates, just produce the rows with the same opcode as the
+			incoming ones. The only possible usage of this option might be to
+			simulate the CEP systems that do not support the opcodes and treat
+			averything as an INSERT. The data produced is outright garbage. It
+			can also be used for the entertainment value, to show, why it's
+			garbage. Optional. Default: 0.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>overrideKeyTypes => 0/1</pre></term>
+			<listitem>
+			Flag: if 1, allow the key field types to be not exactly the same.
+			Optional. Default: 0.
+			</listitem>
+		</varlistentry>
+		</variablelist>
+
+<pre>
+$rt = $joiner->getResultRowType();
+</pre>
+
+		<para>
+		Returns the row type of the join result.
+		</para>
+
+<pre>
+$lb = $joiner->getOutputLabel();
+</pre>
+
+		<para>
+		Returns the output label of the joiner. The results from processing of
+		the  input rowops come out here. Note that there is no input label, the
+		join is fed by connecting to the tables (with the possible override
+		with the options <quote>left/rightFromLabel</quote>).
+		</para>
+
+<pre>
+$fret = $joiner->fnReturn();
+</pre>
+
+		<para>
+		Returns an FnReturn object connected to the output of this joiner.
+		The FnReturn contains one label <quote>out</quote>.
+		The FnReturn is created on the first call of
+		this method and is kept in the joiner object.  All the following calls return
+		the same object. 
+		See more detail in
+		<xref linkend="sc_strf_templates" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+<pre>
+$res = $joiner->getUnit();
+$res = $joiner->getName();
+$res = $joiner->getLeftTable();
+$res = $joiner->getRightTable();
+$res = $joiner->getLeftIdxPath();
+$res = $joiner->getRightIdxPath();
+$res = $joiner->getLeftFields();
+$res = $joiner->getRightFields();
+$res = $joiner->getFieldsLeftFirst();
+$res = $joiner->getFieldsUniqKey();
+$res = $joiner->getBy();
+$res = $joiner->getByLeft();
+$res = $joiner->getType();
+$res = $joiner->getOverrideSimpleMinded();
+$res = $joiner->getOverrideKeyTypes();
+</pre>
+
+		<para>
+		Get back the values of the options use to construct the object. 
+		If such an option was not set,
+		returns the default value, or the automatically calculated value.
+		Sometimes an automatically calculated value may even override the
+		user-specified value. There is no way to get back
+		<quote>left/rightFromLabel</quote>, they are discarded after the JoinTwo is
+		constructed and chained.
+		</para>
+	</sect1>

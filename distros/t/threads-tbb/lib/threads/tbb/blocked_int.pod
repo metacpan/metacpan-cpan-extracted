@@ -1,0 +1,43 @@
+=head1 NAME
+
+threads::tbb::blocked_int - a divisible range of integers
+
+=head1 SYNOPSIS
+
+  use threads::tbb;
+
+  # a range, and a minimum quanta
+  my $range = threads::tbb::blocked_int->new(1, 10, 1);
+
+  print $range->size;         # 9
+  print $range->begin;        # 1
+  print $range->end;          # 10
+  print $range->grainsize;    # 1
+  print $range->is_divisible; # bool: 1 or ""
+  print $range->empty;        # bool: 1 or ""
+
+=head1 DESCRIPTION
+
+This class lets you construct a C<tbb::blocked_rangeE<lt>intE<gt>>
+range.  This is used for passing to functions such as
+L<threads::tbb/parallel_for> to specify the iteration / division
+space.
+
+Ranges use a convention called b<half-open intervals>, written in the
+TBB documentation as C<[x,y)>, which means the integers x <= N < y.
+So, if you want to iterate from 1 to 10 you'll need to set begin to 1
+and end to 11.
+
+The B<grainsize> is a quanta for each work item.  The idea is that
+this is tuned once the code is finished; it is the size of a minimum
+chunk for processing in one go.  Larger grain sizes give more
+performance, but allow less scope for the work to be divided among
+processors.  If the grain size is too small, the overhead of the
+library may slow down the program unacceptably on uniprocessor
+systems.
+
+=head1 SEE ALSO
+
+L<threads::tbb>
+
+=cut

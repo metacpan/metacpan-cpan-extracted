@@ -1,0 +1,10 @@
+# The use of immediate import.
+Thread A creates the nexus O;
+Thread A creates the helper thread B and tells it to import the nexus A/O for its input immediately and create the reverse nexus R for result;
+Thread A requests a (normal) import of the nexus B/R and falls asleep because B is not constructed yet;
+	Thread B starts running;
+	Thread B imports the nexus A/O immediately and succeeds;
+	Thread B defines its result nexus R;
+	Thread B marks itself as constructed and ready;
+Thread A wakes up after B is constructed, finds the nexus B/R and completes its import;
+Thread A can then complete its initialization, export other nexuses etc.

@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_unit_tracer">
+		<title>Unit Tracer reference</title>
+
+		<indexterm>
+			<primary>Unit</primary>
+		</indexterm>
+		<indexterm>
+			<primary>tracing</primary>
+		</indexterm>
+		<para>
+		Unlike Perl, in &Cpp; the tracer is defined by inheriting from the class
+		Unit::Tracer. The base class inherits from the Mtarget, and in the subclass
+		you need at the minimum to define your virtual method:
+		</para>
+
+<pre>
+virtual void execute(Unit *unit, const Label *label, const Label
+	*fromLabel, Rowop *rop, TracerWhen when);
+</pre>
+
+		<para>
+		It gets called at the exactly same points as the Perl tracer (the &Cpp;
+		part of the UnitTracerPerl forwards the calls to the Perl level). The
+		arguments are also the same as described in the Perl docs:
+		</para>
+
+		<itemizedlist>
+		<listitem>
+		<pre>unit</pre> is the unit being traced.
+		</listitem>
+		<listitem>
+		<pre>label</pre> is the current label being traced.
+		</listitem>
+		<listitem>
+		<pre>fromLabel</pre> is the parent label in the chaining (would be
+		<pre>NULL</pre> if the current label is called directly, without
+		chaining from anything).
+		</listitem>
+		<listitem>
+		<pre>rop</pre> is the current row operation.
+		</listitem>
+		<listitem>
+		<pre>when</pre> is a constant showing the point when the
+		tracer is being called. It's value may be one of
+		<pre>Unit::TW_BEFORE</pre>, 
+		<pre>Unit::TW_AFTER</pre>, 
+		<pre>Unit::TW_BEFORE_DRAIN</pre>,
+		<pre>Unit::TW_AFTER_DRAIN</pre>,
+		<pre>Unit::TW_BEFORE_CHAINED</pre>, 
+		<pre>Unit::TW_AFTER_CHAINED</pre>; 
+		the prefix <pre>TW</pre> stands for <quote>tracer when</quote>.
+		</listitem>
+		</itemizedlist>
+
+		<para>
+		Here is a simple example of a tracer:
+		</para>
+
+<!-- cpp/sched/test/t_Unit.cpp -->
+<pre>
+class SampleTracer : public Unit::Tracer
+{           
+public: 
+	virtual void execute(Unit *unit, const Label *label,
+		const Label *fromLabel, Rowop *rop, Unit::TracerWhen when)
+	{   
+		printf("trace %s label '%s' %c\n", Unit::tracerWhenHumanString(when),
+			label->getName().c_str(), Unit::tracerWhenIsBefore(when)? '{' : '}');
+	}
+};
+</pre>
+
+		<para>
+		The Unit methods shown are documented in
+		<xref linkend="sc_cpp_unit" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<para>
+		The SampleTracer above was just printing the trace right away. Usually
+		a better idea is to save the trace in the tracer object and return it
+		on demand. Unit::Tracer provides the means to do that:
+		an Erref object is used as a buffer, where the data can be added
+		efficiently line-by-line, and later read back. The buffer is defined
+		protected, so that the subclasses can access it but the end users can't:
+		</para>
+		
+<pre>
+protected:
+	Erref buffer_; // buffer for collecting the trace
+</pre>
+
+		<para>
+		On each call the tracer's <pre>execute()</pre> would build a string,
+		and append it to the buffer:
+		</para>
+
+<pre>
+buffer_->appendMsg(false, traceString);
+</pre>
+
+
+		<para>
+		The public interface for the buffer is:
+		</para>
+
+<pre>
+virtual Erref getBuffer();
+virtual void clearBuffer();
+</pre>
+
+		<para>
+		These methods are virtual to let the subclasses define their own
+		version if they want. The methods do exactly what their names say.
+		<pre>getBuffer()</pre> returns the reference
+		to the buffer in <pre>buffer_</pre>, after which the end user has
+		the full access to it.
+		</para>
+
+		<para>
+		The pattern of reading the buffer contents works like this:
+		</para>
+
+<pre>
+string tlog = trace->getBuffer()->print();
+trace->clearBuffer();
+</pre>
+
+		<para>
+		The log string can then be printed, or used in any other way.
+		</para>
+
+		<para>
+		The clearing of the buffer is done by discarding the old one and
+		allocating a new one. An interesting consequence is that if you
+		call <pre>getBuffer()</pre>, save the reference, then call
+		<pre>clearBuffer()</pre>, the original buffer is still available
+		at your saved reference and won't be changed any more, for example:
+		</para>
+		
+<pre>
+Erref buf = trace->getBuffer();
+trace->clearBuffer();
+string tlog = buf->print();
+</pre>
+
+		<para>
+		Of course, if a tracer subclass defines its own version of virtual methods,
+		it may change this semantics.
+		</para>
+
+		<para>
+		It can be quite useful to include the row being processed into the trace,
+		as the Perl examples show in 
+		<xref linkend="sc_sched_tracing" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		The &Cpp; part of Triceps doesn't provide a ready row printer yet
+		but Unit::Tracer provides a way for you to use your own row printer.
+		Even two ways. One is to re-define the public method <pre>printRow()</pre>:
+		</para>
+
+<pre>
+virtual void printRow(string &res, const RowType *rt, const Row *row);
+</pre>
+
+		<para>
+		The job of this method is to append the information from the row <pre>row</pre> of the type
+		<pre>rt</pre> to the result string <pre>res</pre>. <i>Append</i>, not replace.
+		</para>
+
+		<para>
+		The second way is by providing a pointer to a simple C-style function of the type:
+		</para>
+
+<pre>
+typedef void RowPrinter(string &res, const RowType *rt, const Row *row);
+</pre>
+
+		<para>
+		The arguments and functionality are exactly the same as for the 
+		method <pre>printRow()</pre>. The base class implementation of
+		<pre>printRow()</pre> works by calling this function pointer of it's
+		not NULL.  This pointer can be given to the Tracer constructor:
+		</para>
+
+<pre>
+Tracer(RowPrinter *rp = NULL);
+</pre>
+
+		<para>
+		In general, the subclasses should also take this argument and pass it
+		through to the parent class.  This allows the separation of the tracer
+		itself and of the row printing: the user becomes capable of specifying
+		any row printer.
+		Since the default row printer is NULL, the row contents doesn't get printed
+		by default.
+		</para>
+
+		<para>
+		Triceps provides a couple of stock tracer classes:
+		</para>
+
+		<variablelist>
+			<varlistentry>
+				<term>StringTracer</term>
+				<listitem>
+				<para>
+				Collects the trace in a buffer, identifying the objects
+				as addresses. This is not exactly easy to read normally but may come
+				useful if you want to analyze a core dump.
+				</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+		<variablelist>
+			<varlistentry>
+				<term>StringNameTracer</term>
+				<listitem>
+				<para>
+				Similar but prints the object identification as
+				names. More convenient but prone to the duplicate names used for
+				different objects.
+				</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+
+		<para>
+		Everything but the constructors of these classes follows the general
+		Tracer interface.  The constructors are:
+		</para>
+
+<pre>
+StringTracer(bool verbose = false, RowPrinter *rp = NULL);
+StringNameTracer(bool verbose = false, RowPrinter *rp = NULL);
+</pre>
+
+		<para>
+		The <pre>verbose</pre> flag enables the tracing at all points,
+		if it's set to <pre>false</pre> then only the <pre>TW_BEFORE</pre>
+		points are traced. The argument <pre>rp</pre> lets the end user supply
+		a row printer function.
+		</para>
+
+		<para>
+		The tracing does not have to be used just for tracing. It can also be
+		used as a breakpoint: check in your tracer for an
+		arbitrary condition and stop if it has been met.
+		</para>
+
+		<para>
+		There is only one tracer per unit at a time. However if you want, you
+		can implement the chaining in your own tracer (particularly useful if
+		it's a breakpoint tracer): accept a reference to another tracer
+		object, and after doing your own part, call that object's <pre>execute()</pre>
+		method.
+		</para>
+
+		<para>
+		Even though the Tracer class inherits from Mtarget, none of its methods
+		have the synchronization in them. Thus each object must be used in only
+		one thread. If you really want to use your tracer object from multiple
+		threads, define your own subclass and re-implement all the virtual methods
+		in it with synchronization.
+		</para>
+	</sect1>

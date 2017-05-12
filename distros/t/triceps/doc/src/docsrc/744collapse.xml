@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_ref_collapse"  xmlns:xi="http://www.w3.org/2001/XInclude">
+		<title>Collapse reference</title>
+
+		<indexterm>
+			<primary>Collapse</primary>
+		</indexterm>
+
+		<para>
+		The Collapse template collapses multiple sequential modifications
+		per primary key into one. On flush it sends out that single modification.
+		</para>
+
+<pre>
+$collapse = Triceps::Collapse->new($optName => $optValue, ...);
+</pre>
+
+		<para>
+		Creates a new Collapse object. The options are:
+		</para>
+
+		<variablelist>
+		<varlistentry>
+			<term><pre>name</pre></term>
+			<listitem>
+			Name of this object. Will be used to create the names of internal objects.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>unit</pre></term>
+			<listitem>
+			The unit where this object belongs.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>data</pre></term>
+			<listitem>
+			The data set description. Each data set has an input label and an
+			output label, and collapses one stream of modifications. Currently
+			only one data set is supported, the options have been structured
+			like this to allow for the future extension. This option's value
+			is a reference to an array (not a hash!) that is itself structured
+			as the nested option-value pairs.
+			</listitem>
+		</varlistentry>
+		</variablelist>
+
+		<para>
+		The nested options in <quote>data</quote> are:
+		</para>
+
+		<variablelist>
+		<varlistentry>
+			<term><pre>name</pre></term>
+			<listitem>
+			The name of the data set. Used for the error messages. Put it
+			first, this would let the constructor report nicely the errors
+			in the other data set options.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>rowType</pre></term>
+			<listitem>
+			The row type of the data in this set. 
+			Mutually exclusive with <quote>fromLabel</quote>, one must
+			be used.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>fromLabel</pre></term>
+			<listitem>
+			The source label for the data set, its input will be chained
+			to this label.
+			Mutually exclusive with <quote>rowType</quote>, one must
+			be used.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>key</pre></term>
+			<listitem>
+			The primary key of the data. A reference to an array of strings
+			with field names, same as for the Hash index type.
+			</listitem>
+		</varlistentry>
+		</variablelist>
+
+<pre>
+$collapse->flush();
+</pre>
+
+		<para>
+		Sends out the collected modifications to the output label(s)
+		and clears the state of the collapse.
+		</para>
+
+<pre>
+$lb = $collapse->getInputLabel($setName);
+</pre>
+
+		<para>
+		Returns the input label of a data set. Confesses if there is no
+		data set with this name.
+		</para>
+
+<pre>
+$lb = $collapse->getOutputLabel($setName);
+</pre>
+
+		<para>
+		Returns the output label of a data set. Confesses if there is no
+		data set with this name.
+		</para>
+
+<pre>
+@setNames = $collapse->getDatasets();
+</pre>
+
+		<para>
+		Returns the names of all the data sets (though since currently only one
+		data set is supported, only one name will be returned).
+		</para>
+
+<pre>
+$fret = $collapse->fnReturn();
+</pre>
+
+		<para>
+		Returns an FnReturn object connected to the output of this collapser.
+		The FnReturn contains a label for each data set, named accordingly.
+		The order of the labels matches the specified order of data sets.
+		The FnReturn is created on the first call of
+		this method and is kept in the collapser object.  All the following calls return
+		the same object. 
+		See more detail in
+		<xref linkend="sc_strf_templates" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+	</sect1>

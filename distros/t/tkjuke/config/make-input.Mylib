@@ -1,0 +1,11 @@
+/usr/local/bin/perl
+/usr/local
+/dev/sch0
+
+
+offline
+/usr/local/sbin/loaderinfo
+/bin/mt
+/usr/local/sbin/mtx
+/dev/nst0
+/dev/st0

@@ -1,0 +1,26 @@
+#!/usr/local/bin/perl -w
+use strict;
+
+my $out;
+
+$out = `/usr/bin/tapeutil -f $ARGV[1] devinfo`;
+my( $product_type ) = $out =~ /devtype = (.*)/;
+
+$out = `/usr/bin/tapeutil -f $ARGV[1] inquiry`;
+my( @out ) = $out =~ /\[([^\]]*)/g;
+substr $out[0], 0, 8, '';
+
+my $vendor_id = $out[0];
+my $product_id = $out[1];
+$out[2] =~ /([^\.]*)/;
+my $revision = $1;
+
+print "Product Type: $product_type\n";
+print "Vendor ID: '$vendor_id'\n";
+print "Product ID: '$product_id'\n";
+print "Revision: '$revision'\n";
+
+# Hand-edit the following two capabilities:
+
+print "Invertable: No\n";
+print "Can Transfer: Yes\n";

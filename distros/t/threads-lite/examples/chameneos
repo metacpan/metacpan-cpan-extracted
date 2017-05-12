@@ -1,0 +1,146 @@
+#! /usr/bin/perl
+# The Computer Language Benchmark Game
+# http://shootout.alioth.debian.org/
+# To be contributed by Leon Timmermans
+
+use 5.010;
+use strict;
+use warnings;
+use experimental 'switch';
+use threads::lite qw/self spawn receive receiveq send_to/;
+
+my @creature_colors = qw/blue red yellow/;
+
+sub complement {
+	my ($c1, $c2) = @_;
+
+	given ($c1) {
+		when ($c2) {
+			return $c1;
+		}
+		when ('red') {
+			given ($c2) {
+				when ('blue')   { return 'yellow' }
+				when ('yellow') { return 'blue'   }
+			}
+		}
+		when('blue') {
+			given ($c2) {
+				when ('red')    { return 'yellow' }
+				when ('yellow') { return 'red'    }
+			}
+		}
+		when ('yellow') {
+			given ($c2) {
+				when ('blue')   { return 'red'    }
+				when ('red')    { return 'blue'   }
+			}
+		}
+	}
+}
+
+my %complement;
+foreach my $c1 (@creature_colors) {
+	foreach my $c2 (@creature_colors) {
+		$complement{$c1,$c2} = complement($c1, $c2);
+	}
+}
+
+sub show_complement {
+	foreach my $c1 (@creature_colors) {
+		foreach my $c2 (@creature_colors) {
+			say "$c1 + $c2 -> " . $complement{$c1,$c2};
+		}
+	}
+	say '';
+}
+
+sub spellout {
+	my ($n) = @_;
+	my @numbers = qw(zero one two three four five six seven eight nine);
+	return ' ' . join(' ', map { $numbers[$_] } split //, $n);
+}
+
+sub print_header {
+	my @args = @_;
+	say ' ', join ' ', @args;
+}
+
+sub run {
+	my ($num, $list) = @_;
+	print_header(@{$list});
+	my $broker = self;
+	my $queue = threads::lite::queue->new;
+	for my $entry (@{$list}) {
+		$queue->enqueue($entry);
+	}
+	my @threads = spawn ({ pool_size => scalar @{$list} }, \&cameneos);
+	for my $thread (@threads) {
+		$thread->send($broker, $queue, \%complement, \&spellout);
+	}
+	broker($num);
+	cleanup(scalar @{$list});
+}
+
+sub cameneos {
+	my ($broker, $queue, $complement, $spellout) = threads::lite::receiveq;
+	my $color = $queue->dequeue;
+	my %complement = %{$complement};
+	my ($meetings, $metself) = (0, 0);
+	my $self = threads::lite::self->id;
+
+	my $continue = 1;
+	while ($continue) {
+		$broker->send($self, $color);
+
+		threads::lite::receive(sub {
+			when (['stop']) {
+				say $meetings, $spellout->($metself);
+				$broker->send($meetings);
+				$continue = 0;
+			}
+			default {
+				my ($opid, $ocolor) = @$_;
+				$metself++ if $opid == $self;
+				$meetings++;
+				$color = $complement{$color,$ocolor};
+			}
+		});
+	}
+}
+
+sub broker {
+	my ($num) = @_;
+	while ($num--) {
+		my ($pid1) = my @c1 = receiveq;
+		my ($pid2) = my @c2 = receiveq;
+		send_to($pid1, @c2);
+		send_to($pid2, @c1);
+	}
+}
+
+sub cleanup {
+	my ($num) = @_;
+	my $total_meetings = 0;
+	while ($num) {
+		receive {
+			when ([ qr//, qr// ]) {
+				my ($pid, $color) = @$_;
+				send_to($pid, 'stop');
+			}
+			default {
+				my ($meetings) = @$_;
+				$total_meetings += $meetings;
+				$num--;
+			}
+		};
+	}
+	say spellout($total_meetings);
+	say '';
+	return;
+}
+
+show_complement();
+die 'No argument given' if not @ARGV;
+run($ARGV[0], ['blue', 'red', 'yellow']);
+run($ARGV[0], ['blue', 'red', 'yellow', 'red', 'yellow', 'blue', 'red', 'yellow', 'red', 'blue']);

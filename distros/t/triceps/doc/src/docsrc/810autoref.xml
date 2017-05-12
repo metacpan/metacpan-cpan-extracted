@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_mem">
+		<title>Memory management in the &Cpp; API and the Autoref reference</title>
+
+		<indexterm>
+			<primary>memory management</primary>
+		</indexterm>
+		<para>
+		The memory management fundamentals have been described in
+		<xref linkend="sc_memory_fund" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;,
+		and the application-level considerations have been descibed in
+		<xref linkend="ch_memory" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		This section goes deeper into the issues specific to the &Cpp; API.
+		</para>
+
+		<para>
+		The code related to the memory management is generally collected under <pre>mem/</pre>. 
+		The memory management is done through the reference counting, which has two parts to it:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+			The objects that can be managed by reference counting.
+			</listitem>
+
+			<listitem>
+			The references that do the counting.
+			</listitem>
+		</itemizedlist>
+
+		<indexterm>
+			<primary>AtomicInt</primary>
+		</indexterm>
+		<indexterm>
+			<primary>NSPR</primary>
+		</indexterm>
+		<para>
+		The managed objects come in two varieties: single-threaded and
+		multi-threaded. The single-threaded objects lead their whole life in a
+		single thread, so their reference counts don't need locking. The
+		multi-threaded objects can be shared by multiple threads, so their
+		reference counts are kept thread-safe by using the atomic integers (if
+		the NSPR library is available) or by using a lock (if NSPR is not
+		used). That whole implementation of atomic data with or without NSPR is
+		encapsulated in the class AtomicInt in <pre>mem/Atomic.h</pre>.
+		</para>
+
+		<para>
+		The way a class selects whether it will be single-threaded or
+		multi-threaded is by inheriting from the appropriate class:
+		</para>
+
+		<variablelist>
+			<varlistentry>
+				<term>Starget</term>
+				<listitem>
+		<indexterm>
+			<primary>Starget</primary>
+		</indexterm>
+				<para>
+				for single-threaded (defined in <pre>mem/Starget.h</pre>).
+				</para>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term>Mtarget</term>
+				<listitem>
+		<indexterm>
+			<primary>Mtarget</primary>
+		</indexterm>
+				<para>
+				for multi-threaded (defined in <pre>mem/Mtarget.h</pre>).
+				</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+
+		<para>
+		If you do the multiple inheritance, the [SM]target has to be inherited
+		only once. Also, you can't change the choice along the inheritance
+		chain. Once chosen, you're stuck with it. The only way around it is by
+		encapsulating that inner class's object instead of inheriting from it.
+		</para>
+
+		<indexterm>
+			<primary>Autoref</primary>
+		</indexterm>
+		<para>
+		The references are created with the template <pre>Autoref<></pre>, defined in
+		<pre>mem/Autoref.h</pre>. For example, if you have an object of class RowType, the
+		reference to it will be <pre>Autoref<RowType></pre>. There are are some similar
+		references in the Boost library, but I prefer to avoid the avoidable
+		dependencies (and anyway, I've never used Boost much).
+		</para>
+
+		<para>
+		The target objects are created in the constructors with the reference
+		count of 0. The first time the object pointer is assigned to an
+		Autoref, the count goes up to 1. After that it stays above 0 for the
+		whole life of the object. As soon as it goes back to 0 (meaning that
+		the last reference to it has disappeared), the object gets destroyed. No
+		locks are held during the destruction itself. After all the references
+		are gone, nobody should be using it, and destroying it is safe without
+		any extra locks.
+		</para>
+
+		<para>
+		Starget and Mtarget are independent classes but Autoref 
+		can work transparently on both of them because Autoref
+		doesn't modify the reference counters by itself. Instead the target
+		class is expected to provide the methods 
+		</para>
+
+<pre>
+void incref() const;
+int decref() const;
+</pre>
+
+		<para>
+		They are defined as const to allow the reference counting of even the
+		const objects, but of course the reference counter field must be mutable.
+		<pre>decref()</pre> returns the resulting counter value. When it goes down to 0,
+		Autoref calls the destructor. 
+		</para>
+
+		<para>
+		An important point is that to do all this, the Autoref must be able to
+		execute the correct destructor when it destroys the object that ran out
+		of references. Starget and Mtarget do not provide the virtual
+		destructors. This allows to keep the reference-counted classes
+		non-virtual, and save a little bit of memory in their objects,
+		which might be important for the objects used in large numbers.
+		If you don't use the polymorphism for some class, you
+		don't have to use the virtual destructors. But if you do use it, i.e.
+		create a class B inheriting from A, inheriting from [SM]target, and
+		then assign something like
+		</para>
+
+<pre>
+Autoref<A> ref = new B;
+</pre>
+
+		<para>
+		then the class A (and by extension all the classes inheriting from it)
+		must have a virtual destructor to get everything working right.
+		</para>
+
+		<para>
+		It's also possible to mess up the destruction with the use of pointers.
+		For example, look at this sequence:
+		</para>
+
+<pre>
+Autoref<RowType> rt = new RowType(...);
+RowType *rtp = rt; // copies a reference to a pointer
+rt = NULL; // reference cleared, count down to 0, object destroyed
+Autoref <RowType> rt2 = rtp; // resurrects the dead pointer, corrupts memory
+</pre>
+
+		<para>
+		The lesson here is that even though you can mix the references with
+		pointers to reduce the overhead (the reference assignments change the
+		reference counters, the pointer assignments don't), and I do it in my
+		code, you need to be careful. A pointer may be used only when you know
+		that there is a reference that holds the object in place. Once that
+		reference is gone, the pointer can't be used any more, and especially
+		can't be assigned to another reference. Be careful.
+		</para>
+
+		<para>
+		There are more varieties of the Autoref template, also
+		defined in <pre>mem/Autoref.h</pre>:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+			Onceref
+			</listitem>
+
+			<listitem>
+			const_Autoref
+			</listitem>
+
+			<listitem>
+			const_Onceref
+			</listitem>
+		</itemizedlist>
+
+		<indexterm>
+			<primary>Onceref</primary>
+		</indexterm>
+		<para>
+		The Onceref is an attempt at optimization when passing the function
+		arguments and results. It's supposed to work like the standard
+		auto_ptr: you assign a value there once, and then when that value gets
+		assigned to an Autoref or another Onceref, it moves to the new
+		location, leaving the reference count unchanged and the original
+		Onceref as NULL. This way you avoid a spurious extra increase-decrease.
+		However in practice I haven't got around to implementing it yet, so for
+		now it's a placeholder that is defined to be an alias of Autoref,
+		and const_Onceref is an alias of const_Autoref.
+		</para>
+
+		<indexterm>
+			<primary>const_Autoref</primary>
+		</indexterm>
+		<indexterm>
+			<primary>const_iterator</primary>
+		</indexterm>
+		<para>
+		const_Autoref is a template defined over the Autoref template:
+		</para>
+
+<pre>
+template <typename Target>
+class const_Autoref : public Autoref<const Target>
+</pre>
+
+		<para>
+		The const_Autoref is a reference to a constant object. As you can see,
+		<pre>const_Autoref<T></pre> is equivalent to <pre>Autoref<const T></pre>, 
+		only it handles the
+		automatic type casts much better. The approach is patterned after the
+		const_iterator. The only problem with const_Autoref is that when you
+		try to assign a NULL to it, that blows the compiler's mind. So you have
+		to write an explicit cast 
+		of <pre>const_Autoref<T>::null()</pre> 
+		or <pre>Autoref<T>::null()</pre> 
+		or <pre>(T*)NULL</pre> of <pre>(const T*)NULL</pre> 
+		to help it out. Either way would work as long as one or the other
+		path for casting is selected (by default the compiler is
+		confused by the presence of two possible paths).
+		</para>
+
+		<indexterm>
+			<primary>const_Onceref</primary>
+		</indexterm>
+		<para>
+		Finally, const_Onceref is the const version of Onceref. 
+		</para>
+
+		<para>
+		The method prototypes of Autoref and all its varieties
+		are (Target is the argument class of the
+		Autoref template, Ptr is the pointer to it):
+		</para>
+
+<pre>
+typedef Target *Ptr;
+static Ptr null();
+Autoref();
+Autoref(Target *t);
+Autoref(const Autoref &ar);
+Autoref(const Autoref<OtherTarget> &ar);
+Target &operator*() const;
+Target *operator->() const;
+Target *get() const;
+operator Ptr() const; // type conversion to pointer
+bool isNull() const;
+Autoref &operator=(const Autoref &ar);
+Autoref &operator=(const Autoref<OtherTarget> &ar);
+bool operator==(const Autoref &ar);
+bool operator!=(const Autoref &ar);
+bool operator==(const Autoref<OtherTarget> &ar);
+bool operator!=(const Autoref<OtherTarget> &ar);
+void swap(Autoref &other);
+</pre>
+
+		<para>
+		Since the typical usage might be hard to understand from the
+		method prototypes, the examples follow.
+		Autoref can be constructed with or assigned from another Autoref or a
+		pointer, or with a NULL value:
+		</para>
+
+<pre>
+T *ptr;
+Autoref<T> ref1(ptr);
+Autoref<T> ref2(ref1);
+Autoref<T> ref3; // initialized as NULL by default
+ref1 = ref2;
+ref1 = ptr;
+ref2 = NULL; // releases the reference
+ref2 = Autoref<T>::null(); // another way to assign NULL
+</pre>
+
+		<para>
+		The simple NULL usually works but there are cases with ambiguity,
+		and the static method <pre>null()</pre> helps to create the NULL of the correct
+		type and remove that ambiguity.
+		</para>
+
+		<para>
+		The assignments work for exactly the same type and also for assignment
+		to any parent in the class hierarchy:
+		</para>
+
+<pre>
+Autoref<Label> = new DummyLabel(...);
+</pre>
+
+		<para>
+		The automatic conversion to pointers works too:
+		</para>
+
+<pre>
+ptr = ref1;
+</pre>
+
+		<para>
+		Or a pointer can be extracted from an Autoref explicitly:
+		</para>
+
+<pre>
+ptr = ref1.get();
+</pre>
+
+		<para>
+		The dereferencing and arrow operations work like on a pointer:
+		</para>
+
+<pre>
+T val = *ref1;
+ref1->method();
+</pre>
+
+		<para>
+		The Autorefs can also be compared for equality and inequality:
+		</para>
+
+<pre>
+ref1 == ref2
+ref1 != ref2
+</pre>
+
+		<para>
+		To compare them to pointers, use <pre>get()</pre>. Except for one special case:
+		the comparison to NULL happens so often that a special method is
+		provided for it:
+		</para>
+
+<pre>
+ref1.isNull()
+</pre>
+
+		<para>
+		Two Autorefs may swap their values, without changing the reference
+		counts of either value:
+		</para>
+
+<pre>
+ref1.swap(ref2);
+</pre>
+
+		<para>
+		There is also a special variety of Autoref for referring to rows,
+		Rowref, described in
+		<xref linkend="sc_cpp_row" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+	</sect1>

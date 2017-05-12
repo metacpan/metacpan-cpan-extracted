@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_idx">
+		<title>Index reference</title>
+
+		<indexterm>
+			<primary>Index</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Aggregator</primary>
+			<secondary>handler</secondary>
+		</indexterm>
+		<para>
+		The Index object can be accessed directly only in one place, in the aggregator handlers.
+		In case if you're not sure about the difference between the Index and IndexType, 
+		it's explained in 
+		<xref linkend="sc_table_indextree" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		The examples of the usage are shown in
+		<xref linkend="sc_cpp_aggregator" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;,
+		while this section lists the available methods.
+		</para>
+
+		<para>
+		The base Index class is defined in <pre>table/Index.h</pre>, and its subclasses in
+		<pre>table/RootIndex.h</pre>, <pre>table/FifoIndex.h</pre>, <pre>table/TreeIndex.h</pre>,
+		<pre>table/TreeNestedIndex.h</pre>.
+		</para>
+
+<pre>
+const IndexType *getType() const;
+</pre>
+
+		<para>
+		Get the type of this index.
+		</para>
+
+<pre>
+RowHandle *begin() const;
+</pre>
+
+		<para>
+		Get the handle of the first row of the group, in the default order according to its first leaf index type. Note that here it's not the whole table's first leaf index type but the first leaf in the index type subtree under this index's type. All the iteration methods return NULL if there are no more rows.
+		</para>
+
+<pre>
+RowHandle *next(const RowHandle *cur) const;
+</pre>
+
+		<para>
+		Get the handle of the next row (or NULL if that was the last one) in the default order. The NULL argument makes the NULL result.
+		</para>
+
+<pre>
+RowHandle *last() const;
+</pre>
+
+		<para>
+		Get the handle of the last row in the group in the default order.
+		</para>
+
+		<para>
+		The rest of the methods of Index aren't really to be used directly.
+		</para>
+
+	</sect1>

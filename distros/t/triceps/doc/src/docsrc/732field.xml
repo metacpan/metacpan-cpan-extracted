@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_ref_fields"  xmlns:xi="http://www.w3.org/2001/XInclude">
+		<title>Fields reference</title>
+
+		<indexterm>
+			<primary>Fields</primary>
+		</indexterm>
+
+		<para>
+		Triceps::Fields is a package with a set of functions that
+		help with handling the variable sets of fields in the templates.
+		</para>
+
+<pre>
+@fields = &Triceps::Fields::filter(
+	$caller, \@inFields, \@translation);
+</pre>
+
+		<para>
+		Filters and renames the incoming set of fields from <pre>\@inFields</pre> (usually
+		coming from some row type) according to <pre>\@translation</pre>. Returns the array 
+		of filtered names, positionally matching the names in the original
+		array. When some field gets thrown away by filtering, its entry in the
+		array will be <pre>undef</pre>. Confesses on errors. <pre>$caller</pre> is the
+		caller's description for the error messages.
+		</para>
+
+		<para>
+		See the description of the translation format in
+		<xref linkend="sc_template_result" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<para>
+		The option-processing functions <pre>Opt::drop()</pre> and <pre>Opt::dropExcept()</pre>
+		can also be used to filter the field lists.
+		</para>
+
+<pre>
+@pairs = &Triceps::Fields::filterToPairs(
+	$caller, \@inFields, \@translation);
+</pre>
+
+		<para>
+		Performs the same actions as <pre>filter()</pre> but returns the result in a different format:
+		an array of pairs of field names, where the old field name is paired with the
+		new one. The field names that gets thrown away by filtering do not appear in
+		the result array.
+		</para>
+
+<pre>
+($rowType, $projectFunc) = &Triceps::Fields::makeTranslation(
+	$optName => $optValue, ...);
+</pre>
+
+		<para>
+		Generates and compiles a function that performs the filtering of rows and
+		creates the rows of the filtered type (a <quote>projection</quote> in SQL terms). 
+		It accepts multiple input row types, each with its own translation specification,
+		and creates the result row type by combining them all.
+		Returns two elements: the result row type and the reference to the compiled
+		function. The function can then be called to perform the projection and
+		combining of the original rows:
+		</para>
+
+<pre>
+$resultRow = &$projectFunc($origRow1, $origRow2, ..., $origRowN);
+</pre>
+
+		<para>
+		If some of the original rows are not available, they may be passed as
+		<pre>undef</pre>.  The options are:
+		</para>
+
+		<variablelist>
+		<varlistentry>
+			<term><pre>rowTypes => [ @rts ]</pre></term>
+			<listitem>
+			Reference to an array of row types for the original rows.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>filterPairs => [ @pairs ]</pre></term>
+			<listitem>
+			Reference to an array of arrays returned by <pre>filterPairs()</pre> for the
+			original rows. Obviously, each of the original rows requires
+			its own filter. The sizes of <quote>rowTypes</quote> and <quote>filterPairs</quote> arrays
+			must match.  The field names in the results must not have
+			any duplicates.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>saveCodeTo => \$code</pre></term>
+			<listitem>
+			Optional. Reference to a scalar where to save the auto-generated source
+			code of the projection function, for debugging.
+			</listitem>
+		</varlistentry>
+		</variablelist>
+
+<pre>
+$result = &Triceps::Fields::isArrayType($typeName);
+</pre>
+
+		<para>
+		Checks whether a simple type is represented in Perl as an array.
+		Since <pre>uint8[]</pre> is represented as a string, it will return 0.
+		</para>
+
+<pre>
+$result = &Triceps::Fields::isStringType($typeName);
+</pre>
+
+		<para>
+		Checks whether a simple type is represented in Perl as a string.
+		<pre>string</pre>, <pre>uint8</pre> and <pre>uint8[]</pre> 
+		will return 1.
+		</para>
+	</sect1>
+

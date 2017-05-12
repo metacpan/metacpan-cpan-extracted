@@ -1,0 +1,25 @@
+---
+abstract: 'reap variables in new threads'
+author:
+  - 'Jens Rehsack <rehsack@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.132510'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: threads-variables-reap
+provides:
+  threads::variables::reap:
+    file: lib/threads/variables/reap.pm
+    version: 0.06
+recommends:
+  threads: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/rehsackthreads-variables-reap
+version: 0.06

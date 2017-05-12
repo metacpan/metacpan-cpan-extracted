@@ -1,0 +1,50 @@
+tidyview version 0.0.1
+
+tidyview is a Tk front-end for managing the complexities of perltidy's plethora of options.
+
+Basically it presents two views of your code - one is your code before perltidy reformats it,
+and the other is your code after perltidy reformats it with the options currently selected in
+the GUI.
+
+Not every option to do with perltidy reformating your code is support, as some make no no visual
+difference - e.g. the ability to set the option of line endings for DOS/UNIX/MAC are not in the GUI,
+as this doesnt change the layout of you code.
+
+Options that control perltidy itself are also _not_ in the GUI.
+
+There are numerous ways this tool could be improved. See the TODO for some ideas.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+If you want to play with the application before installing it, cd into the bin directory and run the
+perlenv.bash script (obviously this only applies to platforms that understand a bash script).
+
+cd bin
+source perlenv.bash
+
+This modifies your PERL5LIB path to find the applications libraries. I dont believe in 'use lib qw()'
+games.
+
+See the pod for how to run the application after installation
+
+    perldoc tidyview
+
+DEPENDENCIES
+
+Tk
+Log::Log4perl
+perltidy
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006, Leif Eriksen
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

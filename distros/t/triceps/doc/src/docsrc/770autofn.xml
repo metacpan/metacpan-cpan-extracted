@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_ref_autofnbind">
+		<title>AutoFnBind reference</title>
+
+		<indexterm>
+			<primary>AutoFnBind</primary>
+		</indexterm>
+		<para>
+		AutoFnBind provides a scoped way of pushing and popping of the
+		FnBindings on the FnReturns. The pushing happens when an AutoFnBind
+		object is constructed, the popping when it is destroyed (or on an
+		explicit clearing).
+		</para>
+
+<pre>
+$ab = AutoFnBind->new($ret1 => $binding1, ...);
+</pre>
+
+		<para>
+		Create an AutoFnBind object. The arguments consist of pairs of FnReturns 
+		and FnBindings to push on them. The pushing will happen in the constructor
+		in the order specified, the popping in the destructor or <pre>clear()</pre>
+		method in the opposite order.
+		</para>
+
+		<para>
+		If any corruption of the call stack is detected at the popping time 
+		(i.e. the binding on the top of the stack is not the one that was
+		pushed on it), this error will be detected. However since there is
+		no way to report an error from a Perl destructor, this error message will
+		be printed on stderr and the whole program will exit with the code 1.
+		If you care about the ability to catch this error, use the method
+		<pre>clear()</pre> before destroying the AutoFnBind object.
+		</para>
+
+<pre>
+$ab->clear();
+</pre>
+
+		<para>
+		Pop the bindings, just as during the destruction, and discard the
+		references to the FnReturn and FnBinding objects.  After the clearing is
+		done once, the destructor will not pop anything any more, and the repeated
+		clearings will have no effect.
+		</para>
+
+		<para>
+		Any detected stack corruptions make this method confess. The popping
+		will always go through the whole list of bindings, collecting the
+		error reports along the way.  At the end of
+		the run it will make sure that it doesn't have any references to
+		anything any more, and only then confess if any errors were found.
+		This cleans up the things as much as possible and as
+		much as can be handled, but the end result will still not be
+		particularly clean: the returns that got their stacks corrupted will
+		still have their stacks corrupted, and some very serious
+		application-level cleaning will be needed to continue. Probably a
+		better choice would be to destroy everything and restart from scratch.
+		But at least it allows to get safely to this point of restarting from
+		scratch.
+		</para>
+
+<pre>
+$res = $ab->same($ab2);
+</pre>
+
+		<para>
+		The usual check for two references referring to the same object.
+		</para>
+
+	</sect1>

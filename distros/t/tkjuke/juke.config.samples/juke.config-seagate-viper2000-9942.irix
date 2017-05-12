@@ -1,0 +1,11 @@
+export CHANGER=/hw/scsi/sc10d6l1
+export EEPOS_OPEN=0
+export EEPOS_SHUT=1
+export EJECT_BEFORE_UNLOAD=0
+export JUKE=/home/root/admin/backup/tkjuke/2.0.1/juke
+export LOADERINFO=/usr/local/bin/loaderinfo
+export MT=/sbin/mt
+export MTX=/usr/local/bin/mtx
+export NRTAPE=/dev/rmt/tps10d6nrvc
+export TAPE=/dev/rmt/tps10d6vc
+export VERSION=2.0.1

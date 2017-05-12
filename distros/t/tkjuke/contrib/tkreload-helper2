@@ -1,0 +1,58 @@
+#!/bin/bash
+
+# Ensure the first tape of the reload is loaded, tkreload should already
+# have directed you to do this.
+#
+# Restored data appears in /root/admin/backup/reload/. Copy from there to
+# user space and reset owner and permissions, or whatever.
+# 
+# $1 is the DTE to use (then shifted off of argv).
+#
+# The input files given by $* are files sorted by tape file number: the
+# first file is file #2 (file #1 is the tape VSN), etc.
+
+#set -x
+
+trap '
+rc=$?
+echo -e "\ntkreload2 status = $rc" >> $out
+echo -e "\ntkreload2 status = $rc"
+/usr/bin/Mail -s "tkreload2 complete - adjust file and jukebox contents now!" luops@lehigh.edu < $out
+/usr/bin/Mail -s "tkreload2 complete - adjust file and jukebox contents now!" sol0@lehigh.edu < $out
+/bin/rm $out
+' EXIT
+
+dte=$1
+nrtape="/dev/nst${1}"
+shift
+
+out="$1.mail"
+echo -e "Using DTE $dte, tape device $nrtape, to restore these files:" > $out
+/bin/cat $* >>$out
+echo    "Using DTE $dte, tape device $nrtape, to restore these files:"
+/bin/cat $*
+
+/bin/mt -f $nrtape rewind
+file=2
+
+while [ "$1" != "" ] ; do
+
+    /bin/mt -f $nrtape fsf 1
+    echo -e "\nProcessing tape file $file"
+    echo -e "\nProcessing tape file $file" >> $out
+
+    if [ -s $1 ] ; then
+	echo -e "  ... restoring list of files in $1" >> $out
+	echo    "  ... restoring list of files in $1"
+	cd /root/admin/backup/reload
+        /bin/tar -xvpf $nrtape -b 512 -M --new-volume-script "/root/bin/media-change $dte" --files-from $1 | /usr/bin/tee --append $out 2>&1
+    else
+	echo -e "  ... nothing to restore from tape file $file" >> $out
+        echo    "  ... nothing to restore from tape file $file"
+    fi
+
+    /bin/rm $1
+    shift
+    let file=$file+1
+
+done

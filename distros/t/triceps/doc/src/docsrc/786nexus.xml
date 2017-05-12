@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_ref_nexus" xmlns:xi="http://www.w3.org/2001/XInclude">
+		<title>Nexus reference</title>
+
+		<indexterm>
+			<primary>Nexus</primary>
+		</indexterm>
+		<para>
+		The Nexus class is pretty much opaque. It's created and managed
+		entirely inside the App infrastructure from a Facet, and even the
+		public API for importing a nexus doesn't deal with the Nexus object
+		itself, but only with its name. The only public use of the Nexus object
+		is for the introspection and entertainment value, to see what Trieads
+		export and import what Nexuses: pretty much the only way to get a Nexus
+		reference is by listing the exports or imports of a Triead.
+		</para>
+
+		<para>
+		The API of a Nexus is very limited:
+		</para>
+
+<pre>
+$nxname = $nx->getName();
+</pre>
+
+		<para>
+		Get the name of the nexus (the short name, inside the Triead).
+		</para>
+
+<pre>
+$tname = $nx->getTrieadName();
+</pre>
+
+		<para>
+		Get the name of the Triead that exported this nexus.
+		</para>
+
+<pre>
+$result = $nx->same($nx2);
+</pre>
+
+		<para>
+		Check whether two nexus references point to the same object.
+		</para>
+
+<pre>
+$result = $nx->isReverse();
+</pre>
+
+		<para>
+		Check whether the nexus is reverse.
+		</para>
+
+<pre>
+$limit = $nx->queueLimit();
+</pre>
+
+		<para>
+		Get the queue limit of the nexus.
+		</para>
+	</sect1>

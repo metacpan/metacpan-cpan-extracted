@@ -1,0 +1,4 @@
+Pthreads-wrapper library, from the book "The practice of parallel programming"
+by Sergey Babkin, <http://www.amazon.com/Practice-Parallel-Programming-Sergey-Babkin/dp/1451536615>.
+This code has been pulled form the book's examples at <https://sourceforge.net/projects/tpopp>
+and is covered by its own separate license that is found in the file COPYRIGHT.

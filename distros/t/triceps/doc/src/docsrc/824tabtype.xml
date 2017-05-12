@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_tabtype">
+		<title>TableType reference</title>
+
+		<indexterm>
+			<primary>TableType</primary>
+		</indexterm>
+		<para>
+		The TableType describes the type of a table, defined in
+		<pre>type/TableType.h</pre>. It inherits being an Mtarget from the Type,
+		and can be shared between the threads after it has been initialized.
+		However like RowType, it can benefit from creating a separate copy
+		for each thread, to keep the reference count changes local to one
+		CPU (see the method <pre>deepCopy()</pre> below).
+		</para>
+
+		<para>
+		In the &Cpp; API it's built very similarly to the current
+		Perl API, by constructing a bare object, then adding information to it,
+		and finally initializing it. The Perl API will eventually change to
+		something more Perl-like, the &Cpp; API will stay this way.
+		</para>
+
+		<para>
+		The creation goes like this:
+		</para>
+
+		<indexterm>
+			<primary>initializeOrThrow</primary>
+		</indexterm>
+<pre>
+Autoref<TableType> tt = initializeOrThrow( (new TableType(rt1))
+	->addSubIndex("primary", it
+	)->addSubIndex("secondary", itcopy
+	)
+);
+</pre>
+
+		<para>
+		In reality the index types would also be constructed as a part of this
+		long statement but for clarity they were assumed to be pre-created
+		as <pre>it</pre> and <pre>itcopy</pre>. 
+		</para>
+		
+		<para>
+		After a table type has been initialized, nothing can be added to it any
+		more. Just as in the Perl API, the <pre>addSubIndex()</pre> adds not its argument
+		index type object but its deep copy (see more about the copy varieties in 
+		<xref linkend="sc_cpp_copy" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;).
+		When the table type gets initialized, these index types get tied to it.
+		</para>
+
+		<para>
+		Note that the operator <pre>new</pre> has to be in parenthesis to get the
+		priorities right. It's kind of annoying, so the better-looking
+		equivalent way to do it is to use the static method <pre>make()</pre>:
+		</para>
+
+<pre>
+Autoref<TableType> tt = initializeOrThrow(TableType::make(rt1)
+	->addSubIndex("primary", it
+	)->addSubIndex("secondary", itcopy
+	)
+);
+</pre>
+
+		<para>
+		And here is a more complete example, with making of all the
+		components in one chain:
+		</para>
+
+<pre>
+Autoref<TableType> tt = initializeOrThrow(TableType::make(rt1)
+	->addSubIndex("primary", HashedIndexType::make(
+		NameSet::make()->add("a")->add("e"))
+		->setAggregator(new MyAggregatorType("onPrimary", NULL))
+		->addSubIndex("level2", new FifoIndexType)
+	)
+);
+</pre>
+
+		<para>
+		The construction-related methods are:
+		</para>
+
+<pre>
+TableType(Onceref<RowType> rt);
+static TableType *make(Onceref<RowType> rt);
+TableType *addSubIndex(const string &name, IndexType *index);
+void initialize();
+</pre>
+
+		<para>
+		The method <pre>initialize()</pre> is called by the <pre>initializeOrThrow()</pre> template,
+		which then checks for errors and throws an Exception if it finds any.
+		But you can call it manually instead if you wish.
+		</para>
+
+		<para>
+		The working of the <pre>addSubIndex()</pre> is such that it doesn't put its
+		<pre>this</pre> object into any kind of Autoref. Because of that it's able to
+		pass that pointer right through to its result for chaining. It doesn't
+		check anything and can't throw any exceptions. So the TableType object
+		created by the constructor gets through the chain of <pre>addSubIndex()</pre>
+		without having any counted references to it created, its reference
+		count stays at 0. Only when the result of the chain is assigned to an
+		Autoref, the first reference gets created. Obviously, this chain must
+		not be interrupted by any exceptions or the memory will leak. Any
+		detected errors must be collected in the embedded error objects, that
+		will be read after initialization.
+		</para>
+
+		<para>
+		The result of initialization is void for a good reason: if you call
+		<pre>initialize()</pre> manually, you can't include it into this chain, and the
+		void result forces the non-chained call. Before the initialization is
+		called, the TableType object must be properly held in a counted
+		reference.  For example:
+		</para>
+
+<pre>
+Autoref<TableType> tt = TableType::make(rt1)
+	->addSubIndex("primary", it
+	)->addSubIndex("secondary", itcopy
+	);
+tt->initialize();
+if (tt->getErrors()->hasError())
+	throw Exception(tt->getErrors());
+</pre>
+
+		<para>
+		But <pre>initializeOrThrow()</pre> is smart enough to do things correctly
+		within the chained call format.
+		It saves the TableType in an Autoref, then calls <pre>initialize()</pre>,
+		and on success returns that Autoref, never corrupting the references.
+		It involves a little more overhead but the TableType construction
+		usually happens only once at the start-up time, and thus a minor
+		difference in efficiency doesn't matter.
+		</para>
+
+		<para>
+		It's safe to call <pre>initialize()</pre> multiple times, the repeated calls will
+		simply have no effect.
+		</para>
+
+		<indexterm>
+			<primary>Exception</primary>
+		</indexterm>
+		<para>
+		The sub-indexes may be added only while the table type is not
+		initialized, afterwards it will throw an Exception.
+		</para>
+
+		<para>
+		The methods to examine the contents of the table type are:
+		</para>
+
+<pre>
+bool isInitialized() const;
+</pre>
+
+		<para>
+		Check whether the table type has been initialized.
+		</para>
+
+<pre>
+const RowType *rowType() const;
+</pre>
+
+		<para>
+		Returns the row type of the table type. Since the table type is not
+		expected to be destroyed immediately, it's OK to return a plain
+		pointer.
+		</para>
+
+<pre>
+IndexType *findSubIndex(const string &name) const;
+</pre>
+
+		<para>
+		Find the index by name. Returns NULL if not found.  This looks only for
+		the top-level indexes, to find the nested indexes, the similar calls
+		have to be continued on the further levels. At the moment there is no
+		ready method to resolve a whole index path in &Cpp;, however the
+		same method in IndexType has a special feature that allows to
+		do it by simple chaining:
+		</para>
+
+<pre>
+Autoref<IndexType> it = tt->findSubIndex("level1")->findSubIndex("level2");
+if (it.isNull()) {
+	// not found
+}
+</pre>
+
+		<para>
+		That special feature is that <pre>findSubIndex()</pre> in IndexType works
+		even on a NULL reference, simply returning NULL. So if 
+		<pre>findSubIndex("level1")</pre> returns NULL,
+		<pre>findSubIndex("level2")</pre> will simply propagate that NULL.
+		The downside compared with the path-resolving method in Perl
+		is that this chain doesn't tell you, which of the indexes in the
+		path were not found.
+		</para>
+
+<pre>
+IndexType *findSubIndexById(IndexType::IndexId it) const;
+</pre>
+
+		<para>
+		Finds the first index type of a particular kind (or NULL if none
+		found). The ids are like IndexType::IT_HASHED, IndexType::IT_FIFO,
+		IndexType::IT_SORTED.
+		</para>
+
+<pre>
+IndexType *getFirstLeaf() const;
+</pre>
+
+		<para>
+		Finds the first leaf index type. This call does search through the
+		whole depth of the index tree for the first leaf index type.
+		</para>
+
+<pre>
+const IndexTypeVec &getSubIndexes() const;
+</pre>
+
+		<para>
+		Returns the vector with all the top-level index type references. The
+		vector is read-only, you must not change it. 
+		</para>
+
+<pre>
+TableType *copy() const;
+</pre>
+
+		<indexterm>
+			<primary>IndexType</primary>
+		</indexterm>
+		<indexterm>
+			<primary>AggregatorType</primary>
+		</indexterm>
+		<para>
+		Copy the table type, including all its contents of IndexTypes
+		and AggregatorTypes, because they get tied to no more than one
+		TableType. However the RowTypes stay shared.
+		The copied table type is always uninitialized and thus can
+		be further extended by defining more indexes and aggregators.
+		</para>
+
+		<para>
+		In case if the table type collected errors, the errors aren't copied,
+		and in general you should not copy such a table type. The errors
+		will be detected again when you try to initialize the copy.
+		</para>
+
+<pre>
+TableType *deepCopy(HoldRowTypes *holder) const;
+</pre>
+
+		<indexterm>
+			<primary>HoldRowTypes</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Nexus</primary>
+		</indexterm>
+		<para>
+		Copy the whole strucutre all the way down, up to and including the
+		row types. This is used for exporting the TableTypes to the other
+		threads through a Nexus. It keeps the reference counts localized to
+		each thread, preventing the thrashing of them between CPUs as the
+		references are created and destroyed.
+		</para>
+
+		<para>
+		The HoldRowTypes object is what takes care of sharing the underlying
+		row types. To copy a bunch of objects with sharing, you create a
+		HoldRowTypes, copy the bunch, destroy the HoldRowTypes,
+		as described in more detail in
+		<xref linkend="sc_cpp_copy" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<para>
+		The Perl API contains one more copy method, <pre>copyFundamental()</pre>.
+		It's not directly available in the &Cpp; API yet but the same task can be
+		done manually.
+		</para>
+
+		<para>
+		Ultimately, the TableType is used to construct the tables. The factory
+		method is:
+		</para>
+
+<pre>
+Onceref<Table> makeTable(Unit *unit, const string &name) const;
+</pre>
+
+		<para>
+		This creates a table with the given name in a given unit. 
+		If the table type is not initialized or the initialization
+		returned an error, will return NULL.
+		</para>
+
+		<para>
+		Finally, there is a call that you don't need to use:
+		</para>
+
+<pre>
+RowHandleType *rhType() const;
+</pre>
+
+		<indexterm>
+			<primary>RowHandleType</primary>
+		</indexterm>
+		<para>
+		Like everything else, the RowHandles have a type. But this type is very
+		much internal, and it knows very little about the row handles. All it
+		knows is how much memory to allocate when constructing a new RowHandle.
+		The rest of the knowledge about the RowHandles is placed inside the
+		Table. So, a Table (yes, a Table, <b>not</b> a TableType) acts among
+		the other things as a type for its RowHandles. 
+		</para>
+	</sect1>
+

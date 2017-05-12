@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+<book id="GUIDE" xmlns:xi="http://www.w3.org/2001/XInclude">
+	<bookinfo>
+		<title>
+			Complex Event Processing with Triceps CEP v2.0
+		</title>
+		<subtitle>
+			Developer's Guide
+		</subtitle>
+		<author>
+			<firstname>Sergey</firstname>
+			<othername role="mi">A.</othername>
+			<surname>Babkin</surname>
+		</author>
+
+		<copyright>
+			<year>2014</year>
+			<holder>Sergey A. Babkin</holder>
+		</copyright>
+
+		<!--
+		<pubdate>June 2012</pubdate>
+		<edition>First Edition</edition>
+		<isbn>1234567890</isbn>
+
+		<printhistory>
+			<para>
+			June, 2012    First Printing
+			</para>
+		</printhistory>
+		-->
+
+		<legalnotice>
+			<para>
+			All rights reserved.
+			</para>
+			<para>
+			This manual is a part of the Triceps project. It is covered
+			by the same Triceps version of the LGPL v3 license as Triceps
+			itself.
+			</para>
+			<para>
+			The author can be contacted by e-mail at 
+			&lt;babkin@users.sf.net&gt; or &lt;sab123@hotmail.com&gt;.
+			</para>
+
+			<para>
+			Many of the designations used by the manufacturers and sellers
+			to distinguish their products are claimed as trademarks. Where those
+			designations appear in this manual, and the author was aware of a
+			trademark claim, the designations have been printed in caps or
+			initial caps.
+			</para>
+			<para>
+			While every precaution has been taken in the preparation of this manual,
+			the author assumes no responsibility for errors or omissions, or for
+			damages resulting from the use of the information contained herein.
+			</para>
+			<!--
+			<para>
+			ISBN-10: 1-234-56889-0
+			</para>
+			<para>
+			ISBN: 123-4567890123
+			</para>
+			-->
+		</legalnotice>
+
+	</bookinfo>
+
+	<!--
+	<xi:include href="file:///DOCS/000preface.xml"/>
+	-->
+
+	<xi:include href="file:///DOCS/000preface.xml"/>
+	<xi:include href="file:///DOCS/010field.xml"/>
+	<xi:include href="file:///DOCS/020enter.xml"/>
+	<xi:include href="file:///DOCS/030build.xml"/>
+	<xi:include href="file:///DOCS/040apifund.xml"/>
+	<xi:include href="file:///DOCS/050rows.xml"/>
+	<xi:include href="file:///DOCS/060labels.xml"/>
+	<xi:include href="file:///DOCS/070sched.xml"/>
+	<xi:include href="file:///DOCS/080memory.xml"/>
+	<xi:include href="file:///DOCS/090tables.xml"/>
+	<xi:include href="file:///DOCS/100templates.xml"/>
+	<xi:include href="file:///DOCS/110aggregation.xml"/>
+	<xi:include href="file:///DOCS/120joins.xml"/>
+	<xi:include href="file:///DOCS/130time.xml"/>
+	<xi:include href="file:///DOCS/140other.xml"/>
+	<xi:include href="file:///DOCS/150strf.xml"/>
+	<xi:include href="file:///DOCS/160mt.xml"/>
+	<xi:include href="file:///DOCS/250tql.xml"/>
+	<xi:include href="file:///DOCS/300perf.xml"/>
+	<xi:include href="file:///DOCS/700ref.xml"/>
+	<xi:include href="file:///DOCS/800cppref.xml"/>
+	<xi:include href="file:///DOCS/990relnotes.xml"/>
+	<xi:include href="file:///DOCS/biblio.xml"/>
+
+	<index/>
+
+	<colophon>
+		<title></title>
+
+		<!--
+		<bridgehead renderas="sect1">About Author</bridgehead>
+		<para>
+		</para>
+		-->
+
+		<bridgehead renderas="sect1">Colophon</bridgehead>
+		<para>
+		This manual has been typeset using the Docbook tools.
+		</para>
+	</colophon>
+</book>

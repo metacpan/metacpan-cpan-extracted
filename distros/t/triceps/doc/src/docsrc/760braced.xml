@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_ref_braced"  xmlns:xi="http://www.w3.org/2001/XInclude">
+		<title>Braced reference</title>
+
+		<indexterm>
+			<primary>Braced</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Tql</primary>
+		</indexterm>
+		<para>
+		The package Braced is designed to parse the Tcl-like nested lists where
+		the elements are separated by whitespace, and braces are used to
+		enquote the elements with spaces in them.  These lists are used to write the
+		pipelines that form the Tql queries. For example:
+		</para>
+
+<pre>
+{read table tWindow} {project fields {symbol price}} {print tokenized 0}
+</pre>
+
+		<para>
+		These lists can then be parsed into elements, and the elements might
+		be also lists that could be parsed into elements and so on. 
+		The spaces between the braces are optional, braces also serve as separators. 
+		For example, the following lines are equivalent:
+		</para>
+
+<pre>
+a b c
+{a} {b} {c}
+{a}{b}{c}
+{a}b{c}
+</pre>
+
+		<para>
+		In case if a brace character needs to be included into one of the strings,
+		they can be escaped by backslashes, for example:
+		</para>
+
+<pre>
+{a\{} b\}c
+</pre>
+
+		<para>
+		Any other Perl backslash escapes, such as <quote>\n</quote> 
+		or <quote>\x20</quote>, work too. The quote characters have no
+		special meaning, they don't need to be escaped and they don't group
+		the words. For example, the following two are equivalent:
+		</para>
+
+<pre>
+"a b c"
+{"a} {b} {c"}
+</pre>
+
+		<para>
+		Escaping the spaces (<quote>\ </quote>) provides another way
+		to combine the words into one element. The following two
+		are equivalent:
+		</para>
+
+<pre>
+{a b c}
+a\ b\ c
+</pre>
+
+		<para>
+		There is no need for the nested escaping.  The characters need
+		to be escaped only once, and then the resulting strings can be
+		wrapped into any number of brace levels.
+		</para>
+
+		<para>
+		All the methods in this module are static, there are no objects.
+		</para>
+
+<pre>
+$string = $data;
+@elements = Triceps::Braced::raw_split_braced($string)
+confess "Unbalanced braces around '$string'" if $string;
+</pre>
+
+		<para>
+		Split the string into the braced elements. If any of the elements
+		were enclosed into their own braces, these braces are left in place,
+		the element string will still contain them. For example, <quote>a {b} {c d}</quote>
+		will be split into <quote>a</quote>, <quote>{b}</quote>, <quote>{c d}</quote>.
+		No unescaping is done, the escaped characters are passed through as-is.
+		This method of splitting is rarely used, it's present as a baseline.
+		</para>
+
+		<para>
+		The original string argument will be fully consumed. If anything is left
+		unconsumed, this is an indication of a syntax error, with unbalanced
+		braces. The argument may not be a constant because it gets modified.
+		</para>
+
+<pre>
+$string = $data;
+@elements = Triceps::Braced::split_braced($string)
+confess "Unbalanced braces around '$string'" if $string;
+</pre>
+
+		<para>
+		Split the string into the braced elements. If any of the elements
+		were enclosed into their own braces, these braces will be removed from the
+		results.  For example, <quote>a {b} {c d}</quote>
+		will be split into <quote>a</quote>, <quote>b</quote>, <quote>c d</quote>.
+		No unescaping is done, the escaped characters are passed through as-is.
+		This is the normal method of splitting, it allows the elements
+		to be split further recursively.
+		</para>
+
+		<para>
+		The original string argument will be fully consumed. If anything is left
+		unconsumed, this is an indication of a syntax error, with unbalanced
+		braces. The argument may not be a constant because it gets modified.
+		</para>
+
+<pre>
+$result = Triceps::Braced::bunescape($string);
+</pre>
+
+		<para>
+		Un-escape a string by processing all the escape characters in it.
+		This step is normally done last, after all the splitting is done.
+		The result will become unsuitable for the future splitting because
+		the escaped characters will lose their special meaning. If any
+		literal braces are present in the argument, they will pass through
+		to the result as literals. For example, <quote>{a \{b }</quote>
+		will become <quote>{a {b }</quote>.
+		</para>
+
+<pre>
+@results = Triceps::Braced::bunescape_all(@strings);
+</pre>
+
+		<para>
+		Perform the un-escaping on a whole array of strings. The result
+		array will contain the same number of elements as the argument.
+		</para>
+
+<pre>
+$ref_results = Triceps::Braced::split_braced_final($string);
+confess "Unbalanced braces around '$string'" if $string;
+</pre>
+
+		<para>
+		The combined functionality of splitting a string and un-escaping
+		the result elements. That's why it's final: no further splits must be
+		done after un-escaping.  <b>The return value is different from the
+		other split methods.</b> It is a reference to the array of result
+		strings. The difference has been introduced to propagate the <pre>undef</pre>
+		from the argument to the result: if the argument string is <pre>undef</pre>,
+		the result will be also <pre>undef</pre>, <b>not</b> a reference to an
+		empty array. The string gets consumed in the same way as for the
+		other split methods, and anything left in it indicates an unbalanced
+		brace.
+		</para>
+
+	</sect1>

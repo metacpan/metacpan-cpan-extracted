@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_ref_aggcontext"  xmlns:xi="http://www.w3.org/2001/XInclude">
+		<title>AggregatorContext reference</title>
+
+		<indexterm>
+			<primary>AggregatorContext</primary>
+		</indexterm>
+
+		<para>
+		AggregatorContext is one of the arguments passed to the aggregator
+		computation function. It encapsulates the iteration through the
+		aggregation group, in the order of the index on which the aggregator is
+		defined. After the computation function returns, the context becomes
+		invalidated and stops working, so there is no point in saving it
+		between the calls. There is no way to construct the aggregator context
+		directly.
+		</para>
+
+		<para>
+		All the methods of the AggregatorContext confess on errors.
+		</para>
+
+		<para>
+		An aggregator must never change the table. Any attempt to change the
+		table is a fatal error.
+		</para>
+
+<pre>
+$result = $ctx->groupSize();
+</pre>
+
+		<para>
+		Returns the number of rows in the group.
+		</para>
+
+<pre>
+$rowType = $ctx->resultType();
+</pre>
+
+		<para>
+		Returns the row type of the aggregation result.
+		</para>
+
+<pre>
+$rh = $ctx->begin();
+</pre>
+
+		<para>
+		Returns the first row handle of the iteration. In case of an empty
+		group it would return a NULL handle.
+		</para>
+
+<pre>
+$rh = $ctx->next($rh);
+</pre>
+
+		<para>
+		Returns the next row handle in order. If the argument handle was the last row
+		in the group, returns a NULL handle. So the iteration through the group
+		with a context is similar to iteration through the whole table: it ends
+		when <pre>begin()</pre> or <pre>next()</pre> returns a NULL handle. 
+		</para>
+
+<pre>
+$rh = $ctx->last();
+</pre>
+
+		<para>
+		Returns the last row handle of the group. In case of an empty
+		group it would return a NULL handle.
+		</para>
+
+<pre>
+$rh = $ctx->beginIdx($idxType);
+</pre>
+
+		<para>
+		Returns the first row in the group, according to a specific index type's order.
+		The index type must belong to the group, otherwise the result is
+		undefined. If the group is empty, will return the same value as
+		<pre>endIdx()</pre>. If <pre>$idxType</pre> is non-leaf, the effect is the same as if its
+		first leaf were used. 
+		</para>
+
+<pre>
+$rh = $ctx->endIdx($idxType);
+</pre>
+
+		<para>
+		Returns the handle past the last row in the group, according to a specific
+		index type's order. The index type must belong to the group, otherwise
+		the result is undefined and might even result in an endless iteration
+		loop.  If <pre>$idxType</pre> is non-leaf, the effect is the same as if its first
+		leaf were used. This kind of iteration uses the table's
+		<pre>$t->nextIdx($idxType, $rh)</pre> or <pre>$rh->next($idxType)</pre> to advance the
+		position. 
+		Unlike the general group iteration described in
+		<xref linkend="sc_ref_table" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;, 
+		the aggregator context does allow the iteration by every index in the group.
+		You can pick any index in the group and iterate in its order.
+		And aggregation is where this ability counts the most.
+		</para>
+
+		<para>
+		If the group happens to be the last group of this index type (not of
+		<pre>$idxType</pre> but of the index on which the aggregator is defined) in the
+		table, <pre>endIdx()</pre> would return a NULL row handle. If it's also
+		empty, <pre>beginIdx()</pre> would also return a NULL handle, and in general, for
+		an empty group <pre>beginIdx()</pre> would return the same value as <pre>endIdx()</pre>. If
+		the group is not the last one, <pre>endIdx()</pre> returns the handle of the first
+		row in the next group.
+		</para>
+
+<pre>
+$rh = $ctx->lastIdx($idxType);
+</pre>
+
+		<para>
+		Returns the last row in the group according to a particular index
+		type's order. The index type must belong to the group, otherwise the
+		result is undefined. If the group is empty, returns a NULL handle.
+		</para>
+
+<pre>
+$ctx->send($opcode, $row);
+</pre>
+
+		<para>
+		Constructs a result rowop for the aggregator and arranges for it to be
+		sent to the aggregator's output label. The actual sending is
+		delayed: it will be done only after all the aggregators run.
+		The runs before and after the table modifications are separate.
+		The aggregator's
+		output label is not directly visible in the computation function, so the rowop
+		can not be constructed directly. Instead <pre>send()</pre> takes care of it. The
+		row must be of a type matching the aggregator's result type
+		(and of course the normal practice is to use the aggregator's result
+		type to construct the row). On success returns 1, on error returns
+		<pre>undef</pre> and the error message.
+		</para>
+
+<pre>
+$ctx->makeHashSend($opcode, $fieldName => $fieldValue, ...);
+</pre>
+
+		<para>
+		A convenience method that produces the row from pairs of field names
+		and values and sends it. A combination of <pre>makeRowHash()</pre> and <pre>send()</pre>.
+		</para>
+
+<pre>
+$ctx->makeArraySend($opcode, @fields);
+</pre>
+
+		<para>
+		A convenience function that produces the row from the array of field
+		values and sends it. A combination of <pre>makeRowArray()</pre> and <pre>send()</pre>.
+		</para>
+
+	</sect1>
+

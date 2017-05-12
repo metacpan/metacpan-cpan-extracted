@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+  <!-- XML Catalog for finding the auto-formatted examples -->
+  <rewriteURI uriStartString="file:///EXAMPLES/" rewritePrefix="../ex/exxml/"/>
+  <rewriteSystem systemIdStartString="file:///EXAMPLES/" rewritePrefix="../ex/exxml/"/>
+  <rewriteURI uriStartString="file:///SEQS/" rewritePrefix="${DOC_SRC}/seq/"/>
+  <rewriteSystem systemIdStartString="file:///SEQS/" rewritePrefix="${DOC_SRC}/seq/"/>
+  <rewriteURI uriStartString="file:///FIGS/" rewritePrefix="${DOC_SRC}/figrefs/pdf/"/>
+  <rewriteSystem systemIdStartString="file:///FIGS/" rewritePrefix="${DOC_SRC}/figrefs/html/"/>
+  <rewriteURI uriStartString="file:///ENTS/" rewritePrefix="${DOC_SRC}/enthtml/"/>
+  <rewriteSystem systemIdStartString="file:///ENTS/" rewritePrefix="${DOC_SRC}/enthtml/"/>
+  <rewriteURI uriStartString="file:///DOCS/" rewritePrefix="${DOC_SRC}/"/>
+  <rewriteSystem systemIdStartString="file:///DOCS/" rewritePrefix="${DOC_SRC}/"/>
+</catalog>

@@ -1,0 +1,828 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+<chapter id="ch_LabelsRowops" xmlns:xi="http://www.w3.org/2001/XInclude">
+	<title>Labels and Row Operations</title>
+
+	<sect1 id="sc_Labels">
+		<title>Labels basics</title>
+
+		<para>
+		In each CEP engine there are two kinds of logic: One is to get some
+		request, look up some state, maybe update some state, and return the
+		result. The other has to do with the maintenance of the state: make
+		sure that when one part of the state is changed, the change propagates
+		consistently through the rest of it. If we take a common RDBMS for an
+		analog, the first kind would be like the ad-hoc queries, the second
+		kind will be like the triggers. The CEP engines are very much like
+		database engines driven by triggers, so the second kind tends to
+		account for a lot of code.
+		</para>
+
+		<para>
+		The first kind of logic is often very nicely accommodated by the
+		procedural logic. The second kind often (but not always) can benefit
+		from a more relational, SQLy definition. However the SQLy definitions
+		don't stay SQLy for long.  When every every SQL
+		statement executes, it gets compiled first into the procedural form,
+		and only then executes as the procedural code.
+		</para>
+
+		<para>
+		The Triceps approach is tilted toward the procedural execution. That is,
+		the procedural definitions come out of the box, and then the high-level
+		relational logic can be defined on top of them with the templates and
+		code generators.
+		</para>
+
+		<indexterm>
+			<primary>label</primary>
+		</indexterm>
+		<para>
+		These bits of code, especially where the first and second kind connect,
+		need some way to pass the data and operations between them. In Triceps
+		these connection points are called Labels.
+		</para>
+
+		<indexterm>
+			<primary>Aleri</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Coral8</primary>
+		</indexterm>
+		<para>
+		The streaming data rows enter the procedural logic through a label.
+		Each row causes one call on the label. From the functional standpoint
+		they are the same as Coral8 Streams, as has been shown in
+		<xref linkend="sc_1950s" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		Except that in Triceps the labels receive not just
+		rows but operations on rows, as in Aleri: a combination of a row and an
+		operation code. 
+		</para>
+
+		<para>
+		They are named <quote>labels</quote> because Triceps has been built
+		around the more procedural ideas, and when looked at from that side,
+		the labels are targets of calls and GOTOs.
+		</para>
+
+		<indexterm>
+			<primary>data flow</primary>
+		</indexterm>
+		<indexterm>
+			<primary>GOTO</primary>
+		</indexterm>
+		<para>
+		If the streaming model is defined as a data flow graph, each arrow in
+		the graph is essentially a GOTO operation, and each node is a label.
+		</para>
+
+		<para>
+		A Triceps label is not quite a GOTO label, since the actual procedural
+		control always returns back after executing the label's code. It can be
+		thought of as a label of a function or procedure. But if the caller
+		does nothing but immedially return after getting the control back, it
+		works very much like a GOTO label.
+		</para>
+
+		<para>
+		Each label accepts operations on rows of a certain type.
+		</para>
+
+		<para>
+		Each label belongs to a certain execution unit, so a label can be used
+		only strictly inside one thread and can not be shared between threads.
+		</para>
+
+		<para>
+		Each label may have some code to execute when it receives a row
+		operation. The labels without code can be useful too.
+		</para>
+
+		<indexterm>
+			<primary>label</primary>
+			<secondary>chaining</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>DummyLabel</primary>
+		</indexterm>
+		<para>
+		A Triceps model contains the straightforward code and the mode complex
+		stateful elements, such as tables, aggregators, joiners (which may be
+		implemented in &Cpp; or in Perl, or created as user templates). These
+		stateful elements would have some input labels, where the actions may
+		be sent to them (and the actions may also be done as direct method
+		calls), and output labels, where they would produce the indications of
+		the changed state and/or responses to the queries. This is shown
+		in the diagram in
+		<xref linkend="fig_label_chain" xrefstyle="select: label nopage"/>&xrsp;.
+		The output labels
+		are typically the ones without code (<quote>dummy labels</quote>). They do nothing
+		by themselves, but can pass the data to the other labels. This passing
+		of data is achieved by <i>chaining</i> the labels: when a label is
+		called, it will first execute its own code (if it has any), and then
+		call the same operation on whatever labels are chained from it. Which
+		may have more labels chained from them in turn. So, to pass the data,
+		chain the input label of the following element to the output label of
+		the previous element.
+		</para>
+
+		<figure id="fig_label_chain" >
+			<title>Stateful elements with chained labels.</title>
+			<xi:include href="file:///FIGS/label-000-chain.xml"/> 
+			<!-- <graphic scale="100%" contentwidth="5in" fileref="label-000-chain.svg"/> -->
+		</figure>
+
+		<para>
+		The make things clear, a label doesn't have to be a part of a stateful
+		element. The labels absolutely can exist by themselves. It's just that
+		the stateful elements can use the labels as their endpoints.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_Label_construction">
+		<title>Label construction</title>
+
+		<para>
+		The execution unit provides methods to construct labels. A dummy label
+		is constructed as:
+		</para>
+
+		<indexterm>
+			<primary>label</primary>
+			<secondary>dummy</secondary>
+		</indexterm>
+<pre>
+$label = $unit->makeDummyLabel($rowType, "name");
+</pre>
+
+		<para>
+		It takes as arguments the type of rows that the label will accept and
+		the symbolic name of the label. As usual, the name can be any but for the ease of
+		debugging it's better to give the same name as the label variable.
+		</para>
+
+		<para>
+		The label with Perl code is constructed as follows:
+		</para>
+
+		<indexterm>
+			<primary>label</primary>
+			<secondary>Perl</secondary>
+		</indexterm>
+<pre>
+$label = $unit->makeLabel($rowType, "name", $clearSub,
+	$execSub, @args);
+</pre>
+
+		<para>
+		The row type and name arguments are the same as for the dummy label.
+		The following two arguments provide the references to the Perl functions
+		that perform the actions. 
+		They can be specified as a function reference or a source code string, see
+		<xref linkend="sc_code" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;. 
+		<pre>$execSub</pre> is the function that executes to
+		handle the incoming rows. It gets the arguments:
+		</para>
+
+<pre>
+&$execSub($label, $rowop, @args)
+</pre>
+
+		<para>
+		Here <pre>$label</pre> is this label, <pre>$rowop</pre> is the row operation, and <pre>@args</pre>
+		are the same as extra arguments specified at the label creation.
+		</para>
+
+		<indexterm>
+			<primary>label</primary>
+			<secondary>chaining</secondary>
+		</indexterm>
+		<para>
+		The row operation actually contains the label reference, so why pass it
+		the second time? The reason lies in the chaining. The current label may
+		be chained, possibly through multiple levels, to some original label,
+		and the rowop will refer to that original label. The extra argument
+		lets the code find the current label.
+		</para>
+
+		<para>
+		<pre>$clearSub</pre> is the function that clears the label. It will be explained in the
+		<xref linkend="sc_memory_labels" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		Either of <pre>$execSub</pre> and <pre>$clearSub</pre> can be specified as <pre>undef</pre>. Though
+		a label with an undefined <pre>$execSub</pre> makes the label useless for anything
+		other than clearing. On an attempt to send data to it, it will complain that
+		the label has been cleared.
+		The undefined <pre>$clearSub</pre> causes the function
+		<pre>Triceps::clearArgs()</pre> to be used as the default, which provides the
+		correct reaction for most situations.
+		</para>
+
+		<indexterm>
+			<primary>label</primary>
+			<secondary>clearing</secondary>
+		</indexterm>
+
+		<para>
+		There is a special convenience constructor for the labels that are used
+		only for clearing an object (their usefulness is discussed in
+		<xref linkend="sc_memory_labels" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;).
+		</para>
+
+<pre>
+$lb = $unit->makeClearingLabel("name", @args);
+</pre>
+
+		<para>
+		The arguments would be the references to the objects that need clearing,
+		usually the object's <pre>$self</pre>. They will be cleared with
+		<pre>Triceps::clearArgs()</pre> when the label clearing gets called.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_LabelOther">
+		<title>Other label methods</title>
+
+		<para>
+		The chaining of labels is done with the method:
+		</para>
+
+<pre>
+$label1->chain($label2);
+</pre>
+
+		<para>
+		<pre>$label2</pre> becomes chained to <pre>$label1</pre>.
+		A label can not be chained to itself, neither directly nor through
+		other intermediate labels. The row types of the chained labels must be equal
+		(this is more strict than for queueing up the row operations for labels,
+		and might change one or the other way in the future).
+		</para>
+
+		<para>
+		When <pre>$label1</pre> executes, its chained labels will normally
+		be executed in the order they were chained. However sometines it's
+		necessary to add a label to the chain later but have it called
+		first. This is done with the method:
+		</para>
+
+<pre>
+$label1->chainFront($label2);
+</pre>
+
+		<para>
+		It chains <pre>$label2</pre> at the start of the chain. Of course,
+		if more labels will be chained at the front afterwards, <pre>$label2</pre>
+		will be called only after them. But usually there is a need for only
+		one such label, and it's usually connected to the FnReturn and Facet
+		objects. For an example, see
+		<xref linkend="sc_mt_pipeline" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<para>
+		A label's chainings can be cleared with
+		</para>
+
+<pre>
+$label1->clearChained();
+</pre>
+
+		<para>
+		It returns nothing, and clears the chainings from this label. There is
+		no way to unchain only some selected labels.
+		</para>
+
+		<para>
+		To check if there are any labels chained from this one, use:
+		</para>
+
+<pre>
+$result = $label->hasChained();
+</pre>
+
+		<para>
+		The same check can be done with
+		</para>
+
+<pre>
+@chain = $label->getChain();
+
+if ($#chain >= 0) { ... }
+</pre>
+
+		<para>
+		but <pre>hasChained()</pre> is more efficient since it doesn't have
+		to construct that intermediate array.
+		</para>
+
+		<para>
+		There is also a convenience method that
+		creates a new label by chaining it from an existing label:
+		</para>
+
+<pre>
+$label2 = $label1->makeChained($name, $subClear, $subExec, @args);
+</pre>
+
+		<para>
+		The arguments are very much the same as in <pre>Unit::makeLabel()</pre>, only there is
+		no need to specify the row type for the new label (nor obviously the
+		Unit), these are taken from the original label. It's really a wrapper
+		that finds the unit and row type from <pre>label1</pre>, makes a new
+		label, and then chains it off <pre>label1</pre>.
+		</para>
+
+
+		<para>
+		The whole label can be cleared with
+		</para>
+
+<pre>
+$label->clear();
+</pre>
+
+		<para>
+		This is fully equivalent to what happens when an execution unit clears
+		the labels: it calls the clear function (if any) and clears the
+		chainings. Note that the labels that used to be chained from this one
+		do not get cleared themselves, they're only unchained from this one.
+		To check whether the label has been already cleared use:
+		</para>
+
+<pre>
+$result = $label->isCleared();
+</pre>
+
+		<para>
+		Labels have the usual way of comparing the references:
+		</para>
+
+<pre>
+$label1->same($label2)
+</pre>
+
+		<para>
+		returns true if both references point to the same label object.
+		</para>
+
+		<para>
+		The labels introspection can be done with the methods:
+		</para>
+
+<pre>
+$rowType = $label->getType();
+$rowType = $label->getRowType();
+$unit = $label->getUnit();
+$name = $label->getName();
+@chainedLabels = $label->getChain();
+$execSubRef = $label->getCode();
+</pre>
+
+		<para>
+		The methods <pre>getType()</pre> and <pre>getRowType()</pre> are the same, they both return
+		the row type of the label. <pre>getType()</pre> is shorter, which looked convenient
+		for a while, but <pre>getRowType()</pre> has the name consistent with the
+		rest of the classes. This consistency comes useful when passing the objects
+		of various types to the same methods, using the Perl's name-based
+		polymorphism. For now both of them are present, but <pre>getType()</pre> will
+		likely be deprecated in the future.
+		</para>
+
+		<para>
+		If the label has been cleared, <pre>getUnit()</pre> will return an
+		<pre>undef</pre>. <pre>getChain()</pre> returns an array of references
+		to the chained labels. <pre>getCode()</pre> is actually half-done
+		because it returns just the Perl function reference to the execution
+		handler but not its arguments, nor reference to the clearing function.
+		It will be changed in the future to fix these issues.
+		<pre>getCode()</pre> is not applicable to the dummy labels, and would
+		return an <pre>undef</pre> for them.
+		</para>
+
+		<para>
+		The labels actually exist in multiple varieties. The underlying common
+		denominator is the &Cpp; class Label. This class may be extended and the
+		resulting labels embedded into the &Cpp; objects. These labels can be
+		accesses and controlled from Perl but their logic is hardcoded in their
+		objects and is not directly visible from Perl. The dummy labels are
+		a subclass of labels in general, and can be constructed directly
+		from Perl. Another subclass is the labels with the Perl handlers.
+		They can be constructed from Perl, and really only from Perl. The &Cpp;
+		code can access and control them, in a symmetrical relation. The
+		method <pre>getCode()</pre> has meaning only on these Perl labels.
+		Finally, the clearing labels also get created from Perl, and fundamentally
+		are Perl labels with many settings hardcoded in the constructor.
+		<pre>getCode()</pre> can be used on them too but since they have
+		no handler code, it would always return <pre>undef</pre>.
+		</para>
+
+		<para>
+		There is also a way to change a label's name:
+		</para>
+
+<pre>
+$label->setName($name);
+</pre>
+
+		<para>
+		It returns nothing, and there is probably no reason to call it. It will
+		likely be removed in the future.
+		</para>
+
+		<para>
+		The label also provides the constructor methods for the row operations, 
+		which are described below.
+		</para>
+
+		<para>
+		And for completeness I'll mention the methods used to mark the
+		label as non-reentrant and to read this mark back. They will be described
+		in detail in 
+		<xref linkend="sc_sched_recursion" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+<pre>
+$label->setNonReentrant();
+$val = $label->isNonReentrant();
+</pre>
+
+	</sect1>
+
+	<sect1 id="sc_Rowop">
+		<title>Row operations</title>
+
+		<indexterm>
+			<primary>Rowop</primary>
+		</indexterm>
+		<indexterm>
+			<primary>row operation</primary>
+		</indexterm>
+
+		<para>
+		A row operation (also known as rowop) in Triceps is an unit of work for
+		a label. It's always destined for a particular label (which could also
+		pass the rowop to its chained labels), and has a row to process and an opcode.
+		The opcodes will be described momentarily in the
+		<xref linkend="sc_opcodes" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<para>
+		A row operation is constructed as:
+		</para>
+
+<pre>
+$rowop = $label->makeRowop($opcode, $row);
+</pre>
+
+		<para>
+		The opcode may be specified an integer or as a string.
+		Historically, there is also an optional extra argument for the enqueuing
+		mode but it's already obsolete, so I don't show it here.
+		</para>
+
+		<para>
+		Since the labels are single-threaded, the rowops are single-threaded
+		too. The rowops are immutable, just as the rows are. It's possible
+		to keep a rowop around and call it over and over again.
+		</para>
+
+		<para>
+		A rowop can be created from a bunch of fields in an array or hash form 
+		in two steps:
+		</para>
+
+<pre>
+$rowop = $label->makeRowop($opcode, $rt->makeRowHash(
+	$fieldName => $fieldValue, ...));
+$rowop = $label->makeRowop($opcode, $rt->makeRowArray(@fields));
+</pre>
+
+		<para>
+		Since this kind of creation happens fairly often, writing out these
+		calls every time becomes tedious. The Label provides the combined
+		constructors to make life easier:
+		</para>
+
+<pre>
+$rowop = $label->makeRowopHash($opcode, $fieldName => $fieldValue, ...);
+$rowop = $label->makeRowopArray($opcode, @fields);
+</pre>
+
+		<indexterm>
+			<primary>error handling</primary>
+		</indexterm>
+		<para>
+		Note that they don't need the row type argument any more,
+		because the label knows the row type and provides it.
+		Internally these methods are currently implemented in Perl, and just wrap
+		the two calls into one.  In the future they will be rewritten
+		in &Cpp; for greater efficiency.
+		</para>
+
+		<para>
+		There also are the methods that create a rowop and immediately
+		call it. They will be described with the execution unit.
+		</para>
+
+		<para>
+		A copy of rowop (not just another reference but an honest separate
+		copied object) can be created with:
+		</para>
+
+<pre>
+$rowop2 = $rowop1->copy();
+</pre>
+
+		<para>
+		However, since the rowops are immutable, a reference is just as good as
+		a copy. This method is historic and will likely be removed or modified.
+		</para>
+
+		<para>
+		A more interesting operation is the rowop adoption:
+		it is a way to pass the row and opcode from one rowop to another new
+		one, with a different label.
+		</para>
+
+		<indexterm>
+			<primary>label</primary>
+			<secondary>adoption</secondary>
+		</indexterm>
+<pre>
+$rowop2 = $label->adopt($rowop1);
+</pre>
+
+		<para>
+		It is very convenient for building the label handlers that pass the
+		rowops to the other labels unchanged. For example, a label
+		that filters the data and passes it to the next label, can be implemented as
+		follows:
+		</para>
+
+<pre>
+my $lab1 = $unit->makeLabel($rt1, "lab1", undef, sub {
+	my ($label, $rowop) = @_;
+	if ($rowop->getRow()->get("a") > 10) {
+		$unit->call($lab2->adopt($rowop));
+	}
+});
+</pre>
+
+		<para>
+		This code doesn't even look at the opcode in the rowop, it just
+		passes it through and lets the next label worry about it.
+		The functionality of <pre>adopt()</pre> also can be implemented with
+		</para>
+
+<pre>
+$rowop2 = $label->makeRowop($rowop1->getOpcode(), $rowop1->getRow());
+</pre>
+
+		<para>
+		But <pre>adopt()</pre> is easier to call and also more efficient,
+		because less of the intermediate data surfaces from the &Cpp; level to
+		the Perl level.
+		</para>
+
+		<para>
+		The references to rowops can be compared as usual:
+		</para>
+
+<pre>
+$rowop1->same($rowop2)
+</pre>
+
+		<para>
+		returns true if both point to the same rowop object.
+		</para>
+
+		<para>
+		The rowop data can be extracted back:
+		</para>
+
+<pre>
+$label = $rowop->getLabel();
+$opcode = $rowop->getOpcode();
+$row = $rowop->getRow();
+</pre>
+
+		<para>
+		A Rowop can be printed (usually for debugging purposes) with
+		</para>
+
+<pre>
+$string = $rowop->printP();
+$string = $rowop->printP($name);
+</pre>
+
+		<para>
+		Just as with a row, the method <pre>printP()</pre> is implemented in Perl. In
+		the future a <pre>print()</pre> done right in &Cpp; may be added, but for now I try
+		to keep all the interpretation of the data on the Perl side. Even though
+		<pre>printP()</pre> is implemented in Perl, it can print the rowops
+		for any kinds of labels.  The
+		following example gives an idea of the format in which the rowops get
+		printed:
+		</para>
+
+<pre>
+$lb = $unit->makeDummyLabel($rt, "lb");
+$rowop = $lb->makeRowop(&Triceps::OP_INSERT, $row);
+print $rowop->printP(), "\n";
+</pre>
+
+		<para>
+		would produce
+		</para>
+
+<pre>
+lb OP_INSERT a="123" b="456" c="3000000000000000" d="3.14" e="text" 
+</pre>
+
+		<para>
+		The row contents is printed through <pre>Row::printP()</pre>, so it has
+		the same format.
+		</para>
+
+		<para>
+		The optional argument allows to override the name of the label
+		printed. For example, if in the example above the last line were
+		to be replaced with
+		</para>
+
+<pre>
+print $rowop->printP("OtherLabel"), "\n";
+</pre>
+
+		<para>
+		the result will become:
+		</para>
+
+<pre>
+OtherLabel OP_INSERT a="123" b="456" c="3000000000000000" d="3.14" e="text" 
+</pre>
+
+		<para>
+		It makes the printing of rowops in the chained
+		labels more convenient. A chained label's execution handler receives
+		the original unchanged rowop that refers to the first label in the
+		chain. So when it gets printed, it will print the name of the first
+		label in the chain, which might be very surprising. The explicit
+		argument allows to override it to the name of the chained label (or to
+		any other value).
+		</para>
+	</sect1>
+
+	<sect1 id="sc_opcodes">
+		<title>Opcodes</title>
+
+		<para>
+		The defined opcodes are:
+		</para>
+
+		<indexterm>
+			<primary>opcode</primary>
+		</indexterm>
+		<itemizedlist>
+		<listitem>
+			<pre>&Triceps::OP_NOP</pre> or <pre>"OP_NOP"</pre>
+		</listitem>
+		<listitem>
+			<pre>&Triceps::OP_INSERT</pre> or <pre>"OP_INSERT"</pre>
+		</listitem>
+		<listitem>
+			<pre>&Triceps::OP_DELETE</pre> or <pre>"OP_DELETE"</pre>
+		</listitem>
+		</itemizedlist>
+
+		<para>
+		The meaning is straightforward: NOP does nothing, INSERT inserts
+		a row, DELETE deletes a row. There is no opcode to replace or
+		update a row. The updates are done as two separate operations: first
+		DELETE the old value then INSERT the new value. The order is
+		important: the old value has to be deleted before inserting the new one.
+		But there is no requirement that these operations must go one
+		after another. If you want to update ten rows, you can first
+		delete all ten and then insert the new ten. In the
+		normal processing the end result will be the same, even though
+		it might go through some different intermediate states.
+		It's a good idea to write your models to follow the same principle.
+		</para>
+
+		<para>
+		Internally an opcode is always represented as an integer constant.
+		The same constant value can be obtained by calling the functions
+		<pre>&Triceps::OP_*</pre>. However when constructing the rowops,
+		you can also use the string literals <pre>"OP_*"</pre> with
+		the same result, they will be automatically transtaled to the integers. 
+		In fact, the string literal form is slightly
+		faster (unless you save the result of the function in a variable
+		and then use the integer value from that variable for the
+		repeated construction).
+		</para>
+
+		<para>
+		But when you get the opcodes back from rowops, they are always
+		returned as integers. Triceps provides functions that convert
+		the opcodes between the integer and string constants:
+		</para>
+
+		<indexterm>
+			<primary>constants</primary>
+		</indexterm>
+<pre>
+$opcode = &Triceps::stringOpcode($opcodeName);
+$opcodeName = &Triceps::opcodeString($opcode); 
+</pre>
+
+		<para>
+		They come handy for all kinds of print-outs. If you pass the invalid
+		values, the conversion to integers will return an <pre>undef</pre>.
+		</para>
+
+		<para>
+		The conversion of the invalid integers to strings is more interesting.
+		And by the way, you can pass the invalid integer opcodes to the
+		rowop construction too, and they won't be caught. The way they
+		will be processed is a bit of a lottery. The proper integer values
+		are actually bitmasks, and they are nicely formatted to make sense.
+		The invalid values would make some random bitmasks, and they will
+		get processed in some unpredictable way. When converting an invalid
+		integer to a string, <pre>opcodeString</pre> tries to predict and 
+		show this way in a set of letters <pre>I</pre> and <pre>D</pre>
+		in square brackets, for INSERT and DELETE flags. If both are present, 
+		usually the INSERT flag wins over the DELETE in the processing. 
+		If none are present, it's a NOP.
+		</para>
+
+		<para>
+		In the normal
+		processing you don't normally read the opcode and then compare
+		it with different values. Instead you check the meaning of the
+		opcode (that is internally a bitmask) directly with the rowop methods:
+		</para>
+
+<pre>
+$rowop->isNop()
+$rowop->isInsert()
+$rowop->isDelete()
+</pre>
+
+		<para>
+		The typical idiom for the label's handler function is:
+		</para>
+
+<pre>
+if ($rowop->isInsert()) {
+	# handle the insert logic ...
+} elsif($rowop->isDelete()) {
+	# handle the delete logic...
+}
+</pre>
+
+		<para>
+		The NOPs get silently ignored in this idiom, as they should be.
+		Generally there is no point in creating the rowops with the <pre>OP_NOP</pre> opcode,
+		unless you want to use them for some weird logic.
+		</para>
+
+		<para>
+		The main Triceps package also provides functions to check the integer
+		opcode values directly:
+		</para>
+
+<pre>
+Triceps::isNop($opcode)
+Triceps::isInsert($opcode)
+Triceps::isDelete($opcode)
+</pre>
+
+		<para>
+		The same-named methods of Rowop are just the more convenient and
+		efficient way to say
+		</para>
+
+<pre>
+Triceps::isNop($rowop->getOpcode())
+Triceps::isInsert($rowop->getOpcode())
+Triceps::isDelete($rowop->getOpcode())
+</pre>
+
+		<para>
+		They handle the whole logic directly in &Cpp; without an extra
+		Perl conversion of the values.
+		</para>
+
+	</sect1>
+
+</chapter>

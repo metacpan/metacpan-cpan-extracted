@@ -1,0 +1,54 @@
+{
+   "abstract" : "reap variables in new threads by attribute",
+   "author" : [
+      "Jens Rehsack <rehsack@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132510",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "threads-variables-reap-attr",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.90"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "threads" : "0"
+         },
+         "requires" : {
+            "Attribute::Lexical" : "0.002",
+            "perl" : "5.008",
+            "threads::variables::reap" : "0.06"
+         }
+      }
+   },
+   "provides" : {
+      "threads::variables::reap::attr" : {
+         "file" : "lib/threads/variables/reap/attr.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/rehsackthreads-variables-reap-attr"
+      }
+   },
+   "version" : "0.06"
+}

@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_ref_table_type"  xmlns:xi="http://www.w3.org/2001/XInclude">
+		<title>TableType reference</title>
+
+		<indexterm>
+			<primary>TableType</primary>
+		</indexterm>
+
+		<para>
+		The TableType is the information about the structure of a Table.
+		It can be used to create multiple Tables in the same mold.
+		</para>
+
+<pre>
+$tt = Triceps::TableType->new($rowType);
+</pre>
+
+		<para>
+		Constructs the TableType. The TableType is anonymous, it has no string name.
+		After that it can be configured by adding the index types. Eventually
+		it has to be initialized and that freezes the table type and makes it
+		immutable. All the steps up to and including the initialization must be
+		done from a single thread, after initialization a table type may be
+		shared between multiple threads.
+		</para>
+
+<pre>
+$tt->addSubIndex("indexName", $indexType);
+</pre>
+
+		<para>
+		Adds an index type, naming it within the scope of the table type.  
+		The result is the same table type (unless it's an
+		<pre>undef</pre> signifying an error), so the index type additions can be
+		chained with each other and with the construction:
+		</para>
+
+<pre>
+$tt = Triceps::TableType->new($rowType) 
+	->addSubIndex("indexName1", $indexType1) 
+	->addSubIndex("indexName2", $indexType2)
+;
+</pre>
+
+		<para>
+		The table type initialization freezes not only the table type
+		itself but also all the index types in it. Also, the index types
+		become permanently tied to this one table type.  That would make things
+		difficult if the same index type is added to two table types. To avoid
+		these issues, <pre>addSubIndex()</pre> adds not the actual argument index type but
+		first creates a fresh uninitialized deep copy of it, and then adds it.
+		</para>
+
+<pre>
+$tt->initialize();
+</pre>
+
+		<para>
+		Initializes the table type.
+		The index types check most of their arguments at the initialization
+		time, so that's where most of the errors will be reported. Calling
+		<pre>initialize()</pre> repeatedly will have no effect and just return the same
+		result again and again. 
+		</para>
+
+<pre>
+$result = $tt->isInitialized();
+</pre>
+
+		<para>
+		Checks whether the table type has been initialized.
+		</para>
+
+<pre>
+$rowType = $tt->rowType();
+$rowType = $tt->getRowType();
+</pre>
+
+		<para>
+		Returns the row type. One method name is historic, the other has been added
+		for consistency.
+		</para>
+
+<pre>
+$indexType = $tt->findSubIndex("indexName");
+$indexType = $tt->findSubIndexSafe("indexName");
+</pre>
+
+		<para>
+		Finds an index type by name.
+		This is symmetric with <pre>addSubIndex()</pre>, so it works only for the
+		top-level index types. To get the nested ones, repeat the same call on
+		the found index types or see the following methods.
+		The <pre>Safe</pre> version returns <pre>undef</pre> if the index is not
+		found, instead of confessing.
+		</para>
+
+<pre>
+$indexType = $tt->findIndexPath( ["indexName", "nestedIndexName"] );
+</pre>
+
+		<para>
+		Finds an index type by the path of names leading to it in the index type tree.
+		If the path is not found, the function would confess.
+		An empty path is also illegal and would cause the same result.
+		The argument is not an array but a reference to array of names.
+		</para>
+
+<pre>
+($indexType, @keys) = $tt->findIndexKeyPath( ["indexName", "nestedIndexName"] );
+</pre>
+
+		<para>
+		Finds by path an index type that allows the direct look-up by key
+		fields. It requires that every index type in the path returns a
+		non-empty array of fields in <pre>getKey()</pre>. In practice it means that every
+		index in the path must be a Hashed index. Otherwise the method
+		confesses. When the Sorted and maybe other index types will support
+		<pre>getKey()</pre>, they will be usable with this method too.
+		The argument is not an array but a reference to array of names.
+		</para>
+
+		<para>
+		Besides checking that each index type in the path works by keys, this
+		method builds and returns the list of all the key fields required for a
+		look-up in this index. Note that <pre>@keys</pre> is an actual array and not a
+		reference to array. The return protocol of this method is a little
+		weird: it returns an array of values, with the first value being the
+		reference to the index type, and the rest of them the names of the key
+		fields.
+		</para>
+
+<pre>
+@idxPath = $tt->findIndexPathForKeys(@keyFields);
+</pre>
+
+		<para>
+		Finds an index path that matches the set of key fields.
+		It returns the array that represents the path.
+		And then having the path you can find the
+		index type as such. The index type and all the types in the path
+		have to be of the Hashed variety (returning their set of keys
+		with the method <pre>getKey()</pre>). If the correct index cannot
+		be found, an empty array is returned. If you specify the fields that
+		aren't present in the row type in the first place, this is simply
+		treated the same as being unable to find an index for these fields.
+		If more that one index would match, the first one found in the direct
+		order of the index tree walk is returned.
+		</para>
+
+<pre>
+$indexType = $tt-findSubIndexById($indexTypeId);
+</pre>
+
+		<para>
+		Finds the first top-level index type of a particular kind. The <pre>$indexTypeId</pre>
+		is one of the <pre>IT_*</pre> constants in integer or string form.
+		</para>
+
+<pre>
+$indexType = $tt->getFirstLeaf();
+</pre>
+
+		<para>
+		Returns the first leaf index type (the one used for the default
+		look-ups and iteration on the tables of this type).
+		</para>
+
+<pre>
+@indexTypes = $tt->getSubIndexes();
+%indexTypes = $tt->getSubIndexes();
+</pre>
+
+		<para>
+		Returns all the top-level index types.  The resulting array contains
+		the pairs of names and index types. If the order is not important but
+		you want to perform the look-ups by name, the result can be stored
+		directly into a hash. However if you plan to use the data to add index
+		types to another table type, don't use the hash because the order of
+		indexes is important and the hash loses it.
+		</para>
+
+<pre>
+$result = $tt1->same($tt2);
+$result = $tt1->equals($tt2);
+$result = $tt1->match($tt2); 
+</pre>
+
+		<para>
+		The usual reference comparison methods.
+		</para>
+
+		<para>
+		Two table types are considered equal when they have the equal row types,
+		and exactly the same set of index types, with the same names.
+		</para>
+
+		<para>
+		Two table types are considered matching when they have the matching row types,
+		and matching set of index types, although the names of the index types
+		may be different.
+		</para>
+
+<pre>
+$res = $tt->print();
+</pre>
+
+		<para>
+		Presents the content of a table type as a human-readable description.
+		Accepts the usual <pre>print()</pre> arguments.
+		</para>
+
+<pre>
+$newtt = $tt->copy();
+</pre>
+		<para>
+		Copy the table type, along with copying all the index types in
+		it, since each table type must have its own instances of the index
+		types. The copied table type is always uninitialized and thus can
+		be further extended by defining more indexes and aggregators.
+		</para>
+
+		<para>
+		In case if the table type collected errors, the errors aren't copied,
+		and in general you should not copy such a table type. The errors
+		will be detected again when you try to initialize the copy.
+		</para>
+
+<pre>
+$newtt = $tt->copyFundamental();
+$newtt = $tt->copyFundamental(@idx_type_paths);
+$newtt = $tt->copyFundamental("NO_FIRST_LEAF", @idx_type_paths);
+</pre>
+
+		<para>
+		Copy only the fundamental data organization of the table type:
+		the row type and the primary index (the whole path to the
+		first leaf index type), and leave alone the rest. All the aggregators
+		on all the indexes, even on the primary one, are not included in the
+		copy. This is a convenient way to create another table, usually
+		in a different thread, that would add its own secondary indexes
+		and aggregators. See
+		<xref linkend="sc_mt_objects" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;
+		for more detail.
+		</para>
+
+		<para>
+		The optional index type paths can be used to include the secondary
+		indexes into the copy. Each path is a reference to an array of index names,
+		such as <pre>[ "byDate", "byAddress", "fifo" ]</pre>. The path must
+		lead all the way to a leaf index. A special path element <pre>"+"</pre>
+		can be used last with the meaning <quote>the first leaf index from this point</quote>.
+		Multiple paths may overlap, their overlapping parts will be copied only once.
+		A special string <pre>"NO_FIRST_LEAF"</pre> used as the first argument
+		excludes the first leaf index
+		from the copy, then only the explicitly specified index paths will be copied.
+		</para>
+	</sect1>

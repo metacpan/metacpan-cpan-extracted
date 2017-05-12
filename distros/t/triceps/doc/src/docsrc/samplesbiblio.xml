@@ -1,0 +1,175 @@
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+
+	<bibliography>
+		<title>Bibliography</title>
+		<bibliodiv>
+
+		<biblioentry id="Mattson05">
+			<authorgroup>
+				<author><firstname>Timothy G.</firstname><surname>Mattson</surname></author>
+				<author><firstname>Beverly A.</firstname><surname>Sanders</surname></author>
+				<author><firstname>Berna L.</firstname><surname>Massingill</surname></author>
+			</authorgroup>
+			<copyright> <year>2005</year> </copyright>
+			<isbn>0-321-22811-1</isbn>
+			<publisher>
+				<publishername>Addison-Wesley</publishername>
+			</publisher>
+			<title>Patterns for parallel programming</title>
+			<seriesinfo>
+				<title>The Software Patterns Series</title>
+				<editor>
+					<firstname>John M.</firstname><surname>Vlissides</surname>
+				</editor>
+				<publisher>
+					<publishername>Addison-Wesley</publishername>
+				</publisher>
+			</seriesinfo>
+		</biblioentry>
+
+		<biblioentry id="Breshears09">
+			<authorgroup>
+				<author><firstname>Clay</firstname><surname>Breshears</surname></author>
+			</authorgroup>
+			<copyright> <year>2009</year> </copyright>
+			<isbn>978-0-596-52153-0</isbn>
+			<publisher>
+				<publishername>O'Reilly</publishername>
+			</publisher>
+			<title>The art of concurrency</title>
+		</biblioentry>
+
+		<biblioentry id="Schimmel94">
+			<authorgroup>
+				<author><firstname>Curt</firstname><surname>Schimmel</surname></author>
+			</authorgroup>
+			<copyright> <year>1994</year> </copyright>
+			<isbn>0-201-63338-8</isbn>
+			<publisher>
+				<publishername>Addison-Wesley</publishername>
+			</publisher>
+			<title>UNIX systems for modern architectures: symmetric multiprocessing and caching for kernel programmers</title>
+		</biblioentry>
+
+		<biblioentry id="Butenhof97">
+			<authorgroup>
+				<author><firstname>David R.</firstname><surname>Butenhof</surname></author>
+			</authorgroup>
+			<copyright> <year>1997</year> </copyright>
+			<isbn>0-201-63392-2</isbn>
+			<publisher>
+				<publishername>Addison-Wesley</publishername>
+			</publisher>
+			<title>Programming with POSIX threads</title>
+		</biblioentry>
+
+		<biblioentry id="Mauro01">
+			<authorgroup>
+				<author><firstname>Jim</firstname><surname>Mauro</surname></author>
+				<author><firstname>Richard</firstname><surname>McDougall</surname></author>
+			</authorgroup>
+			<copyright> <year>2001</year> </copyright>
+			<isbn>0-13-022496-0</isbn>
+			<publisher>
+				<publishername>Sun Microsystems Press</publishername>
+			</publisher>
+			<title>Solaris internals: core kernel components</title>
+		</biblioentry>
+
+		<biblioentry id="McKusick96">
+			<authorgroup>
+				<author><firstname>Marshall Kirk</firstname><surname>McKusick</surname></author>
+				<author><firstname>Keith</firstname><surname>Bostic</surname></author>
+				<author><firstname>Michael J.</firstname><surname>Karels</surname></author>
+				<author><firstname>John S.</firstname><surname>Quarterman</surname></author>
+			</authorgroup>
+			<copyright> <year>1996</year> </copyright>
+			<isbn>0-201-54979-4</isbn>
+			<publisher>
+				<publishername>Addison-Wesley</publishername>
+			</publisher>
+			<title>The design and implementation of the 4.4BSD operating system</title>
+		</biblioentry>
+
+		<biblioentry id="Hoare85">
+			<authorgroup>
+				<author><firstname>C.A.R.</firstname><surname>Hoare</surname></author>
+			</authorgroup>
+			<copyright> <year>1985</year> </copyright>
+			<isbn>0-13-153271-5</isbn>
+			<publisher>
+				<publishername>Prentice-Hall</publishername>
+			</publisher>
+			<title>Communicating sequential processes</title>
+		</biblioentry>
+
+		<biblioentry id="Alexandrescu01">
+			<authorgroup>
+				<author><firstname>Andrei</firstname><surname>Alexandrescu</surname></author>
+			</authorgroup>
+			<copyright> <year>2001</year> </copyright>
+			<isbn>0201704315</isbn>
+			<publisher>
+				<publishername>Addison-Wesley</publishername>
+			</publisher>
+			<title>Modern C++ design: generic programming and design patterns applied</title>
+		</biblioentry>
+
+		<biblioentry id="Sutter08">
+			<biblioset relation="journal">
+				<title>Dr.Dobb's Journal</title>
+			</biblioset>
+			<biblioset relation="article">
+				<title>Writing Lock-Free Code: A Corrected Queue</title>
+				<subtitle>
+					<ulink url="http://www.drdobbs.com/hpc-high-performance-computing/210604448"/>
+				</subtitle>
+				<author><surname>Sutter</surname><firstname>Herb</firstname></author>
+				<copyright><year>2008</year></copyright>
+			</biblioset>
+		</biblioentry>
+
+		<biblioentry id="Dice06">
+			<authorgroup>
+				<author><firstname>Dave</firstname><surname>Dice</surname></author>
+				<author><firstname>Ori</firstname><surname>Shalev</surname></author>
+				<author><firstname>Nir</firstname><surname>Shavit</surname></author>
+			</authorgroup>
+			<copyright> <year>2006</year> </copyright>
+			<publisher>
+				<publishername>In Proc. of the 20th Intl. Symp. on Distributed Computing</publishername>
+			</publisher>
+			<title>Transactional Locking II</title>
+			<subtitle>
+				<ulink url="http://research.sun.com/scalable/pubs/DISC2006.pdf"/>
+			</subtitle>
+		</biblioentry>
+
+		<biblioentry id="Melikyan">
+			<authorgroup>
+				<author><firstname>Hovik</firstname><surname>Melikyan</surname></author>
+			</authorgroup>
+			<title>C++ Portable Types Library</title>
+			<subtitle>
+				<ulink url="http://www.melikyan.com/ptypes/doc"/>
+			</subtitle>
+		</biblioentry>
+
+		<biblioentry id="SunStreams">
+			<authorgroup>
+				<!-- corpauthor would break the sorting -->
+				<author><surname>Sun Microsystems</surname></author>
+			</authorgroup>
+			<title>STREAMS Programming Guide</title>
+			<subtitle>
+				<ulink url="http://docs.sun.com/app/docs/doc/806-6546"/>
+			</subtitle>
+		</biblioentry>
+
+		</bibliodiv>
+	</bibliography>

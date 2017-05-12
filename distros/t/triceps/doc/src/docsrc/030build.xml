@@ -1,0 +1,875 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+<chapter id="ch_build" xmlns:xi="http://www.w3.org/2001/XInclude">
+	<title>Building Triceps</title>
+
+	<sect1 id="sc_build_download">
+		<title>Downloading Triceps</title>
+
+		<indexterm>
+			<primary>download</primary>
+		</indexterm>
+		<para>
+		The official Triceps site is located at SourceForge.
+		</para>
+
+		<para>
+		<ulink url="http://triceps.sf.net"/> is the high-level page.
+		</para>
+
+		<para>
+		<ulink url="http://sf.net/projects/triceps"/> is the SourceForge project page.
+		</para>
+
+		<para>
+		The official releases of Triceps can be downloaded from SourceForge and CPAN. The CPAN
+		location is:
+		</para>
+
+		<para>
+		<ulink url="http://search.cpan.org/~babkin/triceps/"/>
+		</para>
+
+		<para>
+		The Developer's Guide can also be found in the Kindle format on Amazon web site,
+		for the Amazon's minimal price of $1.
+		</para>
+
+		<para>
+		The release policy of Triceps is aimed towards the ease of development.
+		As the new features are added (or sometimes removed), they are checked into
+		the SVN repository and documented in the blog form at
+		<ulink url="http://babkin-cep.blogspot.com/"/>. Periodically 
+		the documentation updates are collected from the blog into this manual,
+		and the official releases are produced.
+		</para>
+
+		<para>
+		If you want to try out the most bleeding-edge features that have been
+		described on the blog but not officially released yet, you can get the
+		most recent code directly from the SVN repository.  The SVN code can be
+		checked out with
+		</para>
+
+<pre>
+svn co http://svn.code.sf.net/p/triceps/code/trunk
+</pre>
+
+		<para>
+		You don't need any login for check-out. You can keep it current with
+		latest changes by periodically running <pre>svn update</pre>. After
+		you've checked out the trunk, you can build it as usual. If you do have
+		a login and SSH key, you can use then as well:
+		</para>
+
+<pre>
+svn co svn+ssh://your_username@svn.code.sf.net/p/triceps/code/trunk
+</pre>
+
+	</sect1>
+
+	<sect1 id="sc_build_refenv">
+		<title>The reference environment</title>
+
+		<indexterm>
+			<primary>build</primary>
+			<secondary>environment</secondary>
+		</indexterm>
+		<para>
+		The tested reference build environment is where I do the Triceps development,
+		and currently it is Linux Fedora 11. The build should work
+		automatically on the other Linux systems as well, and the testing reports
+		from CPAN show that it usually works.
+		</para>
+
+		<para>
+		The build should work on the other Unix environments too but may
+		require some manual configuration for the available libraries.
+		The test reports from CPAN show that the BSD varieties (FreeBSD, OpenBSD,
+		MidnightBSD) usually do well.
+		</para>
+
+		<para>
+		Currently you must use the GNU Linux toolchain: GNU make, GNU &Cpp; 
+		compiler (version 4.4.1 has been tested), glibc, valgrind. You can build
+		without valgrind by running only the non-valgrind tests.
+		</para>
+
+		<para>
+		The older GNU compiler 4.1 and the newer compiler versions have been reported 
+		to work as well. But if you build the trunk code checked out from SVN
+		(or otherwise in the directory named <quote><pre>trunk</pre></quote>),
+		there is a catch with the warning flags. This kind of build treats almost all
+		warnings as errors, and this causes varying results
+		with the different compiler versions. The version 4.1
+		doesn't have the option <pre>-Wno-sign-conversion</pre> and
+		will fail on it. The newer compiler versions may have some extra warnings
+		that will be treated as errors (and since my reference compiler doesn't
+		check for them, the code may trigger them). The fix for this situation is
+		to edit <pre>cpp/Makefile.inc</pre> and change the
+		variable <pre>CFLAGS_WARNINGS</pre>, or just clear it altogether. In the release form
+		this is not an issue, in the release directory the warnings are not treated
+		as errors and no warning options are used.
+		</para>
+
+		<para>
+		GCC 4.1 is also known to have complaints about the construct 
+		<pre>sizeof(field)</pre>. I've modified the
+		reported occurrences but more might creep up in the future. If this
+		stops your build, change them to
+		<pre>sizeof(TypeOfField)</pre>.
+		</para>
+
+		<para>
+		The tested Perl versions are 5.10.0 and 5.19.0, and should work on any recent version
+		as well. With the earlier versions your luck may vary. The Makefile.PL
+		has been configured to require at least 5.8.0. The older versions
+		have a different threading module and definitely won't work.
+		</para>
+
+		<para>
+		The threads support in the Perl interpreter is needed to run
+		the multithreaded API. If your Perl is built without threads, the single-threaded
+		part is still usable but all the tests related to multithreading will fail.
+		The last version of Triceps with no threads support at all is 1.0.1,
+		and it's the last resort if you want to run without threads.
+		</para>
+
+		<para>
+		I am interested in hearing the reports about builds in various environments.
+		</para>
+
+		<para>
+		The normal build expectation is for the 64-bit machines. The 32-bit
+		machines should work (and the code even includes the special cases for
+		them) but have been untested at the moment. Some of the tests might fail
+		on the 32-bit and/or big-endian machines due to the different computation
+		of the hash values, and thus producing a different row order in the result.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_build_basic">
+		<title>The basic build</title>
+
+		<indexterm>
+			<primary>build</primary>
+		</indexterm>
+		<para>
+		If everything works, the basic build is simple, go to the Triceps
+		directory and run:
+		</para>
+
+<pre>
+make all
+make test
+</pre>
+
+		<para>
+		That would build and test both the &Cpp; and Perl portions of Triceps.
+		The &Cpp; libraries will be created under <pre>cpp/build</pre>.
+		The Perl libraries will be created under <pre>perl/Triceps/blib</pre>.
+		</para>
+
+		<para>
+		The tests are normally run with valgrind for the &Cpp; part, without valgrind
+		for the Perl part. The reason is that Perl produces lots of false positives,
+		and the suppressions depend on particular Perl versions and are not
+		exactly reliable.
+		</para>
+
+		<para>
+		If your system differs substantially, you may need to adjust the
+		configurable settings manually, since there is no <pre>./configure</pre> script
+		in the Triceps build yet. More information about them is in the
+		<xref linkend="sc_build_config" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<para>
+		The other interesting <pre>make</pre> targets are:
+		</para>
+
+		<variablelist>
+		<varlistentry>
+			<term><pre>clean</pre></term>
+			<listitem>
+			Remove all the built files.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>clobber</pre></term>
+			<listitem>
+			Remove the object files, forcing the libraries to be
+			rebuilt next time.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>vtest</pre></term>
+			<listitem>
+			Run the unit tests with valgrind, checking for leaks and
+			memory corruption.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>qtest</pre></term>
+			<listitem>
+			Run the unit tests quickly, without valgrind.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>release</pre></term>
+			<listitem>
+			Export from SVN a clean copy of the code and create
+			a release package. The package name will be triceps-<i>version</i>.tgz,
+			where the <i>version</i> is taken from the SVN directory name, from
+			where the current directory is checked out. This includes the build
+			of the documentation.
+			</listitem>
+		</varlistentry>
+		</variablelist>
+	</sect1>
+
+	<sect1 id="sc_build_run_doc">
+		<title>Building the documentation</title>
+
+		<indexterm>
+			<primary>build</primary>
+			<secondary>documentation</secondary>
+		</indexterm>
+		<para>
+		If you have downloaded the release package of Triceps, the documentation
+		is already included it in the built form. The PDF and HTML versions are
+		available in <pre>doc/pdf</pre> and <pre>doc/html</pre>. It is also available online from
+		<ulink url="http://triceps.sf.net"/>.
+		</para>
+
+		<indexterm>
+			<primary>DocBook</primary>
+		</indexterm>
+		<para>
+		The documentation is formatted in DocBook, that produces the PDF
+		and HTML outputs.
+		If you check out the source from SVN and want to build the documentation,
+		you need to download the DocBook tools needed to build it. 
+		I hate the dependency situations, when to build something you need
+		to locate, build and download dozens of other packages firsti,
+		and then the versions turn out to be updated, and don't want
+		to work together, and all kinds of hell break loose.
+		To make things easier, I've collected the set of packages that
+		I've used for the build and that are known to work.
+		They've collected in <ulink url="http://downloads.sourceforge.net/project/triceps/docbook-for-1.0/"/>.
+		The DocBook packages come originally from <ulink url="http://docbook.sf.net"/>,
+		plus a few extra packages that by now I forgot where I've got from.
+		An excellent book on the DocBook tools and their configuration is
+		<biblioref linkend="Stayton07"/>. And if you're interested, the
+		text formatting in Docbook is described in
+		<biblioref linkend="Walsh99"/>.
+		</para>
+
+		<para>
+		DocBook is great in the way it takes cary of great many things
+		automatically but configuring it is plainly a bitch. Fortunately,
+		it's all already taken care of. I've reused the infrastructure I've
+		built for my book <biblioref linkend="Babkin10"/> for Triceps.
+		Though some elements got dropped and some added.
+		</para>
+
+		<para>
+		Downloading and extraction of the DocBook tools gets taken care of
+		by running
+		</para>
+
+<pre>
+make -C doc/dbtools
+</pre>
+
+		<para>
+		These tools are written in Java, and the packages are already the
+		compiled binaries, so they don't need to be built. As long as
+		you have the Java runtime environment, they just run. However
+		like many Java packages, they are sloppy and often don't return
+		the correct return codes on errors. So the results of the build
+		have to be checked visually afterwards.
+		</para>
+
+		<para>
+		The build also uses Ghostscript for converting the figues
+		from the EPS format. The luck with Ghostscript versions
+		also varies. The version 8.70 works for me.
+		I've seen some versions crash on this conversion.
+		Fortunately, it was crashing after the conversion actually
+		succeeded, so a workaround was to ignore the exit code
+		from Ghostscript.
+		</para>
+
+		<para>
+		After the tools have been extracted, the build is done by
+		</para>
+
+<pre>
+make -C doc/src
+</pre>
+
+		<para>
+		The temporary files are cleaned with
+		</para>
+
+<pre>
+make -C doc/src cleanwork
+</pre>
+
+		<para>
+		The results will be in <pre>doc/pdf</pre> and <pre>doc/html</pre>. 
+		</para>
+
+		<para>
+		If like me you plan to use the DocBook tools repeatedly
+		to build the docs for different versions of Triceps,
+		you can download and extract them once in some other
+		directory and then set the exported variable 
+		<pre>TRICEPS_TOOLS_BASE</pre> to point to it.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_build_run_simple">
+		<title>Running the examples and simple programs</title>
+
+		<indexterm>
+			<primary>examples</primary>
+		</indexterm>
+		<para>
+		Overall, the examples live together with unit tests.
+		The primary target language for Triceps is Perl, so the examples
+		from the manual are the Perl examples located in
+		<pre>perl/Triceps/t</pre>. The files with names starting with <quote><pre>x</pre></quote> contain
+		the examples as such, like <pre>xWindow.t</pre>. 
+		Usually there are multiple related examples in the same file. 
+		</para>
+
+		<para>
+		The examples as shown in the manual usually read the inputs from stdin
+		and print their results on stdout.
+		The actual examples in <pre>perl/Triceps/t</pre> are not quite exactly the same
+		because they are plugged into the unit test infrastructure. 
+		The difference is limited to the input/output functions: 
+		rather than reading and writing on the stdin and
+		stdout, they take the inputs from variables, put the results into
+		variables, and have the results checked for correctness.
+		This way the examples stay working and do not experience the 
+		bit rot when something changes.
+		</para>
+
+		<para>
+		Speaking of the examples outputs, the common convention in this manual
+		is to show the lines entered from stdin as bold and the lines printed
+		on stdout as regular font. This way they can be easily told apart,
+		and the effects can be connected to their causes. Like this:
+		</para>
+
+<exdump>
+> OP_INSERT,1,AAA,10,10
+Contents:
+  id="1" symbol="AAA" price="10" size="10" 
+lbAverage OP_INSERT symbol="AAA" id="1" price="10" 
+> OP_INSERT,3,AAA,20,20
+Contents:
+  id="1" symbol="AAA" price="10" size="10" 
+  id="3" symbol="AAA" price="20" size="20" 
+lbAverage OP_INSERT symbol="AAA" id="3" price="15" 
+</exdump>
+
+		<para>
+		The other unit tests in the <pre>.t</pre> files are interesting too, since they
+		contain absolutely all the possible usages of everything, and can be
+		used as a reference. However they tend to be much more messy and hard
+		to read, exactly because they contain in them lots of tiny snippets
+		that do everything.
+		</para>
+
+		<para>
+		The easiest way to start trying out your own small programs is to place
+		them into the same directory <pre>perl/Triceps/t</pre> and run them from
+		there. Just name them with the suffix <pre>.pl</pre>, so that they would
+		not be picked up by the Perl unit test infrastructre (or if you do want
+		to run them as a part of unit tests, use the suffix <pre>.t</pre>).
+		</para>
+
+		<para>
+		To make your programs find the Triceps modules, start them with
+		</para>
+
+<pre>
+use ExtUtils::testlib;
+use Triceps;
+use Carp;
+</pre>
+
+		<para>
+		The module <pre>ExtUtils::testlib</pre> takes care of setting the
+		include paths to find Triceps. You can run them from the parent
+		directory, like:
+		</para>
+
+<pre>
+perl t/xWindow.t
+</pre>
+
+		<para>
+		The parent directory is the only choice, since <pre>ExtUtils::testlib</pre>
+		can not set up the include paths properly from the other directories.
+		</para>
+
+	</sect1>
+
+	<sect1 id="sc_build_locale">
+		<title>Locale dependency</title>
+
+		<para>
+		Some of the Perl tests depend on the locale. They expect the English
+		text in some of the error strings received from the OS and Perl, so if
+		you try to run them in a non-English locale, these tests fail.
+		</para>
+
+		<para>
+		To work around this issue, I've added <pre>LANG=C</pre> in the top-level Makefile,
+		and when the tests run from there, they use this English locale.
+		</para>
+
+		<para>
+		However if you run <pre>make test</pre> directly in the <pre>perl/Triceps</pre>
+		subdirectory, it has no such override (because the Makefile there is built by Perl).
+		If you run the test from there and use a non-English locale, you'd have
+		to set the locale for the command expicitly:
+		</para>
+
+<pre>
+LANG=C make test
+</pre>
+
+		<para>
+		Some of these expected messages might also change between different 
+		OSes and between different versions of Perl. They seem pretty stable
+		overall but you'd never known when something might change somewhere,
+		and that would lead to the spurious failures that can be ignored.
+		I'd be interested to learn of them, to support all known forms of
+		messages in the future.
+		</para>
+
+	</sect1>
+
+	<sect1 id="sc_build_install_perl">
+		<title>Installation of the Perl library</title>
+
+		<indexterm>
+			<primary>installation</primary>
+		</indexterm>
+		<para>
+		If you have the root permissions on the machine and want to install
+		Triceps in the central location, just run
+		</para>
+
+<pre>
+make -C perl/Triceps install
+</pre>
+
+		<para>
+		If you don't, there are multiple options. One is to create your
+		private Perl hierarchy in the home directory. If you decide to
+		put it into <pre>$HOME/inst</pre>, the installation there becomes
+		</para>
+
+<pre>
+mkdir -p $HOME/inst
+cp -Rf perl/Triceps/blib/* $HOME/inst/
+</pre>
+
+		<para>
+		You can then set the environment variable
+		</para>
+
+<pre>
+export PERL5LIB=$HOME/inst/lib:$HOME/inst/arch
+</pre>
+
+		<para>
+		to have your private hierarchy prepended to the Perl's standard
+		library path. You can then insert <quote><pre>use Triceps;</pre></quote>
+		and the Triceps module will be found. If you want to have the man
+		pages from that directory working too, set
+		</para>
+
+<pre>
+export MANPATH=$HOME/inst:$MANPATH
+</pre>
+
+		<para>
+		Not that Triceps has any usable man pages at the moment.
+		</para>
+
+		<para>
+		However if you're building a package that uses Triceps and
+		will be shipped to the customer and/or deployed to a production
+		machine, placing the libraries into the
+		home directory is still not the best idea. Not only you don't
+		want to pollute the random home directories, you also want to
+		make sure that your libraries get picked up, and not the ones
+		that might happen to be installed on the machine from
+		some other sources (because they may be of different versions,
+		or completely different libraries that accidentaly have the
+		same name).
+		</para>
+
+		<para>
+		The best idea then is to copy Triceps and all the other
+		libraries into your distribution package, and have the binaries
+		(including the scripts) find them by a relative path.
+		</para>
+
+		<para>
+		Suppose you build the package prototype in the <pre>$PKGDIR</pre>,
+		with the binaries and scripts located in the subdirectory <pre>bin</pre>, and the
+		Triceps library located in the subdirectory <pre>blib</pre>.
+		When you build your package, you install the Triceps library in that
+		prototype by
+		</para>
+
+<pre>
+cp -Rf perl/Triceps/blib $PKGDIR/
+</pre>
+
+		<para>
+		Then this package gets archived, sent to the destination machine and
+		unarchived. Whatever the package type, <pre>tar</pre>, <pre>cpio</pre> 
+		or <pre>rpm</pre>, doesn't matter.
+		The relative paths under it stay the same. For example,
+		if it gets installed under <pre>/opt/my_package</pre>, the directory
+		hierarchy would look like this:
+		</para>
+
+<pre>
+/opt/my_package
+     +- bin
+     |  +- my_program.pl
+     +- blib
+        +- ... Triceps stuff ...
+</pre>
+
+		<para>
+		The script <pre>my_program.pl</pre> can then use the following code at the
+		top to load the Triceps package:
+		</para>
+
+<!-- t/xRunAnywhere.t -->
+<pre>
+#!/usr/bin/perl
+
+use File::Basename;
+
+# This is the magic sequence that adds the relative include paths.
+BEGIN {
+	my $mypath = dirname($0);
+	unshift @INC, "${mypath}/../blib/lib", "${mypath}/../blib/arch";
+}
+
+use Triceps;
+</pre>
+
+		<para>
+		It finds its own path from <pre>$0</pre>, by taking its directory name. Then it
+		adds the relative directories for the Perl modules and XS shared libraries
+		to the include path. And finally loads Triceps using the modified
+		include path. Of course, more paths for more packages can be added
+		as well. The script can also use that own directory (if saved into a global
+		instead of <pre>my</pre> variable) to run the other programs later,
+		find the configuration files and so on.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_build_install_cpp">
+		<title>Installation of the &Cpp; library</title>
+
+		<indexterm>
+			<primary>installation</primary>
+		</indexterm>
+
+		<para>
+		There are no special install scripts for the &Cpp; libraries and includes.
+		To build your &Cpp; code with Triceps, simply specify the location of Triceps
+		sources and built libraries with options <pre>-I</pre> and <pre>-L</pre>. For example, if
+		you have built Triceps in <pre>$HOME/srcs/triceps-1.0.0</pre>, you can add
+		the following to your Makefile:
+		</para>
+
+<pre>
+TRICEPSBASE=$(HOME)/srcs/triceps-1.0.0
+CFLAGS += -I$(TRICEPSBASE)/cpp -DTRICEPS_NSPR4
+LDFLAGS += -L$(TRICEPSBASE)/cpp/build -ltriceps -lnspr4 -pthread
+</pre>
+
+		<para>
+		The Triceps include files expect that the Triceps &Cpp; subdirectory
+		is directly in the include path as shown.
+		</para>
+
+		<para>
+		The exact set of <pre>-D</pre> flags and extra <pre>-l</pre> libraries may vary with the Triceps
+		configuration. To get the exact ones used in the configuration, run the special
+		configuration <pre>make</pre> targets:
+		</para>
+
+<pre>
+make --quiet -f cpp/Makefile.inc getconf
+make --quiet -f cpp/Makefile.inc getxlib
+</pre>
+
+		<para>
+		The additions to <pre>CFLAGS</pre> are returned by <pre>getconf</pre>. The additional external
+		libraries for <pre>LDFLAGS</pre> are returned by <pre>getxlib</pre>. It's important
+		to use the same settings in the build of Triceps itself and of the user programs.
+		The differing settings may cause the program to crash.
+		</para>
+
+		<para>
+		If you build your code with the dynamic library, the best packaging practice is to
+		copy the <pre>libtriceps.so</pre> to the same directory where your binary is
+		located and specify its location with the build flags (for GCC, the flags of other
+		compilers may vary):
+		</para>
+
+<pre>
+LDFLAGS += "-Wl,-rpath='$$ORIGIN/.'"
+</pre>
+
+		<para>
+		Or any relative path would do. For example, if your binary package contains
+		the binaries in the subdirectory <pre>bin</pre> and the libraries in the subdirectory
+		<pre>lib</pre>, the setting for the path of the libraries relative
+		to the binaries will be:
+		</para>
+
+<pre>
+LDFLAGS += "-Wl,-rpath='$$ORIGIN/../lib'"
+</pre>
+
+		<para>
+		But locating the binaries and the shared libraries won't work if Triceps and your
+		program get ever ported to Windows. Windows searches for the DLLs only in the
+		same directory.
+		</para>
+
+		<para>
+		Or it might be easier to build your code with the static library: just
+		instead of <pre>-ltriceps</pre>, link explicitly with
+		<pre>$(TRICEPSBASE)/cpp/build/libtriceps.a</pre> and the libraries it
+		requires:
+		</para>
+
+<pre>
+LDFLAGS += $(TRICEPSBASE)/cpp/build/libtriceps.a -lpthread -lnspr4
+</pre>
+	</sect1>
+
+	<sect1 id="sc_build_disambig_cpp">
+		<title>Disambiguation of the &Cpp; library</title>
+
+		<para>
+		A problem with the shared libraries is that you never know, which
+		exact library will end up linked at run time. The system library
+		path takes priority over the one specified in <pre>-rpath</pre>.
+		So if somene has installed a Triceps shared library system-wide,
+		it would be found and used instead of your one. And it might be
+		of a completely different version. Or some other package might
+		have messed with <pre>LD_LIBRARY_PATH</pre> in the user's <pre>.profile</pre>, and
+		inserted its path with its own version of Triceps.
+		</para>
+
+		<para>
+		Messing with <pre>LD_LIBRARY_PATH</pre> is bad. The good solution
+		is to give your libraries some unique name, so that it would
+		not get confused. Instead of <pre>libtriceps.so</pre>, name it
+		something like <pre>libtriceps_my_corp_my_project_v_123.so</pre>.
+		</para>
+
+		<para>
+		Triceps can build the libraries with such names directly.
+		To change the name, edit <pre>cpp/Makefile.inc</pre> and change
+		</para>
+
+<pre>
+LIBRARY := triceps
+</pre>
+
+		<para>
+		to
+		</para>
+
+<pre>
+LIBRARY := triceps_my_corp_my_project_v_123
+</pre>
+
+		<para>
+		and it will produce the custom-named library. The Perl part of the build
+		detects this name change automatically and still works (though for the
+		Perl build it doesn't change much, the static &Cpp; Triceps library gets
+		linked into the XS-produced shared library).
+		</para>
+
+		<para>
+		There is also a special <pre>make</pre> target to get back the base name
+		of the Triceps library:
+		</para>
+
+<pre>
+make --quiet -f cpp/Makefile.inc getlib
+</pre>
+
+		<para>
+		The other potential naming conflict could happen with both shared and
+		dynamic libraries. It appears when you want to link two different versions
+		of the library into the same binary. This is needed rarely, but still needed.
+		If nothing special is done, the symbol names in two libraries clash and nothing works.
+		Triceps provides a way around it by having an opportunity to rename the
+		&Cpp; namespaces, instead of the default namespace <quote><pre>Triceps</pre></quote>. 
+		It can be done again by editing <pre>cpp/Makefile.inc</pre>
+		and modifying the setting <pre>TRICEPS_CONF</pre>:
+		</para>
+
+<pre>
+TRICEPS_CONF += -DTRICEPS_NS=TricepsMyVersion
+</pre>
+
+		<para>
+		Suppose that you have two Triceps versions that you want both to
+		use in the same binary. Suppose that you are building them in
+		<pre>$(HOME)/srcs/triceps-1.0.0</pre> and <pre>$(HOME)/srcs/triceps-2.0.0</pre>.
+		</para>
+
+		<para>
+		Then you edit <pre>$(HOME)/srcs/triceps-1.0.0/cpp/Makefile.inc</pre> and
+		put in there
+		</para>
+
+<pre>
+TRICEPS_CONF += -DTRICEPS_NS=Triceps1
+</pre>
+
+		<para>
+		And in <pre>$(HOME)/srcs/triceps-2.0.0/cpp/Makefile.inc</pre> put
+		</para>
+
+<pre>
+TRICEPS_CONF += -DTRICEPS_NS=Triceps2
+</pre>
+
+		<para>
+		If you use the shared libraries, you need to disambiguate their names too,
+		as described above, but for the static libraries you don't have to.
+		</para>
+
+		<para>
+		Almost there, but you need to have your code use the different namespaces
+		for different versions too. The good practice is to include in your files
+		</para>
+
+<pre>
+#include <common/Conf.h>
+</pre>
+
+		<para>
+		and then use everywhere the Triceps namespace <pre>TRICEPS_NS</pre> instead of <pre>Triceps</pre>.
+		Then as long as one source file deals with only one version of Triceps,
+		it can be easily manipulated to which version to use by providing that
+		version in the include path. And you get your program to work with two
+		versions of Triceps by linking the object files produces from these
+		source files together into one binary.
+		Then you just build some of your files
+		with <pre>-I$(HOME)/srcs/triceps-1.0.0/cpp</pre> and some with 
+		<pre>-I$(HOME)/srcs/triceps-2.0.0/cpp</pre> and avoid any conflicts
+		or code changes.
+		</para>
+
+		<para>
+		At the link time, you will need to link with the libraries from both versions.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_build_config">
+		<title>Build configuration settings</title>
+
+		<para>
+		Since Triceps has only a very limited autoconfiguration yet, it may need to be configured
+		manually for the target operating system. The same method is used for the
+		build options.
+		</para>
+
+		<para>
+		The configuration options are set in the file <pre>cpp/Makefile.inc</pre>.
+		The extra defines are added in <pre>TRICEPS_CONF</pre>, the extra library dependencies
+		in <pre>TRICEPS_XLIB</pre>.
+		</para>
+
+		<para>
+		So far the only such configurable library dependency is the NSPR4 library.
+		It's used for its implementation of the atomic integers and pointers.
+		Normally the build attempts to auto-detect the location and name of the
+		library and includes, or otherwise builds without it.
+		Without it the code still works but uses a less efficient implementation
+		of an integer or pointer protected by a mutex. 
+		If your system has a version of NSPR4 that doesn't get auto-detected,
+		you can still enable it by changing the settings manually. For example,
+		for Fedora Linux the auto-detected version amounts to the following
+		settings:
+		</para>
+
+<pre>
+TRICEPS_CONF += -DTRICEPS_NSPR -I/usr/include/nspr4
+TRICEPS_XLIB += -lnspr4
+</pre>
+
+		<para>
+		<pre>-DTRICEPS_NSPR</pre> tells the code to compile with NSPR support
+		enabled, and the other settings give the location of the includes and
+		of the library.
+		</para>
+
+		<para>
+		The other build options require only the <pre>-D</pre> settings.
+		</para>
+
+<pre>
+TRICEPS_CONF += -DTRICEPS_NS=TricepsMyVersion
+</pre>
+
+		<para>
+		Changes the namespace of Triceps.
+		</para>
+
+<pre>
+TRICEPS_CONF += -DTRICEPS_BACKTRACE=false
+</pre>
+
+		<para>
+		Disables the use of the glibc stack backtrace library (it's a standard
+		part of glibc nowadays but if you use a non-GNU libc, you might have
+		to disable it). This library is used to make the messages on fatal
+		errors more readable, and let you find the location of the error easier.
+		</para>
+
+	</sect1>
+
+</chapter>

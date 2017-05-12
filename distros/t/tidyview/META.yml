@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                tidyview
+version:             1.14
+abstract:            Preview the effects of perltidy's plethora of options
+license:             ~
+author:              
+    - Leif Eriksen <tidyview.sourceforge.net>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Log::Log4perl:                 1.0
+    Perl::Tidy:                    0
+    Tk:                            800.025
+    Tk::DiffText:                  0
+    version:                       0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

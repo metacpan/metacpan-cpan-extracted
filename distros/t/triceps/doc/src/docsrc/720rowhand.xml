@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_ref_rowhandle"  xmlns:xi="http://www.w3.org/2001/XInclude">
+		<title>RowHandle reference</title>
+
+		<indexterm>
+			<primary>RowHandle</primary>
+		</indexterm>
+
+		<para>
+		A RowHandle is essentially the glue that keeps a row in the table. A
+		row's handle keeps the position of the row in the table and allows to
+		navigate from it in the direction of every index. It also keeps the
+		helper information for the indexes. For example, the Hashed index
+		calculates the has value for the row's fields once and remembers it in
+		the handle. The table operates always on the handles, never directly on
+		the rows. The table methods that accept rows as arguments, implicitly
+		wrap them into handles before doing any operations.
+		</para>
+
+		<para>
+		A row handle always belongs to a particular table, and can not be mixed
+		between the tables, even if the tables are of the same type. Even
+		before a row handle has been inserted into the table and after it has
+		been removed, it still belongs to that table and can not be inserted
+		into any other one.
+		</para>
+
+		<para>
+		Just as the tables are single-threaded, the row handles are
+		single-threaded.
+		</para>
+
+<pre>
+$rh = $table->makeRowHandle($row);
+</pre>
+
+		<para>
+		Creates the RowHandle.  The newly created row handle is not inserted in
+		the table. The type of the argument row must be matching the table's
+		row type.
+		</para>
+
+<pre>
+$result = $rh->isInTable();
+</pre>
+
+		<para>
+		Finds out, whether the row handle is inserted in the table. If the
+		row handle is NULL, it will quietly return 0.
+		</para>
+
+<pre>
+$result = $rh->isNull();
+</pre>
+
+		<para>
+		Finds out if the RowHandle is NULL.  A RowHandle may be NULL
+		to indicate the special conditions. It pretty much means that there is only the Perl wrapper
+		layer of RowHandle but no actual RowHandle under it. This happens to be
+		much more convenient than dealing with undefined values at Perl level.
+		The NULL row handles are returned by the certain table calls to
+		indicate that the requested data was not found in the table.
+		</para>
+
+<pre>
+$rh = $table->makeNullRowHandle();
+</pre>
+
+		<para>
+		Creates a NULL RowHandle.
+		</para>
+
+<pre>
+$result = $rh1->same($rh2);
+</pre>
+
+		<para>
+		The usual comparison for sameness.
+		</para>
+
+<pre>
+$row = $rh->getRow();
+$row = $rh->getRowSafe();
+</pre>
+
+		<para>
+		Extracts the row from the handle. The row will have the type of the
+		table's row type. A row can not be extracted from a NULL row handle,
+		in this situation <pre>getRow()</pre> will confess and <pre>getRowSafe()</pre>
+		will return <pre>undef</pre>.
+		</para>
+
+<pre>
+$rh = $rh->next();
+$rh = $rh->nextIdx($idxType);
+$rh = $rh->firstOfGroupIdx($idxType);
+$rh = $rh->nextGroupIdx($idxType);
+</pre>
+
+		<para>
+		These methods work exactly the same as the same-named table methods.
+		They are essentially syntactic sugar over
+		the table methods.
+		</para>
+
+	</sect1>
+

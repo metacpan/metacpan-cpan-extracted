@@ -1,0 +1,229 @@
+#!/usr/bin/perl
+use strict;
+use Getopt::Std::Strict 'o:p:f:b:n:hg:dsS:';
+use String::ShellQuote 'shell_quote';
+use LEOCHARRE::FontFind 'find_ttf';
+#use Smart::Comments '###';
+our $VERSION = sprintf "%d.%02d", q$Revision: 1.9 $ =~ /(\d+)/g;
+# setting version manually here
+
+my $TMPDIR='/tmp';
+
+$opt_h and print STDERR usage() and exit;
+
+my $printpath=0;
+if( !$opt_o ){
+
+   $opt_o = sprintf '%s/textrender-%s.png', $TMPDIR, (time . int rand 9999 ); #$opt_o or die("missing -o out filename");
+   $printpath=1;
+}
+$opt_f ||='000000';
+$opt_b ||='ffffff';
+$opt_b=~s/^([a-f0-9]{6})$/#$1/; # make sure 000000 is turned into #000000 - also, allow color names
+$opt_f=~s/^([0-9a-f]{6})$/#$1/;
+$opt_p ||=13;
+$opt_n ||='sans';
+$opt_g ||='west';
+
+#debug?
+warn "$opt_o" if $opt_d;
+
+if ($opt_S and !$opt_s){ # did they set shadow opacity? then turn on shadows regardless
+   $opt_s++;
+}
+$opt_S ||=80; 
+
+my @abs_made;
+
+my $abs_tmp='/tmp';
+my $tmp_id = int rand 999999;
+
+my $abs_font = find_ttf($opt_n) or die("Cannot find font '$opt_n'");
+
+
+my $maxH=0; # largest height of any image made
+my $maxW=0; # largest width of any image made
+
+my $i=0;
+while (<>){
+   my $line = $_;
+   $line=~s/\n$//;
+   $line=~/\w/ or next;
+  
+
+   my $abs_out = sprintf '%s/%s_%03d.%s', $abs_tmp, $tmp_id, $i++,'png';
+  
+   my $cmd = 
+   sprintf "convert -background '%s' -fill '%s' -font %s -pointsize %s label:%s -antialias %s %s ",
+      'none', 
+      #$opt_b,
+      $opt_f,
+      shell_quote($abs_font),
+      $opt_p,
+      shell_quote($line),
+
+      ($opt_s 
+         ? (sprintf q{\( +clone -shadow %sx1+1+1 \) +swap -background '%s' -flatten}, $opt_S, $opt_b ) 
+         : ''
+      ),
+
+      shell_quote($abs_out);
+
+
+   
+
+   
+   ## $cmd
+   warn "# cmd:\n$cmd\n" if $opt_d;
+   
+   system($cmd) ==0 or die($!);
+
+   ### $abs_out
+
+   warn("abs out $abs_out, getting height and width..") if $opt_d;
+   
+   # this is a hoaky way of getting dimensions 
+   my $o = `identify '$abs_out'`;
+   $o=~/$abs_out[\[\]\d]*\s+[a-zA-Z]+\s+(\d+)x(\d+) / or die("cant match into $o");
+   my($h,$w) = ($2,$1); # is correct order
+   
+   warn("identify call to shell got h,w: $h,$w") if $opt_d;
+
+
+   if ($maxH<$h){$maxH=$h}
+   if ($maxW<$w){$maxW=$w}
+
+
+   warn("maxH $maxH, maxW $maxW") if $opt_d;
+   push @abs_made, $abs_out;
+
+   
+
+}
+
+
+
+#for (@abs_made){
+   
+   # gotta know the size
+
+
+   # stack them justified
+   # if they want centering etc, it will have to be in the original
+
+   my $c = scalar @abs_made;
+
+   my $cmd = sprintf 
+      q{montage -label '' %s  -background '%s' -geometry %sx%s -gravity %s  -tile %sx%s %s}, 
+      # label is glitchy, i declared above to blank out
+      "@abs_made", $opt_b, $maxW, $maxH, $opt_g, 1,$c, 
+      #($opt_s ? '-shadow ' : ''), 
+      shell_quote($opt_o);
+      # see http://www.imagemagick.org/Usage/montage/ about labeling
+      # by default montage will label everything *with* label, and miff and png formats will
+      # store the label information
+      # we use the -set label ''   command to set back to 0, because the images had this and
+      # we dont want to read it
+      # furthermore, we could have stored jpg or other format, which does not store label info
+      # after creating the text
+      # however, jpg format for example, also does not store transparency-and we would not
+      # be able to drop shadow
+   warn "# cmd:\n$cmd\n" if $opt_d;
+   system($cmd)==0 or die($!);
+
+#}
+$printpath and print "$opt_o\n";
+
+sub usage {q{textrender [OPTION]..
+Turn stdin into rendered text graphics.
+
+   -p number       pointsize, default 11
+   -f hex          color, such as ddffee
+   -b hex          background color, such as ddffee
+   -n string       font name or path
+   -o path         out filename
+   -g string       gravity, default is west
+   -d              debug, show the commands
+   -s              drop shadow, off by default
+   -S [1-100]      shadow opacity, default is 80 (sets -s to on)
+
+Optionally you can take a text file
+   textrender -n arial ./filewith.txt
+   
+See 'man textrender' for more info.
+
+}}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+textrender - Turn stdin into rendered text graphics.
+
+=head1 DESCRIPTION
+
+This allows you to make very nice renders of text for web reasons, without
+using photoshop/firewors, etc.
+The advantage is that since it's via the cli, you can save text and parameters
+to a file and use that as configuration! 
+
+See textrender, the parent package.
+
+=head1 USAGE
+
+textrender [OPTION]..
+
+   -p number       pointsize, default 11
+   -f hex          color, such as ddffee
+   -b hex          background color, such as ddffee
+   -n string       font name or path
+   -o path         out filename
+   -g string       gravity, default is west
+   -d              debug, show the commands
+   -s              drop shadow, off by default
+   -S [1-100]      shadow opacity, default is 80 (sets -s to on)
+
+If no out filename path is provided, a temporary file is chosen- such as 
+/tmp/textrender.2323525252.png and this path is printed to stdout.
+
+If you provide a path argument, this is not printed to stdout.
+
+=head2 USAGE EXAMPLES
+
+   echo 'Leo Charre' | textrender -o /tmp/leocharre.png
+
+   textrender ./file-with.text
+
+You can search fonts available with 
+   findfont
+
+Say you see /usr/share/fonts/truetype/unfonts-core/UnGungseo.ttf
+You can use it via:
+   echo "this" | textrender -n ungungseo -o ~/test.jpg
+
+=head1 CAVEATS
+
+In development, contact AUTHOR with any suggestions, etc.
+I strive to make software on par with unix philosophy, if I have erred, please let me know.
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=head1 LICENSE
+
+This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, i.e., under the terms of the "Artistic License" or the "GNU General Public License".
+
+=head1 DISCLAIMER
+
+This package is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the "GNU General Public License" for more details.
+
+=cut
+
+
+
+

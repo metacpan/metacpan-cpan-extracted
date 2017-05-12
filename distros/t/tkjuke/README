@@ -1,0 +1,63 @@
+
+"tkjuke" is a GUI for manipulating a jukebox in a windowed environment,
+which uses the program "juke" as the underlying controller. It has
+been tested under AIX,  Linux and IRIX - the default configuration defaults
+are suitable for many Linux installations. (There is unsupported code
+that uses atape rather than mtx for the controller program. It's a small
+mtx <=> atape interface layer I use on AIX. You can manually copy the
+two programs atape-mtx and atape-loaderinfo somewhere, and then, during
+the "perl Makefile.PL" phase use those programs rather than the real
+loaderinfo, mt and mtx programs.)
+
+The "juke" command is a Perl wrapper to the jukebox control program
+"mtx".  Once installed and configured, manipulating the jukebox is
+totally consistent among various computers.  Additionally, "juke" can
+simulate barcodes for jukeboxes lacking an actual barcode reader.  It
+does this by consulting an SDBM file that maps barcodes and jukebox
+slots.
+
+Perl and Perl/Tk are available from the CPAN, and are presumed already
+installed.  "mtx" is available at sourceforge.net, and is presumed
+already installed.
+
+This code has been tested with various auto-loading stackers, and I've
+written emulation code that simulates larger jukeboxes with multiple
+drives, mail slots and invertable media, but since I don't actually
+have such a beast, I can only hope everything works in the real world.
+
+"juke" provides a simple command set.  Briefly, here is what "juke" can
+do:
+
+
+juke V2.2.1 usage:
+
+ juke [help]                            - print this information
+
+ juke config                            - print juke.config
+
+ juke status                            - print jukebox status
+ 
+ juke first    [DTE#]                   - unload current media, load first
+ juke last     [DTE#]                   - unload current media, load last
+ juke next     [DTE#]                   - unload current media, load next
+ juke previous [DTE#]                   - unload current media, load previous
+
+ juke [invert] load    SE#  [DTE#]      - load media from jukebox, may be inverted
+ juke [invert] unload [SE#] [DTE#]      - return media to jukebox, may be inverted
+
+ juke [eepos eepos#] transfer SE# SE#   - transfer media or bump mail slot
+
+ juke loaded   [DTE#]                   - print barcode(s) of loaded media
+
+ juke barcodes [pathname | SE# barcode] - print or set jukebox barcode list
+
+ juke refresh-tkjuke                    - send SIGHUP to update tkjuke's display
+
+
+Steve Lidie
+Lehigh University Computing Center
+sol0@lehigh.edu
+
+2004/03/12
+2006/03/21
+2007/07/20

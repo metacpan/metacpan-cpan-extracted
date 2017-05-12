@@ -1,0 +1,11 @@
+/usr/local/bin/perl
+/usr/local
+/dev/sch0
+1
+2
+rewind
+/usr/local/sbin/loaderinfo
+/bin/mt
+/usr/local/sbin/mtx
+/dev/nst0 /dev/nst1
+/dev/st0 /dev/st1

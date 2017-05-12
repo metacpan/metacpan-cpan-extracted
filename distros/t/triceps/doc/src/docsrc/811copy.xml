@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_copy">
+		<title>The many ways to do a copy</title>
+
+		<indexterm>
+			<primary>memory management</primary>
+		</indexterm>
+		<indexterm>
+			<primary>copying</primary>
+		</indexterm>
+		<para>
+		The Triceps objects need occasionally to be copied. But as the objects
+		are connected into the deep topologies, a question arises, how much of
+		this topology needs to be copied along with the object?
+		</para>
+
+		<indexterm>
+			<primary>IndexType</primary>
+		</indexterm>
+		<indexterm>
+			<primary>TableType</primary>
+		</indexterm>
+		<para>
+		The objects that are copied the most are the IndexType and TableType.
+		The method <pre>copy()</pre>, in both Perl and &Cpp;, is the general way to copy them. 
+		It copies the object, and as needed its
+		components, but tries to share the referred objects that can be shared (such as
+		the row types). But the multithreading support required more kinds of
+		copying.
+		</para>
+
+		<para>
+		The Perl method <pre>TableType::copyFundamental()</pre> copies a table type with
+		only a limited subset of its index types, and excludes all the
+		aggregators. It is implemented in Perl, and if you look in
+		<pre>lib/Triceps/TableType.pm</pre>, you can find that it starts by making a new
+		table type with the same row type, and then one by one adds the needed
+		index types to it. It needs the index types without any aggregators or
+		nested index types, and thus there is a special method for doing this
+		kind of copies:
+		</para>
+
+<pre>
+$idxtype2 = $idxtype->flatCopy();
+</pre>
+
+		<para>
+		The <quote>flat</quote> means exactly what it looks like: copy just the object
+		itself without any connected hierarchies.
+		</para>
+
+		<para>
+		On the &Cpp; level there is no such method, instead there is an optional
+		argument to <pre>IndexType::copy()</pre>:
+		</para>
+
+<pre>
+virtual IndexType *copy(bool flat = false) const;
+</pre>
+
+		<para>
+		So if you want a flat copy, you call
+		</para>
+
+<pre>
+idxtype2 = idxtype->copy(true);
+</pre>
+
+		<para>
+		There is no <pre>copyFundamental()</pre> on the &Cpp; level, though it probably
+		should be, and should be added in the future. For now, if you really
+		want it, you can make it yourself by copying the logic from Perl.
+		</para>
+
+		<para>
+		In the implementation of the index types, this argument <pre>flat</pre> mostly
+		just propagates to the base class, without a whole lot needed from the
+		subclass. For example, this is how it works in the SortedIndexType:
+		</para>
+
+<!-- cpp/type/SortedIndexType.cpp -->
+<pre>
+IndexType *SortedIndexType::copy(bool flat) const
+{
+	return new SortedIndexType(*this, flat);
+}
+
+SortedIndexType::SortedIndexType(const SortedIndexType &orig, bool flat) :
+	TreeIndexType(orig, flat),
+	sc_(orig.sc_->copy())
+{ }
+</pre>
+
+		<para>
+		The base class TreeIndexType takes care of everything, all the subclass
+		needs to do is carry the flat argument to it.
+		</para>
+
+		<para>
+		The next kind of copying is exactly the opposite: it copies the whole
+		table type or index type, including all the objects involved, including
+		the row types or such. It is used for passing the table types through
+		the nexus to the other threads.
+		</para>
+
+		<indexterm>
+			<primary>RowType</primary>
+		</indexterm>
+		<indexterm>
+			<primary>multithreading</primary>
+		</indexterm>
+		<para>
+		Remember that all these objects are reference-counted. Whenever a Row
+		object is created or deleted in Perl, it increases or decreases the
+		reference of the RowType to which that row belongs. 
+		If the same RowType object is shared between
+		multiple threads, they will have  a contention for this atomic counter,
+		or at the very least will be shuttling the cache line with it back and
+		forth between the CPUs. It's more efficient to give each thread its own
+		copy of a RowType, and then it can stay stuck in one CPU's cache.
+		</para>
+
+		<indexterm>
+			<primary>Nexus</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Facet</primary>
+		</indexterm>
+		<para>
+		So wherever a table type is exported into a nexus, it's deep-copied
+		(and when a row type is exported into a nexus, it's simply copied, and
+		so are the row types of the labels in the nexus). Then when a nexus is
+		imported, the types are again deep-copied into the thread's facet.
+		</para>
+
+		<para>
+		But there is one more catch. Suppose we have a label and a table type
+		that use the same row type. Whenever a row coming from a label is
+		inserted into the table (in Perl), the row types of the row (i.e. the
+		label's row type in this case) and of the table are checked for a
+		match. If the row type is the same, this check is very quick. But if
+		the same row type gets copied and then different copies are used for
+		the label and for the table, the check will have to go and actually
+		compare the contents of these row types, and will be much slower. To
+		prevent this slowness, the deep copy has to be smart: it must be able
+		to copy a bunch of things while preserving the identity of the
+		underlying row types. If it's given a label and then a table type, both
+		referring to the same row type, it will copy the row type from the
+		label, but then when copying the table type it will realize that this row type had
+		already been seen and copied, so it will reuse the same row type copy for the table type.
+		And the same applies even within a table type: it may have multiple
+		references to the same row type from the aggregators, and will be smart
+		enough to figure out if they are the same, and copy the same row type
+		only once.
+		</para>
+
+		<para>
+		This smartness stays mostly undercover in Perl. When you import a
+		facet, it will do all the proper copying, sharing the row types.
+		(Though of course if you export the same row type through two separate
+		nexuses, and then import them both into another thread, these facets
+		will not share the types between them any more). There is a method
+		<pre>TableType::deepCopy()</pre> but it was mostly intended for testing and it's
+		self-contained: it will copy one table type with the correct row type
+		sharing inside it but it won't do the sharing between two table types.
+		It's not even documented in the TableType reference.
+		</para>
+
+		<para>
+		All the interesting uses of the <pre>deepCopy()</pre> are at the &Cpp; level. It's
+		used all over the place: for the TableType, IndexType, AggregatorType,
+		SortedIndexCondition and RowSetType (the type of FnReturn and
+		FnBinding). If you decide to create your own subclass of these classes,
+		you need to implement the <pre>deepCopy()</pre> as well as the normal <pre>copy()</pre>
+		for it.
+		</para>
+
+		<para>
+		Its prototype generally looks like this (substitute the correct return
+		type as needed):
+		</para>
+
+<pre>
+virtual IndexType *deepCopy(HoldRowTypes *holder) const;
+</pre>
+
+		<indexterm>
+			<primary>HoldRowTypes</primary>
+		</indexterm>
+		<para>
+		The HoldRowTypes object is what takes care of sharing the underlying
+		row types. To copy a bunch of objects with sharing, you create a
+		HoldRowTypes, copy the bunch, destroy the HoldRowTypes.
+		</para>
+
+		<para>
+		For example, the Facet copies the row and table types from a Nexus like this:
+		</para>
+
+<!-- cpp/app/Facet.cpp fragment -->
+<pre>
+Autoref<HoldRowTypes> holder = new HoldRowTypes;
+
+for (RowTypeMap::iterator it = nx->rowTypes_.begin();
+		it != nx->rowTypes_.end(); ++it)
+	rowTypes_[it->first] = holder->copy(it->second);
+for (TableTypeMap::iterator it = nx->tableTypes_.begin();
+		it != nx->tableTypes_.end(); ++it)
+	tableTypes_[it->first] = it->second->deepCopy(holder);
+</pre>
+
+		<para>
+		It also uses the same holder to copy the labels.
+		A row type gets copied through a holder like this:
+		</para>
+
+<pre>
+Autoref<RowType> rt2 = holder->copy(rt);
+</pre>
+
+		<para>
+		For all the other purposes, HoldRowTypes is an opaque object.
+		</para>
+
+		<para>
+		A special feature is that you can pass the holder pointer as NULL, and
+		the deep copy will still work, only it obviously won't be able to share
+		the underlying row types. So if you don't care about sharing, you can
+		always use NULL as an argument. It even works for the direct copying:
+		</para>
+
+<pre>
+HoldRowTypes *holder = NULL;
+Autoref <RowType> rt2 = holder->copy(rt);
+</pre>
+
+		<para>
+		Its method <pre>copy()</pre> is smart enough to recognize the <pre>this</pre> being NULL and
+		do the correct thing.
+		</para>
+
+		<para>
+		In the subclasses, the <pre>deepCopy()</pre> is typically implemented like this:
+		</para>
+
+<!-- cpp/type/SortedIndexType.cpp -->
+<pre>
+IndexType *SortedIndexType::deepCopy(HoldRowTypes *holder) const
+{
+	return new SortedIndexType(*this, holder);
+}
+
+SortedIndexType::SortedIndexType(const SortedIndexType &orig, HoldRowTypes *holder) :
+	TreeIndexType(orig, holder),
+	sc_(orig.sc_->deepCopy(holder))
+{ }
+</pre>
+
+		<para>
+		The wrapper passes the call to the deep-copy constructor with a holder
+		which in turn propagates the deep-copying to all the components using
+		their constructor with a holder. Of course, if some component doesn't
+		have any RowType references in it, it doesn't need a constructor with a
+		holder, and can be copied without it. But again, the idea of the
+		<pre>deepCopy()</pre> it to copy as deep as it goes, without sharing any
+		references with the original. 
+		</para>
+	</sect1>

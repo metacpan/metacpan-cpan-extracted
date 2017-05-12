@@ -1,0 +1,500 @@
+
+=head1 NAME
+
+threads::tbb - interface to the Threading Building Blocks (TBB) API
+
+=head1 SYNOPSIS
+
+ # this synopsis is available as examples/incredible-threadable.pl
+ package Incredible::Threadable;
+ use threads::tbb;
+
+ sub new {
+     my $class = shift;
+     # make containers which are efficient and thread-safe
+     tie my @input, "threads::tbb::concurrent::array";
+     push @input, @_;  # coming soon: @input = @_
+     tie my @output, "threads::tbb::concurrent::array";
+     bless { input => \@input,
+             output => \@output, }, $class;
+ }
+
+ sub parallel_transmogrify {
+     my $self = shift;
+
+     # Initialize the TBB library, and set a specification of required
+     # modules and/or library paths for worker threads.
+     my $tbb = threads::tbb->new( requires => [ $0 ] );
+
+     my $min = 0;
+     my $max = scalar @{ $self->{input} };
+     my $range = threads::tbb::blocked_int->new( $min, $max, 5 );
+
+     my $body = $tbb->for_int_method( $self, "my_callback" );
+
+     $body->parallel_for( $range );
+ }
+
+ sub my_callback {
+     my $self = shift;
+     my $int_range = shift;
+
+     for my $idx ($int_range->begin .. $int_range->end-1) {
+         my $item = $self->{input}->[$idx];
+
+         my $transmuted = $item->transmogrify;
+
+         $self->{output}->[$idx] = $transmuted;
+     }
+ }
+
+ package Item;
+ sub transmogrify {
+     my $self = shift;
+     "Ex-$self->{id}";
+ }
+
+ package main;
+ use feature 'say';
+
+ unless ($threads::tbb::worker) {  # single script uses can use this
+     my $parallel_transmogrificator = Incredible::Threadable->new(
+         map { chomp; bless { id => $_ }, "Item" } <>
+     );
+
+     $parallel_transmogrificator->parallel_transmogrify();
+     say "Turned to $_" for $parallel_transmogrificator->results();
+ }
+
+=head1 DESCRIPTION
+
+This module provides access to the a selection of Intel's Threading
+Building Blocks (TBB) library to Perl programs.  TBB is a C++ library
+that provides pre-tested, scalable algorithms for solving a number of
+common problems that benefit from parallelism.
+
+The API provided by TBB and this module is quite different to threads
+as provided by POSIX threads and L<use threads;> - instead of directly
+starting threads and managing their activity and
+communication/synchronisation, an API is provided that provides I<data
+parallelism>;
+
+=over
+
+=item *
+
+I<divide and conquer> processing with I<task stealing> via the
+L</parallel_for> and L</parallel_reduce#TODO> APIs
+
+=item *
+
+(coming soon) I<data flow> processing via the L</pipeline> API
+
+=item *
+
+(later, maybe) I<task-oriented> programming via the L</task> API
+
+=back
+
+=head2 Not a thread-centric API
+
+With C<threads::tbb>, you don't write your algorithms from the
+perspective of a thread and what the thread should do next.  Instead,
+a selection of parallelism primitives which have been found to be
+workable and scalable are provided.
+
+Just as when writing "co-operative multi-threading" programs as with
+L<Event> or L<POE>, the challenge is to break heavy work into small
+but substantial, generally non-blocking chunks of work.  "Substantial"
+is yet to be quantified; it's likely to be around the ballpark of
+1,000's of Perl runloop iterations.  Unlike event-based programming,
+you can freely recurse into the library, start new parallel sections,
+and expect all runnable tasks to process, up to the number of threads
+that you started.
+
+As your program runs, the API allows the TBB library to keep queues
+(trees actually) of runnable tasks.  These are identified and kept in
+thread-affinitive task lists.  Other threads can come along and
+"steal" work from these lists, to keep cores busy.
+
+What this means is that it is relatively easy to make programs which
+can make best use of processing power available on newer multi-core
+CPUs.  It also avoids per-thread overheads, to only start as many
+threads are required to use all of the parallelism in hardware.  Each
+thread requires its own C stack and complete Perl interpreter.
+Therefore it is generally not desirable to create more threads than
+the hardware has available.
+
+=head2 Worker Interpreters
+
+When the first C<threads::tbb::init> object is made, one worker thread
+is created for each processor core or virtual core.  This is performed
+by the TBB library before the Perl interpreter can C<use strict;>
+
+Subsequent calls to it will not create new worker pthreads, instead
+they will re-use the existing threads.
+
+Each worker thread is for the most part, completely isolated from the
+other threads - just like C<use threads>.  Unlike C<use threads>, the
+C<perl_clone()> function is never used.  Instead, each interpreter
+must load all of the modules required to get it to do useful work on
+its own.  This is largely automatic, however it isn't foolproof and
+you will benefit from using the constructor thoughtfully.
+
+=head2 Shared Data
+
+Worker threads do not share any perl variables with the main process.
+A system of "lazy deep cloning" is used to transport Perl data
+structures between threads; you must pass data through these objects,
+as they are the only objects which are the same between threads.  See
+L<threads::tbb::concurrent> for more information.
+
+You cannot share information between threads using L<threads::shared>,
+nor use C<threads::lite>'s receive or receive_table; see
+L<threads::tbb::concurrent::queue#TODO>
+
+=head2 Unlocking malloc
+
+Perl core does not yet ship with a thread-scalable malloc function
+(see L<perltodo/Allocate OPs from arenas>.  Memory allocation by Perl
+core will both suffer from contention (as all threads must use the
+memory allocator in turn) and from false sharing on SMP systems due to
+insufficient alignment of allocated blocks.  That is, blocks smaller
+than the smallest unit of cache the processor can "own" are allocated
+and this can cause cache contention.
+
+So for the greatest scalability you will also need to use an
+arena-based memory allocator; a simple way to do this is by setting
+C<LD_PRELOAD=libtbbmalloc_proxy.so.2>.  See
+L<http://software.intel.com/en-us/articles/optimizing-without-breaking-a-sweat/>
+
+=head1 CLASS METHODS
+
+The only C<threads::tbb> class method is the constructor for a new TBB
+context.  This context is a demand that worker threads have at least
+the module set specified loaded.  By default, workers should end up
+with the same module set as "now".
+
+  use threads::tbb;
+  my $tbb = threads::tbb->new();
+
+To make this happen, the library takes a copy of the %INC global
+variable (see L<perlvar/%INC>) at compile time.  It also saves and
+places a special callback onto the @INC global (see
+L<perlfunc/require>) which records all of the modules later loaded by
+code.
+
+It builds these into two lists which are passed to the worker threads
+for driving thread initialization before any work is done.  They can
+be specified manually (as in L<threads::lite>):
+
+  my $tbb = threads::tbb->new(
+      lib => \@INC,   # default: @INC at module BEGIN time
+      modules => [ qw(Math::BigRat) ],
+  );
+
+=over
+
+=item C<lib>
+
+This is an ordered list of paths to prepend to @INC of the worker
+threads before any modules are loaded.  If any paths already exist on
+@INC of the worker thread, they are not duplicated.
+
+=item C<modules>
+
+This is an ordered list of modules to 'require' in the worker thread.
+The modules in this list are specified in module-form (eg
+"Math::BigRat").  If you want to specify instead a list of
+require-form (eg "Math/BigRat.pm"), this is also possible:
+
+  my $tbb = threads::tbb->new( requires => [ "Math/BigRat.pm" ] );
+
+As the list of modules are processed, if any module encountered is
+already in the C<%INC> - for instance, if it was loaded as a
+dependency of another module - then it is not re-loaded.
+
+The default is to take the C<%INC> saved from the module load, and
+sort it such that, eg C<Moose/Object.pm> sorts after C<Moose.pm>, and
+then after that alphabetically.  After this sorted list, any modules
+which were seen by C<require> or C<use> are added to the list in the
+order they were included in the main program.
+
+=back
+
+Note if you add paths to the beginning of C<@INC> yourself, I<after>
+C<use threads::tbb> but before C<threads::tbb-E<gt>new()>, then
+C<threads::tbb> will not see them.  So, put your C<use lib "path">
+statements before the first C<use threads::tbb;>, or specify required
+modules yourself.
+
+=head1 METHODS
+
+These methods are usually available on I<body objects> which must
+first be obtained by methods on the C<threads::tbb> object; some
+convenience wrappers incorporate this stage for you.
+
+=head2 parallel_for
+
+C<parallel_for> can be used to process a set of data.  It is passed a
+B<range> object, and a B<body> object.  The B<body> object
+encapsulates state, and the range selects a part of that state.
+
+You can declare the B<body> object using either of the following
+methods:
+
+=over
+
+=item C<$tbb-E<gt>for_int_array_func( \@array, "Some::Func" )>
+
+This returns a body object, suitable for use with a
+B<threads::tbb::blocked_int> range, and allows a single
+C<threads::tbb::concurrent::array> for shared state.  The
+C<Some::Func> subroutine will be called as:
+
+  &{"Some::Func"}( $range, $array_ref );
+
+If it wants to communicate state, it should do so via the
+C<$array_ref>.
+
+=item C<$tbb-E<gt>for_int_method( $object, "method" )>
+
+This will create a body object which calls the "method" method of
+C<$object> on sub-divided ranges, as:
+
+  $object->method( $range );
+
+C<$object> will be cloned once for each worker, so can be modified and
+the results expected to stay consistent within the lifetime of the
+parallel_for; the calling C<$object> will see none of them.
+
+=back
+
+As more sophisticated body object types are implemented, they will
+have functions made for them, depending on what state the support etc.
+
+It's a good idea not to assume that the concurrent containers are deep
+copying values passed through them unless you do it yourself; the only
+safe access is to assign an item from the container, and to assign an
+item back to the container.  These operations will do deep copies
+where required, and pass references where the values came from the
+same interpreter.  There is more discussion of this on
+L<threads::tbb::concurrent>
+
+=head2 map_list_func
+
+This planned API wraps the for_int_array_func body object for a
+map-like API.  The function must be static.
+
+  use threads::tbb;
+
+  my $tbb = threads::tbb->new;
+
+  sub Some::Static::Func {
+      my $val = shift;
+      $val->frobnicate();
+      return $val;
+  }
+
+  my @result = $tbb->map_list_func('Some::Static::Func', @array);
+
+The grain size for this operation defaults to 1.  See
+L<threads::tbb::blocked_int> for a discussion on what that refers to.
+It can be overridden by defining a scalar with the same name as the
+function, eg in the above example:
+
+  $Some::Static::Func = 3;   # process 3 items at a time
+
+It does not affect the calling convention; each call to the function
+named is passed a single item only.
+
+=head2 reduce_int_array_func#TODO
+
+Parallel_reduce is just C<parallel_for>, but with another function to
+combine results from the array at the end.
+
+To use parallel_reduce via this API, you first create a body function
+which has two methods.
+
+ # map/reduce
+ use threads::tbb;
+
+ tie my @array, "threads::tbb::concurrent::array";
+ push @array, @data;
+
+ # get a range for that array.  up to 5 at a time.
+ my $array_range = threads::tbb::blocked_int->new(0, $#array+1, 5);
+
+ my $tbb = threads::tbb->new;
+
+ # make a body object
+ my $body = $tbb->reduce_int_array_func(
+     \@array,
+     __PACKAGE__.'::map_func',
+     __PACKAGE__.'::reduce_func',
+ );
+
+ sub map_func {
+     my $array = shift;
+     my $range = shift;
+     # code may be executed in another thread.
+     # we now have exclusive use of
+     #  $array->[$range->begin .. $range->end-1]
+     my $price = 0;
+     for my $i ($range->begin .. $range->end-1) {
+         my $val = $array[$i];  # another lazy deep copy
+
+         $price += $val->compute_cost();
+     }
+     return $price;
+ },
+ sub reduce_func {
+     my ($a, $b) = @_;
+     return defined $b ? $a + $b : $a;
+ );
+
+ $tbb->parallel_reduce($array_range, $body);
+
+ say "total is ", $body->result;
+
+=head2 map_reduce_list_func#TODO
+
+Just like B<map_list_func>, this is a convenience wrapper for
+C<reduce_int_array_func>.
+
+  use threads::tbb;
+
+  my $tbb = threads::tbb->new;
+
+  sub Some::Static::Func {
+      my $val = shift;
+      $val->frobnicate();
+      return $val;
+  }
+  sub Some::Static::reduction {
+      my ($a, $b) = @_;
+      return defined $b ? $a + $b : $a;
+  }
+
+  my $result = $tbb->map_reduce_list_func(
+         'Some::Static::Func', 'Some::Static::reduction',
+         @array
+  );
+
+=head2 pipeline / filter #TODO
+
+This extremely useful API allows you to structure code that performs
+multiple discrete steps on a continuous stream of data, with worker
+threads picking up whatever needs doing.
+
+=head2 parallel_while#TODO
+
+This one could potentially be used to implement a generic
+multi-processor event loop.
+
+  my $i = 20;
+  my $iterator = sub {
+      $i-- || undef;
+  };
+  # deep copied to the sub in this block
+  parallel_while($iterator, sub {
+
+      # you can add another iterator to the while block
+      parallel_while_add($iterator2);
+
+  });
+
+Each of the iterators added run in the thread context of the
+interpreter that added them.
+
+=head2 parallel_sort#TODO
+
+Sorting with some scalability.  No plan for this yet; it probably also
+would not scale beyond one processor without naughty cross-thread
+peeking (see L<threads::tbb::concurrent>)
+
+=head2 parallel_scan #TODO #LATER
+
+... an obscure one; see http://en.wikipedia.org/wiki/Prefix_sum ...
+
+Not implemented.
+
+=head1 SEE ALSO
+
+L<threads::tbb::blocked_int>, L<threads::tbb::concurrent>,
+L<threads::tbb::concurrent:item>, L<threads::tbb::concurrent::array>,
+L<threads::tbb::concurrent::hash>
+
+L<threads>, L<threads::lite>
+
+L<http://threadingbuildingblocks.org>
+
+B<Intel Threading Building Blocks>: Outfitting C++ for Multi-core
+Processor Parallelism, By James Reinders.  Publisher: O'Reilly Media.
+Released: July 2007.  L<isbn://978-0-596-51480-8> (print)
+L<isbn://978-0-596-15959-7> (ebook).
+
+=head1 AUTHOR AND LICENSE
+
+C<threads::tbb> was written by Sam Vilain L<sam.vilain@openparallel.com>
+
+Copyright (c) 2011, OpenParallel.  C<threads::tbb> is Free Software;
+you may use it and/or modify it under the same terms as Perl itself.
+
+The TBB library itself is GPL-2, with a special exception that you may
+use it as a part of a free software library without restriction.
+Whether that implies that use of this library imparts the freedoms
+granted by the GPL on users receiving copies of software built using
+this library, or whether using with, say, a GPL-3 library revokes the
+right to copy the software is left as an exercise for the OSS licensing
+geek reader.
+
+=head1 CHANGES
+
+=over
+
+=item B<version 0.04, July 8 2011>
+
+=over 4
+
+=item *
+
+Fix a dire installation/make bug in Makefile.PL
+
+=back
+
+=item B<version 0.03, July 7 2011>
+
+=over 4
+
+=item *
+
+New convenience wrapper for marking foreign XS object types as safely
+sharable between threads; see L<threads::tbb::refcounter>.
+
+=item *
+
+New map_list_func convenience API (wrapper for for_int_array_func);
+see L<threads::tbb/map_list_func>
+
+=item *
+
+Documentation enhancements
+
+=item *
+
+Memory leak fixes with containers: they now free their contents when
+they are freed.
+
+=back
+
+=item B<version 0.02, May 10 2011>
+
+This version principally adds the corresponding white paper and a
+couple of minor documentation changes.  Hopefully the next version
+will actually implement some more of the TBB API!
+
+=back
+
+=cut
+

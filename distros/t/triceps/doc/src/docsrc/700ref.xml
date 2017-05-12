@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+<chapter id="ch_ref" xmlns:xi="http://www.w3.org/2001/XInclude">
+	<title>Triceps Perl API Reference</title>
+
+		<para>
+		There are two distinct ways to descibe something, a <quote>guide</quote> and
+		a <quote>reference</quote>. Most of this manual is a guide: it goes
+		by describing things by examples, together with the idioms of their
+		usage, and with the explanation of the internal structure and
+		underlying reasons. However if you already know how things work
+		and need to look up the trivia, a reference with its short
+		and dry descriptions comes handy. Besides, some methods of the classes
+		essentially are the trivia, and there is no point in making
+		elaborate examples about them. The reference for the whole
+		Perl API is collected here, organized by classes.
+		Eventually it should be placed into the man pages as well, but
+		so far I haven't got around to do it.
+		</para>
+
+		<para>
+		Some of the classes are so fundamental that the guide sections
+		about them were essentially of the reference type, with the
+		use being shown in all the examples of the manual. In such cases
+		I'm not copying them here, instead please refer to the relevant
+		chapters:
+		</para>
+
+		<para>
+		Simple field types in
+		<xref linkend="sc_SimpleTypes" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<para>
+		RowType in 
+		<xref linkend="sc_RowTypes" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<para>
+		Row in 
+		<xref linkend="sc_Rows" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<para>
+		Label in 
+		<xref linkend="ch_LabelsRowops" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<para>
+		Rowop in 
+		<xref linkend="sc_Rowop" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<xi:include href="file:///DOCS/701top.xml"/>
+		<xi:include href="file:///DOCS/703code.xml"/>
+		<xi:include href="file:///DOCS/708unit.xml"/>
+		<xi:include href="file:///DOCS/710tabtype.xml"/>
+		<xi:include href="file:///DOCS/712idxtype.xml"/>
+		<xi:include href="file:///DOCS/714aggtype.xml"/>
+		<xi:include href="file:///DOCS/716simpleagg.xml"/>
+		<xi:include href="file:///DOCS/718table.xml"/>
+		<xi:include href="file:///DOCS/720rowhand.xml"/>
+		<xi:include href="file:///DOCS/722aggcontext.xml"/>
+		<xi:include href="file:///DOCS/730opt.xml"/>
+		<xi:include href="file:///DOCS/732field.xml"/>
+		<xi:include href="file:///DOCS/740lookupjoin.xml"/>
+		<xi:include href="file:///DOCS/742jointwo.xml"/>
+		<xi:include href="file:///DOCS/744collapse.xml"/>
+		<xi:include href="file:///DOCS/760braced.xml"/>
+		<xi:include href="file:///DOCS/766fnreturn.xml"/>
+		<xi:include href="file:///DOCS/768fnbind.xml"/>
+		<xi:include href="file:///DOCS/770autofn.xml"/>
+		<xi:include href="file:///DOCS/780app.xml"/>
+		<xi:include href="file:///DOCS/782triead.xml"/>
+		<xi:include href="file:///DOCS/784towner.xml"/>
+		<xi:include href="file:///DOCS/786nexus.xml"/>
+		<xi:include href="file:///DOCS/788facet.xml"/>
+		<xi:include href="file:///DOCS/790autodrain.xml"/>
+
+		<!-- XXX add references for all the X modules! -->
+</chapter>

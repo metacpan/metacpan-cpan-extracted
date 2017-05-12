@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_ref_toplevel">
+		<title>Top-level functions reference</title>
+
+		<indexterm>
+			<primary>now</primary>
+		</indexterm>
+		<para>
+		The function <pre>Triceps::now()</pre> is similar to
+		Perl <pre>time()</pre> but returns the current time as a floating point
+		number, with the fractional seconds:
+		</para>
+
+<pre>
+$time = &Triceps:now();
+</pre>
+		
+		<para>
+		This time format is used by a few Triceps methods, mostly in the
+		multithreading support.
+		</para>
+
+		<indexterm>
+			<primary>wrapfess</primary>
+		</indexterm>
+		<para>
+		The function <pre>Triceps::wrapfess()</pre> takes care of wrapping the
+		confessions in the templates. It's very much like the try/catch, only it has the
+		hardcoded catch logic that adds the extra error information and then
+		re-throws the exception.
+		</para>
+
+<pre>
+Triceps::wrapfess($message, $code);
+</pre>
+
+		<para>
+		<pre>$code</pre> is the code to execute in an <pre>eval</pre>, the <i>try</i> part. <pre>$message</pre>
+		is the message that is prepended to the error if the code confesses. The original
+		message will be indented to create the nice-looking messages when the errors
+		propagate up a chain of nested <pre>wrapfess()</pre>. The stack trace doesn't
+		get indented or duplicated, it's preserved as-is during the propagation.
+		</para>
+
+		<para>
+		The goal of <pre>wrapfess()</pre> is to make the errors reported from the
+		Triceps templates more user-friendly. When some part of the template's code
+		generation fails, the error message that talks about the low-level details
+		may be difficult to connect to the error in teh template arguments.
+		The wrapping allows to prepend the high-level message about what template
+		arguments were wrong.
+		</para>
+
+		<para>
+		<pre>$message</pre> may be either a string or a code reference, or a reference
+		to a scalar variable containing either. If it's
+		a code reference, it will be evaluated, and its result will be used as a string.
+		The code as message can be useful if the message is expensive to generate,
+		and thus it would be generated only if an error is encountered. The reference to a scalar
+		can be used to wrap the code into a single <pre>wrapfess</pre> but then replace the
+		actual value to print as needed. This might be too flexible, and it's not
+		clear yet if the reference message is a good idea.
+		</para>
+
+		<para>
+		Examples of usage:
+		</para>
+
+<pre>
+my $result_rt = Triceps::wrapfess
+	"$myname: Invalid result row type specification:",
+	sub { Triceps::RowType->new(@rowdef); };
+
+my $result_rt = Triceps::wrapfess sub {
+		"$myname: Invalid result row type specification:"
+	},
+	sub { Triceps::RowType->new(@rowdef); };
+
+my $eref;
+return Triceps::wrapfess \$eref,
+	sub {
+		$eref = "Bad argument foo";
+		buildTemplateFromFoo();
+		$eref = sub {
+			my $bardump = $argbar->dump();
+			$bardump =~ s/^/    /mg;
+			return "Bad argument bar:\n  bar value is:\n$bardump";
+		};
+		buildTemplateFromBar();
+		...
+   };
+</pre>
+
+		<para>
+		An example of produced error message:
+		</para>
+
+<pre>
+Triceps::Fields::makeTranslation: Invalid result row type specification:
+  Triceps::RowType::new: incorrect specification:
+    duplicate field name 'f1' for fields 3 and 2
+    duplicate field name 'f2' for fields 4 and 1
+  Triceps::RowType::new: The specification was: {
+    f2 => int32[]
+    f1 => string
+    f1 => string
+    f2 => float64[]
+  } at blib/lib/Triceps/Fields.pm line 209.
+	Triceps::Fields::__ANON__ called at blib/lib/Triceps.pm line 192
+	Triceps::wrapfess('Triceps::Fields::makeTranslation: Invalid result row type spe...', 'CODE(0x1c531e0)') called at blib/lib/Triceps/Fields.pm line 209
+	Triceps::Fields::makeTranslation('rowTypes', 'ARRAY(0x1c533d8)', 'filterPairs', 'ARRAY(0x1c53468)') called at t/Fields.t line 186
+	eval {...} called at t/Fields.t line 185
+</pre>
+
+		<para>
+		The nested error lines are differentiated from the stack trace lines
+		by assuming that the stack trace lines always start with a tab character.
+		Thus the lines in the errors caught by <pre>wrapfess()</pre> that start
+		with a tab character don't get indented, and the resf ot them get indented
+		by two spaces.
+		</para>
+
+		<para>
+		Note also that even though <pre>wrapfess()</pre> uses <pre>eval()</pre>, there is no <pre>eval</pre>
+		above it in the stack trace. That's the other part of the magic: since
+		that <pre>eval</pre> is not meaningful, it gets cut from the stack trace, and
+		<pre>wrapfess()</pre> also uses it to find its own place in the stack trace, the
+		point from which a simple re-confession would dump the duplicate of the
+		stack. So it cuts the <pre>eval</pre> and everything under it in the original
+		stack trace, and then does its own confession, inserting the stack
+		trace again. This works very well for the traces thrown by the XS code,
+		which actually doesn't write anything below that <pre>eval</pre>; <pre>wrapfess()</pre> then
+		adds the missing part of the stack.
+		</para>
+
+		<indexterm>
+			<primary>nestfess</primary>
+		</indexterm>
+		<para>
+		Internally, <pre>wrapfess()</pre> uses the function <pre>Triceps::nestfess()</pre> to
+		re-throw the error. <pre>Nestfess()</pre> can also be used directly:
+		</para>
+
+<pre>
+Triceps::nestfess($message, $nested_message);
+</pre>
+
+		<para>
+		<pre>$message</pre> is the high level message to prepend to the low-level message,
+		same as in <pre>wrapfess()</pre>. <pre>$nested_message</pre> is the low-level message to be wrapped.
+		<pre>Nestfess()</pre> is responsible for all the smart processing of the indenting
+		and stack traces, <pre>wrapfess()</pre> is really just a bit of syntactic sugar on
+		top of it.
+		</para>
+
+		<para>
+		The typical usage is:
+		</para>
+
+<pre>
+eval {
+	buildTemplatePart();
+};
+if ($@) {
+	Triceps::nestfess("High-level error message", $@);
+}
+</pre>
+
+	</sect1>
+

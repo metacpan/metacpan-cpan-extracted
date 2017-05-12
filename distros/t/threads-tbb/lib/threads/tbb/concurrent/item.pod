@@ -1,0 +1,38 @@
+
+=head1 NAME
+
+threads::tbb::concurrent::item - lazy deep copy slot
+
+=head1 SYNOPSIS
+
+  use threads::tbb;
+
+  #my $scalar :concurrent;  # TODO
+  tie my $scalar, "threads::tbb::concurrent::item";
+
+  # this works:
+  $scalar = "foo";
+  my $item = $scalar;  # safe
+
+  # never:
+  $array[0]->mutate;
+
+=head1 DESCRIPTION
+
+The concurrent item is a single slot which is not duplicated when
+passed between threads.  It is a way to access the lazy deep copy
+mechanism used by L<threads::tbb::concurrent> implementations, free of
+the container.
+
+It does not correspond to any formal TBB API, and should not be
+considered thread-safe when used in isolation.
+
+This API should be considered EXPERIMENTAL.  It probably needs
+altering to be safe, at the very minimum by cloning objects on the way
+in.
+
+=head1 SEE ALSO
+
+L<threads::tbb::concurrent>, L<threads::tbb>
+
+=cut

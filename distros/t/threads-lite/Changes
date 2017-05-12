@@ -1,0 +1,99 @@
+Revision history for threads-lite
+
+0.033      2013-05-27
+           Disable smartmatch warnings
+
+0.032      2013-02-19
+           Fixed C89 issue
+           Postpone store_self a little
+
+0.031_001  2012-02-05
+           Use vtable for queues
+           Use hash table for threads and queues
+           Use per thread thread tables
+           Fix C89 compatibility
+           Fix loading of feature.pm
+
+0.031      2011-05-27
+           Rewrote allocation strategy for messages to be more straightforward
+           Start new interpreters in new threads, not earlier; This makes cloning impossible
+           Depend on 5.10.1 instead of 5.10.0, as the latter has different smartmatching semantics
+           Fixed FSF address in license (RT #68064)
+           Fixed linkage (fixes RT #68111)
+
+0.030      2011-03-05
+           Released 0.029_005 as 0.030
+
+0.029_005  2011-02-16
+           Start threads in scalar context
+           Fixed queue_dequeue_nb linkage
+           Fixed queue_receive_nb return type
+           Added test for queue->dequeue_nb
+
+0.029_004  2011-02-16
+           Renamed receiving functions
+           Fixed more allocation issues on Win32
+
+0.029_003  2011-02-14
+           Remove av_create_and_push usage
+
+0.029_002  2011-02-10
+           Fixed return values of receive, receive_nb and receive_match_nb
+           Fixed deallocation issue on Win32 
+           Fixed list of exports
+
+0.029_001  2010-12-08
+           Replaced receive_table with receive_match
+           Don't clone when creating a set of threads
+           Improved C89 compatibility
+
+0.028      2010-06-13
+           Refactoring and bugfixing for greater stability
+
+0.027      2010-05-11
+           Fixed two typos in the code
+
+0.026      2010-04-26
+           Reimplemented commonly used subs in XS
+           Fixed initalization bugs
+           Fixed documentation
+
+0.025      2010-04-11
+           Added packed encoding
+           Fixed calling the thread waiter
+           Solved compilation error
+           Fixed overallocation
+
+0.024      2010-04-09
+           Restored message queues
+           Added thread waiter and counter
+
+0.023      2010-04-02
+           Fixed dependencies
+
+0.022      2010-03-26
+           API break: made spawn a function instead of a method.
+           Hopefully fixed destuction locker.
+           Fixed bug with handling undefined $options.
+           Added dependency on Test::Difference.
+           Fixed building on Win32.
+           Export parallel_grep, check for child thread death.
+           Refactored receiving, added receive_table_nb.
+           Fixed serialization bug.
+           Added an example.
+
+
+0.021      2010-03-24
+           Fixed locking during destruction time.
+           Refactored and documented parallel_map and tids.
+           Made requirement on perl 5.10 more explicit.
+
+0.020_002  2010-03-23
+           Documentation updates
+
+0.020_001  2010-03-22
+           Complete rewrite of thread creation routines
+
+0.010_001  2009-08-17
+           First version, released on an unsuspecting world.
+

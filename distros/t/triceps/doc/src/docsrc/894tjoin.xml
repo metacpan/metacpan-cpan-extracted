@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_triead_join">
+		<title>TrieadJoin reference</title>
+
+		<indexterm>
+			<primary>TrieadJoin</primary>
+		</indexterm>
+		<para>
+		TrieadJoin is the abstract base class that tells the harvester how to
+		join a thread after it had finished. Obviously, it's present only in
+		the &Cpp; API and not in Perl. It's defined in <pre>app/TrieadJoin.h</pre>.
+		</para>
+
+		<indexterm>
+			<primary>PerlTrieadJoin</primary>
+		</indexterm>
+		<indexterm>
+			<primary>BasicPthread</primary>
+		</indexterm>
+		<para>
+		Currently TrieadJoin has two subclasses: PerlTrieadJoin for the Perl
+		threads and BasicPthread for the POSIX threads in &Cpp;. I won't be
+		describing PerlTriedJoin, since it's in the internals of the Perl
+		implementation, never intended to be directly used by the application
+		developers, and if you're interested, you can always look at its source
+		code. BasicPthread is described in 
+		<xref linkend="sc_cpp_basic_pthread" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<para>
+		Well, actually there is not a whole lot of direct use for TrieadJoin
+		either: you need to worry about it only if you want to define a joiner
+		for some other kind of threads, and this is not very likely.
+		</para>
+
+		<para>
+		So, if you want to define a joiner for some other kind of  threads, you
+		define a subclass of it, with an appropriately defined method <pre>join()</pre>.
+		</para>
+
+		<para>
+		TrieadJoin is an Mtarget, naturally referenced from multiple threads
+		(at the very least it's created in the thread to be joined or its
+		parent, and then passed to the harvester thread by calling
+		<pre>App::defineJoin()</pre>). The methods of TrieadJoin are:
+		</para>
+
+<pre>
+TrieadJoin(const string &name);
+</pre>
+
+		<para>
+		The constructor. The <pre>name</pre> is the name of the Triead, used for the error
+		messages. Due to the various syncronization reasons, this makes the
+		life of the harvester much easier, than trying to look up the name from
+		the Triead object.
+		</para>
+
+<pre>
+virtual void join() = 0;
+</pre>
+
+		<para>
+		<i>The Most Important</i> joining method to be defined by the subclass. The
+		subclass object must also hold the identity of the thread in it, to
+		know which thread to join. The harvester will call this method.
+		</para>
+
+<pre>
+virtual void interrupt();
+</pre>
+
+		<indexterm>
+			<primary>FileInterrupt</primary>
+		</indexterm>
+		<para>
+		The method that interrupts the target thread when it's requested to
+		die. It's called in the context of the thread that triggers the App
+		shutdown (or otherwise requests the target thread to die). By default
+		the TrieadJoin carries a FileInterrupt object in it (it gets created on
+		TrieadJoin construction, and then TrieadJoin keeps a reference to it),
+		that will get called by this method to revoke the files. But everything
+		else is a part of the threading system, and the base class doesn't know
+		how to do it, the subclasses must define their own methods, wrapping
+		the base class.
+		</para>
+
+		<para>
+		Both PerlTrieadJoin and BasicPthread add sending the signal <pre>SIGUSR2</pre> to
+		the target thread. For that they use the same target thread identity
+		kept in the object as used by the <pre>join()</pre> call.
+		</para>
+
+<pre>
+FileInterrupt *fileInterrupt() const;
+</pre>
+
+		<para>
+		Get a pointer to the FileInterrupt object defined in the TrieadJoin.
+		The most typical use is to pass it to the TrieadOwner object, so that
+		it can be easily found later:
+		</para>
+
+<pre>
+to->fileInterrupt_ = fileInterrupt();
+</pre>
+
+		<para>
+		Though of course it could be kept in a separate local Autoref instead.
+		</para>
+
+<pre>
+const string &getName() const;
+</pre>
+
+		<para>
+		Get back the name of the joiner's thread. 
+		</para>
+	</sect1>

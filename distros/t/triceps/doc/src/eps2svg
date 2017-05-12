@@ -1,0 +1,24 @@
+#!/bin/sh
+#
+# (C) Copyright 2011-2014 Sergey A. Babkin.
+# This file is a part of Triceps.
+# See the file COPYRIGHT for the copyright notice and license information
+#
+# converter wrapper from .eps to .svg
+# Use: eps2svg src-file dst-file
+
+die()
+{
+	echo "$*" >&2
+	exit 1
+}
+
+SRC=$1
+DST=$2
+set -- `grep '%%BoundingBox:' "$SRC"` || die "Can't read $SRC"
+WIDTH=$4
+HEIGHT=$5
+
+[ -n "$WIDTH" -a -n "$HEIGHT" ] || die "Unable to read the bounding box"
+
+gs -sDEVICE=svg -sOutputFile="$DST" -dNOPAUSE -dBATCH -dDEVICEWIDTHPOINTS="$WIDTH" -dDEVICEHEIGHTPOINTS="$HEIGHT" "$SRC"

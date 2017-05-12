@@ -1,0 +1,27 @@
+1.01 - None yet - first release.
+1.02 - Correct type in project email.
+     - additional notes in the README file.
+1.03 - fixed bug where checkbox's didnt refresh properly after loading new config.
+     - remember values of options not supported in GUI, so we write them out again on save.
+     - lock text panes to central scrollbar, so code remains side-by-side.
+     - disable text in text panes - this is not an editor.
+     - remember what section we are in when we load a new config, and redraw with this section active.
+1.04 - support for --no_XXX options
+     - lock scrollbar and text panes together, but make text panes same length
+1.05 - fixed issue where windows/cygwin file-insensitive filesystems couldnt detect difference between
+       version.pm and Version.pm. Hence the operator qv() wasnt found, and a crash results.
+1.06 - fixed bug in parameter to PT::R->parseConfig, causing loading of perltidy configs to fail
+     - fixed minor inefficiency where section list was reconstructed over and over, when it can be done just once
+     - fixed bug where a config section heading was being printed twice
+1.07 - pod for CPAN indexing
+1.08 - tweak MANIFEST
+1.09 - Perl/Tidyview not required for CPAN indexing, removed
+1.10 - move lib/VERSION.pm to lib/TidyView/VERSION.pm to keep the application specific version safe
+     - added Perl::Tidy as a dependency
+1.11 - merged contributed patch for coloured diffs from mjcarman - thanx heaps!!!
+     - added in support for reporting semantic ruination caused by an options, via Perl::Signature.
+     - fix bug if user cancels from file selecion dialogue
+1.12 - coloured diff algorithms from Michael Carman, add a "mod" colour to replace add/del sequences
+1.13 - introduced dependency on Tk::DiffText, which does the colourised diff heavy lifting. Removed Tidyview::Text, as there is no longer a requirement to manage the text ourselves, Tk::DiffText does it.
+1.14 - Fixed test cases which were testing for missing types for options - as this has been fixed in perltidy, we now see them.
+     - Fixed bad setting of a glob to undef

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_types_simple">
+		<title>Simple types reference</title>
+
+		<indexterm>
+			<primary>SimpleType</primary>
+		</indexterm>
+		<para>
+		The simple types are defined as instances of the abstract class
+		SimpleType, defined in <pre>type/SimpleType.h</pre>.
+		They have one method in addition to the base Type:
+		</para>
+
+<pre>
+int getSize() const;
+</pre>
+
+		<para>
+		It returns the size of the value of this type. For void it's 0, for
+		string 1 (the minimal size of an empty string, consisting of only a
+		\0 at the end), for the rest of them it's a sizeof.
+		This size is used to extract the values from and copy the values to the
+		compact row format.
+		</para>
+
+		<para>
+		For now this is the absolute minimum of information that makes the data
+		usable. The list of methods will be extended over time. For example,
+		the methods for value comparisons will eventually go here. And if the
+		rows will ever hold the aligned values, the alignment information too.
+		</para>
+
+		<para>
+		The classes for all the actual
+		simple types are defined in <pre>type/AllSimpleTypes.h</pre>:
+		</para>
+
+		<indexterm>
+			<primary>VoidType</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Uint8Type</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Int32Type</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Int64Type</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Float64Type</primary>
+		</indexterm>
+		<indexterm>
+			<primary>StringType</primary>
+		</indexterm>
+<pre>
+VoidType
+Uint8Type
+Int32Type
+Int64Type
+Float64Type
+StringType 
+</pre>
+
+		<para>
+		You can construct the new objects of these classes but usually the
+		pre-created shared objects are easier to use, as described in
+		<xref linkend="sc_cpp_types" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		The shared objects also make the type comparisons for equality and match more efficient,
+		since the comparison gets short-circuited at the object pointer stage.
+		</para>
+	</sect1>

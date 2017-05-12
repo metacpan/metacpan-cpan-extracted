@@ -1,0 +1,329 @@
+#!/usr/bin/perl -w
+
+use Tk;
+use Tk::widgets qw(Label Dialog SimpleFileSelect Balloon);
+
+$VERSION=0.17;
+
+#
+# Default font - edit this for your system.
+#
+my $fn = '*-helvetica-medium-r-*-*-12-*'; # Widget font
+
+my $lang = $ENV{LANG};
+if ($lang =~ /^C$/ || ! defined ($lang)) {$lang = 'default'; }
+my $hdict = $ENV{HOME}."/.ispell_$lang"; # Personal dictionary. 
+
+my $ispell_prog = `which ispell`;  
+chomp $ispell_prog;
+my ($cw, $b1, @misspelledlist, @replacementlist, @addlist, $midx);
+my $ifname = '';
+my $lastmatchindex = '1.0';
+my $matchlength = 0;
+my $nextmiss = 0;
+my $scriptname = $O;
+
+sub mainwindow {
+    $cw = new MainWindow (-title => $O);
+    $b1 = $cw -> Balloon ();
+    @opts = (-padx => 5, -pady => 5);
+    my $cl = $cw->Scrolled ('Text', -height => 3, -wrap => 'none', 
+	   -font => $fn, -scrollbars => 'se');
+    $b1 -> attach ($cl, -balloonmsg => 'Misspelled text.');
+    $cl->Subwidget($_)->configure(-width=>10) foreach('xscrollbar','yscrollbar'); 
+    $cl->grid (-row => 2,-column => 1,-columnspan => 3,-sticky => 'ew',@opts);
+    $cw->Advertise ('text' => $cl);
+    my $lb = $cw -> Scrolled ('Listbox', -font => $fn, -scrollbars => 'osoe');
+    $lb->grid(-row => 3,-column => 1,-columnspan => 2,-sticky => 'ew',@opts);
+    $cw->Advertise('list' => $lb);
+    $b1 -> attach ($lb, -balloonmsg => 'Selection of replacement words.');
+    my $f = $cw->Frame(-container => 0)->grid(-row => 3,-column => 3);
+    my $b = $cw->Button (-text => 'Accept',-command => sub {checknext ()},
+			-width => 15, -font => $fn);
+    $b->grid(-row => 1, -column => 1, -in => $f, -sticky => 'w', @opts);
+    $b1 -> attach ($b, -balloonmsg => 'Accept the misspelled word.');
+    $b = $cw->Button(-text => 'Add', -command => sub {push 
+       @addlist, (gettextselection ()); checknext ()}, 
+		     -width => 15, -font => $fn);
+    $b->grid(-row => 2, -column => 1, -in => $f, -sticky => 'w', @opts);
+    $b1 -> attach ($b, -balloonmsg => 'Add the misspelled wordto dictionary.');
+    $b = $cw->Button(-text => 'Replace', -command => 
+      sub{replace () && checknext ()}, -width => 15, -font => $fn);
+    $b1 -> attach ($b, -balloonmsg => 'Replace this misspelling.');
+    $b->grid(-row => 3, -column => 1, -in => $f, -sticky => 'w', @opts);
+    $b = $cw->Button(-text => 'Replace All', -command => 
+      sub {replaceall () ; checknext ()}, -width => 15, -font => $fn);
+    $b->grid(-row => 4, -column => 1, -in => $f, -sticky => 'w', @opts);
+    $b1 -> attach ($b, -balloonmsg => 'Replace all occurrences of misspelling.');
+    my $l = $cw->Label (-text => 'Replace with:', -font => $fn, -width => 15);
+    $l->grid(-row => 5, -column => 1, -padx => 5, -in => $f, -sticky => 'w');
+    my $e = $cw->Entry (-width => 20);
+    $e->grid(-row => 6, -column => 1, -padx => 5, -in => $f, -sticky => 'ew');
+    $cw->Advertise ('replaceentry' => $e);
+    $b1 -> attach ($e, -balloonmsg => 'Edit and replace the misspelling.');
+    $lb -> bind ('<Button-1>', sub { $e->delete (0,'end');
+		       $e->insert(0, $lb->get ($lb->curselection))});
+    $f2 = $cw->Frame(-container => 0);
+    $f2->grid (-row => 5, -column => 1, -columnspan => 4, -sticky => 'ew');
+    $b = $cw->Button(-text => 'Check...', -command => sub {checkfirst ()},
+			-width => 15, -font => $fn);
+    $b1 -> attach ($b, -balloonmsg => 'Begin spell check.');
+    $b -> grid (-row => 5, -column => 1, -sticky => 'ew', -in => $f2, @opts);
+    $b = $cw -> Button (-text => 'Select File...', 
+         -command => sub {selectfile ()},-width => 15, -font => $fn);
+    $b1 -> attach ($b, -balloonmsg => 'Select file to spell check.');
+    $b -> grid (-row => 5, -column => 2, -sticky => 'ew', -in => $f2, @opts);
+    $b = $cw -> Button (-text => 'Dismiss', -command => sub{save_and_exit ()},
+			-width => 15, -font => $fn);
+    $b -> grid (-row => 5, -column => 3, -sticky => 'ew', -in => $f2, @opts);
+    $b1 -> attach ($b, -balloonmsg => 'Exit the program.');
+}
+
+sub save_and_exit {
+    $cw -> WmDeleteWindow if (defined ($ifname) && ! length ($ifname));
+    if ($#misspelledlist >= 0) {
+	my $d = $cw -> Dialog (-title => 'Save File',
+           -text => "Save $ifname?\nOriginal file will be saved as $ifname.bak.", 
+           -bitmap => 'question', -font => $fn, -buttons => [qw/Yes No/], 
+           -default_button => 'Yes');
+	$d -> Subwidget ('B_Yes') -> configure (-font => $fn);
+	$d -> Subwidget ('B_No') -> configure (-font => $fn);
+	if (($d->Show) =~ /Yes/) {
+	    $cw -> Busy;
+	    system ('mv', $ifname, "$ifname.bak");
+	    open OUT, "+>>$ifname" or die "Couldn't overwrite old $ifname: $!\n";
+	    print OUT ($cw -> Subwidget ('text') -> get ('1.0', 'end'));
+	    close OUT;
+	    $cw -> Unbusy;
+	}
+    }
+    if ($#addlist >= 0) {
+	$d = $cw -> Dialog (-title => 'Add Words',
+	    -text => 'Save new words to your personal dictionary?',
+            -bitmap => 'question', -font => $fn,
+		-buttons => [qw/Yes No/], -default_button => 'Yes');
+	$d -> Subwidget ('B_Yes') -> configure (-font => $fn);
+	$d -> Subwidget ('B_No') -> configure (-font => $fn);
+	if (($d->Show) =~ /Yes/) {
+	  $cw -> Busy;
+	  open OUT, ">>$hdict" or  die "Couldn't add words to $hdict: $!\n";
+	  foreach (@addlist) { print OUT "$_\n"}
+	  close OUT;
+	  $cw -> Unbusy;
+      }
+    }
+    $cw -> WmDeleteWindow;
+}
+
+sub filenotfound {
+    $cw->Dialog (-title => 'File Not Found', -text => "Could not open @_",
+		   -bitmap => 'error', -font => $fn) -> Show;
+}
+
+sub selectfile {
+    my $d = $cw -> SimpleFileSelect;
+    $ifname = $d -> Show;
+    return filenotfound ($ifname) if (length $ifname and (not -f $ifname));
+    openfile ();
+}
+
+sub openfile {
+    open IN, $ifname or (filenotfound ($ifname) && return);
+    while(defined ($l=<IN>)){$cw->Subwidget('text')->insert('end',$l)}
+    $cw -> configure (-title => "$ifname");
+    close IN;
+}
+
+sub addtexttags {
+    $cw->Subwidget('text') -> markSet('insert',$midx);
+    $cw->Subwidget('text') -> tagAdd('sel',$midx,"$midx+$matchlength chars");
+    $cw->Subwidget('text') -> see ($midx);
+}
+
+sub adjust_index {
+    my ($idx,$match) = @_;
+    my ($mr,$mc) = split /\./, $idx;
+    $mc += length $match;
+    return "$mr.$mc";
+}
+
+sub checkfirst {
+    get_misspellings ();
+    if ($#misspelledlist < 0) {	complete_notify (); return 0;}
+    guesses ();
+    my $term = $misspelledlist[0];
+    $midx = $cw->Subwidget('text')->search 
+	(-forwards, -count => \$matchlength, $term, $lastmatchindex);
+    $lastmatchindex = adjust_index ($midx, $term);
+    addtexttags ();
+    show_guesses ();
+    misspelled_replace ();
+}
+
+sub checknext {
+    $cw->Subwidget('text')->tagRemove ('sel', '1.0', 'end');
+    if (++$nextmiss >= $#misspelledlist) {complete_notify ();return 0; }
+    (checknext () && return 1) if grep /$misspelledlist[$nextmiss]/, @addlist;
+    $midx = ($cw->Subwidget('text')->search (-forwards,-count=>\$matchlength,
+        $misspelledlist[$nextmiss],$lastmatchindex,'end'));
+    if ((defined $midx) && (length $midx)) {
+	addtexttags ();
+	$lastmatchindex=adjust_index($midx,$misspelledlist[$nextmiss]);
+	show_guesses ();
+	misspelled_replace ();
+    }
+    return 1;
+}
+
+sub complete_notify {
+    return if ! $ifname;
+    $cw->Subwidget('list') -> delete (0, 'end');
+    $cw -> Subwidget('list') -> insert ('end', 'Spell check complete.');
+    return 0;
+}
+
+
+sub misspelled_replace {
+    $cw -> Subwidget ('replaceentry') -> delete (0, 'end');
+    $cw -> Subwidget ('replaceentry') -> insert (0, gettextselection ());
+}
+
+sub gettextselection {
+ return $cw->Subwidget('text')->get ($midx,"$midx+$matchlength chars");
+}
+
+sub replace {
+    $cw -> Subwidget('text')-> delete('insert',"insert + $matchlength chars");
+    my $replacement = $cw->Subwidget('replaceentry') -> get;
+    $cw->Subwidget('text')->insert('insert', $replacement);
+    push @addlist, ($replacement);
+    $lastmatchindex = adjust_index 
+	(($cw->Subwidget('text')->index('insert')),$replacement);
+    $cw->Subwidget('text') -> markSet('insert',$lastmatchindex);
+}
+
+sub replaceall {
+    $cw -> Busy;
+    my $lastindex = '1.0';
+    my $misspelled = gettextselection ();
+    my $replacement = $cw -> Subwidget ('replaceentry') -> get;
+    while (1) {
+     $midx = ($cw->Subwidget('text')->search 
+       (-forwards, -count => \$mlength, $misspelled,$lastindex,'end'));
+     last unless length $midx;
+     $cw->Subwidget('text')->delete($midx, "$midx + $mlength chars");
+     $cw->Subwidget('text')->insert($midx, $replacement);
+     $lastindex = adjust_index ($midx,$replacement);
+    }
+    push @addlist, ($replacement);
+    $cw -> Unbusy;
+}
+
+sub guesses {
+    $cw -> Busy;
+    return if ! $ifname;
+    @guesslist = qx|$ispell_prog -a \<$ifname 2\>&1|;
+    shift @guesslist;  # remove the ispell id
+    chomp foreach (@guesslist);
+    $cw -> Unbusy;
+}
+
+sub show_guesses {
+    $cw->Subwidget('list') -> delete (0, 'end');
+    my $misspelling = gettextselection ();
+    my @wordguesses = grep /\& $misspelling/, @guesslist;
+    if ($wordguesses[0]) {
+	$wordguesses[0] =~ s/.*\: //;
+	$cw -> Subwidget('list') -> insert ('end', $_) 
+	    foreach (split /, /, $wordguesses[0]);
+    }
+}
+
+sub get_misspellings {
+    return if ! $ifname;
+    $cw -> Busy (-recurse => 1);
+    @misspelledlist = qx|$ispell_prog -l \<$ifname|;
+    if ($#misspelledlist >= 0) {chomp foreach (@misspelledlist);}
+    $cw -> Unbusy (-recurse => 0);
+}
+
+
+mainwindow ();
+(($ifname=$ARGV[0]) && openfile()) if(defined $ARGV[0] and length $ARGV[0]);
+MainLoop;
+
+__DATA__;
+
+=head1 NAME
+
+tkispell - Perl/Tk user interface for ispell.
+
+=head1 SYNPOSIS
+
+tkispell [<filename>]
+
+=head1 DESCRIPTION
+
+Tkispell is a Perl/Tk graphical user interface to GNU ispell.  
+
+Tkispell opens the file given as a command line argument.  
+The "Select File...," button also allows users to select a file.
+
+The, "Check...," button begins the spell check process.  The listing
+at the top of the window shows unrecognized words, and the listing in
+the middle of the window shows the alternative spellings provided by
+ispell.
+
+Clicking the, "Dismiss," button exits the program, after asking if the
+program should save the spell-checked file and the replacement words
+in the user's personal dictionary if necessary.
+
+The entry box at the lower right contains replacement text for
+misspelled words.  The text in the entry is either a selection
+from the word guesses or a word entered by the user.
+
+Buttons on the right side of the window select options for replacing
+possibly misspelled words.
+
+=head2 Accept
+
+Accept the word and continue to the next unrecognized word.
+
+=head2 Add
+
+Add the unrecognized word to the personal dictionary.
+
+=head2 Replace
+
+Replace the misspelled word.
+
+=head2 Replace All
+
+Replace all occurrences of the misspelled word.
+
+
+=head1 PERSONAL DICTIONARY
+
+Tkispell uses ispell's personal dictionary naming conventions:
+$HOME/.ispell_<language> or $HOME/.ispell_default if the $LANG
+environment variable is, "C," or is not set.
+
+=head1 REVISION INFO
+
+Id: tkispell,v 1.4 2004/02/27 01:37:16 kiesling Exp $
+
+=head1 COPYRIGHT
+
+Copyright © 2001-2004 Robert Kiesling, rkies@cpan.org.
+
+Licensed under the same terms as Perl. Refer to the file, "Artistic."
+
+=head1 SEE ALSO
+
+perl(1), ispell(1), Tk(1)
+
+=cut
+
+
+
+

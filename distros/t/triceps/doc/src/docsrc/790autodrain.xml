@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_ref_autodrain" xmlns:xi="http://www.w3.org/2001/XInclude">
+		<title>AutoDrain reference</title>
+
+		<indexterm>
+			<primary>AutoDrain</primary>
+		</indexterm>
+		<para>
+		The AutoDrain class creates the drains on an App with the automatic
+		scoping. When the returned AutoDrain object gets destroyed, the drain
+		becomes released. So placing the object into a lexically-scoped
+		variable in a block with cause the release on the block exit. Placing
+		it into another object will cause the release on deletion of that
+		object. And just not storing the object anywhere works as a barrier:
+		the drain gets completed and then immediately released, guaranteeing
+		that all the previously sent data is processed and then continuing with
+		the processing of the new data.
+		</para>
+
+		<para>
+		All the drain caveats described in the App class apply to the automatic
+		drains too.
+		</para>
+
+<pre>
+$ad = Triceps::AutoDrain::makeShared($app);
+$ad = Triceps::AutoDrain::makeShared($to);
+</pre>
+
+		<para>
+		Create a shared drain and wait for it to complete. A drain may be
+		created from either an App or a TrieadOwner object. Returns the
+		AutoDrain object.
+		</para>
+
+<pre>
+$ad = Triceps::AutoDrain::makeSharedNoWait($app);
+$ad = Triceps::AutoDrain::makeSharedNoWait($to);
+</pre>
+
+		<para>
+		Same as <pre>makeShared()</pre> but doesn't wait for the drain to complete before
+		returning. May still sleep if an exclusive drain is currently active.
+		</para>
+
+<pre>
+$ad = Triceps::AutoDrain::makeExclusive($to);
+</pre>
+
+		<para>
+		Create an exclusive drain on a TrieadOwner and wait for it to complete.
+		Returns the AutoDrain object. Normally the excluded thread (the current one,
+		idendified by the TrieadOwner) should be
+		input-only. Such an input-only thread is allowed to send more data in
+		without blocking. To wait for the app become drained again after that,
+		use the method <pre>wait()</pre>.
+		</para>
+
+<pre>
+$ad = Triceps::AutoDrain::makeExclusiveNoWait($to);
+</pre>
+
+		<para>
+		Same as <pre>makeExclusive()</pre> but doesn't wait for the drain to complete
+		before returning. May still sleep if a shared or another exclusive
+		drain is currently active.
+		</para>
+
+<pre>
+$ad->wait();
+</pre>
+
+		<para>
+		Wait for the drain to complete. Particularly useful after the <pre>NoWait</pre>
+		creation, but can also be used to wait for the App to become drained
+		again after injecting some rowops through the excluded Triead of the
+		exclusive drain.
+		</para>
+
+<pre>
+$ad->same($ad2);
+</pre>
+
+		<para>
+		Check that two AutoDrain references point to the same object. 
+		</para>
+	</sect1>

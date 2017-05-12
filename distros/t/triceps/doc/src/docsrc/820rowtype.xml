@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_rowtype">
+		<title>RowType reference</title>
+
+		<indexterm>
+			<primary>RowType</primary>
+		</indexterm>
+		<para>
+		In the Perl API a row type is a collection of fields. Under the hood
+		the things are more complicated. In the &Cpp; API Triceps allows for more
+		flexibility, more ways to represent a row. The row type is represented
+		by the abstract base class RowType that tells the logical structure of
+		a row and by its concrete subclasses that define the concrete layout of
+		data in a row. To create, read or manipulate a row, all you need to
+		know is a reference to RowType. It would refer to a concrete row type
+		object, and the concrete row operations are accessed by the virtual
+		methods. But when you create a row type, you need to know the concrete
+		row type subclass.
+		</para>
+
+		<indexterm>
+			<primary>CompactRowType</primary>
+		</indexterm>
+		<para>
+		Currently the choice is easy: there is only one such concrete subclass
+		CompactRowType. The <quote>compact</quote> means that the data is stored in the rows
+		in a compact form, one field value after another, without alignment.
+		Perhaps some day there will be an AlignedRowType, allowing to read the
+		values more efficiently. Or perhaps some day there will be a
+		ZippedRowType that would store the data in the compressed format.
+		</para>
+
+		<para>
+		Naturally, RowType is a Mtarget, since it inherits
+		from Type, and CompactRowType inherits from it. 
+		They are defined in <pre>type/RowType.h</pre> and
+		<pre>type/CompactRowType.h</pre> but for the include purposes it's
+		more customary to simply include <pre>type/AllTypes.h</pre>.
+		</para>
+
+		<para>
+		You would never use the RowType constructor directly, it's called from
+		the subclasses.  Even if you care
+		only about the logical structure of a row but not representation, you still
+		can't directly construct a RowType because it's an abstract class. But
+		just construct any concrete subclass, say CompactRowType (since it's
+		the only one available at the moment anyway), and then use its logical
+		structure.
+		Every subclass is expected to define a similar
+		constructor:
+		</para>
+
+<pre>
+RowType(const FieldVec &fields);
+CompactRowType(const FieldVec &fields);
+</pre>
+
+		<para>
+		The FieldVec is the definition of fields in the row type. It's defined
+		as simple as:
+		</para>
+
+<pre>
+typedef vector<Field> FieldVec;
+</pre>
+
+		<indexterm>
+			<primary>FieldVec</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Field</primary>
+		</indexterm>
+		<para>
+		An important side note is that the field is defined within the RowType,
+		so it's really RowType::FieldVec and RowType::Field, and you need to
+		refer to them in your code by this qualified name. So, to create a row
+		type, you create a vector of field definitions first and then construct
+		the row type from it. You can throw away or modify that vector
+		afterwards.
+		</para>
+
+		<para>
+		As usual for Type, the constructor arguments might not be correct, and any
+		errors will be remembered and returned with <pre>getErrors()</pre>. Don't use a
+		type with errors (other than to read the error messages from it, and to
+		destroy it), it might cause your program to crash.
+		</para>
+
+		<para>
+		A Field consists of the basic information about it: the name, the type,
+		and the array indication (remember, a Triceps field may contain an
+		array). The array indication is either RowType::Field::AR_SCALAR for a
+		scalar value or RowType::Field::AR_VARIABLE for a variable-sized array.
+		The original plan was also to use the integer values for the
+		fixed-sized array fields, but in reality the variable-sized array
+		fields have turned out to be easier to implement and that was it. So
+		don't use the integer values. Most probably they would work like the
+		same variable-sized arrays but they haven't been tested, and something
+		somewhere might crash. Use the symbolic enum AR_*.
+		</para>
+
+		<para>
+		The normal Field constructor provides all this information:
+		</para>
+
+<pre>
+Field(const string &name, Autoref<const Type> t, int arsz = AR_SCALAR);
+</pre>
+
+		<para>
+		Or you can use the default constructor and later change the fields in
+		the Field (or of course read them) as you please, they are all public:
+		</para>
+
+<pre>
+string name_;
+Autoref <const Type> type_;
+int arsz_;
+</pre>
+
+		<para>
+		Or you can assign them later in one fell swoop:
+		</para>
+
+<pre>
+void assign(const string &name, Autoref<const Type> t, int arsz = AR_SCALAR);
+</pre>
+
+		<indexterm>
+			<primary>SimpleType</primary>
+		</indexterm>
+		<para>
+		Note that even though theoretically you can define a field of any Type,
+		in practice it has to be of a SimpleType, or the RowType constructor
+		will return an error later. Why isn't it defined as an
+		<pre>Autoref<SimpleType></pre> then? The grand plan for the future 
+		is to allow some more
+		interesting data structures in the rows, and this keeps the door open.
+		In particular, the rows will be able to hold references to the other
+		rows, just I haven't got to implementing it yet.
+		</para>
+
+		<para>
+		Once again, a RowType constructor makes a copy of the FieldVec for its
+		use, so you can modify or destroy the original FieldVec right away. You
+		can get back the information about the fields in RowType:
+		</para>
+
+<pre>
+const vector<Field> &fields() const;
+</pre>
+
+		<para>
+		It returns a reference directly to the FieldVec contained in the row
+		type, so you must never modify it! The const-ness gives a reminder
+		about it.
+		</para>
+
+		<para>
+		There are more row type constructors (but no default one). First, each
+		subclass variety is supposed to be able to construct its variety by
+		copying the logical structure of any RowType:
+		</para>
+
+<pre>
+CompactRowType(const RowType &proto);
+CompactRowType(const RowType *proto);
+</pre>
+
+		<para>
+		The version with the pointer argument also works for passing an
+		<pre>Autoref<RowType></pre> as the argument which gets automatically converted to
+		a pointer (but be careful to not destroy the last reference until after the constructor
+		returns). And it's really the more typically used one than the
+		&amp;-reference version.
+		</para>
+
+		<para>
+		The resulting type will have the same logical structure but possibly a
+		different concrete representation than the original. 
+		</para>
+
+		<para>
+		The second constructor variety is a factory method:
+		</para>
+
+<pre>
+virtual RowType *newSameFormat(const FieldVec &fields) const;
+</pre>
+
+		<para>
+		It combines the representation format from one row type and the
+		arbitrary logical structure (the fields vector) from possibly another
+		row type. Or course, until more of the concrete type representations become
+		available, its use is largely theoretical. 
+		</para>
+
+		<para>
+		And there is also a factory method that copies the current row type
+		together with its concrete representation (it's really a convenience
+		wrapper over <pre>newSameFormat()</pre>):
+		</para>
+
+<pre>
+RowType *copy() const;
+</pre>
+
+		<para>
+		Let's get to some examples of constructing the row types. To reiterate,
+		you don't construct the objects of RowType class itself, it's an
+		abstract class. You construct the objects of the concrete subclass(es),
+		specifically CompactRowType. Make a vector describing the fields and do
+		the construction.
+		</para>
+
+		<para>
+		You can make the vector by either starting with an empty one and adding
+		the fields to it or allocating a vector of the right size in advance
+		and  setting the fields in it:
+		</para>
+
+<pre>
+RowType::FieldVec fields1;
+fields1.push_back(RowType::Field("a", Type::r_int64)); // scalar by default
+fields1.push_back(RowType::Field("b", Type::r_int32, RowType::Field::AR_SCALAR));
+fields1.push_back(RowType::Field("c", Type::r_uint8, RowType::Field::AR_VARIABLE));
+
+RowType::FieldVec fields2(2);
+fields2[0].assign("a", Type::r_int64); // scalar by default
+fields2[1].assign("b", Type::r_int32, RowType::Field::AR_VARIABLE);
+</pre>
+
+		<para>
+		You can also reuse the same vector and clean/resize is as needed to
+		create more types.
+		</para>
+
+		<para>
+		If you're used to laying out the C structures placing the larger
+		elements first for the more efficient alignment, know that this is not
+		needed for the Triceps rows. The CompactRowType stores the row data
+		unaligned, so any field order will result in the same size of the rows.
+		And it can't make use of some fields happening to be aligned either.
+		</para>
+
+		<para>
+		You can also find the simple types by their string names:
+		</para>
+
+<pre>
+fields1.push_back(RowType::Field("d", Type::findSimpleType("uint8"), RowType::Field::AR_VARIABLE));
+</pre>
+
+		<indexterm>
+			<primary>Type</primary>
+		</indexterm>
+		<para>
+		If the type name is incorrect and the type is not found,
+		<pre>findSimpleType()</pre> will return NULL, which NULL will be caught later at
+		the row type creation times. Note that there is no automatic look-up of
+		the array types. You can't simply pass <quote>uint8[]</quote> to <pre>findSimpleType()</pre>.
+		You have to break it up into the simple type name as such an the array
+		indication, like is done in <pre>perl/Triceps/RowType.xs</pre>. This would
+		probably a good thing to add to RowType::Field in the future.
+		</para>
+
+		<para>
+		You can't use the type Type::r_void for the fields, it will be reported
+		as an error.
+		</para>
+
+		<para>
+		After the fields array is created, create the row type:
+		</para>
+
+<pre>
+Autoref<RowType> rt1 = new CompactRowType(fields1);
+if (rt1->getErrors()->hasError())
+	throw Exception(rt1->getErrors(), true);
+</pre>
+
+		<para>
+		Or using the inialization templates:
+		</para>
+
+<pre>
+Autoref<RowType> rt1 = checkOrThrow(new CompactRowType(fields1));
+</pre>
+
+		<para>
+		You could also use <pre>Autoref<CompactRowType></pre> but there isn't any point to
+		it, since all the methods of CompactRowType are virtuals inherited from
+		RowType.
+		</para>
+
+		<para>
+		Don't forget to check that the constructed type has no errors, and bail
+		out if so. Throwing an Exception is a convenient way to abort with a
+		nice error message, and the template <pre>checkOrThrow()</pre> takes care of wrapping
+		all the details.
+		</para>
+
+		<para>
+		The RowType and its subclasses are immutable after construction, so
+		they can be shared between threads all you want. Depending on your
+		approach to the threads, it might be more efficient to create a 
+		separate copy of the row type for each thread. This way when the
+		references to the row types are created and deleted, the reference
+		count can stay in the cache of one CPU and thus be more efficient.
+		The thread support of the Triceps library does use this approach
+		and creates the copies whenever the row types are imported from a
+		nexus.
+		</para>
+
+		<para>
+		There are multiple equivalent ways to create a copy:
+		</para>
+
+<pre>
+Autoref<RowType> rt2 = rt1->copy();
+Autoref<RowType> rt3 = rt1->newSameFormat(rt1->fields());
+Autoref<RowType> rt4 = new CompactRowType(rt1);
+</pre>
+
+		<para>
+		Checking the errors after the copy creation is optional if the
+		original type was correct.
+		</para>
+
+		<para>
+		If you want to extend a type with more fields, make a copy
+		of its fields and extend it:
+		</para>
+
+<pre>
+RowType::FieldVec fields3 = rt1->fields();
+fields3.push_back(RowType::Field("z", Type::r_string));
+Autoref<RowType> rt3 = checkOrThrow(new CompactRowType(fields3));
+</pre>
+
+		<para>
+		That's about it for the RowType construction. 
+		</para>
+
+		<para>
+		The information about the contents of a RowType can be read back:
+		</para>
+
+<pre>
+int fieldCount() const;
+const vector<Field> &fields() const;
+int findIdx(const string &fname) const;
+const Field *find(const string &fname) const;
+</pre>
+
+		<para>
+		<pre>fields()</pre> had already been described. <pre>fieldCount()</pre> returns the count of
+		fields. <pre>findIdx()</pre> finds the index of the field by name, so that it can
+		then be looked up in the result of <pre>fields()</pre>. Or -1 if there is no such
+		field. <pre>find()</pre> directly returns the pointer to the field by name,
+		combining these two actions. (Or it returns NULL if there is no such
+		field).
+		</para>
+
+		<para>
+		The rest of the RowType methods have to do with the manipulation of the
+		rows. They are described in 
+		<xref linkend="sc_cpp_row" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+	</sect1>

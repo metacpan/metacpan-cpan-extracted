@@ -1,0 +1,578 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_ref_unit">
+		<title>Unit and FrameMark reference</title>
+
+		<para>
+		The Unit class represents an execution unit and
+		keeps the state of the Triceps execution for one
+		thread. Each thread running Triceps must have its own execution unit.
+		</para>
+
+		<para>
+		It's perfectly possible to have multiple execution units in the
+		same thread. This is typically done when there is some permanent
+		model plus some small intermittent sub-models created on demand to handle
+		the user requests. These small sub-models would be created in the
+		separate units, to be destroyed when their work is done.
+		</para>
+
+		<indexterm>
+			<primary>unit</primary>
+		</indexterm>
+		<para>
+		A unit is created as:
+		</para>
+
+<pre>
+$myUnit = Triceps::Unit->new($name);
+</pre>
+
+		<para>
+		The <pre>$name</pre> argument will be used in the error messages, making easier
+		to find, which exact part of the model is having troubles.
+		By convention the name should be the same as the name of the unit variable
+		(<quote>myUnit</quote> in this case). When a Unit is created as a part of
+		Triead (a Triceps thread object), it will be given the same name as
+		the Triead.
+		</para>
+
+		<para>
+		The name can be read back:
+		</para>
+
+<pre>
+$name = $myUnit->getName();
+</pre>
+
+		<para>
+		Also, as usual, the variable <pre>$myUnit</pre> here contains a reference to the
+		actual unit object, and two references can be compared for whether they
+		refer to the same object:
+		</para>
+
+<pre>
+$result = $unit1->same($unit2);
+</pre>
+
+		<para>
+		A unit also keeps an empty row type (one with no fields), primarily for the
+		creation of the clearing labels (discussed in
+		<xref linkend="sc_memory_labels" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;
+		and
+		<xref linkend="sc_Label_construction" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;),
+		but you can use it for any other purposes
+		too. You can get it with the method:
+		</para>
+
+<pre>
+$rt = $unit->getEmptyRowType();
+</pre>
+
+		<para>
+		Each unit has its own instance of an empty row type that can be used
+		to create the objects that don't process any data (for which
+		just the fact of a rowop passing through is important). The
+		creation of an empty row type in each unit instead of having
+		a single global one is purely for the conveniece of memory management
+		in the threads, they are all equivalent. You could also create
+		your own empty row type.
+		</para>
+
+		<para>
+		The rowops are enqueued with the calls:
+		</para>
+
+<pre>
+$unit->call(@rowops_or_trays);
+$unit->fork(@rowops_or_trays);
+$unit->schedule(@rowops_or_trays); 
+</pre>
+
+		<indexterm>
+			<primary>enqueue</primary>
+		</indexterm>
+		<para>
+		<quote>Enqueued</quote> is an ugly word but since I've already used the
+		word <quote>schedule</quote> for a specific purpose, I needed another word to name
+		all these operations together. Hence <quote>enqueue</quote>.
+		</para>
+
+		<para>
+		<pre>Call()</pre> executes the rowop immediately, <pre>fork()</pre> puts it onto the current
+		stack frame to be executed after the current label returns, and <pre>schedule()</pre> 
+		puts the rowop onto the outermost frame, to be executed when the model
+		becomes idle.
+		</para>
+
+		<para>
+		Calling these functions with multiple arguments produces the same
+		result as doing multiple calls with one argument at a time. The
+		rowop and tray arguments may be mixed arbitrarily.
+		</para>
+
+		<para>
+		Also there is a call that selects the enqueueing mode by argument:
+		</para>
+
+<pre>
+$unit->enqueque($mode, @rowops_or_trays);
+</pre>
+
+		<para>
+		The calling rules are exactly the same for the other enqueueing methods,
+		may have multiple rowops or trays as arguments, no need to check the result.
+		The <pre>$mode</pre> argument is one of:
+		</para>
+
+		<indexterm>
+			<primary>constants</primary>
+		</indexterm>
+		<itemizedlist>
+		<listitem>
+		<pre>&Triceps::EM_CALL</pre> or <pre>"EM_CALL"</pre>
+		</listitem>
+		<listitem>
+		<pre>&Triceps::EM_FORK</pre> or <pre>"EM_FORK"</pre>
+		</listitem>
+		<listitem>
+		<pre>&Triceps::EM_SCHEDULE</pre> or <pre>"EM_SCHEDULE"</pre>
+		</listitem>
+		<listitem>
+		<pre>&Triceps::EM_IGNORE</pre> or <pre>"EM_IGNORE"</pre>
+		</listitem>
+		</itemizedlist>
+
+		<para>
+		The <pre>EM_IGNORE</pre> is a <quote>no-op</quote> among the enqueueing
+		methods. It means that the rowop will be simply ignored and not executed at all. 
+		It is very rarely used in practice.
+		</para>
+
+		<para>
+		As usual, there are calls to convert between the integer constant and
+		string representations:
+		</para>
+
+<pre>
+$string = &Triceps::emString($value);
+$value = &Triceps::stringEm($string);
+$string = &Triceps::emStringSafe($value);
+$value = &Triceps::stringEmSafe($string);
+</pre>
+
+		<para>
+		And as usual, if the value can not be translated, the functions
+		with <pre>Safe</pre> return <pre>undef</pre>, the functions without
+		it confess.
+		</para>
+
+		<para>
+		The frame marks for looping are created as their own class:
+		</para>
+
+		<indexterm>
+			<primary>frame mark</primary>
+		</indexterm>
+<pre>
+$mark = Triceps::FrameMark->new($name);
+</pre>
+
+		<para>
+		The name can be obtained back from the mark:
+		</para>
+
+<pre>
+$name = $mark->getName();
+</pre>
+
+		<para>
+		Other than that, the frame marks are completely opaque, and can be used
+		only for the loop scheduling. Not even the <pre>same()</pre> method is supported
+		for them at the moment, though it probably will be in the future. The
+		mark gets set and used as:
+		</para>
+
+<pre>
+$unit->setMark($mark);
+$unit->loopAt($mark, @rowops_or_trays);
+</pre>
+
+		<para>
+		<pre>setMark</pre> must be called in the first label of the loop,
+		normally before doing anything else. <pre>loopAt()</pre> is called
+		in any label inside the loop that wants to send a rowop back to the
+		start of the loop.
+		The rowop or tray arguments of the <pre>loopAt()</pre> are the same as for the
+		other enqueueing functions.
+		</para>
+
+		<para>
+		The examples of the <pre>loopAt()</pre> operation are presented in
+		<xref linkend="sc_sched_topo_loops" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;,
+		and the details of its internal works are in 
+		<xref linkend="sc_sched_loop" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<para>
+		There also are the convenience methods that create the rowops
+		from the field values and immediately enqueue them:
+		</para>
+
+<pre>
+$unit->makeHashCall($label, $opcode, 
+	$fieldName => $fieldValue, ...);
+$unit->makeArrayCall($label, $opcode, @fieldValues);
+
+$unit->makeHashSchedule($label, $opcode, 
+	$fieldName => $fieldValue, ...);
+$unit->makeArraySchedule($label, $opcode, @fieldValues);
+
+$unit->makeHashLoopAt($mark, $label, $opcode, 
+	$fieldName => $fieldValue, ...);
+$unit->makeArrayLoopAt($mark, $label, $opcode, @fieldValues);
+</pre>
+
+		<para>
+		These are essentially the shorter ways to make the rowops and enqueue
+		them without the three-deep calls. Only the methods for the most 
+		frequently used enqueueing modes are provided, not for all of them.
+		</para>
+
+		<para>
+		The Unit also serves as a factory for creation of the objects
+		associated with it:
+		</para>
+
+<pre>
+$label = $unit->makeDummyLabel($rowType, "name");
+
+$label = $unit->makeLabel($rowType, "name", $clearSub, $execSub, @args);
+
+$label = $unit->makeClearingLabel("name", @args);
+
+$table = $unit->makeTable($tableType, "name");
+
+$tray = $unit->makeTray(@rowops); 
+</pre>
+
+		<indexterm>
+			<primary>memory management</primary>
+		</indexterm>
+		<indexterm>
+			<primary>label</primary>
+		</indexterm>
+		<indexterm>
+			<primary>DummyLabel</primary>
+		</indexterm>
+		<indexterm>
+			<primary>ClearingLabel</primary>
+		</indexterm>
+		<para>
+		A special thing about the labels is that when a unit creates
+		a label, it keeps a reference to it, for clearing. A label keeps a pointer
+		back to the unit but not a reference (if you call <pre>getUnit()</pre>
+		on a label, the returned value becomes a reference). For a table
+		or a tray, the unit doesn't keep a reference to them. Instead,
+		they keep a reference to the unit. 
+		The references are at the &Cpp; level, not Perl level.
+		</para>
+
+		<para>
+		With the tables, the references can get
+		pretty involved: A table has labels associated with it.
+		When a table is created, it also creates these labels.
+		The unit keeps references of these labels. The table also
+		keeps references of these labels. The table keeps a reference
+		of the unit. The labels 
+		have pointers to the unit and the
+		table but not references, to avoid the reference cycles.
+		</para>
+
+		<para>
+		See more on the memory management and label clearing in the
+		<xref linkend="ch_memory" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<para>
+		The convenience methods to create the whole front part of the 
+		topological loop are:
+		</para>
+
+		<indexterm>
+			<primary>scheduling</primary>
+			<secondary>loop</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>loop</primary>
+			<secondary>scheduling</secondary>
+		</indexterm>
+<pre>
+($label, $frameMark) = $unit->makeLoopHead(
+	$rowType, $name, $clearSub, $execSub, @args);
+
+($label, $frameMark) = $unit->makeLoopAround(
+	$name, $labelFirst);
+</pre>
+
+		<para>
+		You don't have to use them, you can create the loops manually. These
+		methods merely make it more convenient. Remember also that a procedural
+		loop is usually much easier to write, debug, and read later than a
+		topological one.
+		</para>
+
+		<para>
+		<pre>makeLoopHead()</pre> creates the front part of the loop that starts
+		with a Perl label. It gets the arguments for that label and
+		creates it among the other things. <pre>makeLoopAround()</pre> creates
+		the front part of the loop around an existing label that
+		will be the first one executed in the loop. <pre>makeLoopHead()</pre> 
+		is really redundant and can be replaced with a combination
+		of <pre>makeLabel()</pre> and <pre>makeLoopAround()</pre>,
+		but as-is it's slightly more efficient.
+		</para>
+
+		<para>
+		They both return the same results, a pair:
+		</para>
+
+		<itemizedlist>
+		<listitem>
+		The label that will be the real start of the loop, where you
+		send a rowop to both initiate the loop and to do the next iteration of the
+		loop with <pre>loopAt</pre>.
+		</listitem>
+		<listitem>
+		The frame mark that you use in <pre>loopAt()</pre>. You don't need to
+		set the frame mark, it will be set for you in the wrapper logic.
+		</listitem>
+		</itemizedlist>
+
+		<para>
+		The name argument will become the name of the created label. The FrameMark
+		object also has a name, useful for diagnostics, that gets created by adding
+		a suffix to the argument: <quote><i>name</i>.mark</quote>.
+		</para>
+
+		<para>
+		<pre>makeLoopAround()</pre> takes the row type for its wrpper label
+		from <pre>$labelFirst</pre>.
+		</para>
+
+		<para>
+		The unit can be checked for the emptiness of its queues:
+		</para>
+
+<pre>
+$result = $unit->empty();
+</pre>
+
+		<para>
+		Check whether all the frames are empty.
+		</para>
+
+<pre>
+$res = $unit->isFrameEmpty();
+</pre>
+
+		<indexterm>
+			<primary>TrieadOwner</primary>
+		</indexterm>
+		<para>
+		Check whether the current inner frame is empty.  This
+		method is useful if you run multiple units in the same thread, with
+		some potentially complicated cross-unit scheduling. It's what
+		<pre>TrieadOwner::nextXtray()</pre> does with a multi-unit Triead, repeatedly calling
+		<pre>drainFrame()</pre> for all the units that are found not empty. In this
+		situation the simple <pre>empty()</pre> cannot be used because the current inner
+		frame might not be the outer frame, and draining the inner frame can be
+		repeated forever while the outer frame will still contain rowops. The
+		more precise check of <pre>isFrameEmpty()</pre> prevents the possibility of such
+		endless loops.
+		</para>
+
+<pre>
+$res = $unit->isInOuterFrame();
+</pre>
+
+		<para>
+		Check whether the unit's current inner frame is the same as its outer
+		frame, which means that the unit is not in the middle of a call.
+		</para>
+
+		<para>
+		The functions for execution from the queues are:
+		</para>
+
+<pre>
+$unit->callNext();
+$unit->drainFrame();
+</pre>
+
+		<para>
+		<pre>callNext()</pre> takes one label from the top (innermost) stack frame queue and calls it.
+		If the inner frame happens to be empty, it does nothing. 
+		<pre>drainFrame()</pre> calls the rowops from the top stack frame until it becomes
+		empty. This includes any rowops that may be created and enqueued as
+		part of the execution of the previous rowops. But it doesn't pop the
+		frame from the stack.  And of course the method
+		<pre>call()</pre> causes the argument rowops to be executed immediately, without
+		even being technically enqueued.
+		</para>
+
+		<para>
+		The recursive calls may be enabled per-unit with the methods:
+		</para>
+
+<pre>
+$unit->setMaxStackDepth($n);
+$unit->setMaxRecursionDepth($n);
+</pre>
+
+		<para>
+		<pre>setMaxStackDepth()</pre> sets the limit on the total depth of the
+		unit's call stack. That's the maximal length of the call chain, whether
+		it goes straight or in loops.
+		</para>
+
+		<para>
+		<pre>setMaxRecursionDepth()</pre> sets the limit on the 
+		number of times each particular label may appear on
+		the call stack. So if you have a recursive code fragment 
+		(a simple-minded loop or a recursive streaming function), this
+		is the limit on its recursive reentrances.
+		</para>
+
+		<para>
+		You can change them at any time, even when the unit is running (but
+		they will be enforced only on the next attempt to execute a rowop).
+		Both these limits accept the 0 and negative values to mean <quote>unlimited</quote>.
+		The default is: unlimited stack depth, recursion
+		depth of 1.
+		</para>
+
+		<para>
+		You can read the current limits with:
+		</para>
+
+<pre>
+$n = $unit->maxStackDepth();
+$n = $unit->maxRecursionDepth();
+</pre>
+
+		<para>
+		Also the current depth of the call stack (the number of the
+		stack frames on the queue) can be found with:
+		</para>
+
+<pre>
+$result = $unit->getStackDepth();
+</pre>
+
+		<para>
+		It isn't of any use for the model logic as such but comes handy
+		for debugging, to check in the loops that you haven't accidentally
+		created a stack growing with iterations. When the unit is not
+		running, the stack depth is 1, since the outermost frame always
+		stays on the stack. When a rowop is being executed, the stack
+		depth is at least 2.
+		</para>
+
+<pre>
+$unit->clearLabels();
+</pre>
+
+		<indexterm>
+			<primary>label</primary>
+		</indexterm>
+		<indexterm>
+			<primary>UnitClearingTrigger</primary>
+		</indexterm>
+		<para>
+		Clear all the labels in the unit, then drop the references from unit to them.
+		Normally should be called only when the unit is about to be destroyed,
+		and is called automatically when the unit gets destroyed. However
+		in case of cyclic references to the unit, it may need to be called
+		manually or through a UnitClearingTrigger object to break these
+		cycles. For more information, see
+		<xref linkend="sc_ref_cycles" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<para>
+		In case if any errors are found during the clearing of the labels
+		(such as a bug in the user code in the label clearing routine),
+		they get printed to stderr. The reason for that is that the
+		clearing is normally called from the object destructors, and
+		there just isn't any proper way to report an error from a destructor.
+		The only thing that can be done is printing them.
+		</para>
+
+<pre>
+$trigger = $unit->makeClearingTrigger();
+</pre>
+
+		<para>
+		Create a unit clearing trigger object. When this object gets destroyed
+		(at exiting the block, or when its encompassing object gets destroyed)
+		it will cause the clearing of the unit.
+		</para>
+
+<pre>
+$unit->setTracer($tracer); 
+$oldTracer = $unit->getTracer();
+</pre>
+
+		<para>
+		Set and read back a tracer object that will be called before and after
+		each rowop executes in the unit. An <pre>undef</pre> means <quote>no tracer</quote>. 
+		See more information in
+		<xref linkend="sc_sched_tracing" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+<pre>
+$unit->callBound($rowop_or_tray, $fnreturn => $fnbinding, ...);
+$unit->callBound([@rowops], $fnreturn => $fnbinding, ...);
+</pre>
+
+		<indexterm>
+			<primary>streaming function</primary>
+		</indexterm>
+		<para>
+		An encapsulation of a streaming function call.
+		The first argument is a rowop or a tray or a reference to an array of rowops 
+		(but the trays are not allowed in the array). The rest are the pairs
+		of FnReturns and FnBindings. The bindings are pushed onto the FnReturns,
+		then the rowops are called, then the bindings are popped. It replaces
+		a whole block that would contain an AutoFnBind (described in
+		<xref linkend="sc_ref_autofnbind" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;)
+		and the call:
+		</para>
+
+<pre>
+{
+	my $ab = Triceps::AutoFnBind->new(
+		$fnreturn => $fnbinding, ...
+	);
+	$unit->call($rowop_or_tray);
+}
+</pre>
+
+		<para>
+		Only <pre>callBound()</pre> does its work in &Cpp;, so it's more efficient
+		than a Perl block, and it's shorter to write too.
+		</para>
+
+	</sect1>

@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_label">
+		<title>Label reference</title>
+
+		<indexterm>
+			<primary>label</primary>
+		</indexterm>
+		<para>
+		In &Cpp; the custom labels are defined by defining your own class that
+		inherits from Label (which is defined in <pre>sched/Label.h</pre>). 
+		Like this small example from a unit test:
+		</para>
+
+<!-- sched/test/t_Unit.cpp -->
+<pre>
+class ForkingLabel : public Label
+{
+public:
+	ForkingLabel(Unit *unit, Onceref<RowType> rtype, const string &name,
+			Onceref<Label> next) :
+		Label(unit, rtype, name),
+		next_(next)
+	{ }
+
+	virtual void execute(Rowop *arg) const
+	{
+		unit_->fork(next_->adopt(arg));
+	}
+
+	Autoref<Label> next_;
+};
+</pre>
+
+		<para>
+		The subclass needs to define its own execution method:
+		</para>
+
+<pre>
+virtual void execute(Rowop *arg) const;
+</pre>
+
+		<para>
+		The base class takes care of all the general execution mechanics,
+		chaining etc. All you need to do in this method is perform your
+		user-defined actions. By the way, this method is protected and should
+		never be called directly. The labels must always be called through a
+		unit, which will then execute them in the correct way.
+		</para>
+
+		<para>
+		The subclass may (though doesn't have to) also define the custom clearing method:
+		</para>
+
+<pre>
+virtual void clearSubclass();
+</pre>
+
+		<para>
+		Currently this method is called by the public method <pre>clear()</pre>
+		after the label is marked as cleared but before clearing of the chain
+		(though this order may change in the future).
+		</para>
+
+		<para>
+		The base class constructor is also protected, 
+		it's always constructed from a subclass.
+		You can not instantiate the base Label class because it contains an
+		abstract <pre>execute()</pre> method. 
+		</para>
+
+
+<pre>
+Label(Unit *unit, const_Onceref<RowType> rtype, const string &name);
+</pre>
+
+		<para>
+		The arguments are similar to the Perl version, only the Unit is passed
+		as an argument to the Label constructor. 
+		</para>
+
+		<para>
+		The constructed label keeps a reference to its row type, and a pointer
+		(not reference, to avoid the circular references!) to the unit. The unit
+		automatically keeps a reference to the label, so there is no need to call
+		<pre>Unit::rememberLabel()</pre> manually. On the other hand, if you do not want
+		the label to be remembered by its unit (though why?), the only way to achieve
+		that is to call <pre>Unit::forgetLabel()</pre> after its construction.
+		</para>
+
+		<para>
+		Now, the public methods of Label.
+		</para>
+
+<pre>
+const string &getName() const;
+const RowType *getType() const;
+Unit *getUnitPtr() const;
+</pre>
+
+		<para>
+		Read back the information from the constructor.
+		The method <pre>getUnitPtr()</pre> is named this way and not <pre>getUnit()</pre> to
+		emphasize that the Label has only a pointer to the Unit, not a
+		reference. After the label gets cleared, <pre>getUnitPtr()</pre> will return
+		NULL.The reason is that after that the label doesn't know any more
+		whether the unit still exists or has been deleted, and doesn't want to
+		return a pointer to a potentially freed memory.
+		</para>
+
+<pre>
+const string &getUnitName() const;
+</pre>
+
+		<para>
+		A convenience method for the special case of getting the label's unit
+		name. It's used in many error message. You can't just say
+		<pre>label->getUnitPtr()->getName()</pre> because <pre>getUnitPtr()</pre> might return a
+		NULL if the label has been already cleared. <pre>getUnitName()</pre> takes care of it and returns a special string
+		"[label cleared]" if the label has been cleared.
+		</para>
+
+<pre>
+void clear();
+</pre>
+
+		<para>
+		Clears the label. After that the label stops working. Note that
+		clearing a label doesn't disconnect it from its unit. Well, the label
+		won't tell you its unit any more (the pointer will be reset to NULL) but the unit will still have a
+		reference to the label! Use the unit's method <pre>forgetLabel()</pre> to
+		disconnect it (but that won't clear the label itself, so you have to
+		call both <pre>unit->forgetLabel()</pre> and <pre>label->clear()</pre>). Of course, if you
+		call <pre>unit->clearLabels()</pre>, that would take care of everything.
+		</para>
+
+		<para>
+		Clearing cleans the chaining list of this label but doesn't call
+		recursively <pre>clear()</pre> on the formerly chained labels. If you need that,
+		you have to do it yourself.
+		</para>
+
+<pre>
+bool isCleared() const;
+</pre>
+
+		<para>
+		Check if the label has been cleared.
+		</para>
+
+<pre>
+void setNonReentrant();
+bool isNonReentrant() const;
+</pre>
+
+		<para>
+		Mark the label as non-reentrant, and check this flag. There is no way
+		to unset this flag. The meaning of it is described in
+		<xref linkend="sc_sched_recursion" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+<pre>
+Erref chain(Onceref<Label> lab, bool front = false);
+</pre>
+
+		<para>
+		Chain another label to this one (so when this label is executed, the
+		chained labels will also be executed in order). This label will keep a
+		reference of the chained label. The circular chainings are forbidden
+		and will throw an Exception.
+		If the argument <pre>front</pre> is <pre>false</pre> (default), the chaining 
+		will be done at the back of the chain, if <pre>true</pre> then at the front,
+		same as the method <pre>chainFront()</pre> in the Perl API.
+		In the &Cpp; API both kinds of chainings are done with the same method.
+		</para>
+
+<pre>
+typedef vector<Autoref<Label> > ChainedVec;
+const ChainedVec &getChain() const;
+</pre>
+
+		<para>
+		Get back the information about the chained labels. This returns a
+		reference to the internal vector, so if the chainings are changed
+		afterwards, the changes will be visible in the vector.
+		</para>
+
+<pre>
+bool hasChained() const;
+</pre>
+
+		<para>
+		A quick check, whether there is anything chained.
+		</para>
+
+<pre>
+void clearChained();
+</pre>
+
+		<para>
+		Clear the chaining list of this label. (But doesn't call <pre>clear()</pre> on
+		these labels!)
+		</para>
+
+<pre>
+Rowop *adopt(Rowop *from) const;
+</pre>
+
+		<para>
+		A convenient factory method for adopting the rowops. Treat it similarly to a
+		constructor: the returned Rowop will be newly constructed and have the
+		reference count of 0; the returned pointer must be stored in an Autoref (or
+		Onceref). This method by itself doesn't check whether the original
+		Rowop has a matching type, it simply makes a copy with the label
+		reference replaced. It's up to you to make sure that the labels are
+		correct.
+		</para>
+
+		<para>
+		A special subclass of the Label is DummyLabel: it's a label that does
+		nothing. It's <pre>execute()</pre> method is empty. It's constructed very
+		similarly to the normal Label:
+		</para>
+
+<pre>
+DummyLabel(Unit *unit, const_Onceref<RowType> rtype, const string &name);
+</pre>
+
+		<indexterm>
+			<primary>DummyLabel</primary>
+		</indexterm>
+		<para>
+		The dummy labels are convenient for chaining the other labels to them. 
+		</para>
+	</sect1>
+

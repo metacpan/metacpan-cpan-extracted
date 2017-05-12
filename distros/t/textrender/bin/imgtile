@@ -1,0 +1,162 @@
+#!/usr/bin/perl
+use strict;
+use Getopt::Std::Strict 'hdb:g:v';
+use Cwd;
+use String::ShellQuote;
+
+our $VERSION = sprintf "%d.%02d", q$Revision: 1.3 $ =~ /(\d+)/g;
+
+my @g=qw/east west center north south/ ;
+
+
+sub usage { sprintf q{imgtile [OPTION]..
+   -h          help
+   -d          debug, show commands
+   -g string   one of [%s]
+   -v          version
+   -b string   background color, [#dddddd|dddddd|colorname]
+Try 'man imgtile' for more info.
+}, join('|',@g) }
+
+
+$opt_h and print STDERR usage() and exit;
+$opt_v and print $VERSION and exit;
+
+
+$opt_b ||='000000';
+$opt_b=~/^\d+$/ and  $opt_b="#$opt_b";
+$opt_g ||= 'center';
+
+
+    
+
+# figure out  abs out
+my $_out = pop @ARGV;
+my $out = Cwd::abs_path($_out) or die("Can't get abs path to '$_out', no such dir?");
+
+my $count = scalar @ARGV;
+$count > 1 or die("Missing args- You must be tiling 2 or more images.");
+
+
+# -append is vertical, +append is horizontal
+my $cmd = 
+   sprintf 'convert %s -background %s -append -gravity %s %s',
+      (join(' ', (map { String::ShellQuote::shell_quote($_) } @ARGV ))),
+      $opt_b,
+      $opt_g,
+      $out;
+
+$opt_d and warn "$cmd\n";
+
+system($cmd);
+
+
+
+__END__
+
+old version:
+
+#!/usr/bin/perl
+use strict;
+use Getopt::Std::Strict
+   'hb:g:dl';
+use String::ShellQuote 'shell_quote';
+use Cwd;
+
+
+
+
+# default gravity
+$opt_g ||='center'; # middle?
+$opt_b ||='000000';
+$opt_b=~/^\d+$/ and  $opt_b="#$opt_b";
+
+
+# figure out  abs out
+my $_out = pop @ARGV;
+my $out = Cwd::abs_path($_out) or die("Can't get abs path to '$_out', no such dir?");
+
+my $count = scalar @ARGV;
+$count > 1 or die("Missing args- You must be tiling 2 or more images.");
+
+
+
+
+
+# we need to figure out sizes of these things...
+
+my %imghw;
+sub imghw {
+   require String::ShellQuote;
+   my $cmd = sprintf 'identify %s', String::ShellQuote::shell_quote(@_);
+   my $o = `$cmd`;
+   $o=~/@_ [a-zA-Z0-9]{3,5} (\d+)x(\d+) / or die("failed: $o, $? - $o");
+   ($2, $1); # this is correct order for height, width
+}
+
+map { $imghw{$_} = [ (imghw($_)) ] } @ARGV;
+
+#use Smart::Comments '###';
+#### %imghw
+
+# what's the max width and max height..
+my $maxw = $imghw{ ( sort { $imghw{$b}->[0] cmp $imghw{$a}->[0] } keys %imghw )[0] }->[0];
+my $maxh = $imghw{ ( sort { $imghw{$b}->[1] cmp $imghw{$a}->[1] } keys %imghw )[0] }->[1];
+
+$opt_d and warn"max H $maxh, max W $maxw";
+
+# great.
+
+
+
+my $image_count= scalar @ARGV;
+
+ 
+my $cmd = sprintf 
+      q{montage %s -background '%s' -geometry %sx%s -gravity %s %s -tile %sx%s %s}, 
+      join(' ', (map { String::ShellQuote::shell_quote($_) } @ARGV)),  # image list
+      $opt_b,  # background color
+      $maxh, $maxw,  # largest dimensions      
+      $opt_g, # gravity      
+      ($opt_l ? '' : "-set label ''"), #default: strip labels if any, see below
+
+      1,$image_count,  # tiling
+
+      shell_quote($out); # save as
+
+      # see http://www.imagemagick.org/Usage/montage/ about labeling
+      # by default montage will label everything *with* label, and miff and png formats will
+      # store the label information
+      # we use the -set label ''   command to set back to 0, because the images had this and
+      # we dont want to read it
+
+$opt_d and warn "# cmd:\n$cmd";
+
+system($cmd)==0 or die("failed cmd :'$cmd', $!");
+
+
+
+
+
+sub usage {q{imgtile [OPTION].. FILES.. FILE_OUT
+Tile images.
+
+
+   -b color                            background color, such as #000000
+                                       or 000000 or black              
+
+   -g [west|east|nort|south|middle]    gravity, default is middle
+   -d                                  debug, show the commands
+   -l                                  allow labels to remain, if any
+
+
+You must be tiling 2 or more images, otherwise fails.
+
+textrender - parent package
+}}
+
+
+
+__END__
+
+

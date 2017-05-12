@@ -1,0 +1,3664 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+<chapter id="ch_joins" xmlns:xi="http://www.w3.org/2001/XInclude">
+	<title>Joins</title>
+
+	<sect1 id="sc_joins_variety">
+		<title>Joins variety</title>
+
+		<indexterm>
+			<primary>join</primary>
+		</indexterm>
+		<para>
+		The joins are quite important for the relational data processing, and
+		come in many varieties. And the CEP systems have their own specifics.
+		Basically, in CEP you want the joins to be processed fast. The CEP
+		systems deal with the changing model state, and have to process these
+		changes incrementally.
+		</para>
+
+		<para>
+		A small change should be handled fast. It has to use the indexes to
+		find and update all the related result rows. Even though you can make
+		it just go sequentially through all the rows and find the relevant
+		ones, like in a common database, that's not what you normally want.
+		When something like this happens, the usual reaction is <quote>wtf is my
+		model suddenly so slow?</quote> following by an annoyingly long investigation
+		into the reasons of the slowness, and then rewriting the model to make
+		it work faster. It's better to just prevent the slowness in the first
+		place and make sure that the joins always use an index. And since you
+		don't have to deal much with the ad-hoc queries when you write a CEP
+		model, you can provide all the needed indexes in advance very easily.
+		</para>
+
+		<indexterm>
+			<primary>join</primary>
+			<secondary>equi-join</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>index</primary>
+			<secondary>sorted</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>Aleri</primary>
+		</indexterm>
+		<para>
+		A particularly interesting kind of joins in this regard is the
+		equi-joins: ones that join the rows by the equality of the fields in
+		them. They allow a very efficient index look-up. Because of this, they
+		are popular in the CEP world. Some systems, like Aleri, support only
+		the equi-joins to start with. The other systems are much more efficient
+		on the equi-joins than on the other kinds of joins. At the moment
+		Triceps follows the fashion of having the advanced support only for the
+		equi-joins. Even though the Sorted/Ordered indexes in Triceps should allow the
+		range-based comparisons to be efficient too, at the moment there are no
+		table methods for the look-up of ranges, they are left for the future
+		work. Of course, nothing stops you from copying an equi-join template
+		and modifying it to work by a dumb iteration. Just it would be slow,
+		and I didn't see much point in it.
+		</para>
+
+		<para>
+		There also are three common patterns of the join usage.
+		</para>
+
+		<indexterm>
+			<primary>Coral8</primary>
+		</indexterm>
+		<indexterm>
+			<primary>join</primary>
+			<secondary>lookup</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>join</primary>
+			<secondary>stream-to-window</secondary>
+		</indexterm>
+		<para>
+		In the first pattern the rows sort of go by and get enriched by looking
+		up some information from a table and tacking it onto these rows.
+		Sometimes not even tacking it on but maybe just filtering the data:
+		passing through some of the rows and throwing away the rest, or
+		directing the rows into the different kinds of processing, based on the
+		looked-up data. For a reference, in the Coral8 CCL this situation is
+		called <quote>stream-to-window joins</quote>. In Triceps there are no streams and no
+		windows, so I just call them the <quote>lookup joins</quote>.
+		</para>
+
+		<indexterm>
+			<primary>join</primary>
+			<secondary>tables</secondary>
+		</indexterm>
+		<para>
+		In the second pattern multiple stateful tables are joined together.
+		Whenever any of the tables changes, the join result also changes, and
+		the updates get propagated through. This can be done through lookups,
+		but in reality it turns out that defining manually the lookups for the
+		every possible table change becomes tedious pretty quickly. This has to
+		be addressed by the automation.
+		</para>
+
+		<indexterm>
+			<primary>join</primary>
+			<secondary>self</secondary>
+		</indexterm>
+		<para>
+		In the third pattern the same table gets joined recursively,
+		essentially traversing a representation of a tree stored in that table.
+		This actually doesn't work well with the classic SQL unless the
+		recursion depth is strictly limited. There are SQL extensions for the
+		recursive self-joins in the modern databases but I haven't seen them in the
+		CEP systems yet. Anyway, the procedural approach tends to work for this
+		situation much better than the SQLy one, so the templates tend to be of
+		not much help. I'll show a templated and a manual example of this kind
+		for comparison.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_joins_hello">
+		<title>Hello, joins!</title>
+
+		<para>
+		As usual, let me show a couple of little teasers before starting the
+		long bottom-up discussion. We'll eventually get by the long
+		way to the same examples, so here I'll show only some very short
+		code snippets and basic explanations.
+		</para>
+
+<!-- t/xJoin.t, doLookupFull, replaced leftFields from commented-out, removed fieldsLeftFirst, isLeft -->
+<pre>
+our $join = Triceps::LookupJoin->new(
+	name => "join",
+	leftFromLabel => $lbTrans,
+	rightTable => $tAccounts,
+	leftFields => [ "!acct.*", ".*" ],
+	rightFields => [ "internal/acct" ],
+	by => [ "acctSrc" => "source", "acctXtrId" => "external" ],
+);
+</pre>
+
+		<indexterm>
+			<primary>join</primary>
+			<secondary>lookup</secondary>
+		</indexterm>
+		<para>
+		This is a lookup join that gets the incoming rows with transactions
+		data from the label <pre>$lbTrans</pre>, finds the account translation in the
+		table <pre>$tAccounts</pre>, and translates the external account representation
+		to internal one on its output. The join condition is an equivalent of the
+		SQLy
+		</para>
+
+		<indexterm>
+			<primary>SQL</primary>
+		</indexterm>
+<pre>
+on 
+	lbTrans.acctSrc = tAccounts.source
+	and lbTrans.acctXtrId = tAccounts.external
+</pre>
+
+		<para>
+		The condition looks up the rows in <pre>$tAccounts</pre> using the index
+		that has the key fields <pre>source</pre> and <pre>external</pre>. Such index must
+		be already defined, or the join will refuse to compile.
+		</para>
+
+		<para>
+		The result fields will contain all the fields from <pre>$lbTrans</pre> except those
+		starting with <quote>acct</quote> plus the field <pre>internal</pre> from <pre>$tAccounts</pre>
+		that becomes renamed to <pre>acct</pre>.
+		</para>
+
+		<para>
+		Next goes a table join:
+		</para>
+
+<!-- t/xJoin.t, doJoinInner -->
+<pre>
+our $join = Triceps::JoinTwo->new(
+	name => "join",
+	leftTable => $tPosition,
+	rightTable => $tToUsd,
+	byLeft => [ "date", "currency" ],
+	type => "inner",
+);
+</pre>
+
+		<indexterm>
+			<primary>join</primary>
+			<secondary>tables</secondary>
+		</indexterm>
+		<para>
+		It joins the tables <pre>$tPosition</pre> and <pre>$tToUsd</pre>, with the inner join logic.
+		The join condition is on the fields <quote>date</quote> and <quote>currency</quote> being
+		equal in rows in both tables.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_joins_lookup_manual">
+		<title>The lookup join, done manually</title>
+
+		<para>
+		First let's look at a lookup done manually. It would also establish the
+		baseline for the further joins.
+		</para>
+
+		<para>
+		For the background of the model, let's consider the trade information
+		coming in from multiple sources. Each source system has its own
+		designation of the accounts on which the trades happen but ultimately
+		they are the same accounts. So there is a table that contains the
+		translation from the account designations of various external systems
+		to our system's own internal account identifier. This gets described
+		with the row types:
+		</para>
+
+<!-- t/xJoin.t -->
+<pre>
+our $rtInTrans = Triceps::RowType->new( # a transaction received
+	id => "int32", # the transaction id
+	acctSrc => "string", # external system that sent us a transaction
+	acctXtrId => "string", # its name of the account of the transaction
+	amount => "int32", # the amount of transaction (int is easier to check)
+);
+
+our $rtAccounts = Triceps::RowType->new( # account translation map
+	source => "string", # external system that sent us a transaction
+	external => "string", # its name of the account in the transaction
+	internal => "int32", # our internal account id
+);
+</pre>
+
+		<para>
+		Other than those basics, the rest of information is only minimal, to
+		keep the examples smaller. Even the trade ids are expected to be global
+		and not per the source systems (which is not realistic but saves
+		another little bit of work).
+		</para>
+
+		<para>
+		The accounts table can be indexed in multiple ways for multiple
+		purposes, say:
+		</para>
+
+<!-- t/xJoin.t -->
+<pre>
+our $ttAccounts = Triceps::TableType->new($rtAccounts)
+	->addSubIndex("lookupSrcExt", # quick look-up by source and external id
+		Triceps::IndexType->newHashed(key => [ "source", "external" ])
+	)
+	->addSubIndex("iterateSrc", # for iteration in order grouped by source
+		Triceps::IndexType->newHashed(key => [ "source" ])
+		->addSubIndex("iterateSrcExt", 
+			Triceps::IndexType->newHashed(key => [ "external" ])
+		)
+	)
+	->addSubIndex("lookupIntGroup", # quick look-up by internal id (to multiple externals)
+		Triceps::IndexType->newHashed(key => [ "internal" ])
+		->addSubIndex("lookupInt", Triceps::IndexType->newFifo())
+	)
+;
+$ttAccounts->initialize();
+</pre>
+
+		<para>
+		For our purpose of joining, the first, primary key is the way to go.
+		Using the primary key also has the advantage of making sure that there
+		is no more than one row for each key value.
+		</para>
+
+		<indexterm>
+			<primary>join</primary>
+			<secondary>manual lookup</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>join</primary>
+			<secondary>filter</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>join</primary>
+			<secondary>lookup</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>filter</primary>
+		</indexterm>
+		<para>
+		The first manual lookup example will just do the filtering: find, whether there is a match
+		in the translation table, and if so then pass the row through. The
+		example goes as follows:
+		</para>
+
+<!-- t/xJoin.t, doManualLookup -->
+<pre>
+our $uJoin = Triceps::Unit->new("uJoin");
+
+our $tAccounts = $uJoin->makeTable($ttAccounts, "tAccounts");
+
+my $lbFilterResult = $uJoin->makeDummyLabel($rtInTrans, "lbFilterResult");
+my $lbFilter = $uJoin->makeLabel($rtInTrans, "lbFilter", undef, sub {
+	my ($label, $rowop) = @_;
+	my $row = $rowop->getRow();
+	my $rh = $tAccounts->findBy(
+		source => $row->get("acctSrc"),
+		external => $row->get("acctXtrId"),
+	);
+	if (!$rh->isNull()) {
+		$uJoin->call($lbFilterResult->adopt($rowop));
+	}
+});
+
+# label to print the changes to the detailed stats
+makePrintLabel("lbPrint", $lbFilterResult);
+
+while(&readLine) {
+	chomp;
+	my @data = split(/,/); # starts with a command, then string opcode
+	my $type = shift @data;
+	if ($type eq "acct") {
+		$uJoin->makeArrayCall($tAccounts->getInputLabel(), @data);
+	} elsif ($type eq "trans") {
+		$uJoin->makeArrayCall($lbFilter, @data);
+	}
+	$uJoin->drainFrame(); # just in case, for completeness
+}
+</pre>
+
+		<para>
+		The <pre>findBy()</pre> is where the join actually happens: the lookup of the data
+		in a table by values from another row. Very similar to what the
+		basic window example in
+		<xref linkend="sc_table_hello" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;
+		was doing before. It's <pre>findBy()</pre>, without the need for <pre>findByIdx()</pre>,
+		because in this case the index type used in the accounts table is its
+		first leaf index, to which <pre>findBy()</pre> defaults.
+		After that the fact of
+		successful or unsuccessful lookup is used to pass the original row
+		through or throw it away. If the found row were used to pick some
+		fields from it and stick them into the result, that would be a more
+		complete join, more like what you often expect to see.
+		</para>
+
+		<para>
+		And here is an example of the input processing:
+		</para>
+
+<!-- t/xJoin.t, doManualLookup -->
+<exdump>
+> acct,OP_INSERT,source1,999,1
+> acct,OP_INSERT,source1,2011,2
+> acct,OP_INSERT,source2,ABCD,1
+> trans,OP_INSERT,1,source1,999,100
+lbFilterResult OP_INSERT id="1" acctSrc="source1" acctXtrId="999" amount="100" 
+> trans,OP_INSERT,2,source2,ABCD,200
+lbFilterResult OP_INSERT id="2" acctSrc="source2" acctXtrId="ABCD" amount="200" 
+> trans,OP_INSERT,3,source2,QWERTY,200
+> acct,OP_INSERT,source2,QWERTY,2
+> trans,OP_DELETE,3,source2,QWERTY,200
+lbFilterResult OP_DELETE id="3" acctSrc="source2" acctXtrId="QWERTY" amount="200" 
+> acct,OP_DELETE,source1,999,1
+</exdump>
+
+		<para>
+		It starts with populating the accounts table. Then the transactions that
+		find the match pass, and those who don't find don't pass. If more of
+		the account translations get added later, the transactions for them
+		start passing but as you can see, the result might be slightly
+		unexpected: you may get a DELETE that had no matching previous INSERT,
+		as happened for the row with id=3.
+		This happens because the lookup join keeps no history on its left side
+		and can't react properly to the changes to the table on the right.
+		Because of this, the lookup joins work best when the reference table
+		gets pre-populated in advance and then stays stable.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_joins_lookupjoin">
+		<title>The LookupJoin template</title>
+
+		<indexterm>
+			<primary>template</primary>
+		</indexterm>
+		<indexterm>
+			<primary>LookupJoin</primary>
+		</indexterm>
+		<para>
+		When a join has to produce the new rows, with the data from both the
+		incoming row and the ones looked up in the reference table, this can
+		also be done manually but may be more convenient to do with the
+		LookupJoin template. The translation of account to the internal ids can
+		be done like this:
+		</para>
+
+<!-- t/xJoin.t, doLookupLeft, removed saveJoinerTo -->
+<pre>
+our $join = Triceps::LookupJoin->new(
+	unit => $uJoin,
+	name => "join",
+	leftRowType => $rtInTrans,
+	rightTable => $tAccounts,
+	rightIdxPath => ["lookupSrcExt"],
+	rightFields => [ "internal/acct" ],
+	by => [ "acctSrc" => "source", "acctXtrId" => "external" ],
+	isLeft => 1,
+); # would confess by itself on an error
+
+# label to print the changes to the detailed stats
+makePrintLabel("lbPrint", $join->getOutputLabel());
+
+while(&readLine) {
+	chomp;
+	my @data = split(/,/); # starts with a command, then string opcode
+	my $type = shift @data;
+	if ($type eq "acct") {
+		$uJoin->makeArrayCall($tAccounts->getInputLabel(), @data);
+	} elsif ($type eq "trans") {
+		$uJoin->makeArrayCall($join->getInputLabel(), @data);
+	}
+	$uJoin->drainFrame(); # just in case, for completeness
+}
+</pre>
+
+		<para>
+		The join gets defined in the option name-value format. The options <quote>unit</quote> and
+		<quote>name</quote> are as usual.
+		</para>
+
+		<indexterm>
+			<primary>join</primary>
+			<secondary>left outer</secondary>
+		</indexterm>
+		<para>
+		The incoming rows are always on the left side, the table on the right.
+		LookupJoin can do either the inner join or the left outer join (since
+		it does not react to the changes of the right table and has no access
+		to the past data from the left side, the full and right outer joins are not
+		available).
+		In this case the option <quote>isLeft => 1</quote> selects the left outer join.
+		The left outer join also happens to be the default if this option is not used.
+		</para>
+
+		<para>
+		The left side is described by the option <quote>leftRowType</quote>, and causes the join's input
+		label of this row type to be created. The input label can be found with
+		<pre>$join->getInputLabel()</pre>.
+		</para>
+
+		<para>
+		The right side is a table, specified in the option <quote>rightTable</quote>. The
+		lookups in the table are done using a combination of an index and the
+		field pairing. The option <quote>by</quote> provides the field pairing. It contains
+		the pairs of field names, one from the left, and one from the right,
+		for the equal fields. They can be separated by 
+		<quote><pre>,</pre></quote> too, but <quote><pre>=></pre></quote>
+		feels more idiomatic to me. These fields from the left are translated
+		to the right and are used for lookup through the index. The index
+		is specified with the path in the option <quote>rightIdxPath</quote>.
+		This option is optional: if it's missing, the template will automatically
+		find the index that matches the key fields. The index must exist though,
+		if it doesn't exist, LookupJoin can't create it and can't work without
+		it either. The index must be a Hashed index.
+		</para>
+
+		<indexterm>
+			<primary>index</primary>
+			<secondary>hashed</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>index</primary>
+			<secondary>sorted</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>LookupJoin</primary>
+			<secondary>keys</secondary>
+		</indexterm>
+		<para>
+		There is no particular reason for it not being a Sorted/Ordered index, other
+		that the <pre>getKey()</pre> call does not work for these indexes yet, and
+		that's what the LookupJoin uses to check that the right-side index key
+		matches the join key in <quote>by</quote>. The order of the fields in the
+		option <quote>by</quote> and in the index may vary but the set of the
+		fields must be the same.
+		</para>
+
+		<para>
+		The index may be either a leaf (as in this example) or non-leaf. If
+		it's a leaf, it could look up no more than one row per key, and
+		LookupJoin uses this internally for a little optimization. Otherwise
+		LookupJoin is capable of producing multiple result rows for one input row.
+		</para>
+
+		<indexterm>
+			<primary>projection</primary>
+		</indexterm>
+		<indexterm>
+			<primary>result filtering</primary>
+		</indexterm>
+		<para>
+		Finally, there is the result row. It is built out of the two original
+		rows by picking the fields according to the options <quote>leftFields</quote> and
+		<quote>rightFields</quote>. If either option is missing, that means 
+		<quote>take all the fields</quote>. 
+		The format of these options is from <pre>Triceps::Fields::filterToPairs()</pre>
+		that has been described in
+		<xref linkend="sc_template_result" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		So in this example <pre>[ "internal/acct" ]</pre> means: pass the field <pre>internal</pre>
+		but rename it to <pre>acct</pre>.
+		</para>
+
+		<para>
+		Remember that the field names in the result must not
+		duplicate. It would be an error. 
+		If the duplications happen, the most general solution is to use the
+		substitution syntax to rename some of the fields.
+		</para>
+
+		<para>
+		A fairly common usage in joins is to just give the unique prefixes to
+		the left-side and right-side fields. This can be achieved with:
+		</para>
+
+<pre>
+	leftFields => [ '.*/left_$&' ],
+	rightFields => [ '.*/right_$&' ],
+</pre>
+
+		<para>
+		The <pre>$&</pre> in the substitution gets replaced with the whole matched
+		field name. There is also another way to solve a special case of duplication
+		that will be shown in a moment.
+		</para>
+
+		<para>
+		The option <quote>fieldsLeftFirst</quote> determines, which side will go first in
+		the result. By default it's set to 1 (as in this example), and the left
+		side goes first. If set to 0, the right side would go first.
+		</para>
+
+		<para>
+		This setup for the result row types is somewhat clumsy but it's a
+		reasonable first attempt. 
+		</para>
+
+		<para>
+		Now, having gone through the description, an example of how it works:
+		</para>
+
+<!-- t/xJoin.t, doLookupLeft -->
+<exdump>
+> acct,OP_INSERT,source1,999,1
+> acct,OP_INSERT,source1,2011,2
+> acct,OP_INSERT,source2,ABCD,1
+> trans,OP_INSERT,1,source1,999,100
+join.out OP_INSERT id="1" acctSrc="source1" acctXtrId="999" amount="100" acct="1" 
+> trans,OP_INSERT,2,source2,ABCD,200
+join.out OP_INSERT id="2" acctSrc="source2" acctXtrId="ABCD" amount="200" acct="1" 
+> trans,OP_INSERT,3,source2,QWERTY,200
+join.out OP_INSERT id="3" acctSrc="source2" acctXtrId="QWERTY" amount="200" 
+> acct,OP_INSERT,source2,QWERTY,2
+> trans,OP_DELETE,3,source2,QWERTY,200
+join.out OP_DELETE id="3" acctSrc="source2" acctXtrId="QWERTY" amount="200" acct="2" 
+> acct,OP_DELETE,source1,999,1
+</exdump>
+
+		<para>
+		Same as before, first the accounts table gets populated, then the
+		transactions are sent. If an account is not found, this left outer join
+		still passes through the original fields from the left side. Adding an
+		account later doesn't help the rowops that already went through but the
+		new rowops will see it. The same goes for deleting an account, it
+		doesn't affect the past rowops either.
+		</para>
+		
+		<para>
+		Now let's take another look at the field duplication problem.
+		The most typical case of duplication is in the key fields, when the
+		key fields on both sides are named the same. If all the fields from
+		both left and right sides were to be included (which is the default),
+		the key fields would be included twice, with the same names, and
+		cause a conflict. LookupJoin provides a solution for this special
+		case, shown in the following example:
+		</para>
+
+<!-- t/xJoin.t, doLookupLeftSameFields -->
+<pre>
+our $rtTrans = Triceps::RowType->new( # a transaction received
+	id => "int32", # the transaction id
+	source => "string", # external system that sent us a transaction
+	external => "string", # its name of the account of the transaction
+	amount => "int32", # the amount of transaction (int is easier to check)
+);
+
+our $tAccounts = $uJoin->makeTable($ttAccounts, "tAccounts");
+
+our $join = Triceps::LookupJoin->new(
+	unit => $uJoin,
+	name => "join",
+	leftRowType => $rtTrans,
+	rightTable => $tAccounts,
+	byLeft => [ "source", "external" ],
+	fieldsDropRightKey => 1,
+	isLeft => 1,
+); # would confess by itself on an error
+</pre>
+
+		<para>
+		The example does the exact same thing as the last one, only here the fields
+		in the incoming rows have been named the same as in the table. This made the
+		option <quote>byLeft</quote> the more convenient way to specify the join 
+		condition. And this time there are no explicit options to select the result fields,
+		all of them are included. But that would have included the fields
+		<quote>source</quote> and <quote>external</quote> twice, which is illegal.
+		The option <quote>fieldsDropRightKey</quote> set to 1 takes care of that: it automatically
+		removes the key fields on the right side from the result.
+		This example produces the output that is the same as the last one, only with
+		the different field names:
+		</para>
+
+<!-- t/xJoin.t, doLookupLeftSameFields -->
+<exdump>
+> acct,OP_INSERT,source1,999,1
+> acct,OP_INSERT,source1,2011,2
+> acct,OP_INSERT,source2,ABCD,1
+> trans,OP_INSERT,1,source1,999,100
+join.out OP_INSERT id="1" source="source1" external="999" amount="100" internal="1" 
+> trans,OP_INSERT,2,source2,ABCD,200
+join.out OP_INSERT id="2" source="source2" external="ABCD" amount="200" internal="1" 
+> trans,OP_INSERT,3,source2,QWERTY,200
+join.out OP_INSERT id="3" source="source2" external="QWERTY" amount="200" 
+> acct,OP_INSERT,source2,QWERTY,2
+> trans,OP_DELETE,3,source2,QWERTY,200
+join.out OP_DELETE id="3" source="source2" external="QWERTY" amount="200" internal="2" 
+> acct,OP_DELETE,source1,999,1
+</exdump>
+
+		<para>
+		The left-side data can also be specified in another way: the option
+		<quote>leftFromLabel</quote> provides a label which in turn provides both the input
+		row type and the unit. You can still specify the unit option as well
+		but it must match the one in the label. This is driven internally by
+		<pre>Triceps::Opt::handleUnitTypeLabel()</pre>, described in
+		<xref linkend="sc_template_options" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;,
+		so it follows the same rules.
+		The join still has its own
+		input label but it gets automatically chained to the one in the option.
+		For an example of such a join:
+		</para>
+
+<!-- t/xJoin.t, doLookupFull, removed commented-out stuff -->
+<pre>
+our $lbTrans = $uJoin->makeDummyLabel($rtInTrans, "lbTrans");
+
+our $join = Triceps::LookupJoin->new(
+	name => "join",
+	leftFromLabel => $lbTrans,
+	rightTable => $tAccounts,
+	leftFields => [ "id", "amount" ],
+	fieldsLeftFirst => 0,
+	rightFields => [ "internal/acct" ],
+	by => [ "acctSrc" => "source", "acctXtrId" => "external" ],
+	isLeft => 0,
+); # would confess by itself on an error
+
+# label to print the changes to the detailed stats
+makePrintLabel("lbPrint", $join->getOutputLabel());
+
+while(&readLine) {
+	chomp;
+	my @data = split(/,/); # starts with a command, then string opcode
+	my $type = shift @data;
+	if ($type eq "acct") {
+		$uJoin->makeArrayCall($tAccounts->getInputLabel(), @data);
+	} elsif ($type eq "trans") {
+		$uJoin->makeArrayCall($lbTrans, @data);
+	}
+	$uJoin->drainFrame(); # just in case, for completeness
+}
+</pre>
+
+		<indexterm>
+			<primary>join</primary>
+			<secondary>inner</secondary>
+		</indexterm>
+		<para>
+		The other options demonstrate the possibilities described in the last
+		post. This time it's an inner join, the result has the right-side
+		fields going first, and the left-side fields are filtered in the
+		result by an explicit list of fields to pass. The right-side index is found 
+		automatically.
+		</para>
+
+		<para>
+		Another way to achieve the same filtering of the left-side fields would
+		be by throwing away everything starting with <quote>acct</quote> and passing through
+		the rest:
+		</para>
+
+<pre>
+	leftFields => [ "!acct.*", ".*" ],
+</pre>
+
+		<para>
+		And here is an example of a run:
+		</para>
+
+<!-- t/xJoin.t, doLookupFull -->
+<exdump>
+> acct,OP_INSERT,source1,999,1
+> acct,OP_INSERT,source1,2011,2
+> acct,OP_INSERT,source2,ABCD,1
+> trans,OP_INSERT,1,source1,999,100
+join.out OP_INSERT acct="1" id="1" amount="100" 
+> trans,OP_INSERT,2,source2,ABCD,200
+join.out OP_INSERT acct="1" id="2" amount="200" 
+> trans,OP_INSERT,3,source2,QWERTY,200
+> acct,OP_INSERT,source2,QWERTY,2
+> trans,OP_DELETE,3,source2,QWERTY,200
+join.out OP_DELETE acct="2" id="3" amount="200" 
+> acct,OP_DELETE,source1,999,1
+</exdump>
+
+		<para>
+		The input data is the same as the last time, but the result is
+		different. Since it's an inner join, the rows that don't find a match
+		don't pass through. And of course the fields are ordered and subsetted
+		differently in the result.
+		</para>
+
+		<para>
+		The next example loses all connection with reality, it just serves to
+		demonstrate another ability of LookupJoin: matching multiple rows on
+		the right side for an incoming row. The situation itself is obviously
+		useful and normal, just it's not what normally happens with the
+		account id translation, and I was too lazy to invent another
+		realistically-looking example.
+		</para>
+
+<!-- t/xJoin.t, doLookupLeftMulti and the type def before it, removed saveJoinerTo -->
+<pre>
+our $ttAccounts2 = Triceps::TableType->new($rtAccounts)
+	->addSubIndex("iterateSrc", # for iteration in order grouped by source
+		Triceps::IndexType->newHashed(key => [ "source" ])
+		->addSubIndex("lookupSrcExt",
+			Triceps::IndexType->newHashed(key => [ "external" ])
+			->addSubIndex("grouping", Triceps::IndexType->newFifo())
+		)
+	)
+;
+$ttAccounts2->initialize();
+
+our $tAccounts = $uJoin->makeTable($ttAccounts2, "tAccounts");
+
+our $join = Triceps::LookupJoin->new(
+	unit => $uJoin,
+	name => "join",
+	leftRowType => $rtInTrans,
+	rightTable => $tAccounts,
+	rightIdxPath => [ "iterateSrc", "lookupSrcExt" ],
+	rightFields => [ "internal/acct" ],
+	by => [ "acctSrc" => "source", "acctXtrId" => "external" ],
+	#saveJoinerTo => \$code,
+); # would confess by itself on an error
+</pre>
+
+		<para>
+		The main loop is unchanged from the first LookupJoin example, so I
+		won't copy it here. Just for something different, the join index here
+		is nested, and its path consists of two elements. It's not a leaf index
+		either, with one FIFO level under it. It could also have been found
+		automatically.  And when the <quote>isLeft</quote> is not
+		specified explicitly, it defaults to 1, making it a left join.
+		</para>
+
+		<para>
+		The example of a run uses a slightly different input, highlighting the ability to
+		match multiple rows:
+		</para>
+
+<!-- t/xJoin.t, doLookupLeftMulti -->
+<exdump>
+> acct,OP_INSERT,source1,999,1
+> acct,OP_INSERT,source1,2011,2
+> acct,OP_INSERT,source2,ABCD,1
+> acct,OP_INSERT,source2,ABCD,10
+> acct,OP_INSERT,source2,ABCD,100
+> trans,OP_INSERT,1,source1,999,100
+join.out OP_INSERT id="1" acctSrc="source1" acctXtrId="999" amount="100" acct="1" 
+> trans,OP_INSERT,2,source2,ABCD,200
+join.out OP_INSERT id="2" acctSrc="source2" acctXtrId="ABCD" amount="200" acct="1" 
+join.out OP_INSERT id="2" acctSrc="source2" acctXtrId="ABCD" amount="200" acct="10" 
+join.out OP_INSERT id="2" acctSrc="source2" acctXtrId="ABCD" amount="200" acct="100" 
+> trans,OP_INSERT,3,source2,QWERTY,200
+join.out OP_INSERT id="3" acctSrc="source2" acctXtrId="QWERTY" amount="200" 
+> acct,OP_INSERT,source2,QWERTY,2
+> trans,OP_DELETE,3,source2,QWERTY,200
+join.out OP_DELETE id="3" acctSrc="source2" acctXtrId="QWERTY" amount="200" acct="2" 
+> acct,OP_DELETE,source1,999,1
+</exdump>
+
+		<para>
+		When a row matches multiple rows in the table, it gets multiplied. The
+		join function iterates through the whole matching row group, and for
+		each found row creates a result row and calls the output label with it.
+		</para>
+
+		<para>
+		Now, what if you don't want to get multiple rows back even if they are
+		found? Of course, the best way is to just use a leaf index. But once in
+		a while you get into situations with the denormalized data in the
+		lookup table. You might know in advance that for each row in an index
+		group a certain field would be the same. Or you might not care, what
+		exact value you get as long as it's from the right group. But you might
+		really not want the input rows to multiply when they go through the
+		join. LookupJoin has a solution:
+		</para>
+
+<!-- t/xJoin.t, doLookupLeftMultiOne -->
+<pre>
+our $join = Triceps::LookupJoin->new(
+	unit => $uJoin,
+	name => "join",
+	leftRowType => $rtInTrans,
+	rightTable => $tAccounts,
+	rightIdxPath => [ "iterateSrc", "lookupSrcExt" ],
+	rightFields => [ "internal/acct" ],
+	by => [ "acctSrc" => "source", "acctXtrId" => "external" ],
+	limitOne => 1,
+); # would confess by itself on an error
+</pre>
+
+		<para>
+		The option <quote>limitOne</quote> changes the processing logic to pick only the
+		first matching row. It also optimizes the join function. If <quote>limitOne</quote> is
+		not specified explicitly, the join constructor deduces it magically by
+		looking at whether the join index is a leaf or not. Actually, for a
+		leaf index it would always override <quote>limitOne</quote> to 1, even if you
+		explicitly set it to 0.
+		</para>
+
+		<para>
+		With the limit, the same input produces a different output:
+		</para>
+
+<!-- t/xJoin.t, doLookupLeftMultiOne -->
+<exdump>
+> acct,OP_INSERT,source1,999,1
+> acct,OP_INSERT,source1,2011,2
+> acct,OP_INSERT,source2,ABCD,1
+> acct,OP_INSERT,source2,ABCD,10
+> acct,OP_INSERT,source2,ABCD,100
+> trans,OP_INSERT,1,source1,999,100
+join.out OP_INSERT id="1" acctSrc="source1" acctXtrId="999" amount="100" acct="1" 
+> trans,OP_INSERT,2,source2,ABCD,200
+join.out OP_INSERT id="2" acctSrc="source2" acctXtrId="ABCD" amount="200" acct="1" 
+> trans,OP_INSERT,3,source2,QWERTY,200
+join.out OP_INSERT id="3" acctSrc="source2" acctXtrId="QWERTY" amount="200" 
+> acct,OP_INSERT,source2,QWERTY,2
+> trans,OP_DELETE,3,source2,QWERTY,200
+join.out OP_DELETE id="3" acctSrc="source2" acctXtrId="QWERTY" amount="200" acct="2" 
+> acct,OP_DELETE,source1,999,1
+</exdump>
+
+		<para>
+		Now it just picks the first matching row instead of multiplying the
+		rows.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_joins_lookupjoin_iter">
+		<title>Manual iteration with LookupJoin</title>
+
+		<indexterm>
+			<primary>LookupJoin</primary>
+		</indexterm>
+		<indexterm>
+			<primary>join</primary>
+			<secondary>manual iteration</secondary>
+		</indexterm>
+
+		<para>
+		Sometimes you might want to just get the list of the resulting rows
+		from LookupJoin and iterate over them by yourself, rather than have it
+		call the labels. To be honest, this looked kind of important when I
+		wrote LookupJoin first, but by now I don't see a whole lot of use in
+		it. By now, if you want to do a manual iteration, calling <pre>findBy()</pre> and
+		then iterating looks like a more useful option. But at the time there
+		was no <pre>findBy()</pre>, and this feature came to exist. Here is an example:
+		</para>
+
+<!-- t/xJoin.t, doLookupLeftManual, removed saveJoinerTo -->
+<pre>
+our $join = Triceps::LookupJoin->new(
+	unit => $uJoin,
+	name => "join",
+	leftRowType => $rtInTrans,
+	rightTable => $tAccounts,
+	rightFields => [ "internal/acct" ],
+	by => [ "acctSrc" => "source", "acctXtrId" => "external" ],
+	automatic => 0,
+); # would confess by itself on an error
+
+# label to print the changes to the detailed stats
+my $lbPrint = makePrintLabel("lbPrint", $join->getOutputLabel());
+
+while(&readLine) {
+	chomp;
+	my @data = split(/,/); # starts with a command, then string opcode
+	my $type = shift @data;
+	if ($type eq "acct") {
+		$uJoin->makeArrayCall($tAccounts->getInputLabel(), @data);
+	} elsif ($type eq "trans") {
+		my $op = shift @data; # drop the opcode field
+		my $trans = $rtInTrans->makeRowArray(@data);
+		my @rows = $join->lookup($trans);
+		foreach my $r (@rows) {
+			$uJoin->call($lbPrint->makeRowop($op, $r));
+		}
+	}
+	$uJoin->drainFrame(); # just in case, for completeness
+}
+</pre>
+
+		<para>
+		It copies the first LookupJoin example, only now with a manual iteration. Once the
+		option <quote>automatic</quote> is set to 0 for the join, the method
+		<pre>$join->lookup()</pre> becomes available to perform the lookup and return
+		the result rows in an array (the data sent to the input label keeps
+		working as usual, sending the result rows to the output label). This
+		involves the extra overhead of keeping all the result rows (and there
+		might be lots of them) in an array, so by default the join is compiled
+		in an automatic-only mode.
+		</para>
+
+		<para>
+		Since <pre>lookup()</pre> returns rows, not rowops, and knows nothing
+		about the opcodes, those had to be handled separately around the lookup.
+		There is a way to achieve a similar result using the streaming functions
+		that returns the rowops. It will be described in
+		<xref linkend="sc_strf_templates" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<para>
+		The result is the same as for the first example, only the name of the
+		result label differs:
+		</para>
+
+<!-- t/xJoin.t, doLookupLeftManual -->
+<exdump>
+> acct,OP_INSERT,source1,999,1
+> acct,OP_INSERT,source1,2011,2
+> acct,OP_INSERT,source2,ABCD,1
+> trans,OP_INSERT,1,source1,999,100
+lbPrint OP_INSERT id="1" acctSrc="source1" acctXtrId="999" amount="100" acct="1" 
+> trans,OP_INSERT,2,source2,ABCD,200
+lbPrint OP_INSERT id="2" acctSrc="source2" acctXtrId="ABCD" amount="200" acct="1" 
+> trans,OP_INSERT,3,source2,QWERTY,200
+lbPrint OP_INSERT id="3" acctSrc="source2" acctXtrId="QWERTY" amount="200" 
+> acct,OP_INSERT,source2,QWERTY,2
+> trans,OP_DELETE,3,source2,QWERTY,200
+lbPrint OP_DELETE id="3" acctSrc="source2" acctXtrId="QWERTY" amount="200" acct="2" 
+> acct,OP_DELETE,source1,999,1
+</exdump>
+
+		<para>
+		The print label is still connected to the output label of the LookupJoin,
+		but it's done purely for the convenience of its creation. Since no rowops
+		get sent to the LookupJoin's input, none get to its output, and none
+		get from there to the output label. Instead the main loop creates and sends the
+		rowops directly to the output label when it iterates through the lookup
+		results. Because of this the label name in the output is the name of
+		the output label.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_joins_lookupjoin_keys">
+		<title>The key fields of LookupJoin</title>
+
+		<indexterm>
+			<primary>LookupJoin</primary>
+			<secondary>keys</secondary>
+		</indexterm>
+		<para>
+		The key fields are the ones that participate in the join condition.
+		I use these terms interchangeably because by the definition of
+		LookupJoin, these fields must be the key fields in the join index
+		in the right-side table. LookupJoin has a few more facilities for their
+		handling that haven't been shown yet.
+		</para>
+
+		<para>
+		First, the join condition can be specified as the
+		<pre>Triceps::Fields::filterToPairs()</pre> patterns in the option
+		<quote>byLeft</quote>. The options <quote>by</quote> and
+		<quote>byLeft</quote> are mutually exclusive and one of them
+		must be present. The condition
+		</para>
+
+<pre>
+by => [ "acctSrc" => "source", "acctXtrId" => "external" ],
+</pre>
+
+		<para>
+		can be also specified as:
+		</para>
+
+<pre>
+byLeft => [ "acctSrc/source", "acctXtrId/external" ],
+</pre>
+
+		<para>
+		The option name <quote>byLeft</quote> says that the pattern specification is for the
+		fields on the left side (there is no symmetric <quote>byRight</quote>). The
+		substitutions produce the matching field names for the right side.
+		Unlike the result pattern, here the fields that do not find a match do
+		not get included in the key. It's as if an implicit <pre>"!.*"</pre> gets added at
+		the end. In fact, <pre>"!.*"</pre> really does get added implicitly at the end.
+		</para>
+
+		<para>
+		Of course, for the example above either option doesn't make much
+		difference. It starts making the difference when the key fields follow
+		a pattern. For example, if the key fields on both sides have the names
+		<pre>acctSrc</pre> and <pre>acctXtrId</pre>, the specification with the <quote>byLeft</quote>
+		becomes a little simpler:
+		</para>
+
+<pre>
+byLeft => [ "acctSrc", "acctXtrId" ],
+</pre>
+
+		<para>
+		Even more so if the key is long, common on both sides, and all the
+		fields have a common prefix. Such as:
+		</para>
+
+<pre>
+k_AccountSystem
+k_AccountId
+k_InstrumentSystem
+k_InstrumentId
+k_TransactionDate
+k_SettlementDate
+</pre>
+
+		<para>
+		Then the join condition can be specified simply as:
+		</para>
+
+<pre>
+byLeft => [ "k_.*" ],
+</pre>
+
+		<para>
+		If say the settlement date doesn't matter for a particular join, it can be excluded:
+		</para>
+
+<pre>
+byLeft => [ "!k_SettlementDate", "k_.*" ],
+</pre>
+
+		<para>
+		If the right side represents a swap of securities, it might have two
+		parts to it, each describing its half with its key:
+		</para>
+
+<pre>
+BorrowAccountSystem
+BorrowAccountId
+BorrowInstrumentSystem
+BorrowInstrumentId
+BorrowTransactionDate
+BorrowSettlementDate
+LoanAccountSystem
+LoanAccountId
+LoanInstrumentSystem
+LoanInstrumentId
+LoanTransactionDate
+LoanSettlementDate
+</pre>
+
+		<para>
+		Then the join of the one-sided rows with the borrow part condition can be done using:
+		</para>
+
+<pre>
+byLeft => [ 'k_(.*)/Borrow$1' ],
+</pre>
+
+		<para>
+		The key patterns make the long keys easier to drag around.
+		</para>
+
+		<indexterm>
+			<primary>join</primary>
+			<secondary>key field types</secondary>
+		</indexterm>
+		<para>
+		Second, key fields of LookupJoin don't have to be of the same type on
+		the left and on the right side. Since the key building for lookup is
+		done through Perl, the key values get automatically converted as
+		needed. 
+		</para>
+
+		<para>
+		A caveat is that the conversion might be not exactly direct. If a
+		string gets converted to a number, then any string values that do not
+		look like numbers will be converted to 0. A conversion between a string
+		and a floating-point number, in either direction, is likely to lose
+		precision. A conversion between int64 and int32 may cause the upper
+		bits to be truncated. So what gets looked up may be not what you
+		expect.
+		</para>
+
+		<para>
+		I'm not sure yet if I should add the requirement for the types being
+		exactly the same. The automatic conversions seem to be convenient, just
+		use them with care. I suppose, when the joins will get eventually
+		implemented in the &Cpp; code, this freedom would go away because it's
+		much easier and more efficient in &Cpp; to copy the field values as-is
+		than to convert them.
+		</para>
+
+		<para>
+		The only thing currently checked is whether a field is represented in
+		Perl as a scalar or an array, and that must match on the left and on
+		the right. Note that the array <pre>uint8[]</pre> gets represented in Perl as a
+		scalar string, so an <pre>uint8[]</pre> field can be matched with other scalars
+		but not with the other arrays.
+		</para>
+
+		<indexterm>
+			<primary>join</primary>
+			<secondary>key field duplication</secondary>
+		</indexterm>
+		<para>
+		Third, the key fields have the problem of duplication. The LookupJoin is
+		by definition an equi-join, it joins together the rows that have the
+		same values in a set of key fields. If all the fields from both sides
+		are to be included in the result, they key values will be present in it
+		twice, once from the left side, once from the right side. This is not
+		what is usually wanted, and the good practice is to let these fields
+		through from one side and filter out from the other side.
+		</para>
+
+		<para>
+		Letting these fields through on the left side is usually the better
+		choice. For the inner joins it doesn't really matter but for the
+		left outer joins it works much better than the with letting through
+		the fields from the right side. The reason is that when the join
+		doesn't find the match on the right side, all the right-side
+		fields will be NULL. If you pass through the key fields only from the
+		right side, they will contain NULL, and this is probably not what
+		you want.
+		</para>
+
+		<para>
+		However if for some reason, be it the order of the fields or the
+		better field types on the right side, you really want to pass the
+		key fields only from the right side, you can. LookupJoin provides
+		a special magic act enabled by the option
+		</para>
+
+<pre>
+	fieldsMirrorKey => 1
+</pre>
+
+		<para>
+		Then if the row is not found on the right side, a special right-side
+		row will be created with the key fields copied from the left side,
+		and it will be used to produce the result row. With
+		<quote>fieldsMirrorKey</quote> you are guaranteed to always have the
+		key values present on the right side.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_joins_lookupjoin_inside">
+		<title>A peek inside LookupJoin</title>
+
+		<indexterm>
+			<primary>LookupJoin</primary>
+			<secondary>code generation</secondary>
+		</indexterm>
+		<para>
+		I won't be describing in the details the internals of LookupJoin. They
+		seem a bit too big and complicated. Partially it's because the code is
+		of an older origin, and not using all the newer calls. Partially it's
+		because when I wrote it, I've tried to optimize by translating the rows
+		to an array format instead of referring to the fields by names, and
+		that made the code more tricky. Partially, the code has grown more
+		complex due to all the added options. And partially the functionality
+		just is a little tricky by itself.
+		</para>
+
+		<para>
+		But, for debugging purposes, the LookupJoin constructor can return the
+		auto-generated code of the joiner function. It's done with the option
+		<quote>saveJoinerTo</quote>:
+		</para>
+
+<pre>
+	saveJoinerTo => \$code,
+</pre>
+
+		<para>
+		This will cause the auto-generated code to be placed into the variable
+		<pre>$code</pre>. I've collected a few such examples in this section.
+		They provide a glimpse into the internal workings of the
+		joiner. It's definitely a quite advanced topic, but it's helpful if you
+		want to know, what is really going on in there.
+		</para>
+
+		<para>
+		The joiner code from the example
+		</para>
+
+<!-- t/xJoin.t, doLookupLeft, removed saveJoinerTo -->
+<pre>
+our $join = Triceps::LookupJoin->new(
+	unit => $uJoin,
+	name => "join",
+	leftRowType => $rtInTrans,
+	rightTable => $tAccounts,
+	rightIdxPath => ["lookupSrcExt"],
+	rightFields => [ "internal/acct" ],
+	by => [ "acctSrc" => "source", "acctXtrId" => "external" ],
+	isLeft => 1,
+); # would confess by itself on an error
+</pre>
+
+		<para>
+		that was shown first in the
+		<xref linkend="sc_joins_lookupjoin" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;
+		is this:
+		</para>
+
+<!-- t/xJoin.t, doLookupLeft, uncomment saveJoinerTo and print it -->
+<pre>
+sub # ($inLabel, $rowop, $self)
+{
+	my ($inLabel, $rowop, $self) = @_;
+	#print STDERR "DEBUGX LookupJoin " . $self->{name} . " in: ", $rowop->printP(), "\n";
+
+	my $opcode = $rowop->getOpcode(); # pass the opcode
+	my $row = $rowop->getRow();
+
+	my @leftdata = $row->toArray();
+
+	my $resRowType = $self->{resultRowType};
+	my $resLabel = $self->{outputLabel};
+
+	my $lookuprow = $self->{rightRowType}->makeRowHash(
+		"source" => $leftdata[1],
+		"external" => $leftdata[2],
+		);
+	
+	#print STDERR "DEBUGX " . $self->{name} . " lookup: ", $lookuprow->printP(), "\n";
+	my $rh = $self->{rightTable}->findIdx($self->{rightIdxType}, $lookuprow);
+
+	my @rightdata; # fields from the right side, defaults to all-undef, if no data found
+	my @result; # the result rows will be collected here
+
+	if (!$rh->isNull()) {
+		#print STDERR "DEBUGX " . $self->{name} . " found data: " . $rh->getRow()->printP() . "\n";
+		@rightdata = $rh->getRow()->toArray();
+	}
+
+		my @resdata = ($leftdata[0],
+		$leftdata[1],
+		$leftdata[2],
+		$leftdata[3],
+		$rightdata[2],
+		);
+		my $resrowop = $resLabel->makeRowop($opcode, $resRowType->makeRowArray(@resdata));
+		#print STDERR "DEBUGX " . $self->{name} . " +out: ", $resrowop->printP(), "\n";
+		$resLabel->getUnit()->call($resrowop);
+		
+}
+</pre>
+
+		<para>
+		From the example with the manual iteration:
+		</para>
+
+<!-- t/xJoin.t, doLookupLeftManual, removed saveJoinerTo -->
+<pre>
+our $join = Triceps::LookupJoin->new(
+	unit => $uJoin,
+	name => "join",
+	leftRowType => $rtInTrans,
+	rightTable => $tAccounts,
+	rightIdxPath => ["lookupSrcExt"],
+	rightFields => [ "internal/acct" ],
+	by => [ "acctSrc" => "source", "acctXtrId" => "external" ],
+	automatic => 0,
+); # would confess by itself on an error
+</pre>
+
+		<para>
+		comes this code:
+		</para>
+
+<!-- t/xJoin.t, doLookupLeftManual, uncomment saveJoinerTo and print it -->
+<pre>
+sub  # ($self, $row)
+{
+	my ($self, $row) = @_;
+
+	#print STDERR "DEBUGX LookupJoin " . $self->{name} . " in: ", $row->printP(), "\n";
+
+	my @leftdata = $row->toArray();
+
+	my $lookuprow = $self->{rightRowType}->makeRowHash(
+		"source" => $leftdata[1],
+		"external" => $leftdata[2],
+		);
+	
+	#print STDERR "DEBUGX " . $self->{name} . " lookup: ", $lookuprow->printP(), "\n";
+	my $rh = $self->{rightTable}->findIdx($self->{rightIdxType}, $lookuprow);
+
+	my @rightdata; # fields from the right side, defaults to all-undef, if no data found
+	my @result; # the result rows will be collected here
+
+	if (!$rh->isNull()) {
+		#print STDERR "DEBUGX " . $self->{name} . " found data: " . $rh->getRow()->printP() . "\n";
+		@rightdata = $rh->getRow()->toArray();
+	}
+
+		my @resdata = ($leftdata[0],
+		$leftdata[1],
+		$leftdata[2],
+		$leftdata[3],
+		$rightdata[2],
+		);
+		push @result, $self->{resultRowType}->makeRowArray(@resdata);
+		#print STDERR "DEBUGX " . $self->{name} . " +out: ", $result[$#result]->printP(), "\n";
+	return @result;
+}
+</pre>
+
+		<para>
+		It takes different arguments because now it's not an input label handler
+		but a common function that gets called from both the label handler and the
+		<pre>lookup()</pre> method. And it collects the rows in an array to be returned
+		instead of immediately passing them on.
+		</para>
+
+		<para>
+		From the example with multiple rows matching on the right side
+		</para>
+
+<!-- t/xJoin.t, doLookupLeftMulti and the type def before it, removed saveJoinerTo -->
+<pre>
+our $join = Triceps::LookupJoin->new(
+	unit => $uJoin,
+	name => "join",
+	leftRowType => $rtInTrans,
+	rightTable => $tAccounts,
+	rightIdxPath => [ "iterateSrc", "lookupSrcExt" ],
+	rightFields => [ "internal/acct" ],
+	by => [ "acctSrc" => "source", "acctXtrId" => "external" ],
+); # would confess by itself on an error
+</pre>
+
+		<para>
+		comes this code:
+		</para>
+
+<pre>
+sub # ($inLabel, $rowop, $self)
+{
+	my ($inLabel, $rowop, $self) = @_;
+	#print STDERR "DEBUGX LookupJoin " . $self->{name} . " in: ", $rowop->printP(), "\n";
+
+	my $opcode = $rowop->getOpcode(); # pass the opcode
+	my $row = $rowop->getRow();
+
+	my @leftdata = $row->toArray();
+
+	my $resRowType = $self->{resultRowType};
+	my $resLabel = $self->{outputLabel};
+
+	my $lookuprow = $self->{rightRowType}->makeRowHash(
+		"source" => $leftdata[1],
+		"external" => $leftdata[2],
+		);
+	
+	#print STDERR "DEBUGX " . $self->{name} . " lookup: ", $lookuprow->printP(), "\n";
+	my $rh = $self->{rightTable}->findIdx($self->{rightIdxType}, $lookuprow);
+
+	my @rightdata; # fields from the right side, defaults to all-undef, if no data found
+	my @result; # the result rows will be collected here
+
+	if ($rh->isNull()) {
+		#print STDERR "DEBUGX " . $self->{name} . " found NULL\n";
+
+		my @resdata = ($leftdata[0],
+		$leftdata[1],
+		$leftdata[2],
+		$leftdata[3],
+		$rightdata[2],
+		);
+		my $resrowop = $resLabel->makeRowop($opcode, $resRowType->makeRowArray(@resdata));
+		#print STDERR "DEBUGX " . $self->{name} . " +out: ", $resrowop->printP(), "\n";
+		$resLabel->getUnit()->call($resrowop);
+		
+	} else {
+		#print STDERR "DEBUGX " . $self->{name} . " found data: " . $rh->getRow()->printP() . "\n";
+		my $endrh = $self->{rightTable}->nextGroupIdx($self->{iterIdxType}, $rh);
+		for (; !$rh->same($endrh); $rh = $self->{rightTable}->nextIdx($self->{rightIdxType}, $rh)) {
+			@rightdata = $rh->getRow()->toArray();
+		my @resdata = ($leftdata[0],
+		$leftdata[1],
+		$leftdata[2],
+		$leftdata[3],
+		$rightdata[2],
+		);
+		my $resrowop = $resLabel->makeRowop($opcode, $resRowType->makeRowArray(@resdata));
+		#print STDERR "DEBUGX " . $self->{name} . " +out: ", $resrowop->printP(), "\n";
+		$resLabel->getUnit()->call($resrowop);
+		
+		}
+	}
+}
+</pre>
+
+		<para>
+		It's more complicated in two ways: If a match is found, it has to
+		iterate through the whole matching group. And if the match is not
+		found, it still has to produce a result row for the left join with a
+		separate code fragment.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_joins_jointwo">
+		<title>JoinTwo joins two tables</title>
+
+		<indexterm>
+			<primary>JoinTwo</primary>
+		</indexterm>
+		<indexterm>
+			<primary>join</primary>
+			<secondary>tables</secondary>
+		</indexterm>
+		<para>
+		Fundamentally, joining the two tables is kind of like the two
+		symmetrical copies of LookupJoin, each of them reacting to the
+		changes in one table and doing look-ups in another table. 
+		For all I can tell, the CEP systems with the insert-only stream model
+		tend to start with the assumption that the LookupJoin (or whetever they
+		call it) is good enough. Then it turns out that manually writing the
+		join twice where it can be done once is a pain. So the table-to-table
+		join gets added. Then the interesting nuances crop up, since a correct
+		table-to-table join has more to it than just two stream-to-table
+		joins.  Then it turns
+		out that it would be real convenient to propagate the deletes through
+		the join, and that gets added as a special feature behind the scenes.
+		</para>
+
+		<para>
+		In Triceps, JoinTwo is the template for joining the tables. And actually
+		it is translated under the hood to two LookupJoins, but it has
+		more on top of them.
+		</para>
+
+		<para>
+		In a common
+		database a join query causes a join plan to be created: on what table
+		to iterate, and in which to look up next. A CEP system deals with the
+		changing data, and a join has to react to the data changes on each of its
+		input tables. It must have multiple plans, one for starting from each
+		of the tables. And essentially a LookupJoin embodies such a plan, and
+		JoinTwo makes two of them.
+		</para>
+
+		<para>
+		Why only two? Because it's the minimal usable number. The join logic is
+		tricky, so it's better to work out the kinks on something simpler first. And
+		it still can be scaled to many tables by joining them in stages. It's
+		not quite as efficient as a direct join of multiple tables, because the
+		result of each stage has to be put into a table, but it does the job.
+		</para>
+
+		<para>
+		I'll be doing the demonstrations of the table joins on an application
+		example from the area of stock lending. Think of a large multinational
+		broker that wants to keep track of its lending activities. It has many
+		customers to whom the stock can be loaned or from whom it can be
+		borrowed. This information comes as the records of positions, of how
+		many shares are loaned or borrowed for each customer, and at what
+		contractual price. And since the clients are from all around the world,
+		the prices may be in different currencies. A simplified and much
+		shortened version of the position information may look like this:
+		</para>
+
+<!-- t/xJoin.t -->
+<pre>
+our $rtPosition = Triceps::RowType->new( # a customer account position
+	date => "int32", # as of which date, in format YYYYMMDD
+	customer => "string", # customer account id
+	symbol => "string", # stock symbol
+	quantity => "float64", # number of shares
+	price => "float64", # share price in local currency
+	currency => "string", # currency code of the price
+);
+</pre>
+
+		<para>
+		Then we want to aggregate these data in different ways, getting the
+		broker-wide summaries by the symbol, by customer etc. The aggregation
+		is updated as the business day goes on. At the end of the business day
+		the state of the day freezes, and the new day's initial data is loaded.
+		That's why the business date is part of the schema. If you wonder, the
+		next day's initial data is usually the same as at the end of the
+		previous day, except where some contractual conditions change. The
+		detailed position data is thrown away after a few days, or even right
+		at the end of the day, but the aggregation results from the end of the
+		day are kept for a longer history.
+		</para>
+
+		<para>
+		There is a problem with summing up the monetary values: they come in
+		different currencies and can not be added up directly. If we want to
+		get this kind of summaries, we have to translate all of them to a
+		single reference currency. That's what the sample joins will be doing:
+		finding the translation rates to the US dollars. The currency rates
+		come in the translation schema:
+		</para>
+
+<!-- t/xJoin.t -->
+<pre>
+our $rtToUsd = Triceps::RowType->new( # a currency conversion to USD
+	date => "int32", # as of which date, in format YYYYMMDD
+	currency => "string", # currency code
+	toUsd => "float64", # multiplier to convert this currency to USD
+);
+</pre>
+
+		<para>
+		Since the currency rates change all the time, to make sense of a
+		previous day's position, the previous day's rates need to be kept around,
+		and so the rates are also marked with a date.
+		</para>
+
+		<para>
+		Having the mood set, here is the first example of a model with an inner
+		join:
+		</para>
+
+<!-- t/xJoin.t table types, no $ixt..., doJoinInner -->
+<pre>
+# exchange rates, to convert all currencies to USD
+our $ttToUsd = Triceps::TableType->new($rtToUsd)
+	->addSubIndex("primary",
+		Triceps::IndexType->newHashed(key => [ "date", "currency" ])
+	)
+	->addSubIndex("byDate", # for cleaning by date
+		Triceps::SimpleOrderedIndex->new(date => "ASC")
+		->addSubIndex("grouping", Triceps::IndexType->newFifo())
+	)
+;
+$ttToUsd->initialize();
+
+# the positions in the original currency
+our $ttPosition = Triceps::TableType->new($rtPosition)
+	->addSubIndex("primary",
+		Triceps::IndexType->newHashed(key => [ "date", "customer", "symbol" ])
+	)
+	->addSubIndex("currencyLookup", # for joining with currency conversion
+		Triceps::IndexType->newHashed(key => [ "date", "currency" ])
+		->addSubIndex("grouping", Triceps::IndexType->newFifo())
+	)
+	->addSubIndex("byDate", # for cleaning by date
+		Triceps::SimpleOrderedIndex->new(date => "ASC")
+		->addSubIndex("grouping", Triceps::IndexType->newFifo())
+	)
+;
+$ttPosition->initialize();
+
+our $uJoin = Triceps::Unit->new("uJoin");
+
+our $tToUsd = $uJoin->makeTable($ttToUsd, "tToUsd");
+our $tPosition = $uJoin->makeTable($ttPosition, "tPosition");
+
+our $join = Triceps::JoinTwo->new(
+	name => "join",
+	leftTable => $tPosition,
+	rightTable => $tToUsd,
+	byLeft => [ "date", "currency" ],
+	type => "inner",
+); # would confess by itself on an error
+
+# label to print the changes to the detailed stats
+makePrintLabel("lbPrint", $join->getOutputLabel());
+
+while(&readLine) {
+	chomp;
+	my @data = split(/,/); # starts with a command, then string opcode
+	my $type = shift @data;
+	if ($type eq "cur") {
+		$uJoin->makeArrayCall($tToUsd->getInputLabel(), @data);
+	} elsif ($type eq "pos") {
+		$uJoin->makeArrayCall($tPosition->getInputLabel(), @data);
+	}
+	$uJoin->drainFrame(); # just in case, for completeness
+}
+</pre>
+
+		<para>
+		The example just does the joining, leaving the aggregation to the
+		imagination of the reader. The result of a JoinTwo is not stored in a
+		table. It is a stream of ephemeral updates, same as for LookupJoin. If
+		you want to keep them, you can put them into a table yourself (and
+		maybe do the aggregation in the same table).
+		</para>
+
+		<para>
+		Both of the joined tables must provide a Hashed index for the efficient
+		joining. In this case it will be <quote>currencyLookup</quote> on the left and
+		<quote>primary</quote> on the right, found automatically by the key fields.
+		The index may be leaf (selecting one row per key) or non-leaf
+		(containing multiple rows per key) but it must be there. This makes
+		sure that the joins are always efficient and you don't have to hunt for
+		why your model is suddenly so slow.
+		</para>
+
+		<indexterm>
+			<primary>join</primary>
+			<secondary>key field order</secondary>
+		</indexterm>
+		<para>
+		There are two ways to provide the join condition: either specify
+		it explicitly in the option <quote>by</quote> or <quote>byLeft</quote>,
+		or specify the indexes in both tables and have the key fields in them
+		paired together. Or you can specify both, as long as the information stays consistent.
+		For example, the join in this example could also be written as:
+		</para>
+
+<!-- t/xJoin.t doJoinInner modified -->
+<pre>
+our $join = Triceps::JoinTwo->new(
+	name => "join",
+	leftTable => $tPosition,
+	leftIdxPath => [ "currencyLookup" ],
+	rightTable => $tToUsd,
+	rightIdxPath => [ "primary" ],
+	type => "inner",
+); # would confess by itself on an error
+</pre>
+
+		<para>
+		When the key fields in the indexes are paired up together, it's done
+		in the order they go in the index specifications. Once again, the fields are paired not
+		by name but by order. If the indexes are nested, the outer indexes
+		precede in the order. For example, the <pre>$ttToUsd</pre> could have the same
+		index done in a nested way and it would work just as well:
+		</para>
+
+<pre>
+	->addSubIndex("byDate",
+		Triceps::IndexType->newHashed(key => [ "date" ])
+		->addSubIndex("primary",
+			Triceps::IndexType->newHashed(key => [ "currency" ])
+		)
+	) 
+</pre>
+
+		<indexterm>
+			<primary>index</primary>
+			<secondary>hashed</secondary>
+		</indexterm>
+		<para>
+		Same as with LookupJoin, currently only the Hashed indexes are
+		supported, and must go through all the path. The outer index <quote>byDate</quote>
+		here can not be a Sorted/Ordered index, that would be an error and the
+		join will refuse to accept it.
+		</para>
+
+		<para>
+		If the order of key fields in the <pre>$ttToUsd</pre> index were
+		changed to be different from <pre>$ttPosition</pre>, like this
+		</para>
+
+<pre>
+	->addSubIndex("primary",
+		Triceps::IndexType->newHashed(key => [ "currency", "date" ])
+	) 
+</pre>
+
+		<para>
+		then it would be a mess for the automatic pairing by index.
+		The wrong fields would be matched up in the
+		join condition, which would become 
+		<pre>(tPosition.date == tToUsd.currency && tPosition.currency == tToUsd.date)</pre>, 
+		and everything would go horribly wrong.
+		It would be no problem at all for selecting the pairing explicitly
+		with the <quote>by</quote> options and letting the join find the
+		index, which is the recommended way.
+		</para>
+
+		<indexterm>
+			<primary>join</primary>
+			<secondary>key field types</secondary>
+		</indexterm>
+		<para>
+		JoinTwo is much less lenient than LookupJoin as the key field
+		types go. It requires the types of the matching fields to be exactly
+		the same. Partially, for the reasons of catching the wrong field pairing by order,
+		partially for the sake of the result consistency. JoinTwo does the
+		look-ups in both directions. And think about what happens if a string field
+		and an int32 field get matched up, and then the non-numeric strings
+		turn up in the string field, containing things like 
+		<quote>abc</quote> and <quote>qwerty</quote>. Those strings on the left side
+		will match the rows with numeric 0 on the right side. But then if the
+		row with 0 on the right side changes, it would look for the string <quote>0</quote>
+		on the left, which would not find either <quote>abc</quote> or <quote>qwerty</quote>. The state
+		of the join will become a mess. So no automatic key type conversions
+		here.
+		</para>
+
+		<para>
+		By the way, even though JoinTwo doesn't refuse to have the float64 key
+		fields, using them is a bad idea. The floating-point values are subject
+		to non-obvious rounding. And if you have two floating-point values that
+		print the same, this doesn't mean that they are internally the same
+		down to the last bit (because the printing involves the conversion to
+		decimal that involves rounding). The joining requires that the values
+		are exactly equal. Because of this the joining on a floating-point
+		field is rife with unpleasant surprises. Better don't do it. A possible
+		solution is to round values by converting them to integers (scaled by
+		multiplying by a fixed factor to get essentially a fixed-point value).
+		You can even convert them back from fixed-point to floating-point and
+		still join on these floating-point values, because the same values
+		would always be produced from integers in exactly the same way, and
+		will be exactly the same.
+		</para>
+
+		<para>
+		More of the JoinTwo options closely parallel those in LookupJoin.
+		Obviously, <quote>name</quote>, <quote>rightTable</quote> and <quote>rightIdxPath</quote> are the same, with
+		the added symmetrical <quote>leftTable</quote> and <quote>leftIdxPath</quote>. There is no <quote>unit</quote>
+		option though, the unit is always taken from the tables (which must
+		belong to the same unit).
+		The option to save the source code of the generated joiner code has
+		been split in two: <quote>leftSaveJoinerTo</quote> and <quote>rightSaveJoinerTo</quote>. Since
+		JoinTwo has to react to the updates from both sides, is has to have two
+		handlers. And since internally it uses two LookupJoin for this purpose,
+		these happen to be the joiner functions of the left and right
+		LookupJoin.
+		</para>
+
+		<indexterm>
+			<primary>join</primary>
+			<secondary>inner</secondary>
+		</indexterm>
+		<para>
+		The option <quote>type</quote> selects the join mode. The inner join is the
+		default, and would have been used even if this option was not
+		specified.
+		</para>
+
+		<indexterm>
+			<primary>join</primary>
+			<secondary>key field duplication</secondary>
+		</indexterm>
+		<para>
+		The options controlling the result are also the same as in LookupJoin: <quote>leftFields</quote>,
+		<quote>rightFields</quote>, <quote>fieldsLeftFirst</quote>. There is
+		no option <quote>fieldsDropRightKey</quote>,
+		JoinTwo always excludes the duplicate key fields automatically.
+		The results in this example include all the fields from both sides by default.
+		</para>
+
+		<para>
+		The joins are currently not equipped to actually compute the translated
+		prices directly. They can only look up the information for it, and the
+		computation can be done later, before or during the aggregation.
+		</para>
+
+		<para>
+		That's enough explanations for now, let's look at the result. The
+		input rows are shown as usual in bold, and to make keeping track easier,
+		I broke up the output into short snippets with commentary after each one.
+		</para>
+
+<!-- t/xJoin.t doJoinInner -->
+<exdump>
+> cur,OP_INSERT,20120310,USD,1
+> cur,OP_INSERT,20120310,GBP,2
+> cur,OP_INSERT,20120310,EUR,1.5
+</exdump>
+
+		<para>
+		Inserting the reference currencies produces no result, since it's an
+		inner join and they have no matching positions yet.
+		</para>
+
+<!-- t/xJoin.t doJoinInner -->
+<exdump>
+> pos,OP_INSERT,20120310,one,AAA,100,15,USD
+join.leftLookup.out OP_INSERT date="20120310" customer="one" symbol="AAA" quantity="100" price="15" currency="USD" toUsd="1" 
+> pos,OP_INSERT,20120310,two,AAA,100,8,GBP
+join.leftLookup.out OP_INSERT date="20120310" customer="two" symbol="AAA" quantity="100" price="8" currency="GBP" toUsd="2" 
+</exdump>
+
+		<para>
+		Now the positions arrive and find the matching translations to USD. The
+		label names on the output are an interesting artifact of all the
+		chained labels receiving the original rowop that refers to the first
+		label in the chain. Which happens to be the output label of a
+		LookupJoin inside JoinTwo. It works conveniently for the
+		demonstrational purposes, since the name of that LookupJoin shows whether
+		the row that triggered the result came from the left or right side of
+		the JoinTwo.
+		</para>
+
+<!-- t/xJoin.t doJoinInner -->
+<exdump>
+> pos,OP_INSERT,20120310,three,AAA,100,300,RUR
+</exdump>
+
+		<para>
+		This position is out of luck: no translation for its currency. The
+		inner join is actually not a good choice here. If a row does not pass
+		through because of the lack of translation, it gets excluded even from
+		the aggregations that do not require the translation, such as those
+		that total up the quantity of a particular symbol across all the
+		customers. A left outer join would have been suited better.
+		</para>
+
+<!-- t/xJoin.t doJoinInner -->
+<exdump>
+> pos,OP_INSERT,20120310,three,BBB,200,80,GBP
+join.leftLookup.out OP_INSERT date="20120310" customer="three" symbol="BBB" quantity="200" price="80" currency="GBP" toUsd="2" 
+</exdump>
+
+		<para>
+		Another position arrives, same as before.
+		</para>
+
+<!-- t/xJoin.t doJoinInner -->
+<exdump>
+> cur,OP_INSERT,20120310,RUR,0.04
+join.rightLookup.out OP_INSERT date="20120310" customer="three" symbol="AAA" quantity="100" price="300" currency="RUR" toUsd="0.04" 
+</exdump>
+
+		<para>
+		The translation for RUR finally comes in. The position in RUR can now
+		find its match and propagate through.
+		</para>
+
+<!-- t/xJoin.t doJoinInner -->
+<exdump>
+> cur,OP_DELETE,20120310,GBP,2
+join.rightLookup.out OP_DELETE date="20120310" customer="two" symbol="AAA" quantity="100" price="8" currency="GBP" toUsd="2" 
+join.rightLookup.out OP_DELETE date="20120310" customer="three" symbol="BBB" quantity="200" price="80" currency="GBP" toUsd="2" 
+> cur,OP_INSERT,20120310,GBP,2.2
+join.rightLookup.out OP_INSERT date="20120310" customer="two" symbol="AAA" quantity="100" price="8" currency="GBP" toUsd="2.2" 
+join.rightLookup.out OP_INSERT date="20120310" customer="three" symbol="BBB" quantity="200" price="80" currency="GBP" toUsd="2.2" 
+</exdump>
+
+		<para>
+		An exchange rate update for GBP arrives. It amounts to <quote>delete the old
+		translation and then insert a new one</quote>. Each of these operations
+		updates the state of the join: the disappearing translation causes all
+		the GBP positions to be deleted from the result, and the new
+		translation inserts them back, with the new value of toUsd.
+		Which is the correct behavior: to make an up date to the result
+		positions, they have to be deleted and then inserted witn the new values.
+		</para>
+
+<!-- t/xJoin.t doJoinInner -->
+<exdump>
+> pos,OP_DELETE,20120310,one,AAA,100,15,USD
+join.leftLookup.out OP_DELETE date="20120310" customer="one" symbol="AAA" quantity="100" price="15" currency="USD" toUsd="1" 
+> pos,OP_INSERT,20120310,one,AAA,200,16,USD
+join.leftLookup.out OP_INSERT date="20120310" customer="one" symbol="AAA" quantity="200" price="16" currency="USD" toUsd="1" 
+</exdump>
+
+		<para>
+		A position update arrives. Again, it's a delete-and-insert, and
+		propagates through the join as such.
+		</para>
+
+		<para>
+		That's the end of the first example. The commentary said that the
+		left outer join would have been better for the logic, so let's make
+		one for the left outer join.  All we need to change is the join type option:
+		</para>
+
+		<indexterm>
+			<primary>join</primary>
+			<secondary>left outer</secondary>
+		</indexterm>
+<!-- t/xJoin.t doJoinLeft -->
+<pre>
+our $join = Triceps::JoinTwo->new(
+	name => "join",
+	leftTable => $tPosition,
+	rightTable => $tToUsd,
+	byLeft => [ "date", "currency" ],
+	type => "left",
+); # would confess by itself on an error
+</pre>
+
+		<para>
+		Now the positions would pass through even if the currency translation
+		is not available. The same input now produces a different result:
+		</para>
+
+<!-- t/xJoin.t doJoinLeft, except day and clear -->
+<exdump>
+> cur,OP_INSERT,20120310,USD,1
+> cur,OP_INSERT,20120310,GBP,2
+> cur,OP_INSERT,20120310,EUR,1.5
+> pos,OP_INSERT,20120310,one,AAA,100,15,USD
+join.leftLookup.out OP_INSERT date="20120310" customer="one" symbol="AAA" quantity="100" price="15" currency="USD" toUsd="1" 
+> pos,OP_INSERT,20120310,two,AAA,100,8,GBP
+join.leftLookup.out OP_INSERT date="20120310" customer="two" symbol="AAA" quantity="100" price="8" currency="GBP" toUsd="2" 
+</exdump>
+
+		<para>
+		So far things are going the same as for the inner join.
+		</para>
+
+<!-- t/xJoin.t doJoinLeft, except day and clear -->
+<exdump>
+> pos,OP_INSERT,20120310,three,AAA,100,300,RUR
+join.leftLookup.out OP_INSERT date="20120310" customer="three" symbol="AAA" quantity="100" price="300" currency="RUR" 
+</exdump>
+
+		<para>
+		The first difference: even though there is no translation for RUR, the
+		row still passes through (with the field <pre>toUsd</pre> being NULL).
+		</para>
+
+<!-- t/xJoin.t doJoinLeft, except day and clear -->
+<exdump>
+> pos,OP_INSERT,20120310,three,BBB,200,80,GBP
+join.leftLookup.out OP_INSERT date="20120310" customer="three" symbol="BBB" quantity="200" price="80" currency="GBP" toUsd="2" 
+</exdump>
+
+		<para>
+		This is also unchanged.
+		</para>
+
+<!-- t/xJoin.t doJoinLeft, except day and clear -->
+<exdump>
+> cur,OP_INSERT,20120310,RUR,0.04
+join.rightLookup.out OP_DELETE date="20120310" customer="three" symbol="AAA" quantity="100" price="300" currency="RUR" 
+join.rightLookup.out OP_INSERT date="20120310" customer="three" symbol="AAA" quantity="100" price="300" currency="RUR" toUsd="0.04" 
+</exdump>
+
+		<para>
+		The second difference: since this row from the left side has already
+		passed through, just sending another INSERT for it would make the data
+		inconsistent. The original result without the translation must be
+		deleted first, and then a new one, with translation, inserted. JoinTwo
+		is smart enough to figure it out all by itself.
+		</para>
+
+<!-- t/xJoin.t doJoinLeft, except day and clear -->
+<exdump>
+> cur,OP_DELETE,20120310,GBP,2
+join.rightLookup.out OP_DELETE date="20120310" customer="two" symbol="AAA" quantity="100" price="8" currency="GBP" toUsd="2" 
+join.rightLookup.out OP_INSERT date="20120310" customer="two" symbol="AAA" quantity="100" price="8" currency="GBP" 
+join.rightLookup.out OP_DELETE date="20120310" customer="three" symbol="BBB" quantity="200" price="80" currency="GBP" toUsd="2" 
+join.rightLookup.out OP_INSERT date="20120310" customer="three" symbol="BBB" quantity="200" price="80" currency="GBP" 
+</exdump>
+
+		<para>
+		The same logic works for the deletes, only backwards: when the
+		translation for GBP is deleted, the result rows that used it change to
+		the lose the translation.
+		</para>
+
+<!-- t/xJoin.t doJoinLeft, except day and clear -->
+<exdump>
+> cur,OP_INSERT,20120310,GBP,2.2
+join.rightLookup.out OP_DELETE date="20120310" customer="two" symbol="AAA" quantity="100" price="8" currency="GBP" 
+join.rightLookup.out OP_INSERT date="20120310" customer="two" symbol="AAA" quantity="100" price="8" currency="GBP" toUsd="2.2" 
+join.rightLookup.out OP_DELETE date="20120310" customer="three" symbol="BBB" quantity="200" price="80" currency="GBP" 
+join.rightLookup.out OP_INSERT date="20120310" customer="three" symbol="BBB" quantity="200" price="80" currency="GBP" toUsd="2.2" 
+</exdump>
+
+		<para>
+		And again, when the new translation for GBP comes in, the DELETE-INSERT
+		sequence is done for each of the rows. As you can see, the update of
+		the GBP translation in the last two snippets worked in not the most efficient way.
+		Fundamentally, if we knew that a DELETE of GBP will be immediately
+		followed by an INSERT, we could skip inserting and then deleting the
+		rows with the NULL in <pre>toUsd</pre>. But we don't know, and in Triceps there is
+		no way to know it.
+		</para>
+
+		<indexterm>
+			<primary>join</primary>
+			<secondary>no primary key</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>join</primary>
+			<secondary>with collapse</secondary>
+		</indexterm>
+		<para>
+		If you really, really want to avoid the propagation of these
+		intermediate changes, insert after the join a Collapse template described in 
+		<xref linkend="sc_other_collapse" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;,
+		and flush it only
+		after the whole update has been processed. There will be more overhead
+		in the Collapse itself, but all the logic below it will skip the
+		intermediate changes. If this logic below is heavy-weight, that might
+		be an overall win. A caveat though: a Collapse requires that the data
+		has a primary key, a JoinTwo doesn't require its result (nor its
+		inputs) to have a primary key. Because of this, the collapse might not
+		work right with every possible join, you'd have to limit yourself to
+		the joins that produce the data with a primary key.
+		</para>
+
+<!-- t/xJoin.t doJoinLeft, except day and clear -->
+<exdump>
+> pos,OP_DELETE,20120310,one,AAA,100,15,USD
+join.leftLookup.out OP_DELETE date="20120310" customer="one" symbol="AAA" quantity="100" price="15" currency="USD" toUsd="1" 
+> pos,OP_INSERT,20120310,one,AAA,200,16,USD
+join.leftLookup.out OP_INSERT date="20120310" customer="one" symbol="AAA" quantity="200" price="16" currency="USD" toUsd="1" 
+</exdump>
+
+		<para>
+		And the rest is again the same as with an inner join.
+		</para>
+
+		<indexterm>
+			<primary>join</primary>
+			<secondary>right outer</secondary>
+		</indexterm>
+		<para>
+		JoinTwo can do a right outer join too, just use the type <quote>right</quote>. It
+		works in exactly the same way as the left outer join, just with a
+		different table. So much the same that it's not even worth a separate
+		example.
+		</para>
+
+		<indexterm>
+			<primary>join</primary>
+			<secondary>full outer</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>diamond</primary>
+		</indexterm>
+		<indexterm>
+			<primary>fork-join</primary>
+		</indexterm>
+		<para>
+		Now, the full outer join. 
+		The full outer joins usually
+		get used with a variation of the <quote>fork-join</quote> topology described in the
+		<xref linkend="sc_other_diamond" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		In it the processing of a row can be forked into
+		multiple parallel paths, each path doing an optional part of the
+		comuptation and either providing a result row or not,
+		eventually with all the parts merged back together into one row. 
+		The full outer join is a convenient
+		way to do this merge: the paths that didn't produce the result get
+		quietly ignored, and the results that were produced get merged back
+		into a single row. The row in such situations is usually identified by
+		a primary key, so the partial results can find each other. This scheme
+		makes the most sense when the paths are executed in the parallel
+		threads, or when the processing on some paths may get delayed and then
+		continued later. If the processing is single-threaded and fast, Triceps
+		provides a more convenient procedural way of getting the same result:
+		just call every path in order and merge the results from them
+		procedurally, and you won't have to keep the intermediate results in
+		their tables forever, nor delete them manually.
+		</para>
+
+		<para>
+		Even though that use is typical, it has only the 1:1 record matching
+		and does not highlight all the abilities of the JoinTwo. So, let's come
+		up with another example that does.
+		</para>
+
+		<para>
+		The positions-and-currencies do not lend itself easily to 
+		a full outer join but we'll make them do.  Suppose that you want to get the total count of
+		positions (per symbol, or altogether), or maybe the total value, for
+		every currency. Including those for which we have the exchange rates
+		but no positions, for them the count should simply be 0 (or maybe
+		NULL). And those for which there are positions but no exchange rate translations.
+		This is a job for a full outer join, followed by an aggregation. The
+		join has the type <quote>outer</quote> and looks like this:
+		</para>
+
+<!-- t/xJoin.t doJoinOuter -->
+<pre>
+our $join = Triceps::JoinTwo->new(
+	name => "join",
+	leftTable => $tPosition,
+	rightTable => $tToUsd,
+	byLeft => [ "date", "currency" ],
+	type => "outer",
+); # would confess by itself on an error
+</pre>
+
+		<para>
+		As before, the aggregation part will be left to the
+		imagination of the reader. 
+		This join has the many-to-one (M:1) row matching, since there might be
+		multiple positions on the left matching one currency rate translation
+		on the right. This will create interesting effects in the output,
+		let's look at it:
+		</para>
+
+<!-- t/xJoin.t doJoinOuter -->
+<exdump>
+> cur,OP_INSERT,20120310,GBP,2
+join.rightLookup.out OP_INSERT date="20120310" currency="GBP" toUsd="2" 
+</exdump>
+
+		<para>
+		The first translation gets through, even though there is no position for it yet.
+		</para>
+
+<!-- t/xJoin.t doJoinOuter -->
+<exdump>
+> pos,OP_INSERT,20120310,two,AAA,100,8,GBP
+join.leftLookup.out OP_DELETE date="20120310" currency="GBP" toUsd="2" 
+join.leftLookup.out OP_INSERT date="20120310" customer="two" symbol="AAA" quantity="100" price="8" currency="GBP" toUsd="2" 
+</exdump>
+
+		<para>
+		The first position for an existing translation comes in. Now the GBP
+		row has a match, so the unmatched row gets deleted and a matched one
+		gets inserted instead.
+		</para>
+
+<!-- t/xJoin.t doJoinOuter -->
+<exdump>
+> pos,OP_INSERT,20120310,three,BBB,200,80,GBP
+join.leftLookup.out OP_INSERT date="20120310" customer="three" symbol="BBB" quantity="200" price="80" currency="GBP" toUsd="2" 
+</exdump>
+
+		<para>
+		The second position for GBP works differently: since there is no
+		unmatched row any more (it was taken care of by the first position),
+		there is nothing to delete. Just the second matched row gets
+		inserted. 
+		</para>
+
+<!-- t/xJoin.t doJoinOuter -->
+<exdump>
+> pos,OP_INSERT,20120310,three,AAA,100,300,RUR
+join.leftLookup.out OP_INSERT date="20120310" customer="three" symbol="AAA" quantity="100" price="300" currency="RUR" 
+</exdump>
+
+		<para>
+		The position without a matching currency get through as well.
+		</para>
+
+<!-- t/xJoin.t doJoinOuter -->
+<exdump>
+> cur,OP_INSERT,20120310,RUR,0.04
+join.rightLookup.out OP_DELETE date="20120310" customer="three" symbol="AAA" quantity="100" price="300" currency="RUR" 
+join.rightLookup.out OP_INSERT date="20120310" customer="three" symbol="AAA" quantity="100" price="300" currency="RUR" toUsd="0.04" 
+</exdump>
+
+		<para>
+		Now the RUR translation becomes available and it has to do the same
+		things as we've seen before, only on the other side: delete the
+		unmatched record and replace it with the matched one.
+		</para>
+
+<!-- t/xJoin.t doJoinOuter -->
+<exdump>
+> cur,OP_DELETE,20120310,GBP,2
+join.rightLookup.out OP_DELETE date="20120310" customer="two" symbol="AAA" quantity="100" price="8" currency="GBP" toUsd="2" 
+join.rightLookup.out OP_INSERT date="20120310" customer="two" symbol="AAA" quantity="100" price="8" currency="GBP" 
+join.rightLookup.out OP_DELETE date="20120310" customer="three" symbol="BBB" quantity="200" price="80" currency="GBP" toUsd="2" 
+join.rightLookup.out OP_INSERT date="20120310" customer="three" symbol="BBB" quantity="200" price="80" currency="GBP" 
+> cur,OP_INSERT,20120310,GBP,2.2
+join.rightLookup.out OP_DELETE date="20120310" customer="two" symbol="AAA" quantity="100" price="8" currency="GBP" 
+join.rightLookup.out OP_INSERT date="20120310" customer="two" symbol="AAA" quantity="100" price="8" currency="GBP" toUsd="2.2" 
+join.rightLookup.out OP_DELETE date="20120310" customer="three" symbol="BBB" quantity="200" price="80" currency="GBP" 
+join.rightLookup.out OP_INSERT date="20120310" customer="three" symbol="BBB" quantity="200" price="80" currency="GBP" toUsd="2.2" 
+</exdump>
+
+		<para>
+		Then the GBP translation gets updated. First the old translation gets
+		deleted and then the new one inserted. When the translation gets
+		deleted, all the positions in GBP lose their match. So the matched rows
+		gets deleted and replaced with the unmatched ones. When the new GBP
+		translation is inserted, the replacement goes in the other
+		direction.
+		</para>
+
+<!-- t/xJoin.t doJoinOuter -->
+<exdump>
+> pos,OP_DELETE,20120310,three,BBB,200,80,GBP
+join.leftLookup.out OP_DELETE date="20120310" customer="three" symbol="BBB" quantity="200" price="80" currency="GBP" toUsd="2.2" 
+</exdump>
+
+		<para>
+		When this position goes away, the row gets deleted from the result as
+		well. However it was not the only position in GBP, so there is no need
+		to insert an unmatched record for GBP.
+		</para>
+
+<!-- t/xJoin.t doJoinOuter -->
+<exdump>
+> pos,OP_DELETE,20120310,three,AAA,100,300,RUR
+join.leftLookup.out OP_DELETE date="20120310" customer="three" symbol="AAA" quantity="100" price="300" currency="RUR" toUsd="0.04" 
+join.leftLookup.out OP_INSERT date="20120310" currency="RUR" toUsd="0.04" 
+</exdump>
+
+		<para>
+		This position was the last one in RUR. So when it gets deleted, the RUR
+		translation has no match any more. That means, after deleting the
+		matched row from the results, the unmatched row has to be
+		inserted to keep the balance right.
+		</para>
+
+		<indexterm>
+			<primary>join</primary>
+			<secondary>to-many</secondary>
+		</indexterm>
+		<para>
+		This business with keeping track of the unmatched rows is
+		not unique to the full outer joins. Remember, it was showing in the
+		left outer joins too, and the right outer joins are no exception
+		either. When the first matching row gets inserted or the last matching
+		row gets deleted on the side that is opposite to the "outer side", the
+		unmatched rows have to be handled in the result. (That would be the
+		right side for the left outer joins, the left side for the right outer
+		joins, and either side for the full outer joins).
+		The special thing about the M:1 (and 1:M and M:M) joins is that
+		there may be more than one matching row.
+		On insertion, the second and following matching rows produce a different 
+		effect than the first one. On deletion, the opposite: all the
+		rows but the last work differently from the last one.
+		It's not limited to the full outer joins. M:1 or M:M with a right outer
+		join, and 1:M or M:M with a left outer join will do it too.
+		</para>
+
+		<para>
+		If you're like me, by now you'd be wondering, how does it work? If the
+		<quote>opposite side</quote> is of <quote>one</quote> variety (:1 or 1:), which can be known from
+		it using a leaf index for the join, then every insert is the first
+		insert of a matching row for this key, and every delete is the delete
+		of the last row for this key. Which means, do the empty-match business
+		every time.
+		</para>
+
+		<para>
+		If the <quote>opposite side</quote> is of the <quote>many</quote> variety (:M or M:), with a
+		non-leaf index, then things get more complicated. The join works by
+		processing the rowops coming out of the argument tables. When it gets
+		the rowop in such a situation, it goes to the table and checks, was it
+		the first (or last) row for this key? And then uses this knowledge to
+		act.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_joins_jointwo_keys">
+		<title>The key field duplication in JoinTwo</title>
+
+		<indexterm>
+			<primary>join</primary>
+			<secondary>key field duplication</secondary>
+		</indexterm>
+		<para>
+		JoinTwo in its raw form has the same problem of the key field duplication
+		as LookupJoin (described in
+		<xref linkend="sc_joins_lookupjoin_keys" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;).
+		It's a more high-level template, so it solves this problem automatically,
+		removing the duplicate fields from the result by default.
+		</para>
+
+		<para>
+		But the problem in JoinTwo is even worse
+		because the table-to-table outer joins must work with the updates from
+		any side. If a row finds no match in the outer join, the other side
+		and all the fields in that other side will be NULL. If only the fields from that other
+		side pass through into the result, the result will contain NULLs in
+		the key fields, which would be very wrong.
+		Thus JoinTwo has even more magic built into it: it knows how to
+		have the key fields copied into the result from whatever
+		side happens to be present for a particular row, and does this by default. 
+		The other way to think about it is that it makes these fields always available on both sides.
+		</para>
+
+		<para>
+		The default behavior is good enough for most situations. But if you want
+		more control,
+		it's done with the option <quote>fieldsUniqKey</quote>. The default value
+		of this option is <quote>first</quote>. It means: Enable the magic for copying the
+		fields from the non-NULL side to the NULL side. Look at the option
+		<quote>fieldsLeftFirst</quote> and figure out, which side goes first in the result.
+		Let the key fields pass on that side unchanged (though the user can
+		block them on that side manually too, or possibly rename them, it's his
+		choice). On the other side, automatically generate the blocking specs
+		for the key fields and prepend them to that side's result
+		specification. It's smart enough to know that an undefined <quote>leftFields</quote>
+		or <quote>rightFields</quote> means the same as <quote>.*</quote>, so an undefined result spec is
+		replaced by the blocking specs followed by <quote>.*</quote>. If you later call the
+		methods
+		</para>
+
+<pre>
+$fspec = $join->getLeftFields();
+$fspec = $join->getRightFields();
+</pre>
+
+		<para>
+		then you will actually get back the modified field specs.
+		</para>
+
+		<para>
+		If you want the key fields to be present in a different location in the
+		result, you can set <quote>fieldsUniqKey</quote> to <quote>left</quote> or <quote>right</quote>. That will
+		make them pass through on the selected side, and the blocking would be
+		automatically added on the other side.
+		</para>
+
+		<para>
+		For more control yet, set this option to <quote>manual</quote>. The magic for making
+		the key fields available on both sides will still be enabled, but no
+		automatic blocking. You can pick and choose the result fields manually,
+		exactly as you want. Remember though that there can't be multiple
+		fields with the same name in the result, so if both sides have these
+		fields named the same, you've got to block or rename one of the two
+		copies.
+		</para>
+
+		<para>
+		The final choice is <quote>none</quote>: it simply disables the key field magic.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_joins_jointwo_override">
+		<title>The override options in JoinTwo</title>
+
+		<indexterm>
+			<primary>join</primary>
+			<secondary>override</secondary>
+		</indexterm>
+		<para>
+		Normally JoinTwo tries to work in a consistent manner, refusing to do
+		the unsafe things that might corrupt the data. But if you really,
+		really want, and are really sure of what you're doing, there are
+		options to override these restrictions.
+		</para>
+
+		<indexterm>
+			<primary>join</primary>
+			<secondary>left outer</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>join</primary>
+			<secondary>right outer</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>join</primary>
+			<secondary>full outer</secondary>
+		</indexterm>
+		<para>
+		If you set
+		</para>
+
+<pre>
+	overrideSimpleMinded => 1,
+</pre>
+
+		<indexterm>
+			<primary>Coral8</primary>
+		</indexterm>
+		<indexterm>
+			<primary>StreamBase</primary>
+		</indexterm>
+		<para>
+		then the logic that produces the DELETE-INSERT sequences for the outer
+		joins gets disabled. The only reason I can think of to use this option
+		is if you want to simulate a CEP system that has no concept of opcodes.
+		So if your data is INSERT-only and you want to produce the INSERT-only
+		data too, and want the dumbed-down logic, this option is your solution.
+		</para>
+
+		<indexterm>
+			<primary>join</primary>
+			<secondary>key field types</secondary>
+		</indexterm>
+		<para>
+		The option
+		</para>
+
+<pre>
+	overrideKeyTypes => 1,
+</pre>
+
+		<para>
+		disables the check for the exact match of the key field types. This
+		might come helpful for example if you have an int32 field on one side
+		and an int64 field on the other side, and you know that in reality they
+		would always stay within the int32 range. Or if you have an integer on
+		one side and a string that always contains an integer on the other
+		side. Since you know that the type conversions can always be done with
+		no loss, you can safely override the type check and still get the
+		correct result.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_joins_jointwo_inputfilter">
+		<title>JoinTwo input event filtering</title>
+
+		<indexterm>
+			<primary>join</primary>
+			<secondary>input filtering</secondary>
+		</indexterm>
+		<para>
+		Let's look at how the business day logic interacts with the joins. It's
+		typical for the business applications to keep the full data for the
+		current day, or a few recent days, then clear the data that became old
+		and maybe keep it only in an aggregated form.
+		</para>
+
+		<para>
+		So, let's add the business day logic to the left join example. It uses
+		the indexes by date to find the rows that have become old:
+		</para>
+
+<!-- t/xJoin.t, collected together form fragments -->
+<pre>
+# exchange rates, to convert all currencies to USD
+our $ttToUsd = Triceps::TableType->new($rtToUsd)
+	->addSubIndex("primary",
+		Triceps::IndexType->newHashed(key => [ "date", "currency" ])
+	)
+	->addSubIndex("byDate", # for cleaning by date
+		Triceps::SimpleOrderedIndex->new(date => "ASC")
+		->addSubIndex("grouping", Triceps::IndexType->newFifo())
+	)
+;
+$ttToUsd->initialize();
+
+# the positions in the original currency
+our $ttPosition = Triceps::TableType->new($rtPosition)
+	->addSubIndex("primary",
+		Triceps::IndexType->newHashed(key => [ "date", "customer", "symbol" ])
+	)
+	->addSubIndex("currencyLookup", # for joining with currency conversion
+		Triceps::IndexType->newHashed(key => [ "date", "currency" ])
+		->addSubIndex("grouping", Triceps::IndexType->newFifo())
+	)
+	->addSubIndex("byDate", # for cleaning by date
+		Triceps::SimpleOrderedIndex->new(date => "ASC")
+		->addSubIndex("grouping", Triceps::IndexType->newFifo())
+	)
+;
+$ttPosition->initialize();
+
+# remember the indexes for the future use
+our $ixtToUsdByDate = $ttToUsd->findSubIndex("byDate");
+our $ixtPositionByDate = $ttPosition->findSubIndex("byDate");
+
+# Go through the table and clear all the rows where the field "date"
+# is less than the date argument. The index type orders the table by date.
+sub clearByDate($$$) # ($table, $ixt, $date)
+{
+	my ($table, $ixt, $date) = @_;
+
+	my $next;
+	for (my $rhit = $table->beginIdx($ixt); !$rhit->isNull(); $rhit = $next) {
+		last if (($rhit->getRow()->get("date")) >= $date);
+		$next = $rhit->nextIdx($ixt); # advance before removal
+		$table->remove($rhit);
+	}
+}
+</pre>
+
+		<para>
+		The table types are the same as have been already shown before, they've been
+		copied here for convenience. <pre>clearByDate()</pre> is an universal function that
+		can clear the contents of any table by date, provided that the date is
+		in the field <quote>date</quote> and the index type on this table that orders the
+		rows by date is given as an argument. The index with ordering by date
+		must be not just a leaf Ordered index, but have a FIFO index nested in it.
+		Without that FIFO index, the Ordered index would allow only one row for
+		each date.
+		</para>
+
+		<para>
+		The main loop gets extended with a few more commands:
+		</para>
+
+<!-- t/xJoin.t, doJoinLeft -->
+<pre>
+our $businessDay = undef;
+
+our $join = Triceps::JoinTwo->new(
+	name => "join",
+	leftTable => $tPosition,
+	rightTable => $tToUsd,
+	byLeft => [ "date", "currency" ],
+	type => "left",
+); # would confess by itself on an error
+
+# label to print the changes to the detailed stats
+makePrintLabel("lbPrint", $join->getOutputLabel());
+
+while(&readLine) {
+	chomp;
+	my @data = split(/,/); # starts with a command, then string opcode
+	my $type = shift @data;
+	if ($type eq "cur") {
+		$uJoin->makeArrayCall($tToUsd->getInputLabel(), @data);
+	} elsif ($type eq "pos") {
+		$uJoin->makeArrayCall($tPosition->getInputLabel(), @data);
+	} elsif ($type eq "day") { # set the business day
+		$businessDay = $data[0] + 0; # convert to an int
+	} elsif ($type eq "clear") { # clear the previous day
+		# flush the left side first, because it's an outer join
+		&clearByDate($tPosition, $ixtPositionByDate, $businessDay);
+		&clearByDate($tToUsd, $ixtToUsdByDate, $businessDay);
+	}
+	$uJoin->drainFrame(); # just in case, for completeness
+}
+</pre>
+
+		<para>
+		The roll-over to the next business day (after the input data previously
+		shown with the left join example) then looks like this:
+		</para>
+
+<!-- t/xJoin.t, doJoinLeft -->
+<exdump>
+> day,20120311
+> clear
+join.leftLookup.out OP_DELETE date="20120310" customer="two" symbol="AAA" quantity="100" price="8" currency="GBP" toUsd="2.2" 
+join.leftLookup.out OP_DELETE date="20120310" customer="three" symbol="AAA" quantity="100" price="300" currency="RUR" toUsd="0.04" 
+join.leftLookup.out OP_DELETE date="20120310" customer="three" symbol="BBB" quantity="200" price="80" currency="GBP" toUsd="2.2" 
+join.leftLookup.out OP_DELETE date="20120310" customer="one" symbol="AAA" quantity="200" price="16" currency="USD" toUsd="1" 
+</exdump>
+
+		<para>
+		Clearing the left-side table before the right-side one is more
+		efficient than the other way around, since this is a left outer join,
+		and since it's an M:1 join. If the
+		right-side table were cleared first, it would first update all the
+		result records to change all the right-side fields in them to NULL, and
+		then the clearing of the left-side table would finally delete these
+		rows. Clearing the left side first removes this churn: it deletes all
+		the rows from the result right away, and then when the right side is
+		cleared, it still tries to look up the matching rows but finds nothing
+		and produces no result. For an inner join the order would
+		not matter: either one would produce the same amount of churn.
+		For a full outer join, the M:1 consideration would come into play,
+		and removing the rows from the left side first would still be more
+		efficient. This way when it removes multiple position rows that match the same currency,
+		all of them but one generate the simple DELETEs, and only the last
+		one would follow up with an INSERT that has only the right-side data
+		in it. That row with the right-side data will get deleted when the
+		currency row gets deleted from the right side. If the right side were deleted
+		first, deleting each row on the right side would cause an output
+		of a DELETE-INSERT result pair for each of its matching 
+		position rows from the
+		left side, and would produce more churn. For the 1:1 or M:M full
+		outer joins, the order would not matter.
+		</para>
+
+		<para>
+		If you don't want these deletions to propagate though the rest of your
+		model, you can just put a filtering logic after the join, to throw away
+		all the modifications for the previous days. Through don't forget that
+		you would have then to delete the previous-day data from the rest of
+		the model's tables manually.
+		</para>
+
+		<para>
+		If you want to keep only the aggregated data, you may want to pass the
+		join output to the aggregator without filtering and then filter the
+		aggregator's output, thus stopping the updates to the aggregation
+		results. You may even have a special logic in the aggregator, that
+		would ignore the groups of the previous days. Such optimization
+		of the aggregation filtering will be shown in the
+		<xref linkend="sc_time_limited" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		And they aren't any
+		less efficient than filtering on the output of the join, because if you
+		filter after the join, you'd still have to remove the rows from the
+		aggregation table, and would still have to filter after the aggregation
+		too.
+		</para>
+
+		<para>
+		Now, suppose that you want to be extra optimal and don't want any join
+		look-ups to happen at all when you delete the old data. JoinTwo has a
+		feature that lets you do that. You can make it receive the events not
+		directly from the tables but after filtering, using the options
+		<quote>leftFromLabel</quote> and <quote>rightFromLabel</quote>:
+		</para>
+
+<!-- t/xJoin.t, doJoinFiltered -->
+<pre>
+our $lbPositionCurrent = $uJoin->makeDummyLabel(
+	$tPosition->getRowType, "lbPositionCurrent");
+our $lbPositionFilter = $uJoin->makeLabel($tPosition->getRowType,
+	"lbPositionFilter", undef, sub {
+		if ($_[1]->getRow()->get("date") >= $businessDay) {
+			$uJoin->call($lbPositionCurrent->adopt($_[1]));
+		}
+	});
+$tPosition->getOutputLabel()->chain($lbPositionFilter);
+
+our $lbToUsdCurrent = $uJoin->makeDummyLabel(
+	$tToUsd->getRowType, "lbToUsdCurrent");
+our $lbToUsdFilter = $uJoin->makeLabel($tToUsd->getRowType,
+	"lbToUsdFilter", undef, sub {
+		if ($_[1]->getRow()->get("date") >= $businessDay) {
+			$uJoin->call($lbToUsdCurrent->adopt($_[1]));
+		}
+	});
+$tToUsd->getOutputLabel()->chain($lbToUsdFilter);
+
+our $join = Triceps::JoinTwo->new(
+	name => "join",
+	leftTable => $tPosition,
+	leftFromLabel => $lbPositionCurrent,
+	rightTable => $tToUsd,
+	rightFromLabel => $lbToUsdCurrent,
+	byLeft => [ "date", "currency" ],
+	type => "left",
+); # would confess by itself on an error
+</pre>
+
+		<para>
+		The same clearing now looks like this:
+		</para>
+
+<!-- t/xJoin.t, doJoinFiltered -->
+<exdump>
+> day,20120311
+> clear
+</exdump>
+
+		<para>
+		No output is coming from the join whatsoever. It all gets cut off
+		before it reaches the join. It's not such a great gain though. Remember
+		that if you want to keep the aggregated data, you would still have to
+		delete the original rows manually from the aggregation table afterwards. And the
+		filtering logic will add overhead, not only during the clearing but all
+		the time.
+		</para>
+
+		<para>
+		If you're not careful with the filtering conditions, it's also easy to
+		make the results of the join inconsistent. This example filters both
+		input tables on the same key field, with the same condition, so the
+		output will stay always consistent. But if any of these elements were
+		missing, it becomes possible to produce inconsistent output that has
+		the DELETEs of different rows than INSERTs, and deletions of the rows
+		that haven't been inserted in the first place. The reason is that even
+		though the input events are filtered, the table look-ups done by JoinTwo aren't. 
+		If some row comes from the right side and gets thrown away by the filter, and then
+		another row comes on the left side, passes the filter, and then finds a
+		match in that thrown-away right-side row, it will use that row in the
+		result. And the join would think that the right-side row has already
+		been seen, and would produce an incorrect update.
+		</para>
+
+		<para>
+		So these options don't make a whole lot of a win but make a major
+		opportunity for a mess, and probably should never be used. And will
+		probably be deleted in the future, unless someone finds a good use for
+		them. They have been added because at the time they provided a roundabout way to do
+		a self-join. But the later fixes to the Table logic make the self-joins
+		possible without this kind of perversions.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_joins_self_jointwo">
+		<title>Self-join done with JoinTwo</title>
+
+		<indexterm>
+			<primary>join</primary>
+			<secondary>self</secondary>
+		</indexterm>
+
+		<para>
+		The self-joins happen when a table is joined to itself.
+		For an example of a model with self-joins, let's look at the Forex
+		trading. People exchange the currencies in every possible
+		direction in multiple markets. The Forex exchange rates are quoted
+		for every pair of currencies, in every direction.
+		</para>
+
+		<para>
+		Naturally, if you exchange one currency into another and then back into
+		the first one, you normally end up with less money than you've started
+		with. The rest becomes the transaction cost and lines the pockets of
+		the brokers, market makers and exchanges.
+		</para>
+
+		<para>
+		However once in a while some interesting things happen. If the
+		exchange rates between the different currencies become disbalanced, you
+		may be able to exchange the currency A for currency B for currency C
+		and back for currency A, and end up with more money than you've started
+		with. (You don't have to do it in sequence, you would normally do all
+		three transactions in parallel). However it's a short-lived
+		opportunity: as you perform the transactions, you'll be changing the
+		involved exchange rates towards the balance, and you won't be the only
+		one exploiting this opportunity, so you better act fast. This activity
+		of bringing the market into balance while simultaneously extracting
+		profit is called <quote>arbitration</quote>.
+		</para>
+
+		<para>
+		So let's make a model that will detect such arbitration opportunities,
+		for the following automated execution. Mind you, it's all grossly
+		simplified, but it shows the gist of it. And most importantly, it uses
+		the self-joins. Here we go:
+		</para>
+
+<!-- t/xSelfJoin.t, doArbJoins from 2 parts -->
+<pre>
+our $rtRate = Triceps::RowType->new( # an exchange rate between two currencies
+	ccy1 => "string", # currency code
+	ccy2 => "string", # currency code
+	rate => "float64", # multiplier when exchanging ccy1 to ccy2
+);
+
+# all exchange rates
+our $ttRate = Triceps::TableType->new($rtRate)
+	->addSubIndex("byCcy1",
+		Triceps::IndexType->newHashed(key => [ "ccy1" ])
+		->addSubIndex("byCcy12",
+			Triceps::IndexType->newHashed(key => [ "ccy2" ])
+		)
+	)
+	->addSubIndex("byCcy2",
+		Triceps::IndexType->newHashed(key => [ "ccy2" ])
+		->addSubIndex("grouping", Triceps::IndexType->newFifo())
+	)
+;
+$ttRate->initialize();
+
+our $uArb = Triceps::Unit->new("uArb");
+
+our $tRate = $uArb->makeTable($ttRate, "tRate");
+
+our $join1 = Triceps::JoinTwo->new(
+	name => "join1",
+	leftTable => $tRate,
+	leftIdxPath => [ "byCcy2" ],
+	leftFields => [ "ccy1", "ccy2", "rate/rate1" ],
+	rightTable => $tRate,
+	rightIdxPath => [ "byCcy1" ],
+	rightFields => [ "ccy2/ccy3", "rate/rate2" ],
+); # would die by itself on an error
+our $ttJoin1 = Triceps::TableType->new($join1->getResultRowType())
+	->addSubIndex("byCcy123",
+		Triceps::IndexType->newHashed(key => [ "ccy1", "ccy2", "ccy3" ])
+	)
+	->addSubIndex("byCcy31",
+		Triceps::IndexType->newHashed(key => [ "ccy3", "ccy1" ])
+		->addSubIndex("grouping", Triceps::IndexType->newFifo())
+	)
+;
+$ttJoin1->initialize();
+our $tJoin1 = $uArb->makeTable($ttJoin1, "tJoin1");
+$join1->getOutputLabel()->chain($tJoin1->getInputLabel());
+
+our $join2 = Triceps::JoinTwo->new(
+	name => "join2",
+	leftTable => $tJoin1,
+	leftIdxPath => [ "byCcy31" ],
+	rightTable => $tRate,
+	rightIdxPath => [ "byCcy1", "byCcy12" ],
+	rightFields => [ "rate/rate3" ],
+	# the field ordering in the indexes is already right, but
+	# for clarity add an explicit join condition too
+	byLeft => [ "ccy3/ccy1", "ccy1/ccy2" ], 
+); # would die by itself on an error
+
+# now compute the resulting circular rate and filter the profitable loops
+our $rtResult = Triceps::RowType->new(
+	$join2->getResultRowType()->getdef(),
+	looprate => "float64",
+);
+my $lbResult = $uArb->makeDummyLabel($rtResult, "lbResult");
+my $lbCompute = $uArb->makeLabel($join2->getResultRowType(), "lbCompute", undef, sub {
+	my ($label, $rowop) = @_;
+	my $row = $rowop->getRow();
+	my $looprate = $row->get("rate1") * $row->get("rate2") * $row->get("rate3");
+
+	if ($looprate > 1) {
+		$uArb->makeHashCall($lbResult, $rowop->getOpcode(),
+			$row->toHash(),
+			looprate => $looprate,
+		);
+	} else {
+			&send("__", $rowop->printP(), "looprate=$looprate \n"); # for debugging
+	}
+});
+$join2->getOutputLabel()->chain($lbCompute);
+
+# label to print the changes to the detailed stats
+makePrintLabel("lbPrint", $lbResult);
+#makePrintLabel("lbPrintJoin1", $join1->getOutputLabel());
+#makePrintLabel("lbPrintJoin2", $join2->getOutputLabel());
+
+while(&readLine) {
+	chomp;
+	my @data = split(/,/); # starts with a command, then string opcode
+	my $type = shift @data;
+	if ($type eq "rate") {
+		$uArb->makeArrayCall($tRate->getInputLabel(), @data);
+	}
+	$uArb->drainFrame(); # just in case, for completeness
+}
+</pre>
+
+		<para>
+		The rate quotes will be coming into <pre>$tRate</pre>. The indexes are
+		provided to both work with the self-joins and to have a primary index
+		as the first leaf.
+		</para>
+
+		<para>
+		There are no special options for the self-join in JoinTwo: just use the same table
+		for both the left and right side. The first join represents two exchange
+		transactions, so it's done by matching the second currency of the first
+		quote to the first currency of the second quote. The result contains
+		three currency names and two rate multipliers.
+
+		The second join adds one more rate multiplier, returning back to the
+		first currency. Now to learn the effect of
+		the circular conversion we only need to multiply all the multipliers.
+		If it comes out below 1, the cycling transaction would return a loss,
+		if above 1, a profit.
+		</para>
+
+		<para>
+		The label <pre>$lbCompute</pre> with Perl handler performs the multiplication, and if the
+		result is over 1, passes the result to the next label <pre>$lbResult</pre>, from which then
+		the data gets printed. I've also added a debugging printout in case if
+		the row doesn't get through. That one starts with <quote><pre>__</pre></quote> and helps seeing
+		what goes on inside when no result is coming out.
+		</para>
+
+		<para>
+		Finally, the main loop reads the data and puts it into the rates table,
+		thus driving the logic.
+		</para>
+
+		<para>
+		Now let's take a look at an example of a run, with interspersed commentary.
+		</para>
+
+<!-- t/xSelfJoin.t, doArbJoins -->
+<exdump>
+> rate,OP_INSERT,EUR,USD,1.48
+> rate,OP_INSERT,USD,EUR,0.65
+> rate,OP_INSERT,GBP,USD,1.98
+> rate,OP_INSERT,USD,GBP,0.49
+</exdump>
+
+		<para>
+		The rate quotes start coming in. Note that the rates are separate for
+		each direction of exchange. So far nothing happens because there aren't
+		enough quotes to complete a loop of three steps.
+		</para>
+
+<!-- t/xSelfJoin.t, doArbJoins -->
+<exdump>
+> rate,OP_INSERT,EUR,GBP,0.74
+__join2.leftLookup.out OP_INSERT ccy1="EUR" ccy2="GBP" rate1="0.74" ccy3="USD" rate2="1.98" rate3="0.65" looprate=0.95238 
+__join2.leftLookup.out OP_INSERT ccy1="USD" ccy2="EUR" rate1="0.65" ccy3="GBP" rate2="0.74" rate3="1.98" looprate=0.95238 
+__join2.rightLookup.out OP_INSERT ccy1="GBP" ccy2="USD" rate1="1.98" ccy3="EUR" rate2="0.65" rate3="0.74" looprate=0.95238 
+> rate,OP_INSERT,GBP,EUR,1.30
+__join2.leftLookup.out OP_INSERT ccy1="GBP" ccy2="EUR" rate1="1.3" ccy3="USD" rate2="1.48" rate3="0.49" looprate=0.94276 
+__join2.leftLookup.out OP_INSERT ccy1="USD" ccy2="GBP" rate1="0.49" ccy3="EUR" rate2="1.3" rate3="1.48" looprate=0.94276 
+__join2.rightLookup.out OP_INSERT ccy1="EUR" ccy2="USD" rate1="1.48" ccy3="GBP" rate2="0.49" rate3="1.3" looprate=0.94276 
+</exdump>
+
+		<para>
+		Now there are enough currencies in play to complete the loop. None of
+		them get the loop rate over 1 though, so the only printouts are from
+		the debugging logic. There are only two loops, but each of them is
+		printed three times. Why? It's a loop, so you can start from each of
+		its elements and come back to the same element. One row for each
+		starting point. And the joins find all of them.
+		</para>
+
+		<para>
+		To find and eliminate the duplicates, the order of currencies in the
+		rows can be rotated to put the alphabetically lowest currency code
+		first. Note that they can't be just sorted because the relative order
+		matters. Trading in the order GBP-USD-EUR will give a different result
+		than GBP-EUR-USD. The relative order has to be preserved. I didn't put
+		any such elimination into the example to keep it smaller.
+		</para>
+
+<!-- t/xSelfJoin.t, doArbJoins -->
+<exdump>
+> rate,OP_DELETE,EUR,USD,1.48
+__join2.leftLookup.out OP_DELETE ccy1="EUR" ccy2="USD" rate1="1.48" ccy3="GBP" rate2="0.49" rate3="1.3" looprate=0.94276 
+__join2.leftLookup.out OP_DELETE ccy1="GBP" ccy2="EUR" rate1="1.3" ccy3="USD" rate2="1.48" rate3="0.49" looprate=0.94276 
+__join2.rightLookup.out OP_DELETE ccy1="USD" ccy2="GBP" rate1="0.49" ccy3="EUR" rate2="1.3" rate3="1.48" looprate=0.94276 
+> rate,OP_INSERT,EUR,USD,1.28
+__join2.leftLookup.out OP_INSERT ccy1="EUR" ccy2="USD" rate1="1.28" ccy3="GBP" rate2="0.49" rate3="1.3" looprate=0.81536 
+__join2.leftLookup.out OP_INSERT ccy1="GBP" ccy2="EUR" rate1="1.3" ccy3="USD" rate2="1.28" rate3="0.49" looprate=0.81536 
+__join2.rightLookup.out OP_INSERT ccy1="USD" ccy2="GBP" rate1="0.49" ccy3="EUR" rate2="1.3" rate3="1.28" looprate=0.81536 
+</exdump>
+
+		<para>
+		Someone starts changing lots of euros for dollars, and the rate moves.
+		No good news for us yet though.
+		</para>
+
+<!-- t/xSelfJoin.t, doArbJoins -->
+<exdump>
+> rate,OP_DELETE,USD,EUR,0.65
+__join2.leftLookup.out OP_DELETE ccy1="USD" ccy2="EUR" rate1="0.65" ccy3="GBP" rate2="0.74" rate3="1.98" looprate=0.95238 
+__join2.leftLookup.out OP_DELETE ccy1="GBP" ccy2="USD" rate1="1.98" ccy3="EUR" rate2="0.65" rate3="0.74" looprate=0.95238 
+__join2.rightLookup.out OP_DELETE ccy1="EUR" ccy2="GBP" rate1="0.74" ccy3="USD" rate2="1.98" rate3="0.65" looprate=0.95238 
+> rate,OP_INSERT,USD,EUR,0.78
+lbResult OP_INSERT ccy1="USD" ccy2="EUR" rate1="0.78" ccy3="GBP" rate2="0.74" rate3="1.98" looprate="1.142856" 
+lbResult OP_INSERT ccy1="GBP" ccy2="USD" rate1="1.98" ccy3="EUR" rate2="0.78" rate3="0.74" looprate="1.142856" 
+lbResult OP_INSERT ccy1="EUR" ccy2="GBP" rate1="0.74" ccy3="USD" rate2="1.98" rate3="0.78" looprate="1.142856" 
+</exdump>
+
+		<para>
+		The rate for dollars-to-euros follows its opposite. This creates an
+		arbitration opportunity! Step two: trade in the direction
+		USD-EUR-GBP-USD, step three: PROFIT!!!
+		</para>
+
+<!-- t/xSelfJoin.t, doArbJoins -->
+<exdump>
+> rate,OP_DELETE,EUR,GBP,0.74
+lbResult OP_DELETE ccy1="EUR" ccy2="GBP" rate1="0.74" ccy3="USD" rate2="1.98" rate3="0.78" looprate="1.142856" 
+lbResult OP_DELETE ccy1="USD" ccy2="EUR" rate1="0.78" ccy3="GBP" rate2="0.74" rate3="1.98" looprate="1.142856" 
+lbResult OP_DELETE ccy1="GBP" ccy2="USD" rate1="1.98" ccy3="EUR" rate2="0.78" rate3="0.74" looprate="1.142856" 
+> rate,OP_INSERT,EUR,GBP,0.64
+__join2.leftLookup.out OP_INSERT ccy1="EUR" ccy2="GBP" rate1="0.64" ccy3="USD" rate2="1.98" rate3="0.78" looprate=0.988416 
+__join2.leftLookup.out OP_INSERT ccy1="USD" ccy2="EUR" rate1="0.78" ccy3="GBP" rate2="0.64" rate3="1.98" looprate=0.988416 
+__join2.rightLookup.out OP_INSERT ccy1="GBP" ccy2="USD" rate1="1.98" ccy3="EUR" rate2="0.78" rate3="0.64" looprate=0.988416 
+</exdump>
+
+		<para>
+		Our trading (and perhaps other people's trading too) moves the exchange
+		rate of euros to pounds. And with that the balance of currencies is
+		restored, and the arbitration opportunity disappears.
+		</para>
+
+		<para>
+		Now let's have a look inside JoinTwo. What is so special about the
+		self-join? Normally the join works on two separate tables. They get
+		updated one at a time. Even if some common reason causes both tables to
+		be updated, the update arrives from one table first. The join sees this
+		incoming update, looks in the unchanged second table, produces an
+		updated result. Then the update from the second table comes to the
+		join, which takes it, looks in the already modified first table, and
+		produces another updated result.
+		</para>
+
+		<para>
+		If both inputs are from the same table, this logic breaks. Two copies
+		of the updates will arrive, but by the time the first one arrives, the
+		contents of the table has been already changed. When the join looks in
+		the table, it gets the unexpected results and creates a mess.
+		</para>
+
+		<para>
+		But JoinTwo has a fix for this. It makes use of the Pre label of the
+		table for its left-side update (the right side would have worked just
+		as good, it's just a random choice):
+		</para>
+
+<!-- lib/Triceps/JoinTwo.pm -->
+<pre>
+	my $selfJoin = $self->{leftTable}->same($self->{rightTable});
+	if ($selfJoin && !defined $self->{leftFromLabel}) {
+		# one side must be fed from Pre label (but still let the user override)
+		$self->{leftFromLabel} = $self->{leftTable}->getPreLabel();
+	}
+</pre>
+
+		<para>
+		This way when the join sees the first update, the table hasn't changed
+		yet. And then the second copy of that update comes though the normal
+		output label, after the table has been modified. Everything just works
+		out as normal and the self-joins produce the correct result.
+		</para>
+
+		<para>
+		Normally you don't need to concern yourself with this, except if you're
+		trying to filter the data coming to the join. Then remember that for
+		<quote>leftFromLabel</quote> you have to receive the data from the table's
+		<pre>getPreLabel()</pre>, not <pre>getOutputLabel()</pre>.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_joins_self_manual">
+		<title>Self-join done manually</title>
+
+		<indexterm>
+			<primary>join</primary>
+			<secondary>self</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>join</primary>
+			<secondary>manual</secondary>
+		</indexterm>
+		<para>
+		In many cases the self-joins are better
+		suited to be done by the manual looping through the data. This is
+		especially true if the table represents a tree, linked by the
+		parent-child node id and the processing has to navigate through the
+		tree. Indeed, if the tree may be of an arbitrary depth, there is no way
+		to handle if with the common joins, you will need as many joins as
+		the depth of the tree (through there are some SQL extensions for the
+		recursive self-joins).
+		</para>
+
+		<para>
+		The arbitration example can also be conveniently rewritten through the
+		manual loops. The input row type, table type, table, unit, and the main
+		loop do not change, so I won't copy them the second time. The rest of
+		the code is:
+		</para>
+
+<!-- t/xSelfJoin.t, doArbManual -->
+<pre>
+our $rtResult = Triceps::RowType->new(
+	ccy1 => "string", # currency code
+	ccy2 => "string", # currency code
+	ccy3 => "string", # currency code
+	rate1 => "float64",
+	rate2 => "float64",
+	rate3 => "float64",
+	looprate => "float64",
+);
+my $ixtCcy1 = $ttRate->findSubIndex("byCcy1");
+my $ixtCcy12 = $ixtCcy1->findSubIndex("byCcy12");
+
+my $lbResult = $uArb->makeDummyLabel($rtResult, "lbResult");
+my $lbCompute = $uArb->makeLabel($rtRate, "lbCompute", undef, sub {
+	my ($label, $rowop) = @_;
+	my $row = $rowop->getRow();
+	my $ccy1 = $row->get("ccy1");
+	my $ccy2 = $row->get("ccy2");
+	my $rate1 = $row->get("rate");
+
+	my $rhi = $tRate->findIdxBy($ixtCcy1, ccy1 => $ccy2);
+	my $rhiEnd = $rhi->nextGroupIdx($ixtCcy12);
+	for (; !$rhi->same($rhiEnd); $rhi = $rhi->nextIdx($ixtCcy12)) {
+		my $row2 = $rhi->getRow();
+		my $ccy3 = $row2->get("ccy2");
+		my $rate2 = $row2->get("rate");
+
+		my $rhj = $tRate->findIdxBy($ixtCcy12, ccy1 => $ccy3, ccy2 => $ccy1);
+		# it's a leaf primary index, so there may be no more than one match
+		next
+			if ($rhj->isNull());
+		my $row3 = $rhj->getRow();
+		my $rate3 = $row3->get("rate");
+		my $looprate = $rate1 * $rate2 * $rate3;
+
+		# now build the row in normalized order of currencies
+		&send("____Order before: $ccy1, $ccy2, $ccy3\n");
+		my $result;
+		if ($ccy2 lt $ccy3) {
+			if ($ccy2 lt $ccy1) { # rotate left
+				$result = $lbResult->makeRowopHash($rowop->getOpcode(),
+					ccy1 => $ccy2,
+					ccy2 => $ccy3,
+					ccy3 => $ccy1,
+					rate1 => $rate2,
+					rate2 => $rate3,
+					rate3 => $rate1,
+					looprate => $looprate,
+				);
+			}
+		} else {
+			if ($ccy3 lt $ccy1) { # rotate right
+				$result = $lbResult->makeRowopHash($rowop->getOpcode(),
+					ccy1 => $ccy3,
+					ccy2 => $ccy1,
+					ccy3 => $ccy2,
+					rate1 => $rate3,
+					rate2 => $rate1,
+					rate3 => $rate2,
+					looprate => $looprate,
+				);
+			}
+		}
+		if (!defined $result) { # use the straight order
+			$result = $lbResult->makeRowopHash($rowop->getOpcode(),
+				ccy1 => $ccy1,
+				ccy2 => $ccy2,
+				ccy3 => $ccy3,
+				rate1 => $rate1,
+				rate2 => $rate2,
+				rate3 => $rate3,
+				looprate => $looprate,
+			);
+		}
+		if ($looprate > 1) {
+			$uArb->call($result);
+		} else {
+			&send("__", $result->printP(), "\n"); # for debugging
+		}
+	}
+});
+$tRate->getOutputLabel()->chain($lbCompute);
+makePrintLabel("lbPrint", $lbResult);
+</pre>
+
+		<para>
+		Whenever a new rowop is processed in the table, it goes to the 
+		label <pre>$lbCompute</pre>. The row in this rowop is the first leg of the triangle. The loop
+		then finds all the possible second legs that can be connected to the
+		first leg. And then for each second leg it checks whether it can make
+		the third leg back to the original currency. If it can, good, we've
+		found a candidate for a result row.
+		</para>
+
+		<para>
+		The way the loops work, this time there is no triplication. But the
+		same triangle still can be found starting from any of its three
+		currencies. This means that to keep the data consistent, no matter what
+		was the first currency in a particular run, it still must produce the
+		exact same result row. To achieve that, the currencies get rotated as
+		explained in the previous section, making sure that the first currency is has
+		the lexically smallest name. These if-else statements do that by
+		selecting the direction of rotation (if any) and build the result
+		record in one of three ways.
+		</para>
+
+		<para>
+		Finally it compares the combined rate to 1, and if greater then sends
+		the result. If not, a debugging printout starting with <quote><pre>__</pre></quote> prints the
+		row, so that is can be seen. Another debugging printout prints the
+		original order of the currencies, letting us check that the rotation
+		was performed correctly.
+		</para>
+
+		<para>
+		On feeding the same input data this code produces the result:
+		</para>
+
+<!-- t/xSelfJoin.t, doArbManual -->
+<exdump>
+> rate,OP_INSERT,EUR,USD,1.48
+> rate,OP_INSERT,USD,EUR,0.65
+> rate,OP_INSERT,GBP,USD,1.98
+> rate,OP_INSERT,USD,GBP,0.49
+> rate,OP_INSERT,EUR,GBP,0.74
+____Order before: EUR, GBP, USD
+__lbResult OP_INSERT ccy1="EUR" ccy2="GBP" ccy3="USD" rate1="0.74" rate2="1.98" rate3="0.65" looprate="0.95238" 
+> rate,OP_INSERT,GBP,EUR,1.30
+____Order before: GBP, EUR, USD
+__lbResult OP_INSERT ccy1="EUR" ccy2="USD" ccy3="GBP" rate1="1.48" rate2="0.49" rate3="1.3" looprate="0.94276" 
+> rate,OP_DELETE,EUR,USD,1.48
+____Order before: EUR, USD, GBP
+__lbResult OP_DELETE ccy1="EUR" ccy2="USD" ccy3="GBP" rate1="1.48" rate2="0.49" rate3="1.3" looprate="0.94276" 
+> rate,OP_INSERT,EUR,USD,1.28
+____Order before: EUR, USD, GBP
+__lbResult OP_INSERT ccy1="EUR" ccy2="USD" ccy3="GBP" rate1="1.28" rate2="0.49" rate3="1.3" looprate="0.81536" 
+> rate,OP_DELETE,USD,EUR,0.65
+____Order before: USD, EUR, GBP
+__lbResult OP_DELETE ccy1="EUR" ccy2="GBP" ccy3="USD" rate1="0.74" rate2="1.98" rate3="0.65" looprate="0.95238" 
+> rate,OP_INSERT,USD,EUR,0.78
+____Order before: USD, EUR, GBP
+lbResult OP_INSERT ccy1="EUR" ccy2="GBP" ccy3="USD" rate1="0.74" rate2="1.98" rate3="0.78" looprate="1.142856" 
+> rate,OP_DELETE,EUR,GBP,0.74
+____Order before: EUR, GBP, USD
+lbResult OP_DELETE ccy1="EUR" ccy2="GBP" ccy3="USD" rate1="0.74" rate2="1.98" rate3="0.78" looprate="1.142856" 
+> rate,OP_INSERT,EUR,GBP,0.64
+____Order before: EUR, GBP, USD
+__lbResult OP_INSERT ccy1="EUR" ccy2="GBP" ccy3="USD" rate1="0.64" rate2="1.98" rate3="0.78" looprate="0.988416" 
+</exdump>
+
+		<para>
+		It's the same result as before, only without the triplicates. And you
+		can see that the rotation logic works right. The manual self-joining
+		has produced the result without triplicates, without an intermediate
+		table, and for me writing and understanding its logic is much easier
+		than with the <quote>proper</quote> joins. I'd say that the manual self-join is a
+		winner in every respect.
+		</para>
+
+		<para>
+		An interesting thing is that this manual logic produces the same result
+		independently of whether it's connected to the Output or Pre label of
+		the table. Try changing it, it works the same. This is because the
+		original row is taken directly from the input rowop, and never
+		participates in the join again; it's never read from the table by any
+		of the loops. If it were read again from the table by the loops, the
+		table connection would matter. And the correct one would be fairly weird:
+		the INSERT rowops would have to be processed coming from the Output
+		label, the DELETE rowops coming from the Pre label.
+		</para>
+
+		<para>
+		This is because the row has to be in the table to be found. And for an
+		INSERT the row gets there only after it goes through the table and
+		comes out on the Output label. But for a DELETE the row would get
+		already deleted from the table by that time. Instead it has to be
+		handled before that, on the Pre label, when the table only prepares to
+		delete it.
+		</para>
+
+		<indexterm>
+			<primary>JoinTwo</primary>
+		</indexterm>
+		<para>
+		If you look at the version with JoinTwo, that's also how an inner
+		self-join works. Since it's an inner join, both rows on both sides must
+		be present to produce a result. An INSERT first arrives from the Pre
+		label on the left side, doesn't find itself in the table, and produces
+		no result (again, we're talking here about the situation when a row has
+		to get joined to itself; it might well find the other pairs for itself
+		and produce a result for them but not for itself joined with itself).
+		Then it arrives the second time from the Output label on the right
+		side. Now it looks in the table, and finds itself, and produces the
+		result (an INSERT coming form the join). A DELETE also first arrives
+		from the Pre label on the left side. It finds its copy in the table and
+		produces the result (a DELETE coming from the join). When the second
+		copy of the row arrives from the Output label on the right side, it
+		doesn't find its copy in the table any more, and produces nothing. In
+		the end it's the same thing, an INSERT comes out of the join triggered
+		by the table Output label, a DELETE comes out of the join triggered by
+		the table Pre label. It's not a whimsy, it's caused by the requirements
+		of the correctness. The manual self-join would have to mimic this order
+		to produce the correct result. In such a situation perhaps JoinTwo
+		would be easier to use than doing things manually.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_joins_self_lookupjoin">
+		<title>Self-join done with a LookupJoin</title>
+
+		<indexterm>
+			<primary>join</primary>
+			<secondary>self</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>LookupJoin</primary>
+		</indexterm>
+		<para>
+		The experience with the manual join has made me think about using a
+		similar approach to avoid triplication of the data in the version with
+		join templates. And after some false-starts, I've realized that what
+		that version needs is the LookupJoins. They replace the loops. So, one
+		more version is:
+		</para>
+
+<!-- t/xSelfJoin.t, doArbLookupJoins -->
+<pre>
+our $join1 = Triceps::LookupJoin->new(
+	name => "join1",
+	leftFromLabel => $tRate->getOutputLabel(),
+	leftFields => [ "ccy1", "ccy2", "rate/rate1" ],
+	rightTable => $tRate,
+	rightIdxPath => [ "byCcy1" ],
+	rightFields => [ "ccy2/ccy3", "rate/rate2" ],
+	byLeft => [ "ccy2/ccy1" ], 
+	isLeft => 0,
+); # would die by itself on an error
+
+our $join2 = Triceps::LookupJoin->new(
+	name => "join2",
+	leftFromLabel => $join1->getOutputLabel(),
+	rightTable => $tRate,
+	rightIdxPath => [ "byCcy1", "byCcy12" ],
+	rightFields => [ "rate/rate3" ],
+	byLeft => [ "ccy3/ccy1", "ccy1/ccy2" ], 
+	isLeft => 0,
+); # would die by itself on an error
+
+# now compute the resulting circular rate and filter the profitable loops
+our $rtResult = Triceps::RowType->new(
+	$join2->getResultRowType()->getdef(),
+	looprate => "float64",
+);
+my $lbResult = $uArb->makeDummyLabel($rtResult, "lbResult");
+my $lbCompute = $uArb->makeLabel($join2->getResultRowType(), "lbCompute", undef, sub {
+	my ($label, $rowop) = @_;
+	my $row = $rowop->getRow();
+
+	my $ccy1 = $row->get("ccy1");
+	my $ccy2 = $row->get("ccy2");
+	my $ccy3 = $row->get("ccy3");
+	my $rate1 = $row->get("rate1");
+	my $rate2 = $row->get("rate2");
+	my $rate3 = $row->get("rate3");
+	my $looprate = $rate1 * $rate2 * $rate3;
+
+	# now build the row in normalized order of currencies
+	&send("____Order before: $ccy1, $ccy2, $ccy3\n");
+	my $result;
+	if ($ccy2 lt $ccy3) {
+		if ($ccy2 lt $ccy1) { # rotate left
+			$result = $lbResult->makeRowopHash($rowop->getOpcode(),
+				ccy1 => $ccy2,
+				ccy2 => $ccy3,
+				ccy3 => $ccy1,
+				rate1 => $rate2,
+				rate2 => $rate3,
+				rate3 => $rate1,
+				looprate => $looprate,
+			);
+		}
+	} else {
+		if ($ccy3 lt $ccy1) { # rotate right
+			$result = $lbResult->makeRowopHash($rowop->getOpcode(),
+				ccy1 => $ccy3,
+				ccy2 => $ccy1,
+				ccy3 => $ccy2,
+				rate1 => $rate3,
+				rate2 => $rate1,
+				rate3 => $rate2,
+				looprate => $looprate,
+			);
+		}
+	}
+	if (!defined $result) { # use the straight order
+		$result = $lbResult->makeRowopHash($rowop->getOpcode(),
+			ccy1 => $ccy1,
+			ccy2 => $ccy2,
+			ccy3 => $ccy3,
+			rate1 => $rate1,
+			rate2 => $rate2,
+			rate3 => $rate3,
+			looprate => $looprate,
+		);
+	}
+	if ($looprate > 1) {
+		$uArb->call($result);
+	} else {
+		&send("__", $result->printP(), "\n"); # for debugging
+	}
+});
+$join2->getOutputLabel()->chain($lbCompute);
+</pre>
+
+		<para>
+		It produces the exact same result as the version with the manual loops,
+		with the only minor difference of the field order in the result
+		rows.
+		</para>
+
+		<para>
+		And, in retrospect, I should have probably made a function for the row
+		rotation, so that I would not have to copy that code here.
+		</para>
+
+		<para>
+		Well, it works the same as the version with the loops and maybe even
+		looks a little bit neater, but in practice it's much harder to write,
+		debug and understand. The caveat for the situation where the incoming
+		row might participate in the join the second time applies to this
+		version of the code as well. The same thing about the Pre and Output
+		labels would have to be done, resulting in four LookupJoins instead
+		of two. Each pair would become a manually-built analog of JoinTwo, and
+		probably it's easier to use a JoinTwo to start with.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_joins_jointwo_glimpse">
+		<title>A glimpse inside JoinTwo and the hidden options of LookupJoin</title>
+
+		<indexterm>
+			<primary>JoinTwo</primary>
+		</indexterm>
+		<indexterm>
+			<primary>template</primary>
+		</indexterm>
+		<para>
+		The internals of JoinTwo provide an interesting example of a template
+		that builds upon other template (LookupJoin).
+		For a while JoinTwo was compact and straightforward, and easy to
+		demonstrate. Then it has grown all these extra features, options and
+		error checks, and became quite complicated. So I'll show only the
+		selected portions of the JoinTwo constructor, with the gist of its
+		functionality:
+		</para>
+
+<!-- lib/Triceps/JoinTwo.pm, edited -->
+<pre>
+...
+	my $selfJoin = $self->{leftTable}->same($self->{rightTable});
+	if ($selfJoin && !defined $self->{leftFromLabel}) {
+		# one side must be fed from Pre label (but still let the user override)
+		$self->{leftFromLabel} = $self->{leftTable}->getPreLabel();
+	}
+...
+
+	my ($leftLeft, $rightLeft);
+	if ($self->{type} eq "inner") {
+		$leftLeft = 0;
+		$rightLeft = 0;
+	} elsif ($self->{type} eq "left") {
+		$leftLeft = 1;
+		$rightLeft = 0;
+	} elsif ($self->{type} eq "right") {
+		$leftLeft = 0;
+		$rightLeft = 1;
+	} elsif ($self->{type} eq "outer") {
+		$leftLeft = 1;
+		$rightLeft = 1;
+	} else {
+		Carp::confess("Unknown value '" . $self->{type} . "' of option 'type', must be one of inner|left|right|outer");
+	}
+
+	$self->{leftRowType} = $self->{leftTable}->getRowType();
+	$self->{rightRowType} = $self->{rightTable}->getRowType();
+...
+
+	for my $side ( ("left", "right") ) {
+		if (defined $self->{"${side}FromLabel"}) {
+... 
+		} else {
+			$self->{"${side}FromLabel"} = $self->{"${side}Table"}->getOutputLabel();
+		}
+
+		my @keys;
+		($self->{"${side}IdxType"}, @keys) = $self->{"${side}Table"}->getType()->findIndexKeyPath(@{$self->{"${side}IdxPath"}});
+		# would already confess if the index is not found
+
+		if (!$self->{overrideSimpleMinded}) {
+			if (!$self->{"${side}IdxType"}->isLeaf()
+
+			&& ($self->{type} ne "inner" && $self->{type} ne $side) ) {
+				my $table = $self->{"${side}Table"};
+				my $ixt = $self->{"${side}IdxType"};
+				if ($selfJoin && $side eq "left") {
+					# the special case, reading from the table's Pre label;
+					# must adjust the count for what will happen after the row gets processed
+					$self->{"${side}GroupSizeCode"} = sub { # (opcode, row)
+						if (&Triceps::isInsert($_[0])) {
+							$table->groupSizeIdx($ixt, $_[1])+1;
+						} else {
+							$table->groupSizeIdx($ixt, $_[1])-1;
+						}
+					};
+				} else {
+					$self->{"${side}GroupSizeCode"} = sub { # (opcode, row)
+						$table->groupSizeIdx($ixt, $_[1]);
+					};
+				}
+			}
+		}
+
+...
+	my $fieldsMirrorKey = 1;
+	my $uniq = $self->{fieldsUniqKey};
+	if ($uniq eq "first") {
+		$uniq = $self->{fieldsLeftFirst} ? "left" : "right";
+	}
+	if ($uniq eq "none") {
+		$fieldsMirrorKey = 0;
+	} elsif ($uniq eq "manual") {
+		# nothing to do
+	} elsif ($uniq =~ /^(left|right)$/) {
+		my($side, @keys);
+		if ($uniq eq "left") {
+			$side = "right";
+			@keys = @rightkeys;
+		} else {
+			$side = "left";
+			@keys = @leftkeys;
+		}
+		if (!defined $self->{"${side}Fields"}) {
+			$self->{"${side}Fields"} = [ ".*" ]; # the implicit pass-all
+		}
+		unshift(@{$self->{"${side}Fields"}}, map("!$_", @keys) );
+	} else {
+		Carp::confess("Unknown value '" . $self->{fieldsUniqKey} . "' of option 'fieldsUniqKey', must be one of none|manual|left|right|first");
+	}
+
+	# now create the LookupJoins
+	$self->{leftLookup} = Triceps::LookupJoin->new(
+		unit => $self->{unit},
+		name => $self->{name} . ".leftLookup",
+		leftRowType => $self->{leftRowType},
+		rightTable => $self->{rightTable},
+		rightIdxPath => $self->{rightIdxPath},
+		leftFields => $self->{leftFields},
+		rightFields => $self->{rightFields},
+		fieldsLeftFirst => $self->{fieldsLeftFirst},
+		fieldsMirrorKey => $fieldsMirrorKey,
+		by => \@leftby,
+		isLeft => $leftLeft,
+		automatic => 1,
+		oppositeOuter => ($rightLeft && !$self->{overrideSimpleMinded}),
+		groupSizeCode => $self->{leftGroupSizeCode},
+		saveJoinerTo => $self->{leftSaveJoinerTo},
+	);
+	$self->{rightLookup} = Triceps::LookupJoin->new(
+		unit => $self->{unit},
+		name => $self->{name} . ".rightLookup",
+		leftRowType => $self->{rightRowType},
+		rightTable => $self->{leftTable},
+		rightIdxPath => $self->{leftIdxPath},
+		leftFields => $self->{rightFields},
+		rightFields => $self->{leftFields},
+		fieldsLeftFirst => !$self->{fieldsLeftFirst},
+		fieldsMirrorKey => $fieldsMirrorKey,
+		by => \@rightby,
+		isLeft => $rightLeft,
+		automatic => 1,
+		oppositeOuter => ($leftLeft && !$self->{overrideSimpleMinded}),
+		groupSizeCode => $self->{rightGroupSizeCode},
+		saveJoinerTo => $self->{rightSaveJoinerTo},
+	);
+
+	# create the output label
+	$self->{outputLabel} = $self->{unit}->makeDummyLabel($self->{leftLookup}->getResultRowType(), $self->{name} . ".out");
+
+	# and connect them together
+	$self->{leftFromLabel}->chain($self->{leftLookup}->getInputLabel());
+	$self->{rightFromLabel}->chain($self->{rightLookup}->getInputLabel());
+	$self->{leftLookup}->getOutputLabel()->chain($self->{outputLabel});
+	$self->{rightLookup}->getOutputLabel()->chain($self->{outputLabel});
+</pre>
+
+		<para>
+		In the end it boils down to two LookupJoins, with the options
+		computed from the JoinTwo's options. But you might notice that there
+		are a few LookupJoin options that haven't been described before.
+		</para>
+
+		<para>
+		Despite the title of the section, these options aren't really hidden,
+		just they aren't particularly useful unless you want to use a
+		LookupJoin as a part of a multi-sided join, like JoinTwo does. It's
+		even hard to explain what do they do without explaining the JoinTwo
+		first. If you're not interested in such details, you can as well skip
+		them.
+		</para>
+
+		<para>
+		So, setting
+		</para>
+
+<pre>
+	oppositeOuter => 1,
+</pre>
+
+		<para>
+		tells that this LookupJoin is a part of an outer join, with the
+		opposite side (right side, for this LookupJoin) being an outer one
+		(well, this side might be outer too if <pre>isLeft => 1</pre>, but that's a
+		whole separate question). This enables the logic that checks whether
+		the row inserted here is the first one that matches a row in the
+		right-side table, and whether the row deleted here was the last one
+		that matches. If the condition is satisfied, not a simple INSERT or
+		DELETE rowop is produced but a correct DELETE-INSERT pair that replaces
+		the old state with the new one. It has been described in detail in
+		<xref linkend="sc_joins_jointwo" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<para>
+		But how does it know whether the current row if the first one or last
+		one or neither? After all, LookupJoin doesn't have any access to the
+		left-side table. 
+		</para>
+
+		<para>
+		It has two ways to know.
+		First, by default it simply assumes that it's an one-to-something (1:1
+		or 1:M) join. Then there may be no more than one matching row on this
+		side, and every row inserted is the first one, and every row deleted is
+		the last one. Then it does the DELETE-INSERT trick every time.
+		</para>
+
+		<para>
+		Second, the option
+		</para>
+
+<pre>
+	groupSizeCode => \&groupSizeComputation,
+</pre>
+
+		<para>
+		can be used to compute the current group size for the current row. It
+		provides a function that does the computation and gets called as
+		</para>
+
+<pre>
+$gsz = &{$self->{groupSizeCode}}($opcode, $row);
+</pre>
+
+		<para>
+		Note that it doesn't get the table reference nor the index type
+		reference as arguments, so it has to be a closure with the references compiled into
+		it. JoinTwo does it with the definition
+		</para>
+
+<pre>
+sub { # (opcode, row)
+	$table->groupSizeIdx($ixt, $_[1]);
+}
+</pre>
+
+		<para>
+		Why not just pass the table and index type references to JoinTwo and
+		let it do the same computation without the mess of the closure
+		references? Because the group size computation may need to be
+		different. When the JoinTwo does a self-join, it feeds the left side
+		from the table's Pre label, and the normal group size computation would
+		be incorrect because the rowop didn't get applied to the table yet.
+		Instead it has to predict what will happen when the rowop will get
+		applied:
+		</para>
+
+<pre>
+sub { # (opcode, row)
+	if (&Triceps::isInsert($_[0])) {
+		$table->groupSizeIdx($ixt, $_[1])+1;
+	} else {    
+		$table->groupSizeIdx($ixt, $_[1])-1;
+	}           
+}
+</pre>
+
+		<para>
+		If you set the option <quote>groupSizeCode</quote> to <pre>undef</pre>, that's the default
+		value that triggers the one-to-something behavior.
+		</para>
+
+		<para>
+		The option
+		</para>
+
+<pre>
+	fieldsMirrorKey => 1,
+</pre>
+
+		<para>
+		has been already described.
+		It enables another magic behavior: mirroring the values of key fields to
+		both sides before they are used to produce the result row.  This is the heavy
+		machinery that underlies the JoinTwo's high-level option
+		<quote>fieldsUniqKey</quote>. But it hasn't been described yet that
+		the mirroring goes both ways: If this is a left join
+		and no matching row is found on the right, the values of the key fields
+		will be copied from the left to the right. If the option
+		<quote>oppositeOuter</quote> is set and causes a row with the empty left side to be
+		produced as a part of DELETE-INSERT pair, the key fields will be copied
+		from the right to the left.
+		</para>
+	</sect1>
+
+</chapter>

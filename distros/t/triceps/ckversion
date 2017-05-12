@@ -1,0 +1,23 @@
+#!/bin/bash
+# Check that the version in the (mostly Perl module) files is correct.
+
+VERSION="$1"
+shift
+
+[ -n "$VERSION" ] || {
+	echo "Use: ckversion VERSION"
+	exit 1
+} >&2
+
+RET=0
+for f in `find perl/Triceps/lib ! -path '*/.svn/*' -name '*.pm'`
+do {
+	v=`perl -MExtUtils::MakeMaker -le 'print MM->parse_version(shift)' "$f"`
+	[ "v$VERSION" = "$v" ] || {
+		RET=1
+		echo "Bad version in $f: $v"
+	}
+} done
+[ 0 -eq "$RET" ] || { echo "Expected version: v$VERSION" >&2; }
+
+exit $RET

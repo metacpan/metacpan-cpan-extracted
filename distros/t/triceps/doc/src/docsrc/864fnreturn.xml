@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_fnreturn">
+		<title>FnReturn reference</title>
+
+		<indexterm>
+			<primary>FnReturn</primary>
+		</indexterm>
+		<para>
+		FnReturn, defined in <pre>sched/FnReturn.h</pre>, is generally constructed
+		similarly to the RowSetType:
+		</para>
+
+<pre>
+ret = initializeOrThrow(FnReturn::make(unit, name)
+	->addLabel("lb1", rt1)
+	->addFromLabel("lb2", lbX)
+);
+</pre>
+
+		<para>
+		Or of course piece-meal. As it gets built, it actually builds a
+		RowSetType inside itself.
+		</para>
+
+<pre>
+FnReturn(Unit *unit, const string &name);
+static FnReturn *make(Unit *unit, const string &name);
+</pre>
+
+		<para>
+		The constructor and convenience wrapper. The unit will be remembered
+		only as a pointer, not reference, to avoid the reference loops. However
+		this pointer will be used to construct the internal labels. So until
+		the FnReturn is fully initialized, you better make sure that the Unit
+		object has a reference and doesn't get freed. FnReturn is an Starget,
+		and must be used in only one thread.
+		</para>
+
+<pre>
+const string &getName() const;
+Unit *getUnitPtr() const;
+const string &getUnitName() const;
+</pre>
+
+		<para>
+		Get back the information from the constructor. Just like for the Label class,
+		it reminds you that the Unit is only available as a pointer, not a
+		reference, here.  The FnReturn also has a concept of clearing: it has
+		the special labels inside, and once any of these labels gets cleared,
+		the FnReturn is also cleared by setting the unit pointer to NULL and
+		forgetting the FnContext (see more on that below).  So after the
+		FnReturn is cleared, <pre>getUnitPtr()</pre> will return NULL. And again similarly
+		to the Label, there is a convenience function to get the unit name for
+		informational printouts. When FnReturn is cleared, it returns the constant string
+		<quote>[fn return cleared]</quote>.
+		</para>
+
+<pre>
+FnReturn *addFromLabel(const string &lname, Autoref<Label>from, bool front = true);
+</pre>
+
+		<para>
+		Add a label to the return by chaining it off another label. <pre>lname</pre> is
+		the name within the return. The full name of the label will be
+		<quote>return_name.label_name</quote>. The label names within a return must be unique
+		and not empty, or it will be returned as an initialization error. The
+		label type will be copied (actually, referenced) from the <pre>from</pre> label,
+		and the new label will be automatically chained off it. If the argument
+		<pre>front</pre> is <pre>false</pre>, the chaining will be done at the
+		back of the chain, if <pre>true</pre> (default) then at the front.
+		The front chaining is convenient if you want to pass both
+		the original request and the result into the return. Usually you
+		would define the result computation and then define the return.
+		With the chaining at the back, this would lead to the computation
+		chained off the input label first and the return going after it.
+		This would lead to the result coming out before the argument,
+		and special contortions would be needed to avoid it. With chaining
+		at the front, the return will go in the chain before the computation,
+		even if the return was defined last.
+		The labels can
+		be added only until the return is initialized, or it will throw an
+		Exception.
+		</para>
+
+<pre>
+FnReturn *addLabel(const string &lname, const_Autoref<RowType>rtype);
+</pre>
+
+		<para>
+		Add a new independent label to the return. Works very similarly to
+		<pre>addFromLabel()</pre>, only uses the explicit row type and doesn't chain to
+		anything. The label can be later found with <pre>getLabel()</pre> and either
+		chained off something or used to send the rows to it explicitly. The
+		labels can be added only until the return is initialized.
+		</para>
+
+<pre>
+class FnContext: public Starget
+{
+public:
+	virtual ~FnContext();
+	virtual void onPush(const FnReturn *fret) = 0;
+	virtual void onPop(const FnReturn *fret) = 0;
+};
+FnReturn *setContext(Onceref<FnContext> ctx);
+</pre>
+
+		<para>
+		Set the context with handlers for the pushing and popping of the
+		bindings in the FnReturn. FnContext is a top-level class, not nested
+		in FnReturn.  
+		I.e. <b>not</b> Triceps::FnReturn::FnContext but Triceps::FnContext. 
+		Triceps generally tries to follow the &Cpp;
+		tradition of using the virtual methods for the callbacks, with the user
+		then subclassing the base class and replacing the callback methods.
+		However subclassing FnReturn is extremely inconvenient, because it gets
+		connected to the other objects in a quite complicated way. So the
+		solution is to make a separate context class for the callbacks, and
+		then connect it.  
+		The callbacks will be called just before the
+		binding is pushed or popped, but after the check for the correctness of
+		the push or pop. They can be used to adjust the state of the streaming
+		function by pushing or popping its stack of local variables, like was
+		shown in the Perl examples in
+		<xref linkend="sc_strf_more_recursion" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		The context may be set only until the return is initialized.
+		</para>
+
+<pre>
+template<class C> C *contextIn() const;
+</pre>
+
+		<para>
+		Get back the context. Since the context will be a subclass of
+		FnContext, this also handles the correct type casting. Use it like:
+		</para>
+
+<pre>
+Autoref<MyFnCtx> ctx = fret1->contextIn<MyFnCtx>();
+</pre>
+
+		<para>
+		The type is converted using the <pre>static_cast</pre>, and you need to know the
+		correct type in advance, or your program will break in some horrible
+		ways. If the context has not been set, it will return a NULL.
+		</para>
+
+<pre>
+void initialize();
+</pre>
+
+		<para>
+		Initialize the FnReturn. Very similar to the Type classes, it will
+		collect the errors in an Errors object that has to be checked
+		afterwards, and an FnReturn with errors must not be used. The
+		initialization can be called repeatedly with no ill effects. After
+		initialization the structure of the return (labels and context) can not
+		be changed any more.
+		</para>
+
+<pre>
+Erref getErrors() const;
+</pre>
+
+		<para>
+		Get the errors that were detected during construction and initialization. 
+		Normally called after initialization but can
+		also be called at any stage, as the errors are collected all the way
+		through the object construction.
+		</para>
+
+<pre>
+bool isInitialized() const;
+</pre>
+
+		<para>
+		Check whether the return is initialized.
+		</para>
+
+<pre>
+RowSetType *getType() const;
+</pre>
+
+		<para>
+		Get the type of the return, which gets built internally by the return.
+		The names of the row types in the set will be the same as the names of
+		labels in the return, and their order will also be the same. This call
+		can be made only after initialization, or it will throw an Exception.
+		</para>
+
+<pre>
+int size() const;
+</pre>
+
+		<para>
+		Get the number of labels in the return. Can be called at any time.
+		</para>
+
+<pre>
+const RowSetType::NameVec &getLabelNames() const;
+const RowSetType::RowTypeVec &getRowTypes() const;
+const string *getLabelName(int idx) const;
+RowType *getRowType(const string &name) const;
+RowType *getRowType(int idx) const;
+</pre>
+
+		<para>
+		Get the piecemeal information about the label names and types. These
+		are really the convenience wrappers around the RowSetType. Note that
+		they return pointers to be able to return NULL on the argument that is
+		out of range. A somewhat special feature is that even though the row
+		set type can be read only after initialization (after it becomes frozen
+		and can not be messed with any more), these wrappers work at any time,
+		even when the return is being built.
+		</para>
+
+<pre>
+bool equals(const FnReturn *t) const;
+bool match(const FnReturn *t) const;
+bool equals(const FnBinding *t) const;
+bool match(const FnBinding *t) const;
+</pre>
+
+		<para>
+		Convenience wrappers that compare the equality or match of the
+		underlying row set types.
+		</para>
+
+<pre>
+Label *getLabel(const string &name) const;
+int findLabel(const string &name) const;
+Label *getLabel(int idx) const;
+</pre>
+
+		<para>
+		Get the label by name or index, or the index of the label by name.
+		Return a NULL pointer or -1 index on an invalid argument.
+		</para>
+
+<pre>
+typedef vector<Autoref<RetLabel> > ReturnVec;
+const ReturnVec &getLabels() const;
+</pre>
+
+		<para>
+		Get the whole set of labels. FnReturn::RetLabel is a special private
+		label type with undisclosed internals. You need to treat these labels
+		as being a plain Label.
+		</para>
+
+<pre>
+void push(Onceref<FnBinding> bind);
+</pre>
+
+		<para>
+		Push a binding on the return stack. The return must be initialized, and
+		the binding must be of a matching type, or an Exception will be thrown.
+		The reference to the binding will be kept in the FnReturn until it's popped.
+		</para>
+
+<pre>
+void pushUnchecked(Onceref<FnBinding> bind);
+</pre>
+
+		<para>
+		Similar to <pre>push()</pre>, only the type of the binding is not checked. 
+		This method is not available in Perl, it's
+		an optimization for the automatically generated code that does all the
+		type checks up front at the generation time. The manually written code
+		probably should not be using it.
+		</para>
+
+<pre>
+void pop(Onceref<FnBinding> bind);
+</pre>
+
+		<para>
+		Pop a binding from the return stack. The binding argument specifies,
+		which binding is expected to be popped. It's not strictly necessary 
+		(use the <pre>pop()</pre> without arguments to skip it) but
+		allows to catch any mess-ups with the return stack early. If the stack
+		is empty or the top binding is not the same as the argument, throws an
+		Exception.
+		</para>
+
+<pre>
+void pop();
+</pre>
+
+		<para>
+		The unchecked version. It still checks and throws if the stack is
+		empty. This method may come handy occasionally, but in general the
+		checked version should be preferred. Pretty much the only reason to use
+		it would be if you try to restore after a major error and want to pop
+		everything from all your FnReturns untill their stacks become empty.
+		But there is much trouble with this kind of restoration.
+		</para>
+
+<pre>
+int bindingStackSize() const;
+</pre>
+
+		<para>
+		Get the current size of the return stack (AKA the stack of bindings). Useful
+		for debugging.
+		</para>
+
+<pre>
+typedef vector<Autoref<FnBinding> > BindingVec;
+const BindingVec &bindingStack() const;
+</pre>
+
+		<para>
+		Get the current return stack. Useful for debugging. 
+		</para>
+
+<pre>
+bool isFaceted() const;
+</pre>
+
+		<indexterm>
+			<primary>Facet</primary>
+		</indexterm>
+		<para>
+		Returns <pre>true</pre> if this FnReturn object is a part of a Facet.
+		</para>
+	</sect1>

@@ -1,0 +1,903 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_sortidx">
+		<title>SortedIndexType reference</title>
+
+		<indexterm>
+			<primary>SortedIndexType</primary>
+		</indexterm>
+		<para>
+		The SortedIndexType is defined in <pre>type/SortedIndexType.h</pre>, and provides
+		a way to define any custom sorting criteria. That is done by defining
+		your condition class, derived from SortedIndexCondition, and passing it
+		to the SortedIndexType. Because of this the index type itself is
+		simple, all the complex things are in the condition:
+		</para>
+
+<pre>
+SortedIndexType(Onceref<SortedIndexCondition> sc);
+static SortedIndexType *make(Onceref<SortedIndexCondition> sc);
+SortedIndexCondition *getCondition() const;
+</pre>
+
+		<para>
+		A few example of the sort conditions are discussed below, they can also
+		be found in <pre>type/test/t_xSortedIndex.cpp</pre>.  More examples
+		are available in <pre>type/test/t_TableType.cpp</pre> and in
+		<pre>perl/Triceps/PerlSortCondition.*</pre>.  SortedIndexCondition
+		provides a set of virtual methods that can be re-defined in the
+		subclass to create a custom condition. Indeed, some of them must be
+		re-defined, since they are pure virtual.
+		</para>
+
+		<para>
+		The following basic example defines only
+		the absolute minimum of methods. It sorts by an int32 field, whose
+		index (starting as usual from 0) is specified in the constructor:
+		</para>
+
+		<indexterm>
+			<primary>SortedIndexCondition</primary>
+		</indexterm>
+<pre>
+class Int32SortCondition : public SortedIndexCondition
+{
+public:
+	// @param idx - index of field to use for comparison (starting from 0)
+	Int32SortCondition(int idx) :
+		idx_(idx)
+	{ }
+
+	Int32SortCondition(const Int32SortCondition *other, Table *t) :
+		SortedIndexCondition(other, t),
+		idx_(other->idx_)
+	{ }
+
+	virtual SortedIndexCondition *copy() const
+	{
+		return new Int32SortCondition(*this);
+	}
+
+	virtual TreeIndexType::Less *tableCopy(Table *t) const
+	{
+		return new Int32SortCondition(this, t);
+	}
+
+	virtual void initialize(Erref &errors, TableType *tabtype, SortedIndexType *indtype)
+	{
+		SortedIndexCondition::initialize(errors, tabtype, indtype);
+		if (idx_ < 0)
+			errors.f("The index must not be negative.");
+		if (rt_->fieldCount() <= idx_)
+			errors.f("The row type must contain at least %d fields.", idx_+1);
+
+		if (!errors->hasError()) { // can be checked only if index is within range
+			const RowType::Field &fld = rt_->fields()[idx_];
+			if (fld.type_->getTypeId() != Type::TT_INT32)
+				errors.f("The field at index %d must be an int32.", idx_);
+			if (fld.arsz_ != RowType::Field::AR_SCALAR)
+				errors.f("The field at index %d must not be an array.", idx_);
+		}
+	}
+
+	virtual bool equals(const SortedIndexCondition *sc) const
+	{
+		// the cast is safe to do because the caller has checked the typeid
+		Int32SortCondition *other = (Int32SortCondition *)sc;
+		return idx_ == other->idx_;
+	}
+
+	virtual bool match(const SortedIndexCondition *sc) const
+	{
+		return equals(sc);
+	}
+
+	virtual void printTo(string &res, const string &indent = "", const string &subindent = "  ") const
+	{
+		res.append(strprintf("Int32Sort(%d)", idx_));
+	}
+
+	virtual bool operator() (const RowHandle *rh1, const RowHandle *rh2) const
+	{
+		const Row *row1 = rh1->getRow();
+		const Row *row2 = rh2->getRow();
+		{
+			bool v1 = rt_->isFieldNull(row1, idx_);
+			bool v2 = rt_->isFieldNull(row2, idx_);
+			if (v1 > v2) // isNull at true goes first, so the direction is opposite
+				return true;
+			if (v1 < v2)
+				return false;
+		}
+		{
+			int32_t v1 = rt_->getInt32(row1, idx_);
+			int32_t v2 = rt_->getInt32(row2, idx_);
+			return (v1 < v2);
+		}
+	}
+
+	int idx_;
+};
+
+...
+
+Autoref<IndexType> it = new SortedIndexType(new Int32SortCondition(1));
+</pre>
+
+		<para>
+		There are four kinds of constructors for a sort condition:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+			<para>
+			One used to create the SortedIndexType in the first place, specifying
+			the condition argument, such as Int32SortCondition(int idx) here.
+			</para>
+			</listitem>
+
+			<listitem>
+			<para>
+			The copy constructor, used to copy the sort condition when its
+			index gets copied. It should copy all the elements
+			that could be modified by someone else but can share the references
+			for the reference-counted elements that are unchangeable.
+			Feel free to just use the default compiler-created
+			copy constructor, as Int32SortCondition did, unless you really
+			need it to do something more smart.
+			</para>
+			</listitem>
+
+			<indexterm>
+				<primary>RowType</primary>
+			</indexterm>
+			<listitem>
+			<para>
+			The deep-copy constructor, used when SortedIndexType gets deep-copied,
+			including the copying of the RowTypes and other
+			referenced objects that are more efficient to not share between
+			different threads.  See the discussion of the deep-copying in
+			<xref linkend="sc_cpp_tabtype" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+			Most of the sort conditions would not have any row types in them,
+			nor anything deeper to copy than in the normal copy constructor,
+			so they don't need to bother. The base class provides the default <pre>deepCopy()</pre>
+			method that simply reverts to calling <pre>copy()</pre>, so no separate constructor
+			is used.  If you need to define it, the typical prototype for the
+			deep-copy constructor will be:
+			</para>
+<pre>
+MySortCondition(const MySortCondition &other, HoldRowTypes *holder);
+</pre>
+			</listitem>
+
+			<listitem>
+			<para>
+			The table-copy constructor. The need for this one is driven by the
+			error reporting from the sort condition. For most of the sort condition
+			classes defined directly in &Cpp; it doesn't matter, they just can't
+			experience any errors. But when the interpreted code is involved,
+			the possibility of errors arises and something has to be done
+			about them, and thus the infrastructure has to accomodate.
+			</para>
+
+			<indexterm>
+				<primary>Table</primary>
+			</indexterm>
+			<para>
+			When the comparison operator
+			runs, throwing an Exception from the middle of the STL map logic
+			is not a good idea. I've actually looked into the GCC implementation,
+			and it would leak memory and be unhappy in this situation. This
+			means that the sort condition has to report the error back to the
+			Table in some other way. Which means that it has to have a link
+			back to the table, and that link gets provided in the field
+			<pre>table_</pre>. But that means that the sort condition instance
+			gets tied to a table. And normally a sort condition belongs to
+			an index type which belongs to a table type which can be shared
+			by multiple tables. This dilemma is solved by making a copy
+			of the sort condition for each created table. 
+			</para>
+
+			<para>
+			This copying
+			and setting of the Table pointer gets handled by the sort
+			condition method tableCopy()
+			which in turn calls the table-copy constructor. Most of the work is
+			done by the base class, you just need to pass through the arguments
+			and copy your extra fields, as shown in the example.
+			</para>
+			</listitem>
+		</itemizedlist>
+
+		<para>
+		There are three kinds of copy methods for a sort condition:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+			<para>
+			<pre>copy()</pre> copies the sort condition by calling the copy constructor,
+			as shown above.  In particular, the
+			SortedIndexType constructor makes a private copy of the condition, and
+			remembers that copy, not the original.
+			</para>
+			</listitem>
+
+			<indexterm>
+				<primary>RowType</primary>
+			</indexterm>
+			<listitem>
+			<para>
+			<pre>deepCopy()</pre> copies the sort condition all the way deep, as described in 
+			<xref linkend="sc_cpp_tabtype" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;,
+			by calling the deep-copy constructor. Most of the sort conditions don't
+			need to bother since they don't have any RowTypes in them, the base
+			class implements this method by calling <pre>copy()</pre>. If you need one, the
+			typical implementation looks like:
+			</para>
+
+<pre>
+IndexType *MySortCondition::deepCopy(HoldRowTypes *holder) const
+{
+	return new MySortCondition(*this, holder);
+}
+</pre>
+			</listitem>
+
+			<listitem>
+			<para>
+			<pre>tableCopy()</pre> creates a per-table instance of the copy condition,
+			by calling the table-copy constructor.
+			</para>
+			</listitem>
+		</itemizedlist>
+
+		<para>
+		The method <pre>initialize()</pre> is called at the table type initialization
+		time. The argument <pre>errors</pre> is an already allocated Errors object to
+		return the error messages in, <pre>tabtype</pre> is the table type where the
+		initialization is happening, and <pre>indtype</pre> is the index type that owns
+		this condition. Also the field <pre>rt_</pre> gets magically initialized to the
+		table's row type reference before the sort condition initialization is
+		called. This method is expected to do all the initialization of the
+		internal state, check for all the errors, and return these errors if
+		found.
+		</para>
+
+		<para>
+		To be more systematic, the following useful fields are defined in the
+		sort condition base class:
+		</para>
+
+<pre>
+Autoref<const RowType> rt_;
+Table *table_;
+intptr_t rhOffset_;
+</pre>
+
+		<indexterm>
+			<primary>RowHandle</primary>
+		</indexterm>
+		<para>
+		<pre>rt_</pre> is set to NULL on construction and the gets properly set when the
+		SortedIndexType is initialized, before it calls the initialization of the
+		sort condition. <pre>table_</pre> is also NULL to start with and gets set
+		in <pre>tableCopy()</pre>, as described above. <pre>table_</pre> can be used by the
+		comparison operator to report the fatal errors back to the table,
+		as described in more detail below.
+		<pre>rhOffset_</pre> is used by the more advanced sort conditions that
+		want to cache some per-row information in the RowHandle, I'll show
+		another example of that. It's the offset of that cached data in the
+		RowHandle.
+		</para>
+
+		<para>
+		<pre>equals()</pre> and <pre>match()</pre> compare two conditions for equality and match.
+		Before they get called, the caller checks that both conditions are of
+		the same type (i.e. have the same &Cpp; typeid), so it's safe to cast the
+		second condition's pointer to our type. The easiest way to define
+		<pre>match()</pre> is to make it the same as <pre>equals()</pre>. These methods may be called
+		on both uninitialized and initialized conditions; if not initialized
+		then the field <pre>rt_</pre> will be NULL.
+		</para>
+
+		<para>
+		<pre>printTo()</pre> appends the printout of this index's description to a string.
+		For the simple single-line printouts it just appends to the result
+		string. The multi-line prints have to handle the indenting correctly,
+		as is described in
+		<xref linkend="sc_cpp_types" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<para>
+		Finally, the <pre>operator()</pre> implements the comparison for <quote>Less</quote>: it gets
+		two row handles and returns true if the first one contains a row that
+		is <quote>less</quote> (i.e. goes before in the sorting order) than the second one.
+		The reason for why it's done like this is that the SortedIndexCondition
+		is really a Less comparator class for the STL tree that had grown a few
+		extra methods.
+		</para>
+
+		<para>
+		This example shows how to compare a value consisting of multiple
+		elements. Even though this sort condition sorts by only one field, it
+		first compares separately for NULL in that field, and then for the
+		actual value. For each element you must:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+			find the values of the element in both rows;
+			</listitem>
+
+			<listitem>
+			compare for <quote>&lt;</quote>, and if so, return true;
+			</listitem>
+
+			<listitem>
+			compare for <quote>&gt;</quote>, and if so, return false;
+			</listitem>
+
+			<listitem>
+			otherwise (if they are equal), fall through to the next element.
+			</listitem>
+		</itemizedlist>
+
+		<para>
+		The last element doesn't have to go through the whole procedure, it can
+		just return the result of <quote>&lt;</quote>. And in this case the comparison for NULL
+		wants the NULL value go before all the non-NULL values, so the result
+		of true must go before false, and the comparison signs are reversed.
+		It's real important that the second comparison, normally for <quote>&gt;</quote>, can
+		not be skipped (except for the last element). If you skip it, you will
+		make a mess of the data and will spend a lot of time trying to figure
+		out, what is going on.
+		</para>
+
+		<para>
+		That's it for the basics, the minimal subset of the methods that has to
+		be defined. Now let's look at some more advances subjects.
+		</para>
+
+		<indexterm>
+			<primary>sticky error</primary>
+		</indexterm>
+		<para>
+		What if <pre>operator()</pre> needs to to report an error? It has to set
+		the sticky error in the table and return false:
+		</para>
+
+<pre>
+Erref err;
+err.f("error message");
+table_->setStickyError(err);
+return false;
+</pre>
+
+		<para>
+		One more method that can be supported in the sort condition is <pre>getKey()</pre>:
+		</para>
+
+<pre>
+virtual const NameSet *getKey() const;
+</pre>
+
+		<para>
+		The default implementation just returns NULL, thus saying that the
+		key is not available.
+		The SortedIndexType's <pre>getKey()</pre> is really just a wrapper for the
+		SortedIndexCondition's <pre>getKey()</pre>.
+		</para>
+
+		<para>
+		To show <pre>getKey()</pre> and a bit more
+		techniques, so I've done a fairly big extension of the previous
+		example. Now it can compare multiple fields, and the fields are
+		specified by names. The only part missing from it being a general
+		OrderedIndexType is the support of all the field types, not just int32.
+		</para>
+
+<pre>
+class MultiInt32SortCondition : public SortedIndexCondition
+{
+public:
+	// @param key - the key fields specification
+	MultiInt32SortCondition(NameSet *key):
+		key_(key)
+	{ }
+
+	MultiInt32SortCondition(const MultiInt32SortCondition *other, Table *t) :
+		SortedIndexCondition(other, t),
+		idxs_(other->idxs_),
+		key_(other->key_)
+	{ }
+
+	virtual SortedIndexCondition *copy() const
+	{
+		return new MultiInt32SortCondition(*this);
+	}
+
+	virtual TreeIndexType::Less *tableCopy(Table *t) const
+	{
+		return new MultiInt32SortCondition(this, t);
+	}
+
+	virtual void initialize(Erref &errors, TableType *tabtype, SortedIndexType *indtype)
+	{
+		SortedIndexCondition::initialize(errors, tabtype, indtype);
+		idxs_.clear();
+
+		for (int i = 0; i < key_->size(); i++) {
+			const string &s = (*key_)[i];
+			int n = rt_->findIdx(s);
+			if (n < 0) {
+				errors.f("No such field '%s'.", s.c_str());
+				continue;
+			}
+			const RowType::Field &fld = rt_->fields()[n];
+			if (fld.type_->getTypeId() != Type::TT_INT32) {
+				errors.f("The field '%s' must be an int32.", s.c_str());
+				continue;
+			}
+			if (fld.arsz_ != RowType::Field::AR_SCALAR) {
+				errors.f("The field '%s' must not be an array.", s.c_str());
+				continue;
+			}
+			idxs_.push_back(n);
+		}
+	}
+
+	virtual bool equals(const SortedIndexCondition *sc) const
+	{
+		// the cast is safe to do because the caller has checked the typeid
+		MultiInt32SortCondition *other = (MultiInt32SortCondition *)sc;
+
+		// names must be the same
+		if (!key_->equals(other->key_))
+			return false;
+
+		// and if initialized, the indexs must be the same too
+		if (!rt_.isNull()) {
+			if (idxs_.size() != other->idxs_.size())
+				return false;
+
+			for (int i = 0; i < idxs_.size(); i++) {
+				if (idxs_[i] != other->idxs_[i])
+					return false;
+			}
+		}
+
+		return true;
+	}
+
+	virtual bool match(const SortedIndexCondition *sc) const
+	{
+		MultiInt32SortCondition *other = (MultiInt32SortCondition *)sc;
+		if (rt_.isNull()) {
+			// not initialized, check by names
+			return key_->equals(other->key_);
+		} else {
+			// initialized, check by indexes
+			if (idxs_.size() != other->idxs_.size())
+				return false;
+
+			for (int i = 0; i < idxs_.size(); i++) {
+				if (idxs_[i] != other->idxs_[i])
+					return false;
+			}
+			return true;
+		}
+	}
+
+	virtual void printTo(string &res, const string &indent = "", const string &subindent = "  ") const
+	{
+		res.append("MultiInt32Sort(");
+		for (NameSet::iterator i = key_->begin(); i != key_->end(); ++i) {
+			res.append(*i);
+			res.append(", "); // extra comma after last field doesn't hurt
+		}
+		res.append(")");
+	}
+
+	virtual const NameSet *getKey() const
+	{
+		return key_;
+	}
+
+	virtual bool operator() (const RowHandle *rh1, const RowHandle *rh2) const
+	{
+		const Row *row1 = rh1->getRow();
+		const Row *row2 = rh2->getRow();
+
+		int sz = idxs_.size();
+		for (int i = 0; i < sz; i++) {
+			int idx = idxs_[i];
+			{
+				bool v1 = rt_->isFieldNull(row1, idx);
+				bool v2 = rt_->isFieldNull(row2, idx);
+				if (v1 > v2) // isNull at true goes first, so the direction is opposite
+					return true;
+				if (v1 < v2)
+					return false;
+			}
+			{
+				int32_t v1 = rt_->getInt32(row1, idx);
+				int32_t v2 = rt_->getInt32(row2, idx);
+				if (v1 < v2)
+					return true;
+				if (v1 > v2)
+					return false;
+			}
+		}
+		return false; // falls through on equality, which is not less
+	}
+
+	vector<int> idxs_;
+	Autoref<NameSet> key_;
+};
+</pre>
+
+		<indexterm>
+			<primary>NameSet</primary>
+		</indexterm>
+		<para>
+		The key is specified as a NameSet in the constructor. Unlike the HashedIndexType, there
+		is no changing the key later, it must be specified in the constructor,
+		and must not be NULL. The same as with HashedIndexType, the original
+		name set becomes referenced by this sort condition and all its copies.
+		So don't change and don't even use the original condition any more
+		after you've passed it to the sort condition. This sort condition doesn't
+		care to copy the NameSet in the deep copy, just leaves the deep copy the
+		same as the default.
+		</para>
+
+		<para>
+		The initialization translates the field names to indexes (um, that's a
+		confusing double usage of the word "index", here it's like "array
+		indexes") in the row type, and checks that the fields are as expected.
+		</para>
+
+		<para>
+		The equality and match checks follow the fashion of HashedIndexType:
+		if not initialized, they rely on field names, if initialized, they
+		take the field indexes into the consideration (for equality both the
+		names and indexes must be equal, for matching, only the indexes need to
+		be equal).
+		</para>
+
+		<para>
+		The printing and copying is nothing particularly new and fancy.
+		<pre>getKey()</pre> simply returns back the key. This feels a bit like an
+		anti-climax, a whole big example for this little one-liner, but again,
+		that's not the only thing that this example shows.
+		</para>
+
+		<para>
+		The <quote>less</quote> comparison function now loops through all the fields in the
+		key. It can't do the shortcuts in the int32 comparison part any more,
+		so that has been expanded to the full condition. If the whole loop
+		falls through without returning, it means that the key fields in both
+		rows are equal, so it returns false.
+		</para>
+
+		<para>
+		And an example, of its use, the key argument is created similarly
+		to the hashed index:
+		</para>
+
+
+<pre>
+Autoref<IndexType> it = new SortedIndexType(new MultiInt32SortCondition(
+	NameSet::make()->add("b")->add("c")
+));
+</pre>
+
+		<indexterm>
+			<primary>RowHandle</primary>
+		</indexterm>
+		<para>
+		Now we get to another advanced feature that has been mentioned before
+		in the description of the row handles but is not accessible from Perl.
+		A row handle contains a chunk of memory for every index type in the
+		table. It is called a <quote>row handle section</quote>. At the very least this
+		chunk of memory contains the iterator in an index of that type, which
+		allows to navigate through the table and to delete the row handles from
+		the table efficiently.
+		</para>
+
+		<para>
+		But an index type may request more memory (the same fixed amount for each
+		row handle) to store some row-specific information. For example, the
+		hashed index type stores the value of the hash in its section, and uses this
+		value for the efficient comparisons.
+		</para>
+
+		<para>
+		A sort condition may request and use memory in this section of a
+		SortedIndexType. It is done by defining a few more virtual methods that
+		handle the row section.
+		</para>
+
+		<para>
+		I could have made an example of the Hashed index re-implementation
+		through the Sorted interface, but it's kind of boring, since you could
+		as well look directly at the source code of the HashedIndexType.
+		Instead I want to show a different kind of index that doesn't use the
+		data in the rows for comparison at all but keeps the rows in the order
+		they were inserted. Like a more expensive variety of FIFO index type.
+		It's also a bit of a preview of a future feature. It assigns a new
+		auto-generated sequence number to each row handle, and uses that
+		sequence number for ordering. Later you can find the row handle quickly
+		if you know its sequence number. If a table contains multiple copies
+		of a row, the sequence numbers allow you to tell, which copy you are
+		dealing with. It comes handy for such things as results of joins
+		without a natural primary key. Of course, the usefulness of this
+		preview is limited by the fact that there is no place for the sequence
+		numbers in the rowops, and thus there is no way to propagate the
+		sequence numbers in the model. That would have to be addressed before
+		it becomes a full feature.
+		</para>
+
+		<indexterm>
+			<primary>sequence number</primary>
+		</indexterm>
+		<para>
+		Now, you might ask, why not just add an extra field and put the
+		sequence number in there? Sure, that would work too, and also solve the
+		issue with the propagation in the rowops. However this means that as a
+		row goes through a table, it gets copied to set the sequence number in
+		it, which is less efficient. So ultimately keeping the sequence numbers
+		<quote>on the side</quote> is more beneficial.
+		</para>
+
+		<para>
+		The implementation is:
+		</para>
+
+<pre>
+class SeqSortCondition : public SortedIndexCondition
+{
+protected:
+	class SeqRhSection : public TreeIndexType::BasicRhSection
+	{
+	public:
+		SeqRhSection(int64_t val) :
+			seq_(val)
+		{ }
+
+		int64_t seq_; // the sequence number of this row handle
+	};
+
+public:
+	SeqSortCondition() :
+		seq_(0)
+	{ }
+
+	SeqSortCondition(const SeqSortCondition *other, Table *t) :
+		SortedIndexCondition(other, t),
+		seq_(other->seq_)
+	{ }
+
+	virtual SortedIndexCondition *copy() const
+	{
+		return new SeqSortCondition(*this);
+	}
+
+	virtual TreeIndexType::Less *tableCopy(Table *t) const
+	{
+		return new SeqSortCondition(this, t);
+	}
+
+	virtual void initialize(Erref &errors, TableType *tabtype, SortedIndexType *indtype)
+	{
+		SortedIndexCondition::initialize(errors, tabtype, indtype);
+		seq_ = 0;
+	}
+
+	virtual bool equals(const SortedIndexCondition *sc) const
+	{
+		return true;
+	}
+
+	virtual bool match(const SortedIndexCondition *sc) const
+	{
+		return true;
+	}
+
+	virtual void printTo(string &res, const string &indent = "", const string &subindent = "  ") const
+	{
+		res.append("Sequenced");
+	}
+
+	virtual size_t sizeOfRhSection() const
+	{
+		return sizeof(SeqRhSection);
+	}
+
+	virtual void initRowHandleSection(RowHandle *rh) const
+	{
+		// initialize the Seq part, the general Sorted index
+		// will initialize the iterator
+	    SeqRhSection *rs = rh->get<SeqRhSection>(rhOffset_);
+	    new(rs) SeqRhSection(seq_++);
+	}
+	
+	virtual void clearRowHandleSection(RowHandle *rh) const
+	{ 
+	    // clear the iterator by calling its destructor
+	    SeqRhSection *rs = rh->get<SeqRhSection>(rhOffset_);
+	    rs->~SeqRhSection();
+	}
+	
+	virtual void copyRowHandleSection(RowHandle *rh, const RowHandle *fromrh) const
+	{
+	    SeqRhSection *rs = rh->get<SeqRhSection>(rhOffset_);
+	    SeqRhSection *fromrs = fromrh->get<SeqRhSection>(rhOffset_);
+	    
+	    // initialize the iterator by calling its copy constructor inside the placement,
+		// the sequence number gets copied too
+	    new(rs) SeqRhSection(*fromrs);
+	}
+	
+	// Helper method to read the sequence from the row handle,
+	// can also be used by the end-user. The row handle must as usual
+	// belong to a table of this type.
+	int64_t getSeq(const RowHandle *rh) const
+	{
+	    return rh->get<SeqRhSection>(rhOffset_)->seq_;
+	}
+
+	// Helper method to set the sequence in the row handle.
+	// May be used only on the rows that are not in a table.
+	void setSeq(const RowHandle *rh, int64_t val) const
+	{
+		if (rh->isInTable()) {
+			throw Exception("Attempted to change the sequence on a row in table.", true);
+		}
+	    rh->get<SeqRhSection>(rhOffset_)->seq_ = val;
+	}
+
+	virtual bool operator() (const RowHandle *rh1, const RowHandle *rh2) const
+	{
+		return getSeq(rh1) < getSeq(rh2);
+	}
+
+	mutable int64_t seq_; // the next sequence number to assign
+};
+
+...
+Autoref<IndexType> it = new SortedIndexType(new SeqSortCondition());
+...
+</pre>
+
+		<para>
+		The nested class SeqRhSection defines the structure of the
+		section that a SortedIndexType with a SeqSortCondition allocates in the RowHandle.
+		The section class for a sort condition must always inherit from
+		TreeIndexType::BasicRhSection, to get the general SortedIndexType
+		parts from it, such as the iterator. Any
+		extra fields are owned by the sort condition.
+		</para>
+
+		<para>
+		The SeqSortCondition contains the sequence number generator seq_ (not
+		to be confused with the same-named field seq_ in SeqRhSection), that
+		gets initialized to 0, and will be incremented from there. Since each
+		table will get its own copy of the condition, each of them will be counting
+		independently. 
+		</para>
+
+		<para>
+		The <pre>equals()</pre> and <pre>match()</pre> always return true because there is nothing
+		configurable in this sort condition.
+		</para>
+
+		<para>
+		The new features start at <pre>sizeOfRhSection()</pre>. The size of each row
+		handle in a table type is the same, and is computed by asking every
+		index type in it at initialization time and adding up the totals (plus
+		alignment and some fixed amount of basic data). <pre>sizeOfRhSection()</pre> does
+		its part by telling the caller the size of SeqRhSection.
+		</para>
+
+		<para>
+		Then each row handle section must provide the ways to construct and
+		destruct it. Naturally, to save space, a section must have no virtual
+		table, so like for the rows, a separate method in the index type acts
+		as its virtual destructor. And there is no such thing as a virtual
+		constructor in &Cpp;, which gets simulated through more methods in the
+		index type. The SortedIndexType delegates most of this work to the sort
+		condition in it. The basic constructor is <pre>initRowHandleSection()</pre>, the
+		copy constructor is <pre>copyRowHandleSection()</pre>, and the destructor is
+		<pre>clearRowHandleSection()</pre>.
+		</para>
+
+		<para>
+		Each of them gets the location of this index type's section in the row
+		handle using:
+		</para>
+
+<pre>
+SeqRhSection *rs = rh->get<SeqRhSection>(rhOffset_);
+</pre>
+
+		<para>
+		The field <pre>rhOffset_</pre> gets initialized by the SortedIndexType machinery
+		before either of these methods gets ever called. Here <pre>rs</pre> points to the
+		raw bytes, on which the placement constructors and the explicit
+		destructor are called.
+		</para>
+
+		<para>
+		The methods <pre>getSeq()</pre> and <pre>setSeq()</pre> are not virtual, they are unique to
+		this SeqSortCondition. They allow to read the sequence from a row
+		handle or set the sequence in it. Naturally, the sequence number may be
+		changed only when the row handle is not in the table yet, or it would
+		mess up the indexing horribly. It's OK to throw the exceptions from
+		<pre>setSeq()</pre> and <pre>getSeq()</pre> since they are called directly from the user code
+		and won't confuse any Triceps code along the way.
+		</para>
+
+		<para>
+		If you want to find a row handle in the table by its sequence number,
+		you start with creating a new row handle (which can even use an empty
+		row). That new row handle will have a new sequence number assigned to
+		it, but it doesn't matter, because next you call <pre>setSeq()</pre> and overwrite
+		it with your desired number. Then you use this row handle to call
+		<pre>find()</pre> or <pre>delete()</pre> on the table as usual. 
+		</para>
+
+		<para>
+		The creation goes like this:
+		</para>
+
+<pre>
+Rhref rh1(table, r1);
+sc->setSeq(rh1, desired_number);
+</pre>
+
+		<para>
+		The class Rhref, a row handle reference, is similar in spirit to Rowref,
+		and is described in detail in
+		<xref linkend="sc_cpp_rowhandle" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		Or to read the number, you do:
+		</para>
+
+<pre>
+int64_t seq = sc->getSeq(rh);
+</pre>
+
+		<para>
+		Here <pre>sc</pre> is the exact initialized sort condition from the actual table
+		type (not from the exact table, since you can't get the sort condition from a table,
+		but the table type is good enough). If you use a wrong or uninitialized
+		sort condition, the <pre>rhOffset_</pre> in it will likely be wrong, and
+		will cause all kinds of memory corruption. You can get the sort
+		condition from a table type like this:
+		</para>
+
+<pre>
+Autoref<SortedIndexType> ixt = dynamic_cast<SortedIndexType *>(tt->findSubIndex("primary"));
+Autoref<SeqSortCondition> sc = dynamic_cast<SeqSortCondition *>(ixt->getCondition());
+</pre>
+
+		<para>
+		You don't have to use the dynamic cast but it's safer, and since you'd
+		normally do it once at the model setup time and then just keep using
+		the value, there is no noticeable performance penalty for it.
+		</para>
+
+	</sect1>
+

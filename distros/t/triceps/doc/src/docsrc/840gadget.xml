@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_gadget">
+		<title>Gadget reference</title>
+
+		<indexterm>
+			<primary>Gadget</primary>
+		</indexterm>
+		<para>
+		The Gadget is unique to the &Cpp; API, it has no parallels in Perl.
+		It had also become somewhat obsolete in the recent times but still
+		clinging to life for now.
+		</para>
+
+		<para>
+		Gadget is a base class, a single-threaded Starget, defined in 
+		<pre>sched/Gadget.h</pre>, its object being a
+		something with an output label. And the details of what this something
+		is, are determined by the subclass. Presumably, it also has some kind
+		of inputs but it's up to the subclass. The Gadget itself defines only
+		the output label. To make a concrete example, a table is a gadget, and
+		every aggregator in the table is also a gadget. However the <quote>pre</quote> and
+		<quote>dump</quote> labels of the table are not gadgets, they are just extra labels
+		strapped on the side.
+		</para>
+
+		<para>
+		The reasons for the Gadget creation are mostly historic by now.
+		At some point it seemed important to have the ability to associate a
+		particular enqueueing mode with each output label. Most tables might be
+		using <pre>EM_CALL</pre> but some, ones in a loop, would use <pre>EM_FORK</pre>, and those
+		that don't need to produce the streaming output would use <pre>EM_IGNORE</pre>.
+		This approach didn't work out as well as it seemed at first, and now is
+		outright deprecated: the tables have <pre>EM_CALL</pre> hardcoded everywhere, and there are the
+		newer and better ways to handle the loops. The whole Gadget thing
+		should be removed at some point but for now I'll just describe it as
+		it is.
+		</para>
+
+		<indexterm>
+			<primary>EnqMode</primary>
+		</indexterm>
+		<para>
+		As the result of that history, the enqueueing mode constants are
+		defined in the Gadget class, enum EnqMode: <pre>EM_SCHEDULE</pre>, <pre>EM_FORK</pre>,
+		<pre>EM_CALL</pre>, <pre>EM_IGNORE</pre>.
+		</para>
+
+<pre>
+static const char *emString(int enval, const char *def = "???");
+static int stringEm(const char *str);
+</pre>
+
+		<para>
+		Convert from the enqueueing mode constant to string, and back.
+		</para>
+
+<pre>
+Gadget(Unit *unit, EnqMode mode, const string &name, const_Onceref<RowType> rt = (const RowType*)NULL);
+</pre>
+
+		<para>
+		The Gadget constructor is protected, since Gadget is intended to be
+		used only as a base class, and never instantiated directly. The
+		row type can be left undefined if it isn't known yet and
+		initialized later. The output label will be created as soon as the row type
+		is known. The
+		enqueueing mode may also be changed later, so initially it can be set
+		to anything. All this is intended only to split the initialization in a
+		more convenient way, once the Gadget components are set, they must not
+		be changed any more.
+		</para>
+
+		<para>
+		The output label of the Gadget is a DummyLabel, and it shares the name
+		with the Gadget. So if you want to differentiate that label with a
+		suffix in the name, you have to give the suffixed name to the whole
+		Gadget. For example, the Table constructor does:
+		</para>
+
+<pre>
+Gadget(unit, Gadget::EM_CALL, name + ".out", rowt),
+</pre>
+
+		<indexterm>
+			<primary>Unit</primary>
+		</indexterm>
+		<para>
+		A Gadget keeps a reference to both its output label and its unit. This
+		means that the unit won't disappears from under a Gadget, but to avoid
+		the circular references, the Unit must not have references to the
+		Gadgets (having references to their output labels is fine).
+		</para>
+
+<pre>
+void setEnqMode(EnqMode mode);
+void setRowType(const_Onceref<RowType> rt);
+</pre>
+
+		<para>
+		The protected methods to finish the initialization. Once the values are
+		set, they must not be changed any more. Calling <pre>setRowType()</pre> creates
+		the output label.
+		</para>
+
+<pre>
+EnqMode getEnqMode() const;
+const string &getName() const;
+Unit *getUnit() const;
+Label *getLabel() const;
+</pre>
+
+		<para>
+		Get back the gadget's information. The label will be returned only
+		after it's initialized (i.e. the row type is known), before then
+		<pre>getLabel()</pre> would return NULL. And yes, it's <pre>getLabel()</pre>, <b>not</b>
+		<pre>getOutputLabel()</pre>.
+		</para>
+
+		<para>
+		The rest of the methods are for convenience of sending the rows to the
+		output label. They are protected, since they are intended for the
+		Gadget subclasses (which in turn may decide to make them public).
+		</para>
+
+<pre>
+void send(const Row *row, Rowop::Opcode opcode) const;
+</pre>
+
+		<para>
+		Construct a Rowop from the given row and opcode, and enqueue it to the
+		output label according to the gadget's enqueueing method. This is the
+		most typical use.
+		</para>
+
+<pre>
+void sendDelayed(Tray *dest, const Row *row, Rowop::Opcode opcode) const;
+</pre>
+
+		<para>
+		Create a Rowop and put it into the <pre>dest</pre> tray. The rowop will have the
+		enqueueing mode populated according to the Gadget's setting. This
+		method is used when the whole set of the rowops needs to be generated
+		before any of them can be enqueued, such as when a Table computes its
+		aggregators. After the delayed tray is fully generated, it can be
+		enqueued with <pre>Unit::enqueueDelayedTray()</pre>, which will consult each
+		rowop's enqueueing method and process it accordingly. Again, this stuff
+		exists for the historic reasons, and will likely be removed somewhere
+		soon. 
+		</para>
+	</sect1>

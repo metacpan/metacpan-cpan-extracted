@@ -1,0 +1,360 @@
+#!/usr/local/bin/perl -w
+#
+# Semi-automate Rain tar file restoration.  SOL, LUCC, 2002/05/12
+#
+# 2006/03/07 S. O. Lidie
+#   Wow, first update in 4 years!  First, allow a list of users to be
+#   reloaded. Second, the backup is now multi-file, ugh. This means
+#   there is a separate DB file for each tar file on the tape, but
+#   we hide this added complexity from the operator by combining all
+#   the backup DBs into one "virtual" backup from her POV. Next, we
+#   now have a dual-drive jukebox, so we can't just use /dev/st0.
+
+use IO::File;
+use Tie::Watch;
+use Tk;
+use Tk::widgets qw/Balloon BrowseEntry ExecuteCommand LabEntry/;
+use strict;
+
+# Global variables.
+
+our $bh          = undef;                # Balloon help widget
+our $dte         = undef;                # Data Transfer Element ordinal
+our $f1          = undef;                # top Frame
+our $f2          = undef;                # bottom Frame
+our @files       = ();                   # list of files to restore
+our @file_nums   = ();                   # matching list of tape file numbers
+our $lb          = undef;                # Listbox widget
+our $mw          = MainWindow->new;      # main window
+our $root        = '/root';              # root's base
+our $root_backup = "$root/admin/backup"; # main backup directory
+our $root_bin    = "$root/bin";          # backup binaries
+our $root_db     = "$root_backup/db";    # backup DB files
+our $tape        = '';                   # backup DB file name
+our $user        = '';                   # search string
+our @vsns        = ();                   # list of restore VSNs
+
+#$mw->optionAdd( '*Background' => 'lightsteelblue' );
+#$mw->optionAdd( '*activeBackground' => 'lightsteelblue' );
+#$mw->optionAdd( '*activeForeground' => 'black' );
+#$mw->optionAdd( '*selectForeground' => 'black' );
+#$mw->optionAdd( '*selectBackground' => 'steelblue' );
+
+$mw->title( 'tkreload2' );
+$mw->protocol( 'WM_DELETE_WINDOW' => \&quit );
+my $mb = $mw->Menu( -type => 'menubar' );
+$mw->configure( -menu => $mb );
+my $f = $mb->Cascade( qw/-label ~File -tearoff 0 -menuitems/ =>
+    [
+        [ Button => 'Abort',        -command => \&exit ],
+        [ Button => 'Quit',         -command => \&quit ],
+    ],
+);
+my $a = $mb->Cascade( qw/-label ~Actions -tearoff 0 -menuitems/ =>
+    [
+        [ Button => 'Lookup Files', -command => \&lookup ],
+        [ Button => 'Reload Files', -command => \&reload ],
+    ],
+);
+
+# A Text widget with help information.
+
+my $tx = $mw->Scrolled( qw/ Text -height 22 -font 9x15 -wrap word -scrollbars ow / );
+$tx->pack( qw/ -expand 1 -fill both / );
+
+$mw->fontCreate( qw/ C_bold -family courier -size 24 -weight bold -slant italic / );
+$tx->tagConfigure( qw/ bold  -font C_bold / );
+$tx->tagConfigure( qw/ color_blue -foreground blue / );
+
+$tx->insert( '0.0', "\n" );
+$tx->insert( 'insert', 'tkreload2', [ qw/ bold color_blue / ] );
+$tx->insert( 'insert', " restores user files from any Mail backup version 2 tape (backups created from 2006/03/15 onwards). All you need to do is select the user(s), the file(s) and the tape device to use for the restore.\n\nFirst, enter a user name in the " );
+$tx->insert( 'insert', 'User(s)', 'color_blue' );
+$tx->insert( 'insert', " field. You may specify more than one username by separating them with a space, e.g. 'sol0 das1 lac0 jmpb'.\n\nSecond, from the " );
+$tx->insert( 'insert', 'Tape VSN', 'color_blue' );
+$tx->insert( 'insert', " dropdown menu, select the tape containing the files to restore. \n\nThird, from the " );
+$tx->insert( 'insert', 'DTE', 'color_blue' );
+$tx->insert( 'insert', " dropdown menu, select the physical tape drive to use for the restore.\n\nFinally, select " );
+$tx->insert( 'insert', 'Lookup Files', 'color_blue' );
+$tx->insert( 'insert', " from the " );
+$tx->insert( 'insert', 'Actions', 'color_blue' );
+$tx->insert( 'insert', " menu to fill the selection window with every candidate file for that tape (but remember that the user may have files on other tapes used that day).  Click on the files and/or folders to restore.  Selecting a folder implicitly selects all the files and folders contained within it. To actually initiate the restore ensure the proper tape is loaded in the proper DTE, then select " );
+$tx->insert( 'insert', 'Reload Files', 'color_blue' );
+$tx->insert( 'insert', " from the " );
+$tx->insert( 'insert', 'Actions', 'color_blue' );
+$tx->insert( 'insert', " menu.\n\nThe file selection window changes to a progress window where you can monitor the status of the restore.  The restore is finished when you see the message 'tkreload2 status = 0' in the progress window (if the status value is not zero then something went awry). Exit this application by selecting " );
+$tx->insert( 'insert', 'Quit', 'color_blue' );
+$tx->insert( 'insert', " from the " );
+$tx->insert( 'insert', 'File', 'color_blue' );
+$tx->insert( 'insert', " menu.\n" );
+
+# Top Frame contains the search string LabEntry, starting tape VSN list
+# BrowseEntry and the DTE BrowseEntry.
+
+# User(s).
+
+$f1 = $mw->Frame->pack( qw/ -fill x -expand 1 -pady 5/ );
+my $le = $f1->LabEntry(
+    -label           => "User(s)",
+    -labelForeground => 'red',
+    -labelPack       => [qw/-side left/],
+    -textvariable    => \$user,
+);
+$le->pack(qw/ -side left -expand 1 /);
+my $le_watch = Tie::Watch->new(
+    -variable => \$user,
+    -store    => sub {
+	my( $self ,$new_val ) = @_;
+	$le->configure( -labelForeground => 'blue' ),
+	$self->Store( $new_val );
+    },
+);
+if( $#ARGV > -1 ) {
+    $user = join( ' ', @ARGV ) if $#ARGV > -1;
+    $le->icursor( 'end' );
+}
+$le->focus;
+
+# Tape VSN.
+
+my $f1_middle = $f1->Frame;
+my $la = $f1_middle->Label(-text => 'Tape VSN', -foreground => 'red' );
+my $be = $f1_middle->BrowseEntry(
+    -autolistwidth => 1,
+    -font          => 'fixed',
+    -textvariable  => \$tape,
+);
+$be->Subwidget('entry')->configure( qw/ -width 25 / );
+$be->configure( -browsecmd => sub{ $la->configure( -foreground => 'blue' ) } );
+$f1_middle->pack( qw/ -side left -expand 1 / );
+$la->pack(qw/ -side left /);
+$be->pack(qw/ -side left /);
+
+# DTE.
+
+my $f1_right = $f1->Frame;
+my $ld = $f1_right->Label( -text => 'DTE', -foreground => 'red' );
+my $dv = $f1_right->BrowseEntry(
+    -autolistwidth => 1,
+    -font          => 'fixed',
+    -textvariable  => \$dte,
+);
+$dv->insert( qw/ 2 0 1 / );
+$dv->configure( -browsecmd => sub{ $ld->configure( -foreground => 'blue' ) } );
+$f1_right->pack( qw/ -side right -expand 1 / );
+$ld->pack(qw/ -side left /);
+$dv->pack(qw/ -side left /);
+
+# Do a wildcard 'ls' to get all the version 2 DB names, then uniq them to
+# get a list of real VSNs (e.g. drop the ':file#.gz' tags.
+
+my $ls = 'cd /root/admin/backup/db; /bin/ls -al *:* | /usr/local/bin/perl -ne \'s/(\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+)//; s/(:\d+\.gz)//; print\' | /usr/bin/uniq -f 3';
+chomp( my @dbs = `$ls` );
+$be->insert('end', @dbs);
+#$tape = $dbs[0];
+
+# Bottom Frame is a scrolled Listbox that displays the results of a DB
+# search.  Click on the desired files to restore.
+
+$f2 = $mw->Frame->pack;
+$lb = $f2->Scrolled('Listbox',
+    -font       => '9x15',
+    -height     => 24,
+    -width      => 132,
+    -scrollbars => 'sw',
+    -selectmode => 'multiple',
+)->pack;
+$lb->insert( 'end', ' File                                                                      VSN:file#  Date                                Size' );
+
+# Create the Balloon widget so we can provide balloon help.
+
+$bh = $mw->Balloon(qw/-initwait 100 -state balloon/);
+
+$bh->attach( $le, -balloonmsg => 'Enter a search string, typically a user name', -balloonposition => 'mouse' );
+$bh->attach( $la, -balloonmsg => 'Select a starting VSN based on backup date', -balloonposition => 'mouse' );
+$bh->attach( $be, -balloonmsg => 'Select a starting VSN based on backup date', -balloonposition => 'mouse' );
+$bh->attach( $mb, -balloonmsg => 'Quit the application at any time', -balloonposition => 'mouse' );
+$bh->attach( $ld, -balloonmsg => 'Select a tape drive', -balloonposition => 'mouse' );
+$bh->attach( $dv, -balloonmsg => 'Select a tape drive', -balloonposition => 'mouse' );
+
+MainLoop;
+
+sub lookup {
+
+    # egrep the backup listing for lines matching the search string
+    # and insert into the Listbox.
+
+    $lb->delete('1.0' => 'end');
+
+    do {
+	$lb->messageBox(
+            -message => 'Some or all of User(s), Tape VSN, DTE, are missing',
+            -popover => $mw,				 
+            -title   => 'Missing Form Data',
+            -type    => 'OK',
+        );
+	return;
+    } unless defined $user and defined $tape and defined $dte;
+
+    do {
+	$lb->messageBox(
+            -message => 'User name must be >= 4 characters',
+            -popover => $mw,				 
+            -title   => 'Invalid User Name',
+            -type    => 'OK',
+        );
+	return;
+    } unless length $user >= 4;
+
+    my $t = substr $tape, 13;
+    my $regex ='';
+    foreach ( split( ' ', $user ) ) {
+	$regex .= $_ . '[/ ]|';
+    }
+    $regex =~ s/\|$//;
+    $mw->Busy( -recurse => 1 );
+    my (@results) = `/bin/zcat $root_db/${t}:*.gz | /bin/egrep '$regex'`;
+    $mw->Unbusy;
+    chomp @results;
+
+    # Commify file sizes.
+
+    foreach (@results) {
+	s/(.*\s+)(\d+)$/sprintf("%s%15s", $1, &ctu($2))/e;
+    }
+
+    $lb->insert('end', @results);
+    
+    $bh->attach( $lb, -balloonmsg => 'Click to make multiple reload selections',
+		 -balloonposition => 'mouse' );
+
+} # end lookup
+
+sub quit {
+
+    # Display a final reminder detailing where the files were restored,
+    # and what manual intervention might be required.
+
+    $mw->messageBox(
+        -font       => 'fixed',
+        -message    => "Some final notes:\n\nIf files have been restored, they reside below the directory '$root_backup/reload/'.\n\nSo, for instance, if you reloaded 'c/lusol/lidie-isa-dog', then look for '$root_backup/reload/c/lusol/lidie-isa-dog'.\n\nTo complete this restore, some sort of manual intervention is required.  Perhaps a recursive copy followed by a chown, or maybe just moving a freshly reloaded INBOX to the user's home directory - it's a very fluid situation!\n\nCall Lide or Roseman for help ... good luck.",
+        -popover    => $mw,				 
+        -title      => 'Restore Complete',
+        -type       => 'ok',
+	-wraplength => '6i',
+    );
+
+    $mw->destroy;
+
+} # end quit
+
+sub reload {
+
+    # Through a dialog, tell the operator which tapes to load, then
+    # execute our reload helper program and pass it the file name(s)
+    # containing the list of files to reload.
+
+    my (@sel) = $lb->curselection;
+    shift @sel if defined $sel[0] and $sel[0] == 0; # ignore the header line
+
+    if (not @sel) {
+	$lb->messageBox(
+            -message => 'You have not selected any files to reload.',
+            -popover => $mw,				 
+            -title   => 'No Files To Reload',
+            -type    => 'OK',
+        );
+	return;
+    }
+
+    # Fetch all the selection indices, get the Listbox entries, and
+    # trim leading and trailing spaces.
+    #
+    # Extract the list of tape VSNs from the selections.  Ideally, we'd
+    # like to mount just the required tapes, but, for now, mount the 
+    # first, and load subsequent tapes serially.  We're guaranteed to
+    # read all the requested files, it may just take longer ...
+
+    @files   = ();
+    @file_nums = ();
+    @vsns    = ();
+    my @data = ();
+    my $max_file_num = 0;
+    
+    foreach my $index (@sel) {
+	$_ = $lb->get($index);
+	my ($f, $v, $file_num) = /^(.*)= (\S+):(\d+)/;
+	$f =~ s/^\s+//;
+	$f =~ s/\s+$//;
+	push @files, $f;
+	push @vsns, $v;
+	push @file_nums, $file_num;
+	$max_file_num = $file_num if $file_num > $max_file_num;	# the tape file count is variable
+    }
+
+    # Remove duplicate VSNs while retaining the original ordering.
+    # Ask for the go-ahead to begin the restore ...
+
+    my $prev = "not equal to $vsns[0]";
+    @vsns = grep ($_ ne $prev && ($prev = $_, 1), @vsns);
+
+    my $answer = $lb->messageBox(
+        -font       => 'fixed',
+        -message    => "Ensure that VSNs '$vsns[0]' through end-of-set are placed sequentially in the magazine, and that VSN '$vsns[0]' is loaded in DTE $dte.\n\nReady to reload the following files from DTE $dte?\n\n" . join(", ", @files),
+        -popover    => $mw,				 
+        -title      => 'Ready To Reload Files',
+        -type       => 'yesno',
+        -wraplength => '6i',
+    );
+
+    return unless $answer =~ /yes/i;
+
+    $f1->packForget;
+    $lb->packForget;
+
+    # Open $max_file_num - 1 files, these files will contain a list of files to restore for each tape file.
+
+    my @xfh;			# list of file handles
+    my @xfn;			# list of file names
+    foreach my $n ( 2 .. $max_file_num ) {
+	my $xfn = "/tmp/tkreload-xfile-$n-$$";
+	push @xfn, $xfn;
+	my $fh = IO::File->new( $xfn, 'w' );
+	die "cannot open xfile $xfn!" unless defined $fh;
+	$xfh[ $n ] = $fh;
+    }
+
+    for( my $n = 0; $n <= $#files; $n++ ) {
+	my $fh = $xfh[ $file_nums[ $n ] ];
+	print $fh "$files[ $n ]\n"; 
+    }
+    $xfh[ $_ ]->close foreach ( 2 .. $max_file_num );
+
+    my $exec = $f2->ExecuteCommand(
+        -command => "$root_bin/tkreload-helper2 $dte " . join( ' ', @xfn ),
+        -width   => 132,
+    )->pack(qw/-side top -fill both -expand 1/);
+
+    $exec->execute_command;
+    $exec->configure(-command => "echo restore complete");
+
+} # end reload
+
+# Auxilliary subroutines.
+
+sub ctu {
+
+    # ctu($num) or ctu($fmt, $num);
+    #     Returns string of $num with commas
+    # Ex: ctu("1234567890.01234567") returns 1,234,567,890.01234567
+    #             - or -
+    #     Returns string of $num with commas rounded using $fmt
+    # Ex: ctu("%.2f", "1234567890.01234567") returns 1,234,567,890.01
+    #
+    # From Rick Flynn (rick@cb18.sbi.com).  93/06/04
+
+    my ($fmt, $num, $frac) = $#_ ? ($_[0], ($_[1] =~ /([^.]*)(\..*)?/)) : ('', ($_[0] =~ /([^.]*)(\..*)?/));
+    1 while $num =~ s/(.*\d)(\d\d\d)/$1,$2/;
+    $#_ ? return( $num . (sprintf($fmt, $frac) =~ /[^.](.*)/)[0] ) : return( $num . (defined $frac ? $frac : '') );
+
+} # end ctu

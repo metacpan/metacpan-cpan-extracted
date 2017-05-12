@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_triead_owner">
+		<title>TrieadOwner reference</title>
+
+		<indexterm>
+			<primary>TrieadOwner</primary>
+		</indexterm>
+		<para>
+		The TrieadOwner is defined in <pre>app/TrieadOwner.h</pre>. 
+		Its constructor is
+		protected, the normal way of constructing is by calling
+		<pre>App::makeTriead()</pre>. This is also called <quote>defining a Triead</quote>.
+		</para>
+
+		<para>
+		TrieadOwner is an Starget, and must be accessed only from the thread
+		that owns it (though it's possible to create it in the parent thread
+		and then pass to the actual owner thread, as long as the
+		synchronization between the threads is done properly).
+		</para>
+
+<pre>
+Triead *get() const;
+</pre>
+
+		<para>
+		Get the public side if the Triead. In &Cpp;, unlike Perl, the Triead
+		methods are not duplicated in TrieadOwner. So they are accessed through
+		<pre>get()</pre>, and for example to get the Triead name, call
+		<pre>to->get()->getName()</pre>. The TrieadOwner holds a reference to Triead, so
+		the Triead object will never get destroyed as long as the TrieadOwner
+		is alive.
+		</para>
+
+<pre>
+App *app() const;
+</pre>
+
+		<para>
+		Get the App where this Triead belongs. The TrieadOwner holds a
+		reference to App, so the App object will never get destroyed as long as
+		the TrieadOwner is alive.
+		</para>
+
+<pre>
+bool isRqDead() const;
+</pre>
+
+		<para>
+		Check whether this triead has been requested to die.
+		</para>
+
+<pre>
+void requestMyselfDead();
+</pre>
+
+		<para>
+		Request this thread itself to die (see the extended description in the
+		Perl reference).
+		</para>
+
+<pre>
+Unit *unit() const;
+</pre>
+
+		<para>
+		Get the main unit of this Triead. It has the same name as the Triead itself.
+		</para>
+
+<pre>
+void addUnit(Autoref<Unit> u);
+</pre>
+
+		<para>
+		Keep track of an additional unit. Adding a unit multiple times has no
+		effect. See the other implications in the Perl reference.
+		</para>
+
+<pre>
+bool forgetUnit(Unit *u);
+</pre>
+
+		<para>
+		Forget about an additional unit. If the unit is already unknown, has no
+		effect. The main unit can not be forgotten.
+		</para>
+
+<pre>
+typedef list<Autoref<Unit> > UnitList;
+const UnitList &listUnits() const;
+</pre>
+
+		<para>
+		List the tracked units. The main unit is always included at the front
+		of the list.
+		</para>
+
+<pre>
+void markConstructed();
+</pre>
+
+		<para>
+		Advance the Triead state to Constructed. Repeated calls have no effect.
+		</para>
+
+<pre>
+void markReady();
+</pre>
+
+		<para>
+		Advance the Triead state to Ready. Repeated calls have no effect. The
+		advancement is cumulative: if the Triead was not constructed yet, it
+		will be automatically advanced first to Constructed and then to Ready.
+		If this is the last Triead to become ready, it will trigger the App
+		topology check, and if the check fails, abort the App and throw an
+		Exception.
+		</para>
+
+<pre>
+void readyReady();
+</pre>
+
+		<para>
+		Advance the Triead to the Ready state, and wait for all the Trieads to
+		become ready. The topology check applies in the same way as in
+		<pre>markReady()</pre>.
+		</para>
+
+<pre>
+void markDead();
+</pre>
+
+		<para>
+		Advance the Triead to the Dead state. If this Triead was not Ready yet
+		and it's the last one to become so, the topology check will run. If the
+		topology check fails, the App will be aborted but <pre>markDead()</pre> will not
+		throw an exception.
+		</para>
+
+		<para>
+		This method is automatically called from the TrieadOwner destructor, so
+		most of the time there is no need to call it explicitly.
+		</para>
+
+		<para>
+		It also clears all the tracked units.
+		</para>
+
+<pre>
+void abort(const string &msg) const;
+</pre>
+
+		<para>
+		Abort the App. The name of this thread will be forwarded to the App
+		along with the error message. The error message may be multi-line.
+		</para>
+
+<pre>
+Onceref<Triead> findTriead(const string &tname, bool immed = false);
+</pre>
+
+		<para>
+		Find a Triead in the App by name. The flag <pre>immed</pre> controls whether this
+		method may wait. If <pre>immed</pre> is false, and the target thread is not
+		constructed yet (but at least declared), the method will sleep until it
+		becomes constructed, and then returns it. If the target thread is not
+		declared, it will throw an Exception. If <pre>immed</pre> is true, the look-up is
+		immediate: it will return the thread even if it's not constructed but
+		is at least defined. If it's not defined (even if it's declared), an
+		Exception will be thrown. The look-up of this Triead itself is always
+		immediate, irrespective of the <pre>immed</pre> flag, to avoid deadlocking
+		itself.
+		</para>
+
+		<para>
+		An Exception may also be thrown if a circular sequence of Trieads
+		deadlocks waiting for each other.
+		</para>
+
+<pre>
+Onceref<Facet> exportNexus(Autoref<Facet> facet, bool import = true);
+</pre>
+
+		<para>
+		Export a Nexus. The Nexus definition is constructed as a Facet object,
+		which is then used by this method to construct and export the Nexus.
+		The same argument Facet reference is then returned back as the result.
+		The <pre>import</pre> flag tells, whether the Nexus is to be also imported back by
+		connecting the same original Facet object to it. If import is false,
+		the original Facet reference is still returned back but it can't be
+		used for anything, and can only be thrown away. The direction of the
+		import (reading or writing) is defined in the Facet, as well as the
+		nexus name and all the other information.
+		</para>
+
+		<para>
+		Throws an Exception on any errors, in particular on the duplicate facet
+		names within the Triead.
+		</para>
+
+<pre>
+Onceref<Facet> exportNexusNoImport(Autoref<Facet> facet);
+</pre>
+
+		<para>
+		A convenience wrapper around exportNexus() with <pre>import=false</pre>.
+		</para>
+
+<pre>
+Onceref<Facet> importNexus(const string &tname,
+	const string &nexname, const string &asname,
+	bool writer, bool immed = false);
+</pre>
+
+		<para>
+		Import a Nexus from another Triead. <pre>tname</pre> is the name of the other
+		thread, <pre>nexname</pre> is the name of nexus exported from it, <pre>asname</pre> is the
+		local name for the imported facet (<quote></quote> means <quote>same as <pre>nexname</pre></quote>), the
+		<pre>writer</pre> flag determines if the import is for writing, and the <pre>immed</pre> flag
+		has the same meaning as in <pre>findTriead()</pre>. The import of a nexus involves
+		finding its exporting thread, and the <pre>immed</pre> flag controls, how this
+		finding is done.
+		</para>
+
+		<para>
+		Throws an Exception if anything is not found, or the local import name
+		conflicts with another imported facet.
+		</para>
+
+<pre>
+Onceref<Facet> importNexusImmed(const string &tname,
+	const string &nexname, const string &asname, bool writer);
+Onceref<Facet> importReader(const string &tname,
+	const string &nexname, const string &asname = "", bool immed=false);
+Onceref<Facet> importWriter(const string &tname,
+	const string &nexname, const string &asname = "", bool immed=false);
+Onceref<Facet> importReaderImmed(const string &tname,
+	const string &nexname, const string &asname = "");
+Onceref<Facet> importWriterImmed(const string &tname,
+	const string &nexname, const string &asname = "");
+</pre>
+
+		<para>
+		Convenience wrappers for <pre>importNexus()</pre>, providing the default arguments
+		and the more mnemonic names.
+		</para>
+
+<pre>
+typedef map<string, Autoref<Nexus> > NexusMap;
+void exports(NexusMap &ret) const;
+</pre>
+
+		<para>
+		Get the nexuses exported here. The map argument will be cleared and
+		refilled with the new values.
+		</para>
+
+<pre>
+typedef map<string, Autoref<Facet> > FacetMap;
+void imports(FacetMap &ret) const;
+</pre>
+
+		<para>
+		Get the facets imported here. The map argument will be cleared and
+		refilled with the new values.
+		</para>
+
+<pre>
+NexusMaker *makeNexusReader(const string &name);
+NexusMaker *makeNexusWriter(const string &name);
+NexusMaker *makeNexusNoImport(const string &name);
+</pre>
+
+		<para>
+		A convenient way to build the nexuses for export in a chained fashion.
+		The name argument is the nexus name. The NexusMaker is an opaque class
+		that has the same building methods as a Facet, plus the method
+		<pre>complete()</pre> that finishes the export. This call sequence is more
+		convenient than building a Facet and then exporting it. For example:
+		</para>
+
+<pre>
+Autoref<Facet> myfacet = ow->makeNexusReader("my")
+	->addLabel("one", rt1)
+	->addFromLabel("two", lb2)
+	->setContext(new MyFnContext)
+	->setReverse()
+	->complete();
+</pre>
+
+		<para>
+		Only one nexus may be built like this at a time, since there is only
+		one instance of NexusMaker per TrieadOwner that gets reused over and
+		over. It keeps the Facet instance being built in it. If you don't
+		complete the build, that Facet instance will be left sitting around
+		until another <pre>makeNexus*()</pre> call, when it will get thrown away. But in
+		general if you do the calling in the sequence as shown, you can't
+		forget to call <pre>complete()</pre> at the end, since otherwise the return type
+		would not match and the compiler will fail.
+		</para>
+
+<pre>
+bool flushWriters();
+</pre>
+
+		<para>
+		Flush all the writer facets. Returns true on the successfull
+		completion, false if the thread was requested to die, and thus all the
+		output was thrown away.
+		</para>
+
+<pre>
+bool nextXtray(bool wait = true, const struct timespec &abstime =
+	*(const struct timespec *)NULL);
+</pre>
+
+		<para>
+		Read and process the next Xtray. Automatically calls the <pre>flushWriters()</pre>
+		after processing. The rest works in the same way as described in Perl,
+		however this is a combination of Perl's <pre>nextXtray()</pre>, <pre>nextXtrayNoWait()</pre>
+		and <pre>nextXtrayTimeLimit()</pre> in one method. If <pre>wait</pre> is false, this method will never
+		wait. If <pre>wait</pre> is true and the <pre>abstime</pre> reference is not NULL, it might
+		wait but not past that absolute time. Otherwise it will wait until the
+		data becomes available or the thread is requested to die.
+		</para>
+
+		<para>
+		Returns true if an Xtray has been processed, false if it wasn't (for
+		any reason, a timeout expiring or thread being requested to die).
+		</para>
+
+<pre>
+bool nextXtrayNoWait();
+</pre>
+
+		<para>
+		A convenience wrapper over <pre>nextXtray(false)</pre>.
+		</para>
+
+<pre>
+bool nextXtrayTimeout(int64_t sec, int32_t nsec);
+</pre>
+
+		<para>
+		Another convenience wrapper over <pre>nextXtray()</pre>: read and process an
+		Xtray, with a timeout limit. The timeout value consists of the seconds
+		and nanoseconds parts.
+		</para>
+
+<pre>
+void mainLoop();
+</pre>
+
+		<para>
+		Run the main loop, calling <pre>nextXtray()</pre> repeatedly until the thread is
+		requested to die.
+		</para>
+
+<pre>
+bool isRqDrain();
+</pre>
+
+		<para>
+		Check if a drain is currently requested by any thread (and applies to
+		this thread). In case if an exclusive drain is requested with the
+		exclusion of this thread, this method will return false.
+		</para>
+
+<pre>
+void requestDrainShared();
+void requestDrainExclusive();
+void waitDrain();
+bool isDrained();
+void drainShared();
+void drainExclusive();
+void undrain();
+</pre>
+
+		<para>
+		The drain control, same as in Perl. These methods are really wrappers
+		over the corresponding App methods. And generally a better idea is to
+		do the scoped drains with AutoDrain rather than to call these methods
+		directly.
+		</para>
+
+		<para>
+		The &Cpp; API provides no methods for the file descriptor tracking as
+		such. Instead these methods are implemented in the class FileInterrupt.
+		TrieadOwner has a public field
+		</para>
+
+<pre>
+Autoref<FileInterrupt> fileInterrupt_;
+</pre>
+
+		<indexterm>
+			<primary>FileInterrupt</primary>
+		</indexterm>
+		<indexterm>
+			<primary>TrieadJoin</primary>
+		</indexterm>
+		<para>
+		to keep an instance of the interruptor. TrieadOwner itself has no use
+		for it, nor does any other part of Triceps, it's just a location to
+		keep this reference for the convenience of the application developer.
+		The Perl API makes use of this location.
+		</para>
+
+		<para>
+		But how does the thread then get interrupted when it's requested to
+		die? The answer is that the TrieadJoin object also has a reference to
+		the FileInterrupt object, and even creates that object in its own
+		constructor. So when a joiner method is defined for a thread, that
+		supplies the App with the access to its interruptor as well. And to put
+		the file descriptors into the FileInterrupt object, you can either keep
+		a direct reference to it somewhere in your code, or copy that reference
+		into the TrieadOwner object.
+		</para>
+
+		<para>
+		Here is for example how the Perl thread joiner is created for the
+		TrieadOwner inside the Perl implementation:
+		</para>
+
+<!-- TrieadOwner.xs -->
+<pre>
+string tn(tname);
+Autoref<TrieadOwner> to = appv->makeTriead(tn, fragname);
+PerlTrieadJoin *tj = new PerlTrieadJoin(appv->getName(), tname,
+	SvIOK(tid)? SvIV(tid): -1,
+	SvIOK(handle)? SvIV(handle): 0,
+	testfail);
+to->fileInterrupt_ = tj->fileInterrupt();
+appv->defineJoin(tn, tj);
+</pre>
+
+		<para>
+		This is somewhat cumbersome, but the native &Cpp; programs can create
+		their threads using the class BasicPthread that takes care of this and
+		more. 
+		</para>
+	</sect1>

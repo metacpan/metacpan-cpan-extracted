@@ -1,0 +1,466 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_table">
+		<title>Table reference</title>
+
+		<indexterm>
+			<primary>Table</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Gadget</primary>
+		</indexterm>
+		<para>
+		The Table is defined in <pre>table/Table.h</pre>. It inherits from Gadget, with
+		the table's output label being the gadget's output label. Naturally,
+		it's an Starget and usable from one thread only.
+		</para>
+
+		<indexterm>
+			<primary>TableType</primary>
+		</indexterm>
+		<para>
+		Its constructor is not public, and it's created from the TableType
+		with its  method <pre>makeTable()</pre>:
+		</para>
+
+<pre>
+Autoref<Table> t = tabType->makeTable(unit, "t");
+</pre>
+
+		<para>
+		The arguments are the unit where the table will belong and the name of
+		the table.
+		</para>
+
+		<para>
+		Yeah, it's kind of weird that in Perl the method <pre>makeTable()</pre> is defined
+		on Unit, and in &Cpp; on TableType. But if I remember correctly, it has
+		to do with avoiding the circular dependency in the &Cpp; header files. 
+		</para>
+
+		<para>
+		For the reference, that TableType method is:
+		</para>
+
+<pre>
+Onceref<Table> makeTable(Unit *unit, const string &name) const;
+</pre>
+
+		<para>
+		The table has a large number of methods, grouped into multiple subsets.
+		</para>
+
+<pre>
+const string &getName() const;
+Unit *getUnit() const;
+Label *getLabel() const;
+</pre>
+
+		<para>
+		These methods are inherited from the Gadget. The only special thing to
+		remember is that <pre>getLabel()</pre> returns the table's output label.
+		Technically, <pre>getName()</pre> has an overriding implementation in the Table,
+		to return the table's proper name while its output label and the underlying
+		gadget have the suffix <quote>.out</quote> appended to their name.
+		</para>
+
+<pre>
+const TableType *getType() const;
+const RowType *getRowType() const;
+const RowHandleType *getRhType() const;
+</pre>
+
+		<indexterm>
+			<primary>RowType</primary>
+		</indexterm>
+		<indexterm>
+			<primary>RowHandleType</primary>
+		</indexterm>
+		<para>
+		Get back the type of the table, of its rows, and of its row handles.
+		There is not much direct use for the RowHandleType, the Table uses it
+		internally to construct the RowHandles.
+		</para>
+
+<pre>
+Label *getInputLabel() const;
+Label *getPreLabel() const;
+Label *getDumpLabel() const;
+Label *getAggregatorLabel(const string &agname) const;
+</pre>
+
+		<para>
+		Get the assorted labels (remember, <pre>getLabel()</pre> inherited from Gadget
+		is used for the output label). The aggregator label getter takes the name of
+		the aggregator (as was defined in the TableType) as an argument.
+		</para>
+
+<pre>
+FnReturn *fnReturn() const;
+</pre>
+
+		<indexterm>
+			<primary>FnReturn</primary>
+		</indexterm>
+		<para>
+		Get the FnReturn of this table's outputs. It gets created and
+		remembered on the first call, and the subsequent calls return the same
+		object.  It has a few labels with the fixed names: <quote>out</quote>, <quote>pre</quote> and
+		<quote>dump</quote>, and a label for each aggregator with the aggregator's name. It
+		could throw an Exception if you name an aggregator to conflict with one
+		of the fixed labels, which you should not. The FnReturn's name will be
+		<quote><i>tableName</i>.fret</quote>.
+		</para>
+
+		<para>
+		Next go the operations on the table (and of course the table may also
+		be modified by sending the rowops to its input label).
+		</para>
+
+<pre>
+RowHandle *makeRowHandle(const Row *row) const;
+</pre>
+
+		<indexterm>
+			<primary>RowHandle</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Rhref</primary>
+		</indexterm>
+		<para>
+		Create a row handle for a row. Remember, the row handles are
+		reference-counted, and also have the special kind of references with
+		Rhref. So the returned pointer should be stored in an Rhref. The row
+		handle created will not be inserted into the table yet.
+		</para>
+
+<pre>
+bool insert(RowHandle *rh);
+</pre>
+
+		<para>
+		Insert a row handle into the table. This invokes all the row
+		replacement policies along the way. If the handle is already in the
+		table, does nothing and returns false. May also return false if a
+		replacement policy refuses the row, but in practice there are no such
+		refusing policies yet. Otherwise returns true.
+		</para>
+
+		<para>
+		It may throw an Exception. It may throw directly if the row handle
+		doesn't belong to this table or propagate the exception up from the
+		functions it calls: since the
+		execution involves calling the output labels and such, an exception
+		might be thrown from there.
+		</para>
+
+<pre>
+bool insertRow(const Row *row);
+</pre>
+
+		<para>
+		The version that combines the row handle construction and insertion.
+		Unlike Perl, in &Cpp; this method is named differently instead of
+		overloading. The comments about the replacement policies and return
+		code, and about exceptions apply here too.
+		</para>
+
+<pre>
+void remove(RowHandle *rh);
+</pre>
+
+		<para>
+		Remove a row handle from the table. If the handle is not in the table,
+		silently does nothing. May throw an Exception.
+		</para>
+
+<pre>
+bool deleteRow(const Row *row);
+</pre>
+
+		<para>
+		Find a matching row and delete it (internally this involves creating
+		a new RowHandle for the argument row and finding it in the first leaf
+		index by value, and disposing of that temporary row handle afterwards). 
+		Returns true if the row was found and removed, false if not found. May
+		throw an Exception.
+		</para>
+
+<pre>
+void clear(size_t limit = 0);
+</pre>
+
+		<para>
+		Clear the table by removing all the rows from it. The removed rows are
+		sent as usual to the <quote>pre</quote> and <quote>out</quote> labels. If the limit is not 0, no
+		more than that number of the rows will be removed. The rows are removed
+		in the usual order of the first leaf index.
+		</para>
+
+		<para>
+		Next go the iteration methods. The rule of thumb is that for them a
+		NULL row handle pointer means <quote>end of iteration</quote> or <quote>not found</quote> (or
+		sometimes <quote>bad arguments</quote>). And they can handle silently the NULL row handles
+		on the input, just returning NULL on the output.
+		</para>
+
+<pre>
+RowHandle *begin() const;
+</pre>
+
+		<para>
+		Get the first row handle in the default order of the first leaf index.
+		If the table is empty, returns NULL.
+		</para>
+
+<pre>
+RowHandle *beginIdx(IndexType *ixt) const;
+</pre>
+
+		<para>
+		Get the first handle in the order of a particular index. The index type
+		must belong to this table's type. For an incorrect index type it
+		returns NULL (perhaps in the future this will be changed to an
+		exception).
+		</para>
+
+<pre>
+RowHandle *next(const RowHandle *cur) const;
+RowHandle *nextIdx(IndexType *ixt, const RowHandle *cur) const;
+</pre>
+
+		<para>
+		Get the next row handle in the order of the default or specific index.
+		Returns NULL after the last handle. It's safe to pass the current row
+		handle as NULL, the result will be NULL, as well as on any other error.
+		</para>
+
+<pre>
+RowHandle *firstOfGroupIdx(IndexType *ixt, const RowHandle *cur) const;
+RowHandle *lastOfGroupIdx(IndexType *ixt, const RowHandle *cur) const;
+</pre>
+
+		<para>
+		Get the first or last row handle in the same group as the current row
+		according to a non-leaf index. The NULL current handle will cause NULL
+		returned. See the details in the description of the Perl API.
+		</para>
+
+<pre>
+RowHandle *nextGroupIdx(IndexType *ixt, const RowHandle *cur) const;
+</pre>
+
+		<para>
+		Get the first row handle of the next group. The return will be NULL if
+		the current group was the last one, or if the current handle is NULL.
+		</para>
+
+		<para>
+		The iteration loops may look as:
+		</para>
+
+<pre>
+for (RowHandle *iter = t->begin(); iter != NULL; iter = t->next(iter)) {
+	...
+}
+
+for (Rhref iter(t, t->beginIdx(level3)); !iter->isNull();
+		iter = t->nextIdx(level3, iter)) {
+	...
+}
+</pre>
+
+		<para>
+		Note that if the table does not change during the iteration (or at the
+		very least if the row handle at the iterator is not being affected by
+		the changes), the iterator doesn't have to be kept in an Rhref.
+		A pointer to RowHandle is perfectly adequate and more efficient since
+		it doesn't modify the reference counts. However you must be perfectly
+		sure that the table will not be changed by any of the code in any
+		labels called from the iteration loop.
+		</para>
+
+		<para>
+		Unlike Perl, there are no methods on RowHandle that produce the next
+		RowHandle in the table, all the <pre>next*()</pre> methods are defined on the Table.
+		It's possible to define them on Rhref, and will probably be done in the future.
+		</para>
+
+		<para>
+		Next go the size operations:
+		</para>
+
+<pre>
+size_t size() const;
+</pre>
+
+		<para>
+		Get the number of rows currently in the table.
+		</para>
+
+<pre>
+size_t groupSizeIdx(IndexType *ixt, const RowHandle *what) const;
+</pre>
+
+		<para>
+		Get the size of the group where the handle belongs according to a
+		non-leaf index. If any arguments are wrong, returns 0. The row handle
+		doesn't have to be in the table. If it isn't in the table, the method
+		will find the group where the row would belong if it were inserted and
+		return its current size.
+		</para>
+
+<pre>
+size_t groupSizeRowIdx(IndexType *ixt, const Row *what) const;
+</pre>
+
+		<para>
+		A convenience version that makes a row handle from a row, finds the
+		group size and disposes of the handle.
+		</para>
+
+		<para>
+		Next go the finding methods:
+		</para>
+
+<pre>
+RowHandle *find(const RowHandle *what) const;
+RowHandle *findIdx(IndexType *ixt, const RowHandle *what) const;
+</pre>
+
+		<para>
+		Find the handle of a matching row according to the default (first leaf)
+		or the specific index, or return NULL if not found.
+		</para>
+
+<pre>
+RowHandle *findRow(const Row *what) const;
+RowHandle *findRowIdx(IndexType *ixt, const Row *what) const;
+</pre>
+
+		<para>
+		The convenience versions that create a temporary row handle and then
+		perform the search.
+		</para>
+
+		<sect2 id="sc_cpp_table_dump">
+		<title>Data dump</title>
+
+		<para>
+		The dump API of the table sends the whole contents of the table to
+		the <quote>dump</quote> label, thus making any labels connected to it perform an
+		implicit iteration over the table.
+		</para>
+
+<pre>
+void clear(size_t limit = 0); 
+</pre>
+
+		<para>
+		Deletes the rows from the table.
+		If <pre>limit</pre> is 0, the whole table gets cleared. If it's greater
+		than 0, no more than this number of rows will be deleted. 
+		The deletion happens in the usual order of the first
+		leaf index, and the rowops are sent to the table's output label as
+		usual. It's really the same thing as running a loop over all the row
+		handles and removing them.
+		</para>
+
+<pre>
+void dumpAll(Rowop::Opcode op = Rowop::OP_INSERT) const;
+void dumpAllIdx(IndexType *ixt, Rowop::Opcode op = Rowop::OP_INSERT) const;
+</pre>
+
+		<indexterm>
+			<primary>opcode</primary>
+		</indexterm>
+		<para>
+		The dump can go in the order of default or specific index. The opcode
+		argument is used for the rowops sent on the dump label. Using the
+		argument index type of NULL makes <pre>dumpAllIdx()</pre> use the default index
+		and work just like <pre>DumpAll()</pre>. In the future there probably will also be
+		methods that dump only a group of records.
+		</para>
+
+		<para>
+		As usual, the general logic of the methods matches the Perl API unless
+		said otherwise. Please refer to the Perl API description for the
+		details and examples.
+		</para>
+
+		</sect2>
+		<sect2 id="sc_cpp_table_sticky">
+		<title>Sticky errors</title>
+
+		<indexterm>
+			<primary>sticky error</primary>
+		</indexterm>
+		<para>
+		The table
+		internals contain a few places where the errors can't just throw an
+		Exception because it will mess up the logic big time, most specifically
+		the comparator functions for the indexes. The Triceps built-in indexes
+		can't encounter any errors in the comparators but the user-defined
+		ones, such as the Perl Sorted Index, can. Previously there was no way
+		to report these errors other than print the error message and then
+		either continue pretending that nothing happened or abort the program.
+		</para>
+
+		<para>
+		The sticky errors provide a way out of this sticky situation. When an
+		index comparator encounters an error, it reports it as a sticky error
+		in the table and then returns false. The table logic then unrolls like
+		nothing happened for a while, but before returning from the
+		user-initiated method it will find this sticky error and throw an
+		Exception at a safe time. Obviously, the incorrect comparison means
+		that the table enters some messed-up state, so all the further
+		operations on the table will keep finding this sticky error and throw
+		an Exception right away, before doing anything. The sticky error can't
+		be unstuck. The only way out of it is to just discard the table and
+		move on.
+		</para>
+
+<pre>
+void setStickyError(Erref err);
+</pre>
+
+		<para>
+		Set the sticky error from a location where an exception can not be
+		thrown, such as from the comparators in the indexes. Only the first
+		error sticks, all the others are ignored since (a) the table will be
+		dead and throwing this error in exceptions from this point on anyway
+		and (b) the comparator is likely to report the same error repeatedly
+		and there is no point in seeing multiple copies.
+		</para>
+
+<pre>
+Errors *getStickyError() const;
+</pre>
+
+		<para>
+		Get the table's sticky error. Normally there is no point in doing this
+		manually, but just in case.
+		</para>
+
+<pre>
+void checkStickyError() const;
+</pre>
+
+		<para>
+		If the sticky error has been set, throws an Exception with it. 
+		</para>
+		</sect2>
+	</sect1>
+

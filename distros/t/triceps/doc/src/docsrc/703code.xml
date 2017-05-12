@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_ref_code">
+		<title>Code helpers reference</title>
+
+		<indexterm>
+			<primary>code</primary>
+		</indexterm>
+		<indexterm>
+			<primary>compile</primary>
+		</indexterm>
+
+		<para>
+		As described in
+		<xref linkend="sc_code" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;,
+		many Triceps method accept the code references or source code snippets
+		as arguments. The user-defined templates are encouraged to do the same.
+		These code snippets can be compiled with the helper function:
+		</para>
+
+<pre>
+$code = Triceps::Code::compile($code_ref_or_source);
+$code = Triceps::Code::compile($code_ref_or_source, $description);
+</pre>
+
+		<para>
+		It takes either a code reference or a source code string as an argument
+		and returns the reference to the compiled code. If the argument was a
+		code reference, it just passes through unchanged. If it was a source
+		code snippet, it gets compiled (the text
+		gets the <pre>sub { ... }</pre> wrapper added around it implicitly).
+		</para>
+
+		<para>
+		If the argument was an <pre>undef</pre>, it also passes through unchanged. This is
+		convenient in case if the code is optional. But if it isn't then the
+		caller should check for <pre>undef</pre>.
+		</para>
+
+		<para>
+		If the compilation fails, the method confesses, and includes the error
+		and the source code into the message, in the same way as the XS methods
+		do.
+		</para>
+
+		<para>
+		The optional second argument can be used to provide information
+		about the meaning of the code for the error messages. If it's undefined
+		then the default is <quote>Code snippet</quote>.
+		</para>
+
+		<indexterm>
+			<primary>numalign</primary>
+		</indexterm>
+		<para>
+		The error messages reported by <pre>compile()</pre> include the
+		printout of the code with the line numbering. This printout
+		can also be produced directly with the method <pre>Triceps::Code::numalign()</pre>:
+		</para>
+
+<pre>
+$formatted_text = Triceps::Code::numalign($source_text, $indent);
+$formatted_text = Triceps::Code::numalign($source_text, $indent, $tabrepl);
+</pre>
+
+		<para>
+		<pre>$source_text</pre> is the source code to be formatted. <pre>$indent</pre> is the indentation
+		to be prepended to each line of the formatted code (before the line numbers,
+		and since the line numbers are printed as 4 characters, this might add
+		a bit extra visual indentation). The tab characters are replaced with
+		two spaces by default, or <pre>$tabrepl</pre> can be used to specify any other replacement
+		for them.
+		</para>
+
+		<para>
+		The code is also beautified a bit to make it more readable. The following
+		is done to it:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+			The empty lines at the front will be removed. <pre>numalign()</pre> is smart
+			enough to take the removed lines into account and show the numbers
+			as they were in the original code snippet.
+			You can also get the number of the removed
+			lines afterwards, from the global variable
+			<pre>$Triceps::Code::align_removed_lines</pre>.
+			</listitem>
+			<listitem>
+			The <quote>\n</quote> at the end of the snippet will be chomped. But only one, the
+			rest of the empty lines at the end will be left alone.
+			</listitem>
+			<listitem>
+			Then the <quote>baseline</quote> indenting of the code will be determined by
+			looking at the first three and last two lines. The shortest
+			non-empty indenting will be taken as the baseline. If some lines
+			examined start with spaces and some start with tabs, the lines
+			starting with tabs will be preferred as the baseline indenting.
+			</listitem>
+			<listitem>
+			The baseline indenting will be removed from the front of all lines.
+			If some lines in the middle of the code have a shorter indenting,
+			they will be left unchanged.
+			</listitem>
+			<listitem>
+			The tabs will be replaced by either the third argument or two spaces.
+			</listitem>
+			<listitem>
+			The line numbers will be prepended to the lines.
+			</listitem>
+			<listitem>
+			The indenting from the second argument of the function will be
+			prepended to the lines.
+			</listitem>
+		</itemizedlist>
+
+		<para>
+		Here is an example of use:
+		</para>
+
+<pre>
+confess "$myname: error in compilation of the generated function:\n  $@function text:\n"
+. Triceps::Code::numalign($gencode, "  ") . "\n";
+</pre>
+
+		<para>
+		It can produce an error message like this (with a deliberately introduced syntax error):
+		</para>
+
+<pre>
+Triceps::Fields::makeTranslation: error in compilation of the generated function:
+  syntax error at (eval 27) line 13, near "})
+"
+function text:
+     2 sub { # (@rows)
+     3   use strict;
+     4   use Carp;
+     5   confess "template internal error in Triceps::Fields::makeTranslation: result translation expected 1 row args, received " . ($#_+1)
+     6     unless ($#_ == 0);
+     7   # $result_rt comes at compile time from Triceps::Fields::makeTranslation
+     8   return $result_rt->makeRowArray(
+     9     $_[0]->get("one"),
+    10     $_[0]->get("two"),
+    11   );
+    12 })
+ at /home/babkin/w/triceps/trunk/perl/Triceps/blib/lib/Triceps/Fields.pm line 219
+    Triceps::Fields::makeTranslation('rowTypes', 'ARRAY(0x2943cb0)', 'filterPairs', 'ARRAY(0x2943b30)', '_simulateCodeError', 1) called at t/Fields.t line 205
+    eval {...} called at t/Fields.t line 204
+</pre>
+
+		<indexterm>
+			<primary>alignsrc</primary>
+		</indexterm>
+		<para>
+		The method <pre>Triceps::Code::alignsrc()</pre> is just like <pre>numalign()</pre>,
+		except that it doesn't prepend the line numbers but only improves the
+		alignment of the code lines:
+		</para>
+
+<pre>
+$formatted_text = Triceps::Code::alignsrc($source_text, $indent);
+$formatted_text = Triceps::Code::alignsrc($source_text, $indent, $tabrepl);
+</pre>
+
+	</sect1>

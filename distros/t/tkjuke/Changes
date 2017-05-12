@@ -1,0 +1,182 @@
+
+***** TODO LOG
+
+1) Are "-" legal barcode characters?  Fix the \w regex so
+   barcodes 1 slot-1 works.
+   Steve Lidie, sol0@lehigh.edu, 2002/07/02.
+
+
+***** CHANGE LOG
+
+
+***** 0.0.6 -> 1.0.0
+
+1) Enhance barcode simulation.
+   Steve Lidie, sol0@lehigh.edu, 2002/06/12.
+
+   Current barcode simulation is OK for small auto-loaders whose media
+   content is rather static.  Implement a new barcode scheme using a 
+   Perl DBM file (NDBM?).  This would allow dynamic updates as "juke"
+   manipulates the hardware.  A storage media's fake barcode
+   information lasts from the time the media is loaded and the operator
+   enters the barcode until the media is unloaded.
+
+   ********************* DONE, SOL, 2002/07/03 *****************************
+
+   Implemented using a SDBM database in version 0.0.6.  Barcodes are set
+   either by clicking on a media slot in tkjuke, or the juke command line.
+   See the juke POD for details.
+
+2) "juke loaded" must return a list of loaded barcodes.
+   Steve Lidie, sol0@lehigh.edu, 2002/06/12.
+
+   ********************* DONE, SOL, 2002/07/03 *****************************
+
+   Fixed in 0.0.6.
+
+
+***** 1.0.7, 2003/06/27
+
+1) Add EJECT_BEFORE_UNLOAD configuration options to offline a tape prior to
+   unloading it.
+
+2) JukeBox.pm now exports its configuration option via the hash $JUKE_CONFIG
+   rather than individual variables.  The name of the old variables are the
+   hash keys.
+
+3) Add a juke "config" option to display the configuration options and values.
+
+4) Tested with mtx 1.2.17.
+
+
+***** 2.0.1, 2003/07/07
+
+1) Turn tkjuke into a master/slave program, embedding slave tkjuke windows
+   inside the master's NoteBook widget.
+
+
+***** 2.0.6, 2003/07/11
+
+1) To share messageBox calls, even a slave needs to initialize $mw_master.
+
+2) $EJECT_BEFORE_UNLOAD - forgot to add it to juke's next/previous code.
+
+3) POD-ify juke/tkjuke documentation.
+
+
+***** 2.0.7, 2003/12/23
+
+1) Fix JukeboxSlot Checkbutton -onvalue for Tk804.025.
+
+
+***** 2.1.0, 2004/02/29
+
+1) Add the mtx <=> atape compatibility layer for AIX.
+2) Add a SIGHHUP handler to tkjuke that takes inventory of the jukebox and
+   updates its display.  Used by unattended backup scripts to keep the
+   display accurate as they manipulate the device. The slave's PID is kept
+   in /tmp/tkjuke-slave-${device}.pid.
+
+
+***** 2.1.1, 2004/03/10
+
+1) atape-mtx: if a storage element is abnormal and full, no barcode is
+   available, so just mark full rather than abnormal so tkjuke can move it.
+   Do the same for data transfer elements.
+2) Add a new juke command "refresh-tkjuke" that sends a SIGHUP to tkjuke.
+   juke uses this new feature to refresh tkjuke when media is moved.
+
+***** 2.1.2, 2004/08/18
+
+1) Add kluge code for an IBM ULT3582-TL used with Redhat Linux. The jukebox
+   and mtx do not talk properly and mtx doesn't recognize that the device
+   can transfer and has a mail slot. Set the variable $ULT3582_TL_on_Linux
+   to 1 in tkjuke.  Then, from the jukebox front panel configure the mail
+   as a normal media slot rather than an import/export slot.  tkjuke will
+   annotate DTE slot 1 as the mail slot rather than the last slot as it
+   would normally.  No bump support is provided, however - the slot 1 
+   annotation is just sugar to appease the operators ;)
+
+2) Change the EJECT_BEFORE_UNLOAD default from 0 to "rewind" to prevent
+   media from being accidentally ejected if a drive is busy.
+
+***** 2.1.3, 2006/03/09
+
+1) Finally have a dual-drive jukebox - the same IBM ULT3582-TL as above.
+   Widen tkjuke's drive window so the optional scrollbar disappears.
+
+2) Make some juke system commands non-fatal: if tar gets a media error, it
+   unloads the bad tape, then invokes the media-change script. But the juke
+   code first tries to unload the tape before unloading the stacker, and on
+   some systems unloading an already unloaded drive gives an error, thus
+   the media change fails.  Make the drive-unload-before-a-cartridge-unload
+   non-fatal.
+
+3) As noted above, juke does some non-jukebox things, i.e. it touches the
+   physical drives to work around vagrancies noted above, e.g. sometimes
+   a tape must be rewound/unloaded before an library operation is permitted.
+   Since I only had access to single drive libraries, the install prodcedure
+   only configured once drive. Now the install procedure asks for multiple
+   drives, and juke maps DTE numbers to physical drives in its commands.
+
+4) Fixed a "one off" error due to multiple drives when plugging a loaded
+   DTE's barcode in an SE status line.
+
+When all was said and done, less than 20 lines of source code needed changing.
+Not bad considering I had no actual dual-drive hardware when writing the original
+code - I simulated everything!
+
+Here are some additional mods/changes:
+
+5) juke commands barcodes, config and help are faster because they don't first
+   status the changer.
+
+6) Added the contrib/ directory featuring tkreload2 and my Perl Makefile.PL
+   input file make.in.
+
+***** 2.1.4, 2006/03/17
+
+1) Save the results of juke's initial status.  Subcommand processors use that
+   rather than statusing the library yet again - makes things run a tad faster.
+
+2) juke's barcodes command with an empty barcode removes the entry from the
+   barcode DB.
+
+Other than the above, this release is mainly to update other CPAN components
+and otherwise fix errors reported by the CPAN indexer when I submitted 2.1.3.
+
+3) So I removed Proc::killfam, Tk::ExecuteCommand and Tk::CollapsableFrame
+   from this distribution - you'll have to install them yourself.
+
+***** 2.1.5, 2006/03/18
+
+1) Ah ha! I knew something was odd, and I finally figured out the obscure bug.
+   "juke next [dte]" was mis-coded so it always used DTE 0, rather than the
+   DTE specified. But it was my wierd coding that was the problem, so the next
+   used the proper DTE and actually worked properly, but the tape-wait-ready 
+   code always used /dev/nst0 rather than /dev/nst{$dte}.
+
+2) Well, the 2.1.4 CPAN indexer showed my .pm files had no version, so now
+   they do.  I hope this is the last rev for some time ...
+
+***** 2.2.0, 2006/03/20
+
+1) Added an optional DTE for "juke loaded".
+
+2) Re-worked how juke handles tape-not-ready situations.  The code used to be 
+   internal to juke, now it's externalized into the program wait-tape-ready.
+
+3) The contributed backup programs are now really multi-volume aware.
+
+4) Output messages have the word "drive#" changed to "DTE#".
+
+***** 2.2.1, 2007/07/20
+
+1) "juke loaded" no longer quotes barcodes; the assumption is that there can be 
+   no embedded spaces.
+
+2) In order to save some screen area, remove the large Dismiss button at the
+   bottom of each jukebox page, and replace it with a small red close button 
+   in the upper-left corner of the page, just like in Mac OS X.
+
+3) Update AIX atape interface for Atape.driver 9.7.3.0.

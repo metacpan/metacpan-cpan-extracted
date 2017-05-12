@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+<preface id="ch_preface" xmlns:xi="http://www.w3.org/2001/XInclude">
+	<title>Preface</title>
+
+	<sect1 id="sc_about_manual">
+		<title>About the manual</title>
+
+		<para>
+		Before starting on the subject of the Triceps CEP itself,
+		I want to tell some things about the organization of this manual.
+		</para>
+
+		<para>
+		It had grown quite large, and if it were printed on paper,
+		I would have divided it into at least three volumes.
+		But in the electronic form it's more convenient as a single
+		document, this way the cross-references between any parts
+		of it work seamlessly.
+		</para>
+
+		<para>
+		The manual keeps living and growing together with Triceps
+		itself. As things change in Triceps, they change in the manual,
+		but sometimes it's difficult to track down and update all
+		the mentions of the changed subject. I've been spending
+		a huge effort on tracking all such instances down but
+		sometimes things slip through. Keep this in mind and
+		don't be too scared when some paragraph says something
+		contradictory.
+		</para>
+
+		<para>
+		A known issue with this manual is that it tends to describe
+		the subjects in the bottom-up fashion, starting from the
+		low-level details and then building up to the high-level
+		concepts. This is partially because the manual has been
+		growing together with Triceps, which is being built from
+		the ground up. And partially it's because I like the details.
+		When I read about a product, I want to understand, how
+		exactly it works. When I write, I want to convey this
+		information. I rewrote some of the chapters to put the
+		high-level descriptions up front. But it's a huge work
+		that will take some time to complete for the whole manual.
+		In the meantime, I'd rather not delay the releases for it,
+		they've been already slowed a lot by the documentation work.
+		So it will get better with time, and in the meantime,
+		if you feel that some details are too much for you,
+		feel free to skip over them.
+		</para>
+
+		<para>
+		There are great many other improvements that can be done
+		to the manual, and they will eventually be done. But my take on
+		it is that it's better to have an imperfect manual now than
+		a perfect one in some distant future. It had already been too
+		long in the works, writing the manual for the version 2.0
+		had taken a whole year.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_preface_concepts">
+		<title>Some concepts</title>
+
+		<indexterm>
+			<primary>model</primary>
+		</indexterm>
+		<para>
+		When talking about the CEP programs, I often use the term <quote>model</quote>.
+		What is a model? It's basically a CEP program. And more about the models
+		and about what is the CEP itself is described in
+		<xref linkend="ch_field" xrefstyle="select: label"/>&#xA0;.
+		</para>
+
+		<para>
+		Many of the examples are built around the world of stock trading.
+		In the modern times almost everyone is probably familiar with the
+		basics of this area. But if case if you're not, let me tell the
+		most fundamental thing needed for understanding the examples:
+		what is a <i>symbol</i>.
+		</para>
+
+		<para>
+		When the stock shares of some company are traded on an exchange,
+		this company gets assigned a short identifier. This identifier
+		is known as the stock symbol for this company. This word is also
+		often used to mean not just the identifier but also the shares
+		denoted by it. If a company has multiple classes of shares, each
+		class would have its own symbol. And if a company is traded on
+		multiple exchanges, each exchange may have its own identifier for
+		its shares. The options and other derivative financial
+		products also have their own symbols.
+		</para>
+	</sect1>
+</preface>

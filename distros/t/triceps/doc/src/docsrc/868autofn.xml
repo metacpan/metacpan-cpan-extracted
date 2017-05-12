@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_autofn">
+		<title>ScopeFnBind and AutoFnBind reference</title>
+
+		<indexterm>
+			<primary>ScopeFnBind</primary>
+		</indexterm>
+		<para>
+		A couple more of helper classes are defined in <pre>sched/FnReturn.h</pre>.
+		</para>
+
+		<para>
+		ScopeFnBind does a scoped pushing and popping of a binding on an
+		FnReturn. Its only method is the constructor:
+		</para>
+
+<pre>
+ScopeFnBind(Onceref<FnReturn> ret, Onceref<FnBinding> binding);
+</pre>
+
+		<para>
+		It's used as:
+		</para>
+
+<pre>
+{
+    ScopeFnBind autobind(ret, binding);
+    ...
+}
+</pre>
+
+		<para>
+		It will pop the binding at the end of the block. An unpleasant feature
+		is that if the return stack get messed up, it will throw an Exception
+		from a destructor, which is a big no-no in &Cpp;. However since normally
+		in the &Cpp; code the Triceps Exception is essentially an abort, this
+		works good enough. If you make the Exception catchable, such as when
+		calling the &Cpp; code from an interpreter, you better make very sure
+		that the stack can not get corrupted, or do not use ScopeFnBind.
+		</para>
+
+		<indexterm>
+			<primary>AutoFnBind</primary>
+		</indexterm>
+		<para>
+		AutoFnBind is a further extension of the scoped binding. It does three
+		additional things: 
+		<itemizedlist>
+			<listitem>
+			It allows to push multiple bindings on multiple
+			returns as a group, popping them all on destruction. 
+			</listitem>
+			<listitem>
+			It's a
+			reference-counted Starget object, which allows the scope to be more
+			than one block. 
+			</listitem>
+			<listitem>
+			It also has a more controllable way of dealing with the
+			exceptions. 
+			</listitem>
+		</itemizedlist>
+		This last two properties allow it to be used from the Perl
+		code, making the scope of a Perl block, not &Cpp; block, and to pass the
+		exceptions properly back to Perl.
+		</para>
+
+<pre>
+AutoFnBind();
+AutoFnBind *make();
+</pre>
+
+		<para>
+		The constructor just creates an empty object which then gets filled
+		with bindings.
+		</para>
+
+<pre>
+AutoFnBind *add(Onceref<FnReturn> ret, Autoref<FnBinding> binding);
+</pre>
+
+		<para>
+		Add a binding, in a chainable fashion. The simple-minded way of using the
+		AutoFnBind is:
+		</para>
+
+<pre>
+{
+    Autoref<AutoFnBind> bind = AutoFnBind::make()
+        ->add(ret1, binding1)
+        ->add(ret2, binding2);
+    ...
+}
+</pre>
+
+		<para>
+		However if any of these <pre>add()</pre>s throw an Exception, this will leave an
+		orphaned AutoFnBind object, since the throwing would happen before it
+		had a chance to do the reference-counting. So the safer way to use it
+		is:
+		</para>
+
+<pre>
+{
+    Autoref<AutoFnBind> bind = new AutoFnBind;
+    bind
+        ->add(ret1, binding1)
+        ->add(ret2, binding2);
+    ...
+}
+</pre>
+
+		<para>
+		Then the AutoFnBind will be reference-counted first, and if an <pre>add()</pre>
+		throws later, this will cause a controlled destruction of the Autoref
+		and of AutoFnBind.
+		</para>
+
+		<para>
+		But it's not the end of the story yet. The throws on destruction are
+		still a possibility. To catch them, use an explicit clearing before
+		the end of the block:
+		</para>
+
+<pre>
+void clear();
+</pre>
+
+		<para>
+		Pops all the bindings. If any Exceptions get thrown, they can get
+		caught nicely. It tries to be real smart, going through all the
+		bindings in the backwards order and popping each one of them. If a
+		<pre>pop()</pre> throws an exception, its information will be collected but
+		<pre>clear()</pre> will then continue going through the whole list. At the end of
+		the run it will make sure that it doesn't have any references to
+		anything any more, and then will re-throw any collected errors as a
+		single Exception. This cleans up the things as much as possible and as
+		much as can be handled, but the end result will still not be
+		particularly clean: the returns that got their stacks corrupted will
+		still have their stacks corrupted, and some very serious
+		application-level cleaning will be needed to continue. Probably a
+		better choice would be to destroy everything and restart from scratch.
+		But at least it allows to get safely to this point of restarting from
+		scratch.
+		</para>
+
+		<para>
+		So, the full correct sequence will be:
+		</para>
+
+<pre>
+{
+	Autoref<AutoFnBind> bind = new AutoFnBind;
+	bind
+		->add(ret1, binding1)
+		->add(ret2, binding2);
+	...
+	bind->clear();
+}
+</pre>
+
+		<para>
+		Or if any code in <quote>...</quote> can throw anything, then something like this snippet(whis 
+		is not actually tested, so use with caution):
+		</para>
+
+<pre>
+{
+	Autoref<AutoFnBind> bind = new AutoFnBind;
+	bind
+		->add(ret1, binding1)
+		->add(ret2, binding2);
+	try {
+	...
+	} catch (Triceps::Exception e) {
+		try {
+			bind->clear();
+		} catch (Triceps::Exception ee) {
+			e->getErrors()->append("Unbinding errors triggered by the last error:", ee->getErrors());
+		}
+		throw;
+	} catch (exception e) {
+		bind->clear(); // might use a try/catch around it as well
+		throw;
+	}
+}
+</pre>
+
+		<para>
+		It tries to be nice if the exception thrown from <quote>...</quote> was a Triceps
+		one, and add nicely any errors from the binding clearing to it.
+		</para>
+
+		<para>
+		Finally, a little about how the Perl AutoFnBind translates to the &Cpp;
+		AutoFnBind:
+		</para>
+
+		<para>
+		The Perl constructor creates the &Cpp;-level object and adds the bindings
+		to it. If any of them throw, it destroys everything nicely and
+		translates the Exception to Perl. Otherwise it saves a reference to the
+		AutoFnBind in a wrapper object that gets returned to Perl.
+		</para>
+
+		<para>
+		The Perl destructor then first clears the AutoFnBind and catches if
+		there is any Exception. However there is just no way to return a Perl
+		exception from a Perl destructor, so it simply prints the error on stderr
+		and calls <pre>exit(1)</pre>. If no exception was thrown, the AutoFnBind gets
+		destroyed nicely by removing the last reference.
+		</para>
+
+		<para>
+		For the nicer handling, there is a Perl-level method <pre>clear()</pre> that does
+		the clearing and translates the exception to Perl.
+		</para>
+	</sect1>

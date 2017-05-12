@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_exception">
+		<title>Exception reference</title>
+
+		<indexterm>
+			<primary>error handling</primary>
+			<secondary>in &Cpp;</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>Exception</primary>
+		</indexterm>
+		<para>
+		There are different ways to report the errors. Sometimes a function
+		would return a false value. Sometime it would return an Erref with an
+		error in it. And there is also a way to throw the exceptions.
+		</para>
+
+		<para>
+		In general I don't particularly like the exceptions. They tend to break
+		the logic in the unexpected ways, and if not handled properly, mess up
+		the multithreading. The safe way of working with exceptions is with the
+		scope-based variables. This guarantees that all the allocated memory
+		will be freed and all the locked data will be unlocked when the block
+		exits, naturally or on an exception. However not everything can be done
+		with the scopes, and this results in a whole mess of try-catch blocks,
+		and a missed catch can mess up the program in horrible ways.
+		</para>
+
+		<para>
+		However sometimes the exceptions come handy. They have been a late
+		addition to the Triceps version 1.0 and they have blossomed in the version 2.0. 
+		</para>
+
+		<para>
+		The overall approach in Triceps is that the exceptions are used for the
+		things that Should Never Happen in a correct program, or in other words
+		for the substantially fatal events. If the user attempts to do something that
+		can't be executed, this qualifies for an exception. Essentially, use
+		the exceptions for the things that qualify for the classic C <pre>abort()</pre> or
+		<pre>assert()</pre>. The idea is that at this point we want to print an error
+		message, print the call stack the best we can, and dump the core for
+		the future analysis.
+		</para>
+
+		<indexterm>
+			<primary>abort</primary>
+		</indexterm>
+		<indexterm>
+			<primary>stack trace</primary>
+		</indexterm>
+		<para>
+		Why not just use an <pre>abort()</pre> then? In the &Cpp; code you certainly can if
+		you're not interested in the extra niceties provided by the exceptions.
+		In fact, that's what the Triceps exceptions do by default: when you
+		construct an exception, it prints a log message,
+		the Triceps scheduler stack trace (the sequence of the label calls
+		that led to the code throwing the exception) and the &Cpp; stack trace
+		(using a nice feature of glibc), then calls <pre>abort()</pre>. The error output gives the
+		basic idea of what went wrong and the rest can be found from the core
+		file created by <pre>abort()</pre>.
+		</para>
+
+		<indexterm>
+			<primary>XS</primary>
+		</indexterm>
+		<indexterm>
+			<primary>confess</primary>
+		</indexterm>
+		<para>
+		However remember that Triceps is designed to be embedded into the
+		interpreted (or compiled) languages. When something goes wrong
+		inside the Triceps program in Perl, you don't want to get a core dump
+		of the Perl interpreter. An interpreted program must never ever crash
+		the interpreter. You want to get the error reported in the Perl <pre>die()</pre>
+		or its nicer cousin <pre>confess()</pre>, and possibly intercept it in <pre>eval</pre>.
+		So the Perl wrapper of the Triceps library changes the mode of Triceps exceptions
+		to actually throw the &Cpp; exceptions instead of aborting. Since  the
+		Perl code is not really interested in the details at the &Cpp; level, the
+		&Cpp; stack trace in this case is configured not to be included into the
+		text of the exception. The Triceps scheduler trace is still included.
+		Eventually the
+		XS interface does an analog of <pre>confess()</pre>, including the Perl stack
+		trace. When the code goes through multiple layers of Perl and &Cpp; code
+		(Perl code calling the Triceps scheduler, calling the label handlers in
+		Perl, calling the Triceps scheduler again etc.), the whole layered
+		sequence gets nicely unwound and reported. However the state of the
+		scheduler suffers along the way: all the scheduled rowops get freed
+		when their stack frame is unwound, so prepare to repair the state of
+		your model if you catch the exception. Most of the time you don't
+		want to catch it, just let it propagate and let the program die
+		with the error message. After all, it's still a substantially fatal
+		event, even in Perl, just the fatality is translated to the Perl level.
+		</para>
+
+		<para>
+		If you are willing to handle the exceptions (for example, if you add
+		elements dynamically by user description and don't want the whole
+		program to abort because of one faulty description), you can do the
+		same in &Cpp;. Just disable the abort mode for the exceptions and catch
+		them. Of course, it's even better to catch your exceptions before they
+		reach the Triceps scheduler, since then you won't have to repair the
+		state.
+		</para>
+
+		<para>
+		The same feature comes handy in the unit tests: when you test for the
+		detection of a fatal error, you don't want your test to abort, you want
+		it to throw a nice catchable exception.
+		</para>
+
+		<indexterm>
+			<primary>Exception</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Erref</primary>
+		</indexterm>
+		<para>
+		After all this introductory talk, on to the gritty details. The class is
+		Exception (as usual, in the namespace Triceps or whatever custom
+		namespace you define as TRICEPS_NS), defined in <pre>common/Exception.h</pre>.
+		Inside it contains an Erref with the errors. The Exception is not intended
+		for the reference counting, so it doesn't inherit from either of
+		[SM]target.
+		</para>
+
+		<para>
+		An Exception can be constructed in multiple ways. Just like Errors,
+		the most typical modern way is to use the static factory methods that
+		perform the printf-line formatting.
+		</para>
+
+<pre>
+static Exception f(const char *fmt, ...);
+static Exception fTrace(const char *fmt, ...);
+</pre>
+
+		<para>
+		The difference between them is whether the &Cpp; stack trace will
+		ever be included.
+		With <pre>Exception::fTrace()</pre> the &Cpp; stack trace will be
+		added to the messages, if it is otherwise permitted by the Exception
+		modes (see the descriptions of the flags below). 
+		With <pre>Exception::f()</pre>, the stack trace definitely won't ever be added. Why
+		would you want to not add the stack trace? Two reasons:
+		</para>
+		
+		<itemizedlist>
+			<listitem>
+			If you're throwing the Exception from the XS code, you know in
+			advance that the user is interested only in the Perl stack trace,
+			not in the &Cpp; one. So there is no point in adding the trace.
+			This is the case for <pre>Exception::f()</pre>.
+			</listitem>
+
+			<listitem>
+			If you catch an
+			Exception, add some information to it and re-throw a new Exception. The
+			information from the original Exception will already contain the full stack
+			trace, so there is no need to include the partial stack trace again.
+			This case is not applicable to <pre>Exception::f()</pre> but I'll show the other
+			methods where it's used.
+			</listitem>
+		</itemizedlist>
+
+		<para>
+		These factory methods are used like this:
+		</para>
+
+<pre>
+throw Exception::f("a message with integer %d", n);
+</pre>
+
+		<para>
+		And the similar methods for construction with the nested errors,
+		from an Erref or another Exception:
+		</para>
+
+		<indexterm>
+			<primary>Errors</primary>
+		</indexterm>
+<pre>
+static Exception f(Onceref<Errors> err, const char *fmt, ...);
+static Exception fTrace(Onceref<Errors> err, const char *fmt, ...);
+static Exception f(const Exception &exc, const char *fmt, ...);
+</pre>
+
+		<para>
+		Unlike the Erref method, these work unconditionally (since their result
+		is normally used in <pre>throw</pre>, and it's too late to do anything by that
+		time), so you better make sure in advance that there is a child error.
+		A typical usage would be like this:
+		</para>
+
+<pre>
+try {
+	...
+} catch (Exception e) {
+	throw Exception::f(e.getErrors(), "error at stage %d:",  n);
+}
+
+// or more directly
+
+try {
+	...
+} catch (Exception e) {
+	throw Exception::f(e, "error at stage %d:",  n);
+}
+</pre>
+
+		<para>
+		The methods that use Errors are available as <pre>f()</pre> and <pre>fTrace()</pre> while
+		the method for a direct re-throwing of an Exception exists only as <pre>f()</pre>
+		because if any stack tracing was to be done, it would be already done
+		in the original Exception.
+		</para>
+
+		<para>
+		Just like the Errors methods, in the resulting Exception the message
+		goes before the nested errors. 
+		</para>
+
+		<para>
+		Also an Exception can be constructed by absorbing an Erref instead
+		of wrapping it:
+		</para>
+
+
+<pre>
+explicit Exception(Onceref<Errors> err, bool trace);
+</pre>
+
+		<para>
+		The <pre>trace</pre> flag works similarly to the difference between <pre>f()</pre> and
+		<pre>fTrace()</pre>.
+		The Errors object is remembered by reference, so changing it later will
+		change the contents of the Exception.
+		</para>
+
+<pre>
+explicit Exception(const string &err, bool trace);
+</pre>
+
+		<para>
+		A convenience constructor to make  a simple string with the error.
+		Internally creates an Errors object with the string in it.
+		</para>
+
+
+<pre>
+explicit Exception(Onceref<Errors> err, const string &msg);
+explicit Exception(Onceref<Errors> err, const char *msg);
+explicit Exception(const Exception &exc, const string &msg);
+</pre>
+
+		<para>
+		The older ways of wrapping a nested error with a descriptive message
+		and re-throwing it. These constructors get called inside <pre>f()</pre> and
+		<pre>fTrace()</pre>, but the new tradition is not to use them in the user
+		code, use <pre>f()</pre> and <pre>fTrace()</pre> instead.
+		</para>
+
+
+<pre>
+virtual const char *what();
+</pre>
+
+		<para>
+		The usual, returns the text of the error messages in the Exception.
+		</para>
+
+<pre>
+virtual Errors *getErrors() const;
+</pre>
+
+		<para>
+		Return the Errors object from the Exception.
+		</para>
+
+		<indexterm>
+			<primary>Exception</primary>
+			<secondary>modes</secondary>
+		</indexterm>
+		<para>
+		The modes I've mentioned before are set with the class static variables:
+		</para>
+
+<pre>
+static bool abort_;
+</pre>
+
+		<para>
+		Flag: when attempting to create an Exception, instead print the message
+		on stderr and abort. This behavior is more convenient for debugging of the &Cpp;
+		programs, and is the default one. Also forces the stack trace in the
+		error reports. The interpreted language wrappers should reset it to get
+		the proper exceptions. Default: true.
+		</para>
+
+		<para>
+
+<pre>
+static bool enableBacktrace_;
+</pre>
+
+		Flag: enable the backtrace if the constructor requests it. The
+		interpreted language wrappers should reset it to remove the confusion
+		of the &Cpp; stack traces in the error reports. Default: true. 
+		</para>
+
+	</sect1>

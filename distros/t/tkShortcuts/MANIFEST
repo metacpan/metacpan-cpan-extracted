@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/tkShortcuts.t
+lib/tkShortcuts.pm
+META.yml                                 Module meta-data (added by MakeMaker)

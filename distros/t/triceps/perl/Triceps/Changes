@@ -1,0 +1,10 @@
+Revision history for Perl extension Triceps.
+
+0.01  Wed Jan 26 17:53:34 2011
+	- original version; created by h2xs 1.23 with options
+		-O -n Triceps --use-old-tests
+
+0.99  Wed Dec  7 22:37:26 2011
+	- first substantially complete version
+
+See the rest in the Developer's Guide, chapter "Release Notes".

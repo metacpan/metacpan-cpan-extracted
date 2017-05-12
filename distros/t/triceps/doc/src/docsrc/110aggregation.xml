@@ -1,0 +1,3412 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+<chapter id="ch_aggregation" xmlns:xi="http://www.w3.org/2001/XInclude">
+	<title>Aggregation</title>
+
+	<sect1 id="sc_aggregation_vwap">
+		<title>The ubiquitous VWAP</title>
+
+		<indexterm>
+			<primary>aggregation</primary>
+		</indexterm>
+		<para>
+		Every CEP supplier loves an example of VWAP calculation: it's small,
+		it's about that quintessential CEP activity: aggregation, and it sounds
+		like something from the real world.
+		</para>
+
+		<indexterm>
+			<primary>VWAP</primary>
+		</indexterm>
+		<para>
+		A quick sidebar: what is the VWAP? It's the Value-Weighted Average
+		Price: the average price for the shares traded during some period of
+		time, usually a day. If you take the price of every share traded during
+		the day and calculate the average, you get the VWAP. What is the
+		value-weighted part? The shares don't usually get sold one by one.
+		They're sold in the variable-sized lots. If you think in the terms of
+		lots and not individual shares, you have to weigh the trade prices (not
+		to be confused with costs) for the lots proportional to the number of
+		shares in them.
+		</para>
+
+		<para>
+		I've been using VWAP for trying out the different approaches to the aggregation.
+		There are multiple ways to do it, from fully manual, to the 
+		aggregator infrastructure with manual computation of the aggregations,
+		to the simple aggregation functions.
+		The cutest version of VWAP so far is implemented
+		as a user-defined aggregation function for the SimpleAggregator.
+		Here is how it goes:
+		</para>
+
+<!-- t/xVwap.t example 3 -->
+<pre>
+# VWAP function definition
+my $myAggFunctions = {
+	myvwap => {
+		vars => { sum => 0, count => 0, size => 0, price => 0 },
+		step => '($%size, $%price) = @$%argiter; '
+			. 'if (defined $%size && defined $%price) '
+				. '{$%count += $%size; $%sum += $%size * $%price;}',
+		result => '($%count == 0? undef : $%sum / $%count)',
+	},
+};
+
+my $uTrades = Triceps::Unit->new("uTrades");
+
+# the input data
+my $rtTrade = Triceps::RowType->new(
+	id => "int32", # trade unique id
+	symbol => "string", # symbol traded
+	price => "float64",
+	size => "float64", # number of shares traded
+);
+
+my $ttWindow = Triceps::TableType->new($rtTrade)
+	->addSubIndex("byId", 
+		Triceps::IndexType->newHashed(key => [ "id" ])
+	)
+	->addSubIndex("bySymbol", 
+		Triceps::IndexType->newHashed(key => [ "symbol" ])
+		->addSubIndex("fifo", Triceps::IndexType->newFifo())
+	)
+;
+
+# the aggregation result
+my $rtVwap;
+my $compText; # for debugging
+
+Triceps::SimpleAggregator::make(
+	tabType => $ttWindow,
+	name => "aggrVwap",
+	idxPath => [ "bySymbol", "fifo" ],
+	result => [
+		symbol => "string", "last", sub {$_[0]->get("symbol");},
+		id => "int32", "last", sub {$_[0]->get("id");},
+		volume => "float64", "sum", sub {$_[0]->get("size");},
+		vwap => "float64", "myvwap", sub { [$_[0]->get("size"), $_[0]->get("price")];},
+	],
+	functions => $myAggFunctions,
+	saveRowTypeTo => \$rtVwap,
+	saveComputeTo => \$compText,
+);
+
+$ttWindow->initialize();
+my $tWindow = $uTrades->makeTable($ttWindow, "tWindow");
+
+# label to print the result of aggregation
+my $lbPrint = $uTrades->makeLabel($rtVwap, "lbPrint",
+	undef, sub { # (label, rowop)
+		&send($_[1]->printP(), "\n");
+	});
+$tWindow->getAggregatorLabel("aggrVwap")->chain($lbPrint);
+
+while(&readLine) {
+	chomp;
+	my @data = split(/,/); # starts with a string opcode
+	$uTrades->makeArrayCall($tWindow->getInputLabel(), @data);
+	$uTrades->drainFrame(); # just in case, for completeness
+}
+</pre>
+
+		<indexterm>
+			<primary>SimpleAggregator</primary>
+		</indexterm>
+		<para>
+		The aggregators get defined as parts of the table type. 
+		<pre>Triceps::SimpleAggregator::make()</pre> is a kind of a template
+		that adds an aggregator definition to the table type
+		that is specified in the option <quote>tabType</quote>.
+		An aggeragtor doesn't live in a vacuum, it always works
+		as a part of the table type. As the table gets modified, the
+		aggregator also re-computes its aggregation results.
+		The fine distinction is that the aggregator is a part
+		of the table type, and is common for all the tables of this
+		type. But the table stores its aggregation state, and
+		when an aggregator runs on a table, it uses and modifies that
+		state.
+		</para>
+
+		<para>
+		The name of the aggregator is how you can find its result
+		later in the table: each aggregator has an output label
+		created for it, that can be found with 
+		<pre>$table->getAggregatorLabel()</pre>. The option <quote>idxPath</quote> defines
+		both the grouping of the rows for this aggregator and their
+		order in the group. The index type at the path determines the order
+		and its parent defines the groups. In this case the grouping
+		happens by symbol, and the rows in the groups go in the FIFO
+		order. This means that the aggregation function <pre>last</pre>  
+		will be selecting the row that has been inserted last,
+		in the FIFO order.
+		</para>
+
+		<para>
+		The option <quote>result</quote> defines both the row type
+		of the result and the rules for its computation. Each field
+		is defined there with four elements: name, type, aggregation function name,
+		and the function reference to select the value to be aggregated from the
+		row. Triceps provides a bunch of pre-defined aggregation functions
+		like <pre>first</pre>, <pre>last</pre>, <pre>sum</pre>, <pre>count</pre>, <pre>avg</pre> and so on. But VWAP is not
+		one of them (well, maybe now it should be, but then this example
+		would be less interesting). Not to worry, the user can add custom
+		aggregation functions, and that's what this example does.
+		</para>
+
+		<para>
+		The option <quote>functions</quote> contains the definitions
+		of such user-defined aggregation functions. Here it defines the
+		function <pre>myvwap</pre>. It defines the state variables that will be
+		used to keep the intermediate values for a group, a step computation,
+		and the result computation. Whenever the group changes, the
+		aggregator will reset the state variables to the default values
+		and iterate through the new contents of the group. It will
+		perform the step computation for each row and collect the
+		data in the intermediate variables. After the iteration it will
+		perform the result computation and produce the final value.
+		</para>
+
+		<para>
+		The VWAP computation in a weird one, taking two fields as arguments.
+		These two fields get packed into an array reference by 
+		</para>
+
+<!-- fragment from the code above -->
+<pre>
+sub { [$_[0]->get("size"), $_[0]->get("price")];}
+</pre>
+
+		<para>
+		and then the step computation unpacks and handles them.
+		In the aggregator computations the syntax <pre>$%name</pre>
+		refers to the intermediate variables and also to a few pre-defined ones.
+		<pre>$%argiter</pre> is the value extracted from the current row
+		during the iteration.
+		</para>
+
+		<para>
+		And that's pretty much it: send the rows to the table, the
+		iterator state gets updated to match the table contents,
+		computes the results and sends them. For example:
+		</para>
+
+<!-- t/xVwap.t example 3 -->
+<exdump>
+> OP_INSERT,11,abc,123,100
+tWindow.aggrVwap OP_INSERT symbol="abc" id="11" volume="100" vwap="123" 
+> OP_INSERT,12,abc,125,300
+tWindow.aggrVwap OP_DELETE symbol="abc" id="11" volume="100" vwap="123" 
+tWindow.aggrVwap OP_INSERT symbol="abc" id="12" volume="400" vwap="124.5" 
+> OP_INSERT,13,def,200,100
+tWindow.aggrVwap OP_INSERT symbol="def" id="13" volume="100" vwap="200" 
+> OP_INSERT,14,fgh,1000,100
+tWindow.aggrVwap OP_INSERT symbol="fgh" id="14" volume="100" vwap="1000" 
+> OP_INSERT,15,abc,128,300
+tWindow.aggrVwap OP_DELETE symbol="abc" id="12" volume="400" vwap="124.5" 
+tWindow.aggrVwap OP_INSERT symbol="abc" id="15" volume="700" vwap="126" 
+> OP_INSERT,16,fgh,1100,25
+tWindow.aggrVwap OP_DELETE symbol="fgh" id="14" volume="100" vwap="1000" 
+tWindow.aggrVwap OP_INSERT symbol="fgh" id="16" volume="125" vwap="1020" 
+> OP_INSERT,17,def,202,100
+tWindow.aggrVwap OP_DELETE symbol="def" id="13" volume="100" vwap="200" 
+tWindow.aggrVwap OP_INSERT symbol="def" id="17" volume="200" vwap="201" 
+> OP_INSERT,18,def,192,1000
+tWindow.aggrVwap OP_DELETE symbol="def" id="17" volume="200" vwap="201" 
+tWindow.aggrVwap OP_INSERT symbol="def" id="18" volume="1200" vwap="193.5" 
+</exdump>
+
+		<para>
+		When a group gets modified, the aggregator first sends a DELETE
+		of the old contents, then an INSERT of the new contents. But when the
+		first row gets inserted in a group, there is nothing to delete,
+		and only INSERT is sent. And the opposite, when the last row
+		is deleted from a group, only the DELETE is sent.
+		</para>
+
+		<para>
+		After this highlight, let's look at the aggregators from the bottom up.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_aggregation_manual">
+		<title>Manual aggregation</title>
+
+		<indexterm>
+			<primary>aggregation</primary>
+			<secondary>manual</secondary>
+		</indexterm>
+
+		<para>
+		The table exanmple in
+		<xref linkend="sc_table_secondary" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;
+		prints the aggregated
+		information (the average price of two records). This can be
+		fairly easily changed to put the information into the rows and send
+		them on as labels. The function <pre>printAverage()</pre> has morphed into
+		<pre>computeAverage()</pre>, while the rest of the example stayed the same
+		and is omitted:
+		</para>
+
+<!-- t/xWindow.t doManualAgg1 fragment -->
+<pre>
+our $rtAvgPrice = Triceps::RowType->new(
+	symbol => "string", # symbol traded
+	id => "int32", # last trade's id
+	price => "float64", # avg price of the last 2 trades
+);
+
+# place to send the average: could be a dummy label, but to keep the
+# code smaller also print the rows here, instead of in a separate label
+our $lbAverage = $uTrades->makeLabel($rtAvgPrice, "lbAverage",
+	undef, sub { # (label, rowop)
+		&send($_[1]->printP(), "\n");
+	});
+
+# Send the average price of the symbol in the last modified row
+sub computeAverage # (row)
+{
+	return unless defined $rLastMod;
+	my $rhFirst = $tWindow->findIdx($itSymbol, $rLastMod);
+	my $rhEnd = $rhFirst->nextGroupIdx($itLast2);
+	&send("Contents:\n");
+	my $avg = 0;
+	my ($sum, $count);
+	my $rhLast;
+	for (my $rhi = $rhFirst; 
+			!$rhi->same($rhEnd); $rhi = $rhi->nextIdx($itLast2)) {
+		&send("  ", $rhi->getRow()->printP(), "\n");
+		$rhLast = $rhi;
+		$count++;
+		$sum += $rhi->getRow()->get("price");
+	}
+	if ($count) {
+		$avg = $sum/$count;
+		$uTrades->call($lbAverage->makeRowop(&Triceps::OP_INSERT,
+			$rtAvgPrice->makeRowHash(
+				symbol => $rhLast->getRow()->get("symbol"),
+				id => $rhLast->getRow()->get("id"),
+				price => $avg
+			)
+		));
+	}
+}
+
+while(&readLine) {
+	chomp;
+	my @data = split(/,/);
+	$uTrades->makeArrayCall($tWindow->getInputLabel(), @data);
+	&computeAverage();
+	undef $rLastMod; # clear for the next iteration
+	$uTrades->drainFrame(); # just in case, for completeness
+}
+</pre>
+
+		<para>
+		For the demonstration, the aggregated rows sent to <pre>$lbAverage</pre> get
+		printed. The rows being aggregated are printed during the iteration
+		too, indented after <quote>Contents:</quote>. And here is a sample
+		run's result, with the input records shown in bold:
+		</para>
+
+<!-- t/xWindow.t doManualAgg1 -->
+<exdump>
+> OP_INSERT,1,AAA,10,10
+Contents:
+  id="1" symbol="AAA" price="10" size="10" 
+lbAverage OP_INSERT symbol="AAA" id="1" price="10" 
+> OP_INSERT,3,AAA,20,20
+Contents:
+  id="1" symbol="AAA" price="10" size="10" 
+  id="3" symbol="AAA" price="20" size="20" 
+lbAverage OP_INSERT symbol="AAA" id="3" price="15" 
+> OP_INSERT,5,AAA,30,30
+Contents:
+  id="3" symbol="AAA" price="20" size="20" 
+  id="5" symbol="AAA" price="30" size="30" 
+lbAverage OP_INSERT symbol="AAA" id="5" price="25" 
+> OP_DELETE,3
+Contents:
+  id="5" symbol="AAA" price="30" size="30" 
+lbAverage OP_INSERT symbol="AAA" id="5" price="30" 
+> OP_DELETE,5
+Contents:
+</exdump>
+
+		<para>
+		There are a couple of things to notice about it: it produces only the
+		INSERT rowops, no DELETEs, and when the last record of the group is
+		removed, that event produces nothing.
+		</para>
+
+		<para>
+		The first item is mildly problematic because the processing downstream
+		from here might not be able to handle the updates properly without the
+		DELETE rowops. It can be worked around fairly easily by connecting
+		another table to store the aggregation results,
+		with the same primary key as the aggregation key. 
+		That table would automatically transform
+		the repeated INSERTs on the same key to a DELETE-INSERT sequence.
+		</para>
+
+		<indexterm>
+			<primary>Coral8</primary>
+		</indexterm>
+		<para>
+		The second item is actually pretty bad because it means that the last
+		record deleted gets stuck in the aggregation results. The Coral8
+		solution for this situation is to send a row with all non-key fields
+		set to NULL, to reset them (interestingly, it's a relatively recent
+		addition, that bug took Coral8 years to notice). But with the opcodes
+		available, we can as well send a DELETE rowop with the key fields filled,
+		the helper table will fill in the rest of the fields, and produce a
+		clean DELETE.
+		</para>
+
+		<indexterm>
+			<primary>aggregation</primary>
+			<secondary>helper table</secondary>
+		</indexterm>
+		<para>
+		All this can be done by the following changes. Add the table, remember
+		its input label in <pre>$lbAvgPriceHelper</pre>. It will be used to send the
+		aggregated rows instead of <pre>$tAvgPrice</pre>.
+		Then still use <pre>$tAvgPrice</pre> to print the records coming out, but now
+		connect it after the helper table.  And in <pre>computeAverage()</pre> change the
+		destination label and add the case for when the group becomes empty
+		(<pre>$count == 0</pre>).
+		The rest of the example stays the same.
+		</para>
+
+<!-- t/xWindow.t doManualAgg2 fragment -->
+<pre>
+our $rtAvgPrice = Triceps::RowType->new(
+	symbol => "string", # symbol traded
+	id => "int32", # last trade's id
+	price => "float64", # avg price of the last 2 trades
+);
+
+our $ttAvgPrice = Triceps::TableType->new($rtAvgPrice)
+	->addSubIndex("bySymbol", 
+		Triceps::IndexType->newHashed(key => [ "symbol" ])
+	)
+;
+$ttAvgPrice->initialize();
+our $tAvgPrice = $uTrades->makeTable($ttAvgPrice, "tAvgPrice");
+our $lbAvgPriceHelper = $tAvgPrice->getInputLabel();
+
+# place to send the average: could be a dummy label, but to keep the
+# code smaller also print the rows here, instead of in a separate label
+our $lbAverage = makePrintLabel("lbAverage", $tAvgPrice->getOutputLabel());
+
+# Send the average price of the symbol in the last modified row
+sub computeAverage2 # (row)
+{
+	return unless defined $rLastMod;
+	my $rhFirst = $tWindow->findIdx($itSymbol, $rLastMod);
+	my $rhEnd = $rhFirst->nextGroupIdx($itLast2);
+	&send("Contents:\n");
+	my $avg = 0;
+	my ($sum, $count);
+	my $rhLast;
+	for (my $rhi = $rhFirst; 
+			!$rhi->same($rhEnd); $rhi = $rhi->nextIdx($itLast2)) {
+		&send("  ", $rhi->getRow()->printP(), "\n");
+		$rhLast = $rhi;
+		$count++;
+		$sum += $rhi->getRow()->get("price");
+	}
+	if ($count) {
+		$avg = $sum/$count;
+		$uTrades->makeHashCall($lbAvgPriceHelper, &Triceps::OP_INSERT,
+			symbol => $rhLast->getRow()->get("symbol"),
+			id => $rhLast->getRow()->get("id"),
+			price => $avg
+		);
+	} else {
+		$uTrades->makeHashCall($lbAvgPriceHelper, &Triceps::OP_DELETE,
+			symbol => $rLastMod->get("symbol"),
+		);
+	}
+}
+</pre>
+
+		<para>
+		The change is straightforward.
+		The label <pre>$lbAverage</pre> 
+		now reverts to just printing the rowops going through it, 
+		so it can be created with the template <pre>makePrintLabel()</pre> 
+		described in
+		<xref linkend="sc_template_wrapper" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<para>
+		Then the output for the same input becomes:
+		</para>
+
+<!-- t/xWindow.t doManualAgg2 1st run -->
+<exdump>
+> OP_INSERT,1,AAA,10,10
+Contents:
+  id="1" symbol="AAA" price="10" size="10" 
+tAvgPrice.out OP_INSERT symbol="AAA" id="1" price="10" 
+> OP_INSERT,3,AAA,20,20
+Contents:
+  id="1" symbol="AAA" price="10" size="10" 
+  id="3" symbol="AAA" price="20" size="20" 
+tAvgPrice.out OP_DELETE symbol="AAA" id="1" price="10" 
+tAvgPrice.out OP_INSERT symbol="AAA" id="3" price="15" 
+> OP_INSERT,5,AAA,30,30
+Contents:
+  id="3" symbol="AAA" price="20" size="20" 
+  id="5" symbol="AAA" price="30" size="30" 
+tAvgPrice.out OP_DELETE symbol="AAA" id="3" price="15" 
+tAvgPrice.out OP_INSERT symbol="AAA" id="5" price="25" 
+> OP_DELETE,3
+Contents:
+  id="5" symbol="AAA" price="30" size="30" 
+tAvgPrice.out OP_DELETE symbol="AAA" id="5" price="25" 
+tAvgPrice.out OP_INSERT symbol="AAA" id="5" price="30" 
+> OP_DELETE,5
+Contents:
+tAvgPrice.out OP_DELETE symbol="AAA" id="5" price="30" 
+</exdump>
+
+		<para>
+		All fixed, the proper DELETEs are coming out.
+		The last line shows the empty group contents in the table
+		but the DELETE row is still coming out.
+		</para>
+
+		<indexterm>
+			<primary>aggregation</primary>
+			<secondary>of DELETEs</secondary>
+		</indexterm>
+		<para>
+		Why should we worry so much about the DELETEs? Because without them,
+		relying on just INSERTs for updates, it's easy to create bugs. The last
+		example still has an issue with handling the row replacement by
+		INSERTs.  Can you spot it from reading the code?
+		</para>
+
+		<para>
+		Here is run example that highlights the issue (as usual, the input
+		lines are in bold):
+		</para>
+
+<!-- t/xWindow.t doManualAgg2 2nd run -->
+<exdump>
+> OP_INSERT,1,AAA,10,10
+Contents:
+  id="1" symbol="AAA" price="10" size="10" 
+tAvgPrice.out OP_INSERT symbol="AAA" id="1" price="10" 
+> OP_INSERT,3,AAA,20,20
+Contents:
+  id="1" symbol="AAA" price="10" size="10" 
+  id="3" symbol="AAA" price="20" size="20" 
+tAvgPrice.out OP_DELETE symbol="AAA" id="1" price="10" 
+tAvgPrice.out OP_INSERT symbol="AAA" id="3" price="15" 
+> OP_INSERT,5,AAA,30,30
+Contents:
+  id="3" symbol="AAA" price="20" size="20" 
+  id="5" symbol="AAA" price="30" size="30" 
+tAvgPrice.out OP_DELETE symbol="AAA" id="3" price="15" 
+tAvgPrice.out OP_INSERT symbol="AAA" id="5" price="25" 
+> OP_INSERT,5,BBB,30,30
+Contents:
+  id="5" symbol="BBB" price="30" size="30" 
+tAvgPrice.out OP_INSERT symbol="BBB" id="5" price="30" 
+> OP_INSERT,7,AAA,40,40
+Contents:
+  id="3" symbol="AAA" price="20" size="20" 
+  id="7" symbol="AAA" price="40" size="40" 
+tAvgPrice.out OP_DELETE symbol="AAA" id="5" price="25" 
+tAvgPrice.out OP_INSERT symbol="AAA" id="7" price="30" 
+</exdump>
+
+		<para>
+		The row with id=5 has been replaced to change the symbol from <quote>AAA</quote> to
+		<quote>BBB</quote>. This act changes both the groups of <quote>AAA</quote> and of <quote>BBB</quote>, removing the
+		row from the first one and inserting it into the second one. Yet only
+		the output for <quote>BBB</quote> came out. The printout of the next row with id=7 and
+		symbol=<quote>AAA</quote> shows that the row with id=5 has been indeed removed from
+		the group <quote>AAA</quote>. It even corrects the result. But until that row came in,
+		the average for the symbol <quote>AAA</quote> remained unchanged and incorrect.
+		</para>
+
+		<para>
+		There are multiple ways to fix this issue but first it had to be
+		noticed. Which requires a lot of attention to detail. It's much better
+		to avoid these bugs in the first place by sending the clean and nice
+		input.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_aggregation_proper">
+		<title>Introducing the proper aggregation</title>
+
+		<para>
+		Since the manual aggregation is error-prone, Triceps can manage it for
+		you and do it right. The only thing you need to do is do the actual
+		iteration and computation. Here is the rewrite of the same example with
+		a Triceps aggregator:
+		</para>
+
+<!-- t/xAgg.t doNonAdditive -->
+<pre>
+my $uTrades = Triceps::Unit->new("uTrades");
+
+# the input data
+my $rtTrade = Triceps::RowType->new(
+	id => "int32", # trade unique id
+	symbol => "string", # symbol traded
+	price => "float64",
+	size => "float64", # number of shares traded
+);
+
+# the aggregation result
+my $rtAvgPrice = Triceps::RowType->new(
+	symbol => "string", # symbol traded
+	id => "int32", # last trade's id
+	price => "float64", # avg price of the last 2 trades
+);
+
+# aggregation handler: recalculate the average each time the easy way
+sub computeAverage1 # (table, context, aggop, opcode, rh, state, args...)
+{
+	my ($table, $context, $aggop, $opcode, $rh, $state, @args) = @_;
+
+	# don't send the NULL record after the group becomes empty
+	return if ($context->groupSize()==0
+		|| $opcode == &Triceps::OP_NOP);
+
+	my $sum = 0;
+	my $count = 0;
+	for (my $rhi = $context->begin(); !$rhi->isNull(); 
+			$rhi = $context->next($rhi)) {
+		$count++;
+		$sum += $rhi->getRow()->get("price");
+	}
+	my $rLast = $context->last()->getRow();
+	my $avg = $sum/$count;
+
+	my $res = $context->resultType()->makeRowHash(
+		symbol => $rLast->get("symbol"), 
+		id => $rLast->get("id"), 
+		price => $avg
+	);
+	$context->send($opcode, $res);
+}
+
+my $ttWindow = Triceps::TableType->new($rtTrade)
+	->addSubIndex("byId", 
+		Triceps::IndexType->newHashed(key => [ "id" ])
+	)
+	->addSubIndex("bySymbol", 
+		Triceps::IndexType->newHashed(key => [ "symbol" ])
+		->addSubIndex("last2",
+			Triceps::IndexType->newFifo(limit => 2)
+			->setAggregator(Triceps::AggregatorType->new(
+				$rtAvgPrice, "aggrAvgPrice", undef, \&computeAverage1)
+			)
+		)
+	)
+;
+$ttWindow->initialize();
+my $tWindow = $uTrades->makeTable($ttWindow, "tWindow");
+
+# label to print the result of aggregation
+my $lbAverage = makePrintLabel("lbAverage", 
+	$tWindow->getAggregatorLabel("aggrAvgPrice"));
+
+while(&readLine) {
+	chomp;
+	my @data = split(/,/); # starts with a string opcode
+	$uTrades->makeArrayCall($tWindow->getInputLabel(), @data);
+	$uTrades->drainFrame(); # just in case, for completeness
+}
+</pre>
+
+		<para>
+		What has changed in this code? The things got rearranged a bit.The
+		aggregator is now defined as a part of the table type, so the
+		aggregation result row type and its computation function had to be
+		moved up.
+		</para>
+
+		<indexterm>
+			<primary>AggregatorType</primary>
+		</indexterm>
+		<indexterm>
+			<primary>index</primary>
+			<secondary>aggregation</secondary>
+		</indexterm>
+		<para>
+		The AggregatorType object holds the information about the aggregator.
+		In the table type, the aggregator type gets attached to an index type
+		with <pre>setAggregator()</pre>. In this case, to the FIFO index type. 
+		The parent of that index type determines the aggregation groups,
+		grouping happening by its combined key fields (that is, all the
+		key fields of all the indexes in the path starting from the root).
+		For aggregation the working or non-working method <pre>getKey()</pre> doesn't matter,
+		so any of the Hashed, Ordered and Sorted index types can be used.
+		The index type where the aggregator type is attached determines the
+		order of the rows in the groups. If you use FIFO, the rows will
+		be in the order of arrival. If you use Ordered or Sorted, the rows
+		will be in the sort order. If you use Hashed, the rows will be
+		in some random order, which is not particularly useful.
+		</para>
+
+		<para>
+		At present an index type may have no more than one aggregator type
+		attached to it. There is no particular reason for that, other than that
+		it was slightly easier to implement, and that I can't think yet of a
+		real-word situation where multiple aggregators on the same index would
+		be needed. If this situation will ever occur, this support can be
+		added. However a table type may have multiple aggregator types in it,
+		on different indexes. You can save a reference to an aggregator
+		type in a variable and reuse it in the different table types too
+		(though not multiple times in the same table, since that would cause a
+		naming conflict).
+		</para>
+
+		<para>
+		The aggregator type is created with the arguments of 
+		</para>
+
+		<itemizedlist>
+		<listitem>
+		result row type,
+		</listitem>
+		<listitem>
+		aggregator name, 
+		</listitem>
+		<listitem>
+		group initialization Perl function (which may be
+		<pre>undef</pre>, as in this example), 
+		</listitem>
+		<listitem>
+		group computation Perl function or source code snippet, 
+		</listitem>
+		<listitem>
+		the optional arguments for the functions. 
+		</listitem>
+		</itemizedlist>
+
+		<para>
+		Note that there is a
+		difference in naming between the aggregator types and index types: an
+		aggregator type knows its name, while an index type does not. An index
+		type is given a name only in its hierarchy inside the table type, but
+		it does not know its name.
+		</para>
+
+		<para>
+		When a table is created, it finds all the aggregator types in it, and
+		creates an output label for each of them. The names of the aggregator
+		types are used as suffixes to the table name. In this example the
+		aggregator will have its output label named <quote>tWindow.aggrAvgPrice</quote>.
+		This puts all the aggregator types in the table into the same
+		namespace, so make sure to give them different names in the same table
+		type. Also avoid the names <quote>in</quote>, <quote>out</quote> and <quote>pre</quote> 
+		because these are already
+		taken by the table's own labels. The aggregator labels in the table can
+		be found with
+		</para>
+
+<pre>
+$aggLabel = $table->getAggregatorLabel("aggName");
+</pre>
+
+		<para>
+		The aggregator types are theoretically multithreaded but the way the
+		Perl threads work, the Perl code has to be recompiled from the source
+		code in each thread. So for a table type with aggregators to be
+		exportable to the other threads, the aggregators must have their logic
+		specified as the Perl source code, not a compiled Perl function.
+		</para>
+
+		<para>
+		After the logic is moved into a managed aggregator, the main loop
+		becomes simpler.  
+		</para>
+
+		<para>
+		The computation function gets a lot more arguments than it used to. The
+		most interesting and most basic ones are <pre>$context</pre>, <pre>$opcode</pre>, and <pre>$rh</pre>.
+		The rest are useful in the more complex cases only.
+		</para>
+
+		<indexterm>
+			<primary>aggregation</primary>
+			<secondary>context</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>AggregatorContext</primary>
+		</indexterm>
+		<para>
+		The aggregator type is exactly that: a type. It doesn't know, on which
+		table or index, or even index type it will be used. And indeed, it
+		might be used on multiple tables and index types. But to do the
+		iteration on the rows, the computation function needs to get this
+		information somehow. And it does, in the form of aggregator context.
+		The manual aggregation used the last table output row to find, on which
+		exact group to iterate. The managed aggregator gets the last modified
+		row handle as the argument <pre>$rh</pre>. But our simple aggregator doesn't even
+		need to consult <pre>$rh</pre> because the context takes care of finding the
+		group too: it knows the exact group and exact index that needs to be
+		aggregated (look at the index tree drawings in
+		<xref linkend="sc_table_indextree" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;
+		for the difference between an index type and an index).
+		</para>
+
+		<indexterm>
+			<primary>aggregation</primary>
+			<secondary>iteration</secondary>
+		</indexterm>
+		<para>
+		The context provides its own <pre>begin()</pre> and <pre>next()</pre> methods. They are
+		actually slightly more efficient than the usual table iteration methods
+		because they take advantage of that exact known index. The most
+		important part, they work differently.
+		</para>
+
+<pre>
+$rhi = $context->next($rhi);
+</pre>
+
+		<para>
+		returns a NULL row handle when it reaches the end of the group. Do not,
+		I repeat, <b>DO NOT</b> use the <pre>$rhi->next()</pre> in the aggregators, or
+		you'll get some very wrong results.
+		</para>
+
+		<para>
+		The context also has a bit more of its own magic.
+		</para>
+
+<pre>
+$rh = $context->last();
+</pre>
+
+		<indexterm>
+			<primary>aggregation</primary>
+			<secondary>last</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>aggregation</primary>
+			<secondary>first</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>SQL</primary>
+		</indexterm>
+		<para>
+		returns the last row handle in the group. This comes very handy because
+		in most of the cases you want the data from the last row to fill the
+		fields that haven't been aggregated as such. This is like the SQL
+		function <pre>LAST()</pre>. Using the fields from the argument <pre>$rh</pre>, unless they
+		are the key fields for this group, is generally not a good idea because
+		it adds an extra dependency on the order of modifications to the table.
+		The <pre>FIRST()</pre> or <pre>LAST()</pre> (i.e. the 
+		context's <pre>begin()</pre> or <pre>last()</pre>) are much
+		better and not any more expensive.
+		</para>
+
+<pre>
+$size = $context->groupSize();
+</pre>
+
+		<indexterm>
+			<primary>aggregation</primary>
+			<secondary>count</secondary>
+		</indexterm>
+		<para>
+		returns the number of rows in the group. It's your value of <pre>COUNT(*)</pre> in
+		SQL terms, and if that's all you need, you don't need to iterate.
+		</para>
+
+<pre>
+$context->send($opcode, $row);
+</pre>
+
+		<para>
+		constructs a result rowop and sends it to the aggregator's output
+		label. Remember, the aggregator type as such knows nothing about this
+		label, so the path through the context is the only path. Note also that
+		it takes a row and not a rowop, because a label is needed to construct
+		the rowop in the first place.
+		</para>
+
+<pre>
+$rt = $context->resultType();
+</pre>
+
+		<para>
+		provides the result row type needed to construct the result row.
+		There also are a couple of convenience methods that combine
+		the row construction and sending, that can be used instead:
+		</para>
+
+<pre>
+$context->makeHashSend ($opcode, $fieldName => $fieldValue, ...);
+$context->makeArraySend($opcode, @fieldValues);
+</pre>
+
+		<para>
+		The final thing about the aggregator context: it works only inside the
+		aggregator computation function. Once the function returns, all its
+		methods start returning <pre>undef</pre>. So there is no point in trying
+		to save it for later in a global variable or such, don't do that.
+		</para>
+
+		<para>
+		As you can see, <pre>computeAverage()</pre> has the same logic as before, only
+		now it uses the aggregation context. And I've removed the debugging
+		printout of the rows in the group.
+		</para>
+
+		<indexterm>
+			<primary>aggregation</primary>
+			<secondary>opcode</secondary>
+		</indexterm>
+		<para>
+		The last unexplained piece is the opcode handling and that comparison
+		to <pre>OP_NOP</pre>. Basically, the table calls the aggregator computation
+		every time something changes in its index. It describes the reason for
+		the call in the argument <pre>$aggop</pre> (<quote>aggregation operation</quote>). Depending on
+		how clever an aggregator wants to be, it may do something useful on all
+		of these occasions, or only on some of them. The simple aggregator that
+		doesn't try any smart optimizations but just goes and iterates through
+		the rows every time only needs to react in some of the cases. To make
+		its life easier, Triceps pre-computes the opcode that should be used
+		for the result and puts it into the argument <pre>$opcode</pre>. So to
+		ignore the non-interesting calls, the simple aggregator computation can
+		just return if it sees the opcode <pre>OP_NOP</pre>.
+		</para>
+
+		<indexterm>
+			<primary>Coral8</primary>
+		</indexterm>
+		<para>
+		Why does it also check for the group size being 0? Again, Triceps
+		provides flexibility in the aggregators. Among other things, it allows to
+		implement the logic like Coral8, when on deletion of the last row in
+		the group the aggregator would send a row with all non-key fields set
+		to NULL (it can take the key fields from the argument <pre>$rh</pre>). So for this
+		specific purpose the computation function gets called with all rows
+		deleted from the group, and <pre>$opcode</pre> set to <pre>OP_INSERT</pre>. And, by the way,
+		a true Coral8-styled aggregator would ignore all the calls where the
+		<pre>$opcode</pre> is not <pre>OP_INSERT</pre>. But the normal aggregators need to avoid
+		doing this kind of crap, so they have to ignore the calls where
+		<pre>$context->groupSize()==0</pre>.
+		</para>
+
+		<para>
+		And here is an example of the output from that code
+		(as usual, the input lines are in bold):
+		</para>
+
+<!-- t/xAgg.t doNonAdditive -->
+<exdump>
+> OP_INSERT,1,AAA,10,10
+tWindow.aggrAvgPrice OP_INSERT symbol="AAA" id="1" price="10" 
+> OP_INSERT,3,AAA,20,20
+tWindow.aggrAvgPrice OP_DELETE symbol="AAA" id="1" price="10" 
+tWindow.aggrAvgPrice OP_INSERT symbol="AAA" id="3" price="15" 
+> OP_INSERT,5,AAA,30,30
+tWindow.aggrAvgPrice OP_DELETE symbol="AAA" id="3" price="15" 
+tWindow.aggrAvgPrice OP_INSERT symbol="AAA" id="5" price="25" 
+> OP_DELETE,3
+tWindow.aggrAvgPrice OP_DELETE symbol="AAA" id="5" price="25" 
+tWindow.aggrAvgPrice OP_INSERT symbol="AAA" id="5" price="30" 
+> OP_DELETE,5
+tWindow.aggrAvgPrice OP_DELETE symbol="AAA" id="5" price="30" 
+</exdump>
+
+		<para>
+		As you can see, it's exactly the same as from the manual aggregation
+		example with the helper table, minus the debugging printout of the
+		group contents. However here it's done without the helper table:
+		instead the aggregation function is called before and after each
+		update.
+		</para>
+
+		<indexterm>
+			<primary>aggregation</primary>
+			<secondary>helper table</secondary>
+		</indexterm>
+		<para>
+		This presents a memory vs CPU compromise: a helper table uses more
+		memory but requires less CPU for the aggregation computations
+		(presumably, the insertion of the row into the table is less
+		computationally intensive than the iteration through the original
+		records).
+		</para>
+
+		<para>
+		The managed aggregators can be made to work with a helper table too:
+		just chain a helper table to the aggregator's label, and in the
+		aggregator computation add
+		</para>
+
+<pre>
+return if ($opcode == &Triceps::OP_DELETE
+	&& $context->groupSize() != 1);
+</pre>
+
+		<para>
+		This would skip all the DELETEs except for the last one, before the
+		group collapses.
+		</para>
+
+		<indexterm>
+			<primary>aggregation</primary>
+			<secondary>optimization</secondary>
+		</indexterm>
+		<para>
+		There is also a way to optimize this logic right inside the aggregator:
+		remember the last INSERT row sent, and on DELETE just resend the same
+		row, as will be shown in
+		<xref linkend="sc_aggregation_optimized" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		This remembered last state can also be used for the other
+		interesting optimizations that will be shown in
+		<xref linkend="sc_aggregation_additive" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<indexterm>
+			<primary>Aleri</primary>
+		</indexterm>
+		<para>
+		Which approach is better, depends on the particular case. If you need
+		to store the results of aggregation in a table for the future look-ups
+		anyway, then that table is no extra overhead. That's what the
+		Aleri system does internally: since each element in its model keeps a
+		primary-indexed table (<quote>materialized view</quote>) of the result, that table
+		is used whenever possible to generate the DELETEs without involving any
+		logic. Or the extra optimization inside the aggregator can seriously
+		improve the performance on the large groups. Sometimes you may want
+		both. 
+		</para>
+
+		<para>
+		Now let's look at the run with the same input that went wrong with
+		the manual aggregation:
+		</para>
+
+<!-- t/xAgg.t doNonAdditive no missing DELETE -->
+<exdump>
+> OP_INSERT,1,AAA,10,10
+tWindow.aggrAvgPrice OP_INSERT symbol="AAA" id="1" price="10" 
+> OP_INSERT,3,AAA,20,20
+tWindow.aggrAvgPrice OP_DELETE symbol="AAA" id="1" price="10" 
+tWindow.aggrAvgPrice OP_INSERT symbol="AAA" id="3" price="15" 
+> OP_INSERT,5,AAA,30,30
+tWindow.aggrAvgPrice OP_DELETE symbol="AAA" id="3" price="15" 
+tWindow.aggrAvgPrice OP_INSERT symbol="AAA" id="5" price="25" 
+> OP_INSERT,5,BBB,30,30
+tWindow.aggrAvgPrice OP_DELETE symbol="AAA" id="5" price="25" 
+tWindow.aggrAvgPrice OP_INSERT symbol="AAA" id="3" price="20" 
+tWindow.aggrAvgPrice OP_INSERT symbol="BBB" id="5" price="30" 
+> OP_INSERT,7,AAA,40,40
+tWindow.aggrAvgPrice OP_DELETE symbol="AAA" id="3" price="20" 
+tWindow.aggrAvgPrice OP_INSERT symbol="AAA" id="7" price="30" 
+</exdump>
+
+		<para>
+		Here it goes right. Triceps recognizes that the second INSERT with id=5
+		moves the row to another group. So it performs the aggregation logic
+		for both groups. First for the group where the row gets removed, it
+		updates the aggregator result with a DELETE and INSERT (note that
+		id became 3, since it's now the last row left in that group).
+		Then for the group where the row gets added, and since there was nothing in
+		that group before, it generates only an INSERT.
+		</para>
+
+		<indexterm>
+			<primary>error handling</primary>
+		</indexterm>
+		<para>
+		The handling of the fatal errors (as in <pre>die()</pre>) in the 
+		aggregator functions is an interesting subject.
+		The errors propagate properly through the table,
+		and the table operations confess with the Perl handler's error message.
+		But since an error in the aggregator function means that things are going
+		very, very wrong, after that the table becomes inoperative and will die
+		on all the subsequent operations as well. You need to be very careful
+		in writing these functions.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_aggregation_window">
+		<title>Tricks with aggregation on a sliding window</title>
+
+		<para>
+		Now it all works as it should, but there is still some room for improvement,
+		related to the way the sliding window limits are handled.
+		</para>
+
+		<para>
+		Let's look again at the sample aggregation output with row deletion, copied
+		here for convenience:
+		</para>
+
+<!-- t/xAgg.t doNonAdditive, second copy -->
+<exdump>
+> OP_INSERT,1,AAA,10,10
+tWindow.aggrAvgPrice OP_INSERT symbol="AAA" id="1" price="10" 
+> OP_INSERT,3,AAA,20,20
+tWindow.aggrAvgPrice OP_DELETE symbol="AAA" id="1" price="10" 
+tWindow.aggrAvgPrice OP_INSERT symbol="AAA" id="3" price="15" 
+> OP_INSERT,5,AAA,30,30
+tWindow.aggrAvgPrice OP_DELETE symbol="AAA" id="3" price="15" 
+tWindow.aggrAvgPrice OP_INSERT symbol="AAA" id="5" price="25" 
+> OP_DELETE,3
+tWindow.aggrAvgPrice OP_DELETE symbol="AAA" id="5" price="25" 
+tWindow.aggrAvgPrice OP_INSERT symbol="AAA" id="5" price="30" 
+> OP_DELETE,5
+tWindow.aggrAvgPrice OP_DELETE symbol="AAA" id="5" price="30" 
+</exdump>
+
+		<para>
+		When the row with id=3 is deleted, the average price reverts to 30,
+		which is the price of the trade with id=5, not the average of trades
+		with id 1 and 5. 
+		</para>
+
+		<para>
+		This is because the table is actually a sliding window, with the
+		FIFO index having a limit of 2 rows
+		</para>
+
+<!-- fragment of the previous example -->
+<pre>
+my $ttWindow = Triceps::TableType->new($rtTrade)
+	->addSubIndex("byId", 
+		Triceps::IndexType->newHashed(key => [ "id" ])
+	)
+	->addSubIndex("bySymbol", 
+		Triceps::IndexType->newHashed(key => [ "symbol" ])
+		->addSubIndex("last2",
+			Triceps::IndexType->newFifo(limit => 2)
+			->setAggregator(Triceps::AggregatorType->new(
+				$rtAvgPrice, "aggrAvgPrice", undef, \&computeAverage1)
+			)
+		)
+	)
+;
+</pre>
+
+		<para>
+		When the row with id=5 was inserted,
+		it pushed out the row with id=1. Deleting the record with id=3 does not
+		put that row with id=1 back. You can see the group contents in an even
+		earlier printout with the manual aggregation, also copied here for
+		convenience: 
+		</para>
+
+<!-- t/xWindow.t doManualAgg1, 2nd copy -->
+<exdump>
+> OP_INSERT,1,AAA,10,10
+Contents:
+  id="1" symbol="AAA" price="10" size="10" 
+lbAverage OP_INSERT symbol="AAA" id="1" price="10" 
+> OP_INSERT,3,AAA,20,20
+Contents:
+  id="1" symbol="AAA" price="10" size="10" 
+  id="3" symbol="AAA" price="20" size="20" 
+lbAverage OP_INSERT symbol="AAA" id="3" price="15" 
+> OP_INSERT,5,AAA,30,30
+Contents:
+  id="3" symbol="AAA" price="20" size="20" 
+  id="5" symbol="AAA" price="30" size="30" 
+lbAverage OP_INSERT symbol="AAA" id="5" price="25" 
+> OP_DELETE,3
+Contents:
+  id="5" symbol="AAA" price="30" size="30" 
+lbAverage OP_INSERT symbol="AAA" id="5" price="30" 
+> OP_DELETE,5
+Contents:
+</exdump>
+
+		<para>
+		Like the toothpaste, once out of the tube, it's not easy to put back.
+		But for this particular kind of toothpaste there is a trick: keep more
+		rows in the group just in case but use only the last few for the
+		actual aggregation. To allow an occasional deletion of a single row, we
+		can keep 3 rows instead of 2.
+		</para>
+
+		<para>
+		So, change the table definition:
+		</para>
+
+<pre>
+...
+			Triceps::IndexType->newFifo(limit => 3)
+... 
+</pre>
+
+		<para>
+		and modify the aggregator function to use only the last 2 rows from the
+		group, even if more are available:
+		</para>
+
+<!-- t/xAgg.t doExtraRecord -->
+<pre>
+sub computeAverage2 # (table, context, aggop, opcode, rh, state, args...)
+{
+	my ($table, $context, $aggop, $opcode, $rh, $state, @args) = @_;
+
+	# don't send the NULL record after the group becomes empty
+	return if ($context->groupSize()==0
+		|| $opcode == &Triceps::OP_NOP);
+
+	my $skip = $context->groupSize()-2;
+	my $sum = 0;
+	my $count = 0;
+	for (my $rhi = $context->begin(); !$rhi->isNull(); 
+			$rhi = $context->next($rhi)) {
+		if ($skip > 0) {
+			$skip--;
+			next;
+		}
+		$count++;
+		$sum += $rhi->getRow()->get("price");
+	}
+	my $rLast = $context->last()->getRow();
+	my $avg = $sum/$count;
+
+	my $res = $context->resultType()->makeRowHash(
+		symbol => $rLast->get("symbol"), 
+		id => $rLast->get("id"), 
+		price => $avg
+	);
+	$context->send($opcode, $res);
+}
+</pre>
+
+		<para>
+		The output from this version becomes:
+		</para>
+
+<!-- t/xAgg.t doExtraRecord -->
+<exdump>
+> OP_INSERT,1,AAA,10,10
+tWindow.aggrAvgPrice OP_INSERT symbol="AAA" id="1" price="10" 
+> OP_INSERT,3,AAA,20,20
+tWindow.aggrAvgPrice OP_DELETE symbol="AAA" id="1" price="10" 
+tWindow.aggrAvgPrice OP_INSERT symbol="AAA" id="3" price="15" 
+> OP_INSERT,5,AAA,30,30
+tWindow.aggrAvgPrice OP_DELETE symbol="AAA" id="3" price="15" 
+tWindow.aggrAvgPrice OP_INSERT symbol="AAA" id="5" price="25" 
+> OP_DELETE,3
+tWindow.aggrAvgPrice OP_DELETE symbol="AAA" id="5" price="25" 
+tWindow.aggrAvgPrice OP_INSERT symbol="AAA" id="5" price="20" 
+> OP_DELETE,5
+tWindow.aggrAvgPrice OP_DELETE symbol="AAA" id="5" price="20" 
+tWindow.aggrAvgPrice OP_INSERT symbol="AAA" id="1" price="10" 
+</exdump>
+
+		<para>
+		Now after <pre>OP_DELETE,3</pre> the average price becomes 20, the
+		average of 10 and 30, because the row with id=1 comes into play again.
+		Can you repeat that in the SQLy languages?
+		</para>
+
+		<para>
+		This version stores one extra row and thus can handle only one deletion
+		(until the deleted row's spot gets pushed out of the window naturally,
+		then it can handle another). It can not handle the arbitrary
+		modifications properly. If you insert another row with id=3 for the
+		same symbol <quote>AAA</quote>, the new version will be placed again at the end of the
+		window. If it was the last row anyway, that is fine. But if it was not
+		the last, as in this example, that would be an incorrect order that
+		will produce incorrect results.
+		</para>
+
+		<para>
+		But just change the table type definition to aggregate on a sorted
+		index instead of FIFO and it becomes able to handle the updates
+		while keeping the rows in the order of their ids:
+		</para>
+
+<!-- t/xAgg.t doSortById -->
+<pre>
+my $ttWindow = Triceps::TableType->new($rtTrade)
+	->addSubIndex("byId", 
+		Triceps::IndexType->newHashed(key => [ "id" ])
+	)
+	->addSubIndex("bySymbol", 
+		Triceps::IndexType->newHashed(key => [ "symbol" ])
+		->addSubIndex("orderById",
+			Triceps::SimpleOrderedIndex->new(id => "ASC",)
+			->setAggregator(Triceps::AggregatorType->new(
+				$rtAvgPrice, "aggrAvgPrice", undef, \&computeAverage3)
+			)
+		)
+		->addSubIndex("last3",
+			Triceps::IndexType->newFifo(limit => 3))
+	)
+;
+</pre>
+
+		<para>
+		The FIFO index is still there, in parallel, but it doesn't determine
+		the order of rows for aggregation any more.
+		Here is a sample of this version's work:
+		</para>
+
+<!-- t/xAgg.t doSortById -->
+<exdump>
+> OP_INSERT,1,AAA,10,10
+tWindow.aggrAvgPrice OP_INSERT symbol="AAA" id="1" price="10" 
+> OP_INSERT,3,AAA,20,20
+tWindow.aggrAvgPrice OP_DELETE symbol="AAA" id="1" price="10" 
+tWindow.aggrAvgPrice OP_INSERT symbol="AAA" id="3" price="15" 
+> OP_INSERT,5,AAA,30,30
+tWindow.aggrAvgPrice OP_DELETE symbol="AAA" id="3" price="15" 
+tWindow.aggrAvgPrice OP_INSERT symbol="AAA" id="5" price="25" 
+> OP_DELETE,3
+tWindow.aggrAvgPrice OP_DELETE symbol="AAA" id="5" price="25" 
+tWindow.aggrAvgPrice OP_INSERT symbol="AAA" id="5" price="20" 
+> OP_INSERT,3,AAA,20,20
+tWindow.aggrAvgPrice OP_DELETE symbol="AAA" id="5" price="20" 
+tWindow.aggrAvgPrice OP_INSERT symbol="AAA" id="5" price="25" 
+> OP_INSERT,7,AAA,40,40
+tWindow.aggrAvgPrice OP_DELETE symbol="AAA" id="5" price="25" 
+tWindow.aggrAvgPrice OP_INSERT symbol="AAA" id="7" price="35" 
+</exdump>
+
+		<para>
+		When the row with id=3 gets deleted, the average reverts to the rows 1
+		and 5. When the row 3 gets inserted back, the average works on
+		rows 3 and 5 again. Then when the row 7 is inserted, the aggregation
+		moves up to the rows 5 and 7.
+		</para>
+
+		<para>
+		The row expiration is still controlled by the FIFO index. So after the
+		row 3 is inserted back, the order of rows in the FIFO becomes
+		</para>
+
+<pre>
+1, 5, 3
+</pre>
+
+		<para>
+		Then when the row 7 is inserted, it advances to
+		</para>
+
+<pre>
+5, 3, 7
+</pre>
+
+		<para>
+		At this point, until the row 3 gets naturally popped out of the FIFO,
+		it's best not to have other deletions nor updates, or the group
+		contents may become incorrect.
+		</para>
+
+		<indexterm>
+			<primary>index</primary>
+			<secondary>ordered</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>index</primary>
+			<secondary>FIFO</secondary>
+		</indexterm>
+		<para>
+		The FIFO and Ordered index types work in parallel on the same group, and
+		the Ordered index always keeps the right order:
+		</para>
+
+<pre>
+1, 3, 5
+3, 5, 7
+</pre>
+
+		<para>
+		At long as the records with the two highest ids are in the group at
+		all, the Ordered index will keep them in the right position at the end.
+		</para>
+
+		<para>
+		In this case we could even make a bit of optimization: turn the sorting
+		order around, and have the Ordered index arrange the rows in the
+		descending order. Then instead of skipping the rows until the last two,
+		just take the first two rows of the reverse order. They'll be iterated
+		in the opposite direction but for the averaging it doesn't matter. And
+		instead of the last row take the first row of the opposite order. This
+		is a simple modification and is left as an exercise for the reader.
+		</para>
+
+		<para>
+		Thinking further, the sensitivity to the ordering comes largely from
+		the FIFO index. If the replacement policy could be done directly on the
+		Ordered index, it would become easier. Would be a good thing to add in
+		the future. Also, if you keep all the day's trades anyway, you might
+		not need to have a replacement policy at all: just pick the last 2
+		records for the aggregation. There is currently no way to iterate back
+		from the end (another thing to add in the future) but the same trick
+		with the opposite order would work. 
+		</para>
+
+		<indexterm>
+			<primary>table</primary>
+			<secondary>remove row</secondary>
+		</indexterm>
+		<para>
+		For a new subject, this table type indexes by id twice: once as a
+		primary index, another time as a nested one. Are both of them really
+		necessary or would just the nested one be good enough? That depends on
+		your input data. If you get the DELETEs like <pre>OP_DELETE,3</pre> with all the
+		other fields as NULL, then a separate primary index is definitely
+		needed. But if the DELETEs come exactly as the same records that were
+		inserted, only with a different opcode, like <pre>OP_DELETE,3,AAA,20,20</pre>
+		then the primary index can be skipped because the nested sorted index
+		will be able to find the rows correctly and handle them. The bottom
+		line is, the fully correct DELETE records are good.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_aggregation_optimized">
+		<title>Optimized DELETEs</title>
+
+		<indexterm>
+			<primary>aggregation</primary>
+			<secondary>optimization</secondary>
+		</indexterm>
+		<para>
+		I've already mentioned that the DELETEs coming out of an aggregator do not have
+		to be recalculated every time. Instead the rows can be remembered from
+		the insert time, and simply re-sent with the new opcode. That allows to
+		trade the CPU time for the extra memory. Of course, this works best
+		when there are many rows per aggregation group, then more CPU
+		time is saved on not iterating through them. How many is <quote>many</quote>? It
+		depends on the particular cases. You'd have to measure. Anyway, here is
+		how it's done:
+		</para>
+
+<!-- t/xAgg.t doRememberLast -->
+<pre>
+sub computeAverage4 # (table, context, aggop, opcode, rh, state, args...)
+{
+	my ($table, $context, $aggop, $opcode, $rh, $state, @args) = @_;
+
+	# don't send the NULL record after the group becomes empty
+	return if ($context->groupSize()==0
+		|| $opcode == &Triceps::OP_NOP);
+	if ($opcode == &Triceps::OP_DELETE) {
+		$context->send($opcode, $$state);
+		return;
+	}
+
+	my $sum = 0;
+	my $count = 0;
+	for (my $rhi = $context->begin(); !$rhi->isNull(); 
+			$rhi = $context->next($rhi)) {
+		$count++;
+		$sum += $rhi->getRow()->get("price");
+	}
+	my $rLast = $context->last()->getRow();
+	my $avg = $sum/$count;
+
+	my $res = $context->resultType()->makeRowHash(
+		symbol => $rLast->get("symbol"), 
+		id => $rLast->get("id"), 
+		price => $avg
+	);
+	${$state} = $res;
+	$context->send($opcode, $res);
+}
+
+sub initRememberLast #  (@args)
+{
+	my $refvar;
+	return \$refvar;
+}
+
+my $ttWindow = Triceps::TableType->new($rtTrade)
+	->addSubIndex("byId", 
+		Triceps::IndexType->newHashed(key => [ "id" ])
+	)
+	->addSubIndex("bySymbol", 
+		Triceps::IndexType->newHashed(key => [ "symbol" ])
+		->addSubIndex("last2",
+			Triceps::IndexType->newFifo(limit => 2)
+			->setAggregator(Triceps::AggregatorType->new(
+				$rtAvgPrice, "aggrAvgPrice", \&initRememberLast, \&computeAverage4)
+			)
+		)
+	)
+;
+</pre>
+
+		<para>
+		The rest of the example stays the same, so it's not shown. Even in the
+		part that is shown, very little has changed. 
+		</para>
+
+		<indexterm>
+			<primary>aggregation</primary>
+			<secondary>initialization</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>aggregation</primary>
+			<secondary>state</secondary>
+		</indexterm>
+		<para>
+		The aggregator type now has an initialization function. (This function
+		is <b>not</b> of the same kind as for the sorted index!) This function gets
+		called every time a new aggregation group gets created, before the
+		first row is inserted into it. It initializes the aggregator group's
+		Perl state by creating and returning the state value (the state is per
+		aggregator type, so if there are two parallel index types, each with an
+		aggregator, each aggregator will have its own group state). 
+		</para>
+
+		<para>
+		The state is stored in the group as a single Perl variable. So it
+		usually is a reference to a more complex object. 
+		In this case the value returned is a reference
+		to a variable that would contain a Row reference. (Ironically, the
+		simplest case looks a bit more confusing than if it were a reference to
+		an array or hash). Returning a reference to a <pre>my</pre> variable is a way to
+		create a reference to an anonymous value: each time <pre>my</pre> executes, it
+		creates a new value. Which is then kept in a reference after the
+		initialization function returns. The next time the function executes,
+		<pre>my</pre> would create another new value.
+		</para>
+
+		<para>
+		The computation function has that state passed as an argument and now
+		makes use of it. It has two small additions. Before sending a new
+		result row, that row gets remembered in the state reference. And then
+		before doing any computation the function checks, whether the required
+		opcode is DELETE, and if so then simply resends the last result with
+		the new opcode. Remember, the rows are not copied but
+		reference-counted, so this is fairly cheap.
+		</para>
+
+		<para>
+		The extra level of referencing is used because simply assigning to
+		<pre>$state</pre> would only change the local variable and not the value kept in
+		the group.
+		</para>
+
+		<para>
+		However if you change the argument of the function directly, that would
+		change the value kept in the group (similar to changing the loop
+		variable in a <i>foreach</i> loop). So you can save a bit of overhead
+		by eliminating the extra indirection. The modified version will be:
+		</para>
+
+<!-- t/xAgg.t doRememberLastNR -->
+<pre>
+sub computeAverage5 # (table, context, aggop, opcode, rh, state, args...)
+{
+	my ($table, $context, $aggop, $opcode, $rh, $state, @args) = @_;
+
+	# don't send the NULL record after the group becomes empty
+	return if ($context->groupSize()==0
+		|| $opcode == &Triceps::OP_NOP);
+	if ($opcode == &Triceps::OP_DELETE) {
+		$context->send($opcode, $state);
+		return;
+	}
+
+	my $sum = 0;
+	my $count = 0;
+	for (my $rhi = $context->begin(); !$rhi->isNull(); 
+			$rhi = $context->next($rhi)) {
+		$count++;
+		$sum += $rhi->getRow()->get("price");
+	}
+	my $rLast = $context->last()->getRow();
+	my $avg = $sum/$count;
+
+	my $res = $context->resultType()->makeRowHash(
+		symbol => $rLast->get("symbol"), 
+		id => $rLast->get("id"), 
+		price => $avg
+	);
+	$_[5] = $res;
+	$context->send($opcode, $res);
+}
+
+sub initRememberLast5 #  (@args)
+{
+	return undef;
+}
+</pre>
+
+		<para>
+		Even though the initialization function returns <pre>undef</pre>, it still
+		must be present. If it's not present, the state argument of the
+		comparison function will contain a special hardcoded and unmodifiable
+		<pre>undef</pre> constant, and nothing could be remembered.
+		</para>
+
+		<para>
+		And here is an example of its work:
+		</para>
+
+<!-- t/xAgg.t doRememberLastNR -->
+<exdump>
+> OP_INSERT,1,AAA,10,10
+tWindow.aggrAvgPrice OP_INSERT symbol="AAA" id="1" price="10" 
+> OP_INSERT,2,BBB,100,100
+tWindow.aggrAvgPrice OP_INSERT symbol="BBB" id="2" price="100" 
+> OP_INSERT,3,AAA,20,20
+tWindow.aggrAvgPrice OP_DELETE symbol="AAA" id="1" price="10" 
+tWindow.aggrAvgPrice OP_INSERT symbol="AAA" id="3" price="15" 
+> OP_INSERT,4,BBB,200,200
+tWindow.aggrAvgPrice OP_DELETE symbol="BBB" id="2" price="100" 
+tWindow.aggrAvgPrice OP_INSERT symbol="BBB" id="4" price="150" 
+> OP_INSERT,5,AAA,30,30
+tWindow.aggrAvgPrice OP_DELETE symbol="AAA" id="3" price="15" 
+tWindow.aggrAvgPrice OP_INSERT symbol="AAA" id="5" price="25" 
+> OP_DELETE,3
+tWindow.aggrAvgPrice OP_DELETE symbol="AAA" id="5" price="25" 
+tWindow.aggrAvgPrice OP_INSERT symbol="AAA" id="5" price="30" 
+> OP_DELETE,5
+tWindow.aggrAvgPrice OP_DELETE symbol="AAA" id="5" price="30" 
+</exdump>
+
+		<para>
+		Since the rows are grouped by the symbol, the symbols <quote>AAA</quote> and <quote>BBB</quote>
+		will have separate aggregation states.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_aggregation_additive">
+		<title>Additive aggregation</title>
+
+		<indexterm>
+			<primary>aggregation</primary>
+			<secondary>optimization</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>aggregation</primary>
+			<secondary>additive</secondary>
+		</indexterm>
+		<para>
+		In some cases the aggregation values don't have to be calculated by
+		going through all the rows from scratch every time. If you do a sum of
+		a field, you can as well add the value of the field when a row is
+		inserted and subtract when a row is deleted. Not surprisingly, this is
+		called an <quote>additive aggregation</quote>.
+		</para>
+
+		<indexterm>
+			<primary>SQL</primary>
+		</indexterm>
+		<para>
+		The averaging can also be done as an additive aggregation: it amounts
+		to a sum divided by a count. The sum can obviously be done additively.
+		The count is potentially additive too, but even better, we have the
+		shortcut of <pre>$context->groupSize()</pre>. Well, at least for the same
+		definition of count that has been used previously in the non-additive example. The
+		SQL definition of count (and of average) includes only the non-NULL
+		values, but in the next example we will go with the Perl approach where
+		a NULL is taken to have the same meaning as 0. The proper SQL count
+		could not use that shortcut but would still be additive.
+		</para>
+
+		<para>
+		Triceps provides a way to implement the additive aggregation too. It
+		calls the aggregation computation function for each changed row, giving
+		it an opportunity to react. The argument <pre>$aggop</pre> indicates, what has
+		happened. Here is the same example from
+		<xref linkend="sc_aggregation_proper" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;
+		rewritten in an additive way:
+		</para>
+
+<!-- t/xAgg.t doSimpleAdditiveState -->
+<pre>
+sub computeAverage7 # (table, context, aggop, opcode, rh, state, args...)
+{
+	my ($table, $context, $aggop, $opcode, $rh, $state, @args) = @_;
+	my $rowchg;
+	
+	if ($aggop == &Triceps::AO_BEFORE_MOD) { 
+		$context->send($opcode, $state->{lastrow});
+		return;
+	} elsif ($aggop == &Triceps::AO_AFTER_DELETE) { 
+		$rowchg = -1;
+	} elsif ($aggop == &Triceps::AO_AFTER_INSERT) { 
+		$rowchg = 1;
+	} else { # AO_COLLAPSE, also has opcode OP_DELETE
+		return
+	}
+
+	$state->{price_sum} += $rowchg * $rh->getRow()->get("price");
+
+	return if ($context->groupSize()==0
+		|| $opcode == &Triceps::OP_NOP);
+
+	my $rLast = $context->last()->getRow();
+	my $count = $context->groupSize();
+	my $avg = $state->{price_sum}/$count;
+	my $res = $context->resultType()->makeRowHash(
+		symbol => $rLast->get("symbol"), 
+		id => $rLast->get("id"), 
+		price => $avg
+	);
+	$state->{lastrow} = $res;
+
+	$context->send($opcode, $res);
+}
+
+sub initAverage7 #  (@args)
+{
+	return { lastrow => undef, price_sum => 0 };
+}
+</pre>
+
+		<para>
+		The tricks of keeping an extra row from
+		<xref linkend="sc_aggregation_window" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;
+		could not be used with the additive aggregation. An additive
+		aggregation relies on Triceps to tell it, which rows are deleted and
+		which inserted, so it can not do any extra skipping easily. The index
+		for the aggregation has to be defined with the correct limits. If we
+		want an average of the last 2 rows, we set the limit to 2:
+		</para>
+
+<!-- t/xAgg.t doSimpleAdditiveState -->
+<pre>
+my $ttWindow = Triceps::TableType->new($rtTrade)
+	->addSubIndex("byId", 
+		Triceps::IndexType->newHashed(key => [ "id" ])
+	)
+	->addSubIndex("bySymbol", 
+		Triceps::IndexType->newHashed(key => [ "symbol" ])
+		->addSubIndex("last2",
+			Triceps::IndexType->newFifo(limit => 2)
+			->setAggregator(Triceps::AggregatorType->new(
+				$rtAvgPrice, "aggrAvgPrice", \&initAverage7, \&computeAverage7)
+			)
+		)
+	)
+;
+</pre>
+
+		<indexterm>
+			<primary>aggregation</primary>
+			<secondary>state</secondary>
+		</indexterm>
+		<para>
+		The aggregation state has grown: now it includes not only the last sent
+		row but also the sum of the price, which is used for the aggregation,
+		kept together in a hash. The last sent row doesn't really have to be
+		kept, and I'll show another example without it, but for now let's look
+		at how things are done when it is kept.
+		</para>
+
+		<para>
+		The argument <pre>$aggop</pre> describes, why the computation is being called.
+		Note that Triceps doesn't know if the aggregation is additive or not.
+		It does the calls the same in every case. Just in the previous examples
+		we weren't interested in this information and didn't look at it. <pre>$aggop</pre>
+		contains one of the constant values:
+		</para>
+
+		<indexterm>
+			<primary>aggregation</primary>
+			<secondary>operation</secondary>
+		</indexterm>
+		<itemizedlist>
+		<listitem>
+		<pre>&Triceps::AO_BEFORE_MOD</pre>: the group is about to be modified,
+		need to send a DELETE of the old aggregated row. The argument <pre>$opcode</pre> 
+		will always be <pre>OP_DELETE</pre>.
+		</listitem>
+		<listitem>
+		<pre>&Triceps::AO_AFTER_DELETE</pre>: the group has been modified by
+		deleting a row from it. The argument <pre>$rh</pre> will refer to the row handle
+		being deleted. The <pre>$opcode</pre> may be either <pre>OP_NOP</pre> or <pre>OP_INSERT</pre>. A single
+		operation on a table may affect multiple rows: an insert may trigger
+		the replacement policy in the indexes and cause one or more rows to be
+		deleted. If there are multiple rows deleted or inserted in a group, the
+		additive aggregator needs to know about all of them to keep its state
+		correct but does not need (and even must not) send a new result until
+		the last one of them has been processed. The call for the last
+		modification will have the opcode of <pre>OP_INSERT</pre>. The preceding
+		intermediate ones will have the opcode of <pre>OP_NOP</pre>. An important point,
+		even though a row is being deleted from the group, the aggregator
+		opcode is <pre>OP_INSERT</pre>, because it inserts the new aggregator state!
+		</listitem>
+		<listitem>
+		<pre>&Triceps::AO_AFTER_INSERT</pre>: the group has been modified by
+		inserting a row into it. Same as for <pre>AO_AFTER_DELETE</pre>, <pre>$rh</pre> will refer to
+		the row handle being inserted, and <pre>$opcode</pre> will be <pre>OP_NOP</pre> or <pre>OP_INSERT</pre>.
+		</listitem>
+		<indexterm>
+			<primary>memory management</primary>
+		</indexterm>
+		<listitem>
+		<pre>&Triceps::AO_COLLAPSE</pre>: called after the last row is deleted
+		from the group, just before the whole group is collapsed and deleted.
+		This allows the aggregator to destroy its state properly. For most of
+		the aggregators there is nothing special to be done. The only case when
+		you want to do something is if your state causes some circular
+		references. Perl doesn't free the circular references until the whole
+		interpreter exits, and so you'd have to break the circle to let them be
+		freed immediately. The aggregator should not produce any results on
+		this call. The <pre>$opcode</pre> will be <pre>OP_NOP</pre>.
+		</listitem>
+		</itemizedlist>
+
+		<para>
+		The computation reacts accordingly: for the before-modification it
+		re-sends the old result with the new opcode, for the collapse it does
+		nothing, and for after-modification it calculates the sign, whether the
+		value from <pre>$rh</pre> needs to be added or subtracted from the sum. I'm
+		actually thinking, maybe this sign should be passed as a separate
+		argument too, and then both the aggregation operation constants
+		<pre>AO_AFTER_*</pre> can be merged into one. We'll see, maybe it will be changed
+		in the future.
+		</para>
+
+		<para>
+		Then the addition/subtraction is done and the state updated.
+		</para>
+
+		<para>
+		After that, if the row does not need to be sent (opcode is <pre>OP_NOP</pre> or
+		group size is 0), the function can as well return here without
+		constructing the new row.
+		</para>
+
+		<indexterm>
+			<primary>SQL</primary>
+		</indexterm>
+		<para>
+		If the row needs to be produced, continue with the same logic as the
+		non-additive aggregator, only without iteration through the group. The
+		id field in the result is produced by essentially the SQL <pre>LAST()</pre> 
+		operator. <pre>LAST()</pre> and <pre>FIRST()</pre> are not additive, they refer to the values
+		in the last or first row in the group's order, and simply can not be
+		calculated from looking at which rows are being inserted and deleted
+		without knowing their order in the group. But they are fast as they are,
+		and do not require iteration. The same goes for the row count (as long
+		as we don't care about excluding NULLs, violating the SQL semantics).
+		And for averaging there is the last step to do after the additive part
+		is done: divide the sum by the count.
+		</para>
+
+		<para>
+		All these non-additive steps are done in this last section, then the
+		result row is constructed, remembered and sent.
+		</para>
+
+		<para>
+		Not all the aggregation operations can be expressed in an additive way.
+		It may even vary by the data. For <pre>MAX()</pre>, the insertion of a row can be
+		always done additively, just comparing the new value with the
+		remembered maximum, and replacing it if the new value is greater. The
+		deletion can also compare the deleted value with the remembered
+		maximum. If the deleted value is less, then the maximum is unchanged.
+		But if the deleted value is equal to the maximum, <pre>MAX()</pre> has to iterate
+		through all the values and find the new maximum. 
+		</para>
+
+		<indexterm>
+			<primary>aggregation</primary>
+			<secondary>floating point error</secondary>
+		</indexterm>
+		<para>
+		There is also an issue with the floating point precision in the
+		additive aggregation. It's not such a big issue if the rows are only
+		added and never deleted from the group, but can get much worse with the
+		deletion. Let me show it with a sample run of the additive code:
+		</para>
+
+<!-- t/xAgg.t doSimpleAdditiveState precision loss -->
+<exdump>
+> OP_INSERT,1,AAA,1,10
+tWindow.aggrAvgPrice OP_INSERT symbol="AAA" id="1" price="1" 
+> OP_INSERT,2,AAA,1e20,20
+tWindow.aggrAvgPrice OP_DELETE symbol="AAA" id="1" price="1" 
+tWindow.aggrAvgPrice OP_INSERT symbol="AAA" id="2" price="5e+19" 
+> OP_INSERT,3,AAA,2,10
+tWindow.aggrAvgPrice OP_DELETE symbol="AAA" id="2" price="5e+19" 
+tWindow.aggrAvgPrice OP_INSERT symbol="AAA" id="3" price="5e+19" 
+> OP_INSERT,4,AAA,3,10
+tWindow.aggrAvgPrice OP_DELETE symbol="AAA" id="3" price="5e+19" 
+tWindow.aggrAvgPrice OP_INSERT symbol="AAA" id="4" price="1.5" 
+</exdump>
+
+		<para>
+		Why is the last result 1.5 while it had to be (2+3)/2 = 2.5? Because
+		adding together 1e20 and 2 had pushed the 2 beyond the precision of
+		floating-point number. 1e20+2 = 1e20. So when the row with 1e20 was
+		deleted from the group and subtracted form the sum, that left 0. Which
+		got then averaged with 3, producing 1.5.
+		</para>
+
+		<para>
+		Of course, with the real stock prices there won't be that much
+		variation. But the subtler errors will still accumulate over time, and
+		you have to expect them and plan accordingly.
+		</para>
+
+		<para>
+		Switching to a different subject, the additive aggregation contains
+		enough information in its state to generate the result rows quickly
+		without an iteration. This means that keeping the saved result row for
+		DELETEs doesn't give a whole lot of advantage and adds at least a
+		little memory overhead. We can change the code and avoid keeping
+		it:
+		</para>
+
+<!-- t/xAgg.t doSimpleAdditiveNoLast -->
+<pre>
+sub computeAverage8 # (table, context, aggop, opcode, rh, state, args...)
+{
+	my ($table, $context, $aggop, $opcode, $rh, $state, @args) = @_;
+	my $rowchg;
+	
+	if ($aggop == &Triceps::AO_COLLAPSE) { 
+		return
+	} elsif ($aggop == &Triceps::AO_AFTER_DELETE) { 
+		$state->{price_sum} -= $rh->getRow()->get("price");
+	} elsif ($aggop == &Triceps::AO_AFTER_INSERT) { 
+		$state->{price_sum} += $rh->getRow()->get("price");
+	}
+	# on AO_BEFORE_MOD do nothing
+
+	return if ($context->groupSize()==0
+		|| $opcode == &Triceps::OP_NOP);
+
+	my $rLast = $context->last()->getRow();
+	my $count = $context->groupSize();
+
+	$context->makeHashSend($opcode, 
+		symbol => $rLast->get("symbol"), 
+		id => $rLast->get("id"), 
+		price => $state->{price_sum}/$count,
+	);
+}
+
+sub initAverage8 #  (@args)
+{
+	return { price_sum => 0 };
+}
+</pre>
+
+		<para>
+		On <pre>AO_BEFORE_MOD</pre> it doesn't do any change to the additive state but then produces
+		the result row from that state as usual, using the supplied <pre>$opcode</pre> value of
+		<pre>OP_DELETE</pre>.
+		The other change in this example is that the sum gets directly added or
+		subtracted in <pre>AO_AFTER_*</pre> instead of computing the sign first. It's all
+		pretty much self-explanatory.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_aggregation_args">
+		<title>Computation function arguments</title>
+
+		<indexterm>
+			<primary>aggregation</primary>
+			<secondary>arguments</secondary>
+		</indexterm>
+
+		<para>
+		Let's look up close at what calls are done to the aggregation
+		computation function. Just make a <quote>computation</quote> that prints the call
+		arguments:
+		</para>
+
+<!-- t/xAgg.t doPrintCall -->
+<pre>
+sub computeAverage9 # (table, context, aggop, opcode, rh, state, args...)
+{
+	my ($table, $context, $aggop, $opcode, $rh, $state, @args) = @_;
+	
+	&send(&Triceps::aggOpString($aggop), " ", &Triceps::opcodeString($opcode), " ", $context->groupSize(), " ", (!$rh->isNull()? $rh->getRow()->printP(): "NULL"), "\n");
+}
+</pre>
+
+		<para>
+		It prints the aggregation operation, the result opcode, row count in
+		the group, and the argument row (or <quote>NULL</quote>). The aggregation is done
+		as before, on the same FIFO index with the size limit of 2.
+		</para>
+
+		<para>
+		To show the order of aggregator calls relative to the table label
+		calls, I've added the labels that print the updates form the table:
+		</para>
+
+<!-- t/xAgg.t doPrintCall -->
+<pre>
+my $lbPre = makePrintLabel("lbPre", $tWindow->getPreLabel());
+my $lbOut = makePrintLabel("lbOut", $tWindow->getOutputLabel());
+</pre>
+
+		<para>
+		To make keeping track of the printout easier, I broke up the sequence
+		into multiple fragments, with a description after each fragment:
+		</para>
+
+<!-- t/xAgg.t doPrintCall -->
+<exdump>
+> OP_INSERT,1,AAA,10,10
+tWindow.pre OP_INSERT id="1" symbol="AAA" price="10" size="10" 
+tWindow.out OP_INSERT id="1" symbol="AAA" price="10" size="10" 
+AO_AFTER_INSERT OP_INSERT 1 id="1" symbol="AAA" price="10" size="10" 
+> OP_INSERT,2,BBB,100,100
+tWindow.pre OP_INSERT id="2" symbol="BBB" price="100" size="100" 
+tWindow.out OP_INSERT id="2" symbol="BBB" price="100" size="100" 
+AO_AFTER_INSERT OP_INSERT 1 id="2" symbol="BBB" price="100" size="100" 
+</exdump>
+
+		<para>
+		The INSERT of the first row in each group causes only one call. There is
+		no previous value to delete, only a new one to insert. The call happens
+		after the row has been inserted into the group.
+		</para>
+
+<!-- t/xAgg.t doPrintCall -->
+<exdump>
+> OP_INSERT,3,AAA,20,20
+AO_BEFORE_MOD OP_DELETE 1 NULL
+tWindow.pre OP_INSERT id="3" symbol="AAA" price="20" size="20" 
+tWindow.out OP_INSERT id="3" symbol="AAA" price="20" size="20" 
+AO_AFTER_INSERT OP_INSERT 2 id="3" symbol="AAA" price="20" size="20" 
+</exdump>
+
+		<para>
+		Adding the second record in a group means that the aggregation result
+		for this group is modified. So first the aggregator is called to delete
+		the old result, then the new row gets inserted, and the aggregator is
+		called the second time to produce its new result.
+		</para>
+
+<!-- t/xAgg.t doPrintCall -->
+<exdump>
+> OP_INSERT,5,AAA,30,30
+AO_BEFORE_MOD OP_DELETE 2 NULL
+tWindow.pre OP_DELETE id="1" symbol="AAA" price="10" size="10" 
+tWindow.out OP_DELETE id="1" symbol="AAA" price="10" size="10" 
+tWindow.pre OP_INSERT id="5" symbol="AAA" price="30" size="30" 
+tWindow.out OP_INSERT id="5" symbol="AAA" price="30" size="30" 
+AO_AFTER_DELETE OP_NOP 2 id="1" symbol="AAA" price="10" size="10" 
+AO_AFTER_INSERT OP_INSERT 2 id="5" symbol="AAA" price="30" size="30" 
+</exdump>
+
+		<para>
+		The insertion of the third row in a group triggers the replacement policy in the
+		FIFO index. The replacement policy causes the row with id=1 to be
+		deleted before the row with id=5 is inserted. For the aggregator result
+		it's still a single delete-insert pair: First, before modification, the
+		old aggregation result is deleted. Then the contents of the group gets
+		modified with both the delete and insert. And then the aggregator gets
+		told, what has been modified. The deletion of the row with id=1 is not
+		the last step, so that call gets the opcode of <pre>OP_NOP</pre>. Note that the
+		group size with it is 2, not 1. That's because the aggregator gets
+		notified only after all the modifications are already done. So the
+		additive part of the computation must never read the group size or do
+		any kind of iteration through the group, because that would often cause
+		an incorrect result: it has no way to tell, what other modifications
+		have been already done to the group. The last <pre>AO_AFTER_INSERT</pre> gets the
+		opcode of <pre>OP_INSERT</pre> which tells the computation to send the new result
+		of the aggregation. When the opcode is <pre>OP_INSERT</pre>, reading the group
+		size and the other group information becomes safe, because by this
+		time all the modifications are guaranteed to be done, and the additive
+		notifications have caught up with all the changes.
+		</para>
+
+<!-- t/xAgg.t doPrintCall -->
+<exdump>
+> OP_INSERT,3,BBB,20,20
+AO_BEFORE_MOD OP_DELETE 2 NULL
+AO_BEFORE_MOD OP_DELETE 1 NULL
+tWindow.pre OP_DELETE id="3" symbol="AAA" price="20" size="20" 
+tWindow.out OP_DELETE id="3" symbol="AAA" price="20" size="20" 
+tWindow.pre OP_INSERT id="3" symbol="BBB" price="20" size="20" 
+tWindow.out OP_INSERT id="3" symbol="BBB" price="20" size="20" 
+AO_AFTER_DELETE OP_INSERT 1 id="3" symbol="AAA" price="20" size="20" 
+AO_AFTER_INSERT OP_INSERT 2 id="3" symbol="BBB" price="20" size="20" 
+</exdump>
+
+		<para>
+		This insert is of a <quote>dirty</quote> kind, the one that replaces the row using
+		the replacement policy of the hashed primary index, without deleting
+		its old state first. It also moves the row from one aggregation group
+		to another. So the table logic calls <pre>AO_BEFORE_MOD</pre> for each of the
+		modified groups, then modifies the contents of the groups, then tells
+		both groups about the modifications. In this case both calls with
+		<pre>AO_AFTER_*</pre> have the opcode of <pre>OP_INSERT</pre> because each of them is the
+		last and only change to a separate aggregation group.
+		</para>
+
+<!-- t/xAgg.t doPrintCall -->
+<exdump>
+> OP_DELETE,5
+AO_BEFORE_MOD OP_DELETE 1 NULL
+tWindow.pre OP_DELETE id="5" symbol="AAA" price="30" size="30" 
+tWindow.out OP_DELETE id="5" symbol="AAA" price="30" size="30" 
+AO_AFTER_DELETE OP_INSERT 0 id="5" symbol="AAA" price="30" size="30" 
+AO_COLLAPSE OP_NOP 0 NULL
+</exdump>
+
+		<para>
+		This operation removes the last row in a group. It starts as usual with
+		deleting the old state. The next <pre>AO_AFTER_DELETE</pre> with <pre>OP_INSERT</pre> is
+		intended for the Coral8-style aggregators that produce only the rows
+		with the INSERT opcodes, never DELETEs, to let them insert the NULL (or
+		zero) values in all the non-key fields. For the normal aggregators the
+		work is all done after <pre>OP_DELETE</pre>. That's why all the shown examples were
+		checking for <pre>$context->groupSize() == 0</pre> and returning if so. The
+		group size will be zero in absolutely no other case than after the
+		deletion of the last row. Finally <pre>AO_COLLAPSE</pre> allows to clean up the
+		aggregator's group state if it needs any cleaning. It has the opcode
+		<pre>OP_NOP</pre> because no rows need to be sent.
+		</para>
+
+		<indexterm>
+			<primary>table</primary>
+			<secondary>execution order</secondary>
+		</indexterm>
+		<para>
+		To recap, the high-level order of the table operation processing is:
+		</para>
+
+		<orderedlist>
+		<listitem>
+		Execute the replacement policies on all the indexes to find all the
+		rows that need to be deleted first.
+		</listitem>
+
+		<listitem>
+		If any of the index policies forbid the modification, return 0.
+		</listitem>
+
+		<listitem>
+		Call all the aggregators with <pre>AO_BEFORE_MOD</pre> on all the affected rows.
+		</listitem>
+
+		<listitem>
+		Send these aggregator results.
+		</listitem>
+
+		<listitem>
+			<para>
+			For each affected row:
+			</para>
+			<orderedlist>
+			<listitem>
+			Call the "pre" label (if it has any labels chained to it).
+			</listitem>
+
+			<listitem>
+			Modify the row in the table.
+			</listitem>
+
+			<listitem>
+			Call the "out" label.
+			</listitem>
+			</orderedlist>
+		</listitem>
+
+		<listitem>
+		Call all the aggregators with <pre>AO_AFTER_*</pre>, on all the affected rows.
+		</listitem>
+
+		<listitem>
+		Send these aggregator results.
+		</listitem>
+		</orderedlist>
+	</sect1>
+
+	<sect1 id="sc_aggregation_multi_idx">
+		<title>Using multiple indexes</title>
+
+		<indexterm>
+			<primary>aggregation</primary>
+			<secondary>multiple indexes</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>aggregation</primary>
+			<secondary>floating point error</secondary>
+		</indexterm>
+		<para>
+		I've mentioned before that the floating numbers are tricky to handle.
+		Even without additive aggregation the result depends on the rounding.
+		Which in turn depends on the order in which the operations are done.
+		Let's look at a version of the aggregation code that highlights this
+		issue.
+		</para>
+
+<!-- t/xAgg.t doNonAdditive3 -->
+<pre>
+sub computeAverage10 # (table, context, aggop, opcode, rh, state, args...)
+{
+	my ($table, $context, $aggop, $opcode, $rh, $state, @args) = @_;
+
+	# don't send the NULL record after the group becomes empty
+	return if ($context->groupSize()==0
+		|| $opcode != &Triceps::OP_INSERT);
+
+	my $sum = 0;
+	my $count = 0;
+	for (my $rhi = $context->begin(); !$rhi->isNull(); 
+			$rhi = $context->next($rhi)) {
+		$count++;
+		$sum += $rhi->getRow()->get("price");
+	}
+	my $rLast = $context->last()->getRow();
+	my $avg = $sum/$count;
+
+	my $res = $context->resultType()->makeRowHash(
+		symbol => $rLast->get("symbol"), 
+		id => $rLast->get("id"), 
+		price => $avg
+	);
+	$context->send($opcode, $res);
+}
+
+my $ttWindow = Triceps::TableType->new($rtTrade)
+	->addSubIndex("byId", 
+		Triceps::IndexType->newHashed(key => [ "id" ])
+	)
+	->addSubIndex("bySymbol", 
+		Triceps::IndexType->newHashed(key => [ "symbol" ])
+		->addSubIndex("last4",
+			Triceps::IndexType->newFifo(limit => 4)
+			->setAggregator(Triceps::AggregatorType->new(
+				$rtAvgPrice, "aggrAvgPrice", undef, \&computeAverage10)
+			)
+		)
+	)
+;
+$ttWindow->initialize();
+my $tWindow = $uTrades->makeTable($ttWindow, "tWindow");
+
+# label to print the result of aggregation
+my $lbAverage = $uTrades->makeLabel($rtAvgPrice, "lbAverage",
+	undef, sub { # (label, rowop)
+		&sendf("%.17g\n", $_[1]->getRow()->get("price"));
+	});
+$tWindow->getAggregatorLabel("aggrAvgPrice")->chain($lbAverage);
+</pre>
+
+		<para>
+		The differences from the previously shown basic aggregation are:
+		</para>
+
+		<itemizedlist>
+		<listitem>
+		the FIFO limit has been increased to 4;
+		</listitem>
+		<listitem>
+		the only result value printed by the <pre>$lbAverage</pre> handler is the price,
+		and it's printed with a higher precision to make the difference
+		visible;
+		</listitem>
+		<listitem>
+		the aggregator computation only does the inserts, to reduce the clutter
+		in the results and highlight the issue.
+		</listitem>
+		</itemizedlist>
+
+		<para>
+		And here is an example of how the order of computation matters:
+		</para>
+
+<!-- t/xAgg.t doNonAdditive3 -->
+<exdump>
+> OP_INSERT,1,AAA,1,10
+1
+> OP_INSERT,2,AAA,1,10
+1
+> OP_INSERT,3,AAA,1,10
+1
+> OP_INSERT,4,AAA,1e16,10
+2500000000000001
+> OP_INSERT,5,BBB,1e16,10
+10000000000000000
+> OP_INSERT,6,BBB,1,10
+5000000000000000
+> OP_INSERT,7,BBB,1,10
+3333333333333333.5
+> OP_INSERT,8,BBB,1,10
+2500000000000000
+</exdump>
+
+		<para>
+		Of course, the real prices won't vary so wildly. But the other values
+		could. This example is specially stacked to demonstrate the point. The
+		final results for <quote>AAA</quote> and <quote>BBB</quote> should be the same but aren't. Why? The
+		precision of the 64-bit floating-point numbers is such that adding 1
+		to 1e16 makes this 1 fall beyond the precision, and the result is still
+		1e16. On the other hand, adding 3 to 1e16 makes at least a part of it
+		stick. 1 still falls off but the other 2 of 3 sticks on. Next look at the
+		data sets: if you add 1e16+1+1+1, that's adding 1e16+1 repeated three
+		times, and the result is still the same unchanged 1e16. But if you add
+		1+1+1+1e16, that's adding 3+1e16, and now the result is different and
+		more correct. When the averages get computed from these different values
+		by dividing the sums by 4, the results are also different.
+		</para>
+
+		<para>
+		Overall the rule of thumb for adding the floating point numbers is
+		this: add them up in the order from the smallest to the largest. (What
+		if the numbers can be negative too? I don't know, that goes beyond my
+		knowledge of floating point calculations. My guess is that you still
+		arrange them in the ascending order, only by the absolute value.) So
+		let's do it in the aggregator.
+		</para>
+
+<!-- t/xAgg.t doOrderedSum -->
+<pre>
+our $idxByPrice;
+
+# aggregation handler: sum in proper order
+sub computeAverage11 # (table, context, aggop, opcode, rh, state, args...)
+{
+	my ($table, $context, $aggop, $opcode, $rh, $state, @args) = @_;
+	our $idxByPrice;
+
+	# don't send the NULL record after the group becomes empty
+	return if ($context->groupSize()==0
+		|| $opcode != &Triceps::OP_INSERT);
+
+	my $sum = 0;
+	my $count = 0;
+	my $end = $context->endIdx($idxByPrice);
+	for (my $rhi = $context->beginIdx($idxByPrice); !$rhi->same($end); 
+			$rhi = $rhi->nextIdx($idxByPrice)) {
+		$count++;
+		$sum += $rhi->getRow()->get("price");
+	}
+	my $rLast = $context->last()->getRow();
+	my $avg = $sum/$count;
+
+	my $res = $context->resultType()->makeRowHash(
+		symbol => $rLast->get("symbol"), 
+		id => $rLast->get("id"), 
+		price => $avg
+	);
+	$context->send($opcode, $res);
+}
+
+my $ttWindow = Triceps::TableType->new($rtTrade)
+	->addSubIndex("byId", 
+		Triceps::IndexType->newHashed(key => [ "id" ])
+	)
+	->addSubIndex("bySymbol", 
+		Triceps::IndexType->newHashed(key => [ "symbol" ])
+		->addSubIndex("last4",
+			Triceps::IndexType->newFifo(limit => 4)
+			->setAggregator(Triceps::AggregatorType->new(
+				$rtAvgPrice, "aggrAvgPrice", undef, \&computeAverage11)
+			)
+		)
+		->addSubIndex("byPrice",
+			Triceps::SimpleOrderedIndex->new(price => "ASC",)
+			->addSubIndex("multi", Triceps::IndexType->newFifo())
+		)
+	)
+;
+$ttWindow->initialize();
+my $tWindow = $uTrades->makeTable($ttWindow, "tWindow");
+
+$idxByPrice = $ttWindow->findIndexPath("bySymbol", "byPrice");
+</pre>
+
+		<indexterm>
+			<primary>index</primary>
+			<secondary>multimap</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>index</primary>
+			<secondary>ordered</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>index</primary>
+			<secondary>FIFO</secondary>
+		</indexterm>
+		<para>
+		Here another index type is added, ordered by price. It has to be
+		non-leaf, with a FIFO index type nested in it, to allow for multiple
+		rows having the same price in them. That would work out more
+		efficiently if the ordered index could have a multimap mode, but that
+		is not supported yet.
+		</para>
+
+		<para>
+		When the compute function does its iteration, it now goes by that
+		index. The aggregator can't be simply moved to that new index type,
+		because it still needs to get the last trade id in the order in which the rows
+		are inserted into the group. Instead it has to work with two index
+		types: the one on which the aggregator is defined, and the additional
+		one. The calls for iteration on an additional index are different.
+		<pre>$context->beginIdx()</pre> is similar to <pre>$context->begin()</pre> but the end
+		condition and the next step are done differently. 
+		When <pre>$rhi->nextIdx()</pre> reaches the end of the group,
+		it returns not a NULL row handle but a handle value that has to be found in
+		advance with <pre>$context->endIdx()</pre>.  Perhaps the
+		consistency in this department can be improved in the future.
+		</para>
+
+		<para>
+		And finally, the reference to that additional index type has to make it
+		somehow into the compute function. It can't be given as an argument
+		because it's not known yet at the time when the aggregator is
+		constructed (and no, reordering the index types won't help because the
+		index types are copied when connected to their parents, and we need the
+		exact index type that ends up in the assembled table type). So a global
+		variable <pre>$idxByPrice</pre> is used. The index type reference is found and
+		placed there, and later when the compute function runs, it takes the reference from
+		the global variable.
+		</para>
+
+		<para>
+		The printout from this version on the same input is:
+		</para>
+
+<!-- t/xAgg.t doOrderedSum -->
+<exdump>
+> OP_INSERT,1,AAA,1,10
+1
+> OP_INSERT,2,AAA,1,10
+1
+> OP_INSERT,3,AAA,1,10
+1
+> OP_INSERT,4,AAA,1e16,10
+2500000000000001
+> OP_INSERT,5,BBB,1e16,10
+10000000000000000
+> OP_INSERT,6,BBB,1,10
+5000000000000000
+> OP_INSERT,7,BBB,1,10
+3333333333333334
+> OP_INSERT,8,BBB,1,10
+2500000000000001
+</exdump>
+
+		<para>
+		Now no matter what the order of the row arrival, the prices get added
+		up in the same order from the smallest to the largest and produce the
+		same correct (inasmuch the floating point precision allows) result.
+		</para>
+
+		<para>
+		Which index type is used to put the aggregator on, doesn't matter a
+		whole lot. The computation can be turned around, with the ordered index
+		used as the main one, and the last value from the FIFO index obtained
+		with <pre>$context->lastIdx()</pre>:
+		</para>
+
+<!-- t/xAgg.t doOrderedSum2 -->
+<pre>
+our $idxByOrder;
+
+# aggregation handler: sum in proper order
+sub computeAverage12 # (table, context, aggop, opcode, rh, state, args...)
+{
+	my ($table, $context, $aggop, $opcode, $rh, $state, @args) = @_;
+	our $idxByOrder;
+
+	# don't send the NULL record after the group becomes empty
+	return if ($context->groupSize()==0
+		|| $opcode != &Triceps::OP_INSERT);
+
+	my $sum = 0;
+	my $count = 0;
+	for (my $rhi = $context->begin(); !$rhi->isNull(); 
+			$rhi = $context->next($rhi)) {
+		$count++;
+		$sum += $rhi->getRow()->get("price");
+	}
+	my $rLast = $context->lastIdx($idxByOrder)->getRow();
+	my $avg = $sum/$count;
+
+	my $res = $context->resultType()->makeRowHash(
+		symbol => $rLast->get("symbol"), 
+		id => $rLast->get("id"), 
+		price => $avg
+	);
+	$context->send($opcode, $res);
+}
+
+my $ttWindow = Triceps::TableType->new($rtTrade)
+	->addSubIndex("byId", 
+		Triceps::IndexType->newHashed(key => [ "id" ])
+	)
+	->addSubIndex("bySymbol", 
+		Triceps::IndexType->newHashed(key => [ "symbol" ])
+		->addSubIndex("last4",
+			Triceps::IndexType->newFifo(limit => 4)
+		)
+		->addSubIndex("byPrice",
+			Triceps::SimpleOrderedIndex->new(price => "ASC",)
+			->addSubIndex("multi", Triceps::IndexType->newFifo())
+			->setAggregator(Triceps::AggregatorType->new(
+				$rtAvgPrice, "aggrAvgPrice", undef, \&computeAverage12)
+			)
+		)
+	)
+;
+$ttWindow->initialize();
+my $tWindow = $uTrades->makeTable($ttWindow, "tWindow");
+
+$idxByOrder = $ttWindow->findIndexPath("bySymbol", "last4");
+</pre>
+
+		<para>
+		The last important note: when aggregating with multiple indexes, always
+		use the sibling index types forming the same group or their nested
+		sub-indexes (since the actual order is defined by the first leaf
+		sub-index anyway). But don't use the random unrelated index types. If
+		you do, the context would return some unexpected values for those, and
+		you may end up with endless loops.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_aggregation_simple">
+		<title>SimpleAggregator</title>
+
+		<indexterm>
+			<primary>SQL</primary>
+		</indexterm>
+		<indexterm>
+			<primary>SimpleAggregator</primary>
+		</indexterm>
+		<para>
+		Even though the writing the aggregation computation functions manually
+		gives the flexibility, it's too much work for the simple cases. 
+		The SimpleAggregator template takes care of most of that work
+		and allows you to specify the aggregation in a way similar to SQL.
+		It has been already shown on the VWAP example, ans here is the 
+		trade aggregation example from
+		<xref linkend="sc_aggregation_proper" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;
+		rewritten with SimpleAggregator:
+		</para>
+
+<!-- t/xAgg.t doSimpleAgg -->
+<pre>
+my $ttWindow = Triceps::TableType->new($rtTrade)
+	->addSubIndex("byId", 
+		Triceps::IndexType->newHashed(key => [ "id" ])
+	)
+	->addSubIndex("bySymbol", 
+		Triceps::IndexType->newHashed(key => [ "symbol" ])
+		->addSubIndex("last2",
+			Triceps::IndexType->newFifo(limit => 2)
+		)
+	)
+;
+
+# the aggregation result
+my $rtAvgPrice;
+my $compText; # for debugging
+
+Triceps::SimpleAggregator::make(
+	tabType => $ttWindow,
+	name => "aggrAvgPrice",
+	idxPath => [ "bySymbol", "last2" ],
+	result => [
+		symbol => "string", "last", sub {$_[0]->get("symbol");},
+		id => "int32", "last", sub {$_[0]->get("id");},
+		price => "float64", "avg", sub {$_[0]->get("price");},
+	],
+	saveRowTypeTo => \$rtAvgPrice,
+	saveComputeTo => \$compText,
+);
+
+$ttWindow->initialize();
+my $tWindow = $uTrades->makeTable($ttWindow, "tWindow");
+
+# label to print the result of aggregation
+my $lbAverage = makePrintLabel("lbAverage", 
+	$tWindow->getAggregatorLabel("aggrAvgPrice"));
+</pre>
+
+		<para>
+		The main loop and the printing is the same as before. The result
+		produced is also exactly the same as before.
+		</para>
+
+		<para>
+		But the aggregator is created with <pre>Triceps::SimpleAggregator::make()</pre>.
+		Its arguments are in the option format: the option name-value pairs, in
+		any order. 
+		</para>
+
+<pre>
+$tabType = Triceps::SimpleAggregator::make($optName => $optValue, ...);
+</pre>
+
+		<para>
+		It returns back the table type that it received as an option.
+		But most of the time there is not a whole lot of use to that
+		return value, and it gets simply ignored.
+		Most of the <quote>options</quote> are actually mandatory. The
+		aggregator type is connected to the table type with the options:
+		</para>
+
+		<variablelist>
+			<varlistentry>
+				<term>tabType</term>
+				<listitem>
+				Table type to put the aggregator on. It must be un-initialized yet.
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term>idxPath</term>
+				<listitem>
+				A reference to an array of index names, forming the path to the
+				index where the aggregator type will be set.
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term>name</term>
+				<listitem>
+				The aggregator type name.
+				</listitem>
+			</varlistentry>
+		</variablelist>
+
+		<para>
+		The result row type and computation is defined with the option
+		<quote>result</quote>: each group of four values in that array defines one result
+		field: 
+		</para>
+		
+		<itemizedlist>
+		<listitem>
+		The field name. 
+		</listitem>
+		<listitem>
+		The field type. 
+		</listitem>
+		<listitem>
+		The aggregation function name used to compute the field. There is no
+		way to combine multiple aggregation functions or even an aggregation function
+		and any arithmetics in a field computation. The workaround is to compute
+		each function in a separate field, and then send the result rows to a
+		computational label that would arithmetically combine these fields into one.
+		</listitem>
+		<listitem>
+		A closure that extracts the aggregation function argument from the row
+		(well, it can be any function reference, doesn't have to be an
+		anonymous closure). 
+		That closure gets the row as the argument <pre>$_[0]</pre>
+		and returns the extracted value to run the aggregation on. 
+		</listitem>
+		</itemizedlist>
+		
+		<para>
+		The field name is by convention separated from its definition fields by <pre>=></pre>.
+		Remember, it's just a convention, for Perl a <pre>=></pre> is just as good as
+		a comma.
+		</para>
+
+		<para>
+		<pre>SimpleAggregator::make()</pre> automatically generates the result row
+		type and aggregation function, creates an aggregator type from them,
+		and sets it on the index type. 
+		The information about the aggregation result
+		can be found by traversing through the index type tree, or by
+		constructing a table and getting the row type from the aggregator
+		result label. However it's often easier to save it during construction,
+		and the option (this time an optional one!) <quote>saveRowTypeTo</quote> allows to
+		do this. Give it a reference to a variable, and the row type will be
+		placed into that variable.
+		</para>
+
+		<para>
+		Most of the time the things would just work. However if they don't and
+		something dies in the aggregator, you will need the source code of the
+		compute function to make sense of these errors. The option
+		<pre>saveComputeTo</pre> gives a variable to save that source code for future
+		perusal and other entertainment. Here is the compute function that 
+		gets produced by the example above (it gets implicitly wrapped in a
+		<pre>sub { ... }</pre>, like any other source code argument):
+		</para>
+
+<!-- t/xAgg.t doSimpleAgg, contents of $compText -->
+<pre>
+  use strict;
+  my ($table, $context, $aggop, $opcode, $rh, $state, @args) = @_;
+  return if ($context->groupSize()==0 || $opcode == &Triceps::OP_NOP);
+  my $v2_count = 0;
+  my $v2_sum = 0;
+  my $npos = 0;
+  for (my $rhi = $context->begin(); !$rhi->isNull(); $rhi = $context->next($rhi)) {
+    my $row = $rhi->getRow();
+    # field price=avg
+    my $a2 = $args[2]($row);
+    { if (defined $a2) { $v2_sum += $a2; $v2_count++; }; }
+    $npos++;
+  }
+  my $rowLast = $context->last()->getRow();
+  my $l0 = $args[0]($rowLast);
+  my $l1 = $args[1]($rowLast);
+  $context->makeArraySend($opcode,
+    ($l0), # symbol
+    ($l1), # id
+    (($v2_count == 0? undef : $v2_sum / $v2_count)), # price
+  );
+</pre>
+
+		<para>
+		At the moment the compute function is quite straightforward and just
+		does the aggregation from scratch every time. It doesn't support the
+		additive aggregation nor the DELETE optimization. It's only smart enough to
+		skip the iteration if all the result consists of only aggregation
+		functions <pre>first</pre>, <pre>last</pre>
+		and <pre>count_star</pre>. It receives the closures for the argument extraction as
+		arguments in <pre>@args</pre>, SimpleAggregator arranges these arguments
+		when it creates the aggregator.
+		</para>
+
+		<para>
+		The aggregation functions available at the moment are:
+		</para>
+
+		<variablelist>
+			<varlistentry>
+				<term><pre>first</pre></term>
+				<listitem>
+				Value from the first row in the group.
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><pre>last</pre></term>
+				<listitem>
+				Value from the last row in the group.
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><pre>count_star</pre></term>
+				<listitem>
+				Number of rows in the group, like SQL <pre>COUNT(*)</pre>. Since there is
+				no argument for this function, use <pre>undef</pre> instead of the
+				argument closure.
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><pre>sum</pre></term>
+				<listitem>
+				Sum of the values.
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><pre>max</pre></term>
+				<listitem>
+				The maximal value.
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><pre>min</pre></term>
+				<listitem>
+				The minimal value.
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><pre>avg</pre></term>
+				<listitem>
+				The average of all the non-NULL values.
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><pre>avg_perl</pre></term>
+				<listitem>
+				The average of all values, with NULL values treated in Perl
+				fashion as zeroes. So, technically when the example above used
+				<pre>avg</pre>, it works the same as the previous versions only for the
+				non-NULL fields. To be really the same, it should have used
+				<pre>avg_perl</pre>.
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><pre>nth_simple</pre></term>
+				<listitem>
+				The Nth value from the start of the group. This is a tricky
+				function because it needs two arguments: the value of N and the
+				field selector. Multiple direct arguments will be supported in
+				the future but right now it works through a workaround: the
+				argument closure must return not just the extracted field but a
+				reference to array with two values, the N and the field. For
+				example, <pre>sub { [1, $_[0]->get("id")];}</pre>. The N is
+				counted starting from 0, so the value of 1 will return the
+				second record. This function works in a fairly simple-minded
+				and inefficient way at the moment.
+				</listitem>
+			</varlistentry>
+		</variablelist>
+
+		<para>
+		As usual in Triceps and Perl, the case of the aggregation function name
+		matters. The names have to be used in lowercase as shown.
+		There will be more functions to come, and you can even already add your own,
+		as has been shown in
+		<xref linkend="sc_aggregation_vwap" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<para>
+		The user-defined aggregation functions are defined with the option
+		<quote>functions</quote>. Let's take another look at the code
+		from the VWAP example:
+		</para>
+
+<!-- t/xVwap.t example 3 -->
+<pre>
+# VWAP function definition
+my $myAggFunctions = {
+	myvwap => {
+		vars => { sum => 0, count => 0, size => 0, price => 0 },
+		step => '($%size, $%price) = @$%argiter; '
+			. 'if (defined $%size && defined $%price) '
+				. '{$%count += $%size; $%sum += $%size * $%price;}',
+		result => '($%count == 0? undef : $%sum / $%count)',
+	},
+};
+
+...
+
+Triceps::SimpleAggregator::make(
+	functions => $myAggFunctions,
+);
+</pre>
+
+		<para>
+		The definition of the functions is a reference to a hash, keyed
+		by the function name. Each function definition in order is
+		a hash of options, keyed by the option name. When
+		the SimpleAggregator builds the common computation function,
+		it assembles the code by tying together the code fragments
+		from these options: 
+		Whenever the group changes, the
+		aggregator will reset the function state variables to the default values
+		and iterate through the new contents of the group. It will
+		perform the step computation for each row and collect the
+		data in the intermediate variables. After the iteration it will
+		perform the result computation of all the functions
+		and produce the final value.
+		</para>
+
+		<para>
+		The expected format of the values of these
+		options varies with the option. The option <quote>result</quote>
+		is mandatory, the rest can be skipped if not needed. The supported
+		options are:
+		</para>
+
+		<variablelist>
+			<varlistentry>
+				<term><pre>argcount</pre></term>
+				<listitem>
+				Integer. Defines the number of arguments of the function, which
+				may currently be 0 or 1, with 1 being the default. If this option
+				is 0, SimpleAggregator will check that the argument closure
+				is <pre>undef</pre>.
+				If the aggregation function needs more arguments than one,
+				they have to be packed into an array or hash, and then its
+				reference used as a single argument. The standard function
+				<pre>nth_simple</pre> and the VWAP function provide the examples
+				of how to do this.
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><pre>vars</pre></term>
+				<listitem>
+				Reference to a hash. Defines the variables used to
+				keep the context of this function during the iteration 
+				(the hash keys are the variable names) and their initial values
+				(specified as the values in the hash).
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><pre>step</pre></term>
+				<listitem>
+				<para>
+				String. The code fragment to compute a single step of iteration.
+				It can refer to the variables defined in <pre>vars</pre> and to a few of
+				the pre-defined values using the syntax <pre>$%name</pre> (which has
+				been chosen because it's illegal in the normal Perl variable syntax).
+				When SimpleAggregator generates the code, it creates the actual scope
+				variables for everything defined in <pre>vars</pre>, then substitutes
+				them for the <pre>$%</pre> syntax in the string and inserts the result
+				into its group iteration code.
+				</para>
+				<para>
+				If this option is not defined, SimpleAggregator assumes that this function
+				doesn't need it. If no functions in the aggregation define the <pre>step</pre>,
+				the iteration does not get included into the generated code altogether.
+				</para>
+				<para>
+				The defined special values are:
+				</para>
+				<itemizedlist>
+					<listitem>
+					<pre>$%argiter</pre> - The function's argument extracted from the current row.
+					</listitem>
+					<listitem>
+					<pre>$%niter</pre> - The number of the current row in the group, starting from 0.
+					</listitem>
+					<listitem>
+					<pre>$%groupsize</pre> - The size of the group (<pre>$context->groupSize()</pre>).
+					</listitem>
+				</itemizedlist>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><pre>result</pre></term>
+				<listitem>
+				<para>
+				String. The code fragment to compute the result of the function.
+				This option is mandatory. Works in the same way as <pre>step</pre>, only
+				gets executed once per call of the computation function, and the defined
+				special values are different:
+				</para>
+				<itemizedlist>
+					<listitem>
+					<pre>$%argfirst</pre> - The function's argument extracted from the first row.
+					</listitem>
+					<listitem>
+					<pre>$%arglast</pre> - The function's argument extracted from the last row.
+					</listitem>
+					<listitem>
+					<pre>$%groupsize</pre> - The size of the group (<pre>$context->groupSize()</pre>).
+					</listitem>
+				</itemizedlist>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+
+		<para>
+		I can think of many ways the SimpleAggregator can be improved, but for
+		now they have been pushed into the future to keep it simple.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_aggregation_simple_guts">
+		<title>The guts of SimpleAggregator</title>
+
+		<indexterm>
+			<primary>SimpleAggregator</primary>
+		</indexterm>
+
+		<para>
+		The implementation of the SimpleAggregator has turned out to be
+		surprisingly small. Not quite tiny but still
+		small. I've liked it so much that I've even saved the original small
+		version in the file <pre>xSimpleAggregator.t</pre>. As more features will be
+		added, the <quote>official</quote> version of the SimpleAggregator will grow (and
+		already did) but that example file will stay small and simple.
+		</para>
+
+		<indexterm>
+			<primary>template</primary>
+		</indexterm>
+		<para>
+		It's a nice example of yet another kind of template that I want
+		to present. I'm going to go through it, interlacing the code with the
+		commentary.
+		</para>
+
+<!-- t/xSimpleAggregator.t -->
+<pre>
+package MySimpleAggregator;
+use Carp;
+
+use strict;
+
+our $FUNCTIONS = {
+	first => {
+		result => '$%argfirst',
+	},
+	last => {
+		result => '$%arglast',
+	},
+	count_star => {
+		argcount => 0,
+		result => '$%groupsize',
+	},
+	count => {
+		vars => { count => 0 },
+		step => '$%count++ if (defined $%argiter);',
+		result => '$%count',
+	},
+	sum => {
+		vars => { sum => 0 },
+		step => '$%sum += $%argiter;',
+		result => '$%sum',
+	},
+	max => {
+		vars => { max => 'undef' },
+		step => '$%max = $%argiter if (!defined $%max || $%argiter > $%max);',
+		result => '$%max',
+	},
+	min => {
+		vars => { min => 'undef' },
+		step => '$%min = $%argiter if (!defined $%min || $%argiter < $%min);',
+		result => '$%min',
+	},
+	avg => {
+		vars => { sum => 0, count => 0 },
+		step => 'if (defined $%argiter) { $%sum += $%argiter; $%count++; }',
+		result => '($%count == 0? undef : $%sum / $%count)',
+	},
+	avg_perl => { # Perl-like treat the NULLs as 0s
+		vars => { sum => 0 },
+		step => '$%sum += $%argiter;',
+		result => '$%sum / $%groupsize',
+	},
+	nth_simple => { # inefficient, need proper multi-args for better efficiency
+		vars => { n => 'undef', tmp => 'undef', val => 'undef' },
+		step => '($%n, $%tmp) = @$%argiter; if ($%n == $%niter) { $%val = $%tmp; }',
+		result => '$%val',
+	},
+};
+</pre>
+
+		<para>
+		The package name of this saved simple version is MySimpleAggregator,
+		to avoid confusion with the <quote>official</quote> SimpleAggregator class.
+		First goes the definition of the aggregation functions.
+		They are defined in exactly the same way as the vwap function has been
+		shown before.  They are fairly straightforward.
+		You can use them as the starting point for adding your own.
+		</para>
+
+<pre>
+sub make # (optName => optValue, ...)
+{
+	my $opts = {}; # the parsed options
+	my $myname = "MySimpleAggregator::make";
+	
+	&Triceps::Opt::parse("MySimpleAggregator", $opts, {
+			tabType => [ undef, sub { &Triceps::Opt::ck_mandatory(@_); &Triceps::Opt::ck_ref(@_, "Triceps::TableType") } ],
+			name => [ undef, \&Triceps::Opt::ck_mandatory ],
+			idxPath => [ undef, sub { &Triceps::Opt::ck_mandatory(@_); &Triceps::Opt::ck_ref(@_, "ARRAY", "") } ],
+			result => [ undef, sub { &Triceps::Opt::ck_mandatory(@_); &Triceps::Opt::ck_ref(@_, "ARRAY") } ],
+			saveRowTypeTo => [ undef, sub { &Triceps::Opt::ck_refscalar(@_) } ],
+			saveInitTo => [ undef, sub { &Triceps::Opt::ck_refscalar(@_) } ],
+			saveComputeTo => [ undef, sub { &Triceps::Opt::ck_refscalar(@_) } ],
+		}, @_);
+</pre>
+
+		<para>
+		The options get parsed. Since it's not a proper object constructor but a factory,
+		it uses the hash <pre>$opts</pre> instead of <pre>$self</pre> to save the
+		processed copy of the options. This early version doesn't have
+		an option for the user-supplied aggregation function definitions.
+		</para>
+
+<pre>
+	# reset the saved source code
+	${$opts->{saveInitTo}} = undef if (defined($opts->{saveInitTo}));
+	${$opts->{saveComputeTo}} = undef if (defined($opts->{saveComputeTo}));
+	${$opts->{saveRowTypeTo}} = undef if (defined($opts->{saveRowTypeTo}));
+</pre>
+
+		<para>
+		The generated source code will not be placed
+		into the <pre>save*</pre> references until the table type gets initialized, so for the
+		meantime they get filled with <pre>undef</pre>s.
+		</para>
+
+<pre>
+	# find the index type, on which to build the aggregator
+	my $idx = $opts->{tabType}->findIndexPath(@{$opts->{idxPath}});
+	confess "$myname: the index type is already initialized, can not add an aggregator on it"
+		if ($idx->isInitialized());
+</pre>
+
+		<para>
+		Since the SimpleAggregator uses an existing table with existing index,
+		it doesn't require the aggregation key: it just takes an index that
+		forms the group, and whatever key that leads to this index becomes the
+		aggregation key.
+		</para>
+
+<pre>
+	# check the result definition and build the result row type and code snippets for the computation
+	my $rtRes;
+	my $needIter = 0; # flag: some of the functions require iteration
+	my $needfirst = 0; # the result needs the first row of the group
+	my $needlast = 0; # the result needs the last row of the group
+	my $codeInit = ''; # code for function initialization
+	my $codeStep = ''; # code for iteration
+	my $codeResult = ''; # code to compute the intermediate values for the result
+	my $codeBuild = ''; # code to build the result row
+	my @compArgs; # the field functions are passed as args to the computation
+	{
+		my $grpstep = 4; # definition grouped by 4 items per result field
+		my @resopt = @{$opts->{result}};
+		my @rtdefRes; # field definition for the result
+		my $id = 0; # numeric id of the field
+
+		while ($#resopt >= 0) {
+			confess "$myname: the values in the result definition must go in groups of 4"
+				unless ($#resopt >= 3);
+			my $fld = shift @resopt;
+			my $type = shift @resopt;
+			my $func = shift @resopt;
+			my $funcarg = shift @resopt;
+
+			confess("$myname: the result field name must be a string, got a " . ref($fld) . " ")
+				unless (ref($fld) eq '');
+			confess("$myname: the result field type must be a string, got a " . ref($type) . " for field '$fld'")
+				unless (ref($type) eq '');
+			confess("$myname: the result field function must be a string, got a " . ref($func) . " for field '$fld'")
+				unless (ref($func) eq '');
+</pre>
+
+		<para>
+		This starts the loop that goes over the result fields and builds the
+		code to create them. The code will be built in multiple snippets that
+		will eventually be combined to produce the compute function. Since the
+		arguments go in groups of 4, it becomes fairly easy to miss one element
+		somewhere, and then everything gets real confusing. So the code
+		attempts to check the types of the arguments, in hopes of catching
+		these off-by-ones as early as possible. The variable <pre>$id</pre> will be used
+		to produce the unique prefixes for the function's variables.
+		</para>
+
+<pre>
+			my $funcDef = $FUNCTIONS->{$func}
+				or confess("$myname: function '" . $func . "' is unknown");
+
+			my $argCount = $funcDef->{argcount}; 
+			$argCount = 1 # 1 is the default value
+				unless defined($argCount);
+			confess("$myname: in field '$fld' function '$func' requires an argument computation that must be a Perl sub reference")
+				unless ($argCount == 0 || ref $funcarg eq 'CODE');
+			confess("$myname: in field '$fld' function '$func' requires no argument, use undef as a placeholder")
+				unless ($argCount != 0 || !defined $funcarg);
+
+			push(@rtdefRes, $fld, $type);
+
+			push(@compArgs, $funcarg)
+				if (defined $funcarg);
+</pre>
+
+		<para>
+		The function definition for a field gets pulled out by name, and
+		the arguments of the field are checked for correctness.
+		The types of the fields get collected for the row definition, and the
+		aggregation argument computation closures (or, technically, functions)
+		get also collected, to pass later as the arguments of the compute
+		function.
+		</para>
+
+<pre>
+			# add to the code snippets
+
+			### initialization
+			my $vars = $funcDef->{vars};
+			if (defined $vars) {
+				foreach my $v (keys %$vars) {
+					# the variable names are given a unique prefix;
+					# the initialization values are constants, no substitutions
+					$codeInit .= "  my \$v${id}_${v} = " . $vars->{$v} . ";\n";
+				}
+			} else {
+				$vars = { }; # a dummy
+			}
+</pre>
+
+		<para>
+		The initialization fragment gets processed if defined. 
+		The unique names for variables are generated from the <pre>$id</pre> and the
+		variable name in the definition, so that there would be no interference
+		between the result fields. And the initialization snippets are collected
+		in <pre>$codeInit</pre>. The initialization values are not enquoted
+		because they are expected to be strings suitable for such use.
+		That's why the undefined values in the function defnitions are not
+		<pre>undef</pre> but <pre>'undef'</pre>. If you'd want to initialize
+		a variable as a string <pre>"x"</pre>, you'd use it as <pre>'"x"'</pre>.
+		For the numbers it doesn't
+		really matter, the numbers just get converted to strings as needed,
+		so the zeroes are simply <pre>0</pre>s without quoting.
+		</para>
+
+		<para>
+		Another possibility would be to have the actual values as-is in the hash and then either put
+		these values into the argument array passed to the computation
+		function or use the closure trick from <pre>Triceps::Fields::makeTranslation()</pre> described in
+		<xref linkend="sc_template_result" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+		
+<pre>
+			### iteration
+			my $step = $funcDef->{step};
+			if (defined $step) {
+				$needIter = 1;
+				$codeStep .= "    # field $fld=$func\n";
+				if (defined $funcarg) {
+					# compute the function argument from the current row
+					$codeStep .= "    my \$a${id} = \$args[" . $#compArgs ."](\$row);\n";
+				}
+				# substitute the variables in $step
+				$step =~ s/\$\%(\w+)/&replaceStep($1, $func, $vars, $id, $argCount)/ge;
+				$codeStep .= "    { $step; }\n";
+			}
+</pre>
+
+		<para>
+		Then the iteration fragment gets processed.
+		The logic remembers
+		in <pre>$needIter</pre> if any of the functions involved needs iteration.
+		Before the iteration snippet gets collected, it has the <pre>$%</pre>
+		names substitutted, and placed into a block, just in case if it wants
+		to define some local variables.  An extra <quote>;</quote> is added
+		just in case, it doesn't hurt and helps if it was forgotten in the
+		function definition.
+		</para>
+
+<!-- removed XXX lines -->
+<pre>
+			### result building
+			my $result = $funcDef->{result};
+			confess "MySimpleAggregator: internal error in definition of aggregation function '$func', missing result computation"
+				unless (defined $result);
+			# substitute the variables in $result
+			if ($result =~ /\$\%argfirst/) {
+				$needfirst = 1;
+				$codeResult .= "  my \$f${id} = \$args[" . $#compArgs ."](\$rowFirst);\n";
+			}
+			if ($result =~ /\$\%arglast/) {
+				$needlast = 1;
+				$codeResult .= "  my \$l${id} = \$args[" . $#compArgs ."](\$rowLast);\n";
+			}
+			$result =~ s/\$\%(\w+)/&replaceResult($1, $func, $vars, $id, $argCount)/ge;
+			$codeBuild .= "    ($result), # $fld\n";
+
+			$id++;
+		}
+		$rtRes = Triceps::wrapfess
+			"$myname: invalid result row type definition:",
+			sub { Triceps::RowType->new(@rtdefRes); };
+	}
+	${$opts->{saveRowTypeTo}} = $rtRes if (defined($opts->{saveRowTypeTo}));
+</pre>
+
+		<para>
+		In the same way the result computation is created, and remembers if any
+		function wanted the fields from the first or last row. And eventually
+		after all the functions have been processed, the result row type is created. 
+		If it was asked to save, it gets saved.
+		</para>
+
+<pre>
+	# build the computation function
+	my $compText = "sub {\n";
+	$compText .= "  use strict;\n";
+	$compText .= "  my (\$table, \$context, \$aggop, \$opcode, \$rh, \$state, \@args) = \@_;\n";
+	$compText .= "  return if (\$context->groupSize()==0 || \$opcode == &Triceps::OP_NOP);\n";
+	$compText .= $codeInit;
+	if ($needIter) {
+		$compText .= "  my \$npos = 0;\n";
+		$compText .= "  for (my \$rhi = \$context->begin(); !\$rhi->isNull(); \$rhi = \$context->next(\$rhi)) {\n";
+		$compText .= "    my \$row = \$rhi->getRow();\n";
+		$compText .= $codeStep;
+		$compText .= "    \$npos++;\n";
+		$compText .= "  }\n";
+	}
+	if ($needfirst) {
+		$compText .= "  my \$rowFirst = \$context->begin()->getRow();\n";
+	}
+	if ($needlast) {
+		$compText .= "  my \$rowLast = \$context->last()->getRow();\n";
+	}
+	$compText .= $codeResult;
+	$compText .= "  \$context->makeArraySend(\$opcode,\n";
+	$compText .= $codeBuild;
+	$compText .= "  );\n";
+	$compText .= "}\n";
+
+	${$opts->{saveComputeTo}} = $compText if (defined($opts->{saveComputeTo}));
+</pre>
+
+		<para>
+		The compute function gets assembled from the collected fragments.
+		The optional parts get included only if some of the functions needed them.
+		</para>
+
+<!-- removed XXX lines -->
+<pre>
+	# compile the computation function
+	my $compFun = eval $compText
+		or confess "$myname: error in compilation of the aggregation computation:\n  $@function text:\n"
+			. Triceps::Code::numalign($compText, "  ") . "\n";
+
+	# build and add the aggregator
+	my $agg = Triceps::wrapfess
+		"$myname: internal error: failed to build an aggregator type:",
+		sub { Triceps::AggregatorType->new($rtRes, $opts->{name}, undef, $compFun, @compArgs); };
+
+	Triceps::wrapfess
+		"$myname: failed to set the aggregator in the index type:",
+		sub { $idx->setAggregator($agg); };
+
+	return $opts->{tabType};
+}
+</pre>
+
+		<para>
+		Then the compute function is compiled. In case if the compilation
+		fails, the error message will include both the compilation error and
+		the text of the auto-generated function. Otherwise there would be no
+		way to know, what exactly went wrong. Well, since no user code is
+		included into the auto-generated function, it should never fail. Except
+		if there is some bad code in the aggregation function definitions. The
+		compiled function and collected closures are then used to create the
+		aggregator, which should also never fail.
+		</para>
+
+		<para>
+		The functions that translate the <pre>$%variable</pre> names are built after the
+		same pattern but have the different built-in variables:
+		</para>
+
+<pre>
+sub replaceStep # ($varname, $func, $vars, $id, $argCount)
+{
+	my ($varname, $func, $vars, $id, $argCount) = @_;
+
+	if ($varname eq 'argiter') {
+		confess "MySimpleAggregator: internal error in definition of aggregation function '$func', step computation refers to 'argiter' but the function declares no arguments"
+			unless ($argCount > 0);
+		return "\$a${id}";
+	} elsif ($varname eq 'niter') {
+		return "\$npos";
+	} elsif ($varname eq 'groupsize') {
+		return "\$context->groupSize()";
+	} elsif (exists $vars->{$varname}) {
+		return "\$v${id}_${varname}";
+	} else {
+		confess "MySimpleAggregator: internal error in definition of aggregation function '$func', step computation refers to an unknown variable '$varname'"
+	}
+}
+
+sub replaceResult # ($varname, $func, $vars, $id, $argCount)
+{
+	my ($varname, $func, $vars, $id, $argCount) = @_;
+
+	if ($varname eq 'argfirst') {
+		confess "MySimpleAggregator: internal error in definition of aggregation function '$func', result computation refers to '$varname' but the function declares no arguments"
+			unless ($argCount > 0);
+		return "\$f${id}";
+	} elsif ($varname eq 'arglast') {
+		confess "MySimpleAggregator: internal error in definition of aggregation function '$func', result computation refers to '$varname' but the function declares no arguments"
+			unless ($argCount > 0);
+		return "\$l${id}";
+	} elsif ($varname eq 'groupsize') {
+		return "\$context->groupSize()";
+	} elsif (exists $vars->{$varname}) {
+		return "\$v${id}_${varname}";
+	} else {
+		confess "MySimpleAggregator: internal error in definition of aggregation function '$func', result computation refers to an unknown variable '$varname'"
+	}
+}
+</pre>
+
+		<para>
+		They check for the references to the undefined variables and confess if
+		any are found.  That's it, the whole aggregator generation.
+		</para>
+
+		<para>
+		Now let's look back at the printout of a generated computation function
+		that has been shown above..
+		The aggregation results were:
+		</para>
+
+<!-- a fragment from the bigger example above -->
+<pre>
+	result => [
+		symbol => "string", "last", sub {$_[0]->get("symbol");},
+		id => "int32", "last", sub {$_[0]->get("id");},
+		price => "float64", "avg", sub {$_[0]->get("price");},
+	],
+</pre>
+
+		<para>
+		Which produced the function body:
+		</para>
+
+<!-- saved by uncommenting the print in t/xAgg.t doSimpleAgg, copy 2 -->
+<pre>
+  use strict;
+  my ($table, $context, $aggop, $opcode, $rh, $state, @args) = @_;
+  return if ($context->groupSize()==0 || $opcode == &Triceps::OP_NOP);
+  my $v2_count = 0;
+  my $v2_sum = 0;
+  my $npos = 0;
+  for (my $rhi = $context->begin(); !$rhi->isNull(); $rhi = $context->next($rhi)) {
+    my $row = $rhi->getRow();
+    # field price=avg
+    my $a2 = $args[2]($row);
+    { if (defined $a2) { $v2_sum += $a2; $v2_count++; }; }
+    $npos++;
+  }
+  my $rowLast = $context->last()->getRow();
+  my $l0 = $args[0]($rowLast);
+  my $l1 = $args[1]($rowLast);
+  $context->makeArraySend($opcode,
+    ($l0), # symbol
+    ($l1), # id
+    (($v2_count == 0? undef : $v2_sum / $v2_count)), # price
+  );
+</pre>
+
+		<para>
+		The fields get assigned the ids 0, 1 and 2. <pre>avg</pre> for 
+		the <pre>price</pre> field is the only function
+		here that requires the iteration, and its variables are defined with
+		the prefix <pre>$v2_</pre>. In the loop the function argument
+		closure is called from <pre>$args[2]</pre>, 
+		and its result is stored in <pre>$a2</pre> (again,
+		2 here is the id of this field). Then a copy of the step
+		computation for <pre>avg</pre> is copied in a block, with the
+		variables substituted. <pre>$%argiter</pre> becomes <pre>$a2</pre>, <pre>$%sum</pre> becomes
+		<pre>$v2_sum</pre>, <pre>$%count</pre> becomes <pre>$v2_count</pre>.
+		Then the loop ends.
+		</para>
+
+		<para>
+		The functions make use of the last row, so <pre>$rowLast</pre> is computed.
+		The values for the <pre>$%arglast</pre> fields 0 and 1 are calculated 
+		in <pre>$l0</pre> and <pre>$l1</pre>.
+		Then the result row is created and sent from an array of substituted
+		result snippets from all the fields. That's how it all works together.
+		</para>
+	</sect1>
+
+</chapter>

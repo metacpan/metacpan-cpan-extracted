@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<!-- non-breakable 0-width space used in PDF to avoid word hyphenation in wrong places -->
+<!ENTITY sbnbrk "">
+<!ENTITY emdash "&#x2014;">
+<!-- in PDF "C++" has to be made unbreakable to prevent the hyphenation in its middle -->
+<!ENTITY Cpp "C++">
+<!-- in PDF need to add a little space after xref -->
+<!ENTITY xrsp "">

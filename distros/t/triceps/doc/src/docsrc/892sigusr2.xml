@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_sigusr2">
+		<title>Sigusr2 reference</title>
+
+		<indexterm>
+			<primary>SIGUSR2</primary>
+		</indexterm>
+		<para>
+		When a thread is requested to die, its registered file descriptors
+		become revoked, and the signal <pre>SIGUSR2</pre> is sent to it to interrupt any
+		ongoing system calls. For this to work correctly, there must be a
+		signal handler defined on <pre>SIGUSR2</pre>, because otherwise the default
+		reaction to it is to kill the process. It doesn't matter what signal
+		handler, just some handler must be there. The Triceps library defines
+		an empty signal handler but you can also define your own instead.
+		</para>
+
+		<para>
+		In Perl, the empty handler for <pre>SIGUSR2</pre> is set when the module
+		<pre>Triceps.pm</pre> is loaded. You can change it afterwards.
+		</para>
+
+		<para>
+		In &Cpp; Triceps provides a class Sigusr2, defined in <pre>app/Sigusr2.h</pre>, to
+		help with this.  All the methods of Sigusr2 are static.  If you use the
+		class BasicPthread, you don't need to deal with Sigusr2 directly:
+		BasicPthread takes care of it. 
+		</para>
+
+<pre>
+static void setup();
+</pre>
+
+		<para>
+		Set up an empty handler for <pre>SIGUSR2</pre> if it hasn't been done yet. This
+		class has a static flag (synchronized by a mutex) showing that the
+		handler had been set up. On the first call it sets the handler and sets
+		the flag. On the subsequent calls it checks the flag and does nothing.
+		</para>
+
+<pre>
+static void markDone();
+</pre>
+
+		<para>
+		Just set the flag that the setup has been done. This allows to set your
+		own handler instead and still cooperate with the logic of Sigusr2 and
+		BasicPthread.
+		</para>
+
+		<para>
+		If you set your custom handler before any threads have been started,
+		then set up your handler and then call <pre>markDone()</pre>, telling Sigusr2 that
+		there is no need to set the handler any more.
+		</para>
+
+		<para>
+		If you set your custom handler when the Triceps threads are already
+		running (not the best idea but still a possibility), there is a
+		possibility of a race with another thread calling <pre>setup()</pre>. To work
+		around that race, set up your handler, call <pre>markDone()</pre>, then set up
+		your handler again.
+		</para>
+
+<pre>
+static void reSetup();
+</pre>
+
+		<para>
+		This allows to replace a custom handler with the empty one. It always
+		forcibly sets the empty handler (and also the flag). 
+	</para>
+	</sect1>

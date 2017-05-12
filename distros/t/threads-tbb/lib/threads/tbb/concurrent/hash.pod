@@ -1,0 +1,155 @@
+
+=head1 NAME
+
+threads::tbb::concurrent::hash - shared hash via tbb::concurrent_hash_map
+
+=head1 SYNOPSIS
+
+  use threads::tbb;
+
+  #my @array :concurrent;  # TODO
+  tie my %hash, "threads::tbb::concurrent::array";
+
+  $hash{foo} = "bar";  # unsafe, use for initializing only
+  print $hash{foo};    # safe, but hangs while write locked
+
+  # threadsafe access with exclusive lock:
+  my $lock = (tied %hash)->writer($key);
+  print $lock->get();        # starts as undef
+  $lock->set("new value");
+  undef($lock);              # release lock
+
+  # threadsafe access with share (read-only) lock:
+  $lock = (tied %hash)->reader($key);  # may return undef
+  print $lock->get();
+  undef($lock);              # release lock
+
+=head1 DESCRIPTION
+
+The concurrent hash is a Perl tied hash that multiple threads can read
+to and write from.  It also provides the advantage of using
+cache-aligned hash slots, so threads don't conflict on nearby access
+with each other.
+
+Implementation of basic hash primitives is incomplete; stick with the
+concurrent API and you will be fine.  Patches welcome!
+
+=head2 CLASS METHODS
+
+These methods will get you a new instance of a
+C<threads::tbb::concurrent::hash>;
+
+=over
+
+=item B<threads::tbb::concurrent::hash-E<gt>new()>
+
+=item B<threads::tbb::concurrent::hash-E<gt>TIEHASH()>
+
+Both of these class methods return a new concurrent hash container.
+
+The TIEHASH constructor is provided for the C<tie> built-in (see
+L<perlfunc/tie> and L<perltie>).
+
+=back
+
+=head2 INSTANCE METHODS
+
+The thread-safe operations on this type are:
+
+=over
+
+=item $hash->FETCH(key)
+
+Tied API.  Access a slot in the hash.  This will only return
+immediately if there are no other locks held on this hash slot (see
+below).  As there is no lock object returned, this access method
+I<always> deep-clones the return value.
+
+=item $slot = $hash->reader(key)
+
+Returns a I<const accessor> for the slot at C<key>, or C<undef> if
+there is no slot there.  If the slot exists, and contains C<undef> or
+any other scalar value, the function will return a lazy clone handle
+to it.  You may get a copy of the scalar in C<$slot> with its
+C<-E<gt>get()> method:
+
+   my $slot = (tied %hash)->reader($key);
+   my $value = $slot->get();
+
+The key will have a share lock taken out - no exclusive (write) locks
+can exist or be taken out until the C<$slot> value passes out of scope
+or is undefined.
+
+Make sure that you do not save objects which were referenced from
+C<-E<gt>get()> for longer than the lifetime of the locks, without
+cloning via C<Storable::dclone> first.  If you do, they must be
+completely constant values.
+
+=item $slot = $hash->writer(key)
+
+Returns a I<mutable accessor> for the slot at C<key>.  If the slot
+does not exist, then it creates the slot with value C<undef> first.
+The function will return a lazy clone handle to it which can also
+change the value.  You may get a copy of the scalar in C<$slot> with
+its C<-E<gt>get()> method as above, and also change its value using
+its C<-E<gt>set()> method:
+
+   my $slot = (tied %hash)->reader($key);
+   $slot->get($key);
+   my $value = $slot->get();
+
+   $slot->set($value);
+
+The key will have an exclusive lock taken out - no other locks can
+exist or be taken out until the C<$slot> value passes out of scope or
+is undefined.
+
+=back
+
+=head2 THREAD UNSAFE OPERATIONS
+
+No other operations are currently implemented; sadly, currently
+including iteration.  So the tied hash is still quite deficient.
+
+Also not yet supported is returning of a divisible hash key range for
+potential use with a new C<parallel_for> or C<parallel_reduce> body
+type.
+
+=head2 UNSUPPORTED OPERATIONS
+
+=over
+
+=item DELETE
+
+=item CLEAR
+
+Can't delete a slot (or all slots) at the moment..
+
+=item EXISTS
+
+Not yet implemented, but you can use the C<reader> method of the tied
+object.
+
+=item FIRSTKEY
+
+=item NEXTKEY
+
+This particularly badly designed API is required for C<keys> to work,
+however implementation will not be straightforward - of course because
+of its awful side-effect-by-design nature.
+
+=item SCALAR
+
+=item Array with contents
+
+Currently the TIEARRAY method doesn't respect tieing to an array with
+existing contents.
+
+=back
+
+=head1 SEE ALSO
+
+L<threads::tbb::concurrent>, L<threads::tbb>
+
+=cut
+

@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd">
+
+<book id="TPOPP" xmlns:xi="http://www.w3.org/2001/XInclude">
+	<bookinfo>
+		<title>
+			Title Of The Book
+		</title>
+		<author>
+			<firstname>Sergey</firstname>
+			<othername role="mi">A</othername>
+			<surname>Babkin</surname>
+		</author>
+
+		<copyright>
+			<year>2009</year>
+			<year>2010</year>
+			<holder>Sergey A. Babkin</holder>
+		</copyright>
+
+		<pubdate>2010</pubdate>
+		<edition>First Edition</edition>
+		<isbn>A-BCD-EFGHI-J</isbn>
+
+		<printhistory>
+			<para>
+			March, 2010    First Printing
+			</para>
+		</printhistory>
+
+		<legalnotice>
+			<para>
+			Many of the designations used by the manufacturers and sellers
+			to distinguish their products are claimed as trademarks. Where those
+			designations appear in this book, and the author was aware of a
+			trademark claim, the designations have been printed in caps or
+			initial caps.
+			</para>
+		</legalnotice>
+		<legalnotice>
+			<para>
+			While every precaution has been taken in the preparation of this book,
+			the author assumes no responsibility for errors or omissions, or for
+			damages resulting from the use of the information contained herein.
+			</para>
+		</legalnotice>
+	</bookinfo>
+
+	<chapter id="Placeholder">
+		<title>Placeholder</title>
+		<para>
+		This is just some placeholder text to see what comes out.
+		<indexterm class="startofrange" id="idx_tralala">
+			<primary>tralala</primary></indexterm>
+		tralala tralala tralala tralala tralala tralala tralala tralala
+		tralala tralala tralala tralala tralala tralala tralala tralala
+		tralala tralala tralala tralala tralala tralala tralala tralala
+		tralala tralala tralala tralala tralala tralala tralala tralala
+		tralala tralala tralala tralala tralala tralala tralala tralala
+		tralala tralala tralala tralala tralala tralala tralala tralala
+		tralala tralala tralala tralala tralala tralala tralala tralala
+		tralala tralala tralala tralala tralala tralala tralala tralala
+		</para>
+		<sect1 id="Placeholder_sub1">
+			<title>Subplaceholder</title>
+			<para>
+			This is just some 
+			placeholder<indexterm significance="preferred"><primary>placeholder</primary></indexterm>
+			text to see what comes out.
+			tralala tralala tralala tralala tralala tralala tralala tralala
+			tralala tralala tralala tralala tralala tralala tralala tralala
+			tralala tralala tralala tralala tralala tralala tralala tralala
+			tralala tralala tralala tralala tralala tralala tralala 
+			tralala<footnote>
+				<para>
+				This is the first footnote.
+				</para>
+			</footnote>
+			tralala tralala tralala tralala tralala tralala tralala 
+			tralala<footnote>
+				<para>
+				This is the second footnote.
+				</para>
+			</footnote>
+			tralala tralala tralala tralala tralala tralala tralala tralala
+			tralala tralala tralala tralala tralala tralala tralala tralala
+			tralala tralala tralala tralala tralala tralala tralala tralala.
+			This is a long URL: 
+			<ulink url="http://www.google.com/#hl=en&amp;sclient=psy-ab&amp;q=triceps+cep&amp;oq=triceps+cep&amp;aq=f&amp;aqi=g1g-bsK1&amp;aql=&amp;gs_l=hp.3..0j0i8i10i30.3844.5594.0.6998.11.11.0.0.0.0.224.1003.7j3j1.11.0...0.0.O96g-moZzHs&amp;pbx=1&amp;bav=on.2,or.r_gc.r_pw.r_qf.,cf.osb&amp;fp=539fbe40cafc9eb7&amp;biw=1920&amp;bih=1055"/>.
+			</para>
+			<sect2 id="Placeholder_sub1_sub2">
+				<title>Sub-sub-placeholder</title>
+				<para>
+				This is just some 
+				placeholder<indexterm><primary>placeholder</primary>
+				<secondary>text</secondary>
+				</indexterm>
+				text to see what comes out.
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala.
+				This subsection is a child of 
+				<xref linkend="Placeholder_sub1" xrefstyle="select: label pageabbrev"/>
+				, in chapter
+				<xref linkend="Placeholder"/>
+				, and itself is
+				<xref linkend="Placeholder_sub1_sub2"/> .
+				</para>
+				<example id="exNothing">
+					<title>
+						An example about nothing.<footnote>
+							<para>
+							This is the footnote from inside an example title.
+							</para>
+						</footnote>
+					</title>
+					<programlisting>
+if (a &lt; b) {
+    printf("hello world!\n");
+}
+					</programlisting>
+					<footnote>
+						<para>
+						This is the footnote from inside an example.
+						</para>
+					</footnote>
+				</example>
+				<para>
+				This is just some 
+				placeholder<indexterm><primary>placeholder</primary></indexterm>
+				text to see what comes out. See <biblioref linkend="Sutter08"/>.
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala.
+				<indexterm class="endofrange" startref="idx_tralala"></indexterm>
+				See <xref linkend="exNothing" xrefstyle="select: label"/> 
+				and 
+				<xref linkend="diagram" xrefstyle="select: label nopage"/>.
+				</para>
+				<figure id="diagram" >
+					<title>
+						A fictitions diagram.
+					</title>
+					<para>
+					The diagram will be here.
+					</para>
+					<!-- <xi:include href="file:///FIGS/samplesdraw.xml"/> -->
+					<graphic scale="100%" contentwidth="4in" fileref="samplesdraw.svg"/>
+					<!-- <graphic fileref="samplesdraw.svg"/> -->
+				</figure>
+				<para>
+					<programlisting>
+This is a very very very very very very very very very very very very very long line in the listing.
+This_is_a_very1very2very3very4very5very6very7very8very9very10very11very12very13very14very15very16very17very18very19very20 long line in the listing.
+12345678901234567890123456789012345678901234567890123456789012345678901234567890
+         1         2         3         4         5         6         7         8
+					</programlisting>
+				</para>
+
+				<para>
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala.
+				</para>
+				<para>
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala.
+				</para>
+
+				<para>
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala.
+				</para>
+
+				<para>
+<pre>
+while(&readLine) {
+	if (a > 0 && a < 3)
+		&send a;
+}
+</pre>
+				</para>
+
+<exdump>
+> this is an input string
+adjask jdwqej jklewq jkljfkasd
+> this is another input string
+tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala
+	tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala tralala
+</exdump>
+
+				<para>
+				tralala tralala <pre>a->b()</pre> tralala tralala <pre>&f(x)</pre> tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala
+				tralala tralala tralala tralala tralala tralala tralala tralala.
+				</para>
+
+			</sect2>
+		</sect1>
+	</chapter>
+
+	<xi:include href="file:///DOCS/samplesbiblio.xml"/>
+
+	<index/>
+<!--
+		<indexterm>
+			<primary></primary>
+			<secondary></secondary>
+		</indexterm>
+		<indexterm class="startofrange" id="idx_">
+			<primary></primary>
+			<secondary></secondary>
+		</indexterm>
+		<indexterm class="endofrange" startref="idx_"/>
+
+<programlisting><?dbfo keep-together="auto" ?>
+</programlisting>
+<programlisting><?dbfo keep-together="always" ?>
+</programlisting>
+
+<example id=""><?dbfo keep-together="auto" ?>
+<title></title>
+<programlisting><?dbfo keep-together="auto" ?>
+</programlisting>
+</example>
+
+	<quote></quote>
+	<firstterm></firstterm>
+	<constant></constant>
+	<command></command>
+	<function></function>
+	<citation></citation>
+	<emphasis></emphasis>
+	<emphasis role="bold"></emphasis>
+	<acronym></acronym>
+	<filename></filename>
+	<replaceable></replaceable>
+	<keycap></keycap>
+
+		<xi:include href="file:///EXAMPLES/.xml"/>
+		<xi:include href="file:///SEQS/.xml"/>
+		<xi:include href="file:///FIGS/.xml"/>
+
+		<xref linkend="" xrefstyle="select: label pageabbrev"/>&#xA0;
+		<xref linkend="" xrefstyle="select: label"/>&#xA0;
+		<xref linkend="" xrefstyle="select: label quotedtitle"/>
+		<xref linkend="" xrefstyle="select: label quotedtitle pageabbrev"/>&#xA0;
+
+		<figure id="" >
+			<title>List of lists.</title>
+			<graphic scale="100%" contentwidth="4.2in" fileref=".svg"/>
+		</figure>
+
+	<variablelist>
+		<varlistentry>
+			<term></term>
+			<listitem>
+			<para>
+			</para>
+			</listitem>
+		</varlistentry>
+	</variablelist>
+
+	<itemizedlist>
+		<listitem>
+		</listitem>
+	</itemizedlist>
+
+	<orderedlist>
+		<listitem>
+		</listitem>
+	</orderedlist>
+
+	&#xA0; nbsp
+	&#x2014; emdash
+	&#x2003; emspace
+	&#x2023; triangle
+	&#x2011; non-breaking hyphen
+	&sbnbrk; (raw &#xFEFF;)  non-breaking zero-width space
+	&#xAD; soft hyphen
+	&Cpp; "C++" that is non-breakable
+	&xrsp; spacing in PDF after xrefs, translates to &#xA0;
+
+		<indexterm>
+			<primary>Pthreads wrapper</primary>
+			<secondary></secondary>
+		</indexterm>
+
+<pre>
+my $lbInsInput = $dataset->{tbInsert}->getInputLabel();
+</pre>
+<exdump>
+collapse.idata.out OP_DELETE local_ip="3.3.3.3" remote_ip="7.7.7.7" bytes="100"
+</exdump>
+
+-->
+</book>

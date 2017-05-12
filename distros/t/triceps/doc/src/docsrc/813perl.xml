@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_perl">
+		<title>Perl wrapping for the &Cpp; objects</title>
+
+		<indexterm>
+			<primary>wrapper</primary>
+		</indexterm>
+		<para>
+		The subject of this section is not a part of the &Cpp; API as such but the
+		connection between the &Cpp; and Perl APIs. You need to bother about it
+		only if you want to write more of the components in &Cpp; and export them into
+		Perl.
+		</para>
+
+		<para>
+		When exporting the &Cpp; (or any compiled language) API into Perl (or
+		into any scripting language) there are two things to consider:
+		</para>
+
+		<orderedlist>
+			<listitem>
+			The script must never crash the interpterer. The interpreted program
+			might die but the interpreter itself must never crash. If you've ever
+			dealt with <pre>wksh</pre> (not thankfully long dead), you know how
+			horrible is the debugging of such crashes.
+			</listitem>
+
+			<listitem>
+			Perl has its memory management by reference counting, which needs to
+			be married with the memory management at the &Cpp; level.
+			</listitem>
+		</orderedlist>
+
+		<para>
+		The solution to the second problem is fairly straightforward: have an
+		intermediate wrapper structure. Perl has its reference counting for the
+		pointer to this structure.  When you construct a Perl object, return
+		the pointer to a newly allocated instance of this structure. When the
+		Perl reference count goes down to zero, it calls the method <pre>DESTROY</pre> for
+		this object, and then you destroy this structure.
+		</para>
+
+		<para>
+		And inside this structure will be the &Cpp; reference to the actual
+		&Cpp; object. When the wrapper structure gets created, it gets a new
+		reference and when the wrapper structure gets destroyed, it releases
+		this reference.
+		</para>
+
+		<para>
+		Here is a small example of how the RowType object gets created and
+		destroyed in the Perl XS code, using the wrapper structure WrapRowType:
+		</para>
+
+<!-- RowType.xs, edited -->
+<pre>
+WrapRowType *
+Triceps::RowType::new(...)
+	CODE:
+		RETVAL = NULL; // shut up the warning
+		try { do {
+			RowType::FieldVec fld;
+
+			clearErrMsg();
+			...
+			Onceref<RowType> rt = new CompactRowType(fld);
+			Erref err = rt->getErrors();
+			if (err->hasError()) {
+				throw Exception::f(err, "Triceps::RowType::new: incorrect data");
+			}
+
+			RETVAL = new WrapRowType(rt);
+		} while(0); } TRICEPS_CATCH_CROAK;
+	OUTPUT:
+		RETVAL
+
+void
+DESTROY(WrapRowType *self)
+	CODE:
+		// warn("RowType destroyed!");
+		delete self;
+</pre>
+
+		<para>
+		This example also shows the way the Triceps XS code deals with the conversion
+		of the &Cpp; Exceptions to the Perl confessions. The <pre>while(0)</pre> part
+		is a hold-over from the earlier implementation of error handling that allows
+		to set the error message directly in a buffer and then do a <pre>break</pre> to jump
+		to the end of the pseudo-loop. The new way is the throwing of Exceptions.
+		The shown code is a hybrid that handles both. The handling itself is done
+		in the macro <pre>TRICEPS_CATCH_CROAK</pre>.
+		</para>
+
+		<para>
+		Now let's look more in-depth at the first problem. How does Perl know to call a particular XS
+		method for a object? From the package this object is blessed to. If the
+		package happens to be an XS package, the XS method will be called.
+		However it's entirely possible to re-bless the object to a completely
+		different package. If the user does this, a completely wrong method may
+		be called and will crash when it tries to reach a wrong object at the
+		pointer.
+		</para>
+
+		<para>
+		Things get even worse for the other arguments of the methods. For
+		example, the argument <pre>other</pre> here:
+		</para>
+
+<pre>
+int
+equals(WrapRowType *self, WrapRowType *other)
+</pre>
+
+		<para>
+		Well, Perl lets you provide a code snippet for the <pre>typemap</pre> file
+		that would check that the object is as expected. But how would that snippet
+		know? Going just by the blessed package is unreliable.
+		</para>
+
+		<para>
+		Triceps solves this problem by placing an 8-byte magic code at the
+		front of every wrap object. Each class has its own magic value for this
+		field. 8 bytes allow to have great many unique codes, and is quick to
+		check because it's just one CPU word.
+		</para>
+
+		<para>
+		This magic code is defined  in the &Cpp; part in <pre>wrap/Wrap.h</pre> as:
+		</para>
+
+<!-- wrap/Wrap.h -->
+<pre>
+struct WrapMagic {
+	~WrapMagic()
+	{
+		(*(int64_t *)v_) = 0; // makes sure that it gets invalidated
+	}
+
+	char v_[8]; // 8 bytes to make a single 64-bit comparison
+
+	bool operator!=(const WrapMagic &wm) const
+	{
+		return (*(int64_t *)v_) != (*(int64_t *)wm.v_);
+	}
+};
+</pre>
+
+		<para>
+		Then the wrapper is implemented as follows:
+		</para>
+
+<!-- wrap/Wrap.h -->
+<pre>
+template<const WrapMagic &magic, class Class>
+class Wrap
+{
+public:
+	Wrap(Onceref<Class> r) :
+		magic_(magic),
+		ref_(r)
+	{ }
+
+	// returns true if the magic value is bad
+	bool badMagic() const
+	{
+		return magic_ != magic;
+	}
+
+	Class *get() const
+	{
+		return ref_.get();
+	}
+
+	operator Class*() const
+	{
+		return ref_.get();
+	}
+
+public:
+	WrapMagic magic_;
+	Autoref<Class> ref_; // referenced value
+private:
+	Wrap();
+};
+</pre>
+
+		<para>
+		The check is done with the method <pre>badMagic()</pre>.
+		</para>
+
+		<para>
+		And the <pre>typemap</pre> entry is:
+		</para>
+
+<pre>
+O_WRAP_OBJECT
+	if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) ) {
+		$var = ($type)SvIV((SV*)SvRV( $arg ));
+		if ($var == 0 || $var->badMagic()) {
+			croakWithMsg( \"${Package}::$func_name(): $var has an incorrect magic for $ntype\" );
+		}
+	} else{
+		croakWithMsg( \"${Package}::$func_name(): $var is not a blessed SV reference to $ntype\" );
+	}
+</pre>
+
+		<para>
+		It checks that this is an object, of an XS package, and then that the
+		pointer to the C/&Cpp; object is not NULL, and that the value at this
+		pointer starts with the right magic.
+		</para>
+
+		<para>
+		<pre>croakWithMsg()</pre> is the Triceps function for building the confession
+		trace and then croaking with it.
+		</para>
+
+		<para>
+		The template shown above is normally used through a macro that
+		substitutes the repeated values from one source.
+		For example,  the definition for the RowType wrapper
+		is:
+		</para>
+
+<pre>
+DEFINE_WRAP(RowType);
+</pre>
+
+		<para>
+		The static definition of the magic code that the macro passes to the
+		template is defined in <pre>wrap/Wrap.cpp</pre>:
+		</para>
+
+<pre>
+WrapMagic magicWrapRowType = { "RowType" };
+</pre>
+
+		<para>
+		Just make sure that the string contains no more than 7 characters.
+		</para>
+
+		<para>
+		Some objects in Triceps are reached through the special references that
+		know both the object and its type (such as rows and row handles). For
+		them there is a separate template and a separate macro:
+		</para>
+
+<pre>
+DEFINE_WRAP2(const RowType, Rowref, Row);
+DEFINE_WRAP2(Table, Rhref, RowHandle);
+</pre>
+
+		<para>
+		The arguments are the type class, the reference class and finally the
+		object class itself.
+		</para>
+
+		<para>
+		And there is one more twist: sometimes the objects are self-contained
+		but when you use them, you must use them only with a correct parent
+		object. Right now there is only one such class: the Tray must be used
+		with its correct Unit, and the Perl code checks it. In this case the
+		wrapper has the reference to both Tray and the Unit, and is defined as:
+		</para>
+
+<pre>
+DEFINE_WRAP_IDENT(Unit, Tray); 
+</pre>
+
+		<para>
+		Triceps has a substantial library of helper methods and objects
+		for wrappig the &Cpp; objects, located in the Perl part of the code.
+		Many of them are located in <pre>TricepsPerl.h</pre>. Feel free
+		to refer to them if you need to, but for now they are out of scope
+		of the documentation.
+		</para>
+
+		<indexterm>
+			<primary>multithreading</primary>
+		</indexterm>
+		<indexterm>
+			<primary>XS</primary>
+		</indexterm>
+		<para>
+		Just one more thing: Perl is not happy about sharing the objects
+		between multiple threads. Even when a &Cpp; object is OK with multithreading,
+		Perl requires the separate wrappers to be created for it from each thread.
+		When a new Perl thread is started, Perl can not properly ask the XS
+		code to split the wrappers, so instead all the objects need to be invalidated
+		in the new thread. To do that, the XS package needs to define the method
+		<pre>CLONE_SKIP</pre>:
+		</para>
+
+<!-- RowType.xs -->
+<pre>
+int
+CLONE_SKIP(...)
+	CODE:
+		RETVAL = 1;
+	OUTPUT:
+		RETVAL
+</pre>
+
+	</sect1>

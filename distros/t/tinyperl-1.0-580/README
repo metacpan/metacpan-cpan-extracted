@@ -1,0 +1,30 @@
+TinyPerl 1.0 v5.8.0 Win32
+=========================
+
+This is a Perl 5.8.0 Win32 binary with only the basics.
+
+It has every thing compressed:
+  - Lib: inside lib.zip
+  - PerlLib (perl58.dll): compressed with UPX
+  
+* To compress the Lib it uses the module LibZip. This is way you still use a
+  little directory ./lib
+
+* You can create your own lib.zip file. Just get a normal Lib, cut what you don't
+  need and compress it with ZIP! See LibZip module for more!
+
+* This version of Perl was compiled without PerlIO to avoid bugs with sockets!
+  Wait Perl 5.8.1?!
+  
+* Tested with WxPerl too! :-)
+
+Enjoy ;-P
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Graciliano M. P. <gm@virtuasites.com.br>
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

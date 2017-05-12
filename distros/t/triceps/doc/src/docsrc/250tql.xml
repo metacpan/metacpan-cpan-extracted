@@ -1,0 +1,1962 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+<chapter id="ch_tql" xmlns:xi="http://www.w3.org/2001/XInclude">
+	<title>TQL, Triceps Trivial Query Language</title>
+
+	<sect1 id="sc_tql_intro">
+		<title>Introduction to TQL</title>
+
+		<indexterm>
+			<primary>main loop</primary>
+		</indexterm>
+		<indexterm>
+			<primary>loop</primary>
+			<secondary>main</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>TQL</primary>
+		</indexterm>
+		<para>
+		Triceps by itself is a library that can be embedded into any program
+		to add the CEP functionality. But sometimes having a ready server process
+		that handles the communications and queries and wraps the CEP logic
+		within itself is a great convenience.  TQL, the Triceps Trivial Query 
+		Language, is used in this server.
+		</para>
+
+		<para>
+		The server is useful as both a tool to play with Triceps programs
+		and as an example of implementation.
+		It all started with the example of simple queries in 
+		<xref linkend="sc_sched_mainloop_socket" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;,
+		then I've wanted to use the queries to demonstrate a feature of the
+		streaming functions, then I've wanted to use it for a threaded
+		logic demonstration, so it has been growing over time.
+		</para>
+
+		<para>
+		This server and the TQL are so far of only an example quality, but TQL
+		is extensible and it already can do some interesting things.
+		The <quote>example quality</quote> means that they work but
+		the set of commands is limited and they
+		don't have an extensive set of tests for every possibility,
+		so it could happen that some corner cases don't work so well.
+		</para>
+
+		<para>
+		Why not SQL, after all, there are multiple parser building tools
+		available in Perl? Partially, because I wanted to keep it trivial and
+		to avoid introducing extra dependencies, especially just for the
+		examples. Partially, because I don't like SQL. I think that the queries
+		can be expressed much more naturally in the form of shell-like
+		pipelines. At one of my past jobs I wrote a simple toolkit for querying and
+		comparison of the CSV files (yeah, I didn't find the DBD::CSV module),
+		I've used a pipeline semantics and it worked pretty well. It also did
+		things that are quite difficult with SQL, like mass renaming and
+		reordering of fields, and diffing. Although TQL is not a descendant of
+		the language I've used in that query tool, it is a further development
+		of the pipeline idea. As I've found later, there are other products
+		that also use the pipeline approach for the queries, such as the PowerShell.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_tql_syntax">
+		<title>TQL syntax</title>
+
+		<para>
+		Syntactically, TQL is very simple: its query is represented as a
+		nested list, similar to Tcl (or if you like Lisp better, you can think
+		that it's similar to Lisp but with different parentheses). A list is
+		surrounded by curly braces <quote>{}</quote>. The elements of a list are either
+		other lists or words consisting of non-space characters.
+		</para>
+
+<exdump>
+{word1 {word21 word22} word3}
+</exdump>
+
+		<para>
+		Unlike Tcl, there are no quotes in the TQL syntax, the quote characters
+		are just the normal word characters. If you want to include spaces into
+		a word, you use the curly braces instead of the quotes.
+		</para>
+
+<exdump>
+{ this is a {brace-enquoted} string with spaces and nested braces }
+</exdump>
+
+		<para>
+		Note that the spaces inside a list are used as delimiters and thrown
+		away but within a brace-quoted word-string they are significant. How do
+		you know, which way they will be treated in a particular case? It all
+		depends on what is expected in this case. If the command expects a
+		string as an argument, it will treat it as a string. If the command
+		expects a list as an argument, it will treat it as a list.
+		</para>
+
+		<para>
+		What if you need to include an unbalanced brace character inside a
+		string? Escape it with a backslash, <quote>\{</quote>. The other usual Perl
+		backslash sequences work too (though in the future TQL may get
+		separated from Perl and then only the C sequences will work, that is to
+		be seen). Any non-alphanumeric characters (including spaces) can be
+		prepended with a backslash too. An important point is that when you
+		build the lists, unlike shell, and like Tcl, you do the backslash
+		escaping only once, when accepting a raw string. After that you can
+		include the string with escapes into the lists of any depth without any
+		extra escapes (and you must not add any extra escapes in the lists).
+		</para>
+
+		<para>
+		Unlike shell, you can't combine a single string out of the quoted and
+		unquoted parts. Instead the quoting braces work as implicit separators.
+		For example, if you specify a list as {a{b}c d}, you don't get two
+		strings <quote>abc</quote> and <quote>d</quote>, you get four 
+		strings <quote>a</quote>, <quote>b</quote>, <quote>c</quote>, <quote>d</quote>.
+		</para>
+
+		<para>
+		The parsing of the lists is done with the package Braced, with some more
+		examples shown in 
+		<xref linkend="sc_ref_braced" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<para>
+		A TQL query is a list that represents a pipeline. Each element of the
+		list is a command. The first command reads the data from a table, and
+		the following commands perform transformations on that data. For
+		example:
+		</para>
+
+<exdump>
+{read table tWindow} {project fields {symbol price}} {print tokenized 0}
+</exdump>
+
+		<para>
+		If the print command is missing at the end of the pipeline, it will be
+		added implicitly, with the default arguments: <pre>{print}</pre>.
+		</para>
+
+		<para>
+		The arguments of each TQL command are always in the option name-value
+		format, very much like the Perl constructors of many Triceps objects.
+		There aren't any arguments in TQL that go by themselves without an
+		option name.
+		</para>
+
+		<para>
+		So for example the command <pre>read</pre> above has an option <quote>table</quote> with
+		value <quote>tWindow</quote>. The command <pre>project</pre> has an option <quote>fields</quote> with a
+		list value of two elements. In this case the elements are simple words
+		and don't need the further bracing. But the braces around it won't hurt.
+		Say, if you wanted to rename the field <quote>price</quote> to <quote>trade_price</quote>, you
+		use the <pre>Triceps::Fields::filter()</pre> syntax for it, and even though the
+		format doesn't contain any spaces and can be still used just as a word,
+		it looks nicer with the braces around it:
+		</para>
+
+<exdump>
+{project fields {symbol {price/trade_price} }}
+</exdump>
+	</sect1>
+
+	<sect1 id="sc_tql_commands">
+		<title>TQL commands</title>
+
+		<para>
+		I'm sure that the list of commands and their options will expand and
+		change over time. So far the supported commands are:
+		</para>
+
+		<variablelist>
+		<varlistentry>
+			<term><pre>read</pre></term>
+			<listitem>
+			<para>
+			Defines a table to read from and starts the command pipeline.
+			</para>
+			<para>
+			Options:
+			</para>
+			<para>
+			<pre>table</pre> - name of the table to read from. When a Triceps
+			model gets wrapped in the server, it defines, what tables it has
+			available.
+			</para>
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>project</pre></term>
+			<listitem>
+			<para>
+			Projects (and possibly renames) a subset of fields in the current
+			pipeline. In other words, all the files besides the specified
+			ones get thrown away.
+			</para>
+			<para>
+			Options:
+			</para>
+			<para>
+			<pre>fields</pre> - an array of field definitions in the syntax of
+			<pre>Triceps::Fields::filter()</pre> (same as in the joins), as described in
+			<xref linkend="sc_ref_fields" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+			</para>
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>print</pre></term>
+			<listitem>
+			<para>
+			The last command of the pipeline, which prints the results. If not
+			used explicitly, the query adds this command implicitly at the end
+			of the pipeline, with the default options.
+			</para>
+			<para>
+			Options:
+			</para>
+			<para>
+			<pre>tokenized</pre> (optional) - Flag: print in the name-value format, as in
+			Row::printP(). Otherwise prints only the values in the CSV format.
+			Default: 1.
+			</para>
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>join</pre></term>
+			<listitem>
+			<para>
+			Joins the current pipeline with another table. This is the functionally
+			similar to LookupJoin, although the options are closer to JoinTwo.
+			</para>
+			<para>
+			Options:
+			</para>
+			<para>
+			<pre>table</pre> - name of the table to join with. The current pipeline is
+			considered the <quote>left side</quote>, the table the <quote>right side</quote>. The
+			duplicate key fields on the right side are always excluded from the
+			result, as by the LookupJoin option <pre>fieldsDropRightKey => 1</pre>.
+			</para>
+			<para>
+			<pre>rightIdxPath</pre> (optional) - path name of the table's index on which to join.
+			As usual, the path is an array of nested index type names. If this option is not
+			specified, the index path will be found automatically by the join fields.
+			</para>
+			<para>
+			<pre>by</pre> (semi-optional) - the join equality condition specified as pairs
+			of fields. Similarly to JoinTwo, it's a single-level array with the
+			fields logically paired:{leftFld1 rightFld1 leftFld2 rightFld2 ...
+			}.  Options <quote>by</quote> and <quote>byLeft</quote> are mutually exclusive, and one of
+			them must be present.
+			</para>
+			<para>
+			<pre>byLeft</pre> (semi-optional) - the join equality condition specified as a
+			transformation on the left-side field set in the syntax of
+			<pre>Triceps::Fields::filter()</pre>, with an implicit element <pre>{!.*}</pre> added at
+			the end. Options <quote>by</quote> and <quote>byLeft</quote> are mutually exclusive, and one
+			of them must be present.
+			</para>
+			<para>
+			<pre>leftFields</pre> (optional) - the list of patterns for the left-side
+			fields to pass through and possibly rename, in the syntax of
+			<pre>Triceps::Fields::filter()</pre>. Default: pass all, with the same name.
+			</para>
+			<para>
+			<pre>rightFields</pre> (optional) - the list of patterns for the right-side
+			fields to pass through and possibly rename, in the syntax of
+			<pre>Triceps::Fields::filter()</pre>. The key fields get implicitly removed
+			before. Default: pass all, with the same name.
+			</para>
+			<para>
+			<pre>type</pre> (optional) - type of the join, <quote>inner</quote> or 
+			<quote>left</quote>. Default: <quote>inner</quote>.
+			</para>
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>where</pre></term>
+			<listitem>
+			<para>
+			Filters/selects the rows.
+			</para>
+			<para>
+			Options:
+			</para>
+			<para>
+			<pre>istrue</pre> - a Perl expression, the condition for the rows to pass
+			through. The particularly dangerous constructions are not allowed
+			in the expression, including the loops and the general function
+			calls. The fields of the row are referred to as <pre>$%field</pre>, these
+			references get translated before the expression is compiled.
+			</para>
+			</listitem>
+		</varlistentry>
+		</variablelist>
+
+		<para>
+		Here are some examples of the Tql queries, with results produced from
+		the output of the code examples that will be shown below.
+		</para>
+
+<!-- t/xTql.t runTqlQuery1 assembled -->
+<exdump>
+> query,{read table tSymbol}
+query OP_INSERT symbol="AAA" name="Absolute Auto Analytics Inc" eps="0.5" 
++EOD,OP_NOP,query
+</exdump>
+
+		<para>
+		Reads the stock symbol information table and prints it in the default
+		tokenized format. The input line is CSV, containing as usual in the examples
+		from
+		<xref linkend="sc_sched_mainloop_socket" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;,
+		the command and the data for it. Here the command <quote>query</quote>
+		has been defined to handle the TQL queries. It's possible to define
+		multiple TQL-handling commands in a server, in case if you want them
+		to query different units, or different subsets of the tables.
+		The parsing of the data part is
+		smart enough not to break up the text of the query on the commas in it.
+		</para>
+		
+		<para>
+		The tokenized result format is a bit messy for now, a mix of
+		tokenized data lines and a CSV end-of-data line. 
+		</para>
+		
+		<para>
+		In the simpler examples in
+		<xref linkend="sc_sched_mainloop_socket" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;
+		the end-of-data has been marked by either a row with opcode <pre>OP_NOP</pre> or not
+		marked at all. For the TQL queries I've decided to try out a
+		different approach: send a CSV row on the pseudo-label <quote>+EOD</quote> with the
+		value equal to the name of the command that has been completed. The
+		labels with names starting with <quote>+</quote> are special in this convention,
+		they represent some kind of metadata.
+		</para>
+
+<!-- t/xTql.t runTqlQuery1 assembled -->
+<exdump>
+> query,{read table tWindow} {project fields {symbol price}}
+query OP_INSERT symbol="AAA" price="20" 
+query OP_INSERT symbol="AAA" price="30" 
++EOD,OP_NOP,query
+</exdump>
+
+		<para>
+		Reads the trade window rows and projects the fields <quote>symbol</quote> and
+		<quote>price</quote> from them.
+		</para>
+
+<!-- t/xTql.t runTqlQuery1 assembled -->
+<exdump>
+> query,{read table tWindow} {project fields {symbol price}} {print tokenized 0}
+query,OP_INSERT,AAA,20
+query,OP_INSERT,AAA,30
++EOD,OP_NOP,query
+</exdump>
+
+		<para>
+		The same, only explicitly prints the data in the CSV format.
+		</para>
+
+<!-- t/xTql.t runTqlQuery1 assembled -->
+<exdump>
+> query,{read table tWindow} {where istrue {$%price == 20}}
+query OP_INSERT id="3" symbol="AAA" price="20" size="20" 
++EOD,OP_NOP,query
+</exdump>
+
+		<para>
+		Selects the trade window row with price equal to 20.
+		</para>
+
+<!-- t/xTql.t runTqlQuery1 assembled -->
+<exdump>
+> query,{read table tWindow} {join table tSymbol byLeft {symbol}}
+query OP_INSERT id="3" symbol="AAA" price="20" size="20" name="Absolute Auto Analytics Inc" eps="0.5" 
+query OP_INSERT id="5" symbol="AAA" price="30" size="30" name="Absolute Auto Analytics Inc" eps="0.5" 
++EOD,OP_NOP,query
+</exdump>
+
+		<para>
+		Reads the trade window and enriches it by joining with the symbol
+		information.
+		</para>
+
+		<para>
+		A nice feature of TQL is that it allows to combine the operations in
+		the pipeline in any order, repeated any number of times. For example,
+		you can read a table, filter it, join with another table, filter again,
+		join with the third table, filter again and so on. SQL in the same
+		situation has to resort to specially named clauses, for example <i>WHERE</i>
+		filters before grouping and <i>HAVING</i> filters after grouping.
+		</para>
+
+		<para>
+		Of course, a typical smart SQL compiler would determine the earliest
+		application point for each <i>WHERE</i> sub-expression and build a similar
+		pipeline. But TQL allows to keep the compiler trivial, following the
+		explicit pipelining in the query. And nothing really prevents a smart
+		TQL compiler either, it could as well analyze, split and reorder the
+		pipeline stages. 
+		</para>
+
+		<para>
+		As mentioned above, the TQL queries are compiled before the execution
+		into the normal Triceps code. A query is built in a separate unit.
+		After the query is built, the data is fed into it to produce the
+		result, and then the unit gets destroyed. Potentially, TQL could
+		be extended for writing the general Triceps programs as well.
+		</para>
+
+	</sect1>
+
+	<sect1 id="sc_tql_single">
+		<title>TQL in a single-threaded server</title>
+
+		<indexterm>
+			<primary>TQL</primary>
+			<secondary>single-threaded</secondary>
+		</indexterm>
+		<para>
+		The TQL support may be instantiated in both the single-threaded and
+		multi-threaded applications. The single-threaded support is simpler,
+		so we'll look at it first. The TQL itself stays the same in both cases,
+		and even the way to construct the TQL server is similar but then
+		the way for the TQL queries to extract the data from the application
+		is different.
+		</para>
+
+		<para>
+		The code that produced the query output examples from the previous section
+		looks like this:
+		</para>
+
+<!-- t/xTql.t assembled from type defintiions and runTqlQuery1 -->
+<pre>
+# The basic table type to be used for querying.
+# Represents the trades reports.
+our $rtTrade = Triceps::RowType->new(
+	id => "int32", # trade unique id
+	symbol => "string", # symbol traded
+	price => "float64",
+	size => "float64", # number of shares traded
+);
+
+our $ttWindow = Triceps::TableType->new($rtTrade)
+	->addSubIndex("bySymbol", 
+		Triceps::SimpleOrderedIndex->new(symbol => "ASC")
+			->addSubIndex("last2",
+				Triceps::IndexType->newFifo(limit => 2)
+			)
+	)
+;
+$ttWindow->initialize();
+
+# Represents the static information about a company.
+our $rtSymbol = Triceps::RowType->new(
+	symbol => "string", # symbol name
+	name => "string", # the official company name
+	eps => "float64", # last quarter earnings per share
+);
+
+our $ttSymbol = Triceps::TableType->new($rtSymbol)
+	->addSubIndex("bySymbol", 
+		Triceps::IndexType->newHashed(key => [ "symbol" ])
+	)
+;
+$ttSymbol->initialize();
+
+my $uTrades = Triceps::Unit->new("uTrades");
+my $tWindow = $uTrades->makeTable($ttWindow, "tWindow");
+my $tSymbol = $uTrades->makeTable($ttSymbol, "tSymbol");
+
+# The information about tables, for querying.
+my $tql = Triceps::X::Tql->new(
+	name => "tql",
+	tables => [
+		$tWindow,
+		$tSymbol,
+	],
+);
+
+my %dispatch;
+$dispatch{$tWindow->getName()} = $tWindow->getInputLabel();
+$dispatch{$tSymbol->getName()} = $tSymbol->getInputLabel();
+$dispatch{"query"} = sub { $tql->query(@_); };
+$dispatch{"exit"} = \&Triceps::X::SimpleServer::exitFunc;
+
+# calls Triceps::X::SimpleServer::startServer(0, \%dispatch);
+Triceps::X::DumbClient::run(\%dispatch);
+</pre>
+
+		<para>
+		It's very much like the example shown before in
+		<xref linkend="sc_sched_mainloop_socket" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;,
+		with one of the dispatch entries being a TQL query method.
+		The list of tables is given to the Tql object which figures
+		out all by itself how to run the queries on them.
+		</para>
+
+		<para>
+		Just as before, DumbClient is a class for both starting the server
+		and running the unit tests on it, so in reality the dispatch
+		table is handled in <pre>SimpleServer::startServer()</pre>.
+		</para>
+
+		<para>
+		The dispatched labels have the CSV line received from the socket broken
+		up into the fields and formed into the rowops but
+		the dispatched functions receive the whole argument
+		line as the client had sent it.
+		The functions can then do the text parsing
+		in their own way, which comes real handy for TQL. The <pre>Tql::query()</pre>
+		method splits off the name of the label to be used as the name of
+		the query, and parses the rest as the query body.
+		</para>
+
+		<para>
+		There are multiple ways to create a Tql object. By default the
+		option <quote>tables</quote> lists all the queryable tables, and their <quote>natural</quote>
+		names will be used in the queries, as was shown above. It's possible to specify the names
+		explicitly as well:
+		</para>
+
+<!-- t/xTql.t runTqlQuery3 -->
+<pre>
+my $tql = Triceps::X::Tql->new(
+	name => "tql",
+	tables => [
+		$tWindow,
+		$tSymbol,
+		$tWindow,
+		$tSymbol,
+	],
+	tableNames => [
+		"window",
+		"symbol",
+		$tWindow->getName(),
+		$tSymbol->getName(),
+	],
+);
+</pre>
+
+		<para>
+		This version defines each table under two synonymous names. The tables
+		and their names go in the parallel arrays in the same order.
+		</para>
+
+		<para>
+		It's also possible to create a Tql object without tables, and add tables to it
+		later as they are created:
+		</para>
+
+<!-- t/xTql.t runTqlQuery2 -->
+<pre>
+my $tql = Triceps::X::Tql->new(name => "tql");
+$tql->addNamedTable(
+	window => $tWindow,
+	symbol => $tSymbol,
+);
+# add 2nd time, with different names
+$tql->addTable(
+	$tWindow,
+	$tSymbol,
+);
+$tql->initialize();
+</pre>
+
+		<para>
+		Multiple tables can be added in one method call, as shown here.
+		The tables can be added with explicit names or with <quote>natural</quote> names.
+		After all the tables are added, the Tql object has to be initialized.
+		</para>
+
+		<para>
+		The two ways of creation are mutually exclusive: if the option <quote>tables</quote>
+		is used, the object will be initialized right away in the constructor.
+		If this option is absent, the explicit initialization has to be done later. The
+		methods <pre>addTable()</pre> and <pre>addNamedTable()</pre> cannot be used on an
+		initialized table, and <pre>query()</pre> cannot be used on an uninitialized
+		table. 
+		</para>
+
+	</sect1>
+
+	<sect1 id="sc_tql_multi">
+		<title>TQL in a multi-threaded server</title>
+
+		<indexterm>
+			<primary>TQL</primary>
+			<secondary>multi-threaded</secondary>
+		</indexterm>
+		<para>
+		As the single-threaded version of TQL works
+		symbiotically with the SimpleServer, the multithreaded version works
+		with the ThreadedServer. The multithreaded version of TQL does all
+		that the single-threaded one does, and more: it allows to define
+		the dynamic queries. Some day TQL might become the language to
+		define the whole Triceps models.
+		</para>
+
+		<para>
+		One thread created by the programmer contains the <quote>core logic</quote> of the
+		model. It doesn't technically have to be all in a single thread: the
+		data can be forwarded to the other threads and then the results
+		forwarded back from them. But a single core logic thread is a
+		convenient simplification. This thread has some input labels, to
+		receive data from the outside, and some tables with the computed
+		results that can be read by TQL. Of course, it's entirely realistic to
+		have also just the output labels without tables, sending a stream of
+		computed rowops, but again for simplicity let's leave this out for now.
+		</para>
+
+		<para>
+		This core logic thread creates a TQL instance, which listens on a
+		socket, accepts the connections, forwards the input data to the core
+		logic, performs queries on the tables from the core logic and sends the
+		results back to the client. To this end, the TQL instance creates a few
+		nexuses in the core logic thread and uses them to communicate between
+		all the fragments. The input labels and tables in the core thread also
+		get properly connected to these nexuses. 
+		<xref linkend="fig_tql_multi" xrefstyle="select: label nopage"/>&xrsp;
+		shows the thread structure, I'll use it for the reference throughout
+		the discussion.
+		</para>
+
+		<figure id="fig_tql_multi" >
+			<title>Multithreaded TQL application structure.</title>
+			<xi:include href="file:///FIGS/tql-010-mt-over.xml"/> 
+		</figure>
+
+		<para>
+		The core logic thread then goes into its main loop and performs as its
+		name says, the core logic computations.
+		</para>
+
+		<para>
+		Here is a very simple example of a TQL application:
+		</para>
+
+<!-- t/xTqlMt.t, combined, removed commented-out stuff -->
+<pre>
+sub appCoreT # (@opts)
+{
+	my $opts = {};
+	&Triceps::Opt::parse("appCoreT", $opts, {@Triceps::Triead::opts,
+		socketName => [ undef, \&Triceps::Opt::ck_mandatory ],
+	}, @_);
+	undef @_; # avoids a leak in threads module
+	my $owner = $opts->{owner};
+	my $app = $owner->app();
+	my $unit = $owner->unit();
+
+	# build the core logic
+
+	my $rtTrade = Triceps::RowType->new(
+		id => "int32", # trade unique id
+		symbol => "string", # symbol traded
+		price => "float64",
+		size => "float64", # number of shares traded
+	);
+
+	my $ttWindow = Triceps::TableType->new($rtTrade)
+		->addSubIndex("byId", 
+			Triceps::SimpleOrderedIndex->new(id => "ASC")
+		)
+	;
+	$ttWindow->initialize();
+
+	# Represents the static information about a company.
+	my $rtSymbol = Triceps::RowType->new(
+		symbol => "string", # symbol name
+		name => "string", # the official company name
+		eps => "float64", # last quarter earnings per share
+	);
+
+	my $ttSymbol = Triceps::TableType->new($rtSymbol)
+		->addSubIndex("bySymbol", 
+			Triceps::SimpleOrderedIndex->new(symbol => "ASC")
+		)
+	;
+	$ttSymbol->initialize();
+
+	my $tWindow = $unit->makeTable($ttWindow, "tWindow");
+	my $tSymbol = $unit->makeTable($ttSymbol, "tSymbol");
+
+	# export the endpoints for TQL (it starts the listener)
+	my $tql = Triceps::X::Tql->new(
+		name => "tql",
+		trieadOwner => $owner,
+		socketName => $opts->{socketName},
+		tables => [
+			$tWindow,
+			$tSymbol,
+		],
+		tableNames => [
+			"window",
+			"symbol",
+		],
+		inputs => [
+			$tWindow->getInputLabel(),
+			$tSymbol->getInputLabel(),
+		],
+		inputNames => [
+			"window",
+			"symbol",
+		],
+	);
+
+	$owner->readyReady();
+
+	$owner->mainLoop();
+}
+
+{
+	my ($port, $thread) = Triceps::X::ThreadedServer::startServer(
+			app => "appTql",
+			main => \&appCoreT,
+			port => 0,
+			fork => -1, # create a thread, not a process
+	);
+}
+</pre>
+
+		<para>
+		This core logic is the same as in the single-threaded example:
+		all it does is create two tables and
+		then send the input data into them. The server gets started in a
+		background thread (<pre>fork => -1</pre>) because this code is taken from a test
+		that then goes and runs the <pre>expect</pre> with the ThreadedClient.
+		</para>
+
+		<para>
+		The specification of tables for TQL is the same as for the 
+		single-threaded version.
+		The new options available only in the multi-threaded mode
+		are the <quote>threadOwner</quote>, <quote>inputs</quote> and
+		<quote>inputNames</quote>. The <quote>threadOwner</quote>
+		is how TQL knows that it must run in the multithreaded mode, and it's
+		used to create the nexuses for communication between the core logic and
+		the rest of TQL. The <quote>inputs</quote> are needed because the multithreaded TQL
+		parses and forwards the input data, unlike the single-threaded version
+		that relies on the SimpleServer to do that according to the
+		user-defined dispatch table.
+		</para>
+
+		<para>
+		The names options don't have to be used: if you name your labels and
+		tables nicely and suitable for the external vieweing, the
+		renaming-for-export can be skipped.
+		</para>
+
+		<para>
+		Similarly to the single-threaded version, if any of the options <quote>tables</quote>
+		or <quote>inputs</quote> is used, the TQL object gets initialized automatically,
+		otherwise the tables and inputs can be added piecemeal with <pre>addTable()</pre>,
+		<pre>addNamedTable()</pre>, <pre>addInput()</pre>, <pre>addNamedInput()</pre>, and then the whole thing
+		initialized manually.
+		</para>
+
+		<para>
+		Then the clients can establish the connections with the TQL server,
+		send in the data and the queries. To jump in, here is a trace of a
+		simple session that sends some data, then does some table dumps and
+		subscribes, not touching the queries yet. I'll go through it fragment
+		by fragment and explain the meaning. The dumps and subscribes were the
+		warm-up exercises before writing the full queries, but they're useful
+		in their own right, and here they serve as the warm-up exercises for
+		the making of the queries!
+		</para>
+
+		<para>
+		The trace is marked with the client name <quote>c1</quote>, just as it is in
+		<xref linkend="sc_mt_dynamic_server" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;,
+		since it's also a trace from SimpleClient.
+		</para>
+
+<!-- t/xTqlMt.t -->
+<exdump>
+> connect c1
+c1|ready
+</exdump>
+
+		<para>
+		The <quote>connect</quote> is not an actual command send but just the indication in
+		the trace that the connection was set up by the client <quote>c1</quote>.  The
+		<quote>ready</quote> response is sent when the connection is opened.
+		</para>
+
+<!-- t/xTqlMt.t -->
+<exdump>
+> c1|subscribe,s1,symbol
+c1|subscribe,s1,symbol
+</exdump>
+
+		<para>
+		This is a subscription request. It means <quote>I'm not interested in the
+		current state of a table but send me all the updates</quote>. The response is
+		the mirror of the request, so that the client knows that the request
+		has been processed. The format of the requests is different in the
+		multi-threaded mode than in the single-threaded, it has the extra elements.
+		The first element is always the command.
+		<quote>s1</quote> is the unique identifier of the request, so
+		that the client can match together the responses it received to the
+		requests it sent. Keeping the uniqueness is up to the client, the
+		server may refuse the requests with duplicate identifiers.
+		And <quote>symbol</quote> is the name of the table. Once a subscription is in place,
+		there is no way to unsubscribe other than by disconnecting the client
+		(it's doable but adds complications, and I wanted to skip over the
+		nonessential parts). Subscribing multiple times to the same table will
+		send a confirmation every time but the repeated confirmations will have
+		no effect: only one copy of the data will be sent anyway.
+		</para>
+
+		<para>
+		Side-tracking a bit, if a second subscription attempt is to be
+		done with the same id, the error would look like:
+		</para>
+
+<!-- manually created -->
+<exdump>
+error,s1,Duplicate id 's1': query ids must be unique,bad_id,s1
+</exdump>
+		
+		<para>
+		The response type field contains <quote>error</quote>, followed by the id of the request,
+		the error message, the error name, and the data that caused the error.
+		</para>
+
+		<para>
+		Let's send the data into the model:
+		</para>
+
+<!-- t/xTqlMt.t -->
+<exdump>
+> c1|d,symbol,OP_INSERT,ABC,ABC Corp,1.0
+c1|d,symbol,OP_INSERT,ABC,ABC Corp,1
+</exdump>
+
+		<para>
+		And since it propagates through the
+		subscription, the data gets sent back too. The <quote>symbol</quote> here means two
+		different things: on the input side it's the name of the label where
+		the data is sent, on the output side it's the name of the table that
+		has been subscribed to.
+		</para>
+
+		<para>
+		The data lines start with the command <quote>d</quote> (since the data is sent much
+		more frequently than the commands, I've picked a short one-letter
+		command name for it), then the label/table name, opcode and the row
+		fields in CSV format.
+		</para>
+
+<!-- t/xTqlMt.t -->
+<exdump>
+> c1|confirm,cf1
+c1|confirm,cf1,,,
+</exdump>
+
+		<para>
+		The <quote>confirm</quote> command provides a way for the client to check that the
+		data it send had propagated through the model. And it doesn't have to
+		subscribe back to the data and read them. Send some data lines, then
+		send the <quote>confirm</quote> command and wait for it to come back (again, the
+		unique id allows to keep multiple confirmations in flight if you
+		please). This command doesn't guarantee that all the clients have seen
+		the results from that data. It only guarantees that the core logic had
+		seen the data, and more weakly guarantees that the data had been
+		processed by the core logic, and this particular client had already
+		seen all the results from it.
+		</para>
+
+		<para>
+		Why weakly? It has to do with the way it works inside, and it depends
+		on the core logic. If the core logic consists of one thread, the
+		guarantee is quite strong. But if the core logic farms out the work
+		from the main thread to the other threads and then collects the results
+		back, the guarantee breaks.
+		</para>
+
+		<para>
+		You can see in
+		<xref linkend="fig_tql_multi" xrefstyle="select: label nopage"/>&xrsp;
+		that unlike the chat server shown 
+		<xref linkend="sc_mt_dynamic_server" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;,
+		TQL doesn't have any private nexuses for communication between the reader
+		and writer threads of a client. Instead it relies on the same input and
+		output nexuses, adding a control label to them, to forward the commands
+		from the reader to the writer. The TQL object in the core logic thread
+		creates a short-circuit connection between the control labels in the
+		input and output nexuses, forwarding the commands. And if the core
+		logic all runs in one thread, this creates a natural pipeline: the data
+		comes in, gets processed, comes out, the <quote>confirm</quote> command comes in,
+		comes out after the data. But if the core logic farms out the work to
+		more threads, the confirmation can <quote>jump the line</quote> because its path is
+		a direct short circuit.
+		</para>
+
+<!-- t/xTqlMt.t -->
+<exdump>
+> c1|drain,dr1
+c1|drain,dr1,,,
+</exdump>
+
+		<para>
+		The <quote>drain</quote> is an analog of <quote>confirm</quote> but more reliable and slower:
+		the reader thread drains the whole model before sending the command on.
+		This guarantees that all the processing is done, and all the output
+		from it has been sent to all the clients.
+		</para>
+
+<!-- t/xTqlMt.t -->
+<exdump>
+> c1|dump,d2,symbol
+c1|startdump,d2,symbol
+c1|d,symbol,OP_INSERT,ABC,ABC Corp,1
+c1|dump,d2,symbol
+</exdump>
+
+		<para>
+		The <quote>dump</quote> command dumps the current contents of a table. Its result
+		starts with <quote>startdump</quote>, and the same id and table name as in the
+		request, then goes the data (all with OP_INSERT), finishing with the
+		completion confirmation echoing the original command. The dump is
+		atomic, the contents of the table doesn't change in the middle of the
+		dump. However if a subscription on this table is active, the data rows
+		from that subscription may come before and after the dump.
+		</para>
+
+<!-- t/xTqlMt.t -->
+<exdump>
+> c1|dumpsub,ds3,symbol
+c1|startdump,ds3,symbol
+c1|d,symbol,OP_INSERT,ABC,ABC Corp,1
+c1|dumpsub,ds3,symbol
+</exdump>
+
+		<para>
+		The <quote>dumpsub</quote> command is a combination of a dump and subscribe: get the
+		initial state and then get all the updates.  The confirmation of
+		<quote>dumpsub</quote> marks the boundary between the original dump and the
+		following updates.
+		</para>
+
+<!-- t/xTqlMt.t -->
+<exdump>
+> c1|d,symbol,OP_INSERT,DEF,Defense Corp,2.0
+c1|d,symbol,OP_INSERT,DEF,Defense Corp,2
+</exdump>
+
+		<para>
+		Send some more data, and it comes back only once, even though the
+		subscription was done twice: once in <quote>subscribe</quote> and once in <quote>dumpsub</quote>.
+		The repeated subscription requests simply get consumed into one
+		subscription.
+		</para>
+
+<!-- t/xTqlMt.t -->
+<exdump>
+> c1|d,window,OP_INSERT,1,ABC,101,10
+</exdump>
+
+		<para>
+		This sends a row to the other table but nothing comes back because
+		there is no subscription to that table.
+		</para>
+
+<!-- t/xTqlMt.t -->
+<exdump>
+> c1|dumpsub,ds4,window
+c1|startdump,ds4,window
+c1|d,window,OP_INSERT,1,ABC,101,10
+c1|dumpsub,ds4,window
+> c1|d,window,OP_INSERT,2,ABC,102,12
+c1|d,window,OP_INSERT,2,ABC,102,12
+</exdump>
+
+		<para>
+		This demonstrates the pure dump-and-subscribe without any interventions.
+		</para>
+
+<!-- t/xTqlMt.t -->
+<exdump>
+> c1|shutdown
+c1|shutdown,,,,
+c1|__EOF__
+</exdump>
+
+		<para>
+		And the shutdown command works the same as in the chat server, draning
+		and then shutting down the whole server.
+		</para>
+
+		<para>
+		Now on to the queries.
+		</para>
+
+<!-- t/xTqlMt.t -->
+<exdump>
+> connect c1
+c1|ready
+> c1|d,symbol,OP_INSERT,ABC,ABC Corp,1.0
+</exdump>
+
+		<para>
+		Starts a client connection and sends some data.
+		</para>
+
+<!-- t/xTqlMt.t -->
+<exdump>
+> c1|querysub,q1,query1,{read table symbol}{print tokenized 0}
+c1|d,query1,OP_INSERT,ABC,ABC Corp,1
+c1|querysub,q1,query1
+</exdump>
+
+		<para>
+		The <quote>querysub</quote> command does the <quote>query-and-subscribe</quote>: reads the
+		initial state of the table, processed through the query, and then
+		subscribes to any future updates. The single-threaded variety of TQL
+		doesn't do this, it does just the one-time queries. The multithreaded
+		TQL could potentially do the one-time queries, and also just the subscribes
+		without the initial state, but so far I've been cutting corners
+		and the only thing that's actually available is the combination
+		of two, the <quote>querysub</quote>.
+		</para>
+
+		<para>
+		Similarly to the other commands, <quote>q1</quote> is the command identifier. The next
+		field <quote>query1</quote> is the name for the query, it's the name that will be
+		shown for the data lines coming out of the query. And then goes the
+		query in the brace-quoted format, same as in the single-threaded TQL (and
+		there is no further splitting by commas, so the commas can be used
+		freely in the query).
+		</para>
+
+		<para>
+		The identifier and the name of the query sound kind of redundant. But
+		the client may generate them in different ways and need both. The name
+		has the more symbolic character. The identifier can be generated as a
+		sequence of numbers, so that the client can keep track of its progress
+		more easily. And the error reports include the identifier but not the
+		query name in them.
+		</para>
+
+		<para>
+		For the query, there is no special line coming out before the initial
+		dump. Supposedly, there would not be more than one query in flight with
+		the same name, so they could be easily told apart based on the name in
+		the data lines. There is also an underlying consideration that when the
+		query involves a join, in the future the initial dump might be
+		happening in multiple chunks, requiring to either surround every chunk
+		with the start-end lines or just let them go without the extra
+		notifications, as they are now.
+		</para>
+		 
+		<para>
+		And the initial dump ends as usual with getting the echo of the command
+		(without the query part) back.
+		</para>
+
+		<para>
+		This particular query is very simple and equivalent to a <quote>dumpsub</quote>.
+		</para>
+
+<!-- t/xTqlMt.t -->
+<exdump>
+> c1|d,symbol,OP_INSERT,DEF,Defense Corp,2.0
+c1|d,query1,OP_INSERT,DEF,Defense Corp,2
+</exdump>
+
+		<para>
+		Send more data and it will come out of the query.
+		</para>
+
+<!-- t/xTqlMt.t -->
+<exdump>
+> c1|querysub,q2,query2,{read table symbol}{where istrue {$%symbol =~ /^A/}}{project fields {symbol eps}}
+c1|t,query2,query2 OP_INSERT symbol="ABC" eps="1"
+c1|querysub,q2,query2
+</exdump>
+
+		<para>
+		This query is more complicated, doing a selection (the <quote>where</quote> query
+		command) and projection. It also prints the results in the tokenized
+		format (the <quote>print</quote> command gets added automatically if it wasn't used
+		explicitly, and the default options for it enable the tokenized
+		format).
+		</para>
+
+		<para>
+		The tokenized lines come out with the command <quote>t</quote>, query name and then
+		the contents of the row. The query name happens to be sent twice, and
+		I'm not sure yet if it's a feature or a bug.
+		</para>
+
+<!-- t/xTqlMt.t -->
+<exdump>
+> c1|d,symbol,OP_INSERT,AAA,Absolute Auto Analytics Inc,3.0
+c1|d,query1,OP_INSERT,AAA,Absolute Auto Analytics Inc,3
+c1|t,query2,query2 OP_INSERT symbol="AAA" eps="3"
+> c1|d,symbol,OP_DELETE,DEF,Defense Corp,2.0
+c1|d,query1,OP_DELETE,DEF,Defense Corp,2
+</exdump>
+
+		<para>
+		More examples of the data sent, getting processed by both queries.  In
+		the second case the <quote>where</quote> filters out the row from query2, so only
+		query1 produces the result.
+		</para>
+
+<!-- t/xTqlMt.t -->
+<exdump>
+> c1|shutdown
+c1|shutdown,,,,
+c1|__EOF__
+</exdump>
+
+		<para>
+		And the shutdown as usual.
+		</para>
+
+		<para>
+		Now the <i>piece de resistance</i>: queries with joins.
+		</para>
+
+<!-- t/xTqlMt.t -->
+<exdump>
+> connect c1
+c1|ready
+> c1|d,symbol,OP_INSERT,ABC,ABC Corp,2.0
+> c1|d,symbol,OP_INSERT,DEF,Defense Corp,2.0
+> c1|d,symbol,OP_INSERT,AAA,Absolute Auto Analytics Inc,3.0
+> c1|d,window,OP_INSERT,1,AAA,12,100
+</exdump>
+
+		<para>
+		Connect and send some starting data.
+		</para>
+
+<!-- t/xTqlMt.t -->
+<exdump>
+> c1|querysub,q1,query1,{read table window}{join table symbol byLeft {symbol} type left}
+c1|t,query1,query1 OP_INSERT id="1" symbol="AAA" price="12" size="100" name="Absolute Auto Analytics Inc" eps="3"
+c1|querysub,q1,query1
+</exdump>
+
+		<para>
+		A left join of the tables <quote>window</quote> and <quote>symbol</quote>, by the field <quote>symbol</quote>
+		as join condition.
+		</para>
+
+		<para>
+		The TQL joins, even in the multithreaded mode, are still implemented
+		internally as LookupJoin, driven only by the main flow of the query. So
+		the changes to the joined dimension tables will not update the query
+		results, and will be visible only when a change on the main flow picks
+		them up, potentially creating inconsistencies in the output. This is
+		wrong, but fixing it presents complexities that I've left alone until
+		some later time.
+		</para>
+
+<!-- t/xTqlMt.t -->
+<exdump>
+> c1|d,window,OP_INSERT,2,ABC,13,100
+c1|t,query1,query1 OP_INSERT id="2" symbol="ABC" price="13" size="100" name="ABC Corp" eps="2"
+> c1|d,window,OP_INSERT,3,AAA,11,200
+c1|t,query1,query1 OP_INSERT id="3" symbol="AAA" price="11" size="200" name="Absolute Auto Analytics Inc" eps="3"
+</exdump>
+
+		<para>
+		Sending the data updates the results of the query.
+		</para>
+
+<!-- t/xTqlMt.t -->
+<exdump>
+> c1|d,symbol,OP_DELETE,AAA,Absolute Auto Analytics Inc,3.0
+> c1|d,symbol,OP_INSERT,AAA,Alcoholic Abstract Aliens,3.0
+</exdump>
+
+		<para>
+		As described above, the modifications of the dimension table are not
+		visible in the query directly.
+		</para>
+
+<!-- t/xTqlMt.t -->
+<exdump>
+> c1|d,window,OP_DELETE,1
+c1|t,query1,query1 OP_DELETE id="1" symbol="AAA" price="12" size="100" name="Alcoholic Abstract Aliens" eps="3"
+</exdump>
+
+		<para>
+		But an update on the main flow brings them up (an in this case
+		inconsistently, the row getting deleted is not exactly the same as the
+		row inserted before).
+		</para>
+
+<!-- t/xTqlMt.t -->
+<exdump>
+> c1|querysub,q2,query2,{read table window}{join table symbol byLeft {symbol} type left}{join table symbol byLeft {eps} type left rightFields {symbol/symbol2}}
+c1|t,query2,query2 OP_INSERT id="2" symbol="ABC" price="13" size="100" name="ABC Corp" eps="2" symbol2="ABC"
+c1|t,query2,query2 OP_INSERT id="2" symbol="ABC" price="13" size="100" name="ABC Corp" eps="2" symbol2="DEF"
+c1|t,query2,query2 OP_INSERT id="3" symbol="AAA" price="11" size="200" name="Alcoholic Abstract Aliens" eps="3" symbol2="AAA"
+c1|querysub,q2,query2
+</exdump>
+
+		<para>
+		This is a more complicated query, involving two joins, with the same
+		dimension table <quote>symbol</quote>. The second join by <quote>eps</quote> makes no real-world
+		sense whatsoever but it's interesting from the technical perspective:
+		if you check the table type of this table at the start of the section,
+		you'll find that it has no index on the field <quote>eps</quote>. The join adds this
+		index on demand!
+		</para>
+
+		<para>
+		The way it works, all the dimension tables are copied into the client's
+		writer thread, created from the table types exported by the core logic
+		throuhg the output nexus. (And if a table is used in the same query
+		twice, it's currently also copied twice). This provides a nice
+		opportunity to amend the table type by adding any necessary secondary
+		index before creating the table, and TQL makes a good use of it.
+		</para>
+
+	</sect1>
+
+	<sect1 id="sc_tql_join_internals">
+		<title>Internals of a TQL join</title>
+
+		<para>
+		The TQL implementation provides interesting examples of the
+		sophisticated Triceps usage. Remember, it isn't somehow special
+		or monolothic with the rest of Triceps. It uses the normal triceps
+		API and anyone can write a similar language layer from scratch.
+		The code is located in <pre>perl/Triceps/lib/Triceps/X/DumbClient.pm</pre>.
+		</para>
+
+		<para>
+		The most complex operation implemented in TQL is the join in the
+		multi-threaded server. It requires copying of multiple tables
+		from the core logic thread to the client thread that executes
+		the join, and rebuilding them in the new thread, possibly with
+		the automatically added indexes.
+		</para>
+
+		<para>
+		It all starts in the Tql initialization method. In the multithreaded
+		mode it builds the nexuses for communication. I'll skip the input nexus
+		(it's straightforward) and show the building of only the output and
+		request-dump nexuses:
+		</para>
+
+<!-- lib/Triceps/X/Tql.pm, shifted left -->
+<pre>
+	# row type for dump requests and responses
+	my $rtRequest = Triceps::RowType->new(
+		client => "string", #requesting client
+		id => "string", # request id
+		name => "string", # the table name, for convenience of requestor
+		cmd => "string", # for convenience of requestor, the command that it is executing
+	);
+</pre>
+
+		<para>
+		The request row type is used by the client writer thread to request the
+		table dumps from the core logic, and to get back the notifications
+		about the dumps.
+		</para>
+
+<!-- lib/Triceps/X/Tql.pm, shifted left -->
+<pre>
+	# build the output side
+	for (my $i = 0; $i <= $#{$self->{tables}}; $i++) {
+		my $name = $self->{tableNames}[$i]; 
+		my $table = $self->{tables}[$i];
+
+		push @tabtypes, $name, $table->getType()->copyFundamental();
+		push @labels, "t.out." . $name, $table->getOutputLabel();
+		push @labels, "t.dump." . $name, $table->getDumpLabel();
+	}
+	push @labels, "control", $rtControl; # pass-through from in to out
+	push @labels, "beginDump", $rtRequest; # framing for the table dumps
+	push @labels, "endDump", $rtRequest;
+
+	$self->{faOut} = $owner->makeNexus(
+		name => $self->{nxprefix} . "out",
+		labels => [ @labels ],
+		tableTypes => [ @tabtypes ],
+		import => "writer",
+	);
+	$self->{beginDump} = $self->{faOut}->getLabel("beginDump");
+	$self->{endDump} = $self->{faOut}->getLabel("endDump");
+</pre>
+
+		<para>
+		On the output side each table is represented by 3 elements:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+			its fundamental table type (stripped down to the primary index);
+			</listitem>
+			<listitem>
+			its output label for normal updates;
+			</listitem>
+			<listitem>
+			its dump label for the responses to the dump requests.
+			</listitem>
+		</itemizedlist>
+
+		<para>
+		There also are the <quote>beginDump</quote> and <quote>endDump</quote> labels that frame each
+		response to a dump request.
+		</para>
+
+		<para>
+		The row type <pre>$rtControl</pre> and label <quote>control</quote> are used to pass the
+		commands from the client reader to client writer, but its exact
+		contents is not important here.
+		All the magic happens in the client writer thread. The
+		reader thread just passes the commands to the writer thread, and then
+		the writer thread controls the parsing and processing of the commands.
+		</para>
+
+		<para>
+		The dump request nexus is built in a similar way:
+		</para>
+
+<!-- lib/Triceps/X/Tql.pm, shifted left -->
+<pre>
+	# build the dump requests, will be coming from below
+	undef @labels;
+	for (my $i = 0; $i <= $#{$self->{tables}}; $i++) {
+		my $name = $self->{tableNames}[$i]; 
+		my $table = $self->{tables}[$i];
+
+		push @labels, "t.rqdump." . $name, $rtRequest;
+	}
+	$self->{faRqDump} = $owner->makeNexus(
+		name => $self->{nxprefix} . "rqdump",
+		labels => [ @labels ],
+		reverse => 1, # avoids making a loop, and gives priority
+		import => "reader",
+	);
+	# tie together the labels
+	for (my $i = 0; $i <= $#{$self->{tables}}; $i++) {
+		my $name = $self->{tableNames}[$i]; 
+		my $table = $self->{tables}[$i];
+
+		$self->{faRqDump}->getLabel("t.rqdump." . $name)->makeChained(
+			$self->{nxprefix} . "rqdump." . $name, undef, 
+			\&_dumpTable, $self, $table
+		);
+	}
+</pre>
+
+		<para>
+		Each table has a label created for requesting its contents.
+		The dumps are executed in the function _dumpTable:
+		</para>
+
+<!-- lib/Triceps/X/Tql.pm -->
+<pre>
+sub _dumpTable # ($label, $rowop, $self, $table)
+{
+	my ($label, $rop, $self, $table) = @_;
+	my $unit = $label->getUnit();
+	# pass through the client id to the dump
+	$unit->call($self->{beginDump}->adopt($rop));
+	$table->dumpAll();
+	$unit->call($self->{endDump}->adopt($rop));
+	$self->{faOut}->flushWriter();
+}
+</pre>
+
+		<para>
+		The data gets framed around by the 
+		copies of the original request sent to the labels
+		<quote>beginDump</quote> and <quote>endDump</quote>.
+		This helps the client
+		writer thread keep track of its current spot. The flushing of the
+		writer is not strictly needed. Just in case if multiple dump requests
+		are received in a single tray, the flush breaks up the responses into a
+		separate tray for each dump, keeping the size of the trays lower. Not
+		that this situation could actually happen yet.
+		</para>
+
+		<para>
+		This part taken care of, let's jump around and see how the client
+		writer thread processes a <quote>querysub</quote> command:
+		</para>
+
+<!-- lib/Triceps/X/Tql.pm, shifted left -->
+<pre>
+		} elsif ($cmd eq "querysub") {
+			if ($id eq "" || exists $queries{$id}) {
+				printOrShut($app, $fragment, $sock,
+					"error,$id,Duplicate id '$id': query ids must be unique,bad_id,$id\n");
+				next;
+			}
+			my $ctx = compileQuery(
+				qid => $id,
+				qname => $args[0],
+				text => $args[1],
+				subError => sub {
+					chomp $_[2];
+					$_[2] =~ s/\n/\\n/g; # no real newlines in the output
+					$_[2] =~ s/,/;/g; # no confusing commas in the output
+					printOrShut($app, $fragment, $sock, "error,", join(',', @_), "\n");
+				},
+				faOut => $faOut,
+				faRqDump => $faRqDump,
+				subPrint => sub {
+					printOrShut($app, $fragment, $sock, @_);
+				},
+			);
+			if ($ctx) { # otherwise the error is already reported
+				$queries{$id} = $ctx;
+				&$runNextRequest($ctx);
+			}
+		}
+</pre>
+
+		<para>
+		The query id is used to keep track of the outstanding queries, so the
+		code makes sure that it's unique. This is the origin of the
+		duplicate id error that was shown before.
+		</para>
+
+		<para>
+		The bulk of the work is done in the method
+		<pre>compileQuery()</pre>. Its arguments supply the details of the query and
+		also provide the closures for the functionality that differs between
+		the single-threaded and multi-threaded versions. The option <quote>subError</quote>
+		is used to send the errors to the client, and <quote>subPrint</quote> is used to
+		send the output to the client, it gets used for building the labels in
+		the <quote>print</quote> command of the query.
+		</para>
+
+		<para>
+		<pre>compileQuery()</pre> returns the query context, which contains a compiled
+		sub-model that executes the query and a set of requests that tell the
+		writer how to connect the query to the incoming data. Or on error it
+		reports the error using the closure from the option <quote>subError</quote>
+		and returns an <pre>undef</pre>. If the
+		compilation succeeded, the writer thread remembers the query and starts the
+		asynchronous execution of the requests. The requests are the 
+		data dump requests to be sent back to the application core thread.
+		More about the requests later,
+		now let's look at the query compilation and context.
+		</para>
+
+		<para>
+		The context is created in <pre>compileQuery()</pre> thusly:
+		</para>
+
+<!-- lib/Triceps/X/Tql.pm compileQuery -->
+<pre>
+	my $ctx = {};
+	$ctx->{qid} = $opts->{qid};
+	$ctx->{qname} = $opts->{qname};
+
+	# .. skipped the parts related to single-threadde TQL
+
+	$ctx->{faOut} = $opts->{faOut};
+	$ctx->{faRqDump} = $opts->{faRqDump};
+	$ctx->{subPrint} = $opts->{subPrint};
+	$ctx->{requests} = []; # dump and subscribe requests that will run the pipeline
+	$ctx->{copyTables} = []; # the tables created in this query
+		# (have to keep references to the tables or they will disappear)
+
+	# The query will be built in a separate unit
+	$ctx->{u} = Triceps::Unit->new($opts->{nxprefix} . "${q}.unit");
+	$ctx->{prev} = undef; # will contain the output of the previous command in the pipeline
+	$ctx->{id} = 0; # a unique id for auto-generated objects
+	# deletion of the context will cause the unit in it to clean
+	$ctx->{cleaner} = $ctx->{u}->makeClearingTrigger();
+</pre>
+
+		<para>
+		It has some parts common and some parts differing for the single- and
+		multi-threaded varieties, here I've skipped over the single-threaded
+		parts.
+		</para>
+
+		<para>
+		One element that is left undefined here is <pre>$ctx->{prev}</pre>. It's the label
+		created as the output of the previous stage of the query pipeline. As
+		each command in the pipeline builds its piece of processing, it chains
+		its logic from <pre>$ctx->{prev}</pre> and leaves its result label in
+		<pre>$ctx->{next}</pre>. Then <pre>compileQuery()</pre> moves <pre>next</pre> to <pre>prev</pre> and calls the
+		compilation of the next command in the pipeline. The only command that
+		accepts an undefined <pre>prev</pre> (and it must be undefined for it) is
+		<quote>read</quote> which reads the table at the start of the pipeline.
+		</para>
+
+		<para>
+		<pre>$ctx->{copyTables}</pre> also has an important point behind it. When you
+		create a label, it's OK to discard the original reference after you
+		chain the label into the logic, that chaining will keep a reference, and
+		the label will stay alive. Not so with a table: if you create a table,
+		then chain its input label and drop the reference to a table, the table
+		will be discarded. When the input label would try to send any data
+		to the table, it will die.
+		So it's important to keep the direct table references, and
+		that's what this array is for.
+		</para>
+
+		<para>
+		<pre>$ctx->{id}</pre> is used to generate the unique names for the objects built
+		in this context.
+		</para>
+
+		<para>
+		Each query is built in its own unit. This is convenient, after the
+		query is done or the compilation encounters an error, the unit with its
+		whole contents can be easily discarded. The clearing trigger placed in
+		the context makes sure that the unit gets properly cleared and
+		discarded.
+		</para>
+
+		<para>
+		Next goes the compilation of the join query command, I'll go through it
+		in chunks.
+		</para>
+
+<!-- lib/Triceps/X/Tql.pm -->
+<pre>
+sub _tqlJoin # ($ctx, @args)
+{
+	my $ctx = shift;
+	die "The join command may not be used at the start of a pipeline.\n" 
+		unless (defined($ctx->{prev}));
+	my $opts = {};
+	&Triceps::Opt::parse("join", $opts, {
+		table => [ undef, \&Triceps::Opt::ck_mandatory ],
+		rightIdxPath => [ undef, undef ],
+		by => [ undef, undef ],
+		byLeft => [ undef, undef ],
+		leftFields => [ undef, undef ],
+		rightFields => [ undef, undef ],
+		type => [ "inner", undef ],
+	}, @_);
+
+	my $tabname = bunescape($opts->{table});
+	my $unit = $ctx->{u};
+	my $table;
+
+	&Triceps::Opt::checkMutuallyExclusive("join", 1, "by", $opts->{by}, "byLeft", $opts->{byLeft});
+	my $by = split_braced_final($opts->{by});
+	my $byLeft = split_braced_final($opts->{byLeft});
+
+	my $rightIdxPath;
+	if (defined $opts->{rightIdxPath}) { # propagate the undef
+		$rightIdxPath = split_braced_final($opts->{rightIdxPath});
+	}
+</pre>
+
+		<para>
+		It starts by parsing the options and converting them to the internal
+		representation, removing the braced quotes.
+		</para>
+
+<!-- lib/Triceps/X/Tql.pm _tqlJoin -->
+<pre>
+	# If we were to use a JoinTwo (which is more correct), the data
+	# incoming through the query would have to be put into a table too.
+	# And that requires finding the primary key for the data.
+	# I suppose, after the sequence ids for the rows would get worked
+	# out, that would provide the easy default primary key.
+	if ($ctx->{faOut}) {
+		# Potentially, the tables might be reused between multiple joins
+		# in the query if the required keys match. But for now keep things
+		# simpler by creating a new table from scratch each time.
+
+		my $tt = eval {
+			# copy to avoid adding an index to the original type
+			$ctx->{faOut}->impTableType($tabname)->copy();
+		};
+		die ("Join found no such table '$tabname'\n") unless ($tt);
+
+		if (!defined $rightIdxPath) {
+			# determine or add the index automatically
+			my @workby;
+			if (defined $byLeft) { # need to translate
+				my @leftfld = $ctx->{prev}->getRowType()->getFieldNames();
+				@workby = &Triceps::Fields::filterToPairs("Join option 'byLeft'", 
+					\@leftfld, [ @$byLeft, "!.*" ]);
+			} else {
+				@workby = @$by;
+			}
+			
+			my @idxkeys; # extract the keys for the right side table
+			for (my $i = 1; $i <= $#workby; $i+= 2) {
+				push @idxkeys, $workby[$i];
+			}
+			$rightIdxPath = [ $tt->findOrAddIndex(@idxkeys) ];
+		}
+
+		# build the table from the type
+		$tt->initialize();
+		$table = $ctx->{u}->makeTable($tt, "tab" . $ctx->{id} . $tabname);
+		push @{$ctx->{copyTables}}, $table;
+
+		# build the request that fills the table with data and then
+		# keeps it up to date; 
+		# the table has to be filled before the query's main flow starts,
+		# so put the request at the front
+		&_makeQdumpsub($ctx, $tabname, 1, $table->getInputLabel());
+	} else {
+		die ("Join found no such table '$tabname'\n")
+			unless (exists $ctx->{tables}{$tabname});
+		$table = $ctx->{tables}{$tabname};
+	}
+</pre>
+
+		<para>
+		The presence of <pre>$ctx->{faOut}</pre> means that the query is compiled in the
+		multithreaded context.
+		</para>
+
+		<para>
+		The command handlers, including the join command handler,
+		may freely die, and the error messages will be
+		caught by <pre>compileQuery()</pre> and nicely (at least, sort-of) reported back
+		to the user.
+		</para>
+
+		<para>
+		If an explicit <quote>rightIdxPath</quote> option was not requested, it gets found or added
+		automatically. On the way there the index fields need to be determined.
+		Which can be specified either as the explicit field pairs in the option <quote>by</quote> or
+		as the name translation syntax in the option <quote>byLeft</quote>. If we've got
+		a <quote>byLeft</quote>, first it gets translated to the same format as <quote>by</quote>, and
+		then the right-side fields are extracted from the format of <quote>by</quote>. After
+		that <pre>$tt->findOrAddIndex()</pre> takes care of all the heavy lifting. It
+		either finds a matching index type in the table type or creates a new
+		one from the specified fields, and either way returns the index path
+		(an invalid field will make it confess).
+		</para>
+
+		<para>
+		You might wonder, how come the explicit <quote>rightIdxPath</quote> option is not checked in
+		any way? It will be checked later by <pre>LookupJoin()</pre>, so not much point in
+		doing the check twice.
+		</para>
+
+		<para>
+		After that the table is created in a straightforward way, and
+		rememebered in <pre>$ctx->{copyTables}</pre>. And the requests list gets prepended with a
+		request to dump and subscribe to this table in <pre>_makeQdumpsub()</pre>. I'll get back to that, for
+		now let's finish up with <pre>_tqlJoin()</pre>.
+		</para>
+
+<!-- lib/Triceps/X/Tql.pm _tqlJoin -->
+<pre>
+	my $isLeft = 0; # default for inner join
+	my $type = $opts->{type};
+	if ($type eq "inner") {
+		# already default
+	} elsif ($type eq "left") {
+		$isLeft = 1;
+	} else {
+		die "Unsupported value '$type' of option 'type'.\n"
+	}
+
+	my $leftFields = split_braced_final($opts->{leftFields});
+	my $rightFields = split_braced_final($opts->{rightFields});
+
+	my $join = Triceps::LookupJoin->new(
+		name => "join" . $ctx->{id},
+		unit => $unit,
+		leftFromLabel => $ctx->{prev},
+		rightTable => $table,
+		rightIdxPath => $rightIdxPath,
+		leftFields => $leftFields,
+		rightFields => $rightFields,
+		by => $by,
+		byLeft => $byLeft,
+		isLeft => $isLeft,
+		fieldsDropRightKey => 1,
+	);
+	
+	$ctx->{next} = $join->getOutputLabel();
+}
+</pre>
+
+		<para>
+		The rest of the options get parsed, and then all the collected data
+		gets forwarded to the LookupJoin constructor. Finally the <pre>next</pre> label
+		is assigned from the join's result.
+		</para>
+
+		<para>
+		Now jumping to the <pre>_makeQdumpsub()</pre>. It's used by both the <quote>read</quote> and
+		<quote>join</quote> query commands to initiate the joins and subscriptions.
+		</para>
+
+<!-- lib/Triceps/X/Tql.pm -->
+<pre>
+sub _makeQdumpsub # ($ctx, $tabname, [$front, $lbNext])
+{
+	my $ctx = shift;
+	my $tabname = shift;
+	my $front = shift;
+	my $lbNext = shift;
+
+	my $unit = $ctx->{u};
+
+	my $lbrq = eval {
+		$ctx->{faRqDump}->getLabel("t.rqdump.$tabname");
+	};
+	my $lbsrc = eval {
+		$ctx->{faOut}->getLabel("t.out.$tabname");
+	};
+	die ("Found no such table '$tabname'\n") unless ($lbrq && $lbsrc);
+
+	# compute the binding for the data dumps, that would be a cross-unit
+	# binding to the original faOut but it's OK
+	my $fretOut = $ctx->{faOut}->getFnReturn();
+	my $dumpname = "t.dump.$tabname";
+	# the dump and following subscription data will merge on this label
+	if (!defined $lbNext) {
+		$lbNext = $unit->makeDummyLabel(
+			$lbsrc->getRowType(), "lb" . $ctx->{id} . "out_$tabname");
+	}
+
+	my $bindDump = Triceps::FnBinding->new(
+		on => $fretOut,
+		name => "bind" . $ctx->{id} . "dump",
+		labels => [ $dumpname => $lbNext ],
+	);
+</pre>
+
+		<para>
+		First it finds all the proper labels. The label <pre>$lbNext</pre> will accept the
+		merged dump contents and the following subscription, and it might be
+		either auto-generated or received as an argument. A join will pass it as an
+		argument, set to <pre>$table->getInputLabel()</pre>, so all the data goes to the copied
+		table.
+		</para>
+
+		<para>
+		The binding is used to receive the dump. It's a bit of an optimization.
+		Remember, the dump responses are sent to all the clients. Whenever
+		any client requests a dump, all the clients will get the response. A
+		client finds that the incoming dump is destined for it by processing
+		the <quote>beginDump</quote> label. If it contains this client's name, the dump is
+		destined here, and the client reacts by pushing the appropriate binding
+		onto the facet's FnReturn, and the data flows. The matching <quote>endDump</quote>
+		label then pops the binding and the data stops flowing. The binding
+		allows to avoid checking every rowop for whether it's supposed to be
+		accepted and if yes then where exactly (rememeber, the same table may
+		be dumped independently multiple times by multiple queries). Just check
+		once at the start of the bundle and then let the data flow in bulk.
+		</para>
+
+<!-- lib/Triceps/X/Tql.pm _makeQdumpsub -->
+<pre>
+	# qdumpsub:
+	#   * label where to send the dump request to
+	#   * source output label, from which a subscription will be set up
+	#     at the end of the dump
+	#   * target label in the query that will be tied to the source label
+	#   * binding to be used during the dump, which also directs the data
+	#     to the same target label
+	my $request = [ "qdumpsub", $lbrq, $lbsrc, $lbNext, $bindDump ];
+	if ($front) {
+		unshift @{$ctx->{requests}}, $request;
+	} else {
+		push @{$ctx->{requests}}, $request;
+	}
+	return $lbNext;
+}
+</pre>
+
+		<para>
+		Finally, the created bits and pieces get packaged into a request and
+		added to the list of requests in the query context. The last tricky
+		part is that the request can be added at the back or the front of the
+		list. The <quote>normal</quote> way is to add at the back, however the dimension
+		tables for the joins have to be populated before the main data flow of
+		the query starts. So for them the argument <pre>$front</pre> is set to 1, and they
+		get added at the front.
+		</para>
+
+		<para>
+		Now jumping back to the writer thread logic, after it called
+		<pre>compileQuery()</pre>, it starts the query execution by calling
+		<pre>&$runNextRequest()</pre>. Which is a closure function defined inside the
+		client writer thread function, and knows how to send the dump requests we've
+		just seen created to the core logic.
+		</para>
+
+<!-- lib/Triceps/X/Tql.pm writerT shifted -->
+<pre>
+# The requests from a query context get sent one by one, and
+# after one is done, the next is sent until they all are done.
+my $runNextRequest = sub { # ($ctx)
+	my $ctx = shift;
+	my $requests = $ctx->{requests};
+	undef $ctx->{curRequest}; # clear the info of the previous request
+	my $r = shift @$requests;
+	if (!defined $r) {
+		# all done, now just need to pump the data through
+		printOrShut($app, $fragment, $sock,
+			"querysub,$ctx->{qid},$ctx->{qname}\n");
+		return;
+	}
+</pre>
+
+		<para>
+		First it clears the information about the previous request, if any.
+		This function will be called after each request, to send the next
+		one, so on all its calls except the first one of a query it will have
+		something to clear.
+		</para>
+
+		<para>
+		Then it checks if all the requests are already done. If so, it sends
+		the query confirmation to the client socket and returns. The subscription part
+		of the query will continue running on its own.
+		</para>
+
+<!-- lib/Triceps/X/Tql.pm writerT/runNextRequest shifted -->
+<pre>
+	$ctx->{curRequest} = $r; # remember until completed
+	my $cmd = $$r[0];
+	if ($cmd eq "qdumpsub") {
+		# qdumpsub:
+		#   * label where to send the dump request to
+		#   * source output label, from which a subscription will be set up
+		#     at the end of the dump
+		#   * target label in the query that will be tied to the source label
+		#   * binding to be used during the dump, which also directs the data
+		#     to the same target label
+		my $lbrq = $$r[1];
+		# this code very specifically ignores %dump, doing its requests
+		# independently for each query, and showing off another way to
+		# do things
+		# print "DBG next request {" . $ctx->{qname} . "} qdumpsub " . $lbrq->getName() . "\n";
+		$unit->makeHashCall($lbrq, "OP_INSERT", 
+			client => $fragment, id => $ctx->{qid}, name => $ctx->{qname}, cmd => $cmd);
+	} else {
+		printOrShut($app, $fragment, $sock,
+			"error,", $ctx->{qid}, ",Internal error: unknown request '$cmd',internal,", $cmd, "\n");
+		$ctx->{requests} = [];
+		undef $ctx->{curRequest};
+		# and this will leave the query partially initialized,
+		# but it should never happen
+		return;
+	}
+};
+</pre>
+
+		<para>
+		The request data might vary by the command. If the command is <quote>qdumpsub</quote>,
+		the request gets translated to a rowop sent through the nexus to the dump
+		request label in the core logic.
+		</para>
+
+		<para>
+		And a catch-all just in case if the query compiler ever decides to
+		produce an invalid request.
+		</para>
+
+		<para>
+		Next goes the handling of the dump labels (again, this gets set up
+		during the build of the client reader threads, and then the nature is
+		left to run its course, reacting to the rowops as they come in).
+		It gets set up in the writer thread function:
+		</para>
+
+<!-- lib/Triceps/X/Tql.pm writerT -->
+<pre>
+	$faOut->getLabel("beginDump")->makeChained("lbBeginDump", undef, sub {
+		my $row = $_[1]->getRow();
+		my ($client, $id, $name, $cmd) = $row->toArray();
+		return unless ($client eq $fragment);
+		if ($cmd eq "qdumpsub") {
+			return unless(exists $queries{$id});
+			my $ctx = $queries{$id};
+			$fretOut->push($ctx->{curRequest}[4]); # the binding for the dump
+		} else {
+			return unless (exists $dumps{$name});
+			printOrShut($app, $fragment, $sock,
+				"startdump,$id,$name\n");
+			$fretOut->push($bindDump);
+		}
+	});
+</pre>
+
+		<para>
+		As described before, it checks if this is the destination client, and if there
+		is an active request with this id, then it pushes the appropriate
+		binding.
+		</para>
+
+		<para>
+		The handling of the end of transaction also gets set up in the writer
+		thread function:
+		</para>
+
+<!-- lib/Triceps/X/Tql.pm writerT modified -->
+<pre>
+	$faOut->getLabel("endDump")->makeChained("lbEndDump", undef, sub {
+		my $row = $_[1]->getRow();
+		my ($client, $id, $name, $cmd) = $row->toArray();
+		return unless ($client eq $fragment);
+
+		if ($cmd eq "qdumpsub") {
+			return unless(exists $queries{$id});
+			my $ctx = $queries{$id};
+			$fretOut->pop($ctx->{curRequest}[4]); # the binding for the dump
+			# and chain together all the following updates
+			$ctx->{curRequest}[2]->makeChained(
+				"qsub$id." . $ctx->{curRequest}[3]->getName(), undef,
+				sub {
+					# a cross-unit call
+					$_[2]->call($_[3]->adopt($_[1]));
+				},
+				$ctx->{u}, $ctx->{curRequest}[3]
+			);
+
+			&$runNextRequest($ctx);
+		} else {
+			# .. skipped the handling of dump/dumpsub
+		}
+	});
+</pre>
+
+		<para>
+		Same as the <quote>beginDump</quote>, it checks if this is the right client, and
+		if it has an outstanding dump request, then pops the binding. After the
+		dump is completed, the subscription has to be set up, so it sets up a
+		label that forwards the normal output of this table to the label
+		specified in the request. Since each query is defined in its own unit,
+		this forwarding is done as a cross-unit call.
+		</para>
+
+		<para>
+		And then the next request of this query can be started until they all are done.
+		And that's it, the end of the example. 
+		</para>
+	</sect1>
+</chapter>

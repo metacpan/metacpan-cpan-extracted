@@ -1,0 +1,48 @@
+{
+   "abstract" : "Turn stdin into rendered text graphics.",
+   "author" : [
+      "Leo Charre leocharre at cpan dot org"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.120351",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "textrender",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cache::File" : "2.04",
+            "Carp" : "1",
+            "Cwd" : "3",
+            "Exporter" : "5",
+            "Getopt::Std::Strict" : "1.01",
+            "Smart::Comments" : "1",
+            "String::ShellQuote" : "1.03",
+            "Test::Simple" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.09"
+}

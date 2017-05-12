@@ -1,0 +1,631 @@
+#!PERL -w
+#
+# juke
+#
+# Provide a command line wrapper for the jukebox control program "mtx".
+# It's derived from "stacker", which emulates the IRIX "stacker" command.
+#
+# See the POD for usage information.
+
+use lib 'JUKE_ROOT';
+use Fcntl;
+use File::Basename;
+use Jukebox;
+use SDBM_File;
+use Socket;
+use Sys::Hostname;
+
+use subs qw/
+    barcodes bcenter bcremove config customize fini init main refresh status usage
+/;
+use strict;
+
+our (%barcodes, $dte_count, $exit, $hostname, @mail, @mt, $mtx, $se_count, $wait_tape_ready);
+our $BROKEN_SUN_LIBRARY = 0;
+
+my( @status ) = init;
+main @status;
+fini;
+
+sub barcodes {
+
+    # Parse the barcode input lines and update the barcode DB:
+    #
+    # host:device:dte:se=barcode
+    #      device:dte:se=barcode
+    #             dte:se=barcode
+    #                 se=barcode
+    #
+    # If "host" is missing use this machine.  If "device" is missing use
+    # this machine's default juke changer device.  If "dte" is missing,
+    # use ''.
+
+    if ($#ARGV == 0) {
+	foreach (sort keys %barcodes) {
+	    print sprintf ("%-50s = %s\n", $_, $barcodes{$_});
+	}
+	return;
+    }
+
+    if ($#ARGV == 1) {
+	open B, "$ARGV[1]" or die "Cannot open '$ARGV[1]' for read: $!";
+	while ($_ = <B>) {
+	    chomp;
+	    my ($l, $bc) = /(.+)=(.+)/;
+	    if (not defined $l or not defined $bc) {
+		warn "Illegal barcode, syntax is host:device:dte:se=barcode: '$_'";
+		next;
+	    }
+	    bcenter $l, $bc;
+	}
+	close B;
+    } else {
+	die usage if $#ARGV % 2 != 0;
+	for (my $i = 1; $i <= $#ARGV; $i += 2) {
+	    my ($l, $bc) = ($ARGV[$i], $ARGV[$i + 1]);
+	    bcenter $l, $bc;
+	}
+    }
+
+
+} # end barcodes
+
+sub bcenter {
+
+    # Enter a pseudo-barcode into the DB.
+
+    my ($l, $bc) = @_;
+
+    return delete $barcodes{$l} if $bc eq '*  delete  *';
+
+    $l =~ s/^\s+//;
+    $l =~ s/\s+$//;
+    $bc =~ s/^\s+//;
+    $bc =~ s/\s+$//;
+    my (@toks) = split ':', $l;
+    my ($hn, $ch, $dte, $sl);
+    if (@toks == 4) {
+	($hn, $ch, $dte, $sl) = @toks;
+	$hn = lc $hn;
+    } elsif (@toks == 3) {
+	($hn, $ch, $dte, $sl) = ($hostname, @toks);
+    } elsif (@toks == 2) {
+	($hn, $ch, $dte, $sl) = ($hostname, $JUKE_CONFIG{CHANGER}, @toks);
+    } elsif (@toks == 1) {
+	($hn, $ch, $dte, $sl) = ($hostname, $JUKE_CONFIG{CHANGER}, '', @toks);
+    } else {
+	warn "Illegal barcode, syntax is host:device:dte:se=barcode: '$l=$bc'";
+	return;
+    }
+
+    if ($sl !~ /^\d+$/) {
+	warn "Illegal SE, must be an integer: '$l=$bc'";
+	return;
+    }
+    if ($sl > $se_count) {
+	warn "Illegal SE, $sl > SE count of $se_count: '$l=$bc'";
+	return;
+    }
+    if ($dte ne '' and $dte !~ /^\d+$/) {
+	warn "Illegal DTE, must be an integer: '$l=$bc'";
+	return;
+    }
+    if ($dte ne '' and $dte >= $dte_count) {
+	warn "Illegal DTE, $dte >= DTE count of $dte_count: '$l=$bc'";
+	return;
+    }
+
+    if( $bc eq '' ) {
+	delete $barcodes{"$hn:$ch:$dte:$sl"};
+    } else {
+	$barcodes{"$hn:$ch:$dte:$sl"} = $bc;
+    }
+
+} # end bcenter
+
+sub bcremove {
+
+    # Remove a pseudo-barcode from the DB.
+
+    my ($hn, $ch, $dte, $sl) = @_;
+
+    return unless $hn and $ch and defined($dte) and $sl;
+    delete $barcodes{"$hn:$ch:$dte:$sl"};
+
+} # end bcremove
+
+sub config {
+
+    return map { sprintf("%20s = %s\n", $_, $JUKE_CONFIG{$_}) }
+        sort keys %JUKE_CONFIG;
+
+} # end config
+
+sub customize {
+
+    # Configure the following variables for your site, if required. Unlikely.
+    #
+    # The file 'juke.config' contains a series of shell EXPORT commands that
+    # define the media and jukebox devices on this machine.  The Perl module
+    # Jukebox.pm parses this file and makes its information available to Perl
+    # programs.  Thus, one file provides identical information to shell and
+    # Perl programs.
+
+    # Pathname for the "mt" command, plus, the rewind tape device name(s).
+
+    foreach my $mt ( split ' ', $JUKE_CONFIG{TAPE} ) {
+	push @mt, "$JUKE_CONFIG{MT} -f $mt";
+    }
+
+    # Pathname for the "mtx" command, plus, the changer device name.
+
+    $mtx = "$JUKE_CONFIG{MTX} -f $JUKE_CONFIG{CHANGER}";
+    
+    # After a media is loaded, there's a time period in which it's not ready,
+    # due to mechanical delays, or perhaps because the media is rewinding. 
+    # $wait_tape_ready is the pathname of a program that waits for the media
+    # to become ready, or dies with a timeout failure. The logic is often
+    # dependant upon the operating system and physical device.
+
+    $wait_tape_ready = $JUKE_CONFIG{WAIT_TAPE_READY};
+
+} # end customize
+
+sub fini {
+    
+    untie %barcodes;
+    exit $exit;
+
+} # end fini
+
+sub init {
+
+    customize;
+
+    if ($#ARGV < 0 or $ARGV[0] =~ /\-h/) {
+	print STDOUT usage;
+	exit;
+    }
+
+    $hostname = hostname();
+    $hostname = gethostbyaddr(gethostbyname($hostname), AF_INET) or die $!;
+    $hostname = lc $hostname;
+
+    # Now tie the file of pseudo barcodes.
+
+    my $barcodes = 'JUKE_ROOT/juke.barcodes';
+    tie %barcodes, 'SDBM_File', $barcodes, O_RDWR|O_CREAT, 0640;
+
+    my @status;
+    unless( $#ARGV == -1 or $ARGV[0] =~ /^config|^help/ or ( $#ARGV == 0 and $ARGV[0] =~ /^barcodes/ ) ) {
+	(@status) = sys "$mtx status"; # from now on use status() !
+	($dte_count) = $status[0] =~ /(\d+) Drives/;
+	($se_count)  = $status[0] =~ / (\d+) Slots/;
+    $se_count = $BROKEN_SUN_LIBRARY if $BROKEN_SUN_LIBRARY > 0;
+
+	# Determine which SEs are mail slots.
+
+	for (my $i = 1; $i <= $#status; $i++) {
+	    if ($status[$i] =~ /Data Transfer Element (\d+)/) {
+		$mail[$1] = ($status[$i] =~ m!IMPORT/EXPORT!) ? 1 : 0;
+	    }
+	}
+    } # unlessend
+	
+    $exit = 0;
+
+    @status;
+
+} # end init
+
+sub main {
+
+    my( @status ) = @_;
+
+    # Check for 'invert' or 'eepos' arguments and save and remove them from 
+    # the argument vector for later processing.
+    
+    my $invert = '';
+    my $eepos  = '';
+    my @argv = @ARGV;
+    @ARGV = ();
+    foreach (my $i = 0; $i <= $#argv; $i++) {
+	$_ = $argv[$i];
+	if (/^invert$/) {
+	    $invert = ' invert ';
+	    next;
+	}
+	if (/^eepos$/) {
+	    $eepos = " eepos $argv[$i + 1] ";
+	    $i++;
+	    next;
+	}
+	push @ARGV, $_;		# keep this option for later processing
+    }
+
+    $_ = $ARGV[0];
+
+  CASE:
+    {
+
+	/^help$/ and do {
+	    print STDOUT usage;
+	    last CASE;
+	};
+
+	/^config$/ and do {
+	    print STDOUT config;
+	    last CASE;
+	};
+
+	/^status$/ and do {
+	    die "Usage: juke $ARGV[0]" unless $#ARGV == 0;
+	    print STDOUT status @status; # from init()
+	    last CASE;
+	};
+
+	/^load$/ and do {
+	    die "Usage: juke [invert] $ARGV[0] SE# [DTE#]" if $#ARGV > 2;
+	    sys "$mtx $invert @ARGV 2>&1";
+	    my $dte = (defined $ARGV[2]) ? $ARGV[2] : 0;
+
+	    # Update barcode of SE loaded into DTE.
+
+	    if (exists $barcodes{"$hostname:$JUKE_CONFIG{CHANGER}\:\:$ARGV[1]"}) {
+		my $bc = $barcodes{"$hostname:$JUKE_CONFIG{CHANGER}\:\:$ARGV[1]"};
+		bcremove $hostname, $JUKE_CONFIG{CHANGER}, '', $ARGV[1];
+		bcenter "$hostname:$JUKE_CONFIG{CHANGER}:$dte:$ARGV[1]", $bc;
+	    }
+
+	    sys "$wait_tape_ready $dte", 'warn';
+	    refresh;
+	    last CASE;
+	};
+
+        /^unload$/ and do {
+            die "Usage: juke [invert] $ARGV[0] [SE#] [DTE#]" if $#ARGV > 2;
+
+	    # Get source DTE and thus source SE from a status command output.
+
+	    my (@out) = status @status;
+	    my ($bc, $dte, $se_source, $se_destination);
+	    $dte = (defined $ARGV[2]) ? $ARGV[2] : 0;
+	    ($se_source) = $out[1 + $dte] =~ /Element (\d+) Loaded/;
+	    ($bc) = $out[1 + $dte] =~ /VolumeTag = (.*)/;
+	    
+	    # Get destination SE from STDERR.
+
+	    my $eject = $JUKE_CONFIG{EJECT_BEFORE_UNLOAD};
+	    sys "$mt[ $dte ] $eject 2>&1", 'warn' if $eject;
+
+            (@out) = sys "$mtx $invert @ARGV 2>&1";
+	    $exit = 1 if @out;
+	    ($se_destination) = $out[0] =~ /Storage Element (\d+)/;
+
+	    # Update barcode of SE unloaded from DTE.
+
+	    if (exists $barcodes{"$hostname:$JUKE_CONFIG{CHANGER}:$dte:$se_source"} and
+		defined($bc) ) {
+		bcremove $hostname, $JUKE_CONFIG{CHANGER}, $dte, $se_source;
+		bcenter "$hostname:$JUKE_CONFIG{CHANGER}\:\:$se_destination", $bc;
+	    }
+	    refresh;
+            last CASE;
+        };
+
+	/^first|last|next|previous$/ and do {
+	    die "Usage: juke $ARGV[0] [DTE#]" if $#ARGV > 1;
+
+	    # Get source DTE and thus source SE from a status command output.
+
+	    my (@out) = status @status;
+	    my ($bc, $dte, $se_source, $se_destination);
+	    $dte = (defined $ARGV[1]) ? $ARGV[1] : 0;
+	    ($se_source) = $out[1 + $dte] =~ /Element (\d+) Loaded/;
+	    ($bc) = $out[1 + $dte] =~ /VolumeTag = (.*)/;
+	    
+	    # Perform the operation - exit if errors.
+ 
+	    my $eject = $JUKE_CONFIG{EJECT_BEFORE_UNLOAD};
+	    sys "$mt[ $dte ] $eject 2>&1", 'warn' if $eject;
+
+	    (@out) = sys "$mtx @ARGV 2>&1", 'warn';
+            $exit = 1 if $#out > 0;
+	    last CASE if $#out > 1; # probably a usage: message
+
+	    if ($#out != -1) {
+
+		# Get destination SE from STDERR.
+
+		last CASE if $out[0] =~ /source Element Address \d+ is Empty/;
+		($se_destination) = $out[0] =~ /Storage Element (\d+)/;
+
+		# Update barcode of SE unloaded from DTE.
+
+		if (exists $barcodes{"$hostname:$JUKE_CONFIG{CHANGER}:$dte:$se_source"} and
+		    defined($bc) ) {
+		    bcremove $hostname, $JUKE_CONFIG{CHANGER}, $dte, $se_source;
+		    bcenter "$hostname:$JUKE_CONFIG{CHANGER}\:\:$se_destination", $bc;
+		}
+
+	    }
+
+	    last CASE if $#out == 1 and 
+		$out[1] =~ /source Element Address \d+ is Empty/;
+	    last CASE if $#out == 1 and 
+		$out[1] =~ /No More Tapes/;
+
+	    # Update barcode of SE loaded into DTE.
+
+	    (@out) = status;
+	    
+	    # Get SE from media loaded in $dte. Then get the barcode from
+	    # the empty SE slot and update the pseudo barcode hash.
+
+	    ($se_source) = $out[1 + $dte] =~ /Element (\d+) Loaded/;
+	    ($bc) = $out[$dte_count + $se_source] =~ /VolumeTag=(.*)/;
+
+	    if (exists $barcodes{"$hostname:$JUKE_CONFIG{CHANGER}\:\:$se_source"}) {
+		my $bc = $barcodes{"$hostname:$JUKE_CONFIG{CHANGER}\:\:$se_source"};
+		bcremove $hostname, $JUKE_CONFIG{CHANGER}, '', $se_source;
+		bcenter "$hostname:$JUKE_CONFIG{CHANGER}:$dte:$se_source", $bc;
+	    }
+
+	    sys "$wait_tape_ready $dte", 'warn';
+	    refresh;
+	    last CASE;
+	};
+
+	/^transfer$/ and do {
+	    die "Usage: juke [eepos eepos#] $ARGV[0] src-SE# dest-SE#" if $#ARGV != 2;
+	    sys "$mtx $eepos @ARGV 2>&1";
+	    if ($ARGV[1] != $ARGV[2]) {
+		if (exists $barcodes{"$hostname:$JUKE_CONFIG{CHANGER}\:\:$ARGV[1]"}) {
+		    my $bc = $barcodes{"$hostname:$JUKE_CONFIG{CHANGER}\:\:$ARGV[1]"};
+		    bcremove $hostname, $JUKE_CONFIG{CHANGER}, '', $ARGV[1];
+		    bcenter "$hostname:$JUKE_CONFIG{CHANGER}\:\:$ARGV[2]", $bc; 
+		}
+	    } else {		# remove barcode if bumped
+		if (exists $barcodes{"$hostname:$JUKE_CONFIG{CHANGER}\:\:$ARGV[1]"} and 
+		    $mail[$ARGV[1]]) {
+		    bcremove $hostname, $JUKE_CONFIG{CHANGER}, '', $ARGV[1];
+		}
+	    }
+	    refresh;
+	    last CASE;
+	};
+
+	/^loaded$/ and do {
+	    die "Usage: juke $ARGV[0] [DTE#]" if $#ARGV > 1;
+	    my $dte = $ARGV[1];
+	    die "juke: DTEs 0 through ", ( $dte_count - 1 ), " are available, DTE $dte is illegal."
+		if defined( $dte ) and $dte > ( $dte_count - 1 );
+	    my (@status) = status @status;
+	    my $first = 1;
+	    my @bcs;
+	    foreach (@status) {
+		next unless /Data Transfer Element/;
+		/VolumeTag = (.*)/;
+		my $bc = defined $1 ? $1 : '';
+		push @bcs, $bc;
+	    }
+	    if( defined $dte ) {
+		print STDOUT $bcs[ $dte ], "\n";
+	    } else {
+		print STDOUT join( ' ', @bcs ), "\n";
+	    }
+	    last CASE;
+	};
+
+	/^barcodes$/ and do {
+	    barcodes;
+	    last CASE;
+	};
+
+	/^refresh-tkjuke$/ and do {
+	    refresh;
+	    last CASE;
+	};
+
+        die "Unrecognized juke command '$_'.\n";
+    } # casend
+
+} # end main
+
+sub refresh {
+
+    my $pidfile = '/tmp/tkjuke-slave-' . basename( $JUKE_CONFIG{CHANGER} ) . '.pid';
+    if( open PID, $pidfile ) {
+	chomp( my $pid = <PID> );
+	close PID;
+	kill 1, $pid if $pid;
+    }
+
+} # end refresh
+
+sub status {
+
+    my( @status ) = @_;
+
+    # This subroutine executes an "mtx status" command and returns the
+    # results - possibly modified with pseudo barcodes.
+
+    (@status) = sys "$mtx status 2>&1" if "@status" eq '';
+    foreach (@status) {
+	s/\s+$/\n/;
+    }
+
+    # Pass 1: handle full DTEs and SEs.
+
+    for (my $i = 1; $i <= $#status; $i++) {
+	if ($status[$i] =~ /Data Transfer Element (\d+)/) {
+	    my ($dte) = $1;
+	    if ($status[$i] =~ /(\d+) Loaded/) {
+		my ($se) = $1;
+		my $bc = $barcodes{"$hostname:$JUKE_CONFIG{CHANGER}:$dte:$se"};
+		if (defined $bc) {
+		    chomp $status[$i];
+		    if ($status[$i] =~ /VolumeTag/) {
+			$status[$i] =~ s/(=.*)/= $bc/;
+		    } else {
+			$status[$i] .= ":VolumeTag = $bc";
+		    }
+		    $status[$i] .= "\n";
+		} # ifend barcode
+	    }
+        } else {
+	    my ($se) = $status[$i] =~ /Storage Element (\d+)/;
+	    my $bc = $barcodes{"$hostname:$JUKE_CONFIG{CHANGER}\:\:$se"};
+	    if (defined $bc) {
+		chomp $status[$i];
+		if ($status[$i] =~ /VolumeTag/) {
+		    $status[$i] =~ s/(=.*)/=$bc/;
+		} else {
+		    $status[$i] .= ":VolumeTag=$bc";
+		}
+		$status[$i] .= "\n";
+	    } # ifend barcode
+        } # ifend DTE or SE
+    } # forend all mtx status output lines
+
+    # Pass 2: replicate barcodes from loaded DTEs to empty SEs.
+
+    for (my $i = 1; $i <= $dte_count; $i++) {
+	if ( $status[$i] =~ /Storage Element (\d+) Loaded/ ) {
+	    my $se = $1;
+            last if $se > $BROKEN_SUN_LIBRARY;
+	    if ( $status[$i] =~ /VolumeTag = (.*)/ ) {
+		my $bc = $1;
+		if (defined $bc) {
+		    chomp $status[$i + $se];
+		    if ($status[ $dte_count + $se ] =~ /VolumeTag/) {
+			$status[ $dte_count + $se ] =~ s/(=.*)/=$bc/;
+		    } else {
+			$status[ $dte_count + $se ] .= ":VolumeTag=$bc";
+		    }
+		    $status[$i + $se] .= "\n";
+		} # ifend barcode
+	    }
+	} # ifend loaded DTE with a barcode
+    } # forend all DTEs
+
+    return @status[ 0 .. ( $#status - $BROKEN_SUN_LIBRARY ) ];
+
+} # end status
+
+sub usage {
+
+    return <<"USAGE";
+
+juke V${JUKE_CONFIG{VERSION}} usage:
+
+ juke [help]                            - print this information
+
+ juke config                            - print juke.config
+
+ juke status                            - print jukebox status
+ 
+ juke first    [DTE#]                   - unload current media, load first
+ juke last     [DTE#]                   - unload current media, load last
+ juke next     [DTE#]                   - unload current media, load next
+ juke previous [DTE#]                   - unload current media, load previous
+
+ juke [invert] load    SE#  [DTE#]      - load media from jukebox, may be inverted
+ juke [invert] unload [SE#] [DTE#]      - return media to jukebox, may be inverted
+
+ juke [eepos eepos#] transfer SE# SE#   - transfer media or bump mail slot
+
+ juke loaded   [DTE#]                   - print barcode(s) of loaded media
+
+ juke barcodes [pathname | SE# barcode] - print or set jukebox barcode list
+
+ juke refresh-tkjuke                    - send SIGHUP to update tkjuke's display
+
+USAGE
+
+} # end usage
+
+__END__
+
+=head1 NAME
+
+B<juke> - manipulate jukeboxes from the command line
+
+Provide a command line wrapper for the jukebox control program B<mtx>.
+It's derived from my B<stacker> program, which emulates the IRIX
+B<stacker> command.
+
+B<juke> exists because:
+
+ . its interface is simple
+ . usage is consistent across machines and operating systems
+ . it implements pseudo barcodes for changers lacking a reader
+ . it acts as my jukebox simulator - no mtx hacking required
+ . it waits for a "media ready" condition when changing media
+ . it's usable in file backup solutions for all the above
+
+=head1 SYNOPSIS
+
+juke -help
+
+=head1 DESCRIPTION
+
+In B<juke> lingo, a jukebox is a physical device consisting of one or
+more Data Transfer Elements (DTE) and one or more Storage Elements
+(SE).  Think of a DTE as the hardware that reads/writes storage media,
+perhaps magnetic tapes or optical disks.  An SE stores media until it's
+loaded into a DTE.  A mail slot is a special SE used to add or remove
+(bump) media from the jukebox without having to open the jukebox up (as
+is required with a simple stacker device). In the case of two-sided
+optical media, B<juke> can invert the media if there is hardware
+support.
+
+B<juke> can also simulate a barcode capability for jukeboxes lacking a
+real barcode reader. Once media is physically loaded into an SE the
+operator enters the media's barcode.  As long as B<juke> is the only
+program manipulating that media, it is tracked as it moves about the
+jukebox. Barcode information is maintained in a Perl SDBM database.
+
+Barcodes are set either by clicking on a media slot in B<tkjuke>, or
+the B<juke> command line:
+   
+    juke barcodes filename
+    juke barcodes saddr1 barcode1 [ saddr2 barcode2 .... ]
+
+If a filename is specified, each line is of the form I<saddr>=I<barcode>,
+where I<barcode> is the barcode, and I<saddr> is the slot address:
+  
+    host:changer:slot
+
+I<slot> is required and is the SE number, I<host> defaults to the local
+host and I<changer> is the configured changer device for this instance of
+B<juke>.
+
+=head1 EXAMPLE
+
+To see the status of a jukebox:
+
+    juke status
+
+To load media:
+
+    juke load 1
+
+To unload the media:
+
+    juke unload
+
+=head1 AUTHOR
+
+sol0@lehigh.edu
+
+Copyright (C) 2002 - 2007, Steve Lidie. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 KEYWORDS
+
+mtx, jukebox, tkjuke
+
+=cut

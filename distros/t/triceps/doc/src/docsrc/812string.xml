@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_string">
+		<title>String utilities</title>
+
+		<para>
+		Triceps has a number of small helper functions for string handling
+		that are used throughout the code. This description includes a few
+		forward references but you don't really need to understand them to
+		understand these functions.
+		</para>
+
+		<para>
+		The first two are declared in <pre>common/Strprintf.h</pre>:
+		</para>
+
+		<indexterm>
+			<primary>strprintf</primary>
+		</indexterm>
+		<indexterm>
+			<primary>vstrprintf</primary>
+		</indexterm>
+<pre>
+string strprintf(const char *fmt, ...);
+string vstrprintf(const char *fmt, va_list ap);
+</pre>
+
+		<para>
+		They are entirely similar to <pre>sprintf()</pre> and <pre>vsprintf()</pre> with the
+		difference that they place the result of formatting into a newly
+		constructed string and return that string.
+		</para>
+
+		<para>
+		The rest are defined in <pre>common/StringUtil.h</pre>.
+		</para>
+
+<pre>
+extern const string &NOINDENT;
+</pre>
+
+		<indexterm>
+			<primary>NOINDENT</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Type</primary>
+		</indexterm>
+		<para>
+		The special constant that when passed to the printing of the Type
+		(see
+		<xref linkend="sc_cpp_types" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;)
+		causes it to print without line breaks. Doesn't have any special effect
+		on Errors, there it's simply treated as an empty string.
+		</para>
+
+<pre>
+const string &nextindent(const string &indent, const string &subindent, string &target);
+</pre>
+
+		<para>
+		Compute the indentation for the next level when printing a Type. The
+		arguments are:
+		</para>
+
+		<variablelist>
+			<varlistentry>
+				<term><pre>indent</pre></term>
+				<listitem>
+				<para>
+				indent string of the current level.
+				</para>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><pre>subindent</pre></term>
+				<listitem>
+				<para>
+				characters to append for the next indent level.
+				</para>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term><pre>target</pre></term>
+				<listitem>
+				<para>
+				buffer to store the extended indent string.
+				</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+
+		<para>
+		The passing of <pre>target</pre> as an argument allows to reuse the same string
+		object and avoid the extra construction.
+		</para>
+
+		<para>
+		The function returns the computed reference: if <pre>indent</pre> was NOINDENT,
+		then reference to NOINDENT, otherwise reference to <pre>target</pre>. This
+		particular calling pattern is strongly tied to how things are computed
+		inside the type printing, but you're welcome to look inside it and do
+		the same for any other purpose.
+		</para>
+
+<pre>
+void newlineTo(string &res, const string &indent);
+</pre>
+
+		<para>
+		Another helper function for the printing of Type, inserting a line
+		break. The <pre>indent</pre> argument specifies the indentation, with the special
+		handling of NOINDENT: if <pre>indent</pre> is NOINDENT, a single space is added,
+		thus printing everything in one line; otherwise a <quote>\n</quote> and the contents
+		of <pre>indent</pre> are added. The <pre>res</pre> argument is the result string, where the
+		line break characters are added.
+		</para>
+
+<pre>
+void hexdump(string &dest, const void *bytes, size_t n, const char *indent = "");
+</pre>
+
+		<para>
+		Print a hex dump of a sequence of bytes (at address <pre>bytes</pre> and of length
+		<pre>n</pre>), appending the dump to the destination string <pre>dest</pre>. The data will be
+		nicely broken into lines, with 16 bytes printed per line. The first
+		line is added directly to the end of the <pre>dest</pre> as-is,  but if <pre>n</pre> is over
+		16, the other lines will follow after <quote>\n</quote>. The <pre>indent</pre> argument allows to
+		add indentation at the start of each following line.
+		</para>
+
+<pre>
+void hexdump(FILE *dest, const void *bytes, size_t n, const char *indent = "");
+</pre>
+
+		<para>
+		Another version, sending the dumped data directly into a file descriptor.
+		</para>
+
+		<para>
+		The next pair of functions provides a generic mechanism for converting
+		enums between a string and integer representation:
+		</para>
+
+<pre>
+struct Valname
+{
+    int val_;
+    const char *name_;
+};
+
+int string2enum(const Valname *reft, const char *name);
+const char *enum2string(const Valname *reft, int val, const char *def = "???");
+</pre>
+
+		<para>
+		The reference table is defined with an array of Valnames, with the
+		last element being <pre>{ -1, NULL }</pre>. Then it's passed as the argument <pre>reft</pre>
+		of the conversion functions which do a sequential look-up by that
+		table. If the argument is not found, <pre>string2enum()</pre> will return -1, and
+		<pre>enum2string()</pre> will return the value of the <pre>def</pre> argument (which may be
+		NULL).
+		</para>
+
+		<para>
+		Here is an example of how it's used for the conversion of opcode flags:
+		</para>
+
+<pre>
+Valname opcodeFlags[] = {
+    { Rowop::OCF_INSERT, "OCF_INSERT" },
+    { Rowop::OCF_DELETE, "OCF_DELETE" },
+    { -1, NULL }
+};
+
+const char *Rowop::ocfString(int flag, const char *def)
+{
+    return enum2string(opcodeFlags, flag, def);
+}
+
+int Rowop::stringOcf(const char *flag)
+{
+    return string2enum(opcodeFlags, flag);
+}
+</pre>
+	</sect1>
+

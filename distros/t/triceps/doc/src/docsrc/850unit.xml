@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_unit">
+		<title>Unit reference</title>
+
+		<indexterm>
+			<primary>Unit</primary>
+		</indexterm>
+		<para>
+		The Unit is declared in <pre>sched/Unit.h</pre>. It represents an
+		execution unit that controls the execution order of a sequential
+		part of a model.
+		An unit is an Mtarget but in reality
+		it may be used in one thread only. The multithreading support in the
+		references is needed to build the multithreaded applications but
+		each Unit in the application belongs to one thread (possibly sharing 
+		it with other Units).
+		</para>
+
+<pre>
+Unit(const string &name);
+</pre>
+
+		<para>
+		Constructs an execution unit. 
+		</para>
+
+<pre>
+const string &getName() const;
+</pre>
+
+		<para>
+		Get back the name.
+		</para>
+
+<pre>
+void schedule(Onceref<Rowop> rop);
+void scheduleTray(const_Onceref<Tray> tray);
+void fork(Onceref<Rowop> rop);
+void forkTray(const_Onceref<Tray> tray);
+void call(Onceref<Rowop> rop);
+void callTray(const_Onceref<Tray> tray);
+
+void enqueue(int em, Onceref<Rowop> rop);
+void enqueueTray(int em, const_Onceref<Tray> tray);
+</pre>
+
+		<para>
+		Schedule, fork or call a rowop or tray, like in Perl. Unlike Perl, the
+		methods with a tray argument have different names. And the enqueueing
+		mode is always an integer constant. These constants are defined in the
+		enum Gadget::EnqMode (the Gadget class is described in
+		<xref linkend="sc_cpp_gadget" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;), and is
+		one of <pre>Gadget::EM_SCHEDULE</pre>, <pre>Gadget::EM_FORK</pre>, <pre>Gadget::EM_CALL</pre> and
+		<pre>Gadget::EM_IGNORE</pre>. 
+		</para>
+
+<pre>
+void enqueueDelayedTray(const_Onceref<Tray> tray);
+</pre>
+
+		<indexterm>
+			<primary>Gadget</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Rowop</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Table</primary>
+		</indexterm>
+		<para>
+		Enqueue (schedule, fork or call) the rowops from a tray built by
+		Gadget's method <pre>sendDelayed()</pre>.  The Rowop has a semi-undocumented
+		field to store the enqueuing mode for that particular Rowop, that
+		gets populated by <pre>Gadget::sendDelayed()</pre>.
+		The <pre>enqueueDelayedTray()</pre> uses the value from this field
+		to determine the enqueueing method individually for each Rowop.
+		The whole arraggement is largely obsolete: it used to be used for
+		the aggregators in a Table, mixing the outputs from multiple
+		aggregators with potentially different enqueueing methods in one
+		tray. But now everything just uses <pre>EM_CALL</pre> and there
+		is no need for this any more.
+		</para>
+
+<pre>
+bool empty() const;
+</pre>
+
+		<para>
+		Check whether all the Unit's frames are empty.
+		</para>
+
+<pre>
+bool isFrameEmpty() const;
+</pre>
+
+		<para>
+		Check whether the current inner frame is empty.
+		</para>
+
+<pre>
+bool isInOuterFrame() const;
+</pre>
+
+		<para>
+		Check whether the unit's current inner frame is the same as its outer
+		frame, which means that the unit is not in the middle of a call.
+		</para>
+
+<pre>
+void callNext();
+void drainFrame();
+</pre>
+
+		<para>
+		Execute the next rowop from the current (inner) frame, or all the
+		rowops on the current frame. The semantics is the same as in the Perl
+		code.
+		</para>
+
+<pre>
+void setMark(Onceref<FrameMark> mark);
+</pre>
+
+		<para>
+		Set a mark on the current frame, same as in Perl.
+		</para>
+
+<pre>
+void loopAt(FrameMark *mark, Onceref<Rowop> rop);
+void loopTrayAt(FrameMark *mark, const_Onceref<Tray> tray);
+</pre>
+
+		<para>
+		Enqueue a rowop or a tray at the marked frame.
+		</para>
+
+<pre>
+void callAsChained(const Label *label, Rowop *rop, const Label *chainedFrom);
+</pre>
+
+		<para>
+		This method was introduced in Triceps version 2, and hasn't propagated to
+		Perl yet. I'm not even sure that I want it visible in Perl, since it's
+		kind of low-level. It executes a label call, assuming that it was
+		chained from another label (before version 2 the functionality itself had
+		obviously existed but was not visible in the API).
+		</para>
+
+		<para>
+		The row types of all the arguments must be matching, or the method
+		would likely crash. 
+		</para>
+
+		<para>
+		The label will be called with rowop, just as if this label was chained
+		from another label. Since the chaining might be multi-level, the
+		<pre>chainedFrom</pre> label is not necessarily the one in the rowop,
+		it can itself be chained from the label in the rowop, directly or
+		indirectly.
+		</para>
+
+		<para>
+		All the tracing for the chained calls is automatically invoked.
+		Keeping the consistency of the
+		tracing is up to you: if you use the <pre>chainedFrom</pre> argument label that
+		hasn't actually been called through the chain, the trace will look surprising.
+		</para>
+
+		<indexterm>
+			<primary>streaming function</primary>
+		</indexterm>
+		<indexterm>
+			<primary>FnReturn</primary>
+		</indexterm>
+		<indexterm>
+			<primary>FnBinding</primary>
+		</indexterm>
+		<para>
+		This method is used in Triceps in such places as calling a label in
+		FnBinding through an FnReturn. You can use it directly as
+		well, just be very careful. 
+		</para>
+
+<pre>
+void clearLabels();
+</pre>
+
+		<para>
+		Clear all the unit's labels, same semantics as when called from Perl.
+		</para>
+
+<pre>
+void rememberLabel(Label *lab);
+</pre>
+
+		<para>
+		The method that connects a label to the unit. Normally you don't need
+		to call it manually, the label constructor calls it (and that's why
+		it's not in the Perl API). The only real reason to use this method
+		manually is if you've disconnected a label manually from the unit, and
+		want to reconnect it back (and I'm not sure if anyone would ever want
+		that). Calling this method repeatedly with the same label and unit will
+		have no effect. Remembering the same label in multiple units is not a
+		good idea.
+		</para>
+
+<pre>
+void  forgetLabel(Label *lab);
+</pre>
+
+		<para>
+		Make the unit forget a label, so on <pre>clearLabels()</pre> that label won't be
+		cleared. This is another dangerous low-level method, since only the
+		unit will forget about the label but the label will still keep the
+		pointer to the unit, unless it's cleared. Because of the danger, it's
+		also not in the Perl API. The reason to use it would be if you want to
+		disassemble and discard a part of the unit without disturbing the rest
+		of it. However a safer alternative is to just create multiple units in
+		one thread and discard by a whole unit.
+		</para>
+
+<pre>
+RowType *getEmptyRowType() const;
+</pre>
+
+		<para>
+		A convenience method to get a reference to a row type with no fields.
+		Such row type is useful for creation of pseudo-labels that have the
+		user-defined clearing handlers that clear some user data.
+		</para>
+
+		<para>
+		Each unit has its own instance of an empty row type. The separate instances
+		(instead of having a single global one) are purely for the conveniece of memory management
+		in the threads, they are all equivalent. You could also create
+		your own empty row type.
+		</para>
+
+<pre>
+void setMaxStackDepth(int v);
+int maxStackDepth() const;
+void setMaxRecursionDepth(int v);
+int maxRecursionDepth() const;
+</pre>
+
+		<para>
+		Set and get the maximal unit stack depth and recursion depth, works the
+		same as in Perl.
+		</para>
+
+<pre>
+int getStackDepth() const;
+</pre>
+
+		<para>
+		Returns the current depth of the execution stack.
+		It isn't of any use for the model logic as such but comes handy
+		for debugging, to check in the loops that you haven't accidentally
+		created a stack growing with iterations. When the unit is not
+		running, the stack depth is 1, since the outermost frame always
+		stays on the stack. When a rowop is being executed, the stack
+		depth is at least 2.
+		</para>
+
+<pre>
+void clearLabels();
+</pre>
+
+		<indexterm>
+			<primary>label</primary>
+		</indexterm>
+		<indexterm>
+			<primary>UnitClearingTrigger</primary>
+		</indexterm>
+		<para>
+		Clear all the labels in the unit, then drop the references from unit to them.
+		Normally should be called only when the unit is about to be destroyed,
+		and is called automatically when the unit gets destroyed. However
+		in case of cyclic references to the unit, may need to be called
+		manually or through a UnitClearingTrigger object to break these
+		cycles. For more information, see
+		<xref linkend="sc_ref_cycles" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<para>
+		The Unit has a few helper classes: the tracers and the clearing triggers.
+		</para>
+
+		<para>
+		The tracer classes inherit from the nested virtual class Unit::Tracer.
+		They will be described in
+		<xref linkend="sc_cpp_unit_tracer" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		The Unit class contains the definition of the enums of the tracers
+		and provides a way to set the tracer in the unit.
+		</para>
+
+		<indexterm>
+			<primary>tracing</primary>
+		</indexterm>
+<pre>
+enum TracerWhen {
+	// The values go starting from 0 in before-after pairs
+	TW_BEFORE, // before calling the label's execution as such
+	TW_AFTER, // after all the execution is done
+	TW_BEFORE_CHAINED, // after execution, before calling the chained labels (if they are present)
+	TW_AFTER_CHAINED, // after calling the chained labels (if they were present)
+	TW_BEFORE_DRAIN, // before draining the label's frame if it's not empty
+	TW_AFTER_DRAIN, // after draining the label's frame if was not empty
+};
+</pre>
+
+		<para>
+		This enum describes the point of the tracer invocation.
+		The meaning of the values is described in detail in
+		<xref linkend="sc_sched_tracing" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+<pre>
+static const char *tracerWhenString(int when, const char *def = "???");
+static int stringTracerWhen(const char *when);
+</pre>
+
+		<para>
+		The usual conversions between the integer constants and their
+		string representations.
+		<pre>def</pre> is as usual the default placeholder that will be used
+		for an invalid value. And the conversion from string would return a -1
+		on an invalid value.
+		</para>
+
+<pre>
+static const char *tracerWhenHumanString(int when, const char *def = "???");
+static int humanStringTracerWhen(const char *when);
+</pre>
+
+		<para>
+		The same kind of conversion as above, only the strings are more
+		human-readable.  Basically, the same thing, only in the lowercase
+		words. For example, TW_BEFORE_CHAINED would become "before-chained".
+		This conversion is used by the provided tracer classes in their traces.
+		</para>
+
+<pre>
+static bool tracerWhenIsBefore(int when);
+static bool tracerWhenIsAfter(int when);
+</pre>
+
+		<para>
+		Check a TracerWhen value for whether it represents a point before or after
+		calling a label. Right now all the valid values fall into one or the
+		other classification.
+		But more trace points that are neither <quote>before</quote> or <quote>after</quote> could get added
+		in the future, so a good practice is to check explicitly for both
+		conditions rather than a simple if/else with one condition.
+		</para>
+
+<pre>
+void setTracer(Onceref<Tracer> tracer);
+Onceref<Tracer> getTracer() const;
+</pre>
+
+		<para>
+		Set and get back the tracer object for the Unit. <pre>NULL</pre> means
+		that no tracer is set. It's possible to use the same tracer object
+		for multiple units, as long as these units are in the same threads;
+		that will combine the traces from these units into one trace.
+		If you really want, it's even possible to use the same tracer object
+		for the units in different threads but for that you must define
+		your own tracer class that does the proper synchronization. None
+		of the pre-defined tracers have the synchronization, since using
+		them from multiple threads is usually not a good idea.
+		</para>
+
+		<para>
+		The clearing trigger objects are constructed with:
+		</para>
+		
+<pre>
+UnitClearingTrigger(Unit *unit);
+</pre>
+
+		<para>
+		The trigger is an Mtarget, so the typical use would be:
+		</para>
+
+<pre>
+{
+  Autoref<UnitClearingTrigger> ctrig = new UnitClearingTrigger(myunit);
+  ...
+}
+</pre>
+
+		<para>
+		At the block exit when the Autoref will get destroyed, it will destroy the trigger,
+		which would in turn cause the clearing of the unit. Of course, you can
+		also place the Autoref into another object, and then the destruction of
+		that object would cause the clearing, instead of the end of the block.
+		</para>
+	</sect1>

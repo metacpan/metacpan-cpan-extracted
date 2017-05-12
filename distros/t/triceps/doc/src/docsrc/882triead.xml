@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_triead">
+		<title>Triead reference</title>
+
+		<indexterm>
+			<primary>Triead</primary>
+		</indexterm>
+
+		<para>
+		Triead is a class that can be referenced from multiple
+		threads and inherits from Mtarget. It's defined in <pre>app/Triead.h</pre>.
+		</para>
+
+		<para>
+		The meaning of the &Cpp; methods is exactly the same as in Perl, only the
+		format of values is slightly different. Obviously, the <pre>start*()</pre> methods
+		are Perl-only, in &Cpp; the Trieads are defined by <pre>App::makeTriead()</pre>
+		with the help of <pre>App::defineJoin()</pre>.
+		</para>
+
+<pre>
+const string &getName() const;
+</pre>
+
+		<para>
+		Get the Triead's name.
+		</para>
+
+<pre>
+const string &fragment() const;
+</pre>
+
+		<para>
+		Get the name of the Triead's fragment. If the Triead doesn't belong to
+		a fragment, returns an empty string <quote></quote>.
+		</para>
+
+<pre>
+bool isConstructed() const;
+</pre>
+
+		<para>
+		Check whether the Triead has been constructed. For the explanation of
+		the Triead lifecycle states, see
+		<xref linkend="sc_mt_triead_life" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+<pre>
+bool isReady() const;
+</pre>
+
+		<para>
+		Check whether the Triead is ready.
+		</para>
+
+<pre>
+bool isDead() const;
+</pre>
+
+		<para>
+		Check whether the Triead is dead.
+		</para>
+
+<pre>
+bool isInputOnly() const;
+</pre>
+
+		<para>
+		Check whether the Triead is input-only, that is, it has no reader nexuses
+		imported into it. When the Triead is created, this flag starts its life
+		as <pre>false</pre>, and then its correct value is computed when the
+		Triead becomes ready. So, to check this flag correctly, you must first
+		check that the Triead is ready.
+		</para>
+
+<pre>
+typedef map<string, Autoref<Nexus> > NexusMap;
+void exports(NexusMap &ret) const;
+void imports(NexusMap &ret) const;
+void readerImports(NexusMap &ret) const;
+void writerImports(NexusMap &ret) const;
+</pre>
+
+		<para>
+		Get the list of nexuses exported from this Triead, or imported, or only
+		the reader imports, or only the writer imports. In the result of
+		<pre>imports()</pre> there is no way to tell, which nexuses are
+		imported for reading and which for writing, use the specialized methods
+		for that. In all these methods the argument map gets cleared and then
+		filled with the new returned contents.
+		</para>
+
+<pre>
+Onceref<Nexus> findNexus(const string &srcName,
+	const string &appName, const string &name) const;
+</pre>
+
+		<para>
+		This is a method unique to the &Cpp; API. It looks up an exported nexus
+		by name without involving the overhead of getting the whole map. Here
+		<pre>name</pre> is the name of the nexus to look up (its short part, without the
+		thread's name in it). If there is no such nexus, an Exception will be
+		thrown.
+		</para>
+
+		<para>
+		The <pre>srcName</pre> and <pre>appName</pre> are used for the error message in the
+		Exception: <pre>srcName</pre> is the name of the thread that requested the
+		look-up, and <pre>appName</pre> is the name of the App where the threads belong.
+		(It might seem surprising, but a Triead object has no reference to its
+		App, and doesn't know the App's name. It has to do with the avoidance
+		of the circular references). 
+		</para>
+	</sect1>

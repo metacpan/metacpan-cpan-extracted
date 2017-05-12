@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+<chapter id="ch_enter_triceps" xmlns:xi="http://www.w3.org/2001/XInclude">
+	<title>Enter Triceps</title>
+
+	<sect1 id="sc_triceps_reasons">
+		<title>What led to it</title>
+
+		<para>
+		It had happened that I've worked for a while on and with the Complex Event
+		Processing (CEP) systems. I've worked for a few years on the internals
+		of the Aleri CEP engine, then after Aleri acquired Coral8, some on the
+		Coral8 engine, then after Sybase gobbled up them both, I've designed
+		and did the early implementation of a fair bit of the Sybase CEP R5.
+		After that I've moved on to Deutsche Bank and got the experience from
+		the other side: using the CEP systems, primarily the former Coral8,
+		now known as Sybase CEP R4.
+		</para>
+
+		<para>
+		This made me feel that writing the CEP models is unnecessarily
+		difficult. Even the essentially simple things take too much effort.
+		I've had this feeling before as well, but one thing is to have it in
+		abstract, and another is to grind against it every day. 
+		</para>
+
+		<para>
+		Which in turn led me to thinking about making my own Open Source CEP
+		system, where I could try out the ideas I get, and make the streaming
+		models easier to write. I aim to do better than the 1950's style, to
+		bring the advances of the structured programming into the CEP world.
+		</para>
+
+		<para>
+		Thus the Triceps project was born. For a while
+		it was called Biceps, until I've learned of the existence of a recearch
+		project called BiCEP. It's spelled differently, and is in a
+		substantially differnt area of CEP work, but it's easier to avoid
+		confusion, so I went one better and renamed mine Triceps.
+		</para>
+
+		<para>
+		Since then I've moved on from DB, and I'm currently not using any CEP
+		at work (though you never know what would happen), but Triceps has
+		already gained momentum by itself.
+		</para>
+
+		<para>
+		The Triceps development has been largely shaped by two considerations:
+		</para>
+
+		<itemizedlist>
+		<listitem>
+		It has to be different from the Sybase products on which I worked.
+		This is helpful from both legal standpoint and from marketing
+		standpoint: Sybase and StreamBase already have similar products that
+		compete head to head. There is no use getting into the same fray
+		without some major resources.
+		</listitem>
+		<listitem>
+		It has to be small. I can't spend the same amount of effort on Triceps
+		as a large company, or even as a small one. Not only this saves time
+		but also allows the modifications to be easy and fast. The point of
+		Triceps is to experiment with the CEP language to make it easy to use:
+		try out the ideas, make sure that they work well, or replace them with
+		other ideas. The companies with a large established product can't
+		really afford the radical changes: they have invested much effort into
+		the product, and are stuck with supporting it and providing
+		compatibility into the future.
+		</listitem>
+		</itemizedlist>
+
+		<indexterm>
+			<primary>Esper</primary>
+		</indexterm>
+		<para>
+		Both of these considerations point into the same direction: an
+		embeddable CEP system. Adapting an integrated system for an embedded
+		usage is not easy, so it's a good open niche. Yeah, this niche
+		is not empty either.  There already is Esper.  But from a cursory look, it
+		seems to have the same issues as Coral8/StreamBase. It's also
+		Java-centric, and Triceps is aimed for embeddability into different 
+		languages.
+		</para>
+
+		<para>
+		And an embeddable system saves on a lot of components.
+		</para>
+
+		<para>
+		For starters, no IDE. Anyway, I find the IDEs pretty useless for
+		development in general, and especially for the CEP development. Though
+		it comes handy once in a while for the analysis of the code and
+		debugging.
+		</para>
+
+		<para>
+		No new language, no need to develop compilers, virtual machines,
+		function libraries, external callout APIs. Well, the major goal of
+		Triceps actually is the development of a new and better language. But
+		it's one of these paradoxes: Aleri does the relational logic looking
+		like procedural, Coral8 and StreamBase do the procedural logic looking
+		like relational, and Triceps is a design of a language without a
+		language. Eventually there probably will be a language, to be mixed
+		with the parent one. But for now a lot can be done by simply using the
+		Triceps library in an existing scripting language. The existing
+		scripting languages are already powerful, fast, and also support the
+		dynamic compilation.
+		</para>
+
+		<para>
+		No separate server executable, no need to control it, and no custom
+		network protocols: the users can put the code directly into their
+		executables and devise any protocols they please. Well, it's not a
+		real good answer for the protocols, since it means that everyone who
+		wants to communicate the streaming data for Triceps over the network
+		has to implement these protocols from scratch. So eventually Triceps
+		will provide a default implementation. But it doesn't have to be done
+		right away.
+		</para>
+
+		<para>
+		No data persistence for now either. It's a nice feature, and I have
+		some ideas about it too, but it requires a large amount of work, and
+		doesn't really affect the API. 
+		</para>
+
+		<para>
+		The language used to implement Triceps is &Cpp;, and the scripting
+		language is Perl. Nothing really prevents embedding Triceps into other
+		languages but it's not going to happen anywhere soon. The reason being
+		that extra code adds weight and makes the changes more difficult.
+		</para>
+
+		<para>
+		The multithreading support has been a major consideration from the
+		start. All the &Cpp; code has been written with the multithreading in
+		mind. However for the first release the multithreading did not
+		propagate into the Perl API yet.
+		</para>
+
+		<para>
+		Even though Triceps is a system aimed for quick experimentation, that does not imply
+		that it's of a toy quality. The code is written in production quality
+		to start with, with a full array of unit tests. In fact, the only way
+		you can do the quick experimentation is by setting up the proper
+		testing from the scratch. The idea of <quote>move fast and break
+		things</quote> is complete rubbish.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_hello_world">
+		<title>Hello, world!</title>
+
+		<para>
+		Let's finally get to business: write a simple <quote>Hello, world!</quote> program with
+		Triceps. Since Triceps is an embeddable library, naturally, the
+		smallest <quote>Hello, world!</quote> program would be in the host language without
+		Triceps, but it would not be interesting. So here is the a bit
+		contrived but more interesting Perl program that passes some data
+		through the Triceps machinery:
+		</para>
+
+<!-- perl/Triceps/t/xHelloWorld.t -->
+<pre>
+use Triceps;
+
+$hwunit = Triceps::Unit->new("hwunit");
+$hw_rt = Triceps::RowType->new(
+	greeting => "string",
+	address => "string",
+);
+
+my $print_greeting = $hwunit->makeLabel($hw_rt, "print_greeting", undef, sub { 
+	my ($label, $rowop) = @_;
+	&sendf("%s!\n", join(', ', $rowop->getRow()->toArray()));
+} );
+
+$hwunit->call($print_greeting->makeRowop(&Triceps::OP_INSERT, 
+	$hw_rt->makeRowHash(
+		greeting => "Hello",
+		address => "world",
+	)
+));
+</pre>
+
+		<indexterm>
+			<primary>unit</primary>
+		</indexterm>
+		<para>
+		What happens there? First, we import the Triceps module.
+		Then we create a Triceps execution unit. An execution unit keeps the
+		Triceps context and controls the execution for one logical thread.
+		</para>
+
+		<para>
+		The argument of the constructor is the name of the unit, that can be used
+		in printing messages about it. It doesn't have to be the same as the
+		name of the variable that keeps the reference to the unit, but it's a
+		convenient convention to make the debugging easier. This is a common
+		idiom of Triceps: when you create something, you give it a name. If
+		any errors occur later with this object, the name will be present int
+		the error message, and you'll be able to find easily, which object has
+		the issue and where it was created.
+		</para>
+
+		<indexterm>
+			<primary>error handling</primary>
+		</indexterm>
+		<indexterm>
+			<primary>confess</primary>
+		</indexterm>
+		<para>
+		If something goes wrong, the Triceps methods will confess. To be precise,
+		call <pre>Carp::confess</pre>, which is like Perl's <pre>die</pre>
+		but also prints the stack trace. Triceps also includes its own high-level
+		call stack into this trace.
+		</para>
+
+		<indexterm>
+			<primary>row type</primary>
+		</indexterm>
+		<para>
+		The next statement creates the type for rows. For the simplest
+		example, one row type is enough. It contains two string fields. A row
+		type does not belong to an execution unit. It may be used in parallel
+		by multiple threads. Once a row type is created, it's immutable, and
+		that's the story for pretty much all the Triceps objects that can be
+		shared between multiple threads: they are created, they become
+		immutable, and then they can be shared. (Of course, the containers
+		that facilitate the passing of data between the threads would have to
+		be an exception to this rule).
+		</para>
+
+		<indexterm>
+			<primary>GOTO</primary>
+		</indexterm>
+		<indexterm>
+			<primary>label</primary>
+		</indexterm>
+		<para>
+		Then we create a label.
+		The <quote>label</quote> is the Triceps term for the
+		same kind of stream processing elements as in the other CEP systems.
+		The Coral8 term for the same concept is <quote>stream</quote>.
+		The <quote>SQLy vs procedural</quote> example in
+		<xref linkend="sc_1950s" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;
+		shows why these elements are analogs of labels in the procedural programming,
+		and Triceps generally follows the procedural terminology.
+		</para>
+
+		<para>
+		Of course,
+		now, in the days of the structured programming, we don't create labels
+		for GOTOs all over the place. But we still use labels. The function
+		names are essentially labels, the loops in Perl may have labels. So a Triceps
+		label can often be seen kind of like a function definition, but
+		only kind of. It takes a data row as a parameter and does something
+		with it. But unlike a proper function it has no way to return the
+		processed data back to the caller. It has to either pass the processed
+		data to other labels or collect it in some hardcoded data structure,
+		from which the caller can later extract it back.
+		Thus a Triceps label is still much more like a GOTO label.
+		</para>
+
+		<para>
+		Triceps has the streaming functions too, where the caller does provide
+		the way to return the result. These are more than the ordinary labels.
+		</para>
+
+		<para>
+		A basic label takes a row type for the rows it accepts, a name (again,
+		purely for the ease of debugging) and a reference to a Perl function
+		that will be handling the data. Extra arguments for the function can
+		be specified as well, but there is no use for them in this example. 
+		</para>
+
+		<para>
+		Here it's a simple unnamed Perl function. Though of course a reference
+		to a named function can be used instead, and the same function may be
+		reused for multiple labels. Whenever the label gets a row operation to
+		process, its function gets called with the reference to the label
+		object, the row operation object, and whatever extra arguments were
+		specified at the label creation (none in this example). The example
+		just prints a message combined from the data in the row.
+		</para>
+
+		<indexterm>
+			<primary>row operation</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Rowop</primary>
+		</indexterm>
+		<para>
+		Note that the label's handler function doesn't just get a row as an
+		argument.  It gets a row operation (<quote>rowop</quote> as it's
+		called throughout the code). It's an important distinction. A row just
+		stores some data. As the row gets passed around, it gets referenced
+		and unreferenced, but it just stays the same until the last reference
+		to it disappears, and then it gets destroyed. It doesn't know what
+		happens with the data, it just stores them. A row may be shared
+		between multiple threads. On the other hand, a row operation says
+		<quote>take these data and do such and such a thing with them</quote>.
+		A row operation is a combination of a row of data, an operation code,
+		and a label that has to carry out the operation. 
+		Since the row operation object is also immutable,
+		a reference to a row operation may
+		be kept and reused again and again.
+		</para>
+
+		<indexterm>
+			<primary>opcode</primary>
+		</indexterm>
+		<indexterm>
+			<primary>operation code</primary>
+		</indexterm>
+		<para>
+		Triceps has the explicit operation codes, very much like Aleri/Sybase R5 (only
+		Aleri doesn't differentiate between a row and row operation, every row
+		there has an opcode in it). It
+		might be just my background, but let me tell you: the CEP systems
+		without the explicit opcodes are a pain. The visible opcodes make life
+		a lot easier. However unlike Aleri, there is no UPDATE opcode. The
+		available opcodes are INSERT, DELETE and NOP (no-operation). If you
+		want to update something, you send two operations: first DELETE for
+		the old value, then INSERT for the new value. All this will be
+		described in more detail later.
+		</para>
+
+		<para>
+		For this simple example, the opcode doesn't really matter, so the
+		label handler function quietly ignores it. It gets the row from the
+		row operation and extracts the data from it into the Perl
+		representation, then prints them. The Triceps row data may be
+		represented in Perl in two ways: an array and a hash. In the array
+		format, the array contains the values of the fields in the order they
+		are defined in the row type. The hash format consists of name-value
+		pairs, which may be stored either in an actual hash or in an array.
+		The conversion from a row to a hash actually returns an array of
+		values which becomes a real hash if it gets stored into a hash
+		variable.
+		</para>
+
+		<para>
+		As a side note, this also suggests, how the systems without explicit
+		opcodes came to be: they've been initially built on the simple
+		stateless examples. And when the more complex examples have turned up,
+		they've been aready stuck on this path, and could not afford too deep
+		a retrofit.
+		</para>
+
+		<para>
+		The final part of the example is the creation of a row operation for
+		our label, with an INSERT opcode and a row created from hash-formatted
+		Perl data, and calling it through the execution unit. The row type
+		provides a method to construct the rows, and the label provides a
+		method to construct the row operations for it. The <pre>call()</pre>
+		method of the execution unit does exactly what its name implies: it
+		evaluates the label function right now, and returns after all its
+		processing its done.
+		</para>
+
+		<para>
+		This is a very simple example, so it does only one call. The real
+		Triceps programs get a stream of incoming data, and do the
+		calls to handle each row of it.
+		</para>
+	</sect1>
+
+</chapter>

@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_idxtype">
+		<title>IndexType reference</title>
+
+		<indexterm>
+			<primary>IndexType</primary>
+		</indexterm>
+		<para>
+		Very much like the Perl API, the IndexType is an abstract class, in
+		which you can't create the objects directly, you have to create the
+		objects with its concrete sub-classes. It has the methods common for
+		all the index types, it is defined in <pre>type/IndexType.h</pre>
+		and like all types it's an Mtarget.
+		</para>
+
+		<para>
+		The index type id, defined as enum IndexType::IndexId, allows to find
+		out the subclass of the actual object and cast it if desired.
+		The supported index types are:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+			IT_HASHED,
+			</listitem>
+
+			<listitem>
+			IT_FIFO,
+			</listitem>
+
+			<listitem>
+			IT_SORTED. 
+			</listitem>
+		</itemizedlist>
+
+		<para>
+		There is
+		also the semi-hidden type IT_ROOT: you can't create it directly but
+		every table type creates one implicitly, as the root of its index tree.
+		And the value IT_LAST is defined past the last actual type, so if you ever
+		need to iterate through the types, you can do it as
+		</para>
+
+<pre>
+for (int i = 0; i < IndexType::IT_LAST; i++) { ... }
+</pre>
+
+		<para>
+		The conversion between the index type id and name can be done with the
+		methods:
+		</para>
+
+<pre>
+static const char *indexIdString(int enval, const char *def = "???");
+static int stringIndexId(const char *str);
+</pre>
+
+		<para>
+		As usual with the contant-and-name conversions, if the numeric id <pre>enval</pre> is
+		invalid, the string <pre>def</pre> is returned, by default <quote>???</quote>. If the string
+		name <pre>str</pre> is unknown, -1 is returned.
+		</para>
+
+<pre>
+IndexId getIndexId() const;
+</pre>
+
+		<para>
+		Returns the type id of this index type. The id can't be changed, it gets
+		hardcoded in the subclass constructor.
+		</para>
+
+<pre>
+IndexType *addSubIndex(const string &name, Onceref<IndexType> index);
+</pre>
+
+		<para>
+		Add a sub-index, in exactly the same way as adding an index type to
+		the TableType. 
+		</para>
+
+		<para>
+		In works like TableType in all the other ways as well:
+		it adds a copy of the argument, not the argument
+		itself, and it designed for chaining. For example:
+		</para>
+
+<pre>
+Autoref<TableType> tt = initializeOrThrow( TableType::make(rt1)
+	->addSubIndex("primary", HashedIndexType::make(
+		NameSet::make()->add("b")->add("c"))
+	)->addSubIndex("limit", FifoIndexType::make()
+		->setLimit(2) // will policy-delete 2 rows
+	)
+); 
+</pre>
+
+		<indexterm>
+			<primary>Exception</primary>
+		</indexterm>
+		<para>
+		Not all index types allow sub-indexes but this method
+		works silently for all of them. Any mistakes will be detected and
+		reported at the initialization time. The sub-indexes may be added
+		only until the index type is initialized. Any modification attempts
+		after that will throw an Exception.
+		</para>
+
+<pre>
+bool isLeaf() const;
+</pre>
+
+		<para>
+		Returns true if this index type has no sub-indexes. Of course, if this
+		type is not initialized yet, more sub-types can be added to it to make
+		it non-leaf later.
+		</para>
+
+<pre>
+IndexType *findSubIndex(const string &name) const;
+IndexType *findSubIndexById(IndexId it) const;
+</pre>
+
+		<para>
+		Find the sub-index by name or id, works in the same way as for
+		TableType. A special feature is that it can be applied on a NULL object
+		reference, like this:
+		</para>
+
+<pre>
+Autoref<IndexType> it; // NULL by default
+Autoref<IndexType> itsub = it->findSubIndex("xxx"); // doesn't crash, returns NULL
+</pre>
+
+		<para>
+		The idea here is to allow the safe chaining of <pre>findSubIndex()</pre> for the
+		look-ups of the nested types:
+		</para>
+
+<pre>
+Autoref<IndexType> it = tt->findSubIndex("level1")->findSubIndex("level2");
+if (it.isNull()) {
+	// not found
+}
+</pre>
+
+		<para>
+		If any of the elements in the path are missing, the end result will be
+		NULL, conveniently. But it won't tell you, which one was missing,
+		inconveniently.
+		</para>
+
+<pre>
+const IndexTypeVec &getSubIndexes() const;
+</pre>
+
+		<para>
+		Returns back the whole set of sub-indexes.
+		</para>
+
+<pre>
+IndexType *getFirstLeaf() const;
+</pre>
+
+		<para>
+		Returns the first leaf index type (if a leaf itself, will return
+		itself).
+		</para>
+
+<pre>
+const NameSet *getKey() const;
+</pre>
+
+		<para>
+		Get the key information from the index.
+		It will work with any kind of index, but will return a NULL if the
+		index doesn't support the key. There is no matching method to
+		set it, setting the key is up to the subclasses.
+		</para>
+
+<pre>
+IndexType *setAggregator(Onceref<AggregatorType> agg);
+const AggregatorType *getAggregator() const;
+</pre>
+
+		<para>
+		Set or get an aggregator type for this index type. As usual, any
+		setting can be done only until the index type is initialized. 
+		Any modification attempts after that will throw an Exception.
+		</para>
+
+<pre>
+bool isInitialized() const;
+</pre>
+
+		<para>
+		Check whether the index type has been initialized.
+		The index types are initialized as a part of the table type
+		initialization, there is no method to initialize an index
+		type directly.
+		</para>
+
+<pre>
+TableType *getTabtype() const;
+</pre>
+
+		<para>
+		Returns the table type, to which this index type is tied. The
+		tying-together happens at the initialization time, so for an
+		initialized index type this method will return NULL.
+		</para>
+
+<pre>
+IndexType *copy(bool flat = false) const;
+</pre>
+
+		<para>
+		Create an un-initialized copy of this index. If <pre>flat</pre> is <pre>false</pre> then
+		the copy is done with all the sub-index and
+		aggregator types also copied, but the row types shared. This method is used by
+		<pre>addSubIndex()</pre> to copy its argument before adding. By the way, the usual
+		copy constructor could theoretically be used on the index types but
+		usually doesn't make a whole lot of a sense because the sub-types and
+		such will end up shared by reference.
+		</para>
+
+		<para>
+		If <pre>flat</pre> is true, the copy is flat, with the sub-index types and aggregator
+		types simply not included. It's the &Cpp; analog of the Perl method
+		<pre>flatCopy()</pre>. This allows to re-create the partial index hierarchies,
+		recursively flat-copying the parts that need to be included.
+		</para>
+
+<pre>
+IndexType *deepCopy(HoldRowTypes *holder) const;
+</pre>
+
+		<para>
+		Create a deep copy, up to and including the row types. See the
+		<xref linkend="sc_cpp_tabtype" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;
+		and
+		<xref linkend="sc_cpp_copy" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;
+		for the detailed explanation. When you deep-copy a table type,
+		the <pre>holder</pre> argument propagates recurively to all the
+		index types in it.
+		</para>
+
+		<para>
+		There are great many more methods on the IndexType, that are used to
+		maintain the index trees, but you don't need to look at them unless you
+		are interested in the inner workings of the Triceps tables.
+		</para>
+	</sect1>

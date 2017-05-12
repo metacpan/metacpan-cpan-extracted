@@ -1,0 +1,548 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+<chapter id="ch_field" xmlns:xi="http://www.w3.org/2001/XInclude">
+	<title>The field of CEP</title>
+
+	<sect1 id="sc_what_is_cep">
+		<title>What is the CEP?</title>
+
+		<para>
+		CEP stands for the Complex Event Processing.  If you look at Wikipedia,
+		it has separate articles for the Event Stream Processing and the
+		Complex Event Processing. In reality it's all the same thing, with the
+		naming driven by the marketing. I would not be surprised if someone
+		invents yet another name, and everyone will start jumping on that
+		bandwagon too.
+		</para>
+
+		<indexterm>
+			<primary>CEP</primary>
+		</indexterm>
+		<indexterm>
+			<primary>ESP</primary>
+		</indexterm>
+
+		<para>
+		In general a CEP system can be thought of as a black box, where the
+		input events come in, propagate in some way through that black box, and
+		come out as the processed output events. There is also an idea that the
+		processing should happen fast, though the definitions of <quote>fast</quote> vary
+		widely.
+		</para>
+
+		<para>
+		If we open the lid on the box, there are at least three ways to think
+		of its contents:
+		</para>
+
+		<itemizedlist>
+		<listitem>
+		a spreadsheet on steroids
+		</listitem>
+		<listitem>
+		a data flow machine
+		</listitem>
+		<listitem>
+		a database driven by triggers
+		</listitem>
+		</itemizedlist>
+
+		<indexterm>
+			<primary>spreadsheet</primary>
+		</indexterm>
+		<indexterm>
+			<primary>data flow</primary>
+		</indexterm>
+		<indexterm>
+			<primary>trigger</primary>
+		</indexterm>
+		<indexterm>
+			<primary>model</primary>
+		</indexterm>
+		<para>
+		Hopefully you've seen a spreadsheet before. The cells in it are tied
+		together by formulas. You change one cell, and the machine goes and
+		recalculates everything that depends on it. So does a CEP system. If we
+		look closer, we can discern the CEP engine (which is like the
+		spreadsheet software), the CEP model (like the formulas in the
+		spreadheet) and the state (like the current values in the
+		spreadsheet). An incoming event is like a change in an input
+		cell, and the outgoing events are the updates of the values in the
+		spreadsheet. 
+		</para>
+
+		<para>
+		Only a typical CEP system is bigger: it can handle some very complicated
+		formulas and many millions of records. There actually are products that
+		connect the Excel spreadsheets with the behind-the-curtain computations
+		in a CEP system, with the results coming back to the spreadsheet
+		cells. Pretty much every commercial CEP provider has a product
+		that does that through the Excel RT interface. The way these models are
+		written are not exactly pretty, but the results are, combining the nice
+		presentation of spreadsheets and the speed and power of CEP.
+		</para>
+
+		<para>
+		A data flow machine, where the processing elements are exchanging
+		messages, is your typical academical look at CEP. The events
+		represented as data rows are the messages, and the CEP model describes
+		the connections between the processing elements and their internal
+		logic. This approach naturally maps to the multiprocessing, with each
+		processing element becoming a separate thread. The hiccup is that the
+		research in the dataflow machines tends to prefer the non-looped
+		topologies. The loops in the connections complicate the things.
+		</para>
+
+		<para>
+		And many real-world relational databases already work very similarly to
+		the CEP systems. They have the constraints and triggers propagating these
+		constraints. A trigger propagates an update on one table to an update
+		on another table. It's like a formula in a spreasheet or a logical
+		connection in a dataflow graph.  Yet the databases usually miss two
+		things: the propagation of the output events and the notion of being
+		<quote>fast</quote>.
+		</para>
+
+		<para>
+		The lack of propagation of the output events is totally baffling to me:
+		the RDBMS engines already write the output event stream as the redo
+		log. Why not send them also in some generalized format, XML or
+		something? Then people realize that yes, they do want to get the output
+		events and start writing some strange add-ons and aftermarket solutions
+		like the log scrubbers. This has been a mystery to me for some 15
+		years. I mean, how more obvious can it be? But nobody budges. Well,
+		with the CEP systems gaining popularity and the need to connect them to
+		the databases, I think it will eventually grow on the database vendors
+		that a decent event feed is a competitive advantage, and I think it
+		will happen somewhere soon. 
+		</para>
+
+		<para>
+		The feeling of <quote>fast</quote> or lack thereof has
+		to do with the databases being stored on disks. The growth of CEP has
+		coincided with the growth in RAM sizes, and the data is usually kept
+		completely in memory. People who deploy CEP tend to want the
+		performance not of hundreds or thousands but hundreds of thousands
+		events per second. The second part of <quote>fast</quote> is connected with the
+		transactions. In a traditional RDBMS a single event with all its
+		downstream effects is one transaction. Which is safe but may cause lots
+		of conflicts. The CEP systems usually allow to break up the logic into
+		multiple loosely-dependent layers, thus cutting on the overhead.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_uses_of_cep">
+		<title>The uses of CEP</title>
+
+		<para>
+		Despite what Wikipedia says (and honestly, the Wikipedia articles on
+		CEP and ESP are not exactly connected with reality), the pattern detection is <b>not</b> your
+		typical usage, by a wide, wide margin. The typical usage is for the
+		data aggregation: lots and lots of individual events come in, and you
+		want to aggregate them to keep a concise and consistent picture for the
+		decision-making. The actual decision making can be done by humans
+		or again by the CEP systems. It may involve some pattern recognition
+		but usually even when it does, it doesn't look like patterns, it looks
+		like conditions and joins on the historical chains of events.
+		</para>
+
+		<para>
+		The usage in the cases I know of includes the
+		ad-click aggregation, the decisions to make a market trade, the
+		watching whether the bank's end-of-day balance falls within the
+		regulations, the choosing the APR for lending.
+		</para>
+
+		<para>
+		A related use would be for the general alert consoles. The data
+		aggregation is what they do too. The last time I worked with it up close
+		(around 2006), the processing in the BMC Patrol and Nagios was just
+		plain inadequate for anything useful, and I had to hand-code the data
+		collection and console logic. I've been touching this issue recently
+		again at Google, and apparently nothing has changed much since then.
+		All the real monitoring is done with the systems developed in-house.
+		</para>
+
+		<indexterm>
+			<primary>Sybase</primary>
+		</indexterm>
+		<para>
+		But the CEP would have been just the
+		ticket. I think, the only reason why it has not been widespread yet is
+		that the commercial CEP licenses had cost a lot. But with the
+		all-you-can-eat pricing of Sybase, and with the Open Source systems,
+		this is gradually changing.
+		</para>
+
+		<para>
+		Well, and there is also the pattern matching. It has been lagging
+		behind the aggregation but growing too.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_landscape">
+		<title>Surveying the CEP langscape</title>
+
+		<indexterm>
+			<primary>Sybase</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Aleri</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Coral8</primary>
+		</indexterm>
+		<indexterm>
+			<primary>StreamBase</primary>
+		</indexterm>
+		<para>
+		What do we have in the CEP area now? The scene is pretty much dominated
+		by Sybase (combining the former competitors Aleri and Coral8) and StreamBase.
+		</para>
+
+		<indexterm>
+			<primary>execution model</primary>
+		</indexterm>
+		<para>
+		There seem to be two major approaches to the execution model. One was
+		used by Aleri, another by Coral8 and StreamBase. I'm not hugely
+		familiar with StreamBase, but that's how it seems to me. Since I'm much
+		more familiar with Coral8, I'll be calling the second model the Coral8
+		model. If you find StreamBase substantially different, let me know.
+		</para>
+
+		<indexterm>
+			<primary>materialized view</primary>
+		</indexterm>
+		<indexterm>
+			<primary>SQL</primary>
+		</indexterm>
+		<para>
+		The Aleri idea is to collect and keep all the data. The relational
+		operators get applied on the data, producing the derived data
+		("materialized views") and eventually the results. So, even though the
+		Aleri models were usually expressed in XML (though an SQL compiler was
+		also available), fundamentally it's a very relational and SQLy
+		approach.
+		</para>
+
+		<para>
+		This creates a few nice properties. All the steps of execution can be
+		pipelined and executed in parallel. For persistence, it's fundamentally
+		enough to keep only the input data (what has been called BaseStreams
+		and then SourceStreams), and all the derived computations can be easily
+		reprocessed on restart (it's funny but it turns out that often it's
+		faster to read a small state from the disk and recalculate the rest
+		from scratch in memory than to load a large state from the disk).
+		</para>
+
+		<indexterm>
+			<primary>SPLASH</primary>
+		</indexterm>
+		<para>
+		It also has issues. It doesn't allow loops, and the procedural
+		calculations aren't always easy to express. And keeping all the state
+		requires more memory. The issues of loops and procedural computations
+		have been addressed in Aleri by FlexStreams: modules that would perform the
+		procedural computations instead of relational operations, written in
+		SPLASH &emdash; a vaguely C-ish or Java-ish language. However this tends to
+		break the relational properties: once you add a FlexStream,
+		usually you do it for the reasons that prevent the derived
+		calculations from being re-done, creating issues with saving and
+		restoring the state. Mind you, you can write a FlexStream that doesn't
+		break any of them, but then it would probably be doing something that
+		can be expressed without it in the first place.
+		</para>
+
+		<indexterm>
+			<primary>CCL</primary>
+		</indexterm>
+		<para>
+		Coral8 has grown from the opposite direction: the idea has been to
+		process the incoming data while keeping a minimal state in the variables
+		and short-term <i>windows</i> (limited sliding recordings of the incoming
+		data). The language (CCL) is very SQL-like. It relies on the state of
+		variables and windows being pretty much global (module-wide), and
+		allows the statements to be connected in loops. Which means that the
+		execution order matters a lot. Which means that there are some quite
+		extensive rules, determining this order. The logic ends up being very
+		much procedural, but written in the peculiar way of SQL statements and
+		connecting streams.
+		</para>
+
+		<para>
+		The good thing is that all this allows to control the execution order
+		very closely and write things that are very difficult to express in
+		the pure un-ordered relational operators. Which allows to aggregate the
+		data early and creatively, keeping less data in memory.
+		</para>
+
+		<para>
+		The bad news is that it limits the execution to a single thread. If you
+		want a separate thread, you must explicitly make a separate module, and
+		program the communications between the modules, which is not exactly
+		easy to get right. There are lots of people who do it the easy way and
+		then wonder, why do they get the occasional data corruption. Also, the
+		ordering rules for execution inside a module are quite tricky. Even for
+		some fairly simple logic, it requires writing a lot of code, some of which
+		is just bulky (try enumerating 90 fields in each statement), and some
+		of which is tricky to get right.
+		</para>
+
+		<para>
+		The summary is that everything is not what it seems: the Aleri models
+		aren't usually written in SQL but are very declarative in their
+		meaning, while the Coral8/StreamBase models are written in an SQL-like
+		language but in reality are totally procedural.
+		</para>
+
+		<para>
+		Sybase is also striking for a middle ground, combining the features
+		inherited from Aleri and Coral8 in its CEP R5 and later: use the CCL
+		language but relax the execution order rules to the Aleri level, except
+		for the explicit single-threaded sections where the order is important.
+		Include the SPLASH fragments for where the outright procedural logic is
+		easy to use. Even though it sounds hodgy-podgy, it actually came
+		together pretty nicely. Forgive me for saying so myself since I've done
+		a fair amount of design and the execution logic implementation for it
+		before I've left Sybase.
+		</para>
+
+		<para>
+		Still, not everything is perfect in this merged world. The SQLy syntax
+		still requires you to drag around all your 90 fields into nearly every
+		statement. The single-threaded order of execution is still non-obvious.
+		It's possible to write the procedural code directly in SPLASH but the
+		boundary where the data passes between the SQLy and C-ish code still
+		has a whole lot of its own kinks (less than in Aleri but still a lot).
+		And worst of all, there is still no modular programming. Yeah, there
+		are <quote>modules</quote> but they are not really reusable. They are
+		tied too tightly to the schema of the data. What is needed, is more
+		like &Cpp; templates. Only preferrably something more flexible and
+		less difficult to debug than the &Cpp; templates.
+		</para>
+
+		<para>
+		Let me elaborate a little on the point of <quote>dragging around all your
+		fields</quote>. Here is a typical example: you have a stream of data
+		and you want to pass through only the rows that find a match in some
+		reference table. Which is reasonable to do with something like:
+		</para>
+
+<pre>
+insert into filtered_data
+select
+	incoming_data.*
+from 
+	incoming_data as d left join reference_table as r
+	on d.key_field = r.key_field;
+</pre>
+
+		<para>
+		Only you can't write <pre>incoming_data.*</pre> in their syntax,
+		you have to list every single field of it explicitly. If the data
+		has 90 fields, that becomes quite a drag.
+		</para>
+
+		<para>
+		StreamBase does have modules with parametrizable arguments (<quote>
+		capture fields</quote>), somewhat like the &Cpp; templates. The limitation
+		is that you can say <quote>and carry any additional fields through 
+		unchanged</quote> but can't really specify subsets of fields
+		for a particular usage (<quote>and use these fields as a key</quote>).
+		Or at least that's my understanding. I haven't used it in practice
+		and don't understand StreamBase too well.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_1950s">
+		<title>We're not in 1950s any more, or are we?</title>
+
+		<indexterm>
+			<primary>CCL</primary>
+		</indexterm>
+		<para>
+		Part of the complexity with CCL programming is that the CCL programs
+		tend to feel very broken-up, with the flow of the logic jumping all
+		over the place.
+		</para>
+
+		<para>
+		Consider a simple example: some incoming financial information may
+		identify the securities by either RIC (Reuters identifier) or SEDOL
+		or ISIN, and before processing it further we want to convert them
+		all to ISIN (since the fundamentally same security may be identified in
+		multiple ways when it's traded in multiple countries, ISIN is the
+		common denominator). 
+		</para>
+
+		<para>
+		This can be expressed in CCL approximately like this (no guarantees
+		about the correctness of this code, since I don't have a compiler to
+		try it out):
+		</para>
+
+<pre>
+// the incoming data
+create schema s_incoming (
+  id_type string, // identifier type: RIC, SEDOL or ISIN
+  id_value string, // the value of the identifier
+  // add another 90 fields of payload...
+);
+
+// the normalized data
+create schema s_normalized (
+  isin string, // the identity is normalized to ISIN
+  // add another 90 fields of payload...
+);
+
+// schema for the identifier translation tables
+create schema s_translation (
+  from string, // external id value (RIC or SEDOL)
+  isin string, // the translation to ISIN
+);
+
+// the windows defining the translations from RIC and SEDOL to ISIN
+create window w_trans_ric schema s_translation
+  keep last per from;
+create window w_trans_sedol schema s_translation
+  keep last per from;
+
+create input stream i_incoming schema s_incoming;
+create stream incoming_ric  schema s_incoming;
+create stream incoming_sedol  schema s_incoming;
+create stream incoming_isin  schema s_incoming;
+create output stream o_normalized schema s_normalized;
+
+insert
+  when id_type = 'RIC' then incoming_ric
+  when id_type = 'SEDOL' then incoming_sedol
+  when id_type = 'ISIN' then incoming_isin
+select *
+from i_incoming;
+
+insert into o_normalized
+select
+  w.isin,
+  i. ... // the other 90 fields
+from
+  incoming_ric as i join w_tranc_ric as w
+    on i.id_value =  w.from;
+
+insert into o_normalized
+select
+  w.isin,
+  i. ... // the other 90 fields
+from
+  incoming_sedol as i join w_tranc_sedol as w
+    on i.id_value =  w.from;
+
+insert into o_normalized
+select
+  i.id_value,
+  i. ... // the other 90 fields
+from
+  incoming_isin; 
+</pre>
+
+		<para>
+		Not exactly easy, is it, even with the copying of payload data skipped?
+		You may notice that what it does could also be expressed as procedural
+		pseudo-code:
+		</para>
+
+<pre>
+// the incoming data
+struct s_incoming (
+  string id_type, // identifier type: RIC, SEDOL or ISIN
+  string id_value, // the value of the identifier
+  // add another 90 fields of payload...
+);
+
+// schema for the identifier translation tables
+struct s_translation (
+  string from, // external id value (RIC or SEDOL)
+  string isin, // the translation to ISIN
+);
+
+// the windows defining the translations from RIC and SEDOL to ISIN
+table s_translation w_trans_ric
+  key from;
+table s_translation w_trans_sedol
+  key from;
+
+s_incoming i_incoming;
+string isin;
+
+if (i_incoming.id_type == 'RIC') {
+  isin = lookup(w_trans_ric, 
+    w_trans_ric.from == i_incoming.id_value
+  ).isin;
+} elsif (i_incoming.id_type == 'SEDOL') {
+  isin = lookup(w_trans_sedol, 
+    w_trans_sedol.from == i_incoming.id_value
+  ).isin;
+} elsif (i_incoming.id_type == 'ISIN') {
+  isin = i_incoming.id_value;
+}
+
+if (isin != NULL) {
+  output o_ normalized(isin,
+    i_incoming.(* except (id_type, id_value))
+  );
+}
+</pre>
+
+		<indexterm>
+			<primary>Fortran</primary>
+		</indexterm>
+		<indexterm>
+			<primary>GOTO</primary>
+		</indexterm>
+		<indexterm>
+			<primary>label</primary>
+		</indexterm>
+		<para>
+		Basically, writing in CCL feels like programming in Fortran in the 50s:
+		lots of labels, lots of GOTOs. Each stream is essentially a label, when
+		looking from the procedural standpoint. It's actually worse than
+		Fortran, since all the labels have to be pre-defined (with types!). And
+		there isn't even the normal sequential flow, each statement must be
+		followed by a GOTO, like on those machines with magnetic-drum main
+		memory.
+		</para>
+
+		<para>
+		This is very much like the example in my book 
+		<biblioref linkend="Babkin10"/>,
+		in section 6.4. <i>Queues as the sole synchronization
+		mechanism</i>. You can alook at the draft text online at <ulink
+		url="http://web.newsguy.com/sab123/tpopp/06odata.txt"/>. This
+		similarity is not accidental: the CCL streams are queues, and they are
+		the only communication mechanism in CCL.
+		</para>
+
+		<indexterm>
+			<primary>SQL</primary>
+		</indexterm>
+		<para>
+		The SQL statement structure also adds to the confusion: each statement
+		has the destination followed by the source of the data, so each
+		statement reads like it flows backwards.
+		</para>
+	</sect1>
+
+</chapter>
+

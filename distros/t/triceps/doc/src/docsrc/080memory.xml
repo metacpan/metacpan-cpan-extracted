@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+<chapter id="ch_memory" xmlns:xi="http://www.w3.org/2001/XInclude">
+	<title>Memory Management</title>
+
+	<sect1 id="sc_ref_cycles">
+		<title>Reference cycles</title>
+
+		<indexterm>
+			<primary>memory management</primary>
+		</indexterm>
+		<para>
+		Remember that the
+		Triceps memory management uses the reference counting, which does not like
+		the reference cycles, as has been mentioned in
+		<xref linkend="sc_memory_fund" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;. 
+		The reference cycles cause the objects to be never
+		freed. It's no big deal if the data structures exist until the program
+		exit anyway but it becomes a memory leak if they keep being created and deleted
+		dynamically.
+		</para>
+
+		<indexterm>
+			<primary>model</primary>
+		</indexterm>
+		<para>
+		The problems come not with the data that goes through the models but
+		with the models themselves. The data gets reference-counted without any
+		issues. The reference cycles can get formed only between the elements of
+		the models: labels, tables etc. If you don't need them destroyed until
+		the program exits (or more exactly, until the Perl interpreter instance
+		exits), there is no problem. The leaks could happen only if the model
+		elements get created and destroyed as the program runs, such as if you
+		use them to parse and process the short-lived ad-hoc queries.
+		</para>
+
+		<para>
+		These leaks are pretty hard to diagnose. There are some
+		packages, like Devel::Cycle, but they won't detect the loops that
+		involve a reference at &Cpp; level. And when the Perl interpreter exits,
+		it clears up all the variables used, even the ones involved in the
+		loops, so if you run it under valgrind, valgrind doesn't show any
+		leaks. There is a package Devel::LeakTrace that should be able
+		to detect all these left-over variables. However I can't tell for sure
+		yet, so far I haven't had enough patience to build all the
+		dependencies for it.
+		</para>
+
+		<para>
+		One possibility is to use the weak references (using the module Scalar::Util).
+		But the problem is that you need to not forget weakening the references
+		manually. Too much work, too much attention, too easy to forget. 
+		</para>
+
+		<para>
+		The mechanism used in Triceps works by breaking up the reference cycles
+		when the data needs to be cleared. The execution unit
+		keeps track of all its labels, and when it gets destoryed, clears them
+		up, breaking up the cycles. It's also possible to clear the labels
+		individually, by a manual call.
+		</para>
+
+		<para>
+		The clearing of a label clears all the chainings.
+		The chained labels get cleared too in their turn, and eventually the whole chain
+		clears up. This removes the links in the forward direction, and if any
+		cycles were present, they become open.
+		More on the details of label clearing in the 
+		<xref linkend="sc_memory_labels" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;. 
+		</para>
+
+		<para>
+		Another potential for reference cycles is between the execution
+		unit and the labels. A unit keeps a reference to all its labels. So the
+		labels can not keep a reference to the unit. And they don't. Internally
+		they have a plain &Cpp; pointer to the unit. However the Perl level
+		may present a problem.
+		</para>
+
+		<para>
+		In many cases 
+		the labels have a Perl reference to the template object where they belong. 
+		And that object is likely to have a Perl reference to the unit. It's one more
+		opportunity for the reference cycle. This code usually looks like this:
+		</para>
+
+<pre>
+package MyTemplate;
+
+sub new # ($class, $unit, $name, $rowType, ...)
+{
+	my $class = shift;
+	my $unit = shift;
+	my $name = shift;
+	my $rowType = shift;
+	my $self = {};
+
+	...
+
+	$self->{unit} = $unit;
+	$self->{inputLabel} = $unit->makeLabel($rowType, $name . ".in",
+		sub { ... }, sub { ... }, $self);
+
+	...
+
+	bless $self, $class;
+	return $self;
+}
+</pre>
+
+		<para>
+		So the unit refers to the label at the &Cpp; level, the label has a
+		<pre>$self</pre> reference to the Perl object that owns it, and 
+		the object's <pre>$self->{unit}</pre> refers back to the unit.
+		Once the label clearing happens, the link from the unit will
+		disappear and the cycle would unroll. But the clearing would not
+		happen by itself because the unit can't get automatically
+		defererenced and destroyed.
+		</para>
+
+		<para>
+		Because of this, the unit provides an explicit way to trigger the clearing:
+		</para>
+
+<pre>
+$unit->clearLabels();
+</pre>
+
+		<indexterm>
+			<primary>Unit</primary>
+		</indexterm>
+		<indexterm>
+			<primary>label</primary>
+		</indexterm>
+		<para>
+		If you want to get rid of an execution unit with all its components
+		without exiting the whole program, use this call. It will start the
+		chain reaction of destruction. Of course, don't forget to undefine all the other
+		references in your program to these objects being destroyed.
+		</para>
+
+		<para>
+		There is also a way to trigger this chain reaction automatically.
+		It's done with a helper object that is created as follows:
+		</para>
+
+<pre>
+my $clearUnit = $unit->makeClearingTrigger();
+</pre>
+
+		<indexterm>
+			<primary>UnitClearingTrigger</primary>
+		</indexterm>
+		<para>
+		When the reference to <pre>$clearUnit</pre> gets destroyed, it
+		will call <pre>$unit->clearLabels()</pre> and trigger the destruction
+		of the whole unit. Obviously, don't copy the <pre>$clearUnit</pre>
+		variable, keep it on one place.
+		</para>
+
+		<para>
+		If you put it into a block variable, the unit will get destroyed on
+		exiting the block. If you put it into a global variable in a thread,
+		the unit will get destroyed when the thread exits (though I'm a bit
+		hazy on the Perl memoery management with threads yet, it might get
+		all cleared by itself without any special tricks too).
+		</para>
+	</sect1>
+
+	<sect1 id="sc_memory_labels">
+		<title>Clearing of the labels</title>
+
+		<para>
+		To remind, a label that executes the Perl code is created with:
+		</para>
+
+		<indexterm>
+			<primary>label</primary>
+			<secondary>Perl</secondary>
+		</indexterm>
+<pre>
+$label = $unit->makeLabel($rowType, "name", \&clearSub,
+	\&execSub, @args);
+</pre>
+
+		<para>
+		The function <pre>clearSub</pre> deals with the destruction. 
+		</para>
+
+		<indexterm>
+			<primary>label</primary>
+			<secondary>clearing</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>label</primary>
+			<secondary>chaining</secondary>
+		</indexterm>
+		<para>
+		The clearing of a label drops all the references to <pre>execSub</pre>, <pre>clearSub</pre>
+		and arguments, and clears all the chainings. And of course the chained
+		labels get cleared too.  But before anything else
+		is done, <pre>clearSub</pre> gets a chance to execute and clear any
+		application-level data. It gets as its arguments all the
+		arguments from the label constructor, same as <pre>execSub</pre>:
+		</para>
+
+<pre>
+clearSub($label, @args) 
+</pre>
+
+		<para>
+		A typical case is to keep the state of a stateful element in a hash:
+		</para>
+
+<pre>
+package MyTemplate;
+
+sub new # ($class, $unit, $name, $rowType, ...)
+{
+	my $class = shift;
+	my $unit = shift;
+	my $name = shift;
+	my $rowType = shift;
+	my $self = {};
+
+	...
+
+	$self->{unit} = $unit;
+	$self->{inputLabel} = $unit->makeLabel($rowType, $name . ".in",
+		\&clear, \&handle, $self);
+
+	...
+
+	bless $self, $class;
+	return $self;
+}
+</pre>
+
+		<para>
+		These elements may end up pointing to the other elements. It's fairly common to keep
+		the pointers to the other elements (especially tables) that provide inputs to this one.
+		In general, these references <quote>up</quote> should be safe because the clearing of the
+		labels would destroy the references <quote>down</quote> and open the cycles.
+		But the way things get connected in the heat of the moment, you never know.
+		It's better to be safe than sorry.
+		To be on the safe side, the clearing function can wipe out the whole state of the element
+		by undefining its hash:
+		</para>
+
+<pre>
+sub clear # ($label, $self)
+{
+	my ($label, $self) = @_;
+	undef %$self;
+}
+</pre>
+
+		<para>
+		The whole contents of the hash becomes lost, all the refrences from it disappear.
+		And if you use this approach in every object, the complete destruction reigns
+		and everything is nicely laid to waste.
+		</para>
+
+		<para>
+		Writing these clear methods for each class quickly becomes tedious and easy to
+		forget. Triceps is a step ahead: it provides a ready function
+		<pre>Triceps::clearArgs()</pre> that does all this destruction. It can undefine
+		the contents of various things passed as its arguments, and then also undefines
+		these arguments themselves. Just reuse it:
+		</para>
+
+<pre>
+$self->{inputLabel} = $unit->makeLabel($rowType, $name . ".in",
+	\&Triceps::clearArgs, \&handle, $self);
+</pre>
+
+		<para>
+		But that's not all. Triceps is actually <i>two</i> steps ahead. If the
+		<pre>clearSub</pre> is specified as <pre>undef</pre>, Triceps automatically
+		treats it to be <pre>Triceps::clearArgs()</pre>. The last snippet and
+		the following one are equivalent:
+		</para>
+
+<pre>
+$self->{inputLabel} = $unit->makeLabel($rowType, $name . ".in",
+	undef, \&handle, $self);
+</pre>
+
+		<para>
+		No need to think, the default will do the right thing for you. Of course,
+		if by some reason you don't want this destruction to happen, you'd have to
+		override it with an empty function <quote><pre>sub {}</pre></quote>.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_clearing_labels">
+		<title>The clearing labels</title>
+
+		<indexterm>
+			<primary>label</primary>
+			<secondary>clearing</secondary>
+		</indexterm>
+		<para>
+		Some templates don't have their own input labels, instead they just
+		combine and tie together a few internal objects, and use the input
+		labels of some of these internal objects as their inputs. Among
+		the templates included with Triceps, JoinTwo is
+		one of them, it just combines two LookupJoins. Without an input label,
+		there would be no clearing, and the template object would never
+		get undefined. 
+		</para>
+
+		<para>
+		This can be solved by creating an artificial label that is not connected
+		anywhere and has no code to execute. Its only purpose in life would be
+		to clear the object when told so.
+		To make life easier, rather than abusing <pre>makeLabel()</pre>,
+		there is a way to create the special clearing-only labels:
+		</para>
+
+<pre>
+$lb = $unit->makeClearingLabel("name", @args);
+</pre>
+
+		<indexterm>
+			<primary>ClearingLabel</primary>
+		</indexterm>
+		<para>
+		The arguments would be the references to the objects that need clearing,
+		usually <pre>$self</pre>.  For a concrete usage example, here is how
+		JoinTwo uses it:
+		</para>
+
+<pre>
+$self->{clearingLabel} = $self->{unit}->makeClearingLabel(
+	$self->{name} . ".clear", $self);
+</pre>
+
+		<para>
+		Since this call <quote>should never fail</quote>, on
+		any errors it will confess. There is no need to check the result. The
+		result can be saved in a variable or can be simply ignored. If you
+		throw away the result, you won't be able to access that label from the
+		Perl code but it won't be lost: it will be still referenced from the
+		unit, until the unit gets cleared.
+		</para>
+
+		<para>
+		Note how the clearing label doesn't have a row type. In reality every
+		label does how a row type, just it would be silly to abuse the random
+		row types to create the clearing-only labels. Because of this, the
+		clearing labels are created with a special empty row type that has no
+		fields in it. If you ever want to use this row type for any other
+		purposes, you can get it with the method
+		</para>
+
+<pre>
+$rt = $unit->getEmptyRowType();
+</pre>
+
+		<para>
+		Under the hood, the clearing label is the same as a normal label
+		with Perl code, only with the special default values used
+		for its construction. The normal Perl label methods would work on
+		it like on a normal label.
+		</para>
+
+		<para>
+		</para>
+
+	</sect1>
+
+</chapter>

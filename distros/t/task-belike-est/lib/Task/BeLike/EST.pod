@@ -1,0 +1,259 @@
+=encoding utf8
+
+=head1 NAME
+
+Task::BeLike::EST - EST's favarite CPAN modules
+
+=for html
+<a href="https://travis-ci.org/eddy/perl-task-belike-est"><img alt="Build Status" src="https://travis-ci.org/eddy/perl-task-belike-est.svg?branch=master" /></a>
+<a href="https://coveralls.io/r/eddy/perl-task-belike-est?branch=master"><img alt="Coverage Status" src="https://coveralls.io/repos/eddy/perl-task-belike-est/badge.svg?branch=master" /></a>
+<a href="http://badge.fury.io/pl/EST%2FTask-BeLike-EST-0.01"><img alt="CPAN version" src="https://badge.fury.io/pl/EST%2FTask-BeLike-EST-0.01.svg" /></a>
+
+=head1 CONTENTS
+
+=head2 OO TOOLS
+
+=over
+
+=item L<Moo>
+
+=item L<namespace::autoclean>
+
+=back
+
+=head2 DATABASE
+
+=over
+
+=item L<DBI>
+
+=item L<DBD::SQLite>
+
+=item L<DBIx::Connector>
+
+=item L<DBIx::Class>
+
+=back
+
+=head2 FILE, PATH
+
+=over
+
+=item L<Path::Tiny>
+
+=item L<IO::All>
+
+=item L<File::chdir>
+
+=item L<File::AtomicWrite>
+
+=item L<IPC::System::Simple>
+
+=back
+
+=head2 CPAN TOOLS
+
+=over
+
+=item L<CPAN::Mini>
+
+=item L<CPAN::Mini::Inject>
+
+=item L<App::cpanoutdated>
+
+=item L<Dist::Milla>
+
+=back
+
+=head2 DATA SERIALISER
+
+=over
+
+=item L<JSON::MaybeXS>
+
+=item L<JSON>
+
+=item L<XML::Twig>
+
+=item L<XML::LibXML>
+
+=item L<XML::Toolkit>
+
+=item L<YAML>
+
+=item L<YAML::Tiny>
+
+=item L<YAML::XS>
+
+=item L<File::Serialize>
+
+=back
+
+=head2 EMAILS
+
+=over
+
+=item L<Email::Sender::Simple>
+
+=item L<Email::MIME>
+
+=item L<Email::Valid>
+
+=item L<Email::Stuffer>
+
+=back
+
+=head2 FORKING, PARALLEL, LIMIT PROCESS
+
+=over
+
+=item L<Parallel::ForkManager>
+
+=item L<IPC::ConcurrencyLimit>
+
+=item L<IPC::ConcurrencyLimit::Lock::NFS>
+
+=item L<MCE>
+
+=back
+
+=head2 DEBUGGING
+
+=over
+
+=item L<Carp::Always>
+
+=item L<DB::Skip>
+
+=item L<DB::Color>
+
+=item L<Data::Show>
+
+=item L<Data::Printer>
+
+=back
+
+=head2 WEB
+
+=over
+
+=item L<PSGI>
+
+=item L<Plack>
+
+=item L<Mojolicious>
+
+=back
+
+=head2 LOGGING
+
+=over
+
+=item L<Log::Log4perl>
+
+=back
+
+=head2 CONFIGURATION
+
+=over
+
+=item L<Config::ZOMG>
+
+=back
+
+=head2 DEPLOYMENT
+
+=over
+
+=item L<Carton>
+
+=item L<Carmel>
+
+=back
+
+=head2 DATE/TIME
+
+=over
+
+=item L<Time::Moment>
+
+=back
+
+=head2 TESTING
+
+=over
+
+=item L<Test::Pretty>
+
+=item L<Test::Deep>
+
+=back
+
+=head2 REGEX
+
+=over
+
+=item L<Regexp::Debugger>
+
+=item L<Regexp::Common>
+
+=back
+
+=head2 TEMPLATE
+
+=over
+
+=item L<Text::Xslate>
+
+=item L<Text::CSV_XS>
+
+=back
+
+=head2 DATA TOOLS
+
+=over
+
+=item L<Tie::StoredOrderHash>
+
+=item L<Hash::Ordered>
+
+=item L<List::AllUtils>
+
+=item L<Const::Fast>
+
+=item L<CLDR::Number>
+
+=back
+
+=head2 OTHER USEFUL MODULES
+
+=over
+
+=item L<boolean>
+
+=item L<Kavorka>
+
+=item L<Safe::Isa>
+
+=item L<Import::Into>
+
+=item L<failures>
+
+=item L<Perl::Tidy>
+
+=item L<Data::GUID>
+
+=item L<Attempt>
+
+=back
+
+=head1 AUTHOR
+
+Eddy (est) 
+
+=head1 COPYRIGHT AND LISENCE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_ref_agg_type"  xmlns:xi="http://www.w3.org/2001/XInclude">
+		<title>AggregatorType reference</title>
+
+		<indexterm>
+			<primary>AggregatorType</primary>
+		</indexterm>
+
+		<para>
+		The aggregator type describes an aggregation. It gets connected
+		to an index type which defines the grouping for the aggregator.
+		Whenever the aggregation is performed, the code from the
+		aggregator type receives the group context as its argument.
+		</para>
+
+<pre>
+$at = Triceps::AggregatorType->new($resultRowType, "aggName", $initFunc,
+	$handlerFunc, @args);
+</pre>
+
+		<para>
+		Creates an aggregator type.
+		The rows created by the aggregator will be of <pre>$resultRowType</pre>. The
+		aggregator name is used to name the aggregator result label in the
+		table, <quote>tableName.aggName</quote>. It is also used to get the reference of
+		that label from the table.
+		</para>
+
+		<para>
+		<pre>$initFunc</pre> and <pre>$handlerFunc</pre> provide either references or
+		source code strings for the init and handler functions (as usual, if the format
+		is the source code, the <pre>sub { ... }</pre> wrapper will be added implicitly, see
+		<xref linkend="sc_code" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;). 
+		The init function is
+		called when the row group (contained in an index of the type, on which
+		this aggregator type is set) is created. It initializes the group's
+		aggregation state. The handler function gets called on the
+		changes to the group.  See the details in
+		<xref linkend="sc_aggregation_optimized" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;,
+		<xref linkend="sc_aggregation_additive" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;
+		and
+		<xref linkend="sc_aggregation_args" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		The optional <pre>@args</pre> are passed to both the init and handler functions.
+		</para>
+
+		<para>
+		If any fatal errors (as in <pre>die()</pre>) occur in the 
+		aggregator functions, they propagate properly through the table,
+		and the table operations confess with the Perl handler's error message.
+		But since an error in the aggregator function means that things are going
+		very, very wrong, after that the table becomes inoperative and will die
+		on all the subsequent operations as well. You need to be very careful
+		in writing these functions.
+		</para>
+
+<pre>
+$result = $at1->same($at2);
+$result = $at1->equals($at2);
+$result = $at1->match($at2);
+$result = $at->print(); 
+$atCopy = $at->copy();
+</pre>
+
+		<para>
+		The methods for comparison, printing and copying work similarly to the index types.
+		</para>
+
+		<indexterm>
+			<primary>IndexType</primary>
+			<secondary>equals</secondary>
+		</indexterm>
+		<para>
+		The equal aggregator types have the equal result row types, same names,
+		same initialization and handler function references, same arguments.
+		</para>
+
+		<indexterm>
+			<primary>IndexType</primary>
+			<secondary>match</secondary>
+		</indexterm>
+		<para>
+		The matching aggregator types may differ in the aggregator name and in
+		the field names of the result row type. However the function references
+		and their arguments must still be the same.
+		</para>
+
+<pre>
+$rt = $at->getRowType(); 
+</pre>
+
+		<para>
+		Get back the result row type.
+		</para>
+	</sect1>
+

@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_ref_triead">
+		<title>Triead reference</title>
+
+		<indexterm>
+			<primary>Triead</primary>
+		</indexterm>
+		<para>
+		The Triead class is the public interface of a Triceps thread, i.e. what
+		of it is visible to the other threads. It's intended pretty much for
+		introspection only, and all its method are only for reading the state.
+		They are all synchronized, but of course the thread may change its state
+		at any moment. The Triead objects can be obtained by calling
+		<pre>App::getTrieads()</pre>.
+		</para>
+
+		<para>
+		The class also contains some static methods that are used to construct
+		the Trieads.
+		</para>
+
+<pre>
+$result = $t->same($t2);
+</pre>
+
+		<para>
+		Check that two Triead references point to the same Triead object.
+		</para>
+
+<pre>
+$name = $t->getName();
+</pre>
+
+		<para>
+		Get the Triead's name.
+		</para>
+
+<pre>
+$fragment = $t->fragment();
+</pre>
+
+		<para>
+		Get the name of the Triead's fragment. If the Triead doesn't belong to
+		a fragment, returns an empty string <quote></quote>.
+		</para>
+
+<pre>
+$result = $t->isConstructed();
+</pre>
+
+		<para>
+		Check whether the Triead has been constructed. For the explanation of
+		the Triead lifecycle states, see
+		<xref linkend="sc_mt_triead_life" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+<pre>
+$result = $t->isReady();
+</pre>
+
+		<para>
+		Check whether the Triead is ready.
+		</para>
+
+<pre>
+$result = $t->isDead();
+</pre>
+
+		<para>
+		Check whether the Triead is dead.
+		</para>
+
+<pre>
+$result = $t->isInputOnly();
+</pre>
+
+		<para>
+		Check whether the Triead is input-only, that is, it has no reader nexuses
+		imported into it. When the Triead is created, this flag starts its life
+		as <pre>false</pre> (0 for Perl), and then its correct value is computed when the
+		Triead becomes ready. So, to check this flag correctly, you must first
+		check that the Triead is ready.
+		</para>
+
+<pre>
+@nexuses = $t->exports();
+</pre>
+
+		<para>
+		Get the list of nexuses exported from this Triead, as name-value
+		pairs, suitable to be assigned into a hash. The values are the
+		references to nexus objects.
+		</para>
+
+<pre>
+@nexuses = $t->imports();
+@nexuses = $t->readerImports();
+@nexuses = $t->writerImports();
+</pre>
+
+		<para>
+		Get the list of nexuses imported into this Triead, as name-value pairs.
+		The <pre>imports()</pre> returns the full list, without the ability to tell, which
+		nexuses are imported for reading and which for writing, while
+		<pre>readImports()</pre> and <pre>writeImports()</pre> return these subsets separately.
+		</para>
+
+		<para>
+		The names here are the <quote>as-names</quote> used for the import (the full names
+		of the Nexuses can be obtained from the Nexus objects). The values are
+		the references to nexus objects.
+		</para>
+
+		<para>
+		The next part of the API is the static construction methods. They
+		really are wrappers of the TrieadOwner methods but Triead is a shorter
+		name, and thus more convenient.
+		</para>
+
+<pre>
+Triceps::Triead::start(@options);
+</pre>
+
+		<para>
+		Start a new Triead in a new Perl thread. The options are:
+		</para>
+
+		<variablelist>
+		<varlistentry>
+			<term><pre>app => $appname</pre></term>
+			<listitem>
+			Name of the App that owns the new Triead. The App object will be
+			looked up by name for the actual construction.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>thread => $threadname</pre></term>
+			<listitem>
+			Name of the new Triead.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>fragment => $fragname</pre></term>
+			<listitem>
+			Name of the new Triead's fragment. Optional. Default: <quote></quote>, which means no
+			fragment.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>immed => 0/1</pre></term>
+			<listitem>
+			Flag: when the new thread imports its nexuses, it should import
+			them in the immediate mode. This flag is purely advisory, and the
+			thread's main function is free to use or ignore it depending on its
+			logic. It's provided as a convenience, since it's a typical concern
+			for the helper threads. Optional. Default: 0.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>main => $code</pre></term>
+			<listitem>
+			<para>
+			The main function of the thread that will be called with all the
+			options of <pre>start()</pre> plus some more:
+			</para>
+
+<pre>
+&$func(@opts, owner => $ownerObj)
+</pre>
+
+			<para>
+			The extra option of the main is:
+			</para>
+
+			<variablelist>
+			<varlistentry>
+				<term><pre>owner => $ownerObj</pre></term>
+				<listitem>
+				The TrieadOwner object constructed for this thread, through which
+				its state can be controlled.
+				</listitem>
+			</varlistentry>
+			</variablelist>
+
+			<para>
+			Also, any other options may be added, and they will be forwarded to the
+			main function without parsing. The main function is then free to parse
+			them by itself, and if it finds any unknown options, it will fail.
+			</para>
+
+			<para>
+			For the convenience of writing the main functions, the set of
+			<quote>standard</quote> options is provided in the global variable
+			</para>
+
+<pre>
+@Triceps::Triead::opts
+</pre>
+
+			<para>
+			The main function then uses this variable as a preamble for any of
+			its own options, for example:
+			</para>
+
+<pre>
+sub listenerT          
+{
+    my $opts = {}; 
+    &Triceps::Opt::parse("listenerT", $opts, {@Triceps::Triead::opts,
+        socketName => [ undef, \&Triceps::Opt::ck_mandatory ],
+    }, @_);
+    ...
+}
+</pre>
+			</listitem>
+		</varlistentry>
+		</variablelist>
+
+		<para>
+		Another convenience method is:
+		</para>
+
+<pre>
+Triceps::Triead::startHere(@options);
+</pre>
+
+		<para>
+		It's very much the same as <pre>start()</pre> but starts the Triead in the current
+		Perl thread. It's intended for the short-lived Apps that perform some
+		computation and then have to return the result into the original
+		thread. The unit tests are a good example of such apps.
+		</para>
+
+		<para>
+		And because of the typical usage, this method has some extra
+		functionality compared to the plain <pre>start()</pre>: unless told otherwise, it
+		will first create the App (with the name specified by the option
+		<quote>app</quote>), then construct and run it, and after the main function of this
+		thread exits, run the harvester and drop the App. So it just does the
+		whole package, similar to <pre>App::build()</pre>, only typically the Triead
+		started here runs as a normal real Triead, collects the results of
+		computations and places them into some variables (global or referenced
+		by the user-specific options of the main function).
+		</para>
+
+		<para>
+		This extra functionality can be disabled by the additional options
+		(disable by setting them to 0):
+		</para>
+
+		<variablelist>
+		<varlistentry>
+			<term><pre>harvest => 0/1</pre></term>
+			<listitem>
+			After the main function exits, automatically run the harvesrer. If
+			you set it to 0, don't forget to call the harvester after this
+			function returns. Optional. Default: 1.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
+			<term><pre>makeApp => 0/1</pre></term>
+			<listitem>
+			Before doing anything, create the App.  Obviously, this App must
+			not exist yet. Optional. Default: 1.
+			</listitem>
+		</varlistentry>
+		</variablelist>
+
+		<para>
+		These options are not passed through to the main function, unlike all
+		the others. 
+		</para>
+	</sect1>

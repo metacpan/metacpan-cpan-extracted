@@ -1,0 +1,4591 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+<chapter id="ch_mt" xmlns:xi="http://www.w3.org/2001/XInclude">
+	<title>Multithreading</title>
+
+	<sect1 id="sc_mt_concepts">
+		<title>Triceps multithreading concepts</title>
+
+		<indexterm>
+			<primary>multithreading</primary>
+		</indexterm>
+		<para>
+		When running the CEP models, naturally the threads have to be connected
+		by the queues for the data exchange. The use of queues is extremely
+		popular but also notoriously bug-prone.
+		</para>
+
+		<para>
+		The idea of the multithreading support in Triceps is to make writing
+		the multithreaded model easier. To make writing the good code easy and
+		writing the bad code hard. But of course you don't have to use it, if 
+		it feels too constraining, you can always make your own.
+		</para>
+
+		<para>
+		The diagram in
+		<xref linkend="fig_mt_overview" xrefstyle="select: label nopage"/>&xrsp;
+		shows all the main elements of a multithread Triceps application.
+		</para>
+
+		<figure id="fig_mt_overview" >
+			<title>Triceps multithreaded application.</title>
+			<xi:include href="file:///FIGS/thread-010-over.xml"/> 
+		</figure>
+
+		<indexterm>
+			<primary>App</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Triead</primary>
+		</indexterm>
+		<indexterm>
+			<primary>TrieadOwner</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Nexus</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Facet</primary>
+		</indexterm>
+		<indexterm>
+			<primary>fragment</primary>
+		</indexterm>
+		<para>
+		The Triceps application is embodied in the class App. It's possible to
+		have multiple Apps in one program.
+		</para>
+
+		<para>
+		Each thread has multiple parts to it. First, of course, there is the
+		OS-level (or, technically, library-level, or Perl-level) thread where
+		the code executes. And then there is a class that represents this
+		thread and its place in the App. To reduce the naming conflict, this
+		class is creatively named Triead (pronounced still <quote>thread</quote>). In the
+		discussion I use the word <quote>thread</quote> for both concepts, the OS-level
+		thread and the Triead, and it's usually clear from the context which
+		one I mean. But sometimes it's particularly important to make the
+		distinction, and then I name one or the other explicitly.
+		</para>
+
+		<para>
+		The class Triead itself is largely opaque, allowing only a few methods
+		for introspection. But there is a control interface to it, called
+		TrieadOwner. The Triead is visible from the outside, the TrieadOwner
+		object is visible only in the OS thread that owns the Triead. The
+		TrieadOwner manages the thread state and acts as the intermediary in
+		the thread's communications with the App.
+		</para>
+
+		<para>
+		The data is passed between the threads through the Nexuses. A Nexus is
+		unidirectional, with data going only one way, however it may have
+		multiple writers and multiple readers. All the readers see the exact
+		same data, with rowops going in the exact same order (well, there will
+		be other policies in the future as well, but for now there is only one
+		policy).
+		</para>
+
+		<para>
+		A Nexus passes through the data for multiple labels, very much like an
+		FnReturn does (and indeed there is a special connection between them).
+		A Nexus also allows to export the row types and table types from one
+		thread to another.
+		</para>
+
+		<para>
+		A Nexus is created by one thread, and then the other threads connect to it.
+		The thread that creates the Nexus determines what labels will it contain,
+		and what row types and table types to export.
+		</para>
+
+		<para>
+		A Nexus gets connected to the Trieads through the Facets (in the diagram,
+		the Facets are shown as flat spots on the round Nexuses). A Facet is
+		a connection point between the Nexus and the Triead. Each Facet is for
+		either reading or writing. And there may be only one Facet between a
+		given Nexus and a given Triead, you can't make multiple connections
+		between them. As a consequence, a thread can't both write and read to
+		the same Nexus, it can do only one thing. This might actually be an
+		overly restrictive limitation and might change in the future but that's
+		how things work now.
+		</para>
+
+		<indexterm>
+			<primary>Nexus</primary>
+			<secondary>reverse</secondary>
+		</indexterm>
+		<para>
+		Each Nexus also has a direction: either direct (<quote>downwards</quote>) or reverse
+		(<quote>upwards</quote>). How does it know, which direction is down and
+		whih is up? It doesn't. You tell it by designating a Nexus one way or the other.
+		And yes, the reverse Nexuses allow to build the models
+		with loops. However the loops consisting of only the direct Nexuses are
+		not allowed, nor of only reverse Nexuses. They would mess up the flow
+		control. The proper loops must contain a mix of direct and reverse
+		Nexuses.
+		</para>
+
+		<para>
+		The direct Nexuses have a limited queue size and stop the writers when
+		the queue fills up, until the data gets consumed, thus providing the
+		flow control. The reverse Nexuses have an unlimited queue size, which
+		allows to avoid the circular deadlocks. The reverse Nexuses also have
+		a higher priority: if a thread is reading from a direct Nexus and a
+		reverse one, with both having data available, it will read the data
+		from the reverse Nexus first. This is to prevent the unlimited queues
+		in the reverse Nexuses from the truly unlimited growth.
+		</para>
+
+		<para>
+		Normally an App is built once and keeps running in this configuration
+		until it stops. But there is a strong need to have the threads
+		dynamically added and deleted too. For example, if the App running as a
+		server, and clients connect to it, each client needs to have its
+		thread(s) added when the client connects and then deleted when the client
+		disconnects. This is handled through the concept of fragments. There is
+		no Fragment class but when you create a Triead, you can specify a
+		fragment name for it. Then it becomes possible to shut down and dispose
+		the threads in a fragment after the fragment's work is done. 
+		</para>
+	</sect1>
+
+	<sect1 id="sc_mt_triead_life">
+		<title>The Triead lifecycle</title>
+
+		<indexterm>
+			<primary>Triead</primary>
+			<secondary>stages</secondary>
+		</indexterm>
+
+		<para>
+		Each Triead goes through a few stages in its life:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+			declared
+			</listitem>
+			<listitem>
+			defined
+			</listitem>
+			<listitem>
+			constructed
+			</listitem>
+			<listitem>
+			ready
+			</listitem>
+			<listitem>
+			waited ready
+			</listitem>
+			<listitem>
+			requested dead
+			</listitem>
+			<listitem>
+			dead
+			</listitem>
+		</itemizedlist>
+
+		<para>
+		Note by the way that it's the stages of the Triead object. The OS-level
+		thread as such doesn't know much about them, even though these stages
+		do have some connections to its state.
+		</para>
+
+		<para>
+		These stages always go in order and can not be skipped. However for
+		convenience you can request a move directly to a further stage. This will just
+		automatically pass through all the intermediate stages. Although, well,
+		there is one exception: the <quote>waited ready</quote> and <quote>requested dead</quote> stages
+		can get skipped on the way to <quote>dead</quote>. Other than that, there is always
+		the sequence, so if you find out that a Triead is dead, you can be sure
+		that it's also declared, defined, constructed and ready. The attempts
+		to go to a previous stage are silently ignored.
+		</para>
+
+		<para>
+		Now, what do these stages mean?
+		</para>
+
+		<variablelist>
+
+			<varlistentry>
+				<term>Declared:</term>
+				<listitem>
+				<para>
+				The App knows the name of the thread and that this thread
+				will eventually exist. When an App is asked to find the resources from
+				this thread (such as Nexuses, and by the way, the Nexuses are
+				associated with the threads that created them) it will know to wait
+				until this thread becomes constructed, and then look for the resources.
+				It closes an important race condition: the code that defines the Triead
+				normally runs in a new OS thread but there is no way to tell when
+				exactly will it run and do its work. If you had spawned a new thread and
+				then attempted to get a nexus from it before it actually runs, the App
+				would tell you that there is no such thread and fail. To get around it,
+				you declare the thread first and then start it. Most of the time there
+				is no need to declare explicitly, the library code that wraps the
+				thread creation does it for you.
+				</para>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term>Defined:</term>
+				<listitem>
+				<para>
+				The Triead object has been created and connected to the App.
+				Since this is normally done from the new OS thread, it also implies
+				that the thread is running and is busy about constructing the nexuses
+				and whatever its own internal resources.
+				</para>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term>Constructed:</term>
+				<listitem>
+				<para>
+				The Triead had constructed and exported all the nexuses
+				that it planned to. This means that now these nexuses can be imported
+				by the other threads (i.e. connected to the other threads). After this
+				point the thread can not construct any more nexuses. However it can
+				keep importing the nexuses from the other threads. It's actually a good
+				idea to do all your exports, mark the thread constructed, and only then
+				start importing. This order guarantees the absence of initialization deadlocks (which
+				would be detected and will cause the App to be aborted). There are some
+				special cases when you need to import a nexus from a thread that is not
+				fully constructed yet, and it's possible, but requires more attention
+				and a special override of the <quote>immediate</quote> import.
+				This is described in more detail in
+				<xref linkend="sc_ref_triead_owner" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;,
+				with the method <pre>importNexus()</pre>.
+				</para>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term>Ready:</term>
+				<listitem>
+				<para>
+				The thread had imported all the nexuses it wanted and fully
+				initialized all its internals (for example, if it needs to load data
+				from a file, it might do that before telling that it's ready). After
+				this point no more nexuses can be imported. A fine point is that the
+				other threads may still be created, and they may do their exporting and
+				importing, but once a thread is marked as ready, it's cast in bronze.
+				And in the simple cases you don't need to worry about separating the
+				constructed and ready stages, just initialize everything and mark the
+				thread as ready.
+				</para>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term>Waited ready:</term>
+				<listitem>
+				<para>
+				Before proceeding further, the thread has to wait for all
+				the threads in App to be ready, or it would lose data when it tries to
+				communicate with them. It's essentially a barrier. Normally both the
+				stages <quote>ready</quote> and <quote>waited ready</quote> are advanced to with a single call
+				<pre>readyReady()</pre>. With it the thread says <quote>I'm ready, and let me continue when
+				everyone is ready</quote>. After that the actual work can begin. It's still
+				possible to create more threads after that (normally, parts of the
+				transient fragments), and until they all become ready, the App may
+				temporarily become unready again, but that's a whole separate advanced
+				topic that will be discussed in
+				<xref linkend="sc_mt_dynamic_server" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+				</para>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term>Requested dead:</term>
+				<listitem>
+				<para>
+				This is the way to request a thread to exit. Normally
+				some control thread will decide that the App needs to exit and will
+				request all its threads to die. The threads will get these requests,
+				perform their last rites and exit. The threads don't have to get this
+				request to exit, they can also always decide to exit on their own. When
+				a thread is requested to die, all the data communication with it stops.
+				No more data will get to it through the nexuses and any data it sends
+				will be discarded. It might churn a little bit through the data in its
+				input buffers but any results produced will be discarded. The good
+				practice is to make sure that all the data is drained before requesting
+				a thread to die. Note that the nexuses created by this thread aren't
+				affected at all, they keep working as usual. It's the data connections
+				between this thread and any nexuses that get broken.
+				</para>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term>Dead:</term>
+				<listitem>
+				<indexterm>
+					<primary>harversting</primary>
+				</indexterm>
+				<para>
+				The thread had completed its execution and exited. Normally you
+				don't need to mark this explicitly. When the thread's main function
+				returns, the library will do it for you. Marking the thread dead also
+				drives the harvesting of the OS threads: the harvesting logic will
+				perform a <pre>join()</pre> (not to be confused with SQL join) of the thread and
+				thus free the OS resources. The dead Trieads are still visible in the
+				App (except for some special cases with the fragments), and their
+				nexuses continue working as usual (even including the special cases
+				with the fragments), the other threads can keep communicating through
+				them for as long as they want. 
+				</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+	</sect1>
+
+	<sect1 id="sc_mt_pipeline">
+		<title>Multithreaded pipeline</title>
+
+		<indexterm>
+			<primary>pipeline</primary>
+		</indexterm>
+		<para>
+		The multithreaded models are well suited for running the pipelines,
+		so that is going to be the first example of the threads. The full text of the example
+		can be found in <pre>t/xTrafficAggMt.t</pre> in the class Traffic1.
+		It's a variation of an already shown example, the traffic
+		data aggregation from 
+		<xref linkend="sc_time_periodic" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		The short recap is that it gets
+		the data for each network packet going through and keeps it for some
+		time, aggregates the data by the hour and keeps it for a longer time,
+		and aggregates it by the day and keeps for a longer time yet. This
+		multi-stage computation naturally matches the pipeline approach.
+		</para>
+
+		<para>
+		Since this new example highlights different features than the original one,
+		I've changed it logic a little: it updates both the
+		hourly and daily summaries on every packet received. And I didn't
+		bother to implement the part with the automatic cleaning of the old
+		data, it doesn't add anything interesting to the pipeline works.
+		</para>
+
+		<para>
+		The pipeline topologies are quite convenient for working with the
+		threads. The parallel computations create a possibility of things
+		happening in an unpredictable order and producing unpredictable
+		results. The pipeline topology allows the parallelism and at the same
+		time also keeps the data in the same predictable order, with no
+		possibility of rows overtaking each other.
+		</para>
+
+		<para>
+		The computation in this example is split into the following threads:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+			Read the input, parse and send the data into the model.
+			</listitem>
+
+			<listitem>
+			Store the recent data and aggregate it by the hour.
+			</listitem>
+
+			<listitem>
+			Store the hourly data and aggregate it by the day.
+			</listitem>
+
+			<listitem>
+			Store the daily data.
+			</listitem>
+
+			<listitem>
+			Get the data at the end of the pipeline and print it.
+			</listitem>
+		</itemizedlist>
+
+		<para>
+		The result of each aggregation gets stored in a table in the next thread,
+		which then uses the same table for the next stage of aggregation.
+		</para>
+
+		<para>
+		Technically, each stage only needs the data from the previous
+		stage, but to get the updates to the printing stage (since we want
+		to print the original updates, daily and hourly), they all go all
+		the way through.
+		</para>
+
+		<para>
+		Dumping the contents of the tables also requires some special support.
+		Each table is local to its thread and can't be accessed from the other
+		threads. To dump its contents, the dump request needs to be sent to its
+		thread, which would extract the data and send it through. There are
+		multiple ways to deal with the dump results. One is to have a special
+		label for each table's dump and propagate it to the last stage to
+		print. If all that is needed is text, another way is to have one label that allows to send
+		strings is good enough, all the dumps can send the data converted to
+		text into it, and it would go all the way through the pipeline.
+		For this example I've picked the last approach.
+		</para>
+
+		<para>
+		And now is time to show some code. The main part goes like this:
+		</para>
+
+<!-- perl/Triceps/t/xTrafficAggMt.t Traffic1 -->
+<pre>
+Triceps::Triead::startHere(
+	app => "traffic",
+	thread => "print",
+	main => \&printT,
+);
+</pre>
+
+		<indexterm>
+			<primary>App</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Triead</primary>
+		</indexterm>
+		<para>
+		The <pre>startHere()</pre> creates an App and starts a Triead in the current OS
+		thread. <quote>Here</quote> in the method name stands for <quote>in the current OS thread</quote>.
+		<quote>traffic</quote> is the app name, <quote>print</quote> the thread name. This thread
+		will be the end of the pipeline, and it will create the rest of the
+		threads. This is a convenient pattern when the results of the model
+		need to be fed back to the current thread, and it works out very
+		conveniently for the unit tests. <pre>printT()</pre> is the body function of
+		this printing thread:
+		</para>
+
+<!-- perl/Triceps/t/xTrafficAggMt.t Traffic1 -->
+<pre>
+sub printT # (@opts)
+{
+	my $opts = {};
+	Triceps::Opt::parse("traffic main", $opts, {@Triceps::Triead::opts}, @_);
+	my $owner = $opts->{owner};
+	my $unit = $owner->unit();
+
+	Triceps::Triead::start(
+		app => $opts->{app},
+		thread => "read",
+		main => \&readerT,
+	);
+	Triceps::Triead::start(
+		app => $opts->{app},
+		thread => "raw_hour",
+		main => \&rawToHourlyT,
+		from => "read/data",
+	);
+	Triceps::Triead::start(
+		app => $opts->{app},
+		thread => "hour_day",
+		main => \&hourlyToDailyT,
+		from => "raw_hour/data",
+	);
+	Triceps::Triead::start(
+		app => $opts->{app},
+		thread => "day",
+		main => \&storeDailyT,
+		from => "hour_day/data",
+	);
+
+	my $faIn = $owner->importNexus(
+		from => "day/data",
+		as => "input",
+		import => "reader",
+	);
+
+	$faIn->getLabel("print")->makeChained("print", undef, sub {
+		&send($_[1]->getRow()->get("text"));
+	});
+	for my $tag ("packet", "hourly", "daily") {
+		makePrintLabel($tag, $faIn->getLabel($tag));
+	}
+
+	$owner->readyReady();
+	$owner->mainLoop(); # all driven by the reader
+}
+</pre>
+
+		<para>
+		<pre>startHere()</pre> accepts a number of fixed options plus arbitrary options
+		that it doesn't care about by itself but passes through to the thread's main
+		function, which are then the responsibility of the main function to
+		parse. To reiterate, the main function gets all the options from the
+		call of <pre>startHere()</pre>, both these that <pre>startHere()</pre> parses and these that
+		it simply passes through. <pre>startHere()</pre> also adds one more option on its
+		own: <quote>owner</quote> containing the TrieadOwner object that the thread uses to
+		communicate with the rest of the App.
+		</para>
+
+		<para>
+		In this case <pre>printT()</pre> doesn't have any extra options on its own,
+		it's just happy to get <pre>startHere()</pre>'s standard set that it takes all
+		together from <pre>@Triceps::Triead::opts</pre>.
+		</para>
+
+		<indexterm>
+			<primary>TrieadOwner</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Unit</primary>
+		</indexterm>
+		<indexterm>
+			<primary>UnitClearingTrigger</primary>
+		</indexterm>
+		<para>
+		It gets the TrieadOwner object <pre>$owner</pre> from the option appended by
+		<pre>startHere()</pre>. Each TrieadOwner is created with its own Unit, so the unit
+		is obtained from it to create the thread's model in it. Incidentally,
+		the TrieadOwner  also acts as a clearing trigger object for the Unit,
+		so when the TrieadOwner is destroyed, it properly clears the Unit.
+		</para>
+
+		<para>
+		Then it goes and creates all the threads of the pipeline. The <pre>start()</pre>
+		works very much like <pre>startHere()</pre>, only it actually creates a new thread
+		and starts the main function in it. The main function can be the same
+		whether it runs through <pre>start()</pre> or <pre>startHere()</pre>. The special catch is
+		that the options to <pre>start()</pre> must contain only the plain Perl values,
+		not Triceps objects. It has to do with how Perl works with threads: it
+		makes a copy of every value for the new thread, and it cant's copy the
+		XS objects, so they simply become undefined in the new thread.
+		</para>
+
+		<para>
+		All but the first thread in the pipeline have the extra option <quote>from</quote>: it
+		specifies the input nexus for this thread, and each thread creates an
+		output nexus <quote>data</quote>. A nexus it named relatively to the
+		thread that created it, so when the option <quote>from</quote> says <quote>day/data</quote>, it's
+		the nexus <quote>data</quote> created by the thread <quote>day</quote>.
+		</para>
+
+		<indexterm>
+			<primary>Nexus</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Facet</primary>
+		</indexterm>
+		<para>
+		So, the pipeline gets all connected sequentially until eventually
+		<pre>printT()</pre> imports the nexus at its tail. <pre>importNexus()</pre> returns a
+		Facet, which is the thread's API to the nexus. A facet looks very much
+		like an FnReturn for most purposes, with a few additions. It even has a
+		real FnReturn in it, and you work with the labels of that FnReturn to get the
+		data out of the nexus (or to send data into the nexus). You could potentially
+		use an FnBinding with that FnReturn but the typical pattern for reading
+		from a facet is different: just get its labels 
+		and chain the handling labels directly to them.
+		</para>
+
+		<para>
+		The option <quote>as</quote> of <pre>importNexus()</pre> gives the name to the facet and to its
+		same-named FnReturn (without it the facet would be named the same as
+		the short name of the nexus, in this case <quote>data</quote>). The option <quote>import</quote>
+		tells whether this thread will be reading or writing the nexus, and
+		in this case it's reading.
+		</para>
+
+		<para>
+		By the time the pipeline gets to the last stage, it has a few
+		labels in its facet:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+			<pre>print</pre> - carries the direct text lines to print in its field <pre>text</pre>,
+			and its contents gets printed.
+			</listitem>
+
+			<listitem>
+			<pre>dumprq</pre> - carries the dump requests to the tables, and the printing
+			thread doesn't care about it.
+			</listitem>
+
+			<listitem>
+			<pre>packet</pre> - carries the raw data about the packets.
+			</listitem>
+
+			<listitem>
+			<pre>hourly</pre> - carries the hourly summaries.
+			</listitem>
+
+			<listitem>
+			<pre>daily</pre> - carries the daily summaries.
+			</listitem>
+		</itemizedlist>
+
+		<para>
+		The last three get also printed but this time as whole rows.
+		</para>
+
+		<para>
+		And after everything is connected, the thread both tells that it's
+		ready and waits for all the other threads to become ready by calling
+		<pre>readyReady()</pre>. Then its the run time, and <pre>mainLoop()</pre> takes care of it:
+		it keeps reading data from the nexus and
+		processes it until it's told to shutdown.
+		The shutdown will be controlled by the file reading
+		thread at the start of the pipeline. The processing is done by getting
+		the rowops from the nexus and calling them on the appropriate label in
+		the facet, which then calls the the labels chained from it, and that
+		gets all the rest of the thread's model running.
+		</para>
+
+		<para>
+		The reader thread drives the pipeline:
+		</para>
+
+<!-- perl/Triceps/t/xTrafficAggMt.t Traffic1 -->
+<pre>
+sub readerT # (@opts)
+{
+	my $opts = {};
+	Triceps::Opt::parse("traffic main", $opts, {@Triceps::Triead::opts}, @_);
+	my $owner = $opts->{owner};
+	my $unit = $owner->unit();
+
+	my $rtPacket = Triceps::RowType->new(
+		time => "int64", # packet's timestamp, microseconds
+		local_ip => "string", # string to make easier to read
+		remote_ip => "string", # string to make easier to read
+		local_port => "int32", 
+		remote_port => "int32",
+		bytes => "int32", # size of the packet
+	);
+
+	my $rtPrint = Triceps::RowType->new(
+		text => "string", # the text to print (including \n)
+	);
+
+	my $rtDumprq = Triceps::RowType->new(
+		what => "string", # identifies, what to dump
+	);
+
+	my $faOut = $owner->makeNexus(
+		name => "data",
+		labels => [
+			packet => $rtPacket,
+			print => $rtPrint,
+			dumprq => $rtDumprq,
+		],
+		import => "writer",
+	);
+
+	my $lbPacket = $faOut->getLabel("packet");
+	my $lbPrint = $faOut->getLabel("print");
+	my $lbDumprq = $faOut->getLabel("dumprq");
+
+	$owner->readyReady();
+
+	while(&readLine) {
+		chomp;
+		# print the input line, as a debugging exercise
+		$unit->makeArrayCall($lbPrint, "OP_INSERT", "> $_\n");
+
+		my @data = split(/,/); # starts with a command, then string opcode
+		my $type = shift @data;
+		if ($type eq "new") {
+			$unit->makeArrayCall($lbPacket, @data);
+		} elsif ($type eq "dump") {
+			$unit->makeArrayCall($lbDumprq, "OP_INSERT", $data[0]);
+		} else {
+			$unit->makeArrayCall($lbPrint, "OP_INSERT", "Unknown command '$type'\n");
+		}
+		$owner->flushWriters();
+	}
+
+	{
+		# drain the pipeline before shutting down
+		my $ad = Triceps::AutoDrain::makeShared($owner);
+		$owner->app()->shutdown();
+	}
+}
+</pre>
+
+		<para>
+		It starts by creating the nexus with the initial set of the labels: for
+		the data about the network packets, for the lines to be printed at the
+		end of the pipeline and for the dump requests to the tables in the
+		other threads. It gets exported for the other threads to import, and
+		also imported right back into this thread, for writing. And then the
+		setup is done, <pre>readyReady()</pre> is called, and the processing starts.
+		</para>
+
+		<para>
+		It reads the CSV lines, splits them, makes a decision if it's a data
+		line or dump request, and one way or the other sends it into the nexus.
+		The data sent to a facet doesn't get immediately forwarded to the
+		nexus. It's collected internally in a tray, and then <pre>flushWriters()</pre>
+		sends it on. The <pre>mainLoop()</pre> shown in <pre>printT</pre> calls <pre>flushWriters()</pre>
+		automatically after every tray it processes from the input. But when
+		reading from a file you've got to do it yourself. Of course, it's more
+		efficient to send through multiple rows at once, so a smarter
+		implementation would check if multiple lines are available from the
+		file and send them in larger bundles.
+		</para>
+
+		<indexterm>
+			<primary>shutdown</primary>
+		</indexterm>
+		<indexterm>
+			<primary>drain</primary>
+		</indexterm>
+		<para>
+		The last part is the shutdown. After the end of file is reached, it's
+		time to shut down the application. You can't just shut down it right
+		away because there still might be data in the pipeline, and if you shut
+		it down, that data will be lost. The right way is to drain the pipeline
+		first, and then do the shutdown when the app is drained.
+		<pre>AutoDrain::makeShared()</pre> creates a scoped drain: the drain request for
+		all the threads is started when this object is created, and the object
+		construction completes when the drain succeeds. When the object is
+		destroyed, that releases the drain. So in this case the drain succeeds and
+		then the app gets shut down.
+		</para>
+
+		<para>
+		The shutdown causes the <pre>mainLoop()</pre> calls in all the other threads to
+		return, and the threads to exit. Then <pre>startHere()</pre> in the first thread
+		has the special logic in it that joins all the started threads after
+		its own main function returns and before it completes. After that the
+		script continues on its way and is free to exit. 
+		</para>
+
+		<para>
+		The rest of this example might be easier to understand by looking at an
+		example of a run first. The lines in bold are the copies of
+		the input lines that <pre>readerT()</pre> reads from the input and
+		sends into the pipeline, and <pre>printT()</pre> faithfully
+		prints.
+		</para>
+
+		<para>
+		<pre>input.packet</pre> are the rows that reach the <pre>printT</pre> on the <pre>packet</pre> label
+		(remember, <quote>input</quote> is the name with which it imports its input nexus).
+		<pre>input.hourly</pre> is the data aggregated by the hour intervals (and also by
+		the IP addresses, dropping the port information), and <pre>input.daily</pre>
+		further aggregates it per day (and again per the IP addresses). The
+		timestamps in the hourly and daily rows are truncated to the start
+		of the hour or day.
+		</para>
+
+		<para>
+		And the lines without any prefixes are the dumps of the table contents
+		that again reach the <pre>printT()</pre> through the <quote>print</quote> label:
+		</para>
+
+<!-- perl/Triceps/t/xTrafficAggMt.t Traffic1 -->
+<exdump>
+> new,OP_INSERT,1330886011000000,1.2.3.4,5.6.7.8,2000,80,100
+input.packet OP_INSERT time="1330886011000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" local_port="2000" remote_port="80" bytes="100" 
+input.hourly OP_INSERT time="1330884000000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="100" 
+input.daily OP_INSERT time="1330819200000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="100" 
+> new,OP_INSERT,1330886012000000,1.2.3.4,5.6.7.8,2000,80,50
+input.packet OP_INSERT time="1330886012000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" local_port="2000" remote_port="80" bytes="50" 
+input.hourly OP_DELETE time="1330884000000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="100" 
+input.daily OP_DELETE time="1330819200000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="100" 
+input.hourly OP_INSERT time="1330884000000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="150" 
+input.daily OP_INSERT time="1330819200000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="150" 
+> new,OP_INSERT,1330889612000000,1.2.3.4,5.6.7.8,2000,80,150
+input.packet OP_INSERT time="1330889612000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" local_port="2000" remote_port="80" bytes="150" 
+input.hourly OP_INSERT time="1330887600000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="150" 
+input.daily OP_DELETE time="1330819200000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="150" 
+input.daily OP_INSERT time="1330819200000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="300" 
+> new,OP_INSERT,1330889811000000,1.2.3.4,5.6.7.8,2000,80,300
+input.packet OP_INSERT time="1330889811000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" local_port="2000" remote_port="80" bytes="300" 
+input.hourly OP_DELETE time="1330887600000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="150" 
+input.daily OP_DELETE time="1330819200000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="300" 
+input.daily OP_INSERT time="1330819200000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="150" 
+input.hourly OP_INSERT time="1330887600000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="450" 
+input.daily OP_DELETE time="1330819200000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="150" 
+input.daily OP_INSERT time="1330819200000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="600" 
+> new,OP_INSERT,1330972411000000,1.2.3.5,5.6.7.9,3000,80,200
+input.packet OP_INSERT time="1330972411000000" local_ip="1.2.3.5" remote_ip="5.6.7.9" local_port="3000" remote_port="80" bytes="200" 
+input.hourly OP_INSERT time="1330970400000000" local_ip="1.2.3.5" remote_ip="5.6.7.9" bytes="200" 
+input.daily OP_INSERT time="1330905600000000" local_ip="1.2.3.5" remote_ip="5.6.7.9" bytes="200" 
+> new,OP_INSERT,1331058811000000
+input.packet OP_INSERT time="1331058811000000" 
+> new,OP_INSERT,1331145211000000
+input.packet OP_INSERT time="1331145211000000" 
+> dump,packets
+time="1330886011000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" local_port="2000" remote_port="80" bytes="100" 
+time="1330886012000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" local_port="2000" remote_port="80" bytes="50" 
+time="1330889612000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" local_port="2000" remote_port="80" bytes="150" 
+time="1330889811000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" local_port="2000" remote_port="80" bytes="300" 
+time="1330972411000000" local_ip="1.2.3.5" remote_ip="5.6.7.9" local_port="3000" remote_port="80" bytes="200" 
+> dump,hourly
+time="1330884000000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="150" 
+time="1330887600000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="450" 
+time="1330970400000000" local_ip="1.2.3.5" remote_ip="5.6.7.9" bytes="200" 
+> dump,daily
+time="1330819200000000" local_ip="1.2.3.4" remote_ip="5.6.7.8" bytes="600" 
+time="1330905600000000" local_ip="1.2.3.5" remote_ip="5.6.7.9" bytes="200" 
+</exdump>
+
+		<para>
+		Note that the order of the lines is completely nice and predictable,
+		nothing goes out of order. Each nexus preserves the order of the rows
+		put into it, and the fact that there is only one writer per nexus and
+		that every thread is fed from only one nexus, avoids the races.
+		</para>
+
+		<para>
+		Let's look at the thread that performs the aggregation by the hour:
+		</para>
+
+<!-- perl/Triceps/t/xTrafficAggMt.t Traffic1 edited -->
+<pre>
+# compute an hour-rounded timestamp (in microseconds)
+sub hourStamp # (time)
+{
+	return $_[0]  - ($_[0] % (1000*1000*3600));
+}
+
+sub rawToHourlyT # (@opts)
+{
+	my $opts = {};
+	Triceps::Opt::parse("traffic main", $opts, {
+		@Triceps::Triead::opts,
+		from => [ undef, \&Triceps::Opt::ck_mandatory ],
+	}, @_);
+	my $owner = $opts->{owner};
+	my $unit = $owner->unit();
+
+	# The current hour stamp that keeps being updated;
+	# any aggregated data will be propagated when it is in the
+	# current hour (to avoid the propagation of the aggregator clearing).
+	my $currentHour;
+
+	my $faIn = $owner->importNexus(
+		from => $opts->{from},
+		as => "input",
+		import => "reader",
+	);
+
+	# the full stats for the recent time
+	my $ttPackets = Triceps::TableType->new($faIn->getLabel("packet")->getRowType())
+		->addSubIndex("byHour", 
+			Triceps::IndexType->newPerlSorted("byHour", undef, sub {
+				return &hourStamp($_[0]->get("time")) <=> &hourStamp($_[1]->get("time"));
+			})
+			->addSubIndex("byIP", 
+				Triceps::IndexType->newHashed(key => [ "local_ip", "remote_ip" ])
+				->addSubIndex("group",
+					Triceps::IndexType->newFifo()
+				)
+			)
+		)
+	;
+
+	# type for a periodic summary, used for hourly, daily etc. updates
+	my $rtSummary;
+
+	Triceps::SimpleAggregator::make(
+		tabType => $ttPackets,
+		name => "hourly",
+		idxPath => [ "byHour", "byIP", "group" ],
+		result => [
+			# time period's (here hour's) start timestamp, microseconds
+			time => "int64", "last", sub {&hourStamp($_[0]->get("time"));},
+			local_ip => "string", "last", sub {$_[0]->get("local_ip");},
+			remote_ip => "string", "last", sub {$_[0]->get("remote_ip");},
+			# bytes sent in a time period, here an hour
+			bytes => "int64", "sum", sub {$_[0]->get("bytes");},
+		],
+		saveRowTypeTo => \$rtSummary,
+	);
+
+	$ttPackets->initialize();
+	my $tPackets = $unit->makeTable($ttPackets, "tPackets");
+
+	# Filter the aggregator output to match the current hour.
+	my $lbHourlyFiltered = $unit->makeDummyLabel($rtSummary, "hourlyFiltered");
+	$tPackets->getAggregatorLabel("hourly")->makeChained("hourlyFilter", undef, sub {
+		if ($_[1]->getRow()->get("time") == $currentHour) {
+			$unit->call($lbHourlyFiltered->adopt($_[1]));
+		}
+	});
+
+	# update the notion of the current hour before the table
+	$faIn->getLabel("packet")->makeChained("processPackets", undef, sub {
+		my $row = $_[1]->getRow();
+		$currentHour = &hourStamp($row->get("time"));
+		# skip the timestamp updates without data
+		if (defined $row->get("bytes")) {
+			$unit->call($tPackets->getInputLabel()->adopt($_[1]));
+		}
+	});
+
+	# The makeNexus default option chainFront => 1 will make
+	# sure that the pass-through data propagates first, before the
+	# processed data.
+	my $faOut = $owner->makeNexus(
+		name => "data",
+		labels => [
+			$faIn->getFnReturn()->getLabelHash(),
+			hourly => $lbHourlyFiltered,
+		],
+		import => "writer",
+	);
+
+	my $lbPrint = $faOut->getLabel("print");
+
+	# the dump request processing
+	$tPackets->getDumpLabel()->makeChained("printDump", undef, sub {
+		$unit->makeArrayCall($lbPrint, "OP_INSERT", $_[1]->getRow()->printP() . "\n");
+	});
+	$faIn->getLabel("dumprq")->makeChained("dump", undef, sub {
+		if ($_[1]->getRow()->get("what") eq "packets") {
+			$tPackets->dumpAll();
+		}
+	});
+
+	$owner->readyReady();
+	$owner->mainLoop(); # all driven by the reader
+}
+</pre>
+
+		<para>
+		This function inherits the options from <pre>Triead::start()</pre> as usual and
+		adds the option <quote>from</quote> of its own. This option's value is then used as
+		the name of nexus to import for reading. The row types of the labels
+		from that imported facet are then used to create the table and
+		aggregation.
+		</para>
+
+		<para>
+		The table and aggregation themselves are the same as in
+		<xref linkend="sc_time_periodic" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;,
+		so I won't go into much detail describing them.  The only big change is
+		the use of SimpleAggergator instead of a manually-built one.  The
+		filter logic allows to delete the old raw data without propagation of
+		the aggregation changes caused by it.
+		</para>
+
+		<para>
+		Then the output nexus is created. The creation passes through all the
+		incoming data, short-circuiting the input and output, and adds the
+		extra label for the aggregated output. The call
+		<pre>$faIn->getFnReturn()->getLabelHash()</pre> pulls all the labels
+		and their names from the input facet, convenient for passing the
+		data directly through to the output.  Just like an FnReturn,
+		the Facet construction with <pre>makeNexus()</pre> has the option
+		<quote>chainFront</quote> set to 1 by default, and thus when it chains
+		the labels from the pass-through ones, they are chained on the front.
+		This works very nicely: this way the input data passes through first
+		and only then the input goes to the computational labels and produces
+		the results that follow it into the output facet.
+		</para>
+
+		<para>
+		The table dump is implemented after the output facet is defined because
+		it needs the print label from that facet to send the results to.
+		That print label ends up with two sources of datra for it. One is
+		the eponymous label from the input facet, that passes the print
+		requests from the previous stage of the pipeline. Another one is the
+		table dump logic from this thread. Both are fine and can be mixed
+		together.
+		</para>
+
+		<para>
+		And after that it's all usual <pre>readyReady()</pre> and <pre>mainLoop()</pre>.
+		</para>
+
+		<para>
+		The <pre>hourlyToDailyT()</pre> is very similar, so I won't even show it here, you can
+		find the full text in the sources.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_mt_objects">
+		<title>Object passing between threads</title>
+
+		<indexterm>
+			<primary>multithreading</primary>
+		</indexterm>
+		<indexterm>
+			<primary>XS</primary>
+		</indexterm>
+		<para>
+		A limitation of the Perl threads is that no variables can be shared
+		between them. Well, there are the special shared variables but
+		they're are very special and have great many limitations on their own.
+		When a new thread gets created, it gets a copy of all the
+		variables of the parent. That is, of all the plain Perl variables. With
+		the XS extensions your luck may vary: the variables might get copied,
+		might become undefined, or just become broken (if the XS module is not
+		threads-aware). Copying the XS variables requires a quite high overhead
+		at all the other times, so Triceps doesn't do it and all the Triceps
+		object become undefined in the new thread.
+		</para>
+
+		<para>
+		This model of behavior for a package is marked by creating the
+		method <pre>CLONE_SKIP</pre> in it:
+		</para>
+
+<pre>
+sub CLONE_SKIP { 1; }
+</pre>
+
+		<para>
+		All the Triceps packages define it, and it's the best practice to
+		define it in your packages as well.
+		</para>
+
+		<para>
+		However the threads are useless without communication, and
+		Triceps provides a way to pass around certain objects through the
+		Nexuses.
+		</para>
+
+		<indexterm>
+			<primary>Nexus</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Facet</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Rowop</primary>
+		</indexterm>
+		<para>
+		First, obviously, the Nexuses are intended to pass through the Rowops.
+		These Rowops coming out of a nexus are not the same Rowop objects that
+		went in. Rowop is a single-threaded object and can not be shared by two
+		threads. Instead it gets converted to an internal form while in the
+		nexus, and gets re-created when it comes out, pointing to the same Row object and to the
+		correct Label in the local Facet.
+		</para>
+
+		<para>
+		Then, again obviously, the Facets get imported to the other threads
+		as an interface of the Nexus, together with their row types.
+		</para>
+
+		<indexterm>
+			<primary>RowType</primary>
+		</indexterm>
+		<indexterm>
+			<primary>TableType</primary>
+		</indexterm>
+		<para>
+		And two more types of objects can be exported through a Nexus: the
+		RowTypes and TableTypes. They get exported through the options as in
+		this example:
+		</para>
+
+<pre>
+$fa = $owner->makeNexus(
+    name => "nx1",
+    labels => [
+        one => $rt1,
+        two => $lb,
+    ], 
+    rowTypes => [
+        one => $rt2,
+        two => $rt1,
+    ], 
+    tableTypes => [
+        one => $tt1,
+        two => $tt2,
+    ], 
+    import => "writer",
+); 
+</pre>
+
+		<para>
+		As you can see, the namespaces for the labels, row types and table
+		types are completely independent, and the same names can be reused in
+		each of them for different meaning. All the three sections are
+		optional, so if you want, you can export only the types in the nexus,
+		without any labels.
+		</para>
+
+		<para>
+		They can then be extracted from the imported facet as:
+		</para>
+
+<pre>
+$rt1 = $fa->impRowType("one");
+$tt1 = $fa->impTableType("one");
+</pre>
+
+		<para>
+		Or the whole set of name-value pairs can be obtained with:
+		</para>
+
+<pre>
+@rtset = $fa->impRowTypesHash();
+@ttset = $fa->impTableTypesHash();
+</pre>
+
+		<para>
+		The exact table types and row types (by themselves or in the table
+		types or labels) in the importing thread will be copied. It's
+		technically possible to share the references to the same row type
+		from multiple threads in
+		the &Cpp; code but it's more efficient to make a separate copy for each
+		thread, and thus the Perl API goes along the more efficient way.
+		</para>
+
+		<para>
+		The import is smart in the sense that it preserves the sameness of the
+		row types: if in the exporting thread the same row type was referred
+		from multiple places in the <pre>labels</pre>, <pre>rowTypes</pre> and <pre>tableTypes</pre> sections,
+		in the imported facet that would again be the same row type object (even
+		though of course not the one that has been exported but its copy). This
+		again helps with the efficiency when various objects decide if the rows
+		created by this and that type are matching.
+		</para>
+
+		<indexterm>
+			<primary>TableType</primary>
+		</indexterm>
+		<para>
+		This is all well until you want to export a table type that has an
+		index with a Perl sort condition in it, or an aggregator with the Perl
+		code. The Perl code objects are tricky: they get copied OK when a new
+		thread is created but the attempts to import them through a nexus later
+		cause a terrible memory corruption. So Triceps doesn't allow to export
+		the table types with the function references in them. 
+		But it provides an
+		alternative solution: the code snippets can be specified as the source
+		code, as described in
+		<xref linkend="sc_code" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;. 
+		They get compiled when the table type gets initialized. When a
+		table type gets imported through a nexus, it brings the source code
+		with it. The imported table types are always uninitialized, so at
+		initialization time the source code gets compiled in the new thread and
+		works.
+		</para>
+
+		<para>
+		It all works transparently: just specify a string instead of a function
+		reference when creating the index, and it will be recognized and
+		processed. For example:
+		</para>
+
+<pre>
+$it= Triceps::IndexType->newPerlSorted("b_c", undef, '
+    my $res = ($_[0]->get("b") <=> $_[1]->get("b")
+        || $_[0]->get("c") <=> $_[1]->get("c"));
+    return $res;
+    '
+);
+</pre>
+
+		<para>
+		Before the code gets compiled, it gets wrapped into a <pre>sub { ... }</pre>, so
+		don't write your own <pre>sub</pre> in the code string, that would be an error.
+		</para>
+
+		<para>
+		To recap the differences between the code references and the
+		source code snippets format:
+		</para>
+
+		<para>
+		When you compile a function, it carries with it the lexical context. So
+		you can make the closures that refer to the <quote>my</quote> variables in their
+		lexical scope. With the source code you can't do this. The table type
+		compiles them at initialization time in the context of the main
+		package, and that's all they can see. Remember also that the global
+		variables are not shared between the threads, so if you refer to a
+		global variable in the code snippet and rely on a value in that
+		variable, it won't be present in the other threads (unless the other
+		threads are direct descendants and the value was set before their
+		creation).
+		</para>
+
+		<para>
+		There is also the issue of arguments that can be specified for these
+		functions. Triceps is smart enough to handle the arguments that are
+		one of:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+			<pre>undef</pre>
+			</listitem>
+			<listitem>
+			integer
+			</listitem>
+			<listitem>
+			floating-point
+			</listitem>
+			<listitem>
+			string
+			</listitem>
+			<listitem>
+			Triceps::RowType object
+			</listitem>
+			<listitem>
+			Triceps::Row object
+			</listitem>
+			<listitem>
+			reference to an array or hash thereof
+			</listitem>
+		</itemizedlist>
+
+		<para>
+		It converts the data to an internal &Cpp; representation in the nexus and
+		then converts it back on import. So, if a TableType has all the code in
+		it in the source form, and the arguments for this code within the
+		limits of this format, it can be exported through the nexus. Otherwise
+		an attempt to export it will fail.
+		</para>
+
+		<indexterm>
+			<primary>SimpleOrderedIndex</primary>
+		</indexterm>
+		<indexterm>
+			<primary>aggregation</primary>
+		</indexterm>
+		<para>
+		The SimpleOrderedIndex uses the source code format for the
+		functions it generates, so they will pass through the nexuses.
+		And if you specify the aggregator functions as code snippets, you
+		can export the table types with them through the nexuses too.
+		</para>
+
+		<indexterm>
+			<primary>SimpleAggregator</primary>
+		</indexterm>
+		<para>
+		However things didn't work out so well for the SimpleAggregator.
+		I've found that I can't just do it within the current aggregation
+		infrastructure. As mentioned in
+		<xref linkend="sc_aggregation_optimized" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;,
+		the aggregators don't have the same kind of initialization function
+		as indexes (one that would run at the table type initialization
+		time), and that becomes the deal-breaker. 
+		</para>
+
+		<para>
+		Fortunately, some thinking had showed that this feature is not really
+		needed. There usually just isn't any need to export a table type with
+		aggregators. 
+		So it's a nice feature to have overall but not urgent.
+		Moreover, there is a need to export the table types with
+		many elements stripped. 
+		</para>
+
+		<para>
+		What is to be stripped and why?
+		The most central part of the table type is its primary index. It
+		defines how the data gets organized. And then the secondary indexes and
+		aggregators perform the computations from the data in the table. The
+		tables can not be shared between threads, and thus the way to copy a
+		table between the threads is to export the table type and send the
+		data, then let the other thread construct a copy of the table from that.
+		But the table created in another thread really needs only the base data
+		organization. If it does any computations on that data, that would be
+		its own computations, different than the ones in the exporting thread.
+		So all it needs to get is the basic table type with the primary index,
+		very rarely some secondary indexes, and pretty much never the
+		aggregators. The importing thread would then add its own secondary
+		indexes and aggregators before initializing its table type and
+		constructing the table from it.
+		</para>
+
+		<para>
+		The way to get such a stripped table type with only the fundamentally
+		important parts is:
+		</para>
+
+<pre>
+$tabtype_fundamental = $tabtype->copyFundamental();
+</pre>
+
+		<para>
+		That copies the row type and the primary index (the whole path to the
+		first leaf index type) and leaves alone the rest. All the aggregators
+		on all the indexes, even on the primary one, are not included in the
+		copy. In the context of the full nexus, making it can look like:
+		</para>
+
+<pre>
+$facet = $owner->makeNexus(
+    name => "data"
+    labels => [ @labels ],
+    tableTypes => [
+         mytable => $mytable->getType()->copyFundamental(),
+    ],
+    import => "writer",
+);
+</pre>
+
+		<para>
+		In case if more index types need to be included, they can be specified
+		by path in the arguments of <pre>copyFundamental()</pre>:
+		</para>
+
+<pre>
+$tabtype_fundamental = $tabtype->copyFundamental(
+    [ "byDate", "byAddress", "fifo" ],
+    [ "byDate", "byPriority", "fifo" ],
+);
+</pre>
+
+		<para>
+		The paths may overlap, as shown here, and the matching subtrees will be
+		copied correctly, still properly overlapping in the result. There is
+		also a special syntax:
+		</para>
+
+<pre>
+$tabtype_fundamental = $tabtype->copyFundamental(
+    [ "secondary", "+" ],
+);
+</pre>
+
+		<para>
+		The <pre>"+"</pre> in the path means <quote>do the path to the first leaf index of that
+		subtree</quote> and saves the necessity to write out the whole path.
+		</para>
+
+		<para>
+		Finally, what if you don't want to include the original primary index
+		at all? You can use the string <pre>"NO_FIRST_LEAF"</pre> as the first argument.
+		That would skip it. You can still include it by using its explicit
+		path, possibly at the other position.
+		</para>
+
+		<para>
+		For example, suppose that you have a table type with two top-level
+		indexes, <quote>first</quote> is the primary index and <quote>second</quote> as secondary, and
+		make a copy:
+		</para>
+
+<pre>
+$tabtype_fundamental = $tabtype->copyFundamental(
+     "NO_FIRST_LEAF",
+    [ "second", "+" ],
+    [ "first", "+" ],
+);
+</pre>
+
+		<para>
+		In the copied table type the index <quote>second</quote> becomes primary and <quote>first</quote>
+		secondary.
+		</para>
+
+		<para>
+		Another example of the table type exporting and of the table copying is
+		shown in 
+		<xref linkend="sc_tql_join_internals" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_mt_files">
+		<title>Threads and file descriptors</title>
+
+		<indexterm>
+			<primary>multithreading</primary>
+		</indexterm>
+		<indexterm>
+			<primary>socket</primary>
+		</indexterm>
+		<indexterm>
+			<primary>file</primary>
+		</indexterm>
+		<para>
+		The interaction of the file descriptors (including sockets) with threads
+		tends to be a somewhat thorny issue. The problems lie around the problem
+		of geting a thread to  stop if it's stuck reading from a file descriptor.
+		Triceps aims to be an one-stop shop for the threading solutions, so
+		among other things it covers the interaction with the file descriptors.
+		</para>
+
+		<indexterm>
+			<primary>revocation</primary>
+		</indexterm>
+		<para>
+		The overall approach is that whenever a thread opens a file, it should register
+		that file with its TrieadOwner object. Then when the thread is requested
+		to die, that file will be revoked, waking up the thread if it's waiting
+		for that file descriptor. This is an operation that requires finesse,
+		with multiple possibilities for the race conditions, but Triceps
+		covers all the complexity and takes care of everything.
+		</para>
+
+		<para>
+		The registration of files with TrieadOwner is done with:
+		</para>
+
+<pre>
+$to->track(*FILE);
+$to->track($socket);
+</pre>
+
+		<para>
+		The form of the argument differs depending on whether it's a plain
+		Perl file handle or if it's a file object, such as the one returned
+		by the socket creation methods. The plain perl file handles have to be specified
+		in a glob form, with <pre>*</pre>.
+		</para>
+
+		<para>
+		To unregister the file and close it, use:
+		</para>
+
+<pre>
+$to->close(*FILE);
+$to->close($socket);
+</pre>
+
+		<para>
+		If you just want to unregister a file without closing it (not sure
+		why would you want to do that, but why not), there is also a way:
+		</para>
+
+<pre>
+$to->forget(*FILE);
+$to->forget($socket);
+</pre>
+
+		<para>
+		And there also are the methods that do the registration with the
+		plain file descriptors:
+		</para>
+
+<pre>
+$to->trackFd($fd);
+$to->forgetFd($fd);
+</pre>
+
+		<para>
+		The file descriptor methods underlie the file handle methods,
+		a <pre>$to->trackFd(fileno(FILE));</pre> is really an equivalent
+		of <pre>$to->track(*FILE);</pre>.
+		</para>
+
+		<para>
+		But wait, there is more. It's annoying to close the files manually,
+		and easy to miss too (especially if the code might die within an
+		<pre>eval</pre>, with the file close sandwiched between them). 
+		The scope-based file closing is much easier and more reliable: when
+		you leave the scope, the file is guaranteed to get closed.
+		Triceps provides the scope-based file handle management.
+		Actuallly, if you use files-as-objects in Perl (in the form like
+		<pre>$socket</pre>), Perl already does the scope-based management,
+		closing the file when the last reference to it disappears.
+		But Triceps adds the automatic forgetting of the file in the
+		TrieadOwner as well.  And it's very, very important to unregister
+		the file descriptors before closing them, or the file descriptor
+		corruption will result when the thread exits.
+		A scope-based file is registered like this:
+		</para>
+
+<pre>
+$tf = $to->makeTrackedFile($file);
+</pre>
+
+		<indexterm>
+			<primary>TrackedFile</primary>
+		</indexterm>
+		<para>
+		<pre>$tf</pre> will contain a TrackedFile object that will control
+		the life of the file tracking. <pre>$tf</pre> contains its own reference
+		to the file handle, so until <pre>$tf</pre> is destroyed, the file
+		handle will not be destroyed and thus will not be automatically closed.
+		When <pre>$tf</pre> goes out of scope and gets
+		destroyed, it will unregister the file from TrieadOwner and then
+		discard its reference to the file handle, letting Perl close it if all
+		the references are gone. 
+		To find the file handle from the TrackedFile, use:
+		</para>
+
+<pre>
+$file = $tf->get();
+</pre>
+
+		<para>
+		It's also possible to close the file explicitly before <pre>$tf</pre> goes
+		out of scope:
+		</para>
+
+<pre>
+$tf->close();
+</pre>
+
+		<para>
+		That will unregister the file and close it. And in this case close really
+		means close: even if there are other references to the file handle, it will
+		still get closed and could not be used through these other references any more
+		either. After that, the final destruction of the TrackedFile object will have
+		nothing to do.
+		</para>
+
+		<indexterm>
+			<primary>FileInterrupt</primary>
+		</indexterm>
+		<para>
+		In the &Cpp; API the file registration happens a bit differently, through a
+		FileInterrupt object that keeps track of a set of file descriptors. Each
+		trieadOwner object has a public field <pre>fileInterrupt_</pre> of that
+		class. There is no scoped unregistration in the &Cpp; API yet, it should
+		probably be added in the future. The Perl API actually also uses the
+		FileInterrupt but with the high-level logic on top of it.
+		</para>
+
+		<indexterm>
+			<primary>dup2</primary>
+		</indexterm>
+		<indexterm>
+			<primary>SIGUSR2</primary>
+		</indexterm>
+		<para>
+		In case if you wonder what exactly happens with the file handle during the
+		revocation, let me tell you. Overall it follows the approach described
+		in my book <biblioref linkend="Babkin10"/>,
+		with the system call <pre>dup2()</pre> copying a
+		descriptor of <pre>/dev/null</pre> opened read-only over the target file descriptor.
+		Perl's file handle keeps owning that file descriptor id but now
+		with a different contents in it. However there is a problem with
+		the plain <pre>dup2()</pre>, it doesn't always interrupt the ongoing system call.  
+		I've thought that on Linux it
+		works reliably but then I've found that it works on the sockets but not
+		on the pipes, and even with sockets the <pre>accept()</pre> seems to ignore it.
+		So I've found a better solution: use a <pre>dup2()</pre> but then also
+		send a signal (Triceps uses <pre>SIGUSR2</pre>) to the target thread, which
+		has a dummy handler of that signal to avoid killing the process.
+		Even if <pre>dup2()</pre> gets ignored by the
+		current system call, the signal will get through and either make the ongoing system call return
+		<pre>EINTR</pre> to make the user code retry or cause a system call restart in the
+		OS. In either case the new file descriptor copied by <pre>dup2()</pre> will be
+		discovered on the next attempt and cause the desired interruption. And
+		unlike the signal used by itself, <pre>dup2()</pre> closes the race window around
+		the signal.
+		</para>
+
+		<para>
+		By the way, the Perl's <pre>threads::kill()</pre> doesn't send a real signal, it
+		just sets a flag for the interpreter. If you try it on your own, it
+		won't interrupt the system calls, and now you know why. Instead Triceps
+		gets the POSIX thread identity from the Perl thread and calls the
+		honest <pre>ptherad_kill()</pre> from the &Cpp; code.
+		</para>
+
+		<para>
+		And another detour into the gritty details, what if the thread gets
+		requested to die after the socket is opened but before it is tracked? 
+		The answer is that the tracking enrollment will check whether
+		the death request already happened, and if so, it will revoke the socket
+		right away, before returning. So the reading loop will find the socket
+		revoked right on its first iteration. It's one of these potential
+		race conditions that Triceps prevents.
+		</para>
+
+		<para>
+		Now returning back to the high-level Perl API.
+		As it turns out, Perl doesn't allow to pass the file descriptors between the
+		threads. Well, you sort of can pass them as arguments to another thread
+		but then it ends up printing the error messages like these and
+		corrupting the reference counts:
+		</para>
+
+<pre>
+Unbalanced string table refcount: (1) for "GEN1" during global destruction.
+Unbalanced string table refcount: (1) for "/usr/lib/perl5/5.10.0/Symbol.pm" during global destruction.
+Scalars leaked: 1
+</pre>
+
+		<indexterm>
+			<primary>socket</primary>
+		</indexterm>
+		<para>
+		If you try to pass a file descriptor through trheads::shared, it
+		honestly won't allow you, while the thread arguments pretend that they
+		can and then fail.
+		</para>
+
+		<para>
+		And it's something that is really needed, for more than one reason.
+		If you write a TCP server, you typically have one thread accepting
+		connections and then creating a new thread to handle each accepted
+		socket. And the typical way to avoid polling on a socket is to have
+		two threads handle it, one doing all the reading, another one
+		doing all the writing. None of that works with Perl out of the box.
+		Triceps comes to the rescue again, it gets done as follows:
+		</para>
+
+<pre>
+# in one thread
+$to->app()->storeCloseFile($name, $socket);
+
+#----------
+
+# in another thread
+my ($tf, $socket) = $to->trackGetFile($name, 'r+');
+</pre>
+
+		<para>
+		The first thing that needs to be clarified here is that even though
+		the variables <pre>$to</pre> are named the same in both threads, they
+		contain different TrieadOwner objects, each one belonging to its own thread.
+		<pre>storeCloseFile()</pre> stores a copy of the socket in the App object and
+		then closes it in the local thread (the copy stays open). <pre>trackGetFile()</pre> pulls the
+		socket out of the App, registers it with the TrieadOwner and creates
+		a TrackedFile scoped object for it, returning both the TrackedFile and
+		the socket handle object. 
+		</para>
+
+		<para>
+		You can actually get the filehandle directly from the
+		TrackedFile, as <pre>$tf->get()</pre>, so why return the socket separately? As
+		it turns out, Perl has issues with handling the Perl values stored
+		inside the XS objects if they aren't referred by any Perl variables.
+		Returning the file handle as a separate value prevents that.
+		</para>
+
+		<para>
+		The file opening mode still has to be specified
+		as a <pre>trackGetFile()</pre> argument because it can't be easily
+		pulled out of the original file handle, and also because the other
+		thread might want to use only a subset of the modes from the original.
+		The mode can be specified in either of the fashions: 
+		as <pre>r/w/a/r+/w+/a+</pre> or <pre></>/>>/+</+>/+>></pre>.
+		</para>
+
+		<para>
+		The <pre>$name</pre> is a unique name by which
+		this socket is known in the App, it has to be generated in some way
+		to guarantee the uniqueness. But then the name is a plain string that
+		can be passed between the threads, either as an argument at the thread
+		creation time or in a Triceps Rowop going through a nexus.
+		The whole procedure is easy, straightforward, and difficult to get wrong.
+		</para>
+
+		<para>
+		Let's look at more variations of the same. What if you want to pass
+		a file handle to more than one thread? It's a typical case when a TCP
+		server accepts a connection and wants to start the separate reader
+		and writer threads on that socket.  One way is to simply pass it twice,
+		with different names. For example:
+		</para>
+
+<pre>
+# in the acceptor thread
+$to->app()->storeFile('name_r', $socket);
+$to->app()->storeCloseFile('name_w', $socket);
+
+#----------
+
+# in the reader thread
+my ($tf, $socket) = $to->trackGetFile('name_r', 'r');
+
+#----------
+
+# in the writer thread
+my ($tf, $socket) = $to->trackGetFile('name_w', 'w');
+</pre>
+
+		<para>
+		The <pre>storeFile()</pre> in the acceptor stores a copy of the file
+		descriptor but doesn't close the original. Which then gets closed after
+		storing the second copy. Then two threads extract each its own copy.
+		In this example each thread adds its own permission limitation on the
+		extracted file handle, one reading, another one writing, even though the
+		underlying socket is capable of both reading and writing.
+		</para>
+
+		<para>
+		Another way is possible if the threads are started sequentially, such as
+		if the acceptor thread starts the reader thread, which in turn starts the
+		writer thread. Then the reader thread can load the file handle without
+		forgetting it in the App before starting the writer thread, and then
+		the writer thread would get it and discard from the App:
+		</para>
+
+<pre>
+# in the acceptor thread
+$to->app()->storeCloseFile('name', $socket);
+// ... start the reader thread
+
+#----------
+
+# in the reader thread
+my ($tf, $socket) = $to->trackDupFile('name', 'r');
+// ... start the writer thread
+
+#----------
+
+# in the writer thread
+my ($tf, $socket) = $to->trackGetFile('name', 'w');
+</pre>
+
+		<para>
+		Yet another way is to store the file once and load into
+		each thread without forgetting, but then have the storing thread close
+		the copy stored in the App
+		after all the loading threads have completed the initialization.
+		For example:
+		</para>
+
+<pre>
+# in the acceptor thread
+$to->app()->storeCloseFile('name', $socket);
+// ... start the reader thread
+// ... start the writer thread
+
+$to->readyReady(); // wait for all threads to initialize
+$to->app()->closeFd('name');
+
+#----------
+
+# in the reader thread
+my ($tf, $socket) = $to->trackDupFile('name', 'r');
+$to->readyReady();
+
+#----------
+
+# in the writer thread
+my ($tf, $socket) = $to->trackDupFile('name', 'w');
+$to->readyReady();
+</pre>
+
+		<para>
+		In the acceptor thread, <pre>readyReady()</pre> doesn't mark
+		the acceptor thread as ready, because it already is, but simply waits
+		for all other threads to become ready. And the reader and writer threads
+		report that they are ready only after they have copied the file handle
+		out of the App. This approach is used, for example, in Triceps::X::ThreadedClient.
+		It would not be so great in a server because generally we want the
+		server to accept the connections as fast as possible, without waiting
+		for each connection's threads to initialize. But it's fine for a client.
+		</para>
+
+		<para>
+		The App's copy of the file is closed by <pre>closeFd()</pre>. 
+		It's an Fd and not a File because the App really stores the OS file
+		descriptors, not the Perl file handles, and the File handling is
+		done as wrappers on top of it. If you really want, you can deal with the
+		raw file descriptors in the App, with the methods described in
+		<xref linkend="sc_ref_app" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;
+		and
+		<xref linkend="sc_cpp_triead_owner" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		But dealing directly with the Perl file handles is much more convenient.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_mt_dynamic_server">
+		<title>Dynamic threads and fragments in a socket server</title>
+
+		<indexterm>
+			<primary>multithreading</primary>
+		</indexterm>
+		<indexterm>
+			<primary>socket</primary>
+		</indexterm>
+		<para>
+		The threads can be used to run a TCP server that
+		accepts the connections and then starts the new client communication
+		thread(s) for each connection.  This thread can then communicate with
+		the rest of the model, feeding and receiving data, as usual, through
+		the nexuses.
+		</para>
+
+		<para>
+		The challenge here is that there must be a way to create the threads
+		dynamically, and later when the client closes connection, to dispose of
+		them. There are two possible general approaches:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+			Dynamically create and delete the threads in the same App;
+			</listitem>
+
+			<listitem>
+			Create a new App per connection and connect it to the main App.
+			</listitem>
+		</itemizedlist>
+
+		<para>
+		Both have their own advantages and difficulties, but the approach with
+		the dynamic creation and deletion of threads ended up looking easier,
+		and that's what Triceps has. The second approach is not particularly
+		well supported yet. You can create multiple Apps in one program, and
+		you can connect them by making two Triceps Trieads run in the same OS
+		thread and ferry the data around. But it's extremely cumbersome. This
+		will be improved in the future, but for now the first approach is the
+		ticket.
+		</para>
+
+		<indexterm>
+			<primary>fragment</primary>
+		</indexterm>
+		<para>
+		The dynamically created threads are grouped into the fragments. This is
+		done by specifying the fragment name option when creating a thread. The
+		threads in a fragment have a few special properties.
+		</para>
+
+		<para>
+		One, it's possible to shut down (i.e. request to die) the whole fragment in one fell swoop.
+		There is no user-accessible way to shut down the individual threads,
+		you can shut down either the whole App or a fragment. Shutting down
+		individual threads is dangerous, since it can mess up the application
+		in many non-obvious ways. But shutting down a fragment is OK, since the
+		fragment serves a single logical function, such as servicing one TCP
+		connection, and it's OK to shut down the whole logical function.
+		</para>
+
+		<para>
+		Two, when a thread in the fragment exits, it's really gone, and takes
+		all its nexuses with it. Well, technically, the nexuses continue to
+		exist and work as long as there are threads connected to them, but no new
+		connections can be created after this point. Since usually the whole
+		fragment will be gone together, and since the nexuses defined by the
+		fragment's thread are normally used only by the other threads of the
+		same fragment, a fragment shutdown cleans up its state like the
+		fragment had never existed. By contrast, when a normal thread exists,
+		the nexuses defined by it stay present and accessible until the App
+		shuts down.
+		</para>
+
+		<indexterm>
+			<primary>chat server</primary>
+		</indexterm>
+		<para>
+		To show how all this stuff works, I've created an example of a <quote>chat
+		server</quote>. It's not really a human-oriented chat, it's more of a
+		machine-oriented publish-subscribe, and specially tilted to work
+		through the running of a socket server with threads.
+		</para>
+
+		<para>
+		In this case the core logic is absolutely empty. All there is of it, is
+		a nexus that passes messages through. The clients read from this
+		nexus to get the messages, and write to this nexus to send the
+		messages.
+		</para>
+
+		<para>
+		When the App starts, it has only one thread, the listener thread that
+		listens on a socket for the incoming connections. The listener doesn't
+		even care about the common nexus and doesn't import it. When a
+		connection comes in, the listener creates two threads to serve it: the
+		reader reads the socket and sends to the nexus, and the writer receives
+		from the nexus and writes to the socket. These two threads constitute a
+		fragment for this client. They also create their own private nexus,
+		allowing the reader to send control messages to the writer. That could
+		also have been done through the central common nexus, but I wanted to
+		show that there are different ways of doing things.
+		</para>
+
+		<para>
+		With a couple of clients connected, threads and sockets start looking
+		as shown in
+		<xref linkend="fig_mt_chat" xrefstyle="select: label nopage"/>&xrsp;.
+		And the listener thread still stays on the side.
+		</para>
+
+
+		<figure id="fig_mt_chat" >
+			<title>Chat server internal structure.</title>
+			<xi:include href="file:///FIGS/thread-020-chat.xml"/> 
+		</figure>
+
+		<para>
+		Now let's look at the code, located in <pre>t/xChatMt.t</pre>.
+		Let's start with the top-level: how the server gets started. It's
+		really the last part of the code, that brings everything together.
+		</para>
+
+		<para>
+		It uses the ThreadedServer infrastructure:
+		</para>
+
+<!-- t/xChatMt.t -->
+<pre>
+use Triceps::X::ThreadedServer qw(printOrShut);
+</pre>
+
+		<indexterm>
+			<primary>ThreadedServer</primary>
+		</indexterm>
+		<para>
+		The X subdirectory is for the examples and experimental stuff, but the
+		ThreadedServer is really of production quality, I just haven't written
+		a whole set of tests for it yet.
+		</para>
+
+		<para>
+		The server gets started like this:
+		</para>
+
+<!-- t/xChatMt.t, shifted -->
+<pre>
+my ($port, $pid) = Triceps::X::ThreadedServer::startServer(
+		app => "chat",
+		main => \&listenerT,
+		port => 0,
+		fork => 1,
+);
+</pre>
+
+		<para>
+		The port option of 0 means <quote>pick any free port</quote>, it will be returned as
+		the result.  If you know the fixed port number in advance, use it.
+		<quote>chat</quote> will be the name of the App, and <pre>listenerT</pre> is the main function
+		of the thread that will listen for the incoming connections and start
+		the other threads. And it's also the first thread that gets started, so
+		it's responsible for creating the core part of the App as well (though
+		in this case there is not a whole lot of it).
+		</para>
+
+		<para>
+		The option <quote>fork</quote> determines how and whether the server gets started in
+		the background. The value 1 means that a new process will be forked,
+		and then the threads will be created there. The returned PID can be
+		used to wait for that process to complete:
+		</para>
+
+<pre>
+waitpid($pid, 0);
+</pre>
+
+		<para>
+		Of course, if you're starting a daemon, you'd probably write this PID
+		to a file and then just exit the parent process.
+		</para>
+
+		<para>
+		The fork value of 0 starts the server in the current process, and the
+		current thread becomes the App's harvester thread (the one that
+		joins the other threads when the App shuts down).
+		</para>
+
+		<para>
+		In this case the server doesn't return until it's done, so there is not
+		much point in the returned port value, by that time the socket will be
+		already closed. In this case you really need to either use a fixed port
+		or write the port number to a file from your listener thread. The PID
+		also doesn't make sense, and it's returned as <pre>undef</pre>. Here is an example
+		of this kind of call:
+		</para>
+
+<!-- t/xChatMt.t, shifted -->
+<pre>
+my ($port, $pid) = Triceps::X::ThreadedServer::startServer(
+		app => "chat",
+		main => \&listenerT,
+		port => 12345,
+		fork => 0,
+);
+</pre>
+
+		<para>
+		Finally, the server can be started in the current process, with a new
+		thread created as the App's harvester thread, setting the <quote>fork</quote> option 
+		to -1. The
+		original thread can then continue and do other things in parallel. It's
+		the way I use for the unit tests.
+		</para>
+
+<!-- t/xChatMt.t, shifted -->
+<pre>
+my ($port, $thread) = Triceps::X::ThreadedServer::startServer(
+		app => "chat",
+		main => \&listenerT,
+		port => 0,
+		fork => -1,
+);
+</pre>
+
+		<para>
+		In this case the second value returned is not a PID but the Perl thread
+		object for the harvester thread. You should either detach it or
+		eventually join it:
+		</para>
+
+<pre>
+$thread->join();
+</pre>
+
+		<indexterm>
+			<primary>error handling</primary>
+			<secondary>multithreaded</secondary>
+		</indexterm>
+		<para>
+		Perl propagates the errors in the threads through the <pre>join()</pre>, so if the
+		harvester thread dies, that would show only in the <pre>join()</pre> call. And
+		since Triceps propagates the errors too, any other App's thread dying will
+		cause the harvester thread to die after it shuts down and joins all the App's threads. 
+		So if there are any errors in the application, it will die and you will know
+		it right away, and not left wondering why does the application appear to run but
+		not work right. Unless, of course, you wrap the whole thing in an <pre>eval</pre>,
+		then you get the error message and the clean state, and can try running another App.
+		</para>
+
+		<para>
+		The listener thread is:
+		</para>
+
+<pre>
+sub listenerT
+{
+	my $opts = {};
+	&Triceps::Opt::parse("listenerT", $opts, {@Triceps::Triead::opts,
+		socketName => [ undef, \&Triceps::Opt::ck_mandatory ],
+	}, @_);
+	undef @_;
+	my $owner = $opts->{owner};
+
+	my ($tsock, $sock) = $owner->trackGetFile($opts->{socketName}, "+<");
+
+	# a chat text message
+	my $rtMsg = Triceps::RowType->new(
+		topic => "string",
+		msg => "string",
+	);
+
+	# a control message between the reader and writer threads
+	my $rtCtl = Triceps::RowType->new(
+		cmd => "string", # the command to execute
+		arg => "string", # the command argument
+	);
+
+	$owner->makeNexus(
+		name => "chat",
+		labels => [
+			msg => $rtMsg,
+		],
+		rowTypes => [
+			ctl => $rtCtl,
+		],
+		import => "none",
+	);
+
+	$owner->readyReady();
+
+	Triceps::X::ThreadedServer::listen(
+		owner => $owner,
+		socket => $sock,
+		prefix => "cliconn",
+		handler => \&chatSockReadT,
+	);
+}
+</pre>
+
+		<para>
+		It gets the usual options of the thread start (and as usual you can
+		pass more options to the <pre>startServer()</pre> and they will make their way to
+		the listener thread. But there is also one more option added by
+		<pre>startServer()</pre>: <quote>socketName</quote>.
+		</para>
+
+		<para>
+		As described in
+		<xref linkend="sc_mt_files" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;,
+		since the the socket objects can't be passed directly between the
+		threads, a roundabout way is taken. After <pre>startServer()</pre> opens a socket,
+		it stores the dupped file descriptor in the App with a unique name and passes that name
+		through, so that it can be used to load the socket back
+		into the listener thread:
+		</para>
+
+<pre>
+my ($tsock, $sock) = $owner->trackGetFile($opts->{socketName}, "+<");
+</pre>
+
+
+		<para>
+		This does multiple things:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+			Loads the file descriptor from the App by name (with a <pre>dup()</pre>).
+			</listitem>
+
+			<listitem>
+			Opens a Perl socket object from that file descriptor.
+			</listitem>
+
+			<listitem>
+			Registers that file descriptor for tracking with the TrieadOwner,
+			so that if the thread needs to be shut down, that descriptor will
+			be revoked and any further operations with it will fail.
+			</listitem>
+
+			<listitem>
+			Creates a TrackedFile object that will automatically unregister the
+			file descriptor from TrieadOwner when the TrackedFile goes out of
+			scope. This is important to avoid that races between the revocation
+			and the normal close of the file.
+			</listitem>
+
+			<listitem>
+			Makes the App close and forget its file descriptor.
+			</listitem>
+		</itemizedlist>
+
+		<para>
+		The <pre>$tsock</pre> returned is a TrackedFile object, and <pre>$sock</pre> is the socket
+		filehandle.
+		</para>
+
+		<para>
+		The listener thread then creates the row types for the data messages
+		and for the control messages between the client's reader and writer
+		threads, and makes a nexus. The listener is not interested in the data,
+		so it doesn't even import this nexus itself. The nexus passes the data
+		only, so it has no label for the control messages, only the row type.
+		</para>
+
+		<para>
+		Then the mandatory <pre>readyReady()</pre>, and then the control goes again to the
+		library that accepts the connections and starts the client connection
+		threads. The handler is the main function for the thread that gets
+		started to handle the connection. The prefix is used to build the names
+		for the new thread, for its fragment, and for the connection socket
+		that gets also passed through by storing it in the App. The name is the
+		same for all three and gets created by concatenating the prefix with a
+		number that gets increased for every connection, to keep it unique. The newly created
+		thread will then get the option <quote>socketName</quote> with the name of the socket.
+		</para>
+
+		<para>
+		How does the <pre>ThreadedServer::listen()</pre> know when to return? It runs until the
+		App gets shut down, and returns only when the thread is requested to
+		die as a result of the shutdown. 
+		</para>
+
+		<para>
+		As described before, each socket gets served by two threads: one runs
+		reading from the socket and forwards the data into the model and
+		another one runs getting data from the model and forwards it into the
+		socket. Since the same thread can't wait for both a socket descriptor
+		and a thread synchronization primitive, they have to be separate.
+		</para>
+
+		<para>
+		The first thread started for a connection by the listener is the socket
+		reader. Let's go through it bit by bit.
+		</para>
+
+<!-- t/xChatMt.t, chatSockReadT -->
+<pre>
+sub chatSockReadT
+{
+	my $opts = {};
+	&Triceps::Opt::parse("chatSockReadT", $opts, {@Triceps::Triead::opts,
+		socketName => [ undef, \&Triceps::Opt::ck_mandatory ],
+	}, @_);
+	undef @_; # avoids a leak in threads module
+	my $owner = $opts->{owner};
+	my $app = $owner->app();
+	my $unit = $owner->unit();
+	my $tname = $opts->{thread};
+
+	# only dup the socket, the writer thread will consume it
+	my ($tsock, $sock) = $owner->trackDupFile($opts->{socketName}, "<");
+</pre>
+
+		<para>
+		The beginning is quite usual. Then it loads the socket from the App and
+		gets it tracked with the TrieadOwner. The listener passes the name
+		under which it stored the socket in the App as the option
+		<quote>socketName</quote>.
+		<pre>trackDupSocket()</pre> leaves the socket instance in the App, to be found by the
+		writer-side thread.
+		</para>
+
+		<para>
+		The socket is loaded in this thread as read-only. The writing to the
+		socket from all the threads has to be synchronized to avoid mixing the
+		half-messages. And the easiest way to synchronize is to always write
+		from one thread; if the other thread wants to write something, it
+		has to pass the data to the writer thread through the control nexus.
+		</para>
+
+<!-- t/xChatMt.t, chatSockReadT -->
+<pre>
+	# user messages will be sent here
+	my $faChat = $owner->importNexus(
+		from => "global/chat",
+		import => "writer",
+	);
+
+	# control messages to the reader side will be sent here
+	my $faCtl = $owner->makeNexus(
+		name => "ctl",
+		labels => [
+			ctl => $faChat->impRowType("ctl"),
+		],
+		reverse => 1, # gives this nexus a high priority
+		import => "writer",
+	);
+</pre>
+
+		<para>
+		Imports the chat nexus and creates the private control nexus for
+		communication with the writer side. The name of the chat nexus is
+		hardcoded here, since it's pretty much a solid part of the application.
+		If this were a module, the name of the chat nexus could be passed
+		through the options.
+		</para>
+
+		<indexterm>
+			<primary>Nexus</primary>
+			<secondary>reverse</secondary>
+		</indexterm>
+		<para>
+		The control nexus is marked as reverse even though it really isn't. But
+		the reverse option has a side effect of making this nexus
+		high-priority. Even if the writer thread has a long queue of messages
+		from the chat nexus, the messages from the control nexus will be read
+		first. Which again isn't strictly necessary here, but I wanted to show
+		how it's done.
+		</para>
+
+		<para>
+		The type of the control label is imported from the chat nexus, so it
+		doesn't have to be defined from scratch.
+		</para>
+
+<!-- t/xChatMt.t, chatSockReadT -->
+<pre>
+	$owner->markConstructed();
+
+	Triceps::Triead::start(
+		app => $opts->{app},
+		thread => "$tname.rd",
+		fragment => $opts->{fragment},
+		main => \&chatSockWriteT,
+		socketName => $opts->{socketName},
+		ctlFrom => "$tname/ctl",
+	);
+
+	$owner->readyReady();
+</pre>
+
+		<indexterm>
+			<primary>fragment</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Triead</primary>
+			<secondary>stages</secondary>
+		</indexterm>
+		<para>
+		Then the construction is done and the writer thread gets started.  And
+		then the thread becomes ready and waits for the writer thread to be ready
+		too. The <pre>readyReady()</pre> works in the fragments just as it does at the
+		start of the App. Whenever a new thread is started, the App becomes not
+		ready, and stays this way until all the threads report that they are
+		ready. The rest of the App keeps working like nothing happened, at
+		least sort of. Whenever a nexus is imported, the messages from this
+		nexus start collecting for this thread, and if there are many of them,
+		the nexus will become backed up and the threads writing to it will
+		block. The new threads have to call <pre>readyReady()</pre> as usual to
+		synchronize between themselves, and then everything gets on its way.
+		</para>
+
+		<para>
+		Of course, if two connections are received in a quick succession, that
+		would start two sets of threads, and <pre>readyReady()</pre> will continue only
+		after all of them are ready. This is not very good but acceptable in most cases.
+		</para>
+
+<!-- t/xChatMt.t, chatSockReadT -->
+<pre>
+	my $lbChat = $faChat->getLabel("msg");
+	my $lbCtl = $faCtl->getLabel("ctl");
+
+	$unit->makeHashCall($lbCtl, "OP_INSERT", 
+		cmd => "print", arg => "!ready," . $opts->{fragment});
+	$owner->flushWriters();
+</pre>
+
+		<para>
+		A couple of labels get remembered for the future use, and the
+		connection ready message gets sent to the writer thread through the
+		control nexus. By convention of this application, the messages go in
+		the CSV format, with the control messages starting with <quote>!</quote>. If this is
+		the first client, this would send
+		</para>
+
+<exdump>
+!ready,cliconn1
+</exdump>
+
+		<para>
+		to the client. It's important to call <pre>flushWriters()</pre> every time to get
+		the message(s) delivered.
+		</para>
+
+<!-- t/xChatMt.t, chatSockReadT -->
+<pre>
+	while(<$sock>) {
+		s/[\r\n]+$//;
+		my @data = split(/,/);
+		if ($data[0] eq "exit") {
+			last; # a special case, handle in this thread
+		} elsif ($data[0] eq "kill") {
+			eval {$app->shutdownFragment($data[1]);};
+			if ($@) {
+				$unit->makeHashCall($lbCtl, "OP_INSERT", cmd => "print", arg => "!error,$@");
+				$owner->flushWriters();
+			}
+		} elsif ($data[0] eq "shutdown") {
+			$unit->makeHashCall($lbChat, "OP_INSERT", topic => "*", msg => "server shutting down");
+			$owner->flushWriters();
+			Triceps::AutoDrain::makeShared($owner);
+			eval {$app->shutdown();};
+		} elsif ($data[0] eq "shutdown2") { # with the guarantee of the last word
+			my $drain = Triceps::AutoDrain::makeExclusive($owner);
+			$unit->makeHashCall($lbChat, "OP_INSERT", topic => "*", msg => "server shutting down");
+			$owner->flushWriters();
+			$drain->wait();
+			eval {$app->shutdown();};
+		} elsif ($data[0] eq "publish") {
+			$unit->makeHashCall($lbChat, "OP_INSERT", topic => $data[1], msg => $data[2]);
+			$owner->flushWriters();
+		} else {
+			# this is not something you want to do in a real chat application
+			# but it's cute for a demonstration
+			$unit->makeHashCall($lbCtl, "OP_INSERT", cmd => $data[0], arg => $data[1]);
+			$owner->flushWriters();
+		}
+	}
+</pre>
+
+		<para>
+		The main loop keeps reading lines from the socket and interpreting
+		them. The lines are in CSV format, and the first field is the command
+		and the rest are the arguments (if any).  The commands are:
+		</para>
+
+		<variablelist>
+			<varlistentry>
+				<term>publish</term>
+				<listitem>
+				<para>
+				Send a message with a topic to the chat nexus.
+				</para>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term>exit</term>
+				<listitem>
+				<para>
+				Close the connection.
+				</para>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term>kill</term>
+				<listitem>
+				<para>
+				Close another connection, by name.
+				</para>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term>shutdown</term>
+				<listitem>
+				<para>
+				Shut down the server.
+				</para>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term>subscribe</term>
+				<listitem>
+				<para>
+				Subscribe the client to a topic.
+				</para>
+				</listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term>unsibscribe</term>
+				<listitem>
+				<para>
+				Unsubscribe the client from a topic.
+				</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+
+		<para>
+		The <quote>exit</quote> just exits the loop, since it works the same as if the socket
+		just gets closed from the other side.
+		</para>
+
+		<para>
+		The <quote>kill</quote> shuts down by name the fragment where the threads of the other
+		connection belong. This is a simple application, so it doesn't check
+		any permissions, whether this fragment should allowed to be shut down.
+		If there is no such fragment, the shutdown call will silently do
+		nothing, so the error check and reporting is really redundant (if
+		something goes grossly wrong in the thread interruption code, an error
+		might still occur, but theoretically this should never happen).
+		</para>
+
+		<para>
+		The <quote>shutdown</quote> sends the notification to the common topic <quote>*</quote> (to which
+		all the clients are subscribed by default), then drains the model and
+		shuts it down. The drain makes sure that all the messages in the model
+		get processed (and even written to the sockets) without allowing any new
+		messages to be injected. <quote>Shared</quote> means that there is no special
+		exceptions for some threads.
+		</para>
+
+		<para>
+		<pre>AutoDrain::makeShared()</pre> actually creates a drain object that keeps the drain
+		active during its lifetime. Here this object is not assigned anywhere,
+		so it gets immediately destroyed and lifts the drain. So potentially
+		more messages can get squeezed in between this point and shutdown.
+		Which doesn't matter a whole lot here.
+		</para>
+
+		<para>
+		The command <quote>shutdown2</quote> shows the implementation for
+		the case when it's really important that nothing get sent after the shutdown
+		notification.
+		</para>
+
+		<para>
+		It starts the drain in the exclusive mode, which means that this
+		thread is excluded from the drain and allowed to send more data. When the drain is created, it
+		waits for success, so when the new message is inserted, it will be
+		after all the other messages. <pre>$drain->wait()</pre> does another wait and
+		makes sure that this last message propagates all the way. And then the
+		app gets shut down, while the drain is still in effect, so no more
+		messages can be sent for sure.
+		</para>
+
+		<para>
+		The <quote>publish</quote> sends the data to the chat nexus (note the <pre>flushWriters()</pre>,
+		as usual!).
+		</para>
+
+		<para>
+		And the rest of commands (that would be <quote>subscribe</quote> and <quote>unsubscribe</quote> but
+		you can do any other commands like <quote>print</quote>) get simply forwarded to the
+		reader thread for execution. Sending through the commands like this
+		without testing is not a good practice for a real application but it's
+		cute for a demo.
+		</para>
+
+<!-- t/xChatMt.t, chatSockReadT -->
+<pre>
+	{
+		# let the data drain through
+		my $drain = Triceps::AutoDrain::makeExclusive($owner);
+
+		# send the notification - can do it because the drain is excluding itself
+		$unit->makeHashCall($lbCtl, "OP_INSERT", cmd => "print", arg => "!exiting");
+		$owner->flushWriters();
+
+		$drain->wait(); # wait for the notification to drain
+
+		$app->shutdownFragment($opts->{fragment});
+	}
+
+	$tsock->close(); # not strictly necessary
+}
+</pre>
+
+		<para>
+		The last part is when the connection get closed, either by the <quote>exit</quote>
+		command or when the socket gets closed. Remember, the socket can get
+		closed asymmetrically, in one direction, so even when the reading is
+		closed, the writing may still work and needs to return the responses to
+		any commands received from the socket. And of course the same is true
+		for the <quote>exit</quote> command.
+		</para>
+
+		<indexterm>
+			<primary>drain</primary>
+		</indexterm>
+		<para>
+		So here the full exclusive drain sequence is used, ending with the
+		shutdown of this thread's own fragment, which will close the socket.
+		Even though only one fragment needs to be shut down, the drain drains
+		the whole model. Because of the potentially complex interdependencies,
+		there is no way to reliably drain only a part, and all the drains are
+		App-wide.
+		</para>
+
+		<para>
+		The last part, with <pre>$tsock->close()</pre>, is not technically necessary since
+		the shutdown of the fragment will get the socket descriptor revoked
+		anyway, and then the socket will get closed when the last reference to
+		it disappears. But other than that, it's a good practice that unregisters the
+		socket from the TrieadOwner and then closes it. 
+		</para>
+
+		<para>
+		The socket writer thread is the last part of the puzzle:
+		</para>
+
+<!-- t/xChatMt.t, chatSockWriteT -->
+<pre>
+sub chatSockWriteT
+{
+	my $opts = {};
+	&Triceps::Opt::parse("chatSockWriteT", $opts, {@Triceps::Triead::opts,
+		socketName => [ undef, \&Triceps::Opt::ck_mandatory ],
+		ctlFrom => [ undef, \&Triceps::Opt::ck_mandatory ],
+	}, @_);
+	undef @_;
+	my $owner = $opts->{owner};
+	my $app = $owner->app();
+	my $tname = $opts->{thread};
+
+	my ($tsock, $sock) = $owner->trackGetFile($opts->{socketName}, ">");
+
+	my $faChat = $owner->importNexus(
+		from => "global/chat",
+		import => "reader",
+	);
+
+	my $faCtl = $owner->importNexus(
+		from => $opts->{ctlFrom},
+		import => "reader",
+	);
+</pre>
+
+		<para>
+		The usual preamble. The <pre>trackGetFile()</pre> consumes the socket from the
+		App, and this time reopens it for writing. The previously created
+		nexuses are imported.
+		</para>
+
+<!-- t/xChatMt.t, chatSockWriteT -->
+<pre>
+	my %topics; # subscribed topics for this thread
+
+	$faChat->getLabel("msg")->makeChained("lbMsg", undef, sub {
+		my $row = $_[1]->getRow();
+		my $topic = $row->get("topic");
+		#printOrShut($app, $opts->{fragment}, $sock, "XXX got topic '$topic'\n");
+		if ($topic eq "*" || exists $topics{$topic}) {
+			printOrShut($app, $opts->{fragment}, $sock, $topic, ",", $row->get("msg"), "\n");
+		}
+	});
+</pre>
+
+		<para>
+		The logic is defined as the connected labels. The topic hash keeps the
+		keys that this thread is subscribed to. When a message is received from
+		the chat nexus and the topic is in the hash or is <quote>*</quote>, the message gets
+		sent into the socket in the CSV format:
+		</para>
+
+<exdump>
+topic,text
+</exdump>
+
+		<para>
+		The function <pre>printOrShut()</pre> is imported from Triceps::X::ThreadedServer.
+		Its first 3 arguments are fixed, and the rest are passed through to
+		<pre>print()</pre>. It prints the message to the socket file handle, flushes the
+		socket, and in case of any errors it shuts down the fragment specified
+		in its second argument. This way if the socket gets closed from the
+		other side, the threads handling it automatically shut down.
+		</para>
+
+<!-- t/xChatMt.t, chatSockWriteT -->
+<pre>
+	$faCtl->getLabel("ctl")->makeChained("lbCtl", undef, sub {
+		my $row = $_[1]->getRow();
+		my ($cmd, $arg) = $row->toArray();
+		if ($cmd eq "print") {
+			printOrShut($app, $opts->{fragment}, $sock, $arg, "\n");
+		} elsif ($cmd eq "subscribe") {
+			$topics{$arg} = 1;
+			printOrShut($app, $opts->{fragment}, $sock, "!subscribed,$arg\n");
+		} elsif ($cmd eq "unsubscribe") {
+			delete $topics{$arg};
+			printOrShut($app, $opts->{fragment}, $sock, "!unsubscribed,$arg\n");
+		} else {
+			printOrShut($app, $opts->{fragment}, $sock, "!invalid command,$cmd,$arg\n");
+		}
+	});
+</pre>
+
+		<para>
+		The handling of the control commands is pretty straightforward.
+		</para>
+
+<!-- t/xChatMt.t, chatSockWriteT -->
+<pre>
+	$owner->readyReady();
+
+	$owner->mainLoop();
+
+	$tsock->close(); # not strictly necessary
+}
+</pre>
+
+		<para>
+		And the rest is taken care of by the <pre>mainLoop()</pre>. The thread's main loop
+		runs until the thread gets shut down, by handling the incoming
+		messages. So if say <pre>printOrShut()</pre> decides to shut down the fragment,
+		the next iteration of the loop will detect it and exit. 
+		</para>
+
+		<para>
+		And now a recorded log from a run. It has been produced with the automated
+		testing infrastructure described in
+		<xref linkend="sc_mt_threaded_client" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<para>
+		As usual, the lines sent from the clients to the socket server are
+		shown in bold. But since there are many clients, to tell them
+		apart, both the sent and received lines are prefixed by the client's
+		name and a <quote>|</quote>. I've just picked arbitrary client names to tell them
+		apart.
+		</para>
+
+		<para>
+		I've also marked the incoming connection as <quote><b>connect client_name</b></quote>,
+		the client's close of the socket for writing as <quote><b>close WR client_name</b></quote>,
+		and the disconnections as <quote>__EOF__</quote> after the client name.
+		</para>
+
+		<para>
+		So, here we go.
+		</para>
+
+<exdump>
+> connect c1
+c1|!ready,cliconn1
+> connect c2
+c2|!ready,cliconn2
+</exdump>
+
+		<para>
+		Two clients connect.
+		</para>
+
+<exdump>
+> c1|publish,*,zzzzzz
+c1|*,zzzzzz
+c2|*,zzzzzz
+</exdump>
+
+		<para>
+		A message published to the topic <quote>*</quote> gets forwarded to all the
+		connected clients. In reality the messages may of course be received on
+		separate sockets in any order, but I've ordered them here for the ease
+		of reading.
+		</para>
+
+<exdump>
+> c2|garbage,trash
+c2|!invalid command,garbage,trash
+</exdump>
+
+		<para>
+		An invalid command gets detected in the writer thread and responded as
+		such.
+		</para>
+
+<exdump>
+> c2|subscribe,A
+c2|!subscribed,A
+> c1|publish,A,xxx
+c2|A,xxx
+</exdump>
+
+		<para>
+		A subscription request gets acknowledged, and after that all the
+		messages sent to this topic get received by the client.
+		</para>
+
+<exdump>
+> c1|subscribe,A
+c1|!subscribed,A
+> c1|publish,A,www
+c1|A,www
+c2|A,www
+</exdump>
+
+		<para>
+		If more than one client is subscribed to a topic, all of them get the messages.
+		</para>
+
+<exdump>
+> c2|unsubscribe,A
+c2|!unsubscribed,A
+> c1|publish,A,vvv
+c1|A,vvv
+</exdump>
+
+		<para>
+		The unsubscription makes the client stop receiving messages from this
+		topic.
+		</para>
+
+<exdump>
+> connect c3
+c3|!ready,cliconn3
+> c3|exit
+c3|!exiting
+c3|__EOF__
+</exdump>
+
+		<para>
+		The third client connects, immediately requests an exit, gets the
+		confirmation and gets disconnected.
+		</para>
+
+<exdump>
+> connect c4
+c4|!ready,cliconn4
+> close WR c4
+c4|!exiting
+c4|__EOF__
+</exdump>
+
+		<para>
+		The fourth client connects and then closes its write side of the socket
+		(that is the read side for the server). It produces the same affect as
+		the exit command.
+		</para>
+
+<exdump>
+> c1|shutdown
+c1|*,server shutting down
+c1|__EOF__
+c2|*,server shutting down
+c2|__EOF__
+</exdump>
+
+		<para>
+		And the shutdown command sends the notifications to all the remaining
+		clients and closes the connections. 
+		</para>
+	</sect1>
+
+	<sect1 id="sc_mt_threaded_server">
+		<title>ThreadedServer implementation, and the details of thread harvesting</title>
+
+		<indexterm>
+			<primary>ThreadedServer</primary>
+		</indexterm>
+		<indexterm>
+			<primary>harversting</primary>
+		</indexterm>
+		<indexterm>
+			<primary>socket</primary>
+		</indexterm>
+		<para>
+		And now I want to show the internals of the ThreadedServer methods. It
+		shows how to store the socket file handles into the App, how the
+		threads are harvested, and how the connections get accepted.
+		The class is defined in <pre>lib/Triceps/X/ThreadedServer.pm</pre>.
+		It's of essentially production quality but misses the detailed set of
+		tests yet, and thus for now is placed in the X subdirectory.
+		</para>
+
+		<para>
+		The most important method in it is <pre>startServer()</pre>:
+		</para>
+
+<!-- lib/Triceps/X/ThreadedServer.pm startServer -->
+<pre>
+sub startServer # ($optName => $optValue, ...)
+{
+	my $myname = "Triceps::X::ThreadedServer::startServer";
+	my $opts = {};
+	my @myOpts = (
+		app => [ undef, \&Triceps::Opt::ck_mandatory ],
+		thread => [ "global", undef ],
+		main => [ undef, sub { &Triceps::Opt::ck_mandatory(@_); &Triceps::Opt::ck_ref(@_, "CODE") } ],
+		port => [ undef, \&Triceps::Opt::ck_mandatory ],
+		socketName => [ undef, undef ],
+		fork => [ 1, undef ],
+	);
+	&Triceps::Opt::parse($myname, $opts, {
+		@myOpts,
+		'*' => [],
+	}, @_);
+
+	if (!defined $opts->{socketName}) {
+		$opts->{socketName} = $opts->{thread} . ".listen";
+	}
+
+	my $srvsock = IO::Socket::INET->new(
+		Proto => "tcp",
+		LocalPort => $opts->{port},
+		Listen => 10,
+	) or confess "$myname: socket creation failed: $!";
+	my $port = $srvsock->sockport() or confess "$myname: sockport failed: $!";
+</pre>
+
+		<para>
+		So far it's pretty standard: get the options and open the socket for
+		listening.
+		A slightly special thing is that it saves the list of supported
+		options in the variable <pre>@myOpts</pre> for the future use.
+		That future use will be to pass the list of unknown options to the
+		user thread, so the known options in <pre>@myOpts</pre> will be removed
+		from the list before passing it.
+		<quote>*</quote> is the pass-through: it tells <pre>Opt::parse</pre>
+		to accept any options and gets all the unknown options collected in
+		<pre>$opts->{"*"}</pre>.
+		</para>
+
+<!-- lib/Triceps/X/ThreadedServer.pm startServer -->
+<pre>
+	if ($opts->{fork} > 0)  {
+		my $pid = fork();
+		confess "$myname: fork failed: $!" unless defined $pid;
+		if ($pid) {
+			# parent
+			$srvsock->close();
+			return ($port, $pid);
+		}
+		# for the child, fall through
+	}
+</pre>
+
+		<para>
+		This handles the process forking option: if forking is requested, it
+		executes and then the parent process returns the PID while the child
+		process continues with the rest of the logic. By the way, your success
+		with forking a process that has multiple running threads may vary. The
+		resulting process usually has one running thread (continuing where the
+		thread that called <pre>fork()</pre> was) but the synchronization primitives in
+		the new process can be inherited in any state, so the attempts to
+		continue the threaded processing are usually not such a good idea. It's
+		usually best to fork first before there are more threads.
+		</para>
+
+<!-- lib/Triceps/X/ThreadedServer.pm startServer -->
+<pre>
+	# make the app explicitly, to put the socket into it first
+	my $app = Triceps::App::make($opts->{app});
+	$app->storeCloseFile($opts->{socketName}, $srvsock);
+	Triceps::Triead::start(
+		app => $opts->{app},
+		thread => $opts->{thread},
+		main => $opts->{main},
+		socketName => $opts->{socketName},
+		&Triceps::Opt::drop({ @myOpts }, \@_),
+	);
+</pre>
+
+		<indexterm>
+			<primary>App</primary>
+		</indexterm>
+		<para>
+		Then the App gets created.  Previously I've shown starting the App
+		with <pre>startHere()</pre> that created the App, the first thread,
+		and did a bunch of services implicitly. Here everything will be done manually. 
+		</para>
+
+		<para>
+		Triceps keeps a global list of all its Apps in the process, and after
+		an App is created, it's placed into that list and can be found by name
+		from any thread. The App object will exist while there are references
+		to it, including the reference from that global list. On the other
+		hand, it's possible to remove the App from the list while it's still
+		running but that's a bad practice because it will break any attempts
+		from its threads to find it by name.
+		</para>
+		 
+		<para>
+		So the App is made, then the file handle gets stored.  The listening socket
+		has to be stored into the App before the listener thread gets started,
+		so that the listener thread can find it.
+		<pre>storeCloseFile()</pre>
+		gets the file descriptor from the socket, dups it, stores into the App,
+		and then closes the original file handle, as explained before. 
+		</para>
+
+		<para>
+		Then the listener thread is started, and as shown before, it's
+		responsible for starting all the other threads. It gets a set of
+		fixed options plus all the unknown options that the user had specified.
+		It will do the same trick with passing these unknown options to
+		the thread that runs the user code and handles the accepted
+		connections, such as <pre>readerT()</pre> in 
+		<xref linkend="sc_mt_dynamic_server" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		In the meantime, the <pre>startServer()</pre> continues:
+		</para>
+
+<!-- lib/Triceps/X/ThreadedServer.pm startServer -->
+<pre>
+	my $tharvest;
+	if ($opts->{fork} < 0) {
+		@_ = (); # prevent the Perl object leaks
+		$tharvest = threads->create(sub {
+			# In case of errors, the Perl's join() will transmit the error 
+			# message through.
+			Triceps::App::find($_[0])->harvester();
+		}, $opts->{app}); # app has to be passed by name
+	} else {
+		$app->harvester();
+	}
+</pre>
+
+		<indexterm>
+			<primary>harversting</primary>
+		</indexterm>
+		<para>
+		The harvester logic is started. Each App must have its harvester.
+		<pre>startHere()</pre> runs the harvester implicitly, unless told otherwise, but
+		if the App is created manually, the harvester has to be run manually. 
+		It can be run either in this
+		thread or in another thread, as determined by the ThreadedServer option 
+		<quote>fork</quote>. 
+		</para>
+
+		<para>
+		If the option <quote>fork</quote> is 0, the server just runs the harvester in the
+		current process and thread. If the option <quote>fork</quote> is 1, the server
+		runs in the first thread of the child process, and if the code got to this
+		point, it would be running now in the child process. So these two cases
+		are handled together and for them the harvester just starts in the current thread
+		with <pre>$app->harvester();</pre> and returns after the App shuts down.
+		</para>
+
+		<para>
+		If the option <quote>fork</quote> is -1, it requires that the harvester is to
+		be started in another newly created thread.
+		<pre>$tharvest</pre> will contain that thread's
+		identity. A special thing about starting threads with <pre>threads->create()</pre>
+		is that it's sensitive to anything in <pre>@_</pre>. If <pre>@_</pre> contains anything, it
+		will be leaked (though the more recent versions of Perl should have it
+		fixed). So <pre>@_</pre> gets cleared before starting the thread.
+		</para>
+
+		<para>
+		And the harvester gets started in the new thread slightly differently.
+		Since in the new thread all the XS objects become <pre>undef</pre>s,
+		the App object has to be found by name in the global list first.
+		</para>
+
+		<para>
+		One way or the other, the harvester is started. What does it do? It
+		joins the App's threads as they exit. After all of them exit, it
+		removes the App from the global list of Apps, which will allow to
+		collect the App's memory when the last reference to it is gone, and
+		then the harvester returns.
+		</para>
+
+		<para>
+		If any of the App's threads die rather than exit nicely, they cause the App to be aborted. The
+		aborted App shuts down immediately and remembers the identity of the
+		failed thread and its error message (only the first message is saved
+		because the abort is likely to cause the other threads to die too, and
+		there is no point in seeing these derivative messages). The harvester,
+		in turn, collects this message from the App, and after all its
+		cleaning-up work is done, also dies, propagating this message. Then if the
+		harvester is running not in the first thread of the program, that message will be
+		propagated further by Perl's <pre>join()</pre>.
+		</para>
+
+		<para>
+		A catch is that the errors are not reported until the harvester
+		completes. Normally all the App's threads should exit immediately on
+		shutdown but if they don't, the program will be stuck without any
+		indication of what happened.
+		</para>
+
+		<para>
+		It's also possible to disable this propagation of dying by using the
+		option <quote>die_on_abort</quote>:
+		</para>
+
+<pre>
+$app->harvester(die_on_abort => 0);
+</pre>
+
+		<para>
+		There is a way to get the error message that caused the abort directly
+		from the App instead.
+		</para>
+
+		<para>
+		And finally the last part of startServer():
+		</para>
+
+<!-- lib/Triceps/X/ThreadedServer.pm startServer -->
+<pre>
+	if ($opts->{fork} > 0) {
+		exit 0; # the forked child process
+	}
+
+	return ($port, $tharvest);
+}
+</pre>
+
+		<para>
+		 If this was the child process forked before, it exits at this point.
+		 Otherwise the port and the harvester's thread object are returned. 
+		</para>
+
+		<para>
+		The next function of the ThreadedServer is <pre>listen()</pre>, the function that gets
+		called from the listener thread and takes care of accepting the
+		connections and spawning the per-client threads.
+		</para>
+
+<!-- lib/Triceps/X/ThreadedServer.pm listen -->
+<pre>
+sub listen # ($optName => $optValue, ...)
+{
+	my $myname = "Triceps::X::ThreadedServer::listen";
+	my $opts = {};
+	my @myOpts = (
+		owner => [ undef, sub { &Triceps::Opt::ck_mandatory(@_); &Triceps::Opt::ck_ref(@_, "Triceps::TrieadOwner") } ],
+		socket => [ undef, sub { &Triceps::Opt::ck_mandatory(@_); &Triceps::Opt::ck_ref(@_, "IO::Socket") } ],
+		prefix => [ undef, \&Triceps::Opt::ck_mandatory ],
+		handler => [ undef, sub { &Triceps::Opt::ck_mandatory(@_); &Triceps::Opt::ck_ref(@_, "CODE") } ],
+		pass => [ undef, sub { &Triceps::Opt::ck_ref(@_, "ARRAY") } ],
+	);
+	&Triceps::Opt::parse($myname, $opts, {
+		@myOpts,
+		'*' => [],
+	}, @_);
+	my $owner = $opts->{owner};
+	my $app = $owner->app();
+	my $prefix = $opts->{prefix};
+	my $sock = $opts->{socket};
+</pre>
+
+
+		<para>
+		The option parsing is similar to <pre>startServer()</pre>:
+		it also saves the list of supported options in the variable <pre>@myOpts</pre>
+		and accepts any unknown options with <quote>*</quote>, to pass them
+		through to the user thread.
+		</para>
+
+<!-- lib/Triceps/X/ThreadedServer.pm listen -->
+<pre>
+	my $clid = 0; # client id
+
+	while(!$owner->isRqDead()) {
+		my $client = $sock->accept();
+		if (!defined $client) {
+			my $err = "$!"; # or the text message will be reset by isRqDead()
+			if ($owner->isRqDead()) {
+				last;
+			} elsif($!{EAGAIN} || $!{EINTR}) { # numeric codes don't get reset
+				next;
+			} else {
+				confess "$myname: accept failed: $err";
+			}
+		}
+</pre>
+
+		<para>
+		The accept loop starts. It runs until the thread is requested to die
+		at shutdown. The shutdown would also revoke the listening socket,
+		and thus if it happened in the middle of <pre>$sock->accept()</pre>,
+		<pre>$sock->accept()</pre> would return an <pre>undef</pre> because
+		it will see the revocation as an error.
+		Note that <pre>listen()</pre> itself doesn't request to
+		track the socket for revocation. The caller must do that
+		before calling <pre>listen()</pre>.
+		</para>
+
+		<para>
+		So, after <pre>accept()</pre> the code checks for
+		errors. The first thing to check for is again the <pre>isRdDead()</pre>, because
+		it's not really an error, it's an expected condition. 
+		If the shutdown is found, the loop exits.  However
+		the error text had to be saved before <pre>isRqDead()</pre>, 
+		because like other Triceps calls <pre>isRdDead()</pre> will clear the error text.
+		Then the check
+		for the spurious interruptions is done, and for them the loop
+		continues. Interestingly, the <pre>$!{}</pre> uses the numeric part of <pre>$!</pre> that is
+		independent from its text part and doesn't get cleared by the Triceps
+		calls. And on any other errors the thread confesses. The confession will unroll
+		the stack, eventually will get caught by the Triceps threading code, abort
+		the App, and propagate the error message to the harvester.
+		</para>
+
+<!-- lib/Triceps/X/ThreadedServer.pm listen -->
+<pre>
+		$clid++;
+		my $cliname = "$prefix$clid";
+		$app->storeCloseFile($cliname, $client);
+
+		Triceps::Triead::start(
+			app => $app->getName(),
+			thread => $cliname,
+			fragment => $cliname,
+			main => $opts->{handler},
+			socketName => $cliname,
+			&Triceps::Opt::drop({ @myOpts }, \@_),
+		);
+
+		# Doesn't wait for the new thread(s) to become ready.
+	}
+}
+</pre>
+
+		<para>
+		If a proper connection has been received, the socket gets stored into
+		the App with a unique name, for later load by the per-client thread.
+		And then the per-client thread gets started.
+		</para>
+
+		<para>
+		<pre>Opt::drop()</pre> passes through all the original options except for the ones
+		handled by this thread. In retrospect, this is not the best solution
+		for this case. It would be better to just use <pre>@{$opts->{"*"}}</pre> instead.
+		<pre>Opt::drop()</pre> is convenient when not all the explicitly recognized
+		options but only some of them have to be dropped.
+		</para>
+
+		<para>
+		After starting the thread, the loop doesn't call <pre>readyReady()</pre> but goes
+		for the next iteration. This is basically because it doesn't care about
+		the started thread and doesn't ever send anything to it. And waiting
+		for the threads to start will make the loop slower, possibly
+		overflowing the socket's listening queue and dropping the incoming
+		connections if they arrive very fast.
+		</para>
+
+		<para>
+		And the last part of the ThreadedServer is the function <pre>printOrShut()</pre>:
+		</para>
+
+<!-- lib/Triceps/X/ThreadedServer.pm -->
+<pre>
+sub printOrShut # ($app, $fragment, $sock, @text)
+{
+	my $app = shift;
+	my $fragment = shift;
+	my $sock = shift;
+
+	undef $!;
+	print $sock @_;
+	$sock->flush();
+
+	if ($!) { # can't write, so shutdown
+		Triceps::App::shutdownFragment($app, $fragment);
+	}
+}
+</pre>
+
+		<para>
+		Nothing too complicated. Prints the text into the socket, flushes it
+		and checks for errors. On errors shuts down the fragment. In this case
+		there is no need for draining. After all, the socket leading to the
+		client is dead and there is no way to send anything more through it, so
+		there is no point in worrying about any unsent data. Just shut down as
+		fast as it can, before the threads have generated more data that can't
+		be sent any more. Any data queued in the nexuses for the shut down
+		threads will be discarded.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_mt_threaded_client">
+		<title>ThreadedClient, a Triceps Expect</title>
+
+		<indexterm>
+			<primary>ThreadedClient</primary>
+		</indexterm>
+		<indexterm>
+			<primary>expect</primary>
+		</indexterm>
+		<para>
+		In case if you're not familiar with it, <pre>expect</pre> is a program that
+		allows to connect to the interactive programs and pretend being an
+		interactive user. Obviously, the terminal programs, not the GUI ones.
+		It has originally been done as an extension for Tcl, and later ported
+		as a library for Perl and other languages.
+		</para>
+
+		<para>
+		The class Triceps::X::ThreadedClient implements a variety of <pre>expect</pre> in
+		the Triceps framework. I'm using it for the unit tests of the Triceps
+		servers but it can have other uses as well. Why not just use <pre>expect</pre>?
+		One reason, I don't like bringing in extra dependencies, especially
+		just for tests, second, it was an interesting exercise, and third, I
+		didn't realize that I was writing a simplified variety of expect until I
+		had it mostly completed. The biggest simplification compared to the
+		real <pre>expect</pre> is that ThreadedClient works with the complete lines.
+		</para>
+
+		<para>
+		It gets used in the unit tests like this: first the server gets started
+		in a background process or thread, and then the server's port number is used to
+		create the clients. The ThreadedClient gets embedded into a Triceps
+		App, so you can start other things in the same App. Well, the names of
+		the ThreadedClient threads are hardcoded at the moment, so you can
+		start only one copy of it per App, and there could be conflicts if you
+		start your other threads and use the same names as in ThreadedClient.
+		</para>
+
+		<para>
+		But first you need to start an App. I'll show it done in yet another way this
+		time:
+		</para>
+
+<!-- t/xChatMt.t "test of the thread killing in the chat" reduced -->
+<pre>
+	Triceps::App::build "client", sub {
+		my $appname = $Triceps::App::name;
+		my $owner = $Triceps::App::global;
+
+		# give the port in startClient
+		my $client = Triceps::X::ThreadedClient->new(
+			owner => $owner,
+			totalTimeout => 5,
+			debug => 0,
+		);
+
+		$owner->readyReady();
+
+		$client->startClient("c1", $port);
+		$client->expect("c1", '!ready');
+
+		# this repetition tests the expecting to the first match
+		$client->send("c1", "publish,*,zzzzzz\n");
+		$client->send("c1", "publish,*,zzzzzz\n");
+		$client->expect("c1", '\*,zzzzzz');
+		$client->expect("c1", '\*,zzzzzz');
+
+		$client->startClient("c2", $port);
+		$client->expect("c2", '!ready,cliconn2');
+
+		$client->send("c1", "kill,cliconn2\n");
+		$client->expect("c2", '__EOF__');
+
+		$client->send("c1", "shutdown\n");
+		$client->expect("c1", '__EOF__');
+	};
+</pre>
+
+		<para>
+		<pre>Triceps::App::build()</pre> is kind of like <pre>Triceps::Triead::startHere()</pre> but
+		saves the trouble of parsing the options. The app name is its first
+		argument and the code for the main routine of the first thread is the
+		second argument. That first Triead will run in the current Perl thread.
+		After that the name of the app is placed into the global variable
+		<pre>$Triceps::App::name</pre>, the App object into <pre>$Triceps::App::app</pre>, and the
+		TrieadOwner into <pre>$Triceps::App::global</pre>. The name of the first Triead is
+		hardcoded as <quote>global</quote>.  After the main function exits,
+		<pre>Triceps::App::build()</pre> runs the harvester, very similar to <pre>startHere()</pre>.
+		</para>
+
+		<para>
+		<pre>Triceps::X::ThreadedClient->new()</pre> is used to start an instance of a
+		client. A single client instance supports multiple connections, to the
+		same or different servers.
+		The option <quote>owner</quote> gives it the current TrieadOwner as a
+		starting point but ThreadedClient will create its own threads starting from this
+		point. 
+		</para>
+
+		<para>
+		The port number for the connection can be specified as either the option <quote>port</quote> or as the
+		second argument of <pre>startClient()</pre>. You can use both, and then the option
+		will provide the default value while <pre>startClient()</pre> can stil override it.
+		</para>
+
+		<para>
+		The option <quote>debug</quote> is optional, with the default value of 0. In the non-debug
+		mode ThreadedClient collects the trace of the run but otherwise runs silently.
+		Setting the <quote>debug</quote> option to 1 makes it also print the trace as it gets
+		collected, so if something goes not the way you expected, you can see
+		what it is. Setting the debug to 1 also adds the printouts from the
+		socket-facing threads, so you can also see what goes in and out the
+		client socket.
+		</para>
+
+		<para>
+		The option <quote>totalTimeout</quote> can be used to set the time limit
+		in seconds (as a floating-point number, so you can use values like 0.1 for
+		a timeout of 0.1 second) for the whole exchange.
+		It's very convenient for the unit tests,
+		limiting the time for which the test could get stuck if something
+		goes wrong. If the timeout gets exceeded, all the following calls of <pre>expect()</pre>
+		will return immediately, setting the error message in <pre>$@</pre> and appending
+		it to the trace.
+		</para>
+
+		<para>
+		There are three ways to specify the timeout. Two of them are in the <pre>new()</pre>:
+		</para>
+
+<pre>
+my $client = Triceps::X::ThreadedClient->new(
+	owner => $owner,
+	totalTimeout => $timeout,
+);
+
+my $client = Triceps::X::ThreadedClient->new(
+	owner => $owner,
+	timeout => $timeout,
+);
+</pre>
+
+		<para>
+		The option <quote>totalTimeout</quote> gives a timeout for the whole run to
+		complete. Once that timeout is reached, all future <pre>expect()</pre>s just fail
+		immediately. The option <quote>timeout</quote> gives the default timeout for each
+		<pre>expect()</pre>. It's possible to use both, and each call of <pre>expect()</pre> will be
+		limited by the shorter time limit of the two (<quote>totalTimeout</quote>
+		starts counting since the call of <pre>new()</pre>, <b>not</b> from <pre>startClient()</pre>,
+		while <quote>timeout</quote> starts counting since the call of <pre>expect()</pre>).
+		</para>
+
+		<para>
+		The third way is to use an extra argument in <pre>expect()</pre>:
+		</para>
+
+<pre>
+$client->expect("c1", "expected text", $timeout);
+</pre>
+
+		<para>
+		This timeout completely overrides whatever was set in <pre>new()</pre>. The value
+		of 0 disables the timeout for this call, and even 0 still overrides the timeout
+		from <pre>new()</pre>, so it can be used for the one-off calls without the
+		timeout.
+		</para>
+
+		<para>
+		After the ThreadedClient object is created, the client connections get
+		started with <pre>startClient()</pre>. Its first
+		argument is a symbolic name of the client that will be used in the
+		further calls and also in the trace. The second optional argument is
+		the port number, if you want to use a different port than specified in
+		the <pre>new()</pre>.
+		</para>
+
+		<para>
+		After that the data gets sent into the client socket with <pre>send()</pre>, and
+		the returned lines get parsed with <pre>expect()</pre>. The usual procedure is
+		that you send something, then expect some response to it. 
+		</para>
+
+		<para>
+		The second argument of <pre>expect()</pre> is actually a regexp placed inside a
+		string. So to expect a literal special character like <quote>*</quote>, prefix it
+		with a backslash and put the string into single quotes, like:
+		</para>
+
+<pre>
+$client->expect("c1", '\*,zzzzzz');
+</pre>
+
+		<para>
+		<pre>expect()</pre> keeps reading lines until it finds one matching the
+		regexp. Then all the lines including that one are added to the trace
+		and the call returns.  The sent
+		lines are also included into the trace, with the prefix <quote>&gt; </quote>.
+		</para>
+
+		<para>
+		There are a couple of special lines generated by the connection status
+		itself rather than coming from the socket. When the socket gets
+		connected, it generates the line <quote>connected <i>name</i></quote> in the trace
+		(but not as an expectable input). When the connection gets dropped by the server,
+		this generates an expectable line <quote>__EOF__</quote>. And each line in the
+		trace gets prefixed with the client name and <quote>|</quote>. The example of the
+		chat server run in the previous section was created by the ThreadedClient.
+		</para>
+
+		<para>
+		The socket disconnect (<quote>__EOF__</quote>) has another special property:
+		if it's encountered by an <pre>expect()</pre> call that doesn't expect it,
+		that call and the following ones will set the
+		error message in <pre>$@</pre> and append it to the trace, then immediately return.
+		This handles the situation with the unexpectedly
+		dropped connection quickly, without resorting to the timeout.
+		</para>
+
+		<para>
+		The recorded trace can be extracted as <pre>$client->getTrace()</pre>. So for unit tests
+		you can check the trace match as
+		</para>
+
+<pre>
+ok($client->getTrace(), $expected);
+</pre>
+
+		<para>
+		It's possible to get only the error messages with <pre>$client->getErrorTrace()</pre>.
+		</para>
+
+		<para>
+		One more method not shown above allows to close the client socket 
+		(in socket terms, shut it down):
+		</para>
+
+<pre>
+$client->sendClose("c4", "WR");
+</pre>
+
+		<para>
+		The first argument is the client name. The second argument determines,
+		which side of the socket gets closed: <quote>WR</quote> for the writing side, <quote>RD</quote>
+		for the reading side, and <quote>RDWR</quote> for both. It's the same names as for
+		the system call <pre>shutdown()</pre>. 
+		</para>
+
+		<para>
+		Internally the ThreadedClient is very much like the chat server, 
+		except for the support of the timeouts. The way the timeouts work is described
+		below in
+		<xref linkend="sc_mt_main_timeouts" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		But there is not a whole lot of point in going over the rest of implementation
+		in detail. Feel free to read it on your own, in <pre>lib/Triceps/X/ThreadedClient.pm</pre>.
+		</para>
+
+	</sect1>
+
+	<sect1 id="sc_mt_main_timeouts">
+		<title>Thread main loop and timeouts in the guts of ThreadedClient</title>
+
+		<indexterm>
+			<primary>ThreadedClient</primary>
+		</indexterm>
+		<indexterm>
+			<primary>main loop</primary>
+		</indexterm>
+		<indexterm>
+			<primary>timeout</primary>
+		</indexterm>
+		<indexterm>
+			<primary>time</primary>
+		</indexterm>
+		<para>
+		First of all, let me re-iterate: if you look for repeatability
+		of computation, you should really use an external time source
+		synchronized with your data.  But sometimes you really need to work
+		with the real time, such as when handling the input from a socket
+		and/or time-limiting the run of the tests. The repeatability doesn't
+		matter much for these uses, since it's really for handling of the
+		cases that Should Never Happen.
+		</para>
+
+		<para>
+		The ThreadedClient uses this kind of timeouts, so I'll use its
+		implementation as an example. Let's start by stepping back and
+		looking at the structure of ThreadedClient. It runs in multiple
+		threads.
+		</para>
+
+		<para>
+		The collector thread is the heart of ThreadedClient. When a
+		ThreadedClient object is created, the collector thread starts.
+		It will be receiving data from the connections and matching it
+		up with the expectations.
+		</para>
+
+		<para>
+		Whenever a client connection is created, two threads go with
+		it, the reader and writer. The reader passes the data directly
+		to the collector, which then buffers all the received data
+		until <pre>expect()</pre> asks for it.
+		</para>
+
+		<para>
+		Finally, there is the thread where the user's control code runs.
+		When a ThreadedClient gets created in the user thread, the option <quote>owner</quote>
+		provides the TrieadOwner of that user thread to the ThreadedClient object.
+		</para>
+
+		<para>
+		<pre>expect()</pre> works by sending a request to the collector
+		thread and waiting for the response from it. If there is a time limit
+		and the response is not received within it, the wait gets interrupted,
+		and a cancellation request gets sent to the collector.
+		</para>
+
+		<para>
+		<pre>new()</pre> creates the labels for processing the replies from the
+		collector:
+		</para>
+
+<!-- lib/Triceps/X/ThreadedClient.pm new -->
+<pre>
+	$self->{faReply}->getLabel("msg")->makeChained("lbReplyExpect", undef, sub {
+		my ($cmd, $client, $arg) = $_[1]->getRow()->toArray();
+		if ($cmd eq "expect") {
+			my $ptext = $arg;
+			$ptext =~ s/^/$client|/gm;
+			$self->{trace} .= $ptext;
+			if ($self->{debug}) {
+				print $ptext;
+			}
+			$self->{expectDone} = 1;
+		} elsif ($cmd eq "error") {
+			# save the error in trace, so that it will be easily printed.
+			my $ptext = $arg . "\n";
+			$ptext =~ s/^/$client|/gm;
+			$self->{trace} .= $ptext;
+			$self->{errorTrace} .= $ptext;
+			if ($self->{debug}) {
+				print $ptext;
+			}
+
+			$self->{error} = $arg;
+			$self->{expectDone} = 1;
+		}
+</pre>
+
+		<para>
+		But of course these labels will not run until the thread reads
+		the data from its input facets. Most threads read the data from the facets
+		continuously with <pre>TrieadOwner::mainLoop()</pre>. Of course, the
+		user thread that owns ThreadedClient can't do that, or it would not
+		be able to run the user code. But anyway, let's look at the internals
+		of the <pre>mainLoop()</pre> for the reference first. It's implemented
+		in &Cpp; literally as follows:
+		</para>
+
+<!-- cpp/app/TrieadOwner.cpp -->
+<pre>
+void TrieadOwner::mainLoop()
+{
+	while (nextXtray())
+		{ }
+}
+</pre>
+
+		<indexterm>
+			<primary>Xtray</primary>
+		</indexterm>
+		<para>
+		<pre>nextXtray()</pre> represents one step of the main loop: it reads one
+		incoming tray from one of the input facets and processes it. 
+		"Xtray" is a special form of the trays used to pass the data across the nexus. 
+		If no tray
+		is available, it waits. If more that one facet has trays available,
+		the facets of the reverse nexuses get the higher priority, and then
+		within the same priority it round-robins. 
+		It returns <pre>true</pre> until the thread is requested
+		dead, and then it returns <pre>false</pre>.
+		<pre>nextXtray()</pre> is
+		available in the Perl API as well.
+		</para>
+
+		<para>
+		Now we're ready to look at <pre>expect()</pre>.
+		The core part of <pre>expect()</pre>, after it computes the time limit from the
+		three sources, is this:
+		</para>
+
+<!-- lib/Triceps/X/ThreadedClient.pm expect -->
+<pre>
+	$self->{error} = undef;
+	$self->{expectDone} = 0;
+
+	if ($self->{debug} > 1) {
+		print "expect: $pattern\n"
+	}
+
+	$owner->unit()->makeHashCall($self->{faCtl}->getLabel("msg"), "OP_INSERT",
+		cmd => "expect",
+		client => $client,
+		arg => $pattern,
+	);
+	$owner->flushWriters();
+
+	if ($limit > 0.) {
+		while(!$self->{expectDone} && $owner->nextXtrayTimeLimit($limit)) { }
+		# on timeout reset the expect and have that confirmed
+		if (!$self->{expectDone}) {
+			$owner->unit()->makeHashCall($self->{faCtl}->getLabel("msg"), "OP_INSERT",
+				cmd => "cancel",
+				client => $client,
+			);
+			$owner->flushWriters();
+			# wait for confirmation
+			while(!$self->{expectDone} && $owner->nextXtray()) { }
+		}
+	} else {
+		while(!$self->{expectDone} && $owner->nextXtray()) { }
+	}
+
+
+	if ($app->isAborted()) {
+		confess "$myname: app is aborted";
+	}
+	$@ = $self->{error};
+</pre>
+
+		<para>
+		If there is no time limit, it keeps reading the data from the facets with
+		<pre>$owner->nextXtray()</pre> until it gets the reply from the collector
+		thread. If there is a time limit, it uses a special form of <pre>nextXtray()</pre>
+		with the time limit. There are multiple of these special forms:
+		</para>
+		
+<pre>
+$res = $owner->nextXtrayNoWait();
+</pre>
+
+		<para>
+		Returns immediately if there is no data available at the moment.
+		</para>
+
+<pre>
+$res = $owner->nextXtrayTimeLimit($deadline);
+</pre>
+
+		<para>
+		Returns if no data becomes available before the absolute deadline.
+		</para>
+
+<pre>
+$res = $owner->nextXtrayTimeout($timeout);
+</pre>
+
+		<para>
+		Returns if no data becomes available before the timeout, starting at
+		the time of the call. Just to reiterate, the difference is that the
+		<pre>nextXtrayTimeLimit()</pre> receives the absolute time since the epoch while
+		<pre>nextXtrayTimeout()</pre> receives the length of the timeout starting from the
+		time of the call, both as seconds in floating-point.
+		</para>
+
+		<para>
+		All the forms that may return early on no data return <pre>false</pre> if they
+		have to do so. If you need to differentiate between these functions returning
+		<pre>false</pre> due to the lack of data and due to the thread being requested
+		to shut down, you can do it with <pre>$owner->isRqDead()</pre>.
+		</para>
+
+		<indexterm>
+			<primary>now</primary>
+		</indexterm>
+		<para>
+		The absolute deadline is generally a more reliable approach than the
+		relative timeout. It's not susceptible to drift over time caused
+		by the slight delays between the timeout being calculated and the
+		start of the time-limited call. To compute the deadline as an offset
+		from the current time, you need to get the current time.
+		The function <pre>Triceps::now()</pre>
+		returns the current time in seconds since epoch as a floating-point
+		value, including the fractions of the seconds (which is the general
+		time format of the Triceps Perl API). Then you add the timeout to
+		it and get the deadline value:
+		</para>
+
+<pre>
+$limit = Triceps::now() + $timeout;
+</pre>
+
+		<para>
+		<pre>Triceps::now()</pre> is also convenient for finding out the performance
+		of the Triceps code, and in general of the Perl code.
+		</para>
+
+		<para>
+		<pre>expect()</pre> uses the form with the absolute deadline. If the collector
+		thread finds a match, it will send a rowop back to the expect thread,
+		where it will get processed in <pre>nextXtrayTimeLimit()</pre>, calling a label that
+		sets the flag <pre>$self->{expectDone}</pre>, and then <pre>nextXtrayTimeLimit()</pre> will
+		return 1, and the loop will find the flag and exit.
+		</para>
+
+		<para>
+		If the collector thread doesn't find a match, <pre>nextXtrayTimeLimit()</pre> will
+		return 0, and the loop will again exit. But then it will fill find
+		the <quote>done</quote> flag not set, so it knows that the timeout has expired and
+		it has to tell the collector thread that the call is being cancelled.
+		So it sends another rowop for the cancel, and then waits for the
+		confirmation with another <pre>nextXtray()</pre>, this time with no limit on it
+		since the confirmation must arrive back quickly in any case.
+		</para>
+
+
+		<para>
+		It's the confirmation rowop processing that sets <pre>$self->{error}</pre>. But
+		there is always a possibility that the match will arrive just after the
+		timeout has expired but just before the cancellation. It's one of these
+		things that you have to deal with when multiple threads exchange
+		messages. What then? Then the normal confirmation will arrive back to
+		the expecting thread. And when the cancel message will arrive to the
+		collector thread, it will find that this client doesn't have an
+		outstanding expect requests any more, and will just ignore the cancel.
+		Thus, the second <pre>nextXtray()</pre> will receive either a confirmation of the
+		cancel and set the error message, or it will receive the last-moment
+		success message. Either way it will fall through and return (setting <pre>$@</pre>
+		if the cancel confirmation came back).
+		</para>
+
+		<para>
+		By the way, if the collector thread finds the socket closed, it will
+		immediately return an error rowop, very similar to the confirmation of
+		the cancel. Which will set both <pre>$self->{expectDone}</pre> and <pre>$self->{error}</pre>
+		in the expect thread. 
+		</para>
+
+	</sect1>
+
+	<sect1 id="sc_mt_main_reorder">
+		<title>The threaded dreaded diamond and data reordering</title>
+
+		<indexterm>
+			<primary>diamond</primary>
+		</indexterm>
+		<indexterm>
+			<primary>fork-join</primary>
+		</indexterm>
+
+		<para>
+		The pipelined examples shown before had very conveniently preserved the
+		order of the data while spreading the computational load among multiple
+		threads. But it forced the computation to pass sequentially through
+		every thread, increasing the latency and adding overhead. The other
+		frequently used option is to farm out the work to a number of parallel
+		threads and then collect the results back from them.
+		This topology is colloquially known as <quote>diamond</quote> or <quote>fork-join</quote>
+		(having nothing to do with the SQL joins, just that the arrows first
+		fork from one box to multiple and then join back to one box).
+		</para>
+
+		<para>
+		The single-threaded use of this topology has already been discussed in
+		<xref linkend="sc_other_diamond" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;,
+		and its diagram can be found there in
+		<xref linkend="fig_other_diamond" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+
+		<para>
+		There are multiple ways to decide, which thread gets which unit of data
+		to process. One possibility that provides the natural load balancing is
+		to keep a common queue of work items, and have the worker threads (B
+		and C in 
+		<xref linkend="fig_other_diamond" xrefstyle="select: label pageabbrev"/>&xrsp;)
+		read the next work item when they become free after
+		processing the last item. But this way has an important limitation:
+		there is no way to tell in advance, which work item will go to which
+		thread, so there is no way for the worker threads to keep any state.
+		All the state would have to be encapsulated into the work item (
+		a work item
+		would be a tray in the Triceps terms). And at the moment Triceps
+		provides no way to maintain such a shared queue.
+		</para>
+
+		<para>
+		The other way is to partition the data between the worker threads based
+		on the primary key. Usually it's done by using a hash of the key, which
+		would distribute the data randomly and hopefully evenly. Then a worker
+		thread can keep the state for its subset of keys, forming a partition
+		(also known as <quote>shard</quote>) and process the sequential updates for this
+		partition. The way to send a rowop only to the thread B or only to the
+		thread C would be by having a separate designated nexus for each worker
+		thread, and the thread A making the decision based on the hash of the
+		primary key in the data. The processed data from all the worker threads
+		can then be sent to a single nexus feeding the thread D.
+		</para>
+
+		<para>
+		But either way the data will arrive at D in an unpredictable order. The
+		balance of load between the worker threads is not perfect, and there is
+		no way to predict, how long will each tray take to process. A tray
+		following one path may overtake a tray following another path.
+		</para>
+
+		<indexterm>
+			<primary>reordering</primary>
+		</indexterm>
+		<indexterm>
+			<primary>collation</primary>
+		</indexterm>
+		<para>
+		If the order of the data is important, D must collate the data back
+		into the original order before processing it further. Obviously, for
+		that it must know what the original order was, so A must tag the data
+		with the sequential identifiers. Since the data rows themselves may get
+		multiplied, the tagging is best done at the tray level (what happens if
+		the trays split in the worker threads is a separate story,
+		for now the solution is simply <quote>keep the tray together</quote>).
+		</para>
+
+		<indexterm>
+			<primary>Facet</primary>
+		</indexterm>
+		<indexterm>
+			<primary>tray</primary>
+		</indexterm>
+		<para>
+		When the data goes through a nexus, Triceps always keeps a tray as an
+		indivisible bundle. It always gets read from the reading facet
+		together, without being interspersed with the data from the other
+		trays. As the data is sent into a writer facet, it's collected in a
+		tray, and sent on only when the facet gets flushed, with the
+		<pre>TrieadOwner::flushWriters()</pre> or <pre>Facet::flushWriter()</pre>.
+		</para>
+
+		<para>
+		There also are two special labels defined on every nexus, that tell the
+		tray boundaries to the reading thread:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+			<quote>_BEGIN_</quote> is called at the start of the tray.
+			</listitem>
+
+			<listitem>
+			<quote>_END_</quote> is called at the end of the tray.
+			</listitem>
+		</itemizedlist>
+
+		<para>
+		These labels can be defined explicitly, or otherwise they become
+		defined implicitly anyway. If they get defined implicitly, they get the
+		empty row type (one with no fields). If you define them explicitly, you
+		can use any row type you please, and this is a good place for the tray
+		sequence id.
+		</para>
+
+		<para>
+		And in a writer facet you can send data to these labels. When you want
+		to put a sequence id on a tray, you define the <quote>_BEGIN_</quote> label with that
+		sequence id field, and then call the <quote>_BEGIN_</quote> label with the appropriate
+		id values. Even if you don't call the <quote>_BEGIN_</quote> and <quote>_END_</quote> labels, they do
+		get called (not quite called but placed on the tray) automatically
+		anyway, with the opcode of <pre>OP_INSERT</pre> and all the fields NULL. The
+		direct calling of these labels will also cause the facet to be flushed:
+		<quote>_BEGIN_</quote> flushes any data previously collected on the tray and then adds
+		itself; <quote>_END_</quote> adds itself and then flushes the tray.
+		</para>
+
+		<para>
+		The exact rules of how the <quote>_BEGIN_</quote> and <quote>_END_</quote> get called are actually
+		somewhat complicated, having to deal with the optimizations for the
+		case when nobody is interested in them, but they do what makes sense
+		intuitively.
+		</para>
+
+		<para>
+		The case when these labels get a call with <pre>OP_INSERT</pre> and no data, gets
+		optimized out by not placing it into the actual Xtray, even if it was
+		called explicitly. Then in the reader facet these implicit rowops are
+		re-created but only if there is a chaining for their labels from the
+		facet's FnReturn or if they are defined in the currently pushed
+		FnBinding. So if you do a trace on the reading thread's unit, you will
+		see these implicit rowops to be called only if they are actually used.
+		</para>
+
+		<indexterm>
+			<primary>partitioning</primary>
+		</indexterm>
+		<para>
+		Before going to the example itself, let's talk more about the general
+		issues of the data partitioning.
+		</para>
+
+		<para>
+		If the data processing is stateless, it's easy: just partition by the
+		primary key, and each thread can happily work on its own. If the data
+		depends on the previous data with the same primary key, the
+		partitioning is still easy: each thread keeps the state for its part of
+		the keys and updates it with the new data.
+		</para>
+
+		<para>
+		But what if you need to join two tables with independent primary keys,
+		where the matches of the keys between them are fairly arbitrary? Then
+		you can partition by one table but you have to give a copy of the
+		second table to each thread. Typically, if one table is larger than the
+		other, you would partition by the key of the big table, and copy the
+		small table everywhere. Since the data rows are referenced in Triceps,
+		the actual data of the smaller table won't be copied, it would be just
+		referenced from multiple threads, but each copy will still have the
+		overhead of its own index.
+		</para>
+
+		<para>
+		With some luck, and having enough CPUs, you might be able to save a
+		little overhead by doing a matrix: if you have one table partitioned
+		into the parts A, B and C, and the other table into parts 1, 2 and 3,
+		you can then do a matrix-combination into 9 threads processing the
+		combinations A1, A2, A3, B1, B2, B3, C1, C2, C3. If both tables are of
+		about the same size, this would create a total of 18 indexes, each
+		keeping 1/3 of one original table, so the total size of indexes will be
+		6 times the size of one original table (or 3 times the combined sizes
+		of both tables). On the other hand, if you were to copy the first table
+		to each thread and split the second table into 9 parts, creating the
+		same 9 threads, the total size of indexes will be 9 times the first
+		table and 1 times the second table, resulting in the 10 times the size
+		of one original table (or 5 times the combined sizes of both tables).
+		The 3x3 matrix is more optimal, but the catch is that the results from it
+		will really have to be restored to the correct order afterwards.
+		</para>
+
+		<para>
+		The reason is that when a row in the first table changes, it might change
+		its join key, matching the row from a different partition of the second table.
+		Which means that the DELETE of the old value and the INSERT of the
+		new value will be processed in the different threads.
+		For example, it might move the processing from the thread A1 to the thread A2. 
+		So the thread
+		A1 would generate a DELETE for the join result, and the thread A2 would
+		generate a following INSERT. With two separate threads, the resulting
+		order will be unpredictable, and the INSERT coming before the DELETE
+		would be bad. The post-reordering is required to ensure the correct order.
+		</para>
+
+		<para>
+		By contrast, if you just partition the first table and copy the second one
+		everywhere, you get 9 threads A, B, C, D, E, F, G, H, I, and the change
+		in a row will still keep it in the same thread, so the updates will
+		come out of that thread strictly sequentially. If you don't care about
+		the order of changes between different primary keys, you can get away
+		without the post-reordering. Of course, if a key field might change and
+		you care about it being processed in order, you'd still need the
+		post-reordering.
+		</para>
+
+		<para>
+		The example I'm going to show is a somewhat strange mix. It's an
+		adaptation of the Forex arbitration example from the 
+		<xref linkend="sc_joins_lookup_manual" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		As you can see from the name of that section,
+		it's doing a self-join, and doing it twice: kind of like going through the same table three
+		times.
+		</para>
+
+		<para>
+		The partitioning in this example works as follows:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+			All the data is sent to all the threads. All the threads keep a
+			full copy of the table and update it according to the input. 
+			</listitem>
+
+			<listitem>
+			But then they compute the join only if the first currency name in
+			the update falls into the thread's partition. 
+			</listitem>
+
+			<listitem>
+			The partitioning is done by the first letter of the symbol, with
+			interleaving: the symbols starting with A are handled by the thread
+			0, with B by thread 1, and so on until the threads end, and then
+			continuing again with the thread 0. A production-ready
+			implementation would use a hash function instead. But the
+			interleaving approach makes much easier to predict, which symbol
+			goes to which thread for the demonstration.
+			</listitem>
+
+			<listitem>
+			Naturally, all this means that the loop of 3 currencies might get
+			created by a change in one pair and then very quickly disappear by
+			a change to another pair.of currencies. So the post-reordering of
+			the result is important to keep the things consistent.
+			</listitem>
+		</itemizedlist>
+
+		<para>
+		I've also added a tweak allowing to artificially slow down the thread
+		0, making the incorrect order show up reliably, and really exercise the
+		reordering code. For example, suppose the following input was
+		sent quickly:
+		</para>
+
+<exdump>
+OP_INSERT,AAA,BBB,1.30
+OP_INSERT,BBB,AAA,0.74
+OP_INSERT,AAA,CCC,1.98
+OP_INSERT,CCC,AAA,0.49
+OP_INSERT,BBB,CCC,1.28
+OP_INSERT,CCC,BBB,0.78
+OP_DELETE,BBB,AAA,0.74
+OP_INSERT,BBB,AAA,0.64
+</exdump>
+
+		<para>
+		With two threads, and thread 0 working slowly, it would produce the raw
+		result:
+		</para>
+
+<exdump>
+BEGIN OP_INSERT seq="2" triead="1"
+BEGIN OP_INSERT seq="5" triead="1"
+BEGIN OP_INSERT seq="7" triead="1"
+result OP_DELETE ccy1="AAA" ccy2="CCC" ccy3="BBB" rate1="1.98" rate2="0.78" rate3="0.74" looprate="1.142856"
+BEGIN OP_INSERT seq="8" triead="1"
+BEGIN OP_INSERT seq="1" triead="0"
+BEGIN OP_INSERT seq="3" triead="0"
+BEGIN OP_INSERT seq="4" triead="0"
+BEGIN OP_INSERT seq="6" triead="0"
+result OP_INSERT ccy1="AAA" ccy2="CCC" ccy3="BBB" rate1="1.98" rate2="0.78" rate3="0.74" looprate="1.142856"
+</exdump>
+
+		<para>
+		Here the BEGIN lines are generated by the code and show the sequence
+		number of the input row and the id of the thread that did the join. 
+		They represent the <quote>_BEGIN_</quote> rowops of the trays that
+		contain the transactions, and all the following result lines until
+		the next BEGIN belong in the same tray.  The
+		result lines show the arbitration opportunities produced by the join.
+		Obviously, not every update produces a new opportunity, most of them don't.
+		But the INSERT and DELETE in the result come in the wrong order: the
+		update 7 had overtaken the update 6.
+		</para>
+
+		<para>
+		The post-reordering comes to the resque and restores the order:
+		</para>
+
+<exdump>
+BEGIN OP_INSERT seq="1" triead="0"
+BEGIN OP_INSERT seq="2" triead="1"
+BEGIN OP_INSERT seq="3" triead="0"
+BEGIN OP_INSERT seq="4" triead="0"
+BEGIN OP_INSERT seq="5" triead="1"
+BEGIN OP_INSERT seq="6" triead="0"
+result OP_INSERT ccy1="AAA" ccy2="CCC" ccy3="BBB" rate1="1.98" rate2="0.78" rate3="0.74" looprate="1.142856"
+BEGIN OP_INSERT seq="7" triead="1"
+result OP_DELETE ccy1="AAA" ccy2="CCC" ccy3="BBB" rate1="1.98" rate2="0.78" rate3="0.74" looprate="1.142856"
+BEGIN OP_INSERT seq="8" triead="1"
+</exdump>
+
+		<para>
+		As you can see, now the sequence numbers go in the sequential order. 
+		</para>
+
+		<para>
+		And finally the code of the example. I've written it with the simple
+		approach of <quote>read all stdin, process, print all to stdout</quote>. 
+		It's easier this way, and
+		anyway to demonstrate the rowop reordering, all the input has to be
+		sent quickly in one chunk. The example is found in <pre>t/xForkJoinMt.t</pre>.
+		The application starts as:
+		</para>
+
+<!-- t/xForkJoinMt.t App1 RUN fragment -->
+<pre>
+Triceps::Triead::startHere(
+	app => "ForkJoin",
+	thread => "main",
+	main => \&mainT,
+	workers => 2,
+	delay => 0.02,
+);
+</pre>
+
+		<para>
+		The main thread is:
+		</para>
+
+<!-- t/xForkJoinMt.t App1 fragment -->
+<pre>
+sub mainT # (@opts)
+{
+	my $opts = {};
+	&Triceps::Opt::parse("mainT", $opts, {@Triceps::Triead::opts,
+		workers => [ 1, undef ], # number of worker threads
+		delay => [ 0, undef ], # artificial delay for the 0th thread
+	}, @_);
+	undef @_; # avoids a leak in threads module
+	my $owner = $opts->{owner};
+	my $app = $owner->app();
+	my $unit = $owner->unit();
+</pre>
+
+		<para>
+		So far the pretty standard boilerplate with the argument parsing.
+		</para>
+
+<!-- t/xForkJoinMt.t App1 fragment -->
+<pre>
+	my $rtRate = Triceps::RowType->new( # an exchange rate between two currencies
+		ccy1 => "string", # currency code
+		ccy2 => "string", # currency code
+		rate => "float64", # multiplier when exchanging ccy1 to ccy2
+	);
+
+	# the resulting trade recommendations
+	my $rtResult = Triceps::RowType->new(
+		triead => "int32", # id of the thread that produced it
+		ccy1 => "string", # currency code
+		ccy2 => "string", # currency code
+		ccy3 => "string", # currency code
+		rate1 => "float64",
+		rate2 => "float64",
+		rate3 => "float64",
+		looprate => "float64",
+	);
+</pre>
+
+		<para>
+		The row types originate from the self-join example code, unchanged.
+		</para>
+
+<!-- t/xForkJoinMt.t App1 fragment -->
+<pre>
+	# each tray gets sequentially numbered and framed
+	my $rtFrame = Triceps::RowType->new(
+		seq => "int64", # sequence number
+		triead => "int32", # id of the thread that produced it (optional)
+	);
+	
+	# the plain-text output of the result
+	my $rtPrint = Triceps::RowType->new(
+		text => "string",
+	);
+</pre>
+
+		<para>
+		Thes definitions of the service row types. The frame row type is used to send the
+		information about the sequence number in the <quote>_BEGIN_</quote> label. The print
+		row type is used to send the text for printing back to the main thread.
+		</para>
+
+<!-- t/xForkJoinMt.t App1 fragment -->
+<pre>
+	# the input data
+	my $faIn = $owner->makeNexus(
+		name => "input",
+		labels => [
+			rate => $rtRate,
+			_BEGIN_ => $rtFrame,
+		],
+		import => "none",
+	);
+
+	# the raw result collected from the workers
+	my $faRes = $owner->makeNexus(
+		name => "result",
+		labels => [
+			result => $rtResult,
+			_BEGIN_ => $rtFrame,
+		],
+		import => "none",
+	);
+
+	my $faPrint = $owner->makeNexus(
+		name => "print",
+		labels => [
+			raw => $rtPrint, # in raw order as received by collator
+			cooked => $rtPrint, # after collation
+		],
+		import => "reader",
+	);
+</pre>
+
+		<para>
+		The processing will go in essentially a pipeline: <quote>read the input ->
+		process in the worker threads -> collate -> print in the main thread</quote>.
+		A nexus is defined for each connection between the stages of the pipeline.
+		The worker thread stage spreads into multiple parallel threads for
+		parititoned data, then joining the data paths back together in the collator.
+		</para>
+
+<!-- t/xForkJoinMt.t App1 fragment -->
+<pre>
+	Triceps::Triead::start(
+		app => $app->getName(),
+		thread => "reader",
+		main => \&readerT,
+		to => $owner->getName() . "/input",
+	);
+
+	for (my $i = 0; $i < $opts->{workers}; $i++) {
+		Triceps::Triead::start(
+			app => $app->getName(),
+			thread => "worker$i",
+			main => \&workerT,
+			from => $owner->getName() . "/input",
+			to => $owner->getName() . "/result",
+			delay => ($i == 0? $opts->{delay} : 0),
+			workers => $opts->{workers},
+			identity => $i,
+		);
+	}
+
+	Triceps::Triead::start(
+		app => $app->getName(),
+		thread => "collator",
+		main => \&collatorT,
+		from => $owner->getName() . "/result",
+		to => $owner->getName() . "/print",
+	);
+
+	my @rawp; # the print in original order
+	my @cookedp; # the print in collated order
+
+	$faPrint->getLabel("raw")->makeChained("lbRawP", undef, sub {
+		push @rawp, $_[1]->getRow()->get("text");
+	});
+	$faPrint->getLabel("cooked")->makeChained("lbCookedP", undef, sub {
+		push @cookedp, $_[1]->getRow()->get("text");
+	});
+
+	$owner->readyReady();
+
+	$owner->mainLoop();
+
+	&send("--- raw ---\n", join("\n", @rawp), "\n");
+	&send("--- cooked ---\n", join("\n", @cookedp), "\n");
+}
+</pre>
+
+		<para>
+		All the threads get started and instructed to connect to the appropriate nexuses.
+		The collator will send the data for printing twice: first time in the
+		order it was received (<quote>raw</quote>), second time in the order after collation
+		(<quote>cooked</quote>).
+		</para>
+
+<!-- t/xForkJoinMt.t App1 fragment -->
+<pre>
+sub readerT # (@opts)
+{
+	my $opts = {};
+	&Triceps::Opt::parse("readerT", $opts, {@Triceps::Triead::opts,
+		to => [ undef, \&Triceps::Opt::ck_mandatory ], # dest nexus
+	}, @_);
+	undef @_; # avoids a leak in threads module
+	my $owner = $opts->{owner};
+	my $unit = $owner->unit();
+
+	my $faIn = $owner->importNexus(
+		from => $opts->{to},
+		import => "writer",
+	);
+
+	my $lbRate = $faIn->getLabel("rate");
+	my $lbBegin = $faIn->getLabel("_BEGIN_");
+	# _END_ is always defined, even if not defined explicitly
+	my $lbEnd = $faIn->getLabel("_END_");
+</pre>
+
+		<para>
+		This demonstrates that the labels <quote>_BEGIN_</quote> and <quote>_END_</quote> always get defined
+		in each nexus, even if they are not defined explicitly. Here
+		<quote>_BEGIN_</quote> was defined explicitly but <quote>_END_</quote> was not, and nevertheless it
+		can be found and used.
+		</para>
+
+<!-- t/xForkJoinMt.t App1 fragment -->
+<pre>
+	my $seq = 0; # the sequence
+
+	$owner->readyReady();
+
+	while(&readLine) {
+		chomp;
+
+		++$seq; # starts with 1
+		$unit->makeHashCall($lbBegin, "OP_INSERT", seq => $seq);
+		my @data = split(/,/); # starts with a string opcode
+		$unit->makeArrayCall($lbRate, @data);
+		# calling _END_ is an equivalent of flushWriter()
+		$unit->makeHashCall($lbEnd, "OP_INSERT");
+	}
+
+	{
+		# drain the pipeline before shutting down
+		my $ad = Triceps::AutoDrain::makeShared($owner);
+		$owner->app()->shutdown();
+	}
+}
+</pre>
+
+		<para>
+		Each input row is sent through in a separate transaction, or in another
+		word, a separate tray. The <quote>_BEGIN_</quote> label carries the sequence number of
+		the tray. The trays can as well be sent on with <pre>TrieadOwner::flushWriters()</pre> or
+		<pre>Facet::flushWriter()</pre>, but I wanted to show that you can also flush it by
+		calling the <quote>_END_</quote> label.
+		</para>
+
+<!-- t/xForkJoinMt.t App1 fragment -->
+<pre>
+sub workerT # (@opts)
+{
+	my $opts = {};
+	&Triceps::Opt::parse("workerT", $opts, {@Triceps::Triead::opts,
+		from => [ undef, \&Triceps::Opt::ck_mandatory ], # src nexus
+		to => [ undef, \&Triceps::Opt::ck_mandatory ], # dest nexus
+		delay => [ 0, undef ], # processing delay
+		workers => [ undef, \&Triceps::Opt::ck_mandatory ], # how many workers
+		identity => [ undef, \&Triceps::Opt::ck_mandatory ], # which one is us
+	}, @_);
+	undef @_; # avoids a leak in threads module
+	my $owner = $opts->{owner};
+	my $unit = $owner->unit();
+	my $delay = $opts->{delay};
+	my $workers = $opts->{workers};
+	my $identity = $opts->{identity};
+
+	my $faIn = $owner->importNexus(
+		from => $opts->{from},
+		import => "reader",
+	);
+
+	my $faRes = $owner->importNexus(
+		from => $opts->{to},
+		import => "writer",
+	);
+
+	my $lbInRate = $faIn->getLabel("rate");
+	my $lbResult = $faRes->getLabel("result");
+	my $lbResBegin = $faRes->getLabel("_BEGIN_");
+	my $lbResEnd = $faRes->getLabel("_END_");
+</pre>
+
+		<para>
+		The worker thread starts with the pretty usual boilerplate.
+		</para>
+
+<!-- t/xForkJoinMt.t App1 fragment -->
+<pre>
+	my $seq; # sequence from the frame labels
+	my $compute; # the computation is to be done by this label
+	$faIn->getLabel("_BEGIN_")->makeChained("lbInBegin", undef, sub {
+		$seq = $_[1]->getRow()->get("seq");
+	});
+</pre>
+
+		<para>
+		The processing of each transaction starts by remembering its sequence
+		number from the <quote>_BEGIN_</quote> label. It doesn't send a <quote>_BEGIN_</quote> to the output
+		yet because it doesn't know yet if it will be producing the output.
+		All the threads get the same input, to be able to update their copies of the
+		table, but then only one thread produces the output. And the thread
+		doesn't know whether it will be the one producing the output until it
+		knows the primary key of the data. So it can start sending the
+		output only after it had seen the data. This whole scheme works for this example because
+		there is exactly one data row per each transaction. A more general
+		approach might be to have the reader thread decide up front, which worker will
+		produce the result and put this information (as either a copy of the
+		primary key or the computed thread id) into the <quote>_BEGIN_</quote> rowop.
+		</para>
+
+<!-- t/xForkJoinMt.t App1 fragment -->
+<pre>
+	...
+
+	# the table gets updated for every incoming rate
+	$lbInRate->makeChained("lbIn", undef, sub {
+		my $ccy1 = $_[1]->getRow()->get("ccy1");
+		# decide, whether this thread is to perform the join
+		$compute = ((ord(substr($ccy1, 0, 1)) - ord('A')) % $workers == $identity);
+
+		# this relies on every Xtray containing only one rowop,
+		# otherwise one Xtray will be split into multiple
+		if ($compute) {
+			$unit->makeHashCall($lbResBegin, "OP_INSERT", seq => $seq, triead => $identity);
+			select(undef, undef, undef, $delay) if ($delay);
+		}
+
+		# even with $compute is set, this might produce some output or not,
+		# but the frame still goes out every time $compute is set, because
+		# _BEGIN_ forces it
+		$unit->call($lbRateInput->adopt($_[1]));
+	});
+</pre>
+
+		<para>
+		This code makes the decision of whether this join is to be computed for
+		this thread. The decisiton is remembered in the flag <pre>$compute</pre>, and used to generate the
+		<quote>_BEGIN_</quote> rowop for the output. Then the table gets updated in any case
+		(<pre>$lbRateInput</pre> is the table's input label). I've skipped over the table
+		creation code, it's unchanged from the original self-join example.
+		</para>
+
+<!-- t/xForkJoinMt.t App1 fragment -->
+<pre>
+	$tRate->getOutputLabel()->makeChained("lbCompute", undef, sub {
+		return if (!$compute); # not this thread's problem
+		
+		...
+			if ($looprate > 1) {
+				$unit->call($result);
+			}
+		...
+	});
+	##################################################
+
+	$owner->readyReady();
+
+	$owner->mainLoop();
+}
+</pre>
+
+		<para>
+		Here again I've skipped over the way the result is computed because it's
+		lengthy and unchanged from the original example. The
+		important part is that if the <pre>$compute</pre> flag is not set, the whole
+		self-joining computation is not performed. 
+		</para>
+
+		<para>
+		The <quote>_END_</quote> label is not
+		touched, the flushing of transactions is taken care of by the
+		<pre>mainLoop()</pre>. Note that the <quote>_BEGIN_</quote> label is always sent if the data is
+		designated to this thread, even if no output as such is produced. This
+		is done because the collator needs to get an uninterrupted sequence of
+		transactions. Otherwise it would not be able to say if some transaction
+		had been dropped or only delayed.
+		</para>
+
+<!-- t/xForkJoinMt.t App1 fragment -->
+<pre>
+sub collatorT # (@opts)
+{
+	my $opts = {};
+	&Triceps::Opt::parse("collatorT", $opts, {@Triceps::Triead::opts,
+		from => [ undef, \&Triceps::Opt::ck_mandatory ], # src nexus
+		to => [ undef, \&Triceps::Opt::ck_mandatory ], # dest nexus
+	}, @_);
+	undef @_; # avoids a leak in threads module
+	my $owner = $opts->{owner};
+	my $unit = $owner->unit();
+
+	my $faRes = $owner->importNexus(
+		from => $opts->{from},
+		import => "reader",
+	);
+
+	my $faPrint = $owner->importNexus(
+		from => $opts->{to},
+		import => "writer",
+	);
+
+	my $lbResult = $faRes->getLabel("result");
+	my $lbResBegin = $faRes->getLabel("_BEGIN_");
+	my $lbResEnd = $faRes->getLabel("_END_");
+
+	my $lbPrintRaw = $faPrint->getLabel("raw");
+	my $lbPrintCooked = $faPrint->getLabel("cooked");
+
+	my $seq = 1; # next expected sequence
+	my @trays; # trays held for reordering: $trays[0] is the slot for sequence $seq
+		# (only of course that slot will be always empty but the following ones may
+		# contain the trays that arrived out of order)
+	my $curseq; # the sequence of the current arriving tray
+</pre>
+
+		<para>
+		The collator thread starts very much as usual. It has its expectation
+		of the next tray in order, which gets set correctly. The trays that
+		arrive out of order will be buffered in the array <pre>@trays</pre>. Well, more
+		exactly, for simplicity, all the trays get buffered there and then sent
+		on if their turn has come. But it's possible to make an optimized
+		version that would let the data flow through immediately if it's
+		arriving in order.
+		</para>
+
+<!-- t/xForkJoinMt.t App1 fragment -->
+<pre>
+	# The processing of data after it has been "cooked", i.e. reordered.
+	my $bindRes = Triceps::FnBinding->new(
+		name => "bindRes",
+		on => $faRes->getFnReturn(),
+		unit => $unit,
+		withTray => 1,
+		labels => [
+			"_BEGIN_" => sub {
+				$unit->makeHashCall($lbPrintCooked, "OP_INSERT", text => $_[1]->printP("BEGIN"));
+			},
+			"result" => sub {
+				$unit->makeHashCall($lbPrintCooked, "OP_INSERT", text => $_[1]->printP("result"));
+			}
+		],
+	);
+	$faRes->getFnReturn()->push($bindRes); # will stay permanently
+</pre>
+
+		<para>
+		The data gets collected into trays through a binding that gets
+		permanently pushed onto the facet's FnReturn. Then when the tray's
+		turn comes, it will be simply called and will produce the print calls
+		for the cooked data order.
+		</para>
+
+<!-- t/xForkJoinMt.t App1 fragment -->
+<pre>
+	# manipulation of the reordering, 
+	# and along the way reporting of the raw sequence
+	$lbResBegin->makeChained("lbBegin", undef, sub {
+		$unit->makeHashCall($lbPrintRaw, "OP_INSERT", text => $_[1]->printP("BEGIN"));
+		$curseq = $_[1]->getRow()->get("seq");
+	});
+	$lbResult->makeChained("lbResult", undef, sub {
+		$unit->makeHashCall($lbPrintRaw, "OP_INSERT", text => $_[1]->printP("result"));
+	});
+	$lbResEnd->makeChained("lbEnd", undef, sub {
+		my $tray = $bindRes->swapTray();
+		if ($curseq == $seq) {
+			$unit->call($tray);
+			shift @trays;
+			$seq++;
+			while ($#trays >= 0 && defined($trays[0])) {
+				# flush the trays that arrived misordered
+				$unit->call(shift @trays);
+				$seq++;
+			}
+		} elsif ($curseq > $seq) {
+			$trays[$curseq-$seq] = $tray; # remember for the future
+		} else {
+			# should never happen but just in case
+			$unit->call($tray);
+		}
+	});
+
+	$owner->readyReady();
+
+	$owner->mainLoop();
+};
+</pre>
+
+		<para>
+		The input rowops are not only collected in the binding's tray but also
+		chained directly to the labels that print the raw order of arrival. The
+		handling of <quote>_BEGIN_</quote> also remembers its sequence number.
+		</para>
+
+		<para>
+		The handler of <quote>_END_</quote> (the <quote>_END_</quote> rowops get produced implicitly at the end
+		of transaction) then does the heavy lifting. It looks at the sequence
+		number remembered from <quote>_BEGIN_</quote> and makes the decision. If the received
+		sequence is the next expected one, the data collected in the tray gets
+		sent on immediately, and then the contents of the <pre>@trays</pre> array 
+		continues being
+		sent on until it hits a blank spot of missing data. Or if the received
+		sequence leaves a gap, the tray is placed into an appropriate spot in
+		<pre>@trays</pre> for later processing.
+		</para>
+
+		<para>
+		This whole logic can be encapsulated in a class but I haven't decided
+		yet on the best way to do it. Maybe some time in the future. 
+		</para>
+	</sect1>
+</chapter>

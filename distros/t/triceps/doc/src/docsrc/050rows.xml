@@ -1,0 +1,697 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+
+<chapter id="ch_Rows" xmlns:xi="http://www.w3.org/2001/XInclude">
+	<title>Rows</title>
+
+	<para>
+	In Triceps the relational data is stored and passed around as rows
+	(once in a while I call them records, which is the same thing
+	here). Each row belongs to a certain type, that defines the types
+	of the fields. Each field may belong to one of the simple types.
+	</para>
+
+	<sect1 id="sc_SimpleTypes">
+		<title>Simple types</title>
+
+		<indexterm>
+			<primary>type</primary>
+			<secondary>simple</secondary>
+		</indexterm>
+
+		<para>
+		The simple values in Triceps belong to one of the simple types:
+		</para>
+
+		<itemizedlist>
+		<listitem>
+		uint8
+		</listitem>
+		<listitem>
+		int32
+		</listitem>
+		<listitem>
+		int64
+		</listitem>
+		<listitem>
+		float64
+		</listitem>
+		<listitem>
+		string
+		</listitem>
+		</itemizedlist>
+
+		<para>
+		I like the explicit specification of the data size, so it's not some
+		mysterious <quote>double</quote> but an explicit <quote>float64</quote>.
+		</para>
+
+		<para>
+		When the data is stored in the rows, it's stored in the strongly-typed
+		binary format. When it's extracted from the rows for the Perl code to
+		access, it gets converted into the Perl values. And the other way
+		around, when stored into the rows, the conversion is done from the Perl
+		values.
+		</para>
+
+		<para>
+		<pre>uint8</pre> is the type intended to represent the raw bytes. So, for example,
+		when they are compared, they should be compared as raw bytes, not
+		according to the locale. Since Perl stores the raw bytes in strings,
+		and its <pre>pack()</pre> and <pre>unpack()</pre> functions operate on strings, The Perl side
+		of Triceps extracts the uint8 values from records into Perl strings,
+		and the other way around. 
+		</para>
+
+		<para>
+		The string type is intended to represent a text string in whatever
+		current locale (at some point it may become always UTF-8, this question
+		is open for now).
+		</para>
+
+		<para>
+		Perl on the 32-bit machines has an issue with int64: it has no type to
+		represent it directly. Because of that, when the int64 values are
+		passed to Perl on the 32-bit machines, they are converted into the
+		floating-point numbers. This gives only 54 bits (including sign) of
+		precision, but that's close enough. Anyway, the 32-bit machines are
+		obsolete by now, and Triceps it targeted towards the 64-bit machines.
+		</para>
+
+		<para>
+		On the 64-bit machines both int32 and int64 translate to the Perl
+		64-bit integers.
+		</para>
+
+		<indexterm>
+			<primary>time</primary>
+		</indexterm>
+		<para>
+		Note that there is no special type for timestamps. As of version 1.0
+		there is no time-based processing inside Triceps, but that does not
+		prevent you from passing around timestamps as data and use them in your
+		logic. Just store the timestamps as integers (or, if you prefer,
+		as floating point numbers). When the time-based processing will be
+		added to Perl, the plan is to still use the int64 to store the number
+		of microseconds since the Unix epoch. My experience with the time types
+		in the other CEP systems is that they cause nothing but confusion.
+		In the meantime, the time-based processing is still possible by driving
+		the notion of time explicitly. It's described in the
+		<xref linkend="ch_time" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_RowTypes">
+		<title>Row types</title>
+
+		<indexterm>
+			<primary>type</primary>
+			<secondary>row</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>RowType</primary>
+		</indexterm>
+		<para>
+		A row type is created from a sequence of (field-name, field-type)
+		string pairs, for example:
+		</para>
+
+<pre>
+$rt1 = Triceps::RowType->new(
+	a => "uint8",
+	b => "int32",
+	c => "int64",
+	d => "float64",
+	e => "string",
+);
+</pre>
+
+		<para>
+		Even though the pairs look like a hash, don't use an actual hash to
+		create row types! The order of pairs in a hash is unpredictable, while
+		the order of fields in a row type usually matters.
+		</para>
+
+		<para>
+		In an actual row the field may have a value or be NULL. The NULLs are
+		represented in Perl as <pre>undef</pre>.
+		</para>
+
+		<indexterm>
+			<primary>type</primary>
+			<secondary>array</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>arrays</primary>
+		</indexterm>
+		<para>
+		The real-world records tend to be pretty wide and contain
+		repetitive data. Hundreds of fields are not unusual, and I know of a
+		case when an Aleri customer wanted to have records of two thousand
+		fields (and succeeded). This just begs for arrays. So the Triceps rows
+		allow the array fields. They are specified by adding <quote>[]</quote> at the end of
+		field type. The arrays may only be made up of fixed-width data, so no
+		arrays of strings.
+		</para>
+
+<pre>
+$rt2 = Triceps::RowType->new(
+	a => "uint8[]",
+	b => "int32[]",
+	c => "int64[]",
+	d => "float64[]",
+	e => "string", # no arrays of strings!
+);
+</pre>
+
+		<indexterm>
+			<primary>arrays</primary>
+			<secondary>empty</secondary>
+		</indexterm>
+		<para>
+		The arrays are of variable length, whatever array data passed when a
+		row is created determines its length. The individual elements in the
+		array may not be NULL (and if <pre>undef</pre>s are passed in the array used to
+		construct the row, they will be replaced with 0s). The whole array
+		field may be NULL, and this situation is equivalent to an empty array.
+		</para>
+
+		<para>
+		The type uint8 is typically used in arrays, <quote>uint8[]</quote> is the Triceps
+		way to define a blob field. In Perl the <quote>uint8[]</quote> is represented as a
+		string value, same as a simple <quote>unit8</quote>.
+		</para>
+
+		<para>
+		The rest of array values are represented in Perl as references to Perl
+		arrays, containing the actual values.
+		</para>
+
+		<para>
+		The row type objects provide a way for introspection:
+		</para>
+
+<pre>
+$rt->getdef()
+</pre>
+
+		<para>
+		returns back the array of pairs used to create this type. It can be
+		used among other things for the schema inheritance. For example, the
+		multi-part messages with daily unique ids can be defined as:
+		</para>
+
+<pre>
+$rtMsgKey = Triceps::RowType->new(
+	date => "string",
+	id => "int32",
+);
+
+$rtMsg = Triceps::RowType->new(
+	$rtMsgKey->getdef(),
+	from => "string",
+	to => "string",
+	subject => "string",
+);
+
+$rtMsgPart = Triceps::RowType->new(
+	$rtMsgKey->getdef(),
+	type => "string",
+	payload => "string",
+);
+</pre>
+
+		<para>
+		The meaning here is the same as in the CCL example:
+		</para>
+
+<pre>
+create schema rtMsgKey (
+	string date,
+	integer id
+);
+create schema rtMsg inherits from rtMsgKey (
+	string from,
+	string to,
+	string subject
+);
+create schema rtMsgPart inherits from rtMsgKey (
+	string type,
+	string payload
+);
+</pre>
+
+		<para>
+		The grand plan is to provide some better ways of defining the
+		commonality of fields between row types. It should include the ability
+		to rename fields, to avoid conflicts, and to remember this equivalence
+		to be reused in the further joins without the need to write it over and
+		over again. But it has not come to the implementation stage yet.
+		</para>
+
+		<para>
+		The other methods are:
+		</para>
+
+<pre>
+$rt->getFieldNames()
+</pre>
+
+		<para>
+		returns the array of field names only.
+		</para>
+
+<pre>
+$rt->getFieldTypes()
+</pre>
+
+		<para>
+		returns the array of field types only.
+		</para>
+
+<pre>
+$rt->getFieldMapping()
+</pre>
+
+		<para>
+		returns the array of pairs that map the field names to their indexes in
+		the field definitions. It can be stored into a hash and used for
+		name-to-index translation. It's used mostly in the templates, to
+		generate code that accesses data in the rows by field index (which is
+		more efficient than access by name). For example, for <pre>rtMsgKey</pre>
+		defined above it would return <pre>(date => 0, id => 1)</pre>.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_RowTypesEquiv">
+		<title>Row types equivalence</title>
+
+		<indexterm>
+			<primary>type</primary>
+			<secondary>match</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>type</primary>
+			<secondary>equals</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>RowType</primary>
+			<secondary>match</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>RowType</primary>
+			<secondary>equals</secondary>
+		</indexterm>
+
+		<para>
+		The Triceps objects are usually strongly typed. A label handles rows of
+		a certain type. A table stores rows of a certain type.
+		</para>
+
+		<para>
+		However there may be multiple ways to check whether a row fits for a
+		certain type:
+		</para>
+
+		<itemizedlist>
+		<listitem>
+		It may be a row of the exact same type, created with the same RowType object.
+		</listitem>
+		<listitem>
+		It may be a row of another type but one with the exact same definition.
+		</listitem>
+		<indexterm>
+			<primary>case sensitivity</primary>
+		</indexterm>
+		<listitem>
+		It may be a row of another type that has the same number of fields and
+		field types but different field names. The field names (and everything
+		else in Triceps) are case-sensitive.
+		</listitem>
+		</itemizedlist>
+
+		<para>
+		The row types may be compared for these conditions using the methods:
+		</para>
+
+<pre>
+$rt1->same($rt2)
+$rt1->equals($rt2)
+$rt1->match($rt2)
+</pre>
+
+		<para>
+		The comparisons are hierarchical: if two type references are the same,
+		they would also be equal and matching; two equal types are also
+		matching.
+		</para>
+
+		<para>
+		Most of the objects would accept the rows of any matching type (this
+		may change or become adjustable in the future). However if the rows are
+		not of the same type, this check involves a performance penalty. If the
+		types are the same, the comparison is limited to comparing the
+		pointers. But if not, then the whole type definition has to be
+		compared. So every time a row of a different type is passed, it would
+		involve the overhead of type comparison.
+		</para>
+
+		<para>
+		For example:
+		</para>
+
+<!-- perl/Triceps/t/xSnippets.t -->
+<pre>
+my @schema = (
+	a => "int32",
+	b => "string"
+);
+
+my $rt1 = Triceps::RowType->new(@schema);
+# $rt2 is equal to $rt1: same field names and field types
+my $rt2 = Triceps::RowType->new(@schema); 
+# $rt3  matches $rt1 and $rt2: same field types but different names
+my $rt3 = Triceps::RowType->new(
+	A => "int32",
+	B => "string"
+);
+
+my $lab = $unit->makeDummyLabel($rt1, "lab");
+# same type, efficient
+my $rop1 = $lab->makeRowop(&Triceps::OP_INSERT,
+	$rt1->makeRowArray(1, "x"));
+# different row type, involves a comparison overhead
+my $rop2 = $lab->makeRowop(&Triceps::OP_INSERT,
+	$rt2->makeRowArray(1, "x"));
+# different row type, involves a comparison overhead
+my $rop3 = $lab->makeRowop(&Triceps::OP_INSERT,
+	$rt3->makeRowArray(1, "x"));
+</pre>
+
+		<para>
+		A dummy label used here is a label that does nothing (its usefulness
+		will be explained later).
+		</para>
+
+		<indexterm>
+			<primary>Row</primary>
+			<secondary>re-typing</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>XS</primary>
+		</indexterm>
+		<para>
+		Once the Rowop is constructed, no further penalty is involved: the
+		row in the Rowop is re-typed to the type of the label from now on.
+		It's physically still the same row with another reference to it,
+		but when you get it back from the Rowop, it will have the label's
+		type. It's all a part of the interesting interaction between &Cpp;
+		and Perl. All the type checking is done in the Perl XS layer.
+		The &Cpp; code just expects that the data is always right and doesn't
+		carry the types around. When the Perl code wants to get the row
+		back from the Rowop, it wants to know the type of the row.
+		The only way to get it is to look, what is the label of this
+		Rowop, and get the row type from the label. This is also the
+		reason why the types have to be checked when the Rowop is
+		constructed: if a wrong row is placed into the Rowop, there will
+		be no later opportunity to check it for correctness, and bad
+		data may cause a crash.
+		</para>
+	</sect1>
+
+	<sect1 id="sc_Rows">
+		<title>Rows</title>
+
+		<indexterm>
+			<primary>Row</primary>
+		</indexterm>
+		<para>
+		The rows in Triceps always belong to some row type, and are always
+		immutable. Once a row is created, it can not be changed. This allows it
+		to be referenced from multiple places, instead of copying the whole row
+		value. Naturally, a row may be passed and shared between multiple
+		threads.
+		</para>
+
+		<para>
+		The row type provides the constructor methods for the rows:
+		</para>
+
+<pre>
+$row = $rowType->makeRowArray(@fieldValues);
+$row = $rowType->makeRowHash($fieldName => $fieldValue, ...);
+</pre>
+
+		<para>
+		Here <pre>$row</pre> is a reference to the resulting row. As usual, in case of
+		error it will confess.
+		</para>
+
+		<para>
+		In the array form, the values for the fields go in the same order as
+		they are specified in the row type (if there are too few values, the
+		rest will be considered NULL, having too many values is an error).
+		</para>
+
+		<para>
+		The Perl value of <pre>undef</pre> is treated as NULL. 
+		</para>
+
+		<para>
+		In the hash form, the fields are specified as name-value pairs. If the
+		same field is specified multiple times, the last value will overwrite
+		all the previous ones. The unspecified fields will be left as
+		NULL. Again, the arguments of the function actually are an array, but
+		if you pass a hash, its contents will be converted to an array on the
+		call stack.
+		</para>
+
+		<para>
+		If the performance is important, the array form is more efficient,
+		since the hash form has to translate internally the field names to
+		indexes.
+		</para>
+
+		<para>
+		The row itself and its type don't have any concept of keys in general
+		and of the primary key in particular. So any fields may be left as NULL.
+		There is no <quote>NOT NULL</quote> constraint.
+		</para>
+
+		<para>
+		Some examples:
+		</para>
+
+<pre>
+$row  = $rowType->makeRowArray(@fields);
+$row  = $rowType->makeRowArray($a, $b, $c);
+$row  = $rowType->makeRowHash(%fields);
+$row  = $rowType->makeRowHash(a => $a, b => $b);
+</pre>
+
+		<para>
+		The usual Perl conversions are applied to the values. So for example,
+		if you pass an integer 1 for a string field, it will be converted to
+		the string <quote>1</quote>. Or if you pass a string <quote></quote> for an integer field, it
+		will be converted to 0. 
+		</para>
+
+		<para>
+		If a field is an array (as always, except for <pre>uint8[]</pre> which is
+		represented as a Perl string), its value is a Perl array reference (or
+		<pre>undef</pre>). For example:
+		</para>
+
+<pre>
+$rt1 = Triceps::RowType->new(
+	a => "uint8[]",
+	b => "int32[]",
+);
+$row = $rt1->makeRowArray("abcd", [1, 2, 3]);
+</pre>
+
+		<para>
+		An empty array will become a NULL value. So the following two are equivalent:
+		</para>
+
+<pre>
+$row = $rt1->makeRowArray("abcd", []);
+$row = $rt1->makeRowArray("abcd", undef);
+</pre>
+
+		<para>
+		Remember that an array field may not contain NULL values. Any <pre>undef</pre>s
+		in the array fields will be silently converted to zeroes (since arrays
+		are supported only for the numeric types, a zero value would always
+		be available for all of them). The following two are equivalent:
+		</para>
+
+<pre>
+$row = $rt1->makeRowArray("abcd", [undef, undef]);
+$row = $rt1->makeRowArray("abcd", [0, 0]);
+</pre>
+
+		<para>
+		The row also provides a way to copy itself, modifying the values of
+		selected fields:
+		</para>
+
+<pre>
+$row2 = $row1->copymod($fieldName => $fieldValue, ...);
+</pre>
+
+		<para>
+		The fields that are not explicitly specified will be left unchanged.
+		Since the rows are immutable, this is the closest thing to the field
+		assignment. <pre>copymod()</pre> is generally more efficient than
+		extracting the row into an array or hash, replacing a few of them with
+		new values and constructing a new row. It bypasses the
+		binary-to-Perl-to-binary conversions for the unchanged fields.
+		</para>
+
+		<para>
+		The row knows its type, which can be obtained with
+		</para>
+
+<pre>
+$row->getType()
+</pre>
+
+		<para>
+		Note that this will create a new Perl wrapper to the underlying type
+		object. So if you do:
+		</para>
+
+<pre>
+$rt1 = ...;
+$row = $rt1->makeRow...;
+$rt2 = $row->getType();
+</pre>
+
+		<para>
+		then <pre>$rt1</pre> will not be equal to <pre>$rt2</pre> by the direct
+		Perl comparison (<pre>$rt1 != $rt2</pre>). However both <pre>$rt1</pre>
+		and <pre>$rt2</pre> will refer to the same row type object, so
+		<pre>$rt1-&gt;same($rt2)</pre> will be true.
+		</para>
+
+		<para>
+		The row references can also be compared for sameness:
+		</para>
+
+<pre>
+$row1->same($row2)
+</pre>
+
+		<para>
+		The row contents can be extracted back into Perl representation as
+		</para>
+
+<pre>
+@adata = $row->toArray();
+%hdata = $row->toHash();
+</pre>
+
+		<para>
+		Again, the NULL fields will become <pre>undef</pre>s, and the array fields (unless
+		they are NULL) will become Perl array references. Since the empty array
+		fields are equivalent to NULL array fields, on extraction back they
+		will be treated the same as NULL fields, and become <pre>undef</pre>s.
+		</para>
+
+		<para>
+		There is also a convenience function to get one field from a row at a
+		time by name:
+		</para>
+
+<pre>
+$value = $row->get("fieldName");
+</pre>
+
+		<para>
+		If you need to access only a few fields from a big row, <pre>get()</pre> is more
+		efficient (and easier to write) that extracting the whole row with
+		<pre>toHash()</pre> or even with <pre>toArray()</pre>. But don't forget that every time you
+		call <pre>get()</pre>, it creates a new Perl value, which may be pretty involved
+		if the value is an array. So the most efficient way then for the
+		values that get reused many times is to call <pre>get()</pre>, remember the result in a Perl
+		variable, and then reuse that variable.
+		</para>
+
+		<para>
+		There is also a way to conveniently print a rows contents, usually for
+		the debugging purposes:
+		</para>
+
+<pre>
+$result = $row->printP();
+</pre>
+
+		<indexterm>
+			<primary>print</primary>
+		</indexterm>
+		<para>
+		The name <pre>printP</pre> is an artifact of implementation: it shows that this
+		method is implemented in Perl and uses the default Perl conversions of
+		values to strings. The <pre>uint8[]</pre> arrays are printed directly as strings.
+		The result is a sequence of <pre>name="value"</pre> or 
+		<pre>name=["value", "value", "value"]</pre> 
+		for all the non-NULL fields. The backslashes and double quotes
+		inside the values are escaped by backslashes in Perl style. For
+		example, reusing the row type above,
+		</para>
+
+<pre>
+$row = $rt1->makeRowArray('ab\ "cd"', [0, 0]);
+print $row->printP(), "\n";
+</pre>
+
+		<para>
+		will produce
+		</para>
+
+<pre>
+a="ab\\ \"cd\"" b=["0", "0"]
+</pre>
+
+		
+		<para>
+		It's possible to check quickly if all the fields of a row are NULL:
+		</para>
+
+<pre>
+$result = $row->isEmpty();
+</pre>
+
+		<para>
+		It returns 1 if all the fields are NULL and 0 otherwise.
+		</para>
+
+		<para>
+		Finally, there is a deep debugging method:
+		</para>
+
+<pre>
+$result = $row->hexdump()
+</pre>
+
+		<para>
+		That dumps the raw bytes of the row's binary format, and is useful only
+		to debug the more weird issues.
+		</para>
+
+	</sect1>
+
+</chapter>

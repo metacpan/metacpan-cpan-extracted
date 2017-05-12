@@ -1,0 +1,1128 @@
+#!PERL
+#
+# tkjuke
+#
+# Provide a Perl/Tk graphical interface for the "mtx" helper command "juke".
+#
+# See the POD for usage information.
+
+use File::Basename;
+use lib 'JUKE_ROOT';
+use Jukebox;
+use Proc::ProcessTable;
+
+use Tk;
+use Tk::CollapsableFrame;
+use Tk::ExecuteCommand;
+use Tk::JukeboxDrive;
+use Tk::JukeboxSlot;
+use Tk::widgets qw/ DialogBox LabEntry NoteBook Pane ROText /;
+
+use subs qw/
+    bccmd discon fini file get_drives get_slots help init main master
+    msgsys ok sdbm_update sdbm_view slave start_slave synchronize
+/;
+use strict;
+
+# Global variables.
+
+our $ULT3582_TL_on_Linux = 1;	# kluge code until mtx/IBM get their act together
+our $BROKEN_SUN_LIBRARY = 0;
+
+our (
+     $bcdialog,			# barcode DialogBox widget
+     $dcount,			# drive count
+     $drives,			# media drives Pane
+     @drives,			# array of JukeboxDrive widgets
+     $dte,			# regex for and empty SE
+     $ec,			# ExecuteCommand widget reference
+     $empty,			# the empty slot string
+     $full,			# the full  slot string
+     $mcount,			# import/export "mail" count
+     $mw,			# slave's MainWindow
+     $mw_master,		# master's MainWindow
+     $nb,                       # NoteBook
+     $opmenu,			# popup operations Menu
+     %pages,                    # names of active NoteBook pages
+     $pidfile,                  # slave's PID
+     $quit,			# application cleanup subroutine
+     $red_button_e,		# encoded GIF red close button
+     $red_button_no_x_e,	# encoded GIF red close button no X
+     $red_button_i,		# red close button image
+     $red_button_no_x_i,	# red close button no X image
+     $scount,			# slot count
+     $se,			# regex for an empty DTE
+     $slave,                    # undef = master, else window ID
+     $slots,			# media slots pane
+     @slots,			# array of JukeboxSlot widgets
+);
+
+# Main. 
+
+init;				# initialize
+main;				# main loop
+fini;				# finish
+
+# Subroutines.
+
+sub bccmd {
+
+    # This callback is invoked to set/change a media's barcode. We're
+    # called with a JukeBoxSlot widget reference.
+
+    my ($self) = @_;
+
+    my $slot = $self->cget(-slotnumber);
+    my $text = $self->cget(-barcode);
+    
+    my $l = $bcdialog->Subwidget('label');
+    $l->configure(
+        -text => "The barcode in SE $slot is '$text'. " .
+        "You may now enter a new barcode.",
+    );
+    my $e = $bcdialog->Subwidget('entry');
+    $e->delete(0, 'end');
+    $e->focusForce;
+
+    my $answer = $bcdialog->Show;
+    return if $answer =~ /Cancel/i;
+
+    if ($answer =~ /OK/i) {
+	msgsys "$JUKE_CONFIG{JUKE} barcodes $slot '" . $e->get . "'", 0;
+    } elsif ($answer =~ /Mark Empty/i) {
+	msgsys "$JUKE_CONFIG{JUKE} barcodes $slot '" . $empty  . "'", 0;
+    } elsif ($answer =~ /Mark Full/i) {
+	msgsys "$JUKE_CONFIG{JUKE} barcodes $slot '" . $full   . "'", 0;
+    }
+
+    synchronize;
+
+} # end bccmd
+
+sub discon {
+
+    # Disconnect a jukebox by killing the ssh process and deleting
+    # the NoteBook page.
+
+    my ($page) = @_;
+
+    my $pt = Proc::ProcessTable->new;
+    foreach my $p ( @{$pt->table} ){
+	kill 15, $p->pid if $p->cmndline =~ /ssh -p \d+ -X -f $page /;
+    }
+
+    $nb->delete($page);
+    delete $pages{$page};
+
+} # end discon
+
+sub fini {
+
+    &$quit;
+
+} # end fini
+
+sub get_drives {
+
+    # We get the drive numbers from the Checkbutton's -variable option. All
+    # the JukeboxDrive widgets have unique variables, which have a value of
+    # zero when unselected and a reference to the Tk::JukeboxDrive widget if
+    # selected.  Foreach selected Tk::JukeboxDrive widget, fetch and return
+    # its -drivenumber value.  Drive numbers start at ZERO and can be used to
+    # index into the @drives array.
+
+    my @d = grep { ${$_->Subwidget('check')->cget(-variable)} != 0  } @drives;
+    return  map  { $_->cget(-drivenumber) } @d;
+
+} # end get_drives
+
+sub get_slots {
+
+    # We get the slot numbers from the Checkbutton's -variable option. All
+    # the JukeboxSlot widgets have unique variables, which have a value of
+    # zero when unselected and a reference to the Tk::JukeboxSlot widget if
+    # selected.  Foreach selected Tk::JukeboxSlot widget, fetch and return
+    # its -slotnumber value.  Slot numbers start at ONE and can be used to
+    # index into the @slots array.
+
+    my @s = grep { ${$_->Subwidget('check')->cget(-variable)} != 0  } @slots;
+    return  map  { $_->cget(-slotnumber) } @s;
+
+} # end get_slots
+
+sub init {
+
+    $slave = $ARGV[0];		# undef for a master
+
+    $quit = sub {		# application cleanup subroutine
+
+	# Run Disconnect callback on all NoteBook pages.
+
+	foreach (keys %pages) {
+	    discon $_;
+	}
+
+	exit;
+    };
+
+    $red_button_e = <<'END';
+/* XPM */
+static char * unknown[] = {
+"14 14 89 2",
+".. c #000000",
+"#. c #d8b0b0",
+"a. c #808080",
+"b. c #683838",
+"c. c #b02820",
+"d. c #805858",
+"e. c #908888",
+"f. c #886058",
+"g. c #804840",
+"h. c #d06058",
+"i. c #c84840",
+"j. c #f09890",
+"k. c #f8b0a8",
+"l. c #803030",
+"m. c #f8a090",
+"n. c #383030",
+"o. c #883038",
+"p. c #f88880",
+"q. c #f07068",
+"r. c #902028",
+"s. c #e0d8d8",
+"t. c #481010",
+"u. c #908880",
+"v. c #e0a098",
+"w. c #c05050",
+"x. c #703838",
+"y. c #b02020",
+"z. c #c04038",
+"A. c #f0a8a0",
+"B. c #702028",
+"C. c #e06858",
+"D. c #d86058",
+"E. c #f89890",
+"F. c #c8c8c8",
+"G. c #982820",
+"H. c #707070",
+"I. c #a83028",
+"J. c #a02828",
+"K. c #d89890",
+"L. c #805050",
+"M. c #d87068",
+"N. c #885850",
+"O. c #c84038",
+"P. c #d05850",
+"Q. c #f8a8a0",
+"R. c #e06058",
+"S. c #c0c0c0",
+"T. c #d0c8c8",
+"U. c #481820",
+"V. c #a02820",
+"W. c #982020",
+"X. c #787070",
+"Y. c #c06058",
+"Z. c #581010",
+"0. c #101010",
+"1. c #887878",
+"2. c #b83030",
+"3. c #c85048",
+"4. c #201818",
+"5. c #c03830",
+"6. c #f8a898",
+"7. c #e87868",
+"8. c #383838",
+"9. c #b8b8b8",
+".# c #f89088",
+"## c #484040",
+"a# c #e0e0e0",
+"b# c #481818",
+"c# c #c88880",
+"d# c #685050",
+"e# c #a83838",
+"f# c #a02020",
+"g# c #888888",
+"h# c #784840",
+"i# c #c04840",
+"j# c #c03828",
+"k# c #e89890",
+"l# c #989090",
+"m# c #803830",
+"n# c #d05048",
+"o# c #f8a098",
+"p# c #a89898",
+"q# c #e06868",
+"r# c #504040",
+"s# c #a86058",
+"t# c #401010",
+"u# c #c88878",
+"v# c #583030",
+"w# c #c89098",
+"F.F.F.9.H.8.0.0.8.H.9.F.F.F.",
+"F.F.g#n.##X.l#l#X.##n.g#F.F.",
+"F.g#4...p#T.s.a#T.p#d#4.g#F.",
+"9.n.v#....#.#.#.#.w#....n.9.",
+"a.b#o.e#....Y.Y.Y.....o.U.a.",
+"r#B.f#y.2.....i#....y.W.B.r#",
+"t#r.c.5.i.P.......i.j#c.r.t.",
+"Z.J.z.n#D.q#......R.n#O.J.Z.",
+"b.I.3.C.q.....p.....C.n#I.x.",
+"1.G.h.7.....E.E..#....D.V.1.",
+"S.m#w.....m.6.Q.o#.#....l.S.",
+"F.l#....k#A.k.k.A.j.M...l#F.",
+"F.F.l#L.s#u#K.v.c#s#N.l#F.F.",
+"F.F.F.F.e.d.h#g.f.u.F.F.F.F."};
+END
+
+    $red_button_no_x_e = << 'END';
+/* XPM */
+static char * unknown[] = {
+"14 14 119 2",
+".. c #808080",
+"#. c #d8b0b0",
+"a. c #683838",
+"b. c #b85050",
+"c. c #b02820",
+"d. c #c04838",
+"e. c #805858",
+"f. c #908888",
+"g. c #989088",
+"h. c #886058",
+"i. c #804840",
+"j. c #d06058",
+"k. c #d05040",
+"l. c #c84840",
+"m. c #988890",
+"n. c #282828",
+"o. c #f8b0a8",
+"p. c #a8a8a8",
+"q. c #803030",
+"r. c #f8a090",
+"s. c #e06860",
+"t. c #b8b0b0",
+"u. c #f08080",
+"v. c #883038",
+"w. c #f88880",
+"x. c #505050",
+"y. c #a06868",
+"z. c #902028",
+"A. c #e0d8d8",
+"B. c #c89090",
+"C. c #c88078",
+"D. c #b85048",
+"E. c #e0b0b0",
+"F. c #e0a098",
+"G. c #d07068",
+"H. c #c85850",
+"I. c #c05050",
+"J. c #b02020",
+"K. c #d06050",
+"L. c #c04038",
+"M. c #f0a8a0",
+"N. c #a0a0a0",
+"O. c #702028",
+"P. c #e06858",
+"Q. c #d86058",
+"R. c #302828",
+"S. c #f89890",
+"T. c #f08078",
+"U. c #982820",
+"V. c #a83028",
+"W. c #a02828",
+"X. c #d89890",
+"Y. c #c06060",
+"Z. c #b83830",
+"0. c #908080",
+"1. c #f0a898",
+"2. c #c84038",
+"3. c #d05850",
+"4. c #e07070",
+"5. c #f8a8a0",
+"6. c #f09088",
+"7. c #a8a0a0",
+"8. c #e87870",
+"9. c #302028",
+".# c #382828",
+"## c #c0c0c0",
+"a# c #f88078",
+"b# c #d0c8c8",
+"c# c #481820",
+"d# c #a03838",
+"e# c #a02820",
+"f# c #982020",
+"g# c #a83020",
+"h# c #787070",
+"i# c #a83840",
+"j# c #500810",
+"k# c #080810",
+"l# c #c06058",
+"m# c #b83030",
+"n# c #805048",
+"o# c #c85048",
+"p# c #e87868",
+"q# c #e07068",
+"r# c #e87070",
+"s# c #c0b8c0",
+"t# c #f89088",
+"u# c #484040",
+"v# c #903028",
+"w# c #606060",
+"x# c #e0e0e0",
+"y# c #583038",
+"z# c #c88880",
+"A# c #685050",
+"B# c #a02020",
+"C# c #080808",
+"D# c #807070",
+"E# c #784840",
+"F# c #c03828",
+"G# c #181010",
+"H# c #201810",
+"I# c #c04840",
+"J# c #e89890",
+"K# c #c03030",
+"L# c #885048",
+"M# c #783030",
+"N# c #d05048",
+"O# c #f8a098",
+"P# c #e06868",
+"Q# c #a89898",
+"R# c #986868",
+"S# c #f07868",
+"T# c #f08880",
+"U# c #e87068",
+"V# c #902828",
+"W# c #585858",
+"X# c #380810",
+"Y# c #a86058",
+"Z# c #c89098",
+"0# c #583030",
+"b#b#b#..x.n.k#C#n.x...b#b#b#",
+"b#7.w#n.u#h#g.m.h#u#n.w#b#b#",
+"b#w#G#A#Q#b#A.x#b#Q#A#H#w#p.",
+"..9.y#y.Z##.E.#.#.B.R#0#R...",
+"W#c#v.d#b.l#Y.l#l#D.i#v.c#W#",
+".#O.B#J.K#L.I#I#L.m#J.f#O..#",
+"X#z.J.Z.d.3.K.K.3.l.F#c.z.X#",
+"j#W.L.k.Q.P#r#8.q#Q.N#2.W.j#",
+"a.V.o#s.U#T.T#w.T.S#P.N#g#a.",
+"D#U.j.p#a#t#S.S.6.a#p#Q.e#D#",
+"N.M#I.T.t#r.O#5.O#6.u.H.q.N.",
+"t.f.V#G.J#1.o.o.M.J#4.v#f.b#",
+"b###f.L#Y#C.X.F.z#Y#n#f.##b#",
+"b#b###s#0.e.E#i.h.0.####b#b#"};
+END
+
+    $slave ? slave : master;
+
+} # end init
+
+sub main {
+
+    MainLoop;
+    
+} # end main
+
+sub master {
+
+    $SIG{HUP}  = 'ignore';
+    $SIG{QUIT} = 'ignore';
+
+    $mw_master = MainWindow->new;
+    $mw_master->title('JukeBox Controller');
+
+    $red_button_i      = $mw_master->Photo( -data => $red_button_e,      -format => 'xpm' );
+    $red_button_no_x_i = $mw_master->Photo( -data => $red_button_no_x_e, -format => 'xpm' );
+
+    $mw_master->configure(-menu => my $menubar = $mw_master->Menu);
+    map {$menubar->cascade( -label => '~' . $_->[0], -menuitems => $_->[1] )}
+         ['File',    file],
+         ['Help',    help];
+
+    $nb = $mw_master->NoteBook(
+        -dynamicgeometry => 1,
+        -background      => 'lightblue',
+    )->pack;
+    my $nb_con = $nb->add('Connect', -label => 'Connect');
+    my $nb_con_l = $nb_con->Listbox(qw/-width 65 -font 9x15bold/)->pack;
+
+    $nb_con->Label(
+        -font       => '9x15bold',
+        -foreground => 'blue',
+        -text       => 'Connect Manually',
+    )->pack(-pady =>20);
+
+    my $nb_con_f = $nb_con->Frame->pack;
+    my $tkjuke;
+    my $e;
+    foreach my $item (['tkjuke command', \$tkjuke]) {
+        my $l = $item->[0] . ':  ';
+        my $le = $nb_con_f->LabEntry(
+            -label        => ' ' x (8 - length $l) . $l,
+            -labelPack    => [qw/-side left -anchor w/],
+            -labelFont    => '9x15',
+            -textvariable => $item->[1],
+            -width        => 50,
+        );
+        $le->pack(qw/ -fill x -expand 1/);
+	$e = $le->Subwidget('entry') if $l eq 'tkjuke command:  ';
+    }
+
+    $nb->pageconfigure('Connect', -raisecmd => sub {$e->focus});
+
+    $nb_con_f->Button(
+        -text    => 'Connect',
+        -command => [\&start_slave, \$tkjuke],
+    )->pack(-pady => 10);
+
+    open(T, "JUKE_ROOT/tkjuke.config") or warn "Cannot open JUKE_ROOT/tkjuke.config: $!";
+    my @auto;
+    while ($_ = <T>) {
+	next if /^#/ or /^$/;
+	chomp;
+	s/auto-connect\s*=\s*(\d+)//;
+	my $a = $1 == 1 ? 1 : 0;
+	s/\s*tkjuke\s*=\s*//;
+	s/"//g;
+	s/\t/ /g;
+	push @auto, $_ if $a;
+	$nb_con_l->insert('end', $_);
+    }
+    close T;
+
+    foreach $tkjuke (@auto) {
+	start_slave \$tkjuke;
+        $mw_master->update;
+    }
+
+    $nb_con_l->bind('<Double-ButtonRelease-1>' =>
+        sub {
+	    my ($l) = @_;
+	    $tkjuke = $l->get('active');
+	    start_slave \$tkjuke;	
+	}
+    );
+
+} # end master
+
+sub msgsys {
+
+    # Optionally post an "OK to continue" Dialog and execute a command.
+
+    my ($cmd, $wait_ack) = @_;
+
+    my $date = scalar localtime;
+    my $text = $ec->Subwidget('text')->Subwidget('scrolled');
+
+    if ($ec->Subwidget('doit')->cget(-text) eq 'Cancel') {
+	$text->insert('end', "$date BSY: $cmd\n");
+	$text->see('end');
+	$text->update;
+	return 0;
+    }
+
+    if ($wait_ack) {
+	my $ans = $mw->messageBox(
+            -font       => '9x15',
+            -message    => "Okay to execute:\n\n$cmd",
+            -title      => 'ExecuteCommand',
+            -type       => 'yesno',
+            -wraplength => '10i',
+        );
+	return unless $ans =~ /yes/i;
+    }
+
+    $date = scalar localtime;
+    $text->insert('end', "$date BEG: $cmd\n");
+    $text->see('end');
+    $text->update;
+
+    $ec->configure(-command => $cmd);
+    $ec->execute_command;
+    $ec->bell;
+
+    $date = scalar localtime;
+    $text->insert('end', "$date END: $cmd\n");
+    $text->see('end');
+    $text->update;
+    
+    return $ec->get_status;
+
+} # end msgsys
+
+sub ok {
+
+    return $mw_master->messageBox(
+        -message    => $_[1],
+        -title      => $_[0],
+        -type       => 'ok',
+        -wraplength => '6i',
+    );
+
+} # end ok
+
+sub slave {
+
+    my $slave_mw = MainWindow->new;
+#    $slave_mw->configure( -background, '#ffffe6e8e6e8' );
+#    $slave_mw->optionAdd( '*Background' => '#ffffe6e8e6e8' );
+#    $slave_mw->optionAdd( '*activeBackground' => 'lightsteelblue' );
+#    $slave_mw->optionAdd( '*activeForeground' => 'black' );
+#    $slave_mw->optionAdd( '*selectForeground' => 'black' );
+#    $slave_mw->optionAdd( '*selectBackground' => 'lightsteelblue' );
+
+    if ($slave eq 'slave') {
+	$mw = $slave_mw;
+    } else {
+	$slave_mw->withdraw;
+	$mw = $slave_mw->Toplevel(-use => hex $slave);
+    }
+    $mw_master = $mw;
+    $SIG{HUP} = sub { &synchronize };
+    $mw->repeat( 10_000 => sub { $mw->idletasks } );
+
+    $pidfile = ( $slave eq 'slave' ) ? 'test' : basename $JUKE_CONFIG{CHANGER};
+    $pidfile = '/tmp/tkjuke-slave-' . $pidfile . '.pid';
+    open PID, ">$pidfile" or die "Cannot open $pidfile: $!";
+    print PID "$$\n";
+    close PID or die "Cannot close $pidfile: $!";
+
+    $empty = '*  empty  *';	# representation of an empty SE
+    $full  = '*  full  *';	# representation of a  full  SE
+
+    $dte = '\^\.\.  DTE \d+';	# regex representation of an empty SE
+    $se  = 'SE \d+ \.\.v';	# regex representation of an empty DTE
+
+    # Get the count of drives and slots, including import/export mail slots,
+    # then create the Scrolled Pane of dive slots.
+
+    my (@status) = sys "$JUKE_CONFIG{JUKE} status";
+    ($dcount, $scount, $mcount) = $status[0] =~
+	/(\d+) Drives, (\d+) Slots \( (\d+) /;
+    $scount = $BROKEN_SUN_LIBRARY if $BROKEN_SUN_LIBRARY > 0;
+
+    my $drives_frame = $mw->Frame->pack;
+    $drives = $drives_frame->Scrolled('Pane',
+        -borderwidth => 4,
+        -height      => 310,
+        -relief      => 'solid',
+        -scrollbars  => 'osow',
+        -sticky      => 'w',
+        -width       => 200,
+    );
+    $drives->pack(qw/-side left -fill x -expand 1/);
+
+    foreach my $drive (1 .. $dcount) {
+	push @drives, $drives->JukeboxDrive(
+            -drivenumber => $drive - 1,
+        )->pack(-side => 'left');
+    }
+
+    $drives[0]->Subwidget('check')->select if @drives == 1;
+
+    # Create the ROText widget containing data from "loaderinfo"
+    # and the scrolled Pane containing the media drives.  If only
+    # one drive, select it.
+
+    $drives_frame->Label(
+        -foreground => 'blue',
+        -text       => &version,
+    )->pack(-pady => 20);
+    my $t = $drives_frame->ROText(qw/-height 4 -width 40/);
+    $t->pack(qw/-side right -padx 30/);
+
+    my (@loaderinfo) = sys "$JUKE_CONFIG{LOADERINFO} -f $JUKE_CONFIG{CHANGER}";
+    my $loaderinfo = join(' ', @loaderinfo);
+
+    $t->tagConfigure('fg', -foreground => 'blue');
+    for (@loaderinfo[0 .. 3]) {
+	my ($l, $v) = /(.*):(.*)/;
+	$t->insert('end', sprintf("%-15s: %-s\n", $l, $v), 'fg');
+    }
+
+    # Create the scrolled Pane containing the media slots, and possibly
+    # one or more import/export "mail" slots.  Clicking on a SE posts
+    # the $bcdialog widget to set/change the barcode.
+    
+    $slots = $mw->Scrolled('Pane',
+        -borderwidth => 4,
+        -height      => 300,
+        -relief      => 'solid',
+        -scrollbars  => 'osow',
+        -sticky      => 'w',
+        -width       => 600,
+    );
+    $slots->pack(qw/-fill x -expand 1/);
+    
+    foreach my $slot (1 .. $scount) {
+	push @slots, $slots->JukeboxSlot(
+	    -barcodecmd => \&bccmd,
+            -slotnumber => $slot,
+        )->pack(-side => 'left');
+    }
+
+    if( $ULT3582_TL_on_Linux ) {
+ 	$slots[0]->configure( qw/ -background darkseagreen -foreground white / );
+	my $fake_mail_slot = $mw->Label( qw/ -text Mail -background darkseagreen -foreground white / );
+	$fake_mail_slot->place( -in => $slots[0], qw/ -x 1 -y 3 / );
+	$fake_mail_slot->raise;
+    }
+
+    $bcdialog = $mw->DialogBox(
+        -title   => 'Set/Change Barcode',
+        -buttons => ['OK', 'Cancel', 'Mark Empty', 'Mark Full'],
+    );
+    $bcdialog->add('Label')->pack;
+    $bcdialog->add('Entry')->pack;
+
+    $mw->Frame(qw/-height 2 -background black/)->pack(qw/-side top -fill x -expand 1/);
+
+    # Create the ExecuteCommand widget inside a CollapsableFrame.
+
+    my $cf = $mw->CollapsableFrame(qw/-title Details -width 600 -height 250/);
+    $cf->pack(qw/-side top -fill x -expand 1/);
+    my $colf = $cf->Subwidget('colf');
+    $cf->toggle;		# open the CollapsableFrame
+
+    $ec = $colf->ExecuteCommand(
+        -command    => '',
+        -entryWidth => 50,
+        -height     => 10,
+        -label      => '',
+        -text       => 'Execute',
+    )->pack(qw/-side top -fill x -expand 1/);
+    $ec->Subwidget('label')->packForget;
+
+    # Create the popup operations Menu and define a Button3 callback
+    # to post it.
+
+    my (@menuitems) = (
+        [qw/command ~Load          -command/ => \&lu          ],
+        [qw/command ~Unload        -command/ => \&lu          ],
+	'',
+        [qw/command ~Invert-Load   -command/ => \&lu          ],
+        [qw/command ~Invert-Unload -command/ => \&lu          ],
+        '',
+        [qw/command ~First         -command/ => \&flnp        ],
+        [qw/command ~Last          -command/ => \&flnp        ],
+        [qw/command ~Next          -command/ => \&flnp        ],
+        [qw/command ~Previous      -command/ => \&flnp        ],
+        '',
+        [qw/command ~Transfer      -command/ => \&transfer    ],
+        [qw/command ~Bump          -command/ => \&bump        ],
+        '',
+	[qw/cascade ~Barcodes -command/ => \&barcodes, -menuitems => [
+         ['command' => '~View Database',       -command => \&sdbm_view],
+         ['command' => '~Update Database ...', -command => \&sdbm_update],
+	]],
+        '',
+        [qw/command ~Refresh       -command/ => \&refresh     ],
+    );
+
+    $opmenu = $mw->Menu(
+        -menuitems => [@menuitems],
+	-tearoff   => 0,
+        -title     => 'tkjuke operations',
+    );
+
+    $mw->bind('<ButtonPress-3>' => [sub {
+	$opmenu->Popup(qw/-popover cursor -popanchor ne/);
+    }]);
+
+    # Disable menu items that the jukebox does not support.
+
+    my ($invertable, $can_transfer) = (0, 0);
+    $invertable   = 1 if $loaderinfo =~ /Invertable: Yes/;
+    $can_transfer = 1 if $loaderinfo =~ /Can Transfer: Yes/;
+    $can_transfer = 1 if $ULT3582_TL_on_Linux;
+
+    if (not $invertable) {
+	$opmenu->entryconfigure('Invert-Load',   -state => 'disabled');
+	$opmenu->entryconfigure('Invert-Unload', -state => 'disabled');
+    }
+    if (not $can_transfer) {
+	$opmenu->entryconfigure('Transfer',      -state => 'disabled');
+	$opmenu->entryconfigure('Bump',          -state => 'disabled');
+    }
+
+    # Populate the jukebox with initial drive, slot and barcode information.
+
+    synchronize;
+
+} # end slave
+
+sub start_slave {
+
+    my ($ssh_command) = @_;
+
+    my $tkjuke = $$ssh_command;
+    my ($user, $host) = $tkjuke =~ /(\S+)\@(\S+)/;
+    $pages{"$user\@$host"} = 1;
+    my $nb_slave = $nb->add("$user\@$host", -label => "$user\@$host");
+
+    my $discon_frame = $nb_slave->Frame->pack(-fill=>'both');
+    my $discon = $discon_frame->Button(
+        -command     => [\&discon, "$user\@$host"],
+        -image       => $red_button_no_x_i,
+        -relief      => 'flat',
+        -borderwidth => 0,
+    )->pack( qw / -side top -anchor w / );
+    $discon->bind( '<Enter>' => sub { $_[0]->configure( -image => $red_button_i ) } );
+    $discon->bind( '<Leave>' => sub { $_[0]->configure( -image => $red_button_no_x_i ) } );
+
+    my $container = $nb_slave->Frame(-container => 1)->pack;
+    my $id = $container->id;
+
+    system "$tkjuke '$id'";
+    warn "slave tkjuke failure: $?" if $?;
+
+} # end start_slave
+
+sub synchronize {
+
+    # Populate the jukebox with drive and slot widgets, and with barcode
+    # data, if available.  Do NOT change the "DTE" and "SE" strings
+    # without a coordinated change to the variables $dte and $se!
+
+
+    my $date = scalar localtime;
+    my $text = $ec->Subwidget('text')->Subwidget('scrolled');
+    $text->insert('end', "$date SYN: synchronizing ...\n");
+    $text->see('end');
+    $text->update;
+
+    if ($ec->Subwidget('doit')->cget(-text) eq 'Cancel') {
+	$text->insert('end', "$date BSY: cannot synchronize\n");
+	$text->see('end');
+	$text->update;
+	return 0;
+    }
+
+    my( $end ) = $text->index( 'end' );
+    my (@status) = msgsys "$JUKE_CONFIG{JUKE} status", 0;
+    @status = split /\n/, $text->get( $end, 'end' );
+    $#status--;			# trim completion date/time
+
+    # Media drives are in $status[1]           .. $status[$dcount].
+    # Media slots  are in $status[$dcount + 1] .. $status[$#status].
+
+    my ($o, $ef, $num, $barcode, %loaded);
+
+    # Update all the drive widgets.
+
+    $o = 0;
+    foreach my $s (@status[1 .. $dcount]) {
+
+	($ef)      = $s =~ /:(\w+)?/;
+	($num)     = $s =~ /Transfer Element (\d+)/;
+	($barcode) = $s =~ /VolumeTag = (.*)/;
+	if (defined($barcode)) {
+	    $loaded{$barcode} = $num;
+	} else {
+	    $barcode = $empty if $ef eq 'Empty';
+	    $barcode = "  SE $1 ..v" if $s =~ /(\d+) Loaded/;
+	}
+
+	$drives[$o]->configure(-barcode => $barcode);
+	$o++;
+
+    } # forend
+
+    # Update all the slot widgets, including any mail slots.
+
+    $o = 0;
+    foreach my $s (@status[$dcount + 1 .. $#status]) {
+
+	if ($s =~ m!IMPORT/EXPORT!) {
+	    $s =~ m!:(\w+)!;
+	    if (not defined $slots[$o]->cget(-mail)) {
+		$slots[$o]->configure(-mail => 'shut');
+		$slots[$o]->Subwidget('button')->configure(
+                    -relief => 'raised',
+                    -state  => 'active',
+                );
+	    }
+	    $slots[$o]->Subwidget('button')->configure(-text => 
+                $slots[$o]->cget(-mail));
+	}
+
+	($ef)      = $s =~ /:(\w+)?/;
+	($barcode) = $s =~ /VolumeTag=(.*)/;
+	if (defined($barcode) and exists $loaded{$barcode}) {
+	    $barcode = "^..  DTE $loaded{$barcode}  ";                            
+	}
+	if (not $barcode) {
+	    $barcode = ($ef eq 'Full') ?  $full : $empty;
+	};
+
+	$slots[$o]->configure(-barcode => $barcode);
+	$o++;
+
+    } # forend
+
+} # end synchronize
+
+# Menu related subroutines.
+
+sub bump {
+
+    # A bump operation either opens or closes a mail slot.  In mtx
+    # speak, a bump is a transfer with the same source and destination
+    # slots, and EEPOS specifying either open or close (often 0 and 1,
+    # respectively, but not always).
+
+    my @snum = get_slots;	# get selected slots
+    if ($#snum != 0) {
+	return ok 'Mail SE?', "Please select one mail SE.";
+    }
+
+    my $ismail = $slots[$snum[0] - 1]->cget(-mail);
+
+    if (not defined $ismail) {
+	return ok 'Mail SE?', "Please select one mail SE.";
+    }
+
+    my $eepos = ($ismail eq 'shut') ? $JUKE_CONFIG{EEPOS_OPEN} : $JUKE_CONFIG{EEPOS_SHUT};
+    my (@status) = msgsys "$JUKE_CONFIG{JUKE} eepos $eepos transfer $snum[0] $snum[0]", 1;
+    $slots[$snum[0] - 1]->toggle_mail_slot if $status[0] == 0;
+
+    synchronize;
+
+} # end bump
+
+sub file {
+
+    [
+      [qw/command ~Quit  -accelerator Ctrl-q -command/ => \&$quit],
+    ];
+
+} # end file
+
+sub flnp {
+
+    # first/last/next/previous.  Fetch the operation from the text label
+    # of the active menu item.
+
+    my $label = $opmenu->entrycget('active', -label);
+
+    my @dnum = get_drives;	# get selected drives
+
+    if ($#dnum != 0) {
+	return ok 'One DTE?', "Please select one DTE.";
+    }
+
+    msgsys "$JUKE_CONFIG{JUKE} ". lc($label) . " $dnum[0]", 1;
+
+    synchronize;
+
+} # end flnp
+
+sub help {
+
+    [
+      ['command', 'Connecting to a jukebox', -command => \&usage_c],
+      ['command', 'Operating a jukebox',     -command => \&usage_m],
+      '-',
+      ['command', 'Version Information',     -command =>
+          sub {ok 'Version Information', &version}],
+    ];
+
+} # end help
+
+sub lu {
+
+    # Load or unload a media.  Fetch the operation from the text label
+    # of the active menu item, and possibly "invert" as well.
+
+    my $label = $opmenu->entrycget('active', -label);
+    my $invert = '';
+
+    if ($label =~ /invert/i) {
+	$invert = 'invert';
+	$label =~ s/(Invert\-)//;
+    }
+
+    my @dnum = get_drives;	# get selected drives
+    my @snum = get_slots;	# get selected slots
+
+    if ($#dnum != 0 or $#snum != 0) {
+	return ok 'DTE and SE?', "Please select one DTE and one SE.";
+    }
+
+    $label = lc $label;
+
+    my ($dbc, $sbc);		# DTE barcode, SE barcode
+    $dbc = $drives[$dnum[0]]->cget(-barcode);
+    $sbc = $slots[$snum[0] - 1]->cget(-barcode);
+
+    if ($label eq 'load') {
+	if ( ($dbc ne $empty and $dbc !~ /$se/ ) or
+             ($sbc eq $empty  or $sbc =~ /$dte/) ) {
+	    return ok 'Empty DTE full SE?', "Please select an empty DTE and a full SE.";
+	}
+    }
+    if ($label eq 'unload') {
+	if ( ($dbc eq $empty) or
+             ($sbc ne $empty and $sbc !~ /$dte/) ) {
+	    return ok 'Full DTE empty SE?', "Please select a full DTE and an empty SE.";
+	}
+    }
+
+    msgsys "$JUKE_CONFIG{JUKE} $invert $label $snum[0] $dnum[0]", 1;
+
+    synchronize;
+
+} # end lu
+
+sub refresh {
+
+    synchronize;
+
+} # end refresh
+
+sub sdbm_update {
+
+    my $file = $mw->getOpenFile;
+    return unless defined $file;
+    msgsys "$JUKE_CONFIG{JUKE} barcodes $file", 1;
+
+} # end sdbm_update
+
+sub sdbm_view {
+
+    msgsys "$JUKE_CONFIG{JUKE} barcodes", 0;
+
+} # end sdbm_view
+
+sub transfer {
+
+    # A transfer operation moves media between slots.  We need two
+    # slots selected, one empty and one full;
+
+    my @snum = get_slots;	# get selected slots
+    if ($#snum != 1) {
+	return ok 'Full SE empty SE?', "Please select two SEs, one full (source), one empty (destination).";
+    }
+
+    my ($bc1, $bc2, $src, $dest);
+    $bc1 = $slots[$snum[0] - 1]->cget(-barcode);
+    $bc2 = $slots[$snum[1] - 1]->cget(-barcode);
+
+    # A  full  slot is equivalent to $full  or a barcode.
+    # An empty slot is equivalent to $empty or $dte.
+
+    if (
+        ($bc1 eq $bc2)
+               or 
+        ( (($bc1 eq $empty or $bc1 =~ /$dte/) and ($bc2 eq $empty or $bc2 =~ /$dte/))
+               or
+          (($bc1 eq $full                   ) and ($bc2 eq $full                   )) )
+       ) {
+	return ok 'Full SE empty SE?', "Please select a full (source) SE and an empty (destination) SE.";
+    }
+
+    if ($bc1 eq $empty or $bc1 =~ /$dte/) {
+	($dest, $src) = ($snum[0], $snum[1]);
+    } else {
+	($src, $dest) = ($snum[0], $snum[1]);
+    }
+
+    msgsys "$JUKE_CONFIG{JUKE} transfer $src $dest", 1;
+
+    synchronize;
+
+} # end transfer
+
+sub usage_c {
+
+    return ok 'How to Connect', "Click the 'Connect' NoteBook tab.\n\nDouble-click a selection from the Listbox to connect to the specified jukebox. Or, manually enter the complete ssh command required to invoke a slave tkjuke, then click the 'Connect' Button.\n\nA new NoteBook tab appears, from which you can control the jukebox.";
+
+} # end usage_c
+
+sub usage_m {
+
+    return ok 'Operating Instructions', "Click the NoteBook tab of the desired jukebox to bring it to the foreground.\n\nSelect the DTE(s) and SE(s) of interest, then right click to see a menu of possible operations.\n\nDouble-clicking the left button over an SE's barcode posts a dialog and allows you to set or change the barcode.";
+
+} # end usage_m
+
+sub version {
+
+    "tkjuke $JUKE_CONFIG{VERSION}, Perl $], Tk $Tk::VERSION";
+
+} # end version
+
+__END__
+
+=head1 NAME
+
+B<tkjuke> - manipulate jukeboxes from a Perl/Tk program
+
+=head1 SYNOPSIS
+
+tkjuke [ "slave" | window ID ]
+
+=head1 DESCRIPTION
+
+B<tkjuke> is a GUI for manipulating a jukebox in a windowed environment,
+which uses the program B<juke> as the underlying controller.
+
+B<tkjuke> runs in either master or slave mode.  As a master, B<tkjuke>
+displays one or more B<tkjuke> windows from the local and/or remote
+jukeboxes in tabs of a NoteBook widget. When an operator wants to
+manipulate a jukebox, she tells the master to contact the requisite
+computer and start B<tkjuke> in slave mode. The slave's window becomes
+embedded in a NoteBook tab on the master.
+
+When B<tkjuke> is invoked with no command line argument, it becomes a
+master.  The master also reads the file B<tkjuke.config> for the list
+of jukeboxes under its control.  Each lines designates a jukebox
+(lines are split below, but in the actual configuration file use one
+line per jukebox):
+
+
+    auto-connect = 1 tkjuke = \
+        "/usr/bin/ssh -p 222 -X -f root@rigel /home/root/bin/tkjuke"
+    auto-connect = 1 tkjuke = \
+        "/usr/bin/ssh -p  22 -X -f root@fire  /home/root/bin/tkjuke"
+
+If I<auto-connect> = 1, the master B<tkjuke> will try to acquire the
+associated jukebox during startup. I<tkjuke> is a double-quoted
+OpenSSH string that invokes a slave tkjuke.
+
+When B<tkjuke> is supplied a single argument, it's a string
+representation of a Tk hexadecimal window ID within which the slave
+should embed itself.  For debugging, if the B<tkjuke> argument is the
+string "slave" then a standalone slave is started.
+
+Communication is via password-less B<ssh> with X11 forwarding enabled.
+For simplicity, we assume OpenSSH, so as to have complete control over
+known command line arguments.
+
+Many thanks to Eric Lee Green - I could not have written this without
+his counseling.  Any bugs and/or misunderstandings concerning jukebox
+operations are my own.
+
+=head1 EXAMPLE
+
+To run the master B<tkjuke>:
+
+    tkjuke
+
+To run a stand-alone slave:
+
+    tkjuke slave
+
+=head1 AUTHOR
+
+sol0@lehigh.edu
+
+Copyright (C) 2002 - 2007, Steve Lidie. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 KEYWORDS
+
+mtx, juke, jukebox
+
+=cut

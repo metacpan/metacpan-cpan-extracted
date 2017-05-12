@@ -1,0 +1,2 @@
+The core C++ implementation. 
+Currently doesn't get installed by itself, only as a part of the Perl module.

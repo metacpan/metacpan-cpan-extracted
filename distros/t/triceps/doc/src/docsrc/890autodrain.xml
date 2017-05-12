@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_autodrain">
+		<title>AutoDrain reference</title>
+
+		<indexterm>
+			<primary>AutoDrain</primary>
+		</indexterm>
+		<para>
+		The scoped drain in &Cpp; has more structure than in Perl. It consists
+		of the base class AutoDrain and two subclasses: AutoDrainShared and
+		AutoDrainExclusive.  They are all defined in <pre>app/AutoDrain.h</pre>.
+		They are all Stargets, and can be used in only one thread.
+		</para>
+
+		<para>
+		The base AutoDrain cannot be created directly but
+		is convenient for keeping a reference to any kind of drain:
+		</para>
+
+<pre>
+Autoref<AutoDrain> drain = new AutoDrainShared(app);
+</pre>
+
+		<para>
+		The constructor of the subclass determines whether the drain is shared
+		or exclusive, and the rest of the methods are defined in the base
+		class.
+		</para>
+
+		<para>
+		It's also possible to use the a direct local variable:
+		</para>
+
+<pre>
+{
+	AutoDrainShared drain(app);
+	...
+}
+</pre>
+
+		<para>
+		Just remember not to mix the metaphors, if you create a local variable,
+		don't try to create the references to it.
+		</para>
+
+		<para>
+		The constructors are:
+		</para>
+
+<pre>
+AutoDrainShared(App *app, bool wait = true);
+AutoDrainShared(TrieadOwner *to, bool wait = true);
+</pre>
+
+		<para>
+		Create a shared drain from an App or TrieadOwner. The <pre>wait</pre> flag
+		determines if the constructor will wait for the drain to complete,
+		otherwise it will return immediately. Well, usually immediately, if
+		there is no other incompatible drain active at the moment.
+		The shared drain requests the
+		draining of all the Trieads, and multiple threads may have their shared
+		drains active at the same time (the release will happen when all these
+		drains become released). A shared drain will wait for all the preceding
+		exclusive drains to be released before it gets created.
+		</para>
+
+<pre>
+AutoDrainExclusive(TrieadOwner *to, bool wait = true);
+</pre>
+
+		<para>
+		Create an exclusive drain from a TrieadOwner. The <pre>wait</pre> flag makes the
+		constructor wait for the completion of the drain. Only one exclusive
+		drain at a time may be active, from only one thread. An exclusive drain
+		will wait for all the preceding shared and exclusive drains to be
+		released before it gets created.
+		</para>
+
+		<para>
+		The common method is:
+		</para>
+
+<pre>
+void wait();
+</pre>
+
+		<para>
+		Wait for the drain to complete. Can be called repeatedly. If more data
+		has been injected into the model through the excluded Triead, will wait
+		for that data to drain.
+		</para>
+
+	</sect1>

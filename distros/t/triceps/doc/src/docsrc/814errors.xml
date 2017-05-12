@@ -1,0 +1,478 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_errors">
+		<title>Error reporting and Errors reference</title>
+
+		<indexterm>
+			<primary>error handling</primary>
+			<secondary>in &Cpp;</secondary>
+		</indexterm>
+		<para>
+		When building some kind of a language, the complicated errors often
+		need to be reported. Often there are many errors at a time, or an error
+		that needs to be tracked through multiple nested layers. And then these
+		error messages need to be nicely printed, with the indentation by
+		nested layers. Think of the errors from a &Cpp; compiler. Triceps is a
+		kind of a language, so it has a class to represent such errors. It
+		hasn't propagated to the Perl layer yet and is available only in the
+		&Cpp; API.
+		</para>
+
+		<indexterm>
+			<primary>Errors</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Erref</primary>
+		</indexterm>
+		<indexterm>
+			<primary>Autoref</primary>
+		</indexterm>
+		<para>
+		The class is Errors, defined in <pre>common/Errors.h</pre>, and inheriting from
+		Starget (for single-threaded reference counting). The references to it
+		are used so often, that <pre>Autoref<Errors></pre> is defined to have its own
+		name <pre>Erref</pre> (yes, that's double <pre>r</pre>, not triple), as well as
+		a couple of helper methods on it.
+		</para>
+
+		<para>
+		Triceps also has the exceptions (more on them in 
+		<xref linkend="sc_cpp_exception" xrefstyle="select: label quotedtitle pageabbrev"/>&xrsp;)
+		which also contain the Errors objects inside them.
+		</para>
+
+		<indexterm>
+			<primary>Aleri</primary>
+		</indexterm>
+		<para>
+		In general an Errors object contains messages, not all of which have to be errors.
+		Some might be warnings. But in practice is has turned out that without
+		a special dedicated compile stage it's hard to report the warnings.
+		Even when there is a special compile stage, and the code gets compiled
+		before it runs, as it was in Aleri, with the warnings written to a log file,
+		still people rarely pay attention to the warnings. You would not
+		believe, how may people would be calling support while the source of
+		their problem is clearly described in the warnings in the log file.
+		Even in C/&Cpp; it's difficult to pay attention to the warnings. I better
+		like the approach of a separate lint tool for this purpose: at least
+		when you run it, you're definitely looking for warnings.
+		</para>
+
+		<para>
+		Because of this, the current Triceps approach is to not have warnings.
+		If something looks possibly right but suspicious, report it as an error
+		but provide an option to override that error (and tell about that
+		option in the error message).
+		</para>
+
+		<para>
+		In general, the Errors are built of two kinds of information:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+			the error messages;
+			</listitem>
+
+			<listitem>
+			the nested Errors reports.
+			</listitem>
+		</itemizedlist>
+
+		<para>
+		More exactly, an Errors contains a sequence of elements, each of which
+		may contain a string, a nested Errors object, or both. When both, the
+		idea is that the string gives a high-level description and the location
+		of the error in the high-level object while the nested Errors digs into
+		the further detail. The string gets printed before the nested Errors.
+		The nested Errors get printed with an indentation. The indentation gets
+		added only when the errors get <quote>printed</quote>, i.e. the top-level Errors
+		object gets converted to a string. Until then the elements may be
+		nested every which way without incurring any extra overhead.
+		</para>
+
+		<para>
+		Obviously, you must not try to nest an Errors object inside itself,
+		directly or indirectly. Not only will it create a memory reference
+		cycle, but also an endless recursion when printing.
+		</para>
+
+		<para>
+		The most typical way to construct an Errors object
+		is with the functions taking the printf-like arguments.
+		They have been a relatively recent addition, so there is plenty of code in Triceps that
+		uses the older ways, but this is the latest and greatest, and
+		recommended for all the future use.
+		</para>
+
+		<para>
+		The consistent theme in its usage is <quote>check if the Errors reference (Erref) is
+		NULL, if it is, allocate a new Errors, and then add a formatted error
+		message to it</quote>. So the printf-like methods are defined not on Errors but on
+		Erref. They check if the Erref object is NULL, allocate a new Errors
+		object into it if needed, and then format the arguments. The simplest
+		one is:
+		</para>
+
+<pre>
+void f(const char *fmt, ...);
+</pre>
+
+		<para>
+		It adds a simple formatted message, always marked as an error. It is used
+		like this:
+		</para>
+
+<pre>
+Erref e; // initially NULL by default
+...
+e.f("a message with integer %d", n);
+</pre>
+
+		<indexterm>
+			<primary>Errors</primary>
+			<secondary>multi-line</secondary>
+		</indexterm>
+		<para>
+		The message may be multi-line, it will be split appropriately, to make
+		it all render with the correct indenting level. If the error message
+		contains a <quote>\n</quote> at the end, that <quote>\n</quote>
+		will be discarded (since the line feed after each line is implicit).
+		</para>
+
+		<para>
+		The next one is used to build the nested error messages:
+		</para>
+
+<pre>
+bool fAppend(Autoref<Errors> clde, const char *fmt, ...);
+</pre>
+
+		<para>
+		It first checks that the child errors object is not NULL and contains
+		an error, and if it does then it goes through the dance of allocating a
+		new Errors object if needed, appending the formatted message and the
+		child errors. The message goes before the child errors, unlike the
+		method signature. So you can use it blindly like this to do the right
+		thing:
+		</para>
+
+<pre>
+Erref checkSubObject(int idx);
+
+Erref checkObject()
+{
+	Erref err; // initially NULL by default
+	...
+	for (int i = 0; i < sz; i++)
+		err.fAppend(checkSubObject(i),  "error in the sub-object %d:", i);
+	...
+	return err; // NULL on success, Errors reference on error
+}
+</pre>
+
+		<para>
+		No additional <b>if</b>s are necessary to check the result of
+		<pre>checkSubObject()</pre>, <pre>fAppend()</pre> contains this <b>if</b> inside it.
+		Similar to <pre>f()</pre>, the error message may be multi-line.
+		</para>
+
+		<para>
+		The more basic way to create an Errors is by calling one of
+		the constructors:
+		</para>
+
+<pre>
+Errors(bool e = false);
+Errors(const char *msg);
+Errors(const string &msg);
+Errors(const string &msg, Autoref<Errors> clde);
+</pre>
+
+		<para>
+		For example:
+		</para>
+
+<pre>
+Erref err = Errors("error message");
+</pre>
+
+		<para>
+		The default constructor creates an empty object, which then needs
+		to be filled with the messages (or not, returning an empty Errors
+		object is also possible, meaning that no errors were found, though
+		returning NULL is more efficient).
+		The argument <pre>e</pre> is an indicator than it contains an actual error.
+		By default it's unset but will be set when an error message is added, or whan a nested Errors
+		object with an error in it is added.
+		</para>
+
+		<para>
+		The rest of the above are the convenience constructors that make one-off
+		Errors from one element (though of course more elements can be added
+		afterwards).
+		In all of them the error flag is always set, and the multi-line messages
+		are properly handled.
+		</para>
+
+		<para>
+		After an Errors object is constructed, more elements can be added to it
+		by one of the following methods.
+		</para>
+
+<pre>
+void appendMsg(bool e, const string &msg);
+</pre>
+
+		<para>
+		The argument <pre>e</pre> shows whether the message is an error message
+		(and it will set the error flag in Errors),
+		otherwise just a warning. 
+		There are no special per-message indications whether it's an error
+		or warning, the Errors keeps just a single flag per object, and the messages
+		are eventually printed as-is. So if you want the user to recognize
+		some message as a warning, prefix its text with something like
+		<quote>warning:</quote>.
+		</para>
+
+		<para>
+		The argument <pre>msg</pre> must be a single-line message, don't use a <quote>\n</quote> in it!
+		If you want to append multiple lines, call <pre>appendMsg()</pre> once per line, or
+		use <pre>appendMultiline()</pre> to append the whole multi-line message.
+		</para>
+
+<pre>
+void appendMultiline(bool e, const string &msg);
+</pre>
+
+		<para>
+		The same as <pre>appendMsg()</pre>, only it will safely break a multi-line message into
+		multiple single-liners and will ignore the <quote>\n</quote> at the end.
+		Inside the Errors object each line will become a separate message.
+		</para>
+
+<pre>
+bool append(const string &msg, Autoref<Errors> clde);
+</pre>
+
+		<para>
+		The <pre>append()</pre> method is somewhat like <pre>Erref::fAppend()</pre> but
+		different, because they represent different ages of the API.
+		When <pre>append()</pre> was written, the warnings were considered important,
+		and a common way to return a no-error condition was by returning
+		an Errors object with no contents. When <pre>fAppend()</pre> was written,
+		I've pretty much given up on the use of warnings, and the preferred
+		way to return the no-error condition had become by returning NULL.
+		</para>
+
+		<para>
+		In <pre>append()</pre> the following situations are possible:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+			The argument <pre>clde</pre> is NULL or empty (that is contains no
+			messages nor sub-objects), and the error flag in it is false. In this case
+			<pre>append()</pre> does nothing, and the message <pre>msg</pre> is thrown away.
+			</listitem>
+
+			<listitem>
+			The argument <pre>clde</pre> is not empty but the error flag is false.
+			Both <pre>msg</pre> and child object will be appended to the Errors.
+			</listitem>
+
+			<listitem>
+			The argument <pre>clde</pre> is not empty and the error flag is true.
+			Both <pre>msg</pre> and child object will be appended to the Errors,
+			and the error flag will be set in it.
+			</listitem>
+
+			<listitem>
+			The argument <pre>clde</pre> is empty and the error flag is true.
+			The <pre>msg</pre> will be appended to the Errors and
+			the error flag will be set in it. The child object will be thrown
+			away (it's reference-counted, so it will be freed when the last
+			reference is gone).
+			</listitem>
+		</itemizedlist>
+
+		<para>
+		Just like <pre>appendMsg()</pre>, the argument <pre>msg</pre> must be a single-line message.
+		</para>
+
+
+		<para>
+		The return value of <pre>append()</pre> will be true
+		if the child element contained any data in it or an error indication
+		flag. This can be used together with another method
+		</para>
+
+
+<pre>
+void replaceMsg(const string &msg);
+</pre>
+
+		<para>
+		to add a complex high-level description if a child element has reported
+		an error. By now it has become old-fashioned, and <pre>Erref::fAppend()</pre> is
+		a better choice. Before <pre>fAppend()</pre> came along, the typical way to
+		create an error message was by calling <pre>strprintf()</pre> that formats a
+		printf-like string into a &Cpp; string object. And it's kind of expensive
+		to call <pre>strprintf()</pre> in any case, even if the child returned no error.
+		So the optimization was to call <pre>append()</pre> with an empty string, and
+		if it happened to actually append something, replace that empty
+		message with the real one. As the following pattern shows:
+		</para>
+
+<pre>
+Erref clde = someThing(...);
+if (e.append("", clde)) {
+    // ... generate msg in some complicated way
+    e.replaceMsg(strprintf(...));
+}
+</pre>
+
+		<para>
+		The <pre>replaceMsg()</pre> replaces the string portion of the last element, which
+		owns the last added child error.
+		</para>
+
+		<para>
+		This pattern can still be used if the error message is truly
+		difficult to generate, but usually <pre>fAppend()</pre> is a better choice.
+		</para>
+
+		<para>
+		It's also possible to include the contents of another Errors directly,
+		without nesting it:
+		</para>
+
+<pre>
+bool absorb(Autoref<Errors> clde);
+</pre>
+
+		<para>
+		The return value has the same meaning as with <pre>append()</pre> (but <pre>replaceMsg()</pre>
+		can not be used with this method for anything reasonable). The argument
+		<pre>clde</pre> may be NULL. The error flag propagates to the parent as usual.
+		</para>
+
+		<para>
+		Finally, an
+		Errors object can be cleared to its empty state:
+		</para>
+
+<pre>
+void clear();
+</pre>
+
+		<para>
+		Usually the clearing of an Errors object is not such a good idea.
+		Remember, they are built into a tree. So if you later modify an
+		Errors object, that would also modify what is seen by all the
+		objects that refer to it. The proper approach is to treat an Errors
+		object as append-only while it's being built. And after it has been
+		completed and returned, treat it as read-only.
+		</para>
+
+		<para>
+		To get the number of elements in Errors, use
+		</para>
+
+<pre>
+size_t size() const;
+</pre>
+
+		<para>
+		Remember, a child object with its associated top-level error message
+		counts as a single element, not two of them.
+		</para>
+
+		<para>
+		However the more typical methods are:
+		</para>
+
+<pre>
+bool isEmpty();
+bool hasError();
+</pre>
+
+		<para>
+		They check whether there is nothing at all or whether there is an
+		error. The special convenience of these methods is that they can be
+		called on NULL pointers. Quite a few Triceps methods return a NULL
+		Erref if there was no error. In the following example, even if 
+		<pre>er</pre> is NULL, these calls are still safe and officially supported. 
+		But <b>not</b> <pre>er->size()</pre>.
+		</para>
+
+<pre>
+Erref er = NULL;
+er->isEmpty();
+er->hasError();
+parent_er->append(msg, er);
+parent_er->absorb(er);
+parent_er.fAppend(er, msg);
+</pre>
+
+		<para>
+		The data gets extracted from Erref by converting it to a string, either
+		appending to an existing string, or creating a new one:
+		</para>
+
+
+<pre>
+void printTo(string &res, const string &indent = "", const string &subindent = "  ");
+string print(const string &indent = "", const string &subindent = "  ");
+</pre>
+
+		<para>
+		The <pre>res</pre> argument provides the result string to append the error messages
+		to. <pre>print()</pre> works by constructing a new string internally, calling <pre>printTo()</pre>
+		on it, and then returning it, so <pre>print()</pre> is more expensive than <pre>printTo()</pre>.
+		</para>
+
+		<para>
+		The messages will be separated by the newline characters <quote>\n</quote>,
+		with the proper indentation after each of these characters.
+		The <pre>indent</pre> argument specifies the initial indentation, <pre>subindent</pre> the
+		additional indentation for each level. 
+		</para>
+		
+		<para>
+		The very first line will have nothing prepended to it, it's assumed that you've
+		already done that indentation manually, or maybe you're appending to the end
+		of some ongoing line. But all the following top-level lines will have
+		the <pre>indent</pre> text following the <quote>\n</quote>. The nested error
+		lines will have the concatenation of <pre>indent</pre> and one copy of <pre>subindent</pre>
+		in front of them after <quote>\n</quote>, the second level of nesting will have
+		an <pre>indent</pre> and two copies of <pre>subindent</pre>, and so on.
+		</para>
+		
+		<para>
+		All the lines are terminated by <quote>\n</quote> (except if the Errors object
+		is empty, then nothing will be appended).
+		</para>
+		
+		<indexterm>
+			<primary>NOINDENT</primary>
+		</indexterm>
+		<para>
+		Note that the constant <pre>NOINDENT</pre> has no special effect on 
+		the printing of Errors (unlike the printing of types), it's just treated 
+		here as an empty string.
+		</para>
+
+	</sect1>

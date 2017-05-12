@@ -1,0 +1,70 @@
+tux_perl version 0.01
+================
+
+tux_perl is a Perl extension for Tux. Tux is a high speed web server from
+Redhat. With the non-blocking event loop structure and the zero copying
+technique, Tux can provide static content at very fast speed. Tux also
+provide an interface to develop user space extensions. tux_perl works as
+an user space module of Tux, and interprets Perl scripts to provide
+dynamic contents.
+
+Tux is embedded into Linux kernel, so tux_perl only work with Linux. Perl
+interpreter is also necessary. GCC compilers is required to build some
+C libraries.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If your want to install this module to somewhere rather than the default
+position, PREFIX option may be set.
+
+   perl Makefile.PL PREFIX=/your/dir/
+
+After installation, config file will be installed in PREFIX/etc/tux_perl.conf.
+It should be modified if you want to enable the scripts of your own.
+Please refer to the Tux(3) man page.
+
+Config file of tux should be modified to enable tux_perl. Please verify
+/etc/tux.mime.types and be sure following line is included:
+
+   TUX/module                      tux x
+
+Modify /etc/sysconfig/tux to include the following lines:
+
+   TUXMODULES="tux_perl.tux"
+   MODULEPATH="<TUX_LIB_DIR>"
+
+Usually, the <TUX_LIB_DIR> will be something like
+
+   /usr/lib/perl5/site_perl/5.8.0/i386-linux-thread-multi/auto/Tux
+
+An empty file named tux_perl.tux should be created in your DOCROOT of Tux,
+so that Tux can recognize tux_perl module:
+
+   %touch <DOCROOT>/tux_perl.tux
+
+Restart tux daemon with
+  
+   /etc/init.d/tux restart
+
+Then you can access the sample script by
+
+   http://localhost/tux_perl.tux?Static
+   http://localhost/tux_perl.tux?Template
+
+DEPENDENCIES
+
+Currently, tux_perl requires no modules except some standard ones of Perl. 
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Yale Huang
+
+This library is released under the GPL; you can redistribute it and/or modify
+it under the term of GPL.

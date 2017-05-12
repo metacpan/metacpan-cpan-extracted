@@ -1,0 +1,45 @@
+threads-lite
+
+This module contains an alternative threads implementation for perl. To summarize things:
+
+ * The interpreter data is *not* cloned. Every thread/interpreter is independent from the others
+ * Communication between the interpreters is only possible through message queues
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc threads::lite
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=threads-lite
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/threads-lite
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/threads-lite
+
+    Search CPAN
+        http://search.cpan.org/dist/threads-lite
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009, 2010, 2011 Leon Timmermans
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

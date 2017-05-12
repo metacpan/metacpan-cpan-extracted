@@ -1,0 +1,54 @@
+
+=head1 NAME
+
+threads::tbb::refcounter - inside-out refcounts for XS types
+
+=head1 SYNOPSIS
+
+ use threads::tbb::refcounter qw(Image::Magick);
+
+ # alternately:
+ use threads::tbb::refcounter;
+ threads::tbb::refcounter->setup("Some::XS::Type");
+
+=head1 DESCRIPTION
+
+This module allows XS modules which were not written with
+C<threads::tbb> in mind (but B<are> thread-safe) to be explicitly
+marked as passable between threads, without requiring the XS type to
+explicitly add a reference count field.
+
+What is does is it institutes an inside-out refcount for the type.  It
+delivers two methods to the target class: C<DESTROY> and
+C<CLONE_REFCNT_inc>.
+
+These are simple "wrappers" which just take care to avoid double-free,
+or prematurely freeing XS references as they pass between
+interpreters.
+
+The C<CLONE_REFCNT_inc> function increments a thread-safe
+process-global hash table mapping reference addresses of instances to
+counts of interpreters holding cloned pointers to that reference.
+
+The C<DESTROY> function finds the entry in that process-global hash
+table, and if it doesn't exist or is already at 0, then it calls the
+original DESTROY function.  Otherwise, it decrements the counter.
+
+If either of these two functions are called, and the invocant is not
+an XS object (ie, not a PVMG), then they act like they weren't there
+(ie, they call the original DESTROY function, or they do nothing).
+
+Finally, it defines a C<CLONE_SKIP> method in the target class, which
+returns 0.
+
+The package must already be loaded when the DESTROY B<must> be
+implemented by the class you are marking with (otherwise, it doesn't
+even make sense to use this module).  So, if it doesn't find DESTROY,
+it will die early.
+
+=head1 SEE ALSO
+
+L<threads::tbb::concurrent>
+
+=cut
+

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2014 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<bibliography>
+		<title>Bibliography</title>
+		<bibliodiv>
+
+		<biblioentry id="Babkin10">
+			<authorgroup>
+				<author><firstname>Sergey A.</firstname><surname>Babkin</surname></author>
+			</authorgroup>
+			<copyright> <year>2010</year> </copyright>
+			<isbn>1-451-53661-5</isbn>
+			<publisher>
+				<publishername>Createspace</publishername>
+			</publisher>
+			<title>The practice of parallel programming</title>
+		</biblioentry>
+
+		<biblioentry id="Stayton07">
+			<authorgroup>
+				<author><firstname>Bob</firstname><surname>Stayton</surname></author>
+			</authorgroup>
+			<copyright> <year>2007</year> </copyright>
+			<isbn>0-974-15213-7</isbn>
+			<publisher>
+				<publishername>Sagehill Enterprises</publishername>
+			</publisher>
+			<title>DocBook XSL: The Complete Guide (4th Edition)</title>
+			<subtitle>
+				<ulink url="http://www.sagehill.net/docbookxsl/"/>
+			</subtitle>
+		</biblioentry>
+
+		<biblioentry id="Walsh99">
+			<authorgroup>
+				<author><firstname>Norman</firstname><surname>Walsh</surname></author>
+				<author><firstname>Leonard</firstname><surname>Muellner</surname></author>
+			</authorgroup>
+			<copyright> <year>1999</year> </copyright>
+			<isbn>156592-580-7</isbn>
+			<publisher>
+				<publishername>O'Reilly Media</publishername>
+			</publisher>
+			<title>DocBook: The Definitive Guide</title>
+			<subtitle>
+				<ulink url="http://www.oasis-open.org/docbook/documentation/reference/html/"/>
+			</subtitle>
+		</biblioentry>
+
+		<biblioentry id="Hyvonen86">
+			<authorgroup>
+				<author><firstname>Eero</firstname><surname>Hyvönen</surname></author>
+				<author><firstname>Jouko</firstname><surname>Seppänen</surname></author>
+			</authorgroup>
+			<copyright> <year>1986</year> </copyright>
+			<isbn>9512627876</isbn>
+			<publisher>
+				<publishername>Kirjayhtymä</publishername>
+			</publisher>
+			<title>Lisp-maailma: Johdatus kieleen ja ohjelmointiin. (Lisp World: Introduction to Language and Programming).</title>
+			<subtitle>
+				<ulink url="Russia Edition: Mir Lispa"/>
+			</subtitle>
+		</biblioentry>
+
+		<biblioentry id="StreamBase">
+			<authorgroup>
+				<author><surname>StreamBase Inc.</surname></author>
+			</authorgroup>
+			<title>StreamBase Documentation</title>
+			<subtitle>
+				<ulink url="http://docs.streambase.com/"/>
+			</subtitle>
+		</biblioentry>
+
+		<biblioentry id="Aleri">
+			<authorgroup>
+				<author><surname>Sybase Inc.</surname></author>
+			</authorgroup>
+			<title>Sybase Aleri Streaming Platform 3.2</title>
+			<subtitle>
+				<ulink url="http://infocenter.sybase.com/help/index.jsp?docset=/com.sybase.infocenter.help.aleri.3.2/title.htm&amp;docSetID=1733"/>
+			</subtitle>
+		</biblioentry>
+
+		<biblioentry id="Coral8">
+			<authorgroup>
+				<author><surname>Sybase Inc.</surname></author>
+			</authorgroup>
+			<title>Sybase CEP Option R4</title>
+			<subtitle>
+				<ulink url="http://infocenter.sybase.com/help/index.jsp?docset=/com.sybase.infocenter.help.cep.4.0/doc/html/title.html&amp;docSetID=1659"/>
+			</subtitle>
+		</biblioentry>
+
+		<biblioentry id="SybaseR5">
+			<authorgroup>
+				<author><surname>Sybase Inc.</surname></author>
+			</authorgroup>
+			<title>Sybase Event Stream Processor 5.0</title>
+			<subtitle>
+				<ulink url="http://infocenter.sybase.com/help/index.jsp?docset=/com.sybase.infocenter.help.esp.5.0/doc/html/title.html&amp;docSetID=1788"/>
+			</subtitle>
+		</biblioentry>
+
+		<biblioentry id="Esper">
+			<authorgroup>
+				<author><surname>EsperTech Inc.</surname></author>
+			</authorgroup>
+			<title>Esper Tutorials</title>
+			<subtitle>
+				<ulink url="http://esper.codehaus.org/tutorials/tutorials.html"/>
+			</subtitle>
+		</biblioentry>
+
+		</bibliodiv>
+	</bibliography>

@@ -1,0 +1,36 @@
+TYPEMAP
+
+
+OUTPUT
+
+# The Perl object is blessed into 'CLASS', which should be a
+# char* having the name of the package for the blessing.
+O_OBJECT
+	sv_setref_pv( $arg, CLASS, (void*)$var );
+
+O_CONTAINER
+	sv_setref_pv( $arg, \"${(my $ntt = $ntype) =~ s{^perl_}{}; $ntt =~ s{Ptr$}{}; $ntt =~ s{_}{::}g; $ntt =~ s{vector}{array}; $ntt = "threads::tbb::$ntt"; \$ntt}\", (void*)$var );
+
+T_STRING
+	$arg = newSVpvn($var.c_str(), $var.length());
+
+INPUT
+
+O_CONTAINER
+	if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) )
+		$var = ($type)SvIV((SV*)SvRV( $arg ));
+	else{
+		warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+		XSRETURN_UNDEF;
+	}
+
+O_OBJECT
+	if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) )
+		$var = ($type)SvIV((SV*)SvRV( $arg ));
+	else{
+		warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+		XSRETURN_UNDEF;
+	}
+
+T_STRING
+	$var = std::string(SvPV_nolen($arg))

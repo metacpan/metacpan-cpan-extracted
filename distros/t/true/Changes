@@ -1,0 +1,49 @@
+Revision history for Perl extension true.
+
+0.18 Mon Apr 18 19:23:37 2011
+    - fix EUMM workaround (Christian Walde)
+
+0.17 Mon Apr 18 17:47:49 2011
+    - RT #65586: work around EUMM issue on ActivePerl (Christian Walde and Schwern)
+    - Makefile.PL fix
+
+0.16 Mon Feb 14 15:39:36 2011
+    - true::VERSION: make the version static
+
+0.15 Mon Feb 14 14:37:14 2011
+    - Make true::VERSION a real module so dependency checkers can find it (thanks, Schwern)
+
+0.14 Fri Feb 11 23:53:11 2011
+    - Create $true::VERSION::VERSION to work around a true dependency issue (thanks, Schwern)
+
+0.13 Thu Jan 27 08:04:00 2011
+    - true.pm: more robust detection of the currently-compiling file
+        - should fix Windows failures - thanks, Alexandr Ciornii and Schwern
+    - eval.t: confirm string evals aren't affected
+    - clean up after compile-time exceptions: preliminary tests
+    - add repository link
+
+0.12 Tue Aug 17 19:01:55 2010
+    - ExtUtils::Depends fix
+    - doc tweak
+
+0.11 Tue Aug 17 16:08:23 2010
+    - add missing dependency
+    - add support/documentation for unimport
+      - add unimport.t
+    - add leak.t
+    - doc tweakage
+
+0.10 Tue Aug 17 04:18:42 2010
+    - rm caveats
+    - more tests
+
+0.03 Mon Jan 25 20:04:01 2010
+    - doc tweak
+
+0.02 Mon Jan 25 19:32:52 2010
+    - POD fmt fix
+    - add pod.t
+
+0.01 Mon Jan 25 16:35:57 2010
+    - original version; created by h2xs 1.23 with options -XA -n true

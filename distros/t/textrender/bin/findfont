@@ -1,0 +1,104 @@
+#!/usr/bin/perl
+use strict;
+use lib './lib';
+use Getopt::Std::Strict 'hfdr';
+use LEOCHARRE::FontFind 'find_ttf', 'find_ttfs';
+
+
+$opt_h and print STDERR usage() and exit;
+
+$opt_r and LEOCHARRE::FontFind::_cache_reset();
+
+my $string = "@ARGV";
+
+
+
+
+
+my @found = ($opt_f ? find_ttf($string) : find_ttfs($string) );
+
+$opt_d and warn(scalar @found . " fonts total");
+
+@found or exit; #die("Cannot find font '$string'");
+
+map { print "$_\n" } @found;
+
+
+
+
+
+
+sub usage {q{findfont [OPTION].. FONT NAME
+Find abs path to fonts.
+
+   -f          show first match only
+   -r          reset the cache
+   -d          debug
+   -h          help
+
+Try 'man findfont' for more info.
+}}
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+findfont - find font paths and print to stdout
+
+=head1 DESCRIPTION
+
+I use imagemagick and friends to do things like render text, and it's annoying to find or remember paths to fonts.
+
+This command will find a font with a substring.
+
+This command uses a cache to remember things.
+
+=head1 USAGE
+
+findfont [OPTION].. FONT NAME
+
+   -f          show first match only
+   -r          reset the cache
+   -d          debug
+   -h          help
+
+=head2 USAGE EXAMPLES
+
+See all fonts
+   findfont
+
+See all fonts that match 'sans'
+   findfont sans
+
+Only the first match..
+   findfont bold
+
+
+
+=head1 SEE ALSO
+
+LEOCHARRE::FontFind 
+textrender - parent package
+
+=head1 AUTHOR
+
+leocharre leocharre at gmail dot com
+
+=head1 COPYRIGHT
+
+Copyright (c) 2010 Leo Charre. All rights reserved.
+
+=head1 LICENSE
+
+This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, i.e., under the terms of the "Artistic License" or the "GNU General Public License".
+
+=head1 DISCLAIMER
+
+This package is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the "GNU General Public License" for more details.
+   
+=cut

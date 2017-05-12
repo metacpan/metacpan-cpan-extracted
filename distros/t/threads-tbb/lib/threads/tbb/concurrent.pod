@@ -1,0 +1,172 @@
+=head1 NAME
+
+threads::tbb::concurrent:: - namespace for concurrent TBB containers
+
+=head1 SYNOPSIS
+
+ use threads::tbb;
+
+ # ARRAY tie interface:
+ tie my @array, "threads::tbb::concurrent::array";
+ $array[0] = $val;
+ push @array, @items;
+
+ # HASH tie interface:
+ tie my %hash, "threads::tbb::concurrent::hash";
+ my $value = $hash{key};  # always deep copies
+ $hash{key} = $value;    # careful!
+
+ # preferred Hash API: for access:
+ my $hash = tied %hash;           # doesn't need to be tied really
+ my $slot = $hash->reader($key);
+ print $slot->get();              # now safe
+ my $copy = $slot->clone();       # also fine
+ undef($slot);                    # release lock
+
+ # for writing:
+ $slot = (tied %hash)->writer($key);
+ $value = $slot->get();           # get the value out
+ $slot->set([$value]);            # fine
+ $copy = $slot->clone();          # $copy now a dup of [$value]
+ undef($slot);                    # release lock
+
+ # TODO hash API:
+ my ($key, $value) = each %hash;
+ # concurrent iteration - safe for update
+ my $iterator = tied(%hash)->iterator;
+ my ($key, $slot) = $iterator->();
+
+ # SCALAR tie interface:
+ # not really concurrent in any way; and every access may copy in to
+ # the thread which requests it.  these wrappers for scalars can be
+ # passed around via the various containers.
+ tie my $item, "threads::tbb::concurrent::item";
+ $item = $val;
+ print $item;
+
+ # TODO queue/channel interface:
+ tie my @queue, "threads::tbb::concurrent::queue";
+ push @queue, $val;
+ my $val = shift @queue;
+
+=head1 DESCRIPTION
+
+The C<threads::tbb::concurrent::> series of modules wrap respective
+tbb concurrent classes.  For now there are two main container classes
+- L<threads::tbb::concurrent::array> and
+L<threads::tbb::concurrent::hash>
+
+Note that they are only concurrent if you restrict yourself to the
+concurrent APIs.  Other ways of accessing the containers may result in
+programs with race conditions.
+
+Also, the SCALAR interface: L<threads::tbb::concurrent::item>
+currently has no locking mechanism, it is currently just an auxilliary
+way of shunting data between interpreters using the lazy clone method.
+
+=head2 Lazy deep copying
+
+  This feature is still in evolution.  It is eventually
+  meant to be used to selectively clone a subroutine and
+  data reachable from that subroutine in a separate
+  interpreter and run the cloned subroutine in a separate
+  thread.  Since there is no shared data between the
+  interpreters, little or no locking will be needed (unless
+  parts of the symbol table are explicitly shared).  This is
+  obviously intended to be an easy-to-use replacement for
+  the existing threads support.
+
+      -- from change#4675: "USE_ITHREADS tweaks and notes"
+         Gurusamy Sarathy, 9 Dec 1999
+
+The C++ function C<clone_other_sv>, from F<src/lazy_clone.cc> in the
+source distribution, exists to implement selecting cloning of data
+reachable from one interpreter to the next.  This is implemented in a
+lazy fashion.
+
+If entries in the container are requested by a different
+thread, a deep copy happens then and there, carried out by
+the worker thread and not the main thread.  So long as there
+is no use of the actual state machine of the foreign
+interpreter, or side effects on data structures it "owns",
+this should be relatively safe.
+
+The advantage to this, over an eager algorithm which used a
+safe, neutral interpreter that never runs anything (as in
+L<threads::shared>), or to a collection of
+C<Storable::freeze> blobs (as in L<threads::lite>) being:
+1. reduced memory use; data is only copied to the threads
+which demand it, 2. there is no overhead for the thread that
+started the operation to process data; other than that taken
+receiving completed blocks from workers, 3. reduced number
+of overall deep copies, 4. faster cloning (C<clone_other_sv>
+is implemented in C++ using STL containers).  5. You can
+choose to use an eager algorithm by simply C<freeze>'ing
+data on the way in.
+
+Of course if the interpreter that sent the data violates
+expectations by modifying the data structures, all bets are
+off.  TODO: setting TTBB_EAGER=1 to copy to neutral shared
+interpreter for a single program run.
+
+=head2 Allowed data types
+
+The initial implementation of the deep copying has very much the same
+limitations as L<threads::shared> - in that only a certain core set of
+"pure" perl objects can be passed through.
+
+XS objects should be safe - as in, not cause segfaults - so long as
+the package either defines C<CLONE_SKIP> (in which case the objects
+will be replaced by "undef" in the cloned structure - see L<perlmod>),
+or if they define a C<CLONE_REFCNT_inc> method.  The
+C<CLONE_REFCNT_inc> method should update the objects' internal idea of
+how many references are pointing at it, and return the value 42.  If
+it did neither, then the code will emit a warning.
+
+As closures are not supported, inside-out objects cannot be
+passed - and in fact they'd likely be very inefficient.
+
+Not yet supported are MAD properties or "strange" forms of magic.
+Overload is currently thought to be safe.  Filehandles should be
+relatively trivial to support but are not implemented yet.
+
+=head1 On memory copying stability
+
+If it does turn out to be stable, then it would help reduce
+the overhead that a threading program has to overcome to
+break even; eg, if the single-threaded case is more than
+100% slower, then you need more than 2 cores just to break
+"even"; and that's before you take into consideration that
+the program may not scale beyond a given number of cores.
+This would mean that this overhead is delegated to the
+worker threads; they might not be able to carry out work at
+full speed compared to the main thread, but at least they're
+not impeding it by making it waste time dumping data that it
+might have to simply load again itself to process.
+
+Of course, in principle, building under -Duse5005threads
+(removed in Perl 5.9.x) would obliviate the need to copy
+anything at all.
+
+If foreign-structure dumping turns out not to be stable then
+there are two main approaches.  Either dump everything and
+just document that the size of data put in and out may be a
+limiting factor for many users, or potentially queue
+requests for the originating thread to process the dump,
+then yield or even spin.
+
+Queuing requests for other threads to safely marshall the
+data in and out could prove problematic and lead to
+deadlocks, so probably the best approach is to support both
+lazy and immediate deep copies by an option set on the
+container.
+
+=head1 AUTHOR
+
+Sam Vilain, C<sam.vilain@openparallel.com>
+
+=head1 SEE ALSO
+
+L<threads::tbb>, L<threads::tbb::concurrent::array>
+
+=cut

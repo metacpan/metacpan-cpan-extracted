@@ -1,0 +1,8 @@
+Put the docbook tools from 
+https://sourceforge.net/projects/triceps/files/docbook-for-1.0/ 
+here.  Run "make" to download an extract them, or "make extract" just to
+extract the already downloaded files.  
+
+They are not a part of the basic distribution, to keep the Triceps package
+smaller and the packages separate.  Besides, they're expected to stay the same
+for a long while.
