@@ -1,0 +1,243 @@
+NAME
+    failures - Minimalist exception hierarchy generator
+
+VERSION
+    version 0.004
+
+SYNOPSIS
+        use failures qw/io::file io::network/;
+        use Try::Tiny;
+        use Safe::Isa; # for $_isa
+
+        try {
+            process_file or
+                failure::io::file->throw("oops, something bad happened: $!");
+        }
+        catch {
+            if   ( $_->$_isa("failure::io::file") ) {
+                ...
+            }
+            elsif( $_->$_isa("failure::io") ) {
+                ...
+            }
+            elsif( $_->$_isa("failure") ) {
+                ...
+            }
+            else {
+                ...
+            }
+        }
+
+DESCRIPTION
+    This module lets you define an exception hierarchy quickly and simply.
+
+    Here were my design goals:
+
+    *   minimalist interface
+
+    *   80% of features in 20% of lines of code
+
+    *   depend only on core modules (nearly achieved)
+
+    *   support hierarchical error types
+
+    *   identify errors types by name (class) not by parsing strings
+
+    *   leave (possibly expensive) trace decisions to the thrower
+
+    Currently, "failures" is implemented in under 70 lines of code.
+
+    Failure objects are implemented with Class::Tiny to allow easy
+    subclassing (see custom::failures), but "Class::Tiny" only requires core
+    modules, so other than that exception, the 'core only' goal is achieved.
+
+USAGE
+  Defining failure categories
+        use failures qw/foo::bar foo::baz/;
+
+    This will define the following classes in the "failure" namespace:
+
+    *   "failure"
+
+    *   "failure::foo"
+
+    *   "failure::foo::bar"
+
+    *   "failure::foo::baz"
+
+    Subclasses inherit, so "failure::foo::bar" is-a "failure::foo" and
+    "failure::foo" is-a "failure".
+
+  Attributes
+    A failure class has three attributes: "msg", "payload", and "trace".
+    Their usage is described below. Accessors exist for all three.
+
+  Throwing failures
+    The "throw" method of a failure class takes a single, optional argument
+    that modifies how failure objects are stringified.
+
+    If no argument is given, a default message is generated if the object is
+    stringified:
+
+        say failure::foo::bar->throw;
+        # Caught failure::foo::bar
+
+    With a single, non-hash-reference argument, the argument is used for the
+    "msg" attribute and is appended if the object is stringified.
+
+        say failure::foo::bar->throw("Ouch!");
+        # Caught failure::foo::bar: Ouch!
+
+    With a hash reference argument, the "msg" key provides the string to
+    append to the default error. If you have extra data to attach to the
+    exception, use the "payload" key:
+
+        failure::foo::bar->throw({
+            msg     => "Ouch!",
+            payload => $extra_data,
+        });
+
+    If an optional "trace" key is provided, it is appended if the object is
+    stringified. To loosely emulate "die" and provide a simple filename and
+    line number, use the "failure->line_trace" class method:
+
+        failure::foo::bar->throw({
+            msg => "Ouch!",
+            trace => failure->line_trace,
+        });
+
+        # Caught failure::foo::bar: Ouch!
+        #
+        # Failure caught at <FILENAME> line <NUMBER>
+
+    To provide a trace just like the Carp module (including respecting
+    @CARP_NOT) use the "croak_trace" or "confess_trace" class methods:
+
+        failure::foo::bar->throw({
+            msg => "Ouch!",
+            trace => failure->croak_trace,
+        });
+
+        # Caught failure::foo::bar: Ouch!
+        #
+        # Failure caught at <CALLING-FILENAME> line <NUMBER>
+
+        failure::foo::bar->throw({
+            msg => "Ouch!",
+            trace => failure->confess_trace,
+        });
+
+        # Caught failure::foo::bar: Ouch!
+        #
+        # Failure caught at <FILENAME> line <NUMBER>
+        #   [confess stack trace continues]
+
+    You can provide a "trace" key with any object that overrides
+    stringification, like Devel::StackTrace:
+
+        failure::foo::bar->throw({
+            msg => "Ouch!",
+            trace => Devel::StackTrace->new,
+        });
+
+        # Caught failure::foo::bar: Ouch!
+        #
+        # [stringified Devel::StackTrace object]
+
+  Catching failures
+    Use Try::Tiny, of course. Within a catch block, you know that $_ is
+    defined, but it still might be an unblessed reference or something that
+    is risky to call "isa" on. If you load Safe::Isa, you get a code
+    reference in $_isa that calls "isa" only on objects.
+
+    So catching looks like this:
+
+        use Try::Tiny;
+        use Safe::Isa;
+
+        try { ... }
+        catch {
+            if ( $_->$_isa("failure::foo") ) {
+                # handle it
+            }
+        };
+
+    If you need to rethrow the exception, just use "die":
+
+        elsif ( $_->$_isa("failure") ) {
+            die $_;
+        }
+
+  Overriding failure class behavior
+    See custom::failures.
+
+SEE ALSO
+    There are many error/exception systems on CPAN. This one is designed to
+    be minimalist.
+
+    If you have more complex or substantial needs, people I know and trust
+    seem to be recommending:
+
+    *   Throwable — exceptions as a Moo/Moose role
+
+    *   Throwable::X — Throwable extended with extra goodies
+
+    Here are other modules I found that weren't appropriate for my needs or
+    didn't suit my taste:
+
+    *   Class::Throwable — no hierarchy and always builds a full stack trace
+
+    *   Error::Tiny — blends Try::Tiny and a trivial exception base class
+
+    *   Exception::Base — complexity on par with Exception::Class, but
+        highly optimized for speed
+
+    *   Exception::Class — once highly recommended, but even the author now
+        suggests Throwable
+
+    *   Exception::Simple — very simple, but always uses "caller" and has no
+        hierarchy
+
+    *   Exception::Tiny — not bad, but always uses "caller" and setting up a
+        hierarchy requires extra work
+
+    *   Ouch — simple, well-thought out, but no hierarchy; also cutesy
+        function names
+
+    Here are some that I'm very dubious about:
+
+    *   Err — alpha since 2012
+
+    *   Error — no longer recommended by maintainer
+
+    *   errors — "still under design" since 2009
+
+    *   Exception — dates back to 1996 and undocumented
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/failures/issues>. You will be notified
+    automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/failures>
+
+      git clone https://github.com/dagolden/failures.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+CONTRIBUTOR
+    Michael Jemmeson <mjemmeson@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2013 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

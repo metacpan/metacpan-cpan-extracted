@@ -1,0 +1,54 @@
+All the people reporting problems and fixes.  More specifically in
+alphabetical order:
+
+Alban Crequy
+ For discovering that expected Perl exit code could be unintentionally
+ overridden in forks END block and providing a patch suggestion.
+
+Elizabeth Mattijsen
+ For providing me (Eric Rybski) the opportunity to maintain and 
+ improve this great module.
+
+Erwan Velu
+ For finding that system() might not return correct exit value on
+ certain target platforms.
+ 
+Nilson Santos Figueiredo Junior <nilsonsfj@cpan.org>
+ For helping identify a problem with locks and large PIDs, and
+ for helping test and refine general BSD kernel compatibility.
+
+Richard Faasen
+ For discovering that some XS code was incompatible with older
+ gcc versions.
+ 
+threads::shared
+ For some of the XS code used for forks::shared exported bless function,
+ and for some code used for exported shared_clone function.
+
+
+ORIGINAL AUTHOR CREDITS
+
+Stephen Adkins
+ For finding that a child thread could not wake the very first parent
+ thread with cond_signal, and providing a patch to fix it.
+
+Arthur Bergman
+ For implementing the first working version of Perl threads support
+ and providing us with an API to build on.
+ 
+ For Hook::Scope (from which I swiped the code to have locked variables
+ automatically unlock upon leaving the scope they were locked in) and
+ threads::shared (from which I swiped the code to create references from the
+ parameter list passed to a subroutine).
+
+Lars Fenneberg
+ For helping me through the initial birthing pains.
+
+Paul Golds
+ For spotting a problem with very large shared scalar values.
+
+Bradley W. Langhorst
+ For making sure everything runs with warnings enabled.
+
+Juerd Waalboer
+ For pointing me to the source filter solution for Perl 5.6.x.

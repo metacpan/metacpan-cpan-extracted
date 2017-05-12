@@ -1,0 +1,14 @@
+While this is an experimental module, it won't harm anything to
+install it.
+
+To install...
+
+        perl Makefile.PL
+        make test
+        make install
+
+To install in a local directory...
+
+        perl Makefile.PL PREFIX=<somedir>
+        make test
+        make install

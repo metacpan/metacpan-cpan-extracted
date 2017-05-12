@@ -1,0 +1,31 @@
+flail to-do list.
+
+* Built-in MIME support, toolkit-ish
+* GnuPG supported based on the newer Perl GPG CPAN module
+* Maildir support
+* A new variant of ls: sort metric.  Displays messages sorted by metric
+* Per-message metric computation that can then be used e.g. the sort command
+* Make documentation better
+* Modularize commands.  Create Flail:: namespace and put commands in
+  it and dynload the right module via AUTOLOAD, perhaps.
+* Multiple commands on a line, e.g. "rm .; next; cat" so you can
+  at least make aliases like that.
+* Clean up a lot of the archaic code I wrote when I was still thinking
+  in perl4 and not perl5.
+* Hack send_internal to not use a relay if $SMTPHost is undef, but to
+  look up the MX for the recipient or just try connecting to the destination
+  directly if there is no MX.
+* Mark new messages as new and automatically map a new_hook over them
+  after doing a get.  Clear the new flag afterwards.  This would let you
+  build filters.
+* Use the seen flag.
+* Support arbitrary flags
+* Change all prints to a call to something else, so that a GUI or web
+  interface doesn't need so much work.
+* Standardize argument parsing for commands that take options, instead
+  of the ad hocery there is in unmark and so on [HALF DONE]
+* Add the necessary code to readline() usage to do real command completion
+* Hierarchical addressbook w/more structure to the entries [real LDIF support]
+* Daemon mode?
+* GUI using gtk+ perl bindings
+* HTTP interface, or support access via CGI

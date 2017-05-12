@@ -1,0 +1,25 @@
+BODY { background: white; color: black; font: small 'Trebuchet MS', Helvetica, arial, sans }
+P { font-size: 100%; text-align: left }
+EM { font-style: italic }
+P.rel { font-size: 90%; text-align: right }
+P.desc { font-size: 90%; text-align: left }
+P.fnh { font-size: 80%; font-style: bold; text-align: left }
+P.fn { font-size: 80%; text-align: left }
+P.rhead { color: yellow; text-align: right }
+TT { font-family: courier, courier new; font-size: 90%; font-style: bold }
+CODE { font-family: courier, courier new; font-size: 105%; font-style: bold; }
+PRE { font-family: courier, courier new; font-size: 105%; font-style: bold; margin-left: 5%; margin-right: 5%; margin-top: 2%; margin-bottom: 2%; border: 2px dashed #aaaaaa; padding: 8px; }
+A { text-decoration: none }
+TABLE.outer { width: 100%; border: 1px solid #4682b4; }
+TR.header { background-color: #4682b4; font-size: 90%; font-style: bold; }
+TR.header TD.rhead { width: 10%; text-align: right; }
+TR.header TD { color: yellow; }
+TR.data TD { border-top: 1px solid #4682b4; }
+H1, H2, H3, H4, H5, H6 { text-align: left; font-style: bold; }
+H1, H2 { padding-bottom: 2px; margin-bottom: 4px; border-bottom: 2px solid black;  margin-top: 6px; }
+H1 { font-size: 140%; }
+H2 { font-size: 135%; }
+H3 { font-size: 130%; }
+H4 { font-size: 125%; }
+H5, H6 { font-size: 100%; }
+IMG { border: 0 }

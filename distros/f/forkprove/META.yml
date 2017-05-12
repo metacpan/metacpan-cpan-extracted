@@ -1,0 +1,39 @@
+---
+abstract: 'forking prove'
+author:
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+build_requires:
+  Test::More: '0.94'
+  Test::Requires: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.5, Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: forkprove
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  App::Prove: '3.25'
+  TAP::Harness: '3.25'
+  parent: '0.221'
+  perl: '5.008001'
+  version: '0.77'
+resources:
+  bugtracker: https://github.com/miyagawa/forkprove/issues
+  homepage: https://github.com/miyagawa/forkprove
+  repository: https://github.com/miyagawa/forkprove.git
+version: v0.4.10
+x_contributors:
+  - 'Jesse Luehrs <doy@tozt.net>'
+  - 'Jonathan Swartz <swartz@pobox.com>'
+  - 'Shigeki Morimoto <github@morimo.to>'

@@ -1,0 +1,36 @@
+README for forks::BerkeleyDB
+
+Version:
+ 0.06
+
+This module is a drop-in replacement for threads.pm.  It has the
+same syntax as the threads.pm module (it even takes over its namespace) but
+has some significant differences:
+
+- you do _not_ need a special (threaded) version of Perl
+- it is _much_ more economic with memory usage on OS's that support COW.
+  Additionally, it uses local temp filesystem space for shared variable
+  data, so memory savings are at a premium when dealing with very large
+  shared variables
+- it is more efficient in the startup of threads
+- it is slightly less efficient in the stopping of threads
+- it is somewhat less efficient in shared variable data operations
+- it is less efficient in shared variable locking and signaling
+
+Copyright (c) 2006-2009 Eric Rybski <rybskej@yahoo.com>.
+All rights reserved.  This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+Required Modules:
+ BerkeleyDB (0.27)
+ Devel::Required (0.07)
+ forks (0.29)
+ Storable (any)
+ Tie::Restore (0.11)
+
+The build is standard:
+
+perl Makefile.PL
+make
+make test
+make install

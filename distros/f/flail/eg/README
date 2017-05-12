@@ -1,0 +1,19 @@
+These are examples that you can check out for inclusion or
+adaption into your ~/.flailrc
+
+util.pl - various utility subs that don't go anywhere else
+identities.pl - code to manage multiple identities, including a "be" command
+autofile.pl - flexible, header- and content-based auto-filing code
+
+The *_config.pl files are separate, sample configurations of the
+globals needed by the above modules, e.g. autofile_config.pl goes
+with autofile.pl.  You should require them both in your .flailrc,
+e.g.
+
+
+  require 'autofile_config.pl';
+  require 'autofile.pl';
+
+This is one of the reasons why the sample .flailrc puts ~/.flail on
+@INC if it exists and is a directory - it gives you a place to keep
+your flail scripts.

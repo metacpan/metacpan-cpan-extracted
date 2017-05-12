@@ -1,0 +1,20 @@
+Revision history for Perl extension fp.
+
+0.03 Wed Sept 28 2005
+    - added implementation of lambda calculus using
+      perl subs as the lambda abstraction
+
+0.02 Fri July 9 2004
+    - I added fp::functionals to this module. This
+      too has been kicking around for a little while
+      and I initially did not include it since it uses
+      assigment, and I wanted this pure. But pure-shmure,
+      functionals (or higher-order functions) are 
+      part of functional programming too.
+
+0.01 Wed May 26, 2004
+    - This module has been kicking around for a 
+      while now. I have never thought of it as 
+      useful, being as esoteric as it is, but I 
+      figured I would release it anyway. 
+

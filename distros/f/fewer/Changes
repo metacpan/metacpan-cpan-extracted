@@ -1,0 +1,20 @@
+Revision history for fewer
+
+0.203     2014-03-16 12:47:31+01:00 Europe/Paris
+          update minimum perl to 5.12.0, for less 0.03
+
+0.202     2013-09-24 20:57:20 America/New_York
+          replace a busted test file
+
+0.201     2013-08-24 08:07:31 America/New_York
+          updated bug tracker, repo data
+
+          switch from base.pm to parent.pm
+
+0.200     2011-02-07 11:38:30 America/New_York
+
+          use more 'more'
+
+0.100220  2010-01-22
+
+          first release

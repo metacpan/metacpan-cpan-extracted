@@ -1,0 +1,775 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+use Getopt::Std;
+use vars qw/ $opt_c $opt_n $opt_f $opt_e $opt_d $opt_o $opt_h $opt_t $opt_v $opt_x $opt_z /;
+use Config::Tiny;
+use File::Spec;
+
+use FTN::Database qw(&open_ftn_database &close_ftn_database &create_ftn_index &drop_ftn_index);
+use FTNDB::Nodelist;
+use FTN::Log qw(&logging);
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+=head1 NAME
+
+ftndb-nodelist - Fidonet/FTN Nodelist related processing using an SQL Database.
+
+=head1 VERSION
+
+Version 0.37
+
+=cut
+
+our $VERSION = '0.37';
+
+=head1 DESCRIPTION
+
+This script both provides an example of using the FTN::Database and
+FTNDB::Nodelist modules as well as providing some basic
+functionality related to using an SQL Database for Fidonet/FTN related
+processing.  The SQL Database engine is one for which a DBD module exists,
+defaulting to SQLite.
+
+=head1 SYNOPSIS
+
+C<ftndb-nodelist [-c config_file] [-t tablename] [-f nodelist_file] [-d domain] [-n net] [-z zone] [-e] [-v] [-x] load>
+
+C<ftndb-nodelist [-c config_file] [-t tablename] [-n net] [-z zone] [-o outfile] [-v] [-x] list>
+
+C<ftndb-nodelist [-h | --help]>
+
+C<ftndb-nodelist --version>
+
+=cut
+
+getopts('c:n:f:d:t:o:ehvxz:');
+
+if ($opt_h) {
+    HELP_MESSAGE(*STDOUT);    #printing usage/help message
+    exit 0;
+}
+
+my (
+    $nodelist_directory, $nodelist_file, $db_handle, $sql_statement, $domain, $type,
+    $number,   $name,   $location,  $log_file, $command, $zone_number, $net_number,
+    $sysop, $phone,  $bps, $flags,  $table_name, $list_file, $config_file
+);
+
+=head1 OPTIONS
+
+=over
+
+=item -c
+
+This is the filename and path of a configuration file, with the
+default being ftndb.cfg in the current directory.
+
+=cut
+
+if ($opt_c) {
+    $config_file = $opt_c;
+    undef $opt_c;
+}
+else {
+    my $config_dir = File::Spec->curdir();
+    $config_file = File::Spec->join($config_dir, 'ftndb.cfg');
+}
+
+#  Get configuration from file
+my $ftndb_config = Config::Tiny->new();
+$ftndb_config = Config::Tiny->read($config_file)
+    or die "Could not open configuration file:  $config_file";
+
+# Get the definition of the log file
+$log_file = $ftndb_config->{_}->{LogFile};
+
+my $log_id = 'nl2db';
+
+logging($log_file, $log_id, "Starting ftndb-nodelist $VERSION ... ");
+
+=item -v
+
+Verbose option.
+
+=cut
+
+if ($opt_v) {
+    logging($log_file, $log_id, 'Verbose flag is set');
+}
+
+=item -x
+
+Debug option.
+
+=cut
+
+if ($opt_x) {
+    logging($log_file, $log_id, 'Debug flag is set');
+}
+
+my %db_option = ();
+
+# Get the definition of the database type
+$db_option{'Type'} = $ftndb_config->{Database}->{Type};
+
+if ($opt_v) { logging($log_file, $log_id, "Database type being used is $db_option{'Type'}") };
+
+# Get the definition of the database name
+$db_option{'Name'} = $ftndb_config->{Database}->{Name};
+
+if ($opt_v) { logging($log_file, $log_id, "Database name being used is $db_option{'Name'}") };
+
+# Get the definition of the database user
+if ($db_option{'Type'} eq 'SQLite') {
+
+    $db_option{'User'} = q{};
+
+} else {
+    $db_option{'User'} = $ftndb_config->{Database}->{User};
+
+    if ($opt_v) { logging($log_file, $log_id, "Database user being used is $db_option{'User'}") };
+
+}
+
+# Get the definition of the database password
+if ($db_option{'Type'} eq 'SQLite') {
+
+    $db_option{'Password'} = q{};
+
+} else {
+
+    $db_option{'Password'} = $ftndb_config->{Database}->{Password};
+    if ($opt_v) { logging($log_file, $log_id, "Database password being used is $db_option{'Password'}") };
+
+}
+
+=item -f
+
+The nodelist file.
+If the -e option is also set, then this is an exact file name.  If -e is
+not set, then this is the basename of the nodelist files.  If -f is not
+set, then when needed it defaults to "nodelist".
+
+=item -e
+
+If set, then the -f option must be exact file name.  If not set, then
+the -f option is the basename of a nodelist file.
+
+=item -t
+
+The nodelist table name to be used.
+Note that if there is a period in the name, that period will be changed
+to an underscore.
+
+=cut
+
+if ($opt_t) {
+    if ( $opt_t =~ /\./ ) {    # period in proposed table name?
+        logging($log_file, $log_id, 'sqlite does not allow periods in table names.');
+        $opt_t =~ tr/\./_/;    # change period to underscore
+        $table_name = $opt_t;     #
+        logging($log_file, $log_id, "Changed table name to $table_name.");
+    }
+    else {                     # no period in name
+        $table_name = $opt_t;     #  just assign to variable
+    }
+
+}
+else {
+    $table_name = 'Nodelist';     # default table name
+}
+
+=item -n
+
+If set, it is the FTN Net number being operated on.
+
+=cut
+
+if ($opt_n) {
+
+    $net_number = $opt_n;
+    logging($log_file, $log_id, "Defined Net: $net_number");
+    undef $opt_n;
+
+}
+
+=item -z
+
+If defined;  is the only zone being operated on.
+
+=cut
+
+if ($opt_z) {
+    $zone_number = $opt_z;
+    logging($log_file, $log_id, "Defined Zone: $zone_number");
+    undef $opt_z;
+}
+
+=item -d
+
+If defined, this is the domain of the nodelist being loaded.  Defaults
+to fidonet.
+
+=cut
+
+if ($opt_d) {
+    $domain = $opt_d;
+}
+else {
+    $domain = 'fidonet';
+}
+
+if ($opt_v) {                  # log domain name
+    logging($log_file, $log_id, "Domain: '$domain'");
+}
+if ($opt_x) {
+    logging($log_file, $log_id, 'Debug mode is set');
+}
+
+=item -o
+
+Output file.
+This needs to be at least the filename and can also include a path.
+
+=back
+
+=cut
+
+if ($opt_o) {
+    $list_file = $opt_o;
+    undef $opt_o;
+}
+
+=head1 COMMANDS
+
+=over
+
+=item load 
+
+This will load an FTN Nodelist database table in an SQL database
+server being used for Fidonet/FTN processing. Note that it does
+not currently check if a nodelist for the same domain, year, and
+year day is already in the database.
+
+=item list
+
+This will list information from an FTN Nodelist database table in
+an SQL database server being used for Fidonet/FTN processing, by
+a specified zone and/or net number.
+
+=back
+
+=cut
+
+# Parse commands
+#   if a command is found, then execute & exit
+#   if not;  display error message, then help message, then exit
+$command = shift;
+if (lc($command) eq 'create') {
+
+    $command = shift;
+    if (lc($command) eq 'table') {
+    #  Create an FTN nodelist table
+    create_ftn_nodelist_table();
+
+    } else {
+    print {*STDERR} "Unrecognized parameter for \'create\' command.\n";
+    HELP_MESSAGE(*STDERR);
+    exit 1;
+
+    }   # End parsing of 'create' command
+
+} elsif (lc($command) eq 'load') {
+
+    load_ftn_nodelist();
+
+} elsif (lc($command) eq 'list') {
+
+    list_ftn_nodelist();
+
+} else {
+    print {*STDERR} "Unrecognized command.\n";
+    HELP_MESSAGE(*STDERR);
+    exit 1;
+
+}       # End of command parsing.
+
+exit 0;
+
+################################################################################
+#   Subroutines
+################################################################################
+
+# Display of help message
+########################################################################
+sub HELP_MESSAGE {
+
+    my $fh = shift;
+
+    print {$fh} "\n\tSynopsis:\n";
+    print {$fh} "ftndb-nodelist [-c config_file] [options] load\n";
+    print {$fh} "ftndb-nodelist [-c config_file] [options] list\n";
+    print {$fh} "ftndb-nodelist -h | --help\t= Display this help message.\n";
+    print {$fh} "ftndb-nodelist --version\t= Display version message\n";
+
+    print {$fh} "\tOptions.\n";
+    print {$fh} "[-c config_file]\t= Name and path for configuration file.\n";
+    print {$fh} "[-t tablename]\t\t= Nodelist table name;  defaults to 'Nodelist'.\n";
+    print {$fh} "[-f nodelist_file]\t= Nodelist filename, defaults to 'nodelist'.\n";
+    print {$fh} "[-d domain]\t\t= Nodelist domain;  defaults to 'fidonet'.\n";
+    print {$fh} "[-n net_number]\t= If only, the only net to be operated on.\n";
+    print {$fh} "[-z zone_number]\t= If only, the only zone to be operated on.\n";
+    print {$fh} "[-o outfile]\t\t= Output file and path.\n";
+    print {$fh} "[-e]\t\t\t= If present, then nodelist_file is an exact filename\n";
+    print {$fh} "[-v]\t\t\t= Verbose Mode\n";
+    print {$fh} "[-x]\t\t\t= Debug Mode\n";
+
+    return();
+
+}
+
+########################################################################
+# Create an FTN Nodelist table
+########################################################################
+sub create_ftn_nodelist_table {
+
+    # connect to database
+    $db_handle = FTN::Database::open_ftn_database(\%db_option);
+
+    # drop the old nodelist table index, if it exists.
+    FTN::Database::drop_ftn_index($db_handle, 'ftnnode');
+
+    # drop the old nodelist table, if it exists.
+    logging($log_file, $log_id, "Dropping existing nodelist table $table_name if it already exists.");
+    FTN::Database::drop_ftn_table($db_handle, $table_name);
+
+    # Create nodelist table
+    FTNDB::Nodelist::create_nodelist_table($db_handle, $table_name, $db_option{'Type'});
+
+    # Creating Index
+    my $index_name = 'ftnnode';
+    my $index_fields = 'zone,net,node,point,domain';
+    FTN::Database::create_ftn_index($db_handle, $table_name, $index_name, $index_fields);
+
+    # disconnect from database
+    FTN::Database::close_ftn_database($db_handle);
+
+    logging($log_file, $log_id, "Table $table_name created.");
+
+    return();
+}
+
+########################################################################
+# Load an FTN Nodelist table in an FTN database
+########################################################################
+sub load_ftn_nodelist {
+
+    use constant EIGHT => 8;
+
+    #  set defaults
+    my $zone   = 1;
+    my $net    = 0;
+    my $node   = 0;
+    my $point  = 0;
+    my $region = 0;
+
+    $nodelist_directory = $ftndb_config->{Nodelist}->{Directory};
+
+    if ($opt_f) {
+
+        if ($opt_e) {
+            logging($log_file, $log_id, "Using exact file name $opt_f.");
+            $nodelist_file = $opt_f;
+        } else {
+            $nodelist_file = get_nodelist_filename($opt_f);
+        }
+
+    } else {
+        $nodelist_file = get_nodelist_filename('nodelist');
+    }
+
+    logging($log_file, $log_id, "Nodelist directory: '$nodelist_directory'");
+    logging($log_file, $log_id, "Nodelist file: '$nodelist_file'");
+
+    my %nl_info = FTNDB::Nodelist::nodelist_file_info("$nodelist_directory/$nodelist_file");
+
+    open NODELIST, "$nodelist_directory/$nodelist_file"
+    or die logging($log_file, $log_id, "Cannot open $nodelist_directory/$nodelist_file");
+
+    # connect to database
+    $db_handle = FTN::Database::open_ftn_database(\%db_option);
+
+    # drop the old nodelist table index 'ftnnode', if it exists.
+    logging($log_file, $log_id, 'Dropping existing nodelist table index ftnnode if it already exists.');
+    FTN::Database::drop_ftn_index($db_handle, 'ftnnode');
+
+    if ($opt_v) {
+    logging($log_file, $log_id, "Loading database from nodelist $nodelist_file");
+    }
+
+    #   Build SQL Statement for Prepare
+    $sql_statement = "INSERT INTO $table_name ";
+    $sql_statement .= '(type,zone,net,node,point,region,name,';
+    $sql_statement .= 'location,sysop,phone,baud,flags,domain,ftnyear,yearday,source) ';
+    $sql_statement .= 'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+
+    my $insert_handle = $db_handle->prepare($sql_statement);
+
+    while (<NODELIST>) {
+    if ( /^;/ || /^\cZ/ ) {
+
+        #	print;
+        next;
+    }
+
+    ( $type, $number, $name, $location, $sysop, $phone, $bps, $flags ) =
+        split /,/, $_, EIGHT ;
+
+    # if $flags is undefined (i.e., nothing after the baud rate)
+    if ( !defined $flags ) {
+        $flags = q{ };
+    }
+    else {
+        $flags =~ s/\r?\n$//;    # else remove EOL (removes \r\n or \n but not \r) from $flags
+    }
+
+    if ( $type eq 'Zone' ) {    # Zone line
+        $zone = $number;
+        $net  = $number;
+        $node = 0;
+    }    #
+    elsif ( $type eq 'Region' ) {    # Region line
+        $region = $number;
+        $net    = $number;
+        $node   = 0;
+    }
+    elsif ( $type eq 'Host' ) {      # Host line
+        $net  = $number;
+        $node = 0;
+    }
+    else {
+        $node = $number;
+    }
+
+    # display where in the nodelist we are if debug flag is set
+    if ($opt_x) {
+        print "$type,";
+        printf "%-16s", "$zone:$net/$node";
+        print "$sysop\n";
+    }
+
+    # If zone_number is defined, then go to the next line if the zone
+    # number is not the same as zone_number 
+    if (defined $zone_number) {
+        if ($zone != $zone_number) {
+        next;
+        }
+    }
+
+    #       Execute the insert SQL statment
+    $insert_handle->execute($type, $zone, $net, $node, $point, $region,
+         $name, $location, $sysop, $phone, $bps, $flags, $domain, $nl_info{'Year'}, $nl_info{'YearDay'}, $nodelist_file)
+        or die logging($log_file, $log_id, $DBI::errstr);
+
+    }
+
+    $insert_handle->finish;
+    undef $insert_handle;
+
+    if ($opt_v) { logging($log_file, $log_id, 'Create ftnnode index'); }
+    # Recreate ftnnode Index
+    my $index_name = 'ftnnode';
+    my $index_fields = 'zone,net,node,point,domain';
+    FTN::Database::create_ftn_index($db_handle, $table_name, $index_name, $index_fields);
+
+    if ($opt_v) { logging($log_file, $log_id, 'Closing database'); }
+    # disconnect from database
+    FTN::Database::close_ftn_database($db_handle);
+
+    close NODELIST;
+
+    logging($log_file, $log_id, 'Nodelist table loaded... ');
+
+    return();
+}
+
+########################################################################
+# List information from FTN nodelist 
+########################################################################
+sub list_ftn_nodelist {
+
+    if (!defined $list_file) {
+    print "The output file option, -o, was not defined.\n";
+    HELP_MESSAGE();
+    exit 1;
+    }
+
+    # connect to database
+    my $db_handle = FTN::Database::open_ftn_database(\%db_option);
+
+    # build Select query sql statement
+    my $sql_statement = "SELECT * FROM $table_name WHERE zone = $zone_number and net = $net_number ";
+    $sql_statement .= 'ORDER by node ASC';
+
+    # execute query
+    my $query_handle = $db_handle->prepare($sql_statement);
+    $query_handle->execute();
+
+    $query_handle->bind_columns(\my($id, $type, $zone, $net, $node, $point, $region,
+     $name, $location, $sysop, $phone, $baud, $flags, $domain, $ftnyear, $yearday, $source, $updated));
+
+    open(ListFile, ">$list_file") or die "Cannot open $list_file\n";
+
+    while($query_handle->fetch()) {
+        write ListFile;
+    }
+
+    close ListFile;
+
+    # finish query
+    $query_handle->finish;
+    undef $query_handle;
+
+    # disconnect from database
+    FTN::Database::close_ftn_database($db_handle);
+
+    return ();
+
+format ListFile_TOP =
+Zone @<<<<      Net @<<<<
+$zone_number,   $net_number
+------------------------------------------------------------------------
+.
+
+format ListFile =
+Node:     @<<<<
+          $node
+Name:     @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+          $name
+Sysop:    @<<<<<<<<<<<<<<<<
+          $sysop
+Location: @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+          $location
+Phone:    @<<<<<<<<<<<<<<<<       Baud:   @<<<<<
+          $phone,                         $baud
+Flags:    @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+          $flags
+
+.
+
+}
+
+########################################################################
+# get nodelist filename, given path & base name
+########################################################################
+sub get_nodelist_filename {
+
+    # Find the most recent version (by day number) when given a base name & dir
+    # of the nodelist;  once this is implemented, this will be the default.
+    # Note that if there is more than one file with the same base name, it will
+    # use the first one found.
+
+    use constant MinusOne => -1;
+
+    my ($basename) = @_;
+
+    my ( $i, @files );
+
+    if ($opt_v) { logging($log_file, $log_id, "Searching for $basename files.") }
+
+    opendir DIR, $nodelist_directory;
+    @files = reverse sort (grep( /$basename\.[0-9][0-9][0-9]$/i, readdir(DIR) ));
+    closedir DIR;
+
+    if ( $#files == MinusOne ) {
+        logging($log_file, $log_id, "Nodelist files $basename not found");
+        print "\nNodelist files $basename not found.\n";
+        HELP_MESSAGE();
+        exit 0;
+    }
+    else {
+        if ($opt_v) {
+            for ( $i = 0 ; $i < @files ; $i++ ) {
+                logging($log_file, $log_id, "Nodelist file $i found: $files[$i]");
+            }
+        }
+    }
+
+    if ( $#files > 1 ) {
+        logging($log_file, $log_id, "More than one '$basename' found, using first.");
+    }
+
+    return ( $files[0] );    # return filename
+
+}
+
+#########################################################################
+# Display Version message
+#########################################################################
+sub VERSION_MESSAGE {
+
+    my $fh = shift;
+
+    print {$fh} "ftndb-nodelist version $VERSION\n";
+
+    return();
+
+}
+
+################################################################################
+
+=head1 CONFIGURATION
+
+Configuration information not provided by the command line options are
+obtained from a configuration file.  That can be defined by setting the
+"-c" option, which is the path and file name of the configuration file
+to be used. If that is not defined, it looks for a file named ftndb.cfg
+in the current directory. The file contains configuration items listed
+outside of a named section as well as those listed within a named section,
+and blank lines and lines starting with a "#" are ignored.
+
+The first items in the file are those outside of a named section:
+
+=over 4
+
+=item LogFile
+
+This is the required filename and path of a log file.
+
+=back
+
+The B<Database> section in the configuration file has the following
+keywords:
+
+=over 4
+
+=item Type
+
+Database type.
+This needs to be a database type for which a DBD module exists, the type
+being the name as used in the DBD module.  The default type is SQLite.
+
+=item Name
+
+Database name.
+For an SQLite database; this needs to be at least the filename and can
+also include a path.
+
+=item User
+
+Database user.
+For an SQLite database, this defaults to an empty string as it is not
+needed for that type of database.
+
+=item Password
+
+Database password.
+For an SQLite database, this defaults to an empty string as it is not
+needed for that type of database.
+
+=back
+
+The B<Nodelist> section in the configuration file has the following
+keywords:
+
+=over 4
+
+=item Directory
+
+The directory where the FTN Nodelist files are located.
+
+=back
+
+This is an example of the contents of an ftndb.cfg file for use with
+FTN Nodelist related processing:
+
+    # ftndb.cfg
+    LogFile=/opt/ftndb/ftndb.log
+
+    [Database]
+    Type=mysql
+    Name=ftndbtst
+    User=sysop
+    Password=ftndbtst
+
+    [Nodelist]
+    Directory=/var/lib/ftn/nodelist
+
+=head1 EXAMPLES
+
+Given that $CFGFILE is a configuration file, the following command line can be
+used to create an FTN Nodelist table in that database file:
+
+C<ftndb-nodelist -c $CFGFILE -t Nodelist -v create table>
+
+Given that NODELIST is the base nodelist filename and that $CFGFILE is an
+existing configuration file, the following command line can be used to
+load an FTN nodelist from a set of nodelist files all with the same
+basename of NODELIST:
+
+C<ftndb-nodelist -c $CFGFILE -f NODELIST -d fidonet -v load>
+
+Given that $CFGFILE is an existing configuration file, the
+following command line can be used to load a specified zone of the
+specified domain from a specified nodelist:
+
+C<ftndb-nodelist -c $CFGFILE -f nodelist.197 -d fidonet -z 1 -e -v load>
+
+=head1 AUTHOR
+
+Robert James Clay, C<< <jame at rocasa.us> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests via the web interface at
+L<https://sourceforge.net/p/ftnpl/ftndb/tickets/>. I will be notified,
+and then you'll automatically be notified of progress on your bug
+as I make changes.
+
+Note that you can also report any bugs or feature requests to
+C<bug-ftndb at rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=ftndb>;
+however, the FTN Database application issue tracker at the
+SourceForge project is preferred.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc ftndb-nodelist
+
+
+You can also look for information at:
+
+=over 4
+
+=item * FTN Database application issue tracker
+
+L<https://sourceforge.net/p/ftnpl/ftndb/tickets/>
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=ftndb>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/ftndb>
+
+=back
+
+=head1 SEE ALSO
+
+ L<FTN::Database>, L<FTNDB::Nodelist>, and L<ftndb-admin>.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2010-2012 Robert James Clay, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+

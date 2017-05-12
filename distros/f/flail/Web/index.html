@@ -1,0 +1,341 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html>
+
+  <head>
+    <!-- Time-stamp: <2008-09-07 20:17:13 snl@cluefactory.com> -->
+    <title>flail - the Perl MUA from the Clue Factory</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link rel="stylesheet" type="text/css" href="flail.css">
+  </head>
+
+  <body>
+
+    <div align="center"><a href="index.html" title="flail: the perl MUA from the cluef actory"><img src="flail.png"></a></div>
+
+    <div style="margin-left: 10%; margin-right: 10%">
+
+      <h1>Welcome to the flail Home Page</h1>
+
+      <p>
+        Flail is a hacker's <a href="http://en.wikipedia.org/wiki/E-mail_client" title="wikipedia: MUA">MUA</a>
+        (<em>Mail User Agent</em>, a program you use to read your mail).  It has a terse, extensible,
+        Unix-like command-line interface.  It is written in
+        <a href="http://www.perl.org" title="Perl: everyone ends up here eventually">Perl</a>, and
+        is designed to make Perl hackers happy.  It now comes with a
+        Makefile.PL and a README, so what more could you possibly ask?
+      </p>
+
+      <p>
+        Flail is still mainly programmerware.  If you're a Perl hacker
+        and like the idea of using a mailer that lets you map
+        arbitrary snippets of Perl code over your messages and folders
+        in a terse way, then you might want to check it out.  I
+        recently revived the project from the dead, after getting sick
+        of my current mailer and deciding my own dogfood
+        just <b>had</b> to be better.
+      </p>
+
+      <p>
+        I use flail to read all my mail, from multiple mailboxes,
+        faced with hundreds or even thousands of spams a day,
+        using <a href="http://www.gnupg.org" title="The GNU Privacy Guard">GnuPG</a> and
+        <a href="http://www.gnu.org/software/emacs/" title="EMACS: The one, true editor">EMACS</a>
+        as my trusty helper apps.  I also highly recommend
+        <a href="http://www.catb.org/~esr/fetchmail/" title="Fetchmail: email protocol swiss army knife / utility belt">fetchmail</a>,
+        <a href="http://www.courier-mta.org/maildrop/" title="Maildrop: mail filtering tool">maildrop</a>,
+        and <a href="http://bmf.sourceforge.net/" title="bmf: bayesian mail filter">bmf</a>.
+        <a href="bits/eg/dot.flailrc">My .flailrc</a> and
+        <a href="bits/eg">associated helper modules</a> are
+        included, and are probably the best source of examples, along
+        with <a href="spam.html" title="Flail-based spam mitigation setup">the page on spam mitigation hacks in flail</a>.
+      </p>
+
+      <p>
+        My original idea for flail was to write a
+        <em>variable-weight</em> MUA.  By variable-weight, I mean a
+        mailer that you could use from a command-line interface
+        (lightweight), a full-blown GUI (heavyweight), or even by
+        accessing a detached flail process via HTTP or IRC on the fly
+        (sort of medium-weight).  I have used mail systems in the past
+        that had this kind of capability, but they are now outdated,
+        were always much too large for what they did, and still didn't
+        do everything I wanted.
+      </p>
+
+      <p>
+        There is a modicum of documentation in flail itself, via the
+        help command, including a brand-spanking new POD, also
+        known as <a href="flail.html" title="the flail manual">the man page</a>.
+        To get at all this goodness yourself,
+        unpack <a href="bits/flail-0.2.5.tar.gz">the tarball</a>,
+        read the <a href="bits/README">README</a>, and follow the instructions.
+      </p>
+
+      <p>
+        If you like this or want to help me work on it, please let me
+        know.  I have a lot of plans for this, but have to work on other
+        things now.  Send email to
+        <a href="mailto:flail@cluefactory.com">flail@cluefactory.org</a>
+        with comments or, better, code.  The <tt>flail-dev@cluefactory.com</tt>
+        mailing list also awaits you; send email to
+        <tt>flail-dev-subscribe@cluefactory.com</tt> to subscribe.
+      </p>
+
+      <p>
+        The latest release is <a href="bits/flail-0.2.5.tar.gz">0.2.5</a>.
+        You can read <a href="flail.html" title="the flail manual">the manual</a> to get a better idea
+        of how flail works.  You might also find some of the CPAN modules
+        cached in my <a href="bits/">bits</a> directory of use.
+        However, I would suggest trying to satisfy the dependences
+        that Makefile.PL complains about using whatever means are
+        normal on your system first.  For instance, under
+        <a href="http://www.openbsd.org" title="OpenBSD: it's the 'open' stupid!">OpenBSD</a> you would look
+        in <tt>/usr/ports</tt> for the missing Perl modules first.
+      </p>
+
+      <table class="outer" cellspacing="0" cellpadding="5">
+
+        <tr class="header">
+          <td class="rhead">Release</td>
+          <td>Description</td>
+        </tr>
+
+        <!-- 0.2.5 -->
+        <tr class="data">
+          <td width="10%" valign="top"><p class="rel"><a href="bits/flail-0.2.5.tar.gz">0.2.5</a></p></td>
+          <td>
+            <p class="desc">
+              Recovered "lost" changes from a source tree on a dead laptop:
+              multiple commands separated by semi-colons on the same line,
+              reorganized SMTP code into <tt>send_via_program</tt> and
+              <tt>send_via_smtp</tt> so that we can use e.g. <tt>msmtp</tt>
+              to hack up outbound email via Gmail easily, updated example
+              code in <tt>eg/</tt> subdir a bit.  Nothing major, but
+              slightly comfier to use.
+            </p>
+          </td>
+        </tr>
+
+        <!-- 0.2.4 -->
+        <tr class="data">
+          <td width="10%" valign="top"><p class="rel"><a href="bits/flail-0.2.4.tar.gz">0.2.4</a></p></td>
+          <td>
+            <p class="desc">
+              Fixed bug in ls output for messages with goofy whitespace in
+              headers (e.g. tons of spam), fixed some hard-coded constants (e.g. path
+              to gpg), added SMTP AUTH fu, added the <tt>pipe</tt> command, added
+              <tt>/debug</tt>, <tt>/verbose</tt> and <tt>/quiet</tt> options to many
+              commands (including <tt>send_internal</tt>), fixed <tt>help brief</tt>
+              command, made <tt>flail_defcmd1</tt> overwrite existing aliases by
+              default so we can <tt>reconf</tt> sanely, updated the POD,
+              wrote a working <tt>Makefile.PL</tt> for flail version 0.x and renamed
+              the flail version 1.x makefile to something else for now, updated
+              examples in <tt>eg/</tt>.
+            </p>
+          </td>
+        </tr>
+
+        <!-- 0.2.3 -->
+        <tr class="data">
+          <td width="10%" valign="top"><p class="rel"><a href="bits/flail-0.2.3.tar.gz">0.2.3</a></p></td>
+          <td>
+            <p class="desc">Many bug fixes and improvements, especially to the
+             documentation.  Added several examples from my config, including
+             a module that supports multiple identities, and
+             another that automatically files your mail according to
+             regular expressions.
+            </p>
+          </td>
+        </tr>
+
+        <!-- 0.2.2 -->
+        <tr class="data">
+          <td width="10%" valign="top"><p class="rel"><a href="bits/flail-0.2.2.tar.gz">0.2.2</a></p></td>
+          <td>
+            <p class="desc">Many bug fixes and improved documentation.  Includes
+              support for local spools, but w/no locking!
+            </p>
+          </td>
+        </tr>
+
+        <!-- 0.2.1 -->
+        <tr class="data">
+          <td width="10%" valign="top"><p class="rel"><a href="bits/flail-0.2.1.tar.gz">0.2.1</a></td>
+          <td>
+            <p class="desc">Fix a bad bug in <code>get_imap()</code> that would
+             totally pooch messages from IMAP spools on the way into your
+             incoming folder.
+            </p>
+          </td>
+        </tr>
+
+        <!-- 0.2.0 -->
+        <tr class="data">
+          <td width="10%" valgin="top"><p class="rel"><a href="bits/flail-0.2.0.tar.gz">0.2.0</a></td>
+          <td>
+            <p class="desc">First 0.2.x release.  IMAP support, albeit
+              buggy.
+            </p>
+          </td>
+        </tr>
+
+        <!-- 0.1.28 -->
+        <tr class="data">
+          <td width="10%" valign=top><p class="rel"><a href="bits/flail-0.1.28.tar.gz">0.1.28</a></td>
+          <td>
+            <p class="desc">This has a couple bugfixes over 0.1.27, and is
+              what I use now to read all of my mail.  I wish I had more time
+              to clean this up.
+            </p>
+            <p class="desc">I have announced this version on freshmeat.net
+              in the hopes that someone else might be interested in helping
+              out with flail development, since I have such little time.
+              Here is <a href="flail-screenshot.png">a screen shot</a>.  Woo hoo!
+              Aterm!  I'm a dork!
+            </p>
+          </td>
+        </tr>
+
+        <!-- 0.1.27 -->
+        <tr class="data">
+          <td width="10%" valign=top><p class="rel"><a href="bits/flail-0.1.27.tar.gz">0.1.27</a></td>
+          <td>
+            <p class="desc">Fixed the reply From address bug.  Fixed the
+              orphaned gpg child process bug.  Fixed some POP issues.
+              Aborted attempt to add Maildir support because I need to rework
+              a few things.  Damn.  Otherwise, reasonably solid.
+            </p>
+          </td>
+        </tr>
+
+        <!-- 0.1.22 -->
+        <tr class="data">
+          <td width="10%" valign=top><p class="rel"><a href="bits/flail-0.1.22-full.tar.gz">0.1.22</a></td>
+          <td>
+            <p class="desc">Skipped a <b>bunch</b> of releases.  Oh, well.  0.1.22 is
+              a pretty solid mail reader, and it has a primitive installer now.  This tarball
+              contains all of the modules and collateral libraries needed to install
+              flail.  It has been tested under Linux and OpenBSD.  Please let me know if
+              you get it to work anywhere else.
+            </p>
+          </td>
+        </tr>
+
+        <!-- 0.1.12 -->
+        <tr class="data">
+          <td width="10%" valign=top><p class="rel"><a href="bits/flail-0.1.12-full.tar">0.1.12</a></td>
+          <td>
+            <p class="desc">Skipped a release... 0.1.12 has some portability
+              fixes and just general bug fixes.  This is the release I have
+              been using to read and send all of my mail for months now.
+            </p>
+          </td>
+        </tr>
+
+        <!-- 0.1.10 -->
+        <tr class="data">
+          <td width="10%" valign=top><p class="rel"><a href="bits/flail-0.1.10.tar">0.1.10</a></td>
+          <td>
+            <p class="desc">Added old-sk00l /opt[:val] style command
+              line argument parsing, i.e. <tt>send/as:me@somewhere you</tt>
+            </p>
+          </td>
+        </tr>
+
+        <!-- 0.1.9 -->
+        <tr class="data">
+          <td width="10%" valign=top><p class="rel"><a href="bits/flail-0.1.9.tar">0.1.9</a></td>
+          <td><p class="desc">First semi-public release.</p></td>
+        </tr>
+
+      </table>
+
+      <br><br>
+
+      <table class="outer" cellspacing="0" cellpadding="5">
+
+        <tr class="header">
+          <td class="rhead">Notes</td>
+          <td>&nbsp;</td>
+        </tr>
+
+        <tr class="data">
+          <td width="10%" valign=top><p class="rel"><a name="required">CPAN</a></p></td>
+
+          <td>
+            <p class="desc"><b>Required Modules</b></p>
+            <p class="desc">As of version 0.1.12, the following CPAN modules are
+              required to get flail to work:
+            </p>
+            <menu>
+              <li><p class="desc">ANSIColor</p></li>
+              <li><p class="desc">File-Sync</p></li>
+              <li><p class="desc">libnet</p></li>
+              <li><p class="desc">MailTools</p></li>
+              <li><p class="desc">TimeDate</p></li>
+              <li><p class="desc">Time-modules</p></li>
+              <li><p class="desc">MIME-Base64</p></li>
+              <li><p class="desc">IO-stringy</p></li>
+              <li><p class="desc">MIME-tools</p></li>
+              <li><p class="desc">MailFolder (my version has a slight patch that isn't on CPAN)</p></li>
+              <li><p class="desc">POP3Client</p></li>
+              <li><p class="desc">Mail-IMAPClient</p></li>
+              <li><p class="desc">Proc-Simple</p></li>
+            </menu>
+          </td>
+        </tr>
+
+      </table>
+
+      <br><br>
+
+      <table class="outer" cellspacing="0" cellpadding="5">
+
+        <tr class="header">
+          <td class="rhead">Links</td>
+          <td>&nbsp;</td>
+        </tr>
+
+        <tr class="data">
+          <td width="10%">&nbsp;</td>
+          <td>
+            <p class="desc">
+              A few links to some related content of mine:
+            </p>
+            <menu>
+              <li><p class="desc"><a title="freshmeat.net: flail project page" href="http://freshmeat.net/projects/flail/">freshmeat project page</a> for flail.  releases are announced here.</p></li>
+              <li><p class="desc"><a title="the clue factory" href="http://cluefactory.com">the clue factory</a>, our home sweet home on the web.</p></li>
+              <li><p class="desc"><a title="red yucatan: multilingual web hosting in mexico and elsewhere" href="http://redyucatan.com">redyucatan.com</a> web design and hosting for rural mexico (for the non-spanish-enabled, "red" means "network").</p></li>
+              <li><p class="desc"><a title="uncacheable at any speed: my blog" href="http://uncacheable.blogspot.com">uncacheable.blogspot.com</a> my blog, mainly centered around topics of interest to hackers</p></li>
+              <li><p class="desc"><a title="~attila" href="http://www.stalphonsos.com/~attila">www.stalphonsos.com/~attila</a> my ancient web pages, from the old days of the empire.</p></li>
+            </menu>
+            <p class="desc">
+              ... and let's not forget the obligatory <b>URLs of Power And Majesty!!!</b>
+            </p>
+            <menu>
+              <li><p class="desc"><a href="http://www.openbsd.org" title="OpenBSD: You need it. We all need it.">OpenBSD: ALL YOUR BASE BELONG TO YOU!1!!</a></p></li>
+              <li><p class="desc"><a href="http://cr.yp.to/qmail.html" title="qmail: the bestest MTA on the wild frontier">qmail</a>, the open-source mail server for <a href="http://lifewithqmail.org" title="clueful qmail people">discerning peoples</a></p></li>
+              <li><p class="desc">flail would not exist without <a href="http://perl.org" title="perl: a programming language for the communist in us all">perl</a>, which both <a href="http://www.cpan.org" title="CPAN!">inspired and hindered</a> its <a href="http://search.cpan.org/~attila/flail-0.2.4/flail0.pl" title="pathetic first attempt at uploading to CPAN">birth</a></p></li>
+            </menu>
+          </td>
+        </tr>
+
+      </table>
+
+    </div>
+
+  </body>
+
+</html>
+
+<!-- Local variables: -->
+<!-- indent-tabs-mode: nil -->
+<!-- adaptive-fill-mode: nil -->
+<!-- fill-column: 76 -->
+<!-- paragraph-start: "^[ ]+\074\\(p\\|h[0-9]\\|br\\|/body\\|!\055\055\\)\076" -->
+<!-- fill-prefix: "   " -->
+<!-- sentence-end-double-space: t -->
+<!-- time-stamp-line-limit: 32 -->
+<!-- tab-width: 2 -->
+<!-- sgml-basic-offset: 2 -->
+<!-- End: -->

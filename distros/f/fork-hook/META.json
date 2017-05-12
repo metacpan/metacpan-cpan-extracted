@@ -1,0 +1,55 @@
+{
+   "abstract" : "отпределяет функции, которые будут вызваны после форка в дочерних процессах.",
+   "author" : [
+      "Evgeniy Vansevich <hammer@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "fork-hook",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kadavr/p5-fork-hook/issues"
+      },
+      "license" : [
+         "https://opensource.org/licenses/MIT"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kadavr/p5-fork-hook.git",
+         "web" : "https://github.com/kadavr/p5-fork-hook"
+      }
+   },
+   "version" : "0.02"
+}

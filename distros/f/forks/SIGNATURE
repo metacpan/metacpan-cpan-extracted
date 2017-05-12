@@ -1,0 +1,58 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 455b7ebe2265a00e97f133c8cd7ebf56148a573d CREDITS
+SHA1 f432b0a0c8ea1bffd9c2b724384ea69e9ca1b1f9 Changes
+SHA1 bf45f93ef237359a116ed179621698bc865731e4 MANIFEST
+SHA1 0a40de91b5f4169eef3ff3ef456a40b79d056e78 MANIFEST.skip
+SHA1 687eac03d4a054dd7f64c6152191ae0989079961 META.json
+SHA1 6016e39b86f1f0069f7069cf87deb8b25cb5c2d3 META.yml
+SHA1 714de983d50916f4029061f1ea9e83facac6340f Makefile.PL
+SHA1 352db8375a00c64f6697ac23bf574a621aefb5a1 README
+SHA1 55a99bb963e4e531cb7f3832684a8a1900ed9f24 TODO
+SHA1 1c3548011fb1c9210eff34e2ab563e3d42059f29 forks.xs
+SHA1 a5e8067717f4c9fd105912a6c4f629ea7adbf087 lib/forks.pm
+SHA1 d2106f5f2be9d1b3a3fdb8ed27969a4a0398bb90 lib/forks/Devel/Symdump.pm
+SHA1 f105c25f5b2467bce71717c6a4c89212cc254103 lib/forks/shared.pm
+SHA1 cba53e21854bc8c0e7f95d78429faff6cd311690 lib/forks/shared/attributes.pm
+SHA1 e90b763bcdb5689248dfe689929ad4133571db60 lib/forks/shared/global_filter.pm
+SHA1 79f7bc609c09ad7a28ff00f76cefe439902492b5 lib/forks/signals.pm
+SHA1 b409af52a3a88e0de4fd0bc30d019ef033ed5921 lib/threads/shared/array.pm
+SHA1 6bdbc7f9d64597609739a8a50f00b4bd581fd99b lib/threads/shared/handle.pm
+SHA1 22d373298049c658b296a8f8cc168a0e9c190130 lib/threads/shared/hash.pm
+SHA1 65007596b270e52784cdd18f19a40d9ebfb2094d lib/threads/shared/scalar.pm
+SHA1 c0911c487a42e39c8541d2db1ddd5fd74c7c1986 ppport.h
+SHA1 f22bda39f483db8ddaafd61935c6723d4087a778 t/forks00-requirements.t
+SHA1 e0b161c71a2dba88fa7827c54ab597bf29ba2cdb t/forks00-sigtrap.t
+SHA1 aa7a677571cc9789653d489bc7cab8fbc091773d t/forks01.t
+SHA1 dc739710ac9c97c36f8e2cb77ae5af4aee2e8447 t/forks02.t
+SHA1 0f74478dda08dbd57a29bb46ef5a95cdf6d864eb t/forks03.t
+SHA1 2863b14f575b3415ac7b415ad77a8a7ed5cb9143 t/forks04.t
+SHA1 5c172556a690f58812039b10a243376ec2b9d6e3 t/forks05.t
+SHA1 50af07b5275498fd708b4fb2d0de5e28062b33fd t/forks06.t
+SHA1 f8dd4f7c16f7ce96cde23f1953737468fa6bad7f t/forks07.t
+SHA1 4a5951b2c10bfd35e3281c07d4101fbe27779d02 t/forks08.t
+SHA1 b073b28bc806f47dabe93d69dd7e47dc7fe5ee6d t/forks09.t
+SHA1 84f14953836fd57500007907d3a30e9813fdfca3 t/forks10.t
+SHA1 d45ee162070db10b691958fa140d8fc297bd3d90 t/forks20.t
+SHA1 fc5734f9c393dcc9f12c87df4bf9362e88a800ad t/forks99.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.14 (GNU/Linux)
+
+iEYEARECAAYFAlOs6noACgkQQwn7DcpJEO4WXQCgg2bTzGAnJIoyzvhgS/kDj8ok
+uX0An0yVUvkrbu9YRiD7Qsqdb3g4jUzl
+=ghN3
+-----END PGP SIGNATURE-----

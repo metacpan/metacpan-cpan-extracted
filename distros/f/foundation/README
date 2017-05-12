@@ -1,0 +1,41 @@
+This is a proof-of-concept implementation of an idea I had to pull of
+inheritance without OO.  Basically just want to wipe that smug smile
+off the OO folks.
+
+
+NAME
+    foundation - Inheritance without objects
+
+SYNOPSIS
+      package Foo;
+
+      sub fooble { 42 }
+
+      package Bar;
+
+      sub mooble { 23 }
+      sub hooble { 13 }
+
+      package FooBar;
+      use foundation;
+      foundation(qw(Foo Bar));
+
+      sub hooble { 31 }
+
+      print fooble();       # prints 42
+      print moodle();       # prints 23
+      print hooble();       # prints 31 (FooBar overrides hooble() from Bar)
+      print SUPER('hooble');     # prints 13 (Bar's hooble())
+
+DESCRIPTION
+    Haven't drunk the OO Kool-Aid yet? Think object-oriented has something
+    to do with Ayn Rand? Do you eat Java programmers for breakfast?
+
+    If the answer to any of those is yes, than this is the module for you!
+    `foundation' adds the power of inheritance without getting into a
+    class-war!
+
+    Simply `use foundation' and list which libraries symbols you wish to
+    "inherit". It then sucks in all the symbols from those libraries into
+    the current one.
+

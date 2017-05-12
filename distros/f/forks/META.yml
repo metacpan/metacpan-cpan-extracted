@@ -1,0 +1,33 @@
+---
+abstract: 'forks - emulate threads with fork'
+author:
+  - 'Eric Rybski (rybskej@yahoo.com)'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: forks
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Acme::Damn: 0
+  Attribute::Handlers: 0
+  Devel::Symdump: 0
+  File::Spec: 0
+  IO::Socket: 1.18
+  List::MoreUtils: 0.15
+  Scalar::Util: 1.11
+  Storable: 0
+  Sys::SigAction: 0.11
+  Test::More: 0
+  Time::HiRes: 0
+  if: 0
+version: 0.36

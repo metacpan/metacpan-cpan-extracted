@@ -1,0 +1,16 @@
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+Documentation is provided in the module file.
+Upon install you can read it via:
+
+    perldoc fytwORM
+
+Or befre you install:
+
+    perldoc fytwORM.pm

@@ -1,0 +1,214 @@
+***** Future Features / Interface Changes *****
+
+optimizations:
+- support alternate, faster locking mechanisms (filesystem and/or SysV shmem)
+- allow for shared memory as transport medium
+    - current alternative is to use BerkeleyDB, e.g. forks::BerkeleyDB
+- implement more methods using custom filters (to reduce Storable usage)
+
+Make thread objects shared in nature, such that their properties may be read
+across all threads.  Will make _handle more reliable, and allow for thread
+state params to be persisted.
+
+Add a method to give the user run-time privilege control over Unix socket 
+file descriptors (for additional security control).
+
+Possibly implement TTY wrapper control for Perl debugger, such that user has simpler
+API functions to call to bind a thread to a TTY.  Idea is to integrate debugger
+TTY control functionality as thread create arguments, to allow for unique tty
+subroutines to be defined per thread, or unique TTY values to be "bound" to specific
+threads.
+
+Consider interfacing with graphical Perl debugger intefaces, to simplify
+multi-threaded debugging; managing multiple TTYs, although supported in different
+terminals (1 per thread), can be conceptually difficult.  Considering interface
+to Devel::PDB.  Consider support for Eclipse.  Open to suggestions, comments, patches.
+
+
+***** Issues to Address *****
+
+Need to load internally cached, shared REF values from server, not from first use
+to insure that values are correctly loaded, to insure they correctly evaluate when
+used in is_shared(). (TODO temp patch seen in t/forks09.t)
+
+Circular references and ref(), Scalar::Util::reftype(), attribute::reftype() don't
+work well with perltie shared variables.  Likely a limitation of how we're using
+variables in a remote process.  May be able to improve on this by overloading
+all these functions with a forks::shared aware function that contacts remote process
+when variable is shared to determine what has circular recursion and what doesn't.
+
+END { } blocks should be skipped unless they were defined in a thread: eval "END {...}"
+or module use/require).  One idea is to somehow sneak POSIX::_exit(), as long as we
+are careful to flush buffered sockets before calling it.  NOTE: this behavior likely
+should ONLY occur when in native ithreads mode; I consider END {...} block execution
+a good thing for all threads that were aware of it otherwise.  (Note: better programming
+practice would be to use DESTROY method whenever possible, but END is important
+for some modules.
+
+Environment variables should be shared among all threads (ithreads behavior).
+
+Current working directory should be shared among all threads (ithreads behavior).  Note
+that this may be considered bug in current ithreads implementation.
+
+Should implement to-the-letter behavior: when parent thread calls ->kill and target
+doesn't have a signal handler registered, caller should croak.  Current behavior is
+target emits a warning, exits, and kill caller quietly continues.
+
+Memory is currently not reclaimed for shared variables that are no longer
+referenced by any thread.  Possible solutions: implement PL_destroyhook; or use
+STORE for threads::shared objects, and DESTROY for threads, to track shared var _refcnt.
+DESTROY will be called on shared objects in an exiting thread, even if still
+referenced in other threads.  If can track global _refcnt, could determine refcnt
+state from server and destroy only when 0.
+
+Determine if it is possible to recover all memory from detached threads.  Joined
+threads reclaim all shared memory (very stable memory usage); detached threads
+currently use a small amount of memory (~200Kb/100K threads) even after they
+complete.
+
+exit() in a thread may allow other threads that were waiting to join that thread
+to continue before they are terminated (race condition).  Join should not return.
+
+Add more defensive logic in _join() to prevent hang on join (for processes
+that have already terminated).  May wish to check client socket when join for
+that thread is requested: if socket exception, then assume client terminated;
+otherwise, wait for client (regularly checking client socket connection to
+determine if it has prematurely closed).
+
+Perl 5.6 doesn't seem to respond to thread global exit in this case:
+use forks; threads->new(sub { exit($desired_exit_val);} )->join(); sleep 10; sleep 10;
+
+***** Possible Issues to Address *****
+
+In rare cases, if the main thread dies, the server process doesn't appear to
+shut down correctly.  Sometimes, it appears to use high CPU usage (is stuck in a loop
+somewhere).  It is likely that a socket disconnect is getting a read or write
+while loop stuck in a loop, and that additional error checking (or non-error
+occurrence but no change to the amount of data read/written) might help the
+state of things.  Reproducing this one is pretty hard--I can't create the
+exact conditions yet to manually trigger it.  Problem last seen in forks 0.20.
+Note that this issue may have been squashed in forks 0.21, as most of the socket
+handling was rewritten in that release.
+
+Need to look into why some signals very rarely are not handled by threads
+(i.e. SIGTERM should cause thread to exit--but thread appears to have ignored
+signal.  Is this a side effect of Perl's safe signal handling mechanism?).
+The thread does appear to actually get the signal, but sometimes it doesn't
+seem to completely exit.  Problem last seen in forks 0.23, but not seen since
+forks 0.25, so may be resolved.
+
+
+***** Miscellaneous Items *****
+
+Consider implementing virtual signals that map to one signal handler, thus allowing
+use of special signals like 'STOP', 'KILL', etc. for improved portability with
+scripts that might use these signal names already.  e.g. ABRT might be used across
+all threads and a virtual signal mask check could be tracked by the shared server.
+
+Update documentation to discuss fault-tolerance (individual thread can't take down the thread group, even with memory faults like segfault).  Very helpful for high-availability systems.
+
+Consider checking _check_pl_signal_unsafe_flag for any thread signaling behavior,
+and warn user about (or prevent from using) signals (i.e. deadlock detect, $t->kill).
+
+Allow manual disabling of forks.pm signal management (for embedding with other
+pragmas or interfaces that implement their own signals management, such as mod_perl
+via Apache::forks).
+
+Need a way to keep deserialized shared variable references consistent between
+lookups, e.g.
+    my $shared :shared = &share({});
+    $$shared{'foo'} = 'bar';
+    my $str1 = "$shared";
+    my $str2 = "$shared";
+    ok($str1 eq $str2, 'stringify');
+This is a side-effect of Storable, which reconstitutes a new tied hash each time
+FETCH returns a shared variable.
+This might be solved with overload.pm, although documentation indicates that it
+may not work with Storable since we're masking the master package in a different
+file (Storable uses XS load_module, which tries to load real threads/shared.pm even
+though %INC is populated).  (I wonder if it's possible to fake out load_module?)
+Thus, maybe we can implement a thread-local reference cache for all shared
+variables (dynamically populated as they are FETCHed), which returns the
+thread-local copy instead of the server copy.  (Same idea as forks::BerkeleyDB,
+but caching the server copy instead.)  Benefit to this method is that ref()
+and refaddr() will return the same results, although won't return the same value
+as is_shared() unless we change this to use the same logic.
+UPDATE: we need to get away from the caching mechanism, or somehow have logic
+that resolves REF types (before or in) the shared server such that it returns
+a shared variable to the code.  The code itself should be able to know the following:
+1. when a REF is a shared variable
+2. when a REF has changed in the shared process, we need to make sure all child threads
+that have a reference to it are correctly updated.
+
+Enable custom concurrent lock interface to support optimized locking mechanisms;
+specifically, SysV semaphores, filesystem (+alarm/ALRM), or other possibilities.
+
+Add additional tests to rigorously test tied handle (for shared var) behavior.
+Test delete with single, hash slice, and array slice elements.
+
+Cache signal names from Config.pm for higher performance (avoid tied access)?
+
+Begin adding some sort of CLONE forks.pm compatibility framework to insure that
+modules that implement non-forks.pm CLONE methods are supported.  Currently,
+DBI is the only known module that may need a CLONE patch, and this is only to
+suppress annoying warning for resources that are closed (or is this something
+that actually needs to be fixed in DBI?)
+
+Signals sent to main thread can propagate to all threads.  We need to
+prevent this from happening, if possible, to replicate threads.pm behavior.
+This may be due to signal being sent to a process group (so it may not be
+blockable).
+
+Add recursive lock tests with cond_* (to test that recursive locks are
+correctly acquired and released).
+
+Add tests to validate that storing CODE refs in shared variables works.
+
+Add documentation explaining that forks installs a SIGCHLD handler by default,
+and that system calls in your user code may be interrupted by this handler
+at any time (threads exiting), depending on the system call and if your kernel
+auto-continues the system call after handling the signal.
+
+NOTE: There still appears to be an issue with the last value of $! not being
+cleared and EINTR still being returned on the next accept() vall.  Setting $!
+to undef before calling the system call appears to clear the issue.  This is
+system behavior outside of forks module that needs more research to resolve.
+
+A few suggestions if this is an issue:
+
+1. Check if $! == POSIX::EINTR() if your system call returns undef.  If so,
+manually re-enter into (call again) the system call, like:
+
+       while((my $conn = $server->accept) || $! == EINTR) {
+          next if $! == EINTR;
+          ...
+       }
+
+This is the most portable solution.
+
+2. Localize $SIG{CHLD} = 'IGNORE' when performing your interruptible
+(non-reentrant) system call.  For example:
+
+       my $conn;
+       my $loop = 1;
+       while($loop) {
+          {
+              local $SIG{CHLD} = 'IGNORE';
+              $conn = $server->accept;
+              next if $! == EINTR;
+              last unless $conn;
+          }
+          ...
+       }
+
+This is a more verbose but acceptable solution.
+
+   
+3. Set $SIG{CHLD} = 'IGNORE' after loading the forks module.
+
+This is the simplest solution as it applies globally to all system calls, but be
+warned that this may cause the exit value of your script to be ignored
+(returns -1) depending on your kernel behavior.  You can always check your kernel
+behavior by executing the following at a shell command line:
+
+    perl -e '$SIG{CHLD} = "IGNORE"; exit(42);'; echo "Expected 42. Got $?"

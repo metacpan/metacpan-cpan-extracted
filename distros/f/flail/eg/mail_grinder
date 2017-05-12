@@ -1,0 +1,18 @@
+#!/bin/sh
+##
+# Time-stamp: <2007-03-04 13:18:07 snl@cluefactory.com>
+#
+# I have an entry in my crontab like this:
+#
+# */5     *       *       *       *       $HOME/bin/mail_grinder
+#
+# with the following script in $HOME/bin/mail_grinder:
+##
+export PATH=$HOME/bin:/usr/bin:/usr/sbin:/bin:/sbin:/usr/X11R6/bin:/usr/local/gimp2/bin:/usr/local/bin:/usr/local/sbin
+FMLOG=$HOME/tmp/fetchmail.log
+SFLOG=$HOME/tmp/spamfish.log
+fetchmail -v -F > $FMLOG 2>&1
+#cat $FMLOG
+spamfish -nodots -recent >$SFLOG 2>&1
+grep -v MAILER $SFLOG
+exit 0

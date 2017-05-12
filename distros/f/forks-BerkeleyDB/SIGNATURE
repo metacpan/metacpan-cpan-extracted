@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 a0a7c47808e69a9e4962145c434b49227ac22b8e Changes
+SHA1 8174c8675777c37475a8b77af16630f127733c64 MANIFEST
+SHA1 76c71b99b60b15058378365e7a09f0c9b0686ff6 MANIFEST.skip
+SHA1 fe6ea21a4145f507d522896b5c29e1cdcda94447 META.yml
+SHA1 771d202985f403414ae3cd0d9c8c4170e438aab8 Makefile.PL
+SHA1 31014bcf1a3714ee581ad9c7fb0bb1dc922a7fd2 README
+SHA1 548d524c6d67f4c6e516d950483fa296bc4a6586 TODO
+SHA1 e96fd7c6ea9544ae52c84971925d05031da891d3 lib/forks/BerkeleyDB.pm
+SHA1 22783088db15295f38a8469d6babeb8383828017 lib/forks/BerkeleyDB/Config.pm
+SHA1 4f8d6e251a4f9a4063547ec23da8126953703f78 lib/forks/BerkeleyDB/ElemNotExists.pm
+SHA1 88aa595088e89e6fca1d1b4e0cf3c9fa4766ad4e lib/forks/BerkeleyDB/shared.pm
+SHA1 d304a6522e660ff5ed453e9ccd78df2634b5d3b9 lib/forks/BerkeleyDB/shared/array.pm
+SHA1 030046b89c85c9f72dd8b7ba2d0438f370552ec5 lib/forks/BerkeleyDB/shared/handle.pm
+SHA1 d462bdb8f0c0672293bd39cd8ddcead70e0aa988 lib/forks/BerkeleyDB/shared/hash.pm
+SHA1 2d508ba037ee7133b33e0d84ee8f47afbe61845e lib/forks/BerkeleyDB/shared/scalar.pm
+SHA1 ba734f16f7292487752579627c7e4aca4498ab80 t/forks00.t
+SHA1 924ea7a41204db0f233b171489352a53be035345 t/forks01.t
+SHA1 ca1b3dfbdecf657428517063cb867a27b8bff6b9 t/forks02.t
+SHA1 eacdcae7892da57638fb3934f83c7bc5429c7454 t/forks03.t
+SHA1 2863b14f575b3415ac7b415ad77a8a7ed5cb9143 t/forks04.t
+SHA1 eb7f90ad7b0f8aac23019a0855717b5dc0e4d062 t/forks05.t
+SHA1 13a43fb7f9b344f63b122bf6de6ff8bff1e898c1 t/forks06.t
+SHA1 e328a03bf50d7835a4156c3e8a78f90dce494eda t/forks07.t
+SHA1 26d74df031190e770536b09e5151638b934efc7c t/forks08.t
+SHA1 80bba118bfc5aeaa1d39e275117242414e333535 t/forks20.t
+SHA1 fc5734f9c393dcc9f12c87df4bf9362e88a800ad t/forks99.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.8 (Darwin)
+
+iEYEARECAAYFAkmahZMACgkQQwn7DcpJEO6VgACeN7nHfRLnGLFRzxDLSiW/LfqT
+2uYAoMRGg9Z3pTn6iCgn0S7bJ7CEt8pe
+=u5cs
+-----END PGP SIGNATURE-----

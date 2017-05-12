@@ -1,0 +1,255 @@
+Revision history for FTN Database application (ftndb)
+
+0.37    Mon Oct  8 14:52 2012
+    - Add insertion of the "ftnyear" & "yearday" fields to those being inserted
+      for each nodelist row in the database.
+
+0.36    Mon Oct  8 11:26 2012
+    - Add a nodelist_file_info function to lib/FTNDB/Nodelist.pm for providing
+      information for a nodelist file.
+
+0.35    Sat Sep  2 17:22 2012
+    - Add the '-or9" ZIPFLAGS WriteMakefile dist parameter in Makefile.PL 
+    - Change to use the ABSTRACT keyword instead of ABSTRACT_FROM in Makefile.PL.
+
+0.34    Sat Sep  1 09:55 2012
+    - Separate out the FTN::Database Perl Modules and the FTN Database application
+      into their own distributions.
+
+0.33    Sun Jun 10 08:43 2012
+    - Copy create_ftn_nodelist_table from ftnpl-admin to ftnpl-nodelist
+    - Rewrite/Rename subroutine create_ftn_nodelist_table in ftnpl-admin 
+    - Add generic create_ftn_table subroutine to FTN::Database.
+
+0.32    Sat Jun  2 14:12 2012
+    - Rewrite the lib/FTN/Database/Nodelist.pm module to only include functions
+      that define the nodelist table fields (define_nodelist_table) and the
+      ftnnode index fields (ftnnode_index_fields) plus documentation for them.
+
+0.31    Mon May 28 12:55 2012
+    - Move FTN::Database::Nodelist to FTNDB::Nodelist and update modules and
+      scripts as neccessary.
+
+0.30    Mon Mar 19 21:41 2012
+    - Move and rewrite the doc/TODO file to the separate ToDo files
+      lib/FTNDB/ToDo.pod and lib/FTN/Database/ToDo.pod.
+    - Change ftnpldb references in files to being ftndb instead, including
+      renameing bin/ftnpldb-admin to bin/ftndb-admin and bin/ftnpldb-nodelist
+      to bin/ftndb-nodelist.
+    - Create the initial set of files for the development of a replacement
+      administration script using App::Cmd and at least initially using the
+      name 'ftndbadm'.
+
+0.29    Sun Mar 18 18:28 2012
+    - Use the database type for the 'id' field selection in the function
+      create_nodelist_table.
+
+0.28    Sun Mar 18 15:56 2012
+    - Add $ftnyear and $yearday to the list_ftn_nodelist bind_columns call in
+      ftnpldb-nodelist.
+    - Change the default to 'now' and drop the "(14)" from TIMESTAMP for the
+      field 'updated' definition.
+
+0.27    Sun Mar 18 12:56 2012
+    - Updated the doc/TODO file.
+    - lib/FTN/Database/Nodelist.pm:
+        Add the new field 'ftnyear' to the nodelist table definition.
+        Add the new field 'yearday' to the nodelist table definition.
+        Add 'ftnyear' and 'yearday' to the nodelist ftnnode index definition.
+
+0.26    Sun Mar 18 10:58 2012
+    - Update the Copyright end year to 2012.
+    - lib/FTN/Database/Nodelist.pm:
+        Change the 'name' field constraint from 32 to 48.
+        Change the 'sysop' field constraint from 32 to 48.
+        Change the 'phone' field constraint from 20 to 32.
+        Change the 'flags' field constraint from 64 to 128.
+        Change the 'location' field constraint from 32 to 48.
+    - Update the git repository URLs for their new locations in the README.
+
+0.25    Sun Nov 06 14:02 2011
+    - Correct the ftnpldb-admin script to use the drop_ftn_index subroutine.
+    - Derive the initial version of the new create_ftn_index subroutine from
+      the create_ftnnode_index function in FTN::Database::Nodelist.
+    - Change the ftnpldb-nodelist and ftnpldb-admin scripts to use the new
+      create_ftn_index subroutine.
+
+0.24    Wed Sep 21 15:31 2011
+    - Correct GitHub ftnpl project Issues references.
+    - Rename the drop_ftndb_table function to drop_ftn_table.
+    - Derive a drop_ftn_index function from the drop_ftnnode_index function.
+    - Changed ftnpldb-nodelist script to use the new drop_ftn_index function.
+    - Removed the old drop_ftnnode_index function.
+
+0.23    Mon Jul 25 11:44 2011
+    - Derive a drop_ftn_table function from the drop_nodelist_table function.
+    - Change the ftnpldb-admin script to use the new drop_ftndb_table function.
+    - Remove old drop_nodelist_table function from FTN::Database::Nodelist.
+
+0.22    Sun Jul 24 22:31 2011
+    - Some cleanup of white space in all files.
+    - Rename the create_ftndb function to create_ftn_database.
+    - Rename the open_ftndb function to open_ftn_database.
+    - Rename the close_ftndb function to close_ftn_database,
+    - Rename the drop_ftndb function to drop_ftn_database.
+
+0.21    Sun Jul 17 11:44 2011
+    - Update Copyright years to 2011.
+    - Cleaned up tabs and other white space in Changes file.
+    - Update BUGS and SUPPORT sections regarding the GitHub project.
+    - Corrected the ftnpldb-admin link in the modules SEE ALSO section.
+
+0.20    Thu Oct 20 19:33 2010
+    - Rewrite how the reverse sort in ftnpldb-nodelist is done.
+    - Builtins in ftnpldb-* scripts do not need to use parentheses.
+    - Use constant pragma in ftnpldb-nodelist for variable constants.
+    - Correct literal string interpolations in the ftnpldb-* scripts. 
+    - Rewrite how the split function call is done in ftnpldb-nodelist.
+    - Clean up white space and etc. in ftnpldb-admin and ftnpldb-nodelist.
+    - Correct how definitions of empty strings are done in ftnpldb-* scripts.
+    - Use braces for print file handles in ftnpldb-admin and ftnpldb-nodelist.
+
+0.19    Sat Oct 02 14:28 2010
+    - Use Perl format and the write command to format the output of the List
+      command in ftnpldb-nodelist.
+    - Change the load command in ftnpldb-nodelist to using the DBI prepare
+      function to set up the SQL nodelist table insert.
+
+0.18    Tue Sep 28 16:43 2010
+    - Add an introductory paragraph to the CONFIGURATION documentation section
+      in bin/ftnpldb-admin and bin/ftnpldb-nodelist.
+    - Move the definition of the script log file from being a separate script
+      option to the LogFile item in the configuration file.
+    - Change the open_ftndb function to being called with a single reference
+      to a hash containing the items:  Type, Name, User, & Password.
+
+0.17    Mon Sep 27 15:22 2010
+    - Rename bin/ftndbadm to bin/ftnpldb-admin.
+    - Move definition of nodelist directory to the configuration file, using
+      the keyword Directory in the new section Nodelist.
+    - Rename bin/nl2ftndb to bin/ftnpldb-nodelist. Change how the -z FTN Zone
+      number parameter is coded. Change the -n option to being the definition
+      of an FTN Net number. Move the nodelist listing functionality from the 
+      bin/listftndb script to the bin/ftnpldb-nodelist script as the List
+      command, and remove the file bin/listftndb.
+
+0.16    Fri Sep 17 17:29 2010
+    - Reorganize and move the code in the nl2ftndb script that does an
+      initial load of an FTN nodelist table into a subroutine, and add
+      code for a Load command to call that subroutine.
+    - Rewrite help message and other documentation for new Load command. 
+
+0.15    Fri Sep 17 14:17 2010
+    - Some cleanup of comments and documentation in scripts.
+    - Correct the create_ftndb subroutine call in the bin/ftndbadm script.
+    - Correct the drop_ftndb subroutine call in the bin/ftndbadm script.
+    - Replace the T, D, u, & p command line database options in the scripts
+      with the required '-c' command line option to define a configuration
+      file;  options are now in a Database section in the configuration file
+      using the keywords 'Type', 'Name', 'User', and 'Password'.
+  
+0.14    Fri Sep 10 16:37 2010
+    - Add parsing of command line arguments to bin/ftndbadm for the following
+      commands:  create database, drop database, create table, drop table.
+
+0.13    Wed Sep 01 11:09 2010
+    - Add a '--version' option to bin/* scripts.
+    - Change default log file in bin/nl2ftndb to ftnpldb.log
+    - Change log_id in bin/ftndbadm to DBADM, and add log_file option.
+    - Rewrite the perldoc reference in the SUPPORT section of bin/ftndbadm.
+    - Reorganize and rewrite the display of the help message into a subroutine
+      with the name HELP_MESSAGE in the bin/* scripts.
+    - Move the code in bin/ftndbadm to create an FTN Nodelist table into a
+      subroutine named create_ftn_nodelist_table.
+    - Reorganize SYNOPSIS section for the help options in the bin/* scripts.
+
+0.12    Tue Aug 31 16:05 2010
+    - Add DBI to the SEE ALSO section in lib/FTN/Database.pm
+    - Correct the perldoc reference in the SUPPORT section of bin/ftndbadm.
+    - Add create_ftndb and drop_ftndb functions to lib/FTN/Database.pm and
+      add examples showing their usage.
+
+0.11    Sun Aug 29 15:46 2010
+    - Correct the '-n' pod documentation in bin/listftndb.
+    - Change name of SYNOPSIS section in modules to DESCRIPTION.
+    - Removed extraneous character in lib/FTN/Database/Nodelist.pm.
+    - Move DESCRIPTION section in the bin/* scripts ahead of SYNOPSIS.
+    - Change sql_stmt to sql_statement in lib/FTN/Database/Nodelist.pm.
+    - Create an EXAMPLES pod section in the Database and Nodelist modules.
+
+0.10    Fri Aug 27 12:37 2010
+    - Rewrite the git commit id reference in the README file.
+    - Add SEE ALSO section to pod documentation in modules an scripts.
+    - Update/rewrite comments and documentation as neccessary in all files,
+      including by adding pod style documentation to the bin/* scripts.
+    - Move the example shell scripts to an EXAMPLE pod section in the
+      appropriate bin/* script.
+
+0.09    Mon Aug 23 20:38 2010
+    - Correct remove_ftn_domain call in bin/nl2ftndb.
+    - Correct help message for the -f parameter in bin/nl2ftndb.
+    - Redo the variables used in the Perl scripts for readability, including by
+      separating the words in the variables by underscores.
+    - Corrected an instance of a duped variable in bin/nl2ftndb help message.
+
+0.08    Sat Aug 21 20:03 2010
+    The default DBI user and password parameters for an SQLite database
+    is an empty string;  change the default codeing for those in the bin/*
+    scripts.
+
+0.07    Sat Aug 21 18:19 2010
+    - Correct script name in Makefile.PL from net2file to listftndb.
+    - Correct wording regarding EOL change in previous Changes entry.
+    - Derive and move the remove_ftn_domain functions from nl2ftndb
+      to the FTN::Database::Nodelist module.
+
+0.06    Sat Aug 21 16:55 2010
+    - Rename bin/net2file to bin/listftndb.
+    - Change indentation formatting in Changes file.
+    - Drop pl extension from program name in help messages.
+    - Correct the ListFile open failure message in bin/listftndb.
+    - Rename the doc/Changes.nl2sql file to doc/History and add it to the
+      distribution.
+    - In bin/nl2ftndb;  strip EOL from nodelist lines.  Removes instances
+      of \r\n or \n but not \r.
+    - Correct all bin/* Perl scripts to being at version 0.06.  The version
+      of the scripts is intended to be the same as the oldest version of the
+      module(s) that each requires.
+
+0.05    Thu Aug 19 21:45 2010
+    - Now doing a reverse sort of the nodelist filelist being obtained
+      from the nodelist directory in the get_nodelist_filename subroutine
+      in bin/nl2ftndb.
+
+0.04    Thu Aug 19 15:34 2010
+    - Add LICENSE information to Makefile.PL.
+    - Add EXE_FILES information to Makefile.PL.    	
+    - Rewrite example code snippet in lib/FTN/Database.pm.
+    - Rewrite lib/FTN/Database/Nodelist.pm example code snippet.
+
+0.03    Wed Aug 18 14:43 2010
+    - Correct PREREQ_PM list in Makefile.PL file.
+    - Correct FTN::Database SUPPORT module references.
+    - Enable use of 'croak' function from the Carp module in the 
+    - Use the full package names for the FTN::Database subroutines.
+      FTN::Database::Nodelist module.
+    - Derive and move the create_nodelist_table and drop_nodelist_table
+      functions from ftndbadm and nl2ftndb to the FTN::Database::Nodelist
+      module.
+    - Derive and move the create_ftnnode_index and drop_ftnnode_index
+      functions from ftndbadm and nl2ftndb to the FTN::Database::Nodelist
+      module.
+
+0.02    Tue Aug 17 23:55 2010
+    - Move examples to doc/examples source directory.
+    - Corrected name of nl2ftndb in example loadzone.sh file.
+    - Enable use of 'croak' function from the Carp module in FTN::Database.
+    - Derive and move the open_ftndb and close_ftndb subroutines from the Perl
+      scripts to the FTN::Database module.
+
+0.01    Sat Aug 14 17:29 2010
+    Derive the initial v0.01 version of FTN-Database application from the
+    nl2sql v1.2 scripts (nl2sql branch in the ftn-database.git repository,
+    and also available as nl2sql12.zip, at the ftnpl project at SourceForge)
+    plus additional directory structure and set of files created using
+    Module::Starter.

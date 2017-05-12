@@ -1,0 +1,6 @@
+Revision history for Perl extension first.
+
+0.0.1  Wed Jan 31 23:15:07 2007
+	- original version; created by h2xs 1.23 with options
+		-AXc -n first
+

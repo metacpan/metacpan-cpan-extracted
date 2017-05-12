@@ -1,0 +1,7 @@
+The freetype-config command must be in /usr/bin/ and return the appropriate values.  If it is not, edit the Makefile.PL
+lines INC and LIBS to point to the appropriate config command.
+
+perl Makefile.PL
+make
+make test
+make install

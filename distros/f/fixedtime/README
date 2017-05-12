@@ -1,0 +1,32 @@
+README for fixedtime 0.03
+=========================
+This pragma demonstrates the new perl 5.10 user-defined lexical pragma
+capability.
+
+The "fixedtime" pragma affects "time()", "gmtime()" and
+"localtime()" only when called without an argument.
+
+PREREQUISITES
+=============
+This package needs:
+
+    * perl 5.10 or higher
+
+INSTALLATION
+============
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make test
+    make install
+
+COPYRIGHT & LICENSE
+===================
+Copyright MMV, MMVII Abe Timmerman, All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

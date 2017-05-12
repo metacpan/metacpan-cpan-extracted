@@ -1,0 +1,6 @@
+Revision history for Perl extension Finance::BDT.
+
+0.01  Tue Feb  8 19:33:21 2005
+	- original version; created by h2xs 1.22 with options
+		-X -n Finance::BDT
+

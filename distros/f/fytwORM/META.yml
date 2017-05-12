@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                fytwORM
+version:             0.0.1
+abstract:            An ORM you probably won't like.
+license:             ~
+author:              
+    - Brian Clapper <bclapper@omniti.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,29 @@
+Revision history for failures
+
+0.004     2014-07-14 15:42:51-04:00 America/New_York
+
+    [DOCUMENTATION]
+
+    - Updated documentation for custom failure classes
+
+0.003     2014-01-07 12:21:20 America/New_York
+
+    [CHANGES]
+
+    - Revised default error message slightly ("Caught $class error"
+      to "Caught $class")
+
+    - Documented attributes and stringification better
+
+0.002     2013-09-24 12:53:37 America/New_York
+
+    [FIXED]
+
+    - made tests less sensitive to exact short/longmess format from Carp
+
+    - suppressed undef warning from length($msg) on older perls
+
+0.001     2013-09-18 18:20:05 America/New_York
+
+    - First release
+

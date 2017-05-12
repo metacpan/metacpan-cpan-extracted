@@ -1,0 +1,132 @@
+See also the main Changes file for the module history since being adapted
+from the nl2sql scripts.
+
+
+Changes from nl2sql v1.2
+-------------------------
+
+10 Aug 10
+    - Released as v1.2.
+    - Update the reference to the nl2db scripts code history in README.
+    - Added missing entry for release of v1.1 to Changes file.
+
+ 8 Aug 10
+    - Changed '-n' option for nodelist table name to '-t'.
+    - Add the script net2file.pl which lists a specific net from a specific
+      zone of a nodelist table to a specified output file.
+
+21 Jul 10
+    - Added an example script named loadzone.sh that loads a specific zone
+      from a specific nodelist file.
+    - Corrected the help message regarding the usage of the '-z' parameter
+      in the nl2db.pl script.
+    - Corrected the example usage of the '-z' parameter in nl2db.sh.
+    - Moved the example shell scripts to a new 'bin' subdirectory and added
+      a new README file for them.
+    - Since using the '&' as part of of a subroutine call is not neccessary
+      and can be an issue;  changed how that is done by dropping the use
+      of '&' in the subroutine calls.
+    - Define which database type to use, using what is supported by the
+      DBI DBD modules and defaulting to using the SQLite database engine.
+      Use the parameter '-T' for the selection.
+    
+16 Jul 10
+    - Moved the version number in the comment line of the Perl scripts to a
+      $VERSION variable.
+    - Add command line parameters to define the database name ($dbname),
+      user ($dbuser), and password ($dbpass) for access to the database. 
+    - Add code for creating an index on the nodelist table.
+    - Change to using the FTN::Log subroutine directly.  
+    - nl2db.pl - Add an option -z to load just a defined zone into the database.
+    - nldbadm.pl - Replaced the use of the TableExists function with using the
+      following SQL:  DROP TABLE IF EXISTS <tablename>.
+    - Added note to README file about support via echos or mailing lists.
+    - Rewrite shell script examples.
+    
+15 Jul 10
+    - Changed name from nl2sql to nl2db
+
+ 5 Jul 10
+    - nldbadm.pl - Corrected the "-n" help line, to include which option
+      is being referred to in the line.
+    - nl2sql.pl - Removed the comment line still referring to ftndbtst.
+    - modules/README - Removed reference to dialup phone number.  Remove
+      reference to ftngate.net domain.  Add fidonet domain to node number.
+    - Cleaned up formating of nldbadm.pl & nl2sql.pl with perltidy v20071205
+      using it's defaults.
+          
+23 Jun 10
+    - Removed period from end of line that logs name of nodelist file.
+    _ For the logging subroutine;  use the FTN:Log module instead of the
+      FTN::Utility module.
+    - Changed name of "&log" subroutine to "&logged".
+      
+ 4 Mar 10
+    - Change script name of nltable.pl to nldbadm.pl.
+    - Use the warnings pragma instead of the -w perl option.
+    - nltable.pl - Do not create the ftnnode index when creating
+      the nodelist table.
+    - nltable.pl - Updated the line that creates the primary
+      key in the table to what SQLite will accept.
+    - Removed the ftndbtst.pl reference from the README file,
+      as it is not neccessary for use with SQLite.
+    - Added note to README about nl2sql GIT repository.
+    - Update copyright end year from 2005 to 2010.
+    - Change database references from mysql to sqlite.
+    - Started work on v1.2, using sqlite database instead of mysql,
+      bumping version references from 1.1. to 1.2
+
+29 Jun 05
+    - Released as v1.1.
+
+22 Mar 04
+    - Merged v1.1 beta back in to main.
+
+21 Mar 04 -
+    - updated copyright years to 2004
+    
+11 AUG 03 - 
+   nltable.pl - added a timestamp filed, 'updated'.
+
+04 May 03 -
+   nltable.pl -  doubled possible size of flags field to 64.
+
+ 1 Jan 03 - Corrected year numbers to 2003.
+
+29 June 02
+    nl2sql.pl : Implement finding file (by day number) when given a basename
+    & directory of the nodelist file; this is now the default; use "-e" option
+    to have it match full file name. Use nodelist filename for the 'source'
+    field for each entry into the nodelist table. 
+
+28 Jun 02
+    nl2sql.pl : added $opt_t option for defineing nodelist table name.  Made
+    nl2sql.sh : added option t for defineing nodelist table name.  
+    the tablename a variable, using $opt_t to define at command line.
+    nl2sql.pl & nltable.pl : implemented processing of period character in
+    nodelist table name (mysql does not allow periods in tablenames).
+    nltable.sh : implemented example script for using nltable.pl.
+    README : added references to nltable.sh script
+        
+23 Jun 02
+    nl2sql.pl & nltable.pl : isolated actual call to logging subroutine in
+    utility module to a "log" subroutine.  Isolated database open & closing
+    to openftndb & closeftndb subroutines.
+    
+16 Apr 02 
+    nl2sql.pl:  Corrected message wording for when debug is enabled. 
+    nl2sql.sh:  added a $BINDIR variable for use in the script.
+
+24 Feb 02 - Moved Changes & TODO files to doc/ subdirectory.  Added logging
+    capability, using the logging function in the FTN::Utility module.
+    Added option '-v' for verbose mode.   Added option '-f' to indicate if
+    nodelistfile (option '-n') is exact file name.  Added 'source' field
+    to nltable.pl script.  Added & populated modules subdirectory.
+     
+26 Dec 01 - Added '2002' to copyright statement, & also included the
+    copyright statement in nl2sql.pl, nltable.pl, & nl2sql.sh instead
+    of just in the README.
+
+Nov 2001 - Added Changes file (this file) to working directory.
+
+Aug 2001 Released version 1.0.  Created v1.1 beta branch

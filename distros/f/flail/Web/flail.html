@@ -1,0 +1,1020 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>flail - a hacker's mailer in Perl</title>
+<link rel="stylesheet" href="flail.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:attila@stalphonsos.com" />
+</head>
+
+<body>
+
+    <div align="center"><a href="index.html" title="flail: the perl MUA from the cluef actory"><img src="flail.png"></a></div>
+    <div style="margin-left: 10%; margin-right: 10%">
+    <h1>The flail manual</h1>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#commandline_options">COMMAND-LINE OPTIONS</a></li>
+	<li><a href="#command_language">COMMAND LANGUAGE</a></li>
+	<ul>
+
+		<li><a href="#checking_and_retrieving_mail">Checking and Retrieving Mail</a></li>
+		<ul>
+
+			<li><a href="#check__check_pop3__imap_or_local_spool_mailbox">check: check pop3, imap or local spool mailbox</a></li>
+			<li><a href="#get__download_mail_from_a_remote_mailbox">get: download mail from a remote mailbox</a></li>
+		</ul>
+
+		<li><a href="#navigating_and_managing_messages">Navigating and Managing Messages</a></li>
+		<ul>
+
+			<li><a href="#next__goto_next_message">next: goto next message</a></li>
+			<li><a href="#prev__goto_previous_message">prev: goto previous message</a></li>
+			<li><a href="#goto__goto_arbitrary_message_by_number">goto: goto arbitrary message by number</a></li>
+			<li><a href="#cat__display_message_contents">cat: display message contents</a></li>
+			<li><a href="#headers__display_message_headers_in_detail">headers: display message headers in detail</a></li>
+			<li><a href="#decode__decode_a_mime_message">decode: decode a MIME message</a></li>
+			<li><a href="#cp__copy_a_message_to_another_folder">cp: copy a message to another folder</a></li>
+			<li><a href="#mv__move_a_message_to_another_folder">mv: move a message to another folder</a></li>
+			<li><a href="#rm__delete_a_message">rm: delete a message</a></li>
+		</ul>
+
+		<li><a href="#folderrelated_commands">Folder-Related Commands</a></li>
+		<ul>
+
+			<li><a href="#cd__enter_a_folder">cd: enter a folder</a></li>
+			<li><a href="#pwd__display_current_folder">pwd: display current folder</a></li>
+			<li><a href="#ls__list_folder_contents">ls: list folder contents</a></li>
+			<li><a href="#mkdir__create_a_folder">mkdir: create a folder</a></li>
+		</ul>
+
+		<li><a href="#sending_messages">Sending Messages</a></li>
+		<ul>
+
+			<li><a href="#send__send_a_new_message">send: send a new message</a></li>
+			<li><a href="#reply__reply_to_a_message">reply: reply to a message</a></li>
+			<li><a href="#forward__forward_a_message_to_a_new_recipient">forward: forward a message to a new recipient</a></li>
+			<li><a href="#resend__resend_a_bounced_message">resend: resend a bounced message</a></li>
+		</ul>
+
+		<li><a href="#the_address_book">The Address Book</a></li>
+		<ul>
+
+			<li><a href="#address__interface_to_the_address_book">address: interface to the address book</a></li>
+		</ul>
+
+		<li><a href="#marking__mapping_and_other_fun_stuff">Marking, Mapping and Other Fun Stuff</a></li>
+		<ul>
+
+			<li><a href="#mark__add_a_label_to_a_message">mark: add a label to a message</a></li>
+			<li><a href="#unmark__remove_a_label_from_a_message">unmark: remove a label from a message</a></li>
+			<li><a href="#map__map_a_piece_of_code_over_some_messages">map: map a piece of code over some messages</a></li>
+			<li><a href="#count__count_labeled_messages">count: count labeled messages</a></li>
+			<li><a href="#run__run_message_hooks_for_label">run: run message hooks for label</a></li>
+		</ul>
+
+		<li><a href="#state_management">State Management</a></li>
+		<ul>
+
+			<li><a href="#sync__flush_changes_to_the_current_folder">sync: flush changes to the current folder</a></li>
+			<li><a href="#reset__reset_various_bits_of_state">reset: reset various bits of state</a></li>
+		</ul>
+
+		<li><a href="#crypto">Crypto</a></li>
+		<ul>
+
+			<li><a href="#decrypt__decrypt_a_pgpencrypted_message">decrypt: decrypt a PGP-encrypted message</a></li>
+		</ul>
+
+		<li><a href="#other_commands">Other Commands</a></li>
+		<ul>
+
+			<li><a href="#alias__create_a_new_command">alias: create a new command</a></li>
+			<li><a href="#unalias__remove_an_alias">unalias: remove an alias</a></li>
+			<li><a href="#help__get_help">help: get help</a></li>
+			<li><a href="#quit__exit_flail">quit: exit flail</a></li>
+		</ul>
+
+	</ul>
+
+	<li><a href="#message_composition_interface">MESSAGE COMPOSITION INTERFACE</a></li>
+	<li><a href="#configuration">CONFIGURATION</a></li>
+	<ul>
+
+		<li><a href="#your__flailrc">Your .flailrc</a></li>
+		<li><a href="#managing_multiple_identities_and_mailboxes">Managing Multiple Identities and Mailboxes</a></li>
+		<li><a href="#passwords_and_the_pipe_trick">Passwords and the Pipe Trick</a></li>
+		<li><a href="#hacking_flail">Hacking Flail</a></li>
+		<li><a href="#alphabetical_listing_of_all_configuration_variables">Alphabetical Listing of All Configuration Variables</a></li>
+	</ul>
+
+	<li><a href="#bugs___todo">BUGS / TODO</a></li>
+	<li><a href="#credits">CREDITS</a></li>
+	<li><a href="#version_history">VERSION HISTORY</a></li>
+	<li><a href="#copyright_and_license">COPYRIGHT AND LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<hr />
+<h1><a name="name">NAME</a></h1>
+<p>flail - a hacker's mailer in Perl</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  # to run a single flail command:
+  $ flail -1 -other_options [cmd ... args ...]</pre>
+<pre>
+  # to get into the interactive command loop
+  $ flail</pre>
+<pre>
+  # to get a usage message:
+  $ flail -h</pre>
+<pre>
+  # to get the whole manual
+  $ flail -hv</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>flail is a hacker's mailer, written in Perl, and sporting a
+command-line interface.  It currently supports pop3 and imap for
+access to remote maildrops, as well as regular old Unix mail spool
+files for local maildrops (e.g. because you use fetchmail).</p>
+<p>The commands are vaguely Unix-like (rm, cp, mv, cat, ls).  There are
+facilities for mapping bits of perl code over some subset of the
+messages in a folder, crypto, external editors, and user-defined
+commands.</p>
+<p>
+</p>
+<hr />
+<h1><a name="commandline_options">COMMAND-LINE OPTIONS</a></h1>
+<p>You naturally invoke flail on the command-line.  It takes
+single-letter options, just like Pan intended.  Where it makes sense,
+we note the name of the config variable corresponding to each option
+in parentheses.</p>
+<dl>
+<dt><strong><a name="item_c">-c ($NoDefaultCC)</a></strong>
+
+<dd>
+<p>Do not ask for Cc: addresses by default in the composer</p>
+</dd>
+</li>
+<dt><strong><a name="item_q">-q ($AskBeforeSending)</a></strong>
+
+<dd>
+<p>Confirm with user before sending message</p>
+</dd>
+</li>
+<dt><strong><a name="item_o">-o ($AllowCommandOverrides)</a></strong>
+
+<dd>
+<p>Allow the alias command to override built-in commands.</p>
+</dd>
+</li>
+<dt><strong><a name="item_q">-Q ($Quiet)</a></strong>
+
+<dd>
+<p>Be Vewy Quiet: Only produce error messages and explicitly
+request output (e.g. ls)</p>
+</dd>
+</li>
+<dt><strong><a name="item_l">-l ($RemoveFromServer)</a></strong>
+
+<dd>
+<p>Remove messages from server during <code>get</code> processing.</p>
+</dd>
+</li>
+<dt><strong><a name="item__2dh">-h</a></strong>
+
+<dd>
+<p>When by itself, display usage message.
+When specified with -v, display this POD.</p>
+</dd>
+</li>
+<dt><strong><a name="item_s">-s ($SyncImmediately)</a></strong>
+
+<dd>
+<p>Automatically sync the current folder after operations that change it,
+e.g.  mv, rm, ...</p>
+</dd>
+</li>
+<dt><strong><a name="item_p">-p ($PipeStdin)</a></strong>
+
+<dd>
+<p>Read message from stdin; really only useful in conjunction with &lt;-1&gt;.
+Implies <code>-c</code>.</p>
+</dd>
+</li>
+<dt><strong><a name="item__2d1">-1</a></strong>
+
+<dd>
+<p>Run a single flail command, specified as arguments on the command line.
+For instance</p>
+</dd>
+<dd>
+<pre>
+  $ flail -1 send rms@mit.edu</pre>
+</dd>
+<dd>
+<p>can be used to send a single message to someone famous.</p>
+</dd>
+</li>
+<dt><strong><a name="item_v">-v ($Verbose)</a></strong>
+
+<dd>
+<p>Make ourselves verbose.</p>
+</dd>
+</li>
+<dt><strong><a name="item__2dr_rcfile">-r rcfile</a></strong>
+
+<dd>
+<p>Specify an alternate rc file.  The default is <code>~/.flailrc</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_folderdir">-d folderdir ($FolderDir)</a></strong>
+
+<dd>
+<p>Specify an alternative directory for mail folders.  The default
+is <code>~/mail</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_incfolder">-i incfolder ($IncomingFolder)</a></strong>
+
+<dd>
+<p>Specify an alterntive incoming mail folder name.  The default
+is <code>INCOMING</code></p>
+</dd>
+</li>
+<dt><strong><a name="item__2dp_pop3info">-P pop3info</a></strong>
+
+<dt><strong><a name="item__2di_imapinfo">-I imapinfo</a></strong>
+
+<dd>
+<p>These options are largely outdated, but can still be useful, especially
+in conjunction with <a href="#item__2d1"><code>-1</code></a>.</p>
+</dd>
+<dd>
+<p>In both cases, a string of the form <code>user@server:port</code>, where
+<code>user</code> and <code>port</code> are both optional, and given the obvious
+default values if left unspecified.</p>
+</dd>
+</li>
+<dt><strong><a name="item_fromaddr">-F fromaddr ($FromAddress)</a></strong>
+
+<dt><strong><a name="item_domain">-D domain ($Domain)</a></strong>
+
+<dt><strong><a name="item_smtphost">-S smtphost ($SMTPHost)</a></strong>
+
+<dd>
+<p>These are also probably only really useful with <a href="#item__2d1"><code>-1</code></a>, since your
+<code>~/.flailrc</code> will probably arrange to set them in less obvious ways.
+These options set the From address, domain, and SMTP relay used to
+send a message.</p>
+</dd>
+</li>
+<dt><strong><a name="item_tempdir">-T tempdir ($TempDir)</a></strong>
+
+<dd>
+<p>Set the temp dir used for e.g. message composition.</p>
+</dd>
+</li>
+<dt><strong><a name="item_editor">-e editor ($Editor)</a></strong>
+
+<dd>
+<p>Set the external editor used from the composer.  Defaults
+to your <code>$EDITOR</code> environment variable.</p>
+</dd>
+</li>
+<dt><strong><a name="item_fccfolder">-C fccfolder ($FCCFolder)</a></strong>
+
+<dd>
+<p>Set the folder name in which to automatically file outgoing messages.</p>
+</dd>
+</li>
+<dt><strong><a name="item_imap">-R pop3|imap ($CheckType)</a></strong>
+
+<dd>
+<p>Outdated: specify default message check method, pop3 or imap.  Since you
+can have more than one account of each kind, sort of silly.  If you do
+not specify any arguments to <code>check</code>, we use <code>$CheckType</code> as the default.</p>
+</dd>
+</li>
+<dt><strong><a name="item_abook">-A abook ($AddressBook)</a></strong>
+
+<dd>
+<p>File containing your addressbook as a dbm file.</p>
+</dd>
+</li>
+<dt><strong><a name="item_n">-n ($NoAddressBook)</a></strong>
+
+<dd>
+<p>Do not use an addressbook.</p>
+</dd>
+</li>
+<dt><strong><a name="item_a">-a ($AutoAddressBook)</a></strong>
+
+<dd>
+<p>Automatically try to look up all outgoing addresses in our
+addressbook.</p>
+</dd>
+</li>
+<dt><strong><a name="item_k">-k ($AskAddressBook)</a></strong>
+
+<dd>
+<p>Interactively prompt the user for address book matches before sending.</p>
+</dd>
+</li>
+<dt><strong><a name="item_e">-E ($ExactHostMatch)</a></strong>
+
+<dd>
+<p>Only match two addresses if the hostnames are identical.</p>
+</dd>
+</li>
+<dt><strong><a name="item_b">-b ($QuietAddressBook)</a></strong>
+
+<dd>
+<p>Make addressbook functionality quiet.</p>
+</dd>
+</li>
+<dt><strong><a name="item_newlabel">-N newlabel ($NewLabel)</a></strong>
+
+<dd>
+<p>Label all incoming messages with <a href="#item_newlabel"><code>newlabel</code></a> by default.</p>
+</dd>
+</li>
+<dt><strong><a name="item_dir">-g dot.sig.dir ($SignatureDir)</a></strong>
+
+<dd>
+<p>Look for dot.sigs in dot.sig.dir</p>
+</dd>
+</li>
+<dt><strong><a name="item_g">-G ($Debug)</a></strong>
+
+<dd>
+<p>Turn on debugging output.  Not useful for ordinary use.</p>
+</dd>
+</li>
+<dt><strong><a name="item_defaultsubj">-u defaultsubj ($DefaultSubject)</a></strong>
+
+<dd>
+<p>Set the default subject for outgoing email.  None by default</p>
+</dd>
+</li>
+<dt><strong><a name="item_u">-U ($HeadersFromStdin)</a></strong>
+
+<dd>
+<p>If <code>-p</code> is specified, then <code>-U</code> says that the entire message,
+including headers, is coming in on stdin.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="command_language">COMMAND LANGUAGE</a></h1>
+<p>The command language is vaguely Unixy.  Commands look like:</p>
+<pre>
+  word [arg arg...]</pre>
+<p>Some commands take slash-style options, ala TOPS-20:</p>
+<pre>
+  send/as:someone@somewhere ...</pre>
+<p>Many (most?) commands at least will pay attention to options
+named <code>debug</code>, <code>verbose</code> and <code>quiet</code>.  For instance, to
+turn on SMTP debugging when you send an email:</p>
+<pre>
+  send/debug to@some.one</pre>
+<p>The first character of a command might specify another action than a
+normal command:</p>
+<dl>
+<dt><strong><a name="item__21cmd">!cmd</a></strong>
+
+<dd>
+<p>Execute Unix command <code>cmd</code> and display results on stdout</p>
+</dd>
+</li>
+<dt><strong><a name="item__7ccmd">|cmd</a></strong>
+
+<dd>
+<p>Pipe the current message through <code>cmd</code> and display the results on stdout</p>
+</dd>
+</li>
+<dt><strong><a name="item__2ccode">,code</a></strong>
+
+<dd>
+<p>Evaluate the perl code <code>code</code>.  Does not display results by default,
+if you want them, use the <code>print</code> statement, e.g.</p>
+</dd>
+<dd>
+<pre>
+  ,print $Editor</pre>
+</dd>
+</li>
+</dl>
+<p>Other than those special cases, we look at our first word and
+dispatched based on it.  The complete list of built-in commands
+follows, grouped by function.  For information on adding your own
+commands, see the section on CONFIGURATION, below.</p>
+<p>Message Sequences (also called ``Range Expressions'') are an important
+part of the flail command language.  The following are all valid
+range expressions:</p>
+<ol>
+<li>
+<p>Message 1</p>
+</li>
+<li><strong><a name="item__3a3">:3</a></strong>
+
+<p>Messages 1 through 3</p>
+</li>
+<li><strong><a name="item__3a_24">:$</a></strong>
+
+<p>Messages 3 through the end of the folder.</p>
+</li>
+<dt><strong><a name="item__3__">$-3:$</a></strong>
+
+<dd>
+<p>The last three messages in a folder</p>
+</dd>
+</li>
+<li><strong><a name="item__2c3_2c5_2c_24_2d3_3a_24_2d1">,3,5,$-3:$-1</a></strong>
+
+<p>The first, third, and fifth messages, as well as the second two
+from the end (not including the last one)</p>
+</li>
+</ol>
+<p>In addition, you can specify <code>-label</code> to include all messages tagged
+with the given label, so the range expression <code>-marked</code> expands to
+all marked messages.</p>
+<p>Many commands take message sequences in place of single message
+numbers.  Some do not.  Hopefully, I'll do a good job of telling you
+which is which.</p>
+<p>
+</p>
+<h2><a name="checking_and_retrieving_mail">Checking and Retrieving Mail</a></h2>
+<p>Commands to query and fetch mail from mail spools.</p>
+<p>
+</p>
+<h3><a name="check__check_pop3__imap_or_local_spool_mailbox">check: check pop3, imap or local spool mailbox</a></h3>
+<p>Check a mailbox for mail.  The full syntax is</p>
+<pre>
+  check type user server</pre>
+<p>e.g.</p>
+<pre>
+  check pop3 attila mailserver</pre>
+<p>looks for mail using pop3 on mailserver as the user attila.  You will
+be prompted for a password, unless flail remembers what it is.  The
+<code>remember_password</code> internal function can be useful in your
+configuration file to keep you from having to type your password all
+the time.  If you insist, you can specify your password as the final
+argument on the command line, but we don't recommend it.</p>
+<p>To check a local spool file, use</p>
+<pre>
+  check spool /path/to/spool</pre>
+<p>The default spool is <code>/var/mail/yourusername</code>, so if this is correct
+you can just
+do</p>
+<pre>
+  check spool</pre>
+<p>to check your local mail spool.  You can override both the file name
+and directory with the <code>$SpoolFile</code> and <code>$SpoolDir</code> configuration
+variables in your <code>~/.flailrc</code>.</p>
+<p>
+</p>
+<h3><a name="get__download_mail_from_a_remote_mailbox">get: download mail from a remote mailbox</a></h3>
+<p>Just like the <code>check</code> command, except that we fetch the mail and
+incorporate it into the incoming folder.  It takes the same <code>type</code>
+parameter as its first argument, e.g.</p>
+<pre>
+  get spool</pre>
+<p>grabs (and expunges) your local mail spool.</p>
+<p>
+</p>
+<h2><a name="navigating_and_managing_messages">Navigating and Managing Messages</a></h2>
+<p>These commands are for stumbling around in the folder tree and looking
+at messages.</p>
+<p>If you have a folder selected, flail shows you what it is in your
+prompt.  If your prompt is simply</p>
+<pre>
+  flail&gt;</pre>
+<p>then you are not in any folder, and many of these commands
+will fail with an error.</p>
+<p>
+</p>
+<h3><a name="next__goto_next_message">next: goto next message</a></h3>
+<p>Move to the next message.</p>
+<p>
+</p>
+<h3><a name="prev__goto_previous_message">prev: goto previous message</a></h3>
+<p>Move to the previous message.</p>
+<p>
+</p>
+<h3><a name="goto__goto_arbitrary_message_by_number">goto: goto arbitrary message by number</a></h3>
+<p>Go to a message by number, e.g.</p>
+<pre>
+  goto 3</pre>
+<p>moves to the message numbered 3 in the output of <code>ls</code></p>
+<p>
+</p>
+<h3><a name="cat__display_message_contents">cat: display message contents</a></h3>
+<p>Displays the current message, or one by number if specified.  Output
+is paginated if we know how to do that on your terminal.</p>
+<p>
+</p>
+<h3><a name="headers__display_message_headers_in_detail">headers: display message headers in detail</a></h3>
+<p>The <code>cat</code> command normally shows abbreviated headers.
+The <code>headers</code> command shows only the headers for a message,
+and it shows them all.</p>
+<p>
+</p>
+<h3><a name="decode__decode_a_mime_message">decode: decode a MIME message</a></h3>
+<p>Not yet implemented.</p>
+<p>
+</p>
+<h3><a name="cp__copy_a_message_to_another_folder">cp: copy a message to another folder</a></h3>
+<p>Copy a message to another folder, e.g.</p>
+<pre>
+  cp 3 spam</pre>
+<p>copies message 3 to the folder named SPAM</p>
+<p>
+</p>
+<h3><a name="mv__move_a_message_to_another_folder">mv: move a message to another folder</a></h3>
+<p>Like <code>cp</code>, but removes the message from the current folder
+after it is copied.  If <code>$SyncImmediately</code> is true, we
+sync the folder afterwards.  Otherwise, the message appears
+with the <code>D</code> (Deleted) flag turned on until you <code>sync</code>.</p>
+<p>A message sequence can be specified, e.g.</p>
+<pre>
+  mv 1,2,$-3:$ odd_folder</pre>
+<p>
+</p>
+<h3><a name="rm__delete_a_message">rm: delete a message</a></h3>
+<p>Delete a message or messages, e.g.</p>
+<pre>
+  rm 1:$</pre>
+<p>deletes all messages in the current folder.</p>
+<p>
+</p>
+<h2><a name="folderrelated_commands">Folder-Related Commands</a></h2>
+<p>flail uses <a href="/Mail/Folder.html">the Mail::Folder manpage</a>, and can thus support any type of mail
+folder that it supports.  Generally, we use mbox folders, which
+are single files containing multiple messages.  None the less,
+we treat ``folders'' as if they were directories from the command
+language, for consistency.</p>
+<p>
+</p>
+<h3><a name="cd__enter_a_folder">cd: enter a folder</a></h3>
+<p>Change the object of your affections to another folder, e.g.</p>
+<pre>
+  cd INCOMING</pre>
+<p>
+</p>
+<h3><a name="pwd__display_current_folder">pwd: display current folder</a></h3>
+<p>Show the current folder and your state in it.</p>
+<p>
+</p>
+<h3><a name="ls__list_folder_contents">ls: list folder contents</a></h3>
+<p>List the contents of the folder, one message per line.  If
+<code>$PlainOutput</code> is not true, we try to color it nicely for ttys that
+support ANSI color sequences, like <code>xterm</code>.  If a message sequence is
+specified, we only show those messages.  Output is paginated.</p>
+<p>If you are not in a folder, then ls shows you the subfolders in
+whatever part of the folder tree you happen to be in.  If you are at
+top level, this is all of the top-level folders under the root.</p>
+<p>You can specify an arbitrary range expression to ls, as you can with
+many other commands.  For instance,</p>
+<pre>
+  ls -marked</pre>
+<p>will list all marked messages.</p>
+<p>
+</p>
+<h3><a name="mkdir__create_a_folder">mkdir: create a folder</a></h3>
+<p>Not yet implemented.  For now, use the following idiom</p>
+<pre>
+  !touch foldername</pre>
+<p>to create a new blank folder (remember: we chdir to your
+<code>$FolderDir</code> on startup...).</p>
+<p>
+</p>
+<h2><a name="sending_messages">Sending Messages</a></h2>
+<p>Things that call the composer.  See MESSAGE COMPOSITION INTERFACE,
+below, for details.</p>
+<p>
+</p>
+<h3><a name="send__send_a_new_message">send: send a new message</a></h3>
+<p>Send a message to the addresses given as arguments.  The <code>From</code>
+address can be set explicitly with the <code>as</code> option, e.g.</p>
+<pre>
+  send/as:bozo@clown.com gosper@mathematicians.org</pre>
+<p>If there is a problem, you might re-trying the <code>send</code> command with
+the <code>debug</code> option, which turns on <a href="/Net/SMTP.html">the Net::SMTP manpage</a> debugging and will
+produce a large amount of output.</p>
+<p>We invoke the external editor of your choice for composition, which
+should return a valid status code.  You will generally have a chance
+to go over it, re-edit it, abort, cryptosign, attach .sig, etc. after
+you're done editing.</p>
+<p>
+</p>
+<h3><a name="reply__reply_to_a_message">reply: reply to a message</a></h3>
+<p>Like <code>send</code>, but replies to the sender of a previous message.</p>
+<p>
+</p>
+<h3><a name="forward__forward_a_message_to_a_new_recipient">forward: forward a message to a new recipient</a></h3>
+<p>Like <code>send</code>, but forwards an existing message to a third party.</p>
+<p>
+</p>
+<h3><a name="resend__resend_a_bounced_message">resend: resend a bounced message</a></h3>
+<p>Like <code>send</code>, but resends a message that was bounced.</p>
+<p>
+</p>
+<h2><a name="the_address_book">The Address Book</a></h2>
+<p>
+</p>
+<h3><a name="address__interface_to_the_address_book">address: interface to the address book</a></h3>
+<p>The <code>address</code> command has several subcommands to help you
+manage your addresses.  Flail stores these in a dbm file,
+typically called <code>~/.flail_addressbook</code>.</p>
+<p>Subcommands:</p>
+<dl>
+<dt><strong><a name="item_add_nickname_email">add nickname email</a></strong>
+
+<dd>
+<p>Add a new entry.  Nickname must be unique in your addressbook.</p>
+</dd>
+</li>
+<dt><strong><a name="item_show_nickname">show nickname</a></strong>
+
+<dd>
+<p>Show the address associated with the given nickname.</p>
+</dd>
+</li>
+<dt><strong><a name="item_list__5bregexp_5d">list [regexp]</a></strong>
+
+<dd>
+<p>Search the addressbook by regexp, or list the whole thing
+if no regexp specified</p>
+</dd>
+</li>
+<dt><strong><a name="item_del_nickname">del nickname</a></strong>
+
+<dd>
+<p>Remove an entry by nickname</p>
+</dd>
+</li>
+<dt><strong><a name="item_import_filename">import filename</a></strong>
+
+<dd>
+<p>Import address book data stored in a file.  The two kinds of files we
+currently support are LDIF and CSV; files should have extensions that
+reflect their type, e.g <code>.ldif</code> or <code>.csv</code>.</p>
+</dd>
+</li>
+<dt><strong><a name="item_take__5blabel_5d">take [label]</a></strong>
+
+<dd>
+<p>Extract email addresses from one or more messages and import them
+into your addressbook.  If no label is specified, the current message
+is examined; otherwise, all messages in the current folder with
+the specified label are examined.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<h2><a name="marking__mapping_and_other_fun_stuff">Marking, Mapping and Other Fun Stuff</a></h2>
+<p>Messages can have an arbitrary set of labels associated with them.
+Some, such as <code>deleted</code> and <code>filed</code>, have meaning to flail itself.
+Some, such as <code>marked</code> or whatever other string you might use, are
+just for your own purposes.  Marking messages lets you apply code to
+them, so flail users do it alot.</p>
+<p>
+</p>
+<h3><a name="mark__add_a_label_to_a_message">mark: add a label to a message</a></h3>
+<p>In the absence of any arguments, applies the <code>marked</code> label to
+the current message.</p>
+<p>If a message sequence is specified, then all messages in that sequence
+get the <code>marked</code> label.  If the word <code>all</code> is specified, then all
+messages get <code>marked</code>.</p>
+<p>If the first character of our first argument is a comma, then the rest
+of the arguments are treated as a bit of perl code that is invoked for
+every message in the folder.  The token <code>%m</code> will be substituted for
+a variable that is bound to an <a href="/Mail/Internet.html">the Mail::Internet manpage</a> object representing
+each message in the folder on subsequence calls.</p>
+<p>For instance, if we have in our configuration</p>
+<pre>
+  sub is_blue { shift-&gt;get(&quot;Subject&quot;) =~ /\[blue\]/; }</pre>
+<p>Then we can do</p>
+<pre>
+  mark ,is_blue(%m)</pre>
+<p>to mark all messages whose <code>Subject</code> headers contain the string
+<code>[blue]</code>.</p>
+<p>
+</p>
+<h3><a name="unmark__remove_a_label_from_a_message">unmark: remove a label from a message</a></h3>
+<p>Unmark takes the same argumentology as mark, but removes the <code>marked</code>
+label instead.</p>
+<p>
+</p>
+<h3><a name="map__map_a_piece_of_code_over_some_messages">map: map a piece of code over some messages</a></h3>
+<pre>
+  map label ...</pre>
+<p>Run a command or piece of code over a set of messages, specified by
+a label.  If the label is <code>all</code>, then all messages have the action
+applied to them.  The action can be a flail command, or a piece of
+random Perl code.  In the latter case, the first character of
+the code should be a curly brace, and the code should end with
+one as well, e.g.</p>
+<pre>
+  map marked { grep_msg('Foo'); }</pre>
+<p>Runs the given code for each message.  The code is called in a
+context where the following globals are available in the <code>main</code>
+namespace:</p>
+<dl>
+<dt><strong><a name="item__n">$N the message number in the folder</a></strong>
+
+<dt><strong><a name="item__m">$M a Mail::Internet object that represents the message</a></strong>
+
+<dt><strong><a name="item__f">$F the Mail::Folder object corresponding to the folder</a></strong>
+
+<dt><strong><a name="item__h">$H the Mail::Header object associated with $M</a></strong>
+
+</dl>
+<p>If there are no curly braces, the command should be a legal
+flail command.  In both cases, two additional substitutions
+take place:</p>
+<dl>
+<dt><strong><a name="item__n">%n is substituted with the message number</a></strong>
+
+<dt><strong><a name="item___">%* is substituted for any arguments that appear <code>after</code> the command</a></strong>
+
+</dl>
+<p>This last substitution is a bit odd, and requires explaining.</p>
+<p>Supposing we have our hypothetical sub <code>grep_msg</code> (which does in fact
+come with the <code>dot.flailrc</code> in the distribution).  It wants a regexp as
+its argument.  It uses <a href="#item__m"><code>$M</code></a>, etc. to get at the message it is
+grepping.  Supposing we want to be able to type</p>
+<pre>
+  mgrep pattern</pre>
+<p>to run <code>grep_msg(&quot;pattern&quot;)</code> over each message.  How do we do it?</p>
+<pre>
+  alias mgrep map all { grep_msg(&quot;%*&quot;); }</pre>
+<p>Now, when we type</p>
+<pre>
+  mgrep pattern</pre>
+<p>The <a href="#item___"><code>%*</code></a> is substituted with <code>pattern</code>.  This is why <code>map</code> is
+useful even when operating on a single message.</p>
+<p>Another enlightening example:</p>
+<pre>
+  alias mmv map marked mv %n %*</pre>
+<p>This creates an alias, <code>mmv</code>, which can be used thusly:</p>
+<pre>
+  # arrange to mark the messages that are spam,
+  # either by hand ...
+  mark 1,3,5</pre>
+<pre>
+  # or by some automated oracle
+  mark ,is_spam(%m)</pre>
+<pre>
+  # now, move it all to a folder named spam
+  mmv spam</pre>
+<p>Of course this is just a contrived example, since you can accomplish
+the same thing with labels, e.g.</p>
+<pre>
+  mv -marked spam</pre>
+<p>will move all marked messages to the folder named <code>spam</code>.</p>
+<p>
+</p>
+<h3><a name="count__count_labeled_messages">count: count labeled messages</a></h3>
+<p>Given a label, count the messages that match it.  If no label is specified,
+<code>marked</code> is assumed.</p>
+<p>
+</p>
+<h3><a name="run__run_message_hooks_for_label">run: run message hooks for label</a></h3>
+<p>Given a label, run all of the message hooks associated with that label
+over every message that has that label in the current folder.  See the
+discussion on message hooks in Hacking Flail, below.</p>
+<p>
+</p>
+<h2><a name="state_management">State Management</a></h2>
+<p>
+</p>
+<h3><a name="sync__flush_changes_to_the_current_folder">sync: flush changes to the current folder</a></h3>
+<p>Flush any changes to the current folder to disk.  This includes
+expunging messages labeled <code>deleted</code>.</p>
+<p>
+</p>
+<h3><a name="reset__reset_various_bits_of_state">reset: reset various bits of state</a></h3>
+<p>Resets the password cache and/or the connection cache.</p>
+<p>
+</p>
+<h2><a name="crypto">Crypto</a></h2>
+<p>
+</p>
+<h3><a name="decrypt__decrypt_a_pgpencrypted_message">decrypt: decrypt a PGP-encrypted message</a></h3>
+<p>This needs a rewrite, as my crypto fu relies on outdated modules and
+must be rewritten.</p>
+<p>
+</p>
+<h2><a name="other_commands">Other Commands</a></h2>
+<p>
+</p>
+<h3><a name="alias__create_a_new_command">alias: create a new command</a></h3>
+<p>Create a new command.  You cannot overwrite existing command table
+entries this way; use Perl code in your config file instead.</p>
+<p>Example:</p>
+<pre>
+  alias mvspam map marked mv %n spam</pre>
+<p>
+</p>
+<h3><a name="unalias__remove_an_alias">unalias: remove an alias</a></h3>
+<p>Remove an alias.</p>
+<p>
+</p>
+<h3><a name="help__get_help">help: get help</a></h3>
+<p>You can ask for help on any specific command or alias by using
+it as an argument, e.g.</p>
+<pre>
+  help ls</pre>
+<p>Invoking help with no arguments produces a list of commands.</p>
+<p>In addition to commands, you can ask for help on the following
+subjects</p>
+<dl>
+<dt><strong><a name="item_pod">pod</a></strong>
+
+<dd>
+<p>spit out the flail manual (thanks to Pod::Usage)</p>
+</dd>
+</li>
+<dt><strong><a name="item_version">version</a></strong>
+
+<dd>
+<p>show our version information</p>
+</dd>
+</li>
+<dt><strong><a name="item_license">license</a></strong>
+
+<dd>
+<p>show our full license</p>
+</dd>
+</li>
+<dt><strong><a name="item_warranty">warranty</a></strong>
+
+<dd>
+<p>show our warranty</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<h3><a name="quit__exit_flail">quit: exit flail</a></h3>
+<p>Bug out, flushing all changes.</p>
+<p>If you want to bug out without saving anything, use Perl:</p>
+<pre>
+  ,exit</pre>
+<p>
+</p>
+<hr />
+<h1><a name="message_composition_interface">MESSAGE COMPOSITION INTERFACE</a></h1>
+<p>When you are sending a message, you will be generally be prompted
+before it goes out.  The prompt allows you to perform some fairly
+complex sequences of actions with a few keystrokes, and is usually
+called the composer.</p>
+<p>XXX Write more.</p>
+<p>
+</p>
+<hr />
+<h1><a name="configuration">CONFIGURATION</a></h1>
+<p>flail is a hacker's mailer.  Configuring flail means writing Perl
+code.  If this does not fill you with joy, you're in the wrong bar.</p>
+<p>
+</p>
+<h2><a name="your__flailrc">Your .flailrc</a></h2>
+<p>Flail loads <code>~/.flailrc</code> upon startup.  An extensive example comes
+with the distribution (dot.flailrc).  You can specify another file
+with the <code>-c</code> command-line option.</p>
+<p>Command-line options will already have been parsed by the time your rc
+file is loaded.  This means you can check for the value of
+e.g. <code>$SingleCommand</code> to see if <a href="#item__2d1"><code>-1</code></a> was specified on the command
+line, etc.</p>
+<p>
+</p>
+<h2><a name="managing_multiple_identities_and_mailboxes">Managing Multiple Identities and Mailboxes</a></h2>
+<p>
+</p>
+<h2><a name="passwords_and_the_pipe_trick">Passwords and the Pipe Trick</a></h2>
+<p>
+</p>
+<h2><a name="hacking_flail">Hacking Flail</a></h2>
+<p>Flail is ultimately just a bunch of Perl subs.  It currently all lives
+in the <code>main</code> package, which is where your flailrc is loaded as well.
+This means you can write code that calls any flail primitive, add new
+primitives, or extend the command set using the same API (if you want
+to diginfy it with that name) that I use.</p>
+<p>WARNING: I will be rewriting flail to use OO techniques in the very
+near future.  You should get on the <code>flail-dev</code> mailing list if you
+are interested.</p>
+<p>
+</p>
+<h2><a name="alphabetical_listing_of_all_configuration_variables">Alphabetical Listing of All Configuration Variables</a></h2>
+<p>
+</p>
+<hr />
+<h1><a name="bugs___todo">BUGS / TODO</a></h1>
+<p>Too many bugs to count at the moment...</p>
+<dl>
+<dt><strong><a name="item_finish_the_oo_2fmodular_rewrite">Finish the OO/modular rewrite</a></strong>
+
+<dt><strong><a name="item_get_rid_of_all_i_2fo_in_signal_handlers">Get rid of all I/O in signal handlers</a></strong>
+
+<dt><strong><a name="item_move_main_into_a_main_3a__7b__7d_block">Move main into a MAIN: { } block</a></strong>
+
+<dt><strong><a name="item_re_2dwrite_this_turkey_so_it_27s_not_so_fugly">Re-write this turkey so it's not so fugly</a></strong>
+
+<dt><strong><a name="item_just_finally_stop_reading_email_already_2c_everybo">Just finally stop reading email already, everybody is so over email.</a></strong>
+
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="credits">CREDITS</a></h1>
+<p>Sean Levy &lt;<a href="mailto:snl@cluefactory.com">snl@cluefactory.com</a>&gt; wrote this thing, sometime in or
+around 2000 most likely, although he can't quite remember the exact
+year.  It started out as a pile of hacks and has matured and blossomed
+into a GREAT FREAKING HUGE PILE OF HACKS.</p>
+<p>Sean is also known as attila &lt;<a href="mailto:attila@stalphonsos.com">attila@stalphonsos.com</a>&gt;, for historical
+reasons almost entirely under his control.  That's ``Saint Alphonsos''.</p>
+<p>
+</p>
+<hr />
+<h1><a name="version_history">VERSION HISTORY</a></h1>
+<p><strong>Alice</strong>: Well I must say I've never heard it that way before...</p>
+<p><strong>Caterpillar</strong>: I know, I have improved it.</p>
+<p></p>
+<pre>
+  0.2.4    05 Aug 08     attila  revived from the dead AGAIN after
+                                 t-bird screwed me hard.
+  0.2.3    30 Jun 06     attila  released on freshmeat
+  0.2.2    26 Jun 06     attila  wrote pod, use strict, blah blah
+                                 added local spools
+  0.2.1    25 Jun 06     attila  fixed horrible bug in get_imap
+  0.2.0    24 Jun 06     attila  resurrected after i got sick of VM
+  0.1.28   26 Feb 03     attila  0.1.28 released
+  0.1.?    ?? ??? 02     attila  Somewhere around 2002 I found myself
+                                 using flail everyday and thought perhaps
+                                 I should release it or something
+  0.0.0    ?? ??? 00     attila  Sometime in y2k I had a brain schizm
+                                 and decided to write an MUA in perl</pre>
+<p>
+</p>
+<hr />
+<h1><a name="copyright_and_license">COPYRIGHT AND LICENSE</a></h1>
+<pre>
+  Copyright (C) 1999,2000 St. Alphonsos.
+  Copyright (C) 2000-2008 by Sean Levy &lt;snl@cluefactory.com&gt;.
+  All Rights Reserved.
+
+  Redistribution and use in any form, with or without modification, are
+  permitted provided that the following conditions are met:
+
+  1. Redistributions of source code must retain the above copyright
+     notice, this list of conditions and the following disclaimer.
+
+  2. The names &quot;St. Alphonsos&quot;, &quot;The Clue Factory&quot;, and &quot;Sean Levy&quot;
+     must not be used to endorse or promote products derived from this
+     software without prior written permission. To obtain permission,
+     contact info@stalphonsos.com or snl@cluefactory.com
+
+  3. Redistributions of any form whatsoever must retain the following
+     acknowledgment:
+     &quot;This product includes software developed by St. Alphonsos
+      <a href="http://www.stalphonsos.com/">http://www.stalphonsos.com/</a> and Sean Levy &lt;snl@cluefactory.com&gt;&quot;
+
+  THIS SOFTWARE IS PROVIDED BY ST. ALPHONSOS, THE CLUE FACTORY AND
+  SEAN LEVY ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES,
+  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+  IN NO EVENT SHALL ST. ALPHONSOS NOR ITS EMPLOYEES, THE CLUE FACTORY
+  NOR ITS EMPLOYEES, OR SEAN LEVY BE LIABLE FOR ANY DIRECT, INDIRECT,
+  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  POSSIBILITY OF SUCH DAMAGE.</pre>
+
+</div>
+</body>
+
+</html>

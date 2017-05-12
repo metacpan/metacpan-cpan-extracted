@@ -1,0 +1,27 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         flail
+version:      0.2.5
+version_from: flail0.pl
+installdirs:  site
+requires:
+    IO::File:                      0
+    IO::String:                    0
+    Mail::Folder:                  0
+    Mail::Header:                  0
+    Mail::IMAPClient:              0
+    Mail::Internet:                0
+    Mail::POP3Client:              0
+    Mail::Util:                    0
+    Net::SMTP:                     0
+    Proc::Simple:                  0
+    Proc::SyncExec:                0
+    Symbol:                        0
+    Term::ANSIColor:               0
+    Term::ReadKey:                 0
+    Term::ReadLine:                0
+    Time::Local:                   0
+    Time::ParseDate:               0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

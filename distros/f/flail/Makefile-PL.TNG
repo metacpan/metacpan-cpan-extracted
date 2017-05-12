@@ -1,0 +1,138 @@
+## flail, A command-line MUA in Perl
+
+use ExtUtils::MakeMaker;
+do "./Flail.pm";
+
+print STDERR "Welcome to flail $Flail::VERSION\n\n";
+
+WriteMakefile(
+  AUTHOR => 'Sean Levy <snl@cluefactory.com>',
+  ABSTRACT => 'Command-line MUA in Perl',
+  NAME => 'flail',
+  VERSION_FROM => 'Flail.pm',
+  EXE_FILES => [ 'flail', 'flail2' ],
+  PREREQ_PM => {
+    'IO::File' => 0,
+    'IO::String' => 0,
+    'Term::ReadLine' => 0,
+    'Mail::Folder' => 0,
+    'Mail::Header' => 0,
+    'Mail::Internet' => 0,
+    'Term::ANSIColor' => 0,
+    'Term::ReadKey' => 0,
+    'Time::Local' => 0,
+    'Time::ParseDate' => 0,
+    'Mail::POP3Client' => 0,
+    'Mail::IMAPClient' => 0,
+    'Mail::Util' => 0,
+    'Net::SMTP' => 0,
+    'Proc::Simple' => 0,
+    'Proc::SyncExec' => 0,
+    'Symbol' => 0,
+  },
+  PM => {
+    'SecretPipe.pm' => '$(INST_LIBDIR)/SecretPipe.pm',
+    'Flail.pm' => '$(INST_LIBDIR)/Flail.pm',
+    'Flail/AddressBook.pm' => '$(INST_LIBDIR)/Flail/AddressBook.pm',
+    'Flail/CLI.pm' => '$(INST_LIBDIR)/Flail/CLI.pm',
+    'Flail/Config.pm' => '$(INST_LIBDIR)/Flail/Config.pm',
+    'Flail/ConnectionCache.pm' => '$(INST_LIBDIR)/Flail/ConnectionCache.pm',
+    'Flail/Exec.pm' => '$(INST_LIBDIR)/Flail/Exec.pm',
+    'Flail/Exec/Cmd/addressbook.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/addressbook.pm',
+    'Flail/Exec/Cmd/alias.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/alias.pm',
+    'Flail/Exec/Cmd/check.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/check.pm',
+    'Flail/Exec/Cmd/copy.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/copy.pm',
+    'Flail/Exec/Cmd/count.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/count.pm',
+    'Flail/Exec/Cmd/decode.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/decode.pm',
+    'Flail/Exec/Cmd/decrypt.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/decrypt.pm',
+    'Flail/Exec/Cmd/echo.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/echo.pm',
+    'Flail/Exec/Cmd/forward.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/forward.pm',
+    'Flail/Exec/Cmd/get.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/get.pm',
+    'Flail/Exec/Cmd/goto.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/goto.pm',
+    'Flail/Exec/Cmd/headers.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/headers.pm',
+    'Flail/Exec/Cmd/help.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/help.pm',
+    'Flail/Exec/Cmd/invert.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/invert.pm',
+    'Flail/Exec/Cmd/list.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/list.pm',
+    'Flail/Exec/Cmd/map.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/map.pm',
+    'Flail/Exec/Cmd/mark.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/mark.pm',
+    'Flail/Exec/Cmd/mkdir.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/mkdir.pm',
+    'Flail/Exec/Cmd/move.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/move.pm',
+    'Flail/Exec/Cmd/next.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/next.pm',
+    'Flail/Exec/Cmd/open.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/open.pm',
+    'Flail/Exec/Cmd/prev.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/prev.pm',
+    'Flail/Exec/Cmd/quit.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/quit.pm',
+    'Flail/Exec/Cmd/range.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/range.pm',
+    'Flail/Exec/Cmd/read.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/read.pm',
+    'Flail/Exec/Cmd/remove.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/remove.pm',
+    'Flail/Exec/Cmd/reply.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/reply.pm',
+    'Flail/Exec/Cmd/resend.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/resend.pm',
+    'Flail/Exec/Cmd/reset.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/reset.pm',
+    'Flail/Exec/Cmd/run_hooks.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/run_hooks.pm',
+    'Flail/Exec/Cmd/send.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/send.pm',
+    'Flail/Exec/Cmd/stat.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/stat.pm',
+    'Flail/Exec/Cmd/sync.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/sync.pm',
+    'Flail/Exec/Cmd/unalias.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/unalias.pm',
+    'Flail/Exec/Cmd/unmark.pm' => '$(INST_LIBDIR)/Flail/Exec/Cmd/unmark.pm',
+    'Flail/SecretPipe.pm' => '$(INST_LIBDIR)/Flail/SecretPipe.pm',
+    'Flail/Thing.pm' => '$(INST_LIBDIR)/Flail/Thing.pm',
+    'Flail/Utils.pm' => '$(INST_LIBDIR)/Flail/Utils.pm',
+  }
+);
+sub MY::postamble {
+    print STDERR "To install completely:\n";
+    print STDERR "    \$ make\n    \$ sudo make install\n";
+    print STDERR "\nDon't forget to read the README and the POD.\n";
+    print STDERR "Examples will be installed somehwere like /usr/local/share/examples/flail\nThey are also in the eg/ subdirectory of this distribution.\n\nEat your veggies.\n\n";
+    return <<__MyTaRgEt__;
+OPENSSLCMD?=openssl
+MD5CMD?=\$(OPENSSLCMD) dgst -md5
+SHA1CMD?=\$(OPENSSLCMD) dgst -sha1
+RIPEMD160CMD?=\$(OPENSSLCMD) dgst -ripemd160
+GPGCMD?=gpg
+GPGKEYID?=0x4FFCBB9C
+RELEASEDIR?=\$\$HOME/release
+RELEASETARBALL?=\$(NAME)-\$(VERSION).tar.gz
+RELEASEFILES?=\$(RELEASETARBALL) \$(NAME)-\$(VERSION).tar.gz.md5 \$(NAME)-\$(VERSION).tar.gz.sha1 \$(NAME)-\$(VERSION).tar.gz.ripemd160 \$(NAME)-\$(VERSION).tar.gz.asc
+RELEASETARGETS?=dist md5 sha1 ripemd160 asc
+RM?=/bin/rm
+SHAREDIR?=\$(PREFIX)/share
+EXAMPLEDIR?=\$(SHAREDIR)/examples/\$(NAME)
+EXAMPLES?=eg
+MKDIR_P?=mkdir -p
+
+clean::
+	\$(RM) -f *.flc *.bak *~ .tec*
+
+force-releasefiles: cleanrelease releasefiles
+
+distclean:: cleanrelease
+
+install :: \$(EXAMPLEDIR)
+	\$(CP) dot.flailrc \$(EXAMPLEDIR)
+	(cd \$(EXAMPLES); \$(TAR) cf - `grep eg/ ../MANIFEST | sed -e 's|eg/||'`) | (cd \$(EXAMPLEDIR); \$(TAR) xf -)
+
+\$(EXAMPLEDIR) :
+	\$(MKDIR_P) \$(EXAMPLEDIR)
+
+cleanrelease:
+	-\$(RM) -f \$(RELEASEFILES)
+
+releasefiles: \$(RELEASETARGETS)
+
+release: releasefiles
+	\@-[ -d \$(RELEASEDIR) ] && \$(MV) \$(RELEASEFILES) \$(RELEASEDIR)
+	\@echo Moved release files to \$(RELEASEDIR): \$(RELEASEFILES)
+
+md5: \$(RELEASETARBALL)
+	\$(MD5CMD) \$(NAME)-\$(VERSION).tar.gz > \$(NAME)-\$(VERSION).tar.gz.md5
+
+sha1: \$(RELEASETARBALL)
+	\$(SHA1CMD) \$(NAME)-\$(VERSION).tar.gz > \$(NAME)-\$(VERSION).tar.gz.sha1
+
+ripemd160: \$(RELEASETARBALL)
+	\$(RIPEMD160CMD) \$(NAME)-\$(VERSION).tar.gz > \$(NAME)-\$(VERSION).tar.gz.ripemd160
+
+asc: \$(RELEASETARBALL)
+	\$(GPGCMD) --sign --default-key \$(GPGKEYID) --detach --armor \$(NAME)-\$(VERSION).tar.gz
+__MyTaRgEt__
+}

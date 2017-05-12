@@ -1,0 +1,108 @@
+          Time-stamp: <2008-08-05 23:00:04 snl@cluefactory.com>
+   (c) 2006-2008 by Sean Levy <snl@cluefactory.com>.  All Rights Reserved
+==[ INTRODUCTION: TNG ]=====================================================
+  Flail is currently a pile of perl code that gives you a Unix command-line
+interface to your mail.  It's morally the equivalent of the old /bin/mail
+program, but with perl integrated into it and a few more commands than the
+bare minimum.
+  What I would like Flail to become is a toolkit for hackers to construct
+their own MUAs easily, because that's effectively what I do.  I hack and
+tweak and more or less live in my MUA when it comes to email.  I expect many
+other hackers do as well.  If hacking your mailer sounds like something you
+might do before breakfast, then flail might be for you, and should become
+increasingly so.
+==[ YE OLDE INTRODUCTION ]==================================================
+  Flail is a flexible, lightweight, minimalist mailer with a command-line
+interface.  It is written in Perl, and is unabashedly designed to make Perl
+hackers happy.  Using flail it's a cinch to assemble useful bits of
+mail-related Perl code into a fairly powerful mail reading and filtering
+environment with no frills, GUIs or other such stuff.
+  At one point flail integrated seamlessly with GnuPG, but that code suffers
+from some bit-rot at the moment.  Nevertheless, it plays nice with external
+programs, has a Unix-like command structure (adapted to email), and is
+infinitely extensible.  Better GnuPG support is coming, since I use
+it every day (ASCII ARMOR UBER ALLES).
+  I use flail to read all of my mail, from several maildrops, with several
+identities, all on my cruddy little laptop.  All the power of Perl regexps,
+etc. at my fingertips, in a situation where I often want it: filtering
+through the goop that is email.
+  If you don't write code for a living, you might find flail off-putting.  I
+would like to do something about that as time goes on, but for now it is
+what it is: a mailer shamelessly aimed at a target audience of people like
+me.
+  You're out there, right?
+  Of course you are.  I hear your voices in my head.
+  All the time.
+==[ INSTALLATION ]==========================================================
+  (1) Build Makefile:
+      $ perl Makefile.PL
+    # OR: perhaps you prefer to keep stuff out of e.g. /usr/bin:
+      $ perl Makefile.PL PREFIX=/usr/local INSTALLDIRS=site
+  If your system is missing any CPAN modules that we depend on, they will be
+noted at this point.  Go install them before continuing, then retry step 1.
+  (2) Install
+      $ make
+      $ sudo make install
+Sadly there is no test suite yet.  This sucks.  The flail 1.x version will
+have a real test suite.
+  In any event, that's it.  You should be able to type:
+      $ flail
+and get a prompt.  To get a short usage message, try
+      $ flail -h
+You can read the man page with either
+      $ flail -hv
+or
+      $ man flail
+  Inside of flail, use the "help manual" command to see the same thing.
+===[ Getting Those Missing Modules ]========================================
+  If step 1 complains about missing dependencies, your next course of action
+is highly system-dependent.
+  Under OpenBSD and FreeBSD, you would probably start poking around under
+the /usr/ports tree to find the correct p5-xxx ports to install.  Do a "man
+ports" to get more information.  Under NetBSD, it's called pkgsrc, but is
+much the same thing.
+  Under MacOSX, you might consider using fink to find the missing packages.
+  Under Linux, well, who knows.  I've gotten flail working under Ubuntu just
+by using 'sudo perl -MCPAN -e CPAN::shell' to track down the various modules
+I require.  Beware that you'll need a slew of -dev packages installed or
+else libraries will be missing when you try to install modules from CPAN.
+  If all else fails, you may have to download the CPAN modules from cpan.org
+itself and install them by hand.  The installation instructions for your
+typical CPAN module are almost identical to those for flail itself:
+  (1) Unpack the module 
+  (2) Run: perl Makefile.PL
+  (3) If it complains about dependencies, go fulfill them using this
+      very same procedure
+  (4) When the deps are satisfied: make; sudo make install
+==[ Examples ]==============================================================
+  Starting with version 0.2.3, some more elaborate examples come with
+the distribution, and get installed in $PREFIX/share/examples/flail,
+e.g. /usr/local/share/examples/flail on a typical BSD system.  These
+include scripts I use in my config to filter my email, etc.  The
+dot.flailrc also gets put in this directory, which you can adapt to
+your own purposes as well.  You can look in the eg/ subdir of the
+distribution for these examples, too.
+==[ A word on mail protocols: IMAP, POP3, ... ]=============================
+  Flail does have rudimentary but working IMAP and POP3 support.  It has
+worked for me against several IMAP and POP servers.  That much said, I don't
+really use any of that, so YMMV.  Instead, I use fetchmail, maildrop and bmf
+(plus some scripts included in eg/) to process my mail, and always read my
+mail from the system mail spool on my laptop, where all of my mail ends up.
+  I highly recommend fetchmail as an alternative to actually talking to your
+mail server from flail.  He's taken care of pretty much anything that can
+come up already, and fetchmail is beaten on constantly by hordes of people.
+============================================================================
+
+============================================================================
+$Id: README,v 1.4 2006/06/29 22:13:30 attila Exp $
+============================================================================
+
+Local variables:
+mode: text
+adaptive-fill-mode: nil
+fill-column: 76
+paragraph-start: "  \\|\\|=="
+indent-tabs-mode: nil
+fill-prefix: ""
+sentence-end-double-space: t
+End:

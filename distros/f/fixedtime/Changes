@@ -1,0 +1,186 @@
+Changes on 2017-02-05 for repository at:
+  Fetch URL: git@github.com:abeltje/fixedtime.git
+  Push  URL: git@github.com:abeltje/fixedtime.git
+
+Enjoy!
+
+________________________________________________________________________________
+[6c4b768] by abeltje on Sun, 5 Feb 2017 12:25:37 +0100
+
+     Autocommit for distribution fixedtime 0.04 (same)
+
+
+M	Changes
+M	lib/fixedtime.pm
+________________________________________________________________________________
+[43bb664] by abeltje on Sun, 5 Feb 2017 12:21:57 +0100
+
+     Fix bad test
+
+
+M	t/1basic.t
+________________________________________________________________________________
+[7018756] by abeltje on Fri, 14 Mar 2008 14:27:03 +0000
+
+    
+        * Regenerate Changes for fixedtime 0.03
+
+        git-svn-id:
+        https://source.test-smoke.org/repos/cpan/trunk/fixedtime@15
+        03e79c58-f747-0410-a819-f71e7ca513d9
+
+
+M	Changes
+________________________________________________________________________________
+[e4d6fd8] by abeltje on Fri, 14 Mar 2008 14:26:18 +0000
+
+    
+        * [CHANGE]
+         * different wording: replace 'stamp' with 'epoch_offset'
+         * rework the example code in the synopsis
+
+         git-svn-id:
+        https://source.test-smoke.org/repos/cpan/trunk/fixedtime@14
+        03e79c58-f747-0410-a819-f71e7ca513d9
+
+
+M	lib/fixedtime.pm
+________________________________________________________________________________
+[a53e0ca] by abeltje on Fri, 14 Mar 2008 14:23:39 +0000
+
+    
+        * [CHANGE]
+         + add: new t/4example.t file
+
+         git-svn-id:
+        https://source.test-smoke.org/repos/cpan/trunk/fixedtime@13
+        03e79c58-f747-0410-a819-f71e7ca513d9
+
+
+M	MANIFEST
+A	t/4example.t
+________________________________________________________________________________
+[cd326ba] by abeltje on Fri, 14 Mar 2008 14:13:20 +0000
+
+    
+        * [CHANGE]
+         + add: README file
+
+         git-svn-id:
+        https://source.test-smoke.org/repos/cpan/trunk/fixedtime@12
+        03e79c58-f747-0410-a819-f71e7ca513d9
+
+
+M	MANIFEST
+A	README
+________________________________________________________________________________
+[4781fa4] by abeltje on Sun, 9 Mar 2008 03:45:40 +0000
+
+    
+        * Regenerate Changes for fixedtime 0.02
+
+        git-svn-id:
+        https://source.test-smoke.org/repos/cpan/trunk/fixedtime@10
+        03e79c58-f747-0410-a819-f71e7ca513d9
+
+
+M	Changes
+________________________________________________________________________________
+[0cbafaf] by abeltje on Sun, 9 Mar 2008 03:44:05 +0000
+
+    
+        * Regenerate Changes for fixedtime 0.02
+
+        git-svn-id:
+        https://source.test-smoke.org/repos/cpan/trunk/fixedtime@9
+        03e79c58-f747-0410-a819-f71e7ca513d9
+
+
+M	Changes
+________________________________________________________________________________
+[0f63ac5] by abeltje on Sun, 9 Mar 2008 03:38:11 +0000
+
+    
+        * [CHANGE]
+         + add: Changes file
+
+         git-svn-id:
+        https://source.test-smoke.org/repos/cpan/trunk/fixedtime@8
+        03e79c58-f747-0410-a819-f71e7ca513d9
+
+
+A	Changes
+________________________________________________________________________________
+[2c66881] by abeltje on Sun, 9 Mar 2008 03:35:26 +0000
+
+    
+        * [CHANGE]
+         + add: Changes file te the MANIFEST
+
+         git-svn-id:
+        https://source.test-smoke.org/repos/cpan/trunk/fixedtime@7
+        03e79c58-f747-0410-a819-f71e7ca513d9
+
+
+M	MANIFEST
+________________________________________________________________________________
+[f4ce106] by abeltje on Sun, 9 Mar 2008 03:15:13 +0000
+
+    
+        * [CHANGE]
+         * rearrange the pod
+         * rename the stamp argument to epoch_offset
+         * adjust tests for the argument rename
+         * add the new tests to the MANIFEST
+
+         git-svn-id:
+        https://source.test-smoke.org/repos/cpan/trunk/fixedtime@5
+        03e79c58-f747-0410-a819-f71e7ca513d9
+
+
+M	MANIFEST
+M	lib/fixedtime.pm
+M	t/1basic.t
+M	t/2gmtime.t
+M	t/3localtime.t
+________________________________________________________________________________
+[53882ad] by abeltje on Sun, 9 Mar 2008 02:52:38 +0000
+
+    
+        * [CHANGE]
+         + split the tests into more files
+         + add: tests for localtime()
+
+         git-svn-id:
+        https://source.test-smoke.org/repos/cpan/trunk/fixedtime@4
+        03e79c58-f747-0410-a819-f71e7ca513d9
+
+
+M	t/1basic.t
+A	t/2gmtime.t
+A	t/3localtime.t
+________________________________________________________________________________
+[4b34a96] by abeltje on Sun, 9 Mar 2008 02:28:23 +0000
+
+    
+        * [IMPORT]
+         * fixedtime
+
+         git-svn-id:
+        https://source.test-smoke.org/repos/cpan/trunk/fixedtime@3
+        03e79c58-f747-0410-a819-f71e7ca513d9
+
+
+A	MANIFEST
+A	Makefile.PL
+A	lib/fixedtime.pm
+A	t/1basic.t
+________________________________________________________________________________
+[9848be4] by abeltje on Sun, 9 Mar 2008 02:06:31 +0000
+
+    
+        * start a subdirectory for 'fixedtime'
+
+         git-svn-id:
+        https://source.test-smoke.org/repos/cpan/trunk/fixedtime@2
+        03e79c58-f747-0410-a819-f71e7ca513d9

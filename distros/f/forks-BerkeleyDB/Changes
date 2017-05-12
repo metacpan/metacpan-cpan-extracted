@@ -1,0 +1,128 @@
+0.060	February 16 2009
+	Fix compatibility with forks 0.29 (now a minimum requirement) and later.
+
+	*** Behavior change *** All variables now retain their pre-existing values after
+	being shared.  This may cause slow sharing of a variable if the variable contained
+	many values or was very large, or may trigger errors if the variable contained
+	value(s) that are not valid for sharing.  Rule of thumb: always undef a variable
+	before sharing it, unless you trust any pre-existing value(s) to be sharable.
+	
+	Improved shared variable memory management: more efficient use of BDB environment
+	resources on a per-thread basis.
+	
+	Now correctly handles tmpdir locations with non-alphanumeric chars in the path.
+	
+	Support forks::BerkeleyDB::shared->set_deadlock_option.
+	
+	Silence spurious warnings when pushing undef values on shared array.
+	
+	Close unused environment resources in shared server.
+
+	Integrated all forks 0.30 tests.
+
+0.054	March 25 2009
+	Fixed bug when forking that would prevent BerkeleyDB environment from explicitly
+	closing.  This used to cause occasional environment corruption with certain
+	BerkeleyDB releases.  forks::BerkeleyDB::shared is now fully compatible with
+	all 4.x Berkeley DB releases.
+	
+	Corrected issue with TMPDIR path privilege modification that could cause loss
+	of sticky bit (commonly used on certain platforms) and incorrect privileges
+	assigned to / and /tmp.
+	
+	Added user-level control over permission, user, and group settings for TMPDIR.
+	
+	Improved logging in certain terminal exception cases.
+	
+	Miscellaneous minor under-the-hood improvements.
+
+0.053	January 6 2008
+	Modified shared array FETCHSIZE to use default, optimized BerlekeyDB.pm methods.
+	This improves performance (efficient C function) and should improve overall 
+	size reporting reliability, as the old use of BDB stats may not always guarantee
+	up-to-date results (depending on kernel or physical disk buffer flushing delays).
+	
+	Modified shared hash FIRSTKEY and NEXTKEY to use default, optimized BerlekeyDB.pm
+	methods.  Disabled shared hash SCALAR function in favor of FIRSTKEY.
+
+0.052	September 30 2007
+	Shared hash store and fetch are now 15% faster.
+	Shared array store is now 18% faster.
+	
+	Silenced a warning when storing undef in shared hash element.
+	
+	Corrected a bug with multiuser support and temp directory permissions.
+	
+	Updated distribution to require at least forks 0.23.
+	
+	Test suite will not allow this module to be used with BerkeleyDB 4.4, due to
+	apparent race-condition issues with CDB engine of that version.
+	
+	Implemented boolean hook $forks::DEFER_INIT_BEGIN_REQUIRE to insure shared
+	files are purged at process exit with forks 0.26 and later.
+	(Note: feature was broken in forks 0.24 - 0.25.)
+
+0.051	9 July 2007
+	Minor patch to forks::BerkeleyDB::shared to support forks::shared 0.24.
+	
+	Minor change to test suite to support forks 0.24.
+
+0.05	10 April 2007
+	Corrected package SIGNATURE file.
+
+0.04	9 April 2007
+	Fixed incompatible splice() on shared array with forks 0.21 and later.
+	
+	Added auto-cleanup of shared variable data at process exit if using
+	forks.pm 0.23 or later.
+	
+	Updated support for CORE::GLOBAL::fork of forks 0.22 and later.
+
+	Improved management of temp dir hierarchy for greater filesystem portability
+	(e.g. to insure that max inodes are not exceeded for num folders in a folder).
+	
+	Shared variable data cleanup now performed in reverse order of file creation
+	(so BDB environment files are deleted last, as a precaution).
+	
+	Performance improvement regarding undefined shared array values:
+	ElemNotExists.pm is now a singleton class (to eliminate unnecessary object
+	instantiation costs).
+	
+	Now using Devel::Required module as part of build process.
+
+0.03	5 October 2006
+	Corrected method by which CORE::GLOBAL::fork was overridden--now it really is
+	working correctly (at compile-time).
+	
+	Signifigantly cleaned up and further optimized pre/post thread spawn logic.
+	
+	Corrected slow memory leak in threads whenever they would spawn new threads,
+	caused by BerkeleyDB XS-level cleanup that was being inadvertantly skipped.
+
+0.02	6 August 2006
+	Implemented transparent bless across threads (note: feature will be silently
+	disabled unless forks.pm >= 0.19 is installed).
+	
+	Updated test suite to match complete forks 0.19 set of tests (including blessed
+	object tests).
+	
+	Implemented separate config module to allow access to global constants between
+	packages.
+	
+	Moved base BDB base environment to BerkeleyDB.pm (was originally in shared.pm).
+	
+	Reworked some internals to better handle overriding of function calls, when
+	necessary by other support modules.
+	
+	Implemented Scalar::Util::reftype instead of ref() in internal function
+	_filter_store_value to correctly support blessed references.
+	
+	Enabled database syncing in shared.pm END block to improve data integrity.
+	
+	Corrected minor POD bug in forks::BerkeleyDB::shared::array.
+	
+	Corrected a few file text formats to prevent inconsistencies between package
+	signature and package contents.
+
+0.01	25 April 2006
+	First public version.

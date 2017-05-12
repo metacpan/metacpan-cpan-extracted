@@ -1,0 +1,215 @@
+2008-09-06  attila  <attila@stalphonsos.com>
+
+        * flail0.pl: Pulled in lost wordification code from a source
+        tree that was dead in SVN - switched to GIT at some point and
+        did not merge changes.  This mod adds the ability to enter
+        multiple commands on a single line/alias separated by
+        semicolons.  Uses Text::Balanced and a couple helper subs.
+
+2008-08-05  attila  <attila@stalphonsos.com>
+
+        * flail0.pl: A lot has happened, but still under the flail0
+        regime.  Fixed some constants, added SMTP AUTH fu, added
+        /noheader and /nosep options to cat, added flail_emit(), added
+        flail_pipe(), added /debug and /verbose options to
+        send_internal, fixed "help brief", made flail_defcmd1()
+        overwrite existing commands so we can reconf with sane
+        results, updated POD a bit, updated stuff in eg/
+
+2006-11-11  attila  <attila@stalphonsos.com>
+
+        * flail (parse_range): Added support for -label syntax in
+        parse_range, and added calls to parse_range in a couple places
+        (flail_copy).  This means you can now do: ls -marked,
+        mv -marked foldername, etc.
+        (flail_help): Use args like regexps over the keys of %COMMANDs
+        if they are not exact matches.  Add documentation for range
+        expression extensions to the POD
+
+        * dot.flailrc: Some more code for eg/ to e.g. invert selections, etc.
+
+2006-10-05  attila  <attila@stalphonsos.com>
+
+        * Started using changelog again.
+        * flail: hack addressbook_lookup to favor exact matches
+
+2000-12-18  attila  <attila@stalphonsos.com>
+
+	* flail: Force Mail::POP3Client to do AUTH_MODE => "PASS"
+
+2000-12-18  attila  <attila@stalphonsos.com>
+
+	* flail: Added missing waitpid() call to avoid creating umpteen
+	zombies  Some other silly fixes.
+
+2000-12-02  attila  <attila@stalphonsos.com>
+
+	* flail: Added support for non-selfsigned keys because a friend
+	insists on using an old PGP 2.6 key that isn't self-signed.  I
+	don't know why, but it actually lets me deal a little better with
+	gpg anyway, when there are errors.  Made GPG interaction generally
+	more fault-tolerant.
+
+2000-11-06  attila  <attila@stalphonsos.com>
+
+	* install.pl: Wrote an installer.  Seems to work under BSD and
+	Linux, have not tried it on other Unix systems.  Packaged up
+	the modules we need in perl-modules and readline-4.1
+
+	* flail: Lots of bug fixes.  This is 0.1.22
+
+2000-08-04  attila  <attila@stalphonsos.com>
+
+	* flail: Bug fixes galore, extended gpg_op() to handle decryption
+	as well as encryption and signing, added built-in decrypt command
+	to invoke it properly.  This is 0.1.19 [0.1.18 was what I've been
+	using since the middle of July].
+
+2000-07-04  attila  <attila@stalphonsos.com>
+
+	* flail (call_editor): Switched to Proc::SyncExec and fixed the
+	problem with using gnuedit [TMPDIR was set incorrectly].  This is
+	0.1.17.
+
+2000-07-02  attila  <attila@stalphonsos.com>
+
+	* flail (gpg_op): Made it so that our idea of which GPG home
+	dir to use can be based on the entire email address, not just
+	the user name; I need this because snl@stalphonsos.net has a
+	different keypair from snl@halosoft.com.  Fixed send/draft so
+	that a couple headers [Mail-From and Status] get deleted before
+	you edit the message, because they make no sense in that context.
+	This is 0.1.16.
+
+2000-06-26  attila  <attila@stalphonsos.com>
+
+	* flail (filter_addresses): Fixed stupid bug that was adding
+	spurious, empty headers.
+
+2000-06-25  attila  <attila@stalphonsos.com>
+
+	* flail (gpg_op): Implemented gpg_op using
+	PGP::GPG::MessageProcessor and SecretPipe's for storing your
+	passphrase [which you can set in .flailrc which should be stored
+	in an encrypted filesystem].  This means you don't have to type
+	your passphrase all the time, and is also just cleaner [you can
+	always use pgp2 the old way with : from the composer].  Also
+	cleaned up address handling everywhere using headaddrs() so
+	address lists with commas in them work the way you'd expect
+	them to now.  First cut at a "drafts" folder functionality, which
+	works, but sort of strangely at the moment.  This is 0.1.15.
+
+2000-05-23  attila  <attila@stalphonsos.com>
+
+	* flail (send_internal): Added support for Bcc and Fcc, and for
+	multiple comma-separated addresses in a single To, Cc or Bcc
+	header.  If you Fcc to the special Fcc folder ".", that's just
+	like Fcc'ing to the default folder [which is usually a computed
+	name based on the month and year].  So, you can say:
+		To: a@b, c@d
+		Bcc: e@f
+		Fcc: sekret, .
+	And the message will have three recipients, one of them blind,
+	and be Fcc'ed to two folders.  This is 0.1.14.
+
+2000-05-19  attila  <attila@stalphonsos.com>
+
+	* flail: Fixed slash-style command option processing when there
+	are quoted strings as arguments to options, e.g. you can now do
+	  flail> send/subject:"a string with spaces" foo@bar.com
+	and the right thing happens.  Also added a -c option to suppress
+	queries for Cc addresses, and a -p option to pipe from stdin for
+	sending mail, so you can use flail as a replacement for /bin/mail
+	by doing something like:
+	  $ flail -1pq send/subject:'"whatever it is"' to@where.com < file
+	note the stupid quoting to deal with the shell.  This is 0.1.13.
+	
+2000-04-19  attila  <attila@stalphonsos.com>
+
+	* flail: Lots of bug fixes and patches, thanks to some early
+	beta-testers.  Packaging up with all of the modules you need.
+	This is 0.1.12.  I've been using this for all my mail-reading
+	for months now.
+
+2000-03-16  attila  <attila@stalphonsos.com>
+
+	* flail (prompt_str): added support for prompt hook and extended
+	the default prompt with the from and subject fields of the msg
+
+2000-03-02  attila  <attila@stalphonsos.com>
+
+	* flail: Added opthash parsing.  Now, any command can take
+	old DEC-style options, i.e.
+		flail> send/as:alt@altdomain.com/verbose
+	will call flail_send with $OPT bound to a hash that maps
+	as => alt@altdomain.com and verbose => 1.  Added support
+	to flail_send to let you send as some identity of yours.
+
+2000-03-01  attila  <attila@stalphonsos.com>
+
+	* flail: Greatly extended send_internal's command set.  Added
+	built-in commands to attach a .sig, sign cryptographically and
+	encrypt+sign [by default with gpg, but you can customize via
+	.flailrc].  Added the ability to give multiple composer actions
+	in one shot.  Added the ability to invoke an arbitrary piece of
+	perl code on your message from the composer.  Added a real help
+	message.  Also wrote the .sig code, cleaned up a couple of things.
+
+2000-02-29  attila  <attila@stalphonsos.com>
+
+	* flail (print_paged_line): Fixed the stupid bug in the pager.
+	Man, was that dumb.
+
+2000-02-27  attila  <attila@stalphonsos.com>
+
+	* flail: Fixed some scoping problems wrt $RCFile; I don't
+	actually know the "right" way to do this now, so "use strict"
+	will just have to wait, because my "solution" violates strict.
+	Still have some issues with hooks that need to be fixed.
+	This is 0.1.9.  We really are starting to get into release
+	territory now.
+	
+2000-02-26  attila  <attila@stalphonsos.com>
+
+	* flail: Added hook functionality, specifically for filtering
+	new messages.  By default, new messages get labeled as "new",
+	and any hooks defined on that label get run immediately after
+	slurping mail over from the server.  The "new" label gets cleared
+	automatically afterwards, so it's only visible to the hooks.
+	Implemented primitive but effective anti-spam measures in my
+	.flailrc using hooks.  This is 0.1.8.
+
+2000-02-24  attila  <attila@stalphonsos.com>
+
+	* flail: Added ranges to map and a few other commands.
+	Cleaned up some more stupid stuff.  Fixed y2k foolishness
+	in ls output.
+
+2000-02-23  attila  <attila@stalphonsos.com>
+
+	* flail: Busy day.  Interrupts now do the right thing
+	most of the time, as does "die" from in the bowels of flail
+	code and extension subs.  The addressbook now has a "take"
+	function.  There should be fewer random exits without an
+	error message.
+
+	* SecretPipe.pm: Fixed the stupid bug that was keeping this
+	from working more than once [hint: local *A, *B does not mean
+	what I thought it did].
+
+	* flail: Added address book functionality, including LDIF import.
+	Fixed a few stupid bugs.  Made map and unmark more general.  Most
+	interesting extensions now make use of the map command;
+	specifically, the "cur" and "all" labels.
+
+2000-02-21  attila  <attila@stalphonsos.com>
+
+	* flail (flail_map): Added "all" keyword to map command.  Made
+	mapping anonymous bits of code over messages actually work.
+	Fixed some bugs.  This is 0.1.5
+
+1999-12-20  attila  <attila@stalphonsos.com>
+
+	* flail: First change-log entry.  This is a fully functioning
+	version.  It needs a lot of work, but I read all my mail
+	with it now.

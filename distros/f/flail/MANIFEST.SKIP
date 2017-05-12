@@ -1,0 +1,16 @@
+.*\.tar
+test_.*\.pl
+.*~$
+#.*#
+.*/CVS/.*
+CVS/.*
+.*\.bak
+.*\.old
+cvs-adds\.sh
+\.tec.*
+^Makefile$
+\.svn/.*
+\.svn$
+\.git/.*
+\.git$
+^\.[-a-zA-Z]+$

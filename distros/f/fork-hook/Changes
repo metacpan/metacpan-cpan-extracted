@@ -1,0 +1,11 @@
+Revision history for Perl extension fork::hook.
+
+0.02  Wed Oct 12 12:25:46 2016
+	- Add small test
+	- change license to MIT
+	- First revision of POD
+
+0.01  Thu May  5 19:56:27 2016
+	- original version; created by h2xs 1.23 with options
+		-An fork::hook
+

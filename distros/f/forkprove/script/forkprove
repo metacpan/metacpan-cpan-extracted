@@ -1,0 +1,104 @@
+#!perl
+use strict;
+use App::ForkProve;
+exit(App::ForkProve->run(@ARGV) ? 0 : 1);
+
+__END__
+
+=head1 NAME
+
+forkprove - forking prove
+
+=head1 SYNOPSIS
+
+  forkprove -MMoose -MCatalyst -MDBIx::Class -j8 -lr t
+
+=head1 DESCRIPTION
+
+forkprove is a forking version of prove that allows you to preload
+modules with C<-M> and then run each test after forking, potentially
+makes most of the tests to run faster without an overhead of loading
+the same modules again and again, while having an isolated, clean
+testing environment with a fork.
+
+It works well with parallel testing as well, combined with C<-j> option.
+
+=head1 CONFIGURATION
+
+You can specify an environment variable C<PERL_FORKPROVE_IGNORE> to
+contain a regular expression to ignore files to test with forkprove.
+
+  PERL_FORKPROVE_IGNORE=no-preload forkprove -lr t
+
+This will run the tests whose filenames and directory match
+C<no-preload> with the standard perl execution via prove.
+
+=head1 CAVEATS
+
+Following kind of tests B<might> fail when tested under
+forkprove. There are workarounds in forkprove to detect/fix some of
+them, so don't be surprised if your tests still pass :)
+
+=over 4
+
+=item *
+
+Tests that rely on the value of C<$FindBin::Bin>.
+
+=item *
+
+Tests that relies on C<CHECK> and C<INIT> block to run correctly.
+
+=back
+
+See also L<http://search.cpan.org/~flora/Test-Aggregate-0.364/lib/Test/Aggregate.pm#CAVEATS>,
+many of which could apply to forkprove as well.
+
+=head1 WHY
+
+L<Test::Aggregate> allows you to create a nested TAP output by running
+a whole bunch of C<.t> files from a directory.
+
+forkprove shares the basic idea, but it creates a whole new test
+environment by making a copy of the process with fork for each test,
+which means it could run your tests that rely on the singleton state
+etc. without modifying the code to run with Test::Aggregate.
+
+=head1 TIPS
+
+=over 4
+
+=item *
+
+If you have a bunch of modules you want to load, put them in a file
+C<t/Preload.pm> and load it:
+
+  forkprove -Mt::Preload
+
+If you're lazy and just load all of C<.pm> files in lib and t: use
+L<lib::require::all>
+
+  forkprove -Mlib::require::all=lib,t
+
+=back
+
+=head1 PERFORMANCE
+
+Your mileage might vary, if forkprove runs your tests faster or
+not. For lightweight modules, we've found that using forkprove doesn't
+make any siginificant difference, due to the fact that fork overhead
+nullifies the benefit of preloading modules.
+
+On the other hand, test suite with Moose, Catalyst and Dist::Zilla
+seems to run 80-100% faster with forkprove and C<-jN> option.
+
+=head1 AUTHOR
+
+Tatsuhiko Miyagawa
+
+=head1 SEE ALSO
+
+L<prove>, L<TAP::Parser>
+
+=cut
+

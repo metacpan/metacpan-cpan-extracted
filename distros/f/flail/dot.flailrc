@@ -1,0 +1,266 @@
+# flail rc file -*- mode:cperl; indent-tabs-mode:nil; perl-indent-level:4 -*-
+#
+############################################################################
+###
+### Sample .flailrc
+###
+### Time-stamp: <2006-11-20 15:43:04 attila@stalphonsos.com>
+###
+### Unfortunately, this file is probably the best documentation to the
+### flail programmer's interface.  Anyone who wants to pitch in, please
+### feel free.  I use much of the code in here in my real .flailrc, and
+### I use flail to read all my mail.
+###
+### A lot of the functionality in this file should be moved into flail
+### proper eventually, especially the grep and spam stuff.  Since we have
+### all of perl at our disposal for writing one-liners that do things
+### to our mail, it's tempting to just keep accumulating little bits of
+### fluff...
+###
+### The most useful command for doing perl fu is map.  You can say
+###
+###         map all { snippet_of_perl_code... } [args]
+###
+### The code inside the braces gets mapped across every message in the
+### current folder, with the following local bindings:
+###
+###         $F  Mail::Folder object representing the folder
+###         $N  Message number of the current message
+###         $M  Mail::Internet object representing message $N in $F
+###         $H  Mail::Header object from $M (for convenience)
+###
+### If any arguments are specified after the terminating brace, they
+### appear in @_.  You can use any label instead of "all", i.e. "marked"
+### to map code across all marked messages.  You can also use the special
+### label "cur" to run the code over the current message, and any legal
+### range expression to run it over that range, i.e.
+###
+###         map 1,5,$-3:$ { ... }
+###
+### maps the code in braces over messages 1, 5, and the last three messages
+### in the folder.
+###
+### Hooks are functions that get run at specific times.  Right now, there
+### is only one such time: when mail is slurped off of the pop server.
+### Flail marks all newly gotten messages with the "new" label, and then
+### immediately runs any hooks for that label.  You add a hook with
+### flail_add_hook() (see the examples below).  The message gets run
+### in the same kind of context that map'ed code gets run in, i.e. with
+### the same bindings as above.  See the spam and mailing-list examples
+### below.  Flail automatically clears the "new" label after the hooks for
+### it have run.  There's no reason why you can't define hooks for arbitrary
+### labels.  You can invoke the hooks for a label with the run command,
+### i.e.
+###
+###         run filed
+###
+### You cannot currently DEFINE hook functions in the command-line interface
+### directly, but you can always use the comma operator, i.e.
+###
+###         ,sub my_hook { do_Something_with($M); }
+###         ,flail_add_hook("filed",\&my_hook)
+###         run filed
+###
+### There's not much point to this usually, though, because there's no
+### way to save what you just did into .flailrc right now [coming].
+###
+### One of the simplest things to do with ~/.flailrc is to set run-time
+### options.  The command-line optionology is rather obtuse, due to the
+### fact that I still use Getopt::Std instead of Getopt::Long or something
+### saner... oh, well, I'm a dinosaur, and I never really intended for
+### the command-line options to be used all that heavily.  For options that
+### you really care about, find the actual variable name that the option
+### sets and set it in your .flailrc instead, like I do for $Editor and
+### $Quiet, below.  The $SingleCommand option means that flail is being
+### invoked to run a single command and then quit, i.e.
+###
+###         $ flail -1 send my_pal
+###
+### This is useful if you want to use flail as your mailer from inside of
+### other programs instead of, say, /bin/mail [though the lack of a true
+### internal editor is a bit of a bother there].
+###
+############################################################################
+
+$| = 1;
+print "[flail configuration loading..." unless $SingleCommand;
+
+my $cfgdir = $ENV{'HOME'} . '/.flail';
+unshift(@INC,$cfgdir) if (-d $cfgdir);
+
+## these are defined in flail proper, but we sometimes need them here.
+## declare them so that perl -c ~/.flailrc won't bitch about them,.
+sub say;
+sub psychochomp;
+sub addresschomp;
+sub colored_;
+
+### global settings
+
+$Editor = 'vi';
+$Quiet = 1;
+$AskAddressBook = 0;
+$AutoAddressBook = 1;
+$TempDir = $ENV{'HOME'} . "/crypt/tmp"; # don't leak info outside of my cryptfs
+$SHOW_HEADERS{'x-mailer'} = 1;  # it's often interesting
+$AutoSyncIncoming = 0;
+$IMAPAutoExpunge = 1;
+$LeftJustifyList = 1;
+$CheckType = 'spool'; # if you use fetchmail, perhaps
+#$SpoolDir = '/var/spool/mail'; # default is /var/mail
+
+
+## Look in $PREFIX/share/examples/flail for these scripts
+
+require 'util.pl';
+require 'identities_config.pl';
+require 'identities.pl';
+require 'autofile_config.pl';
+require 'autofile.pl';
+
+use vars qw($MAX_SPAMFOLDER_SIZE);
+$MAX_SPAMFOLDER_SIZE = 1500000;
+
+## If you want to keep your passwords in a crypt and source them
+## at startup, make a file in whatever encrypted filesystem you
+## use that has some remember_password() calls, then source it
+## here:
+# require 'passwords.pl';
+
+## Hook functions
+
+#flail_add_hook("new", \&toss_spam);
+#flail_add_hook("new", \&filter_mailing_lists);
+
+## Commands
+
+sub cmd_reconf {
+  local $SingleCommand = 1;
+  do "conf" or die(qq{conf error: $@\n}); # use lib helped here
+}
+
+sub cmd_ssz {
+  print "Spam size: ".eval join('+',map { (stat($_))[7] } <spam*>);
+  print "\n";
+}
+
+sub number_of {
+    my($thing,$base) = @_;
+    $base ||= '[^\d]+';
+    my $n = $2 if $thing =~ m/^($base)(\d+)$/;
+    $n ||= 0;
+    return $n;
+}
+
+sub latest_spam_folder {
+    my($f) = sort { number_of($b) <=> number_of($a) } <spam[0-9]*>;
+    return 'spam1' unless $f;
+    my $z = (stat($f))[7];
+    if ($z >= $MAX_SPAMFOLDER_SIZE) {
+        my $n = 1+number_of($f);
+        $f = "spam$n";
+    }
+    return $f;
+}
+
+sub cmd_split_folder {
+    if (!defined($FOLDER)) {
+        print "No current folder.\n";
+        return;
+    }
+    my($fbase,$chunk) = @_;
+    if (!$fbase) {
+        print "Need at least one arg: base-name\n";
+        return;
+    }
+    $chunk ||= 200;
+    my @match = (
+        sort { number_of($b,$fbase) <=> number_of($a,$fbase) } <${fbase}[0-9]*>
+    );
+    my $n = @match? 1+number_of($match[0]): 0;
+    my $nf = $FOLDER->qty;
+    my $nchunks = POSIX::ceil($nf / $chunk);
+    my $c = 0;
+    my $i = 1;
+    while ($c < $nchunks) {
+        last if ($i >= $nf);
+        my $f = "${fbase}${n}";
+        my $j = $i+$chunk;
+        $j = $nf if ($j > $nf);
+        print "[mv $i:$j $f]\n" unless $Quiet;
+        flail_move("$i:$j",$f);
+        ++$n;
+        $i = 1+$j;
+        ++$c;
+    }
+    return undef;
+}
+
+sub cmd_invert_label {
+    if (!defined($FOLDER)) {
+        print "No current folder.\n";
+        return;
+    }
+    my($label) = @_;
+    $label ||= 'marked';
+    my @labeled = $FOLDER->select_label($label);
+    if (!@labeled) {
+        print "No messages marked \"$label\"\n";
+        return;
+    }
+    my %hash = map { $_ => 1 } (1 .. $FOLDER->qty);
+    delete $hash{$_} foreach @labeled;
+    $FOLDER->clear_label($label);
+    $FOLDER->add_label($_,$label) foreach sort { $a <=> $b } keys %hash;
+    my @new = $FOLDER->select_label($label);
+    print "Inverted \"$label\" ".scalar(@labeled)." => ".scalar(@new)." msgs\n";
+    return undef;
+}
+
+flail_defcmd1("be",\&cmd_be,"switch identities, or list available");
+{ local($Quiet) = (1); cmd_be("MyDefaultID"); }
+flail_defcmd1("reconf",\&cmd_reconf,"reload configuration file(s)");
+flail_defcmd1("ssz",\&cmd_ssz,"total up spam folders' sizes");
+flail_defcmd1("split",\&cmd_split_folder,"base chunk: split up a folder");
+flail_defcmd1("invert",\&cmd_invert_label,"label: invert label selection");
+
+## aliases
+
+flail_alias("verify","|gpg --verify");
+flail_alias("mm","|metamail -p"); # subtly wrong... also: metamail SUCKS
+flail_alias("mark_before","mark ,is_before(%m,\"%*\")");
+flail_alias("mark_after","mark ,is_after(%m,\"%*\")");
+flail_alias("mark_about","mark ,is_about(%m,\"%*\")");
+flail_alias("mark_from","mark ,is_from(%m,\"%*\")");
+flail_alias("mark_to","mark ,is_to(%m,\"%*\")");
+flail_alias("mark_spam", "mark ,is_spam(%m)");
+#flail_alias("toss_spam", "map all { toss_spam(); }");
+flail_alias("incoming","cd INCOMING");
+#flail_alias("spam", "map cur mv %m spam");
+flail_alias("slurp","map all { slurp1(%*); }");
+flail_alias("mgrep","map cur { grep_msg(%*); }");
+flail_alias("agrep","map all { grep_msg(%*); }");
+flail_alias("hgrep","map cur { grep_headers('_',%*); }");
+flail_alias("fgrep","map all { grep_headers('_',%*); }");
+flail_alias("mls","ls -marked");
+flail_alias("gls","ls -matched");
+flail_alias("mmv","mv -marked %*");
+flail_alias("mcp","cp -marked %*");
+flail_alias("autofile","map all { autofile(); }");
+flail_alias("automark","map all { automark(); }");
+flail_alias("load",",print do \"%*\""); # so you can say: load autofile.pl
+flail_alias("sls",'!ls -l spam*');
+flail_alias("ils",'!ls -l INCOMING');
+flail_alias("allspam",',flail_move(q|1:$|,latest_spam_folder)');
+flail_alias("mspam",',flail_move(q|-marked|,latest_spam_folder)');
+
+print " done]\n" unless $SingleCommand;
+
+42;
+
+# Local variables:
+# mode: perl
+# indent-tabs-mode: nil
+# tab-width: 4
+# perl-indent-level: 4
+# End:

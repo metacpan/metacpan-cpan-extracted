@@ -1,0 +1,7 @@
+Changes
+INSTALL
+MANIFEST
+Makefile.PL
+README
+lib/foundation.pm
+t/foundation.t

@@ -1,0 +1,41 @@
+#!/usr/bin/perl
+##
+#
+# latest_spam_folder - print name of latest spam fodler
+#
+# Time-stamp: <2007-03-04 13:19:11 snl@cluefactory.com>
+#
+# XXX should get $FolderDir from ~/.flailrc
+##
+my $FolderDir = $ENV{"HOME"}."/mail/folders";
+my $MAX_SPAMFOLDER_SIZE = 1500000;
+
+sub number_of {
+    my($thing,$base) = @_;
+    $base ||= '[^\d]+';
+    my $n = $2 if $thing =~ m/^($base)(\d+)$/;
+    $n ||= 0;
+    return $n;
+}
+
+sub latest_spam_folder {
+    my($f) = sort { number_of($b) <=> number_of($a) } <spam[0-9]*>;
+    return 'spam1' unless $f;
+    my $z = (stat($f))[7];
+    if ($z >= $MAX_SPAMFOLDER_SIZE) {
+        my $n = 1+number_of($f);
+        $f = "spam$n";
+    }
+    return $f;
+}
+
+MAIN: {
+    chdir($FolderDir) or die("$FolderDir: $!\n");
+    my $latest = latest_spam_folder();
+    if ($ARGV[0] =~ /^-s/) {
+	print "$latest\n";
+    } else {
+	print "$FolderDir/$latest\n";
+    }
+    exit(0);
+}

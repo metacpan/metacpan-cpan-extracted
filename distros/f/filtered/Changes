@@ -1,0 +1,33 @@
+Revision history for filtered
+
+v0.0.7    2012-11-13 23:57:09 Asia/Tokyo
+    * Handle correctly optional prereq Filter::tee.
+
+v0.0.6    2012-11-05 23:41:58 Asia/Tokyo
+    [Functional changes]
+        * Add debug feature.
+        * Replace package name even though it is in quoted strings, with PPI.
+        * Avoid conflict between original module and filtered module.
+    [Non-functional changes]
+        * Use DZP::Test::Kwalitee::Extra and DZP::MinimumPerl for Kwalitee.
+        * Use DZP::Twitter for release notification.
+
+v0.0.5    2012-10-31 12:41:12 Asia/Tokyo
+    [Functional changes]
+        * Use `can' instead of direct access to symbol table.
+    [Non-functional changes]
+        * Avoid false alarm by prereq_matches_use Kwalitee indicator.
+        * Use Pod::Weaver.
+
+v0.0.4    2012-10-18 02:47:28 Asia/Tokyo
+    * Add using PPI feature (use_ppi option).
+
+v0.0.3    2012-10-17 01:19:14 Asia/Tokyo
+    * Fix incorrect prereq name.
+    * Add `with' option.
+
+v0.0.2    2012-10-13 13:22:59 Asia/Tokyo
+    * Fix missing prereq to Test::Exception.
+
+v0.0.1    2012-10-13 01:02:26 Asia/Tokyo
+    * Initial release.

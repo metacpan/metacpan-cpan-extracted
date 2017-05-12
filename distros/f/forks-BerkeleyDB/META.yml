@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                forks-BerkeleyDB
+version:             0.06
+abstract:            High performance drop-in replacement for threads
+license:             ~
+author:              
+    - Eric Rybski (rybskej@yahoo.com)
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    BerkeleyDB:                    0.27
+    Devel::Required:               0.07
+    forks:                         0.29
+    Storable:                      0
+    Tie::Restore:                  0.11
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

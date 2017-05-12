@@ -1,0 +1,879 @@
+0.35 June 26 2014
+	***** Bug fixes *****
+	
+	Fix manager process blocking issue if a child thread dies while waiting on a signal. (RT#69578)
+	
+0.36 June 25 2014
+	***** Bug fixes *****
+	
+	Fix a usage bug with an each iterator in manager process. (RT#56263)
+        Improves compatibility with Perl 5.18 and later.
+	
+	Support prompt from ExtUtils::MakeMaker when available. (RT#82781)
+	
+	***** Threads API consistency changes *****
+	
+	Bumped threads $VERSION to 1.92, threads::shared $VERSION to 1.39. to match
+	version-supported features and behavior.
+	
+	***** Miscellaneous changes *****
+	
+	Support Makefile.PL env FORKS_SIMULATE_USEITHREADS=1 option to auto-install forks in
+	place of threads namespace for non-ithreaded Perl build. (RT#69880)
+	
+0.34 June 14 2010
+	***** Bug fixes *****
+	
+	Fix compatibility with perl 5.11 and later. (RT#56263)
+	(Possible bug in core each() iterator, when using blessed globrefs as hash keys?)
+	
+	Main thread will no longer be ABRT signalled (to exit) if it is already shutting down.
+	
+	Fix usleep behavior on platforms without nanosleep support. (RT#52782)
+	
+	Fix test skip counts in forks08.t. (RT#52781)
+	
+	***** Threads API consistency changes *****
+	
+	Bumped threads $VERSION to 1.77, threads::shared $VERSION to 1.33 to match
+	version-supported features and behavior.
+	
+	***** Miscellaneous changes *****
+	
+	Runtime 'require threads::shared' now correctly loads forks::shared in an ithreads-enabled
+	Perl, as long as 'forks' was loaded first.  Can default to the previous behavior with a
+	true-value environment variable, THREADS_NO_PRELOAD_SHARED. (RT#56139)
+	
+	Use SvGETMAGIC macro instead of mg_get.
+	
+	Add module dependency requirements test.
+	
+	Updated to ppport.h 3.19.
+	
+0.33 April 8 2009
+	***** Bug fixes *****
+	
+	exit() in child process after fork() in user code no longer causes process hang.
+	
+	Address issue with Devel::Symdump and internal typeglob reference changes in Perl 5.10.
+	
+	***** Miscellaneous changes *****
+	
+	Removed Devel::Required (used only for forks development) from Makefile.PL required
+	modules.
+	
+0.32	March 18 2009
+	***** Miscellaneous changes *****
+	
+	Minor change to forks08.t nanosleep usage when not available, to avoid srror.
+	
+	Made time tolerances consistent throughout forks08.t.
+	
+0.31	March 14 2009
+	***** Threads API consistency changes *****
+	
+	Module CLONE and CLONE_SKIP functions now are passed package name as first argument.
+
+	When CLONE_SKIP true in package, all objects in child threads are now cleared.  This
+	occurs after fork (unavoidable affect of system fork COW), which hopefully should
+	be portable with all non-perl modules.  Note that arrays and hashes will be emptied,
+	but not converted to undef scalar ref; this differs from ithreads (where all become
+	undef scalar ref).  Patches are welcome.
+	
+	Bumped threads $VERSION to 1.72, threads::shared $VERSION to 1.28 to match
+	version-supported features and behavior.
+	
+	***** Bug fixes *****
+	
+	Improve package detection for CLONE and CLONE_SKIP; now identifies all packages in
+	symbol table, not just packages identified by %INC.  This allows for support of
+	multiple modules in a file/module that may have CLONE or CLONE_SKIP functions.
+	
+	Improved Time::HiRes::nanosleep support detection.
+	
+	Corrected possible race condition with $thr->get_stack_size().  Documented
+	expected behavior.
+	
+	***** Miscellaneous changes *****
+	
+	Added preliminary Perl debugger support.  Defaults to tying TTY only to main thread,
+	unless breakpoints exist in user code.
+	
+	Add some time tolerance in forks08.t, to accomodate for busy systems or slow signal
+	handling.
+	
+	New CPAN module requirements: Devel::Symdump and Acme::Damn.
+	
+	Updated to ppport.h 3.16.
+
+0.30	February 16 2009
+	***** Bug fixes *****
+	
+	Don't overload/define Time::HiRes usleep or nanosleep unless they are supported
+	on target platform.
+	
+	Check for "Invalid value for shared scalar" errors when storing values in
+	shared scalars.
+	
+	Shared scalar values containing user tied objects will no longer be treated as
+	threads::shared objects when checking for circular references.
+	
+	***** Miscellaneous changes *****
+	
+	Overloaded sleep total sleep time is more accurate in cases where it might be
+	interrupted by child thread shutdown (CHLD) signals.
+	
+0.29	February 2 2009
+	***** Bug fixes *****
+	
+	Shared variables that reference shared variables now consistently report the
+	same thread-local reference memory address.
+	
+	Code refs can now be used as hash keys.
+	
+	Fix spurious warnings regarding mismatched Time::HiRes prototypes.
+	
+	Explicit mg_get in is_shared() to insure tied scalar fetched before ref check.
+	
+	***** Threads API consistency changes *****
+	
+	Can now store CODE refs in shared variables if using Storable >= 2.05.
+	
+	Can now use CODE refs as shared variable keys (stringified values work as
+	expected).
+	
+	Bumped threads::shared $VERSION to 1.27 to match version-supported features
+	and behavior.
+	
+	***** Miscellaneous changes *****
+	
+	Add Makefile build option to upgrade Storable to support using CODE refs in
+	shared variable keys, if using Storable 2.05 or later.
+	
+	Round test suite sleep time check sensitivity to eliminate false positives on
+	some (hardware) platforms.
+	
+	Using more portable prototype definitions with some versions of Test::HiRes.
+	
+	Scalar::Util 1.11 or later now required.
+	
+	Sys::SigAction 0.11 or later now required, as this correctly handles the
+	'safe' sigaction attribute.
+	
+	Fix typo in croak error text in cond_timedwait.
+	
+0.28	December 30 2008
+	***** Bug fixes *****
+	
+	join() and detach() now correctly propagate and throw exceptions to threads,
+	in such cases as joining or detaching an already joined or detached thread.
+	
+	Threads now supports circular self-referential shared variables
+	(i.e. my $x:shared; $x = \$x;) and consistently returns the correct REF value;
+	circular-referental sets of variables are also supported, if defined before
+	sharing with shared_clone()).
+	
+	forks::shared function is_shared() now understands REF type input and circular
+	referential shared variables.
+	
+	is_shared() should now return a consistent address in all threads and for
+	all variable types; however, note since it refences memory in the shared
+	process, do NOT use the return value to perform direct memory access (not that
+	it was intended for this purpose, anyway).
+	
+	Using single-declaration form of 'use constant' for Perl 5.6.x compatibility.
+	
+	Explicitly registering 'threads' warnings pragma, for Perl 5.6.x compatibility.
+	
+	Added more XS prototype compatibility with 5.6.x, allowing second forms of
+	cond_wait and cond_timedwait to be better supported.
+	
+	Added second forms of cond_wait and cond_timedwait to Perl < 5.8 source filters
+	(eliminates segfaults).
+	
+	Identified and implemented additional internal state conditions when error
+	'Cannot detach a joined thread' should occur.
+	
+	threads->list(threads::all) no longer returns threads that already have a
+	thread blocking to join them.
+	
+	Corrected a few uses of hash and array iterators that modify structure in loop
+	(using each() for hashes, separate array copy).
+	
+	***** Threads API consistency changes *****
+	
+	forks::shared now implements standard threads::shared function shared_clone().
+	
+	Scalars that have a value and are shared afterwards will retain the shared
+	value when running in native threads emulation mode.
+	
+	Restartable system calls (platform-dependent) and sleep (including Time::HiRes
+	sleep, usleep, and nanosleep) should no longer be interrupted by CHLD signal,
+	unless CHLD signal handler is defined in user code.  This should more accurately
+	represent process behavior with slow system calls, as would be expected with
+	native ithreads.
+
+	Bumped threads $VERSION to 1.71 and threads::shared $VERSION to 1.26 to match
+	version-supported features and behavior.
+	
+	forks::shared share() now correctly checks the function prototype when disabled
+	(e.g. when forks::shared is loaded without or before forks).
+
+	CLONE method/function is now supported in main:: package (was ignored).
+	
+	CLONE_SKIP method/function is now supported.
+	Usage details at: http://perldoc.perl.org/perl593delta.html#'CLONE_SKIP()'
+	
+	threads->object(0) now returns undef (main thread is not considered an object).
+	
+	Support for 'array' context type (alias for already supported 'list' type) when
+	creating a new thread.
+	
+	Thread attempting to join self (while non-detached) returns an error.
+	
+	Now correctly storing/returning stack size settings, although not internally used
+	for anything useful at this time.
+	
+	Core function rand() is now reseeded in each new thread (via srand()).
+	
+	***** Miscellaneous changes *****
+	
+	Added THREADS_NATIVE_EMULATION environment variable to allow users to have forks
+	behave more like native ithreads ("buggy" behaviors and all).
+	
+	Removed source filter requirement for Perl 5.9+.  (Now using internal PL_sharehook
+	instead of Attribute::Handlers whenver possible, including with Perl 5.8.x.)
+	
+	Removed use of AUTOLOAD in forks::shared; may see a minor shared variable access
+	performance improvement.
+	
+	Added signal blocking when doing fork() system call, to insure most reliable
+	thread startup behavior (i.e. custom CHLD signal handler won't create instability).
+		
+	Made minor changes to the test suite to improve descriptions and suppress a few
+	unnecessary warnings.
+	
+	Added internal patching mechanism to allow Test::More to work with Perl
+	5.8.1 and older (primarily for test suite backward compatibility).
+	
+	Silenced spurious Test::More "WOAH! ..." warnings in test suite, regarding Test::More
+	being unaware of global test counting when mixing forks and threads.
+
+	Added extra parameter error checking to XS code.
+	
+	Modified internal data manipulation for broadcast() to protect against occasional
+	memory corruption with Perl 5.6.x (delete() on array appeared to cause rare segfaults).
+	
+	Added 'if' CPAN module to package requirements, for Perl 5.6 support (test suite).
+	
+	Updated to ppport.h 3.14.
+
+0.27	January 27 2008
+	***** Bug fixes *****
+	
+	forks::shared now supports perl 5.9.0 and later (with a source filter).  The
+	requirement for a source filter is hopefully just a temporary solution until
+	Attribute::Handlers can access the 'shared' attribute again (which perl 5.9
+	and later currently prevent, perhaps because they consider it a reserved word).
+	
+	Corrected perl 5.6 support, regarding incompatible XS function Perl prototypes
+	(broken since 0.16).
+	
+	All internal %INC manipulation is now done at compilation (require) time.  This
+	corrects cases where modules that 'use threads::shared' before forks::shared has
+	been loaded actually load ithreads-native threads::shared.
+
+	Corrected bug regarding handling forks-server operation deferred signals (which
+	was preventing them from being executed when they should be executed).
+	
+	***** Miscellaneous changes *****
+	
+	Forks now uses Perl core module Attribute::Handlers for 'shared' variable
+	attribute handling.  This also insures compatibility with any other modules
+	that may use Attribute::Handlers.
+	
+	Removed BUS, FPE, ILL, SEGV, and SYS from list of "forks-aware" signal handlers
+	for better cross-platform portability.
+	
+	Added POD strongly encouraging use of forks and forks::shared as FIRST modules.
+
+	Now tracking last known CORE::GLOBAL::exit at require time, and resetting at
+	END.  This should insure that cases where forks wasn't first module to be loaded
+	allows for other modules to still use their own custom exit methods.
+	
+	Moved 5.6.x source filter from forks.pm to forks::shared.pm, where it belongs.
+	
+	Added appropriate disabled functions (without prototypes) for perl 5.6.x when
+	forks::shared is disabled if was loaded without loading forks first).
+
+0.26	September 30 2007
+	***** Bug fixes *****
+	
+	Eliminated some warnings on platforms that do not implement all signals forks
+	can monitor.
+	
+	Added boolean hook $forks::DEFER_INIT_BEGIN_REQUIRE to allow external
+	modules to override forks server functions if forks loaded in a BEGIN block.
+	
+	***** Miscellaneous changes *****
+
+	Added some logic in CHLD reapers for better cross-platform stability.
+	
+	Updated to ppport.h 3.12.
+
+0.25	August 12 2007
+	***** Bug fixes *****
+	
+	Updated internal PID tracking to U32 size for increased portability across
+	different kernels and kernel configurations.  This corrects irregular issues
+	with locks on such systems.
+	
+	Rewrote signal handling engine to be more portable and stable.  Changes
+	eliminated behavior on BSD kernels that would cause processes to improperly
+	exit with an ABRT-triggered core dump.
+
+	***** Miscellaneous changes *****
+	
+	Added some protections in test suite for non-mixed fork/thread safe
+	Test::More module.
+	
+	Added tests for new signal handling engine.
+
+0.24	July 9 2007
+	***** Threads API consistency changes *****
+
+	Changed $thr->wantarray return value to 0-length string (was string '0') to
+	meet standard wantarray scalar context return value.
+	
+	Added support for exit() and threads->exit() methodology and behavior.
+	
+	Added support for $thr->error() feature.
+	
+	Added a warning (and disallowing thread detach) if attempting to detach a
+	thread that another thread is currently waiting to join.
+	
+	***** Internal behavior changes *****
+	
+	Added ability to swap primary process (main<->shared) that is parent of all
+	processes in threaded application (via $ENV{THREADS_DAEMON_MODEL});
+	should help support co-existance with some fork-aware modules, like POE.
+	
+	Rewrote signal handling methodology to resolve stability issues with
+	inter-thread and external process signaling.
+	
+	Addressed the limit of 65535 shared variables: you may now create up to
+	2^31-1 (2+ billion) shared variables.  Note: shared variables are currently
+	not memory deallocated even if they go out of scope in all threads; thus,
+	it's NOT recommended to create too many (1k+) unless you have a requirement
+	to do so.  Shared var mem deallocation (when no longer referenced by any
+	thread) will be addressed in a future release.
+	
+	Improved behavior of signal() and scope-exit unlock ordinal to insure that
+	all threads, no matter what type of waiting they were performing, have an
+	equal chance to receive the signal or re-acquire the lock.  The old behavior
+	gave preference towards regular waiting events for signal, and timedwaiting
+	events waiting to reacquire the lock for unlock ordinal.
+	
+	Deprecated and removed deadlock detection 'resolve_signal' feature (as this
+	could not be supported in new forks.pm signal handling logic).
+	
+	***** Bug fixes *****
+	
+	Shared variable in push() on shared array now works.
+	
+	Eliminated slow memory leak when creating many joinable threads: the shared
+	process now reclaims all shared memory allocated for joinable threads, as
+	long as the application (periodically) joins then after they complete.
+
+	Eliminated "Performing cleanup for dead thread 0" errors when compiling
+	a script (i.e. perl -c script.pl).  This fix also eliminates double
+	"syntax OK" reports when compiling a script.
+	
+	Fixed a case where detach after thread had already completed could result
+	in incorrect thread group exit state reporting.
+	
+	Corrected a bug regarding recursive variable unlocking (was deleting
+	instead of decrementing lock count).
+	
+	Fixed a few issues in test scripts regarding mis-reported errors related to
+	older threads.pm installs or non-threaded Perl targets.
+	
+	Forks now starts correctly if called with 'require' or if forks::import
+	is skipped for any reason.
+	
+	Added additional check in server to shutdown if main thread dies in a hard
+	way (no notification to server or thread group).
+
+	Added some extra protection in thread signaling (to insure that process
+	exists before signaling it).
+	
+	Added some protection in test suite for issues with race-conditions in
+	Test::More.
+	
+	Fixed race condition in forks07.t that could cause test to report an error.
+	
+	Fixed race issue in forks04.t that could cause script to error out on
+	Perl instances with old native threads.pm libraries or no threads.pm
+	library.
+	
+
+	***** Miscellaneous changes *****
+	
+	Added additional thread environment protection regarding fork occuring
+	outside forks.pm module.  Also silenced a few warnings that might have
+	occured in such cases.
+	
+	Silenced a few more unnecessary run-time warnings in specific exception
+	and error cases.
+	
+	Rewrote END behavior for more stability and better cleanup during thread
+	(process) group exit.
+	
+	Added internal hooks to allow external modules to override default forks.pm
+	fork logic.  This should allow more flexibility to integrate forks with
+	application-scope modifying environments (i.e. mod_perl, POE, Coro, etc.).
+	
+	Removed dependency on Reaper module.
+	
+	Updated version requirement for Scalar::Util module.
+	
+	Upgraded to ppport.h 3.11.
+	
+	Fixed some XS portability issues with older versions of Perl (5.8.1 and older).
+
+0.23	8 April 2007
+	***** Test suite fixes *****
+	
+	Corrected issue in forks04.t that would cause irrelevant but terminal
+	compilation errors if real threads.pm (1.34 or later) weren't present.
+	
+	***** Miscellaneous changes *****
+	
+	Silenced a warning during external fork (non-thread) process exit. 
+	
+	Added some internal hooks to allow add-on modules (e.g. forks::BerkeleyDB)
+	the opportunity to clean up global thread resources during shutdown.
+	
+0.22	19 March 2007
+	***** Internal behavior changes *****
+
+	Thread manager process now forcefully kills any still active threads
+	when it exits.  This is intended to best simulate standard thread.pm
+	thread cleanup during process exit.
+
+	***** Bug fixes *****
+
+	Corrected bug in shared server shutdown preventing complete cleanup.
+	
+	Corrected some platform and perl build sensitivities in the test suite.
+
+	***** Miscellaneous changes *****
+
+	Added additional stability against fork() outside of forks.pm.
+	
+	Tweaked some warnings and disabled some debug logging.
+	
+0.21	17 March 2007
+	This revision includes *many* core changes and improvements, so be sure
+	to perform full testing with existing forks-enabled applications before
+	upgrading.
+	
+	All changes have been exposed to extensive regression testing, so you may
+	expect all new features to be reasonably stable unless otherwise noted
+	with a *WARNING* tag.
+
+
+	***** New features *****
+	
+	Enabled complete thread context support.  Be sure to specify the context,
+	either implicit or directly.  This also means you may not get what you
+	expect if you return values in a context that doesn't match your spec.
+	
+	Add optional, automatic deadlock detection (warnings) in threads::shared.
+	Also added is_deadlocked() method (manual deadlock detection) for threads.
+	
+	Added set_deadlock_option class method to forks::shared (threads::shared).
+
+	Aware of thread params at thread creation, e.g. threads->new({}, sub {});
+	
+	Added complete support for $thr->wantarray and thread->wantarray.
+	
+	Added complete support for thread state: is_running, is_joinable,
+	is_detached().
+	
+	Added additional support to threads->list(), with package variables:
+	threads::all, threads::running, and threads::joinable.
+	
+	Added support for 'use forks qw(stringify)'where the TID is returned
+	for a threads object in string context.
+	
+	Added detailed last known state of all threads on main thread exit (or
+	server process unexpected exit), like:
+		Perl exited with active threads:
+				x running and unjoined
+				y finished and unjoined
+				z running and detached
+
+	Added stubs for get_stack_size and set_stack_size, although they don't
+	do anything (yet).
+	
+	Added support for threads->_handle and $thr->_handle, although it
+	currently does not guarantee a reference to the same memory address
+	each time (will be addressed in a later release).
+	
+	Added support for inter-thread signaling using $thr->kill('SIG...').
+	*WARNING* This feature is still highly experimental and has known
+	issues when sending a signal to a process sending or receiving socket
+	data pertaining to a threads operation.  This will be addressed in
+	a future release.
+	
+	Added question during build process to allow forks to override threads
+	namespace if target Perl does not have native threading built in.
+	Added POD describing this feature and behavior implications.
+	
+	
+	***** Bug fixes *****
+
+	Corrected bug in threads::shared::scalar that prevented tieing without
+	a pre-existing scalar reference.
+	
+	Localizing $? in END block to insure that main thread exit code isn't
+	accidentally overwritten during shutdown.
+	
+	Corrected several cases where internal auto-vivification was not intended,
+	but might cause internal variable state issues.
+	
+	Corrected bug where fork() followed by ->isthread() in a child process
+	while parent process (a thread) was already waiting on a separate thread
+	could cause internal synchronization issues.
+	
+	Corrected bug in ->list where scalar context would return last object,
+	not the number of waiting threads.
+
+	Added additional protection in END block against external fork() occuring
+	outside our knowledge causing synchronization havoc with the thread process
+	group.
+
+	Removed delete from %DETACHED on thread exit, as this property is used for
+	internal thread type and state checking.
+	
+	Updated some error handling to suppress some undefined variable warnings.
+
+
+	***** Internal behavior improvements *****
+
+	Added silent overload of Config.pm 'useithreads' property to insure all
+	modules and scripts see a true value when forks is loaded.
+	
+	Added explicit signal trapping of all untrapped normal and error signals
+	for consistent and safe thread exit behavior.
+
+	Added defensive error handling around non-blocking server sockets to
+	protect against interruptions or busy resources during read or write.
+	This should also make UNIX socket support more stable on certain target
+	architectures.
+	
+	Added defensive logic to cleanup internal resources for threads that
+	appear to have exited in an unsafe manner (and that may have left
+	forks::shared resources in a unclean state) or were terminated with SIGKILL.
+	
+	Rewrote _length(), _send(), and _receive() internal functions to protect
+	against signal interruptions, busy resources, socket disconnections, full
+	socket buffers, and miscellaneous socket errors, including adding retry
+	logic where appropriate.
+	
+	Updated _join() server function with much more intelligent logic regarding
+	the state of a thread during the join process and a few more error cases
+	that it needed to check for.
+
+	threads->yield() now does a 1 ms sleep.
+	
+	
+	***** Threads API consistency changes *****
+
+	Can now signal unlocked variable using cond_signal and cond_broadcast.
+	Note: Signaling locked returns 1; signaling unlocked returns undef.
+	
+	Modified lock, cond_signal, and cond_broadcast to return undef (instead
+	of 1) to be consistent with threads.pm.
+	
+	Overloaded != for thread objects.
+	
+	A failed thread spawn (fork) now prints a warning and returns undef
+	instead of dieing out.
+	
+	Detach twice on the same thread now throws an error.
+	
+	Improved format and content of internal warnings, and warnings now
+	respect warnings state in caller for category 'threads'.
+	
+	Bumped threads $VERSION to 1.26, threads::shared to 1.04 to match
+	version-supported features and behavior.
+	
+	
+	*** Miscellaneous changes ***
+	
+	Implemented initial framework for better message handling.  This should
+	help reduce overall CPU usage, and hopefully improve performance, using
+	custom filter definition for request and response messages that do not
+	require Storable freeze/thaw.  Requests that currently implement this 
+	are: _lock and _unlock.  Responses that currently implement this are:
+	any generic boolean response.
+	
+	Made Time::HiRes a prerequisite now.  This means that fractional
+	cond_timedwait is now supported by default.
+	
+	Optimized sigset masking: now only one set is created at compile time
+	and reused during execution.
+	
+	Now safely runs in taint mode when any potentially tainted environment
+	vars are defined.
+	
+	Suppressing unnecessary warnings in the case that 'test' does not exist
+	in /bin or /usr/bin.
+	
+	Silenced thread socket errors during thread shutdown process, unless
+	debugging is enabled.
+	
+	Added basic blocking join poll checks, to help prevent against forever
+	blocking join() cases in abnormal thread death circumstances.
+	
+	Thread shutdown now expects a response (to insure synchronized shutdown
+	agreement with server process).
+	
+	General improvements in thread shutdown stability (primarily server-side).
+	
+0.20	5 October 2006
+	Fixed rare thread start race condition where parent thread would block
+	indefinitely if child thread were to spawn, complete, and exit before
+	the parent could obtain the TID associated with the child thread.
+
+	Corrected a few cases in server timedwait handling, cond_broadcast,
+	and cond_signal where a lock could be prematurely transferred to
+	another thread if the main thread (tid 0) were holding the lock at
+	the time the event expired.
+	
+	Modified cond_timedwait to support fractional seconds (if Time::HiRes
+	is loaded before forks).
+	
+	Minor changes to forks.xs for backwards compatibility with gcc 2.96.
+	
+	Minor cleanup in (forks.xs) bless reference handling.
+	
+	When using INET sockets, peer address is validated against the loopback
+	address (IPv4 127.0.0.1) before accepting the connection; otherwise,
+	socket is immediately closed and a warning is emitted.
+	
+	Added THREADS_IP_MASK env param to allow override of default IP mask
+	filter.
+	
+	Misc cleanup of internal server environment variable handling.
+	
+	Moved some server code into separate subroutines.
+	
+0.19	21 May 2006
+	Implemented an exported bless() function allow transparent bless()
+	across threads with forks::shared.
+	
+	Implemented exported is_shared function in forks::shared.
+	
+	Implemented custom CHLD signal handler to cleanup zombie process.
+	This change was introduced to resolve an issue on some platforms
+	where using $SIG{CHLD}='IGNORE' resulted in the perl core system()
+	function returning -1 instead of the exit code of the system call.
+	This signal handler is only used if the target system's system() 
+	call returns -1 on success when $SIG{CHLD}='IGNORE'.
+	
+	Added THREADS_SIGCHLD_IGNORE to allow users to force forks to use
+	$SIG{CHLD}='IGNORE' on systems where a custom CHLD signal handler
+	is automatically installed to support correct exit code of perl
+	core system() function.
+	
+	Added THREADS_NICE env param to allow user to adjust forks.pm server
+	process POSIX::nice value when running as root.  If unset, no change
+	is made to the server process priority.  This differs from the 
+	historical behavior of forks.pm defaulting to nice -19 when run as 
+	root.
+	
+	Patched XS code to be ANSI C86 compliant (again). Code was unintentionally
+	changed to require a minimum of ANSI C89 compliance since 0.17.  This
+	should allow all gcc 2.95.x and other C86-compliant compilers to once
+	again build forks.pm.
+
+	Fixed prototype mismatch warning when disabling cond_wait when forks
+	is not used before forks::shared.
+
+	Added patch to quietly ignore sharing an already shared variable.
+	forks::shared used to bombs out in such cases (e.g. $a:shared; share($a);).
+	
+	Updated to ppport.h 3.06.
+	
+	Implemented separate package versions for forks and threads.  threads
+	package version will represent the most recent threads.pm release that
+	this module is functionally compatible with.
+	
+	Disabled call to server process on shared variable DESTROY calls to
+	decrease server communication load, as none of the affected TIE classes
+	implement custom DESTROY methods.
+
+0.18	7 December 2005
+	Introduction of UNIX socket support.  Socket descriptors are written
+	to /var/tmp and given rw access by all by default for best support
+	on multi-user systems.
+
+	Importing SOMAXCONN and using for socket server listener max socket
+	connections (was hard coded at 10) for best (and system-level flexible)
+	thread spawn stability under high load.
+
+0.17	14 May 2005 (unreleased)
+	Added method cond_timedwait and added second forms of cond_wait and
+	cond_timedwait per the ithread specification (where signal var 
+	differs from lock var). All elements of perl ithread interface are
+	now implemented, with respect to perl 5.8.7.
+	
+	Added eval wrapper around new thread code execution to trap die
+	events; thus, join() is now more robust (fewer chances for runtime
+	hangs on '$thread->join' due to premature child thread termination).
+	
+	Fixed bug in _islocked in case where if main thread tried to unlock
+	an already unlocked variable, it would not correctly enter if case
+	and return undef or croak() due to undef value in @LOCKED resolving
+	to numeric 0.
+
+0.16	8 April 2004
+	Changed semantics of debugging function: must now specify environment
+	variable THREADS_DEBUG to be able to enable and disable debugging.
+	If the environment variable does not exist at compile time, then all
+	of the debugging code is optimised away.  So performance in production
+	environments should be better than before.
+
+	29 March 2004
+	Goto &sub considered evil with regards to performance and memory
+	leaking.  Therefore removed goto's where appropriate.
+
+0.15	14 January 2004
+	Just got too much mail from people attempting to use forks.pm on
+	Windows.  Decided to add check for Win32 to Makefile.PL to have it
+	die when attempting to run on Windows.  Added documentation to
+	explain this.
+
+0.14	7 January 2004
+	Removed dependency on load.pm: it really doesn't make sense in a
+	forked environment: I don't know what I was thinking in that respect.
+
+	Added dependency on IO::Socket 1.18: we do need auto-flushing sockets
+	(which seems to be pretty standard nowadays, but just to make sure).
+
+	Fixed problem with large values / structures being passed with some
+	help from Jan-Pieter Cornet at the Amsterdam PM Meeting.  Spotted by
+	Paul Golds.  Added test for it.
+
+0.13	4 January 2004
+	Looked at fixing the problem with signalling unlocked variables.
+	Unfortunately, there does not seem to be a quick solution.  Need to
+	abandon this idea right now until I have more time.  Updated
+	documentation to let the world know there is an inconsistency.
+
+	Documented the THREADS_DEBUG environment variable and made sure it is
+	unset during testing.
+
+	Updated ppport.h to 2.009.  Didn't expect any problems with 5.8.1,
+	but you never know.
+
+0.12	2 January 2004
+	Fixed problem with signalling thread 0.  Spotted by Stephen Adkins.
+
+0.11    28 December 2003
+        Added automatic required modules update using Devel::Required.
+
+	Added requirement for Devel::Required, so that optional modules
+	are listed as required on the appropriate systems.
+
+0.10	11 November 2003
+	Added check for processes dieing at the length check of a message.
+	Not 100% sure whether this will be the best way to handle the main
+	thread dieing, e.g. when it exits before all threads have been
+	joined.
+
+0.09	24 October 2003
+	Apparently, Test::Harness cannot handle testing "threaded" scripts
+	using an unthreaded Perl.  Added test for threadedness of the Perl
+	being used: if so, skips testing Thread::Queue.  Spotted by several
+	CPAN testers.
+
+0.08	24 October 2003
+	Shared entities that were also blessed as an object, were not
+	correctly handled (ref() versus Scalar::Util::reftype() ).  Spotted
+	by Jack Steadman.  Now fixed by using reftype() rather than ref().
+
+	Dependency on Scalar::Util added (not sure when that became core).
+	Added tests to excercise Thread::Queue (if available).
+
+	10 October 2003
+	Changed async() to make it a little faster by removing an extra call
+	from the stack.
+
+0.07	27 September 2003
+	Added error detection in case lock or cond_xxx were called on unshared
+	variables or cond_xxx were called on an unlocked variable.  Added tests
+	for it in the test-suite.
+
+	Added dummy package declaration to forks::shared.pm for CPAN's sake.
+	Cleaned up the attribute handler code in forks::shared.pm a bit.
+
+0.06	27 September 2003
+	Finally grokked the documentation about attributes.  This allowed me
+	to finally write the handler for the ":shared" attribute.  Which in
+	the end turned out to be surprisingly simple.
+
+	Adapted the test-suite to test usage of the ":shared" attribute as
+	opposed to sharing variables with the "share" subroutine.
+
+0.05	26 September 2003
+	Increased dependency on load.pm to 0.11: versions of load.pm before
+	that had issues with running under taint.
+
+	Debug statements can now be activated by setting the environment
+	variable THREADS_DEBUG to true.  As this is still experimental, this
+	feature is only described in the CHANGELOG for now.
+
+	Fixed several issues when running under taint.  Test-suite now runs
+	in tainted mode just to be on the safe side.
+
+	Removed some debug statements from the test-suite.
+
+0.04	10 August 2003
+	Implemented .xs file munging and source-filter to be able to truly
+	support forks.pm under Perl 5.6.x.  Thanks to Juerd Waalboer for the
+	idea of the source filter.
+
+	It is now confirmed that forks.pm won't work under 5.005, so the
+	minimum version of Perl is now set to 5.6.0 in the Makefile.PL.
+	
+	7 August 2003
+	Tested under 5.8.1-RC4.  The WHOA! messags seem to have disappeared
+	but instead a warning has appeared that cannot be suppressed.  This
+	was caused by my attempt to activate the :shared attribute.  Since
+	that doesn't work anyway, I removed the offending code and the
+	warning went away.
+
+	Fixed some warnings in the test-suite.
+
+	Fixed another warning in forks.pm.  Reported by Bradley W. Langhorst.
+
+0.03	2 April 2003
+	Fixed a warning in forks.pm.  Reported by Bradley W. Langhorst.
+
+0.02	17 January 2003
+	Added dummy -package forks- to forks.pm to fool CPAN into thinking
+	it really is the forks.pm module, when in fact it is of course
+	threads.pm.
+
+	Fixed some warnings in t/forks01.t.
+
+	28 October 2002
+	Made sure length packing uses Network order.
+
+0.01	27 October 2002
+	First public version of forks.pm.  Thanks to Lars Fenneberg for all
+	the help so far.

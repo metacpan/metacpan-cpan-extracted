@@ -1,0 +1,45 @@
+README for forks
+
+Version:
+ 0.36
+
+The forks.pm module is a drop-in replacement for threads.pm.  It has the
+same syntax as the threads.pm module (it even takes over its namespace) but
+has some significant differences:
+
+- you do _not_ need a special (threaded) version of Perl
+- it is _much_ more economic with memory usage on OS's that support COW
+- it is more efficient in the startup of threads
+- it is slightly less efficient in the stopping of threads
+- it is less efficient in inter-thread communication
+
+If for nothing else, it allows you to use the Perl threading model in
+non-threaded Perl builds and in older versions of Perl (5.6.0 and
+higher are supported).
+
+Copyright (c)
+ 2005-2008 Eric Rybski <rybskej@yahoo.com>,
+ 2002-2004 Elizabeth Mattijsen <liz@dijkmat.nl>.
+All rights reserved.  This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+Required Modules:
+ Acme::Damn (any)
+ Attribute::Handlers (any)
+ Devel::Symdump (any)
+ File::Spec (any)
+ if (any)
+ IO::Socket (1.18)
+ List::MoreUtils (0.15)
+ Scalar::Util (1.11)
+ Storable (any)
+ Sys::SigAction (0.11)
+ Test::More (any)
+ Time::HiRes (any)
+
+The build is standard:
+
+perl Makefile.PL
+make
+make test
+make install

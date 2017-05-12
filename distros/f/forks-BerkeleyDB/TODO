@@ -1,0 +1,61 @@
+Implement thread joined data using BerkeleyDB.
+
+Determine what additional functions should be migrated to BerkeleyDB backend vs. those that
+should remain as part of the forks package.
+
+Add a high security mode, where all BerkeleyDB data is encrypted using either
+native encryption (preferred, if available) or an external cryptography module
+of the user's choice (i.e. Crypt::* interface module, or something that
+supports a standard interface given an object instance).
+
+Consider porting all shared variable tied class support into package classes,
+instead of depending on BerkeleyDB module parent classes for some methods, to
+insure method behavior consistency no matter which BerkeleyDB.pm version is installed.
+
+Consider merging shared scalars into one or more BDB recno tables, to minimize
+use of environment locks and database files (at the cost of write cursor performance,
+if multiple threads attempting to write to different SVs in same physical table).
+
+Consider rewriting all SV actions to use write cursor (unless complete action is already
+atomic in BDB API) to insure perltie actions are atomic in nature.  Intention is to allow
+use of SV without always requiring a lock (for apps that require highest possible
+concurrency).
+
+Consider implementing "atomic" shared variable classes, which allow all non-iterative
+operations to be atomic without locks.  This would require overload of all math and
+string operators.  Hopefully this will be enabled with an attribute, such
+as 'sharedatomic'.  I don't believe this can be achieved with perltie, so only non-blessed
+primitives would be allowed for scalars.
+
+May need to enable DB_ENV->failchk when shared var process detects that a thread
+has unexpectedly exited.  If return value is DB_RUNRECOVERY, then we likely need
+to terminate the entire application (as the shared bdb environment is no longer
+guaranteed to be stable.
+
+Consider using bdb txn subsystem environment for locking and signaling. Theoretically,
+this should require: 1 recno for locks (idx=sid, value=tid holding lock), 1 recno for waiting
+(idx=sid, value=[list if tid waiting]), and N queue for signaling (1 per thread; thread block 
+on own queue to wimulate waiting; push from other source acts as signal).  Txn would be
+used on locks and waiting recno databases (locking individual elements with cursors). Deadlock
+detection could be enabled using BDB deadlock detection engine.  Would need hooks into deadlock
+detection forks.pm interface.
+
+Issues:
+	1 Rare "Can't create bdb /tmp/perlforks/55/5508/bdb/10.bdb: ; Unknown locker ID".
+	2 (Unknown lockup at forks02.t after "ok 4 - check object type isa threads::shared").
+		a Can lead to 0% cpu...forever stuck
+			- This case occured when BDB env was left for global destruction at END
+			- Appears to have been resolved in each thread by doing a scalar(keys %hash),
+			which may indicate that DB does a mpool sync?
+		b Seen a case of 100% cpu; appears to have been main thread that was stuck
+			- This case occured when BDB env was explicitly closed at END
+	3 Corrupted array data on join('',@array) after multi-thread push; however, issue
+	"disappears" when we add a scalar(@array) in each thread before threads exit.  Perhaps
+	this action forces a DB checkpoint (i.e. sync/close)?
+		- This issue first arose when DB env close was not explicitly closed immediately before
+		fork.  Closing DB env before fork appears to have fixed BDD 4.4+ reliability.
+
+General stability:
+	- 4.3: quite stable, rare cases of above issues on certain platforms (cygwin, ?)
+	- 4.4: quite stable, rare case of above issue (1) (cygwin, ?)
+	- 4.5: 

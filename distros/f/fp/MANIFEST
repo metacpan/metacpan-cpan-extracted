@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/fp.pm
+lib/fp/functionals.pm
+t/10_fp_test.t
+t/20_fp_functionals_test.t
+t/pod.t
+t/pod_coverage.t

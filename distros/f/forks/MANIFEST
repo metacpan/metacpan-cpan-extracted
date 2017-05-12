@@ -1,0 +1,36 @@
+Changes
+CREDITS
+forks.xs
+lib/forks.pm
+lib/forks/Devel/Symdump.pm
+lib/forks/shared.pm
+lib/forks/shared/attributes.pm
+lib/forks/shared/global_filter.pm
+lib/forks/signals.pm
+lib/threads/shared/array.pm
+lib/threads/shared/handle.pm
+lib/threads/shared/hash.pm
+lib/threads/shared/scalar.pm
+Makefile.PL
+MANIFEST
+MANIFEST.skip
+META.yml			Module meta-data (added by MakeMaker)
+ppport.h
+README
+SIGNATURE
+t/forks00-requirements.t
+t/forks00-sigtrap.t
+t/forks01.t
+t/forks02.t
+t/forks03.t
+t/forks04.t
+t/forks05.t
+t/forks06.t
+t/forks07.t
+t/forks08.t
+t/forks09.t
+t/forks10.t
+t/forks20.t
+t/forks99.t
+TODO
+META.json                                Module JSON meta-data (added by MakeMaker)

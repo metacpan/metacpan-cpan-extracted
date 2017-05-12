@@ -1,0 +1,507 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+use Getopt::Std;
+use vars qw/ $opt_c $opt_t $opt_d $opt_h $opt_v $opt_x /;
+use Config::Tiny;
+use File::Spec;
+
+use FTN::Database qw(&create_ftn_database &drop_ftn_database &open_ftn_database &close_ftn_database &create_ftn_index &drop_ftn_index);
+use FTNDB::Nodelist qw(&create_nodelist_table &drop_nodelist_table);
+use FTN::Log qw(&logging);
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+=head1 NAME
+
+ftndb-admin - Administration of an SQL database for Fidonet/FTN processing.
+
+=head1 VERSION
+
+Version 0.37
+
+=cut
+
+our $VERSION = '0.37';
+
+=head1 DESCRIPTION
+
+Administration of a database for Fidonet/FTN related processing. The SQL
+database engine is one for which a DBD module exists, defaulting to SQLite.
+
+=head1 SYNOPSIS
+
+C<ftndb-admin -c config_file [options] [-d databasename] create|drop database>
+
+C<ftndb-admin -c config_file [options] [-t tablename] create|drop table>
+
+C<ftndb-admin [-h | --help]>
+
+C<ftndb-admin --version>
+
+=cut
+
+my ( $config_file, $database_name, $table_name, $db_handle, $log_file, $command );
+
+my $log_id = 'DBADM';
+
+getopts('c:t:d:hvx');
+
+if ($opt_h) {
+    HELP_MESSAGE(*STDOUT);
+    exit(0);
+}
+
+=head1 OPTIONS
+
+=over
+
+=item -c
+
+This is the filename and path of a configuration file, with the
+default being ftndb.cfg in the current directory.
+
+=cut
+
+if ($opt_c) {
+    $config_file = $opt_c;
+    undef $opt_c;
+}
+else {
+    my $config_dir = File::Spec->curdir();
+    $config_file = File::Spec->join($config_dir, 'ftndb.cfg');
+}
+
+#  Get configuration from file
+my $ftndb_config = Config::Tiny->new();
+$ftndb_config = Config::Tiny->read($config_file)
+    or die "Could not open configuration file:  $config_file\n";
+
+# Get the definition of the log file
+$log_file = $ftndb_config->{_}->{LogFile};
+
+=item -x
+
+Debug option.
+
+=cut
+
+if ($opt_x) {
+    logging($log_file, $log_id, 'Debug flag is set');
+}
+
+=item -v
+
+Verbose option.
+
+=cut
+
+if ($opt_v) {
+    logging($log_file, $log_id, 'Verbose flag is set');
+}
+
+
+my %db_option = ();
+
+# Get the definition of the database type
+$db_option{'Type'} = $ftndb_config->{Database}->{Type};
+
+if ($opt_v) { logging($log_file, $log_id, "Database type being used is $db_option{'Type'}") };
+
+# Get the definition of the database name
+$db_option{'Name'} = $ftndb_config->{Database}->{Name};
+
+if ($opt_v) { logging($log_file, $log_id, "Database name being used is $db_option{'Name'}") };
+
+# Get the definition of the database user
+if ($db_option{'Type'} eq 'SQLite') {
+
+    $db_option{'User'} = q{};
+
+} else {
+    $db_option{'User'} = $ftndb_config->{Database}->{User};
+
+    if ($opt_v) { logging($log_file, $log_id, "Database user being used is $db_option{'User'}") };
+
+}
+
+# Get the definition of the database password
+if ($db_option{'Type'} eq 'SQLite') {
+
+    $db_option{'Password'} = q{};
+
+} else {
+
+    $db_option{'Password'} = $ftndb_config->{Database}->{Password};
+    if ($opt_v) { logging($log_file, $log_id, "Database password being used is $db_option{'Password'}") };
+
+}
+
+=item -d
+
+Name of the database being created or dropped.
+
+=cut
+
+if ($opt_d) {
+    $database_name = $opt_d;
+    undef $opt_d;
+}
+
+=item -t
+
+The nodelist table name to be used.
+Note that if there is a period in the name, that period will be changed
+to an underscore.
+
+=back
+
+=cut
+
+if ($opt_t) {
+    if ( $opt_t =~ /\./ ) {    # period in proposed table name?
+        logging($log_file, $log_id, 'sqlite does not allow periods in table names.');
+        $opt_t =~ tr/\./_/;    # change period to underscore
+        $table_name = $opt_t;     #
+        logging($log_file, $log_id, "Changed table name to $table_name.");
+    }
+    else {                     # no period in name
+        $table_name = $opt_t;     #  just assign to variable
+    }
+
+}
+else {
+    $table_name = 'Nodelist';     # default table name
+}
+
+=head1 COMMANDS
+
+=over
+
+=item create database
+
+This will create a database an SQL database server being used
+for Fidonet/FTN processing.  If it already exists, it will drop
+it first, before going on to create it again.
+
+=item drop database
+
+This will drop a database if it exists in an SQL database server
+being used for Fidonet/FTN processing.
+
+=item create table
+
+This will create a nodelist table in an SQL database being used
+for Fidonet/FTN nodelist processing. If it already exists, it
+will drop it first before going on to create it again.
+
+=item drop table
+
+This will drop a database table if it exists in an SQL database
+server being used for Fidonet/FTN processing.
+
+=back
+
+=cut
+
+# Parse commands
+#   if a command is found, then execute & exit
+#   if not;  display error message, then help message, then exit
+$command = shift;
+if (lc($command) eq 'create') {
+
+    $command = shift;
+    if (lc($command) eq 'database') {
+    create_ftn_database();
+
+    } elsif (lc($command) eq 'table') {
+    #  Create an FTN table
+    create_ftn_table();
+
+    } else {
+    print {*STDERR} "Unrecognized parameter for \'create\' command.\n";
+    HELP_MESSAGE(*STDERR);
+    exit 1;
+
+    }   # End parsing of 'create' command
+
+} elsif (lc($command) eq 'drop') {
+
+    $command = shift;
+    if (lc($command) eq 'database') {
+    call drop_ftn_database();
+
+    } elsif (lc($command) eq 'table') {
+    #  Drop an FTN table
+    drop_ftn_table();
+
+    } else {
+    print {*STDERR} "Unrecognized parameter for \'drop\' command.\n";
+    HELP_MESSAGE(*STDERR);
+    exit 1;
+
+    }   # End parsing of 'drop' command
+
+} else {
+    print {*STDERR} "Unrecognized command.\n";
+    HELP_MESSAGE(*STDERR);
+    exit 1;
+
+}       # End of command parsing.
+
+
+exit 0;
+
+########################################################################
+# subroutines
+########################################################################
+# Display Help message
+########################################################################
+sub HELP_MESSAGE {
+
+    my $fh = shift;
+
+    print {$fh} "\n\tSynopsis:\n";
+    print {$fh} "ftndb-admin -c config_file [options] [-d databasename] create|drop database\n";
+    print {$fh} "ftndb-admin -c config_file [options] [-t tablename] create|drop table\n";
+    print {$fh} "ftndb-admin -h | --help\t= Display this help message.\n";
+    print {$fh} "ftndb-admin --version\t= Display version message.\n\n";
+
+    print {$fh} "\tOptions.\n";
+    print {$fh} "[-c config_file]\t= Name and path for configuration file.\n";
+    print {$fh} "[-d databasename]\t= Database name being created or dropped.\n";
+    print {$fh} "[-t tablename]\t= Nodelist table name;  defaults to \'Nodelist\'. \n";
+    print {$fh} "[-v]\t\t= Verbose option.\n";
+    print {$fh} "[-x]\t\t= Debug option.\n\n";
+
+    return();
+
+}
+
+########################################################################
+# Create an FTN database
+########################################################################
+sub create_ftn_database {
+
+    # connect to database server
+    $db_handle = FTN::Database::open_ftn_database(\%db_option);
+
+    # drop the old database, if it exists.
+    logging($log_file, $log_id, "Dropping existing $database_name if it already exists.");
+    FTN::Database::drop_ftn_database($db_handle, $database_name);
+
+    # Create database
+    FTN::Database::create_ftn_database($db_handle, $database_name);
+
+    # disconnect from database
+    FTN::Database::close_ftn_database($db_handle);
+
+    logging($log_file, $log_id, "Database $database_name created.");
+
+    return();
+}
+
+########################################################################
+# Drop an FTN database
+########################################################################
+sub drop_ftn_database {
+
+    # connect to database server
+    $db_handle = FTN::Database::open_ftn_database(\%db_option);
+
+    # drop the old database, if it exists.
+    logging($log_file, $log_id, "Dropping existing $database_name if it already exists.");
+    FTN::Database::drop_ftn_database($db_handle, $database_name);
+
+    # disconnect from database
+    FTN::Database::close_ftn_database($db_handle);
+
+    logging($log_file, $log_id, "Database $database_name dropped.");
+
+    return();
+}
+
+########################################################################
+# Create an FTN table
+########################################################################
+sub create_ftn_table {
+
+    # connect to database
+    $db_handle = FTN::Database::open_ftn_database(\%db_option);
+
+    # drop the old table, if it exists.
+    logging($log_file, $log_id, "Dropping existing table $table_name if it already exists.");
+    FTN::Database::drop_ftn_table($db_handle, $table_name);
+
+    # Create table
+    FTN::Database::create_ftn_table($db_handle, $table_name, $define_fields, $db_option{'Type'});
+
+    # disconnect from database
+    FTN::Database::close_ftn_database($db_handle);
+
+    logging($log_file, $log_id, "Table $table_name created.");
+
+    return();
+}
+
+########################################################################
+# Drop an FTN database table
+########################################################################
+sub drop_ftn_table {
+
+    # connect to database server
+    $db_handle = FTN::Database::open_ftn_database(\%db_option);
+
+    # drop the old database table, if it exists.
+    logging($log_file, $log_id, "Dropping existing $table_name if it already exists.");
+    FTN::Database::drop_ftn_table($db_handle, $table_name);
+
+    # disconnect from database
+    FTN::Database::close_ftn_database($db_handle);
+
+    logging($log_file, $log_id, "Database table $table_name dropped.");
+
+    return();
+}
+
+########################################################################
+# Display Version message
+########################################################################
+sub VERSION_MESSAGE {
+
+    my $fh = shift;
+
+    print {$fh} "ftndb-admin version $VERSION\n";
+
+    return();
+
+}
+
+########################################################################
+
+=head1 CONFIGURATION
+
+Configuration information not provided by the command line options are
+obtained from a configuration file.  That can be defined by setting the
+"-c" option, which is the path and file name of the configuration file
+to be used. If that is not defined, it looks for a file named ftndb.cfg
+in the current directory. The file contains configuration items listed
+outside of a named section as well as those listed within a named section,
+and blank lines and lines starting with a "#" are ignored.
+
+The first items in the file are those outside of a named section:
+
+=over 4
+
+=item LogFile
+
+This is the rquired filename and path of a log file.
+
+=back
+
+The B<Database> section in the configuration file has the following
+keywords:
+
+=over 4
+
+=item Type
+
+Database type.
+This needs to be a database type for which a DBD module exists, the type
+being the name as used in the DBD module.  The default type is SQLite.
+
+=item Name
+
+Database name.
+For an SQLite database; this needs to be at least the filename and can
+also include a path.
+
+=item User
+
+Database user.
+For an SQLite database, this defaults to an empty string as it is not
+needed for that type of a database.
+
+=item Password
+
+Database password.
+For an SQLite database, this defaults to an empty string as it is not
+needed for that type of a database.
+
+=back
+
+This is an example of the contents of an ftndb.cfg file:
+
+    # ftndb.cfg
+    LogFile=/opt/ftndb/ftndb.log
+
+    [Database]
+    Type=mysql
+    Name=ftndbtst
+    User=sysop
+    Password=ftndbtst
+
+=head1 EXAMPLES
+
+Given that $CFGFILE is a configuration file, the following command line can be
+used to create an FTN Nodelist table in that database file:
+
+C<ftndb-admin -c $CFGFILE -t Nodelist -v create table>
+
+=head1 AUTHOR
+
+Robert James Clay, C<< <jame at rocasa.us> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests via the web interface at
+L<https://sourceforge.net/p/ftnpl/ftndb/tickets/>. I will be notified,
+and then you'll automatically be notified of progress on your bug
+as I make changes.
+
+Note that you can also report any bugs or feature requests to
+C<bug-ftndb at rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=ftndb>;
+however, the FTN Database application Issue tracker at the
+SourceForge project is preferred.
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc ftndb-admin
+
+
+You can also look for information at:
+
+=over 4
+
+=item * FTN Database application issue tracker
+
+L<https://sourceforge.net/p/ftnpl/ftndb/tickets/>
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=ftndb>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/ftndb>
+
+=back
+
+=head1 SEE ALSO
+
+ L<FTN::Database>, L<FTNDB::Nodelist>, and L<ftndb-nodelist>.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2010-2012 Robert James Clay, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+

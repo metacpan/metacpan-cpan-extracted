@@ -1,0 +1,7 @@
+aliased.xs
+Makefile.PL
+MANIFEST
+README
+t/fields-aliased.t
+lib/fields/aliased.pm
+META.yml                                 Module meta-data (added by MakeMaker)

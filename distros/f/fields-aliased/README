@@ -1,0 +1,78 @@
+fields-aliased version 1.04
+===========================
+
+NAME
+    fields::aliased - create aliases for fields
+
+SYNOPSIS
+    package MyPackage;
+    use strict;
+    use fields::aliased;
+    use fields qw($scalar @array %hash);
+
+    sub new {
+        my $self = fields::new(shift);
+        fields::aliased::init($self);
+        use fields::aliased qw($self $scalar @array %hash);
+
+        $scalar = 1;
+        @array = ('foo', 'bar');
+        %hash = ('foo' => 'bar', 'baz' => 'huh?');
+
+        return $self;
+    }
+
+    sub myMethod {
+        my MyPackage $self = shift;
+        use fields::aliased qw($self $scalar @array %hash);
+
+        ...
+    }
+
+DESCRIPTION
+    This module is a companion to the 'fields' module, which allows
+    efficient handling of instance variables with checking at compile
+    time. 'fields::aliased' goes one step further and creates lexical
+    aliases to the fields used by a method, so that they can be used
+    as regular lexical variables. This makes code shorter and also
+    easier to read.
+
+CHANGES
+    Version 1.04 admits that the private fields in superclasses thing isn't
+    going to work transparently, and stops trying to initialize them.
+
+    Version 1.03 make some changes so that private fields in superclasses
+    work as expected.
+
+    Version 1.02 adds some additional code in the XS source (a function I
+    am using turns out not to be universally available).
+
+    Version 1.01 corrects the MANIFEST.
+
+    Version 1.00 was the initial release.
+
+INSTALLATION
+
+    To install this module, use the standard incantation:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+DEPENDENCIES
+
+    This module requires these other modules and libraries:
+
+        Tie::IxHash, Filter::Util::Call, Test::More (for the tests)
+
+COPYRIGHT AND LICENCE
+
+    Copyright (C) 2004 by Kevin Michael Vail
+
+    This library is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.
+
+AUTHOR
+
+    Kevin Michael Vail <kvail@cpan.org>
