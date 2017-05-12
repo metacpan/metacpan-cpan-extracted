@@ -1,0 +1,15 @@
+#!/usr/bin/perl -w
+use POSIX qw/locale_h/;
+
+my $orig_loc = setlocale( LC_ALL );
+my $loc;
+open my $LOCALES, '-|', 'locale -a';
+local $\ = "\n";
+print "The following locales use comma as decimal point";
+while (<$LOCALES>) {
+    chomp;
+    $loc = setlocale( LC_ALL, $_);
+    print $_ if localeconv()->{decimal_point} eq ',';
+}
+close $LOCALES;
+$loc = setlocale( LC_ALL, $orig_loc);

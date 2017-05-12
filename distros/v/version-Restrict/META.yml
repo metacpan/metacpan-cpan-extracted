@@ -1,0 +1,22 @@
+---
+abstract: "Control permitted versions that can be use'd"
+author:
+  - 'Steven Haryanto <stevenharyanto@gmail.com>'
+build_requires:
+  Capture::Tiny: 0
+  Test::Exception: 0
+  Test::More: 0.98
+  blib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: version-Restrict
+resources:
+  homepage: http://metacpan.org/release/version-Restrict
+  repository: http://github.com/sharyanto/perl-version-Restrict
+version: 0.01

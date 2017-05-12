@@ -1,0 +1,76 @@
+NAME
+    version::Store - Get your module's minimum/required version from your
+    users
+
+VERSION
+    version 0.01
+
+SYNOPSIS
+    In your module:
+
+     package YourModule;
+     our $VERSION = 0.12;
+
+     use version::Store;
+     our %USER_PACKAGES;
+
+     use Exporter;
+     our @ISA = qw(Exporter);
+     our @EXPORT = qw(foo);
+
+     sub foo {
+         my $caller = caller;
+         my $min_ver = $USER_PACKAGES{$caller}{min_ver};
+         print "foo" . ($min_ver && $min_ver >= 0.11 ? " with extra zazz!" : "");
+     }
+
+    In code using your module:
+
+     use YourModule;
+     foo(); # prints "foo";
+
+    In another code:
+
+     use YourModule 0.12;
+     foo(); # prints "foo with extra zazz!"
+
+DESCRIPTION
+    Sometimes you want to present different features to each user, depending
+    on what version of your module she requests.
+
+    This pragma lets you do that. This is done by installing a "VERSION()"
+    subroutine to your module. This subroutine is called by Perl whenever a
+    user does something like "use YourModule 0.12" (the "use MODULE VERSION"
+    form). The version information is stored in your module's %USER_PACKAGES
+    package variable, with each calling package as the key and a hashref for
+    each value. Each hashref contains the key "version" containing the data.
+
+    Alternatively, you can write your own "VERSION()" when appropriate.
+
+SEE ALSO
+    "use" on perldoc.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/version-Store>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/sharyanto/perl-version-Store>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=version-Store>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

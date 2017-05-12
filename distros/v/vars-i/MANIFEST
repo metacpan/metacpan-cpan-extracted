@@ -1,0 +1,9 @@
+MANIFEST
+LICENSE
+README
+Todo
+Changes
+lib/vars/i.pm
+t/010__vars-i.t
+Makefile.PL
+META.yml                                 Module meta-data (added by MakeMaker)

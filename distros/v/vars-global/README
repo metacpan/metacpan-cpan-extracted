@@ -1,0 +1,58 @@
+vars-global version 0.0.1
+
+This module lets you define 'global' variables and gain a slight
+advantage over blind use of package variables.
+
+SYNOPSIS
+
+    # In the place/package where we want to create globals
+    use vars::global create => qw( $foo @bar %baz );
+
+    # Add some more global symbols
+    vars::global->create(qw( $hello @world %now ));
+
+    # Somewhere else, where we need to access those globals
+    use vars::global qw( $foo @bar %baz );
+
+    # Don't try to use globals that do not exist
+    use vars::global qw( $Foo ); # typo, croaks
+    use vars::global qw( @inexistent ); # we don't create by default
+                                        # use 'create' as above
+
+    # You can also import and create new globals
+    use vars::global qw( $foo %baz ), create => qw( $hey @joe );
+
+    # If you're lazy, you can import all the globals defined so far
+    use vars::global ':all';
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+None (strict, warnings and Carp: do you call these "dependencies"?!?).
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006, Flavio Poletti
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

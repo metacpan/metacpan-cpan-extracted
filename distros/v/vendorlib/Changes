@@ -1,0 +1,40 @@
+Revision history for vendorlib
+
+0.12 2016-03-30 10:05:22
+    - convert to dzil
+
+0.11  2011-03-10 05:02:20
+    - patch from Gregor Herrmann in Debian to skip tilde expansion tests when
+      the home directory does not exist
+
+0.10  2011-01-17 02:36:15
+    - fix a bug in the tests
+
+0.09  2011-01-16 07:25:10
+    - do not use directories that don't exist
+
+0.08  2011-01-14 05:45:08
+    - some fixes for Win32
+
+0.07  2011-01-11 09:49:29
+    - add tilde expansion from Config values
+
+0.06  2011-01-09 12:22:12
+    - added checks for loading core modules in t/01basic.t
+
+0.05  2011-01-06 11:04:51
+    - add repository to META.yml
+
+0.04  2011-01-05 10:01:22
+    - another POD update
+
+0.03  2011-01-05 09:54:27
+    - minor POD update
+
+0.02  2011-01-05 09:00:06
+    - Use correct order in @INC.
+    - Add /etc/perl as a special case for Debian, should be harmless on other
+      systems.
+
+0.01  2011-01-05 04:30:06
+    - Initial release.

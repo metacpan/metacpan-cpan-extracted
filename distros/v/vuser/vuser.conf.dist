@@ -1,0 +1,6 @@
+[vuser]
+# Enable debugging
+
+# Space delimited list of extensions to load
+# extensions = asterisk courier
+extensions =

@@ -1,0 +1,308 @@
+#!/usr/bin/perl
+
+eval 'exec /usr/bin/perl  -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+use warnings;
+use strict;
+
+# Copyright 2004 Randy Smith
+# $Id: vuser,v 1.29 2008-03-17 17:52:05 perlstalker Exp $
+
+use Pod::Usage;
+use Getopt::Long qw(:config require_order);
+use FindBin;
+use Config::IniFiles;
+use User::pwent;
+
+our $REVISION = (split (' ', '$Revision: 1.29 $'))[1];
+our $VERSION = "0.5.0";
+
+our $DEBUG = 0;
+
+BEGIN {
+
+    our @etc_dirs = (
+		             "$FindBin::Bin/../etc",
+		             "$FindBin::Bin",
+		             "$FindBin::Bin/..",
+                     "$FindBin::Bin/vuser",
+                     "$FindBin::Bin/../vuser",
+                     "$FindBin::Bin/../etc/vuser",
+                     '/usr/local/etc',
+		             '/usr/local/etc/vuser',
+		             '/etc',
+		             '/etc/vuser',
+                     );
+}
+
+use vars qw(@etc_dirs);
+
+use lib (map { "$_/extensions" } @etc_dirs);
+use lib (map { "$_/lib" } @etc_dirs);
+
+use VUser::ExtHandler;
+use VUser::ResultSet;
+use VUser::ResultSet::Display;
+use VUser::Meta;
+use VUser::ExtLib qw(strip_ws check_bool);
+use VUser::Log qw(:levels);
+
+my $config_file;
+my $format;
+my $debug = 0;
+my $result = GetOptions( "config=s" => \$config_file,
+			 "format=s" => \$format,
+                         "debug|s"  => \$debug
+			 );
+
+if( defined $config_file )
+{
+    die "FATAL: config file: $config_file not found" unless( -e $config_file );
+}
+else
+{
+    for my $etc_dir (@etc_dirs)
+    {
+	if (-e "$etc_dir/vuser.conf") {
+	    $config_file = "$etc_dir/vuser.conf";
+	    last;
+	}
+    }
+}
+
+if (not defined $config_file) {
+    die "Unable to find a vuser.conf file in ".join (", ", @etc_dirs).".\n";
+}
+
+if ($debug) {
+    print STDERR "Loading $config_file\n";
+}
+
+my %cfg;
+tie %cfg, 'Config::IniFiles', (-file => $config_file);
+
+if (@Config::IniFiles::errors) {
+    warn "There were errors loading $config_file\n";
+    foreach my $error (@Config::IniFiles::errors) {
+	warn "$error\n";
+    }
+    die "Please correct the errors and try again\n";
+}
+
+$DEBUG = check_bool $cfg{'vuser'}{'debug'};
+$DEBUG = 1 if ($debug);
+
+if ($debug) {
+    use Data::Dumper;
+    print Dumper \%cfg;
+}
+
+our $log = VUser::Log->new(\%cfg, 'vuser');
+
+## Load extensions
+if ($cfg{'vuser'}{'include paths'}) {
+    my @inc_paths = ();
+    if (ref $cfg{'vuser'}{'include paths'} eq 'ARRAY') {
+	@inc_paths = @{ $cfg{'vuser'}{'include paths'} };
+    } else {
+	@inc_paths = ($cfg{'vuser'}{'include paths'});
+    }
+    my @paths = map { split(/:|$/m) } @inc_paths;
+    foreach my $path (@paths) {
+	my $p = strip_ws($path);
+	$log->log(LOG_INFO, "Adding '$p' to \@INC");
+        push @INC, $p;
+    }
+}
+
+my $eh = new VUser::ExtHandler (\%cfg);
+$eh->load_extensions(\%cfg);
+$eh->register_task('version', '', \&version, -10);
+
+$log->log(LOG_DEBUG, "Config loaded from $config_file");
+
+my $keyword = shift @ARGV || 'help';
+my $action = shift @ARGV;
+
+# Actions cannot start with -
+if (defined $action
+    and $action =~ /^-/) {
+    unshift @ARGV, $action;
+    $action = '';
+}
+
+$action = '' unless defined $action;
+
+my $exit_code = 0;
+
+# Ok. Now it's time to do the action.
+my $real_user = 'unknown';
+my $ent;
+eval { $ent = getpwuid($<); }; # Get the user running this.
+$real_user = $ent->name if (defined $ent);
+$log->log(LOG_NOTICE, "%s running %s %s", $real_user, $keyword, $action);
+my @rs;
+eval { @rs = $eh->run_tasks($keyword, $action, \%cfg); };
+if ($@) {
+    # Should we change the exit code if there are warnings
+    # but everything completes?
+    $exit_code = 0;
+    warn $@;
+}
+
+if ($debug) {
+    print "RS: "; use Data::Dumper; print Dumper \@rs;
+
+    print("Show rs ($cfg{'vuser'}{'show result set'}) ? ",
+	  (check_bool($cfg{'vuser'}{'show result set'})? "Yes":"No"),
+	  "\n"
+	  );
+}
+
+## Check for errors
+my @errors = VUser::ResultSet::get_all_errors(@rs);
+if (@errors) {
+    # Thar be errors here
+
+    foreach my $error (@errors) {
+	$exit_code = $error->{error_code};
+	foreach my $msg ($error->{errors}) {
+	    $log->log(LOG_ERROR, "error(%d): %s",
+		      $error->{error_code},
+		      $msg
+		);
+	}
+    }
+}
+
+## Display results
+if (check_bool($cfg{'vuser'}{'show result set'}) and @rs) {
+    $cfg{'vuser'}{'display format'} = $format if defined $format;
+    my $display = VUser::ResultSet::Display->new(\%cfg);
+    $display->display(@rs);
+}
+
+eval { $eh->cleanup(%cfg); };
+
+exit $exit_code;
+
+sub version
+{
+    my $cfg = shift;
+    my $opts = shift;
+
+    my $rs = VUser::ResultSet->new();
+    $rs->add_meta(VUser::Meta->new('name' => 'extension',
+				   'type' => 'string',
+				   'description' => 'Extension name'));
+    $rs->add_meta(VUser::Meta->new('name' => 'version',
+				   'type' => 'string',
+				   'description' => 'Version number'));
+    $rs->add_data(['vuser', $VERSION]);
+    return $rs;
+}
+
+sub revision
+{
+    my $cfg = shift;
+    my $opts = shift;
+
+    my $rs = VUser::ResultSet->new();
+    $rs->add_meta(VUser::Meta->new('name' => 'extension',
+				   'type' => 'string',
+				   'description' => 'Extension name'));
+    $rs->add_meta(VUser::Meta->new('name' => 'version',
+				   'type' => 'string',
+				   'description' => 'Revision number'));
+    $rs->add_data(['vuser', $REVISION]);
+    return $rs;
+}
+
+__END__
+
+=head1 NAME
+
+vuser - Virtual user management utility
+
+=head1 SYNOPSIS
+
+ vuser [--config=/path/to/vuser.conf] module action [options]
+ vuser help [module]
+
+=head1 OPTIONS
+
+See 'vuser help module' for a list of actions and options.
+
+=head1 DESCRIPTION
+
+=head1 CONFIGURATION
+
+By default, vuser looks for the file F<vuser.conf> in these locations:
+
+ "$FindBin::Bin/../etc",
+ "$FindBin::Bin",
+ "$FindBin::Bin/..",
+ "$FindBin::Bin/vuser",
+ "$FindBin::Bin/../vuser",
+ "$FindBin::Bin/../etc/vuser",
+ '/usr/local/etc',
+ '/usr/local/etc/vuser',
+ '/etc',
+ '/etc/vuser',  
+
+You may specify the path to the configuration file with the C<--config> option. 
+
+ [vuser]
+ # Enable debugging (Lots of output)
+ debug = no
+ 
+ # Space delimited list of extensions to load
+ # extensions = Email::Courier Radius::SQL
+ extensions = Email
+ 
+ #log type = Syslog
+ #log level = notice
+ log level = debug
+ 
+ show result set = yes
+ # Display the result set in a different format.
+ # Allowed formats: CSV
+ #display format = CSV
+ 
+ # Add paths to the include path
+ # This may be ':' or newline delimited in a heredoc or both
+ #include paths = /opt/lib:/home/user/lib
+ #include paths = <<PATHS
+ #/opt/lib:/home/vuser/lib
+ #/opt/vuser/plugins
+ #PATHS
+
+=head1 BUGS
+
+Report bugs at http://code.google.com/p/vuser/issues/list.
+
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+Randy Smith <perlstalker@vuser.org>
+
+=head1 LICENSE
+ 
+ This file is part of vuser.
+ 
+ vuser is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+ 
+ vuser is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with vuser; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+=cut

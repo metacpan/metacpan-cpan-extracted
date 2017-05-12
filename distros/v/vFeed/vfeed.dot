@@ -1,0 +1,113 @@
+//
+// $Id$
+//
+
+digraph db_schema {
+   //
+   // Tables
+   //
+   nvd_db [label="{nvd_db|cveid\ldate_published\ldate_modified\lsummary\lcvss_base\lcvss_impact\lcvss_exploit\lcvss_access_vector\lcvss_access_complexity\lcvss_authentication\lcvss_confidentiality_impact\lcvss_integrity_impact\lcvss_availability_impact\l}", shape=record];
+   cve_cwe [label="{cve_cwe|cweid\lcveid\l}", shape=record];
+   cve_cwe -> nvd_db [label=cveid, fontcolor=blue, color=blue];
+
+   cwe_db [label="{cwe_db|cweid\lcwetitle\l}", shape=record];
+   cwe_category [label="{cwe_category|categoryid\lcategorytitle\lcweid\l}", shape=record];
+   cwe_category -> cwe_db [label=cweid, fontcolor=blue, color=blue];
+
+   cwe_capec [label="{cwe_capec|capecid\lcweid\l}", shape=record];
+   cwe_capec -> cwe_db [label=cweid, fontcolor=blue, color=blue];
+
+   cve_cpe [label="{cve_cpe|cpeid\lcveid\l}", shape=record];
+   cve_cpe -> nvd_db [label=cveid, fontcolor=blue, color=blue];
+
+   cve_reference [label="{cve_reference|refsource\lrefname\lcveid\l}", shape=record];
+   cve_reference -> nvd_db [label=cveid, fontcolor=blue, color=blue];
+
+   map_cve_aixapar [label="{map_cve_aixapar|aixaparid\lcveid\l}", shape=record];
+   map_cve_aixapar -> nvd_db [label=cveid, fontcolor=blue, color=blue];
+
+   map_cve_redhat [label="{map_cve_redhat|redhatid\lredhatovalid\lredhatupdatedesc\lcveid\l}", shape=record];
+   map_cve_redhat -> nvd_db [label=cveid, fontcolor=blue, color=blue];
+
+   map_redhat_bugzilla [label="{map_redhat_bugzilla|advisory_dateissue\lbugzillaid\lbugzillatitle\lredhatid\l}", shape=record];
+   map_redhat_bugzilla -> map_cve_redhat [label=redhatid, fontcolor=blue, color=blue];
+
+   map_cve_suse [label="{map_cve_suse|suseid\lcveid\l}", shape=record];
+   map_cve_suse -> nvd_db [label=cveid, fontcolor=blue, color=blue];
+
+   map_cve_debian [label="{map_cve_debian|debianid\lcveid\l}", shape=record];
+   map_cve_debian -> nvd_db [label=cveid, fontcolor=blue, color=blue];
+
+   map_cve_mandriva [label="{map_cve_mandriva|mandrivaid\lcveid\l}", shape=record];
+   map_cve_mandriva -> nvd_db [label=cveid, fontcolor=blue, color=blue];
+
+   map_cve_exploitdb [label="{map_cve_exploitdb|exploitdbid\lcveid\l}", shape=record];
+   map_cve_exploitdb -> nvd_db [label=cveid, fontcolor=blue, color=blue];
+
+   map_cve_saint [label="{map_cve_saint|saintexploitid\lsaintexploittitle\lsaintexploitlink\lcveid\l}", shape=record];
+   map_cve_saint -> nvd_db [label=cveid, fontcolor=blue, color=blue];
+
+   map_cve_milw0rm [label="{map_cve_milw0rm|milw0rmid\lcveid\l}", shape=record];
+   map_cve_milw0rm -> nvd_db [label=cveid, fontcolor=blue, color=blue];
+
+   map_cve_osvdb [label="{map_cve_osvdb|osvdbid\lcveid\l}", shape=record];
+   map_cve_osvdb -> nvd_db [label=cveid, fontcolor=blue, color=blue];
+
+   map_cve_oval [label="{map_cve_oval|ovalid\lcveid\l}", shape=record];
+   map_cve_oval -> nvd_db [label=cveid, fontcolor=blue, color=blue];
+
+   map_cve_nessus [label="{map_cve_nessus|nessus_script_id\lnessus_script_file\lnessus_script_name\lnessus_script_family\lcveid\l}", shape=record];
+   map_cve_nessus -> nvd_db [label=cveid, fontcolor=blue, color=blue];
+
+   map_cve_msf [label="{map_cve_msf|msfid\lmsf_script_file\lmsf_script_name\lcveid\l}", shape=record];
+   map_cve_msf -> nvd_db [label=cveid, fontcolor=blue, color=blue];
+
+   map_cve_openvas [label="{map_cve_openvas|openvas_script_id\lopenvas_script_file\lopenvas_script_name\lopenvas_script_family\lcveid\l}", shape=record];
+   map_cve_openvas -> nvd_db [label=cveid, fontcolor=blue, color=blue];
+
+   map_cve_scip [label="{map_cve_scip|scipid\lsciplink\lcveid\l}", shape=record];
+   map_cve_scip -> nvd_db [label=cveid, fontcolor=blue, color=blue];
+
+   map_cve_iavm [label="{map_cve_iavm|iavmid\ldisakey\liavmtitle\lcveid\l}", shape=record];
+   map_cve_iavm -> nvd_db [label=cveid, fontcolor=blue, color=blue];
+
+   map_cve_cisco [label="{map_cve_cisco|ciscoid\lcveid\l}", shape=record];
+   map_cve_cisco -> nvd_db [label=cveid, fontcolor=blue, color=blue];
+
+   map_cve_ubuntu [label="{map_cve_ubuntu|ubuntuid\lcveid\l}", shape=record];
+   map_cve_ubuntu -> nvd_db [label=cveid, fontcolor=blue, color=blue];
+
+   map_cve_gentoo [label="{map_cve_gentoo|gentooid\lcveid\l}", shape=record];
+   map_cve_gentoo -> nvd_db [label=cveid, fontcolor=blue, color=blue];
+
+   map_cve_fedora [label="{map_cve_fedora|fedoraid\lcveid\l}", shape=record];
+   map_cve_fedora -> nvd_db [label=cveid, fontcolor=blue, color=blue];
+
+   map_cve_certvn [label="{map_cve_certvn|certvuid\lcertvulink\lcveid\l}", shape=record];
+   map_cve_certvn -> nvd_db [label=cveid, fontcolor=blue, color=blue];
+
+   map_cve_ms [label="{map_cve_ms|msid\lmstitle\lcveid\l}", shape=record];
+   map_cve_ms -> nvd_db [label=cveid, fontcolor=blue, color=blue];
+
+   map_cve_mskb [label="{map_cve_mskb|mskbid\lmskbtitle\lcveid\l}", shape=record];
+   map_cve_mskb -> nvd_db [label=cveid, fontcolor=blue, color=blue];
+
+   map_cve_snort [label="{map_cve_snort|snort_id\lsnort_sig\lsnort_classtype\lcveid\l}", shape=record];
+   map_cve_snort -> nvd_db [label=cveid, fontcolor=blue, color=blue];
+
+   map_cve_suricata [label="{map_cve_suricata|suricata_id\lsuricata_sig\lsuricata_classtype\lcveid\l}", shape=record];
+   map_cve_suricata -> nvd_db [label=cveid, fontcolor=blue, color=blue];
+
+   map_cve_vmware [label="{map_cve_vmware|vmwareid\lcveid\l}", shape=record];
+   map_cve_vmware -> nvd_db [label=cveid, fontcolor=blue, color=blue];
+
+   map_cve_bid [label="{map_cve_bid|bidid\lcveid\l}", shape=record];
+   map_cve_bid -> nvd_db [label=cveid, fontcolor=blue, color=blue];
+
+   map_cve_hp [label="{map_cve_hp|hpid\lhplink\lcveid\l}", shape=record];
+   map_cve_hp -> nvd_db [label=cveid, fontcolor=blue, color=blue];
+
+   stat_new_cve [label="{stat_new_cve|new_cve_id name\lnew_cve_summary name\l}", shape=record];
+
+   stat_vfeed_kpi [label="{stat_vfeed_kpi|db_version\ltotal_cve\ltotal_cpe\ltotal_cwe\ltotal_capec\ltotal_bid\ltotal_osvdb\ltotal_certvu\ltotal_iavm\ltotal_scip\ltotal_aixapar\ltotal_suse\ltotal_ubuntu\ltotal_vmware\ltotal_cisco\ltotal_debian\ltotal_fedora\ltotal_gentoo\ltotal_hp\ltotal_mandriva\ltotal_ms\ltotal_mskb\ltotal_redhat\ltotal_redhat_bugzilla\ltotal_exploitdb\ltotal_msf\ltotal_milw0rm\ltotal_saint\ltotal_nessus\ltotal_openvas\ltotal_oval\ltotal_snort\ltotal_suricata\l}", shape=record];
+}

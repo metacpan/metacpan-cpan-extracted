@@ -1,0 +1,11 @@
+Revision history for Perl extension vpopmail.
+
+0.01  Sat Jul 15 16:44:48 2000
+	- original version; created by h2xs 1.18
+
+0.03 Mon Jan 22 21:05:03 EST 2001
+	- updated vadddomain function; added wrapper function adddomain
+
+0.04 Mon May 28 23:38:33 EDT 2001
+	- added vaddalias(), vaddforward(), vgetdomaindir(), vauth_getpw,
+vlistusers(), vlistdomains()...

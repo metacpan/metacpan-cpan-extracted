@@ -1,0 +1,388 @@
+Major changes for Perl module version
+
+This is not a complete list of changes.  See repository for full details:
+
+    https://bitbucket.org/jpeacock/version (primary)
+
+0.9918 - 2017-04-15
+
+  * Fix compiling under C++11
+	https://rt.cpan.org/Ticket/Display.html?id=118846
+
+  * Make version::regex variables public for better reuse
+	https://rt.cpan.org/Ticket/Display.html?id=119669
+
+  * Use rel2abs for require in tests to support 5.26.0 @INC
+	https://rt.cpan.org/Ticket/Display.html?id=121148
+
+  * Move change list to standard CHANGES out of README
+	https://rt.cpan.org/Ticket/Display.html?id=119123
+
+  * Better taint handling for Perl < 5.17.2 with tests
+	https://rt.cpan.org/Ticket/Display.html?id=118087
+
+0.9917 - 2016-05-29
+
+  * Fix version::regex captures, resolves:
+	https://rt.cpan.org/Ticket/Display.html?id=114712
+
+0.9916 - 2016-03-18
+
+  * Incorporate changes from bleadperl (destined to be 5.24.0)
+
+0.9915 - 2016-03-05
+
+  * Clarify details of Lyon Compromise:
+      https://gist.github.com/dagolden/9559280
+
+    - version comparision should be done irrespective of the presence of
+      underscores in the string used to initialize the version object
+
+    - underscore should no longer be used as a tuple separator in vstrings or
+      vstring-like strings; vstrings are converted to tuples by splitting into
+      *characters* (not bytes) and converting to codepoints; any elements after
+      the first must be in the range 0-999
+
+    - numify/normal should produce a standarized string representation without
+      underscores
+
+    - stringify should produce the best possible representation of the value
+      used to initialize the version object; it should include underscores
+      only if the initializing value was a non-vstring string.
+
+    - floating point numbers used as initializers are converted to a decimal
+      string form at the precision limit of the architecture; people will be
+      warned about this in the documentation
+
+0.9914 - 2016-02-18
+
+  * Release non-alpha version to CPAN
+
+0.9913_01 - 2016-02-17
+
+  * Apply one additional changeset from leont to handle magic v-strings
+
+0.9913 - 2016-02-16
+
+  * Release non-alpha version to CPAN
+
+0.9912_03 - 2016-01-21
+
+  * Apply two pull requests from bitbucket:
+    https://bitbucket.org/jpeacock/version/pull-requests/1/fix-test-failures-due-to-hard-coded/diff
+    https://bitbucket.org/jpeacock/version/pull-requests/2/static-all-symbols/diff
+
+0.9912_02 - 2016-01-03
+
+  * Fix stupid mistake in locale tests, resolves:
+	https://rt.cpan.org/Ticket/Display.html?id=110852
+
+0.9912_01 - 2015-12-31
+
+  * Apply patch to implement Lyon Consensus:
+	https://gist.github.com/dagolden/9559280
+
+  * Also resolve the following tickets:
+	https://rt.cpan.org/Ticket/Display.html?id=101647
+	https://rt.cpan.org/Ticket/Display.html?id=101841
+	https://rt.cpan.org/Ticket/Display.html?id=105315
+	https://rt.cpan.org/Ticket/Display.html?id=106782
+	https://rt.cpan.org/Ticket/Display.html?id=107113
+	https://rt.cpan.org/Ticket/Display.html?id=107114
+	https://rt.cpan.org/Ticket/Display.html?id=98744
+	https://rt.cpan.org/Ticket/Display.html?id=102272
+
+0.9912 - 2015-01-20
+
+  * Complete reverting the ill-conceived alpha->normal() code, resolves:
+
+	https://rt.cpan.org/Ticket/Display.html?id=101632
+
+  * Skip leading zeros when parsing dotted-decimal versions after the
+    first element, resolves:
+
+	https://rt.cpan.org/Ticket/Display.html?id=101628
+
+  * Minor change to report the correct rt.cpan.org URL, resolves:
+
+	https://rt.cpan.org/Public/Bug/Display.html?id=101600
+
+0.9911 - 2015-01-17
+
+  * Backout change to normal() and numify() because it breaks Module::Build
+
+0.9910 - 2015-01-17
+
+  * Ensure that calling either normal() or numify() on an alpha version
+    is explicitly a lossy operation, and add a warning to that effect.  Forbid
+    trailing bare decimal for dotted-decimal versions.  Change heuristic in vpp
+    to better resolve v-string versions.  Various cleanups.
+
+    Resolves:
+
+	https://rt.cpan.org/Ticket/Display.html?id=93603
+	https://rt.cpan.org/Ticket/Display.html?id=93715
+	https://rt.cpan.org/Ticket/Display.html?id=93721
+	https://rt.cpan.org/Ticket/Display.html?id=95896
+	https://rt.cpan.org/Ticket/Display.html?id=96100
+	https://rt.cpan.org/Ticket/Display.html?id=96620
+	https://rt.cpan.org/Ticket/Display.html?id=96699
+
+  * Patch from Dave Mitchell to rewrite the parser and avoid warnings
+    from clang.  Resolves
+
+	https://rt.cpan.org/Ticket/Display.html?id=101501
+
+0.9909 - 2014-08-15
+
+  * Compatibility release for Perl 5.20.1.  Apply two patches from bleadperl
+    (one which shipped with 5.20.0 and one from bleadperl) so that a clean
+    release can be applied prior to 5.20.1 being shipped.  Holding back a
+    few other improvements, so expect 0.9910 shortly.
+
+0.9908 - 2014-02-02
+
+  * More optimizations courtesy of Daniel Dragan (bulk88@hotmail.com).
+    Also resolves:
+	https://rt.cpan.org/Ticket/Display.html?id=92438
+	https://rt.cpan.org/Ticket/Display.html?id=92540
+	https://rt.cpan.org/Ticket/Display.html?id=92642
+
+0.9907 - 2014-01-12
+
+  * Lots of optimizations of XS and C code courtesy of Daniel Dragan
+    (bulk88@hotmail.com).  Lots of minor tweaks as well.
+
+    Resolves:
+	https://rt.cpan.org/Ticket/Display.html?id=91892
+	https://rt.cpan.org/Ticket/Display.html?id=91867
+	https://rt.cpan.org/Ticket/Display.html?id=91987
+	https://rt.cpan.org/Ticket/Display.html?id=92051
+
+0.9906 - 2014-01-04
+
+  * Applied C89 compatibility fix from Karl Williamson to vxs.inc.  Added back
+    support for $version::LAX and $version::STRICT to resolve:
+
+	https://rt.cpan.org/Ticket/Display.html?id=88458
+	https://rt.cpan.org/Ticket/Display.html?id=91858
+	https://rt.cpan.org/Ticket/Display.html?id=91868
+
+0.9905 - 2014-01-04
+
+  * Major rewrite of XS code to permit easier inclusion in core Perl (mostly 
+    written by Father Chrysostomos <sprout@cpan.org>).  XS code is no longer
+    supported for any Perl < v5.10, although the pure Perl code still works
+    going back to 5.005_04.
+
+    In addition, the version::vpp class is now completely independent and can
+    be use'd exactly like the base version class.  It is still better to use
+    the base class for compatibility purposes.
+
+0.9904 - 2013-08-20
+
+  * Final upstream changes from bleadperl.  Resolves RT tickets:
+
+	https://rt.cpan.org/Ticket/Display.html?id=87513
+	https://rt.cpan.org/Ticket/Display.html?id=87983
+
+0.9903 - 2013-08-18
+
+  * Upstream test changes from bleadperl.
+    Include version::vpp even when installing XS version.
+    Subtle locale test changes.
+
+0.9902 - 2013-03-05
+
+  * Upstream test changess from bleadperl.
+    Support env PERL_ONLY=1 as well as --perl-only.
+    version::new with no arguments reads past the end of the stack.
+
+0.9901 - 2012-04-26
+
+  * Fix problem with short floating point alpha versions (e.g. 0.52_0).
+
+0.99 - 2012-04-26
+
+  * Apply missing patch from core Perl to prevent overflow with ludicrous
+    versions.
+
+0.98 - 2012-04-25
+
+  * Apply patch from core Perl to prevent overflow with ludicrous versions.
+
+0.97 - 2012-02-28
+
+  * Minor tweak to locale test to skip if no locales are installed at all.
+
+0.96 - 2012-02-06
+
+  * Merge in upstream changes from bleadperl.  Improved locale tests.
+
+0.95 - 2011-11-12
+
+  * Restore compatibility in replacement UNIVERSAL::VERSION with the behavior
+    of Perl 5.14.x, essentially by reverting the changes in 
+
+	https://rt.perl.org/rt3/Ticket/Display.html?id=95544
+
+  * Fix segfault error with strings that begin with 'v', especially the string
+    'version'.  Resolves:
+
+	https://rt.cpan.org/Ticket/Display.html?id=72365
+
+  * Forbid all math operations on version objects in base class (this was
+    already the case for XS code but the pure Perl was lacking).  Resolves:
+
+	https://rt.cpan.org/Public/Bug/Display.html?id=70950
+
+0.94 - 2011-08-21
+
+  * Clarify documentation on advisability of using leading 'v' (it isn't
+    mandatory, but it is much more likely to DTRT).  Resolves:
+
+	https://rt.cpan.org/Public/Bug/Display.html?id=70120
+
+  * Use a localized DIE handler when attempting to load the XS code, in case
+    the caller has its own DIE handler.  Resolves:
+
+	https://rt.cpan.org/Public/Bug/Display.html?id=70260
+
+0.93 - 2011-07-27
+
+  * Fix problem with UNIVERSAL::VERSION noted by Father Chrysostomos.
+
+0.92 - 2011-07-26
+
+  * Forbid negative versions.  Make replacement UNIVERSAL::VERSION return the
+    original $VERSION scalar if called without a requested version.  Resolves
+
+      https://rt.perl.org/rt3/Ticket/Display.html?id=95544
+
+    Rewrite code so that we just override all subs for Perl >= 5.9.0 (when
+    version.pm was added to the core).
+
+0.91 - 2011-06-05
+
+  * Fix compilation/linking on Strawberry Perl, resolves
+
+      https://rt.cpan.org/Ticket/Display.html?id=68611
+
+0.90 - 2011-06-01
+
+  * Make all tests pass even with older Test::More releases.  Resolves
+
+      https://rt.cpan.org/Ticket/Display.html?id=68588
+
+0.89 - 2011-05-31
+
+  * Change behavior of pure Perl qv/declare to match the core/XS behavior;
+    do not use parent's new() class for derived classes.  This breaks
+    encapsulation but I can justify it because qv/declare is a very
+    specific thing that shouldn't be casually overridden (unless you do it
+    directly in the subclass).
+
+0.88 - 2010-12-19
+
+  * Fix Makefile.PL to make Strawberry Perl happy.  Resolves:
+
+	https://rt.cpan.org/Public/Bug/Display.html?id=63991
+
+0.87 - 2010-12-09
+
+  * Remove Build.PL since there are modules in the Module::Build tool chain
+    that require version.pm, leading to circular dependencies.  This also allows
+    Module::Build itself to depend on version.pm.
+
+0.86 - 2010-11-26
+
+  * is_strict/is_lax were not exported correctly (which no one noticed).  Also
+    pull in strict/lax tests from core.
+
+0.85 - 2010-10-25
+
+  * Don't include MYMETA.yml file in distro
+
+0.84 - 2010-10-24
+
+  * Restore public API vcmp() broken in 0.83
+
+0.83 - 2010-10-17
+
+  * Changed vverify API (David Golden).  Improved heuristic for non-magical
+    v-strings (Perl 5.6.0-5.8.0).  Install in proper patch post-@INC
+    reordering.
+
+0.82 - 2010-04-13
+
+  * Still more changes to sync with Perl 5.12.0-as-released.  Rewritten POD
+    thanks to many hands, but mostly David Golden.  Vastly improved Regex
+    definitions from Zephram.
+
+0.81 - 2010-02-01
+
+  * Merge in changes from bleadperl that will be part of Perl 5.12.0.
+    Completely rewrite pure Perl code to operate exactly like the XS code,
+    through the creation of a character-array class called charstar.  Now
+    the pure Perl code and XS code can be more easily be synchronized.
+
+0.80 - 2010-01-21
+
+  * No outwardly visible changes.  This release is to fix an assertion error
+    with certain picky/older compilers.  NOTE: this is not the version object
+    code that will be part of Perl 5.12.0, which will be released shortly as
+    0.81.
+
+0.79 - 2010-01-03
+
+  * No outwardly visible changes.  This release is to match the code that 
+    will part of Perl 5.12.0, but which doesn't affect the external API of
+    the CPAN release.
+
+
+0.78 - 2009-10-12
+
+  * More changes to improve the non-magic v-string heuristics, this time 
+    affecting both the pure Perl and XS backends.  NOTE: these fixes only
+    matter if you are running Perl 5.6.x to 5.8.0 (inclusive).  Beginning
+    with Perl 5.8.1, v-strings are now magical and version.pm no longer has
+    to guess.  Resolves:
+
+	    https://rt.cpan.org/Ticket/Display.html?id=50347
+
+  * Also resolve the issue where attempting to install CPAN releases on top
+    of core releases (e.g. 5.10.0 and 5.10.1) would not DTRT.  Resolves:
+
+	    https://rt.cpan.org/Ticket/Display.html?id=49667
+
+0.7702 - 2009-09-07
+
+  * Add additional contraints to the code which tries to guess whether
+    something is a v-string or not for Perl 5.6.0 through 5.8.0 (inclusive).
+    Resolves:
+
+	https://rt.cpan.org/Ticket/Display.html?id=49348
+
+0.7701 - 2009-07-28
+
+  * Special RHEL4.x/Fedora4.x Are Too Stupid to Live Release.  Those distros
+    have never updated beyond Perl 5.8.5/5.8.6 respectively.  Consequently,
+    they contain a complete broken Test::More::use_ok which doesn't load the
+    package into the correct namespace:
+
+	    https://rt.cpan.org/Ticket/Display.html?id=48268
+
+    thus causing mysterious test failures.  No version.pm code was changed at
+    all. :(
+
+0.77 - 2009-07-26
+
+  * Complete POD rewrite to document common usage in version.pod and put all
+    of the implementation details into version::Internals.
+
+  * Resolve a number of RT tickets:
+    RT#48135 - Compilation failure using MS VC++ 7.0.
+    RT#47980 - Remove need for runtime class loading in pure Perl code
+    RT#46921 - locale and eval action at a distance.
+    RT#45241 - mistaken regex to convert large exponential numbers
+    to non-exponential form before scanning.

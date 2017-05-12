@@ -1,0 +1,25 @@
+.cvsignore
+COPYING
+INSTALL
+lib/VUser/ACL.pm
+lib/VUser/Auth/SQLite.pm
+lib/VUser/Batch.pm
+lib/VUser/CORE.pm
+lib/VUser/Extension.pm
+lib/VUser/ExtHandler.pm
+lib/VUser/ExtLib.pm
+lib/VUser/Log.pm
+lib/VUser/Log/Syslog.pm
+lib/VUser/Log/File.pm
+lib/VUser/Meta.pm
+lib/VUser/ResultSet.pm
+lib/VUser/ResultSet/Display.pm
+lib/VUser/ResultSet/Display/CSV.pm
+lib/VUser/Test.pm
+lib/VUser/Widget.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+sbin/vuser
+vuser.conf.dist

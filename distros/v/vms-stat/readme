@@ -1,0 +1,70 @@
+VMS/Stat version 0.03
+=====================
+
+VMS::Stat provides perl access to:
+* many portions of the File Access Block for an RMS file (read only) via VMS::Stat::get_fab().
+* the HP C extensions to the mkdir() call in the C run time library (C RTL).
+  ( In particular, optional extra arguments for the owner UIC, 
+    maximum RMS version limit, and relative volume number may be given in 
+    calls to VMS::Stat::vmsmkdir(). )
+
+Other documentaton can be found by running:
+
+   perldoc Stat.pm
+
+prior to installation, or:
+
+   perldoc VMS::Stat
+
+after installation.
+
+This extension can only be expected to work on VMS.
+
+This extension was developed and tested on Alpha VMS V7.3-1 && V7.3-2, 
+perl 5.005_02 && 5.8.1, and Compaq C S6.5-002.
+Results with other version combinations are unknown.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   mmk
+   mmk test
+   mmk install
+
+In the last three steps mms may be used in place of mmk.
+Issue the command:
+
+   perl "-V:make"
+
+at the DCL prompt to determine which utility was used to
+build your perl installation.
+
+DEPENDENCIES
+
+This extension requires these other modules and libraries:
+
+The DEC/Compaq/HP C run time should provide you access to a mkdir()
+call that has extensions to ISO standards for arguments to pass to
+this routine.  Refer to HELP CC Run-time_functions mkdir as well as
+other C Run-Time library documentation (e.g. AA-PUNEE-TK or later
+documents).
+
+File::Path is used during testing of this extension.
+The one that shipped with your perl installation should be fine.
+File::Path is not required for the working of an installed VMS::Stat.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Peter Prymmer
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+HISTORY
+
+17-MAY-2004 VMS/Stat version 0.03 - Added initial (simple) implementation of get_fab().
+28-APR-2004 VMS/Stat version 0.02 - second release to CPAN with updated 
+                                    README.;1 that had been accidentally left out of the 0.01 release
+28-APR-2004 VMS/Stat version 0.01 - first release to CPAN

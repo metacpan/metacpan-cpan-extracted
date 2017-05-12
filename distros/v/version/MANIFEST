@@ -1,0 +1,33 @@
+CHANGES
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/version.pm
+lib/version.pod
+lib/version/Internals.pod
+lib/version/regex.pm
+t/00impl-pp.t
+t/01base.t
+t/02derived.t
+t/03require.t
+t/04strict_lax.t
+t/05sigdie.t
+t/06noop.t
+t/07locale.t
+t/08_corelist.t
+t/09_list_util.t
+t/10_lyon.t
+t/11_taint.t
+t/coretests.pm
+t/survey_locales
+vperl/vpp.pm
+vutil/Makefile.PL
+vutil/lib/version/vxs.pm
+vutil/ppport.h
+vutil/vutil.c
+vutil/vutil.h
+vutil/vxs.inc
+vutil/vxs.xs
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

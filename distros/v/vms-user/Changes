@@ -1,0 +1,22 @@
+Revision history for Perl extension VMS::User.
+
+Dan Sugalski:
+
+0.01  Fri Jan 29 16:16:07 1999
+	- original version; created by h2xs 1.18
+
+0.01  Fri Jan 29 16:34:23 1999
+    - Started in writing the silly thing
+
+0.01  Mon Apr 19, 14:23:18 1999
+    - Got back to it (finally!). user_list and user_info are done and work.
+
+Craig Berry and Peter Prymmer:
+
+0.02  Wed Oct 17 08:02:51 2007
+	- original version; created by h2xs 1.22 with options
+		-AX -n VMS::User
+          (done on Unix to get filename cases corrected in MANIFEST)
+        - updated User.xs to compile with later versions of Perl
+        - updated documentation to more accurately reflect read only nature
+

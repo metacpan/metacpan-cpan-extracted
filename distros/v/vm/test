@@ -1,0 +1,40 @@
+#!/usr/bin/perl
+
+use vm;
+
+sub ok {
+  my ($num, $ok) = @_;
+  $ok or print "not ";
+  print STDOUT "ok $num\n";
+  $ok or die("not ok $num\n");
+} 
+
+print STDOUT "1..6\n";
+
+my $filename = "/tmp/vm.test.$$";
+open(my $fp, "+> $filename");
+ok 1, $fp && -e $filename;
+
+select($fp); $| = 1;
+print $fp 'hello' x 4096;
+seek($fp, 0, 0);
+
+my $mem_ref = vm::mmap($fp, 0, 4096);
+ok 2, $mem_ref && ref($mem_ref) eq 'SCALAR';
+
+local *mem = $mem_ref;
+substr($mem, 0, 7) = 'goodbye';
+ok 3, substr($mem, 0, 10) eq 'goodbyello';
+
+local $/ = \10;
+ok 4, <$fp> eq 'goodbyello';
+
+close($fp);
+my $mem_ref = vm::mmap($filename, 0, 4096);
+local *mem = $mem_ref;
+ok 5, substr($mem, 0, 10) eq 'goodbyello';
+
+undef $mem_ref;
+unlink($filename);
+ok 6, !-e $filename;
+exit 0;

@@ -1,0 +1,12 @@
+Revision history for Perl extension vFeed.
+
+0.12
+   - bugfix: correctly handle searches giving more than one result (get_cpe, for instance)
+   - bugfix: depends on DBI
+   - update: no more LIKE by default in SELECT queries. Makes it too slow.
+   - update: give credit where it is due, ToolsWatch original source code:
+             https://github.com/toolswatch/vFeed
+
+0.11 Tue Apr  8 14:31:18 CEST 2014
+   - first public release
+

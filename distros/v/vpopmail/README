@@ -1,0 +1,50 @@
+Sorry for the lack of docs.
+please see [ http://bluedot.net/ ] for more information / support.
+
+I've tested this with vpopmail-3.4.11.released, vpopmail-4.8.5 and
+vpopmail-4.9.[7,10] running perl 5.6.0, but should work with 5.004_03 +
+
+See: <http://www.inter7.com/vpopmail/vpopmail.html>
+for more info about the API, etc...
+
+see the INSTALL file for installation instructions.
+
+the following functions are available via this module:
+
+adddomain()
+vdeldomain()
+vadduser()
+vdeluser()
+vpasswd()
+vsetuserquota()
+vauth_user()
+vauth_getpw()
+vauth_setpw()
+vlistusers()
+vlistdomains()
+vaddalias()
+vaddforward()
+vgetdomaindir()
+
+see examples/example.pl and the files in the t/ dir for some examples
+
+! # ! # ! # ! README ! # ! # ! # !
+previous version of this module made available vadddomain(),
+due to argument changes in the C library vadddomain() I have written
+a wrapper adddomain().
+this function supports both old and new arguments to vadddomain
+old style:
+
+adddomain(domainname);
+
+and the new:
+
+adddomain(domainname, directory, uid, gid);
+
+sorry is this creates any confusion..
+
+
+Drop me an email let me know how you are using this module, and
+your suggestions on how to make it better.
+
+Please send comments and questions to <sscanlon@cpan.org>

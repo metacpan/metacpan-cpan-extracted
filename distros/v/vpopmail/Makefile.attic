@@ -1,0 +1,10 @@
+use ExtUtils::MakeMaker;
+# See lib/ExtUtils/MakeMaker.pm for details of how to influence
+# the contents of the Makefile that is written.
+WriteMakefile(
+    'NAME'	=> 'vpopmail',
+    'VERSION_FROM' => 'vpopmail.pm', # finds $VERSION
+    'LIBS'	=> ['-L/usr/local/lib/mysql -lmysqlclient -L/home/vpopmail/lib -lvpopmail'],   # e.g., '-lm' 
+    'DEFINE'	=> '-DPREFIVE',   # add -DPREFIVE if using a version older than 5.0
+    'INC'	=> '-I/home/vpopmail/include', 
+);

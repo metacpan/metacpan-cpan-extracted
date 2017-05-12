@@ -1,0 +1,16 @@
+Revision history for vars-global
+
+0.0.4  Fri Aug 02 22:42:00 2013
+       Fixed hashing uncertainty bug in tests
+
+0.0.3  Sun Jul 21 16:55:00 2013
+       Fixed issues with encoding and POD.
+       Removed POD tests for non-authors.
+
+0.0.2  Mon Nov 12 09:56:00 2007
+       Upgraded META.yml.
+       Added examples.
+
+0.0.1  Sat Sep 30 02:44:17 2006
+       Initial release.
+

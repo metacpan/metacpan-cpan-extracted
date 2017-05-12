@@ -1,0 +1,17 @@
+This is a pTk based browser/converter for STADAF (STAndard DAtaset Flight).
+STADAF is a Standard Dataset for the exchange of net airrates.
+So it will only be useful for you if you are working at this business.
+
+The module STADAF.pm provides an XBase-like interface for reading records.
+Writing will be supported soon, but the stucture of such files is too stupid
+having fun implementing it!!!
+
+For more information about this strange structure goto: http://www.stadaf.com
+
+If you are a commercial travel fellow you would love to use the Win32-binary
+version "vstadaf-x.xx.zip" only.
+
+Dirk Tostmann
+(tostmann@tosti.com)
+
+22-Feb-99

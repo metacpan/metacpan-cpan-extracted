@@ -1,0 +1,17 @@
+Version 2009110702
+- Fix prerequisites.
+----
+Version 2009110701
+- Modernized Makefile.PL
+- Added POD and Kwalitee tests
+----
+Version 2009081101
+- 20090811: Added README and Changes to MANIFEST.
+- 20090403: Added README and Changes.
+----
+Version 2009040301
+- 20090403: Move to git and github.
+- 20090403: Standard layout.
+----
+Revision 1.1  2000/05/31 19:38:56  abigail
+Initial revision.

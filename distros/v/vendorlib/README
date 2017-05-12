@@ -1,0 +1,35 @@
+NAME
+
+    vendorlib - Use Only Core and Vendor Libraries in @INC
+
+SYNOPSIS
+
+        #!/usr/bin/perl
+    
+        use vendorlib;
+        use strict;
+        use warnings;
+        use SomeModule; # will only search in core and vendor paths
+        ...
+
+DESCRIPTION
+
+    In a system distribution such as Debian, it may be advisable for Perl
+    programs to ignore the user's CPAN-installed modules and only use the
+    distribution-provided modules to avoid possible breakage with newer and
+    unpackaged versions of modules.
+
+    To that end, this pragma will replace your @INC with only the core and
+    vendor @INC paths, ignoring site_perl and $ENV{PERL5LIB} entirely.
+
+    It is recommended that you put use vendorlib; as the first statement in
+    your program, before even use strict; and use warnings;.
+
+ACKNOWLEDGEMENTS
+
+    Thanks to mxey, jawnsy and ribasushi for help with the design.
+
+AUTHOR
+
+    Rafael Kitover <rkitover@gmail.com>
+

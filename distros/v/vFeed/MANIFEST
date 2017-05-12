@@ -1,0 +1,21 @@
+bin/vfeed.pl
+Changes
+examples/cpe.pl
+examples/cve-from-cpe.pl
+examples/cve.pl
+examples/latest.pl
+examples/update.pl
+lib/vFeed.pm
+lib/vFeed/DB.pm
+lib/vFeed/Log.pm
+LICENSE
+LICENSE.Artistic
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01-pod-coverage.t
+t/01-test-pod.t
+t/01-use.t
+vfeed.dot
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

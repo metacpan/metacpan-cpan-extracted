@@ -1,0 +1,37 @@
+---
+abstract: 'Use Only Core and Vendor Libraries in @INC'
+author:
+  - 'Rafael Kitover <rkitover@gmail.org>'
+build_requires:
+  Data::Dumper: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  blib: '1.01'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: vendorlib
+no_index:
+  directory:
+    - t
+requires:
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=vendorlib
+  homepage: http://metacpan.org/release/vendorlib
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/rkitover/vendorlib.git
+version: '0.12'
+x_authority: cpan:RKITOVER

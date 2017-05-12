@@ -1,0 +1,33 @@
+vsDB version $Revision: 1.4.3 $
+==========================================
+
+vsDB provides Perl programmers with a simple object-oriented 
+interface for text-delimited data files.  The object model is very similar 
+to Microsoft's ADO RecordSet object, so if you've used that, vsDB will be a bit 
+familiar to you. The primary difference is that you don't use SQL commands to 
+retrieve data.  Instead, all data is loaded from flat files. You use the 
+Filter method to find individual or groups of records and the Sort method to 
+order your results.
+
+Please see the POD for the module for additional information.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2001 Jason M. Hinkle. All rights reserved.
+
+This library is free software.  You can redistribute it and/or modify it 
+under the same terms as Perl itself.
+

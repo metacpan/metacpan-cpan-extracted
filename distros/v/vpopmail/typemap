@@ -1,0 +1,3 @@
+const char *					T_PTROBJ
+off_t						T_PTROBJ
+uid_t						T_UV

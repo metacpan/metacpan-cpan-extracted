@@ -1,0 +1,128 @@
+NAME
+    variable - Perl pragma to declare (scalar) variables without a leading
+    "$".
+
+SYNOPSIS
+        use variable  spam  =>  17;
+        use variable  eggs  =>  spam + 25;
+        use variable "i";            # Makes "i" undefined.
+        use variable  arr   =>  [qw /aap noot mies wim zus jet/];
+
+        print eggs, "\n";            # Print 42.
+              eggs += 27;
+        print eggs, "\n";            # Print 69.
+
+        for (i = 0; defined (arr -> [i]); i ++) {
+            print arr -> [i], " ";   # Print aap noot mies wim zus jet.
+        }
+
+DESCRIPTION
+    This simple module allows you to create scalar variables that do not
+    need a leading "$". This will make people coming from a C or a Python
+    background feel more at home.
+
+NOTES
+    This module requires perl 5.6.0.
+
+    The values given to the variables are evaluated in list context. You may
+    wish to override this by using "scalar".
+
+    These variables do not directly interpolate into doublequotish strings,
+    although you may do so indirectly. (See the perlref manpage for details
+    about how this works.)
+
+        print "The value of eggs is ${\eggs}.\n";
+
+    This only works for scalar variables, not arrays or hashes.
+
+    Naming of variables follow the same rules as in "constant.pm". Names
+    must begin with a letter or underscore. Names beginning with a double
+    underscore are reserved. Some poor choices for names will generate
+    warnings, if warnings are enabled at compile time.
+
+    Variable symbols are package scoped (rather than block scoped, as "use
+    strict;" is. That is, you can refer to a variable from package "Other"
+    as "Other::var".
+
+    As with all "use" directives, defining a variable happens at compile
+    time. This, it's probably not correct to put a variable declaration
+    inside of a conditional statement (like "if ($foo) {use variable ...}").
+
+    Omitting the value for a symbol gives it the value of "undef". This
+    isn't so nice as it may sound, though, because in this case you must
+    either quote the symbol name, or use a big arrow "=>" with nothing to
+    point to. It is probably best to declare these explicitly.
+
+        use variable bacon  =>  ();
+        use variable ham    =>  undef;
+
+    The result from evaluating a list constant in a scalar context is not
+    documented, and is not guaranteed to be any particular value in the
+    future. In particular, you should not rely upon it being the number of
+    elements in the list, especially since it is not necessarily that value
+    in the current implementation.
+
+    In the rare case in which you need to discover at run time whether a
+    particular variable has been declared via this module, you may use this
+    function to examine the hash %variable::declared. If the given variable
+    name does not include a package name, the current package is used.
+
+        sub declared ($) {
+            use variable;                   # don't omit this!
+            my $name =  shift;
+               $name =~ s/^::/main::/;
+            my $pkg  =  caller;
+            my $full = $name =~ /::/ ? $name : "${pkg}::$name";
+            $variable::declared {$full};
+        }
+
+BUGS
+    A variable with the name in the list "STDIN STDOUT STDERR ARGV ARGVOUT
+    ENV INC SIG" is not allowed anywhere but in package "main::", for
+    technical reasons.
+
+    You can get into trouble if you use variables in a context which
+    automatically quotes barewords (as is true for any subroutine call). For
+    example, you can't say "$hash {variable}" because "variable" will be
+    interpreted as a string. Use "$hash {variable ()}" or "$hash
+    {+variable}" to prevent the bareword quoting mechanism from kicking in.
+    Similarly, since the "=>" operator quotes a bareword immediately to its
+    left, you have to say "variable () => 'value'" (or simple use a comma in
+    place of the big arrow) instead of "variable => 'value'"
+
+DEVELOPMENT
+    The current sources of this module are found on github,
+    <git://github.com/Abigail/variable.git>.
+
+AUTHOR
+    This package was written by Abigail, cpan@abigail.be.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2000, 2009, Abigail
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+THANKS
+    The author wishes to thank EFNet's #python IRC channel for the
+    inspiration to write this module.
+
+    A lot of the code and documentation of "constant.pm" was cut and pasted
+    in.
+

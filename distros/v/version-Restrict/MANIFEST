@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/version/Restrict.pm
+t/00-compile.t
+t/01-basics.t
+t/lib/Bar.pm
+t/lib/Foo.pm
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/release-rinci.t

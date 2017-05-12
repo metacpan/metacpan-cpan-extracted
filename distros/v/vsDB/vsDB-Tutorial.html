@@ -1,0 +1,289 @@
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" Content="Microsoft Visual Studio 6.0">
+<TITLE>vsDB Tutorial</TITLE>
+</HEAD>
+<BODY>
+
+<P><FONT face=Arial size=4><STRONG>vsDB.pm Tutorial</STRONG> </FONT> </P>
+<P><FONT face=Arial size=2>vsDB is a 
+Perl module that provides Perl programmers with a simple object-oriented 
+interface for text-delimited data files.&nbsp; The object model is very similar 
+to Microsoft's ADO RecordSet object, so if you've used that, vsDB will be a bit 
+familiar to 
+you.&nbsp; The primary difference is that you don't use SQL commands to retrieve data.&nbsp; 
+Instead, all data&nbsp;is loaded from&nbsp;flat files.&nbsp; You use a 
+Filter method to find individual or groups of records, and the Sort method to 
+order your results.</FONT>             
+           
+               
+</P>
+<P><FONT face=Arial size=2>     If you have 
+experience with data driven applications&nbsp;you may be&nbsp;wondering why you 
+would choose vsDB as     opposed 
+to the Perl DBI modules, which support a wide range of database back-ends?&nbsp; 
+vsDB fits a particular niche that I have discovered while writing small applications 
+to distribute as freeware.&nbsp; Most end-users of Perl scripts fit one of 
+two profiles: 1) webmasters with an account on a virtual 
+server, 2) webmasters with their own personal Windows server.&nbsp; Although&nbsp;installing DBI and a database&nbsp;server 
+is not terribly difficult, it is beyond what the average 
+webmaster is willing to do (and/or has the server permissions to do),&nbsp; especially for 
+a small utility-type application.&nbsp; Furthermore, a full-featured database system may be overkill for 
+a script to&nbsp;store&nbsp;a small mailing list, product listing,&nbsp;etc.</FONT>&nbsp;           
+         
+</P>
+<P><FONT face=Arial size=2>vsDB is 
+perfect for small&nbsp;applications, but&nbsp;I've used it with files of over 
+20,000 records.&nbsp; It is fairly fast and has all the features needed for 
+single-table applications.&nbsp; Relational databases can even be simulated with clever 
+programming.&nbsp; Also, with some Perl trickery on your part, the end-user of 
+your script does not even&nbsp;need server permissions to install new Perl modules.&nbsp; You can 
+create a simple data-driven application in minutes&nbsp;that will run on just about any 
+server with no complicated installation.</FONT>            
+              
+            
+          </P>
+<P><FONT face=Arial size=2><STRONG>Example 1: Create a new database file and add two 
+records</STRONG>       </FONT></P>
+<P><FONT face=Arial size=2>The following 
+program will create a new database with two fields "Name" and "Age."&nbsp; It 
+will add two records to the database, set the values for each record's fields, 
+and save it to C:\database.txt.&nbsp; You can copy/paste this code 
+to a Perl script, or even run it directly from the Perl command line.&nbsp; 
+(If you are using a UNIX server, you should change C:\database.txt to 
+an appropriate file path)&nbsp; We'll use this datafile for the other examples, so keep the datafile 
+that it creates.&nbsp; This program is meant to run from the command 
+line - not through web browser.</FONT></P>
+<pre>
+use vsDB;
+
+# first create the database object
+my ($objDB) = new vsDB;
+
+# specify the filepath for our new file 
+$objDB-&gt;File("C:/database.txt");
+
+#this is a new database - add two columns 
+$objDB-&gt;AddNewField("Name"); 
+$objDB-&gt;AddNewField("Age"); 
+
+# now add a new record and set the field values 
+$objDB-&gt;AddNew; 
+$objDB-&gt;FieldValue("Name","Joe"); 
+$objDB-&gt;FieldValue("Age",8); 
+
+# let's add a second record
+$objDB-&gt;AddNew; 
+$objDB-&gt;FieldValue("Name","Jim"); 
+$objDB-&gt;FieldValue("Age",9); 
+
+# looks good - lets save it to disk and close the database 
+$objDB-&gt;Commit;
+$objDB-&gt;Close; 
+</pre>
+<P> 
+
+<FONT face = Arial size =2>
+<STRONG>
+Example 2: Retrieve 
+information
+from
+your
+database</STRONG>
+   
+</FONT></P>
+<P>
+
+         
+<FONT face=Arial size=2>
+Now that 
+you have created the database with the first program, we can retrieve some 
+records and print them to the screen.&nbsp; Make sure
+that&nbsp;you have a file called&nbsp;database.txt on your C:\ drive (or wherever you saved
+it)</FONT>&nbsp; </P>
+<pre>
+use vsDB;
+
+# first create the database object
+my ($objDB) = new vsDB; 
+
+# specify the file path and open the file 
+$objDB-&gt;File("C:/database.txt"); 
+$objDB-&gt;Open; 
+
+# now loop through all the records, printing them one per line 
+until($objDB-&gt;EOF) { 
+    print"Name: " . $objDB-&gt;FieldValue("Name") . " "; 
+    print "Age:" . $objDB-&gt;FieldValue("Age") . "\n"; 
+    $objDB-&gt;MoveNext; 
+} 
+
+# all done - close the database
+$objDB-&gt;Close; 
+</pre>
+
+<p><FONT face=Arial size=2>
+   
+What we have done is open the datafile, then loop through all of the 
+records in the file.&nbsp; If you were running this at the command line, you 
+would have seen the two&nbsp;records that we added to the datafile in Example 1.&nbsp; If you 
+tried to run this in a browser, you probably got a cgi error, because we didn't 
+print the "Content-type text/html\n\n" header.
+</FONT></p>
+<P><FONT face=Arial size=2>The most interesting part of this script is where we 
+are looping through the records.&nbsp; Notice that the <EM>until</EM> command 
+loops until <EM>$objDB-&gt;EOF</EM>.&nbsp; What the heck does this 
+mean??!!&nbsp; Well, EOF is a property of the vsDB object that stands for End Of 
+File.&nbsp; This means that when <EM>$objDB-&gt;EOF</EM> returns a <EM>True</EM> 
+ value, we have reached the end of our datafile.</FONT></P>
+<P><FONT face=Arial size=2>vsDB uses the 
+database concept of a "curser."&nbsp; You move your computer's curser up and 
+down in a document&nbsp;using the up and down arrows on your keypad.&nbsp; Well, 
+you can move the database "curser" up and down from one record to the 
+next.&nbsp; To do this, you simple call the method <EM>$objDB-&gt;MoveNext</EM> 
+to move&nbsp;down one line to the next record.&nbsp; In case you're curious, there's another 
+method not used in this example called <EM>$objDB-&gt;MovePrevious</EM>.&nbsp; That, of course, moves 
+the cursor up one line to the previous record.&nbsp; If you know exacly what row 
+you want, you can call the AbsolutePosition method.&nbsp; For 
+example,&nbsp;<EM>$objDB-&gt;AbsolutePosition(2)</EM> would move the cursor directly&nbsp;to record number 2.</FONT></P>
+<P><FONT face=Arial size=2>So, using the cursor we are able to retrieve the 
+entire datafile - one record at a time.&nbsp; When we want to move to the next 
+record, we call the <EM>MoveNext</EM>   method.&nbsp;&nbsp;Each time we check the 
+<EM>EOF</EM> property.&nbsp; When <EM>EOF</EM> is <EM>True</EM>, then we know 
+we have reached the end of 
+the datafile -&nbsp;there are no more records.</FONT></P>
+
+<P><FONT face=Arial size=2><STRONG>Example 3: Update a record</STRONG>       </FONT></P>
+<P><FONT face=Arial size=2>This third example will open our datafile
+and update one of the records.</FONT></P>
+<pre>
+use vsDB;
+
+# first create the database object
+my ($objDB) = new vsDB; 
+
+# specify the file path for data file and open it 
+$objDB-&gt;File("C:/database.txt"); 
+$objDB-&gt;Open; 
+
+# move the cursor to a specific record 
+$objDB-&gt;AbsolutePosition(2); 
+
+# update the field values
+$objDB-&gt;FieldValue("Name","Jerry"); 
+$objDB-&gt;FieldValue("Age",10); 
+
+# save it to disk and close the database 
+$objDB-&gt;Commit;
+$objDB-&gt;Close; 
+</pre>
+<P><FONT face=Arial size=2>If you open the datafile, you'll 
+see that the second record has been changed from Jim, Age 9 to Jerry, Age 10. We 
+updated record number 2. </FONT> 
+             
+             
+<p><FONT face=Arial size=2>
+You might have noticed that the <EM>FieldValue</EM> method is used differently in
+Example 2.  Example 2 has one parameter, which is our field name ("Name") and ("Age").
+In Example 1 and 3, though, it has two parameters ("Name", "Jerry").
+When you submit only 1 parameter, vsDB assumes that you want to see
+what the value is for that field.  When you submit 2 parameters, vsDB
+assumes that you want to <EM>change</EM> the value of that field. </FONT>     
+
+<p><STRONG><FONT face=Arial 
+size=2>Notes:</FONT></STRONG></p><FONT face=Arial size=2>The above examples show 
+you the 3 main features that you would normally need from a datafile. Inserting 
+data, retrieving data, and updating data. In addition, Example 1 showed us how 
+to create a brand new datafile programmatically. </FONT>
+
+            
+           
+             
+<p><FONT face=Arial size=2>There are several features that 
+you will probably need that are not explained here. This includes sorting 
+records, searching for one or more records Included with this module are a few 
+example scripts. They should provide you with further examples for normal 
+database functions. You can also check the documentation for vsDB. </FONT>
+            
+           
+            
+          
+     
+<p><FONT face=Arial size=2>One particular thing to notice is 
+that the row number is used for locating a particular record in Example 3. 
+Basically, we are using the actual file row number as the primary key for the 
+data. This works fine as however you have to be careful when deleting or 
+re-ordering the datafile, as you can update the wrong record. This method is 
+especially dangerous if you're writing an application that more than one person 
+will be using simultaneously. A safer way to do this is to create an ID field to 
+use as a primary key. You simply increment the ID for each new record. (The Max 
+method is helpful for finding the current largest ID). Then you use the Filter 
+method to locate the record with the specified ID. This technique is used in the 
+included example scripts. </FONT>
+            
+           
+              
+           
+            
+         
+             
+              
+             
+            
+            
+  
+
+
+<P><FONT face=Arial size=2><STRONG>Perl trickery to allow the script to look in 
+the current directory for modules:</STRONG> </FONT></P>
+<P><FONT face=Arial size=2>
+One of the best things about using vsDB is that you can create a script
+that will run on just about any platform with no administrative access to
+the server necessary.  Most people with a virtual host don't have permission
+to install Pel modules.  Using the following code, you can tell
+your script to look in a specific directory for modules.  This requires two steps.</FONT> </P>
+<P><FONT face=Arial size=2>a) Perl modules are generally installed in the Perl 
+path somewhere.&nbsp; Not all Perl programmers realize that the Perl path is 
+available to your program in an array called @INC.&nbsp; You can add the current 
+directory to this array, thus adding the current directory to the Perl 
+path!&nbsp; The trick is that you have to put it in the BEGIN clause so that it 
+will be compiled by the Perl interpreter before interpreting the rest of the 
+script.&nbsp; (Otherwise it would compile the whole script first and would give 
+you an error saying that it couldn't find your module!)&nbsp; You can copy/paste 
+the following BEGIN clause into your script.&nbsp; All this does is attempt to 
+find the current directory and then add it to the Perl path (@INC array).&nbsp; 
+You may or may not know that . stands for the current directory on many 
+servers.&nbsp; However, Windows servers are more picky, requiring the full 
+path.</FONT></P>
+<P></FONT>
+<pre>
+BEGIN {
+  my ($currentDirectory);
+  if ($ENV{'PATH_TRANSLATED'}) {
+    my ($scriptPath) = $ENV{'PATH_TRANSLATED'};
+    my ($directorySeparator) = "\\";
+    $currentDirectory =  substr($scriptPath,0,rindex($scriptPath,$directorySeparator)); 
+  } else { 
+    $currentDirectory = "."; 
+  }  
+  push(@INC,$currentDirectory);
+}   
+</pre>
+<P><FONT face=Arial size=2>b) The next step is just a slight modification of the 
+way you would normally include a module for use in your script.&nbsp; Normally, 
+you would include a module like so:</FONT></P>
+<P><FONT face="Courier New" size=2>use vsDB;</FONT></P>
+<P><FONT face=Arial size=2>However, this will execute at compile time and can 
+cause an error&nbsp;when Perl doesn't find your module.&nbsp; You can instead 
+force the module to load at run-time instead like so:</FONT></P>
+<P><FONT face="Courier New" size=2>eval 'use vsDB';</FONT></P>
+<P><FONT face=Arial size=2>That's it!&nbsp; Now you can just include a copy of 
+vsDB.pm along with your script and your end-user only has to save it in the same 
+directory as the script.</FONT></P>
+
+<hr>
+<FONT face=Arial size=1>Copyright 2001, </FONT>
+  <a href="http://www.verysimple.com/jason/"><FONT face=Arial 
+size=1>Jason M. Hinkle</FONT>  </a>
+</BODY>
+</HTML>

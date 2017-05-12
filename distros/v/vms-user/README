@@ -1,0 +1,33 @@
+README for VMS::User
+
+Copyright (c) 1999 Dan Sugalski
+comaintained by Craig Berry
+cocomaintained since 2007 by Peter Prymmer
+
+You may distribute under the terms of the Artistic License, as distributed
+with Perl.
+
+This module lets you retrieve most of the info available via the system
+service GETUAI. It will also get a list of users in your SYSUAF if 
+you have read access to it and execute access to AUTHORIZE.
+
+To build and test with perl use:
+
+    perl Makefile.pl
+    mms
+    mms test
+
+If it tests OK, then
+
+    mms install
+
+to install it (mmk may be used in place of mms in the above commands). 
+More info is in the POD documentation in the User.pm file.
+
+VMS::User allows Perl programs to retrieve a list of users and get
+information about their accounts. The information it returns is pretty much
+equivalent to what AUTHORIZE provides.
+
+This module can't violate VMS system security in any way that DCL can't, so
+if you can see something with SYS$GETUAI, you can see it with VMS::User.
+If you can't see the item with AUTHORIZE, you can't here, either.

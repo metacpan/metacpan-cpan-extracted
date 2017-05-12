@@ -1,0 +1,64 @@
+NAME
+    version::Restrict - Control permitted versions that can be use'd
+
+VERSION
+    version 0.01
+
+SYNOPSIS
+    In your module (you don't want users using version "v" where "0.0.0 <= v
+    < 1.0.0" or "2.2.4 <= v < 2.3.1"):
+
+     package YourModule;
+     use version::Restrict (
+         "[0.0.0,1.0.0)" => "constructor syntax has changed",
+         "[2.2.4,2.3.1)" => "frobniz method croaks without second argument",
+     );
+
+    Now your module users will die when they write:
+
+     use YourModule;       # no version specified
+     use YourModule 0.0.1; # contructor syntax has changed
+     use YourModule 2.2.5; # frobniz method croaks without second argument
+
+    But any of these are OK:
+
+     use YourModule 1.0.0;
+     use YourModule 2.4.1;
+
+DESCRIPTION
+    Status: experimental/proof-of-concept.
+
+    This module is like version::Limit, but with a different interface (you
+    specify restricted versions in the "use" statement) and a different
+    behavior (if v0.0.0 is in one of the restricted versions, your module
+    user must specify desired version of your module explicitly, otherwise
+    they will die).
+
+    This module works by installing a "VERSION()" method to your module.
+    This method will be called by Perl when your module user use's your
+    module with specified version, e.g. "use YourModule 0.123;".
+
+    Additionally, this module will also install (or wrap) an "import()"
+    method to your module. The task of this method is to check whether
+    "VERSION()" has been called via checking a flag variable. We require
+    "VERSION()" to be run if one of the restricted versions is "v0.0.0",
+    meaning that you don't want your module users to just say "use
+    YourModule;" (without specifying explicit version). After that, the
+    installed "import()" method just passes control to the original import
+    method.
+
+SEE ALSO
+    version::Limit
+
+    http://blogs.perl.org/users/steven_haryanto/2013/09/breaking-users-of-ol
+    d-versions-of-a-module.html
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
