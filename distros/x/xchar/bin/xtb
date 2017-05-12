@@ -1,0 +1,1026 @@
+#!/usr/bin/env perl
+# $Source: /home/keck/gen/RCS/xtb,v $
+# $Revision: 4.23 $$Date: 2007/07/07 07:51:55 $
+# Contents
+#   1 standard    9 image              17 xhandler_clients   25 tkid
+#   2 global      10 picture           18 xhandler_active    26 buttons
+#   3 args        11 thandler          19 xhandler_stacking  27 picture
+#   4 log         12 destroy_zombies   20 xhandler           28 main
+#   5 xtops/1     13 xon/off           21 event masks        29 notes
+#   6 dot file    14 xhandler_icon     22 name               30 pod
+#   7 xtops/2     15 xhandler_command  23 tk
+#   8 left/right  16 xhandler_adjust   24 screen
+
+# ----------------------------------------------------------------------
+
+#1# standard
+
+use strict;
+use warnings;
+
+(my $cmd = $0) =~ s%.*/%%;
+
+sub usage { print "Usage: $cmd -help\n"; }
+sub quit { (@_) ? print STDERR "$cmd quitting: @_\n" : usage; exit 1 }
+
+use X11::Tops; # uses X11::Protocol
+
+use Carp;
+
+use Data::Dumper;
+$Data::Dumper::Terse = 1;
+$Data::Dumper::Indent = 1;
+$Data::Dumper::Quotekeys = 0;
+$Data::Dumper::Sortkeys = 1;
+
+sub perldoc {
+  my ($perldoc, $less);
+  for (split /:/, $ENV{PATH}) {
+    $perldoc = "$_/perldoc" if -x "$_/perldoc";
+    last if $perldoc; next if $less;
+    $less = "$_/less" if -x "$_/less";
+  }
+  if ($perldoc) {
+    $ENV{LESSCHARSET} = 'latin1';
+    exec $perldoc, $0
+  } elsif ($less) {
+    exec $less, '+/^# Sorry.*', $0
+  } else {
+    print
+      "Sorry, there's no perldoc(1) or even less(1) in your \$PATH\n" .
+      "The documentation can be found at the end of $0\n";
+    exit 1
+  }
+}
+
+# ----------------------------------------------------------------------
+
+#2# global
+
+my $X;
+my $root;
+
+my $xtops;
+my @xtops;
+my %xtopsbyid;
+my %xtopsbychar;
+
+my $main;
+my $name;
+my $tkid;
+my $active;
+my %button;
+
+my $screen;
+my @screen_x;
+my $screen_w;
+
+my $timer;
+my $xtb_on_top;
+
+my $relief = 'raised'; # raised sunken flat ridge solid groove
+
+my $nopicture = 0;
+my $picture_commands;
+my $picture;
+my $screenheight;
+my $width = 170;
+
+# ----------------------------------------------------------------------
+
+#3# args
+
+my @ORGV = @ARGV; # for restart
+my @argv; # collect standard X arguments
+my $logfile;
+
+while (@ARGV) {
+  $_ = shift;
+  perldoc() if /^-+(man|help)/;
+  push(@argv, $_, shift), next if /^-(geometry|display)/;
+  $logfile = shift, next if /^-+l/;
+  $nopicture = 1, next if /^-p/;
+  $relief = shift, next if /^-+r/;
+  $width = shift, next if /^-+w/;
+  unshift @ARGV, $_;
+  last;
+}
+
+@ARGV = @argv;
+
+# ----------------------------------------------------------------------
+
+#4# log
+
+use POSIX qw(strftime);
+
+sub printlog {
+  print strftime("%y%m%d %H%M%S\n", localtime(time));
+  print @_;
+}
+
+sub printlog_attributes {
+  print strftime("%y%m%d %H%M%S\n", localtime(time));
+  print @_;
+  my %attributes = X11::Top::attributes($tkid);
+  print (Data::Dumper->Dump([\%attributes], ['attributes']));
+  my $your_event_mask = $attributes{your_event_mask};
+  my @your_event_mask = $X->unpack_event_mask($your_event_mask);
+  print(
+    Data::Dumper->Dump([\@your_event_mask], ['above_your_event_mask'])
+  );
+}
+
+if (defined $logfile) {
+  local $_ = $logfile;
+  quit("logfile name empty") if /^$/;
+  quit("no such directory '$1'") if m-(.+)/- && !-d $1;
+  $logfile = "./$_" unless $_;
+  open LOG, ">>$logfile";
+  open STDOUT, ">>&LOG";
+  open STDERR, ">>&LOG";
+  select LOG;
+  $| = 1;
+  print strftime("%y%m%d %H%M%S ", localtime(time)), '-' x 58, "\n";
+}
+
+# ----------------------------------------------------------------------
+
+#5# xtops/1
+
+# avoid unix socket [+taskbar2] ...
+$ENV{DISPLAY} =
+  $ENV{DISPLAY} =~ /.:/ ? $ENV{DISPLAY} :
+  $ENV{DISPLAY} =~ /^:/ ? 'localhost' . $ENV{DISPLAY} :
+  'localhost:0';
+
+$xtops = X11::Tops->new;
+$X = $xtops->X;
+$root = $X->root;
+
+# ----------------------------------------------------------------------
+
+#6# dot file
+
+quit("no ~/.$cmd") unless -f "$ENV{HOME}/.$cmd";
+my $config = do "$ENV{HOME}/.$cmd";
+
+$xtops->{char} = $config->{char};
+
+{ my $order = $config->{order}; # arrayref, element = char
+  my %order;
+  for (0 .. $#$order) {
+    $order{$order->[$_]} = $_ unless defined $order{$order->[$_]}
+  }
+  $xtops->{order} = \%order;
+}
+
+$picture_commands = $config->{picture};
+
+# ----------------------------------------------------------------------
+
+#7# xtops/2
+
+# want current instance names so can add suffix to xtb
+
+$xtops->update; # returns array of deleted Top, empty in this case
+@xtops = @{$xtops->sorted};
+%xtopsbyid = %{$xtops->byid};
+%xtopsbychar = %{$xtops->bychar};
+
+# ----------------------------------------------------------------------
+
+#8# left/right
+
+# @screen_x = distances from xterm right edges to screen right edge
+# $r1 & $r2 are distances from xtb right edge to screen right edge
+
+sub left {
+  my $geometry = $main->geometry;
+  my ($w1, $h1, $x1, $y1) =
+    $geometry =~ /(\d+)x(\d+)([+-]+\d+)([+-]+\d+)/;
+  my $r1 = $x1 =~ /^-/ ? -$x1 : $screen_w - $x1 - $w1;
+  my $r2;
+  for my $i (0 .. $#screen_x) {
+    $r2 = $screen_x[$i], last if $r1 < $screen_x[$i];
+  }
+  $r2 = $screen_x[0] unless defined $r2;
+  my $y2 = 0 + $y1; # stop walking
+  $main->geometry("-$r2+$y2");
+}
+
+sub right {
+  left for 1 .. $#screen_x;
+}
+
+# ----------------------------------------------------------------------
+
+#9# image
+
+sub image {
+  my ($picture_command, $size) = @_;
+  { no warnings;
+    open OLDOUT, '>&', STDOUT;
+    open STDOUT, ">/tmp/$name-cmd";
+    system @$picture_command, "-$size", "/tmp/$name";
+    open STDOUT, '>&', OLDOUT;
+  }
+  chop(my ($fullsize, $format) = `cat /tmp/$name-cmd`);
+  unlink "/tmp/$name-cmd";
+  unless ($format) {
+    print STDERR
+      "$cmd warning: wrong return from\n",
+      "  '",
+      join("' '", @$picture_command, "-$size", "/tmp/$name"),
+      "'\n";
+    return;
+  }
+  my $return;
+  eval qq{
+    \$return = \$main->Photo(
+      -file => "/tmp/$name", -format => \$format
+    );
+  };
+  unless ($return) {
+    print STDERR "$cmd warning: Tk::Photo failure for $fullsize\n";
+    return;
+  }
+  $return;
+}
+
+# ----------------------------------------------------------------------
+
+#10# picture
+
+sub picture {
+  my $i = shift;
+  $i %= @$picture_commands;
+  my $image = image(
+    $picture_commands->[$i],
+    $picture->width . 'x' . $picture->height
+  );
+  return unless $image;
+  $picture->configure(-image => $image);
+}
+
+# ----------------------------------------------------------------------
+
+#11# thandler
+
+my $delay = 60_000;
+
+sub thandler { $main->raise; }
+
+# ----------------------------------------------------------------------
+
+#12# destroy_zombies
+
+# +taskbar9
+
+sub destroy_zombies {
+  my %xtop_button_ids;
+  for my $xtop (@xtops) {
+    next unless my $button = $xtop->{button};
+    my $id = $button->id;
+    $xtop_button_ids{$id}  = 1
+  }
+  for my $widget ($main->children) {
+    next unless $widget->class eq 'Button';
+    my $id = $widget->id;
+    next if $xtop_button_ids{$id};
+    $logfile && printlog(
+      "destroying zombie with text '", $widget->cget(-text), "'\n"
+    );
+    $widget->destroy;
+  }
+}
+
+# ----------------------------------------------------------------------
+
+#13# xon/off
+
+sub xon {
+  $main->fileevent(
+    $X->connection->fh,
+    readable => \&xhandler
+  );
+}
+
+sub xoff {
+  $main->fileevent(
+    $X->connection->fh,
+    readable => ''
+  );
+}
+
+# ----------------------------------------------------------------------
+
+#14# xhandler_icon
+
+sub xhandler_icon {
+  my $xtop = shift;
+  my $text = $xtop->icon;
+  my $char = $xtop->{char};
+  $text = $text =~ /^$char / ? $text : "$char $text";
+  my $button = $xtop->{button};
+  if ($button) {
+    $logfile &&
+      printlog("\$button->configure(-text => '$text')\n");
+    $button->configure(-text => $text);
+  } else {
+    print "no button for $xtop->{instance}\n";
+  }
+}
+
+# ----------------------------------------------------------------------
+
+#15# xhandler_command
+
+sub xhandler_command {
+  my $xtop = shift;
+  local $_ = $xtop->command;
+  $logfile && printlog("$_\n");
+  if (/^exi/) {
+    exit
+  } elsif (/^res/) {
+    exec $0, @ORGV;
+  } elsif (/^dum/) {
+    $Data::Dumper::Sortkeys = sub {
+      my @grep_v = sort grep !/^replies$/, keys %{$_[0]};
+      \@grep_v;
+    };
+    print Dumper $xtops;
+    $Data::Dumper::Sortkeys = 1;
+  } elsif (/^DUM/) {
+    print Dumper $xtops;
+  } elsif (/^pic\D*(\d*)$/) {
+    picture($1 || 0) if $picture;
+  } elsif (/^aut\D*(\d+)/) {
+    $delay = $1 * 1000;
+  } elsif (/^lef/) {
+    left;
+  } elsif (/^rig/) {
+    right;
+  } elsif (/^rai|^low/) {
+    my ($nofocus, $char);
+    my $key = 'char';
+    for my $a (split) {
+      $key = 'instance', next if $a =~ /^-i/;
+      $nofocus = 1, next if $a =~ /^-n/;
+      $char = $a;
+    }
+    my $xtop2 = $xtopsbychar{$char};
+    if ($xtop2) {
+      if (/^rai/) {
+        $nofocus ? $xtop2->raise : $xtop2->raise_and_focus;
+      } elsif (/^low/) {
+        $xtop2->lower;
+      }
+    }
+  }
+}
+
+# ----------------------------------------------------------------------
+
+#16# xhandler_adjust
+
+sub xhandler_adjust {
+  my %event = @_;
+  if ($event{state} eq 'Unobscured') {
+    $timer->cancel if $timer;
+  } else {
+    $timer = $main->after(60_000, \&thandler)
+  }
+}
+
+# ----------------------------------------------------------------------
+
+#17# xhandler_clients
+
+sub xhandler_clients {
+  my @deleted = $xtops->update;
+  @xtops = @{$xtops->sorted};
+  %xtopsbyid = %{$xtops->byid};
+  %xtopsbychar = %{$xtops->bychar};
+  $logfile && !@xtops && printlog("empty update\n");
+  if (@deleted) {
+    print(+@deleted .  " toplevels deleted at once\n")
+      if @deleted > 1;
+    while (my $xtop = shift @deleted) {
+      if (@xtops || @deleted > -1) { # ie always true
+        $xtop->{button}->destroy if $xtop->{button};
+      } else { # doesn't handle all cases
+        $xtop->{button}->configure(-text => 'aaaargh!')
+	  if $xtop->{button};
+      }
+    }
+  }
+  my $prev;
+  for my $xtop (@xtops) {
+    unless ($xtop->{button}) {
+      $xtop->monitor_property_and_visibility_change, next
+        if $xtop->{instance} eq $cmd && $name eq $cmd;
+      $xtop->monitor_property_change;
+      my $text = $xtop->icon;
+      my $char = $xtop->{char};
+      my $c = quotemeta $char;
+      $text = $text =~ /^$c / ? $text : "$char $text";
+      my $button = $main->Button(-text => $text, %button);
+      if ($xtop == $xtops[0]) {
+	if ($picture) {
+          $button->pack(
+            -fill => 'x',
+            -before => $picture,
+          );
+	} else {
+          $button->pack(
+            -fill => 'x',
+          );
+	}
+      } else {
+        $button->pack(
+          -fill => 'x',
+          $prev
+            ? (-after => $prev)
+            : (-before => $xtops[0]{button}),
+        );
+      }
+      $xtop->{button} = $button;
+    }
+    $prev = $xtop->{button};
+  }
+  destroy_zombies;
+}
+
+# ----------------------------------------------------------------------
+
+#18# xhandler_active
+
+sub xhandler_active {
+  my $id = $xtops->active;
+  $_->{button}->configure(-state => 'normal')
+    if $active && ($_ = $xtopsbyid{$active}) && $_->{button};
+  if ($id) {
+    $active = $id;
+    $_->{button}->configure(-state => 'active')
+      if ($_ = $xtopsbyid{$active}) && $_->{button};
+  } else {
+    print "no active window\n";
+  }
+}
+
+# ----------------------------------------------------------------------
+
+#19# xhandler_stacking
+
+sub xhandler_stacking {
+  my @stacking = $xtops->stacking;
+  return unless @stacking;
+  $logfile &&
+    printlog(
+      join("\n  ", "stacking (\$tkid=$tkid):", @stacking), "\n"
+    );
+  if ($stacking[-1] == $tkid) {
+    $timer->cancel if $timer && !$xtb_on_top;
+    $xtb_on_top = 1;
+  } else {
+    $timer = $main->after($delay, \&thandler) if $xtb_on_top;
+    $xtb_on_top = 0;
+  }
+}
+
+# ----------------------------------------------------------------------
+
+#20# xhandler
+
+sub xhandler {
+  xoff;
+  $X->handle_input;
+  my %event;
+  while (my %event = $X->dequeue_event) {
+    my $xtop = $xtopsbyid{$event{window}};
+    my $atom = $X->atom_name($event{atom}) if $event{atom};
+    $logfile && printlog(Data::Dumper->Dump([\%event], ['event']));
+    $logfile && $atom && printlog("atom above = $atom\n");
+    if ($xtop) {
+      if ($event{name} eq 'PropertyNotify') {
+        if ($atom eq 'WM_ICON_NAME') {
+          xhandler_icon($xtop);
+        } elsif ($atom eq '_XCHAR_COMMAND') {
+          xhandler_command($xtop);
+        }
+      } elsif ($event{name} eq 'VisibilityNotify') {
+        if ($event{window} == $tkid) {
+          xhandler_adjust(%event);
+        }
+      }
+    } elsif ($event{window} == $root) {
+      if ($event{name} eq 'PropertyNotify') {
+        if ($atom =~ /^_[A-Z]+_CLIENT_LIST$/) {
+          xhandler_clients;
+        } elsif ($atom eq '_NET_ACTIVE_WINDOW') {
+          xhandler_active;
+        } elsif ($atom eq '_NET_CLIENT_LIST_STACKING') {
+          xhandler_stacking;
+        }
+      }
+    }
+  }
+  $main->update;
+  xon;
+}
+
+# ----------------------------------------------------------------------
+
+#21# event masks
+
+# $tkid elsewhere
+
+$_->monitor_property_change for @xtops;
+$xtops->monitor_property_change;
+
+# ----------------------------------------------------------------------
+
+#22# name
+
+# instance name of xtb
+# this finds other xtb instances
+
+$name = $cmd;
+
+{ my $n;
+  for my $xtop (@xtops) {
+    my $instance = $xtop->instance;
+    next unless my ($m) = $instance =~ /^$cmd(\d*)/;
+    $m ||= 0;
+    $n ||= 0;
+    $n = $m if $m > $n;
+  }
+  $name .= $n + 1 if defined $n;
+}
+
+# ----------------------------------------------------------------------
+
+#23# tk
+
+use Tk;
+
+# Tk/Web.pm selects the module
+if ($picture_commands) {
+  require Tk::Photo;
+  require Tk::JPEG;
+  require Tk::PNG;
+}
+
+$main = new Tk::MainWindow( # qualified for $screens->current($main)
+  -class => uc($cmd),
+  -name => $name,
+  -width => $width,
+);
+
+$main->scaling(1); # +taskbar7
+
+# %button global
+if ($picture_commands && !$nopicture) {
+  my $screenheight = $main->screenheight;
+  $main->configure(-height => $screenheight);
+  $main->packPropagate(0);
+  %button = (-anchor => 'w', -relief => $relief);
+} else {
+  my $tmpbutton = $main->Button;
+  my $font = $tmpbutton->cget(-font);
+  $font = $main->fontActual($font);
+  my $w = $tmpbutton->fontMeasure($font, 'A');
+  my $charwidth = int($width / $w);
+  %button = (-anchor => 'w', -relief => $relief, -width => $charwidth);
+}
+
+$main->title($name);
+$main->iconname($name);
+
+# ----------------------------------------------------------------------
+
+#24# screen
+
+require X11::Screens;
+
+{ my $screens = X11::Screens->new;
+  $screen = $screens->current($main);
+  quit("no screen found") unless $screen;
+}
+
+@screen_x = sort { $a <=> $b } @{$screen->x()};
+$screen_w = $main->screenwidth; # or $screen->width
+
+# ----------------------------------------------------------------------
+
+#25# tkid
+
+{ $tkid = my $wrapper = $main->wrapper;
+  if (ref $wrapper) {
+    for (@$wrapper) { $tkid = $_, last if $_ > 0 }
+  }
+}
+
+# X11::Top::monitor_property_and_visibility_change($tkid);
+# $logfile && printlog_attributes;
+
+# ----------------------------------------------------------------------
+
+#26# buttons
+
+for my $xtop (@xtops) {
+  next if $xtop->{instance} eq $cmd && $name eq $cmd;
+  my $text = $xtop->icon;
+  my $char = $xtop->{char};
+  $text = $text =~ /^$char / ? $text : "$char $text";
+  my $button = $main->Button(-text => $text, %button);
+  $button->pack(-fill => 'x');
+  $xtop->{button} = $button;
+}
+
+# ----------------------------------------------------------------------
+
+#27# picture
+
+if ($picture_commands && !$nopicture) {
+  $picture = $main->Label(-width => $width);
+
+  $picture->pack(-expand => 1, -fill => 'y');
+  $main->update;
+
+  picture(0);
+} else {
+  $main->update;
+}
+
+# ----------------------------------------------------------------------
+
+#28# main
+
+$X->{event_handler} = 'queue';
+
+xon;
+
+MainLoop;
+
+__END__
+
+# ----------------------------------------------------------------------
+
+#29# notes
+
+# 1.6
+#   some Tk
+# 1.10
+#   gui looks about right
+#   changes detected, but gui unaffected
+# 1.11
+#   changes show in gui
+# 1.14
+#   receives root window property changes
+# 1.16
+#   unfinished new window handling
+#   dropped Xchars, made .xls
+#   copied .xchars sub into .xls 'char' sub
+# 1.17
+#   sorting with .xls 'order' array
+# 1.19
+#   compare() of $oldtops & $newtops
+#   moved reading .xls to Xtops.pm
+#   doesn't quite work
+# 1.20
+#   much simpler
+#   new toplevels don't appear ... get empty updates
+# 1.21
+#   checks for root _WIN_CLIENT_LIST
+#   new xterm causes 2 entries, A & B
+# 1.22
+#   various fixes
+#   new xterm still shows no iconname, dunno why
+#   deletes still not handled
+# 1.23
+#   new xterm shows iconname & changes to it
+# 1.24
+#   deletes handled
+# 1.27
+#   active window shown
+# 1.29
+#   -name => 'xls1'
+#   moved subs before action
+# 1.30
+#   _XLS1_COMMAND & gen/xlc
+# 1.31
+#   experimenting with expose events
+# 1.32
+#   experimenting with visibility events
+# 1.33
+#   visibility events fixed
+# 1.34
+#   raises after timeout
+# 1.35
+#   no button for 'xls' if name is 'xls'
+# 1.37
+#   xup redone using message to xls [+taskbar4]
+# 1.38
+#   lowers as well as raises
+# 1.39
+#   raise & lower by instance as well as char
+# 1.40
+#   1st picture (filename & size hardwired)
+# 1.43
+#   picture from irand
+#   fiddly code to decide what module to load
+# 1.44
+#   load all probably needed modules
+#   sub image
+# 1.45
+#   size calculated
+# 1.51
+#   sub picture
+#   xlc picture works
+#   handles 'picture' message from xlc (renamed from xlcs)
+# 1.56
+#   got rid of extra frames with $main->packPropagate(0)
+# 1.57
+#   -relief -width -nopicture
+#   lots of usage
+# 1.58
+#   xlc picture 2
+#   handle sh magic characters in $picture_command
+# 1.59
+#   handle Tk::Photo failures [+taskbar4]
+# 1.69
+#   command 'config' ... works for picture_commands ... nothing else
+#     tried
+# 1.73
+#   autoraise using stacking order
+# 1.79
+#   left & right [+taskbar5]
+# 2.1
+#   +taskbar7
+# 3.1
+#   +taskbar7
+#   doesn't work yet
+# 4.6
+#   renamed rom xls to xtb [+taskbar8]
+
+# $Revision: 4.23 $
+
+# ----------------------------------------------------------------------
+
+#30# pod
+
+# Sorry, there's no perldoc in your $PATH, so here's the raw pod
+
+=head1 NAME
+
+xtb - xchar taskbar and char allocator
+
+=head1 SYNOPSIS
+
+ xtb [-geometry ...] [-r relief] [-w width] [-p] [-l logfile]
+
+=head1 DESCRIPTION
+
+Displays a vertical taskbar.  That is, a tall thin window containing a
+list of X clients.
+
+It requires that the window manager support some of the standard
+extended window manager hints (fvwm does, twm doesn't).  Specifically,
+it requires:
+
+          _NET_CLIENT_LIST
+          _NET_ACTIVE_WINDOW
+
+It also uses the always supported hints:
+
+          WM_CLASS
+          WM_ICON_NAME
+
+Access to all these is through the module X11::Tops.
+
+Each client's slot in the taskbar shows the client's 'character'
+followed by its icon name.  The characters are assigned to clients via a
+perl function in the cfgfile $HOME/.xtb.  The perl function argument is
+the client's instance name.
+
+The character is fixed for the life of the client, but for best results
+the icon name contains information about the current state of the client
+(eg current directory, current mail folder, file or URL being viewed).
+
+It normally sets its own instance name to 'xtb'.  If it finds that a
+client with this name already exists, then it adds a number.  If there's
+no other such instance, then it chooses xtb1.  If there are instances of
+the form 'xtbN' then it chooses 'xtbM' where M is one more than the
+largest N.
+
+It normally doesn't show itself in the list, but does if its own name is
+not xtb.
+
+If .xtb contains a picture specification, then unless -p is given, the
+list is padded to the screen height by an image determined by a Unix
+command specified in the picture specification.
+
+The possible relief values are, the 1st being the default:
+
+        raised sunken flat ridge solid groove
+
+The default width is 170.
+
+=head1 XTC
+
+The taskbar can be controlled from the command line with xtc(1), whose
+main function is to send commands to the taskbar via the _XCHAR_COMMAND
+property on the taskbar window.
+
+Commands currently known are:
+
+    restart
+    exit
+
+    left
+    right
+
+    raise [-n] char
+    lower char
+
+    picture [index]
+
+    autoraise [delay]
+
+    dump
+    DUMP
+
+They are sent by for example:
+
+    xtc restart
+    xtc raise -n c
+
+The first word (restart etc) can be abbreviated to 3 letters.
+
+=over 
+
+=item restart
+
+    xtb restarts itself with the same arguments (so -geometry and -l).
+    Use this after you edit the configfile.
+
+=item exit
+
+    xtb exits, ceases, quits
+
+=item left, right
+
+    If the ~/.xscreens entry for the current screen has an 'x' key, it
+    should list a sequence of numbers.  These are treated by xtb as
+    distances from the right side of the screen.  On these commands, xtb
+    aligns its right side to the next 'x' value, moving left or right
+    respectively.  
+    
+    Normally the 'x' values are distances from the right side of client
+    geometries (elsewhere in ~/.xscreens) to the right edge of the
+    screen.  The reason for this is that the right side of text-based
+    clients is often less used than the left side, so is a less annoying
+    place for the taskbar.
+
+    Possibly these functions should be generalized and moved into xmv(1)
+    (which moves any window, not just the taskbar, but so far does not
+    allow relative moves).
+
+=item raise, lower
+
+     These raise or lower the window with the specified character.  The
+     former also gives it the keyboard focus, unless -n is specified.
+
+     They are redundant really, xup(1) & xdn(1) doing the same.
+
+=item picture
+
+    Refreshes the picture if any (see above).  This is useful if the
+    picture fetching machinery is nondeterministic or has changed.
+
+=item autoraise
+
+    The taskbar automatically raises itself some time after being even
+    partly obscured.  The default time is 60 seconds, but can be changed
+    by this command.
+
+=item DUMP, dump
+
+    For debugging.  Causes the taskbar to dump its internal state to
+    stdout, or to the logfile if xtb was started with -l.  DUMP is far
+    more verbose than dump.
+
+=back
+
+=head1 CFGFILE
+
+This is $HOME/.xtb.  It is a perl fragment returning a hash reference.
+
+Currently allowed keys & the type their allowed values are:
+
+          char     function
+          order    reference to an array of characters
+          picture  reference to an array of arrays
+
+The 'char' function maps instance names to sequences of characters.
+The former is the usual X instance name (eg 'xterm' and 'firefox-bin').
+A sequence is allowed because there may be several clients with the same
+instance name.  Things are nicer if these clashes are avoided, such as
+by using 'xterm -name xterm/c' and mapping xterm/c to 'c'.
+
+The 'order' array specifies the order in which clients are shown.
+
+Each element of the picture array specifies a Unix command followed by
+its arguments.  The command is called by xtb with the specified
+arguments supplemented by the size of the space available to the picture
+& the name of the file in which the command should place the image.  The
+size is specified by xtb in the form '-170x400', & the name as /tmp/xtb
+(or /tmp/xtb1 or such).  The command should return the image type on
+stdout.  This can be any of the types handled by perl-tk, currently:
+
+  BMP GIF JPEG PNG PPM PGM XBM XPM
+
+=head1 EXAMPLE CHAR FUNCTIONS
+
+The argument is an instance name.
+
+A simple example is:
+
+    char => sub {
+        local $_ = shift;
+        m-/(.)$-             ?  $1            :
+        /gecko|firefox-bin/  ?  'f'           :
+        /acroread/i          ?  'a'           :
+        /xtb/                ?  '.'           :
+        /./                  ?  ['A' .. 'Z']  :
+        undef;
+    },
+
+A more realistic example involves a bit more Perl:
+
+    my @reserved;
+    push @reserved, qw(x r s o h);
+    push @reserved, qw(a c e f g j k t y z , . - =);
+    my %reserved;
+    $reserved{$_} = 1 for @reserved;
+    my @spare;
+    for ('a' .. 'z') { push(@spare, $_) unless $reserved{$_}; }
+
+    char => sub {
+      local $_ = shift;
+      m-/(.)$-             ?  $1             :
+      /acroread/i          ?  ['a', @spare]  :
+      /xchat/              ?  ['c', @spare]  :
+      /ethereal/           ?  ['e', @spare]  :
+      /gecko|firefox-bin/  ?  ['f', @spare]  :
+      /gv/i                ?  ['g', @spare]  :
+      /sjphone/i           ?  ['j', @spare]  :
+      /kaffeine/           ?  ['k', @spare]  :
+      /TeXmacs/            ?  ['t', @spare]  :
+      /skype/i             ?  ['y', @spare]  :
+      /SWT/                ?  ['z', @spare]  : # azureus
+      /xtb./               ?  [',', ';' ]    :
+      /xtb/                ?  '.'            :
+      /^$/                 ?  ['-', '=']     :
+      /./                  ?  ['A' .. 'Z']   :
+      undef;
+
+    },
+
+=head1 EXAMPLE ORDER ARRAY
+
+    order => [
+      qw(0 . , ; f g t p ), 'a' .. 'e', 1 .. 9, 'x' .. 'z', 'A' .. 'Z'
+    ]
+
+=head1 EXAMPLE PICTURE ARRAY
+
+    picture => [
+      [qw(irand -m-^apod/- -y 4d -a)],
+      [qw(irand -m-^apod/(galaxy|nebula)- -a)],
+      [qw(irand -M-^apod/- -a)],
+    ],
+
+=head1 SEE ALSO
+
+xchar(1), xtc(1), xup(1), xdn(1), screens(1), xterms(1)
+
+mk.xtb(1), mk.xscreens(1), mk.xchar(1)
+
+X11::Tops(3), X11::Screens(3), X11::XTerms(3)
+
+=head1 AUTHOR
+
+Brian Keck E<lt>bwkeck@gmail.comE<gt>
+
+=head1 VERSION
+
+ $Source: /home/keck/gen/RCS/xtb,v $
+ $Revision: 4.23 $
+ $Date: 2007/07/07 07:51:55 $
+ xchar 0.2
+
+=cut
+

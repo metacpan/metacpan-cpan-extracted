@@ -1,0 +1,159 @@
+#!/usr/bin/perl -w
+#
+# parallel_test
+#
+# Quick and dirty test rig I use for checking that changes to
+# tv_grab_uk give the same results.  Should be possible to
+# use it for testing any program where you want to make sure there are
+# no differences between the old and new versions.
+#
+# At present, the command to run is hardcoded in the script.  You'll
+# need to make a copy of this script and edit it.
+#
+# Should not be installed as part of XMLTV, but can be included in
+# source tarball.
+#
+# -- Ed Avis, ed@membled.com, 2002-01-31
+# $Id: parallel_test,v 1.17 2003/07/19 16:16:00 epaepa Exp $
+#
+use strict;
+
+# Use Log::TraceMessages if installed.
+BEGIN {
+    eval { require Log::TraceMessages };
+    if ($@) {
+	*t = sub {};
+	*d = sub { '' };
+    }
+    else {
+	*t = \&Log::TraceMessages::t;
+	*d = \&Log::TraceMessages::d;
+	Log::TraceMessages::check_argv();
+    }
+}
+
+# Old command - directory it should run from, and command to run.
+my $a_dir = '/home/ed/work/apps/xmltv/old_version';
+my @a_cmd = qw(perl -Iblib/lib blib/script/tv_grab_uk --share blib/share);
+
+# New command in its directory.
+my $b_dir = '/home/ed/work/apps/xmltv/cvs_working';
+my @b_cmd = qw(perl -Iblib/lib blib/script/tv_grab_uk --share blib/share);
+
+# Directory to store test results.
+my $tmp = '/home/ed/vol/tmp';
+
+foreach ($a_dir, $b_dir, $tmp) {
+    if (not -d) {
+	die "no such directory $_ - edit the script for your setup\n";
+    }
+}
+
+# Arguments to pass to each command for each test.  A list of pairs
+# and each element of a pair is a list of arguments.
+#
+my @tests = map { [ $_, $_ ] }
+  (
+   [qw(--days 1 --config-file grab/uk/test_configs/carlton)],
+   [qw(--days 1 --config-file grab/uk/test_configs/bbc1)],
+   [qw(--days 1 --config-file grab/uk/test_configs/radio4)],
+   [qw(--config-file grab/uk/test_configs/carlton)],
+   [qw(--days 1 --config-file grab/uk/test_configs/bbc1)],
+   [qw(--config-file grab/uk/test_configs/tynetees)],
+   [qw(--days 1 --config-file grab/uk/test_configs/radio)],
+   [qw(--config-file grab/uk/test_configs/radio)],
+   [qw(--config-file grab/uk/test_configs/satellite)],
+   [qw(--config-file grab/uk/test_configs/all)],
+   [qw(--config-file grab/uk/test_configs/gratis)],
+   [qw(--config-file grab/uk/test_configs/gratis_radio)],
+   [qw(--config-file grab/uk/test_configs/music_nickelodeon_e4)],
+  );
+
+# Arguments at the start of the command line for every test.
+my @constant_args;
+@constant_args = ('--cache', "$tmp/parallel_test.cache");
+
+# Normally this script checks for identical output.  But you may give
+# fixups to be applied to either version's output before comparison.
+#
+my (@a_fixups, @b_fixups);
+@a_fixups = @b_fixups = ('tv_sort');
+
+# More advanced munging may depend on looking at one file and using it
+# to alter the other.  These programs should act as filters, and the
+# filename of the 'other' file will be passed as an argument.
+#
+# Note that @fixup_a_given_b will be run in the directory of the old
+# version, and @fixup_b_given_a will run in the new directory.
+#
+my (@fixup_a_given_b, @fixup_b_given_a);
+
+use Getopt::Std;
+our ($opt_q, $opt_a, $opt_b); getopts('qab');
+if ($opt_q) {
+    warn "use -a to reuse results from old version, -b for new, -ab for both\n";
+    $opt_a = $opt_b = 1;
+}
+
+my $starting_test = $ARGV[0] || 0;
+my $num_failures = 0;
+$SIG{__WARN__} = sub { ++ $num_failures; warn @_ };
+for (my $test_num = $starting_test; $test_num < @tests; $test_num++) {
+    my ($a_args, $b_args) = @{$tests[$test_num]};
+    print STDERR "test $test_num: @$b_args\n";
+
+    chdir $a_dir or die;
+    my $old_out = "$tmp/$test_num.old.out";
+    unless ($opt_a) {
+	system("time @a_cmd @constant_args @$a_args >$old_out") && die "@a_cmd failed";
+    }
+    foreach (@a_fixups) {
+	t "in dir $a_dir, running fixup $_ <$old_out >$old_out.fix";
+	system("{ $_ ; } <$old_out >$old_out.fix") && die "$_ failed";
+	$old_out = "$old_out.fix";
+    }
+
+    chdir $b_dir or die;
+    my $new_out = "$tmp/$test_num.new.out";
+    unless ($opt_b) {
+	system("time @b_cmd @constant_args @$b_args >$new_out") && die "@b_cmd failed";
+    }
+    foreach (@b_fixups) {
+	t "in dir $b_dir, running fixup $_ <$new_out >$new_out.fix";
+	system("{ $_ ; } <$new_out >$new_out.fix") && die "$_ failed";
+	$new_out = "$new_out.fix";
+    }
+
+    if (@fixup_a_given_b and @fixup_b_given_a) {
+	warn "fixing up old output given new, _then_ fixing up new given old\n";
+    }
+
+    chdir $a_dir or die;
+    foreach (@fixup_a_given_b) {
+	t "in dir $a_dir, running fixup $_ $new_out <$old_out >$old_out.fix";
+	system("{ $_ $new_out ; } <$old_out >$old_out.fix") && die "$_ failed";
+	$old_out = "$old_out.fix";
+    }
+    chdir $b_dir or die;
+    foreach (@fixup_b_given_a) {
+	t "in dir $b_dir, running fixup $_ $old_out <$new_out >$new_out.fix";
+	system("{ $_ $old_out ; } <$new_out >$new_out.fix") && die "$_ failed";
+	$new_out = "$new_out.fix";
+    }
+
+    my $diff = "$tmp/$test_num.diff";
+    if (system("diff -u $old_out $new_out >$diff")) {
+	print STDERR "diff found differences: \n";
+	open(DIFF, $diff) or die;
+	while (<DIFF>) {
+	    if ($. > 1000) {
+		print "...\n";
+		last;
+	    }
+	    print;
+	}
+	exit 1;
+    }
+}
+print STDERR "$num_failures errors\n";
+exit($num_failures < 255 ? $num_failures : 255);

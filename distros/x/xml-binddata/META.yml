@@ -1,0 +1,26 @@
+---
+abstract: 'Bind Perl data structures into XML'
+author:
+  - 'Neil Kirsopp <cpan@pneumatoscopic.net>'
+build_requires:
+  Test::Mock::Simple: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: xml-binddata
+requires:
+  XML::LibXML: '0'
+resources:
+  bugtracker: https://github.com/cursork/xml-binddata/issues
+  repository: git://github.com/cursork/xml-binddata.git
+version: 0.3.1
+x_contributors:
+  - 'Gareth Harper <gharper@cpan.org>'
+  - 'Chris Pereira'
+  - 'Michael Jemmeson <mjemmeson@cpan.org>'

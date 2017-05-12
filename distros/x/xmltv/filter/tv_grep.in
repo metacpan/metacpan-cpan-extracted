@@ -1,0 +1,820 @@
+#!/usr/bin/perl -w
+
+=pod
+
+=head1 NAME
+
+tv_grep - Filter programmes and channels from an XMLTV listings file.
+
+=head1 SYNOPSIS
+
+C<tv_grep [--help] [--output FILE] [--ignore-case|-i] (EXPR | REGEXP) [FILE...]>
+
+=head1 DESCRIPTION
+
+Reads XMLTV listings data and writes out data containing some of the
+programmes and channels from the original.  Which programmes and
+channels are left in the output is controlled by the regexp or Boolean
+expression given.
+
+Simple usage is B<tv_grep REGEXP [FILE...]>, where B<REGEXP> is a Perl 5
+regular expression (see L<perlre(1)>).  This finds all <programme>
+elements containing text matching the regexp.  The channels are left
+unchanged, that is, all the <channel> elements are output.
+
+For more advanced searches, you can specify a Boolean expression
+(which loosely follows the style of find(1)).  There are many tests
+for matching programme content against a regular expression, a few for
+matching channels and programmes on those channels, and a few special
+tests.
+
+=head1 OPTIONS
+
+B<--output FILE> write to FILE rather than standard output.
+
+B<--ignore-case>, B<-i> treat all regular expression matches as case insensitive.
+
+=head1 EXPRESSIONS
+
+=head2 PROGRAMME CONTENT TESTS
+
+The tests for programme content match against particular attributes or
+subelements of the <programme> element in the XML data.  Each test is
+named the same as the attribute or element it matches.  Those which
+take a regexp as an argument match if the programme contains at least
+one attribute or element of the same name whose content matches the
+regexp.  Those which do not take a regexp match if the programme
+simply contains one or more attributes or elements of that name.
+
+Some elements may or may not have content - they may just be empty.
+The regular expression '' (the empty string) matches any element, even
+one with empty content, while a nonempty regular expression matches
+only those with content.
+
+For example, B<--desc Racing> matches a programme if the programme has
+at least one <desc> element whose content contains 'Racing'.  B<--stop ''>
+(the second argument is the empty string) matches a programme if the
+programme gives a stop time.
+
+There are some elements where only yes/no matching is possible, where
+you cannot give a regexp to query the elementE<39>s content.  For
+these the second B<''> argument is mandatory.  For example
+B<--previously-shown ''> will match programmes which have that
+element, but a test of B<--previously-shown foo> will give an error
+because querying the content of previously-shown is not implemented.
+The additional empty-string argument is to leave room for future
+expansion.
+
+The content tests are generated from the XMLTV file format.  The
+current set of programme content tests is:
+
+@PROGRAMME_CONTENT_TESTS
+
+While every attribute and subelement of <programme> elements is
+included in the above list, for some of them it is normally more
+convenient to use the special tests described below.
+
+=head2 CHANNEL TESTS
+
+There are two tests for channels.  These filter both <programme> and
+<channel> elements: if a channel is filtered out then all programmes
+on that channel are too.
+
+B<--channel-name REGEXP> True if the channel has a <name> whose content matches REGEXP.
+
+B<--channel-id CHANNEL_ID> True if the channelE<39>s XMLTV id is exactly equal to CHANNEL_ID.
+
+=head2 TIME TESTS
+
+Normally you donE<39>t want to test time strings with a regular
+expression but rather compare them with some other time.  There are
+two tests for this.
+
+B<--on-after DATE> True if the programme will be broadcast at or after
+DATE, or will be part of the way through broadcasting at DATE.  (Note:
+a programme is considered to be broadcasting from its start time, up
+to but not including its stop time.)  DATE can be given in any sane
+date format; but if you donE<39>t specify the timezone then UTC is
+assumed.  To remove all the programmes you have already missed, try
+B<--on-after now>.
+
+B<--on-before DATE> True if the programme will be broadcast wholly
+before DATE, or if it will be part of the way through broadcasting at
+DATE.  To remove all the programmes that havenE<39>t yet begun
+broadcasting, try B<--on-before now>.  You can use B<--on-before> and
+B<--on-after> together to find all programmes which are broadcasting
+at a certain time.
+
+Another way of thinking about these two tests is that B<--on-after
+now> gives 'all programmes you could possibly still watch, although
+perhaps only catching the end'.  B<--on-before now> gives 'all
+programmes you could possibly have seen, even if only the start'.
+
+B<--eval CODE> Evaluate CODE as Perl code, use the return value to
+decide whether to keep the programme.  The Perl code will be given
+the programme data in $_ in XMLTV.pm hash format (see L<XMLTV>).  The
+code can actually modify the programme passed in, which can be used
+for quick fixups.  This option is not intended for normal use, but as
+an escape in case none of the existing tests is what you want.  If you
+develop any useful bits of code, please submit them to be included as
+new tests.
+
+=head2 LOGICAL OPERATORS
+
+B<EXPR1 --and EXPR2>, B<EXPR1 -and EXPR2>, B<EXPR1 EXPR2>
+
+B<EXPR1 --or EXPR2>, B<EXPR1 -or EXPR2>
+
+B<--not EXPR>, B<-not EXPR>, B<! EXPR>
+
+Of these, 'not' binds tightest, affecting the following predicate
+only.  'and' is next, and 'or' binds loosest.
+
+=head1 SEE ALSO
+
+L<xmltv(5)>, L<perl(1)>, L<XMLTV(3)>.
+
+=head1 AUTHOR
+
+Ed Avis, ed@membled.com
+
+=head1 BUGS
+
+The --on-after test cannot be totally accurate when the input data did
+not give a stop time for a programme.  In this case we assume the stop
+time is equal to the start time.  This filters out more programmes than
+if the stop time were given.  There will be a warning if this happens
+more than once on any single channel.  It could be worthwhile to filter
+the listings data through L<tv_sort(1)> beforehand to add stop times.
+
+Similar remarks apply to --on-before: if the stop time is missing we
+assume it is equal to the start time, and this can mean leaving in a
+programme which, if it had a stop time, would be removed.
+
+The assumption of UTC for dates without timezones could be considered a
+bug.  Perhaps the user input should be interpreted according to the
+local timezone.  OTOH, if the data has no timezones and neither
+does the user input, then things will work as expected.
+
+The simple usage is the only way to match against all a
+programmeE<39>s content because some things (like <credits>) do not
+have programme content tests defined.  It actually works by
+stringifying the whole programme and regexp matching that, which means
+that it could give wrong results for regular expressions containing
+quote characters or some punctuation symbols.  This is not
+particularly likely to happen in practice.
+
+Some listings sources generate timeslots containing two or more
+programmes in succession.  This is represented in XMLTV with the
+'clumpidx' attribute.  If tv_grep selects only some of the programmes
+from a clump, then it will alter the clumpidx of those remaining to
+make it consistent.  This is maybe not ideal, perhaps the clumpidx
+should be left unchanged so itE<39>s obvious that something is
+missing, but at least it prevents complaints from other XMLTV tools
+about badly formed clumps.  The clumpidx handling does mean that
+tv_grep is not always idempotent.
+
+=cut
+
+use strict;
+use XMLTV::Version '$Id: tv_grep.in,v 1.38 2004/01/01 12:31:02 epaepa Exp $ ';
+use XMLTV;
+use XMLTV::Clumps qw(clump_relation fix_clumps);
+use XMLTV::Grep qw(get_matcher);
+use XMLTV::TZ qw(parse_local_date);
+use XMLTV::Date;
+use Data::Dumper;
+use Date::Manip;
+# We will call Date_Init() later on, but to start with, parse
+# command-line arguments in the local timezone.
+#
+
+# Use Log::TraceMessages if installed.
+BEGIN {
+    eval { require Log::TraceMessages };
+    if ($@) {
+	*t = sub {};
+	*d = sub { '' };
+    }
+    else {
+	*t = \&Log::TraceMessages::t;
+	*d = \&Log::TraceMessages::d;
+	Log::TraceMessages::check_argv();
+    }
+}
+
+sub usage( ;$ ); # too complex for XMLTV::Usage
+sub all_text( $$ );
+sub abbrev( $$ );
+sub on_after( $ );
+sub on_before( $ );
+sub whole_programme_regexp( $ );
+
+my $ignore_case = 0; # global flag
+
+my %key_type = %{XMLTV::list_programme_keys()};
+
+# Tests to apply.  We store them as a disjunction of conjunctions, for
+# example (a && b && c) || (d && e) || (f && g).
+#
+# We keep tests separately for programmes and channels: but really the
+# channel tests are just extras and not important.  When we add a
+# programme test referring to channels, we add a channel test to go
+# with it so that the list of channels in the output is trimmed.  But
+# remember that the tests primarily are there to filter programmes.
+#
+my (@prog_conjs, @curr_prog_conj);
+my (@chan_conjs, @curr_chan_conj);
+
+# Hash mapping regexp -> channel id -> true/undef (see later)
+my %ch_name;
+my @ch_regexps; # regexps to populate %ch_name with
+
+# Prepare an OptionAbbrev object with all the long options we expect
+# to find.
+#
+my $oa = new OptionAbbrev(qw(--ignore-case --help --output
+			     --channel-id --channel-name
+			     --on-after --on-before --eval
+			     --and --or --not));
+
+# Add the autogenerated options.  We add even those which aren't
+# supported just so we can annoy the user with an error message.
+#
+$oa->add(map { "--$_" } keys %key_type);
+
+# Secret debugging option.
+if (@ARGV and $ARGV[0] eq '--echo') {
+    print "arguments enclosed by '':\n";
+    print "'$_'\n" foreach @ARGV;
+    exit();
+}
+
+my ($output, $regexp, $ended_options, @filenames);
+my $not = 0; # next arg expected to be a predicate, and negated
+while (@ARGV) {
+    my $arg = shift @ARGV;
+    t 'processing arg: ' . d $arg;
+
+    unless ($ended_options) {
+	if ($arg eq '--') {
+	    $ended_options = 1;
+	    next;
+	}
+	my @long_opts = $oa->match($arg);
+	my $lo;
+	if (@long_opts >= 2) {
+	    die "option $arg ambiguous: could be any of @long_opts\n";
+	}
+	elsif (@long_opts == 1) {
+	    $lo = $long_opts[0];
+	    die unless $lo =~ /^--/;
+	}
+	elsif (@long_opts == 0) {
+	    die "unknown long option $arg\n" if $arg =~ /^--/;
+	    # Otherwise okay.
+	}
+	else { die }
+
+	if (defined $lo and $lo eq '--help') {
+	    usage(1);
+	}
+
+	if (defined $lo and $lo eq '--output') {
+	    if (defined $output) {
+		die "option --output can be given only once\n";
+	    }
+	    $output = shift @ARGV;
+	    if (not defined $output) {
+		die "option --output requires an argument, a filename\n";
+	    }
+	    next;
+	}
+
+	if ($arg eq '-i' or (defined $lo and $lo eq '--ignore-case')) {
+	    $ignore_case = 1; # no warning if given twice
+	    next;
+	}
+
+	# Logical operators --and, --or and --not.  --not binds the
+	# most tightly, and affects only the following predicate.
+	# --and is next and binds together predicates in a
+	# conjunction.  --or binds loosest and joins together two
+	# conjunctions.
+	#
+	if ($arg eq '-and' or (defined $lo and $lo eq '--and')) {
+	    next;
+	}
+	elsif ($arg eq '-o' or $arg eq '-or'
+	       or (defined $lo and $lo eq '--or')) {
+	    # Finished with this conjunction, start a new one.  The
+	    # final test is a disjunction of all conjunctions.
+	    #
+	    # Won't be this easy if we ever implement ( and ).
+	    #
+	    if (not @curr_prog_conj) {
+		warn "nothing to the left of $arg, should use as EXPR1 $arg EXPR2\n";
+		usage();
+	    }
+	    push @prog_conjs, [ @curr_prog_conj ]; # make a copy
+	    @curr_prog_conj = ();
+
+	    # And the same for the channel predicates (if any).
+	    push @chan_conjs, [ @curr_chan_conj ];
+	    @curr_chan_conj = ();
+
+	    next;
+	}
+	elsif ($arg eq '!' or $arg eq '-not'
+	       or (defined $lo and $lo eq '--not')) {
+	    $not = 1;
+	    die "$arg requires a predicate following" if not @ARGV;
+	    next;
+	}
+
+	# Called to add a predicate to the current conjunction, taking
+	# account of any preceding 'not'.
+	#
+	my $add_to_prog_conj = sub( $ ) {
+	    my $pred = shift;
+	    if ($not) {
+		push @curr_prog_conj, sub { not $pred->(@_) };
+	    }
+	    else {
+		push @curr_prog_conj, $pred;
+	    }
+	};
+
+	# Similarly for channel filtering.
+	my $add_to_chan_conj = sub( $ ) {
+	    my $pred = shift;
+	    if ($not) {
+		push @curr_chan_conj, sub { not $pred->(@_) };
+	    }
+	    else {
+		push @curr_chan_conj, $pred;
+	    }
+	};
+
+	# See if it's a predicate.
+	if ($arg eq '-e' or (defined $lo and $lo eq '--eval')) {
+	    my $code = shift @ARGV;
+	    die "-e requires an argument, a snippet of Perl code"
+	      if not defined $code;
+	    my $pred = eval "sub { $code }";
+	    if ($@) {
+		die "-e $code: $@\n";
+	    }
+	    if (not defined $pred) {
+		# Shouldn't happen, I think.
+		die "-e $code failed for some reason";
+	    }
+	    $add_to_prog_conj->($pred);
+	    $not = 0;
+	    next;
+	}
+
+	if (defined $lo and $lo eq '--on-after') {
+	    my $date = shift @ARGV;
+	    die "--on-after requires an argument, a date and time"
+	      if not defined $date;
+	    my $pd = parse_local_date($date);
+ 	    die "--on-after $date: invalid date\n"
+ 	      if not defined $pd;
+	    t 'parsed date argument: ' . d $pd;
+	    $add_to_prog_conj->(sub { on_after($pd) });
+	    $not = 0;
+	    next;
+	}
+
+	if (defined $lo and $lo eq '--on-before') {
+	    my $date = shift @ARGV;
+	    die "--on-before requires an argument, a date and time"
+	      if not defined $date;
+	    my $pd = parse_local_date($date);
+ 	    die "--on-before $date: invalid date\n"
+ 	      if not defined $pd;
+	    t 'parsed date argument: ' . d $pd;
+	    $add_to_prog_conj->(sub { on_before($pd) });
+	    $not = 0;
+	    next;
+	}
+
+	if (defined $lo and $lo eq '--channel-id') {
+	    my $id = shift @ARGV;
+	    die "--channel-id requires an argument, an XMLTV internal channel id\n"
+	      if not defined $id;
+	    # We know every programme has 'channel' and every channel
+	    # has 'id'.
+	    #
+	    $add_to_prog_conj->(sub { $_->{channel} eq $id });
+	    $add_to_chan_conj->(sub { $_->{id} eq $id });
+	    $not = 0;
+	    next;
+	}
+
+	if (defined $lo and $lo eq '--channel-name') {
+	    my $regexp = shift @ARGV;
+	    die "--channel name requires an argument, a Perl regular expression\n"
+	      if not defined $regexp;
+
+	    # The matchers check against a global hash mapping
+	    # channel-name regexps to channel ids to true/undef.  We
+	    # must remember to create this hash later when we've read
+	    # in the channels.
+	    #
+	    $add_to_prog_conj->(sub { $ch_name{$regexp}->{$_->{channel}} });
+	    $add_to_chan_conj->(sub { $ch_name{$regexp}->{$_->{id}} });
+	    $not = 0;
+	    push @ch_regexps, $regexp;
+	    next;
+	}
+
+	if (defined $lo) {
+	    # Must be one of the autogenerated ones like --title.
+	    $lo =~ /^--(.+)/ or die "matched long option $lo, no --";
+	    my $key = $1;
+	    t "getting matcher for key $key";
+	    my ($arg_type, $matcher) = @{get_matcher($key, $ignore_case)};
+	    t 'expects extra argument: ' . d $arg_type;
+	    my $s;
+	    if (not defined $arg_type) {
+		t 'no extra argument wanted';
+		$s = $matcher;
+	    }
+	    elsif ($arg_type eq 'regexp') {
+		t 'expects a regexp';
+		my $arg = shift @ARGV;
+		t 'got arg: ' . d $arg;
+		die "$lo requires an argument, a Perl regular expression\n"
+		  if not defined $arg;
+		$s = sub { $matcher->($arg) };
+	    }
+	    elsif ($arg_type eq 'empty') {
+		t 'expects empty string';
+		my $arg = shift @ARGV;
+		t 'got arg: ' . d $arg;
+		die "$lo requires an argument, which currently must be the empty string\n"
+		  if $arg ne '';
+		$s = $matcher;
+	    }
+	    else { die "bad arg type $arg_type" }
+	    $add_to_prog_conj->($s);
+	    $not = 0;
+	    next;
+	}
+
+	# It wasn't a predicate.  Just check that the previous option
+	# wasn't --not, since that requires a predicate to follow.
+	#
+	die "argument '$arg' follows 'not', but isn't a predicate"
+	  if $not;
+    }
+
+    # It wasn't an option, see if it's a regexp or filename.
+    if (not $ended_options and $arg =~ /^-/) {
+	die "bad option $arg\n";
+    }
+
+    # A regular expression is allowed only in the simple case where we
+    # haven't got any of the fancy boolean tests.
+    #
+    if (not defined $regexp
+	and not @prog_conjs and not @curr_prog_conj) {
+	$regexp = $arg;
+	next;
+    }
+    else {
+	push @filenames, $arg;
+	next;
+    }
+}
+push @prog_conjs, \@curr_prog_conj if @curr_prog_conj;
+push @chan_conjs, \@curr_chan_conj if @curr_chan_conj;
+if (not @prog_conjs and not defined $regexp) {
+    warn "neither boolean tests nor regexp given\n";
+    usage();
+}
+elsif (not @prog_conjs and defined $regexp) {
+    t "no predicates, but regexp $regexp";
+    @prog_conjs = ([ sub { whole_programme_regexp($regexp) } ]);
+}
+elsif (@prog_conjs and not defined $regexp) {
+    t 'predicates given, not simple regexp';
+}
+elsif (@prog_conjs and defined $regexp) {
+    warn "bad argument $regexp\n";
+    usage();
+}
+t '\@prog_conjs=' . d \@prog_conjs;
+t '\@chan_conjs=' . d \@chan_conjs;
+# No test for @chan_conjs since there is no test which weeds out
+# channels but does not weed out programmes.  (How could there be?)
+#
+
+# Now we have finished parsing dates in arguments, go to UTC mode to
+# parse the files.
+#
+t 'setting Date::Manip timezone to UTC';
+Date_Init('TZ=UTC');
+
+@filenames = ('-') if not @filenames;
+my ($encoding, $credits, $ch, $progs) = @{XMLTV::parsefiles(@filenames)};
+#local $Log::TraceMessages::On = 1;
+
+# Prepare the channel name lookup.
+my %seen_ch_id;
+foreach my $ch_id (keys %$ch) {
+    $seen_ch_id{$ch_id}++ && die "duplicate channel id $ch_id\n";
+    my $ch = $ch->{$ch_id}; die if not defined $ch;
+    my %seen_re;
+    foreach my $re (@ch_regexps) {
+	next if $seen_re{$re}++;
+	my $matched = 0;
+	if (exists $ch->{'display-name'}) {
+	    foreach (map { $_->[0] } @{$ch->{'display-name'}}) {
+		if ($re eq ''
+		    or ($ignore_case ? /$re/i : /$re/)) {
+		    $matched = 1;
+		    last;
+		}
+	    }
+	}
+	if ($matched) {
+	    $ch_name{$re}->{$ch_id}++ && die;
+	}
+    }
+}
+
+# Filter channels.  This has an effect only for the --channel-id and
+# --channel-name predicates; we do not drop channels simply because no
+# programmes remained on them after filtering.
+#
+my %new_ch;
+if (@chan_conjs) {
+  CH: foreach my $ch_id (keys %$ch) {
+	local $_ = $ch->{$ch_id};
+      CONJ: foreach my $conj (@chan_conjs) {
+	    foreach my $test (@$conj) {
+		# Every test in the conjunction must succeed.
+		next CONJ if not $test->();
+	    }
+	    # They all succeeded, the channel should be kept.
+	    $new_ch{$ch_id} = $_;
+	    next CH;
+	}
+	# All the conjunctions failed, won't write.
+    }
+}
+else {
+    # No tests specifically affecting channels, keep the full listing.
+    %new_ch = %$ch;
+}
+
+# Filter programmes.
+my @new_progs;
+my $related = clump_relation($progs);
+PROG: foreach (@$progs) {
+    t 'filtering prog: ' . d $_;
+    CONJ: foreach my $conj (@prog_conjs) {
+	  t 'testing against all of conjunction: ' . d $conj;
+	  foreach my $test (@$conj) {
+	      t 'testing condition: ' . d $test;
+	      if ($test->()) {
+		  t 'passed, onto next condition in conj (if any)';
+	      }
+	      else {
+		  t 'failed, so failed this conj';
+		  next CONJ;
+	      }
+	  }
+	  t 'passed all tests in conj, finished with prog';
+	  push @new_progs, $_;
+	  next PROG;
+      }
+    t 'failed at least one test in all conjs, not keeping';
+    fix_clumps($_, [], $related);
+}
+
+# All done, write the new programmes and channels.
+t 'finished grepping, writing';
+my %w_args = ();
+if (defined $output) {
+    my $fh = new IO::File ">$output";
+    die "cannot write to $output\n" if not $fh;
+    %w_args = (OUTPUT => $fh);
+}
+XMLTV::write_data([ $encoding, $credits, \%new_ch, \@new_progs ], %w_args);
+exit();
+
+
+# Parameter: if true, write 'help message' rather than 'usage
+# message', ie write to stdout and exit successfully.
+#
+sub usage( ;$ ) {
+    my $is_help = shift; $is_help = 0 if not defined $is_help;
+    my $msg = <<END
+usage: $0 [--help] [--output FILE] [--ignore-case|-i] (EXPR | REGEXP) [FILE]
+where EXPR may consist of
+(programme content matches)
+END
+  ;
+
+    foreach (sort keys %key_type) {
+	# (Assume ignore-case flag does not affect argument syntax.)
+	my $arg_type = get_matcher($_, 0)->[0];
+	if (not defined $arg_type) {
+	    $msg .= "    --$_\n";
+	}
+	elsif ($arg_type eq 'regexp') {
+	    $msg .= "    --$_ REGEXP\n";
+	}
+	elsif ($arg_type eq 'empty') {
+	    # Can query on this only for presence.
+	    $msg .= "    --$_ ''\n";
+	}
+	else { die }
+    }
+
+    $msg .= <<END
+(channel matches)
+    --channel-name REGEXP
+    --channel-id CHANNEL_ID
+(special tests)
+    --on-after DATE
+    --on-before DATE
+    --eval PERL_CODE
+(logical operators)
+    EXPR1 [--and|-and] EXPR2
+    EXPR1 [--or|-or|-o] EXPR2
+--and is implicit and may be omitted.
+END
+  ;
+
+    if ($is_help) {
+	print $msg;
+	exit(0);
+    }
+    else {
+	print STDERR $msg;
+	exit(1);
+    }
+}
+
+# all_text()
+#
+# Get all pieces of text for a particular programme attribute.
+#
+# Parameters:
+#   programme hashref
+#   attribute name, eg 'title', 'desc'
+#
+# Returns: list of text strings for that attribute
+#
+# I wrote Lingua::Preferred::acceptable_lang() especially for this
+# routine but then realized that when grepping you probably don't care
+# about viewing only those strings applicable to the current language.
+#
+sub all_text( $$ ) {
+    my ($p, $key) = @_;
+    return () if not $p->{$key};
+    return map { $_->[0] } @{$p->{$key}};
+}
+
+####
+# Boolean tests.  These work on the programme $_ and return true or
+# false.  Their behaviour should be affected, if appropriate, by the
+# global $ignore_case.
+#
+my %warned_no_stop;
+sub on_after( $ ) {
+    my $cutoff = shift;
+#    local $Log::TraceMessages::On = 1;
+    t "testing on-after $cutoff";
+    my $stop = $_->{stop};
+    t 'stop time: ' . d $stop;
+
+    if (not defined $stop) {
+	# We use the start time instead, that will lose some shows
+	# crossing the boundary but is mostly accurate.
+	#
+	my $start = $_->{start};
+	t 'no stop time, using start time: ' . d $start;
+	my $pd = parse_date($start);
+	t 'parsed to: ' . d $pd;
+
+	my $result = (Date_Cmp($cutoff, $pd) < 0);
+	t 'cutoff before start: ' . $result;
+	if (not $result) {
+	    # This programme was dropped, but maybe it wouldn't have
+	    # been if it had a stop time.
+	    #
+	    # We should warn about this: but have an allowance of one
+	    # programme per channel without stop time, because you
+	    # can reasonably expect that from sorted listings.
+	    #
+	    unless ($warned_no_stop{$_->{channel}}++) {
+		warn "not all programmes have stop times, "
+		  . "cannot accurately filter those on after a certain time\n"
+		    . "(maybe filter through tv_sort to add stop times)\n";
+	    }
+	}
+	return $result;
+    }
+    else {
+	my $pd = parse_date($stop);
+	t 'parsed stop time: ' . d $pd;
+	my $r = Date_Cmp($cutoff, $pd) < 0;
+	t 'cutoff before stop: ' . d $r;
+	return $r;
+    }
+}
+
+sub on_before( $ ) {
+    my $cutoff = shift;
+    my $start = $_->{start};
+    my $pd = parse_date($start);
+    return (Date_Cmp($cutoff, $pd) >= 0);
+}
+
+sub whole_programme_regexp( $ ) {
+    my $re = shift;
+    # Stringify the whole darn thing and match against that.
+    local $_ = Dumper($_);
+#    t 'testing stringified whole programme: ' . d $_;
+    return 1 if $re eq '';
+    return $ignore_case ? /$re/i : /$re/;
+}
+
+
+# Class for long option abbreviation.  You tell it all the options
+# you're going to use, and then it will tell you whether a (possibly
+# abbreviated) argument matches an option unambiguously, ambiguously
+# could match several options, or matches none.
+#
+# Having to roll my own Getopt::Long is getting annoying.  I wonder
+# how much of this code could be shared?
+#
+package OptionAbbrev;
+
+# Use Log::TraceMessages if installed.
+BEGIN {
+    eval { require Log::TraceMessages };
+    if ($@) {
+	*t = sub {};
+	*d = sub { '' };
+    }
+    else {
+	*t = \&Log::TraceMessages::t;
+	*d = \&Log::TraceMessages::d;
+    }
+}
+
+# Constructor.  Give a list of long options and/or add() them later.
+sub new {
+    my $proto = shift;
+    my $class = (ref $proto) || $proto;
+
+    # The representation of an object is a list of long options known
+    # about.
+    #
+    my $self = [];
+    bless $self, $class;
+    $self->add(@_);
+    return $self;
+}
+
+sub add {
+    my $self = shift;
+    foreach (@_) {
+	die 'long options start with --' unless /^--/;
+	foreach my $already (@$self) {
+	    die "option $_ already added" if $_ eq $already;
+	}
+	push @$self, $_;
+    }
+    return $self;
+}
+
+# match() returns a list of possible long options matched.  So if the
+# list has no elements, no match; one element is the unambiguous
+# match; two or more elements mean ambiguity.
+#
+sub match {
+    my ($self, $arg) = @_;
+    t "matching arg $arg against list: " . d $self;
+    return () unless $arg =~ /^--\w/;
+    t 'begins with --, continue';
+    foreach (@$self) {
+	t "testing for exact match: '$arg' against '$_'";
+	return ($_) if $arg eq $_;
+    }
+    t 'no exact match, try initial substring';
+    my @r;
+    foreach (@$self) {
+	t "testing if $arg is initial substring of $_";
+	push @r, $_ if index($_, $arg) == 0;
+    }
+    t 'returning list of matches: ' . d \@r;
+    return @r;
+}

@@ -1,0 +1,16 @@
+FUTURE
+
+* find/write a simple protocol to update structure
+
+2015-05-04 v0.5 
+
+* redundant attributes set from the $_[3] are now appended
+
+
+
+
+
+
+
+
+

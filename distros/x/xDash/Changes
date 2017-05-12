@@ -1,0 +1,11 @@
+Revision history for Perl extension group xDash.
+
+1.00  2005-06-10
+	- original version;
+
+1.01  2005-07-01
+	- minor bug fixes in the documentation;	
+
+1.02  2006-02-16
+	- minor bug fixes in the deployment scripts; 
+

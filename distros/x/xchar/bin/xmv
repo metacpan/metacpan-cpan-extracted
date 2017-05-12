@@ -1,0 +1,259 @@
+#!/usr/bin/env perl
+# $Source: /home/keck/gen/RCS/xmv,v $
+# $Revision: 3.22 $$Date: 2007/07/04 17:00:25 $
+# Contents
+#   1 standard  2 args  3 log  4 dst  5 main  6 notes  7 pod
+
+# ----------------------------------------------------------------------
+
+#1# standard
+
+(my $cmd = $0) =~ s%.*/%%;
+sub usage { print "Usage: $cmd -help\n"; }
+sub quit { (@_) ? print STDERR "$cmd quitting: @_\n" : &usage; exit 1 }
+
+use X11::Tops;
+
+use strict;
+use warnings;
+
+use Data::Dumper;
+
+
+sub perldoc {
+  my ($perldoc, $less);
+  for (split /:/, $ENV{PATH}) {
+    $perldoc = "$_/perldoc" if -x "$_/perldoc";
+    last if $perldoc; next if $less;
+    $less = "$_/less" if -x "$_/less";
+  }
+  if ($perldoc) {
+    $ENV{LESSCHARSET} = 'latin1';
+    exec $perldoc, $0
+  } elsif ($less) {
+    exec $less, '+/^# Sorry.*', $0
+  } else {
+    print
+      "Sorry, there's no perldoc(1) or even less(1) in your \$PATH\n" .
+      "The documentation can be found at the end of $0\n";
+    exit 1
+  }
+}
+
+# ----------------------------------------------------------------------
+
+#2# args
+
+my $logfile;
+my $expand;
+my $nofocus;
+
+while (@ARGV) {
+  $_ = shift;
+  perldoc() if /^-+(man|help)/;
+  $expand = 1, next if /^-+e/;
+  $nofocus = 1, next if /^-+f/;
+  $logfile = shift, next if /^-+l/;
+  quit("illegal flag '$_'") if /^-/;
+  unshift @ARGV, $_;
+  last;
+}
+
+my ($src, $dst) = @ARGV;
+
+quit("'$src' not a single character or decimal number or hex number")
+  unless $src =~ /^.$/ || /^\d+$/ || /^0x[0-9a-fA-F]+$/;
+
+quit("'$dst' not a single character") unless $dst =~ /^.$/;
+
+# ----------------------------------------------------------------------
+
+#3# log
+
+use POSIX qw(strftime);
+
+sub printlog {
+  print strftime("%y%m%d %H%M%S\n", localtime(time));
+  print @_;
+}
+
+if (defined $logfile) {
+  local $_ = $logfile;
+  quit("logfile name empty") if /^$/;
+  quit("no such directory '$1'") if m-(.+)/- && !-d $1;
+  $logfile = "./$_" unless $_;
+  open LOG, ">>$logfile";
+  open STDOUT, ">>&LOG";
+  open STDERR, ">>&LOG";
+  select LOG;
+  $| = 1;
+  print strftime("%y%m%d %H%M%S ", localtime(time)), '-' x 58, "\n";
+}
+
+# ----------------------------------------------------------------------
+
+#4# dst
+
+require X11::Screens;
+
+my $screen = X11::Screens->current ||
+  quit("no match in ~/.screens for current display");
+
+my $name = $screen->name; # for error message
+my $xterm = $screen->clients->{$dst} ||
+  quit("no xterm corresponding to '$dst' in $name entry in ~/.screens");
+
+my $geometry = $xterm->geometry('pixels') ||
+  quit("no geometry in pixel units for display '$name' & char '$dst'");
+
+# $logfile && printlog("\$geometry = $geometry\n");
+
+# ----------------------------------------------------------------------
+
+#5# main
+
+my $xtops = X11::Tops->new->update_ids;
+
+for my $xtop (values %{$xtops->byid}) {
+  next unless $src =~ /^.$|^\d{2,}$|^(0x)?[0-9a-f]{2,}$/;
+  next if $src =~ /^.$/ && $xtop->char ne $src;
+  next if $src =~ /^\d{2,}$/ && $xtop->{id} != $src;
+  next if $src =~ /^(0x)?[0-9a-f]{2,}$/ && $xtop->{id} != eval $src;
+  if ($expand) {
+    $xtop->expand($geometry);
+  } else {
+    $xtop->move($geometry);
+  }
+  unless ($nofocus) {
+    $xtops->X->flush;
+    $xtop->raise_and_focus;
+  }
+  exit;
+}
+
+quit("no toplevel matching '$src'");
+
+__END__
+
+# ----------------------------------------------------------------------
+
+#6# notes
+
+# +xwin/protocol +taskbar[1245]
+# remember gen/x1 [+xterm1] & wmctrl [+xwm]
+# remember gen/imgr (raising) [+xwin/protocol]
+
+# started from gen/xp 2.8
+
+# 1.4
+#   handles -0+0 etc
+# 1.6
+#   retries
+# 1.7
+#   -l to list (instance, class)
+# 1.8
+#   -i to list icon names
+# 1.10
+#   changed -l to -c
+#   moves icon manager with -i
+# 1.11
+#   -n|-t
+# 1.13
+#   dropped -t (same as -n)
+#   uses ~/.tmgr
+# 1.14
+#   renamed .tmgr to .xup
+# 2.1
+#   much changed ...
+#   uses Xtop.pm, so works with both twm & fvwm [+taskbar1]
+#   renamed from chgeom to xmv
+#   dropped -l
+# 2.5
+#   --10+10 etc work
+# 2.8
+#   reversed order of geometry & pattern/char [+taskbar5]
+# 2.10
+#   'xmv /xterm.4/ 1' via ConfigureWindow [+taskbar5]
+# 2.11
+#   'xmv 4 1' works after adding quotemeta
+# 2.14
+#   xmv 0x1e0000e 7
+# 2.20
+#   WM_NORMAL_HINTS
+#   much better ... 1 to 6 move among themselves correctly
+#   +taskbar5
+# 2.22
+#   r -> b fixed
+#   printlog
+# 2.25
+#   WM_NORMAL_HINTS.flags
+# 2.27
+#   added $xterm->geometry('pixels') to Screen.pm [+taskbar5]
+# 2.30
+#   focus after move
+# 2.32
+#   -e works but badly ... WM_NORMAL_HINTS maybe the trouble
+#   code structure getting messy
+#   sub bbox
+#   +taskbar6
+# 2.34
+#   replaced bbox by whxyg2, doesn't work
+#   replaced older stuff by whxyg1, which works
+# 2.37
+#   much changed ...
+#   moved wm_normal_hints to Xtops.pm
+#   frame_x etc
+#   changed whxyg2 arguments to global variables
+#   accurate for 'xmv -e 5 6'
+# 2.38
+#   xmv -e working quite nicely ... gravity maybe needs work
+# 3.1
+#   +taskbar7
+
+# $Revision: 3.22 $
+
+# ----------------------------------------------------------------------
+
+#7# pod
+
+# Sorry, there's no perldoc in your $PATH, so here's the raw pod
+
+=head1 NAME
+
+xmv - move an X client's window.
+
+=head1 SYNOPSIS
+
+  xmv [-l logfile] [-e] [-f] src dst
+
+=head1 DESCRIPTION
+  
+
+Changes the geometry of the X window whose _XCHAR_CHAR value is the src
+char to the geometry from .screens specified by the dst char.
+
+With -e expands the src window so that it contains both its original
+rectangle & the dst rectangle.
+
+Normally focusses the window after the move or expand, but omits this
+with -f.
+
+=head1 SEE ALSO
+
+xtb(1), xtc(1), xup(1), screens(1), xterms(1)
+
+X11::Tops(3), X11::Screens(3), X11::XTerms(3)
+
+=head1 AUTHOR
+
+Brian Keck E<lt>bwkeck@gmail.comE<gt>
+
+=head1 VERSION
+
+ $Source: /home/keck/gen/RCS/xmv,v $
+ $Revision: 3.22 $
+ $Date: 2007/07/04 17:00:25 $
+ xchar 0.2
+
+=cut
+

@@ -1,0 +1,7 @@
+ChangeLog              # All changes up to this point
+MANIFEST               # This file
+Makefile.PL            # MakeMaker file
+bench/xmlrpc_bench     # A simple benchmark script
+lib/XMLRPC/PurePerl.pm # XLMRPC::PurePerl module
+t/00_serialize.t       # serialize tests
+t/10_deserialize.t     # deserialize tests

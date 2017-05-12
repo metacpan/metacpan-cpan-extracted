@@ -1,0 +1,76 @@
+
+xchar, version 0.2
+
+Copyright (C) 2006-2007 Brian Keck.  All rights reserved.  This module
+is free software; you can redistribute and/or modify it under the same
+terms as Perl itself.
+
+For a description of xchar see firstly xchar.pod in this directory
+(xchar-0.2), which becomes xchar(1) after installation.
+
+Prerequisites are Tk and X11::Protocol.
+
+Install in the usual way:
+
+	perl Makefile.PL
+	make
+	sudo make install
+
+The 'make test' is useless currently.
+
+If you suspect that you might not like xchar, & like to keep your system
+spotless, you might want to save the output of
+
+	make uninstall
+
+which does nothing but output a list of files to delete.
+
+If you're impatient a quick way to start is:
+
+	mk.xtb > ~/.xtb
+	mk.xscreens > ~/.xscreens
+
+At this point you should be able to run xtb from the command line, and
+raise & move windows via xup & xmv.
+
+Getting keyboard mappings to do this (without which there's no point to
+xchar) is sadly still a bit of work, and depends on your window manager.
+
+If you happen to be using fvwm, you can do most of the work with:
+
+	mk.xchar fvwm >> $FVWMRC
+
+where FVWMRC is ~/.fvwm/config or ~/.fvwmrc.
+
+However, these fvwm key mappings assume that mod3 (xup) & mod4 (xmv) are
+not used for something else, and have had keys assigned to them.  I do
+this in my .xinitrc file.  On my Sony TX laptop I use respectively the
+key with the picture of a menu and the key with the mswin logo:
+
+        xmodmap \
+          -e 'keycode 115 = Super_L' \
+          -e 'keycode 117 = Super_R' \
+          -e 'add mod4 = Super_L' \
+          -e 'add mod3 = Super_R'
+
+On my Sun Ultra 10 with Sun 5c keyboard I use respectively the right & left
+keys marked with a diamond:
+
+        xmodmap \
+          -e 'keycode 115 = Super_L' \
+          -e 'keycode 116 = Super_R' \
+          -e 'add mod3 = Super_R' \
+          -e 'add mod4 = Super_L'
+
+If you don't use fvwm then, instead of the last step, look at the output
+of 'mk.xchar fvwm' & create similar key mappings for your window
+manager, and send them to me so I can add them to mk.xchar.  Maybe some
+xmodmaps will be needed as well.
+
+Brian Keck
+bwkeck@gmail.com
+
+$Source: /home/keck2/xwin/taskbar/makemaker/RCS/README,v $
+$Revision: 1.3 $$Date: 2007/07/07 13:13:27 $
+xchar version 0.2
+

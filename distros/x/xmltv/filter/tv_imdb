@@ -1,0 +1,322 @@
+#!/usr/bin/perl -w
+
+=pod
+
+=head1 NAME
+
+tv_imdb - Augment XMLTV listings files with imdb.com data.
+
+=head1 SYNOPSIS
+
+tv_imdb --imdbdir <dir> [--help] [--quiet] [--download]
+       [--prepStage (1-7,all)]
+
+tv_imdb --imdbdir <dir> [--help] [--quiet]
+       [--movies-only][--stats][--output FILE] [FILE...]
+
+=head1 DESCRIPTION
+
+Very similar to tv_cat in symantics (see tv_cat)
+except whenever a programme appears with "date" entry the
+title and date are used to look up extra data by using the
+XMLTV::IMDB package.
+
+B<--output FILE> write to FILE rather than standard output
+
+B<--quiet> disable all status messages (that normally appear on stderr).
+
+B<--download> try to download data files if they are missing (in --prepStage).
+
+B<--stats> force output of grab stats (stats output disabled in --quiet mode).
+
+B<--movies-only> only augment programs that look like movie listings (4 digit
+E<39>dateE<39> field).
+
+All programs are checked against imdb.com data (unless --movies-only is used).
+
+For the purposes of tv_imdb, an "exact" match is defined as a case
+insensitive match gainst imdb.com data (which may or may not include the
+transformation of E<39>&E<39> to E<39>andE<39> and vise-versa.
+
+If the program includes a 4 digit E<39>dateE<39> field the following is
+matches are attempted, the first succeeding match is used:
+
+B<1.> an "exact" title/year match against movie titles is done
+
+B<2.> an "exact" title match against tv series (and tv mini series)
+
+B<3.> an "exact" title match against movie titles with production dates
+
+within 2 years of the E<39>dateE<39> value.
+
+Unless --movies-only is used, if the program does not include a 4 digit
+E<39>dateE<39> field the following
+matches are attempted, the first succeeding match is used:
+
+B<1.> an "exact" title match against tv series (and tv mini series)
+
+When a match is found in the imdb.com data the following is applied:
+
+B<1.> the E<39>titleE<39> field is set to match exactly the title from the
+imdb.com data. This includes modification of the case to match and any
+transformations mentioned above.
+
+B<2.> if the match is a movie, the E<39>dateE<39> field is set to imdb.com
+4 digit year of production.
+
+B<3.> the type of match found (Movie, TV Movie, Video Movie, TV Series,
+or TV Mini Series) is placed in the E<39>categoriesE<39> field.
+
+B<4.> the url to the www.imdb.com page is added
+
+B<5.> the director is added if the match was a movie or if only one director
+is listed in the imdb.com data (because some tv series have > 30 directors)
+
+B<6.> the top 3 billing actors are added.
+
+B<7.> genres added to E<39>categoriesE<39> field (current list of genres are
+Short, Drama, Comedy, Documentary, Animation, Adult, Action, Family, Romance,
+Crime, Thriller, Musical, Adventure, Western, Horror, Sci-Fi, Fantasy, Mystery,
+War, Film-Noir, Music
+
+B<8.> imdb user ratings added to E<39>star-ratingsE<39> field.
+
+=head1 HOWTO
+In order to use tv_imdb, you need:
+
+B<1.> choose a directory location to use for the tv_imdb database (youE<39>ll
+need about 1/2 GB of free space),
+
+B<2a.> run E<39>tv_imdb --imdbdir <dir> --prepStage all --downloadE<39>
+to download the list files from imdb.com.  Or,
+
+B<2b> If you have a slow network connection you may prefer to omit
+the '--download' flag and be prompted for what you need to download by
+hand.  See <http://www.imdb.com/interfaces> for the download sites.
+Then once you have the files rerun without '--download'.
+
+Note: '--prepStage' sucks a bit of memeory, but you can run each
+prepStage separately by running --prepStage with each of the stages
+(see --help for details).
+
+B<3.> Once you have the database loaded try
+E<39>cat tv.xml | tv_imdb --imdbdir <dir> > tv1.xmlE<39>.
+
+Feel free to report any problems with these steps to xmltv-devel@lists.sf.net.
+
+=head1 BUGS
+
+The '--prepStage' needs a lot of memory to run at a reasonable speed,
+over 200 megabytes with the current imdb data files.  For there to be
+200 megabytes free for tv_imdb, the system will need at least 256 megabytes
+of RAM.  Running with less can take hours (or days!) - although fortunately 
+this stage needs to be run only once after downloading the data files.
+
+Could use a --configure step just like the grabbers so you do not have
+to specify the --imdbdir on the command line every time. Also this could
+step you through the prep stages with more description of what is being
+done and what is required. Configure could also control the number of
+actors to add (since some movies have an awful lot), currently we are
+adding the top 3.
+
+How and what to look up needs to be option driven.
+
+Needs some more controls for fine tuning "close" matches. For
+instance, currently it looks like the North America grabber only has
+date entries for movies, but the imdb.com data contains made for video
+movies as well as as real movies, ot is itE<39>s possible to get the
+wrong data to be inserted. In this case we may want to say "ignore tv
+series" and "ignore tv mini series".  Along with this, weE<39>d want
+to define what a "close" match is. For instance does a movie by the
+same title with a date out by 1 year or 2 years considered a match
+(currently weE<39>re using 2).
+
+Nice to haves include: verification/addition of programe MPAA/VCHIP ratings,
+addition of imdb.com user ratings (by votes) to programes. Potenially we
+could expand to include "country of origin", "description", "writer" and
+"producer" credits, maybe even "commentator".
+
+Heh, if the XMLTV.dtd supported it, we could even include urls to head
+shots of the actors :)
+
+=head1 SEE ALSO
+
+L<xmltv(5)>
+
+=head1 AUTHOR
+
+Jerry Veldhuis, jerry@matilda.com
+
+=cut
+
+use strict;
+use XMLTV::Version '$Id: tv_imdb,v 1.23 2004/03/22 22:01:14 epaepa Exp $ ';
+use Data::Dumper;
+use Getopt::Long;
+
+use XMLTV;
+use XMLTV::Usage <<END
+$0: augment listings with data from imdb.com
+$0 --imdbdir <dir> [--help] [--quiet] [--download] [--prepStage (1-7,all)]
+$0 --imdbdir <dir> [--help] [--quiet] [--download] [--movies-only][--stats][--output FILE] [FILE...]
+
+END
+;
+use XMLTV::IMDB;
+
+my ($opt_help,
+    $opt_output,
+    $opt_prepStage,
+    $opt_imdbDir,
+    $opt_quiet,
+    $opt_download,
+    $opt_stats,
+    $opt_movies_only,
+   );
+
+GetOptions('help' => \$opt_help,
+	   'output=s' => \$opt_output,
+	   'prepStage=s' => \$opt_prepStage,
+	   'imdbdir=s' => \$opt_imdbDir,
+	   'movies-only' => \$opt_movies_only,
+	   'quiet' => \$opt_quiet,
+	   'download' => \$opt_download,
+	   'stats' => \$opt_stats) or usage(0);
+
+usage(1) if $opt_help;
+usage(1) if ( not defined($opt_imdbDir) );
+
+$opt_movies_only=0 if ( !defined($opt_movies_only) );
+
+$opt_quiet=(defined($opt_quiet));
+if ( !defined($opt_stats) ) {
+    $opt_stats=!$opt_quiet;
+}
+else {
+    $opt_stats=(defined($opt_stats));
+}
+
+if ( defined($opt_prepStage) ) {
+    print STDERR <<END
+Building indices.  Be warned, this needs a lot of memory for the final stage
+(working set about 220 megabytes).
+
+END
+  ;
+    my %options =
+      ('imdbDir' => $opt_imdbDir,
+       'verbose' => !$opt_quiet,
+       'downloadMissingFiles' => $opt_download,
+      );
+
+    if ( $opt_prepStage eq "all" ) {
+	for (my $stage=1 ; $stage <= 7 ; $stage++ ) {
+	    my $n=new XMLTV::IMDB::Crunch(%options);
+	    if ( !$n ) {
+		exit(1);
+	    }
+	    my $ret=$n->crunchStage($stage);
+	    if ( $ret != 0 ) {
+		exit($ret);
+	    }
+	}
+	print STDERR "database load complete, let the games begin !\n" if ( !$opt_quiet);
+	exit(0);
+    }
+    else {
+	my $n=new XMLTV::IMDB::Crunch(%options);
+	if ( !$n ) {
+	    exit(1);
+	}
+	my $ret=$n->crunchStage(int($opt_prepStage));
+	if ( $ret == 0 && int($opt_prepStage) == 6 ) {
+	    print STDERR "database load complete, let the games begin !\n" if ( !$opt_quiet);
+	}
+	exit($ret);
+    }
+}
+
+my $imdb=new XMLTV::IMDB('imdbDir' => $opt_imdbDir,
+			 'verbose' => !$opt_quiet,
+			 'cacheLookups' => 1,
+			 'cacheLookupSize' => 1000);
+
+#$imdb->{verbose}++;
+
+if ( my $errline=$imdb->sanityCheckDatabase() ) {
+    print STDERR "$errline";
+    print STDERR "tv_imdb: you need to use --prepStage to rebuild\n";
+    exit(1);
+}
+
+if ( !$imdb->openMovieIndex() ) {
+    print STDERR "tv_imdb: open database failed\n";
+    exit(1);
+}
+
+# test that movie database works okay
+my %w_args = ();
+if (defined $opt_output) {
+    my $fh = new IO::File ">$opt_output";
+    die "cannot write to $opt_output\n" if not $fh;
+    %w_args = (OUTPUT => $fh);
+}
+
+my $numberOfSeenChannels=0;
+
+my $w;
+
+sub encoding_cb( $ ) {
+    die if defined $w;
+    $w = new XMLTV::Writer(%w_args, encoding => shift);
+}
+
+sub credits_cb( $ ) {
+    $w->start(shift);
+}
+
+my %seen_ch;
+sub channel_cb( $ ) {
+    my $c = shift;
+    my $id = $c->{id};
+    if (not defined $seen_ch{$id}) {
+	$w->write_channel($c);
+	$seen_ch{$id} = $c;
+	$numberOfSeenChannels++;
+    }
+    elsif (Dumper($seen_ch{$id}) eq Dumper($c)) {
+	# They're identical, okay.
+    }
+    else {
+	warn "channel $id may differ between two files, "
+	  . "picking one arbitrarily\n";
+    }
+}
+
+sub programme_cb( $ ) {
+    my $prog=shift;
+    
+    my $nprog=$imdb->augmentProgram($prog, $opt_movies_only);
+    if ( $nprog ) {
+	$prog=$nprog;
+    }
+
+    # we only add movie information to programmes
+    # that have a 'date' element defined (since we need
+    # a year to work with when verifing we got the correct
+    # hit in the imdb data)
+    $w->write_programme($prog);
+}
+
+@ARGV = ('-') if not @ARGV;
+
+XMLTV::parsefiles_callback(\&encoding_cb, \&credits_cb,
+			   \&channel_cb, \&programme_cb,
+			   @ARGV);
+$w->end();
+
+if ( $opt_stats ) {
+    print STDERR $imdb->getStatsLines($numberOfSeenChannels);
+}
+$imdb->closeMovieIndex();
+exit(0);

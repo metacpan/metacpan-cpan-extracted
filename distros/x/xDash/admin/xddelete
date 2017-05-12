@@ -1,0 +1,104 @@
+#!/usr/bin/perl
+# Copyright 2004 Jerzy Wachowiak
+
+use strict;
+use warnings;
+use DBI;
+use Getopt::Std;
+
+# Option retrival
+getopts( "msht:d:u:p:" );
+our ( $opt_m, $opt_s, $opt_t );
+
+our( $opt_d, $opt_u, $opt_p, $opt_h );
+unless ( $opt_m or $opt_s or $opt_t or $opt_h or $opt_d ) { $opt_h = 1 };
+if ( defined( $opt_m ) and  defined( $opt_s ) ){ undef $opt_m; undef $opt_s };
+
+if ( defined( $opt_h ) ){
+    print <<EOU;
+    
+USAGE:
+$0 -d database [-u user] [-p password]  -t thread [-ms]
+
+DESCRIPTION: 
+xddelete removes messages and statistics belonging to a thread from the 
+database and returns number of deleted messages and statistics:
+-m\t\tdeletes only messages belonging to the thread (option);
+-s\t\tdeletes only statistics belonging to the thread (option);
+-t thread\tthe message thread to act on;
+-d name\t\tPostgreSQL database name;
+-u user\t\tusername, if no switch, root assumed;
+-p password\tuser password, if no switch, root password assumed.
+
+EOU
+    exit 0
+}
+
+unless( $opt_t ){
+    print "$0: Switch -t thread is missing.\n";
+    exit 1
+}
+
+# Database with most common values for root on postgresql:
+my $DBIdriver = "dbi:Pg:dbname="; 
+my $database;
+$database = $opt_d  if $opt_d;
+unless( defined( $database ) ){
+    print "$0: Switch -d is missing.\n";
+    exit 1
+}
+my $DBIuser = "";
+$DBIuser = $opt_u  if $opt_u;
+my $DBIpassword = "";
+$DBIpassword = $opt_p  if $opt_p;
+
+my %attr = ( PrintError=>1, RaiseError=>1, AutoCommit => 0 ); 
+my $dbh = DBI->connect( $DBIdriver.$database, $DBIuser,$DBIpassword, \%attr );
+
+my ( $sqlcommand, $sth, @row, $srv, $mrv );
+
+# Option delete statistics: 
+if ( $opt_s ){
+    $sqlcommand = "delete from statistics where thread = '$opt_t' ";
+    $sth = $dbh->prepare( $sqlcommand );
+    $srv = $sth->execute();
+    $dbh->commit();
+    if ( $srv == 0 ) { $srv = 0 };
+    $mrv = 0;
+    print "$mrv; $srv\n"
+}
+
+# Option delete messages
+if ( $opt_m ){
+    $sqlcommand = "delete from messages where thread = '$opt_t' ";
+    $sth = $dbh->prepare( $sqlcommand );
+    $mrv = $sth->execute();
+    $dbh->commit();
+    if ( $mrv == 0 ) { $mrv = 0 };
+    $srv = 0;
+    print "$mrv; $srv\n"
+}
+
+# All messages and threads should be deleted:
+if ( !defined( $opt_m ) and !defined( $opt_s ) ){ 
+    eval {
+	$sqlcommand = "delete from statistics where thread = '$opt_t' ";
+	$sth = $dbh->prepare( $sqlcommand );
+	$srv = $sth->execute();
+	$sqlcommand = "delete from messages where thread = '$opt_t' ";
+        $sth = $dbh->prepare( $sqlcommand );
+	$mrv = $sth->execute();
+        $dbh->commit()
+    };
+    if ( $@ ) { 
+	$dbh->rollback() 
+    }
+    else {
+	if ( $srv == 0 ) { $srv = 0 };
+	if ( $mrv == 0 ) { $mrv = 0 };
+        print "$mrv; $srv\n";
+    }
+}
+
+$dbh->disconnect();
+exit 0

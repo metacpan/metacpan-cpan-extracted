@@ -1,0 +1,273 @@
+=head1 NAME
+
+xchar - single character names for X windows and geometries 
+
+=head1 AUTHOR
+
+Brian Keck, bwkeck@gmail.com
+
+=head1 DESCRIPTION
+
+Xchar is a set of programs for keyboard (mouseless) management (raising,
+focussing, moving, resizing) of X windows.  It includes a taskbar.  It
+is useful if you use so many windows that they can't all be seen at
+once.
+
+Xchar is not a 'window manager' like fvwm or metacity.  In fact it only
+works if such a window manager is running.
+
+Xchar's novelty is the use of one-character names for windows (such as
+'f' for Firefox).  It also uses one-character names for screen
+geometries.  These character mappings are normally defined by the user.
+
+Most of the work in installing Xchar is in adjusting the sample
+configfiles to define these 2 mappings, and in adding key mappings to
+your window manager configfile.
+
+The main programs are the daemon xtb, and the 2 commands xup and xmv.
+The daemon displays a vertical taskbar, each slot showing the character
+and iconname of the corresponding window.  It is typically started soon
+after X (and the window manager).  Currently it doesn't react to events
+in the taskbar (mouse clicks, key presses, etc).  The command xup takes
+a window character argument.  The command xmv takes a window character
+or an X window id argument, and a geometry character argument.  Both
+these commands are normally run indirectly by a window manager key
+mapping.  For example modifier1-f might cause xup to raise and focus
+firefox, and modifier2-p might cause xmv to move and resize the window
+with keyboard focus to geometry 'p'.
+
+The daemon is responsible for creating the character->window mapping.
+How it does this is defined by the configfile $HOME/.xtb, which includes
+a function that maps instance names to sequences of characters.  The
+former is the usual X instance name (eg 'xterm' and 'Firefox-bin').  A
+sequence is allowed because there may be several windows with the same
+instance name.  Xchar is nicer if these clashes are avoided, such as by
+using 'xterm -name xterm/c' and mapping xterm/c to 'c'.
+
+The daemon sets a property _XCHAR_CHAR on each window, containing the
+window's character.  The commands, when they take a window character
+argument, search the toplevel windows for one whose _XCHAR_CHAR matches.
+
+The character->geometry mapping is defined in the configfile
+$HOME/.screens.  By geometry is meant X geometry, such as 484x745+438+0.
+The command xmv makes no distinction between moving and resizing, just
+changing a window's geometry to that specified.  It understands an extra
+wrinkle concerning zeros.  A geometry is used by xmv in combination with
+an existing window.  A zero width or height in the geometry is replaced
+by the window's width or height.  A double 0 has the same effect with x
+and y, as in 0x0-444+00.
+
+The distribution contains two other commands.  One is 'xtc', which
+sends simple messages to the daemon via the taskbar property _XCHAR_MSG.
+The set of messages changes by the week, but probably permanent members
+are 'exit', 'restart', and 'dump'.  The other is 'xterms', whose main
+arguments are of the form p.w, where p is a geometry character and w is
+a window character.  For each such argument xterms starts an xterm at
+the geometry 'p' and instance name xterm/w.
+
+=head1 DETAILS
+
+
+The syntax of the configfiles is Perl's.  They are trivial to parse,
+because all the programs are in Perl.  Even if you don't know Perl, the
+sample configfiles in the distribution (and below) should make it easy
+to create your own.  Both should end in expressions evaluating to hash
+references.  See later sections for details of these hashes.
+
+Much of the code of Xchar is factored out into the module X11::Tops (in
+the Xchar distribution).  All the programs in Xchar except 'xterms' use
+it.  X11::Tops in turn uses the widely available module X11::Protocol
+(CPAN and Debian (libx11-protocol-perl) at least).
+
+The daemon also depends on the universally available module Tk.
+
+Common code related to the character->geometry mapping is in the module
+X11::Screens (in the Xchar distribution).  It is used by xmv and xterms,
+and itself depends on Tk.
+
+The daemon depends on the window manager supporting some of the
+Extended Window Manager Hints, namely
+    _NET_CLIENT_LIST
+    _NET_ACTIVE_WINDOW
+    _NET_CLIENT_LIST_STACKING
+(as well as the usual WM_CLASS etc).  This seems to be the case for many
+window managers, though Xchar has only been tested with fvwm
+(which judging from the changelog has supported EWMH since 2001).
+
+The command xmv moves windows directly, rather than via the window
+manager.  That is, by ConfigureWindow rather than
+_NET_MOVERESIZE_WINDOW.  There's no reason known this couldn't be
+changed if the latter has advantages.
+
+=head1 DAEMON CONFIGURATION FILE
+
+As mentioned, the Perl code in the configfiles ends in an expression
+evaluating to a hash reference.  The daemon configfile is the simpler,
+the hash it refers to having only 3 keys:
+
+  { char => sub { ... },
+    order => [ ... ],
+    picture => [ ... ],
+  };
+
+The 'char' sub has already been described.
+
+The 'order' array is an array of characters that specifies the order of
+slots in the taskbar.  To simplify the expression, this array can have
+repetitions - a character's place in the order is determined by its
+first occurrence in the array.
+
+The elements of the 'picture' array are themselves references to arrays.
+Each of the latter arrays specifies a Unix command and its arguments.
+The daemon normally executes one of these commands when it starts, after
+adding two arguments.  These extra arguments are a size such as -170x400
+and the file name /tmp/xtb.  The command is supposed to write an image
+into this file.  The image format can be any supported by Tk (BMP, GIF,
+JPEG, PNG, PPM, PGM, XBM, XPM).  The image is used to pad the taskbar
+(at the bottom) to the height of the screen.
+
+A complete example is the following:
+
+    { my @reserved;
+      push @reserved, qw(x r s o h);
+      push @reserved, qw(a c e f g j k t y z , . - =);
+      my %reserved;
+      $reserved{$_} = 1 for @reserved;
+      my @spare;
+      for ('a' .. 'z') { push(@spare, $_) unless $reserved{$_}; }
+      { char => sub { # arg = instance name from WM_CLASS
+          local $_ = shift;
+          m-/(.)$-     ?  $1             :
+          /acroread/i  ?  ['a', @spare]  :
+          /xchat/      ?  ['c', @spare]  :
+          /ethereal/   ?  ['e', @spare]  :
+          /gecko/      ?  ['f', @spare]  : # firefox
+          /gv/i        ?  ['g', @spare]  :
+          /sjphone/i   ?  ['j', @spare]  :
+          /kaffeine/   ?  ['k', @spare]  :
+          /TeXmacs/    ?  ['t', @spare]  :
+          /skype/i     ?  ['y', @spare]  :
+          /SWT/        ?  ['z', @spare]  : # azureus
+          /xtb./       ?  [',', ';' ]    :
+          /xtb/        ?  '.'            :
+          /^$/         ?  ['-', '=']     :
+          /./          ?  ['A' .. 'Z']   :
+          undef;
+        },
+        order => [
+          qw(0 . , ; f F c C e E a A g G z Z t T j J k K r x s h o),
+          1 .. 9, qw(i q I Q), 'a' .. 'z', 'A' .. 'Z', '-', '='
+        ],
+        picture => [
+          [qw(irand -m-^apod.*(/image|galax|nebula|cloud)- -a -y 6d)],
+          [qw(irand -m-^apod/- -y 4d -a)],
+        ],
+      }
+    };
+
+The command irand is not in the Xchar distribution.
+
+=head1 POSITION CONFIGURATION FILE
+
+The geometry configfile is designed to be used on different displays, or
+more precisely on displays of different sizes.  The toplevel keys
+essentially name the display.  The file might contain:
+
+    vaio => {
+        width => 1368,
+        height => 768,
+        chars => { ... }
+    }
+
+where no other entry matches 1368 and 768.  The module X11::Screens
+finds the current display's width, height, depth, and resolution (using
+Tk).  If the width and height match the vaio entry then X11::Screens
+will provide the character->geometry mapping specified in the vaio
+'chars' hash.  If you have two displays with the same width and height
+but want to use different geometries, you can do this by adding depth
+and resolution (dots per inch) keys, provided the displays differ in at
+least one of these.
+
+The chars hash looks like:
+
+    chars => {
+        0 => {
+          geometry => ['72x10+0+0', '436x130+0+0'],
+          %{$common{unicode6}},
+        },
+        a => {
+          geometry => ['72x57+-1+0', '436x745+-1+0'],
+          %{$common{unicode6}},
+        },
+        b => {
+          geometry => ['80x57+438+0', '484x745+438+0'],
+          %{$common{unicode6}},
+        },
+        c => {
+          geometry => ['80x74-0+0', '444x744-0+0'],
+        },
+        1 => {
+          geometry => ['72x18+0+0', '436x238+0+0'],
+          %{$common{unicode6}},
+        },
+        2 => {
+          geometry => ['72x18+0+255', '436x238+0+255'],
+          %{$common{unicode6}},
+        },
+        3 => {
+          geometry => ['72x18+0-2', '436x238+0-2'],
+          %{$common{unicode6}},
+        },
+        4 => {
+          geometry => ['80x18+438+0', '484x238+438+0'],
+          %{$common{unicode6}},
+        },
+        5 => {
+          geometry => ['80x18+438+255', '484x238+438+255'],
+          %{$common{unicode6}},
+        },
+        6 => {
+          geometry => ['80x18+438-2', '484x238+438-2'],
+          %{$common{unicode6}},
+        },
+        7 => ['88x23--2+0', '444x234--2+0'],
+        8 => ['88x23--2+252', '444x234--2+252'],
+        9 => ['88x24--2-2', '444x244--2-2'],
+        f => ['120x74+438+0', '760x745+438+0'],
+        x => '0x0-930+00',
+        y => '0x0-444+00',
+        z => '0x0--1+00',
+    },
+
+The term %{$common{unicode6}} is defined at the start of the file by
+
+    %common = (
+        unicode6 => {
+          unicode => 1,
+          normal => '-*-*-medium-r-*--13-*-*-*-c-60-iso10646-*',
+          bold => '-*-*-bold-r-*--13-*-*-*-c-60-iso10646-*',
+        },
+	...
+    );
+
+Where the geometry values are references to an array of two geometries,
+the obvious one of the two is assumed to have width and height in
+character rather than pixel units.  These are used by the command
+xterms, the other by xmv.
+
+=head1 FVWM CONFIGURATION
+
+xxx
+
+=head1 AUTHOR
+
+Brian Keck E<lt>bwkeck@gmail.comE<gt>
+
+=head1 VERSION
+
+  $Source: /home/keck2/xwin/taskbar/makemaker/RCS/xchar.pod,v $
+  $Revision: 1.9 $
+  $Date: 2007/07/05 17:07:23 $
+  xchar version 0.2
+
+=cut

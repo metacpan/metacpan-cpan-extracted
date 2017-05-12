@@ -1,0 +1,109 @@
+#!/usr/bin/perl
+# Copyright 2004 Jerzy Wachowiak
+
+use strict;
+use warnings;
+use IO::Socket;
+use Term::ANSIColor;	
+use Getopt::Std;
+
+getopts("h:p:d:");
+our ( $opt_h, $opt_p, $opt_d );
+usage () unless ( defined( $opt_h ) and defined( $opt_p ) );
+my $path = '.';
+$path = $opt_d  if $opt_d; 
+my $host = $opt_h  if $opt_h;
+my $port = $opt_p  if $opt_p;
+
+
+my $handle = IO::Socket::INET->new( Proto => 'tcp', PeerAddr => $host,
+ PeerPort => $port ) or die "straw->INFO: Can not connect to the server!\n";	    
+$handle->autoflush(1);
+print STDERR "\nstraw->INFO: Connection to the server is active.";
+
+my $kid_pid;
+die "\nstraw->INFO: Can not fork: $!\n\n" unless defined ( $kid_pid = fork() );
+
+if ( $kid_pid ){
+    my $socket_exists = 1;
+    my $message_line = '';
+    my $line;
+    while ( $socket_exists ){
+    	while ( $socket_exists = defined( $handle->recv( $line, 1024 ) ) ){
+	    $message_line .= $line;
+	    last if length( $line ) != 1024
+	}	    
+	if ( $socket_exists and ($message_line ne '') ){
+	    $| = 1;
+	    print STDOUT "\nstraw->RECV:\n";
+	    
+	    $message_line =~
+	     s/=\s*'([^']+)'/"='".colored( $1, 'yellow')."'"/ge;
+	    $message_line =~
+	     s/=\s*"([^"]+)"/'="'.colored( $1, 'yellow').'"'/ge;
+	    $message_line =~
+	     s/>([^>]+)</'>'.colored( $1,  ' yellow').'<'/ge;
+	    
+	    print $message_line;
+	    $message_line = '';
+	    print STDOUT "\nstraw> "
+	}
+    }
+    kill ("TERM" => $kid_pid)
+}
+else {
+    print "\nstraw> ";	
+    while ( defined( my $command = <STDIN> ) ){
+	if ( $command =~ m/^\s*cls\s*$/ ){ 
+	    system( 'clear' );
+	    print STDOUT ( "\nstraw> " );
+	    next
+	}
+        my $command_path = "$path/$command";
+	unless ( defined( open( COMMAND, $command_path ) ) ){ 
+	    print STDOUT "\nstraw->INFO: No such command in the working "
+	     ."directory. Check the correct command name!\nstraw> ";
+	    next
+	}
+	$| = 1;
+	print STDOUT 'straw->SEND:';
+	my $command_line = '';
+	while ( defined( my $line = <COMMAND> ) ){ 
+	    $command_line .= $line
+	}
+	
+	my $color_line = $command_line;        
+	$color_line =~
+	     s/=\s*'([^']+)'/"='".colored( $1, 'bold blue')."'"/ge;
+	$color_line =~	    
+	    s/=\s*"([^"]+)"/'="'.colored( $1, 'bold blue').'"'/ge;
+        $color_line =~
+	     s/>([^>]+)</'>'.colored( $1,  'bold blue').'<'/ge;
+	    
+	print STDOUT "\n$color_line";
+	print STDOUT "\nstraw> ";
+	print $handle $command_line
+	}
+    }
+
+print STDOUT "\n\nstraw->INFO: Connection to the server lost. Bye bye...\n\n";    
+exit;
+
+sub usage {
+    print <<EOU;
+
+USAGE:
+$0 -h host -p port [-d directory]
+
+DESCRIPTION:
+straw opens on start an INET socket connection to the host and port specified 
+in the argument line and starts a very simple shell. Shell input is interpreted 
+as a file name in the straw current working directory or directory specyfied
+in the argument line at start. The content of the file is read and transmitted
+to the host and the answer is displayed. As straw is used mostly with XML 
+protocols, XML is coloured but no pretty printing is used. To stop straw use 
+CTR+C.
+
+EOU
+exit 1
+}

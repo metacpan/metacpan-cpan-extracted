@@ -1,0 +1,69 @@
+#!/bin/bash
+# Copyright 2004 Jerzy Wachowiak
+
+# FUNCTION: Checking if call result OK, if not the script is dying.
+check() {
+    if [ $1 -ne 0 ]; 
+    then
+	echo
+        echo "Script $0 is dying at $2 in disgrace !!!"
+        echo
+	exit 1
+    fi    
+}
+
+
+# Checking if filename exists:
+if [ -z "$1" ]
+then
+        echo "
+USAGE:
+./xdgo filename [database_name]
+
+DESCRIPTION:
+xdgo glues xdreg, xdcnf, xdpg, xdosr, xdscr, xdstraw, xdclean. The mandatory 
+input parameter is a filename and optional a name for the resulting active 
+PostgreSQL database. The records in the input file must have the format: 
+description; role; hostname; port; username; password; resource; operating 
+system; home path. The role can be: sender, receiver or archivist. Comments 
+have to start with #.
+"
+	exit 1
+fi
+
+FILENAME=$1
+DATABASE=$2
+
+# Checking if optional database name exists:
+if [ -z "$DATABASE" ]; 
+then 
+    DATABASE="xdash" 
+fi
+
+# Registration on the jabber server:
+./xdreg $FILENAME
+check $? ./xdreg
+
+# Building configuration files
+./xdcnf $FILENAME
+check $? ./xdcnf
+
+# Building agent scripts
+./xdscr $FILENAME $DATABASE
+check $? xdscr
+
+# Building service registration for various OS
+./xdosr $FILENAME
+check $? xdosr
+
+# Building sql for the Postgresql:
+./xdpg $FILENAME $DATABASE
+check $? ./xdpg
+
+# Building jabber messages for straw:
+./xdstraw $FILENAME 
+check $? ./xdpg
+
+# Cleaning everything...
+./xdclean $FILENAME
+check $? ./xdclean

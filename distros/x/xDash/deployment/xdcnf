@@ -1,0 +1,116 @@
+#!/usr/bin/perl  
+# Copyright Jerzy Wachowiak
+
+use strict;
+use warnings;
+use Text::CSV_XS;
+use xdSRA;
+
+my $filepath = shift;
+
+defined( $filepath ) or usage();
+
+my $result = xdSRA::create_sra_from( $filepath );
+my @sender = @{ $result->{sender} };
+my @receiver = @{ $result->{receiver} };
+my @archivist = @{ $result->{archivist} };
+
+print "\n---Start creating configuration files---\n";
+my $jclientpath;
+for my $si (0..$#sender) {
+    $jclientpath = "$sender[$si]{username}\@$sender[$si]{hostname}_$sender[$si]{resource}";
+    xdSRA::create_directory( $jclientpath ); 
+    print "File sender.xml for $sender[$si]{username}\@$sender[$si]{hostname}/$sender[$si]{resource} created in the directory ./$jclientpath.\n";
+
+    open(CONFIG, ">> $jclientpath".'/sender.xml');
+    print CONFIG '<?xml version="1.0" encoding="ISO-8859-2" ?>',"\n";
+    print CONFIG "<sender>\n";
+    print CONFIG "   <account>\n";
+    print CONFIG "	<role>sender</role>\n";
+    print CONFIG "	<hostname>$sender[$si]{hostname}</hostname>\n";
+    print CONFIG "	<port>$sender[$si]{port}</port>\n";
+    print CONFIG "	<username>$sender[$si]{username}</username>\n";
+    print CONFIG "	<password>$sender[$si]{password}</password>\n";
+    print CONFIG "	<resource>$sender[$si]{resource}</resource>\n";
+    print CONFIG "	<comments>$sender[$si]{comments}</comments>\n";
+    print CONFIG "   </account>\n";
+    print CONFIG "   <account>\n";
+    print CONFIG "	<role>archivist</role>\n";
+    print CONFIG "	<hostname>$archivist[0]{hostname}</hostname>\n";
+    print CONFIG "	<username>$archivist[0]{username}</username>\n";
+    print CONFIG "	<resource>$archivist[0]{resource}</resource>\n";
+    print CONFIG "	<comments>$archivist[0]{comments}</comments>\n";
+    print CONFIG "   </account>\n";
+    print CONFIG "</sender>\n";
+    close( CONFIG);
+};
+
+for my $ri (0..$#receiver) {
+    $jclientpath = "$receiver[$ri]{username}\@$receiver[$ri]{hostname}_$receiver[$ri]{resource}";
+    xdSRA::create_directory( $jclientpath ); 
+    print "File receiver.xml for $receiver[$ri]{username}\@$receiver[$ri]{hostname}/$receiver[$ri]{resource} created in the directory ./$jclientpath.\n";
+
+    open(CONFIG, ">> $jclientpath".'/receiver.xml');
+    print CONFIG '<?xml version="1.0" encoding="ISO-8859-2" ?>',"\n";
+    print CONFIG "<receiver>\n";
+    print CONFIG "   <account>\n";
+    print CONFIG "	<role>receiver</role>\n";
+    print CONFIG "	<hostname>$receiver[$ri]{hostname}</hostname>\n";
+    print CONFIG "	<port>$receiver[$ri]{port}</port>\n";
+    print CONFIG "	<username>$receiver[$ri]{username}</username>\n";
+    print CONFIG "	<password>$receiver[$ri]{password}</password>\n";
+    print CONFIG "	<resource>$receiver[$ri]{resource}</resource>\n";
+    print CONFIG "	<comments>$receiver[$ri]{comments}</comments>\n";
+    print CONFIG "   </account>\n";
+    print CONFIG "   <account>\n";
+    print CONFIG "	<role>archivist</role>\n";
+    print CONFIG "	<hostname>$archivist[0]{hostname}</hostname>\n";
+    print CONFIG "	<username>$archivist[0]{username}</username>\n";
+    print CONFIG "	<resource>$archivist[0]{resource}</resource>\n";
+    print CONFIG "	<comments>$archivist[0]{comments}</comments>\n";
+    print CONFIG "   </account>\n";
+    print CONFIG "</receiver>\n";
+    close( CONFIG);
+};
+
+for my $ai (0..0) {
+    $jclientpath = "$archivist[$ai]{username}\@$archivist[$ai]{hostname}_$archivist[$ai]{resource}";
+    xdSRA::create_directory( $jclientpath ); 
+    print "File archivist.xml for $archivist[$ai]{username}\@$archivist[$ai]{hostname}/$archivist[$ai]{resource} created in the directory ./$jclientpath.\n";
+
+    open(CONFIG, ">> $jclientpath".'/archivist.xml');
+    print CONFIG '<?xml version="1.0" encoding="ISO-8859-2" ?>',"\n";
+    print CONFIG "<archivist>\n";
+    print CONFIG "   <account>\n";
+    print CONFIG "	<role>archivist</role>\n";
+    print CONFIG "	<hostname>$archivist[$ai]{hostname}</hostname>\n";
+    print CONFIG "	<port>$archivist[$ai]{port}</port>\n";
+    print CONFIG "	<username>$archivist[$ai]{username}</username>\n";
+    print CONFIG "	<password>$archivist[$ai]{password}</password>\n";
+    print CONFIG "	<resource>$archivist[$ai]{resource}</resource>\n";
+    print CONFIG "	<comments>$archivist[$ai]{comments}</comments>\n";
+    print CONFIG "   </account>\n";
+    print CONFIG "</archivist>\n";
+    close( CONFIG);
+
+};
+print "---End creating configuration files---\n";
+exit;
+
+sub usage {
+    print <<EOU;
+
+USAGE:
+$0 filename
+
+DESCRIPTION:
+xdcnf creates for scripts: sender, receiver and archivist configuration files 
+respective sender.xml, receiver.xml and archivist.xml in the directories with
+the name of their JID. The only input parameter is a file. The records in the
+input file must have the format: description; role; hostname; port; username;
+password; resource. The role can be only: sender, receiver or archivist. 
+Comments have to start with #.
+
+EOU
+exit 1
+}

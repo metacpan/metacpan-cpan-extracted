@@ -1,0 +1,49 @@
+#!c:/perl/bin/perl
+
+use strict;
+use lib qw(c:/work/);
+use XMLRPC::PurePerl qw(encode_call_xmlrpc encode_response_xmlrpc decode_xmlrpc);
+use Frontier::RPC2;
+use RPC::XML;
+use RPC::XML::Parser;
+use Benchmark;
+use Data::Dumper;
+
+my $todo = 5000;
+
+my $coder = new Frontier::RPC2;
+
+my $structure = [ map { { 'boo' => [ 'a', 'b', 'c' ] } } (0..$todo) ];
+
+my $rpcxml = RPC::XML::request->new('myCall', $structure);
+print "ENCODING SPEED TEST\n";
+
+timethese( -10, {
+  'frontier' => sub {
+    my $res = $coder->encode_call('myCall', $structure);
+  },
+  'pureperl' => sub {
+    my $res = &encode_call_xmlrpc('myCall', $structure);
+  },
+  'rpcxml' => sub {
+    my $res = $rpcxml->as_string();
+  }
+});
+
+print "DECODING SPEED TEST\n";
+
+my $xml = &encode_call_xmlrpc('myCall', $structure);
+
+my $rpcxmldec = RPC::XML::Parser->new();
+
+timethese( -10, {
+  'frontier' => sub {
+    my $struct = $coder->decode($xml);
+  },
+  'rpcxml' => sub {
+    my $resp = $rpcxmldec->parse($xml);
+  },
+  'pureperl' => sub {
+    my $struct = &decode_xmlrpc($xml);
+  }
+});

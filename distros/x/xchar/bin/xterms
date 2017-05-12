@@ -1,0 +1,846 @@
+#!/usr/bin/env perl
+#!/usr/bin/perl -w
+# $Source: /home/keck/gen/RCS/xterms,v $
+# $Revision: 8.11 $$Date: 2007/07/05 17:00:30 $
+# Contents
+#   1 standard   4 args/1      7 config    10 display       13 notes
+#   2 constants  5 screenname  8 args/2    11 xenvironemnt  14 perldoc
+#   3 cmd        6 font        9 geometry  12 main          15 pod
+
+# ----------------------------------------------------------------------
+
+#1# standard
+
+use strict;
+use warnings;
+
+(my $cmd = $0) =~ s%.*/%%;
+
+sub usage { print "Usage: $cmd -help\n"; }
+
+sub quit { (@_) ? print STDERR "$cmd quitting: @_\n" : &usage; exit 1 }
+
+my $HOME = $ENV{HOME};
+
+(my $user = `id`) =~ s/^[^(]*\(([^)]+)\).*\n/$1/;
+
+chdir $HOME;
+
+use X11::XTerms;
+my $localhost = X11::XTerms->localhost;
+
+use Data::Dumper;
+
+# ----------------------------------------------------------------------
+
+#2# constants
+
+# see font/1, xenvironment
+
+my $xterms = 'xterms';
+
+# ----------------------------------------------------------------------
+
+#3# cmd
+
+(my $remotehost = $cmd) =~ tr/A-Z/a-z/ unless $cmd =~ /^$xterms$/i;
+my $uppercase = $cmd =~ /[A-Z]/;
+
+# ----------------------------------------------------------------------
+
+#4# args/1
+
+my %prefs;
+
+my $BIG;
+my $C;
+my $big;
+my $dotfile;
+my $display = 1;
+my $list;
+my $name;
+my $scrollbar;
+my $show;
+my $sleep;
+my $u;
+my $U;
+my $xcmd = 'xterm';
+
+while (@ARGV) {
+  $_ = shift;
+  &perldoc() if /^-+(man|help)/;
+  $sleep = $1, next if /^-(\d+)/;
+  $big = 1, next if /^-b/;
+  $BIG = 1, next if /^-B/;
+  $dotfile = shift, next if /^-c/;
+  $C = '-C', next if /^-C/;
+  $ENV{DISPLAY} = shift, next if /^-d/;
+  $display = 0, next if /^-D/;
+  $prefs{bold} = shift, next if /^-fb/;
+  $prefs{normal} = shift, next if /^-f/;
+  $prefs{height} = shift, next if /^-he/;
+  $remotehost = shift, next if /^-h/;
+  $list = 1, next if /^-l$/;
+  $prefs{name} = shift, next if /^-n/;
+  $prefs{rcmd} = 'rlogin', next if /^-rl/;
+  $prefs{rcmd} = 'rsh', next if /^-rs/;
+  $scrollbar = 1, next if /^-sc/;
+  $show = 1, next if /^-sh/;
+  $prefs{rcmd} = 'ssh', next if /^-ss/;
+  $prefs{rcmd} = 'telnet', next if /^-t/;
+  $prefs{rcmd} = 'TELNET', next if /^-T/;
+  $u = 1, next if /^-u/;
+  $U = 1, next if /^-U/;
+  quit("illegal option: $_") if /^-/ && !/^-+$/;
+  unshift @ARGV, $_;
+  last;
+}
+
+# ----------------------------------------------------------------------
+
+#5# screenname
+
+$ENV{DISPLAY} = ':0' unless defined $ENV{DISPLAY};
+
+use X11::Screens;
+
+my $screen = X11::Screens->current; # croaks on failure
+
+my $screenname = $screen->name;
+
+quit("\$screen->name failed") unless $screenname;
+
+# ----------------------------------------------------------------------
+
+#6# font
+
+# lots of notes in 7.3
+# +vim +etc2
+
+my $unicode = '-*-*-medium-r-*--8-*-*-*-c-50-iso10646-*';
+
+my $Unicode = '-*-*-medium-r-*--13-*-*-*-c-60-iso10646-*';
+
+my $bigunicode =
+  '-misc-fixed-medium-r-normal--15-140-75-75-c-90-iso10646-1';
+
+my $BIGunicode =
+  '-sony-fixed-medium-r-normal--24-170-100-100-c-120-iso8859-1';
+
+# bold not handled yet ...
+unless (defined $prefs{normal}) {
+  if ($u || $U || $screen->unicode) {
+    $prefs{normal} =
+      $BIG ? "$BIGunicode -u8" :
+      $big ? "$bigunicode -u8" :
+      $U ? "$Unicode -u8" :
+      $u ? "$unicode -u8" :
+      undef;
+  } else {
+    $prefs{normal} =
+      $BIG ? '12x24' :
+      $big ? '9x15' :
+      undef;
+  }
+}
+
+# ----------------------------------------------------------------------
+
+#7# config
+
+if (defined $dotfile) {
+  quit("no such file: $dotfile") unless -f $dotfile;
+} else {
+  $dotfile = "$HOME/.$xterms";
+}
+
+if (-f $dotfile) {
+  if ($list) {
+    my $pager = $ENV{PAGER} ? $ENV{PAGER} : 'more';
+    exec "$pager $dotfile";
+  }
+  my $config = X11::XTerms->new(file => $dotfile);
+  %prefs = %{$config->prefs(\%prefs, $remotehost)};
+}
+
+# needs to stay '' if defined to be '' in .xterms (cu for ipaq) ...
+my $loginhost =
+  defined $prefs{address} ? $prefs{address} :
+  defined $prefs{between} ? $prefs{between} :
+  $remotehost;
+
+if ($loginhost) {
+  $loginhost = "$loginhost $prefs{port}" if $prefs{port};
+  unless ($prefs{user}) {
+    if ($loginhost =~ /(.*)@(.*)/) {
+      $prefs{user} = $1;
+      $loginhost = $2;
+    } else {
+      $prefs{user} = $user;
+    }
+  }
+  $prefs{rcmd} = $uppercase ? 'SSH' : 'ssh' if !$prefs{rcmd};
+  $prefs{rcmd} .= " -l $prefs{user}"
+    if $prefs{rcmd} =~ /rsh|rlogin|ssh/;
+}
+
+# ----------------------------------------------------------------------
+
+#8# args/2
+
+quit("no places specified") unless @ARGV;
+# for ion, where -geometry ignored, allow '-', '--', etc
+
+my $i = 0;
+my @xterms;
+
+for (@ARGV) {
+  my @places = ();
+  my @ichars = ();
+  my $last;
+  if (/^-+$/) {
+    @places = split '';
+  } elsif (/(.+)\.(.+)/) {
+    my @ranges = split '', $1; # position chars
+    my @iranges = split '', $2; # instance chars
+    while (@ranges)  {
+      local $_ = shift @ranges;
+      push(@places, $_), $last = $_, next unless /-/;
+      $_ = shift @ranges;
+      my @extra = $last .. $_;
+      shift @extra;
+      push @places, @extra;
+    }
+    while (@iranges)  {
+      local $_ = shift @iranges;
+      push(@ichars, $_), $last = $_, next unless /-/;
+      $_ = shift @iranges;
+      my @extra = $last .. $_;
+      shift @extra;
+      push @ichars, @extra;
+    }
+    quit("more places than names in '$_'") if @places > @ichars;
+    push(@places, $places[-1]) while @places < @ichars;
+  } else {
+    my @ranges = split('', $_);
+    while (@ranges)  {
+      $_ = shift @ranges;
+      push(@places, $_), $last = $_, next unless /-/;
+      $_ = shift @ranges;
+      my @extra = $last .. $_;
+      shift @extra;
+      push @places, @extra;
+    }
+  }
+  for (@places) {
+    my $ichar = shift @ichars;
+    my $id = sprintf("%05d", $$) . sprintf("%02d", $i++);
+    my $xterm = {
+      place => $_,
+      id => $id,
+      instance => (
+        defined $name ? $name :
+        defined $remotehost ? $remotehost :
+	'xterm'
+      ) . "/$ichar",
+      ichar => $ichar,
+    };
+    push @xterms, $xterm;
+  }
+}
+
+# print Dumper(\@xterms); exit;
+
+# ----------------------------------------------------------------------
+
+#9# geometry
+
+my %clients = %{$screen->clients};
+
+# ----------------------------------------------------------------------
+
+#10# display
+
+# notes in 7.3
+
+$ENV{DISPLAY} = "$localhost:$1" if
+  defined $remotehost &&
+  $ENV{DISPLAY} =~ /^:(.*)/ &&
+  $prefs{rcmd} =~ /^rsh/;
+
+# ----------------------------------------------------------------------
+
+#11# xenvironemnt
+
+my $xenvironment =
+  $prefs{noxenv} ? undef :
+  $ENV{XENVIRONMENT} ? $ENV{XENVIRONMENT} :
+  -f "$HOME/.Xdefaults.d/$screenname" ? "$HOME/.Xdefaults.d/$screenname" :
+  undef;
+
+# ----------------------------------------------------------------------
+
+#12# main
+
+my $remote =
+  defined $prefs{rcmd} && $prefs{rcmd} =~ /^rsh/; # xterm remote
+
+for (@xterms) {
+  my $place = $_->{place};
+  my $client = $clients{$place}; # empty for $place eq '-'
+  my %screen;
+  $screen{font} = $screen->font;
+  my %char;
+  $char{geometry} = $client->geometry('chars');
+  $char{normal} = $client->font('normal');
+  $char{bold} = $client->font('bold');
+  my $geometry = $char{geometry};
+  $geometry =~ s/x\d+/x$prefs{height}/ if $prefs{height};
+  my $normal =
+    $prefs{normal} ? $prefs{normal} :
+    $char{normal} ? $char{normal} :
+    $screen{font} ? $screen{font} :
+    undef;
+  my $bold =
+    $prefs{bold} ? $prefs{bold} :
+    $char{bold} ? $char{bold} :
+    $normal ? $normal :
+    undef;
+  my $id = $_->{id},
+  my $instance = $_->{instance},
+  my $ichar = $_->{ichar},
+  my @command;
+  push @command, "DISPLAY=$ENV{DISPLAY}" if $display && $remote;
+  push @command, "XENVIRONMENT=$xenvironment" if defined $xenvironment;
+  push @command,
+    'PATH=$PATH:/usr/local/bin:/usr/openwin/bin:/usr/X11R6/bin'
+    if $remote;
+  push @command, "XTERMID=$id"; # for scrollbuffer [+xterm]
+  push @command, $xcmd, qw(-ut -sl 8192);
+  push @command, $C if $C;
+  push @command, '-fn', $normal if $normal;
+  push @command, '-sb', if $scrollbar;
+  push @command, '-fb', $bold if $bold;
+  push @command, '-name', $instance;
+  push @command, '-geometry', $geometry if $geometry;
+  my $command;
+  if ($remote) {
+    $command = join(' ', @command);
+    quit "\$loginhost undefined" unless $loginhost;
+    $command = qq{$prefs{rcmd} $loginhost '$command >/dev/null 2>&1 &'};
+  } else {
+    push @command, '-n', $remotehost if $remotehost;
+    push @command, '-e', $prefs{rcmd} if defined $loginhost;
+    push @command, $loginhost if $loginhost;
+    $command = join(' ', @command, '&');
+  }
+  if ($show) { print $command, "\n" } else { system $command }
+  sleep $sleep if $sleep;
+}
+
+# ----------------------------------------------------------------------
+
+#13# notes
+
+# XX84-7
+# +xdm +xwin/config +mandrake +erx +iplab/configs
+# +etc2 +xterm2
+
+# 1.3
+#   reduced '-title $remotehost -n $remotehost -name $iman' to '-name $iman '
+# 1.4
+#   -k
+#   a-d
+# 1.5
+#   -telnet, -TELNET, -font
+#   classes
+# 1.12
+#   +abbreviation
+# 1.17
+#   .bash/c works with telnet
+# 2.1
+#   having got masquerading working
+#   dropped gen/readmes & gen/classes
+#   dropped -name
+#   can use rxosh with places
+#   +abb moved into place arguments
+#   works from ramidus to chook, not to laptop
+# 2.3
+#   cleaned up
+#   laptop OK
+# 2.5
+#   restored -name because 139.130.239.254 too long
+#   added '' keys to .xterms for defaults
+#   improved .xterms format
+#   improved .xterms processing
+#   iman internal rather than gen/iman (easier error handling)
+# 2.6
+#   logic simplified
+#   usage much revised
+# 2.8
+#   moved hardwired r => readme etc out into .xterms
+#   usage much changed
+# 2.10
+#   redesigned .xterms
+#   iman explicit in .xterms rather than derived from variable name
+#   allowed for inboxes
+# 2.12
+#   added 'between' for isp1
+# 2.14
+#   added keck@ermintrude & 'user' for ermintrude
+# 2.15
+#   passed XENVIRONMENT to remote host, adding /nfs/host if missing
+#   already done by gen/det, forgotten here
+# 2.16
+#   drastic changes
+#   logic maybe not recovered
+#   at same time removed nearly all logic from gen/menu login proc
+#   matches gen/menu 5.41
+#   all done in .xterms now
+#   here ...
+#     dropped -local & -remote
+#     added -rsh
+#   .xterms ...
+#     added address
+#     dropped boolean values keys rlogin, TELNET, etc
+#     added string valued key rcmd
+#   remote iff -rsh or rcmd eq rsh
+#   so now script arguments not one-to-one with dotfile keys
+# 2.23
+#   -C
+# 2.28
+#   -sl 1024 -> 8192
+# 2.34
+#   castor -k
+# 2.35
+#   -height & height attribute (for ced)
+# 2.38
+#   -u & $xwin->{unicode} [+vim]
+# 2.40
+#   $wm from .wmpid (.xinitrc, gen/wm)
+#   doesn't work
+# 2.43
+#   pass XENVIRONMENT=$HOME rather than /nfs/...
+#   +xterm
+# 2.44
+#   $wm works here (maybe not in .xinitrc & gen/wm)
+#   $maxname changed from 13 to 20 (using twm ... timbaz broken)
+#     ditto in gen/twmrc & gen/Xdefaults
+#     should be in .xwin
+# 2.45
+#   $maxname from .xwin & renamed to $chars
+# 2.46
+#   $chars overused, so above renamed to $twmchars
+# 3.1
+#   same as 2.46
+#   +xwin/config
+# 3.2
+#   works with new .xwin
+# 3.4
+#   fixed $wmpid to work with .xinitrc
+# 4.1
+#   Xwin.pm
+# 5.1
+#   replaced Xwin by Screen
+# 5.3
+#   noxenvironment [+mandrake]
+# 6.1
+#   got rid of detach (not in trl0.tgz)
+#   worked out how to stop rsh's waiting
+#   got rid of -k ... guess in detach case rsh's were waiting ... had
+#     thought not, but can't see how -k worked otherwise
+#   check that $loginhost defined for remote case ... not sure of old
+#     logic
+#   here() & there() simpler
+#   dunno that ancient twisting & turning all necessary or adequate
+# 6.3
+#   iPAQ serial restored ... realize depended on address => '' causing
+#     $loginhost to be defined but ''
+# 6.5
+#   added -n $remotehost to there() to set iconname for routers (only
+#     transient for hosts that use xdeco)
+# 6.6
+#   -show
+#   deleted old -e usage entry ... relic of detach
+#   deleted gen/classes usage entry ... seems to have been retired to
+#     RCS years ago
+# 6.7
+#   deleted LC_CTYPE=$lang because of font errors [+dia]
+#   originally for unicode: +vim
+#   $lang still set to fa_IR above & with -u, no reason, but not used
+# 6.10
+#   set ICONWIDTH for xdeco
+#   renamed $twmchars to $iconwidth
+# 6.12
+#   dropped farsi
+# 6.13
+#   -sleep
+# 6.15
+#   '-' for unspecified geometry
+# 6.17
+#   pod
+#   adjusted order of getting preferences, so with
+#       xxx => { '' => ...
+#       '' => { yyy => ... }
+#     first overrides second when connecting from xxx to yyy
+#   makemaker ... make test fails ...
+#     OK if delete enough of blib/script/xterms
+# 6.27
+#   changed default from rsh to ssh
+# 6.33
+#   -b (see fonts)
+# 6.45
+#   location.instance begun [+taskbar1]
+# 6.46
+#   ~/.tmgr
+# 6.47
+#   WM_INSTANCE
+# 6.50
+#   per-xterm fonts
+#   merged &here and &there into main
+# 6.54
+#   renamed .tmgr to .xup
+# 6.55
+#   having trouble with xchar<->instance [+taskbar1]
+#   simpler for mo to have some redundancy
+#   have been thinking of splitting config again anyway
+#   moved .xterms to .xterms/hosts
+#   made .xterms/chars ... currently also have .xchars
+# 6.57
+#   $xterm->geometry & $xterm->font
+# 7.x
+#   +taskbar7
+# 8.x
+#   XTerms.pm
+#   +taskbar8
+# 8.6
+#   dropped WM_INSTANCE & WM_ICHAR [+taskbar9]
+# 8.8
+#   moved XTerms to X11::Xterms
+
+# $Revision: 8.11 $
+
+# ----------------------------------------------------------------------
+
+#14# perldoc
+
+# gen/makemaker 'make test' fails: +makemaker
+
+sub perldoc {
+  my ($perldoc, $less);
+  for (split /:/, $ENV{PATH}) {
+    $perldoc = "$_/perldoc" if -x "$_/perldoc";
+    last if $perldoc; next if $less;
+    $less = "$_/less" if -x "$_/less";
+  }
+  if ($perldoc) {
+    $ENV{LESSCHARSET} = 'latin1';
+    exec $perldoc, $0
+  } elsif ($less) {
+    exec $less, '+/^# Sorry.*', $0
+  } else {
+    print
+      "Sorry, there's no perldoc(1) or even less(1) in your \$PATH\n" .
+      "The documentation can be found at the end of $0\n";
+    exit 1
+  }
+}
+
+__END__
+
+# ----------------------------------------------------------------------
+
+#15# pod
+
+# sub usage in standard
+
+# Sorry, there's no perldoc in your $PATH, so here's the raw pod
+
+=head1 NAME
+
+xterms - run multiple xterms and remote logins
+
+=head1 SYNOPSIS
+
+ xterms [-host host] [-name name] \
+      [-rsh] [-rlogin] [-telnet] [-TELNET] [-ssh] [-height height] \
+      [-display display] [-fn font] [-u|-U] [-C] [-sleep] \
+      [-c config] \
+      where_and_what where_and_what ...
+
+=head1 DESCRIPTION
+
+Does one of (first is default) ...
+
+ * runs local xterms at specified places on the display,
+   & logs into the specified host (usually) in all of
+   them via ssh (default) or telnet or TELNET or rsh
+
+ * runs remote xterms via ssh to the specified host (usually)
+   at specified places on the display (remember .rhosts &
+   .Xauthority)
+
+It can also be used simply to start some xterms.
+
+All the arguments in the 3rd row above are passed to the xterms.
+
+A where_and_what argument specifies (indirectly) the geometry of the
+xterms and (optionally) some environment for the xterms.
+
+Much of the behaviour of xterms is controlled by the config file
+$HOME/.xterms, or as specified with -c
+
+Finally $HOME/.screens is used, via the Perl module X11::Screen.pm, which has
+its own documentation.
+
+The (xterms) config file is a perl fragment returning a reference to a
+hash (associative array).  Most keys are hostnames, but the empty key
+('') and the key containing just an underscore have special meanings.
+The empty key means the default host.
+
+=head1 HOSTNAME CONFIG FILE ENTRIES
+
+For hostname & empty keys, the value is again a reference to a hash with
+either hostname or empty keys.  The outer hostname is the name of the
+local host (where xterms is run), and the inner hostname the name of the
+remote host (as specified in the -host parameter or the name used to run
+$cmd).  The inner values are hashrefs specifying properties of the login
+specific to the particular local & remotes hosts.  The keys recognized
+are:
+
+ address  IP address, in case the remote host has no name
+ between  log into this host instead
+ font     used for xterm argument
+ height   xterm height (see below)
+ name     xterm instance name (see below)
+ noxenv   XENVIRONMENT not set for xterm
+ port     instead of normal telnet port
+ rcmd     telnet or TELNET or rlogin or rsh or ssh (default)
+ user     remote user name, if different to local
+
+The point of 'between' is that you may only be able to reach
+the desired host from an intermediate host.
+
+Several of these correspond to command line arguments.
+
+See below for how empty hostnames are handled.
+
+=head1 WHERE
+
+In the simplest cases the where_and_what argument only specifies
+where.  It is, or expands to, a string of characters each of which
+specifies an xterm geometry via $HOME/.screens (above).
+
+For example, the command
+
+	xterms a-d
+
+starts 4 xterms, with the geometry specified for the keys a, b, c, d in
+$HOME/.screens.
+
+The window height can be overridden by -height or a height attribute in
+the config file.
+
+If where_and_what consists solely of dashes (-) then one xterm is
+created for each dash, with unspecified geometry.  For no good reason,
+this is hardwired into xterms (maybe could have been left to
+$HOME/.screens).
+
+=head1 WHAT
+
+The underscore key in the config file allows for more information
+being provided by where_and_what arguments.
+
+Here is an example:
+
+  xxx
+        xterms aar bbx cci
+
+will start 6 xterms, 2 with geometry a, 2 with geometry b, & 2 with
+geometry c.  The first 2 will have the environment variable CLASS set to
+readme, and the arguments '-name --classes--'.  The second 2 are
+similar.  The 3rd 2 will have the environment variable INBOXES set to c
+(from %p, p for place), & the arguments '-name ---inboxes---'.
+
+The '+' in the example is treated as a separator, the where_and_what
+argument being split into 2 words.  The 1st word is handled as above,
+and the second is set as the value of the environment variable ABB.
+
+The command
+
+        xterms ar+www
+
+will start an xterm with geometry a, with CLASS set to readme
+and the environment variable ABB set to www (from %w, w for word).
+
+=head1 XTERM INSTANCE NAME
+
+The application name (xterm -name) (which is used for example by twm for
+icon manager names) is generated by padding out a base name to $maxname
+characters with dashes before & after.  The base name is decided rather
+historically as follows.  For xterms associated with an environment
+setting character, the base name is the name (not value) of the
+environment variable.  If -name is used, then all other base names have
+the name thus specified.  If not, then the remote host name is used,
+failing which 'xterm'.
+
+The iconname is explicitly set to the -name value, lacking which to the
+remote host name, if any.  The shell can override this by sending xterm
+control sequences, so this is most useful when the remote host is a
+router.  If there is no -name or remote host, then nothing is done,
+leaving it to xterm, which sets it to 'telnet' or such.
+
+=head1 DISPLAY
+
+The default DISPLAY is taken from the environment, or :0.0, or xxx:0.0
+where xxx is the local host name, etc.  Normally passed to remote host,
+but not with -D.
+
+=head1 REMOTE HOST
+
+If no host is specified then no rlogin or such is done.  The current
+directory is changed to $HOME before the xterms are started.
+
+If the command is called by a name different to xterms then it's taken
+to be the host name (cf Note below).
+
+An exception to the above is that if the entry in the config file has a
+'between' key, whose argument is a host name, then the rlogin etc is
+done to that host instead.  This is normally used when the final target
+host is only reachable from an intermediate (the 'between' value).  The
+rlogin or such from the intermediate host to the final host is not done
+by xterms.
+
+=head1 USER
+
+The host argument can have the form user@host.
+The remote user name can also be set in the config file.
+
+=head1 FONT
+
+The font is passed as the parameter of xterm's -fn flag.
+It can be set in the config file (see above) or on the command line.
+
+The defaults are:
+
+ 6x13
+ -misc-fixed-medium-r-semicondensed--13-120-75-75-c-60-iso10646-1
+
+The latter (unicode) is used with -U or if specified in $HOME/.xscreens
+(via X11::Screen).  In this case, -u8 is passed to xterm.  With -u a smaller
+unicode font is used, but it's hard to read.
+
+With -b (big font), defaults are:
+
+ 9x15
+ -misc-fixed-medium-r-normal--15-140-75-75-c-90-iso10646-1
+
+=head1 SLEEP
+
+With for example -2 there's a pause of 2 seconds between starting each
+xterm.  The reason for this is that they are started in background, & on
+a slow machine the window manager can occasionally learn of them out of
+order, which may be undesirable.
+
+=head1 OPTION ABBREVIATION
+
+All the options can be abbreviated to one letter, or 2 for -rlogin &
+-remote.
+
+=head1 DEFAULT ATTRIBUTES
+
+The config file can specify some defaults (rlogin/telnet/TELNET/ssh,
+name, font) through empty keys ('') in place of hostnames, as for
+example in ...
+
+      { ...
+	local1 => {
+	  remote1 => { ... },
+          remote2 => { ... },
+          '' => { ... }
+	},
+        local2 => {
+	  remote1 => { ... },
+	  remote3 => { ... },
+	  '' => { ... }
+	},
+        '' => {
+	  remote2 => { ... },
+	  remote3 => { ... },
+	  '' => { ... }
+	},
+        ...
+      }
+
+Here local1, remote1, etc are hostnames, & the { ... } contain attribute
+definitions.
+
+The order of preference for taking attribute values from the config file
+is:
+
+  (1) both local & remote hostnames nonempty
+  (2) remote hostname nonempty, local hostname empty
+  (3) local hostname nonempty, remote hostname empty
+  (4) both local & remote hostname empty
+
+That is, for a given local & remote host & given attribute, the value
+used will be from an entry of type (1) if given there, otherwise from an
+entry of type (2), etc.
+
+=head1 CONFIG FILE EXAMPLE
+
+ { '_' => {
+     chars => {
+       r => { var => 'CLASS', val => 'readme', man => 'classes', },
+       x => { var => 'CLASS', val => 'x', man => 'classes', },
+       s => { var => 'CLASS', val => 'script', man => 'classes', },
+       h => { var => 'CLASS', val => 'html', man => 'classes', },
+       o => { var => 'CLASS', val => 'odd', man => 'classes', },
+       i => { var => 'INBOXES', val => '%p', man => 'inboxes', },
+     },
+     words => {
+       '+' => { var => 'ABB', val => '%w', },
+     },
+   },
+   ram => {
+     pollux => { rcmd => 'rsh', },
+     '' => { rcmd => 'telnet', },
+   },
+   '' => {
+     lonsdale => { address => '139.130.239.254', rcmd => 'ssh', },
+     isp1 => { between => 'evunka', rcmd = 'rlogin', },
+     ermintrude => { user => 'keck', },
+   },
+ }
+
+=head1 OTHER NOTES
+
+The xterms are put in background so xterms & any ssh's don't wait.
+
+The config file name is always the same, regardless of renaming or
+symlinking.
+
+=head1 OTHER OPTIONS
+
+ xterms -l
+
+Outputs (lists) the config file via $PAGER or more.
+
+ xterms -show ...
+
+Just outputs the commands that would be run.
+Still uses X11::Screen, so DISPLAY or -display needs to be correct.
+
+=head1 AUTHOR
+
+Brian Keck E<lt>bwkeck@gmail.comE<gt>
+
+=head1 VERSION
+
+ $Source: /home/keck/gen/RCS/xterms,v $
+ $Revision: 8.11 $
+ $Date: 2007/07/05 17:00:30 $
+ xchar 0.2
+
+=cut
+

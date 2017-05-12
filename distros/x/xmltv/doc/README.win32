@@ -1,0 +1,118 @@
+XMLTV 0.5.33, Windows binary release
+
+Gather television listings, process them and organize your viewing.
+XMLTV is a file format for storing TV listings, defined in xmltv.dtd.
+Then there are several tools to produce and process these listings.
+
+Please see doc\QuickStart for documentation on what each program does,
+and xmltv.dtd for documentation on the file format.
+
+This is a release of the software as a single Windows binary
+xmltv.exe, generated from the Perl source code linked from
+<http://sourceforge.net/project/showfiles.php?group_id=39046>.
+
+* Known problems
+
+Due to prerequisite problems, EXE support is not currently available
+for the following programs:
+        tv_grab_nz
+        tv_grab_jp
+        tv_grab_se
+If you need those programs, you'll need to install Perl (and/or Python)
+and the necessary modules and use the full distribution.
+
+* Changes in this release (0.5.33)
+
+tv_grab_na - gone, replaced by tv_grab_na_dd, see below
+
+tv_grab_na_icons - a new script to grab icons from Zap2IT
+                 - requires WWW::Mechanize
+
+tv_grab_na_dd - updated to include icon links downloaded with tv_grab_na_dd
+              - changed handling of programme copyright dates and repeats
+              - changed format of episode-num in output
+              - fixed warnings seen in Sourceforge bug #935843
+              - some tidyups to configuration
+
+tv_grab_de_tvtoday - fixed for upstream site changes
+
+tv_grab_pt - cleanly handle 'site unavailable' (which seems to be the
+             state at the moment)
+
+tv_grab_no - fixed for upstream site changes and bugs
+
+tv_grab_hu - fixed for upstream site changes
+
+tv_grab_uk_rt - fixed for upstream site changes
+
+The tv_grab_na_dd crashing issue has been resolved.  The cause was a
+Windows 98 machine with an old version of perl installed.
+
+tv_grab_na is now officially retired and is no longer included in the
+distribution. tv_grab_na_dd is a faster and more functional replacement.
+
+** Notes on the new U.S./Canadian Grabber. (tv_grab_na_dd)
+
+tv_grab_na_dd users are strongly encouraged to read the man page for
+the new grabber.  Don't forget about the --old-chan-id switch if you
+depend on tv_grab_na channel IDs.
+
+Thanks to Tribune Media Services for making the new grabber possible.
+Data from the new grabber is more detailed and download times are
+greatly reduced.
+
+* Installation
+
+There is no installer, just unpack the zipfile into a
+directory such as C:\xmltv.  If you are reading this you've probably
+already done that.
+
+All the different programs are combined into a single executable.  For
+example, instead of running 'tv_grab_na --days 2 >na.xml' you would run
+
+c:\xmltv\xmltv.exe tv_grab_na_dd --days 2 --output a.xml
+
+Apart from the extra 'xmltv.exe' at the front of each command line,
+the usage should be the same as the Unix version.  Some programs make
+use of a "share" directory.  That directory is assumed be named
+"share" at the same location as the exe.  If you just keep everything
+where you unzipped it, everything should be fine.  If you must move
+xmltv.exe, you may need to specify a --share option with some
+programs.
+
+xmltv.exe will try and guess a timezone.  This usually works fine. If
+it doesn't, you can set a TZ variable just like on unix.
+
+* General Windows Notes
+
+Spaces in filenames may cause problems with some programs.  Directories
+with spaces (i.e. C:\program files\xmltv) are not recommended.
+C:\xmltv is better.
+
+Some of the programs allow you pass a date format on the command line.
+This uses % followed by a letter to specify a component of a date, for
+example %Y gives a four digit year.  This can cause problems on windows
+since % is used as a shell escape character.
+
+To get around this, use %% to pass a % to the application. (ex. %%Y%%M )
+
+If you *DO* want to insert a shell variable, you can do so by surrounding
+it with percents. (ex %HOME% )
+
+* Author and copying
+
+This is free software distributed under the GPL, see COPYING.  But if
+you would like to use the code under some other conditions, please do
+ask.  The Windows executable distribution was created by Robert Eden;
+for details of the many contributors to the project please download
+the source code.
+
+There is a web page at <http://membled.com/work/apps/xmltv/> and a
+Sourceforge project 'XMLTV', where you can download the source code.
+Sourceforge also hosts the following mailing lists
+    xmltv-announce - low volume announcements. Please join this at least.
+    xmltv-users    - how to use XMLTV
+    xmltv-devel    - detailed discussions among developers
+
+Add signature line when release is made
+$Id: README.win32,v 1.55 2004/05/08 10:17:12 epaepa Exp $

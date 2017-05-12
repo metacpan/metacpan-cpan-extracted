@@ -1,0 +1,20 @@
+MANIFEST
+Makefile.PL
+README
+bin/mk.xchar
+bin/mk.xscreens
+bin/mk.xtb
+bin/xscreens
+bin/xdeco
+bin/xmv
+bin/xtb
+bin/xtc
+bin/xterms
+bin/xup
+lib/X11/Screens.pm
+lib/X11/Tops.pm
+lib/X11/XTerms.pm
+test.pl
+version
+xchar.pod
+META.yml                                 Module meta-data (added by MakeMaker)

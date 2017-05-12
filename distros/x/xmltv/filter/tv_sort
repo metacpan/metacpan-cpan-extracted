@@ -1,0 +1,503 @@
+#!/usr/bin/perl -w
+
+=pod
+
+=head1 NAME
+
+tv_sort - Sort XMLTV listings files by date, and add stop times.
+
+=head1 SYNOPSIS
+
+tv_sort [--help] [--by-channel] [--output FILE] [FILE...]
+
+=head1 DESCRIPTION
+
+Read XMLTV data and write out the same data sorted in date order.
+Where stop times of programmes are missing, guess them from the start
+time of the next programme on the same channel.
+
+Tv_sort also performs some sanity checks such as making sure no
+two programmes on the same channel overlap.
+
+B<--output FILE> write to FILE rather than standard output
+
+B<--by-channel> sort first by channel id, then by date within each
+                channel.
+
+The time sorting is by start time, then by stop time.  Without
+B<--by-channel>, if start times and stop times are equal then two
+programmes are sorted by internal channel id.  With B<--by-channel>,
+channel id is compared first and then times.
+
+You can think of tv_sort as converting XMLTV data into a canonical
+form, useful for diffing two files.
+
+=head1 SEE ALSO
+
+L<xmltv(5)>.
+
+=head1 AUTHOR
+
+Ed Avis, ed@membled.com
+
+=cut
+
+use strict;
+use XMLTV::Version '$Id: tv_sort,v 1.29 2004/01/06 20:45:25 epaepa Exp $ ';
+use XMLTV::Date;
+use Date::Manip; Date_Init('TZ=UTC');
+use Getopt::Long;
+
+# We use Storable to do 'deep equality' of data structures; this
+# requires setting canonical mode.
+#
+use Storable qw(freeze); $Storable::canonical = 1;
+
+# Use Log::TraceMessages if installed.
+BEGIN {
+    eval { require Log::TraceMessages };
+    if ($@) {
+	*t = sub {};
+	*d = sub { '' };
+    }
+    else {
+	*t = \&Log::TraceMessages::t;
+	*d = \&Log::TraceMessages::d;
+	Log::TraceMessages::check_argv();
+    }
+}
+
+use XMLTV;
+use XMLTV::Usage <<END
+$0: sort listings by time, sanity-check and add stop time to programmes
+usage: $0 [--help] [--by-channel] [--output FILE] [FILE...]
+END
+;
+
+# Memoize some subroutines if possible
+eval { require Memoize };
+unless ($@) {
+    foreach (qw/Date_Cmp pd programme_eq/) {
+	Memoize::memoize($_) or die "cannot memoize $_: $!";
+    }
+    # clumpidx_cmp() isn't memoized, since it uses undef arguments and
+    # they cause warnings.
+    #
+}
+
+# Prototype declarations
+sub programme_cmp();
+sub chan_cmp( $$ );
+sub clumpidx_cmp( $$ );
+sub overlap( $$ );
+sub add_stop( $ );
+sub programme_eq( $$ );
+sub pd( $ );
+
+my ($opt_help, $opt_output, $opt_by_channel);
+GetOptions('help' => \$opt_help, 'output=s' => \$opt_output,
+	   'by-channel' => \$opt_by_channel)
+  or usage(0);
+usage(1) if $opt_help;
+@ARGV = ('-') if not @ARGV;
+my ($encoding, $credits, $channels, $progs) = @{XMLTV::parsefiles(@ARGV)};
+my @progs = @$progs;
+
+# We really want the sort to be stable, so that tv_sort can be
+# idempotent.  Since the manual page claims that tv_sort produces a
+# 'canonical form', it would be embarrassing otherwise.  Okay, it's
+# not really important what to do with clearly stupid listings having
+# two different programmes on at exactly the same time on the same
+# channel, but since the XMLTV format still allows this we should do
+# something sensible.
+#
+# Accordingly, we use the original ordering of programmes as a
+# comparison of last resort.
+#
+# TODO: use sort 'stable'; pragma with perl 5.8.
+#
+# This function takes a reference to a list of elements, and a
+# comparison function f.  It returns a comparison function f' which
+# agrees with f, except that where f would return 0 for two elements,
+# f' orders them according to their original position in the list.  In
+# other words you can turn any sort into a stable sort.  (Expects the
+# sort function to use $a and $b, not function parameters.)
+#
+sub make_stable_sort_fn( $$ ) {
+    our @orig; local *orig = shift;
+    my $f = shift;
+    my %orig_order;
+    for (my $i = 0; $i < @orig; $i++) {
+	$orig_order{$orig[$i]} = $i;
+    }
+    return sub() {
+	my $r = &$f;
+	return $r if $r;
+	return $orig_order{$a} <=> $orig_order{$b};
+    };
+}
+
+# Check that a list is sorted according to a given comparison
+# function.  Used for debugging.
+#
+use Carp;
+sub check_sorted( $$ ) {
+    my $f = shift; die if ref $f ne 'CODE';
+    die if ref $_[0] ne 'ARRAY';
+    our @l; local *l = shift;
+    our ($a, $b);
+    foreach my $i (0 .. @l - 2) {
+	($a, $b) = ($l[$i], $l[$i + 1]);
+	if ($f->() > 0) {
+#	    local $Log::TraceMessages::On = 1;
+	    t 'not sorted elements: ' . d($a);
+	    t '...and: ' . d($b);
+	    confess 'failed to sort correctly';
+	}
+    }
+}
+
+# Split up programmes according to channel
+my %chan;
+foreach (@progs) {
+    push @{$chan{$_->{channel}}}, $_;
+}
+
+# Sort each channel individually, and guess stop times.
+foreach (keys %chan) {
+    our @ps; local *ps = $chan{$_};
+    my $f = make_stable_sort_fn(\@ps, \&programme_cmp);
+    @ps = sort { $f->() } @ps;
+    check_sorted(\&programme_cmp, \@ps);
+    add_stop(\@ps);
+    check_sorted(\&programme_cmp, \@ps);
+}
+
+# Remove duplicates and sanity-check that there is no overlap on a
+# channel.
+#
+foreach (sort keys %chan) {
+    my $progs = $chan{$_};
+    my @new_progs;
+    die if not @$progs;
+
+    # Sanity check that no programme starts after it begins.  As with
+    # the 'overlapping programmes' check below, this should really be
+    # moved into a separate tv_semantic_check or whatever.
+    #
+    foreach (@progs) {
+	if (not defined $_->{stop}) {
+	    delete $_->{stop}; # sometimes gets set undef, don't know why
+	    next;
+	}
+	if (Date_Cmp(pd($_->{start}), pd($_->{stop})) > 0) {
+	    warn <<END
+programme on channel $_->{channel} stops before it starts: $_->{start}, $_->{stop}
+END
+  ;
+	}
+    }
+
+    my $first = shift @$progs;
+    while (@$progs) {
+	my $second = shift @$progs;
+	die if not defined $first or not defined $second;
+	t 'testing consecutive programmes to see if the same';
+	t 'first: ' . d $first;
+	t 'second: ' . d $second;
+	if (programme_eq($first, $second)) {
+	    # Quietly drop the duplicate.
+	    next;
+	}
+	else {
+	    if (overlap($first, $second)) {
+		local $^W = 0;
+		warn <<END
+overlapping programmes on channel $_:
+    $first->{title}->[0]->[0]\tat $first->{start}-|$first->{stop}
+and $second->{title}->[0]->[0]\tat $second->{start}-|$second->{stop}
+END
+  ;
+	    }
+	}
+	push @new_progs, $first;
+	$first = $second;
+    }
+    # Got to the last element.
+    push @new_progs, $first;
+    $chan{$_} = \@new_progs;
+    check_sorted(\&programme_cmp, $chan{$_});
+}
+
+# Combine the channels back into a big list.
+@progs = ();
+foreach (sort keys %chan) {
+    push @progs, @{$chan{$_}};
+}
+unless ($opt_by_channel) {
+    # Sort again.  (Could use merge sort.)
+    my $f = make_stable_sort_fn(\@progs, \&programme_cmp);
+    @progs = sort { $f->() } @progs;
+    check_sorted(\&programme_cmp, \@progs);
+}
+
+# Write out the new document
+t 'writing out data';
+t 'new programmes list: ' . d \@progs;
+my %w_args = ();
+if (defined $opt_output) {
+    my $fh = new IO::File ">$opt_output";
+    die "cannot write to $opt_output\n" if not $fh;
+    %w_args = (OUTPUT => $fh);
+}
+XMLTV::write_data([ $encoding, $credits, $channels, \@progs ], %w_args);
+exit();
+
+
+# Compare two programme hashes.
+sub programme_cmp() {
+    my $xa = $a; my $xb = $b;
+    my $r;
+
+    # Assume that {start} is always there, as it should be.
+    my ($a_start, $b_start) = (pd($xa->{start}), pd($xb->{start}));
+    $r = Date_Cmp($a_start, $b_start);
+    t "compare start times: " . d $r;
+    return $r if $r;
+
+    # {stop} is optional and a programme without stop comes before one
+    # with (assuming they have the same start).  I did try comparing
+    # stop only if both programmes had it, but this made the sort
+    # function inconsistent, eg
+    #
+    # (0, 1) <= (0, undef) <= (0, 0).
+    #
+    my ($a_stop_u, $b_stop_u) = ($xa->{stop}, $xb->{stop});
+    if (not defined $a_stop_u and not defined $b_stop_u) {
+	# Go on to to compare other things.
+    }
+    elsif (not defined $a_stop_u and defined $b_stop_u) {
+	return -1;
+    }
+    elsif (defined $a_stop_u and not defined $b_stop_u) {
+	return 1;
+    }
+    elsif (defined $a_stop_u and defined $b_stop_u) {
+	my ($a_stop, $b_stop) = (pd($a_stop_u), pd($b_stop_u));
+	$r = Date_Cmp($a_stop, $b_stop);
+	t "compare stop times: " . d $r;
+	return $r if $r;
+    }
+    else { die }
+
+    # Channel.  Ideally would sort on pretty name, but no big deal.
+    $r = $xa->{channel} cmp $xb->{channel};
+    t "compare channels: " . d $r;
+    return $r if $r;
+
+    $r = clumpidx_cmp($xa->{clumpidx}, $xb->{clumpidx});
+    t "compare clumpidxes: " . d $r;
+    return $r if $r;
+
+    t 'do not sort';
+    return 0;
+}
+
+
+# Compare indexes-within-clump
+sub clumpidx_cmp( $$ ) {
+    my ($A, $B) = @_;
+
+    if (not defined $A and not defined $B) {
+	return 0; # equal
+    }
+    elsif ((not defined $A and defined $B)
+	   or (defined $A and not defined $B)) {
+	warn "mismatching clumpidxs: one programme has, one doesn't";
+	return undef;
+    }
+    elsif (defined $A and defined $B) {
+	$A =~ m!^(\d+)/(\d+)$! or die "bad clumpidx $A";
+	my ($ai, $num_in_clump) = ($1, $2);
+	$B =~ m!^(\d+)/(\d+)$! or die "bad clumpidx $B";
+	my $bi = $1;
+	if ($2 != $num_in_clump) {
+	    warn "clumpidx's $A and $B don't match";
+	    return undef;
+	}
+	
+	return $ai <=> $bi;
+    }
+    else { die }
+}
+
+
+# Test whether two programmes overlap in time.  This takes account of
+# start time and stop time, and clumpidx (so two programmes with the same
+# start and stop times, but different places within the clump, are not
+# considered to overlap).
+#
+sub overlap( $$ ) {
+    my ($xa, $xb) = @_;
+
+    my ($xa_start, $xb_start) = (pd($xa->{start}), pd($xb->{start}));
+    my $xa_stop = pd($xa->{stop}) if exists $xa->{stop};
+    my $xb_stop = pd($xb->{stop}) if exists $xb->{stop};
+    die if exists $xa->{stop} and not defined $xa->{stop};
+    die if exists $xb->{stop} and not defined $xb->{stop};
+
+    # If we don't know the stop times we can't do an overlap test; if
+    # we know only one stop time we can do only one half of the
+    # test.  We assume no overlap if we can't prove otherwise.
+    #
+    # However, obviously two _identical_ start times on the same
+    # channel must overlap, except for zero length.
+    #
+    {
+	local $^W = 0;
+	t "xa: $xa_start -| $xa_stop"; t "xb: $xb_start -| $xb_stop"
+    }
+
+    if (not defined $xa_stop and not defined $xb_stop) {
+	# Cannot prove overlap, even if they start at the same time.
+	return 0;
+    }
+    elsif (not defined $xa_stop and defined $xb_stop) {
+	return (Date_Cmp($xa_start, $xb_start) > 0
+		and Date_Cmp($xa_start, $xb_stop) < 0);
+	# (Cannot prove overlap if A and B start at same time,
+	# or A starts before B.)
+	#
+    }
+    elsif (defined $xa_stop and not defined $xb_stop) {
+	return (Date_Cmp($xb_start, $xa_start) > 0
+		and Date_Cmp($xb_start, $xa_stop) < 0);
+	# (Cannot prove overlap if A and B start at same time,
+	# or A starts before B.)
+	#
+    }
+    elsif (defined $xa_stop and defined $xb_stop) {
+	if (Date_Cmp($xa_stop, $xb_start) <= 0) {
+	    # A finishes before B starts.
+	    return 0;
+	}
+	elsif (Date_Cmp($xa_start, $xb_start) < 0
+	       and Date_Cmp($xa_stop, $xb_start) > 0) {
+	    # A starts before B starts, finishes after.
+	    return 1;
+	}
+	elsif (Date_Cmp($xa_start, $xb_start) == 0
+	       and Date_Cmp($xa_start, $xa_stop) < 0
+	       and Date_Cmp($xb_start, $xb_stop) < 0) {
+	    # They start at the same time and neither is zero length.
+	    my $cmp = clumpidx_cmp($xa->{clumpidx}, $xb->{clumpidx});
+	    if (not defined $cmp) {
+		# No clumpidxes, so must overlap.  (Also happens if
+		# the two indexes were not comparable - but that will
+		# have been warned about already.)
+		#
+		t 'no clumpidxes, overlap';
+		return 1;
+	    }
+	    t 'compared clumpidxes: same? ' . not $cmp;
+	    return not $cmp;
+	}
+	elsif (Date_Cmp($xa_start, $xb_start) > 0
+	       and Date_Cmp($xa_start, $xb_stop) < 0) {
+	    # B starts before A starts, finishes after.
+	    return 1;
+	}
+	elsif (Date_Cmp($xa_start, $xb_stop) >= 0) {
+	    # B finishes before A starts.
+	    return 0;
+	}
+	else { die }
+    }
+}
+
+
+# Add 'stop time' to a list of programmes (hashrefs).
+# The stop time of a programme is the start time of the next.
+#
+# Parameters: reference to list of programmes, sorted by date, to be
+# shown consecutively (except for 'clumps').
+#
+# Modifies the list passed in.
+#
+# Precondition: the list of programmes is sorted.  Postcondition: it's
+# still sorted.
+#
+sub add_stop( $ ) {
+    die 'usage: add_stop(ref to list of programme hashrefs)' if @_ != 1;
+    our @l; local *l = shift;
+
+    # We make several passes over the programmes, stopping when no
+    # further stop times can be added.
+    #
+  PASS:
+    t 'doing a pass through list of programmes: ' . d \@l;
+    my $changed = 0;
+    my $p = undef;
+    for (my $i = 0; $i < @l - 1; $i++) {
+	my ($last_start, $last_stop);
+	if ($p) {
+	    $last_start = $p->{start};
+	    $last_stop = $p->{stop};
+	}
+	$p = $l[$i];
+	next if defined $p->{stop};
+	t 'programme without stop time: ' . d $p;
+
+	my $f = $l[$i + 1];
+	if (not defined $f) {
+	    t 'this is the last programme, cannot pick following';
+	    next;
+	}
+	t 'look at following: ' . d $f;
+	my $cmp = Date_Cmp(pd($f->{start}), pd($p->{start}));
+	if ($cmp < 0) {
+	    die 'strange, programmes not sorted in add_sort()';
+	}
+	elsif ($cmp == 0) {
+	    # The following programme has the same start time as
+	    # this one.  Don't use it as a stop time, that would
+	    # make this one be zero length.
+	    #
+	    # If the following programme has a stop time we can use it
+	    # and still have this <= following.
+	    #
+	    if (defined $f->{stop}) {
+		t 'following has stop time, use it';
+		$p->{stop} = $f->{stop};
+		$changed = 1;
+	    }
+	}
+	elsif ($cmp > 0) {
+	    t 'found programme with later start time, use that as stop time';
+
+	    # Since the list was sorted we know that this
+	    # programme is the last with its start time.  So we
+	    # can set the stop time and it will still be the last.
+	    #
+	    t 'following has later start than our start, use it as stop';
+	    $p->{stop} = $f->{start};
+	    $changed = 1;
+	}
+	t 'doing next programme';
+    }
+    goto PASS if $changed;
+}
+
+sub programme_eq( $$ ) {
+#    local $Log::TraceMessages::On = 1;
+    t 'comparing programmes ' . d($_[0]) . ' and ' . d($_[1]);
+    return freeze($_[0]) eq freeze($_[1]);
+}
+
+# Lift parse_date() to handle undef.
+sub pd( $ ) {
+    for ($_[0]) {
+	return undef if not defined;
+	return parse_date($_);
+    }
+}

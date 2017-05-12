@@ -1,0 +1,53 @@
+#!/bin/bash
+
+echo "
+USAGE:
+./xdpkg
+
+DESCRIPTION:
+xdpkg installs, using: apt-get -y install <package_name>, all the debian 
+packages needed by xDash and gives hints about further manual configuration.
+"
+echo "Prerequisites:"
+echo "[1] Debian-like distribution (APT);"
+echo "[2] APT cache updated due to package renaming;"
+echo "[3] Postgresql, Jabber server and agents run on the same computer."
+echo
+echo -n "Should the package installation start? (y/n): "
+read yes
+if [[ $yes != "y" ]] 
+    then
+	echo 
+	exit 
+fi
+
+echo
+echo "===========================
+=    Jabber packages      =       
+==========================="
+apt-get -y install jabber
+sleep 2
+apt-get -y install libnet-jabber-perl
+sleep 2
+apt-get -y install libtext-csv-perl
+sleep 2
+echo
+echo
+echo "===========================
+=    PostgreSQL packages  =
+==========================="
+apt-get -y install postgresql
+sleep 2
+apt-get -y install libdbd-pg-perl
+echo
+echo 
+echo "MANUAL:"
+echo
+echo "[1] Before  first /etc/init.d/jabber start,"
+echo "    set variable JABBER_HOSTNAME from /etc/jabber/jabber.cfg."
+echo
+echo "[2] After first /etc/init.d/postgresql start, do as root:"
+echo "    su - postgres"
+echo "    createuser -a -d -e root"
+echo
+echo

@@ -1,0 +1,12 @@
+This file contains the perl source code of pTk-dbfdump.
+
+This GUI does exactly the same than dbfdump but under X.
+For details about basic functionality see XBase.pm.
+
+You will be able to convert nearly each DBF-file to at least:
+CVS format.
+
+If you are interested in a compiled Win32-binary see: 
+xdbfdump-win32-bin-x.xx.zip
+
+23-Jan-1999 Dirk Tostmann (tostmann@tosti.com)

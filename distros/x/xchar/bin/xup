@@ -1,0 +1,156 @@
+#!/usr/bin/env perl
+# $Source: /home/keck/gen/RCS/xup,v $
+# $Revision: 4.13 $$Date: 2007/07/06 17:00:26 $
+# Contents
+#   1 standard  2 notes  3 args  4 main  5 pod
+
+# ----------------------------------------------------------------------
+
+#1# standard
+
+use strict;
+use warnings;
+
+(my $cmd = $0) =~ s%.*/%%;
+sub usage { print "Usage: $cmd -help\n"; }
+sub quit { (@_) ? print STDERR "$cmd quitting: @_\n" : usage; exit 1 }
+
+use X11::Tops;
+
+use Data::Dumper;
+
+sub perldoc {
+  my ($perldoc, $less);
+  for (split /:/, $ENV{PATH}) {
+    $perldoc = "$_/perldoc" if -x "$_/perldoc";
+    last if $perldoc; next if $less;
+    $less = "$_/less" if -x "$_/less";
+  }
+  if ($perldoc) {
+    $ENV{LESSCHARSET} = 'latin1';
+    exec $perldoc, $0
+  } elsif ($less) {
+    exec $less, '+/^# Sorry.*', $0
+  } else {
+    print
+      "Sorry, there's no perldoc(1) or even less(1) in your \$PATH\n" .
+      "The documentation can be found at the end of $0\n";
+    exit 1
+  }
+}
+
+# ----------------------------------------------------------------------
+
+#2# notes
+
+# +taskbar[1-47]
+
+# 1.1
+#   started from gen/imgr 1.4
+# 1.4
+#   warps
+# 1.6
+#   lowers too
+# 1.8
+#   level3s for fvwm
+# 1.9
+#   renamed from tmgr to xup
+# 1.10
+#   can raise fvwm IM
+# 1.11
+#   much simpler - uses Xtops & Xchars
+#   raises fvwm IM without hack
+# 1.11
+#   much simpler - uses Xtops & Xchars
+# 1.15
+#   same as 1.10 except .xup changed to .xterms/chars [+taskbar2]
+# 2.1
+#   back to Xtops, & asking xl to raise if running [+taskbar4]
+#   simplified back to one window argument & just a char
+# 2.2
+#   lowers as well as raises
+# 2.3
+#   argument can be an instance
+# 2.4
+#   -l
+# 3.1
+#   +taskbar7
+# 4.1
+#   +taskbar7
+
+# ----------------------------------------------------------------------
+
+#3# args
+
+my $char;
+my $nowarp;
+
+while (@ARGV) {
+  $_ = shift;
+  perldoc() if /^-+(man|help)/;
+  $nowarp = 1, next if /^-+n/;
+  quit("illegal flag '$_'") if /^-/;
+  $char = $_;
+  last;
+}
+
+quit('no instances specified') unless defined $char;
+quit("too many arguments") if @ARGV;
+
+# ----------------------------------------------------------------------
+
+#4# main
+
+my $xtops = X11::Tops->new->update_ids;
+
+for my $xtop (values %{$xtops->byid}) {
+  next unless $xtop->char eq $char;
+  if ($cmd =~ /up/ && $nowarp) {
+    $xtop->raise;
+  } elsif ($cmd =~ /up/) {
+    $xtop->raise_and_focus;
+  } else {
+    $xtop->lower;
+  }
+}
+
+__END__
+
+# ----------------------------------------------------------------------
+
+#5# pod
+
+
+# Sorry, there's no perldoc in your $PATH, so here's the raw pod
+
+=head1 NAME
+
+xup, xdn - raise or lower an X client's window.
+
+=head1 SYNOPSIS
+
+  xup|xdn [-n] char
+
+=head1 DESCRIPTION
+
+Normally raises & warps to, or lowers, the specified X client.
+
+With -n doesn't warp.
+
+=head1 SEE ALSO
+
+xchar(1), xtb(1), X11::Tops(3)
+
+=head1 AUTHOR
+
+Brian Keck E<lt>bwkeck@gmail.comE<gt>
+
+=head1 VERSION
+
+ $Source: /home/keck/gen/RCS/xup,v $
+ $Revision: 4.13 $
+ $Date: 2007/07/06 17:00:26 $
+ xchar 0.2
+
+=cut
+

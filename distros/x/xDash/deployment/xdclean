@@ -1,0 +1,67 @@
+#!/usr/bin/perl 
+# Copyright 2005 Jerzy Wachowiak
+
+use strict;
+use warnings;
+use Text::CSV_XS;
+use xdSRA;
+
+my $filepath = shift;
+
+defined( $filepath ) or usage();
+
+my $result = xdSRA::create_sra_from( $filepath );
+my @sender = @{ $result->{sender} };
+my @receiver = @{ $result->{receiver} };
+my @archivist = @{ $result->{archivist} };
+
+print "\n---Start packaging files---\n";
+
+for my $si (0..$#sender) {
+    clean(
+     "$sender[$si]{username}\@$sender[$si]{hostname}_$sender[$si]{resource}" )
+};
+
+for my $ri (0..$#receiver) {
+    clean( 
+     "$receiver[$ri]{username}\@$receiver[$ri]{hostname}"
+     ."_$receiver[$ri]{resource}" )    
+};
+
+for my $ai (0..0) {
+    clean(
+     "$archivist[$ai]{username}\@$archivist[$ai]{hostname}"
+     ."_$archivist[$ai]{resource}" )
+};
+print "---End packaging files---\n";
+exit;
+
+sub clean {
+    
+    my $jclientpath = shift;
+    
+    if ( -d $jclientpath ){
+	system "tar -czf $jclientpath.tar.gz $jclientpath";
+	if ( -e "$jclientpath.tar.gz" ){
+	    system "rm -r $jclientpath";
+	    print "$jclientpath.tar.gz\n"
+	}
+    }
+}
+
+sub usage {
+    print <<EOU;
+
+USAGE:
+$0 filename
+
+DESCRIPTION:
+xdclean compresses and tars directories with the name of their JID to 
+a file with name pattern: username\@host_ressource.tar.gz and removes 
+the JID directories. The records in the input file must have the format: 
+description; role; hostname; port; username; password; resource. The role can 
+be: sender, receiver or archivist. Comments have to start with #.
+
+EOU
+exit 1
+}

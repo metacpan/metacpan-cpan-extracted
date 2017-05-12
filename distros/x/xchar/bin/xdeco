@@ -1,0 +1,685 @@
+#!/usr/bin/env perl
+# $Source: /home/keck/gen/RCS/xdeco,v $
+# $Revision: 1.77 $$Date: 2007/07/05 17:00:28 $
+# Contents
+#   1 standard     6 pathsplit  11 xchar & host      16 title
+#   2 environment  7 width      12 directory/folder  17 icon
+#   3 constants    8 iconwidth  13 printer           18 notes
+#   4 perldoc      9 directory  14 tab               19 pod
+#   5 args         10 folder    15 space
+
+# ----------------------------------------------------------------------
+
+#1# standard
+
+use strict;
+use warnings;
+
+(my $cmd = $0) =~ s-.*/--;
+
+sub usage { print "Usage: $cmd -help\n"; }
+sub quit { (@_) ? print STDERR "$cmd quitting: @_\n" : &usage; exit 1 }
+
+# ----------------------------------------------------------------------
+
+#2# environment
+
+my $user = $ENV{USER};
+my $host = $ENV{HOST};
+my $printer = $ENV{PRINTER};
+my $xchar = defined $ENV{_XCHAR_CHAR} ? $ENV{_XCHAR_CHAR} : '';
+
+my $noscrollbar = $ENV{NOSCROLLBAR};
+
+my $width = $ENV{WIDTH};
+my $titlewidth = $ENV{TITLEWIDTH}; # set in .xinitrc
+my $iconwidth = $ENV{ICONWIDTH}; # set in gen/xterms
+
+# perl-5.6.1 (or solaris) doesn't like shorter form ...
+my $mhpath = $ENV{MHPATH} ? $ENV{MHPATH} : '';
+$mhpath =~ s-^/(net|a|amd)/-/nfs/-;
+(my $pwd = $ENV{PWD}) =~ s-^/(net|a|amd)/-/nfs/-;
+(my $home = $ENV{HOME}) =~ s-^/(net|a|amd)/-/nfs/-;
+(my $homebase = $home) =~ s-.*/--;
+
+# ----------------------------------------------------------------------
+
+#3# constants
+
+# see width, iconwidth
+
+my $prefixes = "nfs|net|a";
+
+my %control = (
+  icon => {
+    intro => "\033]1;",
+    outro => "\007",
+  },
+  title => {
+    intro => "\033]2;",
+    outro => "\007",
+  },
+  both => {
+    intro => "\033]0;",
+    outro => "\007",
+  },
+);
+
+# ----------------------------------------------------------------------
+
+#4# perldoc
+
+sub perldoc {
+  my ($perldoc, $less);
+  for (split /:/, $ENV{PATH}) {
+    $perldoc = "$_/perldoc" if -x "$_/perldoc";
+    last if $perldoc; next if $less;
+    $less = "$_/less" if -x "$_/less";
+  }
+  if ($perldoc) {
+    $ENV{LESSCHARSET} = 'latin1';
+    exec $perldoc, $0
+  } elsif ($less) {
+    exec $less, '+/^# Sorry.*', $0
+  } else {
+    print
+      "Sorry, there's no perldoc(1) or even less(1) in your \$PATH\n" .
+      "The documentation can be found at the end of $0\n";
+    exit 1
+  }
+}
+# ----------------------------------------------------------------------
+
+#5# args
+
+my $title;
+my $icon;
+my $nocontrol;
+
+while (@ARGV) {
+  $_ = shift;
+  perldoc() if /^-+[mh]/;
+  $title = shift, next if /^-t/;
+  $icon = shift, next if /^-i/;
+  $nocontrol = 1, next if /^-n/;
+  last;
+}
+
+# ----------------------------------------------------------------------
+
+#6# pathsplit
+
+sub pathsplit {
+  $_ = $_[0];
+  my %hash;
+  if (m-^/($prefixes)/([^/]+)(.*)-) {
+    $hash{prefix} = $1;
+    $hash{host} = $2;
+    ($_ = $3) =~ s/.//;
+    $_ = "/$_";
+    $hash{path} = $_;
+  } else {
+    # $hash{prefix} undefined
+    $hash{host} = $host;
+    $hash{path} = $_;
+  }
+  return %hash;
+}
+
+my %pwd = &pathsplit($pwd);
+my %home = &pathsplit($home);
+my %mhpath = &pathsplit($mhpath);
+
+# ----------------------------------------------------------------------
+
+#7# width
+
+$width = $width ? $width : 80;
+
+if ($titlewidth) {
+  $width = $titlewidth
+} else {
+  $width = int(75 * $width / 100) - (defined $noscrollbar ? 5 : 3)
+}
+
+# ----------------------------------------------------------------------
+
+#8# iconwidth
+
+# mandrake sets ICONWIDTH but empty
+$iconwidth = 16 unless defined $iconwidth && $iconwidth ne '';
+
+# ----------------------------------------------------------------------
+
+#9# directory
+
+# perl5.003/HP/titan wants quotes inside {}
+
+my %letter;
+
+$letter{d} = "$pwd{host}:$pwd{path}";
+
+my $tilde;
+
+if ($pwd{host} eq $home{host}) {
+  my $pwd = $pwd{path};
+  my $home = $home{path};
+  $tilde = 1;
+  if ($pwd eq $home) {
+    $letter{d} = "~";
+  } elsif ($pwd =~ m-^$home/(.*)-) {
+    $letter{d} = "~/$1";
+  } else {
+    $tilde = 0;
+  }
+}
+# directory on current host ...
+if (!$tilde && $pwd{host} eq $host) {
+  $letter{d} = $pwd{path};
+}
+
+# ----------------------------------------------------------------------
+
+#10# folder
+
+# at most 3 components aaa/bbb/ccc ...
+($letter{m} = $mhpath{path}) =~ s-.*/([^/]+/[^/]+/[^/]+)$-$1-;
+
+# drop trailing '/.' ...
+$letter{m} =~ s-/+\.$--;
+
+# ----------------------------------------------------------------------
+
+#11# xchar & host
+
+$letter{i} = $xchar;
+$letter{j} = "$xchar $host";
+$letter{h} = $host;
+
+# ----------------------------------------------------------------------
+
+#12# directory/folder
+
+if ($letter{d} eq '~' && $mhpath ne '' && $mhpath !~ m-/inbox$-) {
+  $letter{e} = '=' . $letter{m};
+} else {
+  $letter{e} = $letter{d};
+}
+
+# ----------------------------------------------------------------------
+
+#13# printer
+
+$letter{p} = $printer;
+
+# ----------------------------------------------------------------------
+
+#14# tab
+
+$letter{t} = '';
+
+# ----------------------------------------------------------------------
+
+#15# space
+
+# quoting hell in .bashrc
+
+$letter{s} = ' ';
+
+# ----------------------------------------------------------------------
+
+#16# title
+
+# types are [dehimpst] or f
+
+if (defined $title) {
+
+  my @split = split(/(%[dehijmpst])/, $title);
+  my @piece;
+  for (@split) { push(@piece, $_) unless /^$/ }
+  my @type;
+  my @text;
+  for my $i (0 .. $#piece) {
+    if ($piece[$i] =~ /^%([dehijmpst])$/) {
+      $type[$i] = $1;
+      $text[$i] = $letter{$1}
+    } else {
+      $type[$i] = 'f';
+      $text[$i] = $piece[$i]
+    }
+  }
+
+  # drop dir components ...
+  my $title_ok;
+  while (!$title_ok) {
+    my $total = length(join(" ", @text));
+    $title_ok = 1, last if $total <= $width;
+    my $decreased = 0;
+    for my $i (0 .. $#text) {
+      next unless $type[$i] =~ /[dim]/;
+      $_ = $text[$i];
+      if (m-^[^/]+:-) {
+        s-^[^/]+:--
+      } elsif (m-^~/-) {
+        s-..--
+      } elsif (m-/-) {
+        s-^/--;
+        s-^[^/]*/--
+      } else {
+        next
+      }
+      $text[$i] = $_;
+      $decreased = 1;
+    }
+    last unless $decreased
+  }
+
+  # drop variable components ...
+  while (!$title_ok) {
+    my $total = length(join(" ", @text));
+    $title_ok = 1, last if $total <= $width;
+    my $max = 0;
+    my $m;
+    for my $i (0 .. $#text) {
+      next if $type[$i] eq 'f';
+      my $len = length($text[$i]);
+      $max = $len, $m = $i if $len > $max
+    }
+    last if $max == 1 || !defined $m;
+    $text[$m] = "!";
+  }
+
+  # drop words from literal components ...
+  while (!$title_ok) {
+    my $total = length(join(" ", @text));
+    $title_ok = 1, last if $total <= $width;
+    my $max = 0;
+    my $m;
+    for my $i (0 .. $#text) {
+      next unless $type[$i] eq 'f';
+      my $len = length($text[$i]);
+      $max = $len, $m = $i if $len > $max
+    }
+    last if $max <= 4;
+    if ($text[$m] =~ / \.\.\.$/) {
+      $text[$m] =~ s/....$//;
+    }
+    if ($text[$m] =~ /\s/) {
+      $text[$m] =~ s/\s+\S+\s*$/ .../;
+    } else {
+      $text[$m] = "...";
+    }
+  }
+
+  # spread ...
+  if (my $gaps = $#text) {
+    # different $total ...
+    my $total = length(join('', @text));
+    my $left = $width - $total;
+    my $smallgap = " " x ($left / $gaps);
+    my $extras = $left % $gaps;
+    for (my $i = 0; $i < $#text; $i++) { $text[$i] .= $smallgap }
+    for (my $i = 1; $i <= $extras; $i++) { $text[$i] .= " " }
+    $title = join('', @text);
+  } else {
+    $title = join(" ", @text);
+  }
+
+  if ($nocontrol) {
+    print "$title\n"
+  } else {
+    # fails if $title has 512 characters or more - see pod
+    print "$control{title}{intro}$title$control{title}{outro}"
+  }
+
+}
+
+# ----------------------------------------------------------------------
+
+#17# icon
+
+# overkill for little icon, but cheap (started with title code)
+
+if (defined $icon) {
+
+  # keep at most 2 components of directory ...
+
+  my @split = split(/(%[dehijmpst])/, $icon);
+  my @piece = my @text = my @type = ();
+  for (@split) { push(@piece, $_) unless /^$/ }
+  for my $i (0 .. $#piece) {
+    if ($piece[$i] =~ /^%([dehijmpst])$/) {
+      $type[$i] = $1;
+      $text[$i] = $letter{$1}
+    } else {
+      $type[$i] = 'f';
+      $text[$i] = $piece[$i]
+    }
+  }
+
+  # drop dir components ...
+  my $icon_ok;
+  while (!$icon_ok) {
+    my $total = length(join('', @text));
+    $icon_ok = 1, last if $total <= $iconwidth;
+    my $decreased = 0;
+    for my $i (0 .. $#text) {
+      next unless $type[$i] =~ /[dem]/;
+      $_ = $text[$i];
+      if (m-^[^/]+:-) {
+        s-^[^/]+:--
+      } elsif (m-^~/-) {
+        s-..--
+      } elsif (m-/-) {
+        s-^/--;
+        s-^[^/]*/--
+      } else {
+        next
+      }
+      $text[$i] = $_;
+      $decreased = 1
+    }
+    last unless $decreased
+  }
+
+  # drop leading USER & homebase & homebase2
+  for my $i (0 .. $#text) {
+     next unless $type[$i] =~ /[de]/;
+     $text[$i] =~ s-^$user/--;
+     $text[$i] =~ s-^$homebase/--;
+     $text[$i] =~ s-^${homebase}2/--;
+  }
+
+  # drop variable components ...
+  while (!$icon_ok) {
+    my $total = length(join('', @text));
+    $icon_ok = 1, last if $total <= $iconwidth;
+    my $max = 0;
+    my $m;
+    for my $i (0 .. $#text) {
+      next if $type[$i] eq 'f';
+      my $len = length($text[$i]);
+      $max = $len, $m = $i if $len > $max
+    }
+    last if $max == 1;
+    last if @text == 1; # @text stuff just hacked in
+    $text[$m] = "!";
+  }
+
+  # drop words from literal components ...
+  while (@text > 1 && !$icon_ok) {
+    my $total = length(join(" ", @text));
+    $icon_ok = 1, last if $total <= $width;
+    my $max = 0;
+    my $m;
+    for my $i (0 .. $#text) {
+      next unless $type[$i] eq 'f';
+      my $len = length($text[$i]);
+      $max = $len, $m = $i if $len > $max
+    }
+    last if $max <= 4;
+    if ($text[$m] =~ / \.\.\.$/) {
+      $text[$m] =~ s/....$//;
+    }
+    if ($text[$m] =~ /\s/) {
+      $text[$m] =~ s/\s+\S+\s*$/ .../;
+    } else {
+      $text[$m] = "...";
+    }
+  }
+
+  $icon = join('', @text);
+
+  # remove /tmp/zless.1234/5/ ...
+  $icon =~ s-^/tmp/zless\.\d+/\d+/--;
+
+  # truncate
+  # better then "..." ?
+  if (!$icon_ok) { $icon = substr($icon, 0, $iconwidth); }
+
+  if ($nocontrol) {
+    print "$icon\n"
+  } else {
+    print "$control{icon}{intro}$icon$control{icon}{outro}"
+  }
+
+}
+
+__END__
+
+# ----------------------------------------------------------------------
+
+#18# notes
+
+# see winch() in bashrc
+
+# +perl +gen
+# perl/shelltalk ... irrelevant after 1.4
+
+# unix/FAQ.bash ...
+# cd() { builtin cd "$@" && xtitle "$HOST: $PWD" }
+# xtitle not on chook
+
+# nakita perl trouble +perl
+
+# redhat-6.2 /etc/bashrc uses
+#   PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD}\007"'
+
+# if slow at home, check PERL5LIB for /nfs/castor
+
+# 1.1
+#   ioctl doesn't work
+#   lots of commented-out experiments
+# 1.2
+#   TIOCGWINSZ ioctl works (abandoned in 1.5)
+# 1.4
+#   more organized (&splitpath)
+#   but slow ...
+# 1.5
+#   sped up by factor of 10 by getting rid of external programs & system
+#     calls, except final write, by using environment ... added MHPATH &
+#     WIDTH to bashrc, & changed hostname to HOST for consistent look
+#   also changed to #! to save time
+# 1.6
+#   made environment variables optional
+# 1.8
+#   title working
+#   dropped percents ... ie no literal text
+#   always fill (not an option) ... too hard otherwise
+#   need to drop "export" from HOME to get tilde ... done in bashrc
+#   no slower
+# 1.10
+#   back to percents, remembering vix
+#   icon working
+#   replaced bin/title & gen/label in bashrc, myvi, vix, vish, viz,
+#     lyx, lyr, & menu (just unsets XDECO)
+# 1.18
+#   dropped last word of longest literal piece, having noticed
+#     that xterm ignores control sequences where the title is 512 characters
+#     or more ... which can happen with "less *"
+# 1.22
+#   truncated sometimes instead of using "!"
+#   not carefully done
+#   motivation was Internet drafts (long filenames)
+# 1.23
+#   %t for new titles set in .bashrc.c
+# 1.27
+#   %i
+# 1.30
+#   added '' to all {xxx} for HP/titan
+#   PS: removed having forgotten this
+# 1.40
+#   removed extra xterm control sequence stuff added few weeks ago
+# 1.46
+#   getting linux/Mh instead of sun/linux/Mh, so allowed extra component
+#     in $letter{m}, & changed [di] to [dim] in trimming code in title &
+#     icon sections
+# 1.48
+#   pod, for gen/makemaker
+# 1.52
+#   TITLEWIDTH for ion [+ion]
+#   dropped -w, which don't remember using
+# 1.56
+#   -n for texmacs
+# 1.60
+#   use strict; use warnings; ... lots of variables
+# 1.62
+#   dropped $iconfile =".icon"; $titlefile =".title";
+#   defined but not used since 1.1 probably
+#   some .title files exist, all 1995-7 (xdeco-1.1 97/7)
+#   no .icon files exist
+#   notice gen/px & notes in +gen ... tbc
+# 1.66
+#   changed %i to %e to make way for ...
+# 1.67
+#   added %i for instance character [+taskbar]
+
+# $Revision: 1.77 $
+
+# ----------------------------------------------------------------------
+
+#19# pod
+
+# Sorry, there's no perldoc in your $PATH, so here's the raw pod
+
+=head1 NAME
+
+xdeco - output xterm titlebar & iconname control sequences
+
+=head1 SYNOPSIS
+
+ xdeco -t title -i icon
+ xdeco -t %h%d%m%p -i %d
+ xdeco -n ...
+
+=head1 DESCRIPTION
+
+Outputs xterm control sequences to set window title & icon name.
+
+With -n, the window title or icon name are output alone (ie no control
+characters).
+
+Title & icon arguments normally contain %-codes to interpolate text
+derived from environment variables.
+
+The %-codes divide the title into pieces, which are spread out to fill
+the titlebar.  This is not done for the icon name, where the pieces are
+concatenated without spaces between them.  Spaces can be inserted in
+an icon name with %s.
+
+=head1 PERCENTS
+
+  d = shortened directory (from PWD)
+  e = same as d or m (see Choice of d or m)
+  h = hostname (from HOST)
+  i = letter mapping to instance name 
+  m = shortened MH folder (from MHPATH)
+  p = printer (from PRINTER)
+  s = space (useful in icons)
+  t = nothing (useful for spreading literal text)
+
+=head1 ENVIRONMENT
+
+  HOME HOST MHPATH PRINTER PWD USER NOSCROLLBAR
+  WIDTH TITLEWIDTH ICONWIDTH
+
+The effect of these is described in the following.
+
+=head1 TERMINAL WIDTH
+
+The title is reduced to TITLEWIDTH if that's set, otherwise to WIDTH,
+otherwise to 80.  The intent is that TITLEWIDTH be set for tabbed window
+managers (Ion), and WIDTH for others (twm etc).
+
+WIDTH should be the terminal width from stty or tput.  If zero or empty
+or undefined then 80 is used.  The maximum title width is usually less
+than WIDTH because the title font is usually larger than the internal
+font & resizing buttons etc consume space, although a scrollbar adds a
+bit.  If NOSCROLLBAR is not defined then the width of the scrollbar is
+guessed.  The width calculations are rough in that no attempt is made to
+find out the ratio of the title font and the main font.  It is assumed
+to be 4/3, from the twm & xterm defaults.
+
+=head1 ICON WIDTH
+
+ICONWIDTH should be the number of characters that fit in the icon
+managers or icons.  Default is 16.  Not adjusted, unlike WIDTH.
+
+=head1 SHORTENING OF DIRECTORIES
+
+A prefix like "/nfs/myhost" is replaced by "myhost:".
+
+A prefix that is the user's home directory is replaced by a tilde.
+
+The "myhost" is omitted if it's the local host.
+
+For icons, the leading component is removed if it's the user's name
+(USER).
+
+For icons, /tmp/zless.1234/5/ is removed from the start.
+
+=head1 SHORTENING OF MH FOLDERS
+
+Reduced to 3 components.
+
+=head1 CHOICE OF d OR m
+
+The code %e gives the same as %d generally, but gives the same as %m
+prefixed by '=' if the directory would be shortened to a tilde & the MH
+folder doesn't end in /inbox.
+
+=head1 MISSING VARIABLES
+
+  Replaced by "!".
+
+=head1 OVERLONG TITLES & ICON NAMES
+
+If the title doesn't fit, then the directory name (%d) is shortened from
+the left till there are no more slashes.
+
+If still too long, the longest of the %interpolations is replaced by a
+"!", & so on.
+
+If still too long, the last word of the longest piece of literal text is
+removed, & so on.  Shortened pieces have " ..." appended.  Can still
+fail to fit into title bar if there are too many literal pieces.
+
+Same applies to the icon name.
+
+=head1 DESIGN
+
+There is no need for the environment variables to be "correct", because
+xdeco's only interaction with the outside world is via stdout.  So if
+for example you want the title to show the name of a file & shorten it
+as for directories, you can say (Bourne shell & bash)
+
+	PWD=$filename xdeco -t %d -i %d
+
+=head1 BUG
+
+If the title is 512 characters or more then xterm ignores the control
+sequence.  This is unlikely to happen.
+
+=head1 NOTES
+
+Some xdeco applications can be done more simply with bash's
+PROMPT_COMMAND.  It may be necessary to unset PROMPT_COMMAND for
+xdeco to work.
+
+Debian has a package called xtermcontrol.
+
+See also xdh -help.
+
+=head1 AUTHOR
+
+Brian Keck E<lt>bwkeck@gmail.comE<gt>
+
+=head1 VERSION
+
+ $Source: /home/keck/gen/RCS/xdeco,v $
+ $Revision: 1.77 $
+ $Date: 2007/07/05 17:00:28 $
+ xchar 0.2
+
+=cut
+

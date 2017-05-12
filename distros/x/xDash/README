@@ -1,0 +1,47 @@
+xDash version 1.00
+==================
+
+xDash is a framework for publish/subscribe integration of applications
+(EAI). xDash is using Jabber as communication 
+protocol and implementing the concept of convergence between 
+backend asynchronous messaging and instant messaging. For more details
+look at http://xdash.jabberstudio.org.
+
+xDash framework consists of three main modules: xDash::Sender, 
+xDash::Receiver, xDash::Archivist and some other supporting modules.
+Modules are developed in the object orientated way. If you need to 
+customize/extend functionality of the tree main modules, you have to provide 
+your own base classes/modules for some tasks, which have to implement a fixed 
+set of methods (driver pattern). If you think, they can be reused, 
+make them public over CPAN in the xDash namespace!
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module set requires these other modules and libraries.
+
+[1] For Sender, Receiver:
+  Net::Jabber
+  Text::CSV_XS    
+
+[2] For Sender, Receiver, Archivist:
+  Net::Jabber
+  Text::CSV_XS
+  DBI
+  DBD::Pg
+  
+COPYRIGHT AND LICENCE
+
+Copyright 2005 Jerzy Wachowiak <jwach@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the Apache 2.0 license attached to the module.
+

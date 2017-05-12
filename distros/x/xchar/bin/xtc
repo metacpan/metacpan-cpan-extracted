@@ -1,0 +1,179 @@
+#!/usr/bin/env perl
+# $Source: /home/keck/gen/RCS/xtc,v $
+# $Revision: 2.15 $$Date: 2007/07/06 07:52:20 $
+# Contents
+#   1 standard  2 notes  3 usage()  4 args  5 xtops  6 list  7 xtop
+
+# ----------------------------------------------------------------------
+
+#1# standard
+
+use strict;
+use warnings;
+
+(my $cmd = $0) =~ s%.*/%%;
+(my $cmd0 = $cmd) =~ s/\d+$//;
+sub usage { print "Usage: $cmd -help\n"; }
+sub quit { (@_) ? print STDERR "$cmd quitting: @_\n" : usage; exit 1 }
+
+use X11::Tops;
+use Data::Dumper;
+
+sub perldoc {
+  my ($perldoc, $less);
+  for (split /:/, $ENV{PATH}) {
+    $perldoc = "$_/perldoc" if -x "$_/perldoc";
+    last if $perldoc; next if $less;
+    $less = "$_/less" if -x "$_/less";
+  }
+  if ($perldoc) {
+    $ENV{LESSCHARSET} = 'latin1';
+    exec $perldoc, $0
+  } elsif ($less) {
+    exec $less, '+/^# Sorry.*', $0
+  } else {
+    print
+      "Sorry, there's no perldoc(1) or even less(1) in your \$PATH\n" .
+      "The documentation can be found at the end of $0\n";
+    exit 1
+  }
+}
+
+# ----------------------------------------------------------------------
+
+#2# notes
+
+# 1.3
+#   renamed from xlsc to xlc
+# 2.1
+#   +taskbar7
+# 2.8
+#   renamed from xlc to xtc [+taskbar8]
+# 2.9
+#   usage -> pod
+
+# ----------------------------------------------------------------------
+
+#4# args
+
+my $instance;
+my $command;
+my $list = 0;
+
+while (@ARGV) {
+  $_ = shift;
+  perldoc() if /^-+(man|help)/;
+  $instance = shift, next if /^-+i/;
+  $list = 1, next if /^-+l/;
+  quit("illegal option '$_'") if /^-/;
+  unshift @ARGV, $_;
+  last;
+}
+
+$instance = "xtb$1" if !defined $instance && $cmd =~ /(\d*)$/;
+
+quit("no command given") unless @ARGV || $list;
+
+# ----------------------------------------------------------------------
+
+#5# xtops
+
+# xtb does something like this to avoid Unix socket.
+# This a simple way to get xlc working from cron.
+$ENV{DISPLAY} ||= 'localhost:0';
+
+my $xtops = $list ?
+  X11::Tops->new->update_from_props :
+  X11::Tops->new->update_ids;
+
+my $X = $xtops->X;
+my $root = $X->root;
+
+# ----------------------------------------------------------------------
+
+#6# list
+
+if ($list) {
+  open ALIGN, '| align -t -lrl'; select ALIGN;
+  for my $xtop (sort { $a->char cmp $b->char } values %{$xtops->byid}) {
+    print join("\t",
+      $xtop->char,
+      $xtop->id,
+      $xtop->instance,
+      $xtop->class,
+      $xtop->icon,
+    ), "\n";
+  }
+  close ALIGN;
+  exit;
+}
+
+# ----------------------------------------------------------------------
+
+#7# xtop
+
+my $xtop;
+
+for (values %{$xtops->byid}) {
+  $xtop = $_, last if $_->instance eq $instance;
+}
+
+quit ("no toplevel with instance name '$instance'") unless $xtop;
+
+$xtop->command(join ' ', @ARGV);
+
+__END__
+
+# ----------------------------------------------------------------------
+
+#7# pod
+
+# Sorry, there's no perldoc in your $PATH, so here's the raw pod
+
+=head1 NAME
+
+xtc - xchar taskbar (xtb) controller
+
+=head1 SYNOPSIS
+
+ xtc command ...
+
+ xtc -l
+
+=head1 DESCRIPTION
+
+Controls the xchar taskbar xtb by setting the _XCHAR_COMMAND property of
+xtb's toplevel window to 'command ...'.
+
+The available commands are described in xtb(1).
+
+With -l, the X clients are listed (char, id, instance, class, icon) in
+alphabetical order of chars (not taskbar order).  No command is sent to
+xtb.
+
+=head1 DEVELOPMENT
+
+If more than one instance of xtb is running, the desired instance can
+be selected with -i:
+
+    xtc -i instance command ...
+
+or by running xtc under the name xtc1 for xtb1, or xtc2 for xtb2, etc.
+
+=head1 SEE ALSO
+
+xtb(1), X11::Tops(3)
+
+=head1 AUTHOR
+
+Brian Keck E<lt>bwkeck@gmail.comE<gt>
+
+=head1 VERSION
+
+ $Source: /home/keck/gen/RCS/xtc,v $
+ $Revision: 2.15 $
+ $Date: 2007/07/06 07:52:20 $
+ xchar 0.2
+
+=cut
+

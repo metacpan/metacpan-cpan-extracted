@@ -1,0 +1,451 @@
+#!/usr/bin/env perl
+# $Source: /home/keck/gen/RCS/mk.xscreens,v $
+# $Revision: 1.24 $$Date: 2007/07/06 14:24:10 $
+# Contents
+#   1 standard     5 xterm           9 output/1   13 output/5
+#   2 args         6 decide widths   10 output/2  14 notes
+#   3 screen size  7 store widths    11 output/3  15 pod
+#   4 fonts        8 decide heights  12 output/4
+
+# ----------------------------------------------------------------------
+
+#1# standard
+
+use strict;
+use warnings;
+
+(my $cmd = "$0") =~ s%.*/%%;
+
+sub usage { print "Usage: $cmd -help\n"; }
+sub quit { (@_) ? print STDERR "$cmd quitting: @_\n" : &usage; exit 1 }
+
+use Tk;
+
+use Data::Dumper;
+$Data::Dumper::Terse = 1;
+$Data::Dumper::Indent = 1;
+$Data::Dumper::Quotekeys = 0;
+$Data::Dumper::Sortkeys = 1;
+
+sub perldoc {
+  my ($perldoc, $less);
+  for (split /:/, $ENV{PATH}) {
+    $perldoc = "$_/perldoc" if -x "$_/perldoc";
+    last if $perldoc; next if $less;
+    $less = "$_/less" if -x "$_/less";
+  }
+  if ($perldoc) {
+    $ENV{LESSCHARSET} = 'latin1';
+    exec $perldoc, $0
+  } elsif ($less) {
+    exec $less, '+/^# Sorry.*', $0
+  } else {
+    print
+      "Sorry, there's no perldoc(1) or even less(1) in your \$PATH\n" .
+      "The documentation can be found at the end of $0\n";
+    exit 1
+  }
+}
+
+# ----------------------------------------------------------------------
+
+#2# args
+
+my $name;
+
+while (@ARGV) {
+  $_ = shift;
+  perldoc() if /^-+(man|h)/;
+  $name = $_;
+  last;
+}
+
+# ----------------------------------------------------------------------
+
+#3# screen size
+
+my %screen;
+
+my $main = MainWindow->new;
+
+if (defined $name && $name =~ /(\d+)x(\d+)/) {
+  %screen = (
+    width => $1,
+    height => $2
+  ) if $1 > 0 && $2 > 0;
+}
+
+%screen = (
+  width => $main->screenwidth,
+  height => $main->screenheight
+) unless %screen;
+
+$name = $cmd . '_' . $screen{width} . 'x' . $screen{height}
+  unless defined $name;
+
+# ----------------------------------------------------------------------
+
+#4# fonts
+
+my %font;
+my %bold;
+
+$font{5} = '-*-*-*-*-*-*-10-*-*-*-*-50-*-*';
+$bold{5} = '-*-*-*-*-*-*-10-*-*-*-*-50-*-*';
+$font{6} = '-*-*-medium-r-*--13-*-*-*-c-60-iso10646-*';
+$bold{6} = '-*-*-bold-r-*--13-*-*-*-c-60-iso10646-*';
+
+# ----------------------------------------------------------------------
+
+#5# xterm
+
+my %inc;
+my %base;
+my %wm;
+
+for my $f (5, 6) {
+
+  my $xy = $f == 5 ? '+0+0' : '-0-0';
+
+  system qq(
+    xterm -geometry 80x24$xy -fn $font{$f} \\
+      -e sh -c 'echo \$\$ \$WINDOWID >/tmp/$cmd$$; sleep 10' &
+  );
+
+  sleep 3; # 1 too short for Gateway 2000
+  $_ = `cat /tmp/$cmd$$`;
+  my ($pid, $windowid) = split;
+  my $xprop = `xprop -id $windowid`;
+  my $xwininfo = `xwininfo -id $windowid`;
+  kill 15, $pid;
+
+  ($inc{$f}{width}, $inc{$f}{height}) =
+    $xprop =~ /program specified resize increment: (\d+) by (\d+)/;
+  ($base{$f}{width}, $base{$f}{height}) =
+    $xprop =~ /program specified base size: (\d+) by (\d+)/;
+
+  if ($f == 5) {
+    ($wm{left}, $wm{top}) =
+      $xwininfo =~ /Corners:\s+\+(\d+)\+(\d+)/;
+  } else {
+    ($wm{right}, $wm{bottom}) =
+      $xwininfo =~ /Corners:\s+\S+\s+\S+\s+-(\d+)-(\d+)/;
+  }
+}
+
+# ----------------------------------------------------------------------
+
+#6# decide widths
+
+# number of columns of 80+ @ 6
+my $i = int(
+  $screen{width} /
+    ($wm{left} + 80 * $inc{6}{width} + $base{6}{width} + $wm{right})
+);
+
+quit("can't fit an 80 column xterm with font 6 pixels wide") if $i == 0;
+
+my $remains = $screen{width};
+$remains -= $i *
+   ($wm{left} + 80 * $inc{6}{width} + $base{6}{width} + $wm{right});
+
+# number of columns of 72+ @ 6
+my $j = int(
+  $remains /
+    ($wm{left} + 72 * $inc{6}{width} + $base{6}{width} + $wm{right})
+);
+
+# number of columns of 72+ @ 5
+my $k = 0;
+if ($j == 0) {
+  $k = int(
+    $remains /
+      ($wm{left} + 72 * $inc{5}{width} + $base{5}{width} + $wm{right})
+  );
+}
+
+# print "\$i=$i, \$j=$j, \$k=$k\n";
+
+# ----------------------------------------------------------------------
+
+#7# store widths
+
+my @widths;
+my @fonts;
+
+$widths[$_] = 80 for 0 .. $i - 1;
+$fonts[$_] = 6 for 0 .. $i - 1;
+
+if ($j == 0 && $k == 0) { # extend last 80
+  $widths[$i - 1] += int($remains / $inc{6}{width});
+} elsif ($k == 0) { # extend 72 @ 6
+  $widths[$i] = int($remains / $inc{6}{width});
+  $fonts[$i] = 6;
+} elsif ($j == 0) { # extend 72 @ 5
+  $widths[$i] = int($remains / $inc{5}{width});
+  $fonts[$i] = 5;
+} else {
+  quit("\$j=$j,\$k=$k");
+}
+
+# ----------------------------------------------------------------------
+
+#8# decide heights
+
+# 2 dimensional array ...
+my %n; # number of xterms in a column, key = column font width
+my %lines_per_xterm;
+my %lines_remaining;
+my $min = 20;
+
+# 1 dimensional array ...
+my %lines_per_screen;
+
+for my $f (5, 6) {
+  $n{$f} = int(
+    $screen{height} /
+      ($wm{top} + $base{$f}{height} +
+        $min * $inc{$f}{height} + $wm{bottom})
+  );
+
+  # 1 dimensional array ...
+  $lines_per_screen{$f} = int(
+    ($screen{height} - ($wm{top} + $base{$f}{height} + $wm{bottom})) /
+      $inc{$f}{height}
+  );
+
+  # 2 dimensional array ...
+  my $pixels_for_lines =
+    $screen{height} -
+      $n{$f} * ($wm{top} + $base{$f}{height} + $wm{bottom});
+  $lines_per_xterm{$f} = int(
+    $pixels_for_lines / ($n{$f} * $inc{$f}{height})
+  );
+  $lines_remaining{$f} = int(
+    ($pixels_for_lines -
+        $n{$f} * $inc{$f}{height} * $lines_per_xterm{$f}) /
+      $inc{$f}{height}
+  );
+}
+
+# ----------------------------------------------------------------------
+
+#9# output/1
+
+print "# example ~/.xscreens file for xchar system\n";
+print "# generated by $0 " . `date`;
+print "\n";
+
+print "{\n";
+
+$name = "'$name'" if $name =~ /\W|^\d/;
+print ' ' x 2, "$name => {\n";
+print ' ' x 4, "width => $screen{width},\n";
+print ' ' x 4, "height => $screen{height},\n";
+
+# ----------------------------------------------------------------------
+
+#10# output/2
+
+# full height xterms
+
+print ' ' x 4, "clients => {\n";
+
+{ my $m = 1;
+  my $x = 0;
+
+  for my $I (0 .. $#widths) {
+    my $f = $fonts[$I]; # 5 or 6
+    next if $n{$f} == 1;
+    my %w;
+    $w{chars} = $widths[$I];
+    $w{pixels} = $widths[$I] * $inc{$f}{width} + $base{$f}{width};
+    my $y = 0;
+    my %h;
+    $h{chars} = $lines_per_screen{$f};
+    $h{pixels} = $h{chars} * $inc{$f}{height} + $base{$f}{height};
+    my %geometry;
+    $geometry{chars} = "$w{chars}x$h{chars}+$x+$y";
+    $geometry{pixels} = "$w{pixels}x$h{pixels}+$x+$y";
+    print ' ' x 6, "$m => {\n";
+    print ' ' x 8,
+      "geometry => ['$geometry{chars}', '$geometry{pixels}'],\n";
+    print ' ' x 8, "normal => '$font{$f}',\n";
+    print ' ' x 8, "bold => '$bold{$f}',\n";
+    print ' ' x 6, "},\n";
+    $m++;
+    $x += $w{pixels} + $wm{left} + $wm{right};
+  }
+}
+
+# ----------------------------------------------------------------------
+
+#11# output/3
+
+# 2-dim array of xterms
+
+{ my $c = 'a';
+  my $x = 0;
+
+  for my $I (0 .. $#widths) {
+    my $f = $fonts[$I]; # 5 or 6
+    my %w;
+    $w{chars} = $widths[$I];
+    $w{pixels} = $widths[$I] * $inc{$f}{width} + $base{$f}{width};
+    my $y = 0;
+    for my $J (0 .. $n{$f} - 1) {
+      my %h;
+      $h{chars} = $lines_per_xterm{$f};
+      $h{chars}++ if $n{$f} - $J <= $lines_remaining{$f};
+      $h{pixels} = $h{chars} * $inc{$f}{height} + $base{$f}{height};
+      my %geometry;
+      $geometry{chars} = "$w{chars}x$h{chars}+$x+$y";
+      $geometry{pixels} = "$w{pixels}x$h{pixels}+$x+$y";
+      print ' ' x 6, "$c => {\n";
+      print ' ' x 8,
+        "geometry => ['$geometry{chars}', '$geometry{pixels}'],\n";
+      print ' ' x 8, "normal => '$font{$f}',\n";
+      print ' ' x 8, "bold => '$bold{$f}',\n";
+      print ' ' x 6, "},\n";
+      $c++;
+      $y += $h{pixels} + $wm{top} + $wm{bottom};
+    }
+    $x += $w{pixels} + $wm{left} + $wm{right};
+  }
+}
+
+print ' ' x 4, "},\n";
+
+# ----------------------------------------------------------------------
+
+#12# output/4
+
+# distances from right edges of xterms to right side of screen
+
+{ my @x;
+  my $x = $screen{width};
+
+  for my $I (0 .. $#widths) {
+    my $f = $fonts[$I]; # 5 or 6
+    my %w;
+    $x -=
+      $wm{left} + $widths[$I] * $inc{$f}{width} + 
+        $base{$f}{width} + $wm{right};
+    push @x, $x;
+  }
+
+  print ' ' x 4, 'x => [', join(', ', @x), "],\n";
+}
+
+# ----------------------------------------------------------------------
+
+#13# output/5
+
+print ' ' x 4, "font => '$font{6}',\n";
+print ' ' x 4, "root => 'steelblue',\n";
+
+print ' ' x 2, "},\n";
+print "}\n";
+
+__END__
+
+# ----------------------------------------------------------------------
+
+#14# notes
+
+# +xwin/config3 +taskbar9
+
+# 1.16
+#   renamed from mkscreens to mkxscreens
+# 1.17
+#   renamed from mkxscreens to mk.xscreens
+# 1.22
+#   stopped being mean with borders ... no longer overlap
+#   because ugly with default (wide) side & bottom fvwm borders
+
+# $Revision: 1.24 $
+
+# ----------------------------------------------------------------------
+
+#15# pod
+
+# Sorry, there's no perldoc in your $PATH, so here's the raw pod
+
+=head1 NAME
+
+mk.xscreens - generate an X11::Screens configfile
+
+=head1 SYNOPSIS
+
+ mk.xscreens [name]
+
+ mk.xscreens > ~/.xscreens
+
+=head1 DESCRIPTION
+
+See the references below for the role of the X11::Screens configfile
+~/.xscreens.  Briefly, it contains an entry for each screen size you
+use.  Each entry defines a set of what could be simply X geometries,
+each keyed by a character (see xchar(1)).  In general they might contain
+two X geometries, one in character units & one in pixel units, and two
+font names (normal and bold).  The extra information allows the
+configfile to be used by terminal launchers (eg xterms(1)) as well as by
+xmv(1) & GUI launchers.  With mk.xscreens all are given two geometries &
+two fonts.
+
+mk.xscreens is an X client.  It creates a configfile with one entry.
+This entry is suitable for the current screen ($DISPLAY or :0.0).
+
+The entry divides the screen into columns (2 or 3 for most screens).  It
+creates 2 arrays of geometries based on these columns.  One array is
+just the 1 dimensional array of columns.  The other is 2 dimensional,
+each column being divided into rows.  The geometries in the 1
+dimensional array are assigned characters '1', '2', etc.  The geometries
+in the 2 dimensional array are assigned characters 'a', 'b', etc, going
+down the 1st column, then down the 2nd, etc.
+
+mk.xscreens tries to use a 13-pixel font, falling back to a 10-pixel
+font if needed to get reasonably wide or high windows (this sometimes
+results in different columns having different numbers of rows).
+
+If the entry's key is not specified on the command line, it's
+constructed from the screen size (something like
+'mk.xscreens_1280x960').  The name isn't important in getting started
+with xchar(1).
+
+mk.xscreens runs 2 xterms for a few seconds, to get the relation between
+pixel-relative & character-relative geometries, and the size of the
+window manager decorations (titlebar & other borders).  It uses xprop(1)
+& xwininfo(1) for this.
+
+The fonts used are old fashioned server-side fonts:
+
+        -*-*-medium-r-*--13-*-*-*-c-60-iso10646-*
+        -*-*-*-*-*-*-10-*-*-*-*-50-*-*
+
+=head1 BUGS
+
+With mk.xscreens in it's current form, creating an X11::Screens
+configfile can still easily be too much work for the user.  In
+particular, many people won't be able to read 10-pixel fonts, & have to
+adjust the configfile by trial & error, or learn more than they want to
+about the relation between character-relative geometries, pixel-relative
+geometries, & font metrics.
+
+=head1 SEE ALSO
+
+X11::Screens(3), xscreens(1), xchar(1)
+
+=head1 AUTHOR
+
+Brian Keck E<lt>bwkeck@gmail.comE<gt>
+
+=head1 VERSION
+
+ $Source: /home/keck/gen/RCS/mk.xscreens,v $
+ $Revision: 1.24 $
+ $Date: 2007/07/06 14:24:10 $
+ xchar 0.2
+
+=cut
+

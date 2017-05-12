@@ -1,0 +1,424 @@
+#!/usr/bin/perl 
+# Copyright 2005 Jerzy Wachowiak
+
+use strict;
+use warnings;
+use Text::CSV_XS;
+use File::Copy;
+use xdSRA;
+
+my $filepath = shift;
+
+defined( $filepath ) or usage();
+my $result = xdSRA::create_sra_from( $filepath );
+my @sender = @{ $result->{sender} };
+my @receiver = @{ $result->{receiver} };
+my @archivist = @{ $result->{archivist} };
+
+print "\n---Start creating straw command files---\n";
+
+for my $si (0..$#sender) {
+
+    my $jclientpath 
+    = "$sender[$si]{username}\@$sender[$si]{hostname}_$sender[$si]{resource}";
+
+    create_straw_dir( $jclientpath );
+    
+    my $senderFQJID
+     = "$sender[$si]{username}\@$sender[$si]{hostname}/$sender[$si]{resource}";
+    my $archivistJID = "$archivist[0]{username}\@$archivist[0]{hostname}";
+    
+    print "Files created for $jclientpath in the directory straw: ";
+    create_connection( "$jclientpath/straw/c", $sender[$si]{hostname} );
+    print 'c, ';
+    create_authentication( "$jclientpath/straw/a",
+     $sender[$si]{username}, $sender[$si]{password}, $sender[$si]{resource} );
+    print 'a, ';
+    create_presence( "$jclientpath/straw/p" );
+    print 'p, ';
+    create_selftest( "$jclientpath/straw/s",  $senderFQJID,
+     'Jabber sever should send as repley an error message.' );	
+    print 's, ';
+    create_normal( "$jclientpath/straw/n", $senderFQJID, $archivistJID, 
+     'Archivist should discard this message.' );
+    print 'n, ';
+    create_good( "$jclientpath/straw/g", $senderFQJID, $archivistJID,
+     'Archivist has to send back confirmation with the same id.',
+      $sender[$si]{id} );
+    print 'g, ';
+    create_bad( "$jclientpath/straw/b", $senderFQJID, $archivistJID, 
+     'Sender has dedected some processing error.', $sender[$si]{id} );
+    print 'b, ';
+    create_error( "$jclientpath/straw/e", $senderFQJID, $archivistJID,
+     'Some internal processing error has happend.' );
+    print "e\n";
+    create_readme( "$jclientpath/straw/README.txt");
+    print "README.txt.\n";
+
+    copy_straw( $jclientpath )
+};
+
+for my $ri (0..$#receiver) {
+    
+    my $jclientpath 
+    = "$receiver[$ri]{username}\@$receiver[$ri]{hostname}_$receiver[$ri]{resource}";
+    
+    create_straw_dir( $jclientpath );
+    
+    my $receiverFQJID
+     = "$receiver[$ri]{username}\@$receiver[$ri]{hostname}"
+     ."/$receiver[$ri]{resource}";
+    my $archivistJID = "$archivist[0]{username}\@$archivist[0]{hostname}";
+    
+    print "Files created for $jclientpath in the directory straw: ";
+    create_connection( "$jclientpath/straw/c", $receiver[$ri]{hostname} );
+    print 'c, ';
+    create_authentication( "$jclientpath/straw/a",
+     $receiver[$ri]{username}, $receiver[$ri]{password},
+     $receiver[$ri]{resource} );
+    print 'a, ';
+    create_presence( "$jclientpath/straw/p" );
+    print 'p, ';
+    create_selftest( "$jclientpath/straw/s",  $receiverFQJID,
+     'Jabber sever should send as repley an error message.' );	
+    print 's, ';
+    create_normal( "$jclientpath/straw/n", $receiverFQJID, $archivistJID, 
+     'Archivist should discard this message.' );
+    print 'n, ';
+    create_good( "$jclientpath/straw/g", $receiverFQJID, $archivistJID,
+     'Receiver sends result of a job, which has succeeded.' );
+    print 'g, ';
+    create_bad( "$jclientpath/straw/b", $receiverFQJID, $archivistJID, 
+     'Receiver sends result of a job, which failed' );
+    print 'b, ';
+    create_error( "$jclientpath/straw/e", $receiverFQJID, $archivistJID,
+     'Some internal processing error has happend.' );
+    print "e\n";
+    create_readme( "$jclientpath/straw/README.txt");
+    print "README.txt.\n";
+
+    copy_straw( $jclientpath )
+};
+
+for my $ai (0..0) {
+
+    my $jclientpath 
+    = "$archivist[$ai]{username}\@$archivist[$ai]{hostname}_$archivist[$ai]{resource}";
+
+    create_straw_dir( $jclientpath );
+    
+    my $archivistFQJID
+     = "$archivist[$ai]{username}\@$archivist[$ai]{hostname}/$archivist[$ai]{resource}";
+    
+    print "Files created for $jclientpath in the directory straw: ";
+    create_connection( "$jclientpath/straw/c", $archivist[$ai]{hostname} );
+    print 'c, ';
+    create_authentication( "$jclientpath/straw/a",
+     $archivist[$ai]{username}, $archivist[$ai]{password}, $archivist[$ai]{resource} );
+    print 'a, ';
+    create_presence( "$jclientpath/straw/p" );
+    print 'p, ';
+    create_selftest( "$jclientpath/straw/s",  $archivistFQJID,
+     'Jabber sever should send as repley an error message.' );	
+    print 's, ';
+
+    for my $si (0..$#sender) {
+	my $senderJID = "$sender[$si]{username}\@$sender[$si]{hostname}";
+	create_good( "$jclientpath/straw/g$sender[$si]{id}", $archivistFQJID,
+	 $senderJID, 'Job confirmation sent back to the sender.', 
+	 $sender[$si]{id} );
+	print "g$sender[$si]{id}, ";
+	create_bad( "$jclientpath/straw/b$sender[$si]{id}", $archivistFQJID,
+	 $senderJID, 'Archivist has dedected some processing error.',
+	 $sender[$si]{id} );
+	print "b$sender[$si]{id}, ";
+	create_error( "$jclientpath/straw/e$sender[$si]{id}", $archivistFQJID,
+	 $senderJID, 'Some internal processing error has happend.' );
+	print "e$sender[$si]{id}\n";
+	create_readme( "$jclientpath/straw/README.txt");
+        print "README.txt.\n";
+    }
+    
+    copy_straw( $jclientpath )
+};
+print "---End creating straw command files---\n";
+exit;
+
+sub create_connection {
+
+    my $file = shift;
+    my $host = shift;
+    
+    my $xml = <<EOM;
+<?xml version='1.0' ?>
+<stream:stream to='$host' xmlns='jabber:client'
+ xmlns:stream='http://etherx.jabber.org/streams' 
+EOM
+    xml2file( $file, $xml ) 
+}
+
+sub create_authentication {
+
+    my $file = shift;
+    my $username = shift;
+    my $password = shift;
+    my $resource = shift;
+
+    my $xml = <<EOM;
+    <iq type='set'>
+	<query xmlns='jabber:iq:auth'>
+    	    <username>$username</username>
+    	    <password>$password</password>
+    	    <resource>$resource</resource>
+	</query>
+    </iq>
+EOM
+    xml2file( $file, $xml )
+}
+
+sub create_presence {
+
+    my $file = shift;    
+
+    my $xml = <<EOM;
+    <presence type='available'/>
+EOM
+    xml2file( $file, $xml )
+}
+
+sub create_selftest {
+
+    my $file = shift;
+    my $FQJID = shift;
+    my $body = shift;
+    my $id_string;
+    if ( defined( my $id = shift ) ){ $id_string = " id='$id'" } 
+    else { $id_string = '' };
+
+    my $xml = <<EOM;
+    <message to='$FQJID' from='$FQJID'$id_string>
+	<subject> a message to myself</subject>
+	<body>$body</body>
+    </message>
+EOM
+    xml2file( $file, $xml )
+}
+
+sub create_normal {
+
+    my $file = shift;
+    my $fromFQJID = shift;
+    my $toJID = shift;
+    my $body = shift;
+    my $id_string;
+    if ( defined( my $id = shift ) ){ $id_string = " id='$id'" } 
+    else { $id_string = '' };
+    
+    my $xml = <<EOM;
+    <message  to='$toJID' from='$fromFQJID'$id_string>
+	<thread>test</thread> 
+	<subject>a message of type normal</subject>
+	<body>$body</body>
+    </message>
+EOM
+    xml2file( $file, $xml )
+}
+
+sub create_good {
+
+    my $file = shift;
+    my $fromFQJID = shift;
+    my $toJID = shift;
+    my $body = shift;
+    my $id_string;
+    if ( defined( my $id = shift ) ){ $id_string = " id='$id'" } 
+    else { $id_string = '' };
+    
+    my $xml = <<EOM;
+    <message type='job'  to='$toJID' from='$fromFQJID'$id_string>
+	<thread>test</thread> 
+	<subject>a good message</subject>
+	<body>$body</body>
+    </message>
+EOM
+    xml2file( $file, $xml )
+}
+
+sub create_bad {
+
+    my $file = shift;
+    my $fromFQJID = shift;
+    my $toJID = shift;
+    my $body = shift;
+    my $id_string;
+    if ( defined( my $id = shift ) ){ $id_string = " id='$id'" } 
+    else { $id_string = '' };
+    
+    my $xml = <<EOM;
+    <message type='job'  to='$toJID' from='$fromFQJID'$id_string>
+	<thread>test</thread> 
+	<subject>a bad processing message</subject>
+	<body>$body</body>
+	<error code='1001'>xDash agent error</error>
+    </message>
+EOM
+    xml2file( $file, $xml )
+}
+
+sub create_error {
+
+    my $file = shift;
+    my $fromFQJID = shift;
+    my $toJID = shift;
+    my $body = shift;
+    my $id_string;
+    if ( defined( my $id = shift ) ){ $id_string = " id='$id'" } 
+    else { $id_string = '' };
+    
+    my $xml = <<EOM;
+    <message type='error'  to='$toJID' from='$fromFQJID'$id_string>
+	<thread>test</thread> 
+	<subject>an internal error message</subject>
+	<body>$body</body>
+	<error>unknown internal error</error>
+    </message>
+EOM
+    xml2file( $file, $xml )
+}
+
+sub xml2file {
+    
+    my $file = shift;
+    my $xml = shift;
+    
+    open( FILE, "> $file" );
+    print FILE $xml;
+    close( FILE )
+    }
+
+sub trim {
+    my @out=@_;
+    for (@out) {
+	s/^\s+//;
+	s/\s+$//;
+    }
+    return wantarray ? @out : $out[0];
+}
+
+sub copy_straw {
+
+    my $jclientpath = shift;
+    
+    if ( -e 'straw' ){
+	copy('straw', "$jclientpath/straw/straw" ) or 
+         die 'Failed to copy script straw to the directory'
+	 ." ./$jclientpath/straw ($!). Bye, bye...\n"
+    }
+    else { 
+	print "Missing script straw,"
+	." cannot copy to the directory ./$jclientpath/straw\n"
+    }
+}
+
+sub create_straw_dir {
+    
+    my $jclientpath = shift;
+    unless ( -d $jclientpath ){
+	mkdir( $jclientpath ) or 
+         die "Failed to create the directory $jclientpath ($!). Bye, bye...\n";
+    }
+    unless ( -d "$jclientpath/straw" ){
+	mkdir("$jclientpath/straw") or 
+         die "Failed to create directory straw in $jclientpath ($!)."
+	  ." Bye, bye...\n";
+    }
+}
+
+sub usage {
+    print <<EOU;
+
+USAGE:
+$0 filename
+
+DESCRIPTION:
+xdstraw creates for Sender, Receiver and Archivist xml jabber test messages 
+in directory straw inside directories with the name of their JID and copies the
+the script straw to them. The usage of messages and of the script are described 
+in the generated file ReadMe.txt and script built-in help. The only input 
+parameter is a file. The records in the input file must have the format: 
+description; role; hostname; port; username; password; resource.The role can 
+be only: sender, receiver or archivist. Comments have to start with #.
+
+EOU
+exit 1
+}
+
+sub create_readme {
+
+    my $file = shift;    
+
+    my $text = <<EOT;
+Author: Jerzy Wachowiak; Version: 1.0; Last update: 2005-05-20.
+
+==========================================
+   Hints for straw usage
+==========================================
+
+@ straw
+
+USAGE:
+$0 -h host -p port [-d directory]
+
+DESCRIPTION:
+straw opens on start an INET socket connection to the host and port specified 
+in the argument line and starts a very simple shell. Shell input is interpreted 
+as a file name in the straw current working directory or directory specyfied
+in the argument line at start. The content of the file is read and transmitted
+to the host and the answer is displayed. As straw is used mostly with XML 
+protocols, XML is coloured but no pretty printing is used. To stop straw use 
+CTR+C.
+
+
+@ Naming convention for jabber files
+
+The files are generated according to the following naming convention:
+ c - open XML stream (connection) to the jabber server;
+ a - plain authentication request;
+ p - presence on;
+ s - selftest (message to itself);
+ n - message of type normal;
+ g - good message;
+ b - bad message;
+ e - some jabber internal error. 
+Meaning of good and bad message depends on the role of the agent. Archivist
+filenames, which are sent as response to Senders, are numbered 1, 2, 3, ... 
+according the alias naming convention in the Archivit's database (sender1, 
+sender2, sender3, ...)
+
+
+@ Typical test session
+
+Read the docs to understand, what is going on inside xDash. Check execution
+rights for the straw script. If using example provided in the CPAN module, open 
+3 terminal sessions, each one for Sender, Receiver and Archivist. Typical test 
+session consists of the following steps:
+[1] ./straw
+[2] c -> waiting for jabber server response
+[3] a -> waiting for jabber server response
+[4] p -> waiting for jabber server response
+[5] s -> waiting for jabber server response
+[6] n -> waiting for jabber server response
+[7] g -> waiting for response of another agent
+[8] b -> waiting for response of another agent
+[9] e -> waiting for jabber server response
+[10] CRT+C
+
+
+@ Sea also
+
+[1] Book "Programming Jabber" by DJ Adams, ISBN: 0-596-00202-5;
+[2] Jabber protocol description on www.jabber.org.
+EOT
+    xml2file( $file, $text )
+}
+

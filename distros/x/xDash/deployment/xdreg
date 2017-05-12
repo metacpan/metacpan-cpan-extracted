@@ -1,0 +1,235 @@
+#!/usr/bin/perl  
+# Copyright 2004 Jerzy Wachowiak
+
+use strict;
+use warnings;
+use Text::CSV_XS;
+use Term::ANSIColor;
+use Net::Jabber qw (Client);
+use constant NS_REGISTER=>"jabber:iq:register";
+use constant NS_AUTH=>"jabber:iq:auth";
+use constant NS_FILTER=>"jabber:iq:filter";
+use xdSRA;
+
+my $filepath=shift;
+
+defined( $filepath ) or usage();
+
+my $result = xdSRA::create_sra_from( $filepath );
+my @sender = @{ $result->{sender} };
+my @receiver = @{ $result->{receiver} };
+my @archivist = @{ $result->{archivist} };
+
+my $c;
+my $i;
+for $i (0..$#sender) {
+        
+    print"\n---Start jabber server registration for $sender[$i]{username}\@$sender[$i]{hostname}.---";
+    $c=Net::Jabber::Client->new();
+    # Open stream to the server.. 
+    print "\nConnecting to the jabber sever $sender[$i]{hostname} on port $sender[$i]{port}.\n"; 
+    defined($c->Connect(hostname=>$sender[$i]{hostname},
+     port=>$sender[$i]{port})) or die "Cannot reach the jabber server! Bye, bye...\n";
+
+    # For sender only registration needed,no forward rules to build
+    &registeruser($c, $sender[$i]{username},$sender[$i]{password},
+     $sender[$i]{resource});
+    &settypefilter( $c );
+    $c->Disconnect();
+    print"---End jabber server registration for $sender[$i]{username}\@$sender[$i]{hostname}---.\n\n";
+    sleep(5);
+};
+
+for $i (0..$#receiver) {
+       
+    print"\n---Start jabber server registration for $receiver[$i]{username}\@$receiver[$i]{hostname}.---";
+    $c=Net::Jabber::Client->new();
+    # Open stream to the server.. 
+    print "\nConnecting to the jabber sever $receiver[$i]{hostname} on port $receiver[$i]{port}.\n"; 
+    defined($c->Connect(hostname=>$receiver[$i]{hostname},
+     port=>$receiver[$i]{port})) or die "Cannot reach the jabber server! Bye, bye...\n";
+
+    # For receiver only registration needed,no forward rules to build
+    &registeruser($c, $receiver[$i]{username},$receiver[$i]{password},
+     $receiver[$i]{resource});
+    &settypefilter( $c );
+    $c->Disconnect();
+    print"---End jabber server registration for $receiver[$i]{username}\@$receiver[$i]{hostname}---.\n\n";
+    sleep(5);
+};
+
+for $i (0..$#archivist) {
+        
+    print"\n---Start jabber server registration for $archivist[$i]{username}\@$archivist[$i]{hostname}.---";
+    my $c=Net::Jabber::Client->new();
+        
+    print "\nConnecting to the jabber sever $archivist[$i]{hostname} on port $archivist[$i]{port}.\n"; 
+    my $status=$c->Connect(hostname=>$archivist[$i]{hostname},
+     port=>$archivist[$i]{port});
+    defined($status) or die "$status Cannot reach the jabber server! Bye, bye...\n";
+
+    # Archivist needs registartion and forward rules
+    &registeruser($c, $archivist[$i]{username},$archivist[$i]{password},
+     $archivist[$i]{resource});
+    &setfilter($c, \@sender, \@receiver);
+    
+    $c->Disconnect();
+    print"---End jabber server registration for $archivist[$i]{username}\@$archivist[$i]{hostname}---.\n\n";
+    if ($i != $#archivist) {sleep(5)};
+};
+exit;
+
+sub registeruser{
+    
+    my ($c, $username, $password, $resource);
+    $c=shift; 
+    $username=shift; 
+    $password=shift; 
+    $resource=shift;
+
+    # Registering username and password
+    my $iq=new Net::Jabber::IQ();
+    $iq->SetType("set");
+    my $query=$iq->NewQuery(NS_REGISTER);		    
+    $query->SetUsername($username);
+    $query->SetPassword($password);
+    print "\nRegistering user $username with password $password:\n";
+    print color_XML( $iq->GetXML() ), "\n";
+    $iq=$c->SendAndReceiveWithID($iq);
+    # The account maybe already registered from a prevoius run...
+    print color_XML( $iq->GetXML() ), "\n";
+    if ($iq->GetType eq "error") {
+	SWITCH:{
+	        if ($iq->GetErrorCode()==409){
+		    print "Jabber: ", $iq->GetError()," (xDash: Account probably exists). Going on ! \n";
+		    last SWITCH;
+		};
+		if ($iq->GetErrorCode()==406){
+		    die "Jabber: ", $iq->GetError(),' (xDash: @, :, /, ", tabs, newlines, carriage return,',
+		     "\n control characters, ASCI under 33 (decimal), in the username?). Bye, bye..."," \n";
+		};
+		die "Jabber: ", $iq->GetError(),". Bye, bye... \n";
+	}
+    }
+
+    $iq=new Net::Jabber::IQ();
+    $iq->SetType("set");
+    $query=$iq->NewQuery(NS_AUTH);		    
+    $query->SetUsername($username);
+    $query->SetPassword($password);
+    $query->SetResource($resource);
+    print "\nAuthorising user $username with password $password:\n";
+    print color_XML( $iq->GetXML() ), "\n";
+    $iq=$c->SendAndReceiveWithID($iq);
+    # Dev:the result should be checked against error 401- Not Authorized 
+    print color_XML( $iq->GetXML() ), "\n";
+    if ($iq->GetType eq "error") {
+	SWITCH:{
+	        if ($iq->GetErrorCode()==401){
+		    die "Jabber: ", $iq->GetError()," (xDash: Right password? Really your account?). Bye, bye...\n";
+		};
+		die "Jabber: ", $iq->GetError(),". Bye, bye... \n";
+	}
+    }
+    
+    print "\nDiscarding the jabber server welcome message if any.\n";
+    $c->SetCallBacks(message=>sub {my $message=shift;$message=shift;print $message->GetXML, "\n"});
+    $c->PresenceSend();
+    $c->Process(1);
+}
+
+sub setfilter{
+    my ($c, @sender, @receiver, $reference);
+    $c=shift;     
+    $reference=shift;
+    @sender=@{$reference}; 
+    $reference=shift;
+    @receiver=@{$reference};
+
+    my $filterstart="<iq type='set'><query xmlns='jabber:iq:filter'>"
+    ."<rule name='xdblock'>"
+    ."<type>normal</type>"
+    ."<type>chat</type>"
+    ."<type>groupchat</type>"
+    ."<type>headline</type>"
+    ."<error/></rule><rule name='xdforward'><type>job</type>";
+    my $filterfrom="";
+    my $filterforward="";
+    my $filterend="<continue/></rule></query></iq>";
+    
+    my $i;
+    for $i (0..$#sender) {
+	$filterfrom=$filterfrom."<from>".$sender[$i]{username}."\@".
+	 $sender[$i]{hostname}."</from>";
+    }
+    for $i (0..$#receiver) {
+	$filterforward=$filterforward."<forward>".$receiver[$i]{username}."\@".
+	 $receiver[$i]{hostname}."</forward>";
+    }
+    my $filteriq=$filterstart.$filterfrom.$filterforward.$filterend;
+    print "\nSetting forward rules:\n";
+    print color_XML( $filteriq ), "\n";
+    $c->SetCallBacks(iq=>\&report);
+    my $id=$c->Send($filteriq);
+    $c->Process(1);
+}
+
+sub settypefilter{
+    my $c=shift;     
+    
+    my $filteriq= "<iq type='set'><query xmlns='jabber:iq:filter'>"
+    ."<rule name='xdblock'>"
+    ."<type>normal</type>"
+    ."<type>chat</type>"
+    ."<type>groupchat</type>"
+    ."<type>headline</type>"
+    ."<error/></rule>"
+    ."</query></iq>";
+    
+    print "\nSetting forward rules:\n";
+    print color_XML( $filteriq ), "\n";
+    $c->SetCallBacks(iq=>\&report);
+    my $id=$c->Send($filteriq);
+    $c->Process(1);
+}
+
+sub report {
+	my $sid=shift;
+	my $iq=shift;
+	print color_XML( $iq->GetXML() ),"\n";
+	if ($iq->GetType eq "error") {
+	    SWITCH:{
+			die "Jabber: ", $iq->GetError(),". Bye, bye... \n";
+	    }
+	}
+}
+
+sub color_XML {
+        
+	my $line = shift;
+	
+	$line
+	 =~ s/=\s*'([^']+)'/"='".colored( $1, 'yellow')."'"/ge;
+        $line
+	 =~ s/=\s*"([^"]+)"/'="'.colored( $1, 'yellow').'"'/ge;
+        $line
+	 =~ s/>([^>]+)</'>'.colored( $1,  ' yellow').'<'/ge;
+	return $line
+}
+
+sub usage {
+    print <<EOU;
+
+USAGE:
+$0 filename
+
+DESCRIPTION:
+xdreg registers accounts on the jabber server. The only input parameter
+is a file. The records in the input file must have the format:
+description; role; hostname; port; username; password; resource.
+The role can be only: sender, receiver or archivist. Comments have to start 
+with #.
+
+EOU
+exit 1
+}

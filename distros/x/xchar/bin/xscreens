@@ -1,0 +1,210 @@
+#!/usr/bin/env perl
+# $Source: /home/keck/gen/RCS/xscreens,v $
+# $Revision: 4.9 $$Date: 2007/07/05 13:58:21 $
+# Contents
+#   1 standard      3 args    5 output  7 pod
+#   2 Data::Dumper  4 screen  6 notes
+
+# ----------------------------------------------------------------------
+
+#1# standard
+
+use strict;
+use warnings;
+
+(my $cmd = "$0") =~ s%.*/%%;
+
+sub usage { print "Usage: $cmd -help\n"; }
+sub quit { (@_) ? print STDERR "$cmd quitting: @_\n" : &usage; exit 1 }
+
+require X11::Screens;
+
+sub perldoc {
+  my ($perldoc, $less);
+  for (split /:/, $ENV{PATH}) {
+    $perldoc = "$_/perldoc" if -x "$_/perldoc";
+    last if $perldoc; next if $less;
+    $less = "$_/less" if -x "$_/less";
+  }
+  if ($perldoc) {
+    $ENV{LESSCHARSET} = 'latin1';
+    exec $perldoc, $0
+  } elsif ($less) {
+    exec $less, '+/^# Sorry.*', $0
+  } else {
+    print
+      "Sorry, there's no perldoc(1) or even less(1) in your \$PATH\n" .
+      "The documentation can be found at the end of $0\n";
+    exit 1
+  }
+}
+
+# ----------------------------------------------------------------------
+
+#2# Data::Dumper
+
+use Data::Dumper;
+$Data::Dumper::Terse = 1;
+$Data::Dumper::Indent = 1;
+$Data::Dumper::Quotekeys = 0;
+$Data::Dumper::Sortkeys = sub {
+  my @grep_v = sort grep !/^(tkmain|screens)$/, keys %{$_[0]};
+  \@grep_v;
+};
+
+# ----------------------------------------------------------------------
+
+#3# args
+
+my $current;
+my %given;
+
+while (@ARGV) {
+  $_ = shift;
+  perldoc() if /^-+(man|help)/;
+  $current = 1, next if /^-c/;
+  $given{$1} = shift, next if /^-+(.+)/;
+  unshift @ARGV, $_;
+  last;
+}
+
+quit("neither -c nor any -key given") unless $current || %given;
+
+# ----------------------------------------------------------------------
+
+#4# screen
+
+my $screen;
+
+if ($current) {
+  $screen = X11::Screens->current || X11::Screen->current;
+} else {
+  my $screens = X11::Screens->new;
+  my @screens = $screens->match_tight(%given);
+  my $x = @screens;
+  quit(
+    'more than 1 screen matches ' .
+    join ', ', map { "$_ => $given{$_}" } sort keys %given
+  ) if @screens > 1;
+  $screen = $screens[0];
+}
+
+# ----------------------------------------------------------------------
+
+#5# output
+
+print(Dumper $screen) unless @ARGV;
+
+my $status = 0;
+
+for my $arg (@ARGV) {
+  my @wanted = split /\./, $arg;
+  my $value = $screen;
+  my $sofar; # for errors
+  for (@wanted) {
+    $value = $value->{$_};
+    $sofar .= defined $sofar ? ".$_" : $_;
+    $status = 1, $value = '', print(STDERR "'$sofar' undefined"), last
+      unless defined $value;
+  }
+  print ref $value ? Dumper $value : "$value\n";
+}
+
+exit $status;
+
+__END__
+
+# ----------------------------------------------------------------------
+
+#6# notes
+
+# +xwin/config
+# +perl/tk
+
+# 1.x
+#   XX86
+#   wrote this having forgotten gen/screensize ... deleted latter
+#   wish
+#   just outputs screensize
+#   +xwin/config
+# 2.1
+#   rewritten in perl, using new Xwin.pm
+#   outputs parts of .xwin as well as just screensize
+# 2.2
+#   -a & -A
+# 2.3
+#   console instead of init, depth
+# 2.4
+#   console fixed, unicode
+# 3.1
+#   renamed this from xwin to screen
+#   renamed .xwin to .screens
+#   renamed Xwin.pm to Screen.pm
+#   XXII128
+# 3.3 [RCS]
+#   added SCREEN
+# 3.6
+#   added -c (current display)
+# 3.10
+#   added managers.chars to usage
+#   xterms.4 for my-init-texmacs.scm
+# 3.12
+#   texmacs.a etc for my-init-texmacs.scm
+# 3.13
+#   added 'xterms.' and 'texmacs.' for my-init-texmacs.scm
+# 3.17
+#   strict & warnings
+# 4.1
+#   renamed from screen to screens
+#   uses Screens.pm rather than Screen.pm
+#   +xwin/config3
+
+# ----------------------------------------------------------------------
+
+#7# pod
+
+# Sorry, there's no perldoc in your $PATH, so here's the raw pod
+
+=head1 NAME
+
+xscreens - wrapper round X11::Screens
+
+=head1 SYNOPSIS
+
+  xscreens -c key1 ...
+  xscreens -key1 value1 key2 ...
+  xscreens -key1 value1 -key2 value2 key3 ...
+
+  xscreens -c name clients.a.geometry
+
+=head1 DESCRIPTION
+
+The flag (-xxx) arguments specify a screen from ~/.xscreens.
+
+The other arguments specify what information for this screen is to be
+output (stdout).  In their absence all information about the screen is
+output.
+
+Both kinds of arguments can contain dots which separate keys.
+
+If a value is a reference then it's output via Data::Dumper.  Otherwise
+it's output directly, followed by a newline.  Nonexistent values are
+output as empty strings, & a warning written to stderr.
+
+=head1 SEE ALSO
+
+X11::Screens(3), xchar(1)
+
+=head1 AUTHOR
+
+Brian Keck E<lt>bwkeck@gmail.comE<gt>
+
+=head1 VERSION
+
+ $Source: /home/keck/gen/RCS/xscreens,v $
+ $Revision: 4.9 $
+ $Date: 2007/07/05 13:58:21 $
+ xchar 0.2
+
+=cut
+

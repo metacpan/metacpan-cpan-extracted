@@ -1,0 +1,116 @@
+#!/usr/bin/perl  
+# Copyright Jerzy Wachowiak
+
+use strict;
+use warnings;
+use Text::CSV_XS;
+use xdSRA;
+
+my $filepath=shift;
+
+defined( $filepath ) or usage();
+
+my $result = xdSRA::create_sra_from( $filepath );
+my @sender = @{ $result->{sender} };
+my @receiver = @{ $result->{receiver} };
+my @archivist = @{ $result->{archivist} };
+
+print "\n---Start operating system registration files---\n";
+
+&OSregistration( @sender, $#sender, 'sender' ) if @sender ; #exists
+&OSregistration( @receiver, $#receiver, 'receiver' ) if @receiver; #exists
+&OSregistration( @archivist, 0, 'archivist' ) if @archivist; #exists
+
+print "---End operating system registration files---\n";
+exit;
+
+sub OSregistration{
+    my @participant = shift;
+    my $limit = shift;
+    my $default_name = shift;
+    
+    my $pi;
+    for $pi (0..$limit) {
+
+	defined( $participant[$pi]{OSname} ) or next;
+        unless ( defined( $participant[$pi]{homepath} ) ){
+	    print "Cannot create operating system registration"
+	    ." for $participant[$pi]{username}\@$participant[$pi]{hostname}/$participant[$pi]{resource}"
+	    ." missing directory path.\n";
+	    next
+	}
+	$participant[$pi]{filename} = $default_name;
+
+	my $jclientpath = "$participant[$pi]{username}\@$participant[$pi]{hostname}_$participant[$pi]{resource}";
+	xdSRA::create_directory( $jclientpath );
+	if ( $participant[$pi]{OSname} eq 'cygwin' ) {
+	    print "File NTservice.bash for $participant[$pi]{username}\@$participant[$pi]{hostname}/$participant[$pi]{resource} created in the directory ./$jclientpath.\n";
+	    my $servicename = $participant[$pi]{username}.
+	    $participant[$pi]{hostname}.$participant[$pi]{resource};
+	    $servicename =~ s/_//g;
+	    $servicename =~ s/\.//g;
+	    $servicename =~ s/\-//g;
+	    open(SERVICE, "> $jclientpath".'/NTservice.bash');
+	    print SERVICE "#!/bin/bash\n\n";
+	    print SERVICE "# [1] This script registers the Windows NT/2k/XP Dash service\n".
+	    "#     using cygwin cygrunsrv and cygwin perl.\n";
+	    print SERVICE "# [2] Beware of Windows service naming quirks like special characters or name\n".
+	    "#     length! If needed, overide default service name as script input parameter.\n\n";
+    	    print SERVICE "service=$servicename\n\n";
+	    print SERVICE 'if [ -n "$1" ]',"\n";
+	    print SERVICE "then\n";
+	    print SERVICE ' service=$1',"\n";
+	    print SERVICE "fi\n\n";
+	    print SERVICE 'echo Stoping $service, if any running.',"\n";
+	    print SERVICE 'sc stop $service',"\n";
+	    print SERVICE 'echo Deleting $service, if any exists.',"\n";
+	    print SERVICE 'sc delete $service',"\n\n";
+	    print SERVICE "echo Registration result:\n";
+	    print SERVICE 'cygrunsrv'.
+	    ' --install $service'.
+	    " --path /bin/perl".
+	    " --args $participant[$pi]{homepath}/$jclientpath/$participant[$pi]{filename}".
+	    ' --disp "'."xDash agent / $participant[$pi]{username}\@$participant[$pi]{hostname}/$participant[$pi]{resource}".'"'.
+	    ' --desc "'.$participant[$pi]{comments}.'"'.
+	    " --neverexits --shutdown".
+	    ' --user "NT AUTHORITY\NetworkService" --passwd "xdash"'.
+	    " -e CYGWIN=ntsec\n";
+	    print SERVICE 'sc failure $service'.
+	    "  reset= 0 actions= restart/10000\n\n";
+	    print SERVICE 'sc query $service',"\n";
+	    print SERVICE 'sc qfailure $service',"\n\n";
+	    close( SERVICE );
+	}
+
+	if ( $participant[$pi]{OSname} eq 'linux' ) {
+	    print "Linux inittab template for $participant[$pi]{username}\@$participant[$pi]{hostname}/$participant[$pi]{resource} created in the directory ./$jclientpath.\n";
+	    open(SERVICE, "> $jclientpath".'/inittab.tmpl');
+	    print SERVICE "# [1] This entry should be put into /etc/inittab at the end of the file.\n".
+	    "# [2] Please uncomment and change the xD to an id sticking to the inittab rules.\n".
+	    "# [3] Correct, if needed, runleveles according to your linux distribution.\n".
+        "# [4] Test with :once: if everything OK, run with :respawn:\n\n";
+    	    print SERVICE "# xDash agent / $participant[$pi]{username}\@$participant[$pi]{hostname}/$participant[$pi]{resource} - $participant[$pi]{comments}.\n";
+    	    print SERVICE "#xD:23:once:$participant[$pi]{homepath}/$jclientpath/$participant[$pi]{filename}\n";
+            print SERVICE "#xD:23:respawn:$participant[$pi]{homepath}/$jclientpath/$participant[$pi]{filename}\n";
+    	}
+    }
+}
+
+sub usage {
+    print <<EOU;
+
+USAGE:
+$0 filename
+
+DESCRIPTION:
+xdosr creates for scripts: sender, receiver and archivist registration files 
+with Windows NT/2k/XP and Linux in the directories with the name of their JID. 
+The usage is described in the generated files. The only input parameter is 
+a file. The records in the input file must have the format: description; role; 
+hostname; port; username; password; resource; operating system; home path. 
+The role can be only: sender, receiver or archivist. Comments have to start 
+with #.
+
+EOU
+exit 1
+}

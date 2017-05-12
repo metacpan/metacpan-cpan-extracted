@@ -1,0 +1,17 @@
+#!/bin/bash
+# Copyright 2004 Jerzy Wachowiak
+
+if [ -z "$1" ]
+then
+        echo "
+USAGE:
+./chmod-xd options
+
+DESCRIPTION:
+chmod-xd changes permissions for files listed in the chmod-xd script,
+see chmod command description for options details
+"
+	exit 1
+fi
+
+chmod -v $1 straw xdclean xdcnf xdgo xdosr xdpg xdpkg xdreg xdscr xdstraw

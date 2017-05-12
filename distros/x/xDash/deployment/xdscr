@@ -1,0 +1,367 @@
+#!/usr/bin/perl  
+# Copyright Jerzy Wachowiak
+
+use strict;
+use warnings;
+use Text::CSV_XS;
+use xdSRA;
+
+my $filepath = shift;
+my $database_name = shift;
+
+defined( $filepath ) or usage();
+defined( $database_name ) or usage();
+
+my $result = xdSRA::create_sra_from( $filepath );
+my @sender = @{ $result->{sender} };
+my @receiver = @{ $result->{receiver} };
+my @archivist = @{ $result->{archivist} };
+
+print "\n---Start creating script files---\n";
+my $jclientpath;
+for my $si (0..$#sender) {
+    $jclientpath = "$sender[$si]{username}\@$sender[$si]{hostname}"
+    ."_$sender[$si]{resource}";
+    xdSRA::create_directory( $jclientpath ); 
+    $sender[$si]{filename} = 'sender';
+    print "Sender script $sender[$si]{filename} created in the directory"
+    ." $sender[$si]{username}\@$sender[$si]{hostname}_$sender[$si]{resource}\n";
+    my $script = << 'EOS';
+#!/usr/bin/perl 
+# xDash - Asynchronous Messaging and Instant Messaging reunited
+
+#===
+package EventLogger;
+use base xDash::Logger::File;
+# Check the correct file path for logger (absolute path if daemon!) and
+# Uncomment 1.line and comment out 2.line below after debugging,
+#sub Open { shift->SUPER::Open( <event_logger_path> ) }
+sub Open { shift->SUPER::Open( STDOUT ) }
+
+
+package ErrorLogger;
+use base xDash::Logger::File;
+# Check the correct file path for logger (absolute path if daemon!) and
+# Uncomment 1.line and comment out 2.line below after debugging.
+#sub Open { shift->SUPER::Open( <error_logger_path> ) }
+sub Open { shift->SUPER::Open( STDERR ) }
+
+package MessageLogger;
+# Uncomment the 1.line and comment out 2.line & 3.line below after debugging.
+#use base xDash::Logger::Dumb;
+use base xDash::Logger::File;
+sub Open { shift->SUPER::Open( STDOUT ) }
+
+package Spool;
+# Test settings:
+use base xDash::Spool::Dummy;
+sub SetParameters { shift->SUPER::SetParameters( 
+ event_limit => 20, mean_interoccurence_time => 5 ) }
+
+# Change if you have your own implemantation or 
+# Comment out the test settings above and uncomment the 1.line & 3.line below.
+#use base xDash::Spool::Dir;
+# Do not forget to create spool directory (absolute path if daemon!).
+#sub SetParameters { shift->SUPER::SetDirPath( <spool_path> ) }
+#===
+
+package main;
+use strict;
+use warnings;
+use xDash::Sender;
+
+my $sender = new xDash::Sender;
+
+# After debugging change:
+# daemon => 1, for running as daemon (daemon => O, console usage)
+# delay => 10, for waiting 10 seconds before becomming a daemon
+# timeout => 100, for waiting 100 seconds to try to reconnect
+# wait => 100, for waiting 100 seconds on the job confirmation from Archivist
+# Test settings:
+$sender->SetMode( daemon => 0, delay => 0, timeout => 100, wait => 100 );
+
+# Parameters from sender.xml and default connection parameters 
+# from package Net::Jabber::Client (::Connect()) can be overriden here:
+#	hostname => string, port => integer,
+# 	connectiontype => tcpip|http, ssl => 0|1
+# Uncomment if needed, method is optional.
+# $sender->SetConnectionParameters( ... => ... , );
+
+# Set Subject to everything, what helps to track jobs better 
+# (below alias name from the archiv database).
+$sender->SetJobSubject( <sender_id> );
+
+# Initiate Sender's and Archivist's JIDs (absolute path if daemon!)
+$sender->SetParticipants( <configuration_path> );
+
+# Spool check interval all 5 seconds, change if needed.
+$sender->SetSpoolCheckInterval( 5 ); 
+
+# A comma separated list of spool error numbers on which Sender's script dies 
+# and is restarted by the operating system.
+$sender->SetRestartSpoolError( 1 );
+
+# Go on ...
+$sender->Process();
+EOS
+	
+    defined( $sender[$si]{homepath} ) or $sender[$si]{homepath} = '.';
+
+    $script =~
+     s/<event_logger_path>/'$sender[$si]{homepath}\/$jclientpath\/event.log'/g;
+    $script =~
+     s/<error_logger_path>/'$sender[$si]{homepath}\/$jclientpath\/error.log'/g;
+    $script =~
+     s/<spool_path>/'$sender[$si]{homepath}\/$jclientpath\/spool'/g;
+    $script =~ s/<sender_id>/'sender$sender[$si]{id}'/g;
+    $script =~
+     s/<configuration_path>/'$sender[$si]{homepath}\/$jclientpath\/sender.xml'/g;
+
+    open( SCRIPT, ">> $jclientpath/$sender[$si]{filename}" );
+    print SCRIPT $script;
+    close( SCRIPT )
+}
+
+for my $ri (0..$#receiver) {
+    $jclientpath = "$receiver[$ri]{username}\@$receiver[$ri]{hostname}"
+    ."_$receiver[$ri]{resource}";
+    xdSRA::create_directory( $jclientpath ); 
+    
+    $receiver[$ri]{filename} = 'receiver';
+    print "Receiver script $receiver[$ri]{filename} created in the directory"
+    ." $receiver[$ri]{username}\@$receiver[$ri]{hostname}_"
+    ."$receiver[$ri]{resource}\n";
+    my $script = << 'EOS';
+#!/usr/bin/perl 
+# xDash - Asynchronous Messaging and Instant Messaging reunited
+
+#===
+package EventLogger;
+use base xDash::Logger::File;
+# Check the correct file path for logger (absolute path if daemon!) and
+# Uncomment 1.line and comment out 2.line below after debugging.
+#sub Open { shift->SUPER::Open( <event_logger_path> ) }
+sub Open { shift->SUPER::Open( STDOUT ) }
+
+package ErrorLogger;
+use base xDash::Logger::File;
+# Check the correct file path for logger (absolute path if daemon!) and
+# Uncomment 1.line and comment out 2.line below after debugging.
+#sub Open { shift->SUPER::Open( <error_logger_path> ) }
+sub Open { shift->SUPER::Open( STDERR ) }
+
+package MessageLogger;
+# Uncomment the 1.line and comment out 2.line & 3.line below after debugging.
+#use base xDash::Logger::Dumb;
+use base xDash::Logger::File;
+sub Open { shift->SUPER::Open( STDOUT ) }
+#===
+
+package main;
+use strict;
+use warnings;
+use xDash::Receiver;
+
+# Establish first local communication to the application receiving jobs
+# (die at this place, if not possible, and let the OS restart everything) 
+# and then...
+
+my $receiver = new xDash::Receiver;
+
+# After debugging change:
+# daemon => 1, for running as daemon (daemon => O, console usage)
+# delay => 10, for waiting 10 seconds before becomming a daemon
+# timeout => 100, for waiting 100 seconds to try to reconnect
+# Test settings:
+$receiver->SetMode( daemon => 0, delay => 0, timeout=> 100 );
+
+# Parameters from receiver.xml and default connection parameters 
+# from package Net::Jabber::Client (::Connect()) can be overriden here:
+#	hostname => string, port => integer,
+# 	connectiontype => tcpip|http, ssl => 0|1
+# Uncomment if needed, method is optional.
+# $receiver->SetConnectionParameters( ... => ... , );
+
+# Set Subject to everything, what helps to track better jobs
+# (below alias name from the archiv database).
+$receiver->SetJobSubject( <receiver_id> );
+
+# Initiate Receiver's and Archivist's JIDs (absolute path if daemon!)
+$receiver->SetParticipants( <configuration_path> );
+
+# Set job callback function for incomming jobs
+# (You habe to implement you own job handling - see some lines below...).
+$receiver->SetJobCallback( \&job_execution );
+
+# Go on ...
+$receiver->Process();
+
+#===========
+#  CUSTOM: This should be implemented as the script doing integration
+#===========
+    
+sub job_execution {
+    
+    # Unique ID of the transported data
+    my $thread = shift;  
+    
+    # Data transported inside of the message from Sender
+    my $job = shift; 
+            
+    # Use for critical part of the internal script: eval{...}; if($!){...} 
+    eval { 
+     print "\n THIS JOB EXECUTION SCRIPT NEEDS STILL TO BE IMPLEMENTED !!!\n\n"
+    };
+    if ($!) { print "Ups, some error...!\n"};
+    
+    # If everything OK make return without any parameters or
+    # only optional response of your choice:
+     
+    return { response => '  ~{:-)  ' };
+        
+    # if the were some troubles:
+    return { 
+
+	    # Beware of jabber internal error codes: 400-409, 500-510
+	    # carried also by the coresponding jabber message tag    
+	    error_code => '1001',
+
+	    # Your optional error description
+	    error => 'hocus pocus',
+
+	    # Your optional response
+	    response => '  ~{:-(  '
+	    }
+}
+EOS
+	
+    defined( $receiver[$ri]{homepath} ) or $receiver[$ri]{homepath} = '.';
+
+    $script =~
+     s/<event_logger_path>/'$receiver[$ri]{homepath}\/$jclientpath\/event.log'/g;
+    $script =~ 
+     s/<error_logger_path>/'$receiver[$ri]{homepath}\/$jclientpath\/error.log'/g;
+    $script =~ s/<receiver_id>/'receiver$receiver[$ri]{id}'/g;
+    $script =~
+     s/<configuration_path>/'$receiver[$ri]{homepath}\/$jclientpath\/receiver.xml'/g;
+
+    open( SCRIPT, ">> $jclientpath/$receiver[$ri]{filename}" );
+    print SCRIPT $script;
+    close( SCRIPT )
+
+};
+
+for my $ai (0..0) {
+    $jclientpath = "$archivist[$ai]{username}\@$archivist[$ai]{hostname}_$archivist[$ai]{resource}";
+    xdSRA::create_directory( $jclientpath ); 
+    $archivist[$ai]{filename} = 'archivist';
+    print "Archivist script $archivist[$ai]{filename} created in the directory"
+    ." $archivist[$ai]{username}\@$archivist[$ai]{hostname}_$archivist[$ai]{resource}\n";
+    my $script = << 'EOS';
+#!/usr/bin/perl 
+# xDash - Asynchronous Messaging and Instant Messaging reunited
+
+#===
+package EventLogger;
+use base xDash::Logger::File;
+# Check the correct file path for logger (absolute path if daemon!) and
+# Uncomment 1.line and comment out 2.line below after debugging.
+#sub Open { shift->SUPER::Open( <event_logger_path> ) }
+sub Open { shift->SUPER::Open( STDOUT ) }
+
+package ErrorLogger;
+use base xDash::Logger::File;
+# Check the correct file path for logger (absolute path if daemon!) and
+# Uncomment 1.line and comment out 2.line below after debugging.
+#sub Open { shift->SUPER::Open( <error_logger_path> ) }
+sub Open { shift->SUPER::Open( STDERR ) }
+
+package MessageLogger;
+# Check the correct file path for logger and
+# Uncomment the 1.line and comment out 2.line & 3.line below after debugging.
+#use base xDash::Logger::Dumb;
+use base xDash::Logger::File;
+sub Open { shift->SUPER::Open( STDOUT ) }
+
+package EmergencyLogger;
+# Check the correct file path for logger (absolute path if daemon!).
+use base xDash::Logger::File;
+sub Open { shift->SUPER::Open( <emergency_logger_path> ) }
+
+package Archive;
+use base xDash::Archive::Pg;
+# Set up your own database access parameters 
+sub SetParameters { shift->SUPER::SetDatabaseConnection(
+ name => <database_name>, user => '', password => '' ) }
+#===
+
+package main;
+use strict;
+use warnings;
+use xDash::Archivist;
+
+my $archivist = new xDash::Archivist;
+
+# After debugging change:
+# daemon => 1, for running as daemon (daemon => O, console usage)
+# delay => 10, for waiting 10 seconds before becomming a daemon
+# timeout => 100, for waiting 100 seconds to try to reconnect
+# Test settings:
+$archivist->SetMode( daemon => 0, delay => 0, timeout => 100 );
+
+# Parameters from archivist.xml and default connection parameters 
+# from package Net::Jabber::Client (::Connect()) can be overriden here:
+#	hostname => string, port => integer,
+# 	connectiontype => tcpip|http, ssl => 0|1
+# Uncomment if needed, method is optional.
+# $archivist->SetConnectionParameters( ... => ... , );
+
+# Initiate Archivist's JID (absolute path if daemon!)
+$archivist->SetParticipants( <configuration_path> );
+
+# A comma separated list of archive error numbers on which Archivist's script
+# dies and is restarted by the operating system.
+$archivist->SetRestartArchiveError( -1 );
+
+# Go on ...
+$archivist->Process();
+EOS
+	
+    defined( $archivist[$ai]{homepath} ) or $archivist[$ai]{homepath} = '.';
+
+    $script =~
+     s/<event_logger_path>/'$archivist[$ai]{homepath}\/$jclientpath\/event.log'/g;
+    $script =~
+     s/<error_logger_path>/'$archivist[$ai]{homepath}\/$jclientpath\/error.log'/g;
+    $script =~
+     s/<emergency_logger_path>/'$archivist[$ai]{homepath}\/$jclientpath\/emergency.log'/g;
+    $script =~
+     s/<configuration_path>/'$archivist[$ai]{homepath}\/$jclientpath\/archivist.xml'/g;
+    $script =~
+     s/<database_name>/'$database_name'/g;
+    open( SCRIPT, ">> $jclientpath/$archivist[$ai]{filename}" );
+    print SCRIPT $script;
+    close( SCRIPT )
+
+};
+print "---End creating script files---\n";
+exit;
+
+sub usage {
+    print <<EOU;
+
+USAGE:
+$0 filename database_name
+
+DESCRIPTION:
+xdscr creates scripts for Sender, Receiver and Archivist execution files 
+in the directories with the name of their JID. The usage and needed 
+customisation are described in the generated files. The input parameters are 
+the file and database name. The records in the input file must have the 
+format: description; role; hostname; port; username; password; resource;
+operating system; home path. The role can be only: sender, receiver 
+or archivist. Comments have to start with #.
+
+EOU
+exit 1
+}

@@ -1,0 +1,145 @@
+#!/usr/bin/perl
+# Copyright 2004 Jerzy Wachowiak
+
+use strict;
+use warnings;
+use DBI;
+use Getopt::Std;
+
+# Option retrival
+getopts( "gbfrwtho:d:u:p:" );
+our ( $opt_g, $opt_b, $opt_f, $opt_r, $opt_w, $opt_t, $opt_o, $opt_h );
+our( $opt_d, $opt_u, $opt_p );
+unless ( $opt_g or $opt_b or $opt_f or $opt_r or $opt_w or $opt_t or $opt_o 
+or $opt_h or $opt_d ){ $opt_h = 1 };
+
+if ( defined($opt_h) ){
+    print <<EOU;
+
+USAGE: 
+$0 -d database [-u user] [-p password] [-gbrfwt] [-o time]
+
+DESCRIPTION:
+xdlist displays message statistics from the database:
+-g\t\tgood jobs, jobs done by receiver without errors (option);
+-b\t\tbad jobs, some errors reported by receiver (option);
+-r\t\trunning job, sender or receiver message still missing (option);
+-f\t\tfinished jobs, both sender and receiver sent a message (option);
+-w\t\twarning, messages with the same thread arrived several times
+\t\tfrom sender or receiver (option);
+-o time\t\tat least delta time in seconds between sender and receiver 
+\t\tmessage arrival (option); 
+-t\t\tlists only threads, no other information (option);
+-d name\t\tPostgreSQL database name;
+-u user\t\tusername, if no switch, root assumed;
+-p password\tuser password, if no switch, root password assumed.
+
+EOU
+    exit 0
+}
+
+# Database with most common values for root on postgresql:
+my $DBIdriver = "dbi:Pg:dbname="; 
+my $database;
+$database = $opt_d if $opt_d;
+unless( defined( $database ) ){
+    print "$0: Switch -d is missing.\n";
+    exit 1
+}
+my $DBIuser = "";
+$DBIuser = $opt_u if $opt_u;
+my $DBIpassword = "";
+$DBIpassword = $opt_p if $opt_p;
+
+
+my %attr = ( PrintError=>1, RaiseError=>1 ); 
+my $dbh = DBI->connect( $DBIdriver.$database, $DBIuser, $DBIpassword, \%attr );
+
+# Preparing sender occurence condition ...
+my @senders;
+my @sender_occurence;
+my $sth = $dbh->prepare( "select alias_in_statistics from senders;" );
+$sth->execute();
+my ( @row, $DBalias );
+my $i = 0;
+while( @row = $sth->fetchrow_array() ){
+    $DBalias = $row[0];
+    $DBalias=~s/^\s+//;
+    $DBalias=~s/\s+//;
+    $senders[$i] = $DBalias;
+    $sender_occurence[$i] = $DBalias."_occurence";
+    $i++
+}
+my $so_condition="";
+foreach $i ( @sender_occurence ){
+    $so_condition=join ( ' + ', @sender_occurence );
+    }
+$so_condition = "($so_condition)";
+
+# Preparing receiver occurence condition ...
+my @receivers;
+my @receiver_occurence;
+$sth = $dbh->prepare( "select alias_in_statistics from receivers;" );
+$sth->execute();
+$i = 0;
+while( @row = $sth->fetchrow_array() ){
+    $DBalias = $row[0];
+    $DBalias=~s/^\s+//;
+    $DBalias=~s/\s+//;
+    $receivers[$i] = $DBalias;
+    $receiver_occurence[$i] = $DBalias."_occurence";
+    $i++
+}
+my $ro_condition="";
+foreach $i ( @receiver_occurence ){
+    $ro_condition=join ( ' + ', @receiver_occurence )
+    }
+$ro_condition = "($ro_condition)";
+
+# Main body:
+my $sqlcommand;
+if ( $opt_t ){
+    $sqlcommand = "select thread from statistics where true "
+}
+else {
+    $sqlcommand = "select * from statistics where true "
+}
+
+# Option good
+my $good = " and (error_counter = 0) ";
+$sqlcommand =  $sqlcommand.$good if $opt_g;
+
+# Option bad
+my $bad = " (error_counter > 0) ";
+if ( defined( $opt_b ) and defined( $opt_g ) ){
+    $sqlcommand = " $sqlcommand or $bad "
+}
+elsif ( defined( $opt_b ) and !defined( $opt_g ) ){
+    $sqlcommand =  "$sqlcommand and $bad "
+}
+
+# Option finished:
+my $finished = " and ($ro_condition >0 and $so_condition > 0) ";
+$sqlcommand =  $sqlcommand.$finished if $opt_f;
+
+# Option running:
+my $running = " ($ro_condition = 0 or $so_condition = 0) ";
+if ( defined( $opt_r ) and defined( $opt_f ) ){
+    $sqlcommand = " $sqlcommand or $running "
+}
+elsif ( defined( $opt_r ) and !defined( $opt_f ) ){
+    $sqlcommand =  "$sqlcommand and $running "
+}
+
+# Option at least time:
+$sqlcommand =  $sqlcommand." and (deltatime >= $opt_o) " if $opt_o;
+
+# Option warnining:
+my $warning = " and ($ro_condition > 1 or $so_condition > 1) ";
+$sqlcommand =  $sqlcommand.$warning if $opt_w;
+
+$sth = $dbh->prepare( $sqlcommand );
+$sth->execute();
+while( @row = $sth->fetchrow_array() ){ print join("; ", @row), "\n" };
+$dbh->disconnect();
+exit 0

@@ -1,0 +1,21 @@
+#! env perl
+
+BEGIN {
+    use Modern::Perl;
+    my $format = shift @ARGV;
+    eval "use XML::Tag::$format";
+    die $@ if $@; 
+}
+
+my $sub; do {
+    local $/; 
+    $sub = eval sprintf 'sub {%s}',  <STDIN>;
+    die $@ if $@;
+};
+
+print $sub->();
+
+=head1 p5-xml-tags
+
+this is a filter for the C<XML::Tags> module
+

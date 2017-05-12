@@ -1,0 +1,100 @@
+__END__
+######################## User Documentation ##################
+
+=pod
+
+=head1 NAME
+
+xDash - Framework for publish/subscribe integration of applications
+
+=head1 DESCRIPTION
+
+xDash is a framework for publish/subscribe integration of applications
+(EAI). xDash is using Jabber as communication 
+protocol and implementing the concept of convergence between 
+backend asynchronous messaging and instant messaging.
+
+Survival strategy of the xDash integration architecture:
+
+=over
+
+=item The show must go on! 
+
+The foremost aim of the integration 
+project is to provide reliable communication between applications, 
+close to the real time from the integrated applications point of view. 
+The data, which should be published to other applications, 
+has to be processed as soon as possible, even at the cost of 
+processing the same data again. 
+This means, that the working strategy of xDash must be fault 
+tolerant, also to the internal problems.
+
+=item Lazy evaluation
+
+xDash assumes that in 99% cases everything 
+goes well and does things only when really needed. Processing 
+information like data extraction and transformation is done 
+where the information is used.
+
+=item Storing only as much information as needed
+
+Only as much information should be kept persistent 
+as it is needed to reconstruct and relaunch an action in case something 
+went wrong.
+
+=back
+
+xDash frameworks consists of three main modules: C<xDash::Sender>, 
+C<xDash::Receiver>, C<xDash::Archivist> and some other supporting modules.
+Modules are developed in the object orientated way. If you need to customize/extend
+functionality of the tree main modules, you have to provide 
+your own base classes/modules for some tasks, which have to implement a fixed 
+set of methods (driver pattern). If you think, they can be reused, 
+make them public over CPAN in the xDash namespace!
+
+For detailed conceptual description, how xDash framework works, please refer to 
+L<http://xdash.jabberstudio.org>.
+
+For hints, how to implement integration scripts based on xDash framework, 
+please refer to L<xDash::Sender>, L<xDash::Receiver> and L<xDash::Archivist>.
+
+For xDash deployment use tools from the directory F<deployment>. 
+Read the F<deployment/README.txt> or usage 
+information embedded into scripts! 
+You can find an introduction to the deployment: I<Planning and deploying xDash 
+in a sandbox> at L<http://xdash.jabberstudio.org/deployment/perl> 
+
+For xDash administration use tools from the directory F<admin>. 
+Read the F<admin/README.txt> or usage information 
+embedded into scripts!
+
+=head1 BUGS
+
+Any suggestions for improvement are welcomed!
+
+If a bug is detected or nonconforming behavior, 
+please send an error report to <jwach@cpan.org>.
+Please attache log entries, if possible.
+
+=head1 COPYRIGHT
+
+Copyright 2005 Jerzy Wachowiak <jwach@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the Apache 2.0 license attached to the module.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<xDash::Sender>
+
+=item L<xDash::Receiver>
+
+=item L<xDash::Archivist>
+
+=item L<http://xdash.jabberstudio.org>
+
+=back
+
+=cut

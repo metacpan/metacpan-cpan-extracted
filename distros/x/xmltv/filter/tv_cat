@@ -1,0 +1,83 @@
+#!/usr/bin/perl -w
+
+=pod
+
+=head1 NAME
+
+tv_cat - Concatenate XMLTV listings files.
+
+=head1 SYNOPSIS
+
+tv_cat [--help] [--output FILE] [FILE...]
+
+=head1 DESCRIPTION
+
+Read one or more XMLTV files and write a file to standard ouput whose
+programmes are the concatenation of the programmes in the input files,
+and whose channels are the union of the channels in the input files.
+
+B<--output FILE> write to FILE rather than standard output
+
+The treatment of programmes and channels is slightly different because
+for programmes, the ordering is important (typically programmes are
+processed or displayed in the same order as they appear in the input)
+whereas channels are just a set indexed by channel id.  There is a
+warning if channel details clash for the same id.
+
+One more wrinkle is the credits (source, generator and so on), they
+are taken from one of the files and then thereE<39>s a warning if the
+other files differ.  If two input files have different character
+encodings, then it is not meaningful to combine their data (without
+recoding or other processing) and tv_cat die with an error message.
+
+This tool is rather useless, but it makes a good testbed for the XMLTV
+module.
+
+=head1 SEE ALSO
+
+L<xmltv(5)>.
+
+=head1 AUTHOR
+
+Ed Avis, ed@membled.com
+
+=cut
+
+use strict;
+use XMLTV::Version '$Id: tv_cat,v 1.18 2003/10/25 09:59:27 epaepa Exp $ ';
+use Getopt::Long;
+
+# Use Log::TraceMessages if installed.
+BEGIN {
+    eval { require Log::TraceMessages };
+    if ($@) {
+	*t = sub {};
+	*d = sub { '' };
+    }
+    else {
+	*t = \&Log::TraceMessages::t;
+	*d = \&Log::TraceMessages::d;
+	Log::TraceMessages::check_argv();
+    }
+}
+
+use XMLTV;
+use XMLTV::Usage <<END
+$0: concatenate listings, merging channels
+usage: $0 [--help] [--output FILE] [FILE...]
+END
+;
+
+my ($opt_help, $opt_output);
+GetOptions('help' => \$opt_help, 'output=s' => \$opt_output) or usage(0);
+usage(1) if $opt_help;
+@ARGV = ('-') if not @ARGV;
+
+my %w_args = ();
+if (defined $opt_output) {
+    my $fh = new IO::File ">$opt_output";
+    die "cannot write to $opt_output\n" if not $fh;
+    %w_args = (OUTPUT => $fh);
+}
+
+XMLTV::catfiles(\%w_args, @ARGV);

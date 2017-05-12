@@ -1,0 +1,8 @@
+# port;5222;;;;;;;
+# hostname;xdash;;;;;;;
+# role;sender;receiver;archivist;;;;;
+# OS;linux;cygwin;;;;;;
+#Description;Role;Hostname;Port;Username;Password;Resource;Operating System;Homepath
+Example of event producer;sender;xdash;5222;s.sandy;secret;PC;linux; /root/Ex1S1R
+Example of event consumer;receiver;xdash;5222;r.rachel;secret;PC;cygwin; /home/Ex1S1R
+Example of event archivist;archivist;xdash;5222;a.archi;secret;PC;linux; /root/Ex1S1R

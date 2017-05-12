@@ -1,0 +1,9 @@
+Revision history for xDT-Parser
+
+1.00    2017-04-24T12:00
+        Parser finished.
+	Made the xDT::RecordType configurable by xml. (Documentation available at L<http://search.cpan.org/dist/xDT-RecordType/>
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
