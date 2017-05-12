@@ -1,0 +1,3 @@
+[% IF self.container_tag.defined %]<[% self.container_tag %][% process_attrs(self.container_attributes) %]>
+[% END %][% content %][% IF self.container_tag.defined %]
+</[% self.container_tag %]>[% END %]

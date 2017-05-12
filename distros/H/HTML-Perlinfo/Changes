@@ -1,0 +1,228 @@
+Revision history for Perl extension HTML::Perlinfo 
+
+1.69 Changes
+     Base.pm:
+     -Created a new method 'print_htmlstart' to handle the doctype declaration
+     -Created a new constructor option 'htmlstart' for this method (default is true)
+     -Modified the HTML and CSS in print_htmlhead, by adding a new id 'perlinfo'.
+     -Modified info_apache to check for print_httpd() 
+     HTML::Perlinfo::Modules:
+     -Fixed get_files_in sub to check if file_path is defined
+
+1.68 Fixed makefile to include "perlinfo", thanks to Kurt Jaeger
+
+1.67 distzilla messed up the release, releasing again!
+
+1.66 Fixed distfile, included dist.ini
+
+1.65 Fixed subroutine redefine errors (perlinfo script) #1 with patch from Baldur Kristinsson
+
+1.64 Added git repo and bumped version number in Perlinfo.pm
+
+1.63 Fixes for bugs 87048, 86552, 78637: Use of qw(...) as parentheses is deprecated error.
+
+1.61 No Changes
+     I am trying to avoid the world writables policy on pause.
+     The last version was fine, but I am trying to lose the 
+     'withoutworldwritables' ext. 
+    
+1.60 Changes
+      HTML::Perlinfo::Modules
+      -Improved the version extraction method for modules. 
+       HTML::Perlinfo will show its version now in INFO_MODULES     
+
+1.59 Changes
+      -HTML::Perlinfo now validates as XHTML 1.0 Transitional.
+      -Updated the perlinfo utility with INFO_GENERAL
+      -Added 5 new tests.
+      -Bug fixes:
+	HTML::Perlinfo::Modules
+	-The module description was not escaping POD tags, so some abstracts were garbled. 
+	Fixed now. 
+
+1.58 Changes
+      -Changed title from 'Loaded Files' to 'Loaded Modules' for INFO_LOADED.
+      -Minor POD update.
+      -Bug fixes:
+	INFO_GENERAL wasn't listed as an option in the perlinfo routine.
+
+1.57 Changes
+     -Removed INFO_CREDITS. This option would always have been out of 
+date as soon as a new Perl release. Plus, the JavaScript link on 
+INFO_ALL was causing errors for certain security levels of IE. Besides, 
+it is not very useful. Perhaps the option will return in a future release. 
+     -Removed CGI::Carp 'fatalsToBrowser'. Having this there seemed 
+like a good idea, until I realized that its inclusion, forced its usage
+ for users of HTML::Perlinfo. Since I don't like forcing anything on anyone,
+ it has been removed.
+     -Removed the test program (HTML::Perlinfo.t). I couldn't solve all of 
+the persistent errors and I realized that it really makes no sense to include
+ tests for this module. I can use 'perlinfo' to see if the pages are rendered properly.  
+
+1.56 Changes
+       Bug fixes:
+	-Fixed some errors in HTML::Perlinfo::Modules
+
+1.55 Changes
+	Bug fixes:
+	-HTML::Perlinfo now runs under taint mode.
+ 	-Removed 3 problematic tests from HTML::Perlinfo.t.
+
+1.54 Changes
+	-HTML::Perlinfo::Loaded & HTML::Perlinfo no longer show in INFO_LOADED
+	-Added strict to HTML::Perlinfo::Modules. 
+	-Improved POD in HTML::Perlinfo & HTML::Perlinfo::Loaded
+	Bug fix:
+	-INFO_LOADED wasn't showing all the modules used. Fixed now. 
+
+1.53 Changes
+	-Added HTML::Perlinfo::Loaded module
+	-Added INFO_LOADED option to perlinfo
+	-Added 'files_in' option to HTML::Perlinfo::Modules
+	-Finally got around to cleaning up Perlinfo.pm. Now 100% fat free, no sodium. 
+	-Changed internal function print_htmlhead to print/return html
+	-Updated lots of POD
+
+1.52 Changes
+	-This version fixes a security vulnerability in HTML::Perlinfo::Modules that could lead to denial-of-service attacks
+        -The vulnerability was discovered by Moritz Lenz.
+	HTML::Perlinfo::Modules Changes: 
+        -HTML::Perlinfo::Modules no longer accepts regular expressions as arguments for the show_only, link, and color parameters.    
+	-POD updated
+	INFO_VARIABLES changes:
+	-Default title changed to 'Environment' from 'Environment Variables'
+	-Individual cookies are now listed from HTTP_COOKIE
+	-GET and POST values are also listed
+	INFO_APACHE changes:
+	-Apache titles will not appear if Apache is not detected
+	Bug fixes:
+	-POST values are now shown in INFO_VARIABLES
+
+1.51 Changes
+	INFO_APACHE changes:
+	-Removed App::Info. INFO_APACHE now relies 100% on environment variables.
+	-Due to this change, less Apache information is displayed. 
+	-Modified Makefile.PL, since App::Info is no longer optional.
+ 
+	-Improved error checking for perlinfo utility. 
+	-Removed underscores in INFO_VARIABLES. 
+	-Improved POD in Perlinfo.pm, added bug notice.
+
+1.50 Changes:
+	-Added perlinfo commandline utility. 
+	Bug fixes:
+	-Added missing section title to info_modules
+	-HTML::Perlinfo:Modules: italicized the word 'unknown' for unknown module versions 
+
+1.49 Changes:
+	-Makefile.PL changes: added use 5.006 and made App::Info optional
+	-Removed the following modules: Module::CoreList, IO::Socket, File::Which, CGI
+	-Added File::Which code to Common.pm, modified Apache.pm to make App::Info optional, 
+         and now HTML::Perlinfo no longer requires non-core modules
+	-Removed all images (ORA and mod_perl) and associated code. Simplicity is better than flash.
+	Bug fixes: 
+	-Fixed bug in Apache.pm that caused warnings of uninitialized value in concatenation (.) or string
+
+1.48 Changes:
+	Removed false disclaimer: "This is the last release ..."
+
+1.47 Changes:
+        *This is the last release of this module in this namespace.*
+        Bug fixes:
+        - Fixed Carp::croak to report error in the right place
+        - Changed Perl path value in INFO_GENERAL to $^X. Previously it was searching the path.   
+
+1.46 Changes:
+        - Fixed some annoying POD formatting errors
+
+1.45 Changes:
+	- Updated pod
+	- The description column appears in the perlinfo core module section
+	- The info_modules method/option shows the description, instead of the path 
+	HTML::Perlinfo::Modules
+	- Updated lots of pod
+	- Added 'desc' column
+	- Made the search_dir function better report @INC errors
+	- Rewrote some internal code
+	- Moved the check_my_args function to Common.pm, renamed it check_module_args
+
+1.44 Changes:
+	- Added titles to the perlinfo methods
+	- Improved pod
+	HTML::Perlinfo::Modules:
+	- Added columns parameter. This allowed me to rewrite a lot of internal code.
+	- Changed color parameter to exclude color section without 3rd element in array ref
+        - Improved pod
+        Bug fixes:
+        - Fixed a bug that excluded links of the config keys in the INFO_CONFIG section
+
+1.43 Bug fix that breaks old versions:
+	The previous version did not print the content-type header for HTML::Perlinfo::Modules. Upon
+	reflection, automatically printing the header is a bad idea anyway. So the perlinfo library 
+	no longer prints the content-type header. I added this feature a long time ago. But it causes 
+	more problems than anything else. Users must now print the header themselves.
+
+	Other changes:
+	- Added better titles to the perlinfo pages
+	- HTML::Perlinfo::Common:
+		* Changed the image locations per image hosting policy. 
+	- HTML::Perlinfo::Modules:
+		* print_modules now returns undef when no modules are found.
+		* Improved error reporting for the internal search_dir function
+	- HTML.pod:
+		* Added documentation for the print_htmlhead method.
+
+1.42 Bug fixes:
+	- HTML::Perlinfo::Modules:
+		* Major bug fix: print_modules was printing pages with full_page set to 0. 
+		  So added full_page option to print_modules. This option was mistakenly left out. 
+
+1.41 Changes:
+	- POD fixes and removal of 'use lib' from Perlinfo.pm
+
+1.40 Changes:
+	- Major reorganization of code. 
+        	* Added Base.pm to handle info methods
+        	* CSS methods removed. They can only be changed in the constructor now.
+		* Transplanted pod from HTML::Perlinfo::HTML into HTML::Perlinfo::HTML.pod. 
+		* Renamed HTML::Perlinfo::HTML.pm to HTML::Perinfo::Common.pm
+		* Various pod updates to HTML::Perlinfo::Modules and HTML.pod
+		* Removed info_modules test and created separate test for HTML::Perlinfo::Modules
+		* Turned HTML::Perlinfo::Apache into an internal module 
+		* Various improvements to Apache detection
+    		* mod_perl version is now listed in info_all and info_apache
+		* Removed no_links method and added universal links parameter
+    		* Added header and full_page attributes
+	- HTML::Perlinfo::Modules: 
+        	* Renamed named parameters 'show' and 'sort' to 'from' and 'sort_by' respectively.
+        	* The form parameter only accepts a directory or an array ref
+        	* Created the show_only, show_inc, show_dir, and section parameters
+        	* Improved the directory listing in the search summary
+	Bug fixes:
+		* Default links to the local file system have been removed. The links attribute can now turn them on. 
+
+1.25 Changes:
+	- Added HTML::Perlinfo::Modules version 1.0. This is the most significant change. 
+	- Moved the HTML docs to HTML::Perlinfo::HTML.
+	- Made HTML::Perlinfo::Credits and HTML::Perlinfo::HTML internal modules
+	- Removed Data-Dumper  
+	- Updated docs
+
+     Bug fixes:
+	- Fixed Apache version reporting
+	- Fixed failure to show more than 2 duplicate modules 
+
+1.05    
+    - Cleaned up some code that caused a few warnings in Config.pm and Perlinfo.pm 
+	- Moved links to a new links sub. Added no_links method.
+	- Added title method. Cleaned up some css code
+	- Added variable extraction for Apache version
+	- Made module version detection to be more silent with problems
+	- Simplified module directories listing
+	- Removed a potentially problematic test
+	- Updated pod and added security section
+
+1.00  Thu Aug 18 12:58:36 2005
+	- original version; created by h2xs 1.23 with options
+		-A -X -n HTML::Perlinfo
+

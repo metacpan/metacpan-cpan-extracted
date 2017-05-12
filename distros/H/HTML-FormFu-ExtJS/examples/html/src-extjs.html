@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>src</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" type="text/css" href="http://extjs.cachefly.net/ext-3.3.1/resources/css/ext-all.css">
+    <script type="text/javascript" src="http://extjs.cachefly.net/ext-3.3.1/adapter/ext/ext-base.js"></script>
+    <script type="text/javascript" src="http://extjs.cachefly.net/ext-3.3.1/ext-all.js"></script>
+<script type="text/Javascript">
+
+Ext.onReady(function(){
+
+    var simple = new Ext.FormPanel({"width":800,"baseParams":{"x-requested-by":"ExtJS"},"frame":true,"action":"","method":"post","title":"HTML::FormFu::ExtJS - src","id":"form","buttons":[],"items":[{"hideLabel":false,"name":"t1","fieldLabel":"a Text element","xtype":"textfield"},{"html":"<hr>Insert raw <a href=\"#\">html</a>"}]});;
+
+    simple.render(document.body);
+});
+</script>
+
+</head>
+<body>
+
+
+<a href="../forms/src.yml">Form config file</a><br/><br/>
+
+
+
+</body>
+</html>
+

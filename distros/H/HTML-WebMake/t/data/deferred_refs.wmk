@@ -1,0 +1,14 @@
+
+<content name=foo> ${foohdr} ${foobody} </content>
+
+<content name=foohdr>
+	This is the header. REQ2
+	Title: $[title]
+</content>
+
+<content name=foobody>
+	<{set title="The title: REQ1"}>
+	This is the content. REQ3
+</content>
+
+<out file=log/deferred_refs.html>${foo}</out>

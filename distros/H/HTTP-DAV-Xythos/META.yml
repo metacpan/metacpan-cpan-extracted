@@ -1,0 +1,18 @@
+---
+abstract: 'Subclass of HTTP::DAV which adds support for Xythos Ticket authentication.'
+author:
+  - 'Jesse Thompson'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+generated_by: 'Dist::Zilla version 2.101040'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTTP-DAV-Xythos
+recommends: {}
+requires:
+  HTTP::DAV: 0
+version: 1.101180

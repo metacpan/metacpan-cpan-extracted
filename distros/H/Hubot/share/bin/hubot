@@ -1,0 +1,109 @@
+#!/usr/bin/env perl
+use Hubot::Robot;
+use Cwd 'cwd';
+use File::Slurp qw/read_file/;
+use JSON::XS;
+use Getopt::Long::Descriptive;
+
+my ( $opt, $usage ) = describe_options(
+    "hubot %o <arg>",
+    [ 'adapter|a=s', 'The Adapter to use', { default => 'shell' } ],
+    [ 'name|n=s', 'The name of the robot in chat', { default => 'hubot' } ],
+    [ 'scripts|s=s', 'hubot-scripts.json file path' ],
+    [ 'create|c=s',  'Create a deployable hubot' ],
+    [ 'help',        'Display the help information' ],
+);
+
+print( $usage->text ), exit if $opt->help;
+
+if ( my $path = $opt->create ) {
+
+    exit;
+}
+
+my $robot = Hubot::Robot->new(
+    {   adapter => $opt->{adapter},
+        name    => $opt->{name},
+    }
+);
+
+$robot->alias( $opt->{alias} ) if $opt->{alias};
+
+$robot->adapter->on(
+    'connected',
+    sub {
+        my $cwd = cwd();
+        my $scriptsFile = $opt->{scripts} || "$cwd/hubot-scripts.json";
+        if ( -f $scriptsFile ) {
+            my $json    = read_file($scriptsFile);
+            my $scripts = decode_json($json);
+            $robot->loadHubotScripts($scripts);
+        }
+        else {
+            print "load built-in scripts\n";
+            $robot->loadHubotScripts( [ 'help', 'tweet', 'ascii', 'roles' ] );
+        }
+    }
+);
+
+$robot->run;
+
+=pod
+
+=head1 NAME
+
+hubot - convenience command line interface L<Hubot::Robot>.
+
+=head1 SYNOPSIS
+
+    $ hubot --help
+    $ echo '["help"]' > ./hubot-scripts.json    # `hubot-scripts.json` is required.
+    $ hubot
+    hubot> hubot help
+    # hubot: help <command>
+    hubot> exit
+
+    # irc?
+    $ HUBOT_IRC_ROOMS='#myroom' \
+      HUBOT_IRC_SERVER='irc.myserver.com' \
+      HUBOT_IRC_PORT=6667 \
+      hubot -a irc
+
+    # campfire?
+    $ HUBOT_CAMPFIRE_TOKEN='xxxx' \
+      HUBOT_CAMPFIRE_ROOMS='1234' \
+      HUBOT_CAMPFIRE_ACCOUNT=myaccount \
+      hubot -a campfire
+
+    $ perldoc Hubot
+    $ perldoc Hubot::Adapter::Irc
+    $ perldoc Hubot::Adapter::Campfire
+
+=head1 DESCRIPTION
+
+C<hubot> is a Command Line Interface for L<Hubot>.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Hubot>
+
+=item L<Hubot::Adapter::Irc>
+
+=item L<Hubot::Adapter::Campfire>
+
+=back
+
+=head1 AUTHOR
+
+Hyungsuk Hong <hshong@perl.kr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Hyungsuk Hong.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,41 @@
+HTML-Widgets-NavMenu
+====================
+
+HTML::Widgets::NavMenu generates a navigation menu for a site. It can also
+generate a complete site map, a path of leading components, and also keeps
+track of navigation links ("Next", "Prev", "Up", etc.)
+
+It accepts as input a nested tree with the input for the various nodes in
+the site, and generates the HTML as output. It has a detailed API documentation
+in the embedded POD, and many examples in the tests and in sites created
+by the author. Currently, it lacks developer's and extender's information,
+but hopefully one can find his way around the code easily enough.
+
+HTML::Widgets::NavMenu is covered by many automated tests.
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+after you install all of its dependencies.
+
+Alternatively use the CPAN.pm module:
+
+    # perl -MCPAN -e 'install HTML::Widgets::NavMenu'
+
+Or the new CPANPLUS.pm module
+
+    # perl -MCPANPLUS -e 'install HTML::Widgets::NavMenu'
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Shlomi Fish
+
+This library is free software; you can redistribute it and/or modify
+it under the MIT X11 license. (see the file COPYING for its text.)
+

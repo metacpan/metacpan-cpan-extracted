@@ -1,0 +1,31 @@
+=head1 NAME
+
+latin - just some example code using HTML::Stream::Latin1
+
+=cut
+
+
+use HTML::Stream;
+
+accept_tag HTML::Stream 'BLORF';
+
+$PLAIN = new HTML::Stream \*STDOUT;
+$LATIN = new HTML::Stream::Latin1 \*STDOUT;
+
+sub test {
+    my $HTML = shift;
+    $HTML -> nl 
+	  -> H2 -> t("From ", ref($HTML), "...") -> _H2
+	  -> nl;
+    $HTML -> t(qq{\253Fran\347ois, },
+	       qq{a \"right angle\" is 90\260, \277No?\273}) -> nl;
+    $HTML -> P  -> t("This example uses \\251: Copyright \251 1997 by me!")
+          -> BR -> t("This example uses ent(): Copyright ") 
+	        -> e('copy') -> t(" 1997 by me!");
+    $HTML -> P -> BLORF -> t("Hi!") -> _BLORF -> nl;
+    $HTML -> BLORF -> t("Hi!") -> _BLORF;
+    $HTML -> nl(2);
+}
+test($PLAIN);
+test($LATIN);
+

@@ -1,0 +1,19 @@
+HTML-Zoom-Parser-HH5P
+=====================
+
+Created:      2012-12-21
+Home page:    <https://metacpan.org/release/HTML-Zoom-Parser-HH5P>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=HTML-Zoom-Parser-HH5P>
+Maintainer:   Toby Inkster <mailto:tobyink@cpan.org>
+
+0.002  2013-05-28
+
+ - (Update) HTML::Zoom changed the syntax for
+   add_to_attribute/set_attribute methods; support newer syntax.
+
+0.001  2012-12-26  # Initial release
+
+
+0.000_01  2012-12-22  # Preview / experiment
+
+

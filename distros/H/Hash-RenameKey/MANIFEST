@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Hash-RenameKey.t
+lib/Hash/RenameKey.pm
+META.yml                                 Module meta-data (added by MakeMaker)

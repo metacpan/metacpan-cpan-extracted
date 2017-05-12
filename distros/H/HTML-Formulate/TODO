@@ -1,0 +1,57 @@
++ implement support for hidden, display, and readonly fields
++ implement first-pass support for selects
++ add support for submit => 'SCALAR' (or 1), for just one submit button
++ should default be submit => 1 ? 
++ check submit => undef does the right thing
++ add xhtml support, closing empty tags like <input /> and <br /> appropriately
++ add formtype => 'table' support, reverting to vanilla Tabulate
++ cell_merge_extras is called too late for 'omit' fields, since row stuff
+  already included
++ add support for top-level hidden hashref
++ work out where you would add clever datatype handlers to mess with field 
+  attributes based on column types (prerender_munge)
++ work through what sort of next-level semantics you'd need to be able to 
+  support to handle different formtypes semi-automatically e.g. create vs.
+  edit vs. delete fields, timestamps (require undef) vs auto_increment 
+  fields (omit on create, display otherwise) vs uids (static or omit?)
++ try out input defaults like 'size', 'maxlength'
++ check that textareas work as expected
++ check that custom field values work as expected (to drop in e.g. date
+  widgets etc.)
++ ignore field 'links' setting unless type display or static
++ add marking of required/mandatory fields ('required' field list)
++ add support for validation error reporting ('errors' hash)
++ add errors_where location (column/top), and (top) errors_format args
++ add label %s sprintf support to error messages
++ add some DFV-type trickery to default required and errors formatting
++ allow field-less forms if fields is undefined/empty (just submits) 
++ allow field-less and submit-less forms if both fields and submits are
+  undefined (useful for confirmation pages in FormFactory?)
++ move scalar required support from FF into Formulate
++ add generalised field_attr td handling, and special case td_error
++ add support for scalar errors_format (+ errors_format tests!)
++ allow errors hash to contain multiple errors per field (via arrayref)
++ need to allow submits to be either in table or out of table (in-table
+  buttons look stupid if border=1), and appropriate presentation hooks
++ change 'format' to be applied after <input /> construction rather than before
++ fix selects to allow repeat values
++ rename 'vlist' to 'values'
++ allow values and vlabels to be subrefs
++ fix size inheritance issue on selects
++ fix inherited attributes on submits
++ Tabulate title and text should allow coderefs instead of just scalars
++ label => '' should render a row with an empty label
++ review whether omits are being handled properly
++ size/maxlength inheritance is still broken for non-text/password types
++ add back support for non-std labels on static fields, via vlabel
++ need to handle non-field-specific top-style errors properly
++ change empty vlist entries to render as <option value=""> instead of <option>
++ only add default submit if 'fields' is defined i.e. no fields no submit should
+  do the right thing
++ hidden arrayrefs don't seem to be working
+- need to add proper support for checkboxes and radio buttons (layout etc.)
+- need to add docs on field attribute behaviour, including special handling
+  of selects
+- need to handle non-field-specific column-style errors properly
+- should display requireds be marked as such? esp. required => 'ALL'
+- add some proper perldocs

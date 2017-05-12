@@ -1,0 +1,122 @@
+2013-02-04 22:37 -0500  Diab Jerius  <djerius@cfa.harvard.edu>  (f8ee891a0c6a [tip])
+
+	* cpanfile: new file.
+	* Makefile.PL, cpanfile:
+	use cpanfile to track dependencies
+
+2013-02-04 22:31 -0500  Diab Jerius  <djerius@cfa.harvard.edu>  (488c2163cdd8)
+
+	* Makefile.PL, lib/Hg/Lib/Server.pm, lib/Hg/Lib/Server/Pipe.pm:
+	Backed out changeset c6da6f7bb57e; pre-alpha code shouldn't have
+	been checked in
+
+2013-01-27 23:41 -0500  Diab Jerius  <djerius@cfa.harvard.edu>  (c6da6f7bb57e)
+
+	* Makefile.PL, lib/Hg/Lib/Server.pm, lib/Hg/Lib/Server/Pipe.pm:
+	add test requirement on Moo::Role
+
+2013-01-27 23:38 -0500  Diab Jerius  <djerius@cfa.harvard.edu>  (251d4eaa854d)
+
+	* t/Server.t:
+	add check for missing runcommand capability
+
+2013-01-27 23:37 -0500  Diab Jerius  <djerius@cfa.harvard.edu>  (4052af0bcbdd)
+
+	* t/BadServer.pm, t/Server.pm: new file.
+	* t/BadServer.pm, t/Server.pm, t/fake-hg:
+	write play hg server to test for bugs in client; switch tests over
+	to it.
+
+2013-01-26 21:59 -0500  Diab Jerius  <djerius@cfa.harvard.edu>  (cf334e87d741)
+
+	* t/Server/Pipe/check_on_child.t:
+	clean up namespace pollution
+
+2013-01-26 21:59 -0500  Diab Jerius  <djerius@cfa.harvard.edu>  (7316685e436a)
+
+	* t/Server/Pipe/check_on_child.t:
+	need Perl 5.10.1 for proper switch support
+
+2013-01-26 21:25 -0500  Diab Jerius  <djerius@cfa.harvard.edu>  (4fa69cf34142)
+
+	* t/Server.t: new file.
+	* lib/Hg/Lib/Server.pm, t/Server.t, t/fake-hg:
+	new errors to fake-hg; tests for Server.pm; synch error messages in
+	tests and code
+
+2013-01-26 21:18 -0500  Diab Jerius  <djerius@cfa.harvard.edu>  (e218ae1b5fc3)
+
+	* lib/Hg/Lib/Server.pm:
+	don't lazy build pipe to server.
+
+	build pipe to server upon object instantiation rather than first
+	access. this ensures that connection errors are reported when and
+	where the caller expects them.
+
+2013-01-26 20:49 -0500  Diab Jerius  <djerius@cfa.harvard.edu>  (fd1da7b6fa05)
+
+	* lib/Hg/Lib/Server/Pipe.pm:
+	make format more readable
+
+2013-01-26 20:48 -0500  Diab Jerius  <djerius@cfa.harvard.edu>  (5f10e95ba647)
+
+	* lib/Hg/Lib.pm:
+	scrub bad copyright, old unused code
+
+2013-01-26 20:47 -0500  Diab Jerius  <djerius@cfa.harvard.edu>  (3f0803eed388)
+
+	* t/Server/Pipe.t, t/fake-hg:
+	fake-hg now runs multiple commands; handles/ignores more hg options
+
+	* ignores -R, serve
+
+2013-01-06 22:06 -0500  Diab Jerius  <djerius@cfa.harvard.edu>  (1fc43ade7b3d)
+
+	* Makefile.PL:
+	update dependencies
+
+2013-01-06 22:05 -0500  Diab Jerius  <djerius@cfa.harvard.edu>  (fbfecf433380)
+
+	* t/Server/Pipe.t, t/Server/Pipe/check_on_child.t: new file.
+	* t/Server/Pipe.t, t/Server/Pipe/check_on_child.t:
+	add tests for Pipe object and child status routine
+
+2013-01-06 22:04 -0500  Diab Jerius  <djerius@cfa.harvard.edu>  (adb0b741cbf7)
+
+	* t/common.pm:
+	make fake_hg a constant and export it
+
+2013-01-06 22:03 -0500  Diab Jerius  <djerius@cfa.harvard.edu>  (10f23ac9bb0f)
+
+	* t/fake-hg:
+	no need for dispatch table code in fake hg command
+
+2013-01-06 22:01 -0500  Diab Jerius  <djerius@cfa.harvard.edu>  (f447beb520db)
+
+	* lib/Hg/Lib/Server.pm, lib/Hg/Lib/Server/Pipe.pm:
+	move all IPC logic into Pipe.pm
+
+2012-11-30 23:57 -0500  Diab Jerius  <djerius@cfa.harvard.edu>  (149f78f5d96d)
+
+	* Makefile.PL: new file.
+	* Makefile.PL:
+	add perl build driver
+
+2012-11-30 23:57 -0500  Diab Jerius  <djerius@cfa.harvard.edu>  (7bcdd9840c1d)
+
+	* t/common.pm, t/fake-hg: new file.
+	* t/common.pm, t/fake-hg:
+	add fake hg command to test errors
+
+2012-11-30 23:56 -0500  Diab Jerius  <djerius@cfa.harvard.edu>  (5958ce41f92b)
+
+	* lib/Hg/Lib/Server.pm, lib/Hg/Lib/Server/Pipe.pm: new file.
+	* lib/Hg/Lib.pm, lib/Hg/Lib/Server.pm, lib/Hg/Lib/Server/Pipe.pm:
+	reorganize code
+
+2012-10-27 22:20 -0400  Diab Jerius  <djerius@cfa.harvard.edu>  (87ea7ed058ea)
+
+	* Changes, dist.ini, lib/Hg/Lib.pm: new file.
+	* Changes, dist.ini, lib/Hg/Lib.pm:
+	initial import
+

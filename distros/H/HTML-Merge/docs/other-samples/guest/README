@@ -1,0 +1,35 @@
+GUEST Demo application
+=-==-====-=-=-=-=-=-=-=-=-=-==
+This is a demo guest book application we have on our site. 
+
+Please note it was developed for HTML::Merge version 1,
+ where many features we have today where not available.
+
+For that reason a lot of use of <$RPERL> that we wouldn't
+need today.
+
+I've added the lines in merge.conf you should
+check and modify. You will have to connect
+your SQL database having the proper settings 
+in merge.conf. 
+
+mergecreateinstance can help you to set 
+the database for the demo application.
+
+you have MySQL  loadme.sql that contains the data 
+for the demo application.
+
+Type http://YourServer.com/cgi-bin/merge.pl?template=tableframe.html
+to run the demo.
+
+As I belive you want the demo to be as small
+as possible I use js, css and gif file from www.raz.co.il.
+The demo is not fully functional as i didn't want to
+change some javascript functions on our web server.
+
+You can run the demo with no internet connection but
+it will not be as nice :( 
+
+Enjoy
+
+Oded S. Resnik 

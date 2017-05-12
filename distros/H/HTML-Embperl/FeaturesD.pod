@@ -1,0 +1,107 @@
+=pod
+
+=head1 Wesentliche Features von HTML::Embperl 1.3
+
+=over 4
+
+=item * 
+
+Erlaubt das Einbetten von Perlcode in HTML Dokumente. Der Perlcode wird
+im Server ausgeführt und das Ergebnis zum Browser geschickt.
+
+
+=item *
+
+Stellt verschiedene Meta Commands zur bedingten und
+iterativen Verarbeitung von HTML Dokumenten zur Verfügung.
+
+=item * 
+
+Erzeugt automatisch dynamische Tabellen/Listen aus Perl Arrays oder
+Funktionsaufrufen (z.B. DBI fetch)
+
+
+=item *
+
+Formulardaten die an ein Embperl Dokument gesandt werden sind einfach
+über einen Hash zugreifbar.
+
+
+=item * 
+
+Fügt automatisch Daten aus dem Formularhash in HTML Input, Textarea
+und Select Tags ein.
+
+
+=item *
+
+Versteht HTML und URL Kodierung/Dekodierung.
+
+=item *
+
+Stellt Pro-Benutzer und Pro-Seite persitente Sessiondaten zur Verfügung.
+Dafür ist es lediglich nötig die Daten in einem spezielle Hash abzulegen.
+
+=item *
+
+Ermöglicht das Erstellen von Websites aus Komponenten. Oft benutzte Elemente
+können einmal definiert und in jede Seite eingefügt werden.
+
+=item *
+
+I<EmbperlObject> erlaubt es das standart Layout einer Website lediglich einmal
+zu definieren und I<EmbperlObject> sorgt dafür das die passenden Komoponeten
+an die entsprechenden Stellen eingefügt werden. Die eigentlichen Seiten
+enthalten nur noch den tatsächlichen Inhalt und nicht gemeinsamme Elemente wie
+Kopf- und Fußbereich oder Navigationsleisten. Diese gemeinsammen Bereiche
+können weiterhin je Unterverzeichnis überschrieben werden.
+
+=item *
+
+Erlaubt Bibliotheken mit oft benutzten Elementen zu erstellen und diese der 
+ganzen Website, wie normale Perlmodule, zur Verfügung zu stellen .
+
+=item *
+
+Unterstüzt das Debuggen von Seiten durch Erzeugen einer detaillierten
+Logdatei, die mittels eines einzigen Klicks vom Browser aus betrachtet 
+werden kann.
+
+=item *
+
+Erzeugt ausführliche Fehlerseiten, wobei jeder Fehler ein
+Link an die richtige Stelle in die Logdatei sein kann.
+
+=item *
+
+Bietet eine ganze Reihe Optionen zur Konfigurierung entsprechend 
+den persönlichen Vorlieben.
+
+=item *
+
+Vollständig integriert in Apache und mod_perl, um die beste
+Performance zu erreichen. Kann auch als CGI Skript laufen,
+Offline ausgeführt werden oder von anderem Perlprogrammen/-modulen
+aufgerufen werden.
+
+=item *
+
+Das Perlmodule DBIx::Recordset bietet einen hochwertigen, einfach
+zu handhabenden, Datenbankzugriff für Embperl.
+
+=item *
+
+Wenn Sicherheit ein Problem darstellt, ist es möglich Embperl so zu
+konfigurieren, daß es Safe.pm nutzt. Dadurch entstehen sichere 
+Namensräume und einzelne Perl Opcode können gesperrt werden.
+
+=item *
+
+I<HTML::Embperl::Mail> ermöglicht es das Ergebnis direkt an eine E-Mail
+Adresse zu versenden.
+
+
+=back
+
+
+

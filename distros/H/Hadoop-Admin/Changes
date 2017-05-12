@@ -1,0 +1,10 @@
+0.4      
+  - Added tests for 0.23.1 cluster and Resource Manager
+  - Fixed warnings from Perl::Critic
+  - Added support for ResourceManager
+  - Converted from ExtUtils::MakeMaker to Dist::Zilla
+  - Updated build and configure requirements.  Some CPAN tests were failing.
+  - Removed some unused runtime dependencies.
+  - Changed version number to eval.
+0.1
+  - Initial revision

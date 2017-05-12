@@ -1,0 +1,5 @@
+<%method main>=== PERSON ===
+<& SELF:name &>
+<& SELF:extras &></%method>
+<%method name>Bob</%method>
+<%method extras></%method>

@@ -1,0 +1,79 @@
+{
+   "abstract" : "HTTP Action, Adventure and Excitement",
+   "author" : [
+      "Stevan Little <stevan.little@iinteractive.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTTP-Headers-ActionPack",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Encode" : "0",
+            "HTTP::Date" : "0",
+            "HTTP::Headers::Util" : "0",
+            "List::Util" : "0",
+            "MIME::Base64" : "0",
+            "Module::Runtime" : "0",
+            "Scalar::Util" : "0",
+            "Sub::Exporter" : "0",
+            "Time::Piece" : "0",
+            "URI::Escape" : "0",
+            "overload" : "0",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Headers" : "0",
+            "HTTP::Request" : "0",
+            "HTTP::Response" : "0",
+            "Test::Fatal" : "0.0003",
+            "Test::More" : "0.88",
+            "Test::Warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-http-headers-actionpack@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Dist/Display.html?Name=HTTP::Headers::ActionPack"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/stevan/http-headers-actionpack.git",
+         "web" : "https://github.com/stevan/http-headers-actionpack"
+      }
+   },
+   "version" : "0.09",
+   "x_authority" : "cpan:STEVAN",
+   "x_contributors" : [
+      "Andrew Nelson <anelson@cpan.org>",
+      "Dave Rolsky <autarch@urth.org>",
+      "Florian Ragwitz <rafl@debian.org>",
+      "Jesse Luehrs <doy@tozt.net>",
+      "Karen Etheridge <ether@cpan.org>"
+   ]
+}
+

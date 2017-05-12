@@ -1,0 +1,32 @@
+HTML::Any - a common interface for HTTP clients (LWP, AnyEvent::HTTP, Curl)
+===========================================================================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Also install:
+
+ - Net::Curl to use HTML::Any::Curl
+ - Net::Curl, EV and Net::Curl::Multi::EV to use HTML::Any::Curl with Multi
+ - AnyEvent::HTTP, EV to use HTML::Any::AnyEvent
+ - LWP to use HTML::Any::LWP
+
+
+DOCUMENTATION
+
+See Any.pod file.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013 by Nick Kostyria
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.

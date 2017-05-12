@@ -1,0 +1,62 @@
+ChangeLog
+---------
+
+[2016-02-19]
+* Bump version to 0.20.
+* Handle value html-escaping properly with HTML::Entities.
+
+[2012-04-21]
+* Bump version to 0.19.
+* Add support for input_ prefixed attributes e.g. input_class.
+
+[2011-10-28]
+* Bump version to 0.18.
+* Use 'selected' instead of selected="selected" if not in xhtml mode.
+* Add special support for label_colspan = 2.
+* Add a -required example to perldocs.
+
+[2011-10-16]
+* Bump version to 0.17.
+* Bump Tabulate requirement to latest 0.39.
+* Change input_attr splitting due to changes to Tabulate upstream.
+
+[2010-01-26]
+* Bump version to 0.16.
+* Convert Makefile.PL to Module::Install.
+
+[2009-11-28]
+* Bump version to 0.15.
+* Add missing file, image, and button types.
+
+[2008-09-18]
+* Bump version to 0.14.
+* Add support for submit_location.
+
+[2008-09-06]
+* Bump version to 0.13.
+* Bump Tabulate requirement to latest 0.30.
+* Fix no labels handling and add unit tests
+
+[2008-08-19]
+* Bump version to 0.12.
+* Tweak use_name_as_id handling on radio fields to make unique.
+* Pass data row through to tr_attr() in row_across.
+* Add tr sub support for forms.
+
+[2008-08-16]
+* Bump version to 0.11.
+* Add composite field handling per HTML::Tabulate 0.30
+
+[2008-04-30]
+* Bump version to 0.10.
+* Add first-pass radio button support.
+
+[2008-01-24]
+* Bump version to 0.09.
+* Allow subref vlabel parameter with statics; make extra error fields also sprintf.
+* Update errors perldocs to make sprintf handling explicit.
+* Add use_name_as_id attribute
+
+[2007-06-11]
+* Initial import.
+

@@ -1,0 +1,5 @@
+-unformatted = 1
+-selfrender = 1
+<p><div foo><p>foo</p></div></p>
+<!--expected-->
+<p><div foo="foo"><p>foo</p></div></p>

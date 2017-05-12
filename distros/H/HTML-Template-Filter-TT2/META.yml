@@ -1,0 +1,21 @@
+---
+name: HTML-Template-Filter-TT2
+version: 0.03
+author:
+  - 'Sébastien Aperghis-Tramoni <sebastien@aperghis.net>'
+abstract: Template Toolkit 2 syntax for HTML::Template
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  HTML::Template: 0
+build_requires:
+  Test::More: 0
+provides:
+  HTML::Template::Filter::TT2:
+    file: lib/HTML/Template/Filter/TT2.pm
+    version: 0.03
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

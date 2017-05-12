@@ -1,0 +1,24 @@
+
+There are LOTS of things to do.
+
+Anybody who wants to do them, feel free!  Extra bonus points if you
+mail me first <gossamer@tertius.net.au>, or jump on the mailing list
+(see the README file) so we don't duplicate effort.
+
+General
+   Barfs on multiple attributes with the same name
+
+   Language support isn't finished
+
+   The insert_* functions don't seem to, like, work.  I don't know
+   why.  I am perplexed.
+
+new()
+   Doesn't support encryption yet.
+
+get_html()
+   Doesn't get HTML headers or body tags or stuff.
+
+There's also half a dozen things not implemented - just skeletons in
+the CSP.pm file.  Search for the phrase TODO.
+

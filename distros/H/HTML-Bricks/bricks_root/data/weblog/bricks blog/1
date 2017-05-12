@@ -1,0 +1,24 @@
+$VAR1 = {
+          'data' => '<p>
+<b>CONGRATULATIONS!</b>
+</p>
+
+<p>
+You have correctly installed Bricks Site Builder.
+</p>
+
+<p>
+Now you just need to login to access the authoring functions.  To do that, enter at right the name 
+and password you selected at installation time.</p>
+
+<p>
+The login prompt can always be accessed via /bricks_login.html.<p> 
+</p>
+
+<p>
+Once logged in, press the \'edit\' button at the top to get going.
+</p>',
+          'description' => undef,
+          'title' => 'Congratulations!',
+          'mtime' => '995113320'
+        };

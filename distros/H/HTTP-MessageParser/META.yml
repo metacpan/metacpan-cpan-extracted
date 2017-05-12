@@ -1,0 +1,16 @@
+---
+name: HTTP-MessageParser
+version: 0.3
+author:
+  - 'Christian Hansen C<chansen@cpan.org>'
+abstract: Parse HTTP Messages
+license: perl
+requires:
+  Sub::Exporter: 0
+build_requires:
+  Test::More: 0
+provides:
+  HTTP::MessageParser:
+    file: lib/HTTP/MessageParser.pm
+    version: 0.3
+generated_by: Module::Build version 0.2611

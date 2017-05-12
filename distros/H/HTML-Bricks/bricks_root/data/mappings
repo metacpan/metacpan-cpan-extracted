@@ -1,0 +1,9 @@
+$VAR1 = [
+          {
+            'brick_name' => 'bricks_welcome',
+            'folder' => '/',
+            'match_type' => 'string',
+            'match_string' => 'index.html',
+            'recurse' => 'n'
+          }
+        ];

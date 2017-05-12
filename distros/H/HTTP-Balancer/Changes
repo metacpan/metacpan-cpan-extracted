@@ -1,0 +1,11 @@
+Revision history for Perl extension HTTP::Balancer
+
+0.0.2   Wed Feb 20 19:00:29 CST 2013
+        - fix minor bugs
+        - dbpath as a part of config
+        - `init` creates directories for all models
+        - `status` to show status of balancer
+
+0.0.1   Tue Feb 19 20:00:58 CST 2013
+        - works with Nginx
+        - original version

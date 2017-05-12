@@ -1,0 +1,26 @@
+
+HTML::Defaultify  (see http://www.jmarshall.com/tools/defaultify/)
+==================================================================
+
+
+CHANGES:
+--------
+
+
+1.0.1, released June 17, 2002:
+------------------------------
+
+Sanity checks no longer croak on uppercase tag names.
+
+<script> and <style> blocks are no longer parsed for form fields.
+
+
+
+1.0, released June 10, 2002:
+----------------------------
+
+Initial release.
+
+
+========================================================================
+

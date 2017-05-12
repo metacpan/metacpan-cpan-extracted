@@ -1,0 +1,148 @@
+NAME
+    HTML::HTML5::Outline - implementation of the HTML5 Outline algorithm
+
+SYNOPSIS
+            use JSON;
+            use HTML::HTML5::Outline;
+        
+            my $html = <<'HTML';
+            <!doctype html>
+            <h1>Hello</h1>
+            <h2>World</h2>
+            <h1>Good Morning</h1>
+            <h2>Vietnam</h2>
+            HTML
+        
+            my $outline = HTML::HTML5::Outline->new($html);
+            print to_json($outline->to_hashref, {pretty=>1,canonical=>1});
+
+DESCRIPTION
+    This is an implementation of the HTML5 Outline algorithm, as per
+    <http://www.w3.org/TR/html5/sections.html#outlines>.
+
+    The module can output a JSON-friendly hashref, or an RDF model.
+
+  Constructor
+    *   "HTML::HTML5::Outline->new($html, %options)"
+
+        Construct a new outline. $html is the HTML to generate an outline
+        from, either as an HTML or XHTML string, or as an
+        XML::LibXML::Document object.
+
+        Options:
+
+        *   default_language - default language to assume text is in when no
+            lang/xml:lang attribute is available. e.g. 'en-gb'.
+
+        *   element_subjects - rather advanced feature that doesn't bear
+            explaining. See USE WITH RDF::RDFA::PARSER for an example.
+
+        *   microformats - support "<ul class="xoxo">", "<ol class="xoxo">"
+            and "<whatever class="figure">" as sectioning elements (like
+            "<section>", "<figure>", etc). Boolean, defaults to false.
+
+        *   parser - 'html' (default) or 'xml' - choose the parser to use
+            for XHTML/HTML. If the constructor is passed an
+            XML::LibXML::Document, this is ignored.
+
+        *   suppress_collections - allows rdf:List stuff to be suppressed
+            from RDF output. RDF output - especially in Turtle format -
+            looks somewhat nicer without them, but if you care about the
+            order of headings and sections, then you'll want them. Boolean,
+            defaults to false.
+
+        *   uri - the document URI for resolving relative URI references.
+            Only really used by the RDF output.
+
+  Object Methods
+    *   "to_hashref"
+
+        Returns data as a nested hashref/arrayref structure. Dump it as JSON
+        and you'll figure out the format pretty easily.
+
+    *   "to_rdf"
+
+        Returns data as a n RDF::Trine::Model. Requires RDF::Trine to be
+        installed. Otherwise this method won't exist.
+
+    *   "primary_outlinee"
+
+        Returns a HTML::HTML5::Outline::Outlinee element representing the
+        outline for the page.
+
+  Class Methods
+    *   "has_rdf"
+
+        Indicates whether the "to_rdf" object method exists.
+
+USE WITH RDF::RDFA::PARSER
+    This module produces RDF data where many of the resources described are
+    HTML elements. RDFa data typically does not, but RDF::RDFa::Parser does
+    also support some extensions to RDFa which do (e.g. support for the
+    "cite" and "role" attributes). It's useful to combine the RDF data from
+    each, and RDF::RDFa::Parser 1.093 and upwards contains a few shims to
+    make this possible.
+
+    Without further ado...
+
+            use HTML::HTML5::Outline;
+            use RDF::RDFa::Parser 1.093;
+            use RDF::TrineShortcuts;
+
+            my $rdfa = RDF::RDFa::Parser->new(
+                    $html_source,
+                    $base_url,
+                    RDF::RDFa::Parser::Config->new(
+                            'html5', '1.1',
+                            role_attr     => 1,
+                            cite_attr     => 1,
+                            longdesc_attr => 1,
+                            ),
+                    )->consume;
+        
+            my $outline = HTML::HTML5::Outline->new(
+                    $rdfa->dom,
+                    uri              => $rdfa->uri,
+                    element_subjects => $rdfa->element_subjects,
+                    );
+        
+            # Merging two graphs is pretty complicated in RDF::Trine
+            # but a little easier with RDF::TrineShortcuts...
+            my $combined = rdf_parse();
+            rdf_parse($rdfa->graph,     model => $combined);
+            rdf_parse($outline->to_rdf, model => $combined);
+        
+            my $NS = {
+                    dc    => 'http://purl.org/dc/terms/',
+                    o     => 'http://ontologi.es/outline#',
+                    type  => 'http://purl.org/dc/dcmitype/',
+                    xs    => 'http://www.w3.org/2001/XMLSchema#',
+                    xhv   => 'http://www.w3.org/1999/xhtml/vocab#',
+                    };
+        
+            print rdf_string($combined => 'Turtle', namespaces => $NS);
+
+SEE ALSO
+    HTML::HTML5::Outline::RDF, HTML::HTML5::Outline::Outlinee,
+    HTML::HTML5::Outline::Section.
+
+    HTML::HTML5::Parser, HTML::HTML5::Sanity.
+
+AUTHOR
+    Toby Inkster, <tobyink@cpan.org>
+
+ACKNOWLEDGEMENTS
+    This module is a fork of the document structure parser from Swignition
+    <http://buzzword.org.uk/swignition/>.
+
+    That in turn includes the following credits: thanks to Ryan King and
+    Geoffrey Sneddon for pointing me towards [the HTML5] algorithm. I also
+    used Geoffrey's python implementation as a crib sheet to help me figure
+    out what was supposed to happen when the HTML5 spec was ambiguous.
+
+COPYRIGHT AND LICENCE
+    Copyright (C) 2008-2011 by Toby Inkster
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

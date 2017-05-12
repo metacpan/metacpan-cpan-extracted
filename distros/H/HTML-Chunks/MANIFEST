@@ -1,0 +1,12 @@
+MANIFEST
+Makefile.PL
+examples/local.pl
+examples/local.txt
+examples/meals.html
+examples/meals.pl
+examples/super.pl
+lib/HTML/Chunks.pm
+lib/HTML/Chunks/Local.pm
+lib/HTML/Chunks/Super.pm
+readme
+t/use.t

@@ -1,0 +1,29 @@
+---
+abstract: 'Lightweight HTTP server'
+author:
+  - 'Best Practical Solutions, LLC <modules@bestpractical.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.17'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: HTTP::Server::Simple
+name: HTTP-Server-Simple
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  CGI: 0
+  Socket: 1.94
+  Test::More: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/bestpractical/http-server-simple
+version: '0.52'

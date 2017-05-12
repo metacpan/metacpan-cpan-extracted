@@ -1,0 +1,8 @@
+Changes
+CryptoCookie.pm
+MANIFEST
+Makefile.PL
+README
+t/01-self.t
+t/02-set-single.t
+META.yml                                Module meta-data (added by MakeMaker)

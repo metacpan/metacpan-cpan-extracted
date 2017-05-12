@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/HTML/Miner.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+t/local_html.t
+t/bug-62877.t
+t/bug-76236.t
+t/convert_to_valid_url_tests.t
+t/css_and_js.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

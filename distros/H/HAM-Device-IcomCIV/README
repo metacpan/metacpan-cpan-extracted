@@ -1,0 +1,45 @@
+HAM-Device-IcomCIV version 0.02
+===============================
+
+This module is an OO approach to use Icom radios attached to a serial port.
+
+HAM::Device::IcomCIV is not an abstract class, but one you can use directly.
+It allows for the most basic form of remote control of practically any Icom
+radio equipped with a CI-V port, namely set & get of the displayed frequency,
+set & get the mode and filter, read the band edges, switch to VFO or Memory
+(if radio has a VFO), select a memory channel, write VFO data to memory and
+clear a memory.
+
+It supports multiple radios on the same serial port, differentiated by their
+CI-V adress. Note: If you have two or more identical models on the same bus,
+they must use different CI-V adresses.
+
+This class can be used in a procedural manner or with an event callback
+mechanism (or both at the same time). When used without callbacks you just
+use the provided methods for setting or getting radio settings (Frequency,
+Mode etc.). If you use the callback mechanism you will receive a callback to
+your sub (set with set_callback) which tells you what happened, i.e. which
+data was received (see event and status constants).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  HAM::Device::IcomCIVerialIO
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2007 Ekkehard (Ekki) Plicht. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+

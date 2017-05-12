@@ -1,0 +1,32 @@
+Revision history for HTML-Filter-Callbacks
+
+0.10 2013-04-19T17:46:48Z
+  - repackaging
+
+0.09 2013-04-08T12:53:54Z
+  - added replace_tag method (cos31++)
+
+0.08 2011/11/30
+  - fixed coderef reuse (charsbar)
+
+0.07 2011/07/06
+  - fixed broken dist
+  - ignore cases of remove_attr and replace_attr (xaicron)
+
+0.06 2011/07/05
+  - ignore cases fo attr (xaicron)
+
+0.05 2011/01/18
+  - allows coderef reuse (xaicron++)
+
+0.04 2010/06/13
+  - ignore cases of tags
+
+0.03 2010/03/16
+  - fixed empty tag handling
+
+0.02 2009/12/05
+  - no code changes; just fixed a test
+
+0.01 2009/12/05
+  - initial release

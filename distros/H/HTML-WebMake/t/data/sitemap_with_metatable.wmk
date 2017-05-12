@@ -1,0 +1,137 @@
+<webmake>
+
+<!--
+
+     A quick demo of using WebMake to generate a news site.
+     This one generates a sitemap, and does not use sections.
+
+-->
+
+<!-- ----------------------------------------------------------------- -->
+
+<include file="data/test_stories.inc" />
+
+
+<{perl
+        # create a ${all_stories} variable containing the list
+        # of all text files just loaded.
+        $_ = '';
+        foreach my $pg (sorted_content_matching ("score title", "*.txt"))
+	{
+          $pg =~ s/\.txt$//; $_ .= "$pg ";
+        }
+        set_content ("all_stories", $_);
+        '';
+}>
+
+<!-- also add some media items that we'll be including in the sitemap -->
+<media src="data/contentsfind.data" name=".../*.txt" />
+
+<metatable delimiter="|">
+
+.|section|score|title|up|abstract
+
+foo.txt|sec1|45|This is Foo|index_chunk|Abstract for foo
+dir1/bar.txt|sec2|30|This is Bar|story_2.txt|Abstract for bar
+dir2/dir2a/baz.txt|sec1|20|This is Baz|story_4.txt|Abstract for baz
+
+</metatable>
+
+<{!-- ------------------------------------------------------------------- --}>
+
+<content name=header map=false>
+  <html><head>
+    <title>$[this.title]</title>
+    <meta name="Abstract" value="$[this.abstract]" />
+  </head>
+  <body bgcolor=#ffffff>
+  <h1>WebMake Sitemap Demo</h1>
+  <hr />
+  <a href=$(mainindex)>Index</a> | 
+  <a href=$(map)>Site Map</a> | 
+  <a href=$(fullmap)>Full Site Map</a>
+  <hr />
+</content>
+
+<content name=footer map=false> <hr /> </body> </html> </content>
+
+<{!-- ------------------------------------------------------------------- --}>
+
+<content name=index_list_item map=false>
+  <li>
+    <a href=$(${item})>$[${item}.txt.title]</a><br />
+    <p>$[${item}.txt.abstract]</p>
+  </li>
+</content>
+
+<content name=index_chunk isroot=true>
+  <wmmeta name=title value="WebMake Sample: a news site" />
+  <wmmeta name=abstract value="some old news site" />
+  <ul>
+  <{perl
+    make_list ('index_list_item', get_list ("all_stories"));
+  }>
+  </ul>
+</content>
+
+<{!-- ------------------------------------------------------------------- --}>
+
+
+<content name=sitemapnode map=false>
+  <li>
+    <p>
+      <a href=$(url)>${title}</a>: $[${name}.abstract]<br>
+      <em>[score: ${score}, name: ${name}, is_node: ${is_node}]</em>
+      <{!-- don't forget to list the sub-items --}>
+      <ul> ${list} </ul>
+    </p>
+  </li>
+</content>
+
+<content name=sitemapleaf map=false>
+  <li>
+    <p>
+      <a href=$(url)>${title}</a>: $[${name}.abstract]<br>
+      <em>[score: ${score}, name: ${name}, is_node: ${is_node}]</em>
+      <{!-- no sub-items here --}>
+    </p>
+  </li>
+</content>
+
+<content name=sitemapdynamic map=false>
+  <li>
+    <em>[${name} = "$[${name}]"]</em>
+  </li>
+</content>
+
+<sitemap name=mainsitemap node=sitemapnode leaf=sitemapleaf />
+
+<sitemap name=fullsitemap rootname=index_chunk all=true
+      node=sitemapnode leaf=sitemapleaf dynamic=sitemapdynamic />
+
+<!-- ----------------------------------------------------------------- -->
+
+<for name=pg values="${all_stories}">
+  <out name="${pg}" file="log/sitemap_with_metatable_${pg}.html">
+    ${header}${${pg}.txt}${footer}
+  </out>
+</for>
+
+<out name=mainindex file=log/sitemap_with_metatable.html>
+  ${header}${index_chunk}${footer}
+</out>
+
+<out name=map file=log/sitemap_with_metatable_map.html>
+  <wmmeta name=title value="WebMake Sample: site map" />
+  <wmmeta name=Abstract value="Map of the site" />
+  ${header}${mainsitemap}${footer}
+</out>
+
+<out name=fullmap file=log/sitemap_with_metatable_fullmap.html>
+  <wmmeta name=title value="WebMake Sample: full site map" />
+  <wmmeta name=Abstract value="Full map of the site" />
+  ${header}${fullsitemap}${footer}
+</out>
+
+</webmake>
+

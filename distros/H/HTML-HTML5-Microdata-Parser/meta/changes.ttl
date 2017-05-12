@@ -1,0 +1,72 @@
+@prefix :        <http://usefulinc.com/ns/doap#> .
+@prefix dcs:     <http://ontologi.es/doap-changeset#> .
+@prefix dc:      <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix my:      <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Microdata-Parser/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix toby:    <http://tobyinkster.co.uk/#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+my:project :release my:v_0-01 .
+my:v_0-01
+	a               :Version ;
+	dc:issued       "2010-01-08"^^xsd:date ;
+	:revision       "0.01"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Microdata-Parser-0.01.tar.gz> ;
+	rdfs:comment    "Original version"@en .
+
+my:project :release my:v_0-02 .
+my:v_0-02
+	a               :Version ;
+	dc:issued       "2010-01-29"^^xsd:date ;
+	:revision       "0.02"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Microdata-Parser-0.02.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-01;
+		dcs:item
+			[ rdfs:label "Synchronise &set_callbacks behaviour with RDF::RDFa::Parser."@en ; a dcs:Update ] ,
+			[ rdfs:label "Make non-item-related processing optional (enabled by default)."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Document &consume_microdata_item."@en ] ,
+			[ rdfs:label "Introduced a bug where &set_callbacks became *required*."@en ; a dcs:Regression ]
+		] .
+
+my:project :release my:v_0-030 .
+my:v_0-030
+	a               :Version ;
+	dc:issued       "2010-06-24"^^xsd:date ;
+	:revision       "0.030"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Microdata-Parser-0.030.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-02;
+		dcs:item
+			[ rdfs:label "Some of the constructor option defaults were implemented differently from the documentation. Changed implementation to match documentation."@en ; a dcs:Bugfix ] ,
+			[ rdfs:label "Clean up API."@en ]
+		] .
+
+my:project :release my:v_0-031 .
+my:v_0-031
+	a               :Version ;
+	dc:issued       "2010-07-26"^^xsd:date ;
+	:revision       "0.031"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Microdata-Parser-0.031.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-030;
+		dcs:item
+			[ rdfs:label "Fix &set_callbacks bug from 0.02."@en ; a dcs:Bugfix ]
+		] .
+
+my:project :release my:v_0-100 .
+my:v_0-100
+	a               :Version ;
+	dc:issued       "2011-10-26"^^xsd:date ;
+	:revision       "0.100"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Microdata-Parser-0.100.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-031;
+		dcs:item   [ rdfs:label "Module::Package::RDF"@en ; a dcs:Packaging ] ;
+		dcs:item   [ rdfs:label "Swappable predicate URI generation strategies."@en ; a dcs:Update ] ;
+		dcs:item   [ rdfs:label "Disable all non-item triples (processing of <title>, <meta>, @rel and @cite) by default."@en ; a dcs:Update ] ;
+		dcs:item   [ rdfs:label "use 5.010"@en ; a dcs:Update ] ;
+		dcs:item   [ rdfs:label "Clean up code somewhat."@en ]
+		] .
+

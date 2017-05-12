@@ -1,0 +1,42 @@
+HTML::WWWTheme is a module that creates a standard header and footer for
+HTML pages.  This header includes <BODY> tags, and is designed to wrap
+around valid body HTML.
+
+After unpacking the distribution, to install this module type
+
+        perl Makefile.PL
+        make
+	make test
+        make install
+
+There are some sample configuration files in the templates directory that
+you may find useful.  Details on how to read from configuration files may
+be found in the pod for WWWTheme.
+
+An image (blank.gif) is included with this distribution as an example
+-only-. I don't know the legalities of using gifs and all that jazz.  I
+created it with the Gimp, if that makes any difference.  If there are any
+legal problems with using them on public web servers, DON'T use it.  Make
+your own with a registered gif maker.  It's not hard -- it's a 1x1 blank
+pixel.  
+
+Please report any bugs/suggestions to <chogan@uvastro.phys.uvic.ca>
+
+Copyright (C) 2000 Chad Hogan <chogan@uvastro.phys.uvic.ca>
+	           
+Copyright (C) 2000 Joint Astronomy Centre
+
+
+All rights reserved.  This program is free software.  you can redistribute
+it and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 2, or (at your
+option) any later version.
+
+HTML::WWWTheme is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+ 
+You should have received a copy of the GNU General Public License along
+with HTML::WWWTheme; see the file gpl.txt.  If not, write to the Free
+Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.

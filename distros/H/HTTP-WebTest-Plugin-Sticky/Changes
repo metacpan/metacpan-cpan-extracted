@@ -1,0 +1,10 @@
+Revision history for HTTP-WebTest-Plugin-Sticky
+
+0.02    2009-02-05
+        Corrected bug that was sending checkboxes even if they
+        we're not "checked"
+        https://rt.cpan.org/Ticket/Display.html?id=43030
+
+0.01    2006-01-20
+        First version.
+

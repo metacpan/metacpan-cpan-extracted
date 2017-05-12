@@ -1,0 +1,61 @@
+{
+   "abstract" : "check for HTML errors in a string or file",
+   "author" : [
+      "Andy Lester <andy@petdance.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-Lint",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "File::Find" : "0",
+            "HTML::Entities" : "0",
+            "HTML::Parser" : "3.47",
+            "HTML::Tagset" : "3.03",
+            "Test::Builder" : "0",
+            "Test::Builder::Tester" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/petdance/html-lint/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/html-lint",
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0.php"
+      ],
+      "repository" : {
+         "url" : "https://github.com/petdance/html-lint"
+      }
+   },
+   "version" : "2.26",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

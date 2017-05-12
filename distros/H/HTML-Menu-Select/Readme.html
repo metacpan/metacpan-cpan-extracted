@@ -1,0 +1,370 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>HTML::Menu::Select - Create HTML for select menus to simplify your templates.</title>
+<link rev="made" href="mailto:" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#installation">INSTALLATION</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<ul>
+
+		<li><a href="#menu__"><code>menu()</code></a></li>
+		<li><a href="#options__"><code>options()</code></a></li>
+		<li><a href="#popup_menu__"><code>popup_menu()</code></a></li>
+	</ul>
+
+	<li><a href="#html_escaping">HTML escaping</a></li>
+	<li><a href="#cgi_pm_compatability">CGI.pm COMPATABILITY</a></li>
+	<li><a href="#support___bugs">SUPPORT / BUGS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#credits">CREDITS</a></li>
+	<li><a href="#copyright_and_license">COPYRIGHT AND LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>HTML::Menu::Select - Create HTML for select menus to simplify your templates.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  use HTML::Menu::Select qw( menu options );
+  
+  my $html = menu(
+    name   =&gt; 'myMenu',
+    values =&gt; [ 'yes', 'no' ],
+  );
+  
+  $tmpl-&gt;param( select_menu =&gt; $html );</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>This modules creates HTML for form <code>select</code> items.</p>
+<p>Traditionally, if you wanted to dynamically generate a list of options 
+in a <code>select</code> menu, you would either have to use CGI's HTML 
+generation routines, or use a complicated template such as this:</p>
+<pre>
+  &lt;select name=&quot;day&quot;&gt;
+  &lt;TMPL_LOOP day&gt;
+          &lt;option value=&quot;&lt;TMPL_VAR value&gt;&quot; &lt;TMPL_VAR selected&gt;&gt;
+            &lt;TMPL_VAR label&gt;
+          &lt;/option&gt;
+        &lt;/TMPL_LOOP&gt;
+  &lt;/select&gt;</pre>
+<p>This module allows you to quickly prototype a page, allowing the CGI 
+to completely generate the HTML, while allowing you at a later stage 
+to easily change how much HTML it generates.</p>
+<p>
+</p>
+<hr />
+<h1><a name="installation">INSTALLATION</a></h1>
+<p>To install this module, run the following commands:</p>
+<pre>
+  perl Makefile.PL
+  make
+  make test
+  make install</pre>
+<p>Alternatively, to install with Module::Build, you can use the following 
+commands:</p>
+<pre>
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install</pre>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<p>
+</p>
+<h2><a name="menu__"><code>menu()</code></a></h2>
+<p>Use <code>menu()</code> to generate the entire HTML for a select menu.</p>
+<p>This allows you to have a very simple template tag, such as:</p>
+<pre>
+  &lt;TMPL_VAR select_menu&gt;</pre>
+<p><code>menu()</code> accepts the following parameters:</p>
+<dl>
+<dt><strong><a name="item_name">name</a></strong><br />
+</dt>
+<dd>
+This is used in the <code>select</code> tag's <code>name=&quot;&quot;</code> attribute.
+</dd>
+<dd>
+<p>The name value will be run through escapeHTML(), see <a href="#html_escaping">HTML escaping</a>.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_values">values</a></strong><br />
+</dt>
+<dd>
+This is an array-ref of values used for each of the <code>option</code> tags.
+</dd>
+<dd>
+<p>The values will be run through escapeHTML, see <a href="#html_escaping">HTML escaping</a>.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_default">default</a></strong><br />
+</dt>
+<dd>
+This selects which (if any) <code>option</code> tag should have a 
+<code>selected=&quot;selected&quot;</code> attribute.
+</dd>
+<p></p>
+<dt><strong><a name="item_labels">labels</a></strong><br />
+</dt>
+<dd>
+This is a hash-ref of values to provide different values for the 
+user-visible label of each <code>option</code> tag. Each key should match a 
+value provided by the <a href="#item_values"><code>values</code></a> parameter.
+</dd>
+<dd>
+<p>If this parameter is not provided, or for any <a href="#item_value"><code>value</code></a> which doesn't 
+have a matching key here, the user-visible label will be the 
+<code>option</code>'s <a href="#item_value"><code>value</code></a>.</p>
+</dd>
+<dd>
+<pre>
+  print menu(
+    values =&gt; [1, 2],
+    labels =&gt; {
+      1 =&gt; 'one'},
+      2 =&gt; 'two'},
+    },
+  );
+  
+  # will output
+  
+  &lt;select name=&quot;&quot;&gt;
+  &lt;option name=&quot;1&quot;&gt;one&lt;/option&gt;
+  &lt;option name=&quot;2&quot;&gt;two&lt;/option&gt;
+  &lt;/select&gt;</pre>
+</dd>
+<dd>
+<p>The labels will be run through escapeHTML, see <a href="#html_escaping">HTML escaping</a>.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_attributes">attributes</a></strong><br />
+</dt>
+<dd>
+This is a hash-ref of values to provide extra HTML attributes for the 
+<code>option</code> tags. Like the <a href="#item_labels"><code>labels</code></a> parameter, the keys should match 
+a value provided by the c&lt;values&gt; parameter.
+</dd>
+<dd>
+<p>Each value of this hash-ref should be a hash-ref representing the name 
+and value of a HTML attribute.</p>
+</dd>
+<dd>
+<pre>
+  print menu(
+    values     =&gt; ['one', 'two'],
+    attributes =&gt; {
+      one =&gt; {onSubmit =&gt; 'do(this);'},
+      two =&gt; {style =&gt; 'color: #000;'},
+    },
+  );
+  
+  # will output
+  
+  &lt;select name=&quot;&quot;&gt;
+  &lt;option onSubmit=&quot;do(this);&quot; name=&quot;one&quot;&gt;one&lt;/option&gt;
+  &lt;option style=&quot;color: #000;&quot; name=&quot;two&quot;&gt;two&lt;/option&gt;
+  &lt;/select&gt;</pre>
+</dd>
+<dd>
+<p>All attribute values (but not the attribute name) will be run through 
+escapeHTML, see <a href="#html_escaping">HTML escaping</a>.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_value">value</a></strong><br />
+</dt>
+<dd>
+An alias for <a href="#item_value"><code>value</code></a>.
+</dd>
+<p></p>
+<dt><strong><a name="item_defaults">defaults</a></strong><br />
+</dt>
+<dd>
+An alias for <a href="#item_default"><code>default</code></a>.
+</dd>
+<p></p></dl>
+<p>All parameters are optional, though it doesn't make much sense to not 
+provide anything for <a href="#item_values"><code>values</code></a>.</p>
+<p>Any unrecognised parameters will be used to provide extra HTML 
+attributes for the <code>select</code> tag. For example:</p>
+<pre>
+  print menu(
+    id       =&gt; 'myID',
+    values   =&gt; ['one'],
+    onChange =&gt; 'do(this);',
+  );
+  
+  # will output
+  
+  &lt;select name=&quot;&quot; id=&quot;myID&quot; onChange=&quot;do(this);&quot;&gt;
+  &lt;option name=&quot;one&quot;&gt;one&lt;/option&gt;
+  &lt;/select&gt;</pre>
+<p>All attribute values (but not the attribute name) will be run through 
+escapeHTML, see <a href="#html_escaping">HTML escaping</a>.</p>
+<p>
+</p>
+<h2><a name="options__"><code>options()</code></a></h2>
+<p>Use <code>options()</code> to generate the HTML for only the <code>option</code> tags, 
+allowing you to keep the outer <code>select</code> tag in the template, so that, 
+for example, a designer can easily make changes to the CSS or 
+JavaScript handlers.</p>
+<p>You would have something like the following in your template:</p>
+<pre>
+  &lt;select name=&quot;day&quot;&gt;
+    &lt;TMPL_VAR menu_options&gt;
+  &lt;/select&gt;</pre>
+<p><code>options()</code> accepts the same parameters as <a href="#menu__">menu()</a>, but the <a href="#item_name"><code>name</code></a> 
+parameter is ignored.</p>
+<p>
+</p>
+<h2><a name="popup_menu__"><code>popup_menu()</code></a></h2>
+<p><code>popup_menu()</code> is an alias for <a href="#menu__">menu()</a> for those familiar with 
+CGI.</p>
+<p>
+</p>
+<hr />
+<h1><a name="html_escaping">HTML escaping</a></h1>
+<p>If any of the following modules are already loaded into memory, their own 
+escapeHTML (or equivalent) method will be used</p>
+<dl>
+<dt><strong><a name="item_cgi">CGI</a></strong><br />
+</dt>
+<dt><strong><a name="item_cgi_3a_3asimple">CGI::Simple</a></strong><br />
+</dt>
+<dt><strong><a name="item_html_3a_3aentities">HTML::Entities</a></strong><br />
+</dt>
+<dt><strong><a name="item_apache_3a_3autil">Apache::Util</a></strong><br />
+</dt>
+</dl>
+<p>Otherwise the following characters will be escaped</p>
+<pre>
+  &amp; &lt; &gt; &quot;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="cgi_pm_compatability">CGI.pm COMPATABILITY</a></h1>
+<dl>
+<dt><strong><a name="item_arguments_may_be_passed_as_a_hash_2dreference_2c_r">Arguments may be passed as a hash-reference, rather than a hash.</a></strong><br />
+</dt>
+<dd>
+This allows compile time checking, rather than runtime.
+</dd>
+<dd>
+<pre>
+  popup_menu( name =&gt; $name );
+  
+  # OR
+  popup_menu( {name =&gt; $name} );</pre>
+</dd>
+<p></p></dl>
+<p>Arguments to the <a href="#menu__">menu()</a>, <a href="#options__">options()</a> and <a href="#popup_menu__">popup_menu()</a> functions 
+are similar to CGI.pm's, excepting the following differences.</p>
+<dl>
+<dt><strong><a name="item_named_arguments_should_not_have_a_leading_dash">Named arguments should not have a leading dash</a></strong><br />
+</dt>
+<dd>
+<pre>
+  popup_menu( name =&gt; $name );
+  
+  # NOT
+  # popup_menu( -name =&gt; $name );</pre>
+</dd>
+<dt><strong><a name="item_positional_arguments_are_not_supported">Positional arguments are not supported</a></strong><br />
+</dt>
+<dd>
+<pre>
+  popup_menu( name =&gt; $name, labels =&gt; \@labels );
+  
+  # NOT
+  # popup_menu( $name, \@labels );</pre>
+</dd>
+<dt><strong><a name="item_attribute_names_not_lowercased">Attribute names not lowercased</a></strong><br />
+</dt>
+<dd>
+An argument to CGI.pm's popup_menu such as <code>-onChange =</code> 'check()'&gt; will 
+output the HTML <code>onchange=&quot;check()&quot;</code>.
+
+
+</dd>
+<dd>
+<p>This module will retain the case, outputting <code>onChange=&quot;check()&quot;</code>.
+
+</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_the_optgroup_function_is_not_yet_supported">The <code>optgroup</code> function is not yet supported</a></strong><br />
+</dt>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="support___bugs">SUPPORT / BUGS</a></h1>
+<p>Please log bugs, feature requests and patch submissions at 
+<a href="http://sourceforge.net/projects/html-menu">http://sourceforge.net/projects/html-menu</a>.
+
+</p>
+<p>Support mailing list: <a href="mailto:html-menu-users@lists.sourceforge.net">html-menu-users@lists.sourceforge.net</a>
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>HTML::Menu::DateTime, HTML::Template, Template, Template::Magic, 
+DateTime::Locale.
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Carl Franks &lt;<a href="mailto:cpan@fireartist.com">cpan@fireartist.com</a>&gt;
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="credits">CREDITS</a></h1>
+<pre>
+  Ron Savage
+
+</pre>
+<p>
+</p>
+<hr />
+<h1><a name="copyright_and_license">COPYRIGHT AND LICENSE</a></h1>
+<p>Copyright 2005, Carl Franks.  All rights reserved.  
+
+</p>
+<p>This library is free software; you can redistribute it and/or modify it under 
+the same terms as Perl itself.
+
+</p>
+<p>Licenses are in the files ``Artistic'' and ``Copying'' in this distribution.
+
+</p>
+
+</body>
+
+</html>

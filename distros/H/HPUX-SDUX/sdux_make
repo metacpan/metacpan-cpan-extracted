@@ -1,0 +1,7 @@
+install:
+	-test -d HPUX || (mkdir HPUX 2>&1 >/dev/null && ln SDUX.pm HPUX 2>&1 >/dev/null)
+	perl -MHPUX::SDUX -e wmf
+	make
+	make test
+	make depot
+	swinstall -s ${PWD}/sdux -x write_remote_files=true

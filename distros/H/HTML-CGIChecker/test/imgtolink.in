@@ -1,0 +1,5 @@
+<IMG ALT="pokus" SRC="my.server.com/a.gif" HEIGHT=60 WIDTH=70>
+<IMG ALT="pokus" SRC="http://my.server.com/a.gif">
+<IMG SRC=http://my.server.com/a.gif>
+<IMG SRC="http://my.server.com/a.gif" />
+<IMG SRC=http://my.server.com/a.gif WIDTH="40">

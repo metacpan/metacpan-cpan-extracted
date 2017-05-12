@@ -1,0 +1,23 @@
+Revision history for Hash-ConsistentHash
+0.07   Tue Jun  3 01:18:16 IST 2014
+  * Fix bug in the constructor
+  * cleanup trailing whitespaces
+0.05   Mon Apr 18 03:28:12 EEST 2011
+  * Rework the algorithm for more performance.
+  * Add get_bucket method for the cases when we look for only one
+    bucket per key.
+
+0.04   Sun Apr 17 22:23:35 EEST 2011
+  * Fix documentation and examples.
+
+0.03   Sun Apr 17 19:50:07 EEST 2011
+  * Rename Hash-ConstantHash to Hash-ConsistentHash
+  * Use user supplied hash function
+
+0.02    Sun Apr 17 02:51:34 EEST 2011
+  * Fix typos in documentation
+  * Add dependencies to the build system
+
+0.01    Sun Apr 17 00:51:34 EEST 2011
+  * First version, released on an unsuspecting world.
+

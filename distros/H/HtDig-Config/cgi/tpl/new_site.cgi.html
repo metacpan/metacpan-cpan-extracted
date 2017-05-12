@@ -1,0 +1,33 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <%$style_sheet_link%>
+    <title>ConfigDig: An ht://Dig Admin Tool</title>
+  </head>
+
+  <body>
+    <h1 align="center">ConfigDig</h1>
+    <h2 align="center">Indexed Site Administration</h2>
+<center>
+<form action="new_site.cgi" method="POST">
+<table align=center border=1>
+<tr>
+	  <td align=center>Register New Site</td>
+</tr>
+<tr>
+	  <td>New Site Name:<BR><input type="text" name="name"></td>
+</tr>
+<tr>
+	  <td>Conf file path:<BR><input type="text" name="path"></td>
+</tr>
+<tr>
+	  <td><input type="checkbox" name="auto_create"> Create this file if it doesn't exist</td>
+</tr>
+<tr>
+	  <td colspan=2 align=center><input type="submit" name="action" value="Register"> | <input type="submit" name="action" value="Cancel"></td>
+</tr>
+</table>
+</form>
+</center>
+</body>
+</html>

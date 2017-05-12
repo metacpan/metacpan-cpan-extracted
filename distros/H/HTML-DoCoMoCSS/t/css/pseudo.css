@@ -1,0 +1,14 @@
+a:visited {
+    color: blue;
+    background-color: red;
+}
+
+a:link {
+    color: yellow;
+    background-color: red;
+}
+
+.foo {
+    color: red;
+}
+

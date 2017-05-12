@@ -1,0 +1,72 @@
+{
+   "abstract" : "A cart/order/checkout framework with AxKit/TT/Catalyst support",
+   "author" : [
+      "Christopher H. Laco"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Handel",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.62",
+            "Test::More" : "0.94"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Class::Accessor::Grouped" : "0.10006",
+            "Class::ISA" : "0.36",
+            "Class::Inspector" : "1.24",
+            "Clone" : "0.31",
+            "DBD::SQLite" : "1.29",
+            "DBIx::Class" : "0.08123",
+            "DBIx::Class::UUIDColumns" : "0.02005",
+            "DBIx::Class::Validation" : "0.02005",
+            "Data::Currency" : "0.04002",
+            "DateTime" : "0.61",
+            "DateTime::Format::MySQL" : "0.04",
+            "Error" : "0.17016",
+            "File::Path" : "2.08",
+            "File::Spec::Functions" : "3.3",
+            "FileHandle" : "2.01",
+            "Finance::Currency::Convert::WebserviceX" : "0.07001",
+            "FormValidator::Simple" : "0.28",
+            "Getopt::Long" : "2.38",
+            "Locale::Currency" : "2.07",
+            "Locale::Currency::Format" : "1.28",
+            "Locale::Maketext" : "1.13",
+            "Module::Pluggable" : "3.9",
+            "Module::Starter" : "1.54",
+            "NEXT" : "0.64",
+            "Pod::Usage" : "1.36",
+            "SQL::Translator" : "0.11006",
+            "Scalar::Util" : "1.22",
+            "Tie::Hash" : "1.03",
+            "YAML" : "0.71",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.00014"
+}

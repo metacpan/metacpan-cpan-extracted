@@ -1,0 +1,14 @@
+Level 10
+--------
+
+"For security reasons, we now filter on certian characters" --
+okay they've gotten wise to our little game. But let's check
+how good their countermeasures are.
+
+Well, they don't allow us to use the semicolon or ampersand
+any longer. Well that's not a problem, I know other ways to
+manhandle that command into doing what I want. How about using
+the hash to make the rest of the line into a comment?
+
+Yep, it returns something that looks plausible. On to the next
+level!

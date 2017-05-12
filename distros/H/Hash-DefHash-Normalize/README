@@ -1,0 +1,25 @@
+SYNOPSIS
+
+     use Hash::DefHash::Normalize qw(normalize_defhash);
+    
+     my $ndh = normalize_defhash($dh);
+
+FUNCTIONS
+
+ normalize_defhash($dh[, \%opts ]) => HASH
+
+    Normalize and check DefHash $dh (a hashref). Return normalized hash,
+    which is a shallow copy of $dh. Die on error.
+
+    Available options:
+
+      * remove_internal_properties => BOOL (default: 0)
+
+      If set to 1, all properties and attributes starting with underscore
+      (_) with will be stripped. According to DefHash specification, they
+      are ignored and usually contain notes/comments/extra information.
+
+SEE ALSO
+
+    DefHash
+

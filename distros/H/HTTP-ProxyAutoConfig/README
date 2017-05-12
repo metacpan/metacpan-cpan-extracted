@@ -1,0 +1,61 @@
+HTTP::ProxyAutoConfig is Copyright (C) 1998-1999 The Jabber Team http://jabber.org/
+                         Copyright 2001, Ryan Eatmon <reatmon@mail.com>,
+                         Copyright 2010, Craig MacKenna <craig@animalhead.com>
+
+0.2 March 2010
+
+INSTALL via CPAN or CPANPLUS, or 
+    * download HTTP-AutoProxy-0.n.tar.gz into a good place for building
+    * cd into that place
+    * tar -xf HTTP-AutoProxy-0.n.tar.gz makes a similarly-named folder 
+    * cd into it
+    * perl Makefile.PL
+    * make
+    * make test
+    * sudo make install  (your system may not need sudo)
+     
+DESCRIPTION
+    Modern references include:
+      http://en.wikipedia.org/wiki/Proxy_auto-config
+      http://en.wikipedia.org/wiki/Web_Proxy_Autodiscovery_Protocol
+      http://www.craigjconsulting.com/proxypac.html
+      http://www.returnproxy.com/proxypac/
+     
+    This version allows use of a .pac file on disk as well as on the 
+    network, and improves the JavaScript to perl translation process,
+    almost to the point of being usable.
+     
+    Any fancy JavaScript in the .pac or wpad.dat file is can still  
+    result in a perl syntax error, but hopefully it will be displayed 
+    in an understandable way.  
+
+    If this happens to you, complain to craig@animalhead.com.  Include 
+    the error message and the .pac or wpad.dat file.
+     
+LICENSE INFORMATION
+    This module is free software; you may redistribute it and/or modify
+    it under the same terms as Perl 5.10.1.  For more details, see the
+    full text of the licenses at
+
+    <http://www.perlfoundation.org/artistic_license_1_0> and
+    <http://www.gnu.org/licenses/gpl-2.0.html>.
+
+    This program is distributed in the hope that it will be useful, but
+    it is provided "as is" and without any express or implied warranties.
+    For details, see the full text of the licenses at the above URLs.
+
+     
+0.1 May 2001
+
+    This module is being developed to provide access for Perl scripts 
+    to the Proxy Auto Config format from Netscape, originally at:
+    http://home.netscape.com/eng/mozilla/2.0/relnotes/demo/proxy-live.html
+
+    The URL above is no longer valid.  The file is now archived at
+    http://linuxmafia.com/faq/Web/autoproxy.html
+     
+    This is very very alpha, and may end up being sucked into another 
+    package if I can find a different maintainer.
+
+    Ryan Eatmon
+    reatmon@jabber.org

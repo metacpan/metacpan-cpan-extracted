@@ -1,0 +1,371 @@
+
+=head1 NAME
+
+ HTML::Transmorgify::Metatags - Template language processor
+
+=head1 SYNOPSIS
+
+ use HTML::Transmorgify;
+
+ my $magic = HTML::Transmorgify->new(xml_quoting => 1);
+
+ $magic->mixin('HTML::Transmorgify::Metatags');
+
+ my $output = $magic->process($input_text, { %options }, %variables);
+
+ use HTML::Transmorgify::Metatags qw(%transformations);
+ use HTML::Transmorgify::Metatags qw(@include_dirs);
+ use HTML::Transmorgify::Metatags qw(%allowed_functions);
+
+=head1 DESCRIPTION
+
+HTML::Transmorgify::Metatags provices an HTML-esque template
+language for transforming HTML.
+
+HTML::Transmorgify is a framework for compiling HTML transformations
+and HTML::Transmorgify::Metatags uses it to compile the template
+transformations.  Applying the transformations is a two step
+process with a compile-time part and a run-time part.  Compiled
+templates are cached so a second invocation of the same template
+will skip the compile-time part.
+
+HTML::Transmorgify::Metatags does not provide an escape-to-perl mechenism for
+template writers.  Instead template writers are considered to be only
+semi-trusted (by default they can embed javascript) and real programming
+is expected to be done either outside the template system or by 
+creating add-on modules for the template system to use.
+
+HTML::Transmorgify::Metatags directives look like regular
+HMTL tags.  They are 
+interpreted by HTML::Transmorgify and are not included in
+the final output stream.
+
+=head1 MACROS
+
+The C<E<lt>macroE<gt>> tag is used to expand a variable or macro.  
+The form of the call is:
+
+ <macro VAR_NAME>
+ <macro name=VAR_NAME>
+ <macro name=VAR_NAME encode=ENCODING=>
+
+Macro expansions can be done inside attribute values of other tags:
+
+ <img alt="<macro alttag>">
+
+Some macro values are evaluated at runtime.  These might in turn
+use other macros.  All named attributes to a E<lt>macroE<gt> 
+are added as temporary macros while doing a lookup.
+
+=head2 Defining Macro Values
+
+Macro values can be set in the invocation of HTML::Transmorgify:
+
+ my $output = $magic->process($input_text, { %options }, 
+ 	alt_tag => 'my image',
+	my_title => 'yea, we did it',
+	an_array => [ 'foo', 'bar' ],
+	a_hash => { foo => 'bar' },
+	an_object => $object,
+ );
+
+If a macro name has periods in it, then variable is expected to be
+a complex object or structure.  For example, if the variable name
+is C<an_array.1> then first C<an_array> would be looked up.  Assuming
+that what's found is a object, array, or hash, then C<1> would be 
+looked up in the result.  With the values initialized in the previous
+example, the result would be C<bar>.
+
+When a variable refers to an object, if there are additional elements
+to the variable name, they will be looked up by using the 
+C<lookup> method.  If there are no additional elements to refine the
+lookup, then the object is turned to text with the C<text> method.
+
+A virtual base clase that objects can inherit from is defined in
+L<HTML::Transmorgify::ObjectGlue>.
+
+Macros can also be defined with the C<E<lt>defineE<gt>> 
+directive.  All of these do the same thing:
+
+ <define title>my new title</define>
+ 
+ <define name="title">my new title</define>
+ 
+ <define title value="my new title" />
+  
+ <define name="title" value="my new title" />
+
+The E<lt>defineE<gt> tag uses some attributes to control
+it's behavior:
+
+=over 10
+
+=item eval
+
+Normally, E<lt>defineE<gt> values are evaluated at 
+runtime.  If you know that the value is never going to change,
+then you can use the C<eval> attribute set to false 
+to force the value to be evaluated and locked in at 
+compile time.  This can provide a performance boost.
+Setting C<eval=false> can have bad consequences if 
+the values change.
+
+ <define fullname><macro firstname> <macro lastname></define>
+
+Compile-time only happens once so if C<firstname> and C<lastname>
+are parameters that change from invocation to invocation, evaluating
+them should be deferred until runtime by using the C<eval="true">
+attribute.
+
+=item name
+
+The name of the Macro being defined. 
+
+=item value
+
+The text of the new defintion.
+
+=item trim
+
+The trim attribute will eleminate some of the whitespace from
+within the new value:
+
+=over 10
+
+=item start
+
+Trims whitespace from the beginning of the definition
+
+=item end
+
+Trims whitespace from the end of the definition
+
+=item all
+
+Trims whitespace from both ends of all text blocks within
+the definition.  The only things that are not text blocks
+are other tags that compile to something other than literal
+text.  For example, another E<lt>defineE<gt> tag.
+
+=back
+
+=back
+
+All attribute values of the E<lt>defineE<gt> tag become temporary
+overrides (local variables) for that define.  
+
+ <define firstname>John</define>
+ <define middlename>Fredricks</define>
+ <define lastname>Smith</define>
+ <define name lastname="Jones" eval=1><macro firstname> <macro middlename> <macro lastname></define>
+ <macro name middlename="Simon" lastname="Barney">
+
+The output from this will be C<John Simon Johnes>.  The firstname is C<John> 
+because that is the only value it gets.  The middle name is C<Simon> because
+it is overridden in the E<lt>macroE<gt> invocation.  The last name is
+C<Jones> because the it is overriden twice: first in the macro invocation
+and then in the definition of the C<name> E<lt>macroE<gt>.
+
+=head2 Transformations
+
+When a C<E<lt>macroE<gt>> is expanded, the new value can be
+transformed.  The syntax is
+
+ <macro macro_name encode="ENCODING">
+
+Where C<ENCODING> is one of the following:
+
+=over 10
+
+=item html
+
+Substitute C<&lt;> for C<E<lt>> and 
+C<&gt;> for C<E<gt>> and all similar HTMl entity 
+transformations handled by L<HTML::Entities>.
+This is the default transformation.  Use
+
+ encode="none"
+
+if you do not want this.
+
+=item uri / url
+
+Encode for a URL: Substitute C<%20> for space
+and all the rest of the substitutions 
+handled by L<URI::Escape>.
+
+=item comment
+
+Throw away the value and return the empty string.  
+XXX currently this still evaluates things within the
+comment, it's just the final result that is tossed.
+XXX add a <silent> or <empty> tag to supplant the
+current <comment> and have <comment> ignore its contents.
+
+=item none
+
+Pass the expanded value through unchanged.
+
+=back
+
+Transformations can also be invoked on any section of
+input text using the C<E<gt>transformE<lt>> tag.
+
+ <transform html>Really sloppy stuff with <> and the like.</transform>
+
+ <transform encode=url>http://my.url/with spaces in it</transform>
+
+Additional transformations can be added by modifying the 
+hash C<%HTML::Transmorgify::Metatags::transformations> which
+is exported by request.
+
+=head1 CONTROL FLOW
+
+HTML::Transmorgify::Metatags also provides control flow
+directives: conditionals, loops, and include files.
+
+=head2 C<E<lt>ifE<gt> E<lt>elsifE<gt> E<lt>elseE<gt>>
+
+There are two ways to write the conditional for an 
+C<E<lt>ifE<gt>> tag:
+
+ <if is_set="MACRO_NAME">
+
+ <if expr="<macro age> < 18">
+
+The C<is_set> test is true if the macro variable C<MACRO_NAME> 
+is set to a non-empty string.
+
+The C<expr> test supports a syntax that closely matches the 
+expresssion syntax supported by perl.  It is not evaluated with
+perl's C<eval> but rather the expression is parsed at compile
+time and evaluated at runtime using a grammer.  
+
+The grammer includes calling functions.  Only the functions
+defined in C<%HTML::Transmorgify::Metatags::allowed_functions> 
+(exported on request) are
+allowed.  Add more to that hash if you need them.
+
+The pre-defined functions are:
+
+=over 10
+
+=item abs()
+
+absolute value
+
+=item defined()
+
+value is defined
+
+=item min()
+
+From L<List::Util>
+
+=item max()
+
+From L<List::Util>
+
+=back
+
+The C<E<lt>ifE<gt>> block finishes with 
+
+ </if>
+
+C<E<lt>elsifE<gt>> and C<E<lt>elseE<gt>> are optional and do not have 
+their own closing tags.
+
+=head2 C<E<lt>foreach varname container(s) [assignments]E<gt>> 
+
+The C<E<lt>foreachE<gt>> tag provides looping. 
+
+The first parameter for C<E<lt>foreachE<gt>> is the name of the macro 
+that will change with each iteration.  This can also be set with 
+C<var=SOME_NAME>.  
+
+All suceeding parameters that are of the form of just an attribute
+name (without an equals sign for an attribute value) will be treated
+as macros that will be expanded into lists (if they can be).  The 
+resulting values from these expansions is what will be looped over 
+in the E<lt>foreachE<gt>.
+
+If there are no such parameters then E<lt>foreachE<gt> will look for
+a C<container=> parameter.
+
+Any additional attributes with values will be temporary overrides to 
+macros.
+
+When looping over a hash, C<E<lt>macro varnameE<gt>> will be set to 
+each of the values in turn.  When looping over an array, it will be set
+to each of the values in turn.  The keys from a hash will be
+available as C<E<lt>macro _varnameE<gt>> (notice the underscore).  The
+index positions from ann array will be C<E<lt>macro _varnameE<gt>>.
+
+=head2 C<E<lt>includeE<gt>> 
+
+The E<lt>includeE<gt> tag incoporates the contents of another file into
+the current output.  The name of the file can be specified as either the
+first attribute of the E<lt>includeE<gt> tag or as the named attribute
+C<file>.  Both of the following examples do the same thing:
+
+	<include body.inc>
+
+	<include file="body.inc">
+
+The filename must be a relative path.
+
+Files are searched for by traversing the array
+C<@HTML::Transmorgify::Metatags::include_dirs> which is exported by request.
+If any elements in that array are CODE references, then they will
+be invoked with the filename that is being searched for as an 
+argument.  Their return value should be undef or a filename.
+
+=head1 DIVERSIONS
+
+HTML::Transmorgify::Metatags provides diversions.  The macros that
+control this are C<E<lt>captureE<gt>> and C<E<lt>playbackE<gt>>.  What is capture'd is
+removed from the normal output flow of the document.  It can be
+included somewhere else with C<E<lt>playbackE<gt>>.  Diversions do not 
+effect the runtime execution order so the text for a capture will 
+be captured sequenced as if the capture didn't exist.
+
+For example you have:
+
+ Before
+ <define x value=before>
+ <capture A>
+ A
+ x1=<macro x>
+ <define x value=A>
+ x2=<macro x>
+ </capture A>
+ After
+ x3=<macro x>
+ <define x value=after>
+ <playback A />
+
+You'll get:
+
+  Before
+  After
+  x3=A
+  A
+  x1=before
+  x2=A
+
+Diversions are resolved as a post-processing step so
+the C<E<lt>captureE<gt>> and C<E<lt>playbackE<gt>> tags can be used in nearly any order.  
+You can C<E<lt>playbackE<gt>> a diverison before it is saved wtih C<E<lt>captureE<gt>>.
+
+A C<E<lt>playbackE<gt>> inside a C<E<lt>captureE<gt>> creates a dependency:
+the playback'ed diversion must be resolved before the catpure'd diversion.  
+Circular dependencies are not allowed.
+
+=head1 RESERVED WORDS
+
+The following macros/variables are reserved for future use and should
+not be used at the current time:
+
+	_diversions
+	_current_diversion
+

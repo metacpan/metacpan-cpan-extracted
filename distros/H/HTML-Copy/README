@@ -1,0 +1,38 @@
+HTML-Copy
+======================
+
+HTML::Copy copy a HTML file without breaking links in the file. HTML::Copy will be useful to mainten web site and to handle HTML templates. 
+
+This package provide a perl module "HTML::Copy" and a command line tool "htmlcopy".
+
+
+
+== INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+== DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  HTML::Parser
+  Class::Accessor
+  URI
+
+== COPYRIGHT
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2007 by Tetsuro KURITA
+mailto:tkurita@mac.com
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

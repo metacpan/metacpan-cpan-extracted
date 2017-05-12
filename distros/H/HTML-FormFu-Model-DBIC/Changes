@@ -1,0 +1,161 @@
+2.02 2016-06-24
+
+    - documentation fixes
+
+    - build and packaging tweaks, including travis CI config, additional
+      author tests, packaging etc
+
+2.00 2014-05-05
+
+    - switch from MooseX::Attribute::Chained to MooseX::Attribute::FormFuChained
+
+1.01 2014-01-06
+
+    - don't "use" optional modules in tests
+
+1.00 2013-12-16
+
+    - tests updated for HTML-FormFu v1.00 changes
+
+0.09010 2012-10-05
+
+    - Support belongs_to rel with a ComboBox element.
+    
+    - localize_label works with non-column label accessors.
+    
+    - Add support to create required belongs_to rels (pshangov).
+    
+    - options_from_model() can populate from DBIx::Class ENUM values.
+    
+    - Constraint::DBIC::Unique - new id_field() and method_name() methods.
+    
+    - Constraint::DBIC::Unique - others() now supports nested_names values.
+    
+    - Require HTML-FormFu v0.09010 due to internals used by
+      Constraint::DBIC::Unique
+
+0.09000 2011-03-29
+
+    - Updated to work with HTML-FormFu 0.09000
+    
+    - condition_from_stash now accepts hash from stash, but not from config.
+
+0.08002 2010-09-22
+
+    - Incompatible Change: removed all previously deprecated methods.
+    
+    - Fix: Was trying to pass undef to NOT NULL columns - changed check from
+      ( $is_nullable || ... ) to ( $is_nullable && ... )
+      appears to have been unintentionally changed in svn r93 when the code
+      was a part of DBIx::Class::HTML::FormFu.
+    
+    - many-to-many handling with restricting condition tests and code
+      to prevent deleting outside of restriction in update code.
+
+    - New 'others' option for Constraint::DBIC::Unique.
+
+    - Constraint::DBIC::Unique tests added.
+
+0.06000 2009-12-10
+
+    - Test suite now uses in-memory SQLite database, so tests can be run in
+      parallel.
+    
+    - many-to-many Checkboxgroup tests.
+
+0.05003 2009-11-25
+
+    - New 'link_values' and 'additive' options for multi-value fields for
+      many-to-many relationships.
+    
+    - Doc updates.
+
+0.05002 2009-07-06
+
+    - Remove prerequisite Test::MockObject - it uses UNIVERSAL::isa which
+      was causing test failures.
+
+0.05001 2009-07-03
+
+    - Fix delete_if_true to work inside a surrounding block.
+    
+    - Made DBIC deletes conditional on row being in_storage.
+    
+    - Bump DBIx::Class prerequisite to 0.08106, when it switched from using
+      DateTime::Format::MySQL to DateTime::Format::SQLite.
+    
+0.05000 2009-05-26
+
+    - Fix update() "primary key and the foreign key may not be the same column"
+      errors.
+    
+    - options_from_model() 'label_col' works again with non-column accessors.
+
+0.04003 2009-05-10
+
+    - Bumped prerequisite HTML-FormFu to 0.04002
+
+0.04002 2009-05-08
+
+    - New "empty_rows" setting - replaces now deprecated "new_empty_row".
+    
+    - New "new_rows_max" setting - replaces now deprecated "new_empty_row_multi".
+    
+    - Previously, the field named in "new_empty_row" was used to determine
+      whether to insert a new row. - Now we simply insert a new row if any
+      field within the Repeatable block has a submitted value.
+    
+    - New 'read_only' model_config option.
+    
+    - New 'ignore_if_empty' model_config option.
+    
+    - Support nested Repeatable elements.
+
+0.04000 2009-04-22
+
+    - New "empty_rows" setting - replaces now deprecated "new_empty_row".
+    
+    - New "new_rows_max" setting - replaces now deprecated "new_empty_row_multi".
+    
+    - Previously, the field named in "new_empty_row" was used to determine
+      whether to insert a new row. - Now we simply insert a new row if any
+      field within the Repeatable block has a submitted value.
+
+0.03007 2008-12-08
+
+    - Bump required version no. of HTML-FormFu to 0.03007
+
+0.03006 2008-12-03
+
+    - options_from_model() - If we've a Catalyst context but no schema on
+      the form stash, use config values for 'model' and 'resultset'
+    
+    - update() - if a checkbox/radio value isn't submitted, and the column
+      is NOT NULL, set it to 0 (zero), not DEFAULT VALUE.
+    
+    - Tests for new ComboBox element.
+    
+    - Modified delete_if_true example to no longer use "delete" as a
+      form item name - this is bad!
+
+0.03003 2008-08-21
+
+    - Updated to work with is_field/is_block changes in HTML-FormFu
+
+0.03002 2008-08-11
+
+    - New {label} setting.
+    
+    - New {new_empty_row_multi} setting.
+    
+    - Allow {nested_base} on non-column, non-rel methods.
+    
+    - Bugfix: RT#35861 - not all non-field elements have a nested_name() method.
+    
+    - Bugfix: use new_related() instead of create_related() before setting
+      column values, to ensure we don't die on NOT NULL columns.
+
+0.03000 2008-06-19
+
+    - First CPAN release
+    - HTML::FormFu::Model::DBIC moved out of HTML::FormFu distribution

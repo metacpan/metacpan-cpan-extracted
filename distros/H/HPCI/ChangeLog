@@ -1,0 +1,135 @@
+0.50 - Documentation for regexp add_deps
+     - fixed some add_dep -> add_deps typos
+
+0.49 - Added regex support for add_deps method
+     - Added documentation for log_no_stdout/log_no_stderr from 0.48
+
+0.48 - Added log_no_stdout and log_no_file attributes to suppress writing
+       the log either to stdout or to a file.  The default is to continue
+	   writing both.
+	 - Fixed a message that was going explicitly to stdout instend of being
+	   logged.
+	 - Removed a test from t/19-env_key.t which would break if the BoutrosLab
+	   local config is being used. That config setting is a reasonable one
+	   for other locations to set (making max_concurrent have a non-zero
+	   default), so the test is no worth keeping around.
+
+0.47 - Improved docs for verify_completion_state
+       - added state argument to verify_completion_state callback
+       - allows callback to only test when the run passed or failed
+       - clarified that undef return would leave state unchanged
+     - Added env_keys list of named keys, and env_key_specific hashes of
+       attributes.  The env_key_specific contains hashes of attribute values
+       to be merged into the new object attribute list (like cluster_specific)
+       if the key is in the env_keys list.
+
+0.46 - SystemLogger - moved the commentary from STDERR to log
+     - changed log status of some messages from info to warn/debug
+     - converted some STDERR messages to use log
+     - added some missing build_requires for testing
+
+0.45 - SystemLogger - moved the commentary from STDERR to log
+     - added files attribute to Stage
+     - added checking files attribute to ensure that required output files
+       were generated before accepting a stage as passed
+
+0.44 - SystemLogger was not in MANIFEST
+     - added .perlcriticrc to quiet BoutrosLab local settings
+
+0.43 - added SystemLogger.pm module
+       - not used by default
+       - available by request (esp. by LocalConfig)
+       - logs return status in a global location
+         - can be used to check for recurring problems like failing node
+           hardware
+       - initialization of default_attributes was broken
+
+0.42 - added verify_completion_state callback to allow user code to decide
+       whether a stage finished successfully, should be retried, or failed
+       independently of the stage's exit status
+     - added final_job_state to stats to record pass/fail/retry decision
+     - removed modules_to_load from tests - they are BoutrosLab specific
+     - renamed t/01-templating-role.t to t/01-templating_role.t for consistency
+     - fixed a test title
+     - added test for forced_retries and fixed it (was broken)
+     - removed unused line of code from ScriptSource - would fail if local
+       config did not invoke HPCI::ModuleLoad
+
+0.41 - made stage_dir the normal name for the stage creation attribute
+     - added stage_dir_name to have the created stage_dir be created under
+     group_dir
+
+0.40 - rearranged retry logic
+       - added should_choose_retry and choose_retries attributes
+         - allows user-provided function to decide whether a retry
+           should be attempted after a stage fails (with a limit to
+           the maximum number of retries, default 1)
+
+0.39 - Doc updates
+
+0.38 - cleanup of HPCI.pm pod
+     - minor typo bugfixes noticed in pod cleanup, no-body had actually
+       tripped over them yet
+
+0.37 - add force_retries attribute to stage objects to force a specified
+         number of retries before deciding that a stage has really failed
+     - some cleanup of pod, more yet to come
+
+0.36 - tighten timeout processing to reduce critical section holes
+     - protect against $? being over-written
+     - added 'stage_defaults' attribute to group - a hash that will be used as
+         attributes for every stage that gets created
+     - added 'cluster_specific' attribute to both group and stage creation
+         - a hash indexed by cluster type
+             - if there is an entry for the actual cluster type
+                 - that subhash will be used as attributes
+             - other non-matching cluster types will be ignored
+         - allows same code to be used for multipe cluster types more easily
+     - added a default_attrs hash to HPCI for config over-rides to use
+
+0.35 - added HPCI::LocalConfig support code to allow local configuration
+     - cleaned up module dependencies, removed some use statements that are no
+     longer used
+     - refactored _register_status and _collect_job_stats to support drmaa in
+     SGE
+     - cleaner (non-Dumper) output for stage status
+     - added required modules to Build.PL
+
+0.34 - made dump of job status info more readble
+
+0.33 -
+     - use 'method' instead of 'sub' in parameterized roles - the doc says
+         that this is required, although it seemed to be working before
+     - added support for abort for cases when the driver can identify a
+         situation in which the job was not attempted to be run
+     - added direct support for kill, killsignal rather than leaving them
+         tangled in exit_status and subject to local interpretation
+     - rearranged a number of methods and modifiers so that they could be
+         overridden in drivers smoothly
+     - removed default from HPCI::ModuleLoad, made it an empty array that can
+         be loaded by a config wrapper module
+     - added support for extra roles to be provided for local environments
+         and/or specific cluster types.  (e.g. ModuleLoad might be selected
+         for labs that use it for all cluster types)
+     - added ScriptSource extra role to allow a local environment to request
+         adding a line at the beginning of the generated script for each run
+         to source necessary config stuff
+         It defaults to an empty array that can be provided by a config
+         wrapper module
+     - reordered stuff relating to running, needed to provide alternate
+         control for different run styles in drivers (in particular, using DRMAA
+         to manage SGE)
+0.32 - major cleanup of existing tests
+     - more tests added
+     - bug fixes
+       - mkdir initialization handling
+       - timeout termination handling
+       - failure handling choices all work (skip_deps, skip_all, ignore)
+     - enhancements
+       - made dep/deps and pre_req/pre_reqs be synonyms for add_deps method
+         - both accept a scalar or list
+       - added ChangeLog and README
+
+0.31 - initial CPAN release
+0.30 - separate SGE into an independent module preparing for CPAN release
+0.01 .. 0.25 - BoutrosLab internal releases

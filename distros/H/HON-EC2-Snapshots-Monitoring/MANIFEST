@@ -1,0 +1,24 @@
+.perlcriticrc
+.perltidyrc
+.travis.yml
+bin/hon-ec2-snapshots-monitoring.pl
+Changes
+ignore.txt
+lib/HON/EC2/Snapshots/Monitoring.pm
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+README.md
+t/00-load.t
+t/01-find-backup.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/resources/bad-example-1.log
+t/resources/bad-example-2.log
+t/resources/good-example.log
+xt/boilerplate.t
+Makefile.PL
+META.yml
+META.json

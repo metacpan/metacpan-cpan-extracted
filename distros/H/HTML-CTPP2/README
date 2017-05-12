@@ -1,0 +1,68 @@
+HTML-CTPP2 version 2.5.9
+========================
+
+HTML::CTPP2 - Perl interface for CTPP2 library
+
+This module is very similar to well-known Sam Tregar's HTML::Template but works
+in 22 - 25 times faster and provides extra functionality.
+CTPP2 template language dialect contains 11 operators: <TMPL_var>, <TMPL_if>,
+<TMPL_elsif>, <TMPL_else>, <TMPL_unless>, <TMPL_loop>, <TMPL_udf>, <TMPL_include>,
+<TMPL_comment>, <TMPL_call> and <TMPL_block>.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires installed CTPP2 library version 2.4.1 or higher.
+You can download it here: http://ctpp.havoc.ru/download/
+To install CTPP2 library type the following:
+
+   wget http://ctpp.havoc.ru/download/ctpp2-2.X.X.tar.gz
+   gunzip ctpp2-2.X.X.tar.gz
+   tar -xf ctpp2-2.X.X.tar
+   cd ctpp2-2.X.X
+   cmake .
+   make
+   make test
+   make install
+
+Since CTPP uses cmake you should have installed cmake building system,
+see http://www.cmake.org/
+
+
+COPYRIGHT AND LICENCE
+
+  Copyright (c) 2006 - 2009 CTPP Team
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+  1. Redistributions of source code must retain the above copyright
+     notice, this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+  4. Neither the name of the CTPP Team nor the names of its contributors
+     may be used to endorse or promote products derived from this software
+     without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+  OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+  HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+  SUCH DAMAGE.
+

@@ -1,0 +1,30 @@
+<ep-package name="HTML::EP::Locale">
+<ep-if neval="$cgi->from$">
+  <ep-language language="de">
+    <ep-error type=user>Keine Absendermailadresse wurde eingegeben.</ep-error>
+  <ep-language language="en">
+    <ep-error type=user>Missing sender address.</ep-error>
+  </ep-language>
+</ep-if>
+<ep-mail subject="$@cgi->subject$" from="$@cgi->from$" to="$@cgi->to$"
+         cc="$@cgi->cc$" bcc="$@cgi->bcc$">
+$@cgi->body$
+</ep-mail>
+<ep-language language="de">
+  <ep-set var="ListButton" val="Zurück zur Mailboxliste">
+<ep-language language="en">
+  <ep-set var="ListButton" val="Back to the mailbox list">
+</ep-language>
+<html><head><title><ep-language de="Mail verschickt" en="Mail sent"></title>
+</head>
+<body onLoad="document.listform.submit()">
+  <form name=listform action=list.ep method=post>
+    <input type=hidden name=pop3server value="$cgi->pop3server$">
+    <input type=hidden name=pop3user value="$cgi->pop3user$">
+    <input type=hidden name=pop3password value="$cgi->pop3password$">
+    <input type=hidden name=start value="$start$">
+    <input type=submit value="$ListButton$">
+  </form>
+</body>
+<script language=Javascript>document.listform.submit()</script>
+</html>

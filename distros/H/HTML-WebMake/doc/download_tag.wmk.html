@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>
+      WebMake: Documentation: download_tag.wmk
+    </title>
+    <meta name="generator" content="WebMake/2.2" />
+    <style>
+      body {
+       background-color: #ffffff; 
+       color: #000000; 
+       font-size: medium;
+       font-family: verdana,lucida,helvetica,sans-serif;
+      }
+      code, samp, pre {
+       font-family: Courier New,courier,fixed-width,monospace;
+      }
+      H1 { font-size: x-large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFCC66; }
+      H2 { font-size: large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFDD77; }
+      H3 { font-size: medium; font-family: Garamond,Book Antiqua,Times,serif; background: #FFEE88; }
+      H4 { font-size: small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H5 { font-size: x-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H6 { font-size: xx-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      A:link {
+       font-weight: bold;
+       color: #004000;
+       text-decoration: underline; 
+      }
+      A:visited {
+       font-weight: normal;
+       color: #008000;
+       text-decoration: underline; 
+      }
+      A:active {
+       font-weight: bold;
+       color: #800000;
+       text-decoration: underline; 
+      }
+      dt {
+       font-size: medium;
+       font-weight: bold;
+       padding-top: 8px; padding-bottom: 8px;
+      }
+      dd {
+       padding-top: 8px; padding-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body bgcolor="#ffffff" text="#000000" link="#3300cc" vlink="#660066">
+    <font face="lucida,verdana,sans-serif">
+      <div align="center">
+        <img src="images/WebMakeTitle.png" alt="WebMake" width="500" height="122" />
+      </div>
+      <table width="100%">
+        <tr>
+          <td valign="top">
+            <strong><a href="http://webmake.taint.org/">WebMake</a>
+             Documentation</strong> (version 2.2)
+             
+          </td>
+          <td valign="top">
+            <div align="right">
+              
+               [ <a href="csvtable_tag.wmk.html">Back</a> | <a href="dump_vars.wmk.html">Forward</a> | <a href="index.html">Index</a>
+               | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+               
+            </div>
+          </td>
+        </tr>
+      </table>
+<!-- yes, it's that Mozilla black-border code again ;) -->
+      <!-- stolen from www.mozilla.org via rc3.org -->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td bgcolor="#aaaaaa">
+            <table border="0" cellspacing="4" cellpadding="4" width="100%">
+              <tr>
+                <td bgcolor="#ffffff">
+                  <table border="0" cellspacing="4" cellpadding="4" width="100%">
+                    <tr>
+                      <td>
+                        <h1>download_tag.wmk</h1><!-- INDEX BEGIN -->
+                        <ul>
+                          <li>
+                            <a href="#LOADING">LOADING</a><li>
+                              <a href="#HTML_TAGS">HTML TAGS</a><li>
+                                <a href="#DESCRIPTION">DESCRIPTION</a><li>
+                                  <a href="#OPTIONS_WHICH_AFFECT_THIS_TAG">OPTIONS WHICH AFFECT THIS TAG</a>
+                                </ul>
+<!-- INDEX END -->
+                                                                <hr />
+                                <h1><a name="LOADING">LOADING</a></h1><p>
+                                  <pre>
+  &lt; use plugin=&quot;download_tag&quot; /&gt;
+                                </pre>
+                                <hr />
+                                <h1><a name="HTML_TAGS">HTML TAGS</a></h1><p>
+                                  <pre>
+  &lt; download file=&quot;filename.dat&quot; [text=&quot;template&quot;] /&gt;
+                                </pre>
+                                <hr />
+                                <h1><a name="DESCRIPTION">DESCRIPTION</a></h1><p>
+                                  
+                                  This WebMake Perl library provides a quick shortcut to make links to files
+                                  for download.
+                                  <p>
+                                    
+                                    The attributes supported are as follows:
+                                    <dl>
+                                      <dt>
+                                        <strong><a name="item_file">file=&quot;filename.dat&quot;</a></strong>
+                                      </dt>
+                                      <dd>
+                                        <p>
+                                          
+                                          The filename to link to. If a file by this filename does not exist, a
+                                          warning will be printed.
+                                          <p>
+                                            
+                                            Filenames should be specified relative to one of the following:
+                                            <dl>
+                                              
+                                            </dd>
+                                            <dt>
+                                              <strong><a name="item_the">the top level of the site</a></strong>
+                                            </dt>
+                                            <dd>
+                                              
+                                            </dd>
+                                            <dt>
+                                              <strong>the output file which contains the tag (not recommended, as it precludes
+                                              the tag being used in another output file in a different directory)</strong>
+                                            </dt>
+                                            <dd>
+                                              
+                                            </dd>
+                                            <dt>
+                                              <strong><a name="item_a">a directory named in the FileSearchPath WebMake option</a></strong>
+                                            </dt>
+                                            <dd>
+                                              
+                                            </dd>
+                                          </dl>
+                                        </dd>
+                                        <dt>
+                                          <strong><a name="item_text">text=&quot;template&quot;</a></strong>
+                                        </dt>
+                                        <dd>
+                                          <p>
+                                            
+                                            The link text to be used. The following content items are defined for use
+                                            inside the link text:
+                                            <dl>
+                                              
+                                            </dd>
+                                            <dt>
+                                              <strong><a name="item_download">download.path</a></strong>
+                                            </dt>
+                                            <dd>
+                                              <p>
+                                                
+                                                The real path to the file.
+                                                
+                                              </dd>
+                                              <dt>
+                                                <strong><a name="item_download">download.href</a></strong>
+                                              </dt>
+                                              <dd>
+                                                <p>
+                                                  
+                                                  The path to the file, relative to the current output file.
+                                                  
+                                                </dd>
+                                                <dt>
+                                                  <strong><a name="item_download">download.name</a></strong>
+                                                </dt>
+                                                <dd>
+                                                  <p>
+                                                    
+                                                    The file's name, without directories.
+                                                    
+                                                  </dd>
+                                                  <dt>
+                                                    <strong><a name="item_download">download.mdate</a></strong>
+                                                  </dt>
+                                                  <dd>
+                                                    <p>
+                                                      
+                                                      The file's modification date, in <code>ctime()</code> format, e.g. <em>Thu Mar 01 20:54:34
+                                                      2001</em>.
+                                                      
+                                                    </dd>
+                                                    <dt>
+                                                      <strong><a name="item_download">download.mtime</a></strong>
+                                                    </dt>
+                                                    <dd>
+                                                      <p>
+                                                        
+                                                        The file's modification date, in UNIX time_t format.
+                                                        
+                                                      </dd>
+                                                      <dt>
+                                                        <strong><a name="item_download">download.size_in_k</a></strong>
+                                                      </dt>
+                                                      <dd>
+                                                        <p>
+                                                          
+                                                          The file's size, in kilobytes (rounded up).
+                                                          
+                                                        </dd>
+                                                        <dt>
+                                                          <strong><a name="item_download">download.size</a></strong>
+                                                        </dt>
+                                                        <dd>
+                                                          <p>
+                                                            
+                                                            The file's size, in bytes.
+                                                            
+                                                          </dd>
+                                                          <dt>
+                                                            <strong><a name="item_download">download.owner</a></strong>
+                                                          </dt>
+                                                          <dd>
+                                                            <p>
+                                                              
+                                                              The file's owner.
+                                                              
+                                                            </dd>
+                                                            <dt>
+                                                              <strong><a name="item_download">download.group</a></strong>
+                                                            </dt>
+                                                            <dd>
+                                                              <p>
+                                                                
+                                                                The file's group.
+                                                                
+                                                              </dd>
+                                                              <dt>
+                                                                <strong><a name="item_download">download.tag_attrs</a></strong>
+                                                              </dt>
+                                                              <dd>
+                                                                <p>
+                                                                  
+                                                                  The remaining attributes of the download tag.
+                                                                  
+                                                                </dd>
+                                                              </dl>
+                                                              <p>
+                                                                <code>template</code> can be, and should often be, a $ {content_reference}. The default template
+                                                                is:
+                                                                <p>
+                                                                  <pre>
+  &lt; a href=&quot;$ {download.href}&quot; $ {download.tag_attrs}&gt;$ {download.name}
+  ($ {download.size_in_k}k)&lt; /a&gt;
+                                                                </pre>
+                                                                <p>
+                                                                  
+                                                                  Note that this means that any unrecognised attributes of the download tag
+                                                                  itself will become attributes of the A tag.
+                                                                  <p>
+                                                                    
+                                                                    The default template can be overridden by setting the template content item
+                                                                    <code>download.template</code>.
+                                                                    <hr />
+                                                                    <h1><a name="OPTIONS_WHICH_AFFECT_THIS_TAG">OPTIONS WHICH AFFECT THIS TAG</a></h1><p>
+                                                                      <code>FileSearchPath</code> - WebMake option
+                                                                    </td>
+                                                                  </tr>
+                                                                </table>
+                                                              </td>
+                                                            </tr>
+                                                          </table>
+                                                        </td>
+                                                      </tr>
+                                                    </table>
+                                                    <table width="100%">
+                                                      <tr>
+                                                        <td valign="top">
+                                                          <strong><a href="http://webmake.taint.org/">WebMake</a>
+                                                           Documentation</strong> (version 2.2)
+                                                           
+                                                        </td>
+                                                        <td valign="top">
+                                                          <div align="right">
+                                                            
+                                                             [ <a href="csvtable_tag.wmk.html">Back</a> | <a href="dump_vars.wmk.html">Forward</a> | <a href="index.html">Index</a>
+                                                             | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+                                                             
+                                                          </div>
+                                                        </td>
+                                                      </tr>
+                                                    </table>
+                                                    <div align="right">
+                                                      <a href="http://webmake.taint.org/"><img src="images/BuiltWithWebMake.png" alt="Built With WebMake" border="0" width="88" height="31" /></a>
+                                                    </div>
+                                                  </font>
+                                                </body>
+                                              </html>

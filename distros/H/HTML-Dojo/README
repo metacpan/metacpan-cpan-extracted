@@ -1,0 +1,100 @@
+NAME
+    HTML::Dojo - Provides the Dojo JavaScript / AJAX distribution 0.4.3
+    files.
+
+SYNOPSIS
+        use HTML::Dojo;
+    
+        my $dojo = HTML::Dojo->new;
+    
+        my @editions = $dojo->editions();
+    
+        my @files = $dojo->list( \%options );
+    
+        my $data = $dojo->file( $filename, \%options );
+
+DESCRIPTION
+    HTML::Dojo provides files from the Dojo JavaScript / AJAX distribution.
+
+    These files include the "dojo.js" file, the entire "src" directory, the
+    "iframe_history.html" file, various "*.swf" files, the "LICENSE",
+    "README" and "build.txt" files.
+
+METHODS
+  new
+        $dojo->new( %options );
+
+    This returns a HTML::Dojo object.
+
+    Optional arguments are:
+
+    "edition"
+
+  editions
+        $dojo->editions();
+
+    This method returns a list of all available editions. Each edition
+    represents a distribution file made available by the Dojo Foundation,
+    and as such is subject to change with each release.
+
+    The current editions available are:
+
+    ajax
+    charting
+    dojoWebsite
+    editor
+    event_and_io
+    kitchen_sink
+    lfx
+    moxie
+    storage
+    widget
+    xdomain-ajax
+
+  list
+                $dojo->list( \%options );
+
+            Returns an array-ref of all files available.
+
+            Optional arguments are:
+
+            "edition"
+            "directories", include directory names, default 0
+            "files", include ordinary-file names, default 1
+
+  file
+                $dojo->file( $filename, \%options )
+
+            Returns the contents of the named file.
+
+            Optional arguments are:
+
+            "edition", default "ajax".
+
+SEE ALSO
+            <http://dojotoolkit.org>, HTML::Prototype
+
+SUPPORT
+            Catalyst mailing list:
+
+                http://lists.rawmode.org/mailman/listinfo/catalyst
+
+AUTHOR
+            Carl Franks, <cfranks@cpan.org>
+
+COPYRIGHT AND LICENSE
+                Copyright (C) 2006 by Carl Franks
+
+            This library is free software; you can redistribute it and/or
+            modify it under the same terms as Perl itself, either Perl
+            version 5.8.8 or, at your option, any later version of Perl 5
+            you may have available.
+
+                    Copyright (c) 2004-2005, The Dojo Foundation
+
+                    All Rights Reserved
+
+            The Dojo distribution files may be redistributed under either
+            the modified BSD license or the Academic Free License version
+            2.1.
+

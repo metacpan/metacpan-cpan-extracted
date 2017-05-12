@@ -1,0 +1,81 @@
+#!/usr/bin/perl
+=head1 NAME
+
+giggles - just some example code using HTML::Stream
+
+=cut
+
+
+BEGIN {
+    unshift @INC, "..";
+}
+
+package StringHandle;
+sub new {
+    my $self = '';
+    bless \$self, shift;
+}
+sub print {
+    my $self = shift;
+    $$self .= join('', @_);
+}
+
+
+package main;
+use HTML::Stream;
+use FileHandle;
+
+my $SH = new StringHandle;
+my $HTML = new HTML::Stream $SH;
+$HTML -> H1 -> t("<Hello & welcome!>") -> _H1;
+print "PRINTED STRING: ", $$SH, "\n";
+
+my $HTML = new HTML::Stream;
+$HTML -> H1 -> t("none") -> _H1;
+
+my $HTML = new HTML::Stream \*STDOUT;
+$HTML -> H1 -> t("<\\*STDOUT>") -> _H1;
+
+my $HTML = new HTML::Stream 'STDOUT';
+$HTML -> H1 -> t("STDOUT") -> _H1;
+
+my $HTML = new HTML::Stream 'main::STDOUT';
+$HTML -> H1 -> t("main::STDOUT") -> _H1;
+
+my $fh = new FileHandle ">&STDOUT";
+my $HTML = new HTML::Stream $fh;
+$HTML -> H1 -> t("FD 0") -> _H1;
+
+
+
+package MY::HTML;
+
+@ISA = qw(HTML::Stream);
+     
+    sub Aside {
+	$_[0] -> FONT(SIZE=>-1) -> I;
+    }
+    sub _Aside {
+	$_[0] -> _I -> _FONT;
+    }
+
+package main;
+
+use HTML::Stream qw(:funcs);
+
+    my $HTML = new MY::HTML \*STDOUT;
+    
+    $HTML -> Aside
+          -> t("Don't drink the milk, it's spoiled... pass it on...")
+          -> _Aside;
+
+    $HTML -> nl -> comment("Hey\nthere") -> comment("Ho");
+
+my $htmlstr = "<I>Hi</I> &amp; 360&#176;\n";
+print "Raw:        ", $htmlstr;
+print "Unescaped:  ", html_unescape($htmlstr);
+print "Unmarkedup: ", html_unmarkup($htmlstr);
+
+
+1;
+

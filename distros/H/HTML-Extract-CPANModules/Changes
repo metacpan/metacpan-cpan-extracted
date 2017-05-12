@@ -1,0 +1,23 @@
+Revision history for HTML-Extract-CPANModules
+
+0.04    2016-03-07 (PERLANCAR)
+
+	- No functional changes.
+
+	- Adjust to CPAN::Module::FromURL 0.05.
+
+
+0.03    2016-02-21 (PERLANCAR)
+
+	- [Bugfix] Extract text from all elements, not just <p> & <td> (we
+	  might miss text in <li>, <h1>, <h2>, and lots of others).
+
+
+0.02    2016-02-21 (PERLANCAR)
+
+	- Tweak Rinci metadata to make function more CLI-friendly.
+
+
+0.01    2016-02-21 (PERLANCAR)
+
+        - First release.

@@ -1,0 +1,313 @@
+README
+
+Table of Contents
+  1. INSTALLATION
+      a. FIRST-TIME INSTALLATION
+      b. SUBSEQUENT OR MANUAL INSTALLATION
+      c. A COMPLETELY MANUAL INSTALL
+
+  2. SPACE-BAR POSITIONING
+  3. INSERTING AND UPLOADING IMAGES
+  4. MEDIA MANAGER IN MULTIPLE DOKUWIKI INSTALLATIONS
+  5. FCKEDITOR TOOLBAR
+    DokuWikiFCK Tools and Toolbar Extensions
+  6. LOCK TIME OUT AND AUTO-DRAFT SYSTEM
+  7. SUPPORT FOR LARGE FILES
+  8. BACKUPS OF FCK FILES WHEN SWITCHING TO NATIVE DOKUWIKI EDITOR 
+
+1. INSTALLATION
+
+HTML::WikiConverter::DokuWikiFCK
+
+This package includes DokuWikiFCK.pm, a perl extension to DokuWik.pm and fckg, a 
+plugin which supports the new syntax created by DokuWikiFCK.pm. 
+
+    a. FIRST-TIME INSTALLATION
+    A first-time installation is best done using CPAN: perl -MCPAN -e 'install 
+    HTML::WikiConverter::DokuWikiFCK' This will install all of the Perl dependencies 
+    you need as well as the fckg DokuWiki plugin. Please Note: You should be 
+    prepared to provide the installer with the full path to your DokuWiki plugins, 
+    for instance: /var/www/html/dokuwiki/lib/plugins 
+    The fckg plugin will then be installed in your plugins directory. 
+    You will also be asked if you would like to replace the DokuWiki mediamanager 
+    with a revised version which is needed for the FCKeditor The revised version is 
+    entirely compatible with DokuWiki. Your original DokuWiki mediamanager.php will 
+    be backed up. 
+
+    b. SUBSEQUENT OR MANUAL INSTALLATION
+    The DokuWikiFCK package can be downloaded from this web site or from CPAN at:
+                      
+    http://search.cpan.org/search?module=HTML::WikiConverter::DokuWikiFCK 
+  
+    To install, the standard instructions are: 
+    gzip -dc HTML-WikiConverter-DokuWikiFCK-0..tar.gz | tar -xvf - 
+    OR 
+    tar -xzf HTML-WikiConverter-DokuWikiFCK-0.XX.tar.gz 
+    perl Makefile.PL 
+    make 
+    make test 
+    make install 
+
+
+    c. A COMPLETELY MANUAL INSTALL
+    DokuWikiFCK.pm subclasses DokuWiki.pm in order to give additional functionality 
+    to the FCK editor. First, place DokuWikiFCK.pm and DokuWikiFCKN.pm in the perl5 
+    directory, where DokuWiki.pm is installed. This should be: 
+    usr/lib/perl5/site_perlHTML/WikiConverter. Then install the fckg plugin in the 
+    DokuWiki plugins directory. The following perl dependencies are required: 
+      HTML::WikiConverter
+      HTML::WikiConverter::DokuWiki
+
+    d. EXTRA CSS
+    The file fckg/extra/style.css should be copied to your dokuwiki template
+    directory, which is normally lib/tp/default 
+
+2. SPACE-BAR POSITIONING
+    The FCKeditor supports positioning of text and images using the Outdent, Indent, 
+    and Justification toolbar items. Justification is left, right, and center. 
+    Outdent and Indent position elments at 40 pixel intervals. DokuWikiFCK has 
+    extended this functionality to enable positioning by use of the space-bar.  The 
+    editor's toolbar functions have priority over space-bar positioning. 
+    Until version 3.0.1 of Firefox, Firefox ignored spaces when switching from the 
+    FCKeditor the browser; that is, it collapsed runs of contiguous spaces to a 
+    single space.  Presumably, it treated spaces found in the editor like spaces in 
+    an HTML document instead of as non-breaking spaces, which have a width set by 
+    the current font and font-size.  This meant, for example, that if you pushed 
+    something over from the left margin, using the space-bar, when you switched over 
+    to the browser it would be back at the left margin.  To compensate, DokuWikiFCK 
+    saved runs of three or more spaces as medial dots.  This required a great deal 
+    of book-keeping.  First, since the middot is a printable character, 
+    DokuWikiFCK had to make sure that it didn't display; then it had to convert the 
+    middot to a non-breaking space when displaying in the browser; and it had to 
+    keep track of whether it was in IE or in Firefox, since the problem didn't exist 
+    in IE.  Finally, it was not an ideal solution, because the middot is not the 
+    same width as a space character and since in non-Latin alaphabets the middot may 
+    have a valid orthographical use. 
+
+    Because of the changes in Firefox 3.0.1, this work-around is no long needed.  
+    Therefore, as of version 24 of DokuWikiFCK, the middot workaround is no longer 
+    supported.  However, version 24 of DokuWikiFCK recognizes that there may still 
+    be users of DokuWiki who have not upgraded to Firefox 3 or who might be using 
+    browsers incompatible with the changes to version 24.  The administrator can 
+    assign these users to a special DokuWiki group (or groups) using the 
+    Configuration Manager. The default name for this group is middot. Users 
+    assigned to this goup will use DokuiWikiFCKN instead of DokuWikiFCK.  
+    DokuWikiFCKN retains the middot protocol.  In version 24, DokuWikiFCK and 
+    DokuWikiFCKN are as much as possible homogenous, and there should be little if 
+    any difference between documents edited using either of these modules when the 
+    documents are displayed in the browser.   However, there is no guarantee that 
+    DokuWikFCKN will keep up with changes to DokuWikiFCK.  One hopes that users will 
+    upgrade to compatible browsers. 
+
+    Version 24 of DokuWikiFCK has been tested on IE6 and 7, Firefox 3.0.1, Safari 
+    3.1.2 (Windows). 
+
+3. INSERTING AND UPLOADING IMAGES
+    The DokuWiki media manager is used for uploading files and the FCKEditor media 
+    manager is used for inserting files in the FCK editor's editing space. To 
+    implement inserting and uploading of images: 
+         a. replace the copy of DokuWiki's mediamanager.php in tpl/ with the one included 
+            in this package.
+         b. create a userfiles directory in your document root directory. Inside 
+            userfiles, create a symbolic link that points to the dokuwiki media directory:
+                     userfiles
+                     image  -> /data/media
+
+4. MEDIA MANAGER IN MULTIPLE DOKUWIKI INSTALLATIONS
+
+    If you are running more than one dokuwiki on your server,each using DokuWikiFCK, 
+    and if each has its own media directory, you will have to create a 'userfiles' 
+    directory for each installation, and each 'userfiles' will need an 'image' link 
+    to its own media directory. The way to do this is as follows: 
+        a. for each installation create a 'userfiles' directory
+        b. in each 'userfiles' create a link to its media directory
+        b. go to fckg/fckeditor/editor/filemanager/connectors/php.config.php and in 
+        config.php make the following edits:
+
+            ADD: 
+            $UserFilesRealPath = /absolute/path/to/userfiles/'; 
+
+            CHANGE: 
+            Path to user files relative to the document root: 
+            $Config['UserFilesPath'] = '/userfiles/'; 
+            Note: 'path/to' does not include the document root directory itself! See the 
+            example below. 
+            //$Config['UserFilesAbsolutePath'] = ""; 
+            $Config['UserFilesAbsolutePath'] = $UserFilesRealPath; 
+
+            EXAMPLE: 
+            Your absolute path is: /var/www/html/dw_1/userfiles 
+            Your document root is: /html/ 
+            $UserFilesRealPath = '/var/www/html/dw_1/userfiles/'; 
+            $Config['UserFilesPath'] = '/dw_1/userfiles/'; 
+            $Config['UserFilesAbsolutePath'] = $UserFilesRealPath; 
+            The rest follows the instructions for a single userfiles directory in 3 above. 
+
+5. FCKEDITOR TOOLBAR
+    The following FCKEditor Toolbar items are supported: 
+
+            FCKConfig.ToolbarSets["Dokuwiki"] = [
+               ['Bold','Italic','Underline','StrikeThrough','-','Subscript','Superscript'],
+               ['OrderedList','UnorderedList'],  ['Outdent','Indent'],
+               ['JustifyCenter','JustifyLeft','JustifyRight'],
+               ['Rule', 'Block_Q'], ['Smiley', 'SpecialChar'], [],
+               ['Cut','Copy','Paste','PasteText', 'PasteWord', 'SpellCheck', 'Find'],
+               ['Style'], ['FontFormat','FontName','FontSize'],
+               ['Undo','Redo','RemoveFormat', '-','Table','Format_Table'],
+               ['TextColor','BGColor', 'Plugin_Tool', 'Trim_Spaces','Delete_P'],
+               ['Link','Unlink'], ['Image', 'Source' ],
+               ['About']
+             ] ;
+
+    The Quick Reference to the Standard toolbar items shows the toolbar icons of the 
+    tools supported by DokuWikiFCK, and it briefly describes the use of each tool. 
+    The toolbar can be customized. See the documentation on the FCKeditor site. 
+
+    DOKUWIKIFCK TOOLS AND TOOLBAR EXTENSIONS
+
+    DokuWikiFCK implements a number of tools of its own and extensions to the 
+    standard toolbar items.Some of these are described fully on the features page
+    of the web site.  More briefly, they are: 
+
+    The plugin tool ('Plugin_Tool')
+      a. This tool maintains the integrity of syntax plugins. 
+      b. It escapes plugin markup for plugins which use angle brackets, so that the 
+        brackets will not be mistaken for HTML syntax.
+      c. It guarantees that plugin syntax which produces output will not be replaced by 
+        that output. This is essential for plugins that refresh their output when the 
+        page is refreshed.
+      d. It guarantees that javascript scripts needed for the plugins will be sent to 
+        the browser.
+        See the features page for details. 
+
+    The Table Formatting tool ('Format_Table')
+        This tool supports an extended set of options for formatting tables. See the 
+        features page section on formatting tables. There is also a 'Styles' option 
+        which implements the creation of standard DokuWiki table headers. See table 
+        headers on the features page. 
+
+    The BlockQuote Tool ('Block_Q')
+        This is an extended version of the Blockquote toolbar item that comes standard 
+        with the FCKEditor. Our extension supports border styles and colors, font 
+        selection and background colors. 
+
+    The Paragraph to LineBreak Tool ('Delete_P')
+        The FCKeditor uses paragraphs as its basic unit of separation between text 
+        blocks.   This tool will convert paragraphs to line-breaks, making it possible 
+        to create sequences of short single-spaced lines, as in I.b. above.  Otherwise, 
+        single-spacing would happen only within paragraphs, and sequences of short lines 
+        would be double spaced  (i.e. each it own paragraph).  The ony other way in 
+        DokuWiki to get sequences of single-spaced lines is in lists. 
+
+    The Trim Spaces Tool ('Trim_Spaces')
+        The FCKeditor often populates a page with blank paragraphs.  This tool 
+        eliminates them.  It was developed before the appearance of Firefox 3 when 
+        unnecessary inserted spaces also found their way into documents.  The 'spaces' 
+        mode of this tool is operable only with the older protocol governing runs of 
+        spaces (see 2. above). 
+
+   Spell Checker
+        DokuWikiFCK supports the FCKeditor SpellerPages facility.  To use this facility,
+        you must have GNU aspell installed and all required aspell dictionaries. The
+        aspell binary must be in the web server's path.  On Mac OS X, for instance,
+        the ports command installs in the /opts directory and so /opts/bin
+        will very likely not be in the web server's path; hence a symbolic link from /usr/bin
+        to the aspell binary will be needed.
+
+   
+   Creating Code Blocks
+    
+       With the Style->Code Selection, when pasting text use this procedure,
+       depending on which browser you use:
+         FireFox:
+               Use the 'Paste' Icon or right-click and then click on "Paste"
+               Then Select Text and click on Style->Code
+               Inserting a new-line when at the end of a line sometimes causes the code 
+               block to divide into two blocks. There are two techniques that
+               help to prevent this.  The first is to make sure there are no
+               spaces at the end of the line.  Or else, move the cursor to the 
+               beginning of the next line and then hit return.  The
+               new line is now above the current line and below the line above it.               
+               IF no text follows your code block, insert a few extra blank lines
+               at the end of your page before creating the code block; otherwise
+               the cursor gets stuck inside the block and you can't move on
+               to the next line.
+        IE
+               Use the 'Paste' Icon, then select your text and click on the
+               <P> -> <BR> tool (also available by right-click mouse).  This
+               will remove the paragraphs (or double line spacing) which
+               can be restored after the code block has been created.
+               Then Select Text and click on Style->Code.   
+       Safari:
+              Safari is similar to FireFox but also may require using the <P> -> <BR>
+              tool, as in IE. 
+
+       In all cases, you can create an empty code block and insert text into it using 
+       Ctrl-C/Ctrl-V on Windows and Command-C/Command-V on the Mac.  
+       
+       To match the FCKeditor's handling of the Code styles, insert into your template
+       directory the style.css file found in fckg/extra.
+
+   Special Characters Tool ('SpecialChar')
+      The FCKeditor's Special Characters Tool comes with a table of chacters that can
+      be inserted into the text with a mouse click. DokuWikiFCK expands this by providing
+      a text box which will accept either an HTML character entity or entity number,
+      enabling the user to insert all potential character entities into the text.
+
+      Note on the Open Angle Bracket
+         The open angle bracket introduces an HTML tag and requires special treatment outside of a code
+         block.  The open angle bracket should be converted to a variable, using the Style
+         menu.  Highlight the bracket and select Style->variable.  Initially and text following
+         may be converted to italic.  To get rid of the italics after the bracket, use the eraser tool.
+         
+      
+6. LOCK TIME OUT AND AUTO-DRAFT SYSTEM
+
+With version 24 of DokuWikiFCK, the FCKeditor is fully tied into DokuWiki's auto-draft and
+file locking systems. Until this tie-in, DokuWiki was unable to monitor the FCKeditor
+editing space for keyboard activity. Unable to detect evidence of editing activity, it
+would not save drafts and would would issue a lock time out warning every 14 minutes.
+Version 23 of DokuWikiFCK dealt with the latter by disabling the time out warning, because
+users found the warnings a nuisance. With version 24, this is no longer necessary; time
+out warnings and the auto-drafts work as they should. 
+
+Issues: 
+
+    1. Because making this tie-in took a bit of technological legerdemain, DokuWikiFCK
+provides for the possibility that it might fail in untested browsers or under certain
+browser conditions. If so, a check box will appear with the following label : Disable
+editor time-out messsages. Administrators may not want to allow all users to have the
+privilege; therefore, there is a setting in the Configuration Manager which enables the
+administrator to set a group which has this privilege. The default setting for this group
+is ANY, which means that all users have this privilege should they need it; there is no
+need to create a group called ANY .
+    2. In cases where a draft file is recovered, the draft is not in DokuWiki format but in
+HTML, which is how the FCKeditor sees it.
+    3. There is a Refresh button, which enables the user to renew the lock wthout having to
+Save or switch to Preview.
+
+See: http://www.dokuwiki.org/draft
+     http://www.dokuwiki.org/locking
+
+7. SUPPORT FOR LARGE FILES
+
+On some systems the shell cannot pass through large files between scripts, hence the files
+would be lost.  Large files are now saved to a tmp file by save.php
+and reloaded for processing in saveFCK.pl The files are saved to a temp file ins Dokuiki's 
+data/tmp directory (this must be writable by the web server).
+
+Configuration options for handling large files (found in Configuration Manager):
+ big_files:     default=FALSE. 
+                Must be set to TRUE for large files facility to take effect.
+ big_file_sz:   default=65000 bytes.
+                Files larger than big_file_sz will be treated as Large Files; 
+ big_file_tm:   default=15 seconds.
+                If a large file takes longer big_file_tm seconds to be
+                processed, the procesing will be aborted and the original text will be saved--
+                which means that the current edits will be lost. 
+
+8. BACKUPS OF FCK FILES WHEN SWITCHING TO NATIVE DOKUWIKI EDITOR
+   The editing page gives the user the option of switching to the native DokuWiki Editor.  It offers
+   two choices, to convert to standard DokuWiki markup or to save the current file and start with
+   a blank editor.  
+

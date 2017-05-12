@@ -1,0 +1,49 @@
+auto_fieldset: 1
+
+elements:
+    - type: Select
+      name: view_class
+      label: 'Catalyst View Class'
+      values:
+        - 'View::TT'
+        - 'View::TT::Alloy'
+      constraints:
+        - type: AutoSet
+        - type: Required
+        - type: SingleValue
+    
+    - type: Select
+      name: render_method
+      label: 'FormFu render_method'
+      options:
+        - [string, string]
+        - [tt, tt]
+      constraints:
+        - type: AutoSet
+        - type: Required
+        - type: SingleValue
+    
+    - type: Select
+      name: tt_module
+      label: 'FormFu tt_module'
+      values:
+        - Template
+        - Template::Alloy
+      constraints:
+        - type: AutoSet
+        - type: Required
+        - type: SingleValue
+    
+    - type: Select
+      name: config_file_ext
+      label: 'Config file type'
+      options:
+        - ['.yml',  'YAML']
+        - ['.conf', 'Config::General']
+      constraints:
+        - type: AutoSet
+        - type: Required
+        - type: SingleValue
+    
+    - type: Submit
+      name: submit

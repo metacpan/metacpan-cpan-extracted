@@ -1,0 +1,5 @@
+<table>
+<tr><td>123</td><td>Fred Flintstone</td><td><a href="delete.html?id=123">delete</a></td></tr>
+<tr><td>456</td><td>   Barney Rubble   </td><td></td></tr>
+<tr><td>789</td><td>Dino  </td><td><a href="delete.html?id=789">delete</a></td></tr>
+</table>

@@ -1,0 +1,36 @@
+1.15
+  A few smalll bugfixes
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+   make clean
+   make install_examples #open /index.html in your browser
+
+UNINSTALLATION
+
+   To uninstall this module type the following:
+
+   make install unistall=1
+
+DEPENDENCIES
+
+if you want run the examples you need CGI.pm.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Hr. Dirk Lindner
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public License
+as published by the Free Software Foundation; 
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+

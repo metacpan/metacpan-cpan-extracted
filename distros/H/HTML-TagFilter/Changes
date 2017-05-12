@@ -1,0 +1,116 @@
+Revision history for Perl extension HTML::TagFilter.
+
+1.03  Wed Nov 7 2005
+	- updated manifest to include new tests and test subclass module. d'oh.
+
+1.02  Wed Nov 7 2005
+	- callbacks will now call method of same (triggerpoint) name if no
+	  coderef has been supplied. This means that people who prefer to 
+	  override in subclass just need a method with the triggerpoint name.
+	- fixed silly bug where setting xss_allow_local_links to zero was ignored
+	- fixed very silly operator precedence bug in xss test for local urls. 
+	  (Both these last two thanks to kolya@mail.ru)
+
+1.01  Sun Oct 15 2005
+    - tweaked trigger points so that tag acceptability tests are called
+      first: avoids situations where the callback sub is doing something
+      with a tag that will then be rejected. stupido! 
+    - also fixed a couple of minor bugs in sample code
+    - tweaked default acceptance rules to include <strong>
+
+1.0	  Sun Oct 15 2005
+	- handy hooks added in response to various requests for added 
+	  functionality. See spanner.org/tagfilter for recipes.
+	- documentation tidied up.
+	- No bug reports for a year now, so we'll call this version 1.
+
+0.091 Fri Aug 13 2004
+    - silly bug fixed in mailto obfuscation (the mailto: part has to be left
+      in clear, as any fule kno).
+
+0.09 Fri Jul 9 2004
+    - mailto: obfuscation added. switchable-off.
+    - url filtering properly integrated with other attribute rules, so that 
+      naughty url attributes are omitted instead of empty.
+    - xss logging brought into line with other filters, thanks to Brian Hirt.
+    - 'reason' value added to filter log, mostly for later use
+    - entification of <> now switchable-off too.
+    - method documentation improved. rules docs still longer than bible :(
+    - xss configuration (eg attributes to watch out for) made easier to change.
+
+0.08 Wed Jun 2 2004
+    - By popular demand, a filter with only denial rules lets through everything
+      that is not explicitly denied. Makes it easier to strip out a few tags and
+      leave the rest.
+    - bugfix: supplying an empty set of rules to allow_tags or deny_tags now
+      clears that part of the rule set, as the docs promise.
+    - clear_rules method added to simplify the interface.
+    - Tests now use Test::More like proper grown-ups.
+
+0.075 Wed Oct 8 2003
+    - noticed that cross-site safeguards were preventing mailto: hrefs from 
+      getting through. Corrected.
+
+0.074 Tues Jul 23 2003
+    - tidied up a bit
+    - extended the default list of xss vulnerable tags to: src, lowsrc, 
+      href, background, cite. Also made it user-modifiable in subclass.
+    - a few remaining variables turned into subs to facilitate subclassing
+
+0.073  Tues Jul 22 2003
+    - cross-site scripting protection improved: parser allowed to entify
+      again (that was silly), but values for certain vulnerable attributes
+      are subjected to extra tests to ensure urlness not scriptness.
+    - tests added for the xss protection and other recent fixes
+
+0.072  Tues Jul 22 2003
+    - attribute order now preserved (requested by GA long ago)
+    - parser instructed not to de-entify: closes a loophole that
+      could allow an attacker to hide forbidden tags (eg script)
+      within attribute values, to be revealed when Parser turned &quot;
+      into "
+    - all attributes s/javascript:// just in case.
+    - bug corrected where 'none' was not magic in rule set, but just 
+      treated as another attribute (d'oh)
+
+0.071  Mon Jul 21 2003
+    - changed default handler to escape < and > in order
+      to prevent a common cross-site attack, thanks to bug report 
+      by nick cleaton
+
+0.07  Thu Oct 25 2001
+    - no more warnings
+    - error() reporting. can now write 
+      $foo = $tf->filter($bar) || die $tf->error 
+      and get sensible output. main tests in place. 
+
+0.06 Sun Oct 21 2001
+    - Simplified interface with addition of ->filter() and ->report() methods
+    - Abandoned attempts to preserve tag order: put back on to do list :(
+    - Made pod even more windy.
+    - Added 'echo' option to direct output to STDOUT as a proper child 
+      of HTML::Parser should, at Gisle Aas' suggestion. makes it more 
+      useful to networking applications, apparently.
+
+0.05  Wed Sep 20 2001
+    - Added tag/attribute removal logging, and 'log' option, in order 
+      that users may be chastised in detail for putting in naughty html.
+
+0.04  Wed Sep 19 2001
+    - Added _check() method to allow testing of values deep in HoHoHo 
+      without autovivification and subsequent mess. 
+    - Denial rules become less ambitious, more useful. 
+    - Pod grows more verbose.
+
+0.03  Tues Sep 18 2001
+    - Changed from trying to work out meaning of empty lists to using 
+      reserved words 'any', 'all', 'none'. 
+    - Denial rules work sporadically.
+
+0.02  Mon Sep 17 2001
+    - Added denial rules. 
+    - Didn't work very well.
+
+0.01  Fri Sep 14 01:19:43 2001
+    - Only permission filter: no denial rules.
+    - Worked quite well.

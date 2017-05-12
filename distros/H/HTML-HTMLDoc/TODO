@@ -1,0 +1,8 @@
+Deal with error codes coming from htmldoc. Create an interface to deal with this codes.
+
+Test the path function
+accept more than one path in the path-function
+use the dirs specified in path to check the location of images and files
+
+Examine and add toc-support
+

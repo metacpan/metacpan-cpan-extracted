@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <%$style_sheet_link%>
+    <title>ConfigDig: An ht://Dig Admin Tool</title>
+  </head>
+
+  <body>
+    <h1 align=center>ConfigDig</h1>
+    <h2 align=center>Indexed Site Administration<BR>Global Settings</h2>
+<center>
+<form action="edit_conf.cgi" method="POST">
+<table align=center border=1>
+<tr>
+	  <td colspan=2 align="center"><a href="index.cgi">Back to Main</a></td>
+</tr>
+<tr>
+	  <td colspan=2 align="center"><%$status_msg%></td>
+</tr>
+<tr>
+	  <td>ConfigDig Log Path<BR>(must be valid directory)</td>
+	  <td><input name="log_path" value="<%$log_path%>"></td>
+</tr>
+<tr>
+	  <td>htDig Base Path<BR>Usually "/opt/www"<BR>(must be valid directory)</td>
+	  <td><input name="base_path" value="<%$base_path%>"></td>
+</tr>
+<tr>
+	  <td align="center" colspan="2"><input type="submit" value="Update" name="action"> 
+	  <input type="reset" value="Revert to Saved"></td>
+</tr>
+</table>
+</form>
+</center>
+  </body>
+</html>

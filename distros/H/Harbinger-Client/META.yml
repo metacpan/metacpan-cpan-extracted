@@ -1,0 +1,32 @@
+---
+abstract: 'Impend all the doom you could ever want ⚔'
+author:
+  - 'Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Harbinger-Client
+recommends:
+  Catalyst: '5.90053'
+  Plack: '0'
+requires:
+  DBIx::Class::QueryLog: '0'
+  List::Util: '0'
+  Module::Runtime: '0'
+  Moo: '0'
+  Sereal::Encoder: '0'
+  Time::HiRes: '0'
+  Try::Tiny: '0'
+  namespace::clean: '0'
+  perl: '5.016001'
+resources:
+  bugtracker: https://github.com/frioux/Harbinger-Client/issues
+  homepage: https://github.com/frioux/Harbinger-Client
+  repository: https://github.com/frioux/Harbinger-Client.git
+version: '0.001002'

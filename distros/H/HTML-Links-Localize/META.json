@@ -1,0 +1,62 @@
+{
+   "abstract" : "Convert HTML Files to be used on a hard disk",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830",
+   "keywords" : [
+      "hard-disk",
+      "html",
+      "index",
+      "links",
+      "local",
+      "localise",
+      "localize",
+      "view"
+   ],
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-Links-Localize",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::Parser" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "HTML::Links::Localize" : {
+         "file" : "lib/HTML/Links/Localize.pm",
+         "version" : "v0.2.8"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "url" : "http://bitbucket.org/shlomif/perl-html-links-localize"
+      }
+   },
+   "version" : "v0.2.8"
+}

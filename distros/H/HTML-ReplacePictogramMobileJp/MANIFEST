@@ -1,0 +1,22 @@
+Build.PL
+Changes
+lib/HTML/ReplacePictogramMobileJp.pm
+lib/HTML/ReplacePictogramMobileJp/AirHPhone.pm
+lib/HTML/ReplacePictogramMobileJp/Base.pm
+lib/HTML/ReplacePictogramMobileJp/DoCoMo.pm
+lib/HTML/ReplacePictogramMobileJp/EZweb.pm
+lib/HTML/ReplacePictogramMobileJp/Vodafone.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00_compile.t
+t/01_simple.t
+t/02_regression_utf8_flag.t
+xt/01_podspell.t
+xt/02_perlcritic.t
+xt/03_pod.t
+xt/04_minimum_version.t
+xt/05_cpan_meta.t
+xt/06_meta_author.t

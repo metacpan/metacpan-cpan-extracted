@@ -1,0 +1,12 @@
+---
+id: form
+elements:
+  - type: Hidden
+    name: h1
+  - type: Text
+    name: t1
+    label: a Text element
+  - type: Hr
+  - type: Text
+    name: t2
+    label: ^ This is a Hr

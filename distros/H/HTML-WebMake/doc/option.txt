@@ -1,0 +1,20 @@
+<wmmeta name="Title" value="The &lt;option&gt; Tag" />
+<wmmeta name="Section" value="02-tags_attrs" />
+<wmmeta name="Score" value="114" />
+<wmmeta name="Abstract">
+set options controlling WebMake behaviour
+</wmmeta>
+
+The &lt;option&gt; tag takes two attributes:
+
+	__name__:	The name of the option;
+
+	__value__:	The value to set it to.
+
+
+Example
+=======
+
+<safe>
+  <option name="FileSearchPath" value="../files" />
+</safe>

@@ -1,0 +1,189 @@
+<webmake>
+
+<{!--
+
+     A quick demo of using WebMake to generate a news site, this time with
+     sections.  This is vaguely reminiscent of Wired News, or Slashdot without
+     the comments.
+
+     For this demo, we read the sections from the story text files, and use
+     whatever sections they have defined.  Normally I would imagine it would be
+     better to define the section names in advance, in a list, then warn about
+     stories that used an unknown section, but hey, this is a demo. ;)
+
+  --}>
+
+<{!-- ------------------------------------------------------------------- --}>
+
+<include file="sample_stories.inc" />
+
+<{perl
+  # create a ${all_stories} variable containing the list
+  # of all text files just loaded. Trim off the .txt
+  # at the end of each filename.  Also create per-section
+  # lists.
+  #
+  # Note that there will probably be a PerlCode library function
+  # to do all this ;)
+
+  my @all = ();
+  my %sections = ();
+
+  foreach my $pg (sorted_content_matching ("score title", "*.txt"))
+    my $sect = get_content ($pg . ".section");
+    $pg =~ s/\.txt$//; push (@all, $pg);
+    push (@{$sections{$sect}}, $pg);
+  }
+
+  # make the list of all stories
+  set_content ("all_stories", join (' ', @all));
+
+  # the list of all sections
+  my @section_names = sort keys %sections;
+  set_content ("all_sections", join (' ', @section_names));
+
+  # and each per-section story list
+  foreach my $sect (@section_names) {
+    set_content ("section_stories_$sect",
+			  join (' ', @{$sections{$sect}}));
+  }
+
+  '';		# this perl code produces no output
+}>
+
+<{!-- ------------------------------------------------------------------- --}>
+
+<{!-- Just as a demo, let's throw the story's abstract into the
+      header as the Description HTML meta tag.
+   --}>
+
+<content name=header map=false>
+  <html><head>
+    <title>$[this.title]</title>
+    <meta name="Description" value="$[this.abstract]" />
+  </head>
+  <body bgcolor=#ffffff>
+  <h1>WebMake Sitemap with Sections Demo</h1>
+  <hr />
+  <a href=$(mainindex)>Index</a> | 
+  <a href=$(map)>Site Map</a> | 
+  <a href=$(fullmap)>Full Site Map</a>
+  <hr />
+</content>
+
+<content name=footer map=false>
+  </body>
+  </html>
+</content>
+
+<{!-- ------------------------------------------------------------------- --}>
+
+<content name=index_list_item map=false>
+  <li>
+    [<a href=$(sect_$[${item}.txt.section])>$[${item}.txt.section]</a>]
+    <a href=$(${item})>$[${item}.txt.title]</a><br />
+    <p>$[${item}.txt.abstract]</p>
+  </li>
+</content>
+
+<content name=index_chunk isroot=true>
+  <wmmeta name=Title value="WebMake Sample: a news site with sections" />
+  <wmmeta name=Abstract value="A news site with sections" />
+
+  <ul>
+  <{perl
+    make_list ('index_list_item', split (' ', get_content ("all_stories")));
+  }>
+  </ul>
+</content>
+
+<{!-- ------------------------------------------------------------------- --}>
+
+<for name=sect values="${all_sections}">
+  <content name="${sect}_index_chunk" up=index_chunk>
+    <wmmeta name=Title value="WebMake Sample: ${sect} section" />
+    <wmmeta name=Abstract value="Index of the ${sect} section" />
+    <wmmeta name=Score value="5" />
+
+    <{perl
+      make_list ('index_list_item',
+	    split (' ', get_content ("section_stories_${sect}")));
+    }>
+  </content>
+</for>
+
+<{!-- ------------------------------------------------------------------- --}>
+
+<{!-- 
+  BTW, in passing, note that this file uses a /story directory to store
+  the stories, whereas the basic news site does not; the only change
+  that needed to be made was the change to the file attribute below.
+  Nothing else needed to be changed to do this! Cool eh?
+--}>
+
+<for name=pg values="${all_stories}">
+  <out name="${pg}" file="sitemap_with_sections_html/story/${pg}.html">
+    ${header}${${pg}.txt}${footer}
+  </out>
+</for>
+
+<{!-- ------------------------------------------------------------------- --}>
+
+<for name=sect values="${all_sections}">
+  <out name="sect_${sect}" file="sitemap_with_sections_html/${sect}/index.html">
+    ${header}${${sect}_index_chunk}${footer}
+  </out>
+</for>
+
+<out name=mainindex file=sitemap_with_sections_html/index.html>
+  ${header}${index_chunk}${footer}
+</out>
+
+<{!-- ------------------------------------------------------------------- --}>
+
+<content name=sitemapnode map=false>
+  <li>
+    <p>
+      <a href=$(url)>${title}</a><br>
+      <em>[score: ${score}, name: ${name}, is_node: ${is_node}]</em>
+      <ul>
+	${list}
+      </ul>
+    </p>
+  </li>
+</content>
+
+<content name=sitemapleaf map=false>
+  <li>
+    <p>
+      <a href=$(url)>${title}</a><br>
+      <em>[score: ${score}, name: ${name}, is_node: ${is_node}]</em>
+    </p>
+  </li>
+</content>
+
+<content name=sitemapdynamic map=false>
+  <li>
+    <em>[${name} = "$[${name}]"]</em>
+  </li>
+</content>
+
+<out name=map file=sitemap_with_sections_html/map.html>
+  <wmmeta name=title value="WebMake Sample: site map" />
+  <wmmeta name=Abstract value="Map of the site" />
+  ${header}${mainsitemap}${footer}
+</out>
+
+<sitemap name=mainsitemap node=sitemapnode leaf=sitemapleaf />
+
+<out name=fullmap file=sitemap_with_sections_html/fullmap.html>
+  <wmmeta name=title value="WebMake Sample: full site map" />
+  <wmmeta name=Abstract value="Full map of the site" />
+  ${header}${fullsitemap}${footer}
+</out>
+
+<sitemap name=fullsitemap rootname=index_chunk all=true
+      node=sitemapnode leaf=sitemapleaf dynamic=sitemapdynamic />
+
+</webmake>
+

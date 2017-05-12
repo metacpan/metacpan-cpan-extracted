@@ -1,0 +1,30 @@
+<ep-package name="HTML::EP::Explorer">
+<ep-explorer-init>
+<ep-explorer-config file="admin/config.pm">
+<ep-set var=dir_template>
+  <tr><td><a href="$env->PATH_INFO$?basedir=$#l->url$"><img src=folder.gif> $l->name$</a></td><td>$&MODE->l->mode$</td><td>$&UID->l->uid$</td><td>$&GID->l->gid$</td><td>$l->size$</td><td>$&DATE->l->mtime$</td></tr>
+</ep-set>
+<ep-set var=file_template>
+  <tr><td>$l->name$</td><td>$&MODE->l->mode$</td><td>$&UID->l->uid$</td><td>$&GID->l->gid$</td><td>$l->size$</td><td>$&DATE->l->mtime$</td><td>$&ACTIONS->l$</td></tr>
+</ep-set>
+<ep-set var=action_template>
+  <td><a href="action.ep?file=$#l->url$&action=$#action->name$">$@icon$</a></td>
+</ep-set>
+
+<html><head><title>HTML::EP Explorer</title></head>
+<body bgcolor=#ffffff>
+<h1>HTML::EP Explorer</h1>
+<table>
+  <tr><th>Name</th><th>Unix-Permissions</th><th>User</th>
+      <th><ep-language de="Gruppe" en="Group"></th>
+      <th><ep-language de="Größe" en="Size"></th>
+      <th><ep-language de="Datum" en="Date"></th>
+  </tr>
+<ep-explorer-browse basedir="$env->DOCUMENT_ROOT$" item=l>
+</table>
+<div align=center>
+  <a href="prefs.ep?return_to=index.ep">
+    <ep-language de="Voreinstellungen" en="Preferences"></a>
+</div>
+</body></html>
+

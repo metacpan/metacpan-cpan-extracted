@@ -1,0 +1,397 @@
+=pod
+
+=head1 NAME
+
+Hyper::Developer::Manual::Example - Example Hyper Application
+
+=head1 VERSION
+
+This document describes Hyper::Developer::Manual::Example 0.03
+
+=head1 DESCRIPTION
+
+Hyper is a Workflow and Service/Usecase based Web Framework.
+After creating a new environment for your Hyper stuff
+developing applications with Hyper can be splitted into three
+different parts.
+
+=over
+
+=item Modelling
+
+Define Workflows and Controls.
+
+=item Programming
+
+Add your own code to your pages, to interfaces and add additonal things.
+
+=item Beautifying
+
+Modify generated templates (HTML) and add JavaScript for Show/Hide etc.
+
+=back
+
+=head1 REQUIREMENTS
+
+You need to install the following Perl packages.
+
+=over
+
+=item *
+
+Hyper
+
+=item *
+
+Hyper::Developer
+
+=item *
+
+Authen::Htpasswd
+
+=back
+
+=head1 SAMPLE
+
+Let's look at our sample:
+
+You want to create a workflow for changing passwords. Usernames
+and passwords are stored in a .htpasswd file. The tasks should
+be placed on three different pages.
+
+=over
+
+=item Page 1 - choose_username
+
+With a username select, where the selection is required. There
+should be an button to go to the next page.
+
+=item Page 2 - change_password
+
+Two fields - one for the new password and another one to confirm the
+new password. Both entered passwords must match, before the password
+will be changed. The fields are required fields. There should be
+a button to go to next page.
+
+=item Page 3 - confirmation
+
+Confirm the password change and show page 1 again.
+
+=back
+
+=head1 CREATE NEW ENVIRONMENT
+
+Depending on your operating system you maybe need to change the permissions
+of the directory /srv using chmod.
+
+Then run the following command:
+
+    hyper.pl --base_path=/srv/www.example.com/ --namespace=Example --type=env
+
+If this is your first Hyper Usecase you have to create a new environment.
+
+=head1 MODELLING
+
+=head2 Page 1
+
+Create a file
+
+    /srv/www.example.com/etc/Example/Control/Container/User/CSelectUsername.ini
+
+with the following Content
+
+    [Control]
+    [Control user]
+    class=Hyper.Control.Base.BSelect
+
+    [Control submit]
+    class=Hyper.Control.Base.BPushButton
+
+    [Step]
+    [Step START]
+    [Step START Show]
+
+    [Step Show]
+    controls=<<EOT
+    user
+    submit
+    EOT
+    [Step Show END]
+    condition=submit.pushed();
+
+    [Step END]
+
+To get rid of the syntax, have a look at L<Hyper::Config::Reader::Container>
+
+To generate code and a template from this file call
+
+    hyper.pl --template --file=/srv/www.example.com/etc/Example/Control/Container/User/CSelectUsername.ini
+
+=head2 Page 2
+
+Create a file
+
+    /srv/www.example.com/etc/Example/Control/Container/User/CChangePassword.ini
+
+with the following content
+
+    [Control]
+    [Control compare_passwords]
+    class=Hyper.Control.Validator.Group
+    [Control compare_passwords Validator Group Hyper.Validator.Group.Compare]
+
+    [Control new_password]
+    class=Hyper.Control.Base.BInput
+    [Control new_password Validator Single Hyper.Validator.Single.Required]
+    [Control new_password Validator Named compare_passwords]
+    act_as=first
+
+    [Control repeat_new_password]
+    class=Hyper.Control.Base.BInput
+    [Control repeat_new_password Validator Single Hyper.Validator.Single.Required]
+    [Control repeat_new_password Validator Named compare_passwords]
+    act_as=second
+
+    [Control submit]
+    class=Hyper.Control.Base.BPushButton
+
+    [Step]
+    [Step START]
+    [Step START Show]
+
+    [Step Show]
+    controls=<<EOT
+    new_password
+    repeat_new_password
+    compare_passwords
+    submit
+    EOT
+    [Step Show END]
+    condition=submit.pushed() && this.is_valid();
+
+    [Step END]
+
+To get rid of the syntax, have a look at L<Hyper::Config::Reader::Container>
+
+To generate code and a template from this file call
+
+    hyper.pl --template --file=/srv/www.example.com/etc/Example/Control/Container/User/CChangePassword.ini
+
+=head2 Page 3
+
+Create a file
+
+    /srv/www.example.com/etc/Example/Control/Container/User/CConfirmation.ini
+
+with the following content
+
+    [Control]
+    [Control submit]
+    class=Hyper.Control.Base.BPushButton
+
+    [Step]
+    [Step START]
+    [Step START Show]
+
+    [Step Show]
+    controls=<<EOT
+    submit
+    EOT
+    [Step Show END]
+    condition=submit.pushed();
+
+    [Step END]
+
+To get rid of the syntax, have a look at L<Hyper::Config::Reader::Container>
+
+To generate code and a template from this file call
+
+    hyper.pl --template --file=/srv/www.example.com/etc/Example/Control/Container/User/CConfirmation.ini
+
+=head2 Connecting the Pages
+
+Create a file
+
+    /srv/www.example.com/etc/Example/Control/Flow/User/FChangePassword.ini
+
+with the following content
+
+    [Control]
+    [Control select_username]
+    class=Example.Control.Container.User.CSelectUsername
+
+    [Control change_password]
+    class=Example.Control.Container.User.CChangePassword
+
+    [Control confirmation]
+    class=Example.Control.Container.User.CConfirmation
+
+    [Step]
+    [Step START]
+    [Step START select]
+
+    [Step select]
+    controls=<<EOT
+    select_username
+    EOT
+    [Step select change]
+    condition=select_username.state eq 'END'
+
+    [Step change]
+    controls=<<EOT
+    change_password
+    EOT
+    [Step change confirm]
+    condition=change_password.state eq 'END'
+
+    [Step confirm]
+    action=<<EOT
+    select_username.state='START';
+    EOT
+    controls=<<EOT
+    confirmation
+    EOT
+    [Step confirm select]
+    condition=confirmation.state eq 'END'
+
+    [Step END]
+
+To get rid of the syntax, have a look at L<Hyper::Config::Reader::Flow>
+
+To generate code and a template from this file call
+
+    hyper.pl --file=/srv/www.example.com/etc/Example/Control/Flow/User/FChangePassword.ini
+
+=head1 Verify your work
+
+Before we do the programming part it's time to see what we've created since yet.
+
+You can use the integrated Developer Webserver to do this
+
+    perl /srv/www.example.com/bin/example/server.pl
+
+Now connect to your page via your webbrowser using
+
+    http://localhost:8080/cgi-bin/example/index.pl?service=User&usecase=ChangePassword
+
+Now you see your first Hyper usecase. You can't go from Page 1 to Page 2
+because the username select is a required field. So we have to fill
+the username select with some data.
+
+=head1 Programming
+
+=head2 Create Data Source
+
+Create the file
+
+    /srv/www.example.com/.htpasswd
+
+with the following content
+
+    Andreas:X
+    Martin:X
+    Helmut:X
+
+=head2 Fill the username select
+
+Open the generated file
+
+    /srv/www.example.com/lib/Example/Control/Flow/User/FChangePassword.pm
+
+and add the following code before the __END__ mark
+
+    use Authen::Htpasswd;
+
+    sub _get_authen_object :PRIVATE {
+        return Authen::Htpasswd->new('/srv/www.example.com/.htpasswd');
+    }
+
+    sub ACTION_select {
+        my $self = shift;
+
+        $self->get_object('select_username')->get_object('user')->set_elements([
+            map {
+                { value => $_->username(), data => $_->username() };
+            } $self->_get_authen_object()->all_users()
+        ]);
+
+        return $self;
+    }
+
+    sub ACTION_confirm {
+        my $self   = shift;
+
+        $self->_get_authen_object()->update_user(
+            $self->get_object('select_username')
+                 ->get_object('user')
+                 ->get_value(),
+            $self->get_object('change_password')
+                 ->get_object('new_password')
+                 ->get_value(),
+        );
+
+        return $self;
+    }
+
+To get more information (e.g. why should you name this subroutines ACTION_* ?)
+have a look at L<Hyper::Control::Flow>
+
+=head1 Verify your work
+
+Now restart your Developer Webserver and
+connect again to your page via your webbrowser using
+
+    http://localhost:8080/cgi-bin/index.pl?service=User&usecase=ChangePassword
+
+Your usecase should be completely useable (but maybe it looks ugly).
+
+=head1 Beautifying
+
+Now you can edit the default templates *.htc located below
+
+    /srv/www.example.com/var/Example/
+
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+=head1 RCS INFORMATIONS
+
+=over
+
+=item Last changed by
+
+ $Author: ac0v $
+
+=item Id
+
+ $Id: Example.pod 333 2008-02-18 22:59:27Z ac0v $
+
+=item Revision
+
+ $Revision: 333 $
+
+=item Date
+
+ $Date: 2008-02-18 23:59:27 +0100 (Mon, 18 Feb 2008) $
+
+=item HeadURL
+
+ $HeadURL: http://svn.hyper-framework.org/Hyper/Hyper-Developer/branches/0.07/lib/Hyper/Developer/Manual/Example.pod $
+
+=back
+
+=head1 AUTHOR
+
+Andreas Specht  C<< <ACID@cpan.org> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2007, Andreas Specht C<< <ACID@cpan.org> >>.
+All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut

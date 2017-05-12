@@ -1,0 +1,26 @@
+---
+abstract: 'streaming HTTP parser'
+author:
+  - 'Tom Molesworth <cpan@entitymodel.com>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::More: 0.98
+  perl: 5.010001
+configure_requires:
+  ExtUtils::MakeMaker: 6.48
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.001, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTTP-StreamParser
+requires:
+  Mixin::Event::Dispatch: 1.002
+  parent: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=HTTP-StreamParser
+  homepage: http://search.cpan.org/dist/HTTP-StreamParser/
+version: 0.101

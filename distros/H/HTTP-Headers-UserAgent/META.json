@@ -1,0 +1,55 @@
+{
+   "abstract" : "identify browser by parsing User-Agent string (deprecated)",
+   "author" : [
+      "Neil Bowers <neilb@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "HTTP-Headers-UserAgent",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0.19"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "HTTP::BrowserDetect" : "1.77",
+            "perl" : "5.006",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/HTTP-Headers-UserAgent",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/HTTP-Headers-UserAgent.git",
+         "web" : "https://github.com/neilb/HTTP-Headers-UserAgent"
+      }
+   },
+   "version" : "3.09",
+   "x_deprecated" : 1
+}
+

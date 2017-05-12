@@ -1,0 +1,26 @@
+Revision history for HTML-Form-ForceValue
+
+0.009     2014-01-21 22:04:30-05:00 America/New_York
+        - still deprecated!
+
+        - repackage to update bugtracker and repo
+
+0.008     2013-09-11 10:33:53 America/New_York
+        - still deprecated!
+
+        - repackage to update bugtracker and repo
+
+0.006     2006-11-14
+        - packaging updates
+
+0.005     2006-08-22
+        - automatically create form fields if needed with $form->force_value
+
+0.003     2006-08-15
+        - fix stupid typo (thanks DSKOLL, bug 21001)
+
+0.002     2006-08-09
+        - fix typographical/link errors in documentation
+
+0.001     2006-08-08
+        - first draft

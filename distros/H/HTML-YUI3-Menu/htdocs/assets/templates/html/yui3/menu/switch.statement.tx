@@ -1,0 +1,14 @@
+	menu.on("click", function(e)
+	{
+		e.preventDefault();
+		switch (e.target.getAttribute('href') )
+		{
+: for $entry -> $item {
+		case "<: $item.url :>":
+			<: $item.name :>();
+			break;
+: }
+		default:
+			break;
+		}
+	});

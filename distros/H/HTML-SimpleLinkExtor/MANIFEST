@@ -1,0 +1,24 @@
+Changes
+examples/README
+lib/HTML/SimpleLinkExtor.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
+README
+scripts/linktractor
+t/absolute_links.t
+t/autoload.t
+t/compile.t
+t/example.html
+t/example2.html
+t/parse.t
+t/pod.t
+t/pod_coverage.t
+t/relative_links.t
+t/rt87288.t
+t/schemes.t
+t/tags.t
+t/test_manifest
+META.json                                Module JSON meta-data (added by MakeMaker)

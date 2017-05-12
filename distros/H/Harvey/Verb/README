@@ -1,0 +1,33 @@
+Harvey/Verb version 1.02
+========================
+INSTALLATION
+
+This module required that the Harvey::Word module already be
+successfully installed, along with any supporting modules
+that Word needs.  To get a feel for how this module is used,
+install the Harvey::Harvey module after this module.  Harvey.pm
+provides a simple dialog routine that allows sentences to be
+entered, parsed and queried using the Verb.pm module.
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+  Harvey::Word
+
+The Word.pm module must be installed before Verb.pm.  See
+the README in the Word install directory for additional
+packages needed for word.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Chris Meyer, chris@mytechs.com.  This is 
+free software and may be used under the same terms as Perl 
+itself.
+
+

@@ -1,0 +1,114 @@
+<HTML><TITLE>Test for HTML::Embperl::Execute</TITLE><BODY>
+<H1> 1.) Include from memory</H1>
+<P>Here is some text</P>
+<H1> 2.) Include from memory with some Embperl code</H1>
+^<table> ?<tr> ?<td>a1</td> ?<td>b2</td> ?<td>c3</td> ?</tr> ?</table> ?</P>
+<H1> 3.) Include from memory with passing of variables</H1>
+<P>Transfer some vars Some Var !</P>
+<H1> 4.) Change the variable, but not the code</H1>
+<P>Transfer some vars Do it again !</P>
+<H1> 5.) Use @param to pass parameters</H1>
+<P>Use @param to transfer some data (1 2 3 4) !</P>
+<H1> 6.) Use @param to pass parameters and return it</H1>
+<H3> $p[0] is vara and $p[1] is varb<H3><P>Got data in @param (vara varb) !</P><P>Change data in @param to (newA newB) !</P>
+<H3> $p[0] is now newA and $p[1] is now newB<H3><H1> 7.) Presetup %fdat and @ffld</H1>
+<P><table><tr><td>fdat</td><td>text</td></tr><tr><td>test</td><td>value</td></tr></table></P>
+<H1> 8.) Inculde a file</H1>
+
+Here it starts with some HTML Text<P>
+
+All values should be undefined at the first include and
+apear at the second include:
+<P>
+
+$a =  <BR>
+$b =  <BR>
+$c =  <BR>
+$d =  <BR>
+$e =  <BR>
+
+
+First of all assign a value:
+<BR>
+
+Now we have some 'Umlaute':
+
+
+Now lets look what we are getting from this:<BR>
+(this is the value in $a) (this is the value in $a) &auml;&ouml;&uuml;<BR>
+
+And now a and b together: (this is the value in $a)(this is the value in $a) &auml;&ouml;&uuml;<P>
+
+Here we have some HTML tags within the perl code, Embperl will delete them!<BR>
+
+57
+SELECT *  FROM a ORDER BY b USING &lt;; Hi There&gt;
+Here we have something which looks like a HTML tag, but does not start with<br>
+a character, Embperl does not change them!<BR>
+
+SELECT * FROM a ORDER BY b USING &lt;; Hi There&gt;
+Embperl will also translate HMTL escapes to the right characters i.e. $a &amp;lt; 6 will get the perl expression $a &lt; 6: <BR>
+
+1
+Now they should have a value
+
+$a = (this is the value in $a) <BR>
+$b = (this is the value in $a) &auml;&ouml;&uuml; <BR>
+$c = 57 <BR>
+$d = 1 <BR>
+$e = 2 <BR>
+
+<P>Ok.<P>
+
+
+<H1> 9.) Inculde a file and return output in a scalar</H1>
+<H3>
+Here it starts with some HTML Text<P>
+
+All values should be undefined at the first include and
+apear at the second include:
+<P>
+
+$a = (this is the value in $a) <BR>
+$b = (this is the value in $a) &auml;&ouml;&uuml; <BR>
+$c = 57 <BR>
+$d = 1 <BR>
+$e = 2 <BR>
+
+
+First of all assign a value:
+<BR>
+
+Now we have some 'Umlaute':
+
+
+Now lets look what we are getting from this:<BR>
+(this is the value in $a) (this is the value in $a) &auml;&ouml;&uuml;<BR>
+
+And now a and b together: (this is the value in $a)(this is the value in $a) &auml;&ouml;&uuml;<P>
+
+Here we have some HTML tags within the perl code, Embperl will delete them!<BR>
+
+57
+SELECT *  FROM a ORDER BY b USING &lt;; Hi There&gt;
+Here we have something which looks like a HTML tag, but does not start with<br>
+a character, Embperl does not change them!<BR>
+
+SELECT * FROM a ORDER BY b USING &lt;; Hi There&gt;
+Embperl will also translate HMTL escapes to the right characters i.e. $a &amp;lt; 6 will get the perl expression $a &lt; 6: <BR>
+
+1
+Now they should have a value
+
+$a = (this is the value in $a) <BR>
+$b = (this is the value in $a) &auml;&ouml;&uuml; <BR>
+$c = 57 <BR>
+$d = 1 <BR>
+$e = 2 <BR>
+
+<P>Ok.<P>
+
+
+</H3>
+<H1> 10.) Done :-)</H1>
+</body></html>

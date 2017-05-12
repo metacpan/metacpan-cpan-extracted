@@ -1,0 +1,56 @@
+<wmmeta name="Title" value="Tips On Using WebMake" />
+<wmmeta name="Section" value="01-intro" />
+<wmmeta name="Score" value="80" />
+<wmmeta name="Abstract">
+Some tips on using WebMake
+</wmmeta>
+
+Editor/IDE Support
+~~~~~~~~~~~~~~~~~~
+
+The root directory of the WebMake distribution includes a "Vim" [vim] rc file
+to support syntax-highlighting for WebMake.  To use it, make a directory
+called **.vim** in your home directory, copy it there, and add the following
+lines to your **.vimrc**:
+
+ au BufNewFile,BufReadPost *.wmk so &wmdollar;HOME/.vim/webmake.vim
+ map ,wm :w!&lt;CR&gt;:! **/usr/local/bin/webmake** -R %&lt;CR&gt;
+
+	Auto: [vim]: http://www.vim.org/
+
+Change **/usr/local/bin/webmake** to whatever the real path to the ##webmake##
+command is.
+
+Once you do this, the macro sequence **,wm** will cause a rebuild of the site
+which contains the file you're currently editing.  In addition, opening a
+file called ##something.wmk## will automatically use WebMake syntax
+highlighting (if you have syntax highlighting enabled in VIM).
+
+
+The Button
+~~~~~~~~~~
+
+WebMake now includes a WebMake button:
+
+	<div align=center>
+	<a href=http://webmake.taint.org/><img
+	src=images/BuiltWithWebMake.png
+	width=88 height=31 border=0 /></a>
+	</div>
+
+Feel free to include it on your pages; but please, if possible, add it with a
+href to http://webmake.taint.org/, so people who are curious can find out more
+about WebMake.
+
+It's 88 pixels wide and 31 high, by the way.  If you look in the ''images''
+directory of the distribution, there's also an 130x45 one and a 173x60 one.
+
+To make things **really** easy, here's some cut-and-paste HTML
+for the image:
+
+<safe>
+ <a href="http://webmake.taint.org/"><img
+ src="http://webmake.taint.org/BuiltWithWebMake.png"
+ width="88" height="31" border="0" /></a>
+</safe>
+

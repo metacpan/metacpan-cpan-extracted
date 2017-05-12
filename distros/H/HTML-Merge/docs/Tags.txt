@@ -1,0 +1,564 @@
+NAME
+    HTML::Merge::Tags - A summary of the available tags in Merge
+
+DATABASE TAGS
+    *   <$RDB='[Database type:]Database name[:Host][,User[,Password]]'>
+
+        Connect to alternative database. Defaults are taken from the
+        configuration file. If two parameters are given in the first token,
+        the database type takes precedence.
+
+        Predefined databases from merge.conf can be used like this:
+
+        <$RDB='SYSTEM'> for system database If system database (SESSION_DB)
+        is not defined in merge.conf a system wide definition will apply.
+
+        <$RDB='DEFAULT'> for the application database as defined in
+        merge.conf
+
+    *   <$RS='SQL statement'>
+
+        Perform a non query SQL statement.
+
+    *   <$RQ='SELECT SQL statement'>
+
+        Perform a query. First row of result is immediately available. Query
+        can be iterated with <$RLOOP> tags.
+
+    *   <$RERUN>
+
+        Re-performs the query.
+
+    *   <$RLOOP[.LIMIT=number]>
+
+        </$RLOOP>
+
+        <$REND>
+
+        Performs a loop over fetched query elements. Last row remains valid
+        after iteration. Iteration number can be limited.
+
+    *   <$RSQL.variable>
+
+        Dereferences a column from the current fetch. Or in other words the
+        variable holds the data fetched from data base.
+
+    *   <$RINDEX>
+
+        Substitutes for the number of the row currently fetched.
+
+    *   <$RFETCH>
+
+        Fetches another row. Increments the index.
+
+    *   <$RSTATE>
+
+        Returns the SQL state of the last statement.
+
+    *   <$REMPTY>
+
+        Returns a boolean value of whether the last query yielded an empty
+        set.
+
+    *   <$RDISCONNECT>
+
+        Destroy an engine. This is used if the DB_DATABASE configuration
+        variable has been changed using the <$RCFGSET> tag to recreate the
+        engine with the new parameters.
+
+FLOW TAGS
+    *   <$RITERATION.LIMIT=number>
+
+        </$RITERATION>
+
+        Performs a counted loop.
+
+    *   <$RIF.'perl code'>
+
+        <$RELSE> (optional)
+
+        <$REND_IF>
+
+        </$RIF>
+
+        <$RELSIF.'perl code'>
+
+        Perform the code if the Perl code evaluates to true.
+
+    *   <$RWHILE.'perl code'>
+
+        </$RWHILE>
+
+        <$REND_WHILE>
+
+        Perform a while loop.
+
+    *   <$RBREAK>
+
+        Break out of a loop.
+
+    *   <$RCONT>
+
+        Jump to the next iteration of the loop.
+
+    *   <$RCOUNT.variable=from:to[,step]>
+
+        </$RCOUNT>
+
+        Perform a classic variable iteration loop. All parameters are
+        mandatory.
+
+    *   <$REXIT>
+
+        Exit a template in the middle.
+
+    *   <$RENUMREQ.iterator variable=value variable>
+
+        Iterate over all request parameters; each time having the first
+        variable contain the parameter name and the second contain the
+        value.
+
+    *   <$RENUMQUERY.iterator variable=value variable>
+
+        Iterate over all the columns of a query result. each time having the
+        first variable contain the column name and the second contain the
+        data.
+
+FUNCTIONAL TAGS
+    *   <$RPIC.picture type(instruction set).'string'>
+
+        <$RPIC.F(char).'string'>
+
+        Replace all white spaces by the given char. e.g.,
+        <$RPIC.F(+).'Banana, a yellow energy bomb'> will yield:
+        Banana,+a+yellow+energy+bomb and so on.
+
+        <$RPIC.R(find=replace, ...).'string'>
+
+        Replace tuples of string-to-find/string-to-replace in the given
+        string. e.g., <$RPIC.R('na'='ta').'Banana'> will yield Batata and so
+        on.
+
+        <$RPIC.C(find=replace, ...).'string'>
+
+        Change words word-to-find/word-to-replace in the given string. e.g.,
+        <$RPIC.C('Banana'='Orange').'Banana'> will yield Orange and so on.
+
+        <$RPIC.N(width.fraction positions).'number'>
+
+        Left space pad the number, with a fixed number of decimal places.
+
+        <$RPIC.N(0<width>).'number'>
+
+        Left zero pad the number, with a fixed number of decimal places.
+
+        (Hint, the instruction is equal to *printf*ing with %stringf)
+
+        <$RPIC.NZ(<format>).'number'>
+
+        Substitute a blank for zero. (Mnemonic: zero suppress)
+
+        <$RPIC.NF(<format>).'number'>
+
+        After formatting the number, add commas.
+
+        Z and F may be combined.
+
+        <$RPIC.A(<width>).'alphanumeric string'>
+
+        Left space pad the number to achieve a width. (Right justify)
+
+        <$RPIC.A(-<width>).'alphanumeric string'>
+
+        Right space pad the number to achieve a width. (Left justify)
+
+        <$RPIC.AC(<format>).'alphanumeric string'>
+
+        Capitalize string.
+
+        <$RPIC.AS(<format>).'alphanumeric string'>
+
+        Convert string to lower case. (Mnemonic: Small)
+
+        <$RPIC.AP(<format>).'alphanumeric string'>
+
+        Convert string to 'proper' case, ie, first and only first letter of
+        each word capitalized.
+
+        <$RPIC.AW(<format>).'alphanumeric string'>
+
+        Trim redundant spaces, ie, convert bulk spaces to one space.
+
+        <$RPIC.AR(<format>).'alphanumeric string'>
+
+        Trim right spaces.
+
+        <$RPIC.AL(<format>).'alphanumeric string'>
+
+        Trim left spaces.
+
+        L, R and W may be combined, and all combinations may be combined
+        with either C, S or P.
+
+        <$RPIC.D(format).'date'>
+
+        Format a POSIX time string, requires Date::Format.
+
+        <$RPIC.X(number).'string'>
+
+        Repeats a string the required number of times.
+
+    *   <$RDECIDE.'perl code'?'string':'string'>
+
+        Evaluates the code. If true, yields the first string, otherwise the
+        second.
+
+    *   <$RMAIL.'From address','To address'[,'Subject']>
+
+        </$RMAIL>
+
+        Send email, using SMTP to a host configured in merge.conf.
+
+    *   <$RPERL>
+
+        </$RPERL>
+
+        Embedded Perl code. print() may be used to write HTML or javascript.
+
+        you may set HTML::Merge variables (<$RVAR>) using the setvar
+        function e.g :
+
+        "setvar('test_var',$test1);"
+
+        <$RVAR.test_var> will hold the value of Perl variable $test1.
+
+        All merge.conf settings are available to your Perl code in the
+        HTML::Merge::Ini name space e.g. :
+
+        "my $path = $HTML::Merge::Ini::MERGE_ABSOLUTE_PATH;"
+
+    *   <$RPERL.B>
+
+        </$RPERL>
+
+        Embedded Perl with before processing.
+
+        Your Perl code can have HTML::Merge output tags and
+        HTML::Merge::Compile will expand your code before it will be passed
+        to Perl. e.g.:
+
+        "my $buf="<$RVAR.pic>";"
+
+    *   <$RPERL.A>
+
+        </$RPERL>
+
+        Embedded Perl with after processing. HTML::Merge::Compile will
+        process the value returned by your Perl code. e.g.:
+
+        "return "<\$RSET.pic=' \"$buf\" '>";"
+
+        You can use the merge function to enter input to HTML::Merge e.g.:
+
+        "my $data = '<$RSET.full_date =\'' . scalar(localtime()) . '\'>';"
+
+        "merge($data);"
+
+    *   <$RPERL.C>
+
+        </$RPERL>
+
+        Embedded Perl with after and before processing combined.
+
+        see <$RPERL.B> for information about before processing and
+        <$RPERL.A> for about after processing.
+
+    *   <$REVAL.'perl code'>
+
+        Evaluates the code.
+
+SOURCE TAGS
+    *   <$REM.'string'>
+
+        Add a server side comment.
+
+    *   <$RTRACE.'string'>
+
+        Send a string to the log file.
+
+    *   <$RINCLUDE.'template name'>
+
+        Include a template in compile time.
+
+    *   <$RWEBINCLUDE.'url'>
+
+        Include an external web page in run time.
+
+    *   <$RSOURCE.'template'>
+
+        </$RSOURCE>
+
+        Generate an Anchor for a source view for a template. e.g,
+        <$RSOURCE.'<$RTEMPLATE>'>Click here to view the source for this
+        template</$RSOURCE>
+
+VARIABLE TAGS
+    *   <$RVAR.variable>
+
+        Dereferences a local variable, or a CGI variable. (Precedence to the
+        former).
+
+    *   <$RSET.variable='perl code'>
+
+        Set a variable to the result of a perl code segment. CGI variables
+        may be overwritten.
+
+    *   <$RINC.variable>
+
+    *   <$RINC.variable+number>
+
+        <$RINC.variable-number>
+
+        Modify a variable.
+
+    *   <$RPSET.variable='perl code'>
+
+        <$RPGET.variable>
+
+        Store and retrieve session variables. Must be configured in the
+        configuration file manually.
+
+    *   <$RPIMPORT.variable>
+
+        Copy a persistent variable to a local variable, for faster
+        retrieving. Memory variables work much faster than session
+        variables.
+
+    *   <$RPEXPORT.variable>
+
+        Copy a regular variable to a persistent variable of the same name.
+
+    *   <$RPCLEAR>
+
+        Erases all session variables.
+
+    *   <$RCFG.variable>
+
+        Retrieve a variable from Merge configuration.
+
+    *   <$RCFGSET.variable='perl code'>
+
+        Forge a temporary value instead of a configuration variable. Does
+        NOT change the configuration file!
+
+    *   <$RCOOKIE.name>
+
+        Retrieve a cookie.
+
+    *   <$RCOOKIESET.name='perl expression'>
+
+        <$RCOOKIESET.name='perl expression',minutes>
+
+        <$RCOOKIESET.name='perl expression',non numeric>
+
+        Set a cookie using a HTTP-EQUIV <META> HTML tag. The notations are
+        used for setting a permanent cookie, a cookie with an expire date,
+        and a temporary cookie that will disappear when the browser exits.
+
+    *   <$RENV.variable>
+
+        Get an environment variable.
+
+    *   <$RENVSET.variable='perl code'>
+
+        Set an environment variable.
+
+SECURITY TAGS
+    These tags are valid only if the merge database exists.
+
+    IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT
+    These tags are to be used with the Merge security backend which is not
+    written yet. IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT IMPORTANT
+    IMPORTANT
+
+    *   <$RLOGIN.'user','password'>
+
+        Logs in. Tag outputs a boolean value to notify if login was
+        successful or failed.
+
+    *   <$RAUTH.'realm'>
+
+        Check if the user has permission to a specific realm/key.
+
+    *   <$RCHPASS.'new password'>
+
+        Change password for the logged in user.
+
+    *   <$RADDUSER.'user','password'>
+
+        Add a new user. Use with CAUTION! Any user running the page could
+        create a user with this tag. If Merge is running on a user shell
+        machine, configuration and templates should be readable to the web
+        server but not world readable! Pages using <$RADDUSER> *must* be
+        protected.
+
+    *   <$RDELUSER.'user'>
+
+        Remove a user.
+
+    *   <$RJOIN.'user','group'>
+
+        <$RPART.'user','group'>
+
+        Add a user to a group and remove a user from a group, accordingly.
+
+    *   <$RGRANT.U.'user','realm'>
+
+        <$RGRANT.G.'group','realm'>
+
+        Grant a permission over a realm to a group or a user.
+
+    *   <$REVOKE.U.'user','realm'>
+
+        <$REVOKE.G.'group','realm'>
+
+        Revoke a permission over a realm from a group or a user.
+
+    *   <$REQUIRE.'template name','list of possible realms'>
+
+        Require users of a specific template to have access for at least one
+        of the templates in the list. (Comma separated)
+
+    *   <$RUSER>
+
+        Returns the user name of the currently logged in user.
+
+    *   <$RNAME>
+
+        Yield the real name of the currently logged in user.
+
+    *   <$RTAG>
+
+        Yield the tag string of the currently logged in user.
+
+    *   <$RATTACH.'template','subsite'>
+
+        Attach a template to a subsite.
+
+    *   <$RDETACH.'template','subsite'>
+
+        Detach a template from a subsite.
+
+
+DATE TAGS
+    *   <$RDATE>
+
+        <$RDATE,'number of days ahead'>
+
+        Return the date as a YYMDHmS string. For example: 199912312359 is
+        December 31, 1999, at one minute before midnight. The second
+        parameter gives the date for a few days ahead, or beyond, if given
+        negative.
+
+    *   <$RSECOND.'date'>
+
+        <$RMINUTE.'date'>
+
+        <$RHOUR.'date'>
+
+        <$RDAY.'date'>
+
+        <$RMONTH.'date'>
+
+        <$RYEAR.'date'>
+
+        Return the corresponding part of the date given.
+
+    *   <$RDATEDIFF.D.'earlier date','later date'>
+
+        <$RDATEDIFF.H.'earlier date','later date'>
+
+        <$RDATEDIFF.M.'earlier date','later date'>
+
+        <$RDATEDIFF.S.'earlier date','later date'>
+
+        Return the difference between dates, in days, hours, minutes and
+        seconds, correspondingly.
+
+    *   <$RLASTDAY.'date'>
+
+        Give the last day of month related to the specific date.
+
+    *   <$RADDDATE.'date','day','month','year'>
+
+        Add the given number of days, then the given number of months and
+        years to the date. Returns a new date.
+
+    *   <$RDATE2UTC.'date'>
+
+        <$RUTC2DATE.'UNIX epoch time'>
+
+        Convert between a date string and a universal UNIX time.
+
+FORM AND HTML ENHANCEMENT TAGS
+    *   <$RSUBMIT[.'javascript validation code']>
+
+        </$RSUBMIT>
+
+        Create the HTML code for a POST form pointed at the same merge
+        template it is called from. An optional parameter is passed to the
+        onSubmit attribute; a typical value would be 'return *function*()'
+        where *function* returns a boolean value.
+
+    *   <$RTRANSFER.field name>
+
+        Create a HIDDEN input tag, for the parameter with the corresponding
+        name, based on the values the server side parameter with the same
+        name has. Useful to transfer input fields among pages.
+
+    *   <$RMULTI.'iterator variable'='form field'>
+
+        Iterate over multiple input form fields.
+
+    *   <$RMERGE>
+
+        The name of the Merge CGI.
+
+    *   <$RTEMPLATE>
+
+        The name of the current template.
+
+FILE TAGS
+    *   <$RGLOB.F.'iterator variable'='base directory or *'>
+
+        <$RGLOB.D.'iterator variable'='base directory'>
+
+        Iterate over a directory. Produces either files only or directories
+        only, accordingly.
+
+    *   <$RFTS.'iterator variable'='base directory'>
+
+        Iterate over a subtree of files.
+
+    *   <$RDIVERT.'buffer name'> </$RDIVERT>
+
+        Divert the output into a named buffer. Buffers are store in
+        temporary files and do not overlap between processes. Subsequent
+        diverting is appended to the existing buffer.
+
+    *   <$RDUMP.'buffer name'>
+
+        Dump the named buffer.
+
+META TAGS
+    *   <$RVERSION>
+
+        Returns Merge version.
+
+COPYRIGHT
+    Copyright (c) 1999 - 2005 Raz Information Systems Ltd.
+    http://www.raz.co.il/
+
+    This package is distributed under the same terms as Perl itself, see the
+    Artistic License on Perl's home page.
+

@@ -1,0 +1,8 @@
+patches/.*
+pod2htm.*
+pm_to_blib$
+blib.*
+\.git.*
+Makefile$
+\.bak$
+\.old$

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE testresults [
+<!ELEMENT testresults (group+)>
+<!ATTLIST testresults
+   date    CDATA    #REQUIRED >
+
+<!ELEMENT group (test+)>
+<!ATTLIST group
+   name    CDATA    #REQUIRED
+   url     CDATA    #REQUIRED >
+
+<!ELEMENT test (result+)>
+<!ATTLIST test
+   name    CDATA    #REQUIRED >
+
+<!ELEMENT result (#PCDATA)>
+<!ATTLIST result
+   status  (PASS | FAIL)  #REQUIRED >
+]>
+<testresults date="A_DATESTAMP">
+<group name="dtd-test" url="A_URL">
+<test name="Status code check">
+<result status="PASS">Expected '200' and got: 200 OK</result>
+</test>
+<test name="Forbidden text">
+<result status="PASS">Internal Server Error</result>
+</test>
+<test name="Required text">
+<result status="PASS">SEE_ALSO</result>
+<result status="PASS">&lt;/html&gt;</result>
+</test>
+</group>
+</testresults>

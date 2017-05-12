@@ -1,0 +1,29 @@
+<wmmeta name="ltitle">XSL Transformations (XSLT)</wmmeta>
+<wmmeta name="stitle">XSLT</wmmeta>
+<wmmeta name="author">J&ouml;rn Clausen</wmmeta>
+<wmmeta name="cdate">2001-04-23</wmmeta>
+<wmmeta name="mdate">2001-04-23</wmmeta>
+
+    <ul>
+      <li>
+	<a href="http://www.w3.org/TR/xslt">XSL Transformations (XSLT)</a>
+      </li>
+      <li>
+	<a href="http://www.w3.org/TR/xpath">XML Path Language (XPath)</a>
+      </li>
+      <li>
+	<a href="http://www.zvon.org/xxl/XSLTreference/Output/index.html">
+	  XSLT Reference</a>
+      </li>
+      <li>
+	<a href="http://www.heise.de/ix/artikel/E/2001/01/167/">iX: XSLT
+	  Tutorial</a>
+      </li>
+      <li>
+	<a href="http://www.xml.com/pub/a/2000/08/holman/">What is XSLT?</a>
+      </li>
+      <li>
+	<a href="http://www.ibiblio.org/xml/books/bible/updates/14.html">
+	  Chapter 14 of the XML Bible: XSL Transformations</a>
+      </li>
+    </ul>

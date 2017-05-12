@@ -1,0 +1,14 @@
+Revision history for Hex-Record
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+0.06    Date/time
+        - new algorithms
+        - less repeat yourself
+        - coverage 100%
+        - bug fixes
+0.07    Date/time
+        - removed die for address to big,
+          there will be a warning of perl itself
+0.08    Date/time
+        - removed Test::Exception as dependeny

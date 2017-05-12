@@ -1,0 +1,28 @@
+=head1 NAME
+
+HTML::ListScraper::Instance - sequence instance found by L<HTML::ListScraper>
+
+=head1 METHODS
+
+All documented methods are simple accessors, taking no arguments and
+leaving the C<HTML::ListScraper::Instance> object unchanged.
+
+=head2 start
+
+Sequence start position.
+
+=head2 match
+
+Match type: C<exact> for exact matches, C<approx> for matches against a
+"similar" tag sequence whose omissions and extra parts were ignored.
+
+=head2 score
+
+A number quantifying the quality of an approximate match (bigger
+scores are better).
+
+=head2 tags
+
+An array of L<HTML::ListScraper::Tag> objects.
+
+=cut

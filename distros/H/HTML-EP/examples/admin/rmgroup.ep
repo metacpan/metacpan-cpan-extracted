@@ -1,0 +1,24 @@
+<html><head><title>Benutzerverwaltung - Löschen einer Gruppe</title>
+</head>
+<body><h1>Benutzerverwaltung - Löschen einer Gruppe</h1>
+Wollen Sie die folgende Gruppe tatsächlich löschen:
+<form action="group.ep" method=GET>
+<input type=hidden name="delete" value="$group->GROUPNAME->val$">
+<table>
+<tr><th>Gruppenname:</th>
+    <td>$group->GROUPNAME->val$</td>
+<tr><th>Mitglieder:</th>
+    <td>$group->MEMBERS->val$</td>
+</table>
+<input type=submit value="Ja" name="doit">
+</form>
+<br><br><br>
+<div align=center>
+  <a href="index.ep?language=$_ep_language$">
+    <ep-language de="Menü" en="Menu"></a>
+  <a href="user.ep?language=$_ep_language$">
+    <ep-language de="Benutzerverwaltung" en="User administration"></a>
+</div>
+</body>
+</html>
+

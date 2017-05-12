@@ -1,0 +1,181 @@
+SYNOPSIS
+
+     use Hash::DefHash; # imports defhash()
+    
+     # create a new defhash object, die when hash is invalid defhash
+     $dh = Hash::DefHash->new; # creates an empty hash, or ...
+    
+     # ... manipulate an existing hash, defhash() is a synonym for
+     # Hash::DefHash->new().
+     $dh = defhash({foo=>1});
+    
+     # return the original hash
+     $hash = $dh->hash;
+    
+     # list properties
+     @prop = $dh->props;
+    
+     # list property names, values, and attributes, will return ($prop => $attrs,
+     # ...). Property values will be put in $attrs with key "". For example:
+     %content = DefHash::Hash->new({p1=>1, "p1.a"=>2, p2=>3})->contents;
+     # => (p1 => {""=>1, a=>2}, p2=>3)
+    
+     # get property value, will die if property does not exist
+     $propval = $dh->prop($prop);
+    
+     # like prop(), but will return undef if property does not exist
+     $propval = $dh->get_prop($prop);
+    
+     # check whether property exists
+     say "exists" if $dh->prop_exists($prop);
+    
+     # add a new property, will die if property already exists
+     $dh->add_prop($prop, $propval);
+    
+     # add new property, or set value for existing property
+     $oldpropval = $dh->set_prop($prop, $propval);
+    
+     # delete property, noop if property already does not exist. set $delattrs to
+     # true to delete all property's attributes.
+     $oldpropval = $dh->del_prop($prop, $delattrs);
+    
+     # delete all properties, set $delattrs to true to delete all properties's
+     # attributes too.
+     $dh->del_all_props($delattrs);
+    
+     # get property's attributes. to list defhash attributes, set $prop to undef or
+     # ""
+     %attrs = $dh->attrs($prop);
+    
+     # get attribute value, will die if attribute does not exist
+     $attrval = $dh->attr($prop, $attr);
+    
+     # like attr(), but will return undef if attribute does not exist
+     $attrval = $dh->get_attr($prop, $attr);
+    
+     # check whether an attribute exists
+     @attrs = $dh->attr_exists($prop, $attr);
+    
+     # add attribute to a property, will die if attribute already exists
+     $dh->add_attr($prop, $attr, $attrval);
+    
+     # add attribute to a property, or set value of existing attribute
+     $oldatrrval = $dh->set_attr($prop, $attr, $attrval);
+    
+     # delete property's attribute, noop if attribute already does not exist
+     $oldattrval = $dh->del_attr($prop, $attr, $attrval);
+    
+     # delete all attributes of a property
+     $dh->del_all_attrs($prop);
+    
+     # get predefined properties
+     say $dh->v;            # shortcut for $dh->get_prop('v')
+     say $dh->default_lang; # shortcut for $dh->get_prop('default_lang')
+     say $dh->name;         # shortcut for $dh->get_prop('name')
+     say $dh->summary;      # shortcut for $dh->get_prop('summary')
+     say $dh->description;  # shortcut for $dh->get_prop('description')
+     say $dh->tags;         # shortcut for $dh->get_prop('tags')
+    
+     # get value in alternate languages
+     $propval = $dh->get_prop_lang($prop, $lang);
+    
+     # get value in all available languages, result is a hash mapping lang => val
+     %vals = $dh->get_prop_all_langs($prop);
+    
+     # set value for alternative language
+     $oldpropval = $dh->set_prop_lang($prop, $lang, $propval);
+
+FUNCTIONS
+
+ defhash([ $hash ]) => OBJ
+
+    Shortcut for Hash::DefHash->new($hash). As a bonus, can also detect if
+    $hash is already a defhash and returns it immediately instead of
+    wrapping it again. Exported by default.
+
+METHODS
+
+ new([ $hash ],[ %opts ]) => OBJ
+
+    Create a new Hash::DefHash object, which is a thin OO skin over the
+    regular Perl hash. If $hash is not specified, a new anonymous hash is
+    created.
+
+    Internally, the object contains a reference to the hash. It does not
+    create a copy of the hash or bless the hash directly. Be careful not to
+    assume that the two are the same!
+
+    Known options:
+
+      * check => BOOL (default: 1)
+
+      Whether to check that hash is a valid defhash. Will die if hash turns
+      out to contain invalid keys/values.
+
+      * parent => HASH/DEFHASH_OBJ
+
+      Set defhash's parent. Default language (default_lang) will follow
+      parent's if unset in the current hash.
+
+ $dh->hash
+
+ $dh->check
+
+ $dh->contents
+
+ $dh->default_lang
+
+ $dh->props
+
+ $dh->prop
+
+ $dh->get_prop
+
+ $dh->prop_exists
+
+ $dh->add_prop
+
+ $dh->set_prop
+
+ $dh->del_prop
+
+ $dh->del_all_props
+
+ $dh->attrs
+
+ $dh->attr
+
+ $dh->get_attr
+
+ $dh->attr_exists
+
+ $dh->add_attr
+
+ $dh->set_attr
+
+ $dh->del_attr
+
+ $dh->del_all_attrs
+
+ $dh->defhash_v
+
+ $dh->v
+
+ $dh->name
+
+ $dh->summary
+
+ $dh->description
+
+ $dh->tags
+
+ $dh->get_prop_lang
+
+ $dh->get_prop_all_langs
+
+ $dh->set_prop_lang
+
+SEE ALSO
+
+    DefHash specification
+

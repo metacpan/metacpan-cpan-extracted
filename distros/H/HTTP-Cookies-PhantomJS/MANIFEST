@@ -1,0 +1,9 @@
+Changes
+lib/HTTP/Cookies/PhantomJS.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01-cookies.t
+t/cookies.txt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

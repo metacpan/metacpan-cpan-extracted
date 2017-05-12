@@ -1,0 +1,28 @@
+HTML-Defang version 1.04
+========================
+
+This module accepts an input HTML and/or CSS string and removes any
+executable code including scripting, embedded objects, applets, etc.,
+and neutralises any XSS attacks. A whitelist based approach is used
+which means only HTML known to be safe is allowed through.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003-2010 by Opera Software Australia Pty Ltd
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

@@ -1,0 +1,23 @@
+---
+abstract: 'Mixin to record HTTP::Server::Simple''s sockets'
+author:
+  - 'David Glasser <glasser@bestpractical.com>'
+distribution_type: module
+generated_by: 'Module::Install version 0.770'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTTP-Server-Simple-Recorder
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  HTTP::Server::Simple: 0.10
+  IO::Tee: 0
+  Test::HTTP::Server::Simple: 0.02
+  Test::More: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

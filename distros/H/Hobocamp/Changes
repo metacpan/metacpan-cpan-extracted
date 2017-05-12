@@ -1,0 +1,23 @@
+Revision history for Hobocamp.
+
+{{$NEXT}}
+
+0.600  Sat Aug 13 11:45:53 EDT 2011
+
+  [ENHANCEMENTS]
+
+  * now works with 5.10.x
+
+  [OTHER]
+
+  * use Moose Changes file format
+
+0.501  Thu Jan 27 11:07:05 EST 2011
+
+  [BUG FIXES]
+
+  * Fix proper depends in Makefile.PL, dist.ini
+
+0.500  Mon Jan 10 10:55:34 EST 2011
+
+  * initial release

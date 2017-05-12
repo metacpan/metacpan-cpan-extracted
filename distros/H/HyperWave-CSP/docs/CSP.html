@@ -1,0 +1,340 @@
+    <HTML> 
+	<HEAD> 
+	    <TITLE>HyperWave::CSP - Communicate with a HyperWave server
+
+</TITLE> 
+	</HEAD>
+
+	<BODY>
+
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#NAME">NAME</A>
+	<LI><A HREF="#SYNOPSIS">SYNOPSIS</A>
+	<LI><A HREF="#DESCRIPTION">DESCRIPTION</A>
+	<LI><A HREF="#CONSTRUCTOR">CONSTRUCTOR</A>
+	<LI><A HREF="#METHODS">METHODS</A>
+	<LI><A HREF="#SEE_ALSO">SEE ALSO</A>
+	<LI><A HREF="#AUTHOR">AUTHOR</A>
+	<LI><A HREF="#COPYRIGHT">COPYRIGHT</A>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="NAME">NAME
+
+</A></H1>
+HyperWave::CSP - Communicate with a HyperWave server
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="SYNOPSIS">SYNOPSIS
+
+</A></H1>
+<PRE>   use HyperWave::CSP;
+     
+   $server = HyperWave::CSP-&gt;New(&quot;my.hyperwave.server&quot;);
+   $server-&gt;quit;
+</PRE>
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="DESCRIPTION">DESCRIPTION
+
+</A></H1>
+<CODE>HyperWave</CODE> is a class implementing a simple HyperWave client in Perl.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="CONSTRUCTOR">CONSTRUCTOR
+
+</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new">new ( [ HOST [, PORT [, USERNAME [, PASSWORD [, ENCRYPT [, LANGUAGE ] ] ] ] ] ] )
+
+</A></STRONG><DD>
+This is the constructor for a new HyperWave object. <CODE>HOST</CODE> is the name of the remote host to which a HyperWave connection is required.
+If not given the environment variables <CODE>HWHOST</CODE> and then <CODE>HGHOST</CODE>
+are checked, and if a host is not found then <CODE>localhost</CODE> is used.
+
+
+<P>
+
+<CODE>PORT</CODE> is the HyperWave port to connect to, it defaults to the environment
+variable <CODE>HWPORT</CODE>, then <CODE>HGPORT</CODE> and then to the standard port 418 if nothing else is found.
+
+
+<P>
+
+<CODE>USERNAME</CODE> and <CODE>PASSWORD</CODE> are the HyperWave username and password, they default to anonymous.  <CODE>ENCRYPT</CODE> will eventually allow you to pass the password in in encrypted form rather
+than plaintext, but is not yet implemented.
+
+
+<P>
+
+<CODE>LANGUGAE</CODE> also is not yet used, and defaults to the value of the environment variable <CODE>HWLANGUAGE</CODE> and then to English.
+
+
+<P>
+
+The constructor returns the open socket, or <CODE>undef</CODE> if an error has been encountered.
+
+
+<P>
+
+<H1><A NAME="METHODS">METHODS
+
+</A></H1>
+Unless otherwise stated all methods return either a <EM>true</EM> or
+<EM>false</EM> value, with <EM>true</EM> meaning that the operation was a success. When a method states that it
+returns a value, failure will be returned as <EM>undef</EM> or an empty list.
+
+
+<P>
+
+<DT><STRONG><A NAME="item_command_stat">command_stat ( )
+
+</A></STRONG><DD>
+Returns string containing various statistics for the server.
+
+
+<P>
+
+<DT><STRONG><A NAME="item_command_ftstat">command_ftstat ( )
+
+</A></STRONG><DD>
+Returns string containing various statistics for the server.
+
+
+<P>
+
+<DT><STRONG><A NAME="item_command_dcstat">command_dcstat ( )
+
+</A></STRONG><DD>
+Returns string containing various statistics for the server.
+
+
+<P>
+
+<DT><STRONG><A NAME="item_command_who">command_who ( )
+
+</A></STRONG><DD>
+Returns string containing current users for the server.
+
+
+<P>
+
+<DT><STRONG><A NAME="item_get_objnum_by_name">get_objnum_by_name ( NAME )
+
+</A></STRONG><DD>
+Returns object number for the document with NAME as an attribute, or false
+on error.
+
+
+<P>
+
+<DT><STRONG><A NAME="item_get_url">get_url ( OBJNUM )
+
+</A></STRONG><DD>
+Returns a guess at a URL that might work for the document OBJNUM to be
+retreived via the HyperWave HTTP interface. Note that it is ONLY a guess.
+For one thing, it depends on the HyperWave server running a web interface
+on the default HTTP port.
+
+
+<P>
+
+<DT><STRONG><A NAME="item_get_attributes">get_attributes ( OBJNUM )
+
+</A></STRONG><DD>
+Returns a string containing the attributes for OBJNUM. The string is in
+form <CODE>key1=value1\nkey2=value2\n...</CODE>.
+
+
+<P>
+
+<DT><STRONG><A NAME="item_get_attributes_hash">get_attributes_hash ( OBJNUM )
+
+</A></STRONG><DD>
+Like <CODE>get_attributes()</CODE> except that the attributes are returned
+as a hash.
+
+
+<P>
+
+<DT><STRONG><A NAME="item_get_text">get_text ( OBJNUM )
+
+</A></STRONG><DD>
+Returns body text for the objnum passed. This usually means HTML sans
+anchors in practical terms.
+
+
+<P>
+
+<DT><STRONG><A NAME="item_get_html">get_html ( OBJNUM )
+
+</A></STRONG><DD>
+Returns HTML text, including anchors, for the objnum passed.
+
+
+<P>
+
+<DT><STRONG><A NAME="item_exec_cgi">exec_cgi ( OBJNUM )
+
+</A></STRONG><DD>
+Returns output of the CGI, for the objnum passed. Depends on the CGI script
+not requiring input.
+
+
+<P>
+
+<DT><STRONG><A NAME="item_add_attribute">add_attribute ( OBJNUM, NAME, VALUE )
+
+</A></STRONG><DD>
+Adds an attribute to the given objnum. Note that HyperWave allows multiple
+attributes of the same name, so if you add an attribute that already exists
+you'll end up with two. Use change_attribute if you want to overwrite the
+old one.
+
+
+<P>
+
+<DT><STRONG><A NAME="item_remove_attribute">remove_attribute ( OBJNUM, NAME, VALUE )
+
+</A></STRONG><DD>
+Removes an attribute to the given objnum. Note that you DO need to know the
+old value because HyperWave allows multiple attributes with the same value.
+
+
+<P>
+
+<DT><STRONG><A NAME="item_change_attribute">change_attribute ( OBJNUM, NAME, OLD_VALUE, NEW_VALUE )
+
+</A></STRONG><DD>
+Alters an attribute to the given objnum (NB: needs to know old value).
+
+
+<P>
+
+<DT><STRONG><A NAME="item_get_children">get_children ( OBJNUM )
+
+</A></STRONG><DD>
+Returns objnums for all the children in the objnum passed. If the object
+was a leaf node (ie: no children) you'll get a 0 back.
+
+
+<P>
+
+<DT><STRONG><A NAME="item_get_parents">get_parents ( OBJNUM )
+
+</A></STRONG><DD>
+Returns objnums for all the parents in the objnum passed. If the object had
+no parents (it was the root collection) you'll get a 0 back.
+
+
+<P>
+
+<DT><STRONG><A NAME="item_get_anchors">get_anchors ( OBJNUM )
+
+</A></STRONG><DD>
+Returns objnums for all the anchors in the document passed.
+
+
+<P>
+
+<DT><STRONG><A NAME="item_add_collection">add_collection ( PARENT_OBJNUM, NAME [, OTHER_PARAMS ] )
+
+</A></STRONG><DD>
+Inserts a collection on the HyperWave server. Returns object ID of the new
+collection.
+
+
+<P>
+
+<CODE>PARENT_OBJNUM</CODE> is the object number (probably returned from
+<CODE>get_objnum_by_name()</CODE> of the collection to insert this
+collection into.
+<CODE>NAME</CODE> is the name attribute, this will become the apparent URL to somebody using
+the WaveMaster interface.
+
+
+<P>
+
+<CODE>OTHER_PARAMS</CODE> should be in the form
+<CODE>Attribute=AttributeValue\nAttr2=Value2</CODE> and so on. You might particularly want to set a Title for the collection.
+
+
+<P>
+
+<DT><STRONG><A NAME="item_add_image">add_image ( OBJNUM, PARENT, NAME )
+
+</A></STRONG><DD>
+Adds a new picture.
+
+
+<P>
+
+<DT><STRONG><A NAME="item_add_text">add_text ( OBJNUM, PARENT )
+
+</A></STRONG><DD>
+Adds a new text object (no anchors).
+
+
+<P>
+
+<DT><STRONG><A NAME="item_add_html">add_html ( OBJNUM )
+
+</A></STRONG><DD>
+Adds a new html object (we parse the anchors).
+
+
+<P>
+
+</DL>
+<P>
+<HR>
+<H1><A NAME="SEE_ALSO">SEE ALSO
+
+</A></H1>
+<P>
+<HR>
+<H1><A NAME="AUTHOR">AUTHOR
+
+</A></H1>
+Bek Oberin <A
+HREF="MAILTO:<gossamer@tertius.net.au>"><gossamer@tertius.net.au></A>
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="COPYRIGHT">COPYRIGHT
+
+</A></H1>
+Copyright (c) 1998 Bek Oberin. All rights reserved.
+
+
+<P>
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+<P>
+
+</DL>
+    </BODY>
+
+    </HTML>

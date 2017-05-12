@@ -1,0 +1,8 @@
+Build.PL
+Changes
+MANIFEST			This list of files
+META.yml
+Makefile.PL
+README
+lib/HTML/SimpleParse.pm
+t/basic.t

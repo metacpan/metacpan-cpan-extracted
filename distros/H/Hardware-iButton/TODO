@@ -1,0 +1,20 @@
+
+settle on a common way to identify buttons: make all methods accept lower-case
+hex strings
+
+get stty settings right
+
+get reset sequence right, sometimes it doesn't work
+
+clean up buttonmaster.pl: I'm pretty slow at this Gtk stuff
+
+add TMEX layer (represent a button as a small filesystem)
+
+consider adding interface code for the Java button. The interface is pretty
+tricky (looking over the dallas code, it seems to require multiple
+transactions to get the whole APDU into the button, then various polling
+schemes to wait for the operation to finish, then multiple transactions to get
+it out again). If the licensing issues aren't a problem, it may be a lot
+easier to write a perl wrapper around the dallas 'capi' library than to
+reimplement the [undocumented] protocol in perl.
+

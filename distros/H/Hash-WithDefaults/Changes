@@ -1,0 +1,8 @@
+Revision history for Perl extension Hash::WithDefaults.
+
+0.01  Tue Jul 23 17:39:23 2002
+	- original version; created by h2xs 1.21 with options
+		-X -n Hash::WithDefaults
+
+0.04  Thu Dec 5 13:22 2002 (CET)
+	- made public

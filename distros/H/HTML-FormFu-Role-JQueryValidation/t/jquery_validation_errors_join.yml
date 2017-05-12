@@ -1,0 +1,12 @@
+---
+roles:
+  - JQueryValidation
+
+elements:
+  - name: foo
+    constraints:
+      - type: Required
+        message: One
+      
+      - type: Required
+        message: Two

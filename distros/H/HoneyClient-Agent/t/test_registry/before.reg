@@ -1,0 +1,59 @@
+REGEDIT4
+
+[HKEY_CURRENT_USER\]Testing Group 1[]
+@="Default"
+"Foo"="Bar"
+
+[HKEY_CURRENT_USER\Testing Group 2]
+@="\"Annoying=Value\""
+"\"Annoying=Key\""="Bar"
+"Multiline"="This
+value spans
+multiple lines
+"
+"Sane_Key"="\"Wierd=\"Value"
+
+[HKEY_CURRENT_USER\Testing Group 3]
+"Test_Bin_1"=hex:f4,ff,ff,ff,00,00,00,00,00,00,00,00,00,00,00,00,bc,02,00,00,00,\
+  00,00,00,00,00,00,00,54,00,61,00,68,00,6f,00,6d,00,61,00,00,00,f0,77,3f,00,\
+  3f,00,3f,00,3f,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,78,00,1c,10,fc,\
+  7f,22,14,fc,7f,b0,fe,12,00,00,00,00,00,00,00,00,00,98,23,eb,77
+"Test_Bin_2"=hex:f5,ff,ff,ff,00,00,00,00,00,00,00,00,00,00,00,00,90,01,00,00,00,\
+  00,00,00,00,00,00,00,4d,00,69,00,63,00,72,00,6f,00,73,00,6f,00,66,00,74,00,\
+  20,00,53,00,61,00,6e,00,73,00,20,00,53,00,65,00,72,00,69,00,66,00,00,00,f0,\
+  77,00,20,14,00,00,00,00,10,80,05,14,00,f0,1f,14,00,00,00,14,00
+
+[HKEY_CURRENT_USER\Testing Group 4]
+
+[HKEY_CURRENT_USER\Testing Group 5]
+@=""
+
+[HKEY_CURRENT_USER\Testing Group 6\With\Really\Deep\Nested\Directory\Structure]
+"InstallerLocation"="C:\\WINDOWS\\system32\\"
+
+[HKEY_CURRENT_USER\Testing Group 7]
+"C:\\Program Files\\Common Files\\Microsoft Shared\\Web Folders\\"=""
+"C:\\WINDOWS\\Installer\\{350C97B0-3D7C-4EE8-BAA9-00BCB3D54227}\\"=""
+"C:\\Program Files\\Support Tools\\"=""
+"C:\\Documents and Settings\\All Users\\Start Menu\\Programs\\Windows Support Tools\\"=""
+"C:\\WINDOWS\\Installer\\{6855CCDD-BDF9-48E4-B80A-80DFB96FE36C}\\"=""
+"C:\\WINDOWS\\Installer\\{F251B999-08A9-4704-999C-9962F0DFD88E}\\"=""
+"C:\\WINDOWS\\Installer\\{1CB92574-96F2-467B-B793-5CEB35C40C29}\\"=""
+"C:\\WINDOWS\\Installer\\{B37C842A-B624-46B8-A727-654E72F1C91A}\\"=""
+
+[HKEY_CURRENT_USER\Testing Group 8\{00021492-0000-0000-C000-000000000046}]
+"000"="String Value"
+
+[HKEY_CURRENT_USER\SessionInformation]
+"ProgramCount"=dword:0000000b
+
+[HKEY_CURRENT_USER\Volatile Environment]
+"LOGONSERVER"="\\\\MWDC4"
+"USERDNSDOMAIN"="MITRE.ORG"
+"CLIENTNAME"="Console"
+"SESSIONNAME"="Console"
+"APPDATA"="C:\\Documents and Settings\\kindlund\\Application Data"
+"HOMEDRIVE"="C:"
+"HOMESHARE"=""
+"HOMEPATH"="\\Documents and Settings\\kindlund"
+

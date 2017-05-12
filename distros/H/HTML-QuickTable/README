@@ -1,0 +1,363 @@
+NAME
+    HTML::QuickTable - Quickly create fairly complex HTML tables
+
+SYNOPSIS
+        use HTML::QuickTable;
+
+        my $qt = HTML::QuickTable->new(
+                       table_width  => '95%',       # opt method 1
+                       td => {bgcolor => 'gray'},   # opt method 2
+                       font_face => 'arial',        # set font
+                       font => {face => 'arial'},   # same thing
+                       labels => 1,                 # make top <th>?
+                       stylesheet => 1,             # use stylesheet?
+                       styleclass => 'mytable',     # class to use
+                       useid  => 'results',         # id="results_r1c2" etc
+                       header => 0,                 # print header?
+                 );
+
+        my $table1 = $qt->render(\@array_of_data);
+
+        my $table2 = $qt->render(\%hash_of_keys_and_values);
+
+        my $table3 = $qt->render($object_with_param_method);
+
+DESCRIPTION
+    This modules lets you easily create HTML tables. Like CGI::FormBuilder,
+    this module does a lot of thinking for you. For a comprehensive module
+    that gives you the ability to tweak every aspect of table building, see
+    HTML::Table or Data::Table. This one gives you a lot of control, but is
+    really designed as an easy way to expand arbitrary data structures.
+
+    The simplest table can be created with nothing more than:
+
+        my $qt = HTML::QuickTable->new;
+        print $qt->render(\@data);
+
+    Where @data would be an array holding your data structure. For example,
+    the data structure:
+
+        @data = (
+            [ 'nwiger', 'Nathan Wiger', 'x43264', 'nate@wiger.org' ],
+            [ 'jbobson', 'Jim Bobson', 'x92811', 'jim@bobson.com' ]
+        );
+
+    Would be rendered as something like:
+
+        <table>
+        <tr><td>nwiger</td><td>Nathan Wiger</td><td>x43264</td><td>nate@wiger.org</td></tr>
+        <tr><td>jbobson</td><td>Jim Bobson</td><td>x92811</td><td>jim@bobson.com</td></tr>
+        </table>
+
+    Of course, the best use for this module is on dynamic data, say
+    something like this:
+
+        use DBI;
+        use HTML::QuickTable;
+
+        my $qt = HTML::QuickTable->new(header => 1);    # print header
+        my $dbh = DBI->connect( ... );
+
+        my $all_arrayref = $dbh->selectall_arrayref("select * from billing");
+    
+        print $qt->render($all_arrayref);
+
+    With "header => 1", you will get a brief "CGI" header as well as some
+    basic "HTML" to prettify things. As such, the above will print out all
+    the rows that your query selected in an "HTML" table.
+
+FUNCTIONS
+  new(opt => val, opt => val)
+    The "new()" function takes a list of options and returns a $qt object,
+    which can then be used to "render()" different data. The "new()"
+    function has a flexible options-parsing mechanism that allows you to
+    specify settings to pretty much any element of the table.
+
+    Options include:
+
+    header => 1 | 0
+        If set to 1, a basic "CGI" header and leading "HTML" is printed out.
+        Useful if you're really looking for quick and dirty. Defaults to 0.
+
+    htmlize => 1 | 0
+        If set to 1, then all values will be run through a simple filter
+        that creates links for things that look like email addresses or
+        websites. Also, "*word*" will be changed to "<b>word</b>", and
+        "_word_" will be changed to "<i>word</i>".
+
+    labels => 1 | 0 | LTRB
+        If set to 1, then the first row of the data is used as the labels of
+        the data columns, and is placed in "<th>" tags. For example, if we
+        assume our above data structure, and said:
+
+            my $qt = HTML::QuickTable->new(... labels => 1);
+
+            unshift @data, ['User', 'Name', 'Ext', 'Email'];
+
+            print $qt->render(\@data);
+
+        You would get something like this:
+
+            <table>
+            <tr><th>User</th><th>Name</th><th>Ext</th><th>Email</th></tr>
+            <tr><td>nwiger</td><td>Nathan Wiger</td><td>x43264</td><td>nate@wiger.org</td></tr>
+            <tr><td>jbobson</td><td>Jim Bobson</td><td>x92811</td><td>jim@bobson.com</td></tr>
+            </table>
+
+        Since the labels are placed in "<th>" tags, you can then use the
+        extra "HTML" options described below to alter the way that the
+        labels look.
+
+        You can also set this to a string that includes the characters L, T,
+        R, and B, to specify that "<th>" tags should be created for the
+        Left, Top, Right, and Bottom rows and columns. So for example:
+
+            labels => 'LT'
+
+        Would alter the table so that both the first row AND first column
+        had "<th>" instead of "<td>" elements. This is useful for creating
+        tables that have two axes, such as calendars.
+
+    null => $string
+        If set, then null (undef) fields will be set to that string instead.
+        This is useful if pulling a bunch of records out of a database and
+        not wanting to get blank table spaces everywhere there's a null
+        field. For example:
+
+            my $qt = HTML::QuickTable->new(null => '-');
+            my $all_arrayref = $sth->fetchall_arrayref;
+            print $qt->render($all_arrayref);
+
+        By default null table elements are left blank.
+
+    nulltags => \%hash
+        In addition to just changing the string used to represent null data,
+        you may want to change the look of it as well. These tags will
+        become attributes to the "<td>" element holding the null field. So,
+        settings like this:
+
+            null => 'N/A',
+            nulltags => {bgcolor => 'gray'},
+
+        Would result in an element like the following for null fields:
+
+            <td bgcolor="gray">N/A<td>
+
+        Make sense?
+
+    stylesheet => 1 | '/path/to/style.css'
+        If set, then any font settings are ignored and instead all table
+        elements are wrapped with a "class=" attribute. The class name is
+        whatever "styleclass" is set to (see below). See also the "useid"
+        option to generate "id" tags in an intelligent way.
+
+    styleclass => $string | \@array
+        This used as a style class to use if the above setting is used. If
+        set to a string, it is passed directly to the "class" tag. If set to
+        an arrayref, then those styles are alternated between on a
+        row-by-row ("tr") basis. For example:
+
+            styleclass => [qw(one two)]
+
+        Would yield "XHTML" similar to:
+
+            <table class="one">
+              <tr class="one">
+                <td class="one">a</td>
+                <td class="one">b</td>
+                <td class="one">c</td>
+                <td class="one">d</td>
+              </tr>
+              <tr class="two">
+                <td class="two">e</td>
+                <td class="two">f</td>
+                <td class="two">g</td>
+                <td class="two">h</td>
+              </tr>
+            </table>
+
+        Notice that the table gets the style of the first array element.
+
+    text => $string
+        Just like FormBuilder, this text is printed out for you to easily
+        annotate your table.
+
+    title => $string
+        If you set "header => 1", then you can also specify the "title" to
+        be prefixed to the document. Otherwise this option is ignored.
+
+    useid => $baseid
+        If set, then unique "id" tags are automatically generated for each
+        and every table element, allowing you to address the entire table on
+        a per-element basis via Javascript or CSS. These tags take the
+        format:
+
+            $baseid[_rX[cY]]
+
+        Where "X" is the row number and "Y" is the column number. So this
+        setting:
+
+            useid => 'results'
+
+        Would yield "XHTML" like:
+
+            <table id="results">
+              <tr id="results_r1">
+                <th id="results_r1c1">n1</th>
+                <th id="results_r1c2">n2</th>
+                <th id="results_r1c3">n3</th>
+                <th id="results_r1c4">n4</th>
+              </tr>
+              <tr id="results_r2">
+                <td id="results_r2c1">1</td>
+                <td id="results_r2c2">2</td>
+                <td id="results_r2c3">3</td>
+                <td id="results_r2c4">4</td>
+              </tr>
+            </table>
+
+        Notice that the table gets the baseid verbatim.
+
+    vertical => 1 | 0
+        If you set this to 1, then it fundamentally changes the way in which
+        data is expanded. Instead of walking the data structure and building
+        rows horizontally, each element of data will become a column. This
+        option is described more below under "render()".
+
+    body => {opt => val, opt => val}
+    font => {opt => val, opt => val}
+    table => {opt => val, opt => val}
+    td => {opt => val, opt => val}
+    th => {opt => val, opt => val}
+    tr => {opt => val, opt => val}
+        These options can be used to set attributes to be used on the
+        applicable tag. For example, if you wanted the table width to be
+        "95%" and the "border" to be 1, you would say:
+
+            my $qt = HTML::QuickTable->new(table => {width => '95%', border => 1});
+
+        Of course, you can specify as many different options as you want:
+
+            my $qt = HTML::QuickTable->new(table => {width => '95%', border => 1},
+                                           td    => {class => 'td_el'},
+                                           font  => {face => 'arial,helvetica'} );
+
+        As an alternative form, you can also use:
+
+    body_opt => val
+    font_opt => val
+    table_opt => val
+    td_opt => val
+    th_opt => val
+    tr_opt => val
+        Instead of having to specify a hashref, you can use this option form
+        to specify "HTML" tags. For example, if you want to set the font
+        face, either of these will do the exact same thing:
+
+            my $qt = HTML::QuickTable->new(font => {face => 'verdana'});
+            my $qt = HTML::QuickTable->new(font_face => 'verdana');
+
+        Again, you can specify any "HTML" tag you want and it will get
+        included. Anything after the underscore is taken as the tag name and
+        placed into the output "HTML" verbatim.
+
+  render(\@data | \%data | $object)
+    The "render()" function can accept either an "arrayref", "hashref", or
+    "object". It then recursively expands the data per the options you
+    specified to "new()". Each data structure is rendered differently:
+
+    arrayref (\@array)
+        An "arrayref" should expand intuitively; each row in the array
+        becomes another row in the table. If you specify the "labels"
+        option, then the first row is taken as the column labels and is
+        placed within "<th>" elements.
+
+    object ($object)
+        An "object" also expands quite simply. First, the "object"'s
+        "param()" method is called to get a list of keys. Then, for each key
+        the value is placed in the array. The key is taken as the label for
+        that column, and is placed within a "<th>". As an example, you can
+        dump a nice table of your "CGI" query with:
+
+            use CGI;
+            use HTML::QuickTable;
+
+            my $cgi = CGI->new;
+            my $qt  = HTML::QuickTable->new(header => 1);
+
+            print $qt->render($cgi); 
+
+    hashref (\%hash)
+        A "hashref" is first sorted by "key". Then, each data element
+        becomes a data element for that column. For example:
+
+            %user = (
+                'nwiger'  => ['Nathan Wiger', 'nate@wiger.org'],
+                'jbobson' => ['Jim Bobson', 'jim@bobson.com']
+            );
+
+            print $qt->render(\%user);
+
+        Would be rendered as:
+
+            <table>
+            <tr><td>jbobson</td><td>Jim Bobson</td><td>jim@bobson.com</td></tr>
+            <tr><td>nwiger</td><td>Nathan Wiger</td><td>nate@wiger.org</td></tr>
+            </table>
+
+        Note that it's very similar to the way arrays are handled. The
+        benefit here is that this allows you to expand arbitrary data
+        structures.
+
+        If it's a "hashref" of "hashrefs", for example:
+
+            %user = (
+                'nwiger'  => { name => 'Nathan Wiger', email => 'nate@wiger.org' },
+                'jbobson' => { name => 'Jim Bobson', email => 'jim@bobson.com'}
+            );
+
+            print $qt->render(\%user);
+
+        Then some Major Magic (tm) happens and you'll get something like
+        this:
+
+            <table>
+            <tr><th></th><th>email</th><th>name</th></tr>
+            <tr><td>jbobson</td><td>jim@bobson.com</td><td>Jim Bobson</td></tr>
+            <tr><td>nwiger</td><td>nate@wiger.org</td><td>Nathan Wiger</td></tr>
+            </table>
+
+        Notice that the keys were sorted alphabetically and output in order.
+        But, note that the top-level "key" is not labeled in the "<th>". To
+        change this, you must specify the "keylabel" option to "new()":
+
+            my $qt = HTML::QuickTable->new(keylabel => 'user');
+            # ...
+            print $qt->render(\%user);
+
+        That would create the same "HTML" as above, except the first column
+        label would be "user".
+
+NOTES
+    The 'B' option to 'labels' is currently broken, due to the fact that
+    "render()" recursively calls itself and thus loses track of where it is.
+    But who the heck puts labels at the *bottom* of an HTML table??
+
+    If you run into a bug, please DO NOT submit it via "rt.cpan.org" - that
+    just causes me alot of extra work. Email me at the below address, and
+    include the version string your eyes are about to pass over.
+
+SEE ALSO
+    HTML::Table, Data::Table, SQL::Abstract, CGI::FormBuilder
+
+VERSION
+    $Id: QuickTable.pm,v 1.12 2005/05/10 21:10:52 nwiger Exp $
+
+AUTHOR
+    Copyright (c) 2001-2005 Nathan Wiger <nate@wiger.org>. All Rights
+    Reserved.
+
+    This module is free software; you may copy this under the terms of the
+    GNU General Public License, or the Artistic License, copies of which
+    should have accompanied your Perl kit.
+

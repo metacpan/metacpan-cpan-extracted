@@ -1,0 +1,39 @@
+build\.pl
+blib/.*
+.gitignore
+.git/.*
+Makefile$
+pm_to_blib
+MYMETA..*
+.*\.bak
+^HTML-Valid-[0-9\.]+/$
+^HTML-Valid-[0-9\.]+\.tar\.gz$
+^timesheet\.txt$
+# Template for building pod file.
+^.*\.pod\.tmpl$
+^lib/HTML/Valid\.pod\.tmpl$
+^lib/HTML/Valid/Tagset\.pod\.tmpl$
+^Valid.(?:c|o|bs)$
+^build/example.*$
+^tidy-html5\.o$
+^extra\.[ch]$
+^xt/runtest\.pl$
+^clean\.pl$
+.*\.~[0-9]+~$
+^make-c-file\.pl$
+^extract-constants\.pl$
+# Output from running the example programs
+^examples/.*-out\.txt$
+# Not useful for CPAN
+^make-pod\.pl$
+# Template files
+^tmpl/.*$
+^tmpl/html-tidy-copyright$
+^make-attr-type-hash\.pl$
+# Users don't need these tests.
+^xt/.*$
+# Object files
+.*\.o$
+# Build tools
+^tools/.*$
+^config\.txt$

@@ -1,0 +1,11 @@
+srun --partition hpc --nodelist hpc014 /home/guests/jir2004/perlmodule/HPC-Runner-Slurm/script/cpus.pl 
+srun --partition hpc --nodelist hpc005 /home/guests/jir2004/perlmodule/HPC-Runner-Slurm/script/cpus.pl 
+srun --partition hpc --nodelist hpc007 /home/guests/jir2004/perlmodule/HPC-Runner-Slurm/script/cpus.pl 
+srun --partition hpc --nodelist hpc015 /home/guests/jir2004/perlmodule/HPC-Runner-Slurm/script/cpus.pl 
+srun --partition hpc --nodelist hpc006 /home/guests/jir2004/perlmodule/HPC-Runner-Slurm/script/cpus.pl 
+srun --partition hpc --nodelist hpc013 /home/guests/jir2004/perlmodule/HPC-Runner-Slurm/script/cpus.pl 
+srun --partition hpc --nodelist hpc011 /home/guests/jir2004/perlmodule/HPC-Runner-Slurm/script/cpus.pl 
+srun --partition hpc --nodelist hpc008 /home/guests/jir2004/perlmodule/HPC-Runner-Slurm/script/cpus.pl 
+srun --partition hpc --nodelist hpc010 /home/guests/jir2004/perlmodule/HPC-Runner-Slurm/script/cpus.pl 
+srun --partition hpc --nodelist hpc012 /home/guests/jir2004/perlmodule/HPC-Runner-Slurm/script/cpus.pl 
+srun --partition hpc --nodelist hpc009 /home/guests/jir2004/perlmodule/HPC-Runner-Slurm/script/cpus.pl 

@@ -1,0 +1,9 @@
+% my $var = "Foo";
+Hello World <% $var %>
+<% do { join ",", $r->params } %>
+
+<%perl>
+   if ($ARGS{403}) {
+      $m->clear_and_abort(403);
+   }
+</%perl>

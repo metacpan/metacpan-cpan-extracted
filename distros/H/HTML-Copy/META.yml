@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               HTML-Copy
+version:            1.31
+abstract:           ~
+author:  []
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Class::Accessor:  0
+    HTML::Parser:     3.4
+    HTTP::Headers:    0
+    Test::More:       0
+    URI:              0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

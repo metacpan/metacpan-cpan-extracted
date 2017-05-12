@@ -1,0 +1,430 @@
+=pod
+
+=head1 NAME
+
+HTML::ListToTree - Convert nested HTML lists to Javascripted tree widget
+
+=head1 SYNOPSIS
+
+	use HTML::ListToTree;
+	#
+	#	convert some arbitrary HTML from STDIN to a tree
+	#
+	$/ = undef;
+	my $htmltree = <STDIN>;
+
+	my $list2tree = HTML::ListToTree->new(
+		Text => 'Some::Module',
+		Link => '#TOP',
+		Source => $htmltree);
+
+	print $list2tree->render(
+		CloseIcon => 'closedbook.gif',
+		CSSPath =>'./css/dtree.css',
+		IconPath => './img',
+		JSPath => './js/dtree.js',
+		OpenIcon => 'openbook.gif',
+		RootIcon => 'globe.gif',
+		Target => 'mainframe',
+		Widget => 'HTML::ListToTree::DTree',
+		Additions => '<small><i>Generated on July 1, 2007</i></small>'
+		);
+	#
+	#	get the stuff we need for the tree
+	#
+	my $js = $list2tree->getJavascript();
+	my $css = $list2tree->getCss();
+	my $openimg = $list2tree->getIcon('openicon.gif');
+	my %images = $list2tree->getIcons();
+	#
+	#	or just write it out
+	#
+	die $@
+		unless $list2tree->writeJavascript() &&
+			$list2tree->writeCSS() &&
+			$list2tree->writeIcons();
+
+=head1 DESCRIPTION
+
+Converts HTML nested lists (E<lt>ulE<gt> or E<lt>olE<gt>) into an
+HTML document containing an alternate widget using a specified
+Widget class. By default, the Widget class is HTML::ListToTree::DTree, which
+generates a Javascripted tree using the B<dtree> widget I<(with some minor modifications)>
+available at L<http://www.destroydrop.com/javascripts/tree/>.
+
+=head1 METHODS
+
+=head3 $list2tree = C<HTML::ListToTree-E<gt>new( %args )>
+
+Convert the first instance of an HTML list (ordered or unordered)
+in the supplied HTML text into a structure which can be used
+to construct the alternate widget. Embedded links are preserved,
+and nested lists are recursively traversed to construct expandable
+tree nodes. If the first item in a nested list is another
+nested list, the subordinate list is "pulled up" to the outer level
+(in order to avoid unlabeled tree nodes).
+
+On success, returns an HTML::ListToTree object
+
+The method will C<die> on any failure with an appropriate error message
+in C<$@>.
+
+C<%args> contains the following named parameters:
+
+=over
+
+=item Text => $text
+
+Text label for the node
+
+=item Link => $link
+
+Link URL for the node. If the link starts with '#', the link will be prefixed
+by a parent document URL.
+
+=item Children => [ @nodes ] I<(optional)>
+
+A list of HTML::ListToTree objects to populate the new node.
+Any objects extracted from a C<Source> document are appended to this list.
+
+=item Source => $document I<(optional)>
+
+A source document from which to extract HTML::ListToTree objects to populate the new node.
+Objects extracted from the document are appended to any supplied C<Children> list.
+
+=item Widget => $widget I<(optional)>
+
+Either the name of a Perl class, or a Perl object; default 'HTML::ListTiTree::DTree'.
+If a classname is provided, an instance of the class will be constructed. The class
+constructs a Javascript tree widget using the B<dtree> library. The object provides methods
+for constructing the widget from HTML lists members. See L<HTML::ListToTree::DTree>
+for methods the widget class should implement.
+
+=back
+
+=head3 @nodes = C<$list2tree-E<gt>addChildren( @nodes )>
+
+Add the specified list of either HTML::ListToTree objects, or
+nodes created from 2-tuples of Text => Link values, to the object's list
+of children. Returns the list of added nodes. E.g.,
+
+	@nodes = $list2tree->addChildren(
+		'Chapter 1' => '#chapter1',
+		$chapter2_node,
+		'Chapter 3' => '#chapter3',
+		);
+
+=head3 @nodes = C<$list2tree-E<gt>addFromDocument( $html )>
+
+Add a list of nodes extracted from the supplied document to the object's
+list of children. Returns the list of extracted nodes. Applies the
+object's L<extractTree()> method to the supplied document.
+
+=head3 @nodes = C<$list2tree-E<gt>getChildren()>
+
+Returns the list of child nodes of the object.
+
+=head3 $text = C<$list2tree-E<gt>getText()>
+
+Returns the text label of the object.
+
+=head3 C<$list2tree-E<gt>setText( $text )>
+
+Sets the text label of the object.
+Returns the object.
+
+=head3 $link = C<$list2tree-E<gt>getLink()>
+
+Returns the link URL of the object.
+
+=head3 C<$list2tree-E<gt>setLink( $link )>
+
+Sets the link URL of the object.
+Returns the object.
+
+=head3 $node = C<$list2tree-E<gt>getNodeByText( $text )>
+
+Search the object's children for the first node
+with the specified text label. The search is breadth-first,
+i.e., all siblings are searched before any children are searched.
+Returns the matching node if a match is found, otherwise,
+returns undef.
+
+=head3 $node = C<$list2tree-E<gt>getNodeByLink( $link )>
+
+Search the object's children for the first node
+with the specified link URL. The search is breadth-first,
+i.e., all siblings are searched before any children are searched.
+Returns the matching node if a match is found, otherwise,
+returns undef.
+
+=head3 $tree = C<$list2tree-E<gt>extractTree( $html )>
+
+Extracts a HTML::ListToTree from the first top-level
+list element in supplied document. This method is usually
+not used by applications, but can be overridden by
+subclasses to provide alternate extraction logic.
+
+=head3 $widget = C<$list2tree-E<gt>render( %args )>
+
+Render an HTML document containing the widget for the object's tree. 
+The resulting document is suitable for use with an HTML frameset document. Subclasses
+may choose to override this method to provide alternate
+renderings of the tree. C<%args> contains the following named parameters:
+
+=over
+
+=item B<Additions>
+
+I<(optional)> HTML text to be appended to the generated tree for display
+in the same frame as the navigation tree. Default none.
+
+=item B<CloseIcon>
+
+I<(optional)> Name of icon file used for closed tree nodes; default 'closedbook.gif'
+
+=item B<CSSPath>
+
+I<(optional)> Path to the stylesheet file dtree.css used by dtree; default './css'
+
+=item B<IconPath>
+
+I<(optional)> Path to the location of icons used by dtree; default './img'
+
+=item B<JSPath>
+
+I<(optional)> Path to the Javascript file dtree.js; default '.js'
+
+=item B<UseIcons>
+
+I<(optional)> If true (the default), tree nodes are decorated with icons.
+
+=item B<OpenIcon>
+
+I<(optional)> Name of icon file used for open tree nodes; default 'openbook.gif'
+
+=item B<RootIcon>
+
+I<(optional)> Name of icon file used for the root tree node; default is same as OpenIcon
+
+=item B<Target>
+
+I<(optional)> Name of an HTML frame to contain the document being navigated; default 'mainframe'
+
+=back
+
+=head3 $js = C<$list2tree-E<gt>getJavascript()>
+
+Returns any Javascript library required for the widget.
+
+=head3 $css = C<$list2tree-E<gt>getCSS()>
+
+Returns any CSS stylesheet required for the widget.
+
+=head3 $image = C<$list2tree-E<gt>getIcon( $name )>
+
+Returns the binary image data for the widget icon specified by C<$name>.
+
+=head3 %images = C<$list2tree-E<gt>getIcons()>
+
+Returns the binary image data for all the icons provided by the widget
+as a hash mapping the image name to its binary data.
+
+=head1 SUBCLASSING
+
+This module was developed primarily to aid in beautifying the
+output of L<Pod::ProjectDocs>. Therefore, the provided
+C<extractTree()> implementation may not be suitable for
+some applications. Likewise, some applications may wish to
+render the tree differently, or use a different Javascript widget,
+in which case the provided C<render()> implementation may not be appropriate.
+
+Both of those situations can be remedied by simply subclassing HTML::ListToTree
+to override the C<extractTree()> and/or C<render()> methods. Refer
+to the source code for details on the structure of the nodes generated
+by C<extractTree()> and consumed by C<render()>.
+
+Also, the provided default dtree browser widget (provided within
+HTML::ListToTree::DTree) can be overridden by specifying an
+alternate Perl package name as the C<Widget> constructor argument.
+
+
+=head2 Widget Package Methods
+
+The widget package must provide the following methods:
+
+=head3 new()
+
+Constructor.
+
+=head3 start( %args )
+
+Starts the construction of the widget. The contents of C<%args> depends on the
+widget class; for the default supports the following members:
+
+=over
+
+=item B<RootText> 
+
+text for root node of tree
+
+=item B<CSSPath> 
+
+full path to the stylesheet; default './css/dtree.css'
+
+=item B<JSPath> 
+
+full path to the Javascript document; default './js/dtree.js'
+
+=item B<UseIcons> 
+
+if true, widget includes open/close icons; default false
+
+=item B<RootIcon> 
+
+icon used for root node of tree; default none
+
+=item B<RootLink> 
+
+URL of root node of tree; default none
+
+=item B<Target> 
+
+name of target frem for tree links; default 'mainframe'
+
+=item B<CloseIcon> 
+
+icon used for closed nodes; default <IconPath>/folder.gif
+
+=item B<OpenIcon> 
+
+icon used for open node; default <IconPath>/folderopen.gif
+
+=item B<IconPath> 
+
+path to the icon image directory
+
+=back
+
+=head3 addLeaf( $node, $parent, $text, $link )
+
+Add a leaf node to the widget. 
+
+=over
+
+=item *
+
+C<$node> is a unique integer node id.
+
+=item *
+
+C<$parent> is the unique node id of the parent node. 
+
+=item *
+
+C<$text> is the text label for the node. 
+
+=item *
+
+C<$link> is a URL for the content the node should cause
+to be presented in the target frame when the node is clicked.
+
+=back
+
+=head3 add( $node, $parent, $text, $link )
+
+Add an intermediate node to the widget. The parameters are the
+same as for C<addLeaf()>.
+
+=head3 getJavascript()
+
+Returns the text of any Javascript library required for the widget
+
+=head3 getCSS()
+
+Returns the text of any stylesheet required for the widget
+
+=head3 getIcon( $name )
+
+Returns the binary image data for the specified widget icon.
+Widget classes are expected to provide their own icons encoded
+within their package (usually via L<MIME::Base64>).
+
+=head3 getIcons()
+
+Returns the image data for all widget icons as a hash mapping
+icon names to binary image data.
+Widget classes are expected to provide their own icons encoded
+within their package (usually via L<MIME::Base64>).
+
+=head3 writeJavascript( [ $path ] )
+
+Writes a file of the text of any Javascript library required for the widget. If
+C<$path> is not specified, uses the JSPath specified for C<render()>.
+
+=head3 getCSS( [ $path ] )
+
+Writes a file of the text of any stylesheet required for the widget. If
+C<$path> is not specified, uses the CSSPath specified for C<render()>.
+
+
+=head3 writeIcon( $name [ , $path ] )
+
+Writes a file of the binary image data for the specified widget icon.
+Widget classes are expected to provide their own icons encoded
+within their package (usually via L<MIME::Base64>).
+If C<$path> is not specified, uses the IconPath specified for C<render()>.
+
+=head3 writeIcons( [ $path ] )
+
+Writes files of the image data for all widget icons.
+Widget classes are expected to provide their own icons encoded
+within their package (usually via L<MIME::Base64>).
+If C<$path> is not specified, uses the IconPath specified for C<render()>.
+
+=head1 PREREQUISITES
+
+Perl 5.8 or later.
+
+L<HTML::TreeBuilder>
+
+B<dtree> from L<http://www.destroydrop.com/javascripts/tree/>;
+(a copy of the package, along with associated images and CSS,
+is included in the L<HTML::ListToTree::DTree> package)
+
+=head1 SEE ALSO
+
+L<index2dtree> - included script to perform conversions from the command line
+
+L<HTML::Widgets::NavMenu> - a similar solution, but for pure HTML (no Javscript)
+
+L<CGI::Explorer> - similar solution, but limited to Windows(R) Explorer look alike
+(no configurable icons)
+
+L<Tree::Simple::View> - a generalized solution for creating views of Tree::Simple
+implementations
+
+=head1 AUTHOR, COPYRIGHT, and LICENSE
+
+Copyright (C) 2007, Dean Arnold, Presicient Corp., USA. All rights reserved.
+
+Excluding the dtree widget software and components included in the 
+L<HTML::ListToTree::DTree> package, permission is granted to use this software 
+under the same terms as Perl itself. Refer to the L<Perl Artistic License|perlartistic> for details.
+
+The dtree widget software and components included in the 
+L<HTML::ListToTree::DTree> package are distributed in accordance
+with the following license and copyright:
+
+	/*--------------------------------------------------|
+	| dTree 2.05| www.destroydrop.com/javascripts/tree/ |
+	|---------------------------------------------------|
+	| Copyright (c) 2002-2003 Geir Landrö               |
+	|                                                   |
+	| This script can be used freely as long as all     |
+	| copyright messages are intact.                    |
+	|                                                   |
+	| Updated: 17.04.2003                               |
+	|--------------------------------------------------*/
+
+=cut

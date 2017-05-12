@@ -1,0 +1,27 @@
+HTML/Entities/Latin2 version 0.04
+=================================
+
+This module was written to solve a problem I had which involved taking text data from a feed source and submiting it to a custom-built content management system (not my own). The problem was that the CMS could only handle ASCII text and the feed source was encoded in ISO-8859-2 (Hungarian). Since the eventual output was destined for a web page, an obvious solution was to encode all non-ASCII characters into their HTML entity equivalents. Unfortunately after an extensive search and an email exchange with Gisle Aas (author of HTML::Entities) I decided I would have to roll my own.
+
+This module has one basic job: to take text which may contain high-bit chataracters encoded as Latin-2, find those characters and replace them with their HTML entity equivalents. The result is a string which contains only ASCII but when displayed in a web page will render the Latin-2 glyphs.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+none
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Michael J. Mathews
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

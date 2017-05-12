@@ -1,0 +1,126 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: HTML-HTML5-DOM
+Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
+Source: https://metacpan.org/release/HTML-HTML5-DOM
+
+Files: README
+ lib/HTML/HTML5/DOM.pm
+ lib/HTML/HTML5/DOM/HTMLAnchorElement.pod
+ lib/HTML/HTML5/DOM/HTMLAreaElement.pod
+ lib/HTML/HTML5/DOM/HTMLAudioElement.pod
+ lib/HTML/HTML5/DOM/HTMLBRElement.pod
+ lib/HTML/HTML5/DOM/HTMLBaseElement.pod
+ lib/HTML/HTML5/DOM/HTMLBodyElement.pod
+ lib/HTML/HTML5/DOM/HTMLButtonElement.pod
+ lib/HTML/HTML5/DOM/HTMLCanvasElement.pod
+ lib/HTML/HTML5/DOM/HTMLCollection.pod
+ lib/HTML/HTML5/DOM/HTMLCommandElement.pod
+ lib/HTML/HTML5/DOM/HTMLDListElement.pod
+ lib/HTML/HTML5/DOM/HTMLDataListElement.pod
+ lib/HTML/HTML5/DOM/HTMLDetailsElement.pod
+ lib/HTML/HTML5/DOM/HTMLDivElement.pod
+ lib/HTML/HTML5/DOM/HTMLDocument.pod
+ lib/HTML/HTML5/DOM/HTMLElement.pod
+ lib/HTML/HTML5/DOM/HTMLEmbedElement.pod
+ lib/HTML/HTML5/DOM/HTMLFieldSetElement.pod
+ lib/HTML/HTML5/DOM/HTMLFormControlsCollection.pod
+ lib/HTML/HTML5/DOM/HTMLFormElement.pod
+ lib/HTML/HTML5/DOM/HTMLHRElement.pod
+ lib/HTML/HTML5/DOM/HTMLHeadElement.pod
+ lib/HTML/HTML5/DOM/HTMLHeadingElement.pod
+ lib/HTML/HTML5/DOM/HTMLHtmlElement.pod
+ lib/HTML/HTML5/DOM/HTMLIFrameElement.pod
+ lib/HTML/HTML5/DOM/HTMLImageElement.pod
+ lib/HTML/HTML5/DOM/HTMLInputElement.pod
+ lib/HTML/HTML5/DOM/HTMLKeygenElement.pod
+ lib/HTML/HTML5/DOM/HTMLLIElement.pod
+ lib/HTML/HTML5/DOM/HTMLLabelElement.pod
+ lib/HTML/HTML5/DOM/HTMLLegendElement.pod
+ lib/HTML/HTML5/DOM/HTMLLinkElement.pod
+ lib/HTML/HTML5/DOM/HTMLMapElement.pod
+ lib/HTML/HTML5/DOM/HTMLMediaElement.pod
+ lib/HTML/HTML5/DOM/HTMLMenuElement.pod
+ lib/HTML/HTML5/DOM/HTMLMetaElement.pod
+ lib/HTML/HTML5/DOM/HTMLMeterElement.pod
+ lib/HTML/HTML5/DOM/HTMLModElement.pod
+ lib/HTML/HTML5/DOM/HTMLOListElement.pod
+ lib/HTML/HTML5/DOM/HTMLObjectElement.pod
+ lib/HTML/HTML5/DOM/HTMLOptGroupElement.pod
+ lib/HTML/HTML5/DOM/HTMLOptionElement.pod
+ lib/HTML/HTML5/DOM/HTMLOutputElement.pod
+ lib/HTML/HTML5/DOM/HTMLParagraphElement.pod
+ lib/HTML/HTML5/DOM/HTMLParamElement.pod
+ lib/HTML/HTML5/DOM/HTMLPreElement.pod
+ lib/HTML/HTML5/DOM/HTMLProgressElement.pod
+ lib/HTML/HTML5/DOM/HTMLQuoteElement.pod
+ lib/HTML/HTML5/DOM/HTMLScriptElement.pod
+ lib/HTML/HTML5/DOM/HTMLSelectElement.pod
+ lib/HTML/HTML5/DOM/HTMLSourceElement.pod
+ lib/HTML/HTML5/DOM/HTMLSpanElement.pod
+ lib/HTML/HTML5/DOM/HTMLStyleElement.pod
+ lib/HTML/HTML5/DOM/HTMLTableCaptionElement.pod
+ lib/HTML/HTML5/DOM/HTMLTableCellElement.pod
+ lib/HTML/HTML5/DOM/HTMLTableColElement.pod
+ lib/HTML/HTML5/DOM/HTMLTableDataCellElement.pod
+ lib/HTML/HTML5/DOM/HTMLTableElement.pod
+ lib/HTML/HTML5/DOM/HTMLTableHeaderCellElement.pod
+ lib/HTML/HTML5/DOM/HTMLTableRowElement.pod
+ lib/HTML/HTML5/DOM/HTMLTableSectionElement.pod
+ lib/HTML/HTML5/DOM/HTMLTextAreaElement.pod
+ lib/HTML/HTML5/DOM/HTMLTimeElement.pod
+ lib/HTML/HTML5/DOM/HTMLTitleElement.pod
+ lib/HTML/HTML5/DOM/HTMLTrackElement.pod
+ lib/HTML/HTML5/DOM/HTMLUListElement.pod
+ lib/HTML/HTML5/DOM/HTMLUnknownElement.pod
+ lib/HTML/HTML5/DOM/HTMLVideoElement.pod
+ lib/HTML/HTML5/DOM/RadioNodeList.pod
+ lib/HTML/HTML5/DOM/ReleaseNotes.pod
+Copyright: This software is copyright (c) 2012, 2014 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: CONTRIBUTING
+ INSTALL
+ LICENSE
+ NEWS
+ examples/basics.pl
+ examples/extending.pl
+ examples/xml11.pl
+Copyright: Unknown
+License: Unknown
+
+Files: Changes
+ META.json
+ META.yml
+ dist.ini
+ doap.ttl
+ t/02simple.t
+Copyright: Copyright 2014 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: t/01basic.t
+Copyright: Copyright 2012 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

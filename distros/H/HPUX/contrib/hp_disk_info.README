@@ -1,0 +1,45 @@
+Copyright (C) 2001 Christopher White.  All rights reserved.  these
+programs are free software;  you can redistribute it and/or modify them 
+under the same terms as perl itself.
+
+Dependencies:
+
+HPUX::Ioscan.pm
+HPUX::FS.pm
+HPUX::LVM.pm
+Storable.pm
+
+Installation:
+
+1. Copy both files to your cgi directory structure.
+
+2. edit last lines in hp_disk_info_launcher.cgi to point to location of hp_disk_info.cgi
+
+Notes:
+
+You might have to increase your webservers timeout variable to allow enough time to generate the info before the page times out.
+
+Brief Mod History:
+
+Tue May 1, 2002
+
+created a text command line version of the script.
+
+Tue Jan 22 12:44:39 PST 2002
+
+-Added hooks to identify alternate links and link#
+-fixed up postscript output to scale right and more like HTML
+-Added to modules Ioscan, LVM and FS.
+-Updated MANIFEST file
+
+Mon Jan 21 2002
+
+-Added old and new option to launcher cgi
+-embeded launcher cgi into a table so it looks better
+
+
+
+ToDo:
+
+-Fix postrpit output so it spans pages more gracefully
+-Fix blank entry for filesystem in html ouput when device not in fstab

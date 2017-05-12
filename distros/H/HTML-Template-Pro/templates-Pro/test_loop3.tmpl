@@ -1,0 +1,40 @@
+<HTML>
+<body>
+<H1> test_loop3 </H1>
+
+We test loops and nesting
+
+<table>
+<TMPL_LOOP name="HASHREF1"> <tr>
+  <td><tmpl_var NAME="LOOPVAR1"></td>
+  <td><tmpl_var NAME="LOOPVAR2"></td>
+  <td><tmpl_var NAME="LOOPVAR3"></td>
+  <td><tmpl_var NAME="LOOPVAR0"></td>
+ </tr> <TMPL_LOOP NAME=HASHREF0>
+test failed <tmpl_var NAME="VAR1"> test failed
+</tmpl_loop> <TMPL_LOOP NAME=FAKEHASH> 
+test failed <tmpl_var NAME="VAR1"> test failed
+</tmpl_loop> </tmpl_loop> 
+</table>
+
+<TMPL_LOOP NAME='HASHREF0'> 
+test failed <tmpl_var NAME="VAR1"> test failed
+<table>
+<TMPL_LOOP NAME=HASHREF1><tr>
+<td><tmpl_var NAME="LOOPVAR1"></td>
+<td><tmpl_var NAME="LOOPVAR2"></td>
+<td><tmpl_var NAME="LOOPVAR3"></td>
+<td><tmpl_var NAME="LOOPVAR0"></td>
+</tr>
+</tmpl_loop> 
+</table>
+</tmpl_loop>
+
+<tmpl_if VAR2> <tmpl_var name="VAR2"> test passed </tmpl_if>
+
+<TMPL_LOOP name="FAKENAME"> 
+test failed <tmpl_var NAME="VAR1"> test failed
+</tmpl_loop> 
+
+</body>
+</HTML>

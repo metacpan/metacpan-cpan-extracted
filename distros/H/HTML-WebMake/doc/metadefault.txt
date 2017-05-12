@@ -1,0 +1,73 @@
+<wmmeta name="Title" value="The &lt;metadefault&gt; Tag" />
+<wmmeta name="Section" value="05-meta" />
+<wmmeta name="Score" value="40" />
+<wmmeta name="Abstract">
+Specify default metadata to attach to content
+</wmmeta>
+
+Metadata is usually embedded inside a content item using the &lt;wmmeta&gt;
+tag.  However, this can be a chore for lots of content items, so to make
+things easier, you can specify default metadata settings, using the
+&lt;metadefault&gt; tag.
+
+Specify this tag before the content items in question, and those content items
+will all be tagged with the metadata you set.
+
+Like the attrdefault [attrdefault] tag, this tag can be used either in a
+__scoped__ mode, or in a __command__ mode.
+
+        [attrdefault]: $(attrdefault)
+
+Scoped Mode
+~~~~~~~~~~~
+
+''Scoped'' mode uses opening (**&lt;metadefault&gt;**) and closing
+(**&lt;/metadefault&gt;**) tags; the metadata is only set on content items
+between the two tags.
+
+Command Mode
+~~~~~~~~~~~~
+
+Command mode uses standalone tags (**&lt;metadefault ... /&gt;**); the
+metadata are set until the end of the WebMake file, or until you change
+them with another &lt;metadefault&gt; tag.
+
+Attributes
+==========
+
+	__name__:	the metadatum's name, e.g. __Title__, __Section__,
+	etc.  This is required.
+
+	__value__:	the metadatum's value.  This is optional.  If the
+	value is not specified, the metadatum will be removed from the list of
+	default metadata.
+
+Example
+=======
+
+Using the scoped style:
+
+<safe>
+  <metadefault name="section" value="tags_and_attributes">
+
+    <content name="chunk_1.txt">...</content>
+    <content name="chunk_2.txt">...</content>
+    <content name="chunk_3.txt">...</content>
+    <content name="chunk_4.txt">...</content>
+
+  </metadefault>
+</safe>
+
+Or, in the ''command'' style:
+
+<safe>
+  <metadefault name="section" value="tags_and_attributes" />
+
+  <content name="chunk_1.txt">...</content>
+  <content name="chunk_2.txt">...</content>
+  <content name="chunk_3.txt">...</content>
+  <content name="chunk_4.txt">...</content>
+
+  <metadefault name="section" />
+</safe>
+

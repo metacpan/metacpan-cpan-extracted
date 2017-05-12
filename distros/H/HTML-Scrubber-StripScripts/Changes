@@ -1,0 +1,6 @@
+
+0.01  25 Jul 2003  Initial release.
+
+0.02  18 Mar 2004  Rework some tests that were too sensitive to the version
+                   of HTML::Scrubber in use.
+

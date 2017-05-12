@@ -1,0 +1,199 @@
+Revision history for Perl extension HTML::Menu::TreeView version 1.20
+
+1.20 This distribution reports a dependency on Module::Build, which is being set here:
+     
+     This is incorrect, as Module::Build is only used for configuration of the distribution,
+     
+     and not at runtime.
+     
+     In fact, Module::Build adds itself to configure_requires, as seen here:
+
+1.19 required perl Version Build.pm and css img class
+
+1.18 like 1.17 but at some other places
+
+1.17 #defined @{@$tree[$i]->{subtree}} don't works with perl > 5.20
+
+    so try test it with ref @$tree[$i]->{subtree}[0].
+
+1.14 after a few years there a only a few bugfixes.
+
+1.13
+
+Sorting of closed folders will work now.
+
+1.12
+        -some fixes (German umlaute help())
+1.11
+       - edit.pl fixed
+1.10
+        -Overwrought
+1.09
+        -Overwrought
+1.08
+        - delete one unnessesary file.
+1.07
+       -Drag & drop example edit.pl
+       -new css class dropzone
+       -Overwrought Documentation
+       -Overwrought Images
+1.06
+        -New Images, german help
+        -language function set it to "de" for german help
+        -German Documentation droped
+        -:/Build install_examples
+1.05
+       -Sorting, German translation, Trover (columns)  and rights fixed.
+1.03
+       -Change Charset to ISO 8859-1 (HTML::Menu::TreeView::GER)
+       -Background-position Crystal 16px style.
+       -Fix Required Perl Version. it is 5.00600
+1.02
+      -Fixe Perldoc links and Charset
+1.01
+      -German Translation avaible. Right permissions
+1.00
+      -This should be final.
+
+0.88
+    - Start renameing mimetypes.
+0.87
+    - Overwrought Code.
+0.86
+      - clean up
+0.84
+      - make usage of Module::Build
+      - Overwrought Code.
+0.8.3
+     - fix some problems with mod_perl and alt attributes.
+0.8.2
+     - new attribute empty
+     - new subs appendEmptyFolder, appendLastEmptyFolder.
+0.8.1
+     - fix background color if different sizes are used.
+     - fix treeviewLink classname.
+     - get Document Root form previous installed Version.
+     - fixe export_ok and export tag :all.
+0.8
+     - Overwrought Code.
+0.7.9
+     - some fixes
+0.7.8
+     - fix simple style
+     - fix some images.
+0.7.7
+     - Overwrought and clean up code.
+     - TreeView is fit for different sizes within one Document.
+0.7.6
+     - a few fixes, the main change is one konqueror fix in the js file.
+0.7.5
+     - there are no new futures planned .
+     - new function orderByColumn(i), border.
+     - fix Columns, set the "Name" Column text.(see columns.pl ).
+
+0.7.4
+     - style is renamed to Style you can import qw(:all style) explizit for backward compatibility.
+     - new possible usage of columns, give a list of Captions instead of the columns count.
+     - Overwrought Documentation,Code,Examples, tests and Documentation.
+0.7.3
+     - Cleanup TreeView.pm
+0.7.2
+     - skip emty files module2treeview.pl --reverse=1
+     - Overwrought Documentation,Code,Examples, tests and Documentation.
+0.7.1
+     - some fixes.
+     - new function columns()
+     - new attribute coulmuns => {1,2,3,4,5,6,7,8]
+     - Overwrought Documentation,Code,Examples, tests and Documentation.
+     - new export tag :standart (Tree css jscript preload size style documentRoot).
+0.7.0
+     - new function prefix.
+     - new export tag :recommend (Tree css jscript clasic preload folderFirst size style documentRoot  loadTree saveTree sortTree orderBy prefix )
+     - Overwrought Documentation,Code,Examples, tests and Documentation.
+     - document Root is set during make.
+0.6.9
+     - preload returns the treeview without script tag.
+     - new function folderFirst, documentRoot, size, style,loadTree,saveTree,sortTree,orderBy
+     - new usage for clasic().
+     - new example folderFirst.pl (sort the TreeView)
+     - Overwrought Code,Examples, tests and Documentation.
+     - more tests. (test pod and new functions use new syntax).
+
+0.6.8 Wen Jul 04 17:00:37 2007
+     - Meta.yml and Signature
+     - include a few example scripts: oo,fo syntax,crystal and module2treeview.
+     - new function help
+     - more tests.
+     - Overwrought Documentation.
+0.6.7
+     - some bugs with preloading etc
+     - make use of  ExtUtils::MakeMaker.
+     - more tests.
+     - Overwrought Documentation.
+0.6.6
+     - export tag all.
+     - remove shebang line.
+     - check anchor attributes.
+     - default values title anchors is now the text.
+     - Overwrought Tests.
+     - skip questions if command line options ( perl Makefile.PL -cgidir=/cgiDir -htdocs=/htdocs ) are passed to Makefile.PL
+
+0.6.5
+     - fix preload folder red, green and gray.
+     - Overwrought Dokumentation.
+     - fix wrong License. GNU Lesser General Public License instead GNU General Public License.
+0.6.4
+     - fix Crystal folderRed 16 px
+     - fix bw style
+     - i use perl 5.008006 but i think it is not strongly necessary. So i removed use 5.008006 for use with older Perl versions.
+     - preload plusNode fixed.
+0.6.3
+     -new Styles Crystal 64, 128 ( In the future no more styles will be added to this Modul, if there a different ones they will be avaible as a standalone package).
+     -preload.js files for preloading images.
+0.6.2
+     -size lastNode 16 & 32 px
+
+0.6.1
+     - new Styles Cyrstal 22, 48
+     - new function preload();
+     - Overwrought Dokumentation.
+     - Some fixes in installdocs and width ocpNode
+     - remove some unnecessary files.
+0.6
+     - setClasic, setModern clasic ( alternate node decoration ).
+     - setSize ( new Style Cyrstal 32 ) 16 or 32 are possible.
+     - make installdocs
+       (install html documentation vor HTML::Menu::TreeView like http://treeview.lindnerei.de.
+        Open /TreeView.html on your host into your browser after installation.)
+     - include some styles into Cyrstal.
+     - preload images for ie etc.
+     - delete unessesary files.
+     - new path for images
+     - make uninstalldocs
+     - Overwrought css
+0.5.1
+     -new Namespace HTML::Menu::TreeView
+     -new styles red green orange.
+     -alternate folder symbols for Crystalm style.
+     -one folder for mimetypes (link images).
+     -warn instead of  die
+     -spacer.gif for emty cells which contain only a background image.
+     -Overwrought code, test, Documentation, styles, exaples.
+     -shebang within pod crashes some older Perl verions
+     -if you want use treevie.pm with perl > 5.008006 you should remove use 5.008006;.
+0.41
+     -export_ok use treeview qw(Tree css jscript setStyle setDocumentRoot);
+     -onclick default attribute wird nur gesetzt wenn kein href uebergeben wurde,
+     -sinnvoll wenn man Foldern href attribute mit auf den weg geben will.
+0.4
+     -New SYNTAX, setter for DocumentRoot and Style.
+     -Overwrought Documentation, code,exaples.
+     -New default style (system).
+
+0.3  Sun Nov 19 09:00:37 2006
+     - Opera, imagges and css fixed.
+0.2  Sun Sep 10 00:50:35 2006
+     - lincoln loader like getself function
+0.01  Sun Jan 22 01:37:35 2006
+     - original version; created by h2xs 1.23 with options
+     -XAn treeview

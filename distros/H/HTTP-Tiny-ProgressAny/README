@@ -1,0 +1,20 @@
+SYNOPSIS
+
+     use HTTP::Tiny::ProgressAny;
+     use Progress::Any::Output;
+    
+     Progress::Any::Output->set("TermProgressBarColor");
+     my $resp = HTTP::Tiny->new->get("http://example.com/some-big-file");
+     # you will see a progress bar in your terminal
+
+DESCRIPTION
+
+    This class is a subclass of HTTP::Tiny that uses Progress::Any to let
+    you see progress during HTTP requests.
+
+    Sample output:
+
+SEE ALSO
+
+    LWP::UserAgent::ProgressAny
+

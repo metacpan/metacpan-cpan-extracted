@@ -1,0 +1,19 @@
+Changes
+lib/HTML/YaTmpl.pm
+lib/HTML/YaTmpl.pod
+lib/HTML/YaTmpl/_parse.pm
+templates/main.tmpl
+templates/left.tmpl
+templates/right.tmpl
+templates/thumb.tmpl
+Makefile.PL
+MANIFEST
+README
+mk_README.sh
+t/1_load.t
+t/2_eval.t
+t/3_control.t
+t/4_cache.t
+t/5_fruits.t
+t/6_config.t
+META.yml                                 Module meta-data (added by MakeMaker)

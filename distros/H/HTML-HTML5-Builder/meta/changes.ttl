@@ -1,0 +1,62 @@
+# This file acts as the project's changelog.
+
+@prefix :        <http://usefulinc.com/ns/doap#> .
+@prefix dcs:     <http://ontologi.es/doap-changeset#> .
+@prefix dc:      <http://purl.org/dc/terms/> .
+@prefix dist:    <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Builder/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+dist:project :release dist:v_0-001 .
+dist:v_0-001
+	a               :Version ;
+	dc:issued       "2011-10-07"^^xsd:date ;
+	:revision       "0.001"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Builder-0.001.tar.gz> ;
+	rdfs:label      "Initial release" .
+
+dist:project :release dist:v_0-002 .
+dist:v_0-002
+	a               :Version ;
+	dc:issued       "2011-10-10"^^xsd:date ;
+	:revision       "0.002"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Builder-0.002.tar.gz> ;
+	dcs:changeset [
+		dcs:versus dist:v_0-001 ;
+		dcs:item   [ a dcs:Documentation ; rdfs:label "Explain usage with RDF::RDFa::Generator."@en ] ;
+		dcs:item   [ a dcs:Addition ; rdfs:label "CHUNK function."@en ] ;
+		dcs:item   [ a dcs:Addition ; rdfs:label "RAW_CHUNK function."@en ] ;
+		dcs:item   [ a dcs:Addition ; rdfs:label "XML_CHUNK function."@en ] ;
+		dcs:item   [ a dcs:Addition ; rdfs:label "COMMENT function."@en ] ;
+		dcs:item   [ a dcs:Addition ; rdfs:label "ELEMENT function."@en ] ;
+		dcs:item   [ rdfs:label "Use autoloading to create functions."@en ] ;
+		dcs:item   [ a dcs:Addition ; rdfs:label "JQUERY function."@en ] ;
+		dcs:item   [ a dcs:Addition ; rdfs:label "OPENGRAPH function."@en ] ;
+		dcs:item   [ a dcs:Addition ; rdfs:label "Provide ucfirst equivalent functions for some HTML elements with names that conflict with Perl built-ins."@en ] ;
+		dcs:item   [ a dcs:Addition ; rdfs:label "CREATIVE_COMMONS function."@en ]
+		] .
+
+dist:project :release dist:v_0-003 .
+dist:v_0-003
+	a               :Version ;
+	dc:issued       "2011-10-11"^^xsd:date ;
+	:revision       "0.003"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Builder-0.003.tar.gz> ;
+	dcs:changeset [
+		dcs:versus dist:v_0-002 ;
+		dcs:item   [ a dcs:Bugfix ; rdfs:label "Implement a custom 'can' method."@en ] ;
+		dcs:item   [ a dcs:Bugfix ; rdfs:label "Remove spurious 'use DateTime' from t/01basic.t that was causing test failures."@en ] 
+		] .
+
+dist:project :release dist:v_0-004 .
+dist:v_0-004
+	a               :Version ;
+	dc:issued       "2011-10-20"^^xsd:date ;
+	:revision       "0.004"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Builder-0.004.tar.gz> ;
+	dcs:changeset [
+		dcs:versus dist:v_0-003 ;
+		dcs:item   [ a dcs:Bugfix ; rdfs:label "Make test t/01basic.t no longer rely on HTML::HTML5::Parser - was causing test failures."@en ] ;
+		dcs:item   [ a dcs:Documentation ; rdfs:label "Advertise XML::LibXML::PrettyPrint."@en ] 
+		] .
+

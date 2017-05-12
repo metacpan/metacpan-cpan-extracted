@@ -1,0 +1,40 @@
+Revision history for Hash-Util-FieldHash-Compat
+
+0.11      2016-06-13 21:57:55Z
+        - be gentle to older toolchains by avoiding the use of
+          Module::Metadata in configure-requires (RT#115310)
+
+0.10      2015-09-27 04:28:27Z
+        - fix invalid prereq specification for Heavy implementation (changed
+          in 0.09)
+
+0.09      2015-08-16 05:34:14Z
+        - update some distribution tooling
+
+0.08      2014-07-17 15:06:28Z
+        - add missing prereq declarations needed for perl 5.6 (RT#97000)
+
+0.07      2014-03-20 17:05:45Z
+        - better fix for misleading 'provides' metadata
+        - now skipping back-compat tests on newer perls - this test will now
+          run for authors only
+
+0.06      2014-03-20 05:56:43Z
+        - fix misleading 'provides' metadata (added in 0.05) that may confuse
+          some tools
+
+0.05      2014-02-16 09:14:30Z
+        - convert to Dist::Zilla, with more metadata
+
+0.04      2014-02-01
+        - RT#83667: localize $SIG{__DIE__} before an eval
+
+0.03      2008-05-15
+        - Work around the strangeness of if.pm trying to use ":all.pm". WTF?
+
+0.02      2008-04-29
+        - Tie::RefHash related dependencies changed
+        - ::Compat imports all of Hash::Util::FielDhash on 5.10 so that fully qualified calls work
+
+0.01      2008-01-21
+        - Initial release

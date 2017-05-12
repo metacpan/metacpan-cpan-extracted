@@ -1,0 +1,10 @@
+Revision history for Perl extension HTML::SummaryBasic.
+
+0.02  2011 03 30
+	Removed HTML::HeadParser, as it didn't work
+	Added small test
+	
+0.01  Mon Sep  2 16:17:33 2002
+	- original version; created by h2xs 1.21 with options
+		-Xn HTML::SummaryBasic
+

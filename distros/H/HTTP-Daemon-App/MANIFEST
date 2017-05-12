@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/HTTP-Daemon-App.t
+lib/HTTP/Daemon/App.pm
+META.yml                                 Module meta-data (added by MakeMaker)

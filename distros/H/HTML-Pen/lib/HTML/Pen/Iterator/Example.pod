@@ -1,0 +1,2832 @@
+# Below is stub documentation for your module. You'd better edit it!
+
+=head1 NAME
+
+HTML::Pen::Iterator - Creating a calendar using a Pen Iterator
+
+=head1 SYNOPSIS
+
+  $festival = [
+          [
+            bless( {}, 'empty' ),
+            bless( {}, 'empty' ),
+            bless( {}, 'empty' ),
+            bless( {}, 'empty' ),
+            [
+              [
+                bless( {
+                         'weekday' => 'Thursday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          11,
+                                          1,
+                                          8,
+                                          111,
+                                          4,
+                                          243,
+                                          1
+                                        ],
+                         'time' => '11:00:00',
+                         'month' => 'Sep',
+                         'date' => 1314889200,
+                         'timedisplay' => '11:00 am',
+                         'event' => 'Pamelas Catering Food Tent',
+                         'midnight' => 1314849600,
+                         'monthday' => 1,
+                         'monthno' => 8,
+                         'yearday' => 243,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Thursday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          14,
+                                          1,
+                                          8,
+                                          111,
+                                          4,
+                                          243,
+                                          1
+                                        ],
+                         'time' => '14:00:00',
+                         'month' => 'Sep',
+                         'date' => 1314900000,
+                         'timedisplay' => '2:00 pm',
+                         'event' => 'MID AMERICA SHOWS CARNIVAL',
+                         'midnight' => 1314849600,
+                         'monthday' => 1,
+                         'monthno' => 8,
+                         'yearday' => 243,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Thursday',
+                         'localtime' => [
+                                          0,
+                                          15,
+                                          17,
+                                          1,
+                                          8,
+                                          111,
+                                          4,
+                                          243,
+                                          1
+                                        ],
+                         'time' => '17:15:00',
+                         'month' => 'Sep',
+                         'date' => 1314911700,
+                         'timedisplay' => '5:15 pm',
+                         'event' => 'Registration for 5K/10K Fun Run',
+                         'midnight' => 1314849600,
+                         'monthday' => 1,
+                         'monthno' => 8,
+                         'yearday' => 243,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Thursday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          18,
+                                          1,
+                                          8,
+                                          111,
+                                          4,
+                                          243,
+                                          1
+                                        ],
+                         'time' => '18:00:00',
+                         'month' => 'Sep',
+                         'date' => 1314914400,
+                         'timedisplay' => '6:00 pm',
+                         'event' => 'Beers Around the World',
+                         'midnight' => 1314849600,
+                         'monthday' => 1,
+                         'monthno' => 8,
+                         'yearday' => 243,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Thursday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          19,
+                                          1,
+                                          8,
+                                          111,
+                                          4,
+                                          243,
+                                          1
+                                        ],
+                         'time' => '19:00:00',
+                         'month' => 'Sep',
+                         'date' => 1314918000,
+                         'timedisplay' => '7:00 pm',
+                         'event' => '20th Annual 5K/10K  Fun Run',
+                         'midnight' => 1314849600,
+                         'monthday' => 1,
+                         'monthno' => 8,
+                         'yearday' => 243,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Thursday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          21,
+                                          1,
+                                          8,
+                                          111,
+                                          4,
+                                          243,
+                                          1
+                                        ],
+                         'time' => '21:00:00',
+                         'month' => 'Sep',
+                         'date' => 1314925200,
+                         'timedisplay' => '9:00 pm',
+                         'event' => 'Harley (Bike) Night',
+                         'midnight' => 1314849600,
+                         'monthday' => 1,
+                         'monthno' => 8,
+                         'yearday' => 243,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ]
+            ],
+            [
+              [
+                bless( {
+                         'weekday' => 'Friday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          10,
+                                          2,
+                                          8,
+                                          111,
+                                          5,
+                                          244,
+                                          1
+                                        ],
+                         'time' => '10:00:00',
+                         'month' => 'Sep',
+                         'date' => 1314972000,
+                         'timedisplay' => '10:00 am',
+                         'event' => 'Mike & Ruths Hilltop Farm - Homemade Peach Pies',
+                         'midnight' => 1314936000,
+                         'monthday' => 2,
+                         'monthno' => 8,
+                         'yearday' => 244,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Friday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          11,
+                                          2,
+                                          8,
+                                          111,
+                                          5,
+                                          244,
+                                          1
+                                        ],
+                         'time' => '11:00:00',
+                         'month' => 'Sep',
+                         'date' => 1314975600,
+                         'timedisplay' => '11:00 am',
+                         'event' => 'St. Paul\'s Peachy Craft Fair',
+                         'midnight' => 1314936000,
+                         'monthday' => 2,
+                         'monthno' => 8,
+                         'yearday' => 244,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Friday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          11,
+                                          2,
+                                          8,
+                                          111,
+                                          5,
+                                          244,
+                                          1
+                                        ],
+                         'time' => '11:00:00',
+                         'month' => 'Sep',
+                         'date' => 1314975600,
+                         'timedisplay' => '11:00 am',
+                         'event' => 'Pamelas Catering Food Tent',
+                         'midnight' => 1314936000,
+                         'monthday' => 2,
+                         'monthno' => 8,
+                         'yearday' => 244,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Friday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          11,
+                                          2,
+                                          8,
+                                          111,
+                                          5,
+                                          244,
+                                          1
+                                        ],
+                         'time' => '11:00:00',
+                         'month' => 'Sep',
+                         'date' => 1314975600,
+                         'timedisplay' => '11:00 am',
+                         'event' => '46th Annual Baby & Pet Photo Contest',
+                         'midnight' => 1314936000,
+                         'monthday' => 2,
+                         'monthno' => 8,
+                         'yearday' => 244,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Friday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          11,
+                                          2,
+                                          8,
+                                          111,
+                                          5,
+                                          244,
+                                          1
+                                        ],
+                         'time' => '11:00:00',
+                         'month' => 'Sep',
+                         'date' => 1314975600,
+                         'timedisplay' => '11:00 am',
+                         'event' => 'St. Paul\'s Sausage Shack - Has Moved!!',
+                         'midnight' => 1314936000,
+                         'monthday' => 2,
+                         'monthno' => 8,
+                         'yearday' => 244,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Friday',
+                         'localtime' => [
+                                          0,
+                                          30,
+                                          11,
+                                          2,
+                                          8,
+                                          111,
+                                          5,
+                                          244,
+                                          1
+                                        ],
+                         'time' => '11:30:00',
+                         'month' => 'Sep',
+                         'date' => 1314977400,
+                         'timedisplay' => '11:30 am',
+                         'event' => 'RWB Peach Jam Skateboard Clinic & Competition',
+                         'midnight' => 1314936000,
+                         'monthday' => 2,
+                         'monthno' => 8,
+                         'yearday' => 244,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Friday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          12,
+                                          2,
+                                          8,
+                                          111,
+                                          5,
+                                          244,
+                                          1
+                                        ],
+                         'time' => '12:00:00',
+                         'month' => 'Sep',
+                         'date' => 1314979200,
+                         'timedisplay' => '12:00 pm',
+                         'event' => 'Mid America Shows Carnival Rides',
+                         'midnight' => 1314936000,
+                         'monthday' => 2,
+                         'monthno' => 8,
+                         'yearday' => 244,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Friday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          12,
+                                          2,
+                                          8,
+                                          111,
+                                          5,
+                                          244,
+                                          1
+                                        ],
+                         'time' => '12:00:00',
+                         'month' => 'Sep',
+                         'date' => 1314979200,
+                         'timedisplay' => '12:00 pm',
+                         'event' => 'Peachy Keen Art Scene, Starkweather Artists Market',
+                         'midnight' => 1314936000,
+                         'monthday' => 2,
+                         'monthno' => 8,
+                         'yearday' => 244,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Friday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          16,
+                                          2,
+                                          8,
+                                          111,
+                                          5,
+                                          244,
+                                          1
+                                        ],
+                         'time' => '16:00:00',
+                         'month' => 'Sep',
+                         'date' => 1314993600,
+                         'timedisplay' => '4:00 pm',
+                         'event' => 'St. Clement K of C #7018 Pasta Dinner',
+                         'midnight' => 1314936000,
+                         'monthday' => 2,
+                         'monthno' => 8,
+                         'yearday' => 244,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Friday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          18,
+                                          2,
+                                          8,
+                                          111,
+                                          5,
+                                          244,
+                                          1
+                                        ],
+                         'time' => '18:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315000800,
+                         'timedisplay' => '6:00 pm',
+                         'event' => 'River of God Cafe',
+                         'midnight' => 1314936000,
+                         'monthday' => 2,
+                         'monthno' => 8,
+                         'yearday' => 244,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Friday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          18,
+                                          2,
+                                          8,
+                                          111,
+                                          5,
+                                          244,
+                                          1
+                                        ],
+                         'time' => '18:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315000800,
+                         'timedisplay' => '6:00 pm',
+                         'event' => 'Beers Around the World',
+                         'midnight' => 1314936000,
+                         'monthday' => 2,
+                         'monthno' => 8,
+                         'yearday' => 244,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Friday',
+                         'localtime' => [
+                                          0,
+                                          30,
+                                          18,
+                                          2,
+                                          8,
+                                          111,
+                                          5,
+                                          244,
+                                          1
+                                        ],
+                         'time' => '18:30:00',
+                         'month' => 'Sep',
+                         'date' => 1315002600,
+                         'timedisplay' => '6:30 pm',
+                         'event' => 'Lions Las Vegas Games',
+                         'midnight' => 1314936000,
+                         'monthday' => 2,
+                         'monthno' => 8,
+                         'yearday' => 244,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Friday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          19,
+                                          2,
+                                          8,
+                                          111,
+                                          5,
+                                          244,
+                                          1
+                                        ],
+                         'time' => '19:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315004400,
+                         'timedisplay' => '7:00 pm',
+                         'event' => 'Special Event - Peach Queen Reception',
+                         'midnight' => 1314936000,
+                         'monthday' => 2,
+                         'monthno' => 8,
+                         'yearday' => 244,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ]
+            ],
+            [
+              [
+                bless( {
+                         'weekday' => 'Saturday',
+                         'localtime' => [
+                                          0,
+                                          30,
+                                          7,
+                                          3,
+                                          8,
+                                          111,
+                                          6,
+                                          245,
+                                          1
+                                        ],
+                         'time' => '07:30:00',
+                         'month' => 'Sep',
+                         'date' => 1315049400,
+                         'timedisplay' => '7:30 am',
+                         'event' => 'Romeo Masonic Lodge Peach Pie & Food Sale',
+                         'midnight' => 1315022400,
+                         'monthday' => 3,
+                         'monthno' => 8,
+                         'yearday' => 245,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Saturday',
+                         'localtime' => [
+                                          0,
+                                          30,
+                                          7,
+                                          3,
+                                          8,
+                                          111,
+                                          6,
+                                          245,
+                                          1
+                                        ],
+                         'time' => '07:30:00',
+                         'month' => 'Sep',
+                         'date' => 1315049400,
+                         'timedisplay' => '7:30 am',
+                         'event' => 'Child ID Program',
+                         'midnight' => 1315022400,
+                         'monthday' => 3,
+                         'monthno' => 8,
+                         'yearday' => 245,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Saturday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          8,
+                                          3,
+                                          8,
+                                          111,
+                                          6,
+                                          245,
+                                          1
+                                        ],
+                         'time' => '08:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315051200,
+                         'timedisplay' => '8:00 am',
+                         'event' => 'The Peach Festival Golf Classic',
+                         'midnight' => 1315022400,
+                         'monthday' => 3,
+                         'monthno' => 8,
+                         'yearday' => 245,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Saturday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          8,
+                                          3,
+                                          8,
+                                          111,
+                                          6,
+                                          245,
+                                          1
+                                        ],
+                         'time' => '08:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315051200,
+                         'timedisplay' => '8:00 am',
+                         'event' => 'Peach Festival Tennis Tournaments',
+                         'midnight' => 1315022400,
+                         'monthday' => 3,
+                         'monthno' => 8,
+                         'yearday' => 245,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Saturday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          8,
+                                          3,
+                                          8,
+                                          111,
+                                          6,
+                                          245,
+                                          1
+                                        ],
+                         'time' => '08:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315051200,
+                         'timedisplay' => '8:00 am',
+                         'event' => '30th Annual NMSC Soccer Tournament',
+                         'midnight' => 1315022400,
+                         'monthday' => 3,
+                         'monthno' => 8,
+                         'yearday' => 245,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Saturday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          8,
+                                          3,
+                                          8,
+                                          111,
+                                          6,
+                                          245,
+                                          1
+                                        ],
+                         'time' => '08:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315051200,
+                         'timedisplay' => '8:00 am',
+                         'event' => 'R-W-B Mens Double Elimination Softball Tournament',
+                         'midnight' => 1315022400,
+                         'monthday' => 3,
+                         'monthno' => 8,
+                         'yearday' => 245,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Saturday',
+                         'localtime' => [
+                                          0,
+                                          30,
+                                          8,
+                                          3,
+                                          8,
+                                          111,
+                                          6,
+                                          245,
+                                          1
+                                        ],
+                         'time' => '08:30:00',
+                         'month' => 'Sep',
+                         'date' => 1315053000,
+                         'timedisplay' => '8:30 am',
+                         'event' => 'PEACH FESTIVAL KIDFEST 2011',
+                         'midnight' => 1315022400,
+                         'monthday' => 3,
+                         'monthno' => 8,
+                         'yearday' => 245,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Saturday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          9,
+                                          3,
+                                          8,
+                                          111,
+                                          6,
+                                          245,
+                                          1
+                                        ],
+                         'time' => '09:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315054800,
+                         'timedisplay' => '9:00 am',
+                         'event' => 'Nicaragua Bake Sale - Wesleyan Medical Mission',
+                         'midnight' => 1315022400,
+                         'monthday' => 3,
+                         'monthno' => 8,
+                         'yearday' => 245,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Saturday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          10,
+                                          3,
+                                          8,
+                                          111,
+                                          6,
+                                          245,
+                                          1
+                                        ],
+                         'time' => '10:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315058400,
+                         'timedisplay' => '10:00 am',
+                         'event' => 'Croswell Extravaganza',
+                         'midnight' => 1315022400,
+                         'monthday' => 3,
+                         'monthno' => 8,
+                         'yearday' => 245,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Saturday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          10,
+                                          3,
+                                          8,
+                                          111,
+                                          6,
+                                          245,
+                                          1
+                                        ],
+                         'time' => '10:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315058400,
+                         'timedisplay' => '10:00 am',
+                         'event' => '"Dunk a Hunk" - Romeo Football Team',
+                         'midnight' => 1315022400,
+                         'monthday' => 3,
+                         'monthno' => 8,
+                         'yearday' => 245,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Saturday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          10,
+                                          3,
+                                          8,
+                                          111,
+                                          6,
+                                          245,
+                                          1
+                                        ],
+                         'time' => '10:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315058400,
+                         'timedisplay' => '10:00 am',
+                         'event' => 'Annual Used Book Sale',
+                         'midnight' => 1315022400,
+                         'monthday' => 3,
+                         'monthno' => 8,
+                         'yearday' => 245,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Saturday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          10,
+                                          3,
+                                          8,
+                                          111,
+                                          6,
+                                          245,
+                                          1
+                                        ],
+                         'time' => '10:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315058400,
+                         'timedisplay' => '10:00 am',
+                         'event' => 'Frontier Town Arts & Craft Show',
+                         'midnight' => 1315022400,
+                         'monthday' => 3,
+                         'monthno' => 8,
+                         'yearday' => 245,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Saturday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          10,
+                                          3,
+                                          8,
+                                          111,
+                                          6,
+                                          245,
+                                          1
+                                        ],
+                         'time' => '10:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315058400,
+                         'timedisplay' => '10:00 am',
+                         'event' => 'Mike & Ruths Hilltop Farm ',
+                         'midnight' => 1315022400,
+                         'monthday' => 3,
+                         'monthno' => 8,
+                         'yearday' => 245,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Saturday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          11,
+                                          3,
+                                          8,
+                                          111,
+                                          6,
+                                          245,
+                                          1
+                                        ],
+                         'time' => '11:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315062000,
+                         'timedisplay' => '11:00 am',
+                         'event' => 'St. Paul\'s Peachy Flea Market & Craft Fair',
+                         'midnight' => 1315022400,
+                         'monthday' => 3,
+                         'monthno' => 8,
+                         'yearday' => 245,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Saturday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          11,
+                                          3,
+                                          8,
+                                          111,
+                                          6,
+                                          245,
+                                          1
+                                        ],
+                         'time' => '11:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315062000,
+                         'timedisplay' => '11:00 am',
+                         'event' => 'Pamelas Catering Food Tent',
+                         'midnight' => 1315022400,
+                         'monthday' => 3,
+                         'monthno' => 8,
+                         'yearday' => 245,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Saturday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          11,
+                                          3,
+                                          8,
+                                          111,
+                                          6,
+                                          245,
+                                          1
+                                        ],
+                         'time' => '11:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315062000,
+                         'timedisplay' => '11:00 am',
+                         'event' => '46th Annual Baby & Pet Photo Contest',
+                         'midnight' => 1315022400,
+                         'monthday' => 3,
+                         'monthno' => 8,
+                         'yearday' => 245,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Saturday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          11,
+                                          3,
+                                          8,
+                                          111,
+                                          6,
+                                          245,
+                                          1
+                                        ],
+                         'time' => '11:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315062000,
+                         'timedisplay' => '11:00 am',
+                         'event' => 'River of God Cafe',
+                         'midnight' => 1315022400,
+                         'monthday' => 3,
+                         'monthno' => 8,
+                         'yearday' => 245,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Saturday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          12,
+                                          3,
+                                          8,
+                                          111,
+                                          6,
+                                          245,
+                                          1
+                                        ],
+                         'time' => '12:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315065600,
+                         'timedisplay' => '12:00 pm',
+                         'event' => 'Peachy Keen Art Scene, Starkweather Artists Market',
+                         'midnight' => 1315022400,
+                         'monthday' => 3,
+                         'monthno' => 8,
+                         'yearday' => 245,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Saturday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          12,
+                                          3,
+                                          8,
+                                          111,
+                                          6,
+                                          245,
+                                          1
+                                        ],
+                         'time' => '12:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315065600,
+                         'timedisplay' => '12:00 pm',
+                         'event' => 'Mid America Shows Carnival Rides',
+                         'midnight' => 1315022400,
+                         'monthday' => 3,
+                         'monthno' => 8,
+                         'yearday' => 245,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Saturday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          12,
+                                          3,
+                                          8,
+                                          111,
+                                          6,
+                                          245,
+                                          1
+                                        ],
+                         'time' => '12:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315065600,
+                         'timedisplay' => '12:00 pm',
+                         'event' => 'Beers Around the World',
+                         'midnight' => 1315022400,
+                         'monthday' => 3,
+                         'monthno' => 8,
+                         'yearday' => 245,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Saturday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          12,
+                                          3,
+                                          8,
+                                          111,
+                                          6,
+                                          245,
+                                          1
+                                        ],
+                         'time' => '12:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315065600,
+                         'timedisplay' => '12:00 pm',
+                         'event' => 'RWB Parks & Rec Senior Dept. Carnival Bingo',
+                         'midnight' => 1315022400,
+                         'monthday' => 3,
+                         'monthno' => 8,
+                         'yearday' => 245,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Saturday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          13,
+                                          3,
+                                          8,
+                                          111,
+                                          6,
+                                          245,
+                                          1
+                                        ],
+                         'time' => '13:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315069200,
+                         'timedisplay' => '1:00 pm',
+                         'event' => 'Romeo Varsity Wrestling Annual Beanbag Tournament',
+                         'midnight' => 1315022400,
+                         'monthday' => 3,
+                         'monthno' => 8,
+                         'yearday' => 245,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Saturday',
+                         'localtime' => [
+                                          0,
+                                          30,
+                                          18,
+                                          3,
+                                          8,
+                                          111,
+                                          6,
+                                          245,
+                                          1
+                                        ],
+                         'time' => '18:30:00',
+                         'month' => 'Sep',
+                         'date' => 1315089000,
+                         'timedisplay' => '6:30 pm',
+                         'event' => 'Lions Las Vegas Games',
+                         'midnight' => 1315022400,
+                         'monthday' => 3,
+                         'monthno' => 8,
+                         'yearday' => 245,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ]
+            ]
+          ],
+          [
+            [
+              [
+                bless( {
+                         'weekday' => 'Sunday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          7,
+                                          4,
+                                          8,
+                                          111,
+                                          0,
+                                          246,
+                                          1
+                                        ],
+                         'time' => '07:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315134000,
+                         'timedisplay' => '7:00 am',
+                         'event' => 'Peach Festival Fly-In & Farmers Breakfast',
+                         'midnight' => 1315108800,
+                         'monthday' => 4,
+                         'monthno' => 8,
+                         'yearday' => 246,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Sunday',
+                         'localtime' => [
+                                          0,
+                                          30,
+                                          7,
+                                          4,
+                                          8,
+                                          111,
+                                          0,
+                                          246,
+                                          1
+                                        ],
+                         'time' => '07:30:00',
+                         'month' => 'Sep',
+                         'date' => 1315135800,
+                         'timedisplay' => '7:30 am',
+                         'event' => 'Car Show Registration',
+                         'midnight' => 1315108800,
+                         'monthday' => 4,
+                         'monthno' => 8,
+                         'yearday' => 246,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Sunday',
+                         'localtime' => [
+                                          0,
+                                          30,
+                                          7,
+                                          4,
+                                          8,
+                                          111,
+                                          0,
+                                          246,
+                                          1
+                                        ],
+                         'time' => '07:30:00',
+                         'month' => 'Sep',
+                         'date' => 1315135800,
+                         'timedisplay' => '7:30 am',
+                         'event' => 'Festival of Cars Show',
+                         'midnight' => 1315108800,
+                         'monthday' => 4,
+                         'monthno' => 8,
+                         'yearday' => 246,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Sunday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          8,
+                                          4,
+                                          8,
+                                          111,
+                                          0,
+                                          246,
+                                          1
+                                        ],
+                         'time' => '08:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315137600,
+                         'timedisplay' => '8:00 am',
+                         'event' => 'Peach Festival Tennis Tournaments',
+                         'midnight' => 1315108800,
+                         'monthday' => 4,
+                         'monthno' => 8,
+                         'yearday' => 246,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Sunday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          8,
+                                          4,
+                                          8,
+                                          111,
+                                          0,
+                                          246,
+                                          1
+                                        ],
+                         'time' => '08:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315137600,
+                         'timedisplay' => '8:00 am',
+                         'event' => '30th Annual NMSC Soccer Tournament',
+                         'midnight' => 1315108800,
+                         'monthday' => 4,
+                         'monthno' => 8,
+                         'yearday' => 246,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Sunday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          8,
+                                          4,
+                                          8,
+                                          111,
+                                          0,
+                                          246,
+                                          1
+                                        ],
+                         'time' => '08:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315137600,
+                         'timedisplay' => '8:00 am',
+                         'event' => 'R-W-B Mens Double Elimination Softball Tournament',
+                         'midnight' => 1315108800,
+                         'monthday' => 4,
+                         'monthno' => 8,
+                         'yearday' => 246,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Sunday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          9,
+                                          4,
+                                          8,
+                                          111,
+                                          0,
+                                          246,
+                                          1
+                                        ],
+                         'time' => '09:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315141200,
+                         'timedisplay' => '9:00 am',
+                         'event' => 'Nicaragua Bake Sale - Wesleyan Medical Mission',
+                         'midnight' => 1315108800,
+                         'monthday' => 4,
+                         'monthno' => 8,
+                         'yearday' => 246,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Sunday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          10,
+                                          4,
+                                          8,
+                                          111,
+                                          0,
+                                          246,
+                                          1
+                                        ],
+                         'time' => '10:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315144800,
+                         'timedisplay' => '10:00 am',
+                         'event' => 'Mike & Ruths Hilltop Farm  Homemade Peach Pies',
+                         'midnight' => 1315108800,
+                         'monthday' => 4,
+                         'monthno' => 8,
+                         'yearday' => 246,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Sunday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          10,
+                                          4,
+                                          8,
+                                          111,
+                                          0,
+                                          246,
+                                          1
+                                        ],
+                         'time' => '10:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315144800,
+                         'timedisplay' => '10:00 am',
+                         'event' => 'Croswell Extravaganza - Craft Show',
+                         'midnight' => 1315108800,
+                         'monthday' => 4,
+                         'monthno' => 8,
+                         'yearday' => 246,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Sunday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          11,
+                                          4,
+                                          8,
+                                          111,
+                                          0,
+                                          246,
+                                          1
+                                        ],
+                         'time' => '11:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315148400,
+                         'timedisplay' => '11:00 am',
+                         'event' => 'Frontier Town Arts & Craft Show',
+                         'midnight' => 1315108800,
+                         'monthday' => 4,
+                         'monthno' => 8,
+                         'yearday' => 246,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Sunday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          11,
+                                          4,
+                                          8,
+                                          111,
+                                          0,
+                                          246,
+                                          1
+                                        ],
+                         'time' => '11:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315148400,
+                         'timedisplay' => '11:00 am',
+                         'event' => 'Pamelas Catering Food Tent',
+                         'midnight' => 1315108800,
+                         'monthday' => 4,
+                         'monthno' => 8,
+                         'yearday' => 246,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Sunday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          11,
+                                          4,
+                                          8,
+                                          111,
+                                          0,
+                                          246,
+                                          1
+                                        ],
+                         'time' => '11:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315148400,
+                         'timedisplay' => '11:00 am',
+                         'event' => 'St. Paul\'s Peachy Flea Market & Craft Fair',
+                         'midnight' => 1315108800,
+                         'monthday' => 4,
+                         'monthno' => 8,
+                         'yearday' => 246,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Sunday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          12,
+                                          4,
+                                          8,
+                                          111,
+                                          0,
+                                          246,
+                                          1
+                                        ],
+                         'time' => '12:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315152000,
+                         'timedisplay' => '12:00 pm',
+                         'event' => 'Peachy Keen Art Scene, Starkweather Artists Market',
+                         'midnight' => 1315108800,
+                         'monthday' => 4,
+                         'monthno' => 8,
+                         'yearday' => 246,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Sunday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          12,
+                                          4,
+                                          8,
+                                          111,
+                                          0,
+                                          246,
+                                          1
+                                        ],
+                         'time' => '12:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315152000,
+                         'timedisplay' => '12:00 pm',
+                         'event' => 'Annual Used Book Sale - Romeo A.A.U.W.',
+                         'midnight' => 1315108800,
+                         'monthday' => 4,
+                         'monthno' => 8,
+                         'yearday' => 246,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Sunday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          12,
+                                          4,
+                                          8,
+                                          111,
+                                          0,
+                                          246,
+                                          1
+                                        ],
+                         'time' => '12:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315152000,
+                         'timedisplay' => '12:00 pm',
+                         'event' => 'River of God Cafe',
+                         'midnight' => 1315108800,
+                         'monthday' => 4,
+                         'monthno' => 8,
+                         'yearday' => 246,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Sunday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          12,
+                                          4,
+                                          8,
+                                          111,
+                                          0,
+                                          246,
+                                          1
+                                        ],
+                         'time' => '12:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315152000,
+                         'timedisplay' => '12:00 pm',
+                         'event' => '46th Annual Baby & Pet Photo Contest',
+                         'midnight' => 1315108800,
+                         'monthday' => 4,
+                         'monthno' => 8,
+                         'yearday' => 246,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Sunday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          12,
+                                          4,
+                                          8,
+                                          111,
+                                          0,
+                                          246,
+                                          1
+                                        ],
+                         'time' => '12:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315152000,
+                         'timedisplay' => '12:00 pm',
+                         'event' => 'Romeo Masonic Lodge Peach Pie & Food Sale',
+                         'midnight' => 1315108800,
+                         'monthday' => 4,
+                         'monthno' => 8,
+                         'yearday' => 246,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Sunday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          12,
+                                          4,
+                                          8,
+                                          111,
+                                          0,
+                                          246,
+                                          1
+                                        ],
+                         'time' => '12:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315152000,
+                         'timedisplay' => '12:00 pm',
+                         'event' => 'Mid America Shows Carnival Rides',
+                         'midnight' => 1315108800,
+                         'monthday' => 4,
+                         'monthno' => 8,
+                         'yearday' => 246,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Sunday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          12,
+                                          4,
+                                          8,
+                                          111,
+                                          0,
+                                          246,
+                                          1
+                                        ],
+                         'time' => '12:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315152000,
+                         'timedisplay' => '12:00 pm',
+                         'event' => 'Beers Around the World',
+                         'midnight' => 1315108800,
+                         'monthday' => 4,
+                         'monthno' => 8,
+                         'yearday' => 246,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Sunday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          15,
+                                          4,
+                                          8,
+                                          111,
+                                          0,
+                                          246,
+                                          1
+                                        ],
+                         'time' => '15:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315162800,
+                         'timedisplay' => '3:00 pm',
+                         'event' => 'Lions Las Vegas Games',
+                         'midnight' => 1315108800,
+                         'monthday' => 4,
+                         'monthno' => 8,
+                         'yearday' => 246,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Sunday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          16,
+                                          4,
+                                          8,
+                                          111,
+                                          0,
+                                          246,
+                                          1
+                                        ],
+                         'time' => '16:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315166400,
+                         'timedisplay' => '4:00 pm',
+                         'event' => 'Romeo Masonic Lodge Grilled Chicken Dinner',
+                         'midnight' => 1315108800,
+                         'monthday' => 4,
+                         'monthno' => 8,
+                         'yearday' => 246,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Sunday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          17,
+                                          4,
+                                          8,
+                                          111,
+                                          0,
+                                          246,
+                                          1
+                                        ],
+                         'time' => '17:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315170000,
+                         'timedisplay' => '5:00 pm',
+                         'event' => 'Festival of Cars Parade',
+                         'midnight' => 1315108800,
+                         'monthday' => 4,
+                         'monthno' => 8,
+                         'yearday' => 246,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Sunday',
+                         'localtime' => [
+                                          0,
+                                          30,
+                                          18,
+                                          4,
+                                          8,
+                                          111,
+                                          0,
+                                          246,
+                                          1
+                                        ],
+                         'time' => '18:30:00',
+                         'month' => 'Sep',
+                         'date' => 1315175400,
+                         'timedisplay' => '6:30 pm',
+                         'event' => 'Food Booth to Benefit His Table Community Meal',
+                         'midnight' => 1315108800,
+                         'monthday' => 4,
+                         'monthno' => 8,
+                         'yearday' => 246,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Sunday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          19,
+                                          4,
+                                          8,
+                                          111,
+                                          0,
+                                          246,
+                                          1
+                                        ],
+                         'time' => '19:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315177200,
+                         'timedisplay' => '7:00 pm',
+                         'event' => 'Bed Races',
+                         'midnight' => 1315108800,
+                         'monthday' => 4,
+                         'monthno' => 8,
+                         'yearday' => 246,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Sunday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          20,
+                                          4,
+                                          8,
+                                          111,
+                                          0,
+                                          246,
+                                          1
+                                        ],
+                         'time' => '20:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315180800,
+                         'timedisplay' => '8:00 pm',
+                         'event' => 'Mummers Parade',
+                         'midnight' => 1315108800,
+                         'monthday' => 4,
+                         'monthno' => 8,
+                         'yearday' => 246,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ]
+            ],
+            [
+              [
+                bless( {
+                         'weekday' => 'Monday',
+                         'localtime' => [
+                                          0,
+                                          30,
+                                          7,
+                                          5,
+                                          8,
+                                          111,
+                                          1,
+                                          247,
+                                          1
+                                        ],
+                         'time' => '07:30:00',
+                         'month' => 'Sep',
+                         'date' => 1315222200,
+                         'timedisplay' => '7:30 am',
+                         'event' => 'Romeo Masonic Lodge Grilled Chicken Dinner',
+                         'midnight' => 1315195200,
+                         'monthday' => 5,
+                         'monthno' => 8,
+                         'yearday' => 247,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Monday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          8,
+                                          5,
+                                          8,
+                                          111,
+                                          1,
+                                          247,
+                                          1
+                                        ],
+                         'time' => '08:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315224000,
+                         'timedisplay' => '8:00 am',
+                         'event' => 'Peach Festival Tennis Tournaments',
+                         'midnight' => 1315195200,
+                         'monthday' => 5,
+                         'monthno' => 8,
+                         'yearday' => 247,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Monday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          9,
+                                          5,
+                                          8,
+                                          111,
+                                          1,
+                                          247,
+                                          1
+                                        ],
+                         'time' => '09:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315227600,
+                         'timedisplay' => '9:00 am',
+                         'event' => 'Nicaragua Bake Sale - Wesleyan Medical Mission',
+                         'midnight' => 1315195200,
+                         'monthday' => 5,
+                         'monthno' => 8,
+                         'yearday' => 247,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Monday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          9,
+                                          5,
+                                          8,
+                                          111,
+                                          1,
+                                          247,
+                                          1
+                                        ],
+                         'time' => '09:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315227600,
+                         'timedisplay' => '9:00 am',
+                         'event' => 'Snack Shack to Benefit His Table Community Meal',
+                         'midnight' => 1315195200,
+                         'monthday' => 5,
+                         'monthno' => 8,
+                         'yearday' => 247,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Monday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          10,
+                                          5,
+                                          8,
+                                          111,
+                                          1,
+                                          247,
+                                          1
+                                        ],
+                         'time' => '10:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315231200,
+                         'timedisplay' => '10:00 am',
+                         'event' => '*2011 CHILDRENS PARADE*',
+                         'midnight' => 1315195200,
+                         'monthday' => 5,
+                         'monthno' => 8,
+                         'yearday' => 247,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Monday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          10,
+                                          5,
+                                          8,
+                                          111,
+                                          1,
+                                          247,
+                                          1
+                                        ],
+                         'time' => '10:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315231200,
+                         'timedisplay' => '10:00 am',
+                         'event' => 'Frontier Town Arts & Craft Show',
+                         'midnight' => 1315195200,
+                         'monthday' => 5,
+                         'monthno' => 8,
+                         'yearday' => 247,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Monday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          10,
+                                          5,
+                                          8,
+                                          111,
+                                          1,
+                                          247,
+                                          1
+                                        ],
+                         'time' => '10:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315231200,
+                         'timedisplay' => '10:00 am',
+                         'event' => 'Mike & Ruths Hilltop Farm - Homemade Peach Pies',
+                         'midnight' => 1315195200,
+                         'monthday' => 5,
+                         'monthno' => 8,
+                         'yearday' => 247,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Monday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          10,
+                                          5,
+                                          8,
+                                          111,
+                                          1,
+                                          247,
+                                          1
+                                        ],
+                         'time' => '10:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315231200,
+                         'timedisplay' => '10:00 am',
+                         'event' => 'Croswell Extravaganza Craft Show',
+                         'midnight' => 1315195200,
+                         'monthday' => 5,
+                         'monthno' => 8,
+                         'yearday' => 247,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Monday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          11,
+                                          5,
+                                          8,
+                                          111,
+                                          1,
+                                          247,
+                                          1
+                                        ],
+                         'time' => '11:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315234800,
+                         'timedisplay' => '11:00 am',
+                         'event' => 'Pamelas Catering Food Tent',
+                         'midnight' => 1315195200,
+                         'monthday' => 5,
+                         'monthno' => 8,
+                         'yearday' => 247,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Monday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          11,
+                                          5,
+                                          8,
+                                          111,
+                                          1,
+                                          247,
+                                          1
+                                        ],
+                         'time' => '11:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315234800,
+                         'timedisplay' => '11:00 am',
+                         'event' => 'Mid America Shows Carnival Rides',
+                         'midnight' => 1315195200,
+                         'monthday' => 5,
+                         'monthno' => 8,
+                         'yearday' => 247,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Monday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          12,
+                                          5,
+                                          8,
+                                          111,
+                                          1,
+                                          247,
+                                          1
+                                        ],
+                         'time' => '12:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315238400,
+                         'timedisplay' => '12:00 pm',
+                         'event' => 'River of God Cafe',
+                         'midnight' => 1315195200,
+                         'monthday' => 5,
+                         'monthno' => 8,
+                         'yearday' => 247,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Monday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          12,
+                                          5,
+                                          8,
+                                          111,
+                                          1,
+                                          247,
+                                          1
+                                        ],
+                         'time' => '12:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315238400,
+                         'timedisplay' => '12:00 pm',
+                         'event' => 'Annual Used Book Sale - Romeo A.A.U.W.',
+                         'midnight' => 1315195200,
+                         'monthday' => 5,
+                         'monthno' => 8,
+                         'yearday' => 247,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' ),
+                bless( {
+                         'weekday' => 'Monday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          12,
+                                          5,
+                                          8,
+                                          111,
+                                          1,
+                                          247,
+                                          1
+                                        ],
+                         'time' => '12:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315238400,
+                         'timedisplay' => '12:00 pm',
+                         'event' => 'Beers Around the World',
+                         'midnight' => 1315195200,
+                         'monthday' => 5,
+                         'monthno' => 8,
+                         'yearday' => 247,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Monday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          13,
+                                          5,
+                                          8,
+                                          111,
+                                          1,
+                                          247,
+                                          1
+                                        ],
+                         'time' => '13:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315242000,
+                         'timedisplay' => '1:00 pm',
+                         'event' => 'VFW Post 2052 Peach Festival Parade',
+                         'midnight' => 1315195200,
+                         'monthday' => 5,
+                         'monthno' => 8,
+                         'yearday' => 247,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Monday',
+                         'localtime' => [
+                                          0,
+                                          30,
+                                          13,
+                                          5,
+                                          8,
+                                          111,
+                                          1,
+                                          247,
+                                          1
+                                        ],
+                         'time' => '13:30:00',
+                         'month' => 'Sep',
+                         'date' => 1315243800,
+                         'timedisplay' => '1:30 pm',
+                         'event' => '** 2011 Peach Festival Floral Parade **',
+                         'midnight' => 1315195200,
+                         'monthday' => 5,
+                         'monthno' => 8,
+                         'yearday' => 247,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ],
+              [
+                bless( {
+                         'weekday' => 'Monday',
+                         'localtime' => [
+                                          0,
+                                          0,
+                                          15,
+                                          5,
+                                          8,
+                                          111,
+                                          1,
+                                          247,
+                                          1
+                                        ],
+                         'time' => '15:00:00',
+                         'month' => 'Sep',
+                         'date' => 1315249200,
+                         'timedisplay' => '3:00 pm',
+                         'event' => 'Lions Las Vegas Games',
+                         'midnight' => 1315195200,
+                         'monthday' => 5,
+                         'monthno' => 8,
+                         'yearday' => 247,
+                         'monthname' => 'September',
+                         'year' => 2011
+                       }, 'event' )
+              ]
+            ],
+            bless( {
+                     'weekday' => 'Tuesday',
+                     'localtime' => [
+                                      0,
+                                      0,
+                                      0,
+                                      6,
+                                      8,
+                                      111,
+                                      2,
+                                      248,
+                                      1
+                                    ],
+                     'time' => '00:00:00',
+                     'month' => 'Sep',
+                     'date' => 1315281600,
+                     'midnight' => 1315281600,
+                     'monthday' => 6,
+                     'monthno' => 8,
+                     'yearday' => 248,
+                     'monthname' => 'September',
+                     'year' => 2011
+                   }, 'dates' ),
+            bless( {
+                     'weekday' => 'Wednesday',
+                     'localtime' => [
+                                      0,
+                                      0,
+                                      0,
+                                      7,
+                                      8,
+                                      111,
+                                      3,
+                                      249,
+                                      1
+                                    ],
+                     'time' => '00:00:00',
+                     'month' => 'Sep',
+                     'date' => 1315368000,
+                     'midnight' => 1315368000,
+                     'monthday' => 7,
+                     'monthno' => 8,
+                     'yearday' => 249,
+                     'monthname' => 'September',
+                     'year' => 2011
+                   }, 'dates' ),
+            bless( {
+                     'weekday' => 'Thursday',
+                     'localtime' => [
+                                      0,
+                                      0,
+                                      0,
+                                      8,
+                                      8,
+                                      111,
+                                      4,
+                                      250,
+                                      1
+                                    ],
+                     'time' => '00:00:00',
+                     'month' => 'Sep',
+                     'date' => 1315454400,
+                     'midnight' => 1315454400,
+                     'monthday' => 8,
+                     'monthno' => 8,
+                     'yearday' => 250,
+                     'monthname' => 'September',
+                     'year' => 2011
+                   }, 'dates' ),
+            bless( {
+                     'weekday' => 'Friday',
+                     'localtime' => [
+                                      0,
+                                      0,
+                                      0,
+                                      9,
+                                      8,
+                                      111,
+                                      5,
+                                      251,
+                                      1
+                                    ],
+                     'time' => '00:00:00',
+                     'month' => 'Sep',
+                     'date' => 1315540800,
+                     'midnight' => 1315540800,
+                     'monthday' => 9,
+                     'monthno' => 8,
+                     'yearday' => 251,
+                     'monthname' => 'September',
+                     'year' => 2011
+                   }, 'dates' ),
+            bless( {
+                     'weekday' => 'Saturday',
+                     'localtime' => [
+                                      0,
+                                      0,
+                                      0,
+                                      10,
+                                      8,
+                                      111,
+                                      6,
+                                      252,
+                                      1
+                                    ],
+                     'time' => '00:00:00',
+                     'month' => 'Sep',
+                     'date' => 1315627200,
+                     'midnight' => 1315627200,
+                     'monthday' => 10,
+                     'monthno' => 8,
+                     'yearday' => 252,
+                     'monthname' => 'September',
+                     'year' => 2011
+                   }, 'dates' )
+          ],
+          [
+            bless( {
+                     'weekday' => 'Sunday',
+                     'localtime' => [
+                                      0,
+                                      0,
+                                      0,
+                                      11,
+                                      8,
+                                      111,
+                                      0,
+                                      253,
+                                      1
+                                    ],
+                     'time' => '00:00:00',
+                     'month' => 'Sep',
+                     'date' => 1315713600,
+                     'midnight' => 1315713600,
+                     'monthday' => 11,
+                     'monthno' => 8,
+                     'yearday' => 253,
+                     'monthname' => 'September',
+                     'year' => 2011
+                   }, 'dates' ),
+            bless( {
+                     'weekday' => 'Monday',
+                     'localtime' => [
+                                      0,
+                                      0,
+                                      0,
+                                      12,
+                                      8,
+                                      111,
+                                      1,
+                                      254,
+                                      1
+                                    ],
+                     'time' => '00:00:00',
+                     'month' => 'Sep',
+                     'date' => 1315800000,
+                     'midnight' => 1315800000,
+                     'monthday' => 12,
+                     'monthno' => 8,
+                     'yearday' => 254,
+                     'monthname' => 'September',
+                     'year' => 2011
+                   }, 'dates' ),
+            bless( {
+                     'weekday' => 'Tuesday',
+                     'localtime' => [
+                                      0,
+                                      0,
+                                      0,
+                                      13,
+                                      8,
+                                      111,
+                                      2,
+                                      255,
+                                      1
+                                    ],
+                     'time' => '00:00:00',
+                     'month' => 'Sep',
+                     'date' => 1315886400,
+                     'midnight' => 1315886400,
+                     'monthday' => 13,
+                     'monthno' => 8,
+                     'yearday' => 255,
+                     'monthname' => 'September',
+                     'year' => 2011
+                   }, 'dates' ),
+            bless( {
+                     'weekday' => 'Wednesday',
+                     'localtime' => [
+                                      0,
+                                      0,
+                                      0,
+                                      14,
+                                      8,
+                                      111,
+                                      3,
+                                      256,
+                                      1
+                                    ],
+                     'time' => '00:00:00',
+                     'month' => 'Sep',
+                     'date' => 1315972800,
+                     'midnight' => 1315972800,
+                     'monthday' => 14,
+                     'monthno' => 8,
+                     'yearday' => 256,
+                     'monthname' => 'September',
+                     'year' => 2011
+                   }, 'dates' ),
+            bless( {
+                     'weekday' => 'Thursday',
+                     'localtime' => [
+                                      0,
+                                      0,
+                                      0,
+                                      15,
+                                      8,
+                                      111,
+                                      4,
+                                      257,
+                                      1
+                                    ],
+                     'time' => '00:00:00',
+                     'month' => 'Sep',
+                     'date' => 1316059200,
+                     'midnight' => 1316059200,
+                     'monthday' => 15,
+                     'monthno' => 8,
+                     'yearday' => 257,
+                     'monthname' => 'September',
+                     'year' => 2011
+                   }, 'dates' ),
+            bless( {
+                     'weekday' => 'Friday',
+                     'localtime' => [
+                                      0,
+                                      0,
+                                      0,
+                                      16,
+                                      8,
+                                      111,
+                                      5,
+                                      258,
+                                      1
+                                    ],
+                     'time' => '00:00:00',
+                     'month' => 'Sep',
+                     'date' => 1316145600,
+                     'midnight' => 1316145600,
+                     'monthday' => 16,
+                     'monthno' => 8,
+                     'yearday' => 258,
+                     'monthname' => 'September',
+                     'year' => 2011
+                   }, 'dates' ),
+            bless( {
+                     'weekday' => 'Saturday',
+                     'localtime' => [
+                                      0,
+                                      0,
+                                      0,
+                                      17,
+                                      8,
+                                      111,
+                                      6,
+                                      259,
+                                      1
+                                    ],
+                     'time' => '00:00:00',
+                     'month' => 'Sep',
+                     'date' => 1316232000,
+                     'midnight' => 1316232000,
+                     'monthday' => 17,
+                     'monthno' => 8,
+                     'yearday' => 259,
+                     'monthname' => 'September',
+                     'year' => 2011
+                   }, 'dates' )
+          ],
+          [
+            bless( {
+                     'weekday' => 'Sunday',
+                     'localtime' => [
+                                      0,
+                                      0,
+                                      0,
+                                      18,
+                                      8,
+                                      111,
+                                      0,
+                                      260,
+                                      1
+                                    ],
+                     'time' => '00:00:00',
+                     'month' => 'Sep',
+                     'date' => 1316318400,
+                     'midnight' => 1316318400,
+                     'monthday' => 18,
+                     'monthno' => 8,
+                     'yearday' => 260,
+                     'monthname' => 'September',
+                     'year' => 2011
+                   }, 'dates' ),
+            bless( {
+                     'weekday' => 'Monday',
+                     'localtime' => [
+                                      0,
+                                      0,
+                                      0,
+                                      19,
+                                      8,
+                                      111,
+                                      1,
+                                      261,
+                                      1
+                                    ],
+                     'time' => '00:00:00',
+                     'month' => 'Sep',
+                     'date' => 1316404800,
+                     'midnight' => 1316404800,
+                     'monthday' => 19,
+                     'monthno' => 8,
+                     'yearday' => 261,
+                     'monthname' => 'September',
+                     'year' => 2011
+                   }, 'dates' ),
+            bless( {
+                     'weekday' => 'Tuesday',
+                     'localtime' => [
+                                      0,
+                                      0,
+                                      0,
+                                      20,
+                                      8,
+                                      111,
+                                      2,
+                                      262,
+                                      1
+                                    ],
+                     'time' => '00:00:00',
+                     'month' => 'Sep',
+                     'date' => 1316491200,
+                     'midnight' => 1316491200,
+                     'monthday' => 20,
+                     'monthno' => 8,
+                     'yearday' => 262,
+                     'monthname' => 'September',
+                     'year' => 2011
+                   }, 'dates' ),
+            bless( {
+                     'weekday' => 'Wednesday',
+                     'localtime' => [
+                                      0,
+                                      0,
+                                      0,
+                                      21,
+                                      8,
+                                      111,
+                                      3,
+                                      263,
+                                      1
+                                    ],
+                     'time' => '00:00:00',
+                     'month' => 'Sep',
+                     'date' => 1316577600,
+                     'midnight' => 1316577600,
+                     'monthday' => 21,
+                     'monthno' => 8,
+                     'yearday' => 263,
+                     'monthname' => 'September',
+                     'year' => 2011
+                   }, 'dates' ),
+            bless( {
+                     'weekday' => 'Thursday',
+                     'localtime' => [
+                                      0,
+                                      0,
+                                      0,
+                                      22,
+                                      8,
+                                      111,
+                                      4,
+                                      264,
+                                      1
+                                    ],
+                     'time' => '00:00:00',
+                     'month' => 'Sep',
+                     'date' => 1316664000,
+                     'midnight' => 1316664000,
+                     'monthday' => 22,
+                     'monthno' => 8,
+                     'yearday' => 264,
+                     'monthname' => 'September',
+                     'year' => 2011
+                   }, 'dates' ),
+            bless( {
+                     'weekday' => 'Friday',
+                     'localtime' => [
+                                      0,
+                                      0,
+                                      0,
+                                      23,
+                                      8,
+                                      111,
+                                      5,
+                                      265,
+                                      1
+                                    ],
+                     'time' => '00:00:00',
+                     'month' => 'Sep',
+                     'date' => 1316750400,
+                     'midnight' => 1316750400,
+                     'monthday' => 23,
+                     'monthno' => 8,
+                     'yearday' => 265,
+                     'monthname' => 'September',
+                     'year' => 2011
+                   }, 'dates' ),
+            bless( {
+                     'weekday' => 'Saturday',
+                     'localtime' => [
+                                      0,
+                                      0,
+                                      0,
+                                      24,
+                                      8,
+                                      111,
+                                      6,
+                                      266,
+                                      1
+                                    ],
+                     'time' => '00:00:00',
+                     'month' => 'Sep',
+                     'date' => 1316836800,
+                     'midnight' => 1316836800,
+                     'monthday' => 24,
+                     'monthno' => 8,
+                     'yearday' => 266,
+                     'monthname' => 'September',
+                     'year' => 2011
+                   }, 'dates' )
+          ],
+          [
+            bless( {
+                     'weekday' => 'Sunday',
+                     'localtime' => [
+                                      0,
+                                      0,
+                                      0,
+                                      25,
+                                      8,
+                                      111,
+                                      0,
+                                      267,
+                                      1
+                                    ],
+                     'time' => '00:00:00',
+                     'month' => 'Sep',
+                     'date' => 1316923200,
+                     'midnight' => 1316923200,
+                     'monthday' => 25,
+                     'monthno' => 8,
+                     'yearday' => 267,
+                     'monthname' => 'September',
+                     'year' => 2011
+                   }, 'dates' ),
+            bless( {
+                     'weekday' => 'Monday',
+                     'localtime' => [
+                                      0,
+                                      0,
+                                      0,
+                                      26,
+                                      8,
+                                      111,
+                                      1,
+                                      268,
+                                      1
+                                    ],
+                     'time' => '00:00:00',
+                     'month' => 'Sep',
+                     'date' => 1317009600,
+                     'midnight' => 1317009600,
+                     'monthday' => 26,
+                     'monthno' => 8,
+                     'yearday' => 268,
+                     'monthname' => 'September',
+                     'year' => 2011
+                   }, 'dates' ),
+            bless( {
+                     'weekday' => 'Tuesday',
+                     'localtime' => [
+                                      0,
+                                      0,
+                                      0,
+                                      27,
+                                      8,
+                                      111,
+                                      2,
+                                      269,
+                                      1
+                                    ],
+                     'time' => '00:00:00',
+                     'month' => 'Sep',
+                     'date' => 1317096000,
+                     'midnight' => 1317096000,
+                     'monthday' => 27,
+                     'monthno' => 8,
+                     'yearday' => 269,
+                     'monthname' => 'September',
+                     'year' => 2011
+                   }, 'dates' ),
+            bless( {
+                     'weekday' => 'Wednesday',
+                     'localtime' => [
+                                      0,
+                                      0,
+                                      0,
+                                      28,
+                                      8,
+                                      111,
+                                      3,
+                                      270,
+                                      1
+                                    ],
+                     'time' => '00:00:00',
+                     'month' => 'Sep',
+                     'date' => 1317182400,
+                     'midnight' => 1317182400,
+                     'monthday' => 28,
+                     'monthno' => 8,
+                     'yearday' => 270,
+                     'monthname' => 'September',
+                     'year' => 2011
+                   }, 'dates' ),
+            bless( {
+                     'weekday' => 'Thursday',
+                     'localtime' => [
+                                      0,
+                                      0,
+                                      0,
+                                      29,
+                                      8,
+                                      111,
+                                      4,
+                                      271,
+                                      1
+                                    ],
+                     'time' => '00:00:00',
+                     'month' => 'Sep',
+                     'date' => 1317268800,
+                     'midnight' => 1317268800,
+                     'monthday' => 29,
+                     'monthno' => 8,
+                     'yearday' => 271,
+                     'monthname' => 'September',
+                     'year' => 2011
+                   }, 'dates' ),
+            bless( {
+                     'weekday' => 'Friday',
+                     'localtime' => [
+                                      0,
+                                      0,
+                                      0,
+                                      30,
+                                      8,
+                                      111,
+                                      5,
+                                      272,
+                                      1
+                                    ],
+                     'time' => '00:00:00',
+                     'month' => 'Sep',
+                     'date' => 1317355200,
+                     'midnight' => 1317355200,
+                     'monthday' => 30,
+                     'monthno' => 8,
+                     'yearday' => 272,
+                     'monthname' => 'September',
+                     'year' => 2011
+                   }, 'dates' ),
+            bless( {}, 'empty' )
+          ]
+        ];
+
+=head1 DESCRIPTION
+
+The Data::Dumper output of the data set used in the example in 
+L<HTML::Pen::Iterator>.
+
+The code is primarily intended to demonstrate the data structure.
+
+    \@weeks -> \@days -> \@times -> \@events -> \%event objects
+
+The first two dimensions consist of 35 days elements displayed as a 5x7
+HTML table.  Each days elements is one of the following:
+
+=over 2
+
+=list
+
+A reference to an array of times.  This object recurses to display a 
+chronological list of events.
+
+=list
+
+A reference to a B<data> object.  This object displays its B<monthday>
+property and does not recurse.
+
+=list
+
+A reference to an B<empty> object.  This object returns no properties
+when referenced by C<iteratorValue()>, resulting in empty calendar boxes.
+
+C<iteratorValue()> is type safe, so these objects could be undefined 
+scalars instead.
+
+=back
+
+When a days element is represented by an array reference containing a 
+nested set of B<event> objects, each B<event> object contains a duplicate 
+of the B<date> object to reflect properties normally associated with days 
+and times objects.  As arrays, those objects cannot reflect themselves.
+This data duplication is significant.  L<HTML::Pen> describes a more 
+efficient data representation that is probably more appropriate for a 
+production environment.
+
+=head1 AUTHOR
+
+Jim Schueler, E<lt>jim@tqis.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011 by Jim Schueler
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.9 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut

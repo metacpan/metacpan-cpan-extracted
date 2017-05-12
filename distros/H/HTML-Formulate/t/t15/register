@@ -1,0 +1,12 @@
+<form method="post">
+<table cellpadding="2">
+<tr><th style="color:blue"><span class="required">Firstname</span></th><td><input name="firstname" type="text" /></td></tr>
+<tr><th style="color:blue"><span class="required">Surname</span></th><td><input name="surname" type="text" /></td></tr>
+<tr><th style="color:blue"><span class="required">Email</span></th><td><input name="email" type="text" /></td></tr>
+<tr><th style="color:blue"><span class="required">Password</span></th><td><input name="password" type="password" /></td></tr>
+<tr><th style="color:blue"><span class="required">Password Confirm</span></th><td><input name="password_confirm" type="password" /></td></tr>
+<tr><td align="center" colspan="2">
+<input id="register" name="register" type="submit" value="Register" />
+</td></tr>
+</table>
+</form>

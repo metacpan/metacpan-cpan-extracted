@@ -1,0 +1,71 @@
+
+HTML::Template::HTX - Handle HTML Extension template (.htx) files
+
+
+DESCRIPTION
+
+Reads and outputs HTML Extension template (.htx) files, which enable you to
+seperate your Perl code from HTML code.
+
+
+MOTIVATION
+
+The .htx file format was originally used by Microsoft's Index Server and
+their Internet Database Connector, but may be useful for any server side
+program that outputs HTML (or even some other ASCII file format), and
+especially for scripts generating sequential data, such as search engines.
+
+Note that this module and its template format are not directly related nor
+compatible with the popular HTML::Template module.
+
+
+DOCUMENTATION
+
+Documentation on how to use this module is availabe in the POD format,
+inside the HTX.pm file.
+
+Some documentation on the internal ("private") methods and variables are
+availabe as comments inside inside the HTX.pm file.
+
+
+INSTALLATION
+
+To install this module type the following well-known commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires Perl 5.6 (because of UTF-8 support), and these other
+modules and libraries:
+
+  FileHandle
+  HTML::Entities
+  URI::Escape
+
+All of these modules were shipped with my Perl (ActivePerl 5.6.1 build 630)
+by default, so I guess you won't have to worry about them. However, for full
+UTF-8 support you might want to update at least the HTML::Entities module to
+the latest version.
+
+If you run a Perl version older than 5.6, then you should manually disable a
+couple of lines in the HTX.pm file (lines 11 and 12). More information can
+be found inside the HTX.pm file itself. (By the way, I haven't actually
+tested this module on such an old Perl version, but it should work...)
+
+
+AUTHOR INFORMATION
+
+Theo Niessink <niessink@martinic.nl>, http://www.taletn.com/
+
+
+COPYRIGHT
+
+(c) MARTINIC Computers 2002-2005. This module is free software; you can
+redistribute it and/or modify it under the same terms as Perl itself.
+
+For more information on MARTINIC Computers visit http://www.martinic.nl/

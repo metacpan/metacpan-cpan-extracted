@@ -1,0 +1,21 @@
+build\.pl
+blib/.*
+.gitignore
+.git/.*
+Makefile$
+pm_to_blib
+MYMETA..*
+.*\.bak
+^Hazy-Cosmic-Jive-[0-9\.]+/$
+^Hazy-Cosmic-Jive-[0-9\.]+\.tar\.gz$
+^timesheet.txt$
+# Template for building pod file.
+^lib/Hazy/Cosmic/Jive.pod.tmpl$
+^Jive.(?:c|o|bs)$
+# Ignore this directory
+^bcd/.*$
+# Don't need for CPAN
+^make-pod\.pl$
+^makeitfile$
+^copy\.pl$
+^xt/.*$

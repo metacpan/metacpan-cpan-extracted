@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+NoVivify.pm
+NoVivify.xs
+README
+t/Hash_NoVivify.t

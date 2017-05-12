@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name: HTML-SimpleParse
+version: 0.12
+license: perl
+distribution_type: module
+requires: {}
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  HTML::SimpleParse:
+    file: lib/HTML/SimpleParse.pm
+    version: 0.12
+generated_by: Module::Build version 0.18_02

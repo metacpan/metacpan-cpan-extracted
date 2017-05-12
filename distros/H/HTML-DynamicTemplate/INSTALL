@@ -1,0 +1,8 @@
+To install this module, run:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Report any problems to Brian Ng <brian@m80.org>

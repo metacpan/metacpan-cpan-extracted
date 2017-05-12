@@ -1,0 +1,90 @@
+<!--
+=head1 NAME
+
+csvtable_tag.wmk - define a HTML table using comma-separated values
+
+=head1 LOADING
+
+  < use plugin="csvtable_tag" />
+
+=head1 HTML TAGS
+
+  < csvtable [delimiter="char"] [HTML table attributes] >
+  [...cells...]
+  < /csvtable >
+
+=head1 DESCRIPTION
+
+This WebMake Perl library provides a tag to allow HTML tables to be
+constructed, quickly, using a tab-, comma-, or pipe-separated value table.
+
+Firstly, pick a delimiter character, such as C<|>.  Set the C<delimiter>
+attribute to this character.
+
+Each line of the CSV table will become a < TR >; each delimiter-separated cell
+will be enclosed in a < TD > tag pair.
+
+Attributes for the HTML table tag itself, can be provided as attributes to this
+tag; they will be passed through into the resulting < TABLE > tag.
+
+By default, items inside the tables are represented as < TD > cells, with no
+attributes.  Certain special line prefixes allow control over formatting of
+table items, as follows.  These are all case-insensitive, and whitespace after
+them will be stripped; but they must start on the first character of the line
+(no leading spaces), and, despite how they're rendered here, should not contain
+any spaces between the angle brackets.
+
+Blank lines are skipped.
+
+=over 4
+
+=item < !-- .... -- >
+
+Comments, a la HTML.
+
+=item < csvfmt >
+
+The rest of the line is used to specify the format to be used for each line
+afterwards, until the end of the < csvtable >, or until the next < csvfmt >
+line.
+
+The line should end in a < /csvfmt > closing tag.
+
+Specify a < tr >...< /tr > block, with $1, $2, $3, etc. for the numbered cells
+(counting from 1). For example:
+
+  < csvfmt >< tr >< td >$1< /td >< td >$2< /td >< td >$3< /td >< /tr >< /csvfmt >
+
+=back
+
+=head1 EXAMPLE
+
+  < csvtable delimiter="|" >
+  < !-- heading -- >
+  < csvfmt >< tr >< th >$1< /th >< th >$2< /th >< th >$3< /th >< /tr ></ csvfmt >
+  First Name|Surname|Title
+  < !-- contents -- >
+  < csvfmt >< tr >< td >$1< /td >< td >$2< /td >< td >$3< /td >< /tr ></ csvfmt >
+  Justin|Mason|JAPH
+  Foo|Bar|Baz
+  < /csvtable >
+
+=head1 THANKS
+
+Thanks to Chris Barrett; he suggested this tag.
+
+=cut
+
+-->
+
+<{perl
+
+  use HTML::WebMake::PerlLib::CSVTableTag;
+
+  $self->define_tag ("csvtable",
+  	\&HTML::WebMake::PerlLib::CSVTableTag::handle_csvtable_tag,
+	());
+
+  ''
+}>
+

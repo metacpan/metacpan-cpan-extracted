@@ -1,0 +1,28 @@
+body {
+    background-color: black;
+    color: silver;
+}
+
+* {
+    font-family: monospace;
+    font-size: 12px;
+}
+
+td {
+    padding: 0;
+    vertical-align: top;
+}
+
+td.spacer { height: 10px; }
+
+span.arr { font-weight: bold; color: aqua; }
+span.att { font-weight: bold; color: yellow; }
+span.eql { font-weight: bold; color: olive; }
+span.num { font-weight: bold; color: lime; }
+span.sep { font-weight: bold; color: red; }
+span.sig { font-weight: bold; color: fuchsia; }
+span.tag { font-weight: bold; color: blue; }
+span.val { font-weight: bold; color: white; }
+span.doc { font-weight: bold; color: green; }
+
+u { background-color: red; color: red; }

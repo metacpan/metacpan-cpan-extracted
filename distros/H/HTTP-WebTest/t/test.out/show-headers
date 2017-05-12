@@ -1,0 +1,48 @@
+Failed  Succeeded  Test Name
+   0          2    *** no name ***
+   1          0    *** no name ***
+
+
+Test Name: N/A
+URL: http://http.web.test/test-file1
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  REQUIRED TEXT
+    987654                                                       SUCCEED
+
+  REQUEST HEADERS:
+GET http://http.web.test/test-file1
+User-Agent: HTTP-WebTest/NN
+
+  RESPONSE HEADERS:
+HTTP/1.1 200 OK
+Date: SOMEDAY
+Server: libwww-perl-daemon/NN
+Content-Length: 52
+Content-Type: text/plain
+Last-Modified: SOMEDAY
+
+
+
+Test Name: N/A
+URL: http://http.web.test/non-existent
+
+  STATUS CODE CHECK
+    Expected '200' and got: 404 Not Found                        FAIL
+
+  REQUEST HEADERS:
+GET http://http.web.test/non-existent
+User-Agent: HTTP-WebTest/NN
+
+  RESPONSE HEADERS:
+HTTP/1.1 404 Not Found
+Date: SOMEDAY
+Server: libwww-perl-daemon/NN
+Content-Length: 53
+Content-Type: text/html
+Title: 404 Not Found
+
+
+
+Total web tests failed: 1  succeeded: 2

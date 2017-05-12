@@ -1,0 +1,60 @@
+=head1 NAME
+
+HTML::Template::Extension::DO_NOTHING - Plugin that do nothing :-)
+
+=head1 SYNOPSIS
+
+ use HTML::Template::Extension;
+
+ my $text = qq
+    |
+     Standard module emulation
+     =========================
+     If all is ok you can read this here --> <TMPL_VAR NAME="test">
+
+    |;
+
+ # This is equivalent to
+ # my $comp       = new HTML::Template::Extension(
+ #                                            scalarref => \$text
+ #                        );
+
+ my $comp       = new HTML::Template::Extension(
+                                            scalarref => \$text,
+                                            plugins=>["DO_NOTHING"],
+                        );
+
+ $comp->param('test' => "It works!!!");
+ print $comp->output;
+
+ #   OUTPUT:
+ #
+ #   Standard module emulation
+ #   =========================
+ #   If all is ok you can read this here --> It works!!!
+
+
+=head1 DESCRIPTION
+
+This plugin don't add anything to base class and loading it or not is the same.
+
+It's here so that you can use it to build your own extension to HTM::Template
+dictionary.
+
+If you develope something interesting, send me so that you can share your works
+with perl comunity.
+
+=head1 AUTHOR
+
+Bruni Emiliano, <info@ebruni.it>
+
+=head1 SEE ALSO
+
+ HTML::Template
+ HTML::Template::Extension::DO_NOTHING
+ HTML::Template::Extension::SLASH_VAR
+ HTML::Template::Extension::CSTART
+ HTML::Template::Extension::DOC
+ HTML::Template::Extension::HEAD_BODY
+
+=cut

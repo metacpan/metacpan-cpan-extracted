@@ -1,0 +1,194 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+wmblog -- an example script demonstrating how to use WebMake to generate a web
+log.
+
+=head1 SYNOPSIS
+
+  wmblog [-D] [-m] < message
+
+=head1 DESCRIPTION
+
+This is a work in progress -- this script is used to generate
+L<http://taint.org/>, my web log ;)
+
+I live in my mail reader, so the blog is mail-oriented; when I find something
+interesting, I compose a mail to the blog address, or forward the interesting
+mail.  As a result, this script supports stripping forwarded messages into a
+separate page.
+
+=cut
+
+# Where to save the resulting blog items
+$BLOGDIR = '/home/jm/taint.org/raw';
+
+# Who can submit items to the blog
+$BLOGGERS = '(jm@jmason.org|jm@netnoteinc.com)';
+
+# Where WebMake is installed. This is optional, as for most installs
+# WebMake will be in the Perl system lib path.
+use lib '/home/jm/ftp/webmake/lib';
+
+$KILLED_HEADERS = qr{
+        (?:Return-Path|Received|Delivered-To|Message-Id|MIME-Version|
+        Importance|Sender|Errors-To|Precedence|List-Id|X-Beenthere|
+	Content-Type|Content-Transfer-Encoding|Reply-To|X-Spam-Status|
+	Priority|X-\S+)
+}x;
+
+# ---------------------------------------------------------------------------
+
+require HTML::WebMake::Main;
+
+sub usage {
+  die "usage: wmblog [-D] [-m] < message\n";
+}
+
+use vars qw{
+  $opt_h $opt_D $opt_m
+};
+
+use Getopt::Std;
+getopts ('hDm') or usage();
+if (defined $opt_h) { usage(); }
+
+# ---------------------------------------------------------------------------
+
+my $text = '';
+my $author = '';
+
+# read the mail headers, if present, and find the author from From: header
+if ($opt_m) {
+  while (<STDIN>) {
+    /^$/ and last;
+
+    if (/^From: (.*?)$/) {
+      if ($1 !~ /${BLOGGERS}/) {
+	die "access denied: $1\n";
+      }
+
+      $_ = $1;
+      if (/\((.*)\)/) { $author = $1; }
+      elsif (/\"?(.*)\"? <.*>/) { $author = $1; }
+      else { $author = $_; }
+    }
+  }
+}
+
+# get the text
+$text = join ('', <STDIN>);
+close STDIN;
+
+# by default, the entire mail message is a blog entry.
+# However, if there's BlogStart...BlogEnd block, that's
+# the text; the rest of the mail is an attachment.
+my $attachedmail = '';
+my $linktext = undef;
+if ($text =~ s/BlogStart:\s*\n\s*(.*?)\s*\nBlogEnd://s) {
+  $attachedmail = $text;
+  $text = $1;
+
+  # find the link text. If it's not there, add one.
+  if ($attachedmail =~ s/^LinkText:\s+(.*?)\s*$//m) {
+    $linktext = $1;
+
+    if (!defined $linktext || $text !~ /\Q$linktext\E/) {
+      $text .= ' (Link)';
+      $linktext = 'Link';
+    }
+  }
+}
+
+# only add an attached-mail file if there *is* an attached mail!
+if ($attachedmail =~ /\S/) {
+  $text =~ s/\b\Q$linktext\E\b/"${linktext}" [mail]/gs;
+  $text .= "\n\n    [mail]: \$(__NAME__.mail)\n\n";
+
+  # clean off any spare whitespace, and headers, at the top of the
+  # attached mail.
+  $_ = $attachedmail;
+
+  s/^From \S+  \S\S\S \S\S\S \d\d [^\n]*$//gm;
+  s/^---+\s+forwarded message.*$//gim;
+  s/^---+\s+end of forwarded message.*$//gim;
+
+  # trim off unwanted headers
+  1 while s/(?:^|\n)
+	${KILLED_HEADERS}
+	:\s[^\n]*(?:\n\ \ +[^\n]*)*
+	/\n/gsx;
+
+  s/^\s+//gs;
+  s/\n\n\n+/\n\n/gs;
+
+  $attachedmail = $_;
+}
+
+# tag it with author metadata from the From: address
+if ($author ne '') {
+  $text .= "<wmmeta name=Author>$author</wmmeta>";
+}
+
+# now generate a filename to save the content item (and the
+# attached mail, if there is one)
+my $filename = generate_filename($BLOGDIR);
+$text =~ s/__NAME__/${filename}/gs;
+$filename = $BLOGDIR.'/'.$filename;
+
+
+if ($opt_D) {
+  print "Dump: text = '$text'\n\n\nmail = '$attachedmail'\n\n".
+  	"textfile=$filename.txt\nmailfile=$filename.mail\n";
+  exit;
+}
+
+open (OUT, ">$filename.txt")
+	or die "Cannot write to $filename.txt\n";
+print OUT $text;
+close OUT;
+
+if ($attachedmail ne '') {
+  open (OUT, ">$filename.mail")
+	  or die "Cannot write to $filename.mail\n";
+  print OUT $attachedmail;
+  close OUT;
+}
+
+exit;
+
+# ---------------------------------------------------------------------------
+
+# Generates a filename of the form:
+#
+#    YYYY/MM/DD/HHMMSSa.txt
+#
+# Where YYYY=year, MM=month, DD=day, HHMMSS=time. 'a' is reserved
+# as a counter character to avoid collisions, in case >1 blog item
+# arrives in the same second. It's unlikely, but better to be safe.
+#
+sub generate_filename {
+  my ($targetdir) = @_;
+
+  use POSIX qw(strftime);
+  use File::Path;
+
+  my @time = localtime;
+  my $dirname = strftime ("%Y/%m/%d", @time);
+  my $filename = strftime ("%T", @time); $filename =~ s/[^0-9]//g;
+
+  my $fulldir = $targetdir.'/'.$dirname;
+  if (!-d $fulldir) {
+    mkpath ($fulldir)
+	  or die "Cannot create $fulldir\n";
+  }
+
+  $filename = $dirname.'/'.$filename;
+  my $counter = 'a';
+  while (-f $targetdir.'/'.$filename.$counter.'.txt') { $counter++; }
+
+  $filename =  $filename.$counter;
+  $filename;
+}
+

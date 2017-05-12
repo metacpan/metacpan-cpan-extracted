@@ -1,0 +1,103 @@
+HTML::WikiConverter readme
+==========================
+
+HTML::WikiConverter is an HTML to wiki converter capable of converting
+HTML source into a variety of wiki dialects. It's aimed at folks who
+are converting vanilla HTML websites into wikis.
+
+The following dialects (and more) are supported:
+
+  DokuWiki
+  GoogleCode
+  Kwiki
+  Markdown
+  MediaWiki
+  MoinMoin
+  Oddmuse
+  PbWiki
+  PhpWiki
+  PmWiki
+  SnipSnap
+  Socialtext
+  TikiWiki
+  UseMod
+  WakkaWiki
+  WikkaWiki
+
+INSTALLATION
+
+The HTML::WikiConverter module is just an interface; you must select
+the wiki dialects you would like to use. You may install dialect
+modules individually (see below) or install Bundle::HTMLWikiConverter
+to get most of the dialect modules in one shot:
+
+  % perl -MCPAN -e 'install Bundle::HTMLWikiConverter'
+
+For just the HTML::WikiConverter interface:
+
+  % perl -MCPAN -e 'install HTML::WikiConverter'
+
+Individual dialects can be installed separately; for example:
+
+  % perl -MCPAN -e 'install HTML::WikiConverter::MediaWiki'
+  % perl -MCPAN -e 'install HTML::WikiConverter::PhpWiki'
+
+SYNOPSIS
+
+Converting HTML to wiki markup is easy:
+
+  use HTML::WikiConverter;
+  my $wc = new HTML::WikiConverter( dialect => 'MediaWiki' );
+  print $wc->html2wiki( $html );
+
+The included html2wiki utility converts on the command line:
+
+  % html2wiki --dialect MediaWiki \
+              --base-uri http://en.wikipedia.org \
+              --wiki-uri /wiki/ \
+              input.html > output.mw
+
+A web application is also provided with this distribution, called
+HTML::WikiConverter::WebApp. It provides a web interface to this
+module and any installed dialects. Detailed instructions on
+installation and usage are provided in the INSTALL file.
+
+PREREQUISITES
+
+The following are required for a basic installation:
+
+  * Test::More
+  * Pod::Usage
+  * Class::Data::Inheritable
+  * Params::Validate
+  * URI and URI::Escape
+  * HTML::TreeBuilder
+  * HTML::Tagset
+  * HTML::Entities
+  * HTML::Element
+  * CSS
+
+CGI::Application and XML::Writer are required if you will be using the
+installed web application, HTML::WikiConverter::WebApp. (My apologies;
+I'll make them optional in a future release.)
+
+BUGS
+
+This module is far from perfect. Please report bugs to rt.cpan.org.
+
+THANKS TO
+
+  * Tatsuhiko Miyagawa for suggestions and code
+  * Dave Schaefer for the PbWiki dialect and for the idea behind the
+    new C<attributes()> implementation.
+  * Martin Kudlvasr for fixing a bug in how 'wrap_in_html' was applied to
+    HTML read from files
+
+COPYRIGHT
+
+Copyright (c) David J. Iberri <diberri@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+See http://www.perl.com/perl/misc/Artistic.html

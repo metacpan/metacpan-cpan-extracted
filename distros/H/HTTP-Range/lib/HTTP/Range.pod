@@ -1,0 +1,219 @@
+=pod
+
+=head1 NAME
+
+HTTP::Range - Handle multi-segment HTTP requests
+
+=head1 SYNOPSIS
+
+    require HTTP::Range;
+    require HTTP::Request;
+    require LWP::UserAgent;
+    require LWP::Parallel::UserAgent;
+
+    my $url = "http://example.com";
+    my $segments = 2;
+
+    my $head_request = HTTP::Request->new( HEAD => $url );
+    my $head_response = LWP::UserAgent->new->request( $head_request );
+    my $get_request = HTTP::Request->new( GET => $head_request->uri );
+
+    # divide a single HTTP request object into many
+    my @requests = HTTP::Range->split(
+            request     => $get_request,
+            length      => $head_response->header( 'Content-Length' ),
+            segments    => $segments,
+        );
+                                                                                                                                                    
+    my $pua = LWP::Parallel::UserAgent->new;
+    $pua->register( $_ ) foreach @requests;
+    my $entries = $pua->wait;
+    my @responses;
+    push( @responses, $entries->{ $_ }->response ) foreach keys %$entries;
+
+    # fuse many HTTP responses into a single object
+    my $res = HTTP::Range->join(
+            responses   => \@responses,
+            length      => $head_response->header( 'Content-Length' ),
+            segments    => $segments,
+        );
+                                                                                                                                                    
+    print $res->as_string;
+
+=head1 DESCRIPTION
+
+This module provides class methods that allow you to divide an L<HTTP::Request>
+object into multiple smaller I<segments> of the original request and to fuse
+the L<HTTP::Response> objects resulting from a segmented transfer back into a
+complete resource.  The segmentation is accomplished via the use of the HTTP
+C<Range> and C<Content-Range> fields as defined in L</"RFC2616">.
+
+This module aims to be useful for HTTP transfers across aggregated network
+connections, as is possible for Ethernet with L</"IEEE 802.3ad">.  It may also
+be advantageous on high latency network links where a single TCP session won't
+scale to use all available bandwidth and it will probably circumvent some HTTP
+bandwidth throttling techniques.
+
+This module is similar in function to both the L</"Prozilla"> and L</"McURL">
+programs. 
+
+=head1 IMPORT PARAMETERS
+
+This module accepts no arguments to it's C<import> method and exports no
+I<symbols>.
+
+=head1 CLASS METHODS
+
+=over 4
+
+=item * split( ... )
+
+Accepts a mandatory hash and returns a list of L<HTTP::Request> objects.
+
+    my @requests = HTTP::Range->split(
+            request     => $req,
+            length      => 1000,
+            segments    => 2,
+        );
+
+=over 4
+
+=item * request
+
+A L<HTTP::Request> object that is cloned to recreate the HTTP segment
+requests.
+
+=item * length
+
+A positive non-zero integer that specifies the length of the content being
+requested.
+
+=item * segments
+
+A positive non-zero integer that sets the number of segments to split the HTTP
+request into.  The value must be less then or equal to the the C<length> key.
+The default number of segments is 4.
+
+I<This key is optional.>
+
+=back
+
+=item * join( ... )
+
+Accepts a mandatory hash and returns an L<HTTP::Response> object.
+
+    my $res = HTTP::Range->join(
+            responses   => \@responses,
+            length      => 1000,
+            segments    => 2,
+        );
+
+=over 4
+
+=item * responses
+
+A reference to an array of L<HTTP::Response> objects.  The C<content> of all
+passed in L<HTTP::Response> objects is destroyed during reassembly to converse
+memory.
+
+The first object in the array is cloned to be use as the returned object.  The
+C<Content-Range> header is stripped and the HTTP status code + status message
+are modified.  All other properties of the object are unmodified.
+
+=item * length
+
+A positive non-zero integer that specifies the total C<Content-Length> of all
+the L<HTTP::Response> objects being passed in.
+
+I<This key is optional.>
+
+=item * segments
+
+A positive non-zero integer that sets the number L<HTTP::Response> objects that
+we expected to pass into the C<responses> key.  The value must be less then or
+equal to the the optional C<length> key.
+
+I<This key is optional.>
+
+=back
+
+=back
+
+=head1 DEVELOPER NOTES
+
+=over 4
+
+=item Memory Usage
+
+This module is currently unsuitable for transfers near to or exceeding the size
+of the host systems physical memory and B<will not> work for for transfers
+exceeding the size of physical memory + swap space.  The memory footprint is at
+least C<data_size + ( 1/num_segments * data_size )> and be up to C<data_size *
+2>.
+
+=back
+
+=head1 REFERENCES
+
+=over 4
+
+=item RFC2616
+
+Hypertext Transfer Protocol -- HTTP/1.1
+
+L<ftp://ftp.rfc-editor.org/in-notes/rfc2616.txt>
+
+=item IEEE 802.3ad
+
+Link Aggregation, Claus 43 (in Section Three) of IEEE 802.3 
+
+L<http://standards.ieee.org/getieee802/802.3.html>
+
+=item Prozilla
+
+L<http://prozilla.genesys.ro/>
+
+=item McURL
+
+L<http://www.goforlinux.de/scripts/mcurl/>
+
+=back
+
+=head1 CREDITS
+
+Just me, myself, and I.
+
+=head1 SUPPORT
+  
+Please contact the author directly via e-mail.
+ 
+=head1 AUTHOR
+
+Joshua Hoblitt <jhoblitt@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2004  Joshua Hoblitt
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+The full text of the license can be found in the LICENSE file included with
+this module or in the L<perlgpl> Pod included with Perl 5.8.1 or later.
+
+=head1 SEE ALSO
+
+L<HTTP::Request>, L<HTTP::Response>
+
+=cut

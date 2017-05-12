@@ -1,0 +1,27 @@
+Revision history for Perl extension Hash::Filler.
+
+1.00  Fri Sep  1 09:27:19 2000
+	- original version; created by h2xs 1.19
+
+1.10  Fri Sep  1 15:00:11 2000
+	- Added ->method and some constants
+
+1.20  Mon Sep  4 11:45:00 2000
+	- Added statistics to the rules to ease the tuning
+	- Added documentation about what this module is for :)
+	- ->dump_r_tree is now 'public'
+	- Added user-supplied hash methods.
+
+1.30  Mon Sep  4 14:11:00 2000
+	- Added wildcard rules
+	- ->dump_r_tree changed the format of its input
+	- ->remove was added
+
+1.40  Mon Sep  4 20:00:00 2000
+	- Semantic clarification in the user-supplied sub to the rules
+	- Fixed a few semantic quirks regarding rule ordering,
+	  wildcards and preferences
+	- A prerequisite's user-supplied sub returning false will
+	  not directly cause the current rule to be skipped.
+	- Added basic tests
+

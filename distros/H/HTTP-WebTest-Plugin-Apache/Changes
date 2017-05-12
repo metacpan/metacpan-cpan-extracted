@@ -1,0 +1,14 @@
+$Id: Changes,v 1.2 2002/12/16 21:17:18 m_ilya Exp $
+
+Revision history for Perl module HTTP::WebTest::Plugin::Apache.
+
+1.01 Sat Dec 17 2002
+
+BUG FIXES:
+
+* Fix bug in test suite triggered when 'make test' is run
+non-interactively.
+
+1.00 Sat Dec 14 2002
+
+* First version (based on code used to be in HTTP::WebTest distro).

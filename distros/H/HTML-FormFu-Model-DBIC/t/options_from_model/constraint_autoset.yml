@@ -1,0 +1,26 @@
+---
+auto_fieldset: 1
+
+elements:
+  - type: Hidden
+    name: id
+
+  - type: Text
+    name: text_col
+
+  - type: Select
+    name: type
+    model_config:
+      options_from_model: 1
+    constraint:
+      - AutoSet
+
+  - type: Select
+    name: type2_id
+    model_config:
+      resultset: Type2
+    constraint:
+      - AutoSet
+
+  - type: Submit
+    name: submit

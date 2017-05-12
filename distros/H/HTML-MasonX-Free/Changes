@@ -1,0 +1,25 @@
+Release history for HTML-MasonX-Free
+
+0.006     2016-05-24 19:54:42-04:00 America/New_York
+        - added HTML::MasonX::Free::HTMLHunk
+
+0.005     2013-08-31 23:59:31 America/New_York
+          update bugtracker and repo
+
+0.004     2012-11-01 09:57:17 America/New_York
+          fix the text of an error message
+
+          pass tests on Win32 (path sep error! thanks, CPAN Testers!)
+
+0.003     2012-09-24 14:36:23 America/New_York
+          HTML::MasonX::Free::Request to eliminate the wrapping chain; see
+          4497ab8 for explanation
+
+0.002     2012-09-24 11:21:21 America/New_York
+          combined MasonX::Resolver::AutoInherit and MasonX::Component::RunMain
+
+          They just didn't work well independently.  They only make sense
+          when all put together.  What a bummer.
+
+0.001     2012-09-20 23:03:04 America/New_York
+          first release, after meaning to write this for three years

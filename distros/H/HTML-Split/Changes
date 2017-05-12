@@ -1,0 +1,18 @@
+Revision history for Perl extension HTML::Split
+
+0.04  Sat Jan  2 2010
+        - Fixed v-string of perl deps.
+        
+0.03  Thu Apr 16 2009
+        - Fixed problems that close tag are gone when non empty tag in
+          "<a>...</a>" like a "<a><strong>...</strong></a>".
+        - Return undef from constructor new() instead of die if the
+          validation of arguments failed. 
+        - Added missing document of text() and slightly changed POD.
+
+0.02  Sat May 10 2008
+        - Fixed problems of handling utf8 flags.
+        - Fixed document.
+
+0.01  Sun May  4 2008
+        - first version

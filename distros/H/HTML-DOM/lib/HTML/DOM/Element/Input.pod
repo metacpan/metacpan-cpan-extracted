@@ -1,0 +1,154 @@
+
+=head1 NAME
+
+HTML::DOM::Element::Input - A Perl class for representing 'input' elements in an HTML DOM tree
+
+=head1 VERSION
+
+Version 0.054
+
+=head1 SYNOPSIS
+
+  use HTML::DOM;
+  $doc = HTML::DOM->new;
+  $elem = $doc->createElement('input');
+  $elem->setAttribute('type' => 'text');
+
+  $elem->click();
+  $elem->blur();
+  # etc.
+
+  $elem->checked(1) # set attribute
+  $elem->type;      # get attribute
+  $elem->tagName;
+  # etc.
+
+=head1 DESCRIPTION
+
+This class implements 'input' elements in an HTML::DOM tree. It 
+implements the HTMLInputElement DOM interface and inherits from 
+L<HTML::DOM::Element> (q.v.).
+
+=head1 METHODS
+
+In addition to those inherited from HTML::DOM::Element and its 
+superclasses, this class implements the following DOM methods:
+
+=over 4
+
+=item defaultValue
+
+=item defaultChecked
+
+=item accept
+
+=item accessKey
+
+=item align
+
+=item alt
+
+=item disabled
+
+=item maxLength
+
+=item name
+
+=item readOnly
+
+=item size
+
+=item src
+
+=item tabIndex
+
+=item type
+
+=item useMap
+
+Each of these returns the corresponding HTML attribute (the 'value' and
+'checked' attributes
+in the case of C<defaultValue> and C<defaultChecked>, respectively). If you 
+pass an
+argument, it will become the new value of the attribute, and the old value
+will be returned.
+
+=item form
+
+Returns the form containing this input element.
+
+=item checked
+
+=item value
+
+These methods allow one to change the state of the input field. The change 
+is not reflected in the HTML attributes. These will be called with the 
+values of C<defaultValue> and
+C<defaultChecked> when the form's C<reset> method is invoked.
+
+The C<value> method behaves differently if the calling package is HTML::Form, HTML::Form::Input or
+WWW::Mechanize. For checkboxes, the return value will be undef if the box 
+is not checked.
+With an undef argument the box will be unchecked. If an argument is given
+that is the same as the 'value' attribute, the box will be checked. If any
+other argument is passed, it will die. If the 'type' attribute is 'button' or 'reset,' C<value> will simply return.
+
+=item blur
+
+=item focus
+
+=item select
+
+=item click
+
+Each of these triggers the corresponding event. The C<click> method can 
+take
+three arguments, all optional: (0) the form, (1) the x-coordinate where the
+mouse supposedly clicked and (2) the y-coordinate.
+
+=back
+
+In addition, the following methods are provided for compatibility with 
+L<WWW::Mechanize>:
+
+=over 4
+
+=item possible_values
+
+This returns an empty list for most input elements, but for checkboxes it
+returns C<(undef, $value)>.
+
+=item form_name_value
+
+Returns a list of two items: (0) the name of the field and (1) the value.
+
+=item file
+
+An alias for C<value>
+
+=item filename
+
+This get/sets the filename reported to the server during file upload.
+This attribute defaults to the value reported by the file() method.
+
+=item headers
+
+Returns an empty list (for now).
+
+=item content
+
+This get/sets the file content provided to the server during file
+upload.  This method can be used if you do not want the content to be
+read from an actual file.
+
+=back
+
+=head1 SEE ALSO
+
+L<HTML::DOM>
+
+L<HTML::DOM::Element>
+
+L<HTML::DOM::Element::Form>
+
+L<HTML::Form>

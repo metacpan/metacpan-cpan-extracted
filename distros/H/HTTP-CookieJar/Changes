@@ -1,0 +1,61 @@
+Revision history for HTTP-CookieJar
+
+0.008     2015-11-06 22:48:19-05:00 America/New_York
+
+    [PREREQS]
+
+    - Dropped minimum Perl requirement to 5.8.1
+
+0.007     2015-08-21 13:57:31-04:00 America/New_York
+
+    [PREREQS]
+
+    - Dropped Time::Mock dependency to allow building on Windows
+
+    [META]
+
+    - Modernized repo layout for newest DAGOLDEN Dist::Zilla bundle
+
+0.006     2014-02-19 19:52:00-05:00 America/New_York
+
+    [FIXED]
+
+    - Fixed file encoding of test files
+
+    [CHANGED]
+
+    - Updated distribution repo URL and other meta files
+
+    - Tidied test files
+
+0.005     2013-08-03 21:41:10 America/New_York
+
+    [FIXED]
+
+    - Fixed test failure under hash randomization
+
+0.004     2013-04-23 22:24:25 America/New_York
+
+    [REMOVED]
+
+    - Removed test dependency on HTTP::Request/Response; The LWP adapter
+      test will only be run if they are already available
+
+0.003     2013-03-07 17:49:40 America/New_York
+
+    [FIXED]
+
+    - Another attempt to avoid test failures on older, 32-bit Perls
+
+0.002     2013-03-07 06:12:04 America/New_York
+
+    [FIXED]
+
+    - Won't warn about undefined value for length on empty cookie on old Perls
+
+    - Requires Time::Local 1.1901 to fix Y2038 bug on old Perls
+
+0.001     2013-02-13 16:41:24 America/New_York
+
+    - First release
+

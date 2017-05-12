@@ -1,0 +1,52 @@
+Hash-AutoHash
+
+This is yet another module that lets you access or change the elements
+of a hash using methods with the same name as the element's key.  It
+follows in the footsteps of Hash::AsObject, Hash::Inflator,
+Data::OpenStruct::Deep, Object::AutoAccessor, and probably others. The
+main difference between this module and its forebears is that it
+supports tied hashes, in addition to regular hashes. This allows a
+modular division of labor: this class is generic and treats all hashes
+the same; any special semantics come from the tied hash.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Hash::AutoHash
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Hash-AutoHash
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Hash-AutoHash
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Hash-AutoHash
+
+    Search CPAN
+        http://search.cpan.org/dist/Hash-AutoHash/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Nat Goodman
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

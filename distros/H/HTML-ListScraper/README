@@ -1,0 +1,36 @@
+HTML-ListScraper
+
+While Perl has good support and is often used for extracting
+machine-friendly data from HTML pages, most scripts used for that task
+are ad-hoc, parsing just one site's HTML and depending on superficial,
+transient details of its structure - and are therefore brittle and
+labor-intensive to maintain. This module tries to support more generic
+scraping for a class of pages: those whose most important part is a
+list of links.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc HTML::ListScraper
+
+If you have questions about the module, or think it should be doing
+something different than it does, send me e-mail.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007-2013 Vaclav Barta
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

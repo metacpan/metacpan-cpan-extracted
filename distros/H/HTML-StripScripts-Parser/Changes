@@ -1,0 +1,35 @@
+1.03   5 Nov 2009  Changed min version of HTML::StripScripts to 1.0.5
+1.02   1 Dec 2007  Made minimum required version of HTML::StripScripts 1.04
+                   because of a bug in previous versions
+1.01  21 Nov 2007  Made minimum required version of HTML::Parser 3.56
+                   because of some parsing bugs in previous versions
+                   of that module
+
+1.00   5 Jun 2007  Passed all CPAN tests - bumped version
+
+0.991 29 May 2007  Fixed some Kwalitee issues:
+                     - improved META.yml
+                     - added Test::Pod and Test::Pod::Coverage tests
+
+0.99  28 May 2007  Added the filter_html() method
+                   Added the XSS tests from http://ha.ckers.org/xss.html
+                   Now requires HTML::StripScripts v 0.99
+
+0.06  09 Dec 2003  Removed some more tests that proved fragile with respect
+                   to HTML::Parser variations.
+
+0.05  09 Dec 2003  Depend on HTML::Parser 3.25 or later, since we need the
+                   end_document hook.
+
+0.04  02 Oct 2003  Added PARSER_OPTIONS to the init() method.
+
+0.03  02 Oct 2003  Removed some fragile tests that depended on HTML::Parser
+                   parsing in a particular way.
+
+                   Added a workaround for HTML::Parser bug
+                   http://rt.cpan.org/NoAuth/Bug.html?id=3954
+
+0.02  31 Mar 2003  Removed misplaced =back in the POD.
+
+0.01  30 Mar 2003  Initial release.
+

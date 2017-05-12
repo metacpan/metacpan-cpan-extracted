@@ -1,0 +1,16 @@
+Level 6
+-------
+
+Now there is a curious "Input secret" form. I wonder what it
+does? Well, there is also a "View sourcecode" link, which
+will presumably show us the source code for that form. Then,
+we can try to anaylze whether it has any weaknesses we can
+take advantage of.
+
+So, it simply checks if the value you POSTed in the text
+field is the same as the secret, and if so, gives you the
+password for the next level. I wonder if we can access that
+`includes/secret.inc` file to see what the secret is.
+
+Yes, we can. Now we can use that in the web form to get the
+password for the next level.

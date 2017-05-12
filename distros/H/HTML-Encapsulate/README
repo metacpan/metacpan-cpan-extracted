@@ -1,0 +1,192 @@
+NAME
+    HTML::Encapsulate - rewrites an HTML page as a self-contained set of
+    files
+
+VERSION
+    This document describes HTML::Encapsulate version 0.1
+
+SYNOPSIS
+        use HTML::Encapsulate qw(download);
+    
+        # This will download the page at the URL given in the first
+        # argument into a folder named in the second, here called
+        # C<bar.html>.  The folder will contain all the images and other
+        # components required to view the page.  The page itself will be
+        # saved as C<index.html>
+        download "http://foo.com/bar" => "bar.html";
+
+        # It also has an OO interface, allows various defaults to be
+        # adjusted via the %options hash.
+        my $he = HTML::Encapsulate->new(%options);
+        $he->download("http://foo.com/bar" => "bar.html");
+
+
+        # HTTP::Requests can also be passed.  This enables the result of
+        # form posts to be captured.
+        my $request = HTTP::Request->new(GET => 'http://somewhere.com/something.html');
+        my $download_dir = 'some/directory/path';
+
+        $he->download($request, $download_dir);
+
+DESCRIPTION
+    The main motivation for this module is for archiving and printing web
+    pages: these typically come in various separate pieces and aren't simple
+    to download as one chunk.
+
+    However, it is possible to preserve the content of a web page, but to
+    rewrite the links to the embedded contend like images, stylesheets, etc.
+    so that the downloaded version can be viewed entirely offline.
+
+    Once web pages have been downloaded in an "encapsulated" form, they can
+    then be archived, and/or converted into other formats.
+
+    The "wget" command line utility has an option for downloading web pages
+    with their images and stylesheets, rewriting the links to point to the
+    downloaded copies, like this:
+
+        wget -kp http://foo.com/bar
+
+    This command isn't always convenient, nor available, so it's a fairly
+    non-portable option. This module aims to perform the same function in a
+    portable, pure-perl fashion.
+
+    See the documentation for the "->download" method for more details.
+
+EXPORTABLE FUNCTIONS
+  "download($url_or_request, $download_dir)"
+  "download($url_or_request, $download_dir, $user_agent)"
+    Essentially constructs a default instance and delegates to its
+    "->download" method. See the appropriate documentation for that method.
+    Note that, once created, this instance will be re-used by future calls
+    to "download".
+
+    Optionally, a LWP::UserAgent instance $user_agent may be supplied for
+    use, e.g. if the download needs to be performed as part of an ongoing
+    session, or needs to have specific properties or behaviour.
+
+    If no $user_agent is supplied, a new LWP::UserAgent instance will be
+    created by the default instance used. See the "->new" method for
+    details.
+
+CLASS METHODS
+  "$obj = $class->new(%options)"
+    Constructs a new instance with tweaked properties.
+
+    Only one option is currently available:
+
+    "ua"
+        Supplies a "LWP::UserAgent" instance to use instead of the default.
+        If not supplied, a default new instance will be constructed like
+        this:
+
+            $ua = LWP::UserAgent->new(
+                requests_redirectable => [qw(GET POST HEAD)]
+            );
+
+        This means that redirects will be followed for "GET", "HEAD", and
+        (unlike a default instance), "POST".
+
+        One reason for using an externally supplied user agent might be to
+        download within the context of a session it has created.
+
+OBJECT METHODS
+  "$obj->download($url_or_request, $download_dir)"
+    This downloads the page obtained by the HTTP::Request $request (which
+    could be a post, or any other request returning HTML) in the directory
+    $download_dir, plus all images and other dependencies needed to render
+    it.
+
+    The main HTML document will be saved in $download_dir as 'index.html'.
+    Other dependencies will be saved with filenames composed of an index
+    number (1 for the first item saved, 2 for the second, etc.), plus an
+    extension (taken from the source URL).
+
+    By design, this function will dowload but not attempt to process
+    non-html content (i.e. if the 'content-type' header does not end in
+    html). Note also that I've been lazy, so it will still save the content
+    with as "index.html" as for a HTML page.
+
+    The content of the HTML is re-written so that links to dependencies
+    refer to the downloaded files. External dependencies (anything not
+    downloaded) are left as-is.
+
+    The following dependencies *are* handled:
+
+    *   "<img href="...">" linked images
+
+    *   "<style href="...">" stylesheet links
+
+    *   CSS "@import url(...)" linked stylesheets
+
+    *   "<script src="...">" linked scripts.
+
+    *   "<input src="...">" linked images.
+
+    *   CSS "url()" links.
+
+    TODO
+
+    The following constructs are not handled, but ought to be:
+
+    *   Frames and "iframe" tags.
+
+    *   "<embed>", "object"
+
+    Unsupported
+
+    These are not handled, and may or may not get implemented:
+
+    *   inline "data://" urls
+
+    *   excessivly funky javascript which constructs content dynamically
+
+DEPENDENCIES
+    Dependencies are intentionally kept fairly minimal, but do exist. The
+    main non-core ones are HTML::Tidy, HTML::Entities and
+    HTML::TreeBuilder::XPath. See the "META.yaml" included the distribution
+    for full details.
+
+BUGS / CAVEATS
+    The internals are a bit of an ugly hack. If I could find something off
+    the shelf which does the job equivalently, I'd have used that. Since I
+    couldn't find anything suitable I whipped this up in a jiffy, and then
+    warped it to support as much as I could.
+
+    See the description of "->download" for details of what is and isn't
+    implemented.
+
+    Please report any bugs or feature requests to
+    "bug-HTML-Encapsulate@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org>.
+
+AUTHOR
+    Nick Woolley "<npw@cpan.org>"
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2009, Nick Woolley "<npw@cpan.org>". All rights reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

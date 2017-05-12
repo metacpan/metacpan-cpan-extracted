@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:               HTML-CruftText
+version:            0.02
+abstract:           Remove unuseful text from HTML
+author:
+    - David Larochelle <dlarochelle@cyber.law.harvard.edu>
+license:            agpl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    List::MoreUtils:      0.33
+    Readonly:             1.03
+    Test::More:           0
+    Test::NoWarnings:     1.04
+    Test::Pod:            1.45
+    Test::Pod::Coverage:  1.08
+    Time::HiRes:          1.51
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

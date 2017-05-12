@@ -1,0 +1,423 @@
+
+=head1 INSTALLATION
+
+
+=head2 UNIX
+
+=over 4
+
+=item Unpack the archive
+
+=item perl Makefile.PL
+
+You will be asked if you want to compile in support for Apache mod_perl. If
+you say yes, the source of Apache is searched (for headerfiles). If 
+it can't found, please specify the basepath of your Apache sources or the
+directory where the Apache include files are installed. Please make sure 
+mod_perl is already installed. If you have installed mod_perl-0.96 or
+higher, Makefile.PL automatically suggests the same source path as was 
+used to build mod_perl.
+
+=item make
+
+=item make test
+
+=item make install
+
+=back
+
+B<NOTE 1:> For using session handling you need
+Apache::Session 1.53 and Apache::SessionX 2.00b3 or higher. 
+
+B<NOTE 2:> I<Embperl> runs without additional Perl modules, but the C<make test>
+needs the following modules to work:
+
+=over 4
+
+=item * URI
+
+=item * MIME::Base64 
+
+=item * HTML::Parser 
+
+=item * HTML::HeadParser 
+
+=item * Digest::MD5 
+
+=item * libnet 
+
+=item * libwww 
+
+=item * libwin32 (only Win32) 
+
+=back
+
+B<NOTE 3:> I<EmbperlObject> needs the following modules to work:
+
+=over 4
+
+=item * File::Spec 0.8 or higher
+
+=back
+
+If you have already successfully build and tested C<mod_perl> all modules
+will already be there.
+
+=head2 Options for make test
+
+C<make test> can take several options, which can be given with the C<TESTARGS>
+parameter:
+
+  make test TESTARGS="--help"
+
+will show you a list of available option. Most of them you will never need,
+they are mainly nesseccary for debugging I<Embperl> itself.
+
+=head2 XML and XSLT support
+
+Starting with Embperl 2.0b4 it has a build in XSLT support. You can either
+use the Apache Xerces-C and Xalan-C and/or Gnome libxml and libxslt.
+Embperl is currently tested with Xalan 1.2 and libxslt 1.0.4+.
+
+To install Xalan, download the Xalan archive for your OS from 
+http://xml.apache.org/dist/xalan-c/
+ 
+For Linux it is Xalan-C_1_2-linux.tar.gz
+For Solaris it is Xalan-C_1_2-solaris.tar.gz
+ 
+Extract the archive and make the shared libraries available to the system,
+either by adding the directories to LD_LIBRARY_PATH or by coping them to
+a library directory, e.g. /usr/local/lib and run ldconfig -v. The two
+ncessary libraries can be found under
+ 
+    xerces-c1_5_1-linux/lib/libxerces-c1_5_1.so
+    xml-xalan/c/lib/libxalan-c1_2.so
+
+Now you only have to enter the basepath of where you have extraced the 
+Xalan archive, when Makefile.PL asks you for it and proceed as normal.
+
+B<NOTE:> For special hints on compiling XALAN see below
+
+To use libxml/libxslt, download them from http://xmlsoft.org/ and install
+them on your system. Makefile.PL will automaticly detect the installed
+libraries and linked them into Embperl. (you have to make sure
+that xml2-config and xslt-config can be found and run by Makefile.PL)
+
+
+=head2 Debian packages
+
+The Debian packages are maintained by Angus Lees. Here are his
+installation hints:
+
+i've also setup an apt repository for those using stable (potato). to
+use it, just add these lines to /etc/apt/sources.list (deb-src line is
+only necessary if you want to download the source at some point):
+
+  deb http://www.cse.unsw.edu.au/~gusl/embperl stable/binary-$(ARCH)/
+  deb-src http://www.cse.unsw.edu.au/~gusl/embperl stable/source/
+
+then run "apt-get update" followed by either
+"apt-get install libhtml-embperl-perl" or just "apt-get upgrade" if
+you already have embperl installed.
+
+if you don't like apt, and want to do it the old fashioned way, i'm
+sure you can work out how to download the .deb manually.
+
+
+notes:
+
+currently i only have i386 packages built for stable. if anyone wants
+to build other archs and let me know, i can add them in (else, i can
+probably get a sparc and alpha version compiled)
+
+
+the package for unstable is compiled against perl5.6, so it has to
+conflict with earlier mod_perl packages that are compiled against
+perl5.5. unfortunately, there is no perl5.6 apache-perl package yet
+(drow assures me he's uploading one soon), so you have to make do with
+a DSO mod-perl (ie: apache + libapache-mod-perl) for now.
+
+
+=head2 UNIX (without Apache Source)
+
+If you have an UNIX with preinstalled Apache and mod_perl (e.g. a Linux 
+distribution), you need to locate the following files on your disk:
+
+ - httpd.h
+ - httpd
+ - mod_env.so
+
+For example in SuSE Linux 7.1 they could be found at
+
+ - /usr/include/apache/httpd.h
+ - /usr/sbin/httpd
+ - /usr/lib/apache/mod_env.so
+
+Now go to the Embperl directory and start 
+
+ perl Makefile.PL
+
+When get asked for the Apache sources, enter the directory where you
+found C<httpd.h> (e.g. C</usr/include/apache>). For the Apache executable
+enter the path to C<httpd>. If the Apache modules are loaded dynamicly,
+you will get ask for C<mod_env.so>, enter it's directory. Now you can
+continue as normal with
+
+ make test
+ make install
+  
+
+=head2 WIN 32 (non ActiveState Perl)
+
+
+B<NOTE:> You need mod_perl >= 1.12 on win32
+
+
+On Windows 95/98/ME/NT/2000/XP you have to do the following:
+
+=over 4
+
+=item perl Makefile.PL
+
+=item nmake (you must have the c compiler in your path)
+
+if you get an error about compiling Embperl.c. Edit Embperl.c and change
+
+    #line  "Embperl.xs"
+
+to
+
+    #line  1 "Embperl.xs"
+
+now re-run nmake and it should compile.
+
+=item nmake test
+
+
+B<NOTE:> C<nmake test> needs libwin32, libwww and HTML::Parser installed to work
+
+=item nmake install
+
+=back
+
+B<NOTE 1:> For using session handling you need
+Apache::Session 1.53 and Apache::SessionX 2.00b3 or higher. 
+
+B<NOTE 2:> I<Embperl> runs without additional Perl modules, but the C<make test>
+needs the following modules to work:
+
+=over 4
+
+=item * URI
+
+=item * MIME::Base64 
+
+=item * HTML::Parser 
+
+=item * HTML::HeadParser 
+
+=item * Digest::MD5 
+
+=item * libnet 
+
+=item * libwww 
+
+=item * libwin32 (only Win32) 
+
+=back
+
+B<NOTE 3:> I<EmbperlObject> needs the following modules to work:
+
+=over 4
+
+=item * File::Spec 0.8 or higher
+
+=back
+
+If you have already successfully build and tested C<mod_perl> all modules
+will already be there.
+
+
+=head2 WIN 32 with ActiveState Perl
+
+First get and install ActiveState Perl from http://www.activestate.com
+
+You can skip the installation of Apache and mod_perl, if you only want
+to use Embperl offline or as CGI.
+
+Next get the Apache binary (e.g. apache_1.3.22-win32-x86.msi) from        
+http://www.apache.org/dist/httpd/binaries/win32/ . (You may need to install the
+windows MSI installer from the same page too). Now run the Apache installation.
+
+Then run the ppm program to install mod_perl
+
+  ppm install http://theoryx5.uwinnipeg.ca/ppmpackages/mod_perl.ppd
+
+If you get asked for the Apache directory, enter the C<modules> subdirectory under the path
+where you have installed your Apache, e.g. 
+
+  \Program Files\Apache Group\Apache\modules
+
+As last step you need to install Embperl itself:
+
+  ppm install http://theoryx5.uwinnipeg.ca/ppmpackages/HTML-Embperl.ppd
+
+If you want to use session management, you have additionaly to install
+Apache::Session and Apache::SessionX
+
+  ppm install http://theoryx5.uwinnipeg.ca/ppmpackages/Apache-Session.ppd
+  ppm install http://theoryx5.uwinnipeg.ca/ppmpackages/Apache-SessionX.ppd
+
+
+=head2 Compile Embperl from the sources on WIN 32 with ActiveState Perl
+
+First install ActiveState Perl, Apache and mod_perl as described above. 
+(Of course when you want to use
+Embperl only offline or as CGI you don't have to install Apache and mod_perl)
+
+Then extract the Embperl distribution and go to the directory where you have extracted
+Embperl. Start
+
+  perl Makefile.PL
+
+Enter y or hit enter when you get ask "Build with support for Apache mod_perl?(y/n) [y]"
+When get asked for the Apache source enter the Apache directory you have installed above.
+e.g. \Program Files\Apache Group\Apache.
+
+Now you can continue by running 
+
+  nmake test
+  nmake install  
+
+
+=head2 WIN 32: Install Apache and non Apache version on the same system
+
+Unlike Unix, Windows loads any needed DLL (dynamic libraries) at startup. This 
+causes trouble when Embperl is compiled for use with Apache and mod_perl, but 
+is used outside of Apache, because Windows tries to load F<ApacheCore.dll>.
+To solve this problem Embperl 1.3.4+ can install a Apache and a non Apache
+version. To do this first install the Apache version as decribed above 
+(including the C<nmake install> !) . 
+Afterwards rerun Makefile.PL, when ask for mod_perl support answer no, now
+Makefile.PL detects that a mod_perl version was already compiled and asks
+if you what a separate non Apache version. Just say yes here and compile
+and install this version too. When Embperl is loaded it detects if runs in-
+or outside of Apache and loads the correct library.
+
+
+=head2 How to continue
+
+You can view the documentation at any time from the Embperl source directory,
+by using the following commands metioned below. After the installation you can
+also view documention by specifying the full module name: e.g.
+
+perldoc HTML::Embperl, perldoc HTML::Embperl::Intro etc.
+
+To get familiar how Embperl works, read the L<"Intro"|"Intro.pod"> and
+L<"IntroEmbperlObject"|"IntroEmbperlObject.pod"> documents. 
+To learn how to use and configure Embperl, read the L<"Embperl documentation"|"Embperl.pod">.
+
+
+=head2 Further Documentation (english)
+
+
+See L<"perldoc Features"|"Features.pod"> for list of Embperls features 
+
+See L<"perldoc Intro"|"Intro.pod"> for an step by step 
+introduction to Embperl.
+
+See L<"perldoc IntroEmbperlObject"|"IntroEmbperlObject.pod"> for an step by step 
+introduction to the OO features of Embperl.
+
+See L<"perldoc Embperl"|"Embperl.pod"> for complete documentation.
+
+See the L<"eg/"|"Examples.pod"> directory for examples.
+
+See L<"perldoc Faq"|"Faq.pod"> for Frequently Asked Questions.
+
+See L<"perldoc TipsAndTricks"|"TipsAndTricks.pod"> for Tips and Tricks 
+around Embperl.
+
+or you can view it online on http://perl.apache.org/embperl/
+
+=head2 Further Documentation (german)
+
+See B<perldoc FeaturesD> for list of Embperls features 
+
+See B<perldoc IntroD> for an step by step 
+introduction to Embperl.
+
+See B<perldoc EmbperlD> for complete documentation.
+
+or you can view it online on http://www.ecos.de/embperl/
+
+
+=head2 Compiling XALAN
+
+Normaly you should be fine with the binary packages that are provided for 
+XALAN. If you want to compile XALAN from the sources there should be normaly
+no problem as long as you use GNU gcc on Unix or Microsoft VC++ on Windows.
+
+Here are some hints how to compile XALAN 1.2 with the sun C++ 5.1:
+
+=over 4
+
+=item * Get the sources for XERCES and XALAN
+
+=item * Untar the files 
+
+Use GNU tar, solaris tar doesn't work! GNU tar can be found at
+ftp://ftp.mcc.ac.uk/pub/gnu/tar/tar-1.13.tar.gz
+
+=item * Set the root directories
+
+    export XERCESCROOT=/path/to/xerces-c-src1_5_1
+    export XALANCROOT=/path/to/xml-xalan/c
+ 
+=item * Compile XERCES
+
+    cd xerces-c-src1_5_1/src
+    sh runConfigure -p solaris -c cc -x CC
+    make
+
+=item * Patch XALAN
+
+There must be one typecast inserted in the following three files:
+
+    
+    "c/src/XSLT/ExtensionFunctionHandler.cpp", line 156
+    156c156
+    < 	return m_functions.find(function) != m_functions.end();
+    ---
+    > 	return StringSetType::const_iterator(m_functions.find(function)) != m_functions.end();
+
+    "c/src/XSLT/ExtensionNSHandler.cpp", line 200
+    200c200
+    <     return (m_elements.find(element) != m_elements.end());
+    ---
+    >     return (ExtensionSetType::const_iterator(m_elements.find(element)) !=  m_elements.end());
+
+    "c/src/XSLT/NamespacesHandler.cpp", line 366
+    366c366
+    < 			|| m_extensionNamespaceURIs.find(theURI) != m_extensionNamespaceURIs.end()
+    ---
+    > 			|| ExtensionNamespaceURISetType::const_iterator(m_extensionNamespaceURIs.find(theURI)) != m_extensionNamespaceURIs.end()
+
+
+
+=item * Compile XALAN
+
+    cd xml-xalan/c/src
+    sh runConfigure -p solaris -c cc -x CC -z "-D__GNUC__"
+    make
+
+B<NOTE:> I found that only the above parameters to configure work.
+Don't worry that __GNUC__ is defined. It works with sun C++ 5.1.
+When using sun C++ 5.1 you don't need the STLPort template library.
+
+=item * Make the libraries available
+
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/path/to/xerces-c-src1_5_1/lib:/path/to/xml-xalan/c/lib 
+
+=item * Now you can run Embperl's Makefile.PL as described above
+

@@ -1,0 +1,70 @@
+=head1 NAME
+
+HTML::HTML5::DOM::HTMLDListElement - implementation of the HTMLDListElement interface of the HTML DOM
+
+=head1 DESCRIPTION
+
+HTML::HTML5::DOM::HTMLDListElement is an implementation of the HTMLDListElement interface of the HTML DOM. See L<HTML::HTML5::DOM> for a list of the conventions that have been used when translating the DOM to Perl.
+
+=head2 HTML Elements
+
+This class applies to the following HTML elements.
+
+=over
+
+=item * C<< {http://www.w3.org/1999/xhtml}dl >>
+
+=back
+
+=head2 Inheritance
+
+HTML::HTML5::DOM::HTMLDListElement inherits methods from the following Perl classes.
+
+=over
+
+=item * L<HTML::HTML5::DOM::HTMLElement>
+
+=item * L<XML::LibXML::Augment::Element>
+
+=item * L<XML::LibXML::Augment::Node>
+
+=item * L<XML::LibXML::Element>
+
+=item * L<XML::LibXML::Node>
+
+=item * L<XML::LibXML::QuerySelector>
+
+=item * L<HTML::HTML5::DOMutil::FancyISA>
+
+=back
+
+=head2 Additional Methods
+
+This class provides no additional methods over those it inherits.
+
+It is mostly pointless, but its existance is required by the HTML DOM.
+
+=head1 BUGS
+
+L<http://rt.cpan.org/Dist/Display.html?Queue=HTML-HTML5-DOM>.
+
+=head1 SEE ALSO
+
+L<HTML::HTML5::DOM>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2012, 2014 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+
+

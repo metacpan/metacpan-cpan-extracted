@@ -1,0 +1,39 @@
+0.07 - 2006-08-03
+  - fixed warnings when passing an empty string to parse() or
+     reverse(), it should now just return an empty string
+     without unnecessary warnings.
+  - $_ is now untouched outside the function's scope
+  - small fix in documentation
+
+0.06 - 2006-02-15
+  - fixed a bug with (incorrectly) removing tags when they are
+     not allowed. This bug was added in 0.05.
+  - fixed XSS bug and added no_jslink option. Thanks to Alex
+     for reporting and M. Blom for notifiying me.
+
+0.05 - 2006-01-22
+  - fixed a bug with extra newlines at the end of the string
+  - fixed a bug with multiple list-tags at the same line, this
+     should now work without problems
+  - added [html]-tag
+  - rewrote and combined the parsing and reversing code for
+     the [code], [list] and [html] tags, this should speed up
+     some things :)
+  - small code cleanup
+  - documented the supported BBCode
+
+0.04 - 2005-11-10
+  - added compatibility with Makefile.PL, the CPAN shell didn't
+     like the Build.PL
+
+0.03 - 2005-11-09
+  - fixed documentation
+  - changed to Module::Build for the installation process
+  - fixed bugs #16402 and #16403 reported by M. Blom
+
+0.02 - 2005-11-08
+  - fixed bug in the distribution, CPAN should now be able to 
+     index HTML::BBReverse.
+
+0.01 - 2005-11-07
+  - first version

@@ -1,0 +1,22 @@
+# http://module-build.sourceforge.net/META-spec.html
+name:         Hash-Extract
+version:      0.02
+version_from: lib/Hash/Extract.pm
+installdirs:  site
+author:       YAMASHINA Hio <hio@cpan.org>
+abstract:     extract hash values onto lexical variables.
+license:      perl
+requires:
+  PadWalker: 0
+build_requires:
+  Test::More: 0
+no_index:
+  directory:
+    - inc
+    - t
+
+distribution_type: module
+generated_by: ExtUtils::MY_Metafile version 0.08, EUMM-6.17.
+meta-spec:
+  version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html

@@ -1,0 +1,51 @@
+Hash-AutoHash-AVPairsMulti
+
+This is a subclass of Hash::AutoHash which wraps a tied hash whose
+elements contain multiple simple values like numbers and strings, not
+references.  Hash::AutoHash::Record uses this class to represent
+attribute-value pairs parsed from text
+files. Hash::AutoHash::AVPairsSingle is similar but requires each
+attribute to have a single value.  Hash::AutoHash::MultiValued is
+similar, but permits values to be non-simple, ie, references.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Hash::AutoHash::AVPairsMulti
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Hash-AutoHash-AVPairsMulti
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Hash-AutoHash-AVPairsMulti
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Hash-AutoHash-AVPairsMulti
+
+    Search CPAN
+        http://search.cpan.org/dist/Hash-AutoHash-AVPairsMulti/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Nat Goodman
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

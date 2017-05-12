@@ -1,0 +1,9 @@
+# skip vim temp files
+\.swp$
+# skip git
+\.git
+# skip default files
+Makefile$
+MANIFEST.bak
+MYMETA.json
+MYMETA.yml

@@ -1,0 +1,30 @@
+--- #YAML:1.0
+name:               Ham-Packet-DXSpider
+version:            0.04
+abstract:           Receives DX Spots from the DXCluster
+author:
+    - Bruce James <custard@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    IO::Handle:           0
+    IO::Socket:           0
+    IO::Socket::INET:     0
+    Moose:                0
+    perl:                 5.006
+    POSIX:                0
+    Test::More:           0
+    Test::Pod:            0
+    Test::Pod::Coverage:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

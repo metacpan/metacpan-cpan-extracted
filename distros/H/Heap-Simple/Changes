@@ -1,0 +1,53 @@
+Revision history for Perl extension Heap::Simple.
+
+0.13	2008-01-27 14:57:46 UT
+	- No functional changes
+	- Added "cover" and "ppm uninstall private make targets
+	- Removed "ppm_update" private make target
+	- Demand Heap::Simple::Perl 0.13 which got a workaround for a perl 5.6
+	  bug
+
+0.12	2008-01-13 16:17:30 UT
+	- No functional changes
+	- Removed the comment that for equal keys the code reference order is
+	  free to return either true or false. That was never completely true
+	  and it can confuse things like "extract_upto".
+	- Small clarifications in the documentation
+	- Added MANIFEST.SKIP
+	- added private "ppm_install" and "ppm_update" make targets
+	- Added PackageTools based versioning
+	- Demand at least version 0.10 for Heap::Simple::XS
+	- Stop being a flat distribution
+
+0.11	2005-11-30
+	- Fixed a missing interpolation in Makefile.PL. This only changes
+	  the text shown during make and doesn't change any functionality
+
+0.10	2005-11-20
+	- Fetch required versions of Heap::Simple::XS and Heap::Simple::Perl in
+          Makefile.PL, and warn about out of order upgrades
+	- Updated documentation (fixes, new functionality)
+	    - insert/key_insert can now take a variable number of arguments
+	    - absorb/key_absorb can now take a variable number of arguments
+	    - new method merge_arrays
+	    - new method extract_all
+        - Updated minimum version numbers of Heap::Simple::Perl and
+          Heap::Simple::XS so that they support the new documented features
+	- Replaced :: by - in author email address (easier quoting for mailers)
+
+0.09  2004-11-11
+	- Remove double documentation of "first"
+        - Fixed email in Makefile.PL
+        - Oops, required perl 5.8.4 in the Makefile.PL. Module should however
+          work on any perl5
+        - Updated minimum version numbers of Heap::Simple::Perl and
+          Heap::Simple::XS
+
+0.08  2004-10-25
+	- Increase the version number so it's higher than the old Heap::Simple
+          (which is now Heap::Simple::Perl). 0.07 was an accidental upload of
+          Heap::Simple::Perl with the wrong name for the tar.gz file
+
+0.01  2004-10-23
+	- original version; created by h2xs 1.23 with options
+		-X -n Heap::Simple

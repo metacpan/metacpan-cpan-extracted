@@ -1,0 +1,9 @@
+Revision history for Perl extension HTML::WidgetValidator::Widget::PixivEmbedFeature.
+
+* 0.03  Tue Jul  1 19:30:12 2008
+	- Re-packaging
+
+* 0.01  Sun Jun 29 15:26:01 2008
+	- original version; created by h2xs 1.23 with options
+		-AX -n HTML::WidgetValidator::Widget::PixivEmbedFeature
+

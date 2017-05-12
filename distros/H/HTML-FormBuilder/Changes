@@ -1,0 +1,38 @@
+Revision history for HTML-FormBuilder
+
+0.11  2015-12-10
+        - encode / decode HTML entities in get / set field
+
+0.10  2015-10-12
+        - allow <input>, heading /traling text to be wrapped in <div>, for better checkbox styling
+        - Add no_new_line option for comment only field
+
+0.09  2015-10-08
+        - add validation type "checkbox_checked", ensure checkbox is checked
+
+0.08  2015-09-23
+        - csrf in build_confirmation_button_with_all_inputs_hidden
+
+0.07  2015-09-20
+        - csrf supports
+
+0.06  2015-08-03 12:05:30 CST
+        - HTML::FormBuilder::Validation add onsubmit_js_error
+        - change class mapping to global var $HTML::FormBuilder::Base::CLASSES
+
+0.05  2015-01-26 13:05:49 CST
+        - FormBuilder add_fieldset will return a FormBuilder::FieldSet object
+        - amend the pod
+        - change some html class name
+
+0.04  2015-01-14 21:54:55 CST
+        - small fixes
+
+0.03  2015-01-12 10:20:13 CST
+        - perltidy/critic
+
+0.02  2015-01-09 17:28:52 CST
+        - no code changes
+
+0.01  2015-01-09 15:02:46 CST
+        - Initial release

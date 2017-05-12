@@ -1,0 +1,73 @@
+NAME
+    Hash::Dispatch - Find CODE in a hash (hashlike)
+
+VERSION
+    version 0.0010
+
+SYNOPSIS
+        $dispatch = Hash::Dispatch->dispatch(
+
+            'xyzzy' => sub {
+                return 'xyzzy';
+            },
+
+            qr/.../ => 'xyzzy',
+
+            ...
+
+        );
+
+        $result = $dispatch->dispatch( 'xyzzy' );
+
+        $result->value->( ... );
+
+DESCRIPTION
+    Hash::Dispatch is a tool for creating a hash-like lookup for returning a
+    CODE reference
+
+    It is hash-like because a query against the dispatcher will only return
+    once a CODE reference a found. If a key (a string or regular expression)
+    maps to a string, then that will cause the lookup to begin again with
+    the new value, recursing until a CODE reference is found or a deadend is
+    reached:
+
+        a => CODE0
+        b => CODE1
+        c => CODE2
+        d => a
+        qr/z/ => c
+
+        query( a ) => CODE0
+        query( b ) => CODE1
+        query( d ) => CODE0
+        query( xyzzy ) => CODE2
+        query( j ) => undef
+
+    Hash::Dispatch will throw an exception if it is cycling:
+
+        a => b
+        b => a
+
+        query( a ) => {{{ Exception! }}}
+
+USAGE
+  $dispatcher = Hash::Dispatch->dispatch( ... )
+    Returns a new $dispatcher with the given mapping
+
+  $result = $dispatcher->dispatch( <query> )
+    Search $dispatcher with "<query>"
+
+    Returns an object with a "->value" method that contains the CODE
+    reference
+
+    Returns undef is nothing is found
+
+AUTHOR
+    Robert Krimen <robertkrimen@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Robert Krimen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

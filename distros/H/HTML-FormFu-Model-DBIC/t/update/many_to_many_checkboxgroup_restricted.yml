@@ -1,0 +1,19 @@
+---
+auto_fieldset: 1
+
+elements:
+  - type: Hidden
+    name: id
+
+  - type: Text
+    name: name
+
+  - type: Checkboxgroup
+    name: bands
+    model_config:
+      model: Bands
+      condition:
+        manager: 1
+
+  - type: Submit
+    name: submit

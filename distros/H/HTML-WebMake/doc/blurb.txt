@@ -1,0 +1,89 @@
+<wmmeta name="Title" value="The Blurb" />
+<wmmeta name="Section" value="01-intro" />
+<wmmeta name="Score" value="10" />
+<wmmeta name="Abstract">
+What it is, and what it does
+</wmmeta>
+
+WebMake is a simple content management system, based around a templating
+system for HTML documents, with lots of built-in smarts about what a
+''typical'' informational website needs in the way of functionality; metadata,
+sitemapping, navigational aids, and (of course) embedded perl code. ;)
+
+  - **Creates portable sites**: It requires no dynamic scripting capabilities
+    on the server; WebMake sites can be deployed to a plain old FTP site
+    without any problems.
+
+  - **No need to edit lots of files:** A multi-level website can be generated
+    entirely from 1 WebMake file containing content, links to content files,
+    perl code (if needed), and output instructions. 
+
+  - **Useful for team work:** Since the file-to-page mapping is no longer
+    required, WebMake allows the separation of responsibilities between the
+    content editors, the HTML page designers, and the site architect. Only the
+    site architect needs to edit the WebMake file itself, or know perl or
+    WebMake code.  Standard file access permissions can be used to restrict
+    editing by role.
+
+  - **Efficient:** WebMake supports dependency checking, so a one-line change
+    to one source file will not regenerate your entire site -- unless it's
+    supposed to.  Only the files that refer to that chunk of content, however
+    indirectly, will be modified.
+
+  - **Supports content conversion, on the fly:** Text can be edited as
+    standard HTML, converted from plain text (see below), or converted from
+    any other format by adding a conversion method to the
+    WebMake::FormatConvert module.
+
+  - **Edit text as text, not as HTML:** One of the built-in content conversion
+    modules is "Text::EtText" [ettext], which provides an easy-to-edit,
+    easy-to-read and intuitive way to write HTML, based on the plain-text
+    markup conventions we've been using for years.
+
+    	[ettext]: $(ettext)
+
+  - **Rearrange your site in 30 seconds:** Since URLs can be referred to
+    symbolically, pages can be moved around and URLs changed by changing just
+    one line.  All references to that URL will then change automatically. This
+    is vaguely Xanalogical [xanadu].
+
+	Auto: [xanadu]: http://www.sfc.keio.ac.jp/~ted/XUsurvey/xuDation.html
+
+  - **Scriptable:** Content items and output URLs can be generated, altered,
+    or read in dynamically using perl code.  Perl code can even be used to
+    generate other perl code to generate content/output URLs/etc.,
+    recursively. New tags can be defined and interpreted in perl.
+
+  - **Extensible:** New tags (for use in content items or in the WebMake file
+    itself) can be added from perl code, providing what amounts to a
+    dynamically-loaded plugin API.
+
+  - **Inclusion of text:** Content can incorporate other content items, simply
+    by referring to it's name.  This is a form of "Xanadu-style transclusion"
+    [xanadu].
+
+  - **Edit content in your web browser:** WebMake now includes webmake.cgi,
+    which provides a CGI front-end to editing and managing a WebMake site.
+
+  - **Site replication:** with webmake.cgi's CVS integration, multiple copies
+    of the same site can be replicated, and changes made on any of the sites
+    will be automatically replicated to all the others.
+
+  - **Version control:** changes made to sites using webmake.cgi will be kept
+    under CVS version control, so older versions of the site can be ''rolled
+    back'' if necessary.
+
+But enough of the bulleted lists.  Here's where you should start:
+
+  - First of all, read <a href=$(concepts)>WebMake Concepts</a> for a quick
+    intro to the assumptions and concepts that are used in WebMake.
+
+  - Next, read <a href=$(making)>WebMake Operation</a> for an overview
+    of how WebMake operates.
+
+  - Then, read <a href=$(firsttime)>How To Migrate to WebMake</a> for a guide
+    to bringing an existing, simple web site into WebMake.
+
+  - After that, you just need to read the rest of the manual, which is mostly
+    reference text.  Good luck!
+

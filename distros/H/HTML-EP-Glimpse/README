@@ -1,0 +1,180 @@
+NAME
+    HTML::EP::Glimpse - A simple search engine using Glimpse
+
+SYNOPSIS
+      <!-- Put the following in your EP page: -->
+      <!-- Load the Glimpse package: -->
+      <ep-package name="HTML::EP::Glimpse">
+      <!-- Run glimpse: -->
+      <ep-glimpse-search>
+      <!-- List the hits: -->
+        <ep-list items=files item=f>
+          <tr><td><a href="$f->url$">$f->title$</a></td>
+        </ep-list>
+
+DESCRIPTION
+    This is a simple search engine I wrote for the movie pages of a friend,
+    Anne Haasis.
+
+    It is based on HTML::EP, my embedded Perl system and Glimpse, the well
+    known indexing system, as a backend.
+
+INSTALLATION
+    First of all, you have to install the latest version of HTML::EP, 0.20
+    or later, and it's prerequisites. Next you have to install this package,
+    HTML::EP::Glimpse. If you don't know how to install Perl packages, it's
+    fairly simple: Fetch the required archives from any CPAN mirror, for
+    example
+
+      ftp://ftp.funet.fi/pub/languages/perl/CPAN/modules/by-module/HTML
+
+    and then do, for example
+
+      gzip -cd HTML-EP-0.20.tar.gz | tar xf -
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+    It's even more simple, if you have the CPAN module available:
+
+      perl -MCPAN -e shell
+      install HTML::EP
+      install HTML::EP::Glimpse
+
+    While running perl Makefile.PL in the HTML::EP::Glimpse directory,
+    you'll be prompted some questions. These are explained in the
+    CONFIGURATION section below. See the CONFIGURATION manpage.
+
+    Your web server must be ready for serving EP pages. See the HTML::EP
+    docs for details of the web server configuration. the HTML::EP(3)
+    manpage.
+
+CONFIGURATION
+    The module is configured at installation time when running perl
+    Makefile.PL. However, you can repeat the configuration at any later time
+    by running perl -MHTML::EP::Glimpse::Install -e Config.
+
+    Configuration will create a module *HTML::EP::Glimpse::Config*, which
+    holds a single hash ref with the following keys:
+
+    install_html_files
+        A TRUE (yes) value means, that the HTML examples will be copied to
+        your web servers document root. This is recommended, unless you have
+        an existing installation with own modifications in the HTML files.
+        Of course you wouln't want to overwrite your own files.
+
+    html_base_dir
+        Base directory, where you put your HTML files to. The default is
+        /home/httpd/html/Glimpse, which is fine on a Red Hat Linux box.
+
+    vardir
+        A directory, where the web server is allowed to create files, in
+        particular your preferences and the Glimpse index. By default the
+        subdirectory admin/var of the base directory is choosen.
+
+    httpd_user
+        The UID under which your web server is running CGI binaries. The
+        vardir must have read, execute and write permissions for this user.
+        The default is *nobody*, which is fine on a Red Hat Linux box again.
+
+    glimpse_path
+    glimpseindex_path
+        Path of the *glimpse* and *glimpseindex* binaries.
+
+  The Preferences
+
+    All other settings are fixed via the Web browser. Assuming your base
+    directory is accessible via
+
+      http://localhost/Glimpse/
+
+    point your browser to
+
+      http://localhost/Glimpse/admin/index.ep
+
+    and enter the preferences page. The following items must be entered
+    here:
+
+    Web servers root directory
+        This is your web servers home directory, for example
+
+          /home/httpd/html
+
+        on a Red Hat Linux box.
+
+    Directories being indexed
+        Usually you just put the value / here, because you want your whole
+        web server being indexed. However, if you want restrict the index to
+        some directories, enter them here. For example, if you have a manual
+        in /manual and want to index the manual directory only, then enter
+
+          /manual
+
+        The directory names are relative to the servers root directory.
+
+    Directories being excluded
+        If you don't want your whole directory tree being indexed, you can
+        also exclude some directories. For example, there's not much sense
+        in indexing the Glimpse directory, so I usually enter
+
+          /Glimpse
+
+        here.
+
+    Suffixes of files being indexed
+        Of course you don't want all files being indexed. For example,
+        there's not much sense in indexing GIF's or JPEG's. By default only
+        files with the extensions *.htm* and *.html* are indexed. If you
+        want your EP files being indexed as well, add a *.ep*. Likewise you
+        might want to add *.php* for PHP3 files or *.txt* for text files.
+
+  Running glimpseindex
+
+    As soon as you modified your preferences, you should create an index.
+    This is done by returning to the admin menu and calling the index page.
+
+    The same procedure should be repeated each time you modify your HTML
+    files. If this is happening frequently, you might prefer using a cron
+    job, for example
+
+      su - nobody -c "/usr/bin/glimpseindex -b -H $vardir -X"
+
+    with $vardir being the vardir from above. Note that your job shouln't
+    run as root, unless you want to disable a manual recreation via the web
+    browser.
+
+  Configuring for multiple virtual servers or multiple directories
+
+    So far configuration is fine, but can you use multiple instances of
+    HTML::EP::Glimpse on one machine? Of course you can!
+
+    It is quite simple: Just copy the base directory to another location.
+    Then create a subdirectory admin/lib/HTML/EP/Glimpse of the new base
+    directory. Create a new configuration by running
+
+      cd $basedir/admin/lib/HTML/EP/Glimpse
+      perl -MHTML::EP::Glimpse::Install -e Config Config.pm
+
+    That's it!
+
+AUTHOR AND COPYRIGHT
+    This module is
+
+        Copyright (C) 1998-1999     Jochen Wiedmann
+                                    Am Eisteich 9
+                                    72555 Metzingen
+                                    Germany
+
+                                    Phone: +49 7123 14887
+                                    Email: joe@ispsoft.de
+
+    All rights reserved.
+
+    You may distribute this module under the terms of either the GNU General
+    Public License or the Artistic License, as specified in the Perl README
+    file.
+
+SEE ALSO
+    the DBI(3) manpage, the CGI(3) manpage, the HTML::Parser(3) manpage
+

@@ -1,0 +1,88 @@
+{
+   "abstract" : "Job submission using threads",
+   "author" : [
+      "Jillian Rowe, C<< <jillian.e.rowe at gmail.com> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.027, Dist::Milla version v1.0.9, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HPC-Runner-Threads",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.9",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Cwd" : "0",
+            "Data::Dumper" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::Duration" : "0",
+            "File::Path" : "0",
+            "File::Temp" : "0",
+            "IO::File" : "0",
+            "IO::Select" : "0",
+            "IPC::Open3" : "0",
+            "Log::Log4perl" : "0",
+            "Moose" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "MooseX::Getopt" : "0",
+            "MooseX::Getopt::Usage::Role::Man" : "0",
+            "MooseX::SimpleConfig" : "0",
+            "Symbol" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://bitbucket.org/jir2004/hpc-runner-threads/issues"
+      },
+      "homepage" : "https://bitbucket.org/jir2004/hpc-runner-threads",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git@bitbucket.org:jir2004/hpc-runner-threads.git",
+         "web" : "https://bitbucket.org/jir2004/hpc-runner-threads"
+      }
+   },
+   "version" : "2.35",
+   "x_contributors" : [
+      "Jillian Rowe <jir2004@qatar-med.cornell.edu>"
+   ]
+}
+

@@ -1,0 +1,51 @@
+{
+   "abstract" : "enhanced, high-resolution logging for Helios applications",
+   "author" : [
+      "Andrew Johnson <lajandy at cpan dot org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HeliosX-Logger-HiRes",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Helios" : "2.8",
+            "JSON::Tiny" : "0.48",
+            "Time::HiRes" : "1.86",
+            "Time::Piece" : "1.12",
+            "parent" : "0.221",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "git://github.com/logicalhelion/heliosx-logger-hires.git"
+      }
+   },
+   "version" : "1.00"
+}

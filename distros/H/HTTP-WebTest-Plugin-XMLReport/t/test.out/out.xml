@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testresults date="A_DATESTAMP">
+<group name="xmltest" url="A_URL">
+<test name="Status code check">
+<result status="PASS">Expected '200' and got: 200 OK</result>
+</test>
+<test name="Forbidden text">
+<result status="PASS">Internal Server Error</result>
+</test>
+<test name="Required text">
+<result status="PASS">SEE_ALSO</result>
+<result status="PASS">&lt;/html&gt;</result>
+<result status="FAIL">This SHOULD fail</result>
+</test>
+</group>
+</testresults>

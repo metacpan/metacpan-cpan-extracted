@@ -1,0 +1,56 @@
+Revision history for Perl extension HTTP::Server::EV.
+
+0.69
+	- Using socket object instead of port not worked, fixed
+	- Fixed bug with : symbol in header values
+
+0.68
+	- Make-time configuration of buffer sizes
+	- Added Coro to test prerequisites. 
+
+0.66
+	- Bugfix, thanx Edgar Fuß 
+
+0.65
+	- ~300% Faster urldecode
+	- Any HTTP methods now supported. Server just parses headers, use $cgi->fh to process body of PUT or other methods
+	- Added ->flush_wait and ->give_up_handle methods in HTTP::Server::EV::Buffer
+	- Fixed stack corruption, thanx Edgar Fuß 
+
+0.6
+	- Implemented HTTP::Server::EV::Buffer onerror(ondisconnect) callback
+	- Listen now can accept IO::Socket::INET object with socket to listen
+	- Added support of sharing one listening socket per several forks, and fork_hook cb to integrate with fork managers
+	- Fixed bug when only first defined port listener worked
+	- Fixed segfault when starting/stopping PortListener
+
+0.5
+	- Implemented timeout for not received connections
+
+0.41 
+	- Bugfixes
+
+0.4 
+	- Written tests
+	- HTTP::Server::EV::PortListener module
+	- Rewritten disk IO code. Now it can use built in perl functions or IO::AIO module.
+	- Fixed segfault when uploading zero size file
+	- Multipart processing callbacks. 
+	- Coro support
+
+
+0.31  
+	- Fixed non ARRAY reference error when cgi->param called in list context with nonexistent param name
+	- Added explicit type-casting, no more compiler warnings
+	- Little documentation fix
+
+
+0.21  
+	- Written HTTP::Server::EV::Buffer - non blocking output
+	- Written HTTP::Server::EV::BufTie - workaround to correct handling requests in Coro threads
+	- Some changes in HTTP::Server::EV::CGI to provide non blocking output
+	- Multipart files now deleted on self object DESTROY, not on parent CGI object DESTROY, so you can work with files after deleting request object
+
+0.1  Fri Nov  4 19:50:01 2011
+	- first release
+

@@ -1,0 +1,51 @@
+Failed  Succeeded  Test Name
+   1          2    *** no name ***
+   0          3    *** no name ***
+   2          3    *** no name ***
+   1          3    *** no name ***
+
+
+Test Name: N/A
+URL: http://http.web.test/test-file1
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  FORBIDDEN TEXT
+    123456                                                       SUCCEED
+    test test                                                    FAIL
+
+
+Test Name: N/A
+URL: http://http.web.test/test-file1
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  REQUIRED TEXT
+    987654                                                       SUCCEED
+    failed test                                                  SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/test-file1
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  FORBIDDEN REGEX
+    (?-xism:\d{400})                                             SUCCEED
+    \s1\s2\s3\s\w{20}                                            SUCCEED
+    abcde                                                        FAIL
+    failed\s\w\w\w\w                                             FAIL
+
+
+Test Name: N/A
+URL: http://http.web.test/test-file1
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  REQUIRED REGEX
+    (?-xism:\w+)                                                 SUCCEED
+    \s\d{3}\s                                                    SUCCEED
+    (?-xism:(?:\w\d){10,})                                       FAIL
+
+
+Total web tests failed: 4  succeeded: 11

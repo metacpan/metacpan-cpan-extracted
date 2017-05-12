@@ -1,0 +1,5 @@
+Level 0
+-------
+
+The next level's password is in an HTML comment, so
+simply right-click, and view source.

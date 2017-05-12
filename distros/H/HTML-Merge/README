@@ -1,0 +1,13 @@
+
+HTML::Merge is an embedded HTML/SQL/Perl system
+
+please read INSTALL !
+
+for more information read the documentation in the modules.
+
+see HTML::Merge 
+see HTML::Merge::Tags 
+see HTML::Merge::Ext
+ 
+on Linux after install you may use man to read documentation (e.g. man HTML::Merge).
+on other platform use perldoc (e.g. perldoc HTML::Merge::Tags).

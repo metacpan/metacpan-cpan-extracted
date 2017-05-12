@@ -1,0 +1,19 @@
+HTML-HTML5-DOM
+==============
+
+Created:      2012-02-27
+Home page:    <https://metacpan.org/release/HTML-HTML5-DOM>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=HTML-HTML5-DOM>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.002	2014-06-01
+
+ [ Packaging ]
+ - use Dist::Inkt.
+
+ [ Other ]
+ - Methods which returned a Web::Magic object have been altered to return
+   an HTTP::Request object instead.
+ - Updated: Avoid smart match; use match::simple instead.
+
+0.001	2012-07-15	Initial release

@@ -1,0 +1,230 @@
+<html><head><title>HTML::AsText::Fix</title>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" >
+</head>
+<body class='pod'>
+<a name='___top' class='dummyTopAnchor' ></a>
+
+<div class='indexgroup'>
+<ul   class='indexList indexList1'>
+  <li class='indexItem indexItem1'><a href='#NAME'>NAME</a>
+  <li class='indexItem indexItem1'><a href='#VERSION'>VERSION</a>
+  <li class='indexItem indexItem1'><a href='#SYNOPSIS'>SYNOPSIS</a>
+  <li class='indexItem indexItem1'><a href='#DESCRIPTION'>DESCRIPTION</a>
+  <ul   class='indexList indexList2'>
+    <li class='indexItem indexItem2'><a href='#Distinction_between_block%2Finline_nodes'>Distinction between block/inline nodes</a>
+  </ul>
+  <li class='indexItem indexItem1'><a href='#FUNCTIONS'>FUNCTIONS</a>
+  <ul   class='indexList indexList2'>
+    <li class='indexItem indexItem2'><a href='#as_text'>as_text</a>
+    <li class='indexItem indexItem2'><a href='#global'>global</a>
+    <li class='indexItem indexItem2'><a href='#object'>object</a>
+  </ul>
+  <li class='indexItem indexItem1'><a href='#SEE_ALSO'>SEE ALSO</a>
+  <li class='indexItem indexItem1'><a href='#ACKNOWLEDGEMENTS'>ACKNOWLEDGEMENTS</a>
+  <li class='indexItem indexItem1'><a href='#AUTHOR'>AUTHOR</a>
+  <li class='indexItem indexItem1'><a href='#COPYRIGHT_AND_LICENSE'>COPYRIGHT AND LICENSE</a>
+</ul>
+</div>
+
+<h1><a class='u' href='#___top' title='click to go to top of document'
+name="NAME"
+>NAME</a></h1>
+
+<p>HTML::AsText::Fix - extends HTML::Element::as_text() to render text properly</p>
+
+<h1><a class='u' href='#___top' title='click to go to top of document'
+name="VERSION"
+>VERSION</a></h1>
+
+<p>version 0.003</p>
+
+<h1><a class='u' href='#___top' title='click to go to top of document'
+name="SYNOPSIS"
+>SYNOPSIS</a></h1>
+
+<pre>    # fix individual objects
+    my $tree = HTML::TreeBuilder::XPath-&#62;new_from_content($html);
+    my $guard = HTML::AsText::Fix::object($tree);
+
+    # fix deeply nested objects
+    use URI;
+    use Web::Scraper;
+
+    # First, create your scraper block
+    my $tweets = scraper {
+        process &#34;li.status&#34;, &#34;tweets[]&#34; =&#62; scraper {
+            process &#34;.entry-content&#34;, body =&#62; &#39;TEXT&#39;;
+            process &#34;.entry-date&#34;, when =&#62; &#39;TEXT&#39;;
+            process &#39;a[rel=&#34;bookmark&#34;]&#39;, link =&#62; &#39;@href&#39;;
+        };
+    };
+
+    my $res;
+    {
+        my $guard = HTML::AsText::Fix::global();
+        $res = $tweets-&#62;scrape( URI-&#62;new(&#34;http://twitter.com/creaktive&#34;) );
+    }</pre>
+
+<h1><a class='u' href='#___top' title='click to go to top of document'
+name="DESCRIPTION"
+>DESCRIPTION</a></h1>
+
+<p>Consider the following HTML sample:</p>
+
+<pre>    &#60;p&#62;
+        &#60;span&#62;AAA&#60;/span&#62;
+        BBB
+    &#60;/p&#62;
+    &#60;h2&#62;CCC&#60;/h2&#62;
+    DDD
+    &#60;br&#62;
+    EEE</pre>
+
+<p><code>HTML::Element::as_text()</code> method stringifies it as <i>AAABBBCCCDDDEEE</i>. Despite being correct, this is far from the actual renderization within a &#34;real&#34; browser. <a href="http://man.he.net/man1/links" class="podlinkman"
+>links(1)</a>, <a href="http://man.he.net/man1/lynx" class="podlinkman"
+>lynx(1)</a> &#38; <a href="http://man.he.net/man1/w3m" class="podlinkman"
+>w3m(1)</a> break lines this way:</p>
+
+<pre>    AAABBB
+    CCC
+    DDD
+    EEE</pre>
+
+<p>This module tries to implement the same behavior in the method <a href="http://search.cpan.org/perldoc?HTML%3A%3AElement#as_text" class="podlinkpod"
+>&#34;as_text&#34; in HTML::Element</a>. By default, <code>$/</code> value is inserted in place of line breaks, and <code>&#34;\x{200b}&#34;</code> (Unicode zero-width space) separates text from adjacent inline elements.</p>
+
+<h2><a class='u' href='#___top' title='click to go to top of document'
+name="Distinction_between_block/inline_nodes"
+>Distinction between block/inline nodes</a></h2>
+
+<p>&#34;span&#34;, for instance, is an inline node:</p>
+
+<pre>    &#60;p&#62;&#60;span&#62;A&#60;/span&#62;pple&#60;/p&#62;</pre>
+
+<p>In that case, there really shouldn&#39;t be a space between &#34;A&#34; and &#34;pple&#34;. To handle inline nodes properly, only block nodes are separated by line break. Following nodes are currently assumed being blocks:</p>
+
+<ul>
+<li>p</li>
+
+<li>h1 h2 h3 h4 h5 h6</li>
+
+<li>dl dt dd</li>
+
+<li>ol ul li</li>
+
+<li>dir</li>
+
+<li>address</li>
+
+<li>blockquote</li>
+
+<li>center</li>
+
+<li>del</li>
+
+<li>div</li>
+
+<li>hr</li>
+
+<li>ins</li>
+
+<li>noscript script</li>
+
+<li>pre</li>
+
+<li>br (just to make sense)</li>
+</ul>
+
+<p>(source: <a href="http://en.wikipedia.org/wiki/HTML_element#Block_elements" class="podlinkurl"
+>http://en.wikipedia.org/wiki/HTML_element#Block_elements</a>)</p>
+
+<h1><a class='u' href='#___top' title='click to go to top of document'
+name="FUNCTIONS"
+>FUNCTIONS</a></h1>
+
+<h2><a class='u' href='#___top' title='click to go to top of document'
+name="as_text"
+>as_text</a></h2>
+
+<p>The replacement function. Not to be used separately. It is injected inside <a href="http://search.cpan.org/perldoc?HTML%3A%3AElement" class="podlinkpod"
+>HTML::Element</a>.</p>
+
+<h2><a class='u' href='#___top' title='click to go to top of document'
+name="global"
+>global</a></h2>
+
+<p>Hook into every <a href="http://search.cpan.org/perldoc?HTML%3A%3AElement" class="podlinkpod"
+>HTML::Element</a> within the lexical scope. Returns the guard object, destroying it will unhook safely.</p>
+
+<p>Accepts following options:</p>
+
+<ul>
+<li><b>lf_char</b>: character inserted between block nodes (by default, <code>$/</code>);</li>
+
+<li><b>zwsp_char</b>: character inserted between inline nodes (by default, <code>&#34;\x{200b}&#34;</code>, Unicode zero-width space);</li>
+
+<li><b>trim</b>: trim heading/trailing spaces (considers <code>&#34;\x{A0}&#34;</code> as space!);</li>
+
+<li><b>extra_chars</b>: extra characters to trim;</li>
+
+<li><b>skip_dels</b>: if true, then text content under &#34;del&#34; nodes is not included in what&#39;s returned.</li>
+</ul>
+
+<p>For example, to completely get rid of separation between inline nodes:</p>
+
+<pre>    my $guard = HTML::AsText::Fix::global(zwsp_char =&#62; &#39;&#39;);</pre>
+
+<h2><a class='u' href='#___top' title='click to go to top of document'
+name="object"
+>object</a></h2>
+
+<p>Hook object instance. Accepts the same options as <a href="#global" class="podlinkpod"
+>&#34;global&#34;</a>:</p>
+
+<pre>    my $guard = HTML::AsText::Fix::object($tree, zwsp_char =&#62; &#39;&#39;);</pre>
+
+<h1><a class='u' href='#___top' title='click to go to top of document'
+name="SEE_ALSO"
+>SEE ALSO</a></h1>
+
+<ul>
+<li><a href="http://search.cpan.org/perldoc?HTML%3A%3AElement" class="podlinkpod"
+>HTML::Element</a></li>
+
+<li><a href="http://search.cpan.org/perldoc?HTML%3A%3ATree" class="podlinkpod"
+>HTML::Tree</a></li>
+
+<li><a href="http://search.cpan.org/perldoc?HTML%3A%3AFormatText" class="podlinkpod"
+>HTML::FormatText</a></li>
+
+<li><a href="http://search.cpan.org/perldoc?Monkey%3A%3APatch" class="podlinkpod"
+>Monkey::Patch</a></li>
+</ul>
+
+<h1><a class='u' href='#___top' title='click to go to top of document'
+name="ACKNOWLEDGEMENTS"
+>ACKNOWLEDGEMENTS</a></h1>
+
+<ul>
+<li><a href="https://metacpan.org/author/ARISTOTLE" class="podlinkurl"
+>&#913;&#961;&#953;&#963;&#964;&#959;&#964;&#941;&#955;&#951;&#962; &#928;&#945;&#947;&#954;&#945;&#955;&#964;&#950;&#942;&#962;</a></li>
+
+<li><a href="https://metacpan.org/author/TOBYINK" class="podlinkurl"
+>Toby Inkster</a></li>
+</ul>
+
+<h1><a class='u' href='#___top' title='click to go to top of document'
+name="AUTHOR"
+>AUTHOR</a></h1>
+
+<p>Stanislaw Pusep &#60;stas@sysd.org&#62;</p>
+
+<h1><a class='u' href='#___top' title='click to go to top of document'
+name="COPYRIGHT_AND_LICENSE"
+>COPYRIGHT AND LICENSE</a></h1>
+
+<p>This software is copyright (c) 2014 by Stanislaw Pusep.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+</body></html>

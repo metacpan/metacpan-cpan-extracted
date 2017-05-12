@@ -1,0 +1,84 @@
+Failed  Succeeded  Test Name
+   0          2    *** no name ***
+   0          4    *** no name ***
+   0          2    *** no name ***
+   0          4    *** no name ***
+   0          2    *** no name ***
+   0          1    *** no name ***
+   0          2    *** no name ***
+   0          1    *** no name ***
+
+
+Test Name: N/A
+URL: http://http.web.test/test6.html
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  REQUIRED TEXT
+    <title>Test File 6</title>                                   SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/show-request?param1=value1
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  REQUIRED TEXT
+    Method: <GET>                                                SUCCEED
+    Query: <param1=value1>                                       SUCCEED
+    Content: <>                                                  SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/test6.html
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  REQUIRED TEXT
+    <title>Test File 6</title>                                   SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/show-request?param1=value1
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  REQUIRED TEXT
+    Method: <GET>                                                SUCCEED
+    Query: <param1=value1>                                       SUCCEED
+    Content: <>                                                  SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/test6.html
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  REQUIRED TEXT
+    <title>Test File 6</title>                                   SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/bad-request?param1=value1
+
+  STATUS CODE CHECK
+    Expected '404' and got: 404 Not Found                        SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/test6.html
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  REQUIRED TEXT
+    <title>Test File 6</title>                                   SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/bad-request?param1=value1
+
+  STATUS CODE CHECK
+    Expected '404' and got: 404 Not Found                        SUCCEED
+
+
+Total web tests failed: 0  succeeded: 18

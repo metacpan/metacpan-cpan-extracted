@@ -1,0 +1,24 @@
+NAME
+    Hg::Lib - interface to mercurial's command server
+
+SYNOPSIS
+      use HG::Lib;
+
+      my $server = HG::Lib->new( );
+
+DESCRIPTION
+    mercurial is a distributed source control management tool. Hg::Lib is an
+    interface to its command server.
+
+    THIS CODE IS ALPHA QUALITY. This code is incomplete. Interfaces may
+    change.
+
+AUTHOR
+    Diab Jerius <djerius@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This code is Copyright 2013 Diab Jerius. All rights reserved.
+
+    This program is free software; you can redistribute and/or modify it
+    under the same terms as Perl itself.
+

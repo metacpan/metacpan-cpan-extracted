@@ -1,0 +1,40 @@
+<wmmeta name="Title" value="The WebMake File Format" />
+<wmmeta name="Section" value="02-tags" />
+<wmmeta name="Score" value="05" />
+<wmmeta name="Abstract">
+the file format used for the .wmk file
+</wmmeta>
+
+Firstly, note that an WebMake site requires one or more WebMake files, each
+one containing at least 1 &lt;webmake&gt; section.  Between them, there needs
+to be at least one &lt;out&gt; section between them, otherwise no output is
+generated.  Typically one or more &lt;content&gt; and/or &lt;contents&gt;
+sections would be used, too.
+
+The sections are specified using XML-/HTML-style notation, e.g.
+
+        **&lt;type attribute=val ...&gt;**
+        [ ...text... ]
+        **&lt;/type&gt;**
+
+WebMake uses the XML style of comments -- everything between
+**&lt;!--** and **--&gt;** is ignored.
+
+However, if this comment string occurs inside another WebMake tag body, it will
+not be stripped, as this is the same format used by XML and HTML. To include
+WebMake comments inside other tag bodies, use the alternative WebMake comment
+format.
+
+This comment format starts with **&lt;{!--** and ends with
+**--}&gt;**.
+
+Take a look at <a href=documentation.wmk>documentation.wmk</a> for a sample
+WebMake file; this WebMake file is used to generate this documentation.
+
+Be warned though, this documentation uses some advanced techniques, so it may
+not be an easy file to understand straight away.  There's lots more WebMake
+files linked to on the "WebMake website" [site], and they might be easier
+to grok.
+
+	[site]: http://webmake.taint.org/sample.html
+

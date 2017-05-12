@@ -1,0 +1,20 @@
+Failed  Succeeded  Test Name
+   0          1    Test File #1
+   0          1    Test File #2
+
+
+Test Name: Test File #1
+URL: http://http.web.test/test-file1
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+
+
+Test Name: Test File #2
+URL: http://http.web.test/test-file2
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+
+
+Total web tests failed: 0  succeeded: 2

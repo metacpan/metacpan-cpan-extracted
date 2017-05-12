@@ -1,0 +1,14 @@
+0.05  Mar 08, 2011
+  - properly escape regexps
+
+0.04  Oct 13, 2010
+  - handle empty content-type header
+
+0.03  Oct 08, 2010
+  - handle all response types by using response_cb
+
+0.02  Jul 28, 2010
+  - added option to set the highlight text in a callback
+
+0.01  Jul 25, 2010
+  - initial release

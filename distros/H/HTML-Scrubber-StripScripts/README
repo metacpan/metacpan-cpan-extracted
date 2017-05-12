@@ -1,0 +1,87 @@
+NAME
+    HTML::Scrubber::StripScripts - strip scripting from HTML
+
+SYNOPSIS
+       use HTML::Scrubber::StripScripts;
+
+       my $hss = HTML::Scrubber::StripScripts->new(
+          Allow_src      => 1,
+          Allow_href     => 1,
+          Allow_a_mailto => 1,
+          Whole_document => 1,
+          Block_tags     => ['hr'],
+       );
+
+       my $clean_html = $hss->scrub($dirty_html);
+
+DESCRIPTION
+    This module provides a preworked configuration for HTML::Scrubber,
+    configuring it to leave as much non-scripting markup in place as
+    possible while being certain to eliminate all scripting constructs. This
+    allows web applications to display HTML originating from an untrusted
+    source without introducing XSS (cross site scripting) vulnerabilities.
+
+CONSTRUCTORS
+    new ( CONFIG )
+        Returns a new "HTML::Scrubber" object, configured with a filtering
+        policy based on a whitelist of XSS-free tags and attributes. If
+        present, the CONFIG parameter must be a hashref. The following keys
+        are recognized (unrecognized keys will be silently ignored).
+
+        "Allow_src"
+            By default, the scrubber won't be configured to allow constructs
+            that cause the browser to fetch things automatically, such as
+            "SRC" attributes in "IMG" tags. If this option is present and
+            true then those constructs will be allowed.
+
+        "Allow_href"
+            By default, the scrubber won't be configured to allow constructs
+            that cause the browser to fetch things if the user clicks on
+            something, such as the "HREF" attribute in "A" tags. Set this
+            option to a true value to allow this type of construct.
+
+        "Allow_a_mailto"
+            By default, the scrubber won't be configured to allow "MAILTO:"
+            URLs in "HREF" attributes in "A" tags. Set this option to a true
+            value to allow them. Ignored unless "Allow_href" is true.
+
+        "Whole_document"
+            By default, the scrubber will be configured to deal with a
+            snippet of HTML to be placed inside another document after
+            scrubbing, and won't allow "head" and "body" tags and so on.
+
+            Set this option to a true value if an entire HTML document is
+            being scrubbed.
+
+        "Block_tags"
+            If present, this must be an array ref holding a list of lower
+            case tag names. These tags will be removed from the allowed
+            list.
+
+            For example, a guestbook CGI that uses "HR" tags to separate
+            posts might wish to disallow the "HR" tag in posts, even though
+            "HR" presents no XSS hazard.
+
+BUGS
+        *   All scripting is safely removed, but no attempt is made to
+            ensure that there is a matching end tag for each start tag. That
+            could be a problem if the scrubbed HTML is to be inserted into a
+            larger HTML document, since "FONT" tags and so on could be
+            maliciously left open.
+
+            If that's a big problem for you, consider using the more
+            heavyweight (and probably much slower) HTML::StripScripts module
+            instead.
+
+SEE ALSO
+        HTML::Scrubber, HTML::StripScripts
+
+AUTHOR
+        Nick Cleaton <nick@cleaton.net>
+
+COPYRIGHT
+        Copyright (C) 2003 Nick Cleaton. All Rights Reserved.
+
+        This module is free software; you can redistribute it and/or modify
+        it under the same terms as Perl itself.
+

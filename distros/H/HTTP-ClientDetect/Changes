@@ -1,0 +1,11 @@
+Revision history for HTTP-ClientDetect
+
+0.03 Tue Jun 23 09:48:37 2015 CEST
+
+     * Add missing prerequisites on Locale::Language and Locale::Country
+       (Stefan Hornburg).
+
+0.02 Fri Jun 19 10:00:45 2015 CEST
+
+	 * Initial release.
+

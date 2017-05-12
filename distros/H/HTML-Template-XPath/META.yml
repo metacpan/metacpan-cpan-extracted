@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         HTML-Template-XPath
+version:      0.20
+version_from: lib/HTML/Template/XPath.pm
+installdirs:  site
+requires:
+    HTML::Template:                1.8
+    IO::File:                      0
+    XML::LibXML:                   1.31
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

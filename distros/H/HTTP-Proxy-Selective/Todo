@@ -1,0 +1,15 @@
+Possible enhancements not covered in the Venda contract:
+
+ . Make use of SSL MITM a configurable option which can be turned on or off.
+ . Allow SSL MITM keys / certs to be configurable by command line..
+ . Use File::HomeDir so that you can configure paths relative to your user's 
+   home directory.
+ . Enable config paths relative to current directory.
+ . Have a standard 'dot file' location to store config, so that regular users
+   can just invoke selective_proxy
+ . Have 'if you can't find it locally, serve it from remote' type of path/
+   mode of operation (as opposed to the current 404 behavior). Could be useful 
+   sometimes.
+ . Make Module::Install::PAR be able to generate make targets which make 
+   executables for scripts.
+ . Proxy able to emit logs of things served, and/or HTTP access logs.

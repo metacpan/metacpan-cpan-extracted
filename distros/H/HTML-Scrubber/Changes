@@ -1,0 +1,77 @@
+Revision history for Perl extension HTML::Scrubber.
+
+0.15      2015-10-10 15:01:31+01:00 Europe/London
+    - Minor spelling check avoidance tweaks
+    - Enforce comments to be well formed, to resolve potential security issue
+      described in JVN53973084
+
+0.14      2015-04-02 17:20:41+01:00 Europe/London
+    - Travis integration  (thanks to mrcaron)
+    - Fix some packaging/dist-zilla issues (thanks to mrcaron)
+    - check for definedness before calling ->parse (github #3 leejo)
+    - Removed the link to HTML::Sanitizer  (github #4 avereha)
+    - Removed circular reference (github #5 avereha)
+    - Fixed up dependancies from dzil bundles
+    - Enforced minimum perl version of 5.8
+
+0.11      2013-10-11 15:11:59 Europe/London
+    - Build/release changes only
+
+0.10      2013-09-27 15:05:03 Europe/London
+    - RT3008 Changed examples to be XSS free
+    - RT19063, RT25477 fixed handling of self closing tags,
+      for example '<hr />'
+    - * attribute rule can be a regexp
+    - callbacks in rules to check or adjust attributes with
+      custom code (RT15747)
+
+0.09      2011-04-01 16:35:50 Europe/London
+    - Basic conversion to Dist::Zilla/git
+    - Tidies to keep Perl::Critic happier
+    - Removed use of naked filehandles
+    - Reworked tests to not use predicable temp file name
+    - Collapsed duplicate code to a single version
+    - Various documentation tweaks
+    - Change of maintainer as PODMASTER cannot be contacted
+
+0.08  Thu Apr  1 14:14:38 2004
+    - removed test which relied on stuff that changed in HTML-Parser-3.36
+      <https://rt.cpan.org/Ticket/Display.html?id=5472>
+
+0.07  Thu Mar 18 06:21:38 2004
+    - allow for boolean attributes (thanks b10m)
+    - which is why now attribute order is followed (attrseq)
+      repeated elements get squashed (see 07_booleans.t for details).
+
+0.06  Sun Nov  2 01:26:42 2003
+    - fixed more typos
+    - added t\06_scrub_file.t (that part was broken, now fixed)
+
+0.05  Thu Oct 30 23:27:37 2003
+    - fixed up various typos in tests ...
+    - bumped up version number ;(
+
+0.04  Wed Oct 29 18:35:08 2003
+    - added missing lc in a few places (and got rid of for @_)
+    - fixed (and improved) optimizations (stupid typo)
+    - added DESTROY to break circular reference (I lost my TODO, so i forgot)
+    - added more pod (allow deny ...)
+    - improved test suite
+    - added LICENSE file
+    - added script/style functions (nice)
+
+0.03  Mon Jul 21 07:32:10 2003
+    - perltidy ;)
+    - closed http://rt.cpan.org/NoAuth/Bug.html?id=2969
+      now escape spurious >< in text
+    - updated test.pl
+
+0.02  Fri Apr 18 14:12:02 2003
+    - finished TODO, settled on API
+    - created a cpan worthy distribution and uploaded to CPAN
+
+0.01  Thu Apr 17 20:34:11 2003
+  - original version; created by h2xs 1.21 with options
+    -AX HTML::Scrubber
+    - wrote initial version and released at
+        http://perlmonks.org/index.pl?node_id=251427

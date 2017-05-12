@@ -1,0 +1,164 @@
+Revision history for HTML-CalendarMonth
+
+2.04  Fri Apr 15 13:08:28 EDT 2016
+        - *really* fixed version check for DateTime::Locale 1.03
+
+2.03  Wed Apr 13 15:25:20 EDT 2016
+        - Updated tests to work with DateTime::Locale 1.03
+          based on CLDR 29
+
+2.02  Tue Nov 17 16:18:40 EST 2015
+        - Adjusted version cutoff for legacy locale tests
+
+2.01  Tue Nov 17 14:26:35 EST 2015
+        - fixed minor bug with undefined 'today' attribute
+
+2.00  Tue Nov 17 13:48:44 EST 2015
+        - Updated for compatibility with DateTime::Locale
+          versions 0.90 and greater. Backwards compatibility
+          retained.
+        - updated tests
+
+1.26  Fri Aug 26 15:08:49 EDT 2011
+        - fixed css/header interactions
+        - updated tests
+
+1.25  Fri Sep 24 03:09:38 EDT 2010
+        - Switched to File::Which for finding cal/ncal
+        - Added some sanity checks for the cal/ncal output
+
+1.23  Sat Jun 12 21:12:45 EDT 2010
+        - Updated interface with DateTime::Locale (will eventually
+          require another update when Locale::CLDR is released
+        - Deprecated offsets; too much complexity for little gain
+        - Fixed week-of-year bug in end-of-year edge cases (first
+          week has higher number than the next) RT #53795
+        - Made row globbing optimize on row elements if possible
+        - Updated default HTML style to be more CSS friendly (inspired
+          by RT #37548)
+        - Added option for semantic CSS classes on cells (past, present,
+          future) ala RT #37549
+        - Updated test data
+        - Improved date tool auto detect
+        - Fixed Date::Manip parse error for negative day deltas
+        - Doc updates
+        - Test updates
+        - Added linux 'ncal' harness
+
+1.19  Sat Mar 15 00:47:26 EDT 2008
+        - Fixed longstanding test failure due to HTML::Tree (properly)
+          deciding to put quotes around numeric attributes in tags.
+        - Also changed i8n test to Zulu rather than Basque since the
+          DateTime::Local::eu (Basque) module no longer has
+          abbreviated day names
+        - Some of the DateTool modules had a minor bug in add_days() not
+          checking for defined vs 0
+        - I released a calendar-related module update on the Ides of
+          March. I'm just sayin'.
+
+1.18  Fri Feb 24 15:53:41 EST 2006
+        - Fixed some scoping issues in DateTool/DateCalc.pm (thanks
+          Carl Franks)
+        - Fixed a Win32 test module location issue (File::Spec tricks)
+          (thanks Carl Franks)
+
+1.17  Fri Jan  6 16:09:46 EST 2006
+        - Updated tests with more recent test cases
+
+1.16  Fri Oct 21 16:23:48 EDT 2005
+        - Polished tests
+        - Fixed a Date::Calc testing procedure
+
+1.15  Fri Apr  1 12:43:09 EST 2005
+        - Split out tests
+        - Version roll hopefully ironed out some cpan tester
+          dependency issues
+
+1.14  Mon Mar 28 15:32:54 EST 2005
+        - forced dependency on HTML::ElementTable 1.13 or greater
+        - minor brush ups
+
+1.13  Mon Feb 28 16:02:31 EST 2005
+        - Streamlined accessor/mutator logic. Uses Class::Accessor now.
+        - Fixed a week of year bug introduced in the recent changes.
+        - General cleanup
+        - Added more tests (including one i8n test)
+
+1.12  Mon Feb 28 00:31:16 EST 2005
+        - Fixed auto-select bug that slipped through tests. :(
+        - Fixed tests.
+
+1.11  Sun Feb 27 23:58:04 EST 2005
+        - No reason to reinvent the wheel. Language support has now been
+          entirely replaced with full locale support as provided by
+          DateTime::Locale (does not require installation of entire
+          DateTime suite, if that's an issue)
+        - Calendrical calculations have now been fully abstracted out to
+          a back end interface. Calendars can be generated given the
+          presence of any one of the following and subject to the
+          circumstances of the request:
+
+          * native Time::Local (but limited to dates between 1970 and
+            2038)
+          * Date::Calc
+          * DateTime
+          * Date::Manip
+          * unix 'cal' command
+
+1.10  Sat Feb 26 00:47:37 EST 2005
+        - Added more robust language support. Currently supports en,
+          de, and fr.
+
+1.09  Tue Mar 26 05:21:59 CST 2002
+        - Fixed obscure bug that caused March 31 2002
+          to be dropped; related to a localtime/gmtime
+          issue with DST effects.
+        - Added tests for calendars over 1-year span
+          plus special cases such as the aforementioned
+          March 31 2002 instance.
+
+1.08  Mon Jan  8 19:15:16 CST 2001
+        - Added Date::Manip fallback from Date::Calc,
+          so a C compiler is not strictly necessary
+          for folks wanting week-of-year numbering
+          or exotic dates.
+
+1.07  Wed Nov  8 01:42:40 CST 2000
+        - Day-of-week bug REALLY fixed. Should now work
+          properly with all perumutations of calendar
+          pecularities and concepts of what the first
+          day of the week should be.
+
+1.06  Wed Oct  4 13:37:31 CDT 2000
+        - Day-of-week bug fixed for cases where Sunday is
+          the first day of the month (such as Oct, 2000),
+          or last day of the month (such as Dec, 2000),
+          over various configurations of what is considered
+          the first day of the week.
+
+1.04  Sun Sep 17 12:13:40 CDT 2000
+        - Documentation tweaks and corrections.
+
+1.03  Wed Apr 26 12:06:23 CDT 2000
+        - Added HTML::ElementTable dependency check in Makefile.PL
+        - Various bug fixes, under less common circumstances.
+        - Code syntax tweaks.
+
+1.02  Tue Jan 25 20:05:05 CST 2000
+        - Cleaned up -w noise
+        - Added mailing list information
+
+1.01  Thu Sep 16 15:33:41 CDT 1999
+        - Distribution patch
+        - Purged erroneus Date::Manip references
+
+1.00  Tue Jul 27 21:55:43 CDT 1999
+        - abstracted item/coord translations to cell refs
+          rather than redundant coord lookups
+        - initial release
+
+0.09  Thu Jul  8 19:02:39 CDT 1999
+        - added week counts and arbitrary 1st DOW
+
+0.08  Fri Jul 10 19:58:28 1998
+        - first public version

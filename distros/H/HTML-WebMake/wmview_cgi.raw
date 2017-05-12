@@ -1,0 +1,112 @@
+#!/usr/bin/perl -w
+
+# ---------------------------------------------------------------------------
+
+# set this to the directory under which WebMake can edit files.
+# $FILE_BASE = '/home/jm/public_html';
+$FILE_BASE = '/home/jm/ftp/wmtest';
+
+# set this, if WebMake is not installed in the std locations.
+$WEBMAKE = '/home/jm/ftp/webmake';
+
+# set this to use CVS. Alternatively, do a "cvs login" and a "cvs checkout"
+# in the $FILE_BASE directory beforehand and this will be picked up.
+# $CVSROOT = '/local/cvs/public_html';	# local cvs dir
+
+# need to fix the path to include the "cvs" binary? do it here
+$ENV{'PATH'} .= ":/usr/local/bin";
+$ENV{'CVS_RSH'} = 'ssh';
+
+# ---------------------------------------------------------------------------
+
+if (defined $WEBMAKE) {
+  push (@INC, "$WEBMAKE/lib"); push (@INC, "$WEBMAKE/site_perl");
+}
+if (defined $CVSROOT) { $ENV{'CVSROOT'} = $CVSROOT; }
+
+use CGI qw(-private_tempfiles);
+use CGI::Carp 'fatalsToBrowser';
+$CGI::POST_MAX = 1024*1024*2;
+
+my $q = new CGI();
+
+require HTML::WebMake::Main;
+
+if ($q->cgi_error()) {
+  print header(-status=>cgi_error()); exit;
+}
+
+my $myurl = $q->url(-query=>1);
+
+# replace __HOST__ with the URL's hostname in FILE_BASE if present.
+# This allows multiple sites to be edited with only one script, as
+# long as they all ScriptAlias the same directory.
+if ($FILE_BASE =~ /__HOST__/) {
+  if ($myurl !~ m,^[a-zA-Z0-9]+://([^/]+)/,) {
+    die "no hostname in URL";
+  }
+
+  my $host = $1; $host =~ s/:\d+$//;
+  $FILE_BASE =~ s/__HOST__/${host}/g;
+}
+
+# Some trickery.  Since the WebMake path-canonicalisation code
+# can't work with http://.../wmview.cgi?p=... URLs (and nor should it),
+# we use a magic string ("!!WMVIEWCGI!!") as the base href for all
+# URLs, then replace that in the output with the correct URL for the
+# cgi script.
+
+# First trim off the p=... parameter from myurl and canonicalise it
+$myurl =~ s/(&|\?)p=([^&]*)/$1/gs;
+$path = $2;
+$path =~ s,\%2F,/,gi;		# convert %2F to /
+$path =~ s,(?:/+|^)[^/]+$,,g;	# get the dirname
+$path = HTML::WebMake::Main::canon_path ($path);
+$path =~ s,^/,,g;		# trim leading /
+
+$myurl .= '&p='; $myurl =~ s/\?\&/\?/g;
+# later we will subst !!WMVIEWCGI!!/ with $myurl
+
+chdir ($FILE_BASE);
+
+my $f = new HTML::WebMake::Main ({
+  'risky_fast_rebuild'	=> 1,
+  'verbose'		=> 0,
+  'base_href'		=> '!!WMVIEWCGI!!/'.$path
+});
+
+$f->setcachefile ("/tmp/webmake_cache/%u/%F");
+$f->readfile ("main.wmk");
+
+my $path = $q->param ('p');
+# my $path = $q->path_info();
+$path ||= '';
+
+# make it safe for file/shell use
+$path =~ s,[^-_\/A-ZA-z0-9\.\:\\\,\+],_,g;
+$path = HTML::WebMake::Main::canon_path ($path);
+$path =~ s,^/,,g;		# trim leading /
+
+if ($path =~ /(?:^|\/)$/) { $path .= 'index.html'; }
+
+# if it's a registered output, then we can build it
+if (defined $f->{outs}->{$path}) {
+  $_ = $f->make_to_string ($path);
+  $f->finish();
+  s/!!WMVIEWCGI!!/${myurl}/gs;
+  print $q->header(), $_;
+  exit;
+}
+
+# Otherwise, redirect to the live site and let the web server handle it
+
+my $href = $f->{locations}->{'WebMake.SiteHref'};
+if (!defined $href) {
+  print $q->header();
+  warn "no <site> tag in .wmk, cannot redirect to live site for: $path";
+  exit 1;
+}
+
+print $q->redirect($href."/".$path);
+exit;
+

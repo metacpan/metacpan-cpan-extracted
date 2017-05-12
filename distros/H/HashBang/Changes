@@ -1,0 +1,8 @@
+# Revision history for Perl extension HashBang.
+
+---
+version: 0.10
+date:    Mon Jul 22 14:08:57 2002
+changes: >
+  original version; 
+  created by h2xs 1.1.1.4 with options -PAXn HashBang

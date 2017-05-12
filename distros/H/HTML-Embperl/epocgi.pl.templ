@@ -1,0 +1,65 @@
+#!/usr/bin/perl 
+###################################################################################
+#
+#   Embperl - Copyright (c) 1997-2001 Gerald Richter / ECOS
+#
+#   You may distribute under the terms of either the GNU General Public
+#   License or the Artistic License, as specified in the Perl README file.
+#   For use with Apache httpd and mod_perl, see also Apache copyright.
+#
+#   THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
+#   IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+#   WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+#
+#   $Id: epocgi.pl.templ,v 1.2 2001/05/15 10:41:23 richter Exp $
+#
+###################################################################################
+
+use HTML::Embperl ;
+use HTML::EmbperlObject ;
+
+my $Logfile    = $ENV{EMBPERL_LOG} || $HTML::Embperl::DefaultLog ;
+my $rc  ; 
+my $ioType ;
+my %req ;
+
+HTML::EmbperlObject::ScanEnvironment (\%req) ;
+
+$req{'inputfile'} = $ENV{PATH_TRANSLATED} ;
+$ioType = HTML::Embperl::epIOCGI ;
+
+HTML::Embperl::XS_Init ($ioType, $Logfile, $DebugDefault) ;
+
+tie *LOG, 'HTML::Embperl::Log' ;
+
+$req{'uri'} = $ENV{SCRIPT_NAME} ;
+
+$req{'cleanup'} = 0 ;
+$req{'cleanup'} = -1 if (($req{'options'} & HTML::Embperl::optDisableVarCleanup)) ;
+$req{'options'} |= HTML::Embperl::optSendHttpHeader ;
+
+$rc = HTML::EmbperlObject::Execute (\%req) ;
+
+#close LOG ;
+HTML::Embperl::XS_Term () ;
+
+if ($rc)
+    {
+    $time = localtime ;
+
+    print <<EOT;
+Status: $rc
+Content-Type: text/html
+
+<HTML><HEAD><TITLE>Embperl Error</TITLE></HEAD>
+<BODY bgcolor=\"#FFFFFF\">
+<H1>epocgi Server Error: $rc</H1>
+Please contact the server administrator, $ENV{SERVER_ADMIN} and inform them of the time the error occurred, and anything you might have done that may have caused the error.<P><P>
+$ENV{SERVER_SOFTWARE} HTML::Embperl $HTML::Embperl::VERSION [$time]<P>
+</BODY></HTML>
+
+EOT
+    }
+
+
+

@@ -1,0 +1,35 @@
+---
+name: HTML-Prototype
+version: 1.48
+author:
+  - |-
+    Sascha Kiefer, C<esskar@cpan.org>
+    Sebastian Riedel, C<sri@oook.de>
+    Marcus Ramberg, C<mramberg@cpan.org>
+abstract: Generate HTML and Javascript for the Prototype library
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Class::Accessor::Fast: 0
+  HTML::Tree: 0
+provides:
+  HTML::Prototype:
+    file: lib/HTML/Prototype.pm
+    version: 1.48
+  HTML::Prototype::Controls:
+    file: lib/HTML/Prototype/Controls.pm
+  HTML::Prototype::DragDrop:
+    file: lib/HTML/Prototype/DragDrop.pm
+  HTML::Prototype::Effects:
+    file: lib/HTML/Prototype/Effects.pm
+  HTML::Prototype::Helper:
+    file: lib/HTML/Prototype/Helper.pm
+  HTML::Prototype::Helper::Tag:
+    file: lib/HTML/Prototype/Helper/Tag.pm
+  HTML::Prototype::Js:
+    file: lib/HTML/Prototype/Js.pm
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

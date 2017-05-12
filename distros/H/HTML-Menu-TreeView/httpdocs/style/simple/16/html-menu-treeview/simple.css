@@ -1,0 +1,155 @@
+a.dropzone16{
+color:#000;
+cursor:pointer;
+font-family:verdana,sans-serif;
+height:22px;
+vertical-align:top;
+background-color:#d6d2d0;
+}
+a.treeviewLink16 {
+color:#000;
+cursor:pointer;
+height:22px;
+vertical-align:top;
+}
+a.treeviewLink16:hover {
+color:blue;
+cursor:pointer;
+height:22px;
+vertical-align:top;
+}
+td.caption16 {
+color:#000;
+font-family:verdana, sans-serif;
+height:24px;
+}
+td.captionBorder16 {
+border-bottom:1px;
+border-bottom-style:dashed;
+color:#000;
+font-family:verdana, sans-serif;
+height:24px;
+vertical-align:top;
+}
+td.clasicLastMinusNode16 {
+background-image:url('/style/simple/16/html-menu-treeview/clasicLastMinusNode.gif');
+cursor:pointer;
+vertical-align:top;
+}
+td.clasicLastPlusNode16 {
+background-image:url('/style/simple/16/html-menu-treeview/clasicLastPlusNode.gif');
+cursor:pointer;
+vertical-align:top;
+}
+td.clasicMinusNode16 {
+background-image:url('/style/simple/16/html-menu-treeview/clasicMinusNode.gif');
+cursor:pointer;
+vertical-align:top;
+}
+td.clasicPlusNode16 {
+background-image:url('/style/simple/16/html-menu-treeview/clasicPlusNode.gif');
+cursor:pointer;
+vertical-align:top;
+}
+td.columnsFolder16 {
+color:#000;
+font-family:verdana, sans-serif;
+height:22px;
+vertical-align:top;
+}
+td.columnsFolderBorder16,td.columnsNodeBorder16 {
+border-left:1px;
+border-left-style:dashed;
+color:#000;
+font-family:verdana, sans-serif;
+height:22px;
+vertical-align:top;
+}
+td.columnsLastNode16 {
+color:#000;
+font-family:verdana, sans-serif;
+height:22px;
+vertical-align:top;
+}
+td.columnsLastNodeBorder16 {
+border-left:1px;
+border-left-style:dashed;
+color:#000;
+font-family:verdana, sans-serif;
+height:22px;
+vertical-align:top;
+}
+td.columnsNode16 {
+color:#000;
+font-family:verdana, sans-serif;
+height:22px;
+vertical-align:top;
+}
+td.folder16 {
+background-image:url('/style/simple/16/html-menu-treeview/folderOpen.gif');
+background-repeat:no-repeat;
+cursor:pointer;
+height:22px;
+vertical-align:top;
+}
+td.folderClosed16 {
+background-image:url('/style/simple/16/html-menu-treeview/folderClosed.gif');
+background-repeat:no-repeat;
+cursor:pointer;
+height:22px;
+vertical-align:top;
+}
+td.lastMinusNode16 {
+background-image:url('/style/simple/16/html-menu-treeview/lastMinusNode.gif');
+background-repeat:no-repeat;
+cursor:pointer;
+vertical-align:top;
+}
+td.lastNode16 {
+background-image:url('/style/simple/16/html-menu-treeview/lastNode.gif');
+background-repeat:no-repeat;
+cursor:pointer;
+height:22px;
+vertical-align:top;
+}
+td.lastPlusNode16 {
+background-image:url('/style/simple/16/html-menu-treeview/lastPlusNode.gif');
+background-repeat:no-repeat;
+cursor:pointer;
+height:22px;
+vertical-align:top;
+}
+td.minusNode16 {
+background-image:url('/style/simple/16/html-menu-treeview/minusNode.gif');
+background-repeat:no-repeat;
+cursor:pointer;
+vertical-align:top;
+}
+td.node16 {
+background-image:url('/style/simple/16/html-menu-treeview/node.gif');
+background-repeat:no-repeat;
+cursor:pointer;
+height:22px;
+vertical-align:top;
+}
+td.plusNode16 {
+background-image:url('/style/simple/16/html-menu-treeview/plusNode.gif');
+background-repeat:no-repeat;
+cursor:pointer;
+vertical-align:top;
+}
+td.submenuDeco16 {
+background-image:url('/style/simple/16/html-menu-treeview/vertLine.gif');
+background-repeat:repeat-y;
+}
+tr.trOver{
+color:black;
+background-color:#d4d0c8;
+}
+td.img{
+background-repeat:no-repeat;
+cursor:pointer;
+background-position:0px 2px;
+padding-left:14px;
+vertical-align: top;
+}

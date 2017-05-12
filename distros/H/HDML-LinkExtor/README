@@ -1,0 +1,25 @@
+NAME
+
+HDML::LinkExtor - Extract links from an HDML document
+
+SYNOPSIS
+
+  use HTML::LinkExtor;
+  $p = HTML::LinkExtor->new(\&cb, "http://www.perl.org/");
+  sub cb {
+      my($tag, %links) = @_;
+      print "$tag @{[%links]}\n";
+  }
+  $p->parse_file("index.html");
+
+ESCRIPTION
+
+HDML::LinkExtor is an HDML parser that extracts links from an HDML document. The HDML::LinkExtor is a subclass of HTML::LinkExtor.
+
+AUTHOR
+
+milano <milano@cpan.org>
+
+SEE ALSO
+
+HTML::LinkExtor

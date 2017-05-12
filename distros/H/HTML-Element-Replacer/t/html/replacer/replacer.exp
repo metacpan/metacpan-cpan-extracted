@@ -1,0 +1,16 @@
+<table>
+  <tr scla="top" /="/"></tr>
+  <tr scla="mid">
+    <td kmap="brand">schlitz</td>
+    <td kmap="age">young</td>
+  </tr>
+  <tr scla="mid">
+    <td kmap="brand">lowenbrau</td>
+    <td kmap="age">24</td>
+  </tr>
+  <tr scla="mid">
+    <td kmap="brand">miller</td>
+    <td kmap="age">17</td>
+  </tr>
+  <tr scla="bot" /="/"></tr>
+</table>

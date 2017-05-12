@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+README.md
+t/HTTP-Cache-Transparent.t
+t/cache.t
+t/pod.t
+t/pod-coverage.t
+lib/HTTP/Cache/Transparent.pm
+examples/check_server
+examples/check_server_approve
+examples/test-range
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

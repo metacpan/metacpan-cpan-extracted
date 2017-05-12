@@ -1,0 +1,42 @@
+<wmmeta name="Title" value="The HTML Cleaner" />
+<wmmeta name="Section" value="07-fmt_converters" />
+<wmmeta name="Score" value="60" />
+<wmmeta name="Abstract">
+the HTML cleaning filter
+</wmmeta>
+
+The HTML cleaner is a powerful filter which can polish grotty, messy HTML into
+fully-standards-compliant glory.  By default, all output of format
+**text/html** (the default format) will be passed through it.
+
+It is controlled using the __clean__ parameter of the &lt;out&gt; tag.
+The features to be used should be listed in this parameter's value, separated
+by whitespace.
+
+Here are the features available:
+
+  * __pack__ - Compress the HTML, removing all white space that is not
+  part of an attribute's value, or inside &lt;xmp&gt; or &lt;pre&gt; tags.
+
+  * __indent__ - ''Pretty-print'' the HTML, indenting tags appropriately,
+  except for text and markup inside &lt;xmp&gt; or &lt;pre&gt; tags.
+
+  * __nocomments__ - Trim all comments.
+
+  * __addimgsizes__ - Add image sizes to &lt;img&gt; tags if they do not
+  already specify them.
+
+  * __cleanattrs__ - Quote all attributes in opening tags, and lowercase
+  all tag names.
+
+  * __addxmlslashes__ - Add XML-style slashes to the end of empty-element
+  tags, such as &lt;hr&gt;, &lt;img&gt; etc.
+
+  * __fixcolors__ - Fix colors that do not start with a # character, so that
+  they do.
+
+The feature string __all__ can be used to include all cleaning modes.
+
+The default mode is ##pack addimgsizes cleanattrs addxmlslashes
+fixcolors indent##.
+

@@ -1,0 +1,164 @@
+=head1 NAME
+
+HTML::Microformats::Documentation::Notes - misc usage and design notes
+
+=head1 NOTES
+
+=head2 Byzantine Internals
+
+The internals of HTML::Microformats are pretty complicated - best to steer clear
+of them. Here are three usage patterns that mostly avoid dealing with the internals:
+
+=over
+
+=item * B<Parse a page and use it as a single RDF graph.>
+
+A page can be parsed into an L<RDF::Trine::Model> and queried
+using SPARQL.
+
+	use HTML::Microformats;
+	use LWP::Simple qw[get];
+	use RDF::Query;
+	
+	my $page  = 'http://example.net/';
+	my $graph = HTML::Microformats
+	               ->new_document(get($page), $page)
+	               ->assume_all_profiles
+	               ->parse_microformats
+	               ->model;
+	
+	my $query = RDF::Query->new(<<SPARQL);
+	PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+	SELECT DISTINCT ?friendname ?friendpage
+	WHERE {
+		<$page> ?p ?friendpage .
+		?person foaf:name ?friendname ;
+			foaf:page ?friendpage .
+		FILTER (
+			isURI(?friendpage)
+			&& isLiteral(?friendname) 
+			&& regex(str(?p), "^http://vocab.sindice.com/xfn#(.+)-hyperlink")
+		)
+	}
+	SPARQL
+	
+	my $results = $query->execute($graph);
+	while (my $result = $results->next)
+	{
+		printf("%s <%s>\n",
+			$result->{friendname}->literal_value,
+			$result->{friendpage}->uri,
+			);
+	}
+
+=item * B<Use the data method on each object.>
+
+The C<data> method on microformat objects returns a hashref of useful data.
+
+	use HTML::Microformats;
+	use LWP::Simple qw[get];
+	
+	my $page     = 'http://example.net/';
+	my @xfn_objs = HTML::Microformats
+	               ->new_document(get($page), $page)
+	               ->assume_all_profiles
+	               ->parse_microformats
+	               ->objects('XFN');
+	
+	while (my $xfn = shift @xfn_objs)
+	{
+		printf("%s <%s>\n",
+			$xfn->data->{title},
+			$xfn->data->{href},
+			);
+	}
+
+(If you're wondering why the second example's simpler it's because it returns
+somewhat dumber data.)
+
+=item * B<Convert to other formats.>
+
+Various microformat objects have C<to_foo> methods allowing the data to be
+exported in various formats..
+
+	use HTML::Microformats;
+	use LWP::Simple qw[get];
+	
+	my $page     = 'http://example.net/';
+	my @hcards   = HTML::Microformats
+	               ->new_document(get($page), $page)
+	               ->assume_all_profiles
+	               ->parse_microformats
+	               ->objects('hCard');
+	
+	print $_->to_vcard foreach @hcards;
+
+Methods available are:
+
+=over
+
+=item * C<to_vcard> (hCard objects)
+
+Exports as vCard 3.0.
+
+=item * C<to_vcard4> (hCard objects)
+
+Exports as vCard 4.0.
+
+=item * C<to_vcard4_xml> (hCard objects)
+
+Exports as vCard XML.
+
+=item * C<to_icalendar> (hCalendar, hEvent, hTodo, hFreebusy, hAlarm and hEntry objects)
+
+Exports as iCalendar.
+
+=item * C<to_atom> (hAtom and hEntry objects)
+
+Exports as Atom 1.0.
+
+=item * C<to_kml> (geo objects)
+
+Exports as KML 2.0.
+
+=item * C<< serialialise_model(as => $format) >> (all microformat objects)
+
+Exports as RDF, serialised as C<$format>. (Format can be 'RDFXML', 'Turtle',
+'NTriples', 'RDFJSON'.)
+
+=back
+
+=back
+
+=head2 Stuff that's b0rked
+
+The C<get_foo>, C<set_foo>, C<add_foo>, C<clear_foo> methods defined in
+L<HTML::Microformats::Format> work unreliably and are poorly documented.
+You're better off using the C<data> method and inspecting the returned structure
+for the data you need. This will be fixed in the future.
+
+=head2 Here be monsters
+
+There are several parts of the code which are incredibly complicated and desperately
+need refactoring. This will be done at some point, so don't rely too much on their current
+behaviour.
+
+C<stringify> and C<_stringify_helper> in L<HTML::Microformats::Utilities>.
+The whole of L<HTML::Microformats::Mixin::Parser>.
+
+=head1 SEE ALSO
+
+L<HTML::Microformats>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright 2008-2012 Toby Inkster
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

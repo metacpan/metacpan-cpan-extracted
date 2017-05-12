@@ -1,0 +1,21 @@
+
+<html>
+<head>
+<title>Check Tainiting for Embperl</title>
+</head>
+
+<body>
+
+This is a test if tainting works with Embperl<P>
+
+The following code should be trapped by the perl interpreter <BR>
+when running with -T option or PaintTaintCheck on <P>
+
+
+[+ do { system ('echo blabla') ;}  +]
+
+<P>Ok.<P>
+
+
+</body>
+</html>

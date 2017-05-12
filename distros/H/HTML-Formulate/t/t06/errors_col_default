@@ -1,0 +1,11 @@
+<form method="post">
+<table cellpadding="2">
+<tr><th style="color:red"><span class="error_field">Emp Name</span></th><td><input name="emp_name" type="text" value="Fred Flintstone" /></td><td class="error">Fred Flintstone is a stupid name</td></tr>
+<tr><th>Emp Title</th><td><input name="emp_title" type="text" value="CEO" /></td><td>&nbsp;</td></tr>
+<tr><th style="color:red"><span class="error_field">Emp Birth Dt</span></th><td><input name="emp_birth_dt" type="text" value="20-10-55" /></td><td class="error">People born in October are not accepted here</td></tr>
+<tr><td align="center" colspan="3">
+<input id="submit" name="submit" type="submit" value="Submit" />
+</td></tr>
+</table>
+<input name="emp_id" type="hidden" value="123" />
+</form>

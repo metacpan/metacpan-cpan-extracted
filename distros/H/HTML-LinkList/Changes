@@ -1,0 +1,48 @@
+Revision History for HTML-LinkList
+==================================
+
+v0.1701 2016-01-01
+------------------
+
+* 2016-01-01 10:58:19 +1100
+  tweaking dist.ini
+* 2015-05-05 11:14:32 +1000
+  Dist::Zilla stuff.
+* 2015-05-05 11:11:09 +1000
+  version bump
+* 2015-05-05 11:08:35 +1000
+  Fixing some compatibility Dist::Zilla stuff.
+* 2013-09-14 11:49:20 +1000
+  added [ReportVersions::Tiny]
+* 2012-02-06 00:32:05 +1100
+  added a ConfirmRelease test
+* 2011-02-21 16:57:32 +1100
+  Disabled Progressive Critic tests.
+* 2011-02-21 16:37:27 +1100
+  Fixed Dist::Zilla version setting.
+* 2011-02-21 16:34:11 +1100
+  Tweaking Dist::Zilla config.
+* 2011-02-21 16:30:46 +1100
+  Changing build system over to Dist::Zilla.
+* 2011-02-21 13:09:53 +1100
+  fixed warnings
+* 2011-02-21 13:07:33 +1100
+  Links with Mixed Caps, don't decase the labels.
+* 2011-02-18 13:18:59 +1100
+  New formatting options: pre_item_active + pre_item_current_parent
+* 2010-07-02 19:48:46 +1000
+  updated MANIFEST.SKIP for git
+* 2010-02-26 16:52:36 +1100
+  removed nofilter_paths option
+* 2010-02-26 16:50:33 +1100
+  Improved algorithm for deeper nested navbars
+* 2010-01-04 12:54:58 +1100
+  not a released version
+* 2010-01-04 12:54:34 +1100
+  added nofilter_paths option
+* 2009-12-16 17:01:27 +1100
+  Slight speed improvements; also added .gitignore
+
+====================================
+End of changes in the last 1000 days
+====================================

@@ -1,0 +1,36 @@
+---
+abstract: 'Reformats HTML code blocks coming from Pod verbatim paragraphs'
+author:
+  - 'Emanuele Zeppieri <emazep@cpan.org>'
+build_requires:
+  English: 0
+  File::Find: 0
+  File::Spec::Functions: 0
+  File::Temp: 0
+  Scalar::Util: 0
+  Test::More: 0.94
+  Text::Diff: 0
+  perl: 5.004
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-PodCodeReformat
+requires:
+  Carp: 0
+  Class::Accessor::Fast: 0
+  File::Copy: 0
+  Getopt::Long: 0
+  HTML::Parser: 3.00
+  Pod::Usage: 0
+  constant: 0
+  perl: 5.006
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-PodCodeReformat
+  homepage: http://search.cpan.org/dist/HTML-PodCodeReformat
+  repository: git://github.com/emazep/HTML-PodCodeReformat.git
+version: 0.20000

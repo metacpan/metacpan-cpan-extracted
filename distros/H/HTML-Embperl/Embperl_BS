@@ -1,0 +1,13 @@
+@dl_resolve_using = ('') ; # must be an array with one empty entry to get $bscode written out
+$bscode = 
+q[
+
+if (!$ENV{MOD_PERL})
+    {
+    my $nafile = $file ;
+    $nafile =~ s/(.*)\./$1.NoApache./ ;
+    $file = $nafile if (-f $nafile) ;
+    #print STDERR "\n*** bs load file = $file ***\n" ;
+    }
+
+] ;

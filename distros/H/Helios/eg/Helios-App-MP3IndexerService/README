@@ -1,0 +1,49 @@
+Helios::App::MP3IndexerService version 2.00
+===========================================
+
+Helios::App::MP3IndexerService is a sample Helios application that 
+indexes MP3 information into a database table.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Then use the files in the sql/ directory to create the index 
+database table.  
+
+Once the database is set up, add your database connection information 
+to the commands in the config.sh file, and then run it:
+
+    sh ./config.sh
+
+This will use the helios_config_set command to add the 
+Helios::App::MP3IndexerService configuration to the Helios collective 
+database.
+
+See the Helios::App::MP3IndexerService documentation for more 
+information.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Helios 2.80
+  MP3::Info
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2012 by Andrew Johnson
+
+Portions of this software are Copyright (C) 2012-4 by Logical 
+Helion, LLC where noted.
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the Artistic License 2.0.  See the LICENSE 
+file included in this distribution for more information.
+

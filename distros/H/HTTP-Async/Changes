@@ -1,0 +1,196 @@
+CHANGES to HTTP::Async
+
+0.33 2017/01/14
+  * Perl Critic fixes from Nitish Bezzala
+
+0.32 2017/01/11
+  * Perl Critic fixes from Nitish Bezzala
+
+0.31 2016/08/17
+  * Add minimum Perl version to Makefile.PL
+  * Match HTTP::Async::Polite version to HTTP::Async (CPANTS)
+    Thanks to Mohammad S Anwar (Manwar) for both changes!
+  * Replace yahoo.com with metacpan.org in t/real_servers.t
+
+0.30 2015/05/30
+  * Allow max_redirect or max_redirects, to be consistent with LWP::UserAgent
+    Thanks Vincent Lequertier (SkySymbol)!
+
+0.29 2015/05/30
+
+  * Make add_with_opts throw error on invalid options
+    Thanks Tom Grimwood-Taylor (tgt)!
+
+0.28 2015/03/09
+
+  * Allow manual override of PeerAddr via peer_addr (rt #102634)
+  * Switch from print() to note() in TestServer for test suite
+
+0.27 2014/11/17
+
+  * Github user acferen finally patched the long-standing timeout bug
+    Thanks acferen!
+
+0.26 2014/06/06
+
+  * Daniel Lintott of the Debian Perl Group reported that the HTTP::Async proxy
+    tests were broken with a development version of HTTP-Server-Simple (0.45_1)
+    I fixed the test, or rather fixed t/TestServer.pm, so that it would work
+    Thanks Daniel!
+  * While I was in there, I replaced some warn() calls in the tests with diag()
+    calls, to be a better TAP citizen
+
+0.25 2014/03/20
+
+  * Added remove($id) and remove_all() methods
+    Thanks go to rt.cpan.org user Ikegami
+  * Added support for forwarding headers on redirect
+    Thanks to Github users kloevschall and kaol
+  * Added support for having an HTTP::Cookies cookie jar object
+    Thanks again to Github user kaol
+  * Use Net::EmptyPort for the TestServer in the tests
+    Thanks to Github user and all around great Perl Monger DrHyde
+
+0.24 2014/03/19
+
+  * Better POD docs for the counting methods
+  - Requested by Dave Hodgkinson via rt.cpan.org
+
+0.23 2013/11/03
+
+  * Added REAL_SERVERS check to t/proxy-with-https.t
+  - Thanks to Gregor Herrmann, Debian Perl Group, for the patch
+
+0.22 2013/09/12
+
+  * Added repository cpan metadata to Makefile.PL
+  - Thanks to David Steinbrunner for the patch
+
+0.21 2013/08/29
+
+  * Updated Changes file to meet CPAN::Changes::Spec
+    * FIxed unparseable date for version 0.02
+
+0.20 2013/07/18
+
+  * Updates Changes file to meet CPAN::Changes::Spec
+    * Changed and standardized date formats
+    * Changed name from CHANGES to Changes
+    * Added author/release test to check this going forward
+
+0.19 2013/07/17
+
+  * Added ssl_options support
+  * Increased Net::HTTPS::NB requirement to 0.13
+  - Thanks to Heikki Vatiainen for the patch
+
+0.18 2013/05/27
+
+  * Fixed typo in POD
+  - Added THANKS for Florian (fschlich)
+
+0.17 2013/04/20
+
+  * Added local_addr and local_port support
+  * Standardised test names
+  * Added THANKS for github user c00ler-
+
+0.16 2013/04/04
+
+  * Fixed CPAN Testers bug in bad-hosts.t
+
+0.15 2013/04/04
+
+  * Two bug fixes provided by Josef Toman:
+    * Fixed header handling to use header_field_names()
+    * Replaced _make_url_absolute with URI::new_abs()
+
+0.14 2013/04/01
+
+  * More diagnostics in bad-hosts.t on failure
+
+0.13 2013/03/29
+
+  * Fixed t/real-servers.t to work whether or not Net::HTTPS::NB is available
+
+0.12 2013/03/29
+
+  * New logic for making https requests through a proxy
+  * Made tests run ok in parallel by using different ports per test
+  * Set explicit SSL_verify_mode in real-servers.t
+  * Minor update to code comment about is_proxy mode
+
+0.11 2012/11/13
+
+  * Use high ports to prevent test failure when 8080 is already used
+  * Travis config
+
+0.10 2012/03/08
+
+  * added support for https requests - thanks Naveed Massjouni
+
+0.09 2007/09/13
+
+  * added requirement for Pod::Coverage >= 0.19 if perl >= 5.9.0
+  
+  * moved polite.t test into t/ so that it gets run by the makefile.
+
+0.08 2007/09/12
+
+  * Deleted Module::Build
+
+  * Removed test in bad-hosts.t that was unreliable. I think that it was failing
+    under certain proxy configs.
+
+0.07 2007/02/18
+
+  * Added proper handling of 304 responses based on code patch and test by
+    Tomohiro Ikebe from livedoor.jp
+
+0.06 2007/02/06
+
+  * Changed the request uri that is used so that it has the host in for proxy
+    requests and does not otherwise. This is to comply with the RFC for HTTP
+    ( http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5.1.2 ).
+
+0.05 2006/11/17
+
+  * Added ability to pass arguments to new to configure the async object.
+
+0.04 2006/09/28
+
+  * Fixed stupid bug that caused the polite module to crash if the numbers of
+    requests per domain were not the same.
+
+0.03 2006/09/27
+
+  * Created HTTP::Async::Polite that adds limits to the scraping to avoid over
+    stretching the domain being scraped.
+
+  * Increased the delay in poll-interval tests to stop them failing on slow
+    machines.
+
+  * Added pod tests, README and Makefile.PL in an attempt to achieve kwalitee.
+
+0.02 2006/09/06
+
+  * Changed the timeout to be an inactivity timeout and added a
+    max_request_length to limit the amount of time that a request can be
+    running for.
+
+  * Added more diagnostics to the tests to try to find the bug that is causing
+    MIYAGAWA issues.
+
+  * Created TODO and CHANGES docs.
+
+  * Added error checking to catch connections that fail before the headers are
+    sent. (patch submitted by Egor Egorov)
+
+  * Added ability to specify proxy to use. (based on patch from Egor Egorov)
+
+  * Added 'add_with_opts' method that lets you override the default options
+    for this request.
+
+0.01 2006/08/21
+
+   * Initial release onto CPAN.

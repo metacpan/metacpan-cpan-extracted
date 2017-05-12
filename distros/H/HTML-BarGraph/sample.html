@@ -1,0 +1,2750 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title></title>
+</head>
+<body bgcolor="white">
+<center>
+<h2>test HTML::BarGraph</h2>
+<table><tr align="center" valign="middle">
+<td>
+<!-- %args
+    labelbgcolor => #AAAAAA
+    colors => [ blue green lightblue ]
+    direction => h
+    bgcolor => #DDDDDD
+    ylabel => tags
+    barwidth => 10
+    setspacer => 0
+    barlength => 100
+    bordercolor => black
+    baraspect => 0.03
+    pixeldir => ./pixels
+    showmaxvalues => 1
+    fontface => sansserif
+    bordertype => flat
+    highlightcolor => red
+    showaxistags => 1
+    graphminsize => 250
+    data => [ 7 12 25 0 15 4 6 18 ]
+    labeltextcolor => black
+    tags => [ one two three four five six seven eight ]
+    xlabel => values
+    pixelfmt => PNG
+    addalt => 1
+    titlealign => center
+    title => one dataset + highlight + horizontal
+    highlighttag => [ two six ]
+    borderwidth => 1
+    bartype => pixel
+-->
+
+<!--  GRAPH START -->
+<table cellpadding="1">
+   <tr>
+   <td bgcolor="black">
+<table cellspacing=0 cellpadding=2 border=0 bgcolor="#DDDDDD">
+   <tr bgcolor="#DDDDDD">
+      <td bgcolor="#DDDDDD"></td>
+      <td align="center" colspan="2">
+          <font face="sansserif" color="black" size="+1"><b><u>one dataset + highlight + horizontal</u></b></font>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td></td>
+      <td></td>
+      <td></td>
+   </tr>
+    <tr bgcolor="#DDDDDD">
+      <td bgcolor="#AAAAAA" valign="middle" align="center" rowspan="9">
+         <font face="sansserif" color="black"><b>
+          &nbsp;t&nbsp;<br>&nbsp;a&nbsp;<br>&nbsp;g&nbsp;<br>&nbsp;s&nbsp;
+         </b></font>
+      </td>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        one 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="28" height="10" border=0 alt="7">
+        <font face="sansserif" color="black" size="-2">
+        7
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        two 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/red.png" width="48" height="10" border=0 alt="12">
+        <font face="sansserif" color="black" size="-2">
+        12
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        three 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="100" height="10" border=0 alt="25">
+        <font face="sansserif" color="black" size="-2">
+        25
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        four 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="1" height="10" border=0 alt="0">
+        <font face="sansserif" color="black" size="-2">
+        0
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        five 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="60" height="10" border=0 alt="15">
+        <font face="sansserif" color="black" size="-2">
+        15
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        six 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/red.png" width="16" height="10" border=0 alt="4">
+        <font face="sansserif" color="black" size="-2">
+        4
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        seven 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="24" height="10" border=0 alt="6">
+        <font face="sansserif" color="black" size="-2">
+        6
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        eight 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="72" height="10" border=0 alt="18">
+        <font face="sansserif" color="black" size="-2">
+        18
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td></td>
+      <td></td>
+      <td></td>
+   </tr>
+  <tr bgcolor="#DDDDDD">
+      <td></td>
+      <td></td>
+      <td bgcolor="#AAAAAA" valign="middle" align="center" colspan="1">
+          <font face="sansserif" color="black">
+             <b>v&nbsp;a&nbsp;l&nbsp;u&nbsp;e&nbsp;s</b>
+          </font>
+      </td>
+  </tr>
+</table>
+   </td>
+   </tr>
+</table>
+<!--  GRAPH END -->
+
+
+</td>
+<td width="90">&nbsp;</td>
+<td>
+<!-- %args
+    labelbgcolor => #AAAAAA
+    colors => [ blue green lightblue ]
+    direction => h
+    bgcolor => #DDDDDD
+    ylabel => tags
+    barwidth => 10
+    barlength => 100
+    setspacer => 0
+    fontface => sansserif
+    showmaxvalues => 1
+    pixeldir => ./pixels
+    baraspect => 0.03
+    bordercolor => black
+    bordertype => flat
+    showaxistags => 1
+    highlightcolor => red
+    data => [ 
+             [ 11 22 23 15 17 5 19 6 ]
+             [ 3 0 5 12 19 5 25 10 ]
+          ] 
+    graphminsize => 250
+    labeltextcolor => black
+    tags => [ one two three four five six seven eight ]
+    xlabel => values
+    pixelfmt => PNG
+    addalt => 1
+    titlealign => center
+    title => multiple datasets
+    highlighttag => [ two six ]
+    borderwidth => 1
+    bartype => pixel
+-->
+
+<!--  GRAPH START -->
+<table cellpadding="1">
+   <tr>
+   <td bgcolor="black">
+<table cellspacing=0 cellpadding=2 border=0 bgcolor="#DDDDDD">
+   <tr bgcolor="#DDDDDD">
+      <td bgcolor="#DDDDDD"></td>
+      <td align="center" colspan="2">
+          <font face="sansserif" color="black" size="+1"><b><u>multiple datasets</u></b></font>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td></td>
+      <td></td>
+      <td></td>
+   </tr>
+    <tr bgcolor="#DDDDDD">
+      <td bgcolor="#AAAAAA" valign="middle" align="center" rowspan="9">
+         <font face="sansserif" color="black"><b>
+          &nbsp;t&nbsp;<br>&nbsp;a&nbsp;<br>&nbsp;g&nbsp;<br>&nbsp;s&nbsp;
+         </b></font>
+      </td>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        one 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="44" height="10" border=0 alt="11">
+        <font face="sansserif" color="black" size="-2">
+        11
+        </font>
+
+
+<br>
+        <img src="./pixels/green.png" width="12" height="10" border=0 alt="3">
+        <font face="sansserif" color="black" size="-2">
+        3
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        two 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="88" height="10" border=0 alt="22">
+        <font face="sansserif" color="black" size="-2">
+        22
+        </font>
+
+
+<br>
+        <img src="./pixels/green.png" width="1" height="10" border=0 alt="0">
+        <font face="sansserif" color="black" size="-2">
+        0
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        three 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="92" height="10" border=0 alt="23">
+        <font face="sansserif" color="black" size="-2">
+        23
+        </font>
+
+
+<br>
+        <img src="./pixels/green.png" width="20" height="10" border=0 alt="5">
+        <font face="sansserif" color="black" size="-2">
+        5
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        four 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="60" height="10" border=0 alt="15">
+        <font face="sansserif" color="black" size="-2">
+        15
+        </font>
+
+
+<br>
+        <img src="./pixels/green.png" width="48" height="10" border=0 alt="12">
+        <font face="sansserif" color="black" size="-2">
+        12
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        five 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="68" height="10" border=0 alt="17">
+        <font face="sansserif" color="black" size="-2">
+        17
+        </font>
+
+
+<br>
+        <img src="./pixels/green.png" width="76" height="10" border=0 alt="19">
+        <font face="sansserif" color="black" size="-2">
+        19
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        six 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="20" height="10" border=0 alt="5">
+        <font face="sansserif" color="black" size="-2">
+        5
+        </font>
+
+
+<br>
+        <img src="./pixels/green.png" width="20" height="10" border=0 alt="5">
+        <font face="sansserif" color="black" size="-2">
+        5
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        seven 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="76" height="10" border=0 alt="19">
+        <font face="sansserif" color="black" size="-2">
+        19
+        </font>
+
+
+<br>
+        <img src="./pixels/green.png" width="100" height="10" border=0 alt="25">
+        <font face="sansserif" color="black" size="-2">
+        25
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        eight 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="24" height="10" border=0 alt="6">
+        <font face="sansserif" color="black" size="-2">
+        6
+        </font>
+
+
+<br>
+        <img src="./pixels/green.png" width="40" height="10" border=0 alt="10">
+        <font face="sansserif" color="black" size="-2">
+        10
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td></td>
+      <td></td>
+      <td></td>
+   </tr>
+  <tr bgcolor="#DDDDDD">
+      <td></td>
+      <td></td>
+      <td bgcolor="#AAAAAA" valign="middle" align="center" colspan="1">
+          <font face="sansserif" color="black">
+             <b>v&nbsp;a&nbsp;l&nbsp;u&nbsp;e&nbsp;s</b>
+          </font>
+      </td>
+  </tr>
+</table>
+   </td>
+   </tr>
+</table>
+<!--  GRAPH END -->
+
+
+</td>
+</tr>
+<tr align="center" valign="middle">
+<td>
+<!-- %args
+    labelbgcolor => #AAAAAA
+    colors => [ blue green lightblue ]
+    direction => v
+    bgcolor => #DDDDDD
+    ylabel => values
+    barwidth => 10
+    barlength => 100
+    setspacer => 0
+    fontface => sansserif
+    showmaxvalues => 1
+    pixeldir => ./pixels
+    baraspect => 0.03
+    bordercolor => black
+    bordertype => flat
+    showaxistags => 1
+    highlightcolor => red
+    data => [ 7 12 25 0 15 4 6 18 ]
+    graphminsize => 250
+    labeltextcolor => black
+    tags => [ one two three four five six seven eight ]
+    xlabel => tags
+    pixelfmt => PNG
+    addalt => 1
+    titlealign => center
+    title => vertical
+    highlighttag => [ two six ]
+    borderwidth => 1
+    bartype => pixel
+-->
+
+<!--  GRAPH START -->
+<table cellpadding="1">
+   <tr>
+   <td bgcolor="black">
+<table cellspacing=0 cellpadding=2 border=0 bgcolor="#DDDDDD">
+   <tr bgcolor="#DDDDDD">
+      <td bgcolor="#DDDDDD"></td>
+      <td align="center" colspan="10">
+          <font face="sansserif" color="black" size="+1"><b><u>vertical</u></b></font>
+      </td>
+   </tr>
+    <tr bgcolor="#DDDDDD">
+      <td bgcolor="#AAAAAA" valign="middle" align="center" rowspan="1">
+         <font face="sansserif" color="black"><b>
+          &nbsp;v&nbsp;<br>&nbsp;a&nbsp;<br>&nbsp;l&nbsp;<br>&nbsp;u&nbsp;<br>&nbsp;e&nbsp;<br>&nbsp;s&nbsp;
+         </b></font>
+      </td>
+      <td></td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        7
+        </font><br>
+        <img src="./pixels/blue.png" width="10" height="28" border=0 alt="7">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        12
+        </font><br>
+        <img src="./pixels/red.png" width="10" height="48" border=0 alt="12">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        25
+        </font><br>
+        <img src="./pixels/blue.png" width="10" height="100" border=0 alt="25">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        0
+        </font><br>
+        <img src="./pixels/blue.png" width="10" height="1" border=0 alt="0">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        15
+        </font><br>
+        <img src="./pixels/blue.png" width="10" height="60" border=0 alt="15">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        4
+        </font><br>
+        <img src="./pixels/red.png" width="10" height="16" border=0 alt="4">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        6
+        </font><br>
+        <img src="./pixels/blue.png" width="10" height="24" border=0 alt="6">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        18
+        </font><br>
+        <img src="./pixels/blue.png" width="10" height="72" border=0 alt="18">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td></td>
+   <tr bgcolor="#DDDDDD">
+      <td></td>
+      <td></td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">one</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">two</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">three</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">four</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">five</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">six</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">seven</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">eight</font>
+      </td>
+      <td></td>
+  <tr bgcolor="#DDDDDD">
+      <td></td>
+      <td></td>
+      <td bgcolor="#AAAAAA" valign="middle" align="center" colspan="9">
+          <font face="sansserif" color="black">
+             <b>t&nbsp;a&nbsp;g&nbsp;s</b>
+          </font>
+      </td>
+    <td></td>
+  </tr>
+</table>
+   </td>
+   </tr>
+</table>
+<!--  GRAPH END -->
+
+
+</td>
+<td width="90">&nbsp;</td>
+<td>
+<!-- %args
+    labelbgcolor => #AAAAAA
+    colors => [ blue green lightblue ]
+    direction => v
+    bgcolor => #DDDDDD
+    ylabel => values
+    barwidth => 10
+    barlength => 100
+    setspacer => 0
+    fontface => sansserif
+    showmaxvalues => 1
+    pixeldir => ./pixels
+    baraspect => 0.03
+    bordercolor => black
+    bordertype => reised
+    showaxistags => 1
+    highlightcolor => red
+    data => [ 7 12 25 0 15 4 6 18 ]
+    graphminsize => 250
+    labeltextcolor => black
+    tags => [ one two three four five six seven eight ]
+    xlabel => tags
+    pixelfmt => PNG
+    addalt => 1
+    titlealign => center
+    title => reised border
+    highlighttag => [ two six ]
+    borderwidth => 3
+    bartype => pixel
+-->
+
+<!--  GRAPH START -->
+<table border="3">
+   <tr>
+   <td>
+<table cellspacing=0 cellpadding=2 border=0 bgcolor="#DDDDDD">
+   <tr bgcolor="#DDDDDD">
+      <td bgcolor="#DDDDDD"></td>
+      <td align="center" colspan="10">
+          <font face="sansserif" color="black" size="+1"><b><u>reised border</u></b></font>
+      </td>
+   </tr>
+    <tr bgcolor="#DDDDDD">
+      <td bgcolor="#AAAAAA" valign="middle" align="center" rowspan="1">
+         <font face="sansserif" color="black"><b>
+          &nbsp;v&nbsp;<br>&nbsp;a&nbsp;<br>&nbsp;l&nbsp;<br>&nbsp;u&nbsp;<br>&nbsp;e&nbsp;<br>&nbsp;s&nbsp;
+         </b></font>
+      </td>
+      <td></td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        7
+        </font><br>
+        <img src="./pixels/blue.png" width="10" height="28" border=0 alt="7">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        12
+        </font><br>
+        <img src="./pixels/red.png" width="10" height="48" border=0 alt="12">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        25
+        </font><br>
+        <img src="./pixels/blue.png" width="10" height="100" border=0 alt="25">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        0
+        </font><br>
+        <img src="./pixels/blue.png" width="10" height="1" border=0 alt="0">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        15
+        </font><br>
+        <img src="./pixels/blue.png" width="10" height="60" border=0 alt="15">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        4
+        </font><br>
+        <img src="./pixels/red.png" width="10" height="16" border=0 alt="4">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        6
+        </font><br>
+        <img src="./pixels/blue.png" width="10" height="24" border=0 alt="6">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        18
+        </font><br>
+        <img src="./pixels/blue.png" width="10" height="72" border=0 alt="18">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td></td>
+   <tr bgcolor="#DDDDDD">
+      <td></td>
+      <td></td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">one</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">two</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">three</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">four</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">five</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">six</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">seven</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">eight</font>
+      </td>
+      <td></td>
+  <tr bgcolor="#DDDDDD">
+      <td></td>
+      <td></td>
+      <td bgcolor="#AAAAAA" valign="middle" align="center" colspan="9">
+          <font face="sansserif" color="black">
+             <b>t&nbsp;a&nbsp;g&nbsp;s</b>
+          </font>
+      </td>
+    <td></td>
+  </tr>
+</table>
+   </td>
+   </tr>
+</table>
+<!--  GRAPH END -->
+
+
+</td>
+</tr>
+<tr align="center" valign="middle">
+<td>
+<!-- %args
+    labelbgcolor => #AAAAAA
+    titlecolor => red
+    colors => [ yellow green ]
+    direction => v
+    bgcolor => black
+    ylabel => values
+    barwidth => 10
+    barlength => 100
+    setspacer => 0
+    textcolor => red
+    fontface => sansserif
+    showmaxvalues => 1
+    pixeldir => ./pixels
+    baraspect => 0.03
+    bordercolor => yellow
+    bordertype => flat
+    showaxistags => 1
+    highlightcolor => red
+    data => [ 
+             [ 11 22 23 15 17 5 19 6 ]
+             [ 3 0 5 12 19 5 25 10 ]
+          ] 
+    graphminsize => 250
+    labeltextcolor => yellow
+    tags => [ one two three four five six seven eight ]
+    xlabel => tags
+    pixelfmt => PNG
+    addalt => 1
+    titlealign => center
+    title => colors
+    highlighttag => [ two six ]
+    borderwidth => 1
+    bartype => pixel
+-->
+
+<!--  GRAPH START -->
+<table cellpadding="1">
+   <tr>
+   <td bgcolor="yellow">
+<table cellspacing=0 cellpadding=2 border=0 bgcolor="black">
+   <tr bgcolor="black">
+      <td bgcolor="black"></td>
+      <td align="center" colspan="10">
+          <font face="sansserif" color="red" size="+1"><b><u>colors</u></b></font>
+      </td>
+   </tr>
+    <tr bgcolor="black">
+      <td bgcolor="#AAAAAA" valign="middle" align="center" rowspan="1">
+         <font face="sansserif" color="yellow"><b>
+          &nbsp;v&nbsp;<br>&nbsp;a&nbsp;<br>&nbsp;l&nbsp;<br>&nbsp;u&nbsp;<br>&nbsp;e&nbsp;<br>&nbsp;s&nbsp;
+         </b></font>
+      </td>
+      <td></td>
+      <td align="center" valign="bottom" bgcolor="black">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="black">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="black">
+        <font face="sansserif" color="red" size="-2">
+        11
+        </font><br>
+        <img src="./pixels/yellow.png" width="10" height="44" border=0 alt="11">
+
+      </td>
+      <td align="center" valign="bottom" bgcolor="black">
+        <font face="sansserif" color="red" size="-2">
+        3
+        </font><br>
+        <img src="./pixels/green.png" width="10" height="12" border=0 alt="3">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="black">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="black">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="black">
+        <font face="sansserif" color="red" size="-2">
+        22
+        </font><br>
+        <img src="./pixels/yellow.png" width="10" height="88" border=0 alt="22">
+
+      </td>
+      <td align="center" valign="bottom" bgcolor="black">
+        <font face="sansserif" color="red" size="-2">
+        0
+        </font><br>
+        <img src="./pixels/green.png" width="10" height="1" border=0 alt="0">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="black">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="black">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="black">
+        <font face="sansserif" color="red" size="-2">
+        23
+        </font><br>
+        <img src="./pixels/yellow.png" width="10" height="92" border=0 alt="23">
+
+      </td>
+      <td align="center" valign="bottom" bgcolor="black">
+        <font face="sansserif" color="red" size="-2">
+        5
+        </font><br>
+        <img src="./pixels/green.png" width="10" height="20" border=0 alt="5">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="black">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="black">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="black">
+        <font face="sansserif" color="red" size="-2">
+        15
+        </font><br>
+        <img src="./pixels/yellow.png" width="10" height="60" border=0 alt="15">
+
+      </td>
+      <td align="center" valign="bottom" bgcolor="black">
+        <font face="sansserif" color="red" size="-2">
+        12
+        </font><br>
+        <img src="./pixels/green.png" width="10" height="48" border=0 alt="12">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="black">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="black">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="black">
+        <font face="sansserif" color="red" size="-2">
+        17
+        </font><br>
+        <img src="./pixels/yellow.png" width="10" height="68" border=0 alt="17">
+
+      </td>
+      <td align="center" valign="bottom" bgcolor="black">
+        <font face="sansserif" color="red" size="-2">
+        19
+        </font><br>
+        <img src="./pixels/green.png" width="10" height="76" border=0 alt="19">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="black">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="black">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="black">
+        <font face="sansserif" color="red" size="-2">
+        5
+        </font><br>
+        <img src="./pixels/yellow.png" width="10" height="20" border=0 alt="5">
+
+      </td>
+      <td align="center" valign="bottom" bgcolor="black">
+        <font face="sansserif" color="red" size="-2">
+        5
+        </font><br>
+        <img src="./pixels/green.png" width="10" height="20" border=0 alt="5">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="black">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="black">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="black">
+        <font face="sansserif" color="red" size="-2">
+        19
+        </font><br>
+        <img src="./pixels/yellow.png" width="10" height="76" border=0 alt="19">
+
+      </td>
+      <td align="center" valign="bottom" bgcolor="black">
+        <font face="sansserif" color="red" size="-2">
+        25
+        </font><br>
+        <img src="./pixels/green.png" width="10" height="100" border=0 alt="25">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="black">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="black">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="black">
+        <font face="sansserif" color="red" size="-2">
+        6
+        </font><br>
+        <img src="./pixels/yellow.png" width="10" height="24" border=0 alt="6">
+
+      </td>
+      <td align="center" valign="bottom" bgcolor="black">
+        <font face="sansserif" color="red" size="-2">
+        10
+        </font><br>
+        <img src="./pixels/green.png" width="10" height="40" border=0 alt="10">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td></td>
+   <tr bgcolor="black">
+      <td></td>
+      <td></td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="red">one</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="red">two</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="red">three</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="red">four</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="red">five</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="red">six</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="red">seven</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="red">eight</font>
+      </td>
+      <td></td>
+  <tr bgcolor="black">
+      <td></td>
+      <td></td>
+      <td bgcolor="#AAAAAA" valign="middle" align="center" colspan="9">
+          <font face="sansserif" color="yellow">
+             <b>t&nbsp;a&nbsp;g&nbsp;s</b>
+          </font>
+      </td>
+    <td></td>
+  </tr>
+</table>
+   </td>
+   </tr>
+</table>
+<!--  GRAPH END -->
+
+
+</td>
+<td width="90">&nbsp;</td>
+<td>
+<!-- %args
+    labelbgcolor => #AAAAAA
+    colors => [ blue green lightblue ]
+    direction => h
+    bgcolor => #DDDDDD
+    ylabel => 
+    barwidth => 10
+    barlength => 100
+    setspacer => 0
+    fontface => sansserif
+    showmaxvalues => 0
+    pixeldir => ./pixels
+    baraspect => 0.03
+    bordercolor => black
+    bordertype => flat
+    showaxistags => 0
+    highlightcolor => red
+    data => [ 7 12 25 0 15 4 6 18 ]
+    graphminsize => 250
+    labeltextcolor => black
+    tags => [ one two three four five six seven eight ]
+    xlabel => 
+    pixelfmt => PNG
+    addalt => 1
+    titlealign => center
+    title => bare
+    highlighttag => [ two six ]
+    borderwidth => 1
+    bartype => pixel
+-->
+
+<!--  GRAPH START -->
+<table cellpadding="1">
+   <tr>
+   <td bgcolor="black">
+<table cellspacing=0 cellpadding=2 border=0 bgcolor="#DDDDDD">
+   <tr bgcolor="#DDDDDD">
+      <td align="center" colspan="1">
+          <font face="sansserif" color="black" size="+1"><b><u>bare</u></b></font>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td></td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="28" height="10" border=0 alt="7">
+        <font face="sansserif" color="black" size="-2">
+        7
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+        <td align="left" valign="middle">
+        <img src="./pixels/red.png" width="48" height="10" border=0 alt="12">
+        <font face="sansserif" color="black" size="-2">
+        12
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="100" height="10" border=0 alt="25">
+        <font face="sansserif" color="black" size="-2">
+        25
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="1" height="10" border=0 alt="0">
+        <font face="sansserif" color="black" size="-2">
+        0
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="60" height="10" border=0 alt="15">
+        <font face="sansserif" color="black" size="-2">
+        15
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+        <td align="left" valign="middle">
+        <img src="./pixels/red.png" width="16" height="10" border=0 alt="4">
+        <font face="sansserif" color="black" size="-2">
+        4
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="24" height="10" border=0 alt="6">
+        <font face="sansserif" color="black" size="-2">
+        6
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="72" height="10" border=0 alt="18">
+        <font face="sansserif" color="black" size="-2">
+        18
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td></td>
+   </tr>
+</table>
+   </td>
+   </tr>
+</table>
+<!--  GRAPH END -->
+
+
+</td>
+</tr>
+<tr align="center" valign="middle">
+<td colspan="3" align="center">
+<!-- %args
+    labelbgcolor => #AAAAAA
+    colors => [ blue green lightblue ]
+    direction => h
+    bgcolor => #DDDDDD
+    ylabel => tags
+    barwidth => 10
+    barlength => 650
+    setspacer => 0
+    fontface => sansserif
+    showmaxvalues => 1
+    pixeldir => ./pixels
+    baraspect => 0.03
+    bordercolor => black
+    bordertype => flat
+    showaxistags => 1
+    highlightcolor => red
+    data => [ 7 12 25 0 15 4 6 18 ]
+    graphminsize => 250
+    labeltextcolor => black
+    tags => [ one two three four five six seven eight ]
+    xlabel => values
+    pixelfmt => PNG
+    addalt => 1
+    titlealign => center
+    title => graph dimensions
+    highlighttag => [ two six ]
+    borderwidth => 1
+    bartype => pixel
+-->
+
+<!--  GRAPH START -->
+<table cellpadding="1">
+   <tr>
+   <td bgcolor="black">
+<table cellspacing=0 cellpadding=2 border=0 bgcolor="#DDDDDD">
+   <tr bgcolor="#DDDDDD">
+      <td bgcolor="#DDDDDD"></td>
+      <td align="center" colspan="2">
+          <font face="sansserif" color="black" size="+1"><b><u>graph dimensions</u></b></font>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td></td>
+      <td></td>
+      <td></td>
+   </tr>
+    <tr bgcolor="#DDDDDD">
+      <td bgcolor="#AAAAAA" valign="middle" align="center" rowspan="9">
+         <font face="sansserif" color="black"><b>
+          &nbsp;t&nbsp;<br>&nbsp;a&nbsp;<br>&nbsp;g&nbsp;<br>&nbsp;s&nbsp;
+         </b></font>
+      </td>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        one 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="182" height="10" border=0 alt="7">
+        <font face="sansserif" color="black" size="-2">
+        7
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        two 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/red.png" width="312" height="10" border=0 alt="12">
+        <font face="sansserif" color="black" size="-2">
+        12
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        three 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="650" height="10" border=0 alt="25">
+        <font face="sansserif" color="black" size="-2">
+        25
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        four 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="1" height="10" border=0 alt="0">
+        <font face="sansserif" color="black" size="-2">
+        0
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        five 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="390" height="10" border=0 alt="15">
+        <font face="sansserif" color="black" size="-2">
+        15
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        six 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/red.png" width="104" height="10" border=0 alt="4">
+        <font face="sansserif" color="black" size="-2">
+        4
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        seven 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="156" height="10" border=0 alt="6">
+        <font face="sansserif" color="black" size="-2">
+        6
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        eight 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="468" height="10" border=0 alt="18">
+        <font face="sansserif" color="black" size="-2">
+        18
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td></td>
+      <td></td>
+      <td></td>
+   </tr>
+  <tr bgcolor="#DDDDDD">
+      <td></td>
+      <td></td>
+      <td bgcolor="#AAAAAA" valign="middle" align="center" colspan="1">
+          <font face="sansserif" color="black">
+             <b>v&nbsp;a&nbsp;l&nbsp;u&nbsp;e&nbsp;s</b>
+          </font>
+      </td>
+  </tr>
+</table>
+   </td>
+   </tr>
+</table>
+<!--  GRAPH END -->
+
+
+</td>
+</tr>
+<tr align="center" valign="middle">
+<td>
+<!-- %args
+    labelbgcolor => #AAAAAA
+    colors => [ blue green lightblue ]
+    direction => v
+    bgcolor => #DDDDDD
+    ylabel => values
+    barwidth => 0
+    barlength => 0
+    setspacer => 0
+    fontface => sansserif
+    showmaxvalues => 1
+    pixeldir => ./pixels
+    baraspect => 0.4
+    bordercolor => black
+    bordertype => flat
+    showaxistags => 1
+    highlightcolor => red
+    data => [ 7 12 25 0 15 4 6 18 ]
+    graphminsize => 250
+    labeltextcolor => black
+    tags => [ one two three four five six seven eight ]
+    xlabel => tags
+    pixelfmt => PNG
+    addalt => 1
+    titlealign => center
+    title => bar aspect
+    highlighttag => [ two six ]
+    borderwidth => 1
+    bartype => pixel
+-->
+
+<!--  GRAPH START -->
+<table cellpadding="1">
+   <tr>
+   <td bgcolor="black">
+<table cellspacing=0 cellpadding=2 border=0 bgcolor="#DDDDDD">
+   <tr bgcolor="#DDDDDD">
+      <td bgcolor="#DDDDDD"></td>
+      <td align="center" colspan="10">
+          <font face="sansserif" color="black" size="+1"><b><u>bar aspect</u></b></font>
+      </td>
+   </tr>
+    <tr bgcolor="#DDDDDD">
+      <td bgcolor="#AAAAAA" valign="middle" align="center" rowspan="1">
+         <font face="sansserif" color="black"><b>
+          &nbsp;v&nbsp;<br>&nbsp;a&nbsp;<br>&nbsp;l&nbsp;<br>&nbsp;u&nbsp;<br>&nbsp;e&nbsp;<br>&nbsp;s&nbsp;
+         </b></font>
+      </td>
+      <td></td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        7
+        </font><br>
+        <img src="./pixels/blue.png" width="40" height="28" border=0 alt="7">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        12
+        </font><br>
+        <img src="./pixels/red.png" width="40" height="48" border=0 alt="12">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        25
+        </font><br>
+        <img src="./pixels/blue.png" width="40" height="100" border=0 alt="25">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        0
+        </font><br>
+        <img src="./pixels/blue.png" width="40" height="1" border=0 alt="0">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        15
+        </font><br>
+        <img src="./pixels/blue.png" width="40" height="60" border=0 alt="15">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        4
+        </font><br>
+        <img src="./pixels/red.png" width="40" height="16" border=0 alt="4">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        6
+        </font><br>
+        <img src="./pixels/blue.png" width="40" height="24" border=0 alt="6">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        18
+        </font><br>
+        <img src="./pixels/blue.png" width="40" height="72" border=0 alt="18">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td></td>
+   <tr bgcolor="#DDDDDD">
+      <td></td>
+      <td></td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">one</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">two</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">three</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">four</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">five</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">six</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">seven</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">eight</font>
+      </td>
+      <td></td>
+  <tr bgcolor="#DDDDDD">
+      <td></td>
+      <td></td>
+      <td bgcolor="#AAAAAA" valign="middle" align="center" colspan="9">
+          <font face="sansserif" color="black">
+             <b>t&nbsp;a&nbsp;g&nbsp;s</b>
+          </font>
+      </td>
+    <td></td>
+  </tr>
+</table>
+   </td>
+   </tr>
+</table>
+<!--  GRAPH END -->
+
+
+</td>
+<td width="90">&nbsp;</td>
+<td>
+<!-- %args
+    labelbgcolor => #AAAAAA
+    colors => [ blue green lightblue ]
+    direction => h
+    valuesuffix => %
+    bgcolor => #DDDDDD
+    ylabel => tags
+    barwidth => 10
+    barlength => 100
+    setspacer => 0
+    fontface => sansserif
+    showmaxvalues => 1
+    pixeldir => ./pixels
+    baraspect => 0.03
+    bordercolor => black
+    bordertype => flat
+    showaxistags => 1
+    highlightcolor => red
+    data => [ 7 12 25 0 15 4 6 18 ]
+    graphminsize => 250
+    labeltextcolor => black
+    tags => [ one two three four five six seven eight ]
+    xlabel => values
+    pixelfmt => PNG
+    addalt => 1
+    titlealign => center
+    title => max value prefix and suffix
+    valueprefix =>  >
+    highlighttag => [ two six ]
+    borderwidth => 1
+    bartype => pixel
+-->
+
+<!--  GRAPH START -->
+<table cellpadding="1">
+   <tr>
+   <td bgcolor="black">
+<table cellspacing=0 cellpadding=2 border=0 bgcolor="#DDDDDD">
+   <tr bgcolor="#DDDDDD">
+      <td bgcolor="#DDDDDD"></td>
+      <td align="center" colspan="2">
+          <font face="sansserif" color="black" size="+1"><b><u>max value prefix and suffix</u></b></font>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td></td>
+      <td></td>
+      <td></td>
+   </tr>
+    <tr bgcolor="#DDDDDD">
+      <td bgcolor="#AAAAAA" valign="middle" align="center" rowspan="9">
+         <font face="sansserif" color="black"><b>
+          &nbsp;t&nbsp;<br>&nbsp;a&nbsp;<br>&nbsp;g&nbsp;<br>&nbsp;s&nbsp;
+         </b></font>
+      </td>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        one 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="28" height="10" border=0 alt="7">
+        <font face="sansserif" color="black" size="-2">
+         >7%
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        two 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/red.png" width="48" height="10" border=0 alt="12">
+        <font face="sansserif" color="black" size="-2">
+         >12%
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        three 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="100" height="10" border=0 alt="25">
+        <font face="sansserif" color="black" size="-2">
+         >25%
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        four 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="1" height="10" border=0 alt="0">
+        <font face="sansserif" color="black" size="-2">
+         >0%
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        five 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="60" height="10" border=0 alt="15">
+        <font face="sansserif" color="black" size="-2">
+         >15%
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        six 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/red.png" width="16" height="10" border=0 alt="4">
+        <font face="sansserif" color="black" size="-2">
+         >4%
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        seven 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="24" height="10" border=0 alt="6">
+        <font face="sansserif" color="black" size="-2">
+         >6%
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        eight 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="72" height="10" border=0 alt="18">
+        <font face="sansserif" color="black" size="-2">
+         >18%
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td></td>
+      <td></td>
+      <td></td>
+   </tr>
+  <tr bgcolor="#DDDDDD">
+      <td></td>
+      <td></td>
+      <td bgcolor="#AAAAAA" valign="middle" align="center" colspan="1">
+          <font face="sansserif" color="black">
+             <b>v&nbsp;a&nbsp;l&nbsp;u&nbsp;e&nbsp;s</b>
+          </font>
+      </td>
+  </tr>
+</table>
+   </td>
+   </tr>
+</table>
+<!--  GRAPH END -->
+
+
+</td>
+</tr>
+<tr align="center" valign="middle">
+<td>
+<!-- %args
+    labelbgcolor => #AAAAAA
+    colors => [ blue green lightblue ]
+    direction => h
+    bgcolor => #DDDDDD
+    ylabel => tags
+    barwidth => 10
+    barlength => 100
+    setspacer => 0
+    fontface => sansserif
+    showmaxvalues => 1
+    pixeldir => ./pixels
+    baraspect => 0.03
+    bordercolor => black
+    bordertype => flat
+    showaxistags => 1
+    highlightcolor => red
+    data => [ 7 12 25 0 15 4 6 18 ]
+    graphminsize => 250
+    labeltextcolor => black
+    tags => [ one two three four five six seven eight ]
+    xlabel => values
+    pixelfmt => PNG
+    addalt => 1
+    titlealign => right
+    ylabelalign => top
+    title => alignment
+    highlighttag => [ two six ]
+    borderwidth => 1
+    xlabelalign => right
+    bartype => pixel
+-->
+
+<!--  GRAPH START -->
+<table cellpadding="1">
+   <tr>
+   <td bgcolor="black">
+<table cellspacing=0 cellpadding=2 border=0 bgcolor="#DDDDDD">
+   <tr bgcolor="#DDDDDD">
+      <td bgcolor="#DDDDDD"></td>
+      <td align="right" colspan="2">
+          <font face="sansserif" color="black" size="+1"><b><u>alignment</u></b></font>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td></td>
+      <td></td>
+      <td></td>
+   </tr>
+    <tr bgcolor="#DDDDDD">
+      <td bgcolor="#AAAAAA" valign="top" align="center" rowspan="9">
+         <font face="sansserif" color="black"><b>
+          &nbsp;t&nbsp;<br>&nbsp;a&nbsp;<br>&nbsp;g&nbsp;<br>&nbsp;s&nbsp;
+         </b></font>
+      </td>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        one 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="28" height="10" border=0 alt="7">
+        <font face="sansserif" color="black" size="-2">
+        7
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        two 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/red.png" width="48" height="10" border=0 alt="12">
+        <font face="sansserif" color="black" size="-2">
+        12
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        three 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="100" height="10" border=0 alt="25">
+        <font face="sansserif" color="black" size="-2">
+        25
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        four 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="1" height="10" border=0 alt="0">
+        <font face="sansserif" color="black" size="-2">
+        0
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        five 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="60" height="10" border=0 alt="15">
+        <font face="sansserif" color="black" size="-2">
+        15
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        six 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/red.png" width="16" height="10" border=0 alt="4">
+        <font face="sansserif" color="black" size="-2">
+        4
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        seven 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="24" height="10" border=0 alt="6">
+        <font face="sansserif" color="black" size="-2">
+        6
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        eight 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+        <img src="./pixels/blue.png" width="72" height="10" border=0 alt="18">
+        <font face="sansserif" color="black" size="-2">
+        18
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td></td>
+      <td></td>
+      <td></td>
+   </tr>
+  <tr bgcolor="#DDDDDD">
+      <td></td>
+      <td></td>
+      <td bgcolor="#AAAAAA" valign="middle" align="right" colspan="1">
+          <font face="sansserif" color="black">
+             <b>v&nbsp;a&nbsp;l&nbsp;u&nbsp;e&nbsp;s</b>
+          </font>
+      </td>
+  </tr>
+</table>
+   </td>
+   </tr>
+</table>
+<!--  GRAPH END -->
+
+
+</td>
+<td width="90">&nbsp;</td>
+<td>
+<!-- %args
+    labelbgcolor => #AAAAAA
+    colors => [ blue green lightblue ]
+    direction => v
+    bgcolor => #DDDDDD
+    ylabel => values
+    barwidth => 10
+    barlength => 100
+    setspacer => 0
+    fontface => sansserif
+    showmaxvalues => 0
+    pixeldir => ./pixels
+    baraspect => 0.03
+    bordercolor => black
+    bordertype => flat
+    showaxistags => 1
+    highlightcolor => red
+    data => [ 7 12 25 0 15 4 6 18 ]
+    graphminsize => 0
+    labeltextcolor => black
+    tags => [ one two three four five six seven eight ]
+    pixelfmt => PNG
+    addalt => 1
+    titlealign => center
+    title => Y label only, no max values
+    highlighttag => [ two six ]
+    borderwidth => 1
+    bartype => pixel
+-->
+
+<!--  GRAPH START -->
+<table cellpadding="1">
+   <tr>
+   <td bgcolor="black">
+<table cellspacing=0 cellpadding=2 border=0 bgcolor="#DDDDDD">
+   <tr bgcolor="#DDDDDD">
+      <td bgcolor="#DDDDDD"></td>
+      <td align="center" colspan="10">
+          <font face="sansserif" color="black" size="+1"><b><u>Y label only, no max values</u></b></font>
+      </td>
+   </tr>
+    <tr bgcolor="#DDDDDD">
+      <td bgcolor="#AAAAAA" valign="middle" align="center" rowspan="1">
+         <font face="sansserif" color="black"><b>
+          &nbsp;v&nbsp;<br>&nbsp;a&nbsp;<br>&nbsp;l&nbsp;<br>&nbsp;u&nbsp;<br>&nbsp;e&nbsp;<br>&nbsp;s&nbsp;
+         </b></font>
+      </td>
+      <td></td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        7
+        </font><br>
+        <img src="./pixels/blue.png" width="10" height="28" border=0 alt="7">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        12
+        </font><br>
+        <img src="./pixels/red.png" width="10" height="48" border=0 alt="12">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        25
+        </font><br>
+        <img src="./pixels/blue.png" width="10" height="100" border=0 alt="25">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        0
+        </font><br>
+        <img src="./pixels/blue.png" width="10" height="1" border=0 alt="0">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        15
+        </font><br>
+        <img src="./pixels/blue.png" width="10" height="60" border=0 alt="15">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        4
+        </font><br>
+        <img src="./pixels/red.png" width="10" height="16" border=0 alt="4">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        6
+        </font><br>
+        <img src="./pixels/blue.png" width="10" height="24" border=0 alt="6">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        18
+        </font><br>
+        <img src="./pixels/blue.png" width="10" height="72" border=0 alt="18">
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td></td>
+   <tr bgcolor="#DDDDDD">
+      <td></td>
+      <td></td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">one</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">two</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">three</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">four</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">five</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">six</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">seven</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">eight</font>
+      </td>
+      <td></td>
+</table>
+   </td>
+   </tr>
+</table>
+<!--  GRAPH END -->
+
+
+</td>
+</tr>
+<tr align="center" valign="middle">
+<td>
+<!-- %args
+    labelbgcolor => #AAAAAA
+    colors => [ blue green lightblue ]
+    direction => h
+    bgcolor => #DDDDDD
+    ylabel => tags
+    barwidth => 10
+    barlength => 100
+    setspacer => 0
+    fontface => sansserif
+    showmaxvalues => 1
+    pixeldir => ./pixels
+    baraspect => 0.03
+    bordercolor => black
+    bordertype => flat
+    showaxistags => 1
+    highlightcolor => red
+    data => [ 7 12 25 0 15 4 6 18 ]
+    graphminsize => 250
+    labeltextcolor => black
+    tags => [ one two three four five six seven eight ]
+    xlabel => values
+    pixelfmt => PNG
+    addalt => 1
+    titlealign => center
+    title => 100% HTML graph
+    highlighttag => [ two six ]
+    borderwidth => 1
+    bartype => html
+-->
+
+<!--  GRAPH START -->
+<table cellpadding="1">
+   <tr>
+   <td bgcolor="black">
+<table cellspacing=0 cellpadding=2 border=0 bgcolor="#DDDDDD">
+   <tr bgcolor="#DDDDDD">
+      <td bgcolor="#DDDDDD"></td>
+      <td align="center" colspan="2">
+          <font face="sansserif" color="black" size="+1"><b><u>100% HTML graph</u></b></font>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td></td>
+      <td></td>
+      <td></td>
+   </tr>
+    <tr bgcolor="#DDDDDD">
+      <td bgcolor="#AAAAAA" valign="middle" align="center" rowspan="9">
+         <font face="sansserif" color="black"><b>
+          &nbsp;t&nbsp;<br>&nbsp;a&nbsp;<br>&nbsp;g&nbsp;<br>&nbsp;s&nbsp;
+         </b></font>
+      </td>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        one 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+             <table cellspacing=0 cellpadding=0 border=0 align="left">
+                <tr><td width="28" height="10" bgcolor="blue" align="left" valign="middle"></td></tr>
+             </table>&nbsp;
+        <font face="sansserif" color="black" size="-2">
+        7
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        two 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+             <table cellspacing=0 cellpadding=0 border=0 align="left">
+                <tr><td width="48" height="10" bgcolor="red" align="left" valign="middle"></td></tr>
+             </table>&nbsp;
+        <font face="sansserif" color="black" size="-2">
+        12
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        three 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+             <table cellspacing=0 cellpadding=0 border=0 align="left">
+                <tr><td width="100" height="10" bgcolor="blue" align="left" valign="middle"></td></tr>
+             </table>&nbsp;
+        <font face="sansserif" color="black" size="-2">
+        25
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        four 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+             <table cellspacing=0 cellpadding=0 border=0 align="center">
+                <tr><td width="1" height="10" bgcolor="blue" align="center" valign="bottom"></td></tr>
+             </table>&nbsp;
+        <font face="sansserif" color="black" size="-2">
+        0
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        five 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+             <table cellspacing=0 cellpadding=0 border=0 align="left">
+                <tr><td width="60" height="10" bgcolor="blue" align="left" valign="middle"></td></tr>
+             </table>&nbsp;
+        <font face="sansserif" color="black" size="-2">
+        15
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        six 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+             <table cellspacing=0 cellpadding=0 border=0 align="left">
+                <tr><td width="16" height="10" bgcolor="red" align="left" valign="middle"></td></tr>
+             </table>&nbsp;
+        <font face="sansserif" color="black" size="-2">
+        4
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        seven 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+             <table cellspacing=0 cellpadding=0 border=0 align="left">
+                <tr><td width="24" height="10" bgcolor="blue" align="left" valign="middle"></td></tr>
+             </table>&nbsp;
+        <font face="sansserif" color="black" size="-2">
+        6
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td align="right" valign="middle">
+        <font face="sansserif" color="black"> 
+        eight 
+        </font>
+      </td>
+        <td align="left" valign="middle">
+             <table cellspacing=0 cellpadding=0 border=0 align="left">
+                <tr><td width="72" height="10" bgcolor="blue" align="left" valign="middle"></td></tr>
+             </table>&nbsp;
+        <font face="sansserif" color="black" size="-2">
+        18
+        </font>
+
+
+<br>
+      </td>
+   </tr>
+   <tr bgcolor="#DDDDDD">
+      <td></td>
+      <td></td>
+      <td></td>
+   </tr>
+  <tr bgcolor="#DDDDDD">
+      <td></td>
+      <td></td>
+      <td bgcolor="#AAAAAA" valign="middle" align="center" colspan="1">
+          <font face="sansserif" color="black">
+             <b>v&nbsp;a&nbsp;l&nbsp;u&nbsp;e&nbsp;s</b>
+          </font>
+      </td>
+  </tr>
+</table>
+   </td>
+   </tr>
+</table>
+<!--  GRAPH END -->
+
+
+</td>
+<td width="90">&nbsp;</td>
+<td>
+<!-- %args
+    labelbgcolor => #AAAAAA
+    colors => [ blue green lightblue ]
+    direction => v
+    bgcolor => #DDDDDD
+    ylabel => values
+    barwidth => 10
+    barlength => 100
+    setspacer => 0
+    fontface => sansserif
+    showmaxvalues => 1
+    pixeldir => ./pixels
+    baraspect => 0.03
+    bordercolor => black
+    bordertype => flat
+    showaxistags => 1
+    highlightcolor => red
+    data => [ 7 12 25 0 15 4 6 18 ]
+    graphminsize => 250
+    labeltextcolor => black
+    tags => [ one two three four five six seven eight ]
+    xlabel => tags
+    pixelfmt => PNG
+    addalt => 1
+    titlealign => center
+    title => 100% HTML graph
+    highlighttag => [ two six ]
+    borderwidth => 1
+    bartype => html
+-->
+
+<!--  GRAPH START -->
+<table cellpadding="1">
+   <tr>
+   <td bgcolor="black">
+<table cellspacing=0 cellpadding=2 border=0 bgcolor="#DDDDDD">
+   <tr bgcolor="#DDDDDD">
+      <td bgcolor="#DDDDDD"></td>
+      <td align="center" colspan="10">
+          <font face="sansserif" color="black" size="+1"><b><u>100% HTML graph</u></b></font>
+      </td>
+   </tr>
+    <tr bgcolor="#DDDDDD">
+      <td bgcolor="#AAAAAA" valign="middle" align="center" rowspan="1">
+         <font face="sansserif" color="black"><b>
+          &nbsp;v&nbsp;<br>&nbsp;a&nbsp;<br>&nbsp;l&nbsp;<br>&nbsp;u&nbsp;<br>&nbsp;e&nbsp;<br>&nbsp;s&nbsp;
+         </b></font>
+      </td>
+      <td></td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        7
+        </font><br>
+             <table cellspacing=0 cellpadding=0 border=0 align="center">
+                <tr><td width="10" height="28" bgcolor="blue" align="center" valign="bottom"></td></tr>
+             </table>&nbsp;
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        12
+        </font><br>
+             <table cellspacing=0 cellpadding=0 border=0 align="center">
+                <tr><td width="10" height="48" bgcolor="red" align="center" valign="bottom"></td></tr>
+             </table>&nbsp;
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        25
+        </font><br>
+             <table cellspacing=0 cellpadding=0 border=0 align="center">
+                <tr><td width="10" height="100" bgcolor="blue" align="center" valign="bottom"></td></tr>
+             </table>&nbsp;
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        0
+        </font><br>
+             <table cellspacing=0 cellpadding=0 border=0 align="left">
+                <tr><td width="10" height="1" bgcolor="blue" align="left" valign="middle"></td></tr>
+             </table>&nbsp;
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        15
+        </font><br>
+             <table cellspacing=0 cellpadding=0 border=0 align="center">
+                <tr><td width="10" height="60" bgcolor="blue" align="center" valign="bottom"></td></tr>
+             </table>&nbsp;
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        4
+        </font><br>
+             <table cellspacing=0 cellpadding=0 border=0 align="center">
+                <tr><td width="10" height="16" bgcolor="red" align="center" valign="bottom"></td></tr>
+             </table>&nbsp;
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        6
+        </font><br>
+             <table cellspacing=0 cellpadding=0 border=0 align="center">
+                <tr><td width="10" height="24" bgcolor="blue" align="center" valign="bottom"></td></tr>
+             </table>&nbsp;
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <table cellspacing=0 cellpadding=0 border=0 bgcolor="#DDDDDD">
+          <tr>
+      <td align="center" valign="bottom" bgcolor="#DDDDDD">
+        <font face="sansserif" color="black" size="-2">
+        18
+        </font><br>
+             <table cellspacing=0 cellpadding=0 border=0 align="center">
+                <tr><td width="10" height="72" bgcolor="blue" align="center" valign="bottom"></td></tr>
+             </table>&nbsp;
+
+      </td>
+          </tr>
+        </table>
+      </td>
+      <td></td>
+   <tr bgcolor="#DDDDDD">
+      <td></td>
+      <td></td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">one</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">two</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">three</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">four</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">five</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">six</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">seven</font>
+      </td>
+      <td align="center" valign="middle">
+         <font face="sansserif" color="black">eight</font>
+      </td>
+      <td></td>
+  <tr bgcolor="#DDDDDD">
+      <td></td>
+      <td></td>
+      <td bgcolor="#AAAAAA" valign="middle" align="center" colspan="9">
+          <font face="sansserif" color="black">
+             <b>t&nbsp;a&nbsp;g&nbsp;s</b>
+          </font>
+      </td>
+    <td></td>
+  </tr>
+</table>
+   </td>
+   </tr>
+</table>
+<!--  GRAPH END -->
+
+
+</td>
+</tr></table>
+</center>
+</body>
+</html>

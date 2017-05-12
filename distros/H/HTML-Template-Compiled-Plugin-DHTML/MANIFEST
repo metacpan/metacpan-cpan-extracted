@@ -1,0 +1,17 @@
+Changes
+Build.PL
+lib/HTML/Template/Compiled/Plugin/DHTML.pm
+MANIFEST			This list of files
+README.md
+t/01_version.t
+t/02_pod.t
+t/03_pod_cover.t
+t/04_dhtml.t
+t/HTC_Utils.pm
+t/templates/dhtml.htc
+t/templates/inc.html
+examples/dhtml.html
+Makefile.PL
+README
+META.yml
+META.json

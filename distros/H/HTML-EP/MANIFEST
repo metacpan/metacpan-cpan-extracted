@@ -1,0 +1,57 @@
+ChangeLog			Version history
+MANIFEST			This file
+MANIFEST.SKIP
+Makefile.PL			Makefile generator
+README				I mean it :-)
+lib/Apache/EP.pm		Modules for mod_perl support
+lib/Bundle/HTML/EP.pm		Bundle for CPAN installation
+lib/HTML/EP.pm			Main module
+lib/HTML/EP.pod			Docs
+lib/HTML/EP/CGIEncryptForm.pm	Interface to CGI::EncryptForm
+lib/HTML/EP/Install.pm
+lib/HTML/EP/EditTable.pm	Editing a DBI table
+lib/HTML/EP/Locale.pm		Localization
+lib/HTML/EP/Parser.pm
+lib/HTML/EP/Session.pm		Session management
+lib/HTML/EP/Session/Cookie.pm	Cookie sessions
+lib/HTML/EP/Session/DBI.pm	DBI sessions
+lib/HTML/EP/Session/DBIq.pm	DBI sessions using quoted column names
+lib/HTML/EP/Session/Dumper.pm	Data::Dumper based sessions
+lib/HTML/EP/Shop.pm		E-Commerce support
+lib/HTML/EP/Examples/Admin.pm   Library for Firewall administration
+lib/HTML/EP/Examples/POP3Client.pm Library for a simple POP3 client
+ep.cgi.PL			CGI binary (standalone)
+t/base.t			Base test (loading the modules)
+t/cef.t				HTML::EP::CGIEncryptForm test
+t/errors.t			Error handling test
+t/locale.t			HTML::EP::Locale tests
+t/misc.t			Miscellaneous commands
+t/session.t			Session test
+t/shop.t			Shopping cart test
+t/vars.t			Variable handling test
+examples/admin/README		Firewall administration (Docs)
+examples/admin/group.ep		Firewall administration (Group management)
+examples/admin/index.ep		Firewall administration (Menu)
+examples/admin/mail2group	Firewall administration (Mail forwarder)
+examples/admin/mail2group.ep	Firewall administration (Mail forwarder admin)
+examples/admin/rmgroup.ep	Firewall administration (Group removal)
+examples/admin/rmuser.ep	Firewall administration (User removal)
+examples/admin/squid.ep		Firewall administration (Squid configuration)
+examples/admin/squid_simple.ep	Firewall administration (Same, but simple)
+examples/admin/user.ep		Firewall administration (User managament)
+examples/admin/usersModified	Firewall administration (Backend)
+examples/edit.ep		Generic script for editing DBI tables
+examples/pop3/delete.ep		POP3 Client (Deleting a mail)
+examples/pop3/index.ep		POP3 Client (Welcome page)
+examples/pop3/list.ep		POP3 Client (Mailbox list)
+examples/pop3/reply.ep		POP3 Client (Replying a mail)
+examples/pop3/send.ep		POP3 Client (Sending a mail)
+examples/pop3/show.ep		POP3 Client (Mail display)
+examples/shop/README		Shopping cart (Docs)
+examples/shop/admin/index.ep	Shopping cart (Main administration page)
+examples/shop/admin/download.ep	Shopping cart (Download page)
+examples/shop/admin/prefs.ep	Shopping cart (Preferences)
+examples/shop/admin/upload.ep	Shopping cart (Upload page)
+html/test.ep
+html/de.jpg
+html/en.jpg

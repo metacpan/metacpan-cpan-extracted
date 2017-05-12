@@ -1,0 +1,773 @@
+# NAME
+
+HTML::GenToc - Generate a Table of Contents for HTML documents.
+
+# VERSION
+
+version 3.20
+
+# SYNOPSIS
+
+  use HTML::GenToc;
+
+  # create a new object
+  my $toc = new HTML::GenToc();
+
+  my $toc = new HTML::GenToc(title=>"Table of Contents",
+			  toc_entry=>{
+			    H1=>1,
+			    H2=>2
+			  },
+			  toc_end=>{
+			    H1=>'/H1',
+			    H2=>'/H2'
+			  }
+    );
+
+  # generate a ToC from a file
+  $toc->generate_toc(input=>$html_file,
+		     footer=>$footer_file,
+		     header=>$header_file
+    );
+
+
+
+# DESCRIPTION
+
+HTML::GenToc generates anchors and a table of contents for
+HTML documents.  Depending on the arguments, it will insert
+the information it generates, or output to a string, a separate file
+or STDOUT.
+
+While it defaults to taking H1 and H2 elements as the significant
+elements to put into the table of contents, any tag can be defined
+as a significant element.  Also, it doesn't matter if the input
+HTML code is complete, pure HTML, one can input pseudo-html
+or page-fragments, which makes it suitable for using on templates
+and HTML meta-languages such as WML.
+
+Also included in the distrubution is hypertoc, a script which uses the
+module so that one can process files on the command-line in a
+user-friendly manner.
+
+# DETAILS
+
+The ToC generated is a multi-level level list containing links to the
+significant elements. HTML::GenToc inserts the links into the ToC to
+significant elements at a level specified by the user.
+
+__Example:__
+
+If H1s are specified as level 1, than they appear in the first
+level list of the ToC. If H2s are specified as a level 2, than
+they appear in a second level list in the ToC.
+
+Information on the significant elements and what level they should occur
+are passed in to the methods used by this object, or one can use the
+defaults.
+
+There are two phases to the ToC generation.  The first phase is to
+put suitable anchors into the HTML documents, and the second phase
+is to generate the ToC from HTML documents which have anchors
+in them for the ToC to link to.
+
+For more information on controlling the contents of the created ToC, see
+L</Formatting the ToC>.
+
+HTML::GenToc also supports the ability to incorporate the ToC into the HTML
+document itself via the __inline__ option.  See L</Inlining the ToC> for more
+information.
+
+In order for HTML::GenToc to support linking to significant elements,
+HTML::GenToc inserts anchors into the significant elements.  One can
+use HTML::GenToc as a filter, outputing the result to another file,
+or one can overwrite the original file, with the original backed
+up with a suffix (default: "org") appended to the filename.
+One can also output the result to a string.
+
+# METHODS
+
+Default arguments can be set when the object is created, and overridden
+by setting arguments when the generate_toc method is called.
+Arguments are given as a hash of arguments.
+
+## Method -- new
+
+    $toc = new HTML::GenToc();
+
+    $toc = new HTML::GenToc(toc_entry=>\%my_toc_entry,
+	toc_end=>\%my_toc_end,
+	bak=>'bak',
+    	...
+        );
+
+Creates a new HTML::GenToc object.
+
+These arguments will be used as defaults in invocations of other methods.
+
+See [generate_tod](http://search.cpan.org/perldoc?generate_tod) for possible arguments.
+
+## generate_toc
+
+    $toc->generate_toc(outfile=>"index2.html");
+
+    my $result_str = $toc->generate_toc(to_string=>1);
+
+Generates a table of contents for the significant elements in the HTML
+documents, optionally generating anchors for them first.
+
+__Options__
+
+- bak
+
+bak => _string_
+
+If the input file/files is/are being overwritten (__overwrite__ is on), copy
+the original file to "_filename_._string_".  If the value is empty, __no__
+backup file will be created.
+(default:org)
+
+- debug
+
+debug => 1
+
+Enable verbose debugging output.  Used for debugging this module;
+in other words, don't bother.
+(default:off)
+
+- entrysep
+
+entrysep => _string_
+
+Separator string for non-<li> item entries
+(default: ", ")
+
+- filenames
+
+filenames => \@filenames
+
+The filenames to use when creating table-of-contents links.
+This overrides the filenames given in the __input__ option,
+and is expected to have exactly the same number of elements.
+This can also be used when passing in string-content to the __input__
+option, to give a (fake) filename to use for the links relating
+to that content.
+
+- footer
+
+footer => _file_or_string_
+
+Either the filename of the file containing footer text for ToC;
+or a string containing the footer text.
+
+- header
+
+header => _file_or_string_
+
+Either the filename of the file containing header text for ToC;
+or a string containing the header text.
+
+- ignore_only_one
+
+ignore_only_one => 1
+
+If there would be only one item in the ToC, don't make a ToC.
+
+- ignore_sole_first
+
+ignore_sole_first => 1
+
+If the first item in the ToC is of the highest level,
+AND it is the only one of that level, ignore it.
+This is useful in web-pages where there is only one H1 header
+but one doesn't know beforehand whether there will be only one.
+
+- inline
+
+inline => 1
+
+Put ToC in document at a given point.
+See L</Inlining the ToC> for more information.
+
+- input
+
+input => \@filenames
+
+input => $content
+
+This is expected to be either a reference to an array of filenames,
+or a string containing content to process.
+
+The three main uses would be:
+
+    - (a)
+
+    you have more than one file to process, so pass in multiple filenames
+
+    - (b)
+
+    you have one file to process, so pass in its filename as the only array item
+
+    - (c)
+
+    you have HTML content to process, so pass in just the content as a string
+
+(default:undefined)
+
+- notoc_match
+
+notoc_match => _string_
+
+If there are certain individual tags you don't wish to include in the
+table of contents, even though they match the "significant elements",
+then if this pattern matches contents inside the tag (not the body),
+then that tag will not be included, either in generating anchors nor in
+generating the ToC.  (default: `class="notoc"`)
+
+- ol
+
+ol => 1
+
+Use an ordered list for level 1 ToC entries.
+
+- ol_num_levels
+
+ol_num_levels => 2
+
+The number of levels deep the OL listing will go if __ol__ is true.
+If set to zero, will use an ordered list for all levels.
+(default:1)
+
+- overwrite
+
+overwrite => 1
+
+Overwrite the input file with the output.
+(default:off)
+
+- outfile
+
+outfile => _file_
+
+File to write the output to.  This is where the modified HTML
+output goes to.  Note that it doesn't make sense to use this option if you
+are processing more than one file.  If you give '-' as the filename, then
+output will go to STDOUT.
+(default: STDOUT)
+
+- quiet
+
+quiet => 1
+
+Suppress informative messages. (default: off)
+
+- textonly
+
+textonly => 1
+
+Use only text content in significant elements.
+
+- title
+
+title => _string_
+
+Title for ToC page (if not using __header__ or __inline__ or __toc_only__)
+(default: "Table of Contents")
+
+- toc_after
+
+toc_after => \%toc_after_data
+
+%toc_after_data = { _tag1_ => _suffix1_,
+    _tag2_ => _suffix2_
+    };
+
+toc_after => { H2=>'</em>' }
+
+For defining layout of significant elements in the ToC.
+
+This expects a reference to a hash of
+tag=>suffix pairs.
+
+The _tag_ is the HTML tag which marks the start of the element.  The
+_suffix_ is what is required to be appended to the Table of Contents
+entry generated for that tag.
+
+(default: undefined)
+
+- toc_before
+
+toc_before => \%toc_before_data
+
+%toc_before_data = { _tag1_ => _prefix1_,
+    _tag2_ => _prefix2_
+    };
+
+toc_before=>{ H2=>'<em>' }
+
+For defining the layout of significant elements in the ToC.  The _tag_
+is the HTML tag which marks the start of the element.  The _prefix_ is
+what is required to be prepended to the Table of Contents entry
+generated for that tag.
+
+(default: undefined)
+
+- toc_end
+
+toc_end => \%toc_end_data
+
+%toc_end_data = { _tag1_ => _endtag1_,
+    _tag2_ => _endtag2_
+    };
+
+toc_end => { H1 => '/H1', H2 => '/H2' }
+
+For defining significant elements.  The _tag_ is the HTML tag which
+marks the start of the element.  The _endtag_ the HTML tag which marks
+the end of the element.  When matching in the input file, case is
+ignored (but make sure that all your _tag_ options referring to the
+same tag are exactly the same!).
+
+- toc_entry
+
+toc_entry => \%toc_entry_data
+
+%toc_entry_data = { _tag1_ => _level1_,
+    _tag2_ => _level2_
+    };
+
+toc_entry => { H1 => 1, H2 => 2 }
+
+For defining significant elements.  The _tag_ is the HTML tag which marks
+the start of the element.  The _level_ is what level the tag is considered
+to be.  The value of _level_ must be numeric, and non-zero. If the value
+is negative, consective entries represented by the significant_element will
+be separated by the value set by __entrysep__ option.
+
+- toclabel
+
+toclabel => _string_
+
+HTML text that labels the ToC.  Always used.
+(default: "<h1>Table of Contents</h1>")
+
+- toc_tag
+
+toc_tag => _string_
+
+If a ToC is to be included inline, this is the pattern which is used to
+match the tag where the ToC should be put.  This can be a start-tag, an
+end-tag or a comment, but the < should be left out; that is, if you
+want the ToC to be placed after the BODY tag, then give "BODY".  If you
+want a special comment tag to make where the ToC should go, then include
+the comment marks, for example: "!--toc--" (default:BODY)
+
+- toc_tag_replace
+
+toc_tag_replace => 1
+
+In conjunction with __toc_tag__, this is a flag to say whether the given tag
+should be replaced, or if the ToC should be put after the tag.
+This can be useful if your toc_tag is a comment and you don't need it
+after you have the ToC in place.
+(default:false)
+
+- toc_only
+
+toc_only => 1
+
+Output only the Table of Contents, that is, the Table of Contents plus
+the toclabel.  If there is a __header__ or a __footer__, these will also be
+output.
+
+If __toc_only__ is false then if there is no __header__, and __inline__ is
+not true, then a suitable HTML page header will be output, and if there
+is no __footer__ and __inline__ is not true, then a HTML page footer will
+be output.
+
+(default:false)
+
+- to_string
+
+to_string => 1
+
+Return the modified HTML output as a string.  This _does_ override
+other methods of output (unlike version 3.00).  If _to_string_ is false,
+the method will return 1 rather than a string.
+
+- use_id
+
+use_id => 1
+
+Use id="_name_" for anchors rather than <a name="_name_"/> anchors.
+However if an anchor already exists for a Significant Element, this
+won't make an id for that particular element.
+
+- useorg
+
+useorg => 1
+
+Use pre-existing backup files as the input source; that is, files of the
+form _infile_._bak_  (see __input__ and __bak__).
+
+# INTERNAL METHODS
+
+These methods are documented for developer purposes and aren't intended
+to be used externally.
+
+## make_anchor_name
+
+    $toc->make_anchor_name(content=>$content,
+	anchors=>\%anchors);
+
+Makes the anchor-name for one anchor.
+Bases the anchor on the content of the significant element.
+Ensures that anchors are unique.
+
+## make_anchors
+
+    my $new_html = $toc->make_anchors(input=>$html,
+	notoc_match=>$notoc_match,
+	use_id=>$use_id,
+	toc_entry=>\%toc_entries,
+	toc_end=>\%toc_ends,
+	);
+
+Makes the anchors the given input string.
+Returns a string.
+
+## make_toc_list
+
+    my @toc_list = $toc->make_toc_list(input=>$html,
+	labels=>\%labels,
+	notoc_match=>$notoc_match,
+	toc_entry=>\%toc_entry,
+	toc_end=>\%toc_end,
+	filename=>$filename);
+
+Makes a list of lists which represents the structure and content
+of (a portion of) the ToC from one file.
+Also updates a list of labels for the ToC entries.
+
+## build_lol
+
+Build a list of lists of paths, given a list
+of hashes with info about paths.
+
+## output_toc
+
+    $self->output_toc(toc=>$toc_str,
+	input=>\@input,
+	filenames=>\@filenames);
+
+Put the output (whether to file, STDOUT or string).
+The "output" in this case could be the ToC, the modified
+(anchors added) HTML, or both.
+
+## put_toc_inline
+
+    my $newhtml = $toc->put_toc_inline(toc_str=>$toc_str,
+	filename=>$filename, in_string=>$in_string);
+
+Puts the given toc_str into the given input string;
+returns a string.
+
+## cp
+
+    cp($src, $dst);
+
+Copies file $src to $dst.
+Used for making backups of files.
+
+# FILE FORMATS
+
+## Formatting the ToC
+
+The __toc_entry__ and other related options give you control on how the
+ToC entries may look, but there are other options to affect the final
+appearance of the ToC file created.
+
+With the __header__ option, the contents of the given file (or string)
+will be prepended before the generated ToC. This allows you to have
+introductory text, or any other text, before the ToC.
+
+- Note:
+
+If you use the __header__ option, make sure the file specified
+contains the opening HTML tag, the HEAD element (containing the
+TITLE element), and the opening BODY tag. However, these
+tags/elements should not be in the header file if the __inline__
+option is used. See L</Inlining the ToC> for information on what
+the header file should contain for inlining the ToC.
+
+With the __toclabel__ option, the contents of the given string will be
+prepended before the generated ToC (but after any text taken from a
+__header__ file).
+
+With the __footer__ option, the contents of the file will be appended
+after the generated ToC.
+
+- Note:
+
+If you use the __footer__, make sure it includes the closing BODY
+and HTML tags (unless, of course, you are using the __inline__ option).
+
+If the __header__ option is not specified, the appropriate starting
+HTML markup will be added, unless the __toc_only__ option is specified.
+If the __footer__ option is not specified, the appropriate closing
+HTML markup will be added, unless the __toc_only__ option is specified.
+
+If you do not want/need to deal with header, and footer, files, then
+you are allowed to specify the title, __title__ option, of the ToC file;
+and it allows you to specify a heading, or label, to put before ToC
+entries' list, the __toclabel__ option. Both options have default values.
+
+If you do not want HTML page tags to be supplied, and just want
+the ToC itself, then specify the __toc_only__ option.
+If there are no __header__ or __footer__ files, then this will simply
+output the contents of __toclabel__ and the ToC itself.
+
+## Inlining the ToC
+
+The ability to incorporate the ToC directly into an HTML document
+is supported via the __inline__ option.
+
+Inlining will be done on the first file in the list of files processed,
+and will only be done if that file contains an opening tag matching the
+__toc_tag__ value.
+
+If __overwrite__ is true, then the first file in the list will be
+overwritten, with the generated ToC inserted at the appropriate spot.
+Otherwise a modified version of the first file is output to either STDOUT
+or to the output file defined by the __outfile__ option.
+
+The options __toc_tag__ and __toc_tag_replace__ are used to determine where
+and how the ToC is inserted into the output.
+
+__Example 1__
+
+    $toc->generate_toc(inline=>1,
+		       toc_tag => 'BODY',
+		       toc_tag_replace => 0,
+		       ...
+		       );
+
+This will put the generated ToC after the BODY tag of the first file.
+If the __header__ option is specified, then the contents of the specified
+file are inserted after the BODY tag.  If the __toclabel__ option is not
+empty, then the text specified by the __toclabel__ option is inserted.
+Then the ToC is inserted, and finally, if the __footer__ option is
+specified, it inserts the footer.  Then the rest of the input file
+follows as it was before.
+
+__Example 2__
+
+    $toc->generate_toc(inline=>1,
+		       toc_tag => '!--toc--',
+		       toc_tag_replace => 1,
+		       ...
+		       );
+
+This will put the generated ToC after the first comment of the form
+<!--toc-->, and that comment will be replaced by the ToC
+(in the order
+    __header__
+    __toclabel__
+    ToC
+    __footer__)
+followed by the rest of the input file.
+
+- Note:
+
+The header file should not contain the beginning HTML tag
+and HEAD element since the HTML file being processed should
+already contain these tags/elements.
+
+# NOTES
+
+- *
+
+HTML::GenToc is smart enough to detect anchors inside significant
+elements. If the anchor defines the NAME attribute, HTML::GenToc uses
+the value. Else, it adds its own NAME attribute to the anchor.
+If __use_id__ is true, then it likewise checks for and uses IDs.
+
+- *
+
+The TITLE element is treated specially if specified in the __toc_entry__
+option. It is illegal to insert anchors (A) into TITLE elements.
+Therefore, HTML::GenToc will actually link to the filename itself
+instead of the TITLE element of the document.
+
+- *
+
+HTML::GenToc will ignore a significant element if it does not contain
+any non-whitespace characters. A warning message is generated if
+such a condition exists.
+
+- *
+
+If you have a sequence of significant elements that change in a slightly
+disordered fashion, such as H1 -> H3 -> H2 or even H2 -> H1, though
+HTML::GenToc deals with this to create a list which is still good HTML, if
+you are using an ordered list to that depth, then you will get strange
+numbering, as an extra list element will have been inserted to nest the
+elements at the correct level.
+
+For example (H2 -> H1 with ol_num_levels=1):
+
+    1. 
+	* My H2 Header
+    2. My H1 Header
+
+For example (H1 -> H3 -> H2 with ol_num_levels=0 and H3 also being
+significant):
+
+    1. My H1 Header
+	1. 
+	    1. My H3 Header
+	2. My H2 Header
+    2. My Second H1 Header
+
+In cases such as this it may be better not to use the __ol__ option.
+
+# CAVEATS
+
+- *
+
+Version 3.10 (and above) generates more verbose (SEO-friendly) anchors
+than prior versions. Thus anchors generated with earlier versions will
+not match version 3.10 anchors.
+
+- *
+
+Version 3.00 (and above) of HTML::GenToc is not compatible with
+Version 2.x of HTML::GenToc.  It is now designed to do everything
+in one pass, and has dropped certain options: the __infile__ option
+is no longer used (it has been replaced with the __input__ option);
+the __toc_file__ option no longer exists; use the __outfile__ option
+instead; the __tocmap__ option is no longer supported.  Also the old
+array-parsing of arguments is no longer supported.  There is no longer
+a __generate_anchors__ method; everything is done with __generate_toc__.
+
+It now generates lower-case tags rather than upper-case ones.
+
+- *
+
+HTML::GenToc is not very efficient (memory and speed), and can be
+slow for large documents.
+
+- *
+
+Now that generation of anchors and of the ToC are done in one pass,
+even more memory is used than was the case before.  This is more notable
+when processing multiple files, since all files are read into memory
+before processing them.
+
+- *
+
+Invalid markup will be generated if a significant element is
+contained inside of an anchor. For example:
+
+    <a name="foo"><h1>The FOO command</h1></a>
+
+will be converted to (if H1 is a significant element),
+
+    <a name="foo"><h1><a name="The">The</a> FOO command</h1></a>
+
+which is illegal since anchors cannot be nested.
+
+It is better style to put anchor statements within the element to
+be anchored. For example, the following is preferred:
+
+    <h1><a name="foo">The FOO command</a></h1>
+
+HTML::GenToc will detect the "foo" name and use it.
+
+- *
+
+name attributes without quotes are not recognized.
+
+# BUGS
+
+Tell me about them.
+
+# REQUIRES
+
+The installation of this module requires `Module::Build`.  The module
+depends on `HTML::SimpleParse`, `HTML::Entities` and `HTML::LinkList` and uses
+`Data::Dumper` for debugging purposes.  The hypertoc script depends on
+`Getopt::Long`, `Getopt::ArgvFile` and `Pod::Usage`.  Testing of this
+distribution depends on `Test::More`.
+
+# INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+Or, if you're on a platform (like DOS or Windows) that doesn't like the
+"./" notation, you can do this:
+
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install
+
+In order to install somewhere other than the default, such as
+in a directory under your home directory, like "/home/fred/perl"
+go
+
+   perl Build.PL --install_base /home/fred/perl
+
+as the first step instead.
+
+This will install the files underneath /home/fred/perl.
+
+You will then need to make sure that you alter the PERL5LIB variable to
+find the modules, and the PATH variable to find the script.
+
+Therefore you will need to change:
+your path, to include /home/fred/perl/script (where the script will be)
+
+	PATH=/home/fred/perl/script:${PATH}
+
+the PERL5LIB variable to add /home/fred/perl/lib
+
+	PERL5LIB=/home/fred/perl/lib:${PERL5LIB}
+
+# SEE ALSO
+
+perl(1)
+htmltoc(1)
+hypertoc(1)
+
+# AUTHOR
+
+Kathryn Andersen     (RUBYKAT)	http://www.katspace.org/tools/hypertoc/
+
+Based on htmltoc by Earl Hood       ehood AT medusa.acs.uci.edu
+
+Contributions by Dan Dascalescu, <http://dandascalescu.com>
+
+# COPYRIGHT
+
+Copyright (C) 1994-1997  Earl Hood, ehood AT medusa.acs.uci.edu
+Copyright (C) 2002-2008 Kathryn Andersen
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.

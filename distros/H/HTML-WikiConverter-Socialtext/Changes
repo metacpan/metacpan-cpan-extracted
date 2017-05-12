@@ -1,0 +1,10 @@
+# Change log for HTML::WikiConverter::Socialtext
+
+version 0.02
+date:    Wed Aug 16 2006
+   - Make dist is better for getting indexed
+
+version 0.01
+date:    Wed Aug 16 2006
+changes:
+   - First published version

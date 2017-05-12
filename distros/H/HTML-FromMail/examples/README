@@ -1,0 +1,19 @@
+
+Examples for HTML::FromMail
+===========================
+
+This directory contains two examples for the "oodoc" or "magic" formatter.
+The latter requires Bundle::Text::MagicTemplate to be installed.
+
+ show_all.pl [-v] msg   # where "msg" is a file containing one message
+                        #    without a leading 'From '
+   will run the template in templ_all.  It will show you many (not all)
+   features provided by the template system.
+   You have to modify show_all.pl, to select the browser you use.
+
+ demo.pl [-v] folder
+   will run the templates in templ_demo.  It will display the first
+   message in the folder in a complex way.  In coming releases, the
+   whole folder will be displayed, however the module doesn't support
+   the required features yet.
+   You have to modify demo.pl, to select the browser you use.

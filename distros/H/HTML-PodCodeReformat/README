@@ -1,0 +1,250 @@
+NAME
+    HTML::PodCodeReformat - Reformats HTML code blocks coming from Pod
+    verbatim paragraphs
+
+VERSION
+    version 0.20000
+
+SYNOPSIS
+        use HTML::PodCodeReformat;
+    
+        my $f = HTML::PodCodeReformat->new;
+        my $fixed_html = $f->reformat_pre( *DATA );
+    
+        print $fixed_html; # It prints:
+    
+        #<!-- HTML produced by a Pod transformer -->
+        #<html>
+        #<h1>SYNOPSIS</h1>
+        #<pre>
+        #while (<>) {
+        #    chomp;
+        #    print;
+        #}
+        #</pre>
+        #<h1>DESCRIPTION</h1>
+        #<p>Remove trailing newline from every line.</p>
+        #</html>
+    
+        __DATA__
+        <!-- HTML produced by a Pod transformer -->
+        <html>
+        <h1>SYNOPSIS</h1>
+        <pre>
+            while (<>) {
+                chomp;
+                print;
+            }
+        </pre>
+        <h1>DESCRIPTION</h1>
+        <p>Remove trailing newline from every line.</p>
+        </html>
+
+DESCRIPTION
+    This module is mainly intended to strip the extra leading spaces which
+    appear in text lines inside "<pre>...</pre>" blocks (corresponding to
+    Pod *verbatim paragraphs*) in an HTML-transformed pod (then it can
+    optionally apply other transformations as well on such blocks).
+
+    perlpodspec states that (leading) *whitespace is significant in verbatim
+    paragraphs*, that is, they must be preserved in the final output (e.g.
+    HTML).
+
+    This is an unfortunate mixture between syntax and semantics (which is
+    really unavoidable, given the freedom perlpodspec leaves in choosing the
+    verbatim paragraphs indentation width), which leads to (at least) a
+    couple of annoying consequences:
+
+    *   the code blocks are awful to see (at least in HTML, where those
+        leading spaces have no meaning);
+
+    *   the extra leading spaces can break the code (for example with
+        non-*free form* code such as YAML, but it can even happen with plain
+        Perl code - think of *heredocs*), so that, in the general case, the
+        code cannot be taken verbatim from the document (for example by
+        copying and pasting it into a text editor) and run without
+        modifications.
+
+    This module takes any document created by a Pod to HTML transformer and
+    eliminates the extra leading spaces in *code blocks* (rendered in HTML
+    as "<pre>...</pre>" blocks).
+
+    Really, Pod::Simple already offers a sane solution to this problem
+    (through its "strip_verbatim_indent" method), which has the advantage
+    that it works with any final format.
+
+    However it requires you to pass the leading string to strip, which, to
+    work across different pods, of course requires the indentation of
+    verbatim paragraphs to be consistent (which is very unlikely, if said
+    pods come from many different authors). Alternatively, an heuristic to
+    remove the extra indentation can be provided (through a code reference).
+
+    Though much more limited in scope, since it works only on HTML, this
+    module offers instead a ready-made simple but effective heuristic, which
+    has proved to work on 100% of the HTML-rendered pods tested so far
+    (including a large CPAN Search subset). For the details, please look at
+    the "ALGORITHM" section below.
+
+    Furthermore, since it works only on the final HTML (produced by any Pod
+    transformer), it can more easily be integrated into existing workflows.
+
+METHODS
+  "new"
+    *   "HTML::PodCodeReformat->new( %options )"
+
+    *   "HTML::PodCodeReformat->new( \%options )"
+
+    It creates and returns a new "HTML::PodCodeReformat" object. It accepts
+    its options either as a hash or a hashref.
+
+    It can take the following options:
+
+    *   "squash_blank_lines"
+
+        Boolean option which, when set to *true*, causes every line composed
+        solely of spaces ("\s") in a "pre" block, to be *squashed* to an
+        empty string (the newline is left untouched).
+
+        When set to *false* (which is the default) the *blank lines* in a
+        "pre" block will be treated as *normal* lines, that is, they will be
+        stripped only of the extra leading whitespaces, as any other line.
+
+    *   "line_numbers"
+
+        Boolean option which, when set to true, causes every line in a "pre"
+        text to be wrapped in "<li>...</li>" tags, and the whole text to be
+        wrapped in "<ol>...</ol>" tags (so that a line number is prepended
+        to every line in the "pre" text, when the HTML document is viewed in
+        a browser).
+
+        In this case the original newlines in the "pre" text are removed, to
+        not add extra empty lines when the HTML document is rendered.
+
+        It defaults to false.
+
+    The above options can be read/set after the object construnction through
+    their corresponding methods as well.
+
+  "reformat_pre"
+    *   "reformat_pre( $filename )"
+
+    *   "reformat_pre( $filehandle )"
+
+    *   "reformat_pre( \$string )"
+
+    Instance method which removes the *extra* leading spaces from the lines
+    contained in every "<pre>...</pre>" block in the given HTML document (of
+    course preserving any *real* indentation *inside* code, as showed in the
+    "SYNOPSIS" above), and returns a string containing the HTML code
+    modified that way.
+
+    It can take the name of the HTML file, an already opened filehandle or a
+    reference to a string containing the HTML code.
+
+    It would work even on nested "pre" blocks, though this situation has
+    never been encountered in *real* pods.
+
+    If the options "squash_blank_lines" and "line_numbers" are set, the
+    corresponding transformations (described above) are applied as well
+    (after the extra leading spaces removal).
+
+ALGORITHM
+    The adopted algorithm to remove the extra leading whitespaces is
+    extremely simple.
+
+    Skipping some minor details, it basically works this way: given an HTML
+    document, for each text block inside "<pre>...</pre>" tags, first the
+    length of the shortest leading whitespace string across all the lines in
+    the block is calculated (ignoring empty lines), then every line in the
+    block is *shifted to the left* by such amount.
+
+LIMITATIONS
+    With the exception explained below in the "Non-limitations" section, any
+    "<pre>...</pre>" block which has *extra* leading spaces will be
+    reformatted. This will happen also if a given verbatim paragraph (most
+    probably composed of text, not code) is intended to stay indented (no
+    pun intended) that way, such as in, for example:
+
+            This text
+            should really stay
+            8-spaces indented
+            (but it will be shifted to the first column :-(
+
+    Currently there is no way to *protect* a "pre" block, but such
+    requirement should be really rare.
+
+  Non-limitations
+    *   Really, perlpodspec says that indenting only the first line it is
+        sufficient to qualify a verbatim paragraph. But this seems not to be
+        used by any author (at least not for *real* code), and it's even not
+        fully honoured by some Pod parsers.
+
+        Furthermore, the only time I've found such a situation, it was
+        *text* (not code) meant to really remain indented that way. Since
+        you asked, it was the following block:
+
+                                   columns
+        <------------------------------------------------------------>
+        <----------><------><---------------------------><----------->
+         leftMargin  indent  text is formatted into here  rightMargin
+
+        from Text::Format.
+
+        That's why such blocks will be left unaltered, and that's why it's
+        more an advantage than a limitation (hopefully).
+
+    *   Working only on "pre" tags may seem a limitation, but this is the
+        way any Pod to HTML transformer I'm aware of renders a Pod verbatim
+        paragraph in HTML.
+
+AUTHOR
+    Emanuele Zeppieri, "<emazep@cpan.org>"
+
+BUGS
+    No known bugs.
+
+    Please report any bugs or feature requests to "bug-html-PodCodeReformat
+    at rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=HTML-PodCodeReformat>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command:
+
+        perldoc HTML::PodCodeReformat
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-PodCodeReformat>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/HTML-PodCodeReformat>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/HTML-PodCodeReformat>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/HTML-PodCodeReformat/>
+
+SEE ALSO
+    *   reformat-pre.pl
+
+    *   perlpodspec
+
+    *   Pod::Simple
+
+LICENSE AND COPYRIGHT
+    Copyright 2011 Emanuele Zeppieri.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation, or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

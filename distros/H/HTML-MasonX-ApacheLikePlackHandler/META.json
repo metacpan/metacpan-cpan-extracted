@@ -1,0 +1,57 @@
+{
+   "abstract" : "An evil mod_perl-like Mason handler under L<Plack>",
+   "author" : [
+      "Ævar Arnfjörð Bjarmason <avar@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-MasonX-ApacheLikePlackHandler",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::Mason" : "1.50",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-HTML-MasonX-ApacheLikePlackHandler@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-MasonX-ApacheLikePlackHandler"
+      },
+      "homepage" : "http://metacpan.org/release/HTML-MasonX-ApacheLikePlackHandler",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/avar/html-masonx-apachelikeplackhandler.git",
+         "web" : "http://github.com/avar/html-masonx-apachelikeplackhandler"
+      }
+   },
+   "version" : "0.02"
+}
+

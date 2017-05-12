@@ -1,0 +1,26 @@
+Revision history for Perl extension HTML::Manipulator.
+
+0.07  Mon Nov 14 2005
+    - added the insert_* subroutines
+
+0.06  Thu Oct 08 2004
+	- added support for marking areas with HTML comments
+		(instead of DOM ID)
+
+0.05  Thu Jun 17 2004
+	- added support for regular expressions in extract_all, extract_all_content
+	  and extract_all_ids
+
+0.04  Mon May 31 2004
+	- added replace_title and extract_title
+	- added HTML::Maninpulator::Document->save_as
+
+0.03  Mon Apr 26 2004
+	- HTML::Manipulator::Document added
+
+0.02  Thu Apr 22 2004
+	- attributes to be replaced can now be specified in mixed case 
+		(will appear lower-cased in the output though)
+
+0.01  Tue Apr 20 2004
+	- original version

@@ -1,0 +1,75 @@
+#!/bin/sh
+#
+# This is a simple cvs wrapper for an initial site import; it takes care
+# to tag binary files (images etc.) as binary (cvs arg "-kb").
+
+if [ "$#" -lt 2 ] ; then
+  echo "
+
+usage: webmake_cvs_import username@host/path modulename
+
+e.g., to import the contents of a directory called webmake_html into CVS, as a
+module called webmake:
+
+	cd webmake_html
+	webmake_cvs_import jm@localhost/local/cvsroot webmake
+  
+" 1>&2
+  exit 1
+fi
+
+CVSLOCATION="$1"
+MOD="$2"
+
+echo "Starting cvs import.  Keep an eye out for files marked with an
+I at the start of the line; these have been ignored and will need to
+be added by hand using 'cvs add' once you check everything out.
+" 1>&2
+
+exec cvs -d $CVSLOCATION import \
+  -W "*.class -k 'b'" \
+  -W "*.gz -k 'b'" \
+  -W "*.db -k 'b'" \
+  -W "*.cab -k 'b'" \
+  -W "*.prc -k 'b'" \
+  -W "*.pdb -k 'b'" \
+  -W "*.dat -k 'b'" \
+  -W "*.hist -k 'b'" \
+  -W "*.Z -k 'b'" \
+  -W "*.sys -k 'b'" \
+  -W "*.exe -k 'b'" \
+  -W "*.com -k 'b'" \
+  -W "*.png -k 'b'" \
+  -W "*.jpg -k 'b'" \
+  -W "*.jpeg -k 'b'" \
+  -W "*.mpg -k 'b'" \
+  -W "*.mpeg -k 'b'" \
+  -W "*.avi -k 'b'" \
+  -W "*.qt -k 'b'" \
+  -W "*.mov -k 'b'" \
+  -W "*.zip -k 'b'" \
+  -W "*.gif -k 'b'" \
+  -W "*.mp3 -k 'b'" \
+  -W "*.ra -k 'b'" \
+  -W "*.ram -k 'b'" \
+  -W "*.cab -k 'b'" \
+  -W "*.jar -k 'b'" \
+  -W "*.PNG -k 'b'" \
+  -W "*.JPG -k 'b'" \
+  -W "*.JPEG -k 'b'" \
+  -W "*.MPG -k 'b'" \
+  -W "*.MPEG -k 'b'" \
+  -W "*.AVI -k 'b'" \
+  -W "*.QT -k 'b'" \
+  -W "*.MOV -k 'b'" \
+  -W "*.ZIP -k 'b'" \
+  -W "*.GIF -k 'b'" \
+  -W "*.MP3 -k 'b'" \
+  -W "*.CAB -k 'b'" \
+  -W "*.JAR -k 'b'" \
+  -W "*.RA -k 'b'" \
+  -W "*.PRC -k 'b'" \
+  -W "*.PDB -k 'b'" \
+  -W "*.RAM -k 'b'" \
+  -m "initial import" $MOD main start
+

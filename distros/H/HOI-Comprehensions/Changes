@@ -1,0 +1,45 @@
+Revision history for Perl extension HOI::Comprehensions.
+
+0.01  Sun Nov 30 18:16:58 2014
+	- original version; created by h2xs 1.23 with options
+		-XAn HOI::Comprehensions
+
+0.011 Sun Nov 30 2014
+    - Fixed readme.
+
+0.012 Sun Nov 30 2014
+    - Fixed readme.
+
+0.02 Sun Nov 30 2014
+    - Correct latest version.
+
+0.03 Mon Feb 02 2015
+    - Inlined Alias.pm ( Issue 101042 )
+
+0.031 Tue Feb 03 2015
+    - Require perl 5.13 in Makefile.PL
+
+0.032 Tue Feb 03 2015
+    - Require perl 5.08 in Makefile.PL. Fixed test plans for perl 5.16.
+
+0.033 Tue Feb 03 2015
+    - Comprehensions as generators.
+
+0.034 Wes Feb 04 2015
+    - Fixed test plans.
+
+0.04 Wes Feb 11 2015
+    - Fixed test cases. Replace inline code with runtime-evaluated code.
+
+0.041 Thu Feb 12 2015
+    - Modified test plans.
+
+0.042 Fri Feb 13 2015
+    - Modified operator<> for older perls.
+
+0.043 Thu May 28 2015
+    - Bugfix: empty list generators cause undone evaluation.
+    - Added method: force
+
+0.044 Mon Jun 1 2015
+    - Bugfix: dependence between generators

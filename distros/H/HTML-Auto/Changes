@@ -1,0 +1,42 @@
+Revision history for HTML-Auto
+
+0.09      2016-07-18 20:51:13+01:00 Europe/Lisbon
+          * Small documentation updates.
+          * Fix white spaces.
+          * dzil updates.
+
+0.08      2016-07-18 16:42:52+01:00 Europe/Lisbon
+          * Move to dzil.
+
+0.07      Thu Jul 14 15:46:33 WEST 2016
+          * Update default CSS.
+          * Add options to the matrix function: diagonal, ucfirst, and format.
+
+0.06      Thu Nov 12 20:55:02 WET 2015
+          Handle paths correctly in Windows too (reported by CHORNY).
+
+0.05      Sun Nov  8 17:27:23 WET 2015
+          Fix tests to run in recent perl releases (reported by SREZIC).
+
+0.04      Tue Jun  5 16:02:52 WEST 2012
+          Fixed UTF-8 in POD
+
+0.03      Tue May 22 22:50:31 WEST 2012
+          Cells can have a hover pop-up.
+		  Additional CSS can be provided.
+		  Added some tests.
+
+0.02      Sat Apr 21 14:53:52 WEST 2012
+          Update docs.
+
+0.01      Sun Sep 25 16:45:04 WEST 2011
+          First version.
+
+0.01_3    Tue Sep 20 23:24:32 WEST 2011
+          Matrix elements may be scalars.
+
+0.01_2    Sun Jan 30 13:58:32 WET 2011
+          Fix makefile dependencies.
+
+0.01_1    Fri Jan 28 14:11:09 WET 2011
+          First devel release.

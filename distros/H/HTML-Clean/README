@@ -1,0 +1,85 @@
+HTML::Clean - Cleans up HTML code for web browsers, not humans
+-------------------------------------------------------------------
+
+1. INTRODUCTION
+
+  --    ``The HTML Compiler!'' 
+
+The majority of the web pages of the internet today are 
+much larger than they need to be.  The reason for this is 
+that HTML tends to be stored in a human readable format, with
+indenting, newlines and comments.
+
+However, all of these comments, whitespace etc. are ignored by
+the browser, and needlessly lengthen download times.
+
+Second, many people are using WYSIWYG HTML editors these days.
+This makes creating content easy.  However these editors can
+cause a number of compatibility problems by tying themselves to
+a particular browser or operating system.
+
+Enter HTML::Clean.
+
+The HTML::Clean module encapsulates a number of HTML optimizations
+and cleanups.  The end result is HTML that loads faster, displays
+properly in more browsers.  Think of it as a compiler that
+translates HTML input into optimized machine readable code.
+
+Uses
+
+You can use the library in your perl-cgi scripts to optimize data.  Or
+use the included htmlclean script to preprocess HTML files or templates
+on your server.
+
+The results should be pages that load faster, less load on your web 
+server and better cross-platform HTML.
+
+To read about the latest features, see the Changes file.  To find
+out about known bugs and to see what's planned for future versions,
+see the TODO file.
+
+
+2. AVAILABILITY
+
+You can get the latest version of the HTML::Clean module from the 
+Comprehensive Perl Archive Network (CPAN) or from the author's homepage:
+
+    http://www.perl.org/CPAN/modules/by-module/HTML/
+    http://people.itu.int/~lindner/
+
+
+3. PREREQUISITES
+
+The HTML module requires the following:
+
+    Perl 5.004
+
+The HTML::Clean module may work with earlier versions of the above, but the
+author hasn't tested this.  The latest versions can be obtained from CPAN:
+
+    http://www.perl.org/CPAN/
+
+
+4. INSTALLATION
+
+To build this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+5. COPYRIGHT
+
+Copyright (c) 1999 ITU.  All rights reserved.  This program
+is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself.
+
+
+6. AUTHOR INFORMATION
+
+Paul Lindner
+paul.lindner@itu.int
+http://people.itu.int/~lindner/
+

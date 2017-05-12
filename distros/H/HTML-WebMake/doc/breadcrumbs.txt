@@ -1,0 +1,117 @@
+<wmmeta name="Title" value="The &lt;breadcrumbs&gt; Tag" />
+<wmmeta name="Section" value="02-tags_attrs" />
+<wmmeta name="Score" value="100" />
+<wmmeta name="Abstract">
+generate a ''breadcrumb trail'' navigational aid
+</wmmeta>
+
+Another common site navigation strategy is to provide what Jakob Nielsen has
+called a ''breadcrumb trail''.  The &lt;breadcrumbs&gt; tag supports this.
+
+WTF Is A Breadcrumb Trail?
+--------------------------
+
+The ''breadcrumb trail'' is a piece of navigation text, displaying a list of
+the parent pages, from the top-level page right down to the current page.
+You've probably seen them before; take a look at this <a
+href=http://dir.yahoo.com/Business_and_Economy/Shopping_and_Services/Communication_and_Information_Management/Internet_and_World_Wide_Web/Portals/Personalized/>Yahoo
+category</a> for an example.
+
+To illustrate, here's an example.  Let's say you're browsing the __Man Bites
+Dog__ story in an issue of __Dogbiting Monthly__, which in turn is part of the
+__Bizarre Periodicals__ site.  Here's a hypothetical breadcrumb trail for that
+page:
+
+      __Bizarre Periodicals__ : __Dogbiting Monthly__ : __Issue 24__ : __Man
+      Bites Dog__
+
+Typically those would be links, of course, so the user can jump right back to
+the contents page for Issue 24 with one click.
+
+If you have a site that contains pages that are more than 2 levels deep from
+the front page, you should consider using this to aid navigation.
+
+How To Use It With WebMake
+--------------------------
+
+To use a breadcrumb trail, first define a "sitemap". This tells WebMake how to
+order the page hierarchy, and which pages to include.
+
+Next, define a template to be used for each entry in the trail. This
+should contain references to **&wmdollar;{url}** (note: __not__
+**&wmdollar;(url)**), which will be replaced with the URL for the page in
+question; and **&wmdollar;{name}**, which will be expanded to the name of the
+''main'' content item on that page, allowing you to retrieve metadata for that
+content like so: **&wmdollar;&etsqi;&wmdollar;{name}.title&etsqo;** .
+
+	__Note:__ the ''main'' content item is defined as the first content
+	item on the page which is not metadata, not perl-generated code, and
+	has the __map__ attribute set to __''true''__, ie. not a template.
+
+You can also define two more templates to be used at the __top__ of the
+breadcrumb trail, ie. the root page, and at the __tail__ of it, ie. the
+current page being viewed.  These are optional though, and if not specified,
+the generic template detailed above will be used as a default.
+
+Then add a **&lt;breadcrumbs&gt;** tag to the WebMake file as follows.
+
+<pre>
+	&lt;breadcrumbs name=__mycrumbs__ map=__sitemapname__
+		top=__toptemplatename__
+		tail=__tailtemplatename__
+		level=__leveltemplatename__ /&gt;
+</pre>
+
+The __top__ and __tail__ attributes are optional, as explained above.
+The __level__ attribute, which names the ''generic'' breadcrumb template
+item to use for intermediate levels, is mandatory.
+
+You can then add references to **&wmdollar;&etsqi;__mycrumbs__&etsqo;** in
+other content items, and the breadcrumb-trail text will be inserted.  __Note!__
+be sure to use a deferred reference, or the links may not appear!
+
+Attribute Reference
+-------------------
+
+These are the attributes accepted by the **&lt;breadcrumbs&gt;** tag.
+
+	__name__:	the name of the breadcrumb-trail content item.
+	Required.
+
+	__map__:	the name of the sitemap used to determine page
+	hierarchy. Required.
+
+	__level__:	the name of the template used to draw links at the
+	intermediate levels of the trail.  Required.
+
+	__top__:	the name of the template used to draw the link to
+	the top-most, or root, page. Optional -- __level__ will be used as a
+	fallback.
+
+	__tail__:	the name of the template used to draw the link to
+	the bottom-most, currently-viewed page. Optional -- __level__ will be
+	used as a fallback.
+
+
+Example
+=======
+
+This will generate an extremely simple set of &lt;a href&gt; links, no frills.
+The sitemap it uses isn't specified here; see the "sitemap tag documentation"
+[sitemap] for details on how to generate a site map.
+
+<pre>
+  &lt;template name=btop&gt;
+  	[ &lt;a href=&wmdollar;{url}&gt;&wmdollar;[&wmdollar;{name}.title]&lt;/a&gt; /
+  &lt;/template&gt;
+  &lt;template name=blevel&gt;
+  	&lt;a href=&wmdollar;{url}&gt;&wmdollar;[&wmdollar;{name}.title]&lt;/a&gt; /
+  &lt;/template&gt;
+  &lt;template name=btail&gt;
+  	&lt;a href=&wmdollar;{url}&gt;&wmdollar;[&wmdollar;{name}.title]&lt;/a&gt; ]
+  &lt;/template&gt;
+  &lt;breadcrumbs map=__sitemapname__ name=crumbs
+  	top=btop tail=btail level=blevel /&gt;
+</pre>
+
+	[sitemap]: $(sitemap)

@@ -1,0 +1,327 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use HTTP::Proxy;
+use Config::Tiny;
+use HTTP::Proxy::Selective;
+use LWP::UserAgent;
+use IO::Socket::SSL;
+use IO::Socket::INET;
+use Net::SSLeay;
+use File::Temp;
+
+# For PAR
+my $sep = '/';
+if ($^O =~ /WIN32/i) {
+    $sep = "\\";
+}
+require join($sep, qw/HTTP Proxy Engine NoFork.pm/);
+
+# Monkeypatch HTTP::Proxy to handle CONNECT as I want to.
+my ($key, $cert);
+{
+    my $key_temp = File::Temp->new( UNLINK => 0 );
+    print $key_temp q{-----BEGIN RSA PRIVATE KEY-----
+MIIEowIBAAKCAQEAshDKYNsCd+ETRUITIg1U3Tg4uy/vXJkN3ZZS14LSbcFpnwzi
+nMxFD4A/g/dSphHWxl/yZegDVz3ZWIV0En62YC7PfYwJWWd/4YLvDenQAEWz7cNT
+kBzXqQwqirjDqEKXDyQQZ4jFLR3EwYafjrD99h71JEjuOa+ZZ0rgLu2CPhH5MxEV
+WjSz0tSFU77bZNZKdYFdeKtZv0Ez4JGyTlVu8dwfsnfMpoyVL/c4xCXsJ+kNcnLA
+p4RGjYrUTmh/XrYK07QuPjUhPPXylTYKrzYCchjMRZjAmz5EvXSbXl6CTn0JOUEt
+YVvkJGNdd14jKez5ioDf1+gnX7nh20uog6ks9QIDAQABAoIBACBNfXk+od7/fNB2
+oSPvSTLsjRYgJwskVOia6aJhAC2bBb8txjptsCWUvXECQAMSf2TzaPTltx1vgetW
+Im1sgUdHlqqO6e9HIGLXruhWPz6dZnu+kH03TkRDicAqrovqsJ61iyhNHoAFw3jc
+JDvtjdTFXvFbLaRXX7vmUG8S9SqvKIMwDIlURJlW71RwsbrkVskc3Ioq7VVWbc5Z
+cUwGLZv7WJidKTmsoFXClT5sVCj+GMvIHM2Ib8rwZsv9vdzY1oPNt3CIIWaoD3ea
+PADlqK80tx43vHdZhb50QZk41Rs6fcecaL0gU9wMMxQAzvEISLswgS3bPAiU0bkT
+WggocUECgYEA3VCKGJlEn598ELqicp1NLiel+u0EVIdPUbkDJQfLijyN/UI5Kz5J
+02lV5SLZ2F7Cnj9X+prMy3G/TcLMZz3gemhrrdBEUt+RbeBWdDP5pGsTOPmb+Cq6
+ocDAPGQkIVsK5nmP/4z5Y3ldpJPUhbV6aOhVA4o8d4dz0ebLn44N3+UCgYEAzfkJ
+yB681UT9ne6zwfRX32aE8Hy4aGnBMgB4UP7508e87anDYcK+WnRgtSEPCqYnfngC
+tZA7bNMN1HEG65CYKssZD3FqqPepw6c/7siLdxgcJ+/q5XEjjn0aWQu0Aj/qnCWZ
+9Z5Fq78cZKu6TR7Z1wja02cXdZ/4JrIXnx27p9ECgYAPMV85jxQB7T3kHBvYyGmq
++HfRgQHiF6PfVVcc7KsRY1TQBQLNsCn7RGjsIPdZfi/YEzsj7gqPEND0MqI7mCjX
+3mE9/mUiV0yxgUwOEB9cJSmdqK0HXU+QmR3ZR3qfe5OE/OVgwrnAFW3TRX66axnr
+J7/mTVAXWIof57skyeiz7QKBgQCJEA71T5cDKJzIat7N02ZiMBuI2MXyHWXFe1CV
+PYdL6Z+MW6q7tFbtZIIyJiSXRogDfaL35VnWCgAq/WfIe/j2iR5NC4EZnW0n2HUP
+1f4Qq0eZP+sE8aviltdgqAwKbzQU4mS4cLEWH9+qEiiwRzZZBPhxMyoGSQRd46ca
+aDPG8QKBgGcfirAer9OGH0TOktK2fzfkZlV7mgmPtjp7ia1DnTgozZCq26j5Bwuy
+g9hcGJT7XwPVChY4A3pLX87Xx08TBlcLpKAorY8tP7maxHa0Dpg8/tErmwNyPE/A
+g0oXuSr48qa6mkrQMqkmCcouNT4MKuvFiQ70DB+kwJ5hB2pM75bS
+-----END RSA PRIVATE KEY-----
+};
+    $key = $key_temp->filename;
+    close($key_temp);
+    
+    my $cert_temp = File::Temp->new( UNLINK => 0 );
+    print $cert_temp q{-----BEGIN CERTIFICATE-----
+MIIEhjCCA26gAwIBAgIJALsLM/f4lmkHMA0GCSqGSIb3DQEBBQUAMIGIMQswCQYD
+VQQGEwJHQjEPMA0GA1UECBMGTG9uZG9uMQ8wDQYDVQQHEwZMb25kb24xGzAZBgNV
+BAoTEkJvYiBUIEZpc2ggZG90IE5ldDEUMBIGA1UEAxMLVG9tYXMgRG9yYW4xJDAi
+BgkqhkiG9w0BCQEWFWJvYnRmaXNoQGJvYnRmaXNoLm5ldDAeFw0wODA4MDYxNjI5
+MTFaFw0zNTEyMjMxNjI5MTFaMIGIMQswCQYDVQQGEwJHQjEPMA0GA1UECBMGTG9u
+ZG9uMQ8wDQYDVQQHEwZMb25kb24xGzAZBgNVBAoTEkJvYiBUIEZpc2ggZG90IE5l
+dDEUMBIGA1UEAxMLVG9tYXMgRG9yYW4xJDAiBgkqhkiG9w0BCQEWFWJvYnRmaXNo
+QGJvYnRmaXNoLm5ldDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALIQ
+ymDbAnfhE0VCEyINVN04OLsv71yZDd2WUteC0m3BaZ8M4pzMRQ+AP4P3UqYR1sZf
+8mXoA1c92ViFdBJ+tmAuz32MCVlnf+GC7w3p0ABFs+3DU5Ac16kMKoq4w6hClw8k
+EGeIxS0dxMGGn46w/fYe9SRI7jmvmWdK4C7tgj4R+TMRFVo0s9LUhVO+22TWSnWB
+XXirWb9BM+CRsk5VbvHcH7J3zKaMlS/3OMQl7CfpDXJywKeERo2K1E5of162CtO0
+Lj41ITz18pU2Cq82AnIYzEWYwJs+RL10m15egk59CTlBLWFb5CRjXXdeIyns+YqA
+39foJ1+54dtLqIOpLPUCAwEAAaOB8DCB7TAdBgNVHQ4EFgQUOzPRmC5xIBWKeeOT
+sam6S+s5l8swgb0GA1UdIwSBtTCBsoAUOzPRmC5xIBWKeeOTsam6S+s5l8uhgY6k
+gYswgYgxCzAJBgNVBAYTAkdCMQ8wDQYDVQQIEwZMb25kb24xDzANBgNVBAcTBkxv
+bmRvbjEbMBkGA1UEChMSQm9iIFQgRmlzaCBkb3QgTmV0MRQwEgYDVQQDEwtUb21h
+cyBEb3JhbjEkMCIGCSqGSIb3DQEJARYVYm9idGZpc2hAYm9idGZpc2gubmV0ggkA
+uwsz9/iWaQcwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQUFAAOCAQEAZmk7GGuI
+xiI/ctxD7DY9j7K9nbb6geie/BUHhAkK6MFX+wU9/txA19MhxZo/j/pZyWFs1ocH
+DFk+DGk1cbxyJVa5EhIRaGygKDfkD3RO21rbvkqOeEONnqAkrXbD0C2RaO/yPpQh
+Eo7MzmVnDSJC03MRPMSmcOf4/+FdgXNmI7fJ6uqH1poVuISvcyVaufSIiwz1rmCw
+U3f1B/1R70Fj7X5yj+pd2BQHUHzfwk6kSwBXbnqzA8zReOorrCkGuier9wzB2OUT
+5EFOcIb3iNvk445bowUsH7pCGUYh3dJqWjIQ39BMfyO5K2SaOzldF0Z9VoK/lCOE
+eCRh+7VA074hiw==
+-----END CERTIFICATE-----
+        
+};
+    $cert = $cert_temp->filename;
+    close($cert_temp);
+}
+sub _handle_CONNECT {
+    my ($self, $served) = @_;
+    my $last = 0;
+    my $conn = $self->client_socket;    
+    my $req  = $self->request;
+    my $upstream = IO::Socket::INET->new( PeerAddr => $req->uri->host_port );
+    unless( $upstream and $upstream->connected ) {
+        # 502 Bad Gateway / 504 Gateway Timeout
+        # Note to implementors: some deployed proxies are known to
+        # return 400 or 500 when DNS lookups time out.
+        my $response = HTTP::Response->new( 200 );
+        $response->content_type( "text/plain" );
+        $self->response($response);
+        return $last;
+    }
+
+    # send the response headers (FIXME more headers required?)
+    my $response = HTTP::Response->new(200);
+    $self->response($response);
+    $self->{$_}{response}->select_filters( $response ) for qw( headers body );
+
+    $self->_send_response_headers( $served );
+
+    # we now have a TCP connection to the upstream host
+    $last = 1;
+    my $class = ref($conn);
+    { no strict 'refs'; unshift(@{$class . "::ISA"}, 'IO::Socket::SSL'); } # Forcibly change classes the socket inherits from
+    $class->start_SSL($conn, 
+        SSL_server => 1, 
+        SSL_key_file => $key,
+        SSL_cert_file => $cert, # Turn our client socket into SSL.
+    ) or warn("Could not start SSL");
+    ${*$conn}{'httpd_nomore'} = 0; # Pay no attention to the Connection: close header behind the curtain.
+    {   # Build a method to fiddle with the request object we get from the client, as it needs to http->https
+        my $old_setrequest_method = \&HTTP::Proxy::request;
+        my $new_request_method = sub {
+            my ($self, $new_req) = @_;
+            if ($new_req) {
+                use Data::Dumper;
+                if (!$new_req->uri->scheme or $new_req->uri->scheme eq 'http') {
+                    $new_req->uri->scheme('https');
+                    $new_req->uri->host($new_req->header('Host'));
+                }
+            }
+            $old_setrequest_method->($self, $new_req);
+        };
+        # And monkeypatch it into HTTP proxy, using local to restrict it by lexical scope
+        # so that it goes away once we exit the block (i.e. the CONNECT method finishes).
+        no warnings qw[once redefine];
+        local *HTTP::Proxy::request = $new_request_method;
+        use warnings qw[once redefine];
+        $self->serve_connections($conn);
+    }
+    $conn->stop_SSL($conn);
+    return $last;
+}
+{
+    no warnings qw(once redefine);
+    *HTTP::Proxy::_handle_CONNECT = \&_handle_CONNECT;
+}
+
+our %http_proxy_defaults = (
+    port                    => 3128,
+    max_clients             => 10,
+    max_requests_per_child  => 100,
+    min_spare_servers       => 1,
+    max_spare_servers       => 5,
+    keep_alive              => 0,
+    max_keep_alive_requests => 1,
+    keep_alive_timeout      => 60,
+    engine                  => 'NoFork',
+);
+
+sub _generate_proxy_config {
+    my %in_params = @_;
+    my %params;
+    foreach my $k (keys %http_proxy_defaults) {
+        $params{$k} = exists $in_params{$k} ? $in_params{$k} : $http_proxy_defaults{$k};
+    }
+    return %params;
+}
+
+my $_help = q{No config file passed on command line.
+    
+Please create a file in a text editor which looks like this:
+# Note that more options are available, please see example_config.ini in the distribution for usage.
+port = 3128
+debug = 1
+#upstream_proxy = proxy.example.com:8080
+
+[search.cpan.org]
+/s/=/tmp/css
+/stuff/=/tmp/stuff
+
+[www.google.com]
+/js/=/tmp/js
+/some/file.jpg=/tmp/somefile.jpg
+
+and save it in your editor. Then re-run selective_proxy, appending the configuration file name.
+};
+
+sub main {
+    my $conf_file = shift(@ARGV);
+    die($_help) unless ($conf_file);
+    die("Config file passed on command line ($conf_file) could not be read.\n") unless (-r $conf_file);
+
+    my %config = %{ Config::Tiny->read( $conf_file ) };
+
+    my $root_config = delete $config{_};
+    my $debug = delete $root_config->{debug};
+    my $upstream_proxy = delete $root_config->{upstream_proxy};
+
+    my $proxy = HTTP::Proxy->new( 
+        _generate_proxy_config( %{$root_config} ),
+        max_connections => 0, # Not lettng the users stamp on this..
+    );
+    $proxy->init;
+    die("No agent") unless $proxy->{agent};
+    warn("Upstream proxy: $upstream_proxy") if $upstream_proxy;
+    $proxy->{agent}->proxy([qw/http https/], $upstream_proxy) if $upstream_proxy;;
+    
+    $proxy->push_filter( 
+        method => 'GET, HEAD',
+        request => HTTP::Proxy::Selective->new(\%config, $debug)
+    );
+    warn("Starting proxy at " . $proxy->url . "\n");
+    $proxy->start;
+}
+
+main() unless caller();
+main() if $ENV{PAR_0};
+
+1;
+
+__END__
+
+=head1 NAME
+
+selective_proxy - Simple HTTP Proxy which can be configured to serve some paths from locations on local disk.
+    
+=head1 SYNOPSIS
+
+    # Install, standard (MacOS/Linux).
+    perl Makefile.PL
+    make
+    sudo make install
+    
+    # Install, .exe version (can be copied to other systems without perl). Needs the PAR::Dist and PAR::Packer modules from CPAN.
+    # Yes, this is hacky, there should be Makefile targets to do this. I'm speaking to the Module::Install author about it,
+    # so hopefully this will be less fugly in the next release :)
+    perl Makefile.PL
+    make par
+    PAR_PROGNAME=selective_proxy pp HTTP-Proxy-Selective-0.1-darwin-thread-multi-2level-5.8.6.par -o selective_proxy
+    sudo cp selective_proxy /usr/local/bin/
+    
+    # Run (Installed)
+    selective_proxy example_config.ini
+    
+    # Run (without installing)
+    perl Makefile.PL
+    make
+    perl -Iblib/lib script/selective_proxy example_config.ini
+    
+=head1 DESCRIPTION
+
+C<selective_proxy> acts as a filtering web proxy. You pass it a configuration file when started, which contains a list of sites
+and paths. Any GET or HEAD HTTP requests which match one of the sites and paths configured is served from local disk by the proxy.
+
+This allows you to try out new CSS / Javascript / Images for a website, without having any access to the site (or code it is running),
+and so this tool can be used as a multi-platform and multi-browser CSS developer tool for web authors.
+
+=head1 EXAMPLE CONFIGURATION
+
+    # Note that more options are available, please see example_config.ini in the distribution for usage.
+    port = 3128
+
+    [search.cpan.org]
+    /s/=/tmp/css
+    /stuff/=/tmp/stuff
+
+    [www.google.com]
+    /js/=/tmp/js
+    /some/file.jpg=/tmp/somefile.jpg
+
+=head2 Notes
+
+When you want to map an entire directory (as opposed to a specific 
+file), then use of the trailing slash (as shown in the examples above) is 
+highly recommended, otherwise you can and will confuse yourself with 
+unintended side effects.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<HTTP::Proxy::Selective> -  Library module used by and shipped with this script.
+
+=item L<HTTP::Proxy> - Provides the basis for this software.
+
+=item L<Catalyst::Engine::HTTP> - Many parts of the HTTP server were ripped out of this module. 
+
+=back
+
+=head1 AUTHOR
+
+Tomas Doran, <bobtfish@bobtfish.net>
+
+=head1 CREDITS
+
+This software is based upon a number of other open source projects, and builds on software originally implemented by the following people.
+
+=over
+
+=item Philippe (BooK) Bruhat - L<HTTP::Proxy>, the basis for this module.
+
+=item Sebastian Riedel, Andy Grubman, Dan Kubb, Sascha Kiefer - L<Catalyst::Engine::HTTP>, inspiration as a pure perl web server.
+
+=item Jesse Vincent - L<HTTP::Server::Simple>, which L<Catalyst::Engine::HTTP> stole a lot of code from..
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright 2008 Tomas Doran. Some rights reserved.
+
+The development of this software was 100% funded by Venda
+(L<http://www.venda.com>).
+
+=head1 LICENSE
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+    * Neither the name of Venda Ltd. nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=cut
+

@@ -1,0 +1,100 @@
+2017-04-07 Mattias Holmlund
+
+  Version 1.4
+
+    Fix tests when run without internet connectivity. Patch by Mike Parker.
+    Fixes https://rt.cpan.org/Ticket/Display.html?id=120584
+
+2017-03-11 Mattias Holmlund
+
+  Version 1.3
+
+    Added missing Changes entry for version 1.2. No other changes.
+
+2017-03-07 Mattias Holmlund
+
+  Version 1.2
+
+    Add X-No-Server-Contact header when the content returned has been
+      delivered without any contact with the external server
+
+2012-10-25 Mattias Holmlund
+
+  Version 1.1
+
+    Unlink temporary cachefiles if we fail to give them a proper name
+      Resolves https://rt.cpan.org/Ticket/Display.html?id=60065
+
+    Handle multiple simultaneous cache cleanups
+      Hopefully resolves https://rt.cpan.org/Public/Bug/Display.html?id=77015
+
+    Handle caching of zero-size documents
+      Resolves https://rt.cpan.org/Public/Bug/Display.html?id=76785
+
+    Populate $response->message with the default message for the code
+      Patch from Graham Barr
+
+    Ensure response has access to request when fetching from cache
+      Patch from Graham Barr.
+
+    Handle undefined content from servers.
+
+2007-12-12 Mattias Holmlund
+
+  Version 1.0
+
+  Add ApproveContent option.
+  Add pod-tests.
+  Mark internal methods with leading underscore.
+
+2006-03-12 Mattias Holmlund
+
+  Version 0.7
+
+
+  Add NoUpdate option.
+  Remove Verbose output for HEAD requests.
+
+2005-05-30 Mattias Holmlund
+
+  Version 0.6
+
+  Handle invalid cache-directories.
+  Create the cache directory if it doesn't exist.
+  Store the headers Content-Type, Content-Length, Content-Encoding,
+  Content-Range and Last-Modified in the cache and restore them
+  when returning a cached response.
+  Fix bug in ETag cache handling.
+
+2004-12-08 Mattias Holmlund
+
+  Version 0.5
+
+  Handle spaces in the path to the cache-dir.
+  Handle multiple calls to init() without failing.
+
+2004-10-24 Mattias Holmlund
+
+  Version 0.4
+
+  Renamed from HTTP::TransparentCache to HTTP::Cache::Transparent
+  on request from Brian D Foy on the modules@perl.org list.
+
+  Add support for ranges. Added test-program from Nigel Horne.
+
+2004-10-15 Mattias Holmlund
+
+  Version 0.3
+
+  Support for libwww < 5.800
+
+  Only cache entries with response-code OK.
+  Never delete files in cache with an invalid filename.
+  Document cache format.
+
+2004-10-11 Mattias Holmlund
+
+  Release 0.2
+
+  Support initialization via use directive.
+  Lower perl requirements to Perl 5.6.1.

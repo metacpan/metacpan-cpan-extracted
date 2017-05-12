@@ -1,0 +1,73 @@
+HTML::Mason-ApacheHandler2 version 0.01
+=======================================
+
+Copyright (c) 2004 by Beau E. Cox. All rights reserved.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+Welcome to Mason under mod_perl2.
+
+This module is a Mason add-on which allows Mason to run in a pure
+mod_perl2 environment.
+
+Documentation can be found in the htdocs/ sub-directory.
+You may want to start with 'htdocs/Mason-with-mod_perl2.html'
+or 'htdocs/Mason-with-mod_perl2.txt'.
+
+WARNINGS!
+
+THIS MODULE IS EXPERIMENTAL AND NOT RECOMMENDED
+EXCEPT IN A TEST ENVIRONMENT.
+
+INSTALLATION
+
+To install HTML::Mason::ApacheHandler2, run the standard sequence:
+
+	perl Makefile.PL
+	make
+	make install
+
+After HTML::Mason::ApacheHandler2 is installed, you will need to activate
+it by adding some directives to your Apache configuration files.
+
+The included pod docs have been pre-converted to HTML for you and
+placed in the htdocs/ directory.
+
+GETTING HELP
+
+Contact the author at <mason@beaucox.com>.
+
+REPORTING BUGS
+
+Send bug reports to the author at <mason@beaucox.com>.
+
+For all bug reports indicate your architecture, Apache/Perl/module
+versions, etc. For installation problems send your handler.pl and
+httpd.conf. For component problems try to isolate the bug in a single
+small component or set of components, and send those.
+
+LICENSE
+
+This module is provided "as is" and without any express or implied
+warranties, including, without limitation, the implied warranties of
+merchantability and fitness for a particular purpose.
+
+It is released under the same terms as Perl itself.  For more
+information see the "README" or "Artistic" files provided with the
+Perl distribution.
+
+AUTHOR
+
+Beau E. Cox
+mason@beaucox.com
+
+Based on the HTML::Mason::ApacheHandler written by:
+
+Jonathan Swartz
+swartz@pobox.com
+
+Dave Rolsky
+autarch@urth.org
+
+Ken Williams
+ken@mathforum.org

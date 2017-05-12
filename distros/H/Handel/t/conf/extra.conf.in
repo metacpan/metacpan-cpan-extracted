@@ -1,0 +1,33 @@
+# $Id$
+<IfModule mod_perl.c>
+	PerlSetVar db_name		@ServerRoot@/var/axkit.db
+	PerlSetVar db_driver	"SQLite"
+
+	<IfDefine APACHE1>
+		<IfDefine AXKIT>
+			PerlModule		AxKit
+			AxNoCache		On
+			AxLogDeclines	On
+			AxDebugLevel	10
+			AxStackTrace	On
+			AxAddProcessor	application/x-xsp .
+			AxAddXSPTaglib	AxKit::XSP::Handel::Cart
+			AxAddXSPTaglib	AxKit::XSP::Handel::Checkout
+			AxAddXSPTaglib	AxKit::XSP::Handel::Order
+
+			<Files *.xsp>
+				SetHandler	AxKit
+			</Files>
+		</IfDefine>
+	</IfDefine>
+	<IfDefine TT2>
+		PerlModule		Apache::Template
+		TT2Trim			On
+
+		<Files *.tt2>
+			SetHandler	perl-script
+			PerlHandler	Apache::Template
+		</Files>
+	</IfDefine>
+</IfModule>
+

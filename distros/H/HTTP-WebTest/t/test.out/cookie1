@@ -1,0 +1,80 @@
+Failed  Succeeded  Test Name
+   0          1    *** no name ***
+   0          2    *** no name ***
+   0          1    *** no name ***
+   0          2    *** no name ***
+   0          1    *** no name ***
+   0          2    *** no name ***
+   0          3    *** no name ***
+   0          3    *** no name ***
+
+
+Test Name: N/A
+URL: http://http.web.test/set-cookie-c1-v1
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/show-cookies
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  REQUIRED TEXT
+    <c1>=<v1>                                                    SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/set-cookie-c2-v2
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/show-cookies
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  FORBIDDEN TEXT
+    <c2>=<v2>                                                    SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/set-cookie-c3-v3
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/show-cookies
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  REQUIRED TEXT
+    <c3>=<v3>                                                    SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/show-cookies
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  FORBIDDEN TEXT
+    <c1>=<v1>                                                    SUCCEED
+    <c3>=<v3>                                                    SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/show-cookies
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  REQUIRED TEXT
+    <c1>=<v1>                                                    SUCCEED
+    <c3>=<v3>                                                    SUCCEED
+
+
+Total web tests failed: 0  succeeded: 15

@@ -1,0 +1,30 @@
+HTTP-Server-EV version 0.1
+==========================
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+	
+	EV
+	Time::HiRes
+	File::Copy
+	File::Util
+	Scalar::Util
+	Guard
+	
+	Optional:
+	Coro
+	IO::AIO
+
+COPYRIGHT AND LICENCE
+
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

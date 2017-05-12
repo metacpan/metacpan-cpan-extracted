@@ -1,0 +1,33 @@
+---
+abstract: 'Call server-side validation code asynchronously from client-side forms'
+author:
+  - 'Dave Baird <dave@zerofive.co.uk>'
+build_requires:
+  HTML::FormHandler: '0.01'
+  Test::Lib: '0.001'
+  Test::LongString: '0.12'
+  Test::More: '0'
+  namespace::autoclean: '0.01'
+  perl: v5.12.0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-FormHandlerX-JQueryRemoteValidator
+no_index:
+  directory:
+    - lib/HTML/FormHandlerX/JQueryRemoteValidator/t
+requires:
+  HTML::FormHandler: '0.01'
+  HTML::FormHandler::Moose::Role: '0'
+  HTML::FormHandlerX::Field::JavaScript: '0'
+  JSON: '0'
+  Method::Signatures::Simple: '0.02'
+  perl: v5.12.0
+resources:
+  bugtracker: https://github.com/davebaird/html-formhandlerx-jqueryremotevalidator/issues
+  homepage: https://github.com/davebaird/html-formhandlerx-jqueryremotevalidator
+  repository: https://github.com/davebaird/html-formhandlerx-jqueryremotevalidator.git
+version: '0.24'

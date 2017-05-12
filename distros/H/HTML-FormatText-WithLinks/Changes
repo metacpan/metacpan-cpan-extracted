@@ -1,0 +1,70 @@
+# Changelog for HTML::FormatText::WithLinks
+version:    0.14
+date:       4/01/2015
+    Various small documentation errors fixed
+---
+version:    0.14
+date:       9/12/2010
+    Missed the skipped links test from the MANIFEST :(
+---
+version:    0.13
+date:       9/12/2010
+    Added code to change the delimiters for italic and bold text <Thomas Sibley> (rt #63571)
+---
+version:    0.12
+date:       27/11/2010       
+    Updated HTML::FormatText dependancy to require version 2+
+    Added code to pull out the base from the base element in a document <Kevin Ryde> (rt #55238)
+    Added code to optionally skip links where the text is the same as the HREF <Thomas Sibley> (rt #63236)
+---
+version:    0.11
+date:       30/07/2008
+    failed to actually include any of the mentioned things in the previous release so re-releasing with the things actually there. sigh.
+---
+version:    0.10
+date:       21/07/2008
+    added anchor_links config option <Simon Dessau> (rt #37634)
+    compile regex and make it work with https <Simon Dessau> (rt #37634)
+    reset internal link collectors when call parse so object can be reused < Simon Dessau> (rt #37636)
+---
+version:    0.09
+date:       18/04/2007
+    added in examples directory
+---
+version:    0.08
+date:       26/03/2007
+    add in unique_links config option (rt #24713)
+---
+version:    0.07
+date:       30/08/2006
+    actually fix issues with empty hrefs (rt #14288)
+---
+version:    0.06
+date:       06/10/2005
+    add in missing ; to use line in examples in POD and README (rt #14777)
+---
+version:    0.05
+date:       12/09/2005
+    change way skip tests in t/12_treebuilderproblem.t to try and avoid CPAN 
+    testers failure
+---
+version:    0.04
+date:       27/08/2005
+    anchors with no href or empty href don't produce footnotes
+    some internal refactoring
+    much better test coverage
+---
+version:    0.03
+date:       19/05/2005
+    Added with_emphasis option
+    Delete HTML::TreeBuilder object after parsing
+---
+version:    0.02
+date:       02/02/2004
+    Now call eof on HTML::TreeBuilder which fixes bug with last words in
+    HTML fragments sometimes being lost
+---
+version:    0.01
+date:       12/01/2004
+changes:
+    Initial release

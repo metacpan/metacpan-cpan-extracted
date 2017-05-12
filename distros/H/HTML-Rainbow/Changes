@@ -1,0 +1,26 @@
+Revision history for Perl extension HTML::Rainbow
+
+0.06
+    - Ensure that rainbow() can be called procedurally.
+
+0.05 2007-09-27 10:39:59 UTC
+    - Rebuild with a more recent EU::MM to generate a correct
+      META.yml file.
+    - Minor test restructuring
+
+0.04 2006-10-14 07:48:16 UTC
+    - reworked tests to avoid bogus failure caused by
+      rounding errors.
+    - clarified licensing information in Makefile.PL
+    - renamed an example file to gain Kwalitee (I have no shame).
+
+0.03 2005-10-02 14:38:08 UTC
+    - use_span was not documented
+    - referenced Tie::Cycle::Sinewave in the documentation
+
+0.02 2005-10-01 18:15:36 UTC
+    - eg/html-parser was left off the manifest
+    - release dates were incorrect in the documentation
+
+0.01 2005-09-25 16:44:58 UTC
+    - original version; created by genpm v1.0

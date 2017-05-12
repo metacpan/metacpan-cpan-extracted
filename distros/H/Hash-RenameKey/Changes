@@ -1,0 +1,8 @@
+Revision history for Perl extension Hash::RenameKey.
+
+0.02  Fri Feb 26 13:30:00 2010
+    - remove stupid print statements
+
+0.01  Wed Feb 24 21:01:24 2010
+	- original version
+

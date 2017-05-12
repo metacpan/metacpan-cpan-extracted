@@ -1,0 +1,7 @@
+<h3>Current Environment</h3>
+<ul>
+% foreach my $key (sort(keys(%ENV))) {
+<li><b><% $key %></b>: <% $ENV{$key} %>
+% }
+</ul>
+

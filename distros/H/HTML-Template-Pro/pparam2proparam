@@ -1,0 +1,273 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+
+my %proparam_c_set_hook = (
+filename =>  
+"    if (NULL!=val) {
+      param->scalarref.begin=NULL;
+      param->scalarref.endnext=NULL;
+}\n", 
+scalarref => "    if (NULL!=val.begin) param->filename=NULL;\n",
+);
+
+open (PP,'pparam.h');
+open (PARAMH,'>','proparam.h');
+open (PARAMC,'>','proparam.c');
+
+#open (PGETINT,'>','getoptint.re2c');
+#open (PSETINT,'>','setoptint.re2c');
+open (PGETINT2,'>','getoptint.re2c.inc');
+open (PSETINT2,'>','setoptint.re2c.inc');
+open (PPRESET0,'>','resetopt0.inc');
+open (PPRESET1,'>','resetoptnot0.inc');
+
+open (PARAMM1,'>','mono-wrapper/src/htp-c-opts.cs.inc');
+open (PARAMM2,'>','mono-wrapper/src/htp-intset.cs.inc');
+open (PARAMM3,'>','mono-wrapper/src/htp-intget.cs.inc');
+open (PARAMM4,'>','mono-wrapper/src/htp-intprop.cs.inc');
+open (PARAMDLLSYM,'>','htmltmplpro/src/libhtmltmplpro.sym');
+open (PARAMDLLDEF,'>','htmltmplpro/src/libhtmltmplpro.def');
+
+print PARAMDLLDEF "LIBRARY htmltmplpro\r\nEXPORTS\r\n";
+{
+    open my $fh, "<", 'htmltmplpro/src/libhtmltmplpro.sym.header' or die $!;
+#    local $/; # enable localized slurp mode
+#    my $content = <$fh>;
+#    print PARAMDLLDEF $content;
+#    close $fh;
+    while (my $sym = <$fh>) {
+	chomp $sym;
+	print PARAMDLLDEF "   $sym\r\n";
+	print PARAMDLLSYM "$sym\n";
+    }
+}
+
+print PARAMH '
+/*! \file proparam.h
+    \brief Getters and setters for libhtmltmplpro options.
+
+    Public interface to get and set libhtmltmplpro options.
+ 
+    \author Igor Vlasenko <vlasenko@imath.kiev.ua>
+    \warning This header file should never be included directly.
+    Include <tmplpro.h> instead.
+*/
+
+/* generated; do not edit */
+#ifndef _PROPARAM_H
+#define _PROPARAM_H	1
+
+struct tmplpro_param;
+
+';
+print PARAMC '/* generated; do not edit */
+#include "pabidecl.h"
+#include "pabstract.h"
+#include "pparam.h"
+#include "proparam.h"
+
+';
+
+print PARAMM1 '
+    /* generated; do not edit */
+    internal class C_OPTS {
+';
+
+print PARAMM2 '/* generated; do not edit */
+';
+print PARAMM3 '/* generated; do not edit */
+';
+
+
+#print PGETINT catfile('getoptint.re2c.header');
+#print PSETINT catfile('setoptint.re2c.header');
+
+#----------- BEGIN LOOP-------------------
+while (<PP>) {
+
+    last if m!/\*\s*private\s*\*/!;
+    next if /^\s*\};\s*$/;
+    next if /typedef/;
+    next unless m!^\s*(.+);\s*(/\*.+\*/)?\s*$!;
+    my $field=$1;
+    my $default_value=0;
+    $default_value=$1 if m!/\*\s*default:(\d+).+\*/!;
+    #print STDERR "defval: $default_value\n" if $default_value;
+    $field=~/(.*?)\s+(\S+)$/;
+    my $type=$1;
+    my $name=$2;
+    my $flagtype=$type;
+    $flagtype=~s/flag/int/;
+
+    my $monotype=$flagtype;
+    $monotype=~s/ABSTRACT_.*\*/IntPtr/;
+    $monotype=~s/char\*\*/IntPtr/;
+    $monotype=~s/const char\*/IntPtr/;
+    $monotype=~s/char\*/IntPtr/;
+    #$monotype=~s/struct exprval/exprval/;
+    $monotype='C_API.'.$monotype if $monotype=~/(functype|PSTRING)/;
+
+    my $is_int_option = $monotype eq 'int';
+    my $is_bool_option = $is_int_option && $type eq 'flag';
+
+    if ($flagtype=~/functype$/) {
+        print PARAMH "/*! \\fn $flagtype tmplpro_get_option_$name(struct tmplpro_param*);
+    \\brief get address of callback of ::$flagtype
+    \\param param -- pointer to an internal state.
+*/
+";
+    } elsif ($flagtype=~/^ABSTRACT_/) {
+        my $typeref=$flagtype;
+        $typeref=~s/\*//;
+        print PARAMH "/*! \\fn $flagtype tmplpro_get_option_$name(struct tmplpro_param*);
+    \\brief get value of an external pointer that will be passed to a callback. see ::$typeref.
+    \\param param -- pointer to an internal state.
+*/
+";
+    } else {
+        print PARAMH "/*! \\fn $flagtype tmplpro_get_option_$name(struct tmplpro_param*);
+    \\brief get value of $name option.
+
+    see HTML::Template::Pro perl module documentation for $name option.
+
+    \\param param -- pointer to an internal state.
+*/
+";
+    }
+    print PARAMH "TMPLPRO_API $flagtype APICALL tmplpro_get_option_$name(struct tmplpro_param*);
+
+";
+    if ($flagtype=~/functype$/) {
+        print PARAMH "/*! \\fn void tmplpro_set_option_$name(struct tmplpro_param*,$flagtype);
+    \\brief set callback of ::$flagtype
+    \\param param -- pointer to an internal state.
+    \\param val -- callback address to set.
+*/
+";
+    } elsif ($flagtype=~/^ABSTRACT_/) {
+        my $typeref=$flagtype;
+        $typeref=~s/\*//;
+        print PARAMH "/*! \\fn void tmplpro_set_option_$name(struct tmplpro_param*,$flagtype);
+    \\brief set external pointer that will be passed to a callback. see ::$typeref.
+    \\param param -- pointer to an internal state.
+    \\param val -- value to set.
+*/
+";
+    } else {
+        print PARAMH "/*! \\fn void tmplpro_set_option_$name(struct tmplpro_param*,$flagtype);
+    \\brief set value of $name option.
+
+    see HTML::Template::Pro perl module documentation for $name option.
+
+    \\param param -- pointer to an internal state.
+    \\param val -- value to set.
+*/
+";
+    }
+    print PARAMH "TMPLPRO_API void APICALL tmplpro_set_option_$name(struct tmplpro_param*,$flagtype);
+
+";
+
+    my $c_get_line = ($type eq 'flag' ? '(int) ':'').'param->'.$name;
+    my $c_set_line = "param->$name=".($type eq 'flag' ? '(flag)':'').'val';
+
+    print PARAMC "
+API_IMPL 
+$flagtype 
+APICALL tmplpro_get_option_$name(struct tmplpro_param* param) {
+    return $c_get_line;
+}
+
+API_IMPL 
+void
+APICALL tmplpro_set_option_$name(struct tmplpro_param* param, $flagtype val) {
+    $c_set_line;
+".($proparam_c_set_hook{$name} ? $proparam_c_set_hook{$name} : '').
+"}
+";
+
+    #print PGETINT '	"'.$name.'"		{return '.$c_get_line.";}\n" if $is_int_option;
+    #print PSETINT '	"'.$name.'"		{'.$c_set_line."; return 0;}\n" if $is_int_option;
+    print PGETINT2 '	"'.$name.'"		{return '.$c_get_line.";}\n" if $is_int_option;
+    print PSETINT2 '	"'.$name.'"		{'.$c_set_line."; return 0;}\n" if $is_int_option;
+
+    if ($is_int_option) {
+	if ($default_value) {
+	    print PPRESET1 "	param->$name=".($type eq 'flag' ? '(flag)':'').$default_value.";\n";
+	} else {
+	    print PPRESET0 "	param->$name=".($type eq 'flag' ? '(flag)':'').$default_value.";\n";
+	}
+    }
+
+    print PARAMM1 "
+    [DllImport(DLL.HTP_DLL, CallingConvention=DLL.HTP_CallingConvention, CharSet=DLL.HTPCharSet)]
+      internal static extern $monotype tmplpro_get_option_$name(IntPtr c_param);
+
+    [DllImport(DLL.HTP_DLL, CallingConvention=DLL.HTP_CallingConvention, CharSet=DLL.HTPCharSet)]
+      internal static extern void tmplpro_set_option_$name(IntPtr c_param, $monotype val);
+";
+    print PARAMM2 '      case "'.$name.'": '."\t".'C_OPTS.tmplpro_set_option_'.$name.'(_c_param, val); break;
+' if $is_int_option;
+    print PARAMM3 '      case "'.$name.'": '."\t".'return C_OPTS.tmplpro_get_option_'.$name.'(_c_param);
+' if $is_int_option;
+
+    print PARAMM4 '
+    /// <summary>
+    /// HTML::Template::Pro template processing option.
+    /// see HTML::Template::Pro perl module documentation for '.$name.' option.
+    /// </summary>
+    public int '.$name.' {
+      get {
+	return C_OPTS.tmplpro_get_option_'.$name.'(_c_param);
+      }
+      set {
+	C_OPTS.tmplpro_set_option_'.$name.'(_c_param, value);
+      }
+    }
+' if $is_int_option;
+
+    print PARAMDLLDEF "   tmplpro_get_option_$name\r\n";
+    print PARAMDLLDEF "   tmplpro_set_option_$name\r\n";
+
+    print PARAMDLLSYM "tmplpro_get_option_$name\n";
+    print PARAMDLLSYM "tmplpro_set_option_$name\n";
+}
+#----------- END LOOP-------------------
+
+print PARAMH '
+#endif /* proparam.h */
+';
+
+print PARAMM1 '
+    }
+';
+
+#print PGETINT catfile('getoptint.re2c.footer');
+#print PSETINT catfile('setoptint.re2c.footer');
+
+close (PARAMH);
+close (PARAMC);
+close (PARAMM1);
+close (PARAMM2);
+close (PARAMM3);
+close (PARAMM4);
+close (PARAMDLLDEF);
+
+#close (PGETINT);
+#close (PSETINT);
+close (PGETINT2);
+close (PSETINT2);
+close (PPRESET0);
+close (PPRESET1);
+
+sub catfile {
+    my $file=shift;
+    open (INFILE, $file) || die "can't open $file: $!";
+    binmode (INFILE);
+    local $/;
+    my $catfile=<INFILE>;
+    close (INFILE) || die "can't close $file: $!";
+    return $catfile;
+}

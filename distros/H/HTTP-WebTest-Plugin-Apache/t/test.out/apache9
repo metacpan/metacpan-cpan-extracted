@@ -1,0 +1,42 @@
+Failed  Succeeded  Test Name
+   0          2    *** no name ***
+   0          1    *** no name ***
+   0          2    *** no name ***
+   1          1    *** no name ***
+
+
+Test Name: N/A
+URL: http://http.web.test/error-log-0
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  APACHE ERROR LOG TEST
+    Number of messages in Apache error log is zero ?             SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/error-log-1
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/error-log-0
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  APACHE ERROR LOG TEST
+    Number of messages in Apache error log is zero ?             SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/error-log-3
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  APACHE ERROR LOG TEST
+    Number of messages in Apache error log ( = 3 ) is zero ?     FAIL
+
+
+Total web tests failed: 1  succeeded: 6

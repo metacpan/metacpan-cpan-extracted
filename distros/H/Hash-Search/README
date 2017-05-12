@@ -1,0 +1,32 @@
+Hash-Search version 0.03
+========================
+
+Hash::Search allows a search to be made on a hash based on a regular
+expressions pattern based on the name of the key and returns the
+results as a seperate hash. It also keeps a count of how many
+matches have been made.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+strict
+warnings
+Carp
+Exporter
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Steve Brokenshire <sbrokenshire@xestia.co.uk>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

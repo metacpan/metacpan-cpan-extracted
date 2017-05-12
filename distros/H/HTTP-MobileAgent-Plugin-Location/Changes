@@ -1,0 +1,21 @@
+Revision history for HTTP-MobileAgent-Plugin-Location
+
+0.0.5  Thu Oct 09 2008
+       Fix some errors in test script
+
+0.0.4  Mon Sep 22 2008
+       Add Geo::Point support
+       Remove H::MA::P::XHTML dependency
+       Update data of newest models
+
+0.0.3  Tue Jan 29 18:50:00 2008
+       - Maintain some funny codes, thanks to Black TKSK
+       - Escaping unsafe character in description
+
+0.0.2  Tue Jan 15 17:29:00 2008
+       Some changes to avoid PAUSE parsing error.
+       Thanks to Mr. Tatsuhiko Miyagawa.
+
+0.0.1  Wed Nov 28 04:56:02 2007
+       Initial release.
+

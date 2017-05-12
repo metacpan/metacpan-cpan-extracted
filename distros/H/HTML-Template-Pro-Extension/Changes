@@ -1,0 +1,53 @@
+Revision history for Perl extension HTML::Template::Pro::Extension.
+
+0.11 Wed Jul 23 15:19:04 2014
+	- Update documentation
+
+0.10 (2009-10-27)
+=================
+- A change in H::T::Pro interface (probabily). I don't find anymore clear_param
+  and there is a new method called clear_params.
+
+0.09 (2006-08-19)
+=================
+- H::T::P::Extension::HEAD_BODY::header_css now return also <link...> tags with
+  "rel" attribute equal to "stylesheet" and "type" equal to "text/css".
+
+0.08 (2005-11-02)
+=================
+- Now, when calling filters, the object is passed to filter as second parameter.
+- Removed a bug in the HEAD_BODY.pm module that cannot parse headers sometimes.
+
+0.07 (2005-09-20)
+=================
+- In vanguard mode, key can be start with an underscore (_) too because, for
+  example, some internal LOOP variable (__COUNTER__,...) start with it.
+
+0.06 (2005-09-19)
+=================
+- In vanguard mode (%....) now is accepted only keys that start with alpha
+  characters [A-Za-z]
+
+0.05 (2005-09-14)
+=================
+- If you try to initialize H::T::P::Extention with some parameters that should
+  be routed to H::T::Pro, it doesn't work because H::T::P::Extension 
+	inizialize H::T::Pro with internal parameters. Now you can pass 
+	initializing parameters (like functions as an example) to H::T::P::Extension
+	that routed them to H::T::Pro.
+
+0.04 (2005-08-21)
+=================
+- A little optimization in calling H::T::P->param method.
+
+0.03 (2005-08-18)
+=================
+- Removed a bug.
+
+0.02 (2005-08-17)
+=================
+- Minor changes
+
+0.01 (2005-08-16)
+=================
+- First release derived from HTML::Template::Extension

@@ -1,0 +1,141 @@
+<webmake>
+
+<!--
+
+     A quick demo of using WebMake's <sitetree> tag.
+
+-->
+
+<include file="${WebMake.PerlLib}/sitetree.wmk" />
+<include file="sample_stories.inc" />
+
+<{perl
+        # create a ${all_stories} variable containing the list
+        # of all text files just loaded.
+        $_ = '';
+        foreach my $pg (sorted_content_matching ("score title", "*.txt"))
+	{
+          $pg =~ s/\.txt$//; $_ .= "$pg ";
+        }
+        set_content ("all_stories", $_);
+        '';
+}>
+
+<{!-- ------------------------------------------------------------------- --}>
+
+<content name=header map=false>
+  <html><head>
+    <title>$[this.title]</title>
+    <meta name="Abstract" value="$[this.abstract]" />
+  </head>
+  <body bgcolor=#ffffff>
+  <h1>WebMake Sitetree Demo</h1>
+  The sitetree is this position-indicator thingy below.
+  <hr />
+  $[sitetree]
+  <hr />
+  <a href=$(mainindex)>Index</a> | 
+  <a href=$(map)>Site Map</a>
+  <hr />
+</content>
+
+<content name=footer map=false>
+  <hr /><p>
+  <em>Sorry about the crappy formatting BTW, this is just a demo. ;)</em>
+  </p>
+  </body>
+  </html>
+</content>
+
+<{!-- ------------------------------------------------------------------- --}>
+
+<content name=index_list_item map=false>
+  <li>
+    <a href=$(${item})>$[${item}.txt.title]</a><br />
+    <p>$[${item}.txt.abstract]</p>
+  </li>
+</content>
+
+<content name=index_chunk isroot=true>
+  <wmmeta name=title value="WebMake Sample: a news site" />
+  <wmmeta name=abstract value="some old news site" />
+  <ul> <{perl make_list ('index_list_item', get_list ("all_stories")); }> </ul>
+</content>
+
+<{!-- ------------------------------------------------------------------- --}>
+
+<for name=pg values="${all_stories}">
+  <out name="${pg}" file="sitetree_html/sitetree_${pg}.html">
+    ${header}${${pg}.txt}${footer}
+  </out>
+</for>
+
+<out name=mainindex file=sitetree_html/sitetree.html>
+  ${header}${index_chunk}${footer}
+</out>
+
+<{!-- ------------------------------------------------------------------- --}>
+
+<content name=treeopen map=false>
+  <li>
+    <strong>-</strong> <a href=$(url)>${title}</a>: $[${name}.abstract]<br>
+    <ul>${list}</ul>
+  </li>
+</content>
+
+<content name=treeclosed map=false>
+  <li>
+    <strong>+</strong> <a href=$(url)>${title}</a>: $[${name}.abstract]<br>
+  </li>
+</content>
+
+<content name=treenotthispage map=false>
+  <li>
+    <strong>.</strong> <a href=$(url)>${title}</a>: $[${name}.abstract]<br>
+  </li>
+</content>
+
+<content name=treethispage map=false>
+  <li>
+    <strong>&gt;</strong> <a href=$(url)>${title}</a>: $[${name}.abstract]<br>
+  </li>
+</content>
+
+<sitemap name=mainsitemap node=sitemapnode leaf=sitemapleaf>
+<wmmeta name=title value="WebMake Sample: site map" />
+<wmmeta name=Abstract value="Map of the site" />
+</sitemap>
+
+<sitetree name=sitetree sitemap="mainsitemap"
+	opennode="treeopen" closednode="treeclosed"
+	thispage="treethispage" leaf="treenotthispage" />
+
+<{!-- ------------------------------------------------------------------- --}>
+
+<content name=sitemapnode map=false>
+  <li>
+    <p>
+      <a href=$(url)>${title}</a>: $[${name}.abstract]<br>
+      <em>[score: ${score}, name: ${name}, is_node: ${is_node}]</em>
+      <{!-- don't forget to list the sub-items --}>
+      <ul> ${list} </ul>
+    </p>
+  </li>
+</content>
+
+<content name=sitemapleaf map=false>
+  <li>
+    <p>
+      <a href=$(url)>${title}</a>: $[${name}.abstract]<br>
+      <em>[score: ${score}, name: ${name}, is_node: ${is_node}]</em>
+      <{!-- no sub-items here --}>
+    </p>
+  </li>
+</content>
+
+<out name=map file=sitetree_html/sitetree_map.html>
+  ${header}${mainsitemap}${footer}
+</out>
+
+</webmake>
+

@@ -1,0 +1,1351 @@
+#!/usr/bin/perl
+
+eval 'exec /usr/bin/perl  -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
+############################################
+# Modules ########################
+
+use lib qw(lib private/perl);
+use strict qw(subs vars);
+use warnings;
+use FileHandle;
+use Term::ReadLine;
+use File::Copy;
+use Data::Dumper;
+$Data::Dumper::Terse = 1;
+use Config;
+use Carp;
+
+# My Modules ######################
+
+use HTML::Merge::Engine qw(:unconfig);
+use HTML::Merge::Compile;
+use HTML::Merge::App::Repository;
+
+# Def #############################
+# auto flush
+$| = 1;
+
+##################################
+sub nChoice ($;$$);
+sub Log($$);
+sub user_msg($;$);
+#############################################
+# Main ############################
+
+# Globals ############################
+my %param;
+my $term = new Term::ReadLine('');
+my @files;
+my $unix = 1;
+my $win32 =1;
+my $is_internal = 0;
+my $buf;
+my $flag;
+my @drivers;
+my $i;
+my @databases;
+my $dbh;
+my $is_root;
+my $merge;
+my $private;
+my ($conf,$default,$nextdef);
+my $cgi_bin;
+my $tmp;
+my $root;
+my $have_data_password;
+my $user;
+my $uid;
+my $gid = 100;
+my $group = 'nobody';
+my $allow_symlink = '';
+# Settings ############################
+my $local_install = $ARGV[0];
+$local_install =~ /^-l|--local$/ ? 1 : 0 if $local_install;
+
+my $me = $0;
+$me =~ s|^.*/||;
+$me =~ s/\..*$//;
+
+my $log_file = "$0.log"; 
+my @apache = qw(/home/httpd 
+		/usr/local/www 
+		/var/www 
+		/usr/local/httpd
+		/usr/local/apache 
+		/usr/local/etc/apache 
+		/usr/local/etc/httpd
+		/usr/local/etc/www
+		/usr/HTTPServer
+		);
+                                                                                
+# require Data password if installed
+$@ = undef;
+eval{ require Data::Password; };
+$have_data_password = 1 unless $@;
+
+
+Log('INFO',"*** START of $me session ***");
+
+foreach (qw(in32 vms os390 os2 dos amiga mac))
+{
+	$unix = undef if ($^O =~ /$_/);
+}
+
+$win32 = undef unless ($^O =~ /in32/);
+
+
+unless ($unix || $win32)
+{
+	user_msg('this script works ONLY on UNIX systems!','Warning');
+ 	user_msg('Some support for win32 and apache.','Info');
+	pause();
+} else	{
+	unlink <*.inc>;
+	}
+
+user_msg("
+
+RAZ Information Systems presents:
+
+ M M  EEEEE RRR   GGG  EEEEE
+M M M E     R  R G     E
+M   M EEE   RRR  G  GG EEE
+M   M E     R  R G   G E
+M   M EEEEE R  R  GGG  EEEEE
+
+This script will create an instance for HTML::Merge ver. $HTML::Merge::Compile::VERSION. 
+An instance is a definition of HTML::Merge application and URL. 
+Please consult the documentation about instances.
+
+Notes: 
+* In order to work with HTML::Merge you MUST create at least one instance.
+* To force blank input when a default is suggested, type: NONE
+
+For any information, please refer to http://rmerge.sourceforge.net
+or send mail to raz\@raz.co.il
+
+",'None');
+
+pause();
+
+$is_root =  IsRoot($>);
+
+# get default paths
+$tmp = $local_install;
+$merge = findpath('merge.cgi', $Config{'installscript'}) || '';
+Log('FATAL',"Could not find merge.cgi in PATH") unless (-f $merge);
+
+if($local_install)
+{
+	if(!$tmp)
+	{
+		$buf = "There is no system wide HTML::Merge installation, switching to local mode";
+		BoldPrint($buf);
+		user_msg("\n",'None');
+	}
+
+	if(-d './private' && -d './public') 
+	{
+		$private = '.';
+	}
+	else
+	{
+		die "Could not find merge data in the current directory";
+	}
+}
+else
+{
+	$private = $merge;
+	$private =~ s|/bin/merge.cgi|/share/merge|;
+	$private =~ s|\\bin\\merge.cgi|\\share\\merge| if $win32;
+	
+	do{
+	   user_msg("Faild to find merge data at $private",'Info');
+	   $private = $Config{installprefixexp} || $Config{prefix}; 
+	   $private .= '/merge';
+	   Log('DEBUG',"merge data: $private");
+	   Log('FATAL',
+		"Could not find merge data at $private") unless (-d $private); 
+	} unless (-d $private);
+	user_msg("Merge data is in $private",'Info');
+}
+
+# let's look for a default cgi-bin dir
+foreach (@apache) 
+{
+	if (-d "$_/cgi-bin") 
+	{
+		$default = "$_/cgi-bin";
+		last;
+	}
+}
+
+user_msg("\n",'None');
+$cgi_bin = &getone("Enter your cgi-bin directory, full path", 
+		'CGI_BIN', $default, sub 
+{
+	s/^\s+//;
+	s/\s+$//;
+	s|/$||;
+	my $cgi_dir = $_;
+
+	unless (-d $cgi_dir){
+	   user_msg("$cgi_dir does not exist.",'Info');
+	   user_msg("\n\nWould you like to create $cgi_dir ? (Y/N) [N]: ",'None');
+  	   my $choice = nChoice("YN",'N');
+	   if ($choice eq 'Y') {
+	      Log('DEBUG',"Creating $cgi_dir");
+	      mkdir $cgi_dir || Log('FATAL',"Can't mkdir $cgi_dir");
+	      chmod 0777, $cgi_dir if ($unix);
+	   }
+	}
+	die "$_ does not exist" unless (-d $cgi_dir);
+});
+
+while (-f "$cgi_bin/merge.conf") 
+{
+	require "$cgi_bin/merge.conf";
+
+	last if $@;
+
+# Read factory settings to %param
+   user_msg("Merge instance was found in $cgi_bin");
+   user_msg("
+   We can use your 'FACTORY' settings during reinstall 
+   Those are settings you made set last time when using $me 
+   or we can use your current settings\n",'None');
+   user_msg("\n\nWould you like to use 'FACTORY' settings ? (Y/N) [N]: ",'None');
+
+no warnings;
+   my $choice = nChoice("YN",'N');
+   if ($choice eq 'Y') {
+      Log('DEBUG',"Reading FACTORY from $cgi_bin/merge.conf");
+         while (my ($var, $val) = each %$HTML::Merge::Ini::FACTORY) 
+            {
+            $param{$var} = $val;
+            }
+      }
+use warnings;
+   if ($choice eq 'N') {
+# Override with user's some settings 
+      Log('DEBUG',"Reading Settings from $cgi_bin/merge.conf");
+      while (my ($var,$val) = each (%{"HTML::Merge::Ini::"})) {
+         if ($$val and not(ref($$val))) {
+            $param{$var} = $$val; 
+            Log('DEBUG',"Reading: $var=$$val");
+            }
+      } # while
+   } # choice eq 'N'
+      open(I, "$private/private/perl/input.frm") || last;
+      while (<I>) 
+	{
+		chop;
+		my ($title, $name, $type, $opts, $default) = split(/\|/);
+		if ($default =~ s/\@(.*?)\@/\0/) 
+		{
+			my $item = $1;
+			next if $param{$item};
+			my $re = quotemeta($default);
+			$re =~ s/\\\0/(.*)/;
+			my $val = ${"HTML::Merge::Ini::$name"} || '';
+			if ($val =~ /^$re$/) 
+			{
+				$param{$item} = $1;
+			}
+		}
+	}
+	close(I);
+
+	$param{'__DB_PASS'}=HTML::Merge::Engine::Convert($param{'DB_PASSWORD'});
+
+	last;
+}
+
+user_msg("\n",'None');
+
+$default = $cgi_bin;
+$default =~ s|^.*[/\\]|/|;
+
+user_msg("Enter the web url (without http://server) for that cgi-bin directory\n",'None'); 
+my $url = getone("Web url", 
+		'URL', 
+		$default, 
+		sub {
+	 		s|/$||;
+			$_ ||= $default;
+			s|^http://[^/]+||;
+		});
+
+if($is_root)
+{
+	($conf,$default,$nextdef) = @{ EditHttpdConf()};
+}
+else
+{
+	$default = 'nobody';
+}
+
+my @data;
+
+
+if ($win32) 
+{
+	$user = $default;
+	$uid = 100;
+}
+else 
+{
+  	$user = &getone("Enter the user id for your web server" , 
+			'WWW_U', 
+			$default,
+			sub {
+				@data = getpwnam($_);
+				die "No user $_" unless (@data);
+			});
+
+	$uid = $data[2];
+	user_msg("\n",'None');
+}
+
+$default = $nextdef;
+
+unless ($default) 
+{
+	$default = $user;
+	@data = getgrnam($default)  unless $win32;;
+	$default = '' unless (@data);
+}
+
+$default ||= 'nobody';
+
+$group = &getone("Enter the group id for your web server",
+		'WWW_G', 
+		$default, 
+		sub {
+			@data = getgrnam($_);
+			die "No group $_" unless (@data);
+		}) unless $win32;
+
+$gid = $data[2] unless $win32;
+
+user_msg("\n",'None');
+
+($param{'SUFFIX'}) = (split(/\./, $param{'SCRIPT'}))[-1] if $param{'SCRIPT'};
+	
+user_msg("\n",'None');
+
+my $ext = getone("Enter suffix to use for CGI script", undef, 'pl');
+
+delete $param{'SUFFIX'};
+
+my $script = $ext ? "merge.$ext" : 'merge';
+$param{'SCRIPT'} = $script;
+
+foreach (qw(template cache logs pl)) 
+{
+	mkdir "$cgi_bin/$_", 0755;
+	chown $uid, $gid, "$cgi_bin/$_";
+}
+
+my ($choice, $def, $cd, $c2);
+
+if (-f "$cgi_bin/$script") 
+{
+	$def = "/.No change.";
+	$c2 = "\n\r";
+} else {
+	$def = '';
+	}
+
+if ($win32 || $local_install) 
+{
+	$cd = 'C';
+}
+else 
+{
+	$cd = 'L';
+	user_msg("
+
+Symbolic <L>inks are recommended , but will work only 
+on UNIX systems and Apache servers that have the FollowSymLinks 
+directive applied. 
+If they are not applicable, choose <C>opy.
+If you choose <N>one or <C>opy, $cgi_bin/$script
+will be created as a copy of $merge 
+if you choose Link it will be a symbolic link.
+Do you wish to <C>opy HTML::Merge files into $cgi_bin 
+or create a symbolic <L>ink?
+
+(C/L/None$def) [$cd]: ",'None');
+
+	$choice = nChoice("CLN", $cd);
+}
+
+$choice = $cd if $win32 || $local_install;
+
+
+if ($choice eq 'C') 
+{
+	user_msg('Copied instance selected','Info');   
+	$allow_symlink = '';
+	&scrape($cgi_bin);
+
+	require ExtUtils::Install;
+	require File::Copy;
+
+	ExtUtils::Install::install({"$private/private" => "$cgi_bin/private"}, 1, 0);
+	ExtUtils::Install::install({"$private/public" => "$cgi_bin/public"}, 1, 0);
+	unlink "$cgi_bin/$script";
+	File::Copy::copy($merge, "$cgi_bin/$script");
+	chmod 0755, "$cgi_bin/$script";
+	chown $uid, $gid, "$cgi_bin/$script";
+} 
+elsif ($choice eq 'L') 
+{
+	user_msg("Link\n",'None');
+	$allow_symlink = 'FollowSymLinks';
+	user_msg('Link based instance selected','Info');   
+	&scrape($cgi_bin);
+
+	symlink	"$private/private", "$cgi_bin/private" ||
+		die "Could not link $private/private to $cgi_bin/private: $!";
+	chmod 0755, "$cgi_bin/private";
+	chown $uid, $gid, "$cgi_bin/private";
+
+	symlink	"$private/public", "$cgi_bin/public" ||
+		die "Could not link $private/public to $cgi_bin/public: $!";
+	chmod 0755, "$cgi_bin/public";
+	chown $uid, $gid, "$cgi_bin/public";
+
+	unlink "$cgi_bin/$script";
+	symlink $merge, "$cgi_bin/$script" || 
+		die "Could not link $merge to $cgi_bin/$script: $!";
+	chmod 0755, "$cgi_bin/$script";
+	chown $uid, $gid, "$cgi_bin/$script";
+} 
+elsif ($choice eq 'N') 
+{
+	user_msg("None\n",'None');
+	$allow_symlink = '';
+	unless (-x "$cgi_bin/$script") 
+	{
+		require File::Copy;
+		File::Copy::copy($merge, "$cgi_bin/$script");
+		chmod 0755, "$cgi_bin/$script";
+	}
+} 
+elsif ($choice ne "\r") 
+{
+	die "Unknown choice $choice";
+}
+
+if (-w "$cgi_bin/template" && !$param{'DEF_TEMPLATE'}) {
+	user_msg("\n\nWould you like to install the samples? (Y/N) [Y]: ",'None');
+	$choice = nChoice("YN",'Y');
+	} else {
+	$choice = 'N';
+	}
+
+$param{'DEF_TEMPLATE'} = '' unless $param{'DEF_TEMPLATE'};
+
+if ($choice eq 'Y') 
+{
+	user_msg("Yes\n",'None');
+	Log('DEBUG','Samples install');
+
+	system('perl createsamples.pl') if($local_install);
+		
+	foreach (glob("$private/docs/samples/*.html")) 
+	{
+		my $dest = $_;
+		$dest =~ s|^$private/docs/samples|$cgi_bin/template|;
+		File::Copy::copy($_, $dest);
+	}
+
+	$param{'DEF_TEMPLATE'} = 'samples.html';
+} 
+else 
+{
+	user_msg("No\n",'None');
+}
+
+my $has_dbi = 0;
+
+eval {
+	require DBI;
+	$has_dbi = 1;
+     };
+
+	for (;;) 
+	{
+	last unless $has_dbi;
+
+		@drivers = DBI->available_drivers;
+		$i = 0;
+
+		user_msg("\n",'None');
+		user_msg("
+    Please choose a database driver for your instance
+    From the available DBI drivers or type NONE 
+    if you don't want to configure a database at the moment:\n",'Note');
+
+		foreach (@drivers) 
+		{
+			print ++$i, ") $_\n";
+		}
+	
+		my $drv = &getone("Choose DBI driver",
+			'DRIVER', undef, undef, 1);
+		if ($drv =~ /^\d+$/) 
+		{
+			$drv = $drivers[$drv - 1];
+		}
+		last unless ($drv);
+
+   		last if (uc($drv) eq 'NONE');
+
+		user_msg("$drv chosen.",'Info');
+
+		eval { @databases = DBI->data_sources($drv); 
+			foreach(@databases) 
+			{
+				s/^.*?:.*?://;
+			}
+		};
+
+		$i = 0;
+
+		if (@databases) 
+		{
+			foreach (@databases) 
+			{
+				print ++$i, ") $_\n";
+			}
+		}
+
+		$param{'DRIVER'} |='';
+		my $default = $drv eq $param{'DRIVER'} ? $param{'DB'} : '';
+		my $db = getone("Choose application database:",undef, $default);
+
+		if ($db =~ /^\d+$/) 
+		{
+			$db = $databases[$db - 1];
+		}
+
+		user_msg("DSN is dbi:$drv:$db",'Info');
+
+		user_msg("
+      On some databases user name and password could be left blank. 
+      Type NONE to override the default by an empty string.\n\n"
+		,'Note');
+	
+		my $duser = getone("Username to connect to database", 
+			'DB_USER', $user, undef, 1);
+
+		$default = $param{'__DB_PASS'};
+		$default =~ s/./*/g if $default;
+  	my $dpass;
+		$dpass = getone("Password for username '$duser'",'__DB_PASS', $duser, undef, 1);
+   
+		exit unless defined $dpass;
+		$dpass ||= $param{'__DB_PASS'};
+		$dpass =~ s/^none$//i if $dpass;
+
+		user_msg("\n\nTrying...",'None');
+
+		$@ = undef;
+		eval { $dbh = DBI->connect("dbi:$drv:$db", $duser, $dpass, { RaiseError => 1, AutoCommit => 0 }) 
+			|| die $DBI::errstr;};
+
+		if ($@) 
+		{
+			user_msg("$DBI::errstr",'Warning');
+			next;
+		} else 
+		{
+		   user_msg("Database looks parameters OK !",'Info');
+		}
+
+		$param{'DRIVER'} = $drv;
+		$param{'DB'} = $db;
+		$param{'DB_USER'} = $duser;
+		$param{'__DB_PASS'} = $dpass;
+		$flag = 1;
+
+		user_msg( "
+      As we finished defining the application database we are now about to 
+      define system data base. The system database stores 'merge security 
+      backed feature' and persistent server side context. 
+
+      For new users we recommend using SQLite.  If you want to use SQLite 
+      type NONE. If you want merge internal tables in other database you 
+      may change the default values on the next option.
+
+",'Note');
+
+pause();
+my $sys_db_def = 'merge';
+
+		$i = 0;
+		if (@databases) 
+		{
+			foreach (@databases) 
+			{
+				print ++$i, ") $_\n";
+			}
+		}
+
+		$@ = undef;
+
+		eval {
+        		require DBD::SQLite;
+		};
+
+		user_msg( "
+Choose an existing database or type the name of a new one\n",'Note');
+
+		if($@)
+		{
+			user_msg(q|
+As you don't have DBD::SQLite if you choose NONE you will not be able
+to use HTML::Merge's security and session features.|,'Note');
+			user_msg("\n",'None'); 
+		}
+		else
+		{
+		   $sys_db_def = 'NONE';
+		   user_msg('Choose NONE and HTML::Merge will use DBD::SQLite for system database'
+				,'Note');
+		}
+
+		my $mergedb = getone("Choose system database",
+			'MERGE_DB', $sys_db_def);
+
+		if ($mergedb) 
+		{
+			
+			$mergedb =~ s/\s//g;
+			if ($mergedb =~ /^\d+$/) 
+			{
+				$mergedb = $databases[$mergedb - 1];
+				$param{'MERGE_DB'} = $mergedb;
+			user_msg("'$mergedb' is the system database",'Info');
+			}
+			user_msg("tring to create $mergedb DATABASE",'Info');
+			eval { $dbh->do("CREATE DATABASE $mergedb") };
+                	if ($@)
+                	{
+                           user_msg("$DBI::errstr",'Warning');
+			   user_msg("you may need to create $mergedb DATABASE manualy\n and try again",'Info')
+				unless $@ =~ /exist/i;
+                	}
+		}
+		else
+	  	{
+			my $internal_dbh;
+                	eval { $internal_dbh = DBI->connect("dbi:SQLite:dbname=$cgi_bin/merge.db","","") 
+				|| die $DBI::errstr;};
+	 
+                	if ($@)
+                	{
+                        	user_msg("\nError: $DBI::errstr",'Warning');
+                        	next;
+                	}
+
+			user_msg("SQLite file $cgi_bin/merge.db is the system database",'Info');
+			eval {$internal_dbh->disconnect(); };
+
+			$is_internal=1;
+		}	
+
+		eval {$dbh->disconnect(); };
+		last;
+	} # for 
+
+@param{qw(DB_USER DB_PASS DRIVER DB MERGE_DB)} = () unless $flag;
+
+my $savep = $param{'ROOT_PASSWORD'} || '';
+my $nextp = '';
+
+user_msg("\n",'None'); 
+user_msg(" 
+      Merge instance web user can access merge toolbox
+      when merge is in development mode. 
+
+After the instance creation is complete you may use apache 'htpasswd'
+to set password or add other web users. see '.htmerge' file
+in your instance directory: $cgi_bin\n\n",'Note');
+
+pause();
+
+for (;;) 
+{
+	my $p;
+	my $save = $param{'ROOT_USER'};
+	my $ru = getone("Enter Merge instance web user",'ROOT_USER','admin');
+	my ($default, $s_default);
+
+	if (exists $param{'ROOT_PASSWORD'} && $save eq $ru) 
+	{
+		$s_default = '<no change>';
+	} 
+	else 
+	{
+		$s_default = $default = $ru;
+	}
+
+	$p = getone("Enter Merge instance web user password",
+		undef,
+	 	$s_default,undef,1);
+
+	$p = $savep if $p eq '<no change>';
+
+	if ($p && $p !~ /^none$/i && ! $win32 && $have_data_password && $p ne $savep)
+	{
+		my $reason = Data::Password::IsBadPassword($p);
+		if ($reason) 
+		{
+			user_msg("Bad password: It $reason",'Warning');
+			next;
+		}
+
+	}
+
+        $p ||= $default;
+	$p =~ s/^none$//i;
+
+	unless ($p) 
+	{
+		$nextp = $param{'ROOT_PASSWORD'} = '';
+		last;
+	}
+ 
+ 	if ($win32 || $savep eq $p) 
+	{
+ 		$param{'ROOT_PASSWORD'} = $p;
+ 		$nextp = $p;
+  	}
+	else 
+	{
+		$param{'ROOT_PASSWORD'} = crypt($p, pack("CC", rand(26) + 65,
+				rand(26) + 65));
+		$nextp = crypt($p, pack("CC", rand(26) + 65,
+				rand(26) + 65));
+ 	}
+	last;
+}
+
+user_msg("\nYou must configure your webserver to alias $url 
+as $cgi_bin and run .pl files over there 
+as CGI scripts",'Note');
+
+my $no_conf_read = 0;
+my $need = 1;
+my $flag_merge = undef;
+my $flag_dir_rem = '';
+my $temp;
+if ($conf) {
+	if ($is_root) {
+		$temp = "merge-httpd.$$";
+       		$temp = "/tmp/$$-merge-httpd" if $unix;
+		}
+
+	unless (open(I, $conf)) 
+		{
+		$no_conf_read = 1;
+		};
+
+	user_msg("Cannot open $conf: $!",'Warning') if $no_conf_read;
+	} else {
+	$no_conf_read =1;
+	$temp = "merge-httpd.inc";
+	user_msg("Manually edit your web server configuration file",'Info');
+	user_msg("You can use $temp when updating httpd.conf",'Info');
+	}
+
+open(O, ">$temp") || Log('FATAL',"Cannot open $temp: $!");
+Log('TRACE',"Saving conf changes to $temp");
+
+unless ($no_conf_read) {
+	while (<I>) 
+	{
+		if (/^\s*(Script)?Alias\s+$url\/?\s/i) 
+		{
+			$need = undef;
+		}
+
+		$flag_merge = 1 if (/^#\s*BEGIN MERGE $cgi_bin\b/);
+		$flag_dir_rem = '#' 
+			if (/^<Directory\s+"$cgi_bin"\s*>/);
+		print O unless $flag_merge;
+		$flag_merge = undef if (/^#\s*END MERGE $cgi_bin\b/);
+	}
+}
+
+print O "# BEGIN MERGE $cgi_bin\n",
+	"# generated by ${me}\[$$\]\n# ",
+	scalar(localtime()),
+	"\n\n"; 
+
+if ($need) 
+	{
+	print O "ScriptAlias $url/ $cgi_bin/\n";
+	} else {
+	print O "# ScriptAlias $url/ $cgi_bin/\n";
+	}
+
+print O "\n# This is cgi directory definition.\n";
+print O "# It's commented out as $me think you already have it.\n" 
+	if $flag_dir_rem;
+
+my $pwd = "$cgi_bin/.htmerge";
+
+print O <<EOM;
+${flag_dir_rem}<Directory "$cgi_bin">
+$flag_dir_rem      AllowOverride None
+$flag_dir_rem      Options +ExecCGI $allow_symlink
+$flag_dir_rem      Order allow,deny      
+$flag_dir_rem      Allow from all
+${flag_dir_rem}</Directory>
+
+<Location $url/.htmerge>
+    Order deny,allow
+    Deny from all
+</Location>
+<Directory $cgi_bin/public>
+        SetHandler default-handler
+</Directory>
+<Directory $cgi_bin/private>
+  AuthType Basic
+  AuthName "Merge instance $url"
+  AuthUserFile $pwd
+  AuthGroupFile /dev/null
+
+  <Limit GET POST>
+    require valid-user
+  </Limit>
+</Directory>
+EOM
+print O "\n# END MERGE $cgi_bin\n";
+close(O);
+chmod 0666,$temp if $unix;
+
+unless ($no_conf_read) {
+	copy($conf,"$conf.save") 
+		|| Log('FATAL',"Copy $conf to $conf.save failed: $!");
+	Log('DEBUG',"$conf saved to $conf.save");
+	open(I, $temp) || Log("Cannot open $temp: $!",'FATAL');
+	open(O, ">$conf") || Log("Cannot open $conf: $!",'FATAL');
+	user_msg("Updating $conf",'Info');
+	print O <I>;
+	close(O);
+	close(I);
+	}
+
+if ($savep ne $param{'ROOT_PASSWORD'}) 
+	{
+	my @save;
+	my $can_write = $is_root || 0;
+
+	close (I) if open(I, ">>$pwd"); 
+	$can_write = 1 if -w $pwd;
+
+	my $out_file = $can_write ? $pwd : "htmerge.inc";
+
+	unless (open(I, "$pwd")) 
+		{ 
+		Log('TRACE',"Cannot read $pwd: $!"); 
+		} else {
+		user_msg("Reading $pwd",'Info');
+		while (<I>) 
+			{
+			push(@save, $_) unless (/^$param{'ROOT_USER'}:/);
+			}
+		close(I);
+		}
+
+	open(O, ">$out_file") || Log('FATAL',"Cannot open $out_file: $!");
+	user_msg("Writing to $out_file",'Info');
+	print O "$param{'ROOT_USER'}:$nextp\n";
+	print O join("", @save);
+	close(O);
+	unless ($can_write){
+		chmod 0666,$temp if $unix;
+		}
+	}
+
+my $source = $merge;
+$source =~ s/\.\w+?$/.conf/;
+
+user_msg("Reading configuration from $source",'Info');
+open(I, $source) || Log('FATAL',"Cannot open $source: $!");
+my @lines = <I>;
+close(I);
+
+my $set = $param{'S_FROM'} = join("", 'A' .. 'Z', 'a' .. 'z', '-_',
+					'0' .. '9');
+
+$param{'S_TO'} = '';
+
+while ($set) 
+{
+	my $r = int(rand(length($set)));
+	$param{'S_TO'} .= substr($set, $r, 1);
+	substr($set, $r, 1) = '';
+}
+
+foreach (qw(S_FROM S_TO)) 
+{
+	$param{$_} = join("", map {sprintf("%02X", $_);} unpack("C*", $param{$_}));
+	${"HTML::Merge::Ini::$_"} = $param{$_};
+}
+
+my @params;
+foreach(@lines) 
+{
+	chomp;
+	unless (/;\s*#/) 
+	{
+		push(@params, undef);
+	} 
+	else 
+	{
+		my $pos = length($_) - length($') - 1;
+		my $extra = substr($_, $pos);
+		substr($_, $pos) = "";
+		push(@params, [$pos, $extra]);
+	}
+	s/\s+$//;
+}
+
+my $cfg = join("\n", @lines);
+
+$param{'DB_PASSWORD'} = HTML::Merge::Engine::Convert($param{'__DB_PASS'}, 1);
+delete $param{'__DB_PASS'};
+$param{'SCRIPT'} = $script;
+
+# Some common defaults
+$param{PRECOMPILED_PATH} ||= $cgi_bin . '/pl' ;
+$param{SUPPORT_SITE}  ||= 'http://www.raz.co.il/'; 
+$param{TEMPLATE_PATH} ||= "$cgi_bin/template";           
+
+no warnings;
+
+while (my ($var, $val) = each %param) 
+{
+	$cfg =~ s/\@$var\@/$val/gi;
+}
+use warnings;
+
+@lines = split(/\n/, $cfg);
+
+my $line_index = 0;
+foreach (@lines) 
+{
+	s/\s+$//;
+	my $this = $params[$line_index];
+
+	if ($this) 
+	{
+		my ($pos, $extra) = @$this;
+
+		$_ = sprintf("%-${pos}s", $_);
+
+		$_ .= $extra;
+	}
+
+	$line_index++;
+}
+
+$cfg = join("\n", @lines);
+
+user_msg("Creating $cgi_bin/merge.conf",'Info');
+
+unless (open(O, ">$cgi_bin/merge.conf")) {
+	if ($is_root) {	
+		Log('FATAL','Open merge.conf: ' . $!);
+	} else {
+		Log('TRACE',
+			"As $cgi_bin/merge.conf not writable merge.conf.inc created");
+		open(O, '>merge.conf.inc') 
+			||  Log('FATAL','Open merge.conf.inc: ' . $!);
+	}
+}
+print O "$cfg\n";
+print O "# FACTORY settings: $me \[$$\]",scalar(localtime),"\n";
+print O '$FACTORY = ' . Dumper(\%param) . ";\n1;\n";
+close(O);
+
+if ($unix) {
+	chmod 0644, "$cgi_bin/merge.conf" if $is_root;
+	chmod 0666, "merge.conf.inc" unless $is_root;
+	}
+
+Log('DEBUG',"Loading $cgi_bin/merge.conf");
+do "$cgi_bin/merge.conf";
+require HTML::Merge::Engine;
+
+# *** Clear();
+
+if($param{'DB'}) 
+{
+	user_msg("Your $param{'MERGE_DB'} database will be created now.",'Info');
+	user_msg("Please ignore error messages.\n",'None');
+	eval { HTML::Merge::Engine::InitDatabase();
+               HTML::Merge::App::Repository::InitDatabase(); };
+  	user_msg("\n\n\n\n\n\n\n\n\n",'None');
+}
+
+@files = qw(template cache logs merge.conf);
+
+push(@files,'merge.db') if $is_internal;
+
+foreach (@files) 
+{
+	chown $uid, $gid, "$cgi_bin/$_" || Log('FATAL',
+		 "Could not change ownership on $cgi_bin/$_ to $user.$group: $!");
+}
+
+user_msg("
+
+* READ THIS FIRST * READ THIS FIRST * READ THIS FIRST * READ THIS FIRST *
+
+*** You advised to edit $cgi_bin/merge.conf !!! ***
+It is recommended that templates are stored in a directory where they cannot be
+retrieved by simple HTTP requests. The simplest way is if the installation
+directory is a CGI enabled (or mod perl enabled) directory.
+If the script is enabled per directory or per location, it is recommended to
+change it in the configuration.
+
+If you installed the development environment, you may now access 
+http://<server>$url/$script to view and edit your
+configuration.
+It is essential that you protect the directory $cgi_bin/private to
+be password protected. If you linked your instance (and not copied it)
+it is better to modify the central configuration, as creating an .htaccess
+file will share it between all instances.
+
+If you let HTML::Merge edit your httpd.conf you will need to restart 
+your web server. If $me can't edit httpd.conf you will have to
+set it manually (find out what we wanted to do in merge-httpd.inc).
+
+You my find information in $log_file useful.
+
+* READ THIS FIRST * READ THIS FIRST * READ THIS FIRST * READ THIS FIRST *
+
+",'None');
+
+pause();
+
+suggest_edit($conf) if $conf && $is_root;
+suggest_edit("$cgi_bin/merge.conf");
+
+BoldPrint("Please check :\n\t" . join("\n\t",glob('*.inc'))) if glob("*.inc");
+
+user_msg("\n\n",'None');
+user_msg("*** Configuration ended ***",'Info');
+user_msg("\n\n",'None');
+
+# Functions ##################################
+sub scrape 
+{
+	my ($path) = @_;
+
+	require File::Path;
+
+	# unlink any old installation
+	File::Path::rmtree(["$path/private","$path/public"]);
+}
+#############################################
+sub getone 
+{
+	my ($msg, $key, $default, $code, $dont) = @_;
+no warnings;
+	$default = $param{$key} if (exists $param{$key} && defined($key));
+	$default = 'NONE' unless ($default || $default =~ /0/);
+use warnings;
+	local ($_);
+
+	for (;;) 
+	{
+		$_ = $term->readline("$msg [$default]: ");
+		exit unless defined $_;
+		$_ = $default if ($_ eq "");
+		s/^none$//i;
+		if ($code) 
+		{
+			eval '&$code;';
+			if ($@) 
+			{
+				Log('ERROR',$@);
+				$@ =~ s/at \S+ line.*$//;
+				print "\007Error: $@\n";
+				next;
+			}
+		}
+		last;
+	}
+	$param{$key} = $_ if defined($key) && !$dont;
+	$_;
+}
+#############################################
+sub findpath
+{
+	my ($prog,$more_path) = @_;
+
+	my $search_path = $ENV{'PATH'};
+	$search_path .= ":$more_path" if $more_path;
+
+	my $candidate;
+
+	foreach (split(/[:;]/, $search_path))
+	{
+		if($win32) 
+		{
+			$candidate = "$_\\$prog";
+		}
+		else
+		{
+			$candidate = "$_/$prog";
+		}
+
+		return source($candidate) if (-f $candidate);
+	}
+
+	# last check local
+	$candidate = "./$prog";
+
+	if(-f $candidate)
+	{
+		$local_install = 1;
+		return source($candidate);
+	}
+
+	return undef;
+}
+#############################################
+sub source 
+{
+	my ($file) = @_;
+
+	while (my $next = readlink($file)) 
+	{
+		$file = $next;
+	}
+
+	return $file;
+}
+#############################################
+sub suggest_edit 
+{
+	my $file = shift;
+	my $editor = $ENV{'EDITOR'} || 'vi';
+	$editor = findpath($editor) unless -x $editor;
+	return unless -x $editor;
+	print "Would you like to edit $file? (Y/N): [N] ";
+	my $ch = nChoice("YN\3", 'N');
+	exit if $ch eq "\3";
+
+	if ($ch eq 'N') 
+	{
+		print "No\n";
+		return;
+	}
+	print "Yes\n";
+	system "$editor", $file;
+}
+#############################################
+sub BoldPrint
+{
+	my ($buf) =@_;
+
+	print '*' x length($buf),"\n";
+	Log('TRACE',$buf);
+	print "$buf\n";
+	print '*' x length($buf),"\n";
+}
+#############################################
+sub Log($$)
+{
+	my ($type, $msg) = @_;
+	my $new_log = 0;
+	if ($unix) {
+		$new_log = 1 unless -s $log_file;
+		}
+	open(LOG, ">>$log_file") || return 0 ;
+        print LOG scalar(localtime) . " $me\[$$\]: $type: $msg\n";
+        close(LOG);
+	chmod 0666, $log_file if $new_log;
+	croak $msg if $type eq 'FATAL';
+}
+
+#############################################
+# check for the euid of the proccess
+sub IsRoot
+{
+	my ($euid) = @_; 
+
+	my $buf;
+
+	if ($euid)
+	{
+		# you are not root
+		$buf = "you are not running as root, some configuration options will not be available !!!";
+		BoldPrint($buf);
+		user_msg('Please note *.inc files created for you as update is not possible','Info');
+
+		return 0;
+	}
+
+	return 1;
+}
+#############################################
+sub EditHttpdConf
+{
+	my $root = $unix ? `httpd -V | grep HTTPD_ROOT` : '';
+	my $default = '';
+
+	if ($win32) 
+	{
+		open (HTTPD,'apache -V |');
+
+		while (<HTTPD>) 
+		{
+			$root = $_ if /HTTPD\_ROOT/;
+                        $default = $_ if /SERVER_CONFIG_FILE/;
+		}
+
+		close (HTTPD);
+	}
+
+	$root =~ s/^\s*-D\s+HTTPD_ROOT=\"(.*)\"\s*$/$1/;
+
+	$default = `httpd -V | grep SERVER_CONFIG_FILE` unless $win32;
+	$default =~ s/^\s*-D\s+SERVER_CONFIG_FILE=\"(.*)\"\s*$/$1/;
+	$default = "$root/$default" if (-f "$root/$default");
+
+	unless ($default && -e $default) 
+	{
+		foreach ((@apache,'/etc/httpd')) 
+		{
+			if (-f "$_/conf/httpd.conf") 
+			{
+				$default = "$_/conf/httpd.conf";
+			}
+		}
+	}
+
+	print "\n";
+
+	print "Note: enter NONE if you do not wish to modify your httpd.conf!\n\n";
+
+	my $conf = getone("Enter the location of your httpd.conf", 
+			'HTTP_CONFIG',
+			$default, 
+			sub { s/^\s*(.*?)\s*$/$1/; die "$_ not found" if $_ && ! -f; });
+
+	$default = 'nobody';
+
+	foreach (qw(apache www httpd)) 
+	{
+		my @data = getpwnam($_)  unless $win32;;
+		if (@data) 
+		{
+			$default = $_;
+			last;
+		}
+	}	
+
+	print "\n";
+
+	my $nextdef;
+	if ($conf) 
+	{
+		open(I, $conf) || die "Cannot open $conf: $!";
+		while (<I>) 
+		{
+			if (/^\s*User\s+(.*?)\s*((?:#.*)?)$/) 
+			{
+				$default = $1;
+			}
+			if (/^\s*Group\s+(.*?)\s*((?:#.*)?)$/) 
+			{
+				$nextdef = $1;
+			}
+		}
+		close(I);
+	}
+
+	Log('DEBUG',"EditHttpdConf conf: $conf") if $conf;
+	Log('DEBUG',"EditHttpdConf default: $default") if $default;
+	Log('DEBUG',"EditHttpdConf nextdef: $nextdef") if $nextdef;
+	return [$conf ,$default, $nextdef];
+}
+#############################################
+sub pause {
+ my $msg = shift || 'Hit [ENTER] continue:';
+ print $msg;
+ getc(); #wait for ENTER
+}
+#############################################
+sub user_msg ($;$) {
+ my $msg = shift || '';
+ my $type = shift || 'Info';
+ my %decode = (
+	'Info' => 'TRACE',
+	'Error' => 'FATAL',
+	'Warning' => 'ERROR',		
+	'None' => '',
+	'Note' => '',
+	);
+ print $type eq 'None' ?  $msg : "$type: $msg \n";
+ Log($decode{$type},$msg) if $decode{$type};
+}
+#############################################
+sub nChoice ($;$$)
+{
+	my $sOptions = uc(shift);
+	my $sDefault = uc(shift);
+	my $iLength = shift;
+
+	my $sResult= "";
+
+	$sOptions = ':' . join(':',split(/ */,$sOptions)).':' unless ($sOptions =~ /\:/);
+
+  	$iLength = 1 unless $iLength;
+
+    	while(1)
+     	{
+     		read (STDIN, $sResult, $iLength);
+     		$sResult = uc($sResult);
+
+		if ($sResult eq "\n" && $sDefault) 
+		{
+     			$sResult = $sDefault;
+			last; 
+                }
+     		if ($sOptions =~ /\:${sResult}\:/) 
+		{
+			getc(); #kill \n 
+                	last; 
+		}
+	 	else 
+		{
+                   	print "\r\a";
+
+                   	while ($sResult ne "\n") 
+			{
+                   		print ' ' x length ($sResult);
+                        	read (STDIN, $sResult, 1);
+                        }
+
+                   	print "\r";
+                   	next;
+          	} # else
+
+     	}
+
+ 	return ($sResult);
+}

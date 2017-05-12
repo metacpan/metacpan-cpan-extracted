@@ -1,0 +1,108 @@
+#!/usr/bin/perl
+# This script demonstrates a minimal HTTP server.  By its own, it
+# implements a normal webservice, with document-tree and access to
+# user directories via /~user
+use warnings;
+use strict;
+
+# this is only needed, because I run with un-installed software in the
+# test-environment.
+use lib 'lib', '../lib';
+
+use HTTP::Server::Multiplex;
+use HTTP::Status;
+
+use Getopt::Long   qw/GetOptions :config gnu_compat bundling/;
+use Log::Report    syntax => 'SHORT', mode => 'DEBUG';
+use Cwd            qw/abs_path/;
+use File::Basename qw/dirname/;
+
+dispatcher SYSLOG => 'syslog', accept => 'TRACE-';
+
+#
+### Default settings
+#
+
+# It is easy to read these parameters from an external file.  There are
+# zillions of options on CPAN.
+
+# See HTTP::Server::Multiplex::_configDaemon()
+# user/group/pidfile and such
+my $config_daemon = { };
+
+# See HTTP::Server::Multiplex::_configNetwork()
+# socket connection parameters.
+my $config_conn   = { port => 8080 };
+
+# See HTTP::Server::Multiplex::addVirtualHost()
+# The default vhost is HTTP::Server::VirtualHost::Default
+my $config_vhosts = [];
+
+# Debugging, syslog and such via Log::Report
+my $mode = 0;
+
+#
+### Command-line overruling defaults
+#
+
+# Far from all parameters are available on the command-line: only
+# those which are often used in test environments are provided.
+
+GetOptions
+   'daemon|d=s' => \$config_daemon->{detach}
+ , 'pid-file=s' => \$config_daemon->{pid_file}
+ , 'port|p=i'   => \$config_conn  ->{port}
+ , 'host|h=i'   => \$config_conn  ->{host}
+ , 'user|u=s'   => \$config_daemon->{user}
+ , 'group|g=s'  => \$config_daemon->{group}
+ , 'v+'         => \$mode                    # -v -vv -vvv
+ , 'mode=s'     => \$mode                    # NORMAL, ASSERT, DEBUG
+   or error __"Daemon not started";
+
+dispatcher mode => $mode;
+
+#
+### the server is a singleton object
+#
+
+my $daemon = HTTP::Server::Multiplex->new
+ ( daemon     => $config_daemon
+ , connection => $config_conn
+ , vhosts     => $config_vhosts
+ );
+
+# root of the documents to serve.  For fun, it is the source dir of
+# the code.
+my $documents = dirname abs_path $INC{'HTTP/Server/Multiplex.pm'};
+
+my $vhost = $daemon->addVirtualHost
+ ( name           => 'localhost'
+ , documents      => $documents
+ , directory_list => 1
+
+ # "internal" CGI scipts
+ , handlers =>
+    { '/test/bigread'  => \&bigread
+    , '/test/bigwrite' => \&bigwrite
+    }
+ );
+
+$daemon->run;
+
+sub bigread($$$)
+{   my ($conn, $req, $uri) = @_;
+    my $bigfile = '... some big file to load ...';
+    $conn->load($bigfile, sub
+      { my $x = shift;
+        $conn->sendStatus($req, RC_ACCEPTED, 'read '.length($$x). ' bytes');
+      } );
+}
+
+sub bigwrite($$$)
+{   my ($conn, $req, $uri) = @_;
+    my $bigwr = '... big file to save... ';
+    my $x     = 'a' x 35000;
+    $conn->save($bigwr, $x, sub
+      { $conn->sendStatus($req, RC_ACCEPTED, 'written '.length($x).' bytes');
+      } );
+}

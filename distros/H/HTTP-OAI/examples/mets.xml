@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type='text/xsl' href='/static/celestial.xsl'?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+  <responseDate>2007-06-01T15:44:53Z</responseDate>
+  <request verb="GetRecord" metadataPrefix="mets" identifier="oai:dspace.mit.edu:1721.1/8338">http://celestial.eprints.org/oai/DSpace%20at%20MIT</request>
+  <GetRecord>
+    <record>
+      <header>
+        <identifier>oai:dspace.mit.edu:1721.1/8338</identifier>
+        <datestamp>2006-10-23T15:52:20Z</datestamp>
+        <setSpec>hdl_1721.1_7680</setSpec>
+        <setSpec>hdl_1721.1_7843</setSpec>
+      </header>
+      <metadata>
+        <mets xmlns="http://www.loc.gov/METS/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3" OBJID="hdl:1721.1/8338" xsi:schemaLocation="http://www.loc.gov/METS/ http://www.loc.gov/standards/mets/mets.xsd http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-0.xsd" LABEL="DSpace Item">
+ <metsHdr CREATEDATE="2007-06-01T15:08:20">
+  <agent TYPE="ORGANIZATION" ROLE="CUSTODIAN">
+   <name>DSpace at MIT</name></agent></metsHdr>
+ <dmdSec ID="DMD_hdl_1721.1/8338">
+  <mdWrap MDTYPE="MODS">
+   <xmlData><mods:name><mods:role><mods:roleTerm type="text">advisor</mods:roleTerm></mods:role><mods:namePart>Daniel J. Kleitman.</mods:namePart></mods:name>
+<mods:name><mods:role><mods:roleTerm type="text">author</mods:roleTerm></mods:role><mods:namePart>Yang, Xiaochun, 1971-</mods:namePart></mods:name>
+<mods:name><mods:role><mods:roleTerm type="text">other</mods:roleTerm></mods:role><mods:namePart>Massachusetts Institute of Technology. Dept. of Mathematics.</mods:namePart></mods:name>
+<mods:extension><mods:dateAccessioned encoding="iso8601">2005-08-23T19:18:06Z</mods:dateAccessioned></mods:extension>
+<mods:extension><mods:dateAvailable encoding="iso8601">2005-08-23T19:18:06Z</mods:dateAvailable></mods:extension>
+<mods:originInfo><mods:copyrightDate encoding="iso8601">2002</mods:copyrightDate></mods:originInfo>
+<mods:originInfo><mods:dateIssued encoding="iso8601">2002</mods:dateIssued></mods:originInfo>
+<mods:identifier type="uri">http://hdl.handle.net/1721.1/8338</mods:identifier>
+<mods:note>Thesis (Ph. D.)--Massachusetts Institute of Technology, Dept. of Mathematics, 2002.</mods:note>
+<mods:note>Includes bibliographical references (p. 89-91).</mods:note>
+<mods:abstract>Geometry is the synthetic tool we use to unify all existing analytical cone-beam reconstruction methods. These reconstructions are based on formulae derived by Tuy [Tuy, 1983], Smith [Smith, 1985] and Grangeat [Grangeat, 1991] which explicitly link the cone-beam data to some intermediate functions in the Radon transform domain. However, the essential step towards final reconstruction, that is, differential-backprojection, has not yet achieved desired efficiency. A new inversion formula is obtained directly from the 3D Radon inverse [Radon, 1917, Helgason, 1999]. It incorporates the cone-beam scanning geometry and allows the theoretical work mentioned above to be reduced to exact and frugal implementations. Extensions can be easily carried out to 2D fan-beam reconstruction as well as other scanning modalities such as parallel scans by allowing more abstract geometric description on the embedding subspace of the Radon manifold. The new approach provides a canonical inverse procedure for computerized tomography in general, with applications ranging from diagnostic medical imaging to industrial testing, such as X-ray CT, Emission CT, Ultrasound CT, etc. It also suggests a principled frame for approaching other 3D reconstruction problems related to the Radon transform. The idea is simple: as was spelled out by Helgason on the opening page of his book, The Radon Transform [Helgason, 1999] - a remarkable duality characterizes the Radon transform and its inverse. Our study shows that the dual space, the so-called Radon space, can be geometrically decomposed according to the specified scanning modality.</mods:abstract>
+<mods:abstract>(cont.) In cone-beam X-ray reconstruction, for example, each cone-beam projection is seen as a 2D projective subspace embedded in the Radon manifold. Besides the duality in the space relation, the symbiosis played between algebra and geometry, integration and differentiation is another striking feature in the tomographic reconstruction. Simply put, * Geometry and algebra: the two play fundamentally different roles during the inverse. Algebraic transforms carry cone-beam data into the Radon domain, whereas, the geometric decomposition of the dual space determines how the differential-backprojection operator should be systematically performed. The reason that different algorithms in cone-beam X-ray reconstruction share structural similarity is that the dual space decomposition is intrinsic to the specified scanning geometry. The differences in the algorithms lie in the appearance of algebra on the projection submanifold. The algebraic transforms initiate diverse reconstruction methods varying in terms of computational cost and stability. Equipped with this viewpoint, we are able to simplify mathematical analysis and develop algorithms that are easy to implement. Integration and differentiation: forward projection is the integral along straight lines (or planes) in the Euclidean space. During the reconstruction, differentiation is performed over the parallel planes in the projective Radon space, a manifold with clear differential structure. It is important to learn about this differential structure to ensure that correct differentiation can be carried out with respect to the parameters governing the scanning process during the reconstruction ...</mods:abstract>
+<mods:note type="provenance">Made available in DSpace on 2005-08-23T19:18:06Z (GMT). No. of bitstreams: 2
+50500372.pdf: 5942218 bytes, checksum: b1eba8f820c75fe04e1de950af6c3548 (MD5)
+50500372-MIT.pdf: 5941980 bytes, checksum: ed337b0618cf18bd701502cc9e79e823 (MD5)
+  Previous issue date: 2002</mods:note>
+<mods:note type="statement of responsibility">by Xiaochun Yang.</mods:note>
+<mods:physicalDescription><mods:extent>91 p.</mods:extent></mods:physicalDescription>
+<mods:physicalDescription><mods:extent>5942218 bytes</mods:extent></mods:physicalDescription>
+<mods:physicalDescription><mods:extent>5941980 bytes</mods:extent></mods:physicalDescription>
+<mods:physicalDescription><mods:internetMediaType>application/pdf</mods:internetMediaType></mods:physicalDescription>
+<mods:physicalDescription><mods:internetMediaType>application/pdf</mods:internetMediaType></mods:physicalDescription>
+<mods:language><mods:languageTerm authority="rfc3066">eng</mods:languageTerm></mods:language>
+<mods:originInfo><mods:publisher>Massachusetts Institute of Technology</mods:publisher></mods:originInfo>
+<mods:accessCondition type="useAndReproducation">M.I.T. theses are protected by copyright. They may be viewed from this source for any purpose, but reproduction or distribution in any format is prohibited without written permission. See &lt;a href="https://dspace.mit.edu/handle/1721.1/7582"&gt;https://dspace.mit.edu/handle/1721.1/7582&lt;/a&gt; for inquiries about permission.</mods:accessCondition>
+<mods:subject><mods:topic>Mathematics.</mods:topic></mods:subject>
+<mods:titleInfo>Geometry of cone-beam reconstruction</mods:titleInfo>
+<mods:genre>Thesis</mods:genre></xmlData></mdWrap></dmdSec>
+ <amdSec ID="TMD_hdl_1721.1/8338"/>
+ <fileSec>
+  <fileGrp USE="ORIGINAL">
+   <file SIZE="5942218" GROUPID="GROUP_1721.1_8338_1" MIMETYPE="application/pdf" ID="1721.1_8338_1" CHECKSUM="b1eba8f820c75fe04e1de950af6c3548" OWNERID="http://dspace.mit.edu/bitstream/1721.1/8338/1/50500372.pdf" CHECKSUMTYPE="MD5">
+    <FLocat xlink:type="simple" xlink:href="http://dspace.mit.edu/bitstream/1721.1/8338/1/50500372.pdf" LOCTYPE="URL"/></file>
+   <file SIZE="5941980" GROUPID="GROUP_1721.1_8338_2" MIMETYPE="application/pdf" ID="1721.1_8338_2" CHECKSUM="ed337b0618cf18bd701502cc9e79e823" OWNERID="http://dspace.mit.edu/bitstream/1721.1/8338/2/50500372-MIT.pdf" CHECKSUMTYPE="MD5">
+    <FLocat xlink:type="simple" xlink:href="http://dspace.mit.edu/bitstream/1721.1/8338/2/50500372-MIT.pdf" LOCTYPE="URL"/></file></fileGrp>
+  <fileGrp USE="TEXT">
+   <file SIZE="13" GROUPID="GROUP_1721.1_8338_1" MIMETYPE="text/plain" ID="1721.1_8338_3" CHECKSUM="ae7bfd8939a443518716da0dea5e1585" OWNERID="http://dspace.mit.edu/bitstream/1721.1/8338/3/50500372.pdf.txt" CHECKSUMTYPE="MD5">
+    <FLocat xlink:type="simple" xlink:href="http://dspace.mit.edu/bitstream/1721.1/8338/3/50500372.pdf.txt" LOCTYPE="URL"/></file>
+   <file SIZE="92" GROUPID="GROUP_1721.1_8338_2" MIMETYPE="text/plain" ID="1721.1_8338_4" CHECKSUM="c2e3159404c549745fddef97685308d8" OWNERID="http://dspace.mit.edu/bitstream/1721.1/8338/4/50500372-MIT.pdf.txt" CHECKSUMTYPE="MD5">
+    <FLocat xlink:type="simple" xlink:href="http://dspace.mit.edu/bitstream/1721.1/8338/4/50500372-MIT.pdf.txt" LOCTYPE="URL"/></file></fileGrp></fileSec>
+ <structMap>
+  <div/></structMap></mets>
+      </metadata>
+      <about>
+        <provenance xmlns="http://www.openarchives.org/OAI/2.0/provenance" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/provenance http://www.openarchives.org/OAI/2.0/provenance.xsd">
+          <originDescription altered="false" harvestDate="2007-06-01T15:04:38Z">
+            <baseURL>http://dspace.mit.edu/dspace-oai/request</baseURL>
+            <identifier>oai:dspace.mit.edu:1721.1/8338</identifier>
+            <datestamp>2006-10-23T15:52:20Z</datestamp>
+            <metadataNamespace>http://www.loc.gov/METS/</metadataNamespace>
+          </originDescription>
+        </provenance>
+      </about>
+    </record>
+  </GetRecord>
+</OAI-PMH>

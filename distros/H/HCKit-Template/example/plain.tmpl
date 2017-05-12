@@ -1,0 +1,43 @@
+<html>
+<head>
+  <title><* title *></title>
+  <* header *>
+</head>
+<body>
+<h1><* title *></h1>
+<ul>
+<{ foreach link as l }>
+  <li><a href="<* l.url *>"><* l.label *></a>
+<{ /foreach }>
+</ul>
+</body>
+</html>
+
+---RULE---
+<title>Plain</title>
+
+<header>
+</header>
+
+---DATA---
+<link>
+  <url>http://www.cpan.org</url>
+  <label>CPAN</label>
+</link>
+<link>
+  <url>http://www.perl.com</url>
+  <label>Perl</label>
+</link>
+<link>
+  <url>http://www.perl.org</url>
+  <label>Perl Mongers</label>
+</link>
+<link>
+  <url>http://use.perl.org</url>
+  <label>use Perl;</label>
+</link>
+<link>
+  <url>http://www.take23.org</url>
+  <label>Take23</label>
+</link>
+

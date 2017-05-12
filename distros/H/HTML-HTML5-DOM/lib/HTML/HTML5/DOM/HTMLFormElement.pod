@@ -1,0 +1,124 @@
+=head1 NAME
+
+HTML::HTML5::DOM::HTMLFormElement - implementation of the HTMLFormElement interface of the HTML DOM
+
+=head1 DESCRIPTION
+
+HTML::HTML5::DOM::HTMLFormElement is an implementation of the HTMLFormElement interface of the HTML DOM. See L<HTML::HTML5::DOM> for a list of the conventions that have been used when translating the DOM to Perl.
+
+=head2 HTML Elements
+
+This class applies to the following HTML elements.
+
+=over
+
+=item * C<< {http://www.w3.org/1999/xhtml}form >>
+
+=back
+
+=head2 Inheritance
+
+HTML::HTML5::DOM::HTMLFormElement inherits methods from the following Perl classes.
+
+=over
+
+=item * L<HTML::HTML5::DOM::HTMLElement>
+
+=item * L<XML::LibXML::Augment::Element>
+
+=item * L<XML::LibXML::Augment::Node>
+
+=item * L<XML::LibXML::Element>
+
+=item * L<XML::LibXML::Node>
+
+=item * L<XML::LibXML::QuerySelector>
+
+=item * L<HTML::HTML5::DOMutil::FancyISA>
+
+=back
+
+=head2 Additional Methods
+
+As well as its inherited methods, this class provides the following methods.
+
+=over
+
+=item * C<< acceptCharset >>
+
+Called with no arguments, is a shortcut for C<< $elem->getAttribute("accept-charset") >>. Called with a defined argument, acts as C<setAttribute>. Called with undef as an argument, acts as C<removeAttribute>.
+
+=item * C<< action >>
+
+Called with no arguments, is a shortcut for C<< $elem->getAttribute("action") >> but as a blessed L<URI> object. Called with a defined argument, acts as C<setAttribute>. Called with undef as an argument, acts as C<removeAttribute>.
+
+=item * C<< autocomplete >>
+
+Called with no arguments, is a shortcut for C<< $elem->getAttribute("autocomplete") >>. Called with a defined argument, acts as C<setAttribute>. Called with undef as an argument, acts as C<removeAttribute>.
+
+=item * C<< elements >>
+
+Returns a list of form-related elements which this form owns. In list context this is a normal Perl list. In scalar context it is a HTML::HTML5::DOM::HTMLFormControlsCollection.
+
+=item * C<< encoding >>
+
+Called with no arguments, is a shortcut for C<< $elem->getAttribute("encoding") >>. Called with a defined argument, acts as C<setAttribute>. Called with undef as an argument, acts as C<removeAttribute>.
+
+=item * C<< enctype >>
+
+Called with no arguments, is a shortcut for C<< $elem->getAttribute("enctype") >>. Called with a defined argument, acts as C<setAttribute>. Called with undef as an argument, acts as C<removeAttribute>.
+
+=item * C<< length >>
+
+The length of the C<elements> list.
+
+=item * C<< method >>
+
+Called with no arguments, is a shortcut for C<< $elem->getAttribute("method") >>. Called with a defined argument, acts as C<setAttribute>. Called with undef as an argument, acts as C<removeAttribute>.
+
+=item * C<< name >>
+
+Called with no arguments, is a shortcut for C<< $elem->getAttribute("name") >>. Called with a defined argument, acts as C<setAttribute>. Called with undef as an argument, acts as C<removeAttribute>.
+
+=item * C<< noValidate >>
+
+Called with no arguments, is a shortcut for C<< $elem->getAttribute("novalidate") >>. Called with a defined argument, acts as C<setAttribute>. Called with undef as an argument, acts as C<removeAttribute>.
+
+=item * C<< p5_submittableElements >>
+
+Returns a list of form-related elements which this form owns that can potentially cause name=value pairs to be added to the form submission. (e.g. not C<< <fieldset> >>.) In list context this is a normal Perl list. In scalar context it is a HTML::HTML5::DOM::HTMLFormControlsCollection.
+
+=item * C<< submit >>
+
+Submits the form based on the current values of its submittable elements. May be passed an optional hashref of name=>value pairs to override those values, but this is not always enough to do what you want, as HTML allows for multiple form elements of the same name to exist in a form.
+
+=item * C<< target >>
+
+Called with no arguments, is a shortcut for C<< $elem->getAttribute("target") >>. Called with a defined argument, acts as C<setAttribute>. Called with undef as an argument, acts as C<removeAttribute>.
+
+=back
+
+=head1 BUGS
+
+L<http://rt.cpan.org/Dist/Display.html?Queue=HTML-HTML5-DOM>.
+
+=head1 SEE ALSO
+
+L<HTML::HTML5::DOM>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2012, 2014 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+
+

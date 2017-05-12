@@ -1,0 +1,140 @@
+NAME
+    HTML::Email::Obfuscate - Obfuscated HTML email addresses that look
+    normal
+
+DESCRIPTION
+    *"Don't put emails directly on the page, they will be scraped"*
+
+    Stuff that, I'm sick of looking at "bob at smith dot com". Why can't we
+    just write emails in a way that looks normal to people, but is very,
+    very difficult to scrape off. Most email scrapers only use very very
+    simple parsing methods. And it isn't as if it is hard to just do.
+
+      # Before we search for email addresses...
+      $page =~ s/\s+at\s+/@/g;
+      $page =~ s/\s+dot\s+/./g;
+
+    This is an arms war dammit, and I want nukes!
+
+  About this Module
+    This module was written during OSDC/YAPC.AU to demonstrate how quick and
+    easy it is to write a basic module and put it on CPAN. The code was
+    written in about 40 minutes, the documentation was added during a break
+    period before drinks and dinner, and the packing and test files were
+    added during the python keynote (significant whitespace... ew...).
+
+  How this works
+    This module starts by applying a fairly basic set of character escapes
+    to avoid the most basic scrapers, and then layers more and more crap on
+    randomly, so that any scraper will need to implement more and more of a
+    full web browser, while keeping the email looking "normal" to anyone
+    browsing.
+
+    I've only scraped the surface of what we can achieve, and I'll leave it
+    to others to submit patches to improve it from here on.
+
+  Using HTML::Email::Obfuscate
+    This is a pretty simple module.
+
+    First, create an obfuscator object. This is just a simple object that
+    holds some preferences about how extreme you want to be about the
+    obfuscation.
+
+      # Create a default obfuscation object
+      my $Email = HTML::Email::Obfuscate->new;
+
+    Now to turn a normal email string into an obfuscated and fully escaped
+    HTML one, just provide it to the escape_html method.
+
+      # Obfuscate my email address
+      my $html = $Email->escape_html( 'cpan@ali.as' );
+
+    And we get something like this
+
+      ***Example here once I get a chance to run it***
+
+    The defaults are fairly insane, so for people that just want veeeery
+    simple escaping, we'll provide a lite version.
+
+      # Create a "lite" obfuscator
+      my $Email = HTML::Email::Obfuscate->new( lite => 1 );
+  
+      # Access the lite escape method directly, regardless of the
+      # obfuscator's constructor params.
+      my $html = $Email->escape_html_lite( 'cpan@ali.as' );
+
+    For the more serious people, we can also add some more extreme measures
+    that are probably not going to be compatible with everything, such as
+    JavaScript. :/
+
+      # Allow the obfuscator to use JavaScript
+      my $Email = HTML::Email::Obfuscator->new( javascript => 1 );
+
+    Best not to use that unless you have a JavaScript-capable browser.
+
+    I think that just about covers it, and my 7 minute lightning talk is
+    probably almost up.
+
+METHODS
+  new $param => $value [, ... ]
+    The "new" constructor creates a new obfuscation object, which use can
+    then use to obfuscate as many email addresses as you like, at whatever
+    severity you want it to be done.
+
+    It takes two optional parameters.
+
+    If you set the 'javascript' param, the obfuscator will add JavaScript
+    obfuscation (possibly, and randomly) to the mix of obfuscation routines.
+
+    If you set the 'lite' param, the obfuscator will only use the most basic
+    form of escaping, which will only fool scanner that don't do HTML entity
+    decoding. Setting 'lite' implies that JavaScript should not be used,
+    even if you explicitly try to turn it on.
+
+    Returns a new "HTML::Email::Obfuscate" object.
+
+  escape_html_lite $email
+    On an otherwise normal obfuscator, the "escape_html_lite" method
+    provides direct access to the lite method for obfuscating emails.
+
+    Returns a HTML string, or "undef" if passed no params, or and undefined
+    param.
+
+  escape_html $email
+    The "escape_html" method obfuscates an email according to the params
+    provided to the constructor.
+
+    Returns a HTML string, or "undef" if passed no params, or and undefined
+    param.
+
+TO DO
+    OK, other than compile testing, I admit that I haven't really done
+    anything significant in the way of testing. I mean, there was SUCH an
+    interesting python talk on, and how on earth do you test something that
+    has randomised output. :/
+
+    So yeah, it would be nice to write some better tests.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=HTML-Email-Obfuscate>
+
+    For other issues, or commercial enhancement or support, contact the
+    author.
+
+AUTHORS
+    Adam Kennedy <adamk@cpan.org>
+
+    Thank you to Phase N (<http://phase-n.com/>) for permitting the open
+    sourcing and release of this distribution.
+
+COPYRIGHT
+    Copyright 2004 - 2006 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

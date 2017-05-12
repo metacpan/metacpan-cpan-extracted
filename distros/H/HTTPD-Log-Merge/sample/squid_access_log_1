@@ -1,0 +1,10 @@
+992829304.752 3 205.188.209.198 TCP_MISS/200 311 GET http://www.itn.co.uk/pixel_clear.gif - DIRECT/192.168.1.2 image/gif
+992829306.571 2 216.35.116.44 TCP_MISS/302 453 GET http://www.itn.co.uk/Britain/brit19980724/072408.htm - DIRECT/192.168.1.2 text/html
+992829307.348 1 198.142.165.111 TCP_HIT/200 348 GET http://www.itn.co.uk/pixel_clear.gif - NONE/- image/gif
+992829312.907 29 212.135.253.144 TCP_CLIENT_REFRESH/200 1705 GET http://itn.co.uk/media/news_ticker/ticker_text.txt - DIRECT/192.168.1.2 text/plain
+992829312.914 1356 38.31.224.139 TCP_IMS_HIT/200 8211 GET http://www.itn.co.uk/js/javascripts2.js - NONE/- -
+992829314.907 29 212.161.21.27 TCP_MISS/200 1705 GET http://www3.itn.co.uk/media/news_ticker/ticker_text.txt - DIRECT/192.168.1.2 text/plain
+992829315.410 2 209.185.143.138 TCP_MISS/302 459 GET http://www.itn.co.uk/World/world20000306/mozambique.htm - DIRECT/192.168.1.2 text/html
+992829315.428 1 38.31.224.139 TCP_HIT/200 522 GET http://www.itn.co.uk/ticker/news0.js - NONE/- -
+992829317.240 517 38.31.224.139 TCP_HIT/200 10050 GET http://www.itn.co.uk/js/fader.js - NONE/- -
+992829318.291 3 132.185.132.14 TCP_CLIENT_REFRESH/304 247 GET http://www.itn.co.uk/images/itntext.gif - DIRECT/192.168.1.2 image/gif

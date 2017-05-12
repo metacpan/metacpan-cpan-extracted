@@ -1,0 +1,103 @@
+#!/usr/bin/env perl
+use 5.010;
+use autodie;
+use strict;
+use Hailo;
+use Benchmark qw(:all);
+
+my ($logfile, $test_count, $method) = @ARGV;
+$method //= "reply";
+
+# Get some log lines to throw at Hailo
+
+my @lines;
+open my $fh, '<:encoding(utf8)', $logfile;
+while (<$fh>) {
+    next if int(rand 5) != 0;
+    last if @lines > $test_count;
+    chomp;
+    push @lines => $_;
+}
+
+die "You must construct additional Pylons" if @lines < $test_count;
+
+# Test
+my $h_sqlite = Hailo->new(
+    storage_class   => 'SQLite',
+    brain           => 'hailo.sqlite',
+    storage_args => {
+        pragma_synchronous => 'ON',
+        pragmas_journal_mode => 'ON',
+    },
+);
+
+my $h_sqlite_28 = Hailo->new(
+    storage_class   => 'SQLite',
+    brain           => 'hailo_28.sqlite',
+    storage_args    => {
+        pragma_synchronous => 'ON',
+        pragmas_journal_mode => 'ON',
+        pragma_cache_size => 28_000,
+    },
+);
+
+my $h_sqlite_mem = Hailo->new(
+    storage_class   => 'SQLite',
+    brain           => 'hailo_mem.sqlite',
+    save_on_exit    => 0,
+    storage_args    => {
+        in_memory => 1,
+    },
+);
+
+my $h_pg = Hailo->new(
+    storage_class   => 'PostgreSQL',
+    storage_args => {
+        dbname => 'failo',
+    }
+);
+
+my $h_mysql = Hailo->new(
+    storage_class   => 'MySQL',
+    storage_args => {
+        database => 'hailo',
+        username => 'hailo',
+        password => 'hailo',
+    }
+);
+
+sub testit {
+    my ($what, $hailo, $i) = @_;
+    my $line = $lines[$i];
+
+    my $reply = $hailo->$method($line);
+    my $gave  = substr $line, 0, 10;
+    my $got   = substr $reply, 0, 10;
+    warn "Testing $what line $i/$test_count. Fed <<$gave>> and got <<$got>" if(($i % 50) == 0);
+}
+
+# Make sure things are loaded before conducting tests
+$_->reply("foobar") for $h_sqlite, $h_sqlite_28, $h_sqlite_mem, $h_mysql, $h_pg;
+
+cmpthese($test_count, {
+    'SQLite-file' => sub {
+        state $i = 0;
+        testit("SQLite/file", $h_sqlite, $i++);
+    },
+    'SQLite-file-28MB' => sub {
+        state $i = 0;
+        testit("SQLite/file/28MB cache", $h_sqlite_28, $i++);
+    },
+    'SQLite-memory' => sub {
+        state $i = 0;
+        testit("SQLite/memory", $h_sqlite_mem, $i++);
+    },
+    PostgreSQL => sub {
+        state $i = 0;
+        testit("PostgreSQL", $h_pg, $i++);
+    },
+    MySQL => sub {
+        state $i = 0;
+        testit("MySQL", $h_mysql, $i++);
+    },
+});

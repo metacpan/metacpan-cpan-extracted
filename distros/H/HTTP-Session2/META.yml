@@ -1,0 +1,66 @@
+---
+abstract: 'HTTP session management'
+author:
+  - 'tokuhirom <tokuhirom@gmail.com>'
+build_requires:
+  Crypt::Rijndael: '0'
+  Plack::Request: '0'
+  Plack::Response: '0'
+  Test::More: '0.98'
+  Test::WWW::Mechanize::PSGI: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTTP-Session2
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  HTTP::Session2:
+    file: lib/HTTP/Session2.pm
+    version: '1.09'
+  HTTP::Session2::Base:
+    file: lib/HTTP/Session2/Base.pm
+  HTTP::Session2::ClientStore:
+    file: lib/HTTP/Session2/ClientStore.pm
+  HTTP::Session2::ClientStore2:
+    file: lib/HTTP/Session2/ClientStore2.pm
+  HTTP::Session2::Expired:
+    file: lib/HTTP/Session2/Expired.pm
+  HTTP::Session2::Random:
+    file: lib/HTTP/Session2/Random.pm
+  HTTP::Session2::ServerStore:
+    file: lib/HTTP/Session2/ServerStore.pm
+    version: '1.09'
+requires:
+  Cookie::Baker: '0'
+  Crypt::CBC: '0'
+  Data::MessagePack: '0'
+  Digest::HMAC: '0'
+  Digest::SHA: '0'
+  Digest::SHA1: '0'
+  MIME::Base64: '3.11'
+  Mouse: '0'
+  Time::HiRes: '0'
+  parent: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/tokuhirom/HTTP-Session2/issues
+  homepage: https://github.com/tokuhirom/HTTP-Session2
+  repository: git://github.com/tokuhirom/HTTP-Session2.git
+version: '1.09'
+x_contributors:
+  - 'magai <xxmagai@gmail.com>'
+  - 'Songmu <y.songmu@gmail.com>'

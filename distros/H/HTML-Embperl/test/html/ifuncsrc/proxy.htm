@@ -1,0 +1,68 @@
+
+<html>
+<head>
+<title>mod_include/proxy test</title>
+</head>
+
+<body>
+
+This document contains SSI and Embperl commands<BR>
+
+
+<!--#set var="abc" -->
+
+<!--#printenv -->
+
+
+Here it starts with some HTML Text<P>
+
+All values should be undefined:
+
+$a = [+ $a || '' +] <BR>
+$b = [+ $b || '' +] <BR>
+$c = [+ $c || '' +] <BR>
+$d = [+ $d || '' +] <BR>
+$e = [+ $e || '' +] <BR>
+
+
+First of all assign a value:
+[- $a = '(this is the value in $a)' -] <BR>
+
+Now we have some 'Umlaute':
+
+
+[- $b = "$a &auml;&ouml;&uuml;" -]
+
+Now lets look what we are getting from this:<BR>
+[+ $a +] [+ $b +]<BR>
+
+And now a and b together: [+ "$a$b" +]<P>
+
+Here we have some HTML tags within the perl code, Embperl will delete them!<BR>
+
+[+ $c = <BR> 6 + 17 <font size="3"> * 3 </font> &nbsp;&nbsp; + 0 +]
+[+ "SELECT * <br> FROM a ORDER BY b USING <; Hi There>" +]
+
+Here we have something which looks like a HTML tag, but does not start with<br>
+a character, Embperl does not change them!<BR>
+
+[+ "SELECT * FROM a ORDER BY b USING <; Hi There>" +]
+
+Embperl will also translate HMTL escapes to the right characters i.e. $a &amp;lt; 6 will get the perl expression $a &lt; 6: <BR>
+
+[- $e = 2 -]
+[+ $d = $e &lt; 6 +]
+
+Now they should have a value
+
+$a = [+ $a +] <BR>
+$b = [+ $b +] <BR>
+$c = [+ $c +] <BR>
+$d = [+ $d +] <BR>
+$e = [+ $e +] <BR>
+
+<P>Ok.<P>
+
+
+</body>
+</html>

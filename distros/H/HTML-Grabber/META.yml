@@ -1,0 +1,21 @@
+---
+abstract: 'jQuery style DOM traversal/manipulation'
+author:
+  - 'Martyn Smith <martyn@dollyfish.net.nz>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-Grabber
+requires:
+  HTML::Selector::XPath: 0.03
+  Moose: 0.94
+  XML::LibXML: 1.70
+  perl: 5.010
+version: 0.7

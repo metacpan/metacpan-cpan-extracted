@@ -1,0 +1,34 @@
+<wmmeta name="Title" value="Contributors to WebMake" />
+<wmmeta name="Section" value="01-intro" />
+<wmmeta name="Score" value="90" />
+<wmmeta name="Abstract">
+Contributors to WebMake
+</wmmeta>
+
+Here's a list of people who've contributed to WebMake:
+
+  - Justin Mason &lt;jm /at/ jmason.org&gt;: original author and maintainer
+
+  - Mark McLoughlin &lt;mark /at/ skynet.ie&gt;: added ##perlout## directive,
+    fixes to HTML cleaner
+
+  - Caolan McNamara &lt;caolan /at/ csn.ul.ie&gt;: EtText contributions;
+    lists, pre-formatted text, lots of suggestions; he's written a "nice
+    testimonial here" [ctest].
+
+    [ctest]: http://www.csn.ul.ie/~caolan/Personal/Design.html
+
+  - Jan Hudec &lt;bulb /at/ ucw.cz&gt;: navtree plugin, patches to remove
+    metadata from site mapping and control mapping of media items
+
+  - Matthew Clarke &lt;clamat /at/ van.maves.ca&gt;: doco fix for datasource
+    documentation
+
+  - rudif /at/ bluemail.ch: lots of help with supporting Windows
+
+Thanks all!  Patches and suggestions are welcomed -- "send them in" [hacking]!
+(By the way, patch contributors get listed at the top, 'cos patches save
+me writing the code ;)
+
+	[hacking]: http://webmake.taint.org/hacking.html
+

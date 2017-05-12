@@ -1,0 +1,17 @@
+abstract: converts text into html with almost Hatena style.
+author: Kazuhiro Osawa <ko@yappo.ne.jp>
+build_requires: 
+  Test::More: 0.42
+distribution_type: module
+generated_by: Module::Install version 0.61
+license: perl
+name: Hatena-Formatter
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Class::Accessor::Fast: 0
+  Hatena::Keyword: 0.04
+  Text::Hatena: 0
+version: 0.03

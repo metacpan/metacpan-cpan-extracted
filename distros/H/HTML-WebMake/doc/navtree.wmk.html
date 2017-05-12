@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>
+      WebMake: Documentation: navtree.wmk
+    </title>
+    <meta name="generator" content="WebMake/2.2" />
+    <style>
+      body {
+       background-color: #ffffff; 
+       color: #000000; 
+       font-size: medium;
+       font-family: verdana,lucida,helvetica,sans-serif;
+      }
+      code, samp, pre {
+       font-family: Courier New,courier,fixed-width,monospace;
+      }
+      H1 { font-size: x-large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFCC66; }
+      H2 { font-size: large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFDD77; }
+      H3 { font-size: medium; font-family: Garamond,Book Antiqua,Times,serif; background: #FFEE88; }
+      H4 { font-size: small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H5 { font-size: x-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H6 { font-size: xx-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      A:link {
+       font-weight: bold;
+       color: #004000;
+       text-decoration: underline; 
+      }
+      A:visited {
+       font-weight: normal;
+       color: #008000;
+       text-decoration: underline; 
+      }
+      A:active {
+       font-weight: bold;
+       color: #800000;
+       text-decoration: underline; 
+      }
+      dt {
+       font-size: medium;
+       font-weight: bold;
+       padding-top: 8px; padding-bottom: 8px;
+      }
+      dd {
+       padding-top: 8px; padding-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body bgcolor="#ffffff" text="#000000" link="#3300cc" vlink="#660066">
+    <font face="lucida,verdana,sans-serif">
+      <div align="center">
+        <img src="images/WebMakeTitle.png" alt="WebMake" width="500" height="122" />
+      </div>
+      <table width="100%">
+        <tr>
+          <td valign="top">
+            <strong><a href="http://webmake.taint.org/">WebMake</a>
+             Documentation</strong> (version 2.2)
+             
+          </td>
+          <td valign="top">
+            <div align="right">
+              
+               [ <a href="dump_vars.wmk.html">Back</a> | <a href="safe_tag.wmk.html">Forward</a> | <a href="index.html">Index</a>
+               | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+               
+            </div>
+          </td>
+        </tr>
+      </table>
+<!-- yes, it's that Mozilla black-border code again ;) -->
+      <!-- stolen from www.mozilla.org via rc3.org -->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td bgcolor="#aaaaaa">
+            <table border="0" cellspacing="4" cellpadding="4" width="100%">
+              <tr>
+                <td bgcolor="#ffffff">
+                  <table border="0" cellspacing="4" cellpadding="4" width="100%">
+                    <tr>
+                      <td>
+                        <h1>navtree.wmk</h1><!-- INDEX BEGIN -->
+                        <ul>
+                          <li>
+                            <a href="#LOADING">LOADING</a><li>
+                              <a href="#WEBMAKE_TAGS">WEBMAKE TAGS</a><li>
+                                <a href="#DESCRIPTION">DESCRIPTION</a><li>
+                                  <a href="#ATTRIBUTES">ATTRIBUTES</a><li>
+                                    <a href="#VARIABLES">VARIABLES</a><li>
+                                      <a href="#THANKS">THANKS</a>
+                                    </ul>
+<!-- INDEX END -->
+                                                                        <hr />
+                                    <h1><a name="LOADING">LOADING</a></h1><p>
+                                      <pre>
+  &lt; use plugin=&quot;navtree&quot; /&gt;
+                                    </pre>
+                                    <hr />
+                                    <h1><a name="WEBMAKE_TAGS">WEBMAKE TAGS</a></h1><p>
+                                      <pre>
+  &lt; navtree name=... sitemap=...
+        opennode=... closednode=...
+        thisnode=... thisleaf=...
+        leaf=... depth=... /&gt;
+                                    </pre>
+                                    <hr />
+                                    <h1><a name="DESCRIPTION">DESCRIPTION</a></h1><p>
+                                      
+                                      This WebMake plugin provides the <code>navtree</code> tag.
+                                      <p>
+                                        <code>navtree</code> operates similarly to the <code>sitetree</code> tag, but displays only a subset of all the site's nodes; it will map all of
+                                        the top-level nodes of the site, the parent nodes of the current page,
+                                        their direct children, and the current page plus it's children up to depth <a href="#item_depth">depth</a>. The effect is similar to a tree-view-based file browser, like Windows
+                                        Explorer.
+                                        <p>
+                                          
+                                          This differs from the <code>sitetree</code> tag in that <code>sitetree</code> does not support displaying the current page's children.
+                                          <p>
+                                            
+                                            So, for a site like this:
+                                            <dl>
+                                              <dt>
+                                                <strong><a name="item__">+ Section 1</a></strong>
+                                              </dt>
+                                              <dd>
+                                                <dl>
+                                                  
+                                                </dd>
+                                                <dt>
+                                                  <strong>+ Section 1 Subsection 1</strong>
+                                                </dt>
+                                                <dd>
+                                                  
+                                                </dd>
+                                                <dt>
+                                                  <strong>+ Section 1 Subsection 2</strong>
+                                                </dt>
+                                                <dd>
+                                                  
+                                                </dd>
+                                              </dl>
+                                            </dd>
+                                            <dt>
+                                              <strong>+ Section 2</strong>
+                                            </dt>
+                                            <dd>
+                                              <dl>
+                                                
+                                              </dd>
+                                              <dt>
+                                                <strong>+ Section 2 Subsection 1</strong>
+                                              </dt>
+                                              <dd>
+                                                
+                                              </dd>
+                                              <dt>
+                                                <strong>+ Section 2 Subsection 2</strong>
+                                              </dt>
+                                              <dd>
+                                                
+                                              </dd>
+                                            </dl>
+                                          </dl>
+                                          <p>
+                                            
+                                            A reference to the site tree on page <code>Section 1</code> would result in a site tree like this:
+                                            <dl>
+                                              
+                                            </dd>
+                                            <dt>
+                                              <strong><a name="item__">- Main Page</a></strong>
+                                            </dt>
+                                            <dd>
+                                              <dl>
+                                                
+                                              </dd>
+                                              <dt>
+                                                <strong>- Section 1</strong>
+                                              </dt>
+                                              <dd>
+                                                <ul>
+                                                  <li>
+                                                    <strong><a name="item_Section">Section 1 Subsection 1</a></strong><li>
+                                                      <strong><a name="item_Section">Section 1 Subsection 2</a></strong>
+                                                    </ul>
+                                                  </dd>
+                                                  <dt>
+                                                    <strong>+ Section 2</strong>
+                                                  </dt>
+                                                  <dd>
+                                                    
+                                                  </dd>
+                                                </dl>
+                                              </dl>
+                                              <p>
+                                                
+                                                Display of each page's entry in the tree is performed by expanding one of
+                                                the 5 template content items named in the tag's attributes: <a href="#item_closednode">closednode</a>,
+                                                <a href="#item_opennode">opennode</a>, <a href="#item_thisnode">thisnode</a>, <a href="#item_thisleaf">thisleaf</a> or <a href="#item_leaf">leaf</a>. See the <a href="#item_sitemap">sitemap</a> tag documentation for more details on how to use these (note however that
+                                                the
+                                                <em>is_node</em> variable is not available for sitetrees).
+                                                <hr />
+                                                <h1><a name="ATTRIBUTES">ATTRIBUTES</a></h1><dl>
+                                                  
+                                                </dd>
+                                                <dt>
+                                                  <strong><a name="item_name">name</a></strong>
+                                                </dt>
+                                                <dd>
+                                                  <p>
+                                                    
+                                                    The name of the sitetree object. To include a sitetree in a page, refer to
+                                                    it using this name, as a deferred reference.
+                                                    
+                                                  </dd>
+                                                  <dt>
+                                                    <strong><a name="item_sitemap">sitemap</a></strong>
+                                                  </dt>
+                                                  <dd>
+                                                    <p>
+                                                      
+                                                      The name of the sitemap. The sitetree requires a sitemap, as the sitemap is
+                                                      responsible for mapping out the site and defining which pages and content
+                                                      items are included.
+                                                      
+                                                    </dd>
+                                                    <dt>
+                                                      <strong><a name="item_closednode">closednode</a></strong>
+                                                    </dt>
+                                                    <dd>
+                                                      <p>
+                                                        
+                                                        A content item which is evaluated to display a ''closed'' node, ie. a node
+                                                        which is not on the path to the current page.
+                                                        
+                                                      </dd>
+                                                      <dt>
+                                                        <strong><a name="item_opennode">opennode</a></strong>
+                                                      </dt>
+                                                      <dd>
+                                                        <p>
+                                                          
+                                                          A content item which is evaluated to display an ''open'' node, one which is
+                                                          on the path to the current page. As for the <a href="#item_sitemap">sitemap</a> tag's <code>node</code> attribute, this content item must include a reference to the <strong>list</strong> variable, which will contain all the entries for the pages beneath it in
+                                                          the hierarchy.
+                                                          
+                                                        </dd>
+                                                        <dt>
+                                                          <strong><a name="item_rootnode">rootnode</a></strong>
+                                                        </dt>
+                                                        <dd>
+                                                          <p>
+                                                            
+                                                            A content item which is evaluated to display an ''open'' root node. It
+                                                            defaults to <a href="#item_opennode">opennode</a> if not specified. It may be used to generate ''multirooted'' tree (a
+                                                            forest). In that case you should create a dummy root content (it upsets
+                                                            sitemap code if you dont have one single root) and create <a href="#item_rootnode">rootnode</a> template to output only the list with apropriate decorations.
+                                                            
+                                                          </dd>
+                                                          <dt>
+                                                            <strong><a name="item_thisnode">thisnode</a></strong>
+                                                          </dt>
+                                                          <dd>
+                                                            <p>
+                                                              
+                                                              A content item which is evaluated to display the current page if it is an
+                                                              inner node, that is it has children. Iff <a href="#item_depth">depth</a> &gt; 0, <a href="#item_thisnode">thisnode</a> must include a reference to the <strong>list</strong> variable.
+                                                              
+                                                            </dd>
+                                                            <dt>
+                                                              <strong><a name="item_thisleaf">thisleaf</a></strong>
+                                                            </dt>
+                                                            <dd>
+                                                              <p>
+                                                                
+                                                                A content item which is evaluated to display the current page if it is a
+                                                                leaf.
+                                                                
+                                                              </dd>
+                                                              <dt>
+                                                                <strong><a name="item_leaf">leaf</a></strong>
+                                                              </dt>
+                                                              <dd>
+                                                                <p>
+                                                                  
+                                                                  A content item which is evaluated to display a leaf-node page, one which
+                                                                  has no pages beneath it in the hierarchy.
+                                                                  
+                                                                </dd>
+                                                                <dt>
+                                                                  <strong><a name="item_depth">depth</a></strong>
+                                                                </dt>
+                                                                <dd>
+                                                                  <p>
+                                                                    
+                                                                    How many levels beneath the current page should be listed. 0 means none
+                                                                    (behavior of <code>sitetree</code> tag). The default is 1 which means to list direct children of the current
+                                                                    node.
+                                                                    
+                                                                  </dd>
+                                                                </dl>
+                                                                <hr />
+                                                                <h1><a name="VARIABLES">VARIABLES</a></h1><p>
+                                                                  
+                                                                  Following variables (content items) are defined for use in templates:
+                                                                  <dl>
+                                                                    
+                                                                  </dd>
+                                                                  <dt>
+                                                                    <strong><a name="item_title">title</a></strong>
+                                                                  </dt>
+                                                                  <dd>
+                                                                    <p>
+                                                                      
+                                                                      The <a href="#item_title">title</a> metadatum of the node.
+                                                                      
+                                                                    </dd>
+                                                                    <dt>
+                                                                      <strong><a name="item_score">score</a></strong>
+                                                                    </dt>
+                                                                    <dd>
+                                                                      <p>
+                                                                        
+                                                                        The <a href="#item_score">score</a> metadatum of the node.
+                                                                        
+                                                                      </dd>
+                                                                      <dt>
+                                                                        <strong>name</strong>
+                                                                      </dt>
+                                                                      <dd>
+                                                                        <p>
+                                                                          
+                                                                          The name of the node.
+                                                                          
+                                                                        </dd>
+                                                                        <dt>
+                                                                          <strong><a name="item_url">url</a></strong>
+                                                                        </dt>
+                                                                        <dd>
+                                                                          <p>
+                                                                            
+                                                                            The url of the node. Should be referenced using url reference (<code>$ (url)</code>).
+                                                                            
+                                                                          </dd>
+                                                                          <dt>
+                                                                            <strong><a name="item_level">level</a></strong>
+                                                                          </dt>
+                                                                          <dd>
+                                                                            <p>
+                                                                              
+                                                                              The level of the node, that is how deep it is in the tree. Root node has
+                                                                              level 0, it's children 1, their children 2 and so on.
+                                                                              
+                                                                            </dd>
+                                                                            <dt>
+                                                                              <strong><a name="item_sublvl">sublvl</a></strong>
+                                                                            </dt>
+                                                                            <dd>
+                                                                              <p>
+                                                                                
+                                                                                The level under current page. This is similar to <a href="#item_level">level</a>, except that current page is considered root. -1 for nodes not descendant
+                                                                                from current page.
+                                                                                
+                                                                              </dd>
+                                                                              <dt>
+                                                                                <strong><a name="item_left">left</a></strong>
+                                                                              </dt>
+                                                                              <dd>
+                                                                                <p>
+                                                                                  
+                                                                                  This is <a href="#item_depth">depth</a> above the current node and <code>depth - sublvl</code> for the descendants of the current node.
+                                                                                  
+                                                                                </dd>
+                                                                                <dt>
+                                                                                  <strong><a name="item_is_leaf">is_leaf</a></strong>
+                                                                                </dt>
+                                                                                <dd>
+                                                                                  <p>
+                                                                                    
+                                                                                    This is 1 for leaf nodes and 0 for inner nodes (both closed and open).
+                                                                                    
+                                                                                  </dd>
+                                                                                  <dt>
+                                                                                    <strong><a name="item_list">list</a></strong>
+                                                                                  </dt>
+                                                                                  <dd>
+                                                                                    <p>
+                                                                                      
+                                                                                      This is the list of children, which should be output by open nodes.
+                                                                                      
+                                                                                    </dd>
+                                                                                  </dl>
+                                                                                  <hr />
+                                                                                  <h1><a name="THANKS">THANKS</a></h1><p>
+                                                                                    
+                                                                                    Thanks to Jan Hudec &amp;lt;bulb /at/ ucw.cz&amp;gt;, who provided this
+                                                                                    tag.
+                                                                                  </td>
+                                                                                </tr>
+                                                                              </table>
+                                                                            </td>
+                                                                          </tr>
+                                                                        </table>
+                                                                      </td>
+                                                                    </tr>
+                                                                  </table>
+                                                                  <table width="100%">
+                                                                    <tr>
+                                                                      <td valign="top">
+                                                                        <strong><a href="http://webmake.taint.org/">WebMake</a>
+                                                                         Documentation</strong> (version 2.2)
+                                                                         
+                                                                      </td>
+                                                                      <td valign="top">
+                                                                        <div align="right">
+                                                                          
+                                                                           [ <a href="dump_vars.wmk.html">Back</a> | <a href="safe_tag.wmk.html">Forward</a> | <a href="index.html">Index</a>
+                                                                           | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+                                                                           
+                                                                        </div>
+                                                                      </td>
+                                                                    </tr>
+                                                                  </table>
+                                                                  <div align="right">
+                                                                    <a href="http://webmake.taint.org/"><img src="images/BuiltWithWebMake.png" alt="Built With WebMake" border="0" width="88" height="31" /></a>
+                                                                  </div>
+                                                                </font>
+                                                              </body>
+                                                            </html>

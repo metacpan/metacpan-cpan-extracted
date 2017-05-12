@@ -1,0 +1,25 @@
+Revision history for Perl extension HtDig::Config.
+
+0.01  Wed Dec 29 22:37:14 1999
+	- original version; created by h2xs 1.19
+
+0.02  Tue Feb 08
+	- Site.pm:
+	*fixed timed digs for unix systems (currently uses "at" only)
+	*dig() now returns the "at" queue job number for timed digs
+	
+	- view_site.cgi:
+	*fixed the dig_later action so it properly set the notify flag
+	*also fixed dig_later so it sets the status message to indicate
+	  that the number is the job number not the process ID
+
+1.01
+	- Config.pm
+	*fixed problem with autocreation creating invalid perl syntax
+	 for include file.
+	-index.cgi
+	*fixed problem with autocreate not being used when cgi is first
+	 accessed.
+	*created new installer.pl file that initializes conf files and
+	 installs the cgi files.
+

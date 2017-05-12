@@ -1,0 +1,4 @@
+This file has an error in it
+on line three:
+<if blah>; the error should be at char 0
+Nothing on line 4 to be concerned about

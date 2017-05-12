@@ -1,0 +1,10 @@
+Revision history for Perl extension HTML::RelExtor
+
+0.03  Sat Apr 11 20:19:08 PDT 2009
+        - Support 'rel' and 'rev' parameter to links()
+
+0.02  Sat Apr 11 13:41:29 PDT 2009
+        - Support extracting 'rev' links as well
+
+0.01  Mon Feb  7 19:00:02 2005
+	- original version

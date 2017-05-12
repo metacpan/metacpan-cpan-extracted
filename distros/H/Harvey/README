@@ -1,0 +1,79 @@
+Harvey 1.02
+
+The overall goal of the Harvey project is to create an NLP interface to  
+computers that will allow people to converse with their computer as if they
+were talking to a friend.  This is the type of program, which if it develops
+corretly, would be a candidate for the so called 'Turing' tests, named for 
+the great early British computer scientist and mathematician, Alan Turing.
+
+I started with a lexical corpus of English words, their syntactic information 
+and frequencies provided by Adam Kilgarriff in the British National Corpus.  I
+edited it into a form that would suit my needs and built the Word module.  The
+Word module takes a word string and creates an object that can be queried for
+syntactic information about the word using various methods associated with the
+object.  I then proceeded to creat a Verb module which takes a sentence
+in the form of an array of Word objects and creates a Verb object, which 
+can likewise be queried about the verb in the sentence.  
+
+Parsing simple verbs is relatively easy, but when modals become involved,
+complications abound.  I define a modal as a verb which establishes a
+relationship between the subject of the sentence and the actucal verb of 
+the sentence.  I say that a modal expresses a certain modality for the verb of
+the sentence.  These modalities are really much like the more standardized 
+tense information about the verb.  For example, 'present' means that the subjectis doing the action now.  'Past' means the subject did it in the past. 
+'Progressive' means it is being done by the subject, etc.  Now for modals: 
+'want to' means that the subject wants to do it, 'would' means the subject woulddo it if he could, 'must' means the subject has to do it, 'will' means the 
+subject intends to do it (note how will is just another modal, but many consider
+it a 'tense').  In short, modals just extend indefinitely the varieties of 
+'tense' information that we can express about a verb.  From the syntax point of
+view, modals can operate in a diverse number of ways.  We have the
+standard old germanic modals: can, could, shall, should ,will, would, may,
+might and must, which do not conjugate.  Then we have a wide variety of other
+verbs which can act as modals when used with other verbs.  'Want to + 
+infinitive' is still a standard modal in German, but in English, want is 
+a fully conjugating verb.  'Help' can act as a modal in many ways:  I helped
+fix this car (just like a modal), I helped to fix the car (just like a 'to'
+modal), I helped with fixing the car (help + with + gerund) and I helped
+the men with fixing the car (throw in an object for good measure).  There are
+also predicate adjective modals, like:  'i am able to run', which is basically
+the conjugatable form of 'can'.  
+
+In the Verb module I have explored a wide variety of the modals, and support 
+chaining them together, just as we do in English (e.g. I would like to have been
+able to be found).  Not all possible patterns have been found, but I have a goodstart with this release 1.02 of Verb.pm.  The modalities which I have come up 
+with are ad hoc at best and will need to be thought through carefully as we move
+ahead.  New verbs and their patterns can be added to the existing verbs 
+very easily by adding them into the appropriate hashes defined in Verb.pm.  
+
+A major goal of future releases will be to standardize the modality list, 
+complete the verb patterns, more exhaustively fill in the verbs that fit
+the patterns, and provide for a convenient dialog based machanism for 
+adding new verbs as they show up.
+
+The current Verb.pm module will report the following information on verbs:
+tense; present, past, progressive, perfect or passive: modality for any of
+the modalities that I have already defined.  The Verb module will also provide
+an integer bitmap which shows where the verbs are in the sentence, an integer
+based indicator of what persons are possible for the verb structure (i.e.
+1st singular, 2nd etc) and what adverbs appear in the verb structure.
+
+Some sample sentences that I throw at Harvey are:
+
+i would like to be able to swim
+he has been eager to work
+they have to want to be able to be being eaten by cannibals
+do i want to be able to swim
+
+INSTALLATION NOTE:
+
+To get Harvey up and running, install the Word module first, then the
+Verb module, and finally the Harvey module.  To install them, go to their
+respective directories and do the standard Perl installs:
+
+perl Makefile.PL
+make
+make test
+make install
+
+Enjoy!  Chris Meyer, chris@mytechs.com
+

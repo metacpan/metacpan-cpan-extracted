@@ -1,0 +1,608 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>
+      WebMake: Documentation: How to Migrate to WebMake
+    </title>
+    <meta name="generator" content="WebMake/2.2" />
+    <style>
+      body {
+       background-color: #ffffff; 
+       color: #000000; 
+       font-size: medium;
+       font-family: verdana,lucida,helvetica,sans-serif;
+      }
+      code, samp, pre {
+       font-family: Courier New,courier,fixed-width,monospace;
+      }
+      H1 { font-size: x-large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFCC66; }
+      H2 { font-size: large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFDD77; }
+      H3 { font-size: medium; font-family: Garamond,Book Antiqua,Times,serif; background: #FFEE88; }
+      H4 { font-size: small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H5 { font-size: x-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H6 { font-size: xx-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      A:link {
+       font-weight: bold;
+       color: #004000;
+       text-decoration: underline; 
+      }
+      A:visited {
+       font-weight: normal;
+       color: #008000;
+       text-decoration: underline; 
+      }
+      A:active {
+       font-weight: bold;
+       color: #800000;
+       text-decoration: underline; 
+      }
+      dt {
+       font-size: medium;
+       font-weight: bold;
+       padding-top: 8px; padding-bottom: 8px;
+      }
+      dd {
+       padding-top: 8px; padding-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body bgcolor="#ffffff" text="#000000" link="#3300cc" vlink="#660066">
+    <font face="lucida,verdana,sans-serif">
+      <div align="center">
+        <img src="images/WebMakeTitle.png" alt="WebMake" width="500" height="122" />
+      </div>
+      <table width="100%">
+        <tr>
+          <td valign="top">
+            <strong><a href="http://webmake.taint.org/">WebMake</a>
+             Documentation</strong> (version 2.2)
+             
+          </td>
+          <td valign="top">
+            <div align="right">
+              
+               [ <a href="making.html">Back</a> | <a href="invoking.html">Forward</a> | <a href="index.html">Index</a>
+               | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+               
+            </div>
+          </td>
+        </tr>
+      </table>
+<!-- yes, it's that Mozilla black-border code again ;) -->
+      <!-- stolen from www.mozilla.org via rc3.org -->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td bgcolor="#aaaaaa">
+            <table border="0" cellspacing="4" cellpadding="4" width="100%">
+              <tr>
+                <td bgcolor="#ffffff">
+                  <table border="0" cellspacing="4" cellpadding="4" width="100%">
+                    <tr>
+                      <td>
+                        <h1>How to Migrate to WebMake</h1><p>
+                          Chances are, you already have a HTML site you wish to migrate to WebMake.
+                          This document introduces WebMake's way of doing things, and how to go
+                          about a typical migration.
+                          
+                        </p>
+                        <a name="Place_The_WebMake_File"><h3>Place The WebMake File</h3></a><p>
+                          First, pick a top-level directory for the site; that's where you'll place your
+                          <strong>.wmk</strong> file. All the generated files should be beneath this directory. In
+                          this example I'll call it <strong>index.wmk</strong>.
+                          
+                        </p>
+                        <a name="Make_Templates"><h3>Make Templates</h3></a><p>
+                          Next, identify the page templates used in the site. To keep it simple, let's
+                          imagine you have only one look and feel on the pages, with the usual stuff in
+                          it; high-level HTML document tags, such as &lt;html&gt;, &lt;head&gt;,
+                          &lt;title&gt;, &lt;body&gt;, that kind of stuff. There may also be some
+                          formatting, such as a &lt;table&gt; with a side column containing links, etc.,
+                          or a top-of-page title. All of these are good candidates for moving into a
+                          template. I typically call these templates something obvious like
+                          <strong>page_template</strong> or <strong>sitename_template</strong>, where <strong>sitename</strong> is the name of
+                          the site.
+                          
+                        </p>
+                        <p>
+                          For this example, let's imagine you have the HTML high-level tags and a page
+                          title as your typical template items.
+                          
+                        </p>
+                        <p>
+                          So edit the <strong>index.wmk</strong> file, and add a template content item, by cutting
+                          and pasting it from one of your pages. Instead of cutting and pasting the
+                          <em>real</em> title, use a metadata reference:
+                          <strong>$[this.title]</strong>. Also, replace the text of the page
+                          with <strong>${page_text}</strong>; the plan is that, before this content item
+                          will be referenced, this content item will have been set to the text you wish
+                          to use.
+                          
+                        </p>
+                      </p>
+                      <pre>
+    &lt;webmake&gt;
+    &lt;content name=page_template&gt;
+      &lt;html&gt;&lt;head&gt;&lt;title&gt;$[this.title]&lt;/title&gt;&lt;/head&gt;
+      &lt;body bgcolor=#ffffff&gt;&lt;h1&gt;$[this.title]&lt;/h1&gt;
+      &lt;hr&gt;
+        ${page_text}
+      &lt;hr&gt;
+      &lt;/body&gt;&lt;/html&gt;
+    &lt;/content&gt;
+                    </pre>
+                    <a name="Grab_The_Pages_Text"><h3>Grab The Pages' Text</h3></a><p>
+                      Next, run through the pages you wish to WebMake-ify, and either:
+                      
+                    </p>
+                    <ol>
+                      <li>
+                        <p>
+                          move them into a "raw" subdirectory, from where WebMake can read them
+                           with a <a href="contents.html">&lt;contents&gt;</a> tag, or;
+                          
+                        </p>
+                      </li>
+                      <li>
+                        <p>
+                          include them into the <strong>index.wmk</strong> file directly.
+                          
+                        </p>
+                      </li>
+                    </ol>
+                    <p>
+                      It's a matter of taste; I initially preferred to do 1, but nowadays 2 seems
+                      more convenient for editing, as it provides a very easy way to break up long
+                      pages, and it makes search-and-replace easy. Anyway, it's up to you. I'll
+                      illustrate using 2 in this example.
+                      
+                    </p>
+                    <p>
+                      Give each content item a name. I generally use the name of the HTML file, but
+                      with a <strong>.txt</strong> extension instead of <strong>.html</strong>. This lets me mentally
+                      differentiate the input from the output, but still lets me quickly see the
+                      relationship between input file and output file.
+                      
+                    </p>
+                    <p>
+                      Strip the template elements (head tag, surrounding eye-candy tables, etc.)
+                      from each page, leaving just the main text body behind. Keep the titles
+                      around for later, though.
+                      
+                    </p>
+                  </p>
+                  <pre>
+    &lt;content name="document1.txt"&gt;
+      ....your html here...
+    &lt;/content&gt;
+    &lt;content name="document2.txt"&gt;
+      ....your html here...
+    &lt;/content&gt;
+    &lt;content name="document3.txt"&gt;
+      ....your html here...
+    &lt;/content&gt;
+                </pre>
+                <a name="Convert_To_EtText_OPTIONAL"><h3>Convert To EtText (OPTIONAL!)</h3></a><p>
+                  Now, one of the best bits of WebMake (in my opinion) is <a href="ettext.html">EtText</a>,
+                  the built-in simple text markup language; to use this, run the command-line
+                  tool <em>ethtml2text</em> on each of your HTML files to convert them
+                  to EtText, then include that text, instead of the HTML, as the content items.
+                  Don't forget to add <strong>format="text/et"</strong> to the content tag's attributes,
+                  though:
+                  
+                </p>
+              </p>
+              <pre>
+    &lt;content name="document1.txt" format="text/et"&gt;
+      ....your ettext here...
+    &lt;/content&gt;
+    ...
+            </pre>
+            <p>
+              To keep things simple, I'll assume you haven't used EtText in the examples
+              from now on.
+              
+            </p>
+            <a name="Add_Titles"><h3>Add Titles</h3></a><p>
+              Next, you need to set the titles in the content items, so that they can be
+              used in higher-level templates, such as the <strong>page_template</strong> content item we
+              defined earlier.
+              
+            </p>
+            <p>
+              To really get some power from WebMake, use metadata to do this.
+              
+            </p>
+            <hr />
+            <blockquote>
+              <p>
+                <strong>What is Metadata?</strong>
+              </p>
+              <p>
+                A <em>metadatum</em> is like a normal content item, except it is exposed to other
+                pages in the <strong>index.wmk</strong> file. Normally, you cannot reliably read a dynamic
+                content item that was set from another page; if one content item sets a
+                variable like this:
+                
+              </p>
+            </p>
+            <pre>
+    &lt;{set foo="Value!"}&gt;
+          </pre>
+          <p>
+            Any content items evaluated after that variable is set can access
+            <strong>${foo}</strong>, <em>as long as they occur on the same output page</em>.
+            However if they occur on another output page, they may not be able to access
+            <strong>${foo}</strong>.
+            
+          </p>
+          <p>
+            To get around this, WebMake includes <a href="wmmeta.html">the <strong>&lt;wmmeta&gt;</strong> tag</a>,
+            which allows you to attach data to a content item. This data will then be
+            accessible, both to other pages in the site (as
+            <strong>$[<em>contentname</em>.<em>metaname</em>]</strong>, and to other content
+            items within the same page (as <strong>$[this.<em>metaname</em>]</strong>).
+            
+          </p>
+          <p>
+            Think of them as like size, modification time, owner etc. on files. A good
+            concept is that it's data used to generate catalogs or lists.
+            
+          </p>
+        </blockquote>
+        <hr />
+        <p>
+          Anyway, titles of pages are a perfect fit for metadata. So convert your
+          page titles into &lt;wmmeta&gt; tags like so:
+          
+        </p>
+      </p>
+      <pre>
+    &lt;content name="document1.txt"&gt;
+      &lt;wmmeta name="title"&gt;Your Title Here&lt;/wmmeta&gt;
+      ....your ettext here...
+    &lt;/content&gt;
+    ...
+    </pre>
+    <p>
+      (BTW it's not required that metadata be stored in the content text; it can
+      also be loaded en masse from another location, such as the WebMake file, or
+      another file altogether, using the <a href="metatable.html">&lt;metatable&gt;</a>
+      directive. Again, it's a matter of taste.)
+      
+    </p>
+    <p>
+      Sometimes, for example if you plan to generate index pages or a sitemap, you
+      may wish to add a one-line summary of the content item as a metadatum called
+      <strong>abstract</strong>. I'll leave it out of the examples, just to keep them simple.
+      
+    </p>
+    <p>
+      Metadata may seem like a lot of bother, but it's a perfect fit when you need to
+      generate pages that list links to, or details about, the pages in your site.
+      
+    </p>
+    <p>
+      It should always be referred to in <strong>$[square
+      brackets]</strong>. I'll explain why later on.
+      
+    </p>
+    <a name="Naming_The_Output_URLs"><h3>Naming The Output URLs</h3></a><p>
+      Finally, you've assembled all the content items; now to tell WebMake
+      where they should go. This is accomplished using the &lt;out&gt; tag.
+      
+    </p>
+    <p>
+      Each output URL, in this example, requires the following content items:
+      
+    </p>
+    <ul>
+      <li>
+        <p>
+          <strong>${page_template}</strong>, which refers to:
+          
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>$[this.title]</strong>
+        </p>
+      </li>
+      <li>
+        <p>
+          <strong>${page_text}</strong>
+        </p>
+      </li>
+    </ul>
+    <p>
+      As you can see, both <strong>this.title</strong> and <strong>page_text</strong> rely on which output URL
+      is being written, otherwise you'll wind up with lots of finished pages
+      containing the same text. ;)
+      
+    </p>
+    <p>
+      There are several ways to deal with this.
+      
+    </p>
+    <ol>
+      <li>
+        <p>
+          Set a variable in the &lt;out&gt; text, using &lt;{set}&gt;, to the name
+           of the content item that should be used for the <strong>page_text</strong>.
+          
+        </p>
+      </li>
+      <li>
+        <p>
+          Derive the correct value for <strong>page_text</strong> using the name of the
+           &lt;out&gt; section itself.
+          
+        </p>
+      </li>
+    </ol>
+    <p>
+      The simplest way is the latter. WebMake defines a built-in "magic"
+      variable, <a href="webmake_vars.html">${WebMake.OutName}</a>, which contains the
+      <em>name</em> of the output URL. (Note that output URLs have both a name <em>and</em> a
+      filename; you'll see why in the next section.)
+      
+    </p>
+    <p>
+      To do this, define another content item:
+      
+    </p>
+  </p>
+  <pre>
+    &lt;content name=out_helper&gt;
+       &lt;{set page_text="${${WebMake.OutName}.txt}" }&gt;
+       ${page_template}
+    &lt;/content&gt;
+</pre>
+<a name="What_Does_That_Do"><h3>What Does That Do?</h3></a><p>
+  Line 2, in the example above, needs an explanation.
+  
+</p>
+<p>
+  This takes the name of the output URL (as discussed above), using a content
+  reference: <strong>${WebMake.OutName}</strong>. For example, let's say the
+  page was named <strong>pageurl</strong>.
+  
+</p>
+</p>
+<pre>
+    &lt;{set page_text="${<b>${WebMake.OutName}</b>.txt}" }&gt;
+</pre>
+<p>
+  <b>${WebMake.OutName}</b> expands to <strong>pageurl</strong>:
+  
+</p>
+</p>
+<pre>
+    &lt;{set page_text="${<b>pageurl</b>.txt}" }&gt;
+</pre>
+<p>
+  It then appends <strong>.txt</strong> to the end:
+  
+</p>
+</p>
+<pre>
+    &lt;{set page_text="<b>${pageurl.txt}</b>" }&gt;
+</pre>
+<p>
+  and expands that as a <a href="content_refs.html">content reference</a>.
+  
+</p>
+</p>
+<pre>
+    &lt;{set page_text="<b><i>...entire text of page...</i></b>" }&gt;
+</pre>
+<p>
+  Finally, it stores that in a content item called <strong>page_text</strong>.
+  
+</p>
+<p>
+  This looks pretty complicated -- and it is. But the important thing is that,
+  as in traditional UNIX style, it's also a very powerful way to do templating
+  and variable interpolation; once you get the hang of it, there's plenty more
+  stuff it can do. 
+  
+</p>
+<p>
+  BTW: you could simply skip defining this "helper" content item altogether,
+  and just go to the top of the file and change the template to refer directly
+  to <strong>${${WebMake.OutName}.txt}</strong> instead of
+  <strong>${page_text}</strong> . That's what I usually do.
+  
+</p>
+<a name="What_s_With_the_Square_Brackets"><h3>What's With the Square Brackets?</h3></a><p>
+  But what about the title? Handily, since we defined the titles as metadata,
+  and referred to them as <strong>$[this.title]</strong> in <strong>page_template</strong>,
+  this is taken care of; once the <strong>${page_text}</strong> reference is
+  expanded, <strong>$[this.title]</strong> will be set.
+  
+</p>
+<p>
+  Remember I mentioned that metadata should always be referred to in
+  <strong>$[square brackets]</strong>? Here's why. Square bracket
+  references, or <a href="deferred_content_refs.html"><em>deferred references</em></a>, are
+  evaluated only after <a href="content_refs.html">normal, "squiggly bracket" content references</a>.
+  
+</p>
+<p>
+  The example page contains the following content references:
+  
+</p>
+<ul>
+  <li>
+    <p>
+      <strong>${page_template}</strong>, which refers to:
+      
+    </p>
+  </li>
+  <li>
+    <p>
+      <strong>$[this.title]</strong>
+    </p>
+  </li>
+  <li>
+    <p>
+      <strong>${page_text}</strong>
+    </p>
+  </li>
+</ul>
+<p>
+  Since <strong>${page_text}</strong> is a normal content reference, it will be
+  expanded first; and when it's expanded, the &lt;wmmeta&gt; tag setting
+  <strong>title</strong> will be encountered. This will cause <strong>this.title</strong> to be set.
+  
+</p>
+<p>
+  Once all the normal content references are expanded, WebMake runs through
+  the deferred references, causing <strong>$[this.title]</strong> to
+  be expanded.
+  
+</p>
+<p>
+  If <strong>page_template</strong> had used a normal content reference to refer to
+  <strong>${this.title}</strong>, WebMake would have tried to expand it before
+  <strong>${page_text}</strong>, since it appeared in the file earlier.
+  
+</p>
+<p>
+  Anyway, I digress.
+  
+</p>
+<a name="Writing_The_lt_out_gt_Tags"><h3>Writing The &lt;out&gt; Tags</h3></a><p>
+  Each output URL needs an &lt;out&gt; tag, with a <em>name</em> and a <em>file</em>. The
+  <em>name</em> provides a symbolic name which one can use to refer to the URL; the
+  <em>file</em> names the file that the output should be written to.
+  
+</p>
+<p>
+  Typically the name should be similar to the page's main content item's name,
+  to keep things simple and allow the shortcut detailed in the previous section
+  to work.
+  
+</p>
+<p>
+  Also, sites typically use a pretty similar filename to the name, for obvious
+  reasons. At least, they do, to start with; further down the line, you may
+  need to move one (or more) pages around in the URL or directory hierarchy;
+  since you've been referring to them by name, instead of by URL or by filename,
+  this means changing only one attribute in the &lt;out&gt; tag, instead of
+  trying to do a global search and replace throughout hundreds of HTML files.
+  
+</p>
+<p>
+  Anyway, here's a sample &lt;out&gt; tag:
+  
+</p>
+</p>
+<pre>
+    &lt;out name="document1" file="document1.html"&gt; ${out_helper} &lt;/out&gt;
+</pre>
+<p>
+  But what about multiple outputs? Two choices:
+  
+</p>
+<ol>
+  <li>
+    <p>
+      Simply list all the output HTML files, one after the other.
+       Works fine for small sites, and it's simple.
+      
+    </p>
+  </li>
+  <li>
+    <p>
+      Use a <a href="for.html">&lt;for&gt;</a> tag.
+      
+    </p>
+  </li>
+</ol>
+<p>
+  I don't think you need to see how 1. works, it's pretty obvious.
+  Let's see how 2. does it:
+  
+</p>
+</p>
+<pre>
+    &lt;for name="page" values="document1 document2 document3"&gt;
+      &lt;out name="${page}" file="${page}.html"&gt; ${out_helper} &lt;/out&gt;
+    &lt;/for&gt;
+</pre>
+<p>
+  The important thing here, is that any references to <strong>${page}</strong> inside
+  the <strong>&lt;for&gt;</strong> block, will be replaced with the name of the current item
+  in the <strong>values</strong> list.
+  
+</p>
+<a name="Putting_lt_out_gt_Names_To_Work"><h3>Putting &lt;out&gt; Names To Work</h3></a><p>
+  So you've named the output URLs. However all your content items contain
+  static URLs in the HREFs! Let's fix that.
+  
+</p>
+<p>
+  This really is up to you; it's a global search-and-replace. Let's say
+  you want to fix all links to "document1.html". Replace this:
+  
+</p>
+</p>
+<pre>
+    &lt;a href="document1.html"&gt;foo&lt;/a&gt;
+</pre>
+<p>
+  with an <a href="url_refs.html">URL reference</a>, like this:
+  
+</p>
+</p>
+<pre>
+    &lt;a href="$(document1)"&gt;foo&lt;/a&gt;
+</pre>
+<p>
+  Now, even if "document1.html" is renamed to "blah/whatever/doc1.cgi", you
+  won't have to do a search-and-replace again.
+  
+</p>
+<a name="Getting_Advanced_Adding_Navigation_and_a_Sitemap"><h3>Getting Advanced - Adding Navigation and a Sitemap</h3></a><p>
+  This hasn't been written yet. Sorry!
+  
+</p>
+<p>
+  
+</p>
+</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+<table width="100%">
+  <tr>
+    <td valign="top">
+      <strong><a href="http://webmake.taint.org/">WebMake</a>
+       Documentation</strong> (version 2.2)
+       
+    </td>
+    <td valign="top">
+      <div align="right">
+        
+         [ <a href="making.html">Back</a> | <a href="invoking.html">Forward</a> | <a href="index.html">Index</a>
+         | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+         
+      </div>
+    </td>
+  </tr>
+</table>
+<div align="right">
+  <a href="http://webmake.taint.org/"><img src="images/BuiltWithWebMake.png" alt="Built With WebMake" border="0" width="88" height="31" /></a>
+</div>
+</font>
+</body>
+</html>

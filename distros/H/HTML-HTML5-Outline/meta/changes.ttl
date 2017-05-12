@@ -1,0 +1,75 @@
+@prefix :        <http://usefulinc.com/ns/doap#> .
+@prefix dcs:     <http://ontologi.es/doap-changeset#> .
+@prefix dc:      <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix my:      <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Outline/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix toby:    <http://tobyinkster.co.uk/#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+my:project :release my:v_0-001 .
+my:v_0-001
+	a               :Version ;
+	dc:issued       "2010-12-20"^^xsd:date ;
+	:revision       "0.001"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Outline-0.001.tar.gz> ;
+	rdfs:comment    "Original version"@en .
+
+my:project :release my:v_0-002 .
+my:v_0-002
+	a               :Version ;
+	dc:issued       "2011-01-21"^^xsd:date ;
+	:revision       "0.002"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Outline-0.002.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-001 ;
+		dcs:item   [ rdfs:label "Refactor a lot of code out into separate classes. Add methods to access these classes."@en ] ;
+		dcs:item   [ rdfs:label "Improve to_hashref output."@en ]
+		] .
+
+my:project :release my:v_0-003 .
+my:v_0-003
+	a               :Version ;
+	dc:issued       "2011-01-21"^^xsd:date ;
+	:revision       "0.003"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Outline-0.003.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-002 ;
+		dcs:item   [ rdfs:label "Documentation fix."@en ; a dcs:Documentation ]
+		] .
+
+my:project :release my:v_0-004 .
+my:v_0-004
+	a               :Version ;
+	dc:issued       "2011-10-07"^^xsd:date ;
+	:revision       "0.004"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Outline-0.004.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-003 ;
+		dcs:item   [ rdfs:label "use Module::Package::RDF"@en ; a dcs:Packaging ] ;
+		dcs:item   [ rdfs:label "Lots of test cases."@en ; a dcs:Addition ] ;
+		dcs:item   [ rdfs:label "Refactor RDF code into a separate file to allow it to be an optional feaure."@en ]
+		] .
+
+my:project :release my:v_0-005 .
+my:v_0-005
+	a               :Version ;
+	dc:issued	    "2011-10-13"^^xsd:date ;
+	:revision       "0.005"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Outline-0.005.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-004 ;
+		dcs:item   [ rdfs:label "Don't 'use' RDF::Trine::Namespace in 05tripletests.t."@en ]
+		] .
+
+my:project :release my:v_0-006 .
+my:v_0-006
+	a               :Version ;
+	dc:issued	    "2011-10-20"^^xsd:date ;
+	:revision       "0.006"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Outline-0.006.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-005 ;
+		dcs:item   [ rdfs:label "Don't 'use' HTML::HTML5::Outline::RDF in 05tripletests.t."@en ]
+		] .
+

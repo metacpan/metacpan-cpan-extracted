@@ -1,0 +1,33 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.143240'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTTP-DAV
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Cwd: '0'
+  File::Temp: '0'
+  Getopt::Long: '0'
+  LWP: '5.48'
+  Pod::Usage: '0'
+  Scalar::Util: '0'
+  Term::ReadLine: '0'
+  Text::ParseWords: '0'
+  Time::Local: '0'
+  URI: '0'
+  URI::Escape: '0'
+  XML::DOM: '0'
+version: '0.48'

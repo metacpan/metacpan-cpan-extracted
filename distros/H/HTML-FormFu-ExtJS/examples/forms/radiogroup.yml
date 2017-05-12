@@ -1,0 +1,37 @@
+---
+elements:
+  - type: Radiogroup
+    label: Fancy Checkboxgroups
+    name: foo
+    default: 2b
+    options:
+      - label: "group 1"
+        group:
+          - [1a, 'item 1a']
+          - [1b, 'item 1b']
+      - label: "group 2"
+        group:
+          - [2a, 'item 2a']
+          - [2b, 'item 2b']
+          
+  - type: Radiogroup
+    label: Without groups
+    name: foo2
+    options:
+          - [1a, 'item 1a']
+          - [1b, 'item 1b']
+          - [2a, 'item 2a']
+          - [2b, 'item 2b']
+          
+  - type: Radiogroup
+    label: one column
+    name: foo3
+    attrs:
+      columns: 1
+    options:
+          - [1a, 'item 1a']
+          - [1b, 'item 1b']
+          - [2a, 'item 2a']
+          - [2b, 'item 2b']
+          
+          

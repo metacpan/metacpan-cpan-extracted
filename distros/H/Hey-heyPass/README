@@ -1,0 +1,50 @@
+NAME
+    Hey::heyPass - Client for heyPass Centralized Authentication System
+
+DESCRIPTION
+    heyPass is a centralized authentication system made for any web
+    application that needs user authentication. The heyPass system is
+    hosted, maintained, and managed by hey.nu Network Community Services and
+    Megagram Managed Technical Services in a joint venture to help web
+    application developers provide a safe, user privacy-controlled
+    authentication and profile data sharing system.
+
+    All data stored within heyPass by individual applications can be shared
+    with other heyPass-powered applications based on the user's permission
+    and the application's permission settings. This system makes it easy for
+    an application to store both public and private data for a user and
+    share only permitted data with other applications that have been given
+    permission by the user.
+
+    Through this system, no heyPass-powered applications have access to the
+    user's login information, email address, or any other identifying data.
+    Upon successful login, the only piece of data that an application is
+    given is a user UUID that identifies that user with that application.
+    Only after the application requests specific profile data and the user
+    has given explicit permission via a web interface will an application be
+    able to access additional data stored within heyPass. This system ensure
+    that a user's privacy is maintained at the levels that they prefer. For
+    example, a user is not required to provide an application their email
+    address or identity information just to login.
+
+    This system was originally designed as a central authentication system
+    for hey.nu Network Official sites, but it is now being made available to
+    the general public. Any application developer or application owner may
+    use the heyPass system for their applications. Any heyPass user can
+    create their own applications and any application developer can
+    distribute their heyPass-powered applications to others.
+
+AUTHOR
+        Dusty Wilson
+        hey.nu Network Community Services
+        Megagram Managed Technical Services
+        cpan-hey-heypass@dusty.hey.nu
+        http://heypass2.hey.nu/
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

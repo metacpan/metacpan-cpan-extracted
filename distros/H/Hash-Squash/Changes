@@ -1,0 +1,14 @@
+Revision history for {{$dist->name}}
+
+v0.0.4 2014-08-26T18:24:48Z
+    Fix POD
+
+v0.0.3 2014-08-26T17:53:10Z
+    Rename Hash::Squash
+
+v0.0.2 2014-08-26T17:39:00Z
+    Add unnumber subroutine
+
+v0.0.1 2014-08-24T13:21:58Z
+    init
+

@@ -1,0 +1,391 @@
+=pod
+
+
+=head1 Contents
+
+=over 4
+
+=item Tips and Tricks
+
+=item Alternative Way To Do Global Variables, using __PACKAGE__
+
+=item Global Variables Via Namespaces
+
+=item Handling Queries in DBI
+
+=item Handling Exits
+
+=item Handling Errors
+
+=item Development and Production Websites
+
+=back
+
+
+=head1 Tips and Tricks
+
+This document follows on from the Embperl/EmbperlObject introductory
+tutorial. As you can see from that, Embperl/EmbperlObject enables extremely
+powerful websites to be built using a very intuitive object-oriented
+structure. Now, we'll look at some additional, "unofficial" techniques
+which may also be useful in certain circumstances.
+
+This is a small collection of personal tricks which I have developed
+over the course of months using EmbperlObject in my own websites. I
+hope they are useful, or at least spur you on to develop your own
+frameworks and share these with others.
+
+If you have any Tips & Tricks you want to share with the public
+please send them to richter@dev.ecos.de .
+
+=head1 Alternative Way To Do Global Variables, using __PACKAGE__
+
+In the process of developing a large website I have found it can be a
+little onerous at times to use the Request object to pass around
+global data. I would like to just create variables like $xxx rather
+than typing $req->{xxx} all the time. It may not seem like much, but
+after a while your code can start looking a lot more complex because
+of all the extra brackets and suchlike. As a typical lazy programmer,
+I looked for a way to simplify this.
+
+The method I am going to describe should be used with caution, because
+it can increase memory useage rather dramatically if you're not
+careful. The way I use it, no extra memory is used, but you do need to
+be aware of the issues.
+
+Basically, you change the way you include files from F</base.html>, so
+that they are included into the same package as F</base.html>:
+
+	[- Execute ({inputfile => '*', package => __PACKAGE__}) -]
+
+You should only do this with HTML files which are included from
+F</base.html>, not with the files such as F<subs.html> - those files
+have to be in their own packages in order for Perl inheritance to
+work. You can't use this technique with any files which are accessed
+via method calls.
+
+So how does this make things better? Well, since all these files now
+share the same package, any variables which are created in one of the
+files is accessible to any of the other files. This means that if you
+create $xxx in F</init.html>, then you can access $xxx in
+F</head.html> or any other file. This effectively gives you global
+variables across all the files which are included from F</base.html>
+into the same package as F</base.html>.
+
+The thing you need to be careful of here is that if one of these files
+is included more than once elsewhere on the website, then it will be
+seperately compiled for that instance - thus taking up more
+memory. This is the big caveat. As a rule, if your files are all just
+included once by F</base.html>, then you should be fine. Note that
+you'll also need to change any calls to parent files, for example:
+
+F</contact/init.html>
+
+	[- Execute ({inputfile => '../init.html', package => __PACKAGE__}) -]
+
+	[-
+		# Do some setup specific to this subdirectory
+	-]
+
+This is ok, since F<../init.html> will still be compiled into the same
+package as the rest of the files included from F</base.html>, and so
+only one version of it will exist in the Embperl cache. Thus memory
+usage is not increased.
+
+I like this technique because it simplifies the look of my code, which
+is important for projects containing complex algorithms. It is not the
+"official" way to implement globals though, and should be used with
+care.
+
+=head1 Global Variables Via Namespaces
+
+The previous section described a way to share variables between
+different files which are included from F</base.html>, by using the
+same package across all the files. However this doesn't help us much
+when dealing with the method files such as F<subs.html>, because
+these files have to have their own packages - so we are back to square
+one.
+
+There is another way to share variables across even different
+packages, and that is by using namespaces. For variables that need to
+be accessible even from F<subs.html>, you could use a namespace which
+is specific to your website. For example, if your website domain is
+mydomain.com, then you could create variables using the form
+
+	$mydomain::xxx = "hello";
+
+As long as you then make sure that you only use this namespace on this
+website (and other websites on the same Apache web server use their
+own namespaces), then you shouldn't get any conflicts. Once again, use
+this with caution, since you introduce the possibility of
+inadvertently sharing variables between completely different
+websites. For example, if you cut and paste some useful code from one
+website to another, you will need to make sure you change the
+namespace of any globals. Otherwise, you could get some very obscure
+bugs, since different requests to the various websites could conflict.
+
+You also need to be careful about variable initialization, since these
+globals will now exist between different requests. So, it's possible
+that if you don't re-initialize a global variable, then it may contain
+some random value from a previous request. This can result in obscure
+bugs. Just be careful to initialize all variables properly and you'll
+be fine.
+
+Finally, note that Embperl will only clean up variables which don't
+have an explicit package (i.e. are in one of the packages
+automatically set up by Embperl). Variables in other namespaces are
+not automatically cleaned up. As a result, you need to pay closer
+attention to cleaning up if you use your own namespaces. The safe way
+to clean up a variable is simply to 'undef' it.
+
+=head1 Handling Queries in DBI
+
+If you are like me, you probably use DBI extensively to enable your
+dynamic websites. I have found the cleanup of queries to be onerous -
+e.g. calling finish() on queries. If you don't do that, then you tend
+to get warnings in your error log about unfinished queries.
+
+What I do these days is use a global hash, called e.g. %domain::query
+(see the previous section for using namespaces to safely implement
+global variables). Then, whenever I create a query, I use this
+variable. For example:
+
+	$domain::query{first_page} = $domain::dbh->prepare (qq{
+		SELECT *
+		FROM pages
+		WHERE page = 1
+		});
+	$domain::query{first_page}->execute();
+	my $first_page = $domain::query{first_page}->fetchrow_hashref();
+
+This little pattern, I find, makes all my queries easier to read and
+keep track of. You give each one a name in the %domain::query hash
+that makes sense. Then, at the end of each request, in the
+F</cleanup.html> file, you can do something like this:
+
+	while (($name, $query) = each (%domain::query))
+	{
+		$query->finish();
+	}
+	$domain::dbh->disconnect();
+
+Once again, this method is not really the "official" way of doing
+things in Embperl. You should use the Request object to pass around
+global variables if you're not comfortable with the risks involved
+with namespaces (e.g. conflicting websites on the same web server).
+
+=head1 Handling Exits
+
+You will often find that you want to terminate a page before the
+end. This doesn't necessarily indicate an error condition; it can be
+just that you've done all you want to do. When you do this, it is good
+to first clean up, otherwise you can get annoying warnings showing up
+in your error logs.
+
+I use the following framework. F</cleanup.html> is Executed from
+F</base.html>, and it is the last thing that is done. It calls the
+cleanup() function in the F</subs.html> file:
+
+F</cleanup.html>
+
+	[-
+		$subs->cleanup ();
+	-]
+
+F</subs.html>
+
+	[!
+		sub cleanup
+		{
+			while (($name, $query) = each (%domain::query))
+			{
+				$query->finish();
+			}
+			$domain::dbh->disconnect();
+		}
+
+		sub clean_exit
+		{
+			cleanup();
+			exit();
+		}
+	!]
+
+Now, whenever I want to exit prematurely, I use a call to
+$subs->clean_exit() rather than just exit(). This makes sure that the
+queries and database connections are shut down nicely.
+
+=head1 Handling Errors
+
+The EMBPERL_OBJECT_FALLBACK directive in F<httpd.conf> allows you to
+set a file which will be loaded in the event that the requested file
+is not found. This file should be relative to the same directory as
+F<base.html>. 
+
+I have found that making a special /errors/ directory is useful,
+because it enables that special subdirectory to define its own
+F<head.html> file, F<init.html> and so on.  So, I then just put this
+in F</notfound.html>:
+
+	[-
+		$http_headers_out{'Location'} = "/errors/";
+		clean_exit();
+	-]
+
+See the previous section, "Handling Exits" for more on clean_exit().
+
+=head1 Development and Production Websites
+
+When I am developing a website, I usually use at least two machines. I
+have a workstation where I do developing and testing, and a separate
+production server, which is accessed by the public. When I am finished
+making changes to the development version of the website, I move it
+over to the production server for testing there. However when I do
+this, I usually don't copy it immediately over the existing production
+version, because there are sometimes issues with Perl modules which
+haven't been installed on the server, or other issues which break the
+code on a different machine. So I use a separate virtual server and
+subdomain (which is easy if you run your own DNS) to test the new
+version. For example if the production version of the server is at
+www.mydomain.com, then I might do testing on the production server
+under test.mydomain.com, or beta. or whatever subdomain you like. This
+means you have to create a new virtual server in the httpd.conf
+file. You also obviously create a new directory for the test server
+(see below for an example).
+
+When you do all this, you end up with a very nice, isolated testing
+environment on the same server as production. Obviously you hopefully
+did all your major testing on your workstation, where you can crash
+the machine and it doesn't matter too much. The production server
+testbed is a last staging area before production, to get rid of any
+lingering glitches or omissions. When you're sure it's all working
+correctly you just copy the files from one directory tree (test) to
+another (production) on the same machine. This test server can also be
+used as a beta of the new production version. Friendly users can be
+given access to the new version, while the old version is still
+running.
+
+One issue that comes up when you do this is that of databases. It is
+very likely that you will be using a special test database rather than
+the live one to test your new version. It would be very unwise to use
+a production database for testing. So your production database might
+be called "mydatabase", and the test one called
+"mydatabase_test". This is fine, but it means that you have to
+remember to change the database name in your code when you copy the
+files over to production. This is very error prone. The solution is to
+set variables like the database name in httpd.conf, by setting an
+environment variable. You just add it to the virtual server section.
+
+Here is a real example of two virtual servers on the same production
+machine, which use two different directories, separate log files and
+different databases. The website is crazyguyonabike.com, which is a
+journal of a bicycle ride I did across America in 1998. I decided to
+expand the site to allow other cyclists to upload their own journals,
+which resulted in substantial changes to the code. I wanted to keep
+the original site up while testing the new version, which I put under
+new.crazyguyonabike.com. Here are the relevant apache settings:
+
+F</etc/apache/httpd.conf>
+
+	# The production server
+	<VirtualHost 10.1.1.2:80>
+		ServerName www.crazyguyonabike.com
+		SSLDisable
+		ServerAdmin neil@nilspace.com
+		DocumentRoot /www/crazyguyonabike/com/htdocs
+		DirectoryIndex index.html
+		ErrorLog /www/crazyguyonabike/com/logs/error_log
+		TransferLog /www/crazyguyonabike/com/logs/access_log
+		ErrorDocument 403 /
+		ErrorDocument 404 /
+		PerlSetEnv WEBSITE_DATABASE crazyguyonabike
+		PerlSetEnv WEBSITE_ROOT /www/crazyguyonabike/com/htdocs
+		PerlSetEnv EMBPERL_DEBUG 0
+		PerlSetEnv EMBPERL_ESCMODE 0
+		PerlSetEnv EMBPERL_OPTIONS 16
+		PerlSetEnv EMBPERL_MAILHOST mail.nilspace.com
+		PerlSetEnv EMBPERL_OBJECT_BASE base.html
+		PerlSetEnv EMBPERL_OBJECT_FALLBACK notfound.html
+	</VirtualHost>
+
+	<VirtualHost 10.1.1.2:80>
+		ServerName crazyguyonabike.com
+		Redirect / http://www.crazyguyonabike.com
+	</VirtualHost>
+
+	# Set EmbPerl handler for main directory
+	<Directory "/www/crazyguyonabike/com/htdocs/">
+		<FilesMatch ".*\.html$">
+			SetHandler  perl-script
+			PerlHandler HTML::EmbperlObject
+			Options     ExecCGI
+		</FilesMatch>
+	</Directory>
+
+	# The test server
+	<VirtualHost 10.1.1.2:80>
+		ServerName new.crazyguyonabike.com
+		SSLDisable
+		ServerAdmin neil@nilspace.com
+		DocumentRoot /www/crazyguyonabike/com/new
+		Alias /pics /www/crazyguyonabike/com/pics
+		DirectoryIndex index.html
+		ErrorLog /www/crazyguyonabike/com/logs/new_error_log
+		TransferLog /www/crazyguyonabike/com/logs/new_access_log
+		ErrorDocument 401 /user/register/
+		ErrorDocument 403 /
+		ErrorDocument 404 /
+		PerlSetEnv WEBSITE_DATABASE crazyguyonabike_new
+		PerlSetEnv WEBSITE_ROOT /www/crazyguyonabike/com/new
+		PerlSetEnv EMBPERL_DEBUG 0
+		PerlSetEnv EMBPERL_ESCMODE 0
+		PerlSetEnv EMBPERL_OPTIONS 16
+		PerlSetEnv EMBPERL_MAILHOST mail.nilspace.com
+		PerlSetEnv EMBPERL_OBJECT_BASE base.html
+		PerlSetEnv EMBPERL_OBJECT_FALLBACK notfound.html
+	</VirtualHost>
+
+	# Set EmbPerl handler for new directory
+	<Directory "/www/crazyguyonabike/com/new/">
+		<FilesMatch ".*\.html$">
+			SetHandler  perl-script
+			PerlHandler HTML::EmbperlObject
+			Options     ExecCGI
+		</FilesMatch>
+	</Directory>
+
+	# Restrict access to test server
+	<Directory /www/crazyguyonabike/com/new>
+		AuthType Basic
+		AuthName CrazyTest
+		Auth_MySQL_DB http_auth
+		Auth_MySQL_Encryption_Types Plaintext
+		require valid-user
+		PerlSetEnv EMBPERL_OPTIONS 16
+		PerlSetEnv EMBPERL_MAILHOST mail.nilspace.com
+	</Directory>
+
+Note that the test and production servers each get their own
+databases, directories and log files.
+
+You can also see that I restrict access to the test server (which is
+generally wise, unless you actually like hackers potentially screwing
+with your head while testing). For basic authentication I use
+mod_auth_mysql, which is available from the MySQL website. It is nice
+because it allows you to authenticate based on a MySQL database.
+
+When you use PerlSetEnv to pass in variables, you access these
+variables in your code as follows:
+
+	$db_name = $ENV{WEBSITE_DATABASE};
+
+If you move those constants which differ between the test and
+production versions of the same code into the httpd.conf file, then
+you can just copy the files over from the test directories to the
+production directory without any alterations. This cuts down on
+editing errors and also documents specific constants in one place.
+
+
+=head1 Author
+
+Neil Gunton neil@nilspace.com

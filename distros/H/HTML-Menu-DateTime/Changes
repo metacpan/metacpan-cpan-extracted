@@ -1,0 +1,98 @@
+Changes in 1.00
+
+	HTML generation routines.
+	
+	month_format(), second_increment() and minute_increment() when called with 
+	no arguments, no longer reset the value to it's default.
+	
+	locale(), start_year(), end_year(), less_years() and plus_years() when 
+	called with no arguments, no longer set the undef value.
+	
+	Test suite uses Test::Pod and Test::Pod::Coverage if available.
+
+Changes in 0.94
+
+	Fixed errors in POD documentation.
+	Added missing template-magic files to MANIFEST
+	New second_increment() and new() now accepts 'second_increment' setting.
+	New minute_increment() and new() now accepts 'minute_increment' setting.
+
+Changes in 0.93
+
+	Fixed locale tests when DateTime::Locale isn't installed.
+
+Changes in 0.92
+
+	New locale() method and new() now accepts 'locale' setting, requires 
+	DateTime::Locale.
+	Added Template::Magic example files and tutorial (thanks to Domizio 
+	Demichelis).
+	Dropped month_format('ornate') option introduced in 0.91_01.
+	Fixed up POD formatting.
+
+Changes in 0.91_01 (Developer release)
+
+	New month_format() method and new() now accepts 'month_format' setting.
+
+Changes in 0.91
+
+	All menu methods now accept an arreyref to allow multiple selections.
+	Improved documentation.
+
+Changes in 0.90
+
+	Changed Name to HTML::Menu::DateTime.
+	Changed all methods and flags from dayMenu style to day_menu (Suggested 
+	by Mark Stosberg).
+	Renamed html-template example files from *.html to *.tmpl.
+	Added example files for template-toolkit.
+	Added POD examples for template-toolkit.
+	Added To Do list and support to POD.
+
+Changes in 0.80
+
+	Added template files to example folder.
+	Cleaned up POD.
+
+Changes in 0.70
+
+	Removed all package-wide datetime variables, so that it should work with 
+	mod_perl (untested). The variables are now initialised upon object 
+	creation.
+
+Changes in 0.60
+
+	In secondMenu minuteMenu hourMenu dayMenu and monthMenu methods, all menu 
+	values are prefixed with '0' if less than 10.
+
+Changes in 0.50
+
+	Added secondMenu minuteMenu hourMenu methods.
+	Removed all non-oo capabilities.
+	Changed namespace.
+	Rewrote most tests.
+
+Changes in 0.40
+
+	Clean up some syntax.
+
+Changes in 0.30
+
+	Added noSelect option + test.
+	Added emptyFirst option + test.
+
+Changes in 0.20
+
+	Completely reworked tests and added more.
+	Fixed some of the logic in yearMenu.
+
+Changes in 0.10
+
+	Added 'date' to new() - with tests.
+	Made startYear / endYear accept zero to start / end range on selected 
+	year.
+	More documentation + examples.
+
+Changes in 0.01
+
+	Initial release, includes test suite.

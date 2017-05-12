@@ -1,0 +1,2 @@
+Dynamic include:
+<tmpl_include_var .file>

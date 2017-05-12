@@ -1,0 +1,14 @@
+<wmmeta name="ltitle">PostScript</wmmeta>
+<wmmeta name="stitle">PostScript</wmmeta>
+<wmmeta name="author">J&ouml;rn Clausen</wmmeta>
+<wmmeta name="cdate">2001-04-23</wmmeta>
+<wmmeta name="mdate">2001-04-23</wmmeta>
+
+    <ul>
+      <li>
+	<a href="http://partners.adobe.com/asn/developer/technotes/postscript.html">PostScript Technical Notes</a>
+      </li>
+      <li>
+	<a href="file:/vol/lehre/Dokumentenverarbeitung/docs/PLRM.pdf">PostScript Language Reference, third edition (lokale Kopie)</a>
+      </li>
+    </ul>

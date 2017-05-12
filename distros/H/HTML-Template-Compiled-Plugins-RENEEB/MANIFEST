@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/HTML/Template/Compiled/Plugin/HTML2.pm
+lib/HTML/Template/Compiled/Plugin/Sprintf.pm
+t/01_sprintf_30_left.t
+t/02_sprintf_8_right.t
+t/03_sprintf_6_right.t
+t/04_html2.t

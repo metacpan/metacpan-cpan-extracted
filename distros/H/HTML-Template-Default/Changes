@@ -1,0 +1,36 @@
+2009-09-25 09:12  cvs
+
+	* Makefile.PL, lib/HTML/Template/Default.pm, t/1-othernew.t: Fixed
+	  error with Makefile.PL dependency.
+
+2009-09-24 15:26  cvs
+
+	* HTML-Template-Default-1.01.tar.gz,
+	  HTML-Template-Default-1.02.tar.gz,
+	  HTML-Template-Default-1.03.tar.gz, META.yml, Makefile.PL,
+	  lib/HTML/Template/Default.pm, t/0.t: Made a big update.  The old
+	  way was to use a function oriented interface.
+
+	  This way you use it EXACTLY as you would use HTML::Template, the
+	  only difference is that you can provide a 'filename' source and
+	  one other source type, and if it finds the filename source, it
+	  uses that, if not, uses the default you provided.  Perfect.
+
+2008-06-25 11:44  cvs
+
+	* Changes, lib/HTML/Template/Default.pm: added Changes file to dist
+
+2007-07-10 10:15  cvs
+
+	* HTML-Template-Default-1.01.tar.gz, MANIFEST: added dist
+
+2007-07-10 10:14  cvs
+
+	* MANIFEST, Makefile.PL, lib/HTML/Template/Default.pm, t/0.t,
+	  t/templates/duper.html: Initial revision
+
+2007-07-10 10:14  cvs
+
+	* MANIFEST, Makefile.PL, lib/HTML/Template/Default.pm, t/0.t,
+	  t/templates/duper.html: init import
+

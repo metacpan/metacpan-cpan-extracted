@@ -1,0 +1,359 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+ <head>
+  <link rel="stylesheet" href="http://st.pimg.net/tucs/style.css" type="text/css" />
+  <link rel="stylesheet" href="http://st.pimg.net/tucs/shjs/sh_cpan.css" type="text/css" />
+
+<link rel="stylesheet" href="http://st.pimg.net/tucs/print.css" type="text/css" media="print" />
+  <link rel="alternate" type="application/rss+xml" title="RSS 1.0" href="http://search.cpan.org/uploads.rdf" />
+  <link rel="search" href="http://st.pimg.net/tucs/opensearch.xml" type="application/opensearchdescription+xml" title="SearchCPAN" />
+  <title>&#68;&#66;&#68;::&#83;&#81;&#76;&#105;&#116;&#101;::&#67;&#111;&#111;&#107;&#98;&#111;&#111;&#107; - search.cpan.org</title>
+ <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-3528438-1']);
+    _gaq.push(["_setCustomVar",2,"Distribution","DBD-SQLite",3]);
+    _gaq.push(["_setCustomVar",5,"Release","DBD-SQLite-1.32_02",3]);
+    _gaq.push(["_setCustomVar",4,"Document","DBD::SQLite::Cookbook",3]);
+    _gaq.push(["_setCustomVar",1,"Author","ADAMK",3]);
+    _gaq.push(['_trackPageview']);
+  </script>
+ </head>
+ <body id="cpansearch">
+<center><div class="logo"><a href="/"><img src="http://st.pimg.net/tucs/img/cpan_banner.png" alt="CPAN"></a></div></center>
+<div class="menubar">
+ <a href="/">Home</a>
+&middot; <a href="/author/">Authors</a>
+&middot; <a href="/recent">Recent</a>
+&middot; <a href="http://log.perl.org/cpansearch/">News</a>
+&middot; <a href="/mirror">Mirrors</a>
+&middot; <a href="/faq.html">FAQ</a>
+&middot; <a href="/feedback">Feedback</a>
+</div>
+<form method="get" action="/search" name="f" class="searchbox">
+<input type="text" name="query" value="" size="35">
+<br>in <select name="mode">
+ <option value="all">All</option>
+ <option value="module" >Modules</option>
+ <option value="dist" >Distributions</option>
+ <option value="author" >Authors</option>
+</select>&nbsp;<input type="submit" value="CPAN Search">
+</form>
+
+
+ <a name="_top"></a>
+  <div class=path>
+<div id=permalink class="noprint"><a href="/perldoc?DBD::SQLite::Cookbook">permalink</a></div>
+  <a href="/~adamk/">&#65;&#100;&#97;&#109; &#75;&#101;&#110;&#110;&#101;&#100;&#121;</a> &gt;
+  <a href="/~adamk/DBD-SQLite-1.32_02/">&#68;&#66;&#68;-&#83;&#81;&#76;&#105;&#116;&#101;-1.32&#95;02</a> &gt;
+  &#68;&#66;&#68;::&#83;&#81;&#76;&#105;&#116;&#101;::&#67;&#111;&#111;&#107;&#98;&#111;&#111;&#107;
+ </div>
+
+<div class="noprint" style="float:right;align:left;width:19ex">
+<a href="http://hexten.net/cpan-faces/"><img src="http://www.gravatar.com/avatar.php?gravatar_id=884124d0169f41668fb3f948b2ba8b0a&rating=G&size=80&default=http%3A%2F%2Fst.pimg.net%2Ftucs%2Fimg%2Fwho.png" width=80 height=80 
+style="float:right"
+/></a>
+<br style="clear:both"/>
+<p style="text-align:right">Download:<br/> <a href="/CPAN/authors/id/A/AD/ADAMK/DBD-SQLite-1.32_02.tar.gz">DBD-SQLite-1.32_02.tar.gz</a></p>
+<p style="text-align:right"><a href="http://www.annocpan.org/~ADAMK/DBD-SQLite-1.32_02/lib/DBD/SQLite/Cookbook.pod">Annotate this POD
+</a></p>
+
+<div style="float:right">
+<div class=box style='width:150px'>
+<h1 class=t5>CPAN RT</h1>
+<div style="margin:2px">
+<table style="margin-left:auto;margin-right:auto">
+<tr><td>New&nbsp;</td><td style="text-align:right"> 2</td></tr>
+<tr><td>Open&nbsp;</td><td style="text-align:right"> 12</td></tr>
+<tr><td>Stalled&nbsp;</td><td style="text-align:right"> 2</td></tr>
+</table>
+<a href="https://rt.cpan.org/NoAuth/Bugs.html?Dist=DBD-SQLite">View Bugs</a><br/>
+<a href="https://rt.cpan.org/Public/Bug/Report.html?Queue=DBD-SQLite">Report a bug</a>
+</div>
+</div>
+
+</div>
+</div>
+<span class="noprint">
+  <a href="/src/ADAMK/DBD-SQLite-1.32_02/lib/DBD/SQLite/Cookbook.pod">Source</a> &nbsp;
+</span>
+<a name="___top"></a>
+<div class=pod>
+<div class=toc>
+<div class='indexgroup'>
+<ul   class='indexList indexList1'>
+  <li class='indexItem indexItem1'><a href='#NAME'>NAME</a>
+  <li class='indexItem indexItem1'><a href='#DESCRIPTION'>DESCRIPTION</a>
+  <li class='indexItem indexItem1'><a href='#AGGREGATE_FUNCTIONS'>AGGREGATE FUNCTIONS</a>
+  <ul   class='indexList indexList2'>
+    <li class='indexItem indexItem2'><a href='#Variance'>Variance</a>
+    <li class='indexItem indexItem2'><a href='#Variance_(Memory_Efficient)'>Variance (Memory Efficient)</a>
+    <li class='indexItem indexItem2'><a href='#Variance_(Highly_Scalable)'>Variance (Highly Scalable)</a>
+  </ul>
+  <li class='indexItem indexItem1'><a href='#FTS3_fulltext_indexing'>FTS3 fulltext indexing</a>
+  <ul   class='indexList indexList2'>
+    <li class='indexItem indexItem2'><a href='#Sparing_database_disk_space'>Sparing database disk space</a>
+  </ul>
+  <li class='indexItem indexItem1'><a href='#SUPPORT'>SUPPORT</a>
+  <li class='indexItem indexItem1'><a href='#TO_DO'>TO DO</a>
+  <li class='indexItem indexItem1'><a href='#AUTHOR'>AUTHOR</a>
+  <li class='indexItem indexItem1'><a href='#COPYRIGHT'>COPYRIGHT</a>
+</ul>
+</div>
+</div>
+
+<h1><a class='u' href='#___top' title='click to go to top of document'
+name="NAME"
+>NAME <img alt='^' src='http://st.pimg.net/tucs/img/up.gif'></a></h1>
+
+<p>DBD::SQLite::Cookbook - The DBD::SQLite Cookbook</p>
+
+<h1><a class='u' href='#___top' title='click to go to top of document'
+name="DESCRIPTION"
+>DESCRIPTION <img alt='^' src='http://st.pimg.net/tucs/img/up.gif'></a></h1>
+
+<p>This is the <a href="/~adamk/DBD-SQLite-1.32_02/lib/DBD/SQLite.pm" class="podlinkpod"
+>DBD::SQLite</a> cookbook.</p>
+
+<p>It is intended to provide a place to keep a variety of functions and formals for use in callback APIs in <a href="/~adamk/DBD-SQLite-1.32_02/lib/DBD/SQLite.pm" class="podlinkpod"
+>DBD::SQLite</a>.</p>
+
+<h1><a class='u' href='#___top' title='click to go to top of document'
+name="AGGREGATE_FUNCTIONS"
+>AGGREGATE FUNCTIONS <img alt='^' src='http://st.pimg.net/tucs/img/up.gif'></a></h1>
+
+<h2><a class='u' href='#___top' title='click to go to top of document'
+name="Variance"
+>Variance</a></h2>
+
+<p>This is a simple aggregate function which returns a variance.
+It is adapted from an example implementation in pysqlite.</p>
+
+<pre class="sh_perl">  package variance;
+  
+  sub new { bless [], shift; }
+  
+  sub step {
+      my ( $self, $value ) = @_;
+  
+      push @$self, $value;
+  }
+  
+  sub finalize {
+      my $self = $_[0];
+  
+      my $n = @$self;
+  
+      # Variance is NULL unless there is more than one row
+      return undef unless $n || $n == 1;
+  
+      my $mu = 0;
+      foreach my $v ( @$self ) {
+          $mu += $v;
+      }
+      $mu /= $n;
+  
+      my $sigma = 0;
+      foreach my $v ( @$self ) {
+          $sigma += ($x - $mu)**2;
+      }
+      $sigma = $sigma / ($n - 1);
+  
+      return $sigma;
+  }
+  
+  # NOTE: If you use an older DBI (&#60; 1.608),
+  # use $dbh-&#62;func(..., &#34;create_aggregate&#34;) instead.
+  $dbh-&#62;sqlite_create_aggregate( &#34;variance&#34;, 1, &#39;variance&#39; );</pre>
+
+<p>The function can then be used as:</p>
+
+<pre class="sh_perl">  SELECT group_name, variance(score)
+  FROM results
+  GROUP BY group_name;</pre>
+
+<h2><a class='u' href='#___top' title='click to go to top of document'
+name="Variance_(Memory_Efficient)"
+>Variance (Memory Efficient)</a></h2>
+
+<p>A more efficient variance function, optimized for memory usage at the expense of precision:</p>
+
+<pre class="sh_perl">  package variance2;
+  
+  my $sum   = 0;
+  my $count = 0;
+  my %hash;
+  
+  sub new { bless [], shift; }
+  
+  sub step {
+      my ( $self, $value ) = @_;
+  
+      # by truncating and hashing, we can comsume many more data points
+      $value = int($value); # change depending on need for precision
+                            # use sprintf for arbitrary fp precision
+      if (defined $hash{$value}) {
+          $hash{$value}++;
+      } else {
+          $hash{$value} = 1;
+      }
+      $sum += $value;
+      $count++;
+  }
+  
+  sub finalize {
+      my $self = $_[0];
+  
+      # Variance is NULL unless there is more than one row
+      return undef unless $count &#62; 1;
+  
+      # calculate avg
+      my $mu = $sum / $count;
+  
+      my $sigma = 0;
+      foreach my $h (keys %hash) {
+          $sigma += (($h - $mu)**2) * $hash{$h};
+      }
+      $sigma = $sigma / ($count - 1);
+  
+      return $sigma;
+  }</pre>
+
+<p>The function can then be used as:</p>
+
+<pre class="sh_perl">  SELECT group_name, variance2(score)
+  FROM results
+  GROUP BY group_name;</pre>
+
+<h2><a class='u' href='#___top' title='click to go to top of document'
+name="Variance_(Highly_Scalable)"
+>Variance (Highly Scalable)</a></h2>
+
+<p>A third variable implementation, designed for arbitrarily large data sets:</p>
+
+<pre class="sh_perl">  package variance;
+  
+  my $mu = 0;
+  my $count = 0;
+  my $S = 0
+  
+  sub new { bless [], shift; }
+  
+  sub step {
+      my ( $self, $value ) = @_;
+      $count++;
+      $delta = $value - $mu;
+      $mu = $mu + $delta/$count
+      $S = $S + $delta*($value - $mu);
+  }
+  
+  sub finalize {
+      my $self = $_[0];
+      return $S / ($count - 1);
+  }</pre>
+
+<p>The function can then be used as:</p>
+
+<pre class="sh_perl">  SELECT group_name, variance3(score)
+  FROM results
+  GROUP BY group_name;</pre>
+
+<h1><a class='u' href='#___top' title='click to go to top of document'
+name="FTS3_fulltext_indexing"
+>FTS3 fulltext indexing <img alt='^' src='http://st.pimg.net/tucs/img/up.gif'></a></h1>
+
+<h2><a class='u' href='#___top' title='click to go to top of document'
+name="Sparing_database_disk_space"
+>Sparing database disk space</a></h2>
+
+<p>As explained in <a href="http://www.sqlite.org/fts3.html#section_6" class="podlinkurl"
+>http://www.sqlite.org/fts3.html#section_6</a>, each FTS3 table <code><i>t</i></code> is stored internally within three regular tables <code><i>t</i>_content</code>, <code><i>t</i>_segments</code> and <code><i>t</i>_segdir</code>. The last two tables contain the fulltext index. The first table <code><i>t</i>_content</code> stores the complete documents being indexed ... but if copies of the same documents are already stored somewhere else, or can be computed from external resources (for example as HTML or MsWord files in the filesystem), then this is quite a waste of space. SQLite itself only needs the <code><i>t</i>_content</code> table for implementing the <code>offsets()</code> and <code>snippet()</code> functions, which are not always usable anyway (in particular when using utf8 characters greater than 255).</p>
+
+<p>So an alternative strategy is to use SQLite only for the fulltext index and metadata, and to keep the full documents outside of SQLite : to do so, after each insert or update in the FTS3 table, do an update in the <code><i>t</i>_content</code> table, setting the content column(s) to NULL. Of course your application will need an algorithm for finding the external resource corresponding to any <i>docid</i> stored within SQLite. Furthermore, SQLite <code>offsets()</code> and <code>snippet()</code> functions cannot be used, so if such functionality is needed, it has to be directly programmed within the Perl application. In short, this strategy is really a hack, because FTS3 was not originally programmed with that behaviour in mind; however it is workable and has a strong impact on the size of the database file.</p>
+
+<h1><a class='u' href='#___top' title='click to go to top of document'
+name="SUPPORT"
+>SUPPORT <img alt='^' src='http://st.pimg.net/tucs/img/up.gif'></a></h1>
+
+<p>Bugs should be reported via the CPAN bug tracker at</p>
+
+<p><a href="http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DBD-SQLite" class="podlinkurl"
+>http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DBD-SQLite</a></p>
+
+<h1><a class='u' href='#___top' title='click to go to top of document'
+name="TO_DO"
+>TO DO <img alt='^' src='http://st.pimg.net/tucs/img/up.gif'></a></h1>
+
+<p>* Add more and varied cookbook recipes, until we have enough to turn them into a separate CPAN distribution.</p>
+
+<p>* Create a series of tests scripts that validate the cookbook recipies.</p>
+
+<h1><a class='u' href='#___top' title='click to go to top of document'
+name="AUTHOR"
+>AUTHOR <img alt='^' src='http://st.pimg.net/tucs/img/up.gif'></a></h1>
+
+<p>Adam Kennedy &#60;adamk@cpan.org&#62;</p>
+
+<p>Laurent Dami &#60;dami@cpan.org&#62;</p>
+
+<h1><a class='u' href='#___top' title='click to go to top of document'
+name="COPYRIGHT"
+>COPYRIGHT <img alt='^' src='http://st.pimg.net/tucs/img/up.gif'></a></h1>
+
+<p>Copyright 2009 - 2011 Adam Kennedy.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<p>The full text of the license can be found in the LICENSE file included with this module.</p>
+
+</div>
+
+
+<div class="footer"><div class="cpanstats">65741 Uploads, 22179 Distributions
+91317 Modules, 8809 Uploaders
+</div>
+hosted by <a href="http://www.yellowbot.com">YellowBot</a><br/>
+<a href="http://www.yellowbot.com"><img alt="do. tag. write. share." src="http://st.pimg.net/tucs/img/yellowbot_logo.gif"></a>
+</div>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript" src="http://ipv4.v6test.develooper.com/cdn/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript" src="http://ipv4.v6test.develooper.com/js/v1/v6test.js"></script>
+<script type="text/javascript" src="http://st.pimg.net/tucs/jquery-cookie-67fb34f6a.min.js"></script>
+<script type="text/javascript" src="http://st.pimg.net/tucs/shjs/sh_main.min.js"></script>
+<script type="text/javascript" src="http://st.pimg.net/tucs/shjs/sh_perl.min.js"></script>
+
+<script type="text/javascript">
+   // v6.target = '';
+   if (!v6.target) { v6.only_once = true }
+   v6.site = '7A0D89A6-2B82-11DF-B9DA-F61CBD13F020';
+   v6.api_server = 'http://ipv4.v6test.develooper.com';
+   try {
+     v6.test();
+   } catch(err) {}
+</script>
+<script type="text/javascript">
+  $(document).ready(function(){
+    $("a[href^=http:]").click(function(){
+      var href = $(this).attr('href');
+      var m = href.match('\/\/([^\/:]+)');
+      _gaq.push(['_trackEvent','External',m[1],'Document']);
+    });
+    $("a[href^=/CPAN/]").click(function(){
+      var href = $(this).attr('href');
+      _gaq.push(['_trackEvent','Download',href,'Document']);
+    });
+
+    if ($.cookie("pretty")) {
+      sh_highlightDocument();
+    }
+    $('.cpanstats').click(function() {
+      $.cookie("pretty", $.cookie("pretty") ? null : "1", { path: "/"});
+      location.reload();
+    });
+  });
+</script>
+<!-- Mon Mar  7 11:05:13 2011 GMT (0.023529052734375) @cpansearch1 -->
+ </body>
+</html>

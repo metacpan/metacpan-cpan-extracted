@@ -1,0 +1,20 @@
+<ep-package name="HTML::EP::Glimpse" lib="lib">
+<html><head><title>
+<ep-language en="Glimpse Index Creation"
+             de="Erzeugung des Glimpse-Index"></title></head>
+<body bgcolor=#ffffff>
+  <h1><ep-language en="Glimpse Index Creation"
+             de="Erzeugung des Glimpse-Index"></h1>
+<ep-language language="de">
+  Der Index wurde erfolgreich neu erzeugt. Die folgenden Dateien wurden
+  indiziert:
+</ep-language>
+<ep-language language="en">
+  The Index was recreated successfully. The following files have been
+  indexed:
+</ep-language>
+<pre>
+<ep-glimpse-create>
+</pre>
+</body>
+</html>

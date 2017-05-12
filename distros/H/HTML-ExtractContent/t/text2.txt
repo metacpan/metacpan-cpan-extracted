@@ -1,0 +1,2 @@
+This file is for a simple test that the multiple contents of the
+page (like blog pages) can appropriately be extracted.

@@ -1,0 +1,38 @@
+---
+abstract: 'web scraping assistant'
+author:
+  - 'Stanislaw Pusep <stas@sysd.org>'
+build_requires:
+  HTML::TreeBuilder::XPath: '0'
+  Path::Class: '0'
+  Set::CrossProduct: '0'
+  Test::Script::Run: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-Untemplate
+recommends:
+  AnyEvent::Net::Curl::Queued: '0'
+requires:
+  Class::Load: '0'
+  HTML::Entities: '0'
+  HTML::TreeBuilder: '0'
+  HTTP::Tiny: '0'
+  IO::Interactive: '0'
+  JSON: '0'
+  Moo: '0'
+  MooX::Types::MooseLike::Base: '0'
+  Term::ANSIColor: '4.0'
+  Tie::IxHash: '0'
+  perl: '5.010'
+  utf8::all: '0'
+resources:
+  bugtracker: https://github.com/creaktive/HTML-Untemplate/issues
+  homepage: https://github.com/creaktive/HTML-Untemplate
+  repository: git://github.com/creaktive/HTML-Untemplate.git
+version: '0.019'
+x_contributors:
+  - 'Сергей Романов <sromanov-dev@yandex.ru>'

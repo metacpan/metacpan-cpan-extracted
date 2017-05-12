@@ -1,0 +1,86 @@
+#!/usr/bin/perl
+
+our $VERSION = '0.06';
+
+# $Id: html_gmap_piechart_sample,v 1.9 2007/07/27 15:38:36 canaran Exp $
+
+use warnings;
+use strict;
+
+use HTML::GMap;
+
+my $gmap_key = 'my_gmap_key';
+
+my $gmap = HTML::GMap->new (
+    initial_format        => 'xml-piechart',
+    page_title            => 'HTML::GMap piechart View Demo',
+    header                => '[Placeholder for Header]',
+    footer                => '[Placeholder for Header]',
+    db_access_params      => ['DBI:mysql:database=temp;host=localhost;port=3306', 'gmap', 'gmap'],            
+    base_sql_table        => qq[html_gmap_piechart_sample],
+    base_sql_fields       => ['id',
+                              'latitude',
+                              'longitude',
+                              'name',
+                              'specialty',
+                              'insurance',
+                              ],
+    base_output_headers   => ['Id',
+                              'Latitude',
+                              'Longitude',
+                              'Name',
+                              'Specialty',
+                              'Insurance',
+                              ],
+    cluster_field         => 'specialty',
+    param_fields          => {
+      specialty => ['all:All',      'Specialty #1', 'Specialty #2', 
+                    'Specialty #3', 'Specialty #4', 'Specialty #5'],
+      insurance => ['all:All', 'Yes', 'No'],
+    },
+    gmap_key              => $gmap_key,
+    temp_dir              => qq[/usr/local/demo/html/demo/tmp],
+    temp_dir_eq           => qq[http://localhost:8080/demo/tmp],
+);
+
+# Display
+$gmap->display;
+
+
+=head1 NAME
+
+html_gmap_piechart_sample - Sample CGI script for HTML::GMap
+
+=head1 SYNOPSIS
+
+html_gmap_piechart_sample
+
+=head1 DESCRIPTION
+
+Sample code for demonstrating use of HTML::GMap in piechart mode.
+
+=head1 USAGE
+
+Please refer to HTML::GMap::Tutorial for details on this script.
+
+=head1 AUTHOR
+
+Payan Canaran <pcanaran@cpan.org>
+
+=head1 BUGS
+
+=head1 VERSION
+
+Version 0.06
+
+=head1 ACKNOWLEDGEMENTS
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2006-2007 Cold Spring Harbor Laboratory
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. See DISCLAIMER.txt for
+disclaimers of warranty.
+
+=cut

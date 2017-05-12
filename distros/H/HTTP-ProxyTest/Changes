@@ -1,0 +1,8 @@
+Version history for HTTP::ProxyTest.
+
+v0.10 (Jul 14, 2010)
+    Initial release.
+
+v0.11 (Aug 1, 2011)
+    Default value of -test_url changed.
+

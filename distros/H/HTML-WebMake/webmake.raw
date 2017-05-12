@@ -1,0 +1,296 @@
+#!/usr/bin/perl -w
+
+use File::Basename;
+use Getopt::Std;
+
+use FindBin;
+BEGIN {
+  # This code will track down the directories where WebMake
+  # keeps its modules, portably, so it'll work on Macs, UNIX and Win32,
+  # with or without a UNIX-style "make install" installation.
+  # Sadly, we can't rely on File::Spec to do the slash-twiddling for us;
+  # it's not included with some versions of MacPerl. :(
+  #
+  my $bin = $FindBin::Bin;
+  my $slash = '/';              # between directories in a path
+  my $dirtrailer = '';          # at the end of a directory's path
+
+  if ($^O eq 'MacOS') {
+    $slash = ':'; $dirtrailer = ':';
+  } elsif ($^O =~ /(win|os2)/) {
+    $slash = '\\';
+  }
+
+  # first, find the common candidates: "lib" in
+  # the same dir as the script. These are likely on all platforms.
+  $_ = $bin.$slash. "lib" . $dirtrailer;
+  push (@INC, $_);
+
+  # next, support UNIX-style /usr-based installation, where the
+  # script lives in /usr/*/bin and the support files in /usr/*/lib
+  # or /usr/*/share. This only happens on UNIX afaik.
+  if ($slash eq '/') {
+    $_ = $bin . "/../lib/webmake";
+    if (-d $_) { push (@INC, "$_/lib"); }
+
+    $_ = $bin . "/../share/webmake";
+    if (-d $_) { push (@INC, "$_/lib"); }
+  }
+}
+
+sub usage {
+  my $ver = HTML::WebMake::Main::Version();
+  die <<EOUSAGE;
+
+Usage: webmake [option ...]
+
+  webmake [option ...] [-f webmakefile]
+
+  webmake [option ...] [-R dir_or_file]
+
+Options:
+ 
+  [-b basehref] [-d basedir] [-p] [-D] [-L debuglevel]
+  [-C dir] [-R dir_or_file] [-V] [-F] [-r] [-o] [-s]
+
+Version: $ver      Home: http://webmake.sourceforge.net/
+
+EOUSAGE
+}
+
+
+require HTML::WebMake::Main;
+
+use vars qw{
+  $opt_p $opt_b $opt_d $opt_F $opt_D $opt_L $opt_f $opt_R
+  $opt_V $opt_h $opt_r $opt_s $opt_o
+};
+
+getopts ('pFd:b:DL:R:C:f:hrVso') or usage();
+
+if (defined $opt_h) { usage(); }
+if (defined $opt_V) {
+  my $ver = HTML::WebMake::Main::Version();
+  print <<EOVERSION;
+WebMake version $ver
+EOVERSION
+  exit 0;
+}
+
+if (defined $opt_C) {
+  chdir ($opt_C) or die "cannot cd to \"$opt_C\".\n";
+
+} elsif ($opt_R) {
+  $_ = $opt_R;
+  if (-f $_) { $_ = dirname ($_); }
+  chdir ($_) or die "cannot cd to \"$_\".\n";
+  if ($opt_R =~ /\.wmk$/i && !defined $opt_f) { $opt_f = basename ($opt_R); }
+}
+
+if ($opt_D && !$opt_L) { $opt_L = 1; }
+
+$force_cache_rebuild = 0;
+if ($#ARGV == -1 && $opt_F) { $force_cache_rebuild = 1; }
+
+my $f = new HTML::WebMake::Main ({
+  'debug'		=> $opt_L,
+  'paranoid'		=> $opt_p,
+  'base_href'		=> $opt_b,
+  'base_dir'		=> $opt_d,
+  'force_output'	=> $opt_F,
+  'risky_fast_rebuild'	=> $opt_r,
+  'force_cache_rebuild'	=> $force_cache_rebuild
+});
+
+if (defined $opt_f) {
+  $f->readfile ($opt_f);
+} else {
+  search_for_files();
+}
+
+if ($opt_s || $opt_o) {
+  if ($opt_s) {
+    print join ("\n", $f->source_file_list()), "\n";
+  }
+  if ($opt_o) {
+    print join ("\n", $f->generated_file_list()), "\n";
+  }
+  exit;
+}
+
+$f->make(@ARGV);
+exit $f->finish();
+
+sub search_for_files {
+  for my $tries (1..10) {
+    foreach my $file (<*.wmk>) {
+      $f->readfile ($file) and return;
+    }
+    chdir ("..") or return;
+  }
+
+  die "No .wmk files found!  (webmake -h for help)\n";
+}
+
+# ---------------------------------------------------------------------------
+
+=head1 NAME
+
+webmake - a simple web site management system, allowing an entire site to be
+created from a set of text and markup files and one WebMake file.
+
+=head1 SYNOPSIS
+
+  webmake [option ...]
+
+  webmake [option ...] [-f webmakefile]
+
+  webmake [option ...] [-R dir_or_file]
+
+=head1 DESCRIPTION
+
+WebMake is a simple web site management system, allowing an entire site to be
+created from a set of text and markup files and one WebMake file.
+
+It requires no dynamic scripting capabilities on the server; WebMake sites can
+be deployed to a plain old FTP site without any problems.
+
+It allows the separation of responsibilities between the content editors, the
+HTML page designers, and the site architect; only the site architect needs to
+edit the WebMake file itself, or know perl or WebMake code.
+
+A multi-level website can be generated entirely from 1 or more WebMake files
+containing content, links to content files, perl code (if needed), and output
+instructions.  Since the file-to-page mapping no longer applies, and since
+elements of pages can be loaded from different files, this means that standard
+file access permissions can be used to restrict editing by role.
+
+Text can be edited as standard HTML, converted from plain text (using the
+included Text::EtText module), or converted from any other format by adding a
+conversion method to the WebMake::FormatConvert module.
+
+Since URLs can be referred to symbolically, pages can be moved around and URLs
+changed by changing just one line.  All references to that URL will then change
+automatically.
+
+Content items and output URLs can be generated, altered, or read in dynamically
+using perl code.  Perl code can even be used to generate other perl code to
+generate content/output URLs/etc., recursively.
+
+=head1 OPTIONS
+
+=over 4
+
+=item -f
+
+The WebMake file to read and generate output from.  If this option is not
+supplied, the default behaviour is to search the current directory and its
+parents for a file ending in C<.wmk>.
+
+=item -F
+
+Force output. Normally if a file is already up to date, it is not modified.
+This will force the file to be re-made.
+
+=item -r
+
+Run more quickly, but take more risks.  Normally, dynamic content, such as Perl
+sections, sitemaps, or navigation links, are always considered to be in need of
+rebuilding, as mapping their dependencies is often very difficult or
+impossible.  This switch forces them to be ignored for dependency-tracking
+purposes, and so an output file that depends on them will not be rebuilt unless
+a normal content item on that page changes.
+
+=item -b basehref
+
+Rewrite links to be absolute URLs based at this URL.  By default, links are
+specified as relative wherever possible.
+
+=item -d basedir
+
+Generate output, and look for support files (images etc.), relative to this
+directory.
+
+=item -p
+
+Paranoid mode; do not allow perl code evaluation or accesses to directories
+above the WebMake file.
+
+=item -D
+
+Debug mode; more output.
+
+=item -L
+
+Debug level; how much debug output to produce. 0 means no debug output,
+3 means lots.
+
+=item -C dir
+
+Change to this directory before reading files or generating output.
+
+=item -R dir_or_file
+
+If B<dir_or_file> is a directory, change to that directory, or if it is a file,
+change to that file's parent directory, before starting.
+
+=item -s
+
+List source files that would be used to generate this site, one per line.
+
+=item -o
+
+List output files that would be generated to build this site, one per line.
+When you're using CVS to replicate a site, this comes in handy, as you know
+you can safely overwrite changes in these files when doing a C<cvs update>.
+
+=back
+
+=head1 INSTALLATION
+
+The B<webmake> command is part of the B<HTML::WebMake> Perl module. Install
+this as a normal Perl module, using C<perl -MCPAN -e shell>, or by hand.
+
+=head1 ENVIRONMENT
+
+No environment variables, aside from those used by perl, are required to
+be set.
+
+=head1 SEE ALSO
+
+C<webmake>
+
+C<ettext2html>
+
+C<ethtml2text>
+
+C<HTML::WebMake>
+
+C<Text::EtText>
+
+=head1 AUTHOR
+
+Justin Mason E<lt>jm /at/ jmason.orgE<gt>
+
+=head1 PREREQUISITES
+
+C<HTML::Entities>
+
+C<File::Spec>
+
+C<File::Path>
+
+C<File::Basename>
+
+C<Carp>
+
+C<Cwd>
+
+=head1 COREQUISITES
+
+C<Image::Size> is required to support the IMGSIZE tag.  If this tag is not
+used, or if the module is not available, B<webmake> can still operate
+acceptably.
+
+=cut
+

@@ -1,0 +1,26 @@
+0.05 2016-01-26T00:13:21Z
+
+	- Use content attribute as value of property, if it is available, instead
+	of the annotated text. (by Václav Haisman)
+
+0.04 2013-06-06T06:15:01Z
+
+	- Fix dependency. 
+
+2013-05-28  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.03:
+	Fix error on invalid itemprop. (reported by Lucas Mateus)
+
+2011-12-14  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.02:
+	Compatible 5.8.*.
+
+2011-12-13  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.01:
+	Initial Release
+
+
+vim:set ft=changelog:

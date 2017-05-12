@@ -1,0 +1,5 @@
+<table>
+<tr><th>ID</th><th>Debit</th><th>Credit</th></tr>
+<tr><td>1</td><td><input type="text" name="debit" value="1234"></td><td><input type="text" name="credit" value=""></td></tr>
+<tr><td>2</td><td><input type="text" name="debit" value=""></td><td><input type="text" name="credit" value="-1234"></td></tr>
+</table>

@@ -1,0 +1,38 @@
+#HPC jobname=job_001
+#HPC partition=debug
+#HPC walltime=01:00:00
+#HPC cpus_per_task=1
+#HPC procs=1
+
+echo "hello world from job_001 task 1" && sleep 5
+
+echo "hello again from job_001 task 2" && sleep 5
+
+echo "goodbye from job_001 task 3"
+
+#TASK tags=hello1,world1
+echo "hello again from job_001 task 4" && sleep 5
+
+#HPC jobname=job_002
+#HPC deps=job_001
+
+echo "hello world from job_002 task 1" && sleep 5
+
+echo "hello again from job_002 task 2" && sleep 5
+
+echo "goodbye from job_002 task 3"
+
+#TASK tags=hello2,world2
+echo "hello again from job_002 task 4" && sleep 5
+
+#HPC jobname=job_003
+#HPC deps=job_001
+
+echo "hello world from job_003 task 1" && sleep 5
+
+echo "hello again from job_003 task 2" && sleep 5
+
+echo "goodbye from job_003 task 3"
+
+#TASK tags=hello2,world2
+echo "hello again from job_003 task 4" && sleep 5

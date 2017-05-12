@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>radiogroup</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" type="text/css" href="http://extjs.cachefly.net/ext-3.3.1/resources/css/ext-all.css">
+    <script type="text/javascript" src="http://extjs.cachefly.net/ext-3.3.1/adapter/ext/ext-base.js"></script>
+    <script type="text/javascript" src="http://extjs.cachefly.net/ext-3.3.1/ext-all.js"></script>
+<script type="text/Javascript">
+
+Ext.onReady(function(){
+
+    var simple = new Ext.FormPanel({"width":800,"baseParams":{"x-requested-by":"ExtJS"},"frame":true,"action":"","title":"HTML::FormFu::ExtJS - radiogroup","method":"post","buttons":[],"items":[{"hideLabel":false,"value":"2b","name":"foo","fieldLabel":"Fancy Checkboxgroups","xtype":"radiogroup","items":[{"class":"subgroup","items":[{"cls":"x-form-check-group-label","anchor":"-15","text":"group 1","xtype":"label"},{"inputValue":"1a","boxLabel":"item 1a","name":"foo"},{"inputValue":"1b","boxLabel":"item 1b","name":"foo"}]},{"class":"subgroup","items":[{"cls":"x-form-check-group-label","anchor":"-15","text":"group 2","xtype":"label"},{"inputValue":"2a","boxLabel":"item 2a","name":"foo"},{"checked":"checked","inputValue":"2b","boxLabel":"item 2b","name":"foo"}]}]},{"hideLabel":false,"name":"foo2","fieldLabel":"Without groups","xtype":"radiogroup","items":[{"inputValue":"1a","boxLabel":"item 1a","name":"foo2"},{"inputValue":"1b","boxLabel":"item 1b","name":"foo2"},{"inputValue":"2a","boxLabel":"item 2a","name":"foo2"},{"inputValue":"2b","boxLabel":"item 2b","name":"foo2"}]},{"hideLabel":false,"name":"foo3","columns":1,"fieldLabel":"one column","xtype":"radiogroup","items":[{"inputValue":"1a","boxLabel":"item 1a","name":"foo3"},{"inputValue":"1b","boxLabel":"item 1b","name":"foo3"},{"inputValue":"2a","boxLabel":"item 2a","name":"foo3"},{"inputValue":"2b","boxLabel":"item 2b","name":"foo3"}]}]});;
+
+    simple.render(document.body);
+});
+</script>
+
+</head>
+<body>
+
+
+<a href="../forms/radiogroup.yml">Form config file</a><br/><br/>
+
+
+
+</body>
+</html>
+

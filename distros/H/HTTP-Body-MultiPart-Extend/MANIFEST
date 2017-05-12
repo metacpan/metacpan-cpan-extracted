@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/HTTP/Body/MultiPart/Extend.pm
+t/pod.t
+t/manifest.t
+t/01-all.t
+t/boilerplate.t
+t/00-load.t
+t/data/content.dat
+t/data/headers.pml
+META.yml                                 Module meta-data (added by MakeMaker)

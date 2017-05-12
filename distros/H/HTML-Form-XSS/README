@@ -1,0 +1,14 @@
+USAGE
+-----
+cd script
+./check.pl http://www.targetsite.com/pagewithform.html
+
+TODO
+-----
+Use javascript for better XSS detection with Mozilla::Mechanize.
+Don't run all tests before giving results, bail out at first success.
+
+CREDITS
+-------
+http://search.cpan.org/~miyagawa/HTML-XSSLint-0.01/lib/HTML/XSSLint.pm
+http://ha.ckers.org/xss.html

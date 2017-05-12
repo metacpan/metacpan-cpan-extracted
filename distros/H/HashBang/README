@@ -1,0 +1,3 @@
+HashBang let's you write your own shebang style interpreters in Perl.
+
+    #!/usr/bin/foo

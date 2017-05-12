@@ -1,0 +1,8 @@
+<table>
+   <tr scla="top"/> 
+   <tr scla="mid"> 
+     <td kmap="brand"> blah </td>
+     <td kmap="age"> blah </td>
+   </tr>
+   <tr scla="bot"/> 
+ </table>

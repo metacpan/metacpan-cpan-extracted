@@ -1,0 +1,16 @@
+Build.PL
+Changes
+lib/HTML/Prototype.pm
+lib/HTML/Prototype/Controls.pm
+lib/HTML/Prototype/DragDrop.pm
+lib/HTML/Prototype/Effects.pm
+lib/HTML/Prototype/Js.pm
+lib/HTML/Prototype/Helper.pm
+lib/HTML/Prototype/Helper/Tag.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01use.t
+t/02pod.t
+t/03podcoverage.t

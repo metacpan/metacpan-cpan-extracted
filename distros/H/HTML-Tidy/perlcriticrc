@@ -1,0 +1,35 @@
+[-CodeLayout::ProhibitParensWithBuiltins]
+[CodeLayout::ProhibitHardTabs]
+allow_leading_tabs = 0
+[-CodeLayout::RequireTidyCode]
+# Never works for me.
+
+[Compatibility::PodMinimumVersion]
+above_version = 5.008008
+
+[-ControlStructures::ProhibitPostfixControls]
+
+[-Documentation::PodSpelling]
+[-Documentation::RequirePodAtEnd]
+[-Documentation::RequirePodSections]
+
+[-InputOutput::RequireCheckedSyscalls]
+functions = open opendir read readline readdir close closedir
+
+[-Miscellanea::RequireRcsKeywords]
+
+[-Modules::RequireVersionVar]
+
+[-RegularExpressions::ProhibitEscapedMetacharacters]
+[-RegularExpressions::RequireDotMatchAnything]
+[-RegularExpressions::RequireExtendedFormatting]
+[-RegularExpressions::RequireLineBoundaryMatching]
+
+[Subroutines::RequireArgUnpacking]
+
+[-ValuesAndExpressions::ProhibitConstantPragma]
+[-ValuesAndExpressions::ProhibitNoisyQuotes]
+[-ValuesAndExpressions::ProhibitEmptyQuotes]
+[-ValuesAndExpressions::ProhibitMagicNumbers]
+
+[-Variables::ProhibitPunctuationVars]

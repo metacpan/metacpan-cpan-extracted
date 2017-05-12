@@ -1,0 +1,164 @@
+
+<html><head>
+    <title>HTML::Template::Compiled::Plugin::HTML_Tags example</title>
+</head>
+<body bgcolor="#dddddd">
+
+Form:
+<form>
+<select name="foo">
+<option value="0" >Please choose</option>
+<option value="1" >Jan</option>
+<option value="2" selected="true">Feb</option>
+<option value="3" >Mar</option>
+<option value="4" >Apr</option>
+</select>
+</form>
+
+Table:
+<table bgcolor='black'><tr bgcolor='yellow'><th bgcolor='green' align='center'>Perl-Version</th><th bgcolor='green' align='center'>Age</th></tr><tr bgcolor='yellow'>
+<td bgcolor='white'>0</th>
+<td bgcolor='white'>embryo</th>
+</tr><tr bgcolor='yellow'>
+<td bgcolor='white'>1</th>
+<td bgcolor='white'>infant</th>
+</tr><tr bgcolor='yellow'>
+<td bgcolor='white'>2</th>
+<td bgcolor='white'>toddler</th>
+</tr><tr bgcolor='yellow'>
+<td bgcolor='white'>3</th>
+<td bgcolor='white'>child</th>
+</tr><tr bgcolor='yellow'>
+<td bgcolor='white'>4</th>
+<td bgcolor='white'>preteen</th>
+</tr><tr bgcolor='yellow'>
+<td bgcolor='white'>5</th>
+<td bgcolor='white'>adolescent</th>
+</tr></table>
+
+<hr>
+<h2>The Template:</h2>
+<table border=1 bgcolor="#ffffff"><tr><td>
+<pre>
+&lt;html&gt;&lt;head&gt;
+    &lt;title&gt;HTML::Template::Compiled::Plugin::HTML_Tags example&lt;/title&gt;
+&lt;/head&gt;
+&lt;body bgcolor=&quot;#dddddd&quot;&gt;
+
+Form:
+&lt;form&gt;
+&lt;select name=&quot;foo&quot;&gt;
+[%HTML_OPTION options%]
+&lt;/select&gt;
+&lt;/form&gt;
+
+Table:
+[%HTML_TABLE table HEADER=1
+TABLE_ATTR=&quot;bgcolor='black'&quot;
+TH_ATTR=&quot;bgcolor='green' align='center'&quot;
+TD_ATTR=&quot;bgcolor='white'&quot;
+TR_ATTR=&quot;bgcolor='yellow'&quot;
+%]
+
+&lt;hr&gt;
+&lt;h2&gt;The Template:&lt;/h2&gt;
+&lt;table border=1 bgcolor=&quot;#ffffff&quot;&gt;&lt;tr&gt;&lt;td&gt;
+&lt;pre&gt;[%= template escape=html %]&lt;/pre&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
+&lt;hr&gt;
+&lt;h2&gt;The whole script:&lt;/h2&gt;
+&lt;table border=1 bgcolor=&quot;#ffffff&quot;&gt;&lt;tr&gt;&lt;td&gt;
+&lt;pre&gt;[%= code escape=html %]&lt;/pre&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/body&gt;&lt;/html&gt;
+</pre>
+</td></tr></table>
+
+<hr>
+<h2>The whole script:</h2>
+<table border=1 bgcolor="#ffffff"><tr><td>
+<pre>#!/usr/bin/perl
+use strict;
+use warnings;
+use blib;
+use HTML::Template::Compiled 0.81;
+use HTML::Template::Compiled::Plugin::HTML_Tags;
+use Fcntl qw(:seek);
+
+# ---------- HTC ----------------
+my $template;
+my $script;
+$HTML::Template::Compiled::Plugin::InlineImage::SIZE_WARNING = 0;
+{
+    local $/;
+    $template = &lt;DATA&gt;;
+    seek DATA, 0, SEEK_SET;
+    $script = &lt;DATA&gt;;
+}
+my $htc = HTML::Template::Compiled-&gt;new(
+    scalarref =&gt; \$template,
+    debug =&gt; 1,
+    plugin =&gt; [qw(HTML::Template::Compiled::Plugin::HTML_Tags)],
+    tagstyle =&gt; [qw(+tt)],
+);
+$htc-&gt;param(
+    options =&gt; [
+        2, # selected
+        [0, &quot;Please choose&quot;],
+        [1, 'Jan'],
+        [2, 'Feb'],
+        [3, 'Mar'],
+        [4, 'Apr'],
+    ],
+    table =&gt; [
+        [qw(Perl-Version Age)],
+        [0, 'embryo'],
+        [1, 'infant'],
+        [2, 'toddler'],
+        [3, 'child'],
+        [4, 'preteen'],
+        [5, 'adolescent'],
+    ],
+    template =&gt; $template,
+    code =&gt; $script,
+);
+print $htc-&gt;output;
+
+__DATA__
+
+&lt;html&gt;&lt;head&gt;
+    &lt;title&gt;HTML::Template::Compiled::Plugin::HTML_Tags example&lt;/title&gt;
+&lt;/head&gt;
+&lt;body bgcolor=&quot;#dddddd&quot;&gt;
+
+Form:
+&lt;form&gt;
+&lt;select name=&quot;foo&quot;&gt;
+[%HTML_OPTION options%]
+&lt;/select&gt;
+&lt;/form&gt;
+
+Table:
+[%HTML_TABLE table HEADER=1
+TABLE_ATTR=&quot;bgcolor='black'&quot;
+TH_ATTR=&quot;bgcolor='green' align='center'&quot;
+TD_ATTR=&quot;bgcolor='white'&quot;
+TR_ATTR=&quot;bgcolor='yellow'&quot;
+%]
+
+&lt;hr&gt;
+&lt;h2&gt;The Template:&lt;/h2&gt;
+&lt;table border=1 bgcolor=&quot;#ffffff&quot;&gt;&lt;tr&gt;&lt;td&gt;
+&lt;pre&gt;[%= template escape=html %]&lt;/pre&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
+&lt;hr&gt;
+&lt;h2&gt;The whole script:&lt;/h2&gt;
+&lt;table border=1 bgcolor=&quot;#ffffff&quot;&gt;&lt;tr&gt;&lt;td&gt;
+&lt;pre&gt;[%= code escape=html %]&lt;/pre&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/body&gt;&lt;/html&gt;
+</pre>
+</td></tr></table>
+</body></html>

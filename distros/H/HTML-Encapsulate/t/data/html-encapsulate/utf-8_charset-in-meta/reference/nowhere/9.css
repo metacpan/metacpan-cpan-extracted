@@ -1,0 +1,9 @@
+/* /css/import.css */
+@import url(5.css);
+
+.bimage { 
+  background-image: url(10.jpg);
+}
+.bimage2 { 
+  background-image: url(11.jpg);
+}

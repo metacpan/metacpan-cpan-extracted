@@ -1,0 +1,150 @@
+Revision history for Haineko
+
+0.2.16  Sat, 25 Jan 2014 21:00:22 +0900 (JST)
+    - Fixed code at lib/Haineko/SMTPD/Relay/Haineko.pm reported at CPAN Testers
+      Report 54826936-84d9-11e3-bb3c-11f7f1eb6092, Thanks to Victor Efimov.
+
+0.2.15  Thu, 23 Jan 2014 19:00:04 +0900 (JST)
+    - Fix help message of bin/hainekoctl script.
+    - Fixed again for CPAN Testers Report c629c620-8393-11e3-b3f9-dc652915a26c,
+      at t/127-smtpd-relay-mx.t.
+
+0.2.14  Thu, 16 Jan 2014 15:15:44 +0900 (JST)
+    - New URL /sample/mail respond sample email data.
+    - Respond "Access denied" as a JSON when the client address is not the same
+      address of the server.
+    - Maybe fixed for CPAN Testers Report 9ad9acca-78b1-11e3-a3d9-01ccd95af652,
+      issue #9 at t/127-smtpd-relay-mx.t. Thanks to Nigel Horne.
+    - Fixed an issue that the app process does not exit at "hainekoctl stop".
+    - XML::Simple module is optional.
+
+0.2.13  Fri,  3 Jan 2014 17:41:11 +0900 (JST)
+    - Fixed base64 encoded setup data for "setup" sub command of bin/hainekoctl
+      script at Haineko::CLI::Setup::Data.
+
+0.2.12  Tue, 31 Dec 2013 12:22:22 +0900 (JST)
+    - Haineko now can be installed from CPAN: ``cpanm Haineko''.
+    - Haineko::SMTPD::Relay::Screen is a class for printing an email to standard
+      error device.
+    - Haineko::SMTPD::Relay::File is a class for saving an email to /tmp direc-
+      tory or the specified directory in etc/mailertable file.
+    - Strictly check the numeric values defined in etc/haineko.cf.
+    - Fix comments about Haineko::SMTPD::Relay::* in mailertable and sendermt.
+
+0.2.11  Tue, 18 Dec 2013 20:22:22 +0900 (JST)
+    - Fixed issues: Travis CI Build #26 #27, and #28.
+    - The field name of ``Reply-To'' header in JSON data has been changed from
+      "reply-to" to "replyto", hyphen was deleted.
+
+0.2.10  Tue, 17 Dec 2013 20:22:22 +0900 (JST)
+    - New aliases: "send"(mail) and "recv"(rcpt) for email data as a JSON.
+    - Haineko does fork() when the number of recipients is greater than 1.
+    - New haineko.cf configuration: "max_workers" is the limit of forked worker
+      processes.
+    - Check message body size.
+
+0.2.9   Mon,  2 Dec 2013 12:22:22 +0900 (JST)
+    - Fixed an issue that "debug" property defined in mailertable is not used at 
+      child class of Haineko::SMTPD::Relay which are using Net::SMTP.
+    - Fixed an issue that "QUIT" command is not sent when SMTP transaction has
+      succeeded at Haineko::SMTPD::Relay::* which are using Net::SMTP.
+
+0.2.8   Wed, 27 Nov 2013 20:22:22 +0900 (JST)
+    - Haineko does not contain the value of "stage" property in JSON response.
+    - HTTP error response is returned as a JSON without "queueid".
+    - New sample code: eg/sendmail.java.
+
+0.2.7   Mon, 25 Nov 2013 22:22:22 +0900 (JST)
+    - Haineko now respond the data of "response" in JSON as an array. It hold
+      multiple responses in "response" hash. issue #3.
+    - / returns JSON: issue #4.
+
+0.2.6   Thu, 21 Nov 2013 19:22:22 +0900 (JST)
+    - New email header: ``X-Haineko-Loop'' is for detecting loop during Haineko
+      servers. Haineko does not receive an email message that had already passed 
+      Haineko running on the same server: issue #1.
+    - New option "-x, --maxreqs" for sample script bin/hainekoctl.
+    - Fixed: Remove two unused variables from Haineko->startup sub routine.
+
+0.2.5   Mon, 18 Nov 2013 20:22:22 +0900 (JST)
+    - Haineko::SMTPD::Relay::Haineko for relaying from Haineko to other Haineko.
+    - Haineko::SMTPD::Relay::MX is a class for deliverying an email to the host
+      listed in MX resource records or A resource records.
+    - Haineko::E is a class for converting Perl error message to an object.
+    - eg/sendmail.html is a sample for sending email using jQuery and JSON.
+    - Haineko responds an error as a JSON even if the status code is 4xx or 5xx.
+    - Fix bug: pop [] does not work on Perl 5.12 or older/Haineko::Sendmail#349.
+    - Remove string 'smtp.' from key name of each value in the server response.
+
+0.2.4   Wed, 13 Nov 2013 18:22:22 +0900 (JST)
+    - Fix bug: the first argument of shift() in Haineko::SMTPD::Relay::SendGrid.
+
+0.2.3   Wed, 13 Nov 2013 03:22:22 +0900 (JST)
+    - Fix base64 encoded data in <DATA> section of Haineko::CLI::Setup::Data.
+
+0.2.2   Tue, 12 Nov 2013 22:22:22 +0900 (JST)
+    - Haineko::CLI::Password for ``bin/hainekoctl pw''.
+    - Haineko::CLI::Setup::Data for ``bin/hainekoctl make-setup-data''.
+    - Add test cases for Haineko::CLI::*.
+    - New sub command ``pw'' for bin/hainekoctl to generate Basic Authentication
+      password.
+    - New option ``-l, --log'' for bin/hainekoctl start as a wrapper option of
+      plackup --access-log.
+    - The first argument of ./bin/hainekoctl is a ``Sub command''.
+    - Send log messages to syslog after relayed message if syslog is enabled.
+
+0.2.1   Fri,  8 Nov 2013 13:22:22 +0900 (JST)
+    - README-JA.md is Japanese version of README.md.
+
+0.2.0   Thu,  7 Nov 2013 21:22:22 +0900 (JST)
+    - Fix bug in cpanfile: required perl version.
+    - New script bin/hainekoctl: script for controlling haineko server.
+    - Removed sbin/hainekod, use bin/hainekoctl instead of hainekod.
+    - Haineko::CLI is a base class for command-lile tool.
+    - Haineko::CLI::Daemon for bin/hainekoctl script.
+    - Haineko::CLI::Setup for ``bin/hainekoctl setup''.
+    - Haineko::CLI::Help for ``bin/hainekoctl help''.
+
+0.1.2   Wed,  9 Oct 2013 08:22:22 +0900 (JST)
+    - Basic Authentication returns error message as a JSON.
+    - Haineko::SMTPD::Relay::Mandrill, for sending via Mandrill API.
+
+0.1.1   Tue,  1 Oct 2013 15:22:22 +0900 (JST)
+    - New option ``-A'' of sbin/hainekod and HAINEKO_AUTH environment variable 
+      for using Basic Authentication at connecting Haineko server.
+    - Haineko::HTTPD::Auth is authenticator for Basic Authentication.
+    - etc/password is a password database for Basic Authentication.
+    - Fix hash key name for calling milter at XXFI_BODY block in Haineko::Sendmail.
+    - Register Haineko::SMTPD::Milter::Nyaa as an example.
+
+0.1.0   Thu, 19 Sep 2013 16:22:22 +0900 (JST)
+    - Haineko is now PSGI application.
+    - Name space has been changed: Haineko::* => Haineko::SMTPD::*.
+    - Haineko::HTTPD is something like web application framework for Haineko.
+    - Haineko::JSON is a wrapper class for JSON parser/dumper.
+    - Haineko::Default is loaded when etc/haineko.cf does not exist.
+    - Haineko::Sendmail is a controller class for sending email.
+    - Haineko::Root is a controller class except URL: "/submit".
+
+0.0.4   Sun, 11 Aug 2013 17:22:22 +0900 (JST)
+    - Implement Haineko::Relay::Discard, Mailer for discarding an email.
+    - Implement Haineko::Relay::AmazonSES, for sending via Amazon SES API.
+
+0.0.3   Sat, 27 Jul 2013 14:22:22 +0900 (JST)
+    - Only 127.0.0.1 is permitted to relay if there is no etc/relayhosts file.
+    - Haineko can run even if haineko.cf does not exist.
+    - Support HAINEKO_CONF environment variable for specifying as a config file.
+    - Implement Haineko::Milter and Haineko::Milter::Example.
+
+0.0.2   Tue, 16 Jul 2013 05:22:22 +0900 (JST)
+    - GET method support has been removed. Haineko only receive email data via 
+      POST method and as a JSON format. 
+      Thanks to @nekokak.
+    - As follow as possible ``perl style'': indent style has been changed from 
+      8 width tab to 4 space characters and position of left curly brace ``{'' 
+      for beginning each block and subroutine is the end of a line. 
+      Thanks to @songmu.
+
+0.0.1   Sat, 13 Jul 2013 05:22:22 +0900 (JST)
+    - First release for my presentation at Kyoto.pm 05 Tech Talks.
+

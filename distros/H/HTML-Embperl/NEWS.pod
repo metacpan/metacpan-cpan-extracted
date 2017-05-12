@@ -1,0 +1,216 @@
+
+=head1 News for HTML::Embperl
+
+=over 4
+
+=item * 29. Mar 2001
+
+Embperl 2.0b2 released. The main news are the support for interactive
+debuggers and the possibility to use different syntaxes. 
+
+ftp://ftp.dev.ecos.de/pub/perl/embperl/HTML-Embperl-2.0b2.tar.gz
+
+=item * 25. Mar 2001
+
+My talk from the 3. German Perl-Workshop (http://www.perlworkshop.de)
+is available at http://www.ecos.de/ep/pod/conf/ApCon2001.Embperl.zip .
+It also contains a good introduction to the new features in Embperl 2.0 . 
+
+=item * 1. Mar 2001
+
+I will give a talk on the ApacheCon 2001 (http://www.apachecon.com/) about 
+"Embperl - Building dynamic Websites with Perl" 
+
+=item * 13. Feb 2001
+
+Embperl 1.3.1 released 
+
+=item * 12. Feb 2001
+
+New tutorial from Neil Gunton for EmbperlObject is available online. 
+Also now the full documentation of DBIx::Recordset is available online 
+and a new section about Tips & Tricks. Everybody is welcome to 
+contribute their own Tips & Tricks!. See
+
+perldoc IntroEmbperlObject.pod
+perldoc TipsAndTricks.pod
+
+=item * 22. Dec 2000 
+
+After long time of talking, designing, developing, codeing and testing I am
+now happy to announce the first beta of Embperl 2.0. It has a totaly
+rewritten core and makes the way free for a lot of new possibilities...
+
+At the moment it's mainly a speed improvement and introduces caching of the
+(component) output. In the next releases I successively make the
+possibilities of this new architecture available. (see the readme below for
+some ideas what will happen).
+
+Since it's not yet ready for production use, it's only available from my ftp
+server at
+
+ftp://ftp.dev.ecos.de/pub/perl/embperl/HTML-Embperl-2.0b1.tar.gz
+
+
+=item * 4. Dec 2000 
+
+After nearly a year of beta test, the final 1.3.0 release is out. 
+Beside a lot of enhancements, EmbperlObject which allows you to
+build your web site out of small reusable objects 
+in a OO-style, is the main improvement since 1.2.1. 
+
+=item * 1. Dec 2000 
+
+The slides from my talk on the O'Reilly Open Source Software Convention are now available 
+at http://www.ecos.de/embperl/index.htm/ep/pod/oscon2000/index.html .
+
+=item * 15. Nov 2000 
+
+Embperl 1.3b7 released 
+
+=item * 18. Oct 2000 
+
+Embperl 1.3b6 released 
+
+=item * 20. Aug 2000 
+
+Embperl 1.3b5 released 
+
+=item * 17. July 2000 
+
+Embperl 1.3b4 released 
+
+=item * 22. Juni 2000
+
+On the O'Reilly Open Source Software Convention there is again a talk about Embperl
+Embperl - From Embedding Perl into HTML to Objects and XML
+
+http://www.oreillynet.com/pub/e_sess/863
+
+Slides are available at
+
+http://www.ecos.de/embperl/index.htm/ep/pod/oscon2000/index.html
+
+
+=item * 26. May 2000
+
+Embperl RPMs available  
+
+=item * 26. Apr 2000 
+
+Embperl 1.3b3 released 
+
+=item * 25. Apr 2000 
+
+Perlmonth starts a new article series about Embperl 
+
+http://www.perlmonth.com/index.html?issue=11
+
+=item * 16. Apr 2000 
+
+Added page about syntaxfiles for various editors  
+
+=item * 20. Mar 2000 
+
+Embperl now has it's own Mailinglist  
+
+=item * 13. Mar 2000 
+
+Tallyman is a free content management and shopping system based on Embperl  
+
+http://sourceforge.net/projects/tallyman/
+
+=item * 13. Mar 2000 
+
+Apache::iNcom is a free Web E-Commerce Application Framework based on Embperl.  
+
+http://indev.insu.com/iNcom/incom.html
+
+=item * 11. Feb 2000 
+
+Embperl 1.3b2 released. This release contains the new EmbperlObject which really 
+simplify building a website out of small reusable pieces 
+
+
+=item * 5. Jan 2000 
+
+Embperl 1.2.1 released 
+
+=item * 20. Dec 99 
+
+Added Introduction to DBIx::Recordset 
+
+=item * 4. Dec 99 
+
+Added Page with WorldWide Mirrors 
+
+=item * 17. Nov 99 
+
+Embperl 1.2.0 released 
+
+=item * 4. Nov 99 
+
+Embperl 1.2b11 released 
+
+=item * 7. Oct 99 
+
+Embperl 1.2b10 released 
+
+=item * 10. Sept 99 
+
+Embperl 1.2b9 released 
+
+=item * 10. Sept 99 
+
+Embperl 1.2b9 released 
+
+=item * 9. Sept 99 
+
+Embperl 1.2b8 released 
+
+=item * 8. Sept 99 
+
+German Embperl Website is online 
+
+=item * 30. Aug 99 
+
+Embperl 1.2b7 released 
+
+=item * 19. Aug 99 
+
+Embperl 1.2b6 released 
+
+=item * 12. Aug 99 
+
+Article in german Unix magazine iX 9/99 about Embperl and DBIx::Recordset 
+
+http://www.heise.de/ix/artikel/1999/09/137/
+
+=item * May/April/June 99 
+
+Perlmonth has a column about Embperl 
+
+http://www.perlmonth.com/columns/backend/server_setup.html?issue=1
+
+=item * 5. July 99 
+
+Embperl 1.2b5 released 
+
+=item * 1. July 99
+
+On the O'Reilly Open Source Software Convention there are two talks about Embperl
+Embperl and DBIx::Recordset -- How to Easily Build a Database Driven Web Site
+
+http://conferences.oreilly.com/apache/conf_desc.html#c13
+
+New Stuff: Embedding Perl 
+
+http://conferences.oreilly.com/perl3/conf_desc.html#p21
+
+=back
+
+
+ 
+ 
+ 
+

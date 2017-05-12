@@ -1,0 +1,7 @@
+192.168.1.20 - - [25/May/2001:00:04:32 +0100] "GET /idents/160x120/markets_report.jpg HTTP/1.1" 304 - "-" "Mozilla/4.0 (compatible; MSIE 5.01; Windows NT 5.0)"
+192.168.1.22 - - [25/May/2001:00:04:32 +0100] "GET /news/20010523/pics/lord_maclaurin.jpg HTTP/1.1" 200 8016 "http://www.itn.co.uk/sport.shtml" "Mozilla/4.0 (compatible; MSIE 5.0; Windows 98; DigExt)"
+192.168.1.20 - - [25/May/2001:00:04:32 +0100] "GET /Britain/brit20000120/012013.htm HTTP/1.0" 302 234 "http://random.yahoo.com/bin/ryl" "webcollage/1.65"
+192.168.1.22 - - [25/May/2001:00:04:32 +0100] "GET /news/20000902/pics/hooligans_sm.jpg HTTP/1.1" 304 - "http://www.itn.co.uk/news/20000902/britain/02hooligans.shtml" "Mozilla/4.0 (compatible; MSIE 5.5; Windows 98; BTinternet CD v7.0)"
+192.168.1.20 - - [25/May/2001:00:04:32 +0100] "GET /Britain/brit20000120/012013.htm HTTP/1.0" 302 234 "http://random.yahoo.com/bin/ryl" "webcollage/1.61"
+192.168.1.20 - - [25/May/2001:00:04:32 +0100] "GET /Britain/brit20000120/012013.htm HTTP/1.0" 302 234 "http://random.yahoo.com/bin/ryl" "webcollage/1.44"
+192.168.1.20 - - [25/May/2001:00:04:32 +0100] "GET /Britain/brit20000120/012013.htm HTTP/1.0" 302 234 "http://random.yahoo.com/bin/ryl" "Zyborg"

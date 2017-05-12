@@ -1,0 +1,83 @@
+
+=head1 NAME
+
+HTML::DOM::Element::TableCell - A Perl class for representing table cells in an HTML DOM tree
+
+=head1 VERSION
+
+Version 0.054
+
+=head1 SYNOPSIS
+
+  use HTML::DOM;
+  $doc = HTML::DOM->new;
+  $elem = $doc->createElement('td');
+  
+  $elem->vAlign('top'); # set attribute
+  $elem->align;         # get attribute
+  $elem->tagName;
+  # etc
+  
+=head1 DESCRIPTION
+
+This class implements 'td' and 'th' elements in an HTML::DOM 
+tree. 
+It 
+implements the HTMLTableCellElement DOM interface and inherits from 
+L<HTML::DOM::Element> (q.v.).
+
+=head1 METHODS
+
+In addition to those inherited from HTML::DOM::Element and its 
+superclasses, this class implements the following DOM methods:
+
+=over 4
+
+=item cellIndex
+
+Returns the index of this cell within its table row.
+
+=item abbr
+
+=item align
+
+=item axis
+
+=item bgColor
+
+=item ch
+
+=item chOff
+
+=item colSpan
+
+=item headers
+
+=item height
+
+=item noWrap
+
+=item rowSpan
+
+=item scope
+
+=item vAlign
+
+=item width
+
+Each of these returns the corresponding HTML attribute. (C<ch> and C<chOff>
+correspond to 'char' and 'charoff,' respectively.) If you pass an
+argument, it will become the new value of the attribute, and the old value
+will be returned.
+
+=back
+
+=head1 SEE ALSO
+
+L<HTML::DOM>
+
+L<HTML::DOM::Element>
+
+L<HTML::DOM::Element::Table>
+
+L<HTML::DOM::Element::TR>

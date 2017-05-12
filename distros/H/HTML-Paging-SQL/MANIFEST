@@ -1,0 +1,6 @@
+lib/HTML/Paging/SQL.pm
+CHANGES
+MANIFEST
+README
+Makefile.PL
+test.pl

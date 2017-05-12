@@ -1,0 +1,37 @@
+<h3 id="test1">The first test</h3>
+<p>This is a very conformant
+<a href="/xhtml#def" title="eXtended HyperText Markup Language">XHTML</a>
+fragment. I hope you like it. I will be using it as test material
+during the development of this module. Actually not just <em>development</em>
+but subsequent <strong>support</strong> will both use this and variant 
+files for regression tests. This paragraph is intended to include all the
+features permitted in our restricted subset of HTML. Therefore I need to
+include an utterly gratuitous
+<img alt="a gratuitous image" height="100000" src="/image/gratuitous" title="a gratuitous image" width="100000" />
+at no extra cost.</p>
+<p>This second paragraph is likely to be a bit shorter. However I cannot
+entirely guarantee that. That is I might have to revise that prediction
+once the paragraph is complete.</p>
+<h3 id="test2">The big idea</h3>
+<p>Actually I am sorry to admit it, but I am running out of ideas for 
+test material. I mean I really needed a second header and so I had to 
+have yet another paragraph. I do apologize for any inconvenience reading 
+this material may have caused you.</p>
+<h3 id="lists">Lists</h3>
+<p>I am sure you hate lists, right? Well I apologize for presenting
+some lists but I do need to test some lists.</p>
+
+ <p>dog
+ felines ( wikipedia )
+ large lumbering <em>hippopotamus</em> and tasty <strong>pig</strong>
+
+</p><p>The following list comes from  wikipedia .</p>
+
+ <p>map out everything that is important by making a task list
+ create an oasis of time for one to control
+ say "no"
+ set priorities
+ don't drop everything
+ don't think a critical task will get done in spare time
+
+</p>

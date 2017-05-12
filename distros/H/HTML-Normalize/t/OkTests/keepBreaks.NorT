@@ -1,0 +1,4 @@
+-expelbr=0
+<a href="linkto"><br />link text<br /></a>
+<!--expected-->
+<a href="linkto"><br />link text<br /></a>

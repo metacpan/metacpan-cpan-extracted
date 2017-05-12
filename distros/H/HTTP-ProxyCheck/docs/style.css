@@ -1,0 +1,61 @@
+BODY {
+    background: white;
+    color: black;
+    font-family: arial,sans-serif;
+    font-size: medium;
+    margin: 0;
+    padding: 1ex;
+}
+
+CODE {
+    font-size: large;
+}
+
+A {
+    text-decoration: none;
+}
+
+A:link {
+    background: transparent;
+    color: #336699;
+}
+
+A:visited {
+    background: transparent;
+    color: #336699;
+}
+
+DT {
+    margin-top: 1em;
+}
+
+PRE {
+    background: #eeeeee;
+    border: 1px solid #888888;
+    color: black;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    white-space: pre;
+}
+
+H1 {
+    background: transparent;
+    color: #336699;
+    font-size: large;
+}
+
+H2      {
+    background: transparent;
+    color: #336699;
+    font-size: large;
+}
+
+H3     {
+    background: transparent;
+    color: #336699;
+    font-size: medium;
+}
+
+LI {
+    line-height: 1.2em;
+}

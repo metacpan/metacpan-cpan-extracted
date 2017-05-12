@@ -1,0 +1,83 @@
+Revision history for Perl extension HTTP::Request::Form.
+
+0.1  Fri Feb 13 11:49:30 1998
+	- original version; created by h2xs 1.18
+
+0.2  Wed Jul 15 10:46:00 1998
+	- line-endings were in DOS-format. That's the result if you think
+	  "oh, just hack this up on the dos prompt". Dang. Sorry.
+	- corrected and tested the installation
+	- streamlined the documentation
+
+0.3  Mon Aug 31 09:51:00 1998
+	- methods can be uppercase or lowercase (this was a problem with the
+	  new LWP)
+	- archivename now in standard format
+
+0.4  Mon Sep 28 11:10:44 CEST 1998
+	- better example in the Synopsis (this one actually works!)
+	- bugfixes in the handling of GET (this didn't work before)
+
+0.5  Thu Aug 19 14:02:13 MET DST 1999
+	Several user-reported bug-fixes and some extensions:
+	- fixed synopsis (missing ";")
+	- handle reset buttons identically to submit buttons
+	- debug now shows the expanded URL and not the given link
+	- support for textarea fields
+	- special support for radio buttons (they are now handled in the
+	  same way as selections and only one value is submitted to the
+	  server on press(...))
+	- special support for checkboxes (only checkboxes with defined
+	  value are submitted to the server, undefined ones are left
+	  out)
+	- support for image buttons
+	- support for HTML 4.0 button tags (they are handled identically
+	  to their input equivalents)
+	- when the form-tag doesn't have a method attribute, GET is assumed
+
+0.6  Thu Mar  2 19:23:54 CET 2000
+	Some extensions that I needed myself:
+	- added support for input field type "file"
+	- added a fix to change all field-types to lowercase
+	- added support for the referer header
+
+0.7  Thu Mar  2 21:14:03 CET 2000
+	Added some user-requested features
+	- added a sample for yahoo that uses an anonymous press
+	- changed the servername in the altavista example
+	- added a diagnostic check when pressing a button, that the
+	  button is really defined
+	- added better support for checkboxes. See the is_checkbox and
+	  the checkbox_* functions
+	- added support for (x,y)-coordinates when pressing image buttons
+
+0.8  Mon Dec 18 09:57:00 CET 2000
+	Some bugfixes and some extensions:
+	- textarea should now work in both forms. Before there was either
+	  a problem with textareas that included some default text, or
+	  with empty textareas. Now Form.pm does look wether the contents
+	  of a textarea is able to perform as_HTML and only uses it if
+	  it is able to do it. Should fix some longstanding problems with
+	  textareas.
+	- ex/yahoo.pl wasn't in the MANIFEST
+	- added a simple test procedure that just checks if it can be loaded
+
+0.9  Thu Feb 9 19:43:00 CET 2001
+	Some bugfixes and some extensions by Sean M. Burke:
+	- ISINDEX is supported
+	- a new constructor new_many is created that parses all forms of
+	  a HTML file so you don't have to manually extract links any more.
+	  This constructor handles stray form elements outside of forms.
+	- the name of form elements is cached and can be queried
+
+0.95  Fri Feb 10 08:01:00 CET 2001
+	Some bugfixes from Sean M. Burke:
+	- textarea was still broken in new_many, now fixed.
+	- iteration over self->content || [], not self->content alone
+	  (that one could be undef)
+
+0.951 Thu Sep 13 10:19:00 CET 2001
+	One small bugfix by Michael Kablitz
+	- textarea-handling was broken and needed double $ because of
+	  references. Damn typos. Funny thing: nobody else mentioned it.
+	  Half a year with a broken package :-)

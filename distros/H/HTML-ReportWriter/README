@@ -1,0 +1,39 @@
+HTML/ReportWriter
+===============================================
+
+This module provides a simple OO interface to generating pageable,
+sortable tabular HTML reports from a database.
+
+Currently, the module supports MySQL, PostgreSQL and SQLite.
+If you'd like to see it work with another DBMS, please submit
+a patch containing the necessary get_limit and get_sort functions.
+
+It comes with a default template that allows for quick HTML
+generation without any script or file-level dependencies.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   DBI, CGI, List::MoreUtils, POSIX
+
+It is highly recommended that you install the following modules in order
+to use the full feature-set of the ReportWriter:
+
+   Template, Spreadsheet::SimpleExcel
+
+COPYRIGHT AND LICENSE
+
+This module is released under the same license as Perl itself.
+
+Copyright (C) 2004 Shane Allen <opiate@gmail.com>
+

@@ -1,0 +1,16 @@
+<%args>
+$reln
+$sit   => undef
+$inst  => undef
+$index => undef
+%property => ()
+</%args>\
+\[ {\it predication}\\ 
+RELN  & \textbf{<% $reln %>}\\ 
+<% defined $sit   ? "SIT   & {\\it \$s_{$sit}\$}\\\\\n" : '' %>\
+<% defined $inst  ? "INST  & {\\it $inst}\\\\\n" : '' %>\
+<% defined $index ? "INDEX & $index\\\\\n" : '' %>\
+% while( my( $key, $val ) = each %property ){
+<% uc $key %> & <% $val %>\\ 
+% }
+\]

@@ -1,0 +1,64 @@
+[TPL include='header.inc']
+
+    [TPL IF this = 'now']
+        time is now
+    [TPL ELSIF this = 'then']
+        then
+    [TPL ENDIF]
+    
+<br><br><br>
+
+	[TPL IF hour < '12'] 
+        Good Morning 
+    [TPL ELSIF hour >= '18']  
+        Good Evening 
+    [TPL ELSE] 
+        Good Afternoon 
+    [TPL ENDIF]
+    
+	<br>It is now: [TPL variable='time']
+    <br><br>
+<table border="1" bordercolor="#CCCCCC" cellspacing="0" cellpadding="4">
+<tr>
+    <td>name [<a href="test.cgi?sort=countries-name">sort</a>]</td>
+    <td>population [<a href="test.cgi?sort=population-ASC">ASC</a> | <a href="test.cgi?sort=population-DESC">DESC</a>]</td>
+    <td>currency [<a href="test.cgi?sort=currency">sort</a>]</td>
+    <td>capital [<a href="test.cgi?sort=capital">sort</a>]</td>
+    <td>area [<a href="test.cgi?sort=area">sort</a>]</td>
+    <td>languages</td>
+</tr>
+[TPL LOOP name='countries']
+<tr bgcolor="[TPL array='bgcolor']">
+    <td>[TPL array='name']</td>
+    <td>[TPL array='population']</td>
+    <td>[TPL array='currency']</td>
+    <td>[TPL array='capital']</td>
+    <td align="right">
+        [TPL array='area'] Km<sup>2</sup>
+        [TPL LOOP IF area > '700000']
+            <br>(Huge!)
+        [TPL LOOP ELSIF area > '300000']
+            <br>(medium)
+        [TPL LOOP ELSE]
+            <br> Normal
+        [TPL LOOP ENDIF]
+    </td>
+    <td>
+    [TPL LOOP name='languages']
+        [TPL array='name'], 
+    [TPL LOOP END]
+    </td>
+</tr>
+[TPL LOOP END]
+</table>
+
+[TPL OPTION name='outer']
+    outer option
+    [TPL OPTION name='inner']
+        inner option
+    [TPL OPTION END]
+[TPL OPTION END]
+
+
+</body>
+</html>

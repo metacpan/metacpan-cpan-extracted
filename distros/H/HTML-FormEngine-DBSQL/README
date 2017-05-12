@@ -1,0 +1,65 @@
+HTML::FormEngine::DBSQL version 1.01
+====================================
+
+DBSQL.pm is a exentsion of HTML::FormEngine, that means it inherits
+all functionality from HTML::FormEngine and adds some new features.
+
+In web development form data is mostly used to update a database. For
+example most guestbooks or any similar webapplications store the
+entered data in a database. Often very large forms are needed,
+e.g. when the user should provide his personal data to subscribe to an
+certain service.
+
+In most cases a SQL database is used. If you don't now anything about
+SQL databases or you're not using such things, this module will hardly
+help you. But if you do, you'll know that every record, that you want
+to store in a certain SQL database table, has to have certain fields
+and these fields must contain data of an certain type (datatype).  So
+the tables structure already defines how a form that wants to add data
+to this table might look like (in case that you don't want to process
+the whole data before adding it to the table).
+
+DBSQL.pm reads out the tables structure and creates a form definition
+for HTML::FormEngine. It also helps you in communicating with the
+database (e.g. functions for automatically inserting and updating are
+provided).
+
+NOTE: Due to a consequent redesign FormEngine::DBSQL 1.0 is not
+compatible to older versions. Please read the MIGRATING file (which
+you find in the distribution near to this file) for help on migrating
+your old scripts to FormEngine::DBSQL >=1.0.
+
+Please see the POD for additional information.
+
+INSTALLATION
+
+To install this module, type:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+If you need gettext support, copy the content of the locale directory
+to your systems locale directory, you have to overwrite the file that
+is already there from HTML::FormEngine.  If your locale directory
+isn't /usr/share/locale, you have to adopt the path through the skins
+constructor.
+
+DEPENDENCIES
+
+- Carp 1.01
+- Hash::Merge 0.07 by Michael K. Neylon
+- Locale::gettext 1.01 by Phillip Vandry
+- Digest::MD5 2.24 by Gisle Aas
+- Clone 0.13 by Ray Finch
+- DBI 1.42 by the DBI developers
+- HTML::FormEngine 1.0 by Moritz Sinn
+
+COPYRIGHT AND LICENCE
+
+(c) 2003-2004 Moritz Sinn
+
+This module is free software.  You can redistribute it and/or modify
+it  under the same terms of the GNU GENERAL PUBLIC LICENSE (see
+COPYING).

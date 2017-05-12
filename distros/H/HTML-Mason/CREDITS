@@ -1,0 +1,156 @@
+Mason was created by Jonathan Swartz over several years at CMP Media.
+
+The main development team shifts over time, as with most open source
+projects. However, at the time of writing, most development is done by
+Dave Rolsky and Jonathan Swartz.
+
+Other contributors, most recent first:
+
+(Summer '01)
+
+John Williams (no relation) helped implement a number of new features
+for what became Mason 1.10, including buffer objects and component
+calls with content.
+
+(July '01)
+
+Matthew Lewinski created the design for the second overhaul of Mason
+HQ.
+
+(November '00)
+
+Dave Rolsky was the first new member to the development team since
+Mason's inception. Before joining Dave revamped the parser module,
+answered numerous queries on the user's list and initiated discussions
+on Mason's future.
+
+Ken Williams has submitted a variety of code cleanups/speedups and
+hosted the first mailing list archive at the math forum.
+
+Michael Dorman, Ken Miller and Ken Williams currently administer the
+mailing lists.
+
+Thanks to Hank Leininger and the folks at MARC for their excellent
+mail archive interface, on which all of Mason's lists are archived.
+
+(July '99)
+
+Matt Jalbert lent his artistic flair to the Mason HQ web site design.
+
+(February '99)
+
+Patrick Kane was an early Mason adopter providing useful feedback from
+the beginning.  He acted briefly as FAQ maintainer and contributed the
+first session-related examples. Patrick currently hosts the Mason site
+and core development server.
+
+Kirrily 'Skud' Robert started the first Mason mailing list and hosted
+it at netizen for over a year.
+
+(October '98)
+
+The original idea for Mason was inspired by the component system used
+by NetGuide Live at CMP Media in 1996.  HTML++ lives on!
+
+Gady Costeff formulated the need for a better component-based web
+engine and blessed us with a creative, open-minded environment.
+
+Tom Smith protected our core development team from hostile forces,
+kept calm during the storms, and was (and continues to be) a great
+ally of the Mason open source initiative.
+
+Thanks to Debra Robinson and CMP management for generously supporting
+the Mason and Content Management open source releases.
+
+Chris Dobosz helped design the predecessor to Mason (Scribe) and
+implemented the predecessor to Content Management system.  He had the
+first non-CMP production web site to use Mason, Mojam.com.
+
+Dennis Watson also helped design Scribe and was a never-ending source
+of Perl and Oracle wisdom.
+
+Kurt Hurtado helped convert Scribe to Mason and created the CD-ME
+example.
+
+Mark Schmick wrote all of the original Mason documentation and helped
+greatly in getting the first release out the door.  He also created
+the Mason Content Management system.
+
+The Internet technology team at CMP was supportive and patient with me
+as I brought down the systems with my periodic Mason "improvements".
+
+-----
+
+Besides those mentioned above, the following people have contributed
+suggestions or patches, as listed in the Changes file:
+
+John Arnold
+Alexei V. Barantsev
+Oleg Bartunov
+Vadim Belman
+John Beppu
+Jeremy Blain
+Manuel Capinha
+Paolo Campanella
+Benoit Caron
+Sean Cazzell
+Nicholas Clark
+Caleb Crome
+Joe Edmonds
+Ewan Edwards
+Pascal Eeftinck
+Joe Frisbie
+Jon Frisby
+Radu Greab
+Philip Gwyn
+Eric Hammond
+Gordon Henriksen
+Mark A. Hershberger
+Tom Higgins
+Brian Holmes
+Matt Hoskins
+Tom Hughes
+Tom Hukins
+Chris Hutchinson
+Pelle Johnsen
+Bojan Jovanovic
+Ilmari Karonen
+Dirk Koopman
+Fen Lebalme
+Austin S. Lin
+John Michael Mars
+Ilya Martynov
+Brent Michalski
+Louis-David Mitterrand
+Jim Mortko
+Chuck O'Donnell
+Ivan E. Panchenko
+Rob Perelman
+Carl Raiha
+Alex Robinson
+Aaron Ross
+Adam Roth
+Paul Schilling
+Randal Schwartz
+Lee Semel
+Denis Shaposhnikov
+Michael Shulman
+John Siracusa
+Barrie Slaymaker
+Scott Straley
+Adam Stubbs
+Jeremy Taylor
+Gert Thiel
+John Tobey
+Renzo Toma
+Doug Treder
+Benjamin John Turner
+Jindra Vavruska
+Jesse Vincent
+Kees Vonk
+Viacheslav Voytovich
+Rafael Weinstein
+David Wheeler
+Mikhail Zabaluev
+
+Thanks y'all!

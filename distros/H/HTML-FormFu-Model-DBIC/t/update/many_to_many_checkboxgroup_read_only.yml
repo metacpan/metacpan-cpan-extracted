@@ -1,0 +1,18 @@
+---
+auto_fieldset: 1
+
+elements:
+  - type: Hidden
+    name: id
+
+  - type: Text
+    name: name
+
+  - type: Checkboxgroup
+    name: bands
+    model_config:
+      read_only: 1
+      options_from_model: 0
+
+  - type: Submit
+    name: submit

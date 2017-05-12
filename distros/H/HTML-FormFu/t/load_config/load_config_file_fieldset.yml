@@ -1,0 +1,18 @@
+---
+legend: Jimi
+elements:
+ - type: Text
+   name: age
+   comment: x
+   label: Age
+   constraints:
+   - type: Integer
+     message: No integer.
+   - type: Integer
+     message: This too!
+ - type: Text
+   name: name
+   label: Name
+ - type: Hidden
+   name: ok
+   value: OK 

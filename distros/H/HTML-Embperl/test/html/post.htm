@@ -1,0 +1,18 @@
+<html>
+<head>
+<title>Tests for Embperl - Show posted data</title>
+</head>
+
+
+<body>
+
+[- @ks = sort keys %fdat -]
+
+<table>
+	<tr>
+		<td>[+ $ks[$row] +]</td><td>Length=[+ length ($fdat{$ks[$row] || ''}) +]</td><td>[+ $fdat{$ks[$row] || ''} +]</td>
+	</tr>
+</table>
+
+</body>
+</html>

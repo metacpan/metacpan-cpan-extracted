@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                HTML-StripScripts-LibXML
+version:             0.12
+abstract:            XSS filter -  outputs a LibXML Document or DocumentFragment
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    HTML::StripScripts::Parser:    1.02
+    Test::More:                    0
+    XML::LibXML:                   1.58
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Clinton Gormley <clint@traveljury.com>

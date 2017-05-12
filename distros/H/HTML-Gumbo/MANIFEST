@@ -1,0 +1,11 @@
+Build.PL
+Changes
+lib/HTML/Gumbo.pm
+lib/HTML/Gumbo.xs
+MANIFEST			This list of files
+META.json
+META.yml
+t/callback.t
+t/string.t
+t/tree.t
+LICENSE

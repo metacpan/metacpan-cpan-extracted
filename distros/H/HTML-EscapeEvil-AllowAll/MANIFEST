@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01_use.t
+t/02_isa.t
+t/03_method.t
+t/04_allow_all.t
+AllowAll.pm
+META.yml                                 Module meta-data (added by MakeMaker)

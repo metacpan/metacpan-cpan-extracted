@@ -1,0 +1,46 @@
+@prefix dbug: <http://ontologi.es/doap-bugs#> .
+@prefix dc: <http://purl.org/dc/terms/> .
+@prefix doap: <http://usefulinc.com/ns/doap#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix prio: <http://purl.org/NET/cpan-uri/rt/priority/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rt: <http://purl.org/NET/cpan-uri/rt/ticket/> .
+@prefix status: <http://purl.org/NET/cpan-uri/rt/status/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+_:r1341521548r0 a foaf:Agent ;
+	foaf:mbox <mailto:mail@tobyinkster.co.uk> .
+_:r1341521548r1 a foaf:Agent ;
+	foaf:nick "TOBYINK" .
+_:r1341521548r2 a foaf:Agent ;
+	foaf:mbox <mailto:fschlich@zedat.fu-berlin.de> .
+_:r1341521548r3 a foaf:Agent ;
+	foaf:mbox <mailto:FWIE@cpan.org> .
+<http://purl.org/NET/cpan-uri/dist/HTML-Microformats/project> dbug:issue <http://purl.org/NET/cpan-uri/rt/ticket/72967>, <http://purl.org/NET/cpan-uri/rt/ticket/73336>, <http://purl.org/NET/cpan-uri/rt/ticket/76623> .
+<http://purl.org/NET/cpan-uri/rt/ticket/72967> dbug:assignee _:r1341521548r1 ;
+	dbug:id "72967"^^xsd:string ;
+	dbug:page <https://rt.cpan.org/Ticket/Display.html?id=72967> ;
+	dbug:reporter _:r1341521548r0 ;
+	dbug:status status:resolved ;
+	dc:created "2011-12-05T13:18:59"^^xsd:dateTime ;
+	dc:modified "2011-12-07T06:53:18"^^xsd:dateTime ;
+	a dbug:Issue ;
+	rdfs:label "needs update, remove sig check, etc" .
+<http://purl.org/NET/cpan-uri/rt/ticket/73336> dbug:assignee _:r1341521548r1 ;
+	dbug:id "73336"^^xsd:string ;
+	dbug:page <https://rt.cpan.org/Ticket/Display.html?id=73336> ;
+	dbug:reporter _:r1341521548r2 ;
+	dbug:status status:resolved ;
+	dc:created "2011-12-17T22:29:24"^^xsd:dateTime ;
+	dc:modified "2012-07-05T21:21:48"^^xsd:dateTime ;
+	a dbug:Issue ;
+	rdfs:label "[PATCH] pod errors" .
+<http://purl.org/NET/cpan-uri/rt/ticket/76623> dbug:assignee _:r1341521548r1 ;
+	dbug:id "76623"^^xsd:string ;
+	dbug:page <https://rt.cpan.org/Ticket/Display.html?id=76623> ;
+	dbug:reporter _:r1341521548r3 ;
+	dbug:status status:resolved ;
+	dc:created "2012-04-17T11:46:35"^^xsd:dateTime ;
+	dc:modified "2012-07-05T21:28:38"^^xsd:dateTime ;
+	a dbug:Issue ;
+	rdfs:label "Wrong URL reference" .

@@ -1,0 +1,44 @@
+NAME
+    HTML::FormatText::WithLinks - HTML to text conversion with links as
+    footnotes
+
+SYNOPSIS
+        use HTML::FormatText::WithLinks;
+
+        my $f = HTML::FormatText::WithLinks->new();
+
+        my $html = qq(
+        <html>
+        <body>
+        <p>
+            Some html with a <a href="http://example.com/">link</a>
+        </p>
+        </body>
+        </html>
+        );
+
+        my $text = $f->parse($html);
+
+        print $text;
+
+        # results in something like
+
+        Some html with a [1]link
+
+        1. http://example.com/
+
+INSTALLATION
+
+Either
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+or
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install

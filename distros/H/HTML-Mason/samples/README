@@ -1,0 +1,17 @@
+Component Samples
+=================
+
+dump-request	Dumps request parameters, great for debugging.
+		Converted from Apache documentation.
+
+show-env	Dumps current environment.
+
+
+Note: If you are seeing the source of the above pages as plain text,
+it is because the server is assigning the content type "plain/text"
+instead of "text/html".  The easiest way to remedy this is to put
+
+    DefaultType  text/html
+
+in your configuration file, and make sure mod_mime_magic is not active.
+This will allow filenames with no extensions to be handled by Mason.

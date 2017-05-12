@@ -1,0 +1,162 @@
+=head1 NAME
+
+HTTP::Server::VirtualHost::LocalHost - default virtual host
+
+=head1 INHERITANCE
+
+ HTTP::Server::VirtualHost::LocalHost
+   is a HTTP::Server::VirtualHost
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+This default virtual host is created automatically when no virtual host
+has been registered when the daemon starts.  The fun is that everyone is
+able to contact it with C<< http://localhost:8080 >> (or what-ever your
+run-port is) without further configuration.
+
+=head1 METHODS
+
+=head2 Constructors
+
+HTTP::Server::VirtualHost::LocalHost-E<gt>B<new>(OPTIONS|HASH-of-OPTIONS)
+
+=over 4
+
+ Option        --Defined in     --Default
+ aliases         HTTP::Server::VirtualHost  []
+ directories     HTTP::Server::VirtualHost  <see text>
+ directory_list  HTTP::Server::VirtualHost  <false>
+ documents       HTTP::Server::VirtualHost  <undef>
+ handlers        HTTP::Server::VirtualHost  {}
+ index_file      HTTP::Server::VirtualHost  ['index.html', 'index.htm']
+ name            HTTP::Server::VirtualHost  'localhost'
+ rewrite         HTTP::Server::VirtualHost  <undef>
+ user_dirs       HTTP::Server::VirtualHost  <see text>
+
+. aliases => HOSTNAME|ARRAY-of-HOSTNAMES
+
+. directories => OBJECT|HASH|ARRAY
+
+. directory_list => BOOLEAN
+
+. documents => DIRECTORY
+
+. handlers => HASH
+
+. index_file => STRING|ARRAY
+
+. name => HOSTNAME
+
+. rewrite => CODE
+
+. user_dirs => undef|OBJECT|HASH
+
+=back
+
+=head2 Attributes
+
+$obj-E<gt>B<aliases>
+
+=over 4
+
+See L<HTTP::Server::VirtualHost/"Attributes">
+
+=back
+
+$obj-E<gt>B<name>
+
+=over 4
+
+See L<HTTP::Server::VirtualHost/"Attributes">
+
+=back
+
+=head2 Handler
+
+$obj-E<gt>B<handleRequest>(CONNECTION, REQUEST)
+
+=over 4
+
+See L<HTTP::Server::VirtualHost/"Handler">
+
+=back
+
+$obj-E<gt>B<requestForMe>(URI)
+
+=over 4
+
+See L<HTTP::Server::VirtualHost/"Handler">
+
+=back
+
+$obj-E<gt>B<showDirectory>(CONNECTION, REQUEST, PATH, LIST)
+
+=over 4
+
+See L<HTTP::Server::VirtualHost/"Handler">
+
+=back
+
+=head2 Basic daemon actions
+
+$obj-E<gt>B<allow>(CLIENT, SESSION, REQUEST, URI)
+
+=over 4
+
+See L<HTTP::Server::VirtualHost/"Basic daemon actions">
+
+=back
+
+$obj-E<gt>B<rewrite>(URI)
+
+=over 4
+
+See L<HTTP::Server::VirtualHost/"Basic daemon actions">
+
+=back
+
+=head2 Directories
+
+$obj-E<gt>B<addDirectory>(OBJECT|OPTIONS)
+
+=over 4
+
+See L<HTTP::Server::VirtualHost/"Directories">
+
+=back
+
+$obj-E<gt>B<directoryOf>(PATH)
+
+=over 4
+
+See L<HTTP::Server::VirtualHost/"Directories">
+
+=back
+
+$obj-E<gt>B<filename>(URI)
+
+=over 4
+
+See L<HTTP::Server::VirtualHost/"Directories">
+
+=back
+
+=head2 Access permissions
+
+=head1 DETAILS
+
+=head1 SEE ALSO
+
+This module is part of HTTP-Server-Multiplex distribution version 0.11,
+built on October 01, 2008. Website: F<http://perl.overmeer.net/httpd-multiplex/>
+
+=head1 LICENSE
+
+Copyrights 2008 by Mark Overmeer. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

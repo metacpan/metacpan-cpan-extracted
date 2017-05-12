@@ -1,0 +1,58 @@
+HPUX/SDUX version 0.03
+======================
+
+HPUX::SDUX is a Perl module that will help you manage non-standard
+Perl modules via SD-UX on HP-UX.  As such, it is useful only for
+HP-UX users.
+
+INSTALLATION
+
+To put HPUX::SDUX under SD-UX control:
+	make -f sdux_make
+
+This makefile invokes 'swpackage' and 'swinstall', so you need certain
+privileges to use it.
+
+To do simple CPAN-style install:
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+DEPENDENCIES
+
+All modules that HPUX::SDUX uses are standard as of Perl 5.6.1, perhaps
+earlier.  If you find this to be incorrect, please contact the author.
+
+BASIC USAGE
+
+Download a module from CPAN, expand the tarball, move to the expanded
+directory, and then
+	perl -MHPUX::SDUX -e wmf
+	make
+	make test
+	make depot
+	swinstall -s $PWD/sdux -x write_remote_files=true
+
+KNOWN ISSUES
+
+HPUX::SDUX has been tested only with very simple CPAN modules.  It may not
+work correctly with complicated ones, such as those that require XS
+extensions and those that have complex Makefile.PL's.
+
+The resulting depot in ./sdux is not distributable.  
+
+HPUX::SDUX depends on ExtUtils::MakeMaker, which is reported to be replaced
+by Module::Build.  Module::Build compatibility should be added in a future
+release of HPUX::SDUX.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Hiro Asari
+
+The most up-to-date version of this module is available at 
+	http://www.asari.net/perl.
+
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

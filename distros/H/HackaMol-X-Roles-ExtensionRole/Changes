@@ -1,0 +1,15 @@
+Revision history for HackaMol-X-Roles-ExtensionRole
+
+0.013     2016-04-08 23:01:13-04:00 America/Indiana/Indianapolis
+    * add predicate has_mol 
+    * mol attribute is now rw
+
+0.011     2015-06-05 10:18:07-04:00 America/Indiana/Indianapolis
+    * first release
+
+0.00_3    2014-05-01 14:13:52EDT-0400 America/New_York
+    * simplified map_input map_output
+
+0.00_2    2014-04-30 15:31:16EDT-0400 America/New_York
+    * removed build_command and made it required.  
+

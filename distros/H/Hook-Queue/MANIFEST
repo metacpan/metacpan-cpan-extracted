@@ -1,0 +1,9 @@
+Changes
+README
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Build.PL
+Makefile.PL
+lib/Hook/Queue.pm
+t/queue.t

@@ -1,0 +1,798 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<TITLE>HTML::Merge::App::Repository</TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 1.1.0  (Linux)">
+	<META NAME="CREATED" CONTENT="20041127;23153600">
+	<META NAME="CHANGEDBY" CONTENT="עודד רזניק">
+	<META NAME="CHANGED" CONTENT="20041205;22253300">
+	<META NAME="DESCRIPTION" CONTENT="RAZ Information Systems LTD">
+	<STYLE>
+	<!--
+		@page { size: 21.59cm 27.94cm; margin-left: 3.18cm; margin-right: 3.18cm; margin-top: 2.54cm; margin-bottom: 2.54cm }
+		P { margin-bottom: 0.21cm }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="" DIR="LTR">
+<P ALIGN=CENTER STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=4><SPAN LANG="en-US"><U><B>HTML::Merge::App::Repository
+– A sample of a complex application</B></U></SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=2 STYLE="font-size: 10pt"><SPAN LANG="en-US">&copy;
+RAZ Information Systems Ltd 1999 – 2004. Version 3.46</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+<BR>
+</P>
+<OL>
+	<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm; text-decoration: none"><FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US"><B>Overview</B></SPAN></FONT></FONT></P>
+	<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+	<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">The
+	goal of the HTML::Merge::App::Repository is to provide a form
+	builder multi language design environment. In order to accomplish
+	that all form design meta data are stored in a databases where each
+	record represent a form element. A rendering engine has been created
+	to render the form from the database. The project is lacking a GUI
+	interface for populating the form meta data database.</SPAN></FONT></FONT></P>
+	<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+	</P>
+	<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm; text-decoration: none"><FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US"><B>Database</B></SPAN></FONT></FONT></P>
+	<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">the
+	entire project is stored on tables residing on HTML::Merge system
+	database (tested only on SQLite and MySQL). The table creation and
+	initing code  reside in the class HTML::Merge::App::Repository and
+	it is being utilize in the mergecreateinstance script.
+	HTML::Merge::App::Repository also relay on definition stored on the
+	tbl table populated by the 'private/sql/tbl.dat' pipe delimited
+	file. This actually break the possibility of treating the Repository
+	as an add-on module since it taints the mergecreateinstance and
+	relay on default data from the basic system tbl table, but this
+	design flows can easily be repaired.</SPAN></FONT></P>
+	<P ALIGN=LEFT STYLE="margin-bottom: 0cm"></P>
+</OL>
+<OL START=2>
+	<OL>
+		<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm; text-decoration: none">
+		 <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US"><B>tbl –
+		master table</B></SPAN></FONT></P>
+	</OL>
+</OL>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm">     <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">	FLDTYP
+- contains all form elements types.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">		example
+of a text field:</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">		tbl:
+“FLDTYP”</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">		langug_code:
+“” - nothing, not language dependent information.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">		code:
+“1” - unique identifier.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">		name:
+“TEXT_FIELD” - widget description.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">		number:
+“1” - A boolean value indicating if this object requires a text
+label </SPAN></FONT>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">				to
+accompany the widget.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">		note:
+“&lt;input type=text #fldstatus# value=``#value#`` size=``#size#``
+maxlength=``#maxlength#`` @STDATR@ @STDEVNT@ #field_data#&gt;|0|” -
+this data is what the rendering engine will use to create the HTML
+result. </SPAN></FONT>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">		realm_id:
+“” - Not used.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">	MACROS
+– contain macros to support the FLDTYP methodology.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">		example
+of standard events macro:</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">		tbl:
+“MACROS”</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">		langug_code:
+“” - nothing, not language dependent information.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">		code:
+“1” - unique identifier.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">		name:
+“STDATR” - widget description.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">		number:
+“0” - Not used.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">		note:
+“name=``#field_name#`` id=``#field_name#`` style=``width: #width#;
+height: #height#; background-color: #background#`` #field_data#” -
+this data is what the rendering engine will use to create the HTML
+result. </SPAN></FONT>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">		realm_id:
+“” - Not used.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">	FLDSTS
+– Look up for the HTML::Merge::App::Repository field status.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">		
+     contains: 1 – normal</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">			
+         2 – read only</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">		
+                     3 – disabled</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">			
+         4 - hidden </SPAN></FONT>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">	FLDMTX
+– A per language matrix for describing field status.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">	LANGUG
+– All supported languages and definitions: ISO code, direction.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">	STATUS
+– Record state.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">		
+      contains: 0 – deleted</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">			
+          1 – blocked</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">				2
+- active</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">	FRMSTR
+– Form strings, holds form elements basic text according to the
+selected 		 	system language. For instance the grid 'alt' text for
+sorting or the 				record left text at the grid bottom.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<OL START=2>
+	<OL START=2>
+		<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm"> <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US"><B>templates_t
+		– System templates catalog</B></SPAN></FONT></P>
+		<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+		<FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">id:
+		Unique identifier.</SPAN></FONT></P>
+		<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+		<FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">templatename:
+		The template file name relative to the template directory.</SPAN></FONT></P>
+		<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+		<FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">description:
+		The template description.</SPAN></FONT></P>
+		<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">tag:
+		extra data associated with the template – never been used.</SPAN></FONT></P>
+		<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">epitaph:
+		Mark deleted templates.</SPAN></FONT></P>
+		<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">instance_id:
+		the instance id from instance_t table indicating which merge
+		instance this template belong to (in case of a multi instance
+		environment)</SPAN></FONT></P>
+	</OL>
+</OL>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<OL START=2>
+	<OL START=3>
+		<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm"> <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US"><B>instance_t
+		– HTML::Merge instances catalog</B></SPAN></FONT></P>
+	</OL>
+</OL>
+<OL START=2>
+	<OL START=2>
+		<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+		<FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">id:
+		Unique identifier.</SPAN></FONT></P>
+		<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+		<FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">instancename:
+		The instance merge.conf file path.</SPAN></FONT></P>
+		<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+		<FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">description:
+		The instance description.</SPAN></FONT></P>
+		<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">tag:
+		extra data associated with the instance – never been used.</SPAN></FONT></P>
+		<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">epitaph:
+		Mark deleted instances.</SPAN></FONT></P>
+		<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium"></P>
+		<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">this
+		table is managed automatically by merge.</SPAN></FONT></P>
+	</OL>
+</OL>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<OL START=2>
+	<OL START=4>
+		<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm; text-decoration: none">
+		 <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US"><B>repository_t
+		– forms meta repository</B></SPAN></FONT></P>
+		<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+		<FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">rid:
+		Unique identifier.</SPAN></FONT></P>
+	</OL>
+</OL>
+<OL START=2>
+	<OL START=3>
+		<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+		<FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">template_id:
+		The specific template</SPAN></FONT></P>
+		<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+		<FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">field_parent_repository_id:
+		Mark an rid value of a repository entry which it's					   
+		template_id equals zero. All of the row data is 					    inherited
+		to the non filled fields </SPAN></FONT>
+		</P>
+		<OL>
+			<OL>
+				<OL>
+					<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+					       <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">in
+					the current row.</SPAN></FONT></P>
+				</OL>
+			</OL>
+		</OL>
+		<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+		<FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">field_name:
+		The description of the field – will be used as the HTML field id
+					   and name value.</SPAN></FONT></P>
+		<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+		<FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">fldtyp_code:
+		The tbl table FLDTYP code field value.</SPAN></FONT></P>
+		<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+		<FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">note: A
+		place for comments.</SPAN></FONT></P>
+		<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+		<FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">src: Used
+		for widgets which have an external data source – image, combo box
+			 and data grid.</SPAN></FONT></P>
+	</OL>
+</OL>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+<FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">	    
+value: Used for all widget which their HTML code contain a value key.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+  <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">	    
+size: Used for all widget which their HTML code contain a size key
+and also 			  for the data grid to indicate number of visible rows.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+  <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">	    
+maxlength: Used for all widget which their HTML code contain a
+maxlength 				 key and also for the data grid to indicate the maximum
+number of 			 rows fetched in a single request.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+  <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">	    
+width: Used by all widgets – style sheet width.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+  <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">	    
+height: Used by all widgets – style sheet width.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><SPAN STYLE="text-decoration: none">
+ <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US"><SPAN STYLE="font-weight: medium">	
+    class: Used by all widgets – the widget encapsulating DIV </SPAN></SPAN>class
+key;</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+  <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">	    
+fldsts_code: The tbl table field status code.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+  <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">	    
+realm_id: field creation permissions based on HTML::Merge security
+module.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+  <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">	    
+arrangement: The drawing and placement order of the widgets in the
+form </SPAN></FONT>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+<FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">		   	   (z
+order).</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+  <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">	    
+onBlur: The content of the HTML result onBlur key.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+  <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">	    
+onClick: The content of the HTML result onClick key.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+  <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">	    
+onDblClick: The content of the HTML result onDblClick key.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+  <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">	    
+onChange: The content of the HTML result onChange key.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+  <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">	    
+onMouseOver: The content of the HTML result onMouseOver key.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+  <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">	    
+onMouseMove The content of the HTML result onMouseMove key.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; text-decoration: none">  <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US"><SPAN STYLE="font-weight: medium">	
+    onMouseOut The content of the HTML result onMouseOut key.</SPAN><B>	</B></SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+<FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">	    
+field_data: Extra data to the HTML result which can't be created
+using the 				other fields. for example giving class data to the
+widget and no the 			encapsulating DIV.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+  <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">	    
+pos_x: The screen x position in pixels.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+  <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">	    
+pos_y: The screen y position in pixels.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+  <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">	    
+background: The widget background in HTML keyword or RGB notation
+				  (#xxyyzz).</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+  <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">	    
+border: The encapsulating DIV border in CSS notation. </SPAN></FONT>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+<FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">		     
+example: “1px solid black”.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+  <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">	    
+pos_delta: The length delta in pixels of the length between the
+widget and it's 			lablel.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+  <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">	    
+status_code: The tbl table code indicating the record state only
+value of “2” 				   will be drawn.</SPAN></FONT></P>
+<OL START=2>
+	<OL START=5>
+		<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm">
+		<FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US"><B>repository_language_matrix
+		– widgets multi lingual captions</B></SPAN></FONT></P>
+		<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+		<FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">rid:
+		Unique identifier.</SPAN></FONT></P>
+		<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+		<FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">repository_id:
+		The repository_t rid value.</SPAN></FONT></P>
+	</OL>
+</OL>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+  <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">	    
+langug_code: The tbl table language code value.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+  <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">	    
+caption: The form caption.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; text-decoration: none"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; text-decoration: none"><BR>
+</P>
+<OL START=3>
+	<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm; text-decoration: none"><FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US"><B>The
+	repository rendering engine</B></SPAN></FONT></FONT></P>
+	<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US"><SPAN STYLE="font-weight: medium"><SPAN STYLE="text-decoration: none"><FONT SIZE=3>The
+	rend</FONT></SPAN></SPAN>ering engine is the template
+	“Repository/build_form.inc” which is included in pages usually
+	Between a form element. The engine then: </SPAN></FONT>
+	</P>
+	<OL>
+		<OL>
+			<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">Load
+			all macros from the tbl table.  </SPAN></FONT>
+			</P>
+			<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">Invokes
+			the template “Repository/repository_query.inc” - which loads
+			the specific template data from the database repository_t + the
+			field type definition from the tbl table + all user_realm data
+			curtsey's of the “Reposiotry/get_user_realms.inc” template.</SPAN></FONT></P>
+			<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">Replace
+			all “@”  encapsulated fields in the field definition with the
+			corresponding macro. For example @STATR@.</SPAN></FONT></P>
+			<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">Replace
+			all “#”  encapsulated fields in the field definition with
+			specific database </SPAN></FONT>
+			</P>
+			<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">value.
+			For example #class# will be replaced with the current record value
+			of the class field.</SPAN></FONT></P>
+			<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">Replace
+			all “``” with '“' to avoid placement problems.</SPAN></FONT></P>
+			<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">Replace
+			all '`' with “'” to avoid placement problems.</SPAN></FONT></P>
+			<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">Run
+			the result through Merge so Merge tag like RINCLUDE will be
+			translated.</SPAN></FONT></P>
+			<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">Create
+			two DIV elements: [field_name]_fld – which holds the widget,
+			[field_name]_cap which holds the label if needed by the widget.</SPAN></FONT></P>
+			<P ALIGN=LEFT STYLE="margin-bottom: 0cm"></P>
+		</OL>
+	</OL>
+</OL>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm">      <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">Since
+there is a sub form widget which let us encapsulate other forms
+inside the 	    </SPAN></FONT>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm">      <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">current
+form, The engine handle a stack for saving all different query
+engines that will    </SPAN></FONT>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm">      <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">be
+used in the page creation so no query data will interfere with top
+level queries.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm">      <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">This
+is done using the “Repository/repush.inc” and 
+“Repsoiotry/repop.inc”  		          </SPAN></FONT>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm">       <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">templates.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm">       
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm">       <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">the
+engine uses the following RVAR as init variants:</SPAN></FONT></P>
+<OL>
+	<OL>
+		<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">dir
+		– The direction of the rendering. Option are “rtl” ( right to
+		left) or “ltr” (left to right)</SPAN></FONT></P>
+		<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">__DEBUG__
+		- Paints border on all encapsulating DIV element.</SPAN></FONT></P>
+		<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">repository_query_engine
+		– Specify your own query engine.</SPAN></FONT></P>
+		<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">repository_template
+		– Specify the template to be rendered. Default: the current
+		template.</SPAN></FONT></P>
+	</OL>
+</OL>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm">      
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<OL START=4>
+	<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm; text-decoration: none"><FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US"><B>The
+	repository widgets – The widget list based on the tbl table</B></SPAN></FONT></FONT></P>
+	<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+	<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">1.
+	TEXT_FIELD – HTML standard text field + corresponding caption.</SPAN></FONT></FONT></P>
+	<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+	<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">2.
+	LABEL – A &lt;pre&gt;&lt;/pre&gt; encapsulated text.</SPAN></FONT></FONT></P>
+	<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+	<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">3.
+	COMBO BOX - HTML standard combo box + corresponding caption. The src
+	field		    		 is used to specify a template which will create
+	(usually by 				 querying the db) the &lt;option&gt; section of the
+	select. Source 				 templates are usually marked with “bnd” file
+	extension.</SPAN></FONT></FONT></P>
+	<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+	<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">4.
+	IMAGE -  HTML standard image.</SPAN></FONT></FONT></P>
+	<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+	<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">5.
+	BUTTON - HTML standard button.</SPAN></FONT></FONT></P>
+	<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">6.
+	CHECK_BOX <SPAN STYLE="font-weight: medium"><SPAN STYLE="text-decoration: none"><FONT SIZE=3>-
+	HTML standard check box + corresponding caption.</FONT></SPAN></SPAN></SPAN></FONT></P>
+	<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+	<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">7.
+	RADIO - HTML standard radio button + corresponding caption.</SPAN></FONT></FONT></P>
+	<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+	<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">8.
+	PASSWORD - HTML standard password field + corresponding caption.</SPAN></FONT></FONT></P>
+	<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+	<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">9.
+	RECTANGLE – Used to create boxes using the border and background
+	attribute.</SPAN></FONT></FONT></P>
+	<OL>
+		<OL>
+			<OL>
+				<OL>
+					<OL>
+						<OL>
+							<OL>
+								<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+								<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">Perfect
+								for grouping elements. </SPAN></FONT></FONT>
+								</P>
+							</OL>
+						</OL>
+					</OL>
+				</OL>
+			</OL>
+		</OL>
+	</OL>
+	<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+	<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">10.
+	GRID – A complex combination of HTML::Merge and Javascript that
+	create a data   		 grid based on an SQL query. The grid builds an
+	array of objects called  		 	 “grid_array” from the query and
+	render itself based  on that array. </SPAN></FONT></FONT>
+	</P>
+	<OL>
+		<OL>
+			<OL>
+				<OL>
+					<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+					 <FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">The
+					grid also support triggering of events an automatic ordering of
+					the </SPAN></FONT></FONT>
+					</P>
+					<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+					  <FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">grid
+					 by manipulating the SQL query.</SPAN></FONT></FONT></P>
+					<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+					     
+					</P>
+					<P ALIGN=LEFT STYLE="margin-bottom: 0cm; text-decoration: none">
+					<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US"><SPAN STYLE="font-weight: medium">parameters:</SPAN><B>
+					</B><SPAN STYLE="font-weight: medium">size – number of shown
+					records.</SPAN></SPAN></FONT></FONT></P>
+					<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+					                     <FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">maxlength
+					– maximum number of record to fetch in a request.</SPAN></FONT></FONT></P>
+					<OL>
+						<OL>
+							<OL>
+								<OL>
+									<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+									  <FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">src
+									– The template which needs to contain an RVAR called     </SPAN></FONT></FONT>
+									</P>
+									<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+									           “<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">qrid_query”
+									which holds the SQL query that the grid    </SPAN></FONT></FONT>
+									</P>
+									<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+									            <FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">is
+									bases upon.</SPAN></FONT></FONT></P>
+									<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+									  <FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">width
+									– specify a fix width.</SPAN></FONT></FONT></P>
+									<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+									  <FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">height
+									– override the size definition and specify the grid 	 
+											height in pixels.</SPAN></FONT></FONT></P>
+									<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+									   <FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">field_data
+									– is used to specify in a key=value;key=vale ...</SPAN></FONT></FONT></P>
+									<OL>
+										<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+										                   <FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">notation
+										special parameters to the grid.</SPAN></FONT></FONT></P>
+										<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+										                   <FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">uid:
+										the specific name of the field in the sql 		              
+										query which is used as a unique row    			    identifier.</SPAN></FONT></FONT></P>
+										<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><SPAN STYLE="text-decoration: none">
+										                  <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US"><SPAN STYLE="font-weight: medium"><FONT SIZE=3>quote_data:</FONT></SPAN></SPAN>
+										boolean if true all function  			               returning
+										field data will return the 		               data quoted
+										with semicolons.</SPAN></FONT></P>
+										<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">background
+										– The background color of the field titles.</SPAN></FONT></P>
+									</OL>
+								</OL>
+							</OL>
+						</OL>
+					</OL>
+				</OL>
+			</OL>
+		</OL>
+	</OL>
+</OL>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; text-decoration: none"><FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US"><B>		
+</B><SPAN STYLE="font-weight: medium">events:</SPAN><B> </B><SPAN STYLE="font-weight: medium">On
+all supported events you can specify a pointer to a Javascript 				 
+function (the name without the parameters section). when this  </SPAN></SPAN></FONT></FONT>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+                                      <FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">function
+ will be invoked the grid will send an object to the 				   function
+containing three elements: </SPAN></FONT></FONT>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">			
+  uid: The referred row uid database val.</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">			
+  rowid: The physical position of the row in the grid.</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">			
+  flag: Boolean actioned or not actioned. 		</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+<BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">			
+  onDblClick –  Triggered when double clicking the grid row (also
+					    referred to as zooming) the function will be 						   
+invoked.</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">			
+  onChange – Triggered when pressing on the side control for 					 
+	highlighting a row.</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">			
+  onClick – Triggered when pressing on the title for sorting (never
+				        been tested).</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">		
+API: The grid is a class. The automatic created instance is named as
+			          follows: “c_[field<U>_</U>name]_grid” the following
+methods where design </SPAN></FONT></FONT>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">		
+         to help the programmer interact with the grid.</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">		
+         Refresh(line_offset): Redraw the grid based on the
+“grid_array” 			          		starting from a specify line_offset
+First line is 1.</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">		
+         Rebuild(extra,obj,suppress_header_rebuild,line_offset,form):</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">				Rebuild
+the grid from the database.</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">				extra
+– Name of a template the should be run before the 						fetching
+the data from the database. Usually used for  					doing Insert or
+Update.</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">				obj
+– An object  containing element which should be 					        
+passed to the extra template.</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">				suppress_header_rebuild
+– don't redraw the fields title line.</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">				
+line_offset – Same as in the refresh method.</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">				
+form – name of a form which can be used to transfer the 						 data
+to the server through. if not defined a url string 					 will be
+created, and the location.href method will be 					 used (limited to
+255 charecters).</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">			GetMarkedUid()
+- Return all highlighted rows “uid” as an array.</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US"><SPAN STYLE="font-weight: medium"><SPAN STYLE="text-decoration: none"><FONT SIZE=3>			GetMarkedUidAsStr()
+-  Return all highlighted rows ”uid” as a 							     coma
+delimited</FONT></SPAN></SPAN> row.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">			G<SPAN STYLE="font-weight: medium"><SPAN STYLE="text-decoration: none"><FONT SIZE=3>etMarkedRowid()
+- Return all highlighted rows “rowid” as an 							array.</FONT></SPAN></SPAN></SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US"><SPAN STYLE="font-weight: medium"><SPAN STYLE="text-decoration: none"><FONT SIZE=3>			GetMarkedUidAsStr()
+-  Return all highlighted rows ”rowid” as a 							     coma
+delimited</FONT></SPAN></SPAN> row.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">			<SPAN STYLE="font-weight: medium"><SPAN STYLE="text-decoration: none"><FONT SIZE=3>GetZoomedUid()
+- Return zoomed row “uid”.</FONT></SPAN></SPAN></SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">			GetZoomedRowid()
+- Return zoomed row “rowid”.</SPAN></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US"><SPAN STYLE="font-weight: medium"><SPAN STYLE="text-decoration: none"><FONT SIZE=3>			SetHeaderCaptionByID</FONT></SPAN></SPAN>(id)
+– Change the title caption.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">			<SPAN STYLE="font-weight: medium"><SPAN STYLE="text-decoration: none"><FONT SIZE=3>SetHeaderCaptionByFieldName</FONT></SPAN></SPAN>(field_name)
+– Change the title 										      caption.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US"><SPAN STYLE="font-weight: medium"><SPAN STYLE="text-decoration: none"><FONT SIZE=3>			GetHeaderCaptionByID</FONT></SPAN></SPAN>(id)
+– Get the title caption.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US"><SPAN STYLE="font-weight: medium"><SPAN STYLE="text-decoration: none"><FONT SIZE=3>			GetHeaderCaptionByFieldName</FONT></SPAN></SPAN>(field_name)
+– Get the title 										      caption.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">			GetFieldByRowAndCol(row,col)
+– Get the grid data of a specific 								cell.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">			DelColumnByID(id)
+– Dells an entire column based on the id.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">			DelColumnByFieldName(field_name)
+– Dells an entire column 									       based on the column
+									       name.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">			GetZoomColor()
+- Get the grid zoom color (the row color when 						      double
+clicking).</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">			SetZoomColor(color)
+– Set the zoom color automatically.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">			GetCursorColor()
+- Get the grid cursor color.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">			SetCursorColor(color)
+- Set the grid cursor color.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">		</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">			</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">			</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">		Stracture:
+“Repository/Grid/grid.inc” - Basic CSS and constructor initting.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">			
+    “Repository/Grid/grid_build_data.inc” - Do the actual build
+of 			      	the “grid_array” from the database.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">			
+    “Repository/Grid/grid_refresh.html” - The request to the
+					server triggered when sorting or calling the Rebuild
+					method.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">			
+    “javascript/Repository/Grid/grid.js” - The grid class.</SPAN></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; text-decoration: none"><FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US"><B>			
+         </B></SPAN></FONT></FONT>
+</P>
+<OL START=11>
+	<OL>
+		<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+		<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">11.
+		SUMBIT - HTML standard submit button.</SPAN></FONT></FONT></P>
+		<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+		<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">12.
+		LINE  - Create horizontal and vertical lines based on the 					    
+		pos_x,pos_y,width,height attributes</SPAN></FONT></FONT></P>
+		<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+		<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">13.
+		TEXT – Just plain text.</SPAN></FONT></FONT></P>
+	</OL>
+	<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+	     <FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">14.
+	DATE_BOX – Not finished should open our standard date box
+	automatically.</SPAN></FONT></FONT></P>
+	<OL>
+		<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+		<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">15.
+		SUB_FORM – creates a sub form which runs inside the template
+		specified in t	     the “src” element. </SPAN></FONT></FONT>
+		</P>
+	</OL>
+</OL>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+<BR>
+</P>
+<OL START=5>
+	<P ALIGN=LEFT STYLE="margin-bottom: 0cm; text-decoration: none"><FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US"><B>The
+	road ahead</B></SPAN></FONT></FONT></P>
+	<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+	<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">-
+	Add a delta_y column.</SPAN></FONT></FONT></P>
+	<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+	<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">-
+	Change the grid “grid_arr” to a faster created storage type.</SPAN></FONT></FONT></P>
+	<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+	<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">-
+	 Render all CSS attribute as a style sheet (INPUT:my_field). that
+	way the code will     </SPAN></FONT></FONT>
+	</P>
+	<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+	   <FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">be
+	more consistent and more important it will be possible not to render
+	empty    </SPAN></FONT></FONT>
+	</P>
+	<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+	   <FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">attributes.
+	and cut down the result HTML size dramatically.</SPAN></FONT></FONT></P>
+	<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+	<FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US">-
+	rewrite “build_form.inc” when HTML::Merge performance issues
+	will be solved.</SPAN></FONT></FONT></P>
+	<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US"><SPAN STYLE="font-weight: medium"><SPAN STYLE="text-decoration: none"><FONT SIZE=3>-
+	render the result of the build_form operation </FONT></SPAN></SPAN>so
+	that it won't have to be rendered from   </SPAN></FONT>
+	</P>
+	<P ALIGN=LEFT STYLE="margin-bottom: 0cm">  <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">the
+	database everytime. Could be done inside HTML::Merge (compilation
+	time) Or   </SPAN></FONT>
+	</P>
+	<P ALIGN=LEFT STYLE="margin-bottom: 0cm">  <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">outside
+	HTML::Merge by dynamically creating templates for the rendered
+	result Or   </SPAN></FONT>
+	</P>
+	<P ALIGN=LEFT STYLE="margin-bottom: 0cm">  <FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US">even
+	compiled templates in the cache directory.</SPAN></FONT></P>
+</OL>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><BR>
+</P>
+<OL START=5>
+	<P ALIGN=LEFT STYLE="margin-bottom: 0cm; text-decoration: none"><FONT FACE="Nimbus Roman No9 L, serif"><FONT SIZE=3><SPAN LANG="en-US"><B>-
+	</B><SPAN STYLE="font-weight: medium">The
+	HTML::Merge::App::Repository is licensed under the same terms Perl
+	is licensed.</SPAN></SPAN></FONT></FONT></P>
+	<P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-weight: medium; text-decoration: none">
+	</P>
+	<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Nimbus Roman No9 L, serif"><SPAN LANG="en-US"><SPAN STYLE="font-weight: medium"><SPAN STYLE="text-decoration: none"><FONT SIZE=3>-
+	The copyright licensing notice below applies to this text.
+	<BR></FONT></SPAN></SPAN>Permission is granted to copy, distribute,
+	and/or modify this document under the terms of the GNU Free
+	Documentation License, Version 1.1 or any later version published by
+	the Free Software Foundation. </SPAN></FONT>
+	</P>
+</OL>
+</BODY>
+</HTML>

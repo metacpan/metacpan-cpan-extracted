@@ -1,0 +1,10 @@
+lib/HTML/TableLayout/Component.pm
+lib/HTML/TableLayout/Form.pm
+lib/HTML/TableLayout/Symbols.pm
+lib/HTML/TableLayout/TLCore.pm
+lib/HTML/TableLayout.pm
+RELEASE_NOTES
+Component_Heirarchy.txt
+Makefile.PL
+MANIFEST
+README

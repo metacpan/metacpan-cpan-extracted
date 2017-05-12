@@ -1,0 +1,37 @@
+Revision history for HPC-Runner-PBS
+
+0.12  2016-04-12 12:06:18 GST
+    Added nodes_count for parallel jobs
+
+0.11  2016-03-29 13:46:44 GST
+    - added BUILD for initializing logs
+
+0.10  2016-03-29 10:02:55 GST
+    - Small changes to logging
+
+0.09  2016-02-21 11:45:28 GST
+    - Refactored to extend HPC::Runner::Scheduler instead of HPC::Runner::Slurm
+
+0.08  2015-11-29 15:20:48 GST
+    - Bug fix for dependencies
+
+0.07  2015-11-18 09:34:43 GST
+    - Bug fix for custom template file
+
+0.06  2015-11-16 10:08:06 GST
+    - Bug fix for not assigning a default queue
+
+0.05  2015-11-16 09:51:01 GST
+    - Changing default queue to null
+
+0.04  2015-11-11 12:14:22 GST
+    - Made a few changes to the template
+
+0.03  2015-11-11 10:54:22 GST
+    - Added walltime to template file
+
+0.02  2015-11-10 13:56:46 GST
+    - Added in more support for changing job parameters in script
+
+0.01  2015-11-10 12:43:49 GST
+        - Initial release

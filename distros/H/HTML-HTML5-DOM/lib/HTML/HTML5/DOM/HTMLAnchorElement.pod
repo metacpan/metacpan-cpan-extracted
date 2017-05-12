@@ -1,0 +1,148 @@
+=head1 NAME
+
+HTML::HTML5::DOM::HTMLAnchorElement - implementation of the HTMLAnchorElement interface of the HTML DOM
+
+=head1 DESCRIPTION
+
+HTML::HTML5::DOM::HTMLAnchorElement is an implementation of the HTMLAnchorElement interface of the HTML DOM. See L<HTML::HTML5::DOM> for a list of the conventions that have been used when translating the DOM to Perl.
+
+=head2 HTML Elements
+
+This class applies to the following HTML elements.
+
+=over
+
+=item * C<< {http://www.w3.org/1999/xhtml}a >>
+
+=back
+
+=head2 Inheritance
+
+HTML::HTML5::DOM::HTMLAnchorElement inherits methods from the following Perl classes.
+
+=over
+
+=item * L<HTML::HTML5::DOM::HTMLElement>
+
+=item * L<XML::LibXML::Augment::Element>
+
+=item * L<XML::LibXML::Augment::Node>
+
+=item * L<XML::LibXML::Element>
+
+=item * L<XML::LibXML::Node>
+
+=item * L<XML::LibXML::QuerySelector>
+
+=item * L<HTML::HTML5::DOMutil::FancyISA>
+
+=back
+
+=head2 Additional Methods
+
+As well as its inherited methods, this class provides the following methods.
+
+=over
+
+=item * C<< hash >>
+
+A shortcut for C<< $elem->href->fragment >>. (Does not act as a setter.)
+
+=item * C<< host >>
+
+A shortcut for C<< $elem->href->host_port >>. (Does not act as a setter.)
+
+=item * C<< hostname >>
+
+A shortcut for C<< $elem->href->host >>. (Does not act as a setter.)
+
+=item * C<< href >>
+
+Called with no arguments, is a shortcut for C<< $elem->getAttribute("href") >> but as a blessed L<URI> object. Called with a defined argument, acts as C<setAttribute>. Called with undef as an argument, acts as C<removeAttribute>.
+
+=item * C<< hreflang >>
+
+Called with no arguments, is a shortcut for C<< $elem->getAttribute("hreflang") >>. Called with a defined argument, acts as C<setAttribute>. Called with undef as an argument, acts as C<removeAttribute>.
+
+=item * C<< media >>
+
+Called with no arguments, is a shortcut for C<< $elem->getAttribute("media") >>. Called with a defined argument, acts as C<setAttribute>. Called with undef as an argument, acts as C<removeAttribute>.
+
+=item * C<< name >>
+
+Called with no arguments, is a shortcut for C<< $elem->getAttribute("name") >>. Called with a defined argument, acts as C<setAttribute>. Called with undef as an argument, acts as C<removeAttribute>.
+
+=item * C<< p5_follow >>
+
+Shortcut for C<< HTTP::Request->new(GET => $elem->href) >>
+
+=item * C<< pathname >>
+
+A shortcut for C<< $elem->href->path >>. (Does not act as a setter.)
+
+=item * C<< port >>
+
+A shortcut for C<< $elem->href->port >>. (Does not act as a setter.)
+
+=item * C<< protocol >>
+
+A shortcut for C<< $elem->href->scheme >>. (Does not act as a setter.)
+
+=item * C<< rel >>
+
+Called with no arguments, is a shortcut for C<< $elem->getAttribute("rel") >>. Called with a defined argument, acts as C<setAttribute>. Called with undef as an argument, acts as C<removeAttribute>.
+
+=item * C<< relList >>
+
+Splits C<< $elem->getAttribute("rel") >> into a list on whitespace.
+
+=item * C<< rev >>
+
+Called with no arguments, is a shortcut for C<< $elem->getAttribute("rev") >>. Called with a defined argument, acts as C<setAttribute>. Called with undef as an argument, acts as C<removeAttribute>.
+
+=item * C<< revList >>
+
+Splits C<< $elem->getAttribute("rev") >> into a list on whitespace.
+
+=item * C<< search >>
+
+A shortcut for C<< $elem->href->query >>. (Does not act as a setter.)
+
+=item * C<< target >>
+
+Called with no arguments, is a shortcut for C<< $elem->getAttribute("target") >>. Called with a defined argument, acts as C<setAttribute>. Called with undef as an argument, acts as C<removeAttribute>.
+
+=item * C<< text >>
+
+Called with no arguments, acts as an alias for C<< $elem->textContent >>. Called with an arguments, sets the content for the element. Any existing content will be overwritten. If multiple arguments are provided, they'll be joined using "\n".
+
+=item * C<< type >>
+
+Called with no arguments, is a shortcut for C<< $elem->getAttribute("type") >>. Called with a defined argument, acts as C<setAttribute>. Called with undef as an argument, acts as C<removeAttribute>.
+
+=back
+
+=head1 BUGS
+
+L<http://rt.cpan.org/Dist/Display.html?Queue=HTML-HTML5-DOM>.
+
+=head1 SEE ALSO
+
+L<HTML::HTML5::DOM>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2012, 2014 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+
+

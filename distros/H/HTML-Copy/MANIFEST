@@ -1,0 +1,9 @@
+Changes
+README
+MANIFEST
+Makefile.PL
+lib/HTML/Copy.pm
+bin/htmlcopy
+t/00-load.t
+t/parse.t
+META.yml                                 Module meta-data (added by MakeMaker)

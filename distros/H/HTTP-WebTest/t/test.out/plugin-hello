@@ -1,0 +1,24 @@
+Failed  Succeeded  Test Name
+   1          1    *** no name ***
+   2          0    *** no name ***
+
+
+Test Name: N/A
+URL: http://http.web.test/hello
+
+  STATUS CODE CHECK
+    Expected '200' and got: 404 Not Found                        FAIL
+  ARE WE WELCOME?
+    Hello, World!                                                SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/no-hello
+
+  STATUS CODE CHECK
+    Expected '200' and got: 404 Not Found                        FAIL
+  ARE WE WELCOME?
+    Hello, World!                                                FAIL
+
+
+Total web tests failed: 3  succeeded: 1

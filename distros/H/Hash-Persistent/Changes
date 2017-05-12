@@ -1,0 +1,11 @@
+Revision history for Hash-Persistent
+
+1.02    2015-05-05
+    * close filehandle before renaming
+    (thanks to github:gpoul for the patch, see https://github.com/berekuk/Hash-Persistent/pull/1)
+
+1.01    2013-05-03
+    * bugfix: reference JSON instead of JSON::XS
+
+1.00    2013-04-16
+    * First opensource release.

@@ -1,0 +1,115 @@
+<tmpl_include name="header.html">
+<div class="filter_settings">
+Group by:&nbsp;&nbsp;<a href="./panoptes.pl?rm=collective&groupby=service">Service</a>&nbsp;&nbsp;<a href="./panoptes.pl?rm=collective&groupby=host">Host</a>
+</div>
+<br />
+
+<div >
+
+<table border="0" cellspacing="0" cellpadding="5" style="border: 1px solid black;">
+	<tr>
+		<th>Host</th>
+		<th>Version</th>
+		<th>PID</th>
+		<th>Uptime</th>
+		<th>Max Workers</th>
+		<th>Status</th>
+		<th>Options</th>
+	</tr>
+<tmpl_loop collective>
+	<tmpl_if hosts>
+	<tr>
+		<th colspan="7" class="class" align="left"> <a href="./panoptes.pl?rm=ctrl_panel#<tmpl_var service_class>" class="service_header"><tmpl_var service_class></a> </th>
+	</tr>
+	<tmpl_loop hosts>
+	<tr class="job_header">
+		<td class="data_text" align="left"><tmpl_var host></a></td>
+		<td class="data_text" align="center"><tmpl_var service_version></td>
+		<td class="data_text" align="center"><tmpl_var process_id></td>
+		<td class="data_text" style="text-align: right"><tmpl_var uptime></td>
+		<td class="data_text" align="center">
+			<form>
+				<input type="hidden" name="rm" value="ctrl_panel_mod">
+				<input type="hidden" name="return_to" value="collective">
+				<input type="hidden" name="groupby" value="service">
+				<input type="hidden" name="host" value="<tmpl_var host>">
+				<input type="hidden" name="worker_class" value="<tmpl_var service_class>">
+				<input type="hidden" name="param" value="MAX_WORKERS">
+				<input type="hidden" name="action" value="modify">
+				<input type="text" name="value" value="<tmpl_var max_workers>" size="3">
+				<input type="submit" value="Change">
+			</form>
+		</td>
+		<td class="data_text" style="text-align: center">
+			<tmpl_if HALTING>
+				HALTING
+			<tmpl_else>
+				<tmpl_if HOLDING>
+					HOLDING
+				<tmpl_else>
+					<tmpl_if OVERDRIVE>
+						OVERDRIVE
+					<tmpl_else>
+						Normal
+					</tmpl_if>
+				</tmpl_if>
+			</tmpl_if>
+		</td>
+		<td class="data_text">
+		<form method="post" action="./panoptes.pl" style="display: inline">
+				<input type="hidden" name="rm" value="ctrl_panel_mod">
+				<input type="hidden" name="return_to" value="collective">
+				<input type="hidden" name="groupby" value="service">
+				<input type="hidden" name="host" value="<tmpl_var host>">
+				<input type="hidden" name="worker_class" value="<tmpl_var service_class>">
+				<input type="hidden" name="param" value="HOLD">
+				<input type="hidden" name="action" value="modify">
+				<tmpl_if HOLDING>
+				<input type="hidden" name="value" value="0">
+				<input type="submit" value="UNHOLD jobs">
+				<tmpl_else>
+				<input type="hidden" name="value" value="1">
+				<input type="submit" value="HOLD jobs">
+				</tmpl_if>
+			</form><form method="post" action="./panoptes.pl" style="display: inline">
+				<input type="hidden" name="rm" value="ctrl_panel_mod">
+				<input type="hidden" name="return_to" value="collective">
+				<input type="hidden" name="groupby" value="service">
+				<input type="hidden" name="host" value="<tmpl_var host>">
+				<input type="hidden" name="worker_class" value="<tmpl_var service_class>">
+				<input type="hidden" name="param" value="OVERDRIVE">
+				<input type="hidden" name="action" value="modify">
+				<tmpl_if OVERDRIVE>
+				<input type="hidden" name="value" value="0">
+				<input type="submit" value="Normal mode">
+				<tmpl_else>
+				<input type="hidden" name="value" value="1">
+				<input type="submit" value="OVERDRIVE">
+				</tmpl_if>
+			</form><form method="post" action="./panoptes.pl" style="display: inline;">
+				<input type="hidden" name="rm" value="ctrl_panel_mod">
+				<input type="hidden" name="return_to" value="collective">
+				<input type="hidden" name="groupby" value="service">
+				<input type="hidden" name="host" value="<tmpl_var host>">
+				<input type="hidden" name="worker_class" value="<tmpl_var service_class>">
+				<input type="hidden" name="param" value="HALT">
+				<input type="hidden" name="value" value="1">
+				<tmpl_if HALTING>
+				<input type="submit" value="UNHALT service">
+				<input type="hidden" name="action" value="delete">
+				<tmpl_else>
+				<input type="submit" value="HALT service">
+				<input type="hidden" name="action" value="add">
+				</tmpl_if>
+			</form>
+		</td>
+	</tr>
+	</tmpl_loop>
+	</tmpl_if>
+</tmpl_loop>
+</table>
+
+</div>
+
+<tmpl_include name="footer.html">
+

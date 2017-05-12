@@ -1,0 +1,69 @@
+NAME
+    HTML::DisableForm - Manipulate disabled/readonly HTML Forms
+
+SYNOPSIS
+        use HTML::DisableForm;
+
+        my $df = new HTML::DisableForm;
+        my $output = $dif->disable_form(scalarref     => \$html);
+
+DESCRIPTION
+    This module automatically makes form controlls disable/readonly.
+
+METHODS
+  new
+    Creates a new HTML::DisableForm object
+
+      $df = new HTML::DisableForm
+
+  disable_form
+    Returns HTML with disabled forms. This method can take some type of
+    argument for a HTML document.
+
+      $output = $df->disable_form(scalarref => \$html);
+
+      $output = $df->disable_form(file => "/path/to/document.html");
+
+      $output = $df->disable_form(arrayref => \@html);
+
+    Specify readonly flag if you want to makes it readonly instead of
+    disable.
+
+      $output = $df->disable_form(arrayref => \@html);
+
+    Suppose you have multiple forms in a html and among them there is only
+    one form you want to disable, specify target.
+
+       $output = $df->disable_form(
+          scalarref => \$html,
+          target    => 'foo',
+       );
+
+    If there are some forms you want to ignore, specify their names as
+    ignore_forms.
+
+       $output = $df->disable_form(
+          scalarref    => \$html,
+          ignore_forms => [qw/foo bar/],
+       );
+
+    You can also ignore fields what you want.
+
+       $output = $df->disable_form(
+          scalarref    => \$html,
+          ignore_fields => [qw/name password/],
+       );
+
+  readonly_form
+    This method equals to "disable_form()" with a readonly flag.
+
+AUTHOR
+    Naoya Ito "<naoya@bloghackers.net>"
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2006, Naoya Ito "<naoya@bloghackers.net>". All rights
+    reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+

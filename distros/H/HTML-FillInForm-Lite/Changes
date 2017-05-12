@@ -1,0 +1,139 @@
+Revision history for Perl extension HTML::FillInForm::Lite.
+
+1.15 2016-08-21T11:33:30Z
+    - Remove tests with encoding.pm, which is now obsolete (#3, #6)
+    - Rquires Test::Requires as "test" prereqisites (#5, #7)
+
+1.14 2016-04-16T13:24:00Z
+    - Fix a bug that attribute name "data-name" overrode the "name" attribute(#4 by @mono0x)
+
+1.13 2013-04-24T10:19:51Z
+    - Drop support of perl 5.6.0
+    - Just modernize the code and dist
+
+1.12 2013-01-07 14:30:11
+    - Add CGI.pm to test_requires
+
+1.11 2012-12-05 10:18:38
+    - Resolve issue #2; allow HTML5-style attribute (tokuhirom)
+
+1.10 2012-06-25 20:01:26
+    - allow data-* attributes (github issue #1)
+
+1.09 Mon Jun 28 18:47:44 2010
+    - Add an exportable function fillinform()
+    - Make fill() accept string-like objects as sources
+
+1.08 Wed May 19 12:03:53 2010
+    - Re-support 5.6.0
+
+1.07 Thu Oct  1 13:34:01 2009
+    - Optimize regular expressions for utf8-flagged contents
+
+1.06 Wed Jul  8 14:08:23 2009
+    - update MANIFEST
+
+1.05 Tue Jul  7 18:03:07 2009
+    - fix a bug on undef in hash refs (thanks Chiba san)
+
+1.04 Sat May  2 15:39:35 2009
+    - not to add extra '/' to the end of <input> to be compatible with HTML 4
+
+1.03 Fri Oct 17 18:45:28 2008
+    - add 'layer' option for input PerlIO layers
+    - remove HTML::Entities dependency
+    - change HTML::FillInForm::Lite::Compat to warn incompatible options
+
+1.02 Sat Jul 19 15:50:41 2008
+    - add pod tests
+    - require 5.8.1 or later to make code simpler
+    - chaneg Makefile.PL to use Module::Install
+    - fix typo in pods
+
+1.01 Thu Apr 10 15:59:13 2008
+    - add "image" and "file" to default ignore_types
+
+1.00 Tue Mar  4 09:25:58 2008
+    - no big feature change
+    - internal cleanup
+    - fixed a problem of capital <OPTION> tags
+    - fixed documents
+    - add '=encoding' directive to Compat.pm
+
+0.10 Sun Mar  2 12:15:22 2008
+    - fixed version line in Compat.pm
+
+0.09 Sun Mar  2 11:37:55 2008
+    - improve inheritance compatibility
+        (now _get_param() is inheritable)
+    - add 'decode_entity' option
+    - add t/09decode_entity.t
+    - reform HTML::FillInForm::Lite::Compat
+    - add t/10compat.t
+    - remove 'ignore_fields' option because of its incompatibility
+
+0.08 Tue Feb 26 10:58:00 2008
+    - fixed a problem in processing 'select-one'
+    - add t/08select-extra.t
+    - add some tests
+    - re-skipped encoding tests if not defined &utf8::is_utf8
+    - add t/06encoding_sjis.t
+    - rename t/06fobj.t => t/07fobj.t
+
+0.07 Sat Feb 23 09:12:22  2008
+    - allow any object as form data
+        (the idea comes from Class::DBI::Plugin::Param)
+    - treat the utf8-flagged data better if perl >= 5.8.1
+        (the idea comes from HTML::FillInForm::ForceUTF8)
+    - remove 'ignore_types' option from the document,
+        because of its incompatibility.
+        it may be removed in the future version.
+    - add t/06fobj.t
+    - add utf8-flagged tests to t/05encoding.t
+    - add misc/demo.cgi for utf8 demonstration
+
+0.06 Thu Feb 21 19:56:55  2008
+    - fixed a bug of multi-fields
+    - fixed a bug of "target => 0"
+    - add several tests
+    - add misc/demo.cgi
+    - remove tokanizer tests
+    - a bit of optiomization
+
+0.05 Sun Feb 17 09:51:17  2008
+    - [IMPORTANT] fixed a bug of 'radio' fields
+        (now using 'checked' to check it, not 'selected')
+    - skip encoding test in 5.6.x
+    - changed 'disable_fields' to be ignored
+        because it seems meaningless in HTML::FillInForm
+        (at least as of version 2.0)
+
+0.04 Thu Feb 14 22:51:10  2008
+    - param() called always in list context
+    - fixed some tests to be success on 5.6.x
+    - add a few tests
+
+0.032 Wed Feb 13 18:26:35 2008
+    - no code changed
+    - fixed encoding in JA.pod from Shift_JIS to UTF-8
+
+0.031 Wed Feb 13 12:05:12 2008
+    - fixed NAME section in JA.pod to be indexed correctly
+
+0.03  Wed Feb 13 09:01:32 2008
+    - now the value undef of an option means "to be default"
+    - add "escape" option
+    - add JA.pod
+    - fixed typo in the pod
+
+0.02  Fri Feb  8 08:51:28 2008
+    - [IMPORTANT] fixed to html-escape when filling in textarea
+    - fixed not to incorrect html-unescape in checking values
+    - add tokenizer tests to t/00basic.t
+    - add LIMITATIONS section to the pod
+
+
+0.01  Sat Dec  1 20:18:47 2007
+    - original version; created by h2xs 1.23 with options
+        -AXPn HTML::FillInForm::Lite
+

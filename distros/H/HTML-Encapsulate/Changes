@@ -1,0 +1,17 @@
+Revision history for HTML-Encapsulate
+0.0.1  2009-10-05       Initial release.
+
+v0.3.0 - Fri Nov 13 11:55:21 2015
+	Fix test failures due to spurious EOLs at EOF, fixup dependencies
+
+
+0.02 - Mon Nov  2 23:55:39 2009
+	Removed an inadvertant Perl 5.9 regex feature "(*FAIL)"
+	in Build.PL, which stopped installation on pre-5.9 Perls.
+
+0.01 - Fri Oct 16 14:26:27 2009
+	Initial release. 
+	Basic working version, can deal with included stylesheets, unicode 
+	encoded content, included javascript. Moderately tested on real 
+	websites.  Generates relinked and tidied output HTML.
+

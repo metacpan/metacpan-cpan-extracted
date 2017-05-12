@@ -1,0 +1,14 @@
+Changes
+lib/HTML/String.pm
+lib/HTML/String/Overload.pm
+lib/HTML/String/TT.pm
+lib/HTML/String/TT/Directive.pm
+lib/HTML/String/Value.pm
+maint/Makefile.PL.include
+Makefile.PL
+MANIFEST
+t/simple.t
+xt/tt.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   README file (added by Distar)

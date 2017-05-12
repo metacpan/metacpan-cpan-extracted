@@ -1,0 +1,113 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use v5.16.0;
+package
+    natas15;
+our $VERSION = '0.003'; # VERSION
+# ABSTRACT: solve level 15 of overthewire.org's Natas server-side security war games
+
+use Hack::Natas::15;
+
+
+use Getopt::Long;
+my $opts = { version => 0 };
+GetOptions( $opts, 'version' );
+if ($opts->{version}) {
+    say __PACKAGE__ . ' version ' . (__PACKAGE__->VERSION // 'dev');
+    exit;
+}
+
+my $http_pass = shift || do {
+    require Term::ReadPassword;
+    Term::ReadPassword::read_password('Password for this level: ');
+};
+
+my $hack = Hack::Natas::15->new(http_pass => $http_pass);
+local $SIG{INT} = sub { printf "\rPassword so far: %s\n", $hack->password_so_far; exit 1 };
+$hack->run;
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+natas15 - solve level 15 of overthewire.org's Natas server-side security war games
+
+=head1 VERSION
+
+version 0.003
+
+=head1 SYNOPSIS
+
+B<natas15> [ password ]
+
+=head1 DESCRIPTION
+
+L<overthewire.org|http://www.overthewire.org/wargames/> has a series of war games.
+Natas is the server-side security challenge.
+
+Level 15 requires you to do blind SQL injection. Guessing each one-character
+slice of a 32-character password is tedious and prone to errors if done manually,
+so this script automates the process. You will be prompted interactively for the
+password to access this level. If you prefer to run noninteractively, you can
+give the password as the first argument on the command line, but note that the
+password will be visible to other users on the system.
+
+=head1 OPTIONS
+
+=over 4
+
+=item * --version
+
+Prints the version number and exits.
+
+=back
+
+=head1 NAME
+
+natas15 - solve level 15 of overthewire.org's Natas war games
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<natas16>
+
+=item * L<Hack::Natas>
+
+=back
+
+=head1 AVAILABILITY
+
+The project homepage is L<https://hashbang.ca/tag/natas>.
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit L<http://www.perl.com/CPAN/> to find a CPAN
+site near you, or see L<https://metacpan.org/module/Hack::Natas/>.
+
+=head1 SOURCE
+
+The development version is on github at L<http://github.com/doherty/Hack-Natas>
+and may be cloned from L<git://github.com/doherty/Hack-Natas.git>
+
+=head1 BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at L<https://github.com/doherty/Hack-Natas/issues>.
+
+=head1 AUTHOR
+
+Mike Doherty <doherty@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Mike Doherty.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

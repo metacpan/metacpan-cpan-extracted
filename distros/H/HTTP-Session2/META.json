@@ -1,0 +1,109 @@
+{
+   "abstract" : "HTTP session management",
+   "author" : [
+      "tokuhirom <tokuhirom@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.1.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTTP-Session2",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cookie::Baker" : "0",
+            "Crypt::CBC" : "0",
+            "Data::MessagePack" : "0",
+            "Digest::HMAC" : "0",
+            "Digest::SHA" : "0",
+            "Digest::SHA1" : "0",
+            "MIME::Base64" : "3.11",
+            "Mouse" : "0",
+            "Time::HiRes" : "0",
+            "parent" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Crypt::Rijndael" : "0",
+            "Plack::Request" : "0",
+            "Plack::Response" : "0",
+            "Test::More" : "0.98",
+            "Test::WWW::Mechanize::PSGI" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "HTTP::Session2" : {
+         "file" : "lib/HTTP/Session2.pm",
+         "version" : "1.09"
+      },
+      "HTTP::Session2::Base" : {
+         "file" : "lib/HTTP/Session2/Base.pm"
+      },
+      "HTTP::Session2::ClientStore" : {
+         "file" : "lib/HTTP/Session2/ClientStore.pm"
+      },
+      "HTTP::Session2::ClientStore2" : {
+         "file" : "lib/HTTP/Session2/ClientStore2.pm"
+      },
+      "HTTP::Session2::Expired" : {
+         "file" : "lib/HTTP/Session2/Expired.pm"
+      },
+      "HTTP::Session2::Random" : {
+         "file" : "lib/HTTP/Session2/Random.pm"
+      },
+      "HTTP::Session2::ServerStore" : {
+         "file" : "lib/HTTP/Session2/ServerStore.pm",
+         "version" : "1.09"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/HTTP-Session2/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/HTTP-Session2",
+      "repository" : {
+         "url" : "git://github.com/tokuhirom/HTTP-Session2.git",
+         "web" : "https://github.com/tokuhirom/HTTP-Session2"
+      }
+   },
+   "version" : "1.09",
+   "x_contributors" : [
+      "magai <xxmagai@gmail.com>",
+      "Songmu <y.songmu@gmail.com>"
+   ]
+}

@@ -1,0 +1,11 @@
+.D { color: #009900; } /* doctype declaration */
+.H { color: #990000; } /* html, head and body */
+.B { color: #6666ff; } /* block-level elements; e.g. p, table, ol */
+.I { color: #6666ff; } /* inline elements; e.g. b, i, tt */
+.A { color: #cc00cc; } /* attributes */
+
+.T { color: #000000; font-family: sans-serif, 'sans serif'; } /* text */
+.S { color: #666666; white-space: pre; } /* scripts and styles */
+.C { color: #0000ff; } /* comments */
+
+.X { color: #ff0000; font-weight: 900; text-decoration: underline; } /* error */

@@ -1,0 +1,20 @@
+Revision history for Perl extension Ham::Resources::HamQTH.
+
+0.01  Mon Jan 23 18:04:09 2012
+	- original version; created by h2xs 1.23 with options
+		-cfn Ham::Resources::HamQTH
+0.02	Wed Feb 08 11:19:00 2012
+	- [Minor Bug solved] Add prerequisites on Makefile.PL
+0.03	Wed Feb 08 16:44:00 2012
+	- [Minor Bug solved] Mod prerequisites version on Makefile.PL 
+0.04	Thu Feb 09 15:57:10 2012
+	- Clean distribution of trash ... sorry
+0.05	Thu Oct 26 18:46:03 2012
+	- Add link to show the callsign website
+	- Add the bio of the found station
+	- Add argument, strip_html_bio, for show bio with or without html code
+0.06	Mon May 26 13:30:35 2014
+	- Change dependecy from XML::Reader to XML::LibXML::Reader
+	- Add function get_dxcc
+	
+	

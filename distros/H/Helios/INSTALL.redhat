@@ -1,0 +1,251 @@
+RED HAT/CENTOS INSTALL
+
+Unforuntately, the Perl pre-packaged with Red Hat, CentOS, and other 
+Red Hat-based Linux distributions has significant packaging differences between
+the 5.x and 6.x OS versions.  In the 6.x version, several core Perl modules 
+have been removed from the default Perl installation.  To install Helios on 
+Red Hat-based distributions, it is recommended you install the most recent 
+version of Perl available from http://www.perl.org and proceed with a generic
+Helios installation outlined in the INSTALL file.
+
+If you want to proceed using the built-in Perl, due to the Perl packaging 
+differences between RHEL/CentOS 5.x and 6.x, there are separate procedures for 
+installation for each version.
+
+
+RED HAT ENTERPRISE LINUX / CENTOS 5.x INSTALLATION
+
+Since RHEL/CentOS 5.x contains most of the Perl core modules in the default 
+Perl install, you can use the generic install instructions to install Helios 
+with the default Perl 5.8.x.  If you are using the RHEL/CentOS 5.x system 
+default Perl, this is the preferred installation method.
+
+If you want to maximize your use of prepackaged Perl modules, however, the 
+procedure follows below:
+
+
+1) Install MySQL & Helios Database Schema
+
+If you don't already have a MySQL server installed, you can install it with:
+
+	yum groupinstall "MySQL Database"
+
+If you already have a MySQL server up and running that you want to use on 
+another server, you can just install the MySQL client:
+
+	yum install mysql
+
+Once you have your MySQL server up and running (there are plenty of 
+instructions for that elsewhere on the Web), use the sql/helios_schema.sql 
+to create a database schema for Helios to use.  Uncomment and edit the lines 
+that create the 'helios' user to set an appropriate password.  Once the schema
+file is ready, issue the following command to create the helios_db schema and 
+helios user:
+
+    mysql -u root -p < sql/helios_schema_mysql.sql
+
+You'll be prompted for your MySQL root password, then your helios_db schema 
+will be created.
+
+-- OR --
+
+1) Install Oracle Client libraries and Helios Oracle Schema
+
+Installation of Oracle Instant Client and DBD::Oracle is more complicated than 
+MySQL.  Refer to the Oracle section of the main INSTALL file for more 
+information.
+
+
+2) Install Perl RPM dependencies
+
+As root or via sudo, issue the following command to install the XML::Simple
+parser:
+
+	yum install perl-XML-Simple
+
+
+3) Install Helios & dependencies
+
+Edit the helios.ini to set the MySQL datasource name, username, and password.  
+Also set the pid_path parameter to a location Helios can write PID files to.
+
+Next, set the HELIOS_INI environment variable to point to the helios.ini file:
+
+    export HELIOS_INI=/path/to/helios.ini
+
+Make sure to use an absolute path!
+
+Now that the Helios configuration is set, use the CPAN shell to install the 
+remaining Helios dependencies and Helios itself.  As root or via sudo, issue
+the following commands:
+
+	perl -MCPAN -eshell
+	install Data::ObjectDriver
+	install TheSchwartz
+	install Error
+	install Test::Simple
+	install Pod::Usage
+	install Config::IniFiles
+	install Helios
+
+	
+4) Install Apache HTTP Server (optional)
+
+If you want to submit jobs to Helios via HTTP, you'll need a web server with 
+built-in CGI support.  The most obvious choice is the Apache HTTP Server, which 
+you can install with:
+
+    yum install httpd
+
+You'll need to edit your Apache configuration to enable mod_cgi.  Once your 
+Apache server is configured, install the submitJob.pl program as a CGI program 
+by issue these commands as root or via sudo:
+
+    cp cgi-bin/submitJob.pl /var/www/cgi-bin
+	chown root.root /var/www/cgi-bin/submitJob.pl
+	chmod a+rx /var/www/cgi-bin/submitJob.pl
+	
+You'll also need to edit your Apache configuration to add the HELIOS_INI env var
+so submitJob.pl can find the helios.ini file; use the SetEnv directive in your 
+Apache configuration for this:
+
+    SetEnv HELIOS_INI /path/to/helios.ini
+
+
+5) Install Helios::Panoptes (optional)
+
+Helios::Panoptes is the central web-based administration tool for Helios.  You 
+will only need to install it on one host.  Panoptes is packaged separately and 
+has its own installation instructions; refer its README for instructions.
+
+
+RED HAT ENTERPRISE LINUX / CENTOS 6.x INSTALLATION
+
+Unfortunately, the RHEL/CentOS 6.x default Perl install does not install the 
+CPAN shell or several other core Perl modules necessary to support 
+installation of Perl modules from CPAN.  If you want to use the default system
+Perl on these systems, several extra RPMs must be installed first.
+
+
+1) Install MySQL & Helios Database Schema
+
+If you don't already have a MySQL server installed, you can install it with:
+
+	yum install mysql-server
+
+If you already have a MySQL server up and running that you want to use on 
+another server, you can just install the MySQL client:
+
+	yum install mysql
+
+Once you have your MySQL server or client up and running, use the 
+sql/helios_schema.sql to create a database schema for Helios to use.  Uncomment
+and edit the lines that create the 'helios' user to set an appropriate 
+password.  Once the schema file is ready, issue the following command to create
+the helios_db schema and helios user:
+
+    mysql -u root -p < sql/helios_schema.sql
+
+You'll be prompted for your MySQL root password, then your helios_db schema 
+will be created.
+
+-- OR --
+
+1) Install Oracle Client libraries and Helios Oracle Schema
+
+Installation of Oracle Instant Client and DBD::Oracle is more complicated than 
+MySQL.  Refer to the Oracle section of the main INSTALL file for more 
+information.
+
+
+2) Install Perl RPM dependencies
+
+As root or via sudo, issue the following commands to install some of the
+missing Perl core modules and Helios prerequisites:
+
+    yum install perl-CPAN
+    yum install perl-Module-Build
+    yum install perl-CGI
+	yum install perl-XML-Simple
+
+
+3) Install Helios & dependencies
+
+Edit the helios.ini to set the MySQL datasource name, username, and password.  
+Also set the pid_path parameter to a location Helios can write PID files and 
+grant the user you will run Helios services as access.  For example, to create 
+a /var/run/helios directory (the default location) and make it usable by the 
+user 'helios', as root or via sudo issue:
+
+    mkdir /var/run/helios
+    chown helios /var/run/helios
+    chmod u+rw /var/run/helios
+
+Next, set the HELIOS_INI environment variable to point to the helios.ini file:
+
+    export HELIOS_INI=/path/to/helios.ini
+
+Make sure to use an absolute path!
+
+Now that the Helios configuration is set, use the CPAN shell to install the 
+remaining Helios dependencies and Helios itself.  As root or via sudo, issue
+the following commands:
+
+	perl -MCPAN -eshell
+	install Data::ObjectDriver
+	install TheSchwartz
+	install Error
+	install Test::Simple
+	install ExtUtils::MakeMaker
+	install Pod::Usage
+	install Config::IniFiles
+	install Helios
+
+You may also want to try using the Helios CPAN bundle:
+
+    perl -MCPAN -eshell
+    install Bundle::Helios
+
+	
+4) Install Apache HTTP Server (optional)
+
+If you want to submit jobs to Helios via HTTP, you'll need a web server with 
+built-in CGI support.  The most obvious choice is the Apache HTTP Server, which 
+you can install with:
+
+    yum install httpd
+
+You'll need to edit your Apache configuration to enable mod_cgi.  Once your 
+Apache server is configured, install the submitJob.pl program as a CGI program 
+by issue these commands as root or via sudo:
+
+    cp cgi-bin/submitJob.pl /var/www/cgi-bin
+	chown root.root /var/www/cgi-bin/submitJob.pl
+	chmod a+rx /var/www/cgi-bin/submitJob.pl
+	
+You'll also need to edit your Apache configuration to add the HELIOS_INI env var
+so submitJob.pl can find the helios.ini file; use the SetEnv directive in your 
+Apache configuration for this:
+
+    SetEnv HELIOS_INI /path/to/helios.ini
+
+
+5) Install Helios::Panoptes (optional)
+
+Helios::Panoptes is the central web-based administration tool for Helios.  You 
+will only need to install it on one host.  Panoptes is packaged separately and 
+has its own installation instructions; refer its README for instructions.
+
+# FILE CHANGE HISTORY:
+# [2012-01-08]: Moved instructions for Red Hat-derived Linux distributions from
+# INSTALL to INSTALL.redhat.
+# [2012-01-22]: Changed mentions of Bundle::Helios to Bundle::Helios::RedHat. 
+# Expanded dependency module list in CPAN install instructions.  Other minor
+# clarity/grammar updates.
+# [2012-mm-dd]: Updated instructions for Red Hat/CentOS 6.x; due to differences
+# in packaging Perl in 6.x, the Helios instructions are different for 5.x and
+# 6.x.  Changed mentions of helios_schema.sql to helios_schema_mysql.sql.
+# Added instructions for Oracle schema installation.  Added Apache and 
+# Helios::Panoptes instructions for 5.x.  Added required module list if using
+# CPAN shell.  Changed all mentions of Bundle::Helios::RedHat to Bundle::Helios
+# since Bundle::Helios::RedHat was dropped.

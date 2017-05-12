@@ -1,0 +1,24 @@
+# This file contains general metadata about the project.
+
+@prefix :        <http://usefulinc.com/ns/doap#> .
+@prefix dc:      <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-ToText/project>
+	a               :Project ;
+	:programming-language "Perl" ;
+	:name           "HTML-HTML5-ToText" ;
+	:shortdesc      "convert HTML to plain text" ;
+	:homepage       <https://metacpan.org/release/HTML-HTML5-ToText> ;
+	:download-page  <https://metacpan.org/release/HTML-HTML5-ToText> ;
+	:bug-database   <http://rt.cpan.org/Dist/Display.html?Queue=HTML-HTML5-ToText> ;
+	:repository     [ a :GitRepository ; :browse <https://github.com/tobyink/p5-html-html5-totext> ] ;
+	:created        "2012-01-30"^^xsd:date ;
+	:license        <http://dev.perl.org/licenses/> ;
+	:developer      [ a foaf:Person ; foaf:name "Toby Inkster" ; foaf:mbox <mailto:tobyink@cpan.org> ] .
+
+<http://dev.perl.org/licenses/>
+	dc:title        "the same terms as the perl 5 programming language system itself" .
+

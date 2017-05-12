@@ -1,0 +1,45 @@
+$VAR1 = {
+          'data' => '<p>
+Bricks Site Builder, a DHTML layout tool running on Apache + mod_perl + Mason (www.masonhq.com), enables rapid web-site design. It provides a standardized component architecture so that a user can easily add functionality (photo albums, web logs, etc.) to their web site. But it is not a content management system, per se. 
+</p>
+
+<p>
+Components using this interface are called bricks, hence the name. A central part of Bricks Site Builder is an integrated layout tool that allows the site administrator to add, move, delete, and copy bricks in a page. This layout tool consists of a tool-bar at the top of a web-page. It\'s not drag and drop; it\'s select and submit. 
+</p>
+
+<p>
+Pages are built of assemblies, which contain bricks.  An assembly by itself can be rendered as a web page, or it can be a sub-assembly of another assembly. Only the top-level assembly renders page properties (title, body tag, etc), but those properties can be inherited from children if the site designer so desires. 
+</p>
+
+<p>
+The fundamental bricks are assembly, column, table, and text. A page contains a column. A column may contain any number of bricks in sequential order. A table contains rows and columns of cells, which, in turn, contain more columns. The text brick is as simple as it gets -- it just outputs text. 
+</p>
+
+<p>
+For example, I\'ve written a photo album brick that takes as input a title, description, and a source directory (these values are input via a web form). Then, depending on user input it will render a thumbnail page, a page of four 300x300 photos, a single 700x700 photo, or a full-size photo. On each page it allows easy navigation of the photos. If files are added or removed from 
+the directory, it automatically updates its database. 
+</p>
+
+<p>
+This brick can easily be inserted into an assembly by selecting "add photoalbum to position n" where n is a page position (something like 5 for the fifth item in a column, or 2.4.2 for cell at row 4, col 2, in the table that\'s the second item in the page). 
+</p>
+
+<p>
+In addition to providing a component architecture, Bricks parses and routes incoming html arguments (both from HTTP POSTs and in the URI) to appropriate bricks. This way, a single page can contain two identical bricks and the user\'s input to one brick will not be routed to the other. You can have two photo albums side-by-side on the same page without worrying about input to the left album affecting the right one. 
+</p>
+
+<p>
+Multiple assemblies can map to a given URI. For examle, the first assembly might be a header and footer, the second a right-hand menu, and the third a page containing a web-log. 
+</p>
+
+<p>
+The site designer can attach an assembly to all requests for a folder (and possibly its\' sub-folders), and a virtual filename or a perl regular expression. 
+</p>
+
+<p>
+The primary benefit of Bricks Site Builder is not the rapid layout of web-pages or a flexible mapping of URIs to assemblies. Instead, it is the ability to easily leverage the bricks other people have written to create a kick-ass, data-driven web-site. 
+</p>',
+          'description' => undef,
+          'title' => 'What is Bricks Site Builder?',
+          'mtime' => '995106780'
+        };

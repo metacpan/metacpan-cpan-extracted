@@ -1,0 +1,46 @@
+{
+   "abstract" : "WebDAO handler for HTTP::Server::Simple",
+   "author" : [
+      "Zahatski Aliaksandr zag@cpan.org"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTTP-Server-Simple-WebDAO",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Server::Simple" : "0.44",
+            "WebDAO" : "2.2"
+         }
+      }
+   },
+   "provides" : {
+      "HTTP::Server::Simple::WebDAO" : {
+         "file" : "lib/HTTP/Server/Simple/WebDAO.pm",
+         "version" : "0.04"
+      },
+      "HTTP::Server::Simple::WebDAO::CVcgi" : {
+         "file" : "lib/HTTP/Server/Simple/WebDAO.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.04"
+}

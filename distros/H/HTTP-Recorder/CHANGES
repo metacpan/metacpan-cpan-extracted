@@ -1,0 +1,104 @@
+Revision history for HTTP::Recorder
+-----------------------------------
+
+0.07
+    Quelch 'unitialized' warning in HTTP::Recorder (thanks sjn)
+    Make http_recorder script give a nicer output at startup
+
+0.06_01
+	New maintanner
+	added a script httprecorder.pl for simple recordering
+	Added HTTP::Proxy dependacy to Makefile.PL
+	Added patch by SREZIC for encoding follow_link commands bugid:8243
+	Added patch by Marek.Rouchal bugid:15998 fixing the unmodify sub
+		that sometimes gets a string instead of an object
+	Added patch by david to prevent susbsitute on undef value, bugid:36841
+    Moved the injected JS inside the head tag, bugid:48574
+
+0.05 17 August 2005
+   Fixed a bug where link text wasn't being un-escaped before being
+   logged.
+
+   Significant changes in the use of the Control Panel:
+   - The showwindow option is gone (no popups any more).
+   - If you want to use the control panel, you need to start there.
+   - The control panel now spawns a window for navigation.
+   - The navigation window updates the Control Panel via Javascript.
+
+   Download button downloads the script file directly.
+
+0.04 17 August 2005
+    Parse and manipulate parameters with URI::QueryParam and
+    HTTP::Request::Params, rather than doing it by hand.
+
+0.03_03 16 August 2005
+    Several improvements to the Control Panel UI
+    - background color for easier reading
+    - script textarea resizes with window
+    - JavaScript confirmation before deleting script
+
+    Recording changes
+    - Log 0, false, and empty values
+    - Use click() instead of submit_form()
+
+    Changed the format of the %fields argument to
+    Logger::SetFieldsAndSubmit.  This is unlikely to affect you unless
+    you've made a subclass or are using that method directly.
+
+0.03_02 9 August 2005
+
+    Support forms with multiple Submit buttons.
+
+    Always use single quotes around arguments.
+
+    Applied a patch from alex@kapranoff.ru (rt.cpan.org #6711) to
+    optionally ignore gets for favicon.ico.  On by default.
+
+    Applied a patch from alex@kapranoff.ru (rt.cpan.org #6646) so
+    that the output script doesn't try to set hidden fields.
+
+0.03_01 1 March 2004
+
+    Support for recording SSL
+
+    Added a UI
+    - Available via control URL rather than a JS popup
+    - Update, reset clear, download features
+    - "Goto page" functionality
+
+    Rewriting improvements
+    - Support 'link' tag
+    - Support link anchors
+    - Set base URL if necessary (so relative links will be properly followed)
+    - Don't try to set the value of submit buttons in a form
+    - support multipart/form-data
+
+    Additional documentation
+
+    Logging improvements
+    - Add SetFieldsAndSubmit method to Logger; use it
+    - Set form name before trying to set form fields.
+    - Use form names when available, rather than form numbers.
+
+0.02 15 February 2004
+
+    Improved rewriting for pages with JavaScript:
+    - Don't rewrite href="javascript:XXX" links or text inside them
+    - Change the way forms are re-written, so that JavaScript won't fail.
+
+    Use link indices as well as names (supports multiple links of the
+    same name on a single page).
+
+    Preserve page titles.
+
+    Use form names when available, rather than form numbers.
+
+    Keep attributes in their original order on rewrite.
+
+    Support links with quotes (") in them.
+
+    Only try to rewrite text/ content (images, etc. won't be
+    corrupted).
+
+    ** Many thanks to Jason Gessner <jason@multiply.org> for his
+    patches and feedback.

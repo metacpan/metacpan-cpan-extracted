@@ -1,0 +1,219 @@
+2003-03-16   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 1.071.
+
+	* This is a small maintenance release that is mainly for improving
+	documentation.  Similar maintenance releases are being done with all of my
+	distributions simultaneously.  A lot of it was formatting issues that were
+	easy to miss before; the other bullet points below list the non-formatting
+	issues.  These files had formatting fixes: EasyTags.pm, ChangeLog.
+
+	* The distribution file layouts have also been standardized, with modules
+	going in a "lib" folder and tests going in a "t" folder.  "test.pl" was
+	changed to "t/HTML-EasyTags.t" and "EasyTags.pm" was changed
+	to "lib/HTML/EasyTags.pm".
+
+	* Updated NAME in EasyTags.pm to match the official registered module list.
+
+	* Updated all Copyright statements to a better (and longer) version, which
+	is dated 1999-2003.  Your rights to use these modules haven't changed, but
+	they may now be easier to understand.  These statements appear once in the
+	ReadMe file at the bottom (under "AUTHOR"), and twice in each module (.pm
+	file), a full version at the bottom (under "AUTHOR") and a shorter version
+	at the top (in code comments).
+
+	* Added the "use warnings" pragma at the top of all files beside "use
+	strict"; every occurance of "use strict" gained a "use warnings" whether it
+	was in the module proper or in its test script or in its SYNOPSIS.  This
+	should save users from having to put -w on the command line for them.
+
+	* Incremented the module $VERSION number by 0.001, and all test scripts to
+	require the new version.  Also, where any of my modules use others of my
+	modules, they now require the latest version as of this writing, for
+	simplicity of maintenance.
+
+	* Updated all test scripts to read $verbose from @ARGV (command line
+	arguments), and other test script improvements.
+
+	* Updated these sections of the ReadMe file: INSTALLATION.
+
+2002-12-03   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 1.07.
+
+	* Minor bug fix release to remove any 'uninitialized value' warnings that 
+	appear when running the test suite with the -w option (but the module had 
+	correct output before).
+
+	* Updated test.pl to check for output produced when some input arguments are 
+	'0'; this string value is false, but should not be treated the same as if 
+	the input was '' or undef; a '0' should not be replaced with a ''.  The 
+	updated test suite was run against both release 1.06 and 1.07, and the new 
+	tests are to ensure the new module produces identical output (the simplest 
+	solutions to eliminate the 'uninitialized value' warnings wouldn't have).  
+	There are now 79 tests up from 73.
+
+	* Minor documentation update in the README file so that someone can get an 
+	idea what this module does after looking only at the README.  Also an update 
+	to say how to install to a different directory than the default.  Also an 
+	update in the "TO DO" section.
+
+2001-09-02   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 1.06.
+
+	* This release adds support for the stricter requirements of W3C's XHTML 
+	standard where possible.  See "http://www.w3.org/TR/xhtml1" for details on 
+	how this standard compares to HTML 4.  As a result, the default output from 
+	this class is now slightly different from before.  However, the changes 
+	should be backwards-compatible with older user agents (web browsers).
+
+	* HTML tag and attribute names are now made lowercased instead of uppercased.  
+	While HTML 4 is not case sensitive, XHTML requires lowercased names.
+
+	* XHTML requires "minimized" tags, which are tags that do not come as a pair 
+	of "start/end" tags, to have a different format than "start" tags.  Such 
+	tags include ["br", "img", "input"].  This class now creates such tags like 
+	"<br />" instead of "<br>".  Tags as pairs remain the same, "<p></p>".
+
+	* There is a new autoloaded method suffix for forcing construction of tag 
+	parts that are different than the usual, called "mini".  (The others were 
+	["pair", "start", "end"].)  The new "mini" suffix will force minimized 
+	format, such as "<p />", which is different from "start", which continues to 
+	force "<p>".  From now on, "mini" is meant for tags you are using as singles, 
+	where "start" is meant where you will also use an "end" later to pair it up.
+
+	* For so-called "no value" tag attributes, where positive assertion was 
+	provided by the presence of the attribute name alone (eg: checked, selected), 
+	these now show values in "key=value" format rather than "key" when they are 
+	true.  They are still completely absent as before if they are false, for 
+	backward compatability.
+
+	* The value that prologue_tag() returns is now customizable.  A new object 
+	property was added to store the prologue tag (doctype/dtd), for which 
+	prologue_tag() is now a get/set accessor.  For backwards compatability with 
+	earlier releases, '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">' is 
+	the default value.
+
+	* Updated the test.pl for the new stricter behaviour like lowercased tags.  
+	There are now 73 tests up from 69; two more for prologue, two for "mini".
+
+	* Updated documentation, particularly the NAME and DESCRIPTION and SYNTAX, 
+	plus some method descriptions and the ReadMe file.
+
+2001-05-08   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 1.05.
+
+	* This release adds explicit frames support to the start_html() and 
+	end_html() methods, so that they can be used in the construction of an 
+	HTML 4 frameset document.  It is assumed in that case that any HTML going 
+	between the output of these two methods would be for browsers that don't 
+	understand frames, that is, the "noframes" section.  Each method has an 
+	additional argument now for frame support.  The new 4th argument to 
+	start_html() is usually a hash of attributes for the <FRAMESET> tag, and 
+	the various <FRAME> tags would be provided via the hash key 'text'.  The 
+	new 1st argument to end_html() causes it to make the closing noframes tag.
+
+	* No other changes except for 5 additional tests in test.pl and minor POD 
+	updates.  This release is backwards compatible with previous ones.
+
+2001-04-17   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 1.04.
+
+	* HTML::EasyTags now does not require any other modules and will work on its 
+	own.  The small portion of Class::ParamParser that this class did use has 
+	been copied over into a private method, which adds less than 1K.  The change 
+	should make HTML::EasyTags easier to use since fundamentally it is a 
+	base-level module and now it acts like it.
+
+	* Minor changes were made to the module's POD and other documentation files.
+
+	* Modified test.pl so that it automatically trims long outputs at 50 
+	characters, ensuring that each "ok NN" line does not wrap to multiple lines.
+	This behaviour can be toggled with the $verbose variable.
+
+2001-03-14   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 1.0301.
+
+	* This release fixes a couple of documentation bugs.  There were no 
+	changes made to the code itself as that was fine.
+
+	* The SYNOPSIS section used to show one calling start_html() using named 
+	parameters, a feature which was dropped after v1.01.  The method actually 
+	takes positional parameters only, and SYNOPSIS has been updated to show 
+	proper calling style.
+
+	* Also fixed a bug in the ReadMe file where the file heading said 
+	"class method parameter parser" instead of "easy html tag maker".
+	The wrong heading referred to a different distribution.
+
+2001-02-15   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 1.03.
+
+	* This release is the first one that includes the CPAN standard files 
+	"Makefile.PL", "test.pl", and "MANIFEST", which were all created following 
+	the previous release.  The content of "Manifest" was previously inside the 
+	"ReadMe" file.  Improved the install instructions in my ReadMe file.
+
+	* Added programmer documentation to the various blocks of code, so it is 
+	easier to see how they work; useful because a lot is done with little code.
+
+	* Removed the method positional_by_default() and associated class property 
+	as this property wasn't used anywhere, so to simplify things.  This change 
+	would break any code that depends on the method to be there.
+
+	* Added convenience methods start_html() and end_html() which make a canned 
+	html header and footer respectively.  They are much simpler than the ones 
+	removed for the previous release, and not proprietary.
+
+2001-01-03   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 1.02.
+
+	* This release is the first one following official registrations with 
+	"The Perl 5 Module List".  The updated entry would look like this:
+
+HTML::
+::EasyTags        bdpO Make proper HTML 4 tags/lists/parts          DUNCAND
+
+	* This release contains my "HTML::EasyTags" module, which was previously a 
+	part of the following distributions under the temporary name of 
+	"HTML::TagMaker": 
+		- "libdwg": v1.0 r2000-07-23, v1.11 r2000-08-23
+		- "CGI-FormGenerator": v0.9 r2000-09-04, v0.9201 r2000-12-26
+
+	* This module requires Perl version 5.004.
+	It also requires Class::ParamParser 1.01.
+
+	* Code changes since HTML::TagMaker consist mainly in the removal of the 
+	start_html() and end_html() methods; these were superfluous to the purpose 
+	of the module, had unstable feature sets, and I deemed them proprietary.
+	The POD also received significant updates.
+
+2000-12-26   Darren Duncan <perl@DarrenDuncan.net>
+
+	* CGI-FormGenerator 0.9201, the last version of any distribution to include
+HTML::TagMaker, was released.
+
+2000-07-23   Darren Duncan <perl@DarrenDuncan.net>
+
+	* libdwg 1.0, the first version of any distribution to include
+HTML::TagMaker, was released on CPAN.
+
+2000-04-21   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Completed primary development on this module.
+
+2000-01-30   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Began development on the final version of this module.
+
+	* Module based on a template created by h2xs 1.18.
+
+1999-07-29 thru 1999-11-13
+
+	* Worked on prototype of code that ended up in this module.

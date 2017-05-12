@@ -1,0 +1,199 @@
+{
+   "abstract" : "HTTP API into ESMTP",
+   "author" : [
+      "azumakuniyuki <perl.org [at] azumakuniyuki.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.5.3",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Haineko",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "IO::Socket::INET" : "1.31",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7",
+            "Test::UsedModules" : "0.03"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Authen::SASL" : "2.16",
+            "Class::Accessor::Lite" : "0.05",
+            "Crypt::SaltedHash" : "0.05",
+            "Digest::SHA" : "5.61",
+            "Email::MIME" : "1.910",
+            "Furl" : "2.17",
+            "IO::Socket::SSL" : "1.94",
+            "JSON::Syck" : "1.18",
+            "Net::CIDR::Lite" : "0.21",
+            "Net::DNS" : "0.68",
+            "Net::SMTPS" : "0.03",
+            "Parallel::Prefork" : "0.14",
+            "Path::Class" : "0.24",
+            "Plack" : "1.0027",
+            "Plack::Middleware::Auth::Basic" : "0",
+            "Router::Simple" : "0.14",
+            "Server::Starter" : "0.15",
+            "Try::Tiny" : "0.16",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Request" : "6.00",
+            "Plack::Test" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Haineko" : {
+         "file" : "lib/Haineko.pm",
+         "version" : "v0.2.16"
+      },
+      "Haineko::CLI" : {
+         "file" : "lib/Haineko/CLI.pm"
+      },
+      "Haineko::CLI::Daemon" : {
+         "file" : "lib/Haineko/CLI/Daemon.pm"
+      },
+      "Haineko::CLI::Help" : {
+         "file" : "lib/Haineko/CLI/Help.pm"
+      },
+      "Haineko::CLI::Password" : {
+         "file" : "lib/Haineko/CLI/Password.pm"
+      },
+      "Haineko::CLI::Setup" : {
+         "file" : "lib/Haineko/CLI/Setup.pm"
+      },
+      "Haineko::CLI::Setup::Data" : {
+         "file" : "lib/Haineko/CLI/Setup/Data.pm"
+      },
+      "Haineko::DNS" : {
+         "file" : "lib/Haineko/DNS.pm"
+      },
+      "Haineko::Default" : {
+         "file" : "lib/Haineko/Default.pm"
+      },
+      "Haineko::E" : {
+         "file" : "lib/Haineko/E.pm"
+      },
+      "Haineko::HTTPD" : {
+         "file" : "lib/Haineko/HTTPD.pm"
+      },
+      "Haineko::HTTPD::Auth" : {
+         "file" : "lib/Haineko/HTTPD/Auth.pm"
+      },
+      "Haineko::HTTPD::Request" : {
+         "file" : "lib/Haineko/HTTPD/Request.pm"
+      },
+      "Haineko::HTTPD::Response" : {
+         "file" : "lib/Haineko/HTTPD/Response.pm"
+      },
+      "Haineko::HTTPD::Router" : {
+         "file" : "lib/Haineko/HTTPD/Router.pm"
+      },
+      "Haineko::JSON" : {
+         "file" : "lib/Haineko/JSON.pm"
+      },
+      "Haineko::Log" : {
+         "file" : "lib/Haineko/Log.pm"
+      },
+      "Haineko::Root" : {
+         "file" : "lib/Haineko/Root.pm"
+      },
+      "Haineko::SMTPD::Address" : {
+         "file" : "lib/Haineko/SMTPD/Address.pm"
+      },
+      "Haineko::SMTPD::Greeting" : {
+         "file" : "lib/Haineko/SMTPD/Greeting.pm"
+      },
+      "Haineko::SMTPD::Milter" : {
+         "file" : "lib/Haineko/SMTPD/Milter.pm"
+      },
+      "Haineko::SMTPD::Milter::Example" : {
+         "file" : "lib/Haineko/SMTPD/Milter/Example.pm"
+      },
+      "Haineko::SMTPD::Milter::Nyaa" : {
+         "file" : "lib/Haineko/SMTPD/Milter/Nyaa.pm"
+      },
+      "Haineko::SMTPD::RFC5321" : {
+         "file" : "lib/Haineko/SMTPD/RFC5321.pm"
+      },
+      "Haineko::SMTPD::RFC5322" : {
+         "file" : "lib/Haineko/SMTPD/RFC5322.pm"
+      },
+      "Haineko::SMTPD::Relay" : {
+         "file" : "lib/Haineko/SMTPD/Relay.pm"
+      },
+      "Haineko::SMTPD::Relay::AmazonSES" : {
+         "file" : "lib/Haineko/SMTPD/Relay/AmazonSES.pm"
+      },
+      "Haineko::SMTPD::Relay::Discard" : {
+         "file" : "lib/Haineko/SMTPD/Relay/Discard.pm"
+      },
+      "Haineko::SMTPD::Relay::ESMTP" : {
+         "file" : "lib/Haineko/SMTPD/Relay/ESMTP.pm"
+      },
+      "Haineko::SMTPD::Relay::File" : {
+         "file" : "lib/Haineko/SMTPD/Relay/File.pm"
+      },
+      "Haineko::SMTPD::Relay::Haineko" : {
+         "file" : "lib/Haineko/SMTPD/Relay/Haineko.pm"
+      },
+      "Haineko::SMTPD::Relay::MX" : {
+         "file" : "lib/Haineko/SMTPD/Relay/MX.pm"
+      },
+      "Haineko::SMTPD::Relay::Mandrill" : {
+         "file" : "lib/Haineko/SMTPD/Relay/Mandrill.pm"
+      },
+      "Haineko::SMTPD::Relay::Screen" : {
+         "file" : "lib/Haineko/SMTPD/Relay/Screen.pm"
+      },
+      "Haineko::SMTPD::Relay::SendGrid" : {
+         "file" : "lib/Haineko/SMTPD/Relay/SendGrid.pm"
+      },
+      "Haineko::SMTPD::Response" : {
+         "file" : "lib/Haineko/SMTPD/Response.pm"
+      },
+      "Haineko::SMTPD::Session" : {
+         "file" : "lib/Haineko/SMTPD/Session.pm"
+      },
+      "Haineko::Sample" : {
+         "file" : "lib/Haineko/Sample.pm"
+      },
+      "Haineko::Sendmail" : {
+         "file" : "lib/Haineko/Sendmail.pm"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.2.16",
+   "x_contributors" : [
+      "azumakuniyuki <azumakuniyuki@gmail.com>"
+   ]
+}

@@ -1,0 +1,62 @@
+# Change log for HTML::WikiConverter::MediaWiki
+
+version: 0.59
+date: 2009-05-29
+changes:
+  - (bug #46453) fix bug in which <nowiki> was triggered too often
+  - update readme documentation
+
+version: 0.58
+date: 2009-03-06
+changes:
+  - fix manifest
+
+version: 0.57
+date: 2009-03-06
+changes:
+  - no longer pad section headings by default
+  - add new span/font tests, marked as TODO
+  - add perl license to Makefile.PL
+
+version: 0.56
+date: 2008-11-11
+changes:
+  - (bug #28402) add tbody, thead, font to passthrough_naked_tags
+  - preserve image width in [[Image:]] markup
+  - update 'table w/ blocks' test now that H::WC 0.63 properly supports nested blocks
+  - now requires H::WC 0.63 (for the above test)
+  - add author/license to META.yml
+
+version: 0.55
+date: Sun Sep 17 11:00:00 EST 2006
+changes:
+  - (bug #21531) Added 'preserve_nowiki' attribute
+  - Added 'preserve_templates' attribute (for the TinyMCE folks; see http://meta.wikimedia.org/wiki/TinyMCE)
+
+version: 0.54
+date: Thu Sep 1 00:00:00 EST 2006
+changes:
+  - Added alternate text for [[Image:]] markup
+
+version: 0.53
+date: Thu Jul 20 19:00:00 EST 2006
+changes:
+  - <hr> within <td> is now on own line (reported on [[wp:User_talk:Diberri]])
+  - require H::WC 0.60
+
+version: 0.52
+date: Wed June 07 16:00:00 EST 2006
+changes:
+  - (bug #19046) allow lone '0' in text
+  - add pad_headings attribute
+  - update to require H::WC 0.54
+
+version: 0.51
+date: Fri Mar 03 2006
+changes:
+  - update to require H::WC 0.52
+
+version: 0.50
+date:    Tue Jan 10 2006
+changes:
+  - branched from main HTML::WikiConverter codebase.

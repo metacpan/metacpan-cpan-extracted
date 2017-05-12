@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/HTML-AA.t
+lib/HTML/AA.pm
+META.yml                                 Module meta-data (added by MakeMaker)

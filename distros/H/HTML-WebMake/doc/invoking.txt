@@ -1,0 +1,23 @@
+<wmmeta name="Title" value="Invoking Webmake" />
+<wmmeta name="Section" value="01-intro" />
+<wmmeta name="Score" value="50" />
+<wmmeta name="Abstract">
+how to run WebMake
+</wmmeta>
+
+WebMake can be run using the command-line tool "webmake" [manpage], using
+"webmake.cgi" [$(cgi)], or by using the Perl module __HTML::WebMake::Main__.
+
+    [manpage]: $(webmake.html)
+
+In addition the EtText format can be used using its command line tools,
+or by using the Perl modules directly.
+
+The command-line tools' POD documentation:
+
+    * <a href=$(webmake.html)>webmake(1)</a>
+
+And the POD documentation for the Perl module:
+
+    * <a href=$(Main.pm.html)>HTML::WebMake::Main</a>
+

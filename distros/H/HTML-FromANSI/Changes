@@ -1,0 +1,39 @@
+2.03
+    - Document stuff
+    - Fix show_cursor == 0 row skipping logic
+    - Allow passing of minimal row count again
+
+2.02
+    - Fix silly reverse bug (unused variables)
+
+2.01
+    - Term::VT102::Boundless fixes integrated
+    - Fix show_cursor
+    - fix ansi2html script
+
+2.00
+    - Switch internals to OO, so that %Options doesn't confuse multiple users
+
+
+
+____________________________________________________________________________
+[  7867] By: autrijus                              on 2003/09/04  17:11:36
+        Log: * This be the real 1.01.
+             * Updates copyright and readme.
+	   ! README lib/HTML/FromANSI.pm
+____________________________________________________________________________
+[  7866] By: autrijus                              on 2003/09/04  17:10:17
+        Log: * This be 1.01.
+             * Setting options in the "use" line was not working. fixed.
+             * Implemented a new boolean option, "show_cursor", that
+	       controls
+             whether to highlight the character under the cursor
+	     position.
+             (Suggested by Fabien ALLAINE)
+	   ! lib/HTML/FromANSI.pm t/1-basic.t
+____________________________________________________________________________
+[  7865] By: autrijus                              on 2003/09/04  15:24:44
+        Log: * move things around a bit to meet modern standards.
+	  +> lib/HTML/FromANSI.pm script/ansi2html
+	   - FromANSI.pm bin/ansi2html
+	   ! MANIFEST

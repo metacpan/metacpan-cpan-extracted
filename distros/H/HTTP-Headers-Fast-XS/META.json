@@ -1,0 +1,47 @@
+{
+   "abstract" : "XS implementation of HTTP::Headers::Fast",
+   "author" : [
+      "Sawyer X (xsawyerx@cpan.org)",
+      "Andrei Vereha (avereha@cpan.org)",
+      "Steven Lee (stevenl@cpan.org)",
+      "Gonzalo Diethelm (gonzus@cpan.org)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTTP-Headers-Fast-XS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "5.57",
+            "HTTP::Headers::Fast" : "0.19",
+            "Test::More" : "0",
+            "XSLoader" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.001"
+}

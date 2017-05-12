@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Hardware/Vhdl/Tidy.pm
+t/00-load.t
+t/boilerplate.t
+t/errors.t
+t/pod-coverage.t
+t/pod.t
+t/tidy.t
+t/tidy_commandline.t
+t/TestUtils.pm

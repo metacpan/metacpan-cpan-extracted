@@ -1,0 +1,37 @@
+HTML-Embedded-Turtle
+====================
+
+Created:      2010-05-05
+Home page:    <https://metacpan.org/release/HTML-Embedded-Turtle>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=HTML-Embedded-Turtle>
+Maintainer:   Toby Inkster <mailto:tobyink@cpan.org>
+
+0.404  2013-08-01
+
+ - (Update) Stop using given/when (it warns in Perl 5.18).
+ - General tidy-up.
+
+0.333  2011-12-08
+
+ - (Packaging) Note the dependency on Object::AUTHORITY.
+ - (Packaging) Note the dependency on namespace::clean.
+
+0.314  2011-12-07
+
+ - (Update) use Object::AUTHORITY
+
+0.271  2011-11-03
+
+ - (Packaging) Module::Package::RDF
+ - (Packaging) improved test cases
+ - (Update) use 5.010
+ - drop dependency on RDF::TrineShortcuts
+ - various cleanups
+
+0.090  2010-12-09
+
+ - use RDF::TriN3
+
+0.01  2010-05-05  First release
+
+

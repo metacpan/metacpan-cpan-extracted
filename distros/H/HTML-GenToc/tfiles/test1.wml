@@ -1,0 +1,35 @@
+#-------------------------------------------------------------------------
+#  Test WML page
+#-------------------------------------------------------------------------
+$(body_class=withimage)
+$(style_sheet2=defimg.css)
+$(no_index=true)
+$(header_style=)
+#include "prologue.wml"
+$(TITLE=The Title)
+<new_page title="$(TITLE)">
+<h1><A NAME="Thing">Wow</A></h1>
+
+<h2>Authors</h2>
+<p><strong>Kathryn Andersen</strong>
+&lt;<a href="mailto:kitty@example.com">
+kitty@example.com</a>&gt;
+is the author of HTML::GenToc.
+</p>
+
+<p><strong>Earl Hood</strong>
+is the author of htmltoc.
+
+<anchor Golly Golly />
+<h2>Authors Golly</h2>
+<p>Mary had a little lamb<br />
+Its fleece was white as snow<br />
+And everywhere that Mary went<br />
+The lamb was sure to go.
+</p>
+<h2>Authors Golly Gee</h2>
+<pre>
+"BOOM! Sooner or later. *BOOM*!"
+	-- Ivanova, "Grail" (Babylon 5)
+</pre>
+</new_page>

@@ -1,0 +1,29 @@
+TODO HTTP::WebTest::Plugin::DateTest
+
+In no particular order:
+
+o Add plugin parameter "time_zone" for date calculations
+  This could be useful for other plugins as well, maybe
+
+o Use core param "ignore_case" for matching start/end markers
+  If it's available, why not use it?
+
+o Add regex support for matching start/end markers
+  More flexibility, also to match start or end of
+  line or file
+
+o Add test cases for more Date::Language::*
+  Keeping up with released versions of TimeDate seems
+  reasonable, especially if the test is skipped on 
+  a platform where these languages are missing.
+
+o Think long and hard about character encoding issues
+  The modules that come with Date::Language seem not to
+  agree on one single encoding:
+  - Roman languages seem to be encoded in ISO-8859-1
+  - Greek is encoded in UTF-8
+  Web servers sometimes set the encoding correctly in the
+  HTTP headers, a html document may override this in a
+  specific <meta ...> element and then the user agent may
+  assume some default. What a mess!
+

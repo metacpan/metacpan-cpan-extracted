@@ -1,0 +1,86 @@
+
+=head1 NAME
+
+HTML::DOM::Collection::Elements - A subclass of HTML::DOM::Collection for form elements
+
+=head1 VERSION
+
+Version 0.054
+
+=head1 SYNOPSIS
+
+  use HTML::DOM;
+  $doc = HTML::DOM->new;
+  $doc->write('
+      <form>
+          <input name=r type=radio value=1>
+          <input name=r type=radio value=2>
+      </form>
+  ');
+  $doc->close;
+  
+  $elements = $doc->forms->[0]->elements;
+  # returns an HTML::DOM::Collection::Elements object
+    
+  $elements->[0]; # first radio button
+  $elements->item(0); # same
+
+  $elements->{r}; # an array of buttons named 'r'
+  $elements->namedItem('r'); # same
+  () = $elements->namedItem('r'); # list, not array
+  
+  $elements->length; # same as scalar @$elements
+
+=head1 DESCRIPTION
+
+This implements the HTMLCollection interface as described in the W3C's DOM 
+standard, except that the C<namedItem> method (and the corresponding hash
+dereference) will return a list of form elements if there are several with
+the same name. This is actually in violation of the DOM standard, but it is
+in accordance with the way most web browsers work (at least Safari
+and Firefox).
+
+=head1 CONSTRUCTOR
+
+Normally you would simply call L<HTML::DOM::Element::Form>'s C<elements>
+method
+(as in the L</SYNOPSIS>). But if you wall to call the constructor anyway, 
+here is
+the syntax:
+
+  $elements = HTML::DOM::Collection::Elements->new($nodelist)
+
+$nodelist should be a node list (L<HTML::DOM::NodeList>) object.
+
+=head1 METHODS
+
+=over 4
+
+=item $elements->length
+
+Returns the number of items in the collection.
+
+=item $elements->item($index)
+
+Returns item number C<$index>, numbered from 0. Note that you call also use
+C<< $elements->[$index] >> for short.
+
+=item $elements->namedItem($name)
+
+Returns the item named C<$name>, is there is only one.
+If there is more than one, it returns a node list object in scalar context,
+or a list in list context. You can also write C<< $collection->{$name} >>.
+
+=back
+
+=head1 SEE ALSO
+
+L<HTML::DOM>
+
+L<HTML::DOM::Collection>
+
+L<HTML::DOM::Element::Form>
+
+L<HTML::DOM::NodeList> (manpage not written yet)
+
+L<HTML::DOM::NodeList::Magic> (manpage not written yet)

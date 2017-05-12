@@ -1,0 +1,100 @@
+Revision history for Perl extension HTTP::Headers::Fast
+
+0.21 2017-02-10T03:10:11Z
+
+    - rename flatten to psgi_flatten for fixing compatibility issue plack/plack#541
+      (kazeburo)
+    - Copy "content_is_text" method from HTTP::Headers
+      (nfg)
+
+0.20 2015-11-20T04:44:09Z
+
+    - add flatten and flatten_without_sort
+      (masahiro nagano)
+
+0.19 2015-08-20T05:17:30Z
+
+    - Make standard_case hash global to allow adding XS easily
+      (xsawyerx)
+
+0.18 2015-06-19T06:06:14Z
+
+    - import content_type_charset from HTTP::Headers. #5
+      (miyagawa)
+
+0.17 2013-11-14T04:51:31Z
+
+    - minil migrate
+
+0.16 2012-04-15
+
+    - oops
+
+0.15 2012-04-10
+
+    - fixed deps
+
+0.14 2012-04-08
+
+    - fixed packaging issue
+
+0.13 2010-07-28
+
+    - fixed dependency issue
+
+0.12 2010-01-22
+    - Strip out empty lines separated by CRLF.(markstos)
+      Before the patch, an embedded CRLF would be allowed through with a
+      space added after it. This is spec-compliant but appears not to be
+      the intent, based on the regex to remove empty lines in headers.  If
+      a client accepted "CRLF\sCRLF\s" as a valid header end, then a CRLF
+      injection attack would have been possible.
+      (This patch was ported from the HTTP::Headers git repo. )
+
+      The possiblity of the former behavior exploitably seems particular
+      small. Apache won't even send out header that a space between
+      the two required CRLFs.
+
+
+0.11 2009-06-08
+
+    - added 'sub isa' hack.
+      (suggested by miyagawa++)
+
+0.10 2009-02-21
+
+    - oops. I forgot to remove 'use Test::Warn' orz.
+      (reported by miyagawa++)
+
+0.09 2009-02-19
+
+    - no changes...
+
+    [0.07 not released]
+    - don't depend to Test::Warn
+
+0.06 2009-02-04
+
+    - fixed bugs in test code.
+      0.05 doesn't works with older version of HTTP::Headers
+
+0.05 2008-11-29
+
+    - hmm... this module requires HTTP::Date
+
+0.04 2008-11-26
+
+    - added as_string_without_sort
+
+0.03 2008-11-26
+
+    - load Storable lazily. Storable doesn't needed in a lot of case.
+
+0.02 2008-11-25
+
+    - updated docs(by lestrrat++)
+
+0.01 2008-11-25
+
+    - original version
+

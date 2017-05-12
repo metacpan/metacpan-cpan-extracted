@@ -1,0 +1,343 @@
+#!/usr/bin/perl -I. -w
+
+# Copyright (c) 2001-2005 Nathan Wiger <nate@sun.com>
+# simple tests for HTML::QuickTable
+
+use strict;
+use Test;
+BEGIN { plan tests => 8 };
+
+use HTML::QuickTable;
+
+my @tests = (
+    {
+        new => {
+            font => 'arial',
+        },
+        dat => [ [ 1..4 ], [6..9] ],
+        res => '<table>
+ <tr>
+  <td><font face="arial">1</font></td>
+  <td><font face="arial">2</font></td>
+  <td><font face="arial">3</font></td>
+  <td><font face="arial">4</font></td>
+ </tr>
+ <tr>
+  <td><font face="arial">6</font></td>
+  <td><font face="arial">7</font></td>
+  <td><font face="arial">8</font></td>
+  <td><font face="arial">9</font></td>
+ </tr>
+</table>',
+    },
+
+    {
+        new => {
+            font => 'arial',
+            font_size => '+3',
+            td => { class => 'myClass' },
+            th => { class => 'heading', bgcolor => 'gray' },
+            table => { width => '100%' },
+            labels => 1,
+        },
+        dat => [ [qw/one two three four/], [qw/five six seven eight/], [qw/nine ten eleven twelve/] ],
+        res => '<table width="100%">
+ <tr>
+  <th bgcolor="gray" class="heading"><font face="arial" size="+3">one</font></th>
+  <th bgcolor="gray" class="heading"><font face="arial" size="+3">two</font></th>
+  <th bgcolor="gray" class="heading"><font face="arial" size="+3">three</font></th>
+  <th bgcolor="gray" class="heading"><font face="arial" size="+3">four</font></th>
+ </tr>
+ <tr>
+  <td class="myClass"><font face="arial" size="+3">five</font></td>
+  <td class="myClass"><font face="arial" size="+3">six</font></td>
+  <td class="myClass"><font face="arial" size="+3">seven</font></td>
+  <td class="myClass"><font face="arial" size="+3">eight</font></td>
+ </tr>
+ <tr>
+  <td class="myClass"><font face="arial" size="+3">nine</font></td>
+  <td class="myClass"><font face="arial" size="+3">ten</font></td>
+  <td class="myClass"><font face="arial" size="+3">eleven</font></td>
+  <td class="myClass"><font face="arial" size="+3">twelve</font></td>
+ </tr>
+</table>',
+    },
+
+    {
+        new => {
+            table_width => '95%',
+            border => 0,
+            table_cellpadding => '3',
+            table_cellspacing => '5',
+            lalign => 'right',
+            labels => 1,
+        },
+        # can only test hash pairs, since anything else may be reordered!
+        dat => [ {qw/one two/}, {qw/five six/}, {qw/nine ten/} ],
+        res => '<table border="0" cellpadding="3" cellspacing="5" width="95%">
+ <tr>
+  <th align="right"><table width="100%">
+ <tr>
+  <th align="right">one</th>
+ </tr>
+ <tr>
+  <th align="right">two</th>
+ </tr>
+</table></th>
+ </tr>
+ <tr>
+  <td><table width="100%">
+ <tr>
+  <td>five</td>
+ </tr>
+ <tr>
+  <td>six</td>
+ </tr>
+</table></td>
+ </tr>
+ <tr>
+  <td><table width="100%">
+ <tr>
+  <td>nine</td>
+ </tr>
+ <tr>
+  <td>ten</td>
+ </tr>
+</table></td>
+ </tr>
+</table>',
+    },
+
+    {
+        new => {
+            labels => 'L',
+            vertical => 1,
+            table_width => '99%',
+            header => 1,
+            body => {text => 'red', bgcolor => 'black'},
+        },
+        dat => [ 
+                 ['User', 'Name', 'Ext', 'Email'],
+                 [ 'nwiger', 'Nathan Wiger', 'x43264', 'nate@wiger.org' ],
+                 [ 'jbobson', 'Jim Bobson', 'x92811', 'jim@bobson.com' ],
+               ],
+        res => 'Content-type: text/html; charset=iso-8859-1
+
+<html>
+<head>
+</head>
+<body bgcolor="black" text="red">
+<table width="99%">
+ <tr>
+  <th>User</th>
+  <td>nwiger</td>
+  <td>jbobson</td>
+ </tr>
+ <tr>
+  <th>Name</th>
+  <td>Nathan Wiger</td>
+  <td>Jim Bobson</td>
+ </tr>
+ <tr>
+  <th>Ext</th>
+  <td>x43264</td>
+  <td>x92811</td>
+ </tr>
+ <tr>
+  <th>Email</th>
+  <td>nate@wiger.org</td>
+  <td>jim@bobson.com</td>
+ </tr>
+</table></body></html>
+',
+    },
+
+    {
+        new => {
+            htmlize => 1,
+            title => 'Tacos for everyone',
+            null => 'N/A',
+            nulltags => {bgcolor => 'gray'},
+            header => 1,
+            text => 'Hey there!',
+            vertical => 1,
+            labels => 'R',
+        },
+        dat => [ 
+                 ['User', 'Name', 'Ext', 'Email'],
+                 [ 'nwiger', 'Nathan Wiger', undef, 'nate@wiger.org' ],
+                 [ 'jbobson', undef, 'x92811', 'jim@bobson.com' ],
+               ],
+        res => 'Content-type: text/html; charset=iso-8859-1
+
+<html>
+<head>
+<title>Tacos for everyone</title>
+</head>
+<body bgcolor="white">
+<h3>Tacos for everyone</h3>
+Hey there!
+<table>
+ <tr>
+  <td>User</td>
+  <td>nwiger</td>
+  <th>jbobson</th>
+ </tr>
+ <tr>
+  <td>Name</td>
+  <td>Nathan Wiger</td>
+  <th bgcolor="gray">N/A</th>
+ </tr>
+ <tr>
+  <td>Ext</td>
+  <td bgcolor="gray">N/A</td>
+  <th>x92811</th>
+ </tr>
+ <tr>
+  <td>Email</td>
+  <td><a href="mailto:nate@wiger.org">nate@wiger.org</a></td>
+  <th><a href="mailto:jim@bobson.com">jim@bobson.com</a></th>
+ </tr>
+</table></body></html>
+',
+    },
+
+    {
+        new => {
+            font => 'should be missing',
+            stylesheet => '/path/to/style.css',
+            styleclass => 'yo.momma',
+            td => {class => 'overridden'},
+            th => {class => 'killed'},
+            tr => {class => 'bleearged'},
+            labels => 1,
+            header => 1,
+            title => 'Test Results??>',
+            body_BGCOLOR => 'blah',
+        },
+        dat => [ ['n1','n2','n3','n4'], [ 1..4 ], [6..9] ],
+        res => 'Content-type: text/html; charset=iso-8859-1
+
+<html>
+<head>
+<link rel="stylesheet" href="/path/to/style.css" />
+<title>Test Results??&gt;</title>
+</head>
+<body bgcolor="blah">
+<h3>Test Results??></h3>
+<table class="yo.momma">
+ <tr class="yo.momma">
+  <th class="yo.momma">n1</th>
+  <th class="yo.momma">n2</th>
+  <th class="yo.momma">n3</th>
+  <th class="yo.momma">n4</th>
+ </tr>
+ <tr class="yo.momma">
+  <td class="yo.momma">1</td>
+  <td class="yo.momma">2</td>
+  <td class="yo.momma">3</td>
+  <td class="yo.momma">4</td>
+ </tr>
+ <tr class="yo.momma">
+  <td class="yo.momma">6</td>
+  <td class="yo.momma">7</td>
+  <td class="yo.momma">8</td>
+  <td class="yo.momma">9</td>
+ </tr>
+</table></body></html>
+',
+    },
+
+    {
+        new => {
+            useid => 'results',
+            #stylesheet => '/path/to/style.css',
+            #styleclass => 'yo',
+            labels => 1,
+        },
+        dat => [ ['n1','n2','n3','n4'], [ 1..4 ], [6..9] ],
+        res => '<table id="results">
+ <tr id="results_r1">
+  <th id="results_r1c1">n1</th>
+  <th id="results_r1c2">n2</th>
+  <th id="results_r1c3">n3</th>
+  <th id="results_r1c4">n4</th>
+ </tr>
+ <tr id="results_r2">
+  <td id="results_r2c1">1</td>
+  <td id="results_r2c2">2</td>
+  <td id="results_r2c3">3</td>
+  <td id="results_r2c4">4</td>
+ </tr>
+ <tr id="results_r3">
+  <td id="results_r3c1">6</td>
+  <td id="results_r3c2">7</td>
+  <td id="results_r3c3">8</td>
+  <td id="results_r3c4">9</td>
+ </tr>
+</table>',
+    },
+
+    {
+        new => {
+            stylesheet => 1,
+            styleclass => ['one', 'two', 'four'],
+            nulltags => {class => 'null'},
+            null     => 'NULL',
+        },
+        dat => [ ['n1','n2',undef,'n4'], [ 1..4 ], [6..9], [10,undef,12,13], ['a'..'d'] ],
+        res => '<table class="one">
+ <tr class="one">
+  <td class="one">n1</td>
+  <td class="one">n2</td>
+  <td class="null">NULL</td>
+  <td class="one">n4</td>
+ </tr>
+ <tr class="two">
+  <td class="two">1</td>
+  <td class="two">2</td>
+  <td class="two">3</td>
+  <td class="two">4</td>
+ </tr>
+ <tr class="four">
+  <td class="four">6</td>
+  <td class="four">7</td>
+  <td class="four">8</td>
+  <td class="four">9</td>
+ </tr>
+ <tr class="one">
+  <td class="one">10</td>
+  <td class="null">NULL</td>
+  <td class="one">12</td>
+  <td class="one">13</td>
+ </tr>
+ <tr class="two">
+  <td class="two">a</td>
+  <td class="two">b</td>
+  <td class="two">c</td>
+  <td class="two">d</td>
+ </tr>
+</table>',
+    },
+
+);
+
+for (@tests) {
+    my $qt = HTML::QuickTable->new(%{$_->{new}});
+    my $qtr = $qt->render($_->{dat});
+    my $res = ok($qtr, $_->{res});
+    if (!$res && $ENV{LOGNAME} eq 'nwiger') {
+        open(O, ">/tmp/qt.1");
+        print O $_->{res};
+        close O;
+
+        open(O, ">/tmp/qt.2");
+        print O $qtr;
+        close O;
+
+        system "diff /tmp/qt.?";
+        system "rm -f /tmp/qt.?";
+        exit $res;
+    }
+}
+

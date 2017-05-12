@@ -1,0 +1,31 @@
+Revision history for Perl extension HDB.
+
+1.05 2004-12-20
+     - Added Object Proxy mechanism to HDB::OBject.
+     - Added cache of objects, so only one instance for each object
+       in the DB will be created in the memory.
+     - Fixed CACHE of HDB::Parser, that was growing to much and wasn't being cleaned.
+
+
+1.04 2004-11-4
+     - Fixed and teste oracle support.
+
+
+1.03 2004-11-4
+     - Just some minor bugs.
+
+1.02 2004-10-30
+     - Added filter/unfilter of null bytes when inserting data.
+     - Added support for object references at HDB::Object.
+     - Added support for automatic serialization (Storable) of non HDB::Object attributes.
+     - Added support to serialize or ref of HDB::Object for list attributes (collection).
+
+
+1.01 2004-09-14
+     - Added support for use of DBD::mysqlPP.
+     - Added class HDB::Object - Base class for persisten Class::HPLOO objects.
+
+
+1.0  2004-01-10 16:45:42
+      - original version;
+

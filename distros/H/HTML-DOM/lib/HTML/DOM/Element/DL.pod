@@ -1,0 +1,38 @@
+
+=head1 NAME
+
+HTML::DOM::Element::DL - A Perl class for representing 'dl' elements in an HTML DOM tree
+
+=head1 VERSION
+
+Version 0.054
+
+=head1 SYNOPSIS
+
+  use HTML::DOM;
+  $doc = HTML::DOM->new;
+  $elem = $doc->createElement('dl');
+
+  $elem->compact(1); # set attribute
+  $elem->compact;    # get attribute
+  $elem->tagName;
+  # etc
+
+=head1 DESCRIPTION
+
+This class implements 'dl' elements in an HTML::DOM tree. It 
+implements the HTMLDListElement DOM interface and inherits from 
+L<HTML::DOM::Element> (q.v.).
+
+=head1 METHODS
+
+The only method that this class implements itself, and does not inherit, is
+C<compact>, which returns the corresponding HTML attribute. If you pass an
+argument, it will become the new value of the attribute, and the old value
+will be returned.
+
+=head1 SEE ALSO
+
+L<HTML::DOM>
+
+L<HTML::DOM::Element>

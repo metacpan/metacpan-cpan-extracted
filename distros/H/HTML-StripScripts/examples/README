@@ -1,0 +1,12 @@
+Check the README in each directory for an explanation of the example.
+
+ - examples/direct
+   - Using HTML::StripScripts directly
+
+ - examples/tags
+   - Overriding HTML::StripScripts to add the <meta> and <link> tags
+     into the definition for <head>
+
+ - examples/declaration
+   - Overriding HTML::StripScripts to allow DDTs (Document Type Declarations)
+

@@ -1,0 +1,82 @@
+#!/usr/bin/perl -w
+use HTTP::WebTest;
+use XML::Simple;
+use HTTP::WebTest::XMLParser;
+use HTTP::WebTest::Parser;
+use Getopt::Long qw(GetOptions);
+use Data::Dumper qw(Dumper);
+
+my %opt;
+GetOptions(\%opt, qw(xml force dump help));
+
+usage() if (! $ARGV[0] || (! -f $ARGV[0]) || $opt{help});
+
+my $cfg;
+
+my $format = ($ARGV[0] =~ /\.xml$/) ? 'xml' : 'wt';
+
+if ($opt{xml} || ($format eq 'xml')) {
+  $cfg = XMLin($ARGV[0],
+                suppressempty => '',
+                forcecontent => 0,
+                forcearray => &ARRYPARAMS,
+              );
+} else {
+  local $/;
+  open(FH, $ARGV[0]) or die "$opt{input}: $!";
+  my ($tests, $params) = HTTP::WebTest::Parser->parse(<FH>);
+  $cfg->{testgroup} = $tests;
+  $cfg->{param} = $params;
+}
+
+if ($opt{dump}) {
+  print Dumper( {params =>  $cfg->{param}, tests => $cfg->{testgroup} } );
+  exit;
+}
+
+my $out = HTTP::WebTest::XMLParser->as_xml($cfg->{testgroup}, $cfg->{param});
+if (! $opt{force}) {
+  eval {
+    HTTP::WebTest::XMLParser->parse($out);
+  };
+  if ($@) {
+    die "Converted XML is not correct, the error message is:\n$@\n";
+  }
+}
+print $out;
+
+### UTIL ###
+
+sub usage {
+  print <<"  EU";
+Usage: testconversion [options] <file>
+  converts wtscript or old style XML into
+  WebTest 1.0 XML format.
+Files ending in .xml are treated as old style XML,
+  all others are considered to be wtscript.
+
+Options:
+  --xml   treat input file as XML, even if it doesn't
+          end in '.xml' 
+  --force continue even if the resulting XML is not
+          parsable by HTTP::WebTest::XMLParser
+  --dump  output parsed data as Perl data structure
+  --help  this text
+  EU
+  exit;
+}
+
+## ARRAYPARAMS
+## all xml elements which need to be expanded to array refs
+## even if they contain only one element:
+sub ARRYPARAMS { return [ qw(
+ testgroup
+ plugins
+ cookie
+ text_require text_forbid
+ regex_require regex_forbid
+ date_maxage date_start date_end
+ mail_addresses
+) ];
+}
+

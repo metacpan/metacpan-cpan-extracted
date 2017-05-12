@@ -1,0 +1,123 @@
+NAME
+    HTML::Data::Parser - parses data embedded in HTML
+
+SYNOPSIS
+    Be like Google! Google Rich Snippets supports RDFa, Microdata and
+    Microformats, so why shouldn't you?
+
+      use RDF::Trine;
+      use HTML::Data::Parser;
+  
+      my $parser = HTML::Data::Parser->new(
+        parse_rdfa         => 1,
+        parse_grddl        => 0,
+        parse_microformats => undef,
+        parse_microdata    => undef,
+        parse_n3           => undef,
+        parse_outline      => 0,
+        );
+      my $model  = RDF::Trine::Model->temporary_model;
+      my $writer = RDF::Trine::Serializer->new('RDFXML');
+  
+      $parser->parse_into_model($base_uri, $markup, $model);
+      print $writer->serialize_model_to_string($model);
+
+DESCRIPTION
+    This module parses data embedded in HTML. It understands the following
+    standards and patterns for embedding data:
+
+    *   RDFa <http://www.w3.org/TR/rdfa-syntax/>
+
+    *   Microformats <http://microformats.org/>
+
+    *   GRDDL <http://www.w3.org/TR/grddl/>
+
+    *   Microdata <http://www.w3.org/TR/microdata/>
+
+    *   N3-in-HTML <http://esw.w3.org/N3inHTML>
+
+    *   HTML5 Document Outline
+        <http://www.w3.org/TR/html5/sections.html#outlines>
+
+    This module is just a wrapper around RDF::RDFa::Parser,
+    HTML::Microformats, XML::GRDDL, HTML::HTML5::Microdata::Parser,
+    HTML::Embedded::Turtle and HTML::HTML5::Outline. It is a subclass of
+    RDF::Trine::Parser so inherits the same interface as that.
+
+  Constructor
+    "new( %options )"
+        The options accepted are:
+
+        *   dom_parser - set to 'xml' or 'html5' to determine which parser
+            to use on input strings. Defaults to 'html5'.
+
+        *   named_graphs - boolean; whether to return quads to handler in
+            "parse" method. For advanced use only.
+
+        *   on_error - what to do when an error occurs. (Currently only a
+            subset of all possible errors are covered by this option. Some
+            errors thrown by other modules won't be caught.) Set to 'warn',
+            'die', 'ignore' or a callback coderef (which is passed one
+            parameter - the error message as a string). Defaults to 'warn'.
+
+        *   options_microdata - a hashref of options to pass through to
+            "HTML::HTML5::Microdata::Parser->new" if/when parsing microdata.
+
+        *   options_outline - a hashref of options to pass through to
+            "HTML::HTML5::Outline->new" if/when parsing outlines.
+
+        *   options_rdfa - an RDF::RDFa::Parser::Config object to use
+            if/when parsing RDFa.
+
+        *   parse_grddl - a "troolean" (yes/no/maybe-so). Set to true to
+            indicate that you want GRDDL to be parsed. Set to false to
+            indicate that you want it to be ignored. Set to undef if you
+            don't really care: this will parse GRDDL if the required module
+            (XML::GRDDL) is installed and working, but won't complain if
+            it's not. Defaults to false.
+
+        *   parse_microdata - another troolean. Defaults to undef.
+
+        *   parse_microformats - another troolean. Defaults to undef.
+
+        *   parse_n3 - another troolean. Defaults to undef.
+
+        *   parse_outline - another troolean. Defaults to false.
+
+        *   parse_rdfa - another troolean. Defaults to true.
+
+  Methods
+    "parse($base, $data, \&handler)"
+        Parses the data, given a base URI. The handler coderef is called for
+        each statement.
+
+    Other methods such as "parse_into_model", "parse_file" and
+    "parse_file_into_model" are inherited from RDF::Trine::Parser.
+
+SEE ALSO
+    This module is just a wrapper around: RDF::RDFa::Parser,
+    HTML::Microformats, XML::GRDDL, HTML::HTML5::Microdata::Parser,
+    HTML::HTML5::Outline, HTML::Embedded::Turtle.
+
+    And around these DOM parsers: HTML::HTML5::Parser, XML::LibXML.
+
+    It sits on top of Trine: RDF::Trine, RDF::Trine::Parser,
+    RDF::TrineShortcuts.
+
+    For more information on processing web data in Perl:
+    <http://www.perlrdf.org/>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT
+    Copyright 2010-2011 Toby Inkster
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

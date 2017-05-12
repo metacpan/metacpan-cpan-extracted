@@ -1,0 +1,52 @@
+---
+abstract: 'browse the WebDAV tree'
+author:
+  - 'Jozef Kutej <jkutej@cpan.org>'
+build_requires:
+  LWP::UserAgent: 0
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+keywords:
+  - http
+  - dav
+  - webdav
+  - ls
+  - folders
+  - files
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTTP-DAV-Browse
+provides:
+  HTTP::DAV::Browse:
+    file: lib/HTTP/DAV/Browse.pm
+    version: 0.05
+recommends:
+  Build::Daily: 0
+  CPAN::Mini::Inject: 0
+  File::Basename: 0
+  File::Find::Rule: 0
+  File::Slurp: 0
+  File::Spec: 0
+  File::Temp: 0.21
+  File::Which: 0
+  Getopt::Long: 0
+  IPC::Run: 0
+  JSON::XS: 0
+  Pod::Usage: 0
+  Proc::PID::File: 0
+requires:
+  HTTP::DAV: 0.38
+  Moose: 0
+  Moose::Util::TypeConstraints: 0
+  MooseX::StrictConstructor: 0
+  URI: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTTP-DAV-Browse
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/jozef/HTTP-DAV-Browse.git
+version: 0.05

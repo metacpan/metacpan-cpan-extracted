@@ -1,0 +1,9 @@
+^Makefile$
+^Makefile[.]old$
+^blib/
+^HTTP-Soup-Gnome-
+^pm_to_blib$
+[.]gitignore
+^[.]git/
+^build/
+^Soup[.]bs$

@@ -1,0 +1,76 @@
+<wmmeta name="Title" value="The &lt;attrdefault&gt; Tag" />
+<wmmeta name="Section" value="05-meta" />
+<wmmeta name="Score" value="45" />
+<wmmeta name="Abstract">
+Specify default attributes for content items
+</wmmeta>
+
+Attributes are usually specified inside a content item's "&lt;content&gt;"
+[content] or "&lt;contents&gt;" [contents] tags, or, for output files, inside
+the "&lt;out&gt;" [out] tag.  However, this can be a chore if you have many
+items to set attributes on, so, to make things easier, you can specify default
+attributes using the &lt;attrdefault&gt; tag.
+
+Specify this tag before the content items or output files in question, and
+those items will all be tagged with the attributes you set.
+
+Like the metadefault [metadefault] tag, this tag can be used either in a
+__scoped__ mode, or in a __command__ mode.
+
+	[metadefault]: $(metadefault)
+
+Scoped Mode
+~~~~~~~~~~~
+
+''Scoped'' mode uses opening (**&lt;attrdefault&gt;**) and closing
+(**&lt;/attrdefault&gt;**) tags; the attributes are only set on content items
+or output files between the two tags.
+
+Command Mode
+~~~~~~~~~~~~
+
+Command mode uses standalone tags (**&lt;attrdefault ... /&gt;**); the
+attributes are set until the end of the WebMake file, or until you change
+them with another &lt;attrdefault&gt; tag.
+
+Attributes
+==========
+
+	__name__:	the attribute's name, e.g. __up__, __map__,
+	etc.  This is required.
+
+	__value__:	the attribute's value.  This is optional.  If the
+	value is not specified, the attribute will be removed from the list of
+	default attributes.
+
+	[content]: $(content)
+	[contents]: $(contents)
+	[out]: $(out)
+
+Example
+=======
+
+Using the scoped style:
+
+<safe>
+  <attrdefault name="format" value="text/html">
+    <content name="chunk_1.txt">...</content>
+    <content name="chunk_2.txt">...</content>
+    <content name="chunk_3.txt">...</content>
+    <content name="chunk_4.txt">...</content>
+  </attrdefault>
+</safe>
+
+Or, in the ''command'' style:
+
+<safe>
+  <attrdefault name="format" value="text/html" />
+
+  <content name="chunk_1.txt">...</content>
+  <content name="chunk_2.txt">...</content>
+  <content name="chunk_3.txt">...</content>
+  <content name="chunk_4.txt">...</content>
+
+  <attrdefault name="format" />
+</safe>
+

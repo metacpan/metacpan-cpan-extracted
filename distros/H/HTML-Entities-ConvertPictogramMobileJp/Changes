@@ -1,0 +1,36 @@
+Revision history for Perl extension HTML::Entities::ConvertPictogramMobileJp
+
+0.09
+
+    - modernize package(no feature changes)
+
+0.08
+
+    - skip some tests when your H::MA is too old
+
+0.07
+
+    - we need recent version of Encode::JP::Mobile
+
+0.06
+
+    - enhancement docs and tests
+
+0.05
+
+    - do not use Encode::JP::Mobile's svn HEAD.
+
+0.04
+
+    - fixed build dependencies(YAML).
+
+0.03
+
+    - support pair of the pictograms.
+
+0.02
+
+    - oops. ezweb phone can't display KDDI-Auto character reference.
+
+0.01    Wed Jan 23 12:21:55 2008
+        - original version

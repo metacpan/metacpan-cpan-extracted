@@ -1,0 +1,12 @@
+
+
+This archive contains the distribution HTTP-Request-AsCGI, version
+1.2:
+
+  Set up a CGI environment from an HTTP::Request
+
+This software is copyright (c) 2010 by Christian Hansen <ch@ngmedia.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

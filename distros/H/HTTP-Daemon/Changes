@@ -1,0 +1,18 @@
+_______________________________________________________________________________
+2012-02-18 HTTP-Daemon 6.01
+
+If you bind localhost, don't trust gethostbyaddr() to resolve the
+address.  [RT#67247]
+
+Restore perl-5.8.1 compatiblity.
+
+
+
+
+_______________________________________________________________________________
+2011-02-25 HTTP-Daemon 6.00
+
+Initial release of HTTP-Daemon as a separate distribution. There are no code
+changes besides incrementing the version number since libwww-perl-5.837.
+
+The HTTP::Daemon used to be bundled with the libwww-perl distribution.

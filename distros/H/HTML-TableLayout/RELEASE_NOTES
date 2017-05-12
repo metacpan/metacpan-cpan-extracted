@@ -1,0 +1,86 @@
+R1_1_6-19980514:
+
+## +++. Leakage: make new method to replace print() that does cleanup
+##    too. -- USE THIS: render() 
+## 0. fix >< in commments (i think this was done in 1.001005)
+## x. make default constructor, move processing into tl_init()... in
+##    widgets, you shouldn't deal with redefining new() as a
+##    consequence, only tl_init().
+##    8. i have a feeling someone is going to tell me that my
+##    constructors suck and need to be rewritten (doh! I spoke too
+##    soon; someone already has!)
+## x. improve componentcontainer class to be a mroe usefule generic
+##    container...also export symbol "container" to take advantage of
+##    it.
+## 6. add clone() to the (full) API (based on Data::Dumper)
+## x. remove internal compatibility _isa--this breaks compatibility
+##    with older perls... sorry.  speeds up everyone else.
+## x. change exception handling to use die/warn.
+
+
+R1_1_5-19980416:  
+
+## 1. fixed another sawanampersand problem pointed out by AK.
+## 2. slipped the forms inside the table (and cell) so they don't
+##    cause an extra space in the containing table (if any).
+## 3. added support for breaks after list elements
+## 4. fixed problem with >< in FormComponentMulti items, plus can now
+##    embed real components (not just text) in FormComponentMulti.
+## 9. Make a generic container for grouping things together (no
+##    formatting)... call it "box" or somesuch.2/8/1998 11:43pm
+##    (modified componentcontainer to have a tl_print)
+## 11. added "getName()" to Form class... this will get the
+##     appropriate "name"... if there is no name, or you set the
+##     "force_numeric" flag, then it returns a number for the name.
+##     This number, of course, happens to correspond to the number of
+##     the component in the javascript document model.  this is
+##     important for supporting IE3, which doesn't support symbolic
+##     naming of such.
+## +. moved form back *outside* of the cell, otherwise it incurs a
+##    mess of extra padding. (but should be *inside* table... gotta
+##    love it)
+## +. added setParams()
+## +. added HTML::TableLayout::VERSION variable.
+## +. tinkered with padding of text (tl_do_not_pad()) 4/14/1998 
+## +. added delete() method to base class.  NOT YET IMPLEMENTED. 4/14/1998 
+
+
+R1_1_4-121297: Patches from andreas koenig to reduce number of
+warnings w/-w flag; applied a.k.'s recommendation to make the tags
+always meet as such: "><" to avoid abberations in how some browsers
+(notably netscape) format tables becauses of spaces between the table
+tags.  Plus now the HTML output looks decidely funky.
+
+R1_1_3-120897: Changed version number to be Perl compliant; Changed
+license from GPL to Perl-like (Artistic) as per suggestion by andreas
+koenig; Updated comments;Fixed some form handling bugs
+
+R1_1_2-110697: This will be the first fully public release of this
+module as I am quite happy with the API, and thus it should remain
+stable for at least a little while =).  I removed all use of
+tl_strav(), which, incidentally, was correctly named, as it was a
+travesty.  Also removed another loser: tl_setupComponents().
+
+D1_1_1-102697: Changed timing model to add "setup" phase as a distinct
+phase, numerous other changes and bugfixes, but still wants some more
+cleanup.  Added some new components, changed name of select to choice.
+
+D1_1_0-101197: This IS the first public release.  Improvements
+include (a) much more organized OOness and object heirarchy (b)
+redid "timing" so now there is "late" and "early".  Stuff happens
+late that needs to.  This is good (it means you can stick things
+in other things without thinking about timing at all). (c) added
+many more comments to code, improved numerous variable and method
+names.  (d) changed "cell header" mechanism to use embedded tables.
+cell header can be left,right,top or bottom.  (e) every component
+gets a pointer to its container, its window, and its form; it can
+now find these efficiently and reliably (no dangers of deep nesting
+confusing us).
+
+D1_0_0-092997: This snapshot is after initial profiling (&
+improvements), and after fixing the spelling of the word component.
+This should be considered the "stable" snapshot before reorganizations
+and improvements that have been brewing over the past week or so.
+
+(Just as a note, "D" prefix for a CVS tag means it's earmarked for
+development only... "R" is for releases.)

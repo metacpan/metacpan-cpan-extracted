@@ -1,0 +1,105 @@
+#! /usr/bin/perl
+
+use strict;
+use warnings;
+use English qw( -no_match_vars );
+use HTTP::PublicKeyPins();
+use Getopt::Long();
+use Pod::Usage();
+
+our $VERSION = 0.03;
+
+MAIN: {
+    my %options;
+    Getopt::Long::GetOptions( \%options, 'help', 'version' );
+    if ( $options{'help'} ) {
+        Pod::Usage::pod2usage( -verbose => 1 );
+    }
+    elsif ( $options{version} ) {
+        print "Version $VERSION\n"
+          or Carp::croak("Failed to print to STDOUT:$EXTENDED_OS_ERROR");
+    }
+    foreach my $path (@ARGV) {
+        print HTTP::PublicKeyPins::pin_sha256($path) . "\n"
+          or Carp::croak("Failed to print to STDOUT:$EXTENDED_OS_ERROR");
+    }
+}
+
+sub usage {
+    print
+      <<"__USAGE__" or Carp::croak("Failed to print to STDOUT:$EXTENDED_OS_ERROR");
+Usage: $PROGRAM_NAME [--help] [--version] path_to_(certificate|certificate_request|public_key)
+
+__USAGE__
+    return;
+}
+__DATA__
+
+=head1 NAME
+
+hpkp_pin_sha256 - Print out the pin-sha256 value for a Public Key (or a Private Key, a X.509 Certificate, or a PKCS#10 Certificate Request)
+
+=head1 VERSION
+
+Version 0.02
+
+=head1 SYNOPSIS
+
+hpkp_pin_sha256 [--help] [--version] path_to_(certificate|certificate_request|public_key)
+
+=head1 DESCRIPTION
+
+This program will print out the pin-sha256 value for a public key, a private key, the public key in a X.509 Certificate or the public key in a PKCS#10 Certificate Request.  The pin-sha256 value is used in L<HTTP Public Key Pins (HPKP)|http://tools.ietf.org/html/rfc7469>
+
+The path to a X.509 Certificate (in PEM or DER format), a PKCS#10 Certificate Request (in PEM or DER format), a Private Key (in PEM (PKCS#1) or DER format), or a Public Key (in PEM (SubjectPublicKeyInfo or PKCS#1) or DER format) should be passed to this program on the command line.
+
+Example Public-Key-Pins headers for HTTP from L<RFC 7469|http://tools.ietf.org/html/rfc7469> can be found below;
+
+ * Public-Key-Pins: max-age=3000; pin-sha256="\$short_term_pin_sha256_for_primary_key"; pin-sha256="\$short_term_pin_sha256_for_offline_backup_key"
+
+ * Public-Key-Pins: max-age=2592000; pin-sha256="\$long_term_pin_sha256_for_primary_key"; pin-sha256="\$long_term_pin_sha256_for_offline_backup_key"
+
+ * Public-Key-Pins: max-age=2592000; pin-sha256="\$long_term_pin_sha256_for_primary_key"; pin-sha256="\$long_term_pin_sha256_for_offline_backup_key"; report-uri="http://example.com/pkp-report"
+
+ * Public-Key-Pins-Report-Only: max-age=2592000; pin-sha256="\$long_term_pin_sha256_for_primary_key"; pin-sha256="\$long_term_pin_sha256_for_offline_backup_key"; report-uri="https://other.example.net/pkp-report"
+
+ * Public-Key-Pins: pin-sha256="\$long_term_pin_sha256_for_primary_key"; pin-sha256="\$long_term_pin_sha256_for_offline_backup_key"; max-age=259200
+
+ * Public-Key-Pins: pin-sha256="\$medium_term_pin_sha256_for_primary_key"; pin-sha256="\$medium_term_pin_sha256_for_offline_backup_key"; pin-sha256="\$medium_term_pin_sha256_for_second_offline_backup_key"; max-age=10000; includeSubDomains
+
+=head1 INCOMPATIBILITIES
+ 
+None known.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<RFC 7469 - Public Key Pinning Extension for HTTP|http://tools.ietf.org/html/rfc7469>
+
+=item L<X.509 Certificate|http://tools.ietf.org/html/rfc5280>
+
+=item L<PKCS#1|https://tools.ietf.org/html/rfc2437>
+
+=item L<PKCS#10|https://tools.ietf.org/html/rfc2986>
+
+=back
+
+=head1 AUTHOR
+
+David Dick, C<< <ddick at cpan.org> >>
+
+=head1 BUGS AND LIMITATIONS
+ 
+Please report any bugs or feature requests to C<bug-http-publickeypins at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=HTTP-PublicKeyPins>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2015 David Dick.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. This program is distributed in the hope that 
+it will be useful, but WITHOUT ANY WARRANTY; without even the implied 
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

@@ -1,0 +1,33 @@
+NAME
+    HTML::STable - Create HTML tables using SIMPLE interface.
+    STable name driven from Simple Table.
+
+INSTALL
+    Do usual module installation as:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+DESCRIPTION
+    HTML::STable is used to generate HTML tables for CGI script.
+    You can find extensive description of this module at
+    http://users.rcn.com/seyhan
+
+    Note that HTML::STable is a dynamic table and it adjust its
+    size occording the information entered. It is simple to put
+    tables into tables. Sorting of information in the table is
+    possible. It has many futures that it is hard to descripe it
+    here, please look at web page given.
+   
+
+AUTHOR
+    Seyhan Ersoy, seyhan@rcn.com 
+    http://users.rcn.com/seyhan 
+
+COPYRIGHT
+    Copyright (c) 2000 - 2001 Seyhan Ersoy
+
+    This library is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.

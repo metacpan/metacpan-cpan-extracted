@@ -1,0 +1,64 @@
+// Namespaces
+<TMPL_var E.s.c.a.p.e>
+
+// Escape
+<TMPL_var UrLeScApE("Hello, World! Проверка Escape. 1234567890")>
+<TMPL_var HTMLESCAPE("1 <b> \" ' &quot;")>
+<TMPL_var xmlescape("2 <b> \" \\000 \' &quot;")>
+
+// Version
+<TMPL_var Version()>
+<TMPL_var Version("full")>
+
+// Sets
+<TMPL_var IN_SET(s2, 1, 2, 3, 4)>
+
+// HTML helpers
+<TMPL_var HREF_PARAM("s2", Escape)>
+<TMPL_var FoRM_PARAM("s2", Escape)>
+<TMPL_var FoRM_PARAM("s2", urlescape(Escape) )>
+
+// Date format
+<TMPL_var DATE_FORMAT(1200490323, "%Y-%m-%d %H:%M:%S")>
+// Functions
+<TMPL_var HREF_PARAM("foo", DATE_FORMAT(1200490323, "%Y-%m-%d %H:%M:%S"))>
+
+// Base64
+<TMPL_var BASE64_DECODE(BASE64_ENCODE("1"))>
+<TMPL_var BASE64_DECODE(BASE64_ENCODE("12"))>
+<TMPL_var BASE64_DECODE(BASE64_ENCODE("123"))>
+<TMPL_var BASE64_DECODE(BASE64_ENCODE("1234"))>
+<TMPL_var BASE64_DECODE(BASE64_ENCODE("12345"))>
+<TMPL_var BASE64_DECODE(BASE64_ENCODE("123456"))>
+<TMPL_var BASE64_DECODE(BASE64_ENCODE("1234567"))>
+<TMPL_var BASE64_DECODE(BASE64_ENCODE("12345678"))>
+<TMPL_var BASE64_ENCODE("Hello, World!")>
+<TMPL_var BASE64_DECODE("SGVsbG8sIFdvcmxkIQ==")>
+
+// Object dump
+<TMPL_var HTMLESCAPE(OBJ_DUMP(s1, s2))>
+
+// Cast to type
+<TMPL_var CAST("int", "3.14")>
+<TMPL_var CAST("float", "3.14")>
+<TMPL_var CAST("string", "3.14")>
+
+<TMPL_var CAST("string", 3)>
+<TMPL_var CAST("string", 3.14)>
+<TMPL_var CAST("string", "3.14")>
+
+<TMPL_var CAST("int", 3)>
+<TMPL_var CAST("int", 3.14)>
+<TMPL_var CAST("int", "3.14")>
+
+<TMPL_var CAST("float", 3)>
+<TMPL_var CAST("float", 3.14)>
+<TMPL_var CAST("float", "3.14")>
+
+<TMPL_var JSON(loop)>
+
+<TMPL_var JSESCAPE(Escape)>
+
+// Object dump
+<TMPL_var OBJ_DUMP()>
+End.

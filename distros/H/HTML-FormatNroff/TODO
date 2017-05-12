@@ -1,0 +1,4 @@
+FormatNroff ToDo
+
+1. Use table modules to support HTML to text or postscript with tables.
+2. Handle additional table options such as cellspacing

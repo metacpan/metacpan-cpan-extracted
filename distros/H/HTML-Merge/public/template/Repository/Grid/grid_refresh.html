@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+<head>
+	<title>Connecting to Database</title>
+
+	<meta http-equiv="Content-Type" content="text/html; charset=<$RVAR.charset>">
+	<$RSET.grid_class=' "c_<$RVAR.name>" '>
+	<$RSET.grid_ref=' "parent." '>
+	<$RSET.repository_template=' "<$RVAR.bnd_src>" '>
+	
+</head>
+
+<body bgcolor="silver" onLoad="close()">
+
+<script language="javascript">
+<!--	
+	// change the cursor wait
+	document.documentElement.childNodes[1].style.cursor='wait';
+
+	// makes explorer refetch all other images in page
+	<$RVAR.grid_ref>document.documentElement.childNodes[1].style.cursor='wait';
+//-->
+</script>
+<$R[cap_process].DB='SYSTEM'>
+<$R[cap_process].Q='SELECT name cap_process 
+                      FROM tbl
+                      WHERE tbl='FRMSTR'
+                      AND langug_code='<$RVAR.langug_code>'
+                      AND note='cap_process' '>
+
+<center>
+<div style="font-family: Arial, Helvetica, sans-serif; font-size: 18px; font-style: normal; font-weight: bold;">
+<br>
+<$R[cap_process].SQL.cap_process>
+</div>
+</center>
+
+<$RIF.' "<$RVAR.extra>" '>
+	<$RINCLUDE.'<$RVAR.extra>'>
+</$RIF>
+
+<$RINCLUDE.'<$RVAR.bnd_src>'>
+<$RINCLUDE.'Repository/Grid/grid_build_data.inc'>
+
+<script language="javascript">
+<!--
+	// if order by triggered do the sort arrow
+	<$RIF.' "<$RVAR.order_by>" '>
+		<$RVAR.grid_ref><$RVAR.grid_class>.sort_item.image="<$RVAR.dir_gif>";
+		<$RVAR.grid_ref><$RVAR.grid_class>.sort_item.element="<$RVAR.grid_class>_<$RVAR.order_by>";
+	</$RIF>
+	
+	<$RVAR.grid_ref><$RVAR.grid_class>.Refresh(<$RVAR.line_offset>);
+
+	// change the cursor back to default 
+	document.documentElement.childNodes[1].style.cursor='default';
+
+	// makes explorer refetch all other images in page
+	<$RVAR.grid_ref>document.documentElement.childNodes[1].style.cursor='default';
+//-->
+</script>
+
+</body>
+</html> 

@@ -1,0 +1,25 @@
+Revision history for HTML-Laundry
+
+0.0101    2009-11-23T14:19:00-05:00
+
+          Upload = "reveal typos"
+
+0.0101    2009-11-23T13:29:00-05:00
+
+          Correcting manifest to include Minimal ruleset.
+
+0.01      2009-11-23T12:35:00-05:00
+
+          Support added for non-default rulesets, and Minimal ruleset added as standard option; callback
+          syntax altered to support chaining; base_uri getter/setter method; HTML::Tidy::libXML supported
+          as backup option to HTML::Tidy
+
+0.0002    2009-10-07T12:03:00-04:00
+
+          Providing a variety of features involving URI parsing: cleaning sample XSS injection techniques
+          from ha.ckers.org; support for UTF-8 domains such as tinyarro.ws; tests for URI sanitzation and
+          Unicode handling as well as rebasing
+
+0.0001    2009-04-23T08:57:05-04:00
+
+          First version released to GitHub

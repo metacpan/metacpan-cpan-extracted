@@ -1,0 +1,22 @@
+---
+auto_fieldset: 1
+
+elements:
+  - type: Hidden
+    name: id
+
+  - type: Text
+    name: name
+    constraints:
+      - Required
+      - type:      DBIC::Unique
+        resultset: User
+        method_name: is_name_available
+        self_stash_key: user
+
+  - type: Text
+    name: title
+
+  - type: Submit
+    name: submit
+

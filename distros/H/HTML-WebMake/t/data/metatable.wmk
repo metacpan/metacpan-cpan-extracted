@@ -1,0 +1,28 @@
+<webmake>
+
+<media src="data/contentsfind.data" name=".../*.txt" />
+
+<metatable>
+.	section	score	title
+foo.txt	sec1	50	This is Foo
+dir1/bar.txt	sec2	30	This is Bar
+dir2/dir2a/baz.txt	sec1	20	This is Baz
+</metatable>
+
+<out file=log/metatable.html>
+Name: foo
+Title: $[foo.txt.title]
+Section: $[foo.txt.section]
+Score: $[foo.txt.score]
+
+Name: dir1/bar
+Title: $[dir1/bar.txt.title]
+Section: $[dir1/bar.txt.section]
+Score: $[dir1/bar.txt.score]
+
+Name: dir2/dir2a/baz
+Title: $[dir2/dir2a/baz.txt.title]
+Section: $[dir2/dir2a/baz.txt.section]
+Score: $[dir2/dir2a/baz.txt.score]
+</out>
+

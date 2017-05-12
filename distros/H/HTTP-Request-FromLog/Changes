@@ -1,0 +1,8 @@
+Revision history for Perl extension HTTP::Request::FromLog
+
+0.00002  2008/06/29
+        - edit Makefile.PL
+        - running Perl::Tidy. 
+
+0.00001  2008/06/28
+        - original version

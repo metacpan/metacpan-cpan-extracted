@@ -1,0 +1,35 @@
+Changes
+MANIFEST
+Makefile.PL
+META.yml			Module meta-data (added by MakeMaker)
+README
+lib/HTML/FillInForm.pm
+t/00_base.t
+t/01_form.t
+t/02_hidden.t
+t/03_checkbox.t
+t/04_select.t
+t/05_textarea.t
+t/06_radio.t
+t/07_reuse.t
+t/08_multiple_objects.t
+t/09_default_type.t
+t/10_escape.t
+t/11_target.t
+t/12_mult.t
+t/13_warning.t
+t/14_password.t
+t/15_multiple_fields.t
+t/16_ignore_fields.t
+t/17_xhtml.t
+t/18_ignore_fdat.t
+t/19_extra.t
+t/20_scalarref.t
+t/21_disable_fields.t
+t/22_undef.t
+t/23_absent_checkbox.t
+t/24_radio_absent_checkboxes.t
+t/25_select_absent_checkboxes.t
+t/26_invalid_fields.t
+t/data/form1.html
+META.json                                Module JSON meta-data (added by MakeMaker)

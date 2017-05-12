@@ -1,0 +1,39 @@
+HTML-HTML5-Microdata-Parser
+===========================
+
+Created:      2009-12-03
+Home page:    <https://metacpan.org/release/HTML-HTML5-Microdata-Parser>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=HTML-HTML5-Microdata-Parser>
+Maintainer:   Toby Inkster <mailto:tobyink@cpan.org>
+
+0.100  2011-10-26
+
+ - Clean up code somewhat.
+ - (Update) use 5.010
+ - (Packaging) Module::Package::RDF
+ - (Update) Swappable predicate URI generation strategies.
+ - (Update) Disable all non-item triples (processing of <title>, <meta>,
+   @rel and @cite) by default.
+
+0.031  2010-07-26
+
+ - (Bugfix) Fix &set_callbacks bug from 0.02.
+
+0.030  2010-06-24
+
+ - Clean up API.
+ - (Bugfix) Some of the constructor option defaults were implemented
+   differently from the documentation. Changed implementation to match
+   documentation.
+
+0.02  2010-01-29
+
+ - Document &consume_microdata_item.
+ - (Addition) Make non-item-related processing optional (enabled by
+   default).
+ - (Regression) Introduced a bug where &set_callbacks became *required*.
+ - (Update) Synchronise &set_callbacks behaviour with RDF::RDFa::Parser.
+
+0.01  2010-01-08
+
+

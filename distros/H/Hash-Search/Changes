@@ -1,0 +1,17 @@
+Revision history for Perl extension Hash::Search.
+
+0.03  Sun Jun 21 13:37:15 2009
+	- Hash::Search is now a object orientated module so you will 
+	  need to create an instance of it prior to using it.
+
+0.02  Tue Apr 25 04:11:25 2009
+	- Removed 'use 5.8.0' in both Makefile.PL and the module itself as 
+	  certain testers for Perl 5.6.2 were unable to use this module yet
+	  upon further testing the module appears to work fine in Perl 5.6.2
+	  through 'make test'.
+	- Changed META.yml to make it compliant.
+
+0.01  Tue Mar 17 19:16:43 2009
+	- original version; created by h2xs 1.23 with options
+		-b 5.8.8 -AX Hash::Search
+

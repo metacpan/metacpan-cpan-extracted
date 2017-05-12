@@ -1,0 +1,58 @@
+%strict
+%whites /(\s*(?:#.*)?\s*)+/
+%token NUM  = /([0-9]+(?:\.[0-9]*)?|\.[0-9]+)/
+%token NAME = /([A-Za-z_][A-Za-z_0-9]*)/
+%token OP   = /([-+*\/])/
+%token BOP  = /([<>]=?|[!=]=)/
+
+%%
+
+input:
+    line.content              {
+
+<< 'CODE'
+sub {
+    my %count = %{ shift() };
+    my $total = 0;
+    $total += $_ for values %count;
+    my %percent
+        = $total
+        ? map +( $_ => $count{$_} / $total ), keys %count
+        : map +( $_ => 0 ), keys %count;
+CODE
+. $content . "}\n";
+
+    }
+;
+
+line:
+    stmt.stmt                 { "$stmt" }
+  | line.line ';' stmt.stmt   { "$line$stmt" }
+;
+
+stmt:
+    /* empty */               { "" }
+    /* empty */
+  | bool.exp ':' '{' line.line '}'
+                              { $line =~ s/^/    /gm;  # indent
+                                "    if ( $exp ) {\n$line    }\n" }
+  | bool.exp ':' $NAME        { "    return '$NAME'\n        if $exp;\n"; }
+  | $NAME                     { "    return '$NAME';\n" }
+;
+
+bool:
+    bool.left ',' bool.right  { "$left\n        && $right" }
+  | exp.left BOP.op exp.right { "$left $op $right" }
+;
+
+
+exp:
+    $NUM                      { $NUM }
+  | $NUM '%'                  { $NUM / 100 }
+  | $NAME                     { "( \$count{$NAME} ||= 0 )" }
+  | '%' $NAME                 { "( \$percent{$NAME} ||= 0 )" }
+  | exp.left OP.op exp.right  { "$left $op $right" }
+  | '(' exp.exp ')'           { "( $exp )" }
+;
+
+%%

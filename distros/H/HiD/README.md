@@ -1,0 +1,263 @@
+# NAME
+
+HiD - Static website publishing framework
+
+# VERSION
+
+[![CPAN version](https://badge.fury.io/pl/HiD.svg)](http://badge.fury.io/pl/HiD)
+[![Build Status](https://travis-ci.org/genehack/HiD.svg?branch=master)](https://travis-ci.org/genehack/HiD)
+[![Coverage Status](https://coveralls.io/repos/genehack/HiD/badge.svg?branch=master)](https://coveralls.io/r/genehack/HiD?branch=master)
+# SYNOPSIS
+
+HīD is a blog-aware, GitHub-friendly, static website generation system
+inspired by Jekyll.
+
+# DESCRIPTION
+
+HiD users probably want to look at the documentation for the [hid](https://metacpan.org/pod/hid) command.
+
+Subsequent documentation in this file describes internal details that are only
+useful or interesting for people that are trying to modify or extend HiD.
+
+# ATTRIBUTES
+
+## categories
+
+Categories hash, contains (category, post) pairs
+
+## cli\_opts
+
+Hashref of command line options to integrate into the config.
+
+([HiD::App::Command](https://metacpan.org/pod/HiD::App::Command)s should pass in the `$opt` variable to this.)
+
+## config
+
+Hashref of configuration information.
+
+## config\_file
+
+Path to a configuration file.
+
+## default\_config
+
+Hashref of standard configuration options. The default config is:
+
+    destination => '_site'    ,
+    include_dir => '_includes',
+    layout_dir  => '_layouts' ,
+    plugin_dir  => '_plugins' ,
+    posts_dir   => '_posts' ,
+    drafts_dir  => '_drafts' ,
+    source      => '.' ,
+
+## destination
+
+Directory to write output files into.
+
+__N.B.:__ If it doesn't exist and is needed, it will be created.
+
+## draft\_post\_file\_regex
+
+Regular expression for which files will be recognized as draft blog posts.
+
+FIXME should this be configurable?
+
+FIXME this and post\_file\_regex should probably be built based on a common
+underlying "post\_extensions\_regex" attr...
+
+## excerpt\_separator
+
+String that distinguishes initial excerpt from "below the fold" content
+
+Defaults to "\\n\\n"
+
+## include\_dir
+
+Directory for template "include" files
+
+## inputs
+
+Hashref of input files. Keys are file paths; values are what type of file the
+system has classified that path as.
+
+## layout\_dir
+
+Directory where template files are located.
+
+## layouts
+
+Hashref of [HiD::Layout](https://metacpan.org/pod/HiD::Layout) objects, keyed by layout name.
+
+## limit\_posts
+
+If set, only this many blog post files will be processed during publishing.
+
+Setting this can significantly speed up publishing for sites with many blog posts.
+
+## objects
+
+Array of objects (pages, posts, files) created during site processing.
+
+## page\_file\_regex
+
+Regular expression for identifying "page" files.
+
+\# FIXME should it be possible to set this from the config?
+
+## pages
+
+Arrayref of [HiD::Page](https://metacpan.org/pod/HiD::Page) objects, populated during processing.
+
+## plugin\_dir
+
+Directory for plugins, which will be called after publish.
+
+## plugins
+
+Plugins, which consume either of the [HiD::Plugin](https://metacpan.org/pod/HiD::Plugin) or [HiD::Generator](https://metacpan.org/pod/HiD::Generator) roles.
+
+Plugins used to subclass [HiD::Plugin](https://metacpan.org/pod/HiD::Plugin), but that behavior is deprecated and
+will be removed on or after 13 Nov 2014.
+
+## post\_file\_regex
+
+Regular expression for which files will be recognized as blog posts.
+
+FIXME should this be configurable?
+
+## posts\_dir
+
+Directory where blog posts are located.
+
+## posts
+
+Arrayref of [HiD::Post](https://metacpan.org/pod/HiD::Post) objects, populated during processing.
+
+## processor
+
+Slot to hold the [HiD::Processor](https://metacpan.org/pod/HiD::Processor) object that will be used during the
+publication process.
+
+## processor\_args
+
+Arguments to use when instantiating the [processor](https://metacpan.org/pod/processor) attribute.
+
+Can be an arrayref or a hashref.
+
+Defaults to appropriate Template Toolkit arguments.
+
+## regular\_files
+
+ArrayRef of [HiD::File](https://metacpan.org/pod/HiD::File) objects, populated during processing.
+
+## remove\_unwritten\_files ( Boolean )
+
+Boolean value controlling whether files found in the `dest_dir` that weren't
+produced by HiD should be removed. In other words, when this is true, after a
+`hid publish` run, only files produced by HiD will be found in the
+`dest_dir`.
+
+Defaults to true.
+
+## source
+
+Base directory that all other paths are calculated relative to.
+
+## tags
+
+Tags hash, contains (tag, posts) pairs
+
+## time
+
+DateTime object from the start of the latest run of the system.
+
+Cannot be set via argument.
+
+## written\_files
+
+Hashref of files written out during the publishing process.
+
+# METHODS
+
+## get\_config
+
+    my $config_key_value = $self->get_config( $config_key_name );
+
+Given a config key name, returns a config key value.
+
+## add\_input
+
+    $self->add_input( $input_file => $input_type );
+
+Record what input type a particular input file is.
+
+## seen\_input
+
+    if( $self->seen_input( $input_file )) { ... }
+
+Check to see if a particular input file has been seen.
+
+## get\_layout\_by\_name
+
+    my $hid_layout_obj = $self->get_layout_by_name( $name );
+
+Given a layout name (e.g., 'default') returns the corresponding [HiD::Layout](https://metacpan.org/pod/HiD::Layout) object.
+
+## add\_object
+
+    $self->add_object( $generated_object );
+
+Add an object to the set of objects generated during site processing.
+
+## all\_objects
+
+    my @objects = $self->all_objects;
+
+Returns the list of all objects that have been generated.
+
+## add\_written\_file
+
+    $self->add_written_file( $file => 1 );
+
+Record that a file was written.
+
+## all\_written\_files
+
+    my @files = $self->all_written_files;
+
+Return the list of all files that were written out.
+
+## wrote\_file
+
+    if( $self->wrote_file( $file )) { ... }
+
+Check to see if a particular file has been written out.
+
+## publish
+
+    $self->publish;
+
+Process files and generate output per the active configuration.
+
+# CONTRIBUTORS
+
+- ChinaXing
+- reyjrar
+
+# SEE ALSO
+
+- [jekyll](http://jekyllrb.com/)
+- [Papery](https://metacpan.org/pod/Papery)
+- [StaticVolt](https://metacpan.org/pod/StaticVolt)
+
+# AUTHOR
+
+John SJ Anderson <genehack@genehack.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by John SJ Anderson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

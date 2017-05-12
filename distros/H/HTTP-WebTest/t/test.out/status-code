@@ -1,0 +1,52 @@
+Failed  Succeeded  Test Name
+   0          1    *** no name ***
+   1          0    *** no name ***
+   1          0    *** no name ***
+   0          1    *** no name ***
+   0          1    *** no name ***
+   1          0    *** no name ***
+
+
+Test Name: N/A
+URL: http://http.web.test/status-code-200
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/status-code-400
+
+  STATUS CODE CHECK
+    Expected '200' and got: 400 Bad Request                      FAIL
+
+
+Test Name: N/A
+URL: http://http.web.test/status-code-200
+
+  STATUS CODE CHECK
+    Expected '400' and got: 200 OK                               FAIL
+
+
+Test Name: N/A
+URL: http://http.web.test/status-code-400
+
+  STATUS CODE CHECK
+    Expected '400' and got: 400 Bad Request                      SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/status-code-401
+
+  STATUS CODE CHECK
+    Expected '401' and got: 401 Unauthorized                     SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/status-code-401
+
+  STATUS CODE CHECK
+    Expected '400' and got: 401 Unauthorized                     FAIL
+
+
+Total web tests failed: 3  succeeded: 3

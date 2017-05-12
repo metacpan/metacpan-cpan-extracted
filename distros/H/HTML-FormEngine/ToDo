@@ -1,0 +1,25 @@
+- password shouldn't be displayed when confirming
+
+- submit_name method?? should submit the form name (FormEngine) also when submit-button is not pressed
+
+- Data Text-Dumping (hidden fields not listed)
+
+- besides confirm skin there should also be a text skin for the data text dumping
+
+- Email-Feature? using data text dumping?
+
+- use carp more consequent
+
+- make FormEngine input none-html
+
+- another possibilty for check for confirm and text: [ ] option [ ]  other [x] select [ ] etc.
+
+- distinguish between the 2 possibilites to use the "sub" key. best would be to invent another key.
+
+- OPTION vs. SUBTITLE. Think! (we've to use OPTION atm because of the default-settings)
+
+- rethink mark of not_null fields. doesn't work for e.g. TITLE and ERROR_IN etc.
+
+- commented '$default{_column}->{TD_SUBTITLE_VALIGN} = 'top';' out in SkinComplex.pm. Which influence does that have?
+
+mail your ideas to moritz@freesources.org

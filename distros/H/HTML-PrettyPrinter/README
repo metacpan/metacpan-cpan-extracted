@@ -1,0 +1,33 @@
+README for HTML:::PrettyPrinter
+ 
+
+                       HTML::PrettyPrinter
+
+A module for generating nice looking HTML files from HTML trees. 
+It is especially usefull if the produced HTML file shall be read 
+or edited manually afterwards. Various parameters let you adapt 
+the output to different styles and requirements.
+ 
+If you don't care how the HTML source looks like as long as it is 
+valid and readable by browsers, you should use the as_HTML() method 
+of HTML::Element instead of the pretty printer.
+
+PREREQUISITES
+  - perl 5.004 or higher
+  - HTML::Tagset
+  - HTML::Element 1.56 or higher
+
+INSTALLATION
+  The usual way:
+     perl Makefile.PL
+     make
+     make test
+     make install
+
+SYNOPSIS
+  
+COPYRIGHT
+       (c) 2000 Claus Schotten  schotten@gmx.de
+
+       This library is free software; you can redistribute it
+       and/or modify it under the same terms as Perl itself.

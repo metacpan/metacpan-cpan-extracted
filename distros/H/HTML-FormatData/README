@@ -1,0 +1,33 @@
+HTML::FormatData 0.10
+=====================
+
+DESCRIPTION
+
+HTML::FormatData contains utility functions to format strings and dates.
+These utilities are useful for formatting data to be displayed on webpages,
+or for cleaning and date data during server-side validation before storage
+in a database or file.
+
+While doing web development work in the past, I noticed that I was having
+to do the same operations time and again: strip HTML from form submissions,
+truncate strings for display as table data, URI-encode strings for use in
+links, translate Unix timestamps into mm/dd/yyyy format, etc. Rather than
+try to keep straight the different modules and functions used, I decided to
+write a wrapper with a single, consistent interface.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004-2005 Eric Folley
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

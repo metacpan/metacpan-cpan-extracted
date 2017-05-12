@@ -1,0 +1,23 @@
+Changes
+examples/create_sqlite_test_db
+examples/README
+INSTALL.SKIP
+lib/HTTP/Cookies/Mozilla.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.pod
+t/compile.t
+t/cookies.sqlite
+t/cookies.txt
+t/load.t
+t/pod.t
+t/pod_coverage.t
+t/save.ff3.t
+t/save.t
+t/test_manifest
+t/TestSqliteCmd.pm
+xt/changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

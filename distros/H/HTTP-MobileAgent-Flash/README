@@ -1,0 +1,46 @@
+NAME
+    HTTP::MobileAgent::Flash - Flash information for HTTP::MobileAgent
+
+SYNOPSIS
+      use HTTP::MobileAgent;
+      use HTTP::MobileAgent::Flash;
+
+      my $agent = HTTP::MobileAgent->new;
+      print "Flash Version : " . $agent->flash->version;
+
+      if ($agent->is_flash )   { ...... }
+  
+      if ($agent->flash->is_support('lite1.1') and $agent->flash->width <= 230) {
+        :
+      }
+      if ($agent->flash->is_support('lite1.0') and $agent->flash->max_file_size <= 48) {
+        :
+      }
+
+DESCRIPTION
+    This module adds "flash", "is_flash" method to HTTP::MobileAgent
+
+METHODS
+  is_flash
+  flash
+    version
+    max_file_size
+    is_support
+      $agent->flash->is_support('Lite1.1')
+      $agent->flash->is_support('Lite1.0')
+
+AUTHOR
+    KIMURA, takefumi <takefumi@mobilefactory.jp>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+BUGS
+    This module does not support the Vodafone, yet.
+
+SEE ALSO
+    HTTP::MobileAgent,
+    <http://www.nttdocomo.co.jp/p_s/imode/spec/flash.html>,
+    <http://www.au.kddi.com/ezfactory/mm/flash01.html>,
+    <http://developers.vodafone.jp/>
+

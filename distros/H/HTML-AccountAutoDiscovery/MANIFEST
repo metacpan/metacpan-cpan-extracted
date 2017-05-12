@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01.t
+lib/HTML/AccountAutoDiscovery.pm
+META.yml                                 Module meta-data (added by MakeMaker)

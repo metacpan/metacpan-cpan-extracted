@@ -1,0 +1,7 @@
+<table>
+<tr><th><a class="emp_id" href="?order=emp_id" target="_blank">Emp ID</a></th><th><a class="emp_name" href="?order=emp_name" target="_blank">Emp Name</a></th><th><a class="emp_title" href="?order=emp_title" target="_blank">Emp Title</a></th></tr>
+<tr><td><a href="emp_details.html?id=123" target="_blank">123</a></td><td>Fred Flintstone</td><td>CEO</td></tr>
+<tr><td><a href="emp_details.html?id=456" target="_blank">456</a></td><td>Barney Rubble</td><td>Lackey</td></tr>
+<tr><td><a href="emp_details.html?id=789" target="_blank">789</a></td><td>Wilma Flintstone   </td><td>CFO</td></tr>
+<tr><td><a href="emp_details.html?id=777" target="_blank">777</a></td><td>Betty Rubble</td><td></td></tr>
+</table>

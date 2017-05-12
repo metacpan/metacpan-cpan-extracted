@@ -1,0 +1,37 @@
+Revision history for HTML::GoogleMaps::V3
+
+0.10 2017-01-01
+        - fix various typos in the module (GH #12)
+        - allow dependency injection of the GeoCoder module (GH #14)
+        - thanks to Nigel Horne for the above patch
+
+0.09 2016-11-11
+        - pass sensor=false with api_key (GH #11)
+        - thanks to Nigel Horne for the above patch
+
+0.08 2016-11-09
+        - pass api_key and apidriver to Geo::Coder::Google (GH #9)
+        - fix scrolling of embedded map (GH #10)
+        - thanks to Nigel Horne for the above patches
+
+0.07 2016-11-07
+        - add documentation for return values for functions (GH #5)
+
+0.06 2016-05-22
+        - add LICENCE and use warnings
+
+0.05 2016-05-12
+        - Transfer repo from G3S to Humanstate
+
+0.04 2016-05-08
+        - Use https rather than http (GH #3)
+        - Update to v3 of API (GH #2)
+
+0.03 2016-04-26
+        - Remove dead links from POD
+
+0.02 2016-04-25
+        - Add dist information to Makefile.PL (GH #1, thanks to Manwar)
+
+0.01 2016-04-25
+        - First version, forked from HTML::GoogleMaps

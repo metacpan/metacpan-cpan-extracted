@@ -1,0 +1,72 @@
+<tmpl_include name="header.html">
+
+<br />
+<tmpl_if classes>
+	<tmpl_loop classes>
+	<div class="class"><a name="<tmpl_var worker_class>" /><tmpl_var worker_class></div>
+
+		<tmpl_loop hosts>
+			<div class="job_header" style="border: solid 1px black; font-weight: bold; margin-left: 10px;">Host: <tmpl_var host></div>
+			<div style="margin-left: 20px; font-weight: bold;">
+			<table class="data_table">
+			<tmpl_loop params>
+				<tr>
+					<td class="data_text" style="font-weight: bold;"><tmpl_var param></td>
+					<td class="data_text">
+					<form method="post" action="./panoptes.pl" style="display: inline">
+						<input type="text" name="value" value="<tmpl_var value>" size="50" class="value_field">
+						<input type="hidden" name="rm" value="ctrl_panel_mod">
+						<input type="hidden" name="action" value="modify">
+						<input type="hidden" name="worker_class" value="<tmpl_var worker_class>">
+						<input type="hidden" name="host" value="<tmpl_var host>">
+						<input type="hidden" name="param" value="<tmpl_var param>">
+						<input type="submit" value="Change">
+					</form><form method="post" action="./panoptes.pl" style="display: inline">
+						<input type="hidden" name="rm" value="ctrl_panel_mod">
+						<input type="hidden" name="action" value="delete">
+						<input type="hidden" name="worker_class" value="<tmpl_var worker_class>">
+						<input type="hidden" name="host" value="<tmpl_var host>">
+						<input type="hidden" name="param" value="<tmpl_var param>">
+						<input type="hidden" name="value" value="<tmpl_var value>">
+						<input type="submit" value="Delete">
+					</form>
+					</td>
+				</tr>
+			</tmpl_loop>
+				<tr>
+					<td class="data_text" style="font-style: italic;">New Parameter:</td>
+					<td class="data_text">
+						<form method="post" action="./panoptes.pl">
+							<b>Param:</b>&nbsp;<input type="text" name="param">
+							<b>Value:</b>&nbsp;<input type="text" name="value">
+							<input type="hidden" name="rm" value="ctrl_panel_mod">
+							<input type="hidden" name="action" value="add">
+							<input type="hidden" name="worker_class" value="<tmpl_var worker_class>">
+							<input type="hidden" name="host" value="<tmpl_var host>">
+							<input type="submit" value="Add">
+						</form>
+					</td>
+				</tr>
+			</table>
+			</div>
+		</tmpl_loop>
+	</tmpl_loop>
+<tmpl_else>
+	<p>&nbsp;&nbsp;<i>No configuration parameters set.</i><br /></p>
+</tmpl_if>
+<div class="data_text">
+	<div class="class" style="font-style: italic;">New Service/Host Parameter:</div>
+	<div class="job_header">
+		<form method="post" action="./panoptes.pl">
+			<input type="hidden" name="rm" value="ctrl_panel_mod">
+			<input type="hidden" name="action" value="add">
+			<b>Service:</b>&nbsp;<input type="text" name="worker_class">
+			<b>Host:</b>&nbsp;<input type="text" name="host">
+			<b>Param:</b>&nbsp;<input type="text" name="param">
+			<b>Value:</b>&nbsp;<input type="text" name="value">
+			<input type="submit" value="Add">
+		</form>
+	</div>
+</div>
+
+<tmpl_include name="footer.html">

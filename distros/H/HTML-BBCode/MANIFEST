@@ -1,0 +1,25 @@
+Changes
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/basic.t
+t/bug12036.t
+t/bug14138.t
+t/bug17633.t
+t/bug24448.t
+t/bug28830.t
+t/bug31927.t
+t/bug33495.t
+t/bug33496.t
+t/bug33542.t
+t/bug43698.t
+t/bug81095.t
+t/bug_denny.t
+t/bug_dodger.t
+t/bug_yorhel.t
+t/HTML-BBCode.t
+t/stripscripts.t
+lib/HTML/BBCode.pm
+lib/HTML/BBCode/StripScripts.pm
+META.json                                Module JSON meta-data (added by MakeMaker)

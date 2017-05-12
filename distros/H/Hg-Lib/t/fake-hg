@@ -1,0 +1,84 @@
+#!perl
+
+use IO::Handle;
+use Getopt::Long;
+
+use lib 't';
+
+use BadServer;
+
+my %opt = ( exitval => 0 );
+
+eval {
+
+    local $SIG{__WARN__} = sub { die $_[0] };
+
+    GetOptions(
+        \%opt,
+        qw[
+          config=s
+          cmdserver=s
+          mode=s
+          exitval=i
+          R=s
+          ]
+    );
+};
+
+die if $@;
+
+shift @ARGV if $ARGV[0] eq 'serve';
+
+sub fail { die("failed\n") }
+
+sub eof { exit 0 }
+
+sub bad_hello_chan {
+
+    BadServer::Hello::Chan->new->serve;
+
+}
+
+sub bad_hello_len {
+
+    BadServer::Hello::Len->new->serve;
+
+}
+
+sub bad_hello_no_capabilities {
+
+    BadServer::NoCapabilities->new->serve;
+}
+
+sub bad_hello_no_runcommand {
+
+    BadServer::NoRunCommand->new->serve;
+
+}
+
+sub bad_hello_no_encoding {
+
+    BadServer::NoEncoding->new->serve;
+
+}
+
+
+sub badlen { print pack( 'A[1] l> A[2]', 'o', 3, 'aa' ); exit; }
+
+
+sub wait {
+
+    <STDIN>;
+}
+
+sub default { }
+
+sub hello {
+
+    Server->new->serve;
+
+}
+
+$_->() foreach @ARGV;
+
+exit $opt{exitval};

@@ -1,0 +1,38 @@
+---
+abstract: 'Hash::Map - Manipulate hashes map like'
+author:
+  - 'Steffen Winkler <steffenw at cpan.org>'
+build_requires:
+  Test::Differences: '0.60'
+  Test::More: '0'
+  Test::NoWarnings: '1.03'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Hash-Map
+provides:
+  Hash::Map:
+    file: lib/Hash/Map.pm
+    version: '0.016'
+recommends:
+  Pod::Coverage::Moose: '0'
+  Test::Pod: '1.14'
+  Test::Pod::Coverage: '1.04'
+requires:
+  Carp: '0'
+  Clone: '0'
+  Exporter::Tiny: '0'
+  Scalar::Util: '0'
+  Try::Tiny: '0'
+  parent: '0'
+  perl: '5.006'
+  version: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.016'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

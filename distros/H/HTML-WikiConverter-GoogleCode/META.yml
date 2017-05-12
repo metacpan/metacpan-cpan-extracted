@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                HTML-WikiConverter-GoogleCode
+version:             0.12
+abstract:            Convert HTML to Google Code wiki markup.
+license:             perl
+author:              
+    - Marty Kube <martykube@yahoo.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    HTML::WikiConverter:           0.61
+    Params::Validate:              0
+    Test::More:                    0
+    URI:                           0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

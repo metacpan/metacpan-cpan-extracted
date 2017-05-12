@@ -1,0 +1,39 @@
+HTTP-ClickHouse version 0.061
+=============================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Net::HTTP::NB
+   HTTP::ClickHouse::Base
+   IO::Select
+   URI
+   URI::QueryParam
+   Scalar::Util
+   Storable
+   Data::Dumper
+   strict
+   warnings
+   Carp
+
+COPYRIGHT AND LICENCE
+
+Copyright 2016 Maxim Motylkov <mmv@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES,
+INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTIBILITY
+AND FITNESS FOR A PARTICULAR PURPOSE.

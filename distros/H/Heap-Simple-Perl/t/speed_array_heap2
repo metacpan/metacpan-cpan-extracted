@@ -1,0 +1,60 @@
+#!/usr/bin/perl -w
+use strict;
+
+sub report {
+    my($desc, $count, $sub) = @_;
+    print STDERR "[[ timing ]] $desc\n";
+    print STDERR timestr(timeit($count, $sub))."\n";
+}
+
+sub mark {
+    print STDERR "------\n";
+}
+
+my ($string, $size);
+BEGIN {
+    my %options = @ARGV;
+    srand(delete $options{srand}) if exists $options{srand};
+    defined($size   = delete $options{size})   || die "No size option";
+    defined($string = delete $options{string}) || die "No string option";
+    defined(my $inc    = delete $options{INC})    || die "No INC option";
+    die "Unknown option ", join(",", keys %options) if %options;
+    eval '
+    use Benchmark;
+
+    use Array::Heap2;
+    1' || die $@;
+}
+
+my @input;
+if ($string) {
+    for (1..$size) {
+        push @input, "A" . rand(2*$size);
+    }
+} else {
+    for (1..$size) {
+        push @input, rand(2*$size);
+    }
+}
+
+my @heap;
+mark;
+if ($string) {
+    report("Insert of $size elements into Array::Heap2",
+           $size,
+           sub { push_heap_cmp(sub { $a cmp $b }, @heap, pop @input) });
+} else {
+    report("Insert of $size elements into Array::Heap2",
+           $size,
+           sub { push_heap(@heap, pop @input) });
+}
+undef @input;
+if ($string) {
+    report("Extract $size elements from Array::Heap2",
+           $size,
+           sub { pop_heap_cmp(sub { $a cmp $b }, @heap) });
+} else {
+    report("Extract $size elements from Array::Heap2",
+           $size,
+           sub { pop_heap(@heap) });
+}

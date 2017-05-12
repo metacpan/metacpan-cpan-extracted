@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+eg/xslate.pl
+lib/HTML/CallJS.pm
+minil.toml
+t/00_compile.t
+t/01_simple.t
+t/02_synopsis.t
+META.yml
+MANIFEST

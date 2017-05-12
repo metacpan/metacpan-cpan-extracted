@@ -1,0 +1,109 @@
+-*- outline -*-
+
+* Add utils/random-names to synopsis/usage example
+
+This is a very useful and easy to show use case of Hailo.
+
+* Don't pass the DBI connection string with --storage-args
+
+There's lots of per-driver syntax in the DBI connection string that we
+don't support. We don't support the MySQL syntax for reading auth
+details from ~/.my.cnf for example.
+
+Make Hailo be used like this:
+
+    hailo --brain file-or-db-name
+
+And extended use like this:
+
+    hailo --connect dbi:SQLite:dbname=file.sqlite
+
+And for user/pass:
+
+    hailo --connect='["dbi:SQLite:my.db", "", ""]'
+
+See what dbicadmin(1) does.
+
+--brain would then be optional when --connect is supplied. Here's more
+  examples:
+    
+    Hailo->new(
+        # Simply like this:
+        brain => ':memory:',
+    );
+    Hailo->new(
+        # Or with a custom storage
+        brain => 'hailo',
+        storage_class => 'Pg', # Will connect to dbi:Pg:dbname=hailo
+    );
+    Hailo->new(
+        # Or more verbosely:
+        storage_class => 'SQLite',
+        storage_connect => "dbi:SQLite:dbname=:memory:",
+    );
+    Hailo->new(
+        # Or with Pg
+        storage_class => 'Pg',
+        storage_connect => "dbi:Pg:dbname=hailo",
+    );
+    Hailo->new(
+        # Pg with user/pass:
+        storage_class => 'Pg',
+        storage_connect => [ "dbi:Pg:dbname=hailo", "user", "pass" ],
+    );
+    Hailo->new(
+        # Custom connect args
+        storage_class => 'Pg',
+        storage_connect => [ "dbi:Pg:dbname=hailo", "user", "pass", { RaiseError => 0, pg_unicode => 0 } ],
+    );
+    Hailo->new(
+        # With an existing dbh (like DBIx::Class):
+        storage_class => 'SQLite',
+        storage_dbh => sub {
+            DBI->connect("dbi:SQLite:dbname=:memory:", "", "" { sqlite_unicode => 1 });
+        },
+    );
+    
+
+* Add a looping ->reply() Engine backend
+
+Extend the Default engine so that it supports a looping
+backend. MegaHAL loops for 1 second and cobe loops for 5 iterations
+(with token scoring).
+
+This will generate more surprising replies. Sometimes we spit the
+input string unmodified or almost unmodified at the user.
+
+* Markov order range
+
+In the future we should modify Hailo to use Markov orders
+1..$max_order. I.e. if the user sets $max_order to 5, expressions of
+all lengths up to and including 5 should be created. This should
+vastly improve responses, but it might increase the size of the brain
+quite a bit.
+
+* Add some sort of logging
+
+Something of the 'DEBUG "foo"' variety so the logging can be compiled
+out at BEGIN time if it's not needed.
+
+* Use grammars in the Word tokenizer
+
+Words.pm uses a few hacky regexes to capitalize words. It needs quite
+a bit of context to decide which words to capitalize, so it does it in
+three passes. It might be more efficient to use some of 5.10's grammar
+features instead. -hinrik
+
+    I tried this at one point and I got some errors which indicated
+    internal errors in the regex engine. Perhaps I was doing something
+    wrong. -avar
+
+* Add an --init switch / init sub to storage engines
+
+The _engage sub in Storage.pm can't be called standalone. It would be
+useful to make storage engines init the database but not import
+anything, to e.g. init Pg and then import into it efficiently using
+hacky means (like feeding it a sqlite dump).
+
+    I've now added ->initialized which is 1/2 of this -avar
+

@@ -1,0 +1,60 @@
+{
+   "abstract" : "Wrapper for the hypothes.is web (HTTP) API.",
+   "author" : [
+      "Brandon E. Barker <brandon.barker@cornell.edu>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Hypothesis-API",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI::Cookie" : "0",
+            "HTTP::Cookies" : "0",
+            "HTTP::Request" : "0",
+            "JSON" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "Moose" : "0",
+            "Storable" : "0",
+            "Try::Tiny" : "0",
+            "URI" : "0",
+            "URI::Encode" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bbarker/Hypothesis-API.git",
+         "web" : "https://github.com/bbarker/Hypothesis-API"
+      }
+   },
+   "version" : "0.13"
+}

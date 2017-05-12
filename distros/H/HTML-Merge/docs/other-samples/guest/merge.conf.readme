@@ -1,0 +1,24 @@
+#####################################################################
+# Make these settings in your merge.conf to run guest demo          #
+# The best way is to set it using mergecreate instance              #
+#####################################################################
+
+#--------------- Direcotries ENV --------------#
+
+$MERGE_ABSOLUTE_PATH = '/home/httpd/cgi-bin';   # The instance directory 
+$TEMPLATE_PATH = '/usr/share/merge/docs/other-samples/guest'; # where you put the demo templates
+$CACHE_PATH = '/home/httpd/cgi-bin/cache';      # Cache path
+$DEF_TEMPLATE = 'tableframe.html';                    # Default template
+$MERGE_PATH = '/cgi-bin';                       # your Merge URI
+$SUPPORT_SITE = 'http://YourServer.com';            # your site
+#---------------- Database ENV ----------------#
+
+$DB_TYPE = 'mysql';                                # Database type e.g.: MySQL - see DBI
+$DB_DATABASE = 'demo';                           # Database name - mysql:demo see DBI
+$DB_HOST = '';                                     # Database host
+$DB_PORT = '';                                     # Database port
+$DB_USER = 'yourdbuser';                                 # Database username
+$DB_PASSWORD = 'yourpassword';                                 # Database password
+$AUTO_COMMIT = 1;                                  # Auto commit see man DBI
+
+

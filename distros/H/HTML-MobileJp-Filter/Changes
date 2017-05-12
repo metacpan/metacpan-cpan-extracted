@@ -1,0 +1,20 @@
+Revision history for Perl extension HTML::MobileJp::Filter
+
+0.02
+        - Any-Moosify. thanks Danjou(lopnor)
+
+0.01_03
+        - changed $html into HTML::MobileJp::Filter::Content object
+
+0.01_02
+        - support +MyApp::Filter namespace. thanks Ittetsu Miyazaki.
+
+0.01_01
+        - fix pod typo
+        - moose
+        - s/FallbackImage/PictogramFallback/
+        - add Filter::PictogramFallback::TypeCast
+        - add Filter::EntityReference force option
+
+0.01  Fri Jun 27 12:43:27 JST 2008
+        - original version

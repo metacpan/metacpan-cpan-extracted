@@ -1,0 +1,9 @@
+^MYMETA.yml$
+^cover_db
+^blib
+^_build
+^Build$
+^\.git
+^nytprof*
+.*\.bak$
+^MYMETA\.json$

@@ -1,0 +1,41 @@
+ANNOUNCEMENT: HTML::Template::Expr 0.07
+
+CHANGES
+
+    - Added support for ESCAPE attribute in combination with EXPR.
+      (Michael Peters)
+
+    - Fixed a bug where functions which returned 0 or more than one
+      return value would cause a stack under or overflow.  Functions
+      are now called in scalar context, eliminating the problem.
+      Thanks to Jamie Krasnoo for the spot.
+
+DESCRIPTION
+
+This module provides an extension to HTML::Template which allows
+expressions in the template syntax.  This is purely an addition - all
+the normal HTML::Template options, syntax and behaviors will still
+work.
+
+Expression support includes comparisons, math operations, string
+operations and a mechanism to allow you add your own functions at
+runtime.
+
+
+AVAILABILITY
+
+This module is available on SourceForge.  Download it at:
+
+  http://html-template.sourceforge.net
+
+The module is also available on CPAN.  You can get it using CPAN.pm or
+go to:
+
+  http://www.cpan.org/authors/id/S/SA/SAMTREGAR/
+
+
+CONTACT INFO
+
+You can join the HTML::Template mailing-list by visiting:
+
+  http://lists.sourceforge.net/lists/listinfo/html-template-users

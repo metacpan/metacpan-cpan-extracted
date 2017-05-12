@@ -1,0 +1,23 @@
+ARTISTIC
+Build.PL
+Changes
+GPL
+lib/HTML/Template/Pluggable.pm
+lib/HTML/Template/Plugin/Dot.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/before_output.t
+t/dot_can.t
+t/dot_for_loops.t
+t/dot_loop.t
+t/dot_nested.t
+t/dot_notation.t
+t/dot_notation_methods_with_args.t
+t/dot_notation_mixnmatch.t
+t/dot_notation_recursive.t
+t/pod-coverage.t
+t/pod.t
+t/side_effects.t

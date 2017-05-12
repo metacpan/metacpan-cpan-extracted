@@ -1,0 +1,11 @@
+2016/08/19 13:30:04: DEBUG Enqueuing command:
+	echo "hello world from job 1" && sleep 5
+ 2016/08/19 13:30:04: DEBUG Enqueuing command:
+	echo "hello again from job 2" && sleep 5
+ 2016/08/19 13:30:04: DEBUG Enqueuing command:
+	echo "goodbye from job 3"
+ 2016/08/19 13:30:04: DEBUG Enqueuing command:
+	#TASK tags=hello,world
+echo "hello again from job 3" && sleep 5
+ 2016/08/19 13:30:10: INFO Total execution time 0 years, 00 months, 0 days, 00 hours, 00 minutes, 06 seconds
+ 

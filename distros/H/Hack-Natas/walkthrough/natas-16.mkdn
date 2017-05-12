@@ -1,0 +1,21 @@
+Level 16
+--------
+
+This returns to the grep kind of page from earlier, but with additional
+"sanitiation" enforced.
+
+    if(preg_match('/[;|&`\'"]/',$key)) {
+        print "Input contains an illegal character!";
+    } else {
+        passthru("grep -i \"$key\" dictionary.txt");
+    }
+
+Okay, so we have to deal with two levels of escaping here:
+
+ 1. We can't use semicolon, pipe, ampersand, backtick, single-quote, or double-quote
+ 2. `$key` is now double-quoted
+
+We can still use command substitution (`$()`) though. As with the
+blind SQL injection attack previously, we'll go character-by-character.
+
+`natas16` will do that for you.

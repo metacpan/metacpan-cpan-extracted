@@ -1,0 +1,16 @@
+Changelog for HTML-Widget-Plugin-JS
+
+0.005     2014-06-03 08:40:10-04:00 America/New_York
+        - update tests for new-style plugin loading
+
+0.004     2013-09-14 13:14:04 America/New_York
+        - repackage, update bugtracker and repo
+
+0.003     2013-07-24
+        - skip a test that won't pass easily on 5.18.0+
+
+0.002     2008-09-15
+        - fix abstract
+
+0.001     2008-09-22
+        - first release

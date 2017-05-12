@@ -1,0 +1,26 @@
+---
+abstract: "Strip HTML or XML tags from a string with Perl like PHP's strip_tags() does"
+author:
+  - 'Hinnerk Altenburg <hinnerk@cpan.org>'
+build_requires:
+  Carp: 0
+  Exporter: 0
+  Switch: 0
+configure_requires:
+  Module::Build: 0.36
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-StripTags
+provides:
+  HTML::StripTags:
+    file: lib/HTML/StripTags.pm
+    version: 1.01
+resources:
+  bugtracker: http://github.com/hinnerk-a/perl-strip_tags/issues
+  homepage: http://www.hinnerk-altenburg.de/perl-strip_tags/
+  repository: http://github.com/hinnerk-a/perl-strip_tags
+version: 1.01

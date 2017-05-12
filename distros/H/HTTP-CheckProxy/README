@@ -1,0 +1,100 @@
+NAME
+    HTTP::CheckProxy - Perl module for testing for open proxies
+
+SYNOPSIS
+      use HTTP::CheckProxy
+
+DESCRIPTION
+    This module uses LWP to test the supplied IP address to see if it will
+    promiscuosly proxy on port 80. Caution: this can have false alarms if
+    you are on a network where you are supposed to go through a proxy, such
+    as AOL -- but are you supposed to be running a webserver on such a
+    network ?
+
+    If you feed this an invalid ip address, LWP will complain.
+
+    Note: while there is HTTP::ProxyCheck it is much slower, though it does
+    a lot of input validation. HTTP::CheckProxy is intended to be useful in
+    processing lots of candidate proxies and in recording useful
+    information. To do this, make one object and repeatedly invoke the
+    test() method with different IP addresses.
+
+USAGE
+      my $open_proxy_test = HTTP::CheckProxy->new($ip);
+      print "proxy test for $ip returns ".$open_proxy_test->code."\n";
+      print ($open_proxy_test->guilty? "guilty" : "innocent");
+      $open_proxy_test->test($ip2);
+      print "proxy test for $ip2 returns ".$open_proxy_test->code."\n";
+      print ($open_proxy_test->guilty? "guilty" : "innocent");
+
+BUGS
+SUPPORT
+    Email bugs to the author.
+
+AUTHOR
+            Dana Hudes
+            CPAN ID: DHUDES
+            dhudes@hudes.org
+            http://www.hudes.org
+
+COPYRIGHT
+    This program is free software licensed under the...
+
+            The General Public License (GPL)
+            Version 2, June 1991
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    perl(1).
+
+METHODS
+  new
+     Usage     : HTTP::CheckProxy->new($ip);
+     Purpose   : constructor
+     Returns   : object instance
+     Argument  : Optional first paramenter:
+                    name or ip address of candidate proxy. Do not include http:// .
+                 Optional second parameter: url (including the http://) to try to fetch. If this is invalid or unreachable the results of the test are meaningless, but this is NOT checked.
+     Throws    : We should probably throw an exception if the ip address under test is unreachable
+     Comments  : 
+
+    See Also : HTTPD::ADS::AbuseNotify for sending complaints about
+    validated proxies and other abuse.
+
+  get_proxy_port
+     Usage     :  $open_proxy_test->get_proxy_port;
+     Purpose   : tell which port successfully proxied 
+     Returns   : 16-bit integer port number
+     Argument  : none
+     Throws    : nothing
+     Comments  : only valid when  $open_proxy_test->guilty is TRUE , may be undef otherwise (or have incorrect info if you reused the object)! 
+    See Also   : HTTPD::ADS::AbuseNotify for sending complaints about validated proxies and other abuse.
+
+  guilty
+     Usage     : $open_proxy_test->guilty
+     Purpose   : Is in fact the tested host guilty of being an open proxy?
+     Returns   : true (its an open proxy) or false (it isn't)
+     Argument  : none
+     Throws    : nothing
+     Comments  : This method checks the return status code of the test. If an error code is returned, esp. code 500, the host is not guilty. If the status code is success, the host is guilty.
+
+     See Also   : HTTPD::ADS::AbuseNotify for sending complaints about validated proxies and other abuse.
+
+  code
+     Usage     : $open_proxy_test->code
+     Purpose   : Return the status code of the proxy test
+     Returns   : HTTP status code
+     Argument  : none
+     Throws    : nothing
+     Comments  : 
+
+     See Also   : HTTPD::ADS::AbuseNotify for sending complaints about validated proxies and other abuse.
+    =cut
+
+    sub code { my $self = shift; return ($self->get_response)->code(); }
+
+    1; #this line is important and will help the module return a true value
+    __END__
+

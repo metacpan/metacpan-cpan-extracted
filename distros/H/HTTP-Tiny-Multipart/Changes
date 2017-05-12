@@ -1,0 +1,34 @@
+Change history for HTTP::Tiny::Multipart
+========================================
+
+0.05  2015-09-22
+
+      [BUGFIX]
+      * If $1 is defined from a previous regex match, the Content-Type of the request is incorrect.  The fix is to only use $1 and $2 if the regex matched. (Infinoid, github #3)
+
+0.04  2015-06-05
+
+      [BUGFIX]
+      * Fix out-by-one error on last_boundary (sdt, github#1)
+
+      [DOCUMENTATION]
+      * Small fixups for second pod example (sdt, github#2)
+
+      [TESTS]
+      * Added basic tests for _build_content
+      * Added basic tests for multipart post
+
+0.03  2014-08-26
+
+      add more documentation
+      set content-type for fileuploads if a content-type is defined
+
+0.02  2013-09-13T17:36:55
+
+      return the parts of the body
+      parts are a arrayref, need to deref when using join
+      set the filename for fileuploads
+
+0.01  2013-09-13T16:47:32
+
+      initial release

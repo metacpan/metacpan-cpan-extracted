@@ -1,0 +1,18 @@
+-unformatted=1
+-default=font foo=qr/^Bar/i
+-default=font was="1"
+<p>bar 1
+    <font foo="bar boo" was="1">flibble 1
+        <font foo="baz">baz 1
+            <font foo="bar boo" was="1">was 1
+            </font>
+        </font>
+    </font>
+</p>
+<!--expected-->
+<p>bar 1 flibble 1
+    <font foo="baz">baz 1
+        <font foo="bar boo">was 1
+        </font>
+    </font>
+</p>

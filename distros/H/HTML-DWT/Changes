@@ -1,0 +1,64 @@
+Revision history for Perl extension HTML::DWT.
+
+2.08  Thu Mar  23 12:53:15 2002
+	- Bugfix: fixed Regex in Library includes; library files now parsed
+	- Functionality additions:
+		- added path option to new()
+		- added xml option to new()
+	- update to test suite
+	- update to POD documentation
+
+2.07  Tue Mar  05 22:23:55 2002
+	- Functionality additions:
+    	- added associate functionality to new(); HTML::DWT object
+		  will accept an associated object with a param() method
+		  (i.e. CGI, or HTML::Template object) and will associate
+		  parameter values from that object with the template.
+		- added case_sensitive option, to allow for case sensitive
+		  matching of template field names.
+		- added no_includes option, and ability for module to 
+		  recognize and parse Library item include statements as
+		  written by Dreamweaver.
+		- added clear_params() method
+		- added export() method for XML export
+		- added print_to option to output()
+	- added basic test suite to distribution
+	- included requirements for Carp and Test::More to Makefile.PL
+	- update to POD documentation
+		
+2.06  Fri Mar  01 20:42:22 2002
+	- Bugfix: added Use Carp to support carp() warnings
+	- Functionality additions:
+		- added query(); this implements the same method inter-
+		  face as HTML::Template's query() method.
+		- completed param() functionality to bring it in line
+		  with HTML::Template's param() method
+		- moved actual field replacement regex to output() where
+		  it makes more sense.  Made fill() call param() and then
+		  output()
+		- param() now accepts 'doctitle' fields without <title> tags;
+		  it will DTRT if <title> tags are required
+	- Update to POD documentation
+
+2.05  Thu Feb  28 17:59:55 2002
+	- Major functionality changes:
+		- added fill() to better support standard function
+		  naming schemes
+		- fillTemplate() calls fill() now
+		- added parse(), and output() as well as :Template
+		  option to support HTML::Template-style functionality
+		- fill() dereferences it's hash and calls param()
+		  (not sure if that's efficient, but looks cleaner to me)
+	- Update to POD documentation
+
+2.04  Tue Feb  12 12:10:55 2002
+	- Minor bugfixes
+
+2.03.02  Tue Feb  12 10:12:30 2002
+	- Added POD documentation
+	- changed toplevel namespace (to get added to CPAN)
+
+2.03.01  Mon Feb  4 16:56:43 2002
+	- Release version packaged (minor bugs fixed)
+	
+

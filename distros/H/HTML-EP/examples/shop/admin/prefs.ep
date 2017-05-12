@@ -1,0 +1,131 @@
+<ep-package name="HTML::EP::Shop">
+<ep-database dsn="DBI:CSV:f_dir=$env->DOCUMENT_ROOT$/outdoor/shop/var">
+<ep-shop-prefs-read var="prefs" write=1>
+<HTML><HEAD><TITLE>
+<ep-language de="Stammdaten" en="Preferences"></TITLE></HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<H1><ep-language de="Stammdaten" en="Preferences"></H1>
+<FORM ACTION="prefs.ep" METHOD=POST>
+<INPUT TYPE=hidden NAME=language VALUE="$_ep_language$">
+<H2><ep-language de="Firmenstammdaten" en="Company data"></H2>
+<DIV ALIGN=CENTER>
+<TABLE>
+  <TR><TH><ep-language de="Firma" en="Company">:</TH>
+      <TD><INPUT SIZE=30 NAME="prefs_company" VALUE="$prefs->company$"></TD>
+  </TR>
+  <TR><TH>&nbsp;</TH>
+      <TD><INPUT SIZE=30 NAME="prefs_name" VALUE="$prefs->name$"></TD>
+  </TR>
+  <TR><TH><ep-language de="Straße" en="Street address">:</TH>
+      <TD><INPUT SIZE=30 NAME="prefs_street" VALUE="$prefs->street$"></TD>
+  </TR>
+  <TR><TH><ep-language de="PLZ, Ort" en="ZIP, City">:</TH>
+      <TD><INPUT SIZE=5 NAME="prefs_zip" VALUE="$prefs->zip$">
+          <INPUT SIZE=25 NAME="prefs_city" VALUE="$prefs->city$"></TD>
+  </TR>
+  <TR><TH><ep-language de="Land" en="Country">:</TH>
+      <TD><INPUT SIZE=30 NAME="prefs_country" VALUE="$prefs->country$"></TD>
+  </TR>
+  <TR><TH><ep-language de="Telefon" en="Phone">:</TH>
+      <TD><INPUT SIZE=30 NAME="prefs_phone" VALUE="$prefs->phone$"></TD>
+  </TR>
+  <TR><TH><ep-language de="Telefax" en="Fax">:</TH>
+      <TD><INPUT SIZE=30 NAME="prefs_fax" VALUE="$prefs->fax$"></TD>
+  </TR>
+  <TR><TH><ep-language de="Email" en="Email">:</TH>
+      <TD><INPUT SIZE=30 NAME="prefs_email" VALUE="$prefs->email$"></TD>
+  </TR>
+</TABLE>
+</DIV>
+<H2><ep-language de="Rechnungsdaten" en="Bill related data"></H2>
+<DIV ALIGN=CENTER>
+<TABLE>
+  <TR><TH><ep-language de="MwSt." en="VAT">:</TH>
+      <TD><INPUT SIZE=5 NAME="prefs_vat" VALUE="$prefs->vat$"></TD>
+  </TR>
+  <TR><TH><ep-language de="Kreditkarten" en="Credit Cards">:</TH>
+      <TD><INPUT SIZE=30 NAME="prefs_creditcards" VALUE="$prefs->creditcards$">
+      </TD>
+  </TR>
+  <TR><TD COLSPAN=2>
+          <FONT SIZE=-1>
+	    <ep-language language="en">
+	      Comma separated list of values; leave blank if you don't
+	      want to accept credit cards. <B>Caveat:</B> Sending credit
+	      card data via the Internet has security problems unless you
+	      are using an HTTPS server.
+            </ep-language>
+	    <ep-language language="de">
+	      Durch Kommata getrennte Liste von Namen; leer lassen, falls
+	      Bestellung per Kreditkarte unerwünscht. <B>Vorsicht:</B>
+	      Der Versand von Kreditkartendaten durch das Internet ist ein
+	      potentielles Sicherheitsproblem, sofern kein HTTPS-Server
+	      verwendet wird.
+            </ep-language>
+	  </FONT></TD>
+  </TR>
+  <TR><TH><ep-language de="Versand per Nachnahme"
+	               en="Versand per Nachnahme"></TH>
+      <TD><SELECT NAME="prefs_nachnahme">
+<ep-if eval="$prefs->nachnahme$">
+            <OPTION VALUE=1 SELECTED><ep-language de="Ja" en="Yes">
+            <OPTION VALUE=0><ep-language de="Nein" en="No">
+<ep-else>
+            <OPTION VALUE=1><ep-language de="Ja" en="Yes">
+            <OPTION VALUE=0 SELECTED><ep-language de="Nein" en="No">
+</ep-if>
+          </SELECT></TD>
+  </TR>
+  <ep-language language="en">
+  <TR><TD COLSPAN=2>
+	<FONT SIZE=-1>(English translation missing here, thanks for
+	  any input!)</FONT></TD>
+  </TR>
+  </ep-language>
+  <TR><TH><ep-language de="Versand per Rechnung"
+	               en="Versand per Rechnung"></TH>
+      <TD><SELECT NAME="prefs_rechnung">
+<ep-if eval="$prefs->rechnung$">
+            <OPTION VALUE=1 SELECTED><ep-language de="Ja" en="Yes">
+            <OPTION VALUE=0><ep-language de="Nein" en="No">
+<ep-else>
+            <OPTION VALUE=1><ep-language de="Ja" en="Yes">
+            <OPTION VALUE=0 SELECTED><ep-language de="Nein" en="No">
+</ep-if>
+          </SELECT></TD>
+  </TR>
+  <ep-language language="en">
+  <TR><TD COLSPAN=2>
+	<FONT SIZE=-1>(English translation missing here, thanks for
+	  any input!)</FONT></TD>
+  </TR>
+  </ep-language>
+  <TR><TH><ep-language de="Versand per Lastschrift"
+	               en="Versand per Lastschrift"></TH>
+      <TD><SELECT NAME="prefs_lastschrift">
+<ep-if eval="$prefs->lastschrift$">
+            <OPTION VALUE=1 SELECTED><ep-language de="Ja" en="Yes">
+            <OPTION VALUE=0><ep-language de="Nein" en="No">
+<ep-else>
+            <OPTION VALUE=1><ep-language de="Ja" en="Yes">
+            <OPTION VALUE=0 SELECTED><ep-language de="Nein" en="No">
+</ep-if>
+          </SELECT></TD>
+  </TR>
+  <ep-language language="en">
+  <TR><TD COLSPAN=2>
+	<FONT SIZE=-1>(English translation missing here, thanks for
+	  any input!)</FONT></TD>
+  </TR>
+  </ep-language>
+</TABLE>
+<ep-language language="en">
+<INPUT TYPE=submit VALUE="Save">
+</ep-language>
+<ep-language language="de">
+<INPUT TYPE=submit VALUE="Speichern">
+</ep-language>
+</DIV>
+</FORM>
+</BODY>
+</HTML>

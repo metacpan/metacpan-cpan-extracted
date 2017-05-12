@@ -1,0 +1,25 @@
+<HTML><BODY>
+<H1> test on string compare </H1>
+true:<TMPL_VAR EXPR="'abc' eq 'abc'">
+false:<TMPL_VAR EXPR="'ab' eq 'abc'">
+false:<TMPL_VAR EXPR="'def' eq 'abc'">
+
+false:<TMPL_VAR EXPR="ONE eq TWO">
+false:<TMPL_VAR EXPR="(ONE eq TWO)">
+
+false:<TMPL_VAR EXPR="1 eq 2">
+false:<TMPL_VAR EXPR="'1' eq 2">
+false:<TMPL_VAR EXPR="2 eq '1'">
+
+testing unescape string
+false:<TMPL_VAR EXPR="'\'1' eq '\'2'">
+true:<TMPL_VAR EXPR="'\'1' ne '\'2'">
+
+<tmpl_if expr="(EMPTYSTR eq SystemRequest_MainNavigationSelection)">bad<tmpl_else>good</tmpl_if>
+<tmpl_if expr="(EMPTYSTR eq '')">good<tmpl_else>bad</tmpl_if>
+true:<TMPL_VAR EXPR="'a' ge ''">
+true:<TMPL_VAR EXPR="'a' gt ''">
+true:<TMPL_VAR EXPR="'a' le ''">
+false:<TMPL_VAR EXPR="'a' lt ''">
+
+</body></html>

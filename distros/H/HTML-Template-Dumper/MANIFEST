@@ -1,0 +1,16 @@
+Build.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+COPYING
+CHANGES
+t/001_load.t
+t/020_output.t
+lib/HTML/Template/Dumper.pm
+lib/HTML/Template/Dumper/Format.pm
+lib/HTML/Template/Dumper/Data_Dumper.pm
+lib/HTML/Template/Dumper/YAML.pm
+examples/test_page.pl
+examples/test.cgi
+

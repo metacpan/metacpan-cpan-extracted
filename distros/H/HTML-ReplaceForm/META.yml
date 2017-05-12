@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name: HTML-ReplaceForm
+version: 0.52
+author: ~
+abstract: |-
+  easily replace HTML form fields with corresponding values
+license: perl
+requires:
+  HTML::TokeParser::Simple: 0
+provides:
+  HTML::ReplaceForm:
+    file: lib/HTML/ReplaceForm.pm
+    version: 0.52
+generated_by: Module::Build version 0.2611

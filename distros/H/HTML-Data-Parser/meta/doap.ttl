@@ -1,0 +1,41 @@
+@prefix :        <http://usefulinc.com/ns/doap#> .
+@prefix dcs:     <http://ontologi.es/doap-changeset#> .
+@prefix dc:      <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix my:      <http://purl.org/NET/cpan-uri/dist/HTML-Data-Parser/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix toby:    <http://tobyinkster.co.uk/#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+my:project
+	a               :Project ;
+	:name           "HTML-Data-Parser" ;
+	:shortdesc      "parses data embedded in HTML"@en ;
+	:programming-language  "Perl" ;
+	:homepage       <https://metacpan.org/release/HTML-Data-Parser> ;
+	:download-page  <https://metacpan.org/release/HTML-Data-Parser> ;
+	:bug-database   <http://rt.cpan.org/Dist/Display.html?Queue=HTML-Data-Parser> ;
+	:repository     [ a :HgRepository ; :browse <https://bitbucket.org/tobyink/p5-html-data-parser> ] ;
+	:maintainer     toby:i ;
+	:developer      toby:i ;
+	:documenter     toby:i ;
+	:tester         toby:i ;
+	:created        "2010-12-15"^^xsd:date ;
+	:license        <http://dev.perl.org/licenses/> ;
+	:category
+		[ rdfs:label "RDF" ],
+		[ rdfs:label "RDFa" ],
+		[ rdfs:label "Microdata" ],
+		[ rdfs:label "Microformats" ],
+		[ rdfs:label "GRDDL" ],
+		[ rdfs:label "HTML" ],
+		[ rdfs:label "XHTML" ],
+		[ rdfs:label "Semantic Web" ].
+
+toby:i
+	a               foaf:Person ;
+	foaf:name       "Toby Inkster" ;
+	foaf:homepage   <http://tobyinkster.co.uk/> ;
+	foaf:page       <https://metacpan.org/author/TOBYINK> ;
+	foaf:mbox       <mailto:tobyink@cpan.org> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://purl.org/NET/cpan-uri/person/tobyink> .

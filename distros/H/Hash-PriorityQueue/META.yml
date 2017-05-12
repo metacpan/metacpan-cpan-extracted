@@ -1,0 +1,19 @@
+---
+abstract: 'priority queue based on perl hashes'
+author:
+  - 'Lars Stoltenow <penma.cpan@penma.de>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Hash-PriorityQueue
+provides:
+  Hash::PriorityQueue:
+    file: lib/Hash/PriorityQueue.pm
+    version: 0.01
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

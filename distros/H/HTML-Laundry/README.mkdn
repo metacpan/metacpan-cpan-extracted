@@ -1,0 +1,43 @@
+HTML-Laundry
+
+HTML::Laundry is an HTML::Parser-based HTML normalizer, meant for small pieces
+of HTML, such as user comments, Atom feed entries, and the like, rather than 
+full pages. Laundry takes these and returns clean, sanitary, UTF-8-based XHTML.
+
+A snippet is cleaned several ways:
+
+* Normalized, using HTML::Parser: attributes and elements will be lowercased, 
+empty elements such as &lt;img /&gt; and &lt;br /&gt; will be forced into the 
+empty tag syntax if needed, and unknown attributes and elements will be stripped
+* Sanitized, using an extensible whitelist of valid attributes and elements based
+on [WHATWG's sanitzation rules](http://wiki.whatwg.org/wiki/Sanitization_rules), 
+which are in turn based on Mark Pilgrim and Aaron Swartz's work on sanitize.py. 
+Tags and attributes which are known to be possible attack vectors are removed, and 
+URLs are rewritten to prevent cross-site scripting attacks.
+* Tidied, using HTML::Tidy (as available): unclosed tags will be closed and the 
+output generally neatened; future version may also use HTML::Tidy to deal with 
+character encoding issues
+* Optionally rebased, to turn relative URLs in attributes into absolute ones
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc HTML::Laundry
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Six Apart, Ltd.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

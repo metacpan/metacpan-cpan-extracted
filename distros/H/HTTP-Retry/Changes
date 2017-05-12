@@ -1,0 +1,13 @@
+Revision history for Perl extension HTTP::Retry.
+
+0.01  Thu Jan 30 19:51:41 2014
+	- original version; created by h2xs 1.23 with options
+		-XA -b 5.8.8 -n HTTP::Retry
+0.02  Fri Feb  7 10:39:21 2014
+    - fix a test bug on FreeBSD
+0.03  Wed Feb 12 10:40:18 2014
+    - change test url from example.com to cpan.org
+0.04  Tue Apr 22 14:05:14 2014
+    - add feature 'sleep'
+0.05  Sat Jan 10 10:38:56 2014
+    - fix bug #101425

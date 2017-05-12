@@ -1,0 +1,8 @@
+Revision history for Perl extension Hash::Tally.
+
+0.02  Thu Aug 10 2006
+    - added another test
+    - added copyright and license, author to pod
+    
+0.01  Wed Jul 12 2006
+	- original version;

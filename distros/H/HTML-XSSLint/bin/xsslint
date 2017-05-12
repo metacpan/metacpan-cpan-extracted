@@ -1,0 +1,106 @@
+#!perl -w
+use strict;
+use HTTP::Cookies;
+use HTML::XSSLint;
+use Getopt::Long;
+
+# default
+my %options = (
+    'no-cookie' => 0,
+    'user-agent' => "xsslint/$HTML::XSSLint::VERSION",
+);
+
+GetOptions(\%options, "no-cookie", "user-agent=s");
+do_task(\%options, @ARGV);
+
+sub do_task {
+    my($options, @urls) = @_;
+    my $agent = init_agent($options);
+    audit_it($agent, $_) for @urls;
+}
+
+sub init_agent {
+    my $options = shift;
+    my $agent = HTML::XSSLint->new;
+    unless ($options->{'no-cookie'}) {
+	my $cookie_jar = HTTP::Cookies->new;
+	$agent->cookie_jar($cookie_jar);
+    }
+    $agent->agent($options->{'user-agent'});
+    return $agent;
+}
+
+sub audit_it {
+    my($agent, $url) = @_;
+    my @results = $agent->audit($url);
+    print "Auditing $url: ";
+    my @v = grep { $_->vulnerable } @results;
+    unless (@v) {
+	print "No vulnerable forms!\n";
+	return;
+    }
+
+    printf "Found %d vulnerable %s!\n", scalar @v, (@v > 1 ? 'forms' : 'form');
+    for my $r (@v) {
+	printf <<REPORT, $r->action, join(", ", $r->names), $r->example;
+  form action: %s
+  input names: %s
+  example URL: %s
+REPORT
+    ;
+    }
+}
+
+=head1 NAME
+
+xsslint  - audit XSS vulnerability of web pages
+
+=head1 SYNOPSIS
+
+  xsslint [options] URL [, URL ...]
+
+=head1 DESCRIPTION
+
+C<xsslint> is a command line tool to audit XSS vulnerabity of HTML
+forms in web pages. When it finds XSS vulnerability in HTML form, it
+displays action, untainted names and example URL with which the
+vulnerability can be confirmed.
+
+=head1 OPTIONS
+
+=over 4
+
+=item --no-cookie
+
+This option disables C<xsslint> to accept HTTP-Cookies. Cookie is
+enabled by default.
+
+=item --user-agent=STRING
+
+This option changes User-Agent string of C<xsslint>. default is
+C<xsslint/$VERSION>.
+
+=back
+
+=head1 TODO
+
+=over 4
+
+=item *
+
+Add C<--recursive> option. You'll know what this option means ;)
+
+=back
+
+=head1 AUTHOR
+
+Tatsuhiko Miyagawa E<lt>miyagawa@bulknews.netE<gt>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<xsslint>, L<HTML::XSSLint::Result>, L<LWP>, L<HTML::Form>
+
+=cut

@@ -1,0 +1,62 @@
+#!/usr/bin/perl -w
+use Getopt::Long;
+use HTTP::WebTest;
+use HTTP::WebTest::XMLParser;
+
+my %opt;
+GetOptions(\%opt, qw(config=s help dump debug name=s) );
+my $script = $opt{config} || $ARGV[0] || '';
+
+&usage() if ((! -f $script) || $opt{help});
+
+
+my ($cfg, $params);
+{
+  local $/;
+  open(FH, $script) || die $!;
+  ($cfg, $params) = HTTP::WebTest::XMLParser->parse(<FH>);
+}
+
+
+## read and parse configuration from xml file
+if ($opt{debug}) {
+  $params->{default_report} = 'yes';
+  $params->{plugins} = [];
+  $params->{show_headers} = 'yes';
+  $params->{show_html} = 'yes';
+}
+if ($opt{name}) {
+  my @tests;
+  foreach my $t (@$cfg) {
+    push @tests, $t if ($t->{test_name} =~ /\Q$opt{name}\E/i);
+  }
+  $cfg = \@tests;
+}
+if ($opt{dump}) {
+  eval { local $^W; use Data::Dumper; };
+  print Dumper($cfg, $params);
+  exit;
+}
+
+
+my $wt = HTTP::WebTest->new;
+$wt->run_tests( $cfg, $params );
+
+### UTIL ###
+
+sub usage {
+  print <<"  EU";
+Usage: webtest [options] <xmlfile>
+  --config=file  - read webtests from xml file "file"
+                   this takes precedence over the <xmlfile> argument
+  --dump         - dump parsed configuration, exit
+  --debug        - output full http-headers and html content
+                   in plain text representation
+  --name=string  - run only test(s) where test_name contains
+                   "string", case-insensitive
+  --help         - this
+  EU
+  exit;
+}
+
+

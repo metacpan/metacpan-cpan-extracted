@@ -1,0 +1,35 @@
+Changes
+Makefile.PL
+MANIFEST
+FAP.pm
+IS.pm
+README
+LICENSE
+examples/parse-aprs-packet.pl
+examples/parse-is-file.pl
+examples/aprsis-parser-client.pl
+t/00load-module.t
+t/01pod.t
+t/02pod-coverage.t
+t/10badpacket.t
+t/20decode-uncompressed.t
+t/21decode-uncomp-moving.t
+t/22decode-compressed.t
+t/23decode-mice.t
+t/24decode-gprmc.t
+t/25decode-dao.t
+t/30decode-wx-basic.t
+t/31decode-wx-ultw.t
+t/40decode-object-inv.t
+t/41decode-object.t
+t/51decode-msg.t
+t/52decode-beacon.t
+t/53decode-tlm.t
+t/54decode-tlm-mice.t
+t/55decode-timestamp.t
+t/56decode-status.t
+t/60binary-clean.t
+t/90check_ax25_call.t
+t/91aprsis_paths.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

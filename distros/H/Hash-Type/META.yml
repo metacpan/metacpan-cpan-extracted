@@ -1,0 +1,26 @@
+---
+abstract: 'restricted, ordered hashes as arrays tied to a "type" (shared list of keys)'
+author:
+  - 'Laurent Dami <dami@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.143240'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Hash-Type
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Hash-Type
+  homepage: https://metacpan.org/author/DAMI
+  license: http://www.perlfoundation.org/artistic_license_2_0
+  repository: https://github.com/damil/Hash-Type.git
+version: '2.00'

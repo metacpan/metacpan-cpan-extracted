@@ -1,0 +1,10 @@
+<form method="post">
+<table cellpadding="2">
+<tr><th>Emp ID</th><td>123<input name="emp_id" type="hidden" value="123" /></td></tr>
+<tr><th>Emp Name</th><td><input maxlength="100" name="emp_name" size="60" type="text" value="Fred Flintstone" /></td></tr>
+<tr><th>Emp Birth Dt</th><td><input maxlength="40" name="emp_birth_dt" size="40" type="text" value="20-10-55" /></td></tr>
+<tr><td align="center" colspan="2">
+<input maxlength="40" name="_submit" size="40" type="submit" value="Submit" />
+</td></tr>
+</table>
+</form>

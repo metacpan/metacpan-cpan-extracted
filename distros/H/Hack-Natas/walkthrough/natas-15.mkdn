@@ -1,0 +1,46 @@
+Level 15
+--------
+
+We know there is a users table, with columns "username" and "password".
+This time, the code just checks that the username exists. There's no way
+to print out the data we want. Instead, we'll have to do something
+cleverer.
+
+First, we can deduce that the password we want belongs to the `natas16`
+user. Check your assumption - does that user exist? Yes. Good.
+
+We can still guess parts of the data we need. We'll first guess the
+length of the password (it is probably 32 chars, like the others,
+but let's make sure). Then, we can guess one character at at time.
+
+To guess the length, inject
+
+    natas16" and length(password) = %d #
+
+We already know the first part of that `AND` is true, so now the
+second part is all we care about. When it is false, the whole thing
+is false, and the webpage will say "This user doesn't exist". When
+it is true, the whole thing is true, and a single database row will
+be returned. The webpage will then say "This users exists"
+
+Increment `%d` until true. (Yes the password is 32 chars).
+
+Now, do the same thing for one-character slices of the password:
+
+    natas16" and STRCMP(
+        SUBSTR(password, %d, 1),
+        '%s') = 0 #
+
+Note that there's a mistake here! `SUBSTR` is case-insensitive, so
+to coerce it into case-sensitivity, use `BINARY` on the operands:
+
+    natas16" and STRCMP(
+        BINARY(SUBSTR(password, %d, 1)),
+        BINARY('%s')) = 0 #
+
+With the error, all your letters will be lower-case: `waiheacj63wnnibroheqi3p9t0m5nhmh`
+
+As with the length, increment `%s` along the alphabet `a..z, A..z, 0..9`
+until it returns true, then increment `%d` and do it again.
+
+You'll want to script that. `natas15` does this for you.

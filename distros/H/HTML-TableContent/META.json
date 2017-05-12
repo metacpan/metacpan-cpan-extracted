@@ -1,0 +1,73 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Robert Acock <thisusedtobeanemail@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-TableContent",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "provides" : {
+      "HTML::TableContent" : {
+         "file" : "lib/HTML/TableContent.pm",
+         "version" : "0.18"
+      },
+      "HTML::TableContent::Element" : {
+         "file" : "lib/HTML/TableContent/Element.pm",
+         "version" : "0.18"
+      },
+      "HTML::TableContent::Parser" : {
+         "file" : "lib/HTML/TableContent/Parser.pm",
+         "version" : "0.18"
+      },
+      "HTML::TableContent::Table" : {
+         "file" : "lib/HTML/TableContent/Table.pm",
+         "version" : "0.18"
+      },
+      "HTML::TableContent::Table::Caption" : {
+         "file" : "lib/HTML/TableContent/Table/Caption.pm",
+         "version" : "0.18"
+      },
+      "HTML::TableContent::Table::Header" : {
+         "file" : "lib/HTML/TableContent/Table/Header.pm",
+         "version" : "0.18"
+      },
+      "HTML::TableContent::Table::Row" : {
+         "file" : "lib/HTML/TableContent/Table/Row.pm",
+         "version" : "0.18"
+      },
+      "HTML::TableContent::Table::Row::Cell" : {
+         "file" : "lib/HTML/TableContent/Table/Row/Cell.pm",
+         "version" : "0.18"
+      },
+      "HTML::TableContent::Template" : {
+         "file" : "lib/HTML/TableContent/Template.pm",
+         "version" : "0.18"
+      },
+      "HTML::TableContent::Template::Base" : {
+         "file" : "lib/HTML/TableContent/Template/Base.pm",
+         "version" : "0.18"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ThisUsedToBeAnEmail/HTML-TableContent.git",
+         "web" : "https://github.com/ThisUsedToBeAnEmail/HTML-TableContent"
+      }
+   },
+   "version" : "0.18"
+}

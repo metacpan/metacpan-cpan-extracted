@@ -1,0 +1,30 @@
+---
+abstract: 'Format HTML as nroff man page'
+author:
+  - 'Stefan Geneshky <minimal@cpan.org>'
+build_requires:
+  File::Path: '0'
+  File::Temp: '0'
+  HTML::Parse: '0'
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-FormatNroff
+requires:
+  Carp: '0'
+  HTML::Formatter: '0'
+  parent: '0'
+  perl: '5.004'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/naturalist/perl-html-formatnroff
+  repository: https://github.com/naturalist/perl-html-formatnroff.git
+version: '0.6'

@@ -1,0 +1,6 @@
+#!/usr/bin/env perl
+use local::lib './local';
+use lib 'lib';
+use Modern::Perl;
+use HTTP::Balancer;
+HTTP::Balancer->new->run;

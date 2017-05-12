@@ -1,0 +1,59 @@
+<ep-package name="HTML::EP::Locale" accept-language="de,en">
+<html><head><title>
+  <ep-language de="Testseite f&uuml;r HTML::EP"
+	       en="HTML::EP test page">
+</title></head>
+<body bgcolor=#ffffff>
+<h1><ep-language de="Testseite f&uuml;r HTML::EP" en="HTML::EP test page"></h1>
+<div align=center>
+  <ep-if eval="$_; -f 'de.jpg' && -f 'en.jpg'">
+    <a href="test.ep?language=de"><img src=de.jpg alt="Deutsch" border=0></a>
+    <a href="test.ep?language=en"><img src=en.jpg alt="English" border=0></a>
+  </ep-if>
+</div>
+<p>
+  <ep-language language="de">
+    Dies ist eine Testseite für das Embedded-HTML-System HTML::EP (kurz: EP).
+    Wenn Sie auf dieser Seite nur deutsche und keine englischen Texte
+    sehen, dann ist EP korrekt installiert. Nat&uuml;rlich k&ouml;nnen
+    Sie sich auch die <a href=test.ep?language=en>englische Version</a>
+    dieser Seite anschauen.
+  <ep-language language="en">
+    This is a test page for the embedded HTML system HTML::EP (short: EP).
+    If you are seeing only english texts and no german, then the EP
+    installation went fine. Of course you can also have a look at the
+    <a href=test.ep?language=de>german</a> version of this page.
+  </ep-language>
+</p>
+<p>
+  <ep-language language="de">
+    M&ouml;glicherweise sind die folgenden Informationen für Sie von
+    Interesse:
+  <ep-language language="en">
+    Perhaps the following information might be of any interest for
+    you:
+  </ep-language>
+</p>
+<h2><ep-language de="Die CGI-Umgebung" en="The CGI environment"></h2>
+<p>
+  <ep-language language="de">
+    Das CGI-Interface sieht die Definition gewisser Umgebungsvariablen
+    vor, die auch unter mod_perl, ISAPI usw. zur Verfügung stehen.
+    In Ihrem Fall sind das:
+  <ep-language language="en">
+    The CGI interface specifies the definition of certain environment
+    variables. Most of these variables are present as well under
+    mod_perl, ISAPI etc. In our case we have:
+  </ep-language>
+</p>
+<div align=center>
+<table border=1>
+  <tr><th><ep-language de="Variablenname" en="Variable name"></th>
+      <th><ep-language de="Wert" en="Value"></th></tr>
+<ep-list items="[keys %{$_->{'env'}}]" item=v>
+  <tr><td>$v$</td>
+      <td><ep-perl>$_->_format_NBSP($_->{'env'}->{$self->{'v'}})</ep-perl></td>
+</ep-list>
+</table></div>
+</body></html>
+

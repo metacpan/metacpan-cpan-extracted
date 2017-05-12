@@ -1,0 +1,5 @@
+echo "new commands job 1" && \
+    echo "hello from job 1"
+
+echo "hello from job 1"
+

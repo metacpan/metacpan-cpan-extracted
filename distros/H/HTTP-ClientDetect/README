@@ -1,0 +1,64 @@
+NAME
+    HTTP::ClientDetect - Detect language and location of an HTTP request
+
+VERSION
+    Version 0.03
+
+SYNOPSIS
+      use HTTP::ClientDetect::Location;
+      my $geo = HTTP::ClientDetect::Location->new(db => $dbfile);
+      my $country = $geo->request_country($request_object)
+
+      use HTTP::ClientDetect::Language;
+      my $lang_detect = HTTP::ClientDetect::Language->new(server_default => "hr_HR");
+      my $lang = $lang_detect->language_short($request_object);
+
+DESCRIPTION
+    This module by itself doesn't do nothing. You have to load one or more
+    of its children, as per synopsis.
+
+    The object passed to the methods has to be an object which at least has
+    an `header' method for the language detection, or `address' or
+    `remote_address' for the country detection. This should work with
+    Dancer::Request and Catalyst::Request objects.
+
+AUTHOR
+    Marco Pessotto, `<melmothx at gmail.com>'
+
+BUGS
+    Please report any bugs or feature requests to
+    `bug-interchange6-plugin-autodetect at rt.cpan.org', or through the web
+    interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=HTTP-ClientDetect. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc HTTP::ClientDetect
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTTP-ClientDetect
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/HTTP-ClientDetect
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/HTTP-ClientDetect
+
+    * Search CPAN
+        http://search.cpan.org/dist/HTTP-ClientDetect/
+
+ACKNOWLEDGEMENTS
+LICENSE AND COPYRIGHT
+    Copyright 2013 Marco Pessotto.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

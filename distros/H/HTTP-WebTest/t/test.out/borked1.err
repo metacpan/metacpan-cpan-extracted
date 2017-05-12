@@ -1,0 +1,2 @@
+HTTP::WebTest: wtscript parsing error
+Line 6 near '( borked test )': Global test parameter or test block is expected

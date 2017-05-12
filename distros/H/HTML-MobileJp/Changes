@@ -1,0 +1,35 @@
+Revision history for Perl extension HTML::MobileJp
+
+0.08
+
+    - fixed packaging issue
+
+0.07
+
+    - fixed bad usage for Params::Validate.
+      Now, parameter validation works correctly.
+      And, It works with P::V::PP.
+
+0.06
+
+    - Plugin::GPS: support <form> tag.
+
+0.05
+
+    - this module needs perl 5.8 or later.
+
+0.04
+
+    - nop.
+
+0.03
+
+    - fixed test.
+
+0.02
+    
+    - bug fixed: softbank gps and willcom basic.
+      softbank--, willcom--
+
+0.01    Wed Jan 16 10:42:32 2008
+        - original version

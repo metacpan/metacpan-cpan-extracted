@@ -1,0 +1,105 @@
+
+<html>
+<head>
+  <title><!--{subject}--></title>
+  <style type="text/css2">
+  </style>
+</head>
+<body>
+
+<h1><!--{subject}--></h1>
+
+<form method="POST" action="send_reply.cgi">
+
+<table bgcolor="#e0e0ff">
+<tr><td valign="top">Subject</td>
+    <td>&nbsp;</td>
+    <td valign="top"><input type="text" size="50"
+        value="<!--{subject}-->"></td></tr>
+<!--{head select => From|Reply-To}-->
+<tr><td valign="top"><!--{name}--></td>
+    <td>&nbsp;</td>
+    <td valign="top">
+        <!--{addresses}-->
+         <input type="text" size="50"
+          name="<!--{name}-->_<!--{email}-->"
+          value="<!--{address}-->"><br />
+        <!--{/addresses}-->
+<!--{/head}-->
+<!--{head select => To|Cc|Bcc}-->
+<tr><td valign="top"><!--{name}--></td>
+    <td>&nbsp;</td>
+    <td valign="top">
+        <!--{addresses}-->
+         <input type="checkbox" checked="CHECKED"
+          name="<!--{name}-->_<!--{email}-->"">&nbsp;<!--{address}--><br />
+        <!--{/addresses}-->
+    </td></tr>
+<!--{/head}-->
+<!--{head ignore => Subject|From|Reply-To|To|Cc|Bcc}-->
+<tr><td valign="top"><!--{name}--></td>
+    <td>&nbsp;</td>
+    <td valign="top"><!--{body}--></td></tr>
+<!--{/head}-->
+<tr><td>&nbsp;</td></tr>
+</table>
+
+<!--{message}-->
+   <!--{inline}-->
+       <!--{html}-->
+          <textarea cols="80" rows="20"><!--{rawText}--></textarea>
+       <!--{/html}-->
+   <!--{/inline}-->
+
+   <!--{attach}-->
+       [<!--{url}-->, <!--{type}-->, <!--{size}--> bytes if file]<br />
+       <a href="<!--{url}-->" target="_blank">See attachment</a>.
+   <!--{/attach}-->
+
+   <!--{preview}-->
+       [<a href="<!--{url}-->" target="_blank">view original</a>;
+           <!--{url}-->, <!--{type}-->, <!--{size}--> bytes in file]<br />
+       <!--{html}-->
+          <cite><!--{text}-->&nbsp;...</cite>
+          <a href="<!--{url}-->" target="_blank">read
+               more</a>&nbsp;&gt;&gt;&gt;
+       <!--{/html}-->
+       <!--{image}-->
+          <table>
+          <tr><td width="250" valign="top">
+           <a href="<!--{url}-->" target="_blank"><img
+            src="<!--{smallurl}-->" width="<!--{smallwidth}-->"
+            height="<!--{smallheight}-->" border="0"></a></td>
+              <td valign="top">
+           <a href="<!--{url}-->" target="_blank"><!--{width}--> x
+            <!--{height}--></a>
+          </table>
+       <!--{/image}-->
+   <!--{/preview}-->
+
+   <!--{multipart}-->
+      [<!--{type}-->]
+      <ul>
+      <!--{foreachPart}-->
+      <li><strong>Part <!--{part_number}--></strong>
+          (&nbsp;<input type="checkbox" name="delete_<!--{part_number}-->">&nbsp;delete)
+          <!--{part}--></li>
+      <!--{/foreachPart}-->
+      </ul>
+    <!--{/multipart}-->
+
+    <!--{nested}-->
+       [rfc822 encapsulated message]<br />
+       &nbsp;<br />
+       <strong>Part <!--{part_number}--></strong>
+       <!--{part}-->
+    <!--{/nested}-->
+
+<!--{/message}-->
+
+<center><input type="submit" value=" send ">&nbsp;&nbsp;&nbsp;
+        <input type="reset" value=" reset "></center>
+</form>
+
+</body>
+</html>

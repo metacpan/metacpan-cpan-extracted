@@ -1,0 +1,3 @@
+<a href="linkto"><br>link text<br></a>
+<!--expected-->
+<br /><a href="linkto">link text</a><br />

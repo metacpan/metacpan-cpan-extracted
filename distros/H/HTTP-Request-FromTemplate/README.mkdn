@@ -1,0 +1,87 @@
+# NAME
+
+HTTP::Request::FromTemplate - Create HTTP requests from templates
+
+# SYNOPSIS
+
+    use HTTP::Request::FromTemplate;
+    use LWP::UserAgent;
+
+    my $ua = LWP::UserAgent->new();
+
+    # A request, snarfed from your network monitor logs:
+    my $template = <<TEMPLATE
+    POST http://[% host %][% path %][% query %] HTTP/1.1
+    Host: [% host %]
+    Connection: keep-alive
+    Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+    Accept-Encoding: gzip,deflate
+    Accept-Language: en-us,en;q=0.5
+    User-Agent: QuickTime (qtver=5.0.2;os=Windows NT 5.1)
+    Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+    Keep-Alive: 300
+    Referer: http://[% host %][% path %][% query %]
+
+    TEMPLATE
+    my $t = HTTP::Request::FromTemplate->new(template => $template);
+    my $req = $t->process({ 'host' => 'apple.com',
+                            'path' => '/',
+                            'query' => '?',
+                             });
+    my $response = $ua->request($request); # replay the request
+
+# ABSTRACT
+
+I wanted this for a long time already. It makes it very convenient
+to just paste a logged session from the
+[Live HTTP Headers](http://livehttpheaders.mozdev.org/)
+into a template file and be able to faithfully replay a request
+or to parametrize it without needing to manually compare what
+is sent against what I want.
+
+# PREDEFINED TEMPLATE PARAMETERS
+
+There is one predefined/magic template parameter. `content_length`
+will be set to the length of the content (after the template has
+been filled out) unless it was passed in via the template
+parameters.
+
+# FEEDBACK
+
+This is one of the modules that I created because the idea hit
+me as crazy but useful. So if you use the module, please tell
+me what enhancements you'd like, or where it falls short
+of your expectations.
+
+# KNOWN BUGS
+
+- While this module tries to faithfully replicate a HTTP request
+from a template, it uses [HTTP::Request](https://metacpan.org/pod/HTTP::Request). This means that the order
+of the headers will be as [HTTP::Request](https://metacpan.org/pod/HTTP::Request) thinks and not as your
+template prescribes.
+- Only rudimentary testing has been done.
+- The test suite uses [Test::Base](https://metacpan.org/pod/Test::Base), which uses [Spiffy](https://metacpan.org/pod/Spiffy). I
+know I will rot in hell for that, but it was so convenient at the time.
+
+    Patches are welcome.
+
+# REPORTING BUGS
+
+If you find bugs, please report them via
+[http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTTP-Request-FromTemplate](http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTTP-Request-FromTemplate)
+or, preferrably via mail to [bug-HTTP-Request-FromTemplate@rt.cpan.org](https://metacpan.org/pod/bug-HTTP-Request-FromTemplate@rt.cpan.org).
+
+# AUTHOR
+
+Max Maischein (corion@cpan.org)
+
+# COPYRIGHT
+
+Copyright (C) 2005 Max Maischein.  All Rights Reserved.
+
+This code is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+# SEE ALSO
+
+[LWP](https://metacpan.org/pod/LWP),[HTTP::Request](https://metacpan.org/pod/HTTP::Request),Mozilla Live HTTP Headers

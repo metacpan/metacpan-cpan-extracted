@@ -1,0 +1,45 @@
+NAME
+    HTML::WikiConverter::XWiki - Convert HTML to XWiki markup
+
+SYNOPSIS
+      use HTML::WikiConverter;
+      my $wc = new HTML::WikiConverter( 
+         dialect => 'XWiki',
+         space_identifier => 'MySpace'
+      );
+      print $wc->html2wiki( $html );
+
+      - or -
+
+      html2wiki --dialect XWiki --base-uri=http://yoursite.xwiki.org/ index.html
+
+DESCRIPTION
+    This module contains rules for converting HTML into XWiki markup, the
+    wiki dialect used by xwiki.org. See HTML::WikiConverter for additional
+    usage details.
+
+ATTRIBUTES
+    The XWiki converter introduces a new attribute "space_identifier".
+
+  space_identifier
+    The value of this attribute is used to generate local links. The default
+    value is 'Main'.
+
+    "<a href="http://www.xwiki.org/Test">Test</a>" would result as
+    "[Test|Main.Test]".
+
+AUTHOR
+    Patrick Stählin, "<packi at cpan.org>". Many thanks to David J.
+    Iberri, "<diberri at cpan.org>" for writing HTML::WikiConverter.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc HTML::WikiConverter::XWiki
+
+COPYRIGHT & LICENSE
+    Copyright 2006 Encodo Systems AG, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

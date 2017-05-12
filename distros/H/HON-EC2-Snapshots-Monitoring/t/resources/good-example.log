@@ -1,0 +1,54 @@
+--------------------------------------------------------------------------------
+Starting KAAHE Backup -- 12-17-2015
+Starting rsync btrees
+rsync done
+Starting mysqldump
+Mysqldump done
+Snapshots taken by ec2-automate-backup-awscli.sh will be eligible for purging after the following date (the purge after date given in seconds from epoch): 1451268192.
+Tagging Snapshot snap-XXXXXXX with the following Tags:  Key=Name,Value=ec2ab_vol-XXXXXXXX_1450404192 Key=PurgeAfterFE,Value=1451268192 Key=PurgeAllow,Value=true
+Tagging Snapshot snap-XXXXXXX with the following Tags:  Key=Name,Value=ec2ab_vol-XXXXXXXX_1450404192 Key=PurgeAfterFE,Value=1451268192 Key=PurgeAllow,Value=true
+Snapshot Purging is Starting Now.
+Snapshot "snap-XXXXXXX" with the PurgeAfterFE date of "1448071385" will be deleted.
+Backup done
+--------------------------------------------------------------------------------
+Starting KAAHE Backup -- 12-18-2015
+Starting rsync btrees
+sending incremental file list
+........
+........
+........
+sent 304116175 bytes  received 1705 bytes  86890822.86 bytes/sec
+total size is 4865962017  speedup is 16.00
+rsync error: some files/attrs were not transferred (see previous errors) (code 23) at main.c(1070) [sender=3.0.9]
+rsync done
+Starting mysqldump
+mysqldump database XXXXXXXXXXX.sql
+mysqldump database XXXXXXXXXXX.sql
+mysqldump database XXXXXXXXXXX.sql
+mysqldump database XXXXXXXXXXX.sql
+mysqldump database XXXXXXXXXXX.sql
+mysqldump database XXXXXXXXXXX.sql
+mysqldump database XXXXXXXXXXX.sql
+Mysqldump done
+Snapshots taken by ec2-automate-backup-awscli.sh will be eligible for purging after the following date (the purge after date given in seconds from epoch): 1451268192.
+Tagging Snapshot snap-XXXXXXX with the following Tags:  Key=Name,Value=ec2ab_vol-XXXXXXXX_1450404192 Key=PurgeAfterFE,Value=1451268192 Key=PurgeAllow,Value=true
+Tagging Snapshot snap-XXXXXXX with the following Tags:  Key=Name,Value=ec2ab_vol-XXXXXXXX_1450404192 Key=PurgeAfterFE,Value=1451268192 Key=PurgeAllow,Value=true
+Snapshot Purging is Starting Now.
+Snapshot "snap-XXXXXXX" with the PurgeAfterFE date of "1448071385" will be deleted.
+Snapshot "snap-XXXXXXX" with the PurgeAfterFE date of "1450320001" will be deleted.
+Snapshot "snap-XXXXXXX" with the PurgeAfterFE date of "1450320001" will be deleted.
+Snapshot "snap-XXXXXXX" with the PurgeAfterFE date of "1448071385" will be deleted.
+Backup done
+--------------------------------------------------------------------------------
+Starting KAAHE Backup -- 12-19-2015
+Starting rsync btrees
+rsync done
+Starting mysqldump
+Mysqldump done
+Snapshots taken by ec2-automate-backup-awscli.sh will be eligible for purging after the following date (the purge after date given in seconds from epoch): 1451268192.
+Tagging Snapshot snap-XXXXXXX with the following Tags:  Key=Name,Value=ec2ab_vol-XXXXXXXX_1450404192 Key=PurgeAfterFE,Value=1451268192 Key=PurgeAllow,Value=true
+Tagging Snapshot snap-XXXXXXX with the following Tags:  Key=Name,Value=ec2ab_vol-XXXXXXXX_1450404192 Key=PurgeAfterFE,Value=1451268192 Key=PurgeAllow,Value=true
+Snapshot Purging is Starting Now.
+Snapshot "snap-XXXXXXX" with the PurgeAfterFE date of "1448071385" will be deleted.
+Backup done
+--------------------------------------------------------------------------------

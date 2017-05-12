@@ -1,0 +1,107 @@
+New in 1.21:
+
+Now allow normal XML-style for non-matched tags (like <else/> - we used to
+allow <else/ > and not <else />; now we allow both.
+
+New in 1.20; 
+
+File cache now respects modification times, reloading modified files.
+
+Attribute handling was changed.  You should now specify attributes as a
+hash ref arg to new (like DBI).  Attributes to be specified (without a
+preceding '@') may be: collapse_whitespace, collapse_blank_lines, debug and
+precompile. 
+
+Collapse_whitespace is now called when loading (caching) files, for
+further optimization.  This means interpolated values are no longer
+collapsed; also any files read in by the user are not subject to
+collapsing.
+
+ColdFusion style quotes (<!--- ... --->) are now processed (by removing them).
+The processing is done when a file is read.
+
+
+New in 1.19; Various performance enhancements, including file caching.
+Included files, and templates read by HTML::Macro::new and process are
+cached in memory if the 'cache_files' attribute is true.  This can improve
+performance significantly if you include a file in a loop that is repeated
+often.  No attempt is made to detect when a file changes, so this cache is
+unsuitable for use with mod_perl.  I plan to add cache freshening at some
+point for just this reason.
+
+collapse_whitespace is now only called on the "final" pass of evaluation,
+saving considerable work.  Also, we attempt to make lighter use of cwd,
+which turns out to be expensive in many OS implementations since it calls
+`pwd`.  I am considering a rewrite of the entire mechanism for walking
+directories, but at least it runs reasonably fast now when you have a lot
+of includes.
+
+<eval/>: embedded perl evaluation
+
+New in 1.15, the <eval expr=""></eval> construct evaluates its expression
+attribute as Perl, in the package in which the HTML::Macro was created.
+This is designed to allow you to call out to a perl function, not to embed
+large blocks of code in the middle of your HTML, which we do not advocate.
+The expression attribute is treated as a Perl block (enclosed in curly
+braces) and passed a single argument: an HTML::Macro object whose content
+is the markup between the <eval> and </eval> tags, and whose attributes are
+inherited from the enclosing HTML::Macro.  The return value of the
+expression is interpolated into the output.  A typical use might be:
+
+Your user profile:
+<eval expr="&get_user_info">
+  #FIRST_NAME# #LAST_NAME# <br>
+  #ADDRESS## #CITY# #STATE# <br>
+</eval>
+
+where get_user_info is a function defined in the package that called
+HTML::Macro::process (or process_buf, or print...).  Presumably get_user_info will look something like:
+
+sub get_user_info
+{
+    my ($htm) = @_;
+    my $id = $htm->get ('user_id');
+    ... get database record for user with id $id ...;
+    $htm->set ('first_name', ...);
+    ...;
+    return $htm->process;
+}
+
+Note that the syntax
+used to call the function makes use of a special Perl feature that the @_ variable is automatically passed as an arg list when you use & and not () in the function call: a more explicit syntax would be:
+
+  <eval expr="&get_user_info(@_)">...
+
+
+<define />
+
+You can use the <define/> tag, as in:
+
+ <define/ name="variable_name" value="variable_value">  
+
+to define HTML::Macro tags during the course of processing.  These
+definitions are processed in the same macro evaluation pass as all the
+other tags.  Hence the defined variable is only in scope after the
+definition, and any redefinition will override, in the way that you would
+expect.
+
+This feature is useful for passing arguments to functions called by eval.
+
+New in version 1.14:
+
+- The quote tag is now deprecated.  In its place, you should use tags with
+  an underscore appended to indicate tags to be processed by a
+  preprocessor.  Indicate that this is a preprocessing pass by setting the
+  variable '@precompile' to something true.  For example: <if_ expr="0">I
+  am a comment to be removed by a preprocessor.</if_> <if expr="#num# >
+  10">this if will be left unevaluated by a preprocessor.</if>
+
+- Support for testing for the existence of a variable is now provided by
+  the if "def" attribute.  You used to have to do a test on the value of
+  the variable, which sometimes caused problems if the variable was a
+  complicated string with quotes in it.  Now you can say:
+
+  <if def="var"><b>#var#</b><br></if>
+
+  and so on.
+

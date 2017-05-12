@@ -1,0 +1,17 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         HTML-CheckArgs
+version:      0.11
+version_from: lib/HTML/CheckArgs.pm
+installdirs:  site
+requires:
+    Carp:                          0
+    Email::Valid:                  0.15
+    Geography::Countries:          1.4
+    HTML::FormatData:              0.08
+    LWP::UserAgent:                2.031
+    Scalar::Util:                  1.14
+    URI::Find:                     0.14
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

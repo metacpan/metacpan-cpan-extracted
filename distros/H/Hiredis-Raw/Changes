@@ -1,0 +1,14 @@
+Revision history for Hiredis-Raw
+
+0.07 Mon. Feb 16, 2016
+    - Add support for p(subscribe)
+
+0.03 Mon. Aug 22, 2011
+    - Fix a memory leak affecting every command that returns an array
+
+0.02 Mon. Jul 04, 2011
+    - Fix a few errors in the docs
+    - Have Makefile.PL exit(0) when libs aren't available
+
+0.01 Fri. Jun 24, 2011
+    - Fix a few errors in the docs

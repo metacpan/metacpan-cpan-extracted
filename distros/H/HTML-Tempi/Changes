@@ -1,0 +1,6 @@
+Revision history for Perl extension Tempi.
+
+0.01  Fri Jan 11 16:50:02 2002
+	- original version; created by h2xs 1.20 with options
+		-A HTML::Tempi
+

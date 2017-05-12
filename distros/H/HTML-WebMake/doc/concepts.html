@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>
+      WebMake: Documentation: Concepts
+    </title>
+    <meta name="generator" content="WebMake/2.2" />
+    <style>
+      body {
+       background-color: #ffffff; 
+       color: #000000; 
+       font-size: medium;
+       font-family: verdana,lucida,helvetica,sans-serif;
+      }
+      code, samp, pre {
+       font-family: Courier New,courier,fixed-width,monospace;
+      }
+      H1 { font-size: x-large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFCC66; }
+      H2 { font-size: large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFDD77; }
+      H3 { font-size: medium; font-family: Garamond,Book Antiqua,Times,serif; background: #FFEE88; }
+      H4 { font-size: small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H5 { font-size: x-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H6 { font-size: xx-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      A:link {
+       font-weight: bold;
+       color: #004000;
+       text-decoration: underline; 
+      }
+      A:visited {
+       font-weight: normal;
+       color: #008000;
+       text-decoration: underline; 
+      }
+      A:active {
+       font-weight: bold;
+       color: #800000;
+       text-decoration: underline; 
+      }
+      dt {
+       font-size: medium;
+       font-weight: bold;
+       padding-top: 8px; padding-bottom: 8px;
+      }
+      dd {
+       padding-top: 8px; padding-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body bgcolor="#ffffff" text="#000000" link="#3300cc" vlink="#660066">
+    <font face="lucida,verdana,sans-serif">
+      <div align="center">
+         <img src="images/WebMakeTitle.png" alt="WebMake" width="500" height="122" />
+      </div>
+      <table width="100%">
+        <tr>
+          <td valign="top">
+             <strong><a href="http://webmake.taint.org/">WebMake</a>
+             Documentation</strong> (version 2.2)
+             
+          </td>
+          <td valign="top">
+            <div align="right">
+              
+               [ <a href="blurb.html">Back</a> | <a href="making.html">Forward</a> | <a href="index.html">Index</a>
+               | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+               
+            </div>
+          </td>
+        </tr>
+      </table>
+<!-- yes, it's that Mozilla black-border code again ;) -->
+      <!-- stolen from www.mozilla.org via rc3.org -->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td bgcolor="#aaaaaa">
+            <table border="0" cellspacing="4" cellpadding="4" width="100%">
+              <tr>
+                <td bgcolor="#ffffff">
+                  <table border="0" cellspacing="4" cellpadding="4" width="100%">
+                    <tr>
+                      <td>
+                         <h1>Concepts</h1><p>
+                           <a name="top"></a><p>
+                            Here's a list of the main concepts behind WebMake's design and implementation.
+                            Before using WebMake, it'll probably help to have a read of this, so you
+                            can understand where the functionality is coming from.
+                            
+                          </p>
+                           <a name="1_Templating"><h3>1. Templating</h3></a><blockquote>
+                            <p>
+                              When you start working with the web, it's easy enough to write a few pages and
+                               put them on your site. However, you quickly realise that they all look
+                               different; there's nothing binding them together as one "site".
+                              
+                            </p>
+                          </blockquote>
+                          <blockquote>
+                            <p>
+                              The next step is to add some common elements to tie the pages together, so you
+                               add some header text or graphics, and maybe a table on one side listing the
+                               other pages in the site, allowing your users to quickly find the other pages.
+                               Maybe you add some information at the bottom of the page, describing who you
+                               are, that kind of thing.
+                              
+                            </p>
+                          </blockquote>
+                          <blockquote>
+                            <p>
+                              After a while, you'll have quite a few pages, each with a different piece of
+                               <strong>main content</strong>, but a lot of them sharing some, or all, of the shared
+                               elements -- the <strong>templates</strong>.
+                              
+                            </p>
+                          </blockquote>
+                          <blockquote>
+                            <p>
+                              One day, you need to change the templates -- but there's no easy way to do
+                               this, without manually editing each of the files and changing them by hand.
+                               Wouldn't it be easier to just change this once, and be done with it?
+                              
+                            </p>
+                          </blockquote>
+                          <blockquote>
+                            <p>
+                              That's one of the main features of WebMake: <strong>templating</strong>. It allows you to
+                               define the templates in one place, then generate pages containing the
+                               <strong>content</strong> wrapped in those templates.
+                              
+                            </p>
+                          </blockquote>
+                          <blockquote>
+                            <p>
+                              There's quite a few products that do this; WebMake differs in that it's
+                               <em>very</em> flexible in how you can include your content text in the templates.
+                               Often, other products are limited to just setting a header and a footer to be
+                               added to each page; WebMake takes its cues from traditional UNIX tools by
+                               allowing very deep recursion in its templating, so your templates can include
+                               other templates, etc. etc.
+                              
+                            </p>
+                          </blockquote>
+                           <a name="2_Edit_Text_As_Text_Not_HTML"><h3>2. Edit Text As Text, Not HTML</h3></a><blockquote>
+                            <p>
+                              In some situations, you'll want to write HTML; but in others, text is
+                               best, for ease of editing, and reading while you're editing. WebMake
+                               supports <strong>Text::EtText</strong> and <strong>POD</strong> formats, converting them to
+                               HTML on-the-fly.
+                              
+                            </p>
+                          </blockquote>
+                          <blockquote>
+                            <p>
+                              <strong>Text::EtText</strong> aims to support most of the de-facto conventions we've
+                               been using in mail and in USENET for years, converting them into HTML
+                               in a sensible way.
+                              
+                            </p>
+                          </blockquote>
+                           <a name="3_Breaking_Down_the_File_Per_Page_Mapping"><h3>3. Breaking Down the File-Per-Page Mapping</h3></a><blockquote>
+                            <p>
+                              Another annoyance comes from the default way a web servers serves web pages;
+                               normally, each web page is loaded from a separate file.
+                              
+                            </p>
+                          </blockquote>
+                          <blockquote>
+                            <p>
+                              This is fine for some sites, but in other circumstances you might want to
+                               produce lots of small pages, or include identical text in several pages; or
+                               you may just prefer editing your entire site in one editor, rather than having
+                               to switch from one window to another.
+                              
+                            </p>
+                          </blockquote>
+                          <blockquote>
+                            <p>
+                              WebMake allows you to specify several <strong>content items</strong> inside a single
+                               <strong>WebMake .wmk file</strong> (the .wmk file uses WebMake's XML-based file format),
+                               and/or load content from a data source, such as a comma-separated values file,
+                               a directory tree, or (possibly in future) an SQL database.
+                              
+                            </p>
+                          </blockquote>
+                          <blockquote>
+                            <p>
+                              You can then include these content items into the generated web pages,
+                               whichever way you wish, based on the outputs and templates you specify in the
+                               WebMake file.
+                              
+                            </p>
+                          </blockquote>
+                           <a name="4_Support_URL_Changes"><h3>4. Support URL Changes</h3></a><blockquote>
+                            <p>
+                              At some stage, you may feel like rearranging your site, changing
+                               one URL that's always bothered you, so that it becomes more aesthetically
+                               pleasing or descriptive. Or maybe some directive might suddenly appear,
+                               ordering you to do so for policy reasons (ugh). Whatever!
+                              
+                            </p>
+                          </blockquote>
+                          <blockquote>
+                            <p>
+                              WebMake allows you to track output pages or media, such as images, or
+                               non-WebMake generated pages, using URL references; references to the name
+                               will be converted to the correct URL for that page or image.
+                              
+                            </p>
+                          </blockquote>
+                           <a name="5_Site_Mapping_and_Indices"><h3>5. Site Mapping and Indices</h3></a><blockquote>
+                            <p>
+                              The obvious next step is to allow site maps, indexes, and navigational
+                               information to be generated automatically.
+                              
+                            </p>
+                          </blockquote>
+                          <blockquote>
+                            <p>
+                              WebMake accomplishes this using metadata; in other words, if you tag your
+                               content items with information like its title, its "parent" content item,
+                               and its precedence compared to its neighbours (to specify the order of items),
+                               WebMake can automatically use this information to generate the following maps:
+                              
+                            </p>
+                          </blockquote>
+                          <ul>
+                            <li>
+                              <p>
+                                <strong>dynamically-generated indexes</strong>, such as <a href="index.html">the front page of this
+                                 documentation</a>
+                              </p>
+                            </li>
+                            <li>
+                              <p>
+                                <strong>site maps</strong>, such as <a href="docmap.html">this one of the WebMake documentation</a>
+                              </p>
+                            </li>
+                            <li>
+                              <p>
+                                <strong>breadcrumb trails</strong>, as seen on <a href="http://www.yahoo.com/">
+                                 Yahoo!</a>
+                              </p>
+                            </li>
+                            <li>
+                              <p>
+                                <strong>back/forward navigation links</strong>, as seen at the <a href="#top">top of
+                                 this page</a>
+                              </p>
+                            </li>
+                          </ul>
+                          <a name="6_HTML_Cleaning"><h3>6. HTML Cleaning</h3></a><blockquote>
+                            <p>
+                              Often, the HTML you'll have to work with may be crufty, with <em>img</em>
+                               tags that have no size information, or other inefficiencies.
+                              
+                            </p>
+                          </blockquote>
+                          <blockquote>
+                            <p>
+                              WebMake includes a <strong>HTML cleaner</strong> which will rewrite your HTML until it
+                               sparkles. It can also be turned off for a "HTML verite" effect, if you feel
+                               so inclined. (Alright, it's also a little faster with the cleaner off. Not
+                               much though ;)
+                              
+                            </p>
+                          </blockquote>
+                           <a name="7_Plugins_User_Defined_Tags_And_Perl_Code"><h3>7. Plugins, User-Defined Tags And Perl Code</h3></a><blockquote>
+                            <p>
+                              You can define your own tags, similar to how JSPs support taglibs; this
+                               provides a way to add scripted components to your pages, without
+                               making things too messy or confusing, or arbitrarily peppering code
+                               into the text.
+                              
+                            </p>
+                          </blockquote>
+                          <blockquote>
+                            <p>
+                              Or, if you <em>like</em> peppering code into your text, WebMake provides support
+                               for Perl code embedded directly into the text or WebMake file, similar to PHP,
+                               ePerl, HTML::Mason, or ASPs. It also provides an API for that code to
+                               examine or alter WebMake's behaviour.
+                              
+                            </p>
+                          </blockquote>
+                          <blockquote>
+                            <p>
+                              There's a plugin architecture as well, providing an easy way to load code on
+                               demand from self-contained components.
+                              
+                            </p>
+                          </blockquote>
+                           <a name="8_The_Web_Is_Read_Mostly_Bake_Don_t_Fry"><h3>8. The Web Is "Read-Mostly": Bake, Don't Fry</h3></a><blockquote>
+                            <p>
+                              Several other similar web site management systems revolve around dynamic
+                               code running on the web server, which assembles the pages as they're
+                               requested by the client. In the terminology used <a href="http://www.salon.com/contact/staff/idk/print.html">by Ian Kallen of
+                               Salon.Com</a>, they "fry" the pages on-demand.
+                              
+                            </p>
+                          </blockquote>
+                          <blockquote>
+                            <p>
+                              For most sites, the pages do not change based on which client is accessing
+                               them, or if they do, they don't change entirely; perhaps an extra set of
+                               links becomes available in the page footer allowing a logged-in user to make
+                               modifications using CGI, or PHP or Perl code, but that would be it. The
+                               page just isn't volatile enough to require continual re-generation for each
+                               request.
+                              
+                            </p>
+                          </blockquote>
+                          <blockquote>
+                            <p>
+                              As a result, all this churning about, generating pages on the fly from its
+                               raw components each time, is wasted; it just eats the server's CPU and
+                               memory for no real gain, and introduces yet another breakage point
+                               (databases, memory usage, the /. effect...) where things can go wrong, just
+                               when you're not looking at it.
+                              
+                            </p>
+                          </blockquote>
+                          <blockquote>
+                            <p>
+                              WebMake takes the "baking" approach, generating virtually all its output
+                               <em>before</em> the web server gets involved. The web site admin runs the
+                               <code>webmake</code> command, and this generates the pages.
+                              
+                            </p>
+                          </blockquote>
+                          <blockquote>
+                            <p>
+                              Note that WebMake doesn't preclude dynamic content in the pages, however.
+                               PHP, CGI, ASP or embedded Perl code can be used, and WebMake will not
+                               interfere. In fact, a future version of WebMake will probably provide some
+                               "fried" features of its own...
+                              
+                            </p>
+                          </blockquote>
+                           <a name="9_Site_Replication"><h3>9. Site Replication</h3></a><blockquote>
+                            <p>
+                              You can replicate web sites quickly, easily, and securely over the internet.
+                               WebMake does this using CVS and SSH, two standard UNIX utilities that have
+                               been used for years to do exactly the same thing for other types of data;
+                               why not web sites?
+                              
+                            </p>
+                          </blockquote>
+                          <blockquote>
+                            <p>
+                              A bonus of using CVS is that you also get seamless version control and
+                               conflict management, so users can edit a WebMake site at any replicated
+                               point, check in the changes, and it won't overwrite everyone else's
+                               modifications.
+                              
+                            </p>
+                          </blockquote>
+                           <a name="10_Edit_In_Browser"><h3>10. Edit-In-Browser</h3></a><blockquote>
+                            <p>
+                              The WebMake distribution includes a CGI script which provides a simple
+                               interface allowing a WebMake site to be edited over the web, and the changes
+                               to be checked in to CVS. At the moment, it's not too user-friendly, so it's
+                               not quite suitable for a newbie to use without some instruction -- but it's
+                               getting there, and it'll improve.
+                              
+                            </p>
+                          </blockquote>
+                          <blockquote>
+                            <p>
+                              It's certainly handy for an experienced user who wishes to correct a typo or
+                               add a new page to their site, without requiring command-line access to the
+                               server; so if you check out your site in an internet cafe and spot a typo, you
+                               can immediately fix it without downloading an SSH client! ;)
+                              
+                            </p>
+                          </blockquote>
+                          <p>
+                            
+                          </p>
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+      <table width="100%">
+        <tr>
+          <td valign="top">
+             <strong><a href="http://webmake.taint.org/">WebMake</a>
+             Documentation</strong> (version 2.2)
+             
+          </td>
+          <td valign="top">
+            <div align="right">
+              
+               [ <a href="blurb.html">Back</a> | <a href="making.html">Forward</a> | <a href="index.html">Index</a>
+               | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+               
+            </div>
+          </td>
+        </tr>
+      </table>
+      <div align="right">
+         <a href="http://webmake.taint.org/"> <img src="images/BuiltWithWebMake.png" alt="Built With WebMake" border="0" width="88" height="31" /></a>
+      </div>
+    </font>
+  </body>
+</html>

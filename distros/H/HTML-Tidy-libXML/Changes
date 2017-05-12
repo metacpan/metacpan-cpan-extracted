@@ -1,0 +1,11 @@
+#
+# $Id: Changes,v 0.2 2009/02/21 11:47:58 dankogai Exp dankogai $
+#
+# Revision history for HTML-Tidy-libXML
+$Revision: 0.2 $ $Date: 2009/02/21 11:47:58 $
+! lib/HTML/Tidy/libXML.pm
+  Added dom2xml().
+
+0.01 $ $Date: 2009/02/21 11:18:30
++ *
+  First Release.

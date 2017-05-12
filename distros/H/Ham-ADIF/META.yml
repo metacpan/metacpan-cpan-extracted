@@ -1,0 +1,38 @@
+---
+abstract: 'ADIF (ADI and ADX) processing'
+author:
+  - 'Roger Pettett <rmp@psyphi.net>'
+build_requires:
+  TAP::Harness::JUnit: '0.41'
+  Test::More: '0.62'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Ham-ADIF
+provides:
+  Ham::ADIF:
+    file: lib/Ham/ADIF.pm
+    version: v1.5.1
+  Ham::ADIF::ADI:
+    file: lib/Ham/ADIF/ADI.pm
+    version: '344'
+  Ham::ADIF::ADX:
+    file: lib/Ham/ADIF/ADX.pm
+    version: '160'
+requires:
+  Carp: '1.04'
+  English: '1.02'
+  LWP::Simple: '6.00'
+  XML::LibXML: '2.0107'
+  base: '2.07'
+  strict: '1.03'
+  warnings: '1.05'
+resources:
+  license: http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt
+version: v1.5.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

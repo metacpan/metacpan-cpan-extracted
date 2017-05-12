@@ -1,0 +1,516 @@
+NAME
+    HTTP::ProxyCheck - a class to check the functionality of HTTP proxy
+    servers.
+
+SYNOPSIS
+        use HTTP::ProxyCheck;
+    
+        my $proxy       = 'proxy:8080';
+        my $url         = 'http://search.cpan.org/';
+        my $proxy_check = new HTTP::ProxyCheck(
+            proxy       => $proxy,
+            url         => $url,
+            answer_size => 'header',
+            print_error => 0,
+        ) 
+        or die $HTTP::ProxyCheck::error;
+    
+        print "Trying to connect to '$proxy' and retrieve '$url'\n";
+    
+        if ( $proxy_check->check() ) {
+            print "'$proxy' returns:\n\n", $proxy_check->get_answer(), "\n\n";
+        }
+        else {
+            print "Error: ", $proxy_check->get_error(), "\n";
+        }
+
+DESCRIPTION
+    HTTP::ProxyCheck is a class to check HTTP proxy servers. It connects to
+    given HTTP proxy servers and tries to retrieve a provided URL through
+    them.
+
+CONSTRUCTOR
+  new( [attribute => $value, ...] )
+    "new()" is the HTTP::ProxyCheck object constructor.
+
+    If an error happens while constructing the object, use
+    $HTTP::ProxyCheck::error to get the error message.
+
+    All named attributes of "new()" are optional.
+
+    Attributes
+
+    * proxy => $proxy
+              Specifies the address of the proxy server to check. This can
+              also be done with "set_proxy()".
+
+              The proxy server address has to match the patter 'host:port'.
+              Host and port are tested whether they are valid. If you want
+              to disable this test, you can set "check_proxy => 0".
+
+    * check_proxy => 1|0
+              Set "check_proxy => 0" to disable the check whether the proxy
+              server address is valid.
+
+              The default value of "check_proxy" is 1 which means, the proxy
+              server address gets tested.
+
+              This attribute can also be set with "set_check_proxy()".
+
+    * url => $url
+              Specifies the URL to use for the proxy server check. This can
+              also be done with "set_url()".
+
+              The URL has to be of a valid form, e.g.
+              'http://search.cpan.org'. It gets tested whether it is valid.
+              If you want to disable this test, you can set "check_url =>
+              0".
+
+    * check_url => 1|0
+              Set "check_url => 0" to disable the check whether the URL is
+              valid.
+
+              The default value of "check_url" is 1 which means, the URL
+              gets tested.
+
+              This attribute can also be set with "set_check_url()".
+
+    * answer_size => short|header|full
+              Defines the size of the proxy server answer.
+
+              "short" means that only the HTTP status code, e.g.
+
+                  HTTP/1.0 200 OK
+
+              is returned.
+
+              With "header" the full HTTP header gets returned, e.g.
+
+                  HTTP/1.0 200 OK
+                  Date: Tue, 12 Aug 2003 12:19:46 GMT
+                  Server: Apache/1.3.27 (Unix) mod_perl/1.27
+                  Cache-Control: max-age=3600
+                  Expires: Tue, 12 Aug 2003 13:19:46 GMT
+                  Last-Modified: Tue, 12 Aug 2003 12:19:46 GMT
+                  Content-Type: text/html
+                  X-Cache: MISS from search.cpan.org
+                  X-Cache: MISS from hactar.earth.net
+                  X-Cache-Lookup: HIT from hactar.earth.net:8080
+                  Proxy-Connection: close
+
+              Use "full" if you want the HTTP header including the whole
+              data from the proxy server.
+
+              The default value of "answer_size" is "header".
+
+              This attribute can also be set with "set_answer_size()".
+
+    * user_agent => $user_agent
+              Specifies the name of the user agent sent to the proxy.
+
+              If you don't specify a user agent, "HTTP::ProxyCheck/1.4" is
+              used.
+
+    * verbose_errors => 0|1
+              Set "verbose_errors => 1" to enable verbose error messages.
+
+              Verbose error messages look like this:
+
+                  $method failed: $error_message
+
+              And non-verbose error messages like this:
+
+                  $error_message
+
+              The default value of "verbose_errors" is 0.
+
+              For more information see "ERROR HANDLING".
+
+    * print_error => 1|0
+              Set "print_error => 0" to disable that error messages are
+              displayed with "Carp::carp()".
+
+              The default value of "print_error" is 1.
+
+              For more information see "ERROR HANDLING".
+
+    * raise_error => 0|1
+              Set "raise_error => 1" to enable that error messages are
+              displayed with "Carp::croak()" and the program is brought to
+              an end.
+
+              The default value of "raise_error" is 0.
+
+              For more information see "ERROR HANDLING".
+
+    Return values
+
+    * Okay    Blessed reference
+
+    * Error   "undef"
+
+              The error message can be retrieved with
+              $HTTP::ProxyCheck::error.
+
+METHODS
+  check( [attribute => $value, ...] )
+    "check()" does the actual proxy server checking. It connects to a
+    specified proxy server and tries to get a defined URL through it.
+
+    All named attributes of "check()" are optional, but "proxy" and "url"
+    must be either set as object or method attribute.
+
+    Attributes
+
+    * proxy => $proxy
+              Defines the proxy server to check.
+
+              "proxy => $proxy" has higher precedence than the object
+              attribute "proxy". It is only used by this method call. It
+              doesn't get saved as object attribute or changes the object
+              attribute. If you want to do this use "set_proxy()".
+
+              For more information see "CONSTRUCTOR".
+
+    * check_proxy => 1|0
+              Set "check_proxy => 0" to disable the check whether the proxy
+              server address is valid. If "check_proxy => 1" is set the
+              proxy server address gets tested.
+
+              This method attribute has higher precedence than the object
+              attribute "check_proxy". It is only used by this method call.
+              It doesn't get saved as object attribute or changes the object
+              attribute. If you want to do this use "set_check_proxy()".
+
+    * url => $url
+              Defines the URL to use with the proxy server check.
+
+              "url => $url" has higher precedence than the object attribute
+              "url". It is only used by this method call. It doesn't get
+              saved as object attribute or changes the object attribute. If
+              you want to do this use "set_url()".
+
+              For more information see "CONSTRUCTOR".
+
+    * check_url => 1|0
+              Set "check_url => 0" to disable the check whether the URL is
+              valid. If "check_url => 1" is set the URL gets tested.
+
+              This method attribute has higher precedence than the object
+              attribute "check_url". It is only used by this method call. It
+              doesn't get saved as object attribute or changes the object
+              attribute. If you want to do this use "set_check_url()".
+
+    * answer_size => short|header|full
+              Defines the size of the proxy server answer.
+
+              This method attribute has higher precedence than the object
+              attribute "answer_size". It is only used by this method call.
+              It doesn't get saved as object attribute or changes the object
+              attribute. If you want to do this use "set_answer_size()".
+
+              For more information see "CONSTRUCTOR".
+
+    Return values
+
+    * Okay    1
+
+              The answer of the proxy server can be retrieved with
+              "get_answer()" or $HTTP::ProxyCheck::answer
+
+    * Error   "undef"
+
+              The error message can be retrieved with "get_error()" or
+              $HTTP::ProxyCheck::error
+
+  get_answer( )
+    "get_answer()" gets the most recent proxy server answer.
+
+    The proxy server answer is in the form specified by the "answer_size"
+    attribute of the HTTP::ProxyCheck object or the "check()" method.
+
+    For more information see "CONSTRUCTOR".
+
+    Return values
+
+    * Okay    "$proxy_check->{answer}"
+
+              This is the most recent proxy server answer.
+
+    * Error   "undef"
+
+              The error message can be retrieved with "get_error()" or
+              $HTTP::ProxyCheck::error
+
+  get_error( )
+    "get_error()" gets the most recent error message.
+
+    For more information see "ERROR HANDLING".
+
+    Return values
+
+    * Okay    "$proxy_check->{error}"
+
+              This is the most recent error message.
+
+  get_proxy( )
+    "get_proxy()" gets the current value of the object attribute "proxy".
+
+    Return values
+
+    * Okay    "$proxy_check->{proxy}"
+
+              This is the current proxy server address.
+
+    * Error   "undef"
+
+              The error message can be retrieved with "get_error()" or
+              $HTTP::ProxyCheck::error
+
+  set_proxy( $proxy )
+    "set_proxy()" sets the value of the object attribute "proxy".
+
+    Attributes
+
+    * $proxy  The proxy server address has to match the patter 'host:port'.
+              Host and port are tested whether they are valid. If you want
+              to disable this test, you can set the object attribute
+              "check_proxy => 0" or use set_check_proxy(0).
+
+    Return values
+
+    * Okay    1
+
+    * Error   "undef"
+
+              The error message can be retrieved with "get_error()" or
+              $HTTP::ProxyCheck::error
+
+  get_check_proxy( )
+    "get_check_proxy()" gets the current value of the object attribute
+    "check_proxy".
+
+    Return values
+
+    * Okay    "$proxy_check->{check_proxy}"
+
+              This is the current value of the "check_proxy" attribute.
+
+  set_check_proxy( $check )
+    "set_check_proxy" sets the object attribute "check_proxy".
+
+    Attributes
+
+    * $check  Use 0 to disable the check whether the proxy server address is
+              valid and 1 to enable it.
+
+    Return values
+
+    * Okay    1
+
+    * Error   "undef"
+
+              The error message can be retrieved with "get_error()" or
+              $HTTP::ProxyCheck::error
+
+  get_url( )
+    "get_url()" gets the current value of the object attribute "url".
+
+    Return values
+
+    * Okay    "$proxy_check->{url}"
+
+              This is the current URL.
+
+    * Error   "undef"
+
+              The error message can be retrieved with "get_error()" or
+              $HTTP::ProxyCheck::error
+
+  set_url( $url )
+    "set_url" sets the object attribute "url".
+
+    Attributes
+
+    * $url    The URL has to be of a valid form, e.g.
+              'http://search.cpan.org'. It gets tested whether it is valid.
+              If you want to disable this test, you can set the object
+              attribute "check_url => 0" or use set_check_url(0).
+
+    Return values
+
+    * Okay    1
+
+    * Error   "undef"
+
+              The error message can be retrieved with "get_error()" or
+              $HTTP::ProxyCheck::error
+
+  get_check_url( )
+    "get_check_url()" gets the current value of the object attribute
+    "check_url".
+
+    Return values
+
+    * Okay    "$proxy_check->{check_url}"
+
+              This is the current value of the "check_url" attribute.
+
+  set_check_url( $check )
+    "set_check_url" sets the object attribute "check_url".
+
+    Attributes
+
+    * $check  Use 0 to disable the check whether the URL is valid and 1 to
+              enable it.
+
+    Return values
+
+    * Okay    1
+
+    * Error   "undef"
+
+              The error message can be retrieved with "get_error()" or
+              $HTTP::ProxyCheck::error
+
+  get_answer_size( )
+    "get_answer_size()" gets the current value of the object attribute
+    "answer_size".
+
+    Return values
+
+    * Okay    "$proxy_check->{answer_size}"
+
+              This is the current answer size.
+
+    * Error   "undef"
+
+              The error message can be retrieved with "get_error()" or
+              $HTTP::ProxyCheck::error
+
+  set_answer_size( $answer_size )
+    "set_answer_size" sets the object attribute "answer_size".
+
+    Attributes
+
+    * $answer_size
+              Defines the size of the proxy server answer. Use either
+              "short", "header" or "full" as value.
+
+              For more information see "CONSTRUCTOR".
+
+    Return values
+
+    * Okay    1
+
+    * Error   "undef"
+
+              The error message can be retrieved with "get_error()" or
+              $HTTP::ProxyCheck::error
+
+ERROR HANDLING
+    HTTP::ProxyCheck has a highly configurable error handling system. It is
+    configured with the attributes "verbose_errors", "print_error" and
+    "raise_error" at object creation:
+
+        my $proxy_check = new HTTP::ProxyCheck(
+            proxy          => 'proxy:8080',
+            url            => 'http://search.cpan.org',
+            verbose_errors => 1,
+            print_error    => 0,
+            raise_error    => 1,
+        );
+
+    Every time you call a method of HTTP::ProxyCheck and an error happens,
+    which means the method returns "undef", the error message can be
+    retrieved with "get_error()" or $HTTP::ProxyCheck::error:
+
+        $proxy_check->set_answer_size( 'full' )
+          or die $proxy_check->get_error();
+    
+        $proxy_check->check()
+          or die $HTTP::ProxyCheck::error;
+
+    If there's an error during the object construction, you can't get the
+    error message through "get_error()". Use $HTTP::ProxyCheck::error
+    instead:
+
+        my $proxy_check = new HTTP::ProxyCheck( proxy => 'proxy' )
+          or die $HTTP::ProxyCheck::error;
+
+    The object attribute "verbose_errors" configures the verbosity of the
+    error message. Set "verbose_errors => 1" to enable verbose error
+    messages and "verbose_errors => 0" to disable verbose error messages.
+
+    Verbose error messages look like this:
+
+        $method failed: $error_message
+
+    And non-verbose error messages like this:
+
+        $error_message
+
+    The default value of "verbose_errors" is 0.
+
+    With "print_error" and "raise_error" you can set the degree of
+    automation of the error handling.
+
+    If "print_error" is set to 1, the error message is displayed with
+    "Carp::carp()". Set "print_error" to 0 to disable this feature.
+
+    If "raise_error" is set to 1, the error message is displayed with
+    "Carp::croak()" and the program is brought to an end. If "raise_error"
+    is set to 0, this feature is disabled.
+
+    The default value of "print_error" is 1 and of "raise_error" it is 0.
+
+SUPPORT
+    Contact the "AUTHOR".
+
+BUGS
+    Unknown
+
+VERSION
+        HTTP::ProxyCheck version 1.2
+
+CHANGES
+        1.4 Thu May 25 10:47:42 CEST 2006
+            - Added installation instructions to README
+    
+        1.3 Sun May  7 11:51:50 CEST 2006
+            - Charles Longeau <chl attuxfamily dot org> made a small patch to 
+              specify the user agent, instead of a fixed "HTTP::ProxyCheck/$VERSION"
+              one.
+    
+        1.2 Sat May  8 09:38:02 CEST 2004
+            - Fix to unset the error message of a previous IO::Socket::INET run
+              Thanks to Ben Schnopp <ben at schnopp dot com>
+    
+        1.1 Tue Aug 12 19:45:00 CEST 2003
+            - rewrote the module
+            - added better error handling
+            - updated POD
+    
+        1.0  Fri Feb 21 17:09:32 CET 2003
+            - gone stable after detailed testing 
+            - updated POD (synopsis)
+    
+        0.2  Fri Feb 21 11:57:43 CET 2003
+            - added check(answer => $type)
+            - renamed methods to gain more consistency
+            - updated POD (synopsis, methods)
+    
+        0.1  Wed Feb  5 14:35:25 CET 2003
+            - original version
+
+AUTHOR
+        Thomas Weibel
+        cpan@beeblebrox.net
+        http://beeblebrox.net/
+
+COPYRIGHT
+    Copyright (c) 2004 - 2006 Thomas Weibel. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

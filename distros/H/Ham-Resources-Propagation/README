@@ -1,0 +1,56 @@
+Ham-Resources-Propagation version 0.03
+======================================
+
+This is the README file for Ham::Resources::Propagation, get Solar and propagation data 
+from the web that's useful for Amateur Radio applications, by Carlos Juan Diaz 
+<ea3hmb at gmail.com>.
+
+After installation, please consult the tutorial for how to use it. 
+'perldoc Ham::Resources::Propagation' should work on most systems.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	It requires Perl version 5.14.0 or newer
+
+	XML::Reader::PP
+	LWP::UserAgent
+	
+	Also requiere internet connection.
+	
+TESTING
+
+On 't' directory you can find a little testing script that you use after installation
+for check or use directly its functions.
+	
+	Ham-Resources-Propagation-test.pl
+
+
+COPYRIGHT AND LICENCE
+
+This module is free software; you can redistribute it and/or
+modify it under the terms of the Artistic License 2.0. For
+details, see the full text of the license in the file LICENSE.
+
+This program is distributed in the hope that it will be
+useful, but it is provided "as is" and without any express
+or implied warranties. For details, see the full text of
+the license in the file LICENSE.
+
+Copyright (C) 2011-2012 by Carlos Juan Diaz - EA3HMB <ea3hmb at gmail.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

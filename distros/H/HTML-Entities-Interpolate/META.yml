@@ -1,0 +1,35 @@
+---
+abstract: 'Call HTML::Entities::encode_entities, via a hash, within a string'
+author:
+  - 'Ron Savage (ron@savage.net.au)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Slurper: '0.009'
+  File::Spec: '0'
+  Test::Pod: '1.51'
+  Test::Simple: '1.302052'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-Entities-Interpolate
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Capture::Tiny: '0.44'
+  HTML::Entities: '3.69'
+  Tie::Function: '0.02'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-Entities-Interpolate
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ronsavage/HTML-Entities-Interpolate.git
+version: '1.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

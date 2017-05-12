@@ -1,0 +1,24 @@
+
+<content name=foo format="text/et">
+<wmmeta name="title" value="This is foo." />
+
+This is the foo document. The title looks like this: $[this.title?Untitled]
+</content>
+
+<content name=bar format="text/et">
+<wmmeta name="title" value="This is bar." />
+<wmmeta name="score" value=20 />
+
+This is the bar document. The title looks like this: $[this.title?Untitled]
+</content>
+
+<content name=index format="text/et">
+
+Title for foo: ''$[foo.title?Untitled]'' Foo's score: $[foo.score?50]
+
+Title for bar: ''$[bar.title?Untitled]'' Bar's score: $[bar.score?50]
+
+</content>
+
+<out file=log/metadefvalues.html>${index}${foo}${bar}</out>
+

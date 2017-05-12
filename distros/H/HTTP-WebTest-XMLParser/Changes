@@ -1,0 +1,29 @@
+Revision history for HTTP::WebTest::XMLParser
+
+1.00 Wed Aug  6 21:26:44 CEST 2003
+	- enhanced documentation
+	- made script webtest functional
+	- release on CPAN
+
+0.92 Tue Aug  5 22:55:12 CEST 2003
+	- added CODE support
+	- check for B::Deparse, fallback if missing
+	- sort hash keys in as_xml()
+	- utility scripts: webtest, testconversion
+
+0.91 Mon Aug  4 20:34:15 CEST 2003
+	- added method as_xml() again
+	- more test cases
+	- tool to convert from earlier XML format
+
+0.9 Sat Aug  2 13:31:05 CEST 2003
+	- new XML input format follows wtscript more closely
+	- switched from XML::Simple to XML::SAX
+	- disabled method as_xml
+
+0.02 Fri Mar  7 18:02:03 CET 2003
+	- no 'our' declaration for Perl 5.005 compat.
+
+0.01 Thu Mar  6 18:03:53 CET 2003
+	- start of project
+	- based on example script from XMLReport 

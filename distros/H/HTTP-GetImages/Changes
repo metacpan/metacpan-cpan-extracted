@@ -1,0 +1,37 @@
+Revision history for Perl extension HTTP::GetImages.
+
+Version 0.34*, updates by Lee Goddard:
+
+	Re-implemented the `dont =' ['ALL']> feature that got lost
+	during the redesign of the API; agent now makes multiple
+	attempts to get the image.
+
+Version 0.32, updates by Lee Goddard: fixed bugs..
+
+Version 0.31, updates by Lee Goddard: added 'max_size'.
+
+Version 0.3, updates by Lee Goddard:
+
+	Made it a nicer API and tidied up some coding and added a couple of
+	methods. Started to add tests.
+
+Version 0.25, updates by Duncan Lamb and Lee Goddard:
+
+	* The character "~" in the URL would confuse the "abs_url"
+	subroutine, resolving "http://www.o.com/~home/page.html" to
+	"http://www.o.com". It doesn't any more.
+	* Double obliques in a link would cause an endless loop - no longer.
+	* A link refrencing its own directory with "./" would also cause an
+	endless loop - but no more.
+	* "EXTENSIONS_BAD" list added.
+	* "NEWNAMES" updated.
+	* Frame parsing.
+	* Multiple minimum-paths for URLs added.
+
+0.03  Mon Jun  4 19:00:00 2001
+	- bug fix and updated features
+
+0.02  Sun May  6 01:18:40 2001
+	- version; created by h2xs 1.20 with options
+		-Xcfn HTTP::GetImages
+

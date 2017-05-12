@@ -1,0 +1,64 @@
+Revision history for Perl extension HTML::Puzzle.
+
+0.13 (2002-08-09)
+=================
+- Added DBD::mysql like prerequisite for running examples.
+
+0.12 (2002-04-14)
+=================
+- Expanded some documentation points.
+- Added an 'order' costructor property that will be passed to H:P::DBTable
+  order parameter of hash_items method.
+- Added an 'date_format' contructor paramenter that will be passed
+  to H:P::DBTable to format the date_format hash item returned by
+  hash_items method.
+
+0.11 (2002-04-02)
+=================
+- Added required module HTML::Template::Extension in the Makefile.PL
+
+0.10 (2002-03-24)
+=================
+- Removed H::P::Template. Now used HTML::Template::Extension.
+- The HTML::Template was called enabling loop_context_vars
+- Fixed default initialized parameter error.
+- Added initial documentation for H::P::Template
+- Added initial documentation for H::P::Format
+- The date field in H::P::DBTable::add method is set, by default, to now.
+
+0.09 (2002-03-22)
+=================
+- Unrealized version
+
+0.08 (2002-03-19)
+=================
+- Unrealized version
+
+0.07 (2002-03-17)
+=================
+- Added method "update" to H::P::DBTable for update records.
+- Added property "dbh" and "tablename" for calling internally H::P::DBTable
+  from H::P::Format without explicitly create an istance of H::P::DBTable.
+- Added method "filter" to H::P::Format to postprocessing data obtained from
+  H::P::DBTable before filling template page
+
+0.06 (2002-03-15)
+=================
+- Now H::P::DBTable have a new property date_format for formatting the date
+  field. The return methods *_items now have a new field "date_format" with date
+  formatted according to "date_format" property. The default value of this
+  property is "%Y-%m-%d".
+- Added HTML::Puzzle::Format that, using an html template, returns a web page 
+  filling the template with data obtained from HTML::Puzzle::DBTable module.
+
+0.05 (2002-03-13)
+=================
+- Added HTML::Puzzle::Template which is a wrapper for CPAN HTML::Template for
+  supporting special TAGS (</TMPL_VAR>), autodeleting html header and footer 
+  (<HTML>...<BODY>) and (</BODY></HTML>) tags returning only the body code, 
+  extracting javascript code present in html header.
+
+0.03 (2002-03-11)
+=================
+- First release of HTML::Puzzle
+

@@ -1,0 +1,301 @@
+HTTP-Daemon-App version 0.0.9
+============================
+
+See
+ perldoc HTTP::Daemon::App
+for POD
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+   version
+   HTTP::Daemon
+   HTTP::Daemon::SSL
+   HTTP::Status
+   HTTP::Response
+   Acme::Spork
+   Unix::PID
+   File::Spec
+
+LARGE FILE SUPPORT ERRATA
+
+Unfortunately $c->get_request() is bad for large files because it puts the in memory request into a buffer (also in memory) then once it has it a multi part parsed out puts that into the object. that can result in appx 3 times the amount of memory to upload a file than the file's size.
+
+Below is a partial implementation using temp files that'd be exponentially more memory efficient. (especially for, say a webdav server when someone tries to upload a 300MB file (IE appx 90 MB of RAM for one request from one client, tisk tisk not good))
+
+See TODO's below:
+
+#### TODO: proper class for content and get_request use ##
+
+my $orig_content = \&content;
+
+sub content {
+    my ($self) = @_;
+
+    if (${*$self}{'content_is_fh'}){
+
+        # TODO: do with ${*$self}{'content_fh'} what orig content does with buffer 
+
+        ${*$self}{'content_is_fh'} = 0;
+        ${*$self}{'content_fh'}    = undef;
+
+        unlink ${*$self}{'content_fh_path'};
+        ${*$self}{'content_fh_path'} = undef;
+    }
+    else {
+        $orig_content->(@_);
+    }
+}
+
+# get_request() w/ tmpfile support instead of memory
+sub get_request_large {
+    my($self, $only_headers, $tmpfile) = @_;
+    return $self->get_request($only_headers); # TODO: remove this line once all related TODOs are done
+
+    if (${*$self}{'httpd_nomore'}) {
+        $self->reason("No more requests from this connection");
+        return;
+    }
+
+    $self->reason("");
+    my $buf = ${*$self}{'httpd_rbuf'};
+    $buf = "" unless defined $buf;
+
+    my $timeout = $ {*$self}{'io_socket_timeout'};
+    my $fdset = "";
+    vec($fdset, $self->fileno, 1) = 1;
+    local($_);
+
+    READ_HEADER:
+    while (1) {
+
+        # loop until we have the whole header in $buf
+        $buf =~ s/^(?:\015?\012)+//;  # ignore leading blank lines
+        if ($buf =~ /\012/) {  # potential, has at least one line
+            if ($buf =~ /^\w+[^\012]+HTTP\/\d+\.\d+\015?\012/) {
+                if ($buf =~ /\015?\012\015?\012/) {
+                    last READ_HEADER;  # we have it
+                }
+                elsif (length($buf) > 16*1024) {
+                    $self->send_error(413); # REQUEST_ENTITY_TOO_LARGE
+                    $self->reason("Very long header");
+                    return;
+                }
+            }
+            else {
+                last READ_HEADER;  # HTTP/0.9 client
+            }
+        }
+        elsif (length($buf) > 16*1024) {
+            $self->send_error(414); # REQUEST_URI_TOO_LARGE
+            $self->reason("Very long first line");
+            return;
+        }
+        print STDERR "Need more data for complete header\n" if $DEBUG;
+        return unless $self->_need_more($buf, $timeout, $fdset);
+    }
+    if ($buf !~ s/^(\S+)[ \t]+(\S+)(?:[ \t]+(HTTP\/\d+\.\d+))?[^\012]*\012//) {
+        ${*$self}{'httpd_client_proto'} = _http_version("HTTP/1.0");
+        $self->send_error(400);  # BAD_REQUEST
+        $self->reason("Bad request line: $buf");
+        return;
+    }
+    my $method = $1;
+    my $uri = $2;
+    my $proto = $3 || "HTTP/0.9";
+    $uri = "http://$uri" if $method eq "CONNECT";
+    $uri = $HTTP::URI_CLASS->new($uri, $self->daemon->url);
+    my $r = HTTP::Request->new($method, $uri);
+    $r->protocol($proto);
+    ${*$self}{'httpd_client_proto'} = $proto = _http_version($proto);
+
+    if ($proto >= $HTTP_1_0) {
+
+        # we expect to find some headers
+        my($key, $val);
+        HEADER:
+        while ($buf =~ s/^([^\012]*)\012//) {
+            $_ = $1;
+            s/\015$//;
+            if (/^([^:\s]+)\s*:\s*(.*)/) {
+                $r->push_header($key, $val) if $key;
+                ($key, $val) = ($1, $2);
+            }
+            elsif (/^\s+(.*)/) {
+                $val .= " $1";
+            }
+            else {
+                last HEADER;
+            }
+        }
+        $r->push_header($key, $val) if $key;
+    }
+
+    my $conn = $r->header('Connection');
+    if ($proto >= $HTTP_1_1) {
+        ${*$self}{'httpd_nomore'}++ if $conn && lc($conn) =~ /\bclose\b/;
+    }
+    else {
+        ${*$self}{'httpd_nomore'}++ unless $conn &&
+          lc($conn) =~ /\bkeep-alive\b/;
+    }
+
+    if ($only_headers) {
+        ${*$self}{'httpd_rbuf'} = $buf;
+        return $r;
+    }
+
+    # Find out how much content to read
+    my $te  = $r->header('Transfer-Encoding');
+    my $ct  = $r->header('Content-Type');
+    my $len = $r->header('Content-Length');
+
+    if ($te && lc($te) eq 'chunked') {
+
+        # Handle chunked transfer encoding
+        my $body = "";
+        CHUNK:
+        while (1) {
+            print STDERR "Chunked\n" if $DEBUG;
+            if ($buf =~ s/^([^\012]*)\012//) {
+                my $chunk_head = $1;
+                unless ($chunk_head =~ /^([0-9A-Fa-f]+)/) {
+                    $self->send_error(400);
+                    $self->reason("Bad chunk header $chunk_head");
+                    return;
+                }
+                my $size = hex($1);
+                last CHUNK if $size == 0;
+
+                my $missing = $size - length($buf) + 2; # 2=CRLF at chunk end
+
+                # must read until we have a complete chunk
+                while ($missing > 0) {
+                    print STDERR "Need $missing more bytes\n" if $DEBUG;
+                    my $n = $self->_need_more($buf, $timeout, $fdset);
+                    return unless $n;
+                    $missing -= $n;
+                }
+                $body .= substr($buf, 0, $size);
+                substr($buf, 0, $size+2) = '';
+
+            }
+            else {
+
+                # need more data in order to have a complete chunk header
+                return unless $self->_need_more($buf, $timeout, $fdset);
+            }
+        }
+        $r->content($body);
+
+        # pretend it was a normal entity body
+        $r->remove_header('Transfer-Encoding');
+        $r->header('Content-Length', length($body));
+
+        my($key, $val);
+        FOOTER:
+        while (1) {
+            if ($buf !~ /\012/) {
+
+                # need at least one line to look at
+                return unless $self->_need_more($buf, $timeout, $fdset);
+            }
+            else {
+                $buf =~ s/^([^\012]*)\012//;
+                $_ = $1;
+                s/\015$//;
+                if (/^([\w\-]+)\s*:\s*(.*)/) {
+                    $r->push_header($key, $val) if $key;
+                    ($key, $val) = ($1, $2);
+                }
+                elsif (/^\s+(.*)/) {
+                    $val .= " $1";
+                }
+                elsif (!length) {
+                    last FOOTER;
+                }
+                else {
+                    $self->reason("Bad footer syntax");
+                    return;
+                }
+            }
+        }
+        $r->push_header($key, $val) if $key;
+
+    }
+    elsif ($te) {
+        $self->send_error(501); 	# Unknown transfer encoding
+        $self->reason("Unknown transfer encoding '$te'");
+        return;
+
+    }
+    elsif ($ct && lc($ct) =~ m/^multipart\/\w+\s*;.*boundary\s*=\s*(\w+)/) {
+
+        if($tmpfile && -w $tmpfile) {
+            if(open ${*$self}{'content_fh'}, '<', $tmpfile) {
+                ${*$self}{'content_is_fh'}   = 1;
+                ${*$self}{'content_fh_path'} = $tmpfile; 
+            }
+        }
+
+        # TODO: if ${*$self}{'content_is_fh'} use it as $buf instead of memory
+
+        # Handle multipart content type
+        my $boundary = "$CRLF--$1--$CRLF";
+        my $index;
+        while (1) {
+            $index = index($buf, $boundary);
+            last if $index >= 0;
+
+            # end marker not yet found
+            return unless $self->_need_more($buf, $timeout, $fdset);
+        }
+        $index += length($boundary);
+        $r->content(substr($buf, 0, $index));
+        substr($buf, 0, $index) = '';
+
+    }
+    elsif ($len) {
+
+        # Plain body specified by "Content-Length"
+        my $missing = $len - length($buf);
+        while ($missing > 0) {
+            print "Need $missing more bytes of content\n" if $DEBUG;
+            my $n = $self->_need_more($buf, $timeout, $fdset);
+            return unless $n;
+            $missing -= $n;
+        }
+        if (length($buf) > $len) {
+            $r->content(substr($buf,0,$len));
+            substr($buf, 0, $len) = '';
+        }
+        else {
+            $r->content($buf);
+            $buf='';
+        }
+    }
+    ${*$self}{'httpd_rbuf'} = $buf;
+
+    $r;
+}
+
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2006 by Daniel Muey
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+

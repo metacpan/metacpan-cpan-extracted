@@ -1,0 +1,32 @@
+Revision history for Perl extension HTML::Tagset
+
+2008-02-29  Andy Lester
+
+        * Release 3.20 -- Added <div> to the list of p_closure_barriers.
+
+2005-11-08  Andy Lester
+
+        * Release 3.10 -- Another rebundling, with a new maintainer.
+
+2004-12-29  Sean M. Burke
+
+        * Realese 3.04 -- just a rebundling; no actual code changes
+
+2000-10-20  Sean M. Burke
+
+        * Release 3.03
+        Added 'tr' => ['background'] at the suggestion of Renzo Toma
+        (renzo.toma@veronica.nl), who notes: "Netscape Communicator 4.73
+        (probably even earlier) supports it, Internet Explorer 5.5 does
+        not (yet)."
+
+2000-09-04  Sean M. Burke
+
+        * Release 3.02
+        Added %is_Possible_Strict_P_Content.
+
+2000-08-21  Sean M. Burke
+
+        * Release 3.01 -- first release.
+        Data tables copied from previous version of HTML::Element
+        and HTML::TreeBuilder, with some additions.

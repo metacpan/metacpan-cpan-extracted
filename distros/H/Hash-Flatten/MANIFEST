@@ -1,0 +1,13 @@
+Changes
+COPYING
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+lib/Hash/Flatten.pm
+t/hash_flatten.t
+t/overload.t
+t/data.lib
+t/pod.t
+t/pod_coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

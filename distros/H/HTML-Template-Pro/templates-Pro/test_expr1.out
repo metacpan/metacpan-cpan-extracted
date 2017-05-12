@@ -1,0 +1,26 @@
+<HTML><BODY>
+<H1> test numeric expr </H1>
+ok 
+true 
+true 
+ok 
+true 
+ok 
+2+2=4
+ONE+2=3
+ONE + TWO=3
+THREE=3
+(ONE+TWO)==THREE=1
+ONE+TWO == THREE=1
+(ONE+TWO == THREE) and (THREE && TWO) and sin(ONE)=1
+sin(ONE)=0.841471
+111.111 + 222.333555=333.444555
+7%3=1
+(70*5)%33-20=0
+7 && 3=1
+strings are true: 
+'aaa' && 'bbb'=1
+'aaa' || 0=1
+minus is handled properly:
+MINUSTEN+8=-2
+</body></html>

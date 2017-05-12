@@ -1,0 +1,117 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Beau E. Cox &gt; HTML-Mason-ApacheHeader2-0.01 &gt; HTML::Mason::ApacheHandler2</title>
+<link rel="stylesheet" href="pod.css" type="text/css" />
+<link rev="made" href="mailto:root@cathy.beaucox.com" />
+</head>
+
+<body>
+<table class="hdrtable" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td>Beau E. Cox &gt; HTML-Mason-ApacheHeader2-0.01 &gt; HTML::Mason::ApacheHandler2</td></tr></table>
+
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#prerequisites">PREREQUISITES</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+</ul>
+<!-- INDEX END -->
+
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="name">NAME</a><a name="__H1_1__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+</tr></table>
+<p>HTML::Mason::ApacheHandler2 - experimental (alpha) Mason/mod_perl2 interface</p>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="synopsis">SYNOPSIS</a><a name="__H1_2__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_1__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;NAME</td>
+</tr></table>
+<pre>
+    use HTML::Mason::ApacheHandler2;
+ 
+    my $ah = HTML::Mason::ApacheHandler2-&gt;new (..name/value params..);
+    ...
+    sub handler {
+     my $r = shift;
+     $ah-&gt;handle_request($r);
+    }</pre>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="description">DESCRIPTION</a><a name="__H1_3__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_2__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;SYNOPSIS</td>
+</tr></table>
+<p><strong>HTML::Mason::ApacheHandler2 is highly experimental ( alpha ) and
+should only be used in a test environment.</strong></p>
+<p>HTML::Mason::ApacheHandler2 is a clone of HTML::Mason::ApacheHandler
+changed to work under a pure mod_perl2 environment. The external
+interface is unchanged, see
+<a href="/mason/docs/./ApacheHandler.html">HTML::Mason::ApacheHandler</a>.</p>
+<p>The actual changes I made can be found in the distribution in
+<strong>diff/ApacheHandler.diff</strong> ( made with 'diff -Naru' ... ).</p>
+<p>A HOTWO for HTML::Mason::ApacheHandler2 may be found at
+<a href="/mason/docs/./Mason-with-mod_perl2.html">HOWTO Run Mason with mod_perl2</a>.</p>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="prerequisites">PREREQUISITES</a><a name="__H1_4__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_3__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;DESCRIPTION</td>
+</tr></table>
+<p>You must have the following packages installed:</p>
+<pre>
+    mod_perl        =&gt; 1.9910
+    HTML::Mason'    =&gt; 1.25
+    libapreq2       =&gt; 2.02-dev</pre>
+<p>Please refer to the original packages' documentation
+for instructions.</p>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="see_also">SEE ALSO</a><a name="__H1_5__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_4__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;PREREQUISITES</td>
+</tr></table>
+<p>My documents, including:
+<a href="/mason/docs/./Mason-with-mod_perl2.html">HOWTO Run Mason with mod_perl2</a>,
+<a href="/mason/docs/./WithApacheSession2.html">MasonX::Request::WithApacheSession2</a>,
+<a href="/mason/docs/./WithMultiSession2.html">MasonX::Request::WithMultiSession2</a>,</p>
+<p>Original Mason documents, including:
+<a href="/mason/docs/./ApacheHandler.html">HTML::Mason::ApacheHandler</a>,
+<a href="/mason/docs/./WithApacheSession.html">MasonX::Request::WithApacheSession</a>,
+<a href="/mason/docs/./WithMultiSession.html">MasonX::Request::WithMultiSession</a>.</p>
+<p>Also see the Mason documentation at <a href="http://masonhq.com/docs/manual/">http://masonhq.com/docs/manual/</a>.</p>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="author">AUTHOR</a><a name="__H1_6__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_5__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;SEE ALSO</td>
+</tr></table>
+<p>Beau E. Cox &lt;<a href="mailto:beau@beaucox.com">beau@beaucox.com</a>&gt; <a href="http://beaucox.com">http://beaucox.com</a>.</p>
+<p>The real authors (I just made mod_perl2 changes) are the Mason crew, including:
+Jonathan Swartz &lt;<a href="mailto:swartz@pobox.com">swartz@pobox.com</a>&gt;,
+Dave Rolsky &lt;<a href="mailto:autarch@urth.org">autarch@urth.org</a>&gt;,
+Ken Williams &lt;<a href="mailto:ken@mathforum.org">ken@mathforum.org</a>&gt;.</p>
+<p>Version 0.01 as of January, 2004.</p>
+<table class="hdrtable" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td>Beau E. Cox &gt; HTML-Mason-ApacheHeader2-0.01 &gt; HTML::Mason::ApacheHandler2</td></tr></table>
+
+
+</body>
+
+</html>

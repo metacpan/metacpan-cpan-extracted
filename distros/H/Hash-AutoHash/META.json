@@ -1,0 +1,74 @@
+{
+   "abstract" : "Object-oriented access to real and tied hashes",
+   "author" : [
+      "Nat Goodman <natg@shore.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.120351",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Hash-AutoHash",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Carp" : "1.2",
+            "Exporter" : "5.68",
+            "File::Spec" : "3.4",
+            "List::MoreUtils" : "0.33",
+            "Module::Build" : "0.4007",
+            "Scalar::Util" : "1.23",
+            "Storable" : "2.3",
+            "Test::Deep" : "0.11",
+            "Test::More" : "0.98",
+            "Test::Pod" : "1.48",
+            "Test::Pod::Content" : "v0.0.6",
+            "Tie::Hash" : "1.04",
+            "Tie::Hash::MultiValue" : "1.02"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4007"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.2",
+            "Cwd" : "3.4",
+            "Exporter" : "5.68",
+            "List::MoreUtils" : "0.33",
+            "List::Util" : "1.32",
+            "Tie::Hash" : "1.04",
+            "Tie::ToObject" : "0.03",
+            "XSLoader" : "0.15",
+            "perl" : "v5.8.3"
+         }
+      }
+   },
+   "provides" : {
+      "Hash::AutoHash" : {
+         "file" : "lib/Hash/AutoHash.pm",
+         "version" : "1.17"
+      },
+      "Hash::AutoHash::alias" : {
+         "file" : "lib/Hash/AutoHash.pm",
+         "version" : 0
+      },
+      "Hash::AutoHash::helper" : {
+         "file" : "lib/Hash/AutoHash.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.17"
+}

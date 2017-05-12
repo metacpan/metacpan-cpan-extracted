@@ -1,0 +1,12 @@
+
+[% VARIABLE %]
+
+[%_CHAR-TEST-%]
+
+[% SOMETHING.SOMEWHERE %]
+
+[% ABC.DEF.GHI.JKL.MNO %]
+
+[% SUBROUTINE %]
+
+[% DOES.NOT.EXIST %]

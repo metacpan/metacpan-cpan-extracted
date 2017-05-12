@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+Makefile.PL
+lib/HyperWave/CSP.pm
+lib/HyperWave/CSP/Message.pm
+README
+TODO
+test.pl
+docs/CSP.html
+docs/CSP.man
+docs/CSP.txt
+examples/getattrib.pl
+examples/gethtml.pl
+examples/gettext.pl
+examples/hw_who.pl
+examples/test2.pl

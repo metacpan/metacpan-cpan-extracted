@@ -1,0 +1,7 @@
+Revision history for Perl extension HTML::YUI3::Menu.
+
+1.01  Tue Apr 19 17:12:00 2011
+	- Make Build.PL and Makefile.PL run scripts/copy.config.pl.
+
+1.00  Thu Mar 17 15:37:50 2011
+	- Original version

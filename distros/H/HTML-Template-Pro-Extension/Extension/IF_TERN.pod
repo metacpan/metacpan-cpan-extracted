@@ -1,0 +1,53 @@
+=head1 NAME
+
+HTML::Template::Extension::IF_TERN - Plugins that support ternary if operator ?..:..
+
+=head1 SYNOPSIS
+
+ use HTML::Template::Extension;
+
+ my $text = qq
+    |
+     IF_TERN plugin example
+     ========================
+     If all is ok you can read this here --> %test?It works!!!:It's BAD%
+
+    |;
+
+ my $comp       = new HTML::Template::Extension(
+                                            scalarref => \$text,
+                                            plugins=>["IF_TERN"],
+                        );
+
+ $comp->param('test' => "1");
+ print $comp->output;
+
+ #   OUTPUT:
+ #
+ #   IF_TERN plugin example
+ #   ========================
+ #   If all is ok you can read this here --> It works!!!
+
+
+=head1 DESCRIPTION
+
+IF_TERN add syntax for the ternary operator bool_var?this_if_true:this_if_false.
+
+So with this plugin you can use this syntax to insert a dynamical text:
+
+ %bool_var%this_if_true:this_if_false%
+
+=head1 AUTHOR
+
+Bruni Emiliano, <info@ebruni.it>
+
+=head1 SEE ALSO
+
+ HTML::Template
+ HTML::Template::Extension::DO_NOTHING
+ HTML::Template::Extension::SLASH_VAR
+ HTML::Template::Extension::CSTART
+ HTML::Template::Extension::DOC
+ HTML::Template::Extension::HEAD_BODY
+
+=cut

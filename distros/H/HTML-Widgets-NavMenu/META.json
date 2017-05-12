@@ -1,0 +1,150 @@
+{
+   "abstract" : "A Perl Module for Generating HTML Navigation Menus",
+   "author" : [
+      "Shlomi Fish, E<lt>shlomif@cpan.orgE<gt>, L<http://www.shlomifish.org/> ."
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "keywords" : [
+      "arrows",
+      "bar",
+      "breadcrumbs",
+      "css",
+      "expand",
+      "hidden",
+      "html",
+      "menu",
+      "menus",
+      "nav-bar",
+      "navbar",
+      "navigation",
+      "navigation aids",
+      "nav-menu",
+      "navmenu",
+      "next",
+      "prev",
+      "previous",
+      "pure-perl",
+      "site-map",
+      "skipped",
+      "trail",
+      "tree",
+      "unexpand",
+      "up",
+      "widget",
+      "widgets",
+      "xhtml"
+   ],
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-Widgets-NavMenu",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::XSAccessor" : "0",
+            "IO::Scalar" : "0",
+            "Test::More" : "0",
+            "perl" : "v5.6.1"
+         }
+      }
+   },
+   "provides" : {
+      "HTML::Widgets::NavMenu" : {
+         "file" : "lib/HTML/Widgets/NavMenu.pm",
+         "version" : "1.0703"
+      },
+      "HTML::Widgets::NavMenu::Error" : {
+         "file" : "lib/HTML/Widgets/NavMenu.pm"
+      },
+      "HTML::Widgets::NavMenu::Error::Redirect" : {
+         "file" : "lib/HTML/Widgets/NavMenu.pm"
+      },
+      "HTML::Widgets::NavMenu::EscapeHtml" : {
+         "file" : "lib/HTML/Widgets/NavMenu/EscapeHtml.pm"
+      },
+      "HTML::Widgets::NavMenu::ExpandVal" : {
+         "file" : "lib/HTML/Widgets/NavMenu/ExpandVal.pm"
+      },
+      "HTML::Widgets::NavMenu::HeaderRole" : {
+         "file" : "lib/HTML/Widgets/NavMenu/HeaderRole.pm"
+      },
+      "HTML::Widgets::NavMenu::Iterator::Base" : {
+         "file" : "lib/HTML/Widgets/NavMenu/Iterator/Base.pm"
+      },
+      "HTML::Widgets::NavMenu::Iterator::GetCurrentlyActive" : {
+         "file" : "lib/HTML/Widgets/NavMenu.pm"
+      },
+      "HTML::Widgets::NavMenu::Iterator::Html" : {
+         "file" : "lib/HTML/Widgets/NavMenu/Iterator/Html.pm"
+      },
+      "HTML::Widgets::NavMenu::Iterator::Html::Item" : {
+         "file" : "lib/HTML/Widgets/NavMenu/Iterator/Html.pm"
+      },
+      "HTML::Widgets::NavMenu::Iterator::JQTreeView" : {
+         "file" : "lib/HTML/Widgets/NavMenu/Iterator/JQTreeView.pm"
+      },
+      "HTML::Widgets::NavMenu::Iterator::NavMenu" : {
+         "file" : "lib/HTML/Widgets/NavMenu/Iterator/NavMenu.pm"
+      },
+      "HTML::Widgets::NavMenu::Iterator::NavMenu::HeaderRole" : {
+         "file" : "lib/HTML/Widgets/NavMenu/Iterator/NavMenu/HeaderRole.pm"
+      },
+      "HTML::Widgets::NavMenu::Iterator::SiteMap" : {
+         "file" : "lib/HTML/Widgets/NavMenu/Iterator/SiteMap.pm"
+      },
+      "HTML::Widgets::NavMenu::JQueryTreeView" : {
+         "file" : "lib/HTML/Widgets/NavMenu/JQueryTreeView.pm"
+      },
+      "HTML::Widgets::NavMenu::LeadingPath::Component" : {
+         "file" : "lib/HTML/Widgets/NavMenu.pm"
+      },
+      "HTML::Widgets::NavMenu::NodeDescription" : {
+         "file" : "lib/HTML/Widgets/NavMenu.pm"
+      },
+      "HTML::Widgets::NavMenu::Object" : {
+         "file" : "lib/HTML/Widgets/NavMenu/Object.pm"
+      },
+      "HTML::Widgets::NavMenu::Predicate" : {
+         "file" : "lib/HTML/Widgets/NavMenu/Predicate.pm"
+      },
+      "HTML::Widgets::NavMenu::TagGen" : {
+         "file" : "lib/HTML/Widgets/NavMenu/TagGen.pm"
+      },
+      "HTML::Widgets::NavMenu::Tree::Iterator" : {
+         "file" : "lib/HTML/Widgets/NavMenu/Tree/Iterator.pm"
+      },
+      "HTML::Widgets::NavMenu::Tree::Iterator::Item" : {
+         "file" : "lib/HTML/Widgets/NavMenu/Tree/Iterator/Item.pm"
+      },
+      "HTML::Widgets::NavMenu::Tree::Iterator::Stack" : {
+         "file" : "lib/HTML/Widgets/NavMenu/Tree/Iterator/Stack.pm"
+      },
+      "HTML::Widgets::NavMenu::Tree::Node" : {
+         "file" : "lib/HTML/Widgets/NavMenu/Tree/Node.pm"
+      },
+      "HTML::Widgets::NavMenu::Url" : {
+         "file" : "lib/HTML/Widgets/NavMenu/Url.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://web-cpan.shlomifish.org/modules/HTML-Widgets-NavMenu/",
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "url" : "https://bitbucket.org/shlomif/perl-html-widgets-navmenu"
+      }
+   },
+   "version" : "1.0703"
+}

@@ -1,0 +1,1 @@
+[- $escmode = 0 -][+ "Some binary data" +][- for ($i = 0; $i < 256; $i++) { print OUT chr($i) } -][$foreach $i (0..255)$][+ chr($i) +][$endforeach$]

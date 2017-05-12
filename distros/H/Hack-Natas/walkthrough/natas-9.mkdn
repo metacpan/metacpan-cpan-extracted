@@ -1,0 +1,29 @@
+Level 9
+-------
+
+This time the "Input secret" form is replaced by one that
+looks like it is searching for words containing the string
+you provide. Let's give it a try, and then look at the code.
+
+Well, this is just grepping through a wordlist, using the
+POSTed needle as a parameter. Since we control the value
+of that POSTed variable, we can control the command that
+gets executed. Now we need to figure out how to use that
+to our advantage.
+
+First, notice that `$key` is unquoted inside the command. So,
+we can give multiple words on the command line. What we
+want to do is specify the file to grep, as well as a pattern
+to grep *for* that will match the password we want to get out
+of that file. Well, the easiest way to ensure that we will get
+the right line out of the file is to get them all. So, we can
+use the regex `.*`, which matches any character, zero or more
+times (ie every line). Then, we need to specify our own file
+to "search" through, and get rid of `dictionary.txt`.
+
+Let's try sending a needle of
+`'.*'' /etc/natas_webpass/natas10 ;` - which will make
+`dictionary.txt` the next command. Since there is no command
+by that name, it'll just fail, probably outputting nothing.
+We can just put this in the text box, hit "Search" and now
+we have the next password.

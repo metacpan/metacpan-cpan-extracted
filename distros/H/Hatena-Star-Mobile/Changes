@@ -1,0 +1,6 @@
+Revision history for Perl extension Hatena::Star::Mobile.
+
+0.01  Tue Jan 22 18:47:25 2008
+	- original version; created by h2xs 1.23 with options
+		-X -A -n Hatena::Star::Mobile
+

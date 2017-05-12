@@ -1,0 +1,5 @@
+blib/
+\.svn
+~$
+\.bak$
+\.swp$

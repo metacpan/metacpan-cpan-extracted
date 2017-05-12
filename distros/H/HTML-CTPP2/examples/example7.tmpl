@@ -1,0 +1,17 @@
+<TMPL_comment>
+  This is test of CTPP2 syntax.
+</TMPL_comment>
+<TMPL_include examples/header.tmpl>
+<TMPL_var HTMLESCAPE(Escape)>
+<TMPL_var URLESCAPE(Escape)>
+<TMPL_if loop>
+Loop:
+<TMPL_loop loop>
+
+	Iteration: <TMPL_var __COUNTER__> of <TMPL_var __SIZE__>.
+	In included file: <TMPL_include examples/middle.tmpl>
+	<TMPL_if __FIRST__>Really first loop</TMPL_if><TMPL_if __LAST__>Really last loop</TMPL_if><TMPL_if __INNER__>Inner loop</TMPL_if>
+	<TMPL_var a> <TMPL_if inner_loop>Inner Loop: { <TMPL_loop inner_loop> {<TMPL_var a>} </TMPL_loop>}</TMPL_if>
+</TMPL_loop>
+</TMPL_if>
+<TMPL_include footer.tmpl>

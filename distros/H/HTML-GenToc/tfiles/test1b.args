@@ -1,0 +1,5 @@
+# test arguments
+--gen_anchors
+--quiet
+--gen_toc
+--outfile test1b_toc.html

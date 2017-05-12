@@ -1,0 +1,50 @@
+{
+   "abstract" : "Yet another HTTP useragent string parser.",
+   "author" : [
+      "Takaaki Mizuno <module@takaaki.info>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "HTTP-DetectUserAgent",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor" : "0",
+            "base" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Base" : "0",
+            "Test::More" : "0",
+            "YAML" : "0.83"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/HTTP-DetectUserAgent",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/HTTP-DetectUserAgent.git",
+         "web" : "https://github.com/neilb/HTTP-DetectUserAgent"
+      }
+   },
+   "version" : "0.07"
+}
+

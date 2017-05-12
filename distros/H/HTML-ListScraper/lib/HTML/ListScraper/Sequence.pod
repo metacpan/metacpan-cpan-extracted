@@ -1,0 +1,18 @@
+=head1 NAME
+
+HTML::ListScraper::Sequence - repeating tag sequence found by L<HTML::ListScraper>
+
+=head1 METHODS
+
+All documented methods are simple accessors, taking no arguments and
+leaving the C<HTML::ListScraper::Sequence> object unchanged.
+
+=head2 len
+
+The sequence length.
+
+=head2 instances
+
+An array of L<HTML::ListScraper::Instance> objects.
+
+=cut

@@ -1,0 +1,151 @@
+=head1 NAME
+
+HTML::FormatText::WithLinks::AndTables - Converts HTML to Text with tables intact
+
+=head1 SYNOPSIS
+
+    use HTML::FormatText::WithLinks::AndTables;
+
+    my $text = HTML::FormatText::WithLinks::AndTables->convert($html);
+
+Or optionally...
+
+    my $conf = { # same as HTML::FormatText excepting below
+        cellpadding   => 2,  # defaults to 1
+        no_rowspacing => 1,  # bool, suppress vertical space between table rows
+    };
+
+    my $text = HTML::FormatText::WithLinks::AndTables->convert($html, $conf);
+
+=head1 DESCRIPTION
+
+This module was inspired by HTML::FormatText::WithLinks which has proven to be a
+useful `lynx -dump` work-alike. However one frustration was that no other HTML
+converters I came across had the ability to deal affectively with HTML <TABLE>s.
+This module can in a rudimentary sense do so. The aim was to provide facility to take
+a simple HTML based email template, and to also convert it to text with the <TABLE>
+structure intact for inclusion as "multipart/alternative" content. Further, it will
+preserve both the formatting specified by the <TD> tag's "align" attribute, and will
+also preserve multiline text inside of a <TD> element provided it is broken using <BR/>
+tags.
+
+=head2 EXPORT
+
+None by default.
+
+
+=head1 METHODS
+
+=head2 convert
+
+=head1 EXAMPLE
+
+Given the HTML below ...
+
+    <HTML><BODY>
+    <TABLE>
+        <TR>
+            <TD ALIGN="right">Name:</TD>
+            <TD>Mr. Foo Bar</TD>
+        </TR>
+        <TR>
+            <TD ALIGN="right">Address:</TD>
+            <TD>
+                #1-276 Quux Lane,     <BR/>
+                Schenectady, NY, USA, <BR/>
+                12345
+            </TD>
+        </TR>
+        <TR>
+            <TD ALIGN="right">Email:</TD>
+            <TD><a href="mailto:foo@bar.baz">foo@bar.baz</a></TD>
+        </TR>
+    </TABLE>
+    </BODY></HTML>
+
+... the (default) return value of convert() will be as follows.
+
+       Name:  Mr. Foo Bar
+
+    Address:  #1-276 Quux Lane,
+              Schenectady, NY, USA,
+              12345
+
+      Email:  [1]foo@bar.baz
+
+
+
+              1. mailto:foo@bar.baz
+
+=head1 SEE ALSO
+
+    HTML::FormatText::WithLinks
+    HTML::TreeBuilder
+
+=head1 CAVEATS
+
+    * <TH> elements are treated identically to <TD> elements
+
+    * It assumes a fixed width font for display of resulting text.
+
+    * It doesn't work well on nested <TABLE>s or other nested blocks within <TABLE>s.
+
+=head1 AUTHOR
+
+Shaun Fryer, C<< <pause.cpan.org at sourcery.ca> >> (author emeritus)
+
+Dale Evans, C<< <daleevans at cpan.org> >> (current maintainer)
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-html-formattext-withlinks-andtables at rt.cpan.org>, or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=HTML-FormatText-WithLinks-AndTables>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+
+
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc HTML::FormatText::WithLinks::AndTables
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-FormatText-WithLinks-AndTables>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/HTML-FormatText-WithLinks-AndTables>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/HTML-FormatText-WithLinks-AndTables>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/HTML-FormatText-WithLinks-AndTables>
+
+=back
+
+
+=head1 ACKNOWLEDGEMENTS
+
+Everybody. :)
+L<http://en.wikipedia.org/wiki/Standing_on_the_shoulders_of_giants>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2008 Shaun Fryer, all rights reserved.
+
+Copyright 2015 Dale Evans, all rights reserved
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=for Pod::Coverage configure
+

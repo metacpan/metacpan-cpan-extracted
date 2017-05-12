@@ -1,0 +1,16 @@
+#!/usr/bin/env perl
+
+use 5.010;
+use strict;
+use warnings;
+use FindBin '$Bin';
+use lib "$Bin/../lib";
+
+use Benchmark::Dumb qw(cmpthese timethese);
+#use Benchmark qw(timethese);
+use Hash::DefHash::Normalize qw(normalize_defhash);
+
+timethese(0, {
+    '{}' => sub { normalize_defhash({}) },
+    '{a=>1,b=>2,c=>3,d=>4,e=>5}' => sub { normalize_defhash({a=>1,b=>2,c=>3,d=>4,e=>5}) },
+});

@@ -1,0 +1,51 @@
+{
+   "abstract" : "\"Higher Order Perl\" Parser",
+   "author" : [
+      "Mark Jason Dominus <mjd@plover.com>",
+      "Curtis \"Ovid\" Poe <ovid@cpan.org>",
+      "David E. Wheeler <david@justatheory.com>",
+      "Xavier Caron <xav@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unrestricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HOP-Parser",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HOP::Lexer" : "0.032",
+            "HOP::Stream" : "0.03",
+            "Sub::Uplevel" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://hop.perl.plover.com/",
+      "x_MailingList" : "http://hop.perl.plover.com/#mlist"
+   },
+   "version" : "0.03"
+}

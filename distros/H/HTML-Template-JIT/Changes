@@ -1,0 +1,55 @@
+0.01  Sun Nov 11 18:03:30 2001
+      - First Version
+
+0.02
+      - Added support for loop_context_vars.
+      - Added support for global_vars.
+      - Fixed bug in loop param handling that made loop variables
+        case-sensitive.
+
+0.03 Sat Jun 15 00:31:27 EDT 2002
+      - Fixed bug in escaping of template text.  This caused templates
+        containing the characters any of ($, @, %, \) to be rendered
+        incorrectly.  Thanks to Smejkal Petr for the report.
+
+      - Improved the quality of generated code - variables are now
+        looked-up once and stored in lexical variables.  This has
+        improved performance a small amount.
+
+      - Fixed bug where parameters from previous runs were persisting
+        across calls to new().  Thanks to Tugrul Galatali for the spot.
+
+      - Arguments to new() that modify the compiled object are now
+        included in hashing to create package names.  This means that
+        a single template can be used with different options and
+        different compiled objects will be generated.  Thanks to
+        Tugrul Galatali for the spot.
+
+      - Added support for case_sensitive option to new().
+      
+      - Added new print_to_stdout option to new() to have output
+        printed to STDOUT as it is generated.
+
+      - Added support for ESCAPE.  Template syntax support is now
+        complete.
+
+0.04 Thu Aug 29 12:00:00 2002
+      - Added support for HTML::Template 2.6's new DEFAULT attribute.
+
+      - Added support for HTML::Template 2.6's new __counter__ variable.
+
+      - Updated mailing-list information to reflect move from vm.com
+        to sourceforge.net
+
+      - Fixed bug where tmpl_var's with the escape attribute would
+        cause a crash if not set with a value.
+
+0.05
+      - Fixed param() to allow for blessed hash-refs. [Alex Kapranoff]
+
+      - Fixed url-escaping to work with UTF-8 characters. [Alex Kapranoff]
+
+      - Added support for JS escaping. [Alex Kapranoff]
+
+      - Fixed a compatibility problem with HTML::Template v2.8, which
+        is now a prerequisite.

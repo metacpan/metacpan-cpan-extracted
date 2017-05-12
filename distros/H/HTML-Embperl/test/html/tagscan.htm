@@ -1,0 +1,111 @@
+<html bgcolor="[+ 'blue' +]">
+<head bgcolor="[+ 'blue' +]">
+<title>Some tests for Embperl</title>
+</head bgcolor="[+ 'blue' +]">
+
+[- $a = ' and more' -]
+
+<body  bgcolor="[+ 'blue' +]">
+<table  bgcolor="[+ 'blue'. $a +]">
+<tr  bgcolor="[+ 'blue' +]">
+<td bgcolor="[+ 'blue' +]">
+</td bgcolor="[+ 'blue' +]">
+</tr bgcolor="[+ 'blue' +]">
+</table bgcolor="[+ 'blue' +]">
+
+<dir bgcolor="[+ 'blue' +]">
+</dir bgcolor="[+ 'blue' +]">
+
+<dl bgcolor="[+ 'blue' +]">
+</dl bgcolor="[+ 'blue' +]">
+
+<menu bgcolor="[+ 'blue' +]">
+</menu bgcolor="[+ 'blue' +]">
+
+<ol bgcolor="[+ 'blue' +]">
+</ol bgcolor="[+ 'blue' +]">
+
+<select bgcolor="[+ 'blue' +]">
+</select bgcolor="[+ 'blue' +]">
+
+<textarea bgcolor="[+ 'blue' +]">
+Hallo
+</textarea bgcolor="[+ 'blue' +]">
+
+<ul bgcolor="[+ 'blue' +]">
+</ul bgcolor="[+ 'blue' +]">
+
+<input bgcolor="[+ 'blue' +]">
+<input bgcolor="[+ 'var->blue' +]">
+<input bgcolor="[- 'var->blue' -]">
+
+Here it starts with some HTML Text<P bgcolor="[+ 'blue' +]">
+
+[- $aaa = 1 -]
+<body  [$if $aaa $] bgcolor="[+ 'blue' +]" [$endif$]>
+<body  [$if !$aaa $] bgcolor="[+ 'blue' +]" [$endif$]>
+
+<body [$if $aaa $]bgcolor="[+ 'blue' +]"[$endif$]>
+<body [$if !$aaa $]bgcolor="[+ 'blue' +]"[$endif$]>
+
+
+[- $fdat{ VERSION } = 3 -]
+<IMG SRC="img.gif" [$ if $fdat{ VERSION } >= 3 $]
+		WIDTH=35 [$ endif $]>
+
+<IMG SRC="img.gif" [$ if $fdat{ VERSION } >= 4 $]
+		WIDTH=35 [$ endif $]>
+
+<A HREF="" [$ if $fdat{ VERSION } >= 3 $]
+		foo="" [$ endif $]>
+
+<A HREF="" [$ if $fdat{ VERSION } >= 4 $]
+		foo="" [$ endif $]>
+
+[- @ks = sort keys %idat -]
+
+<table>
+	<tr>
+		<td>[+ $ks[$row] +]</td><td>[+ $fdat{$ks[$row] || ''} +]</td>
+	</tr>
+</table>
+
+[- $stuff = ("X" x 79 . "\n") x 26; -]
+Testing ... length of STUFF=[+ length($stuff) +]<p>
+<input type="hidden" name="STUFF" value="[+ $stuff +]">
+
+[- $stuff = "X" x 2046; -]
+Testing ... length of STUFF=[+ length($stuff) +]<p>
+<input type="hidden" name="STUFF" value="[+ $stuff +]">
+
+[- $stuff = "X" x 2047; -]
+Testing ... length of STUFF=[+ length($stuff) +]<p>
+<input type="hidden" name="STUFF" value="[+ $stuff +]">
+
+[- $stuff = "X" x 2048; -]
+Testing ... length of STUFF=[+ length($stuff) +]<p>
+<input type="hidden" name="STUFF" value="[+ $stuff +]">
+
+[- $stuff = "X" x 2049; -]
+Testing ... length of STUFF=[+ length($stuff) +]<p>
+<input type="hidden" name="STUFF" value="[+ $stuff +]">
+
+[- $stuff = "X" x 2050; -]
+Testing ... length of STUFF=[+ length($stuff) +]<p>
+<input type="hidden" name="STUFF" value="[+ $stuff +]">
+
+
+[- $stuff = "X" x 30000; -]
+Testing ... length of STUFF=[+ length($stuff) +]<p>
+<input type="hidden" name="STUFF" value="[+ $stuff +]">
+
+<[+ 'b' +]>
+
+[$ foreach $tag ('a', 'b', 'c') $]
+    <[+ $tag +]>
+[$endforeach$]
+
+
+
+</body>
+</html>

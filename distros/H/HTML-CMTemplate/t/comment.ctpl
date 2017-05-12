@@ -1,0 +1,3 @@
+<?=comment Nothing should show up at all after parsing this template ?>
+<?=comment?>
+<?=comment ?>

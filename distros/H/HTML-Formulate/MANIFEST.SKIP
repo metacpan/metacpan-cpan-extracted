@@ -1,0 +1,8 @@
+.bzr
+.git
+blib
+pm_to_blib
+EXCLUDE
+Makefile.old
+Makefile
+MANIFEST.bak

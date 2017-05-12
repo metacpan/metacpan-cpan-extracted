@@ -1,0 +1,33 @@
+Failed  Succeeded  Test Name
+   0          2    *** no name ***
+   1          0    *** no name ***
+   0          3    *** no name ***
+
+
+Test Name: N/A
+URL: http://http.web.test/test-file1
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  REQUIRED TEXT
+    abcde                                                        SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/status-forbidden
+
+  STATUS CODE CHECK
+    Expected '200' and got: 403 Forbidden                        FAIL
+
+
+Test Name: N/A
+URL: http://http.web.test/test-file2
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  REQUIRED TEXT
+    begin                                                        SUCCEED
+    644                                                          SUCCEED
+
+
+Total web tests failed: 1  succeeded: 5

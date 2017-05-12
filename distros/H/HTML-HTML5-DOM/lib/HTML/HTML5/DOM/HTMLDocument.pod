@@ -1,0 +1,208 @@
+=head1 NAME
+
+HTML::HTML5::DOM::HTMLDocument - implementation of the HTMLDocument interface of the HTML DOM
+
+=head1 DESCRIPTION
+
+HTML::HTML5::DOM::HTMLDocument is an implementation of the HTMLDocument interface of the HTML DOM. See L<HTML::HTML5::DOM> for a list of the conventions that have been used when translating the DOM to Perl.
+
+=head2 HTML Elements
+
+This class applies to the following HTML elements.
+
+=over
+
+=back
+
+=head2 Inheritance
+
+HTML::HTML5::DOM::HTMLDocument inherits methods from the following Perl classes.
+
+=over
+
+=item * L<HTML::HTML5::DOMutil::FancyISA>
+
+=item * L<XML::LibXML::Augment::Document>
+
+=item * L<XML::LibXML::Augment::Node>
+
+=item * L<XML::LibXML::Document>
+
+=item * L<XML::LibXML::Node>
+
+=item * L<XML::LibXML::QuerySelector>
+
+=back
+
+=head2 Additional Methods
+
+As well as its inherited methods, this class provides the following methods.
+
+=over
+
+=item * C<< AUTOLOAD >>
+
+See L<perlsub> if you don't know the significance of the AUTOLOAD function. HTML::HTML5::DOM::HTMLDocument will pass through unknown menthods to the document's root element. So for example, C<< $document->setAttribute >> will actually set an attribute on the document's root element.
+
+=item * C<< URL >>
+
+Get/set the document's URL.
+
+=item * C<< anchors >>
+
+Returns all C<< <a> >> with a "name" attribute found in the document.
+
+=item * C<< applets >>
+
+Returns all C<< <applet> >> elements (and C<< <object codetype="application/java"> >> elements) found in the document.
+
+=item * C<< body >>
+
+Returns the document body.
+
+=item * C<< characterSet >>
+
+Returns the character set that the document was parsed as (if known). As C<charset> can be used as a setter, this is not necessarily the same as C<charset>.
+
+=item * C<< charset >>
+
+Getter/setter for the document encoding.
+
+=item * C<< compatMode >>
+
+Returns the string 'quirks' or 'limited quirks' or undef.
+
+=item * C<< cookie >>
+
+Ostensibly returns cookies associated with the document, but in this implementation always returns an empty string.
+
+=item * C<< defaultCharset >>
+
+Returns the string 'utf-8'.
+
+=item * C<< doctype >>
+
+This method is not implemented yet, but will eventually support the functionality defined in DOM Core 3.
+
+=item * C<< documentURI >>
+
+Alias for C<URL>.
+
+=item * C<< domConfig >>
+
+Ostensibly an object representing settings which will be used when C<normalize> is called. In practise, just returns an empty hashref that you can do with what you like.
+
+=item * C<< domain >>
+
+The documents URL's host name.
+
+=item * C<< embeds >>
+
+Returns all C<< <embed> >> elements found in the document.
+
+=item * C<< forms >>
+
+Returns all forms found in the document.
+
+=item * C<< getElementById >>
+
+The world-famous C<getElementById> method. The default XML::LibXML implementation of this does not work with HTML::HTML5::Parser documents, because HTML::HTML5::Parser lacks the ability to inform libxml which element to use as an ID. (libxml defaults to xml:id.) This implementation is XPath-based, thus slower.
+
+=item * C<< head >>
+
+Returns the document head.
+
+=item * C<< images >>
+
+Returns all images found in the document.
+
+=item * C<< implementation >>
+
+Returns the same as HTML::HTML5::DOM->getDOMImplementation.
+
+=item * C<< inputEncoding >>
+
+This method is not implemented yet, but will eventually support the functionality defined in DOM Core 3.
+
+=item * C<< lastModified >>
+
+Ostensibly returns the current document readiness, but this implementation always returns the string 'complete'.
+
+=item * C<< links >>
+
+Returns all C<< <a> >> and C<< <area> >> elements with an "href" attribute found in the document.
+
+=item * C<< normalizeDocument >>
+
+Alias for C<normalize>.
+
+=item * C<< p5_tables >>
+
+Returns all tables found in the document.
+
+=item * C<< plugins >>
+
+Returns all C<< <embed> >> elements found in the document.
+
+=item * C<< referer >>
+
+An alias for 'referrer' provided for the benefit of those who learnt to spell by reading HTTP RFCs.
+
+=item * C<< referrer >>
+
+Ostensibly returns the HTTP referer for the document, but in this implementation always returns an empty string.
+
+=item * C<< renameNode >>
+
+This method is not implemented yet, but will eventually support the functionality defined in DOM Core 3.
+
+=item * C<< scripts >>
+
+Returns all scripts found in the document.
+
+=item * C<< strictErrorChecking >>
+
+DOM seems a little vague as to what exactly constitutes 'strict'. This returns false.
+
+=item * C<< title >>
+
+Returns the document's title, from its C<< <title> >> element, with a little whitespace canonicalisation.
+
+=item * C<< xmlEncoding >>
+
+This method is not implemented yet, but will eventually support the functionality defined in DOM Core 3.
+
+=item * C<< xmlStandalone >>
+
+Called with an argument, acts as C<setStandalone>; called without an argument, acts as C<standalone>.
+
+=item * C<< xmlVersion >>
+
+Returrns undef for documents parsed using an HTML parser; 1.0 or 1.1 if parsed using libxml.
+
+=back
+
+=head1 BUGS
+
+L<http://rt.cpan.org/Dist/Display.html?Queue=HTML-HTML5-DOM>.
+
+=head1 SEE ALSO
+
+L<HTML::HTML5::DOM>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2012, 2014 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+
+

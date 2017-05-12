@@ -1,0 +1,116 @@
+
+<html>
+<head>
+  <title>HTML::FromMail::Message examples with Text::MagicTemplate</title>
+</head>
+<body>
+
+<h2>Fields</h2>
+
+<h4>As "Terminal"</h4>
+<pre>Subject: &lt;!--{field name => subject}--&gt;</pre>
+<blockquote>
+Subject: <!--{field name => subject}-->
+</blockquote>
+
+<h4>As container<h4>
+
+<pre>
+&lt;!--{field name =&gt; subject}--&gt;
+Name: &lt;!--{name capitals =&gt; WELLFORMED}--&gt;&lt;br /&gt;
+Body: &lt;!--{body wrap =&gt; 20}--&gt;&lt;br /&gt;
+&lt;!--{/field}--&gt;
+</pre>
+
+<blockquote>
+<!--{field name => subject}-->
+Name: <!--{name capitals => WELLFORMED}--><br />
+Body: <!--{body wrap => 20}--><br />
+<!--{/field}-->
+</blockquote>
+
+<h4>Special case: subject</h4>
+
+<pre>Subject: &lt;!--{subject}--&gt;</pre>
+<blockquote>
+Subject: <!--{subject}-->
+</blockquote>
+
+<h2>Header</h2>
+
+<h4>As "Terminal"</h4>
+<pre>&lt;!--{head}--&gt;</h4></pre>
+<blockquote>
+<!--{head}-->
+</blockquote>
+
+<h4>As container</h4>
+<pre>&lt;table&gt;
+&lt;!--{head remove_spam_groups =&gt; 0, select =&gt; content|X- }--&gt;
+&lt;tr&gt;&lt;td&gt;&lt;!--{name}--&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;!--{body}--&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;!--{/head}--&gt;
+&lt;/table&gt;
+</pre>
+
+<blockquote>
+<table>
+<!--{head remove_spam_groups => 0, select => content|X- }-->
+<tr><td valign="top"><!--{name}--></td>
+    <td valign="top"><!--{body}--></td></tr>
+<!--{/head}-->
+</table>
+</blockquote>
+
+<h2>Complex multipart message:</h2>
+
+<!--{message}-->
+   <!--{head}-->
+
+   <!--{inline}-->
+       <!--{html}-->
+          <!--{text}-->
+       <!--{/html}-->
+   <!--{/inline}-->
+
+   <!--{attach}-->
+       <a href="<!--{url}-->" target="_blank">See attachment</a>.<br />
+       <!--{type}--> (<!--{size}--> bytes)
+   <!--{/attach}-->
+
+   <!--{preview}-->
+       <!--{html}-->
+          <blockquote><cite><!--{text}-->&nbsp;...</cite>
+          <a href="<!--{url}-->" target="_blank">read
+               more</a>&nbsp;&gt;&gt;&gt;<br />
+          <!--{type}--> (<!--{size}--> bytes)
+       <!--{/html}-->
+       <!--{image}-->
+          <a href="<!--{url}-->" target="_blank"><img
+            src="<!--{smallurl}-->" width="<!--{smallwidth}-->"
+            height="<!--{smallheight}-->" border="0"></a><br />
+          <a href="<!--{url}-->" target="_blank"><!--{width}--> x
+            <!--{height}--> (<!--{size}--> bytes)</a>
+       <!--{/image}-->
+   <!--{/preview}-->
+
+   <!--{multipart}-->
+      <ol>
+      <!--{foreachPart}-->
+      <li><!--{part}--></li>
+      <!--{/foreachPart}-->
+      </ol>
+    <!--{/multipart}-->
+
+    <!--{nested}-->
+       message/rfc822 encapsulated
+       <!--{part}-->
+    <!--{/nested}-->
+
+<!--{/message}-->
+
+
+</body>
+</html>
+
+

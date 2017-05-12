@@ -1,0 +1,14 @@
+<: GLOBAL :>
+	our $TMOJO_CONTAINER = '/container_1.tmojo';
+<: /GLOBAL :>
+
+<: METHOD title :>
+	Document Title
+<: /METHOD :>
+
+<: METHOD author :>
+	Will Conant
+<: /METHOD :>
+
+This is a supposed document written
+by <: $Self->author :>.

@@ -1,0 +1,52 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 dedb76e8c33334fcf4299ed0c47df2b55f6a74fe Changes
+SHA1 fc5c231237ae27eb209212028d28d1885498c695 INSTALL
+SHA1 05207cbc5971035849c1de2c7cb3babaeaccb6fb LICENSE
+SHA1 796b63301c04f419f911a2d173156ea3330e2044 MANIFEST
+SHA1 7d5cb10dca5f9c57192add9d19c9203ad9c9ffe7 META.json
+SHA1 101ba4c957c35560ecf8c6172e4950f80bdf81b5 META.yml
+SHA1 48324058e5ebb6e3cce8f058b1572847772f3e92 Makefile.PL
+SHA1 1270dca8b03fb0ce2cf799dff1ba1283d037144c README
+SHA1 a85566fb059e96555d7e83567d8e3b265fb474e4 dist.ini
+SHA1 7fcfc2755d04f1b281265b560a3a7f7097a7d0e2 lib/HTML/Builder.pm
+SHA1 bf9f79b7f1435abc36ddcee73258daafa64afcdd t/00-compile.t
+SHA1 18d5eb3be866f1bd2ced590fabe64c38be11525f t/000-report-versions-tiny.t
+SHA1 fab8f9195df071bcebfa6c06a34fb1e787f5de4e t/author-pod-spell.t
+SHA1 ffdec7838ba559b465132254e4cfed53664e98b4 t/basic.t
+SHA1 77b1c52518505c3162b2634bf62ea67faa4ca3b7 t/deprecated.t
+SHA1 a473e60026a11ea77980ea36c8819295f906010c t/depreciated.t
+SHA1 f36540850cad6df623d5c5ea371d54dcd793ebd7 t/exporter.t
+SHA1 425d0c58ce16955aacc544c0b4726a5037e50eba t/gets-vs-attr.t
+SHA1 9c3627ff37f4fd5bddc34bf46cf3359eaf76a060 t/release-consistent-version.t
+SHA1 a032c41ef6887fab1b900669c2d304fab46680e2 t/release-eol.t
+SHA1 1b8eace1a4b044e807ea81346a46cea8dcec6c5b t/release-has-version.t
+SHA1 b9cc8a3c7f97fed301cdd37e6896cc85e4c8e35a t/release-no-smart-comments.t
+SHA1 455d1dd1867212a665ad5ea4126b572411de300c t/release-no-tabs.t
+SHA1 8ebf40f066f01b383c5f9ffbf919dfe57aa376c3 t/release-pod-coverage.t
+SHA1 7bab5e58cb1527e3373120aac5b9cde8819023ed t/release-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQEcBAEBAgAGBQJQu9xeAAoJEOd5N1CvIgQkiHwIAJg3UZBa5HFZn7RqBgoaAHUI
+xPdLqr6BhB6TkeMk8hao86M1966QBcj9WDWQ80BymTJnX7jRss9Az9t4uz+Jpm6Q
+z2smxvIiytyd2EMGPCWBDVXOIJmHRB/knqj/O7owe/4rRZlAtg6qENhdJGlAgsY0
+YH15RSvHtW2skI7JW430Tz2UFusckQJlIE43mSU1USuFxc5Se4gxZAKnyMPn3ayQ
+Ev3eJXeWqS8oKnU2zsuZNuFCCWxnUS90q4PAkD6bOvAuRVGdWSo9OMYt4PVnOheB
+iOALwU3aXdU/lrAeaybyr0bkw1eZGVr6y/voM/bs5Vh28Jp8jSwNMlLrcGYwPtY=
+=A8GC
+-----END PGP SIGNATURE-----

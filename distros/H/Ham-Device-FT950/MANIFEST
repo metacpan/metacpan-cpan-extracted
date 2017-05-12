@@ -1,0 +1,8 @@
+bin/pRigctl.plx
+Changes
+lib/Ham/Device/FT950.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/Ham-Device-FT950.t
+META.yml                                 Module meta-data (added by MakeMaker)

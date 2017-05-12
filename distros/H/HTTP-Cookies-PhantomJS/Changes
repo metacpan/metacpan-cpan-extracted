@@ -1,0 +1,7 @@
+Revision history for Perl extension HTTP::Cookies::PhantomJS.
+
+0.02  Sat Nov  7 15:46:40 NOVT 2015
+      - fix bug where saving may produce cookies file not readable by PhantomJS
+
+0.01  Sat Nov  7 00:55:38 NOVT 2015
+      - original version

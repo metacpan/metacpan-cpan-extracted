@@ -1,0 +1,29 @@
+Hash/WithDefaults version 0.04
+==============================
+
+This module implements hashes that support "defaults". That is you may specify
+several more hashes in which the data will be looked up in case it is not found in
+the current hash.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Tie::StdHash
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Jenda Krynicky <Jenda@Krynicky.cz>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

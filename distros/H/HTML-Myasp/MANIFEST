@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/HTML-Myasp.t
+lib/HTML/Myasp.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,120 @@
+HTML::Merge - Embedded HTML/SQL/Perl system by RAZ Information Systems.
+-----------------------------------------------------------------------
+Copyright (c) 1999 - 2004 RAZ Information Systems Ltd.
+http://www.raz.co.il
+
+This package is distributed under the same terms as Perl itself, see the
+Artistic License on Perl's home page.
+-----------------------------------------------------------------------
+                      
+                            INSTALL
+----------------------------------------------------------------------
+In this document you can find information on how to install HTML::Merge
+and create instances. Instances are the merge application.
+You will need to create an instance for every web directory (URL)
+that you want to use merge.
+
+
+1. LINUX and UNIX like systems:
+=====================================================================
+If you are on a system where you can run the Makefile.PL and use make,
+then the package can be installed using the normal MakeMaker process,
+that is
+
+  gunzip HTML-Merge-*.*.tar.gz
+  tar xvf HTML-Merge-*.*
+  cd HTML-Merge-*.*
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Note: on Linux and FreeBSD this can be shortened to:
+
+  tar zxvf HTML-Merge-*.*.tar.gz
+  cd HTML-Merge-*.*
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+On many other systems this could be written as:
+  gzip -d -c HTML-Merge-*.*.tar.gz | tar xvf -
+  cd HTML-Merge-*.*
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+At this stage HTML::Merge modules are installed for system wide use.
+You can read the man pages for HTML::Merge and HTML::Merge:Tags for
+more information.
+
+In the next stage you will create your instances (Please 
+read chapter 3).
+
+2. WINDOWS like systems :
+==========================================================
+Open the tar file to an empty directory (e.g C:\MERGE).
+
+perl merge.cgi.PL
+
+Now you will be able to create your instance by typing 
+perl mergecreateinstance. (Please read chapter 3).
+
+Windows user can create instances ONLY in the "local" mode, 
+from the directory where mergecreateinstance is. 
+
+3. After Install - Run merge-create instance
+==========================================================
+Now as you want to set you own application use the script mergecreateinstance.
+HTML::Merge instance is an application or set of applications.
+
+run:
+  mergecreateinstance 
+(on Windows type "perl mergecreateinstance").
+
+For first time users we recommend to install samples and to use NONE option
+when mergecreateinstance prompt you for security.
+
+It is recommended for first time to give mergecreateinstance
+a simple httpd.conf so that it will work for you, and later try it on 
+a more complicated environment. 
+
+mergecreateinstance will set for you:
+  1. merge.conf - your application configuration file. 
+  2. It will try to set for you apache configuration.
+  3. It will create the following sub directories:
+  * cache - Auto generated CGI Perl programs 
+	created by HTML::Merge from templates
+  * template - Your templates (HTML + HTML::Merge tags)
+  * logs - Logs for templates developers (set DEVELOPMENT = 1 in merge.conf)
+  * private - Developers tools files and programs.
+  * public - files shared by all merge instances.
+   	(private and public can be symlinks or real directories) 
+  4. merge.cgi or merge.pl - the web interface to compile and run 
+	the application in the instance
+
+You can find some usefull information in the log file 
+mergecreateinstance.log.
+
+When creating or updating configuration files in not possible
+mergecreateinstance will create local files with configuration
+in *.inc files. 
+ 
+merge.conf.inc - merge.conf for last session. 
+merge-httpd.inc - httpd.conf configuration for the last session.
+htmerge.inc - password file.
+
+You then must edit or create configuration
+files yourself.
+
+4. Instance install for non Apache web-server users
+=========================================================
+If you are using non apache web server, do the following.
+1. Create a script web directory (like cgi-bin) from which you have 
+rights to run CGI application.
+2. create merge instance using mergecreateinstance to that directory.
+3. set rights to the directory.
+4. Manually edit merge.conf
+

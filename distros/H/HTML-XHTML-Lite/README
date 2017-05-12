@@ -1,0 +1,57 @@
+HTML-XHTML-Lite version 0.01
+============================
+
+INTRODUCTION
+
+This module provides a light-weight alternative to the Perl built-in,
+CGI.pm, for those who wish for an easy way to produce a well-formed 
+XHTML <head></head>, with Dublin Core metadata. A function to create 
+a footer is provided for completeness and it is even possible to 
+provide body text to return a complete document.  Provision is made 
+for the inclusion of links to RSS (or other) feeds and FOAF data.  
+The 'extras' property allows for the insertion of arbitrary elements 
+into the document header.
+
+In addition to the generation of XHTML, the function getvars() is 
+included to populate a hash with data from the query string and POST 
+data.  This is an unsophisticated equivalent to CGI.pm's 
+$q->para('xyz') functionality.
+
+The aim of this module is to help produce content that is both 
+accessible and machine-parseable.  For instance, one of the methods 
+of start_page(), nodoctype=>1, is provided purely for the purpose of 
+being able to leave out required components to check that any 
+validation systems being used are actually working.
+
+For further information, please see the documentation.  A sample
+application is included.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  HTTP::Date
+  Time::Local
+
+REVISION HISTORY
+
+See the 'Changes' file
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Matthew Smith (smiffy@cpan.org)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
+
+

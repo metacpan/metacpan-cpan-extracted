@@ -1,0 +1,17 @@
+^Hailo-
+\.bak$
+\.txt$
+\.log$
+\.patch$
+\.diff$
+\.db$
+\.sql(?:ite)?$
+^[^/\\]*\.trn$
+\.brn$
+\.#
+^utils/developer/
+^xt/
+^RELEASE
+^nytprof
+^README.pod$
+^cover_db/

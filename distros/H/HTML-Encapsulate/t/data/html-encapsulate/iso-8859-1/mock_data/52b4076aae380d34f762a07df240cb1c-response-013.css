@@ -1,0 +1,9 @@
+HTTP/1.1 200 OK
+Content-Type: text/css
+
+/* /css/global.css */
+@import "subdir/extra.css";
+
+.border { 
+  border: 3px solid red;
+}

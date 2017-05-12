@@ -1,0 +1,29 @@
+Revision history for Perl module WWW::APS
+
+0.1 Thu Oct  2 11:09:05 2003
+	- original version; created by ExtUtils::ModuleMaker 0.32
+
+0.2 Monday Oct 27 23:16 2003
+	- Still some bugs but less. DefenseServer.pl now uses Net::IP::Route::Reject .
+	- squaashed bug in LogReader.pl with regards to interface to HTTPD::Log::Filter
+	- sockets approach to separating root/non-root is fragile. Considering rewrite
+	- to make one program which runs as root , uses unnamed pipe and then forks.
+0.3 Make things run again. 
+0.4	Add testing for open proxy along with recording result of test in database.
+	Since this code uses Class::Constructor and it was brain-damaged messing with the case of
+	identifiers and the maintainer didn't fix his module in 3 months a corrected version of
+	Class::Constructor is included in this distro. 
+	Fixed up the tests to actually work.
+0.5	HTTPD::Log::Filter sometimes sticks on the adjacent field " -". Add code to ADS.pm to clean this up.
+	remove Class::Constructor, maintainer fixed it.
+
+0.6	Performance improvement: move counting of events to the database backend through sql query using
+	aggreate function COUNT(). Speeds look to be at worst 4x faster when there are events to analyze.
+	Time in the database is supposed to be in Zulu (CUT) time. Dates from logfile are in time+tz format,
+	add code to ADS.pm to convert the time to Zulu.
+	New script: LogTailer.pl reads from multiple logfiles, using File::Tail, as input is ready.
+	
+0.7	Modify Build.PL to add scripts/LogTailer.pl . search_first_error make sure that we get the first one, add ORDER BY "ts" to the SELECT.
+0.7_1	Oops, forgot to add LIMIT 1 to sql of search_first_error and now we can use an array context
+        confident that we are not wasting resources throwing extra records back to the application.
+         

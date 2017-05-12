@@ -1,0 +1,38 @@
+---
+abstract: 'a xs module for clone hash with keys'
+author:
+  - 'itsusony <itsusony@fout.jp>'
+build_requires:
+  Test::LeakTrace: '0.15'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Hash-BulkKeyCopy
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Hash::BulkKeyCopy:
+    file: lib/Hash/BulkKeyCopy.pm
+    version: '0.022'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/itsusony/Hash-BulkKeyCopy/issues
+  homepage: https://github.com/itsusony/Hash-BulkKeyCopy
+  repository: git://github.com/itsusony/Hash-BulkKeyCopy.git
+version: '0.022'
+x_authority: cpan:ITSUSONY

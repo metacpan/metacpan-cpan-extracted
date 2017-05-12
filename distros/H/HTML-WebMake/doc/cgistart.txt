@@ -1,0 +1,96 @@
+<wmmeta name="Title" value="Using webmake.cgi" />
+<wmmeta name="Section" value="075-cgi" />
+<wmmeta name="Score" value="40" />
+<wmmeta name="Abstract">
+How to navigate and use the ''edit-in-browser'' interface
+</wmmeta>
+
+First of all, after typing the ##webmake.cgi## URL, you'll see a login dialog:
+
+	<div align=center>
+	<img src=shots/login.png ${IMGSIZE} />
+	</div>
+
+Type your username and password, and (assuming they're right) you'll see
+the __Choose Site__ page.  Choose the site (ie. the .wmk file) you wish
+to edit and click on its **Edit** link.
+
+	<shot src=shots/choose_site.png />
+
+The site you've chosen will appear in the __Edit Site__ page:
+
+	<shot src=shots/edit_site.png />
+
+If you've set up CVS, it's probably good manners to ensure you do a __cvs
+update__ immediately before changing anything.  If you click on the **Update
+From CVS** link, you'll see the __CVS Update__ page:
+
+	<shot src=shots/cvs_update.png />
+
+Once this is done, click on the **return to WebMake file** link to return to
+the __Edit Site__ page.
+
+Editing Content Items
+---------------------
+
+If you have any items that contain text, such as &lt;content&gt; items, an
+**Edit** button will appear beside them.  If you click this, you can edit the
+text of that item, and any embedded metadata, in a textbox like so:
+
+	<shot src=shots/edit_item_page.png />
+
+This allows you to edit the text of the item, and even upload new text from
+your local disk, if you so wish.  Hit the **Save** button to save the changes,
+or just hit your browser's **Back** button to avoid saving.
+
+The __Edit Site__ page doesn't currently allow you to create new tags
+in the WebMake file, or change parameters to WebMake tags.  To do this,
+use the **Edit This File As Text** link, which will present you with the
+entire Webmake XML file in the __Edit Page__:
+
+	<shot src=shots/edit_page.png />
+
+Editing Directories
+-------------------
+
+WebMake tags that load content from directories, such as the &lt;contents&gt;
+tag, appear with a link beside them reading **Browse Source Dir**.  If you
+click this, you'll be presented with the __Edit Directory__ file browser
+window:
+
+	<shot src=shots/edit_dir.png />
+
+This allows you to navigate about the directory tree (although you cannot
+go above the directory you've named as **&wmdollar;FILE_BASE** in the
+##webmake.cgi## script), and perform some other operations, such as
+editing files in the __Edit Page__, create new files, and delete files:
+
+	<shot src=shots/delete_file.png />
+
+Building The Site
+-----------------
+
+If you click the **Build Site** or **Build Fully** links on any of the
+pages, WebMake will build the site and present you with what was built
+(and what went wrong, if anything did!):
+
+	<shot src=shots/built_site.png />
+
+Committing Your Changes To CVS
+------------------------------
+
+Once you're satisfied with the changes, hit the **Commit Changes To CVS**
+link. This will, firstly, ask you for a message describing your changes:
+
+	<shot src=shots/cvs_commit_msg.png />
+
+And, once you've provided that, will send your changes back to the
+CVS server.
+
+	<shot src=shots/cvs_commit.png />
+
+Note that WebMake tracks any files you've added or deleted using hidden CGI
+variables, so once you've done a commit, you're given a choice between
+clearing out this list (if the commit was successful), or keeping them (if it
+failed in some way).
+

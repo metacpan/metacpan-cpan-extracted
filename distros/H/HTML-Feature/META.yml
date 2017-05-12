@@ -1,0 +1,40 @@
+---
+abstract: 'Extract Feature Sentences From HTML Documents'
+author:
+  - 'Takeshi Miki <miki@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.97'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-Feature
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  Class::Accessor::Fast: 0
+  Class::Data::ConfigHash: 0
+  Data::Decode: 0.00006
+  Encode: 0
+  Filter::Util::Call: 0
+  HTML::TreeBuilder::LibXML: 0
+  HTML::TreeBuilder::XPath: 0
+  HTTP::Request: 0
+  JSON: 0
+  LWP::Simple: 0
+  LWP::UserAgent: 0
+  Scalar::Util: 0
+  Statistics::Lite: 0
+  Storable: 0
+  UNIVERSAL::require: 0
+  URI: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 3.00011

@@ -1,0 +1,30 @@
+Things to do:
+
+- assyslist: new assemblies are listed as 'assembly' instead of 'assemblynnn'
+- unknown: print name of missing brick on label
+- httpd.conf: shouldn't have to change default to text/html from text/plain
+- table: Review unsplit.  Make changes as needed (current method kind-of makes sense).
+- photoalbumset: remove hacks to make pmcdermott.com website look good
+- add native perl bricks (/bricks/standard/perl/*) and move column and table to 
+  native perl.  (should improve speed)
+- Cache component output in the data structure so that Bricks doesn't spend so m
+  much time executing code that outputs the same thing every time.
+
+Long-term things to do:
+
+- Write a manual.  Have it accessible via a 'help' button from the authorbar
+- Get Bricks to work under CGI
+- Add a system configuration API and system configuration manager so that 
+  the behavior of Bricks Site Builder and installed sub-systems can be changed  
+  via HTML forms when logged in.
+- Add a user administraton system so that sub-systems can be built around users
+  logging into an account.
+- Add a system logging API and analysis tools (try not to reinvent the wheel too much)
+- Add internationalization (i18n) and localization (l8n) support
+- Add a staging/release functionality so that changes aren't immediately visible to 
+  people using the site
+- Add a backup/restore functionality 
+- Add file-locking to file IO operations
+- Come up with a system for brick to brick communication (possibly using brick id's).
+- Allow bricks to set a visible error flag so that users know to 'edit' them when 
+  there's a problem (directory no longer exists, etc.)

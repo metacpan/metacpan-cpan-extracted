@@ -1,0 +1,9 @@
+Changes
+lib/HTTP/WebTest/Plugin/Sticky.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/boilerplate.t
+t/pod.t

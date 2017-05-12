@@ -1,0 +1,42 @@
+---
+abstract: 'The non-destructive utilities for picking hash'
+author:
+  - 'Pine Mizune'
+build_requires:
+  Test::Deep: '1.120'
+  Test::Exception: '0.43'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.4005'
+  Module::Build::XSUtil: '0.16'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Hash-Util-Pick
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Hash::Util::Pick:
+    file: lib/Hash/Util/Pick.pm
+    version: '0.11'
+requires:
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/pine/p5-Hash-Util-Pick/issues
+  homepage: https://github.com/pine/p5-Hash-Util-Pick
+  repository: git://github.com/pine/p5-Hash-Util-Pick.git
+version: '0.11'
+x_authority: cpan:PINE
+x_contributors:
+  - 'Pine Mizune <pinemz@gmail.com>'

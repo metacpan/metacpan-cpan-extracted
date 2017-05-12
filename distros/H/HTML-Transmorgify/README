@@ -1,0 +1,339 @@
+NAME
+     HTML::Transmorgify - HTML transformation compiler
+
+SYNOPSIS
+     use HTML::Transmorgify;
+
+     my $magic = HTML::Transmorgify->new(xml_quoting => 1);
+
+     $magic->mixin('HTML::Transmorgify::Metatags');
+     $magic->mixin('HTML::Transmorgify::FormDefaults');
+
+     my $output = $magic->process($input_text, { %options }, %variables);
+     my %output_by_type = $magic->process($input_text, { %options }, %variables);
+
+DESCRIPTION
+    HTML::Transmorgify is an HTML compiler framework. It transforms HTML
+    into a arrays of static text and CODE callbacks. The arrays can be
+    turned into customized HTML very quickly. The compilation process is
+    quick and the runtime process is even quicker. It is designed for sites
+    that will dynamically generate all their content.
+
+    By itself, HTML::Transmorgify doesn't do anything useful: it is just a
+    framework. Most users will want to use one or more of the addon modules
+    for HTML::Transmorgify:
+
+    HTML::Transmorgify::Metatags
+        Provides a template language processor with macros, control flow,
+        and basic functions.
+
+    HTML::Transmorgify::FormChecksum
+        Adds cryptographic checksums to forms so that users cannot add
+        additional elements, change or remove hidden values, or set
+        dropdowns or radio buttons to values that were not provided.
+
+    HTML::Transmorgify::FormDefault
+        Overrides the default values in the form definition so that the
+        end-user's prior input is remembered when re-displaying the form.
+
+    HTML::Transmorgify::Crumbs
+        Adds cookie crumbs to URLs to and forms so to protect against
+        cross-site scripting attacks that direct a logged-in user back to a
+        page that will do something naughty.
+
+    HTML::Transmorgify::Images
+        Changes multiple <img> tags into <div> tags with background
+        attributes that point into shared composite image. This decreases
+        page load time because many fewer items need to be fetched.
+
+        It also adds "height" and "width" attributes to images that don't
+        have them yet.
+
+        It notices roll-over images and adds javascript to display them.
+
+        As of January 2011, this addon is not yet complete.
+
+    Additional modules can be added to the framework.
+
+USING HTML::Transmorgify
+    By itself, HTML::Transmorgify doesn't do anything useful. You need to
+    blend in one of the addon modules or write your own.
+
+    You invoke HTML::Transmorgify with:
+
+     my $output = $magic->process($input_text, { %options }, %variables);
+
+    or
+
+     my %output_by_type = $magic->process($input_text, { %options }, %variables);
+
+    In array context, the results from processing templates are returned as
+    a hash, mapping the type of result to the result string. Two result
+    types are always present: "text" and "script". Other result types may be
+    added by add-on modules.
+
+    Currently, all of the options in "{ %options }" are made available to
+    addon modules via the $invocation_options variable. In additon the
+    following items are singled out and have defined meanings:
+
+    query_param    A reference to a CGI.pm-style query parameters hash.
+
+    input_file     The filename from which the $input_text came from.
+
+    input_line     A line-number offset from the beginning of the input_file
+                   so that error messages can refer to the line number of
+                   the error.
+
+    The %variables are used by HTML::Transmorgify::Metatags as pre-defined
+    macro values. They can be strings, hashes, arrays, or objects. If
+    they're objects, they should inherit from
+    HTML::Transmorgify::ObjectGlue.
+
+WRITING ADDON MODULES
+    HTML::Transmorgify compiles HTML. It compiles HTML into an array of
+    callbacks and literals. It then executes the compiled array. Compilation
+    output from an input string is cached for reuse. Files are compiled
+    separately.
+
+    When you write an addon module, you register to be called back for
+    particular HTML tags. When you are called back, you need to generate
+    strings to be appended to the the final document or callbacks to be
+    called at runtime.
+
+    The runtime program is an array: @$HTML::Transmorgify::rbuf. There is a
+    little function for appending to that array: "rbuf()".
+
+    Addon modules generally start the same:
+
+     package HTML::Transmorgify::MODULE_NAME;
+
+     use HTML::Transmorgify qw(continue_compile capture_compile run queue_intercept rbuf postbuf);
+
+     our @ISA = qw(HTML::Transmorgify Exporter);
+
+     sub add_tags
+     {
+            my ($self, $tobj) = @_;
+            $self->intercept_exclusive($tobj, __PACKAGE__, A_NUMBER, %EXCLUSIVE_TAGS)
+            $self->intercept_shared($tobj, __PACKAGE__, A_NUMBER, %SHARED_TAGS);
+     }
+
+    Where "A_NUMBER" is a priority number for choosing which callbacks get
+    called first (lower is earlier); %EXCLUSIVE_TAGS maps HTML tags to
+    callbacks that compile that HTML tag; and %SHARED_TAGS maps HTML tags to
+    callbacks that participate in compiling that HTML tag.
+
+    Generally you want an exclusive tag when the tag isn't actually part of
+    HTML like when you are creating a template language like what is done in
+    HTML::Transmorgify::Metatags.
+
+    For situations where you are making an adjustment to regular HTML tags,
+    you usually want a shared tag. For example,
+    HTML::Transmorgify::FormChecksum and HTML::Transmorgify::FormDefault
+    both modify forms and attach callbacks to the <input> tags.
+
+    Shared tags must be handled carefully so that the multiple modules that
+    are acting on a tag do not get in each other's way. Not everything can
+    be handled by with a shared tag For example, the <foreach> tag defined
+    in HTML::Transmorgify::Metatags is an exclusive tag.
+
+    All callbacks are invoked with the following arguments:
+
+    $attr   A HTML::Transmorgify::Attributes object representing the a tag
+            and its attributes.
+
+    $closed Closed if this is an end-tag or self-contained tag like <hr />.
+
+  Shared Tags
+    The return value from a shared tag callback is ignored unless the return
+    value is a CODE ref. The callbacks are called at compile time. Any CODE
+    refs returned by the callback will be invoked at runtime BEFORE the tag
+    is interpolated into the results.
+
+    Shared tags are always interpolated into the results.
+
+    The usual form of a shared tag is something like:
+
+     $SHARED_TAGS{img} = \&img_tag;
+     sub img_tag {
+        my ($attr, $closed) = @_;
+        return 1 unless $attr->raw('alt');
+        $attr->eval_at_runtime(1);
+        rbuf(sub {
+            my $text = $attr->get('src');
+            $text =~ s{.*/}{};
+            $text =~ s/([a-z])([A-Z])/$1 $2/g;
+            $text =~ s/_/ /g;
+            $attr->set(alt => $text);
+        });
+        return 1;
+     }
+
+    This example transformation will try to turn the image file name into an
+    <alt> tag.
+
+    It uses "rbuf()" to add a callback that will run just before the <img>
+    tag is added to the output stream.
+
+    It calls
+
+        $attr->eval_at_runtime(1);
+
+    to make sure that the <img> tag is evaluated at runtime rather than
+    added as a literal string at compile time.
+
+    It returns a value of 1 to indicate that the <img> tag should be
+    included in the output stream.
+
+  Exclusive Tags
+    The return value from an exclusive tag indicates whether the tag should
+    be included in the resulting text or not. A true value will cause the
+    tag to be inclucd; a false value will not.
+
+  APIs for Callback Writers
+    rbuf()
+        The tiny rbuf function pushes its arguments on the
+        "HTML::Transmorgify::rbuf" array. This array represents the output
+        from compiling the HTML. It can conntain the following elements:
+
+        strings        Plain scalars will be interpolated into the final
+                       output unchanged.
+
+        CODE refs      Code references will be called. For them to add to
+                       the final output, they need to append to the strings
+                       in @$HTML::Transmorgify::result. The first of these,
+                       $$HTML::Transmorgify::result[0] is used for regular
+                       results. If additional types of output are needed,
+                       the array indexes should be allocated by calling
+                       "allocate_result_type".
+
+    postbuf()
+        Pushes its arguments onto @HTML::Transmorgify::post_intercept_push.
+        This is used during shared tag callback processing. The contents of
+        @HTML::Transmorgify::post_intercept_push is pushed onto
+        "HTML::Transmorgify::rbuf" after the rest of the shared tag callback
+        processing is done.
+
+    allocate_result_type()
+        Alocates another "key" for the results array. The predefined keys
+        are: "text" and "script".
+
+        Keys can be looked up in %HTML::Transmorgify::result_index.
+
+    boolean()
+        The boolean function returns false if it's argument is: "false",
+        "no", "off", 0, or undefined. Otherwise it returns true.
+
+    run($buf, $results)
+        The run function "executes" the compiled HTML in @$buf. Literal
+        strings will be added to $$results[0], code references will be
+        invoked.
+
+        If $results is not specified, it will default to
+        $HTML::Transmorgify::results.
+
+    eat_cr()
+        *Exclusive tag callbacks only.* Advance the input parsing position
+        "pos($$HTML::Transmorgify::textref)" past a newline.
+
+    $rbuf = compile($cacheline, $textref)
+        Compiles $$textref and returns the results. Results are are cached
+        so compiling the same string ($$textref) in the same context will
+        result in a cached result. Do not modify the returned array (@$rbuf)
+        as since it can be handed out again from another call to compile.
+
+        The $cacheline argument specifies the caching context for the input
+        string. For compiling things in the normal context where all
+        currently active transformations can apply, use the context
+        $HTML::Transmorgify::modules.
+
+    ($rbuf, $deferred) = capture_compile($tag, $starting_attr, $opts, %tags)
+        *Exclusive tag callbacks only.* Continues to compile the current
+        $HTML::Transmorgify::textref (as passed to compile()) until a
+        closing "</$tag>" is reached. For better error messages, the
+        HTML::Transmorgify::Attributes for the opening tag ($starting_attr)
+        is passed in.
+
+        The callbacks for multiple tags may be overridden with the %tags
+        argument. Since these may be shared callbacks, only the callbacks
+        for the module doing the overridding should be modified. That should
+        be specified as: $$opts{tag_package}.
+
+        The call to capture_returns after the input pointer has moved past
+        "</$tag>". No "</$tag>". is pushed into the compile output buffer
+        "HTML::Transmorgify::rbuf" and the callbacks requested for "</$tag>"
+        have not been called. To invoke them, simply run:
+
+         $deferred->doit();
+
+        This will also push a "</$tag>" into the output stream.
+
+    continue_compile($tag, $starting_attr, $opts, %tags)
+        *Exclusive tag callbacks only.* continue_compile() is very much like
+        "capture_compile()" except that the output from the compilation
+        process is appended to the existing "HTML::Transmorgify::rbuf" array
+        and there is no return value from the function.
+
+        The purpose of continue_compile() is to allow the normal compilation
+        process to continue for a while. The function returns after
+        "</$tag>" has been rpocessed. Tag callbacks may be temporarily
+        overridden for the duration of the call.
+
+        If $tag is undef, the compilation will continue until the end of
+        $$textref is reached or until a "HTML::Transmorgify::CloseTag"
+        callback is invoked.
+
+    local($HTML::Transmorgify::dispatch{"/$tag"}) =
+    HTML::Transmorgify::ClosedTag->new($HTML::Transmorgify::dispatch{"/$tag"
+    });
+        This will override the callbacks for "</$tag>" so that
+        continue_compile or capture_compile will stop when "</$tag>" is
+        reached. This is normally done automatically but this invocation is
+        needed if stopping for more than one tag.
+
+    queue_capture($coderef)
+        *Shared tag callbacks only.* Shared tag callbacks cannot use
+        capture_compile() and continue_compile(): they can use
+        queue_capture() instead. The function that handles calling all the
+        shared tag callbacks will do a capture_compile(), looking for the
+        close tag to match the current tag if any of the shared tag
+        callbacks uses queue_capture().
+
+        After the $coderefs are invoked (they receive the $rbuf from
+        capture_compile() as their only argument) the temporary $rbuf
+        compile buffer will be appended to the main compile buffer. After
+        that, the deferred callbacks from the close tag will be invoked.
+
+    queue_intercept($tag_pkg, %tags)
+        *Shared tag callbacks only.* Shared tag callbacks cannot use
+        capture_compile() and continue_compile(): they can use
+        queue_capture() instead. The function that handles calling all the
+        shared tag callbacks will do a continue_compile(), looking for the
+        close tag to match the current tag if any of the shared tag
+        callbacks uses queue_intercept(). If queue_capture is also used by a
+        tag callback, then capture_compile() will be used instead.
+
+        For the duration of the continue_compile() (or capture_compile())
+        tag callbacks will be overridden by %tags. $tag_pkg should be set to
+        the name of the invoking package (__PACKAGE__).
+
+NAMING
+    Calvin & Hobbs used to transmogrify not transmorgify things. This module
+    will be renamed to fix my spelling mistake soon. Other API changes may
+    still be made. Please contact the author if you want to be included in
+    dicussions of this module's future.
+
+SEE ALSO
+    Other modules that do similar things: HTML::Seamstreess
+
+AUTHOR
+    David Muir Sharnoff <muir at idiom dot org>
+
+    Development of this module is hosted on github:
+    <https://github.com/muir/HTML-Transmorgify>.
+
+    Some parts of this module are Copyright (C) Google, Inc.
+
+LICENSE
+    Your choice of LGPL or Artistic License.
+

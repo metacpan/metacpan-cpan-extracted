@@ -1,0 +1,26 @@
+<wmmeta name="Title" value="&wmdollar;[deferred_content refs] - Deferred Content References" />
+<wmmeta name="Section" value="04-var_refs" />
+<wmmeta name="Score" value="30" />
+<wmmeta name="Abstract">
+deferred references to content chunks
+</wmmeta>
+
+These are identical to <a href=$(content_refs)>&wmdollar;{content_refs}</a>,
+but are evaluated only after all other references.
+
+        **&wmdollar;&etsqi;__name__&etsqo;**
+
+This means that a content variable can be set at the end of an "&lt;out&gt;"
+[out] section, but referred to at the start, for example.  Handy for HTML page
+titles.
+
+In addition, this is the recommended way to access metadata set using the
+wmmeta [wmmeta] tag.
+
+	[wmmeta]: $(wmmeta)
+	[out]: $(out)
+
+Again, a default value can be supplied, using this format:
+
+        **&wmdollar;&etsqi;__name__?__defaultvalue__&etsqo;**
+

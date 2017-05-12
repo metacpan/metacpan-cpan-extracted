@@ -1,0 +1,26 @@
+abstract: HTML Widget And Validation Framework
+author: Sebastian Riedel, C<sri@oook.de>
+build_requires: 
+  Test::NoWarnings: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: HTML-Widget
+no_index: 
+  directory: 
+    - t/lib
+    - inc
+    - t
+requires: 
+  Class::Accessor::Chained::Fast: 0
+  Class::Accessor::Fast: 0
+  Class::Data::Accessor: 0
+  Date::Calc: 0
+  Email::Valid: 0
+  HTML::Element: 3.22
+  HTML::Scrubber: 0
+  Module::Pluggable::Fast: 0
+  Scalar::Util: 0
+  Storable: 0
+  perl: 5.8.1
+version: 1.11

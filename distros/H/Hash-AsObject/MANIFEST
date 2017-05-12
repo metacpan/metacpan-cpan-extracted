@@ -1,0 +1,17 @@
+Changes
+lib/Hash/AsObject.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/00versions.t
+t/01constructor.t
+t/02get-and-set.t
+t/03class-methods.t
+t/04chain.t
+t/05trickery.t
+t/06can.t
+t/07inherit.t
+t/99pod-coverage.t
+t/99pod.t

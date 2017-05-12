@@ -1,0 +1,47 @@
+---
+abstract: 'HTTP Action, Adventure and Excitement'
+author:
+  - 'Stevan Little <stevan.little@iinteractive.com>'
+build_requires:
+  HTTP::Headers: 0
+  HTTP::Request: 0
+  HTTP::Response: 0
+  Test::Fatal: 0.0003
+  Test::More: 0.88
+  Test::Warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTTP-Headers-ActionPack
+requires:
+  Carp: 0
+  Encode: 0
+  HTTP::Date: 0
+  HTTP::Headers::Util: 0
+  List::Util: 0
+  MIME::Base64: 0
+  Module::Runtime: 0
+  Scalar::Util: 0
+  Sub::Exporter: 0
+  Time::Piece: 0
+  URI::Escape: 0
+  overload: 0
+  parent: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://rt.cpan.org/Dist/Display.html?Name=HTTP::Headers::ActionPack
+  repository: https://github.com/stevan/http-headers-actionpack.git
+version: 0.09
+x_authority: cpan:STEVAN
+x_contributors:
+  - 'Andrew Nelson <anelson@cpan.org>'
+  - 'Dave Rolsky <autarch@urth.org>'
+  - 'Florian Ragwitz <rafl@debian.org>'
+  - 'Jesse Luehrs <doy@tozt.net>'
+  - 'Karen Etheridge <ether@cpan.org>'

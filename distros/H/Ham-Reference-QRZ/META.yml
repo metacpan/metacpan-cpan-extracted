@@ -1,0 +1,25 @@
+---
+abstract: 'An object oriented front end for the QRZ.COM Amateur Radio callsign database'
+author:
+  - 'Brad McConahay N8QQ <brad@n8qq.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.120630'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Ham-Reference-QRZ
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  HTML::Entities: '0'
+  LWP::UserAgent: '0'
+  Test::More: '0'
+  XML::Simple: '0'
+version: '0.04'

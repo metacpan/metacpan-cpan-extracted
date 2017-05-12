@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/HTML-TagTree.t
+lib/HTML/TagTree.pm
+META.yml                                 Module meta-data (added by MakeMaker)

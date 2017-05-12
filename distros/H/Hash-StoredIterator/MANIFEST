@@ -1,0 +1,13 @@
+.travis.yml
+appveyor.yml
+Build.PL
+Changes
+lib/Hash/StoredIterator.pm
+lib/Hash/StoredIterator.xs
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+ppport.h
+README
+t/Hash-StoredIterator.t

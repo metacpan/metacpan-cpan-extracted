@@ -1,0 +1,7387 @@
+=head1 NAME
+
+HTTP::Webdav - Perl interface to Neon HTTP and WebDAV client library
+
+=head1 SYNOPSIS
+
+  use HTTP::Webdav ;
+
+  $sess = HTTP::Webdav -> new ;
+  $sess -> server ("www.ecos.de", 80) ;
+  $sess -> get ("/", STDOUT) ;
+
+  $sess -> put ("/dav/foo.htm", STDIN) ;
+
+  # remove property 'test3'
+  # set value of property 'test' to 'bar'
+  @props = (
+    { name => {nspace => 'DAV:', name => 'test3'}, type => 1},
+    { name => {nspace => 'DAV:', name => 'test'}, value => 'bar'},
+    ) ;
+
+  $sess -> proppatch ("/dav/foo.htm", \@props) ;
+
+
+  sub iterator
+    {
+    my ($userdata, $propname, $propvalue, $propstatus) = @_ ;
+
+    print "propfind userdata = $userdata  nspace = $propname->{nspace}  name = $propname->{name}  value = $propvalue\n" ;
+    
+    return 0 ;
+    }
+
+  sub callback
+    {
+    my ($userdata, $href, $results) = @_ ;
+
+    print "propfind callback userdata = $userdata  href = $href\n" ;
+
+    $results -> iterate (\&iterator) ;
+    }
+
+  $sess -> simple_propfind ("/dav", NE_DEPTH_ONE, undef, \&callback) ;
+
+  print "Status: ", $sess -> get_error , "\n" ;
+
+
+
+=head1 DESCRIPTION
+
+
+This is the Perl interface to the neon HTTP and WebDAV client library.
+Most of the documentation is automaticly generated from the C header
+files of neon. So it looks a little bit C-ish, but is better than
+nothing. See also the examples in the B<eg> directory. 
+If you not sure how it works consult the neon include files.
+
+This document describes the function that are availabe. HTTP::Webdav::Constants
+includes the constants defined by neon.
+
+The neon API is encapsultated in a number of Perl classes. Everything that 
+doesn't fit in a class has gone to HTTP::Webdav::Util. (Maybe some of these
+function will move to other classes in the future)
+
+The clases are
+
+=over 4
+
+=item HTTP::Webdav
+
+Main class which holds a http session
+
+=item HTTP::Webdav::MultiStatus
+
+Class to handle 207 responses
+
+=item HTTP::Webdav::Hip
+
+Interface to XML parser for properties
+
+=item HTTP::Webdav::Lock
+
+Holds a lock
+
+=item HTTP::Webdav::LockSession
+
+Holds a lock session
+
+=item HTTP::Webdav::Propfind
+
+Class to access the result of a PROPFIND
+
+=item HTTP::Webdav::Propset
+
+Class to acess properties of one resource
+
+=item HTTP::Webdav::Request
+
+Low level interface to http request
+
+=item HTTP::Webdav::MD5
+
+MD5 checksum
+
+=item HTTP::Webdav::SSL
+
+SSL support
+
+=item HTTP::Webdav::Socket
+
+Low level socket access
+
+=back
+
+
+WARNING: This wrapper is alpha code, while neon is around for some time and
+stable to use, not all of the interface functions provided by this Perl module
+has been tested extensivly, but most of them should work without problems (At least
+they do it for me :-).
+
+
+See in the eg directory for some examples.
+
+
+=head1 CALLBACKS
+
+Neon uses a lot off callbacks. Basicly there is no difference between using callbacks
+in Perl and C. The only thing that is different, is that the functions that sets the
+callbacks doesn't take the C<userdata> argument, which is used in C to pass a pointer
+to the callback. Instead, the callback get the reference to the object that sets
+the callback, pass as the userdata argument. This object is a hashreference and you
+are free to store data in that hash. The only restriction is, that key starting
+with two underscores ('__') are reserved for HTTP::Webdav internal use. Example:
+
+
+  sub datehdr
+
+    {
+    my ($userdata, $value) = @_ ;
+    $userdata -> {date} = $value ;
+    } 
+
+  $sess = HTTP::Webdav -> new ;
+  $sess -> server ("www.ecos.de", 80) ;
+  $request = $sess -> request_create ("HEAD", "/") ;
+  # install callback which gets only Date header
+  $request -> add_response_header_handler ('Date', \&datehdr) ;
+  $request -> begin_request ;
+  $request -> end_request ;
+  
+  print "Date: $request->{date}\n" ;
+
+=head1 C-DATASTRUCTURS
+
+The C-structures that neon uses are always mapped 1:1 into a Perl hash. The members
+of the Perl hash are shown in the argument list of the function between { and }
+The function argument lists, also list the C datatype to which it map, so you can
+checkout the neon docs and include files for more informations.
+
+
+
+
+
+
+
+=head1 Functions
+
+
+
+
+=head1 Methods of HTTP::Webdav
+
+=head2 int = $session -> DESTROY ()
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $session -> acl_set (uri,entries,numentries)
+
+Set the ACL for the given resource to the list of ACL entries. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item uri
+
+<string>
+
+
+=item entries
+
+ne_acl_entry *
+
+
+
+
+entries = {
+apply => enum, type => enum, principal => <string>, read => <integer>, read_acl => <integer>, write => <integer>, write_acl => <integer>, read_cuprivset => <integer>, };
+
+
+
+=item numentries
+
+<integer>
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $session -> close_connection ()
+
+Prematurely force the connection to be closed for the given
+session.  
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 $session -> cookie_register (cache)
+
+Register cookie handling for given session using given cache. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item cache
+
+ne_cookie_cache *
+
+
+
+
+cache = {
+cookies => ne_cookie *, };
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $session -> copy (overwrite,depth,src,dest)
+
+Copy resource from src to dest URIs. If src identifies a collection
+resource, depth may be NE_DEPTH_ZERO to request that the collection
+and its properties are to be copied, or NE_DEPTH_INFINITE to
+request that the collection and its contents are to be copied.  
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item overwrite
+
+<integer>
+
+
+=item depth
+
+<integer>
+
+
+=item src
+
+<string>
+
+
+=item dest
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 $session -> decide_proxy (use_proxy)
+
+Register the callback for determining whether the proxy server
+should be used or not here.  'userdata' will be passed as the first
+argument to the callback. The callback is only called if a proxy
+server has been set up using ne_session_proxy. 
+
+This function MUST be called before calling ne_session_server.
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+
+
+=item Callback function: use_proxy
+
+int = use_proxy (userdata,scheme,hostname)
+
+Callback to determine whether the proxy server should be used or
+not for a request to the given hostname using the given scheme.
+Scheme will be "http" or "https" etc.
+Must return:
+Zero to indicate the proxy should NOT be used
+Non-zero to indicate the proxy SHOULD be used.
+
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item scheme
+
+<string>
+
+=item hostname
+
+<string>
+
+
+
+=back
+
+
+
+=back
+
+
+=back
+
+=head2 int = $session -> delete (uri)
+
+Delete resource at uri. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item uri
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 $session -> forget_auth ()
+
+Clear any stored authentication details for the given session. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $session -> get (uri,fd)
+
+Return resource at uri, writing response body to f 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item uri
+
+<string>
+
+
+=item fd
+
+<integer>
+
+
+
+
+=back
+
+
+=back
+
+=head2 const char * = $session -> get_error ()
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $session -> get_range (uri,range,fd)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item uri
+
+<string>
+
+
+=item range
+
+ne_content_range *
+
+
+
+
+range = {
+start => <integer>, end => <integer>, total => <integer>, };
+
+
+
+=item fd
+
+<integer>
+
+
+
+
+=back
+
+
+=back
+
+=head2 const char * = $session -> get_scheme ()
+
+Returns the URL scheme being used for the current session.
+Does NOT include a trailing ':'. 
+Example returns: "http" or "https".
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 const char * = $session -> get_server_hostport ()
+
+Returns the 'hostport' URI segment for the end-server, e.g.
+"my.server.com:8080"    or    "www.server.com" 
+(port segment is ommitted if == 80) 
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $session -> getmodtime (uri,modtime)
+
+Retrieve modification time of resource at uri, place in *modtime.
+(uses HEAD) 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item uri
+
+<string>
+
+
+=item modtime
+
+time_t *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 $session -> hook_create_request (fn)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+
+
+=item Callback function: fn
+
+fn (userdata,$request,method,uri)
+
+Hook called when a create is created. 
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item req
+
+ne_request *
+
+=item method
+
+<string>
+
+=item uri
+
+<string>
+
+
+
+=back
+
+
+
+=back
+
+
+=back
+
+=head2 $session -> hook_destroy_request (fn)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+
+
+=item Callback function: fn
+
+fn (userdata)
+
+Hook called when the function is destroyed. 
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+
+
+=back
+
+
+
+=back
+
+
+=back
+
+=head2 $session -> hook_destroy_session (fn)
+
+Hook called when the session is destroyed. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+
+
+=item Callback function: fn
+
+fn (userdata)
+
+Hook called when the function is destroyed. 
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+
+
+=back
+
+
+
+=back
+
+
+=back
+
+=head2 $session -> hook_post_send (fn)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+
+
+=item Callback function: fn
+
+int = fn (userdata,status)
+
+Hook called after the request is sent. May return:
+NE_OK     everything is okay
+NE_RETRY  try sending the request again.
+anything else signifies an error, and the request is failed. The return
+code is passed back the _dispatch caller, so the session error must
+also be set appropriately (ne_set_error).
+
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item status
+
+const ne_status *
+
+
+
+=back
+
+
+
+=back
+
+
+=back
+
+=head2 $session -> hook_pre_send (fn)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+
+
+=item Callback function: fn
+
+fn (userdata,$buffer)
+
+Hook called before the request is sent.  'header' is the raw HTTP
+header before the trailing CRLF is added: add in more here. 
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item header
+
+ne_buffer *
+
+
+
+=back
+
+
+
+=back
+
+
+=back
+
+=head2 void * = $session -> hook_private (id)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item id
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 $session -> hook_session_accessor (id,arg2,userdata)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item id
+
+<string>
+
+
+=item arg2
+
+ne_accessor_fn
+
+Hook used to allow external access into hook processing. 
+
+
+=item userdata
+
+void *
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $session -> lock (lock)
+
+Issue a LOCK request for the given lock.
+Requires that the uri, depth, type, scope, and timeout members
+of 'lock' are filled in. Optionally also the owner.
+On successful return, lock->token will contain the lock token. 
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item lock
+
+struct ne_lock *
+
+
+
+
+lock = {
+uri => <string>, depth => <integer>, type => <integer>, scope => <integer>, token => <string>, owner => <string>, timeout => long, prev => void *, next => void *, };
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $session -> lock_discover (uri,result)
+
+Perform lock discovery on the given URI.  'result' is called
+with the results (possibly >1 times).  
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item uri
+
+<string>
+
+
+
+
+=item Callback function: result
+
+result (userdata,lock,uri,status)
+
+Callback for lock discovery.  If 'lock' is NULL, 
+something went wrong retrieving lockdiscover for the resource,
+look at 'status' for the details. 
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item lock
+
+const struct ne_lock *
+
+=item uri
+
+<string>
+
+=item status
+
+const ne_status *
+
+
+
+=back
+
+
+
+=back
+
+
+=back
+
+=head2 int = $session -> lock_refresh (lock)
+
+Refresh a lock. Updates lock->timeout appropriately. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item lock
+
+struct ne_lock *
+
+
+
+
+lock = {
+uri => <string>, depth => <integer>, type => <integer>, scope => <integer>, token => <string>, owner => <string>, timeout => long, prev => void *, next => void *, };
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 $locksession = $session -> lock_register ()
+
+Register the locking hooks with an ne_session.  Owned locks
+persist for the duration of this session. The lock session lasts
+exactly as long as the corresponding ne_session. Once you call
+ne_session_destroy(sess), any use of the lock session has
+undefined results.  
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $session -> mkcol (uri)
+
+Create a collection at uri, which MUST have a trailing slash. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item uri
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $session -> move (overwrite,src,dest)
+
+Move resource from src to dest URI. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item overwrite
+
+<integer>
+
+
+=item src
+
+<string>
+
+
+=item dest
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $session -> options (uri,caps)
+
+Determines server capabilities (using OPTIONS). 
+Pass uri="*" to determine proxy server capabilities if using
+a proxy server. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item uri
+
+<string>
+
+
+=item caps
+
+ne_server_capabilities *
+
+
+
+
+caps = {
+dav_class1 => unsigned int, dav_class2 => unsigned int, dav_executable => unsigned int, };
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $session -> post (uri,fd,buffer)
+
+Post using buffer as request-body: stream response into f 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item uri
+
+<string>
+
+
+=item fd
+
+<integer>
+
+
+=item buffer
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 $propfind = $session -> propfind_create (uri,depth)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item uri
+
+<string>
+
+
+=item depth
+
+<integer>
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $session -> propnames (href,depth,results)
+
+Retrieve property names for the resources at 'href'.  'results'
+callback is called for each resource.  Use 'ne_propset_iterate' on
+the passed results object to retrieve the list of property names.  
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item href
+
+<string>
+
+
+=item depth
+
+<integer>
+
+
+
+
+=item Callback function: results
+
+results (userdata,href,$propset)
+
+Callback for handling the results of fetching properties for a
+single resource (named by 'href').  The results are stored in the
+result set 'results': use ne_propset_* to examine this object.  
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item href
+
+<string>
+
+=item results
+
+const ne_prop_result_set *
+
+
+
+=back
+
+
+
+=back
+
+
+=back
+
+=head2 int = $session -> proppatch (uri,items)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item uri
+
+<string>
+
+
+=item items
+
+const ne_proppatch_operation *
+
+
+
+
+items = {
+name => const ne_propname *, type => enum, value => <string>, };
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $session -> proxy (hostname,port)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item hostname
+
+<string>
+
+
+=item port
+
+<integer>
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $session -> put (uri,fd)
+
+Replace resource at uri, reading body from f 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item uri
+
+<string>
+
+
+=item fd
+
+<integer>
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $session -> put_if_unmodified (uri,fd,modtime)
+
+PUT resource at uri as above, only if it has not been modified
+since given modtime. If server is HTTP/1.1, uses If-Unmodified-Since
+header; guaranteed failure if resource is modified after 'modtime'.
+If server is HTTP/1.0, HEAD's the resource first to fetch current
+modtime; race condition if resource is modified between HEAD and PUT.
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item uri
+
+<string>
+
+
+=item fd
+
+<integer>
+
+
+=item modtime
+
+time_t
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $session -> read_file (uri,reader)
+
+GET resource at uri, passing response body blocks to 'reader' 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item uri
+
+<string>
+
+
+
+
+=item Callback function: reader
+
+reader (userdata,buf,len)
+
+The 'reader' callback type 
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item buf
+
+<string>
+
+=item len
+
+size_t
+
+
+
+=back
+
+
+
+=back
+
+
+=back
+
+=head2 const char * = $session -> redirect_location ()
+
+Return location of last redirect. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 $session -> redirect_register (confirm,notify)
+
+Register redirect handling for the given session.
+Some redirect responses will be automatically followed.
+If the redirect is automatically followed, the 'notify' callback
+is called.
+For redirects which are NOT automatically followed, the
+'confirm' callback is called: if this returns zero, the redirect
+is ignored.
+
+'confirm' may be passed as NULL: in this case, only automatic
+redirects are followed.  'notify' may also be passed as NULL,
+automatic redirects are still followed.
+
+'userdata' is passed as the first argument to the confirm and
+notify callbacks.  
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+
+
+=item Callback function: confirm
+
+int = confirm (userdata,src,dest)
+
+Get confirmation from the user that a redirect from
+URI 'src' to URI 'dest' is acceptable. Should return:
+Non-Zero to FOLLOW the redirect
+Zero to NOT follow the redirect
+
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item src
+
+<string>
+
+=item dest
+
+<string>
+
+
+
+=back
+
+
+
+=item Callback function: notify
+
+notify (userdata,src,dest)
+
+Notify the user that a redirect has been automatically 
+followed from URI 'src' to URI 'dest' 
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item src
+
+<string>
+
+=item dest
+
+<string>
+
+
+
+=back
+
+
+
+=back
+
+
+=back
+
+=head2 $request = $session -> request_create (method,uri)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item method
+
+<string>
+
+
+=item uri
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $session -> server (hostname,port)
+
+Set the server or proxy server to be used for the session.
+Returns:
+NE_LOOKUP if the DNS lookup for hostname failed.
+NE_OK otherwise.
+
+Note that if a proxy is being used, ne_session_proxy should be
+called BEFORE ne_session_server, so the DNS lookup can be skipped
+on the server. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item hostname
+
+<string>
+
+
+=item port
+
+<integer>
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $session -> set_accept_secure_upgrade (acc_upgrade)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item acc_upgrade
+
+<integer>
+
+
+
+
+=back
+
+
+=back
+
+=head2 $session -> set_error (errstring)
+
+Set the error string for the session 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item errstring
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 $session -> set_expect100 (use_expect100)
+
+Set protocol options for session:
+expect100: Defaults to OFF
+persist:   Defaults to ON
+
+expect100: When set, send the "Expect: 100-continue" request header
+with requests with bodies.
+
+persist: When set, use a persistent connection. (Generally,
+you don't want to turn this off.)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item use_expect100
+
+<integer>
+
+
+
+
+=back
+
+
+=back
+
+=head2 $session -> set_persist (persist)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item persist
+
+<integer>
+
+
+
+
+=back
+
+
+=back
+
+=head2 $session -> set_progress (progress)
+
+Set a progress callback for the session. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+
+
+=item Callback function: progress
+
+progress (userdata,progress,total)
+
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item progress
+
+<integer>
+
+=item total
+
+<integer>
+
+
+
+=back
+
+
+
+=back
+
+
+=back
+
+=head2 $session -> set_proxy_auth (callback)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+
+
+=item Callback function: callback
+
+int = callback (userdata,realm,username,password)
+
+The callback used to request the username and password in the given
+realm. The username and password must be placed in malloc()-allocated
+memory.
+Must return:
+0 on success: *username and *password must be non-NULL, and will
+be free'd by the HTTP layer when necessary
+-1 to cancel (*username and *password are ignored.)
+
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item realm
+
+<string>
+
+=item username
+
+char **
+
+=item password
+
+char **
+
+
+
+=back
+
+
+
+=back
+
+
+=back
+
+=head2 int = $session -> set_request_secure_upgrade (req_upgrade)
+
+
+NOTE: don't bother using the two _secure_update functions yet.
+"secure upgrades" (RFC2817) are not currently supported by any HTTP
+servers.
+
+request_secure_upgrade: When set, notify the server with each
+request made that an upgrade to a secure connection is desired, if
+available.
+
+accept_secure_upgrade: When set, allow a server-requested upgrade
+to a secure connection. 
+
+These return as per ne_set_secure.  
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item req_upgrade
+
+<integer>
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $session -> set_secure (secure)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item secure
+
+<integer>
+
+
+
+
+=back
+
+
+=back
+
+=head2 $session -> set_secure_context ($ssl)
+
+Using SSL/TLS connections:
+
+Session settings:
+secure:                 Defaults to OFF
+secure_context:         No callbacks, any protocol allowed.
+request_secure_upgrade: Defaults to OFF
+accept_secure_ugprade:  Defaults to OFF
+
+secure_context: When set, specifies the settings to use for secure
+connections, and any callbacks (see nsocket.h).  The lifetime of
+the context object must be >= to the lifetime of the session
+object.
+
+secure: When set, use a secure (SSL/TLS) connection to the origin
+server. This will tunnel (using CONNECT) through the proxy server
+if one is being used.
+
+NB: ne_set_scure will return -1 if SSL is not supported by the
+library (i.e., it was not built against OpenSSL), or 0 if it is.
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item $ssl
+
+nssl_context *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 $session -> set_server_auth (callback)
+
+Set callbacks to handle server and proxy authentication.
+userdata is passed as the first argument to the callback. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+
+
+=item Callback function: callback
+
+int = callback (userdata,realm,username,password)
+
+The callback used to request the username and password in the given
+realm. The username and password must be placed in malloc()-allocated
+memory.
+Must return:
+0 on success: *username and *password must be non-NULL, and will
+be free'd by the HTTP layer when necessary
+-1 to cancel (*username and *password are ignored.)
+
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item realm
+
+<string>
+
+=item username
+
+char **
+
+=item password
+
+char **
+
+
+
+=back
+
+
+
+=back
+
+
+=back
+
+=head2 $session -> set_status (status)
+
+Set a status notification callback for the session, to report
+connection status. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+
+
+=item Callback function: status
+
+status (userdata,status,info)
+
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item status
+
+ne_conn_status
+
+=item info
+
+<string>
+
+
+
+=back
+
+
+
+=back
+
+
+=back
+
+=head2 $session -> set_useragent (product)
+
+Sets the user-agent string. neon/VERSION will be appended, to make
+the full header "User-Agent: product neon/VERSION".
+If this function is not called, the User-Agent header is not sent.
+The product string must follow the RFC2616 format, i.e.
+product         = token ["/" product-version]
+product-version = token
+where token is any alpha-numeric-y string [a-zA-Z0-9]*
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item product
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $session -> simple_propfind (uri,depth,props,results)
+
+Fetch properties for a resource (if depth == NE_DEPTH_ZERO),
+or a tree of resources (if depth == NE_DEPTH_ONE or _INFINITE).
+
+Names of the properties required must be given in 'props',
+or if props is NULL, *all* properties are fetched.
+
+'results' is called for each resource in the response, userdata is
+passed as the first argument to the callback. It is important to
+note that the callback is called as the response is read off the
+socket, so don't do anything silly in it (e.g. sleep(100), or call
+any functions which use this session).
+
+Note that if 'depth' is NE_DEPTH_INFINITY, some servers may refuse
+the request.
+
+Returns NE_*.  
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item uri
+
+<string>
+
+
+=item depth
+
+<integer>
+
+
+=item props
+
+const ne_propname *
+
+
+
+
+props = {
+nspace => <string>, name => <string>, };
+
+
+
+
+
+=item Callback function: results
+
+results (userdata,href,$propset)
+
+Callback for handling the results of fetching properties for a
+single resource (named by 'href').  The results are stored in the
+result set 'results': use ne_propset_* to examine this object.  
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item href
+
+<string>
+
+=item results
+
+const ne_prop_result_set *
+
+
+
+=back
+
+
+
+=back
+
+
+=back
+
+=head2 int = $session -> simple_request ($request)
+
+Dispatch a DAV request and handle a 207 error response appropriately 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item $request
+
+ne_request *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $session -> unlock (lock)
+
+Issue an UNLOCK request for the given lock 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+=item lock
+
+struct ne_lock *
+
+
+
+
+lock = {
+uri => <string>, depth => <integer>, type => <integer>, scope => <integer>, token => <string>, owner => <string>, timeout => long, prev => void *, next => void *, };
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $session -> version_pre_http11 ()
+
+Determine if next-hop server claims HTTP/1.1 compliance. Returns:
+0 if next-hop server does NOT claim HTTP/1.1 compliance
+non-zero if next-hop server DOES claim HTTP/1.1 compliance
+Not that the "next-hop" server is the proxy server if one is being
+used, otherwise, the origin server.
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $session
+
+ne_session *
+
+
+
+
+
+=back
+
+
+=back
+
+
+
+=head1 Methods of HTTP::Webdav::Buffer
+
+=head2 $buffer -> DESTROY ()
+
+Destroys (deallocates) a buffer 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $buffer
+
+ne_buffer *
+
+Hook called before the request is sent.  'header' is the raw HTTP
+header before the trailing CRLF is added: add in more here. 
+
+
+
+
+=back
+
+
+=back
+
+=head2 $buffer -> altered ()
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $buffer
+
+ne_buffer *
+
+Hook called before the request is sent.  'header' is the raw HTTP
+header before the trailing CRLF is added: add in more here. 
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $buffer -> append (data,len)
+
+Append 'len' bytes of 'data' to buf.  'data' does not need to be
+zero-terminated. The resultant string will have a zero-terminator,
+either way. Returns 0 on success, non-zero on error.  
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $buffer
+
+ne_buffer *
+
+Hook called before the request is sent.  'header' is the raw HTTP
+header before the trailing CRLF is added: add in more here. 
+
+
+=item data
+
+<string>
+
+
+=item len
+
+size_t
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 $buffer -> clear ()
+
+Empties the contents of buf; makes the buffer zero-length. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $buffer
+
+ne_buffer *
+
+Hook called before the request is sent.  'header' is the raw HTTP
+header before the trailing CRLF is added: add in more here. 
+
+
+
+
+=back
+
+
+=back
+
+=head2 char * = $buffer -> finish ()
+
+Destroys a buffer, WITHOUT freeing the data, and returns the
+data. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $buffer
+
+ne_buffer *
+
+Hook called before the request is sent.  'header' is the raw HTTP
+header before the trailing CRLF is added: add in more here. 
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $buffer -> grow (size)
+
+Grows the ne_buffer to a minimum size.
+Returns 0 on success, non-zero on error 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $buffer
+
+ne_buffer *
+
+Hook called before the request is sent.  'header' is the raw HTTP
+header before the trailing CRLF is added: add in more here. 
+
+
+=item size
+
+size_t
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $buffer -> zappend (str)
+
+Append a zero-terminated string 'str' to buf.
+Returns 0 on success, non-zero on error. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $buffer
+
+ne_buffer *
+
+Hook called before the request is sent.  'header' is the raw HTTP
+header before the trailing CRLF is added: add in more here. 
+
+
+=item str
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+
+
+=head1 Methods of HTTP::Webdav::LockSession
+
+=head2 $locksession -> add (lock)
+
+Add a lock to the given session. The lock will subsequently be
+submitted as required in an If: header with any requests created
+using the ne_session which the lock session is tied to.  Requests
+indicate to the locking layer which locks they might need using
+ne_lock_using_*, as described below. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $locksession
+
+ne_lock_session *
+
+
+
+=item lock
+
+struct ne_lock *
+
+
+
+
+lock = {
+uri => <string>, depth => <integer>, type => <integer>, scope => <integer>, token => <string>, owner => <string>, timeout => long, prev => void *, next => void *, };
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 struct ne_lock * = $locksession -> find (uri)
+
+Find a lock in the session with given URI 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $locksession
+
+ne_lock_session *
+
+
+
+=item uri
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $locksession -> iterate (func)
+
+For each lock added to the session, call func, passing the lock
+and the given userdata. Returns the number of locks. func may be
+pass as NULL, in which case, can be used to simply return number
+of locks in the session. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $locksession
+
+ne_lock_session *
+
+
+
+
+
+=item Callback function: func
+
+func (lock,userdata)
+
+
+
+
+=over 4
+
+=item lock
+
+struct ne_lock *
+
+=item userdata
+
+void *
+
+
+
+=back
+
+
+
+=back
+
+
+=back
+
+=head2 $locksession -> remove (lock)
+
+Remove lock, which must have been previously added to the
+session using 'ne_lock_add' above. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $locksession
+
+ne_lock_session *
+
+
+
+=item lock
+
+struct ne_lock *
+
+
+
+
+lock = {
+uri => <string>, depth => <integer>, type => <integer>, scope => <integer>, token => <string>, owner => <string>, timeout => long, prev => void *, next => void *, };
+
+
+
+
+
+=back
+
+
+=back
+
+
+
+=head1 Methods of HTTP::Webdav::MD5
+
+=head2 void * = $md5ctx -> finish_ctx (resbuf)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $md5ctx
+
+struct ne_md5_ctx *
+
+
+=item resbuf
+
+void *
+
+
+
+
+=back
+
+
+=back
+
+=head2 $md5ctx -> init_ctx ()
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $md5ctx
+
+struct ne_md5_ctx *
+
+
+
+
+=back
+
+
+=back
+
+=head2 void * = $md5ctx -> read_ctx (resbuf)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $md5ctx
+
+const struct ne_md5_ctx *
+
+
+=item resbuf
+
+void *
+
+
+
+
+=back
+
+
+=back
+
+
+
+=head1 Methods of HTTP::Webdav::MultiStatus
+
+=head2 $multstatus -> DESTROY ()
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $multstatus
+
+ne_207_parser *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 void * = $multstatus -> get_current_propstat ()
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $multstatus
+
+ne_207_parser *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 void * = $multstatus -> get_current_response ()
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $multstatus
+
+ne_207_parser *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 $multstatus -> ignore_unknown ()
+
+Call this as the LAST thing before beginning parsing, to install a
+catch-all handler which means all unknown XML returned in the 207
+response is ignored gracefully.  
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $multstatus
+
+ne_207_parser *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 $multstatus -> set_propstat_handlers (start,end)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $multstatus
+
+ne_207_parser *
+
+
+
+=item start
+
+ne_207_start_propstat
+
+
+
+
+
+=item Callback function: end
+
+end (userdata,propstat,status_line,status,description)
+
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item propstat
+
+void *
+
+=item status_line
+
+<string>
+
+=item status
+
+const ne_status *
+
+=item description
+
+<string>
+
+
+
+=back
+
+
+
+=back
+
+
+=back
+
+=head2 $multstatus -> set_response_handlers (start,end)
+
+Set the callbacks for the parser 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $multstatus
+
+ne_207_parser *
+
+
+
+=item start
+
+ne_207_start_response
+
+TODO: do we need to pass userdata to ALL of these? We could get away with
+only passing the userdata to the start_'s and relying on the caller
+to send it through as the _start return value if they need it. 
+
+
+
+
+=item Callback function: end
+
+end (userdata,response,status_line,status,description)
+
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item response
+
+void *
+
+=item status_line
+
+<string>
+
+=item status
+
+const ne_status *
+
+=item description
+
+<string>
+
+
+
+=back
+
+
+
+=back
+
+
+=back
+
+
+
+=head1 Methods of HTTP::Webdav::Propfind
+
+=head2 $propfind -> DESTROY ()
+
+Destroy a propfind handler after use. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $propfind
+
+ne_propfind_handler *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $propfind -> allprop (result)
+
+Find all properties.
+
+Returns NE_*. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $propfind
+
+ne_propfind_handler *
+
+
+
+
+
+=item Callback function: result
+
+result (userdata,href,$propset)
+
+Callback for handling the results of fetching properties for a
+single resource (named by 'href').  The results are stored in the
+result set 'results': use ne_propset_* to examine this object.  
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item href
+
+<string>
+
+=item results
+
+const ne_prop_result_set *
+
+
+
+=back
+
+
+
+=back
+
+
+=back
+
+=head2 void * = $propfind -> current_private ()
+
+Retrieve the 'private' pointer for the current propset for the
+given handler, as returned by the ne_props_create_complex callback
+installed using 'ne_propfind_set_private'.  If this callback was
+not registered, this function will return NULL.  
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $propfind
+
+ne_propfind_handler *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 $hip = $propfind -> get_parser ()
+
+Return the XML parser for the given handler (only need if you want
+to handle complex properties). 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $propfind
+
+ne_propfind_handler *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 $request = $propfind -> get_request ()
+
+Return the request object for the given handler.  You MUST NOT use
+ne_set_request_body_* on this request object.  (this call is only
+needed if for instance, you want to add extra headers to the
+PROPFIND request).  
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $propfind
+
+ne_propfind_handler *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $propfind -> named (prop,result)
+
+Find properties named in a call to ne_propfind_set_flat and/or
+ne_propfind_set_complex.
+
+Returns NE_*. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $propfind
+
+ne_propfind_handler *
+
+
+
+=item prop
+
+const ne_propname *
+
+
+
+
+prop = {
+nspace => <string>, name => <string>, };
+
+
+
+
+
+=item Callback function: result
+
+result (userdata,href,$propset)
+
+Callback for handling the results of fetching properties for a
+single resource (named by 'href').  The results are stored in the
+result set 'results': use ne_propset_* to examine this object.  
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item href
+
+<string>
+
+=item results
+
+const ne_prop_result_set *
+
+
+
+=back
+
+
+
+=back
+
+
+=back
+
+=head2 $propfind -> set_private (creator,userdata)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $propfind
+
+ne_propfind_handler *
+
+
+
+=item creator
+
+ne_props_create_complex
+
+A "complex property" has a value which is structured XML. To handle
+complex properties, you must set up and register an XML handler
+which will understand the elements which make up such properties.
+The handler must be registered with the parser returned by
+'ne_propfind_get_parser'.
+
+To store the parsed value of the property, a 'private' structure is
+allocated in each propset (i.e. one per resource). When parsing the
+property value elements, for each new resource encountered in the
+response, the 'creator' callback is called to retrieve a 'private'
+structure for this resource.
+
+Whilst in XML element callbacks you will have registered to handle
+complex properties, you can use the 'ne_propfind_current_private'
+call to retrieve the pointer to this private structure.
+
+To retrieve this 'private' structure from the propset in the
+results callback, simply call 'ne_propset_private'.
+
+
+
+=item userdata
+
+void *
+
+
+
+
+=back
+
+
+=back
+
+
+
+=head1 Methods of HTTP::Webdav::Propset
+
+=head2 int = $propset -> iterate (iterator)
+
+Iterate over all the properties in 'set', calling 'iterator'
+for each, passing 'userdata' as the first argument to callback.
+
+Returns:
+whatever value iterator returns.
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $propset
+
+const ne_prop_result_set *
+
+The 'ne_simple_propfind' interface. ***
+
+ne_simple_propfind allows you to fetch a set of properties for a
+single resource, or a tree of resources.  You set the operation
+going by passing these arguments:
+
+- the session which should be used.
+- the URI and the depth of the operation (0, 1, infinite)
+- the names of the properties which you want to fetch
+- a results callback, and the userdata for the callback.
+
+For each resource found, the results callback is called, passing
+you two things along with the userdata you passed in originally:
+
+- the URI of the resource (const char *href)
+- the properties results set (const ne_prop_result_set *results)
+
+
+
+
+
+=item Callback function: iterator
+
+int = iterator (userdata,pname,value,status)
+
+ne_propset_iterate iterates over a properties result set,
+calling the callback for each property in the set. userdata is
+passed as the first argument to the callback. value may be NULL,
+indicating an error occurred fetching this property: look at 
+status for the error in that case.
+
+If the iterator returns non-zero, ne_propset_iterate will return
+immediately with that value.
+
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item pname
+
+const ne_propname *
+
+=item value
+
+<string>
+
+=item status
+
+const ne_status *
+
+
+
+=back
+
+
+
+=back
+
+
+=back
+
+=head2 const char * = $propset -> lang (pname)
+
+Return language string of property (may be NULL). 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $propset
+
+const ne_prop_result_set *
+
+The 'ne_simple_propfind' interface. ***
+
+ne_simple_propfind allows you to fetch a set of properties for a
+single resource, or a tree of resources.  You set the operation
+going by passing these arguments:
+
+- the session which should be used.
+- the URI and the depth of the operation (0, 1, infinite)
+- the names of the properties which you want to fetch
+- a results callback, and the userdata for the callback.
+
+For each resource found, the results callback is called, passing
+you two things along with the userdata you passed in originally:
+
+- the URI of the resource (const char *href)
+- the properties results set (const ne_prop_result_set *results)
+
+
+
+=item pname
+
+const ne_propname *
+
+
+
+
+pname = {
+nspace => <string>, name => <string>, };
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 void * = $propset -> private ()
+
+Returns the private pointer for the given propset. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $propset
+
+const ne_prop_result_set *
+
+The 'ne_simple_propfind' interface. ***
+
+ne_simple_propfind allows you to fetch a set of properties for a
+single resource, or a tree of resources.  You set the operation
+going by passing these arguments:
+
+- the session which should be used.
+- the URI and the depth of the operation (0, 1, infinite)
+- the names of the properties which you want to fetch
+- a results callback, and the userdata for the callback.
+
+For each resource found, the results callback is called, passing
+you two things along with the userdata you passed in originally:
+
+- the URI of the resource (const char *href)
+- the properties results set (const ne_prop_result_set *results)
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 const ne_status * = $propset -> status (propname)
+
+Returns the status structure for fetching the given property on
+this resource. This function will return NULL if the server did not
+return the property (which is a server error). 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $propset
+
+const ne_prop_result_set *
+
+The 'ne_simple_propfind' interface. ***
+
+ne_simple_propfind allows you to fetch a set of properties for a
+single resource, or a tree of resources.  You set the operation
+going by passing these arguments:
+
+- the session which should be used.
+- the URI and the depth of the operation (0, 1, infinite)
+- the names of the properties which you want to fetch
+- a results callback, and the userdata for the callback.
+
+For each resource found, the results callback is called, passing
+you two things along with the userdata you passed in originally:
+
+- the URI of the resource (const char *href)
+- the properties results set (const ne_prop_result_set *results)
+
+
+
+=item propname
+
+const ne_propname *
+
+
+
+
+propname = {
+nspace => <string>, name => <string>, };
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 const char * = $propset -> value (propname)
+
+Get the value of a given property. Will return NULL if there was an
+error fetching this property on this resource.  Call
+ne_propset_result to get the response-status if so.  
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $propset
+
+const ne_prop_result_set *
+
+The 'ne_simple_propfind' interface. ***
+
+ne_simple_propfind allows you to fetch a set of properties for a
+single resource, or a tree of resources.  You set the operation
+going by passing these arguments:
+
+- the session which should be used.
+- the URI and the depth of the operation (0, 1, infinite)
+- the names of the properties which you want to fetch
+- a results callback, and the userdata for the callback.
+
+For each resource found, the results callback is called, passing
+you two things along with the userdata you passed in originally:
+
+- the URI of the resource (const char *href)
+- the properties results set (const ne_prop_result_set *results)
+
+
+
+=item propname
+
+const ne_propname *
+
+
+
+
+propname = {
+nspace => <string>, name => <string>, };
+
+
+
+
+
+=back
+
+
+=back
+
+
+
+=head1 Methods of HTTP::Webdav::Request
+
+=head2 $request -> DESTROY ()
+
+Destroy memory associated with request pointer 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $request
+
+ne_request *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 $request -> add_depth_header (depth)
+
+Adds a Depth: header to a request 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $request
+
+ne_request *
+
+
+
+=item depth
+
+<integer>
+
+
+
+
+=back
+
+
+=back
+
+=head2 $request -> add_request_header (name,value)
+
+Adds a header to the request with given name and value. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $request
+
+ne_request *
+
+
+
+=item name
+
+<string>
+
+
+=item value
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 $request -> add_response_body_reader (accpt,rdr)
+
+Add a response reader for the given request, with the given
+acceptance function. userdata is passed as the first argument to
+the acceptance + reader callbacks. 
+
+The acceptance callback is called once each time the request is
+sent: it may be sent >1 time because of authentication retries etc.
+For each time the acceptance callback is called, if it returns
+non-zero, blocks of the response body will be passed to the reader
+callback as the response is read.  After all the response body has
+been read, the callback will be called with a 'len' argument of
+zero.
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $request
+
+ne_request *
+
+
+
+
+
+=item Callback function: accpt
+
+int = accpt (userdata,$request,st)
+
+'acceptance' callback type. Return non-zero to accept the response,
+else zero to ignore it. 
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item req
+
+ne_request *
+
+=item st
+
+ne_status *
+
+
+
+=back
+
+
+
+=item Callback function: rdr
+
+rdr (userdata,buf,len)
+
+The 'reader' callback type 
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item buf
+
+<string>
+
+=item len
+
+size_t
+
+
+
+=back
+
+
+
+=back
+
+
+=back
+
+=head2 $request -> add_response_header_catcher (hdl)
+
+Add handler which is passed ALL header values regardless of name 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $request
+
+ne_request *
+
+
+
+
+
+=item Callback function: hdl
+
+hdl (userdata,value)
+
+The header handler callback type 
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item value
+
+<string>
+
+
+
+=back
+
+
+
+=back
+
+
+=back
+
+=head2 $request -> add_response_header_handler (name,hdl)
+
+Adds a response header handler for the given request. userdata is passed
+as the first argument to the header handler, and the 'value' is the
+header field value (i.e. doesn't include the "Header-Name: " part").
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $request
+
+ne_request *
+
+
+
+=item name
+
+<string>
+
+
+
+
+=item Callback function: hdl
+
+hdl (userdata,value)
+
+The header handler callback type 
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item value
+
+<string>
+
+
+
+=back
+
+
+
+=back
+
+
+=back
+
+=head2 int = $request -> begin_request ()
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $request
+
+ne_request *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 ne_decompress * = $request -> decompress_reader (accpt,rdr)
+
+Call this to register a 'reader' callback which will be passed
+blocks of response body (if the 'acceptance' callback is
+successful).  If the response body is returned compressed by the
+server, this reader will receive UNCOMPRESSED blocks.
+
+Returns pointer to context object which must be passed to
+ne_decompress_destroy after the request has been dispatched, to
+free any internal state.  
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $request
+
+ne_request *
+
+
+
+
+
+=item Callback function: accpt
+
+int = accpt (userdata,$request,st)
+
+'acceptance' callback type. Return non-zero to accept the response,
+else zero to ignore it. 
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item req
+
+ne_request *
+
+=item st
+
+ne_status *
+
+
+
+=back
+
+
+
+=item Callback function: rdr
+
+rdr (userdata,buf,len)
+
+The 'reader' callback type 
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item buf
+
+<string>
+
+=item len
+
+size_t
+
+
+
+=back
+
+
+
+=back
+
+
+=back
+
+=head2 int = $request -> dispatch ()
+
+ne_request_dispatch: Sends the given request, and reads the
+response. Response-Status information can be retrieve with
+ne_get_status(req).
+
+Returns:
+NE_OK         if request sent + response read okay.
+NE_AUTH       if user authentication failed on origin server
+NE_AUTHPROXY  if user authentication failed on proxy server
+NE_SERVERAUTH server authentication failed
+NE_PROXYAUTH  proxy authentication failed
+NE_CONNECT    could not connect to server/proxy server
+NE_TIMEOUT    connection timed out mid-request
+NE_ERROR      for other errors, and ne_get_error() should
+return a meaningful error string
+
+NB: NE_AUTH and NE_AUTHPROXY mean that the USER supplied the
+wrong username/password.  SERVER/PROXYAUTH mean that, after the
+server has accepted a valid username/password, the server/proxy did
+not authenticate the response message correctly.
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $request
+
+ne_request *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $request -> end_request ()
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $request
+
+ne_request *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 $session = $request -> get_session ()
+
+Returns pointer to session associated with request. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $request
+
+ne_request *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 const ne_status * = $request -> get_status ()
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $request
+
+ne_request *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 void * = $request -> hook_private (id)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $request
+
+ne_request *
+
+
+
+=item id
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 $request -> hook_request_accessor (id,arg2,userdata)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $request
+
+ne_request *
+
+
+
+=item id
+
+<string>
+
+
+=item arg2
+
+ne_accessor_fn
+
+Hook used to allow external access into hook processing. 
+
+
+=item userdata
+
+void *
+
+
+
+
+=back
+
+
+=back
+
+=head2 $request -> lock_using_parent (uri)
+
+Indicate that this request will modify parent collection of given URI 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $request
+
+ne_request *
+
+
+
+=item uri
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 $request -> lock_using_resource (uri,depth)
+
+Indicate that this request is of depth n on given uri 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $request
+
+ne_request *
+
+
+
+=item uri
+
+<string>
+
+
+=item depth
+
+<integer>
+
+
+
+
+=back
+
+
+=back
+
+=head2 ssize_t = $request -> read_response_block (buffer,buflen)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $request
+
+ne_request *
+
+
+
+=item buffer
+
+<string>
+
+
+=item buflen
+
+size_t
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 $request -> set_request_body_buffer (buffer,size)
+
+'buffer' will be sent as the request body with given request. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $request
+
+ne_request *
+
+
+
+=item buffer
+
+<string>
+
+
+=item size
+
+size_t
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $request -> set_request_body_fd (fd)
+
+Contents of stream will be sent as the request body with the given
+request. Returns:
+0 on okay.
+non-zero if could not determine length of file.
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $request
+
+ne_request *
+
+
+
+=item fd
+
+<integer>
+
+
+
+
+=back
+
+
+=back
+
+=head2 $request -> set_request_body_provider (size,provider)
+
+Callback is called to provide blocks of request body. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $request
+
+ne_request *
+
+
+
+=item size
+
+size_t
+
+
+
+
+
+=item Callback function: provider
+
+ssize_t = provider (userdata,buffer,buflen)
+
+Callback for providing request body blocks.
+
+Before each time the body is provided, the callback will be called
+once with buflen == 0.  The body may have to be provided >1 time
+per request (for authentication retries etc.).
+
+The callback must return:
+<0           : error, abort.
+0           : ignore 'buffer' contents, end of body.
+0 < x <= buflen : buffer contains x bytes of body data.
+
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item buffer
+
+<string>
+
+=item buflen
+
+size_t
+
+
+
+=back
+
+
+
+=back
+
+
+=back
+
+
+
+=head1 Methods of HTTP::Webdav::SSL
+
+=head2 $ssl -> DESTROY ()
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $ssl
+
+nssl_context *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 $ssl -> disable_sslv2 ()
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $ssl
+
+nssl_context *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 $ssl -> disable_sslv3 ()
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $ssl
+
+nssl_context *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 $ssl -> disable_tlsv1 ()
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $ssl
+
+nssl_context *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $ssl -> set_client_cert (certfile,keyfile)
+
+For PEM-encoded client certificates: use the given client
+certificate and private key file. 
+Returns: 0 if certificate is read okay,
+non-zero otherwise.
+
+For decoding the private key file, the callback above will be used
+to prompt for the password.  If no callback has been set, then the
+OpenSSL default will be used: the prompt appears on the terminal.
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $ssl
+
+nssl_context *
+
+
+
+=item certfile
+
+<string>
+
+
+=item keyfile
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 $ssl -> set_key_prompt (prompt)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $ssl
+
+nssl_context *
+
+
+
+
+
+=item Callback function: prompt
+
+int = prompt (userdata,filename,buf,buflen)
+
+Callback for retrieving the private key password.
+Filename will be the filename of the private key file.
+Must return:
+0 on success.  buf must be filled in with the password.
+non-zero if the user cancelled the prompt.
+
+FIXME: this is inconsistent with the HTTP authentication callbacks.  
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item filename
+
+<string>
+
+=item buf
+
+<string>
+
+=item buflen
+
+<integer>
+
+
+
+=back
+
+
+
+=back
+
+
+=back
+
+
+
+=head1 Methods of HTTP::Webdav::Socket
+
+=head2 int = $socket -> block (timeout)
+
+Blocks waiting for data on the given socket for the given time.
+Returns:
+SOCK_* on error,
+SOCK_TIMEOUT on no data within timeout,
+0 if data arrived on the socket.
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $socket
+
+nsocket *
+
+
+
+=item timeout
+
+<integer>
+
+
+
+
+=back
+
+
+=back
+
+=head2 $socket -> call_progress (progress,total)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $socket
+
+nsocket *
+
+
+
+=item progress
+
+<integer>
+
+
+
+=item total
+
+<integer>
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $socket -> close ()
+
+Closes the socket and frees the nsocket object. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $socket
+
+nsocket *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $socket -> fullread (buffer,buflen)
+
+Reads a chunk of data. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $socket
+
+nsocket *
+
+
+
+=item buffer
+
+<string>
+
+
+=item buflen
+
+<integer>
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $socket -> fullwrite (data,length)
+
+Sends the given block of data down the nsocket 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $socket
+
+nsocket *
+
+
+
+=item data
+
+<string>
+
+
+=item length
+
+size_t
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 const char * = $socket -> get_error ()
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $socket
+
+nsocket *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $socket -> get_fd ()
+
+Returns the file descriptor used for the socket 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $socket
+
+nsocket *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 const char * = $socket -> get_version ()
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $socket
+
+nsocket *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $socket -> make_secure ($ssl)
+
+Ctx is OPTIONAL. If it is NULL, defaults are used. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $socket
+
+nsocket *
+
+
+
+=item $ssl
+
+nssl_context *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $socket -> peek (buffer,count)
+
+sock_peek is recv() with a timeout of SOCKET_TIMEOUT.
+Returns:
+SOCK_* on error,
+0 on no data to read (due to EOF),
+>0 length of data read into buffer.
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $socket
+
+nsocket *
+
+
+
+=item buffer
+
+<string>
+
+
+=item count
+
+size_t
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $socket -> read (buffer,count)
+
+sock_read is read() with a timeout of SOCKET_TIMEOUT.
+Returns:
+SOCK_* on error,
+0 on no data to read (due to EOF),
+>0 length of data read into buffer.
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $socket
+
+nsocket *
+
+
+
+=item buffer
+
+<string>
+
+
+=item count
+
+size_t
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $socket -> readfile_blocked (length,reader)
+
+Read from socket, passing each block read to reader callback.
+Pass userdata as first argument to reader callback.
+
+If length is -1, keep going till EOF is returned. SOCK_CLOSED
+is never returned in this case.
+
+Otherwise, read exactly 'length' bytes. If EOF is encountered
+before length bytes have been read, and SOCK_CLOSED will be
+returned.
+
+Returns:
+0 on success,
+SOCK_* on error (SOCK_CLOSED is a special case, as above)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $socket
+
+nsocket *
+
+
+
+=item length
+
+<integer>
+
+
+
+
+
+=item Callback function: reader
+
+reader (userdata,buf,len)
+
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item buf
+
+<string>
+
+=item len
+
+size_t
+
+
+
+=back
+
+
+
+=back
+
+
+=back
+
+=head2 int = $socket -> readline (line,len)
+
+Reads a line from given nsocket 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $socket
+
+nsocket *
+
+
+
+=item line
+
+<string>
+
+
+=item len
+
+<integer>
+
+
+
+
+=back
+
+
+=back
+
+=head2 $socket -> register_progress (cb)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $socket
+
+nsocket *
+
+
+
+
+
+=item Callback function: cb
+
+cb (userdata,progress,total)
+
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item progress
+
+<integer>
+
+=item total
+
+<integer>
+
+
+
+=back
+
+
+
+=back
+
+
+=back
+
+=head2 int = $socket -> send_string (string)
+
+Sends the null-terminated string down the given nsocket 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $socket
+
+nsocket *
+
+
+
+=item string
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $socket -> sendline (line)
+
+Sends the given line to given socket, CRLF appended 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $socket
+
+nsocket *
+
+
+
+=item line
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+
+
+=head1 Methods of HTTP::Webdav::Util
+
+=head2 int = HTTP::Webdav::Util::accept_207 (userdata,$request,status)
+
+An acceptance function which only accepts 207 responses 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item userdata
+
+void *
+
+
+=item $request
+
+ne_request *
+
+
+
+=item status
+
+ne_status *
+
+Hook called after the request is sent. May return:
+NE_OK     everything is okay
+NE_RETRY  try sending the request again.
+anything else signifies an error, and the request is failed. The return
+code is passed back the _dispatch caller, so the session error must
+also be set appropriately (ne_set_error).
+
+
+
+
+status = {
+major_version => <integer>, minor_version => <integer>, code => <integer>, klass => <integer>, reason_phrase => <string>, };
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = HTTP::Webdav::Util::accept_2xx (userdata,$request,st)
+
+An 'acceptance' callback which only accepts 2xx-class responses.
+Ignores userdata. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item userdata
+
+void *
+
+
+=item $request
+
+ne_request *
+
+
+
+=item st
+
+ne_status *
+
+Hook called after the request is sent. May return:
+NE_OK     everything is okay
+NE_RETRY  try sending the request again.
+anything else signifies an error, and the request is failed. The return
+code is passed back the _dispatch caller, so the session error must
+also be set appropriately (ne_set_error).
+
+
+
+
+st = {
+major_version => <integer>, minor_version => <integer>, code => <integer>, klass => <integer>, reason_phrase => <string>, };
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = HTTP::Webdav::Util::accept_always (userdata,$request,st)
+
+An acceptance callback which accepts all responses.  Ignores
+userdata. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item userdata
+
+void *
+
+
+=item $request
+
+ne_request *
+
+
+
+=item st
+
+ne_status *
+
+Hook called after the request is sent. May return:
+NE_OK     everything is okay
+NE_RETRY  try sending the request again.
+anything else signifies an error, and the request is failed. The return
+code is passed back the _dispatch caller, so the session error must
+also be set appropriately (ne_set_error).
+
+
+
+
+st = {
+major_version => <integer>, minor_version => <integer>, code => <integer>, klass => <integer>, reason_phrase => <string>, };
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 time_t = HTTP::Webdav::Util::asctime_parse (date)
+
+Parses asctime date string 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item date
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 $buffer = HTTP::Webdav::Util::buffer_create ()
+
+Create a new ne_buffer. Returns NULL on error 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+
+
+=back
+
+
+=back
+
+=head2 $buffer = HTTP::Webdav::Util::buffer_create_sized (size)
+
+Create a new ne_buffer of given minimum size. Returns NULL on error 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item size
+
+size_t
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 void * = HTTP::Webdav::Util::calloc (len)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item len
+
+size_t
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 HTTP::Webdav::Util::content_type_handler (userdata,value)
+
+Sets (*ne_content_type)userdata appropriately. 
+Caller must free ->value after use 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item userdata
+
+void *
+
+
+=item value
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 HTTP::Webdav::Util::debug_init (stream,mask)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item stream
+
+<filehandle>
+
+
+
+=item mask
+
+<integer>
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = HTTP::Webdav::Util::decompress_destroy (ctx)
+
+Free's up internal state. Returns non-zero if errors occured during
+decompression: the session error string will have the error. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item ctx
+
+ne_decompress *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 HTTP::Webdav::Util::duplicate_header (userdata,value)
+
+Stock header handlers:
+'duplicate': *(char **)userdata = strdup(value)
+'numeric':   *(int *)userdata = atoi(value)
+e.g.
+int mynum;
+ne_add_response_header_handler(myreq, "Content-Length",
+ne_handle_numeric_handler, &mynum);
+... arranges mynum to be set to the value of the Content-Length header.
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item userdata
+
+void *
+
+
+=item value
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 HTTP::Webdav::Util::handle_numeric_header (userdata,value)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item userdata
+
+void *
+
+
+=item value
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 time_t = HTTP::Webdav::Util::httpdate_parse (date)
+
+Parse an HTTP-date as per RFC2616 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item date
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 time_t = HTTP::Webdav::Util::iso8601_parse (date)
+
+Returns time from date/time using the subset of the ISO8601 format
+referenced in RFC2518 (e.g as used in the creationdate property in
+the DAV: namespace). 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item date
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 struct ne_lock * = HTTP::Webdav::Util::lock_copy (lock)
+
+Deep-copy a lock structure. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item lock
+
+const struct ne_lock *
+
+
+
+
+lock = {
+uri => <string>, depth => <integer>, type => <integer>, scope => <integer>, token => <string>, owner => <string>, timeout => long, prev => void *, next => void *, };
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 HTTP::Webdav::Util::lock_free (lock)
+
+Free a lock structure 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item lock
+
+struct ne_lock *
+
+
+
+
+lock = {
+uri => <string>, depth => <integer>, type => <integer>, scope => <integer>, token => <string>, owner => <string>, timeout => long, prev => void *, next => void *, };
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 void * = HTTP::Webdav::Util::md5_buffer (buffer,len,resblock)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item buffer
+
+<string>
+
+
+=item len
+
+size_t
+
+
+
+=item resblock
+
+void *
+
+
+
+
+=back
+
+
+=back
+
+=head2 HTTP::Webdav::Util::md5_process_block (buffer,len,$md5ctx)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item buffer
+
+const void *
+
+
+=item len
+
+size_t
+
+
+
+=item $md5ctx
+
+struct ne_md5_ctx *
+
+
+
+
+=back
+
+
+=back
+
+=head2 HTTP::Webdav::Util::md5_process_bytes (buffer,len,$md5ctx)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item buffer
+
+const void *
+
+
+=item len
+
+size_t
+
+
+
+=item $md5ctx
+
+struct ne_md5_ctx *
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = HTTP::Webdav::Util::md5_stream (stream,resblock)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item stream
+
+<filehandle>
+
+
+
+=item resblock
+
+void *
+
+
+
+
+=back
+
+
+=back
+
+=head2 HTTP::Webdav::Util::neon_i18n_init ()
+
+Initialize i18n in neon 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+
+
+=back
+
+
+=back
+
+=head2 void * = HTTP::Webdav::Util::null_accessor (userdata)
+
+an accessor which simply returns the userdata. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item userdata
+
+void *
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = HTTP::Webdav::Util::parse_statusline (status_line,s)
+
+Parser for strings which follow the Status-Line grammar from 
+RFC2616.
+Returns:
+0 on success, *s will be filled in.
+-1 on parse error.
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item status_line
+
+<string>
+
+
+=item s
+
+ne_status *
+
+Hook called after the request is sent. May return:
+NE_OK     everything is okay
+NE_RETRY  try sending the request again.
+anything else signifies an error, and the request is failed. The return
+code is passed back the _dispatch caller, so the session error must
+also be set appropriately (ne_set_error).
+
+
+
+
+s = {
+major_version => <integer>, minor_version => <integer>, code => <integer>, klass => <integer>, reason_phrase => <string>, };
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 void * = HTTP::Webdav::Util::realloc (ptr,len)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item ptr
+
+void *
+
+
+=item len
+
+size_t
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 time_t = HTTP::Webdav::Util::rfc1036_parse (date)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item date
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 char * = HTTP::Webdav::Util::rfc1123_date (anytime)
+
+Return current date/time in RFC1123 format 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item anytime
+
+time_t
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 time_t = HTTP::Webdav::Util::rfc1123_parse (date)
+
+Returns time from date/time in RFC1123 format 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item date
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 $session = HTTP::Webdav::Util::session_create ()
+
+Create a new HTTP session 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+
+
+=back
+
+
+=back
+
+=head2 char * = HTTP::Webdav::Util::shave (str,whitespace)
+
+Return portion of 'str' with any characters in 'whitespace' shaved
+off the beginning and end.  Modifies str. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item str
+
+<string>
+
+
+=item whitespace
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 $socket = HTTP::Webdav::Util::sock_accept (listener)
+
+Not as good as accept(2), missing parms 2+3.
+Addings parms 2+3 would probably mean passing socklen_t as an
+int then casting internally, since we don't really want to
+autogenerate the header file to be correct for the build platform.
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item listener
+
+<integer>
+
+
+
+
+=back
+
+
+=back
+
+=head2 $ssl = HTTP::Webdav::Util::sock_create_ssl_context ()
+
+Netscape's prompts on getting a certificate which it doesn't
+recognize the CA for:
+1. Hey, I don't recognize the CA for this cert.
+2. Here is the certificate: for foo signed by BLAH,
+using encryption level BLEE
+3. Allow: accept for this session only, 
+don't accept
+accept forever
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+
+
+=back
+
+
+=back
+
+=head2 HTTP::Webdav::Util::sock_exit ()
+
+Shutdown the socket library. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+
+
+=back
+
+
+=back
+
+=head2 int = HTTP::Webdav::Util::sock_init ()
+
+Initialize the socket library. If you don't do this, SSL WILL NOT WORK.
+Returns 0 on success, or non-zero on screwed up SSL library. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+
+
+=back
+
+
+=back
+
+=head2 int = HTTP::Webdav::Util::sock_name_lookup (hostname,addr)
+
+Do a name lookup on given hostname, writes the address into
+given address buffer. Return -1 on failure. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item hostname
+
+<string>
+
+
+=item addr
+
+struct in_addr *
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = HTTP::Webdav::Util::sock_service_lookup (name)
+
+Returns the standard TCP port for the given service 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item name
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = HTTP::Webdav::Util::sock_transfer (fd,$socket,readlen)
+
+Reads readlen bytes from fd and writes to socket.
+(Not all in one go, obviously).
+If readlen == -1, then it reads from srcfd until EOF.
+Returns number of bytes written to destfd, or SOCK_* on error.
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item fd
+
+<integer>
+
+
+=item $socket
+
+nsocket *
+
+
+
+=item readlen
+
+<integer>
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 char * = HTTP::Webdav::Util::strdup (s)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item s
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 char * = HTTP::Webdav::Util::strndup (s,n)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item s
+
+<string>
+
+
+=item n
+
+size_t
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = HTTP::Webdav::Util::supports_ssl ()
+
+Returns non-zero if neon has support for SSL. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+
+
+=back
+
+
+=back
+
+=head2 char * = HTTP::Webdav::Util::uri_absolute (uri,scheme,hostport)
+
+Returns an absolute URI from a possibly-relative 'uri', using
+given scheme + hostport segment.
+Returns malloc-allocated string on success, or NULL on malloc failure. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item uri
+
+<string>
+
+
+=item scheme
+
+<string>
+
+
+=item hostport
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 const char * = HTTP::Webdav::Util::uri_abspath (uri)
+
+Returns abspath segment in (absolute) uri 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item uri
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 char * = HTTP::Webdav::Util::uri_abspath_escape (abs_path)
+
+Escapes the abspath segment of a URI.
+Returns malloc-allocated string on success, or NULL on malloc failure.
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item abs_path
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = HTTP::Webdav::Util::uri_childof (parent,child)
+
+Returns non-zero if child is a child of parent 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item parent
+
+<string>
+
+
+=item child
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = HTTP::Webdav::Util::uri_compare (a,b)
+
+Returns strcmp-like value giving comparison between a and b,
+ignoring trailing-slashes. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item a
+
+<string>
+
+
+=item b
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 HTTP::Webdav::Util::uri_free (parsed)
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item parsed
+
+struct uri *
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = HTTP::Webdav::Util::uri_has_trailing_slash (uri)
+
+Returns non-zero if uri has a trailing slash character 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item uri
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 char * = HTTP::Webdav::Util::uri_parent (path)
+
+Returns parent of path 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item path
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = HTTP::Webdav::Util::uri_parse (uri,parsed,defaults)
+
+Parse 'uri' and place parsed segments in *parsed. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item uri
+
+<string>
+
+
+=item parsed
+
+struct uri *
+
+
+=item defaults
+
+const struct uri *
+
+
+
+
+=back
+
+
+=back
+
+=head2 char * = HTTP::Webdav::Util::uri_unescape (uri)
+
+Un-escapes a URI. Returns malloc-allocated URI on success,
+or NULL on failure (malloc failure or invalid %<HEX><HEX> sequence). 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item uri
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 char * = HTTP::Webdav::Util::utf8_decode (str)
+
+Returns an ne_malloc-allocated UTF-8 decode copy of 'str'.
+Returns NULL if any of the characters in 'str' are non-8-bit.
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item str
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 char * = HTTP::Webdav::Util::utf8_encode (str)
+
+Returns an ne_malloc-allocated UTF-8 encoded copy of 'str'. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item str
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = HTTP::Webdav::Util::version_minimum (major,minor)
+
+Returns non-zero if the neon API compiled in is less than
+major.minor. i.e.
+I am: 1.2 -  neon_version_check(1, 3) => -1
+I am: 0.10 -  neon_version_check(0, 9) => 0
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item major
+
+<integer>
+
+
+=item minor
+
+<integer>
+
+
+
+
+=back
+
+
+=back
+
+=head2 const char * = HTTP::Webdav::Util::version_string ()
+
+Returns a human-readable version string like:
+"neon 0.2.0: Library build, OpenSSL support"
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+
+
+=back
+
+
+=back
+
+=head2 $hip = HTTP::Webdav::Util::xml_create ()
+
+Initialise the parser 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+
+
+=back
+
+
+=back
+
+=head2 HTTP::Webdav::Util::xml_parse_v (userdata,block,len)
+
+As above, casting (ne_xml_parser *)userdata internally.
+(This function can be passed to ne_add_response_body_reader) 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item userdata
+
+void *
+
+
+=item block
+
+<string>
+
+
+=item len
+
+size_t
+
+
+
+
+
+=back
+
+
+=back
+
+
+
+=head1 Methods of HTTP::Webdav::XML
+
+=head2 $hip -> DESTROY ()
+
+Destroys the parser. Any operations on it then have 
+undefined results. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $hip
+
+ne_xml_parser *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $hip -> currentline ()
+
+Return current parse line for errors 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $hip
+
+ne_xml_parser *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 const char * = $hip -> get_error ()
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $hip
+
+ne_xml_parser *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 $multstatus = $hip -> ne_207_create ()
+
+Create a 207 parser 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $hip
+
+ne_xml_parser *
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 $hip -> parse (block,len)
+
+Parse the given block of input of length len. Block does 
+not need to be NULL-terminated. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $hip
+
+ne_xml_parser *
+
+
+
+=item block
+
+<string>
+
+
+=item len
+
+size_t
+
+
+
+
+
+=back
+
+
+=back
+
+=head2 $hip -> push_handler (elements,validate_cb,startelm_cb,endelm_cb)
+
+Push a handler onto the handler stack for the given list of elements.
+elements must be an array, with the last element .nspace being NULL.
+Callbacks are called in order:
+1. validate_cb
+2. startelm_cb
+3. endelm_cb
+(then back to the beginning again).
+If any of the callbacks ever return non-zero, the parse will STOP.
+userdata is passed as the first argument to startelm_cb and endelm_cb.
+
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $hip
+
+ne_xml_parser *
+
+
+
+=item elements
+
+const struct ne_xml_elm *
+
+
+
+
+=item Callback function: validate_cb
+
+int = validate_cb (userdata,parent,child)
+
+Validate a new child element. 
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item parent
+
+ne_xml_elmid
+
+=item child
+
+ne_xml_elmid
+
+
+
+=back
+
+
+
+=item Callback function: startelm_cb
+
+int = startelm_cb (userdata,elm,atts)
+
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item elm
+
+const struct ne_xml_elm *
+
+=item atts
+
+const char **
+
+
+
+=back
+
+
+
+=item Callback function: endelm_cb
+
+int = endelm_cb (userdata,s,cdata)
+
+Called when a complete element is parsed 
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item s
+
+const struct ne_xml_elm *
+
+=item cdata
+
+<string>
+
+
+
+=back
+
+
+
+=back
+
+
+=back
+
+=head2 $hip -> push_mixed_handler (elements,validate_cb,startelm_cb,cdata_cb,endelm_cb)
+
+Add a handler which uses a mixed-mode cdata callback 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $hip
+
+ne_xml_parser *
+
+
+
+=item elements
+
+const struct ne_xml_elm *
+
+
+
+
+=item Callback function: validate_cb
+
+int = validate_cb (userdata,parent,child)
+
+Validate a new child element. 
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item parent
+
+ne_xml_elmid
+
+=item child
+
+ne_xml_elmid
+
+
+
+=back
+
+
+
+=item Callback function: startelm_cb
+
+int = startelm_cb (userdata,elm,atts)
+
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item elm
+
+const struct ne_xml_elm *
+
+=item atts
+
+const char **
+
+
+
+=back
+
+
+
+=item Callback function: cdata_cb
+
+cdata_cb (userdata,s,cdata,len)
+
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item s
+
+const struct ne_xml_elm *
+
+=item cdata
+
+<string>
+
+=item len
+
+<integer>
+
+
+
+=back
+
+
+
+=item Callback function: endelm_cb
+
+int = endelm_cb (userdata,s,cdata)
+
+Called when a complete element is parsed 
+
+
+
+=over 4
+
+=item userdata
+
+void *
+
+=item s
+
+const struct ne_xml_elm *
+
+=item cdata
+
+<string>
+
+
+
+=back
+
+
+
+=back
+
+
+=back
+
+=head2 $hip -> set_error (msg)
+
+Set error message for parser 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $hip
+
+ne_xml_parser *
+
+
+
+=item msg
+
+<string>
+
+
+
+
+=back
+
+
+=back
+
+=head2 int = $hip -> valid ()
+
+Returns non-zero if the parse was valid, zero if it failed (e.g.,
+any of the callbacks return non-zero, the XML was not well-formed,
+etc).  Use ne_xml_get_error to retrieve the error message if it
+failed. 
+
+=over 4
+
+=item Arguments
+
+=over 4
+
+=item $hip
+
+ne_xml_parser *
+
+
+
+
+
+=back
+
+
+=back
+
+
+
+=head1 Constants
+
+=over 4
+
+Constants are defined in HTTP::Webdav::Constants, to get them imported say
+
+use HTTP::Webdav::Constants ;
+
+=item HTTP_QUOTES
+
+
+
+=item HTTP_WHITESPACE
+
+
+
+=item NE_ACL_H
+
+
+
+=item NE_ALLOC_H
+
+
+
+=item NE_AUTH
+
+ User authentication failed on proxy 
+
+=item NE_AUTHPROXY
+
+ User authentication failed on proxy 
+
+=item NE_AUTH_H
+
+
+
+=item NE_BASIC_H
+
+
+
+=item NE_COMPRESS_H
+
+
+
+=item NE_CONNECT
+
+ Could not connect to server 
+
+=item NE_COOKIES_H
+
+
+
+=item NE_DBG_FLUSH
+
+
+
+=item NE_DBG_HTTP
+
+
+
+=item NE_DBG_HTTPAUTH
+
+
+
+=item NE_DBG_HTTPBASIC
+
+
+
+=item NE_DBG_HTTPBODY
+
+
+
+=item NE_DBG_HTTPPLAIN
+
+
+
+=item NE_DBG_LOCKS
+
+
+
+=item NE_DBG_SOCKET
+
+
+
+=item NE_DBG_XML
+
+
+
+=item NE_DBG_XMLPARSE
+
+
+
+=item NE_DEPTH_INFINITE
+
+
+
+=item NE_DEPTH_ONE
+
+
+
+=item NE_DEPTH_ZERO
+
+
+
+=item NE_ELM_207_UNUSED
+
+
+
+=item NE_ELM_207_first
+
+
+
+=item NE_ELM_UNUSED
+
+
+
+=item NE_ELM_href
+
+
+
+=item NE_ELM_multistatus
+
+
+
+=item NE_ELM_prop
+
+
+
+=item NE_ELM_propstat
+
+
+
+=item NE_ELM_response
+
+
+
+=item NE_ELM_responsedescription
+
+
+
+=item NE_ELM_root
+
+
+
+=item NE_ELM_status
+
+
+
+=item NE_ELM_unknown
+
+
+
+=item NE_ERROR
+
+ Generic error; use ne_get_error(session) for message 
+
+=item NE_FAILED
+
+ The precondition failed 
+
+=item NE_LOCKS_H
+
+
+
+=item NE_LOOKUP
+
+ Name lookup failed 
+
+=item NE_OK
+
+
+
+=item NE_PROPS_H
+
+
+
+=item NE_PROXYAUTH
+
+ Proxy authentication failed 
+
+=item NE_REDIRECT
+
+ See ne_redirect.h 
+
+=item NE_REDIRECT_H
+
+
+
+=item NE_REQUEST_H
+
+
+
+=item NE_RETRY
+
+ Retry request (ne_end_request ONLY) 
+
+=item NE_SERVERAUTH
+
+ Server authentication failed 
+
+=item NE_SESSION_H
+
+
+
+=item NE_SOCKET_H
+
+
+
+=item NE_STRING_H
+
+
+
+=item NE_TIMEOUT
+
+ Connection timed out 
+
+=item NE_TIMEOUT_INFINITE
+
+
+
+=item NE_TIMEOUT_INVALID
+
+
+
+=item NE_URI_H
+
+
+
+=item NE_UTILS_H
+
+
+
+=item NE_XML_CDATA
+
+
+
+=item NE_XML_COLLECT
+
+
+
+=item NE_XML_DECLINE
+
+
+
+=item NE_XML_H
+
+
+
+=item NE_XML_INVALID
+
+
+
+=item NE_XML_MIXED
+
+
+
+=item NE_XML_UTF8DECODE
+
+
+
+=item NE_XML_VALID
+
+
+
+=back
+=head1 See also
+
+http://www.webdav.org/neon/
+
+=head1 SUPPORT
+
+For any problems, suggestion or feedback, please use the neon mailing list
+
+post to:    neon@webdav.org
+subscribe:  http://mailman.webdav.org/mailman/listinfo/neon/
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001 Gerald Richter / ecos gmbh (www.ecos.de)
+
+You may distribute under the terms of either the GNU General Public 
+License or the Artistic License, as specified in the Perl README file.
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED 
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+
+=head1 AUTHOR
+
+Gerald Richter / ecos <richter@dev.ecos.de>
+

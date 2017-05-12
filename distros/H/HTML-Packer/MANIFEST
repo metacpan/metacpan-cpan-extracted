@@ -1,0 +1,26 @@
+Changes
+lib/HTML/Packer.pm
+Makefile.PL
+MANIFEST
+README.md
+t/00-load.t
+t/01-interface.t
+t/02-io.t
+t/03-leaks.t
+t/04-leaks_full.t
+t/gh-6_exempt_some_script_tags.t
+t/html/s1-expected.html
+t/html/s1.html
+t/html/s2-expected.html
+t/html/s2.html
+t/html/s3-expected.html
+t/html/s3.html
+t/html/s4-expected.html
+t/html/s4.html
+t/html/s5-expected.html
+t/html/s5.html
+t/html/s6-expected.html
+t/html/s6.html
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

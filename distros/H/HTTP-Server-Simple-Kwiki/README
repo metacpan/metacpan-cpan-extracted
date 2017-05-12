@@ -1,0 +1,32 @@
+NAME
+    HTTP::Server::Simple::Kwiki - Standalone Kwiki server
+
+SYNOPSIS
+      use HTTP::Server::Simple::Kwiki;
+
+      chdir "my-kwiki"; 
+      my $server = HTTP::Server::Simple::Kwiki->new();
+      $server->run();
+
+DESCRIPTION
+    HTTP::Server::Simple::Kwiki is a standalone webserver for Kwiki. This
+    means that you don't need to run it under a proper webserver. This is
+    intended mostly for debugging Kwiki, or for when you just want to play
+    with it without having to configure Apache.
+
+    Note that all you need to do is write a script like in the synopsis,
+    remembering to chdir into your Kwiki directory.
+
+CONSTRUCTOR
+SEE ALSO
+    Related modules which may be of interest: Kwiki, HTTP::Server::Simple.
+
+AUTHOR
+    Leon Brocard, "<acme@astray.com>"
+
+COPYRIGHT
+    Copyright (C) 2005, Leon Brocard
+
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

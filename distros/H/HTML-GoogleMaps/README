@@ -1,0 +1,86 @@
+NAME
+    HTML::GoogleMaps - a simple wrapper around the Google Maps API
+
+SYNOPSIS
+      $map = HTML::GoogleMaps->new(key => $map_key,
+                                   db => $geo_coder_us_db);
+      $map->center(point => "1810 Melrose St, Madison, WI");
+      $map->add_marker(point => "1210 W Dayton St, Madison, WI");
+ 
+      my ($head, $map_div, $map_script) = $map->render;
+
+NOTE
+    This version is not API compatable with HTML::GoogleMaps versions 1 and
+    2.  The render method now returns three values instead of two.
+
+DESCRIPTION
+    HTML::GoogleMaps provides a simple wrapper around the Google Maps API.
+    It allows you to easily create maps with markers, polylines and
+    information windows. If you have Geo::Coder::US installed, it will be
+    able to do basic geocoding for US addresses.
+
+CONSTRUCTOR
+    $map = HTML::GoogleMaps->new(key => $map_key);
+        Creates a new HTML::GoogleMaps object. Takes a hash of options. The
+        only required option is *key*, which is your Google Maps API key.
+        You can get a key at http://maps.google.com/apis/maps/signup.html .
+        Other valid options are:
+
+        db => Geo::Coder::US database
+            If given, the add_marker and add_polyline methods will be able
+            to map US addresses, as well as longitude/latitude pairs.
+
+        height => height in pixels
+        width => width in pixels
+
+METHODS
+    $map->center($point)
+        Center the map at a given point.
+
+    $map->zoom($level)
+        Set the zoom level
+
+    $map->controls($control1, $control2)
+        Enable the given controls. Valid controls are: large_map_control,
+        small_map_control, small_zoom_control and map_type_control.
+
+    $map->dragging($enable)
+        Enable or disable dragging.
+
+    $map->info_window($enable)
+        Enable or disable info windows.
+
+    $map->map_type($type)
+        Set the map type. Either map_type or satellite_type.
+
+    $map->add_icon(name => $icon_name, image => $image_url, shadow =>
+    $shadow_url, image_size => [ $width, $height ], shadow_size => [ $width,
+    $height ]);
+        Adds a new icon, which can later be used by add_marker. Optional
+        args include icon_anchor and info_window_anchor.
+
+    $map->add_marker(point => $point, html => $info_window_html)
+        Add a marker to the map at the given point. If html is specified,
+        add a popup info window as well. icon can be used to switch to
+        either a user defined icon (via the name) or a standard google
+        letter icon (A-J).
+
+    $map->add_polyline(points => [ $point1, $point2 ])
+        Add a polyline that connects the list of points. Other options
+        include color (any valid HTML color), weight (line width in pixels)
+        and opacity (between 0 and 1).
+
+    $map->render
+        Renders the map and returns a two element list. The first element
+        needs to be placed in the head section of your HTML document. The
+        second in the body where you want the map to appear.
+
+ONLINE EXAMPLE
+    <http://www.cs.wisc.edu/~nmueller/fsbo_open_houses.pl>
+
+SEE ALSO
+    <http://maps.google.com/apis/maps/documentation> <http://geocoder.us>
+
+AUTHORS
+    Nate Mueller <nate@cs.wisc.edu>
+

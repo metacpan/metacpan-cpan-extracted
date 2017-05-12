@@ -1,0 +1,40 @@
+0.1
+---
+
+initial release
+
+0.2
+-----
+
+- enhanced documentation
+- fixed bug in PGSQL.pm
+- fixed bug in _dbsql_parse method
+- fixed bug in dbsql_conf method
+- implemented multi table support
+- added primary key check sum (enhanced security)
+- new method dbsql_add_extra_sql (and many more).
+
+0.2.1
+-----
+
+- fixed 'NULL'-bug in _dbsql_write
+- dbsql_set_show_default will not influence dbsql_update anymore!
+- enhanced documentation
+
+1.0
+---
+        - now using perls DBI database abstraction to be compatible to all databases that are supported by DBI. Unfortunately HTML::FormEngine::DBSQL was only tested with PostgreSQL. But a special database driver is not needed anymore (read the MIGRATING file, you find it in the distribution near README)
+	- new feature: save_as
+	- new feature: display_as
+	- made it compatible to formengine 1.0
+	- removed Config.pm, created SkinClassic.pm the default skin class for HTML::FormEngine::DBSQL
+	- removed dbsql_set_secret therefore added set_dbsql_secret to HTML::FormEngine::DBSQL::SkinClassic
+	- dbsql_preconf knows a new special key format: __add_VARNAME_(first|last)
+	- changed the meaning of dbsql_set_show_default (read POD)
+	- added dbsql_set_write_null_fields
+
+1.01
+----
+	- fixed the POD of DBSQL.pm and Checks.pm
+	- added a pod test (thanks to Mark Stosberg)
+	- fixed some examples

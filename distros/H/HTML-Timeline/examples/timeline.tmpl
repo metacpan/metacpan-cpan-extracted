@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Timeline</title>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<script src="http://simile.mit.edu/timeline/api/timeline-api.js" type="text/javascript"></script>
+<script>
+var tl;
+
+function onLoad() {
+  var eventSource = new Timeline.DefaultEventSource(0);
+  var theme = Timeline.ClassicTheme.create();
+  theme.event.bubble.width = 320;
+  theme.event.bubble.height = 220;
+  var d = Timeline.DateTime.parseGregorianDateTime("<tmpl_var name=earliest_date>");
+  var bandInfos = [
+    Timeline.createBandInfo({
+    width:          "100%",
+    intervalUnit:   Timeline.DateTime.DECADE,
+    intervalPixels: 70,
+    eventSource:    eventSource,
+    date:           d,
+    theme:          theme
+  })
+  ];
+  tl = Timeline.create(document.getElementById("my-timeline"), bandInfos);
+  Timeline.loadXML("<tmpl_var name=xml_file_name>", function(xml, url) { eventSource.loadXML(xml,
+  url); });
+}
+
+var resizeTimerID = null;
+  function onResize() {
+  if (resizeTimerID == null) {
+    resizeTimerID = window.setTimeout(function() {
+    resizeTimerID = null;
+    tl.layout();
+    }, 500);
+  }
+}
+</script>
+</head>
+<body onload="onLoad();" onresize="onResize();">
+  <h1>Timeline</h1>
+  <div id="my-timeline" style="height: <tmpl_var name=timeline_height>px; border: 1px solid #aaa"></div>
+  <tmpl_if name=missing_as_table>
+  <p>
+	<tmpl_var name=missing>
+  </p>
+  <table>
+	<tr>
+	  <th>Name</th><td>Death date</td>
+	</tr>
+	<tmpl_loop name=missing_loop>
+	  <tr><th><tmpl_var name=name></th><td><tmpl_var name=death_date></td>
+	</tmpl_loop>
+  </table>
+  <tmpl_else>
+  <p>
+	People excluded because of missing birth dates have been given a birthdate of <tmpl_var name=todays_date>.
+  </p>
+  </tmpl_if>
+  <hr />
+  <p>Note: You should see 2 timescales at the bottom of the timeline. You can click-and-drag
+on each separately, for slow or quick movement through time.</p>
+</body>
+</html>

@@ -1,0 +1,10 @@
+Changes
+=======
+
+0.02 - Thu 24 May 2007
+  - No code change.
+  - Various documentation fixes. The main documentation should be clearer
+    as to why/when HTML::TagClouder should be used.
+
+0.01 - Wed 23 May 2007
+  - Initial release

@@ -1,0 +1,13 @@
+Revision history for Ham-APRS-LastPacket
+
+0.03    2010-12-19 Sun
+        Changed docs and added LICENSE file in order to change to the
+        Artistic 2.0 license.
+
+0.02    2008-08-03 Sun
+        Fixed a line in the Pod docs that was causing make test errors
+        on systems that have Test::Pod installed.
+
+0.01    2008-08-02 Sat
+        First version released.
+

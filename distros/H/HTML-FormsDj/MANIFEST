@@ -1,0 +1,7 @@
+lib/HTML/FormsDj.pm
+Makefile.PL
+MANIFEST
+README
+t/run.t
+META.yml                                 
+META.json

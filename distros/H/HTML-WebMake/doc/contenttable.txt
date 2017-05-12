@@ -1,0 +1,38 @@
+<wmmeta name="Title" value="The &lt;contenttable&gt; Tag" />
+<wmmeta name="Section" value="02-tags_attrs" />
+<wmmeta name="Score" value="37" />
+<wmmeta name="Abstract">
+Define several small content items quickly, using a table
+</wmmeta>
+
+Quite often, it's handy to define small (one-line) content items quickly, in
+bulk, directly inside the WMK file itself.  The &lt;contenttable&gt; tag
+provides a good way to do this.
+
+Firstly, pick a delimiter character, such as ##|##.  Set the __delimiter__
+attribute to this character.
+
+Next, list a table of content names and their values, separated by a delimiter
+character, one name-value-pair per line.
+
+  __Note:__ if you would prefer to load the content items from a separate
+  file, the "&lt;contents&gt;" [$(contents)] tag is better suited.
+
+  __Another note:__ this is not the way to define data __about__ other content
+  items (in other words, **metadata**), such as titles, authorship, or brief
+  descriptions, as WebMake's built-in metadata support will not be available
+  in that case.  Embedding the metadata into the content item using
+  &lt;wmmeta&gt; tags, or loading them in bulk using &lt;metatable&gt; tags,
+  should be used instead.
+
+Example
+=======
+
+<safe>
+  <contenttable delimiter="|">
+  person1|Justin
+  person2|Catherine
+  person3|The cat
+  </contenttable>
+</safe>
+

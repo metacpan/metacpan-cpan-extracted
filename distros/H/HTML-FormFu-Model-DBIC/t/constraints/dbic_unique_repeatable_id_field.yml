@@ -1,0 +1,27 @@
+---
+auto_fieldset: 1
+
+elements:
+  - type: Hidden
+    name: count
+
+  - type: Repeatable
+    nested_name: user
+    counter_name: count
+    model_config:
+      new_rows_max: 1
+    elements:
+      - type: Hidden
+        name: id
+
+      - name: name
+        constraints:
+          - type: DBIC::Unique
+            resultset: User
+            id_field: user.id
+
+      - name: title
+
+  - type: Submit
+    name: submit
+

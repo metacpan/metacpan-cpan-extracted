@@ -1,0 +1,53 @@
+HTML-EditableTable 0.21
+
+This module was developed to simplify the manipuation of complex tabular data in engineering and business-process web applications.  The developement was motivated by a rapid-prototype software development flow where the requirements gathering phase goes something like "I have this big complicated spreadsheet that I want to make a website out of - can you help?".  The EditableTable class is an 'abstract' base class and EditableTable::Horizontal and EditableTable::Vertical are the implementations for two commonly used table types.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc HTML::EditableTable
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-EditableTable
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/HTML-EditableTable
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/HTML-EditableTable
+
+    Search CPAN
+        http://search.cpan.org/dist/HTML-EditableTable/
+
+RELEASE NOTES
+
+    0.10 2010-07-03 Initial submission to CPAN.
+
+    0.11 2010-07-04 Fix for Javascript module pod.
+
+    0.12 2010-07-05 Improvements to pod.
+
+    0.20 2010-07-07 Output to string, stable sort enabled for javascript sorting, pod bug fixes, additional test cases.
+
+    0.21 2010-07-11 Method provided to reset javascript display flags (for Table and Javascript objects).  Boolean flag cleanup.  Dead code removal.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 Freescale Semiconductor
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

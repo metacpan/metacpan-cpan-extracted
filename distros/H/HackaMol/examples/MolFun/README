@@ -1,0 +1,20 @@
+These examples use multiple PDBs for analysis, e.g.:
+
+foreach my $pdb ( @pdbs )
+{
+
+  ...do something...
+
+}
+
+
+foreach my $i (0 .. $#pdbs)
+{
+
+  ... do something on $pdbs[$i] ...
+
+}
+
+
+
+

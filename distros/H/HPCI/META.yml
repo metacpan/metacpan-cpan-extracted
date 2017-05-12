@@ -1,0 +1,86 @@
+---
+abstract: 'Interface modules for high performance computing on compute clusters.'
+author:
+  - 'Boutros Lab Software Engineering  <BoutrosLabSoftware@oicr.on.ca>'
+  - 'John Macdonald  <jmacdonald@oicr.on.ca>'
+build_requires:
+  File::Slurp: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  File::pushd: '0'
+  Module::Build: '0'
+  Test::Exception: '0'
+  Test::More: '0.10'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HPCI
+provides:
+  HPCD::uni::Group:
+    file: lib/HPCD/uni/Group.pm
+  HPCD::uni::JobGroup:
+    file: lib/HPCD/uni/JobGroup.pm
+  HPCD::uni::Run:
+    file: lib/HPCD/uni/Run.pm
+  HPCD::uni::Stage:
+    file: lib/HPCD/uni/Stage.pm
+  HPCI:
+    file: lib/HPCI.pm
+    version: '0.50'
+  HPCI::CommandScript:
+    file: lib/HPCI/CommandScript.pm
+  HPCI::Env:
+    file: lib/HPCI/Env.pm
+  HPCI::Group:
+    file: lib/HPCI/Group.pm
+  HPCI::JobGroup:
+    file: lib/HPCI/JobGroup.pm
+  HPCI::Logger:
+    file: lib/HPCI/Logger.pm
+  HPCI::ModuleLoad:
+    file: lib/HPCI/ModuleLoad.pm
+  HPCI::Run:
+    file: lib/HPCI/Run.pm
+  HPCI::ScriptSource:
+    file: lib/HPCI/ScriptSource.pm
+  HPCI::Stage:
+    file: lib/HPCI/Stage.pm
+  HPCI::SystemLogger:
+    file: lib/HPCI/SystemLogger.pm
+  HPCI::Template:
+    file: lib/HPCI/Template.pm
+  HPCI::TimeoutQueue:
+    file: lib/HPCI/TimeoutQueue.pm
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  DateTime: '0'
+  File::Path: '0'
+  File::ShareDir: '0'
+  Log::Log4perl: '0'
+  Log::Log4perl::Appender: '0'
+  Log::Log4perl::Level: '0'
+  Module::Load: '0'
+  Module::Load::Conditional: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Moose::Util::TypeConstraints: '0'
+  MooseX::ClassAttribute: '0'
+  MooseX::Params::Validate: '0'
+  MooseX::Role::Parameterized: '0'
+  MooseX::Types::Path::Class: '0'
+  POSIX: '0'
+  Params::Validate: '0'
+  Time::HiRes: '0'
+  Try::Tiny: '0'
+  autodie: '0'
+  namespace::autoclean: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.50'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

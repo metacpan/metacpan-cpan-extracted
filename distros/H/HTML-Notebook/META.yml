@@ -1,0 +1,31 @@
+---
+abstract: 'Compose HTML documents using notebook style'
+author:
+  - 'Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>'
+build_requires:
+  Module::Build: '0.28'
+  Test::Most: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-Notebook
+requires:
+  Moose: '0'
+  Text::Template: '0'
+  UUID::Tiny: '0'
+  namespace::autoclean: '0'
+  perl: '5.010'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/pablrod/p5-HTML-Notebook/issues
+  homepage: https://github.com/pablrod/p5-HTML-Notebook
+  repository: https://github.com/pablrod/p5-HTML-Notebook.git
+version: '0.002'
+x_serialization_backend: 'YAML::Tiny version 1.69'

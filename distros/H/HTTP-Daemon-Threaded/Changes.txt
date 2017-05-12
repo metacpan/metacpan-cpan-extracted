@@ -1,0 +1,11 @@
+Version 0.91 2008-Mar-11	D. Arnold
+
+	- fix regex
+	- provide CGI emulation (added HDT::CGIHandler, HDT::CGIAdapter)
+	- require IO::Stringy (for CGIAdapter)
+	- changed test suite to use Test::More
+	- updated license to AFL 3.0
+
+Version 0.90 2006-08-24	D. Arnold
+
+	- Coded

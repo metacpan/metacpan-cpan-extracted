@@ -1,0 +1,252 @@
+<ep-package name="HTML::EP::Locale">
+<ep-perl>
+    #
+    #   Assuming the following table structure:
+    #
+    #   CREATE TABLE USERS (
+    #       USER VARCHAR(20) NOT NULL,
+    #       UID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    #       REALNAME VARCHAR(20) NOT NULL,
+    #       SHELL VARCHAR(20) NOT NULL,
+    #       HOMEDIR VARCHAR(40) NOT NULL,
+    #       PASSWORD VARCHAR(20) NOT NULL,
+    #       ALIASES VARCHAR(255),
+    #       FORWARD VARCHAR(80),
+    #       CUSTOM VARCHAR(80)
+    #   )
+    #   ALTER TABLE USERS ADD UNIQUE USER_INDEX (USER)
+    #     
+    my $self = $_;
+
+    my $FIRST_UID = 600;
+
+    sub FindUser {
+ 	my $self = shift; my $user = shift;
+ 	my $dbh = $self->{'dbh'};
+ 	my $query = sprintf('SELECT * FROM USERS WHERE USER = %s',
+ 			    $dbh->quote($user));
+ 	$self->_ep_query({'statement' => $query, 'result' => 'user'});
+ 	my $userRef = delete $self->{'user'};
+ 	if (!($user = $userRef->[0])) { die "No such user: $user" }
+ 	$self->{'user'} = {
+ 	    'USER' => { 'val' => $user->{'USER'}, 'type' => 't',
+ 		       'col' => 'USER' },
+ 	    'UID' => { 'val' => $user->{'UID'}, 'type' => 'n',
+ 		       'col' => 'UID' },
+ 	    'REALNAME' => { 'val' => $user->{'REALNAME'}, 'type' => 't',
+ 			    'col' => 'REALNAME' },
+ 	    'SHELL' => { 'val' => $user->{'SHELL'}, 'type' => 't',
+ 			 'col' => 'SHELL' },
+ 	    'HOMEDIR' => { 'val' => $user->{'HOMEDIR'}, 'type' => 't',
+ 			   'col' => 'HOMEDIR' },
+ 	    'PASSWORD' => { 'val' => $user->{'PASSWORD'}, 'type' => 't',
+ 			    'col' => 'PASSWORD' },
+ 	    'ALIASES' => { 'val' => $user->{'ALIASES'}, 'type' => 't',
+ 			   'col' => 'ALIASES' },
+	    'FORWARD' => { 'val' => $user->{'FORWARD'}, 'type' => 't',
+			   'col' => 'FORWARD' },
+ 	    'CUSTOM' => { 'val' => $user->{'CUSTOM'}, 'type' => 't',
+ 			  'col' => 'CUSTOM' }
+ 	}
+    }
+
+    sub VerifyUser {
+	my $self = shift; my $user = shift;
+	if ($user->{'USER'}->{'val'} !~ /^[a-z0-9_]+$/) {
+	    die "Invalid user name: " . $user->{'USER'}->{'val'}
+	        . " (user names must have lowercased or numeric characters only)";
+	}
+	if (length($user->{'USER'}->{'val'}) > 8) {
+	    die "Invalid user name: " . $user->{'USER'}->{'val'}
+	        . " (user names must have 8 characters or less)";
+	}
+	if (!$user->{'HOMEDIR'}->{'val'}) {
+	    $user->{'HOMEDIR'}->{'val'} = "/home/" . $user->{'USER'}->{'val'};
+	}
+	if ($user->{'UID'}->{'val'} =~ /^\d+$/) {
+	    if ($user->{'UID'}->{'val'} < $FIRST_UID) {
+		die "Invalid UID: UID's must be $FIRST_UID or less";
+	    }
+	} else {
+	    if ($user->{'UID'}->{'val'}) {
+		die "Invalid UID: UID's must be positive integers";
+	    } else {
+		my $dbh = $self->{'dbh'};
+		my $max = $FIRST_UID-1;
+		my $sth = $dbh->prepare("SELECT MAX(UID) FROM USERS");
+		$sth->execute();
+		my $ref = $sth->fetchrow_arrayref();
+		if ($ref  &&  $ref->[0]  &&  $ref->[0] > $max) {
+		    $max = $ref->[0];
+		}
+		$user->{'UID'}->{'val'} = $max+1;
+	    }
+	}
+    }
+
+    my $cgi = $self->{'cgi'};
+    my $user;
+    my $modified;
+    $self->_ep_database({'dsn' => 'DBI:mysql:user',
+			 'user' => 'nobody',
+#			 'password' => 'my_name_is_nobody'});
+                         'password' => ''});
+    my $dbh = $self->{'dbh'};
+    my $query;
+    if ($user = $cgi->param('delete')) {
+	if ($cgi->param('doit')) {
+	    $query = "DELETE FROM USERS WHERE USER = " . $dbh->quote($user);
+	    $self->_ep_query({'statement' => $query});
+	    $modified = 1;
+	} else {
+	    $self->{'user'} = FindUser($self, $user);
+	    $self->{'_ep_output'} .=
+		$self->_ep_include({'file' => '/admin/rmuser.ep'});
+	    $self->_ep_exit({});
+	}
+    } elsif ($user = $cgi->param('edit')) {
+	if ($cgi->param('doit')) {
+	    $user = $cgi->param('user_t_USER');
+	    $self->_ep_input({'prefix' => 'user', 'dest' => 'user',
+			      'sqlquery' => 1});
+	    VerifyUser($self, $self->{'user'});
+	    $query = sprintf("UPDATE USERS SET %s WHERE USER = %s",
+			     $self->{'user'}->{'update'},
+			     $dbh->quote($user));
+	    $self->_ep_query({'statement' => $query});
+	    $modified = 1;
+	    delete $self->{'user'};
+	} else {
+	    $self->{'user'} = FindUser($self, $user);
+	}
+    } elsif ($cgi->param('insert')) {
+	$self->_ep_input({'prefix' => 'user', 'dest' => 'user',
+			  'sqlquery' => 1});
+	my $user = $self->{'user'};
+	VerifyUser($self, $self->{'user'});
+	$query = sprintf("INSERT INTO USERS (UID, HOMEDIR, REALNAME, USER,"
+			 . " SHELL, PASSWORD, ALIASES, FORWARD, CUSTOM) VALUES"
+			 . " (%d, %s, %s, %s, %s, %s, %s, %s, %s)",
+			 $user->{'UID'}->{'val'},
+			 $dbh->quote($user->{'HOMEDIR'}->{'val'}),
+			 $dbh->quote($user->{'REALNAME'}->{'val'}),
+			 $dbh->quote($user->{'USER'}->{'val'}),
+			 $dbh->quote($user->{'SHELL'}->{'val'}),
+			 $dbh->quote($user->{'PASSWORD'}->{'val'}),
+			 $dbh->quote($user->{'ALIASES'}->{'val'}),
+			 $dbh->quote($user->{'FORWARD'}->{'val'}),
+			 $dbh->quote($user->{'CUSTOM'}->{'val'}));
+	$self->_ep_query({'statement' => $query});
+	delete $self->{'user'};
+	$modified = 1;
+    }
+    if ($modified) {
+	$self->{'output'} = `/usr/local/bin/usersModified 2>&1`;
+    }
+    my $query = "SELECT * FROM USERS ORDER BY USER";
+    $self->_ep_query({'statement' => $query, 'result' => 'users'});
+    $self->{'shells'} =	[
+	 { 'shell' => '/bin/deny', 'status' => 'Nur Mailaccount' },
+	 { 'shell' => '/bin/ftpok', 'status' => 'Mail und FTP' },
+	 { 'shell' => '/bin/bash', 'status' => 'Administrator' }
+	 ];
+
+    package HTML::EP;
+    sub _format_SHELL_SELECTED {
+	my $self = shift;  my $val = shift;
+	(exists($self->{'user'})  and
+	 $self->{'user'}->{'SHELL'}->{'val'} eq $val) ?
+	     'SELECTED' : '';
+    }
+
+    '';
+</ep-perl>
+<html><head><title>
+<ep-language de="Benutzerverwaltung" en="User administration"></title></head>
+<body>
+<h1><ep-language de="Benutzerverwaltung" en="User administration"></h1>
+<ep-if eval="defined($_->{'output'})">
+<H2><ep-language de="Kommandoausgabe" en="Command output"></H2>
+<ep-language language=de>
+<p>Ihr letztes Kommando erzeugte die folgende Ausgabe:</p>
+</ep-language>
+<ep-language language=en>
+<p>This is the output of your last command:</p>
+</ep-language>
+<pre>
+$output$
+</pre>
+</ep-if>
+<ep-if eval="$@user$">
+<h2><ep-language de="Modifikation eines Benutzers" en="User modification"></h2>
+<ep-else>
+<h2><ep-language de="Anlegen eines Benutzers" en="User creation"></h2>
+</ep-if>
+<form action="user.ep" method=GET>
+<input type=hidden name="language" value="$_ep_language$">
+<input type=hidden name="user_n_UID" value="$user->UID->val$">
+<input type=hidden name="user_t_HOMEDIR" value="$user->HOMEDIR->val$">
+<table>
+<tr><th>Name:</th>
+    <td><input name="user_t_REALNAME" value="$user->REALNAME->val$"></td>
+<tr><th><ep-language de="Benutzername" en="Login">:</th>
+    <td><input name="user_t_USER" value="$user->USER->val$"></td>
+<tr><th><ep-language de="Benutzerstatus" en="User status">:</th>
+    <td><ep-select name="user_t_SHELL" items="shells" item="s">
+	  <option value="$s->shell$" $&SHELL_SELECTED->s->shell$>$s->status$
+        </ep-select></td>
+<tr><th>UID:</th>
+    <td><ep-if eval="$user->UID->val$">$user->UID->val$
+        <ep-else>&nbsp;</ep-if></td>
+<tr><th><ep-language de="Homedirectory" en="Home directory">:</th>
+    <td><ep-if eval="$user->HOMEDIR->val$">$user->HOMEDIR->val$
+        <ep-else>&nbsp;</ep-if></td>
+<tr><th><ep-language de="Paßwort" en="Password">:</th>
+    <td><input name="user_t_PASSWORD" value="$user->PASSWORD->val$"></td>
+<tr><th>Aliases:</th>
+    <td><textarea name="user_t_ALIASES">$user->ALIASES->val$</textarea></td>
+<tr><th><ep-language de="Mail permanent weiterleiten an"
+                     en="Permanent email forward">:</th>
+    <td><input name="user_t_FORWARD" value="$user->FORWARD->val$"></td>
+<tr><th><ep-language de="Mail evtl. weiterleiten an"
+                     en="Eventual email forward">:</th>
+    <td><input name="user_t_CUSTOM" value="$user->CUSTOM->val$"></td>
+</table>
+<ep-if eval="$@user$">
+<ep-language language="de">
+<input type=submit value="Benutzer ändern" name="edit">
+</ep-language>
+<ep-language language="en">
+<input type=submit value="Modify user" name="edit">
+</ep-language>
+<input type=hidden name="doit" value=1>
+<ep-else>
+<ep-language language="de">
+<input type=submit value="Benutzer erzeugen" name="insert">
+</ep-language>
+<ep-language language="en">
+<input type=submit value="Create user" name="insert">
+</ep-language>
+</ep-if>
+</form>
+<h2><ep-language de="Vorhandene Benutzer" en="Existing users"></h2>
+<table border=1>
+  <tr><th>Name</th>
+      <th><ep-language de="Benutzername" en="Login"></th><th>&nbsp;</th>
+  <ep-list items="users" item="u">
+    <tr><td><a href="user.ep?language=$_ep_language$&edit=$u->USER$">
+	      $u->REALNAME$</a></td>
+        <td>$u->USER$</td>
+        <td><a href="user.ep?language=$_ep_language$&delete=$u->USER$">
+	    <ep-language de="Löschen" en="Delete"></a></td>
+  </ep-list>
+</table>
+<br><br><br>
+<div align=center>
+  <a href="index.ep?language=$_ep_language$">
+    <ep-language de="Menü" en="Menu"></a>
+  <a href="group.ep?language=$_ep_language$">
+    <ep-language de="Gruppenverwaltung" en="Group administration"></a>
+</div>
+</body>
+</html>

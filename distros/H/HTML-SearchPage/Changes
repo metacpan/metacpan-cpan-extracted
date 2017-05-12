@@ -1,0 +1,35 @@
+Revision history for HTML-SearchPage
+
+0.05    2008-01-21
+        - Change email address
+        
+0.04    2007-09-28
+        - Add CGI::Session to requirements
+
+0.03    2007-07-03
+        - Handle undef values in text dumps
+        - Add CGI::Session to requirements (?)
+		- Update abstracts
+
+0.02    2007-06-14
+        - Persistent database selection
+        - Check for empty param_list *after* auto_all and auto_null
+          are applied
+        
+0.01    2007-05-07
+        - Change name to HTML::SearchPage
+        - Release to CPAN.
+        - Format code
+        - New package/documentation
+        - Start versioning
+
+Previous releases:
+        - as WebForm::SearchPage
+
+        2007-02-08
+        2006-09-22
+        2006-05-05
+        2006-04-03
+        2006-03-07
+        2006-02-09
+        2006-02-06

@@ -1,0 +1,56 @@
+Revision history for HPC-Runner
+
+2.48  2016-08-31 14:39:15 GST
+    - Including jobref in here for HPC::Runner::MCE
+
+2.47  2016-04-27 10:18:42 GST
+    - Added missing dep
+
+2.46  2016-03-29 10:00:53 GST
+    - Made a change for logging. One function for logging the main app and
+      another for logging individual commands
+
+2.45  2016-01-06 14:18:46 GST
+    - Cleaned up some methods and did a bit of moving things around
+
+2.44  2015-12-16 13:56:17 GST
+    - Cleaned up log file names and dirs
+
+2.43  2015-12-14 12:34:13 GST
+    - Refactored code and added process_table
+
+2.42  2015-12-01 11:10:15 GST
+    Adding Carp Always to cpanfile
+
+2.41  2015-12-01 10:50:46 GST
+    - Fixed double init_log
+
+2.40  2015-11-11 16:37:33 GST
+    - Lazy build in cmd was not playing nice iwth my other libraries
+
+2.39  2015-11-11 16:08:05 GST
+    - Lazy build in cmd was not playing nice iwth my other libraries
+
+2.38  2015-11-08 14:06:06 GST
+    - Moved some attributes out of Slurm.pm for consistency
+
+2.37  2015-10-26 15:18:04 GST
+    - Added in a show_processid parameter for aggregated logging
+
+2.36  2015-06-18 08:36:41 AST
+
+    - Updated copyright
+    - Added in some in code documentation
+
+2.35  2015-06-01 09:03:39 AST
+
+    - Completed dependencies
+
+2.34  2015-05-31 14:46:51 AST
+    - Few changes to documentation
+
+2.33  2015-02-18 13:59:47 AST
+    - Adding things to build file
+
+2.32  2015-02-18 13:16:07 AST
+        - Initial release

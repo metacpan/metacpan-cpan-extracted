@@ -1,0 +1,4 @@
+This directory contains files needed for the tutorial.
+The tutorial should get installed as part of the package installation:
+you should find it in the perl documentation system under 
+Hardware::Vhdl::Automake::Tutorial.

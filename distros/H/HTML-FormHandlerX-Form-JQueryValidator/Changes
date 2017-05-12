@@ -1,0 +1,18 @@
+Revision history for Perl extension HTML::FormHandlerX::Form::JQueryValidator.
+
+0.05  Thu Nov 15
+	Add missing files to MANIFEST
+
+0.04  Wed Nov 14
+	Replace unescape with decodeURIComponent
+        Added unit tests
+	Replace hardcoded required message with proper localised version from Form object
+
+0.03  Thu Sep 13
+	Fix to undeclared dependancy on URI (thanks cpan-testers!)
+
+0.02  Tue Sept 11
+        fix to bug [rt.cpan.org #79323] Undeclared dependency on JSON
+
+0.01  Fri Aug 17 20:35:33 2012
+	Initial Prototype

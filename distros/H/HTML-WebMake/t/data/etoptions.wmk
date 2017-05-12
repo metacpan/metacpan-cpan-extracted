@@ -1,0 +1,15 @@
+
+<option name=EtTextOneCharMarkup value=1 />
+<option name=EtTextBaseHref value="/foo/bar" />
+
+<content name=foo format="text/et">
+This *is* a test.
+
+_seriously!_
+
+And <a href=baz/blargh.html>a link</a>.
+
+</content>
+
+<out file=log/etoptions.html>${foo}</out>
+

@@ -1,0 +1,23 @@
+Revision history for Perl extension HeliosX::Job::JSON.
+
+1.00  Fri Oct 10 14:19:06 2014
+	- Documentation updates only.
+0.02_3670  Sun Sep  7 18:25:16 2014
+	- HeliosX::Job::JSON->new() constructor now allows config, 
+	  jobtype, and argstring to be passed into new() instead of 
+	  calling set* methods later.
+	- HeliosX::Job::JSON->submit() will now use Helios::Config to get 
+	  the global Helios config if it was not specified before it was 
+	  called.
+	- helios_job_submit_json renamed to heliosx_job_json_submit to 
+	  prevent confusion.
+	- Re-wrote Makefile.PL to be more flexible.	
+	- Added more tests.
+0.01_3460  Sat Aug 23 15:29:00 2014
+	- Added functional helios_job_submit_json.
+	- Added HeliosX::Job::JSON::TestService to test JSON parsing and
+	  as an example service.
+0.01  Fri Aug 22 11:34:18 2014
+	- original version; created by h2xs 1.23 with options
+		-XA -b 5.10.0 HeliosX::Job::JSON
+

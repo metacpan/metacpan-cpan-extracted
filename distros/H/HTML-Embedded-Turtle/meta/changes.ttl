@@ -1,0 +1,77 @@
+@prefix :        <http://usefulinc.com/ns/doap#> .
+@prefix dcs:     <http://ontologi.es/doap-changeset#> .
+@prefix dc:      <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix my:      <http://purl.org/NET/cpan-uri/dist/HTML-Embedded-Turtle/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix toby:    <http://tobyinkster.co.uk/#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+my:project :release my:v_0-01 .
+my:v_0-01
+	a               :Version ;
+	dc:issued       "2010-05-05"^^xsd:date ;
+	:revision       "0.01"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Embedded-Turtle-0.01.tar.gz> ;
+	rdfs:label      "First release"@en .
+
+my:project :release my:v_0-090 .
+my:v_0-090
+	a               :Version ;
+	dc:issued       "2010-12-09"^^xsd:date ;
+	:revision       "0.090"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Embedded-Turtle-0.090.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-01 ;
+		dcs:item   [ rdfs:label "use RDF::TriN3"@en ]
+		] .
+
+my:project :release my:v_0-271 .
+my:v_0-271
+	a               :Version ;
+	dc:issued       "2011-11-03"^^xsd:date ;
+	:revision       "0.271"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Embedded-Turtle-0.271.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-090 ;
+		dcs:item   [ rdfs:label "drop dependency on RDF::TrineShortcuts"@en ] ;
+		dcs:item   [ rdfs:label "improved test cases"@en ; rdfs:comment "introduces a dependency on Test::RDF"@en ; a dcs:Packaging ] ;
+		dcs:item   [ rdfs:label "various cleanups"@en ] ;
+		dcs:item   [ rdfs:label "Module::Package::RDF"@en ; a dcs:Packaging ] ;
+		dcs:item   [ rdfs:label "use 5.010"@en ; a dcs:Update ]
+		] .
+
+my:project :release my:v_0-314 .
+my:v_0-314
+	a               :Version ;
+	dc:issued       "2011-12-07"^^xsd:date ;
+	:revision       "0.314"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Embedded-Turtle-0.314.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-271 ;
+		dcs:item   [ rdfs:label "use Object::AUTHORITY"@en ; a dcs:Update ]
+		] .
+
+my:project :release my:v_0-333 .
+my:v_0-333
+	a               :Version ;
+	dc:issued       "2011-12-08"^^xsd:date ;
+	:revision       "0.333"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Embedded-Turtle-0.333.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-314 ;
+		dcs:item   [ rdfs:label "Note the dependency on namespace::clean."@en ; a dcs:Packaging ] ;
+		dcs:item   [ rdfs:label "Note the dependency on Object::AUTHORITY."@en ; a dcs:Packaging ]
+		] .
+
+my:project :release my:v_0-404 .
+my:v_0-404
+	a               :Version ;
+	dc:issued       "2013-08-01"^^xsd:date ;
+	:revision       "0.404"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Embedded-Turtle-0.404.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-333 ;
+		dcs:item   [ rdfs:label "General tidy-up."@en ; a dcs:Change ] ;
+		dcs:item   [ rdfs:label "Stop using given/when (it warns in Perl 5.18)."@en ; a dcs:Update ]
+	] .

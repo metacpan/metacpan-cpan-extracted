@@ -1,0 +1,26 @@
+<wmmeta name="Title" value="The &lt;include&gt; Tag" />
+<wmmeta name="Section" value="02-tags_attrs" />
+<wmmeta name="Score" value="20" />
+<wmmeta name="Abstract">
+include another file into the current WebMake file
+</wmmeta>
+
+Arbitrary files can be included into the current WebMake file
+using this tag. It has one attribute, __file__, which
+names the file to include.
+
+A set of libraries are available to include, distributed with
+WebMake. See the __Included Library Code__ section of the "index
+page" [$(index)] for their documentation.  However, these
+should be loaded using the "&lt;use&gt; tag" [use] instead of this
+one.
+	
+	[use]: $(use)
+
+Example
+=======
+
+<safe>
+  <include file="inc/footer.wmk" />
+</safe>
+

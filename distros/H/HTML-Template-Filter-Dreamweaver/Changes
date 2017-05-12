@@ -1,0 +1,9 @@
+Revision history for Perl extension HTML::Template::Filter::Dreamweaver.
+
+1.01  Tue Dec  9 10:04:17 2003
+	- Added better documentation
+
+1.00  Mon Apr 28 10:20:49 2003
+	- original version; created by h2xs 1.21 with options
+		-X HTML::Template::Filter::Dreamweaver
+

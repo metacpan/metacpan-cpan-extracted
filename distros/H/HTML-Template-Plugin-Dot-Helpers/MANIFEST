@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/HTML/Template/Plugin/Dot/Helpers.pm
+lib/HTML/Template/Plugin/Dot/Helpers/Number.pm
+t/00-load.t
+t/number.t
+t/pod-coverage.t
+t/pod.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

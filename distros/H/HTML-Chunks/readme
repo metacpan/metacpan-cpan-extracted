@@ -1,0 +1,50 @@
+HTML-Chunks
+-----------
+
+A simple template system for HTML, XML and XHTML which completely separates code
+from design. Designers can create a well-formed mockup for presentation purposes
+which can immediately be used by developers to create a working system. Or
+developers can create an interface which designers turn into something pretty.
+This removes the "chicken and egg" problem which plagues traditional template
+systems while making it easier to produce proper code that is easily maintained.
+
+HTML::Chunks - The core class
+
+HTML::Chunks::Local - A subclass which handles localization issues, based on the
+   browser language preference codes (e.g. en, fr) to choose the best chunk
+   to display data. Allows language fallback chaining as well, so display
+   oriented chunks need not be copied tediously for each language.
+
+HTML::Chunks::Super - A subclass with superpowers such as conditionals
+
+
+PREREQUISITES
+
+Perl 5.005 or higher.
+
+HTML::Chunks::Super requires the IO::Scalar and Safe modules.
+
+
+INSTALLATION
+
+Normal stuff:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+CREDITS
+
+Created and maintained by Mark W Blythe and Dave Balmer Jr. Send comments and
+questions to dbalmer@cpan.org or mblythe@cpan.org, or visit www.tanilai.com
+for more documentation, examples, etc.
+
+
+COPYRIGHT
+
+(C) 2001-2005 Mark W Blythe and Dave Balmer, Jr. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

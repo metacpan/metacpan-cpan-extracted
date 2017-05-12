@@ -1,0 +1,56 @@
+<wmmeta name="Title" value="The &lt;{set}&gt; Directive" />
+<wmmeta name="Section" value="03-proc_logic" />
+<wmmeta name="Score" value="20" />
+<wmmeta name="Abstract">
+set a content chunk while inside another content chunk's scope
+</wmmeta>
+
+Small pieces of content can be set from within other content chunks or
+&lt;out&gt; sections using the &lt;set&gt; directive. The format is
+
+	&lt;{set __name__=''__value__''}&gt;
+
+This can be useful to set small chunks of text, by including a <a
+href=$(set)>&lt;{set}&gt;</a> directive in the content item that uses them.
+
+For example, a common use of &lt;{set}&gt; is to define, ahead of
+time, what text should be inserted into a template:
+
+	&lt;{set template_body="&wmdollar;{foo.txt}"}&gt;
+	&wmdollar;{bar_template}
+
+Note: Order of Content Reference Processing
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The processing of content references starts at each <a
+href=$(out)>&lt;out&gt;</a> URL in turn, and descends from the chunk of text
+defined for that file, replacing each <a
+href=$(content_refs)>&wmdollar;{content_ref}</a> and <a
+href=$(url_refs)>&wmdollar;(url_ref)</a> one-by-one, in a depth-first manner.
+
+Finally, the tree-traversal starts again from the chunk of &lt;out&gt; text,
+searching for <a href=$(deferred_content_refs)>&wmdollar;[deferred_content
+refs]</a>.
+
+Therefore if you wish to &lt;{set}&gt; a variable, let's say **x**, in a chunk
+of content that will not be loaded before **x** is accessed, you should use
+a <a href="$(deferred_content_refs)">&wmdollar;[deferred content ref]</a> to
+access it.
+
+How &lt;{set}&gt; Relates To Meta-data
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The &lt;{set}&gt; directive was implemented before metadata was, and initially
+provided a way to do similar things, such as substitute page titles, etc.
+
+Now, however, it's probably better to use "&lt;wmmeta&gt; tags" [wmmeta] to
+handle data that is associated with a content-item.  Using &lt;wmmeta&gt; tags
+means your pages will be able to take advantage of new features, like index
+and site-map generation.
+
+The &lt;{set}&gt; directive is retained as a way of quickly setting content
+items from within other content, in case this feature proves useful for other
+purposes.
+
+	[wmmeta]: $(wmmeta)
+

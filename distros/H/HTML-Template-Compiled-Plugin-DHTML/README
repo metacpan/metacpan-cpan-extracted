@@ -1,0 +1,22 @@
+NAME
+    HTML::Template::Compiled::Plugin::DHTML - Dumps variables into clickable
+    HTML output
+
+VERSION
+    $VERSION = "0.03"
+
+SYNOPSIS
+        use HTML::Template::Compiled::Plugin::DHTML;
+
+        my $htc = HTML::Template::Compiled->new(
+            plugin => [qw(HTML::Template::Compiled::Plugin::DHTML)],
+            ...
+        );
+
+METHODS
+    register
+        gets called by HTC
+
+    dumper
+        Dumps variables into clickable HTML. See "dhtml.html" in examples.
+

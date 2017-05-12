@@ -1,0 +1,14 @@
+MANIFEST
+Makefile.PL
+Changes
+README
+lib/HTML/SiteTear.pm
+lib/HTML/SiteTear/Item.pm
+lib/HTML/SiteTear/PageFilter.pm
+lib/HTML/SiteTear/Root.pm
+lib/HTML/SiteTear/Page.pm
+lib/HTML/SiteTear/CSS.pm
+bin/sitetear
+t/00-load.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

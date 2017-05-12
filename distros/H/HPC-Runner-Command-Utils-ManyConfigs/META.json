@@ -1,0 +1,87 @@
+{
+   "abstract" : "Load many layered configs",
+   "author" : [
+      "Jillian Rowe <jillian.e.rowe@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.16, Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "HPC-Runner-Command-Utils-ManyConfigs",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.16",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Any" : "0",
+            "Cwd" : "0",
+            "File::HomeDir" : "0",
+            "MooseX::App::Role" : "0",
+            "MooseX::Types::Path::Tiny" : "0",
+            "Path::Tiny" : "0",
+            "Try::Tiny" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.010",
+            "utf8" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "Moose" : "0",
+            "MooseX::App" : "0",
+            "MooseX::App::Command" : "0",
+            "Test::Class::Moose" : "0",
+            "Test::Class::Moose::Load" : "0",
+            "Test::Class::Moose::Runner" : "0",
+            "Test::More" : "0",
+            "YAML::XS" : "0",
+            "strict" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/biosails/HPC-Runner-Utils-ManyConfigs/issues"
+      },
+      "homepage" : "https://github.com/biosails/HPC-Runner-Utils-ManyConfigs",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/biosails/HPC-Runner-Utils-ManyConfigs.git",
+         "web" : "https://github.com/biosails/HPC-Runner-Utils-ManyConfigs"
+      }
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

@@ -1,0 +1,29 @@
+0.08 : Thu 28 Aug 2013
+    - Removed Accessor support as it wasn't good, and quite pointless
+    - Renamed back to Hash::KeyMorpher
+
+0.07 : Mon 08 July 2013
+    - Added sub to_under and key_morph method 'under'
+    - to_delim is now left optional for custom delimeted strings
+
+0.06 : Mon 08 July 2013
+    - New git release
+
+0.05 : Mon 08 July 2013
+    - Added support for Accessors
+    - Renamed to Object::KeyMorpher
+
+0.04 : Wed 03 July 2013
+    - Added POD data
+
+0.03 : Wed 03 July 2013
+    - Added Makefile.pl, REAME, INSTALL, Changes
+
+0.02 : Tue 02 July 2013
+    - Added to_upper, to_lower
+    - Added key_morph
+    - Added tests in t/
+
+0.01 : Mon 27 June 2013
+    - First build, only string functions
+    - Functions _split_words, to_camel, to_mixed, to_delim

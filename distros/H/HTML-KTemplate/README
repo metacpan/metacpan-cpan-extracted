@@ -1,0 +1,52 @@
+
++------------------------------------------------------------------+
+|  HTML::KTemplate v1.33 - Perl module to process HTML templates.  |
++------------------------------------------------------------------+
+
+
+DESCRIPTION
+-----------
+
+A fast and simple Perl module to process HTML templates with a customizable
+template syntax, support for multidimensional data structures and many
+advanced options.
+
+
+DOCUMENTATION
+-------------
+
+Documentation for HTML::KTemplate can be found on CPAN:
+
+http://search.cpan.org/dist/HTML-KTemplate/KTemplate.pm
+
+
+INSTALLATION
+------------
+
+To install, unzip and untar the archive, then type in the directory created:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT
+---------
+
+Copyright (c) 2002-2003 Kasper Dziurdz. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+Artistic License for more details.
+
+
+AUTHOR
+------
+
+Kasper Dziurdz <kasper@repsak.de>
+

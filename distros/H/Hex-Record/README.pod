@@ -1,0 +1,90 @@
+=head1 NAME
+
+Hex::Record - manipulate intel and srec hex records
+
+=head1 SYNOPSIS
+
+  use Hex::Record;
+
+  my $hex_record = Hex::Record->new;
+
+  $hex_record->import_intel_hex($intel_hex_str);
+  $hex_record->import_srec_hex($srec_hex_str);
+
+  $hex_record->write(0x100, [qw(AA BB CC)]);
+
+  # get 10 bytes (hex format) starting at address 0x100
+  # every single byte that is not found is returned as undef
+  my $bytes_ref = $hex_record->get(0x100, 10);
+
+  # remove 10 bytes starting at address 0x100
+  $hex_record->remove(0x100, 10);
+
+  # dump as intel hex (will use extended linear addresses for offset)
+  # maximum of 10 bytes in data field
+  my $intel_hex_string = $hex_record->as_intel_hex(10);
+
+  # dump as srec hex (always tries to use smallest address, 16 bit, 24 bit, 32 bit)
+  # maximum of 10 bytes in data field
+  my $srec_hex_string = $hex_record->as_screc_hex(10);
+
+=head1 DESCRIPTION
+
+Manipulate intel/srec hex files.
+
+=head1 Methods
+
+=head2 import_intel_hex($intel_hex_str)
+
+Imports hex bytes from a string containing intel hex formatted data.
+Ignores unknown lines, does not check if the checksum at the end is correct.
+
+  $hex_record->import_intel_hex($intel_hex_str);
+
+=head2 import_srec_hex($srec_hex_str)
+
+Imports hex bytes from a string containing srec hex formatted data.
+Ignores unknown lines, does not check if the checksum at the end is correct.
+
+  $hex_record->import_srec_hex($srec_hex_str);
+
+=head2 get($from, $count)
+
+Returns $count hex bytes in array reference starting at address $from.
+If hex byte is not found, undef instead. For example:
+
+  my $bytes_ref = $hex_record->get(0x0, 6); # ['AA', '00', undef, undef, 'BC', undef]
+
+=head2 remove($from, $count)
+
+Removes $count bytes starting at address $from.
+
+  $hex_record->remove(0x123, 10);
+
+=head2 write($from, $bytes_ref)
+
+(Over)writes bytes starting at address $from with bytes in $bytes_ref.
+
+  $hex_record->write(0x10, [qw(AA BB CC DD EE FF 11)]);
+
+=head2 as_intel_hex($bytes_hex_a_line)
+
+Returns a string containing hex bytes formatted as intel hex.
+Maximum of $bytes_hex_a_line in data field.
+Extended linear addresses as offset are used if needed.
+Extended segment addresses are not supported. (yet? let me know!)
+
+=head2 as_srec_hex($bytes_hex_a_line)
+
+Returns a string containing hex bytes formatted as srec hex.
+Maximum of $bytes_hex_a_line in data field.
+Tries to use the smallest address field. (16 bit, 24 bit, 32 bit)
+
+=head1 LICENSE
+
+This is released under the Artistic License.
+
+=head1 AUTHOR
+
+spebern <bernhard@specht.net>
+

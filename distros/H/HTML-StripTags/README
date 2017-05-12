@@ -1,0 +1,109 @@
+NAME
+    HTML::StripTags - Strip HTML or XML tags from a string with Perl like
+    PHP's strip_tags() does
+
+SYNOPSIS
+     use HTML::StripTags qw(strip_tags);
+
+     $string       = '<html>Hallo <u>beautiful</u> <a href="http://worldonline.com">world</a>!</html>';
+     $allowed_tags = '<u><b>';
+
+     print strip_tags( $string, $allowed_tags );
+
+DESCRIPTION
+    HTML::StripTags provides the function strip_tags() that can strip all
+    HTML or XML tags from a string except the given allowed tags. This is a
+    Perl port of the PHP function strip_tags() based on PHP 5.3.3.
+
+SECURITY NOTE
+    Please note: As per <http://htmlpurifier.org/comparison#striptags> PHP's
+    strip_tags() is a very basic and unsafe method, so it's strongly
+    recommended not to use it for cleaning up user input! As HTML::StripTags
+    uses the same state machine, the same applies to this module.
+
+METHODS
+  strip_tags()
+    A simple little state-machine to strip out html and php tags
+
+    State 0 is the output state, state 1 means we are inside a normal html
+    tag, state 2 means we are inside a php tag, state 3 means we are inside
+    a "<!--", case 4 means we are inside the following JavaScript/CSS/etc.
+    tag.
+
+    When an allow string is passed in we keep track of the string in state 1
+    and when the tag is closed check it against the allow string to see if
+    we should allow it.
+
+     print strip_tags( $string, "<u><b><?php<?" );
+
+     print strip_tags( $string, ('<u>', '<b>', '<?php', '<?') );
+
+TODO
+    Pass in state variable to allow a function like fgetss() to maintain
+    state across calls to the function.
+    Implement fgetss().
+
+BUGS
+    Please report any bugs or feature requests to "<hinnerk at cpan.org>",
+    or through the GitHub web interface at
+    <http://github.com/hinnerk-a/perl-strip_tags/issues>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc HTML::StripTags
+
+    You can also look for information at:
+
+    *   HTML::StripTags Homepage
+
+        <http://www.hinnerk-altenburg.de/perl-strip_tags/>
+
+    *   Code Repository on GitHub
+
+        <http://github.com/hinnerk-a/perl-strip_tags>
+
+    *   GitHub Issue Tracker
+
+        <http://github.com/hinnerk-a/perl-strip_tags/issues>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/HTML-StripTags>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/HTML-StripTags>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/HTML-StripTags>
+
+AUTHOR
+    Hinnerk Altenburg, "<hinnerk at cpan.org>"
+    <http://www.hinnerk-altenburg.de/>
+
+COPYRIGHT & LICENSE
+    Copyright (C) 2011 by Hinnerk Altenburg "<hinnerk at cpan.org>"
+    <http://www.hinnerk-altenburg.de/>.
+
+    This file is part of HTML::StripTags.
+
+    HTML::StripTags is free software; you can redistribute it and/or modify
+    it under the same terms as the Perl 5 programming language system
+    itself.
+
+    Terms of the Perl programming language system itself
+
+    a) the GNU General Public License "perlgpl" as published by the Free
+    Software Foundation; either version 1, or (at your option) any later
+    version, or
+
+    b) the "Artistic License" "perlartistic"" which comes with this Kit.
+
+SEE ALSO
+    HTML::Strip, "How do I remove HTML from a string?" in perlfaq9,
+    HTML::Parser
+

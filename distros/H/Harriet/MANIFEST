@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+eg/memcached.pl
+eg/mysqld.pl
+eg/stf.pl
+lib/App/Prove/Plugin/Harriet.pm
+lib/Harriet.pm
+script/harriet
+t/00_compile.t
+META.yml
+MANIFEST

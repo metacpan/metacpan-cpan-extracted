@@ -1,0 +1,50 @@
+ANNOUNCEMENT: HTML::Template::JIT 0.03
+
+CHANGES
+
+- Added support for HTML::Template 2.6's new DEFAULT attribute.
+
+- Added support for HTML::Template 2.6's new __counter__ variable.
+
+- Updated mailing-list information to reflect move from vm.com
+  to sourceforge.net
+
+- Fixed bug where tmpl_var's with the escape attribute would
+  cause a crash if not set with a value.
+
+
+DESCRIPTION
+
+This module provides a just-in-time compiler for HTML::Template.
+Templates are compiled into native machine code using Inline::C.  The
+compiled code is then stored to disk and reused on subsequent calls.
+
+HTML::Template::JIT is up to 8 times as fast as HTML::Template using
+caching.
+
+
+NOTE
+
+This module is not feature-complete.  Be sure to read the CAVEATS
+section in the documentation before using!
+
+
+AVAILABILITY
+
+This module is available on SourceForge.  Download it at:
+
+  http://prdownloads.sf.net/html-template/HTML-Template-JIT-0.03.tar.gz?download
+
+The module is also available on CPAN.  You can get it using CPAN.pm or
+go to:
+
+  http://www.cpan.org/authors/id/S/SA/SAMTREGAR/
+
+
+CONTACT INFO
+
+This module was written by Sam Tregar (sam@tregar.com). You can
+join the HTML::Template mailing-list by visiting:
+
+  http://lists.sourceforge.net/lists/listinfo/html-template-users
+

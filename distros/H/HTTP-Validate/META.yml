@@ -1,0 +1,27 @@
+---
+abstract: 'validate and clean HTTP parameter values according to a set of rules'
+author:
+  - 'Michael McClennen <mmcclenn@geology.wisc.edu>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.4'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTTP-Validate
+provides:
+  HTTP::Validate:
+    file: lib/HTTP/Validate.pm
+    version: '0.981'
+  HTTP::Validate::Result:
+    file: lib/HTTP/Validate.pm
+requires:
+  perl: v5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.981'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

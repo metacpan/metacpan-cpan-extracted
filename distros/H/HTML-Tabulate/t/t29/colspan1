@@ -1,0 +1,11 @@
+<table>
+<tr><th>ID</th><th>Givenname</th><th>Surname</th><th>Title</th></tr>
+<tr><td class="group" colspan="4">Group1</td></tr>
+<tr><td class="person">123</td><td>Fred</td><td>Flintstone</td><td>CEO</td></tr>
+<tr><td class="person">456</td><td>Barney</td><td>Rubble</td><td>Lackey</td></tr>
+<tr><td class="person">999</td><td>Dino</td><td></td><td>Pet</td></tr>
+<tr><td class="group" colspan="4">Group2</td></tr>
+<tr><td class="person">888</td><td>Bam Bam</td><td></td><td>Child</td></tr>
+<tr><td class="person">789</td><td>Wilma</td><td>Flintstone</td><td>CFO</td></tr>
+<tr><td class="person">777</td><td>Betty</td><td>Rubble</td><td></td></tr>
+</table>

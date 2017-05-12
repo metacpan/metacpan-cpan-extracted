@@ -1,0 +1,13 @@
+~$          # ignore emacs and vim backup files
+.bak$       # ignore manual backups
+\#          # ignore emacs temp files
+.git        # ignore git stuff
+.travis.yml # ignore TravisCI setup
+cover_db    # ignore coverage info
+.tar.gz$    # ignore dist packages
+Makefile$   # ignore Makefile built from Makefile.PL
+README.md   # want just CPAN one
+MYMETA.     # http://weblog.bulknews.net/post/44251476706/stop-shipping-mymeta-to-cpanValidator.md
+Log.md
+blib
+pm_to_blib

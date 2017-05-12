@@ -1,0 +1,156 @@
+<html>
+<head>
+  <title>Complete example</title>
+  <script type="text/javascript"><!--
+  function doSomething() { alert('hello!'); }
+  //--></script>
+  <style type="text/css">
+  body { font-size: 12pt; background:#ccc }
+  h1, h2, h3 { font-family: verdana, sans-serif }
+  </style>
+</head>
+<body>
+
+<h1>HTML::WikiConverter</h1>
+
+<p>HTML::WikiConverter is a Perl module for converting HTML to wiki
+markup for a variety of different wiki engines. Currently, it supports
+<b>many</b> dialects:</p>
+
+<ul>
+  <li>DokuWiki
+  <li>Kwiki
+  <li>MediaWiki
+  <li>MoinMoin
+  <li>Oddmuse
+  <li>PhpWiki
+  <li>PmWiki
+  <li>SnipSnap
+  <li>TikiWiki
+  <li>UseMod
+  <li>WakkaWiki
+  <li>(and others)
+</ul>
+
+<p>I'd <em>really</em> like to add support for TWiki, but the way it
+handles <em><strong>bold italics</strong></em> (and possibly other
+nested elements) is very disappointing.</p>
+
+<h2>Installation</h2>
+
+<p>It's very easy to use HTML::WikiConverter. Grab a copy from your
+favorite <a href="http://www.cpan.org">CPAN mirror</a> and then run
+something like this:</p>
+
+<pre>  #!/usr/bin/perl -w
+  use HTML::WikiConverter;
+  my $wc = new HTML::WikiConverter( dialect =&gt; 'MediaWiki' );
+  print $wc-&gt;html2wiki($html);</pre>
+
+<hr />
+
+<p>Alternatively, you might want to try HTML::WikiConverter's command
+line interface; it's a program called <code>html2wiki</code> and it's
+stored in <i>bin/html2wiki</i>.</p>
+
+<h2>Dialect features</h2>
+
+<p>Unfortunately, I haven't managed to implement every feature of
+each supported dialect. My initial goal was simply to create a
+converter for MediaWiki (I am a Wikipediholic, after all :-), but then
+PhpWiki's Reini Urban suggested that I be more ambitious and provide
+the dialect interface. And so far I've been really happy with the
+progress.</p>
+
+<h2>Bugs</h2>
+
+<p>Of course there are always bugs. Luckily, CPAN comes to the rescue
+again with its <a href="http://rt.cpan.org">bug tracking service</a>
+for module authors.</p>
+
+<p>But where would we be without bugs? My Pacman frog sure wouldn't
+be happy without 'em! Do you know what a <a
+href="http://en.wikipedia.org/wiki/Pacman_frog">Pacman frog</a> is?
+Or how about an Otago skink? Aplysia californica? Why, these are some
+of my favorite animals!</p>
+
+<table>
+  <caption>My favorite animals</caption>
+  <tr>
+    <th>Animal</th>
+    <th>Region</th>
+    <th>Physical traits</th>
+    <th>Food</th>
+  </tr>
+  <tr>
+    <td>Pacman frog</td>
+    <td>Gran Chaco (Argentina)</td>
+    <td>Half mouth, half stomach (quite literally!)</td>
+    <td>Crickets, fish, etc.</td>
+  </tr>
+  <tr>
+    <td>Otago skink</td>
+    <td>Otago (New Zealand)</td>
+    <td>Black, yellow, and green camouflage</td>
+    <td>Insects, fruits, small lizards</td>
+  </tr>
+  <tr>
+    <td>Aplysia california</td>
+    <td>California</td>
+    <td>Deep red-colored sea hare</td>
+    <td>Red and brown seaweed</td>
+  </tr>
+</table>
+
+<h2>Common features</h2>
+
+<h3>Images</h3>
+
+<p>Many dialects allow embedded images, either from local or remote
+stores.</p>
+
+<p><img src="http://www.google.com/images/logo.gif" alt="Google logo" /></p>
+
+<h3>Lists</h3>
+
+<p>Wikis also support lists, even extensively nested ones. Some rely
+on leading characters to determine nest levels, while others rely on
+spaces or (egad!) tabs.</p>
+
+<ul>
+  <li>1
+    <ul>
+      <li>1a</li>
+      <li>1b</li>
+    </ul>
+  </li>
+  <li>2
+    <ul>
+      <li>2a
+        <ol>
+          <li>fee</li>
+          <li>fie</li>
+          <li>foe
+            <ul>
+              <li>fum?
+            </ul>
+          </li>
+        </ol>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<p>Some wikis support definition lists, though they're often used
+inappropriately (as in MediaWiki, which uses them for
+indentation).</p>
+
+<dl>
+  <dt>Perl</dt>
+  <dd>Pathologically eclectic rubbish lister</dd>
+  <dt>POE</dt>
+  <dd>Perl on ecstasy</dd>
+</dl>
+
+</body>
+</html>

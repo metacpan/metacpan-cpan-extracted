@@ -1,0 +1,78 @@
+NAME
+    Hook::Output::File - Redirect STDOUT/STDERR to a file
+
+SYNOPSIS
+     use Hook::Output::File;
+
+     {
+         my $hook = Hook::Output::File->redirect(
+             stdout => '/tmp/1.out',
+             stderr => '/tmp/2.out',
+         );
+
+         saved();
+
+         undef $hook; # restore previous state of streams
+
+         not_saved();
+     }
+
+     sub saved {
+         print STDOUT "..."; # STDOUT output is appended to file
+         print STDERR "..."; # STDERR output is appended to file
+     }
+
+     sub not_saved {
+         print STDOUT "..."; # STDOUT output goes to STDOUT (not to file)
+         print STDERR "..."; # STDERR output goes to STDERR (not to file)
+     }
+
+DESCRIPTION
+    `Hook::Output::File' redirects `STDOUT/STDERR' to a file.
+
+METHODS
+  redirect
+     my $hook = Hook::Output::File->redirect(
+         stdout => $stdout_file,
+         # and/or
+         stderr => $stderr_file,
+     );
+
+    Installs a file-redirection hook for regular output streams (i.e.,
+    `STDOUT/STDERR') with lexical scope.
+
+    A word of caution: do not intermix the file paths for `STDOUT/STDERR'
+    output or you will eventually receive unexpected results. The paths may
+    be relative or absolute; if no valid path is provided, an usage help
+    will be printed (because otherwise, the `open()' call might silently
+    fail to satisfy expectations).
+
+    The hook may be uninstalled either explicitly or implicitly; doing it
+    the explicit way requires to unset the hook variable (more concisely, it
+    is a blessed object), whereas the implicit end of the hook will
+    automatically be triggered when leaving the scope the hook was defined
+    in.
+
+     {
+         my $hook = Hook::Output::File->redirect(
+             stdout => '/tmp/1.out',
+             stderr => '/tmp/2.out',
+         );
+
+         some_sub();
+
+         undef $hook; # explicitly remove hook
+
+         another_sub();
+     }
+     ... # hook implicitly removed
+
+AUTHOR
+    Steven Schubiger <schubiger@cpan.org>
+
+LICENSE
+    This program is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://dev.perl.org/licenses/
+

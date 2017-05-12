@@ -1,0 +1,8 @@
+---
+  model_config:
+    resultset: TwoNote
+  elements:
+    - name: two_note_id
+    - name: note
+    - name: id
+      type: Select

@@ -1,0 +1,19 @@
+---
+name: Hardware-Simulator-MIX
+version: 0.4
+author:
+  - 'Chaoji Li <lichaoji@ict.ac.cn>'
+abstract: MIX simulator, with timing added
+license: perl
+build_requires:
+  Test::More: 0
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  Hardware::Simulator::MIX:
+    file: lib/Hardware/Simulator/MIX.pm
+    version: 0.4
+resources:
+  license: http://dev.perl.org/licenses/

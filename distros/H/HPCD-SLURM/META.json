@@ -1,0 +1,75 @@
+{
+   "abstract" : "A SLURM-specific driver for HPCI",
+   "author" : [
+      "Anqi (Joyce) Yang  <ayang2@oicr.on.ca>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HPCD-SLURM",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "DateTime" : "0",
+            "HPCI" : "0.41",
+            "Module::Load::Conditional" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "MooseX::ClassAttribute" : "0",
+            "namespace::autoclean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Config" : "0",
+            "File::ShareDir" : "0",
+            "File::Temp" : "0",
+            "File::pushd" : "0",
+            "FindBin" : "0",
+            "MooseX::Types::Path::Class" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.10"
+         }
+      }
+   },
+   "provides" : {
+      "HPCD::SLURM" : {
+         "file" : "lib/HPCD/SLURM.pm",
+         "version" : "0.01"
+      },
+      "HPCD::SLURM::Group" : {
+         "file" : "lib/HPCD/SLURM/Group.pm"
+      },
+      "HPCD::SLURM::JobGroup" : {
+         "file" : "lib/HPCD/SLURM/JobGroup.pm"
+      },
+      "HPCD::SLURM::Run" : {
+         "file" : "lib/HPCD/SLURM/Run.pm"
+      },
+      "HPCD::SLURM::Stage" : {
+         "file" : "lib/HPCD/SLURM/Stage.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

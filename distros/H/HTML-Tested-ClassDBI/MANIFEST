@@ -1,0 +1,16 @@
+MANIFEST
+README
+LICENSE
+Makefile.PL
+lib/HTML/Tested/ClassDBI/Upload.pm
+lib/HTML/Tested/ClassDBI/Field.pm
+lib/HTML/Tested/ClassDBI.pm
+t/090_multi_pk.t
+t/080_primary.t
+t/001_load.t
+t/030_datetime.t
+t/050_unicode.t
+t/100_constraints.t
+t/110_group.t
+t/070_upload.t
+META.yml                                 Module meta-data (added by MakeMaker)

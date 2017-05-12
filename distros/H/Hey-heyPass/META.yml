@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Hey-heyPass
+version:             2.11
+abstract:            Client for heyPass Centralized Authentication System
+license:             ~
+author:              
+    - Dusty Wilson (cpan-hey-heypass@dusty.hey.nu)
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    LWP::UserAgent:                2
+    Storable:                      2.15
+    Test::Simple:                  0.44
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

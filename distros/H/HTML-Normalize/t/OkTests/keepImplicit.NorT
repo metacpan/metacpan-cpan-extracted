@@ -1,0 +1,4 @@
+-keepImplicit=1
+<p>foo</p>
+<!--expected-->
+<html><head></head><body><p>foo</p></body></html>

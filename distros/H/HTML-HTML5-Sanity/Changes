@@ -1,0 +1,73 @@
+HTML-HTML5-Sanity
+=================
+
+Created:      2009-11-30
+Home page:    <https://metacpan.org/release/HTML-HTML5-Sanity>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=HTML-HTML5-Sanity>
+Maintainer:   Toby Inkster <tobyink@cpan.org>
+
+0.105	2014-09-13
+
+ [ Packaging ]
+ - Fix dependency metadata (still included Object::AUTHORITY).
+ - Switch to Dist::Inkt.
+
+ [ Other ]
+ - Minor tidying.
+
+0.104	2013-05-13
+
+ [ Packaging ]
+ - Newer version of build system; avoid bundling ancient Scalar::Util.
+
+ [ Other ]
+ - Removed: Object::AUTHORITY
+
+0.103	2011-12-08
+
+ [ Packaging ]
+ - Update test cases to cope with changes to XML::LibXML::Debugging.
+
+ [ Other ]
+ - Updated: use Object::AUTHORITY
+
+0.102	2011-10-20
+
+ [ Packaging ]
+ - Module::Package::RDF.
+
+ [ Other ]
+ - Updated: use 5.010.
+
+0.101	2011-01-20
+
+ - Removed: No longer make fix_element and fix_attribute functions
+   exportable. They're fairly obscure and pretty confusing to use.
+ - Removed: No longer rely on HTML::Entities.
+
+0.100	2010-06-23
+
+ - Removed: Remove deprecated debugging functions.
+
+0.04	2010-04-28
+
+ - Split out XML-LibXML-Debugging.
+
+0.03	2010-01-08
+
+ [ Bug Fixes ]
+ - Mention HTML::Entities dependency in Makefile.PL.
+   <http://rt.cpan.org/Public/Bug/Display.html?id=53160>
+
+ [ Other ]
+ - Updated: Add 2010 copyright notice.
+ - Updated: Use Turtle for Changes file.
+
+0.02	2009-12-23
+
+ - Added: Handling for invalid language attributes.
+ - Improve tests.
+ - Updated: Update build system; sign distribution.
+   <http://tobyinkster.co.uk/#key_pgp_6A2A7D39>
+
+0.01	2009-12-03

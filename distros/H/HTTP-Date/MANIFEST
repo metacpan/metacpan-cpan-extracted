@@ -1,0 +1,7 @@
+Changes
+lib/HTTP/Date.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/date.t
+META.yml                                 Module meta-data (added by MakeMaker)

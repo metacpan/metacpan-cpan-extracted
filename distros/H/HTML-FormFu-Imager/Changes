@@ -1,0 +1,11 @@
+1.00 2013-12-16
+
+    - Update for Moosified HTML-FormFu
+
+0.03006 2008-12-03
+
+    - Validator::Imager::Size has new exact_width() + exact_height() methods.
+
+0.01001	2007-08-22
+
+	- First CPAN release

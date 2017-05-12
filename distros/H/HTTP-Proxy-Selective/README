@@ -1,0 +1,82 @@
+NAME
+    selective_proxy - Simple HTTP Proxy which can be configured to serve
+    some paths from locations on local disk.
+
+SYNOPSIS
+        # Install, standard (MacOS/Linux).
+        perl Makefile.PL
+        make
+        sudo make install
+    
+        # Install, .exe version (can be copied to other systems without perl). Needs the PAR::Dist and PAR::Packer modules from CPAN.
+        # Yes, this is hacky, there should be Makefile targets to do this. I'm speaking to the Module::Install author about it,
+        # so hopefully this will be less fugly in the next release :)
+        perl Makefile.PL
+        make par
+        pp script/selective_proxy -o selective_proxy
+        sudo cp selective_proxy /usr/local/bin/
+    
+        # Run (Installed)
+        selective_proxy example_config.ini
+    
+        # Run (without installing)
+        perl Makefile.PL
+        make
+        perl -Iblib/lib script/selective_proxy example_config.ini
+    
+DESCRIPTION
+    "selective_proxy" acts as a filtering web proxy. You pass it a
+    configuration file when started, which contains a list of sites and
+    paths. Any GET or HEAD HTTP requests which match one of the sites and
+    paths configured is served from local disk by the proxy.
+
+    This allows you to try out new CSS / Javascript / Images for a website,
+    without having any access to the site (or code it is running), and so
+    this tool can be used as a multi-platform and multi-browser CSS
+    developer tool for web authors.
+
+EXAMPLE CONFIGURATION
+        # Note that more options are available, please see example_config.ini in the distribution for usage.
+        port = 3128
+
+        [search.cpan.org]
+        /s/=/tmp/css
+        /stuff/=/tmp/stuff
+
+        [www.google.com]
+        /js/=/tmp/js
+        /some/file.jpg=/tmp/somefile.jpg
+
+  Notes
+    When you want to map an entire directory (as opposed to a specific
+    file), then use of the trailing slash (as shown in the examples above)
+    is highly recommended, otherwise you can and will confuse yourself with
+    unintended side effects.
+
+SEE ALSO
+    HTTP::Proxy::Selective - Library module used by and shipped with this
+    script.
+    HTTP::Proxy - Provides the basis for this software.
+    Catalyst::Engine::HTTP - Many parts of the HTTP server were ripped out
+    of this module.
+
+AUTHOR
+    Tomas Doran, <bobtfish@bobtfish.net>
+
+CREDITS
+    This software is based upon a number of other open source projects, and
+    builds on software originally implemented by the following people.
+
+    Philippe (BooK) Bruhat - HTTP::Proxy, the basis for this module.
+    Sebastian Riedel, Andy Grubman, Dan Kubb, Sascha Kiefer -
+    Catalyst::Engine::HTTP, inspiration as a pure perl web server.
+    Jesse Vincent - HTTP::Server::Simple, which Catalyst::Engine::HTTP stole
+    a lot of code from..
+
+COPYRIGHT
+    Copyright 2008 Tomas Doran. All rights reserved.
+
+LICENSE
+    This software is licensed to Venda, and may be distributed to third
+    parties, but is not for public redistribution.
+

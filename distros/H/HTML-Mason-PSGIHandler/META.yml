@@ -1,0 +1,29 @@
+---
+abstract: 'PSGI handler for HTML::Mason'
+author:
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+  - 'Ask Bjørn Hansen <ask@develooper.com>'
+  - 'Ricardo Signes <rjbs@cpan.org>'
+  - 'Ruslan Zakirov <ruz@bestpractical.com>'
+build_requires:
+  IO::Handle: 0
+  IPC::Open3: 0
+  Plack::Test: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300038, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-Mason-PSGIHandler
+requires:
+  CGI::PSGI: 0
+  HTML::Mason: 0
+resources:
+  bugtracker: http://github.com/abh/HTML-Mason-PSGIHandler/issues
+  homepage: http://search.cpan.org/dist/HTML-Mason-PSGIHandler/
+  repository: git://github.com/ruz/HTML-Mason-PSGIHandler.git
+version: 0.53

@@ -1,0 +1,9 @@
+Changes
+lib/HTML/DublinCore.pm
+Makefile.PL
+MANIFEST
+README
+t/01-use.t
+t/10-parse.t
+t/test.html
+META.yml                                 Module meta-data (added by MakeMaker)

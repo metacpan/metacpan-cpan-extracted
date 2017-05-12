@@ -1,0 +1,207 @@
+diff -r -u -N HTML-TrackerLink-1.0/lib/HTML/TrackerLink.pm H-T/lib/HTML/TrackerLink.pm
+--- HTML-TrackerLink-1.0/lib/HTML/TrackerLink.pm	2004-06-29 00:14:00.000000000 -0300
++++ H-T/lib/HTML/TrackerLink.pm	2006-01-25 15:26:16.000000000 -0200
+@@ -11,7 +11,7 @@
+ 
+ use vars qw{$VERSION $errstr};
+ BEGIN {
+-	$VERSION = '1.0';
++	$VERSION = '1.0_01';
+ 	$errstr  = '';
+ }
+ 
+@@ -59,13 +59,13 @@
+ 				return $self->_error( "Invalid keyword '$keyword': "
+ 					. $self->errstr );
+ 			}
+-			unless ( $self->_check_url( $keyword ) ) {
++			unless ( $self->_check_url( $url ) ) {
+ 				return $self->_error( "Bad URL for keyword '$keyword': "
+ 					. $self->errstr );
+ 			}
+ 
+ 			# Set the keyword
+-			$self->{keywords}->{$keyword} = $url;
++			$self->{keywords}->{lc $keyword} = $url;
+ 		}
+ 
+ 	} else {
+@@ -84,7 +84,7 @@
+ # Get or set a keyword search
+ sub keyword {
+ 	my $self = shift;
+-	my $keyword = $self->_check_keyword($_[0]) ? shift : return undef;
++	my $keyword = $self->_check_keyword($_[0]) ? lc shift : return undef;
+ 	return $self->{keywords}->{$keyword} unless @_;
+ 
+ 	# Set the tracker URL
+@@ -110,7 +110,7 @@
+ # Make the default search the same as a particular keyword
+ sub default_keyword {
+ 	my $self = shift;
+-	my $keyword = $self->_check_keyword($_[0]) ? shift : return undef;
++	my $keyword = $self->_check_keyword($_[0]) ? lc shift : return undef;
+ 
+ 	# Does the keyword exist?
+ 	unless ( exists $self->{keywords}->{$keyword} ) {
+@@ -129,36 +129,31 @@
+ 	my $text = (@_ and defined $_[0]) ? shift
+ 		: return $self->_error( 'You did not provide a string to process' );
+ 
+-	# Do the replacement for each of the keywords
+-	foreach my $keyword ( sort keys %{ $self->{keywords} } ) {
+-		my $url = $self->{keywords}->{$keyword};
+-
+-		# Create the search regex and do the replace
+-		my $search = qr/\b($keyword\s+\#?(\d+))/i;
+-		$text =~ s/$search/$self->_replacer( $url, $1, $2 )/eg;
+-	}
+-
+-	# Shortcut if we don't have to do the default replace
+-	my $default = $self->default or return $text;
+-
+-	# We handle this differently, depending on whether there
+-	# were any keywords or not.
++	my $default = $self->default;
+ 	my @keywords = $self->keywords;
+-	if ( @keywords ) {
+-		# To match the default, we need to do a negative look-behind
+-		# assertion for any of the keywords, since the things we
+-		# matched should be still completely intact.
+-		my $any_keywords = join '|', @keywords;
+-		my $search = qr/(?<!(?:$any_keywords))\s+(\#(\d+))/i;
+-		$text =~ s/$search/$self->_replacer( $default, $1, $2 )/eg;
++	my $any_keywords = '(?i:' . join('|', @keywords) .')';
+ 
+-	} else {
+-		# Just do a regular search for anything like #1234 we can find
+-		my $search = qr/(\#(\d+))/;
+-		$text =~ s/$search/$self->_replacer( $default, $1, $2 )/eg;
++	my $p_text = '';
++	$_ = $text;
++
++	LOOP: {
++		if (@keywords && /\G(.*?)\b(($any_keywords)\s+\#?(\d+))/gc) { # if we have keywords
++			$p_text .= $1;
++			my $url = $self->{keywords}->{lc $3};
++			$p_text .= $self->_replacer($url, $2, $4);
++			redo LOOP;
++		}
++		if ($default && /\G(.*?)(\#(\d+))/gc) { # if we have a default replace
++			$p_text .= $1;
++			$p_text .= $self->_replacer($default, $2, $3);
++			redo LOOP;
++		}
++		# fall off the loop
+ 	}
++  
++	$p_text .= $1 if /\G(.+)$/; # everything else
+ 
+-	$text;
++	$p_text;
+ }
+ 
+ # Return any error message
+@@ -291,7 +286,7 @@
+   bug#12345        # Even in this case
+   bigbug 12345     # 'bug' must be a seperate word
+ 
+-All of these searches are performed condurrently, meaning that given both a
++All of these searches are performed concurrently, meaning that given both a
+ default search, and a C<'bug'> keyword search, the following would match the
+ way you would expect it to.
+ 
+diff -r -u -N HTML-TrackerLink-1.0/t/02_new.t H-T/t/02_new.t
+--- HTML-TrackerLink-1.0/t/02_new.t	1969-12-31 21:00:00.000000000 -0300
++++ H-T/t/02_new.t	2006-01-25 15:22:14.000000000 -0200
+@@ -0,0 +1,14 @@
++
++use strict;
++
++use Test::More tests => 2;
++
++use_ok('HTML::TrackerLink');
++
++{
++my $linker = HTML::TrackerLink->new(
++						'bug' => 'http://host1/path?id=%n',
++                        'tracker' => 'http://host2/path?id=%n');
++ok($linker, '->new(k1 => $url1, k2 => $url2) works');
++
++}
+diff -r -u -N HTML-TrackerLink-1.0/t/03_proc.t H-T/t/03_proc.t
+--- HTML-TrackerLink-1.0/t/03_proc.t	1969-12-31 21:00:00.000000000 -0300
++++ H-T/t/03_proc.t	2006-01-25 15:23:00.000000000 -0200
+@@ -0,0 +1,27 @@
++
++use strict;
++
++use Test::More tests => 7;
++
++use_ok('HTML::TrackerLink');
++
++my $linker = HTML::TrackerLink->new('http://host/path?id=%n');
++ok($linker, "H::T->new");
++
++my $s = 'This is #3';
++my $p = $linker->process($s);
++
++ok($p, "process ok");
++is($p, q{This is <a href='http://host/path?id=3'>#3</a>}, '#3 handled ok');
++
++my $linker2 = HTML::TrackerLink->new();
++$linker->keyword(foo => 'http://host/path?id=%n');
++$linker->keyword(boo => 'http://host/path?id=%n');
++$linker2->default_keyword('boo');
++ok($linker2, "H::T->new");
++
++my $s2 = 'This is #3';
++my $p2 = $linker->process($s2);
++
++ok($p2, "process ok");
++is($p2, q{This is <a href='http://host/path?id=3'>#3</a>}, '#3 handled ok (default keyword)');
+diff -r -u -N HTML-TrackerLink-1.0/t/04_proc.t H-T/t/04_proc.t
+--- HTML-TrackerLink-1.0/t/04_proc.t	1969-12-31 21:00:00.000000000 -0300
++++ H-T/t/04_proc.t	2006-01-25 15:23:44.000000000 -0200
+@@ -0,0 +1,19 @@
++
++use strict;
++
++use Test::More tests => 4;
++
++use_ok('HTML::TrackerLink');
++
++my $linker = HTML::TrackerLink->new();
++$linker->keyword('bug' => 'http://host1/path?id=%n');
++$linker->keyword('change' => 'http://host2/path?id=%n');
++$linker->default_keyword('bug');
++ok($linker, "H::T->new");
++
++my $s = 'This is #3';
++my $p = $linker->process($s);
++
++ok($p, "process ok");
++is($p, q{This is <a href='http://host1/path?id=3'>#3</a>}, 'return ok');
++
+diff -r -u -N HTML-TrackerLink-1.0/t/05_proc.t H-T/t/05_proc.t
+--- HTML-TrackerLink-1.0/t/05_proc.t	1969-12-31 21:00:00.000000000 -0300
++++ H-T/t/05_proc.t	2006-01-25 15:24:08.000000000 -0200
+@@ -0,0 +1,18 @@
++
++use strict;
++
++use Test::More tests => 4;
++
++use_ok('HTML::TrackerLink');
++
++my $linker = HTML::TrackerLink->new();
++$linker->keyword(Bug => 'http://host1/path?id=%n');
++$linker->keyword(Change => 'http://host2/path?id=%n');
++ok($linker, "H::T->new");
++
++my $s = 'This is BuG #3';
++my $p = $linker->process($s);
++
++ok($p, "process ok");
++is($p, q{This is <a href='http://host1/path?id=3'>BuG #3</a>}, 'case-insensitive indeed');
++

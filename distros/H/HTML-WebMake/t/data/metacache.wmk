@@ -1,0 +1,30 @@
+
+<contents src="data/metacache.data" name="*.txt" format="text/et" />
+
+<content name=index format="text/et">
+
+Title for foo: ''$[foo.txt.title]'' Foo's score: $[foo.txt.score]
+Link: <a href=$(foo)>here</a>
+
+Title for bar: ''$[bar.txt.title]'' Bar's score: $[bar.txt.score]
+Link: <a href=$(bar)>here</a>
+
+</content>
+
+<content name=header format="text/et">
+$[this.title]
+-------------
+</content>
+
+<out file=log/metacache.html>${index}</out>
+
+<out name=foo file=log/metacache_foo.html>
+${header}
+Title in out item: $[this.title]
+${foo.txt}</out>
+
+<out name=bar file=log/metacache_bar.html>
+${header}
+Title in out item: $[this.title]
+${bar.txt}</out>
+

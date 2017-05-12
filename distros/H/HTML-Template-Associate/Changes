@@ -1,0 +1,26 @@
+Revision history for Perl modules HTML::Template::Associate and HTML::Template::Associate::FormValidator
+
+1.09 Wed Jul 30 16:59:16 2003
+	- original version; created by ExtUtils::ModuleMaker 0.32
+1.10 Mon Aug 05 18:00:00 2003 
+	- revised version; added support for Data::FormValidator::Results
+1.11 Mon Nov 28 12:00:00 2005
+	- fixed a minor issue with array value handling
+1.12 Mon Dec 05 18:00:00 2005
+	- updated POD
+1.13 Wed Dec 14 15:00:00 2005
+	- minor POD change
+1.14 Mon Dec 18 12:00:00 2005
+	- minor internal changes
+1.15 Fri Dec 29 14:00:00 2005
+	- minor POD changes
+1.16 Sun Dec 31 12:00:00 2005 
+	- added HTML::Template::Associate::DBI
+1.17 Thu Jan 06 12:00:00 2006
+	- fixed a few issues
+1.18 Mon Jan 23 12:00:00 2006
+	- fixed a few issues and updated docs
+2.00 Sun Dec 07 18:00:00 2008
+	- Resolving http://rt.cpan.org/Ticket/Display.html?id=4338
+2.01 Thu May 10 09:00:00 2012
+        - fixed PREREQ_PM

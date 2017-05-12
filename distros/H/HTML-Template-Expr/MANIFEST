@@ -1,0 +1,26 @@
+Changes
+Expr.pm
+Makefile.PL
+MANIFEST
+README
+t/00load.t
+t/01parse.t
+t/02basic.t
+t/03complex.t
+t/04register.t
+t/05cache.t
+t/06extra_attributes.t
+t/templates/foo.tmpl
+t/templates/complex.tmpl
+t/templates/loop.tmpl
+t/templates/func.tmpl
+t/templates/complex.tmpl
+t/templates/numerics.tmpl
+t/templates/register.tmpl
+t/templates/negative.tmpl
+t/templates/extra_attributes.tmpl
+GPL
+ARTISTIC
+ANNOUNCE
+
+META.yml                                 Module meta-data (added by MakeMaker)

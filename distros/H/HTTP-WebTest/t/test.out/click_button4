@@ -1,0 +1,48 @@
+Failed  Succeeded  Test Name
+   0          2    *** no name ***
+   0          4    *** no name ***
+   0          2    *** no name ***
+   0          4    *** no name ***
+
+
+Test Name: N/A
+URL: http://http.web.test/test4.html
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  REQUIRED TEXT
+    <title>Test File 4</title>                                   SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/show-request?param1=value1
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  REQUIRED TEXT
+    Method: <GET>                                                SUCCEED
+    Query: <param1=value1>                                       SUCCEED
+    Content: <>                                                  SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/test4.html
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  REQUIRED TEXT
+    <title>Test File 4</title>                                   SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/show-request
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  REQUIRED TEXT
+    Method: <POST>                                               SUCCEED
+    Query: <>                                                    SUCCEED
+    Content: <param1=value1>                                     SUCCEED
+
+
+Total web tests failed: 0  succeeded: 12

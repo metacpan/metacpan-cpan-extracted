@@ -1,0 +1,6 @@
+Revision history for Perl extension Heap::MinMax.
+
+0.01  Thu Jan  1 18:54:25 2009
+	- original version; created by h2xs 1.23 with options
+		-XAn Heap::MinMax
+

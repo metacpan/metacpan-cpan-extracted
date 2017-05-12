@@ -1,0 +1,207 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>PerlDAV</title>
+<link rel="stylesheet" href="perldav.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+
+
+
+
+<div id="content">
+<H1>PerlDAV -- A WebDAV client library for Perl5</H1>
+</div><div id="content">
+
+<p>PerlDAV is a Perl library for modifying content on webservers using the WebDAV protocol. Now you can LOCK, DELETE and PUT files and much more on a DAV-enabled webserver.</p>
+
+<p>The PerlDAV library consists of:</p>
+
+<ul>
+
+<li><p><b>HTTP::DAV</b> - an object-oriented Web-DAV client API.</p>
+
+</li>
+<li><p><b>dave</b> - the DAV Explorer, an end-user Unix console program for interacting with WebDAV servers. dave looks and feels like a standard Unix ftp program.</p>
+
+</li>
+</ul>
+
+<h1 id="LATEST-VERSION-AND-WHATS-NEW">LATEST VERSION AND WHAT&#39;S NEW</h1>
+
+<p>See the included <code>Changes</code> file for the full changelog.</p>
+
+<h1 id="INSTALLING-HTTP::DAV">INSTALLING HTTP::DAV</h1>
+
+<p>The lazy way to install PerlDAV:</p>
+
+<pre><code>   $ cpan HTTP::DAV</code></pre>
+
+<p>Or the normal way:</p>
+
+<p>Retrieve the latest copy from CPAN: https://metacpan.org/module/HTTP-DAV/</p>
+
+<pre><code>   $ perl Makefile.PL # Creates the Makefile
+   $ make             # Runs the makefile
+   $ make test        # Optional (See Interopability below)
+   $ make install     # Installs dave and HTTP::DAV</code></pre>
+
+<p>With this method you will first have to install the pre-requisites: LWP and XML::DOM, see <a href="#what-are-the-prerequisites">&quot;what are the prerequisites?&quot;</a>.</p>
+
+<p>When you install PerlDAV, the HTTP::DAV library will be installed to your Perl library location (usually /usr/local/lib/perl5)</p>
+
+<p><code>dave</code> will be installed to /usr/local/bin. This suits most people but you can modify this by using the INSTALLBIN flag:</p>
+
+<pre><code>   $ perl Makefile.PL INSTALLBIN=&quot;/home/user/bin&quot;</code></pre>
+
+<h2 id="What-Are-The-Prerequisites">What Are The Prerequisites?</h2>
+
+<ul>
+
+<li><p>Perl 5.6.0+</p>
+
+</li>
+<li><p>LWP (Have not tested lower than v5.48)</p>
+
+</li>
+<li><p>Scalar::Util (standard library from 5.8.0+)</p>
+
+</li>
+<li><p>XML::DOM (Have not tested lower than v1.26). Requires James Clark&#39;s expat library:</p>
+
+</li>
+<li><p>To access SSL urls you will need <a>Crypt::SSLeay</a> and/or <a>IO::Socket::SSL</a>.</p>
+
+</li>
+</ul>
+
+<h2 id="Optional-Prerequisites">Optional Prerequisites.</h2>
+
+<ul>
+
+<li><p>Crypt::SSLeay if you&#39;d like to use https. Crypt::SSLeay requires the openssl library as well. See Crypt::SSLeay&#39;s excellent install instructions for how to get https support into LWP (and hence HTTP::DAV). I&#39;ve tested HTTP::DAV and Crypt::SSLeay against Apache/mod_dav with the mod_ssl plugin. Works seamlessly.</p>
+
+</li>
+<li><p>MD5 if you&#39;d like to use LWP&#39;s Digest authentication.</p>
+
+</li>
+</ul>
+
+<p>To get the latest versions of these prerequisite modules you can simply type this at the command prompt:</p>
+
+<pre><code>   $ &lt;install expat&gt;
+then:
+   $ perl -MCPAN -e shell
+   cpan&gt; install LWP
+   cpan&gt; install XML::DOM</code></pre>
+
+<p>or if you just &#39;install HTTP::DAV&#39; the lovely CPAN module should just magically install all of the prerequisites for you (you&#39;ll still need to manually instal expat though).</p>
+
+<h2 id="What-Systems-Does-It-Work-With">What Systems Does It Work With?</h2>
+
+<p>HTTP::DAV and dave are pure perl so only needs Perl 5.6.0 (or later). PerlDAV is known to run under Windows (although I haven&#39;t tried it myself) and should run under all Unix systems.</p>
+
+<h1 id="WHERE-ARE-THE-MANUALS">WHERE ARE THE MANUALS?</h1>
+
+<p>Once you&#39;ve installed PerlDAV, you can type:</p>
+
+<pre><code>   $ perldoc HTTP::DAV
+   $ man dave</code></pre>
+
+
+
+
+<P>Or you can view them here:
+<A HREF="HTTP-DAV.html">HTTP::DAV</A>,
+<A HREF="dave.html">dave</A>.</P>
+
+<h1 id="GETTING-HELP">GETTING HELP</h1>
+
+<h2 id="The-perldav-mailing-list">The perldav mailing list</h2>
+
+<p>There is a mailing list for PerlDAV for use by Developers and Users. Please see http://mailman.webdav.org/mailman/listinfo/perldav</p>
+
+<h1 id="THE-TEST-SUITE-INTEROPERABILITY">THE TEST SUITE &amp; INTEROPERABILITY</h1>
+
+<p>You will notice that the standard <code>make test</code> command invokes a large set of test procedures, but most will be skipped. This standard test is sufficient to give you a good indication that PerlDAV has installed properly.</p>
+
+<p>If you&#39;d like to see how well PerlDAV performs against a particular DAV server then you should set the URL (and username,password) in the test suite t/TestDetails.pm. Then you can run <code>make test</code> again and watch the test suite perform as many operations as the server supports. Please note that the test suite will perofrm well over 200 HTTP requests to your server.</p>
+
+<p>I have tested PerlDAV against IIS5, mod_dav and the Xythos WFS.</p>
+
+<p>Out of the box, the test suite should NOT fail on any tests.</p>
+
+<p>The test suite is the best way to test interopability between PerlDAV and other servers. I&#39;d really like help with testing PerlDAV&#39;s interoperability. So if one or more tests fail against your server please follow the following steps:</p>
+
+<ul>
+
+<li><p>Determine which test is failing.</p>
+
+</li>
+<li><p>set DEBUG to on: edit the script and change HTTP::DAV::DebugLevel(0) to (3).</p>
+
+</li>
+<li><p>Delete previous server output: rm /tmp/perldav_debug.txt</p>
+
+</li>
+<li><p>Run that single test again:</p>
+
+<p>$make test TEST_FILES=t/thetest.t TEST_VERBOSE=1 &gt; testoutput.log</p>
+
+</li>
+<li><p>Then gzip and mail me both testoutput.log and /tmp/perldav_debug.txt with details of the test environment. (My email is at the bottom)</p>
+
+</li>
+</ul>
+
+<p>Alternatively, you could have a shot at solving the bug yourself :)</p>
+
+<h1 id="BUGS-and-TODO">BUGS and TODO</h1>
+
+<p>Need to convert XML::DOM to a DOM Level 2 compliant parser like XML::Gdome.</p>
+
+
+
+
+<P>See <A HREF="TODO.html">TODO</A> for what is left to be done.</P>
+
+<h1 id="AUTHOR-AND-COPYRIGHT">AUTHOR AND COPYRIGHT</h1>
+
+<p>This module is Copyright (C) 2001 by</p>
+
+<pre><code>   Patrick Collins
+   G03 Gloucester Place, Kensington
+   Sydney, Australia
+
+   mailto:pcollins@cpan.org
+   Phone: +61 2 9663 4916</code></pre>
+
+<p>All rights reserved.</p>
+
+<h1 id="MAINTAINER">MAINTAINER</h1>
+
+<p>The current maintainer of HTTP-DAV is Cosimo Streppone for Opera Software ASA. You can contact us at <code>cosimo@cpan.org</code> or <code>opera@cpan.org</code>.</p>
+
+<h1 id="LICENSE">LICENSE</h1>
+
+<p>You may distribute this module under the terms of either the GNU General Public License or the Artistic License, as specified in the Perl README file.</p>
+
+<p>$Id$</p>
+
+
+
+
+</div>
+
+
+</body>
+
+</html>
+
+

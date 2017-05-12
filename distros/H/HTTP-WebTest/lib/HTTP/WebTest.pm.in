@@ -1,0 +1,565 @@
+# This is a -*-perl-*- source file
+
+# $Id: WebTest.pm.in,v 1.35 2003/09/05 20:03:01 m_ilya Exp $
+
+package HTTP::WebTest;
+
+$VERSION = '2.04';
+
+# actual content of HTTP::WebTest package is in HTTP::WebTest::API
+require HTTP::WebTest::API;
+
+=head1 NAME
+
+HTTP::WebTest - Testing static and dynamic web content
+
+=head1 SYNOPSIS
+
+    use HTTP::WebTest;
+
+    my $webtest = new HTTP::WebTest;
+
+    # run test from file
+    $webtest->run_wtscript('script.wt');
+
+    # or (to pass test parameters as method arguments)
+    $webtest->run_tests($tests);
+
+=head1 DESCRIPTION
+
+=head2 Introduction
+
+This module runs tests on remote URLs containing
+Perl/JSP/HTML/JavaScript/etc. and generates a detailed test report.
+This module can be used "as-is" or its functionality can be extended
+using plugins.  Plugins can define test types and provide additional
+report capabilities.  This module comes with a set of default plugins
+but can be easily extended with third party plugins.
+
+The L<wt|wt> script is provided for running C<HTTP::WebTest> from the
+command line.
+
+The test specifications can be read from a parameter file in wtscript
+format or input as method arguments.  The test results can be
+displayed on the terminal, directed to a file, stored in a scalar
+variable.  The test results can also be emailed.  The report can be
+modified and extended using report plugins.
+
+Each URL/web file is tested by fetching it from the web server using a
+local instance of an HTTP user agent.  The basic test is simply
+whether or not the fetch was successful.  You may also test using
+literal strings or regular expressions that are either required to
+exist or forbidden to exist in the fetched page.  You may also specify
+tests for the minimum and maximum number of bytes in the returned
+page.  You may also specify tests for the minimum and maximum web
+server response time.
+
+Data flow for C<HTTP::WebTest>:
+
+          --------------              -------------
+          |            |              |           |
+          | Input      |------------->|  WebTest  |
+          | parameters |              |           |
+          |            |              -------------
+          --------------                  |   ^
+                                          |   |
+                                          V   |
+          -------------               ------------
+          |           |    request    |          |
+          | Remote    |<--------------|   HTTP   |
+          | webserver |-------------->|   user   |
+          |           |    response   |   agent  |
+          -------------               |          |
+                                      ------------
+
+=head2 Getting started
+
+This module has complex functionality, but using it to run simple
+tests is simple.  Create a file of test parameters in the
+L<wtscript format|Running HTTP::WebTest using a parameter file> and use the
+L<wt|wt> program to process the file using the command C<wt
+filename>.  The only required parameters are C<test_name> and C<url>.
+
+This document describes:
+
+=over 4
+
+=item *
+
+How tests can be specified.  See section
+L<TEST SPECIFICATION|TEST SPECIFICATION>.
+
+=item *
+
+All test parameters supported by core C<HTTP::WebTest>
+plugins.  See section L<TEST PARAMETERS|TEST PARAMETERS>.
+
+=back
+
+See L<"perldoc wt"|wt> for documentation on the wt program.
+
+Other useful documentation is:
+
+=over 4
+
+=item *
+
+L<perldoc HTTP::WebTest::Cookbook|HTTP::WebTest::Cookbook> - examples
+of wtscript files and examples of C<HTTP::WebTest> API usage.
+
+=item *
+
+L<perldoc HTTP::WebTest::API|HTTP::WebTest::API> - full documentaion
+on API of C<HTTP::WebTest>.
+
+=item *
+
+L<perldoc HTTP::WebTest::Plugins|HTTP::WebTest::Plugins> - for
+developers of C<HTTP::WebTest> plugins.
+
+=back
+
+=head1 TEST SPECIFICATION
+
+The test specifications can be read from a parameter file (in the
+wtscript format described below) or passed as method arguments as an
+array of hashes.
+
+=head2 Running HTTP::WebTest using a parameter file
+
+C<HTTP::WebTest> can read test specification from file
+in format called as C<wtscript>.
+
+Tests defined by wtscript file can be
+run either using Perl API of C<HTTP::WebTest>
+
+    use HTTP::WebTest;
+
+    my $webtest = new HTTP::WebTest;
+    $webtest->run_wtscript('script.wt');
+
+or by using program L<wt|wt> supplied with this module.
+
+If you are running dozens of tests, you may want to divide them into
+several parameter files.  This will organize the tests and reduce the
+size of the output and e-mail messages.  However, cookies passed to or
+received from the web server(s) are not shared between tests in
+different parameter files.
+
+=head3 File format
+
+The wtscript file is a text file containing global parameters and test
+blocks containing test block parameters.  A test block begins with a
+test_name parameter and ends with an end_test directive.  The order of
+the parameters and test blocks is arbitrary.
+
+Test block parameters MUST occur between a test_name parameter and an
+end_test directive.  (Test block parameters affect only an individual
+test.) Global parameters must NOT occur between a test_name parameter
+and an end_test directive.  (This requirement does not apply to
+certain parameters that are both global and test block parameters.)
+
+The following lines are ignored:
+
+=over 4
+
+=item *
+
+lines consisting of nothing but white space (blanks or tabs)
+
+=item *
+
+lines beginning with a number sign (C<#>)
+
+=item *
+
+lines beginning with white space (blanks or tabs) followed by a number
+sign
+
+=back
+
+Parameters are either scalar (single-valued) or lists (single-valued,
+multi-valued or nested).
+
+You can specify scalar parameters using forms such as:
+
+    name=value
+    name =
+           value
+    name = 'value'
+
+You can specify list parameters using forms such as:
+
+    name = ( first value
+             second value )
+    name=( first value => second value
+           third value => fourth value
+         )
+    name = ( first value => second value )
+    name = (
+             'first value'
+             'second value' )
+    name= (
+             first value
+             second value
+             third value => 'fourth value'
+          )
+    name =
+           ( first value
+             'second value' )
+    name = (
+             'first value'
+             'second value'
+           )
+
+Lists can be nested. For example:
+
+    name = ( ( first value
+               second value ) )
+
+    name = ( 'third value'
+             ( fourth value => fifth value ) )
+
+    name = (
+             ( first value
+               second value )
+             third value
+             ( fourth value => fifth value )
+           )
+
+You can specify a null (placeholder) value using '' or "".  Within
+single or double quotes, the usual Perl string quoting rules apply.
+Thus, single quotes mean that all enclosed characters are interpreted
+literally: '\n' is backslash-n rather than a newline character.
+Double quotes mean that Perl metasymbols are interpreted: "\n\t" is a
+newline and a tab.  Double quoted strings can also contain Perl
+variables that will be evaluated by Perl.  For example, if the variable
+$myvar contains the string 'foobar', "$myvar" will be replaced by foobar
+at runtime.  Perl variables can be defined by plugin
+modules or in code sections in the parameter file as described below.
+
+It is also possible to specify a Perl expression in place of a scalar
+value, one of a list parameter's values or an entire list.  Curly
+brackets are used to denote Perl code inside wtscript files.
+C<HTTP::WebTest> compiles this Perl code as anonymous subroutines
+which are called when values of corresponding test parameters are
+required.  When these subroutines are called C<HTTP::WebTest> object
+is passed to them as the first argument.
+
+Some examples of syntax:
+
+    # scalar value
+    name = { 1 + 1 }
+
+    # element of a list
+    name = (
+             'first value'
+             { "second " . "value" }
+           )
+
+    # entire list (must be a reference to an array)
+    name = { [ a => 'b', c => 'd' ] }
+
+    # accessing HTTP::WebTest object
+    name = { my $webtest = shift; ..... }
+
+=head3 Examples of wtscript files
+
+The parameters below specify tests.  The tests specified by the
+C<text_forbid> parameter apply to both the "MyCompany home page" and
+the "Yahoo home page" tests.  Hence, if either returned page contains
+one of the case-insensitive strings in text_forbid, the test fails.
+If any test fails or the fetch of the URL fails, an e-mail will be
+sent to tester@mycompany.com.
+
+
+    apache_exec = /usr/sbin/apache
+    ignore_case = yes
+    mail = errors
+    mail_addresses = ( tester@mycompany.com )
+    mail_server = mailhost.mycompany.com
+    text_forbid = ( Premature end of script headers
+                    an error occurred while processing this directive
+                  )
+
+    test_name = 'MyCompany home page (static)'
+        file_path = ( raycosoft_home.html => . )
+        text_require = (
+            <a href="/dept/peopledev/new_employee/"><font color="#0033cc">
+            <a href="https://www.raycosoft.com/"><font color=
+                       )
+    end_test
+
+    test_name = Yahoo home page
+        url = www.yahoo.com
+        text_require = ( <a href=r/qt>Quotations</a>...<br> )
+        min_bytes = 13000
+        max_bytes = 99000
+        min_rtime = 0.010
+        max_rtime = 30.0
+    end_test
+
+=head2 Calling HTTP::WebTest from a Perl program
+
+If you are using the Perl API of C<HTTP::WebTest>, the test parameters
+can be defined as an array of hashes.
+
+Each hash in the array defines tests for one URL.  Keys in the hashes
+are test parameter names and values in hashes are values of test
+parameters.  Optional global test parameters can be passed in a hash
+passed as the second argument.
+
+Subroutine references can be specified instead of test parameter values.
+Referenced subroutines are called during test run when
+values of corresponding test parameters are required.  These subroutines are
+called in an object-oriented fashion, so the C<HTTP::WebTest> object is passed
+as the first argument.
+
+Tests can be run as
+
+    use HTTP::WebTest;
+
+    my $webtest = new HTTP::WebTest;
+    $webtest->run_tests(
+                        [ # test 1
+                          { param1 => value1,
+                            param2 => value2 },
+                          # test 2
+                          { param1 => value1,
+                            param2 => value2 },
+                        ],
+                        { global_param1 => value1,
+                          global_param2 => value2 }
+                       );
+
+=head3 Example
+
+This Perl script tests Yahoo home page and sends full test report to
+C<tester@mycompany.com>.
+
+    use HTTP::WebTest;
+
+    my $tests = [
+                 { test_name    => 'Yahoo home page',
+                   url          => 'http://www.yahoo.com',
+                   text_require => [ '<a href=r/qt>Quotations</a>...<br>' ],
+                   min_bytes    => 13000,
+                   max_bytes    => 99000,
+                 }
+                ];
+
+    my $params = { mail_server    => 'mailhost.mycompany.com',
+                   mail_addresses => [ 'tester@mycompany.com' ],
+                   mail           => 'all',
+                   ignore_case    => 'yes',
+                 };
+
+    my $webtest = new HTTP::WebTest;
+    $webtest->run_tests($tests, $params);
+
+=head1 PLUGIN MODULES
+
+=head2 Core plugin modules
+
+C<HTTP::WebTest> is implemented in a modular structure that allows
+programmers to easily add modules to run additional tests or define
+additional simple tests without writing a module.  C<HTTP::WebTest>
+provides a number of core plugin modules which are loaded by default:
+
+=over 4
+
+=item L<HTTP::WebTest::Plugin::ContentSizeTest|HTTP::WebTest::Plugin::ContentSizeTest>
+
+This plugin checks the size of the fetched web page.
+
+=item L<HTTP::WebTest::Plugin::Cookies|HTTP::WebTest::Plugin::Cookies>
+
+This plugin controls sending and receiving cookies.
+
+=item L<HTTP::WebTest::Plugin::DefaultReport|HTTP::WebTest::Plugin::DefaultReport>
+
+This plugin manages the test report.
+
+=item L<HTTP::WebTest::Plugin::Loader|HTTP::WebTest::Plugin::Loader>
+
+This plugin supports adding external plugin modules.
+
+=item L<HTTP::WebTest::Plugin::ResponseTimeTest|HTTP::WebTest::Plugin::ResponseTimeTest>
+
+This plugin tests the response times of the web server.
+
+=item L<HTTP::WebTest::Plugin::SetRequest|HTTP::WebTest::Plugin::SetRequest>
+
+This plugin initializes the HTTP requests.
+
+=item L<HTTP::WebTest::Plugin::StatusTest|HTTP::WebTest::Plugin::StatusTest>
+
+This plugin checks the status of the HTTP responses.
+
+=item L<HTTP::WebTest::Plugin::TextMatchTest|HTTP::WebTest::Plugin::TextMatchTest>
+
+This plugin tests whether the content of the HTTP response matches or doesn't
+match selected text or regular expressions.
+
+=back
+
+Information about test parameters supported by core plugins is
+summarized below in the section L<TEST PARAMETERS|TEST PARAMETERS>.
+
+=head2 Other plugin modules bundled with HTTP::WebTest
+
+Following plugin modules come with HTTP::WebTest but they are not
+loaded by default.  To use such plugin module load it using global
+test parameter C<plugins>.
+
+=over 4
+
+=item L<HTTP::WebTest::Plugin::Click|HTTP::WebTest::Plugin::Click>
+
+This plugin supports using names of links and buttons on HTML pages to
+build additional tests.
+
+=item L<HTTP::WebTest::Plugin::Delay|HTTP::WebTest::Plugin::Delay>
+
+This plugin module allows the user to specify pauses in the test sequence.
+
+=item L<HTTP::WebTest::Plugin::HarnessReport|HTTP::WebTest::Plugin::HarnessReport>
+
+This report plugin can generate test reports that are compatible with
+L<Test::Harness|Test::Harness>.
+
+=item L<HTTP::WebTest::Plugin::Hooks|HTTP::WebTest::Plugin::Hooks>
+
+This plugin allows the user to define callback parameters that are
+evaluated at runtime.  This allows the user to define additional tests
+without writing a plugin module.
+
+=back
+
+Information about test parameters supported by add-on plugin modules
+is summarized below in section L<TEST PARAMETERS|TEST PARAMETERS>.
+
+=head2 Plugin modules released separately from HTTP::WebTest
+
+Following additional C<HTTP::WebTest> plugins are avialable separately
+from CPAN.
+
+=over 4
+
+=item L<HTTP::WebTest::Plugin::Apache|HTTP::WebTest::Plugin::Apache>
+
+This plugin supports testing web files using a local instance of Apache.
+
+=item L<HTTP::WebTest::Plugin::TagAttTest|HTTP::WebTest::Plugin::TagAttTest>
+
+This plugin allows to forbid or require tags and/or attributes in a web page.
+
+=item L<HTTP::WebTest::Plugin::DateTest|HTTP::WebTest::Plugin::DateTest>
+
+Evaluate the "age" of embedded date strings in response body.
+
+=item L<HTTP::WebTest::Plugin::XMLReport|HTTP::WebTest::Plugin::XMLReport>
+
+Report plugin for HTTP::WebTest, generates output in XML format.
+
+=back
+
+=head2 Writing plugin modules
+
+See L<perldoc HTTP::WebTest::Plugins|HTTP::WebTest::Plugins> for
+information about writing L<HTTP::WebTest|HTTP::WebTest> plugin modules.
+
+=head1 ADD-ONS
+
+Besides L<additional plugins|Plugin modules released separately from HTTP::WebTest> other L<HTTP::WebTest|HTTP::WebTest> add-ons are available from CPAN:
+
+=over 4
+
+=item L<HTTP::WebTest::XMLParser|HTTP::WebTest::XMLParser>
+
+Parser of XML representation of wtscript.
+
+=back
+
+=head1 TEST PARAMETERS
+
+Most parameters can be used as both global and test block
+parameters.  If you specify such parameter outside a test block, that value
+is the default value for all test blocks.  The global value can be
+overriden in each test block by specifying the parameter within the test
+block.
+
+Parameters marked as I<GLOBAL PARAMETER> can be used only as global
+and cannot be overriden in test blocks.
+
+Parameters marked as I<NON-CORE PARAMETER> are defined in add-on
+plugin modules which must be loaded explicitly using the parameter
+C<plugins>.
+
+=for pod_merge replace params
+
+Content of this section should be autogenerated from POD documentation
+in plugin modules.  Everything from this point till next =cut will be
+replaced with autogenerated documentation.
+
+=for pod_merge copy params
+
+=head2 end_test
+
+This is not really a parameter, it is part of
+L<wtscript format|Running HTTP::WebTest using a parameter file>.
+It marks the end of test block.
+
+=cut
+
+=head1 RESTRICTIONS / BUGS
+
+This module have been tested only on Unix (e.g., Solaris, Linux, AIX,
+etc.) but it should work on Win32 systems.
+
+If you want to test https:// web sites you may have to install
+additional modules to enable SSL support in L<LWP>.  In short you may
+have to install L<Crypt::SSLeay> module.  For details see README.SSL
+file in L<LWP> distro.
+
+=head1 AUTHORS
+
+Richard Anderson <richard@richard-anderson.org> wrote
+C<HTTP::WebTest 1.xx>, using some ideas from the CPAN Monkeywrench module.
+
+Ilya Martynov <ilya@martynov.org> implemented the plug-in concept, the
+extended API and completely rewrote C<HTTP::WebTest>.
+
+Please don't email authors directly.  Use the SourceForge
+C<HTTP::WebTest> mail list (see SUPPORT, next section).
+
+=head1 SUPPORT
+
+Please email bug reports, suggestions, questions, etc. to the SourceForge
+C<HTTP::WebTest> maillist.
+You can sign up at
+http://lists.sourceforge.net/lists/listinfo/http-webtest-general .
+The email address is C<http-webtest-general@lists.sourceforge.net>.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2000-2001 Richard Anderson.  All rights reserved.
+
+Copyright (c) 2001-2003 Ilya Martynov.  All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<HTTP::WebTest::Cookbook|HTTP::WebTest::Cookbook>
+
+L<HTTP::WebTest::API|HTTP::WebTest::API>
+
+L<HTTP::WebTest::Plugins|HTTP::WebTest::Plugins>
+
+L<wt|wt>
+
+=cut
+
+1;

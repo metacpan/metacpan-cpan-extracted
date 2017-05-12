@@ -1,0 +1,55 @@
+{
+   "abstract" : "Number::Format plugin for HTML::Template::Compiled",
+   "author" : [
+      "Tina Mueller"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-Template-Compiled-Plugin-NumberFormat",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28",
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Class::Accessor" : 0,
+            "HTML::Template::Compiled" : "1",
+            "Number::Format" : "1.73",
+            "Test::More" : 0,
+            "perl" : "v5.8.1"
+         }
+      }
+   },
+   "provides" : {
+      "HTML::Template::Compiled::Plugin::NumberFormat" : {
+         "file" : "lib/HTML/Template/Compiled/Plugin/NumberFormat.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/perlpunk/HTML-Template-Compiled-Plugin-NumberFormat"
+      }
+   },
+   "version" : "0.02"
+}

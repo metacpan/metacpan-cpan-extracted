@@ -1,0 +1,114 @@
+NAME
+    HTTP::Response::Encoding - Adds encoding() to HTTP::Response
+
+VERSION
+    $Id: README,v 0.2 2007/05/12 09:24:15 dankogai Exp $
+
+SYNOPSIS
+      use LWP::UserAgent;
+      use HTTP::Response::Encoding;
+
+      my $ua = LWP::UserAgent->new();
+      my $res = $ua->get("http://www.example.com/");
+      warn $res->encoding;
+
+EXPORT
+    Nothing.
+
+METHODS
+    This module adds the following methods to HTTP::Response objects.
+
+    "$res->charset"
+      Tells the charset *exactly as appears* in the "Content-Type:" header.
+      Note that the presence of the charset does not guarantee if the
+      response content is decodable via Encode.
+
+      To normalize this, you should try
+
+        $res->encoder->mime_name; # with Encode 2.21 or above
+
+      or
+
+        use I18N::Charset;
+        # ...
+        mime_charset_name($res->encoding);
+
+    "$res->encoder"
+      Returns the corresponding encoder object or undef if it can't.
+
+    "$res->encoding"
+      Tells the content encoding in the canonical name in Encode. Returns
+      undef if it can't.
+
+      For most cases, you are more likely to successfully find encoding
+      after GET than HEAD. HTTP::Response is smart enough to parse
+
+        <meta http-equiv="Content-Type" content="text/html; charset=whatever"/>
+
+      But you need the content to let HTTP::Response parse it. If you don't
+      want to retrieve the whole content but interested in its encoding, try
+      something like below;
+
+        my $req =  HTTP::Request->new(GET => $uri);
+        $req->headers->header(Range => "bytes=0-4095"); # just 1st 4k
+        my $res = $ua->request($req);
+        warn $res->encoding;
+
+    "$res->decoded_content"
+      Discontinued since HTTP::Message already has this method.
+
+      See HTTP::Message for details.
+
+INSTALLATION
+    To install this module, run the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+AUTHOR
+    Dan Kogai, "<dankogai at dan.co.jp>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-http-response-encoding at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=HTTP-Response-Encoding>.
+    I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc HTTP::Response::Encoding
+
+    You can also look for information at:
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/HTTP-Response-Encoding>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/HTTP-Response-Encoding>
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTTP-Response-Encoding>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/HTTP-Response-Encoding>
+
+ACKNOWLEDGEMENTS
+    GAAS for LWP.
+
+    MIYAGAWA for suggestions.
+
+COPYRIGHT & LICENSE
+    Copyright 2007 Dan Kogai, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

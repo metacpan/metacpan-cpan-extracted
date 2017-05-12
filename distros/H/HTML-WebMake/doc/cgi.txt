@@ -1,0 +1,43 @@
+<wmmeta name="Title" value="Using webmake.cgi" />
+<wmmeta name="Section" value="075-cgi" />
+<wmmeta name="Score" value="10" />
+<wmmeta name="Abstract">
+How to use WebMake as a CGI script
+</wmmeta>
+
+WebMake now provides some simple ''edit in browser'' functionality, using
+##webmake.cgi##.
+
+**Note:** this is beta functionality, and may have security implications.  Use
+with caution!
+
+Some features of note:
+
+  - The default view is an overview of your site, allowing you to quickly find
+    what you want to change.
+
+  - webmake.cgi includes a rudimentary file manager, allowing you to travel
+    through the directories that make up your site, and create, delete, edit
+    and upload files therein.
+
+  - Text and XML can be edited quickly, in a textbox, with built-in input
+    areas for entering common metadata items (such as titles).
+
+  - You can also use it to edit the items of content embedded in the WebMake
+    file itself, or simply edit the WebMake XML file in a text box.
+
+  - With a single click of a link, the WebMake site can be built there and
+    then.
+
+Also, webmake.cgi supports CVS, which provides these benefits:
+
+  - multiple copies of the same site can be replicated, and changes made on
+    any of the sites will be automatically updated on all the others.
+
+  - changes made to the site will be kept under version control, so older
+    versions of the site can be ''rolled back'' if necessary.
+
+  - a history of changes to the site is kept, allowing you to see exactly who
+    did what to which.
+
+

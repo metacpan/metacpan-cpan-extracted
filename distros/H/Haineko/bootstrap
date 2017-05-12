@@ -1,0 +1,455 @@
+#!/bin/bash
+#
+# Copyright 2000-2008 Daniel F. Savarese
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.savarese.com/software/ApacheLicense-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# ------------------------------------------------------------------------
+#
+# This script bootstraps the automatic Makefile generation process.
+# It runs the necessary autotools to generate Makefile.in files,
+# libtool, configure, and other support files.  It then passes
+# any arguments on to configure, running it from a build directory.
+#
+# ------------------------------------------------------------------------
+
+PATH=$PATH:/bin:/usr/bin
+export PATH
+
+declare -r VERSION=1.1.5
+declare -r BUILD="2013-07-22 20:59:39 JST"
+declare -r COPYRIGHT='Copyright 2000-2008 Daniel F. Savarese'
+declare -r BOOTSTRAP_CONF="bootstrap.conf"
+declare -r PROGRAM=$0
+declare -r PROGRAM_NAME=$(basename $PROGRAM)
+declare -r PROGRAM_DIR=$(echo $(cd $(dirname $PROGRAM); pwd))
+declare -r CONFIG_DIR="config"
+declare -r CONFIG_GUESS="$CONFIG_DIR/config.guess"
+declare -r CONFIG_FILES="config.guess config.sub depcomp install-sh ltmain.sh ltconfig missing mkinstalldirs"
+declare -r TOPLEVEL_FILES="config.h.in aclocal.m4 stamp-h.in configure autom4te.cache"
+
+declare -r ACLOCAL_FLAGS="-I $CONFIG_DIR"
+declare -r AUTOHEADER_FLAGS="--force"
+declare -r LIBTOOLIZE_FLAGS="--force --copy"
+declare -r AUTOMAKE_FLAGS="--foreign --add-missing --copy"
+
+#
+# Default build directory.  Is overridden by mkbuild_dir.
+#
+declare BUILD_DIR="build"
+
+#
+# Configuration name.  Is set by set_config_args.
+#
+declare CONFIG_NAME=""
+
+function usage() {
+echo "
+usage: $0 -help | -init [topdir] | -build [configure-options] | -clean |
+          -config [configure-options] | -rebuild [configure-options] |
+          -reconfig [configure-options]
+
+OPTIONS
+    -help     Displays this help message.
+
+    -init     Initializes the source tree for use with $PROGRAM_NAME.  This
+              consists merely of making a symbolic link to the $PROGRAM_NAME
+              script in the specified directory (or the current directory
+              if none is specified).  $PROGRAM_NAME must be run from the link
+              for all other operations, or it will fail to find the
+              source tree.
+
+    -build    Performs the same operations as -config, but additionally
+              builds the source.  You can pass configure options after
+              -build just as you would with -config.  Additionally, if
+              you specify a configuration name (see configure-options below)
+              any arguments after the configuration name are passed along
+              to the make command for building the source.
+
+    -clean    Removes all of the configure support files created by
+              autotools.  Specifying a configuration name will remove
+              the build directory for that configuration; otherwise the
+              default build directory is removed.
+
+    -config   After prepping the source tree by running the autotools,
+              runs configure with the specified configure options,
+              readying the source tree for building.
+
+    -configonly Runs configure with the specified configure options without
+                readying the source tree for building.
+
+    -install  Performs the same operations as -build, but in addition
+              installs the resulting build.
+
+    -mkdir    Preps the source tree by running the autotools and then
+              creates an architecture-specific build directory.  Specifying
+              a configuration name will create a build directory with a
+              suffix matching the configuration name.
+
+    -reconfig Performs the same operations as
+                  $0 -clean
+                  $0 -config [configure-options]
+
+    -rebuild  Like -build, but does a -reconfig before building.
+              You can pass configure options after -build just as
+              you would with -config.
+
+    -version  Print $PROGRAM_NAME version number.
+
+SPECIAL ARGUMENTS
+    configure-options  Argument may be options to pass to configure or the
+                       name of a configuration in the bootstrap config file
+                       that predefines the arguments to pass to configure.
+"
+}
+
+
+function version() {
+echo "
+$PROGRAM_NAME
+  version: $VERSION
+  build: $BUILD
+
+$COPYRIGHT
+"
+}
+
+function init() {
+  local directory="$1"
+
+  if [ -n "$directory" -a ! -d "$directory" ]; then
+      echo "Cannot find $directory"
+      return
+  fi
+
+  if [ -z "$directory" ]; then
+      directory="."
+  fi
+
+  local dest="$directory/$PROGRAM_NAME"
+  local src="${PROGRAM_DIR}/${PROGRAM_NAME}"
+
+  if [ -e "$dest" -o -h "$dest" ]; then
+      echo "$dest already exists."
+      return
+  fi
+
+  if ln -s "$src" "$dest"; then
+      echo "Created $dest -> $src"
+  else
+      echo "Failed to create $dest -> $src"
+  fi
+}
+
+#
+# Can't assume mkdir accepts the -p flag, so we use this function instead.
+#
+
+function mkdirs() {
+    local old_ifs;
+    local directory="$1";
+
+    old_ifs="$IFS"
+    IFS=/
+    set $directory
+    directory="."
+    while [ $# -gt 0 ]; do
+	directory="$directory/$1"
+	if [ ! -d "$directory" ]; then
+	    mkdir "$directory"
+	fi
+	shift 1
+    done
+    IFS="$old_ifs"
+}
+
+
+#
+# As a side effect sets BUILD_DIR.
+#
+
+function set_build_dir() {
+    local build_dir;
+
+    pushd "$PROGRAM_DIR" > /dev/null 2>&1
+    if [ ! -x "$CONFIG_GUESS" ]; then
+	popd  > /dev/null 2>&1
+	return 1
+    fi
+
+    build_dir=build/$("$CONFIG_GUESS")
+
+    if [ -n "$CONFIG_NAME" ]; then
+	build_dir="${build_dir}.${CONFIG_NAME}"
+    fi
+
+    popd > /dev/null 2>&1
+    BUILD_DIR="$build_dir"
+}
+
+function mkbuild_dir() {
+    if set_build_dir; then
+	pushd "$PROGRAM_DIR" > /dev/null 2>&1
+	if [ ! -d "$BUILD_DIR" ]; then
+	    mkdirs "$BUILD_DIR"
+	fi
+	popd  > /dev/null 2>&1
+    else
+	return 1;
+    fi
+}
+
+function bootstrap() {
+    if [ "$(type -t pre_bootstrap)" = "function" ]; then
+        pre_bootstrap
+    fi
+
+    pushd "$PROGRAM_DIR" > /dev/null 2>&1
+    if [ ! -d "$CONFIG_DIR" ]; then
+	mkdirs "$CONFIG_DIR"
+    fi
+    set -x
+    aclocal $ACLOCAL_FLAGS
+    autoheader $AUTOHEADER_FLAGS
+    libtoolize $LIBTOOLIZE_FLAGS
+    automake $AUTOMAKE_FLAGS
+    autoconf
+    set +x
+    popd > /dev/null 2>&1
+
+    if [ "$(type -t post_bootstrap)" = "function" ]; then
+        post_bootstrap
+    fi
+}
+
+function configure() {
+    local build_dir;
+
+    pushd "$PROGRAM_DIR" > /dev/null 2>&1
+
+    if ! mkbuild_dir || [ ! -x configure ]; then
+	popd  > /dev/null 2>&1
+	return 1
+    fi
+
+    build_dir="$BUILD_DIR"
+
+    set -x
+    (cd "$build_dir"; ../../configure $@;)
+    set +x
+    popd > /dev/null 2>&1
+}
+
+function build() {
+    local make_args="$@"
+    local build_dir;
+
+    pushd "$PROGRAM_DIR" > /dev/null 2>&1
+
+    if ! set_build_dir || [ ! -f "$BUILD_DIR/Makefile" ]; then
+	popd  > /dev/null 2>&1
+	return 1
+    fi
+
+    build_dir="$BUILD_DIR"
+
+    set -x
+    (cd "$build_dir"; make $make_args;)
+    set +x
+    popd > /dev/null 2>&1
+}
+
+function clean() {
+    pushd "$PROGRAM_DIR" > /dev/null 2>&1
+    if set_build_dir ; then
+	if [ -d "$BUILD_DIR" ]; then
+	    set -x
+	    rm -fr "$BUILD_DIR"
+	    set +x
+	fi
+    fi
+    set -x
+    rm -fr $TOPLEVEL_FILES;
+    find . -name Makefile.in -print | xargs rm -f;
+    (cd "$CONFIG_DIR"; rm -f $CONFIG_FILES;)
+    set +x
+    popd > /dev/null 2>&1
+}
+
+
+#
+# This is a helper that obtains the package name and version
+# from the AC_INIT call in configure.ac.  If successful,
+# sets PACKAGE_NAME and PACKAGE_VERSION as a side effect.
+#
+
+function get_package_info() {
+    local ac_init;
+
+    if [ -f configure.ac ]; then
+	ac_init="$(fgrep AC_INIT configure.ac)"
+	PACKAGE_NAME="${ac_init#*(}"
+	PACKAGE_NAME="${PACKAGE_NAME%,*}"
+	PACKAGE_NAME="${PACKAGE_NAME// /}"
+	PACKAGE_VERSION="${ac_init#*,}"
+	PACKAGE_VERSION="${PACKAGE_VERSION%)*}"
+	PACKAGE_VERSION="${PACKAGE_VERSION// /}"
+    fi
+}
+
+#
+# Looks for bootstrap config file, sources it if it exists, and tries
+# to match the stated configuration against a sourced variable name.
+# If successful, sets CONFIG_FLAGS as a side effect.
+#
+
+function set_config_args() {
+    local bootstrap_conf="$1";
+    local config_name="$2";
+    local config_args;
+
+    pushd "$PROGRAM_DIR" > /dev/null 2>&1
+
+    get_package_info
+
+    if [ -f "$bootstrap_conf" ]; then
+	. "$bootstrap_conf"
+    else
+	popd > /dev/null 2>&1
+	return 1
+    fi
+
+    config_args=conf_${config_name}
+
+#   We really do mean ${!config_args-x} and NOT ${!config_args:-x}
+
+    if [ "${!config_args-x}" = "x" ]; then
+	if [ -z "$conf_default" ]; then
+	    popd > /dev/null 2>&1
+	    return 1
+	else
+	    config_args="$conf_default"
+	fi
+    else
+	config_args=${!config_args}
+	CONFIG_NAME="$config_name"
+    fi
+
+    CONFIG_ARGS="$config_args"
+
+    popd > /dev/null 2>&1
+}
+
+function detect_config_name() {
+    local config_name="$1"
+
+    if ! set_config_args "$BOOTSTRAP_CONF" "$config_name"; then
+	CONFIG_ARGS="$@"
+    fi
+}
+
+function configureonly() {
+    local old_ifs="$IFS";
+    IFS="
+"
+    if ! configure $CONFIG_ARGS; then
+	echo "
+  Error.  Cannot run configure.  Make sure config.guess exists so
+  that the architecture-specific build directory can be created.
+"
+    fi
+    IFS="$old_ifs"
+}
+
+function configonly() {
+    pushd "$PROGRAM_DIR" > /dev/null 2>&1
+
+    if set_build_dir && [ -d "$BUILD_DIR" ]; then
+	configureonly
+    else
+	echo "
+  Error.  $BUILD_DIR does not exist."
+    fi
+
+    popd > /dev/null 2>&1
+}
+
+function config() {
+    bootstrap
+    configureonly
+}
+
+command="$1"
+num_arguments="$#"
+
+shift
+detect_config_name $@
+
+if [ -n "$CONFIG_NAME" ]; then
+    shift
+    build_args="$@"
+else
+    build_args=""
+fi
+
+case "$command" in
+    -help)
+	usage
+	exit 1
+	;;
+    -init)
+	init $@
+	;;
+    -build | -install)
+        if [ "$command" = "-install" ]; then
+	    build_args="install $build_args"
+	fi
+        config
+        build $build_args
+        ;;
+    -clean)
+	clean
+	;;
+    -config | -configure)
+	config
+	;;
+    -configonly | -configureonly)
+	configonly
+	;;
+    -rebuild)
+        clean
+        config
+        build
+        ;;
+    -reconfig)
+	clean
+	config
+	;;
+    -mkdir)
+	bootstrap
+	mkbuild_dir
+	;;
+    -version)
+	version
+	;;
+    *)
+	if [ "$num_arguments" -eq 0 ]; then
+	    bootstrap
+	else
+	    usage 1>&2
+	    exit 1
+	fi
+	;;
+esac
+
+exit 0

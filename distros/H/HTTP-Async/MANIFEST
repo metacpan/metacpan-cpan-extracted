@@ -1,0 +1,38 @@
+.travis.yml
+Changes
+lib/HTTP/Async.pm
+lib/HTTP/Async/Polite.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/bad-connections.t
+t/bad-headers.t
+t/bad-hosts.t
+t/cookies.t
+t/dead-connection.t
+t/headers.t
+t/invalid-options.t
+t/key_aliases.t
+t/local-addr.t
+t/make-url-absolute.t
+t/not-modified.t
+t/peer-addr.t
+t/pod-coverage.t
+t/pod.t
+t/polite.t
+t/poll-interval.t
+t/proxy-with-https.t
+t/proxy.t
+t/real-servers.t
+t/redirects.t
+t/release-cpan-changes.t
+t/remove.t
+t/setup.t
+t/strip-host-from-uri.t
+t/template.t
+t/test-utils.pl
+t/TestServer.pm
+t/timeout.t
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

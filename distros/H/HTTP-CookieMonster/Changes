@@ -1,0 +1,35 @@
+Revision history for HTTP-CookieMonster
+
+0.09 2014-11-24 10:23:51 America/Toronto
+
+    - Removes the BETA warning
+    - Fixes some Pod typos
+
+0.08 2014-10-22 13:47:09 America/Toronto
+    - Cookie values are now unescaped before reading and escaped before writing.
+
+0.07 2014-02-04 10:50:27 America/Toronto
+    - Adds local to MANIFEST.SKIP
+
+0.06 2014-02-04 10:42:31 America/Toronto
+    - Adds delete_cookie() method
+
+0.05 2012-09-28
+    - Fixes typo in SYNOPSIS
+
+0.04 2012-09-19
+    - Now using BUILDARGS to accept just one argument when creating new
+      HTTP::CookieMonster object
+    - Adds cookies() function for quick read-only cookie access
+
+0.03 2012-08-23
+    - all_cookies() now returns an ARRAY rather than ARRAYREF, but will still
+      return the reference if not called in list context
+    - all_cookies() is now a regular method rather than an accessor
+
+0.02 2012-08-21
+    - Fixes errors in Pod
+    - Fixes internal cookie setting
+
+0.01 2012-08-21
+    - Initial release

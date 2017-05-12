@@ -1,0 +1,60 @@
+{
+   "abstract" : "MD5 checksum for choosen hashref",
+   "author" : [
+      "Mario Zieschang <mziescha@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Hash-MD5",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::MD5" : "0",
+            "Exporter" : "0",
+            "Scalar::Util" : "1.42",
+            "perl" : "5.010000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CheckManifest" : "0.9",
+            "Test::More" : "0",
+            "Test::Pod" : "1.22"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mziescha/Hash-MD5.git",
+         "web" : "https://github.com/mziescha/Hash-MD5"
+      }
+   },
+   "version" : "0.08"
+}

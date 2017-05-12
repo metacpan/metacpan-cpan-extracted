@@ -1,0 +1,13 @@
+Build.PL
+Changes
+eg/echo.pl
+lib/HTTP/MessageParser.pm
+MANIFEST			This list of files
+t/01-use.t
+t/02-pod.t
+t/04-header.t
+t/05-request.t
+t/06-response.t
+META.yml
+Makefile.PL
+README

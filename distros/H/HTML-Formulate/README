@@ -1,0 +1,58 @@
+HTML::Formulate
+===============
+
+HTML::Formulate is a perl module used to produce HTML forms. It uses
+a presentation definition hash to control the output format, which is
+great for flexible programmatic control, inheritance, and subclassing
+(e.g. defining site- or section-specific HTML::Formulate subclasses 
+and then producing standardised forms very easily). On the other hand, 
+it doesn't give you the very fine-grained control over presentation 
+that you get using a template-based system.
+
+Example:
+
+   # Simple employee create form
+   $f = HTML::Formulate->new({
+      fields => [ qw(firstname surname email position) ],
+      required => [ qw(firstname surname) ],
+   });
+   print $f->render;
+
+prints:
+
+   <form method="post">
+   <table cellpadding="2">
+   <tr><th style="color:blue"><span class="required">Firstname</span></th><td><input name="firstname" type="text" /></td></tr>
+   <tr><th style="color:blue"><span class="required">Surname</span></th><td><input name="surname" type="text" /></td></tr>
+   <tr><th>Email</th><td><input name="email" type="text" /></td></tr>
+   <tr><th>Position</th><td><input name="position" type="text" /></td></tr>
+   <tr><td align="center" colspan="2">
+   <input name="_submit" type="submit" value="Submit" />
+   </td></tr>
+   </table>
+   </form>
+
+
+
+INSTALLATION
+
+The standard:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module uses my HTML::Tabulate module, as well as Carp.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003-2011 Gavin Carr <gavin@openfusion.com.au>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

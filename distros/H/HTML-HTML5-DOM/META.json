@@ -1,0 +1,366 @@
+{
+   "abstract" : "implementation of the HTML5 DOM on top of XML::LibXML",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-HTML5-DOM",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Attribute" : "0",
+            "DateTime" : "0",
+            "HTML::HTML5::Parser" : "0",
+            "HTML::HTML5::Writer" : "0",
+            "HTTP::Request" : "6.00",
+            "IO::Detect" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0",
+            "XML::LibXML" : "2.00",
+            "XML::LibXML::Augment" : "0",
+            "XML::LibXML::QuerySelector" : "0",
+            "match::simple" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "HTML::HTML5::DOM" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLAnchorElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLAreaElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLAudioElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLBRElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLBaseElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLBodyElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLButtonElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLCanvasElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLCollection" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLCommandElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLDListElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLDataListElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLDetailsElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLDivElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLDocument" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLEmbedElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLFieldSetElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLFormControlsCollection" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLFormElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLHRElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLHeadElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLHeadingElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLHtmlElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLIFrameElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLImageElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLInputElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLKeygenElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLLIElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLLabelElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLLegendElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLLinkElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLMapElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLMediaElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLMenuElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLMetaElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLMeterElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLModElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLOListElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLObjectElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLOptGroupElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLOptionElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLOutputElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLParagraphElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLParamElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLPreElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLProgressElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLQuoteElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLScriptElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLSelectElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLSourceElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLSpanElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLStyleElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLTableCaptionElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLTableCellElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLTableColElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLTableDataCellElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLTableElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLTableHeaderCellElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLTableRowElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLTableSectionElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLTextAreaElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLTimeElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLTitleElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLTrackElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLUListElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLUnknownElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::HTMLVideoElement" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOM::RadioNodeList" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOMutil::AutoDoc" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOMutil::FancyISA" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      },
+      "HTML::HTML5::DOMutil::Feature" : {
+         "file" : "lib/HTML/HTML5/DOM.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/HTML-HTML5-DOM/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=HTML-HTML5-DOM"
+      },
+      "homepage" : "https://metacpan.org/release/HTML-HTML5-DOM",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-html-html5-dom.git",
+         "web" : "https://github.com/tobyink/p5-html-html5-dom"
+      }
+   },
+   "version" : "0.002"
+}

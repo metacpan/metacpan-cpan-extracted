@@ -1,0 +1,193 @@
+Revision history for HackaMol
+
+0.039     2017-02-02 20:05:46-07:00 America/Denver
+  * cleaning up tests and reducing dependencies 
+  * todo: shrink api by moving some heafty Roles into pluggable roles, streamline tests
+
+0.038     2016-04-06 13:38:48-04:00 America/Indiana/Indianapolis
+  * added a print for dirty atoms if hush_read < 0
+  * added qcat_print to AtomGroupRole for concatenated printing of all coordinates
+  * added a little padding to the PdbReadRole.
+  * added sasa attribute to PdbRole.
+
+0.037     2016-03-03 15:50:27-05:00 America/Indiana/Indianapolis
+  * removed some array traits from API for AtomGroupRole and Groups trait in molecule (splice, shuffle)
+  * the HackaMol::Molecule push_groups() method now adds atoms that are not in the molecule already. 
+
+0.036     2016-02-25 21:26:20-05:00 America/Indiana/Indianapolis
+  * added read_string_atoms and read_string_mol... for reading molecules from in memory strings!!!
+
+0.035     2016-02-08 14:14:20-05:00 America/Indiana/Indianapolis
+  * minor fix to remove the Data::Structure::Util dependency (Thank you Slaven Rezic!!)
+
+0.034     2016-02-08 10:43:34-05:00 America/Indiana/Indianapolis
+  * storage is pulled for now 
+ 
+0.033     2016-02-05 11:28:45-05:00 America/Indiana/Indianapolis
+  * added pdb_rename to group 
+
+0.032     2015-06-17 13:51:01-04:00 America/Indiana/Indianapolis
+  * fixed bug in molecule->charge
+  * add method group_rot to HackaMol.pm 
+
+0.031     2015-06-08 13:04:53-04:00 America/Indiana/Indianapolis
+  * improve the printing of pdbs for atom names of 1-3 characters
+
+0.030     2015-06-05 13:58:12-04:00 America/Indiana/Indianapolis
+  * another another quick fix to get tests to pass
+
+0.029     2015-06-05 10:05:29-04:00 America/Indiana/Indianapolis
+  * another quick fix to get tests to pass
+
+0.028     2015-06-03 09:59:15-04:00 America/Indiana/Indianapolis
+  * added is_fixed attribute to AtomGroupRole.  
+  * test coverage has fallen to 85%
+
+0.027     2015-06-02 16:38:50-04:00 America/Indiana/Indianapolis
+  * added a new simple YAML molecular format #16 on github. 
+
+0.026     2015-06-02 11:11:45-04:00 America/Indiana/Indianapolis
+  * allow charge method to set the current charge for molecules
+  * charge method now returns 0 if no charges set for atoms or molecules
+  * see #15 on github
+
+0.025     2015-05-26 20:55:25-04:00 America/Indiana/Indianapolis
+  * minor fixes to testing filenames
+  * charge defaults to 0
+
+0.024     2015-05-25 11:56:05-04:00 America/Indiana/Indianapolis
+  * minor fixes to testing filenames
+
+0.023     2015-05-22 23:07:08-04:00 America/Indiana/Indianapolis
+  * HackaMol::Molecule atomgroups -> groups
+  * a molecule can now be built from a list of groups. e.g.  HackaMol::Molecule->new(groups=>[@groups])
+  
+0.022     2015-05-22 15:03:09-04:00 America/Indiana/Indianapolis
+  * added a bunch of array traits to the AtomGroupRole
+  * fixed Zmatrix Reader bug
+
+0.021     2015-05-18 22:15:52-04:00 America/Indiana/Indianapolis
+  * Mixing in Moo::Roles where possible to allow speedy extensions.
+    see how it works with mixed Moose/Moo
+  * Better warnings from the Zmatrix reader--- still no tests and bad POD
+  * Fix links in POD
+
+
+0.020     2015-05-15 14:37:36-04:00 America/Indiana/Indianapolis
+  * Fix bug in Zmatrix reader
+
+0.019     2015-05-14 23:22:44-04:00 America/Indiana/Indianapolis
+  * Minor fix and added the method pdbid_mol 
+
+0.018     2015-05-14 14:23:22-04:00 America/Indiana/Indianapolis
+  * simplify atoms_bin in AtomGroupRole
+  * Rework POD for HackaMol.pm
+  * support for Z-matrix reading
+
+0.017     2015-02-27 09:15:16-05:00 America/Indiana/Indianapolis
+
+0.016     2015-02-26 21:41:39-05:00 America/Indiana/Indianapolis
+  * dist.ini dependencies again
+
+0.015     2015-02-26 15:25:55-05:00 America/Indiana/Indianapolis
+  * Fix dist.ini dependencies for testing lib versions
+  * minor test improvements
+  
+0.014     2015-02-17 22:33:21-05:00 America/Indiana/Indianapolis
+  * added FileFetchRole that uses LWP to get and getstore files from pdb.org
+  * notebooks
+
+0.013     2015-02-01 20:13:47-05:00 America/New_York
+  * fixed t/HackaMol-DirRole.t for windows installs
+
+0.012     2015-01-19 15:47:59-05:00 America/Indiana/Indianapolis
+    * fixed the github link for metacpan.
+
+0.011     2015-01-19 15:26:19-05:00 America/Indiana/Indianapolis
+    * fixed version issue using dzil.
+
+0.01      2015-01-12 16:31:52-05:00 America/Indiana/Indianapolis
+    * first release: 0.01
+
+0.00_22   2015-01-02 11:04:34-05:00 America/Indiana/Indianapolis
+    * reorganize examples.  Still need more
+    * reformat TODO list to follow P5 conventions
+
+0.00_21   2014-07-25 13:29:06-04:00 America/Indiana/Indianapolis
+    * adjusted defaults on PdbRole attributes 
+    * energy_func no longer return 0 without calculation for default force constant params 
+    * energy_func -> efunc rename
+
+0.00_20   2014-05-27 20:41:40EDT-0400 America/New_York
+    * added fix_serial method to AtomGroupRole 
+    * find_disulfide_bonds generalized to work with nonprotein sulfurs 
+    * GSSG examples added
+
+0.00_19   2014-05-04 20:48:54EDT-0400 America/New_York
+    * examples are reorganized, still not organized enough #TODO
+    * PathRole files are now 'rw'.  The 'rw' is hard to resist 
+
+0.00_18   2014-04-23 14:15:49EDT-0400 America/New_York
+    * merged FileRole and ScratchRole into PathRole
+
+0.00_17   2014-04-23 10:46:53EDT-0400 America/New_York
+    * switched FileRole and ScratchRole over to MooseX::Types::Path::Tiny
+
+0.00_16   2014-04-22 14:27:46EDT-0400 America/New_York
+    * added FileRole for managing files. Loaded into HackaMol.pm builder
+    * added ExeRole  for managing executables.  Loaded into HackaMol.pm builder. Limited functionality
+      can/should be tested with scripts that run exe, capture output, etc.  use Capture::Tiny 
+  
+0.00_15   2014-04-20 20:54:36EDT-0400 America/New_York
+    * minor update test for scratchrole
+
+0.00_14   2014-04-17 21:07:40EDT-0400 America/New_York
+    * added ScratchRole for managing directories. Available in HackaMol builder
+
+0.00_13   2014-04-15 22:09:31EDT-0400 America/New_York
+    * added hush_read to MolReadRole    
+    * added MooseX::StrictConstructor to classes
+  
+0.00_12   2014-04-07 10:48:37EDT-0400 America/New_York
+    * added aa321 to PdbRole; gens 1-letter aa code from resname
+
+0.00_11   2014-04-02 16:46:03EDT-0400 America/New_York
+    * minor fix for pdbqt reading: A -> C
+  
+0.00_10   2014-04-02 15:27:08EDT-0400 America/New_York
+    * AtomGroupRole adjustments:
+      - added print_pdb_ts and print_xyz_ts for printing many configs
+      - improved tmax method 
+
+0.00_09   2014-04-01 17:46:14EDT-0400 America/New_York
+    * PDB reading will atom->is_dirty if the element(s) unknown. Carp warning
+    * added minimal pdbqt reading (i.e. no branch info pulled)
+
+0.00_08   2014-02-20 14:53:19 America/New_York
+    * improve PDB reading and writing 
+    * for PDB guess element from atom name 
+ 
+0.00_07   2013-11-19 22:57:36 America/New_York
+    * Reduced size of test directory
+    * Improved reading of PDBs with multiple (sometimes erroneous) models
+
+0.00_06   2013-11-18 21:28:05 America/New_York
+    * Added find_disulfides to HackaMol.pm
+    * Added read_file_mol to HackaMol.pm
+    * Added read_file_append_mol to HackaMol.pm
+    * Adjusted reading and writing of PDB files 
+
+0.00_05   2013-10-02 16:19:31 America/New_York
+    * Adjusted builders in HackaMol.pm added pdb_print for groups
+  
+0.00_04   2013-09-20 06:56:56 America/New_York
+    * Fixing one test that needs recent MVR to work    
+
+0.00_03   2013-09-19 21:51:03 America/New_York
+    * Fixing POD and tests further 
+
+0.00_02   2013-09-19 16:53:36 America/New_York
+    * Fixing POD and tests based on how things look and cpantesters
+
+0.00_01   2013-09-18 23:46:53 America/New_York
+    * First Devel release

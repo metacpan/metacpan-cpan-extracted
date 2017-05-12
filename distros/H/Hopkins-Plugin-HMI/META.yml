@@ -1,0 +1,31 @@
+---
+abstract: 'hopkins HMI session (using HTTP)'
+author:
+  - 'Mike Eldridge <diz@cpan.org>'
+build_requires:
+  Test::More: 0.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+  File::ShareDir::Install: 0.03
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102342, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Hopkins-Plugin-HMI
+requires:
+  Catalyst::Action::RenderView: 0.08
+  Catalyst::Engine::Embeddable: 0.000003
+  Catalyst::Plugin::Authentication: 0.100092
+  Catalyst::Plugin::Session: 0.24
+  Catalyst::Plugin::Session::State::Cookie: 0.17
+  Catalyst::Plugin::Session::Store::FastMmap: 0.11
+  Catalyst::Plugin::Static::Simple: 0.29
+  Catalyst::View::TT: 0.34
+  Class::Accessor::Fast: 0.31
+  File::ShareDir: 1.00
+  Hopkins: 0.900
+  POE::Component::Server::HTTP: 0.09
+  Sys::Hostname::FQDN: 0.10
+version: 0.900

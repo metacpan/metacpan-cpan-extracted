@@ -1,0 +1,94 @@
+
+An HTML::EP example:	Shopping cart
+-------------------------------------
+
+This is an example I am about to create for a small german company,
+IN.F.O. - Insider for Outside(r), Alexander Löffler.
+
+It is far away from being complete, only the administration is done,
+but I am submitting it anyways, as it demonstrates some usefull
+examples, in particular upload and download of CSV files.
+
+If you like to use it, you are welcome, see Installation below, but
+note:
+
+                        NO WARRANTY
+
+THIS PROGRAM IS LICENSED FREE OF CHARGE AND THERE IS NO WARRANTY FOR THE
+PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW.  EXCEPT WHEN OTHERWISE
+STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE
+PROGRAM "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED,
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS FOR A PARTICULAR PURPOSE.  THE ENTIRE RISK AS TO THE QUALITY
+AND PERFORMANCE OF THE PROGRAM IS WITH YOU.  SHOULD THE PROGRAM PROVE
+DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR
+CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL
+ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE
+THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY
+GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE
+USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED TO LOSS OF
+DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD
+PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS),
+EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.
+
+
+Installation
+------------
+
+  - In the root directory of your webserver, create a directory where the
+    shop will live, I use /outdoor/shop.
+  - Create a subdirectory var, make it writable for anyone, or at least
+    the WWW user.
+  - Prevent WWW access to this directory, for example by inserting a
+    .htaccess file like
+
+	order allow,deny
+	deny from all
+
+  - Create the CSV files you need, for example
+
+        dbimon DBI:CSV:f_dir=/home/httpd/html/outdoor/shop
+	dbimon> CREATE TABLE prefs (var VARCHAR(64), val BLOB)
+        dbimon> CREATE TABLE articles (
+		id VARCHAR(64),
+		Artikel VARCHAR(64),
+		Marke VARCHAR(64),
+		Modell VARCHAR(64),
+		Farbe VARCHAR(64),
+		Groesse VARCHAR(64),
+		Menge VARCHAR(64),
+		Preis VARCHAR(64),
+		BestellNr VARCHAR(64),
+		Bemerkung VARCHAR(64),
+		Textfeld VARCHAR(64))
+
+	Make them writable by anyone, or at least the WWW server.
+    	Of course you are free to use a real SQL engine by choosing
+        another DSN.
+
+  - Put the .ep files into the directory.
+
+  - That's it!
+
+
+Author and Copyright
+--------------------
+
+    This program is
+
+        Copyright (C) 1998    Jochen Wiedmann
+                              Am Eisteich 9
+                              72555 Metzingen
+                              Germany
+
+                              Phone: +49 7123 14887
+                              Email: joe@ispsoft.de
+
+    All rights reserved.
+
+    You may distribute this module under the terms of either the GNU General
+    Public License or the Artistic License, as specified in the Perl README
+    file.

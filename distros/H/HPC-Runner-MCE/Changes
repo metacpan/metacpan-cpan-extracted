@@ -1,0 +1,28 @@
+Revision history for HPC-Runner-MCE
+
+2.41  2016-01-18 10:03:24 GST
+    Bug fix exiting subroutine via next
+
+2.40  2016-01-06 13:57:40 GST
+    - Got rid of an extra print statement
+
+2.39  2016-01-04 13:10:41 GST
+    - Refactored code some for HPC-Runner-Notebook
+
+2.38  2015-11-08 14:12:10 GST
+    - Fixed a bug that was autoincrementing cmd number when waiting
+
+2.37  2015-11-08 14:04:40 GST
+    - Added a few changes for logging
+
+2.36  2015-10-28 11:27:22 GST
+    - Updated cpanfile
+
+2.34  2015-06-18 08:41:10 AST
+    - Updated copyright
+
+2.33  2015-02-18 13:38:40 AST
+    - Moving namespace over from Runner-Init/MCE to HPC-Runner-MCE
+
+2.32  2015-02-18 13:32:46 AST
+        - Initial release

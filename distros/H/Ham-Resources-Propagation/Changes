@@ -1,0 +1,15 @@
+Revision history for Perl extension Ham::Resources::Propagation.
+
+0.01  Fri Dec 02 2011
+		- First working version
+0.02	Thu Nov 13 2012
+		- Fixed bug: don't call method new (XML::Reader). 
+			Change XML::Reader for XML::Reader::PP
+		- Use 5.014
+0.03	Fri Dec 04 2012
+		- Fixed bug: don't call solarflux and solarwind
+			Change group name from 'solar' to 'solar_data'
+		- Fixed bug: Blackout information ever shows the same value
+			Add a return before loop end.
+0.04	Fri Dec 07 2012
+		- Changes on Makefile.PL

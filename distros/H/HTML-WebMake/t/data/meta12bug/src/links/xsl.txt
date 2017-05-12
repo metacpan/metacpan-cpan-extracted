@@ -1,0 +1,34 @@
+<wmmeta name="ltitle">Extensible Stylesheet Language (XSL)</wmmeta>
+<wmmeta name="stitle">XSL</wmmeta>
+<wmmeta name="author">J&ouml;rn Clausen</wmmeta>
+<wmmeta name="cdate">2001-04-23</wmmeta>
+<wmmeta name="mdate">2001-04-23</wmmeta>
+
+    <ul>
+      <li>
+	<a href="http://www.w3.org/Style/XSL/">Extensible Stylesheet Language
+	  (XSL)</a>
+      </li>
+      <li>
+	<a href="http://www.w3.org/TR/xsl/">Extensible Stylesheet Language
+	  (XSL) Version 1.0</a>
+      </li>
+      <li>
+	<a href="http://www.xml.com/pub/a/2001/01/17/xsl-fo/index.html">
+	  Using XSL Formatting Objects</a>
+      </li>
+      <li>
+	<a href="http://www.ibiblio.org/xml/books/bible/updates/15.html">
+	  Chapter 15 of the XML Bible: XSL Formatting Objects</a>
+      </li>
+      <li>
+	<a href="http://www.mulberrytech.com/xsl/index.html">Mulberry
+	  Technologies</a>
+      </li>
+      <li>
+	<a href="http://xml.apache.org/fop/">FOP</a>
+      </li>
+      <li>
+	<a href="http://users.ox.ac.uk/~rahtz/passivetex/">PassiveTeX</a>
+      </li>
+    </ul>

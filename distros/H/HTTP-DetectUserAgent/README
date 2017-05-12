@@ -1,0 +1,36 @@
+HTTP-DetectUserAgent version 0.03
+
+HTTP::DetectUserAgent provides the parsing function for HTTP useragent strings.
+You can use it for determine which browser (or crawler, bot, and so on)
+is accessing to your servers or web applications.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+    Test::More
+    Test::Base
+    Class::Accessor
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009-2012, Takaaki Mizuno
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

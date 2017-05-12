@@ -1,0 +1,80 @@
+<ep-package name="HTML::EP::Examples::Admin">
+<ep-html-ep-examples-admin-squid>
+<html><head><title>
+<ep-language en="Squid Configuration" de="Squid-Konfiguration">
+</title></head>
+<body bgcolor=#ffffff>
+<h1><ep-language en="Squid Configuration" de="Squid-Konfiguration"></h1>
+<ep-language language="de">
+Diese Seite erlaubt Ihnen die Konfiguration des WWW-Proxyservers "Squid".
+Dabei werden nur die am häufigsten benötigten Funktionen angeboten, die
+komplexeren werden durch Modifikation der Datei $admin_config->squid_conf_path$
+vorgenommen.
+</ep-language>
+<ep-language language="en">
+This page offers you the customization of the WWW Proxyserver "Squid".
+Only the tasks being most frequently used are offerred, you have to
+modify $admin_config->squid_conf_path$ for more complex things.
+</ep-language>
+<form action=squid.ep method=GET>
+<h3><ep-language de="Eintragung eines neuen Client-Bereichs"
+                 en="Inserting a new range of client machines"></h3>
+<div align=center>
+<table>
+  <tr><th><ep-language de="Bereichsname" en="Range description"></th>
+      <th><ep-language de="Von IP-Nummer" en="From IP address"></th>
+      <th><ep-language de="Bis IP-Nummer" en="To IP address"></th>
+      <th><ep-language de="Aktiv" en="Active"></th>
+  <tr><td><input size=20 name="insert_name"></td>
+      <td><input size=16 name="insert_ip_from"></td>
+      <td><input size=16 name="insert_ip_to"></td>
+      <td><select name="insert_active">
+            <option value=1>Ja
+            <option value=0>Nein
+          </select>
+      </td>
+  </tr>
+</table>
+</div>
+<ep-if eval="@{$_->{'ranges'}}">
+<h3><ep-language de="Vorhandene Client-Bereiche"
+                 en="Existing Client ranges"></h3>
+<div align=center>
+<table>
+  <tr><th><ep-language de="Bereichsname" en="Range description"></th>
+      <th><ep-language de="Von IP-Nummer" en="From IP address"></th>
+      <th><ep-language de="Bis IP-Nummer" en="To IP address"></th>
+      <th><ep-language de="Aktiv" en="Active"></th>
+      <th><ep-language de="Löschen" en="Delete"></th>
+  </tr>
+<ep-list items="ranges" item="r">
+  <tr><td><input size=20 name="edit_name_$i$" value="$r->name$"></td>
+      <td><input size=16 name="edit_ip_from_$i$" value="$r->from$"></td>
+      <td><input size=16 name="edit_ip_to_$i$" value="$r->to$"></td>
+      <td><select name="edit_active_$i$">
+            <option value=1>Ja
+            <option value=0 $&RANGE_SELECTED->r->active$>Nein
+          </select>
+      </td>
+      <td><input type=checkbox name="delete_ip_$i$"></td>
+  </tr>
+</ep-list>
+</table>
+</div>
+</ep-if>
+<div align=center>
+<p>
+  <ep-language language="en">
+    <input type=submit value="Save Data">
+  </ep-language>
+  <ep-language language="de">
+    <input type=submit value="Daten speichern">
+  </ep-language>
+</p>
+<p><a href="index.ep"><ep-language de="Administrationsmenü" en="Admin menu">
+   </a>
+</p>
+</div>
+</form>
+</body>
+</html>

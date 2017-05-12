@@ -1,0 +1,65 @@
+Revision history for Perl extension HTML::WebDAO.
+
+0.91
+   - fix str number in logs message (HTML::WebDAO::Base::_log)
+0.90
+   - add relative path
+0.89
+   - fix empty accept hash in session object
+0.88
+   -  workaround for CGI.pm: http://rt.cpan.org/Ticket/Display.html?id=36435
+0.87
+   - clean ( register 'HTML::WebDAO::Comp::ListEnv') from scripts
+0.86 
+   - add status 302 for redirect
+0.85
+    - add standalone FastCGI server
+0.84
+    - adopt Lexer::Lmethod to use _get_object_by_path
+    - handle __extra_path attribute
+    - check loaded mods
+    - add resolve_path method
+    - add html context to response class
+    - add _get_object_by_path methods to Container, Element
+0.83
+    - clean deprecated code
+    - add set_absolute_url (Session.pm)
+0.82
+    - add error404 response method
+    - call_path parse custom url (Session)
+0.81
+    - create default controller ( Session )
+    - create Response class
+
+0.80
+    - ENV{wdFCGIreq} - count request per fcgi process
+    - fix mem leaks
+    - unicode
+0.79
+    - fix Session.pm (add strict)
+    - add caching and fix load session attributes
+    - use default ENV when fastcgi
+    - use additional parametr for WebDAO::CVcgi under fastcgi
+0.78
+    - customize fastcgi by SetEnv
+0.77
+    -fix path_info_elments
+0.76    20070508
+    add lexical command method;
+    add support for url_method in shell environment;
+
+0.75    20070329
+    fix CGI.pm bug http://rt.cpan.org/Ticket/Display.html?id=25908
+    improve cockie generate 
+0.04	20040815
+	- fix cpan module prereq
+0.03	20040810
+	- fix perl version
+0.02	20040615
+	-comment Graph
+
+0.01	20031216
+	- original version; created by h2xs 1.22
+	- import into sf.net cvs
+
+#$Id: Changes 344 2008-09-30 12:45:11Z zag $

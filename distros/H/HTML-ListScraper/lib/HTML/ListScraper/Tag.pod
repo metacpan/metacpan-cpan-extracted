@@ -1,0 +1,37 @@
+=head1 NAME
+
+HTML::ListScraper::Tag - sequence item found by L<HTML::ListScraper>
+
+=head1 METHODS
+
+All documented methods are simple accessors, taking no arguments and
+leaving the C<HTML::ListScraper::Tag> object unchanged.
+
+=head2 name
+
+Tag name. L<HTML::ListScraper> extends the L<HTML::Parser> convention
+of naming tags in lowercase: closing tags are identified by a
+prepended '/'. After that, the name itself consists of ASCII letters
+and numbers. In case your input veers rather far from HTML, tags can
+also contain '-' and ':', but no more exotic characters. Empty name is
+not allowed. Angle brackets are not part of the name - if you need
+them, you can always add them when formatting C<HTML::ListScraper>
+output.
+
+=head2 index
+
+Tag position (zero-based).
+
+=head2 link
+
+Value of the C<href> attribute, if the parsed tag had a C<href>
+attribute (with non-empty value). Otherwise, C<undef>.
+
+=head2 text
+
+Text following the tag, if any. Note that even closing tags can have
+associated text, although in well-formed HTML, that text really
+belongs under some previous opening tag.
+
+
+

@@ -1,0 +1,11 @@
+MANIFEST
+LICENSE
+README
+Changes
+lib/HTML/Template/Associate/FormValidator.pm
+lib/HTML/Template/Associate/DBI.pm
+lib/HTML/Template/Associate.pm
+t/001_load.t
+t/test.tmpl
+Makefile.PL
+META.yml                                 Module meta-data (added by MakeMaker)

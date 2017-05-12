@@ -1,0 +1,6 @@
+<html>
+  <head></head>
+  <body><span id="age_dialog" klass="highlander"><span id="under18"> Sorry,
+        you're not old enough to enter (and too dumb to lie about your age)
+      </span></span></body>
+</html>

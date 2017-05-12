@@ -1,0 +1,27 @@
+Revision history for Perl module HTTP::Rollup
+
+0.8    25 Apr 2005
+	* bug fix: wasn't handling command-line input correctly
+	* supports mod_perl2
+
+0.7    28 Aug 2003
+	* OO style, with config options specified in new()
+	* default DELIM should be &, not ;
+	* updated test cases
+
+0.6    14 Aug 2003
+	* fixed errors in pod test
+
+0.5    7 Aug 2003
+	* DELIM config option for input field separator; default is semicolon
+	* updated 01pod.t
+
+0.4   13 Aug 2002
+	* distribute with test cases extracted from pod
+
+0.3   13 Aug 2002
+        - copied some stuff from CGI.pm and shellwords.pl, with
+	  some local revisions.
+
+0.2   17 Jan 2002
+	- created

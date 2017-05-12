@@ -1,0 +1,15 @@
+<HTML><BODY>
+<H1> test_if6 -- if enambled COMPAT_ALLOW_NAME_IN_CLOSING_TAG </H1>
+we test that tmpl_else should be invisible in invisible context
+
+
+
+
+
+
+
+ 
+
+
+<H1> END test_if6 </H1>
+</body></html>

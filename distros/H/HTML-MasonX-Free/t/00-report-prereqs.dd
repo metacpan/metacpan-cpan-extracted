@@ -1,0 +1,50 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Exporter' => '0',
+                                      'HTML::Mason' => '1.50',
+                                      'HTML::Mason::Compiler::ToObject' => '0',
+                                      'HTML::Mason::Component::FileBased' => '0',
+                                      'HTML::Mason::Exceptions' => '0',
+                                      'HTML::Mason::Request' => '0',
+                                      'HTML::Mason::Tools' => '0',
+                                      'List::AllUtils' => '0',
+                                      'Log::Any' => '0',
+                                      'Moose' => '0',
+                                      'Params::Validate' => '0',
+                                      'Scalar::Util' => '0',
+                                      'namespace::autoclean' => '0',
+                                      'overload' => '0',
+                                      'parent' => '0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'HTML::Mason::Interp' => '0',
+                                   'Path::Class' => '0',
+                                   'Test::Fatal' => '0',
+                                   'Test::More' => '0.96'
+                                 }
+                 }
+     };
+  $x;
+ }

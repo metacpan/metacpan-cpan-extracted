@@ -1,0 +1,23 @@
+init:
+  - git config --global core.autocrlf input
+
+install:
+  - ps: Invoke-WebRequest -Uri http://strawberryperl.com/download/5.24.0.1/strawberry-perl-5.24.0.1-64bit.msi -OutFile strawberry-perl-5.24.0.1-64bit.msi
+  - ps: Start-Process msiexec.exe -ArgumentList @("/package", "strawberry-perl-5.24.0.1-64bit.msi", "/qn", "INSTALLDIR=C:\strawberry") -Wait
+  - SET PATH=C:\strawberry\c\bin;C:\strawberry\perl\site\bin;C:\strawberry\perl\bin;%PATH%
+  - cpanm --notest --quiet Carton
+  - carton install --without develop
+
+build: off
+
+test_script:
+  - SET PATH=%CD%\local\bin;%PATH%
+  - SET PERL5LIB=%CD%\local\lib\perl5;%PERL5LIB%
+  - perl Build.PL
+  - Build
+  - Build test
+
+cache:
+  - local
+
+shallow_clone: true

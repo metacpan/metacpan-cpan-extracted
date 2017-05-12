@@ -1,0 +1,13 @@
+<title>Upload a file</title>
+
+<h1>Upload a file</h1>
+
+<FORM METHOD=POST ENCTYPE="multipart/form-data" action="<CGI_DIR>/savepage.cgi"> 
+
+<INPUT TYPE=file name=FILE_UPLOAD size=35> 
+
+<INPUT TYPE=submit NAME=Action VALUE="Upload File">
+
+</FORM>
+
+

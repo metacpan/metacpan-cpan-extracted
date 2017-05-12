@@ -1,0 +1,14 @@
+<li>
+	<span class="yui3-menu-label">
+	<a href="<: $url :>"><: $text :></a>
+	<a href="#<: $id :>" class="yui3-menu-toggle"><: $toggle :></a>
+	</span>											
+
+	<div id="<: $id :>" class="yui3-menu">
+		 <div class="yui3-menu-content">
+			<ul>
+<: $items :>
+			</ul>
+		 </div>
+	</div>				
+</li>

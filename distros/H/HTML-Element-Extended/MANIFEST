@@ -1,0 +1,10 @@
+README
+Makefile.PL
+test.pl
+Changes
+MANIFEST
+lib/HTML/ElementSuper.pm
+lib/HTML/ElementGlob.pm
+lib/HTML/ElementTable.pm
+lib/HTML/ElementRaw.pm
+META.yml                                 Module meta-data (added by MakeMaker)

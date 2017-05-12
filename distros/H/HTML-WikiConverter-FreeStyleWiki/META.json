@@ -1,0 +1,79 @@
+{
+   "abstract" : "Convert HTML to FreeStyleWiki markup",
+   "author" : [
+      "Yusuke Watase <ywatase@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-WikiConverter-FreeStyleWiki",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::WikiConverter" : "0",
+            "Params::Validate" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Differences" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "HTML::WikiConverter::FreeStyleWiki" : {
+         "file" : "lib/HTML/WikiConverter/FreeStyleWiki.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ywatase/p5-HTML-WikiConverter-FreeStyleWiki/issues"
+      },
+      "homepage" : "https://github.com/ywatase/p5-HTML-WikiConverter-FreeStyleWiki",
+      "repository" : {
+         "url" : "git://github.com/ywatase/p5-HTML-WikiConverter-FreeStyleWiki.git",
+         "web" : "https://github.com/ywatase/p5-HTML-WikiConverter-FreeStyleWiki"
+      }
+   },
+   "version" : "0.03",
+   "x_authority" : "cpan:YWATASE",
+   "x_contributors" : [
+      "Yusuke Watase <ywatase+github@gmail.com>"
+   ]
+}

@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               HTTP-Parser
+version:            0.06
+abstract:           parse HTTP/1.1 request into HTTP::Request/Response object
+author:
+    - David. B. Robins <dbrobins@davidrobins.net>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    HTTP::Request:   0
+    HTTP::Response:  0
+    Test::More:      0
+    URI:             0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,81 @@
+{
+   "abstract" : "generate short hashes from numbers",
+   "author" : [
+      "Zak B. Elep <zakame@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Hashids",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.26",
+            "Math::BigInt" : "1.9993",
+            "Moo" : "1.003000",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0.32",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Hashids" : {
+         "file" : "lib/Hashids.pm",
+         "version" : "1.000002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/zakame/hashids.pm/issues"
+      },
+      "homepage" : "https://github.com/zakame/hashids.pm",
+      "repository" : {
+         "url" : "git://github.com/zakame/hashids.pm.git",
+         "web" : "https://github.com/zakame/hashids.pm"
+      }
+   },
+   "version" : "1.000002",
+   "x_contributors" : [
+      "C. A. Church <thisdroneeatspeople@gmail.com>",
+      "Troy Morehouse <troymore@nbnet.nb.ca>",
+      "Zak B. Elep <zakame@zakame.net>"
+   ]
+}

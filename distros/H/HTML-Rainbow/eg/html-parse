@@ -1,0 +1,105 @@
+#! /usr/local/bin/perl -w
+#
+# html-parse - example script for HTML::Rainbow
+#
+# This script shows how to pick up a page from
+# the web and run the text through HTML::Rainbow
+# to produce a new, improved psychedelic version.
+#
+# This tends to ride rough-shod over CSS pages,
+# the improvement of which is left as an
+# exercise to the reader.
+#
+# Copyright (C) David Landgren 2005 
+
+use strict;
+
+use LWP::Simple;
+use HTML::Parser;
+use HTML::Rainbow;
+
+use constant DEBUG => 0;
+
+my $URI = shift || 'http://www.perl.com/';
+
+my $content = get( $URI );
+if( not $content ) {
+    die "$URI is unavailable\n";
+}
+
+my $in_body = 0;
+my $r = HTML::Rainbow->new;
+my $p = HTML::Parser->new(
+	api_version => 3,
+	start_h => [
+		sub {
+			my $tag  = shift;
+			my $attr = shift;
+			++$in_body if $tag eq 'body';
+			my $attlist;
+			if( not $attr ) {
+				$attlist = '';
+			}
+			else {
+				my @attr_pair;
+				while( my( $key, $value ) = each %$attr ) {
+					# renormalise things that look like local URIs
+					$value =~ s{^[/.]}{$URI$1}g;
+					push @attr_pair, qq{$key="$value"};
+				}
+				$attlist = join( ' ', ('', @attr_pair));
+			}
+			print "<$tag$attlist>";
+		},
+		"tagname, attr",
+	],
+	end_h => [
+		sub {
+			print "</$_[0]>"
+		},
+		"tagname",
+	],
+	text_h => [
+		sub {
+			print $in_body ? $r->rainbow($_[0]) : $_[0]
+		},
+		"dtext",
+	],
+);
+
+$p->parse($content);
+$p->eof();
+
+=head1 NAME
+
+html-parser - Parse an HTML page and run the text through a rainbow
+
+=head1 SYNOPSIS
+
+B<html-parser> url
+
+=head1 DESCRIPTION
+
+Downloads an HTML page and parses the text sections to run them
+through a rainbow. The result is best viewed in a browser.
+
+=head1 OPTIONS
+
+None.
+
+=head1 SEE ALSO
+
+L<HTML::Rainbow>
+
+L<HTML::Parser>
+
+=head1 AUTHOR
+
+David Landgren
+
+Copyright 2005 David Landgren. All rights reserved.
+
+=head1 LICENSE
+
+This script is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

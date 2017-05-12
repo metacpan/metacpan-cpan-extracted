@@ -1,0 +1,20 @@
+<%else%>These are remarks, which will not appear in the output.<%endif%>
+<HTML><HEAD><TITLE>Test</TITLE>
+
+</HEAD><BODY>
+
+ <H1>Test HTML::Template::HTX<%if Version isempty%><%else%> <%Version%><%endif%></H1>
+
+<%detailsection LIST%><%begindetail%> <%Count%>. <%EscapeHTML Item%><BR>
+<%enddetail%>
+
+<%begindetail%>This nameless detail section should not appear in the output<%enddetail%>
+
+ <%detailsection SPONSORS%>
+ <H3>Sponsors</H3>
+ <%begindetail%><%if Count gt 1%>, <%endif%><%if URL isempty%><%Name%><%else%><A HREF="<%EscapeRaw URL>"><%Name%></A><%endif%><%enddetail%>
+
+ <HR>
+ &copy; <A HREF="http://www.martinic.nl/"><%EscapeHTML "MARTINIC Computers"%></A> 2005
+
+</BODY></HTML>

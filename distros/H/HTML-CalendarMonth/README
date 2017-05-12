@@ -1,0 +1,71 @@
+HTML-CalendarMonth
+-------------------
+
+HTML::CalendarMonth is a module that simplifies the rendering of a
+calendar month in HTML. It is NOT a scheduling system.
+
+Calendars are represented as HTML::Element based structures, derived
+from the HTML::ElementTable class.
+
+The module includes support for 'week of the year' numbering, arbitrary
+1st day of the week definitions, and locale support.
+
+If you wish to use 'week of the year' numbering, or want to explore
+dates beyond the capability of the internal perl time functions, then
+you will need Date::Calc, DateTime, or Date::Manip.
+
+INSTALLATION
+
+You install HTML-Calendar, as you would install any perl module library,
+by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DOCUMENTATION
+
+See HTML/CalendarMonth.pm for the code. See Changes for recent changes.
+POD style documentation is included in the module. This is normally
+converted to a manual page and installed as part of the "make install"
+process. You should also be able to use the 'perldoc' utility to extract
+and read documentation from the module directly.
+
+Some examples can be found here:
+
+   http://www.mojotoad.com/sisk/projects/HTML-CalendarMonth/examples.html
+
+SUPPORT
+
+There is a mailing list for HTML::Calendar. To subscribe or view past
+messages, please visit the following URL:
+
+   http://lists.sourceforge.net/mailman/listinfo/html-calmonth-general
+
+Questions and comments may also be directed to Matt Sisk
+<sisk@mojotoad.com>
+
+AVAILABILITY
+
+The package is available from CPAN:
+
+   http://www.cpan.org/authors/id/M/MS/MSISK/
+
+The package is also available at the Toadstool:
+
+   http://www.mojotoad.com/sisk/projects/HTML-CalendarMonth/
+
+ACKNOWLEDGMENTS
+
+Thanks to William R. Ward for some conceptual nudging. Thanks to Fabian
+Aichele, Jarkko Hietaniemi, Wolfgang Jürgensen, and David 'Sniper'
+Rigaudiere for some suggestions on global calendar customs. Thanks to
+Gael Marziou, Raul Rivero, Ricardo Signes, T. Bugra Uytun, and Philipp
+W. for some helpful bug spotting.
+
+COPYRIGHT
+
+Copyright (c) 1999-2015 Matthew P. Sisk. All rights reserved. All wrongs
+revenged. This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

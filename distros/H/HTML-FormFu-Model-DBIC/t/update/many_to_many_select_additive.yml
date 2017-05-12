@@ -1,0 +1,21 @@
+---
+auto_fieldset: 1
+
+elements:
+  - type: Hidden
+    name: id
+
+  - type: Text
+    name: name
+
+  - type: Select
+    name: bands
+    multiple: 1
+    model_config:
+      additive: 1
+      options_from_model: 0
+      link_values:
+        rating: 100
+
+  - type: Submit
+    name: submit

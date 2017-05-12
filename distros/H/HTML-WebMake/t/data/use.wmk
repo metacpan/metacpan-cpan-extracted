@@ -1,0 +1,9 @@
+<webmake>
+
+<content name="foo"> Foo! </content>
+<use plugin="dump_vars" />
+
+<out file=log/use.html>${DumpVars_names}</out>
+<out file=log/use_2.html>${DumpVars_full}</out>
+
+</webmake>

@@ -1,0 +1,38 @@
+HTTP-Server-Simple-Recorder version 0.0.1
+
+This module allows you to record all HTTP communication between an 
+L<HTTP::Server::Simple>-derived server and its clients.  It is a mixin, so 
+it doesn't itself subclass L<HTTP::Server::Simple>; you need to subclass from
+both L<HTTP::Server::Simple::Recorder> and an actual L<HTTP::Server::Simple> subclass,
+and L<HTTP::Server::Simple::Recorder> should be listed first.
+
+Every time a client connects to your server, this module will open a pair of files and log
+the communication between the file and server to these files.  Each connection gets a serial
+number starting at 1.  The filename used is C<<$self->recorder_prefix>>, then a period,
+then the connection serial number, then a period, then either "in" or "out".  
+C<recorder_prefix> defaults to C</tmp/http-server-simple-recorder>, but you can override that
+in your subclass.  For example, you might want to include the process ID.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+
+DEPENDENCIES
+
+IO::Tee, HTTP::Server::Simple 0.10.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005, Best Practical Solutions LLC.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

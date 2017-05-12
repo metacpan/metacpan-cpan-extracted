@@ -1,0 +1,1106 @@
+Tmojo(tm) In A Nutshell
+    by Will Conant
+
+Abstract
+    Tmojo is a powerful and flexible content generation engine developed at
+    Lab-01. For more information, visit <http://lab-01.com/>.
+
+Tmojo Template Basics
+    Tmojo templates are used for generating dynamic text documents. While
+    they are particularly suited to generating HTML and XML documents, they
+    can be used effectively to produce any text output, including
+    dynamically generated source code.
+
+    Tmojo may be used to generate text documents that are stored on disk for
+    later use, or it may be used to generate documents on the fly to be
+    served through your web server.
+
+    The simplest Tmojo template looks like this:
+
+      Hello, world!
+
+    When called, this template would simply return the string "Hello,
+    world!". Obvious as this example may be, it illustrates an important
+    fact about Tmojo templates: any plain text document can be a valid Tmojo
+    template.
+
+    A slightly more interesting template might look like this:
+
+      Hello, <: $Args{name} :>!
+
+    Here, we see our first Tmojo tag. In a Tmojo template, any valid Perl
+    expression enclosed in "<:" and ":>" will be replaced by the result of
+    evaluating that expression. Furthermore, Tmojo templates gain access to
+    their arguments through the implicitly defined %Args hash.
+
+    When generating text, it is useful to conditionally allow the inclusion
+    of certain portions. Tmojo allows you to use any valid Perl structures
+    for controlling the creation of the document:
+
+      : if ($Args{show_cat} == 1) {
+        <img src='cat.jpg'>
+      : } else {
+        <img src='dog.jpg'>
+      : }
+  
+      <ol>
+        : foreach my $item (@{$Args{list}}) {
+          <li><: $item :></li>
+        : }
+      </ol>
+
+    In Tmojo templates, any line that begins with a colon, optionally
+    preceded by any amount of whitespace, will be treated as pure Perl. This
+    is useful for conditional and looping logic, as in our example above, as
+    well as simple variable assignment:
+
+      : my @list = @{$Args{list}};
+
+    Occasionally, it is useful to perform operations that take more than one
+    line. In these cases, rather than preceding every line of the operation
+    with a colon, you may use a "<: PERL :>" block, like this:
+
+      <: PERL
+        my $year = (localtime()[5]);
+        $year += 1900;
+      :>
+  
+      The year is <: $year :>.
+
+    For longer "<: PERL :>" sections, you may want to use this style:
+
+      <: PERL :>
+        my $year = (localtime()[5]);
+          $year += 1900;
+          do_something_else();
+        <: /PERL :>
+
+  Methods
+    In more complex Tmojo templates, it is sometimes convenient to break the
+    template up into multiple reusable sections. This is accomplished with
+    methods:
+
+      <: METHOD title :>
+        Favorite Colors
+      <: /METHOD :>
+  
+      <html>
+        <head><title><: $Self->title :></title></head>
+  
+        <body>
+          <h1><: $Self->title :></h1>
+  
+          Red<br>
+          Blue<br>
+          Green<br>
+        </body>
+      </html>
+
+    This example contains a method called 'title' which is referenced twice:
+    once in the header of the HTML and once in the body. Notice that methods
+    are accessed through the implicit $Self variable, which always contains
+    a reference to the current template object.
+
+    Methods may take arguments in the same way that Perl methods take
+    arguments:
+
+      <: METHOD show_number :>
+        : my ($current_number) = @_;
+        Current Number: <: $current_number :><br>
+      <: /METHOD :>
+  
+      : for (1..5) {
+        <: $Self->show_number($_) :>
+      : }
+
+    Methods also have access to the implicit %Args hash and $Self variables
+    as well as the implicit %Vars hash and $Tmojo variable that we'll be
+    discussing later.
+
+    When a Tmojo template is run, all of the content outside of any methods
+    acts as the main part of the template. In fact, everything outside of
+    the other sections is *implicitly* placed in a method called 'main'.
+    Thus, when a template is run, it is initialized, and then its main
+    method is executed. The inclusion of any other methods in the output is
+    dictated by the main method.
+
+  The Global Section
+    It is often useful to include outside Perl modules for use in your Tmojo
+    templates. This is best accomplished in the "<: GLOBAL :>" section, like
+    this:
+
+      <: GLOBAL :>
+        use Time::Local;
+      <: /GLOBAL :>
+  
+      : my $time_stamp = timelocal(0, 0, 12, 24, 2, 104);
+  
+      Unix Time Stamp: <: $time_stamp :>
+
+    Everything in the "<: GLOBAL :>" section is executed outside of any
+    methods, *including* the main method. Here, for instance, you could
+    declare a global variable that would be available to all of the methods
+    in the template, like this:
+
+      <: GLOBAL :>
+        my @months = qw(Jan Feb Mar Apr ...);
+      <: /GLOBAL :>
+
+    Because the "<: GLOBAL :>" section occurs outside of the templates
+    methods, it will only be executed when the template is compiled, not
+    every time it is run. Thus, code in the "<: GLOBAL :>" section *does
+    not* have access to the %Args, %Vars or $Self variables.
+
+  The Init Section and Vars Hash
+    Often, every time your template is run, it is useful to prepare some
+    data that will be available to all of the methods in the template. This
+    can be accomplished with the "<: INIT :>" section and the %Vars hash.
+
+    Unlike the "<: GLOBAL :>" section, the "<: INIT :>" section *is* run
+    every time the template is called, and it *does* have access to the
+    %Args, %Vars, and $Self variables. A typical "<: INIT :>" section might
+    look like this:
+
+      <: INIT :>
+        $Vars{user} = sql_lookup_user($Args{user_id});
+      <: /INIT :>
+
+    This example calls the imaginary function "sql_lookup_user" (which would
+    have been included from a library used in the "<: GLOBAL :>" section)
+    and puts the results in the %Vars hash. In this way, the template can
+    look up the user once, and have that data be available through the %Vars
+    hash to all of the methods in the template.
+
+    It is important to note that lexical variables declared in the "<: INIT
+    :>" section *are not* available to the rest of the template. Thus the
+    nessicity of the %Vars hash.
+
+Calling Tmojo Templates
+    In order to call a Tmojo template from your Perl script or module, you
+    must have a Tmojo object. You create a Tmojo object like this:
+
+      my $Tmojo = HTML::Tmojo->new(
+        template_dir => '/location/of/templates',
+        cache_dir    => '/place/to/save/compiled/templates',
+      );
+
+    If you don't provide those arguments, Tmojo will look for their values
+    in $ENV{TMOJO_TEMPLATE_DIR} and $ENV{TMOJO_CACHE_DIR} respectively.
+
+    Once you have your $Tmojo object, you can call a template like this:
+
+      my $result = $Tmojo->call('/group_1/my_template.tmojo');
+
+    Assuming that we're using the Tmojo object from the previous example,
+    this would compile and execute the Tmojo template located in the file
+    /location/of/templates/group_1/my_template.tmojo.
+
+  Arguments
+    When you call a Tmojo template, you may need to pass arguments. Tmojo
+    allows you to pass named arguments into the template like this:
+
+      my $result = $Tmojo->call(
+        '/group_1/my_template.tmojo',
+  
+        arg1 => 'value1',
+        arg2 => 'value2',
+      );
+
+    In this case, the arguments 'arg1' and 'arg2' would be available to
+    /group_1/my_template.tmojo in the %Args hash.
+
+  Templates Calling Templates
+    While you must create your own Tmojo object to use Tmojo from your own
+    Perl scripts or modules, within Tmojo templates, there is always an
+    implicit $Tmojo object that allows Tmojo templates to refer to other
+    templates in the same template directory.
+
+    Tmojo templates often refer to other Tmojo templates. For instance,
+    /group_1/my_template.tmojo may refer to /group_1/another_template.tmojo.
+    It may do so in two possible ways. First, it may use the absolute
+    template id, like this:
+
+      <: $Tmojo->call('/group_1/another_template.tmojo') :>
+
+    Sometimes, however, it is more convenient when a template doesn't need
+    to know exactly what directory it is in. In these cases,
+    /group_1/my_template.tmojo could refer to
+    /group_1/another_template.tmojo using a relative template id, like this:
+
+      <: $Tmojo->call('another_template.tmojo') :>
+
+    Or, a template may refer to another template in the directory above it
+    like this:
+
+      <: $Tmojo->call('../another_template.tmojo') :>
+
+    This works not only for Tmojo calls inside if templates, but also for
+    template ids put in $TMOJO_CONTAINER and @TMOJO_ISA.
+
+    Another important feature of template ids is Upward Traversal. Take a
+    look at this example:
+
+      my $result = $Tmojo->call(
+        '/some/deep/directory/template.tmojo^'
+      );
+
+    Notice the up-carrot ("^") at the end of this template id. When you
+    provide an up-carrot, Tmojo will traverse all of the specified
+    directories innermost to outermost in search of the template specified.
+    So, in this case, Tmojo would search for the template in this fashion:
+
+      /some/deep/directory/template.tmojo
+      /some/deep/template.tmojo
+      /some/template.tmojo
+      /template.tmojo
+
+    This trick also works for relative template ids, so, if a template in
+    /some/directory refers to a template simply as 'other_template.tmojo^',
+    then Tmojo will search for that template like this:
+
+      /some/directory/other_template.tmojo
+      /some/other_template.tmojo
+      /other_template.tmojo
+
+Filtering
+    It can sometimes be useful to filter a portion of Tmojo output before it
+    is included in the result. This can be accomplished with a "<: FILTER
+    :>" section, like this:
+
+      <: FILTER uc($Result) :>
+        All of the text created in this section
+        will be made uppercase by the filter.
+    
+        Filter sections can include any other valid
+        Tmojo constructs, like this:
+    
+        : for ('a'..'z') {
+          this will be uppercase too: <: $_ :>
+        : }
+      <: /FILTER :>
+
+    "<: FILTER :>" sections work by temporarily masking the $Result variable
+    for the duration of the section. At the end of the section, the Perl
+    code provided in the open tag is executed, and the results are added to
+    the 'real' $Result. Because the $Result variables are placed on a stack,
+    it is possible to have nested "<: FILTER :>" sections.
+
+Capturing
+    If you require more thorough filtering of portions of your Tmojo output,
+    you may use a "<: CAPTURE :>" block to capture a portion of Tmojo output
+    into a variable of your choosing. For instance:
+
+      <: CAPTURE my $stuff :>
+        The contents of this block will be put into the
+        variable $stuff and not included in the $Result.
+      <: /CAPTURE :>
+  
+      <: PERL :>
+        for ($stuff) {
+          tr/a-f/A-F/;
+          s/\n/ keep going /g;
+        }
+      <: /PERL :>
+  
+      <: $stuff :>
+
+    You may use any valid lvalue in the open tag of your "<: CAPTURE :>"
+    block.
+
+Containers
+    When designing web sites, it is common to have a complicated bunch of
+    HTML that defines the overall look and feel for your web application.
+    Generally, this HTML is the same for every single page. Back when I was
+    using JSP, I would accomplish this by having a JSP template called
+    'header.jsp' and one called 'footer.jsp'. Then, each of my application
+    pages would include these at the top and at the bottom of the page.
+
+    While this approach worked OK, it had a few drawbacks. First, because my
+    header and footer were stretched across two files, it was easy to have
+    mismatched HTML tags and otherwise broken stuff in the header and footer
+    files. Second, it forced the header and the footer to rely on the
+    application page for all of their information. Thus, it was possible for
+    my controller to pass data intended for the header into my application
+    page, only to have the application page forget to forward the data to
+    the header. Of course, even if you remembered to pass that data on every
+    time, that still meant a potentially large chunk of parameter passing
+    code repeated on every application page.
+
+    Tmojo resolves the problem with a much more elegant system. Each Tmojo
+    template may declare a container. You do this at the top of your
+    template in the "<: GLOBAL :>" section, like this:
+
+      <: GLOBAL :>
+        our $TMOJO_CONTAINER = '/my/container.tmojo';
+      <: /GLOBAL :>
+
+    When a template declares a container in this way, it changes the way
+    that it is handled. Now, all calls to this template are first handled by
+    its container. This process is best illustrated by an example:
+
+    TEMPLATE: /example.tmojo
+
+      <: GLOBAL :>
+        our $TMOJO_CONTAINER = '/container.tmojo';
+      <: /GLOBAL :>
+  
+      this is the body of my html page
+
+    TEMPLATE: /container.tmojo
+
+      <html>
+        <head><title>Lab-01 Example Page</title></head>
+    
+        <body>
+          <: $Next->main :>
+        </body>
+      </html>
+
+    CONTROLLER
+
+      print $Tmojo->call('/example.tmojo');
+
+    OUTPUT
+
+      <html>
+        <head><title>Lab-01 Example Page</title></head>
+    
+        <body>
+          this is the body of my html page
+        </body>
+      </html>
+
+    In this example, the call to /example.tmojo is interrupted by
+    /container.tmojo which provides the outside structure of the page, and
+    then includes the originally called page with "<: $Next->main :>".
+
+    Inside container templates, the contained template object is accessible
+    through the implicitly defined $Next variable.
+
+    It is possible for a container to communicate with its contained
+    template in some very useful ways. Look at this example:
+
+    TEMPLATE: /example.tmojo
+
+      <: GLOBAL :>
+        our $TMOJO_CONTAINER = '/container.tmojo';
+      <: /GLOBAL :>
+  
+      <: METHOD title :>
+        Example Page
+      <: /METHOD :>
+  
+      <: METHOD css :>
+        p.foo {
+          font-size: 16px;
+          color: red;
+        }
+      <: /METHOD :>
+  
+      <p class='foo'>
+        this is the body of my html page
+      </p>
+
+    TEMPLATE: /container.tmojo
+
+      <html>
+        <head>
+          <title><: $Next->title :></title>
+      
+          <style type='text/css'>
+            h1 {
+              font-family: arial;
+            }
+        
+            <: $Next->css :>
+          </style>
+        </head>
+    
+        <body>
+          <h1><: $Next->title :></h1>
+      
+          <: $Next->main :>
+        </body>
+      </html>
+
+    CONTROLLER
+
+      print $Tmojo->call('/example.tmojo');
+
+    OUTPUT
+
+      <html>
+        <head>
+          <title>Example Page</title>
+      
+          <style type='text/css'>
+            h1 {
+              font-family: arial;
+            }
+        
+            p.foo {
+              font-size: 16px;
+              color: red;
+            }
+          </style>
+        </head>
+    
+        <body>
+          <h1>Example Page</h1>
+      
+          <p class='foo'>
+            this is the body of my html page
+          </p>
+        </body>
+      </html>
+
+    In this example, the container gives the contained template several
+    opportunities to effect the final page. First, it allows the contained
+    template to choose a title for the page. Second, it allows the contained
+    template to add some CSS to the page, and, third, it allows the
+    contained template to provide the body of the page. This mechanism
+    allows for clear and elegant application design.
+
+    One thing to note in our example, however, is that if '/example.tmojo'
+    failed to define a function called 'css', there would be a runtime
+    error. This issue is easily resolved by using parent templates, which
+    will be described in upcoming sections.
+
+  Containers and Init Sections
+    Tmojo templates often contain "<: INIT :>" sections. When a template
+    that doesn't declare a container is called, it is processed in the
+    following order:
+
+    1   If the template is not yet compiled, do so and run the "<: GLOBAL
+        :>" section.
+
+    2   Call the "<: INIT :>" section of the template.
+
+    3   Call the main method of the template.
+
+    When a template declares a container, the process looks like this:
+
+    1   If the contained template is not yet compiled, do so and run its "<:
+        GLOBAL :>" section.
+
+    2   Call the "<: INIT :>" section of the contained template.
+
+    3   If the container is not yet compiled, do so and run its "<: GLOBAL
+        :>" section.
+
+    4   Provide the container with a reference to the contained template in
+        the $Next variable.
+
+    5   Call the "<: INIT :>" section of the container.
+
+    6   Call the main method of the container.
+
+    There are three important things to note about this process:
+
+    First, the contained template always gets to run its "<: INIT :>"
+    section first, which gives it an opportunity to perform calculations on
+    the %Args and place results in %Vars *before* the container ever calls
+    one if its methods.
+
+    Second, while the main() method of the container is guaranteed to run,
+    the container itself chooses how to interact with the contained
+    template. It may call "$Next->main", but it may choose to call a
+    different method entirely, or even several methods as in our last
+    example. It may even choose not to call the contained template at all.
+
+    Third, the %Args passed to the contained template when it is called are
+    also passed to the container. In fact, the same %Args hash is passed to
+    both templates, so it is possible for the contained template to alter
+    the %Args in its "<: INIT :>" section before the container ever has a
+    chance to see them. This is different from the %Vars hash, which is not
+    shared between the container and the contained template.
+
+  Specifying the Container From Your Perl Script
+    Generally, if a template whishes to have a container, it must explicitly
+    reference that container from its "<: GLOBAL :>" section. However,
+    sometimes it makes more sense to choose the container from your Perl
+    script and not from within each Tmojo template.
+
+    It is possible to do this by using the call_with_container() method on
+    the Tmojo object, like this:
+
+      my $result = $Tmojo->call_with_container(
+        '/some/template.tmojo',
+        '/some/container.tmojo',
+    
+        arg1 => 1,
+        arg2 => 'foo',
+      );
+
+    When called this way, the second argument provided will override
+    whatever container was specified by the called template (even if there
+    was no container specified).
+
+    One important feature is that the container template id specified in
+    this way is relative to the called template. This allows you to specify
+    a generic container rule in all of your Tmojo calls, like this:
+
+      my $result = $Tmojo->call_with_container(
+        '/some/template.tmojo',
+        'container.tmojo^',
+    
+        arg1 => 'foo',
+      );
+
+    In this case, no matter what template you call, it will always be
+    contained by the closest template named 'container.tmojo'. This
+    technique is especially useful for content oriented web sites where most
+    of your Tmojo templates will contain nothing but HTML that should be
+    built with containers located in the same directory. By using
+    call_with_container(), your content providers can write HTML and never
+    have to be bothered with providing a "<: GLOBAL :>" section in their
+    Tmojo templates.
+
+Advanced Tmojo Syntax
+  Tag Types
+    According to the Tmojo compiler, a Tmojo template is simply a series of
+    tags. Each tag has a type and some content. Take a look at this tag:
+
+      <: METHOD foo :>
+
+    This Tmojo tag has the type "METHOD" and the content 'foo'.
+
+      <: /METHOD :>
+
+    This tag has the type "/METHOD" and no content.
+
+    Tmojo will always look for a Tmojo keyword at the beginning of a tag.
+    All Tmojo keywords are upper-case to keep them from being too similar to
+    Perl constructs. When Tmojo can't find a valid keyword at the beginning
+    of the tag, it employs a simple heuristic to decide the type of the tag.
+    For example:
+
+      <: $variable :>
+
+    In this case, Tmojo can't find a keyword, so, after looking at the
+    content of the tag, Tmojo decides that this should be a "MERGE" type
+    tag. In fact, it is the same as:
+
+      <: MERGE $variable :>
+
+    On the other hand, if your tag looks like this:
+
+      <: if ($foo == 1) { my $x = 10; } :>
+
+    Tmojo will realize that you have a Perl statement, not a Perl
+    expression, and will decide that this should be a "PERL" type tag. It
+    would be the same as this:
+
+      <: PERL if ($foo == 1) { my $x = 10; } :>
+
+    If you don't want Tmojo to do any guessing about your code, you can
+    always provide the explicit keyword at the beginning of the tag.
+
+  Line Tags
+    As you've seen earlier, Tmojo also allows you to include Perl code on
+    any line that simply begins with ":".
+
+    In fact, this syntax is just an alternative tag syntax. For example,
+    this:
+
+      : my $foo = 1;
+
+    Is exactly the same as:
+
+      <: PERL my $foo = 1; :>
+
+    This means that you can use these line tags as tag, not just "PERL"
+    tags. For instace, you could declare a method like this:
+
+      : METHOD foo
+        this is my method
+      : /METHOD
+
+    Or you could merge the contents of a variable like this:
+
+      : MERGE $variable
+
+    The primary difference in these sorts of tags is that, first, they
+    cannot span multiple lines (because they are termintated by a newline
+    character), and second, if Tmojo cannot find a valid keyword, it will
+    always assume that the tag is a "PERL" type tag (never a "MERGE" type
+    tag).
+
+    Line tags also have the limitation that they cannot override whitespace
+    controls, which we will discuss next.
+
+  Whitespace Controls
+    When generating HTML, whitespace is seldom an issue. This is because
+    HTML parsers normalize almost all strings of whitespace into a single
+    space. On the other hand, when generating plain text documents,
+    whitepsace is the primary layout controll.
+
+    Tmojo allows precise control over whitespace by allowing you to set
+    whitespace options on tags. Take a look at this example *without*
+    whitespace controls:
+
+      <: if ($x == 1) { :>
+      some text
+      <: } :>
+
+    The output from this would look like:
+
+      "
+      some text
+      "
+
+    Now, look at the following example *with* whitespace controls:
+
+      <: if ($x == 1) { -:>
+      some text
+      <:- } :>
+
+    The output of this example would be:
+
+      "some text"
+
+    The "-" on the left of the tag tells Tmojo to remove all whitespace up
+    to and including *one* newline character from the left of the tag. The
+    "-" on the right does the same thing for whitespace on the right of the
+    tag.
+
+    Another example of where this can come in handy is in methods. Look at
+    this:
+
+      <: METHOD some_url :>
+        http://www.sample.com
+      <: /METHOD :>
+  
+      <a href='<: $Self->some_url :>'>My Link</a>
+
+    Without whitespace controls, the output of this template would be:
+
+      "
+  
+      <a href='
+        http://www.sample.com
+      '>My Link</a>"
+
+    Notice the ugly whitespace generated by the method. Now, with whitespace
+    controls:
+
+      <: METHOD some_url --:>
+        http://www.sample.com
+      <:-- /METHOD --:>
+  
+      <a href='<: $Self->some_url :>'>My Link</a>
+
+    The "--" tells Tmojo to remove all whitespace including any number of
+    newlines from that side of the tag, so this example would produce:
+
+      "<a href='http://www.sample.com'>My Link</a>"
+
+    Because the use of certain whitespace controls is so common, Tmojo
+    actually defines default whitespace controls for every type of tag. For
+    instance, the controls shown on the example method above are used by
+    default.
+
+    The default whitespace controls have been carefully chosen so you won't
+    need to specify controls explicitly very often. However, you can always
+    override the default behavior by providing a "-" or "--" or, in the case
+    where you want to explicitly preserve whitespace "+" at the beginnings
+    and/or ends of your tags.
+
+    As mentioned above, line tags cannot override whitespace controls. If
+    you need to control whitespace in those situations, use the inline tag
+    notation instead.
+
+  Tag Styles
+    Just because we like "<:" and ":>" to define tags, doesn't mean that you
+    do. Tmojo allows you to override this option with the "TAG_STYLE" tag,
+    like this:
+
+      <: TAG_STYLE <% %> % :>
+  
+      % my $language = 'ASP';
+      Look Mom! I'm <% $language %>!
+
+    Whenever Tmojo encouters the "TAG_STYLE" tag, it will expect the new
+    style of tags for the rest of the document, or until it encounters
+    another "TAG_STYLE" tag.
+
+    This is extremely useful when you need to output code that looks like
+    Tmojo from Tmojo, like this:
+
+      <: METHOD tmojo_example :>
+        <: TAG_STYLE { } % :>
+    
+        This is a Tmojo Example Number { $_[0] }:
+      
+          <: MERGE $foo :>
+    
+        { TAG_STYLE default }
+      <: /METHOD :>
+
+    This method changes the tagstyle in order to output text that looks like
+    Tmojo, and then changes the tagstyle back before it is over. It is
+    important to note that you must explicitly change the tag style back,
+    otherwise the parser will expect all of the following tags to use the
+    new tag style.
+
+Under the Hood
+    Before we discuss the mechanism of parent templates, it is useful to
+    understand the inner workings of Tmojo templates.
+
+    In actuality, every Tmojo template, when it is first run, is compiled
+    into a Perl object class (which is simply a Perl package). Every Tmojo
+    method in the template is simply converted into a Perl method of the
+    same name. This is also true for the implicit main method. The "<:
+    GLOBAL :>" section of the template is placed near the top of the Perl
+    package (exactly where you'd expect to see Perl "use" statements and
+    constant definitions). The "<: INIT :>" section is placed inside of the
+    object constructor, which is a method called 'new'.
+
+    Take a look at this example template:
+
+      <: GLOBAL :>
+        use POSIX qw(strftime);
+      <: /GLOBAL :>
+  
+      <: INIT :>
+        my $year  = $Args{year};
+        my $month = $Args{month};
+        my $day   = $Args{day};
+    
+        $Vars{readable_time} = strftime(
+          '%b %d, %Y', 0, 0, 12, $day, $month - 1, $year - 1900
+        );
+      <: /INIT :>
+  
+      <: METHOD title :>
+        Report For <: $Vars{readable_time} :>
+      <: /METHOD :>
+  
+      <html>
+        <head>
+          <title><: $Self->title :></title>
+        </head>
+    
+        <body>
+          <h1><: $Self->title :></h1>
+      
+          <p>
+            Well, there is nothing to report!
+          </p>
+        </body>
+      </html>
+
+    This is the resulting Perl package:
+
+      package HTML::Tmojo::Templates::...;
+  
+      use strict;
+  
+      our $Tmojo;
+  
+      use POSIX qw(strftime);
+  
+      sub new {
+        my $Self = {
+          args    => $_[1],
+          next    => $_[2],
+          vars    => {},
+        };
+
+        bless $Self, $_[0];
+
+        # DEFINE THE IMPLICIT VARIABLES
+        my $Next  = $Self->{next};
+        our %Args; local *Args = $Self->{args};
+        our %Vars; local *Vars = $Self->{vars};
+
+        # --- BEGIN USER CODE ---
+        my $year  = $Args{year};
+        my $month = $Args{month};
+        my $day   = $Args{day};
+
+        $Vars{readable_time} = strftime(
+          '%b %d, %Y', 0, 0, 12, $day, $month - 1, $year - 1900
+        );
+
+        # --- END USER CODE ---
+
+        # RETURN THE VALUE
+        return $Self;
+      }
+  
+      sub main {
+        my $Self = shift @_;
+
+        # DEFINE THE IMPLICIT VARIABLES
+        my $Next  = $Self->{next};
+        our %Args; local *Args = $Self->{args};
+        our %Vars; local *Vars = $Self->{vars};
+
+        my $Result = '';
+
+        # --- BEGIN USER CODE ---
+        $Result .= "<html>\n";
+        $Result .= "\t<head>\n";
+        $Result .= "\t\t<title>";
+        $Result .= ( $Self->title );
+        $Result .= "</title>\n";
+        $Result .= "\t</head>\n";
+        $Result .= "\t\n";
+        $Result .= "\t<body>\n";
+        $Result .= "\t\t<h1>";
+        $Result .= ( $Self->title );
+        $Result .= "</h1>\n";
+        $Result .= "\t\t\n";
+        $Result .= "\t\t<p>\n";
+        $Result .= "\t\t\tWell, there is nothing to report!\n";
+        $Result .= "\t\t</p>\n";
+        $Result .= "\t</body>\n";
+        $Result .= "</html>";
+
+        # --- END USER CODE ---
+
+        return $Result;
+      }
+  
+      sub title {
+        my $Self = shift @_;
+
+        # DEFINE THE IMPLICIT VARIABLES
+        my $Next  = $Self->{next};
+        our %Args; local *Args = $Self->{args};
+        our %Vars; local *Vars = $Self->{vars};
+
+        my $Result = '';
+
+        # --- BEGIN USER CODE ---
+        $Result .= "Report For ";
+        $Result .= ( $Vars{readable_time} );
+
+        # --- END USER CODE ---
+
+        return $Result;
+      }
+  
+      1;
+
+    When you call a Tmojo template like this one from your Perl script, the
+    Tmojo object calls the new method to construct an object based on your
+    Tmojo template. It then calls the main method of the new object and
+    returns the results. In order to understand Tmojo parent templates, it
+    is important to see the distinct similarities between Tmojo templates
+    and a pure Perl classes.
+
+Parent Templates
+    Because Tmojo templates are simply Perl object classes, it is possible
+    for them to take advantage of class inheritance and polymorphism. If
+    those two terms make you wince, you should probably take a look at the
+    O'Reilly Programming Perl book before reading this section. In fact, it
+    is possible to use Tmojo to solve most web application design problems
+    *without* ever using parent templates.
+
+    If, however, you're itching to use Object-Oriented Tmojo, read on!
+
+    In a typical Perl class, you set the super-class by putting the
+    super-class package name in the package variable, @ISA. Tmojo has an
+    almost identical mechanism for specifying the parent template of a
+    template. In the global section of your templates, you may set the
+    package variable @TMOJO_ISA, like this:
+
+      <: GLOBAL :>
+        our @TMOJO_ISA = ('/some/parent/template.tmojo');
+      <: /GLOBAL :>
+
+    As with Perl, you can actually set multiple parent templates by putting
+    multiple template ids in the @TMOJO_ISA variable. (But I wouldn't
+    recommend using multiple inheritance unless you're *really* experienced
+    with object oriented programming.)
+
+    Templates referred to in this way are, as with all other things,
+    relative to the child template. So, if you say:
+
+      <: GLOBAL :>
+        our @TMOJO_ISA = ('parent.tmojo');
+      <: /GLOBAL :>
+
+    Tmojo will look in the same directory as the child template for the
+    parent template. Also, if you say:
+
+      <: GLOBAL :>
+        our @TMOJO_ISA = ('parent.tmojo^');
+      <: /GLOBAL :>
+
+    Tmojo will use Upward Traversal to look up the directory paths in search
+    of the nearest 'parent.tmojo'.
+
+    Using parent templates in this way solves the problem discussed earlier,
+    in which a container may expect contained templates to provide a certain
+    set of functions, even if the content of those functions is optional.
+    Take a look at this example:
+
+    TEMPLATE: /example.tmojo
+
+      <: GLOBAL :>
+        our $TMOJO_CONTAINER = '/container.tmojo';
+        our @TMOJO_ISA       = '/parent.tmojo';
+      <: /GLOBAL :>
+  
+      <: METHOD css :>
+        p.foo {
+          font-size: 16px;
+          color: red;
+        }
+      <: /METHOD :>
+  
+      <p class='foo'>
+        this is the body of my html page
+      </p>
+
+    TEMPLATE: /container.tmojo
+
+      <html>
+        <head>
+          <title><: $Next->title :></title>
+      
+          <style type='text/css'>
+            h1 {
+              font-family: arial;
+            }
+        
+            <: $Next->css :>
+          </style>
+        </head>
+    
+        <body>
+          <h1><: $Next->title :></h1>
+      
+          <: $Next->main :>
+        </body>
+      </html>
+
+    TEMPLATE: /parent.tmojo
+
+      <: METHOD title :>
+        Generic Title
+      <: /METHOD :>
+  
+      <: METHOD css :>
+        // no template css
+      <: /METHOD :>
+
+    CONTROLLER
+
+      print $Tmojo->call('/example.tmojo');
+
+    OUTPUT
+
+      <html>
+        <head>
+          <title>Generic Title</title>
+      
+          <style type='text/css'>
+            h1 {
+              font-family: arial;
+            }
+        
+            p.foo {
+              font-size: 16px;
+              color: red;
+            }
+          </style>
+        </head>
+    
+        <body>
+          <h1>Generic Title</h1>
+      
+          <p class='foo'>
+            this is the body of my html page
+          </p>
+        </body>
+      </html>
+
+    In this example, the container calls the method title() on the contained
+    template, example.tmojo. example.tmojo, however, *does not* define the
+    method called title(), it does, however, inherit a method called title()
+    from parent.tmojo. In this way, you can establish an interface between a
+    container and its contained templates in which some or all of the
+    methods called are optional.
+
+    With Tmojo, it is possible to solve problems with containers or with
+    parent templates or both. Obviously there is some overlap in what
+    solutions these two mechanisms provide. Tmojo supports both so that it
+    can grow to accomodate very complex applications. In my experience, it
+    is better to use containers in your solution first, and then use parent
+    templates if they become nessisary.
+
+Prepare
+    Normally, when you call a Tmojo template, you expect it to be
+    initialized, and then you expect the result of it's main() method to be
+    returned. When Templates have containers, you expect the output of their
+    container's main() method to be returned.
+
+    Sometimes, however, it would be convenient to have a Tmojo template
+    initialized, and then be given access to it's functions individually
+    (much as a container has access to a contained template through the
+    $Next variable).
+
+    This can be accomplished with the prepare() function. prepare() takes
+    the same arguments as call(). However, rather than calling the main()
+    method of the specified template and returning the output, it simply
+    initializes the Tmojo template object and returns a reference to that.
+
+    One caveat of prepare() is that it completely ignores containers. You
+    receive a reference to an object based on the specified template, not an
+    object based on the container.
+
+    Prepare is a critical feature for creating multi-lingual web-sites. This
+    is discussed further in... some other document I haven't written yet ;)
+
+But I Don't Want To Write a mod_perl Handler!
+    In my experience, most web applications quickly reach the level of
+    complexity that justifies the use of a model-view-controller solution,
+    with Tmojo stepping in nicely to handle the view side of things.
+    However, in some simple projects, especially those that are simply
+    content oriented, it's preferable to simply have a directory of Tmojo
+    templates served up by Apache for you. If this is all you need, you may
+    want to use the "SimpleHandler" as your mod_perl handler.
+
+    In your Apache config (after you've suffered the horror of installing
+    mod_perl), you'll do something like this:
+
+      <Location /my_tmojo_site>
+        SetHandler perl-script
+        PerlHandler HTML::Tmojo::SimpleHandler
+        PerlSetEnv TMOJO_TEMPLATE_DIR /location/of/templates
+        PerlSetEnv TMOJO_CACHE_DIR /place/to/compile/templates
+      </Location>
+
+    This will cause Apache to directly serve any tmojo templates located in
+    the "TMOJO_TEMPLATE_DIR" specified. Remember that your "TMOJO_CACHE_DIR"
+    *must* be writable by apache processes.
+
+    If you would like to establish a default container for your templates,
+    you may optionally set the "TMOJO_DEFAULT_CONTAINER" environment
+    variable, like this:
+
+      PerlSetEnv TMOJO_DEFAULT_CONTAINER /container.tmojo
+
+    Remember that you may want to use Upward Traversal for a more flexible
+    container hierarchy, like this:
+
+      PerlSetEnv TMOJO_DEFAULT_CONTAINER container.tmojo^
+
+    Tmojo templates served in this way will have access to all POST and GET
+    variables through the %Args hash.
+
+Copyright
+    Copyright 2004 Lab-01 LLC <http://lab-01.com/>
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Tmojo(tm) is a trademark of Lab-01 LLC.
+

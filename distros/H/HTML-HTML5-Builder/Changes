@@ -1,0 +1,38 @@
+HTML-HTML5-Builder
+==================
+
+Created:      2011-10-07
+Home page:    <https://metacpan.org/release/HTML-HTML5-Builder>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=HTML-HTML5-Builder>
+
+0.004  2011-10-20
+
+ - (Bugfix) Make test t/01basic.t no longer rely on HTML::HTML5::Parser -
+   was causing test failures.
+ - (Documentation) Advertise XML::LibXML::PrettyPrint.
+
+0.003  2011-10-11
+
+ - (Bugfix) Remove spurious 'use DateTime' from t/01basic.t that was
+   causing test failures.
+ - (Bugfix) Implement a custom 'can' method.
+
+0.002  2011-10-10
+
+ - Use autoloading to create functions.
+ - (Addition) Provide ucfirst equivalent functions for some HTML elements
+   with names that conflict with Perl built-ins.
+ - (Addition) RAW_CHUNK function.
+ - (Addition) ELEMENT function.
+ - (Addition) CHUNK function.
+ - (Documentation) Explain usage with RDF::RDFa::Generator.
+ - (Addition) COMMENT function.
+ - (Addition) XML_CHUNK function.
+ - (Addition) JQUERY function.
+ - (Addition) CREATIVE_COMMONS function.
+ - (Addition) OPENGRAPH function.
+
+0.001  2011-10-07
+# Initial release
+
+

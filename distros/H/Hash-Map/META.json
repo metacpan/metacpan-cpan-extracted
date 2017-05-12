@@ -1,0 +1,61 @@
+{
+   "abstract" : "Hash::Map - Manipulate hashes map like",
+   "author" : [
+      "Steffen Winkler <steffenw at cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Hash-Map",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Differences" : "0.60",
+            "Test::More" : "0",
+            "Test::NoWarnings" : "1.03"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Pod::Coverage::Moose" : "0",
+            "Test::Pod" : "1.14",
+            "Test::Pod::Coverage" : "1.04"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Clone" : "0",
+            "Exporter::Tiny" : "0",
+            "Scalar::Util" : "0",
+            "Try::Tiny" : "0",
+            "parent" : "0",
+            "perl" : "5.006",
+            "version" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Hash::Map" : {
+         "file" : "lib/Hash/Map.pm",
+         "version" : "0.016"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.016",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

@@ -1,0 +1,33 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head>
+		<title>hopkins HMI[% IF page.title %] - [% page.title %][% END %]</title>
+
+		<meta http-equiv="content-type" content="application/xhtml+xml; charset=UTF-8" />
+		<meta name="description" content="hopkins HMI" />
+		<meta name="robots" content="index, follow, noarchive" />
+		<meta name="googlebot" content="noarchive" />
+		[% IF 0 && page.refresh %]
+		<meta http-equiv="refresh" content="[% page.refresh %];url=[% c.req.uri %]" />
+		[% END %]
+
+		[% FOREACH style = page.styles %]
+		<link rel="stylesheet" type="text/css" href="/static/skins/[% page.skin %]/[% style %]" media="screen, projection, tv " />
+		[% END %]
+
+		<script type="text/javascript">var yuireq = [% page.yui.unique.to_json %];</script>
+		[% FOREACH script = page.scripts %]
+		<script type="text/javascript" src="[% script %]"></script>
+		[%- END %]
+	</head>
+
+	<body id="root" class="yui-skin-sam">
+		<div id="header">
+			<h1>Hopkins HMI</h1>
+		</div>
+
+		[% content WRAPPER "layout/${page.layout}.tt" %]
+	</body>
+</html>

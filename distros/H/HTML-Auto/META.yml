@@ -1,0 +1,26 @@
+---
+abstract: 'write HTML for common elements'
+author:
+  - 'Nuno Carvalho <smash@cpan.org>'
+  - 'André Santos <andrefs@cpan.org>'
+build_requires:
+  Data::Dumper: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-Auto
+requires:
+  Exporter: '0'
+  File::Basename: '0'
+  Template: '0'
+  Template::Provider: '0'
+  base: '0'
+  strict: '0'
+  warnings: '0'
+version: '0.09'

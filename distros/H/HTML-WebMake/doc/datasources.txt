@@ -1,0 +1,31 @@
+<wmmeta name="Title" value="Data Sources" />
+<wmmeta name="Section" value="02-tags_attrs" />
+<wmmeta name="Score" value="60" />
+<wmmeta name="Abstract">
+the protocols supported by &lt;contents&gt;, &lt;templates&gt; and &lt;media&gt;
+</wmmeta>
+
+Contents or URLs can be searched for using the "&lt;contents&gt;" [contents],
+"&lt;templates&gt;" [templates] or "&lt;media&gt;" [media] tags, which allow
+you to search a data source (directory, delimiter-separated-values file,
+database etc.) for a pattern.
+
+"&lt;contents&gt;" [contents] and "&lt;media&gt;" [media] tags can also pick
+up metadata from metatable files while searching for content or media items,
+using the ##metatable## attribute.
+
+Currently two data source protocols are defined, file: [1] and svfile: [2] .
+
+	[1]: #file
+	[2]: #svfile
+
+${datasource_attrs.inc}
+${datasource_file_protocol.inc}
+${datasource_svfile_protocol.inc}
+${datasource_adding_new_protocols.inc}
+
+	[globs]: $(globs)
+	[templates]: $(templates)
+	[contents]: $(contents)
+	[media]: $(media)
+

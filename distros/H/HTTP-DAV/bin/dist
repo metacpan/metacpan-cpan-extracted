@@ -1,0 +1,37 @@
+#!/bin/sh
+
+# $Id$
+
+URL="http://www.webdav.org/perldav"
+HTML="doc/html"
+
+echo "Updating \"The latest version is: ...\" string in doc/README.pod"
+
+perl -pi -e 'BEGIN{require "./lib/HTTP/DAV.pm";}; s/(latest version is:\s*v).*/$1$HTTP::DAV::VERSION (released $HTTP::DAV::VERSION_DATE)/gi;' doc/README.pod
+
+echo "Making html docs"
+pod2html="pod2html --noindex --htmldir $HTML"
+
+$pod2html --infile=doc/TODO.pod    --css=perldav.css --title="TODO" --outfile=$HTML/TODO.html
+$pod2html --infile=doc/README.pod  --css=perldav.css --title="PerlDAV" --outfile=$HTML/index.html
+$pod2html --infile=doc/Changes.pod --css=perldav.css --title="Changes" --outfile=$HTML/Changes.html
+$pod2html --infile=lib/HTTP/DAV.pm --css=perldav_plain.css --outfile=$HTML/HTTP-DAV.html
+$pod2html --infile=bin/dave        --css=$URL/perldav_plain.css --outfile=$HTML/dave.html
+#$pod2html --infile=doc/HISTORY.pod --css=$URL/perldav.css --outfile=$HTML/HISTORY.html
+
+echo "Removing extraneous <P>'s from HTML"
+perl -pi -e 's#^<P>$##; s#^<P></P>$##; ' $HTML/*.html
+
+echo "Making text docs"
+pod2text doc/README.pod > README
+pod2text doc/TODO.pod > TODO
+pod2text doc/Changes.pod > Changes
+
+# Needs to copy in the empty version of the TestDetails.pm module
+
+#cp HTTP-DAV-... doc/html
+
+echo "Copying TestDetails.pm.empty to TestDetails.pm"
+cp t/TestDetails.pm t/TestDetails.pm.bak
+cp t/TestDetails.pm.empty t/TestDetails.pm
+

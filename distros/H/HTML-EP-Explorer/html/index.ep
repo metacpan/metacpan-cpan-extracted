@@ -1,0 +1,12 @@
+<ep-package name="HTML::EP::Explorer" accept="de,en">
+<ep-explorer-init>
+<html><head><title><ep-language de="HTML-Explorer" en="HTML Explorer"></title>
+</head>
+<frameset rows="200,*">
+  <frame name="explorer_top_win" src="topwin.ep?language=$_ep_language$">
+  <frame name="explorer_list_win" src="listwin.ep?language=$_ep_language$">
+</frameset>
+<noframes>
+  <ep-include file="noframes.ep">
+</noframes>
+</html>

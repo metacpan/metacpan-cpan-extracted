@@ -1,0 +1,10 @@
+Revision history for HTTP-MobileAgent-Plugin-ID
+
+0.0.1  Tue Dec 11 04:28:28 2007
+       Initial release.
+
+0.0.2  Tue Jan 15 16:54:00 2008
+        - First letter of Softbank x-jphone-uid value is normalized to 0.
+        - Some changes to avoid PAUSE parsing error.
+          Thanks to Mr. Tatsuhiko Miyagawa.
+

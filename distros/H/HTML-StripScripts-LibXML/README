@@ -1,0 +1,71 @@
+NAME
+    HTML::StripScripts::Parser - XSS filter using HTML::Parser
+
+SYNOPSIS
+      use HTML::StripScripts::Parser;
+
+      my $hss = HTML::StripScripts::Parser->new(
+           {
+               Context => 'Document',
+               Rules   => { ... },
+           },
+           strict_comment => 1,
+           strict_names   => 1,
+      );
+
+      $hss->parse_file("foo.html");
+
+      print $hss->filtered_document;
+
+DESCRIPTION
+
+	
+    This class subclasses both HTML::StripScripts and HTML::Parser, adding
+    the input methods that HTML::Parser provides to HTML::StripScripts.
+
+    See HTML::StripScripts and HTML::Parser.
+
+CONSTRUCTORS
+    new ( CONFIG, [PARSER_OPTIONS] )
+        Creates a new "HTML::StripScripts::Parser" object, and invokes the
+        HTML::Parser init() method so that tags are fed to the correct
+        HTML::StripScripts methods.
+
+        The CONFIG parameter has the same semantics as the CONFIG parameter
+        to the HTML::StripScripts constructor.
+
+        Any PARSER_OPTIONS supplied will be passed on to the HTML::Parser
+        init method, allowing you to influence the way the input is parsed.
+
+        You cannot use PARSER_OPTIONS to set HTML::Parser event handlers,
+        since "HTML::StripScripts::Parser" uses all of the event hooks
+        itself.
+
+METHODS
+    See HTML::Parser for input methods, HTML::StripScripts for output
+    methods.
+
+SUBCLASSING
+    The "HTML::StripScripts::Parser" class is subclassable. Filter objects
+    are plain hashes. The hss_init() method takes the same arguments as
+    new(), and calls the initialization methods of both "HTML::StripScripts"
+    and "HTML::Parser".
+
+    See "SUBCLASSING" in HTML::StripScripts and "SUBCLASSING" in
+    HTML::Parser.
+
+SEE ALSO
+    HTML::StripScripts, HTML::Parser
+
+AUTHOR
+	Original author Nick Cleaton E<lt>nick@cleaton.netE<gt>
+	New code added and module maintained by Clinton Gormley
+	E<lt>clint@traveljury.comE<gt>
+
+
+COPYRIGHT
+    Copyright (C) 2003 Nick Cleaton. All Rights Reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

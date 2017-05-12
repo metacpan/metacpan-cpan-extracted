@@ -1,0 +1,62 @@
+HTML-HTML5-Writer
+=================
+
+Created:      2010-05-02
+Home page:    <https://metacpan.org/release/HTML-HTML5-Writer>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=HTML-HTML5-Writer>
+Maintainer:   Toby Inkster <mailto:tobyink@cpan.org>
+
+0.201  2012-06-12
+
+ - (Bugfix Documentation) Polyglot output defaults.
+
+0.200  2012-06-12
+
+ - Change default doctype for XHTML from DOCTYPE_HTML5 to DOCTYPE_LEGACY.
+ - Default to polyglot output for XHTML.
+ - Drop dependencies on parent.pm and common::sense.
+
+0.104  2011-10-10
+
+ - (Packaging) use Module::Package::RDF
+ - (Update) use 5.010
+ - Handle processing instructions, including special support for <?decode
+   ...?>.
+
+0.103  2011-10-07
+
+ - Remove dependency on HTML::HTML5::Parser
+ - use HTML::HTML5::Entities
+
+0.102  2011-03-29
+
+ - (Bugfix) Prevent elements from being output with duplicate attributes.
+
+0.101  2011-01-20
+
+ - (Addition) More DOCTYPE_* constants are now available.
+ - (Update) Add support for <track> element.
+
+0.100  2010-06-23
+
+ - (Bugfix) Document 'charset' option properly.
+
+0.04  2010-05-21
+
+ - (Bugfix) Handle <script> and <style> elements even better.
+ - (Bugfix) Include the 'x' in hexadecimal numeric character references.
+ - (Bugfix) Use XML predefined entities for &, <, etc.
+
+0.03  2010-05-19
+
+ - (Bugfix) Don't usually need to entity-encode tab characters!
+ - (Bugfix) Handle <script> and <style> elements better.
+
+0.02  2010-05-04  # Star Wars Day!
+
+ - (Bugfix) Makefile.PL should specify that we need common::sense.
+ - Improve documentation.
+
+0.01  2010-05-02  # First release
+
+

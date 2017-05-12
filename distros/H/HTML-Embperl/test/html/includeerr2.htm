@@ -1,0 +1,25 @@
+
+<html>
+<head>
+<title>Embperl Tests - Errors in Include other Embperl pages via Execute 2</title>
+</head>
+
+<h1>Embperl Tests - Errors in Include other Embperl pages via Execute 2</h1>
+
+
+[- Execute ( {inputfile => 'incsub.htm', req_rec => $req_rec, param => [undef, 'main']}) -]
+
+[- Execute ( {inputfile => 'incerr.htm', req_rec => $req_rec, param => ['err', 'main']}) -]
+
+[- Execute ( {inputfile => 'inc.htm', req_rec => $req_rec}) -]
+
+
+<br>
+
+
+<p><hr>
+
+<small>HTML::Embperl (c) 1997-1998 G.Richter</small>
+
+</body>
+</html>

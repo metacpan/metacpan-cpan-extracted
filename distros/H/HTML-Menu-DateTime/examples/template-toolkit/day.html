@@ -1,0 +1,4 @@
+<select name="day">
+[% FOREACH item = day %]
+	<option value="[% item.value %]" [% item.selected %]>[% item.label %]</option>[% END %]
+</select>

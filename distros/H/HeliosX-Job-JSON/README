@@ -1,0 +1,32 @@
+HeliosX-Job-JSON version 1.00
+=============================
+
+HeliosX::Job::JSON is a Helios::Job subclass allowing you to specify 
+Helios job arguments in JSON format instead of Helios's default XML 
+format.  
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Helios 2.80 or later
+    JSON::Tiny 0.49 or later
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014 by Logical Helion, LLC.
+
+This library is free software; you can redistribute it and/or 
+modify it under the terms of the Artistic License 2.0.  See the 
+included LICENSE file for details.
+
+This software comes with no warranty of any kind.

@@ -1,0 +1,102 @@
+HTML::DOM, version 0.057
+
+HTML::DOM is a Perl implementation of the HTML Document Object Model
+
+This is an alpha release.  So far,  the level-2 core,  HTML and event
+DOM interfaces have been implemented,  and some of the level-2  style
+sheet interfaces.
+
+
+RECENT CHANGES
+
+See the Changes file for the long version.
+
+0.057
+-----
+Bug fix:  $doc->base now returns the URL of the page if it is a  data
+URL, instead of just ‘data:’.
+
+0.056
+-----
+Bug fix:  $doc->title no longer dies when setting the title of a docu-
+ment with no head node.
+Miscellaneous:  The  make_request  method of form elements  has  been
+tweaked to work with Encode 2.80.  Technically,  it was working,  but,
+due to changed output in Encode 2.80,  the tests started failing.  So
+now the MIME encoding is skipped on a  string  consisting  solely  of
+spaces and printable ASCII.  (This was easier than  having  two  sets
+of tests.)
+
+0.055
+-----
+Bug fixes:
+• getElementsByClassName now works correctly when class names contain
+  hyphens,  instead of treating hyphens within  class  attributes  as
+  boundaries.  This was based on a patch by Sean Dodger  (thank you!).
+• $doc->body  used to return a text node in some cases,  causing meth-
+  ods like aLink to die.
+
+
+TO DO
+
+- Finish Level 2 CSS support
+- outerHTML/innerText?
+- Other DOM interfaces (the rest of level 2, and level 3)
+- HTML 5 stuff
+- Write more complete documentation
+- Write more tests
+- Finishing checking for memory leaks (run all tests under
+  Devel::Leak::Object)
+
+
+INSTALLATION
+
+The easiest way to install this module is to use the CPAN module or
+the cpan script:
+
+    [sudo] perl -MCPAN -e "install HTML::DOM"
+
+    [sudo] cpan HTML::DOM
+
+Or you can use the following:
+
+    perl Makefile.PL
+    make
+    make test
+    [sudo] make install
+
+
+DEPENDENCIES
+
+This module requires perl 5.8.3 or higher and the following
+Perl modules:
+
+- Scalar::Util 1.14 or later
+- Exporter 5.57 or later
+- URI
+- LWP 1.13 or later
+- CSS::DOM 0.07 or later
+- HTML::Tagset 3.02 or later
+- HTML::Parser 3.46 or later
+- HTML::Encoding is required if the parse_file method is to be used.
+- Tie::RefHash::Weak 0.08 or higher, if you are using perl 5.8.x
+
+
+DOCUMENTATION
+
+After installing, you can find documentation for this module with the 
+perldoc command.
+
+    perldoc HTML::DOM
+
+Or try using man (it's faster, in my experience):
+
+    man HTML::DOM
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007-16 Father Chrysostomos
+
+This program is free software; you may redistribute it and/or modify
+it under the same terms as perl.

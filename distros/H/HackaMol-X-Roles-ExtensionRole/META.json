@@ -1,0 +1,41 @@
+{
+   "abstract" : "Role to assist writing HackaMol extensions to external programs",
+   "author" : [
+      "Demian Riccardi <demianriccardi@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "HackaMol-X-Roles-ExtensionRole",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0.36",
+            "File::chdir" : "0.1010",
+            "HackaMol" : "0.038"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/demianriccardi/HackaMol-X-ExtensionRole",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/demianriccardi/HackaMol-X-ExtensionRole.git",
+         "web" : "https://github.com/demianriccardi/HackaMol-X-ExtensionRole"
+      }
+   },
+   "version" : "0.013"
+}
+

@@ -1,0 +1,14 @@
+# Change log for HTML::WikiConverter::Wikispaces
+
+version: 0.02
+date:    Tue Mar 26 2008
+changes:
+  - Fixed bug where ** (bold) at begining of line could be interpreted as a list
+  - Treat definition lists as unordered lists
+  - Wikispaces does not support anchors begining with non-alphabetic characters, so prefix all anchors with ws_
+  - Convert relative paths to just base name for links and images
+
+version: 0.01
+date:    Mon Jan 21 2008
+changes:
+  - Branched from main HTML::WikiConverter codebase.

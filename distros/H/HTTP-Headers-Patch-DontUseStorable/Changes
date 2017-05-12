@@ -1,0 +1,29 @@
+0.05    2017-04-19 (PERLANCAR)
+
+        - No functional changes.
+
+        - [doc] Update FAQ entry about using Storable_{freeze,thaw} which no
+          longer works with 5.12+ (thanks, Slaven) [RT#120460].
+
+
+0.04    2015-11-04 (PERLANCAR)
+
+        - Update HTTP::Headers version (>= 6.10).
+
+
+0.03    2012-11-18 (SHARYANTO)
+
+        - No functional changes. Add FAQ entries.
+
+
+0.02    2012-11-17 (SHARYANTO)
+
+        [FIXES]
+
+        - Avoid error 'Prototype mismatch: sub HTTP::Headers::clone: none vs
+          ($)' during global destruction.
+
+
+0.01    2012-11-17 (SHARYANTO)
+
+        - First release.

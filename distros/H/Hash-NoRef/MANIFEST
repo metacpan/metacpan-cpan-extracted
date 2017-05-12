@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+NoRef.xs
+README
+test.pl
+lib/Hash/NoRef.pm

@@ -1,0 +1,445 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>
+      WebMake: Documentation: The &lt;contents&gt; Tag
+    </title>
+    <meta name="generator" content="WebMake/2.2" />
+    <style>
+      body {
+       background-color: #ffffff; 
+       color: #000000; 
+       font-size: medium;
+       font-family: verdana,lucida,helvetica,sans-serif;
+      }
+      code, samp, pre {
+       font-family: Courier New,courier,fixed-width,monospace;
+      }
+      H1 { font-size: x-large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFCC66; }
+      H2 { font-size: large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFDD77; }
+      H3 { font-size: medium; font-family: Garamond,Book Antiqua,Times,serif; background: #FFEE88; }
+      H4 { font-size: small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H5 { font-size: x-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H6 { font-size: xx-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      A:link {
+       font-weight: bold;
+       color: #004000;
+       text-decoration: underline; 
+      }
+      A:visited {
+       font-weight: normal;
+       color: #008000;
+       text-decoration: underline; 
+      }
+      A:active {
+       font-weight: bold;
+       color: #800000;
+       text-decoration: underline; 
+      }
+      dt {
+       font-size: medium;
+       font-weight: bold;
+       padding-top: 8px; padding-bottom: 8px;
+      }
+      dd {
+       padding-top: 8px; padding-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body bgcolor="#ffffff" text="#000000" link="#3300cc" vlink="#660066">
+    <font face="lucida,verdana,sans-serif">
+      <div align="center">
+        <img src="images/WebMakeTitle.png" alt="WebMake" width="500" height="122" />
+      </div>
+      <table width="100%">
+        <tr>
+          <td valign="top">
+            <strong><a href="http://webmake.taint.org/">WebMake</a>
+             Documentation</strong> (version 2.2)
+             
+          </td>
+          <td valign="top">
+            <div align="right">
+              
+               [ <a href="contenttable.html">Back</a> | <a href="templates.html">Forward</a> | <a href="index.html">Index</a>
+               | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+               
+            </div>
+          </td>
+        </tr>
+      </table>
+<!-- yes, it's that Mozilla black-border code again ;) -->
+      <!-- stolen from www.mozilla.org via rc3.org -->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td bgcolor="#aaaaaa">
+            <table border="0" cellspacing="4" cellpadding="4" width="100%">
+              <tr>
+                <td bgcolor="#ffffff">
+                  <table border="0" cellspacing="4" cellpadding="4" width="100%">
+                    <tr>
+                      <td>
+                        <h1>The &lt;contents&gt; Tag</h1><p>
+                          Content can be searched for using the &lt;contents&gt; tag, which allows you
+                          to search a <a href="datasources.html">data source</a> (directory, delimiter-separated-values file,
+                          database etc.) for a pattern.
+                          
+                        </p>
+                        <p>
+                          Apart from the fact that it loads many contents instead of one, it's otherwise
+                          identical to the <a href="content.html">content tag</a>; see that tag's documentation
+                          for details on what attributes are supported.
+                          
+                        </p>
+                        <p>
+                          <p>
+                            <a name="Attributes_Supported_By_Datasource_Tags"><h2>Attributes Supported By Datasource Tags</h2></a><dl>
+                              <dt>
+                                <em>src</em>
+                              </dt>
+                              <dd>
+                                <p>
+                                  All datasources require this attribute, which
+                                   specifies a protocol and path, in a URL-style syntax:
+                                   <strong>protocol</strong>:<strong>path</strong> . file: is the default protocol, if none is
+                                   specified.
+                                  
+                                </p>
+                              </dd>
+                              <dt>
+                                <em>name</em>
+                              </dt>
+                              <dd>
+                                <p>
+                                  This attribute is used to specify the pattern of data,
+                                   under this path, which will be converted into content or media items.
+                                   The part of the data's location which matches this name pattern will
+                                   become the name of the item. Typically, WebMake glob patterns, such as "*.txt" or ".../*.html" are used.
+                                  
+                                </p>
+                              </dd>
+                              <dt>
+                                <em>skip</em>
+                              </dt>
+                              <dd>
+                                <p>
+                                  A pattern which should match filenames that should be
+                                   skipped. Files that match this pattern will not be included as content
+                                   or media items, or as metatables. Glob patterns, again, are
+                                   used here.
+                                  
+                                </p>
+                              </dd>
+                              <dt>
+                                <em>prefix</em>
+                              </dt>
+                              <dd>
+                                <p>
+                                  The items' names can be further modified by specifying
+                                   a <em>prefix</em> and/or <em>suffix</em>; these strings are prepended or
+                                   appended to the raw name to make the name the content is given.
+                                  
+                                </p>
+                              </dd>
+                              <dt>
+                                <em>suffix</em>
+                              </dt>
+                              <dd>
+                                <p>
+                                  See above.
+                                  
+                                </p>
+                              </dd>
+                              <dt>
+                                <em>namesubst</em>
+                              </dt>
+                              <dd>
+                                <p>
+                                  a Perl-formatted s// substitution, which is used to
+                                   convert source filenames to content names. See the example under
+                                   <strong>The File: Protocol</strong>, below.
+                                  
+                                </p>
+                              </dd>
+                              <dt>
+                                <em>nametr</em>
+                              </dt>
+                              <dd>
+                                <p>
+                                  a Perl tr// translation, which is used to convert
+                                   source filenames to content names.
+                                  
+                                </p>
+                              </dd>
+                              <dt>
+                                <em>listname</em>
+                              </dt>
+                              <dd>
+                                <p>
+                                  a name of a content item. This content item will be
+                                   created, and will contain the names of all content items picked up by
+                                   the <a href="contents.html">&lt;contents&gt;</a> or &lt;media&gt; search.
+                                  
+                                </p>
+                              </dd>
+                              <dt>
+                                <em><a href="metatable.html">metatable</a></em>
+                              </dt>
+                              <dd>
+                                <p>
+                                  a search pattern, similar to <em>name</em> above, which
+                                   provides filenames from which metadata will be loaded.
+                                  
+                                </p>
+                              </dd>
+                            </dl>
+                            <p>
+                              In addition, the attributes supported by the <a href="content.html">content tag</a> can
+                              be specified as attributes to <a href="contents.html">&lt;contents&gt;</a>, including
+                              <em>format</em>, <em>up</em>, <em>map</em>, etc.
+                              
+                            </p>
+                            <p>
+                              Also, the attributes supported by the <a href="metatable.html">&lt;metatable&gt;</a> tag
+                              can be used if you've specified a <em><a href="metatable.html">metatable</a></em> attribute.
+                              
+                            </p>
+                            <p>
+                              The content blocks picked up from a <a href="contents.html">&lt;contents&gt;</a> search can
+                              also contain meta-data, such as headlines, visibilty dates, workflow approval
+                              statuses, etc. by including <a href="wmmeta.html">metadata</a>.
+                              
+                            </p>
+                            <p>
+                              
+                            </p>
+                          </p>
+                          <p>
+                            <a name="file"><a name="The_file_Protocol"><h2>The file: Protocol</h2></a></a><p>
+                              The file: protocol loads content from a directory; each file is made into one
+                              content chunk. The <em>src</em> attribute indicates the source directory, the
+                              <em>name</em> attribute indicates the <a href="globs.html">glob pattern</a> that will pick up the
+                              content items in question.
+                              
+                            </p>
+                            <blockquote>
+                              <p>
+                                &lt;contents src="stories" name="*.txt" /&gt;
+                                
+                              </p>
+                            </blockquote>
+                            <p>
+                              The filename of the file will be used as the content chunk's name -- unless
+                              you use the <em>namesubst</em> command; see below for details on this.
+                              
+                            </p>
+                            <p>
+                              Note that, for efficiency, the files in question are not actually opened until
+                              their content chunks are referenced using ${name} or
+                              get_content("name").
+                              
+                            </p>
+                            <a name="Searching_Recursively_Through_A_Directory_Tree"><h3>Searching Recursively Through A Directory Tree</h3></a><p>
+                              Normally only the top level of files inside the <em>src</em> directory are added to
+                              the content set. However, if the <em>name</em> pattern starts with <strong>.../</strong>, the
+                              directory will be searched recursively:
+                              
+                            </p>
+                            <blockquote>
+                              <p>
+                                &lt;contents src="stories" name="<strong>.../</strong>*.txt" /&gt;
+                                
+                              </p>
+                            </blockquote>
+                            <p>
+                              The resulting content items will contain the full path from that directory
+                              down, i.e. the file <strong>stories/dir1/foo/bar.txt</strong> exists, the example above
+                              would define a content item called <strong>${dir1/foo/bar.txt}</strong>.
+                              
+                            </p>
+                            <a name="The_namesubst_Option"><h3>The namesubst Option</h3></a><p>
+                              If you use the <em>namesubst</em> command, the filename will be modified using that
+                              substitution, to give the content item's name. So, for example, this contents
+                              tag:
+                              
+                            </p>
+                            <blockquote>
+                              <p>
+                                &lt;contents src="stories" name="*.txt" namesubst="s/.txt//" /&gt;
+                                
+                              </p>
+                            </blockquote>
+                            <p>
+                              will load these example files as follows:
+                              
+                            </p>
+                            <p>
+                              <blockquote>
+                                <table>
+                                  <tr>
+                                    <th>
+                                      <em>Filename</em>
+                                    </th>
+                                    <th>
+                                      <em>Content Name</em>
+                                    </th>
+                                  </tr>
+                                  <tr>
+                                    <td>
+                                       stories/index.txt 
+                                    </td>
+                                    <td>
+                                       ${index} 
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td>
+                                       stories/foo.txt 
+                                    </td>
+                                    <td>
+                                       ${foo} 
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td>
+                                       stories/directory/bar.txt 
+                                    </td>
+                                    <td>
+                                       ${directory/bar} 
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td>
+                                       stories/zz/gum/baz.txt 
+                                    </td>
+                                    <td>
+                                       ${zz/gum/baz} 
+                                    </td>
+                                  </tr>
+                                </table>
+                              </blockquote>
+                            </p>
+                            <a name="Loading_Metadata_Using_the_Metatable_Attribute"><h3>Loading Metadata Using the Metatable Attribute</h3></a><p>
+                              You can now load metadata from external files while searching a directory tree
+                              for content items or media files. This allows you to load image titles, etc.
+                              from files which match the filename pattern you specify in the <em><a href="metatable.html">metatable</a></em>
+                              attribute.
+                              
+                            </p>
+                            <p>
+                              The attributes supported by the <a href="metatable.html">&lt;metatable&gt;</a> tag can be
+                              used in the datasource tag's attribute set, if you've specified a
+                              <em><a href="metatable.html">metatable</a></em> attribute, allowing you to define the format of the
+                              <a href="metatable.html">metatable</a> files you expect to find.
+                              
+                            </p>
+                            <p>
+                              There's one major difference between normal metatables and metatables
+                              found via a data source; the names in this kind of <a href="metatable.html">metatable</a> refer to
+                              the content or media object's <em>filename</em>, not its <em>content name</em>.
+                              
+                            </p>
+                            <p>
+                              In other words, the names of any content items referred to in the <a href="metatable.html">metatable</a>
+                              files will be modified, as follows:
+                              
+                            </p>
+                            <ul>
+                              <li>
+                                <p>
+                                  if the <em>name</em> attribute contains <code>.../</code>, then the content items
+                                   could be deep in a subdirectory. The <a href="metatable.html">metatable</a> file does not have
+                                   to contain the full path to the content item's name; it can just
+                                   contain the item's filename <em>relative to the <a href="metatable.html">metatable</a> itself</em>.
+                                  
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  if a <em>namesubst</em> or <em>nametr</em> function is specified, the content
+                                   names in the <a href="metatable.html">metatable</a> will be processed with this. Again, this
+                                   means that the <a href="metatable.html">metatable</a> data just has to provide the <em>filename</em>,
+                                   not whatever the resulting content item will be called.
+                                  
+                                </p>
+                              </li>
+                            </ul>
+                            <p>
+                              These features will hopefully make the operation a little more intuitive, as
+                              users who add files to a media or contents directory will not have to figure
+                              out what the resulting content item will be called; they can just refer to
+                              them by their filename, when tagging them with metadata.
+                              
+                            </p>
+                            <p>
+                              
+                            </p>
+                          </p>
+                          <p>
+                            <a name="svfile"><a name="The_svfile_Protocol"><h2>The svfile: Protocol</h2></a></a><p>
+                              The svfile: protocol loads content from a delimiter-separated-file; the
+                              <em>src</em> attribute is the name of the file, the <em>name</em> is the <a href="globs.html">glob
+                              pattern</a> used to catch the relevant content items. The <em>namefield</em>
+                              attribute specifies the field number (counting from 1) which the <em>name</em>
+                              pattern is matched against, and the <em>valuefield</em> specifies the number of
+                              the field from which the content chunk is read. The <em>delimiter</em>
+                              attribute specifies the delimiter used to separate values in the file.
+                              
+                            </p>
+                            <blockquote>
+                              <p>
+                                &lt;contents src="svfile:stories.csv" name="*"
+                                 namefield=1 valuefield=2 delimiter="," /&gt;
+                                
+                              </p>
+                            </blockquote>
+                            <p>
+                              
+                            </p>
+                          </p>
+                        </p>
+                        <a name="Example"><h2>Example</h2></a><pre>
+                        <!--etsafe-->
+                        
+  &lt;contents src="file:raw/text" name=".../*.txt" format="text/et" /&gt;
+  &lt;contents src="file:raw/html" name=".../*.html" format="text/html" /&gt;
+<!--/etsafe-->
+                                              </pre>
+                      <p>
+                        
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+    <table width="100%">
+      <tr>
+        <td valign="top">
+          <strong><a href="http://webmake.taint.org/">WebMake</a>
+           Documentation</strong> (version 2.2)
+           
+        </td>
+        <td valign="top">
+          <div align="right">
+            
+             [ <a href="contenttable.html">Back</a> | <a href="templates.html">Forward</a> | <a href="index.html">Index</a>
+             | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+             
+          </div>
+        </td>
+      </tr>
+    </table>
+    <div align="right">
+      <a href="http://webmake.taint.org/"><img src="images/BuiltWithWebMake.png" alt="Built With WebMake" border="0" width="88" height="31" /></a>
+    </div>
+  </font>
+</body>
+</html>

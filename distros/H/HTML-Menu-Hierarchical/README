@@ -1,0 +1,377 @@
+NAME
+     HTML::Menu::Hierarchical - HTML Hierarchical Menu Generator
+
+SYNOPSIS
+     my $menu_obj =
+         HTML::Menu::Hierarchical->new($conf, \&callback, $params);
+
+     my $html = $menu_obj->generateMenu($menu_item);
+
+     or
+
+     my $menu_obj =
+         HTML::Menu::Hierarchical->new($conf, [ $obj, $method ]);
+
+     my $html = $menu_obj->generateMenu($menu_item);
+
+     or
+
+     my $menu_obj =
+         HTML::Menu::Hierarchical->new($conf, $std_callback_name);
+
+     my $html = $menu_obj->generateMenu($menu_item);
+
+     In the first case, the callback is a function.  In the second,
+     the callback is a method called on the given object.  In the
+     third example, the callback is the name of a standard callback
+     defined by HTML::Menu::Hierarchical itself (see the section on
+     callback functions/methods).
+
+     The $conf parameter is a navigation configuration data structure
+     (described below).
+
+     The $params parameter is an optional hash reference containing
+     parameters pertaining to the menu as a whole.  Recognized
+     parameters are:
+
+    first_with_url
+         If this is set to a true value and you are using the 'url'
+         field in the info hash (see below) in the configuration to
+         specify the url for the menu item, then if a menu item is
+         chosen that does not have a url configured, the url for that
+         menu item will be changed to the url of the first child menu
+         item that has a url configured.  This works by looking at the
+         items first child, then at that child's first child, and so
+         on.  It does not look at the second child.
+
+    open_all
+         This has the same effect as the open_all parameter in the
+         menu configuration structure mentioned below, except that it
+         affects the entire menu hierarchy.
+
+    old_style_url
+         When using the utilities urlEncodeVars() and addArgsToUrl(),
+         this parameter controls which separator is used to separate
+         key/value pairs in the generated query string.  Setting
+         old_style_url to a true value will cause an ampersand ('&')
+         to be used as the separator.
+
+    new_style_url
+         When using the utilities urlEncodeVars() and addArgsToUrl(),
+         this parameter controls which separator is used to separate
+         key/value pairs in the generated query string.  Setting
+         new_style_url to a true value will cause a semicolon (';') to
+         be used as the separator, as recommended by the W3C.  This
+         will become the default in a later release.
+
+DESCRIPTION
+     HTML::Menu::Hierarchical provides a way to easily generate a
+     hierarchical HTML menu without forcing a specific layout.
+     All output is provided by your own callbacks (subroutine
+     refs) and your own navigation configuration.
+
+  configuration data structure
+     A navigation configuration is a reference to an array whose
+     elements are hashrefs.  Each hash contains configuration
+     information for one menu item and its children, if any.
+     Consider the following example:
+
+     my $conf = [
+                 { name => 'top_button_1',
+                   info => { text => 'Top Level Button 1',
+                             url => '/'
+                           },
+                   open => 1, # force this item's children to be displayed
+                   children => [
+                                { name => 'button_1_level_2',
+                                  info => { text => "Child 1 of Button 1",
+                                            url => '/child1.cgi'
+                                          },
+                                },
+                                ]
+                 },
+
+                 { name => 'top_button_2',
+                   info => { text => 'Top Level Button 2',
+                             url => '/top2.cgi'
+                           },
+                   callback => [ $obj, 'my_callback' ]
+                 },
+                
+                ];
+
+     In each hash, the 'name' parameter should correspond to the
+     $menu_item parameter passed to the generateMenu() method.  This
+     is how the module computes which menu item is selected.  This is
+     generally passed via a CGI parameter, which can be tacked onto
+     the end of the url in your callback function.  Note that this
+     parameter must be unique among all the array entries.
+     Otherwise, the module will not be able to decide which menu item
+     is selected.
+
+     The value of the 'info' parameter is available to your callback
+     function via the getInfo() method called on the
+     HTML::Menu::Hierarchical::ItemInfo object passed to the callback
+     function.  In the above example, the 'info' parameter contains
+     text to be displayed as the menu item, and a url the user is
+     sent to when clicking on the menu item.
+
+     The 'children' parameter is a reference to another array
+     containing configuration information for child menu items.  This
+     is where the Hierarchical part comes in.  There is no limit to
+     depth of the hierarchy (until you run out of RAM, anyway).
+
+     If a 'callback' parameter is specified that callback will be
+     used for that menu item instead of the global callback passed to
+     new().
+
+     An 'open' parameter can be specified to force an item's children
+     to be displayed.  This can be a scalar value that indicates true
+     or false.  Or it can be a subroutine reference that returns a
+     true or false value.  It can also be an array, in which case the
+     first element is expected to be an object, the second element
+     the name of a method to call on that object, and the rest of the
+     elements will be passed as arguments to the method.  If an
+     'open_all' parameter is passed, the current item and all items
+     under it in the hierarchy will be forced open.
+
+  callback functions/methods
+     Callback functions are passed a single parameter: an
+     HTML::Menu::Hierarchical::ItemInfo object.  See the
+     documentation on this object for available methods.  The
+     callback function should return the HTML necessary for the
+     corresponding menu item.
+
+METHODS
+  new()
+        my $menu_obj = HTML::Menu::Hierarchical->new($conf, \&callback);
+
+  generateMenu($menu_item)
+     my $html = $menu_obj->generateMenu($menu_item);
+
+     $menu_item is the 'name' parameter of the selected item,
+     typically passed as a CGI parameter.
+
+  addChildConf($conf, $menu_item_name)
+     Adds another configuration tree into the current configuration
+     at the specified node (name of the menu item).
+
+  addChildConfToChildren($conf, $menu_item_name)
+     Like addChildConf(), except add this conf to the list of
+     children of the parent with name $menu_item_name.  If $conf is
+     an array, each element of the array will be added to the list of
+     children.
+
+  getSelectedItemInfo($menu_item)
+     Returns the ItemInfo object corresponding to the selected menu
+     item.
+
+  getSelectedPath($menu_item)
+     Returns an array of InfoItem objects representing the path from
+     the top level menu item to the selected menu item.
+
+  There are also underscore_separated versions of these methods.
+     E.g., unescapeHtml($html) becomes unescape_html($html)
+
+EXAMPLES
+     See the scripts in the examples subdirectory for example usages.
+
+     See the documentation for HTML::Menu::Hierarchical::ItemInfo for
+     methods available via the $info_obj parameter passed to the
+     menu_callback function below.
+
+        sub menu_callback { my ($info_obj) = @_; my $info_hash =
+        $info_obj->getInfo; my $level = $info_obj->getLevel;
+
+            my $text = $$info_hash{text};
+            $text = '&nbsp;' if $text eq '';
+            my $item_arg = $info_obj->getName;
+
+            # Add a cgi parameter m_i to url so we know which menu
+            # item was chosen
+            my $url = $info_obj->addArgsToUrl($$info_hash{url},
+                                              { m_i => $item_arg });
+
+            my $dpy_text = $info_obj->isSelected ? "&lt;$text&gt" : $text;
+            my $spacer = '&nbsp;&nbsp;' x $level;
+            my $str = qq{<tr>\n};
+            $str .= qq{<td bgcolor="#cccc88"><a href="$url">};
+            $str .= $spacer . $dpy_text;
+            $str .= qq{</a></td>};
+            $str .= qq{</tr>\n};
+            return $str;
+        }
+
+BUGS
+     Please send bug reports/feature requests to don@owensnet.com.
+
+     There are currently no checks for loops in the configuration
+     data structure passed to the module.
+
+AUTHOR
+     Don Owens <don@owensnet.com>
+
+COPYRIGHT
+     Copyright (c) 2003 Don Owens
+
+     All rights reserved. This program is free software; you can
+     redistribute it and/or modify it under the same terms as Perl
+     itself.
+
+VERSION
+     0.13
+
+NAME
+     HTML::Menu::Hierarchical::ItemInfo - Used by HTML::Menu::Hierarchical.
+     Provides information about the menu item being processed.
+
+SYNOPSIS
+     Created by HTML::Menu::Hierarchical objects.
+
+DESCRIPTION
+     Information holder/gatherer representing one menu item.
+
+METHODS
+  Getting back information
+  hasChildren()
+     Returns true if the current item has child items in the
+     configuration.  False otherwise.
+
+  isSelected()
+     Returns true if the current item is the selected one.
+
+  isInSelectedPath()
+     Returns true if the current item is in the path from the root of
+     the hierarchy to the selected item.
+
+  getSelectedItem()
+     Returns the ItemInfo object corresponding to the selected menu
+     item.
+
+  getSelectedLevel()
+     Returns the level in the hierarchy where the selected menu item
+     is located.  Levels start at zero.
+
+  getMaxDisplayedLevel()
+     Returns the maximum level in the hierarchy to currently be
+     displayed.
+
+  isOpen()
+     Returns true if the current menu item is open, i.e., the current
+     item has child items and is also in the open path.  Return false
+     otherwise.
+
+  isFirstDisplayed()
+     Returns true if the current menu item is the first one to be
+     displayed.
+
+  isLastDisplayed()
+     Returns true if the current menu item is the last to be
+     displayed.
+
+  isFirstSiblingDisplayed()
+     Returns true if the current menu item is the first of its
+     siblings to be displayed, false otherwise.
+
+  isLastSiblingDisplayed()
+     Returns true if the current menu item is the last of its
+     siblings to be displayed, false otherwise.
+
+  getInfo()
+     Returns the value of the 'info' field for the current menu item
+     in the navigation configuration.
+
+     Instead of getting the 'info' hash and then accessing a field
+     within it, you may call a method to get that field directly.
+     This is implemented with AUTOLOAD, so if you do something like
+
+        my $text = $info_obj->getText;
+        my $image_src = $info_obj->getImageSrc;
+
+            or
+
+        my $text = $info_obj->getText;
+        my $image_src = $info_obj->get_image_src;
+
+     you will be given back the corresponding values in the 'info'
+     hash.
+
+  getName()
+     Returns the 'name' field for the current menu item in the
+     navigation configuration.  This is used to determine which menu
+     item has been selected.
+
+  getNextItem()
+     Returns the ItemInfo object corresponding to the next displayed
+     menu item.
+
+  getPreviousItem()
+     Returns the ItemInfo object corrsponding to the previously
+     displayed menu item.
+
+  getLevel()
+     Returns the level in the menu hierarchy where the current menu
+     item is located.  Levels start at zero.
+
+  getParent()
+     Returns the info object for the current item's parent.
+
+  Utilities
+  my $encoded = $info->urlEncode($plain_text)
+     URL encodes the given string.  This does full url-encoding, so a
+     space is %20, not a '+'.
+
+  my $query = $info->urlEncodeVars($var_hash)
+     Takes a hash containing key/value pairs and returns a
+     url-encoded query string appropriate for adding to the end of a
+     url.  If a value is an array, it is assumed to be a multivalued
+     input field and is added to the query string as such.
+
+     If you want to encode the query stirng in the new style
+     recommended by the W3C (use a semicolon as a separator in place
+     of ampersand), pass a true value for the new_style_url parameter
+     when creating the HTML::Menu::Hierarchical object.  This will
+     become the default in a later release.
+
+  my $plain_text = $info->urlDecode($url_enc_str)
+     Decodes the given url-encoded string.
+
+  my $var_hash = $info->urlDecodeVars($url_enc_str)
+     Decodes the url-encoded query string and returns a hash contain
+     key/value pairs from the query string.  If a field appears more
+     than once in the query string, it's value will be returned as a
+     reference to an array of values.
+
+  my $modified_url = $info->addArgsToUrl($url, $var_hash)
+     Takes the key/value pairs in $var_hash and tacks them onto the
+     end of $url as a query string.
+
+  my $html = $info->escapeHtml($text)
+     Escapes the given text so that it is not interpreted as HTML.
+
+  my $text = $info->unescapeHtml($html)
+     Unescape the escaped text.
+
+  There are also underscore_separated versions of these methods.
+     E.g., unescapeHtml($html) becomes unescape_html($html)
+
+TODO
+     hasChildrenDisplayed() - tell whether or not the current item's
+                              children will be displayed
+
+BUGS
+     Please send bug reports/feature requests to don@owensnet.com.
+
+AUTHOR
+     Don Owens <don@owensnet.com>
+
+COPYRIGHT
+     Copyright (c) 2003 Don Owens
+
+     All rights reserved. This program is free software; you can
+     redistribute it and/or modify it under the same terms as Perl
+     itself.
+
+VERSION
+     $Id: README,v 1.15 2005/06/16 15:31:06 don Exp $
+

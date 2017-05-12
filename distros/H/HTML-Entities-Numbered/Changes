@@ -1,0 +1,12 @@
+Revision history for Perl extension HTML::Entities::Numbered
+
+0.04  Thu Sep  2 23:38:13 2004
+	- The following are suggested by Tatsuhiko Miyagawa.
+	o create HTML entities table in it's way.
+	o removed HTML::Entities from prerequisite pm to build this
+	  distribution.
+	o added "_xml" suffixed two functions (name2decimal_xml() and
+	  name2hex_xml()) for addapted to create valid XML.
+
+0.03  Tue Aug 11 22:00:26 2004
+	- original version

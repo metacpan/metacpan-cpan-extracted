@@ -1,0 +1,11 @@
+192.168.1.20 - - [25/May/2001:00:04:32 +0100] "GET /idents/160x120/markets_report.jpg HTTP/1.1" 304 -
+192.168.1.22 - - [25/May/2001:00:04:32 +0100] "GET /news/20010523/pics/lord_maclaurin.jpg HTTP/1.1" 200 8016
+192.168.1.21 - - [25/May/2001:00:04:32 +0100] "HEAD /images/email_businessbulletin.gif HTTP/1.1" 304 -
+192.168.1.20 - - [25/May/2001:00:04:32 +0100] "GET /Britain/brit20000120/012013.htm HTTP/1.0" 302 234
+192.168.1.22 - - [25/May/2001:00:04:32 +0100] "HEAD /js/javascripts2.js HTTP/1.0" 304 -
+192.168.1.22 - - [25/May/2001:00:04:32 +0100] "GET /news/20000902/pics/hooligans_sm.jpg HTTP/1.1" 304 -
+192.168.1.21 - - [25/May/2001:00:04:32 +0100] "HEAD /news/20010524/pics/rail1_sm.jpg HTTP/1.0" 200 0
+192.168.1.20 - - [25/May/2001:00:04:32 +0100] "HEAD /js/fader.js HTTP/1.1" 304 -
+192.168.1.20 - - [25/May/2001:00:04:32 +0100] "GET /Britain/brit20000120/012013.htm HTTP/1.0" 302 234
+192.168.1.20 - - [25/May/2001:00:04:32 +0100] "GET /Britain/brit20000120/012013.htm HTTP/1.0" 302 234
+192.168.1.20 - - [25/May/2001:00:04:32 +0100] "GET /Britain/brit20000120/012013.htm HTTP/1.0" 302 234

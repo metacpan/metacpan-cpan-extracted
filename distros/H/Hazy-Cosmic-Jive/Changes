@@ -1,0 +1,13 @@
+Revision history for Perl module Hazy::Cosmic::Jive
+
+0.02 2016-01-14
+
+- Discard use of bit flags in favour of uint64_t for Windows.
+- Add tests for negative numbers.
+- Handle 10.0 correctly.
+- Add links to pod.
+
+0.01 2016-01-14
+
+- Initial version
+

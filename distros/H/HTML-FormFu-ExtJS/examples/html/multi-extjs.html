@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>multi</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" type="text/css" href="http://extjs.cachefly.net/ext-3.3.1/resources/css/ext-all.css">
+    <script type="text/javascript" src="http://extjs.cachefly.net/ext-3.3.1/adapter/ext/ext-base.js"></script>
+    <script type="text/javascript" src="http://extjs.cachefly.net/ext-3.3.1/ext-all.js"></script>
+<script type="text/Javascript">
+
+Ext.onReady(function(){
+
+    var simple = new Ext.FormPanel({"width":800,"baseParams":{"x-requested-by":"ExtJS"},"frame":true,"action":"","title":"HTML::FormFu::ExtJS - multi","method":"post","buttons":[],"items":[{"layout":"form","items":[{"layout":"column","items":[{"layout":"form","items":[{"hidden":true,"fieldLabel":"one master label","xtype":"textfield"}]},{"layout":"form","hideLabel":false,"fieldLabel":"one master label","items":[{"hideLabel":true,"name":"r1","fieldLabel":null,"xtype":"textfield"}]},{"layout":"form","hideLabel":false,"fieldLabel":"one master label","items":[{"hideLabel":true,"name":"r2","fieldLabel":null,"xtype":"textfield"}]},{"layout":"form","hideLabel":false,"fieldLabel":"one master label","items":[{"hideLabel":true,"name":"r3","fieldLabel":null,"xtype":"textfield"}]}]}]},{"layout":"form","items":[{"layout":"column","items":[{"layout":"form","hideLabel":true,"fieldLabel":null,"items":[{"hideLabel":false,"name":"r1","fieldLabel":"One","xtype":"textfield"}]},{"layout":"form","hideLabel":true,"fieldLabel":null,"items":[{"hideLabel":false,"name":"r2","fieldLabel":"Two","xtype":"textfield"}]},{"layout":"form","hideLabel":true,"fieldLabel":null,"items":[{"hideLabel":false,"name":"r3","fieldLabel":"Three","xtype":"textfield"}]}]}]},{"layout":"form","items":[{"layout":"column","items":[{"layout":"form","items":[{"hidden":true,"fieldLabel":"Appointment (fixed width)","xtype":"textfield"}]},{"width":150,"hideLabel":false,"defaults":{"width":50},"layoutConfig":{"labelSeparator":".:."},"layout":"form","fieldLabel":"Appointment (fixed width)","labelWidth":35,"items":[{"hideLabel":false,"name":"r11","fieldLabel":"Date","xtype":"textfield"}]},{"width":150,"hideLabel":false,"defaults":{"width":50},"layoutConfig":{"labelSeparator":".:."},"layout":"form","fieldLabel":"Appointment (fixed width)","labelWidth":35,"items":[{"hideLabel":false,"name":"r2","fieldLabel":"Time","xtype":"textfield"}]},{"width":150,"hideLabel":false,"defaults":{"width":50},"layoutConfig":{"labelSeparator":".:."},"layout":"form","fieldLabel":"Appointment (fixed width)","labelWidth":35,"items":[{"checked":false,"boxLabel":"st","hideLabel":false,"fieldLabel":"st","xtype":"checkbox"}]}]}]},{"layout":"form","items":[{"layout":"column","items":[{"layout":"form","items":[{"hidden":true,"fieldLabel":"Appointment (individual width)","xtype":"textfield"}]},{"width":210,"hideLabel":false,"defaults":{"width":50},"individualWidth":[210,123],"layoutConfig":{"labelSeparator":".:."},"layout":"form","fieldLabel":"Appointment (individual width)","labelWidth":35,"items":[{"hideLabel":false,"name":"r11","fieldLabel":"Date","xtype":"textfield"}]},{"width":123,"hideLabel":false,"defaults":{"width":50},"individualWidth":[210,123],"layoutConfig":{"labelSeparator":".:."},"layout":"form","fieldLabel":"Appointment (individual width)","labelWidth":35,"items":[{"hideLabel":false,"name":"r2","fieldLabel":"Time","xtype":"textfield"}]},{"hideLabel":false,"defaults":{"width":50},"individualWidth":[210,123],"layoutConfig":{"labelSeparator":".:."},"layout":"form","fieldLabel":"Appointment (individual width)","labelWidth":35,"items":[{"checked":false,"boxLabel":"st","hideLabel":false,"fieldLabel":"st","xtype":"checkbox"}]}]}]},{"layout":"form","items":[{"layout":"column","items":[{"width":210,"hideLabel":true,"defaults":{"width":50},"individualWidth":[210,123],"layoutConfig":{"labelSeparator":".:."},"layout":"form","fieldLabel":null,"labelWidth":35,"items":[{"hideLabel":false,"name":"r11","fieldLabel":"Date","xtype":"textfield"}]},{"width":123,"hideLabel":true,"defaults":{"width":50},"individualWidth":[210,123],"layoutConfig":{"labelSeparator":".:."},"layout":"form","fieldLabel":null,"labelWidth":35,"items":[{"hideLabel":false,"name":"r2","fieldLabel":"Time","xtype":"textfield"}]},{"hideLabel":true,"defaults":{"width":50},"individualWidth":[210,123],"layoutConfig":{"labelSeparator":".:."},"layout":"form","fieldLabel":null,"labelWidth":35,"items":[{"checked":false,"boxLabel":"st","hideLabel":false,"fieldLabel":"st","xtype":"checkbox"}]}]}]},{"layout":"form","items":[{"layout":"column","items":[{"layout":"form","items":[{"hidden":true,"fieldLabel":"Relative width","xtype":"textfield"}]},{"hideLabel":false,"defaults":{"width":50},"individualColumnWidth":["0.2","0.2"],"layout":"form","columnWidth":"0.2","fieldLabel":"Relative width","labelWidth":35,"items":[{"hideLabel":false,"name":"r11","fieldLabel":"Date","xtype":"textfield"}]},{"hideLabel":false,"defaults":{"width":50},"individualColumnWidth":["0.2","0.2"],"layout":"form","columnWidth":"0.2","fieldLabel":"Relative width","labelWidth":35,"items":[{"hideLabel":false,"name":"r2","fieldLabel":"Time","xtype":"textfield"}]},{"individualColumnWidth":["0.2","0.2"],"layout":"form","hideLabel":false,"defaults":{"width":50},"fieldLabel":"Relative width","items":[{"checked":false,"boxLabel":"st","hideLabel":false,"fieldLabel":"st","xtype":"checkbox"}],"labelWidth":35}]}]}]});;
+
+    simple.render(document.body);
+});
+</script>
+
+</head>
+<body>
+
+
+<a href="../forms/multi.yml">Form config file</a><br/><br/>
+
+
+
+</body>
+</html>
+

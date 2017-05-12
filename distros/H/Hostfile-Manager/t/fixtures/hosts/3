@@ -1,0 +1,8 @@
+127.0.0.1 home.sweet.hm
+
+# BEGIN: f1
+192.168.0.1 router
+# END: f1
+# BEGIN: f1a
+192.168.0.1 router
+# END: f1a

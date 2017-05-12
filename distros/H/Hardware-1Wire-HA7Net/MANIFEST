@@ -1,0 +1,6 @@
+Makefile.PL
+MANIFEST
+README
+Changes
+lib/Hardware/1Wire/HA7Net.pm
+test.pl

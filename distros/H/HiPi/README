@@ -1,0 +1,19 @@
+-----------------------------------------------------------------
+ Introduction
+-----------------------------------------------------------------
+
+HiPi provides interfaces to the Raspberry Pi GPIO together with
+wrappers for some common libraries and peripherals.
+
+----------------------------------------------------------------
+ Installation
+----------------------------------------------------------------
+
+see the INSTALL file.
+
+---------------------------------------------------------------
+ License
+---------------------------------------------------------------
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

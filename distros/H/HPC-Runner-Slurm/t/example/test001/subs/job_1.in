@@ -1,0 +1,6 @@
+perl t/example/test002/testioselect.pl 1
+
+perl t/example/test002/testioselect.pl 2
+
+perl t/example/test002/testioselect.pl 3
+

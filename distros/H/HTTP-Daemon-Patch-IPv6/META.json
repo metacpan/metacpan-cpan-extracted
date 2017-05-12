@@ -1,0 +1,44 @@
+{
+   "abstract" : "Avoid error when IO::Socket::INET6 is around",
+   "author" : [
+      "Steven Haryanto <stevenharyanto@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300015, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTTP-Daemon-Patch-IPv6",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Daemon" : "6.01",
+            "Module::Patch" : "0.12",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://search.cpan.org/dist/HTTP-Daemon-Patch-IPv6/",
+      "repository" : {
+         "url" : "http://github.com/sharyanto/perl-HTTP-Daemon-Patch-IPv6"
+      }
+   },
+   "version" : "0.06"
+}
+

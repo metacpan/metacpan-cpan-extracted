@@ -1,0 +1,118 @@
+Revision history for Hash-Ordered
+
+0.012     2017-03-09 11:35:00-05:00 America/New_York
+
+    - No changes from 0.011-TRIAL.
+
+0.011     2017-03-03 22:35:34-05:00 America/New_York (TRIAL RELEASE)
+
+    [Fixed]
+
+    - Fixed bug iterating a tied hash and clearing the underlying hash
+      of data.
+
+    - Fixed bug in merge() where order of new pairs was reversed.
+
+0.010     2016-02-01 19:02:50-05:00 America/New_York
+
+    [Fixed]
+
+    - pop() and shift() now return empty list when hash is empty instead of
+      warning and returning undef values.
+
+    - push() and unshift() of existing keys would cause corruption in
+      certain cases involving optimized deletion of the existing key.  This
+      has been fixed.
+
+    [Documented]
+
+    - Noted that pop() and shift() return just the value in scalar context
+      and undef key/value if the ordered hash is empty.
+
+0.009     2015-05-05 12:14:04-04:00 America/New_York
+
+    [Fixed]
+
+    - Fixed bug in new() that mishandled duplicate keys
+
+0.008     2015-05-05 06:26:42-04:00 America/New_York
+
+    [Optimized]
+
+    - Methods which take lists of keys or key/value pairs no longer makes a
+      temporary copy, which speeds them up substantially for large lists
+
+0.007     2015-05-04 10:57:31-04:00 America/New_York
+
+    [Optimized]
+
+    - The 'as_list' method no longer makes a temporary copy of keys to list
+
+0.006     2015-05-03 20:48:41-04:00 America/New_York
+
+    [Changed]
+
+    - The 'values' method in scalar context now returns an optimized
+      count of elements.
+
+    [Documentation]
+
+    - Amended various parts of the documentation.
+
+    - Fixed formatting of benchmark results and a SEE ALSO list.
+
+0.005     2015-05-01 04:59:00-04:00 America/New_York (TRIAL RELEASE)
+
+    [Added]
+
+    - Added 'preinc', 'postinc', 'predec', 'postdec', 'add', 'subtract',
+      'concat', 'or_equals' and 'dor_equals' functions for efficient
+      in-place modification of hash elements.
+
+    [Changed]
+
+    - The 'keys' method in scalar context now returns an optimized
+      count of keys.
+
+    [Fixed]
+
+    - Keys in the internal ordered list of keys are now stringified so
+      they are in exactly the same form as they would be in a Perl hash.
+      This slows construction slightly, but is necessary for correctness.
+
+    - Added explicit stringification and numification overloads to mimic an
+      unoverloaded object rather than falling back on the result of
+      boolification.
+
+    [Optimized]
+
+    - Added indexed tombstone deletion for hashes over 25 elements; this
+      makes deletion faster than all other pure-Perl ordered hash
+      implementations that I benchmarked.
+
+    - Numerous functions micro-optimized, including get and set.
+
+0.004     2015-04-24 11:45:23-04:00 America/New_York
+
+    - No changes from 0.003-TRIAL
+
+0.003     2015-04-20 01:29:48+02:00 Europe/Berlin (TRIAL RELEASE)
+
+    [Added]
+
+    - Added 'clear' method for efficient clearing.
+
+    [Optimized]
+
+    - Replaced use of List::Util::first to speed up element removal.
+
+0.002     2014-07-05 14:00:24-04:00 America/New_York
+
+    [Documented]
+
+    - Added Hash::Ordered::Benchmarks
+
+0.001     2014-07-02 18:37:27-04:00 America/New_York
+
+    - First release
+

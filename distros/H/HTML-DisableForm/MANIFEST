@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/HTML/DisableForm.pm
+t/00.load.t
+t/01.basic.t
+t/02.ignore_forms.t
+t/03.target.t
+t/04.ignore_fields.t
+t/05.readonly.t
+t/pod-coverage.t
+t/pod.t

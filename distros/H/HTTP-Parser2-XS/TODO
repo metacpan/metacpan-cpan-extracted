@@ -1,0 +1,9 @@
+
+	- HTTP tests
+
+	- ditch HTTP::Parser::XS code and use nginx-like parser
+	  instead;
+
+	- make _keepalive flag more sophisticated, i.e. disable keepalive
+	  on POSTs for buggy user agents, like nginx does;
+

@@ -1,0 +1,61 @@
+#!/usr/bin/perl -w 
+
+use strict;
+
+use LWP::Simple;
+use HTTP::Cache::Transparent;
+
+if( scalar( @ARGV ) != 1 )
+{
+  print << "EOD";
+usage: check_server <url>
+
+Fetches a url via the HTTP::Cache::Transparent module in verbose
+mode. The url is fetched twice to see if the server supports caching
+or not.
+
+The first line of output will say that the url is fetched from the
+server (unless you have fetched this url before and it is already in
+the cache).
+
+The second line of output will tell you what happened when we tried
+to fetch the same url a second time:
+
+Fetching ... from server: 
+The server returned a new page that was different
+from the page that was fetched the previous time.
+Caching didn't improve anything.
+
+
+Fetching ... unchanged from server: 
+The server indicated that caching was not possible, 
+but still returned the exact same page as the last 
+time. Caching didn't improve anything.
+
+
+Fetching ... from cache: 
+The server returned a short note saying that the
+contents of the cache was still up-to-date. If the
+page was big, the cache saved us a lot of bandwidth.
+
+The cache is stored in the directory /tmp/cache. This directory must
+exist and be empty before the command is run.
+
+EOD
+
+  exit;
+}
+
+my( $url ) = @ARGV;
+
+HTTP::Cache::Transparent::init( { 
+  BasePath  => "/tmp/cache", # Directory to store the cache in. 
+  Verbose   => 1,            # Print messages to STDERR. Default is 0.
+} );
+
+# Fetch once
+my $data = get( $url );
+
+# and twice.
+$data = get( $url );
+

@@ -1,0 +1,5 @@
+Desirable changes to HTTP::ProxyTest.
+
+* Add template to make the error message customizable. Thanks to
+  ahmad for the idea: http://www.perlmonks.org/?node_id=849650
+

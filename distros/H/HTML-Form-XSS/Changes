@@ -1,0 +1,34 @@
+HTML::Form::XSS 1.0 -- 16/08/2016
+
+	Now sending IE user agent when testing forms
+
+HTML::Form::XSS 0.34 -- 07/10/2014
+
+	Updated script test
+
+HTML::Form::XSS 0.33 -- 06/09/2014
+
+	Updated path in script
+
+HTML::Form::XSS 0.32 -- 26/08/2013
+
+	Still Fixing bug in unit test
+
+HTML::Form::XSS 0.31 -- 12/08/2013
+
+	Fix bug in unit test
+
+HTML::Form::XSS 0.3 -- 03/12/2011
+
+	Updated POD
+	Added more debugging to unit test
+
+HTML::Form::XSS 0.2 -- 19/08/2009
+
+	More POD
+	Minor internal code changes
+
+HTML::Form::XSS 0.1 -- 15/08/2009
+
+	Initial release
+

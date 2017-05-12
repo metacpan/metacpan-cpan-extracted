@@ -1,0 +1,95 @@
+=head1 NAME
+
+HTML::FromMail::Object - base-class for convertable items
+
+=head1 INHERITANCE
+
+ HTML::FromMail::Object
+   is a Mail::Reporter
+
+ HTML::FromMail::Object is extended by
+   HTML::FromMail::Page
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 METHODS
+
+HTML::FromMail::Object-E<gt>B<new>(OPTIONS)
+
+=over 4
+
+ Option  --Default
+ settings  {}
+ topic     <required>
+
+. settings => HASH-OF-HASHES
+
+=over 4
+
+Contains the special settings for each of the topics.
+See L<HTML::FromMail::new(settings)|HTML::FromMail/"Constructors">.
+
+=back
+
+. topic => STRING
+
+=over 4
+
+A symbolic representation of the group of objects which can be handled
+by the producer.  Each extension of this base class will set a value for
+this option, so you will usually not specify this yourself.
+
+The topic is used to get the right default settings and templates.  See
+L<HTML::FromMail::new(settings)|HTML::FromMail/"Constructors"> and L<HTML::FromMail::new(templates)|HTML::FromMail/"Constructors">.
+
+=back
+
+=back
+
+=head2 Attributes
+
+$obj-E<gt>B<settings>([TOPIC])
+
+=over 4
+
+Returns the settings for objects with a certain TOPIC, by default
+for objects of the current.  An empty hash will be returned when
+not settings where specified.
+
+=back
+
+$obj-E<gt>B<topic>
+
+=over 4
+
+Returns the abstract topic of the producer.
+
+=back
+
+=head2 Export
+
+=head2 Other methods
+
+$obj-E<gt>B<plain2html>(STRING)
+
+=over 4
+
+Convert a STRING into HTML.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of HTML-FromMail distribution version 0.11,
+built on June 08, 2007. Website: F<http://perl.overmeer.net/html-from-mail/>
+
+=head1 LICENSE
+
+Copyrights 2003,2004,2007 by Mark Overmeer. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

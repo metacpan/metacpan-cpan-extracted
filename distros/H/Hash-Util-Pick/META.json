@@ -1,0 +1,85 @@
+{
+   "abstract" : "The non-destructive utilities for picking hash",
+   "author" : [
+      "Pine Mizune"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.4",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Hash-Util-Pick",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4005",
+            "Module::Build::XSUtil" : "0.16"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "CPAN::Uploader" : "0.103012",
+            "Minilla" : "v3.0.4",
+            "Perl::Critic" : "1.125",
+            "Software::License::MIT" : "0.103011",
+            "Test::CPAN::Meta" : "0.25",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.05",
+            "Test::Perl::Critic" : "1.03",
+            "Test::Pod" : "1.51",
+            "Test::Spellunker" : "v0.4.0",
+            "Version::Next" : "1.000"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "1.120",
+            "Test::Exception" : "0.43",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Hash::Util::Pick" : {
+         "file" : "lib/Hash/Util/Pick.pm",
+         "version" : "0.11"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pine/p5-Hash-Util-Pick/issues"
+      },
+      "homepage" : "https://github.com/pine/p5-Hash-Util-Pick",
+      "repository" : {
+         "url" : "git://github.com/pine/p5-Hash-Util-Pick.git",
+         "web" : "https://github.com/pine/p5-Hash-Util-Pick"
+      }
+   },
+   "version" : "0.11",
+   "x_authority" : "cpan:PINE",
+   "x_contributors" : [
+      "Pine Mizune <pinemz@gmail.com>"
+   ]
+}

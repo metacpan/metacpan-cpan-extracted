@@ -1,0 +1,15 @@
+Level 5
+-------
+
+"You are not logged in" -- I wonder what that means. Normally,
+websites use cookies to tell whether you're logged in. Let's
+check if that's the case here. Press CTRL-J and switch to the
+"Resources" tab. Expand the "Cookies" item, and select the
+current domain: "natas5.natas..." and lo and behold there is
+a cookie there. Named `loggedin`. With value `0`. I wonder
+what happens if we change that to a true value, probably `1`?
+
+You can't change cookies here, but I have a browser extension
+that lets me do that. Or, you can use curl again.
+
+Edit the value with the extension, and refresh the page.

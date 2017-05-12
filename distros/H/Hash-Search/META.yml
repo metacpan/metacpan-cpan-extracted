@@ -1,0 +1,18 @@
+--- #YAML:1.0
+
+name: 		Hash-Search
+version: 	0.03
+abstract: 	Search and return hash keys using regular expressions
+author: 
+  - Steve Brokenshire <sbrokenshire@xestia.co.uk>
+
+license: 	perl
+generated_by: 	My own bare hands.
+
+no_index:
+  directory:
+    - t
+
+meta-spec:
+  version: 1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html

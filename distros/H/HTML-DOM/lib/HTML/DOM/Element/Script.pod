@@ -1,0 +1,63 @@
+
+=head1 NAME
+
+HTML::DOM::Element::Script - A Perl class for representing 'script' elements in an HTML DOM tree
+
+=head1 VERSION
+
+Version 0.054
+
+=head1 SYNOPSIS
+
+  use HTML::DOM;
+  $doc = HTML::DOM->new;
+  $elem = $doc->createElement('script');
+
+  $elem->charset('utf-8') # set attribute
+  $elem->src;             # get attribute
+  $elem->tagName;
+  # etc
+
+=head1 DESCRIPTION
+
+This class implements 'script' elements in an HTML::DOM tree. It 
+implements the HTMLScriptElement DOM interface and inherits from 
+L<HTML::DOM::Element> (q.v.).
+
+=head1 METHODS
+
+In addition to those inherited from HTML::DOM::Element and its 
+superclasses, this class implements the following DOM methods:
+
+=over 4
+
+=item text
+
+This returns the text content of the script element. If you provide an 
+argument, it will replace the current content, and the old content will be
+returned.
+
+=item htmlFor
+
+=item event
+
+=item charset
+
+=item defer
+
+=item src
+
+=item type
+
+Each of these returns the corresponding HTML attribute (the 'for' attribute
+in the case of C<htmlFor>). If you pass an
+argument, it will become the new value of the attribute, and the old value
+will be returned.
+
+=back
+
+=head1 SEE ALSO
+
+L<HTML::DOM>
+
+L<HTML::DOM::Element>

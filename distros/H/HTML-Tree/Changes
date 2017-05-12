@@ -1,0 +1,912 @@
+Changelog for HTML-Tree
+
+5.06     2017-04-28
+   Release by Kent Fredric
+
+    * Revert XML escaping changes from 5.04 due to large numbers of
+      broken dependents
+      - RT#121310 https://rt.cpan.org/Ticket/Display.html?id=121310
+      - https://github.com/rjbs/MasonX-Resolver-WidgetFactory/issues/1
+      - https://github.com/kentfredric/HTML-Tree/issues/1
+
+5.05      2017-04-26
+
+    [FIXES]
+    * Revert Dist::Zilla Removal
+      - https://github.com/jfearn/HTML-Tree/issues/7
+      - Vendor note: It should be simpler to compare 5.03 and 5.05
+        than to compare 5.04 and 5.05, or 5.03 and 5.04.
+      - Fixes RT#12230: Undeclared dep on Test::Fatal
+        - https://rt.cpan.org/Ticket/Display.html?id=121230
+    * Proper fix for '.' in @INC
+      - https://rt.cpan.org/Ticket/Display.html?id=120521
+
+5.04     2017-04-17
+   Release by Jeff Fearn
+
+    [FIXES]
+    * Remove Distzilla to fix RT #120521 #89820
+    * Add POD to htmltree RT #116367
+    * Speed up is_inside method RT #113415
+      - From Todd Rinaldo https://github.com/madsen/HTML-Tree/pull/5
+    * Fix extra spaces being added to comments RT #94311
+      - From Tomaz Solc
+
+5.03     2012-09-22
+   Release by Christopher J. Madsen
+
+    [THINGS THAT MAY BREAK YOUR CODE OR TESTS]
+    * as_HTML no longer indents <textarea> (Tomohiro Hosaka) (RT #70385)
+
+    [FIXES]
+    * as_trimmed_text did not accept '0' for extra_chars
+
+    [DOCUMENTATION]
+    * Explain that as_text never adds whitespace (RT #66498)
+    * Explain what extra_chars can contain for as_trimmed_text.
+
+
+5.02     2012-06-27
+   Release by Christopher J. Madsen
+
+    [TESTS]
+    * Do not attempt to check result of $! in construct_tree.t
+      (The fix in 5.01 was not successful.)
+
+
+5.01     2012-06-20
+   Release by Christopher J. Madsen
+
+    [TESTS]
+    * Force C locale in construct_tree.t (in non-English locales,
+      $! will produce messages in a different language) (RT #77823)
+    * Add test for preserving whitespace while parsing.
+
+
+5.00     2012-06-12
+   Release by Christopher J. Madsen
+
+   There are only some minor documentation changes since 4.903.
+   This is a summary of the most significant changes since 4.2.
+
+    [THINGS THAT MAY BREAK YOUR CODE OR TESTS]
+    * Use weak references to avoid memory leaks
+      See "Weak References" in HTML::Element for details.
+    * new_from_file now dies if the file cannot be opened.  $! records
+      the specific problem.  (Previously, you got a tree with a few
+      implicit elements.)
+    * Some methods normally returning a scalar could return the empty
+      list in certain circumstances.  This has been corrected.  The
+      affected methods are: address, deobjectify_text, detach, is_inside,
+      & pindex.
+    * deprecate the Version sub/method.  Use the VERSION method instead.
+
+    [ENHANCEMENTS]
+    * add new_from_url (Using LWP) (David Pottage) (RT #68097)
+
+    [DOCUMENTATION]
+    * Explain that parse_file (and new_from_file) opens files in binary mode
+      BUT THIS IS PLANNED TO CHANGE.
+
+
+4.903    2012-06-08
+   Trial Release by Christopher J. Madsen
+
+    [DOCUMENTATION]
+    * Explain that parse_file (and new_from_file) opens files in binary mode
+      BUT THIS IS PLANNED TO CHANGE.
+
+    [TESTS]
+    * test error handling for new_from_file & new_from_url
+    * remove use_ok from most tests
+      (if the module won't load, the tests can't pass anyway)
+
+
+4.902    2012-06-06
+   Trial Release by Christopher J. Madsen
+
+    [THINGS THAT MAY BREAK YOUR CODE OR TESTS]
+    * new_from_url now dies if the request fails or the response is not HTML
+
+
+4.901    2012-06-06
+   Trial Release by Christopher J. Madsen
+
+    [THINGS THAT MAY BREAK YOUR CODE OR TESTS]
+    * new_from_file now dies if the file cannot be opened.  $! records
+      the specific problem.  (Previously, you got a tree with a few
+      implicit elements.)
+    * Some methods normally returning a scalar could return the empty
+      list in certain circumstances.  This has been corrected.  The
+      affected methods are: address, deobjectify_text, detach, is_inside,
+      & pindex.
+
+    [FIXES]
+    * new_from_url did not call eof after parsing
+
+    [DOCUMENTATION]
+    * Improve SEE ALSO for HTML::TreeBuilder
+    * General documentation cleanup
+
+
+4.900    2012-06-01
+   Trial Release by Christopher J. Madsen
+
+    [THINGS THAT MAY BREAK YOUR CODE OR TESTS]
+    * Use weak references to avoid memory leaks
+      See "Weak References" in HTML::Element for details.
+    * deprecate the Version sub/method.  Use the VERSION method instead.
+
+    [ENHANCEMENTS]
+    * add new_from_url (Using LWP) (David Pottage) (RT #68097)
+
+
+4.2      2011-04-06
+   Release by Jeff Fearn
+
+    [FIXES]
+    * Tied all $VERSION to HTML::Element to ensure latest package is used
+      for all modules. RT #66110
+    * Moved perlcritic tests to xt/author
+    [DOCUMENTATION]
+    * Added text and link to "Perl and LWP" book.
+    * Fix Authors is all PM files.
+
+
+4.1      2010-10-25
+   Release by Jeff Fearn
+
+    [FIXES]
+    * '/' is a valid attribute (pull from tokuhirom) (RT #61809)
+    * Change check fo subclasses in as_HTML. (RT #61673)
+    * Fix ProhibitThreeArgumentOpen being triggered. (RT #61857)
+
+
+4.0      2010-09-20
+   Release by Jeff Fearn
+
+    [THINGS THAT MAY BREAK YOUR CODE OR TESTS]
+    * Changes to entity encoding from ord values to XML entities may break
+      tests expecting &#00; style encoding.
+    * Attribute names are now validated in as_XML and invalid names will
+      cause an error.
+    * HTML-Tree now requires at least Perl 5.8.0
+
+    [FIXES]
+    * Optionally empty tags with content now have close tag. (RT #49932 #41806)
+    * Added attribute name validation. (RT #23439)
+    * Added span to @TAGS in AsSubs. (RT #55848)
+    * Changed tag encoding to human readable form, e.g. &gt;, and stopped
+      re-encoding encoded tags (RT #55835)
+    * Added no_expand_entities option to disable entity decoding when
+      parsing source. (RT #24947)
+    * Fix replace_with not setting parent for an array of content.
+      (RT #28204 #45495)
+    * Removed newline being appended to as_HTML output. (RT #41739)
+    * Fix invalid parent for subsclasses. (RT #36247)
+    * Fixed #! line in tests (RT #41945)
+    * Switched to Module::Build
+    * Fixed Perl::Critic errors
+    * Added lots of use strict and use warnings
+    * Fix PERL_UNICODE breaking tests. (RT #28404)
+    * Add check for class type to traverse. (RT #35948)
+    * Move attribute name validation to as_XML. (RT #60619)
+    * Fix critic test exploding if Test::Perl::Critic isn't installed.
+    * Fix annoying message about x.yy_z not being numeric in t/building.t
+    * Added extra_chars options to as_trimmed_text (RT #26436)
+    * Added catch for broken table tags (RT #59980)
+    * Replace parentheses for constants. (RT #58880)
+    * Removed build deps Devel::Cover, Test::Pod::Coverage, Test::Perl::Critic.
+      (RT #58878)
+    * Added create_makefile_pl => 'traditional' to Build.PL (RT #58878)
+
+    [ENHANCEMENTS]
+    * (Ricardo Signes RT #26282) The secret hack to allow elements to be created
+      from classes other than HTML::Element has been cleaned up and documented
+      for the benefit of TreeBuilder subclasses.
+      q.v., HTML::TreeBuilder->element_class
+    * Added HTML::Element::encoded_content to control encoding of entities on
+      output.
+
+   [TESTS]
+    * Added test for optionally empty tags, like A.
+    * Added test for invalid attribute name.
+    * Added more tests for entity parsing.
+    * Add parent test from Christopher J. Madsen. (RT #28204)
+    * Add subclass test. (RT #36247)
+
+    [DOCUMENTATION]
+    * Docs spelling patch from Ansgar Burchardt <ansgar@43-1.org> (RT #55836)
+    * Added definition of white space to as_trimmed_text. (RT #26436)
+
+
+3.23     2006-11-12
+   Release by Pete Krawczyk <petek@cpan.org>
+
+    [THINGS THAT MAY BREAK YOUR CODE OR TESTS]
+    * Mark-Jason Dominus points out that the fix for as_html was not
+      proper, and broken behavior should never be codified.  Fixed
+      as_html so an empty string doesn't encode entites, instead of
+      blaming the behavior on HTML::Entities.  (RT 18571)
+
+
+3.22     2006-11-11
+   Release by Pete Krawczyk <petek@cpan.org>
+
+    [THINGS THAT MAY BREAK YOUR CODE OR TESTS]
+    * HTML::Element::as_XML now only escapes five characters, instead
+      of escaping everything but alphanumerics and spaces.  This is
+      more in line with the XML spec, and will no longer escape wide
+      characters as two (or more) entities.  Resolves RT 14260.  Thanks
+      to Carl Franks and somewhere [at] confuzzled.lu for assistance.
+
+    [FIXES]
+    * A string comparison was commented to use lc() on both sides, but
+      didn't.  This caused HTML::Element::look_down to not properly find
+      elements in certain cases.  Thanks to Andrew Suhachov. (RT 21114)
+
+    [TESTS]
+    * Added several new tests and enhanced others.  Thanks to Rocco
+      Caputo for t/attributes.t, and several others for providing
+      test cases in their RT bugs.
+
+    [DOCUMENTATION]
+    * Fixed description of HTML::Element::all_attr_names.  Thanks
+      to dsteinbrunner [at] pobox.com for catching it.
+    * Fixed example code in HTML::Element::push_content.  Thanks
+      to dsteinbrunner [at] pobox.com for catching it. (RT 21293)
+    * Fixed description of HTML::Element::as_HTML.  Thanks to
+      Mark-Jason Dominus for catching it.  (RT 18569)
+
+
+3.21     2006-08-06
+   Release by Pete Krawczyk <petek@cpan.org>
+
+    [FIXES]
+    * Updated HTML::Parser requirement to 3.46 to fix a bug in
+      tag-rendering.t, noted in RT 20816 and 19796.  Thanks to
+      Gordon Lack and Ricardo Signes
+    * Fixed HTML::TreeBuilder to not remove &nbsp; where it shouldn't,
+      using patch supplied in RT 17481.  Thanks to Chris Madsen.
+
+    [DOCUMENTATION]
+    * HTML-Tree has a new maintainer: Pete Krawczyk <petek@cpan.org>
+
+
+3.20     2006-06-04
+   Release by Andy Lester
+
+    No code changes.  Just making sure all notes go to Andy Lester,
+    not Sean Burke.
+
+
+3.19_04  2006-02-01
+   Trial Release by Andy Lester
+
+    [FIXES]
+    * Modified starttag() so that it could render a literal HTML::Element
+      correctly. Added a test case for this in tag-rendering.t
+      Thanks to Terrence Brannon.
+
+
+3.19_03  2005-11-25
+   Trial Release by Andy Lester
+
+    [THINGS THAT MAY BREAK YOUR CODE]
+    * The store_declarations() method has been restored, but defaults
+      to true instead of false.
+
+
+3.19_02  2005-11-24
+   Trial Release by Andy Lester
+
+    [THINGS THAT MAY BREAK YOUR CODE]
+    * The store_declarations() method has been removed.
+    * Non-closing HTML tags like <IMG> are now rendered as <IMG />.
+    * All values in tags are now double-quoted.  Previously, all-numeric
+      values weren't quoted.
+
+    [FIXES]
+    * The DOCTYPE declaration now always gets put back at the top of
+      the recreated document.  Thanks, Terrence Brannon.
+    * Non-closing HTML tags like <IMG> are now rendered as <IMG />.
+      Thanks to Ian Malpass.
+    * All values in tags are now double-quoted.
+
+    [DOCUMENTATION]
+    * Updated docs from Terrence Brannon.
+
+
+3.19_01  2005-11-09
+   Trial Release by Andy Lester
+
+   -- No new functionality.  New tests, though!
+   Thanks to the Chicago Perl Mongers for their work.
+
+
+3.18     2003-09-15
+   Release by Sean M. Burke <sburke@cpan.org>
+
+   -- bugfix to test, adding qr// to look_(down|up)
+
+   Accepting Iain 'Spoon' Truskett's neat patch for qr// as lookdown
+   operators (previously you had to do sub { $_[0]=~ m/.../}).
+
+   Rewrote some tests, notably parsefile.t, which was pointlessly
+   failing because of an incompatibility with an HTML::Parser version.
+
+   Removed the disused ancient utils "dtd2pm" and "ent" from the dist.
+
+   Added TODO file.
+
+
+3.17     2003-01-18
+   Release by Sean M. Burke <sburke@cpan.org>
+
+   -- minor bugfix
+
+   HTML::Element : Making as_HTML('',...) work just like
+   as_HTML(undef,...).  Also fixing as_XML's docs to remove mention of
+   an unimplemented feature (specifying what characters to escape).
+
+
+3.16     2002-11-06
+   Release by Sean M. Burke <sburke@cpan.org>
+
+   -- just fixing a doc typo.
+
+
+3.15     2002-11-06
+   Release by Sean M. Burke <sburke@cpan.org>
+
+   -- a few new features.
+
+   Added the aliases "descendents" and "find" to HTML::Element.
+
+   Added a new method "simplify_pres" to HTML::Element.
+
+
+3.14     2002-10-19
+   Release by Sean M. Burke <sburke@cpan.org>
+
+   -- minor bugfix
+
+   Just fixes a few problems in HTML::Element with the number_lists
+   method.
+
+
+3.13     2002-08-16
+   Release by Sean M. Burke <sburke@cpan.org>
+
+   -- basically a bugfix version
+
+   It turns out that 3.12 had a hideous HTML::TreeBuilder bug that
+   made the whole thing damn near useless.  Fixed.
+   Many many thanks to Michael Koehne for catching this!
+
+   Wrote t/parse.t, to catch this sort of thing from happening again.
+
+   Fixed a bug that would treat <td> outside any table context
+   as <tr><table><td> instead of <table><tr><td>
+
+
+3.12     2002-07-30
+   Release by Sean M. Burke <sburke@cpan.org>
+
+   Added as_trimmed_text method to HTML::Element, as described
+   (prophesied?) in the fantabulous new book /Perl & LWP/.
+
+   Bugfix: fixed unshift_content when given a LoL.  (_parent wasn't
+   getting set right.)
+
+   HTML::Element and HTML::TreeBuilder now enforce at least some
+   minimal sanity on what can be in a tag name.  (Notably, no spaces,
+   slashes, or control characters.)
+
+   Semi-bugfix: $element->replace_with(...) can now take LoLs in its
+   replacement list.
+
+   Bumped HTML::Element version up to 3.12 (right from 3.09)
+
+   Semi-bugfix: as_XML now doesn't use named entities in its return
+   value -- it always uses numeric entities.
+
+   Added behavior: new_frow_lol can now do clever things in list
+   context.
+
+   HTML::Tree -- added blurb for /Perl & LWP/
+
+   HTML::TreeBuilder -- added blurb for /Perl & LWP/
+   Also added a few tweaks to do better with XHTML parsing.
+   Added guts() and disembowel() methods, for parsing document fragments.
+
+   TODO: desperately need to add tests to t/
+
+
+3.11     2001-03-14
+   Release by Sean M. Burke <sburke@cpan.org>
+
+   Bugfix: Klaus-Georg Adams <Klaus-Georg.Adams@sap.com> reported that
+   the topmost frameset element in an HTML::TreeBuilder tree wasn't
+   getting its _parent attribute set.  Fixed.
+
+   Minor bugfix: the root element of a new HTML::TreeBuilder tree was
+   missing its initial "_implicit" attribute.  Fixed.
+
+   Two handy new methods in HTML::TreeBuilder:
+    * HTML::TreeBuilder->new_from_content(...)
+    * HTML::TreeBuilder->new_from_file($filename)
+       a.k.a.: HTML::TreeBuilder->new_from_file($fh)
+
+
+3.10     2001-03-10
+   Release by Sean M. Burke <sburke@cpan.org>
+
+   Now bundling three relevent The Perl Journal articles by me:
+   HTML::Tree::AboutObjects, HTML::Tree::AboutTrees, and
+   HTML::Tree::Scanning.
+
+   Vadims_Beilins@swh-t.lv observes that $h->push_content(LoL)
+   doesn't take care of _parent bookkeeping right.  FIXED.
+   John Woffindin <john@xoren.co.nz> notes a similar bug in clone();
+   FIXED.
+
+   Adding no_space_compacting feature to TreeBuilder, at suggestion of
+   Victor Wagner <vitus@ice.ru>.
+
+   Incorporating the clever suggestion (from Martin H. Sluka,
+   <martin@sluka.de>) that $element->extract_links's returned LoL
+   should contain a third item (for the attribute name) in the
+   per-link listref.  I also add a fourth item, the tagname of the
+   element.
+
+   New method, "elementify", in HTML::TreeBuilder.
+
+   Various improvements and clarifications to the POD in
+   HTML::TreeBuilder and HTML::Element.
+
+   Some new methods in HTML::Element: "number_lists",
+   "objectify_text", and "deobjectify_text".
+
+   HTML::Element and HTML::TreeBuilder versions both bumped up from
+   3.08 to 3.10, to keep pace with the HTML::Tree version.
+
+
+3.09     2001-01-21
+   Release by Sean M. Burke <sburke@cpan.org>
+
+   Changed HTML/Element/traverse.pod to HTML/Element/traverse.pm
+
+   Wrote overview file: HTML/Tree.pm
+
+
+3.08     2000-11-03
+   Release by Sean M. Burke <sburke@cpan.org>
+
+   In Element and TreeBuilder: fixed handling of textarea content --
+   Thanks to Ronald J Kimball <rjk@linguist.dartmouth.edu> for
+   catching this.
+
+   In Element: a few internal changes to make it subclassable by the
+   forthcoming XML::Element et al.
+
+
+3.07     2000-10-20
+   Release by Sean M. Burke <sburke@cpan.org>
+
+   In Element: made new_from_lol accept existing HTML::Element objects
+   as part of the loltree.  Thanks for Bob Glickstein
+   <bobg@zanshin.com> for the suggestion.
+
+   In Element: feeding an arrayref to push_content, unshift_content,
+   or splice_content now implicitly calls new_from_lol.
+
+   In Element: reversed the change in as_HTML/XML/Lisp_form that would
+   skip dumping attributes with references for values.  It reacted
+   undesirably with objects that overload stringify; to wit, URI.pm
+   objects.
+
+
+3.06     2000-10-15
+   Release by Sean M. Burke <sburke@cpan.org>
+
+   In Element: methods added:  $x->id, $x->idf, $x->as_XML,
+   $x->as_Lisp_form
+
+   In Element: internal optimization: as_HTML no longer uses the
+   tag() accessor.  Should cause no change in behavior.
+
+   In Element: as_HTML (via starttag) no longer tries to dump
+   attributes whose values are references, or whose names
+   are null-string or "/".  This should cause no change in
+   behavior, as there's no normal way for any document to parse
+   to a tree containing any such attributes.
+
+   In Element: minor rewordings or typo-fixes in the POD.
+
+
+3.05     2000-10-02
+   Release by Sean M. Burke <sburke@cpan.org>
+
+   In Element: fixed typo in docs for the content_refs_list method.
+   Had:
+    foreach my $item ($h->content_array_ref) {
+   Corrected to:
+    foreach my $item (@{ $h->content_array_ref }) {
+
+   In Element: fixed bug in $h->left that made it useless in scalar
+   context.  Thanks to Toby Thurston <toby@wildfire.dircon.co.uk> for
+   spotting this.
+
+   In Element: added new method $h->tagname_map
+
+   In TreeBuilder: Some minor corrections to the logic of handling TD
+   and TH elements -- basically bug fixes, in response to an astute
+   bug report from Toby Thurston <toby@wildfire.dircon.co.uk>.
+
+   In TreeBuilder: Fixed lame bug that made strict-p mode nearly
+   useless.  It may now approach usability!
+
+   This dist contains a simple utility called "htmltree" that parses
+   given HTML documents, and dumps their parse tree.  (It's not
+   actually new in this version, but was never mentioned before.)
+
+   In TreeBuilder, a change of interest only to advanced programmers
+   familiar with TreeBuilder's source and perpetually undocumented
+   features: there is no $HTML::TreeBuilder::Debug anymore.
+
+   If you want to throw TreeBuilder into Debug mode, you have to do it
+   at compile time -- by having a line like this BEFORE any line that
+   says "use HTML::TreeBuilder":
+
+      sub HTML::TreeBuilder::DEBUG () {3};
+
+   where "5" is whatever debug level (0 for no debug output) that you
+   want TreeBuilder to be in.  All the in TreeBuilder that used to say
+
+     print "...stuff..." if $Debug > 1;
+
+   now say
+
+     print "...stuff..." if DEBUG > 1;
+
+   where DEBUG is the constant-sub whose default value set at compile
+   time is 0.  The point of this is that for the typical
+   compilation-instance of TreeBuilder will run with DEBUG = 0, and
+   having that set at compile time means that all the "print ... if
+   DEBUG" can be optimized away at compile time, so they don't appear
+   in the code tree for TreeBuilder.  This leads to a typical ~10%
+   speedup in TreeBuilder code, since it's no longer having to
+   constantly interrogate $Debug.
+
+   Note that if you really do NEED the debug level to vary at runtime,
+   say:
+     sub HTML::TreeBuilder::DEBUG () { $HTML::TreeBuilder::DEBUG };
+   and then change that variable's value as need be.  Do this only if
+   necessary, tho.
+
+   BTW, useful line to have in your ~/.cshrc:
+     alias deparse 'perl -MO=Deparse \!*'
+   I found it useful for deparsing TreeBuilder.pm to make sure that
+   the DEBUG-conditional statements really were optimized away
+   as I intended.
+
+
+3.04     2000-09-04
+   Release by Sean M. Burke <sburke@cpan.org>
+
+   In TreeBuilder: added p_strict, an option to somewhat change
+   behavior of implicating "</p>"s.
+   Added store_comments, store_declarations, store_pis, to control
+   treatment of comments, declarations, and PIs when parsing.
+
+   In Element: documented the pseudo-elements (~comment, ~declaration,
+   ~pi, and ~literal).  Corrected as_HTML dumping of ~pi elements.
+
+   Removed formfeeds from source of Element and TreeBuilder --
+   different editors (and Perl) treat them differently as far as
+   incrementing the line counter; so Perl might report an error on
+   line 314, but preceding formfeeds might make your editor think that
+   that line is actually 316 or something, resulting in confusion all
+   around.  Ahwell.
+
+
+3.03     2000-08-26
+   Release by Sean M. Burke <sburke@cpan.org>
+
+   Introduced an optimization in TreeBuilder's logic for checking that
+   body-worthy elements are actually inserted under body.  Should
+   speed things up a bit -- it saves two method calls per typical
+   start-tag.  Hopefully no change in behavior.
+
+   Whoops -- 3.01's change in the return values of TreeBuilder's
+   (internal) end(...) method ended up breaking the processing of list
+   elements.  Fixed.  Thanks to Claus Schotten for spotting this.
+
+   Whoops 2 -- Margarit A. Nickolov spotted that TreeBuilder
+   documented a implicit_body_p_tag method, but the module didn't
+   define it.  I must have deleted it some time or other.  Restored.
+
+
+3.02     2000-08-20
+   Release by Sean M. Burke <sburke@cpan.org>
+
+   Fixed a silly typo in Element that made delete_ignorable_whitespace
+   useless.
+
+   Made Element's $tree->dump take an optional output-filehandle
+   argument.
+
+   Added (restored?) "use integer" to TreeBuilder.
+
+
+3.01     2000-08-20
+   Release by Sean M. Burke <sburke@cpan.org>
+
+   Now depends on HTML::Tagset for data tables of HTML elements and
+   their characteristics.
+
+   Version numbers for HTML::TreeBuilder and HTML::Element, as well as
+   for the package, moved forward to 3.01.
+
+   Minor changes to HTML::TreeBuilder's docs.
+
+   HTML::TreeBuilder now knows not to amp-decode text children of
+   CDATA-parent elements.  Also exceptionally stores comments under
+   CDATA-parent elements.
+
+   TreeBuilder should now correctly parse documents with frameset
+   elements.  Tricky bunch of hacks.
+
+   TreeBuilder now ignores those pointless "x-html" tags that a
+   certain standards-flouting monopolistic American software/OS
+   company's mailer wraps its HTML in.
+
+   Introduced "tweaks" in HTML::TreeBuilder -- an experimental
+   (and quite undocumented) feature to allow specifying callbacks
+   to be called when specific elements are closed; makes possible
+   rendering (or otherwise scanning and/or manipulating) documents
+   as they are being parsed.  Inspired by Michel Rodriguez's clever
+   XML::Twig module.  Until I document this, email me if you're
+   interested.
+
+   HTML::Element's as_HTML now knows not to amp-escape children of
+   CDATA-parent elements.  Thanks to folks who kept reminding me about this.
+
+   HTML::Element's as_HTML can now take an optional parameter
+   specifying which non-empty elements will get end-tags omitted.
+
+   HTML::Element's traverse's docs moved into separate POD,
+   HTML::Element::traverse.
+
+   Added HTML::Element methods all_attr_names and
+   all_external_attr_names.  Fixed bug in all_external_attr.
+
+   Added HTML::Element method delete_ignorable_whitespace.
+   (Actually just moved from HTML::TreeBuilder, where it was
+   undocumented, and called tighten_up.)
+
+   Adding a bit of sanity checking to Element's look_down, look_up.
+
+   Added some formfeeds to the source of Element and TreeBuilder,
+   to make hardcopy a bit more readable.
+
+
+0.68     2000-06-28
+   Release by Sean M. Burke <sburke@cpan.org>
+
+   Fixed doc typo for HTML::Element's lineage_tag_names method.
+
+   Fixed lame bug in HTML::Element's all_external_attr that made it
+   quite useless.  Thanks to Rich Wales <richw@webcom.com> for the bug
+   report and patch.
+
+   Changed as_text to no longer DEcode entities, as it formerly did,
+   and was documented to.  Since entities are already decoded by time
+   text is stored in the tree, another decoding step is wrong.  Neither
+   me nor Gisle Aas can remember what that was doing there in the
+   first place.
+
+   Changed as_text to not traverse under 'style' and 'script'
+   elements.  Rewrote as_text's traverser to be iterative.
+
+   Added a bit of text to HTML::AsSubs to recommend using XML::Generator.
+
+
+0.67     2000-06-12
+   Release by Sean M. Burke  <sburke@cpan.org>
+
+   Just changes to HTML::Element...
+
+   Introduced look_up and look_down.  Thanks to the folks on the
+   libwww list for helping me find the right form for that idea.
+   Deprecated find_by_attribute
+
+   Doc typo fixed: at one point in the discussion of "consolidating
+   text", I said push_content('Skronk') when I meant
+   unshift_content('Skronk').  Thanks to Richard Y. Kim (ryk@coho.net)
+   for pointing this out.
+
+   Added left() and right() methods.
+
+   Made address([address]) accept relative addresses (".3.0.1")
+
+   Added content_array_ref and content_refs_list.
+
+   Added a bit more clarification to bits of the Element docs here and there.
+
+   Made find_by_tag_name work iteratively now, for speed.
+
+
+0.66     2000-05-18
+   Release by Sean M. Burke  <sburke@cpan.org>
+
+   Noting my new email address.
+
+   Fixed bug in HTML::Element::detach_content -- it would return
+   empty-list, instead of returing the nodes detached.
+
+   Fixed big in HTML::Element::replace_with_content -- it would
+   accidentally completely kill the parent's content list!
+   Thanks to Reinier Post and others for spotting this error.
+
+   Fixed big in HTML::Element::replace_with -- it put replacers
+   in the content list of of the new parent, !but! forgot to update
+   each replacer's _parent attribute.
+   Thanks to Matt Sisk for spotting this error.
+
+
+0.65     2000-03-26
+   Release by Sean M. Burke  <sburke@netadventure.net>
+
+   Important additions to HTML::Element :
+
+     Totally reimplemented the traverse() method, and added features,
+     now providing a somewhat-new interface.  It's still
+     backwards-compatible both syntactically and semantically.
+
+     Added methods: content_list, detach_content, replace_linkage,
+     normalize_content, preinsert, postinsert, and has_insane_linkage.
+
+     $h->attr('foo', undef) now actually deletes the attribute
+     'foo' from $h, instead of setting it to undef.  Hopefully
+     this won't break any existing code!
+
+   Rearranged the order of some sections in the Element docs
+   for purely pedagogical reasons.
+
+   Bugfix:  $tree->clone failed to delete the internal
+   _head and _body attributes of the clone (used by TreeBuilder),
+   $tree->clone->delete ended up deleting most/all of the original!
+   Fixed.  Added cavets to the docs warning against cloning
+   TreeBuilder objects that are in mid-parse (not that I think most
+   users are exactly rushing to do this).
+   Thanks to Bob Glickstein for finding and reporting this bug.
+
+   Added some regression/sanity tests in t/
+
+   A bit more sanity checking in TreeBuilder: checks for _head and
+   _body before including it.
+
+   Modded TreeBuilder's calls to traverse() to be use new [sub{...},0]
+   calling syntax, for sake of efficiency.
+
+   Added some undocumented and experimental code in Element and
+   TreeBuilder for using HTML::Element objects to represent
+   comments, PIs, declarations, and "literals".
+
+
+0.64     2000-03-08
+   Release by Sean M. Burke <sburke@netadventure.net>
+
+   Bugfix:  $element->replace_with_content() would cause
+   a fatal error if any of $element's content nodes were
+   text segments.  Fixed.
+
+
+0.63     2000-03-08
+   Release by Sean M. Burke <sburke@netadventure.net>
+
+   Fixed a typo in the SYNOPSIS of TreeBuilder.pm: I had "->destroy" for
+   "->delete"!
+
+   Added $element->clone and HTML::Element->clone_list(nodes) methods,
+   as Marek Rouchal very helpfully suggested.
+
+   $tree->as_HTML can now indent, hopefully properly.  The logic to do
+   so is pretty frightening, and regrettably doesn't wrap, and it's
+   not obvious how to make it capable of doing so.
+
+   $tree->as_text can now take a 'skip_dels' parameter.
+
+   Added $h->same_as($j) method.
+
+   Added $h->all_attr method.
+
+   Added $h->new_from_lol constructor method.
+
+
+0.62     1999-12-18
+   Release by Sean M. Burke <sburke@netadventure.net>
+
+   Incremented HTML::AsSubs version to 1.13, and HTML::Parse version
+   to 2.7, to avoid version confusion with the old (<0.60) HTML-Tree
+   dist.
+
+   Re-simplified the options to HTML::Element::traverse, removing the
+   verbose_for_text option.  (The behavior that it turned on, is now
+   always on; this should not cause any problems with any existing
+   code.)
+
+   Fixed HTML::Element::delete_content, and made an
+   HTML::TreeBuilder::delete to override it for TreeBuilder nodes,
+   which have their own special attributes.
+
+   HTML::Element::find_by_attribute, find_by_attribute, and get_attr_i
+   now behave differently in scalar context, if you're the sort that
+   likes context on method calls.  HTML::Element::descendant is now
+   optimized in scalar context.
+
+   Fixed up some of the reporting of lineages in some $Debug-triggered
+   messages.
+
+   Fixed minor bug in updating pos when a text node under HTML
+   implicates BODY (and maybe P).
+
+   You should not use release 0.61
+
+
+0.61     1999-12-15
+   Release by Sean M. Burke <sburke@netadventure.net>
+
+   Versions in this dist:
+    HTML::Parse:  2.6
+    HTML::TreeBuilder: 2.91
+    HTML::Element:  1.44
+    HTML::AsSubs: 1.12
+
+   No longer including the Formatter modules.
+
+   Lots of new methods and changes in HTML::Element; reorganized docs.
+
+   Added new HTML tags to HTML::Element's and HTML::TreeBuilder's
+   internal tables.
+
+   Reworked the logic in HTML::TreeBuilder.  Previous versions dealt
+   badly with tables, and attempts to enforce content-model rules
+   occasionally went quite awry.  This new version is much less
+   agressive about content-model rules, and works on the principle
+   that if the HTML source is cock-eyed, there's limits to what can be
+   done to keep the syntax tree from being cock-eyed.
+
+   HTML::TreeBuilder now also tries to ignore ignorable whitespace.
+   The resulting parse trees often have half (or fewer) the number of
+   nodes, without all the ignorable "     " nodes like before.
+
+
+0.53     1999-12-15
+   Release by Gisle Aas <gisle@aas.no>
+
+   Make it compatible with HTML-Parser-3.00
+
+
+0.52     1999-11-10
+   Release by Gisle Aas <gisle@aas.no>
+
+   Fix SYNOPSIS for HTML::FormatText as suggested by
+   Michael G Schwern <schwern@pobox.com>
+
+   Updated my email address.
+
+
+0.51     1998-07-07
+   Release by Gisle Aas <aas@sn.no>
+
+   Avoid new warnings introduced by perl5.004_70
+
+
+0.50    1998-04-01
+   Release by Gisle Aas <aas@sn.no>
+
+   the HTML::* modules that dealt with HTML syntax trees
+   was unbundled from libwww-perl-5.22.

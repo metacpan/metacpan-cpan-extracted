@@ -1,0 +1,147 @@
+Revision history for Perl extension Heap::Simple::Perl.
+
+0.14	2008-01-27 23:43:15 UT
+	- No functional changes
+	- Use two argument open to handle the t/options file. Needed for old
+	  perls before 5.6. Only relevant for "make test"
+
+0.13	2008-01-27 14:59:06 UT
+	- Work around a bug in perl 5.6 where you cannot trust the return
+          value of s///ge
+	- Quote version dependencies in Makefile.PL to avoid having some
+	  systems depend on 9e-2 instead of 0.09
+	- Add a line directive to the partial evaluations so that errors
+	  refer to logical names like
+	  "Heap::Simple::Auto::Number::Scalar::insert line 3" instead of
+	  "eval 25 line 3"
+
+0.12	2008-01-26 18:45:32 UT
+	- Pure maintenance release, no functional changes
+	- Added MANIFEST.SKIP
+	- Added "cover", "ppm install" and "ppm uninstall" private make targets
+	- Fix for test on perl 5.10 where we were testing perl itself, not
+	  Heap::Simple::Perl
+	- Added PackageTools based versioning
+
+0.11	2005-11-20
+	- Add extract_all method
+	- Add merge_arrays method
+	- inserts can now handle multiple elements as argument
+	- absorb and key_absorb use the new multi-inserts
+	- absorb and key_absorb now take any number of heaps as argument
+          instead of absorbing exactly one.
+	- Special characters in generated constant strings were incorrectly
+	  escaped (bugfix)
+	- key_method doesn't return literal strings anymore in the "complex"
+	  case (also causes the above mentioned bug to never trigger)
+	- make the internal _STRING and _LITERAL macros never see each others
+	  output (this is possibly a bugfix)
+
+0.10	2005-07-27
+	- removed a stray print from t/speed_array
+	- Replaced :: by - in author email address (easier quoting for mailers)
+        - Don't run benchmarks unless asked for during Makefile.PL
+
+0.09	2004-11-12
+	- Minor update, only the tests are changed to work with perl 5.6.1:
+	    - Some tests triggered a 5.6.1 issue where -0 differs from 0
+	    - One of the ties in the magic test was one reference too deep.
+
+0.08	2004-11-06
+	- Removed a few stray "use warnings" in the tests
+        - Added a basic "load the module directly" test since the indirection
+          through Heap::Simple hides load errors.
+	- Added _ before the name of the recover methods since they aren't
+	  part of the official API
+	- Only expand all uppercase macros
+
+0.07	2004-10-25
+        - Split off Heap::Simple to its own package. This package is now
+          Heap::Simple::Perl
+        - Add a "top" method.
+	- Use the "official" constant for infinity (9**9**9)
+        - Expand array, hash and method keys inplace (if safe)
+        - Check for unknown options
+	- Generate code in proper package and with proper name
+	  (defining a function twice is now a redefine warning)
+        - _make substitutions functions must start with _, not just contain it
+	- _make macro expansion now has proper argument parsing
+	- _make now does some very trivial code elimination
+	- drop the (always undocumented) internal _init method.
+	  It was too awkward to use anyways.
+        - Move perl code to Simple/Perl.pm in preparation for an XS switch
+	- Renamed the "Key" element type to "Scalar". "Key" remains supported
+          for backward compatibility.
+	- Consistent error message for getting an element of an empty heap.
+        - Document that the methods that return undef on empty are only
+          guaranteed to do so in scalar context.
+        - Added an extract_first method that returns nothing on empty.
+	- Replace test suite with a much cleaner one
+        - More fair speed testing
+        - Added speed compare with Array::Heap2
+	- Added "wrapped", "order", "elements" and "dirty" methods.
+        - Make index 0 into a hash now that more and more attributes get added
+	- Save and restore $@ around _make() based code creation.
+        - Support max_count
+	- add absorb() and key_absorb methods
+	- added _absorb, _key_absorb and _key_insert helper functions, but they
+	  are undocumented (not part of the official interface)
+	- placeholders that croak with a nice error message for all methods that
+	  don't always exist.
+
+0.06	2004-09-29
+        - Don't scare away users by directly explaining all possibilities in
+          the docs. Add examples to the top to show basic usage.
+        - Fix author email.
+        - Be paranoid about defining an expanded function twice.
+        - Rename extract_min to extract_top (like Heap did). Keep
+          extract_min around for backward compatibility. Same with top_key
+          (used to be min_key)
+        - Move Simple.pm into lib/Heap
+        - Allow Simple.pm and package version to be different
+
+0.05	2003-05-20
+        - reorder s.t to take much less memory (failed on fast machines with
+          little memory).
+        - Added keys, values and clear methods, with tests and documentation
+
+0.04	2003-05-19
+        - Small documentation changes
+        - Bugfix: "Any" and "Object" element types without arguments failed
+
+0.03	2003-05-19
+        - Added settable infinity
+        - Added generic compare function
+        - min_key now always exists, but can fail on empty heaps
+        - reordered $self->[0] from most to least likely
+        - Added the Object and Any element methods
+        - Added testcases for element methods Method, Object, Function and Any
+        - Added method "key_insert"
+        - Added testcases for generic compare
+        - Added method "key"
+        - Documented all new stuff
+        - Reduce the number of tests. Still way too many though.
+
+0.02	2003-05-15
+        - Added testcases for > and gt
+        - Cleaned up the tests a bit
+        - Do a bit less work in the tests (faster)
+        - autocalibrate the big benchmark test.
+        - Unify n.t and s.t. Only run the number variant by default.
+        - Unify 2.t into 1.t
+        - changed the macro-expander so it supports balanced parenthesis
+        - Added the Method and Function element types for completely general
+          key fetching (not documented or tested yet)
+
+0.01	2003-05-14
+	- original version; created by h2xs 1.22 with options
+		-X -n Heap::Simple
+        - Insert code from my old FastHeap module
+        - Slight code changes
+        - Make special versions (Plain, Array, Hash)
+        - add testcases
+        - Prepare for release
+        - Module set too simular, names too confusing. Refactor module names
+          into arguments.
+        - remove perl 5.6 dependencies (untested)
+        - Prepare for release again.

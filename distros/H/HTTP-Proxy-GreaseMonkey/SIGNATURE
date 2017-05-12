@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 6bbc88b9a6d5875ba5bcdcfe1fab2139cae4728f Changes
+SHA1 b9a480a40e2c7617662ea157aac2a1b190c8a954 MANIFEST
+SHA1 a7063df74f7338014f1c4f932e4d288d11d88b11 META.yml
+SHA1 9ffef379f52445325f4bda851d592283b5ccdde0 Makefile.PL
+SHA1 8490bad895ca266160381817340f9fdf7b415a35 README
+SHA1 5d2f5199598d910c5e48495aff870f551f315fdd examples/cpansearch.user.js
+SHA1 f20066158e029600c9f1e0e01b180a1cd5c12fd8 examples/gmproxy
+SHA1 3156fb5ef8be53635ef8fd259b18ae8cd17af7ff examples/net.hexten.gmproxy.plist
+SHA1 1ff0258e0af589757cb38447201a793875786fe9 helper/patchbin.PL
+SHA1 43deabad059799ff4eb73d570ba8ef534f5785d5 lib/App/GreaseMonkeyProxy.pm
+SHA1 e93cdfdfe0a714f93c5b5ae6d7ca0ba06f09abcc lib/HTTP/Proxy/GreaseMonkey.pm
+SHA1 86df4d6d14b1348b4cfa55494f54fa8d3469fe52 lib/HTTP/Proxy/GreaseMonkey/Redirector.pm
+SHA1 ccfaf7269ccb603f5e1eb7bd9947d793885acaaa lib/HTTP/Proxy/GreaseMonkey/Script.pm
+SHA1 bb8412f4fa03dbadc170cb8e39e359febc8938af lib/HTTP/Proxy/GreaseMonkey/ScriptHome.pm
+SHA1 e843225e50f587ebdaa067aec3c6bfb05a474040 t/00.load.t
+SHA1 75bae8c506adc17380aed89b81c01d0e3c7e9128 t/gmproxy.t
+SHA1 bdd09cf1930990e0da69bcd59e551c6b162f24d0 t/pod-coverage.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+SHA1 96431eaa715d86341a3261931944430bece78eb6 t/script.t
+SHA1 f7cb0cb467498aa17e8fc5a78916e9068e68274c t/scripthome.t
+SHA1 285e9ea68e405054d9f514152b764abd92d3bf57 t/scripts/u1.js
+SHA1 aa02b32308e03210365e343744a9df821205fb46 t/scripts/u2.js
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (Darwin)
+
+iD8DBQFHaw55woknRJZQnCERAhsyAJsHyT3BdfQWyQUifiXG5AqXsQGW0gCePi3U
+TR1TZKHgQrcAG5PBBhNqVY8=
+=XNG7
+-----END PGP SIGNATURE-----

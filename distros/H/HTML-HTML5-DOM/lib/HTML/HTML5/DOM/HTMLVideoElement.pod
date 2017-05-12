@@ -1,0 +1,86 @@
+=head1 NAME
+
+HTML::HTML5::DOM::HTMLVideoElement - implementation of the HTMLVideoElement interface of the HTML DOM
+
+=head1 DESCRIPTION
+
+HTML::HTML5::DOM::HTMLVideoElement is an implementation of the HTMLVideoElement interface of the HTML DOM. See L<HTML::HTML5::DOM> for a list of the conventions that have been used when translating the DOM to Perl.
+
+=head2 HTML Elements
+
+This class applies to the following HTML elements.
+
+=over
+
+=item * C<< {http://www.w3.org/1999/xhtml}video >>
+
+=back
+
+=head2 Inheritance
+
+HTML::HTML5::DOM::HTMLVideoElement inherits methods from the following Perl classes.
+
+=over
+
+=item * L<HTML::HTML5::DOM::HTMLMediaElement>
+
+=item * L<HTML::HTML5::DOM::HTMLElement>
+
+=item * L<XML::LibXML::Augment::Element>
+
+=item * L<XML::LibXML::Augment::Node>
+
+=item * L<XML::LibXML::Element>
+
+=item * L<XML::LibXML::Node>
+
+=item * L<XML::LibXML::QuerySelector>
+
+=item * L<HTML::HTML5::DOMutil::FancyISA>
+
+=back
+
+=head2 Additional Methods
+
+As well as its inherited methods, this class provides the following methods.
+
+=over
+
+=item * C<< height >>
+
+Called with no arguments, is a shortcut for C<< $elem->getAttribute("height") >>. Called with a defined argument, acts as C<setAttribute>. Called with undef as an argument, acts as C<removeAttribute>.
+
+=item * C<< poster >>
+
+Called with no arguments, is a shortcut for C<< $elem->getAttribute("poster") >> but as a blessed L<URI> object. Called with a defined argument, acts as C<setAttribute>. Called with undef as an argument, acts as C<removeAttribute>.
+
+=item * C<< width >>
+
+Called with no arguments, is a shortcut for C<< $elem->getAttribute("width") >>. Called with a defined argument, acts as C<setAttribute>. Called with undef as an argument, acts as C<removeAttribute>.
+
+=back
+
+=head1 BUGS
+
+L<http://rt.cpan.org/Dist/Display.html?Queue=HTML-HTML5-DOM>.
+
+=head1 SEE ALSO
+
+L<HTML::HTML5::DOM>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2012, 2014 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+
+

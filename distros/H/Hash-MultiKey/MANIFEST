@@ -1,0 +1,23 @@
+Changes
+Makefile.PL
+MANIFEST
+MultiKey.pm
+README
+t/01fetch.t
+t/02exists.t
+t/03delete.t
+t/04keys.t
+t/05values.t
+t/06each.t
+t/07clear.t
+t/08s_fetch.t
+t/09s_exists.t
+t/10s_delete.t
+t/11s_keys.t
+t/12s_values.t
+t/13s_each.t
+t/14s_clear.t
+t/15corners.t
+t/16s_corners.t
+t/17croak.t
+META.yml                                 Module meta-data (added by MakeMaker)

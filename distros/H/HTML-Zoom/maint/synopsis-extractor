@@ -1,0 +1,77 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use FindBin qw($Bin);
+use File::Find;
+use File::Spec;
+
+sub slurp_file {
+    local (@ARGV, $/) = ($_[0]); <>
+}
+
+sub extract_synopsis {
+    my $string = shift || return;
+    my $head_or_cut = qr[head|cut]x;
+    if($string=~m/^=head1 SYNOPSIS\n(.*?)^=$head_or_cut/sm) {
+        my $extracted = $1;
+        my $begin_end = qr[begin|end]x;
+        $extracted=~s/\n^=$begin_end testinfo\n\n//smg; # remove test block
+        $extracted=~s/^\S.+?$//smg; # wipe out non code lines in pod
+        return $extracted;
+    } else {
+        return;
+    }
+}
+
+sub normalize_indent {
+    my $extracted = shift || return;
+        if($extracted=~m/([ \t]+)(\S+)/) { 
+        $extracted=~s/^$1//gsm;
+        return $extracted;
+    } else {
+        return;
+    }
+}
+
+sub create_test_string {
+    my $extracted = shift || return;
+    return <<TEST
+use strict;
+use warnings FATAL => 'all';
+use Test::More qw(no_plan);
+$extracted
+TEST
+}
+
+sub create_test_path_from_lib {
+    my $module_name = shift;
+    $module_name =~s/\.pm$//;
+    return File::Spec->catfile($Bin, '..', 't', 'synopsis', lc($module_name).'.t');
+}
+
+sub create_or_update_test_file {
+    my ($target, $synopsis_string) = @_;
+    return unless $synopsis_string && $target;
+    print "Writing $target\n";
+    open my $syn_test, '>', $target
+      or die "Couldn't open $target - you screwed something up. Go fix it.\n";
+    print $syn_test $synopsis_string;
+}
+
+sub wanted {
+    my $target_path =
+        create_test_path_from_lib $_;
+    my $synopsis_string =
+        create_test_string
+        normalize_indent
+        extract_synopsis
+        slurp_file $File::Find::name;
+    create_or_update_test_file
+        $target_path,
+        $synopsis_string,
+}
+
+find(\&wanted, File::Spec->catfile($Bin, '..', 'lib'));
+

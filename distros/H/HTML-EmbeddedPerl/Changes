@@ -1,0 +1,12 @@
+Revision history for Perl extension HTML::EmbeddedPerl.
+
+  The old version history, please see past archives.
+
+0.91 Mon Jun 03 00:08:37 2013
+	Parsing separated tags "<[|:$?%] \1>" and added option flags.
+
+0.90 Thu May 16 22:00:00 2013
+	This is a beta version, it has been changed to new specification.
+	Please refer to the source code for change details.
+	+added apache_mod_twepl
+

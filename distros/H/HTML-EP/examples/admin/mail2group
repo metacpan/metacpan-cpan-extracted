@@ -1,0 +1,211 @@
+#!/usr/bin/perl
+#
+#	Modigications:
+#
+#		25.12.1998, Jochen Wiedmann
+#			Mails werden nicht mehrfach weitergeleitet;
+#			zu diesem Zweck wird ein eigener Header
+#			X-Mail2Group eingefuehrt.
+#
+use strict;
+require 5.004;
+
+
+require Mail::Internet;
+require Mail::Util;
+require Getopt::Long;
+require Time::Local;
+require DBI;
+require Data::Dumper;
+require Symbol;
+
+
+my $PREFS_FILE = '/home/httpd/html/admin/var/prefs';
+my $SPOOL_DIR  = '/var/spool/mail';
+my $DBI_DSN    = 'DBI:mysql:user';
+my $DBI_USER   = 'nobody';
+#my $DBI_PASS   = '';
+my $DBI_PASS   = 'my_name_is_nobody';
+my $WWW_USER   = 'nobody';
+#my $LOCAL_MAILS = '\@euwid\.de\b';
+my $LOCAL_MAILS = '';
+
+my %MONTHS = (
+    'jan' => 0,
+    'feb' => 1,
+    'mar' => 2,
+    'apr' => 3,
+    'may' => 4,
+    'jun' => 5,
+    'jul' => 6,
+    'aug' => 7,
+    'sep' => 8,
+    'oct' => 9,
+    'nov' => 10,
+    'dec' => 11
+    );
+
+
+my $options = {
+    'dsn' => $DBI_DSN,
+    'user' => $DBI_USER,
+    'password' => $DBI_PASS,
+    'verbose' => 0,
+    'debug' => 0
+};
+
+Getopt::Long::GetOptions($options, 'dsn=s', 'user=s', 'password=s',
+			 'verbose', 'debug');
+my $debug = $options->{'debug'};
+if ($debug) {
+    $options->{'verbose'} = 1;
+}
+my $verbose = $options->{'verbose'};
+
+my $config = do $PREFS_FILE
+    || die "Error while reading prefs file $PREFS_FILE: $@";
+
+
+if (!$config->{'mail2group'}->{'active'}) { exit 0 }
+if (!$config->{'mail2group'}->{'weekend'}) {
+    my($sec, $min, $hour, $mday, $mon, $year, $wday) = localtime(time());
+    if ($wday == 0  ||  $wday == 6) { exit 0 }
+}
+my $cache = $config->{'mail2group'}->{'cache'} or {};
+foreach my $var (keys %$cache) {
+    $cache->{$var} = 0;
+}
+
+
+my $dbh = DBI->connect($options->{'dsn'}, $options->{'user'},
+		       $options->{'password'}, { 'RaiseError' => 1 });
+END { $dbh->disconnect() if $dbh; undef $dbh }
+
+my $sth = $dbh->prepare("SELECT * FROM USERS");
+$sth->execute();
+while (my $ref = $sth->fetchrow_hashref()) {
+    my $user = $ref->{'USER'};
+    my $forward = $ref->{'CUSTOM'};
+    if (!$forward) {
+	print "Ignoring user $user.\n" if $verbose;
+	next;
+    }
+    my $folder = "$SPOOL_DIR/$user";
+    if (! -f $folder  ||  -z _) {
+	print "Empty folder of user $user.\n" if ($verbose);
+	next;
+    }
+    my @mails = eval { Mail::Util::read_mbox("$SPOOL_DIR/$user") };
+    if ($@) {
+	print STDERR "Error while reading folder $folder: $@\n";
+	next;
+    }
+    my $i = 0;
+    foreach my $mail (@mails) {
+	++$i;
+	my $msg = Mail::Internet->new($mail, 'MailFrom' => 'KEEP');
+	my $head = $msg->head();
+	if ($head->get("X-Mail2Group")) {
+	    print "Ignoring mail $i of user $user: Mail2Group header found.\n"
+		if ($verbose);
+	    next;
+	}
+	my $local;
+	if ($LOCAL_MAILS) {
+	    foreach my $address ($head->get("reply-to"),
+				 $head->get("from")) {
+		if ($address =~ /$LOCAL_MAILS/oi) {
+		    $local = $address;
+		    last;
+		}
+	    }
+	    if ($local) {
+		print "Ignoring mail $i of user $user: Local sender $local.\n"
+		    if ($verbose);
+		next;
+	    }
+	}
+	my $id = $head->get("Message-Id");
+	if (!defined($id)) {
+	    print "Ignoring mail $i of user $user: Missing message-id.\n"
+		if ($verbose);
+	    next;
+	}
+	if ($id =~ /<(.*?)>/) {
+	    $id = $1;
+	}
+	$id .= ",$user";
+	if (exists($cache->{$id})) {
+	    print "Ignoring mail $i of user $user (Cache, $id)\n"
+		if ($verbose);
+	    $cache->{$id} = 1;
+	    next;
+	}
+	if ($msg) {
+	    my $received = $msg->head()->get("Received");
+	    my $time;
+	    if ($received =~ /(\d+)\s+(\S+)\s+(\d+)\s+(\d+)\:(\d+)\:(\d+)/s) {
+		my $mday = $1;
+		my $mon = $2;
+		my $year = $3;
+		my $hour = $4;
+		my $min = $5;
+		my $sec = $6;
+		if (exists($MONTHS{lc $mon})) {
+		    $mon = $MONTHS{lc $mon};
+		} else {
+		    print STDERR ("Cannot parse received header from mail $i"
+				  , " of user $user\n");
+		    next;
+		}
+		$year -= 1900 if ($year > 99);
+		$time = Time::Local::timelocal($sec, $min, $hour, $mday, $mon,
+					       $year);
+	    }
+	    if ($time + $config->{'mail2group'}->{'delay'} * 24 * 60 * 60
+		> time()) {
+		printf("Ignoring mail $i ($id) of user $user: $received\n")
+		    if ($verbose);
+		next;
+	    }
+	    printf("Forwarding mail $i ($id) of user $user to $forward.\n")
+		if ($verbose);
+	    $cache->{$id} = 1;
+	    if ($debug) {
+		next;
+	    }
+	    $head->add('X-Forwarder', "mail2group ($user)");
+	    $head->add('X-Mail2Group', "$user => $forward");
+	    $msg->smtpsend('Host' => '127.0.0.1',
+			   map { s/^\s+//; s/\s+$//; ('Bcc' => $_) }
+			       split(/,/, $forward));
+	}
+    }
+}
+
+
+my @keys = grep { !$cache->{$_} } keys %$cache;
+foreach my $key (@keys) {
+    if ($verbose) {
+	printf("Deleting ID $key from cache.\n");
+    }
+    delete $cache->{$key};
+}
+
+
+$config->{'mail2group'}->{'cache'} = $cache;
+my $dump = Data::Dumper->new([$config], ['PREFS']);
+$dump->Indent(1);
+my $str = $dump->Dump();
+my $fh = Symbol::gensym();
+if ($verbose) {
+    print("Saving data:\n$str\n");
+}
+if (!$debug) {
+    if (!open($fh, ">$PREFS_FILE")  ||  !(print $fh $str)  ||
+	!close($fh)) {
+	die "Couldn't save data: $!";
+    }
+    my($login, $pass, $uid, $gid) = getpwnam($WWW_USER);
+    chown $uid, $gid, $PREFS_FILE;
+}

@@ -1,0 +1,97 @@
+Revision history for Perl extension HTTP::HeaderParser::XS.
+
+0.20  Wed Apr 04 14:33:09 PDT 2008
+    - add setter for uri field, and test
+    - remove overall dependence on Perlbal for normal usage
+        (as suggested by Andy Grundman)
+    - added getHeaders() method that returns a hashref of all headers.
+        (feature by Andy Grundman)
+
+0.19  Tue Sep 19 07:54:51 UTC 2006
+    - fix number of tests from 28 to 31 to enable successfull make test
+
+0.18  Wed Jul 20 18:35:51 UTC 2005
+    - allow setting the status code and text
+    - add dependency on Perlbal and Perlbal::HTTPHeaders
+
+0.17  Tue Jul 19 13:41:23 PDT 2005
+    - library now inherits from Perlbal::HTTPHeaders
+    - removed debugging code
+    - further cleanup for CVS commit
+
+0.16  Mon Jul 18 17:13:58 PDT 2005
+    - fix bug causing headers to be considered invalid when they contained no
+        content (should be allowed, per spec)
+
+0.15  Mon Mar  7 15:55:29 PST 2005
+    - cleaned up a bunch of stuff for initial public release
+
+0.14  Tue Feb  1 10:19:28 PST 2005
+    - fix bug in failing to adequately reset pointers in header deletion
+        (found by LiveJournal user nothings)
+    - use delete instead of Safefree for object deletion
+        (found by LiveJournal user keturner)
+    - added debug output for object creation/deletion (for memory leak tracking)
+
+0.13  Thu Jan 27 10:20:47 PST 2005
+    - added failure checks on all memory allocations
+    - switched some Newz calls to New+Poison calls to help catch errors
+    - fixed bug with removing the last header breaking ability to add more headers
+
+0.12  Fri Jan 14 10:31:14 PST 2005
+    - fixed problem with invalid pointers in one case
+    - fixed calling of SvREFCNT_dec on possibly NULL pointer
+    - fixed so you can't enable XS module twice in a row with weird behavior
+    - fixed last call to delete to be a Safefree call
+    - removed extraneous printfs and comments from XS code
+
+0.11  Tue Jan 11 10:41:40 PST 2005
+    - removed some unused variables
+    - removed and cleaned up extraneous comments
+
+0.10  Mon Jan 10 10:39:05 PST 2005
+    - fixed a memory leak in header replacement code
+    - updated res_keep_alive function to fix bug in 1.1 keep-alive handling
+    - revamped getReconstructed function to be more paranoid about inputs
+
+0.09  Fri Jan  7 17:47:53 PST 2005
+    - fixed bug causing incorrect parsing of empty header strings
+
+0.08  Thu Nov  4 17:16:10 PST 2004
+    - implemented header combining (comma separated header values)
+    - fixed a bunch of calls to C functions in Perl code for compatibility
+    - added a few more test cases
+
+0.07  Wed Nov  3 17:51:56 PST 2004
+    - fixed segfault with returning NULL instead of Perl's undef
+    - implemented set_version, req_keep_alive, res_keep_alive, etc
+    - made XS interface for Perlbal to enable/disable XS headers
+    - modified object blesser so we always bless into Perlbal::XS::HTTPHeaders
+
+0.06  Tue Oct 26 13:26:30 PDT 2004
+    - fixed bug where calling setHeader to create a header failed
+    - converted to_string_ref from Perl module to XS module
+    - made constructor take SV * instead of char *
+    - updated findHeader to use strncasecmp (thanks Brad)
+    - made parseHeaders get called by XS, not automatically by new
+    - firstLine is now an SV *
+
+0.05  Tue Oct 26 12:14:04 PDT 2004
+    - modified typemap for char * to support undef inputs
+    - made all char * returns be SV * returns
+
+0.04  Mon Oct 25 11:36:02 PDT 2004
+    - implemented most of Perlbal::HTTPHeaders API in XS
+    - fixed setHeader('Foo', '') to also remove header
+
+0.03  Mon Oct 25 09:37:03 PDT 2004
+    - added to_string function that was missing
+    - added typemap to the manifest so it's included in the package
+
+0.02  Sun Oct 24 22:54:00 PDT 2004
+    - first operational beta release; almost function complete
+
+0.01  Sun Oct 24 12:49:39 PDT 2004
+	- original version; created by h2xs 1.23 with options
+		-x -n HTTPHeaders headers.h
+

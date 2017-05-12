@@ -1,0 +1,27 @@
+---
+name: HTML-TreeBuilder-Select
+version: 0.111
+author:
+  - 'Robert Krimen <rkrimen@cpan.org>'
+abstract: Traverse a HTML tree using CSS selectors
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+  Class::Accessor: 0
+  HTML::Selector::XPath: 0
+  HTML::TreeBuilder: 0
+  HTML::TreeBuilder::XPath: 0
+build_requires:
+  Test::More: 0
+provides:
+  HTML::Element:
+    file: lib/HTML/TreeBuilder/Select.pm
+  HTML::TreeBuilder::Select:
+    file: lib/HTML/TreeBuilder/Select.pm
+    version: 0.111
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

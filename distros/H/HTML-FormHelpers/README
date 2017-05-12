@@ -1,0 +1,59 @@
+NAME
+    HTML::FormHelpers - Useful routines for generating HTML form elements
+
+VERSION
+    version 0.004
+
+SYNOPSIS
+        use HTML::FormHelpers qw<:all>;
+
+        print text('foo');   # generate HTML for an input tag
+
+        my @options = qw( small medium large );
+        print select('size', \@options);
+
+DESCRIPTION
+    NOTE: This module is very alpha code. *Use at your own risk!*
+
+    This module has some handy routines for creating HTML form elements.
+    Each helper routine may optionally pass an object as its first argument.
+    It is expected that this object will have an accessor with the same name
+    as the one specified as the second argument so that the form elements
+    can be initialized with the object's values by default.
+
+    "radio([OBJ], NAME, [VALUES], [SEPARATOR])"
+        Examples:
+
+            radio('item', [ 'hat', 'shirt', 'shorts' ])
+            radio($obj, 'size', [ 'small', 'medium', 'large' ])
+
+    "text([OBJ], NAME, VALUE, [ ATTR ])"
+        Examples:
+
+            text('title')
+            text($person, 'name') %>
+            text($person, 'dob', { size => 8 })
+
+    "select([OBJ], NAME, OPTIONS, [KEY], [VALUE], [ ATTR ])"
+        Example:
+
+            select('priority', [ 'low','medium','high' ])
+
+    "checkbox([OBJ], NAME, CHECKED, [ ATTR ])"
+        Example:
+
+    "button([OBJ], NAME, [VALUE], [ ATTR ])"
+        Example:
+
+    "hidden([OBJ], NAME, VALUE, [ ATTR ] )"
+        Example:
+
+AUTHOR
+    Jonathan Scott Duff <duff@pobox.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Jonathan Scott Duff.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

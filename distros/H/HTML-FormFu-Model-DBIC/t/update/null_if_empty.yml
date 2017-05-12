@@ -1,0 +1,12 @@
+---
+model_config:
+  resultset: User
+
+elements:
+  - type: Text
+    name: name
+  - type: Text
+    name: title
+    model_config:
+      null_if_empty: 1
+

@@ -1,0 +1,50 @@
+# Copyright 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 Kevin Ryde
+
+# This file is part of HTML-FormatExternal.
+#
+# HTML-FormatExternal is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 3, or (at
+# your option) any later version.
+#
+# HTML-FormatExternal is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+# of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with HTML-FormatExternal.  If not, see
+# <http://www.gnu.org/licenses/>.
+
+
+# Build-Depends could have libtaint-util-perl per META.yml
+# "prereqs.test.suggests" but it isn't used unless the tests are run
+# under perl -T taint mode, which isn't usual for the debian build.
+#   
+# Build-Depends could have "libhtml-tree-perl" for HTML::TreeBuilder
+# used by a couple of tests.  The formatter programs are used by the
+# tests likewise.  But demanding all that is a bit tedious for a
+# manual build, and in particular "zen" is not in debian as of Apr
+# 2015.
+
+Source: libhtml-formatexternal-perl
+Section: perl
+Priority: optional
+Build-Depends: cdbs, debhelper (>= 5)
+Maintainer: Kevin Ryde <user42_kevin@yahoo.com.au>
+Standards-Version: 3.9.6
+Homepage: http://user42.tuxfamily.org/html-formatexternal/index.html
+Bugs: mailto:user42_kevin@yahoo.com.au
+
+Package: libhtml-formatexternal-perl
+Architecture: all
+Depends: perl (>= 5.6), libconstant-defer-perl, libfile-temp-perl (>= 0.18) | perl (>= 5.8.9), libipc-run-perl, liburi-perl (>= 0.08), ${perl:Depends}, ${misc:Depends}
+Recommends: lynx | elinks | links | netrik | vilistextum | w3m | zen
+Suggests: elinks, links, lynx, netrik, vilistextum, w3m, zen
+Description: Format HTML to text in perl using external programs
+ HTML::FormatExternal turns HTML into plain text by running it through
+ one of elinks, html2text, links, lynx, netrik, vilistextum, w3m or
+ zen.
+ .
+ The programming interface is compatible with HTML::FormatText and
+ other HTML::Formatter classes.

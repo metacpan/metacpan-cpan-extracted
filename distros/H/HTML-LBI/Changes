@@ -1,0 +1,12 @@
+Revision history for Perl extension HTML::LBI.
+
+2.00  Wed Mar 06 22:32:17 2002
+	- Added functionality:
+		- filename option added to new()
+		- path option added to new()
+	- added simple test suite
+	- update to POD documentation
+
+1.01  Tue Feb 12 10:08:17 2002
+	- packaged release version of HTML::LBI
+

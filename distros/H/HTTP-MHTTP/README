@@ -1,0 +1,43 @@
+HTTP::MHTTP
+=============
+
+    Copyright (c) 2003 Piers Harding.
+    All rights reserved.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of either:
+        a) the GNU General Public License as published by the Free
+        Software Foundation; either version 1, or (at your option) any
+        later version, or
+        b) the "Artistic License"
+
+
+HTTP::MHTTP is a fast http client library for Perl.  its advantages are that 
+it gives you low level access to constructing the HTTP requests, and it 
+handles GET, POST, PUT, HEAD, and DELETE.
+
+Basic SSL support can be compiled in - this does not validate certificates,
+but enables the TLS level negotiation.
+
+To compile in SSL support then amend the call to perl Makefile.PL to be:
+GOTSSL=yes perl Makefile.PL
+
+You may need to amend the Makefile.PL script to ensure that the CFLAGS, and 
+LDFLAGS (INC, and LIBS) are pointing at your openssl installation correctly.
+
+The test suite assumes that you have access to the internet - so if the
+tests fail then it is most likely due to you not being able to hit
+http://www.piersharding.com
+
+perl Makefile.PL   <= change this to "GOTSSL=yes perl Makefile.PL" for SSL support
+make 
+make test
+make install
+
+Dance.
+
+for more details:
+
+perldoc HTTP::MHTTP
+
+Piers Harding - piers@cpan.org
+Somewhere arround: Fri Jan  3 09:48:04 GMT 2003

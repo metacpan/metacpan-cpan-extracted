@@ -1,0 +1,20 @@
+                      Bilstone HTML Template Parser
+                      =============================
+
+4th October 2001	1.33	Corrected problem with embed invisible blocks.
+26th September 2001	1.32	Courtesy change - restore value of $/ in src().
+26th March 2001		1.31	Added getAllTokens and srcString methods.
+8th March 2001		1.30	Released to CPAN
+8th May 2000		1.11	Major speed improvement
+25th February 2000	1.10	Added function 'htmlString'
+23rd February 2000	1.00	First Production Release
+
+13th April 1999    	0.91	beta release
+							Added check for missing end of block token.
+							Added dumpAll function to display in html format
+							all tokens picked up by parser
+
+12th April 1999		0.90	beta release
+
+Ian Steel.	(ian@bilstone.co.uk)
+April 1999

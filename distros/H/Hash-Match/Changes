@@ -1,0 +1,81 @@
+Revision history for Hash::Match
+
+v0.5.3  2014-08-16
+
+        - Added SEE ALSO section to the POD.
+
+	- Fixed license setting to make CPANTS happy.
+
+v0.5.2  2014-07-01
+
+        - Changed POD to not use deprecated keywords in the examples.
+
+        - Made minimum version for List::MoreUtils explicit in the
+          prereqs.
+
+v0.5.1  2014-06-30
+
+        - Added missing prereq.
+
+	- Minor updates to POD and README.
+
+v0.5.0  2014-06-28
+
+	- Further code simplication.
+
+	- Added "-all", "-any", "-notall" and "-notany" keywords.
+
+	- The "-and", "-or" and "-not" keys are deprecated.
+
+	- Match compiler will die on an unknown keyword when the value
+          is a hash or array reference.
+
+	- Reorganized tests. Test::More v0.98 or newer is now required
+          since it uses subtests.
+
+	- Added tests for exceptions, and tweaked error messages
+          slightly.
+
+v0.4.0  2014-06-26
+
+        - Added the ability to use functions for key matching.
+
+v0.3.1  2014-06-26
+
+        - Fixed bug with regex key matching.
+
+v0.3.0  2014-06-26
+
+        - Internal code cleanup.
+
+        - Fixed handling of code references for matching.
+
+          Note that this introduces an incompatability, as the code
+          should check the value passed to it, rather than the
+          subroutine.
+
+v0.2.1  2014-06-25
+
+        - Updated POD.
+
+v0.2.0  2014-06-25
+
+        - Internal code cleanup.
+
+        - Added support for matching undefined values.
+
+        - Added more POD.
+
+        - Added more error checking.
+
+        - Added support for using regular expressions as keys.
+
+v0.1.1  2014-06-25
+
+        - Added missing Changes file.
+
+        - Fixed TODO section of the POD.
+
+v0.1.0  2014-06-25
+
+        - First release on CPAN.

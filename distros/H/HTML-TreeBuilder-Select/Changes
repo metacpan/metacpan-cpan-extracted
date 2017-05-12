@@ -1,0 +1,19 @@
+---
+0.111 Saturday August 04 20:14:21 PDT 2007
+ - Now build Makefile.PL for people without Module::Build
+
+0.11 2007-3-8
+ - Added HTML::Selector::XPath requirement
+
+0.10 2007-2-25
+ - Added tests and documentation
+
+0.04 2007-2-19
+ - Factored out some functionality into a different package: HTML::Element::Convert
+
+0.02 2007-2:
+ - Switched from Class::XPath to HTML::TreeBuilder::XPath
+ - Removed "[@class=...]" hack thanks to switch
+
+0.01 2007-2
+ - Initial release

@@ -1,0 +1,75 @@
+Revision history for Perl extension Hash::Map.
+
+0.016  Sun Jun 26 18:30:00 2016
+- added missing dependency
+
+0.015  Sun Jun 26 08:30:00 2016
+- fixed bug https://rt.cpan.org/Ticket/Display.html?id=115324
+
+0.014  Wed Nov 28 21:32:50 2012
+- fixed documentation
+
+0.013  Tue Nov 27 21:58:39 2012
+- added methods
+  source_keys
+  target_keys
+  source_keys_ref
+  target_keys_ref
+  source_values
+  target_values
+  source_values_ref
+  target_values_ref
+  exists_source
+  exists_target
+  each_source
+  each_target
+  source_iterator
+  target_iterator
+- explained more in tutorial
+
+0.012  Sat Jul 21 21:26:00 2012
+- next try link Tutorial.pod
+
+0.010  Sat Jul 21 15:00:00 2012
+- next try link Tutorial.pod
+
+0.009  Sat Jul 21 13:24:30 2012
+- link Tutorial.pod
+
+0.008  Sat Jul 21 10:38:27 2012
+- NKH sent me an email about long boring Pod
+  tried to make some better
+
+0.007  Sun Jun 24 10:28:35 2012
+- added method set_target_ref and set_souce_ref
+  for the sake of completeness
+- restructured Pod with hints
+
+0.006  Sat Apr 28 14:30:00 2012
+- added methods set_source and set_target
+  to be able to set empty hashes or dynamic sized hashes
+
+0.005  Sun Mar 11 20:15:00 2012
+- fixed code examples in Pod
+- added example scripts
+
+0.004  Sun Mar 11 11:30:50 2012
+- Pod repaired
+  https://rt.cpan.org/Public/Bug/Display.html?id=75576
+- added method combine
+
+0.003  Fri Feb 24 18:00:00 2012
+- added methods
+  - copy_modify_identical(_ref)
+  - map_modify_identical(_ref)
+- repaired method map_modify
+- fixed typos in error messages
+
+0.002  Sat Jan  7 14:18:58 2012
+- added automatic construction
+  for methods target, target_ref, source and source_ref
+- new combined methods
+  copy_modify copy_modify_ref, map_modify and map_modify_ref
+
+0.001  Wed Jan  4 19:01:30 2012
+- first release

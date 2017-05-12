@@ -1,0 +1,47 @@
+Revision history for Perl extension HTML::GenerateUtil.
+
+1.20  Fri Jul 11 11:20:00 2014
+  - Add $E object with escaping by default and other smarts
+  - Add set_paranoia option to escape {} chars
+
+1.11  Fri Jul 15 17:55:00 2011
+  - Document $H object with AUTOLOAD functions
+
+1.10  Mon May 22 14:51:00 2009
+  - Allow single argument version of escape_html()
+
+1.09  Thu Mar 13 16:00:00 2008
+  - Add an AUTOLOAD method which calls generate_tag
+
+1.08  Fri Oct 19 17:09:00 2007
+	- if you use s/(...)/escape_uri($1)/, then $1 might not be SvOK()
+    because it's magic. Need to call SvGETMAGIC first
+
+1.07  Fri Oct 28 15:34:00 2005
+	- add escape_uri function
+  - fix random but very rare cluck bug due to uninitialised memory usage
+
+1.06  Thu Nov 11 16:17:00 2004
+	- allow passing of array refs and hash refs as values to generate_attributes
+
+1.05  Thu Jun 23 14:36:00 2004
+	- fix crash when passing non-strings in values to generate_tag
+
+1.04  Thu Jun 15 09:42:00 2004
+	- fix memory overrun when EH_LEAVEKNOWN and EH_INPLACE used together
+
+1.03  Thu Jun 14 17:12:00 2004
+	- add "leaveknown" entities option
+  - add "closetag" option
+
+1.02  Thu May 27 11:42:00 2004
+	- remove dependence on 5.8.4
+  - move :consts import to first
+
+1.01  Thu May 27 11:20:00 2004
+	- allow array ref for unquoted values in generate_attribtes()
+  - turn on optimisation again
+
+1.00  Wed May 26 12:23:00 2004
+	- initial release
+

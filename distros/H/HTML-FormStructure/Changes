@@ -1,0 +1,26 @@
+Revision history for Perl extension HTML::FormStructure
+
+0.04    2003-10-23(Thu)
+        - add PREREQ_PM Class::Accessor 0.18
+	- changes query's method query_combile to consist_query.
+        - remove consist_* method colling in the query's method query_combine.
+        - add query's accessor consistf
+        - add query's accessor storef
+
+0.03    2003-10-22(Wed)
+        - remove FormStructure/ClassDBI.pm
+        - add argument of validator methods, r(cgi/apache-req).
+        - add query's method 'add'. (left/right concat or push/unshift)
+        - code fix for warning "Use of uninitialized value".
+
+0.02  2003-10-12(Sun)
+        - bug fix make failed under the perl 5.005.
+        - bug fix query's method 'textarea' can not be show as a
+	  textarea tag.
+        - add option interface (form_accessors, query_accessors)
+        - add form accessor 'validator'.
+        - remove form accessor 'tables'.
+        - fix document
+
+0.01  Fri Oct 10 12:45:21 JST 2003
+	- original version

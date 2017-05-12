@@ -1,0 +1,53 @@
+
+=head1 NAME
+
+HTML::DOM::Element::Map - A Perl class for representing 'map' elements in an HTML DOM tree
+
+=head1 VERSION
+
+Version 0.054
+
+=head1 SYNOPSIS
+
+  use HTML::DOM;
+  $doc = HTML::DOM->new;
+  $elem = $doc->createElement('map');
+
+  ($elem->areas)[0]; # first <area> element
+  $elem->areas->[0]; # same
+
+  $elem->name('dingidinedidi'); # set attribute
+  $elem->name;                  # get attribute
+  $elem->tagName;
+  # etc
+
+=head1 DESCRIPTION
+
+This class implements 'map' elements in an HTML::DOM tree. It 
+implements the HTMLMapElement DOM interface and inherits from 
+L<HTML::DOM::Element> (q.v.).
+
+=head1 METHODS
+
+In addition to those inherited from HTML::DOM::Element and its 
+superclasses, this class implements the following DOM methods:
+
+=over 4
+
+=item areas
+
+Returns a collection of all this map's 'area' elements.
+
+=item name
+
+Returns the value of the 'name' attribute. If you pass an
+argument, it will become the new value of the attribute, and the old value
+will be returned.
+
+=back
+
+=head1 SEE ALSO
+
+L<HTML::DOM>
+
+L<HTML::DOM::Element>

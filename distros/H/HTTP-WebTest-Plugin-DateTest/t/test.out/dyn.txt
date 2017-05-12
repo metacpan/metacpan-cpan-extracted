@@ -1,0 +1,5 @@
+Failed  Succeeded  Test Name
+   0          2    datetest
+
+
+Total web tests failed: 0  succeeded: 2

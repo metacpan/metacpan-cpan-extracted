@@ -1,0 +1,513 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>
+      WebMake: Documentation: Setting up CVS and ssh for webmake.cgi HOWTO
+    </title>
+    <meta name="generator" content="WebMake/2.2" />
+    <style>
+      body {
+       background-color: #ffffff; 
+       color: #000000; 
+       font-size: medium;
+       font-family: verdana,lucida,helvetica,sans-serif;
+      }
+      code, samp, pre {
+       font-family: Courier New,courier,fixed-width,monospace;
+      }
+      H1 { font-size: x-large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFCC66; }
+      H2 { font-size: large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFDD77; }
+      H3 { font-size: medium; font-family: Garamond,Book Antiqua,Times,serif; background: #FFEE88; }
+      H4 { font-size: small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H5 { font-size: x-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H6 { font-size: xx-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      A:link {
+       font-weight: bold;
+       color: #004000;
+       text-decoration: underline; 
+      }
+      A:visited {
+       font-weight: normal;
+       color: #008000;
+       text-decoration: underline; 
+      }
+      A:active {
+       font-weight: bold;
+       color: #800000;
+       text-decoration: underline; 
+      }
+      dt {
+       font-size: medium;
+       font-weight: bold;
+       padding-top: 8px; padding-bottom: 8px;
+      }
+      dd {
+       padding-top: 8px; padding-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body bgcolor="#ffffff" text="#000000" link="#3300cc" vlink="#660066">
+    <font face="lucida,verdana,sans-serif">
+      <div align="center">
+        <img src="images/WebMakeTitle.png" alt="WebMake" width="500" height="122" />
+      </div>
+      <table width="100%">
+        <tr>
+          <td valign="top">
+            <strong><a href="http://webmake.taint.org/">WebMake</a>
+             Documentation</strong> (version 2.2)
+             
+          </td>
+          <td valign="top">
+            <div align="right">
+              
+               [ <a href="cgiinstall.html">Back</a> | <a href="cgistart.html">Forward</a> | <a href="index.html">Index</a>
+               | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+               
+            </div>
+          </td>
+        </tr>
+      </table>
+<!-- yes, it's that Mozilla black-border code again ;) -->
+      <!-- stolen from www.mozilla.org via rc3.org -->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td bgcolor="#aaaaaa">
+            <table border="0" cellspacing="4" cellpadding="4" width="100%">
+              <tr>
+                <td bgcolor="#ffffff">
+                  <table border="0" cellspacing="4" cellpadding="4" width="100%">
+                    <tr>
+                      <td>
+                        <h1>Setting up CVS and ssh for webmake.cgi HOWTO</h1><p>
+                          This document covers setting up Webmake with CVS and SSH. It's quite
+                          complicated, but the end result is worth it, providing version control and
+                          replication of your site.
+                          
+                        </p>
+                        <a name="WHAT_YOU_WILL_NEED"><h1>WHAT YOU WILL NEED</h1></a><p>
+                          You will require a CVS server machine (one with a permanent internet connection
+                          if possible). This is where the CVS repository will live. The repository is
+                          the central store for all CVS-controlled documents.
+                          
+                        </p>
+                        <p>
+                          Then you will need at least one client machine (it could be the same computer,
+                          of course). Each client machine will have a copy of the website, checked out
+                          from the CVS repository. Initially, you'll use one of the clients to import
+                          the website into CVS.
+                          
+                        </p>
+                        <p>
+                          The client machines need to be able to connect to the server machine over the
+                          network; and if you're planning to use <a href="cgistart.html">webmake.cgi</a>, they need to be able to do
+                          this without passwords. To do this securely, you'll need to set up an SSH
+                          server and clients, and generate public/private key pairs. I'll cover some of
+                          this where possible, but you need to be familiar with SSH in general.
+                          
+                        </p>
+                        <p>
+                          (You don't strictly need to use SSH, but it allows multiple copies of the same
+                          site across the net, and allows changes made on any of the sites to be
+                          automatically replicated to all the others. This is obviously quite handy!
+                          However, if you don't want to use SSH, you'll still get the benefits of keeping
+                          the site under version control.)
+                          
+                        </p>
+                        <p>
+                          WARNING: as part of this procedure, you will need to allow CGI scripts on the
+                          client machine to run cvs commands on the server machine. If an attacker
+                          subverted the client machine, they may be able to use this to gain shell
+                          access to your account on the server machine. If this is a problem, it would
+                          probably be better not to set up <a href="cgistart.html">webmake.cgi</a>.
+                          
+                        </p>
+                        <p>
+                          When illustrating the commands needed to run this, I'll use my username and my
+                          hostnames. Wherever you see <strong>jm</strong>, replace with your username, wherever you
+                          see <strong>localhost</strong>, replace with your server's hostname, and wherever you see
+                          <strong>/cvsroot</strong>, replace with the path to your CVS repository on the server.
+                          
+                        </p>
+                        <a name="CREATING_THE_REPOSITORY"><h1>CREATING THE REPOSITORY</h1></a><p>
+                          First of all, create the repository on the CVS server machine.
+                          
+                        </p>
+                        <p>
+                          <pre>
+<!--etsafe-->
+                          
+	mkdir /cvsroot;
+	cvs -d /cvsroot init
+<!--/etsafe-->
+                                                  </pre>
+                      </p>
+                      <a name="SETTING_UP_SSH"><h1>SETTING UP SSH</h1></a><p>
+                        On a client machine, install the SSH client ("ssh"), and install the SSH server
+                        ("sshd") on the server machine. Set them up (as described in the ssh
+                        documentation).
+                        
+                      </p>
+                      <p>
+                        Next, if you haven't done this before, generate an ssh key pair for yourself
+                        on all machines:
+                        
+                      </p>
+                      <p>
+                        <pre>
+<!--etsafe-->
+                        
+	ssh-keygen -P "" -N ""
+<!--/etsafe-->
+                                              </pre>
+                    </p>
+                    <p>
+                      When it asks for the filenames to save the keys in, hit Enter to accept the
+                      defaults.
+                      
+                    </p>
+                    <p>
+                      Any machines you plan to run <a href="cgistart.html">webmake.cgi</a> on, you will also need to generate a
+                      key-pair for, so that the user the web server runs CGI scripts as will be able
+                      to communicate without passwords. Here's how (run these as root):
+                      
+                    </p>
+                    <p>
+                      <pre>
+<!--etsafe-->
+                      
+	mkdir ~apache/.ssh
+	chmod 700 ~apache/.ssh
+	chown apache ~apache/.ssh
+	su apache -s/bin/sh -c 'ssh-keygen -P "" -N ""'
+<!--/etsafe-->
+                                          </pre>
+                  </p>
+                  <p>
+                    This will generate a public/private key-pair for the web server user. Note
+                    that the user the web server runs as on your UNIX may be different (<strong>httpd</strong>,
+                    <strong>www</strong>, or <strong>nobody</strong> are common usernames for it); in that case replace
+                    <strong>apache</strong> with the correct username.
+                    
+                  </p>
+                  <p>
+                    Don't worry; the keys you've set up will not compromise your server's
+                    security, as the SSH daemon will not allow anyone to log in as the web server
+                    user, since they have a no-login shell.
+                    
+                  </p>
+                  <a name="SETTING_UP_NO_PASSWORD_LOGINS"><h1>SETTING UP NO-PASSWORD LOGINS</h1></a><p>
+                    This is optional for editing the site by hand using CVS, but if you're using
+                    <a href="cgistart.html">webmake.cgi</a>, it will require that this works.
+                    
+                  </p>
+                  <p>
+                    Here's how to set it up for <a href="cgistart.html">webmake.cgi</a>. Get the public key you just
+                    generated for the web user (run this as root):
+                    
+                  </p>
+                  <p>
+                    <pre>
+<!--etsafe-->
+                    
+  	cat ~apache/.ssh/identity.pub
+<!--/etsafe-->
+                                      </pre>
+                </p>
+                <p>
+                  you should get a long stream of gibberish starting with "1024" and ending
+                  with a hostname; that's the public key. Here's mine:
+                  
+                </p>
+                <p>
+                  <pre>
+<!--etsafe-->
+                  
+	1024 35
+	15059408357788156311432762154619731093579709369085525651528959
+	33782159340399119075502495847161401527101834823731504521848289
+	07097066749035812105735673062224184578113153987480874569311840
+	34611043915547598874334739513173936291615348136113929611666395
+	3155785517017739076839134463214021324783262900267823081443889
+	<a href="mailto:apache@mmmkay">apache@mmmkay</a>
+<!--/etsafe-->
+                                  </pre>
+              </p>
+              <p>
+                On the server, create a file called <code>authorized_keys</code> in your <code>~/.ssh</code>
+                directory:
+                
+              </p>
+              <p>
+                <pre>
+<!--etsafe-->
+                
+	vi ~/.ssh/authorized_keys
+<!--/etsafe-->
+                              </pre>
+            </p>
+            <p>
+              and add this line to to it:
+              
+            </p>
+            <p>
+              <pre>
+<!--etsafe-->
+              
+  	command="cvs server",no-port-forwarding,no-pty <em>...yourpublickey...</em>
+<!--/etsafe-->
+                          </pre>
+          </p>
+          <p>
+            This will allow CGI scripts on the client machine to access cvs on the server
+            machine. Add similar lines for any other machines which need access to the
+            CVS repository.
+            
+          </p>
+          <p>
+            Make sure it's read-write only by you, and unreadable to anyone
+            else:
+            
+          </p>
+          <p>
+            <pre>
+<!--etsafe-->
+            
+	chmod 0600 ~/.ssh/authorized_keys
+<!--/etsafe-->
+                      </pre>
+        </p>
+        <p>
+          Setting up no-password logins for manual editing is similar -- but instead of
+          reading the public key from <code>~apache/identity.pub</code>, read it from
+          <code>~/.ssh/identity.pub</code>, and leave out the <em>command="command"</em> part when
+          adding it to <code>~/.ssh/authorized_keys</code> on the server-side.
+          
+        </p>
+        <p>
+          Next, try it out. This is required to initialise the client account with a
+          host key for the server, and if you omit this step, the CGI script will not be
+          able to update or check in code.
+          
+        </p>
+        <p>
+          <pre>
+<!--etsafe-->
+          
+	echo test | su apache -s/bin/sh -c 'ssh <a href="mailto:jm@localhost">jm@localhost</a> cvs server'
+<!--/etsafe-->
+                  </pre>
+      </p>
+      <p>
+        It will ask you if you wish to accept the host key for server <strong>localhost</strong>.
+        Type "yes" and hit Enter. If all goes well, you should see:
+        
+      </p>
+      <p>
+        <pre>
+<!--etsafe-->
+        
+error  unrecognized request `test'
+<!--/etsafe-->
+              </pre>
+    </p>
+    <p>
+      Important: you should <strong>not</strong> be prompted for a password. If you are prompted
+      for one, check that the correct key has been entered in the
+      <strong>authorized_keys</strong> file.
+      
+    </p>
+    <a name="IMPORTING_THE_SITE_INTO_CVS"><h1>IMPORTING THE SITE INTO CVS</h1></a><p>
+      On a client machine, do this:
+      
+    </p>
+    <p>
+      <pre>
+<!--etsafe-->
+      
+	export CVS_RSH=ssh
+<!--/etsafe-->
+          </pre>
+  </p>
+  <p>
+    If possible, add this to your startup scripts (.bashrc or .cshrc), so
+    you can't forget to set it. All further CVS commands in this document
+    assume this environment variable is set.
+    
+  </p>
+  <p>
+    Create a WebMake XML configuration file for the site, if one is not already
+    present. <a href="cgistart.html">webmake.cgi</a> will <em>require</em> that a site has a .wmk file.
+    
+  </p>
+  <p>
+    Now, run the "webmake_cvs_import" script. This script is a wrapper around
+    the "cvs import" command which ensures that binary files (such as images
+    etc.) are imported into CVS correctly.
+    
+  </p>
+  <p>
+    You need to provide a name for the CVS module. I'm using <strong>jmason.org</strong> in
+    this example. You should pick a name that makes sense; I typically use the
+    host name of the site I'm importing.
+    
+  </p>
+  <p>
+    <pre>
+<!--etsafe-->
+    
+	webmake_cvs_import <a href="mailto:jm@localhost">jm@localhost</a>:/cvsroot jmason.org
+<!--/etsafe-->
+      </pre>
+</p>
+<p>
+  Assuming this works, move on to <strong>CHECKING OUT THE SITE</strong>, below. (Keep a
+  copy of the original site tree around just in case!)
+  
+</p>
+<a name="CHECKING_OUT_THE_SITE"><h1>CHECKING OUT THE SITE</h1></a><p>
+  On the clients, create a directory for <a href="cgistart.html">webmake.cgi</a> to work in, in the web
+  server's HTML tree, then check out the CVS tree:
+  
+</p>
+<p>
+  <pre>
+<!--etsafe-->
+  
+	mkdir /var/www/html/jmason.org
+	cd /var/www/html/jmason.org
+	cvs -d :ext:<a href="mailto:jm@localhost">jm@localhost</a>:/cvsroot checkout jmason.org
+<!--/etsafe-->
+  </pre>
+</p>
+<p>
+  <em>Note:</em> cvs checkout has a few idiosyncrasies; notably, the directory you're
+  checking out must not exist in your filesystem, otherwise it will not populate
+  it with the CVS data files it requires to do check-ins and updates later.
+  
+</p>
+<p>
+  Also, this directory must have the same name it has in the CVS repository
+  (<strong>jmason.org</strong> in the example above). We don't want that, so move them
+  nearer:
+  
+</p>
+<p>
+  <pre>
+<!--etsafe-->
+  
+	mv jmason.org/* . ; rmdir jmason.org
+<!--/etsafe-->
+  </pre>
+</p>
+<p>
+  then, as root,
+  
+</p>
+<p>
+  <pre>
+<!--etsafe-->
+  
+	chown -R apache /var/www/html/jmason.org
+<!--/etsafe-->
+  </pre>
+</p>
+<p>
+  so that <a href="cgistart.html">webmake.cgi</a> can read and write the files. (You could also chgrp them
+  to <strong>www</strong> or whatever the web server user uses as its gid, and <strong>chmod -R
+  g+w</strong> them.)
+  
+</p>
+<p>
+  Next, copy the "<a href="cgistart.html">webmake.cgi</a>" script to your web server's cgi-bin directory:
+  
+</p>
+<p>
+  <pre>
+<!--etsafe-->
+  
+	cp webmake.cgi /cgi-bin/editsite.cgi
+<!--/etsafe-->
+  </pre>
+</p>
+<p>
+  and edit the top of the script. You need to set these variables:
+  
+</p>
+<p>
+  <pre>
+<!--etsafe-->
+  
+	&#36;FILE_BASE = '/var/www/html/jmason.org';
+<!--/etsafe-->
+  </pre>
+</p>
+<p>
+  Note that if you've adopted the same convention as I use for the module name,
+  you can use <strong>_<!-- -->
+  _HOST_<!-- -->
+  _</strong> as a shortcut in this line to mean the
+  hostname of the site being edited. This is handy, as it allows you to use the
+  same CGI script to edit multiple sites, in different virtual servers.
+  
+</p>
+<p>
+  Load up <strong><a href="http://localhost/cgi-bin/editsite.cgi">http://localhost/cgi-bin/editsite.cgi</a></strong> in a web browser, and it
+  should have worked; you should see a list of "sites" (ie. .wmk files) to
+  choose from.
+  
+</p>
+<p>
+  Try clicking on a site, scroll down to the bottom of the page, and click on
+  the "[Update From CVS]" link. You should see a page of cvs
+  messages, indicating that the site has been updated from the latest CVS
+  checked-in version.
+  
+</p>
+<p>
+  If this works without errors, you're now set up. Set up as many more clients
+  as you like!
+  
+</p>
+<p>
+  More info on CVS can be found <a href="http://www.cvshome.org/">here</a>.
+  
+</p>
+<p>
+  
+</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+<table width="100%">
+  <tr>
+    <td valign="top">
+      <strong><a href="http://webmake.taint.org/">WebMake</a>
+       Documentation</strong> (version 2.2)
+       
+    </td>
+    <td valign="top">
+      <div align="right">
+        
+         [ <a href="cgiinstall.html">Back</a> | <a href="cgistart.html">Forward</a> | <a href="index.html">Index</a>
+         | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+         
+      </div>
+    </td>
+  </tr>
+</table>
+<div align="right">
+  <a href="http://webmake.taint.org/"><img src="images/BuiltWithWebMake.png" alt="Built With WebMake" border="0" width="88" height="31" /></a>
+</div>
+</font>
+</body>
+</html>

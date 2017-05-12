@@ -1,0 +1,112 @@
+=head1 NAME
+
+HTML::Puzzle::Format - Html section creator module
+
+=head1 SYNOPSIS
+ 
+ use HTML::Puzzle::Format;
+
+ # test internal DBTable access
+ $fmtHtml = new HTML::Puzzle::Format(
+                                      dbh       => $dbh,
+                                      tablename => 'Test',
+                                      filename  => 'templates/format.tmpl',
+                                      opt_items => {
+                                                    'section_title' =>
+                                                    'PUZZLE Test'
+                                                   }
+                                    );
+ 
+ print $fmtHtml->html;
+
+ 
+=head1 DESCRIPTION
+
+This module return text present in the body of an html template file using
+HTML::Template::Extension to replace placeholders present in it with dynamic text.
+
+Dynamic text can be set using the opt_items parameter, the items parameter or
+internally using HTML::Puzzle::DBTable to retrive data from a db table.
+
+The only required costructor property is the "filename" where you set the path 
+of the html template to be used.
+
+The html method open filename, set dynamic text and return body of template.
+
+If opt_items is set with an hash ref every hash keys present is passed to param
+HMLT::Template method an so, for indeeed, if a tag <TMPL_VAR NAME="test_key">
+exists in the template, this tag and placeholder eventually present till
+<TMPL_VAR> is replaced with the relative hash value.
+
+If "dbh" and "tablename" parameters are set respectivly to an active DBI handle 
+and to a table object present in the database then hash_items method of an
+internally object istance of HTML::Puzzle::DBTable module is used to get all
+data available in table and return values are stored in the "items" property.
+
+If "items" property is set (clearly set or from internal DBTable object) with
+an array ref of hash ref then this array is used to call HTML::Template param 
+method so if, in the template, is present a <TMPL_LOOP NAME="items"> tag all
+text between this and end tag </TMPL_LOOP> is duplicated many times as items
+array elements count. If, in the TMPL_LOOP tag are present TMPL_VAR tag named
+with an hash key present in the items element then, in every duplicated line
+of loop the tag TMPL_VAR tag is replaced with relative hash value.
+
+You can alter items elements and structure before it's used to fill template 
+with a filter parameter set to a code reference. This code is called by
+HTML::Puzzle::Format::html method and receive a reference to items array ref
+that you can modify before applied to template.
+
+=head1 METHODS
+
+=head2 new ()
+
+Create an instance of HTML::Puzzle::Format. 
+
+=head2 output ()
+
+Return text present in filename file using %params hash to set TMPL_* 
+parameters present in this template
+
+=head2 html ()
+
+Under costruction
+
+=head2 items ()
+
+Under costruction
+
+=head2 filename ()
+
+Under costruction
+
+=head2 opt_items ()
+
+Under costruction
+
+=head2 filter ()
+
+Under costruction
+
+=head2 order ()
+
+Set an order string for returning data.
+
+=head2 date_format()
+
+Set a date format for returning date_format field.
+
+=head1 DEBUG COMPONENT 
+
+There is also two static constants: a DEBUG_FILE_PATH and a DEBUG constant that 
+enable debug infos written on DEBUG_FILE_PATH file. 
+
+Debug is disable by default.
+
+=head1 AUTHOR
+
+Bruni Emiliano, <info@ebruni.it>
+
+=head1 SEE ALSO
+
+
+=cut

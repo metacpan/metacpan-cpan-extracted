@@ -1,0 +1,38 @@
+---
+auto_fieldset: 1
+
+elements:
+- type: Hidden
+  name: id
+
+- type: Hidden
+  name: sched_count
+
+- type: Repeatable
+  nested_name: schedules
+  counter_name: sched_count
+  elements:
+
+  - type: Hidden
+    name: id
+
+  - type: Text
+    name: note
+
+  - type: Hidden
+    name: count
+
+  - type: Repeatable
+    nested_name: tasks
+    counter_name: count
+
+    elements:
+      - type: Hidden
+        name: id
+
+      - type: Text
+        name: detail
+
+- type: Submit
+  name: submit
+

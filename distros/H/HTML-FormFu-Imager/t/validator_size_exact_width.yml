@@ -1,0 +1,9 @@
+---
+elements:
+  - type: File
+    name: 100x100_gif
+    inflators: 
+      - type: Imager
+    validators:
+      - type: Imager::Size
+        exact_width: 100

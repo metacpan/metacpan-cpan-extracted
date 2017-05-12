@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+Manipulator.pm
+Manipulator/Document.pm
+README
+t/1.t
+t/1.html
+t/2.t
+META.yml                                Module meta-data (added by MakeMaker)

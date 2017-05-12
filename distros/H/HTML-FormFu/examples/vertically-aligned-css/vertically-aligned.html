@@ -1,0 +1,186 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Vertically Aligned</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style type="text/css" media="all">
+	@import "vertically-aligned.css";
+</style>
+<!--[if IE]>
+	<style type="text/css" media="all">
+		@import "vertically-aligned-ie.css";
+	</style>
+<![endif]-->
+</head>
+<body>
+
+<form action="" enctype="multipart/form-data" id="form" method="post">
+<fieldset>
+<legend>A fieldset</legend>
+<input name="h1" type="hidden" id="h1" />
+<div class="text label">
+<label for="t1">a Text element</label>
+<input name="t1" type="text" id="t1" />
+</div>
+<div class="text comment label">
+<label for="t2">another, with a comment</label>
+<input name="t2" type="text" id="t2" />
+<span class="comment">
+comment here!
+</span>
+</div>
+<div class="text comment">
+<input name="t3" type="text" id="t3" />
+<span class="comment">
+another with no label
+</span>
+</div>
+<div class="password label">
+<label for="p1">a Password element</label>
+<input name="p1" type="password" id="p1" />
+</div>
+<div class="file label">
+<label for="f1">a File element</label>
+<input name="f1" type="file" id="f1" />
+</div>
+<div class="textarea label">
+<label for="ta1">a Textarea element</label>
+<textarea name="ta1" cols="40" id="ta1" rows="3"></textarea>
+</div>
+<div class="fullwidth textarea label">
+<label for="ta2">another, styled fullwidth</label>
+<textarea name="ta2" cols="40" id="ta2" rows="20"></textarea>
+</div>
+<div class="select label">
+<label for="s1">a Select element</label>
+<select name="s1" id="s1">
+<option value="one">One</option>
+<option value="two">Two</option>
+<option value="three">Three</option>
+</select>
+</div>
+<div class="select label">
+<label for="opt1">a Select with optgroups</label>
+<select name="opt1" id="opt1">
+<optgroup label="opt1">
+<option value="1">one</option>
+<option value="2">two</option>
+</optgroup>
+<option value="3">non-optgroup</option>
+<optgroup label="opt2">
+<option value="4">four</option>
+<option value="5">five</option>
+</optgroup>
+</select>
+</div>
+</fieldset>
+<fieldset>
+<fieldset class="radiogroup legend">
+<legend>a RadioGroup element</legend>
+<span>
+<span>
+<input name="rg1" type="radio" value="one" id="rg1_1" />
+<label for="rg1_1">One</label>
+</span>
+<span>
+<input name="rg1" type="radio" value="two" id="rg1_2" />
+<label for="rg1_2">Two</label>
+</span>
+</span>
+</fieldset>
+<fieldset class="radiogroup legend">
+<legend>another styled vertically</legend>
+<span class="vertical">
+<span>
+<input name="rg2" type="radio" value="one" id="rg2_1" />
+<label for="rg2_1">One</label>
+</span>
+<span>
+<input name="rg2" type="radio" value="two" id="rg2_2" />
+<label for="rg2_2">Two</label>
+</span>
+</span>
+</fieldset>
+<fieldset class="radiogroup legend">
+<legend>another, styled vertically, with sub-groups</legend>
+<span class="vertical">
+<span class="subgroup">
+<span>
+<input name="rg3" type="radio" value="1" id="rg3_1" />
+<label for="rg3_1">one</label>
+</span>
+<span>
+<input name="rg3" type="radio" value="2" id="rg3_2" />
+<label for="rg3_2">two</label>
+</span>
+</span>
+<span class="subgroup">
+<span>
+<input name="rg3" type="radio" value="3" id="rg3_3" />
+<label for="rg3_3">three</label>
+</span>
+<span>
+<input name="rg3" type="radio" value="4" id="rg3_4" />
+<label for="rg3_4">four</label>
+</span>
+</span>
+</span>
+</fieldset>
+<div class="multi label">
+<label for="multi1">a Multi element containing 3 Radio elements</label>
+<span class="elements" id="multi1">
+<input name="multi1.r1" type="radio" value="1" id="multi1.r1" />
+<label for="multi1.r1">One</label>
+<input name="multi1.r2" type="radio" value="1" id="multi1.r2" />
+<label for="multi1.r2">Two</label>
+<input name="multi1.r3" type="radio" value="1" id="multi1.r3" />
+<label for="multi1.r3">Three</label>
+</span>
+</div>
+<div class="vertical multi label">
+<label for="multi2">a Multi element with a vertical style</label>
+<span class="elements" id="multi2">
+<select name="multi2.s2" id="multi2.s2">
+<option value="one">One</option>
+<option value="two">Two</option>
+</select>
+<select name="multi2.s3" id="multi2.s3">
+<option value="one">One</option>
+<option value="two">Two</option>
+</select>
+<select name="multi2.s4" id="multi2.s4">
+<option value="one">One</option>
+<option value="two">Two</option>
+</select>
+</span>
+</div>
+</fieldset>
+<fieldset>
+<div class="radio label">
+<label for="r1">a Radio element</label>
+<input name="r1" type="radio" value="1" id="r1" />
+</div>
+<div class="checkbox label">
+<label for="cb1">a Checkbox element</label>
+<input name="cb1" type="checkbox" value="1" id="cb1" />
+</div>
+</fieldset>
+<fieldset>
+<div class="image label">
+<label for="i1">an Image element</label>
+<input name="i1" type="image" id="i1" src="test.jpg" />
+</div>
+<div class="contentbutton label">
+<label for="cnb1">a ContentButton</label>
+<button name="cnb1" type="button" id="cnb1">&lt;i&gt;some&lt;/i&gt; &lt;b&gt;markup&lt;/b&gt;</button>
+</div>
+<div class="submit">
+<input name="submit" type="submit" id="submit" />
+</div>
+</fieldset>
+</form>
+
+
+</body>
+</html>

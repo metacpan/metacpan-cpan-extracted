@@ -1,0 +1,41 @@
+<wmmeta name="Title" value="Globs and Regexps" />
+<wmmeta name="Section" value="03-proc_logic" />
+<wmmeta name="Score" value="40" />
+<wmmeta name="Abstract">
+glob patterns, regular expressions and pattern matching
+</wmmeta>
+
+A number of WebMake parameters and perl APIs support pattern matching.
+This is performed using glob patterns and regular expressions.
+
+Glob Patterns
+-------------
+
+These are more-or-less traditional shell- or MS-DOS-like globs, as follows:
+
+<blockquote>
+<table>
+<tr><td><strong> * </strong></td> <td>matches any number of characters __except__ **/**</td></tr>
+<tr><td><strong> ... </strong></td> <td>matches any number of characters, __including__ **/**</td></tr>
+<tr><td><strong> ? </strong></td> <td>matches one character</td></tr>
+</table>
+</blockquote>
+
+Note that traditional globs do not include **...**; this is a WebMake
+extension (well, the concept's nicked from <a
+href=http://www.perforce.com/>Perforce</a> ;)
+
+This is the default mode of matching. Example globs are:
+<strong>*.html</strong>, <strong>.../*.txt</strong>.
+
+Regular Expressions
+-------------------
+
+These are perl-style regular expressions. They are differentiated
+from glob patterns by prefixing them with **RE:**, for example:
+**##RE:^.*\.html&wmdollar;##**.
+
+An introduction to regular expressions is beyond the scope of this
+documentation.  For more details, check your perl documentation, or search the
+web.
+

@@ -1,0 +1,17 @@
+README
+TODO
+Changes
+MANIFEST
+Makefile.PL
+bin/htmlclean
+lib/HTML/Clean.pm
+t/basic.t
+t/files.t
+t/testpages/altavista.html
+t/testpages/ibm.html
+t/testpages/yahoo.html
+t/testpages/microsoft.html
+t/testpages/infoseek.html
+t/testpages/itu.html
+t/testpages/cnn.html
+t/testpages/hairy.html

@@ -1,0 +1,856 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>HTML::Menu::DateTime - Easily create popup menus for use with templates.</title>
+<link rev="made" href="mailto:" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#motivation">MOTIVATION</a></li>
+	<li><a href="#installation">INSTALLATION</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<ul>
+
+		<li><a href="#new__"><code>new()</code></a></li>
+		<li><a href="#start_year__"><code>start_year()</code></a></li>
+		<li><a href="#end_year__"><code>end_year()</code></a></li>
+		<li><a href="#less_years__"><code>less_years()</code></a></li>
+		<li><a href="#plus_years__"><code>plus_years()</code></a></li>
+		<li><a href="#month_format__"><code>month_format()</code></a></li>
+		<li><a href="#locale__"><code>locale()</code></a></li>
+		<li><a href="#second_increment__"><code>second_increment()</code></a></li>
+		<li><a href="#minute_increment__"><code>minute_increment()</code></a></li>
+		<li><a href="#html__"><code>html()</code></a></li>
+		<li><a href="#second_menu__"><code>second_menu()</code></a></li>
+		<li><a href="#minute_menu__"><code>minute_menu()</code></a></li>
+		<li><a href="#hour_menu__"><code>hour_menu()</code></a></li>
+		<li><a href="#day_menu__"><code>day_menu()</code></a></li>
+		<li><a href="#month_menu__"><code>month_menu()</code></a></li>
+		<li><a href="#year_menu__"><code>year_menu()</code></a></li>
+	</ul>
+
+	<li><a href="#examples">EXAMPLES</a></li>
+	<ul>
+
+		<li><a href="#html__template">HTML::Template</a></li>
+		<ul>
+
+			<li><a href="#templates">Templates</a></li>
+			<li><a href="#displaying_date_dropdown_menus">Displaying date dropdown menus</a></li>
+			<li><a href="#multiple_menus_in_a_single_page">Multiple Menus in a Single Page</a></li>
+		</ul>
+
+		<li><a href="#template_toolkit">Template Toolkit</a></li>
+		<ul>
+
+			<li><a href="#templates">Templates</a></li>
+			<li><a href="#displaying_date_dropdown_menus">Displaying date dropdown menus</a></li>
+			<li><a href="#multiple_menus_in_a_single_page">Multiple Menus in a Single Page</a></li>
+		</ul>
+
+		<li><a href="#template__magic">Template::Magic</a></li>
+		<ul>
+
+			<li><a href="#templates">Templates</a></li>
+			<li><a href="#displaying_date_dropdown_menus">Displaying date dropdown menus</a></li>
+			<li><a href="#multiple_menus_in_a_single_page">Multiple Menus in a Single Page</a></li>
+		</ul>
+
+	</ul>
+
+	<li><a href="#default_values">DEFAULT VALUES</a></li>
+	<li><a href="#export">EXPORT</a></li>
+	<li><a href="#tips">TIPS</a></li>
+	<li><a href="#requirements">REQUIREMENTS</a></li>
+	<li><a href="#deprecated">DEPRECATED</a></li>
+	<li><a href="#to_do">TO DO</a></li>
+	<li><a href="#support___bugs">SUPPORT / BUGS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#credits">CREDITS</a></li>
+	<li><a href="#copyright_and_license">COPYRIGHT AND LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>HTML::Menu::DateTime - Easily create popup menus for use with templates.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  use HTML::Menu::DateTime;
+  
+  my $menu = HTML::Menu::DateTime-&gt;new (
+    date         =&gt; '2004-02-26',
+    no_select    =&gt; 1,
+    empty_first  =&gt; '');
+  
+  $menu-&gt;start_year (2000);
+  $menu-&gt;end_year (2010);
+  
+  $menu-&gt;less_years (1);
+  $menu-&gt;plus_years (5);
+  
+  $menu-&gt;month_format ('short');
+  $menu-&gt;locale ('en_GB');
+  $menu-&gt;second_increment (15);
+  $menu-&gt;minute_increment (5);
+  
+  $menu-&gt;html ('menu');
+  
+  $menu-&gt;second_menu;
+  $menu-&gt;minute_menu;
+  $menu-&gt;hour_menu;
+  $menu-&gt;day_menu;
+  $menu-&gt;month_menu;
+  $menu-&gt;year_menu;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Creates data structures suitable for populating HTML::Template, 
+Template Toolkit or Template::Magic templates with dropdown date and 
+time menus.</p>
+<p>Allows any number of dropdown menus to be displayed on a single page, each 
+independantly configurable.</p>
+<p>Distribution includes ready-to-use template include files.</p>
+<p>Can output valid HTML, allowing quick prototyping of pages, with the freedom 
+to easily switch to using templates later.</p>
+<p>
+</p>
+<hr />
+<h1><a name="motivation">MOTIVATION</a></h1>
+<p>To keep the creation of HTML completely seperate from the program, to easily 
+allow a non-programmer to add css styles, javascript, etc. to individual 
+menus.</p>
+<p>To make the creation of menus as simple as possible, with extra options if 
+needed. HTML Menus can be created as easily as:</p>
+<pre>
+  my $template = HTML::Template-&gt;new (filename =&gt; $filename);
+  
+  my $menu = HTML::Menu::DateTime-&gt;new;
+  
+  $template-&gt;param (day   =&gt; $menu-&gt;day_menu,
+                    month =&gt; $menu-&gt;month_menu,
+                    year  =&gt; $menu-&gt;year_menu);
+  
+  print $template-&gt;output;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="installation">INSTALLATION</a></h1>
+<p>To install this module, run the following commands:</p>
+<pre>
+  perl Makefile.PL
+  make
+  make test
+  make install</pre>
+<p>Alternatively, to install with Module::Build, you can use the following 
+commands:</p>
+<pre>
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install</pre>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<p>
+</p>
+<h2><a name="new__"><code>new()</code></a></h2>
+<pre>
+  my $menu1 = HTML::Menu::DateTime-&gt;new 
+                (date             =&gt; $date,
+                 start_year       =&gt; $start,
+                 end_year         =&gt; $end,
+                 no_select        =&gt; 1,
+                 empty_first      =&gt; 1,
+                 month_format     =&gt; 'short',
+                 locale           =&gt; 'en_GB',
+                 second_increment =&gt; 15,
+                 minute_increment =&gt; 5,
+                 html             =&gt; 'menu');
+  
+  my $menu2 = HTML::Menu::DateTime-&gt;new 
+                (less_years =&gt; $less,
+                 plus_years =&gt; $plus);</pre>
+<p><code>new()</code> accepts the following arguments:</p>
+<dl>
+<dt><strong><a name="item_date">date</a></strong><br />
+</dt>
+<dd>
+Can be in any of the formats 'YYYY-MM-DD hh:mm:ss', 'YYYYMMDDhhmmss', 
+'YYYYMMDDhhmm', 'YYYYMMDDhh', 'YYYYMMDD', 'YYYYMM', 'YYYY', 'YYYY-MM--DD', 
+'hh:mm:ss'.
+</dd>
+<dd>
+<p>The date passed to <a href="#new__">new()</a> is used to decide which item should be selected 
+in all of the menu methods.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_start_year">start_year</a></strong><br />
+</dt>
+<dd>
+Accepts the same values as the <a href="#start_year__">start_year()</a> method.
+</dd>
+<p></p>
+<dt><strong><a name="item_end_year">end_year</a></strong><br />
+</dt>
+<dd>
+Accepts the same values as the <a href="#end_year__">end_year()</a> method.
+</dd>
+<p></p>
+<dt><strong><a name="item_less_years">less_years</a></strong><br />
+</dt>
+<dd>
+Accepts the same values as the <a href="#less_years__">less_years()</a> method.
+</dd>
+<p></p>
+<dt><strong><a name="item_plus_years">plus_years</a></strong><br />
+</dt>
+<dd>
+Accepts the same values as the <a href="#plus_years__">plus_years()</a> method.
+</dd>
+<p></p>
+<dt><strong><a name="item_no_select">no_select</a></strong><br />
+</dt>
+<dd>
+If true, ensures no item in any menu will be selected. (Otherwise, the 
+current date and time will be used).
+</dd>
+<p></p>
+<dt><strong><a name="item_empty_first">empty_first</a></strong><br />
+</dt>
+<dd>
+If defined, will create an extra list item at the start of each menu. The 
+form value will be the empty string (''), the value passed to 
+<a href="#empty_first__">empty_first()</a> will be the visible label for the first item (the empty 
+string is allowed).
+</dd>
+<p></p>
+<dt><strong><a name="item_month_format">month_format</a></strong><br />
+</dt>
+<dd>
+Accepts the same values as the <a href="#month_format__">month_format()</a> method.
+</dd>
+<p></p>
+<dt><strong><a name="item_locale">locale</a></strong><br />
+</dt>
+<dd>
+Accepts the same values as the <a href="#locale__">locale()</a> method.
+</dd>
+<p></p>
+<dt><strong><a name="item_second_increment">second_increment</a></strong><br />
+</dt>
+<dd>
+Accepts the same values as the <a href="#second_increment__">second_increment()</a> method.
+</dd>
+<p></p>
+<dt><strong><a name="item_minute_increment">minute_increment</a></strong><br />
+</dt>
+<dd>
+Accepts the same values as the <a href="#minute_increment__">minute_increment()</a> method.
+</dd>
+<p></p>
+<dt><strong><a name="item_html">html</a></strong><br />
+</dt>
+<dd>
+Accepts the same values as the <a href="#html__">html()</a> method.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="start_year__"><a href="#item_start_year"><code>start_year()</code></a></a></h2>
+<pre>
+  $date-&gt;start_year (2004);</pre>
+<p>Sets the absolute year that the dropdown menu will start from.</p>
+<p>
+</p>
+<h2><a name="end_year__"><a href="#item_end_year"><code>end_year()</code></a></a></h2>
+<pre>
+  $date-&gt;end_year (2009);</pre>
+<p>Sets the absolute year that the dropdown menu will end on.</p>
+<p>
+</p>
+<h2><a name="less_years__"><a href="#item_less_years"><code>less_years()</code></a></a></h2>
+<pre>
+  $date-&gt;less_years (2);</pre>
+<p>Sets the year that the dropdown menu will start from, relative to the 
+selected year.</p>
+<p>May not be used if multiple values for selection are passed to 
+<a href="#year_menu__">year_menu()</a>.</p>
+<p>
+</p>
+<h2><a name="plus_years__"><a href="#item_plus_years"><code>plus_years()</code></a></a></h2>
+<pre>
+  $date-&gt;plus_years (7);</pre>
+<p>Sets the year that the dropdown menu will end on, relative to the selected 
+year.</p>
+<p>May not be used if multiple values for selection are passed to 
+<a href="#year_menu__">year_menu()</a>.</p>
+<p>
+</p>
+<h2><a name="month_format__"><a href="#item_month_format"><code>month_format()</code></a></a></h2>
+<p>Each item in the month menu has a label. By default this is the long English 
+month name, such as 'January', 'February', etc. The format of the label can 
+be changed as shown in the list below.</p>
+<pre>
+  $date-&gt;month_format ('long');      # January, February, ...
+  $date-&gt;month_format ('short');     # Jan, Feb, ...
+  $date-&gt;month_format ('decimal');   # 01, 02, ...</pre>
+<p>The 'ornate' option, available only in developer release 0.90_01 has been 
+dropped, as it isn't supported by the DateTime::Locale module 
+(see <a href="#locale__">locale()</a>).</p>
+<p>
+</p>
+<h2><a name="locale__"><a href="#item_locale"><code>locale()</code></a></a></h2>
+<p>If locale is used, the DateTime::Locale module must be installed.</p>
+<p>Setting locale changes the names used for the 'long' and 'short' options of 
+<a href="#month_format__">month_format()</a>.</p>
+<pre>
+  $date-&gt;locale ('de');
+  $date-&gt;month_format ('long');
+  # the labels in the month_menu would now have the values
+  # Januar, Februar, ...</pre>
+<p>The value passed to locale is used as the argument to 
+<code>DateTime::Locale-&gt;load()</code>, see the DateTime::Locale documentation for a 
+full list of available locales.</p>
+<p>
+</p>
+<h2><a name="second_increment__"><a href="#item_second_increment"><code>second_increment()</code></a></a></h2>
+<p>The <a href="#second_menu__">second_menu()</a> normally lists the seconds from '00' up to '59'. 
+Setting <a href="#second_increment__">second_increment()</a> allows the menu to be shorter by skipping 
+some numbers.</p>
+<p>For example:</p>
+<pre>
+  $date-&gt;second_increment (5);
+  # the menu contains: '00', '05', '10', '15' up to '55'
+  
+  $date-&gt;second_increment (15);
+  # the menu contains: '00', '15', '30', '45'</pre>
+<p><a href="#second_increment__">second_increment()</a> can be set to any number from 1 to 59, though it 
+would normally make sense to only set it to a number that 60 can be divided 
+by, such as 5, 10, 15, 20 or 30.</p>
+<p>
+</p>
+<h2><a name="minute_increment__"><a href="#item_minute_increment"><code>minute_increment()</code></a></a></h2>
+<p>The <a href="#minute_menu__">minute_menu()</a> normally lists the minutes from '00' up to '59'. 
+Setting <a href="#minute_increment__">minute_increment()</a> allows the menu to be shorter by skipping 
+some numbers.</p>
+<p>For example:</p>
+<pre>
+  $date-&gt;minute_increment (5);
+  # the menu contains: '00', '05', '10', '15' up to '55'
+  
+  $date-&gt;minute_increment (15);
+  # the menu contains: '00', '15', '30', '45'</pre>
+<p><a href="#minute_increment__">minute_increment()</a> can be set to any number from 1 to 59, though it 
+would normally make sense to only set it to a number that 60 can be divided 
+by, such as 5, 10, 15, 20 or 30.</p>
+<p>
+</p>
+<h2><a name="html__"><a href="#item_html"><code>html()</code></a></a></h2>
+<pre>
+  $date-&gt;html ('menu');
+  $date-&gt;html ('options');
+  $date-&gt;html (undef);</pre>
+<p>Causes the _menu methods to output HTML, rather than data for a template.</p>
+<p>Valid values are <code>menu</code> and <code>options</code>, which will generate the HTML using 
+HTML::Menu::Select's <em>menu</em> and <em>options</em> routines, respectively.</p>
+<p>When set to <code>menu</code>, the HTML will contain a SELECT tag containing the 
+appropriate OPTION tags. This allows the entire SELECT tag to be replaced 
+within a template with a single, simple template tag.</p>
+<p>When set to <code>options</code>, the HTML will contain the appropriate OPTION tags, 
+without the surrounding SELECT tags. This allows the SELECT tags to remain 
+in the template file, so that the page visuals can still be seen in 
+WYSIWYG HTML editors.</p>
+<pre>
+  &lt;SELECT name=&quot;&quot;&gt;
+    &lt;TMPL_VAR name=select_menu&gt;
+  &lt;/SELECT&gt;</pre>
+<p>Values for <em>values</em>, <em>labels</em> and <em>default</em> are automatically passed to 
+the <em>menu</em> or <em>options</em> routines. If a hash-ref is passed to any of 
+the _menu methods, it will also be passed to the <em>menu</em> or <em>options</em> 
+routine, allowing any of HTML::Menu::Select's other options to be set, such 
+as specifiying JavaScript or CSS attributes. See the HTML::Menu::Select 
+documentation for more details.</p>
+<p><a href="#html__">html()</a> can be given <code>undef</code> to switch off HTML generation.</p>
+<p>Any value other than <code>'menu'</code>, <code>'options'</code> or <code>undef</code> is an error.</p>
+<p>
+</p>
+<h2><a name="second_menu__"><code>second_menu()</code></a></h2>
+<pre>
+  $date-&gt;second_menu;
+  $date-&gt;second_menu (0);
+  $date-&gt;second_menu ('+1');
+  $date-&gt;second_menu ([0, 1]);
+  
+  $date-&gt;second_menu ({html =&gt; 'options'});
+  $date-&gt;second_menu (0, {html =&gt; 'options'});</pre>
+<p>Accepts a value that will override the date (if any) in the <a href="#new__">new()</a> method.</p>
+<p>Argument can be a number (0-59), a value such as '+1' or '-1' (relative to 
+either the date passed to <a href="#new__">new()</a> or the current time) or an arrayref of 
+number values.</p>
+<p>Passing an arrayref of values will cause more than one item in the menu list 
+to be selected. This will require the HTML in the template to be changed so 
+that the SELECT menu has a size higher than 1 and the 'multiple' attribute.</p>
+<pre>
+  &lt;SELECT name=&quot;second&quot; size=&quot;2&quot; multiple=&quot;multiple&quot;&gt;</pre>
+<p>A hash-ref can be given, regardless of whether or not a date-effecting value 
+is given. If <a href="#menu__">menu()</a> is set, this hash-ref will be passed onto the 
+HTML::Menu::Select <em>menu()</em> or <em>options</em> routine.</p>
+<p>If <a href="#html__">html()</a> is not set, this method returns an array-reference suitable for 
+passing directly to a template (See <a href="#examples">EXAMPLES</a> for details.</p>
+<p>
+</p>
+<h2><a name="minute_menu__"><code>minute_menu()</code></a></h2>
+<p>Valid numeric arguments are 0-59.</p>
+<p>See <a href="#second_menu__">second_menu()</a> for further details.</p>
+<p>
+</p>
+<h2><a name="hour_menu__"><code>hour_menu()</code></a></h2>
+<p>Valid numeric arguments are 0-23.</p>
+<p>See <a href="#second_menu__">second_menu()</a> for further details.</p>
+<p>
+</p>
+<h2><a name="day_menu__"><code>day_menu()</code></a></h2>
+<p>Valid numeric arguments are 1-31.</p>
+<p>See <a href="#second_menu__">second_menu()</a> for further details.</p>
+<p>
+</p>
+<h2><a name="month_menu__"><code>month_menu()</code></a></h2>
+<p>Valid numeric arguments are 01-12.</p>
+<p>See <a href="#second_menu__">second_menu()</a> for further details.</p>
+<p>
+</p>
+<h2><a name="year_menu__"><code>year_menu()</code></a></h2>
+<p>Valid numeric arguments are 0 or higher.</p>
+<p>See <a href="#second_menu__">second_menu()</a> for further details.</p>
+<p>
+</p>
+<hr />
+<h1><a name="examples">EXAMPLES</a></h1>
+<p>
+</p>
+<h2><a name="html__template">HTML::Template</a></h2>
+<p>
+</p>
+<h3><a name="templates">Templates</a></h3>
+<p>The 'examples/html-template' folder in this distribution contains the files 
+second.tmpl, minute.tmpl, hour.tmpl, day.tmpl, month.tmpl and year.tmpl. 
+Simply copy these files into the folder containing the rest of your templates.</p>
+<p>
+</p>
+<h3><a name="displaying_date_dropdown_menus">Displaying date dropdown menus</a></h3>
+<p>Contents of template file ``date.tmpl'':</p>
+<pre>
+  &lt;html&gt;
+  &lt;body&gt;
+    &lt;form method=&quot;POST&quot; action=&quot;/cgi-bin/test.pl&quot;&gt;
+      &lt;TMPL_INCLUDE day.tmpl&gt;
+      &lt;TMPL_INCLUDE month.tmpl&gt;
+      &lt;TMPL_INCLUDE year.tmpl&gt;
+      &lt;input type=&quot;submit&quot; name=&quot;Submit&quot; value=&quot;Submit&quot;&gt;
+    &lt;/form&gt;
+  &lt;/body&gt;
+  &lt;/html&gt;</pre>
+<p>Contents of program file:</p>
+<pre>
+  #!/usr/bin/perl
+  use strict;
+  use warnings;
+  use CGI ':standard';
+  use HTML::Menu::DateTime;
+  use HTML::Template;
+  
+  my $template = HTML::Template-&gt;new (filename =&gt; 'date.tmpl');
+  
+  my $menu = HTML::Menu::DateTime-&gt;new;
+  
+  $template-&gt;param (day   =&gt; $menu-&gt;day_menu,
+                    month =&gt; $menu-&gt;month_menu,
+                    year  =&gt; $menu-&gt;year_menu);
+  
+  print header(),
+  print $template-&gt;output;</pre>
+<p>
+</p>
+<h3><a name="multiple_menus_in_a_single_page">Multiple Menus in a Single Page</a></h3>
+<p>To create, for example, 2 'month' menus in a single page you could copy the 
+month.tmpl file to end_month.tmpl and then change the line 
+<code>&lt;select name=&quot;month&quot;&gt;</code> in end_month.tmpl to 
+<code>&lt;select name=&quot;end_month&quot;&gt;</code>.</p>
+<p>Then include both files in your main template:</p>
+<pre>
+  &lt;html&gt;
+  &lt;body&gt;
+    &lt;form method=&quot;POST&quot; action=&quot;/cgi-bin/test.pl&quot;&gt;
+      &lt;TMPL_INCLUDE month.tmpl&gt;
+      &lt;TMPL_INCLUDE end_month.tmpl&gt;
+      &lt;input type=&quot;submit&quot; name=&quot;Submit&quot; value=&quot;Submit&quot;&gt;
+    &lt;/form&gt;
+  &lt;/body&gt;
+  &lt;/html&gt;</pre>
+<p>When this form is submitted, it will send 2 different values, 'month' and 
+'end_month'.</p>
+<p>
+</p>
+<h2><a name="template_toolkit">Template Toolkit</a></h2>
+<p>
+</p>
+<h3><a name="templates">Templates</a></h3>
+<p>The 'examples/template-toolkit' folder in this distribution contains the files 
+second.html, minute.html, hour.html, day.html, month.html and year.html. 
+Simply copy these files into the folder containing the rest of your templates.</p>
+<p>
+</p>
+<h3><a name="displaying_date_dropdown_menus">Displaying date dropdown menus</a></h3>
+<p>Contents of template file ``date.html'':
+
+</p>
+<pre>
+  &lt;html&gt;
+  &lt;body&gt;
+    &lt;form method=&quot;POST&quot; action=&quot;&quot;&gt;
+      [% INCLUDE day.html %]
+      [% INCLUDE month.html %]
+      [% INCLUDE year.html %]
+      &lt;input type=&quot;submit&quot; name=&quot;Submit&quot; value=&quot;Submit&quot;&gt;
+    &lt;/form&gt;
+  &lt;/body&gt;
+  &lt;/html&gt;
+
+</pre>
+<p>Contents of program file:
+
+</p>
+<pre>
+  #!/usr/bin/perl
+  use strict;
+  use warnings;
+  use CGI ':standard';
+  use HTML::Menu::DateTime;
+  use Template;
+  
+  my $template = Template-&gt;new;
+  
+  my $menu = HTML::Menu::DateTime-&gt;new;
+  
+  my $vars = {day   =&gt; $menu-&gt;day_menu,
+              month =&gt; $menu-&gt;month_menu,
+              year  =&gt; $menu-&gt;year_menu};
+  
+  $template-&gt;process ('date.html', $vars) 
+    or die $template-&gt;error;
+
+</pre>
+<p>
+</p>
+<h3><a name="multiple_menus_in_a_single_page">Multiple Menus in a Single Page</a></h3>
+<p>To create, for example, 2 'month' menus in a single page you could copy the 
+month.tmpl file to end_month.tmpl and then change the line 
+<code>&lt;select name=&quot;month&quot;&gt;</code> in end_month.tmpl to 
+<code>&lt;select name=&quot;end_month&quot;&gt;</code>.
+
+</p>
+<p>Then include both files in your main template:
+
+</p>
+<pre>
+  &lt;html&gt;
+  &lt;body&gt;
+    &lt;form method=&quot;POST&quot; action=&quot;&quot;&gt;
+      [% INCLUDE month.html %]
+      [% INCLUDE end_month.html %]
+      &lt;input type=&quot;submit&quot; name=&quot;Submit&quot; value=&quot;Submit&quot;&gt;
+    &lt;/form&gt;
+  &lt;/body&gt;
+  &lt;/html&gt;
+
+</pre>
+<p>When this form is submitted, it will send 2 different values, 'month' and 
+'end_month'.
+
+</p>
+<p>
+</p>
+<h2><a name="template__magic">Template::Magic</a></h2>
+<p>
+</p>
+<h3><a name="templates">Templates</a></h3>
+<p>The 'examples/template-magic' folder in this distribution contains the files 
+second.html, minute.html, hour.html, day.html, month.html and year.html. 
+Simply copy these files into the folder containing the rest of your templates.
+
+</p>
+<p>
+</p>
+<h3><a name="displaying_date_dropdown_menus">Displaying date dropdown menus</a></h3>
+<p>Contents of template file ``date.html'':
+
+</p>
+<pre>
+  &lt;html&gt;
+  &lt;body&gt;
+    &lt;form method=&quot;POST&quot; action=&quot;&quot;&gt;
+      &lt;!--{INCLUDE_TEMPLATE day.html}--&gt;
+      &lt;!--{INCLUDE_TEMPLATE month.html}--&gt;
+      &lt;!--{INCLUDE_TEMPLATE year.html}--&gt;
+      &lt;input type=&quot;submit&quot; name=&quot;Submit&quot; value=&quot;Submit&quot;&gt;
+    &lt;/form&gt;
+  &lt;/body&gt;
+  &lt;/html&gt;
+
+</pre>
+<p>Contents of program file (1st alternative):
+
+</p>
+<pre>
+  #!/usr/bin/perl
+  use strict;
+  use warnings;
+  use CGI ':standard';
+  use HTML::Menu::DateTime;
+  use Template::Magic::HTML;
+  
+  my $template = Template::Magic::HTML;
+  my $menu = DateTime-&gt;new;
+  
+  print header();
+  $template-&gt;nprint( template =&gt; 'date.html',
+                     lookups  =&gt; { day_menu   =&gt; $menu-&gt;day_menu,
+                                   month_menu =&gt; $menu-&gt;month_menu,
+                                   year_menu  =&gt; $menu-&gt;year_menu
+                                 }  
+                   );
+
+</pre>
+<p>Contents of program file (2nd alternative):
+
+</p>
+<pre>
+  #!/usr/bin/perl
+  use strict;
+  use warnings;
+  use CGI ':standard';
+  use HTML::Menu::DateTime;
+  use Template::Magic::HTML;
+  
+  my $template = Template::Magic::HTML;
+  $HTML::Menu::DateTime::no_template_magic_zone = 1;
+  
+  print header();
+  $template-&gt;nprint( template =&gt;'date.html',
+                     lookups  =&gt; HTML::Menu::DateTime-&gt;new 
+                   );
+
+</pre>
+<p>
+</p>
+<h3><a name="multiple_menus_in_a_single_page">Multiple Menus in a Single Page</a></h3>
+<p>To create, for example, 2 'month' menus in a single page you could copy the 
+month.html file to end_month.html and then change the line 
+<code>&lt;select name=&quot;month&quot;&gt;</code> in end_month.html to 
+<code>&lt;select name=&quot;end_month&quot;&gt;</code>.
+
+</p>
+<p>Then include both files in your main template:
+
+</p>
+<pre>
+  &lt;html&gt;
+  &lt;body&gt;
+    &lt;form method=&quot;POST&quot; action=&quot;&quot;&gt;
+      &lt;!--{INCLUDE_TEMPLATE month.html}--&gt;
+      &lt;!--{INCLUDE_TEMPLATE end_month.html}--&gt;
+      &lt;input type=&quot;submit&quot; name=&quot;Submit&quot; value=&quot;Submit&quot;&gt;
+    &lt;/form&gt;
+  &lt;/body&gt;
+  &lt;/html&gt;
+
+</pre>
+<p>When this form is submitted, it will send 2 different values, 'month' and 
+'end_month'.
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="default_values">DEFAULT VALUES</a></h1>
+<p>If a date is not passed to the <a href="#new__">new()</a> or menu methods, then 
+<code>localtime(time)</code> is called.
+
+</p>
+<p>If neither 'start_year' or 'less_years' is set, the default used is 
+<a href="#item_less_years"><code>less_years(5)</code></a>.
+
+</p>
+<p>If neither 'end_year' or 'plus_years' is set, the default used is 
+<a href="#item_plus_years"><code>plus_years(5)</code></a>.
+
+</p>
+<p>If 'locale' is not set, the <code>month_menu()</code> labels are English.
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="export">EXPORT</a></h1>
+<p>None.
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="tips">TIPS</a></h1>
+<p>Years before 1000 AD passed to the <a href="#new__">new()</a> method in the 'YYYYMMDDhhmmss' 
+format should be passed as strings, as the leading zeros are necessary. (e.g. 
+'09990101000000'). (Years before 1000 AD may be passed to the 
+<a href="#year_menu__">year_menu()</a> method as literal numbers.)
+
+</p>
+<p>Years before 1 AD are not allowed at all.
+
+</p>
+<p>DO NOT set both 'start_year' and 'less_years' at the same time, it just 
+doesn't make sense.
+
+</p>
+<p>DO NOT set both with 'end_year' and 'plus_years' at the same time, it just 
+doesn't make sense.
+
+</p>
+<p>To start or end the range on the same year as selected, set less_years or 
+plus_years to zero, DO NOT set start_year or end_year to zero.
+
+</p>
+<p>When settting either 'start_year' or 'end_year', ensure that the selected year 
+will fall within the range of years.
+
+</p>
+<p>When passing relative values to methods, ensure they are sent as strings. 
+<code>+1</code> numerically means <code>1</code> which is not the same as the string <code>'+1'</code>.
+
+</p>
+<p>If a date is set in <a href="#new__">new()</a> and either <a href="#item_less_years"><code>less_years</code></a> or <a href="#item_plus_years"><code>plus_years</code></a>' set 
+and then a value passed to the <a href="#year_menu__">year_menu()</a> method. The start / end year 
+of the menu will be relative to the value passed to <a href="#year_menu__">year_menu()</a>, not the 
+date set in <a href="#new__">new()</a>.
+
+</p>
+<p>'Relative' parameter values sent to menu methods, which result in 
+out-of-range selections are silently ignored and no item in the output menu 
+will be selected.
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="requirements">REQUIREMENTS</a></h1>
+<p>If 'html' is set in <a href="#new__">new()</a>, or <a href="#html__">html()</a> is set, then the 
+HTML::Menu::Select module must be installed.
+
+</p>
+<p>If 'locale' is set in <a href="#new__">new()</a>, or <a href="#locale__">locale()</a> is set, then the 
+DateTime::Locale module must be installed.
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="deprecated">DEPRECATED</a></h1>
+<p>As of version 1.00, if <a href="#month_format__">month_format()</a>, <a href="#second_increment__">second_increment()</a> or 
+<a href="#minute_increment__">minute_increment()</a> is called with no arguments, the 
+value is no longer reset to it's default. (The previous behaviour was not 
+documented, other than in the test suite.)
+
+</p>
+<p>As of version 1.00, if <a href="#locale__">locale()</a>, <a href="#start_year__">start_year()</a>, <a href="#end_year__">end_year()</a>, 
+<a href="#less_years__">less_years()</a> or <a href="#plus_years__">plus_years()</a> is called with no arguments, the 
+value is no longer set to undef. (The previous behaviour was neither 
+documented or tested for.)
+
+</p>
+<p>The 'ornate' option to <a href="#month_format__">month_format()</a>, available only in developer 
+release 0.90_01 has been dropped, as it isn't supported by the 
+DateTime::Locale module (see <a href="#locale__">locale()</a>).
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="to_do">TO DO</a></h1>
+<p>May change <a href="#year_menu__">year_menu()</a> such that less_years / plus_years works with 
+multiple selections - it would probably have to start / end the list in 
+relation to the lowest / highest year.
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="support___bugs">SUPPORT / BUGS</a></h1>
+<p>Please log bugs, feature requests and patch submissions at 
+<a href="http://sourceforge.net/projects/html-menu">http://sourceforge.net/projects/html-menu</a>.
+
+</p>
+<p>Support mailing list: <a href="mailto:html-menu-users@lists.sourceforge.net">html-menu-users@lists.sourceforge.net</a>
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>HTML::Menu::Select, HTML::Template, Template Toolkit, 
+Template::MagicTemplate::Magic, 
+DateTime::Locale.
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Carl Franks
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="credits">CREDITS</a></h1>
+<pre>
+  Pedro Santelmo (suggesting DateTime::Locale for multi-lingual)
+  Domizio Demichelis (template-magic examples and tutorial)
+  Mark Stosberg (naming style feedback)
+
+</pre>
+<p>
+</p>
+<hr />
+<h1><a name="copyright_and_license">COPYRIGHT AND LICENSE</a></h1>
+<p>Copyright 2004-2005, Carl Franks.  All rights reserved.  
+
+</p>
+<p>This library is free software; you can redistribute it and/or modify it under 
+the same terms as Perl itself.
+
+</p>
+<p>Licenses are in the files ``Artistic'' and ``Copying'' in this distribution.
+
+</p>
+
+</body>
+
+</html>

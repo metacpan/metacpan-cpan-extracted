@@ -1,0 +1,75 @@
+#  _           _            _               __ 
+# | |__   __ _(_)_ __   ___| | _____   ___ / _|
+# | '_ \ / _` | | '_ \ / _ \ |/ / _ \ / __| |_ 
+# | | | | (_| | | | | |  __/   < (_) | (__|  _|
+# |_| |_|\__,_|_|_| |_|\___|_|\_\___(_)___|_|  
+#                                              
+#
+# SMTPd configuration
+smtpd:
+    # EHLO hostname for connecting external SMTP server to send an email
+    # If this value is not defined or is empty value, the value of hostname(1)
+    # will be used instead.
+    hostname: 'haineko.example.jp'
+
+    # Max message size(bytes), 0 is unlimited
+    max_message_size: 4194304
+
+    # Max number of recipients, 0 is unlimited
+    max_rcpts_per_message: 4
+
+    # Max workers. When the value is 0 or 1, emails are sent in single process.
+    # The hard limit of `max_workers` is 8.
+    max_workers: 4
+
+    # Table files: mailer and access
+    #   If each file name begin with ``/'', the file will be loaded as abusolute
+    #   path, the file name does not begin with ``/'', Haineko try to find the
+    #   file from the same directory which haineko.cf is saved.
+    #
+    # Routing table files
+    #   rcpt: Envelope recipient based routing table
+    #   mail: Envelope sender based routing table
+    #   auth: Credenticals for SMTP-AUTH at relaying to external host
+    #
+    mailer:
+        auth: 'authinfo'
+        mail: 'sendermt'
+        rcpt: 'mailertable'
+
+    # Access control files
+    #   conn: Permitted ipv4 addresses or network blocks for relaying
+    #   rcpt: Permitted envelope recipients or domain parts for relaying
+    access:
+        conn: 'relayhosts'
+        rcpt: 'recipients'
+
+    # Milter: each milter module listed the followings are called as 
+    # Haineko::SMTPD::Milter::<Name> at checking the value of each SMTP command.
+    # 
+    # For Example:
+    #   libs: [ '/path/to/perl/lib', '/another/lib/perl5/for/my/milter' ]
+    #   mail: [ 'CheckFrom' ]
+    #   rcpt: [ 'AlwaysBcc', '+Check::DDNS' ]
+    #   body: [ '+Make::Me::A::Cat', '+My::Encrypt' ]
+    #
+    #   ``CheckFrom'' is called as Haineko::SMTPD::Milter::CheckFrom->mail();
+    #   ``AlwaysBcc' is called as Haineko::SMTPD::Milter::AlwaysBcc->rcpt();
+    #   ``+Check::DDNS'' is called as Check::DDNS->rcpt();
+    #   ``+Make::Me::A::Cat'' is called as Make::Me::A::Cat->body();
+    #   ``+My::Encrypt'' is called as My::Encrypt->body();
+    #
+    milter:
+        libs: []
+        conn: []
+        ehlo: []
+        mail: []
+        rcpt: []
+        head: []
+        body: []
+
+    # Syslog configuration
+    syslog:
+        disabled: 0
+        facility: 'local2'
+---

@@ -1,0 +1,17 @@
+Changes
+lib/HTTP/ClientDetect.pm
+lib/HTTP/ClientDetect/Language.pm
+lib/HTTP/ClientDetect/Location.pm
+lib/Interchange6/Plugin/Interchange5/Request.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-country.t
+t/02-lang.t
+t/GeoIP.dat
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

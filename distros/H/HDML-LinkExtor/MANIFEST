@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+README
+Makefile.PL
+lib/HDML/LinkExtor.pm
+t/00_compile.t
+t/01_parse.t

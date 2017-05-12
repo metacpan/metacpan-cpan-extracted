@@ -1,0 +1,29 @@
+2010-05-15  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.0.4:
+	* Build.PL
+	- fix dependency
+	* t/perlcritic.t
+	- check $ENV{TEST_CRITIC} whether to execute this test
+
+2008-03-26  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.0.4:
+	* Build.PL
+	- fix dependency
+	* lib/HTML/TableParser/Grid.pm
+	- change conding conventions
+
+2007-02-18  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.0.3:
+	* add Test::Perl::Critic to requires in Build.PL
+
+2007-02-16  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.0.2:
+	* add Test::NoWarnings to requires in Build.PL
+
+2007-02-14  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.0.1: created by Module::Starter

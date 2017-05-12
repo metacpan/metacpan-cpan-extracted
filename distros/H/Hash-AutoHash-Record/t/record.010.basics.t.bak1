@@ -1,0 +1,290 @@
+use lib map {glob($_)} qw(../lib ~/lib/perl5 ~/lib/perl5/site_perl/5.8.5);
+use Carp;
+use Hash::AutoHash::Record;
+use Test::More;
+use Test::Deep;
+use recordUtil;
+
+#$VERBOSE=1;			# cause sub-tests to print passes
+# test object class for sanity sake
+my $record=new Hash::AutoHash::Record;
+is(ref $record,'Hash::AutoHash::Record',"class is Hash::AutoHash::Record - sanity check");
+
+################################################################################
+### basic initialization, set/get, clear
+$record=new Hash::AutoHash::Record(single=>'');
+cmp_record("create empty single",$record,{single=>''},undef,undef,'types','values');
+$record->single('value1');
+cmp_record("set single",$record,{single=>'value1'},undef,undef,'types','values');
+my $actual=$record->single;
+is($actual,'value1','get single');
+%$record=();
+cmp_record("clear single",$record,{single=>''},undef,undef,'types','values');
+
+$record=new Hash::AutoHash::Record(multi=>[]);
+cmp_record("create empty multi",$record,{multi=>[]},undef,undef,'types','values');
+$record->multi('value1');
+cmp_record("set multi 1 value",$record,{multi=>['value1']},undef,undef,'types','values');
+my $actual=$record->multi;
+cmp_deeply($actual,['value1'],'get multi 1 value');
+$record->multi('value2','value3');
+cmp_record("set multi 2 values",$record,
+	   {multi=>['value1','value2','value3']},
+	   undef,undef,'types','values');
+my $actual=$record->multi;
+cmp_deeply($actual,['value1','value2','value3'],'get multi now 3 values');
+$record->multi(['value4','value5','value6']);
+cmp_record("set multi ARRAY 3 values",$record,
+	   {multi=>['value1','value2','value3','value4','value5','value6']},
+	   undef,undef,'types','values');
+my $actual=$record->multi;
+cmp_deeply($actual,['value1','value2','value3','value4','value5','value6'],
+	   'get multi now 6 values');
+%$record=();
+cmp_record("clear multi",$record,{multi=>[]},undef,undef,'types','values');
+
+$record=new Hash::AutoHash::Record(avp_single=>{});
+cmp_record("create empty avp_single",$record,{avp_single=>new_SV},undef,undef,'types','values');
+$record->avp_single(key1=>'value11');
+cmp_record("set avp_single 1 avp",$record,
+	   {avp_single=>new_SV(key1=>'value11')},
+	   undef,undef,'types','values');
+my $actual=$record->avp_single;
+cmp_deeply($actual,new_SV(key1=>'value11'),'get avp_single 1 avp');
+$record->avp_single(key1=>'value12',key2=>'value21');
+cmp_record("set avp_single 2 avps",$record,
+	   {avp_single=>new_SV(key1=>'value12',key2=>'value21')},
+	   undef,undef,'types','values');
+my $actual=$record->avp_single;
+cmp_deeply($actual,new_SV(key1=>'value12',key2=>'value21'),'get avp_single 2 avps');
+%$record=();
+cmp_record("clear avp_single",$record,{avp_single=>new_SV},undef,undef,'types','values');
+
+$record=new Hash::AutoHash::Record(avp_multi=>\{});
+cmp_record("create empty avp_multi",$record,{avp_multi=>new_MV},undef,undef,'types','values');
+$record->avp_multi(key1=>'value11');
+cmp_record("set avp_multi 1 avp",$record,
+	   {avp_multi=>new_MV(key1=>'value11')},
+	   undef,undef,'types','values');
+my $actual=$record->avp_multi;
+cmp_deeply($actual,new_MV(key1=>'value11'),'get avp_multi 1 avp');
+$record->avp_multi(key1=>'value12',key2=>'value21');
+cmp_record("set avp_multi 2 avps",$record,
+	   {avp_multi=>new_MV(key1=>['value11','value12'],key2=>'value21')},
+	   undef,undef,'types','values');
+my $actual=$record->avp_multi;
+cmp_deeply($actual,new_MV(key1=>['value11','value12'],key2=>'value21'),'get avp_multi 2 avps');
+$record->avp_multi(key1=>['value13'],key2=>['value22','value23'],
+		   key3=>['value31','value32','value33']);
+cmp_record("set avp_multi 3 avps ARRAY",$record,
+	   {avp_multi=>new_MV(key1=>['value11','value12','value13'],
+			      key2=>['value21','value22','value23'],
+			      key3=>['value31','value32','value33'])},
+	   undef,undef,'types','values');
+my $actual=$record->avp_multi;
+cmp_deeply($actual,new_MV(key1=>['value11','value12','value13'],
+			  key2=>['value21','value22','value23'],
+			  key3=>['value31','value32','value33']),
+	   'get avp_multi 3 avps ARRAY');
+%$record=();
+cmp_record("clear avp_multi",$record,{avp_multi=>new_MV},undef,undef,'types','values');
+
+$record=new Hash::AutoHash::Record(nested=>new Hash::AutoHash::Record);
+cmp_record("create empty nested",$record,{nested=>new_Nested},undef,undef,'types','values');
+$record->nested(key1=>'value1');
+cmp_record("set nested 1 key",$record,
+	   {nested=>new_Nested(key1=>'value1')},
+	   undef,undef,'types','values');
+my $actual=$record->nested;
+cmp_deeply($actual,new_Nested(key1=>'value1'),'get nested 1 key');
+$record->nested(key2=>'value2',key3=>'value3');
+cmp_record("set nested 2 keys",$record,
+	   {nested=>new_Nested(key1=>'value1',key2=>'value2',key3=>'value3')},
+	   undef,undef,'types','values');
+my $actual=$record->nested;
+cmp_deeply($actual,new_Nested(key1=>'value1',key2=>'value2',key3=>'value3'),
+	   'get nested now 3 keys');
+%$record=();
+cmp_record("clear nested",$record,{nested=>new_Nested},undef,undef,'types','values');
+
+$record=new Hash::AutoHash::Record
+  (single=>'',multi=>[],avp_single=>{},avp_multi=>\{},nested=>new Hash::AutoHash::Record);
+cmp_record("create empty all types",$record,
+	   {single=>'',multi=>[],avp_single=>new_SV,avp_multi=>new_MV,nested=>new_Nested},
+	   undef,undef,'types','values');
+$record->single('value1');
+$record->multi('value1');
+$record->avp_single(key1=>'value1');
+$record->avp_multi(key1=>'value1');
+$record->nested(key1=>'value1');
+cmp_record("set all types",$record,
+	   {single=>'value1',multi=>['value1'],
+	    avp_single=>new_SV(key1=>'value1'),avp_multi=>new_MV(key1=>'value1'),
+	    nested=>new_Nested(key1=>'value1')},
+	   undef,undef,'types','values');
+%$record=();
+cmp_record("clear all types",$record,
+	   {single=>'',multi=>[],avp_single=>new_SV,avp_multi=>new_MV,nested=>new_Nested},
+	   undef,undef,'types','values');
+
+$record=new Hash::AutoHash::Record
+  (single=>'value1',multi=>['value1'],
+   avp_single=>{key1=>'value1'},avp_multi=>\{key1=>'value1'},
+  nested=>new Hash::AutoHash::Record(key1=>'value1'));
+cmp_record("create all types non-empty defaults",$record,
+	   {single=>'value1',multi=>['value1'],
+	    avp_single=>new_SV(key1=>'value1'),avp_multi=>new_MV(key1=>'value1'),
+	    nested=>new_Nested(key1=>'value1')},
+	   undef,undef,'types');
+$record->single('value2');
+$record->multi('value2');
+$record->avp_single(key1=>'value2');
+$record->avp_multi(key1=>'value2');
+$record->nested(key1=>'value2');
+cmp_record("set all types non-empty default",$record,
+	   {single=>'value2',multi=>['value1','value2'],
+	    avp_single=>new_SV(key1=>'value2'),avp_multi=>new_MV(key1=>['value1','value2']),
+	    nested=>new_Nested(key1=>'value2')},
+	   undef,undef,'types');
+%$record=();
+cmp_record("clear all types non-empty default",$record,
+	   {single=>'value1',multi=>['value1'],
+	    avp_single=>new_SV(key1=>'value1'),avp_multi=>new_MV(key1=>'value1'),
+	    nested=>new_Nested(key1=>'value1')},
+	   undef,undef,'types');
+
+## args passed as ARRAY and HASH
+$record=new Hash::AutoHash::Record
+  ([single=>'',multi=>[],avp_single=>{},avp_multi=>\{},nested=>new Hash::AutoHash::Record]);
+cmp_record("args passed as ARRAY",$record,
+	   {single=>'',multi=>[],avp_single=>new_SV,avp_multi=>new_MV,nested=>new_Nested},
+	   undef,undef,'types','values');
+$record=new Hash::AutoHash::Record
+  ({single=>'',multi=>[],avp_single=>{},avp_multi=>\{},nested=>new Hash::AutoHash::Record});
+cmp_record("args passed as HASH",$record,
+	   {single=>'',multi=>[],avp_single=>new_SV,avp_multi=>new_MV,nested=>new_Nested},
+	   undef,undef,'types','values');
+# non-existent key should return nothing. (not undef);
+$record=new Hash::AutoHash::Record(key1=>'value11');
+@list=($record->key0);
+is(scalar @list,0,"non-existent key");
+# non-existent key should return nothing (not undef) but Perl doesn't do it this way!
+@list=($record->{key0});
+is(scalar @list,1,"non-existent key via hash");
+
+################################################################################
+### defaults
+### TBD
+
+### unique
+$record=new Hash::AutoHash::Record(multi1=>[qw(value11 value11)]);
+cmp_record("initialize key with duplicate",$record,{multi1=>[qw(value11 value11)]});
+ok(!tied(%$record)->unique,"unique initially false");
+ok(tied(%$record)->unique(1),"set unique to true");
+cmp_record("key now unique",$record,{multi1=>[qw(value11)]});
+$record->multi1('value11');
+cmp_record("key still unique after storing duplicate",$record,{multi1=>[qw(value11)]});
+$record->multi1('value12');
+cmp_record("storing non-duplicate still works",$record,{multi1=>[qw(value11 value12)]});
+my $defaults=tied(%$record)->defaults;
+cmp_deeply($defaults,{multi1=>[qw(value11 value11)]},"unique leaves defaults unchanged");
+%$record=();
+cmp_record("duplicates removed when set via defaults",$record,{multi1=>[qw(value11)]});
+
+$record=new Hash::AutoHash::Record(multi1=>[qw(value10 value11 VALUE11 value12)]);
+ok(tied(%$record)->unique(sub {lc($_[0]) eq lc($_[1])}),"set unique to sub");
+cmp_record("key now unique using sub",$record,{multi1=>[qw(value10 value11 value12)]});
+$record->multi1('value13');
+cmp_record("storing non-duplicate still works with unique sub",$record,
+	   {multi1=>[qw(value10 value11 value12 value13)]});
+my $defaults=tied(%$record)->defaults;
+cmp_deeply($defaults,
+	   {multi1=>[qw(value10 value11 VALUE11 value12)]},
+	   "unique sub leaves defaults unchanged");
+%$record=();
+cmp_record("duplicates removed when set via defaults with unique sub",$record,
+	   {multi1=>[qw(value10 value11 value12)]});
+
+$record=new Hash::AutoHash::Record
+  (single=>'',multi=>[],avp_single=>{},avp_multi=>\{},nested=>new Hash::AutoHash::Record,
+  multi1=>[qw(value11 value11)],multi2=>[qw(value21 value21)]);
+cmp_record("initialize many keys. 2 with duplicates",$record,
+	   {single=>'',multi=>[],avp_single=>new_SV,avp_multi=>new_MV,nested=>new_Nested,
+	    multi1=>[qw(value11 value11)],multi2=>[qw(value21 value21)]});
+ok(tied(%$record)->unique(1),"set unique to true");
+cmp_record("duplicate keys now unique. others unchanged",$record,
+	   {single=>'',multi=>[],avp_single=>new_SV,avp_multi=>new_MV,nested=>new_Nested,
+	    multi1=>[qw(value11)],multi2=>[qw(value21)]});
+$record->multi1('value11');
+cmp_record("key still unique after storing duplicate",$record,
+	   {single=>'',multi=>[],avp_single=>new_SV,avp_multi=>new_MV,nested=>new_Nested,
+	    multi1=>[qw(value11)],multi2=>[qw(value21)]});
+$record->multi1('value12');
+cmp_record("storing non-duplicate still works",$record,
+	   {single=>'',multi=>[],avp_single=>new_SV,avp_multi=>new_MV,nested=>new_Nested,
+	    multi1=>[qw(value11 value12)],multi2=>[qw(value21)]});
+%$record=();
+cmp_record("duplicate removed when set via defaults. others restored unchanged",$record,
+	   {single=>'',multi=>[],avp_single=>new_SV,avp_multi=>new_MV,nested=>new_Nested,
+	    multi1=>[qw(value11)],multi2=>[qw(value21)]});
+
+$record=new Hash::AutoHash::Record
+  (single=>'',multi=>[],avp_single=>{},avp_multi=>\{},nested=>new Hash::AutoHash::Record,
+  multi1=>[qw(value10 value11 VALUE11 value12)]);
+ok(tied(%$record)->unique(sub {lc($_[0]) eq lc($_[1])}),"set unique to sub");
+cmp_record("duplicate key now unique using sub. others unchanged",$record,
+	   {single=>'',multi=>[],avp_single=>new_SV,avp_multi=>new_MV,nested=>new_Nested,
+	    multi1=>[qw(value10 value11 value12)]});
+$record->multi1('VALUE11');
+cmp_record("key still unique after storing duplicate using sub. others unchanged",$record,
+	   {single=>'',multi=>[],avp_single=>new_SV,avp_multi=>new_MV,nested=>new_Nested,
+	    multi1=>[qw(value10 value11 value12)]});
+$record->multi1('value13');
+cmp_record("storing non-duplicate still works using sub. others unchanged",$record,
+	   {single=>'',multi=>[],avp_single=>new_SV,avp_multi=>new_MV,nested=>new_Nested,
+	    multi1=>[qw(value10 value11 value12 value13)]});
+%$record=();
+cmp_record("duplicate removed when set via defaults using sub. others restored unchanged",$record,
+	   {single=>'',multi=>[],avp_single=>new_SV,avp_multi=>new_MV,nested=>new_Nested,
+	    multi1=>[qw(value10 value11 value12)]});
+
+###  filter
+$record=new Hash::AutoHash::Record(multi1=>[qw(value11 value11)]);
+cmp_record("initialize key with duplicate",$record,{multi1=>[qw(value11 value11)]});
+ok(!tied(%$record)->filter,"filter initially false");
+ok(tied(%$record)->filter(1),"set filter to true");
+cmp_record("key now unique",$record,{multi1=>[qw(value11)]});
+$record->multi1('value11');
+cmp_record("key not unique after storing duplicate",$record,{multi1=>[qw(value11 value11)]});
+
+$record=new Hash::AutoHash::Record(multi1=>[qw(value11 value11)]);
+ok(tied(%$record)->filter(sub {map {uc $_} @_}),"set filter to sub");
+cmp_record("values transformed by filter",$record,{multi1=>[qw(VALUE11 VALUE11)]});
+
+$record=new Hash::AutoHash::Record
+  (single=>'',multi=>[],avp_single=>{},avp_multi=>\{},nested=>new Hash::AutoHash::Record,
+  multi1=>[qw(value11 value11)],multi2=>[qw(value21 value21)]);
+cmp_record("initialize many keys. 2 with duplicates",$record,
+	   {single=>'',multi=>[],avp_single=>new_SV,avp_multi=>new_MV,nested=>new_Nested,
+	    multi1=>[qw(value11 value11)],multi2=>[qw(value21 value21)]});
+ok(tied(%$record)->filter(1),"set filter to true");
+cmp_record("duplicate keys now unique. others unchanged",$record,
+	   {single=>'',multi=>[],avp_single=>new_SV,avp_multi=>new_MV,nested=>new_Nested,
+	    multi1=>[qw(value11)],multi2=>[qw(value21)]});
+$record->multi1('value11');
+cmp_record("key not unique after storing duplicate",$record,
+	   {single=>'',multi=>[],avp_single=>new_SV,avp_multi=>new_MV,nested=>new_Nested,
+	    multi1=>[qw(value11 value11)],multi2=>[qw(value21)]});
+
+$record=new Hash::AutoHash::Record
+  (single=>'',multi=>[],avp_single=>{},avp_multi=>\{},nested=>new Hash::AutoHash::Record,
+   single1=>'value1',avp_single1=>{key1=>'value1'},avp_multi1=>\{key1=>'value1'},
+   avp_nested1=>new Hash::AutoHash::Record(multi2=>['value2']),
+   multi1=>[qw(value11 value11)],multi2=>[qw(value21 value21)]);
+ok(tied(%$record)->filter(sub {map {uc $_} @_}),"set filter to sub");
+cmp_record("multi-values transformed by filter. others unchanged",$record,
+	   {single=>'',multi=>[],avp_single=>new_SV,avp_multi=>new_MV,nested=>new_Nested,
+	    single1=>'value1',
+	    avp_single1=>new_SV(key1=>'value1'),avp_multi1=>new_MV(key1=>'value1'),
+	    avp_nested1=>new_Nested(multi2=>['value2']),
+	    multi1=>[qw(VALUE11 VALUE11)],multi2=>[qw(VALUE21 VALUE21)]});

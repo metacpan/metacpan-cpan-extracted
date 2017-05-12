@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+TODO
+lib/HTTP/WebTest/Plugin/DateTest.pm
+t/01_basic.t
+t/02_dateparsing.t
+t/03_timeunits.t
+t/dyn.txt
+t/in.html
+t/lib/HTTP/WebTest/Plugin/Cookies.pm
+t/lib/HTTP/WebTest/Plugin/FileRequest.pm
+t/test.out/basic
+t/test.out/dyn.txt
+t/utils.pl

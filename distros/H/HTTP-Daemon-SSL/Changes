@@ -1,0 +1,32 @@
+v1.04
+    - production release
+    - only documentation and text file changes from 1.03_02
+
+v1.03_02
+    - removes unnecessary _need_more
+    - which, by side effect, fixes two outstanding bugs:
+      http://rt.cpan.org/Ticket/Display.html?id=21395
+      http://rt.cpan.org/Ticket/Display.html?id=15470
+
+v1.03_01
+    - First release by Mark Aufflick <mark@aufflick.com>
+    - Fixes problem where accep() will never timeout
+      http://rt.cpan.org/Ticket/Display.html?id=28417
+
+v1.02
+	- Async updates
+	- Documentation update to mention SSL certificates. (requested
+	  by Cedric Bouvier <Cedric.Bouvier at ctp.com>)
+	- Update to URL function to return 'https' instead of 'http'
+	  as protocol (Patch from Kees Cook <kees at osdl.org>).
+
+--- Old Versions --------------------------------------------------
+
+v1.01  2003.7.27
+	- Patch from Evgeniy Pirogov <epirogov at tucows.com> to fix
+	  read issues when a client and server have different timeouts.
+	- Fixed the README to actually deal with HTTP::Daemon::SSL
+	  instead of IO::Socket::SSL.
+
+v1.00  2003.7.24
+	- Initial public release.

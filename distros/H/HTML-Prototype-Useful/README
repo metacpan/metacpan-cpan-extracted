@@ -1,0 +1,48 @@
+NAME
+    HTML::Prototype::Useful - Some useful additions for the Prototype
+    library.
+
+SYNOPSIS
+      use HTML::Prototype::Useful;
+      $protype=HTML::Prototype::Useful->new();
+      print $prototype->call_remote( ... )
+      print $prototype->lazy_observe_field( .. )
+
+DESCRIPTION
+     this adds some more useful features for AJAX development based on the 
+     Prototype library, as L<HTML::Prototype> is a straight port of the ruby
+     implementation.
+
+  METHODS
+    define_javascript_functions
+        Returns the javascript required for HTML::Prototype as well as this
+        module.
+
+    remote_function
+        Generate a remote function that you can stuff into your js
+        somewhere.
+
+    lazy_observe_field
+        like HTML::Prototype's observe_field method, but only detect changes
+        after a user has stopped typing for "frequency".
+
+    $p->observe_hover( $id \%options );
+        Observes the element with the DOM ID specified by $id and makes an
+        Ajax when you hover the mouse over it for at least <frequency>
+        seconds.
+
+        Takes the same arguments as observe_field.
+
+SEE ALSO
+    HTML::Prototype, Catalyst::Plugin::Prototype, Catalyst.
+    <http://prototype.conio.net/>
+
+AUTHOR
+Marcus Ramberg, "mramberg@cpan.org"
+THANK YOU
+    Sebastian Riedel for HTML::Prototype
+
+LICENSE
+    This library is free software. You can redistribute it and/or modify it
+    under the same terms as perl itself.
+

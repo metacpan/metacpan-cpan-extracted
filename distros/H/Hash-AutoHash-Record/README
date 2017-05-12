@@ -1,0 +1,51 @@
+Hash-AutoHash-Record
+
+This is a subclass of Hash::AutoHash designed to represent records
+parsed from flat files.  The fields of the records can be
+single-valued, multi-valued, or a collection of attribute-value pairs
+which, in turn, can allow single or multiple values per attribute. A
+field can also be any Hash::AutoHash object, including a
+Hash::AutoHash::Record object, which makes it possible to represent
+nested record structures.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Hash::AutoHash::Record
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Hash-AutoHash-Record
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Hash-AutoHash-Record
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Hash-AutoHash-Record
+
+    Search CPAN
+        http://search.cpan.org/dist/Hash-AutoHash-Record/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Nat Goodman
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

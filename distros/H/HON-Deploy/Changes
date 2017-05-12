@@ -1,0 +1,11 @@
+Revision history for HON-Deploy
+
+0.03    09 Nov 2016 / 08h00
+        Fix install of missing prerequisites
+        Clean code
+
+0.02    27 Mar 2015 / 15h00
+        Feature: add option to install missing prerequisites
+
+0.01    30 Jan 2012 / 16h00
+        First version, released on an unsuspecting world.

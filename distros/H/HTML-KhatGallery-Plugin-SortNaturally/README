@@ -1,0 +1,73 @@
+
+==== NAME ====
+
+HTML::KhatGallery::Plugin::SortNaturally - Plugin for khatgallery to use
+Natural sort for index lists.
+
+
+==== VERSION ====
+
+This describes version ``0.01'' of HTML::KhatGallery::Plugin::SortNaturally.
+
+
+==== DESCRIPTION ====
+
+This is a plugin for khatgallery to use Natural sort for index lists.
+
+
+==== REQUIRES ====
+
+    Test::More
+    HTML::KhatGallery
+    Sort::Naturally
+
+
+==== INSTALLATION ====
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+Or, if you're on a platform (like DOS or Windows) that doesn't like the "./"
+notation, you can do this:
+
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install
+
+In order to install somewhere other than the default, such as in a directory
+under your home directory, like "/home/fred/perl" go
+
+   perl Build.PL --install_base /home/fred/perl
+
+as the first step instead.
+
+This will install the files underneath /home/fred/perl.
+
+You will then need to make sure that you alter the PERL5LIB variable to find
+the modules.
+
+Therefore you will need to change the PERL5LIB variable to add
+/home/fred/perl/lib
+
+        PERL5LIB=/home/fred/perl/lib:${PERL5LIB}
+
+
+==== AUTHOR ====
+
+    Kathryn Andersen (RUBYKAT)
+    perlkat AT katspace dot com
+    http://www.katspace.org/tools
+
+
+==== COPYRIGHT AND LICENCE ====
+
+Copyright (c) 2006 by Kathryn Andersen
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

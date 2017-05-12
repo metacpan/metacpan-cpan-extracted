@@ -1,0 +1,58 @@
+---
+elements:
+  - type: Checkboxgroup
+    label: Fancy Checkboxgroups
+    name: foo
+    default: [1a]
+    options:
+      - label: "group 1"
+        group:
+          - [1a, 'item 1a']
+          - [1b, 'item 1b']
+      - label: "group 2"
+        group:
+          - value: 2a
+            label: 'item 2a'
+            attrs:
+              checked: 1
+          - [2b, 'item 2b']
+  - type: Checkboxgroup
+    label: width 50%
+    name: foo
+    options:
+      - label: "group 1"
+        attrs:
+          columnWidth: .5
+        group:
+          - [1a, 'item 1a']
+          - [1b, 'item 1b']
+      - label: "group 2"
+        attrs:
+          columnWidth: .5
+          label:
+            style: "color: #f00"
+        group:
+          - [2a, 'item 2a']
+          - [2b, 'item 2b']
+          
+  - type: Checkboxgroup
+    label: Without groups
+    name: foo2
+    options:
+          - [1a, 'item 1a']
+          - [1b, 'item 1b']
+          - [2a, 'item 2a']
+          - [2b, 'item 2b']
+          
+  - type: Checkboxgroup
+    label: one column
+    name: foo3
+    attrs:
+      columns: 1
+    options:
+          - [1a, 'item 1a']
+          - [1b, 'item 1b']
+          - [2a, 'item 2a']
+          - [2b, 'item 2b']
+          
+          

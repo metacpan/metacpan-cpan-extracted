@@ -1,0 +1,1 @@
+<%perl __OUT__ "this is perl!\n"; %>

@@ -1,0 +1,119 @@
+Revision history for Perl extension HiLiter.
+
+0.201 15 May 2014
+ - remove File::Slurp dependency since Search::Tools->slurp exists
+
+0.200 1 May 2014
+ - port to Moose for Search::Tools 1.000
+
+0.18 31 Jan 2013
+ - bump dependency on Search::Tools to 0.86, fix failing tests caused by
+   newer S::T
+
+0.17 13 July 2011
+ - bump dependency on Search::Tools to 0.60
+
+0.16 22 Jan 2009
+ - add tests for wildcard matches.
+
+0.15 19 Nov 2009
+ - fixed init() to only pass on args that are methods (was causing tests to
+   fail with latest version of Rose::ObjectX::CAF).
+
+0.05 2004-07-09T12:48:34Z
+ - public release via CPAN
+ - 0.06
+ - use Text::ParseWords instead of original clumsy regexps in
+   prep_queries()
+ - add support for 8211 (ndash) and 8212 (mdash) entities
+ - tweeked StartBound and EndBound to not match within a word
+ - fixed doc to reflect that debugging prints on STDOUT, not STDERR
+ - 0.07
+ - made HTML::Parser optional to allow for more flexibility with using
+   methods
+ - added perldoc for previously undocumented methods
+ - corrected perldoc for Queries() to refer to metanames as second param
+ - updated SWISH::API example to avoid using HTML::Parser
+ - added unicode entity -> ascii equivs for better DocBook support
+ - (NOTE: this expands the ndash/mdash feature from 0.06)
+ - misc cleanup
+ - 0.08
+ - fixed bug in SWISH::API example with ParsedWords and updated Queries()
+   perldoc to reflect the change.
+ - removed dependency on HTML::Entities by hardcoding all relevant
+   entities. (HTML::Entities does a 'require HTML::Parser' which made the
+   parser=>0 feature break.)
+ - 0.09
+ - added Print feature to new() to allow Run() to return highlighted text
+   instead of automatically printing in a streaming fashion. Set Print=>0
+   to turn off print().
+ - Run() now returns highlighted text if Print=>0.
+ - changed parser=>0 to Parser=>0.
+ - the ParsedWords bug reported in 0.08 was really with my example in
+   get_snippet(). so rather than blame someone else's code, I fixed mine...
+   :)
+ - fixed bug with count of real HTML matches that was most evident with
+   running hilite()
+ - added test2.t test to test the Parser=>0 feature
+ - 0.10
+ - fixed prep_queries() perldoc head
+ - Queries() now returns hash ref of q => regexp
+ - fixed SWISH::API example to use new Queries()
+ - fixed Queries() perldoc
+ - added StopWords note to prep_queries()
+ - fixed regexp that caused make test to fail in perl < 5.8.1 (thanks to
+   m@perlmeister.com)
+ - added note to hilite() perldoc to always use Inline()
+ - 0.11
+ - separated debugging into 3 levels for increasing verbosity (1-3).
+ - changed default colors to lighter pastels.
+ - misc perldoc fixes.
+ - internal object key 'query_array' preserves query order.
+ - fixed default HTML::Parser handler to buffer/print according to HiLiter
+   object param.
+ - added support for TextFilter and TagFilter.
+ - renamed $debug to $Debug.
+ - added 'debug' param in new() call.
+ - fixed bugs with default StartBound and EndBound.
+ - fixed bugs with &#NN; numeric entities in $White_Space.
+ - added support to let phrases match over all non-WordChars, not just
+   whitespace.
+ - Queries() now returns either hash ref or array depending on context.
+ - Queries() may now take either an array ref or a scalar text string.
+ - Various small tweeks to better support the SWISHE param.
+ - Queries() now keeps query array in same order as original.
+ - moved all Changes here and out of .pm file
+ - moved examples to their own directory and out of POD
+ - renamed all private routines to start with _
+ - added the 'nohiliter' attribute option, to prevent highlighting within
+   marked tagsets
+ - general cleanup and optimization
+ - build_regexp() now returns an array ref of two regexp: for HTML and
+   plain text.
+ - build_regexp() now uses Ignore Chars from SWISH::API object
+ - prep_queries() now supports SWISH Fuzzy Mode via SWISH::API::Fuzzy
+   (version 0.03 or newer)
+ - changed new() SWISHE param to SWISH -- but either will work
+
+ - 0.12
+ - bug fix: plaintext() not called if text contains entities
+ - mpeters@plusthree.com contributed the HiClass feature.
+ - added filter example to lightfile.cgi
+ - 0.13  10 Nov 2005
+ - 0.14  26 Sep 2009
+ - rewrite to use Search::Tools. At the same time considered replacing 
+   HTML::Parser with XML::LibXML for speed reasons, but when comparing	the
+   RT queues for both, it became obvious that HTML::Parser was a much safer
+   route. That, and I couldn't get tests in XML::LibXML to pass  against
+   libxml2 2.7.
+ - The API has changed. Read the SYNOPSIS.
+ - since Search::Tools normalizes everything to UTF-8, the output of 
+   HTML::HiLiter will always be UTF-8.	As a convenience, if the HiLiter 
+   encounters a http-equiv meta charset tag of anything other than ascii or
+   utf-8, a new meta tagset will be inserted in its place  indicating utf-8
+   encoding. If you really do not want to display UTF-8,  you'll need to
+   convert back to your desired encoding, using something  like the Encode
+   module.
+
+0.01 0.04 testing
+

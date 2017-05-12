@@ -1,0 +1,132 @@
+<!--
+=head1 NAME
+
+download_tag.wmk - quick links to files for download
+
+=head1 LOADING
+
+  < use plugin="download_tag" />
+
+=head1 HTML TAGS
+
+  < download file="filename.dat" [text="template"] />
+
+=head1 DESCRIPTION
+
+This WebMake Perl library provides a quick shortcut to make links to files for
+download.
+
+The attributes supported are as follows:
+
+=over 4
+
+=item file="filename.dat"
+
+The filename to link to.  If a file by this filename does not exist, a warning
+will be printed.
+
+Filenames should be specified relative to one of the following:
+
+=over 4
+
+=item the top level of the site
+
+=item the output file which contains the tag (not recommended, as it precludes
+the tag being used in another output file in a different directory)
+
+=item a directory named in the C<FileSearchPath> WebMake option
+
+=back
+
+=item text="template"
+
+The link text to be used.  The following content items are defined
+for use inside the link text:
+
+=over 4
+
+=item download.path
+
+The real path to the file.
+
+=item download.href
+
+The path to the file, relative to the current output file.
+
+=item download.name
+
+The file's name, without directories.
+
+=item download.mdate
+
+The file's modification date, in ctime() format, e.g. I<Thu Mar 01 20:54:34
+2001>.
+
+=item download.mtime
+
+The file's modification date, in UNIX time_t format.
+
+=item download.size_in_k
+
+The file's size, in kilobytes (rounded up).
+
+=item download.size
+
+The file's size, in bytes.
+
+=item download.owner
+
+The file's owner.
+
+=item download.group
+
+The file's group.
+
+=item download.tag_attrs
+
+The remaining attributes of the download tag.
+
+=back
+
+C<template> can be, and should often be, a $ {content_reference}.  The default
+template is:
+
+=over 4
+
+  < a href="$ {download.href}" $ {download.tag_attrs}>$ {download.name}
+  ($ {download.size_in_k}k)< /a>
+
+=back
+
+Note that this means that any unrecognised attributes of the download tag
+itself will become attributes of the A tag.
+
+The default template can be overridden by setting the template content item
+C<download.template>.
+
+=back
+
+=head1 OPTIONS WHICH AFFECT THIS TAG
+
+C<FileSearchPath> - WebMake option
+
+=cut
+
+-->
+
+<{perl
+
+  use HTML::WebMake::PerlLib::DownloadTag;
+
+  $self->define_empty_tag ("download",
+  	\&HTML::WebMake::PerlLib::DownloadTag::handle_download_tag,
+	qw(file));
+
+  ''
+}>
+
+<template name=download.template>
+  <a href="${download.href}"
+      ${download.tag_attrs}>${download.name} (${download.size_in_k}k)</a>
+</template>
+

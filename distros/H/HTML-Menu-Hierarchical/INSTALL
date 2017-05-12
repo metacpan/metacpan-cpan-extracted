@@ -1,0 +1,24 @@
+HTML::Menu::Hierarchical
+
+Copyright (c) 2003 Don Owens
+
+See the COPYRIGHT section in Hierarchical.pm for usage and
+distribution rights.
+
+HTML::Menu::Hierarchical is a Perl module for creating hierarchical
+HTML menus of arbitrary structure.
+
+INSTALLATION
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+DOCUMENTATION
+
+	There is documentation available in POD format for
+	HTML::Menu::Hierarchical and
+	HTML::Menu::Hierarchical::ItemInfo, e.g.
+
+		perldoc HTML::Menu::Hierarchical

@@ -1,0 +1,128 @@
+Version 0.65  - 26 March 2017
+              - Additional I2C methods
+
+Version 0.64  - 24 March 2017
+              - 4.9 kernel and i2c_bcm2835 module updates
+              
+Version 0.63  - 23 March 2017
+              - HiPi::GPIO error handling issues from CPAN testers
+
+Version 0.60  - 15 February 2017
+              - Added HiPi::GPIO 
+              - Extended Energenie ENER314_RT handling to work
+              - with Mi|Home range of monitors and switches
+              - Refactored HopeRF69 code to make adapting for other
+                uses easier
+              - refactored 'Controllers' to be 'Boards'
+              - Added HiPi::Board::ENER314 - transmit only
+                module for OOK controlled switches
+
+Version 0.50  - 21 April 2016
+              - Added Energenie ENER314_RT RF board interface
+              
+Version 0.49  - 06 April 2016
+              - Refactored Build.PL so there are no sudo calls or
+                package installations in there. Moved all that
+                to hipi-install script which now prompts before
+                installing any packages.
+              - Removed suid scripts hipi-i2c and hipi-pud as they
+                are obsolete since introduction of raspi-gpio and
+                update of i2c device driver in Rasbian distribution
+
+Version 0.45  - released
+              - Added interface for SPI MCP23S17 GPIO extender
+              - added convenience methods for MCP23017/MCP23S17
+              - Fixed bug in MCP23017 write_register_bits
+              - Build HiPI::Wiring against standard Rasbpian package
+              - Updated docs for device tree usage
+
+Version 0.44  - 15 March 2016
+              - SPI interace fixes
+              - Control GUI updates
+
+Version 0.42  - 15 March 2016
+              - Build script fixes and pause versioning;
+
+Version 0.35  - 07 March 2016
+              - bcm2835 library updated to version 1.50
+              - Support for 40 pin GPO Pis
+              - Support for RPI 2, RPI 3 and RPI Zero
+              - Support Raspbian - Jessie
+              - Fixes for Perl > 5.14
+              - changed location of downloads to raspberrypi.znix.com
+              - Wx version updated to 0.9928
+              - Wx::Demo version updated to 0.22
+              - Wx::PdfDocument version updated to 0.20
+              - Alien::wxWidgets version updated to 0.67
+
+Version 0.33  - 20 May 2013
+              - Fixed regression in 0.32 breaking uid and gid settings
+              - Add build options to avoid apt calls during cpan tests
+              - changed location of downloads to Google Code
+              - Wx version updated to 0.9922
+              - Wx::Demo version updated to 0.21
+
+Version 0.32  - 26 April 2013
+              - Added GPIO interrupt handling classes
+              - Many fixes for HiPi::Device::GPIO::Pin
+              
+Version 0.31  - Unreleased development version  
+
+Version 0.30  - Unreleased development version  
+
+Version 0.29  - 23 April 2013
+              - hipi-pud utility added to support setting of PUD resistors
+              - set_pud method added to all HiPi::Pin modules allowing
+                setting of pull up / pull down resistors from usercode.
+
+Version 0.28  - 23 April 2013
+              - bug fixes for HiPi::Device::GPIO::Pin
+
+Version 0.27  - 08 April 2013
+              - Using second I2C channel on P5 now tested and supported
+              - HiPi::BCM2835::I2C now supports per-instance transfer rates
+              - hipi-i2c utility extended to support en/disable of i2c buses
+              - GPIO PAD 5 documentation and GUI App display had 3V3 and 5V0
+                pins reversed.
+
+Version 0.26  - 23 March 2013
+              - Bug in HiPi::BCM2835::I2C->set_baudrate caused peripheral 1
+                value to always be set regardless of peripheral specified.
+              - Added i2c_write_error / bus_write_error to allow case where
+                i2c error condition expected. e.g. when a device has a
+                sofware reset and does not complete the i2c transaction
+                when reset command is sent.
+              - Standardised error handling across all three i2c interfaces.
+              - HiPi::Interface::MPL3115A2 gains mode, active, oversample
+                and now uses delay based on oversample rate.
+
+Version 0.25  - 19 March 2013
+              - fixed bug in hipi-i2c installation
+
+Version 0.24  - 19 March 2013
+              - Added hipi-i2c command line utility to allow none Perl code
+                access to i2c commands.
+              - All calls to external programs ( cat, echo etc. ) are now
+                taint safe.
+              - Installation now always does an apt-get update before 
+                apt-get install (depedency list). My test builds
+                often fail at dependency installation time if apt-get update
+                is not executed. 
+                
+Version 0.23  - 18 March 2013
+              - bug in i2c C code fixed.
+              
+Version 0.22  - 17 March 2013
+              - Added i2c interface to HiPi::Device::I2C (in addition to SMBus)
+              - Added HiPi::BCM2835::I2C - i2c using registers direcly
+              - Added HiPi::Interface::MPL3115A2 - to demonstrate repeated
+                start operation using HiPi::BCM2835::I2C
+              - Updated all i2c using interface modules to accept smbus, i2c
+                or bcm2835 backends
+                
+Version 0.21  - 12 March 2013
+              - HiPi::Device::OneWire read bug fixed
+              - PWM Pin setting fixed in Control App
+              
+Version 0.20  - 11 March 2013
+              - Refactored HiPi module tree

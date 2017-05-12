@@ -1,0 +1,12 @@
+Revision history for HTML-MobileJpCSS
+
+0.02  Tue Feb   3 19:45:12 2009
+        - Added 'css' option
+        - Changed scope 'StyleMap'
+        - Fixed remove 'link rel' tag
+        - Support linefeed in tag
+        Thanks to Craftworks (http://www.craft-works.co.jp/blog/archives/184)
+
+0.01  Tue Jan  15 14:24:20 2009
+        - Initial release.
+

@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<WebTest version="1.0">
+  <params />
+  <test>
+    <list>
+     <param name="parent_element_should_have_name_attribute">000</param>
+    </list>
+  </test>
+</WebTest>

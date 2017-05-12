@@ -1,0 +1,33 @@
+---
+abstract: 'Test HTML forms for cross site scripting vulnerabilities.'
+author:
+  - 'MacGyveR <dumb@cpan.org>'
+build_requires:
+  HTML::Form: '0'
+  Test::More: '0'
+  WWW::Mechanize: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-Form-XSS
+provides:
+  HTML::Form::XSS:
+    file: lib/HTML/Form/XSS.pm
+    version: '1'
+  HTML::Form::XSS::Result:
+    file: lib/HTML/Form/XSS/Result.pm
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  HTML::XSSLint::Result: '0'
+  XML::Simple: '0'
+  perl: v5.10.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/thedumbterminal/HTML-Form-XSS
+version: '1'

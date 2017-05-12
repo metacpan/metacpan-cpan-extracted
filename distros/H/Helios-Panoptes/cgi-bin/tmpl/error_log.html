@@ -1,0 +1,71 @@
+<tmpl_include name="header.html">
+
+<tmpl_loop priority_selected></tmpl_loop>
+
+<div class="filter_settings">
+	<form method="get">
+		<table cellpadding=0 cellspacing=0 class='data_table'>
+			<tr>
+				<td class='data_head'>Error Priority</td>
+				<td class='data_head'>Time Horizon</td>
+				<td class='data_head'>Function</td>
+				<td class='data_head'>Search</td>
+				<td class='data_head'>Results Per page</td>
+				<td class='data_head'>&nbsp;</td>
+			</tr>
+
+			<tr>
+				<td class='data_text'>
+					<select multiple name="priority" size="4" ><tmpl_loop priority_options><option <tmpl_loop priority_selected><tmpl_if expr="key eq option">selected</tmpl_if></tmpl_loop> value="<tmpl_var key>"><tmpl_var value></option></tmpl_loop></select>
+				</td>
+				<td class='data_text'>
+					<select name="time"><tmpl_loop time_options><option <tmpl_if expr="key eq time">selected</tmpl_if> value="<tmpl_var key>"><tmpl_var value></option></tmpl_loop></select>
+				</td>
+				<td class='data_text'>
+					<select name="function"><option <tmpl_if expr="funcid eq 0">selected</tmpl_if> value="0">All</option><tmpl_loop function_options><option <tmpl_if expr="funcid eq function">selected</tmpl_if> value="<tmpl_var funcid>"><tmpl_var funcname></option></tmpl_loop></select>
+				</td>
+				<td class='data_text'>
+					<select name="search"><tmpl_loop search_options><option <tmpl_if expr="key eq search">selected</tmpl_if> value="<tmpl_var key>"><tmpl_var value></option></tmpl_loop>:&nbsp;&nbsp;<input type="text" value="<tmpl_var message>" name="message" />
+				</td>
+				<td class='data_text'>
+					<select name="limit"><tmpl_loop limit_options><option <tmpl_if expr="key eq per_page">selected</tmpl_if> value="<tmpl_var key>"><tmpl_var value></option></tmpl_loop></select>
+				</td>
+				<td class='data_text'>
+					<input type="submit" value="Refresh"  />
+				</td>
+			</tr>
+		</table>
+	</form>
+</div>
+
+<div class='content'>
+<tmpl_var pagination><br>
+<table class='data_table' cellpadding=0 cellspacing=0>
+	<tr>
+		<td class='data_head'>Date/Time</td>
+		<td class='data_head'>Host</td>
+		<td class='data_head'>Job&nbsp;Class</td>
+		<td class='data_head'>Job&nbsp;ID</td>
+		<td class='data_head'>Process&nbsp;ID</td>
+		<td class='data_head'>Priority</td>
+		<td class='data_head'>Message</td>
+	</tr>
+<tmpl_loop log_entries>
+	<tr style='background-color: #<tmpl_var color>'>
+		<td class='data_number' style='white-space: nowrap;'><tmpl_var created_at></td>
+		<td class='data_text'><tmpl_var host></td>
+		<td class='data_text'><tmpl_var job_class></td>
+		<td class='data_number'><a href='joblog.pl?jobid=<tmpl_var jobid>'><tmpl_var jobid></a></td>
+		<td class='data_number'><tmpl_var process_id></td>
+		<td class='data_number'><tmpl_var priority></td>
+		<td class='data_text' style='width: 100%;'><tmpl_var message></td>
+	</tr>
+</tmpl_loop>
+</table>
+<br>
+<tmpl_var pagination>
+</div>
+
+
+<tmpl_include name="footer.html">
+

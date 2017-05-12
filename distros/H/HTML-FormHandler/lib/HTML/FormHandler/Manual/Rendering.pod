@@ -1,0 +1,782 @@
+package HTML::FormHandler::Manual::Rendering;
+# ABSTRACT: how to render with FormHandler
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+HTML::FormHandler::Manual::Rendering - how to render with FormHandler
+
+=head1 VERSION
+
+version 0.40067
+
+=head1 SYNOPSIS
+
+L<Manual Index|HTML::FormHandler::Manual>
+
+Rendering can be done in many different ways, from forms rendered entirely in
+templates with no information from FormHandler (except possibly the fill-in-the-form
+values) to forms that are completely rendered by FormHandler.
+
+=head1 DESCRIPTION
+
+For most situations, something in between hand-built and completely generated
+will probably be the best solution. For admin forms that don't need a lot of
+styling or special HTML, FormHandler's automatic rendering may be appropriate.
+FormHandler rendering may also be a good solution if you have enough forms that
+putting time into creating rendering widgets and themes is worthwhile.
+
+The automatic rendering is also useful when developing a new form. You can
+get an idea of what it looks like, and then customize it.
+
+Another situation in which FormHandler rendering may be useful is when
+the form is complex enough that working in Perl is a better idea than
+putting lots of logic into templates.
+
+All of the rendering is designed to be easily replaced with elements of your
+own, or to be replaced entirely. You can create your own rendering 'widgets'
+and load them into the fields by designating the directory in the
+'widget_name_space'. You could also create a completely separate renderer
+that's a separate object or class that takes a form object,
+or a role that is applied to your form.
+
+Note that unless you set 'no_widgets' in the form, the rendering roles are
+automatically applied. You don't need to include anything else, unless you
+want to use a different renderer.
+
+=head2 Mostly templates
+
+The names of your fields must match the names of your FormHandler fields.
+If you use compound fields, you must use the FormHandler naming convention.
+
+Form used in examples:
+
+    package MyApp::Form::Example;
+    use HTML::FormHandler::Moose;
+    extends 'HTML::FormHandler';
+
+    has_field 'foo';
+    has_field 'bar';
+    has_field 'save' => ( type => 'Submit' );
+
+If you have existing forms in templates or just prefer them, you can use
+the 'fill-in-form' values provided with the form's 'fif' function.
+
+    my $form = MyApp::Form::Example->new;
+    $form->process( params => $params );
+    $c->stash( fif => $form->fif );
+    ...
+    <form id="myform" action="/edit/example" method="post">
+    <label>Foo</label>
+    <input id="foo" name="foo" value="[% fif.foo %]">
+    <label>Bar</label>
+    <input id="bar" name="bar" value="[% fif.bar %]">
+    <input type="submit" name="submit" value="Save">
+    </form>
+
+If you are looking for an easy way to get your fields to line up in an evenly spaced manner,
+all uniformly aligned, and to do so without using templates or tables, you can externally style the
+default FormHandler output with the following CSS rule (not supported in internet explorer 6).
+
+*I<This above is useful for simple forms.  Complex forms with fieldsets and other extra features>
+*I<will require further styling of the HTML.  The following rule is also HTML 5 compatible.>
+
+   form#id_of_your_form div div label, form#id_of_your_form div div input {
+      float: left;
+      display: inline-block;
+      width: 40%
+   } /* make sure the parent element is sized appropriately.  700px is a good width */
+
+Going a little bit farther in using FormHandler rendering, you can render
+each of the fields individually, using 'render' or 'renderx':
+
+     <form id="myform" action="/edit/example" method="post">
+     <fieldset><legend>My Foo</legend>
+     [% form.field('foo').render %]
+     </fieldset>
+     [% form.field('bar').renderx(element_class => 'cb33')  %]
+     [% form.field('save').render %]
+     </form>
+
+If you don't want the wrappers, use a widget_wrapper of 'None'.
+
+    has '+widget_wrapper' => ( default => 'None' );
+
+Then you can provide the HTML in which the form elements are
+embedded:
+
+    <div class="my_class">
+    [% form.field('foo').render %]
+    </div>
+    <div class="another_class">
+    [% form.field('bar').renderx(element_class => 'cb33')  %]
+    </div>
+
+You can also use the 'render_element' or 'render_elementx' methodx, if you want to leave the
+wrapper in place, but sometimes render 'bare' html elements:
+
+    <div class="my_class">
+    [% form.field('foo').render_element %]
+    </div>
+    <div class="my_class">
+    [% form.field('foo').render_elementx(element_class => 'cb33') %]
+    </div>
+
+If you wish to loop through the fields yourself, use the 'sorted_fields'
+method, since it skips inactive fields and handles the 'order' attribute.
+
+A set of Template Toolkit templates is also provided in the 'share'
+directory. There are individual templates for each 'widget', such as
+a checkbox, and there is also an all-in-one template that includes
+blocks for the various 'widgets'. If you want to use these templates
+you can just copy them to your template directory and specify the form
+template in your controller.
+
+See also L<HTML::FormHandler::Manual::Templates>.
+
+=head2 Automatic rendering
+
+If you take all the defaults, you can simply render a form with C<< $form->render >>.
+
+    [% form.render %]
+    or
+    [% form.renderx( form_element_class => ['xxx'] ) %]
+
+This uses the L<HTML::FormHandler::Widget::Form::Simple> role, which is applied to
+the form by default. You can use a different form rendering role by including
+it using 'with':
+
+    with 'HTML::FormHandler::Widget::Form::Table';
+    has '+widget_wrapper' => ( default => 'Table' );
+
+For the 'Table' form widget, you will also need to set the matching
+Table widget_wrapper.
+
+A widget role, providing the 'render' method, and a widget wrapper role,
+providing the 'wrap_field' method, are applied to each field when the form is built.
+Each field has a default widget, but you can change that by setting 'widget' to a different
+widget role:
+
+    has_field 'foxy' => ( widget => 'MyWidget', widget_wrapper => 'MyWrapper' );
+
+Often if you need custom rendering what you need to provide is a custom widget_wrapper.
+The 'widgets' render only the input elements, and that often doesn't need to be
+changed. If you have standard HTML that is used when rendering forms, making custom
+widget_wrappers is often the way to go.
+
+Default widget roles are found in the HTML::FormHandler::Widget directory, in the
+'Field', 'Form', and 'Wrapper subdirectories.
+The name space used to look for the widget roles can be specified on a form or
+field basis by setting 'widget_name_space' to an arrayref of name spaces:
+
+   has '+widget_name_space' => ( default => sub { ['MyApp::Form::Widget' ] } );
+
+For the above widget ('MyWidget') and widget_name_space, you need to have a package named
+'MyApp::Form::Widget::Field::MyWidget'.
+
+The HTML::FormHandler::Widget name space is always searched as the last name space.
+This means that you can set up an application or form specific set of widgets.
+Widgets in a widget directory (specified in widget_name_space) are located in either
+a 'Field', 'Wrapper', or 'Form' subdirectory. (Blocks are in a 'Blocks' subdirectory.)
+
+You can also create an 'all-in-one' type rendering role, using
+L<HTML::FormHandler::Render::Simple> as a basis. It used the method name
+'render_field' on the form ( C<< $form->render_field('field_name') >> )
+instead of the 'render' method on the field.
+
+In addition to the 'Simple' wrapper, there is a 'Bootstrap' wrapper which
+creates HTML formatted to use the Twitter Bootstrap 2.0 CSS. There's also a sample
+"theme", L<HTML::FormHandler::Widget::Theme::Bootstrap>, which is a role that sets
+the widget_wrapper to 'Bootstrap', and provides Bootstrap-type formatting of the
+form error message.
+
+There are a lot of different settings that control the rendering. Some of them are
+attributes in the form or field, and some of them are set using the 'tags' hashref
+in the field or the 'form_tags' hashref in the form.
+
+You can make your own copy of an existing wrapper and add features to it.
+However, there are so many different ways to render the HTML around a field, that it's
+very difficult to handle more than a short list of standard presentations in
+one 'wrapper'. It may be better to make a number of more atomic widget wrappers and
+use those rather than complicate the already fairly complicated "Simple" and
+"Bootstrap" wrappers more.
+
+=head2 HTML attributes
+
+Arbitrary HTML attributes on form elements (such as 'input' elements) can be specified
+with 'element_attr' on the field. You can also set attributes for the label with
+'label_attr' and attributes for the wrapper with 'wrapper_attr'. The 'class'
+attributes are handled separately, and are arrayrefs (element_class, wrapper_class,
+label_class):
+
+    has_field 'foo' => ( wrapper_class => ['form', 'special' ] );
+
+See the documentation on L<HTML::FormHandler::Field/Attributes_for_creating_HTML>.
+
+=head2 Form settings
+
+=over 4
+
+=item widget_wrapper
+
+The short name of the rendering wrapper widget to be applied to the fields. When
+the fields are constructed this is merged into fields that do not already
+set a widget wrapper.
+
+=item do_form_wrapper
+
+Flag set with 'sub build_do_form_wrapper{ 1 }'. Default is no form wrapper.
+
+=item form_tags
+
+Hashref of various tags used in rendering code. See the documentation
+for L<HTML::FormHandler::Widget::Form::Simple>.
+
+=item form_element_attr
+
+Hashref of arbitrary HTML attributes to be included in the form element.
+
+   sub build_form_element_attr { [ ... ] }
+
+=item form_element_class
+
+Arrayref of classes to be included in the form element.
+
+   form_element_class => ['hfh', 'admin']
+   -- or in your class --
+   sub build_form_element_class { ['hfh', 'admin'] }
+
+The above class would produce a form element:
+
+   <form id="myform" method="post" class="hfh admin">
+
+=item form_wrapper_attr
+
+Hashref of arbitrary HTML attributes to be included in the form wrapper
+
+   sub build_form_wrapper_attr { { name => 'formname' } }
+
+=back
+
+=head2 Form messages
+
+Some messages are rendered at the top of the form (inside the form tag)
+by the 'render_form_messages' method, which is implemented in
+L<HTML::FormHandler::Widget::Form::Simple> and
+L<HTML::FormHandler::Widget::Theme::BootstrapFormMessages> (which is
+included by the Bootstrap theme).
+
+There are three types of form messages: 'error_message', 'success_message',
+and 'info_message'. The 'error_message' and 'success_message' are set inside
+the form:
+
+    has '+success_message' => ( default => 'Form successfully submitted' );
+    has '+error_message' => ( default => 'There were errors in your form.' );
+
+And then are displayed after the form is validated.
+
+The 'info_message' is cleared out when a form is re-processed, and so would
+normally be set on the process call, or between new & process.
+
+    $form->process( params => {}, info_message => 'Fill in the form' );
+
+=head2 Field settings
+
+    has_field 'foo' => ( widget => 'MyWidget', widget_wrapper => 'SpecialWrapper',
+        element_attr => { placeholder => 'enter a foo' }, element_class => 'important',
+        wrapper_class => ['label'], label_class => ['major'],
+        tags => { wrapper_tag => 'fieldset' } );
+
+=over 4
+
+=item widget
+
+Short name of the rendering widget for this field.
+
+=item widget_wrapper
+
+Short name of the wrapping widget for this field.
+
+=item do_wrapper
+
+Flag that indicates whether or not the 'wrapper' should be rendered.
+
+=item do_label
+
+Flag that indicates whether or not a label should be rendered.
+
+=item element_attr
+
+Hashref of arbitrary HTML attributes to include in the element. Note that
+this does not include the 'id' and 'type' attributes, which are handled
+separately. The 'id' can be changed with the field's 'id' attribute.
+
+=item element_class
+
+Arrayref of classes to include in the element.
+
+=item wrapper_attr
+
+Hashref of arbitrary HTML attributes to include in the wrapper.
+
+=item wrapper_class
+
+Arrayref of classes to include in the wrapper.
+
+=item label_attr
+
+Hashref of arbitrary HTML attributes to include in the label.
+
+=item label_class
+
+Arrayref of classes to include in the label.
+
+=item build_id_method
+
+Coderef to construct the 'id'. Useful if your javascript needs a different
+format for the 'id'.
+
+=item build_label_method
+
+Coderef to construct the label.
+
+=item wrap_label_method
+
+Coderef to wrap the label. Used by the Simple and Bootstrap wrappers.
+Useful if your label contains HTML or a link. You must do your own
+localization and filtering if you use a 'wrap_label' method.
+
+=back
+
+=head2 html_attributes callback
+
+The form has an 'html_attributes' callback which can be used to customize,
+localize, or modify the various attributes when used.
+Types: element, wrapper, label, form_element, form_wrapper, checkbox_label
+
+   sub html_attributes {
+       my ( $self, $obj, $type, $attrs, $result ) = @_;
+       # obj is either form or field
+       $attrs->{class} = 'label' if $type eq 'label';
+       $attrs->{placeholder} = $self->_localize($attrs->{placeholder})
+           if exists $attrs->{placeholder};
+       return $attrs;
+   }
+
+This callback is called in the methods that wrap the various '_attr' attributes,
+i.e. element_attributes, label_attributes, wrapper_attributes,
+form_element_attributes, form_wrapper_attributes.
+
+=head2 Field tags
+
+The 'tags' are settings and strings which may vary by the particular widget
+that implements them. The best place to look for documentation on them
+is in the field widget, field wrapper, and form widgets that you are using.
+The 'tags' allow customizing rendering behavior on a per-field basis.
+FormHandler has a number of flags/settings that it uses; you can add your
+own for your custom rendering code.
+
+    wrapper_tag    -- the tag to use in the wrapper, default 'div'
+    label_tag      -- tag to use for label (default 'label')
+    label_after    -- string to append to label, for example ': ' to append a colon
+
+Tags can be used to switch the Simple
+wrapper from divs to using paragraphs instead, or to add a colon in
+label formatting:
+
+   has_field 'my_field' => (
+       tags => {wrapper_tag => 'p', label_after => ': '  } );
+
+Most of the tags are implemented by the 'wrapper' widget, so see that
+documentation for more details: L<HTML::FormHandler::Widget::Wrapper::Simple>,
+L<HTML::FormHandler::Widget::Wrapper::Bootstrap>.
+
+=head3 Tag types
+
+The 'get_tag' method will check for these three types of tags and perform
+the appropriate action.
+
+=over 4
+
+=item String
+
+Standard, most common type of value for a tag.
+
+    has_field 'bar' => ( tags => { before_element => '<span>...</span>' } );
+
+Some tags are true/false also:
+
+    has_field 'foo' => ( type => 'CheckBox',
+        tags => { no_wrapped_label => 1 } );
+
+=item CodeRef
+
+You can supply a coderef to a tag, and it will be executed as a method on
+the field. This is useful for localization or other sorts of runtime
+changes.
+
+    has_field 'bar' => ( tags => { before_element => \&bar_element } );
+    sub bar_element {
+        my $self = shift; # $self is the 'bar' field
+        return '<div>In a Sub</div>';
+    }
+
+=item Block
+
+You can supply a block by giving a string that consists of a '%' followed
+by the block name:
+
+    has_block 'comment' => ( tag => 'a', content => 'This is a comment from a block',
+        class => ['comment' ] );
+    has_field 'foo' => ( tags => { before_element => '%comment' } );
+
+=back
+
+=head3 Tags and other settings for all fields
+
+Tags can be set for all fields in the form by using a 'build_update_subfields'
+sub, or 'widget_tags'. The 'update_subfields' hashref takes general-purpose
+keys 'all', 'by_flag' (compound, repeatable, contains), and 'by_type'.
+You can also set specific field attributes by using the field name as a key.
+For example, if you don't want errors to be displayed
+next to the fields, you need to set the 'no_errors' tag:
+
+   sub build_update_subfields {{
+       all => { tags => { no_errors => 1 }, wrapper_class => ['myapp'] },
+       by_type => { Text => { element_class => ['text'] } },
+       by_flag => { compound => { do_wrapper => 1 } },
+       foo => { label => 'My Foo' },
+   }}
+   -- or --
+   '+widget_tags' => ( default => sub { { no_errors => 1 } } );
+
+The 'widget_tags' attribute only handles the 'tags' hashref, so if you also
+want to set classes or attributes, then build_update_subfields is more useful.
+You can also use 'build_update_subfields' in a custom compound field class.
+
+If you have defaults that are set in 'build_update_subfields' in a base class,
+in order to use hashrefs from both base and current classes, you will need to
+merge the hashes:
+
+    use HTML::FormHandler::Merge ('merge');
+    sub build_update_subfields {
+        my $self = shift;
+        my $new = { all => { tags => { wrapper_tag => 'p' } } };
+        return merge( $new, $self->next::method(@_) );
+    }
+
+In a role you would have to do the equivalent with an 'around' method modifier.
+
+=head3 Repeatable field instances
+
+The repeatable field instances are constructed internally, so it's trickier to set
+things like wrapper tags. There are two ways to do it, using the 'init_contains'
+attribute on the repeatable field, and using the 'update_subfields' builder:
+
+    has_field 'records' => ( type => 'Repeatable', num_when_empty => 2,
+        init_contains => { tags => { wrapper_tag => 'fieldset' } } );
+    -- or --
+    sub build_update_subfields { { by_flag => {
+        contains => { tags => { wrapper_tag => 'fieldset' }}}}}
+
+The 'build_update_subfields' option is mainly useful if you have multiple
+repeatable fields that you want to set, or if you want defaults in a base
+class.
+
+=head3 widget and widget_wrapper set to 'None'
+
+If you want to implement the 'render' method in a custom field, you can set
+'widget' to 'None' and no widget will be applied. Setting the 'widget_wrapper'
+to 'None' will apply the 'None' wrapper, which simply returns the widget
+rendering.
+
+=head3 Error messages
+
+The default is currently to display error messages next to the rendered fields,
+if you're doing C<< $form->render >>. If you don't want messages next to fields,
+you can set the 'no_errors' tag, as discussed in the section on 'Tags and other
+settings...'.
+
+Note that the 'None' widget wrapper, since it doesn't render anything except the
+form element (input, select, etc), will not render errors next to the field.
+Setting the 'do_wrapper' and 'do_label' flags to 0 will still render errors.
+
+=head2 Blocks
+
+When rendering, FormHandler loops through the sorted fields in the form and
+executes the 'render' method on each field. Fields in FormHandler forms,
+particularly those that interface with a database, are usually structured
+in a way that matches the data structure. This doesn't always fit with
+the way that you want to display the form.
+
+'Blocks' provide an alternative way of structuring the display. A 'block'
+is a fairly basic object that contains a 'render' method. The standard
+block class, L<HTML::FormHandler::Widget::Block>, has Moose attributes to
+set the HTML tag, the label, the classes, etc, plus a 'render_list'
+which contains the names of a list of fields or other blocks to render.
+
+Here is the definition of a fieldset block that contains two fields:
+
+   has_field 'foo';
+   has_field 'bar';
+   has_block 'first_fset' => ( tag => 'fieldset, label => 'Two Fields',
+       render_list => ['foo', 'bar'] );
+
+The 'first_fset' block will render like this:
+
+    <fieldset><legend>Two Fields</legend>
+        <div>
+           <label>Foo</label>
+           <input type="text" name="foo" id="foo" value="" />
+        <div>
+        <div>
+           <label>Bar</label>
+           <input type="text" name="bar" id="bar" value="" />
+        <div>
+    </fieldset>
+
+In order to actually get this block to be used when you render with
+C<< $form->render >>, you need to supply a 'render_list' on the form
+level:
+
+   sub build_render_list { ['first_fset', 'submit_btn'] }
+
+You could also render it with C<< $form->block('first_fset')->render >>.
+
+Blocks should be located in a widget name space, in a 'Block' directory,
+or else the name should be prefixed with a '+'.
+
+    has '+widget_name_space' => ( default => sub { ['MyApp::Form::Widget'] };
+    has_block 'first' => ( type => 'MyBlock', ... );
+
+The 'MyBlock' above will be found in 'MyApp::Form::Widget::Block::MyBlock'.
+
+    has_block 'intro' => ( type => '+MyApp::Form::Component::Intro' );
+
+A block can inherit from L<HTML::FormHandler::Widget::Block>, but it doesn't
+have to. At a minimum it must provide 'new' and 'render' methods. If no
+'type' is specified, the block is created from the L<HTML::FormHandler::Widget::Block>
+package.
+
+The following package provides a functional block:
+
+    package MyApp::Component::Section;
+    sub new {
+        my ( $class, %args ) = @_;
+        return bless \%args, $class;
+    }
+    sub form {
+        my $self = shift;
+        return $self->{form};
+    }
+    sub render {
+        return
+        '<div class="intro">
+          <h3>Please enter the relevant details</h3>
+        </div>';
+    }
+    1;
+
+When a form is rendered, it will either loop through all of the sorted_fields OR
+loop through the fields and blocks listed in the 'render_list'. A render_list can
+contain a mix of fields and blocks.
+
+Note that you must be rendering with widgets to use block rendering.
+
+=head2 Twitter Bootstrap 2.0 rendering
+
+The main component of Bootstrap rendering is L<HTML::FormHandler::Widget::Wrapper::Bootstrap>.
+It produces the standard Bootstrap-style HTML such as:
+
+    <div class="control-group">
+      <label class="control-label" for="input01">Text input</label>
+      <div class="controls">
+        <input type="text" class="input-xlarge" id="input01" name="input01" value="" />
+      </div>
+    </div>
+
+These are the standard 'control' blocks for Bootstrap vertical and horizontal forms.
+You can apply this wrapper to all of your fields by setting the widget_wrapper in the form:
+
+   has '+widget_wrapper' => ( default => 'Bootstrap' );
+
+There is also a sample "theme": L<HTML::FormHandler::Widget::Theme::Bootstrap>. It sets
+the widget_wrapper for you and provides a 'render_form_messages' method to render a
+success/error messages section.
+
+There are a couple of examples in the t/bootstrap directory of Bootstrap inline and search forms,
+which don't use exactly the same kind of control HTML.
+
+You can always copy the existing wrapper and add your own features, with settings provided
+by the 'tags' hashref.
+
+=head2 Rendering themes
+
+Many of the flags and settings necessary for rendering can now be moved out into a role.
+Whether you want to do that or not is a matter of style and preference. The advantage is
+that it leaves the form class itself cleaner and easier to read. The disadvantage is
+that your settings come from more different places.
+
+Here's an example of a form rendering 'theme', taken from the t/bootstrap/basic.t test:
+
+    package MyApp::Form::Basic::Theme;
+    use Moose::Role;
+
+    # make a wrapper around the form
+    sub build_do_form_wrapper {1}
+    # set the class for the form wrapper
+    sub build_form_wrapper_class { ['span9'] }
+    # set the class for the form element
+    sub build_form_element_class { ['well'] }
+    # set various rendering tags
+    sub build_form_tags {
+        {   wrapper_tag => 'div',
+            before => qq{<div class="row"><div class="span3"><p>With v2.0, we have
+               lighter and smarter defaults for form styles. No extra markup, just
+               form controls.</p></div>\n},
+            after => '</div>',
+        }
+    }
+
+    # the settings in 'build_update_subfields' are merged with the field
+    # definitions before they are constructed
+    sub build_update_subfields {{
+       # all fields have a label but no wrapper
+       all => { do_wrapper => 0, do_label => 1 },
+       # set the element class, a placeholder in element_attr
+       foo => { element_class => ['span3'],
+           element_attr => { placeholder => 'Type something…' },
+           tags => { after_element =>
+              qq{\n<span class="help-inline">Associated help text!</span>} } },
+       bar => { option_label => 'Check me out',
+          label_class => ['checkbox'], do_label => 0 },
+       submit_btn => { element_class => ['btn'] },
+    }}
+
+Note that the value 'all' key in the update_subfields hashref will be merged
+into the attributes used when building all of the fields.
+
+=head2 Rendering fields
+
+The default for most fields is a 'div' wrapper and a label. If you don't want
+the wrapper, set C<< do_wrapper => 0 >>. If you don't want the label, set
+C<< do_label => 0 >>.
+
+Checkboxes are most complicated, in that the default
+is to have two labels. The outer label, the one that's in the same place as the label
+for other input elements, is set with C<< label => '...' >>. The inner label,
+which is the equivalent of the C<< label => '...' >> in the options array used
+for selects and checkbox groups, is set with C<< option_label => '...' >>.
+There are a number of other 'tags' to control the presentation. See
+L<HTML::FormHandler::Widget::Field::Checkbox> for more information, and
+t/render/checkbox.t for examples.
+
+Some fields by default do not render a label: Button, Submit, Reset, ButtonTag.
+If you do want a label with these fields, you must set the 'do_label' flag to 1:
+
+   has_field 'foo' ( type => 'Button', do_label => 1 );
+
+Select fields are also fairly complicated. They can be rendered with the
+'Select', 'RadioGroup', and 'CheckboxGroup' widgets. Option groups are also
+supported. See L<HTML::FormHandler::Field::Select>;
+
+=head2 Rendering labels
+
+A 'standard' label is built in the field if you don't supply one. The label
+can be provided in the field definition:
+
+    has_field 'foo' => ( label => 'My Foo' );
+
+You can also provide a method to 'build' the label:
+
+    has_field 'foo' => ( build_label_method => \&build_label );
+    sub build_label {
+        my $self = shift; # field method
+        return '...';
+    }
+
+And a method to 'wrap' the label (used by the Simple and Bootstrap wrappers):
+
+    has_field 'foo' => ( label => 'My Foo', wrap_label_method => \&wrap_label );
+    sub wrap_label {
+        my ( $self, $label ) = @_;
+        # or: my $label = $self->label;
+        return qq{<a href="...">$label</a>};
+    }
+
+This is particularly useful for creating labels that have links or other HTML.
+The 'wrap_label_method' does no filtering or localization, so you must do that
+yourself in the method if you need it.
+
+=head2 Rendering filter
+
+The base field class has a 'render_filter' attribute which is a coderef used to
+clean the values used to fill in the form for Render::Simple and the Widgets,
+and for some of the labels..
+The default filter changes quote, ampersand, <, and > to the equivalent html
+entities. If you wish to use some other sort of filtering, you can use the
+'render_filter' method in your form, or set a coderef on individual field
+objects. A 'render_filter' function in your form will be used by all fields.
+Setting it for a field will just be for that field.
+
+    sub render_filter {
+        my $string = shift;
+        $string =~ s/my/MY/g; # perform some kind of transformation
+        return $string;
+    }
+    -- or --
+    has_field 'foo' => ( render_filter => sub { ... } );
+
+The filter is called in Render::Simple and in the widgets with
+C<< $self->html_filter( $fif ) >> or C<< $field->html_filter( $fif ) >>.
+
+If you want to turn off the filter for a particular field, you can set it
+to a sub that just returns the value:
+
+    has_field 'bar' => ( render_filter => sub { shift } );
+
+If you want a label that is unfiltered, see 'wrap_label_method'.
+
+=head1 Special rendering pseudo-fields
+
+Also see L<HTML::FormHandler::Widget::Block>. Blocks may be a better
+solution than pseudo-fields (i.e. fields that aren't actual form
+elements).
+
+Various 'tags' used for rendering can also be used for similar
+purposes.
+
+=head2 NonEditable
+
+Like a Bootstrap 'non_editable' field. Displays the field's value
+as a span.
+
+    has_field 'non_edit' => ( type => 'NonEditable', value => 'This is a Test' );
+
+=head2 Display
+
+L<HTML::FormHandler::Field::Display>
+
+You can supply an HTML string to this field, to be displayed directly. There is no
+'value' associated with this field; it's a field for rendering only. The HTML
+string can be built with a form or field method.
+
+Blocks or tags will often be a better solution.
+
+=head1 AUTHOR
+
+FormHandler Contributors - see HTML::FormHandler
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Gerda Shank.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

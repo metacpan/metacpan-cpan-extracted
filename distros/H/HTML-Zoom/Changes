@@ -1,0 +1,75 @@
+0.009009 2015-05-15
+  - just took the most recent dev release and repository updates, made
+    sure all tests pass and cut a stable release.  Please shout out if
+    something unexpected happens.
+
+0.009008_01 2013-02-28
+
+  - remove_from_attribute and related helpers (remove_class, add_class)
+
+  - Several patches for incorrect functionality (thanks to Jim Miner &
+    stratman@gmail.com) :-
+
+  - Don't throw away leading PCDATA in $text, in _hacky_tag_parser().
+    This is important so we can use from_html and replace_content to
+    insert fragments with or without markup into templates.
+
+  - Fix matching against attribute value "0" (zero) or "" (empty).
+
+  - Fix parsing of selectors matching against attribute value "" (empty).
+    (This does not fix parsing of single-quoted attribute values.)
+
+0.009007 2013-02-24
+  - Remove long form ( name, value ) for attributes to set_attribute / add_attribute
+    to allow future enhancements (selector in options).
+
+0.009006 2011-05-20
+  - Add DESTROY method to fix test failures / warnings in perl >= 5.13.1
+
+0.009005 2011-05-12
+
+  - Perforce escaping of meta-characters in selectors and test (rafl)
+  - New Feature:  HTML::Zoom will autoload FilterBuilder functions so that
+    you can avoid a bit of boilerplate in method calls.  Now you can replace:
+
+        $z->select('div')->replace_content("Hello World");
+
+    With:
+
+        $z->replace_content(div => "Hello World");
+
+  - Lots of changes to FilterBuilder so that functionality matched the docs
+    better, improved the docs and added tests for documented functions to
+    avoid future regressions.
+
+  - add / to excluded characters in attribute names to correctly parse <br/>
+  - add transform_attribute method (rbuels)
+
+0.009004 2011-02-14
+
+  - Large chunks of documentation improvements from jnareb
+  - apply_if method from ocharles
+  - selector improvements and bugfixes (jnareb, mst)
+
+0.009003 2010-10-12
+
+  - mst is an idiot and forgot to add strictures.pm as a dependency
+
+0.009002 2010-10-12
+
+  - Added support for more selector syntax support including:
+      element#id
+      element.class
+      element[attr=foo]
+      element[attr*=foo]
+      element[attr~=foo]
+      element[attr]
+      element[attr^=foo]
+      [attr=foo]
+  - HTML::Zoom::MatchWithoutFilter replaced by HTML::Zoom::TransformBuilder
+  - Improved documentation, including documentation for HTML::Zoom::FilterBuilder.
+  - Lots of other refactoring, internal improvements & bugfixes!
+
+0.009001 2010-03-17
+
+  - First release

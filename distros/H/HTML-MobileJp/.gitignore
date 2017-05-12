@@ -1,0 +1,7 @@
+Makefile
+inc/
+MYMETA.*
+META.yml
+*.bak
+blib/
+pm_to_blib

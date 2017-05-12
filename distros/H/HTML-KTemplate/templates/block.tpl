@@ -1,0 +1,7 @@
+
+<!-- BEGIN SUB.TEST.BLOCK -->
+
+[% VARIABLE %]
+[% SUB.VARIABLE %]
+
+<!-- END SUB.TEST.BLOCK -->

@@ -1,0 +1,28 @@
+<tmpl_include name="header.html">
+
+<br />
+
+<div style="margin: 5px;">
+
+<form method="post" action="<tmpl_var job_submit_url>">
+	<b>Job Type (Service Class)</b> <br />
+	<select name="type" >
+		<tmpl_loop classes>
+		<option value="<tmpl_var job_type>"><tmpl_var job_type> (<tmpl_var job_class>)</option>
+		</tmpl_loop>
+	</select>
+<br />
+	<br />
+	<b>Job Arguments</b> <br />
+	<textarea rows="10" cols="80" name="params"></textarea>
+
+	<br />
+	<input type="checkbox" name="validate" value="1" checked="1" />&nbsp;Validate job arguments
+	<br /><br />
+	<input type="submit" value="Submit Job" />
+</form>
+
+</div>
+
+<tmpl_include name="footer.html">
+

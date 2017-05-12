@@ -1,0 +1,170 @@
+=head1 NAME
+
+Heap::Fibonacci::Fast - XS bridge to fast C fibonacci heap implementation
+
+=head1 SYNOPSIS
+
+	use Heap::Fibonacci::Fast;
+	my $heap = Heap::Fibonacci::Fast->new();
+	while(my ($key, $data) = compute()){
+		$heap->key_insert($key, $data);
+	}
+	$heap->extract_top();
+	
+	my $heap = Heap::Fibonacci::Fast->new('code', sub { ord($a) <=> ord($b) });
+
+=head1 DESCRIPTION
+
+Heap is a data structure that keeps it's elements partially sorted, so when your data
+changes a lot, heaps are cheaper then maintaining fully sorted data. 
+
+=head1 METHODS
+
+=head2 C<new>
+
+Initializes heap, with specific type. Default is 'min'. 'min' and 'max' types
+are keyed - with element, you should supply an B<integer> key, that is used for
+ordering.
+
+	my $heap = Heap::Fibonacci::Fast->new([$type, [$coderef]]);
+
+=over 2
+
+=item min
+
+This is default heap type. It is keyed, elements with minimal keys are extracted first.
+
+=item max
+
+This is keyed heap. Elements with maximal keys are extracted first.
+
+=item code
+
+This type is useful, when you can't specify exact keys for your elements, but,
+intead, allows you to compare elements by your own. Callback should use $a and $b, 
+like standard C<sort>, with same return values meanings.
+
+=back
+
+=head2 C<insert>
+
+Adds all supplied elements to the heap. Can be used only for 'code' heaps.
+You can't store C<undef> in the heap. If called in non-void context, then, 
+for each added element, returns handle for usage with C<remove>.
+
+	my @handles = $heap->insert($elem1, ...);
+	my $handle  = $heap->insert($data);
+
+=head2 C<key_insert>
+
+Adds all supplied element+key pairs to the heap. Can be used only for keyed heaps.
+You can't store C<undef> in the heap. If called in non-void context, then, 
+for each added element, returns handle for usage with C<remove>.
+
+	my @handles = $heap->key_insert($key1, $elem1, ...);
+	my $handle  = $heap->key_insert($key, $data);
+
+=head2 C<extract_top>
+
+Remove top element of the heap (minimal one, in terms of comparsion function) 
+and returns it. Returns C<undef> for empty heap.
+	
+	my $elem = $heap->extract_top();
+
+=head2 C<top>
+
+Returns top element of the heap (minimal one, in terms of comparsion function).
+Returns C<undef> for empty heap.
+	
+	my $elem = $heap->top();
+
+=head2 C<top_key>
+
+Returns key for the top element of the heap (minimal one, in terms of comparsion function).
+Returns C<undef> for empty heap. Applicable only for keyed heaps.
+	
+	my $key = $heap->top_key();
+
+=head2 C<extract_upto>
+
+Removes from heap and returns all elements that are smaller (in terms of comparsion function)
+than given key (for keyed heaps) or given element (for code heaps).
+
+	my @elements = $heap->extract_upto(12);
+
+=head2 C<remove>
+
+Removes element from heap, hanlde should be B<valid> one, saved from C<insert>/C<key_insert> call.
+Handle for any particular element becomes invalid after C<clear>, 
+C<extract_top> and C<extract_upto> calls. Supplying invalind handle leads to unpredicatble results.
+
+	$heap->remove($handle);
+
+=head2 C<count>
+
+Returns number of elements in heap.
+
+	my $count = $heap->count();
+
+=head2 C<clear>
+
+Empties heap.
+
+	$heap->clear();
+
+=head2 C<get_type>
+
+Return heap type as  string, same as for C<new> call.
+
+	if ($heap->get_type() ne 'code')
+
+=head1 SEE ALSO
+
+L<Heap>
+
+Pure-perl implementation of B<fibonacci>, B<binary> and B<binomial> heaps, with rather strange interface.
+
+L<Heap::Simple>
+
+Pure-perl and XS implementations of some heap (not specified heap's type), can 
+handle supplied data in a variety of ways.
+
+You can run compare.pl supplied with distribution to see some benchmark values.
+
+L<http://en.wikipedia.org/wiki/Fibonacci_heap>
+
+Read this, if you want to know about Fibonacci heap algorythm complexity.
+
+=head1 AUTHOR
+
+Sergey Aleynikov <sergey.aleynikov@gmail.com>
+
+=head1 LICENSE
+
+Copyright (c) 2009 by Sergey Aleynikov.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+1. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGE.
+
+libfib (c) 1997-2003 John-Mark Gurney, under the same terms. For full license text, see fib.c.
+
+=cut

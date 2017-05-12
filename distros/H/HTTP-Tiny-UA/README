@@ -1,0 +1,149 @@
+NAME
+    HTTP::Tiny::UA - Higher-level UA features for HTTP::Tiny
+
+VERSION
+    version 0.004
+
+SYNOPSIS
+        use HTTP::Tiny::UA;
+    
+        my $ua = HTTP::Tiny::UA->new(
+            ...
+        );
+
+DESCRIPTION
+    This module extends HTTP::Tiny with higher-level convenience features.
+
+METHODS
+  new
+        $http = HTTP::Tiny::UA->new( %attributes );
+
+    This is inherited from HTTP::Tiny. The only difference so far is that
+    "agent" will be "HTTP-Tiny-UA/$VERSION".
+
+    *   "agent"
+
+        A user-agent string (defaults to 'HTTP-Tiny-UA/$VERSION'). If
+        "agent" ends in a space character, the default user-agent string is
+        appended.
+
+    *   "cookie_jar"
+
+        An instance of HTTP::CookieJar or equivalent class that supports the
+        "add" and "cookie_header" methods
+
+    *   "default_headers"
+
+        A hashref of default headers to apply to requests
+
+    *   "local_address"
+
+        The local IP address to bind to
+
+    *   "max_redirect"
+
+        Maximum number of redirects allowed (defaults to 5)
+
+    *   "max_size"
+
+        Maximum response size (only when not using a data callback). If
+        defined, responses larger than this will return an exception.
+
+    *   "proxy"
+
+        URL of a proxy server to use (default is $ENV{http_proxy} if set)
+
+    *   "no_proxy"
+
+        List of domain suffixes that should not be proxied. Must be a
+        comma-separated string or an array reference. (default is
+        $ENV{no_proxy})
+
+    *   "timeout"
+
+        Request timeout in seconds (default is 60)
+
+    *   "verify_SSL"
+
+        A boolean that indicates whether to validate the SSL certificate of
+        an "https" connection (default is false)
+
+    *   "SSL_options"
+
+        A hashref of "SSL_*" options to pass through to IO::Socket::SSL
+
+    See SSL SUPPORT in HTTP::Tiny for more on the "verify_SSL" and
+    "SSL_options" attributes.
+
+  get|head|put|post|post_form|mirror|delete
+    These methods are inherited from HTTP::Tiny and work the same, except
+    they invoke the HTTP::Tiny::UA request method and return a
+    HTTP::Tiny::UA::Response object.
+
+  request
+        my $res = HTTP::Tiny->new->get( $url );
+
+    Just like HTTP::Tiny::request, but returns a HTTP::Tiny::UA::Response
+    object. All other "get", "post", etc. methods eventually invoke this one
+    so all such methods return response objects now.
+
+EXCEPTIONS
+    Exceptions from "max_size", "timeout" or other error conditions will
+    result in a pseudo-HTTP status code of 599 and a reason of "Internal
+    Exception". The content field in the response will contain the text of
+    the exception.
+
+CONTRIBUTING
+    Unlike HTTP::Tiny, this module is open to additional features. Please
+    discuss new ideas on the bug tracker for feedback before implementing.
+
+    While this module is not strictly "Tiny", here are some general
+    guidelines:
+
+    *   The goal for this module is not feature/API equivalence with
+        LWP::UserAgent
+
+    *   Core module dependencies and "Tiny"-ish module dependencies are OK
+
+    *   Other CPAN modules should be used sparingly and only for good
+        reasons
+
+    *   Any XS dependencies must be optional
+
+SEE ALSO
+    *   HTTP::Tiny — the underlying client
+
+    *   HTTP::Thin — another HTTP::Tiny extension that uses HTTP::Message
+        objects
+
+    *   LWP::UserAgent — when you outgrow HTTP::Tiny, use this
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/HTTP-Tiny-UA/issues>. You will be notified
+    automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/HTTP-Tiny-UA>
+
+      git clone https://github.com/dagolden/HTTP-Tiny-UA.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+CONTRIBUTORS
+    *   Felipe Gasper <felipe@felipegasper.com>
+
+    *   Graham Ollis <perl@wdlabs.com>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2013 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

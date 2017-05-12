@@ -1,0 +1,45 @@
+HTML::Index
+===========
+
+Description
+-----------
+
+HTML::Index is a set of modules for creating an index of HTML documents so that
+they can be subsequently searched by keywords, or by Boolean combinations of
+keywords. It was originally inspired by indexer.pl script in the O'Reilly "CGI
+Programming with Perl, 2nd Edition" book
+(http://www.oreilly.com/catalog/cgi2/author.html).
+
+All storage operations are contained in the HTML::Index::Store module that can
+be subclassed to support other storage options (such as BerkeleyDB files, or
+SQL databases). Two such subclasses (HTML::Index::Store::BerkeleyBD and
+HTML::Index::DataDumper) are included in the distribution.
+
+The modules can be used to index any HTML documents - whether stored as
+files, or in a database. They support the use of stopword lists, soundex
+searches, compression of the inverted indexes using Compress::Zlib, and
+re-indexing of documents that have changed.  Search queries can be expressed as
+compound Boolean expressions, composed of keywords, parentheses, and logical
+operators (OR, AND, NOT).
+
+Installation
+------------
+
+The usual ...
+
+> perl Makefile.PL
+> make
+[ > make test ]
+> make install
+
+Copyright
+---------
+
+Copyright (c) 2001 Ave Wrigley. All rights reserved. This program is free
+software; you can redistribute it and/or modify it under the same terms as Perl
+itself.
+
+Author
+------
+
+Ave Wrigley <Ave.Wrigley@itn.co.uk>

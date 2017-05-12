@@ -1,0 +1,59 @@
+HTML-TableExtract
+-----------------
+
+HTML::TableExtract is a module that simplifies the extraction of
+information contained in tables within HTML documents.
+
+Tables of note may be specified using Headers, Depth, Count,
+Attributes, or some combination of the three. See the module
+documentation for details.
+
+
+INSTALLATION
+
+You install HTML-TableExtract, as you would install any perl module
+library, by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DOCUMENTATION
+
+See HTML/TableExtract.pm for the code. See Changes for recent changes.
+POD style documentation is included in the module. This is normally
+converted to a manual page and installed as part of the "make install"
+process. You should also be able to use the 'perldoc' utility to extract
+and read documentation from the module directly.
+
+
+SUPPORT
+
+The project is tracked on GitHub:
+
+https://github.com/mojotoad/HTML-TableExtract
+
+Problems and patches can also be submitted via:
+
+https://rt.cpan.org/Ticket/Create.html?Queue=HTML-TableExtract
+
+Questions and comments may also be sent to sisk AT mojotoad.com
+
+
+ACKNOWLEDGEMENTS
+
+Thanks to the following people for their generous bug catching, fault
+analysis, and suggestions: Celeste Suliin Burris, Jeff Casey, David
+Finberg, Michael Fowler, Robert Goff, Klaus Gottschalk, Daniel Griscom,
+Jeremy Howard, Martin Joost, Jeff Lewwid, Nicholas R. Markham, Julian
+Mehnle, Michael S. Muegel, Patrick Naubert, Jani Ollikainen, Wilson
+Snyder, Volker Stuerzl, Steve Wong, and Matt Zip.
+
+
+COPYRIGHT
+
+Copyright (c) 1999-2015 Matthew P. Sisk. All rights reserved. All wrongs
+revenged. This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

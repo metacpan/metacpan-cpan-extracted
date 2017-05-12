@@ -1,0 +1,60 @@
+Q:
+> I have one quick question. I am unclear 
+> how Template and Template::Pro interact.
+> 
+> For instance, If I use the following code:
+> 
+> use HTML::Template;
+> 
+> my $template = HTML::Template->( filename => $tmp_file );
+> 
+> ..
+> $emplate->output();
+> 
+> With Template::Pro installed, will this code actually use Template::Pro 
+> to parse and output the HTML? Or do I need to change the code to:
+> 
+> use HTML::Template::Pro;
+> my $template = HTML::Template::Pro->new( filename => $tmp_file )
+> 
+
+A:
+use HTML::Template::Pro;
+then, if you don't 'use HTML::Template;'
+both are equivalent.
+so call
+my $template = HTML::Template->new( filename => $tmp_file )
+also uses Pro.
+
+It is better to develop code with HTML::Template,
+because its debug facilities currently much better,
+but to swich ready code to HTML::Template::Pro 
+(replacing use HTML::Template with HTML::Template::Pro) 
+because it faster, lighter and so on.  
+On the other hand, it is useful for writing scripts which
+works with both modules.
+
+in case when both modules are loaded 
+use HTML::Template::Pro;
+use HTML::Template;
+
+my $template = HTML::Template::Pro->new( filename => $tmp_file )
+uses Pro,
+but 
+my $template = HTML::Template->new( filename => $tmp_file )
+uses HTML::Template.
+
+> As I read the docs, the only reason to mix Template and Template::Pro
+> would be that you needed query support from HTML::Template?
+
+Maybe.
+I also used mixing it in the same file for benchmark.pl.t
+:)
+
+
+Q:
+> I am considering using your html::template::pro and I have a question
+> about the tmpl_include tag.  Is it possible to put a template variable 
+> inside the file tag?
+A:
+It is possible through EXPR="", for example, <tmpl_include expr="variable">.

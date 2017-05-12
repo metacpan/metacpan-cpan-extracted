@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01_HTML-Template-Compiled-Plugin-LineBreak.t
+t/02_pod.t
+t/03_pod_cover.t
+lib/HTML/Template/Compiled/Plugin/LineBreak.pm
+META.yml                                 Module meta-data (added by MakeMaker)

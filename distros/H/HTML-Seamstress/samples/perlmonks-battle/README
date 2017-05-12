@@ -1,0 +1,13 @@
+This is written to address
+http://perlmonks.org/?node_id=670068
+
+
+The package View::bullet::text requires HTML::Format which is kind of
+hard to install via CPAN... do this:
+
+
+cpan> i S/SB/SBURKE/HTML-Format-2.04.tar.gz
+Distribution id = S/SB/SBURKE/HTML-Format-2.04.tar.gz
+
+cpan> install S/SB/SBURKE/HTML-Format-2.04.tar.gz
+

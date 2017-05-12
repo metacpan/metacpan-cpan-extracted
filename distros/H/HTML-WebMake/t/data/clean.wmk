@@ -1,0 +1,16 @@
+<webmake>
+
+<content name="foo" format=text/html>
+
+  foo
+  <p>
+  <h1> next foo </h1>
+  foo
+  <p>
+  <hr>
+
+</content>
+
+<out file=log/clean.html>${foo}</out>
+
+</webmake>

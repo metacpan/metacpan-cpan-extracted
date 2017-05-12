@@ -1,0 +1,74 @@
+NAME
+    Haul - Haul packages off CPAN and do things with them
+
+SYNOPSIS
+      use Haul;
+      my $h = Haul->new;
+
+      # report whether a module is installed
+      my $version = $h->installed("Acme::Colour");
+
+      # fetch a package from CPAN
+      my $filename = $h->fetch("Acme::Colour");
+
+      # fetch and extract a package from CPAN
+      my $dir = $h->extract("Acme::Colour");
+
+      # install a module from CPAN (and its deps)
+      $h->install("Acme::Colour");
+
+DESCRIPTION
+    This module knows about CPAN modules. It can report whether a module is
+    installed, can retrieve packages off CPAN that relate to a module,
+    extract them into a directory for you, and even install modules and all
+    their dependencies.
+
+    There are existing tools which do this job, but they are very
+    complicated and only deal with the current perl program. Haul can deal
+    with an external perl program, and so is ideal for build systems, SDK
+    building and automated CPAN testing.
+
+    Throughout this module, we use module names (such as "Acme::Colour")
+    instead of package names (such as "Acme-Colour"). Later releases may be
+    more featureful.
+
+METHODS
+  new
+    This is the constructor. It takes an optional argument, which is the
+    path to the perl program to install modules to.
+
+      my $h = Haul->new;
+      my $h = Haul->new(perl => "/home/acme/perl583/bin/perl");
+
+  installed
+    This method reports the version number of an installed module. It
+    returns undef if the module is not installed.
+
+      if ($h->installed("Acme::Colour") { ... }
+
+  fetch
+    Downloads the package related to a module and returns the path to it.
+
+      my $filename = $h->fetch("Acme::Colour");
+
+  extract
+    Downloads the package related to a module, extracts it into a directory
+    and returns you the path to it.
+
+      my $dir = $h->extract("Acme::Colour");
+
+  install
+    Downloads the package related to a module, and installs it (and its
+    dependencies). Make sure you have appropriate permissions.
+
+      $h->install("Acme::Colour");
+
+AUTHOR
+    Leon Brocard <acme@astray.com>
+
+COPYRIGHT
+    Copyright (C) 2004, Leon Brocard
+
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

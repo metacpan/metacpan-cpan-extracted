@@ -1,0 +1,31 @@
+Revision history for HTML-ExtractText
+
+1.002004  2016-10-30
+        - Fix breakage by Mojolicious 7.0 (dionys)
+
+1.002003  2015-04-15
+        - Internal change to make subclassing a bit saner
+
+1.002002  2015-04-15
+        - Made the module automatically figure out what text to return
+            when selected element is a form element or image
+
+1.002001  2015-04-15
+        - Added extra_processing() sub that can be
+            overriden by other classes that offer extra processing
+        - REMOVED automatic non-breaking space stripping
+
+1.001004  2015-03-26
+        - Added automatic stripping of non-breaking spaces from output
+        - Added notes on encoding
+
+1.001003  2015-03-23
+        - Added extra tests
+
+1.001002  2015-03-20
+        - Documentation corrections and clarifications
+        - Added extra checks for validity of ->extract()'s arguments
+        - Added extra tests for ->error method
+
+1.001001  2015-03-19
+        - First version released on an unsuspecting world

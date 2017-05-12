@@ -1,0 +1,102 @@
+---
+elements:
+  - type: Multi
+    label: one master label
+    elements:
+      - type: Text
+        name: r1
+      - type: Text
+        name: r2
+      - type: Text
+        name: r3
+  - type: Multi
+    elements:
+      - type: Text
+        name: r1
+        label: One
+      - type: Text
+        name: r2
+        label: Two
+      - type: Text
+        name: r3
+        label: Three
+  - type: Multi
+    label: Appointment (fixed width)
+    attrs:
+      defaults:
+        width: 50
+      width: 150
+#      individualWidth: []
+      labelWidth: 35
+      layoutConfig:
+        labelSeparator:  .:.
+    elements:
+      - type: Text
+        name: r11
+        label: Date
+      - type: Text
+        name: r2
+        label: Time
+      - type: Checkbox
+        label: st
+ 
+  - type: Multi
+    label: Appointment (individual width)
+    attrs:
+      defaults:
+        width: 50
+      individualWidth: 
+        - 210
+        - 123
+      labelWidth: 35
+      layoutConfig:
+        labelSeparator:  .:.
+    elements:
+      - type: Text
+        name: r11
+        label: Date
+      - type: Text
+        name: r2
+        label: Time
+      - type: Checkbox
+        label: st
+        
+  - type: Multi
+    attrs:
+      defaults:
+        width: 50
+      individualWidth: 
+        - 210
+        - 123
+      labelWidth: 35
+      layoutConfig:
+        labelSeparator:  .:.
+    elements:
+      - type: Text
+        name: r11
+        label: Date
+      - type: Text
+        name: r2
+        label: Time
+      - type: Checkbox
+        label: st
+ 
+  - type: Multi
+    label: Relative width
+    attrs:
+      defaults:
+        width: 50
+      individualColumnWidth: 
+        - 0.2
+        - 0.2
+      labelWidth: 35
+    elements:
+      - type: Text
+        name: r11
+        label: Date
+      - type: Text
+        name: r2
+        label: Time
+      - type: Checkbox
+        label: st
+        

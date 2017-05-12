@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+set -e
+
+main() {
+  # Dummy REPL loop:
+  while true; do
+    printf "hither> "
+    read line || {
+      echo
+      break
+    }
+    if [ -n "$line" ]; then
+      echo OK
+    fi
+  done
+}
+
+[ "$0" != "$BASH_SOURCE" ] ||
+  main "$@"
+
+# vim: set ft=sh:

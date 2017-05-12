@@ -1,0 +1,11 @@
+MANIFEST
+Makefile.PL
+Pstat.pm
+Pstat.xs
+README
+example1.pl
+example2.pl
+pack.c
+pack.h
+test.pl
+typemap

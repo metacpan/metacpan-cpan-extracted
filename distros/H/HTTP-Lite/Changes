@@ -1,0 +1,113 @@
+Revision history for Perl module HTTP::Lite
+
+2.44 2015-03-11 NEILB
+    - Switched to Dist::Zilla
+
+2.43 2014-01-29
+    - Directed people to HTTP::Tiny and LWP at the start of the doc
+    - Added links to better modules in SEE ALSO
+    - Added "use warnings" (!)
+    - Moved test.pl into t/original-tests.t
+
+2.42 2013-07-21
+    - Fixed typos reported by David Steinbrunner (thanks!)
+
+2.41 2013-07-20
+    - Reformatted this file according to CPAN::Changes::Spec
+
+2.4 2012-07-20
+    - Fixed RT #13791, which meant you couldn't request http://foobar.com --
+      had to have to trailing slash on the URL.
+    - Don't add request header if value passed is undef (RT #4546).
+    - Fixed bug where writing the request can get stuck in a loop.
+      Bug reported by Florian Kirchmeir. Fix based on Florian's patch.
+    - RT #35360 fixed (fix included in report).
+    - Documentation tidy-up
+    - Neil Bowers (NEILB) granted co-maint by Adam (thanks)
+
+2.3 2010-12-14
+	- No functional changes
+	- Updated Module::Install to 1.00
+	- Updated author tests and moved to xt directory
+
+2.2 2009-10-01
+	- Moved Lite.pm into lib directory
+	- Reversed the Changes file order to reverse chronological
+	- Moved to Makefile.PL to Module::Install to autodetect more things
+	- Add no_index entries for the test data
+	- Remove reliable on (partially) dead website for testing
+	- Now this module is mature and unlikely to change much, move to
+	  a more stable and less complicated versioning scheme that suffers
+	  less complications in the Perl toolchain. Also, dotted integers
+	  without the use of something like version.pm isn't strictly
+	  allowed.
+
+2.1.6 2004-01-21
+	- Fixed User-Agent header problem
+	- Fixed lowercase header bugs
+	- Thanks goes to contributed patches by various people
+
+2.1.5 2003-10-05
+	- Fixed duplicate my in method()
+	- Added default content-type for posts
+	- header_at_once mode, patch submitted by Roman Radaschutz
+
+2.1.3 2002-02-10
+	- Documentation fixes
+	- Fixed large write bug in http_write
+	- Documented callback system
+	- Added local_addr and local_port settings
+	- Added method setting to allow use of any request method (GET, PUT,
+	  POST, HEAD)
+
+2.1.1 2002-06-13
+	- Documentation fix
+	- Compatibility fix for 5.005
+
+2.1.0 2002-06-12
+	- Added a callback hook to request() to allow handling of very large
+          files and to allow filtering of content.
+	- Rewrote significant parts of the code to use references instead
+	  of passing data.
+	- Rewrote the engine to read data in blocks instead of by lines
+	  when not transferring headers
+	- Removed the redundant ->content method and associated variables to
+          enable handling of large files.
+	- Added lots of debugging code (Enable with $http->{DEBUG}
+	- Changed ->reset to only clear state and headers instead of also
+	  resetting all switches (HTTP/1.1 state, DEBUG state).
+	- Singnificant speedup of data transfer code
+	- Changed filehandle names to be $url.time()
+	- Eliminated all -w warnings
+
+1.0.2 2002-06-11
+	- Fixed a few errors in the distribution including missing
+ 	  test files.
+
+1.0.1 2002-06-11
+	- Changed default protocol to HTTP/1.0 and added a switch to
+	  activate HTTP/1.1 protocol.
+
+1.0.0 2002-01-08
+	- Fixed bug where content-type was always set to only set it has not
+	  yet been set.
+	  Thanks to Rui Miguel Seabra <rms@multicert.com>
+	- Fixed bug where file descriptors were not being released by
+	  request()
+ 	  Thanks to Ross Snyder" <ross@newgrounds.com>
+	- Fixed a bug preventing the module from working with Win32.  The
+          side-effect is that timeouts do not work in Win32.
+	  Thanks to Andrew Brown <Andrew_Brown@adc.com>
+
+0.2.5 2000-12-21
+	- fixed minor bug with MIME type provided for posts to be
+	  x-www-form-urlencoded, as reported by 
+	  Tobias Kunze <Tobias.Kunze@horz.de>
+
+0.03 2000-09-09
+        - fixed two minor bugs as found and reported by "Marcus I. Ryan"
+	  <shad@cce-7.cce.iastate.edu>.  See Lite.pm for details.
+
+0.01 2000-08-27
+	- original version; created by h2xs 1.1.1.2
+

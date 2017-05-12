@@ -1,0 +1,51 @@
+Revision history for Perl extension HTML::Encoding.
+
+0.61  Fri Sep 24 00:00:00 2010
+	- Fixed https://rt.cpan.org/Ticket/Display.html?id=61603
+
+0.60  Sun Jun 30 09:55:00 2008
+	- minor bugfixes
+
+0.59  Sun Jun 29 23:55:00 2008
+	- De-listed URI as dependency, not my bug
+	- added eg/detector.pl
+	- added t/98podsyn.t
+	- added t/99podcov.t
+	- added 'dist' options in Makefile.PL
+	- marked private subs with an underscore
+
+0.58  Sun Jun 29 19:55:00 2008
+	- List URI as dependency to prevent test failure
+	- Added LICENCE => 'perl' to Makefile.PL
+
+0.57  Wed Apr  9 03:55:00 2008
+	- updated the pitfyful README file
+	- fixed a performance problem in my_decode reported
+	  by Ville Skytta
+
+0.56  Wed Dec  6 06:25:00 2007
+	- updated changes file
+	- fixed line end issues in test
+
+0.55  Wed Dec  5 16:25:00 2007
+	- added basic test suite
+
+0.54  Wed Dec  5 14:25:00 2007
+	- http://www.w3.org/mid/64584787-9995-43F3-A34E-D010ED9811D6@w3.org
+	  fixed
+
+0.53  Tue May 22 10:25:00 2007
+	- http://rt.cpan.org/Public/Bug/Display.html?id=16351
+	  fixed
+
+0.52  Tue Dec 14 09:25:00 2004
+	- encoding_from_http_message encoding defaulting did
+	  not work as intended, fixed.
+
+0.51  Tue Dec 14 08:45:00 2004
+	- encoding_from_html_document returned a list in scalar
+	  context if the document had a XML declaration, fixed.
+
+0.50  Tue Nov  2 03:10:15 2004
+	- rewrite from scratch
+

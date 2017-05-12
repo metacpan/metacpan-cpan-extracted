@@ -1,0 +1,48 @@
+---
+abstract: 'Lightweight field hash for inside-out objects'
+author:
+  - 'Fuji, Goro (gfx) <gfuji(at)cpan.org>.'
+build_requires:
+  Devel::PPPort: '3.19'
+  ExtUtils::MakeMaker: '6.59'
+  ExtUtils::ParseXS: '2.21'
+  Test::LeakTrace: '0.07'
+  Test::More: '0.62'
+configure_requires:
+  Module::Build: '0.4005'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.9, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Hash-FieldHash
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Hash::FieldHash:
+    file: lib/Hash/FieldHash.pm
+    version: '0.15'
+requires:
+  XSLoader: '0.02'
+  parent: '0.221'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/gfx/p5-Hash-FieldHash/issues
+  homepage: https://github.com/gfx/p5-Hash-FieldHash
+  repository: git://github.com/gfx/p5-Hash-FieldHash.git
+version: '0.15'
+x_contributors:
+  - 'Fuji Goro <fuji.goro@dena.jp>'
+  - 'Fuji, Goro <g.psy.va@gmail.com>'
+  - 'Todd Rinaldo <toddr@cpan.org>'
+  - 'FUJI Goro (gfx) <gfuji@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

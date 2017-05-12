@@ -1,0 +1,70 @@
+Revision history for Hash-MD5
+
+#========================================================================
+# Version 0.01  Date: 2015/01/13 (Mario Zieschang)
+#========================================================================
+
+* First version, released on an unsuspecting world.
+
+#========================================================================
+# Version 0.02  Date: 2015/01/16 (Mario Zieschang)
+#========================================================================
+
+* Bugfix got always the same checksum
+ 
+* Add sub for arrayref
+
+* Refractoring
+
+#========================================================================
+# Version 0.03  Date: 2015/01/17 (Mario Zieschang)
+#========================================================================
+
+* Bugfix tests failed
+
+#========================================================================
+# Version 0.04  Date: 2015/01/17 (Mario Zieschang)
+#========================================================================
+
+* Bugfix ticket #101584 
+
+* Bugfix ticket #101585 
+	- arrayref and hashref got an extra element with the number of counted elements 
+  (special thanks to SREZIC)
+
+#========================================================================
+# Version 0.05  Date: 2015/01/24 (Mario Zieschang)
+#========================================================================
+
+* Bugfix ticket #101585 
+  (special thanks to SREZIC)
+
+* Bugfix ticket #101606 
+  (special thanks to SREZIC and ETHER)
+
+#========================================================================
+# Version 0.06  Date: 2015/09/09 (Mario Zieschang)
+#========================================================================
+
+* Bugfix ticket #106861 
+* Bugfix ticket #106862 
+  (special thanks to ETHER)
+
+#========================================================================
+# Version 0.07  Date: 2015/09/10 (Mario Zieschang)
+#========================================================================
+
+* Bugfix ticket #106998 
+  (special thanks to BOBMATH)
+
+#========================================================================
+# Version 0.08  Date: 2015/09/11 (Mario Zieschang)
+#========================================================================
+
+* Bugfix ticket #106998 
+  (special thanks to BOBMATH)
+  (special thanks to ETHER)
+
+* Bugfix ticket #106861 
+* Bugfix ticket #106862 
+  (special thanks to ETHER)

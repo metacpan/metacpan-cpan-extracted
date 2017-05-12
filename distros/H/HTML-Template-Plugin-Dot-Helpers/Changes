@@ -1,0 +1,17 @@
+Revision history for HTML-Template-Plugin-Dot-Helpers
+
+0.05    2013-01-18  Rhesa Rozendaal <rhesa@cpan.org>
+        Fix RT64434
+
+0.04    2010-01-07  Rhesa Rozendaal <rhesa@cpan.org>
+        Add repository to META.yml. No code changes.
+
+0.03    2007-12-21  Rhesa Rozendaal <rhesa@cpan.org>
+        - fixed test. no functional changes
+
+0.02    2005-10-09  Rhesa Rozendaal <rhesa@cpan.org>
+        - fixed build problem: Makefile.PL wasn't bundled.
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

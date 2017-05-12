@@ -1,0 +1,25 @@
+Changes
+ignore.txt
+bin/hpkp_pin_sha256
+lib/HTTP/PublicKeyPins.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/boilerplate.t
+t/01-pin.t
+t/certs/duckduckgo.pem
+t/certs/dsa.pem
+t/certs/google.pem
+t/certs/corrupt.pem
+t/certs/x509_1.pem
+t/certs/x509.pem
+t/certs/trusted.pem
+t/keys/duckduckgo.pub
+t/reqs/new.pem
+t/reqs/rsa.pem
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,18 @@
+Revision history for Ham-Reference-Solar
+
+0.01    2007-07-28 Sun
+        - First version released.
+
+0.02    2007-07-29 Mon
+        - Regenerated package distribution files using Module::Starter instead of h2xs.
+        - Added LWP::UserAgent to PREREQ_PM in Makefile.PL.
+        - Used pod2text to generate a better README from the module's pod docs.
+        - Changed get_hash_ref function to get_hashref.
+        - Removed the items() function since it's no longer used.
+        - Made numerous minor documentation changes.
+
+0.03    2010-12-19 Sun
+        - Added LICENSE file, and changed docs and configs to use the Artistic 2.0
+          license.
+        - Start git repository for this module.
+

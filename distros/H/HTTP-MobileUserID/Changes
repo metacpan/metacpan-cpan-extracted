@@ -1,0 +1,8 @@
+Revision history for Perl extension HTTP::MobileUserID
+
+0.02  Tue Jun 26 15:32:04 2007
+        - fixed type in pod
+          (thanks to k.imagome)
+
+0.01  Sat May  5 23:39:45 2007
+        - original version

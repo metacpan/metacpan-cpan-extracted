@@ -1,0 +1,19 @@
+------------0xKhTmLbOuNdArY
+Content-Disposition: form-data; name="upload"; filename="xx xx.xx xx.tar.gz.Z"
+Content-Type: text/plain
+
+Some random junk
+
+------------0xKhTmLbOuNdArY
+Content-Disposition: form-data; name="upload2"; filename="2013-06-19 at 11.37.56 PM.png"
+Content-Type: text/plain
+
+Some random junk
+
+------------0xKhTmLbOuNdArY
+Content-Disposition: form-data; name="upload3"; filename="C:\Documents\foo bar\bar baz.txt"
+Content-Type: text/plain
+
+blah blah
+
+------------0xKhTmLbOuNdArY--

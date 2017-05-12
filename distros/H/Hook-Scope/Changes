@@ -1,0 +1,22 @@
+Revision history for Perl extension Hook::Scope.
+
+0.04  Wed Jan  1 21:10:08 CET  2003
+	- Preliminary support for the PRE {} statement.
+	  Needs B::Generate and optimizer to work.
+        - In next version POST {} will be compiletime,
+	  and runtime, POST {} will be renamed leave {}
+
+0.03  Sun Sep 22 13:01:59 CEST 2002
+	- [rt.cpan.org:1197] Applied documentation patch from
+	Elizabeth Mattijsen
+	- Uses Module::Signature to verify module with my gpg key
+	- Updated documentation to provide bug report email address	
+
+0.02  Sun Jun  9 23:56:08 CEST 2002
+	- Changed leave() to POST() after suggestion from
+	Rafael Garcia-Suarez to be more compatible with Perl6 naming.
+
+0.01  Sun Jun  9 10:13:36 2002
+	- original version; created by h2xs 1.22 with options
+		--skip-autoloader -b5.5.0 -g -c -f Hook::Scope
+

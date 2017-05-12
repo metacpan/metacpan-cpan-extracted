@@ -1,0 +1,33 @@
+Revision history for Handel-Storage-RDBO
+
+1.00003 Mon  Aug 09 22:13:27 2010
+	- Fixed failing tests under uselongdouble
+	- Tested with latest RDBO modules
+	- Tested in 5.8.9, 5.10.1, 5.12.1
+
+1.00002 Sat Jan 19 23:18:23 2008
+    - Tested with latest RDBO Components
+    - Fixed META.yml syntax (Author)
+    - Fixed Perl::Critic tests
+
+1.00001 Fri July 20 21:42:19 2007
+    - Fixed test schema to actually use Handel 1.0 schema
+    - Changed tests over to TEST_AUTHOR
+
+1.00000 Sun June 24 08:57:22 2007
+    - Converted to Module::Install
+    - Updated tests after Handel Currency changes
+    - Inflate trigger now handles blessed currency objects
+    - Storage classes now cache/reuse same Rose::DB
+    - Item operations in storae now share pae Rose::DB object
+    - Added checkout tests
+    - Removed t/style_critic_tests. ETOOMUCHWORKFORLITTLEBENEFIT
+
+0.01_02 Thur Dec 21 12:29:00 2006
+    - Reworked init_db/Storage connection with the help of John Siracusa
+    - Storage connection_info is now just like the DBIC storage connection_info
+    - Requires latest version of Rose::DB from svn/0.732 when released
+    - Fixed pod typoe in Storage::Order::Item
+
+0.01_01
+    - First version, released on an unsuspecting world.

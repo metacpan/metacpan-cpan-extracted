@@ -1,0 +1,88 @@
+NAME
+
+    HPC::Runner::PBS - Submit jobs to a PBS job scheduler.
+
+DESCRIPTION
+
+    HPC::Runner::PBS is a wrapper around qsub and can be used to submit
+    arbirtary bash commands to PBS.
+
+    It has two levels of management. The first is the main qsub command,
+    and the second is the actual job, which runs commands in parallel,
+    controlled by HPC::Runner::Threads or HPC::Runner::MCE.
+
+    It supports job dependencies. Put in the command 'wait' to tell PBS
+    that some job or jobs depend on some other jobs completion. Put in the
+    command 'newnode' to tell HPC::Runner::PBS to submit the job to a new
+    node.
+
+    The only necessary option is the --infile, and --queue if you wish to
+    run on a queue besides s48.
+
+    The bulk of this code is extended from HPC::Runner::Slurm.
+
+ queue
+
+    Same as the partition in HPC::Runner::Slurm
+
+ walltime
+
+    Define PBS walltime
+
+ mem
+
+ template_file
+
+    actual template file
+
+    One is generated here for you, but you can always supply your own with
+    --template_file /path/to/template
+
+SUBROUTINES/METHODS
+
+ run()
+
+    First sub called Calling system module load * does not work within a
+    screen session!
+
+ submit_slurm()
+
+    Submit jobs to PBS using qsub
+
+    Uses almost the same logic as submit_slurm, so we'll keep that.
+
+    This subroutine was just about 100% from the following perlmonks
+    discussions. All that I did was add in some logging.
+
+    http://www.perlmonks.org/?node_id=151886 You can use the script at the
+    top to test the runner. Just download it, make it executable, and put
+    it in the infile as
+
+    perl command.pl 1 perl command.pl 2 #so on and so forth
+
+SYNOPSIS
+
+      use HPC::Runner::PBS;
+
+AUTHOR
+
+    Jillian Rowe <jillian.e.rowe@gmail.com>
+
+Acknowledgements
+
+    This module was originally developed at and for NYU Abu Dhabi in the
+    Center for Genomics and Systems Biology. With approval from NYUAD, this
+    information was generalized and put on github, for which the authors
+    would like to express their gratitude.
+
+COPYRIGHT
+
+    Copyright 2015- Jillian Rowe
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+

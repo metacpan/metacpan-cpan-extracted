@@ -1,0 +1,8 @@
+Revision history for Perl extension HTML::STable.
+
+0.01  Fri Jul 13 13:29:23 2001
+	- original version; created by h2xs 1.19
+
+0.02  Wed Aug  8 12:45:22 2001
+        - changed insensitive sort flag from "a" to "i"
+        - added background attribute for table cells

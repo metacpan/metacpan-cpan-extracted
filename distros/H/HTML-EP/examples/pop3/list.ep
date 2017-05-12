@@ -1,0 +1,89 @@
+<ep-package name="HTML::EP::Examples::POP3Client">
+<ep-examples-pop3client-list>
+<ep-language language="de">
+  <ep-set var="ShowButton" val="Anzeigen">
+  <ep-set var="SendButton" val="Beantworten">
+  <ep-set var="DeleteButton" val="Löschen">
+  <ep-set var="BackButton" val="Zurück">
+  <ep-set var="NextButton" val="Weiter">
+<ep-language language="en">
+  <ep-set var="ShowButton" val="Show Me">
+  <ep-set var="SendButton" val="Reply">
+  <ep-set var="DeleteButton" val="Delete">
+  <ep-set var="BackButton" val="Back">
+  <ep-set var="NextButton" val="Weiter">
+</ep-language>
+<html><head><title><ep-language de="POP3-Mailfolder" en="POP3 Mailfolder">
+</title></head>
+<body bgcolor="#ffffff">
+<h1><ep-language de="POP3-Mailfolder" en="POP3 Mailfolder"></h1>
+<ep-if eval="$list_num$">
+  <p><div align=center>
+    <table border=1>
+      <tr>
+        <th>Nr.</th>
+        <th><ep-language de="Betreff" en="Subject"></th>
+        <th><ep-language de="Absender" en="From"></th>
+        <th><ep-language de="Größe" en="Size"></th>
+        <th>&nbsp;</th>
+      </tr>
+<ep-list items="list" item="l">
+      <tr>
+        <td align=right>$l->nr$</td>
+        <td>$&HNBSP->l->subject$</td>
+        <td>$&HNBSP->l->from$<br>$&HNBSP->l->date$</td>
+        <td align=right>$&HNBSP->l->size$</td>
+        <td>
+          <form action=show.ep method=post>
+	    <input type=hidden name="pop3server" value="$pop3server$">
+	    <input type=hidden name="pop3user" value="$pop3user$">
+	    <input type=hidden name="pop3password" value="$pop3password$">
+	    <input type=hidden name="id" value="$l->id$">
+	    <input type=hidden name="i" value="$l->i$">
+            <input type=submit name=show value="$ShowButton$">
+            <br>
+            <input type=submit name=reply value="$SendButton$">
+	    <br>
+            <input type=submit name=delete value="$DeleteButton$">
+          </form>
+        </td>
+      </tr>
+</ep-list>
+    </table>
+    <table><tr>
+    <ep-if eval="$start$">
+      <td><form action=show.ep method=post>
+	<input type=hidden name="pop3server" value="$pop3server$">
+	<input type=hidden name="pop3user" value="$pop3user$">
+	<input type=hidden name="pop3password" value="$pop3password$">
+        <input type=hidden name="start" value="$prev$">
+        <input type=hidden name="max" value="$max$">
+        <input type=submit value="$BackButton$">
+      </form></td>
+    </ep-if>
+    <ep-if eval="$next$">
+      <td><form action=show.ep method=post>
+	<input type=hidden name="pop3server" value="$pop3server$">
+	<input type=hidden name="pop3user" value="$pop3user$">
+	<input type=hidden name="pop3password" value="$pop3password$">
+        <input type=hidden name="start" value="$next$">
+        <input type=hidden name="max" value="$max$">
+        <input type=submit value="$NextButton$">
+      </form></td>
+    </ep-if>
+    </table>
+    </div>
+  </p>
+<ep-else>
+  <p>
+    <ep-if eval="$start$">
+      <ep-language de="Es sind keine weiteren Mails vorhanden."
+                   en="No further mails have been found.">
+    <ep-else>
+      <ep-language de="Zur Zeit sind keine Mails vorhanden."
+                   en="No mails are currently available.">
+    </ep-if>
+  </p>
+</ep-if>
+</body>
+</html>

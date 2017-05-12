@@ -1,0 +1,13 @@
+Revision history for HEP-MCNS
+
+0.01	2015-05-18 11:22:23+02:00 Europe/Berlin
+	- init
+
+0.02	Mo 18 Mai 2015 11:29:00 CEST 	
+	- partice_code added
+
+0.021	Mo 18 Mai 2015 15:12:07 CEST
+	- SYNOPSIS FIXED
+
+0.022	Di 19 Mai 2015 13:04:43 CEST
+	- updated for old perl 5.8

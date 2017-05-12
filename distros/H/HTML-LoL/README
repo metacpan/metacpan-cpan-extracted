@@ -1,0 +1,101 @@
+NAME
+    HTML::LoL - construct HTML from pleasing Perl data structures
+
+SYNOPSIS
+      use HTML::LoL;
+
+      &hl(sub { print shift },
+          [body => {bgcolor => 'white'},
+           [p => 'Document body', ...], ...]);
+
+    See EXAMPLE section below.
+
+DESCRIPTION
+    This module allows you to use Perl syntax to express HTML. The
+    function `hl()' converts Perl list-of-list structures into HTML
+    strings.
+
+    The first argument to `hl()' is a callback function that's
+    passed one argument: a fragment of generated HTML. This callback
+    is invoked repeatedly with successive fragments until all the
+    HTML is generated; the callback is responsible for assembling
+    the fragments in the desired output location (e.g., a string or
+    file).
+
+    The remaining arguments to `hl()' are Perl objects representing
+    HTML, as follows:
+
+    [TAG, ...]
+        TAG is a string (the name of an HTML element); remaining
+        list items are any of the forms described herein.
+        Corresponds to <TAG>...</TAG>. If TAG is an "empty element"
+        according to `%HTML::Tagset::emptyElement', then the </TAG>
+        is omitted.
+
+    [TAG => {ATTR1 => VAL1, ATTR2 => VAL2, ...}, ...]
+        Corresponds to <TAG ATTR1="VAL1" ATTR2="VAL2" ...>...</TAG>.
+        (As above, </TAG> is omitted if TAG is an "empty element.")
+        Each ATTR is a string. Each VAL is either a string, in which
+        case the value gets HTML-entity-encoded when copied to the
+        output, or a list reference containing a single string (viz.
+        [VAL]) in which case the value is copied literally.
+
+        Finally, for boolean-valued attributes, VAL may be
+        `hl_bool(BOOLEAN)', where BOOLEAN is a Perl expression. If
+        BOOLEAN is true, the attribute is included in the output;
+        otherwise it's omitted.
+
+    Any string
+        Strings are copied verbatim to the output after entity-
+        encoding.
+
+    `hl_noquote(...)'
+        Suppresses entity-encoding of its arguments.
+
+    `hl_requote(...)'
+        Reenables entity-encoding of its arguments (use it inside a
+        call to `hl_noquote()').
+
+    `hl_preserve(...)'
+        Normally, HTML::LoL tries to optimize the whitespace in the
+        HTML it emits (without changing the meaning of the HTML).
+        This suppresses that behavior within its arguments.
+
+    `hl_entity(NAME)'
+        Includes the HTML character-entity named NAME.
+
+EXAMPLE
+      &hl(sub { print shift },
+          [table => {border => 2, width => '80%'},
+           [tr =>
+            [td => {nowrap => &hl_bool(1)}, 'This & that'],
+            [td => {nowrap => &hl_bool(0)}, '<b>This is not bold</b>'],
+            [td => [b => 'But this is']],
+            [td => &hl_noquote('<b>And so is this</b>')]]]);
+
+    prints:
+
+      <table width="80%" border="2">
+       <tr>
+        <td nowrap>This &amp; that</td>
+        <td>&lt;b&gt;This is not bold&lt;/b&gt;</td>
+        <td><b>But this is</b></td>
+        <td><b>And so is this</b></td>
+       </tr>
+      </table>
+
+SEE ALSO
+    perllol(1), HTML::Tree(3)
+
+    This module was inspired by the `new_from_lol()' function in the
+    HTML::Tree package by Gisle Aas and Sean M. Burke.
+
+COPYRIGHT
+    Copyright 2000 Bob Glickstein.
+
+    This library is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+AUTHOR
+    Bob Glickstein - http://www.zanshin.com/bobg/ - bobg@zanshin.com
+

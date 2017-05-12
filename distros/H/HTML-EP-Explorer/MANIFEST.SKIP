@@ -1,0 +1,8 @@
+~$
+^Makefile(.old)?$
+^blib/
+^lib/HTML/EP/Explorer/Config.pm$
+^html/cgi/nph-logfile.cgi$
+^pm_to_blib$
+^HTML-EP-Explorer-\d+\.\d+\.tar\.gz$
+^HTML-EP-Explorer-\d+\.\d+/

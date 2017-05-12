@@ -1,0 +1,50 @@
+---
+abstract: 'Lightweight FillInForm module in Pure Perl'
+author:
+  - 'Goro Fuji (藤 吾郎) <gfuji(at)cpan.org>'
+build_requires:
+  CGI: '0'
+  ExtUtils::MakeMaker: '6.59'
+  Test::More: '0.62'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-FillInForm-Lite
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  HTML::FillInForm::Lite:
+    file: lib/HTML/FillInForm/Lite.pm
+    version: '1.15'
+  HTML::FillInForm::Lite::Compat:
+    file: lib/HTML/FillInForm/Lite/Compat.pm
+    version: '1.15'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/gfx/p5-HTML-FillInForm-Lite/issues
+  homepage: https://github.com/gfx/p5-HTML-FillInForm-Lite
+  repository: git://github.com/gfx/p5-HTML-FillInForm-Lite.git
+version: '1.15'
+x_contributors:
+  - 'Fuji, Goro <fuji.goro@dena.jp>'
+  - 'tokuhirom <tokuhirom@gmail.com>'
+  - 'Fuji, Goro <g.psy.va@gmail.com>'
+  - 'mono <mono@mono0x.net>'
+  - 'Todd Rinaldo <toddr@cpanel.net>'
+  - 'FUJI Goro (gfx) <gfuji@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

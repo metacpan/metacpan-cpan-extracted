@@ -1,0 +1,1945 @@
+Revision history for HTML::Mason.
+
+** denotes an incompatible change
+
+1.56     2014-11-14
+
+    [ BUG FIXES ]
+
+    - Fix a packaging issue with the last release that prevent PAUSE from
+      indexing some modules in the tarball.
+
+1.55     2014-11-14
+
+    [ BUG FIXES ]
+
+    - Shut up warnings from recent versions of CGI.pm. Patch by Kevin
+      Falcone. GitHub PR #1.
+
+1.54  Jan 19, 2014
+
+    [ DISTRIBUTION ]
+
+    - Remake with gnutar
+
+1.53  Jan 18, 2014
+
+    [ DISTRIBUTION ]
+
+    - Attempt to fix corrupted tar
+
+1.52  Oct 9, 2013
+
+    [ BUG FIXES ]
+
+    - Ignore 'Software caused connection abort' errors. RT #49031. Submitted
+      by Morten Bjoernsvik.
+
+    - Sort hash keys to deal with Perl 5.18+ hash randomization. RT
+      #88708. Submitted by Zefram.
+
+    - Fix 'and' precedence with explicit parens. RT #87050. Submitted by
+      Alex Vandiver.
+
+    - Escape each part of substitution, not their
+      concatenation. github.com/jonswar/perl-HTML-Mason/pull/1. Submitted
+      by Ricardo Signes.
+
+    [ ENHANCEMENTS ]
+
+    - Add use_warnings flag, similar to
+      use_strict. github.com/jonswar/perl-HTML-Mason/pull/4. Submitted by
+      Aevar Bjarmason.
+
+1.51  May 8, 2013
+
+    [ DISTRIBUTION ]
+
+    - Fix hardcoded version
+
+    [DOCS]
+
+    - Add HTML::Mason::FAQ, from old masonhq.com website
+
+1.50 Jul 11, 2012
+
+    [ DISTRIBUTION ]
+
+    - Switch to Dist::Zilla
+    - Eliminate HTML docs from distribution, available on web
+    - Move live Apache tests to author-only
+
+1.49 Feb 27, 2012
+
+    [ DOCS ]
+
+    - Fixed misspellings in docs. RT #74676. Reported by Salvatore Bonaccorso.
+
+1.48 Feb 3, 2012
+
+    [ BUG FIXES ]
+
+    - Calling a subcomponent from inside an anonymous component (created via
+  $interp->make_component) caused an uninitialized value warning. Reported by
+  Javier Amor Garcia.
+
+1.47 Oct 21, 2011
+
+    [ BUG FIXES ]
+
+    - Silenced an uninitalized value warning from ApacheHandler with newer
+  versions of Perl. RT #61900.
+
+1.46 Aug 1, 2011
+
+    [ DOCS ]
+
+    - Mention Mason 2 in documentation
+
+1.45 Apr 3, 2010
+
+    [ BUG FIXES ]
+
+    - Silenced some new warnings that appeared when using Mason with Perl
+  5.12.0+. Reported by Jesse Vincent.
+
+1.44 Jan 4, 2010
+
+    [ ENHANCEMENTS ]
+
+    - Use Log::Any to log various events, such as the start and end of each
+  request and each component call.
+
+    - Add $m->log, allowing easy logging to a component-specific namespace.
+
+    - Fix use of CHI when no data directory is specified.
+
+1.43 Dec 25, 2009
+
+    [ BUG FIXES ]
+
+    - If a component was located in a patch with spaces, the feature which
+  referred to errors by their source file line number was broken. This could
+  cause test failures if the package was downloaded into a path with spaces by
+  CPAN. Reported by Shawn Moore. RT #53072.
+
+    - HTML::Entities is no longer an optional dependency. This fixes some issues
+  with packaged versions of Mason. Reported by Jens Rehsack. RT #48890.
+
+    - $m->flush_buffer is now ignored when inside $m->scomp or $m->content. Patch
+  by Frédéric Brière, with extra tests from Ruslan Zakirov. RT #38924.
+
+1.42 May 7, 2009
+
+    [ BUG FIXES ]
+
+    - Fix 10b-cache-chi.t to work with latest version of CHI - expire_if
+  and ref of cache changed
+
+    - Fixed a bug where attempting to load a module that failed to compile
+  in a Mason component could mask the compilation error. RT #39803.
+
+    - Fixed the print method in HTML::Mason::FakeApache. It was including
+  the object itself in the output. Patch by Martin Petricek. RT
+  #43035.
+
+1.41  May 5, 2009
+
+    [ BUG FIXES ]
+
+    - This is a one-fix release to get this module working with the latest
+  version of Exception::Class (1.27).
+
+1.40  Jul 24, 2008
+
+    [ BUG FIXES ]
+
+    - Attempting to set multiple cookies when running under CGIHandler
+  failed. Patch by Andrej Czapszys. RT #33710.
+
+    - The Request->alter_superclass() method could cause a segfault
+  (sometimes) with perl 5.10.0. Reported and patched by Jesse Vincent.
+
+1.39  Jan 30, 2008
+
+    [ ENHANCEMENTS ]
+
+    - CHI may now be used as the backend for $m->cache as an updated
+  alternative to Cache::Cache.  Among other things, this facilitates
+  easy use of Cache::FastMmap and memcached for data
+  caching. Cache::Cache is still the default for now, and is still
+  listed as a prereq for Mason.
+
+1.38  Dec 20, 2007
+
+    [ BUG FIXES ]
+
+    - (Hopefully) fixed a problem where the cpan shell thought that Mason
+  needed mod_perl1 as a prereq when it was trying to require a newish
+  version of mod_perl2.
+
+    - If you called $r->send_http_header() explicitly in a component under
+  mod_perl 1.x, headers would end up getting sent again once the
+  component finished executing. Reported by Brett Gardner.
+
+    - Component call with content end tags could not span multiple
+  lines. Fixing this makes it consistent with the opening tag. Patch
+  by Alex Robinson.
+
+    - Includes a possible fix for a test failure in 10-cache.t. This
+  failure is a problem in the test code, not the Mason core code.
+
+1.37  Sep 6, 2007
+
+    [ BUG FIXES ]
+
+    - Mason could send the HTTP headers twice under mod_perl 1.x when
+  making a request for a directory path that was handled by a
+  dhandler. Reported by David Beaudet.
+
+    - If you set the Content-Type header in a handler sub before passing
+  control to Mason via ApacheHandler, this value was overwritten if
+  the request was for a directory path.
+
+    [ ENHANCEMENTS ]
+
+    - Make t/08-ah.t and t/16-live-cgi.t more verbose about why they are
+  skipping tests when they do so. Based on a patch from
+  C.J. Adams-Collier.
+
+1.36  Jun 10, 2007
+
+    [ BUG FIXES ]
+
+    - If a component with content call ending tag appeared inside a
+  subcomp or method without an opening tag, then the compiler dies
+  with a Perl error, rather than reporting the error
+  usefully. Reported by Rich Williams.
+
+    - Under mod_perl 2, if decline_dirs was false and a directory was
+  requested, you got a "Use of uninitialized value" warning from
+  ApacheHandler in your logs. Reported by Ogden Nefix.
+
+    - HTML::Entities is now a prereq. Not requiring it made for various
+  weird gyrations in the tests that didn't seem to work all the time,
+  causing various failures. Fixes RT #24827.
+
+    - Request::CGIHandler->exec() now returns the return value from
+  executing the component, just like a normal Request. Reported by
+  Adrian Irving-Beer.
+
+    [ ENHANCEMENTS ]
+
+    - Added a new Compiler::ToObject parameter,
+  named_component_subs. Turning this on makes it possible to profile
+  components.
+
+    - Added a new Request parameter, component_error_handler. This can be
+  set to change how component compilation and runtime errors are
+  handled. It can also be set to false to just let errors go
+  unhandled, which could speed up apps that throw a lot of non-object
+  exceptions.
+
+1.35  Oct 17, 2006
+
+    [ BUG FIXES ]
+
+    - Version 1.34 introduced a bug that caused corruption of the callers
+      stack when a component call with content was used.
+
+    - When Mason tried to load a package required for a feature (like
+      Cache::Cache for $m->cache) and this failed, the error message would
+      say something like "Can't locate Cache::Cache". However, the real
+      error could be that Cache::Cache was present, but a module required by
+      Cache::Cache was not. Now we report the real missing module.
+
+    - Some people saw a spurious test failure in 05-request.t. RT #22099.
+
+    - Added Module::Build to the build_requires prereqs.
+
+1.34  Oct 14, 2006
+
+    [ BUG FIXES ]
+
+    - List Module::Build as a build prereq in the Build.PL, so it shows up
+      in META.yml. Reported by Colin Henein. RT #22097.
+
+    - Apache::Request and mod_perl{1,2} will no longer show up as prereqs
+      in META.yml. Requested by Jesse Vincent.
+
+    - Fixed a serious memory leak bug where an object referenced in
+      arguments to another component was never destroyed. Reported by
+      Dominic Mitchell.
+
+    - Using $m->call_next from a helper component should reset base_comp
+      to the request_comp.  Reported by Mark Elrod.
+
+    - The 08-ah.t and 16-live-cgi.t test files could fail with an error
+      like "Failed to re-load 'Mason::Build'" when Mason was being installed
+      via the CPANPLUS shell (and maybe other cases). Reported by David
+      Wheeler.
+
+    - Fixed a bug where $m->clear_buffer inside a component called from a
+      comp_with_content did not clear all buffers.
+
+    [ ENHANCEMENTS ]
+
+    - Added support for get_server_port() in FakeApache. Patch from Dieter
+      Piercey.
+
+1.33  May 28, 2006
+
+    [ BUG FIXES ]
+
+    - If $m->flush_buffer() was called when there was a filter somewhere
+      in the component chain, the flush did nothing. Task id #596. Reported
+      by Shane McCarron.
+
+    - Added several tests for $m->flush_buffer() and $m->clear_buffer(),
+      which will hopefully avoid more bugs in this part of the code.
+
+    - On Win32, a test failed when Mason tried to use rename to move a dir
+      into an existing dir. Patch by Shane McCarron. Task id #594 and RT
+      #17828.
+
+    - Trying to load HTML::Mason::ApacheHandler outside of mod_perl caused
+      an error "like Undefined subroutine &Apache::perl_hook called at
+      /usr/local/share/perl/5.8.7/HTML/Mason/ApacheHandler.pm line
+      257". While it will never _run_ outside of mod_perl, it should at
+      least load.
+
+    - Fixed test in 14a-fake_apache.t that failed with CGI.pm >= 3.16.
+
+    - The example code in the HTML::Mason::Resolver::Null code was
+      just wrong. Fixed by John Siracusa.
+
+    - Fixed a test failure in 06-compile.t when using bleadperl. RT
+      #17118.
+
+1.32  January 3, 2006
+
+    [ BUG FIXES ]
+
+    - Under mod_perl 1.x with error_mode set to output, the headers were
+      sent after the content when a compilation error occurred.  Reported by
+      Gareth Kirwan.  Task id #592.
+
+    - URI-escape utf8 characters the same way that CGI::escape and
+      URI::Escape::uri_escape_utf8 do.  Patch by Denis Shaposhnikov.
+
+    - On startup Mason creates a file named ".__obj_create_marker" in the
+      object directory.  Under mod_perl, Mason was not chmod'ing the file
+      when Apache was started as root. This led to permission errors in
+      environments where the Interp is created anew every request.  Task id
+      #593.
+
+    - Treat the return value of component execution as a string in
+      ApacheHandler.  This prevent warnings about comparing the empty string
+      to a number when a component returns "".  Reported by Benjamin Franz.
+
+    - Setting a MasonPlugins Apache parameter caused a fatal error.  Patch
+      by David Jack Olrik.
+
+    - Calling base_comp() on the Request object inside a plugin's
+      start_request_hook method caused an infinite recursion in Mason.
+      Reported by Jesse Vincent.
+
+1.3101  August 23, 2005
+
+    [ BUG FIXES ]
+
+    - One last fix for CGIHandler.  If you provided your own out_method it
+      was ignoring it and using its own.  Reported by David Glasser.
+
+1.31  August 20, 2005
+
+    [ BUG FIXES ]
+
+    - Fix several regressions in the CGIHandler and FakeApache modules.
+      Some changes from the stable branch were never merged into the trunk
+      before 1.30.  Reported by Jesse Vincent.  Task id #589.
+
+    - Under Apache2, if an ApacheHandler object was created during server
+      startup and the associated Interp object created any files or
+      directories, Mason would crash when attempting to chown those
+      files/dirs to the uid/gid that Apache will use after forking.  Task
+      #586.
+
+    - The compiler was adding an extra block around a component's
+      body, which meant that variables declared in the body (in perl lines
+      or blocks) were not seen in the cleanup section.  Task id #587.
+
+    - The compiler was also adding "no warnings 'uninitialized'" in this
+      block, which could hide various errors.
+
+    - Hopefully fix $VERSION in ApacheHandler so PAUSE will not be
+      confused and think we have regressed.
+
+    - Turned off some prompts during the module's installation.  These
+      were intended to help new users configure Apache to run Mason
+      components, but they're probably a bit confusing.  Will return in a
+      future release as a separate script that can be run from the command
+      line.
+
+1.30  August 11, 2005
+
+    [ INCOMPATIBLE CHANGES ]
+
+    - ** Under mod_perl2, MasonArgsMethod will default to "CGI", since
+      libapreq2 is still in development.  If you have successfully installed
+      libapreq2, just set MasonArgsMethod to "mod_perl" to use it.
+
+    [ ENHANCEMENTS ]
+
+    - Some doc tweaks to clarify that Mason should work out of the box
+      with both mod_perl 1 and 2.
+    - Added "use warnings" to all modules and made sure all tests ran
+      warnings-free.
+
+    [ BUG FIXES ]
+
+    - Silence a warning when HTML::Mason::ApacheHandler was loaded outside
+      of mod_perl.
+    - Support renamed Apache2::Status module.
+
+1.29_02  June 22, 2005
+
+    [ ENHANCEMENTS ]
+
+    - ** Support for mod_perl-2.00 (mod_perl-1.99 is no longer supported
+      because of API changes in 2.0RC5).
+    - Mason recovers more gracefully from an empty or corrupted object
+      file. Task id #579.
+
+    [ BUG FIXES ]
+
+    - Fixed bug with content type being reset when decline_dirs=0.
+      Submitted by Brian Phillips. Task id #584.
+    - Put "Mason" prefix back in Params.pod. Task id #575.
+    - Fixed fetch_comp(undef) to not return an empty hash. Task id #578.
+    - static_source_touch_file did not take effect until after one request
+      for a top-level component.  Reported by Lai Zit Seng. Task id #576.
+
+1.29_01  January 25, 2005
+
+    [ INCOMPATIBLE CHANGES ]
+
+    - ** Mason now requires Perl 5.6.0 or later. However, because 5.6.0
+      has so many problems, it cannot be officially supported; we strongly
+      recommend upgrading to at least 5.6.1.
+    - ** Mason now requires version 1.24 of mod_perl in the ApacheHandler
+      module.
+    - ** The behaviors of $m->flush_buffer and $m->clear_buffer have been
+      simplified. $m->flush_buffer only acts on the top-level output buffer;
+      $m->clear_buffer clears all output buffers. Task id #554.
+    - ** max_code_cache_size is now kept in terms of number of components,
+      not bytes, and its default value is 'unlimited'.
+    - ** Components with a <%filter> and a cache_self are no longer cached
+      in their filtered state. Performance-related code simplifications made
+      this behavior difficult to maintain. Long term this would be
+      easier to implement with a cache_self component <%flag>.
+    - ** All compiler properties are now read-only. If you need to change
+      compiler properties on a per-request basis, you'll need to create
+      multiple compiler and interpreter objects.
+    - ** comp_exists may try to load the designated component, and may
+      throw an error if it contains a syntax error.
+    - ** The current_time method, deprecated in 1.1x, has been removed.
+    - ** The HTML::Mason::Buffer class has been eliminated for performance
+      reasons. You can use separate components, methods, or subcomponents
+      and scomp to achieve the same effects as buffer pushes and pops.
+
+    [ ENHANCEMENTS ]
+
+    - Significantly improved performance in component execution,
+      especially in static_source mode.
+    - Added static_source_touch_file, making it much easier to update
+      a server running in static_source mode.
+    - Added a plugin architecture. Plugin classes can perform actions at
+      key points, e.g. before and after each request and each component
+      call.  See HTML::Mason::Plugin for documentation. Task id #24.
+      Initial implementation by Doug Treder.
+    - Added the ability to change component root(s) on the fly if the
+      dynamic_comp_root parameter is turned on. Task id #561. Suggested
+      by Alex Robinson.
+    - Added enable_autoflush parameter. When turned off, Mason can
+      compile components to a more efficient form.
+    - Changed the </&> tag to allow the starting component name to be
+      included. e.g. <&| /foo &> ... </& /foo >. Task id #556. Suggested
+      by Alex Robinson, John Williams, and others.
+    - Moved the notion of component roots (single and multiple) from the
+      Resolver to the Interpreter. This improved the performance of multiple
+      component roots in conjunction with static source mode. Any resolver,
+      file-based or otherwise, can benefit from component root settings or
+      choose to ignore them.
+    - Added the compiler object_id to the object file path, so that
+      multiple versions of Mason do not collide in the same object
+      directory. Task id #569.
+    - Added .obj (or a configurable extension) to object filenames.
+      Task id #152. Suggested by John Tobey.
+    - Added $m->clear_and_abort, syntactic sugar for the common idiom
+      of calling clear_buffer() and then abort(). Task id #505.
+    - Added an official comment syntax, <% # ... %>, and documented
+      the various comment markers in the developer's manual. Task id #566.
+    - Added buffer_preallocate_size parameter, which allows you to
+      potentially reduce buffer reallocations.
+    - Augmented the 'could not find component' error message with the
+      current component root(s). Task id #562.
+
+    [ BUG FIXES ]
+
+    - Mason now throws an error if the path specified in a component's
+      'inherit' flag cannot be found. Task id #480.
+    - Fixed comp_exists to work with any path accepted by comp or
+      fetch_comp, and fixed fetch_comp to stop throwing errors for certain
+      bad paths. Task id #572.
+    - Fixed $m->decline to work from /dhandler. Task id #573. Submitted
+      by Carl Raiha.
+    - Using 'next' or 'last' without a loop can no longer corrupt
+      the component stack. Task id #539.
+
+1.28  November 6, 2004
+
+      This version is entirely identical to 1.27 except for a fix to make
+      CPAN/PAUSE properly index the version number in
+      HTML::Mason::ApacheHandler.  If you already installed 1.27 you do not
+      need to install this version unless you want to fix the "out of date
+      modules" report from the CPAN or CPANPLUS shells.
+
+1.27  October 28, 2004
+
+    [ ENHANCEMENTS ]
+
+    - Full support for Apache2/mod_perl2.
+
+    [ BUG FIXES ]
+
+    - The request object was not available as $m in the preamble if
+      in_package was set.  Reported by David Wheeler and David Baird.  Task
+      id #538.
+
+    - Component with subcomponents or methods were not getting freed when
+      they were purged from the code cache.  Task id #549.
+
+    - Component calls (<& &>) starting with a newline were compiled
+      incorrectly. Reported by Rick Delaney. Task id #564.
+
+    - If both a parent request and subrequest had autoflush set, output
+      from the subrequest wasn't actually flushed.  Reported by Tony
+      Clayton.  Task id #550.
+
+    - The documentation in HTML::Mason::Tests for the path and call_path
+      parameters was wrong.  Reported by Michael Gray.  Task id #528.
+
+    - Line numbers in errors were incorrectly reported if the error
+      happened in code after an <%args>, <%attr>, or <%flags> block.
+      Reported by Tony Clayton.  Task id #552.
+
+    - The Apache handler now only sends headers once if make_request()
+      aborts, such as when a redirect is executed in a
+      MasonX::Interp::WithCallbacks callback.
+
+1.26  April 5, 2004
+
+    [ BUG FIXES ]
+
+    - The fix to make CGIHandler support flush_buffer and autoflush caused
+      it to not rethrow any exceptions created during the request.  If
+      error_mode was set to 'fatal', then an error would simply cause no
+      output to be generated.  Task id #531.
+
+    - A comment in the last line of a component call with content caused a
+      syntax error in the compiled component.  Reported by Todd Goldenbaum.
+      Task id #530.
+
+    - The various request handling methods in CGIHandler once again return
+      the value of calling the Interp object's exec() method.
+
+    - CGIHandler now explicitly handles redirect statuses when an abort
+      exception is thrown from the Interp object's exec() method.  This
+      fixes some problems when this module was used with David Wheeler's
+      MasonX::Interp::WithCallbacks module.
+
+    - Using a <%shared> block when "in_package" was set to something other
+      than HTML::Mason::Commands led to an error like "Can't call method
+      "call_dynamic" on an undefined value".  Reported by David Wheeler.
+      Task id #535.
+
+1.25  December 12, 2003
+
+    [ BUG FIXES ]
+
+    - CGIHandler did not support $m->flush_buffer or autoflush.  Reported
+      by Shane McCarron.
+    - Every line in the error stacktrace had a 'g' appended to it in HTML
+      error mode.
+    - The HTML error display of the stacktrace was not filtering out some
+      packages that it should have, so there were extra lines that made it
+      harder to find the real error.
+    - Several FakeApache methods were broken: path_info, uri, and
+      the_request.  Reported by Matthias F. Brandstetter.
+
+    [ ENHANCEMENTS ]
+
+    - The CGIHandler request object now supports the autoflush parameter.
+
+1.24  November 12, 2003
+
+    [ BUG FIXES ]
+
+    - Two tests in 04-misc.t, #9 and #10, failed if Params::Validate 0.66+
+      was installed.  This happened because an error message given by
+      Params::Validate changed slightly, and was not a problem in the Mason
+      core code.
+    - The Component object method attr_if_exists returned 0 when the
+      attribute didn't exist, instead of undef as is documented.  Reported
+      by Chris Reinhardt.
+    - The HTML::Mason::Resolver::File glob_path method, which is used for
+      the preloads feature, now uses File::Glob::bsd_glob when run with Perl
+      5.6.0+.  This function properly handles spaces in filenames, which are
+      legal on most systems, and common on Win32.  Implemented by Autrijus
+      Tang.
+    - The Admin guide erroneously said that the default component root
+      when running Mason outside a web environment was "/".  It is the
+      current working directory.  Reported by Patrick Kane.
+
+1.23  September 8, 2003
+
+    [ ENHANCEMENTS ]
+
+    - Lots of enhancements to the Apache.pm emulation when using the
+      CGIHandler module.  Implemented by David Wheeler.
+    - The fact that autohandlers or dhandlers can be turned off by setting
+      autohandler_name or dhandler_name to "" has now been documented, and
+      we explicitly check for this in the code.  Task id #499.
+    - The ApacheHandler module now handles certain exceptions
+      (TopLevelNotFound, Abort, Decline) thrown from the Interp class's
+      make_request method by returning the desired error code.  With the
+      default Mason Interp & Request classes, this will never happen.
+      However, subclasses may want to throw exceptions when constructing a
+      request.  Implemented by David Wheeler.
+
+    [ BUG FIXES ]
+
+    - If any code type parameters were set in the httpd.conf file, Mason
+      died trying to read them.  This bug was introduced in version 1.20.
+      Task id #496.  Reported by David Wheeler.
+    - $m->caller, $m->callers and $m->caller_args now return undef or an
+      empty list instead of crashing when the specified stack level does not
+      exist. Task id #495.  Reported by Bernhard Schmalhofer.
+    - The busy_lock option to $m->cache->get did not accept did not accept
+      string values for durations, like "4m".  Task id #484.  Reported by
+      Igor Muratov.
+    - When generating the HTML error message page, we now only use basic
+      HTML escaping.  This fixes two problems.  One is that if
+      HTML::Entities is not installed, using the "|h" escape flag in the
+      error display component causes an endless loop.  The other is that the
+      "|h" flag can mangle non-Latin-1 characters.  Task ids #497 and #494.
+      Reported by Harmen and Oleg Bartunov respectively.
+    - If a component generated output, then called another component via
+      $m->scomp, and that other component attempted to clear the buffer and
+      then abort, any output generated before the call to $m->scomp was
+      still sent to the client.  This broke calling $m->redirect inside an
+      $m->scomp call.  Task id #498.  Reported by Kim Alexander Hansen.
+
+1.22  July 14, 2003
+
+    [ ENHANCEMENTS ]
+
+    - Added $m->has_content to check for content without evaluating it.
+    - Comments are now allowed on separate lines inside <%attr> and
+      <%flags> blocks.  Task id #475.
+    - $m->subexec and $m->make_subrequest now accept relative paths which
+      are interpreted relative to the current component directory, like
+      $m->comp.
+    - Documented potential problems if call to $m->redirect is trapped in
+      an eval block, and then output is generated before the exception is
+      rethrown.  Task id #477.
+
+    [ BUG FIXES ]
+
+    - If a component with a filter section called abort, the filter was
+      run twice.  Task id #473.
+    - If an exception was thrown when creating a request, memory was
+      leaked.  This can happen when the top-level component cannot be
+      found (e.g. 404) or if there is an error in compiling the top-level
+      component. Task id #478. Reported by Doug Treder.
+    - Removed the use of alarm() and SIG{ALRM} to trap rare infinite loops
+      inside the compilation of components. It interfered with Mason
+      environments that use alarm() for their own purposes, and the
+      associated test would crash in certain Perl environments. If you find
+      that Mason sometimes enters an infinite loop, see the
+      "Hanging Processes: Detection and Diagnostics" section of the mod_perl
+      guide for hints on diagnosing the problem.  Task id #472.
+    - Mason allowed a component to define two subcomponents or methods
+      with the same name.  Task id #476.  Reported by John Michael Mars.
+
+1.21  June 4, 2003
+
+    [ INCOMPATIBLE CHANGES ]
+
+    - ** The semantics of @_ for components now match Perl subroutines: @_
+      contains aliases to the caller's arguments, instead of copies.  For
+      example, if a component updates $_[0], the corresponding argument is
+      updated (or an error occurs if it is not updateable). The only users
+      that will notice this are those that update elements of @_ in
+      components and do not expect those changes to affect the caller. If
+      you have any doubts, grep your component tree for '\$_\[' and look for
+      assignment statements.
+
+    [ ENHANCEMENTS ]
+
+    - Cache the result of taint_is_on() for performance.
+    - Mason was copying arguments several times for a request, and several
+      more times for each component call. The unnecessary copies have been
+      eliminated.  As part of eliminating these copies, a new compiler
+      parameter has been added, "define_args_hash".  The default setting,
+      "auto", should work with all existing Mason components.  See the
+      HTML::Mason::Compiler::ToObject docs for details.  Task id #464.
+      Suggested by Doug Treder.
+    - Added more details about subclassing the compiler to the Subclassing
+      documentation.
+    - There is now a compiler parameter called "use_source_line_numbers",
+      which can be used to turn off line numbering based on the source file.
+      This can be useful when single stepping a component through the
+      debugger.  Task id #461.
+
+    [ BUG FIXES ]
+
+    - Fixed a serious error in which a Compiler that was used on a
+      component containing certain kinds of syntax errors would claim that
+      any future components also contained syntax errors.  Task id #467.
+    - Now assigning runtime properties (such as interp) to method
+      component objects as well as subcomponent objects.  Task id #462.
+    - Fixed the HTML error display.  Errors were not being properly
+      HTML-escaped.  Task id #468.  Reported by Jeremy Blain.
+    - A bad interaction between the XS version of Params::Validate, Perl
+      5.00503 and taint mode has been "fixed" by requiring Params::Validate
+      0.59, where the problem is fixed.  Task id #470.
+    - The test suite now runs the taint mode tests with earlier versions
+      of Perl.  Task id #471.
+    - The ApacheHandler module would go into an infinite memory-eating
+      loop when run in taint mode with Perl 5.6.1.  Task id #469.  Reported
+      by William McKee.
+
+1.20  May 1, 2003 (May Day)
+
+    [ ENHANCEMENTS ]
+
+    - Added an $m->notes() method, which is similar to $r->pnotes() but
+      may be used outside a mod_perl environment.  Task id #449.
+    - Mason will now only convert non-reference exceptions to
+      HTML::Mason::Exception objects, so it should cooperate better with
+      modules like Error.pm.  Task id #446.
+    - Added more documentation on Mason's error handling and exception
+      system.  Task id #446.
+    - If Mason was configured via the Apache httpd.conf file, it could in
+      many cases be quite a bit slower than configuration via a custom
+      handler subroutine.  Now configuration via the httpd.conf is much
+      faster, and is only about 5% slower than a custom handler subroutine.
+      Reported by Jeremy Blain.
+    - Mason's test harness now gives verbose output when the TEST_VERBOSE
+      environment variable is true.  This eliminates the need for setting
+      MASON_VERBOSE.
+    - ** It is now an error to have a subcomponent and method with the
+      same name in a single component.
+
+    [ BUG FIXES ]
+
+    - Mason would die if asked to compile a component that evaluates
+      to a false value.  Task id #444.  Reported by David Wheeler.
+    - Mason now gives a better error message if you try to call a
+      component's methods or subcomponents from its <%shared> block.  Task
+      id #448.  Reported by Randy Harmon.
+    - If in_package was set, Mason would die if output was generated after
+      a subrequest.  Task id #453.  Reported by David R. Baird.
+    - If Perl's print() was called after a subrequest, Mason would die
+      when run with any Perl before 5.8.0.  Task id #458.
+    - If a component called $m->cache_self, and then $m->decline, no
+      output would be generated.  Task id #454.  Patch by Vadim Ustiansky.
+
+1.19  March 3, 2003
+
+    [ BUG FIXES ]
+
+    - Fixed a very nasty bug that could cause subcomponents or methods
+      from one component to show up in another components.  Task id #443 in
+      todo list.
+    - If the closing tag of a <%flags>, <%attr>, or <%args> block
+      contained upper case characters, the component would not be parsed
+      properly.  Reported by Chris Snyder.  Task id #440 in
+      todo list.
+    - Providing a Resolver object directly to the ApacheHandler
+      constructor caused a fatal error.  Reported by Kwindla Kramer.  Task
+      id #441 in todo list.
+
+1.18  January 24, 2003
+
+    [ BUG FIXES ]
+
+    - Require Exception::Class 1.09.  Version 1.08 has a bug that causes
+      problems with Mason when used with any Perl earlier than 5.8.0.
+    - Fix a bug in the lexer code that caused Mason to not work with Perl
+      5.00503 at all.
+
+1.17  January 17, 2003
+
+    [ ENHANCEMENTS ]
+
+    - Added "REQUEST:" as a component specifier for method comp calls,
+      similar to "SELF:" and "PARENT:".  "REQUEST:" is short-hand for
+      $m->request_comp.  Suggested by Manuel Capinha, among others.
+    - Added $m->call_self.  This was present in Mason pre-1.10, and has
+      been added back per Jon Swartz's request.
+    - Added $comp->attributes, similar to $comp->methods.  This just
+      returns attributes for a given component object.  It doesn't return
+      attributes inherited from a parent.  Suggested by Matti Makitalo.
+
+    [ BUG FIXES ]
+
+    - ** When $m->cache_self was used for a component with a filter block,
+      the output would be cached _before_ filtering, and filtered every time
+      it was retrieved from the cache.  This has been fixed, and the
+      documentation now specifies that the filtered output is cached.
+    - Fixed failure of 12-taint.t #7 on Win32 boxes.  Reported by Randy
+      Kobes.
+    - Without HTML::Entities installed, 13-errors.t #7 failed.  Reported
+      by Sam Kington.
+    - $m->file did not handle relative paths properly when called from a
+      subcomponent or method.  Reported by Chris Hutchinson.
+    - If $m->abort was called in the shared block of a component that had
+      a filter, then a fatal error occured.  Reported by Chris Pudney.
+    - Mason was not cooperating with Apache::Filter, and attempts to
+      filter Mason's output did not work.  Fixing this also requires
+      Apache::Filter 1.021, if you are using Apache::Request to handling
+      incoming arguments.  Reported by by Manuel Capinha.
+    - Mason assumed that if Scalar::Util loaded without errors, it had a
+      weaken() subroutine.  However, Scalar::Util provides a pure Perl
+      implementation that does not include this subroutine.  Now we check
+      for this subroutine explicitly.  Reported by Autrijus Tang.
+    - Some code constructs, such as qw() lists, would end up being turned
+      into invalid code during component compilation.  Reported by Robert
+      Landrum.
+    - Subclassing a subclass of HTML::Mason::Request broke when the class
+      between HTML::Mason::Request and your own class called
+      alter_superclass.
+    - Under mod_perl 2.0, when ApacheHandler could't resolve a filename to
+      a component, it would die instead of returning a not found status.
+
+    [ INCOMPATIBLE CHANGES ]
+
+    - ** Removed the long deprecated and undocumented $comp->parent_comp
+      method.  Use $comp->owner instead.
+
+1.16  December 13, 2002
+
+    [ ENHANCEMENTS ]
+
+    - Documented behavior of $m->flush_buffer when a filter is present.
+    - Turned off "nowrap" for error message on HTML error page.  No more
+      horizontal scrolling!
+    - Substantially rewrote portions of the Admin Guide, in order to
+      improve and clarify the portions related to configuring and
+      customizing Mason under mod_perl.
+    - Added back "raw error" on HTML error page.
+    - Replaced FilesMatch with LocationMatch in docs and FAQ, because
+      using FilesMatch means you can't use dhandlers.
+    - Reduced memory usage when compiling large components.  Memory usage
+      for smaller components hasn't changed much, but they weren't really a
+      problem in the first place.
+    - Added a cgi_request method to the CGIHandler::Request object, which
+      parallels the apache_req method offered by the ApacheHandler::Request
+      object.
+
+    [ BUG FIXES ]
+
+    - When using the code cache within an Interp, a circular reference was
+      created which prevented the Interp object from ever being destroyed.
+      With Perl 5.6.0+, this will be automatically prevented by using weak
+      references as needed.  With Perl 5.00503, you will need to call the
+      new Interp->flush_code_cache method in order to break the circular
+      reference.  This bug could cause memory leaks with code that created
+      new Interp objects over time, though most uses of Mason do not do
+      this.  Reported by Kate Porter.
+    - Fixed bad parsing of <% $foo || 50 %>.  Mason was interpreting this
+      as an escape flag.  Escape flags now much match /^[[:alpha:]_]\w+/ and
+      Mason specifically looks for || in a substitution as well.  Reported
+      by Kwindla Kramer.
+    - If a dhandler one subdirectory down (like /foo/dhandler) called
+      $m->decline, Mason threw a bogus exception.  Fixed by Harmen.
+    - Running the test suite caused an error in the shell on Win32 with
+      newer versions of MakeMaker.  Reported by Murat Unalan.  (We _think_
+      this is fixed but we'd like confirmation from a Win32 user).
+    - It was not possible to set the data_cache_defaults parameter from
+      the httpd.conf file.  Now it is.
+    - Mason was using Apache::Request->new instead of
+      Apache::Request->instance.  This meant that if you had a handler that
+      ran earlier (like a TransHandler) and that handler created an
+      Apache::Request object, then the one Mason created would be missing
+      any POST arguments.  Reported by Ray Zimmerman.
+    - Several different places in the docs said that Cache::Cache accepts
+      a username option, but there is no such thing.
+    - alter_superclass didn't work with CGIHandler because CGIHandler
+      didn't define a $VERSION variable.  Reported by Nadine and Harry
+      Laxen.
+    - Made CGIHandler merge together POST and query string arguments in
+      order to be consistent with ApacheHandler.  Reported by Nadine and Harry
+      Laxen.
+    - The CGIHandler module was overriding any out_method provided by the
+      user.  Reported by Nadine and Harry Laxen.
+
+1.15  October 14, 2002
+
+    [ BUG FIXES ]
+
+    - Fixed a number of problems with filters:
+      -- They didn't see changes made to %ARGS (they were seeing a copy).
+      -- They couldn't see any variables declared in <%args> blocks.
+      -- The presence of a filter caused a call to $m->flush_buffer,
+      breaking redirects.
+    - Added a number of tests for filters (*cough*).
+    - Fixed broken links and other bugs in the POD and HTML versions of
+      the docs.
+    - Fixed test failures when running as root.  These failures were not
+      reflective of bugs in Mason, simply problems in the tests or test
+      setup.  Now we skip the tests for end user installs (we still run them
+      during development, never fear).
+    - HTML::Mason::Request contained code that caused an error when using
+      the CPAN shell's "r" command.
+
+1.14  October 7, 2002
+
+    [ BACKWARDS COMPATIBILITY ]
+
+    - Added compatibility layer for 1.0x cache API. It is now possible to
+      use $m->cache and $m->cache_self in the old way by setting the
+      data_cache_api parameter to '1.0'.
+    - Added back $comp->create_time, which was renamed as $comp->load_time
+      in 1.09_02, as a deprecated method.
+    - Added back $interp->time and $m->current_time, which were removed in
+      1.09_01, as deprecated methods.
+
+    [ ENHANCEMENTS ]
+
+    - Implemented the long requested user-defined escapes feature.  It is
+      now possible to define your own escape flags, as well as overriding
+      Mason's own 'h' and 'u' flags.
+    - Implemented expire_if and busy_lock options in new $m->cache->get
+      API. These retain the essence of the 1.0x options although both
+      work a little differently.
+    - Added new module to implement caching extensions,
+      HTML::Mason::Cache::BaseCache, with accompanying documentation.
+    - Enhanced Params.pod with TOC and full descriptions of all
+      parameters.  Standardized rest of documentation to link to Params.pod
+      when referring to a parameter.
+    - When a component path is not found, but that path matches a file on
+      disk, we now print an extra warning, because this indicates that the
+      user does not understand the distinction between component paths and
+      filesystem paths.
+    - The Request object's redirect() method now accepts an optional
+      additional argument, allowing users to use a status code other than
+      302 for the redirect.
+    - Mason should now work on a box with a fresh mod_perl 2/Apache 2
+      install.  Previously, Mason unconditionally tried to load
+      Apache::Status, which comes with mod_perl 1.x, but not (yet?) with
+      mod_perl 2.
+
+    [ BUG FIXES ]
+
+    - Installation was failing when Exception::Class wasn't installed.
+    - Calling <%def> subcomponents no longer changes base_comp, which is
+      important in autohandlers.  (reported by Ian Robertson)
+    - The documentation incorrectly indicated that you could create an
+      ApacheHandler object during server startup without providing a
+      component root.  This will also shown incorrectly in the sample
+      handler.pl in the eg/ directory.
+    - Reduced Mason's memory usage when compiling and serving components.
+      This is particularly noticeable with very large components (1-2MB or
+      greater).  Work on this will continue for future versions.  (reported
+      by Todd Holbrook)
+    - %ARGS and <%shared> variables could not be accessed from <%filter>.
+      (reported by Adam Roth)
+    - Switch.pm did not work in file-based components. (reported by Gert
+      Thiel)
+    - use_strict could not be turned off. (reported by Viacheslav
+      Voytovich)
+    - $m->clear_buffer (and $m->redirect) did not work inside a component
+      call with content. (reported by Manuel Capinha)
+    - Some tests were failing on Windows, because they assumed Unix style
+      filesystem paths.  This was a problem with the tests, not the core
+      code, but still worth fixing.  (reported by Adam Rinehart).
+    - $m->caller() was inadvertently left out of the documentation - fixed.
+    - Fixed a small documentation error about what kinds of things are
+      valid keys in <%flags> and <%attr> blocks.
+    - Configuring multiple component roots via the httpd.conf file failed
+      silently (as opposed to releases 1.10 - 1.12, where this failed with
+      an error).
+    - Unreadable component source files caused the confusing error message
+      "source callback returned no source".  This will now throw a much more
+      helpful exception.
+    - Errors occurring in subrequests would cause error output to be mixed
+      with regular output when the error_mode was "output" (the default with
+      ApacheHandler and CGIHandler).  Errors in subrequests should now look
+      the same as errors in the top request.
+
+1.13  August 26, 2002 (Taiwan time)
+
+    [ ENHANCEMENTS ]
+
+    - Replace the regex "[A-Za-z0-9]" with "\w", which should cooperate
+      better with Unicode.
+    - Added a section called "Avoiding Concurrent Recomputations" to the
+      Developer's Manual.  This describes how to achieve the same effect as
+      was provided by the "busy locks" feature in 1.0x.
+    [ BUG FIXES ]
+
+    - When running under mod_perl, a warning was issued from
+      HTML::Mason::Request::ApacheHandler's exec() method.  (reported by
+      Marius Feraru)
+    - The request wrapper code did not work with anonymous component.
+      (reported by Bob McElrath)
+    - Mason 1.10-1.12 did not cooperate with Apache::Filter, or any other
+      Apache subclass that overrode the print() method.  (reported by Mark
+      Moseley)
+    - If an object blessed into Apache::Request was provided to
+      ApacheHandler's handle_request method, and you were using the
+      args_method parameter was set to "mod_perl" (the default), then
+      ApacheHandler would die.  This was a bug introduced in 1.12 as a
+      result of fixing the memory leaks in 1.11.  (reported by Autrijus
+      Tang)
+    - Configuring multiple component roots via the httpd.conf file failed.
+      (reported and patched by Alexei V. Barantsev)
+    - $interp->exec and $m->exec were not respecting wantarray.  (reported
+      by David Bushong)
+    - Suppress a "subroutine redefined" warning from
+      HTML::Mason::Request::Apachehandler's exec() method.  (reported by
+      Marius Feraru)
+    - Combining cache_self, <%filter> blocks, and $m->scomp did not work.
+      (reported by Calle Dybedahl)
+    - Tests 4 & 5 for 06-compiler.t would fail if HTML::Entities was not
+      installed.  Now they will be skipped if necessary.
+    - Tests 75 & 99 for 08-ah.t depended on hash key ordering and would
+      fail with Perl 5.8.0.  (submitted by Michael Gray)
+    - Fixed a number of cases where the lexer/compiler's behavior differed
+      from Mason 1.05 in unintended ways.
+      -- Dashes were not being allowed in subcomponent and method names,
+      even though this is documented as being allowed.  (reported by Ken
+      Miller)
+      -- Space between a method or subcomponent name and the '>' at the end
+      of the tag was not being allowed.  It should be noted that this is not
+      documented as being allowed in the docs, and so may change in the
+      future.  But for now, we'd rather be compatible with 1.05.  (reported
+      by Chris Hutchinson)
+      -- Comments were not being allowed after flag and attribute
+      assignments.  Again, this is not documented as being allowed.
+      (reported by Chris Hutchinson)
+    - CPAN thought that version 1.68 of HTML::Mason::ApacheHandler (part
+      of the 1.05 release), was newer than version 1.242 (part of the 1.1201
+      release).  This is what we get for using CVS to set verson numbers.
+      This version number is now set by hand in order to make sure that this
+      does not happen in the future.
+
+1.1201  July 24, 2002
+
+    [ ENHANCEMENTS ]
+
+    - Added details to the UPGRADE document on what has changed with the
+      caching system.
+    - Added some documentation on how to arbitrarily expire items in the
+      cache with the new caching system.  This is in HTML::Mason::Devel.
+
+    [ BUG FIXES ]
+
+    - Fixed a compilation error in HTML::Mason::Tools that was occurring
+      with Perl 5.00503.
+    - Made sure that <%method> and <%def> tags are treated
+      case-insensitively.
+
+1.12  July 23, 2002
+
+    [ ENHANCEMENTS ]
+
+    - Various optimizations have been added to this release in order to
+      address the fact that Mason 1.11 is quite a bit slower than 1.05.  One
+      major factor was optimizing Params::Validate and Class::Container, so
+      for that reason this version of Mason requires Params::Validate 0.24
+      and Class::Container 0.07.  With these modules installed, this release
+      shows improvements of up to 50-60% in benchmarks that stress Mason's
+      weaknesses, with other benchmarks showing up to a 100% improvement.
+    - Made subclassing CGIHandler more useful by breaking out its arg
+      processing into a request_args method, just like ApacheHandler.
+    - Added alter_superclass method to Request class, for use by Request
+      subclasses.  See the HTML::Mason::Subclassing document for details.
+
+    [ BUG FIXES ]
+
+    - Fix HTML generated for error messages so that tags balance out.
+      Unbalanced table tags caused this page to not display properly with
+      Netscape 4.x.
+    - Fix nasty memory leaks in ApacheHandler.
+
+1.11  July 3, 2002
+
+    [ BUG FIXES ]
+
+    - The 08-ah.t tests failed with a runtime error if run by root.  This
+      was not a Mason bug, but a bug in the test code itself.
+    - ApacheHandler did not work Perl 5.005.
+    - Even if ApacheHandler was given an Apache::Request object to
+      handle_request() or prepare_request(), it was still calling
+      Apache::Request->new.  (reported by Ray Zimmerman)
+    - Fixed incorrect $m->make_subrequest documentation.  (reported by Ray
+      Zimmerman)
+    - Added some incompatibilities in 1.10 to the UPGRADE document that
+      were left out in previous versions.
+    - HTML error output could be sent as plain text or some other content
+      type depending on your Apache config and the file extension of the
+      requested component.  Now we explicitly set $r->content_type before
+      sending HTML error output.
+    - Fix failures of Resolver::File::glob_path() with Win32.  (reported
+      by Adam Reinhart)
+
+1.10  June 25, 2002
+
+      This is a big release and there are a number of backwards
+      incompatibilities with version 1.05 and earlier.  Please make sure to
+      read the UPGRADE document, which covers these in more detail.
+
+    [ ENHANCEMENTS ]
+
+    - Mason can always detect when an object file was compiled with an
+      incompatible compiler/lexer, even if the object file contains syntax
+      errors.
+    - Method and subcomponent blocks with no name (<%method>) were caught
+      as an error, but the error message was very confusing.  This has been
+      fixed.
+    - Added HTML::Mason::Subclassing, documentation on subclassing Mason
+      objects.
+    - Added documentation on the interaction between <%once> sections and
+      preloading components.
+    - Mason automatically calls $m->clear_buffer when $m->decline is
+      called.
+
+    [ BUG FIXES ]
+
+    - Fixed a bug in the lexer that made it think it had found a Perl-line
+      where none existed.
+    - Fixed a bug related to handling of parameters in httpd.conf files.
+      This was only noticeable if you attempted to provide a subclass of one
+      of Mason's classes (like your own Request class) that took its own
+      parameters.  Mason was not recognizing those additional parameters as
+      valid.
+    - Improved line number reporting from earlier releases.  Line numbers
+      are now reported properly for errors in any type of block.
+
+1.09_02  June 4, 2002
+
+    [ INCOMPATIBLE CHANGES ]
+
+    - ** The Component class's create_time method has been renamed as
+      load_time.
+    - ** Relative component paths in the $interp->exec() method are no
+      longer resolved.  All component paths must be absolute.  Relative path
+      resolution was added in 1.09_01 so this change is unlikely to affect
+      most users.
+    - ** Removed option to expire a component from the Apache::Status
+      page.  This option made little sense since components are cached
+      per-process, and there's no guarantee that any particular process has
+      cached a given component.  Again, this is a feature added in 1.09_01
+      so this change should not cause most people any problems.
+    - ** Renamed CGIHandler's handle_cgi method to handle_comp.
+    - ** Removed the dev_dirs feature from CGIHandler.
+    - ** The default component root when not using ApacheHandler or
+      CGIHandler is now the current working directory at the time the
+      HTML::Mason::Resolver::File class is loaded.
+
+    [ ENHANCEMENTS ]
+
+    - All the modules included with Mason are now documented.
+    - Various pieces of existing documentation have been tweaked and
+      modified.
+    - Added handle_cgi_object method to CGIHandler.
+    - Mason works with the CVS version of mod_perl 2.0 when mod_perl 2.0's
+      backwards compatibility layer is used.  AFAICT, the CVS version is
+      close enough to what will be released as 2.0 that few, if any, changes
+      should be required once 2.0 is out.
+    - When running Mason with the ApacheHandler or CGIHandler modules, the
+      Mason request object ($m) now has a "redirect" method, which can be
+      used to send an HTTP redirect to the client.
+    [ BUG FIXES ]
+
+    - $m->flush_buffer was sending out '' to the buffer, even if no output
+      existed.  This caused ApacheHandler to send headers, which broke
+      redirects, for example.
+    - Fix broken Apache::Status page  (reported by Thomas A. Lowery).
+    - The lexing code now handles some weird edge case errors in a better
+      way.  One of these involved a component starting with a invalid block
+      name like <%foo>.
+    - A component that compiles into Perl code that causes syntax errors
+      seems to trigger a Perl bug when Mason attempts to eval it.  The
+      symptom is that Mason simply hangs when it tries to eval the
+      component's object file.  This bug is present in Perls before 5.7.3,
+      but appears to be fixed in the development branch.  Mason will use
+      alarm, if supported by the system, to work around this.
+    - Output from subrequests was appearing _before_ other component
+      output.  The new default is that this output appears "inline" in the
+      calling component, which we think is most DWIM-ish.  Alternate
+      behavior can be achieved by explicitly setting the subrequest's
+      out_method parameter.
+    - The $r object provided by CGIHandler.pm was not passing header
+      values to CGI.pm in a way that CGI.pm liked.  Now we add a '-' to the
+      front of the header name if necessary, and all headers are canonized
+      to lower case in order to avoid having duplicates.
+    - Mason only requires Apache::Request if you have mod_perl installed
+      already.
+
+1.09_01  April 4, 2002
+
+    [ INCOMPATIBLE CHANGES ]
+
+    - ** Errors now report line numbers from the component source file.
+    - ** The Parser class has been removed entirely.  Its functionality
+      has been split between the Lexer and Compiler objects.
+    - ** The debug file feature has been removed.
+    - ** The previewer has been removed.
+    - ** The system log feature has been removed.
+    - ** The Interp use_reload_files parameter has been removed.  The new
+      static_source parameter provides a useful, and conceptually simpler,
+      replacement.
+    - ** Mason's built in caching now uses Cache::Cache to do all the
+      heavy lifting.  This means that parameters for both the $m->cache and
+      $m->cache_self methods have changed.
+    - ** The ApacheHandler's top_level_predicate parameter has been
+      removed.
+    - ** The mc_* commands have been removed entirely.
+    - ** The Interp's taint_check parameter has been removed.  Mason now
+      simply determines whether or not it is running in taint mode and acts
+      appropriately without user intervention.
+    - ** Mason now uses Apache::Request as its default argument processing
+      module.  You can explicitly use CGI.pm if you prefer.
+    - ** The ApacheHandler module no longers accepts parameters when
+      imported.  Instead, you specify this parameter via the ApacheHandler
+      constructor.
+    - ** The ApacheHandler module now requires a minimum of mod_perl 1.22.
+    - ** The Component's run_count() and first_time() methods have been
+      removed.
+    - ** The HTML::Mason::Config module is no longer needed, and is no
+      longer generated during the installation process.
+    - ** The Interp's autohandler_name and dhandler_name params no longer take
+      undef as a valid value.
+    - ** The Interp's use_autohandlers, use_dhandlers, and
+      allow_recursive_autohandlers parameters have all been removed.
+    - ** The $m->top_args and $m->top_comp methods have been renamed to
+      $m->request_args and $m->request_comp.  The old methods are deprecated
+      but will work until the 1.20 release.
+    - ** Passing an Interp object to the ApacheHandler constructor (as in
+      a handler.pl file) will no longer work unless you set the Interp's
+      resolver_class parameter to
+      'HTML::Mason::Resolver::File::ApacheHandler'.  However, you can now
+      pass Interp constructor params directly to the ApacheHandler
+      constructor, which will create the interp object internally. 
+    - ** The MasonMultipleConfig httpd.conf parameter has been removed.
+      Mason can now figure this out by itself.
+    - ** The HTML::Mason::Interp time() method has gone away.
+    - ** The base_comp is now changed for each component call, unless that
+      component call uses a component object for its first argument, or the
+      call starts with SELF: or PARENT:.
+    - ** The "perl_" prefix for Mason tags is no longer supported.
+    - ** The backslash character now eliminates a newline at the end of
+      any line, not just before %-lines and section tags.
+
+    [ ENHANCEMENTS AND NEW FEATURES ]
+
+    - It is now possible to pass chunks of component content as part of a
+      component call.
+    - Mason now supports subrequests via the new $m->subexec and
+      $m->make_subrequest methods.
+    - Mason no longer requires you to specify a component root or data
+      directory.  The component root now defaults to your document root in a
+      web context, or your filesystem root in a standalone context.  The
+      data directory will be a subdirectory of your server root under
+      mod_perl, and Mason can work without any data directory at all in
+      other contexts.
+    - The Resolver class API has been redesigned and is documented for the
+      first time.
+    - The installation process will offer to help you setup Mason for use
+      with mod_perl if it can find your Apache configuration file and it
+      cannot find an existing Mason configuration.
+    - The HTML::Mason::Request->instance method is now the officially
+      supported way of getting at the current request object outside of a
+      Mason component (suggested by John Siracusa).
+    - The HTML::Mason::Interp->comp_exists method now checks for a
+      component's existence without loading the component (suggested by
+      Randal Schwartz).
+    - Mason now includes a module called HTML::Mason::CGIHandler, which
+      greatly simplifies the use of Mason via CGI scripts.
+    - Mason now uses File::Spec for all filesystem operations.
+    - All the .pod files have been merged into their corresponding .pm
+      files, where appropriate.
+    - Added the Component attr_if_exists method (suggested by Joe
+      Frisbie).
+    - We now use the HTML::Entities module's encode function for the 'h'
+      substitution escape flag.  This module escapes high-ascii characters
+      properly.
+    - Calling a method via $m->comp('comp:method') works just like
+      $comp->call_method('method').
+    - When an object contains other objects then the containing object's
+      constructor accepts parameters intended for the contained objects.
+      For example, the Interp object contains a Resolver object and Request
+      objects.  The Interp's new method will accept constructor parameter
+      for both the Resolver and Request objects.
+    - The ApacheHandler args_method is now a per-object parameter.
+    - Mason is now much smarter about recompiling components.  In general,
+      it can detect if compiler options for a compiled component are
+      different from the current options, and will recompile the component
+      if necessary.  The exception to this is that with compiler parameters
+      which take callbacks (such as preprocess), Mason can only tell if such
+      a parameter is present, not whether the actual callback has changed.
+    - The ApacheHandler object will chown any files created during server
+      startup as needed.
+
+    [ BUG FIXES ]
+
+    - The <%args> section can now contain comments which contain the
+      string '=>' (reported by Chris Hutchinson).
+    - Fixed the longstanding bug that using print() or $r->print() causes
+      output/headers to appear out of order.  You can now safely use these,
+      though we still recommend that you use Mason to send output.
+    - Filtered output now does appear when $m->abort() used.  However, an
+      abort inside a component called via $m->scomp() still cause the output
+      generated by that component to disappear.
+
+    [ INTERNALS ]
+
+    - Output buffering and filtering is handled by the new
+      HTML::Mason::Buffer class.
+    - All fatal errors thrown during component execution are exception
+      objects in the HTML::Mason::Exception class hierarchy.
+    - The CGI GET/POST argument processing code has been simplified
+      (submitted by Ilmari Karonen).
+    - ApacheHandler now uses a special Resolver subclass to translate URIs
+      to component paths.
+    - Parameters passed to "set" accessors are now validated in the same
+      way as constructor parameters.
+    - The component requested and the arguments it was passed are now
+      properties of the Request object.
+
+1.05  April 30, 2002
+
+    - Fixed improper handling of parameters for non-GET/POST
+      request. (submitted by Radu Greab)
+    - Fixed Interp to accept a resolver object param. (reported by Bojan
+      Jovanovic)
+    - Fixed infinite loop when calling $m->decline with // in dhandler
+      arg. (reported by Baldur Kristinsson)
+
+1.04  October 30, 2001
+
+    - Fixed locale parser_version 0,8 problem. (submitted by Louis-David Mitterrand) 
+    - Fixed inability to use '/' for comp_root. (reported by Doug Hunt) 
+    - Fixed HTML::Mason::Parser::make_dirs dying when reload_file not
+      defined. (reported by Ivan E. Panchenko)
+    - Made error_process regexps more specific. (suggested by Vadim Belman) 
+    - Fixed $m->count. (reported by David Wheeler) 
+    - Fixed writing of object files in taint mode. (submitted by Barrie Slaymaker) 
+    - Made it possible to run Makefile.PL without prompts. 
+
+1.03  May 17, 2001
+
+    - Made raw error message accessible from the new error display via
+      an unobtrusive link.
+    - Fixed Apache tests when started by a non-root user. (reported
+      by Barrie Slaymaker)
+    - Added short-circuits for Apache tests on Win32 and on systems with
+      Apache configurations that cannot be properly parsed. (reported by
+      Jindra Vavruska)
+
+1.02  April 17, 2001
+
+    - Completely redesigned error display. The new display includes a
+      contextual source listing and readable stacktrace. You can access the
+      old error behavior with the raw_html and raw_fatal error modes.
+      (implemented by Matthew Lewinski)
+    - Fixed $m->file to close its filehandle between uses. (reported by
+      Matthew Lewinski)
+    - Fixed bad interaction with Mason 1.01 and CPAN module, by adding
+      version number to ApacheHandler.pm.
+    - Fixed $m->top_comp to work as documented, and made documentation
+      a bit more explicit. (reported by Gordon Henriksen)
+    - Fixed specification of a component root as "foo => /foo" in
+      httpd.conf. (reported by Chuck O'Donnell)
+    - Added MasonDeclineDirs, accidentally omitted in 1.01. (reported by
+      David Wheeler)
+    - Changed sql examples in Devel.pod to use bind variables. (suggested
+      by Austin S. Lin)
+
+1.015 April 3, 2001
+
+    - Fixed incompatibility with mod_perl < 1.21_01, introduced in 1.01.
+    - Added 'use Apache.pm' to ApacheHandler.pm, necessary for some
+      mod_perl installations.
+
+1.01  March 27, 2001
+
+    - Implemented configuration of Mason from httpd.conf via PerlSetVar
+      directives.  This removes the need for a handler.pl file in many
+      cases.
+    - Revamped ApacheHandler tests to use a real Apache web server and
+      mod_perl (assuming this is installed).  This allows for much better
+      testing of Mason.  However, the test suite takes a bit longer to run
+      as starting and stopping the server can take a second or two each
+      time.
+    - ** Fixed handling of POST requests with query strings via CGI.pm;
+      the query string arguments were previously ignored, and are now merged
+      with POST arguments. This is an incompatible change only for those
+      whose code relied on the arguments missing.
+    - Added basic validation of arguments to Parser, Interp,
+      and ApacheHandler constructors.
+    - Added interp->die_handler, allowing you to install your own
+      subroutine as $SIG{__DIE__} to catch errors during component
+      execution.  Alternately, you can simply turn the special error
+      handling off.
+    - Added interp->use_dhandlers and interp->use_autohandlers, more
+      intuitive ways to turn on/off dhandlers and autohandlers.
+    - Eliminated interp->verbose_compile_error, which is no longer needed
+      and has not worked for some time.
+    - Wrapped each component call in eval, allowing us to simplify the
+      request stack code.  No visible user change.
+    - Documented that you cannot call return() from a <%shared> or <%once>
+      section.  (reported by Paolo Campanella)
+    - Fixed documentation of escaped newline behavior.
+    - Fixed incorrect code for using mod_perl args method in
+      eg/session_handler.pl.
+
+1.0  January 31, 2001
+
+    - Identical to 0.896 except for version.
+
+0.896  January 5, 2001
+
+    - Fixed bug preventing Mason from working with PerlFreshRestart.
+    - Fixed use_reload_file to work as documented and not stat() source files. (submitted by Benjamin John Turner)
+    - Fixed display in Apache::Status.
+    - Documented the significance of ordering in <%args> sections.
+    - Fixed documentation of %ARGS with regards to hashes passed in query string. (suggested by Adam Stubbs)
+    - Added version # to 'use Apache::Session::File' in session_handler.pl.
+    - Fixed preloads documentation to match reality.
+
+0.895  December 11, 2000
+
+    - ** Removed ApacheHandler from Mason.pm. It is now necessary to
+      explicitly 'use' the HTML::Mason::ApacheHandler module in your
+      handler.pl file (or elsewhere).  This fixes an intermittent
+      args_method bug and cleans up Mason.pod.
+    - ** Changed $m->caller_args to return a hash reference in scalar
+      context and a list/hash in list context. Older calls expecting a list
+      reference will need to be changed.
+    - Fixed Mason to work under Perl's tainting mode again.  Thanks to John
+      Tobey for pointing us in the right direction.
+    - Modified the definition of "next component" to depend on the current
+      component, not merely the number of times $m->call_next has been
+      called.  This allows $m->fetch_next to work as documented. Also
+      added $m->fetch_next_all, which returns the rest of the wrapper chain.
+    - Fixed bug with ../.. in component paths.  Versions 0.88 and 0.89
+      would create multiple object files for a single component and would
+      allow any filename to be treated as an internal component.  This was
+      _not_ exploitable externally via Apache, however.  (reported by Pascal
+      Eeftinck)
+    - Implemented $m->top_comp and $m->top_args, and fixed documentation
+      for $m->callers(-1).  (suggested by Kees Vonk)
+    - Added full line comments to <%args> sections. (suggested by Matthew
+      Lewinski)
+    - Revamped test harness system with HTML::Mason::Tests, greatly
+      simplifying the new test creation process.
+    - Implemented partial compliance with Apache::Filter; Mason can now be
+      used as a pre-filter but not yet as a post-filter. i.e. Configurations
+      like "PerlHandler HTML::Mason Apache::Compress" will work.
+    - Implemented logging of NOT FOUND errors to match plain Apache. Also
+      issue special warnings for Mason-specific causes of NOT FOUND.
+    - Documented Mason request object's aborted and aborted_value methods.
+    - Documented the fact that any variable declared in the <%args>
+      section must be a valid Perl variable name.  The parser will now give
+      an error if it encounters an invalid name (such as $foo.x).
+    - Eliminated upgrade of Apache request object to Apache::Request class
+      if this were done previously.  (submitted by Shevek)
+    - Removed FAQ from distribution. Users should seek out the most
+      current FAQ, now maintained by Kwindla Kramer, on the web.
+    - Fixed bug where an attempt to escape a substitution that contained a
+      function operating on a list (like sort or map) ended up appending the
+      escape flag characters to the list being operated on.
+    - Fixed the test 08-ah to work with CGI versions >= 3.0. (reported by
+      Alexei V. Barantsev)
+    - Fixed a problem with the parser when running with a locale that used
+      a comma as the decimal separator instead of a period. (reported by
+      Louis-David Mitterrand)
+    - Clarified the 'u' escape flag in docs.
+    - Removed use of $r->finfo in Apachehandler.pm, which causes random
+      core dumps in certain versions of mod_perl.
+    - Updated eg/session_handler.pl code to match Apache::Session 1.50+.
+    - Fixed various problems with debug files.
+    - Fixed a bug sometimes seen when the parser failed to parse a
+      component called by another component.
+    - Fixed a bug that prevented the $m->cache_self method from returning
+      anything.
+    - Fixed documentation regarding 'months' and 'years' units in
+      expire_in cache flag.
+    - Fixed bug in HTML/Mason/Component/Subcomponent.pm create_time
+      method.  (reported by Caleb Crome)
+    - Fixed bug where Mason would try to escape undefined values in a
+      substitution with an escape flag.  (submitted by Denis Shaposhnikov)
+
+0.89  September 14, 2000
+
+    - Fixed broken CGI args implementation from 0.88 (old arguments
+      appearing in new requests)
+    - Fixed system log bug from 0.88
+
+0.88  August 30, 2000
+
+    - Fixed broken Parser postprocessor code (broken since 0.85).  Added
+      tests for this code path as well as the preprocessor feature.
+      (reported by Tim Bishop)
+    - Replaced lots of simple accessors with new HTML::Mason::MethodMaker
+      (which just makes simple read-only and read-write accessor methods).
+    - Removed all direct hash key access from one object into another.
+    - Removed all unneeded uses of Exporter in various modules.
+    - Added warning about using mod_perl as a DSO to README file.
+    - Added 'cgi_object' method to HTML::Mason::Request::ApacheHandler.
+      This method returns the CGI object Mason uses internally (unless
+      you're using Apache::Request instead in which case its a fatal error).
+      Added documentation for this. (suggested by many people).
+    - Squashed warning in assignment to %ARGS in component sub body.
+    - Fixed call_method and scall_method to take arbitrary list of args
+      instead of hash.
+    - Fixed expression escape flags to allow arbitrary following
+      whitespace.  (reported by Mikhail Zabaluev)
+    - Added FAQ on how to handle file uploads.
+    - $m->cache returns the value stored on a successful store action.
+    - Reduced memory usage by removing unneeded uses of various modules.
+      On my box I see about a 500k or so reduction in memory use (Dave).
+    - Removed all uses of the IO::* modules.
+    - Mason seems to be working under a mod_perl DSO, at least under
+      mod_perl 1.24 and Apache 1.3.12.  This probably has nothing to do with
+      Mason but the very adventurous are encouraged to experiment with a
+      mod_perl DSO and report back to the mason list.
+
+0.87  May 24, 2000
+
+    - Fixed multiple GET/POST argument glitch introduced in 0.86.
+      (reported by Matt Hoskins)
+
+0.86  May 18, 2000
+
+    - Fixed multiple-<%perl>-section infinite loop bug introduced in 0.85.
+    - (Re-)Fixed Apache hang on POST not-found bug.
+    - Added $m->scall_method, analagous to $m->scomp. (suggested by Michael Shulman)
+    - When using mod_perl args method, $r is upgraded to Apache::Request object.
+      (suggested by Matt Hoskins)
+    - Documented attr, methods, and flags in Component.pod.
+    - Improved error msg for <%def> or <%method> lacking name.
+    - Improved error msg for using invalid embedded tag in def or
+      method. (submitted by Dave Rolsky)
+    - Eliminated reliance on hash ordering in tests.
+    - Changed test scripts to create separate data dirs for each test
+      branch and clear data dir at start of test.
+    - Added mixed case and repeated sections to <%perl> tests.
+    - ** Removed mod_perl specific $m->http_input; can no longer be
+      supported.
+    - Fixed args processing loop to allow multiple file
+      uploads. (submitted by Matt Hoskins)
+
+0.85  May 7, 2000
+
+    - Added object-oriented primitives to components. Components can
+      define methods and attributes and inherit from parent components.
+      Templates can access the current page's methods and attributes for
+      greater flexibility.
+    - ** Major improvements/changes to autohandler feature. Autohandlers
+      are now recursive by default, and all applicable autohandlers for a
+      given page get a chance to run. If you have multiple autohandlers in
+      parent/child directories, or if you used autohandlers with
+      allow_recursive_autohandlers=0, you will need to adjust for the new
+      policy.
+    - Integrated a revamped parse_component that is cleaner, more modular
+      and easier to subclass. Courtesy of Dave Rolsky.
+    - New <%shared> section contains code that executes once per request
+      and whose declarations are visible from the main component, methods
+      and subcomponents alike.
+    - Added escape flags for <% %> output. Can now HTML-escape or
+      URI-escape expressions on a site-wide or per-expression
+      basis.
+    - Added choice of CGI or Apache::Request when using
+      ApacheHandler. (submitted by Dave Rolsky)
+    - Documented $m->clear_buffer, which removes all pending output from
+      the buffer.
+    - Fixed keys and expires cache actions from m->cache
+      interface. (suggested by Matt Hoskins)
+    - dhandlers can now serve their own directory; added documentation
+      about handling directories.
+    - Fixed dhandler bug introduced in 0.81 whereby $m->dhandler_arg only
+      contains the first branch of a multi-branch argument.
+    - Removed memory leak in ApacheHandler::handle_request_1. (submitted
+      by Pascal Eeftinck and Renzo Toma)
+    - Changed parent_comp() to owner() for subcomponents/methods.
+    - Increased maximum recurse level from 16 to 32.
+    - Reorganized syntax section of developer's manual and added a "how to
+      use this manual" section.
+    - Added an UPGRADE guide to distribution.
+    - Added section about securing top-level components to Admin.pod.
+      (suggested by Sean Cazzell)
+    - Added section about declining image requests to Admin.pod.
+    - Eliminated "Subroutine status_mason redefined" warning when creating
+      multiple ApacheHandlers.
+    - Updated cookie expiration in CD-ME example. (reported by Renzo Toma)
+    - Added a "-f" flag to rm in faq Makefile. (reported by Jeremy Taylor)
+
+0.81  February 20, 2000
+
+    - Fixed small 0.8 bugs with automatic header sending. Headers are now
+      sent for blank pages and are not sent on an error status code.
+    - Fixed bug with default system log file. (submitted by Renzo Toma)
+    - Eliminated memory leak introduced in 0.8 for a few Linux platforms.
+      (submitted by Renzo Toma and Pascal Eeftinck)
+    - Fixed bug with component paths displaying two leading slashes.
+    - Fixed $comp->source_file when multiple comp roots declared.
+    - Fixed $m->decline in mod_perl mode.
+    - Removed legacy dhandler code from ApacheHandler.
+    - Replaced $r->filename with $r->finfo in ApacheHandler.
+      (submitted by Dennis Watson)
+    - Added dynamic virtual server configuration example to Admin.pod.
+      (submitted by Caleb Crome)
+
+0.8  January 23, 2000
+
+    - New integrated request API. $m replaces $REQ as the global variable
+      containing the current request object. All mc_ commands have been
+      incorporated into $m methods: mc_comp becomes $m->comp, mc_file
+      becomes $m->file, etc. The old commands still work for now.
+    - The utility bin/convert0.8.pl converts existing components to use
+      the new request API.
+    - Autohandler methods have been renamed: from mc_auto_next to
+      $m->call_next and mc_auto_comp to $m->fetch_next. This is in
+      preparation for a more general component inheritance system.
+      convert0.8.pl handles this change.
+    - Can now specify multiple component roots in the spirit of @INC.
+      (suggested by Ewan Edwards and others)
+    - Simplified HTTP header behavior. Headers are sent at the end of the
+      request (in batch mode) or just before the first non-whitespace output
+      (in stream mode). suppress_http_header no longer needed.
+    - New organization of Component class into subclasses
+      Component::FileBased and Component::Subcomponent. No outward change.
+    - Updated object file format. Mason should generally auto-detect
+      and recompile old object files, but may not catch everything. Try
+      removing your object directory if errors persist.
+    - ** mc_suppress_http_header command still exists but does nothing.
+      In most cases this should not cause a problem. The only
+      incompatibility is if you have used mc_suppress_http_header to
+      suppress headers completely (i.e. you don't want Mason to send headers
+      at all); in this case pass auto_send_headers=>0 to ApacheHandler.
+    - Output mode parameter was moved from ah->output_mode to
+      interp->out_mode, to make it independent of mod_perl.
+      ah->output_mode still works.
+    - New in-memory code cache keeps track of component usage, and
+      discards the most infrequently used components as needed.  You can
+      specify the cache size with interp->max_code_cache_size.
+    - ** Eliminated the now unnecessary interp->code_cache_mode.
+    - ** Eliminated the "source references" optimization, a common source of
+      bugs, no longer needed with the new code cache.
+    - Allow arguments to be accessed via @_ as in regular subroutines; no
+      longer required to be in hash form. (suggested by Ken Williams)
+    - Added $m->scomp, which returns the output of the component call
+      instead of printing it. This is a cleaner replacement for the STORE
+      parameter, which still works but is no longer officially documented.
+    - Added $m->flush_buffer, which forces the buffer to be sent to the
+      client when in batch mode.
+    - Added $m->caller_args, which returns the argument list for any point
+      in the stack. (suggested by Lee Semel)
+    - Added $m->decline, which passes control to the next dhandler.
+      (suggested by Chuck O'Donnell)
+    - Augmented $m->cache_self to cache return values as well as output.
+      (suggested by Jon Frisby)
+    - Changed data cache filenames from colon-separated to url-encode
+      style for Win32 compatibility. (submitted by Ken Williams)
+    - Added improved, separate session_handler.pl for session handling.
+    - ** mc_comp_source no longer works for non-existent components.
+    - ** Removed mc_date legacy command.
+    - Many new test scripts.
+    - Added warnings about using Mason with mod_perl DSO.
+    - Added more site configuration examples to Admin.pod.
+    - Split object parameter methods (interp->comp_root, etc.) into
+      read/write and read-only as appropriate.
+    - Fixed request stack corruption when die() or error from one
+      component is caught by another component's eval.
+    - Fixed doc_root / comp_root mismatch on case-insensitive O/S.
+      (reported by John Arnold)
+    - Fixed "directory not absolute" warning on "/" (reported by Joe Edmonds)
+    - Fixed reload file scanning mechanism (submitted by Brian Holmes)
+    - Added use_data_dumper_xs Config.pm item, which checks whether
+      Data::Dumper::Dumpxs is available. (reported by Pelle Johnsen)
+    - Added "code examples" section to README
+
+0.72  October 15, 1999
+
+    - Eliminated long-standing infinite-block bug when POSTing to a
+      non-existent URL
+    - Fixed "keys" cache action which never worked as documented
+      (submitted by Scott Straley)
+    - Fixed source references on Win32 platforms by using text mode when
+      reading object file (submitted by Michael Shulman)
+    - Fixed various methods in FakeApache
+    - Remove final slash from system paths (component root, etc.) and
+      check that those paths are absolute
+    - Fixed all-text subcomponents, by bypassing the pure-text
+      optimization
+    - Quoted all hash strings in object file to reduce "Ambiguous use
+      of ..." warnings (suggested by Paul Schilling)
+    - Replaced */* with default-handler as recommended way to bypass Mason
+      (suggested by Dirk Koopman)
+    - Removed defunct pure text section in Administrators Guide (reported
+      by Michael Shulman)
+
+0.71  September 14, 1999
+
+    - Logic of top_level_predicate was reversed in 0.7; fixed.
+      (reported by Tom Hughes, Eric Hammond)
+    - mc_suppress_http_header(0) was broken in 0.7; fixed.
+      (reported by Michael Alan Dorman)
+    - Fixed bug in parser section that determines whether % is at the
+      beginning of a line.  (reported by Tom Hughes)
+    - Parser no longer inadvertently accepts argument names with
+      whitespace.  (reported by Phillip Gwyn)
+
+0.7  September 1, 1999
+
+    - Improved core implementation with two new classes,
+      HTML::Mason::Request and HTML::Mason::Component.  Code is now cleaner
+      and more scalable, and the new APIs give developers control and
+      introspection over Mason's inner workings.
+    - Added documentation to accommodate new classes: created
+      Request.pod and Component.pod, and moved component developer's guide
+      (previously at Components.pod) to Devel.pod to avoid
+      confusion.
+    - Object files have changed significantly (they now return a
+      component object).  Pre-0.7 object files will be detected and
+      automatically updated, unless you are running in reload file mode
+      in which case you are responsible for generating new object files.
+    - New <%def> section defines a subcomponent embedded inside a larger
+      component.  This allows repeated code and HTML to be modularized
+      without affecting the global component namespace.
+    - <%args> section now accommodates optional comments for declarations
+    - Improved Perl translation of <%args> section (submitted by Ken
+      Williams)
+    - Autohandler and dhandler file names are now configurable
+    - Dhandlers, which formerly worked only in mod_perl mode, now work in
+      stand-alone mode as well
+    - Interp::exec is now re-entrant with all request specific information
+      having been moved to Request class.
+    - ** Reworked Parser API. parse is now called make_component, has a
+      simplified set of options, and returns a component object
+      directly. make is now called make_dirs.
+    - Source references now read from the object file, cleaner for a
+      variety of reasons. Preprocess and postprocess now work with source
+      references.
+    - Removed obsolete and undocumented Interp::vars and mc_var functions
+    - Simplified chown/getpwuid usage in handler.pl (submitted by Randal
+      Schwartz)
+
+0.6.2  August 20, 1999
+
+    - Fixed problem with shared data cache locks over NFS (submitted by
+      Tom Hughes)
+    - Fixed mc_auto_comp, which never really worked as documented
+    - Fixed preloading for directories (submitted by Dennis Watson)
+    - Added back Utils::get_lock, which is used by content management
+
+0.6.1  July 27, 1999
+
+    - Added warnings to convert-0.6.pl about occasional erroneous
+      component call syntax conversions (reported by Oleg Bartunov)
+    - Fixed conversion of <% mc_comp("/foo/$bar") %> (reported by Oleg
+      Bartunov)
+    - Fixed cache access under high concurrencies (reported by Oleg
+      Bartunov)
+    - Fixed uppercase <%PERL>, broken in 0.6 (reported by Daniel L. Jones)
+    - Fixed mc_suppress_http_header(0), broken in 0.6 (reported by Jim
+      Mortko)
+
+0.6  July 16, 1999
+
+    - New <& &> tag provides a more convenient way to call components
+      inside HTML. mc_comp still works.
+    - The "perl_" prefix has been eliminated from section names: now
+      simply use <%init>, <%cleanup>, <%args>, etc. The old names still
+      work.
+    - The utility bin/convert0.6.pl converts existing components to use
+      the above new syntax.
+    - New autohandler feature finally provides an easy way to specify a
+      common template or behavior for a directory. An autohandler is invoked
+      just before any top-level components in its directory begins executing.
+      It can display header/footers, apply a filtering function, set up
+      globals, etc.  A good complement to dhandlers.
+    - New <%once> section contains code that will be executed once when a
+      component is loaded.  It is useful for defining persistent variables
+      and named subroutines.
+    - New <%filter> section and mc_call_self command allow you to arbitrarily
+      filter the output of the current component.
+    - New <%text> section allows you to turn off Mason processing for a
+      particular section of text.
+    - Implemented first installation test suite! [modus]
+    - HEAD optimization: we now automatically abort after headers are sent
+      on a HEAD request.
+    - New Parser make() utility traverses a tree of components, compiling
+      any out-of-date components into object files and reporting errors.
+    - New mc_comp_source command returns the source filename of this or
+      any component.
+    - mc_file now uses current component path by default for relative paths
+      if no static_file_root defined (suggested by John Landahl)
+    - Various previewer interface improvements
+    - Removed link tags in pods documentation due to 5.004 problems
+    - Took out previewer stub from Mason.pm to eliminate "subroutine
+      redefined" warning
+    - Updated makeconfig.pl to prefer GDBM_File, to avoid a bug in
+      Berkeley DB 1.x
+    - Cleaned and sped up interp hooks facility
+    - Stopped substituting control characters for section strings in Parser
+      [modus]
+    - Fixed mc_cache 'expire' bug (reported by Aaron Ross)
+    - Changed ignore_warnings default to ignore "subroutine redefined"
+      warnings to make <%once> more useful
+    - Removed defunct Safe code from Parser and defunct ALLOW_HANDLERS
+      code from Interp
+    - Added index file to htdocs/
+
+0.5.1  June 10, 1999
+    - Removed leftover "use File::Recurse" in ApacheHandler.pm [modus]
+    - Added empty test target to FAQ Makefile, required on certain
+      architectures [modus]
+
+0.5   June 3, 1999
+    - Removed memory leak associated with "return sub { ... }"
+    - Overhauled Config.pm, now maintains previous configuration when
+      upgrading Mason (suggested by Patrick Kane)
+    - Made filename processing compatible with Windows 32 (suggested by
+      Rafael Weinstein)
+    - Removed requirement of File::Tools/File::Recurse, replaced with
+      standard File::Find
+    - Switched output to STDOUT from $r->print, to facilitate chaining
+      with other mod_perl tools
+    - Switched to standard argument processing code, now handles
+      multi-part forms [modus]
+    - New preprocess and postprocess Parser options allow you to apply
+      auomatic modifications to components, before or after they are compiled
+      into code. (submitted by Philip Gwyn)
+    - New in_package Parser option allows components to live in any
+      package. (submitted by Philip Gwyn)
+    - Added documentation about using globals in components, and
+      some new facilities: Parser option 'allow_globals' and Interp
+      method 'set_global'.
+    - Documented how to save persistent user information with Apache::Session [modus]
+    - ** Changed behavior of reload_file mode to read directly from object
+      files. If you use reload files, you're now responsible for
+      creating object files. [mschmick]
+    - Reduced number of file stats when loading components [mschmick]
+    - New apache_status_title ApacheHandler option makes it possible to
+      use Mason's perl-status page with multiple ApacheHandler objects.
+      (submitted by Philip Gwyn)
+    - Upgraded FakeApache/debug files to work with mod_perl 1.19
+    - New sections in Component Developer's Guide explain how debug files
+      work and some caveats about when they don't.
+    - Mentioned mailing lists, masonhq.com web site, and FAQ in the
+      documentation and README
+    - Improved documentation on how to integrate images and non-Mason
+      hierarchies with Mason.
+    - Differentiated mc_cache and mc_cache_self in the commands manual
+      (suggested by Tom Hukins)
+    - Increased discouraging of SDBM, improved warnings when cache store
+      fails (suggested by Patrick Kane)
+    - Fixed HTML documentation to work with IE (suggested by Fen Lebalme)
+    - Fixed infinite loop in ApacheHandler dhandler search (submitted by
+      Chuck O'Donnell)
+    - Documented Parser method parse(), which allows you to compile
+      components outside of a Interp environment.
+    - New mc_cache actions 'expire' and 'keys' help you peer into data cache
+      files and expire selected keys.
+    - Corrected Parser to properly handle \ in components (submitted by
+      Ken Williams)
+    - ** Took Preview out of Mason.pm; ApacheHandler used only if mod_perl
+      environment. If you use the previewer, you now have to explicitly "use
+      HTML::Mason::Preview" in your handler.pl.
+    - Improved documentation about argument/GET/POST handling (suggested
+      by Ken Williams)
+    - Added cache option 'busy_lock', which prevents multiple processes
+      from recomputing an expire cache value at the same time.  (suggested
+      by Dennis Watson)
+    - Inserted work-around for Perl 5.005 $r scoping bug (submitted by
+      Rafael Weinstein)
+    - Fixed "new CGI" example in Components.pod (submitted by Austin Lin)
+    - Fixed "return if content-type..." line in handler.pl and Mason.pod
+      (submitted by Patrick Kane)
+    - Added CREDITS file
+
+0.4  January 06, 1999
+    - Added support for using Perl profiler in conjunction with debug
+      files
+    - Fixed bug in previewer HTML trace introduced in 0.3
+    - Created Perl status section for Mason
+    - Removed most warnings when PerlWarn is on (suggested by Philip Gwyn)
+    - Added code_cache_mode parameter to control caching of components in
+      memory
+    - Fixed mismatch between documentation and code with regards to cache
+      store events in system log.  The real event name is CACHE_WRITE.
+    - Changed system logging to use canonical server name when recording
+      URI
+    - Field access methods inside Mason objects are now handled with
+      custom subroutines instead of generic AUTOLOAD, improving performance
+    - Information for debug file is no longer collected if debug mode is
+      "none"
+    - Code to decline images and other non-text requests was placed in
+      default handler.pl and described in documentation (suggested by
+      Patrick Kane)
+    - Fixed server header output from debug files (suggested by Ewan Edwards)
+    - Created a Mason bundle
+    - Created a CPAN "alias" from Apache::Mason to HTML::Mason
+
+0.3   November 25, 1998
+    - Added optional system logging of page requests, cache activity,
+      component loading
+    - Deny directory requests so that index files will work in mod_perl 1.16+
+    - Removed reliance on several external packages (Date::Manip,
+      CGI::Base, URI::Escape). This should reduce the amount of memory taken
+      up by Mason processes and make Mason easier to install.
+    - ** Due to the removal of Date::Manip, the mc_date command will no
+      longer work unless Date::Manip is explicitly used, and the syntax for
+      the expire_at cache parameter and the Interp current_time parameter
+      have changed.
+    - Added parser taint_check flag which allows Mason to work with taint
+      checking on (suggested by Randal Schwartz)
+    - Added warning messages when returning 404 from ApacheHandler
+    - Improved cache locking with the use of separate lock files
+    - Makefile.PL checks for required and optional packages
+    - Documentation fixes and improvements
+    - Removed obsolete and undocumented commands from Commands.pm
+    - Failure to write debug file is now a warning rather than fatal error
+    - Augmented "no configuration for previewer port" error
+    - Fixed $interp->exec to be able to return list
+    - Changed parser to remove ctrl-Ms instead of replacing with spaces
+    - Always call http_header hook, not just at top level
+    - Added global IN_DEBUG_FILE flag
+    - Renamed mc_call_stack to mc_comp_stack to match documentation
+
+0.2   August 21, 1998
+    - Replaced File::lockf module, which could not port to some systems,
+      with simple call to flock
+    - Corrected email address in README
+    - Fixed undeclared variable bug in preview component
+    - The previewer did not work in basic versions of Perl 5.004 due to an
+      eval scoping bug. A workaround was put in place.
+    - Fixed expire_if cache option to pass correct argument to provided
+      subroutine
+    - Empty argument section no longer parsing incorrectly
+    - Took out directory names from manifest which were causing errors on
+      install
+    - Debug file is no longer prepared when debug_mode is "none"
+    - Use Preview.pm in Mason.pm
+
+0.1   July 22, 1998
+    - Original version; created by h2xs 1.18

@@ -1,0 +1,100 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Pod::Usage;
+use Getopt::Long;
+
+our $VERSION = 0.01;
+
+my %config;
+
+# process @ARGV for our own options
+BEGIN {
+    Getopt::Long::Configure ("require_order");
+    GetOptions( \%config, qw( help|? manual|H ) ) or pod2usage(2);
+
+    pod2usage(1) if $config{help};
+    pod2usage( -verbose => 2 ) if $config{manual};
+}
+
+# this processes @ARGV for proxy options
+use HTTP::Proxy::Builder;
+
+# what's left is the list of proxies
+proxy_load(@ARGV);
+
+__END__
+
+=head1 NAME
+
+build_proxy - Combine several HTTP::Proxy based programs into one
+
+=head1 SYNOPSYS
+
+build_proxy [ options ] [ proxy options ] -- [ proxy files ]
+
+Options:
+
+    -h, --help      Display this help
+    -H, --man       Longer manpage for build_proxy
+
+=head1 DESCRIPTION
+
+B<build_proxy> is a simple wrapper around C<HTTP::Proxy::Builder>.
+It lets you combine several proxies written using C<HTTP::Proxy> and
+C<HTTP::Proxy::Builder> into a single one. Each proxy program can still
+be used independently.
+
+
+=head2 How to transform a program based on C<HTTP::Proxy>
+
+A proxy like the following:
+
+    use HTTP::Proxy;
+    use HTTP::Proxy:: ...;    # required filter modules
+
+    my $proxy = HTTP::Proxy->new(@ARGV);
+    $proxy->push_filter(...);
+    $proxy->start();
+
+Can be made usable by B<build_proxy> by transforming it into this:
+
+    use HTTP::Proxy::Builder;
+    use HTTP::Proxy:: ...;    # required filter modules
+
+    $proxy->push_filter(...);
+
+Basically:
+
+=over 4
+
+=item *
+
+replace C<use HTTP::Proxy> by C<use HTTP::Proxy::Builder>,
+
+=item *
+
+remove calls to C<< HTTP::Proxy->new() >>,
+
+=item *
+
+remove calls to C<< $rpxoy->start() >>.
+
+=back
+
+
+=head1 AUTHOR
+
+Philippe Bruhat (BooK), C<< <book@cpan.org> >>.
+
+=head1 COPYRIGHT
+
+Copyright 2008 Philippe Bruhat (BooK), all rights reserved.
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+

@@ -1,0 +1,137 @@
+
+=head1 NAME
+
+HTML::DOM::Element::Select - A Perl class for representing 'select' elements in an HTML DOM tree
+
+=head1 VERSION
+
+Version 0.054
+
+=head1 SYNOPSIS
+
+  use HTML::DOM;
+  $doc = HTML::DOM->new;
+  $elem = $doc->createElement('select');
+
+  $elem->focus();
+  $elem->blur();
+  
+  # $elem->add(...)    # not yet
+  # $elem->remove(...) # implemented
+
+  $elem->options; # a list of 'option' elements
+
+  $elem->name('foo') # set attribute
+  $elem->type;       # get attribute
+  $elem->tagName;
+  # etc.
+
+  $elem->[0]; # first option
+  $elem->[1] = $doc->createElement('option');
+  $elem->[0] = undef; # deletes it
+  delete $elem->[0]; # same
+
+=head1 DESCRIPTION
+
+This class implements 'select' elements in an HTML::DOM tree. It 
+implements the HTMLSelectElement DOM interface and inherits from 
+L<HTML::DOM::Element> (q.v.).
+
+=head1 ARRAY INTERFACE
+
+You can use a 'select' element as an array reference, to access the
+individual elements of its options array. C<< @$elem >> actually does
+exactly the
+same thing as C<< @{$elem->options} >>. See 
+L<HTML::DOM::Collection::Options> for more info on using the array.
+
+=head1 METHODS
+
+In addition to those inherited from HTML::DOM::Element and its 
+superclasses, this class implements the following DOM methods:
+
+=over 4
+
+=item type
+
+=item disabled
+
+=item multiple
+
+=item name
+
+=item size
+
+=item tabIndex
+
+Each of these returns the corresponding HTML attribute. If you 
+pass an
+argument, it will become the new value of the attribute, and the old value
+will be returned.
+
+=item selectedIndex
+
+Returns the index of the selected option. If there is an argument, it
+selects the specified option and returns the index of the previous 
+selection.
+
+=item length
+
+Returns the number of options.
+
+=item form
+
+Returns the form containing this input element.
+
+=item options
+
+Returns a list of 'option' elements in list context, or an 
+L<HTML::DOM::Collection::Options>
+object in scalar context.
+
+=item value
+
+Selects the option with the value given if there is an argument and returns 
+the old value, or
+simply returns the value if there is no argument.
+
+=item blur
+
+=item focus
+
+These each trigger the corresponding event.
+
+=back
+
+In addition, the following methods are provided for compatibility with L<WWW::Mechanize>:
+
+=over 4
+
+=item possible_values
+
+This returns an empty list for most input elements, but for checkboxes it
+returns C<(undef, $value)>.
+
+=item readonly
+
+An alias to readOnly.
+
+=item form_name_value
+
+Returns a list of two items: (0) the name of the field and (1) the value.
+
+=item check
+
+Same as C<< $elem->checked(1) >>.
+
+=back
+
+=head1 SEE ALSO
+
+L<HTML::DOM>
+
+L<HTML::DOM::Collection::Options>
+
+L<HTML::DOM::Element>
+
+L<HTML::DOM::Element::Form>

@@ -1,0 +1,91 @@
+Internal Database
+
+
+
+
+
+The HTML::Merge Security Backend
+--------------------------------
+
+
+HTML::Merge provides a way to define users and for 
+each page (template) to define which user can see it.
+
+In addition, using the security tags of Merge, you can 
+provide more fine tuning to the security system.
+
+
+All the security information is kept in the system (or $SESSION_DB) database of Merge,
+by default its in SQLite. 
+(see merge.conf you created with mergecreateinstance)
+
+On one side there are users and groups. Each user can be in 0 or more groups.
+On the other side there are the templates.
+
+
+Then there are realms that connect between the resources (templates) 
+and between the clients (users or groups).
+
+About the users we only keep 
+   username
+   password
+
+
+
+
+Using the Toolbox and following the "Merge security backend" link you
+will see a menu with the following options:
+
+
+* Add users or change passwords
+    To add user: Type in a new username and the password twice and press
+    Change password: ???
+
+* User manager
+    You'll see a list of all the users with a checkbox on the left of the names
+       and an "Erase from system" and an "Edit" link to the right.
+
+    "Erase from system" will delete the user without further questions
+    "Edit" ???
+
+* Group manager
+* Permission manager
+* Realm manager
+    Add a new REALM
+    Delete (Destroy) an empty realm
+    Manage a real ->
+      leads to another page where you can 
+          add users and groups to the realm
+          remove (revoke) users or groups from the realm 
+          there is even a box to create a new group and add it on the fly 
+          but this might be gone by the next release.
+
+          It also list all the pages (templates) it is protecting - that is o
+
+
+     
+* Subsite manager
+* Template manager
+* Refresh template list
+* Close 
+
+
+
+
+TODO: 
+Write down exactly how does merge decide if a certain user can access a page:
+
+If a logged in user visits a page, she will be able to see the page if 
+  she, or one of her groups belong to one of the realm that has this page listed as protecting.
+
+If a visitor comes who has not authenticated yet she cannot look at any of the pages that are listed
+in any of the realms.
+
+It seems that pages that are not listed in any of the realms can be seen by anybody.
+This seems to be a security risk as I might add a page and forget to "protect" it and it is
+automatically available to everyone. Maybe Merge should disallow access to every page that is not in
+one of the realms and there should be a realm called WORLD or similar so we can decide on certain
+pages (e.g. the login page) that can be accessed by anybody.
+
+
+

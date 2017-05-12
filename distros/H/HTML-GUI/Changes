@@ -1,0 +1,14 @@
+Revision history for GUI-HTML-widget
+
+0.03   20/09/2009
+		    Correction of bug #50512 => https://rt.cpan.org/Public/Bug/Display.html?id=50512
+				Now it should declare all the modules needed.
+
+0.02   25/09/2009
+				A better try
+
+0.01   25/09/2009
+				First try !!
+       
+
+

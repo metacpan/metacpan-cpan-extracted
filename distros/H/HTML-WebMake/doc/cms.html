@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>
+      WebMake: Documentation: WebMake as a CMS
+    </title>
+    <meta name="generator" content="WebMake/2.2" />
+    <style>
+      body {
+       background-color: #ffffff; 
+       color: #000000; 
+       font-size: medium;
+       font-family: verdana,lucida,helvetica,sans-serif;
+      }
+      code, samp, pre {
+       font-family: Courier New,courier,fixed-width,monospace;
+      }
+      H1 { font-size: x-large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFCC66; }
+      H2 { font-size: large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFDD77; }
+      H3 { font-size: medium; font-family: Garamond,Book Antiqua,Times,serif; background: #FFEE88; }
+      H4 { font-size: small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H5 { font-size: x-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H6 { font-size: xx-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      A:link {
+       font-weight: bold;
+       color: #004000;
+       text-decoration: underline; 
+      }
+      A:visited {
+       font-weight: normal;
+       color: #008000;
+       text-decoration: underline; 
+      }
+      A:active {
+       font-weight: bold;
+       color: #800000;
+       text-decoration: underline; 
+      }
+      dt {
+       font-size: medium;
+       font-weight: bold;
+       padding-top: 8px; padding-bottom: 8px;
+      }
+      dd {
+       padding-top: 8px; padding-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body bgcolor="#ffffff" text="#000000" link="#3300cc" vlink="#660066">
+    <font face="lucida,verdana,sans-serif">
+      <div align="center">
+         <img src="images/WebMakeTitle.png" alt="WebMake" width="500" height="122" />
+      </div>
+      <table width="100%">
+        <tr>
+          <td valign="top">
+             <strong><a href="http://webmake.taint.org/">WebMake</a>
+             Documentation</strong> (version 2.2)
+             
+          </td>
+          <td valign="top">
+            <div align="right">
+              
+               [ <a href="invoking.html">Back</a> | <a href="using.html">Forward</a> | <a href="index.html">Index</a>
+               | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+               
+            </div>
+          </td>
+        </tr>
+      </table>
+<!-- yes, it's that Mozilla black-border code again ;) -->
+      <!-- stolen from www.mozilla.org via rc3.org -->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td bgcolor="#aaaaaa">
+            <table border="0" cellspacing="4" cellpadding="4" width="100%">
+              <tr>
+                <td bgcolor="#ffffff">
+                  <table border="0" cellspacing="4" cellpadding="4" width="100%">
+                    <tr>
+                      <td>
+                         <h1>WebMake as a CMS</h1><p>
+                          WebMake is, arguably, a Content Management System, or <a href="http://www.camworld.com/cms/">CMS</a>.
+                          
+                        </p>
+                        <p>
+                          To be more specific, it's oriented entirely towards generating a relatively
+                          static site, such as a weblog, a news site (without comments or
+                          personalisation) or a typical informational site.
+                          
+                        </p>
+                        <p>
+                          It does not have any dynamic, database-driven, features suitable for "live"
+                          sites that update frequently with dynamic data; nor does it have support for
+                          "personalisation" features, where the site displays different data based on
+                          what the user presents in their HTTP request. (Of course, using WebMake does
+                          not preclude using PHP, mod_perl, Mason etc. to provide these, however.)
+                          
+                        </p>
+                        <p>
+                          Here's the relevant details of what it can do.
+                          
+                        </p>
+                         <a name="WebMake_s_CMS_Features"><h2>WebMake's CMS Features</h2></a><ul>
+                          <li>
+                            <p>
+                              <strong>Separation between content and layout</strong>
+                            </p>
+                          </li>
+                          <blockquote>
+                            <p>
+                              Since, logically, content and layout are entirely separate tasks, they
+                               should be easy to keep separate in the CMS.
+                              
+                            </p>
+                          </blockquote>
+                          <blockquote>
+                            <p>
+                              WebMake uses <a href="content_refs.html">content references</a> to include content into pages, and
+                               implement templating. This allows you to separate the content text from
+                               the template layout HTML; the template designers just need to include
+                               a content reference, such as <code>${body}</code>, instead of the
+                               text.
+                              
+                            </p>
+                          </blockquote>
+                          <li>
+                            <p>
+                              <strong>No requirement for text editors to know HTML</strong>
+                            </p>
+                          </li>
+                          <blockquote>
+                            <p>
+                              Only the layout staff should really <em>need</em> to know HTML, so the staff who
+                               provide text content can do this without HTML knowledge.
+                              
+                            </p>
+                          </blockquote>
+                          <blockquote>
+                            <p>
+                              WebMake provides <a href="ettext.html">Text::EtText</a>, which provides an
+                               easy-to-edit, easy-to-read and intuitive way to write HTML, based on the
+                               plain-text markup conventions we've been using for years.
+                              
+                            </p>
+                          </blockquote>
+                          <li>
+                            <p>
+                              <strong>Generation of pages automatically, using metadata from content items</strong>
+                            </p>
+                          </li>
+                          <blockquote>
+                            <p>
+                              It should be possible to generate index pages, sitemaps, navigation links,
+                               and other text automatically, based on properties and metadata of the
+                               pieces of content loaded.
+                              
+                            </p>
+                          </blockquote>
+                          <blockquote>
+                            <p>
+                              WebMake supports this by <a href="metadata.html">allowing any content item to carry arbitrary
+                               textual metadata</a>. Perl code can then be used to dynamically
+                               request a list of content items that have a particular set of metadata,
+                               and any page can refer to another content item's title, description,
+                               abstract etc. without itself needing to parse the content text.
+                              
+                            </p>
+                          </blockquote>
+                          <li>
+                            <p>
+                              <strong>Flexible URL support</strong>
+                            </p>
+                          </li>
+                          <blockquote>
+                            <p>
+                              It should be trivial to rearrange a site, if required, totally changing
+                               the URLs used in the site's pages.
+                              
+                            </p>
+                          </blockquote>
+                          <blockquote>
+                            <p>
+                              WebMake supports this by using <a href="url_refs.html">symbolic URL references</a>,
+                               which can be modified by changing one line, causing references to that
+                               URL throughout the site to change.
+                              
+                            </p>
+                          </blockquote>
+                          <li>
+                            <p>
+                              <strong>Edit-In-Page Functionality</strong>
+                            </p>
+                          </li>
+                          <blockquote>
+                            <p>
+                              Most CMSes boast a nice, browser-based user interface to creating, naming,
+                               uploading and filling out content items and media.
+                              
+                            </p>
+                          </blockquote>
+                          <blockquote>
+                            <p>
+                              WebMake now provides a <a href="cgistart.html">CGI script</a>, which allows a certain
+                               degree of web-based maintainance and content editing. It's not quite as
+                               foolproof as some of the bigger CMS systems, but it's a start!
+                              
+                            </p>
+                          </blockquote>
+                        </ul>
+                        <a name="What_WebMake_Is_Missing"><h2>What WebMake Is Missing</h2></a><ul>
+                          <li>
+                            <p>
+                              <strong>Database Support</strong>
+                            </p>
+                          </li>
+                          <blockquote>
+                            <p>
+                              It would be nice if WebMake could load content from a database. It
+                               currently cannot, although there's nothing in the architecture that would
+                               preclude this; there just has not been a need, just yet.
+                              
+                            </p>
+                          </blockquote>
+                          <blockquote>
+                            <p>
+                              Unfortunately, this may not be possible -- <a href="http://www.delphion.com/details?pn=US06026413__">this IBM software patent</a> details a mechanism whereby a server can dynamically rebuild its
+                               pages, based on changes to objects in a database. WebMake could run
+                               afoul of this if database support is added (although there are a few
+                               points where this could be avoided).
+                              
+                            </p>
+                          </blockquote>
+                          <li>
+                            <p>
+                              <strong>XSLT Support</strong>
+                            </p>
+                          </li>
+                          <blockquote>
+                            <p>
+                              This will definitely arrive -- as soon as a good XSLT engine becomes part
+                               of Perl, or at least becomes easy to install from CPAN. It's on my list ;)
+                              
+                            </p>
+                          </blockquote>
+                          <li>
+                            <p>
+                              <strong>Workflow</strong>
+                            </p>
+                          </li>
+                          <blockquote>
+                            <p>
+                              There's currently no logic to support workflow. This would not
+                               be difficult to add, though.
+                              
+                            </p>
+                          </blockquote>
+                        </ul>
+                        <p>
+                          
+                        </p>
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+    <table width="100%">
+      <tr>
+        <td valign="top">
+           <strong><a href="http://webmake.taint.org/">WebMake</a>
+           Documentation</strong> (version 2.2)
+           
+        </td>
+        <td valign="top">
+          <div align="right">
+            
+             [ <a href="invoking.html">Back</a> | <a href="using.html">Forward</a> | <a href="index.html">Index</a>
+             | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+             
+          </div>
+        </td>
+      </tr>
+    </table>
+    <div align="right">
+       <a href="http://webmake.taint.org/"> <img src="images/BuiltWithWebMake.png" alt="Built With WebMake" border="0" width="88" height="31" /></a>
+    </div>
+  </font>
+</body>
+</html>

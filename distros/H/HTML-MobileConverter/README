@@ -1,0 +1,80 @@
+NAME
+    HTML::MobileConverter - HTML Converter for mobile agent
+
+SYNOPSIS
+      use HTML::MobileConverter;
+
+      my $baseuri = 'http://example.com/';
+      my $c = HTML::MobileConverter->new(baseuri => $baseuri);
+      my $html = qq|<html><body>title<hr><a href="./my">my link</a></body></html>|;
+      print $c->convert($html); # get html with abs-uri.
+  
+      use URI;
+      $html = qq|<html><body>title<hr><a href="./my">my link</a><iframe src="./my"></iframe></body></html>|;
+      $c = HTML::MobileConverter->new(
+        baseuri => $baseuri,
+        hrefhandler => sub {
+          my $href = shift;
+          return URI->new_abs($href, 'http://example.com/');
+        },
+      );
+      print $c->convert($html); # get html without iframe.
+  
+      # create a proxy
+      my $q = CGI->new;
+      my $html = $c->convert(LWP::Simple:get($q->param('uri')));
+      print Jcode->new($html)->sjis;
+
+DESCRIPTION
+    HTML::MobileConverter parses HTML and returns new HTML for mobile agent
+    (mainly for DoCoMo i-mode). If the original HTML doesn't contain so many
+    pc tags, it returns the original HTML strings with absolute uri
+    (href,src...). If the original was guessed as a content for PC, it
+    returns new HTML for mobile agent.
+
+METHODS
+    Here are common methods of HTML::MobileConverter.
+
+    new
+          $c = HTML::MobileConverter->new;
+          $c = HTML::MobileConverter->new(baseuri => 'http://www.example.com/');
+          $c = HTML::MobileConverter->new(
+            baseuri => 'http://www.example.com/',
+            hrefhandler => sub {
+              my $href = shift;
+              $href = URI->new_abs($href, 'http://www.example.com/');
+              return qq|/browse?uri=$href|;
+            },
+          );
+
+        creates a instance of HTML::MobileConverter. If you specify
+        "baseuri", "href/src/action" attributes will be replaced with
+        absolute uris.
+
+        If you specify "hrefhandler" with some function, href attribute will
+        be handled with the handler.
+
+    convert
+          my $mhtml = $c->convert($html);
+
+        returns HTML strings for mobile.
+
+    ismobilecontent
+          print "is mobile" if $c->ismobilecontent;
+
+        returns which the original HTML was guessed as mobile content or
+        not.
+
+AUTHOR
+    Junya Kondo, <jkondo@hatena.ne.jp>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2005 by Junya Kondo
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    HTML::Parser http://www.nttdocomo.co.jp/p_s/imode/tag/lineup.html
+    (Japanese)
+

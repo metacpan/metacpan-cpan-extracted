@@ -1,0 +1,11 @@
+Revision history for Perl extension HTTP::Response::Parser
+
+0.03    Tue Oct 12 21:18:24 2010
+        - update picohttpparser (by tokuhirom)
+
+0.02    Thu Aug 12 17:41:26 2010
+        - update picohttpparser (by kazuho oku)
+        - modernize XS, Makefile etc (by gfx)
+
+0.01    Fri May  7 18:58:36 2010
+        - original version

@@ -1,0 +1,8 @@
+---
+elements:
+    - type: Text
+      name: method_test
+    - type: Select
+      name: method_select_test
+    - type: Checkbox
+      name: method_checkbox_test

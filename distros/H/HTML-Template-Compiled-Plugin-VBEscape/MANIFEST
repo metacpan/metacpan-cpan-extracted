@@ -1,0 +1,16 @@
+Build.PL
+Changes
+example/01_escape.pl
+example/02_default_escape.pl
+lib/HTML/Template/Compiled/Plugin/VBEscape.pm
+MANIFEST			This list of files
+README
+t/01_escape.t
+t/02_default_escape.t
+t/chars.t
+t/perl_critic.t
+t/pod.t
+t/pod_coverage.t
+t/prereq_build.t
+Makefile.PL
+META.yml

@@ -1,0 +1,24 @@
+---
+abstract: 'Add post_multipart to HTTP::Tiny'
+author:
+  - 'Renee Baecker <reneeb@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.142060'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTTP-Tiny-Multipart
+requires:
+  Carp: '0'
+  File::Basename: '0'
+  HTTP::Tiny: '0'
+  MIME::Base64: '0'
+resources:
+  bugtracker: http://github.com/reneeb/HTTP-Tiny-Multipart/issues
+  homepage: http://github.com/reneeb/HTTP-Tiny-Multipart
+  repository: http://github.com/reneeb/HTTP-Tiny-Multipart.git
+version: '0.05'

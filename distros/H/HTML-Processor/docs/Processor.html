@@ -1,0 +1,1008 @@
+<HTML>
+<HEAD>
+<TITLE>HTML::Processor - HTML Template Processor</TITLE>
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#module defaults">Module Defaults</A></LI>
+		<LI><A HREF="#object construction">Object Construction</A></LI>
+		<LI><A HREF="#syntax">Syntax</A></LI>
+		<LI><A HREF="#precedence">Precedence</A></LI>
+		<LI><A HREF="#including external files">Including external files</A></LI>
+		<LI><A HREF="#debugging">Debugging</A></LI>
+		<LI><A HREF="#option blocks">Option blocks</A></LI>
+		<LI><A HREF="#if / else blocks">If / else blocks</A></LI>
+		<LI><A HREF="#loops">Loops</A></LI>
+		<UL>
+
+			<LI><A HREF="#loop options">Loop Options</A></LI>
+			<LI><A HREF="#loop if/else">Loop If/Else</A></LI>
+			<LI><A HREF="#nested loops">Nested Loops</A></LI>
+		</UL>
+
+		<LI><A HREF="#sorting">Sorting</A></LI>
+		<LI><A HREF="#processing variables">Processing Variables</A></LI>
+		<UL>
+
+			<LI><A HREF="#variable concatenation">variable concatenation</A></LI>
+			<LI><A HREF="#variable math">variable math</A></LI>
+		</UL>
+
+		<LI><A HREF="#processing the template">Processing the Template</A></LI>
+	</UL>
+
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>HTML::Processor - HTML Template Processor</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P><EM>-perl</EM></P>
+<PRE>
+        use HTML::Processor;</PRE>
+<PRE>
+        $tpl = new HTML::Processor;
+</PRE>
+<PRE>
+
+        -or with config options-</PRE>
+<PRE>
+
+        $tpl = new HTML::Processor ({ 
+           debug     =&gt; &quot;Normal&quot;,
+           footprint =&gt; 1,
+           clean     =&gt; 0
+        });</PRE>
+<PRE>
+        # data
+        %animals = (
+            mammals    =&gt; {
+               types =&gt; [qw(monkey lion zebra elephant)],
+               count =&gt; 120
+            },
+            fish       =&gt; {
+               types =&gt; [qw(swordfish shark guppy tuna marlin tunny)],
+               count =&gt; 85
+            },
+            reptiles   =&gt; {
+               types =&gt; [qw(monitor python crocodile tortoise)],
+               count =&gt; 25
+            },
+            birds      =&gt; {
+               types =&gt; [qw(eagle pigeon kite crow owl sparrow)],
+               count =&gt; 57
+           }
+</PRE>
+<PRE>
+
+        );</PRE>
+<PRE>
+        # create parent loop object
+        my $animals = $tpl-&gt;new_loop(&quot;animals&quot;);
+        foreach my $animal_type( keys %animals){
+           # add data to the parent loop
+           $animals-&gt;array(&quot;animal_type&quot;, $animal_type);
+           $animals-&gt;array(&quot;count&quot;, $animals{$animal_type}{ count });</PRE>
+<PRE>
+           # create new nested loop object 'keyed' on
+           # the parent via $animal_type
+           my $types = $tpl-&gt;new_loop(&quot;types&quot;, $animal_type);
+           foreach my $type ( @{ $animals{$animal_type}{types} }){
+              # populate each 'child' loop
+              $types-&gt;array(&quot;type&quot;, $type);
+           }
+        }
+        # set variables
+        $tpl-&gt;variable(&quot;what&quot;, &quot;ANIMALS&quot;);
+        $tpl-&gt;variable(&quot;count&quot;, 2);
+</PRE>
+<PRE>
+
+        # process and print parsed template
+        print $tpl-&gt;process(&quot;templates/animals.html&quot;);</PRE>
+<P><EM>-html</EM></P>
+<PRE>
+        &lt;html&gt;
+        &lt;head&gt;
+                &lt;title&gt;Sample&lt;/title&gt;
+        &lt;/head&gt;
+        &lt;body&gt;
+        [TPL variable='what']:&lt;br&gt;
+        &lt;table width=&quot;200&quot;&gt;
+        [TPL LOOP name='animals']
+           &lt;tr&gt;
+              &lt;td&gt;[TPL array='animal_type'] [[TPL array='count']]&lt;/td&gt;
+           &lt;/tr&gt;
+           &lt;tr&gt;
+              &lt;td align=&quot;right&quot;&gt;
+              [TPL LOOP name='types']
+                 [TPL array='type']&lt;br&gt;
+              [TPL LOOP END]
+              &lt;/td&gt;
+           &lt;/tr&gt;
+        [TPL LOOP END]
+        &lt;/table&gt;
+        &lt;br&gt;&lt;br&gt;
+           [TPL IF count == '2']
+              count is  2
+           [TPL ELSE]
+              count is not 2
+           [TPL ENDIF]
+        &lt;br&gt;&lt;br&gt;
+</PRE>
+<PRE>
+
+        [TPL include='footer.inc']</PRE>
+<P><EM>-output</EM></P>
+<PRE>
+        &lt;!--- TEMPLATE: templates/animals.html ---&gt;
+        &lt;html&gt;
+        &lt;head&gt;
+        &lt;title&gt;Sample&lt;/title&gt;
+        &lt;/head&gt;
+        &lt;body&gt;
+        ANIMALS:&lt;br&gt;
+        &lt;table width=&quot;200&quot;&gt;
+        &lt;tr&gt;
+        &lt;td&gt;mammals [120]&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td align=&quot;right&quot;&gt;
+                                monkey&lt;br&gt;
+                                lion&lt;br&gt;
+                                zebra&lt;br&gt;
+                                elephant&lt;br&gt;
+        &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;fish [85]&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td align=&quot;right&quot;&gt;
+                                swordfish&lt;br&gt;
+                                shark&lt;br&gt;
+                                guppy&lt;br&gt;
+                                tuna&lt;br&gt;
+                                marlin&lt;br&gt;
+                                tunny&lt;br&gt;
+        &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;birds [57]&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td align=&quot;right&quot;&gt;
+                                eagle&lt;br&gt;
+                                pigeon&lt;br&gt;
+                                kite&lt;br&gt;
+                                crow&lt;br&gt;
+                                owl&lt;br&gt;
+                                sparrow&lt;br&gt;
+        &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td&gt;reptiles [25]&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+        &lt;td align=&quot;right&quot;&gt;
+                                monitor&lt;br&gt;
+                                python&lt;br&gt;
+                                crocodile&lt;br&gt;
+                                tortoise&lt;br&gt;
+        &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;/table&gt;
+        &lt;br&gt;&lt;br&gt;
+                        count is  2
+        &lt;br&gt;&lt;br&gt;
+        &lt;!--- INCLUDED: templates/footer.inc ---&gt;
+        &lt;br&gt;
+        COMMON FOOTER
+        &lt;/body&gt;
+        &lt;/html&gt;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>The Processor.pm module is designed to remove html from perl 
+scripts without putting too much Perl into the html. 
+The syntax (configurable) is somewhat verbose in order to 
+not scare off html coders, while retaining some Perl logic and 
+functionality. It has a fairly basic set of methods and is not 
+as heavy duty as some of the other Template parsers
+out there but manages to cover most of the essential html
+processing operations.</P>
+<P><STRONG>Documentation Syntax</STRONG></P>
+<P>As the module deals with PERL CODE, HTML CODE and OUTPUT
+the documentation will indicate these as separate blocks:</P>
+<P><EM>-perl</EM></P>
+<P><EM>-html</EM></P>
+<P><EM>-output</EM></P>
+<P>
+<H2><A NAME="module defaults">Module Defaults</A></H2>
+<P>
+<H2><A NAME="object construction">Object Construction</A></H2>
+<PRE>
+
+    use HTML::Processor;</PRE>
+<PRE>
+
+        $tpl = new HTML::Processor; # with defaults
+        -or-
+        $tpl = new HTML::Processor({
+           debuglevel  =&gt; 'Verbose',
+           footprint   =&gt; 0,
+           clean       =&gt; 0,
+           syntax_pre  =&gt; '\[% ',
+           syntax_post =&gt; ' %\]'
+        });</PRE>
+<P>When creating a new object some of the module defaults
+may be overridden by passing a hash of options to
+the constructor, these include:</P>
+<UL>
+<LI><STRONG><A NAME="item_debuglevel">debuglevel</A></STRONG><BR>
+
+<PRE>
+     values: [Off|Fatal|Normal|Verbose]  # case sensitive
+        Default: Off
+    Actions: Off =&gt; no debug info is displayed
+             Fatal =&gt; only fatal errors are displayed
+             Normal =&gt; basic processing info is displayed
+             Verbose =&gt; verbose info about the processing stage
+             ** Debug info is appended to the output</PRE>
+<LI><STRONG><A NAME="item_footprint">footprint</A></STRONG><BR>
+
+<PRE>
+         Values: [1|0]
+        Default: 0
+        Actions: 1 =&gt; leave an html comment describing the
+                      location and name of the primary template
+                      at the start of the output:
+                      &lt;!-- TEMPLATE: templates/animals.html ---&gt;
+                      and for each included file:
+                      &lt;!-- TEMPLATE BEGIN INCLUDE templates/footer.html --&gt;
+                    -- included file data
+                  &lt;!-- TEMPLATE END INCLUDE: templates/footer.html --&gt;
+                 2 =&gt; don't</PRE>
+<LI><STRONG><A NAME="item_clean">clean</A></STRONG><BR>
+
+<PRE>
+         Values: [1|0]
+        Default: 1
+        Actions: 1 =&gt; remove blank lines and leading whitespace
+                      from template output - reduces html
+                      file size for efficiency but soure is
+                      no longer 'pretty'
+                 2 =&gt; don't</PRE>
+<LI><STRONG><A NAME="item_syntax_pre">syntax_pre</A></STRONG><BR>
+
+<PRE>
+         Values: pretty much anything BUT escape special chars
+        Default: '\[TPL ' # note the space
+        Actions: Sets the opening syntax for template tags, may
+                 conform to a variety of existing styles eg:
+                 '&lt;\% ' asp style
+                 '&lt;\? ' php style
+                 '\[% ' Template-Toolkit style
+                 Watch out for spaces and charaters which have
+                 meaning within regular expressions</PRE>
+<LI><STRONG><A NAME="item_syntax_post">syntax_post</A></STRONG><BR>
+
+<PRE>
+         Values: as above
+        Default: '\]'
+        Actions: As above</PRE>
+</UL>
+<P>Default Template Syntax examples</P>
+<PRE>
+        [TPL variable='varname']
+        [TPL LOOP name='loop_name']
+           [TPL array='loop_item']
+        [TPL LOOP END]</PRE>
+<P>Alternative syntax examples</P>
+<PRE>
+        [% variable='varname' %]
+        [% LOOP BEGIN name='loop_name' %]
+           [% array='loop_item' %]
+        [% LOOP END %]</PRE>
+<PRE>
+        &lt;? variable='varname' ?&gt;
+        &lt;? LOOP BEGIN name='loop_name' ?&gt;
+           &lt;? array='loop_item' ?&gt;
+        &lt;? LOOP END ?&gt;</PRE>
+<P>
+<H2><A NAME="syntax">Syntax</A></H2>
+<P>When passing variables to object methods and when
+reflecting the variables in the html, the names
+must be matchable by: [a-zA-Z0-9_-]</P>
+<P>Names must be quoted in single quotes in the HTML/text
+but double quotes are fine within Perl code.</P>
+<P>Bad examples:</P>
+<P><EM>-perl</EM></P>
+<PRE>
+        $tpl-&gt;variable(&quot;my~name&quot;, $val);</PRE>
+<P><EM>-html</EM></P>
+<PRE>
+        [TPL variable='my~name']
+        [TPL variable=&quot;myname&quot;]</PRE>
+<P>
+<H2><A NAME="precedence">Precedence</A></H2>
+<P>The template data is processed in the following order
+</P>
+<PRE>
+
+   (0. SORT - if called)
+    1. INCLUDE
+    2. OPTION
+    3. IF/ELSE
+    4. VARIABLES
+    5. LOOPS
+           5a. LOOP OPTION
+           5b. LOOP IF/ELSE</PRE>
+<PRE>
+
+Thus, if a LOOP is nested within an OPTION, the OPTION is
+evaluated &amp; if true, the LOOP is processed.</PRE>
+<P>
+<H2><A NAME="including external files">Including external files</A></H2>
+<P>File fragments or complete html files may be included into
+any template file. The included files may also contain any
+Template code blocks or tags. The name and path of the included file
+may be stored within a template object or interpreted from
+the include statement in the html.</P>
+<P>The root path is relative to the primary template opened in by the</P>
+<PRE>
+        $tpl-&gt;process(&quot;templates/main_template.html&quot;)</PRE>
+<P>method.</P>
+<P><STRONG>Syntax:</STRONG></P>
+<P><EM>-perl</EM>
+</P>
+<PRE>
+
+    # specifying includes from Perl
+        $tpl-&gt;include(&quot;footer&quot;, &quot;templates/footer.html&quot;);</PRE>
+<P><EM>-html</EM></P>
+<PRE>
+        [TPL include='footer']
+        # $tpl-&gt;include(&quot;footer&quot;) will be accessed for filename</PRE>
+<PRE>
+        -or-
+</PRE>
+<PRE>
+
+    # specifying includes from the template</PRE>
+<PRE>
+
+        [TPL include='fragments/footer.inc']
+        # footer.inc is included by means of the direct
+        # reference to its location in the html
+        # the method call: $tpl-&gt;include(&quot;footer&quot;, &quot;templates/footer.html&quot;);
+        # IS NOT REQUIRED IN PERL
+        # valid included file extensions are: (.inc|.htm|.html)</PRE>
+<P>To expand on this lets take a script in /cgi-bin which calls</P>
+<PRE>
+        $tpl-&gt;process(&quot;templates/main_template.html&quot;)</PRE>
+<P>Within 'main_template.html' is the include:</P>
+<PRE>
+        [TPL include='fragments/footer.inc']
+</PRE>
+<PRE>
+
+Within footer.inc is the include:</PRE>
+<PRE>
+    [TPL include='../../other_files/foo.htm']</PRE>
+<P>When processed we have:</P>
+<PRE>
+    /cgi-bin/templates/main_template.html
+    # which then includes
+    /cgi-bin/templates/fragments/footer.inc
+    # which then includes
+    /cgi-bin/other_files/foo.htm</PRE>
+<P>The include process keeps track of the locations of all
+included files relative to the template root.</P>
+<P>
+<H2><A NAME="debugging">Debugging</A></H2>
+<P>There are several methods available for debugging the Template
+object.</P>
+<PRE>
+    1. Debugging Perl
+       HTML::Processor can be used to display program info during runtime
+       to assist in Perl debugging. There are 2 methods for this:
+       A: $tpl-&gt;print_die(&quot;data_to_print&quot;);
+          &quot;data_to_print&quot; can be anything printable. This method
+          will print an HTML header and then the data and exit
+          the program.
+</PRE>
+<PRE>
+
+       B: $tpl-&gt;print(&quot;data&quot;, 'line terminator')
+          this will print an HTML header(once) then data
+          inline as the script is executed. Sometimes usefull
+          for viewing a loop's content eg:</PRE>
+<PRE>
+
+          while ( @loop_data ) {
+            $tpl-&gt;print($_, &quot;&lt;br&gt;&quot;);
+          }</PRE>
+<PRE>
+
+          This outputs the data with HTML linebreaks for viewing
+          in the browser.</PRE>
+<PRE>
+
+       Output from both methods will be printed before any template
+       content data.</PRE>
+<PRE>
+
+    2. Debugging the Template Object
+       The HTML::Processor object can be debugged in 2 ways:
+       A: Using the Config Option at object creation set 'debuglevel'
+          as describe in 'Object Creation' above. Debug data is appended
+          the the end of object content.
+          eg: $tpl = new HTML::Processor({ debuglevel =&gt; 'Verbose' });</PRE>
+<PRE>
+
+       B: Viewing the entire content of the object via Data::Dumper
+          $tpl-&gt;process(&quot;templates/template.html&quot;, 1);
+          Pass an additional parameter to the process method and the
+          object internal data is passed to Data::Dumper and appended
+          to the end of object output content.</PRE>
+<P>
+<H2><A NAME="option blocks">Option blocks</A></H2>
+<P>Option blocks are chunks of html/text which are displayed only
+if a condition is true. The internal 'option' hash is
+tested first and may be set explicitly, if the variable 
+name is not found there, the 'variables' hash is tested.</P>
+<P>If both tests return false the block is excluded from
+temlate output. True is returned for anything but
+0 or '' (empty string).</P>
+<P><STRONG>Syntax:</STRONG></P>
+<P><EM>-perl</EM></P>
+<PRE>
+        # explicit
+        $hour = (localtime)[2];
+        $morning = ($hour &lt; 12) ? 1 : 0;
+        $tpl-&gt;option(&quot;morning&quot;, $morning);
+        $tpl-&gt;variable(&quot;time&quot;, scalar localtime)
+        -or-
+        # implicit, re-using an object variable
+        $tpl-&gt;variable(&quot;morning&quot;, scalar localtime) if ((localtime)[2] &lt; 12);</PRE>
+<P><EM>-html</EM></P>
+<PRE>
+        # explicit
+        [TPL OPTION name='morning']
+           Good morning&lt;br&gt;
+           It is now: [TPL variable='time']
+        [TPL OPTION END]</PRE>
+<PRE>
+        # implicit
+        [TPL OPTION name='morning']
+           Good morning&lt;br&gt;
+           It is now: [TPL variable='morning']
+        [TPL OPTION END]</PRE>
+<P><EM>-output</EM></P>
+<PRE>
+        # implicit and explicit
+        Good morning
+        It is now: Sat Jun 2 09:23:29 2001</PRE>
+<P>The logic may be inverted in an option block eg:</P>
+<P><EM>-perl</EM></P>
+<PRE>
+    # A
+    $tpl-&gt;option(&quot;optA&quot;, 1);
+    # B
+    $tpl-&gt;option(&quot;optB&quot;, 0);
+</PRE>
+<PRE>
+
+I&lt;-html&gt;</PRE>
+<PRE>
+    [TPL OPTION name='optA']
+           option A data
+        [TPL OPTION END]
+</PRE>
+<PRE>
+
+    [TPL OPTION name!='optB']
+           option B data
+        [TPL OPTION END]</PRE>
+<P>Both of the above evaluate as true and the content
+will be output in both cases.</P>
+<P>
+<H2><A NAME="if / else blocks">If / else blocks</A></H2>
+<P>If/Else blocks function in a similar way to Perl
+if(){} elsif(){} else{} constructs and display the
+contents of the first block for which the expression
+returns true. Regular object variables are used
+for the expression. Evaluation operators include:</P>
+<PRE>
+        ( == != &lt; &lt;= &gt; &gt;= )</PRE>
+<P>Equality and Inequality, for 
+both strings and numerics, is via <CODE>==</CODE> and <CODE>!=</CODE>
+respectively. HTML::Processor will determine whether the values
+for comparison are strings or numerics and apply the
+appropriate operators. Numbers handled are floating points,
+integers or comma delimited floating points ( eg. 2,999,999.34 ).
+All other number formats will be treated as strings.</P>
+<P><STRONG>Syntax:</STRONG></P>
+<P><EM>-perl</EM>
+</P>
+<PRE>
+
+    # Assume the 'hour' is 11:00
+        $tpl-&gt;variable(&quot;hour&quot;, (localtime)[2]);</PRE>
+<P><EM>-html</EM></P>
+<PRE>
+        [TPL IF hour &lt; '12']
+           Good Morning
+        [TPL ELSIF hour &gt;= '18']
+           Good Evening
+        [TPL ELSE]
+           Good Afternoon
+        [TPL ENDIF]</PRE>
+<P><EM>-output</EM></P>
+<PRE>
+        Good morning</PRE>
+<P>
+<H2><A NAME="loops">Loops</A></H2>
+<P>Loops handle multiple records of a given format. Each loop
+must be named and can be thought of as similar to a database
+table with rows and columns. Each 'row' represents a data
+record and the 'columns' are data fields. Loops may be
+nested within other loops by means of associating the
+nested loop to its parent via a 'key' value (one of the data
+fields). Loops may also contain conditional arguments,
+If/Else and Option blocks, which evaluate a condition for 
+each loop of a loop. 
+Loop syntax is best explained by example:</P>
+<P><STRONG>Syntax:</STRONG></P>
+<P><EM>-perl</EM>
+</P>
+<PRE>
+
+    # consider this basic data set:
+    my @pets_data = (
+        &quot;Boots,5,cat&quot;,
+        &quot;Rover,3,dog&quot;,
+        &quot;Tweety,1,budgie&quot;
+    );</PRE>
+<PRE>
+
+    # create a new loop object
+    # and populate the object via the loop
+    # 'array' method
+    $pets = $tpl-&gt;new_loop(&quot;pets&quot;);
+    foreach my $pet (@pets_data){
+        my ( $name, $age, $type ) = split (/,/, $pet);
+        $pets-&gt;array(&quot;name&quot;, $name);
+        $pets-&gt;array(&quot;age&quot;,  $age);
+        $pets-&gt;array(&quot;type&quot;, $type);
+    }</PRE>
+<P><EM>-html</EM>
+</P>
+<PRE>
+
+    My Pets:&lt;br&gt;
+    NAME, AGE, TYPE&lt;br&gt;
+    [TPL LOOP name='pets']
+        [TPL array='name'], [TPL array='age'], [TPL array='type']&lt;br&gt;
+    [TPL LOOP END]</PRE>
+<PRE>
+
+I&lt;-output&gt;</PRE>
+<PRE>
+    My Pets:
+    NAME, AGE, TYPE
+    Boots, 5, cat
+    Rover, 3, dog
+    Tweety, 1, budgie</PRE>
+<P>
+<H3><A NAME="loop options">Loop Options</A></H3>
+<P>Loop options evaluate a data field within the loop, if true the
+optinal content is displayed. They are the same as normal options
+but derive their scope from the current loop of the loop
+which they are in.</P>
+<P>Using our above data set:</P>
+<P><EM>-perl</EM>
+</P>
+<PRE>
+
+    # consider, again, this basic data set:
+    my @pets_data = (
+        &quot;Boots,5,cat&quot;,
+        &quot;Rover,3,dog&quot;,
+        &quot;Tweety,1,budgie&quot;
+    );</PRE>
+<PRE>
+
+    # create a new loop object
+    # and populate the object via the loop
+    # 'array' method
+    $pets = $tpl-&gt;new_loop(&quot;pets&quot;);
+    foreach my $pet (@pets_data){
+        my ( $name, $age, $type ) = split (/,/, $pet);
+        $pets-&gt;array(&quot;name&quot;, $name);
+        $pets-&gt;array(&quot;age&quot;,  $age);
+        $pets-&gt;array(&quot;type&quot;, $type);
+        # set the variable 'cat' as true for testing
+        # optional content
+        $pets-&gt;array(&quot;cat&quot;, 1) if $type eq &quot;cat&quot;;
+    }</PRE>
+<P><EM>-html</EM></P>
+<PRE>
+    My Pets:&lt;br&gt;
+    NAME, AGE, TYPE&lt;br&gt;
+    [TPL LOOP name='pets']
+        [TPL array='name'], [TPL array='age'], [TPL array='type']
+         [TPL LOOP OPTION name = 'cat']
+            'meeow'
+         [TPL LOOP OPTION END]
+        &lt;br&gt;
+    [TPL LOOP END]</PRE>
+<P><EM>-output</EM></P>
+<PRE>
+    My Pets:
+    NAME, AGE, TYPE
+    Boots, 5, cat 'meeow'
+    Rover, 3, dog
+    Tweety, 1, budgie</PRE>
+<P>Internally, each time the loop is evaluated if variable 'cat'
+is true the data is displayed.</P>
+<P>
+<H3><A NAME="loop if/else">Loop If/Else</A></H3>
+<P>Same as normal If/Else but, like the Loop Option, tests values
+within current loop of loop.</P>
+<P><EM>-html</EM>
+</P>
+<PRE>
+
+    My Pets:&lt;br&gt;
+    NAME, AGE, TYPE&lt;br&gt;
+    [TPL LOOP name='pets']
+        [TPL array='name'], [TPL array='age'], [TPL array='type']
+         [TPL LOOP IF type = 'cat']
+            'meeow'
+         [TPL ELSIF type = 'dog']
+            'woof'
+         [TPL ELSIF type = 'bird']
+            'tweet'
+         [TPL LOOP ENDIF]
+        &lt;br&gt;
+    [TPL LOOP END]</PRE>
+<P><EM>-output</EM></P>
+<PRE>
+    My Pets:
+    NAME, AGE, TYPE
+    Boots, 5, cat 'meeow'
+    Rover, 3, dog 'woof'
+    Tweety, 1, budgie 'tweet'</PRE>
+<P>
+<H3><A NAME="nested loops">Nested Loops</A></H3>
+<P>The concept of nested loops is similar to a database 'join'
+where multi-record content for a field is derived from 
+elsewhere based on a 'key'. Nests may be several levels deep
+provided the syntax is maintained. Consider the following:</P>
+<P><EM>-perl</EM></P>
+<PRE>
+    %animals = (
+            mammals    =&gt; {
+               types =&gt; [qw(monkey lion zebra elephant)],
+               count =&gt; 120
+            },
+            fish       =&gt; {
+               types =&gt; [qw(swordfish shark guppy tuna marlin tunny ray)],
+               count =&gt; 85
+            },
+            reptiles   =&gt; {
+               types =&gt; [qw(monitor python crocodile tortoise)],
+               count =&gt; 25
+            },
+            birds      =&gt; {
+               types =&gt; [qw(eagle pigeon owl)],
+               count =&gt; 57
+           }
+        );</PRE>
+<P>Here each type of animal has a variable-length record for the
+names of its types.</P>
+<PRE>
+    # create parent loop object
+        my $animals = $tpl-&gt;new_loop(&quot;animals&quot;);
+        foreach my $animal_type( keys %animals){
+           # add data to the parent loop
+           $animals-&gt;array(&quot;animal_type&quot;, $animal_type);
+           $animals-&gt;array(&quot;count&quot;, $animals{$animal_type}{ count });</PRE>
+<PRE>
+           # create new nested loop object 'keyed' on
+           # the parent via $animal_type
+           my $types = $tpl-&gt;new_loop(&quot;types&quot;, $animal_type);
+           foreach my $type ( @{ $animals{$animal_type}{types} }){
+              # populate each 'child' loop
+              $types-&gt;array(&quot;type&quot;, $type);
+           }
+        }</PRE>
+<PRE>
+    # IMPORATNAT SYNTAX
+    # NEW PARENT LOOP OBJECT is created outside the block
+</PRE>
+<PRE>
+
+    my $parent = $tpl-&gt;new_loop(&quot;parent&quot;);</PRE>
+<PRE>
+
+    foreach ( @parent_data ) {
+        my ( $val1,$val2,$val3,$parent_key ) = @_;
+        $parent-&gt;array(&quot;val1&quot;, $val1);</PRE>
+<PRE>
+
+        # create a NEW CHILD LOOP OBJECT for each loop
+        # of the parent loop, use a unique value in
+        # the parent data as the 'key' for each
+        # child loop</PRE>
+<PRE>
+
+        my $child = $tpl-&gt;new_loop(&quot;child&quot;, $parent_key);</PRE>
+<PRE>
+
+        foreach ( @child_data ) {
+            $child-&gt;array(&quot;name&quot;, $_);
+        }
+    }</PRE>
+<P><EM>-html</EM></P>
+<PRE>
+        &lt;table&gt;
+        [TPL LOOP name='animals']
+           &lt;tr&gt;
+              &lt;td&gt;[TPL array='animal_type'] [[TPL array='count']]&lt;/td&gt;
+           &lt;/tr&gt;
+           &lt;tr&gt;
+              &lt;td align=&quot;right&quot;&gt;
+              [TPL LOOP name='types']
+                 [TPL array='type']&lt;br&gt;
+              [TPL LOOP END]
+              &lt;/td&gt;
+           &lt;/tr&gt;
+        [TPL LOOP END]
+        &lt;/table&gt;</PRE>
+<P>
+<H2><A NAME="sorting">Sorting</A></H2>
+<P>Sort is a handy method to sort output data by columns. Often
+output is an HTML table with rows and columns. The data may
+be derived from several database calls, or other methods, and
+it becomes difficult to sort the output internally in Perl.
+This is where the Sort method comes in. Sort is applied to
+a named LOOP on one of its columns. This is again best illustrated
+by example (see the supplied perl example file for the full
+data example - the example makes use of CGI.pm to grab incoming
+sort data)</P>
+<P><EM>-perl</EM>
+</P>
+<PRE>
+
+    $tpl-&gt;sort($cgi-&gt;param('sortby'));
+    print $tpl-&gt;process(&quot;templates/countries.html&quot;);</PRE>
+<P><EM>-html</EM></P>
+<PRE>
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;td&gt;name [&lt;a href=&quot;scriptname.cgi?sort=countries-name&quot;&gt;sort&lt;/a&gt;]&lt;/td&gt;
+        &lt;td&gt;
+            population 
+            [&lt;a href=&quot;scriptname.cgi?sort=population-ASC&quot;&gt;ASC&lt;/a&gt; 
+            | &lt;a href=&quot;scriptname.cgi?sort=population-DESC&quot;&gt;DESC&lt;/a&gt;]
+        &lt;/td&gt;
+        &lt;td&gt;currency [&lt;a href=&quot;scriptname.cgi?sort=currency&quot;&gt;sort&lt;/a&gt;]&lt;/td&gt;
+        &lt;td&gt;capital [&lt;a href=&quot;scriptname.cgi?sort=capital&quot;&gt;sort&lt;/a&gt;]&lt;/td&gt;
+        &lt;td&gt;area [&lt;a href=&quot;scriptname.cgi?sort=area&quot;&gt;sort&lt;/a&gt;]&lt;/td&gt;
+    &lt;/tr&gt;
+    [TPL LOOP name='countries']
+    &lt;tr&gt;
+        &lt;td&gt;[TPL array='name']&lt;/td&gt;
+        &lt;td&gt;[TPL array='population']&lt;/td&gt;
+        &lt;td&gt;[TPL array='currency']&lt;/td&gt;
+        &lt;td&gt;[TPL array='capital']&lt;/td&gt;
+        &lt;td&gt;[TPL array='area'] Km&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+    [TPL LOOP END]
+    &lt;/table&gt;</PRE>
+<P>The method $tpl-&gt;<CODE>sortby('name_of_column_to_sort')</CODE> is called
+just prior the $tpl-&gt;<CODE>process()</CODE> The value of the column to sort
+on 'name_of_column_to_sort' is derived from the query string in the
+HTML link. The HTML link must be of the form:</P>
+<PRE>
+    sort=name_of_array</PRE>
+<P>'name_of_array' is the named array used when populating the loop object.</P>
+<P>The direction of the sort will change alternately for each array
+sorted beginning with Ascending. To specifically start with a
+descinding sort use:</P>
+<PRE>
+    sort=name_of_array-desc</PRE>
+<P>If the direction is specified IN UPPERCASE as:</P>
+<PRE>
+    sort=name_of_array-ASC
+    -or-
+    sort=name_of_array-DESC</PRE>
+<P>The direction will not alternate for that array during a sort, it will always
+be in the direction specified.</P>
+<P>
+<H2><A NAME="processing variables">Processing Variables</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_simple_variable_get_and_set"><STRONG>simple variable get and set</STRONG></A></STRONG><BR>
+<DD>
+</DL>
+<P>After a new template object has been created, variables
+can be added to or returned from the object via:</P>
+<PRE>
+        $tpl-&gt;variable(&quot;foo&quot;, $bar);
+        # set foo = $bar</PRE>
+<PRE>
+        $tpl-&gt;variable(&quot;foo&quot;);
+        # return the value of foo</PRE>
+<P>Variables may be re-set within the script:</P>
+<PRE>
+    $tpl-&gt;variable(&quot;value&quot;, $value);
+    $tpl-&gt;variable(&quot;value&quot;, sprintf(&quot;%.2f&quot;, $tpl-&gt;variable(&quot;value&quot;)));
+    # this is clearly just an illustration - it could have been
+    # done in one go.
+</PRE>
+<PRE>
+
+    # another example which comes in handy
+    $tpl-&gt;variable(&quot;checkbox_a&quot;, ($checkbox_val) ? &quot;checked&quot; : &quot;&quot;));</PRE>
+<P><EM>-perl</EM></P>
+<PRE>
+        $varval = &quot;hello world&quot;;
+        $tpl-&gt;variable(&quot;greet&quot;, $varval);
+        -or-
+        $tpl-&gt;variable(&quot;greet&quot;, &quot;hello world&quot;);</PRE>
+<P><EM>-html</EM></P>
+<PRE>
+        [TPL variable='greet']</PRE>
+<P><EM>-output</EM></P>
+<PRE>
+        hello world</PRE>
+<P>
+<H3><A NAME="variable concatenation">variable concatenation</A></H3>
+<P>Once a variable is in an object you may want to
+alter it in some way or add strings to it.</P>
+<P>Syntax:</P>
+<PRE>
+        $tpl-&gt;concat(&quot;varname&quot;, value, invert);</PRE>
+<P>If 'invert' is true ie. <CODE>not(0|'')</CODE> value will be pre-pended
+to 'varname'</P>
+<P><EM>-perl</EM></P>
+<PRE>
+        $tpl-&gt;variable(&quot;greet&quot;, &quot;hello world&quot;);
+        $tpl-&gt;concat(&quot;greet&quot;, &quot; its only me&quot;);</PRE>
+<P>You can also invert the concatenation and pre-pend
+a string</P>
+<PRE>
+        $tpl-&gt;variable(&quot;message&quot;, &quot;rain is wet&quot;);
+        $tpl-&gt;concat(&quot;message&quot;, &quot;roses are red, &quot;, 1);</PRE>
+<P><EM>-html</EM></P>
+<PRE>
+        [TPL variable='greet']&lt;br&gt;
+        [TPL variable='message']</PRE>
+<P><EM>-output</EM></P>
+<PRE>
+        hello world its only me
+        roses are red, rain is wet</PRE>
+<P>
+<H3><A NAME="variable math">variable math</A></H3>
+<P>Basic mathematical operators may be applied to
+variables in the form:</P>
+<UL>
+<LI><STRONG><A NAME="item_%27%2B%27_addition">'+' addition</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_%27%2D%27_subtraction">'-' subtraction</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_%27%2A%27_multiplication">'*' multiplication</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_%27%2F%27_division">'/' division</A></STRONG><BR>
+
+</UL>
+<P>Syntax:</P>
+<PRE>
+        $tpl-&gt;math(&quot;varname&quot;, value, operation);
+        # varname = varname operation value
+</PRE>
+<PRE>
+
+        -invert the operation</PRE>
+<PRE>
+
+        $tpl-&gt;math(&quot;varname&quot;, value, operation, invert);
+        # varname = value operation varname</PRE>
+<P><STRONG>addition and subtraction</STRONG></P>
+<PRE>
+        $tpl-&gt;variable(&quot;one&quot;, 1);                        # one = 1
+        $tpl-&gt;variable(&quot;two&quot;, 2);                        # two = 2
+        $tpl-&gt;variable(&quot;three&quot;, 3);                      # three = 3</PRE>
+<PRE>
+        $tpl-&gt;math(&quot;two&quot;, 2, &quot;+&quot;);                       # two = 4
+    # NOTE - this is the same as:
+    $tpl-&gt;variable(&quot;two&quot;, $tpl-&gt;variable(&quot;two&quot;) + 2);
+</PRE>
+<PRE>
+
+        $tpl-&gt;math(&quot;two&quot;, $tpl-&gt;variable(&quot;one&quot;), &quot;+&quot;);   # two = 5</PRE>
+<PRE>
+        # using originally declared values
+        $tpl-&gt;math(&quot;two&quot;, 2, &quot;-&quot;);                       # two = 0
+</PRE>
+<PRE>
+
+        # invert the operation
+        $tpl-&gt;math(&quot;three&quot;, 1, &quot;-&quot;, 1);                  # three = -2
+        # tranlates as: 
+        # 1 - $tpl-&gt;variable(&quot;three&quot;)
+        # 1 - 3
+        # -2</PRE>
+<P><STRONG>multiplication and division</STRONG></P>
+<PRE>
+        $tpl-&gt;variable(&quot;one&quot;, 1);                        # one = 1
+        $tpl-&gt;variable(&quot;two&quot;, 2);                        # two = 2
+        $tpl-&gt;variable(&quot;three&quot;, 3);                      # three = 3</PRE>
+<PRE>
+        $tpl-&gt;math(&quot;two&quot;, 3, &quot;*&quot;);                       # two = 6
+        $tpl-&gt;math(&quot;two&quot;, 12, &quot;/&quot;, 1);                                   # two = 2</PRE>
+<P>
+<H2><A NAME="processing the template">Processing the Template</A></H2>
+<P>$tpl-&gt;process(``template_path/template_name.html'');</P>
+<P>This method returns the parsed template data, substituting all template
+syntax for object data. Typical usage:</P>
+<P><EM>-perl</EM></P>
+<PRE>
+    sub foo {
+        $tpl-&gt;variable(&quot;varname&quot;, 'varval')
+        ... populate template object with data
+        ...
+</PRE>
+<PRE>
+
+        print &quot;Content-type: text/html&quot;;
+        print $tpl-&gt;process(&quot;template_path/template.html&quot;);</PRE>
+<PRE>
+
+        # print template and object data
+        print $tpl-&gt;process(&quot;template_path/template.html&quot;, 1);
+    }</PRE>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Paul Schnell    <A HREF="mailto:pschnell@touchpowder.com">pschnell@touchpowder.com</A></P>
+<P>Thanks to Alexis Orssich and Tom Robinson for ideas and putting the code
+through its paces.</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright (c) 2001 Paul Schnell. All rights reserved. This program is free
+software; you can redistribute it and/or modify it under the same terms
+as Perl itself.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>Html::Template
+Html::Mason
+Template</P>
+
+</BODY>
+
+</HTML>

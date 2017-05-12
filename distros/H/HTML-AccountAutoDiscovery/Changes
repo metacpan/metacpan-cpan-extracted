@@ -1,0 +1,30 @@
+Revision history for Perl extension HTML::AccountAutoDiscovery.
+
+0.06  Wed Sep 02 2005
+	- updated pod about spec of AutoDiscovery.
+	- upload to CPAN
+
+0.05  Wed Aug 03 2005
+	- changed each_account() for parsing foaf:maker instead of
+	dc:creator and foaf:Person, and not being able to parse simple
+	version because the spec was modified.
+
+0.04  Wed Jul 29 2005
+        - fixed bug in find() for correct content handling.
+	- It went back to Perl license because merged moudle was
+          changed too.
+	- modified each_account() for parsing simple version.
+	<http://d.hatena.ne.jp/tociyuki/20050729/1122622661>
+
+0.03  Wed Jul 28 2005
+        - modified each_account() for parsing attribute of
+          foaf:accountName.
+
+0.02  Wed Jul 27 2005
+	- merged some functions from MIZUTANI, Tociyuki
+          <http://tociyuki.cool.ne.jp/>'s module.
+	- license was changed from Perl License to LGPL because merged
+          module is licensed under LGPL.
+
+0.01  Thu Jul 21 2005
+	- original version;

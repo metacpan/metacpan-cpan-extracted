@@ -1,0 +1,20 @@
+TODO list for the HTML::Clean Module
+------------------------------------
+
+* May need to be more selective with some of the regexps, so as to not
+  clobber JavaScript.
+
+* Add length/width elements to IMG tags?
+
+* Add a real parser/grammar system, like a real compiler, then we
+  can optimize repeated HTML elements, like this:
+
+  <center>sometext</center><center>some more text</center>
+
+  This would also allow specific handlers for specific content types
+  i.e. PRE blocks, Javascript, Stylesheets, ASP, etc...
+
+* Replace <div align="center"></div> with just <center></center>
+
+* Add counters so we can collect statistics on the usefullness of 
+  the various optimizations

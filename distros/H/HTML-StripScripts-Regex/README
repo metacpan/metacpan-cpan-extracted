@@ -1,0 +1,53 @@
+This class subclasses HTML::StripScripts, and adds an input method based on
+a regular expression. See HTML::StripScripts.
+
+  use HTML::StripScripts::Regex;
+
+  my $hss = HTML::StripScripts::Regex->new({ Context => 'Inline' });
+
+  $hss->input("<i>hello, world!</i>");
+
+  print $hss->filtered_document;
+
+Using a regular expression to parse HTML is error prone and inefficient for
+large documents. If HTML::Parser is available then
+HTML::StripScripts::Parser should be used in preference to this module.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc HTML::StripScripts::Regex
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML::StripScripts::Regex
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/HTML::StripScripts::Regex
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/HTML::StripScripts::Regex
+
+    Search CPAN
+        http://search.cpan.org/dist/HTML::StripScripts::Regex
+
+
+COPYRIGHT AND LICENCE
+
+Copyright 2009 Nick Cleaton, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+

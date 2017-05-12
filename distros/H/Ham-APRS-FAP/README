@@ -1,0 +1,65 @@
+Ham::APRS::FAP
+==============
+
+FAP - Finnish APRS Parser (Fabulous APRS Parser)
+
+This module is a fairly complete APRS parser implemented in pure Perl.
+It parses normal, mic-e and compressed location packets, NMEA location
+packets, objects, items, messages, telemetry and most weather packets. It is
+stable and fast enough to parse the APRS-IS stream in real time.
+
+Unless a debugging mode is enabled, all errors and warnings are reported
+through the API (as opposed to printing on STDERR or STDOUT), so that
+they can be reported nicely on the user interface of an application.
+This parser is not known to crash on invalid packets. It is used to power
+the http://aprs.fi/ web site.
+
+APRS features specifically NOT handled by this module:
+ - special objects (area, signpost, etc)
+ - network tunneling/third party packets
+ - direction finding
+ - station capability queries
+ - status reports (partially)
+ - user defined data formats
+
+This module is based (on those parts that are implemented)
+on APRS specification 1.0.1.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires a reasonably recent Date::Calc module.
+
+DOCUMENTATION
+
+This module is documented in perldoc format - see 'perldoc Ham::APRS::FAP'
+(after installing) or 'perldoc /path/to/FAP.pm' (before installing).
+
+THINGS TO DO
+
+ - Adding more tests
+ - Implement more of the missing features
+ - Implement some more packet construction methods, passing data in a
+   hash instead of a long list of parameters
+
+SEE ALSO
+
+  http://pakettiradio.net/libfap/ - C library port of Ham::APRS::FAP
+  http://github.com/kd7lxl/python-libfap - Python bindings for libfap
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005-2012 Tapio Sokura
+Copyright (C) 2007-2012 Heikki Hannikainen
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

@@ -1,0 +1,8 @@
+---
+  model_config:
+    resultset: Note
+  elements:
+    - name: id
+    - name: note
+    - name: master
+      type: Select

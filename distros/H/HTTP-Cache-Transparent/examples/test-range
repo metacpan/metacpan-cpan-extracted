@@ -1,0 +1,63 @@
+#!/usr/bin/perl -w
+#  Copyright (C) 2002 Nigel Horne <njh@bandsman.co.uk>
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+use strict;
+use WWW::RobotRules::AnyDBM_File;
+use LWP::RobotUA;	# for spidering and cache lookup
+use HTTP::Cache::Transparent;
+
+HTTP::Cache::Transparent::init( { BasePath => '/tmp/cache',
+                                Verbose => 1 } );
+
+my $url = "http://www.bandsman.co.uk";
+my $rules = WWW::RobotRules::AnyDBM_File->new('www.bandsman.co.uk/Spider', '/tmp/robots.cache');
+
+my $robot = LWP::RobotUA->new('www.bandsman.co.uk/Spider', 'njh@despammed.com', $rules);
+$robot->timeout(20);
+# $robot->delay(1/60);	# wait 1 second between accesses to same site
+$robot->delay(0);
+$robot->protocols_allowed(['http']);	# disabling all others
+
+my $request = new HTTP::Request 'GET' => $url;
+$request->header('Accept' => 'text/html');
+$robot->max_size(2048);
+$request->header('Accept-Encoding' => 'gzip; deflate',
+	'Referer' => 'http://www.bandsman.co.uk');
+
+my $webdoc = $robot->simple_request($request);
+
+if(!$webdoc->is_success) {
+	die $webdoc->status_line . "\n";
+	exit 1;
+}
+my $content = $webdoc->content;
+
+if(my $encoding = $webdoc->content_encoding) {
+	if($encoding =~ /gzip/i) {
+		$content = Compress::Zlib::memGunzip($content);
+		if(!defined $content) {
+			die "$url can't be gunziped\n";
+		}
+	} elsif($encoding  =~ /deflate/i) {
+		$content = Compress::Zlib::uncompress($content);
+		if(!defined $content) {
+			die "$url can't be uncompressed\n";
+		}
+	}
+}
+print "$url: " . length($content) . " bytes\n";
+print $content . "\n";

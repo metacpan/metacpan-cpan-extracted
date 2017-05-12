@@ -1,0 +1,137 @@
+<!--
+=head1 NAME
+
+sitetree.wmk - WebMake tag to generate a per-page sitemap
+
+=head1 LOADING
+
+  < use plugin="sitetree" />
+
+=head1 WEBMAKE TAGS
+
+  < sitetree name=... sitemap=...
+  	opennode=... closednode=...
+	thispage=... leaf=... />
+
+=head1 DESCRIPTION
+
+This WebMake Perl library provides the C<sitetree> tag.
+
+C<Sitetree> operates similarly to the built-in C<sitemap> tag, but, displays
+only a subset of all the site's nodes; it will map all of the top-level nodes
+of the site, and then only the parent nodes of the current page.  The effect is
+similar to a tree-view-based file browser, like Windows Explorer.
+
+In terms of differences in usage, where C<sitemap> creates a single map which
+includes every page in the site, C<sitetree> maps only the pages up to and
+including the current page, and generates a map for each individual output
+page.
+
+So, for a site like this:
+
+=over 4
+
+=item + Section 1
+
+=over 4
+
+=item + Section 1 Subsection 1
+
+=item + Section 1 Subsection 2
+
+=back
+
+=item + Section 2
+
+=over 4
+
+=item + Section 2 Subsection 1
+
+=item + Section 2 Subsection 2
+
+=back
+
+=back
+
+A reference to the site tree on page C<Section 1 Subsection 1> would result in
+a site tree like this:
+
+=over 4
+
+=item - Section 1
+
+=over 4
+
+=item - Section 1 Subsection 1
+
+=back
+
+=item + Section 2
+
+=back
+
+Display of each page's entry in the tree is performed by expanding one of the 4
+template content items named in the tag's attributes: C<closednode>,
+C<opennode>, C<thispage>, or C<leaf>.  See the C<sitemap> tag documentation for
+more details on how to use these (note however that the I<is_node> variable
+is not available for sitetrees).
+
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item name
+
+The name of the sitetree object.  To include a sitetree in a page, refer to it
+using this name, as a deferred reference.
+
+=item sitemap
+
+The name of the sitemap.  The sitetree requires a sitemap, as the sitemap is
+responsible for mapping out the site and defining which pages and content items
+are included.
+
+=item closednode
+
+A content item which is evaluated to display a ''closed'' node, ie. a node
+which is not on the path to the current page.
+
+=item opennode
+
+A content item which is evaluated to display an ''open'' node, one which is on
+the path to the current page.  As for the C<sitemap> tag's C<node> attribute,
+this content item must include a reference to the B<list> variable, which will
+contain all the entries for the pages beneath it in the hierarchy.
+
+=item thispage
+
+A content item which is evaluated to display the current page.
+
+=item leaf
+
+A content item which is evaluated to display a leaf-node page, one which has no
+pages beneath it in the hierarchy.
+
+=back
+
+=head1 THANKS
+
+Thanks go to Alex Canady, who came up with the idea for this one.
+
+=cut
+
+<wmmeta name="Title" value="sitetree.wmk" />
+<wmmeta name="Abstract" value="WebMake tag to generate a per-page sitemap" />
+
+-->
+<{perl
+
+  use HTML::WebMake::PerlLib::SiteTree;
+
+  $self->define_empty_wmk_tag ("sitetree",
+  	\&HTML::WebMake::PerlLib::SiteTree::handle_sitetree_tag,
+ 	qw(name sitemap closednode opennode thispage leaf));
+
+  '';
+}>

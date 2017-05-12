@@ -1,0 +1,38 @@
+<HTML>
+<body>
+<H1> test_loop3 </H1>
+
+We test loops and nesting
+
+<table>
+ <tr>
+  <td>LOOP1-VAR1</td>
+  <td>LOOP1-VAR2</td>
+  <td>LOOP1-VAR3</td>
+  <td></td>
+ </tr>    <tr>
+  <td>LOOP2-VAR1</td>
+  <td>LOOP2-VAR2</td>
+  <td>LOOP2-VAR3</td>
+  <td></td>
+ </tr>    <tr>
+  <td>LOOP3-VAR1</td>
+  <td>LOOP3-VAR2</td>
+  <td>LOOP3-VAR3</td>
+  <td></td>
+ </tr>    <tr>
+  <td>LOOP4-VAR1</td>
+  <td>LOOP4-VAR2</td>
+  <td>LOOP4-VAR3</td>
+  <td></td>
+ </tr>    
+</table>
+
+
+
+ VAR2 test passed 
+
+ 
+
+</body>
+</HTML>

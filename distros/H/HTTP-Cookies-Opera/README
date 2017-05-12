@@ -1,0 +1,29 @@
+HTTP-Cookies-Opera
+==================
+
+This module provides access to the Opera browser cookie file.
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    HTTP::Cookies
+    Test::More
+    Time::Fake
+    parent
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011-2013 by gray <gray@cpan.org>
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

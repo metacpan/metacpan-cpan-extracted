@@ -1,0 +1,129 @@
+Revision history for HBase-JSONRest
+
+0.043  Date/Time: 2015-12-03
+
+        [ENHANCEMENTS]
+        - Added support for gzip content-encoding, to save on bandwidth
+
+
+0.042  Date/time: 2015-09-02
+
+        [BUG FIXES]
+        - Fixed a bug in multiget - if some of specified keys are missing
+          they will be ignored properly (themage).
+
+
+0.041  Date/time: 2015-08-31
+
+        [ENHANCEMENTS]
+        - Don't create HTTP::Tiny object in each request. Create it in
+          constructor and keep it in hbase object instance so it can be
+          reused. This means that the same instance of HTTP::Tiny can
+          used for many requests, so connections can be reused.
+        - More debug info for failed requests
+        - Added strict mode. Defaults to false. If activated, the hbase
+          handle will die on unsuccessful request.
+
+        [BUG FIXES]
+        - Allow scans with pefix '0'
+        - Fixed bug in_build_get_uri - lost columns when current url
+          became too long (dtcyganov)
+        - Fixed bug in _build_multiget_uri - lost keys when current url
+          became too long (dtcyganov)
+
+
+0.040  Date/time: 2015-08-09
+
+        [ENHANCEMENTS]
+        - Added support for specifying and retrieving an arbitrary number
+          of columns when using `get` (Tarek Sheasha).
+        - Added support for [startrow, endrow) scanner
+
+        [BUG FIXES]
+        - Fixed a bug for PREFIX scanner - when prefix is depleted, the
+          scanning will stop as it should.
+
+
+0.032   Date/time: 2015-06-19
+
+        [BUG FIXES]
+        - Fixed a bug in scanner which could cause some keys to be skipped
+          due to wrong postix used for the first key of the next batch.
+        - Fixed a bug which prevented keys that begin with 0 to be
+          inserted.
+
+
+0.031   Date/time: 2015-06-16
+
+        [ENHANCEMENTS]
+        - Added uri_gen tests for stateless REST scanners
+
+
+0.030   Date/time: 2015-06-15
+
+        [ENHANCEMENTS]
+        - Added support for stateless REST scanners
+
+
+0.021   Date/time: 2015-04-16
+
+        [BUG FIXES]
+        - Bug fix for missing uri_escape of a key in _build_multiget_uri.
+
+
+0.020   Date/time: 2014-11-11
+
+        [ENHANCEMENTS]
+        - Moved get uri generator code to separate method
+        - Added tests for get uri generator
+        - Moved multiget uri generation to separate method
+        - Added tests for multiget uri generator
+        - Added delete instance method (Robert Nilsson)
+        - Added support for list of columns in get
+        - Added support for number of versions in get
+        - Added suport for timestamp range in get
+        - Added test for timestamp range uri generator
+        - Added option to override HBase timestamp on put
+        - Standardized structure of error description hash generated
+          in _extract_error_tiny
+
+        [BUG FIXES]
+        - Bug fix for missing $url param in _extract_error_tiny call.
+        - Fix warnings if response has no status (Eric Herman)
+
+        [DOCUMENTATION]
+        - POD for new get options (get by column, version, timestamp range)
+        - POD for multiget for last N versions
+        - POD for put with HBase timestamp override
+        - POD for delete (Robert Nilsson)
+
+
+0.011   Date/time: 2014-08-19
+        Added uri in error message. Correction in comments for get function.
+
+
+0.010   Date/time: 2014-08-18
+        Added support for multiget.
+
+
+0.005   Date/time: 2014-07-21
+        Corrected pod for method calls - use hash refs, not lists for
+        params
+
+
+0.004   Date/time: 2014-07-11
+        Pod coverage test was failing. Added required pod for constructor
+        method.
+
+
+0.003   Date/time: 2014-07-08
+        Correction to pod Synopsis
+
+
+0.002   Date/time: 2014-07-08
+        Added error handling info to pod.
+
+
+0.001   Date/time: 2014-07-07
+        First
+

@@ -1,0 +1,6 @@
+lib/HTTP/RangeSaver.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/everything.t

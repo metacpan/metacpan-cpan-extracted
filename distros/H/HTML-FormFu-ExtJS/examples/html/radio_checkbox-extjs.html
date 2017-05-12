@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>radio_checkbox</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" type="text/css" href="http://extjs.cachefly.net/ext-3.3.1/resources/css/ext-all.css">
+    <script type="text/javascript" src="http://extjs.cachefly.net/ext-3.3.1/adapter/ext/ext-base.js"></script>
+    <script type="text/javascript" src="http://extjs.cachefly.net/ext-3.3.1/ext-all.js"></script>
+<script type="text/Javascript">
+
+Ext.onReady(function(){
+
+    var simple = new Ext.FormPanel({"width":800,"baseParams":{"x-requested-by":"ExtJS"},"frame":true,"action":"","title":"HTML::FormFu::ExtJS - radio_checkbox","method":"post","buttons":[],"items":[{"boxLabel":"test","hideLabel":1,"name":"foo","fieldLabel":"test","xtype":"radio"},{"value":1,"boxLabel":"Checked","hideLabel":false,"name":"foo2","xtype":"checkbox","checked":true,"inputValue":1,"fieldLabel":"Checked"},{"checked":false,"boxLabel":"Unchecked","hideLabel":false,"name":"foo3","fieldLabel":"Unchecked","xtype":"checkbox"}]});;
+
+    simple.render(document.body);
+});
+</script>
+
+</head>
+<body>
+
+
+<a href="../forms/radio_checkbox.yml">Form config file</a><br/><br/>
+
+
+
+</body>
+</html>
+

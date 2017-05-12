@@ -1,0 +1,81 @@
+NAME
+    HTML::ERuby - ERuby processor for Perl.
+
+SYNOPSIS
+      use HTML::ERuby;
+      my $compiler = HTML::ERuby->new;
+      my $result = $compiler->compile(filename => './foo.rhtml');
+      print $result;
+
+DESCRIPTION
+    HTML::ERuby is a ERuby processor written in Perl.
+
+    parse ERuby document by Perl and evaluate by Ruby.
+
+METHODS
+    $compiler = HTML::ERuby->new
+        constructs HTML::ERuby object.
+
+    $result = $compiler->compile(\%option)
+        compile ERuby document and return result. you can specify ERuby
+        document as filename, scalarref or arrayref.
+
+          $result = $compiler->compile(filename => $filename);
+  
+          $result = $compiler->compile(scalarref => \$rhtml);
+  
+          $result = $compiler->compile(arrayref => \@rhtml);
+
+        you can use the Perl variables in the ERuby document. supported
+        types are String, Hash and Array only. NO Objects. See the simple
+        example.
+
+        Perl code
+
+          my %vars = (
+               '@var' => 'foo', # Ruby instance variable
+               'ARRAY_REF' => [qw(a b c)], # Ruby constant
+               'hash_ref' => {foo => 'bar', 'bar' => 'baz'} # Ruby local variable
+          );
+
+          my $compiler = HTML::ERuby->new;
+          print $compiler->compile(filename => './foo.rhtml', vars => \%vars);
+
+        ERuby document
+
+          instance variable <%= @var %>
+          <% ARRAY_REF.each do |v| %>
+          <%= v %>
+          <% end %>
+          foo: <%= hash_ref['foo'] %>
+          bar: <%= hash_ref['baz'] %>
+
+        Result
+
+          instance variable foo
+  
+          a
+  
+          b
+  
+          c
+  
+          foo: bar
+          bar: baz
+  
+CAVEATS
+    this module is experimental.
+
+AUTHOR
+    Author <ikebe@edge.co.jp>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the Inline manpage the Inline::Ruby manpage
+
+    http://www2a.biglobe.ne.jp/~seki/ruby/erb.html
+
+    http://www.modruby.net/
+

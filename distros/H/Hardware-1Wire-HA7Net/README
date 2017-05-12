@@ -1,0 +1,2 @@
+This module provides an interface to the Embedded Data Systems HA7Net 1-Wire
+bus master.  Temperature and analog devices are all supported.

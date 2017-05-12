@@ -1,0 +1,59 @@
+HTTP::ProxyPAC is Copyright 2005, Tatsuhiko Miyagawa <miyagawa@bulknews.net>,
+                  Copyright 2010, Craig MacKenna <craig@animalhead.com>
+
+0.2 March 2010
+
+INSTALL via CPAN or CPANPLUS, or 
+     
+    * download HTTP-ProxyPAC-0.n.tar.gz into a good place for building
+    * cd into that place
+    * tar -xf HTTP-ProxyPAC-0.n.tar.gz makes a similarly-named folder 
+    * cd into it
+    * perl Makefile.PL
+    * make
+    * make test
+    * sudo make install  (your system may not want sudo)
+    
+DESCRIPTION
+
+    Modern references include:
+      http://en.wikipedia.org/wiki/Proxy_auto-config
+      http://en.wikipedia.org/wiki/Web_Proxy_Autodiscovery_Protocol
+      http://www.craigjconsulting.com/proxypac.html
+      http://www.returnproxy.com/proxypac/
+     
+    This version will use the JavaScript module and I<libjs> from 
+    Mozilla, if it finds JavaScript installed.  Otherwise it will use 
+    the JE module as its JavaScript interpreter, so that CPAN or 
+    CPANPLUS can do the whole installation.
+
+    If you have any problems, please complain to craig@animalhead.com
+    rather than the original author.  Include the error message and 
+    the .pac or wpad.dat file.
+     
+LICENSE INFORMATION
+
+    This module is free software; you may redistribute it and/or modify
+    it under the same terms as Perl 5.10.1.  For more details, see the
+    full text of the licenses at
+
+    <http://www.perlfoundation.org/artistic_license_1_0> and
+    <http://www.gnu.org/licenses/gpl-2.0.html>.
+
+    This program is distributed in the hope that it will be useful, but
+    it is provided "as is" and without any express or implied warranties.
+    For details, see the full text of the licenses at the above URLs.
+
+     
+0.01 May 2006
+
+    This module is being developed to provide access for Perl scripts 
+    to the Proxy Auto Config format from Netscape.  The original 
+    description is now archived at:
+    
+    http://linuxmafia.com/faq/Web/autoproxy.html
+     
+    HTTP::ProxyPAC allows use of a Proxy Auto Configuration file to
+    find an appropriate proxy for a URL.  You can use a .pac file 
+    from Firefox, IE or Opera, or a wpad.dat file obtained via the 
+    WPAD protocol (see 2nd link in DESCRIPTION).

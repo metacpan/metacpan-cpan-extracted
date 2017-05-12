@@ -1,0 +1,20 @@
+---
+name: HTTP-Proxy-Builder
+version: 0.01
+author:
+  - 'Philippe Bruhat (BooK) <book@cpan.org>'
+abstract: Assemble several proxies into a single one.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  HTTP::Proxy: 0.10
+  Test::More: 0
+provides:
+  HTTP::Proxy::Builder:
+    file: lib/HTTP/Proxy/Builder.pm
+    version: 0.01
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/HTML-XHTML-Lite.t
+lib/HTML/XHTML/Lite.pm
+META.yml                                 Module meta-data (added by MakeMaker)

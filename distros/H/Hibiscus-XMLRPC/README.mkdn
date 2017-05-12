@@ -1,0 +1,92 @@
+# NAME
+
+Hibiscus::XMLRPC - talk to Hibiscus via XMLRPC
+
+# SYNOPSIS
+
+    my $client = Hibiscus::XMLRPC->new(
+        url => 'https://127.0.0.1:8080/xmlrpc/', # the default
+        user     => $hbciuser,
+        password => $hbcipass,
+    );
+    my $tr = $client->transactions()->get;
+    for my $transaction (@$tr) {
+        ...
+    }
+
+## `->transactions %filter`
+
+    my $transactions = $jameica->transactions(
+        {
+         "datum:min" => '2015-01-01', # or '01.01.2015'
+         'datum:max' => '2015-12-31', # or '31.12.2015'
+        }
+    )->get;
+
+Fetches all transactions that match the given filter and returns
+them as an arrayref. If no filter is given, all transactions are returned.
+
+The keys for each transaction are:
+
+    {
+      'konto_id' => '99',
+      'betrag' => '-999,99',
+      'gvcode' => '835',
+      'zweck' => 'Zins   999,99 Tilg  999,99',
+      'datum' => '2016-04-29',
+      'customer_ref' => 'NONREF',
+      'valuta' => '2016-04-30',
+      'id' => '657',
+      'umsatz_typ' => 'Kredit',
+      'empfaenger_name' => 'IBAN ...',
+      'saldo' => '99999.99'
+    },
+
+See [https://www.willuhn.de/wiki/doku.php?id=develop:xmlrpc:umsatz](https://www.willuhn.de/wiki/doku.php?id=develop:xmlrpc:umsatz)
+for the list of allowed parameters.
+
+# INSTALLATION
+
+1. Install Jameica and Hibiscus from
+[http://www.willuhn.de/products/hibiscus/](http://www.willuhn.de/products/hibiscus/)
+2. From within the application, install the
+`hibiscus.xmlrpc` plugin and all its prerequisites.
+Restart after every prerequisite.
+
+    Yes. CPAN is much more convenient here.
+
+3. Under "File" -> "Preferences" (`CTRL+E`), configure
+`hibiscus.xmlrpc.umsatz` to be enabled.
+4. Restart Jameica once more
+
+# SEE ALSO
+
+[https://www.willuhn.de/wiki/doku.php?id=develop:xmlrpc](https://www.willuhn.de/wiki/doku.php?id=develop:xmlrpc)
+
+# REPOSITORY
+
+The public repository of this module is 
+[http://github.com/Corion/hibiscus-xmlrpc](http://github.com/Corion/hibiscus-xmlrpc).
+
+# SUPPORT
+
+The public support forum of this module is
+[https://perlmonks.org/](https://perlmonks.org/).
+
+# BUG TRACKER
+
+Please report bugs in this module via the RT CPAN bug queue at
+[https://rt.cpan.org/Public/Dist/Display.html?Name=Hibiscus-XMLRPC](https://rt.cpan.org/Public/Dist/Display.html?Name=Hibiscus-XMLRPC)
+or via mail to [hibiscus-xmlrpc-Bugs@rt.cpan.org](https://metacpan.org/pod/hibiscus-xmlrpc-Bugs@rt.cpan.org).
+
+# AUTHOR
+
+Max Maischein `corion@cpan.org`
+
+# COPYRIGHT (c)
+
+Copyright 2016 by Max Maischein `corion@cpan.org`.
+
+# LICENSE
+
+This module is released under the same terms as Perl itself.

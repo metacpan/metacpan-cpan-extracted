@@ -1,0 +1,50 @@
+HTML::WikiConverter::MoinMoin
+=============================
+
+HTML::WikiConverter::MoinMoin adds the MoinMoin dialect to
+HTML::WikiConverter allowing the conversion of HTML to MoinMoin
+markup.
+
+SYNOPSIS
+
+Converting HTML to wiki markup is easy:
+
+  use HTML::WikiConverter;
+  my $wc = new HTML::WikiConverter( dialect => 'MoinMoin' );
+  print $wc->html2wiki( $html );
+
+Or from the command line:
+
+  % html2wiki --dialect MoinMoin input.html > output.wiki
+
+There's also a web interface if you're so inclined:
+
+  http://diberri.dyndns.org/wikipedia/html2wiki/
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc HTML::WikiConverter::MoinMoin
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/HTML-WikiConverter-MoinMoin
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-WikiConverter-MoinMoin
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/HTML-WikiConverter-MoinMoin
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/HTML-WikiConverter-MoinMoin
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) David J. Iberri
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

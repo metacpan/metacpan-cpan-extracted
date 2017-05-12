@@ -1,0 +1,45 @@
+<html>
+	<head><title>ctf gimble challenge ladder - signup</title></head>
+	<body>
+		<h3>signup</h3>
+		<form action=ladder.cgi method=POST>
+			<input type=hidden name=rm value=signup_welcome />
+			<table>
+				<tr>
+					<td>Screen Name</td>
+					<td><input type=text name=screen_name /></td>
+				</tr>
+
+				<tr>
+					<td>Login Name (use this to login next time)</td>
+					<td><input type=text name=login_name /></td>
+				</tr>
+
+				<tr>
+					<td>Clan Name</td>
+					<td>
+						<select name=name id=clan_list>
+							<option id=clan_name>  clan_name </option>
+						</select>
+					</td>
+				</tr>
+
+				<tr>
+					<td>Password (<b>Don't choose one you use elsewhere.)</b></td>
+					<td><input type=password name=password /></td>
+				</tr>
+
+				<tr>
+					<td>Password (Again)</td>
+					<td><input type=password name=password_again /></td>
+				</tr>
+
+				<tr>
+					<td>Email</td>
+					<td><input type=text name=email /></td>
+				</tr>
+			</table>
+			<input type=submit />
+		</form>
+	</body>
+</html>

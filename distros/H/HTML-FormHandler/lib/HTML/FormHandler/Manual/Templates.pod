@@ -1,0 +1,276 @@
+package HTML::FormHandler::Manual::Templates;
+# ABSTRACT: using templates
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+HTML::FormHandler::Manual::Templates - using templates
+
+=head1 VERSION
+
+version 0.40067
+
+=head1 SYNOPSIS
+
+L<Manual Index|HTML::FormHandler::Manual>
+
+Documentation on templates to use with L<HTML::FormHandler>
+
+=head1 Using templates
+
+There is a FormHandler Template Toolkit rendering role at
+L<HTML::FormHandler::Render::WithTT>, with a testcase in t/render_withtt.t.
+Normally, however, it probably won't make much sense to use both a
+TT parser in FormHandler, and a separate one for the "complete" templates,
+so the TT renderer is mainly useful for tests,
+or as an example of how to do TT rendering with HFH. You should
+create a template to render your form and then pass the template name
+and a template variable containing your form object to your templating
+or view engine, in whatever way you normally do that. If you want
+to use the 'process_attrs' function, you need to set that in your
+template variables too.
+
+A common way of using FormHandler with templates is to use the template
+for layout, specifying the divs and spans and wrappers, and then
+use the form object to render just the input fields.
+
+In your form:
+
+    has '+widget_wrapper' => ( default => 'None' );
+
+In your Catalyst controller:
+
+    $c->stash( form => $form, template => 'form.tt' );
+
+..or do the equivalent for your web framework/view.
+
+In a form template (form.tt in the previous controller example):
+
+    <form id="myform" action="/myaction" method="post">
+        <div class="span9">
+            <span class="label">My Foo</span>
+            [% form.field('foo').render %]
+        </div>
+        <div class="span7">[% form.field('bar').render %]</div>
+        [% form.field('save').render %]
+    </form>
+
+However, you can also render entirely with templates.
+There are lots of different ways to set up templates. There are sample
+templates installed in FormHandler's 'share' directory. These templates
+are now organized more-or-less similarly to the widget roles, with 'field',
+'wrapper', and 'form' directories, but many other organizations are possible.
+
+There is also a template which combines the template rendering code into
+one file, 'share/templates/form/form_in_one.tt'. You can copy this template
+into your own TT directories, perhaps as form.tt, and then specify it
+as the template for your Catalyst actions. You can customize it by adding
+additional widget and widget_wrapper blocks, and then setting those in your
+field definitions.
+
+Note that widget names usually are camelcased, like the Moose roles that
+implement them in the Widget directory. You may want to use the
+non-camelcased widget/wrapper names in your TT templates, using
+the C<< $field->uwidget >> (un-camelcased widget name) and
+C<< $field->twidget >> (un-camelcased widget name + '.tt') convenience methods.
+('MySpecialWidget' is the equivalent of 'my_special_widget')
+
+   has_field 'my_field' => ( widget => 'MySpecialWidget' );
+   has_field 'another_field' => ( widget => 'YetAnotherWidget' );
+
+And include them in a generic template:
+
+   [% PROCESS widget/form_start.tt %]
+
+   [% FOREACH f IN form.sorted_fields %]
+      [% PROCESS widget/${f.twidget} %]
+   [% END %]
+
+   [% PROCESS widget/form_end.tt %]
+
+=head1 Field attributes
+
+If you want to use the 'process_attrs' function to pull in HTML attributes
+for the input elements, wrappers, and labels, you would need to pass that
+function into your TT setup. See L<HTML::FormHandler::Render::WithTT> for an
+example:
+
+    use HTML::FormHandler::Render::Util ('process_attrs');
+    $c->stash( process_attrs => &process_attrs ); # or add to TT vars in your view
+
+    <label [% process_attrs(f.label_attributes) %]for="[% f.html_name %]">
+    [% f.label %]: </label>
+    <input type="[% f.input_type %]" name="[% f.html_name %]" id="[% f.id %]"
+    [% process_attrs(f.attributes) %] value="[% f.fif %]">
+
+=head1 Sample templates
+
+The following is copied from the provided share/templates/form/form_in_one.tt file,
+as an example. Note that some fields, like form actions of 'submit' & 'reset', don't
+use the 'fif' value, but just the plain field value.
+
+    [% PROCESS form_start -%]
+    <div class="form_messages">
+    [% FOREACH err IN form.form_errors -%]
+      <span class="error_message">[% err %]</span>
+    [% END -%]
+    </div>
+    [% FOREACH f IN form.sorted_fields -%]
+      [% WRAPPER "wrapper_${f.uwrapper}" -%][% PROCESS "${f.uwidget}" -%][% END -%]
+    [% END -%]
+    [% PROCESS form_end -%]
+
+    [% BLOCK form_start -%]
+    <form[% process_attrs(form.attributes) %]>
+    [% END -%]
+
+    [% BLOCK form_end -%]
+    </form>
+    [% END -%]
+
+    [% BLOCK button -%]
+    <input type="button" name="[% f.html_name %]" id="[% f.id %]"
+        [% process_attrs(f.attributes) %] value="[% f.value %]" />
+    [% END -%]
+
+    [% BLOCK checkbox -%]
+    <input type="checkbox" name="[% f.html_name %]" id="[% f.id %]"
+       [% process_attrs(f.attributes) %] value="[% f.checkbox_value -%]"
+       [% IF f.fif == f.checkbox_value -%] checked="checked"[% END ~%] />[%~ ~%]
+    [% END -%]
+
+    [% BLOCK checkbox_group -%]
+    [% FOR option IN f.options -%]
+      <label class="checkbox" for="[% f.name %].[% loop.index %]">
+      <input type="checkbox" value="[% option.value %]" name="[% f.name %]"
+         id="[% f.name %].[% loop.index %]"
+         [% FOREACH selval IN f.fif -%]
+           [% IF selval == option.value %] checked="checked"[% END -%]
+         [% END -%]>
+      [% option.label | html %]
+      </label>
+    [% END -%]
+    [% END -%]
+
+    [% BLOCK compound -%]
+    [% FOREACH sf IN f.sorted_fields -%]
+      [% outerf = f; f = sf; -%]
+      [% WRAPPER "wrapper_${f.uwrapper}" %][% PROCESS "${f.uwidget}" -%][% END -%]
+      [% f = outerf -%]
+    [% END -%]
+    [% END -%]
+
+    [% BLOCK hidden -%]
+    <input type="hidden" name="[% f.html_name %]" id="[% f.id %]"
+        [% process_attrs(f.attributes) %] value="[% f.fif %]" />
+    [% END -%]
+
+    [% BLOCK password -%]
+    <input type="password" name="[% f.html_name %]" id="[% f.id %]"
+        [% process_attrs(f.attributes) %] value="[% f.fif %]" />
+    [% END -%]
+
+    [% BLOCK radio_group -%]
+    [% FOR option IN f.options -%]
+      <label for="[% f.id %].[% loop.index %]">
+      <input type="radio" value="[% option.value %]" name="[% f.name %]"
+        id="[% f.id %].[% loop.index %]"
+        [% IF option.value == f.fif %] checked="checked"[% END %] />
+      [% option.label %]
+      </label>
+    [% END -%]
+    [% END -%]
+
+    [% BLOCK repeatable -%]
+    [% FOREACH rf IN f.sorted_fields -%]
+      [% outerrf = f; f = rf; -%]
+      [% WRAPPER "wrapper_${f.uwrapper}" %][% PROCESS "${f.uwidget}" -%][% END -%]
+      [% f = outerrf -%]
+    [% END -%]
+    [% END -%]
+
+    [% BLOCK reset -%]
+    <input type="reset" name="[% f.html_name %]" id="[% f.id %]"
+        [% process_attrs(f.attributes) %] value="[% f.value %]" />
+    [% END -%]
+
+    [% BLOCK select -%]
+    <select name="[% f.html_name %]" id="[% f.id %]"[% process_attrs(f.attributes) %]
+      [% IF f.multiple %] multiple="multiple" size="[% f.size %]" [% END -%]>
+      [% FOR option IN f.options -%]
+      <option id="[% f.id %].[% loop.index %]" value="[% option.value -%]"
+          [% FOREACH selval IN f.fif -%]
+            [% IF selval == option.value %] selected="selected"[% END -%]
+          [% END -%]>
+          [% option.label | html %]
+      </option>
+      [% END -%]
+    </select>
+    [% END -%]
+
+    [% BLOCK submit -%]
+    <input type="submit" name="[% f.html_name %]" id="[% f.id %]"
+        [% process_attrs(f.attributes) %] value="[% f.value %]" />
+    [% END -%]
+
+    [% BLOCK text -%]
+    <input type="[% f.input_type %]" name="[% f.html_name %]" id="[% f.id %]"
+       [% process_attrs(f.attributes) %] value="[% f.fif %]" />
+    [% END -%]
+
+    [% BLOCK textarea -%]
+    <textarea name="[% f.html_name %]" id="[% f.id %]" rows="[% f.rows %]"
+       cols="[% f.cols %]" [% process_attrs(f.attributes) %]>[% f.fif %]</textarea>
+    [% END -%]
+
+    [% BLOCK upload -%]
+    <input type="file" name="[% f.html_name %]" id="[% f.html_name %]"
+        [% process_attrs(f.attributes) %] />
+    [% END -%]
+
+    [% BLOCK wrapper_simple -%]
+    <div[% process_attrs(f.wrapper_attributes) -%]>
+      [% IF f.do_label %][% PROCESS label %][% END -%]
+      [% content -%]
+    </div>
+    [% END -%]
+
+    [% BLOCK label -%]
+    <label [% process_attrs(f.label_attributes) %]for="[% f.html_name %]">[% f.label %]</label>
+    [% END -%]
+
+    [% BLOCK wrapper_wrap_label -%]
+    <div[% process_attrs(f.wrapper_attributes) %]>
+        <label[% process_attrs(f.label_attributes) %] for="[% f.html_name %]">
+           [%~ content ~%][%~ f.label %]
+        </label>
+    </div>
+    [% END -%]
+
+    [% BLOCK wrapper_none -%]
+    [% content %]
+    [% END -%]
+
+    [% BLOCK wrapper_fieldset -%]
+    <fieldset[% process_attrs(f.wrapper_attributes)%]><legend>[% f.label %]</legend>
+    [% content -%]
+    </fieldset>
+    [% END -%]
+
+=head1 AUTHOR
+
+FormHandler Contributors - see HTML::FormHandler
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Gerda Shank.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

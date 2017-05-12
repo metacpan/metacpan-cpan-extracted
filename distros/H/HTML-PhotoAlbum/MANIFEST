@@ -1,0 +1,6 @@
+lib/HTML/PhotoAlbum.pm
+Makefile.PL
+README
+t/HTML-PhotoAlbum.t
+Changes
+MANIFEST

@@ -1,0 +1,23 @@
+---
+abstract: 'Client-side JS constraints'
+author:
+  - 'Carl Franks <cpan@fireartist.com>'
+build_requires:
+  Test::More: 0.99
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-FormFu-Role-JQueryValidation
+requires:
+  HTML::FormFu: 1.00
+  JSON::Any: 1.29
+  Moose::Role: 2.0604
+  Scalar::Util: 1.35
+resources:
+  repository: git://github.com/fireartist/HTML-FormFu-Role-JQueryValidation.git
+version: 1.01

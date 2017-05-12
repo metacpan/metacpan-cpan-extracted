@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution HTTP-DAV-Xythos,
+version 1.101180:
+
+  Subclass of HTTP::DAV which adds support for Xythos Ticket authentication.
+
+This software is copyright (c) 2010 by Jesse Thompson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

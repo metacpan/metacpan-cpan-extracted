@@ -1,0 +1,68 @@
+{
+   "abstract" : "Convert a Gedcom file into a Timeline file",
+   "author" : [
+      "Ron Savage (ron@savage.net.au)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-Timeline",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0.46",
+            "Carp" : "0",
+            "Gedcom" : "1.2",
+            "Gedcom::Date" : "0.1",
+            "Getopt::Long" : "0",
+            "HTML::Template" : "2.95",
+            "Path::Class" : "0.37",
+            "Pod::Usage" : "0",
+            "accessors::classic" : "1.01",
+            "perl" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.001002"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/Artistic-2.0"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ronsavage/HTML-Timeline.git",
+         "web" : "https://github.com/ronsavage/HTML-Timeline"
+      }
+   },
+   "version" : "1.10",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

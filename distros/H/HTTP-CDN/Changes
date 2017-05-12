@@ -1,0 +1,7 @@
+Revision history for HTTP-CDN
+
+0.8       2014-10-30 09:34:20 Pacific/Auckland
+    - Add fix for query strings in CSS URLs
+    - Remove use of smartmatching to avoid warning
+
+0.7       2012-06-19 12:18:20 Pacific/Auckland

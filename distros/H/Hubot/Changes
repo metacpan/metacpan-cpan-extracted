@@ -1,0 +1,125 @@
+go to https://github.com/aanoaa/p5-hubot/issues for the roadmap and known issues.
+# git shortlog --no-merges develop --not <tag>
+
+0.2.8    Thu, 27 Aug 2015 15:18:03 +0900
+    - [ascii] http://asciime.heroku.com/generate_ascii service down. use alternative ascii art generator.
+    - [tweet] parse `\n`
+
+0.2.7    Mon Jul 21 13:36:17 2014 KST
+    - fix uninitialized value of msg
+
+0.2.6    Mon Apr 28 22:29:56 2014 KST
+    - use env variable HUBOT_HTTPD_ADDRESS to specify the listen address
+
+0.2.5    Fri Feb 14 01:30:56 2014 KST
+    - keep simple dist.ini and using cpanfile
+    - perltidy all
+
+0.2.4    Fri Nov 29 19:27:09 2013 KST
+    - [shorten] pretty title to unescape tags
+    - save user ip address if available
+
+0.2.3    Sun Jun 23 22:31:42 2013 KST
+    - use twitter api v1.1 for `tweet` script
+    - requires `AnyEvent::HTTP::ScopedClient` 0.0.5 or later
+
+0.2.2    Fri Jun 14 23:23:28 2013 KST
+    - [tweet] - twitter api v1 is no longer available
+      (skip test and prevent installation fail)
+
+0.2.1    Mon Jun 10 11:10:15 2013 KST
+    - fix heroku ping interval - cause too long
+    - fix bug - creator didn't copying `lib/*` files
+
+0.2.0    Mon Jun 10 02:20:32 2013 KST
+    - add `hubot --create` option for building deployable package
+    - deploy hubot onto heroku easily
+
+0.1.10    Sat Jun  8 16:39:20 2013 KST
+    - robot will respond to `/part` and `/quit` on IRC
+      possible to hooking `leave` on the scripts
+
+0.1.9    Tue May 14 14:06:54 2013 KST
+    - robot can adding callback for `notice` like `hear`
+    - support NickServ identify
+    - catch `330` and `MODE` COMMANDS in Irc Adapter
+    - missing meta->make_immutable
+
+0.1.8    Tue May  7 13:46:30 2013 KST
+    - HOTFIX fix bad test plan
+
+0.1.7    Tue Apr 23 20:23:58 2013 KST
+    - delete unused irc connect option and doc
+    - [shortcut] replacement charset to 'euckr' instead of 'ksc5601' # WTF
+    - [help] COMMAND `hubot commands` is available
+
+0.1.6    Wed Jan 30 12:19:11 2013 KST
+    - GH#32 add several IRC connecting options (thanks @yuni)
+    - GH#33 check pkg before using `$irc->enable_ssl` (thanks @yuni)
+
+0.1.5    Fri Jan 18 10:48:49 2013 KST
+    - fix https://rt.cpan.org/Public/Bug/Display.html?id=81555
+
+0.1.4    Fri Jan 18 10:39:59 2013 KST
+    - built-in script load for newbie if there is no exist `hubot-scripts.json`
+
+0.1.3    Thu Jan  3 04:30:14 2013 KST
+    - [shorten] pickup better charset in $body
+    - add $adapter->exist interface and implemets each adapters
+
+0.1.2    Mon Dec 17 12:18:20 2012 KST
+    - add `s|script` option for select hubot-scripts.json file
+
+0.1.1    Thu Nov 22 10:42:30 2012 KST
+    - add HUBOT_IRC_ENABLE_SSL option for support ssl connecting
+
+0.1.0    Wed Nov 21 18:43:05 2012 KST
+    - robot has rest after send a message line for prevent got a kick from IRC server
+
+0.0.10    Wed Nov 21 01:04:18 2012 KST
+    - add whisper interface for IRC adapter
+
+0.0.9    Fri Nov 16 17:11:14 2012 KST
+    - fix generate random number in Hubot::Response
+      for support googleImage script in Hubot::Scripts::Bundle
+
+0.0.8    Thu Nov 15 18:21:55 2012 KST
+    - bug fix
+      - prevent cross reference between Modules
+      - check $stringRegex length before convert
+    - README - better look on github
+    - add Helper module for test
+    - add test file for 'roles' script
+    - add test for help script
+    - add test for shorten script
+    - add test file for 'tweet' script
+    - check ENV before using @shorten
+
+0.0.7    Tue Oct 30 10:36:52 2012 KST
+    - bug fix
+      - matching user name correctly
+      - refresh event owners room for each publicmsg event in IRC Adapter
+
+0.0.6    Thu Oct 25 01:01:40 2012 KST
+    - add whisper feature for IRC adapter
+
+0.0.5    Wed Oct 24 18:58:04 2012 KST
+    - bug fix
+      - don't speak perl code when robot ambiguous users
+      - encode, decode utf8 on IO data
+
+0.0.4    Tue Oct 23 17:00:27 2012 KST
+    - bug fix
+      - assing user to robot's brain for extend script
+      - maybe since now `cpan Hubot` is available (Hubot.pod -> Hubot.pm)
+
+0.0.3    Fri Oct 19 11:38:10 2012 KST
+    - enhance JSON process
+    - Implements $robot's `catchAll`, `enter`, `leave` methods
+    - bug fix
+      - exit when `Shell` adapter
+
+0.0.2    Tue Oct 16 12:57:41 2012 KST
+    - describe pre-require modules
+    - add `Hubot::Scripts::roles` as built
+    - typo in `hubot` SYNOPSIS

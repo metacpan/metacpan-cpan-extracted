@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<WebTest version="0.9" title="Unsupported version level">
+  <params>
+    <list name="auth">
+      <param>user</param>
+      <param>secretpass</param>
+    </list>
+  </params>
+  <test>
+    <!-- the list parameters below will be flattened into an Array -->
+    <!-- this is needed so that the list order wil be retained -->
+    <comment>query parameters</comment>
+    <param name="test_name">query_params</param>
+    <param name="url">http://www.yahoo.com/</param>
+    <list name="params">
+      <param name="page">1</param>
+      <param name="lang">en_US</param>
+    </list>
+    <list name="http_headers">
+      <param name="Accept">text/html,application/xml+xhtml;q=0.9,text/plain;q=0.5</param>
+      <param name="Referer">http://webtest.org/</param>
+      <param name="Accept-Encoding">gzip,deflate</param>
+      <param name="Cache-Control">max-age=300</param>
+    </list>
+  </test>
+</WebTest>

@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/HTML/Template/Default.pm
+lib/HTML/Template/Default.pod
+t/0.t
+t/1-othernew.t
+t/templates/duper.html
+META.yml                                 Module meta-data (added by MakeMaker)

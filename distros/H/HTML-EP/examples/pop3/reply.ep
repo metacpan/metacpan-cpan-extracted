@@ -1,0 +1,56 @@
+<ep-package name="HTML::EP::Examples::POP3Client">
+<ep-language language="de">
+  <ep-set var="SendButton" val="Abschicken">
+<ep-language language="en">
+  <ep-set var="SendButton" val="Send">
+</ep-language>
+<ep-examples-pop3client-reply>
+<html><head><title><ep-language de="Mail beantworten" en="Reply Mail"></title>
+</head>
+<body bgcolor=#ffffff>
+<h1><ep-language de="Mail beantworten" en="Reply Mail"></h1>
+<form action=send.ep method=post>
+<input type=hidden name=pop3server value="$cgi->pop3server$">
+<input type=hidden name=pop3user value="$cgi->pop3user$">
+<input type=hidden name=pop3password value="$cgi->pop3password$">
+
+<table border=1>
+  <tr>
+    <th><ep-language de="An:" en="To:"></th>
+    <td><input size=40 name=to value="$from$"></td>
+  </tr>
+  <tr>
+    <th><ep-language de="Cc:" en="Cc:"></th>
+    <td><input size=40 name=cc value="$cc$"></td>
+  </tr>
+  <tr>
+    <th><ep-language de="Bcc:" en="Bcc:"></th>
+    <td><input size=40 name=bcc></td>
+  </tr>
+  <tr>
+    <th><ep-language de="Von:" en="From:"><br>
+        <font size=-1><ep-language de="(Ihre eigene Mailadresse)"
+                                   en="(Your own mail address)"></font>
+    </th>
+    <td><input size=40 name=from></td>
+  </tr>
+  <tr>
+    <th><ep-language de="Betreff:" en="Subject:"></th>
+    <td><input size=40 name=subject value="$subject$"></td>
+  </tr>
+  <tr>
+    <td colspan=2>
+      <textarea rows=20 cols=60 name=body>
+<ep-language language=de>
+$from$ schrieb am $&TIME->date$:
+<ep-language language=en>
+$from$ wrote at $&TIME->date$:
+</ep-language>
+
+$body$
+      </textarea>
+    </td>
+</table>
+<input type=submit value="$SendButton$">
+</body>
+</html>

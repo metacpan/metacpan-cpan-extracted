@@ -1,0 +1,13 @@
+bin/makeipregex
+Build.PL
+Changes
+lib/HTTP/MobileAgent/Plugin/CIDR.pm
+lib/HTTP/MobileAgent/Plugin/CIDR/RegEx.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+t/00.load.t
+t/01.chkip.t
+t/perlcritic.t
+t/pod-coverage.t
+t/pod.t

@@ -1,0 +1,40 @@
+  Valid Fields:<br>
+  <TMPL_LOOP NAME=VALID_FIELDS>
+      Field Name: <TMPL_VAR NAME=FIELD_NAME><br>
+      Field Value: <TMPL_VAR NAME=FIELD_VALUE><br>
+  </TMPL_LOOP>
+
+  Missing Fields:<br>
+  <TMPL_LOOP NAME=MISSING_FIELDS>
+      Field Name: <TMPL_VAR NAME=FIELD_NAME><br>
+      Field Value: <TMPL_VAR NAME=FIELD_VALUE><br>
+  </TMPL_LOOP>
+
+  <TMPL_IF NAME=INVALID_phone>
+      Phone: <TMPL_VAR NAME="phone"> you supplied is invalid.
+  </TMPL_IF>
+
+  <TMPL_IF NAME=MISSING_city>
+      City name is missing, please fix this.
+  </TMPL_IF>
+
+  Company <TMPL_VAR NAME="VALID_company"> validated.
+  Phone <TMPL_VAR NAME="VALID_phone"> validated.
+
+  <!-- We can also access our normal field names since $cgi object was passed as associate as well -->
+
+  I think <TMPL_VAR NAME=country> is very big country.
+
+  <!-- Optional use of Data::FormValidator::Results msgs interface -->
+
+  Message Fields:
+
+  <TMPL_LOOP NAME=MSGS_FIELDS>
+      Field Name: <TMPL_VAR NAME=FIELD_NAME><br>
+      Field Value: <TMPL_VAR NAME=FIELD_VALUE><br>
+  </TMPL_LOOP>
+
+  <TMPL_IF NAME=MSGS_error_city>
+        Our default error message set in the profiling code is: <TMPL_VAR NAME=MSGS_error_city>
+  </TMPL_IF>
+

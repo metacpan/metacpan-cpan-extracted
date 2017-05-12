@@ -1,0 +1,7 @@
+# $Id$
+compile.t
+pod.t
+pod_coverage.t
+#prereq.t
+load.t
+save.t

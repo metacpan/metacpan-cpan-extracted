@@ -1,0 +1,17 @@
+Build.PL
+Changes
+inc/Module/Build/HiPi/Wiring.pm
+INSTALL
+lib/HiPi/Wiring.pm
+lib/HiPi/Wiring/Pin.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+mylib/include/compat.h
+mylib/include/local-i2c-dev.h
+mylib/include/ppport.h
+README
+t/000-load.t
+typemap
+Wiring.xs
+META.yml
+META.json

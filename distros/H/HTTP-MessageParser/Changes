@@ -1,0 +1,12 @@
+Revision history for Perl extension HTTP::MessageParser
+
+0.3 2006-04-04 00:00
+    - Added support for RFC 2616 19.3 Tolerant Applications
+    - Added support for HTTP/0.9 Requests RFC 1945 5.0 (Simple-Request)
+
+0.2 2006-04-03 00:00
+    - Fixed bug in Request-URI parsing.
+    - Added eg/echo.pl
+
+0.1 2006-04-03 00:00
+    - First release.

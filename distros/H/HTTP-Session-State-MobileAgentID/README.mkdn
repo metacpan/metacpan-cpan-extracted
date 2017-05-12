@@ -1,0 +1,49 @@
+# NAME
+
+HTTP::Session::State::MobileAgentID - Maintain session IDs using mobile phone's unique id
+
+# SYNOPSIS
+
+    HTTP::Session->new(
+        state => HTTP::Session::State::MobileAgentID->new(
+            mobile_agent => HTTP::MobileAgent->new($r),
+        ),
+        store => ...,
+        request => ...,
+    );
+
+# DESCRIPTION
+
+Maintain session IDs using mobile phone's unique id
+
+# CONFIGURATION
+
+- mobile_agent
+
+instance of [HTTP::MobileAgent](http://search.cpan.org/perldoc?HTTP::MobileAgent)
+
+- check_ip
+
+check the IP address in the carrier's cidr/ or not?
+see also [Net::CIDR::MobileJP](http://search.cpan.org/perldoc?Net::CIDR::MobileJP)
+
+- cidr
+
+The object have __get_carrier($ip)__ method like [Net::CIDR::MobileJP](http://search.cpan.org/perldoc?Net::CIDR::MobileJP).
+
+If not provided to constructor, this class create new instance of Net::CIDR::MobileJP automatically.
+
+# AUTHOR
+
+Tokuhiro Matsuno <tokuhirom AAJKLFJEF GMAIL COM>
+
+# SEE ALSO
+
+[HTTP::MobileAgent](http://search.cpan.org/perldoc?HTTP::MobileAgent), [HTTP::Session](http://search.cpan.org/perldoc?HTTP::Session)
+
+# LICENSE
+
+Copyright (C) Tokuhiro Matsuno
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

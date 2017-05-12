@@ -1,0 +1,149 @@
+NAME
+    HTTP::MobileAgent - HTTP mobile user agent string parser
+
+SYNOPSIS
+      use HTTP::MobileAgent;
+
+      # from PSGI $env hash:
+      my $agent = HTTP::MobileAgent->new( $env );
+
+      # from %ENV (CGI mode):
+      my $agent = HTTP::MobileAgent->new();
+
+      # from Apache (mod_perl 1.x):
+      my $agent = HTTP::MobileAgent->new(Apache->request);
+
+      # from a HTTP::Headers / HTTP::Request object:
+      my $agent = HTTP::MobileAgent->new( HTTP::Headers->new( ... ) );
+      my $agent = HTTP::MobileAgent->new( HTTP::Request->new( ... ) );
+
+      # from a raw user agent string:
+      my $agent = HTTP::MobileAgent->new($agent_string);
+
+      if ($agent->is_docomo) {
+          # or if ($agent->name eq 'DoCoMo')
+          # or if ($agent->isa('HTTP::MobileAgent::DoCoMo'))
+          # it's NTT DoCoMo i-mode.
+          # see what's available in H::MA::DoCoMo
+      } elsif ($agent->is_vodafone) {
+          # it's Vodafone(J-Phone).
+          # see what's available in H::MA::Vodafone
+      } elsif ($agent->is_ezweb) {
+          # it's KDDI/EZWeb.
+          # see what's available in H::MA::EZweb
+      } else {
+          # may be PC
+          # $agent is H::MA::NonMobile
+      }
+
+      my $display = $agent->display;        # HTTP::MobileAgent::Display
+      if ($display->color) { ... }
+
+DESCRIPTION
+    HTTP::MobileAgent parses HTTP_USER_AGENT strings of (mainly Japanese)
+    mobile HTTP user agents. It'll be useful in page dispatching by user
+    agents.
+
+METHODS
+    Here are common methods of HTTP::MobileAgent subclasses. More agent
+    specific methods are described in each subclasses. Note that some of
+    common methods are also overrided in some subclasses.
+
+    new
+          $agent = HTTP::MobileAgent->new;       # from %ENV
+          $agent = HTTP::MobileAgent->new($env); # PSGI env hash
+          $agent = HTTP::MobileAgent->new($r);   # Apache or HTTP::Request
+          $agent = HTTP::MobileAgent->new($ua_string);
+
+        Parses HTTP headers and constructs HTTP::MobileAgent subclass
+        instance.
+
+        If no argument is supplied, $ENV{HTTP_*} is used (i.e., expects a
+        CGI environment to be setup)
+
+        If a single hash reference is given, then that hash is treated as a
+        PSGI environment hash.
+
+        If a blessed reference which is based on Apache (mod_perl 1.x),
+        HTTP::Headers or HTTP::Request is passed, those will be used
+        accordingly to parse data.
+
+        If a single scalar is given, then that is taken to be a raw user
+        agent string. Note that most likely this form of usage will not give
+        you much information, as some mobile agents put useful information
+        on HTTP headers other than only "User-Agent:" (like
+        "x-jphone-msname" in J-Phone).
+
+    user_agent
+          print "User-Agent: ", $agent->user_agent;
+
+        returns User-Agent string.
+
+    name
+          print "name: ", $agent->name;
+
+        returns User-Agent name like 'DoCoMo'.
+
+    is_docomo, is_vodafone(is_j_phone, is_softbank), is_ezweb, is_wap1,
+    is_wap2, is_tuka,is_non_mobile
+           if ($agent->is_docomo) { }
+
+        returns if the agent is DoCoMo, Vodafone(J-Phone) or EZweb.
+
+    carrier
+          print "carrier: ", $agent->carrier;
+
+    carrier_longname
+          print "carrier_longname: ", $agent->carrier_longname;
+
+    display
+          my $display = $agent->display;
+
+        returns HTTP::MobileAgent::Display object. See
+        HTTP::MobileAgent::Display for details.
+
+    user_id
+          my $user_id = $agent->user_id;
+
+        return X-DCMGUID, X-UP-SUBNO or X-JPHONE-UID.
+
+    gps_compliant
+          if ($agent->gps_compliant) { }
+
+        returns if the agent is GPS compliant.
+
+NOTE
+    "Why not adding this module as an extension of HTTP::BrowserDetect?"
+        Yep, I tried to do. But the module's code seems hard enough for me
+        to extend and don't want to bother the author for this
+        mobile-specific features. So I made this module as a separated one.
+
+MORE IMPLEMENTATIONS
+    If you have any idea / request for this module to add new subclass, I'm
+    open to the discussion or (more preferable) patches. Feel free to mail
+    me.
+
+OTHER LANGUAGE BINDINGS
+    This module is now ported to PHP as Net::UserAgent::Mobile by Atsuhiro
+    KUBO. See http://pear.php.net/package-info.php?pacid=180 for details.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net> is the original author and
+    wrote almost all the code.
+
+    with contributions of Satoshi Tanimoto <tanimoto@cpan.org> and Yoshiki
+    Kurihara <kurihara@cpan.org>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+MAIN
+SEE ALSO
+    HTTP::MobileAgent::DoCoMo, HTTP::MobileAgent::Vodafone,
+    HTTP::MobileAgent::JPhone, HTTP::MobileAgent::EZweb,
+    HTTP::MobileAgent::NonMobile, HTTP::MobileAgent::Display,
+    HTTP::BrowserDetect
+
+    Reference URL for specification is listed in Pods for each subclass.
+

@@ -1,0 +1,43 @@
+Revision history for Perl extension HTML::Template::Compiled::Plugin::I18N.
+
+1.04  Fri Oct 29 21:32:11 2010
+- Ignore problems with URI::Escape of HTC.
+
+1.03  Thu Jan 21 14:00:00 2010
+- A default escape can be more than 1 escape.
+
+1.02  Thu Dec  3 10:15:00 2009
+- Better POD and examples.
+
+1.01  Thu Nov 19 22:00:00 2009
+- Delete debug code.
+  Add a new test with a more realistic test translator.
+
+1.00  Wed Nov 18 22:00:00 2009
+- API changed.
+  Placeholder escapes are a very bad idea.
+  Now the first step is the translation.
+  During the translation placeholders (maketext/gettext) are expanded.
+  The second step is the escaping of the translated string.
+  Then the formatter should run.
+  At least expand the unescaped placeholders.
+
+0.03  Mon Nov  9 10:00:00 2009
+- no case sensitive escapes
+  (accept all notations, process as upper case)
+
+0.02  Tue Aug 04 22:30:00 2009
+- skip at missing module during escape testig
+
+0.01  Tue Jul 21 09:00:00 2009
+- change API of DefaultTranslator
+
+0.01_03  Sun Jul 19 21:00:00 2009
+- bugfix of an important mistake
+  NAME is the name of the variable and VALUE is the value itself.
+
+0.01_02  Thu Jul 16 14:00:00 2009
+- lot of changes including an API change
+
+0.01_01  Tue Jul 14 14:00:00 2009
+- first developer version

@@ -1,0 +1,109 @@
+HTML-Template-Pro version 0.9509
+==============================
+
+DESCRIPTION
+
+Original HTML::Template is written by Sam Tregar, sam@tregar.com
+with contributions of many people mentioned there.
+Their efforts caused HTML::Template to be mature html tempate engine
+which separate perl code and html design.
+Yet powerful, HTML::Template is slow, especially if mod_perl isn't 
+available or in case of disk usage and memory limitations.
+
+HTML::Template::Pro is a fast lightweight C/Perl+XS reimplementation
+of HTML::Template (as of 2.9) and HTML::Template::Expr (as of 0.0.7). 
+It is not intended to be a complete replacement, 
+but to be a fast implementation of HTML::Template if you don't need 
+quering, the extended facility of HTML::Template.
+Designed for heavy upload, resource limitations, abcence of mod_perl.
+
+HTML::Template::Pro has complete support of filters and HTML::Template::Expr's 
+tag EXPR="<expression>", including user-defined functions.
+
+HTML::Template work cycle uses 2 steps. First, it loads and parse template.
+Then it accepts param() calls until you call output().
+output() is its second phase where it produces a page from the parsed tree
+of template, obtained in the 1st step.
+
+HTML::Template::Pro loads, parse and outputs template on fly, 
+when you call $tmpl->output(), in one pass. The corresponding code is 
+written in C and glued to Perl using Perl+XS. As a result,
+when compared to HTML::Template in ordinary calls, it runs 
+10-25 times faster. Comparing to HTML::Template with all caching enabled
+under mod_perl, it still 1-3 times faster. At that HTML::Template caching 
+requires considerable amount of memory (per process, shareable, or on disk) 
+to be permanently filled with parsed trees, whereas HTML::Template::Pro 
+doesn't consume memory for caches and use mmap() for reading templates on disk.
+
+INSTALLATION
+
+This module is tested on Linux and FreeBSD. There are success reports 
+on MacOS X, Solaris, Windows. Windows users should look at README.win32.
+For Unixes it currently use POSIX mmap() system call, 
+which may be unavaliable on some systems. 
+In such case add argument MMAP=0 to perl Makefile.PL.
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you have libpcre installed try 
+   perl Makefile.PL PCRE=1
+
+other optional parameters include DEBUG (build with extra debug level)
+and IMITATE (imitate behavior of HTML::Template in all circumstances,
+even on broken templates, for a little cost of  perfomance).
+
+So a fully fledged build is
+   perl Makefile.PL PCRE=1 DEBUG=1 IMITATE=1
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+modules:
+  File::Spec
+
+libraries:
+  libpcre (optional)
+
+TODO
+
+Add support for die_on_bad_params => 1.
+Add support for quering.
+Improve debug message subsystem.
+
+WEBSITE
+
+You can find information about HTML::Template::Pro at:
+
+   http://html-tmpl-pro.sourceforge.net 
+	and 
+   http://sourceforge.net/projects/html-tmpl-pro
+
+Original HTML::Template and other related modules are located at:
+
+   http://html-template.sourceforge.net
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005-2009 by I. Yu. Vlasenko.
+Pieces of code in Pro.pm and documentation of HTML::Template are
+copyright (C) 2000-2009 Sam Tregar (sam@tregar.com)
+Other contributors to the code base are listed in Changes.
+
+The template syntax, interface conventions and a large piece of documentation 
+of HTML::Template::Pro are based on CPAN module HTML::Template 
+by Sam Tregar, sam@tregar.com.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available,
+or, at your option, under the terms of the GNU Lesser General Public License 
+as published by the Free Software Foundation; either version 2 of the 
+License, or (at your option) any later version.
+

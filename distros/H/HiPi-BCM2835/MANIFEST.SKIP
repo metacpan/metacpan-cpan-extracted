@@ -1,0 +1,16 @@
+
+devscripts/
+^bak
+^blib
+^BCM2835/buildlib
+^mylib/lib
+Build$
+_build/
+^debian
+^MANIFEST\.bak$
+(?:^|/)MYMETA\.yml$
+(?:^|/)MYMETA\.json$
+^rungui$
+\.bak$
+\.tar\.gz$
+^svn-commit.tmp$

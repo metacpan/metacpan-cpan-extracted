@@ -1,0 +1,8 @@
+Revision history for Perl extension HTTP::Session::Store::KyotoTycoon
+
+0.02
+
+        - fixed bug in synopsis(patch from yappo++)
+
+0.01    Tue Oct 12 20:08:32 2010
+        - original version

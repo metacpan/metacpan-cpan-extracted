@@ -1,0 +1,45 @@
+Revision history for HTTP::Status::Const
+
+v0.3.0    2015-06-23 18:30:56+01:00 Europe/London
+  [Incompatabilities]
+  - Increased minimum version to Perl v5.10.1.
+
+  [Other Changes]
+  - Updated copyright year.
+
+  - Use Perl::Critic tests are part of build process.
+
+  - Clean up prereqs in build.
+
+  - Added author and release tests.
+
+  - Use Dist::Zilla TravisYML plugin.
+
+v0.2.3    2014-12-06 17:41:35+00:00 Europe/London
+  [Documentation]
+  - Fixed typos in the README due to cut-and-paste.
+
+v0.2.2    2014-12-05 17:43:31+00:00 Europe/London
+  - Added support for exporting HTTP::Status's utility functions
+    [Fixes GitHub #1].
+
+  - Switched to use Dist::Zilla for managing the distribution.
+
+  - Fixed typos in POD.
+
+  - Added note about why you don't need this module. Really, you don't
+    need it.
+
+v0.2.1  2014-11-10 23:16 GMT
+   - Removed HTTP::Status::Constants from distribution.  (This version
+     just exports everything that HTTP::Status::Const does, so it
+     should have no effect on existing users.)
+
+v0.2.0  2014-11-10 23:06 GMT
+   - Renamed to HTTP::Status::Const.
+
+   - HTTP::Status::Constants is a deprecated module that uses
+     HTTP::Status::Const.
+
+v0.1.0  2014-11-07
+   - Initial version.

@@ -1,0 +1,9 @@
+
+<contents src="data/contentsfind.data/" name=".../*.txt"
+	skip="RE:.*dir2a.*"
+/>
+
+<out file=log/contentsfind3.html>
+	${foo.txt}${dir1/bar.txt}${dir2/dir2a/baz.txt}
+</out>
+

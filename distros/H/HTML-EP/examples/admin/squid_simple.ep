@@ -1,0 +1,57 @@
+<ep-package name="HTML::EP::Examples::Admin">
+<ep-html-ep-examples-admin-squid>
+<html><head><title>
+<ep-language en="Squid Activation" de="Squid-Aktivierung">
+</title></head>
+<body bgcolor=#ffffff>
+<h1><ep-language en="Squid Activation"
+                 de="Squid-Aktivierung"></h1>
+<ep-language language="de">
+Diese Seite erlaubt Ihnen die Aktivierung oder Deaktivierung bestimmter
+Bereiche für den Proxyserver "Squid".
+</ep-language>
+<ep-language language="en">
+This page offers you to activate or deactivate certain ranges of IP numbers
+for the proxy server "Squid".
+</ep-language>
+<form action=squid_simple.ep method=POST>
+<h3><ep-language de="Vorhandene Client-Bereiche"
+                 en="Existing Client ranges"></h3>
+<div align=center>
+<table>
+  <tr><th><ep-language de="Bereichsname" en="Range description"></th>
+      <th><ep-language de="Von IP-Nummer" en="From IP address"></th>
+      <th><ep-language de="Bis IP-Nummer" en="To IP address"></th>
+      <th><ep-language de="Aktiv" en="Active"></th>
+  </tr>
+<ep-list items="ranges" item="r">
+  <tr><td><input type=hidden name="edit_name_$i$" value="$r->name$">
+          $r->name$</td>
+      <td><input type=hidden name="edit_ip_from_$i$" value="$r->from$">
+          $r->from$</td>
+      <td><input type=hidden name="edit_ip_to_$i$" value="$r->to$">
+          $r->to$</td>
+      <td><select name="edit_active_$i$">
+            <option value=1>Ja
+            <option value=0 $&RANGE_SELECTED->r->active$>Nein
+          </select></td>
+  </tr>
+</ep-list>
+</table>
+</div>
+<div align=center>
+<p>
+  <ep-language language="en">
+    <input type=submit value="Save Data">
+  </ep-language>
+  <ep-language language="de">
+    <input type=submit value="Daten speichern">
+  </ep-language>
+</p>
+<p><a href="index.ep"><ep-language de="Administrationsmenü" en="Admin menu">
+   </a>
+</p>
+</div>
+</form>
+</body>
+</html>

@@ -1,0 +1,12 @@
+README
+Changes
+MANIFEST
+Makefile.PL
+MHTTP.pm
+MHTTP.xs
+t/00use.t
+t/01mhttp.t
+mhttp/Makefile.PL
+mhttp/mhttp.c
+mhttp/mhttp.h
+mhttp/README

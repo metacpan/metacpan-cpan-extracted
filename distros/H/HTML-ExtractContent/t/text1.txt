@@ -1,0 +1,2 @@
+This file is for a simple test that the single content of the page can
+appropriately be extracted.

@@ -1,0 +1,94 @@
+
+<content name=foo format="text/et">
+This is foo
+===========
+
+Should be titled foo
+</content>
+
+<content name=bar format="text/et">
+This is bar
+-----------
+
+Should be titled bar
+</content>
+
+<content name=baz format="text/html">
+<h2>this is baz</h2>
+
+<p>Should be titled baz</p>
+
+<h2>ignore this baz title</h2>
+
+</content>
+
+<content name=blag format="text/pod">
+=head1 NAME
+
+This is blag
+
+=head1 TEXT
+
+Should be titled blag.
+</content>
+
+<content name=gab format="text/et">
+<hr><div align="left">
+
+This is gab
+===========
+
+Should be titled gab
+
+This is not gab
+===============
+
+That heading should be ignored
+
+</div><hr>
+</content>
+
+<content name=boo format="text/plain">
+
+This is boo
+
+Should be titled boo
+</content>
+<content name=floo format="text/et">
+<wmmeta name="title" value="This is floo" />
+
+This should not appear
+-----------
+
+Should be titled floo
+</content>
+
+
+<out file=log/implicitmetas.html>
+The winners are:
+
+	- $[foo.title]
+
+	- $[bar.title]
+
+	- $[baz.title]
+
+	- $[blag.title]
+
+	- $[gab.title]
+
+	- $[boo.title]
+
+	- $[floo.title]
+</out>
+
+<out file=log/implicitmetas_1.html> Title: $[this.title] // ${foo}</out>
+<out file=log/implicitmetas_2.html> Title: $[this.title] // ${bar}</out>
+<out file=log/implicitmetas_3.html> Title: $[this.title] // ${baz}</out>
+<out file=log/implicitmetas_4.html> Title: $[this.title] // ${blag}</out>
+<out file=log/implicitmetas_5.html> Title: $[this.title] // ${gab}</out>
+
+<out file=log/implicitmetas_6.html format=text/plain>
+Title: $[this.title] // ${boo}</out>
+<out file=log/implicitmetas_7.html> Title: $[this.title] // ${floo}</out>
+

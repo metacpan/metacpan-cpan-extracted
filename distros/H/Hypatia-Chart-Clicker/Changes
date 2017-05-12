@@ -1,0 +1,28 @@
+Revision history for Hypatia-Chart-Clicker
+
+0.026     2012-12-22 14:27:50 CST6CDT
+
+- Changed Hypatia prereq to 0.029.
+- Fixed bugs in the unit tests pie.t and pie_columns.t that were created by tweaks to Hypatia.
+
+0.025     2012-12-22 14:19:31 CST6CDT
+
+- Added a type library.
+- Added options via Hypatia::Chart::Clicker::Options and Hypatia::Chart::Clicker::Options::Axis
+
+0.023     2012-10-02 17:19:22 America/Chicago
+
+- Fixed a bug in the test setup_guess_columns.t that caused failures for users who don't have DBD::SQLite installed.
+
+0.022     2012-10-01 21:06:11 America/Chicago
+
+- Added a pre-requisite of Hypatia version 0.026 (to ensure that the tests work with the new version of Hypatia::DBI::Test::SQLite).
+
+0.021     2012-10-01 19:07:58 America/Chicago
+
+- Moved some methods from Hypatia::Chart::Clicker to Hypatia::Base in order to facilitate polymorphism with Hypatia::GraphViz2
+- Fixed a bug in the test bubble_fail.t
+
+0.02      2012-09-26 04:10:08 America/Chicago
+
+- Added a ton of unit tests and the ability to make (reasonably intelligent) guesses at what columns should be which type, depending on the graph type you want. Take a look at the documentation for details.

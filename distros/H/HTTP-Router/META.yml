@@ -1,0 +1,42 @@
+---
+abstract: 'Yet Another Path Router for HTTP'
+author:
+  - 'NAKAGAWA Masaki <masaki@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::Deep: 0
+  Test::MockObject: 0
+  Test::More: 0
+  Test::UseAllModules: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.94'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTTP-Router
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Carp: 0
+  Class::Accessor::Fast: 0
+  Devel::Caller::Perl: 0
+  Filter::Util::Call: 0
+  Hash::AsObject: 0
+  Lingua::EN::Inflect::Number: 0
+  List::MoreUtils: 0
+  Scalar::Util: 1.14
+  Storable: 0
+  String::CamelCase: 0
+  Text::SimpleTable: 0
+  URI::Template::Restrict: 0.05
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/masaki/http-router.git
+version: 0.05

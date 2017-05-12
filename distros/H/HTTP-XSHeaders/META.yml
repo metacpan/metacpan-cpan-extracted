@@ -1,0 +1,28 @@
+---
+abstract: 'Fast XS Header library, replacing HTTP::Headers and HTTP::Headers::Fast.'
+author:
+  - 'Gonzalo Diethelm (gonzus@cpan.org)'
+  - 'Sawyer X (xsawyerx@cpan.org)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.142690'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTTP-XSHeaders
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: '5.57'
+  Test::More: '0'
+  XSLoader: '0'
+  perl: '5.008009'
+resources:
+  repository: https://github.com/p5pclub/http-xsheaders
+version: '0.400003'

@@ -1,0 +1,71 @@
+Revision history for Perl extension HTML::Timeline.
+
+1.10  2017-04-16T18:01:00
+	- Replace 'perl' with $^X in t/test.t. Reported by Slaven Rezic. See RT#121181.
+	- Update pre-reqs in Makefile.PL.
+
+1.09  2017-04-16T11:16:00
+	- Adopt new repo structure. For details, see
+		http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html.
+	- Fix issue with open(my $fh...) used twice in generate_xml_file(). The 2nd use of 'my' was
+		chopped. Reported by Nigel Horne. See RT#120946.
+	- Add the option validate_gedcom_file, which takes a Boolean value, to the set of options
+		accepted by new() and hence accepted by bin/timeline.pl. It defaults to 0, so that
+		validate() is no longer called by default. Suggested by Nigel Horne. See RT#120973.
+	- In bin/timeline.pl, document much more clearly what values are taken by each option.
+		Do the same in the pod.
+	- Fix docs for new(). It takes a hash of options, not a hashref.
+	- Add specific versions of pre-reqs in Makefile.PL.
+	- Rewrite t/test.t to run bin/timeline.pl under control of Capture::Tiny, and check its output.
+		This requires Capture::Tiny as a new pre-req.
+
+1.08  Sun Jan 25 14:07:00 2014
+	- Replace /usr/bin/perl with /usr/bin/env perl.
+	- Replace common::sense with use strict and use warnings, to get uninit var warnings.
+	- Rename CHANGES to Changes, as per CPAN::Changes::Spec.
+	- Rewrite bareword filehandles (INX) to use a variable (my $fh).
+	- Rename github repo from html--timeline to HTML-Timeline - My new standard.
+		Update Build.PL and Makefile.PL to match.
+	- Reformat the docs, and this file, slighty, to be <= 100 chars per line - My new standard.
+	- Move t/pod.t to xt/author/.
+
+1.07  Sun Feb 21 12:55:20 2010
+	- Remove text 'All rights reserved' (for Debian licensing).
+	- Remove POD heads 'Required Modules' and 'Changes'.
+
+1.06  Wed Feb 10 13:52:47 2010
+	- Add META.yml. Update MANIFEST.SKIP. Add MANIFEST and MYMETA.yml.
+
+1.05  Fri Nov 13 13:20:00 2009
+	- Run dos2unix. This only affects examples/bach.ged.
+
+1.04  Fri Aug 29 14:44:00 2008
+	- Download Phil Durbin's patches from github
+	- Implement missing_as_table (see docs for details)
+
+1.03  Fri Aug 22 12:23:00 2008
+	- Add support for ~/.timelinerc, using Config::IniFiles
+	- Rename Changes.txt to CHANGES because search.cpan.org won't display Changes.txt
+	- Ensure spouse of root person is included when processing descendents and spouses
+	- Fix date-parsing via Gedcom::Date
+
+1.02  Mon Aug 18 13:50:00 2008
+	- Switch from Date::Manip as used by ged2xml.pl to Gedcom::Date.
+	  Backwards-incompatability, if any, with Date::Manip, is deemed to be a feature
+	- Add the -output_dir option. This requires Path::Class
+	- Add the -template_dir option. This requires HTML::Template
+	- Add the -template_name option
+	- Add the -timeline_height option
+	- Add the -url_for_xml option
+	- Add the -web_page option
+	- Rename timeline.html to timeline.tmpl
+	- Add user help to the bottom of the HTML output
+	- Report people with missing birth dates below the timeline
+	- Change default height of the HTML output to 500px
+	- Change the hard-coded date in timeline.tmpl to the earliest birth date
+
+1.01  Wed Aug 13 09:27:00 2008
+	- Oops. Left Local::Config in t/test.t
+
+1.00  Mon Aug 11 17:56:00 2008
+	- Original version

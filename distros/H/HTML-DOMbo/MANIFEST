@@ -1,0 +1,8 @@
+ChangeLog
+lib/HTML/DOMbo.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00_about_verbose.t
+META.yml                                 Module meta-data (added by MakeMaker)

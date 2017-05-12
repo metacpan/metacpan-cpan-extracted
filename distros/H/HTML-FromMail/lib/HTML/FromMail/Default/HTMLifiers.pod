@@ -1,0 +1,62 @@
+=head1 NAME
+
+Html::FromMail::Default::HTMLifiers - convert data type to HTML
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 FUNCTIONS
+
+B<htmlifyHtml>(PAGE, MESSAGE, PART, ARGS)
+
+=over 4
+
+THIS FUNCTION IS NOT PRESENT, for the following reason.  What should
+happen here?  The message part/multipart contains an html message, but
+that interferes with the HTML of the template.
+
+One solution could be to strip the header, and the html and body tags.
+However, what about style sheet info?  That may very well interfere
+with the template's style sheet.  And consider erroneous HTML?
+
+So, until some nice solution is presented, HTML will not be inlined.
+As alternative, your production software may differentiate between
+html messages and non-html messages.  Produce the page according to
+the template, and then simply link to the produced HTML for the user.
+However, I don't know whether that is smart....
+
+=back
+
+B<htmlifyText>(PAGE, MESSAGE, PART, ARGS)
+
+=over 4
+
+Convert plain text into HTML using HTML::FromText.  Configuration
+can be supplied as show in the example.  The defaults are set to mode C<pre>
+with C<urls>, C<email>, C<bold>, and C<underline>.
+
+I<Example:> configuring text conversion
+
+  my $f = HTML::FromMail->new
+  ( settings =>
+      { message        => { disposition => \&my_disposer }
+      , HTML::FromText => { block_code  => 0 }
+      }
+  );
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of HTML-FromMail distribution version 0.11,
+built on June 08, 2007. Website: F<http://perl.overmeer.net/html-from-mail/>
+
+=head1 LICENSE
+
+Copyrights 2003,2004,2007 by Mark Overmeer. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

@@ -1,0 +1,15 @@
+Revision History for HTML-FormHandlerX-Field-reCAPTCHA
+
+0.04 24 July 2013
+    -- new test case to make sure recaptcha is properly created (ferz++)
+
+0.03 23 February 2010
+    -- fixed incorrect repository link
+
+0.02 23 February 2010
+    -- Fixed some documentation typos and busted url links.
+    -- Fixed some POD errors
+    -- Fixed incorrect POD name declaration
+
+0.01 22 February 2010 
+    -- Initial Release.

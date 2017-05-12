@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name: HTML-Menu-DateTime
+version: 1.00
+license: perl
+distribution_type: module
+requires:
+  Test::More: 0
+recommends:
+  DateTime::Locale: 0.20
+  HTML::Menu::Select: 1.0
+build_requires: {}
+conflicts: {}
+provides:
+  HTML::Menu::DateTime:
+    file: lib/HTML/Menu/DateTime.pm
+    version: 1.00
+generated_by: Module::Build version 0.20

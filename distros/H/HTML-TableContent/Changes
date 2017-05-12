@@ -1,0 +1,18 @@
+Revision history for HTML-TableContent
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.07    Nested and Vertical Tables
+
+    - Add support for parsing vertical tables
+    - Add support for parsing nested tables
+    - Add support for parsing nested tables inside nested tables inside nested tables
+    - Add support for parsing vertical nested tables
+
+0.10    aoa and aoh
+
+    - Return table as aoa
+    - Return table as aoh
+    - Pass aoh as data to create_table
+    - Parser now stores hrefs found inside tables

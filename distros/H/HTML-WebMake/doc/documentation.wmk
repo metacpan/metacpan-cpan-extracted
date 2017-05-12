@@ -1,0 +1,372 @@
+<webmake>
+<!--
+
+  This is the source .wmk file for the WebMake documentation.  If you are
+  looking at this for some simple WebMake usage examples, be warned; this is
+  quite a complicated WebMake file.  As well as the simple templating and
+  metadata stuff, it also dynamically incorporates the POD documentation
+  straight from the source code, and includes a sitemap, navigation links, and
+  a dynamically-generated index page.
+
+  Some of the other samples on the WebMake site (http://webmake.taint.org/)
+  would be easier for beginners to understand.
+
+  Anyway, just thought I should mention it.  Consider yourself warned! ;)
+
+-->
+
+<!-- include some library .wmk's -->
+<use plugin="safe_tag" />
+
+<!-- include the source EtText files -->
+<contents src="" name="*.txt" format="text/et" listname=all_files />
+<include file="include_datasources.wmk" />
+
+<!-- stylesheets -->
+<templates src="" name="*.css" map="false" />
+
+<!-- the names and titles of all the sections -->
+<templates src="svfile:sections.tsv" name="*" format="text/html"
+	namefield=1 valuefield=2 delimiter="|"
+	listname=all_sections map=false
+/>
+
+<!-- ------------------------------------------------------------------------ -->
+
+<!-- include the POD documentation directly from the source files -->
+
+<attrdefault name="listname"	value="all_pods">
+<attrdefault name="format"	value="text/pod">
+<attrdefault name="asis"	value="true">
+<attrdefault name="map"		value="true">
+<metadefault name="score"	value="50">
+
+<metadefault name="section"	value="08-pod">
+<contents src="../lib/HTML/WebMake" name="PerlCodeLibrary.pm" />
+<contents src="../lib/HTML/WebMake" name="Content.pm" />
+<contents src="../lib/HTML/WebMake" name="Main.pm" />
+</metadefault>
+
+<metadefault name="section"	value="09-man">
+<contents src=".." name="webmake" />
+</metadefault>
+
+<metadefault name="section"	value="10-perllib">
+<contents src="../lib/HTML/WebMake/PerlLib" name="*.wmk" />
+</metadefault>
+
+</metadefault>
+</attrdefault>
+</attrdefault>
+</attrdefault>
+</attrdefault>
+
+<!-- and now define the metadata for those PODs quickly using a metatable -->
+
+<metatable delimiter="|">
+.|title|abstract
+
+Main.pm|HTML::WebMake::Main|module documentation
+PerlCodeLibrary.pm|HTML::WebMake::PerlCodeLibrary|module documentation
+Content.pm|HTML::WebMake::Content|module documentation
+webmake|webmake(1)|manual page
+dump_vars.wmk|dump_vars.wmk|dump all WebMake variables and content items
+sitetree.wmk|sitetree.wmk|WebMake tag to generate a per-page sitemap
+navtree.wmk|navtree.wmk|WebMake tag to generate an alternative per-page sitemap
+safe_tag.wmk|safe_tag.wmk|Tag to ''make safe'' WebMake, EtText or HTML data
+thumbnail_tag.wmk|thumbnail_tag.wmk|Tag to create ''thumbnail'' links for photo albums
+download_tag.wmk|download_tag.wmk|Tag for quick download links to files
+csvtable_tag.wmk|csvtable_tag.wmk|define a HTML table using comma-separated values
+</metatable>
+
+<!-- ------------------------------------------------------------------------ -->
+
+<{perl
+  # define a quick tag to mark up screenshots with a nice border.
+  # If I ever get around to make parameterised content references this taglib-style
+  # clunkiness will not be necessary ;)
+
+  define_empty_tag ("shot", \&make_shot, qw(src));
+
+  sub make_shot {
+    my ($tag, $attrs, $text, $self) = @_;
+
+    return qq{
+        <table border="0" cellpadding="0" cellspacing="0" align=center>
+        <tr><td bgcolor="#333333">
+        <table border="0" cellpadding="2" cellspacing="2">
+        <tr><td bgcolor="#ffffff">
+        <table border="0" cellpadding="2" cellspacing="2">
+        <tr><td>
+        <img src="}.$attrs->{src}.qq{" \${IMGSIZE} />
+        </td></tr></table>
+        </td></tr></table>
+        </td></tr></table>
+    };
+  }
+
+  '';
+}>
+
+<!-- ------------------------------------------------------------------------ -->
+
+<attrdefault name=map value=false />
+
+<!-- Some static bits of HTML for headers and footers... -->
+
+<template name=header>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+      <title>WebMake: Documentation: $[this.title]</title>
+      <meta name="generator" content="${WebMake.GeneratorString}">
+      <style>${documentation.css}</style>
+  </head>
+  <body bgcolor="#ffffff" text="#000000" link="#3300cc" vlink="#660066">
+  <font face="lucida,verdana,sans-serif">
+
+  <div align=center> <img src=$(TOP/)images/WebMakeTitle.png ${IMGSIZE} alt="WebMake"></div>
+  ${navbar}
+
+  <!-- yes, it's that Mozilla black-border code again ;) -->
+  <!-- stolen from www.mozilla.org via rc3.org -->
+  <table border=0 cellpadding=0 cellspacing=0 width="100%">
+  <tr><td BGCOLOR="#aaaaaa">
+  <table border=0 cellspacing=4 cellpadding=4 width="100%">
+  <tr><td BGCOLOR="#ffffff">
+  <table border=0 cellspacing=4 cellpadding=4 width="100%">
+  <tr><td>
+
+  <h1>$[this.title]</h1>
+</template>
+
+<!-- ------------------------------------------------------------------------ -->
+
+<template name=navbar>
+  <table width=100%><tr><td valign=top>
+  <strong><a href=http://webmake.taint.org/>WebMake</a>
+  Documentation</strong> (version ${WebMake.Version})
+  </td><td valign=top>
+  <div align=right>
+  	[ $[navlinks] | <a href=$(index)>Index</a>
+	| <a href=$(allinone)>All&nbsp;In&nbsp;One</a> ]
+  </div>
+  </td></tr></table>
+</template>
+
+<!-- ------------------------------------------------------------------------ -->
+
+<template name=footer>
+  </td></tr></table>
+  </td></tr></table>
+  </td></tr></table>
+  ${navbar}
+  <div align=right>
+  <a href=http://webmake.taint.org/>
+  <img src=$(TOP/)images/BuiltWithWebMake.png ${IMGSIZE} alt="Built With WebMake" border=0></a>
+  </div>
+  </font></body></html>
+</template>
+
+<!-- ------------------------------------------------------------------------ -->
+
+<!-- Take all the files and all the sections, and come up with
+     a list, for each section, of the files that should be in it,
+     in sorted order.
+  -->
+<{perl
+
+  my @all_files = get_list("all_files");
+  my @all_pods = get_list("all_pods");
+  my @all_sects = get_list("all_sections");
+
+  foreach my $sectname (@all_sects) {
+    my @files_in_sect = ();
+
+    foreach my $pg (@all_files, @all_pods) {
+      next unless (get_content ("$pg.section") eq $sectname);
+      push (@files_in_sect, $pg);
+    }
+
+    @files_in_sect = content_names_to_objects (@files_in_sect);
+    @files_in_sect = sort_content_objects ('score title', @files_in_sect);
+    @files_in_sect = content_objects_to_names (@files_in_sect);
+
+    set_list ("$sectname.files", @files_in_sect);
+    push (@all_files, "index_$sectname.txt");
+  }
+
+  set_list ("all_files", @all_files);
+
+  '';
+  
+}>
+
+<!-- ------------------------------------------------------------------------ -->
+
+<!-- Generate the index.html file dynamically. -->
+
+<template name=index_section_item>
+<li>
+  <h2><a href=index_${section}.html>${section_title}</a></h2>
+  <ul>
+  ${section_list}
+  </ul>
+</li>
+</template>
+
+<template name=index_item>
+<li>
+  <p><a href=$[${item}.url]>$[${item}.title]</a> - $[${item}.abstract]</p>
+</li>
+</template>
+
+<!-- ------------------------------------------------------------------------ -->
+
+<content name=index isroot=true map=true>
+<wmmeta name="title" value="Contents" />
+<wmmeta name="abstract" value="What's in this documentation" />
+
+  <ul>
+  <{perl
+      my @all_sects = get_list("all_sections");
+
+      foreach my $sectname (@all_sects) {
+	my @section_list = ();
+
+	foreach my $pg (get_list ("$sectname.files")) {
+	  set_content ("item", $pg);
+	  push (@section_list, get_content ("index_item"));
+	}
+
+	set_content ("section", $sectname);
+	set_content ("section_title", get_content ($sectname));
+	set_list ("section_list", @section_list);
+	$_ .= get_content ("index_section_item");
+      }
+      $_;
+  }>
+  </ul>
+
+</content>
+
+<!-- ------------------------------------------------------------------------ -->
+
+<for name=sectname values="${all_sections}">
+  <content name=index_${sectname}.txt map=true>
+  <wmmeta name="title" value="Contents for the '${${sectname}}' section" />
+  <wmmeta name="abstract" value="section contents" />
+  <wmmeta name="score" value=1 />
+  <wmmeta name="section" value="${sectname}" />
+
+  <ul>
+
+    <{perl
+	my @section_list = ();
+	my $sectname = "${sectname}";	# expanded from for tag above
+
+	$_ = '';
+	foreach my $pg (get_list ("$sectname.files")) {
+	  set_content ("item", $pg);
+	  $_ .= get_content ("index_item");
+	}
+
+	$_;
+    }>
+
+  </ul>
+
+  </content>
+</for>
+
+<!-- ------------------------------------------------------------------------ -->
+<!-- sitemap for navigation -->
+
+<template name=sitemapnode>
+  <li>
+    <p>
+      <a href=$(url)>${title}</a> - $[${name}.abstract]<br>
+      <ul> ${list} </ul>
+    </p>
+  </li>
+</template>
+
+<template name=sitemapleaf>
+  <li><p><a href=$(url)>${title}</a> - $[${name}.abstract]<br></p></li>
+</template>
+
+<out name=docmap file=docmap.html>
+  ${header}${mainsitemap}${footer}
+</out>
+
+<sitemap name=mainsitemap node=sitemapnode leaf=sitemapleaf
+			sortorder="section score title" map=true>
+  <wmmeta name=title value="Documentation map" />
+  <wmmeta name=Abstract value="Map of this documentation" />
+  <wmmeta name=Section value="99-sitemap" />
+</sitemap>
+
+<template name=up></template>
+<template name=next><a href=${url}>Forward</a></template>
+<template name=prev><a href=${url}>Back</a></template>
+<template name=nonext>(Last Page)</template>
+<template name=noprev>(First Page)</template>
+
+<navlinks name=navlinks map=mainsitemap up=up next=next prev=prev
+	nonext=nonext noprev=noprev>
+${prevtext} | ${nexttext}
+</navlinks>
+
+<!-- ------------------------------------------------------------------------ -->
+
+<for name=pg values="${all_pods}">
+  <out name="${pg}.html" file="${pg}.html">
+  ${header}${${pg}}${footer}
+  </out>
+</for>
+
+<for name=pg namesubst="s/.txt//" values="${all_files}">
+  <out name="${pg}" file="${pg}.html">
+  ${header}${${pg}.txt}${footer}
+  </out>
+</for>
+
+<out name=index file=index.html>
+  ${header}${index}${footer}
+</out>
+
+<!-- ------------------------------------------------------------------------ -->
+
+<!-- An all-in-one page, for printing. -->
+
+<out name=allinone file=allinone.html ismainurl=false>
+  <wmmeta name="title" value="All-In-One Documentation" />
+  ${header}
+
+  <h1>$[index.title]</h1>
+  ${index}<hr>
+
+  <{perlout
+	foreach my $sectname (get_list ("all_sections"))
+	{
+	  my $pg = "index_$sectname.txt";
+	  print "<hr size=4><h1>". get_content("$pg.title"). "</h1>".
+		      get_content($pg). "<hr>\n";
+
+	  foreach $pg (get_list ("$sectname.files"))
+	  {
+	    my $shortpg = $pg; $shortpg =~ s/\.txt$//;
+
+	    print "<h2>". get_content("$pg.title"). "</h2>".
+		  	get_content($pg). "<hr noshade>\n";
+	  }
+	}
+  }>
+
+  ${footer}
+</out>
+</webmake>
+

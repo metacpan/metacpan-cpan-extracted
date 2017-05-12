@@ -1,0 +1,95 @@
+NAME
+    HTTP::Router - Yet Another Path Router for HTTP
+
+SYNOPSIS
+      use HTTP::Router;
+
+      my $router = HTTP::Router->new;
+
+      my $route = HTTP::Router::Route->new(
+          path       => '/',
+          conditions => { method => 'GET' },
+          params     => { controller => 'Root', action => 'index' },
+      );
+      $router->add_route($route);
+      # or
+      $router->add_route('/' => (
+          conditions => { method => 'GET' },
+          params     => { controller => 'Root', action => 'index' },
+      ));
+
+      # GET /
+      my $match = $router->match($req);
+      $match->params;  # { controller => 'Root', action => 'index' }
+      $match->uri_for; # '/'
+
+DESCRIPTION
+    HTTP::Router provides a way of constructing routing tables.
+
+    If you are interested in a Merb-like constructing way, please check
+    HTTP::Router::Declare.
+
+METHODS
+  new
+    Returns a HTTP::Router object.
+
+  add_route($route)
+  add_route($path, %args)
+    Adds a new route. You can specify HTTP::Router::Route object, or path
+    string and options pair.
+
+    example:
+
+      my $route = HTTP::Router::Route->new(
+          path       => '/',
+          conditions => { method => 'GET' },
+          params     => { controller => 'Root', action => 'index' },
+      );
+
+      $router->add_route($route);
+
+    equals to:
+
+      $router->add_route('/' => (
+          conditions => { method => 'GET' },
+          params     => { controller => 'Root', action => 'index' },
+      ));
+
+  routes
+    Returns registered routes.
+
+  reset
+    Clears registered routes.
+
+  freeze
+    Creates inline matcher using registered routes.
+
+  thaw
+    Clears inline matcher.
+
+  is_frozen
+    Returns true if inline matcher is defined.
+
+  match($req)
+    Returns a HTTP::Router::Match object that matches a given request. If no
+    routes match, it returns "undef".
+
+  route_for($req)
+    Returns a HTTP::Router::Route object that matches a given request. If no
+    routes match, it returns "undef".
+
+AUTHOR
+    NAKAGAWA Masaki <masaki@cpan.org>
+
+    Takatoshi Kitano <kitano.tk@gmail.com>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    HTTP::Router::Declare, HTTP::Router::Route, HTTP::Router::Match,
+
+    MojoX::Routes, <http://merbivore.com/>, HTTPx::Dispatcher, Path::Router,
+    Path::Dispatcher
+

@@ -1,0 +1,92 @@
+--- DBSchema/DBD/mysql.pm	2001-05-04 00:53:23.000000000 +0200
++++ DBSchema_ok/DBD/mysql.pm	2003-12-18 23:12:45.000000000 +0100
+@@ -37,16 +37,24 @@
+   my $sth = $dbh->prepare("SHOW COLUMNS FROM $table") or die $dbh->errstr;
+   $sth->execute or die $sth->errstr;
+   map {
+-    $_->{'Type'} =~ /^(\w+)\(?([\d\,]+)?\)?( unsigned)?$/
++    $_->{'Type'} =~ /^(\w+)\(?([^\)]+)?\)?( unsigned)?$/
+       or die "Illegal type: ". $_->{'Type'}. "\n";
+     my($type, $length) = ($1, $2);
++	my @enum;
++	if ($type eq 'enum') {
++		# unquote \'
++		$length =~s/'//g;
++		@enum 	= split(/,/,$length);
++		$length = '';
++	}
+     [
+       $_->{'Field'},
+       $type,
+       $_->{'Null'},
+       $length,
+       $_->{'Default'},
+-      $_->{'Extra'}
++      $_->{'Extra'},
++	  \@enum
+     ]
+   } @{ $sth->fetchall_arrayref( {} ) };
+ }
+--- DBSchema/Column.pm	2001-10-23 17:47:26.000000000 +0200
++++ DBSchema_ok/Column.pm	2003-12-18 23:31:00.000000000 +0100
+@@ -26,10 +26,11 @@
+     'length'  => 64,
+     'default' => '
+     'local'   => '',
++	'enum'    => []
+   } );
+ 
+   #list
+-  $column = new DBIx::DBSchema::Column ( $name, $sql_type, $nullability, $length, $default, $local );
++  $column = new DBIx::DBSchema::Column ( $name, $sql_type, $nullability, $length, $default, $local,\@enum );
+ 
+   $name = $column->name;
+   $column->name( 'name' );
+@@ -82,7 +83,7 @@
+   if ( ref($_[0]) ) {
+     $self = shift;
+   } else {
+-    $self = { map { $_ => shift } qw(name type null length default local) };
++    $self = { map { $_ => shift } qw(name type null length default local enum) };
+   }
+ 
+   #croak "Illegal name: ". $self->{'name'}
+@@ -190,6 +191,22 @@
+   }
+ }
+ 
++=item enum [ $arrayref ]
++
++Returns or sets the possible values for field when type is enum
++
++=cut
++
++sub enum {
++  my($self,$value)=@_;
++  return unless ($self->type eq 'enum');
++  if ( defined($value) ) {
++    $self->{'enum'} = $value;
++  } else {
++    $self->{'enum'};
++  }
++}
++
+ =item line [ DATABASE_HANDLE | DATA_SOURCE [ USERNAME PASSWORD [ ATTR ] ] ]
+ 
+ Returns an SQL column definition.
+@@ -252,10 +269,13 @@
+ 
+   my $r = join(' ',
+     $self->name,
+-    $type. ( ( defined($self->length) && $self->length )
++    $type. ($type eq 'enum' 
++			? "('" . join("','",@{$self->enum}) . "')"
++			:
++			( ( defined($self->length) && $self->length )
+              ? '('.$self->length.')'
+              : ''
+-           ),
++           )),
+     $null,
+     ( ( defined($default) && $default ne '' )
+       ? 'DEFAULT '. $default

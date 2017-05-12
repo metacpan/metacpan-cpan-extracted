@@ -1,0 +1,32 @@
+<%once>
+my @agr_pos = qw( verb noun det );
+</%once>
+<%args>
+$pos     => undef
+$tag     => undef
+%agr_arg => ()
+$case    => undef
+$count   => undef
+$aux     => undef
+</%args>
+<% defined $tag ? sprintf('\\@{%s} ', $tag) : ''%>\
+% if( $pos && (grep {$_ eq $pos} @agr_pos) && (grep { $_ } @ARGS{qw(agr_arg aux case count)} ) ){
+\[ {\it <% $pos %>}\
+%   if( %agr_arg ){
+\\ 
+   AGR   & <& '/agr.mas', %agr_arg &>\
+%   }
+%   if( $pos eq 'verb' && $aux ){
+\\ 
+   AUX   & <% $aux %>
+%   }elsif( $pos eq 'noun' && $case ){
+\\ 
+   CASE  & <% $case %>
+%   }elsif( $pos eq 'det' && $count ){
+\\ 
+   COUNT & <% $count %>
+%   }
+\]
+% }elsif( $pos ){
+{\it <% $pos %>}
+% }

@@ -1,0 +1,11 @@
+---
+elements: 
+  - type: Block
+    elements: 
+      - type: Text
+        name: foo
+
+  - type: Block
+    tag: span
+    content: Whatever
+        

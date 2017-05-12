@@ -1,0 +1,65 @@
+Revision history for Perl extension Hardware::Verilog::Parser.
+
+0.01  Fri Feb  4 09:50:20 2000
+	- original version; created by h2xs 1.19
+
+0.02	--
+
+0.03  7 Feb 2000
+	grammar actually compiles
+	cannot parse an always block though.
+
+0.04  7 Feb 2000
+	parses always blocks
+	parses module instantiations
+	added Hierarchy.pm module
+	added hierarchy.pl script
+
+0.05  8 Feb 2000
+	made some fixes to expression rules
+
+0.06  9 Feb 2000
+	fixed some grammar rules
+	can now handle `include, `define, `undef directives
+
+0.07  18 Feb 2000
+	got rid of all leftop constructs in rules.
+	Added Hardware::Verilog::StdLogic.pm module to 
+		evaluate constant expressions.
+
+0.08  23 Feb 2000
+	Simple constant expressions are now evaluated correctly.
+	 8'h4 + 8'h3 + 8'h2   is evaluated to    8'h9
+	changed rules to Parser.pm to support constant expressions,
+	and changed StdLogic.pm to support this as well.
+	StdLogic.pm performs arithmetic operator prioritization.
+
+0.09  24 Feb 2000
+	accumulate instance names, report at end of each module.
+	tweak literals, minor fix.
+
+0.10  28 Feb 2000
+	Precompiled parser now works.  Parses test1.v in about 6 seconds.
+	generate_precompiled_parser.pl can't seem to properly
+	insert the "use Hardware::Verilog::StdLogic" line
+	correctly though. Have to manually edit the PrecompiledParser.pm
+	file to do it correctly.
+
+0.11  1 Mar 2000
+	fixed a bunch of warning messages about unintialized data.
+	ran a bunch of extreme verilog files through the parser.
+	fixed a bunch of errors in the grammar rules.
+	tried to clean up some of the grammar rules to run a bit faster.
+	fixed a number of StdLogic.pm bugs to perform math correctly.
+
+
+0.12	7 Apr 2000
+	minor patch.
+	readme file incorrectly referred to non-existent verilog.pl file.
+	parser.pl script now also report performance information for
+	benchmarking. average is about 20 lines of verilog a second.
+
+0.13	27 Apr 2000
+	minor update.
+	added SearchPath method to Parser.pm
+	can now specify a search path to look for verilog files.

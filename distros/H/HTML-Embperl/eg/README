@@ -1,0 +1,54 @@
+This directory contains a few examples for use of Embperl.
+
+eg/x		Here are the following html files
+eg/images	Here are the background  GIF
+
+if.htm	        simple html file which shows how you can use the 
+                if, elsif, else and endif metacommand.
+
+loop.htm	simple html file which shows how you can use the while,
+                do/until and foreach matacommands to display arrays
+                or hashs
+
+table.htm	simple html file which shows how to use the dynamic table 
+                feature 
+
+lists.htm       shows you how to use dynamic lists and listboxes and
+                dropdownboxes
+
+config.htm      print out your perl config, like perl -V does
+
+dbi1.htm        shows how to fetch data from a database and display them
+                into a table using Embperl dynamic tables
+                Please read the setup notes in the file itself.
+
+dbi2.htm        shows how to fetch data from a database and display them
+                into a table using Embperl loop metacommands
+                Please read the setup notes in the file itself.
+
+recordset.htm   shows how to fetch data from a database using the 
+                DBIx::Recordset module
+                Please read the setup notes in the file itself.
+
+input.htm       a input and confirmation form (including error checking),
+                which data will be send via mail
+
+neu.htm	        this example shows many of the feature of Embperl, as 
+                embedding various code, conditional processing and form 
+		management (It's in German but I think it can be understand 
+		anyway). If called it works like a wizard known from windows 
+		95 where you can enter data on some consecutive pages and walk 
+		forward or back at everytime preserving the input made so far. 
+		Note that the database interface is missing from this example. 
+
+Execute.pl      This is an perl script which shows how to use the function
+                HTML::Embperl::Execute. It runs under Apache::Registry or
+                offline.
+
+upload.htm      Shows how to do a file upload with Embperl
+
+You can also look at the directory test/html. The files found here
+will transformed to the files found in test/cmp, the request for that can
+be found at the beginning of test.pl.
+NOTE: Files in test/html are tests, some things don't make sense for real usage
+ 

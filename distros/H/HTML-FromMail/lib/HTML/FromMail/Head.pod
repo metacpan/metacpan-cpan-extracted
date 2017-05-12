@@ -1,0 +1,146 @@
+=head1 NAME
+
+HTML::FromMail::Head - output a message header as HTML
+
+=head1 INHERITANCE
+
+ HTML::FromMail::Head
+   is a HTML::FromMail::Page
+   is a HTML::FromMail::Object
+   is a Mail::Reporter
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 METHODS
+
+$obj-E<gt>B<fields>(MESSAGE, OPTIONS)
+
+HTML::FromMail::Head-E<gt>B<fields>(MESSAGE, OPTIONS)
+
+=over 4
+
+Collect information about the header fields.
+
+ Option              --Default
+ ignore                undef
+ remove_list_group     1
+ remove_resent_groups  1
+ remove_spam_groups    1
+ select                ''
+
+. ignore => STRING
+
+=over 4
+
+The reverse of C<select>: which fields not to take.
+
+=back
+
+. remove_list_group => BOOLEAN
+
+=over 4
+
+Do not select the headers which are added by mailing list software.
+See Mail::Message::Head::ListGroup.
+
+=back
+
+. remove_resent_groups => BOOLEAN
+
+=over 4
+
+Remove all the lines which are related to transport of the message, for
+instance the C<Received> and C<Return-Path>, and all lines which start
+with C<Resent->.  See Mail::Message::Head::ResentGroup.
+
+=back
+
+. remove_spam_groups => BOOLEAN
+
+=over 4
+
+Do not select headers which were added by spam fighting software.  See
+Mail::Message::Head::SpamGroup.
+
+=back
+
+. select => STRING
+
+=over 4
+
+Select only the fields which match the patterns found in STRING.  Multiple
+patterns can be specified separated by vertical bars (I<pipes>).  The fields
+are ordered as specified in the STRING.
+See Mail::Message::Head::Complete subroutine grepNames.
+
+=back
+
+=back
+
+$obj-E<gt>B<lookup>(LABEL, ARGS)
+
+=over 4
+
+See L<HTML::FromMail::Page/"METHODS">
+
+=back
+
+HTML::FromMail::Head-E<gt>B<new>(OPTIONS)
+
+=over 4
+
+ Option  --Defined in     --Default
+ settings  HTML::FromMail::Object  {}
+ topic     HTML::FromMail::Object  'head'
+
+. settings => HASH-OF-HASHES
+
+. topic => STRING
+
+=back
+
+=head2 Attributes
+
+$obj-E<gt>B<settings>([TOPIC])
+
+=over 4
+
+See L<HTML::FromMail::Object/"Attributes">
+
+=back
+
+$obj-E<gt>B<topic>
+
+=over 4
+
+See L<HTML::FromMail::Object/"Attributes">
+
+=back
+
+=head2 Export
+
+=head2 Other methods
+
+$obj-E<gt>B<plain2html>(STRING)
+
+=over 4
+
+See L<HTML::FromMail::Object/"Other methods">
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of HTML-FromMail distribution version 0.11,
+built on June 08, 2007. Website: F<http://perl.overmeer.net/html-from-mail/>
+
+=head1 LICENSE
+
+Copyrights 2003,2004,2007 by Mark Overmeer. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

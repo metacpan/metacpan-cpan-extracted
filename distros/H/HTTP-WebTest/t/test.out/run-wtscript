@@ -1,0 +1,26 @@
+Failed  Succeeded  Test Name
+   1          2    Some name here
+   1          1    Another name
+
+
+Test Name: Some name here
+URL: http://http.web.test/test-file1
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  FORBIDDEN TEXT
+    FAILED TEST                                                  FAIL
+  REQUIRED REGEX
+    TEST TEST                                                    SUCCEED
+
+
+Test Name: Another name
+URL: http://http.web.test/no-such-file
+
+  STATUS CODE CHECK
+    Expected '200' and got: 404 Not Found                        FAIL
+  FORBIDDEN TEXT
+    FAILED TEST                                                  SUCCEED
+
+
+Total web tests failed: 2  succeeded: 3

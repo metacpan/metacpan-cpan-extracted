@@ -1,0 +1,35 @@
+Revision history for HTML-Builder
+
+0.008     2012-12-02 14:55:23 PST8PDT
+	* fix 'depreciated' (gh #1, thanks Olaf Alders!)
+	* update Changes format
+
+0.007     2012-05-13 22:06:06 America/Los_Angeles
+	* add the table tag to :table *sigh*
+
+0.006     2012-03-20 20:47:19 America/Los_Angeles
+	* add :html5_minimal group
+
+0.005     2012-03-01 15:10:08 America/Los_Angeles
+	* add attr()
+	* add :form, document :header (oops)
+
+0.004     2012-02-20 20:48:01 America/Los_Angeles
+	* drop :html, :moose_safe groups
+	* add :table group
+	* default export list is now :minimal
+	* document (well, give a clue at least) how to rename imports en masse
+	* rejigger group generation as to take advantage of Sub::Exporter
+	* drop dep on CGI for tag list (use a (hopefully) reasonable static one
+instead)
+
+0.003     2012-02-18 11:56:13 America/Los_Angeles
+	* add first attempt at HTML5 tag support
+
+0.002     2012-02-16 10:37:46 America/Los_Angeles
+	* add span to :minimal
+	* nested tags now write to STDOUT rather than return; this helps obviate the
+	  need for say() or print() all over the place
+
+0.001     2012-02-14 11:21:16 America/Los_Angeles
+	* initial release

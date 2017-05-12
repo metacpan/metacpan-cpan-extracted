@@ -1,0 +1,16 @@
+Changes
+examples/README
+lib/HTTP/Cookies/Omniweb.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/compile.t
+t/Cookies.xml
+t/load.t
+t/pod.t
+t/pod_coverage.t
+t/prereq.t
+t/save.t
+t/test_manifest
+META.yml                                 Module meta-data (added by MakeMaker)

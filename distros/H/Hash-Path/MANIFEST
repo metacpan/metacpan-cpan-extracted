@@ -1,0 +1,11 @@
+.cvsignore
+Changes
+lib/Hash/Path.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/01-get.t
+t/02-hash_path.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

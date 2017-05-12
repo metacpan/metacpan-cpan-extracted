@@ -1,0 +1,109 @@
+<html><head><title>HTC example with objects</title></head>
+<body>
+<h2>Script: examples/objects.pl</h2><p>
+Found 4 persons:
+<table>
+<tr><th>Name</th><th>Age</th><th>Hair</th></tr>
+
+<tr>
+    <td>Simpson, Bart</td>
+    <td>10</td>
+    <td>yellow</td>
+</tr>
+
+<tr>
+    <td>Simpson, Maggie</td>
+    <td>10</td>
+    <td>yellow</td>
+</tr>
+
+<tr>
+    <td>Simpson, March</td>
+    <td>42</td>
+    <td>purple</td>
+</tr>
+
+<tr>
+    <td>Simpson, Homer</td>
+    <td>42</td>
+    <td>none</td>
+</tr>
+
+</table>
+<hr>
+<h2>The Script:</h2>
+<pre>
+#!/usr/bin/perl
+
+package HTC::Object;
+use strict;
+use warnings;
+use base qw(Class::Accessor);
+__PACKAGE__-&gt;follow_best_practice;
+__PACKAGE__-&gt;mk_accessors(qw(first last age));
+sub fullname {
+            my $first = $_[0]-&gt;get_first;
+            my $last = $_[0]-&gt;get_last;
+            return &quot;$last, $first&quot;;
+}
+
+package main;
+use strict;
+use warnings;
+use HTML::Template::Compiled;
+use Fcntl qw(:seek);
+
+my ($template, $perlcode);
+{
+    local $/;
+    $template = &lt;DATA&gt;;
+    seek DATA, 0, SEEK_SET;
+    $perlcode = &lt;DATA&gt;;
+}
+
+my $htc = HTML::Template::Compiled-&gt;new(
+    scalarref =&gt; \$template,
+    tagstyle =&gt; [qw(+tt)],
+    use_expressions =&gt; 1,
+);
+my $persons = [
+    HTC::Object-&gt;new({first =&gt; &#39;Bart&#39;,   last =&gt; &#39;Simpson&#39;, age =&gt; 10, hair =&gt; &#39;yellow&#39;}),
+    HTC::Object-&gt;new({first =&gt; &#39;Maggie&#39;, last =&gt; &#39;Simpson&#39;, age =&gt; 10, hair =&gt; &#39;yellow&#39;}),
+    HTC::Object-&gt;new({first =&gt; &#39;March&#39;,  last =&gt; &#39;Simpson&#39;, age =&gt; 42, hair =&gt; &#39;purple&#39;}),
+    HTC::Object-&gt;new({first =&gt; &#39;Homer&#39;,  last =&gt; &#39;Simpson&#39;, age =&gt; 42, hair =&gt; &#39;none&#39;}),
+];
+$htc-&gt;param(
+    count =&gt; scalar @$persons,
+    items =&gt; $persons,
+    script =&gt; $0,
+    perlcode =&gt; $perlcode,
+    columns =&gt; [qw/ age hair /],
+);
+my $output = $htc-&gt;output;
+print $output;
+
+__DATA__
+&lt;html&gt;&lt;head&gt;&lt;title&gt;HTC example with objects&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;h2&gt;Script: [%= .script %]&lt;/h2&gt;&lt;p&gt;
+Found [%= .count %] persons:
+&lt;table&gt;
+&lt;tr&gt;&lt;th&gt;Name&lt;/th&gt;[%loop .columns %]&lt;th&gt;[%= expr=&quot;ucfirst(_)&quot; %]&lt;/th&gt;&lt;%/loop %&gt;&lt;/tr&gt;
+[%loop items alias=person %]
+&lt;tr&gt;
+    &lt;td&gt;[%= fullname %]&lt;/td&gt;
+    [%loop .columns alias=column PRE_CHOMP=3 %]
+    &lt;td&gt;[%= expr=&quot;person{column}&quot; %]&lt;/td&gt;
+    [%/loop PRE_CHOMP=3 %]
+&lt;/tr&gt;
+[%/loop items%]
+&lt;/table&gt;
+&lt;hr&gt;
+&lt;h2&gt;The Script:&lt;/h2&gt;
+&lt;pre&gt;
+[%= perlcode escape=html %]
+&lt;/pre&gt;
+&lt;/body&gt;&lt;/html&gt;
+
+</pre>
+</body></html>

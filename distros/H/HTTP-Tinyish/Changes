@@ -1,0 +1,40 @@
+Revision history for HTTP-Tinyish
+
+0.12  2017-02-11 18:07:14 PST
+        - Relax minimum perl version to 5.8.1 #10
+
+0.11  2017-01-29 16:02:35 PST
+        - Add protocol to HTTP::Tinyish->request (skaji) #7
+        - Use HTTP::Tiny->can_ssl to check if SSL is supported (skaji) #8
+
+0.10  2017-01-02 14:02:54 PST
+        - remove tempfiles created by curl backend (skaji) #6
+
+0.09  2016-11-18 20:45:53 PST
+        - Fix HTTP/2 where it appears in redirects (skaji) #5
+
+0.08  2016-11-18 09:09:04 PST
+        - Accept HTTP/2 when curl is compiled with http2 support (skaji) #4
+
+0.07  2016-01-22 19:33:04 PST
+        - 304 response is considered a success #3
+
+0.06  2015-09-26 10:22:09 PDT
+        - Fixed parsing of HTTP Status reason (shoichikaji) #2
+
+0.05  2015-05-08 14:31:30 PDT
+        - Test with wget 1.12 and up. Also tried to support 1.11 but its exit code and weird
+          server response options made it difficult, so the configure process makes sure that
+          wget is 1.12 or higher.
+
+0.04  2015-05-07 19:30:05 PDT
+        - call ssl_opts attribute only when LWP supports it
+
+0.03  2015-05-07 19:23:10 PDT
+        - Make LWP backend compatible back to 5.823 really
+
+0.02  2015-05-07 18:43:37 PDT
+        - updated documentation
+
+0.01  2015-05-07 18:31:22 PDT
+        - Initial release

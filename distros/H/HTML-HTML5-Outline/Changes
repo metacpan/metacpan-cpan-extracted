@@ -1,0 +1,36 @@
+HTML-HTML5-Outline
+==================
+
+Created:      2010-12-08
+Home page:    <https://metacpan.org/release/HTML-HTML5-Outline>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=HTML-HTML5-Outline>
+Maintainer:   Toby Inkster <mailto:tobyink@cpan.org>
+
+0.006  2011-10-20
+
+ - Don't 'use' HTML::HTML5::Outline::RDF in 05tripletests.t.
+
+0.005  2011-10-13
+
+ - Don't 'use' RDF::Trine::Namespace in 05tripletests.t.
+
+0.004  2011-10-07
+
+ - Refactor RDF code into a separate file to allow it to be an optional
+   feaure.
+ - (Packaging) use Module::Package::RDF
+ - (Addition) Lots of test cases.
+
+0.003  2011-01-21
+
+ - (Documentation) Documentation fix.
+
+0.002  2011-01-21
+
+ - Improve to_hashref output.
+ - Refactor a lot of code out into separate classes. Add methods to access
+   these classes.
+
+0.001  2010-12-20
+
+

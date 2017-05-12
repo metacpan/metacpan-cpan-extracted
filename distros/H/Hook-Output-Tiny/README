@@ -1,0 +1,153 @@
+NAME
+
+    Hook::Output::Tiny - Easily enable/disable trapping of STDOUT/STDERR
+
+SYNOPSIS
+
+        use Hook::Output::Tiny;
+    
+        my $output = Hook::Output::Tiny->new;
+    
+        # trap either
+    
+        $output->hook('stdout');
+        my @out = $output->stdout;
+    
+        $output->hook('stderr');
+        my @err = $output->stderr;
+    
+        # untrap either
+    
+        $output->unhook('stdout');
+        $output->unhook('stderr');
+    
+        # trap/untrap both simultaneously
+    
+        $output->hook;
+        $output->unhook;
+    
+        # delete all entries from both (can specify individually)
+    
+        $output->flush;
+    
+        # append to a file (can specify individually)
+    
+        $output->write('file.txt');
+
+DESCRIPTION
+
+    Extremely lightweight mechanism for trapping STDOUT, STDERR or both.
+
+    We save the captured output internally, so on long running
+    applications, memory usage may become an issue if you don't flush() out
+    or write() out the data.
+
+    There are many modules that perform this task. I wrote this one for
+    fun, and to be as small and as simple as possible.
+
+METHODS
+
+ new
+
+    Returns a new Hook::Output::Tiny instance.
+
+ hook
+
+    You can send in either 'stdout' or 'stderr' and we'll trap that data.
+
+    If you don't specify an option, we'll trap both (the data remains
+    separated).
+
+ unhook
+
+    Send in either 'stdout' or 'stderr'. If not specified, we'll untrap
+    both.
+
+ stdout
+
+    Returns a list of all the STDOUT entries that have been trapped.
+
+ stderr
+
+    Returns a list of all the STDERR entries that have been trapped.
+
+ write($filename, $handle)
+
+    Writes to $filename the entries in $handle, where $handle is either
+    stdout or stderr. If no $handle is specified, we'll write out both
+    handles to the same file.
+
+    We then flush() (ie. delete) the respective handle data until the next
+    write() or flush().
+
+ flush
+
+    Deletes all data for the handles. Send in either 'stdout' or 'stderr'
+    to specify which to delete, otherwise we'll delete both.
+
+EXAMPLE
+
+    Testing scenario...
+
+        use Foo::Bar;
+        use Hook::Output::Tiny;
+        use Test::More;
+    
+        my $output = Hook::Output::Tiny->new;
+        my $thing = Foo::Bar->new;
+    
+        $output->hook;
+    
+        $thing->do;
+    
+        $output->unhook;
+    
+        is ($thing->do(), 1, "thing() ok");
+        is ($output->stdout, 2, "got expected STDOUT");
+        is ($output->stderr, 0, "got no STDERR");
+    
+        my @stdout = $output->stdout;
+    
+        like ($stdout[0], qr/do() called/, "STDOUT ok");
+        is ($stdout[1], 'did', "STDOUT said do() 'did'");
+    
+        $output->hook;
+    
+        $thing->error;
+    
+        $output->unhook;
+    
+        @stderr = $output->stderr;
+    
+        like ($stderr[0], qr/error/, "error() errored properly");
+
+SEE ALSO
+
+    Capture::Tiny, the de-facto in-core standard.
+
+    IO::CaptureOutput
+
+    IO::Capture::Output
+
+    Hook::Output::File
+
+AUTHOR
+
+    Steve Bertrand, <steveb at cpan.org>
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Hook::Output::Tiny
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2016 Steve Bertrand.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

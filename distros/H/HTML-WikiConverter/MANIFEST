@@ -1,0 +1,23 @@
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/HTML/WikiConverter.pm
+lib/HTML/WikiConverter/Dialects.pod
+lib/HTML/WikiConverter/Normalizer.pm
+lib/HTML/WikiConverter/WebApp.pm
+t/00-load.t
+t/01-normalizer.t
+t/01-wikiconverter.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+bin/html2wiki
+cgi/index.cgi
+cgi/templates/main.html
+cgi/templates/sample_html.html
+cgi/templates/stylesheet.css
+webapp-install

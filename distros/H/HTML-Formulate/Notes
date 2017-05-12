@@ -1,0 +1,143 @@
+HTML::Formulate Notes
+=====================
+
+Goals:
+- sane behaviour in the minimal case: given a record, should produce a 
+  form that makes sense and that can then be tweaked as required
+- can be used to produce a family of forms from a shared definition e.g.
+  create, edit (perhaps many), delete, perhaps search
+- possible functionality:
+  - form presentation
+  - data validation
+  - data munging (pre- and post-validation?)
+  - fieldtype and datatype derivation from database types
+- should support as much HTML::Tabulate functionality as possible
+- should be readily subclassed for more specific needs
+
+
+Interface ideas:
+
+how about per-formtype field attribute default sections i.e.
+  my $t = HTML::Formulate->new({
+    field_attr => {
+      -default => {
+      },
+      -create => {
+      },
+      -edit => {
+      },
+    },
+  });
+
+  # auto_increment and timestamp fields omitted, all others queried; 
+  #   current values ignored (if any), all fields 'text'
+  $t->render($pui, {
+    formtype => 'create',
+  });
+
+  # primkey readonly (perhaps formatted), all others editable; all fields 
+  #   except timestamps editable by default
+  $t->render($pui, {
+    formtype => 'edit',
+  });
+
+  # primkey readonly, any others display; default 'fields' is only the primkey
+  $t->render($pui, {
+    formtype => 'delete',
+    fields_delete => [ qw() ],
+  });
+
+
+- primkeys are special in that they generally cannot be edited, and they
+  are generally required for edits and deletes. They are required for 
+  creates too unless the field is an auto field
+
+- primkey should default to first field, if not otherwise specified
+
+- properties like primkey, auto_increment, dependencies are table/object-specific, 
+  not field-specific i.e. not like labels or datatype properties
+
+- from the 'form presentation' point of view, fields like auto_increment fields, 
+  sequences, and timestamps can all be treated similarly - they are display 
+  or hidden or readonly fields. The differences between them come out at db
+  manipulation time, if at all.
+
+- there are also sort-of policy-level things, like how to treat primary keys on 
+  edits and deletes (hidden or readonly), what fields to use by default
+  for deletes, how to handle timestamps, etc.
+
+- you almost want to be able to define multiple per-object field lists, and 
+  possibly defaults using placeholders for these too e.g.
+  + fields, fields_create, fields_edit, fields_delete - all arrayrefs of fieldnames
+  + fields_ignore, fields_create_ignore, fields_edit_ignore, fields_delete_ignore -
+    all arrayrefs of scalars and/or regexes of fieldnames to ignore
+
+- it might make sense to define policy by datatype too, if we can access that
+  somehow (ignore all timestamps, for example; treat auto_increment fields as
+  readonly)
+
+- you also need to be able to differentiate presentation values ($prod->pretty)
+  from underlying values ($prod->id) - perhaps two kinds of 'format' are required,
+  instead of Tabulate's one? (or is this already captured by the distinction between
+  value and format?)
+
+- i'm still not clear how to capture the distinction between readonly+hidden vs.
+  readonly-nohidden - should readonly+hidden be the default 'readonly' behaviour,
+  and the other be something else, maybe 'display'?
+
+- list fields (e.g. select) need the standard value/format functionality,
+  but across the multiple values in a list, rather than just one. I think we
+  need at least either a value_list, returning the set of values comprising the 
+  list, or an extra return value from value(), with the list in it
+ 
+
+
+- areas to think about:
+  + submit buttons: formatting, in table/outside, name => value, 
+    'submit' vs. 'button'
+  + auto_increment/sequence columns
+  + dependent keys
+  + timestamps
+  + joined (multi-table) forms
+  + list fields
+
+
+- higher-level field semantics:
+  - primary keys are set on create but readonly (and mandatory) for edit/delete
+  - primary keys should default to either 'hidden' or 'static' for edit/delete
+  - primary keys should default either to text (std) or to omit (auto)
+  - auto_increment and backend fields are omitted to set, display otherwise
+  - mysql timestamps are null fields - require a null value to set, display 
+    otherwise
+  - has_a relationships are generally of two types - reference tables
+    and denormalised parent relationships - for the reference table
+    case it might make sense to give a select list of values
+  - specific create/edit/delete field lists are useful enough, but I'd like 
+    to be able to *derive* the appropriate field list from a generic one
+
+- ideas from the above:
+  - allow explicit primkey setting, since there are some meaningful semantics 
+    around that
+  - maybe 'auto' and 'null' should be special datatypes, with the given set 
+    semantics
+  - Class::DBI::Formulate could do the following:
+    + identify primary keys (easy, but easier still if first-column convention 
+      applies)
+    + identify has_a relationships (easy-medium) (but how do we distinguish 
+      reference tables and denormalised columns)
+    + setup datatypes and sizes from column datatypes (hard?)
+    + add some notion of permissions
+
+
+  
+- the diamond inheritance idiom: 
+
+  for my $parent (@ISA) {
+    mext if $self->{DESTROY}{$parent}++;
+    my $destructor = $parent->can("DESTROY");
+    $self->$destructor() if $destructor;
+  }
+
+  (OR: $_ && $self->$_() for map { $_->can("DESTROY") } @ISA # !!  )
+
+

@@ -1,0 +1,31 @@
+Revision history for HTTP::GHTTP.
+
+1.07
+    - Added support for clean() and NULL return values (david Ramboz)
+
+1.06 Thu Jan 18 2000
+    - Fixed "use of uninitialized value" messages
+    - Minor tweaks
+
+1.05 Wed Jan 17 2000
+    - Added *much* better LIBS/INC code
+    - Added get_headers() (works with libghttp 1.08 and higher)
+
+1.04 Sat Jan 13 2000
+    - Better INC and LIBS control.
+    - Added g-request to MANIFEST
+
+1.03 Wed Jan 10 2000
+    - Use gnome-config to get INC and LIB from
+
+1.02 Thu Nov 23 2000
+    - Added asynchronous mode code and documentation
+
+1.01 Wed Nov 22 2000
+    - Bug fix in returned body string (could become corrupted with >1 request)
+    - Added lots more ghttp methods (allows you to POST now and much more)
+    - Documentation updates
+
+1.0  Tue Nov 21 2000
+    - original version
+

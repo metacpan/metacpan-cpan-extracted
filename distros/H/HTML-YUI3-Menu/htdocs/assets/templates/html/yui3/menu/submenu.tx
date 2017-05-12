@@ -1,0 +1,10 @@
+<li>
+	<a class="yui3-menu-label" href="#<: $id :>"><em><: $label :></em></a>
+	<div id="<: $id :>" class="yui3-menu">
+		<div class="yui3-menu-content">
+			<ul>
+<: $items :>
+			</ul>
+		</div>
+	</div>
+</li>

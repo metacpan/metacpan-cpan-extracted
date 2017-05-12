@@ -1,0 +1,4 @@
+<wmmeta name="title" value="This is foo." />
+<wmmeta name="score" value=10 />
+
+This is the foo document. The title looks like this: $[this.title]

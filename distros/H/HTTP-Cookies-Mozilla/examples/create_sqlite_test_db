@@ -1,0 +1,14 @@
+#!perl
+use v5.10;
+
+use lib qw(lib);
+
+use Data::Dumper;
+use File::Spec::Functions qw(catfile);
+use HTTP::Cookies::Mozilla;
+
+my $jar = HTTP::Cookies::Mozilla->new;
+$jar->load( catfile( qw(t cookies.txt) ) );
+say Dumper( $jar );
+
+$jar->_save_ff3( catfile( qw(t cookies.sqlite) ) );

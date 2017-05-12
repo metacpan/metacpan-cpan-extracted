@@ -1,0 +1,16 @@
+This is the README file for HTML::FormHighlight, a Perl module for highlighting fields in an HTML form.
+
+INSTALLATION:
+
+The standard perl module install process:
+
+perl Makefile.PL
+make
+make test (optional)
+make install
+
+The module also uses HTML::Parser (available on CPAN)
+
+--
+
+Adekunle Olonoh <ade@bottledsoftware.com>

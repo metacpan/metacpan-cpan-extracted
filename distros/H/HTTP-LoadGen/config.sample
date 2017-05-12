@@ -1,0 +1,120 @@
+#!/usr/bin/loadgen
+# -*-perl-*-
+
+use strict;
+use Math::Random::MT;
+use Coro;
+use Coro::Timer ();
+no warnings 'ambiguous';
+
+# possible hook parameters:
+# $procnr   -- the current process number 0 .. NWorker-1
+# $el       -- an URL element to fetch (ARRAY)
+#              use RQ_* constants from HTTP::LoadGen::Run to access
+# $rc       -- an result element (ARRAY)
+#              use RC_* constants from HTTP::LoadGen::Run to access
+
+my $logger;
++{
+  NWorker=>3,			# use 3 processes
+  RampUpStart=>2,		# start 2 threads immediately
+  RampUpMax=>13,		# then add 11 threads over 5 seconds
+  RampUpDuration=>5,		# that makes 2.2 new threads per second
+
+  ParentInit=>sub {
+    # no parameters
+
+    # create scoreboard
+    sbinit undef, options->{NWorker};
+  },
+  ParentExit=>sub {
+    # no parameters
+    undef scoreboard;
+  },
+
+  ProcInit=>sub {
+    my ($procnr)=@_;
+
+    # set my slot number
+    slot=$procnr;
+
+    # acquire a logger
+    my $fmt='%-2d %d %d %2d %2d %3d %3d %.3f %.3f %.3f %.3f %.3f %s %d '.
+	    "%s(%s://%s:%s%s) %s\n";
+    $logger=get_logger undef, sub {sprintf $fmt, @_};
+  },
+  ProcExit=>sub {
+    my ($procnr)=@_;
+    $logger->();		# close the logger
+  },
+
+  ThreadInit=>sub {
+    # no parameters
+
+    # thread accounting
+    thread_start;
+
+    # set a thread specific RNG
+    rng=Math::Random::MT->new(threadnr);
+
+    return [];			# initializes thread specific user data
+  },
+  ThreadExit=>sub {
+    # no parameters
+    thread_done;
+  },
+
+  ReqStart=>sub {
+    my ($el)=@_;
+
+    # request accounting
+    req_start;
+
+    # started - succeeded - failed = currently pending number of requests
+    @{userdata()}=(thread_count, req_started-req_success-req_failed);
+  },
+
+  ReqDone=>sub {
+    my ($rc, $el)=@_;
+
+    # request accounting: HTTP status 2xx and 3xx are successful
+    #                     other requests are counted as failures.
+    req_done +($rc->[RC_STATUS]=~/^[23]/), $rc->[RC_HEADERS], $rc->[RC_BODY];
+
+    $logger->(threadnr,
+	      @{$rc}[RC_DNSCACHED, RC_CONNCACHED],
+	      @{userdata()},
+	      req_success,
+	      req_failed,
+	      $rc->[RC_STARTTIME],
+	      $rc->[RC_CONNTIME]-$rc->[RC_STARTTIME],
+	      $rc->[RC_FIRSTTIME]-$rc->[RC_STARTTIME],
+	      $rc->[RC_HEADERTIME]-$rc->[RC_STARTTIME],
+	      $rc->[RC_BODYTIME]-$rc->[RC_STARTTIME],
+	      $rc->[RC_STATUS],
+	      length($rc->[RC_BODY]),
+	      @{$el}[RQ_METHOD, RQ_SCHEME, RQ_HOST, RQ_PORT, RQ_URI],
+	      $rc->[RC_STATUSLINE]);
+  },
+
+  dnscache=>{
+	     localhost=>'127.0.0.1',
+	     'kabatinte.net'=>'84.38.75.176',
+	     'www.kabatinte.net'=>'84.38.75.176',
+	     'foertsch.name'=>'109.73.51.50',
+	    },
+
+  times=>3,			# run the URL list 3 times
+
+  InitURLs=>'random_start',
+
+  URLList=>do {
+    my $o={
+	   keepalive=>KEEPALIVE,
+	   qw!predelay 0.05 prejitter 0.1 postdelay 0.5 postjitter 1!,
+	  };
+    [[qw!GET http foertsch.name 80 /-redir!, $o],
+     [qw!HUGO https www.kabatinte.net 443 /!, $o]
+    ];
+  },
+ }

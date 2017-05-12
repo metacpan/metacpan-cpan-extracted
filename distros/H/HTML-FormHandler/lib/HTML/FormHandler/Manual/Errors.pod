@@ -1,0 +1,188 @@
+package HTML::FormHandler::Manual::Errors;
+# ABSTRACT: FormHandler error methods
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+HTML::FormHandler::Manual::Errors - FormHandler error methods
+
+=head1 VERSION
+
+version 0.40067
+
+=head1 SYNOPSIS
+
+L<Manual Index|HTML::FormHandler::Manual>
+
+Errors and error messages for L<HTML::FormHandler>.
+
+=head1 DESCRIPTION
+
+Errors are added to field or form objects by the field 'add_error' method
+or the form 'add_form_error' method. FormHandler will perform the 'add_error'
+for you for built-in validation or 'apply' actions. When performing your
+own validation in a validation method, you must do the 'add_error'
+yourself.
+
+Errors, along with 'input' and 'value' attributes, are collected in the
+FormHandler 'result' objects. A number of error retrieving methods are
+delegated to the field and form classes.
+
+The existence (or not) of errors determines whether or not the form has
+been 'validated'.
+
+=head1 Form methods
+
+=over 4
+
+=item errors
+
+Returns an array of localized error strings (both field and
+form errors):
+
+    my @errors = $form->errors;
+
+Note: this is a form method, not a result method. For the same thing
+from a result object, use C<< $result->form_and_field_errors >>.
+
+=item has_errors
+
+Both 'form' errors and errors from the tree of subfields
+
+    if( $form->has_errors ) {
+        <do something>
+    }
+
+=item form_errors, all_form_errors
+
+Returns an arrayref / array of error strings on the form (not including
+field errors).
+
+    foreach my $err ( $self->all_form_errors ) {
+        $output .= "<span class="error">$err</span>";
+    }
+
+=item has_form_errors
+
+Does the form have form_errors?
+
+=item add_form_error
+
+Add an error to the form which is not associated with a specific field.
+
+    sub validate {
+        my $self = shift;
+        unless( <some condition> ) {
+            $self->add_form_error('....');
+        }
+    }
+
+=item push_form_errors
+
+Add a non-localized error to the form.
+
+=back
+
+=head1 Field methods
+
+The most common error method is probably 'add_error', which you
+use in the validation process.
+
+    sub validate_foo {
+        my ( $self, $field ) = @_;
+        unless ( <some_condition> ) {
+            $field->add_error('Error condition');
+        }
+    }
+
+=over 4
+
+=item errors
+
+Returns an array of error strings.
+
+=item has_errors
+
+Does the field have errors? Note that a compound field that contains subfields
+with errors will not return true for this method. If you want to know if there
+are errors in the subfields, do 'has_error_fields'.
+
+=item num_errors
+
+=item add_error
+
+Add an error to the field. Localization is performed.
+
+=item push_errors
+
+Add an error without localization.
+
+=item error_fields
+
+In a compound field (and its subclasses, like 'Repeatable'), the list
+of fields with errors.
+
+=back
+
+=head1 Result methods
+
+The input, value, and error attributes are actually stored in the
+result objects. Although most of the methods are delegated to the
+form and field classes, there are times, such as when rendering (because you might
+be rendering a result that's been peeled off of the form object), that
+you may need to use result methods.
+
+These are the main methods that you might need to use.
+
+=over 4
+
+=item has_errors
+
+=item errors
+
+=item error_results
+
+The results with errors; 'error_fields' is a wrapper around this.
+
+=back
+
+=head1 Messages
+
+The base field class and the field subclasses have some 'built-in' error messages.
+These can be modified by setting the 'messages' hashref in the form or the
+individual fields.
+
+When a message is retrieved in a field with C<< $field->get_message('upload_file_') >>
+for example, the 'get_message' method will look first in user-set field specific messages,
+then in user-supplied form messages, finally in messages provided by the field classes.
+
+   package MyApp::Form;
+   use HTML::FormHandler::Moose;
+   extends 'HTML::FormHandler';
+
+   sub build_messages {
+       return { required => '....', my_message => '....' };
+   }
+   ...
+   my $form = MyApp::Form->new( messages => { required => '...', ...} );
+   ...
+   has_field 'my_field' => ( messages => { required => 'Please provide a my_field' },
+       required => 1 );
+
+=head1 AUTHOR
+
+FormHandler Contributors - see HTML::FormHandler
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Gerda Shank.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

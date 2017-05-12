@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+Makefile.PL
+Tempi.pm
+Tempi.xs
+tempi.c
+tempi.flex
+tempi.h
+tempi_pub.h
+tempi_vars.h
+test1.html
+test2.html
+test.pl
+README
+COPYING
+libs.c
+libs.h

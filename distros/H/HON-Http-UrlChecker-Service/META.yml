@@ -1,0 +1,37 @@
+---
+abstract: 'HTTP Status Code Checker'
+author:
+  - 'William Belle <william.belle@gmail.com>'
+build_requires:
+  CGI::Test: '1.111'
+  File::Copy::Recursive: '0.38'
+  File::Find::Rule: '0.34'
+  File::Temp: '0.2304'
+  Test::Exception: '0.43'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4206, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HON-Http-UrlChecker-Service
+provides:
+  HON::Http::UrlChecker::Service:
+    file: lib/HON/Http/UrlChecker/Service.pm
+    version: '0.02'
+requires:
+  CGI: '4.31'
+  Carp: '1.38'
+  JSON: '2.9'
+  LWP::UserAgent: '6.15'
+  Readonly: '2.05'
+  Try::Tiny: '0.24'
+  URI: '1.71'
+resources:
+  license: http://www.opensource.org/licenses/mit-license.php
+  repository: https://github.com/healthonnet/hon-http-urlchecker-service
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

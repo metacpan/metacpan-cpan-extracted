@@ -1,0 +1,40 @@
+---
+abstract: 'Remove numbered keys from a nested hash/array'
+author:
+  - 'Shin Kojima <shin@kojima.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Hash-Squash
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Hash::Squash:
+    file: lib/Hash/Squash.pm
+    version: v0.0.4
+requires:
+  Exporter: '0'
+  List::Util: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/ernix/p5-Hash-Squash/issues
+  homepage: https://github.com/ernix/p5-Hash-Squash
+  repository: git://github.com/ernix/p5-Hash-Squash.git
+version: v0.0.4

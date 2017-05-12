@@ -1,0 +1,84 @@
+[% page.styles.push('status.css') %]
+
+[% page.sidebar = 'default' %]
+[% page.refresh = 10 %]
+
+<h2>queue overview</h2>
+
+<table id="status" class="table">
+	<thead>
+		<tr>
+			<th id="status_col1">name</th>
+			<th id="status_col2">status</th>
+			<th id="status_col3">queue</th>
+			<th id="status_col4">load</th>
+		</tr>
+	</thead>
+	<tbody>
+		[% FOREACH name = hopkins.queues.keys %]
+		[% SET queue = hopkins.queue(name) %]
+		<tr>
+			<td>
+				<div class="left">
+					<a href="[% c.uri_for('/queue/details', name) %]">
+						<span style="color: black">[% name %]</span>
+					</a>
+				</div>
+				[% SWITCH queue.status_string %]
+					[% CASE 'idle' %][% SET color='black' %]
+					[% CASE 'running' %][% SET color='green' %]
+					[% CASE 'halted' %][% SET color='red' %]
+					[% CASE %][% SET color='black' %]
+				[% END %]
+				<div class="right">
+					<img src="[% c.uri_for('/static/images/sphere-' _ color _ '.png') %]" />
+				</div>
+			</td>
+			<td>
+				<div class="left">[% queue.status_string %]</div>
+				<div class="right">
+					[% IF queue.halted %]
+						<a href="[% c.uri_for('/queue/start', name) %]" title="start [% name %]">
+							<img src="[% c.uri_for('/static/images/control_play.png') %]" />
+						</a>
+					[% ELSE %]
+						<a href="[% c.uri_for('/queue/halt', name) %]" title="halt [% name %]">
+							<img src="[% c.uri_for('/static/images/control_stop_blue.png') %]" />
+						</a>
+					[% END %]
+				</div>
+			</td>
+			<td>
+				<div class="left">
+					[% queue.num_queued %] / [% queue.concurrency %]
+					[% '(frozen)' IF queue.frozen %]
+				</div>
+				<div class="right">
+					[% IF queue.frozen %]
+						<a href="[% c.uri_for('/queue/thaw', name) %]" title="currently not accepting new tasks; click to thaw [% name %]">
+							<img src="[% c.uri_for('/static/images/add.png') %]" />
+						</a>
+					[% ELSE %]
+						<a href="[% c.uri_for('/queue/freeze', name) %]" title="currently accepting new tasks; click to freeze [% name %]">
+							<img src="[% c.uri_for('/static/images/delete.png') %]" />
+						</a>
+					[% END %]
+				</div>
+			</td>
+			<td>
+				[% SET load = queue.num_queued / queue.concurrency %]
+				[% SET load = load.printf('%.2f') %]
+				[% IF load > '1.00' %]
+					<span style="color: red">[% load %]</span>
+				[% END %]
+				[% IF load == '1.00' %]
+					<span style="color: orange">[% load %]</span>
+				[% END %]
+				[% IF load < '1.00' %]
+					<span style="color: green">[% load %]</span>
+				[% END %]
+			</td>
+		</tr>
+		[% END %]
+	</tbody>
+</table>

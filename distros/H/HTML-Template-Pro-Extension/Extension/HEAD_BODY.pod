@@ -1,0 +1,216 @@
+=head1 NAME
+
+HTML::Template::Extension::HEAD_BODY - Plugins for html file
+
+=head1 SYNOPSIS
+
+ use HTML::Template::Extension;
+
+ my $text = qq
+    |
+     <HTML>
+        <HEAD>
+            <meta http-equiv="Content-Language" content="it">
+            <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+            <title>Test Page</title>
+            <STYLE>
+            body
+                    {
+                            font-family: Verdana, Arial, Helvetica;
+                            background-color: rgb(0,0,0);
+                            color: rgb(102,255,51);
+                    }
+            </STYLE>
+            <SCRIPT Language="Javascript">
+                function do_nothing {
+                    return void;
+                }
+            </SCRIPT>
+        </HEAD>
+        <BODY backgroud="#FFFFFF">
+            <H1>This is a template example...</H1>
+                The sum between 1+1 is: <TMPL_VAR NAME="result">
+        </BODY>
+     </HTML>
+    |;
+
+ my $comp       = new HTML::Template::Extension(
+                                            scalarref => \$text,
+                                            plugins=>["HEAD_BODY"],
+                                            );
+
+ $comp->param('result' => 1+1);
+
+ print $comp->output;
+
+ #  OUTPUT:
+ #
+ #   <HTML>
+ #      <HEAD>
+ #              <SCRIPT Language="Javascript">
+ #                      function do_nothing {
+ #                              return void;
+ #                      }
+ #              </SCRIPT>
+ #      </HEAD>
+ #      <BODY backgroud="#FFFFFF">
+ #              <H1>This is a template example...</H1>
+ #                      The sum between 1+1 is: 2
+ #      </BODY>
+ #   </HTML>
+
+ $comp->autoDeleteHeader(1);
+ print $comp->output;
+
+ #  OUTPUT:
+ #
+ #              <H1>This is a template example...</H1>
+ #                      The sum between 1+1 is: 2
+
+ print $comp->header;
+
+ # OUTPUT:
+ #
+ #       <HTML>
+ #       <HEAD>
+ #               <meta http-equiv="Content-Language" content="it">
+ #               <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+ #               <title>Test Page</title>
+ #               <STYLE>
+ #               body
+ #                       {
+ #                               font-family: Verdana, Arial, Helvetica;
+ #                               background-color: rgb(0,0,0);
+ #                               color: rgb(102,255,51);
+ #                       }
+ #               </STYLE>
+ #           <SCRIPT Language="Javascript">
+ #               function do_nothing {
+ #                   return void;
+ #               }
+ #           </SCRIPT>
+ #       </HEAD>
+ #       <BODY backgroud="#FFFFFF">
+
+ print $comp->header_js;
+
+ # OUTPUT:
+ #
+ #              <SCRIPT Language="Javascript">
+ #                      function do_nothing {
+ #                              return void;
+ #                      }
+ #              </SCRIPT>
+
+ print $comp->header_css;
+
+ # OUTPUT:
+ #
+ #               <STYLE>
+ #               body
+ #                       {
+ #                               font-family: Verdana, Arial, Helvetica;
+ #                               background-color: rgb(0,0,0);
+ #                               color: rgb(102,255,51);
+ #                       }
+ #               </STYLE>
+
+ print $comp->body_attributes;
+
+ # OUTPUT:
+ #
+ # backgroud="#FFFFFF"
+
+ print Data::Dumper::Dumper($comp->header_tokens);
+
+ # OUTPUT:
+ #
+ #      $VAR1 = {
+ #         'style' => [
+ #                      [
+ #                        '<STYLE>',
+ #                        '
+ #               body
+ #                       {
+ #                               font-family: Verdana, Arial, Helvetica;
+ #                               background-color: rgb(0,0,0);
+ #                               color: rgb(102,255,51);
+ #                       }
+ #               ',
+ #                        '</STYLE>'
+ #                      ]
+ #                    ],
+ #         'meta' => [
+ #                     [
+ #                       '<meta http-equiv="Content-Language" content="it">',
+ #                       '
+ #               ',
+ #                       undef
+ #                     ],
+ #                     [
+ #                       '<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">',
+ #                       '
+ #               ',
+ #                       undef
+ #                     ]
+ #                   ],
+ #         'title' => [
+ #                      [
+ #                        '<title>',
+ #                        'Test Page',
+ #                        '</title>'
+ #                      ]
+ #                    ],
+ #         'script' => [
+ #                       [
+ #                         '<SCRIPT Language="Javascript">',
+ #                         '
+ #               function do_nothing {
+ #                   return void;
+ #               }
+ #           ',
+ #                         '</SCRIPT>'
+ #                       ]
+ #                     ]
+ #       };
+
+=head1 DESCRIPTION
+
+This plugin add nothing syntax to HTML::Template but add some methods usefull
+for parsing html template in an environment where web pages are built embedding
+more little html templates (have you see my HTML::Puzzle CPAN module?).
+
+It add a costructor parameter "autoDeleteHeader" that, is set to 1, automatically
+remove html header returning only html code inside BODY tag.
+
+If you have see HTML::Template::Extension::CSTART plugin this is equivalent to
+
+ <HTML>
+ 	<HEAD>
+ 	</HEAD>
+ 	<BODY>
+ 		<TMPL_CSTART>
+ 		...
+ 		</TMPL_CSTART>
+ 	</BODY>
+ </HTML>
+
+But more than this a "header" method will be added to return removed header.
+
+It also have a "js_header" method to return javascript code present in the
+header.
+
+=head1 AUTHOR
+
+Bruni Emiliano, <info@ebruni.it>
+
+=head1 SEE ALSO
+
+ HTML::Template
+ HTML::Template::Extension::DO_NOTHING
+ HTML::Template::Extension::SLASH_VAR
+ HTML::Template::Extension::CSTART
+ HTML::Template::Extension::DOC
+ HTML::Template::Extension::HEAD_BODY
+
+=cut

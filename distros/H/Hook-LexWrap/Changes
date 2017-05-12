@@ -1,0 +1,47 @@
+Revision history for Hook-LexWrap
+
+0.26    2017-02-23 05:42:34Z
+        - properly wrap CORE::caller for @DB::args (RT#103186, Максим Лубянов)
+
+0.25    2014-10-21 02:32:56Z
+        - fix for perl 5.21.4: ensure barewords are parsed properly (RT#99021,
+          perl RT#122757, Father Chrysostomos)
+
+0.24    2010-09-24
+        - Makefile.PL fixed
+        - New test added
+
+0.23    2010-07-26
+        - Add Build.PL
+        - better support for debugger
+
+0.22    2008-12-18
+        - use strict; use warnings;
+        - Added prototype for caller
+        - silenced warnings about sub replacements
+
+0.21    2008-11-06
+        - Added 'See also: Sub::Prepend'
+        - Makefile.PL rewritten
+        - support of 5.6+ only made explicit
+        - Moved tests to t/. Silenced warnings.
+        - Added pod.t
+
+0.20    2001-10-01 23:51:00Z
+	- Fixed various problems in handling C<wantarray> (thanks Marcel)
+	- Fixed C<caller> (thanks everyone)
+
+0.10    2001-09-20 18:22:11Z
+	- Doc tweak (domo Tatsuhiko-san!)
+	- Fixed bug with self-destructing destructor destructing too late
+	  (thanks Garrett)
+	- Rebuilt entire implementation with features missing for previous
+	  release, all based on a cunning idea by Michael Schwern
+	  (thanks Michael)
+	- Added return value access in pre- and post-wrappers
+	- Added pre-emption of original if pre-wrapper changes
+	  return value
+	- Added two demos
+
+0.01    2001-09-18 01:23:33Z
+	- original version; created by h2xs 1.18

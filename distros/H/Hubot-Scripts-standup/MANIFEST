@@ -1,0 +1,10 @@
+Changes
+INSTALL
+MANIFEST
+META.yml
+Makefile.PL
+README.md
+dist.ini
+hubot-scripts.json
+lib/Hubot/Scripts/standup.pm
+weaver.ini

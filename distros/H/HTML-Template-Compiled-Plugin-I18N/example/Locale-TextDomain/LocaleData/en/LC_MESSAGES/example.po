@@ -1,0 +1,42 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+# placeholder
+msgid "{name} is programming <{language}>."
+msgstr "{name} is programming <{language}>."
+
+# different placeholder escape
+msgid "This is the {link_begin}<link>{link_end}."
+msgstr "This is the {link_begin}<link>{link_end}."
+
+# no context
+msgid "Context?"
+msgstr "No context."
+
+# context
+msgctxt "this_context"
+msgid "Context?"
+msgstr "Has context."
+
+# plural
+msgid "shelf"
+msgid_plural "shelves"
+msgstr[0] "shelf"
+msgstr[1] "shelves"
+
+# context and plural
+msgctxt "better"
+msgid "shelf<>"
+msgid_plural "shelve<s>"
+msgstr[0] "good shelf<>"
+msgstr[1] "good shelve<s>"
+

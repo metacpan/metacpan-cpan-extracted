@@ -1,0 +1,12 @@
+MANIFEST
+Changes
+Makefile.PL
+README
+LibXML.pm
+t/10basic.t
+t/20script.t
+t/50flow.t
+t/70xss.t
+t/80pod.t
+t/81pod_coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

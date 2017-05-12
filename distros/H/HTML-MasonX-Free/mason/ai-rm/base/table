@@ -1,0 +1,4 @@
+<%method main>Favorite drink: <& SELF:drink &>
+Favorite fruit: <& SELF:fruit &></%method>
+<%method drink>milk</%method>
+<%method fruit>apple</%method>

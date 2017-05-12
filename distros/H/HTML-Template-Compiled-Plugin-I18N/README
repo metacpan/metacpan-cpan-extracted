@@ -1,0 +1,41 @@
+HTML::Template::Compiled::Plugin::I18N version 1.04
+===================================================
+
+Internationalization for HTML::Template::Compiled
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Carp
+    English
+    Hash::Util
+    Data::Dumper
+    HTML::Template::Compiled
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2009 - 2010,
+Steffen Winkler
+steffenw at cpan.org.
+All rights reserved.
+
+This module is free software;
+you can redistribute it and/or modify it
+under the same terms as Perl itself.

@@ -1,0 +1,15 @@
+---
+atoms:
+- N 0     -12.781   3.620  15.274 
+- C 0     -11.976   4.652  15.944 
+- C 0     -12.722   6.019  15.985 
+- O 0     -13.133   6.378  14.897 
+- C 2  CBCA    3    CBCAC   4 CBCACO 
+- C 5  CBCA 2 CBCAC 3 CG1CBCAC
+- C 5  CBCA 2 CBCAC 6 CG2CBCAC
+vars:
+  CBCA     : 1.54
+  CBCAC    : 113.4
+  CBCACO   : 71.8
+  CG1CBCAC : [0, 25, 40, 55, 70, 90, 105, 130, 145, 170, 180 ]
+  CG2CBCAC : 120.

@@ -1,0 +1,10 @@
+Revision history for Perl extension HADaemon::Control
+
+1.004 May 02 2017
+  * fix 'Exiting subroutine via next'
+
+1.003 Nov 27 2015
+  * checking process status do not require root privileges
+
+1.002 Nov 10 2015
+  * experimental support of 'upgrade' command

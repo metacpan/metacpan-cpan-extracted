@@ -1,0 +1,13 @@
+{
+    "ehlo": "example.com",
+    "mail": "kijitora@example.org",
+    "rcpt": [ "mikeneko@example.jp", "calicocat@example.com" ],
+    "header": {
+        "from":    "Tabby cat <kijitora@example.com>",
+        "subject": "Two stray cats",
+        "replyto": "straycats@cat-ml.example.org",
+        "charset": "UTF-8"
+    },
+    "body": "Lying together. When I stopped stroking the cat, he poked me with tail."
+}
+

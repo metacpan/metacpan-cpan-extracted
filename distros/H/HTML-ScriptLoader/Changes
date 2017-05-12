@@ -1,0 +1,12 @@
+Revision history for Perl extension HTML::ScriptLoader.
+
+1.01  Wed Jul 16 23:46:03 2008
+    - Added some tests
+
+1.00  Wed Jul 16 15:45:01 2008
+    - First release of the HTML::ScriptLoader library.
+
+0.01  Wed Jul 16 15:33:03 2008
+	- original version; created by h2xs 1.23 with options
+		-X -n HTML::ScriptLoader
+

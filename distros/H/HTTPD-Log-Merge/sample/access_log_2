@@ -1,0 +1,10 @@
+205.188.209.139 - - [14/Jun/2001:00:08:01 +0100] "GET / HTTP/1.0" 200 1960
+192.168.1.20 - - [14/Jun/2001:00:08:02 +0100] "GET /nav.htm HTTP/1.0" 200 3783
+192.168.1.20 - - [14/Jun/2001:00:08:02 +0100] "GET /tonight.htm HTTP/1.0" 200 7834
+192.168.1.21 - - [14/Jun/2001:00:08:04 +0100] "HEAD /graphics/c4n_logo_new.gif HTTP/1.0" 200 0
+192.168.1.20 - - [14/Jun/2001:00:08:05 +0100] "HEAD /graphics/prog_weds.gif HTTP/1.0" 200 0
+192.168.1.21 - - [14/Jun/2001:00:08:05 +0100] "HEAD /graphics/prog_tues.gif HTTP/1.0" 200 0
+192.168.1.20 - - [14/Jun/2001:00:08:06 +0100] "HEAD /graphics/prog_mon.gif HTTP/1.0" 200 0
+192.168.1.20 - - [14/Jun/2001:00:08:06 +0100] "HEAD /graphics/prog_fri.gif HTTP/1.0" 200 0
+192.168.1.21 - - [14/Jun/2001:00:08:07 +0100] "HEAD /graphics/special.gif HTTP/1.0" 200 0
+192.168.1.21 - - [14/Jun/2001:00:08:08 +0100] "HEAD /graphics/contact2.gif HTTP/1.0" 200 0

@@ -1,0 +1,13 @@
+HTTP::Server::Simple is a very simple standalone HTTP daemon with no non-core
+module dependencies.  It's ideal for building a standalone http-based UI to
+your existing tools.  
+
+This code is a derivative of the "standalone_httpd" tool used by RT.
+(http://bestpractical.com/rt)
+
+It's desperately short of tests and documentation. It wants your love and help.
+
+
+
+    Jesse Vincent
+    jesse@bestpractical.com. 

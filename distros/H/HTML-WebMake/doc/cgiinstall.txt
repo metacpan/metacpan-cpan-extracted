@@ -1,0 +1,57 @@
+<wmmeta name="Title" value="Installing webmake.cgi" />
+<wmmeta name="Section" value="075-cgi" />
+<wmmeta name="Score" value="20" />
+<wmmeta name="Abstract">
+How to install the WebMake CGI script in your web server
+</wmmeta>
+
+To use this, copy or link ##webmake.cgi## to your web server's ##cgi-bin##
+directory, and set it up as a password-protected area.  Here's how this is
+done with Apache:
+
+<safe>
+  <Location /cgi-bin/webmake.cgi>
+      <Limit GET PUT POST>
+	Require valid-user
+	AuthType Basic
+	AuthName WebMake
+	AuthUserFile /etc/httpd/conf/webmake.passwd
+      </Limit>
+  </Location>
+</safe>
+
+Next, create the file ##/etc/httpd/conf/webmake.passwd##. Example:
+
+<pre>
+  htpasswd -c /etc/httpd/conf/webmake.passwd jm
+  New password: <em>(type a password here)</em>
+  Re-type new password: <em>(again)</em>
+  Adding password for user jm
+</pre>
+
+And edit the ##webmake.cgi## script, changing the value for
+**&wmdollar;FILE_BASE**.  Only files and sites below this directory will be
+editable.
+
+Note that ##webmake.cgi## runs with the web server's username and password,
+so you may have to ##chown## or ##chmod## files for it to work.
+
+Supporting Metadata On Media
+----------------------------
+
+If you attach metadata (e.g. titles) to images or other media items using
+##webmake.cgi##, it will write that metadata to a file called ##metadata.xml##
+in the top-level directory of the site.  To pick this up, you will need to add
+the following &lt;metatable&gt; directive to your site:
+
+<safe>
+	<metatable format=xml src=metadata.xml />
+</safe>
+
+Using CVS With webmake.cgi
+--------------------------
+
+Tt can be tricky setting up a CVS server.  To make things a little easier, a
+step-by-step guide is provided in the <a href=cvshowto.html>Setting up CVS and
+ssh for webmake.cgi HOWTO</a>.
+

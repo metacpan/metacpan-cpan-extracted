@@ -1,0 +1,130 @@
+<webmake>
+
+<include file="data/test_stories.inc" />
+
+
+<{perl
+        # create a ${all_stories} variable containing the list
+        # of all text files just loaded.
+        $_ = '';
+        foreach my $pg (sorted_content_matching ("score title", "*.txt"))
+	{
+          $pg =~ s/\.txt$//; $_ .= "$pg ";
+        }
+        set_content ("all_stories", $_);
+        '';
+}>
+
+<!-- also add some media items that we'll be including in the sitemap -->
+<media src="data/contentsfind.data" name=".../*.txt" />
+
+<metatable delimiter="|">
+
+.|section|score|title|up|abstract
+
+foo.txt|sec1|50|This is Foo|index_chunk|Abstract for foo
+dir1/bar.txt|sec2|30|This is Bar|story_2.txt|Abstract for bar
+dir2/dir2a/baz.txt|sec1|20|This is Baz|story_5.txt|Abstract for baz
+
+</metatable>
+
+<{!-- ------------------------------------------------------------------- --}>
+
+<content name=header map=false>
+  <html><head>
+    <title>$[this.title]</title>
+    <meta name="Abstract" value="$[this.abstract]" />
+  </head>
+  <body bgcolor=#ffffff>
+  <h1>Navlinks Test</h1>
+  <hr />
+  <a href=$(mainindex)>Index</a> | 
+  <a href=$(map)>Site Map</a>
+  <hr />
+  $[navlinks]
+  <hr />
+</content>
+
+<content name=footer map=false> <hr /> </body> </html> </content>
+
+<{!-- ------------------------------------------------------------------- --}>
+
+<content name=index_list_item map=false>
+  <li>
+    <a href=$(${item})>$[${item}.txt.title]</a><br />
+    <p>$[${item}.txt.abstract]</p>
+  </li>
+</content>
+
+<content name=index_chunk isroot=true map=true>
+  <wmmeta name=title value="WebMake Sample: a news site" />
+  <wmmeta name=abstract value="some old news site" />
+  <ul>
+  <{perl
+    make_list ('index_list_item', get_list ("all_stories"));
+  }>
+  </ul>
+</content>
+
+<{!-- ------------------------------------------------------------------- --}>
+
+
+<content name=sitemapnode map=false>
+  <li>
+    <p>
+      <a href=$(url)>${title}</a>: $[${name}.abstract]<br>
+      <em>[score: ${score}, name: ${name}, is_node: ${is_node}]</em>
+      <{!-- don't forget to list the sub-items --}>
+      <ul> ${list} </ul>
+    </p>
+  </li>
+</content>
+
+<content name=sitemapleaf map=false>
+  <li>
+    <p>
+      <a href=$(url)>${title}</a>: $[${name}.abstract]<br>
+      <em>[score: ${score}, name: ${name}, is_node: ${is_node}]</em>
+      <{!-- no sub-items here --}>
+    </p>
+  </li>
+</content>
+
+<sitemap name=mainsitemap node=sitemapnode leaf=sitemapleaf>
+  <wmmeta name=score value="56" />
+  <wmmeta name=title value="WebMake Sample: site map" />
+  <wmmeta name=Abstract value="Map of the site" />
+</sitemap>
+
+<!-- ----------------------------------------------------------------- -->
+
+<!-- Define the navigation links. Must be after sitemap! -->
+
+<content map=false name=navup> <a href=${url}>Up</a> </content>
+<content map=false name=navprev> <a href=${url}>Previous</a> </content>
+<content map=false name=navnext> <a href=${url}>Next</a> </content>
+
+<navlinks name=navlinks map=mainsitemap up=navup prev=navprev next=navnext>
+${prevtext} | ${uptext} | ${nexttext}
+</navlinks>
+
+<!-- ----------------------------------------------------------------- -->
+
+<for name=pg values="${all_stories}">
+  <out name="${pg}" file="log/navlinks_warning_${pg}.html">
+    ${header}${${pg}.txt}${footer}
+  </out>
+</for>
+
+<out name=mainindex file=log/navlinks_warning.html>
+  ${header}${index_chunk}${footer}
+</out>
+
+<out name=map file=log/navlinks_warning_map.html>
+  ${header}${mainsitemap} <hr />
+  ${navlinks}   <!-- should trigger an error, not a deferred ref -->
+  ${footer}
+</out>
+
+</webmake>
+

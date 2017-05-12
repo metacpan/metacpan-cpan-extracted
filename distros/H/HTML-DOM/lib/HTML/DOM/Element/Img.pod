@@ -1,0 +1,70 @@
+
+=head1 NAME
+
+HTML::DOM::Element::Img - A Perl class for representing 'img' elements in an HTML DOM tree
+
+=head1 VERSION
+
+Version 0.054
+
+=head1 SYNOPSIS
+
+  use HTML::DOM;
+  $doc = HTML::DOM->new;
+  $elem = $doc->createElement('img');
+
+  $elem->alt('Click here'); # set attribute
+  $elem->src;               # get attribute
+  $elem->tagName;
+  # etc
+
+=head1 DESCRIPTION
+
+This class implements 'img' elements in an HTML::DOM tree. It 
+implements the HTMLImageElement DOM interface and inherits from 
+L<HTML::DOM::Element> (q.v.).
+
+=head1 METHODS
+
+In addition to those inherited from HTML::DOM::Element and its 
+superclasses, this class implements the following DOM methods:
+
+=over
+
+=item lowSrc
+
+=item name
+
+=item align
+
+=item alt
+
+=item border
+
+=item height
+
+=item hspace
+
+=item isMap
+
+=item longDesc
+
+=item src
+
+=item useMap
+
+=item vspace
+
+=item width
+
+=back
+
+Each of these returns the corresponding HTML attribute. If you pass an
+argument, it will become the new value of the attribute, and the old value
+will be returned.
+
+=head1 SEE ALSO
+
+L<HTML::DOM>
+
+L<HTML::DOM::Element>

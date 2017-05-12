@@ -1,0 +1,16 @@
+0.04 Sun Jan 29 04:26:19 CET 2012
+
+     - switch from HAL to udisks (mga#3458 & #3639)
+
+0.03 Mon Mar  3 19:09:06 CET 2008
+
+     - ->mount and ->umount now work even the cdrom is listed in fstab,
+       use ->mount_hal and ->umount_hal if you want the HAL restriction
+
+0.02 Fri Feb 29 15:28:53 CET 2008
+
+     - save error in $hal_cdroms->{error}
+     - ->mount: do not set the mount point, HAL handles it
+
+0.01 Thu Feb 28 22:14:25 CET 2008
+     - initial release

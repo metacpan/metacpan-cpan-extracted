@@ -1,0 +1,4 @@
+<HTML><BODY>
+<H1> test expr with var quote extension of Emiliano Bruno </H1>
+${foo.bar}=<test passed>
+</body></html>

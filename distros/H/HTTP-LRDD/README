@@ -1,0 +1,179 @@
+NAME
+    HTTP::LRDD - link-based resource descriptor discovery
+
+SYNOPSIS
+     use HTTP::LRDD;
+ 
+     my $lrdd        = HTTP::LRDD->new;
+     my @descriptors = $lrdd->discover($resource);
+     foreach my $descriptor (@descriptors)
+     {
+       my $description = $lrdd->parse($descriptor);
+       # $description is an RDF::Trine::Model
+     }
+
+DESCRIPTION
+    Note: the LRDD specification has ceased to be, with some parts being
+    merged into the host-meta Internet Draft. This CPAN module will go in
+    its own direction, bundling up best-practice techniques for discovering
+    links and descriptors for a given URI.
+
+  Import Routine
+    "use HTTP::LRDD (@predicates)"
+        When importing HTTP::LRDD, you can optionally provide a list of
+        predicate URIs (i.e. the URIs which rel values expand to). This may
+        also include IANA-registered link types, which are short tokens
+        rather than full URIs. If you do not provide a list of predicate
+        URIs, then a sensible default set is used.
+
+        Because this configuration is global in nature, it is not
+        recommended. It is better to supply a list of predicates to the
+        constructor instead, or rely on the defaults. This feature should be
+        regarded as deprecated.
+
+  Constructors
+    "HTTP::LRDD->new(@predicates)"
+        Create a new LRDD discovery object using the given predicate URIs.
+        If @predicates is omitted, then the predicates passed to the import
+        routine are used instead.
+
+    "HTTP::LRDD->new_strict"
+        Create a new LRDD discovery object using the 'describedby' and
+        'lrdd' IANA-registered predicates.
+
+    "HTTP::LRDD->new_default"
+        Create a new LRDD discovery object using the default set of
+        predicates ('describedby', 'lrdd', 'wdrs:describedby', 'xhv:meta'
+        and 'rdfs:seeAlso').
+
+  Public Methods
+    "$lrdd->discover($resource_uri)"
+        Discovers a descriptor for the given resource; or if called in a
+        list context, a list of descriptors.
+
+        A descriptor is a resource that provides a description for
+        something. So, if the given resource URI was the web address for an
+        image, then the descriptor might be the web address for a metadata
+        file about the image. If the given URI was an e-mail address, then
+        the descriptor might be a profile document for the person to whom
+        the address belongs.
+
+        The following sources are checked (in order) to find links to
+        descriptors.
+
+        *   HTTP response headers ("Link" header; "303 See Other" status)
+
+        *   HTTP response message (RDF or RDFa)
+
+        *   https://HOSTNAME/.well-known/host-meta
+
+        *   http://HOSTNAME/.well-known/host-meta
+
+        If none of the above is able to yield a link to a descriptor, then
+        the resource URI itself may be returned if it is in a
+        self-describing format (e.g. RDF).
+
+        There is no guaranteed file format for the descriptor, but it is
+        usually RDF, POWDER XML or XRD.
+
+        This method can also be called without an object (as a class method)
+        in which case, a temporary object is created automatically using
+        "new".
+
+    "$lrdd->parse($descriptor_uri)"
+        Parses a descriptor in XRD or RDF (RDF/XML, RDFa, Turtle, etc).
+
+        Returns an RDF::Trine::Model or undef if unable to process.
+
+        This method can also be called without an object (as a class method)
+        in which case, a temporary object is created automatically using
+        "new".
+
+    "$lrdd->process($resource_uri)"
+        Performs the equivalent of "discover" and "parse" in one easy step.
+
+        Calls "discover" in a non-list context, so only the first descriptor
+        is used.
+
+    "$lrdd->process_all($resource_uri)"
+        Performs the equivalent of "discover" and "parse" in one easy step.
+
+        Calls "discover" in a list context, so multiple descriptors are
+        combined into the resulting graph.
+
+EXAMPLES
+    Discover the hub address (PubSubHubub) for a feed:
+
+     my $lrdd = HTTP::LRDD->new('hub');
+     my $hub  = $lrdd->discover('http://example.net/feed.atom');
+
+    Discover an author link (rel="author") from an HTML page:
+
+     my $lrdd   = HTTP::LRDD->new('author');
+     my $author = $lrdd->discover('http://example.com/page.html');
+
+    (For RDF people, you should note that rel="author" is not semantically
+    equivalent to the "foaf:maker" property but closer to the
+    "foaf:maker/foaf:homepage" SPARQL 1.1 property path - i.e. the
+    rel="author" link destination is not a URI for the author themselves,
+    but a page about the author.)
+
+    If that author resource is in a machine-readable format (e.g. RDF), then
+    parse the data:
+
+     my $author_data = $lrdd->parse($author);
+
+    Or, you can combine "discover" and "parse":
+
+     my $lrdd        = HTTP::LRDD->new('author');
+     my $author_data = $lrdd->process('http://example.com/page.html');
+
+    Get metadata for an image:
+
+     my $lrdd = HTTP::LRDD->new;
+     my $data = $lrdd->process_all('http://example.org/flower.jpeg');
+
+    As we're not passing any arguments to the constructor, we can use a
+    shortcut:
+
+     my $data = HTTP::LRDD->process_all('http://example.org/flower.jpeg');
+
+    Find the title of the image:
+
+     use RDF::QueryX::Lazy;
+ 
+     my $image   = q<http://example.org/flower.jpeg>;
+     my $results = RDF::QueryX::Lazy
+       -> new("SELECT * WHERE { <$image> dc:title ?t }")
+       -> execute( HTTP::LRDD->process_all($image) );
+
+BUGS
+    Please report any bugs to <http://rt.cpan.org/>.
+
+    Note: many problems can stem from servers that send incorrect
+    "Content-Type" headers. If you send an XRD file as "text/html", then
+    this module will not guess what you're doing - it will assume the file
+    is really HTML, and inspect it for RDFa. For host-meta files, this
+    module is slightly more relaxed, as there's a strong assumption that
+    they are XRD... but YOU SHOULD NOT RELY ON THIS. If you're running a
+    server, use the correct media type.
+
+SEE ALSO
+    HTTP::Link::Parser, XRD::Parser, XML::Atom::OWL WWW::Finger.
+
+    <http://www.perlrdf.org/>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    Copyright 2010-2012 Toby Inkster
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

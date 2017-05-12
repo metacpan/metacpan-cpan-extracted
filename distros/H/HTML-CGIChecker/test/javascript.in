@@ -1,0 +1,12 @@
+
+<script>
+<!--
+    function blah() {
+        // hah
+    }
+-->
+</script>
+
+<b>hhh</b>
+<A HREF="javascript:func()">test</A>
+<img src="pokus" onLoad="func()" />

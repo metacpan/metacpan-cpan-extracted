@@ -1,0 +1,16 @@
+ChangeLog		Module history
+MANIFEST		This file
+MANIFEST.SKIP
+Makefile.PL		Makefile generator
+README
+html/advanced.ep
+html/admin/glimpseindex.ep
+html/admin/index.ep
+html/admin/prefs.ep
+html/de.jpg
+html/en.jpg
+html/index.ep
+html/search.ep
+lib/HTML/EP/Glimpse.pm
+lib/HTML/EP/Glimpse/Install.pm
+t/base.t

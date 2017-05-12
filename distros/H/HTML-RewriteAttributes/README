@@ -1,0 +1,76 @@
+NAME
+    HTML::RewriteAttributes - concise attribute rewriting
+
+SYNOPSIS
+        $html = HTML::RewriteAttributes->rewrite($html, sub {
+            my ($tag, $attr, $value) = @_;
+
+            # delete any attribute that mentions..
+            return if $value =~ /COBOL/i;
+
+            $value =~ s/\brocks\b/rules/g;
+            return $value;
+        });
+
+
+        # writing some HTML email I see..
+        $html = HTML::RewriteAttributes::Resources->rewrite($html, sub {
+            my $uri = shift;
+            my $content = render_template($uri);
+            my $cid = generate_cid_from($content);
+            $mime->attach($cid => content);
+            return "cid:$cid";
+        });
+
+
+        # up for some HTML::ResolveLink?
+        $html = HTML::RewriteAttributes::Links->rewrite($html, "http://search.cpan.org");
+
+        # or perhaps HTML::LinkExtor?
+        HTML::RewriteAttributes::Links->rewrite($html, sub {
+            my ($tag, $attr, $value) = @_;
+            push @links, $value;
+            $value;
+        });
+
+DESCRIPTION
+    "HTML::RewriteAttributes" is designed for simple yet powerful HTML
+    attribute rewriting.
+
+    You simply specify a callback to run for each attribute and we do the
+    rest for you.
+
+    This module is designed to be subclassable to make handling special
+    cases eaiser. See the source for methods you can override.
+
+METHODS
+  "new"
+    You don't need to call "new" explicitly - it's done in "rewrite". It
+    takes no arguments.
+
+  "rewrite" HTML, callback -> HTML
+    This is the main interface of the module. You pass in some HTML and a
+    callback, the callback is invoked potentially many times, and you get
+    back some similar HTML.
+
+    The callback receives as arguments the tag name, the attribute name, and
+    the attribute value (though subclasses may override this --
+    HTML::RewriteAttributes::Resources does). Return "undef" to remove the
+    attribute, or any other value to set the value of the attribute.
+
+SEE ALSO
+    HTML::Parser, HTML::ResolveLink, Email::MIME::CreateHTML,
+    HTML::LinkExtor
+
+THANKS
+    Some code was inspired by, and tests borrowed from, Miyagawa's
+    HTML::ResolveLink.
+
+AUTHOR
+    Shawn M Moore, "<sartak@bestpractical.com>"
+
+LICENSE
+    Copyright 2008-2010 Best Practical Solutions, LLC.
+    HTML::RewriteAttributes is distributed under the same terms as Perl
+    itself.
+

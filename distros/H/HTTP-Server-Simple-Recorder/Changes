@@ -1,0 +1,11 @@
+Revision history for HTTP-Server-Simple-Recorder
+
+0.03 Fri Nov 28 22:53:27 EST 2008
+    * win32 binmode oops. fixed by pjf@cpan.org
+
+0.02  Thu Oct 20 03:30:37 EDT 2005
+       Update to work with latest Test::HTTP::Server::Simple.
+
+0.01  Tue Jun 28 01:28:38 2005
+       Initial release.
+

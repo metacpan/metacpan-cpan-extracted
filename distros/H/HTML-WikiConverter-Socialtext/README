@@ -1,0 +1,64 @@
+HTML::WikiConverter::Socialtext Version 0.02
+===========================================
+
+HTML::WikiConverter::Socialtext adds the Socialtext dialect to
+HTML::WikiConverter allowing the conversion of HTML to Socialtext
+markup.
+
+SYNOPSIS
+
+Converting HTML to wiki markup is easy:
+
+  use HTML::WikiConverter;
+  my $wc = new HTML::WikiConverter( dialect => 'Socialtext' );
+  print $wc->html2wiki( $html );
+
+Or from the command line:
+
+  % html2wiki --dialect Socialtext input.html > output.wiki
+
+There's also a web interface if you're so inclined:
+
+  http://diberri.dyndns.org/html2wiki.html
+
+DEPENDENCIES
+
+  * HTML::WikiConverter version 0.54
+  * URI
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc HTML::WikiConverter::Socialtext
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/HTML-WikiConverter-Socialtext
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-WikiConverter-Socialtext
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/HTML-WikiConverter-Socialtext
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/HTML-WikiConverter-Socialtext
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Kirsten L. Jones
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

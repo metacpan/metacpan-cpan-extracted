@@ -1,0 +1,115 @@
+{
+   "abstract" : "Base class for Hessian serialization/deserialization.",
+   "author" : [
+      "William Travis Holton <heytrav@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4004, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Hessian-Translator",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Std" : "0",
+            "Contextual::Return" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::Epoch" : "0",
+            "DateTime::Format::Epoch::Unix" : "0",
+            "DateTime::Format::Strptime" : "0",
+            "Exception::Class" : "0",
+            "HTTP::Request" : "0",
+            "LWP::UserAgent" : "0",
+            "List::MoreUtils" : "0",
+            "Math::BigInt" : "0",
+            "Math::Int64" : "0",
+            "Module::Load" : "0",
+            "Moose" : "0",
+            "Perl::Critic" : "0",
+            "Smart::Comments" : "0",
+            "Test::Class" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
+            "YAML" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Hessian::Client" : {
+         "file" : "lib/Hessian/Client.pm"
+      },
+      "Hessian::Deserializer" : {
+         "file" : "lib/Hessian/Deserializer.pm"
+      },
+      "Hessian::Deserializer::Binary" : {
+         "file" : "lib/Hessian/Deserializer/Binary.pm"
+      },
+      "Hessian::Deserializer::Date" : {
+         "file" : "lib/Hessian/Deserializer/Date.pm"
+      },
+      "Hessian::Deserializer::Numeric" : {
+         "file" : "lib/Hessian/Deserializer/Numeric.pm"
+      },
+      "Hessian::Deserializer::String" : {
+         "file" : "lib/Hessian/Deserializer/String.pm"
+      },
+      "Hessian::Exception" : {
+         "file" : "lib/Hessian/Exception.pm"
+      },
+      "Hessian::Serializer" : {
+         "file" : "lib/Hessian/Serializer.pm"
+      },
+      "Hessian::Serializer::Binary" : {
+         "file" : "lib/Hessian/Serializer/Binary.pm"
+      },
+      "Hessian::Serializer::Date" : {
+         "file" : "lib/Hessian/Serializer/Date.pm"
+      },
+      "Hessian::Serializer::Numeric" : {
+         "file" : "lib/Hessian/Serializer/Numeric.pm"
+      },
+      "Hessian::Serializer::String" : {
+         "file" : "lib/Hessian/Serializer/String.pm"
+      },
+      "Hessian::Simple" : {
+         "file" : "lib/Hessian/Simple.pm"
+      },
+      "Hessian::Translator" : {
+         "file" : "lib/Hessian/Translator.pm",
+         "version" : "1.06"
+      },
+      "Hessian::Translator::Composite" : {
+         "file" : "lib/Hessian/Translator/Composite.pm"
+      },
+      "Hessian::Translator::Envelope" : {
+         "file" : "lib/Hessian/Translator/Envelope.pm"
+      },
+      "Hessian::Translator::V1" : {
+         "file" : "lib/Hessian/Translator/V1.pm"
+      },
+      "Hessian::Translator::V2" : {
+         "file" : "lib/Hessian/Translator/V2.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/heytrav/hessian-client.git"
+      }
+   },
+   "version" : "1.06"
+}

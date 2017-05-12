@@ -1,0 +1,49 @@
+Revision history for Perl extension HTML::Defang.
+
+1.04  Mon Jan 03 12:00:00 2011
+	- Change defang_and_add_to_output to delay the defanging until after the current tag is actually emmitted to the output
+	- If url callback has marked the attribute as to be defanged, skip result of attribute callback
+	- Track <a> tags as part of mismatched tag tracking
+	- Replace magic constants of 0, 1 and 2 in HTML::Defang with exported constants DEFANG_NONE, DEFANG_ALWAYS and DEFANG_DEFAULT
+	- allow attribute values upto 16384 chars long
+
+1.03  Mon Jun 14 16:22:35 2010
+	- fix incorrect tag closing when "/" appears as attribute key
+	- handle deep span nests with the same attrs, not just no attrs
+	- we might not find the tag if we hit one that stops further breaking out, that's not an error to report
+	- track noscript mismatched tags
+	- more nested table tags fixes
+	- unicode fixes on attribute/style entity expansions
+	- more deep nested span/div hacks
+	- avoid undef error
+	- optimisation for nested inline tags within block tags
+	- massive speedup on deeply nested tags
+	- defang tweaks on large sets of style rules
+	- use /\G..../gc matching on style rather than s///
+	- close/re-open inline tags across block tags
+	- only convert \u sequences in stripped values
+	- track mismatched <p> tags, and defang -- in a tag as well
+	- need to strip -- in defanged tags because --'s in comments are bad
+
+1.02  Mon Aug 24 18:00:00 2009
+	- add col and colgroup as possible ImplicitOpenTags
+	- change to prevent double-defang by default.  Add option to allow it.
+	- open a new <tr>, not a <tbody> if we need to open an implicit tag
+	- add tbody back into list of implicit table tags
+	- include & ... ; when encoding entity in new attributes
+	- don't insert implicit open tag if it's the tag we actually just parsed
+	- avoid excessive backtracking on some style tags. cleanup unquoting code
+	- track tt blocks as well
+	- add more tags to track
+	- more quoting fixes
+	- expand html entities in styles as well
+	- don't unescape % sequences in URLs, just in stripped test value
+	- in attributes, % sequences are only every 2 chars
+
+1.01  Tue Apr 27 11:35:44 2009
+	- first public release
+
+0.01  Tue Feb 24 17:50:13 2009
+	- original version; created by h2xs 1.23 with options
+		-XAn HTML::Defang
+

@@ -1,0 +1,6 @@
+# $Id: borked1.wt,v 1.1.1.1 2002/01/24 12:26:10 m_ilya Exp $
+
+text_require = ( Require some
+                 text )
+
+( borked test )

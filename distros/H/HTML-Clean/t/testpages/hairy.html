@@ -1,0 +1,52 @@
+<!-- 
+
+  A big comment
+
+-->
+
+<head>
+<meta name="GENERATOR" content="MS Bloated Pig 2000">
+<meta name="FORMATTER" content="fdisk">
+<title>This is a test page that touches most options of HTML::Clean
+  </title>
+</head>
+<body>
+
+This is a <strong>bold</strong> line with some empty tags <strong></strong><i></I>.
+<P align="left">
+How about some excess space within <font color="#000000" face="arial"   > tags?</font>
+<P>
+<table border="0" align="left">
+<tr>
+  <td align="left" colspan=1 rowspan=1>
+       This is a table with default values.
+  </td>
+  <td>
+      Remove the border=0 from the page
+  </td>
+</tr>
+</table>
+
+<H1 align="left">Tests for align=left in various tags<!-- small comment --></H1>
+<OL start="1">
+  <li>item 1</li>
+  <li>item 2</li>
+</ol>
+<form method="get" enctype="application/x-www-form-urlencoded"><input name="moo" type="text" value"testing this"></form>
+<hr width="100%" align="center">
+<A href="http://www.itu.int:80/home/index.html">Link to the ITU Home page with :80 in the URL</a  >
+<br>
+An image without an alt tag.
+<img src="http://www.itu.int/home/graphics/banner.gif">
+<br>
+<br>
+Voil&aacute;
+<!-- test case from Renzo -->
+<area shape=rect coords="17,6,83,36" target=_top href="http://home/"
+ onmouseover="window.status='HOME';return true;">
+<!-- test case from Gregory Stark  shouldn't remove space there.. -->
+<img src="foo > bar">
+<!-- test case from Jens Quade -->
+<b>test me <br ></b>
+</body>
+

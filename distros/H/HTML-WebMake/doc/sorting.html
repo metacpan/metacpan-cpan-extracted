@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>
+      WebMake: Documentation: Sorting Lists of Content Items
+    </title>
+    <meta name="generator" content="WebMake/2.2" />
+    <style>
+      body {
+       background-color: #ffffff; 
+       color: #000000; 
+       font-size: medium;
+       font-family: verdana,lucida,helvetica,sans-serif;
+      }
+      code, samp, pre {
+       font-family: Courier New,courier,fixed-width,monospace;
+      }
+      H1 { font-size: x-large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFCC66; }
+      H2 { font-size: large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFDD77; }
+      H3 { font-size: medium; font-family: Garamond,Book Antiqua,Times,serif; background: #FFEE88; }
+      H4 { font-size: small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H5 { font-size: x-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H6 { font-size: xx-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      A:link {
+       font-weight: bold;
+       color: #004000;
+       text-decoration: underline; 
+      }
+      A:visited {
+       font-weight: normal;
+       color: #008000;
+       text-decoration: underline; 
+      }
+      A:active {
+       font-weight: bold;
+       color: #800000;
+       text-decoration: underline; 
+      }
+      dt {
+       font-size: medium;
+       font-weight: bold;
+       padding-top: 8px; padding-bottom: 8px;
+      }
+      dd {
+       padding-top: 8px; padding-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body bgcolor="#ffffff" text="#000000" link="#3300cc" vlink="#660066">
+    <font face="lucida,verdana,sans-serif">
+      <div align="center">
+        <img src="images/WebMakeTitle.png" alt="WebMake" width="500" height="122" />
+      </div>
+      <table width="100%">
+        <tr>
+          <td valign="top">
+            <strong><a href="http://webmake.taint.org/">WebMake</a>
+             Documentation</strong> (version 2.2)
+             
+          </td>
+          <td valign="top">
+            <div align="right">
+              
+               [ <a href="perl.html">Back</a> | <a href="globs.html">Forward</a> | <a href="index.html">Index</a>
+               | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+               
+            </div>
+          </td>
+        </tr>
+      </table>
+<!-- yes, it's that Mozilla black-border code again ;) -->
+      <!-- stolen from www.mozilla.org via rc3.org -->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td bgcolor="#aaaaaa">
+            <table border="0" cellspacing="4" cellpadding="4" width="100%">
+              <tr>
+                <td bgcolor="#ffffff">
+                  <table border="0" cellspacing="4" cellpadding="4" width="100%">
+                    <tr>
+                      <td>
+                        <h1>Sorting Lists of Content Items</h1><p>
+                          Frequently, you will need to get a list of content items in sorted order.
+                          WebMake itself does this for the <a href="sitemap.html">sitemap</a> tag, among others.
+                          
+                        </p>
+                        <p>
+                          Sorting is typically performed using a content item's metadata; some <a href="metadata.html">metadata</a>
+                          that are especially useful are:
+                          
+                        </p>
+                        <dl>
+                          <dt>
+                            <em>score</em>
+                          </dt>
+                          <dd>
+                            <p>
+                              A number representing the "priority" of a content
+                               item; specifically intended for use when sorting. Defaults to <strong>50</strong>
+                               if unset.
+                              
+                            </p>
+                          </dd>
+                          <dt>
+                            <em>title</em>
+                          </dt>
+                          <dd>
+                            <p>
+                              The title of a content item. Handy for alphabetic
+                               lists. Defaults to <strong>(Untitled)</strong> if not set.
+                              
+                            </p>
+                          </dd>
+                          <dt>
+                            <em>declared</em>
+                          </dt>
+                          <dd>
+                            <p>
+                              The item's declaration order. This is a number
+                               representing when the content item was first encountered in the
+                               WebMake file; earlier content items have a lower declaration order.
+                               You do not need to set this; WebMake will do so automatically.
+                              
+                            </p>
+                          </dd>
+                          <dt>
+                            <em>mtime</em>
+                          </dt>
+                          <dd>
+                            <p>
+                              The modification date, in UNIX time_t
+                               seconds-since-the-epoch format, of the file the content item was
+                               loaded from.
+                              
+                            </p>
+                          </dd>
+                          <dt>
+                            <em>name</em>
+                          </dt>
+                          <dd>
+                            <p>
+                              The name of the content item.
+                              
+                            </p>
+                          </dd>
+                        </dl>
+                        <p>
+                          WebMake provides a built-in mechanism to allow easy sorting of content items,
+                          called a <em><a href="sorting.html">sort spec</a></em> or <em><a href="sorting.html">sort string</a></em>.
+                          
+                        </p>
+                        <p>
+                          This is typically used either with the Perl code library's
+                          <a href="PerlCodeLibrary.pm.html#item__sortedobjs"><code>sort_content_objects()</code></a> call, or using a
+                          <code>sortorder</code> attribute as the <a href="sitemap.html">sitemap</a> tag does.
+                          
+                        </p>
+                        <p>
+                          A <a href="sorting.html">sort string</a> is a text string, containing a space-separated list of <a href="metadata.html">metadata</a>
+                          items. The first entry in the list is the main sorting criterion; the second
+                          entry is then used to break deadlocks if two entries match for the main
+                          criterion, etc.
+                          
+                        </p>
+                        <p>
+                          In addition, a <a href="metadata.html">metadata</a> item can be prefixed with a <code>!</code>, to reverse its
+                          order.
+                          
+                        </p>
+                        <a name="Example"><h2>Example</h2></a><p>
+                          <strong>score title</strong>: sort by score, and if two content items have the same
+                          score, sort by title.
+                          
+                        </p>
+                        <p>
+                          <strong>declared</strong>: sort by the order in which they were declared in the WebMake
+                          file.
+                          
+                        </p>
+                        <p>
+                          <strong>score title !mtime</strong>: sort by score and title, and if more than one content
+                          item have the same score and title, sort them into oldest-first order.
+                          
+                        </p>
+                        <p>
+                          
+                        </p>
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+    <table width="100%">
+      <tr>
+        <td valign="top">
+          <strong><a href="http://webmake.taint.org/">WebMake</a>
+           Documentation</strong> (version 2.2)
+           
+        </td>
+        <td valign="top">
+          <div align="right">
+            
+             [ <a href="perl.html">Back</a> | <a href="globs.html">Forward</a> | <a href="index.html">Index</a>
+             | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+             
+          </div>
+        </td>
+      </tr>
+    </table>
+    <div align="right">
+      <a href="http://webmake.taint.org/"><img src="images/BuiltWithWebMake.png" alt="Built With WebMake" border="0" width="88" height="31" /></a>
+    </div>
+  </font>
+</body>
+</html>

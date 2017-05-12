@@ -1,0 +1,10 @@
+Revision history for Perl extension HTTPEx::Declare
+
+0.03    2008-08-22T18:46:23+09:00
+        - fixed to broken tests
+
+0.02    2008-08-13T19:04:56+09:00
+        - for HTTP::Engine 0.0.13 higher
+
+0.01    2008-05-28T21:24:17+09:00
+        - original version

@@ -1,0 +1,59 @@
+{
+   "abstract" : "Interface to BCM2835 library",
+   "author" : [
+      "Mark Dootson <mdootson@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HiPi-BCM2835",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "modlib",
+         "userbin"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0",
+            "perl" : "v5.14.0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HiPi" : "0.62",
+            "threads::shared" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "HiPi::BCM2835" : {
+         "file" : "lib/HiPi/BCM2835.pm",
+         "version" : "0.62"
+      },
+      "HiPi::BCM2835::I2C" : {
+         "file" : "lib/HiPi/BCM2835/I2C.pm",
+         "version" : "0.62"
+      },
+      "HiPi::BCM2835::Pin" : {
+         "file" : "lib/HiPi/BCM2835/Pin.pm",
+         "version" : "0.62"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://raspberry.znix.com/",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl-3.0.txt"
+      ]
+   },
+   "version" : "0.62"
+}

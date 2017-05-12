@@ -1,0 +1,8 @@
+<TMPL_loop loop>
+	Iteration: <TMPL_var __COUNTER__> of <TMPL_var __SIZE__> First: <TMPL_var __FIRST__> Last: <TMPL_var __LAST__> Even: <TMPL_var __EVEN__> Odd: <TMPL_var __ODD__> Inner: <TMPL_var __INNER__>
+	<TMPL_if inner_loop>Inner loop: {<TMPL_loop inner_loop> <TMPL_var a> </TMPL_loop>}</TMPL_if>
+	<TMPL_var a> - <TMPL_var s1>
+</TMPL_loop>
+<TMPL_loop loop_content>
+	Iteration: <TMPL_var __COUNTER__>, content: '<TMPL_var __CONTENT__>'
+</TMPL_loop>

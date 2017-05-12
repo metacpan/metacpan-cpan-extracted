@@ -1,0 +1,10 @@
+<HTML><BODY>
+<H1> test unescape in func args </H1>
+arglist('\'','s\a\\nki')=<tmpl_var expr="arglist('\'','s\a\\nki')">
+arglist('\'','\a\\n')=<tmpl_var expr="arglist('\'','\a\\n')">
+arglist('\'','\a\\')=<tmpl_var expr="arglist('\'','\a\\')">
+arglist('\a\\')=<tmpl_var expr="arglist('\a\\')">
+arglist('\a')=<tmpl_var expr="arglist('\a')">
+arglist('\\')=<tmpl_var expr="arglist('\\')">
+arglist('\'')=<tmpl_var expr="arglist('\'')">
+</body></html>

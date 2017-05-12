@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name: Hook-Queue
+version: 1.21
+author:
+  - Richard Clamp <richardc@unixbeard.net>
+abstract: define a queue of handlers
+license: perl
+requires:
+  perl: 5.006
+build_requires:
+  Test::More: 0
+provides:
+  Hook::Queue:
+    file: lib/Hook/Queue.pm
+    version: 1.21
+generated_by: Module::Build version 0.24

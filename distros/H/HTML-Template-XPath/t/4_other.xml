@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<content>
+  <company>
+    <news>
+      <items>
+        <item>
+          <title>Titel</title>
+          <test>Test</test>
+          <bla>bla</bla>
+        </item>
+      </items>
+    </news>
+  </company>
+</content>

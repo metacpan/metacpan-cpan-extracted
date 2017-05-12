@@ -1,0 +1,269 @@
+version 0.004; 2015-01-28
+
+  * port to Perl 5.21.1, where errno-based error messages (as seen in
+    $!) depend on the state of the locale pragma
+
+  * port to Perl 5.21.8, where it is necessary to work around bug [perl
+    #123558] to test deparsing
+
+  * new functions shash_key_min(), shash_key_max(), shash_key_ge(),
+    shash_key_gt(), shash_key_le(), and shash_key_lt(), to iterate over
+    the content of a shared hash, and corresponding ability to iterate a
+    tied hash via each(%shash) and to enumerate it via keys(%shash) et al
+
+  * new functions shash_keys_array() and shash_keys_hash() to enumerate
+    the keys in a shared hash
+
+  * new function shash_group_get_hash() to retrieve the full content of
+    a shared hash
+
+  * new function shash_occupied() to check whether a shared hash is
+    non-empty, and corresponding ability to check occupancy of a tied
+    hash via scalar(%shash)
+
+  * new function shash_count() to count the items in a shared hash
+
+  * new function shash_size() to determine approximate size of the
+    content of a shared hash
+
+  * new function shash_length() to get the length of a value without
+    reifying the value as a string SV
+
+  * add clearer name shash_exists() for the existing function shash_getd()
+
+  * make returned reference scalars and tally value scalars unwritable
+
+  * test that keys and values can contain NULs
+
+  * test unwritability of returned mode strings
+
+  * in documentation, clarify that shash_tidy() counts as a write
+    operation
+
+  * in documentation, correct grammar in the description of shash_open()
+    and the equivalent constructor method
+
+version 0.003; 2014-05-05
+
+  * bugfix: on Perl 5.6, repair a dodgy workaround that could cause
+    magical (e.g., tainted) arguments to lose their magic flags
+
+  * bugfix: build custom ops in a way that satisfies an unnecessary
+    assertion in debugging Perl builds
+
+  * new function shash_idle() to prevent an idle handle keeping an
+    obsolete data file around
+
+  * when tidying, include a non-zero constant term in the computation
+    of the new file size, to avoid cycling data files very rapidly when
+    the shared hash contains little data
+
+  * count events for profiling and debugging, counters accessed
+    through new functions shash_tally_get(), shash_tally_zero(), and
+    shash_tally_gzero()
+
+  * make the constant shash_referential_handle also available as a class
+    method on Hash::SharedMem::Handle
+
+  * when attempting to unlink a file, other than for cleanup of an
+    operation that died, if unlinking fails for reasons other than ENOENT
+    or EBUSY, report the error, rather than silently ignoring it
+
+  * cooperate in the tainting system, mainly imitating the taint behaviour
+    of regular file handles
+
+  * support using the module in multiple threads simultaneously,
+    including, on Perl 5.8.9 and later, duplicating handles for thread
+    spawning
+
+  * cope on Cygwin, which offers a fraudulent openat(2) et al
+
+  * avoid a C99 declaration-after-statement construction
+
+  * avoid using "NULL" for null function pointers, for C compiler
+    portability
+
+  * be cleverer about the asymmetry of key ranges in the B-tree structure,
+    saving about one key comparison per data operation
+
+  * use cursors internally, so that the key has to be resolved only
+    once for each combined read-and-write operation (shash_gset()
+    and shash_cset())
+
+  * when attempting a data file rollover, if the attempt fails due to
+    a conflicting update from another process, unmap the abortive data
+    file before attempting to unlink it, so that the unlink will succeed
+    on OSes that need a mapped file to remain linked
+
+  * in documentation, comment on the inefficiency that occurs when the
+    shared hash doesn't fit into RAM
+
+  * in documentation, comment on the Unicode bug in the treatment of
+    filenames
+
+  * don't uselessly attempt to hook into B::Deparse on Perls where custom
+    ops aren't registered and so the hook can't work
+
+  * don't uselessly attempt to hook into B::Deparse for the
+    shash_referential_handle constant which isn't a custom op type
+
+  * test concurrency with real concurrent racing processes
+
+  * test that a forked handle works correctly
+
+  * include magic(5) file, describing the identifying part of the format
+    of shared hash files, in the distribution
+
+  * manage destruction of shared hash handles through magic rather than
+    a DESTROY method, for a small speedup
+
+  * restructure the internal representation of directory references,
+    for a small simplification of uses of the references
+
+  * in test suite, extend to shash_tidy() some patterns of tests that
+    cover most operators and which were missed when shash_tidy() was
+    added to the module
+
+  * slight refactoring of C code
+
+  * on systems that lack mmap(2), detect the problem cleanly and report
+    it in a way that CPAN Testers understand
+
+  * in design document and code, use the more standard term "fanout"
+    instead of "splay"
+
+  * take todo notes out of code comments
+
+version 0.002; 2014-03-25
+
+  * new function shash_tidy() to make data file rollover happen at a
+    convenient time
+
+  * in many error messages, state more specifically and consistently
+    what kind of action has failed
+
+  * in documentation, consistently describe the content of a shared hash
+    as "content" rather than "contents"
+
+version 0.001; 2014-03-23
+
+  * bugfix: avoid overflowing a directory entry buffer on OSes where
+    struct dirent is not a suitable size for a buffer
+
+  * bugfix: avoid overflowing a filename buffer when time exceeds the
+    32-bit range (a year 2038 problem) or PIDs are larger than 32 bits
+
+  * ensure reliable behaviour across fork(2), by not holding on to
+    allocated data file space between write operations
+
+  * create all data files with the same permission bits as the master
+    file, so that the permissions set when the shash was created stick,
+    and the umask at the time of shash operations doesn't matter
+
+  * attempt to give all data files the same group and owner as the master
+    file, so that permissions behave as consistently as possible
+
+  * new exported constant shash_referential_handle to indicate whether
+    shared hash handles constitute first-class references to the
+    underlying files
+
+  * detect non-octet string values for key and value parameters reliably
+    and early, consistently signalling the error
+
+  * detect non-string values for filename parameters, signalling the error
+
+  * process get magic on each parameter exactly once per hash operation
+    (though users of the tied interface are at the mercy of the tying
+    infrastructure, which doesn't have such clean behaviour)
+
+  * when attempting to clean a shash directory, if listing the directory
+    fails, report the error, rather than silently abandoning the cleaning
+    attempt
+
+  * when attempting to generate a new data file, if the size is so large
+    as to cast to a negative off_t value, detect it early and report
+    EFBIG, rather than going ahead to create the file and detect the
+    error at ftruncate(2) time
+
+  * if ftruncate(2) reports that a requested file size is too big using
+    errno EINVAL, report it as the more enlightening EFBIG
+
+  * when attempting to iterate a shash directory, if opening the directory
+    fails, detect it and report the real error, rather than going ahead
+    to fdopendir(3) and detecting its EBADF
+
+  * when reporting an error including the name of a shash, to match
+    user expectations use the characters of the filename scalar that
+    was supplied upon opening, even though the octets of the scalar's
+    internal representation are what are actually used as the filename
+
+  * automatically detect and adapt to the machine architecture's line
+    and page size, to improve performance on architectures other than
+    IA32/AMD64
+
+  * port to pre-5.14 Perls, back to 5.6
+
+  * automatically use the -lrt library on systems where it is required
+    in order to get access to clock_gettime(2)
+
+  * cope on systems where openat(2) et al are not available, either not
+    defined by the headers, or defined but not functioning
+
+  * cope on systems where clock_gettime(2) is not available, either not
+    defined by the headers, or defined but not functioning
+
+  * cope on systems where O_CLOEXEC is not available, either not defined
+    by the headers, or defined but not honoured (or not accepted) by
+    the kernel
+
+  * when iterating a shash directory, open a new file descriptor rather
+    than duplicate the existing one, avoiding portability problems with
+    F_DUPFD_CLOEXEC
+
+  * use symbolic constants for file permission bits, for portability to
+    systems where they have non-traditional values
+
+  * cope on systems where the headers don't define MAP_FAILED
+
+  * check at compile time that the word data type is of exactly the
+    required size
+
+  * on Perls that support it, hook into B::Deparse to make the custom
+    ops deparse nicely
+
+  * many new tests
+
+  * document the effects of file-level operations on shared hash
+    directories
+
+  * document the tied(%shash) operator as part of the tied interface
+
+  * clarify documentation about permitted keys and values
+
+  * in documentation, mention serialisation and refer to Sereal
+
+  * perform string equality comparisons more efficiently by specific
+    code separate from ordering comparisons
+
+  * use more efficient variants of Perl API functions where available
+
+  * use the Perl-version-dependent matching data type to save
+    PL_tmps_floor, rather than an invariant sufficiently-large type
+
+  * declare C functions as inline where it'll help for compilers that
+    need the hint
+
+  * make some printf operations cheaper by taking advantage of Perl's
+    requirement that the C int type is at least 32 bits
+
+  * shuffle C struct members for better packing on 32-bit systems
+
+  * small clarifications to design document
+
+  * slight refactoring of C code
+
+  * avoid some C compiler warnings
+
+version 0.000; 2014-02-27
+
+  * initial released version

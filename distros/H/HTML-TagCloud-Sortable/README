@@ -1,0 +1,69 @@
+NAME
+    HTML::TagCloud::Sortable - A sortable HTML tag cloud
+
+SYNOPSIS
+        my $cloud = HTML::TagCloud::Sortable->new;
+    
+        # old HTML::TagCloud style
+        $cloud->add( 'foo', $url, 10 );
+    
+        # new HTML::TagCloud::Sortable style
+        $cloud->add( { name => 'foo', url => $url, count => 10, bar => 'baz' } );
+    
+        # old style
+        print $cloud->html( 4 );
+    
+        # new style
+        print $cloud->html( { limit => 4, sort_field => 'count', sort_type => 'numeric' } );
+
+DESCRIPTION
+    HTML::TagCloud::Sortable is an API-compatible subclass of
+    HTML::TagCloud. However, by using a different API, you can gain two
+    features:
+
+    *   Store arbitrary data with your tags
+
+    *   Sort the tags by any stored field
+
+METHODS
+  new( %options )
+    An overridden construtor. Takes the same arguments as HTML::TagCloud.
+
+  add( \%tagdata )
+    Adds the hashref of data to the list of tags. NB: Insertion order is
+    maintained. At the minimum, you will need to supply "name", "url" and
+    "count" key-value pairs.
+
+  tags( \%options )
+    This method is used by "html" to get the relevant list of tags for
+    display. Options include:
+
+    *   limit - uses the N most popular tags
+
+    *   sort_field - sort by this field
+
+    *   sort_order - 'asc' or 'desc'
+
+    *   sort_type - 'alpha' or 'numeric'
+
+    The default sort order is alphabetically by tag name. You can pass a sub
+    reference to "sort_field" to do custom sorting. Example:
+
+        $cloud->html( { sort_field =>
+            sub { $_[ 1 ]->{ count } <=> $_[ 0 ]->{ count }; }
+        } );
+
+    Passing undef to sort_field will maintain insertion order.
+
+AUTHOR
+    Brian Cassidy <bricas@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2007-2009 by Brian Cassidy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    *   HTML::TagCloud
+

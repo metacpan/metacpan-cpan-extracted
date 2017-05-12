@@ -1,0 +1,56 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'List::AllUtils' => '0',
+                                      'Module::Runtime' => '0',
+                                      'Moo' => '1.004003',
+                                      'Moo::Role' => '0',
+                                      'MooX::StrictConstructor' => '0',
+                                      'Package::Variant' => '1.002000',
+                                      'Plack' => '0.9967',
+                                      'Plack::Util' => '0',
+                                      'StackTrace::Auto' => '0',
+                                      'Sub::Exporter' => '0',
+                                      'Sub::Exporter::Util' => '0',
+                                      'Throwable' => '0.102080',
+                                      'Type::Tiny' => '0',
+                                      'Type::Utils' => '0',
+                                      'Types::Standard' => '0',
+                                      'namespace::clean' => '0',
+                                      'overload' => '0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'HTTP::Request::Common' => '0',
+                                   'Plack::Builder' => '0',
+                                   'Plack::Test' => '0',
+                                   'Scalar::Util' => '0',
+                                   'Test::Deep' => '0',
+                                   'Test::Fatal' => '0.003',
+                                   'Test::More' => '0.96',
+                                   'base' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

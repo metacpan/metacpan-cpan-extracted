@@ -1,0 +1,17 @@
+---
+elements:
+  - type: Text
+    name: title
+    label: Title
+  - type: Date
+    name: date2
+    label: Default
+    default_natural: now
+  - type: Date
+    name: date
+    label: Date
+  - type: DateTime
+    name: datetime
+    label: Date & Time
+    default_natural: now
+    

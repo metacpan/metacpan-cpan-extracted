@@ -1,0 +1,42 @@
+This is the README file for HPUX::Pstat, version 1.01
+
+
+INTRODUCTION
+
+    HPUX::Pstat implements a wrapper for the following functions:
+
+    pstat_getstatic()
+    pstat_getdynamic()
+    pstat_getvminfo()
+    pstat_getswap()
+    pstat_getproc()
+    pstat_getprocessor()
+
+
+PREREQUISITES
+
+    HPUX::Pstat needs Perl5 and a decent C Compiler.
+
+
+INSTALLATION
+
+    Unpack the distribution archive and chdir into HPUX-PStat-1.01.
+    Then type the following commands:
+
+    perl Makefile.pl
+    make
+    make test
+    make install
+
+
+LEGAL ISSUES
+
+    Copyright (c) 2003 Axel Schwenke. All rights reserved.
+    This program is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.
+
+
+AUTHOR
+
+    Axel Schwenke <axel.schwenke@gmx.net>
+

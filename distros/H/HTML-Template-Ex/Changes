@@ -1,0 +1,43 @@
+Revision history for Perl extension .
+
+0.07  2007/03/25
+	- Maintenance release for Pod coverage.
+
+0.06
+	- lost property.
+
+0.05
+	- bug fix.
+	- HTML::Template::Ex::Filter was enclosed.
+
+0.04
+	- Addition of '_get_ident_id' internal function.
+
+	- It was made to encode only when the character set was able to be picked up from the template.
+	  It is related to constructor's option 'auto_encoder'.
+
+	- It came to be able to sweeten the check on the syntax of EX-Code.
+	  It is related to constructor's option 'no_strict_exec'.
+
+	- Trifling bug fix.
+
+0.03
+	- When the template was read, the character-code can have been changed.
+	  It is related to constructor's option 'encoder'.
+
+	- Charset of the read template was obtained.
+	  The 'charset' method of the relation is added.
+
+	- EX-Code was evaluated at output.
+
+	- The problem concerning dispatching priority was canceled.
+	  It is processed in order of <TMPL_EX> appearing from the template regardless
+	  of the presence of <TMPL_INCLUDE *NAME>. 
+
+0.02
+	- The module is not updated.
+	  Because an attached file was too rude, it corrected it.
+
+0.01  Wed Jul 20 16:33:07 2005
+	- original version; created by h2xs 1.21 with options
+		-A HTML::Template::Ex

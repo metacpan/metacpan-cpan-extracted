@@ -1,0 +1,24 @@
+Revision history for Perl extension HTML::Entities::ImodePictogram.
+
+0.06  Tue Jun 24 01:47:23 JST 2003
+	* Fixed bug "\xF9\xB0" is missing
+	  (Thanks to Satoshi Tanimoto)
+
+0.05  Mon Aug  5 23:26:15 JST 2002
+	* Extended emoji support
+	  (Thanks to Eijiro Koike <hanabusa@edge.co.jp>)
+
+0.04  Thu Aug 30 15:09:47 JST 2001
+	- Performance improved (slightly efficient regex matching)
+
+0.03  Thu Aug 30 14:14:15 JST 2001
+	- binary <=> number now handled via (un)?pack
+	  (Thanks to SADAHIRO Tomoyuki <BQW10602@nifty.com>)
+
+0.02  Thu Aug 30 02:57:02 JST 2001
+	- Add japanese documentation (ImodePictorgam.ja.pod)
+	- onto CPAN (thanks, PIA <pia@acrlinx.ne.jp>)
+
+0.01  Wed Aug 29 19:58:12 2001
+	- original version; created by h2xs 1.19
+

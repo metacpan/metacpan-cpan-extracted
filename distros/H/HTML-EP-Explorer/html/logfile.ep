@@ -1,0 +1,3 @@
+<ep-package name="HTML::EP::Explorer">
+<ep-explorer-config file="admin/config.pm">
+<ep-explorer-logfile>

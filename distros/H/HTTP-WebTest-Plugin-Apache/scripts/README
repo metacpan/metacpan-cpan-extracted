@@ -1,0 +1,8 @@
+$Id: README,v 1.1.1.1 2002/11/15 21:47:13 m_ilya Exp $
+
+This directory contains module maintenance scripts. Normally you
+should not use (or need) them unless you are module maintainer.
+
+Moreover even maintainer should not use them directly. Usually they
+are called from Makefile (watch for distprepare and other makefile
+targets).

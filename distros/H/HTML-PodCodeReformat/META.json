@@ -1,0 +1,62 @@
+{
+   "abstract" : "Reformats HTML code blocks coming from Pod verbatim paragraphs",
+   "author" : [
+      "Emanuele Zeppieri <emazep@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-PodCodeReformat",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Class::Accessor::Fast" : 0,
+            "File::Copy" : 0,
+            "Getopt::Long" : 0,
+            "HTML::Parser" : "3.00",
+            "Pod::Usage" : 0,
+            "constant" : 0,
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "English" : 0,
+            "File::Find" : 0,
+            "File::Spec::Functions" : 0,
+            "File::Temp" : 0,
+            "Scalar::Util" : 0,
+            "Test::More" : "0.94",
+            "Text::Diff" : 0,
+            "perl" : "5.004"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-HTML-PodCodeReformat@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-PodCodeReformat"
+      },
+      "homepage" : "http://search.cpan.org/dist/HTML-PodCodeReformat",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/emazep/HTML-PodCodeReformat.git",
+         "web" : "http://github.com/emazep/HTML-PodCodeReformat"
+      }
+   },
+   "version" : "0.20000"
+}
+

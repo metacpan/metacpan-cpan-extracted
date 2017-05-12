@@ -1,0 +1,253 @@
+#!/usr/bin/perl
+#===============================================================================
+#
+#         FILE: wd_fcgi.fpl
+#
+#  DESCRIPTION:  FastCGI script for WebDAO project
+#       AUTHOR:  Aliaksandr P. Zahatski (Mn), <zag@cpan.org>
+#===============================================================================
+#$Id: wd_fcgi.fpl,v 1.1 2006/10/13 12:39:09 zag Exp $
+use HTML::WebDAO;
+use FCGI;
+use HTML::WebDAO::CVcgi;
+use HTML::WebDAO::Session;
+use HTML::WebDAO::Lex;
+use HTML::WebDAO::FCGI::ProcManager;
+use Data::Dumper;
+use Getopt::Long;
+use Pod::Usage;
+use strict;
+use warnings;
+use POSIX;
+#use Test::More;
+use Carp;
+
+my ( $listen, $nproc, $pidfile, $manager, $detach, $man, $help, $maxreq );
+
+#set defaults
+$nproc = 1;
+my %opt = ( 'help|?' => \$help, man => \$man, );
+GetOptions(
+    'help|?'      => \$help,
+    'listen|l=s'  => \$listen,
+    'nproc|n=i'   => \$nproc,
+    'pidfile|p=s' => \$pidfile,
+    'daemon|d'    => \$detach,
+    'maxreq|m=i'  => \$maxreq,
+    'man'         => \$man
+  )
+  or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+
+#begin init socket
+my $sock = 0;
+if ($listen) {
+    my $saved_umask = umask(0);
+    $ENV{FCGI_SOCKET_PATH}  = $listen;
+    $ENV{FCGI_LISTEN_QUEUE} = 100;
+    eval "use CGI::Fast qw(:standard); 1" or die $@;
+    umask($saved_umask);
+}
+elsif ( $^O ne 'MSWin32' ) {
+    -S STDIN
+      or die "STDIN is not a socket; specify a listen location";
+    eval "use CGI::Fast qw(:standard); 1" or die $@;
+
+}
+
+my $proc_manager;
+if ($listen) {
+    &daemon_fork() if $detach;
+    $proc_manager = new HTML::WebDAO::FCGI::ProcManager::(
+        {
+            n_processes => $nproc,
+            pid_fname   => $pidfile,
+        }
+    );
+
+    # detach *before* the ProcManager inits
+    &daemon_detach() if $detach;
+    $proc_manager->pm_manage();
+}
+
+=head2 daemon_fork
+
+Performs the first part of daemon initialisation.  Specifically,
+forking.  STDERR, etc are still connected to a terminal.
+
+=cut
+
+sub daemon_fork {
+
+    fork && exit;
+}
+
+=head2 daemon_detach
+
+Performs the second part of daemon initialisation.  Specifically,
+disassociates from the terminal.
+
+However, this does B<not> change the current working directory to "/",
+as normal daemons do.  It also does not close all open file
+descriptors (except STDIN, STDOUT and STDERR, which are re-opened from
+F</dev/null>).
+
+=cut
+
+sub daemon_detach {
+    print "FastCGI daemon started (pid $$)\n";
+    open STDIN,  "+</dev/null" or die $!;
+    open STDOUT, ">&STDIN"     or die $!;
+    open STDERR, ">&STDIN"     or die $!;
+    POSIX::setsid();
+}
+
+sub load_module {
+    my $class = shift || return;
+
+    #check non loaded mods
+    my ( $main, $module ) = $class =~ m/(.*\:\:)?(\S+)$/;
+    $main ||= 'main::';
+    $module .= '::';
+    no strict 'refs';
+    unless ( exists $$main{$module} ) {
+        eval "use $class";
+        if ($@) {
+            croak "Error register class :$class with $@ ";
+            return -1;
+        }
+    }
+    use strict 'refs';
+}
+
+sub _parse_str_to_hash {
+    my $str = shift;
+    return unless $str;
+    my %hash = map { split( /=/, $_ ) } split( /;/, $str );
+    foreach ( values %hash ) {
+        s/^\s+//;
+        s/\s+^//;
+    }
+    \%hash;
+}
+
+my ( $def_store_class, $def_session_class, $def_eng_class );
+my ( $store_class, $session_class, $eng_class ) = map {
+    &load_module($_);
+    $_
+  } (
+    $def_store_class = $ENV{WD_STORE}
+      || $ENV{wdStore}
+      || 'HTML::WebDAO::Store::Abstract',
+    $def_session_class =
+      $ENV{WD_SESSION} || $ENV{wdSession} || 'HTML::WebDAO::Session',
+    $def_eng_class = $ENV{WD_ENGINE} || $ENV{wdEngine} || 'HTML::WebDAO::Engine'
+  );
+my $count_req = $maxreq || $ENV{wdFCGIreq} || -1;
+
+while ( $count_req != 0 and my $fcgi_obj = new CGI::Fast ) {
+
+    $proc_manager && $proc_manager->pm_pre_dispatch();
+#    diag Dumper(\%ENV);
+    if ( $ENV{SERVER_SOFTWARE} && $ENV{SERVER_SOFTWARE} =~ /lighttpd/ ) {
+        $ENV{PATH_INFO} ||= delete $ENV{SCRIPT_NAME};
+    }
+    
+    #customize ENV
+    $store_class   = $ENV{WD_STORE}   || $ENV{wdStore}   || $def_store_class;
+    $session_class = $ENV{WD_SESSION} || $ENV{wdSession} || $def_session_class;
+    $eng_class     = $ENV{WD_ENGINE}  || $ENV{wdEngine}  || $def_eng_class;
+    foreach my $rec (
+        [ $store_class,   $store_class   eq $def_store_class ],
+        [ $session_class, $session_class eq $def_session_class ],
+        [ $eng_class,     $eng_class     eq $def_eng_class ]
+      )
+    {
+        next if $rec->[1];
+        &load_module( $rec->[0] );
+    }
+    my $store_obj = $store_class->new(
+        %{
+            &_parse_str_to_hash( $ENV{wdStorePar} || $ENV{WD_STORE_PAR} ) || {}
+          }
+    );
+    my $sess = $session_class->new(
+        %{
+            &_parse_str_to_hash( $ENV{wdSessionPar} || $ENV{WD_SESSION_PAR} )
+              || {}
+          },
+        store => $store_obj,
+        cv    => new HTML::WebDAO::CVcgi:: $fcgi_obj,
+
+    );
+    $sess->set_header( -type => 'text/html; charset=utf-8' );
+
+    #determine root document
+    my $env_var = $ENV{wdIndexFile} || $ENV{WD_INDEXFILE};
+    my %ini_pars = ();
+    if ( $env_var && !-z $env_var ) {
+        my ($filename) = grep { -r $_ && -f $_ } $env_var,
+          "$ENV{DOCUMENT_ROOT}/$env_var", "$ENV{DOCUMENT_ROOT}/index.xhtml";
+        die "$0 ERR:: file not found or can't access (WD_INDEXFILE): $env_var"
+          unless $filename;
+        my $content = qq!<wD><include file="$filename"/></wD>!;
+        my $lex = new HTML::WebDAO::Lex:: content => $content;
+        $ini_pars{lexer} = $lex;
+    }
+    else {
+        $ini_pars{source} = '';
+    }
+    my $eng = $eng_class->new(
+        %{
+            &_parse_str_to_hash( $ENV{WD_ENGINE_PAR} || $ENV{wdEnginePar} )
+              || {}
+          },
+        %ini_pars,
+        session  => $sess,
+    );
+    $sess->ExecEngine($eng);
+    $sess->destroy;
+    --$count_req if $count_req > 0;
+    $proc_manager && $proc_manager->pm_post_dispatch();
+}
+FCGI::finish();
+
+__END__
+
+=head1 NAME
+
+wd_fcgi.fpl - FastCGI script for WebDAO project
+
+=head1 SYNOPSIS
+
+wd_fcgi.fpl [options]
+
+    -d -daemon     Daemonize the server.
+    -p -pidfile    Write a pidfile with the pid of the process manager.
+    -l -listen     Listen on a socket path, hostname:port, or :port.
+    -n -nproc      The number of processes started to handle requests.
+    -m -maxreq     Number of request before process will be restarted 
+                   -1 - unlimited. (defailt: -1)
+                   
+
+=head1 SETUP
+
+
+
+=head1 SEE ALSO
+
+http://sourceforge.net/projects/webdao, HTML::WebDAO
+
+=head1 AUTHOR
+
+Zahatski Aliaksandr, E<lt>zag@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2003-2008 by Zahatski Aliaksandr
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=cut

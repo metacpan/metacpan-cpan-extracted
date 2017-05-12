@@ -1,0 +1,9 @@
+1999-11-18  Jochen Wiedmann  <joe@ispsoft.de> (0.05)
+
+	* lib/HTML/EP/Glimpse.pm: Oops! Got the previous patch wrong. :-(
+
+1999-11-18  Jochen Wiedmann  <joe@ispsoft.de> (0.04)
+
+	* Glimpse.pm (_ep_glimpse_search): Fixed a bug in the use of
+	  glimpse_path. Frank Ridderbusch <frank.ridderbusch@pdb.siemens.de>
+

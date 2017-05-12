@@ -1,0 +1,58 @@
+HTML::WikiConverter::MediaWiki
+==============================
+
+HTML::WikiConverter::MediaWiki adds the MediaWiki dialect to
+HTML::WikiConverter allowing conversion from HTML to MediaWiki markup.
+
+SYNOPSIS
+
+Converting HTML to wiki markup is easy:
+
+  use HTML::WikiConverter;
+  my $wc = new HTML::WikiConverter( dialect => 'MediaWiki' );
+  print $wc->html2wiki( $html );
+
+Or from the command line:
+
+  % html2wiki --dialect MediaWiki input.html > output.wiki
+
+There's also a web interface if you're so inclined:
+
+  http://toolserver.org/~diberri/cgi-bin/html2wiki/
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc HTML::WikiConverter::MediaWiki
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/HTML-WikiConverter-MediaWiki
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-WikiConverter-MediaWiki
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/HTML-WikiConverter-MediaWiki
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/HTML-WikiConverter-MediaWiki
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) David J. Iberri
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

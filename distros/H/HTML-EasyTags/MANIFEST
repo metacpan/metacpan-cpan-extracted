@@ -1,0 +1,6 @@
+ChangeLog
+lib/HTML/EasyTags.pm
+Makefile.PL
+MANIFEST
+ReadMe
+t/HTML-EasyTags.t

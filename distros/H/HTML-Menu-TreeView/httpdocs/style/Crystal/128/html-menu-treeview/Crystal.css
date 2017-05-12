@@ -1,0 +1,521 @@
+a.dropzone128{
+color:#000;
+cursor:pointer;
+font-family:verdana,sans-serif;
+font-size:90px;
+height:128px;
+vertical-align:top;
+background-color:#d6d2d0;
+}
+a.treeviewLink128 {
+color:#000;
+cursor:pointer;
+font-family:verdana,sans-serif;
+font-size:90px;
+height:128px;
+white-space:nowrap;
+vertical-align:top;
+}
+a.treeviewLink128:hover {
+color:blue;
+cursor:pointer;
+font-family:verdana,sans-serif;
+font-size:90px;
+height:128px;
+white-space:nowrap;
+vertical-align:top;
+}
+table.treeview128 {
+white-space:nowrap;
+color:#000;
+}
+td.captionBorder128 {
+border-bottom:1px;
+border-bottom-style:dashed;
+color:#000;
+font-family:verdana, sans-serif;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.clasicLastMinusNode128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/clasicLastMinusNode.gif');
+background-repeat:no-repeat;
+cursor:pointer;
+height:128px;
+vertical-align:top;
+}
+td.clasicLastPlusNode128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/clasicLastPlusNode.gif');
+background-repeat:no-repeat;
+cursor:pointer;
+height:128px;
+vertical-align:top;
+}
+td.clasicMinusNode128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/clasicMinusNode.gif');
+background-repeat:no-repeat;
+cursor:pointer;
+vertical-align:top;
+}
+td.clasicPlusNode128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/clasicPlusNode.gif');
+background-repeat:no-repeat;
+cursor:pointer;
+height:128px;
+vertical-align:top;
+}
+td.columnsFolder128,td.columnsNode128,td.columnsLastNode128,td.caption128 {
+font-family:verdana, sans-serif;
+font-size:90px;
+height:128px;
+white-space:nowrap;
+vertical-align:top;
+}
+td.columnsFolderBorder128,td.columnsNodeBorder128,td.columnsLastNodeBorder128 {
+border-left:1px;
+border-left-style:dashed;
+color:#000;
+font-family:verdana, sans-serif;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderClosed128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderCrystal128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_crystal_open.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderCrystalClosed128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_crystal.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderFavorite128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_favorite_open.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderFavoriteClosed128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_favorite.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderGray128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_grey_open.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderGrayClosed128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_grey.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderGreen128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_green_open.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderGreenClosed128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_green.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderHtml128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_html_open.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderHtmlClosed128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_html.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderImage128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_image_open.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderImageClosed128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_image.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderImportant128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_important_open.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderImportantClosed128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_important.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderLocked128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_locked_open.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderLockedClosed128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_locked.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderMan128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_man_open.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderManClosed128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_man.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folder128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_open.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+}
+td.folderOrange128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_orange_open.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderOrangeClosed128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_orange.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderPrint128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_print_open.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderPrintClosed128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_print.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderRed128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_red_open.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderRedClosed128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_red.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderSound128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_sound_open.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderSoundClosed128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_sound.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderTar128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_tar_open.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderTarClosed128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_tar.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderText128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_txt_open.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderTextClosed128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_txt.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+}
+td.folderVideo128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_video_open.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderVideoClosed128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_video.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderViolet128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_violet_open.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderVioletClosed128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_violet.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderYellow128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_yellow_open.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.folderYellowClosed128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/folder_yellow.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.lastMinusNode128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/lastMinusNode.gif');
+background-repeat:no-repeat;
+cursor:pointer;
+vertical-align:top;
+}
+td.lastNode128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/lastNode.gif');
+background-repeat:no-repeat;
+cursor:pointer;
+font-size:90px;
+height:128px;
+vertical-align:top;
+}
+td.lastPlusNode128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/lastPlusNode.gif');
+background-repeat:no-repeat;
+cursor:pointer;
+height:128px;
+vertical-align:top;
+}
+td.minusNode128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/minusNode.gif');
+background-repeat:no-repeat;
+cursor:pointer;
+vertical-align:top;
+}
+td.node128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/node.gif');
+background-repeat:repeat-y;
+cursor:pointer;
+font-size:90px;
+height:128px;
+text-align:left;
+white-space:nowrap;
+vertical-align:top;
+}
+td.plusNode128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/plusNode.gif');
+background-repeat:no-repeat;
+cursor:pointer;
+vertical-align:top;
+}
+td.submenuDeco128 {
+background-image:url('/style/Crystal/128/html-menu-treeview/vertLine.gif');
+background-repeat:repeat-y;
+}
+tr.trOver{
+color:black;
+background-color:#d4d0c8;
+}
+td.img{
+background-repeat:no-repeat;
+cursor:pointer;
+background-position:0px 0px;
+padding-left:130px;
+vertical-align: top;
+}

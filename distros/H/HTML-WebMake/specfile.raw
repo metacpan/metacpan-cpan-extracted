@@ -1,0 +1,75 @@
+# This is the spec file for building WebMake RPM's.  Note that if you are
+# reading this as "specfile.raw", it is processed by 'build/mkrpm', which
+# substitutes in the correct version number instead of the __ VERSION __ token
+# below.
+
+%define ver      __VERSION__
+%define rel      1
+%define prefix   /usr
+%define siteperldir %{prefix}/lib/perl5/site_perl/5.6.0
+
+Name: WebMake
+Summary: a simple web site management system.
+Version: %ver
+Release: %rel
+Copyright: GPL
+
+Group: Applications/Internet
+URL: http://webmake.taint.org/
+
+Source: http://webmake.taint.org/released/HTML-WebMake-%{ver}.tar.gz
+BuildRoot: /tmp/webmake-%{ver}-root
+Packager: Justin Mason <jm@jmason.org>
+BuildArchitectures: noarch
+
+Requires: perl >= 5.6
+Prefix: /usr
+
+%description
+
+WebMake is a simple web site management system, allowing an entire site to be
+created from an optional set of text and markup files and one WebMake file.
+
+It requires no dynamic scripting capabilities on the server; WebMake sites can
+be deployed to a plain old FTP site without any problems.
+
+It allows the separation of responsibilities between the content editors, the
+HTML page designers, and the site architect; only the site architect needs to
+edit the WebMake file itself, or know perl or WebMake code.
+
+WebMake requires Perl 5.  This RPM requires Perl 5.6.
+
+%prep
+%setup -n HTML-WebMake-%{ver}
+
+%build
+perl Makefile.PL
+make
+
+%install
+rm -rf $RPM_BUILD_ROOT
+mkdir $RPM_BUILD_ROOT
+make PREFIX=$RPM_BUILD_ROOT/usr install
+
+%clean
+[ "$RPM_BUILD_ROOT" != / ] && rm -rf $RPM_BUILD_ROOT
+
+%post
+
+%postun
+
+%files
+%defattr(-,root,root)
+
+%{prefix}/bin/webmake
+%{prefix}/bin/webmake_cvs_import
+%{prefix}/share/man/man1/webmake.1.gz
+
+%{siteperldir}/HTML/WebMake/*
+
+%doc	README Changes TODO LICENSE MANIFEST MANIFEST.SKIP
+%doc	doc/*
+%doc	webmake.vim
+%doc	webmake.cgi
+%doc	wmblog
+

@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Template.pm
+t/1.t
+example/plain.tmpl

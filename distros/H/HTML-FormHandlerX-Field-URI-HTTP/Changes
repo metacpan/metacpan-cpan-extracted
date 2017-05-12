@@ -1,0 +1,17 @@
+Revision history for Perl module HTML::FormHandlerX::Field::URI::HTTP
+
+0.4 2013-10-24
+
+    * Added Changes file (thanks to Neil Bowers, neilbowers@github).
+    * Improved documentation with an example.
+
+0.3 2013-10-23
+
+    * Fixed a test bug preventing module from installation.
+
+0.2 2012-04-09
+
+0.1 2012-04-08
+
+    * First release to CPAN
+

@@ -1,0 +1,27 @@
+Please also read the MIGRATING file of HTML::FormEngine, this file
+only tells you the HTML::FormEngine::DBSQL related changes that you
+have to do in your scripts when migrating from version < 1.0 to
+version >= 1.0.  Its possible that i forgot something, so if you
+experience problems tell me about it.
+
+First of all you have to replace every occurance of
+'HTML::FormEngine::DBSQL::PGSQL' with 'HTML::FormEngine::DBSQL',
+resp. remove it since the PGSQL package doesn't exist
+anymore. HTML::FormEngine::DBSQL now uses perls DBI database
+abstraction to be compatible to all databases that are supported by
+DBI. Unfortunately HTML::FormEngine::DBSQL was only tested with
+PostgreSQL, please tell me about your experience with other DBMS.
+
+$form is the HTML::FormEngine::DBSQL object, on the left side of the
+'=>' is the old versions command, on the right is written what you
+have to put instead in the new version.
+
+$form->dbsql_set_secret('mysecret')  =>  $form->get_skin_obj()->set_dbsql_secret('mysecret')
+
+$form->dbsql_set_show_default(0) => $form->dbsql_set_show_default(0); $form->dbsql_set_write_null_fields(2) (read POD!!)
+
+Instead of calling 'get_skin_obj()' you can create a new skin object,
+call the needed methods on it and set it with 'set_skin_obj()'.
+
+Normaly its better to use the dbsql_hidden template instead of the
+hidden template.

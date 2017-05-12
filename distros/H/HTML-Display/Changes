@@ -1,0 +1,17 @@
+0.40 - 20130626
+    * Adress RT #86431 - tempfile() receiving "undef" as template parameter
+      throws a warning in some versions of File::Temp.
+
+v0.39 - 20071020
+    * Added LICENSE and AUTHOR information, thanks to David Paleino for
+      pointing out that it was missing.
+    * Fix test failure when $ENV{PERL_HTML_DISPLAY_CLASS} was set
+      Test failure reported by Slaven Rezic
+    . No library changes, no need to upgrade
+    
+v0.38 - 20070906
+    * Add missing prerequisite of HTML::TokeParser::Simple
+
+v0.37 - 20070905
+    * Spun off as a separate distribution
+    * Co-maintainer is DAXIM

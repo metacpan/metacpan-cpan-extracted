@@ -1,0 +1,50 @@
+HTML::ExtractMain
+
+HTML::ExtractMain takes HTML content, and extracts the HTML section
+representing the main body of the page, skipping headers, footers,
+navigation, etc.
+
+HTML::ExtractMain's Readability algorithm is ported from Arc90's
+JavaScript-based Readability application, online at
+http://lab.arc90.com/experiments/readability/
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc HTML::ExtractMain
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-ExtractMain
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/HTML-ExtractMain
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/HTML-ExtractMain
+
+    Search CPAN
+        http://search.cpan.org/dist/HTML-ExtractMain/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009-2010 Anirvan Chatterjee http://www.chatterjee.net/
+Copyright (C) 2013 Rupert Lane http://www.rupert-lane.org/
+Copyright (C) 2013 kryde https://github.com/kryde
+
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

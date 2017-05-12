@@ -1,0 +1,30 @@
+HTML-TreeBuilder-XPath 
+===================================
+
+Extension to HTML::TreeBuilder that adds an XPath engine to HTML::TreeBuilder
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  HTML::TreeBuilder
+  XML::XPathEngine
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006-2011 by Michel Rodriguez
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,21 @@
+Revision history for Perl extension HTML::EscapeEvil::AllowAll.
+
+0.05  Wed Jul 26 02:35:00 2006
+    - added allow tag <basefont>, <frameset>, <nobr>
+    - changed not include File::Basename, File::Spec, YAML
+    - delete _read_yaml private method
+    - added _init create tag mapping
+
+0.04  Sun May 14 12:16:51 2006
+    - add allow tag <embed>,<iframe> tag in AllowTagsDetails.yaml
+
+0.03  Sun May 14 03:22:14 2006
+    - executing perltidy
+
+0.02  Sat Apr 01 23:00:00 2006
+    - added allow tag <s>,<strike>,<label> tag in AllowTagsDetails.yaml
+
+0.01  Thu Mar 30 21:51:24 2006
+	- original version; created by h2xs 1.23 with options
+		-A -X -n HTML::EscapeEvil::AllowAll
+

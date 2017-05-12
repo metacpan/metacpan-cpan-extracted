@@ -1,0 +1,6 @@
+MANIFEST
+README
+Changes
+Makefile.PL
+lib/HTML/LoL.pm
+test.pl

@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:               HTML-WikiConverter-MediaWiki
+version:            0.59
+abstract:           Convert HTML to MediaWiki markup
+author:
+    - David J. Iberri <diberri@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    HTML::WikiConverter:  0.63
+    Test::More:           0
+    URI:                  1.35
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

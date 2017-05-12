@@ -1,0 +1,20 @@
+<H1> test_var1 </H1>
+------------------ <br>
+<bar Name>
+
+VAR1 step1
+
+VAR1 VAR1  step3 VAR1   VAR2 step5 VAR3 step6 VAR10 step7
+<BR> VAR10 step8  VAR10 step9
+
+VAR1 step10
+
+test 1 passed. ':)
+
+template tags could be decorated as html comments
+test 2 passed. ':)
+
+template tags could also be decorated as xml (starting from version 0.90)
+VAR1 no trailing slash here.
+----- end ------- <br>
+<H1> end test_var1 </H1>

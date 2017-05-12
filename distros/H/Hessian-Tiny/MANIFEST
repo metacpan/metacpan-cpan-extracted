@@ -1,0 +1,17 @@
+Build.PL
+Changes
+MANIFEST
+README
+ignore.txt
+lib/Hessian/Tiny/Client.pm
+lib/Hessian/Tiny/ConvertorV1.pm
+lib/Hessian/Tiny/ConvertorV2.pm
+lib/Hessian/Tiny/Type.pm
+t/00-load.t
+t/boilerplate.t
+t/client-caucho.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.yml

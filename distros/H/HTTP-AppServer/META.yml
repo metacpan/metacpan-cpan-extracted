@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name:                HTTP-AppServer
+version:             0.04
+abstract:            Pure-Perl web application server framework
+license:             ~
+author:              
+    - Tom Kirchner <tom@tkirchner.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Data::Dumper:                  0
+    Data::UUID:                    0
+    DBI:                           0
+    HTTP::Server::Simple::CGI:     0
+    IO::File:                      0
+    JSON:                          0
+    MIME::Base64:                  0
+    Path::Trim:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

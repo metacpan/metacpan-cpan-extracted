@@ -1,0 +1,72 @@
+--- #YAML:1.0
+name: HTTPD-ADS
+version: 0.8
+author:
+  - ~
+abstract: |-
+  Perl module for Abuse Detection and Prevention System
+license: gpl
+requires:
+  CGI::Carp: 1.26
+  CLASS: 0.91
+  Class::Accessor: 0.18
+  Class::Constructor: 1.1.3
+  Class::DBI: 0.94
+  Class::DBI::AbstractSearch: 0.03
+  Class::DBI::Pg: 0.03
+  Compress::Zlib: 1.22
+  DBD::Pg: 1.31
+  Date::Calc: 5.3
+  HTTP::Date: 1.46
+  HTTPD::Log::Filter: 1.07
+  IO::Socket::UNIX: 1.20
+  IO::Zlib: 1.01
+  IPC::Cmd: 0.04
+  Net::IP::Route::Reject: 0.3
+provides:
+  HTTPD::ADS:
+    file: lib/HTTPD/ADS.pm
+    version: 0.8
+  HTTPD::ADS::AbuseNotify:
+    file: lib/HTTPD/ADS/AbuseNotify.pm
+    version: 0.1
+  HTTPD::ADS::Blacklist:
+    file: lib/HTTPD/ADS/DBI.pm
+    version: 0.6
+  HTTPD::ADS::Blocker:
+    file: lib/HTTPD/ADS/Blocker.pm
+    version: 0.1
+  HTTPD::ADS::DBI:
+    file: lib/HTTPD/ADS/DBI.pm
+    version: 0.6
+  HTTPD::ADS::Eventrecords:
+    file: lib/HTTPD/ADS/DBI.pm
+    version: 0.6
+  HTTPD::ADS::Hosts:
+    file: lib/HTTPD/ADS/DBI.pm
+    version: 0.6
+  HTTPD::ADS::OpenProxyDetector:
+    file: lib/HTTPD/ADS/OpenProxyDetector.pm
+    version: 0.2
+  HTTPD::ADS::Request_strings:
+    file: lib/HTTPD/ADS/DBI.pm
+    version: 0.6
+  HTTPD::ADS::Times:
+    file: lib/HTTPD/ADS/Times.pm
+    version: 0.1
+  HTTPD::ADS::Usernames:
+    file: lib/HTTPD/ADS/DBI.pm
+    version: 0.6
+  HTTPD::ADS::Whitelist:
+    file: lib/HTTPD/ADS/DBI.pm
+    version: 0.6
+  HTTPD::ADS::notice_templates:
+    file: lib/HTTPD/ADS/DBI.pm
+    version: 0.6
+  HTTPD::ADS::notified:
+    file: lib/HTTPD/ADS/DBI.pm
+    version: 0.6
+  HTTPD::ADS::proxy_tested:
+    file: lib/HTTPD/ADS/DBI.pm
+    version: 0.6
+generated_by: Module::Build version 0.24

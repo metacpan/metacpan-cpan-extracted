@@ -1,0 +1,47 @@
+NAME
+
+HTML::Pager - Perl module to handle CGI HTML paging of arbitary data
+
+DESCRIPTION 
+
+This module handles the paging of data coming from an arbitrary source
+and being displayed using HTML::Template and CGI.pm.  It
+provides an interface to pages of data similar to many well-known
+sites, like altavista.digital.com or www.google.com.
+
+This module uses HTML::Templateto do all its HTML
+generation.  While it is possible to use this module without directly
+using HTML::Template, it's not very useful.  Modification
+of the look-and-feel as well as the functionality of the resulting
+HTML should all be done through HTML::Template objects.  Take a look
+at the the HTML::Template perldocs for more info.
+
+This module is licenced under the GPL.  See the LICENSE section
+below for more details.
+
+DOCUMENTATION 
+
+Please see the perldocs for documentation.  It's much more up-to-date
+and informative than this README!
+
+LICENSE
+
+HTML::Pager : A Perl module to handle CGI HTML paging of arbitary data
+Copyright (C) 1999 Sam Tregar (sam@tregar.com)
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+USA
+
+

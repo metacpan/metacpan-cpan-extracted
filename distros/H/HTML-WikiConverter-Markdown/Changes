@@ -1,0 +1,42 @@
+# Revision history for HTML::WikiConverter::Markdown
+date: 5 Aug 2014
+version: 0.06
+changes:
+  - (bug #97384) Quote inline link titles
+  - (bug #97385) Support heading IDs
+  - (bug #97450) Support PRE and DIV
+  - (bug #56769) Add newline after <br />
+  - Add support for MarkDown Extra table & dl extensions.
+
+date: 2009-03-16
+version: 0.05
+changes:
+  - requires HTML::WikiConverter 0.67
+  - (bug #43997) properly handles multiline code blocks
+
+date: 2009-03-13
+version: 0.04
+changes:
+  - correct handling of blockquotes containing only phrasal elements
+  - (bug #43988) properly escape backticks within code tags
+  - (bug #43993) don't escape underscores within code tags
+  - (bug #43996) decode specific html entities within code tags
+
+date: 2008-11-14
+version: 0.03
+changes:
+  - (bug #40914) require H::WC 0.63
+  - add perl license to Makefile.PL
+  - add more comprehensive test
+  - tighten pod-coverage.t loose ends
+
+date: 2006-07-20
+version: 0.02
+changes:
+  - require H::WC 0.60
+  - add attribute types
+
+date: 2006-07-07
+version: 0.01
+changes:
+  - initial release (fulfill feature request: bug #18111)

@@ -1,0 +1,805 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Beau E. Cox &gt; HOWTO Run Mason with mod_perl2</title>
+<link rel="stylesheet" href="pod.css" type="text/css" />
+<link rev="made" href="mailto:root@cathy.beaucox.com" />
+</head>
+
+<body>
+<table class="hdrtable" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td>Beau E. Cox &gt; HOWTO Run Mason with mod_perl2</td></tr></table>
+
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#prerequisites">PREREQUISITES</a></li>
+	<li><a href="#warning__perl_5_8_2">WARNING: PERL 5.8.2</a></li>
+	<li><a href="#configuration">CONFIGURATION</a></li>
+	<ul>
+
+		<li><a href="#all_configuration_in_the__httpd_conf__file">All Configuration in the 'httpd.conf' File</a></li>
+		<li><a href="#configuration_with_scripts">Configuration with Scripts</a></li>
+		<ul>
+
+			<li><a href="#httpd_conf">httpd.conf</a></li>
+			<li><a href="#startup2_pl">startup2.pl</a></li>
+			<li><a href="#apachehandler2_pm">ApacheHandler2.pm</a></li>
+		</ul>
+
+	</ul>
+
+	<li><a href="#stress_testing">STRESS TESTING</a></li>
+	<ul>
+
+		<li><a href="#stress_pl">stress.pl</a></li>
+		<li><a href="#httpdmem_pl">httpd-mem,pl</a></li>
+	</ul>
+
+	<li><a href="#mod_perl2_all_the_way">mod_perl2 ALL THE WAY</a></li>
+	<li><a href="#don_t">DON'T</a></li>
+	<li><a href="#do">DO</a></li>
+	<li><a href="#todo">TODO</a></li>
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="name">NAME</a><a name="__H1_1__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+</tr></table>
+<p>HTML::Mason::ApacheHandler2 - experimental (alpha) Mason/mod_perl2 interface</p>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="synopsis">SYNOPSIS</a><a name="__H1_2__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_1__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;NAME</td>
+</tr></table>
+<pre>
+    use HTML::Mason::ApacheHandler2;
+ 
+    my $ah = HTML::Mason::ApacheHandler2-&gt;new (..name/value params..);
+    ...
+    sub handler {
+       my $r = shift;
+       $ah-&gt;handle_request($r);
+    }</pre>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="description">DESCRIPTION</a><a name="__H1_3__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_2__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;SYNOPSIS</td>
+</tr></table>
+<p><strong>HTML::Mason::ApacheHandler2 is highly experimental ( alpha ) and
+should only be used in a test environment.</strong></p>
+<p>HTML::Mason::ApacheHandler2 was written to allow Mason to run in
+a 'pure' mod_perl2/Apache2 environment using the mod_perl2 native
+request structure as implemented by libapreq2. As such, this module
+is highly experimental and definitely not-ready-for-prime-time. This
+is an unofficial release, not supported by the Mason group. If you
+want to use this module in a testing environment, please address
+problems, issues, comments, and improvements to me, not Mason.</p>
+<p>When deciding to port Mason to mod_perl2 I took the approach to add
+<code>Module(s)</code> rather than patching core Mason modules. Upon investigation
+I discovered that all the Apache 'glue' code in Mason was contained in
+HTML::Mason::ApacheHandler. Therefore, I renamed and modified that
+module to create HTML::Mason::ApacheHandler2.</p>
+<p>The actual changes I made can be found in the distribution in
+<strong>diff/ApacheHandler.diff</strong> ( made with 'diff -Naru' ... ).</p>
+<p>As a result of my approach, you may install the normal Mason ( &gt;= 1.25 ),
+the modules in <a href="#prerequisites">PREREQUISITES</a> below, and this module. After configuring
+( see <a href="#configuration">CONFIGURATION</a> below ), you're ready to play.</p>
+<p>The ApacheHandler2 object links Mason to mod_perl2, running components in
+response to HTTP requests. It is controlled primarily through
+parameters to the <code>new()</code> constructor.</p>
+<p><code>handle_request()</code> is not a user method, but rather is called from the
+HTML::Mason::handler() routine in handler.pl.</p>
+<p>HTML::Mason::ApacheHandler2 is a modified copy of the standard
+HTML::Mason::ApacheHandler. ApacheHandler2 <strong>MUST</strong> be used with mod_perl2.</p>
+<p>You may, however, run Mason with Apache2/mod_perl2 without ApacheHandler2
+(see my rather dated mini-HOWTO at
+<a href="http://beaucox.com/mason/mason-with-apmp2-mini-HOWTO.htm">http://beaucox.com/mason/mason-with-apmp2-mini-HOWTO.htm</a>), but you then
+use use 'CGI' requests rather than the native
+'mod_perl' requests.</p>
+<p>The interface is the same as ApacheHandler's, Please refer to
+<a href="/mason/docs/HTML/Mason.html">the HTML::Mason manpage</a>, <a href="/mason/docs/HTML/Mason/ApacheHandler.html">the HTML::Mason::ApacheHandler manpage</a>, and
+<a href="http://masonhq.com/docs/manual/Admin.html">http://masonhq.com/docs/manual/Admin.html</a>.</p>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="prerequisites">PREREQUISITES</a><a name="__H1_4__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_3__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;DESCRIPTION</td>
+</tr></table>
+<p>You must have the following packages installed:</p>
+<pre>
+    perl            =&gt; 5.8.0
+    mod_perl        =&gt; 1.9910
+    HTML::Mason     =&gt; 1.25
+    libapreq2       =&gt; 2.02-dev</pre>
+<p>Please refer to the packages' documentation for instructions.</p>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="warning__perl_5_8_2">WARNING: PERL 5.8.2</a><a name="__H1_5__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_4__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;PREREQUISITES</td>
+</tr></table>
+<p>If you are using perl 5.8.2 you may get a series of errors
+in the http/error_log such as:</p>
+<pre>
+    Attempt to free unreferenced scalar: SV 0x405e6e78
+     at /usr/lib/perl5/site_perl/5.8.2/HTML/Mason/Request.pm line 160.
+    ...
+    [Fri Jan 30 09:41:58 2004] [error] [client 207.175.219.202]
+     Attempt to free unreferenced scalar: SV 0x405e6e78
+     at /usr/lib/perl5/site_perl/5.8.2/i686-linux-thread-multi/
+     Apache/Cookie.pm line 67.
+  
+    Stack:
+      [/usr/lib/perl5/site_perl/5.8.2/HTML/Mason/ApacheHandler2.pm:892]
+      [/usr/lib/perl5/site_perl/5.8.2/HTML/Mason/ApacheHandler2.pm:801]
+      [/srv/www/perl/MyApache/Mason/ApacheHandler2.pm:86]
+      [-e:0]</pre>
+<p>which may return a 500 Internal Server Error to the user.</p>
+<p>There was a bug introduced in perl 5.8.2 and fixed in 5.8.3, which affects 
+some XS modules running under a threaded mpm mod_perl 2.0 (or any ithreads 
+perl application). The affected modules can be fixed, to avoid this problem, 
+by using the PERL_NO_GET_CONTEXT macro in the XS code (see the perlguts 
+manpage for more information). So you need to check whether a newer version of 
+the module is available. If not you need to upgrade to perl 5.8.3 or higher 
+and the problem will go away.</p>
+<p>When I had these problems, I ended up
+upgrading to 5.8.3 and <strong>recompiling EVERY CPAN module I use and
+remaking mod_perl2</strong>. You may have to do the same thing.</p>
+<p>I don't know if there are similar problems in 5.8.0 or 5.8.1,
+but I gather the problem is mainly manifested in 5.8.2.</p>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="configuration">CONFIGURATION</a><a name="__H1_6__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_5__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;WARNING: PERL 5.8.2</td>
+</tr></table>
+<p>ApacheHandler2 provides a way for Mason to use the pure mod_perl2 request
+interface (libapreq2). <strong>THIS MODULE IS EXPERIMENTAL. PLEASE USE FOR
+TESTING ONLY UNTIL IT HAS PASSED THE TEST OF TIME.</strong> Having given that
+dire warning, I have been using it on my personal site and one of the
+sites I administer since mid January, 2004. It _seems_ to work fine.</p>
+<p>Configuring your Mason system may be done in many different ways;
+please refer to the Mason documentation, specifically, the Administrator's
+manual at
+<a href="http://masonhq.com/docs/manual/Admin.html">http://masonhq.com/docs/manual/Admin.html</a>.</p>
+<p>This section gives several sample configurations to get you started and
+notes the special configuration parameters that are
+<strong>required</strong> for this module's operation with the native mod_perl2 interface.</p>
+<p>All of the sample configuration files and scripts below can be
+found in the <strong>eg/</strong> subdirectory of this distribution.</p>
+<p>
+</p>
+<table class="h2table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr>
+<td><a name="all_configuration_in_the__httpd_conf__file">All Configuration in the 'httpd.conf' File</a><a name="__H2_1__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_6__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;CONFIGURATION</td>
+</tr></table>
+
+<p>The sample httpd.conf file may be found at <strong>eg/httpd-mason-simple.conf</strong>.
+You must, of course, change all path names below to suit your particular
+installation.</p>
+<p>First, load the necessary mod_perl2 modules:</p>
+<pre>
+    LoadModule perl_module /usr/apache2/lib/apache/mod_perl.so
+    LoadModule apreq_module /usr/apache2/lib/apache/mod_apreq.so
+    LoadModule cgid_module /usr/apache2/lib/apache/mod_cgid.so</pre>
+<p>mod_perl2 is loaded as in the past. libapreg2 - the new mod_perl2-native
+request and cookie interface is loaded next. cgid is the optional
+CGI daemon module.</p>
+<p>Next, load the modules your system requires:</p>
+<pre>
+    PerlModule Apache2
+    PerlSwitches -I/usr/local/test/httpd/perl
+    PerlModule Apache::Request
+    PerlModule Apache::Cookie
+    ...</pre>
+<p>'PerlModule' is the configuration file syntax for perl's 'use';
+trim this list to suit your system (and conserve memory). The
+'PerlSwitches' directive prepends the specified directory to
+perl's @INC array;</p>
+<p>Setup the perl directory for your site:</p>
+<pre>
+    Alias /perl/ /usr/local/test/httpd/perl/
+    &lt;Location /perl/&gt;
+      SetHandler perl-script
+      PerlResponseHandler ModPerl::Registry
+      PerlOptions +ParseHeaders
+      Options +ExecCGI
+    &lt;/Location&gt;</pre>
+<p>Now, configure Mason. First add the following perl variables
+<strong>which are required</strong> for the operation of ApacheHandler2:</p>
+<pre>
+    PerlSetVar _MasonUser wwwrun
+    PerlSetVar _MasonGroup nogroup
+    PerlSetVar _MasonDefaultDocumentRoot &quot;/usr/local/test/httpd/htdocs&quot;</pre>
+<p>'_MasonUser' and '_MasonGroup' specify the user/group under which
+Apache runs; they <strong>must</strong> be the same as specified int the normal
+'User' and 'Croup' directives earlier in your configuration file
+(this change was made necessary because $s-&gt;uid and $s-&gt;gid are
+not supported in mod_perl2
+- see <a href="http://perl.apache.org/docs/2.0/user/porting/compat.html#C__s_E_gt_uid_">http://perl.apache.org/docs/2.0/user/porting/compat.html#C__s_E_gt_uid_</a>).</p>
+<p>'_MasonDefaultDocumentRoot' is required because the configuration
+directives are not available during server startup in mod_perl2.
+It should specify the 'DocumentRoot' directory specified earlier in
+your configuration file.</p>
+<p>You may (optionally) pre-load any modules your Mason modules may
+require here - see
+<a href="http://masonhq.com/docs/manual/Admin.html#external_modules">http://masonhq.com/docs/manual/Admin.html#external_modules</a>.
+The '&lt;Perl&gt;...&lt;/Perl&gt;' directives are used because
+this modules must be loaded within the HTML::Mason::Commands name space.</p>
+<pre>
+    &lt;Perl&gt;
+    {
+        package HTML::Mason::Commands;
+        use Apache::Const -compile =&gt; ':common';
+        ...
+    }
+    &lt;/Perl&gt;</pre>
+<p>Finally, here is an example of a virtual host:</p>
+<pre>
+    Listen 12984
+    NameVirtualHost localhost:12984
+ 
+    # for general testing - default - on localhost
+ 
+    # site: bctest
+    &lt;VirtualHost localhost:12984&gt;
+      ServerName bctest.beaucox.com
+      DocumentRoot &quot;/usr/local/test/httpd/htdocs/bctest&quot;
+      PerlSetVar MasonCompRoot /usr/local/test/httpd/htdocs/bctest
+      PerlSetVar MasonDataDir  /usr/local/test/httpd/mason/bctest
+      PerlSetVar MasonRequestClass          MasonX::Request::WithApacheSession2
+      PerlSetVar MasonSessionAllowInvalidId yes
+      PerlSetVar MasonSessionCookieName     beaucox-bctest-cookie
+      PerlSetVar MasonSessionCookieDomain   .beaucox.com
+      PerlSetVar MasonSessionCookieExpires  +7d
+      PerlSetVar MasonSessionClass          Apache::Session::MySQL
+      PerlSetVar MasonSessionDataSource     dbi:mysql:bctest_sessions
+      PerlSetVar MasonSessionUserName       mysql
+      PerlSetVar MasonSessionPassword       mysql
+      PerlSetVar MasonSessionLockDataSource dbi:mysql:bctest_sessions
+      PerlSetVar MasonSessionLockUserName   mysql
+      PerlSetVar MasonSessionLockPassword   mysql
+      PerlSetVar MasonSessionUseCookie      yes
+      &lt;FilesMatch &quot;^_&quot;&gt;
+        SetHandler perl-script
+        PerlResponseHandler HTML::Mason::ApacheHandler2
+     &lt;/FilesMatch&gt;
+     &lt;Directory &quot;/usr/local/test/httpd/htdocs/bctest&quot;&gt;
+        &lt;FilesMatch &quot;\.html$|\.htm$&quot;&gt;
+          SetHandler perl-script
+          PerlResponseHandler HTML::Mason::ApacheHandler2
+        &lt;/FilesMatch&gt;
+      &lt;/Directory&gt;
+    &lt;/VirtualHost&gt;</pre>
+<p>In this example, the virtual host is using
+MasonX::Request::WithApacheSession2 (note the '2') - hence the
+'MasonSession...' directives. Either modify them
+for your own use ( see <a href="/mason/docs/MasonX/Request/WithApacheSession2.html">the MasonX::Request::WithApacheSession2 manpage</a> and
+<a href="/mason/docs/MasonX/Request/WithApacheSession.html">the MasonX::Request::WithApacheSession manpage</a> or omit them
+if you are not using the session module.
+For mod_perl2 compatibility,
+'PerlResponseHandler' is used instead of 'PerlHandler' - see
+<a href="http://perl.apache.org/docs/2.0/user/porting/compat.html#C_PerlHandler_">http://perl.apache.org/docs/2.0/user/porting/compat.html#C_PerlHandler_</a>.</p>
+<p>
+</p>
+<table class="h2table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr>
+<td><a name="configuration_with_scripts">Configuration with Scripts</a><a name="__H2_2__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_6__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;CONFIGURATION</td>
+</tr></table>
+
+<p>In this example, you must manage the http.conf file and two
+perl scripts; you gain superior flexibility in exchange for a little
+elbow grease.</p>
+<p>
+</p>
+<table class="h3table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr>
+<td><a name="httpd_conf">httpd.conf</a><a name="__H3_1__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H2_2__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;Configuration with Scripts</td>
+</tr></table>
+
+<p>Here are the relevant sections of the httpd.conf file
+(the complete configuration file may be found at <strong>eg/httpd-mason.conf</strong>):</p>
+<pre>
+    LoadModule perl_module /usr/apache2/lib/apache/mod_perl.so
+    LoadModule apreq_module /usr/apache2/lib/apache/mod_apreq.so
+    LoadModule cgid_module /usr/apache2/lib/apache/mod_cgid.so</pre>
+<p>Nothing new here, same as the configuration-file-only example above;</p>
+<pre>
+    PerlSetEnv MOD_PERL_INC     &quot;/usr/local/test/httpd/perl&quot;
+    PerlRequire &quot;/usr/local/test/httpd/conf/startup2.pl&quot;</pre>
+<p>The 'PerlSetEnv' directive is used so the startup scripts can be written
+without any 'hard' path dependences. The 'PerlRequire' runs the actual startup
+script whose name and location are of your choosing.</p>
+<pre>
+    Alias /perl/ /usr/local/test/httpd/perl/
+    &lt;Location /perl/&gt;
+      SetHandler perl-script
+      PerlResponseHandler ModPerl::Registry
+      PerlOptions +ParseHeaders
+      Options +ExecCGI
+    &lt;/Location&gt;</pre>
+<p>Setup you perl directory as shown in the previous section.</p>
+<p>Now to Mason:</p>
+<pre>
+    PerlSetVar _MasonUser wwwrun
+    PerlSetVar _MasonGroup nogroup
+    PerlSetVar _MasonDefaultDocumentRoot &quot;/usr/local/test/httpd/htdocs&quot;</pre>
+<p>The same as described in the previous section.</p>
+<pre>
+    PerlSetEnv MASON_COMP_ROOT  &quot;/usr/local/test/httpd/htdocs&quot;
+    PerlSetEnv MASON_DATA_ROOT  &quot;/usr/local/test/httpd/mason&quot;
+    PerlSetEnv MASON_SITES              &quot;bctest:masontest&quot;</pre>
+<p>We will see below how thews environment variables are used int the scripts
+below.</p>
+<p>Finally, here is a sample virtual host:</p>
+<pre>
+    Listen 12984
+    NameVirtualHost localhost:12984
+ 
+    # for general testing - default - on localhost
+ 
+    &lt;VirtualHost localhost:12984&gt;
+      ServerName bctest.beaucox.com
+      DocumentRoot &quot;/usr/local/test/httpd/htdocs/bctest&quot;
+      PerlSetVar mason_site 'bctest'
+      &lt;FilesMatch &quot;^_&quot;&gt;
+        SetHandler perl-script
+        PerlResponseHandler MyApache::Mason::ApacheHandler2
+      &lt;/FilesMatch&gt;
+      &lt;Directory &quot;/usr/local/test/httpd/htdocs/bctest&quot;&gt;
+        &lt;FilesMatch &quot;\.html$|\.htm$&quot;&gt;
+          SetHandler perl-script
+          PerlResponseHandler MyApache::Mason::ApacheHandler2
+        &lt;/FilesMatch&gt;
+      &lt;/Directory&gt;
+    &lt;/VirtualHost&gt;</pre>
+<p>Much like the virtual host described in the previous section, but
+much of the 'guts' are now filled in by the handler script below.
+Remember to specify 'PerlResponseHandler'.</p>
+<p>
+</p>
+<table class="h3table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr>
+<td><a name="startup2_pl">startup2.pl</a><a name="__H3_2__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H2_2__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;Configuration with Scripts</td>
+</tr></table>
+
+<p>Here is the sample 'startup2.pl' script
+(found at <strong>eq/startup2.pl</strong>):</p>
+<pre>
+    use Apache2 ();
+    use lib ( $ENV{MOD_PERL_INC} );
+    
+    use Apache::Request ();
+    use Apache::Cookie ();
+    use CGI ();
+    use CGI::Cookie ();
+    ...
+    use MyApache::Mason::ApacheHandler2 ();
+ 
+    1;</pre>
+<p>Again, the modules you require are pre-loaded ('use'), and the
+the perl @INC array is adjusted. See how the use of the
+environment variable 'MOD_PERL_INC' - set in the httpd.conf -
+allows this script to be path-independent.</p>
+<p>If you execute ('use') your Handler script here, the ApacheHandler2
+request objects are pre-loaded; otherwise they are loaded 'on the fly'.
+Refer the the discussion at
+<a href="http://masonhq.com/docs/manual/Admin.html#wrappers_with_virtual_hosts">http://masonhq.com/docs/manual/Admin.html#wrappers_with_virtual_hosts</a>.</p>
+<p>
+</p>
+<table class="h3table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr>
+<td><a name="apachehandler2_pm">ApacheHandler2.pm</a><a name="__H3_3__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H2_2__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;Configuration with Scripts</td>
+</tr></table>
+
+<p>Here is the sample 'MyApache::ApacheHandler2.pm' script. The full
+sample script may be found at <strong>eq/ApacheHandler2.pm</strong>. It should be
+installed under <strong>your-perl-directory/Mason/ApacheHandler2</strong> on your system;
+i.e:,
+in my case at: <strong>/usr/local/test/httpd/perl/Mason/ApacheHandler2.pm</strong>.</p>
+<pre>
+    #!/usr/bin/perl
+ 
+    package MyApache::Mason::ApacheHandler2;
+ 
+    use strict;
+    use warnings;</pre>
+<p>Pretty standard perl startup stuff.</p>
+<pre>
+    use Apache2 ();
+    use lib ( $ENV{MOD_PERL_INC} );
+ 
+    use Apache::Request ();
+    use Apache::Cookie ();
+    use CGI ();
+    use CGI::Cookie ();</pre>
+<p>Includes you may need;</p>
+<pre>
+    our %ah = ();</pre>
+<p>This is a global hash that will hold, one for each site,
+ApacheHandler2's.</p>
+<pre>
+    #   Mason w/Apache support
+    use HTML::Mason::ApacheHandler2;
+ 
+    #   Modules my components will use
+    {
+        package HTML::Mason::Commands;
+        
+        use Apache::Const -compile =&gt; ':common';
+        ...
+    }</pre>
+<p>Any includes you may want to pre-load for your Mason components.</p>
+<pre>
+    setup_sites();</pre>
+<p>This line, if present, will pre-load all the ApacheHandler2's (one for
+each site) at server startup time.</p>
+<p>Now to handle the request:</p>
+<pre>
+    #  actual request handler
+    sub handler
+    {
+      my ($r) = @_;
+ 
+      # DON'T allow internal components (starting with '_')
+      my $fn = $r-&gt;filename;
+      if ($fn =~ m{.*/(.*)} &amp;&amp; $1 &amp;&amp; $1 =~ /^_/) {
+        my $rip = $r-&gt;connection-&gt;remote_ip;
+        $r-&gt;log_error (&quot;attempt to access internal component: $fn remote ip: $rip\n&quot;);
+        return Apache::NOT_FOUND;
+      }</pre>
+<p>A check to prevent outside direct access to internal Mason components -
+in my system, components that start with '_'.</p>
+<pre>
+      # allow only text/xxx content type
+        return -1 if $r-&gt;content_type &amp;&amp; $r-&gt;content_type !~ m|^text/|i;</pre>
+<p>Skip Mason processing for non-text items (images, binary downloads, etc.)</p>
+<pre>
+      # find site and handler: dispatch request
+      my $site = $r-&gt;dir_config ('mason_site');
+ 
+      unless( $site ) {
+         $r-&gt;log_error (&quot;no 'mason_site' specified\n&quot;);
+         return Apache::NOT_FOUND;
+      }</pre>
+<p>If there is no site configured with 'PserSetVar mason_site xxx',
+you have boo-boo-ed and the request is logged and rejected. You could
+force a more noticeable alert, i.e. an email, if you really want to
+know when this happens, but you really should be able to prevent these
+error with adequate testing.</p>
+<pre>
+      unless( $ah{$site} ) {
+        setup_sites( $r, $site );
+        unless( $ah{$site} ) {
+          $r-&gt;log_error (&quot;no 'ah' found for 'mason_site' $site\n&quot;);
+          return Apache::NOT_FOUND;
+        }
+      }</pre>
+<p>Here we check the the ApacheHandler2 is loaded, and load it if not; Of that
+does not work, you've got problems.</p>
+<pre>
+      my $status = $ah{$site}-&gt;handle_request ($r);</pre>
+<p>Finally! The request is sent on it's way.</p>
+<pre>
+      # special error handling here (email, etc...)</pre>
+<p>You could check the status here and do extra fancy error reporting here...</p>
+<pre>
+      $status;
+    }</pre>
+<p>Return the status and exit.</p>
+<p>Now, here is where the ApacheHandler2 requests are loaded, either
+at startup time or on the fly.</p>
+<pre>
+    # set up an ApacheHandler2 for each site
+    sub setup_sites
+    {
+      my ( $r, $site ) = shift;
+      my @asites = ();
+      if( $site ) {
+        push @asites, $site;
+      } else {
+        my $sites = $ENV{MASON_SITES};
+        return unless $sites;
+        @asites = split /:/, $sites;
+      }
+      for my $site( @asites ) {
+        next if $ah{$site};
+        my @args =
+        (
+          args_method   =&gt; &quot;mod_perl&quot;,
+          comp_root     =&gt; $ENV{MASON_COMP_ROOT}.&quot;/$site&quot;,
+          data_dir      =&gt; $ENV{MASON_DATA_ROOT}.&quot;/$site&quot;,
+          error_mode    =&gt; 'output',
+          request_class =&gt;'MasonX::Request::WithApacheSession2',
+          session_allow_invalid_id =&gt; 'yes',
+          ...
+        );
+        push @args, $r if $r;
+        $ah{$site} = new HTML::Mason::ApacheHandler2( @args );
+      }
+    }
+ 
+    1;</pre>
+<p>If your sites ApacheHandler2s are being setup 'on-the-fly', this
+method is called as 'setup_sites( $r, $site );'. Only that site
+is loaded.</p>
+<p>On the other hand, if the sites are all loaded at server start as
+follows:</p>
+<p>The 'MASON_SITES' environment variable, set in the httpd.conf
+file, consists of a list of site names separated by ':'s. This trick
+is used so the sites served may be changed in one place, the
+httpd.conf file, without having to update this script too</p>
+<p>Note the use of the native mod_perl2 args_method: 'mod_perl'.
+Again, the environment variables set int the httpd.conf file are used her
+to keep this script path-independent.</p>
+<p>This example is using the session subclass 'MasonX::With::ApacheSession2';
+modify or omit these statements.</p>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="stress_testing">STRESS TESTING</a><a name="__H1_7__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_6__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;CONFIGURATION</td>
+</tr></table>
+<p>To see if your server works under load, you must do some stress testing.
+There are several Apache Test modules on CPAN, but if you are lazy
+( like me ), you may
+try my simple test scripts.</p>
+<p>
+</p>
+<table class="h2table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr>
+<td><a name="stress_pl">stress.pl</a><a name="__H2_3__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_7__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;STRESS TESTING</td>
+</tr></table>
+
+<p>A stress script is in the HTML::Mason::ApacheHandler2 distribution at
+<strong>scripts/stress.pl</strong>. This simple perl script, which requires LWP::UserAgent
+in libwww, repeatedly gets a uri on you server and checks the result.
+Usage:</p>
+<pre>
+    perl stress.pl &lt;uri-to-a-page-on-your-test-server&gt; [repeat-count]</pre>
+<p>If the repeat count is missing, the test is endless ( stop it with
+^C ).</p>
+<p>
+</p>
+<table class="h2table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr>
+<td><a name="httpdmem_pl">httpd-mem,pl</a><a name="__H2_4__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_7__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;STRESS TESTING</td>
+</tr></table>
+
+<p>To check for memory leaks, try <strong>scripts/httpd-mem.pl</strong>. This script finds
+all the processes running for your server and totals the memory usage
+using the '/proc/&lt;pid&gt;/status' pseudo-files. This script will only work on
+systems with the GNU-Linux /proc file system.</p>
+<p>Usage:</p>
+<pre>
+    perl httpd-mem.pl [id-for-ps]</pre>
+<p>Where [id-for-ps] is a string to select your test server pids from the
+ps aux command. The default is 'httpd -k'.</p>
+<p>Every two seconds a line is
+printed to the terminal and <strong>httpd-mem.log</strong>:</p>
+<pre>
+     VmData      VmExe      VmLck      VmLib      VmRSS     VmSize      VmStk
+    4297576      32248          0     524944    1479132    4904200       2784
+    4297576      32248          0     524944    1479132    4904200       2784
+    4297576      32248          0     524944    1479132    4904200       2784
+    ...</pre>
+<p>Check this output when running the stress test above to see if anything
+( especially VmSize ) is growing; that _may_ indicate a memory leak.</p>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="mod_perl2_all_the_way">mod_perl2 ALL THE WAY</a><a name="__H1_8__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_7__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;STRESS TESTING</td>
+</tr></table>
+<p>If you want to take the next step, making a pure mod_perl2 site,
+you should:</p>
+<dl>
+<dt><strong><a name="item_remake_and_install_mod_perl">remake and install mod_perl</a></strong><br />
+</dt>
+<dd>
+Disable global mod_perl backward compatibility by adding the
+'MP_COMPAT_1X=0' flag to 'Makefile.PL':
+</dd>
+<dd>
+<pre>
+ perl Makefile.PL MP_APXS=/where/ever MP_COMPAT_1X=0</pre>
+</dd>
+<dd>
+<p>This flag is ON by default.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_grep_your_site_for_apache_3a_3acompat">grep your site for Apache::compat</a></strong><br />
+</dt>
+<dd>
+Remove 'use Apache::compat' from all of your mod_perl modules; you may
+have to rework them to bring them up to speed. Stas and the guys
+at mod_perl have several excellent 1.x =&gt; 2.x porting documents,
+my personal favorite being
+<a href="http://perl.apache.org/docs/2.0/user/porting/compat.html">http://perl.apache.org/docs/2.0/user/porting/compat.html</a>.
+</dd>
+<p></p>
+<dt><strong><a name="item_update_your_http_2econf_file">update your http.conf file</a></strong><br />
+</dt>
+<dd>
+Once you have removed 1.x backward compatibility, you must bring
+your http.conf directives up to mod_perl2 standards as shown in
+<a href="http://perl.apache.org/docs/2.0/user/porting/compat.html#Configuration_Files_Porting">http://perl.apache.org/docs/2.0/user/porting/compat.html#Configuration_Files_Porting</a>.
+</dd>
+<dd>
+<p>Some of the changes you will have to make are:</p>
+</dd>
+<dd>
+<pre>
+    PerlHandler        =&gt; PerlResponseHandler.
+  
+    PerlSendHeader On  =&gt; PerlOptions +ParseHeaders
+    PerlSendHeader Off =&gt; PerlOptions -ParseHeaders
+ 
+    PerlSetupEnv On    =&gt; PerlOptions +SetupEnv
+    PerlSetupEnv Off   =&gt; PerlOptions -SetupEnv
+ 
+    PerlTaintCheck     =&gt; PerlSwitches -T
+    PerlWarn           =&gt; PerlSwitches -w
+ 
+    PerlFreshRestart   =&gt; is a mod_perl 1.0 legacy =&gt; see docs.</pre>
+</dd>
+<p></p></dl>
+<p>I found this to be a snap, but then I started coding with mod_perl2;
+I suppose the port could be a bear if you have a mature site with lots of
+1.x modules.</p>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="don_t">DON'T</a><a name="__H1_9__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_8__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;mod_perl2 ALL THE WAY</td>
+</tr></table>
+<dl>
+<dt><strong><a name="item_mix_and_match_normal_masonx_3a_3a_2e_2e_2e_modules">Mix and Match normal MasonX::... modules with HTML::Mason::ApacheHandler2</a></strong><br />
+</dt>
+<dd>
+Any MasonX... modules that use ( subclass ) HTML::Mason::ApacheHandler
+will <strong>NOT</strong> work in your pure mod_perl2 environment. Let me know ( or
+change them yourself ) when you want to use one I have not changed.
+</dd>
+<p></p>
+<dt><strong><a name="item_bother_the_mason_developers_with_questions_2c_etc_">Bother the Mason developers with questions, etc.</a></strong><br />
+</dt>
+<dd>
+HTML::Mason::ApacheHandler2 is unofficial and was written and is supported
+by me, not the Mason developers. Talk to me ( &lt;<a href="mailto:mason@beaucox.com">mason@beaucox.com</a>&gt; ).
+</dd>
+<p></p></dl>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="do">DO</a><a name="__H1_10__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_9__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;DON'T</td>
+</tr></table>
+<dl>
+<dt><strong><a name="item_try_it_21">Try it!</a></strong><br />
+</dt>
+<dd>
+Setup a test server and see if the pure mod_perl2 Mason works for you.
+</dd>
+<p></p>
+<dt><strong><a name="item_tell_me_what_you_think">Tell me what you think</a></strong><br />
+</dt>
+<dd>
+Let me know your reaction to this effort. I welcome comments, suggestions,
+bug reports, and, yes, even mild flames.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="todo">TODO</a><a name="__H1_11__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_10__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;DO</td>
+</tr></table>
+<dl>
+<dt><strong><a name="item_build_tests">Build tests</a></strong><br />
+</dt>
+<dd>
+Currently, there are no 'real' tests defined in 'make test'. I
+plan to design and build some. Until then, the testing is
+left to you. Sorry :)
+</dd>
+<p></p>
+<dt><strong><a name="item_continue_to_monitor_my_web_site_for_problems">Continue to monitor my web site for problems</a></strong><br />
+</dt>
+<dd>
+I am running this module at my web site ( <a href="http://beaucox.com">http://beaucox.com</a> ). I
+am continually monitoring the site logs and memory usage to catch
+and correct any bugs I find.
+</dd>
+<p></p>
+<dt><strong><a name="item_investigate_other_masonx_3a_3a_modules_that_may_ha">Investigate Other MasonX:: modules that may have to be converted</a></strong><br />
+</dt>
+<dd>
+The MasonX:: modules that currently tie to ApacheHandler must be reworked
+to operate with ApacheHandler2; I will attack those on demand. Please
+let me know.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="bugs">BUGS</a><a name="__H1_12__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_11__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;TODO</td>
+</tr></table>
+<p>Too early to tell; they are bound to come in as people give it a try.</p>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="author">AUTHOR</a><a name="__H1_13__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_12__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;BUGS</td>
+</tr></table>
+<p>Beau E. Cox &lt;<a href="mailto:mason@beaucox.com">mason@beaucox.com</a>&gt; <a href="http://beaucox.com">http://beaucox.com</a>.</p>
+<p>The real authors (I just made mod_perl2 changes) are the Mason crew, including:
+Jonathan Swartz &lt;<a href="mailto:swartz@pobox.com">swartz@pobox.com</a>&gt;,
+Dave Rolsky &lt;<a href="mailto:autarch@urth.org">autarch@urth.org</a>&gt;,
+Ken Williams &lt;<a href="mailto:ken@mathforum.org">ken@mathforum.org</a>&gt;.</p>
+<p>Version 0.01 as of January, 2004.</p>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="see_also">SEE ALSO</a><a name="__H1_14__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_13__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;AUTHOR</td>
+</tr></table>
+<p>My documents, including:
+<a href="/mason/docs/./ApacheHandler2.html">HTML::Mason::ApacheHandler2</a>,
+<a href="/mason/docs/./WithApacheSession2.html">MasonX::Request::WithApacheSession2</a>,
+<a href="/mason/docs/./WithMultiSession2.html">MasonX::Request::WithMultiSession2</a>,</p>
+<p>Original Mason documents, including:
+<a href="/mason/docs/./ApacheHandler.html">HTML::Mason::ApacheHandler</a>,
+<a href="/mason/docs/./WithApacheSession.html">MasonX::Request::WithApacheSession</a>,
+<a href="/mason/docs/./WithMultiSession.html">MasonX::Request::WithMultiSession</a>.</p>
+<p>Also see the Mason documentation at <a href="http://masonhq.com/docs/manual/">http://masonhq.com/docs/manual/</a>.</p>
+<table class="hdrtable" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td>Beau E. Cox &gt; HOWTO Run Mason with mod_perl2</td></tr></table>
+
+
+</body>
+
+</html>

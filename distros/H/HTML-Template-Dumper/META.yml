@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name: HTML-Template-Dumper
+version: 0.1
+license: perl
+distribution_type: module
+requires:
+  Data::Dumper: 0
+  HTML::Template: 2.6
+recommends:
+  YAML: 0
+build_requires:
+  IO::Scalar: 0
+  Struct::Compare: 0
+conflicts: {}
+provides:
+  HTML::Template::Dumper:
+    file: lib/HTML/Template/Dumper.pm
+    version: 0.1
+  HTML::Template::Dumper::Data_Dumper:
+    file: lib/HTML/Template/Dumper/Data_Dumper.pm
+    version: 0.1
+  HTML::Template::Dumper::Format:
+    file: lib/HTML/Template/Dumper/Format.pm
+  HTML::Template::Dumper::YAML:
+    file: lib/HTML/Template/Dumper/YAML.pm
+    version: 0.1
+generated_by: Module::Build version 0.20

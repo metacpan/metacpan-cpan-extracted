@@ -1,0 +1,20 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Hatena-Keyword
+version:      0.05
+version_from: lib/Hatena/Keyword.pm
+installdirs:  site
+requires:
+    Cache::File:                   0
+    Class::Accessor::Fast:         0
+    Class::Data::Inheritable:      0
+    Class::ErrorHandler:           0
+    Digest::MD5:                   0
+    Jcode:                         0
+    RPC::XML:                      0
+    Storable:                      0
+    Test::More:                    0
+    URI:                           0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

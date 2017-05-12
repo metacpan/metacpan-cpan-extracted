@@ -1,0 +1,53 @@
+HTTP-MobileAgent-Plugin-RoamingZone 
+
+本モジュールは以下の仕様に基づき実装され、また実現している機能に制限があります。
+
+NTTドコモ
+
+L<http://www.nttdocomo.co.jp/service/imode/make/content/ip/index.html#world>に記載された仕様に従い実装され、
+国番号を取得し、L<http://www.itu.int/itudoc/itu-t/ob-lists/icc/e212_685.html>で配布されている国番号->国名の
+変換テーブルに従って、Mobile::Data::ITUモジュールを使って国名/国内海外判定を行っています。
+
+SoftBank
+
+L<http://creation.mb.softbank.jp/download.php?docid=102>にて配布されている、技術資料HTTP編に従い実装しています。
+2008年8月現在、国内海外判定しか機能せず、国名の判定には対応していません。
+
+KDDI
+
+公式な仕様が存在していませんが、L<http://mscl.jp/diary/img/KDDI-SA3D.txt>等でレポートされているグローバル
+パスポート携帯のみに存在するヘッダC<x-up-devcap-zone>において、L<http://www.ifast.org/files/SIDNumeric.htm>
+の仕様に規定された国コードが返される模様であるため、Mobile::Data::SIDモジュールを使って国名変換を行います。
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+HTTP::MobileAgengt
+Mobile::Data::ITU
+Mobile::Data::SID
+Test::Base
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008, OHTSUKA Ko-hei
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

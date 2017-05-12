@@ -1,0 +1,20 @@
+Failed  Succeeded  Test Name
+   0          1    *** no name ***
+
+
+Test Name: N/A
+URL: http://http.web.test/set-cookie-c1-v1
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+
+  SENT COOKIE(S)
+    c1=v1
+  RECEIVED COOKIE(S)
+    c1=v1; path=/; expires=SOMEDAY
+
+  PAGE CONTENT:
+Set cookie test
+
+
+Total web tests failed: 0  succeeded: 1

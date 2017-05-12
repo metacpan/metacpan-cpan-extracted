@@ -1,0 +1,13 @@
+TODO:
+
+0.03 Friday August 15 19:59:28 PDT 2008:
+    - Clone and Storable are now required
+    - Conversion to Module::Install from M::B
+
+0.02 Tuesday October 02 20:47:20 PDT 2007:
+    - Change "use Exporter qw/import/" to "@ISA = qw/Exporter/"
+    - Notification warning if {} is used in @cut
+    - Return hash (%) instead of has reference ($) depending on wantarray
+
+0.01 Monday October 01 00:51:17 PDT 2007:
+    - Initial version

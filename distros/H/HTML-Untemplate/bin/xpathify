@@ -1,0 +1,199 @@
+#!/usr/bin/env perl
+# ABSTRACT: output HTML document as a flat XPath/content list
+# PODNAME: xpathify
+use 5.010;
+use strict;
+use utf8::all;
+use warnings qw(all);
+
+use Carp qw(croak);
+use Encode;
+use Getopt::Long;
+use HTML::Linear;
+use HTTP::Tiny;
+use IO::Interactive qw(is_interactive);
+use Pod::Usage;
+
+## no critic (ProhibitPackageVars)
+
+our $VERSION = '0.019'; # VERSION
+
+
+GetOptions(
+    q(help)         => \my $help,
+    q(color!)       => \my $color,
+    q(16)           => \my $sixteen,
+    q(html!)        => \my $html,
+    q(encoding=s)   => \my $encoding,
+    q(shrink!)      => \my $shrink,
+    q(strict!)      => \my $strict,
+    q(weight!)      => \my $weight,
+) or pod2usage(q(-verbose) => 1);
+pod2usage(q(-verbose) => 1)
+    if $help or $#ARGV != 0;
+
+$color //= is_interactive(*STDOUT);
+$weight //= 0;
+
+if ($html) {
+    (%HTML::Linear::Path::xpath_wrap) = (%{$HTML::Linear::Path::Colors::scheme{html}});
+    $color = 0;
+    print $HTML::Linear::Path::Colors::html[0];
+} elsif ($color) {
+    (%HTML::Linear::Path::xpath_wrap) = (%{$HTML::Linear::Path::Colors::scheme{($sixteen // 0) ? q(terminal) : q(terminal256)}});
+    $html = 0;
+}
+
+my $hl = HTML::Linear->new;
+
+$hl->set_shrink
+    if $shrink // 1;
+
+$hl->set_strict
+    if $strict // 0;
+
+my $encoding_layer = ':' . ($encoding ? "encoding($encoding)" : 'utf8');
+if ($ARGV[0] =~ m{^https?://}x) {
+    my $res = HTTP::Tiny->new->get($ARGV[0]);
+    croak "Can't download $ARGV[0]: " . $res->{reason} unless $res->{success};
+    $hl->parse_content(decode($encoding || 'utf8', $res->{content}));
+} elsif ($ARGV[0] eq '-') {
+    binmode(\*STDIN, $encoding_layer);
+    $hl->parse_file(\*STDIN);
+} else {
+    open(my $fh, '<' . $encoding_layer, $ARGV[0])
+        or croak "Can't open $ARGV[0]: $!";
+    $hl->parse_file($fh);
+    close $fh;
+}
+
+scan($hl);
+
+print $HTML::Linear::Path::Colors::html[1]
+    if $html;
+
+sub scan {
+    my ($tree) = @_;
+    for my $el ($tree->as_list) {
+        my $hash = $el->as_hash;
+        for (sort keys %{$hash}) {
+            my @line;
+            if ($html) {
+                push @line, HTML::Linear::Path::Colors::wrap_xpath($_);
+                $hash->{$_} = HTML::Linear::Path::Colors::wrap_content($hash->{$_}, 1);
+            } elsif ($color) {
+                push @line, $_;
+                $hash->{$_} = HTML::Linear::Path::Colors::wrap_content($hash->{$_});
+            } else {
+                push @line, $_;
+            }
+
+            push @line, $el->weight if $weight;
+            push @line, $hash->{$_};
+            if ($html) {
+                say '<tr><td>' . join('</td><td>', @line) . '</td></tr>';
+            } else {
+                say join("\t", @line);
+            }
+        }
+    }
+    return;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+xpathify - output HTML document as a flat XPath/content list
+
+=head1 VERSION
+
+version 0.019
+
+=head1 SYNOPSIS
+
+    xpathify [options] (HTML file | URL | -)
+
+=head1 DESCRIPTION
+
+Represents a typical HTML document in a very verbose two-column mode.
+The first column is a XPath which locates each element inside the HTML tree.
+The second column is a respective content (if any).
+
+    /html/head/title/text() test 1
+    /html/body/h1/text()    test 2
+    /html/body/p[1]/text()  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+
+=head1 OPTIONS
+
+=over 4
+
+=item --help
+
+This.
+
+=item --encoding=name
+
+Specify the HTML document encoding (C<latin1>, C<utf8>).
+UTF-8 is assumed by default.
+
+=item --[no]color
+
+Enable syntax highlight for XPath.
+By default, enabled automatically on interactive terminals.
+
+=item --16
+
+Use 16 system colors.
+By default, try to use 256-color ANSI palette.
+
+=item --[no]html
+
+Disables the C<--color> option and highlights using HTML/CSS.
+
+=item --[no]shrink
+
+Shrink the XPath to the minimal unique identifier.
+For example:
+
+    /html/body[@id='cpansearch']/form[@class='searchbox']/input[@name='query']
+
+Could be shortened as:
+
+    //input[@name='query']
+
+The shrinking is enabled by default.
+
+=item --[no]strict
+
+Strict mode disables grouping by C<id>, C<class> or C<name> attributes.
+The grouping is enabled by default.
+
+=item --[no]weight
+
+Print XPath weight on a second column.
+
+=back
+
+=head1 EXAMPLES
+
+    xpathify http://metacpan.org
+    curl http://www.msn.com | xpathify -c --strict -
+    xpathify --nocolor --noshrink t/test.html
+
+=head1 AUTHOR
+
+Stanislaw Pusep <stas@sysd.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Stanislaw Pusep.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,18 @@
+---
+name: HTML-Template-Compiled-Plugin-InlineImage
+version: 0.03
+author: ~
+abstract: Inline-Images with HTML::Template::Compiled
+license: perl
+requires:
+  HTML::Template::Compiled: 0.73
+  MIME::Base64: 0
+recommends:
+  File::MMagic: 0
+  GD: 0
+  HTML::Template::Compiled: 0.74
+provides:
+  HTML::Template::Compiled::Plugin::InlineImage:
+    file: lib/HTML/Template/Compiled/Plugin/InlineImage.pm
+    version: 0.03
+generated_by: Module::Build version 0.2611

@@ -1,0 +1,30 @@
+--- 
+childs: 
+  - 
+    label: "my Dialog"
+    type: header
+  - 
+    childs: 
+      - 
+        id: testField
+        label: give me a value !
+        size: 60
+        type: text
+        value: My dialog value
+      -
+        type: br
+      - 
+        childs: 
+          - 
+            id: button2
+            type: button
+            value: "close screen"
+        type: actionbar
+    id: cadre1
+    type: fieldset
+id: ecran
+openCallBack: HTML::GUI::widget::openTestCallbackFunction
+type: screen
+
+
+

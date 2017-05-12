@@ -1,0 +1,18 @@
+# This file provides instructions for packaging.
+
+@prefix : <http://purl.org/NET/cpan-uri/terms#> .
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Microdata-ToRDFa/project>
+	:perl_version_from _:main ;
+	:version_from _:main ;
+	:readme_from _:main ;
+	:test_requires "Test::More 0.61" ;
+	:requires
+		"HTML::HTML5::Microdata::Parser 0.100" , 
+		"HTML::HTML5::Writer 0" ,
+		"RDF::Prefixes 0.002" ,
+		"Scalar::Util 0" ,
+		"XML::LibXML 1.70" .
+
+_:main <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#fileName> "lib/HTML/HTML5/Microdata/ToRDFa.pm" .
+

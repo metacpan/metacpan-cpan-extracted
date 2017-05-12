@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Hash-Mogrify.t
+lib/Hash/Mogrify.pm
+META.yml                                 Module meta-data (added by MakeMaker)

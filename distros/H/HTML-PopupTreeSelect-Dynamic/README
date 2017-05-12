@@ -1,0 +1,36 @@
+HTML::PopupTreeSelect::Dynamic version 1.2
+==========================================
+
+This module provides a dynamic version of HTML::PopupTreeSelect.  By
+dynamic I mean that the tree is sent to the client in chunks as the
+user clicks around the tree.  In HTML::PopupTreeSelect the entire tree
+is sent to the client when the page is loaded, introducing a long
+delay for large trees.  With HTML::PopupTreeSelect::Dynamic trees of
+virtually any size can be navigated without noticable delays.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Then copy the images in images/ into a place here your web server can
+find them.  Remember where you put them so you'll know what value to
+set for image_path when you call new().
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  HTML::PopupTreeSelect
+  HTML::Prototype
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Sam Tregar
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl 5 itself.

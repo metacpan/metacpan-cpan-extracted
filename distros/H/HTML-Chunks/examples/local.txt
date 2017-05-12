@@ -1,0 +1,11 @@
+<!-- begin hello -->Hello!<!-- end -->
+<!-- begin hello_fr -->Bon jour!<!-- end -->
+<!-- begin hello_fr_ca -->Bon jour, eh!<!-- end -->
+<!-- begin hello_sp -->Hola!<!-- end -->
+<!-- begin hello_sp_br -->Beunos Tardes!<!-- end -->
+<!-- begin hello_sp_mx -->Que Pasa!<!-- end -->
+<!-- begin no -->No!<!-- end -->
+<!-- begin yes -->Yes!<!-- end -->
+<!-- begin yes_sp -->Si!<!-- end -->
+<!-- begin yes_fr -->Oi!<!-- end -->
+<!-- begin hello_en_gb -->'Ello!<!-- end -->

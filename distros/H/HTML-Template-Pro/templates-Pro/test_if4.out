@@ -1,0 +1,15 @@
+<HTML><BODY>
+<H1> test_if4 </H1>
+we test that tmpl_else should be invisible in invisible context
+
+
+
+
+
+
+
+ 
+
+
+<H1> END test_if4 </H1>
+</body></html>

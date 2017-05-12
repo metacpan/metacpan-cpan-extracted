@@ -1,0 +1,31 @@
+BUFF       EQU  28
+           ORIG 0
+TEMP1      IN   16(16)
+READ       IN   BUFF(16)
+           LD1  0(0:0)
+           ENTA 0
+           JBUS *(16)
+           LD2N BUFF+1(1:1)
+           STZ  BUFF+1(1:1)
+           LDX  BUFF+1
+TEMP       NUM  0
+           STA  TEMP1
+           ENTA 30,2
+LOOP       STA  TEMP(1:1)
+           LD3  TEMP1
+           JAZ  0,3
+           ENTA 1,3
+           STA  TEMP1
+           LDA  BUFF+3,1(5:5)
+           DECA 25
+           STA  0,3
+           LDA  BUFF+2,1
+           LDX  BUFF+3,1
+           NUM
+           STA  0,3(1:5)
+           MOVE 0,1(2)
+           LDA  TEMP(1:1)
+           DECA 1
+           JAP  LOOP
+           JMP  READ
+           END

@@ -1,0 +1,309 @@
+NAME
+    HTML::HTML5::Builder - erect some scaffolding for your documents
+
+SYNOPSIS
+      use HTML::HTML5::Builder qw[:standard JQUERY];
+
+      open my $fh, '<', 'inline-script.js';
+  
+      print html(
+        -lang => 'en',
+        head(
+          title('Test'),
+          Meta(-charset => 'utf-8'),
+        ),
+        body(
+          h1('Test'),
+          p('This is a test.'),
+          JQUERY(-version => '1.6.4'),
+          script(-type => 'text/javascript', $fh),
+        ),
+      );
+
+DESCRIPTION
+    This module can export function names corresponding to any HTML5
+    element.
+
+    Each function returns an XML::LibXML::Element with the same name as the
+    function. The arguments to each function are processed as a list, and
+    used to set the attributes and contents of that element.
+
+    For each item on the list:
+
+    *   if it's an XML::LibXML::Element, XML::LibXML::TextNode,
+        XML::LibXML::Comment, or XML::LibXML::PI, it's appended as a child
+        of the returned element.
+
+    *   if it's an XML::LibXML::NodeList, each item on the list is appended
+        as a child of the returned element.
+
+    *   if it's an XML::LibXML::Attr, it's set as an attribute on the
+        returned element
+
+    *   if it's an IO::Handle, then it will be slurped and appended to the
+        returned element as a text node.
+
+    *   if it's a scalar reference, then the returned element is also
+        assigned to it. (This feature is at risk.)
+
+    *   if it's a scalar (string) some guesswork is conducted to figure out
+        whether you're setting an attribute and value, or whether the string
+        should be used as a text node. The presence of a hyphen at the start
+        of the string is the main deciding factor.
+
+          p('-class', 'warning', '$LordLucan not found.');
+
+        In this example, a paragraph element is returned, with the class
+        attribute set to 'warning' and the textual contents '$LordLucan not
+        found.'.
+
+        Sometimes it's necessary to protect values against this guesswork.
+        By passing a hashref, all the keys and values are interpreted as
+        setting attributes; by passing an arrayref, all values are
+        interpreted as setting the contents of the element.
+
+          p(['-class'], { warning => '$LordLucan not found.' });
+
+        In this example, a paragraph element is returned, with the warning
+        attribute set to '$LordLucan not found.' and the textual contents
+        '-class'.
+
+    *   Anything else is stringified and added as a text node. This is
+        useful for things with sensible stringification defined, such as
+        "DateTime" and "URI" objects, but less so for some other objects, so
+        you will sometimes get a warning if warnings are enabled. Warnings
+        can be disabled using:
+
+          no warnings 'HTML::HTML::Builder';
+
+  Exceptional Cases
+    The "html" function does not return an "XML::LibXML::Element", but
+    rather a "HTML::HTML5::Builder::Document" object.
+
+    There is special handling for "time" (or "Time"). If the first parameter
+    passed to it is a DateTime object, then that object is used to set its
+    datetime attribute. If there are no subsequent parameters, then the
+    stringified form of the object is also used to form the content of the
+    <time> element.
+
+    Note that the functions that generate <meta>, <link>, <q>, <time>,
+    <sub>, <s> and <map> HTML elements are named "Meta()", "Link()", "Q()",
+    "Time()", "Sub()", "S()" and "Map()" respectively, with an upper-case
+    first letter. This is because each of these names corresponds to a
+    built-in perl keyword (except meta, which is used by Moose). The
+    lower-case versions of these do exist, and can be exported if you ask
+    for them explicitly. The lower-case versions are also available as
+    methods using the object-oriented syntax. (In fact, lower case and
+    ucfirst versions exist for all HTML elements - they're just not always
+    exportable.)
+
+  General Purpose Functions
+    "ELEMENT($tagname, @arguments)"
+        If you need to insert an element which doesn't have its own
+        function.
+
+    "TEXT($string)"
+        Produces a text node.
+
+    "COMMENT($string)"
+        Produces an HTML comment.
+
+    "CHUNK($string)"
+        Parses the string as HTML, and produces a list of elements, text
+        nodes and comments.
+
+        This should be a so-called "balanced chunk". Due to limitations in
+        HTML::HTML5::Parser, this only works for body content. Croaks if
+        HTML::HTML5::Parser is not installed.
+
+    "XML_CHUNK($string)"
+        More useful version of "CHUNK", without the restriction on content,
+        but input needs to be a balanced and well-formed XML chunk.
+
+    "RAW_CHUNK($string)"
+        This allows you to include stuff that isn't anything close to valid
+        HTML into the output document, such as a PHP block. e.g.
+
+          html(
+            head(
+              title('Funny test'),
+              ),
+            body(
+              h1('Funny test'),
+              RAW_CHUNK("<p>Here's a fish: <=><"),
+              ),
+            );
+
+        A processing instruction is used to represent this data in the DOM.
+        HTML::HTML5::Writer can detect that processing instruction and use
+        it to output the raw data. If you're not using HTML::HTML5::Writer
+        to serialise the document, then you may need to post-process the
+        serialised document.
+
+        With great power comes great responsibility.
+
+  Boiler-Plate Functions
+    There are also a number of functions that create lists of multiple HTML
+    elements, for boiler-plate code.
+
+    "JQUERY(-version => $ver, %options)"
+        Link to jQuery at a CDN.
+
+        Other options include -source, to indicate where to link to jQuery
+        (currently allowed values are "Google", "Microsoft" and "official");
+        and -min, a boolean which indicates whether the minified version
+        should be linked to (true by default).
+
+        Setting option -ui to true, also includes jQuery UI. A version
+        number can be indicated using -ui_version. A theme can be included
+        setting -theme. Setting either -ui_version or -theme will imply -ui.
+
+          JQUERY(
+            -source     => 'official',
+            -version    => '1.6.4',
+            -ui_version => '1.8.16',
+            -theme      => 'eggplant',
+            );
+
+        If versions aren't provided, defaults to the latest versions of the
+        libraries that the author of HTML::HTML5::Builder was aware of at
+        the time of publication. If you choose a version which is known to
+        be unavailable at the selected CDN, the function should
+        automatically choose a slightly later version.
+
+    "CREATIVE_COMMONS($licence)"
+    "CREATIVE_COMMONS(-licence => $licence, %options)"
+        $licence can be one of 'by', 'by-nd', 'by-nc', 'by-sa', 'by-sa-nc',
+        or 'by-sa-nd'.
+
+        Other options supported are:
+
+        *   -url - URL of the thing being licensed (if not the page itself)
+
+        *   -size - 'large' or 'small' for the image
+
+        *   -title - title of the work
+
+        *   -attributionName - name people should use for attribution
+
+        *   -attributionURL - link people should use for attribution
+
+    "OPENGRAPH(%data)"
+        Returns a list of <meta> elements providing Open Graph Protocol data
+        for your page.
+
+          OPENGRAPH(
+            -title       => "Hello World",
+            -type        => "example",
+            -description => "A global greeting.",
+            );
+
+  Exporting Functions
+    None by default. Pretty much anything can be exported on request.
+
+    Export tags:
+
+    *   ":all" - everything
+
+    *   ":standard" - elements that are not obsolete in HTML5, plus ELEMENT,
+        TEXT, COMMENT, CHUNK, XML_CHUNK and RAW_CHUNK
+
+    *   ":metadata" - head title base Link Meta style
+
+    *   ":sections" - body div section nav article aside h1 h2 h3 h4 h5 h6
+        header footer address
+
+    *   ":grouping" - p hr br pre dialog blockquote ol ul li dl dt dd
+
+    *   ":text" - a Q cite em strong small mark dfn abbr progress meter code
+        var samp kbd Sub sup span i b bdo ruby rt rp Time
+
+    *   ":embedded" - figure img iframe embed object param video audio
+        source canvas area
+
+    *   ":tabular" - table thead tbody tfoot th td colgroup col caption
+
+    *   ":form" - form fieldset label input button select datalist optgroup
+        option textarea output
+
+  Object Oriented Interface
+    You can also use these functions as methods of an object blessed into
+    the HTML::HTML5::Builder package.
+
+      my $b = HTML::HTML5::Builder->new;
+      my $document = $b->html(
+        -lang => 'en',
+        $b->head(
+          $b->title('Test', \(my $foo)),
+          $b->meta(-charset => 'utf-8'),
+        ),
+        $b->body(
+          $b->h1('Test'),
+          $b->p('This is a test.')
+        ),
+      );
+
+  Using with RDF::RDFa::Generator
+    RDF::RDFa::Generator has a "nodes" method which returns a handy list of
+    "XML::LibXML::Node" objects.
+
+      use DateTime;
+      use HTML::HTML5::Builder qw[:standard];
+      use RDF::RDFa::Generator;
+      use RDF::Trine;
+  
+      my $url   = 'http://dbpedia.org/data/Charles_Darwin';
+      my $model = RDF::Trine::Model->new;
+      RDF::Trine::Parser->parse_url_into_model($url, $model);
+  
+      my $gen = RDF::RDFa::Generator->new(style=>'HTML::Pretty');
+  
+      print html(
+        head(
+          title("Some Data About Charles Darwin"),
+          ),
+        body(
+          h1("Some Data About Charles Darwin"),
+          $gen->nodes($model),
+          hr(),
+          address(
+            "Source: $url", br(),
+            "Generated: ", Time(DateTime->now),
+            ),
+          ),
+        );
+
+    Nice?
+
+  Using with XML::LibXML::PrettyPrint
+    HTML::HTML5::Builder doesn't nicely indent your markup, but
+    XML::LibXML::PrettyPrint can.
+
+      use HTML::HTML5::Builder qw(:standard);
+      use XML::LibXML::PrettyPrint qw(print_xml);
+      print_xml html(
+        head(title("Test")),
+        body(h1("Test"), p("This is a test.")),
+        );
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=HTML-HTML5-Builder>.
+
+SEE ALSO
+    XML::LibXML, HTML::HTML5::Writer, HTML::HTML5::Builder::Document.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2011 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

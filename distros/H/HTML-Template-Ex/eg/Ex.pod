@@ -1,0 +1,277 @@
+﻿=encoding utf-8
+
+=head1 NAME
+
+HTML::Template::Ex - The Perl code is operated in the template for HTML::Template.
+
+=head1 SYNOPSIS
+
+  package MyProject;
+  use CGI;
+  use Jcode;
+  use HTML::Template::Ex;
+  
+  my $cgi = CGI->new;
+  my $self= bless { cgi=> cgi }, __PACKAGE__;
+  
+  my $template= <<END_OF_TEMPLATE;
+  <html>
+  <head><title><tmpl_var name="title"></title></head>
+  <body>
+  <tmpl_set name="title" value="HTML::Template::Ex">
+  
+  <h1><tmpl_var name="page_title"></h1>
+  <h2><tmpl_var name="title"></h2>
+  
+  <div style="margin:10; background:#DDD;">
+  <tmpl_ex>
+    my($self, $param)= @_;
+    $param->{page_title}= 'My Page Title';
+    return $self->{cgi}->param('name') || 'It doesn't receive it.';
+  </tmpl_ex>
+  </div>
+  
+  <div style="margin:10; background:#DDD;">
+  <tmpl_loop name="users">
+   <div>
+   <tmpl_var name="u_name" escape="html">
+   : <tmpl_var name="email" escape="html">
+    </div>
+  </tmpl_loop>
+  </div>
+  
+  <tmpl_ex name="users">
+    return [
+     { u_name=> 'foo', email=> 'foo@mydomain'    },
+     { u_name=> 'boo', email=> 'boo@localdomain' },
+     ];
+  </tmpl_ex>
+  
+  <tmpl_var name="env_remote_addr">
+  
+  <body></html>
+  END_OF_TEMPLATE
+  
+  my $tmpl= HTML::Template::Ex->new($self, {
+    setup_env=> 1,
+    scalarref=> \$template,
+    encoder  => sub { Jcode->new($_[0])->euc },
+    # ... other 'HTML::Template' options.
+    });
+  
+  print STDOUT $cgi->header, $tmpl->output;
+
+=head1 DESCRIPTION
+
+このモジュールは HTML::Template が使用するテンプレートに Perl コードを評価する
+機能を提供します。
+
+<TMPL_EX> ... </TMPL_EX> で囲われた文字列を Perl コードとして評価します。
+
+  <tmpl_ex>
+    my($self, $param)= @_;
+    my $hoge= $self->to_method;
+    $param->{hoge}= $hoge;
+    return "";
+  </tmpl_ex>
+
+tmpl_ex タグへの第一引数には コンストラクタに渡したオブジェクトが渡されます。
+
+第２引数は HTML::Template が使用するパラメータ用のHASHリファレンスです。
+
+各 tmpl_ex ブロックの終わりで値を返すと、その値がその位置に埋め込まれます。
+ですから、何も埋め込みたくない場合は空文字を返す必要があります。
+
+HTML::Template::Ex はちょっとしたコードを評価させる時は便利ですが、複雑な事を
+させる時には少し癖があります。
+
+その一つは、tmpl_ex ブロックを複数記述した場合の優先順位です。
+
+１枚のテンプレートの場合は問題ありません。上から順番に評価されます。
+そして、この評価は HTML::Template がタグを評価するより先に行われる点に注目して
+下さい。
+
+問題はそのテンプレートから他のテンプレートを読み込んでいて、その読み込んだテン
+プレートにも tmpl_ex ブロック が存在する場合です。
+HTML::Template::Ex はテンプレートの読込みに関して口を挟みません。
+ですから HTML::Template がタグを評価してからインクルード先の tmpl_ex ブロック
+が評価される事になり、これは時として混乱を招きます。
+
+  <tmpl_include name="first.tmpl">  ... [3]
+  <tmpl_ex>
+   .... [ 1 ]
+  </tmpl_ex>
+  <tmpl_include name="middle.tmpl"> ... [4]
+  <tmpl_ex>
+   .... [ 2 ]
+  </tmpl_ex>
+  <tmpl_include name="end.tmpl">    ... [5]
+
+
+そして二つ目は、tmpl_ex ブロック でエラーが発生した場合に、エラーメッセージが
+非常に分かり難いと言う事です。
+
+各 tmpl_ex ブロック は個別に eval でコードを評価しています。
+よってテンプレート全体を見渡しながら処理を行っている訳では無いので、eval が発
+するエラーしか得られません。これはエラー発生箇所の特定が非常に難しいです。
+
+この問題については HTML::Template::Ex だけで解決する事は困難なので、今後も改善
+の予定はありません。
+
+よって残念ですが、複雑なコードを書く事を前提に HTML::Template::Ex 使用する事は
+おすすめできません。エラーが発生する度に山勘頼りにデバッグを強要されて、恐らく
+ストレスに悩まされる事になるでしょう。
+
+それでも、もしそのコードを完成させる事が出来れば、HTML::Mason や Template ToolKit
+より高速に動作するテンプレートが出来ると思います。クレージーな方は是非一度試し
+て見て下さい。
+
+ですから HTML::Template::Ex はレンタルサーバーなどでテンプレートドライバの選択
+肢が限られているような状況で、テンプレートドライバに多くを期待しないような使い
+方をお勧めします。
+
+
+そして最後に勘違いしやすい事ですが、tmpl_ex ブロックは HTML::Template より先に
+評価される事から <TMPL_IF > の中で tmpl_ex ブロック を使用する事は意味を持ちま
+せん。* <TMPL_LOOP> 中で使う事も同様です。
+
+  <tmpl_if name="hoge">
+    <tmpl_ex>
+      ....
+    </tmpl_ex>
+  <tmpl_exse>
+    <tmpl_ex>
+      ....
+    </tmpl_ex>
+  </tmpl_if>
+
+これは分岐される事無く tmpl_ex ブロック の両方が評価されます。tmpl_ex ブロック
+絡みのIF文は tmpl_ex ブロック 内で解決するようなしないと上手くいきません。
+
+  <tmpl_ex>
+    my($self, $param)= @_;
+    if ($apram->{hoge}) {
+      ...
+    } else {
+      ...
+    }
+    "";
+  </tmpl_ex>
+
+
+=head1 TAGS
+
+ここで紹介するのは HTML::Template::Ex を使用する事によって追加される拡張タグです。
+HTML::Template の標準タグは L<HTML::Template> のドキュメントをご覧下さい。
+
+=head2 <TMPL_EX ... > [PERL_CODE] </TMPL_EX>
+
+テンプレート中で Perl コードを評価します。
+
+基本的な動作に関する詳細は DESCRIPTION をご覧下さい。
+
+NAME 属性を与えると、その名前のパラメータに tmpl_ex ブロック が返した値を代入
+します。tmpl_ex ブロック の位置に値が埋め込まれるのを防ぐには HIDDEN 属性を同
+時に与えて下さい。
+
+  <h1><tmpl_var name="hoge"></h1>
+  
+  <tmpl_ex name="hoge" hidden="1">
+    my($self)= @_;
+    ..... ban, bo, bon.
+    return $self->request->param('Fooo');
+  </tmpl_ex>
+
+ESCAPE 属性が使用できます。
+
+  <tmpl_ex escape="html">
+    ..... ban, bo, bon.
+    return "<font>Zooooo</font>";
+  </tmpl_ex>
+
+* これは htmlエスケープされてから埋め込まれます。
+
+=head2 <TMPL_SET NAME='...' VALUE='...'>
+
+テンプレート内でパラメータに値をセットします。
+
+=head2 <tmpl_var name='env_*[ Environment variable name. ]'>
+
+コンストラクタに setup_env オプションを与えると環境変数がセットアップされます。
+それは <TMPL_VAR NAME=...> によって参照できます。名前の先頭に env_ を付けて環
+境変数名を指定して下さい。
+
+  <tmpl_var name="env_remote_addr">
+  <tmpl_var name="env_path_info">
+
+=head1 METHODS
+
+=head2 new ([OBJECT], [OPTION])
+
+コンストラクタです。
+
+第一引数に任意のオブジェクトを与えられます。
+与えたオブジェクトは各 tmpl_ex ブロックの第一引数として渡されます。
+
+[OPTION] は HTML::Template に渡すオプションです。
+HTML::Template::Ex のオプションもここに含めて下さい。
+
+Options.
+
+=over 4
+
+=item * setup_env
+
+環境変数を参照する為のセットアップを行います。
+
+=item * exec_off
+
+HTML::Template::Ex が評価するタグを全て無効にして消し去ります。
+
+=item * no_strict_exec
+
+通常は tmpl_ex ブロックのコードは strict 環境下で評価されますが、これを OFF
+にします。strict なコードの作成に慣れていない方用です。
+
+=item * encoder
+
+文字コード処理を行う為のCODEリファレンスを定義できます。
+
+=item * auto_encoder
+
+テンプレートから charset が取得できた時に encoder を処理するようにします。
+
+=back
+
+=head2 charset
+
+テンプレートから charset が取得できた時に、その値を返します。
+
+=head2 other
+
+その他のメソッドについてはL<HTML::Template>のドキュメントを参照して下さい。
+
+=head1 NOTES
+
+HTML::Template オプションで使用するキャッシュの種類によっては動作不良を起こす
+事があります。
+
+通常 mod_perl の時に指定する cache オプションなら正常に動作します。
+
+=head1 SEE ALSO
+
+L<Egg::Release>,
+
+=head1 AUTHOR
+
+Masatoshi Mizuno E<lt>mizunoE<64>bomcity.comE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2007 by Bee Flag, Corp. E<lt>L<http://egg.bomcity.com/>E<gt>, All Rights Reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

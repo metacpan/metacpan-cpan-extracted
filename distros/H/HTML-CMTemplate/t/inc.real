@@ -1,0 +1,2 @@
+Hi there.  This is an included template fragment!
+<?=echo "Hi there.  This is an included template fragment!" ?>

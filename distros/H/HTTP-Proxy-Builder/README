@@ -1,0 +1,63 @@
+HTTP-Proxy-Builder
+
+HTTP::Proxy::Builder is a module designed to help you create proxies in a
+"modular" way.
+
+Until now, HTTP::Proxy programs started as a simple one-purpose program,
+and quickly grew out of that when one started to "enhance" more and more
+web sites. Sometimes not all the features are needed, and commenting out
+large sections of a big proxy script is not what one would call flexible.
+
+With HTTP::Proxy::Builder it is now possible to keep proxyies with
+different functionalities or aimed a different websites in separate
+programs, and to combine them at will using a wrapper program that
+aggregates them.
+
+The build_proxy command included in this distribution provides such
+a flexible combining proxy.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc HTTP::Proxy::Builder
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTTP-Proxy-Builder
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/HTTP-Proxy-Builder
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/HTTP-Proxy-Builder
+
+    Search CPAN
+        http://search.cpan.org/dist/HTTP-Proxy-Builder
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Philippe Bruhat (BooK)
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

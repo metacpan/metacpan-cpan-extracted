@@ -1,0 +1,18 @@
+Contact me - jlawrenc@cpan.org - to have me add things to my HTTP::DAVServer todo list. :)
+
+much of this code is proof of concept and partial transition from my scratch code. I am really
+open to any input at this point!
+
+
+Rough points:
+
+a - PROPPATCH - doesn't do anything / partially responding
+
+b - LOCK / UNLOCK - not done
+
+c - Make decisions on where to stuff things currently as package vars (ROOT, HOST, etc.)
+
+d - improve subclassability
+
+e - mod_perl support
+

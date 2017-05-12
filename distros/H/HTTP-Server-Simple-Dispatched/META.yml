@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:                HTTP-Server-Simple-Dispatched
+version:             0.06
+abstract:            Django-like regex dispatching with request and response objects - no CGI.pm cruft!
+license:             ~
+author:              
+    - Paul Driver <frodwith@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Carp:                          0
+    Data::Dumper:                  0
+    Devel::StackTrace:             0
+    File::Spec::Functions:         0
+    HTTP::Request:                 0
+    HTTP::Response:                0
+    HTTP::Server::Simple:          0
+    MIME::Types:                   0
+    Moose:                         0
+    Test::More:                    0
+    URI:                           0
+    URI::Escape:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

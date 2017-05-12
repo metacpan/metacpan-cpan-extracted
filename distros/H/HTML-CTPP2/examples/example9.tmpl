@@ -1,0 +1,28 @@
+<TMPL_var (2 * (3 + 4) / (7))>
+<TMPL_if 0>ONE<TMPL_else>TWO</TMPL_if>
+<TMPL_if (2 * (3 + 4) / (7) == 0)>ONE<TMPL_else>TWO</TMPL_if>
+<TMPL_if (2 * (3 + 4) / (7) == 2)>ONE<TMPL_else>TWO</TMPL_if>
+
+<TMPL_comment>
+x1 <TMPL_var x1>
+x2 <TMPL_var x2>
+x3 <TMPL_var x3>
+x4 <TMPL_var x4>
+x5 <TMPL_var x5>
+
+<TMPL_var -x1>
+x1 - x2: <TMPL_var (x1 - x2)>
+<TMPL_var (x2 - x1)>
+<TMPL_var (x2 - - - - - x1)>
+<TMPL_var (x2 != x1)>
+
+(1+1 == 2): <TMPL_var (1+1 == 2)>
+(3 <= 3):   <TMPL_var (3 <= 3)>
+(x2 != x1): <TMPL_var (x2 != x1)>
+
+(2* 2 == 4): <TMPL_if (2* 2 == 4)>YES<TMPL_else>NO</TMPL_if>
+</TMPL_comment>
+<TMPL_loop loop_content>
+	<TMPL_var (__COUNTER__ mod 3)> <TMPL_if (__COUNTER__ mod 3 == 0)>red</TMPL_if><TMPL_if (__COUNTER__ mod 3 == 1)>green</TMPL_if><TMPL_if (__COUNTER__ mod 3 == 2)>blue</TMPL_if>
+</TMPL_loop>
+<TMPL_if a>1<TMPL_else>    11</TMPL_if>    a

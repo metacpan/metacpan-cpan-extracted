@@ -1,0 +1,17 @@
+#- check manageuserswithlogin.cgi and all the other stuff
+
+#-replace ROWNUM by saveto... temporary variables, flexible usage.. (main formengine job)
+
+#- phone is not on same level (manageusers.cgi)
+
+- perhaps use textarea instead of 20 char long text-inputs when the database text field is quite big (e.g >= 500 chars)
+
+- write error messages underneath when having one row per record, this should be simply realized by making an extra skin for the one-record-per-row view. this would mean that we don't have to make any special stuff in DBSQL.pm to achieve that view, we simply load the corresponding skin. But it should also exist a method which forces the error messages to be printed right. or better: default should be right (because its now) but underneath should also be possible.
+
+- display_as and save_as should also be interpreted when setted through dbsql_preconf
+
+- check whether values changed before processing an update query!
+
+- cache form configurations so that we don't have to ask the database every time
+
+mail your ideas to moritz@freesources.org

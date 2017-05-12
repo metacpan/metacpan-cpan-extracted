@@ -1,0 +1,52 @@
+{
+   "abstract" : "Perl driver for ClickHouse",
+   "author" : [
+      "Maxim Motylkov <mmv@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTTP-ClickHouse",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "2.161",
+            "HTTP::ClickHouse::Base" : "0",
+            "IO::Select" : "1.22",
+            "Net::HTTP::NB" : "6.09",
+            "Scalar::Util" : "1.46",
+            "Storable" : "2.51",
+            "URI" : "1.71",
+            "URI::QueryParam" : "1.71",
+            "perl" : "v5.10.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.061"
+}

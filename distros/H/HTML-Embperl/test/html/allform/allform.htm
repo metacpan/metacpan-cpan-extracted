@@ -1,0 +1,23 @@
+<html>
+<head>
+<title>Tests for Embperl - optAllFormData</title>
+</head>
+
+
+<body>
+
+
+optAllFormData: [+ $optAllFormData +] <BR>
+
+[- @ks = sort keys %fdat -]
+
+	<table>
+		<tr>
+			<td>[+ $ks[$row] +]</td><td>[+ $fdat{$ks[$row] || ''} +]</td>
+		</tr>
+	</table>
+
+
+
+</body>
+</html>

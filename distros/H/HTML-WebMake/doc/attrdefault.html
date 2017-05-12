@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>
+      WebMake: Documentation: The &lt;attrdefault&gt; Tag
+    </title>
+    <meta name="generator" content="WebMake/2.2" />
+    <style>
+      body {
+       background-color: #ffffff; 
+       color: #000000; 
+       font-size: medium;
+       font-family: verdana,lucida,helvetica,sans-serif;
+      }
+      code, samp, pre {
+       font-family: Courier New,courier,fixed-width,monospace;
+      }
+      H1 { font-size: x-large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFCC66; }
+      H2 { font-size: large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFDD77; }
+      H3 { font-size: medium; font-family: Garamond,Book Antiqua,Times,serif; background: #FFEE88; }
+      H4 { font-size: small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H5 { font-size: x-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H6 { font-size: xx-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      A:link {
+       font-weight: bold;
+       color: #004000;
+       text-decoration: underline; 
+      }
+      A:visited {
+       font-weight: normal;
+       color: #008000;
+       text-decoration: underline; 
+      }
+      A:active {
+       font-weight: bold;
+       color: #800000;
+       text-decoration: underline; 
+      }
+      dt {
+       font-size: medium;
+       font-weight: bold;
+       padding-top: 8px; padding-bottom: 8px;
+      }
+      dd {
+       padding-top: 8px; padding-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body bgcolor="#ffffff" text="#000000" link="#3300cc" vlink="#660066">
+    <font face="lucida,verdana,sans-serif">
+      <div align="center">
+        <img src="images/WebMakeTitle.png" alt="WebMake" width="500" height="122" />
+      </div>
+      <table width="100%">
+        <tr>
+          <td valign="top">
+            <strong><a href="http://webmake.taint.org/">WebMake</a>
+             Documentation</strong> (version 2.2)
+             
+          </td>
+          <td valign="top">
+            <div align="right">
+              
+               [ <a href="metadefault.html">Back</a> | <a href="index_06-magic_vars.html">Forward</a> | <a href="index.html">Index</a>
+               | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+               
+            </div>
+          </td>
+        </tr>
+      </table>
+<!-- yes, it's that Mozilla black-border code again ;) -->
+      <!-- stolen from www.mozilla.org via rc3.org -->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td bgcolor="#aaaaaa">
+            <table border="0" cellspacing="4" cellpadding="4" width="100%">
+              <tr>
+                <td bgcolor="#ffffff">
+                  <table border="0" cellspacing="4" cellpadding="4" width="100%">
+                    <tr>
+                      <td>
+                        <h1>The &lt;attrdefault&gt; Tag</h1><p>
+                          Attributes are usually specified inside a content item's <a href="content.html">&lt;content&gt;</a> or <a href="contents.html">&lt;contents&gt;</a> tags, or, for output files, inside
+                          the <a href="out.html">&lt;out&gt;</a> tag. However, this can be a chore if you have many
+                          items to set attributes on, so, to make things easier, you can specify default
+                          attributes using the &lt;attrdefault&gt; tag.
+                          
+                        </p>
+                        <p>
+                          Specify this tag before the content items or output files in question, and
+                          those items will all be tagged with the attributes you set.
+                          
+                        </p>
+                        <p>
+                          Like the <a href="metadefault.html">metadefault</a> tag, this tag can be used either in a
+                          <em>scoped</em> mode, or in a <em>command</em> mode.
+                          
+                        </p>
+                        <a name="Scoped_Mode"><h3>Scoped Mode</h3></a><p>
+                          "Scoped" mode uses opening (<strong>&lt;attrdefault&gt;</strong>) and closing
+                          (<strong>&lt;/attrdefault&gt;</strong>) tags; the attributes are only set on content items
+                          or output files between the two tags.
+                          
+                        </p>
+                        <a name="Command_Mode"><h3>Command Mode</h3></a><p>
+                          Command mode uses standalone tags (<strong>&lt;attrdefault ... /&gt;</strong>); the
+                          attributes are set until the end of the WebMake file, or until you change
+                          them with another &lt;attrdefault&gt; tag.
+                          
+                        </p>
+                        <a name="Attributes"><h2>Attributes</h2></a><dl>
+                          <dt>
+                            <em>name</em>
+                          </dt>
+                          <dd>
+                            <p>
+                              the attribute's name, e.g. <em>up</em>, <em>map</em>,
+                               etc. This is required.
+                              
+                            </p>
+                          </dd>
+                          <dt>
+                            <em>value</em>
+                          </dt>
+                          <dd>
+                            <p>
+                              the attribute's value. This is optional. If the
+                               value is not specified, the attribute will be removed from the list of
+                               default attributes.
+                              
+                            </p>
+                          </dd>
+                        </dl>
+                        <a name="Example"><h2>Example</h2></a><p>
+                          Using the scoped style:
+                          
+                        </p>
+                        <p>
+                          <!--etsafe-->
+                          <pre>
+
+  &lt;attrdefault name="format" value="text/html"&gt;
+    &lt;content name="chunk_1.txt"&gt;...&lt;/content&gt;
+    &lt;content name="chunk_2.txt"&gt;...&lt;/content&gt;
+    &lt;content name="chunk_3.txt"&gt;...&lt;/content&gt;
+    &lt;content name="chunk_4.txt"&gt;...&lt;/content&gt;
+  &lt;/attrdefault&gt;
+                        </pre>
+<!--/etsafe-->
+                                              </p>
+                      <p>
+                        Or, in the "command" style:
+                        
+                      </p>
+                      <p>
+                        <!--etsafe-->
+                        <pre>
+
+  &lt;attrdefault name="format" value="text/html" /&gt;
+
+  &lt;content name="chunk_1.txt"&gt;...&lt;/content&gt;
+  &lt;content name="chunk_2.txt"&gt;...&lt;/content&gt;
+  &lt;content name="chunk_3.txt"&gt;...&lt;/content&gt;
+  &lt;content name="chunk_4.txt"&gt;...&lt;/content&gt;
+
+  &lt;attrdefault name="format" /&gt;
+                      </pre>
+<!--/etsafe-->
+                                          </p>
+                    <p>
+                      
+                    </p>
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table width="100%">
+  <tr>
+    <td valign="top">
+      <strong><a href="http://webmake.taint.org/">WebMake</a>
+       Documentation</strong> (version 2.2)
+       
+    </td>
+    <td valign="top">
+      <div align="right">
+        
+         [ <a href="metadefault.html">Back</a> | <a href="index_06-magic_vars.html">Forward</a> | <a href="index.html">Index</a>
+         | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+         
+      </div>
+    </td>
+  </tr>
+</table>
+<div align="right">
+  <a href="http://webmake.taint.org/"><img src="images/BuiltWithWebMake.png" alt="Built With WebMake" border="0" width="88" height="31" /></a>
+</div>
+</font>
+</body>
+</html>

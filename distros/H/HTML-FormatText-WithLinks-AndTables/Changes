@@ -1,0 +1,25 @@
+Revision history for HTML-FormatText-WithLinks-AndTables
+
+0.07    Fri 16 Dec 2016
+        Strips \240 characters created by HTML::Formatter when it encounters a &nbsp;
+0.06    Tue 21 May 2015
+        Fixed usage of Dist::Zilla::Plugin::OurPkgVersion so that MetaCPAN will hopefully accept this version
+        Fixed issue with custom formatting parameters not being passed around properly.
+0.05    Tue 21 May 2015
+        Fixed bug with empty <td> tags.
+0.04    Tue 19 May 2015
+        Documentation fix.
+0.03    Tue 19 May 2015
+        New maintainer, Dale Evans http://search.cpan.org/~daleevans/
+        Handle table headers <th> by treating them like <td> (patch from Alex Aminoff, NBER)
+        Some typos fixed (patch from Fabrizio Regalli)
+        Handle empty table rows without crashing
+        Return () when called in an array context on undefined HTML
+        Converted to Dist::Zilla
+
+0.02    Thu 7 Jun 2012
+        Modified so content text of "0" prints properly
+
+0.01    Wed 10 Dec 2008
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,24 @@
+#!/usr/bin/perl
+## skip Test::Tabs
+
+use 5.010;
+use HTML::HTML5::Parser;
+
+my $input  = shift // '-';
+my $output = shift // '-';
+
+my $parser = HTML::HTML5::Parser->new;
+my $dom = ($input eq '-')
+	? $parser->parse_string(do { local $/ = <STDIN> })
+	: $parser->parse_file($input);
+
+if ($output eq '-')
+{
+	print $dom->toString;
+}
+else
+{
+	open my($fh), '>:encoding(UTF-8)', $output;
+	print $fh $dom->toString;
+	close $fh;
+}

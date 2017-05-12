@@ -1,0 +1,63 @@
+body {
+    font-family: verdana, tahoma, sans-serif;
+}
+form {
+    width: 50%;
+    margin: 1em auto;
+}
+.widget_fieldset {
+    padding: 0.5em 0;
+    border: 1px solid #c0c0c0;
+    background: #f0f0f0;
+}
+legend {
+    font-weight: bold;
+    font-style: italic;
+    color: #333;
+    margin: 0;
+    padding: 0.1em 0.5em;
+}
+label, .radiogroup_fieldset {
+    padding: 0 1em;
+    margin: 0em;
+    margin-top: 0.5em;
+    display: block;
+}
+textarea {
+    width: 100%;
+}
+input.submit {
+    margin-left: 1em;
+    font-weight: bold;
+    clear: both;
+    display: block;
+    margin-top: 1em;
+}
+input.texfield, input.password {
+    margin-top: 0.1em;
+    display: block;
+    width: 50%;
+}
+.labels_with_errors {
+    display: block;
+    padding-top: 5px;
+    border-top: 1px solid red;
+    background: #e0e0e0;
+}
+.labels_with_errors span, .labels_with_errors input {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+.error_messages {
+    color: red;
+    font-style: italic;
+    padding: 5px 1em;
+    display: block;
+    border-bottom: 1px solid red;
+    background: #e0e0e0;
+}
+.label_comments {
+    font-style: italic;
+    color: #444;
+    margin-left: 0.4em;
+}

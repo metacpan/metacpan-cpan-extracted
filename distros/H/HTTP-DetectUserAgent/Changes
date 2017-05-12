@@ -1,0 +1,30 @@
+Revision history for perl module HTTP::DetectUserAgent
+
+0.07 2015-10-29 NEILB
+    - Explicitly use YAML in the testsuite, so it will get
+      picked up as a dependency for Test::Base.
+      Thanks to ANDK for re-opening RT#51152 (see 0.04 below)
+
+0.06 2015-10-26 NEILB
+    - Switched to Dist::Zilla
+    - Updated github repo URL after changing my github username
+
+0.05 2014-02-02
+    - Specified min perl dependency of 5.6.0
+
+0.04 2012-09-27
+    - Added YAML as a dependency (required by testsuite). RT#51152
+
+0.03 2012-09-25
+    - This release by Neil Bowers (thanks Takaaki-san for co-maint)
+    - Updated SEE ALSO to link to other UA modules and my review
+    - Added github repository info to Makefile.PL and pod
+    - Reformatted this to follow CPAN::Spec::Changes
+    - Added LICENSE to Makefile.PL (same as perl)
+
+0.02 2009-11-01
+    - Fix Makefile.PL( add Test::Base to require modules )
+    - Add detection code for iPhone and some Crawlers.
+
+0.01 2008-09-22
+    - Initial release.

@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Hash/Weighted/Categorize.pm
+lib/Hash/Weighted/Categorize/Parser.eyp
+lib/Hash/Weighted/Categorize/Parser.pm
+t/00-load.t
+t/000-report-versions-tiny.t
+t/20-sample.t
+t/release-distmeta.t
+t/release-pod-syntax.t
+weaver.ini

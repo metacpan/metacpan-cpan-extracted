@@ -1,0 +1,172 @@
+NAME
+    HTML::HTML5::ToText - convert HTML to plain text
+
+SYNOPSIS
+     my $dom = HTML::HTML5::Parser->load_html(IO => \*STDIN);
+     print HTML::HTML5::ToText
+         ->with_traits(qw/ShowLinks ShowImages RenderTables/)
+         ->new()
+         ->process($dom);
+
+DESCRIPTION
+    The HTML::HTML5::ToText module itself produces a pretty boring
+    conversion of HTML to text, but thanks to Moose and MooseX::Traits it
+    can easily be composed with "traits" that improve the output.
+
+  Compositor
+    "with_traits(@traits)"
+        This class method creates a new class that composes
+        "HTML::HTML5::ToText" with each trait given, returning the name of
+        that class. That class will be a subclass of "HTML::HTML5::ToText".
+
+        Traits are taken to be in the "HTML::HTML5::ToText::Trait" namespace
+        unless overridden by prefixing the trait with "+".
+
+  Constructors
+    *   "new(%attrs)"
+
+        Creates a new instance of the class.
+
+    *   "new_with_traits(traits => \@traits, %attrs)"
+
+        Shortcut for:
+
+         HTML::HTML5::ToText->with_traits(@traits)->new(%attrs)
+
+  Attributes
+    As per usual for Moose classes, accessor methods are provided for each
+    attribute, and attributes may be set in the constructor.
+
+    "HTML::HTML5::ToText" does not actually provide any attributes, but some
+    traits may.
+
+  Methods
+    *   "process($node)"
+
+        Processes an XML::LibXML::Node and returns a string. May be called
+        as a class or object method.
+
+        Because "process" likes to perform some alterations to the DOM tree,
+        as a first stage it makes a clone of the DOM tree (so that it can
+        leave the original intact). If you don't care about any changes to
+        the tree, and want to save a bit of CPU, then you can suppress the
+        cloning by passing a true value as a second argument to "process".
+
+         HTML::HTML5::ToText->process($node, 'no_clone')
+
+    *   "process_string($string)"
+
+        As per "process", but first parses the string with
+        HTML::HTML5::Parser. The second argument (for cloning) does not
+        exist as cloning is not needed in this case.
+
+    There are also methods named (in upper-case) after every element defined
+    in HTML5: "STRONG($node)", "DL($node)", "IMG($node)" and so on, which
+    "process($node)" delegates to; and a "textnode($node)" method which is
+    the equivalent for text nodes. These are the methods which traits tend
+    to modify.
+
+EXTENDING
+    MooseX::Traits makes it pretty easy to cleanly extend this module. Say
+    for example, we want to add the feature where the HTML "<del>" element
+    is output as the empty string. (The default behavious treats it rather
+    like "<div>".)
+
+     {
+       package Local::SkipDEL;
+       use Moose::Role;
+       override DEL => sub { '' };
+     }
+ 
+     print HTML::HTML5::ToText
+       -> with_traits(qw/ShowLinks ShowImages +Local::SkipDEL/)
+       -> process_string($html);
+
+    Or maybe we want to force "<big>" elements into uppercase?
+
+     {
+       package Local::Embiggen;
+       use Moose::Role;
+       around BIG => sub
+       {
+         my ($orig, $self, $elem) = @_;
+         return uc $self->$orig($elem);
+       };
+     }
+ 
+     print HTML::HTML5::ToText
+       -> with_traits(qw/+Local::Embiggen/)
+       -> process_string($html);
+
+    Share your examples of extending HTML::HTML5::ToText at
+    <https://bitbucket.org/tobyink/p5-html-html5-totext/wiki/Extending>.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=HTML-HTML5-ToText>.
+
+SEE ALSO
+    HTML::HTML5::Parser, HTML::HTML5::Table.
+
+    HTML::HTML5::ToText::Trait::RenderTables,
+    HTML::HTML5::ToText::Trait::ShowImages,
+    HTML::HTML5::ToText::Trait::ShowLinks,
+    HTML::HTML5::ToText::Trait::TextFormatting.
+
+  Similar Modules on CPAN
+    *   HTML::FormatText
+
+        About 15 years old, and still maintained, this falls into the
+        "mature" category. This module is based on HTML::Tree, so its HTML
+        parser may not behave as closely to modern browsers as
+        HTML::HTML5::Parser's parsing, but its conversion to text seems
+        somewhat better than HTML::HTML5::ToText's default output (i.e. with
+        no traits applied).
+
+        At the time of writing, its bug queue on rt.cpan.org lists eight
+        bugs, some quite serious. However, since being taken over by its
+        latest maintainer, there seems to be progress being made on them.
+
+        Fairly extensible, but not in the mix-and-match traits way allowed
+        by HTML::HTML5::ToText.
+
+    *   HTML::FormatText::WithLinks
+
+        An extension of HTML::FormatText.
+
+    *   HTML::FormatText::WithLinks::AndTables
+
+        An extension of HTML::FormatText::WithLinks.
+
+        The code that deals with tables is pretty crude compared with
+        HTML::HTML5::ToText::Trait::RenderTables. It doesn't support
+        "colspan", "rowspan", or the "<th>" element.
+
+    *   LEOCHARRE::HTML::Text
+
+        Very basic conversion; basically just tag stripping using regular
+        expressions.
+
+    *   HTML::FormatExternal
+
+        Passes HTML through external command-line tools such as `lynx`.
+        Obviously this has limited portability.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+THANKS
+    Everyone behind Moose. No way I could have done all this in a few hours
+    without Moose's strange brand of meta-programming!
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012-2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

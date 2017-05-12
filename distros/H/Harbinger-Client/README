@@ -1,0 +1,271 @@
+SYNOPSIS
+
+     my $client = Harbinger::Client->new(
+       harbinger_ip => '10.6.1.6',
+       harbinger_port => 8090,
+       default_args => [
+         server => 'foo.lan.bar.com',
+         port   => 1890,
+       ],
+     );
+    
+     my $doom = $client->start(
+        ident => 'process-images',
+     );
+    
+     for (@images) {
+        ...
+        $doom->bode_ill;
+     }
+    
+     $client->send($doom->finish);
+
+LIGHTHOUSE ⛯
+
+    Beware the siren song (👄) of the Harbinger! The API is not stable yet,
+    I already have major changes planned for a plugin (🔌) system. I'm not
+    even going to attempt to keep things working. You've been warned (⚠).
+
+DESCRIPTION
+
+    After reading The Mature Optimization Handbook
+    <http://carlos.bueno.org/optimization/mature-optimization.pdf>, in a
+    fever dream of hubris, I wrote Harbinger::Client and Harbinger::Server
+    <https://github.com/frioux/Harbinger>. They have both served me
+    surprisingly well with how minimal they are. The goal is to be as
+    lightweight as possible such that the measuring of performance does not
+    degrade performance nor impact reliability. If the client ever throws
+    an exception I have failed in my goals.
+
+    As should be clear in the "SYNOPSIS" the grim measurement that the
+    Harbinger records is called "DOOM 💀". "DOOM 💀" currently measures a
+    handful of data points, but the important bits are:
+
+      * time
+
+      * space
+
+      * queries
+
+    See more in "DOOM 💀".
+
+  METHODS
+
+  new
+
+    Instantiate client with this method. Note example in "SYNOPSIS".
+
+    Takes a hash of harbinger_ip (default of 127.0.0.1), harbinger_port
+    (default of 8001), and default_args (default of []).
+
+    harbinger_ip and harbinger_port are how to connect to the remote
+    Harbinger::Server.
+
+    default_args get used in "start" and "instant" when forging new "DOOM
+    💀".
+
+  start
+
+    The typical way to start measuring some "DOOM 💀". Note example in
+    "SYNOPSIS".
+
+    Actual implementation at "Harbinger::Client::Doom->start".
+
+  instant
+
+     $client->instant(
+        ident => 'man overboard',
+        count => 1,
+     );
+
+    Instead of measuring deltas as "DOOM 💀" typically does, this method is
+    for measuring instantaneous events, maybe for counting or graphing them
+    later. Sends the event immediately.
+
+  send
+
+     $client->send($completed_doom);
+
+    Once "DOOM 💀" is ready to be sent to the server pass it to send.
+
+DOOM 💀
+
+    Measure the crushing weight, the glacial pace, the incredible demand
+    which your application puts upon your database server with DOOM™
+
+ DOOMFUL ATTRIBUTES ☠
+
+  server
+
+    Something unique that identifies the machine that we are measuring the
+    "DOOM 💀" for. A good idea is the ip address or the hostname. If this is
+    not set "DOOM 💀" will not be sent or recorded.
+
+  ident
+
+    Something unique that identifies the task that we are measuring the
+    "DOOM 💀" for. For a web server, PATH_INFO might be a good option, or
+    for some kind of message queue the task type would be a good option.
+
+  pid
+
+    The pid of the process "DOOM 💀" is being recorded for. Has a sensible
+    default, you probably will never need to set it.
+
+  port
+
+    The port that the service is listening on, if applicable. Leave alone
+    if unknown or not applicable.
+
+  count
+
+    The count of things being done in this unit of "DOOM 💀". If it were a
+    web request that returns a list of items, this would reasonably be set
+    as that number. If the operation is not related to things that are
+    countable, leave alone.
+
+  milliseconds_elapsed
+
+    The total milliseconds elapsed during the unit of "DOOM 💀". If instant
+    or unknown "DOOM 💀" leave empty.
+
+  db_query_count
+
+    The total queries executed during the unit of "DOOM 💀". If not
+    applicable or unknown "DOOM 💀" leave empty.
+
+  memory_growth_in_kb
+
+    The total memory growth in kb during the unit of "DOOM 💀". If not
+    applicable or unknown "DOOM 💀" leave empty.
+
+  query_logger
+
+    A tool to measure query count with DBIx::Class. Please only use as
+    documented, underlying implementation may change. See "QUERYLOG 📜"
+
+ DOOMFUL METHODS 🔮
+
+  Harbinger::Client::Doom->start
+
+    Normally called via "start". Sets up some internal stuff to make
+    automatic measuring of "memory_growth_in_kb" and "milliseconds_elapsed"
+    work. Takes a hash and merges hash into the object via accessors.
+
+    NOTE: to automatically measure memory growth you need either
+    Win32::Process::Memory or Proc::ProcessTable installed.
+
+  $doom->bode_ill
+
+    Increment the "DOOM 💀" "count"er.
+
+  $doom->finish
+
+     $doom->finish( count => 32 );
+
+    Finalizes "memory_growth_in_kb" and "milliseconds_elapsed". As with
+    "Harbinger::Client::Doom->start" takes a hash and merges it into the
+    object via accessors. Returns the object to allow chaining.
+
+Plack::Middleware::Harbinger
+
+     builder {
+       enable Harbinger => {
+          harbinger_ip   => '192.168.1.1',
+          harbinger_port => 2250,
+          default_args   => [
+             server => '192.168.1.2',
+             port   => 80,
+          ],
+       };
+       $my_app
+     };
+
+    Takes the same args as "new". Adds query_log from "DOOM 💀" to
+    harbinger.querylog in psgi ENV. See "QUERYLOG 📜".
+
+    After the query completes the "DOOM 💀" will automatically be sent.
+
+    If harbinger.ident is set it will be used for the "ident", otherwise
+    PATH_INFO will be used.
+
+    harbinger.server, and harbinger.count are passed more or less directly.
+
+    harbinger.port will be passed if true, otherwise SERVER_PORT will be
+    used.
+
+Catalyst::TraitFor::Controller::Harbinger
+
+    This page intentionally left blank.
+
+QUERYLOG 📜
+
+    You are recommended to apply the query log with
+    DBIx::Class::QueryLog::Tee and DBIx::Class::QueryLog::Conditional.
+
+    First, set up your schema package MyApp::Schema;
+
+     use base 'DBIx::Class::Schema';
+     use aliased 'DBIx::Class::QueryLog::Tee';
+     use aliased 'DBIx::Class::QueryLog::Conditional';
+    
+     __PACKAGE__->load_namespaces(
+        default_resultset_class => 'ResultSet',
+     );
+    
+     sub connection {
+        my $self = shift;
+    
+        my $ret = $self->next::method(@_);
+    
+        $ret->storage->debugobj(
+           Tee->new(
+              loggers => {
+                 original => Conditional->new(
+                    logger => $self->storage->debugobj,
+                    enabled_method => sub { $ENV{DBIC_TRACE} },
+                 ),
+              },
+           )
+        );
+    
+        $ret->storage->debug(1);
+    
+        $ret
+     }
+    
+     1;
+
+    Note that the DBIx::Class::QueryLog::Tee extension allows you to add
+    more Query loggers as you go, so you can even log inner loops and outer
+    loops at the same time. Also note that
+    DBIx::Class::QueryLog::Conditional allows you to have the Harbinger
+    loggers always on, but the pretty DBIx::Class console logger can still
+    be set via environment variable, as usual.
+
+    Now to set the logger after whipping up some "DOOM 💀" this is all
+    that's needed:
+
+     my $doom = $client->start(
+        ident => 'process-images',
+     );
+    
+     $schema->storage->debugobj
+       ->add_logger('process-images-harbinger', $doom->query_logger);
+    
+     $client->send($doom->finish);
+     $schema->storage->debugobj
+       ->remove_logger('process-images-harbinger');
+
+    Finally, if you have some legacy code or are using the wrong ORM, you
+    can still use the QueryLogger as follows:
+
+     $dbh->{Callbacks}{ChildCallbacks}{execute} = sub {
+       $doom->query_log->query_start('', []);
+       $doom->query_log->query_end('', []);
+       return ();
+     }
+
+    If you can pull it off, doing this dynamically with local is preferred,
+    but that's not always possible.
+

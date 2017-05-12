@@ -1,0 +1,105 @@
+HTML-Tree version 5.06, released 2017-04-28
+
+
+This distribution contains a suite of modules for representing,
+creating, and extracting information from HTML syntax trees; there is
+also relevent documentation.  These modules used to be part of the
+libwww-perl distribution, but are now unbundled in order to facilitate
+a separate development track.  Bug reports and discussions about these
+modules can be sent to the RT queue at <bug-html-tree@rt.cpan.org>.
+
+The modules and documentation present in this collection are:
+
+  HTML::Tree -- overview of the modules.
+
+  HTML::Tree::AboutObjects -- an article by Sean M. Burke from
+    The Perl Journal #17: "User's View of Object-Oriented Modules"
+
+  HTML::Tree::AboutTrees -- an article by Sean M. Burke from
+    The Perl Journal #18: "Trees", about tree-shaped data
+    structures in Perl.
+
+  HTML::Tree::Scanning -- an article by Sean M. Burke from
+    The Perl Journal #19: "Scanning HTML".
+
+
+  HTML::Element - class for representing the nodes of the HTML syntax
+        trees.  The elements have other elements and text segments
+        as children.  The HTML::Element class has methods to build,
+        alter, and traverse the structure of the tree.
+
+  HTML::TreeBuilder - a class that uses HTML::Parser to read HTML
+        document text and build from it a syntax tree made of
+        HTML::Element nodes.
+
+  HTML::Parse - deprecated module.  Now just a wrapper around
+        HTML::TreeBuilder
+
+  HTML::AsSubs - module providing an easy way to build an HTML syntax
+        tree by nesting functions.
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+
+DEPENDENCIES
+
+  Package         Minimum Version
+  --------------- ---------------
+  perl             5.8.0
+  Carp             
+  Exporter         
+  HTML::Entities   
+  HTML::Parser     3.46
+  HTML::Tagset     3.02
+  Scalar::Util     
+  integer
+
+
+
+SOURCE
+
+The source is now kept at https://github.com/kentfredric/HTML-Tree
+
+
+
+SUBLIMINAL MESSAGE: BUY THE BOOK!
+
+The book /Perl & LWP/ by Sean M. Burke is published by
+O'Reilly and Associates, 2002.  ISBN: 0-596-00178-9
+
+It has several chapters to do with HTML processing in general,
+and HTML-Tree specifically.  There's more info at:
+
+  http://www.oreilly.com/catalog/perllwp/
+  http://www.amazon.com/exec/obidos/ASIN/0596001789
+
+
+
+COPYRIGHT
+
+Copyright 1995-1998 Gisle Aas; 1999-2004 Sean M. Burke;
+2005 Andy Lester; 2006 Pete Krawczyk; 2010 Jeff Fearn;
+2012 Christopher J. Madsen (Except the articles contained in
+HTML::Tree::AboutObjects, HTML::Tree::AboutTrees, and
+HTML::Tree::Scanning, which are all copyright 2000 The Perl Journal.)
+
+Except for those three TPJ articles, the whole HTML-Tree distribution,
+of which this file is a part, is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+Those three TPJ articles may be distributed under the same terms as
+Perl itself.
+
+The programs in this library are distributed in the hope that they
+will be useful, but without any warranty; without even the implied
+warranty of merchantability or fitness for a particular purpose.

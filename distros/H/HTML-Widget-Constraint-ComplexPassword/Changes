@@ -1,0 +1,7 @@
+Revision history for Perl extension HTML::Widget::Constraint::ComplexPassword.
+
+0.01  Mon Jul 30 17:02:43 2007
+	- standard password complexity checking
+	- original version; created by h2xs 1.23 with options
+		--omit-autoload --omit-XS --compat-version 5.6.0 --name HTML::Widget::Constraint::ComplexPassword
+

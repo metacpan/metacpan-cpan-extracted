@@ -1,0 +1,63 @@
+{
+   "abstract" : "Role to assist writing HackaMol extensions to external programs",
+   "author" : [
+      "Demian Riccardi <demianriccardi@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "HackaMol-X-ExtensionRole",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Carp" : "0",
+            "File::chdir" : "0",
+            "HackaMol::ExeRole" : "0",
+            "HackaMol::PathRole" : "0",
+            "Moose::Role" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Cwd" : "0",
+            "HackaMol" : "0",
+            "Math::Vector::Real" : "0",
+            "Moose" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "MooseX::StrictConstructor" : "0",
+            "Test::Dir" : "0",
+            "Test::Fatal" : "0",
+            "Test::Moose" : "0",
+            "Test::More" : "0",
+            "Test::Warn" : "0",
+            "namespace::autoclean" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/demianriccardi/HackaMol-X-ExtensionRole",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/demianriccardi/HackaMol-X-ExtensionRole.git",
+         "web" : "https://github.com/demianriccardi/HackaMol-X-ExtensionRole"
+      }
+   },
+   "version" : "0.01"
+}
+

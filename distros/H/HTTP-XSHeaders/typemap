@@ -1,0 +1,7 @@
+TYPEMAP
+HList *   T_HLIST
+
+INPUT
+T_HLIST
+  $var = sv_2HList($arg, \"$var\");
+

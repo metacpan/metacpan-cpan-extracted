@@ -1,0 +1,3 @@
+% foreach my $p (sort $req->param) {
+<% $p %>=<% $req->param($p) %>
+% }

@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/HTML/WikiConverter/FreeStyleWiki.pm
+minil.toml
+t/00_compile.t
+t/01_freestylewiki.t
+t/02_convert.t
+t/03_preserve_tags.t
+t/regression/issue1.t
+t/test.html
+t/test.wiki
+META.yml
+MANIFEST

@@ -1,0 +1,14 @@
+Revision history for Perl extension Hyle.
+
+0.04 Thu Fed 20 2014
+    - fixes for the delete action.
+
+0.03 Tue Feb 18 2014
+    - minor fixes
+
+0.02 Mon Feb 10 2014
+    - more tests and documentation.
+
+0.01 Sat Jan 11 2013
+    - initial release.
+

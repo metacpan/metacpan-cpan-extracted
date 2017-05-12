@@ -1,0 +1,162 @@
+NAME
+    HTML::Detergent - Clean the gunk off an HTML document
+
+VERSION
+    Version 0.03
+
+SYNOPSIS
+        use HTML::Detergent;
+
+        my $scrubber = HTML::Detergent->new($config);
+
+        # $input can be a string, GLOB reference, or XML::LibXML::Document
+
+        my $doc = $scrubber->process($input, $uri);
+
+DESCRIPTION
+    HTML::Detergent is for isolating the main content of an HTML page,
+    stripping it of navigation, visual design, and other ancillary content.
+
+    The main purpose of this module is to aid in the migration of web
+    content from one content management system to another. It is also useful
+    for preparing HTML resources for automated content inventories.
+
+    The module currently has no heuristics for determining the main content
+    of a page. It works instead by assuming prior knowledge of the layout,
+    given in the configuration by an XPath expression that uniquely isolates
+    the container node. That node is then lifted into a new document, along
+    with the contents of the "<head>", and returned by the "process" method.
+    To accommodate multiple layouts on a site, the module can be initialized
+    to match multiple XPath expressions. If further processing is necessary,
+    an expression can be associated with an XSLT stylesheet, which is
+    assumed to produce an entire document, thus overriding the default
+    behaviour.
+
+    After the new document is generated and before it is returned by
+    "process", it is possible to inject "<link>" and "<meta>" elements into
+    the "<head>". This enables the inclusion of metadata and the
+    re-association of the main content with links that represent aspects of
+    the page which have been removed (e.g. navigation, copyright statement,
+    etc.). In addition, if the page's URI is supplied to the "process"
+    method, the "<base>" element is either added or rewritten to reflect it,
+    and the URI attributes in the body are rewritten relative to the base.
+    Otherwise they are left alone.
+
+    The document returned is an XML::LibXML::Document object using the XHTML
+    namespace, "http://www.w3.org/1999/xhtml", but does not profess to
+    validate against any particular schema. If DTD declarations (including
+    the empty "<!DOCTYPE html>" recommended in HTML5) are desired, they can
+    be added on afterward. Likewise, the object can be converted from XML
+    into HTML using "toStringHTML" in XML::LibXML::Document.
+
+METHODS
+  new %CONFIG | \%CONFIG | $CONFIG
+    Initialize the processor, either with a list of configuration
+    parameters, a HASH reference thereof, or an HTML::Detergent::Config
+    object. Below are the valid parameters:
+
+    match
+        This is an ARRAY reference of XPath expressions to try against the
+        document, in order of preference. Entries optionally may be
+        two-element ARRAY references themselves, the second element being a
+        URL where an XSLT stylesheet may be found.
+
+            match => [ '/some/xpath/expression',
+                       [ '/other/expr', '/url/of/transform.xsl' ],
+                     ],
+
+    link
+        This is a HASH reference where the keys correspond to "rel"
+        attributes and the values to "href" attributes of "<link>" elements.
+        If the values are ARRAY references, they will be processed in
+        document order. "rel" attributes will be sorted lexically. If a
+        callback is supplied instead, the caller expects a result of the
+        same form.
+
+            link => { rel1 => 'href1', rel2 => [ qw(href2 href3) ] },
+
+            # or
+
+            link => \&_link_cb,
+
+    meta
+        This is a HASH reference where the keys correspond to "name"
+        attributes and the values to "content" attributes of "<meta>"
+        elements. If the values are ARRAY references, they will be processed
+        in document order. "name" attributes will be sorted lexically. If a
+        callback is supplied instead, the caller expects a result of the
+        same form.
+
+            meta => { name1 => 'content1',
+                      name2 => [ qw(content2 content3) ] },
+
+            # or
+
+            meta => \&_meta_cb,
+
+    callback
+        These callbacks will be passed into the internal XML::LibXSLT
+        processor. See XML::LibXML::InputCallback for details.
+
+            callback => [ \&_match_cb, \&_open_cb, \&_read_cb, \&_close_cb ],
+
+            # or
+
+            callback => $icb, # isa XML::LibXML::InputCallback
+
+  process $INPUT [, $URI, $CONFIG ]
+    Processes $INPUT, which may be a string, GLOB reference, or
+    XML::LibXML::Document object. Returns an XML::LibXML::Document object
+    with the changes mentioned in the "DESCRIPTION".
+
+AUTHOR
+    Dorian Taylor, "<dorian at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-html-detergent at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=HTML-Detergent>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc HTML::Detergent
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker (report bugs here)
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-Detergent>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/HTML-Detergent>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/HTML-Detergent>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/HTML-Detergent/>
+
+SEE ALSO
+    XML::LibXML
+    XML::LibXSLT
+    HTML::HTML5::Parser
+
+LICENSE AND COPYRIGHT
+    Copyright 2013 Dorian Taylor.
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at <http://www.apache.org/licenses/LICENSE-2.0>
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+

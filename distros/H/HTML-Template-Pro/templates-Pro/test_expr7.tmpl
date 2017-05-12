@@ -1,0 +1,20 @@
+<HTML>
+<body>
+<H1> test_expr7 </H1>
+
+We test inner loop variables
+
+<table>
+<TMPL_LOOP NAME=HASHREF1> 
+<tr>
+<td>first:<tmpl_var EXPR="__first__"></td>
+<td>last: <tmpl_var EXPR="__last__"></td>
+<td>odd:<tmpl_var EXPR="__odd__"></td>
+<td>inner:<tmpl_var EXPR="__inner__"></td>
+<td>count:<tmpl_var EXPR="__counter__"></td>
+</tr>
+</tmpl_loop> 
+</table>
+
+</body>
+</HTML>

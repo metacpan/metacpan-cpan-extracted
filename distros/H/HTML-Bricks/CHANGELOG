@@ -1,0 +1,15 @@
+07-18-2001: v0.03 released
+  - improved installation script (Pascal Fleury)
+  - fixed global data initialization bug
+  - minor changes elsewhere
+
+07-14-2001: v0.02 released
+  - complete rewrite of guts
+  - clean-up of the bricks graph
+  - changed bricks for cleaned-up graph and new guts
+  - Polished UI a little
+  - fixed many minor bugs
+  - added installation script
+
+04-30-2001: v0.01 released
+  - Peter gets his life back

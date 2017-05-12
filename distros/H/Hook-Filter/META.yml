@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Hook-Filter
+version:             0.10
+abstract:            A runtime firewall for subroutine calls
+license:             ~
+author:              
+    - Erwan Lemonnier <erwan@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    File::Spec:                    0.86
+    Module::Pluggable:             2.2
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

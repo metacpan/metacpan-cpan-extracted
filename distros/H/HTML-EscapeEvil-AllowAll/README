@@ -1,0 +1,48 @@
+NAME
+    HTML::EscapeEvil::AllowAll - Escape tag.but all tag allow
+
+VERSION
+    0.05
+
+SYNPSIS
+        use HTML::EscapeEvil::AllowAll;
+        my $escapeallow = HTML::EscapeEvil::AllowAll->new;
+        print "script is " , ($escapeallow->allow_script) ? "allow" : "not allow";
+        print "style is " , ($escapeallow->allow_style) ? "allow" : "not allow";
+        $escapeallow->clear;
+
+DESCRIPTION
+    Only tag where it wants to escape is specified with deny_tags method
+    etc.
+
+    and it uses it because it all enters the state of permission.
+
+METHOD
+  new
+    Create HTML::EscapeEvil::AllowAll instance.
+
+  allow_all
+    All tags allow.
+
+    Example :
+
+      $escapeallow->allow_all;
+
+  _to_flat_array
+    Private method.
+
+  _init
+    Private method.
+
+SEE ALSO
+    HTML::EscapeEvil
+
+AUTHOR
+    Akira Horimoto <kurt0027@gmail.com>
+
+COPYRIGHT
+    Copyright (C) 2006 Akira Horimoto
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

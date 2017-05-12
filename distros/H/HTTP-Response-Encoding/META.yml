@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               HTTP-Response-Encoding
+version:            0.06
+abstract:           Adds encoding() to HTTP::Response
+author:
+    - Dan Kogai <dankogai@dan.co.jp>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Encode:          2
+    HTTP::Response:  0
+    Test::More:      0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

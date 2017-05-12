@@ -1,0 +1,21 @@
+Hook/Scope version 0.01
+=======================
+
+This module allows you to register hooks for scope exits.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Arthur Bergman
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

@@ -1,0 +1,87 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 300fc54150aee9a54fda9c702420ec87e24ce4d0 Changes
+SHA1 7bcad13ac09dde21f84cf5ce83edeabff115528c MANIFEST
+SHA1 5ed4c509817dc5ba0b6328e27f7d1547c0fbb209 META.json
+SHA1 1ea29b503c9e58687727c70cb833fb5cd9c23060 META.yml
+SHA1 1dda51c011486559d29bb8a7dd99d94b2807a70d Makefile.PL
+SHA1 13943d9e45c3552bf6f6240303b16783bb407e3b README
+SHA1 4a28a03da82ba02ff5796fea73563701e9d77aa8 lib/HTML/Element/Library.pm
+SHA1 de66e070d9ee27d00c9043740a51b75672f8b70c t/00system.t
+SHA1 e2193f3aaf1f01d3afe33b4246a100fd8f22a85a t/html/crunch-exp.html
+SHA1 341bc3688909db8d712eb8e16d827c6c761274fb t/html/crunch.html
+SHA1 f860da3833285b6aadef5f76a0e4d8b8a0c5d2b8 t/html/defmap-exp.html
+SHA1 eca148d8eae0be6f1ab19928f5c3d4b85cc817ff t/html/defmap.html
+SHA1 d0fa0224af178d8aa7d1ee622252d987ae119a04 t/html/dual_iter-exp.html
+SHA1 66d9cdb09279f5bfff6a52155df41bb3c495acf6 t/html/dual_iter.html
+SHA1 404fb46c90fd6564b119eae5d2c8d8cef1af76a4 t/html/fillinform-exp.html
+SHA1 787700b033a6860c3d9e50111cc80dfd11f3081e t/html/fillinform.html
+SHA1 4992e94cb0903c54c38795a41938378d4c8227b0 t/html/hashmap-exp.html
+SHA1 8e228d80be1826a61e1cfe3bcc47d8cfdce73b3a t/html/hashmap.html
+SHA1 7d0e6b932cec1618b5d1ddc5620674cbd7fa57c7 t/html/highlander-15-exp.html
+SHA1 b8c49946bfca498d50df2548d9abe82f5894d3d4 t/html/highlander-5-exp.html
+SHA1 b9971a9de8fe238a8ffa306f0ca2838149e7799b t/html/highlander-50-exp.html
+SHA1 9421015a5b52d4680eb49e673e34529516516f0f t/html/highlander.html
+SHA1 547a7bc5f7498cc1aed8d42d3fa6c28c120eb2a7 t/html/highlander2-15-exp.html
+SHA1 8c0472e58b5ff430d461b1183fa9b3cf779fc485 t/html/highlander2-27-exp.html
+SHA1 61d67c2af21f995ead218469a82aaa7ef40f67e3 t/html/highlander2-5-exp.html
+SHA1 604aadd96324696c0dd033f7abf9665d37be7c5d t/html/highlander2-passover-exp.html
+SHA1 b3923438fea8846e82f6cf05379ff43a774f9c90 t/html/highlander2.html
+SHA1 ec25775279f28ae5cf6029b7f58c8b517c5136a1 t/html/iter-exp.html
+SHA1 405cd0a0d8031e6947bee961f967184ac1f3e75c t/html/iter.html
+SHA1 2d9589489b7bfa58f21938246e688e2bd5a71879 t/html/iter2-exp.html
+SHA1 9311975a54f9cce63a3c5a21ecbfba14abaf46e1 t/html/iter2.html
+SHA1 afc361b5a3a9edb833fb22728d96c57a56a5bf4e t/html/itercb-exp.html
+SHA1 2f55b52a6b897cbe2ab5d973c7bb4af28efc79c2 t/html/itercb.html
+SHA1 24e3ef64a56b047a6ddf357e192ccdf2bcdd85aa t/html/position.html
+SHA1 cb85f61116828c3c1157d6bb026d1cbe7f1bfd78 t/html/prune-exp.html
+SHA1 762afc24bb38d51b3b5293a6b8e7b17d5662a9b4 t/html/prune.html
+SHA1 9ceec5ef96a4a9cb1227866bc78433826cfbb5a8 t/html/table-alt-exp.html
+SHA1 3d21aab8c6c02e878fb3cdd3b72c63bddd8a95d4 t/html/table-alt.html
+SHA1 1895da3c3322a0fa2ed4f04ce8fa0ed3cc7efed6 t/html/table-exp.html
+SHA1 10815b659306e9a0c75133546bdd88a3632460ca t/html/table.html
+SHA1 6c7a9138128aaa8e51332116d3adb8b11aadae8c t/html/table2-exp.html
+SHA1 5b9bedb396e95d268227f1557a270b41b6dda44b t/html/table2-table_ld-exp.html
+SHA1 3647c669c95141deb31dafbd7635d6248a76d75b t/html/table2-tr_ld-arrayref-exp.html
+SHA1 9c6aa4dde4ee1e64915c38e139086c3c93024014 t/html/table2-tr_ld-arrayref.html
+SHA1 6238218ea283a93a26360192b39fec991e4b2364 t/html/table2-tr_ld-coderef-exp.html
+SHA1 c7b37bea01adbe3255e2ada86725f392e86fa9c2 t/html/table2-tr_ld-default-exp.html
+SHA1 71cc9f5a0f03ca3feebe81913876eb9945fb33ff t/html/table2.html
+SHA1 5cb634cca3eb0aa522e0264e10923abe4c11bf22 t/html/unroll_select-exp.html
+SHA1 c1a6c5123288f163671f68e15c68588bd6f4bfd3 t/html/unroll_select.html
+SHA1 aed47a4516ad8c5381e06c41a16bdfc6e7ed15b4 t/lib.pm
+SHA1 79db24f58aa8c16da4644b4fc4591911fa92f508 t/misc.t
+SHA1 61d0ee2ff95402d8b22f637fca777334317171f4 t/perlcritic.t
+SHA1 125969baa323f3257bf675eae19b556cfb2bf958 t/perlcriticrc
+SHA1 97b0d259035dd1b0eac7497ed80ff6d4ae53dccc t/tables.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJXbvmXAAoJEMoENb5ewbNi800P/A8Crj6Zuq16y/q8AnUPaOcK
+6IvoUJacHyvoa1OrQbYV7WBUvRccJr9XODNlDjZS8pEvBwo2WQfeqdzoCLnuuPxn
+BgNleEgr8TQoZoddZtKJ9qiis25QU6Nngo5VBgSWzZsUN6ZHw5ZZLmzkUF3FICxh
+G5uNOSJmvNyJnfUu/UnYQ/zvRQBnYmcj8P1O2O+uK0exPA/vKwVsdWcY+LOXLcSU
+W7/kV9r7EDtaHYwsbuxhWLvPyYhc+QWmy/d/ezqUcpXfuti8IDc1bEEk1wR0yhmS
+2Z4ovJs9wAAhIA047mUUDs016z13ZpR/Qrh3O8sARDUoL+24h6asfy+pb0mq4gWm
+mA9e4mB3oEe9dQWN1YS764sh1wNe5PxOgtfJbfiuFD1dj5BRHM0ZCC4Ve2l1c6HT
+gKzhzylqCqdExBUYyo/Aeql7e4NuNTmcCxwG9f7QJ9RAk9DsbaIDihRbhr2JmPQa
+dEbMUP5eilEBlaEtVXdXJMODAKpvi5Yy3PTNURygKABknn/6h84HUA4jCJBccKKp
+5a/KMxpf6JwVx3db6V1ZJCgwl5smlv6cdUqUsSE/Et3iZ0Fp3YIeUBYBH/z+VAoF
+2IM5KdXIuqKgbfUyY4pnEPuF6AC0LT1WDyPqzTW/ujnE5mff/BE9Z2FuZdrE6fqq
+PtNKv5MB3d5uK/jN3lk6
+=Y3Rq
+-----END PGP SIGNATURE-----

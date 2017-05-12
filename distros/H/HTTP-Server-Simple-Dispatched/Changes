@@ -1,0 +1,25 @@
+Revision history for HTTP-Server-Simple-Dispatched
+
+0.06    Mon March 24
+        301 redirects from unslashied urls will now properly redirect, and we
+				no longer clear headers, like ever.
+
+0.05    Fri March 21
+        Finally uninstalled Test::HTTP and tracked down the test bug.  I
+        really hope this is the last time I have to fix this.
+
+0.04    Thu March 20
+        Fixed some errors in the tests - should skip properly for synopsis if
+        Test::HTTP isn't installed.  Also fixed a bug in static().
+
+0.03    Fri March 14
+        Request should now actually read content bodies, which it did not
+        before.  It doesn't precisely conform to the HTTP standard, but that's
+        acceptable for the time being.
+
+0.02    Automatic setting of Content-Length header to avoid some sticky
+        problems where the trailing request newline was treated as part of the
+        body by most user-agents.
+
+0.01    Tue March 11
+        First release.

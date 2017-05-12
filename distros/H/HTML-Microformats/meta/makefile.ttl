@@ -1,0 +1,35 @@
+# This file provides instructions for packaging.
+
+@prefix : <http://purl.org/NET/cpan-uri/terms#> .
+
+<http://purl.org/NET/cpan-uri/dist/HTML-Microformats/project>
+	:perl_version_from _:main ;
+	:version_from _:main ;
+	:readme_from _:main ;
+	:requires "CGI 0";
+	:requires "CGI::Util 0";
+	:requires "DateTime 0";
+	:requires "DateTime::Duration 0";
+	:requires "DateTime::Format::Builder 0";
+	:requires "DateTime::Format::Natural 0";
+	:requires "DateTime::Format::Strptime 0";
+	:requires "DateTime::Span 0";
+	:requires "HTML::HTML5::Parser 0.200";
+	:requires "HTML::HTML5::Sanity 0.100";
+	:requires "HTTP::Date 0";
+	:requires "JSON 2.00";
+	:requires "Locale::Country 0";
+	:requires "Module::Pluggable 0";
+	:requires "Object::AUTHORITY 0";
+	:requires "RDF::Trine 0.135";
+	:requires "XML::LibXML 1.60";
+	:requires "URI 1.30";
+	:requires "URI::URL 0";
+	:test_requires "Test::More 0.61" ;
+	:recommends "RDF::iCalendar::Exporter 0.002";
+	:recommends "RDF::KML::Exporter 0";
+	:recommends "RDF::vCard::Exporter 0.006";
+	:recommends "XML::Atom::FromOWL 0".
+
+_:main <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#fileName> "lib/HTML/Microformats.pm" .
+

@@ -1,0 +1,21 @@
+---
+abstract: "Work with a deck of playing cards in the fashion engineered by Duane O'Brien of I.B.M. developerWorks.\r"
+author:
+  - 'Jason McVeigh <jmcveigh@outlook.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Helper-Deck
+requires:
+  List::Util: '0'
+  Moose: '0'
+  common::sense: '0'
+  feature: '0'
+version: '1.05'

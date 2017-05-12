@@ -1,0 +1,40 @@
+---
+abstract: 'Role to assist writing HackaMol extensions to external programs'
+author:
+  - 'Demian Riccardi <demianriccardi@gmail.com>'
+build_requires:
+  Cwd: '0'
+  HackaMol: '0'
+  Math::Vector::Real: '0'
+  Moose: '0'
+  Moose::Util::TypeConstraints: '0'
+  MooseX::StrictConstructor: '0'
+  Test::Dir: '0'
+  Test::Fatal: '0'
+  Test::Moose: '0'
+  Test::More: '0'
+  Test::Warn: '0'
+  namespace::autoclean: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HackaMol-X-ExtensionRole
+requires:
+  Capture::Tiny: '0'
+  Carp: '0'
+  File::chdir: '0'
+  HackaMol::ExeRole: '0'
+  HackaMol::PathRole: '0'
+  Moose::Role: '0'
+  perl: '5.008'
+resources:
+  homepage: https://github.com/demianriccardi/HackaMol-X-ExtensionRole
+  repository: https://github.com/demianriccardi/HackaMol-X-ExtensionRole.git
+version: '0.01'

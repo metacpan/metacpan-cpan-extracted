@@ -1,0 +1,44 @@
+<HTML>
+<body>
+<H1> test_expr7 </H1>
+
+We test inner loop variables
+
+<table>
+ 
+<tr>
+<td>first:1</td>
+<td>last: 0</td>
+<td>odd:1</td>
+<td>inner:0</td>
+<td>count:1</td>
+</tr>
+ 
+<tr>
+<td>first:0</td>
+<td>last: 0</td>
+<td>odd:0</td>
+<td>inner:1</td>
+<td>count:2</td>
+</tr>
+ 
+<tr>
+<td>first:0</td>
+<td>last: 0</td>
+<td>odd:1</td>
+<td>inner:1</td>
+<td>count:3</td>
+</tr>
+ 
+<tr>
+<td>first:0</td>
+<td>last: 1</td>
+<td>odd:0</td>
+<td>inner:0</td>
+<td>count:4</td>
+</tr>
+ 
+</table>
+
+</body>
+</HTML>

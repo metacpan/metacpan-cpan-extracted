@@ -1,0 +1,28 @@
+Revision history for HackaMol-X-Calculator
+
+0.012     2015-06-11 14:21:50-04:00 America/Indiana/Indianapolis
+    * dependencies 
+
+0.011     2015-06-05 15:46:58-04:00 America/Indiana/Indianapolis
+    * better examples and documentation
+
+0.00_6    2014-05-02 21:01:07EDT-0400 America/New_York
+    * update pod. dependencies
+
+0.00_5    2014-04-30 15:28:58EDT-0400 America/New_York
+    * Factored out large part into HackaMol::X::Extension for reuse
+    * Consumes HackaMol::X::Extension
+    * build_command is now required by HackaMol::X::ExtensionRole
+
+0.00_4    2014-04-30 09:22:05EDT-0400 America/New_York
+    * several new examples showing separation of input, running, output phases
+    * added examples for processing gaussian output from simple to not so simple
+
+0.00_3    2014-04-28 10:37:57EDT-0400 America/New_York
+    * improved tests, adjusted synopsis
+
+0.00_2    2014-04-27 22:49:01EDT-0400 America/New_York
+    * added examples, improved tests.  
+
+0.00_01   2013-09-18 23:46:53 America/New_York
+    * First Devel release

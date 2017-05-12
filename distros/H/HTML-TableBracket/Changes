@@ -1,0 +1,16 @@
+HTML::TableBracket Changelog
+
+0.11:
+Added as_xhtml at the request of Pete Sargent (CPAN ID: SARGIE)
+Added as_directed_graph_source
+Added as_directed_graph, it works, but it is commented out
+Added round(team1,team2) at the request of KrON@EFnet
+
+0.10:
+Changes by T.J. Eckman:
+Re-added the code to retrieve from $self in match function (oops)
+Cosmetic changes in as_html
+Changed the background of bye cells to blank instead of black
+
+0.09: December 2, 2001
+First FreshMeat release 

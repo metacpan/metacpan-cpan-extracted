@@ -1,0 +1,29 @@
+deprecated examples; keeping for reference.  Use kmeans_bs_ftmap.pl 
+
+Objective: you've run FTMap on a bunch (>1) of configurations of a molecule 
+           that had been aligned beforehand.  You wish to collect up all 
+           the small molecules bound via FTMap's ugly PDBs and reduce them 
+           down to unique binding sites for virtual screens.
+          
+1. collect all the FTMap results for blah*pdb (located in FTMaps dir, change 
+   this to your taste):
+
+perl collect_nodes.pl blah > blah_nodes.xyz
+
+collect_nodes.pl system calls pull_bs_ftmap.pl
+
+2. you now have an XYZ file with too many sites, let's reduce the sites further
+   using a hack that leverages a connectivity (kirchoff) matrix: 
+perl reduce_bs_kirchoff.pl blah_nodes.xyz  > blah_nodes_red.xyz
+
+adjust the cutoff (currently 10 angstroms) in reduce_bs_kirchoff.pl to get more
+or less sites.
+
+steps 1 and 2 could be more elegant via a clustering scheme, but works well 
+enough for now. 
+
+RESULT:
+
+xyz file containing mercury atoms located at the predicted binding sites. 
+verify that things are how you like them by loading up the xyz file and all
+the pdbs with your favorite molecular visualizer. 

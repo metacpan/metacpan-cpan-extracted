@@ -1,0 +1,105 @@
+{
+   "abstract" : "Framework for compiling tranformations on HTML text",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132620",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-Transmorgify",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Parse::RecDescent" : "0",
+            "Test::Differences" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::MD5" : "0",
+            "File::Slurp" : "0",
+            "HTML::Entities" : "0",
+            "Image::Size" : "0",
+            "List::Util" : "0",
+            "Module::Load" : "0",
+            "Object::Dependency" : "0",
+            "Scalar::Util" : "0",
+            "Test::Differences" : "0",
+            "URI::Escape" : "0",
+            "YAML" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "HTML::Transmorgify" : {
+         "file" : "lib/HTML/Transmorgify.pm",
+         "version" : "0.11"
+      },
+      "HTML::Transmorgify::Attributes" : {
+         "file" : "lib/HTML/Transmorgify/Attributes.pm"
+      },
+      "HTML::Transmorgify::CloseTag" : {
+         "file" : "lib/HTML/Transmorgify.pm"
+      },
+      "HTML::Transmorgify::Conditionals" : {
+         "file" : "lib/HTML/Transmorgify/Conditionals.pm"
+      },
+      "HTML::Transmorgify::ConditionalsDebug" : {
+         "file" : "lib/HTML/Transmorgify/ConditionalsDebug.pm"
+      },
+      "HTML::Transmorgify::Crumbs" : {
+         "file" : "lib/HTML/Transmorgify/Crumbs.pm"
+      },
+      "HTML::Transmorgify::Deferred" : {
+         "file" : "lib/HTML/Transmorgify.pm"
+      },
+      "HTML::Transmorgify::Exclusive" : {
+         "file" : "lib/HTML/Transmorgify.pm"
+      },
+      "HTML::Transmorgify::FormChecksum" : {
+         "file" : "lib/HTML/Transmorgify/FormChecksum.pm"
+      },
+      "HTML::Transmorgify::FormDefault" : {
+         "file" : "lib/HTML/Transmorgify/FormDefault.pm"
+      },
+      "HTML::Transmorgify::Metatags" : {
+         "file" : "lib/HTML/Transmorgify/Metatags.pm"
+      },
+      "HTML::Transmorgify::MutuallyExclusive" : {
+         "file" : "lib/HTML/Transmorgify.pm"
+      },
+      "HTML::Transmorgify::ObjectGlue" : {
+         "file" : "lib/HTML/Transmorgify/ObjectGlue.pm"
+      },
+      "HTML::Transmorgify::Stack" : {
+         "file" : "lib/HTML/Transmorgify.pm"
+      },
+      "HTML::Transmorgify::Symbols" : {
+         "file" : "lib/HTML/Transmorgify/Symbols.pm"
+      },
+      "Parse::RecDescent::HTML::Transmorgify::Conditionals" : {
+         "file" : "lib/HTML/Transmorgify/Conditionals.pm"
+      },
+      "Parse::RecDescent::HTML::Transmorgify::ConditionalsDebug" : {
+         "file" : "lib/HTML/Transmorgify/ConditionalsDebug.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.09"
+}

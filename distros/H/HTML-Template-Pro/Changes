@@ -1,0 +1,326 @@
+Revision history for Perl extension HTML::Template::Pro.
+
+0.01  Thu Feb 24 17:20:58 2005
+	- original version; created by h2xs 1.23 with options
+		-A -O -b 5.5.0 -c -n HTML::Template::Pro --skip-exporter *.h
+
+0.17  Tue Mar  8 10:19:28 2005
+	- First stable release. 
+
+0.26  Tue Mar 28 23:05:00 2005
+	- Full support of template syntax. 
+
+0.34  Mon Apr 11 16:31:36 2005
+	- First public release. 
+	- Distinctions from original HTML::Template:
+		* No support for querying of templates, filter
+		* No support for die_on_bad_params=1, strict=1:
+	warn but not die issued when one tries to include template
+	with no_includes=1 or exceeded max_includes.
+
+0.35  Thu May 19 19:10:38 2005
+	- added warnings on incorrect tags like /tmpl_else 
+
+0.36  Thu May 23 19:10:38 2005
+	- merged HTML::Template 2.7 
+	- added escape=js modifier from 2.7
+
+0.37  Thu June 2 11:22:38 2005
+	- internal refactoring
+
+0.38  Thu June 9 13:39:24 2005
+	- added basic support for EXPR="expr" from HTML::Template::Expr. 
+	  it includes numeric arithmetic and comparisons.
+
+0.40  Thu July 7 12:18:22 2005
+	- added support for string comparisions in EXPR="... " tags
+
+0.41  Thu Jul 26 12:18:22 2005
+	- EXPR="... " tags: string type comparisions now support digits
+	- grammar is improved
+	- bug fixes
+
+0.42  Thu Aug 2 16:26:35 2005
+	- complete support of EXPR="... " tags
+
+0.43  Thu Aug 2 19:26:35 2005
+	- added documentation of EXPR="... " tags
+
+0.44  Thu Aug 12 19:03:05 2005
+	- underquoted string fix (thanks to Christopher Pryce)
+
+0.45  Thu Aug 19 21:17:01 2005
+	- merged patch of Emiliano Bruni 
+	With this extension, arbitrary chars can be used in variable name inside 
+	the 'EXPR' tag if bracketed in {}, as, for example, EXPR="{foo.bar} eq 'a'".
+
+0.47  Wed Aug 31 19:29:31 2005
+	- merged patch of Stanislav Yadykin
+	  (implemented his regexp extension)
+
+0.48  Wed Aug 31 20:31:41 2005
+	- added support for cmp in Expr
+	- minor bugfixes in string comparison
+
+0.50  Thu Sep 8 12:34:56 2005
+	- added new debug subsystem
+
+0.51  Thu Sep 15 19:37:13 2005
+	- compatibility fixes in Expr
+
+0.52  Thu Sep 30 14:39:00 2005
+	- Expr: fixed bug with empty string passed (thanks to Stanislav Yadykin)
+	- added filters support
+
+0.53  Tue Oct  5 20:02:15 2005
+	- fixed realloc bug (thanks to Stanislav Yadykin)
+	- fixed comment-like tag bug (thanks to Niklas Bichinger)
+	- fixed incorrect params processing (thanks to Jim Spath)
+
+0.54  Mon Oct 17 10:08:14 2005 
+	- portability fixes
+
+0.55  Mon Oct 23 00:02:16 2005 
+	- added IMITATE build option 
+	  (imitate behavior of HTML::Template even on broken templates)
+	  requested by Jim Spath
+
+0.56  Tue Nov  1 21:45:52 2005
+	- fixed memory leak (thanks to Jim Spath)
+	- ELF symbols cleanup
+
+0.57  Tue Nov  8 22:57:02 2005
+	- fixed bug in Expr with negative variables (thanks to Stanislav Yadykin)
+
+0.58  Wed Nov 30 23:56:36 2005
+	- added support for Expr and Default in Include tag
+	  (thanks to Mike Greenish)
+	- improvements in portability
+
+0.59  Sun Jan 22 21:46:23 EET 2006
+	- improvements in portability
+
+0.60  Thu Feb  2 14:36:26 EET 2006
+	- portability changes for Win32 (thanks to Viacheslav Sheveliov)
+	- portability changes for hpux-pa-risc
+	- tests data integrity test in Makefile.PL
+
+0.61  Sat Feb  4 21:34:56 EET 2006
+        - Win32 support (thanks to Viacheslav Sheveliov)
+	  now HTML::Template::Pro should work on Win32.
+
+0.62  Tue Feb 21 21:56:58 EET 2006
+        - added support for absence of mmap
+	- extra compatibility mode for Win32.
+
+0.63  Thu Apr 13 23:10:34 EEST 2006
+        - fixed bug in escape=url (thanks to Naoya Ito)
+	- ABI design start
+
+0.64  Tue Apr 18 22:42:08 EEST 2006
+        - synced with HTML::Template 2.8.
+        - New: added default_escape option from HTML::Template 2.8
+
+0.65  Fri May  4 10:58:59 EEST 2007
+        - added per-object register_function (thanks to Mike Greenish)
+	Expr: fixed CPAN bugs (thanks to YORHEL for report)
+	- numeric division now always return double (due to compains 1/3==0)
+	- variables with _leading_underscore are allowed too
+	- now expr supports inner_loop_variable
+
+0.66  Sat Jun 2 14:49:07 2007 +0300
+        - added compatibility mode for closing tags. (thanks to Ton Hospel)
+        - code cleanup
+        - now library is reentrant:
+		reentrant Scope()
+		reentrant tagstack
+		reentrant pbuffer
+
+0.67  Sun Dec  2 16:47:15 EET 2007
+	- used long ariphmetics in EXPR instead of int one
+	- fix in clear_params() thanks to Sergey Konovalov
+	- fixed string escaping (see test_expr9)
+
+0.68  Tue Jan  8 19:59:12 EET 2008
+	- fixed Windows compilation thanks to Vyacheslav Shevelyov
+
+0.69  Thu Feb 28 06:46:17 EET 2008
+	- added elsif tag (requested by koha.org project)
+	
+0.70 Thu Apr  3 22:12:33 EEST 2008
+	- fixed regression in include scope (reported by Naxim Babych)
+
+0.71 Sat Aug 16 15:05:01 EEST 2008
+	- fixed evaluation of variables in 'if' even in shadow context
+	- fixed misconfig on Darvin (CPAN #38013)
+
+0.72 Thu Dec 18 21:22:45 EET 2008
+	- added support of path through variable scope 
+	(by Shigeki Morimoto <shigeki.morimoto at mixi.co.jp>)
+
+0.73 Thu Apr  2 22:45:47 EEST 2009
+	- multiple memory leaks fixed 
+	(by Shigeki Morimoto <shigeki.morimoto@mixi.co.jp>)
+
+0.74 Fri Apr  3 20:19:32 EEST 2009
+	- merges from HTML::Template 2.9
+	- memory leaks fix 
+	(by Shigeki Morimoto <shigeki.morimoto@mixi.co.jp>)
+
+0.75 Wed Jul  1 23:23:36 EEST 2009
+	- pos value in log message.
+	(Shigeki Morimoto <shigeki.morimoto@mixi.co.jp>).
+	- fixed cpan rt #38486 (mixed loops && global_var=1)
+
+0.76 Sat Jul 11 10:46:27 EEST 2009
+	- work towards stable backend API. 
+	Current perl wrapper (Pro.xs) had to communicate with 
+	c backend using the param {...} struct(ure).
+	That's still bearable if library is statically built in wrapper
+	but unacceptable for public library that can be used by third-pary 
+	software (the layout of the structure is not a public API. 
+	It is not meant to be and is subject to change without prior notice).
+	Instead, param structure is hidden behind the stable 
+	public library API getter and setter functions.
+	tmplpro.h is now the API header.
+
+0,77 Tue Jul 21 20:45:48 EEST 2009
+	- major API cleanups
+	- concept mono wrapper (requested by Robert Henniger)
+
+0.80 Thu Jul 23 20:08:47 EEST 2009
+	- added sypport for dynamically-linked perl wrapper.
+	- C library is clearly separated from perl
+	The main idea is following:
+	Core C library should be as language neutral
+	and portable as possible.
+
+	As ANSI C lack standard map types,
+	the code was designed so that wrapper should use
+	its own language spacific (as Perl built-in hash)
+	or library specific (C+glib, for example)
+	HashOfHash type, and should provide abstract
+	HashOfHash getters to the core C library
+	as well as some other system specific calls.
+	- released separate public backend library.
+	(libhtmltmplpro.so.0.0.0, htmltmplpro.dll).
+	- explicitly stated "LGPL or Artistic" license for the library.
+
+0.81 Tue Jul 28 14:26:01 EEST 2009
+	- maintainance release, no API/ABI/behaviour changes
+	- support for mingw
+
+0.82 Thu Jul 30 11:56:16 EEST 2009
+	- maintainance release, no API/behaviour changes
+	- CMake fixes
+	- added library documentation
+	- ABI: removed 2 garbage symbols
+	- ABI is officially released as 0:0:0.
+	- library default case-sensitive = 1 (Note: perl module dedault is 0).
+
+0.83 Wed Aug  5 20:42:28 EEST 2009
+	- bugfix release: fixed nested functions bug
+	  thanks to Rebenok Kirill
+	- added ABSTRACT_EXPRVAL to hide 0.82 implementation details.
+
+0.84 Thu Aug  6 13:03:23 EEST 2009
+	- perl: register_function (name), register_function() calls
+	  thanks to Rebenok Kirill
+	- bugfix: fixed function returned undef crush bug
+	  thanks to Rebenok Kirill
+
+0.85 Sun Aug  9 19:31:26 EEST 2009
+	- windows specific fixes
+
+0.86 Sat Aug 22 13:49:10 EEST 2009
+	- bugfix(expr): both strings should be unescaped.
+	- bugfix(built-in find_file).
+	- defined future NULL expr type.
+	- added buit-in funcs: atan2, int, abs, defined, length.
+	- mono: bugfix for case_sensitive=0 root keys.
+
+0.87 Wed Aug 26 22:08:41 EEST 2009
+	- bugfix(expr): fixed memory leak.
+	- perl: by default, built-in find_file implementation is used.
+	  the old perl find_file implementation can be re-enabled with 
+	  __use_perl_find_file option. 
+	  Please, report any misbehavior of built-in find_file implementation.
+
+0.90 Mon Aug 31 18:44:39 EEST 2009
+	- perl: added force_untaint option
+	- perl: bugfix: code references are now treated properly
+	  (evaluated dynamically).
+	- perl: bugfix: support for magic arrays and hashes.
+	- perl: now in void context output use built-in stdout.
+	- perl: support for associate on library level.
+	  case_sensitive option removed from the C library. 
+	  from now on it is wrapper-level option.
+	- template syntax: added support for template tags decorated as xml 
+	  like <TMPL_FOO A="B" /> (thanks to Alberto Simaes).
+	- C lib: added tmpl_var_case option.
+	- C lib: tmplpro_get_expr_type has new return value EXPR_TYPE_NULL
+	- expr: Modified Bruni extension: now recommended bracketing is ${}
+	  change {NAME} -> ${NAME} in Expr
+	  compatibility warning is ifdefed.
+	- C lib: 1.0 ABI (see htmltmplpro/API for details)
+
+0.92 Wed Oct  7 21:41:21 EEST 2009
+	- C lib: 1.1 (2:0:1) ABI (see htmltmplpro/API for details)
+	- C lib: bugfix: memory corruption in ESCAPE=(html|js)
+	  bug seems to be very old, everyone is recommended to update.
+	- php interface first release candidate.
+
+0.93 Sun Nov 22 19:33:06 EET 2009
+	- C lib: bugfix: builtin_find_file on WIN32 does not work
+	  properly with absolute path names.
+	- C lib: 1.2 (3:0:2) ABI (see htmltmplpro/API for details)
+	  added API call for alternate HTML_TEMPLATE_ROOT setup
+	  (hack around %ENV on WIN32).
+
+0.94 Tue Feb 16 16:58:39 EET 2010
+	- c lib 1.3 (4:0:3) ABI (see htmltmplpro/API for details)
+	- fixed lexer bug (thanks to Svetlana Safronova)
+
+0.95 Fri May 21 22:25:10 EEST 2010
+	- perl specific: fixed bug in perl wrapper
+	(list evaluated to false). thanks to Shigeki Morimoto 
+	for bugreport and patch.
+
+0.9501 Wed Jun  9 10:36:07 EEST 2010
+	- bugfix release: segfault in EXPR log subroutine.
+	thanks to Robert Hanniger and Mike Shogin
+
+0.9502 Fri Jun 18 18:02:28 EEST 2010
+	- bugfix release: segfault for string operetions
+	with undefined variables. Thanks to Mike Shogin.
+
+0.9503 Sat Aug 28 18:00:49 EEST 2010
+	- log file is not truncated now in tmplpro_set_log_file.
+	- freed memory access error fixed.
+	- perl: CommonTest.pm hidden from installation
+	- tests: added generic json-packed test data 
+
+0.9504 Tue Sep 28 17:16:55 EEST 2010
+	- bugfix in string comparision
+	- spelling fix by gregor herrmann <gregoa@debian.org>
+
+0.9505 Fri Jul  1 13:27:10 EEST 2011
+	- bugfix in perl wrapper: fix in WrapAssociate.pm
+	  thanks to Viktor Bukhtoyarov
+
+0.9506 Tue Oct  4 22:55:35 EEST 2011
+	- file name in logs
+
+0.9507 Fri Dec  9 09:44:49 EET 2011
+	- patch for XSS vulnerability in HTML::Template::Pro
+	  thanks to Shigeki Morimoto shigeki.morimoto mixi.co.jp
+
+0.9508 Mon Dec 26 16:13:37 EET 2011
+	- use unicode quoting in XSS vulnerability patch (more portable)
+	  thanks to Shigeki Morimoto shigeki.morimoto mixi.co.jp
+
+0.9509 Tue Feb 28 21:15:28 EET 2012
+	- more verbose messages for tag stack underflow
+
+0.9510 Mon May 13 11:30:15 EEST 2013
+	- rt.cpan.org #85211 - pod fix

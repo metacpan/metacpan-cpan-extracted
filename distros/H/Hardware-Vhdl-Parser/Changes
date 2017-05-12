@@ -1,0 +1,26 @@
+Revision history for Perl extension Hardware::Vhdl::Parser.
+
+0.01  Tue Feb  1 16:48:44 2000
+	- original version; created by h2xs 1.19
+
+0.07  3 Feb 2000
+	- now handles comments.
+	- and reserved words are case insensitive
+
+0.08 7 Feb 2000
+	- add comment to test1.vhd file
+	- fixed bug in grammar for configuration specification
+	- fixed missing '}' in test.pl
+
+0.10 10 Feb 2000
+	- got rid of <leftop> directives
+	- trying to restructure expression_rule to be cleaner
+
+0.11 23 Aug 2000
+	- major error with function/procedure declarations fixed.
+	  incorrectly used association_list when should have
+	  been using interface_list.  
+
+0.12 12 Jun 2002
+	- fix problem with configuration rules
+	  haven't checked it with VHDL grammar standard yet.

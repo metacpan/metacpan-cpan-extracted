@@ -1,0 +1,8 @@
+Revision history for Perl extension HTML::Template::Set.
+
+1.008 Fri Apr 30 10:39:00 2004
+  - First cut for release to CPAN *fingers crossed*
+
+0.01  Tue Apr 27 22:18:08 2004
+  - original version; created by h2xs 1.22 with options
+    -b5.6.1 -A -X -n HTML::Template::Set

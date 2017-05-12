@@ -1,0 +1,46 @@
+HTTP::GHTTP
+
+This module is a simple interface to the Gnome project's libghttp.
+
+libghttp is available either as an RPM as part of Gnome (for example
+you will have it installed if you have Helix (Ximian) Gnome), or from
+ftp://ftp.gnome.org/pub/GNOME/stable/sources/libghttp/
+
+It allows you to make very simple HTTP requests, without the weight
+of something like LWP. This makes it very useful in situations where
+memory and speed are at a premium, such as mod_perl.
+
+The API is quite simple to use:
+
+    use HTTP::GHTTP 'get';
+    print get("http://foo.bar.com/");
+    
+or
+    use HTTP::GHTTP:
+    my $r = HTTP::GHTTP->new();
+    $r->set_uri("http://foo.bar.com/");
+    $r->process_request;
+    print $r->get_body;
+
+It has full support for proxy requests and authenticated requests.
+
+There is also a command line script, g-request, which is similar in
+operation to LWP's lwp-request. Run it without any parameters to get
+usage information.
+
+This is free software distributed under the same terms as Perl itself,
+and the code is Copyright AxKit.com Ltd, 2000.
+
+INSTALLATION
+
+Short version:
+
+  perl Makefile.PL
+  make
+  make test
+  su
+  make install
+
+Watch the output - it will test to see if it can load libghttp, and
+not continue if it cannot find it. If so you will have to specify
+LIBS and INC on the perl Makefile.PL command line.

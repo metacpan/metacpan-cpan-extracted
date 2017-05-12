@@ -1,0 +1,53 @@
+---
+abstract: 'Extremely fast HTML escaping'
+author:
+  - 'Goro Fuji'
+build_requires:
+  Devel::PPPort: '3.20'
+  ExtUtils::CBuilder: '0'
+  Module::Build::Pluggable::PPPort: '0.04'
+  Test::More: '0.98'
+  Test::Requires: '0'
+configure_requires:
+  Devel::PPPort: '3.20'
+  Module::Build: '0.4005'
+  Module::Build::Pluggable::PPPort: '0.01'
+dynamic_config: 0
+generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-Escape
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  HTML::Escape:
+    file: lib/HTML/Escape.pm
+    version: '1.10'
+  HTML::Escape::PurePerl:
+    file: lib/HTML/Escape/PurePerl.pm
+requires:
+  Exporter: '0'
+  XSLoader: '0'
+  parent: '0'
+  perl: '5.008008'
+resources:
+  bugtracker: https://github.com/tokuhirom/HTML-Escape/issues
+  homepage: https://github.com/tokuhirom/HTML-Escape
+  repository: git://github.com/tokuhirom/HTML-Escape.git
+version: '1.10'
+x_contributors:
+  - 'Fuji, Goro <fuji.goro@dena.jp>'
+  - 'Shlomi Fish <shlomif@shlomifish.org>'
+  - 'Aaron Crane <arc@cpan.org>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.017'

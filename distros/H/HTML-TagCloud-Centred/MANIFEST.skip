@@ -1,0 +1,10 @@
+DS_Store$
+.*temp.*$
+.*temp.*$
+~$
+blib/.*$
+Makefile
+pm_to_blib
+HTML-.*$
+MYMETA.*$
+

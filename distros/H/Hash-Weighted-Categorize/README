@@ -1,0 +1,40 @@
+Hash::Weighted::Categorize
+
+DESCRIPTION
+
+Hash::Weighted::Categorize is a tool to easily create scoring functions
+(think monitoring) based on a simple mini-language. A
+Hash::Weighted::Categorize object is a parser for this mini-language,
+that will return coderefs implementing a scoring function written in
+this language.
+
+DOMAIN SPECIFIC LANGUAGE
+
+The *domain specific language* parsed by Hash::Weighted::Categorize is
+intentionnaly very simple.
+
+Here is an example:
+
+    %OK > 90%, %CRIT < .1: OK;
+    %CRIT > 50%: CRIT;
+    %CRIT > 25%: WARN;
+    UNKN;
+
+ACKNOWLEDGMENTS
+
+This module was originally developed for Booking.com. With approval from
+Booking.com, this module was generalized and put on CPAN, for which the
+author would like to express his gratitude.
+
+This module is the result of scratching my colleague Menno Blom's itch
+during a company-sponsored hackathon. Thanks to everyone involved.
+
+COPYRIGHT
+
+Copyright 2013 Philippe Bruhat (BooK), all rights reserved.
+
+LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

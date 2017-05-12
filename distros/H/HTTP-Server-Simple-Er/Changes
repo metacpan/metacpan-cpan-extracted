@@ -1,0 +1,26 @@
+Revision history for HTTP-Server-Simple-Er
+
+v0.0.4 2009-08-08
+
+  * deal with stringification-overloaded objects in output()
+
+  * added params(), form_data() methods
+
+  * added CHLD handler in child_server() for better diagnostics
+
+v0.0.3 2008-05-26
+
+  * correctly handle $SIG{INT} with rethrow
+
+v0.0.2 2008-05-24
+
+  * silly "perhaps you forgot to use ..." bugs
+
+v0.0.1 2008-05-23
+
+  * first public release
+
+See the source code repository for more detail.
+  http://svn.scratchcomputing.com/HTTP-Server-Simple-Er/trunk
+
+vim:ts=2:sw=2:et:sta

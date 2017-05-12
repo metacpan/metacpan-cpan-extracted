@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                HTTP-WebTest-Plugin-Sticky
+version:             0.02
+abstract:            Propagate hidden and text form fields
+license:             ~
+author:              
+    - Hugo Salgado H. <huguei@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    HTML::TokeParser:              0
+    HTTP::WebTest:                 0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/HTML-WidgetValidator-Widget-PixivEmbedFeature.t
+lib/HTML/WidgetValidator/Widget/PixivEmbedFeature.pm
+META.yml                                 Module meta-data (added by MakeMaker)

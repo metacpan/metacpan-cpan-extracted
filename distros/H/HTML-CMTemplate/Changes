@@ -1,0 +1,20 @@
+Revision history for Perl extension HTML::CMTemplate.
+
+0.4.0  Tue Nov 05 08:45:24 2001
+        - Added the ability to set a debug hook (a function ref)
+        - Updated the README a bit (spelling and added a comment about VIM)
+0.3.1  Sat Oct 06 10:30:10 2001
+	- Removed spurious test.pl script
+	- Fixed to report template compilation errors in a more sane way
+	- Added the following changes (were actually changes from last time)
+	- Fixed the rawinc directive.  It was completely broken.
+	- Added a number of test cases
+0.3  Fri Oct 05 15:50:36 2001
+	- Added a 'while' loop construct
+	- Fixed the handling of 'else' blocks.  A colon is now required.
+0.2.2  Tue Sep 11 11:30:02 2001
+	- Cleaned up the distribution (was including built stuff)
+0.2.1  Mon Sep 10 15:00:00 2001
+	- Added a README file
+0.2  Wed Aug 29 15:33:36 2001
+	- First Open Source version

@@ -1,0 +1,21 @@
+---
+name: HTML-Calendar-Monthly
+version: 0.03
+author:
+  - 'Johan Vromans <jv@cpan.org>'
+abstract: A very simple HTML calendar
+license: perl
+resources:
+  license: ~
+requires:
+  Date::Simple: 0
+build_requires:
+  Test::More: 0
+provides:
+  HTML::Calendar::Monthly:
+    file: lib/HTML/Calendar/Monthly.pm
+    version: 0.03
+generated_by: Module::Build version 0.31
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

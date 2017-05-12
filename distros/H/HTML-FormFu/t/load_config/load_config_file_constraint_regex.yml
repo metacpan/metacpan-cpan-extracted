@@ -1,0 +1,7 @@
+---
+elements:
+  - type: Text
+    name: foo
+    constraints:
+    - type: Not_Regex
+      regex: '^\n*$'

@@ -1,0 +1,54 @@
+Revision history for Perl module HTTP::Cookies::Safari
+
+1.152 2017-01-05T23:52:20Z
+	* Bump version to index in PAUSE. This is actually an ADOPTME
+	module, but I made a small fix.
+
+1.151 2016-11-27T21:11:58Z
+	* Remove the prereq test. Test::Prereq acts differently now and I do
+	this at release time.
+
+1.15 - 2011-04-18
+	* Updated module and fixed test with expiring cookie
+	* Everything works the same as the last version
+
+1.13 - 2007-11-10
+	* Cleanups for the move from CVS to SVN, kwalitee
+	* Now requires Perl 5.006
+	* No need to upgrade
+
+1.12 - 2007-01-09
+	* updated copyright and license info
+	* no code changes, so no need to upgrade
+
+1.11 - 2005-12-25
+	* Fixed issue with ignore_discard: cookies with no expiry were discarded
+	anyway.
+
+1.09 - 2005-10-13
+	* Jon Orwant pointed out that a Safari cookie file could have a
+	date past the unix epoch for the expiry time of the cookie. I need to
+	convert that to unix seconds internally. To get around this, dates too
+	far in the future get truncated to 0xFF_FF_FF_FF.
+	* If you are working with dates those far out, first ask yourself "Why?",
+	then upgrade.
+
+1.07 - 2005-03-11
+	* Added POD coverage tests, fixed issues
+	* no code updates: no need to upgrade
+
+1.06 - 2004-09-20
+	* updated to work with the latest Mac::PropertyList, which has a new
+	interface
+
+1.03 - 2003-11-27
+	* HTTP::Cookies::Safari now uses Date::Calc instead of Date::Manip.
+	This should make date calculations much faster.
+	* No bugs were fixed, but this should be a performance boost.
+
+1.02 - 2003-01-08
+	* now handles expiry times
+
+1.01 - 2003-01-07
+	* initial version to work with Safari cookie files
+

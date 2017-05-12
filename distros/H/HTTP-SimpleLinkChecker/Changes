@@ -1,0 +1,72 @@
+Revision history for Perl module HTTP::SimpleLinkChecker
+
+1.165 2016-12-07T14:21:25Z
+	* Allow the user agent to redirect a couple times. If you don't like
+	that you can turn it off as documented.
+
+1.164 2016-10-13T03:05:27Z
+	* Use Mojo::UserAgent for the underlying client. This work was
+	contributed by Sebastian Paaske TÃ¸rholm <Eckankar@gmail.com>
+	as GitHub Issue #1 https://github.com/briandfoy/http-simplelinkchecker/issues/1
+
+1.163 2016-01-13T20:05:17Z
+	* Fix up MANIFEST
+
+1.162 2016-01-13T20:03:15Z
+	* Fix prereq test (RT # 111166)
+
+1.161 2016-01-13T18:25:12Z
+	* Handle HTTPS, now that LWP needs extra help
+
+1.16 - 2010-05-23
+	* Fix the status test for 403
+
+1.15 - 2007-12-08
+	* add the http_status command line program to check a URL (and the
+	links it contains)
+	* require 5.006 now
+	* otherwise, things are the same as before :)
+
+1.14 - 2007-11-24
+	* Cleanups for the move from CVS to SVN
+	* added teh httpstatus command line program to make it even
+	easier
+
+1.13 - 2007-01-09
+	* updated copyright and license info
+	* no code changes, so no need to upgrade
+
+1.11 - 2006-12-25
+	* Somehow I forgot to include Exporter, so the exports weren't working.
+	Now they are.
+
+1.10 - 2006-06-08
+	* Distro cleanup; no need up to upgrade
+
+1.09 - 2005-07-07
+	* Updated docs to note the things that can go wrong when checking links.
+	There is no need to upgrade
+
+1.08 - 2005-03-11
+	* Added POD coverage tests, fixed issues
+	* no code changes: no need to upgrade
+
+1.07 - 2005-01-26
+	* I now detect proxy settings with LWP::UserAgent's env_proxy().  This
+	fixes CPAN RT #11069.
+
+1.06 - 2004-09-07
+	* cleaned up distro
+	* added tests and now use Test::More
+	* no need to upgrade if you already have this module
+
+1.5 - 2002-06-23
+	* the user-agent variable is now private, although you
+	can get at it with a method
+
+0.51 - 2001-01-24
+	* minor doc fixes
+
+0.01 - 2000-10-07
+	* original version; created by h2xs 1.18
+

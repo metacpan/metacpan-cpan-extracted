@@ -1,0 +1,30 @@
+#                     _                     _   
+#  ___  ___ _ __   __| | ___ _ __ _ __ ___ | |_ 
+# / __|/ _ \ '_ \ / _` |/ _ \ '__| '_ ` _ \| __|
+# \__ \  __/ | | | (_| |  __/ |  | | | | | | |_ 
+# |___/\___|_| |_|\__,_|\___|_|  |_| |_| |_|\__|
+#                                               
+# Description: Sender based routing table
+# Syntax:
+#   domain-part-of-sender:
+#     mailer:   "ESMTP" or a module name stored in lib/Haineko/SMTPD/Relay/ such
+#               as 'SendGrid' or 'MX'.
+#     host:     SMTP server for relaying, default value is 127.0.0.1
+#     port:     Port number of the server, default value is 25.
+#     auth:     'key' = Use SMTP-AUTH in relaying by using credentials defined
+#                       in etc/authinfo
+#               ''    = No SMTP-AUTH
+#     retry:    Retry count when an SMTP server returns 4XX.
+#     sleep:    Sleep for specified seconds until the next retrying
+#     timeout:  Seconds until timeout for SMTP connection
+#     starttls: 1 = Use STARTTLS at SMTP connection
+#     disabled: 1 = Do not use this routing
+#               0 = Use this routing
+#
+# Example:
+#   smtp.kijitora.example.jp:
+#       mailer: 'ESMTP'
+#       host: '192.0.2.1'
+#       port: 587
+#       auth: 'kijitora-smtpd'
+#

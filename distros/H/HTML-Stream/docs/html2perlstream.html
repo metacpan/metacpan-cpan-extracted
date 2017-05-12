@@ -1,0 +1,137 @@
+<HTML>
+<HEAD>
+  <TITLE>html2perlstream 1.10</TITLE>
+</HEAD>
+<BODY 
+       bgcolor="#FFFFFF" link="#CC3366" vlink="#993366" alink="#FF6666">
+<FONT FACE="sans-serif" SIZE=-1><A HREF="http://www.zeegee.com" TARGET="_top"><IMG SRC="icons/zeegee.gif" ALT="ZeeGee Software" ALIGN="RIGHT" BORDER="0"></A><A NAME="__TOP__"><H1>html2perlstream 1.10</H1>
+</A><UL>
+<LI> <A NAME="menu:NAME"><A HREF="#NAME">NAME</A></A>
+<LI> <A NAME="menu:SYNOPSIS"><A HREF="#SYNOPSIS">SYNOPSIS</A></A>
+<LI> <A NAME="menu:DESCRIPTION"><A HREF="#DESCRIPTION">DESCRIPTION</A></A>
+<LI> <A NAME="menu:OPTIONS"><A HREF="#OPTIONS">OPTIONS</A></A>
+<LI> <A NAME="menu:REQUIRES"><A HREF="#REQUIRES">REQUIRES</A></A>
+<LI> <A NAME="menu:VERSION"><A HREF="#VERSION">VERSION</A></A>
+<LI> <A NAME="menu:AUTHOR"><A HREF="#AUTHOR">AUTHOR</A></A>
+</UL>
+
+
+<P><HR>
+<A NAME="NAME"><H2><A HREF="#__TOP__"><IMG SRC="icons/h1bullet.gif" ALT="Top" BORDER="0"></A> NAME</H2></A>
+
+
+<P>html2perlstream - convert an HTML document to Perl code for that document
+
+
+
+<P><HR>
+<A NAME="SYNOPSIS"><H2><A HREF="#__TOP__"><IMG SRC="icons/h1bullet.gif" ALT="Top" BORDER="0"></A> SYNOPSIS</H2></A>
+
+<FONT SIZE=3 FACE="courier"><PRE>
+    html2perlstream
+    html2perlstream [options] -
+    html2perlstream [options] file.html .. file.html
+</PRE></FONT>
+
+
+<P><HR>
+<A NAME="DESCRIPTION"><H2><A HREF="#__TOP__"><IMG SRC="icons/h1bullet.gif" ALT="Top" BORDER="0"></A> DESCRIPTION</H2></A>
+
+
+<P>Takes an HTML file, and produces from it a Perl script that will
+generate that HTML using the <A HREF="HTML/Stream.pm.html">HTML::Stream</A> module.
+
+
+<P>For usage, just say:
+
+<FONT SIZE=3 FACE="courier"><PRE>
+    html2perlstream
+</PRE></FONT>
+
+<P>The normal form is:
+
+<FONT SIZE=3 FACE="courier"><PRE>
+    html2perlstream [-options] [files]
+</PRE></FONT>
+
+<P>Any named HTML input file <I><FILE>file.html</FILE></I> will cause output script 
+<I><FILE>file.html.pl</FILE></I> to be generated.  To read from the standard input,
+specify '-', like this:
+
+<FONT SIZE=3 FACE="courier"><PRE>
+    html2perlstream - &lt; test.html
+</PRE></FONT>
+
+<P>If reading from the standard input, the output Perl code goes to the 
+standard output.  So if you want to run it right away to see the output, 
+just do this:
+
+<FONT SIZE=3 FACE="courier"><PRE>
+    html2perlstream - &lt; test.html | perl
+</PRE></FONT>
+
+
+<P><HR>
+<A NAME="OPTIONS"><H2><A HREF="#__TOP__"><IMG SRC="icons/h1bullet.gif" ALT="Top" BORDER="0"></A> OPTIONS</H2></A>
+
+
+
+<DL>
+<P><DT><B><A NAME="item:-d"><B>-d</B></A></B></DT>
+<DD>
+Automatically load and run the output Perl file, then do a diff on
+that and the input file (you must input from a file and output to a
+file in order to use this).
+
+<FONT SIZE=3 FACE="courier"><PRE>
+    html2perlstream -w -d testin/test.html
+</PRE></FONT>
+
+<P>You'll get fewer differences if you build the code with <CODE>-w</CODE>.
+
+<P><DT><B><A NAME="item:-w"><B>-w</B></A></B></DT>
+<DD>
+Try to generate code which will output all whitespace between tags verbatim.  
+The default code only outputs whitespace if it is believed to be 
+needed; e.g., if we are inside a <CODE>PRE</CODE> environment.
+
+</DL>
+
+
+
+<P><HR>
+<A NAME="REQUIRES"><H2><A HREF="#__TOP__"><IMG SRC="icons/h1bullet.gif" ALT="Top" BORDER="0"></A> REQUIRES</H2></A>
+
+
+<P>To run this, you need:
+
+<FONT SIZE=3 FACE="courier"><PRE>
+   HTML::Entities
+   HTML::Parser
+</PRE></FONT>
+
+
+<P><HR>
+<A NAME="VERSION"><H2><A HREF="#__TOP__"><IMG SRC="icons/h1bullet.gif" ALT="Top" BORDER="0"></A> VERSION</H2></A>
+
+
+<P>$Id: html2perlstream,v 1.10 2001/08/17 00:50:00 eryq Exp $
+
+
+
+<P><HR>
+<A NAME="AUTHOR"><H2><A HREF="#__TOP__"><IMG SRC="icons/h1bullet.gif" ALT="Top" BORDER="0"></A> AUTHOR</H2></A>
+
+
+<P>Eryq, 11 Jan 1997, <I><FILE><A HREF="mailto:eryq@zeegee.com">eryq@zeegee.com</A></FILE></I> or thereabouts.
+
+
+<P>Thanks (independently) to Tony Cebzanov and John Buckman for suggesting 
+that I write a tool like this.
+
+<P><HR>
+<ADDRESS><FONT SIZE=-1>
+Generated Mon Aug 20 16:34:04 2001 by cvu_pod2html
+</FONT></ADDRESS>
+</FONT></BODY>
+</HTML>

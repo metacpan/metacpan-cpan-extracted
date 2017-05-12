@@ -1,0 +1,22 @@
+Revision history for HPC-Runner-GnuParallel
+
+0.07  2015-12-06 11:15:24 GST
+    - Made some changes for better logging
+
+0.06  2015-11-23 17:17:20 GST
+    - Bugfix
+
+0.05  2015-11-23 17:12:32 GST
+    - Added in a var for keeping track of seq number of gnuparallel
+
+0.04  2015-06-18 08:38:21 AST
+    - Updated copyright
+
+0.03  2015-06-08 06:53:31 AST
+    - Added in dependency for HPC::Runner::MCE in cpanfile
+
+0.02  2015-06-01 09:05:33 AST
+    - I didn't have any dependencies in the cpanfile. That is very bad.
+
+0.01  2015-04-01 10:07:24 AST
+        - Initial release

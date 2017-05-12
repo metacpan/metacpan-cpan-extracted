@@ -1,0 +1,24 @@
+---
+abstract: unknown
+author:
+  - 'Alex Pavlovic (alex.pavlovic@taskforce-1.com)'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.130880'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-FormatText-Html2textPY
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  HTML::FormatExternal: 0
+  MRO::Compat: 0
+  mro: 0
+version: 0.13

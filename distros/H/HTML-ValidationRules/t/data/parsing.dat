@@ -1,0 +1,191 @@
+#html
+<input name=hoge maxlength=45>
+#parsed
+hoge
+HTML_MAXLENGTH 45
+
+#html
+    <form method="post" action="/post">
+      <input type="text" name="text" pattern="[a-z]+" maxlength="255" />
+      <input type="url" name="url" maxlength="255" required />
+      <input type="email" name="email" maxlength="255" required="required" />
+      <input type="number" name="number" min="200" max="800" />
+      <textarea name="textarea" maxlength="1000" required></textarea>
+      <input type="submit" value="submit" />
+    </form>
+#parsed
+| email
+| HTML_EMAIL
+| HTML_MAXLENGTH 255
+| NOT_BLANK
+| 
+| number
+| HTML_MAX 800
+| HTML_MIN 200
+| HTML_NUMBER
+| 
+| text
+| HTML_MAXLENGTH 255
+| HTML_PATTERN [a-z]+
+| 
+| textarea
+| HTML_MAXLENGTH 1000
+| NOT_BLANK
+| 
+| url
+| HTML_MAXLENGTH 255
+| HTML_URL
+| NOT_BLANK
+
+#html
+<select name=foo>
+  <option>a
+</select>
+#parsed
+| foo
+| 
+
+#html
+<select name=foo required>
+  <option>a
+  <option>b
+</select>
+#parsed
+| foo
+| NOT_BLANK
+
+#html
+<input type=radio name=hoge value=1 required>
+<input type=radio name=hoge value=2>
+#parsed
+| hoge
+| 
+| 
+| hoge
+| NOT_BLANK
+
+#html
+<input type=number name=num min=10>
+#parsed
+| num
+| HTML_MIN 10
+| HTML_NUMBER
+
+#html
+<input type=number name=num min=-10>
+#parsed
+| num
+| HTML_MIN -10
+| HTML_NUMBER
+
+#html
+<input type=number name=num min=10.12>
+#parsed
+| num
+| HTML_MIN 10.12
+| HTML_NUMBER
+
+#html
+<input type=number name=num min=-10.12>
+#parsed
+| num
+| HTML_MIN -10.12
+| HTML_NUMBER
+
+#html
+<input type=number name=num min=10e6>
+#parsed
+| num
+| HTML_MIN 10e6
+| HTML_NUMBER
+
+#html
+<input type=number name=num min=10e+6>
+#parsed
+| num
+| HTML_MIN 10e+6
+| HTML_NUMBER
+
+#html
+<input type=number name=num min=10e-6>
+#parsed
+| num
+| HTML_MIN 10e-6
+| HTML_NUMBER
+
+#html
+<input type=number name=num max=10>
+#parsed
+| num
+| HTML_MAX 10
+| HTML_NUMBER
+
+#html
+<input type=number name=num max=-10>
+#parsed
+| num
+| HTML_MAX -10
+| HTML_NUMBER
+
+#html
+<input type=number name=num max=10.12>
+#parsed
+| num
+| HTML_MAX 10.12
+| HTML_NUMBER
+
+#html
+<input type=number name=num max=-10.12>
+#parsed
+| num
+| HTML_MAX -10.12
+| HTML_NUMBER
+
+#html
+<input type=number name=num max=10e6>
+#parsed
+| num
+| HTML_MAX 10e6
+| HTML_NUMBER
+
+#html
+<input type=number name=num max=10e+6>
+#parsed
+| num
+| HTML_MAX 10e+6
+| HTML_NUMBER
+
+#html
+<input type=number name=num max=10e-6>
+#parsed
+| num
+| HTML_MAX 10e-6
+| HTML_NUMBER
+
+#html
+<input type=NUMBEr name=num min=120>
+#parsed
+| num
+| HTML_MIN 120
+| HTML_NUMBER
+
+#html
+<input type=range name=num min=120>
+#parsed
+| num
+| HTML_MIN 120
+| HTML_RANGE
+
+#html
+<input type=range name=num max=120>
+#parsed
+| num
+| HTML_MAX 120
+| HTML_RANGE
+
+#html
+<input type=RANGE name=num max=120>
+#parsed
+| num
+| HTML_MAX 120
+| HTML_RANGE

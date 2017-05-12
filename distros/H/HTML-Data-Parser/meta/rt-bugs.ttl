@@ -1,0 +1,35 @@
+@prefix dbug: <http://ontologi.es/doap-bugs#> .
+@prefix dc: <http://purl.org/dc/terms/> .
+@prefix doap: <http://usefulinc.com/ns/doap#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix prio: <http://purl.org/NET/cpan-uri/rt/priority/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rt: <http://purl.org/NET/cpan-uri/rt/ticket/> .
+@prefix status: <http://purl.org/NET/cpan-uri/rt/status/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+_:r1341308987r0 a foaf:Agent ;
+	foaf:mbox <mailto:mail@tobyinkster.co.uk> .
+_:r1341308987r1 a foaf:Agent ;
+	foaf:nick "TOBYINK" .
+_:r1341308987r2 a foaf:Agent ;
+	foaf:nick "Nobody" .
+<http://purl.org/NET/cpan-uri/dist/HTML-Data-Parser/project> dbug:issue <http://purl.org/NET/cpan-uri/rt/ticket/72961>, <http://purl.org/NET/cpan-uri/rt/ticket/78172> .
+<http://purl.org/NET/cpan-uri/rt/ticket/72961> dbug:assignee _:r1341308987r1 ;
+	dbug:id "72961"^^xsd:string ;
+	dbug:page <https://rt.cpan.org/Ticket/Display.html?id=72961> ;
+	dbug:reporter _:r1341308987r0 ;
+	dbug:status status:resolved ;
+	dc:created "2011-12-05T11:30:41"^^xsd:dateTime ;
+	dc:modified "2011-12-07T13:26:17"^^xsd:dateTime ;
+	a dbug:Issue ;
+	rdfs:label "needs update, remove sig check, etc" .
+<http://purl.org/NET/cpan-uri/rt/ticket/78172> dbug:assignee _:r1341308987r2 ;
+	dbug:id "78172"^^xsd:string ;
+	dbug:page <https://rt.cpan.org/Ticket/Display.html?id=78172> ;
+	dbug:reporter _:r1341308987r0 ;
+	dbug:status status:resolved ;
+	dc:created "2012-07-03T10:29:58"^^xsd:dateTime ;
+	dc:modified "2012-07-03T10:45:28"^^xsd:dateTime ;
+	a dbug:Issue ;
+	rdfs:label "tests failing with recent RDF::RDFa::Parser" .

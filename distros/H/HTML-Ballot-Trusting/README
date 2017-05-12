@@ -1,0 +1,128 @@
+HTML/Ballot/Trusting version 0.2
+=================================
+
+    A simple module for inseucre web ballots.
+
+    This is a very beta version that will mature over the next week or so.
+    Please let me know how it breaks.
+
+    Features:
+
+    *   no test is made of who is voting, so users may vote any number of
+        times, or may even vote (and surely will) thousands of times using a
+        "LWP" hack.
+
+    *   a HTML page of voting options and one of the results of votes so far
+        is generated from a single HTML template, and it is in these pages
+        that ballot status is maintained, so no additional file access is
+        required.
+
+    *   HTML output into the template is minimal, but all unique entities
+        are given a "class" attribute for easy CSS re-definitions.
+
+    *   simple bar charts of results are generated using HTML.
+
+    *   users may submit a comment with thier vote, though no connection
+        between the value of the vote and the user is recorded
+
+    *   users' IP addresses may be recorded, and displayed, and a chart of
+        the IP addresses from which communication has been received the most
+        may be displayed.
+
+    In future these features may be added:
+
+    *   A more secure version is being considered, which uses simple e-mail
+        authentication of users, sending ony one voting password to any
+        e-mail address: this may appear as "HTML::Ballot::MoreCynical".
+
+    *   This may be extended to include a ballot `time out'.
+
+    *   Options to have graphs based on single-pixels, or using the "GD"
+        interface will arrive some time in the future.
+
+USE
+
+    1.  Construct an HTML template that can be used to generate the question
+        and answer pages. Where you wish the questions and answers to
+        appear, insert the following element:
+
+                <TEMPLATEITEM name='QUESTIONS'></TEMPLATEITEM>
+
+        The template should at least define the CSS representation for
+        "votehighscorebar" and "votebar" as having a coloured background, or
+        you will not be able to view the results' bar graph. See the CSS
+        SPECIFICATION entry elsewhere in this document for more details on
+        other CSS classes employed.
+
+        Other functions may be included as below. Note that "TEMPLATEITEM"s
+        may require some minimal content of at least a space character, I'm
+        not sure, I'd better check.
+
+        *   If you wish to allow a user to submit a comment with their vote,
+            include the following element:
+
+                    <TEMPLATEITEM name='COMMENT'>
+                            This is what voter's have said:
+                    </TEMPLATEITEM>
+
+            Unlike the "QUESTIONS TEMPLATEITEM", any text you include in
+            this block will be reatained at the top of a list of users'
+            comments.
+
+        *   If you wish to have the result page display a list of the names
+            entered by voters, also include:
+
+                    <TEMPLATEITEM name='VOTERLIST'>
+                            Here is the voterlist...
+                    </TEMPLATEITEM>
+
+            This acts in the manner of the "COMMENT TEMPLATEITEM", above.
+
+        *   If you wish to have the result page display a list of the most
+            frequently-posting IP addresses, include:
+
+                    <TEMPLATEITEM name='IPCHART'>
+                            <H2>Top IP Addresses To Post To This Ballot</H2>
+                    </TEMPLATEITEM>
+
+            To this, the module will add a "SPAN" of HTML that lists the top
+            posters. Anything before that span (in this example, the "H2"
+            element) will remain.
+
+    2.  Initiate the ballot by constructnig an HTML::Ballot::Trusting object
+        and calling "create" method upon it in a manner simillar to that
+        described in the SYNOPSIS entry elsewhere in this document.
+
+        In response, you should receive a list of the locations of files
+        used and dynamically created by the process.
+
+INSTALLATION
+
+	To install this module, do the usual:
+
+	   perl Makefile.PL
+	   make					- nmake on Win32
+	   make test			- etc
+	   make install
+
+	Then please read the POD.
+
+DEPENDENCIES
+
+	As well as the pragmas 'strict' and 'warnings', this module
+	requires
+
+		CGI.pm,
+		HTML::EasyTemplate version 0.985 or higher,
+		HTML::Entities.
+
+AUTHOR
+
+	Lee Goddard - lgoddard@cpan.org
+
+COPYRIGHT AND LICENCE
+
+	This module and all associated code is Copyright (C) Lee Goddard 2001.
+	All rights reserved.
+
+	This is free software and may be used under the same terms as Perl itself.

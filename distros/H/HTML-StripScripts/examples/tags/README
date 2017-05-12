@@ -1,0 +1,45 @@
+Overriding HTML::StripScripts to add tags
+-----------------------------------------
+
+The allowed tags and attributes in HTML::StripScripts is not complete. Unsafe
+tags have been specifically left out (eg <script>).
+
+If, however, you would like to add certain tags or attributes into the allowed
+list, then you will need to override HTML::StripScripts (or
+HTML::StripScripts::Parser).
+
+In this example, I add the <meta> and <link> tags into tags allowed under
+the <head> tag.
+
+WARNING: Both of these tags are potentially DANGEROUS. So think very carefully
+before you allow them. Imagine, for example:
+
+  <meta http-equiv="refresh" content="0;url=http://hackme.com" />
+
+After enabling these tags, you will be able to filter them with Rules, for
+instance:
+
+   $f = MyStripScripts->new({
+      Rules => { meta => \&check_meta_tags },
+   });
+
+--------------------------------------------------------------------------------
+In this example, I override the tag definitions in MyStripScripts.
+
+To run the example:
+
+ - change to the examples/tags directory:
+
+     cd examples/tags
+
+ - then type:
+
+     perl tags.pl
+
+The example parses the same HTML, first with HTML::StripScripts::Parser, then
+with MyStripScripts (a subclass of HTML::StripScripts::Parser) and prints out
+the two versions.
+
+No checking of the values is done.
+
+The example script requires HTML::StripScripts::Parser to work.

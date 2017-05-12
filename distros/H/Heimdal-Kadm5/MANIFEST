@@ -1,0 +1,10 @@
+Changes
+Kadm5.pm
+Kadm5.xs
+Makefile.PL
+MANIFEST
+README
+test.pl
+consts.h
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

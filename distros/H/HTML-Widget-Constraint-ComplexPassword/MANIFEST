@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/HTML-Widget-Constraint-ComplexPassword.t
+t/distribution.t
+t/0-signature.t
+lib/HTML/Widget/Constraint/ComplexPassword.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

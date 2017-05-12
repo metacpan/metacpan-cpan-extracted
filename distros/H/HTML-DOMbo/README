@@ -1,0 +1,74 @@
+README for HTML::DOMbo
+                                        Time-stamp: "2000-11-03 22:55:11 MST"
+
+NAME
+    HTML::DOMbo -- convert between XML::DOM and {XML/HTML}::Element trees
+
+SYNOPSIS
+      use HTML::DOMbo;
+      use HTML::TreeBuilder;
+      my $tree = HTML::TreeBuilder->new;
+      $tree->parse_from_file('foo.html');
+      my $dom_tree = $tree->to_XML_DOM;
+       # Now you have an XML::DOM element tree in $dom_tree!
+
+DESCRIPTION
+
+    This class puts a method into HTML::Element called `to_XML_DOM',
+    and puts into the class XML::DOM::Node two methods,
+    `to_HTML_Element' and `to_XML_Element'.
+[...]
+
+COPYRIGHT
+    Copyright (c) 2000 Sean M. Burke. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR
+    Sean M. Burke <sburke@cpan.org>
+
+
+PREREQUISITES
+
+HTML::DOMbo suite requires Perl 5; I've only used it under Perl 5.004,
+so for anything lower, you're on your own.
+
+HTML::DOMbo requires the XML::DOM module, and the HTML-Tree
+distribution.
+
+
+INSTALLATION
+
+You install HTML::DOMbo, as you would install any perl module library,
+by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you want to install a private copy of HTML::DOMbo in your home
+directory, then you should try to produce the initial Makefile with
+something like this command:
+
+  perl Makefile.PL LIB=~/perl
+
+
+DOCUMENTATION
+
+POD-format documentation is included in DOMbo.pm.  POD is readable
+with the 'perldoc' utility.  See ChangeLog for recent changes.
+
+
+SUPPORT
+
+Questions, bug reports, useful code bits, and suggestions for
+HTML::DOMbo should just be sent to me at sburke@cpan.org
+
+
+AVAILABILITY
+
+The latest version of HTML::DOMbo is available from the
+Comprehensive Perl Archive Network (CPAN).  Visit
+<http://www.perl.com/CPAN/> to find a CPAN site near you.

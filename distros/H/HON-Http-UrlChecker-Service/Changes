@@ -1,0 +1,9 @@
+Revision history for HON-Http-UrlChecker-Service
+
+0.02    30 Jul 2016
+        Convert status code to integer
+        Convert status message with first character in uppercase
+        Check if the url is formatted correctly
+
+0.01    12 Jul 2016
+        First version, released on an unsuspecting world.

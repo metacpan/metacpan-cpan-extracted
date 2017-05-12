@@ -1,0 +1,37 @@
+1.65 Fri Dec  2 15:43:32 EST 2005
+	- At the request of JPCERT/CC, the internal non-public tracking number 
+	(JPCERT#96622935) has been replaced in the Changelog with the public
+	vulnerability number (JVN#30451602) for the cross-site scripting 
+	vulnerability originally fixed in version 1.63.
+
+1.64 Mon Nov 21 13:15:17 EST 2005
+	- Removed extraneous version numbers.
+
+1.63 Mon Nov 14 16:37:15 EST 2005
+	- Fixed cross-site scripting bug reported by JPCERT/CC Vulnerability Handling Team <vuls@jpcert.or.jp>
+		[JVN#30451602] (originally reported by Kiyotaka Dohmae at IIJ)
+
+1.62 Fri Jun 11 09:51:32 EDT 2004
+	- Patches from Scott Lawrence to support an audit log.
+
+1.61    
+	- Patches from Peter Marschall to support flexible DBMS searches.
+	- Patch from Andrew Hollenbeck to catch filesystem errors during commits of text files.
+
+1.59	Fri May 31 19:03:45 EDT 2002
+	-Fix to MD5 hash config in UserAdmin.pm.  CGI interface was
+	never working with MD method.  Patch provided by Jarrod Teale.
+
+1.58	Mon Feb 19 22:53:42 EST 2001
+	-Fixes for locking/unlocking problems (which caused test 02 to fail)
+	-Cleaned up user_manage code slightly
+	-DBM test now aborts if NDBM module not installed.
+	-RealmManager.pm and Realm.pm now use strict.
+
+1.57	Fri Dec  1 11:37:03 EST 2000
+	-Fixes for exists() failure and other persistent bugs,
+		courtesy Adi Fairbank <adi@certsite.com>.
+	-Removed some bug warnings.
+
+1.56 and earlier
+	no change data available

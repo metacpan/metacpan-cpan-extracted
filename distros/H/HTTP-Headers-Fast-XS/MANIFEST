@@ -1,0 +1,23 @@
+lib/HTTP/Headers/Fast/XS.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+ppport.h
+README
+t/00_compile.t
+t/01-compat.t
+t/02-isa.t
+t/as_string_without_sort.t
+t/charset.t
+t/headers.t
+t/lazy_load_for_storable.t
+t/xs-_header_get.t
+t/xs-_header_get_set.t
+t/xs-_standardize_field_name.t
+tools/benchmark.pl
+tools/dumbbenchmark.pl
+tools/prof.pl
+XS.xs
+Changes
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

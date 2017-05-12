@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: $
+     converted using scripts/testconversion
+     from HTTP::WebTest main distribution, rev.
+     simple.wt,v 1.10 2002/08/22 07:21:12 m_ilya Expi
+-->
+<WebTest version="1.0">
+  <params>
+    <param name="ignore_case">no</param>
+    <list name="text_forbid">
+      <param>Another</param>
+      <param>syntax</param>
+      <param>for list</param>
+      <param>elements</param>
+    </list>
+    <list name="text_require">
+      <param>Require some</param>
+      <param>text</param>
+    </list>
+  </params>
+  <test>
+    <param name="ignore_case">yes</param>
+    <param name="test_name">Some name here</param>
+    <param name="show_cookies">yes</param>
+    <list name="regex_forbid">
+      <param>More = tests</param>
+      <param>Some @#$%^&amp;* chars</param>
+      <param>more</param>
+      <param>tests and fun</param>
+      <param>abcdef 1234</param>
+      <param> a b c d ' e f </param>
+      <code>{
+    package HTTP::WebTest::PlayGround;
+    local $^W;
+    "$undefined";
+}</code>
+    </list>
+    <list name="auth">
+      <param>name</param>
+      <param>value</param>
+    </list>
+    <param name="show_html">no</param>
+    <param name="url">www.dot.com</param>
+    <list name="regex_require">
+      <param>Quoted text " test</param>
+      <param>We can =&gt; quote '</param>
+      <param>test "</param>
+      <param>test '</param>
+      <param>test $a</param>
+      <param>test @a</param>
+      <code>{
+    package HTTP::WebTest::PlayGround;
+    local $^W;
+    'test $a';
+}</code>
+      <code>{
+    package HTTP::WebTest::PlayGround;
+    local $^W;
+    'test @a';
+}</code>
+      <code>{
+    package HTTP::WebTest::PlayGround;
+    local $^W;
+    '$a';
+}</code>
+      <code>{
+    package HTTP::WebTest::PlayGround;
+    local $^W;
+    '\\$a';
+}</code>
+      <code>{
+    package HTTP::WebTest::PlayGround;
+    local $^W;
+    "$test1";
+}</code>
+    </list>
+  </test>
+  <test>
+    <list name="cookie">
+      <list>
+        <param></param>
+        <param>webtest</param>
+        <param>This is the cookie value</param>
+        <param>/</param>
+        <param>.unixscripts.com</param>
+        <param></param>
+        <param></param>
+        <param></param>
+        <param>2592000</param>
+        <param></param>
+        <param>Comment</param>
+        <param>What a tasty cookie!</param>
+      </list>
+      <list>
+        <param></param>
+        <param>webtest1</param>
+        <param>This is the cookie value</param>
+        <param>/</param>
+        <param>.unixscripts.com</param>
+        <param></param>
+        <param></param>
+        <param></param>
+        <param>2592000</param>
+        <param></param>
+        <param>Comment</param>
+        <param>What a tasty cookie!</param>
+      </list>
+    </list>
+    <param name="url">www.tiv.net</param>
+    <param name="test_name">Another name # this is not a comment</param>
+  </test>
+  <test>
+    <code name="auth">{
+    package HTTP::WebTest::PlayGround;
+    local $^W;
+    {
+        ['http', 'http://some.proxy.com/'];
+    }
+}</code>
+    <list name="params">
+      <code>{
+    package HTTP::WebTest::PlayGround;
+    local $^W;
+    {
+        'name';
+    }
+}</code>
+      <param>value</param>
+      <param>name1</param>
+      <code>{
+    package HTTP::WebTest::PlayGround;
+    local $^W;
+    {
+        my $a = 'blabla';
+        $a =~ s/bla//;
+        $a;
+    }
+}</code>
+    </list>
+    <code name="file">{
+    package HTTP::WebTest::PlayGround;
+    local $^W;
+    {
+        '6.ext';
+    }
+}</code>
+    <code name="test_name">{
+    package HTTP::WebTest::PlayGround;
+    local $^W;
+    {
+        'Some evals are here';
+    }
+}</code>
+  </test>
+  <test>
+    <list name="params">
+      <param>upload</param>
+      <list>
+        <param>file</param>
+        <param>/a/myfile</param>
+        <param>filename</param>
+        <param>myfile</param>
+        <param>Content-Type</param>
+        <param>text/plain</param>
+      </list>
+    </list>
+    <param name="test_name">Nested</param>
+  </test>
+</WebTest>

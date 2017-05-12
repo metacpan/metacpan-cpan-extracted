@@ -1,0 +1,58 @@
+HTML::CheckArgs 0.11
+====================
+
+DESCRIPTION
+
+HTML::CheckArgs validates data passed to web applications. Architecturally,
+it is based on CGI::Untaint, and we follow that model of extensibility
+as well.
+
+SYNOPSIS
+
+  use HTML::CheckArgs;
+
+  my @banned_domains = ( 'whitehouse.gov', 'gop.com' );
+  my $config = {
+    email_address => {
+      as        => 'email',
+      required  => 1,
+      label     => 'Email Address',
+      order     => 1,
+      params    => { banned_domains => \@banned_domains },
+    },
+	num_tickets => {
+	  as        => 'integer',
+	  required  => 1,
+	  label     => 'Number of Tickets',
+	  order     => 2,
+	  params    => { min => 0, max => 10 },
+	},
+  };
+
+  my $handler = HTML::CheckArgs->new( $config );
+  my ( $error_message, $error_code );
+  foreach my $field ( sort { $config->{$a}{order} <=> $config->{$b}{order} } keys %$config ) {
+    if ( $handler->validate( $field, $ARGS{$field} ) ) {
+      $ARGS{$field} = $handler->value;
+    } else {
+      push( @$error_message, $handler->error_message );
+      push( @$error_code, $handler->error_code );
+    }
+  }
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004-2005 Eric Folley
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

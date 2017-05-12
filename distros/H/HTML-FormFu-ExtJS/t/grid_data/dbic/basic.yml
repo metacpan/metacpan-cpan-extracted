@@ -1,0 +1,6 @@
+---
+    elements:
+        - type: Hidden
+          name: artistid
+        - type: Text
+          name: name

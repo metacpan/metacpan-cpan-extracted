@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/2002/REC-xhtml1-20020801/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" content="text/xhtml; charset=utf-8">
+    <head>
+        <title>Hyper Developer Server - Overview</title>
+        <style type="text/css">
+            body,td,th,a,p,.h { font-family: arial,sans-serif;      }
+            html,body         { width: 100%; padding: 0; margin: 0; }
+            body              { font-size: small;                   }
+            td,th             { text-align: left;                   }
+            td                { vertical-align: top;                }
+        </style>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    </head>
+    <body>
+        <table style="width: 100%; border: 1px solid #000; padding: 0px; background: #696969; color: #f5f5f5;">
+            <tr>
+                <td style="font-size: 5em; width: 10px; vertical-align: middle;">
+                    
+                </td>
+                <td style="font-size: 1.6em; font-weight: bold; vertical-align: middle;">
+                    Hyper Developer<br />
+                    Server
+                </td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <td>
+                    <table>
+                        <tr>
+                            <th colspan="4">
+                                <h2>Container Controls</h2>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>&nbsp;</th>
+                            <th><%TEXT value="Service" %></th>
+                            <th><%TEXT value="Usecase" %></th>
+                            <th><%TEXT value="Model" %></th>
+                        </tr><%LOOP container_controls %>
+                        <tr>
+                            <%IF is_broken %><td style="color: #FF0000;">✘</td><%ELSE%><td style="color: #228B22;">✔</td><%/IF%>
+                            <td><%= service %></td>
+                            <td><%= usecase %></td>
+                            <td>
+                                <a href="/Model/Viewer/Container/<%= service ESCAPE=URL %>/<%= usecase ESCAPE=URL %>">view</a>
+                            </td>
+                        </tr><%/LOOP%>
+                    </table>
+                </td>
+                <td style="width: 15px;">&nbsp;</td>
+                <td>
+                    <table>
+                        <tr>
+                            <th colspan="5">
+                                <h2>Flow Controls</h2>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>&nbsp;</th>
+                            <th><%TEXT value="Service" %></th>
+                            <th><%TEXT value="Usecase" %></th>
+                            <th><%TEXT value="Model" %></th>
+                            <th><%TEXT value="Workflow" %></th>
+                        </tr><%LOOP flow_controls %>
+                        <tr>
+                            <%IF is_broken %><td style="color: #FF0000;">✘</td><%ELSE%><td style="color: #228B22;">✔</td><%/IF%>
+                            <td><%= service %></td>
+                            <td><%= usecase %></td>
+                            <td style="text-align: center;">
+                                <a href="/Model/Viewer/Flow/<%= service ESCAPE=URL %>/<%= usecase ESCAPE=URL %>">view</a>
+                            </td>
+                            <td style="text-align: center;">
+                                <a href="/cgi-bin/<%= .lc_namespace ESCAPE=URL %>/index.pl?service=<%= service ESCAPE=URL %>&amp;usecase=<%= usecase ESCAPE=URL %>">start</a>
+                            </td>
+                        </tr><%/LOOP%>
+                    </table>
+                </td>
+            </tr>
+        </table><!-- powered by Perl and the Hyper Framework -->
+    </body>
+</html>

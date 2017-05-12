@@ -1,0 +1,124 @@
+HTML::Subtext Version 1.03
+Sun Mar  7 14:16:53 PST 1999
+
+    This module is designed to do simple textual substitutions into an
+    HTML template document in an "offline" process. It is *not* a
+    mechanism for implementing server-side includes -- there are plenty of
+    other perl modules that do that. There are also other modules which
+    let you embed arbitrary perl expressions in a template. [These are
+    quite powerful and useful, but assume a certain sophistication on the
+    part of the template author.] HTML::Subtext doesn't do that either.
+
+    What it does do is allow you to compose an HTML document using your
+    favorite WYSIWYG HTML editor, include place-holder strings in it like
+    "Customer's name here", and then turn those place holders into a
+    substitution field by making the text a link to a special 'subtext:'
+    URI. This approach has the following advantages:
+
+      1. Any Web server can display the finished documents -- you don't
+         need special support for server-side includes, or active server
+	 pages, or anything beyond plain vanilla HTML. (Of course it is
+	 still possible to use those features if you have and want them.)
+      2. The templates are easy for a non-technical user to prepare
+         (in particular a non-perl-literate user).
+      3. It's possible to view the template in its unprocessed form, in a
+         regular Web browser, and to see where the substituted strings
+	 will be placed and approximately what your finished document
+	 will look like.
+      4. The substitution mechanism is robust against errors in the
+         template specification. That is, the output is still a valid
+	 HTML document even if some of the substitution field names are
+	 misspelled or invalid.
+
+    In short, the idea is to make things as simple and convenient as
+    possible from the perspective of the template author. I looked through
+    a lot of HTML manipulation packages on CPAN, but none of them struck
+    me as having quite this goal in mind. [Perhaps this is because the very
+    idea of using a template is that you only have to get it right once,
+    so power and versatility are more important than convenience. But for
+    the particular application I was building at the time, there were a
+    number of templates to be built, and they were to be tweaked fairly
+    regularly.]
+
+INSTALLATION
+
+    Installation is accomplished in the usual manner-- unpacking the tar
+    archive should create a directory called HTML-Subtext-1.03/. cd into
+    this directory and issue the following commands:
+
+      perl Makefile.PL
+      make
+      make test
+
+    Assuming all the tests succeed, you may require root or administrator
+    privledges on your system for the final step:
+
+      make install
+
+    It's possible to make use of the module without installing it. See the
+    perl documentation on @INC for details.
+
+ACKNOWLEDGEMENTS
+
+    The implementation of this module was almost trivially simple, thanks
+    to the excellent work of Gisle Aas (and others) on the HTML::Parser
+    and URI modules.
+
+--------
+
+NAME
+    HTML::Subtext - Perform text substitutions on an HTML template
+
+SYNOPSIS
+      use HTML::Subtext;
+      %context = ( ... ); # Hash of names to substitution text
+      $p = HTML::Subtext->new('CONTEXT' => \%context);
+      $p->parse_file("template.html");
+
+DESCRIPTION
+    `HTML::Subtext' is a package for performing text substitutions
+    on a specially formatted HTML template. The template uses normal
+    HTML markup, but includes links of the form:
+
+      <a href="subtext:foo/bar">This text will be replaced</a>
+
+    The URI in this link tells `HTML::Subtext' to check in the
+    provided hash `'CONTEXT'' for a key named `'foo/bar''. If this
+    lookup succeeds in producing a string value, the text in the
+    body of the link is replaced by that value.
+
+EXAMPLES
+    This example performs substitutions into a template embedded
+    into the Perl code as a *here-document*.
+
+      use HTML::Subtext;
+      
+      %context = (
+        'author/name' => 'Kaelin Colclasure',
+        'author/email' => '<a href="mailto:kaelin@acm.org">kaelin@acm.org</a>'
+      );
+      
+      $p = HTML::Subtext->new('CONTEXT' => \%context);
+      $p->parse(<<EOT);
+      <html><head><title>example</title></head><body>
+      <a href=\"subtext:author/name\">Author's name here</a>
+      <a href=\"subtext:author/email\">mailto: link here</a>
+      </body></html>
+      EOT
+
+    When run, the example produces the following output:
+
+      <html><head><title>example</title></head><body>
+      Kaelin Colclasure
+      <a href="mailto:kaelin@acm.org">kaelin@acm.org</a>
+      </body></html>
+
+SEE ALSO
+    the HTML::Filter manpage, the HTML::Parser manpage
+
+COPYRIGHT
+    Copyright 1999 Kaelin Colclasure.
+
+    This library is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+

@@ -1,0 +1,74 @@
+<ep-package name="HTML::EP::Explorer">
+<ep-explorer-config file="admin/config.pm">
+<ep-explorer-queue>
+<ep-if cnd="'$_ep_language$' eq 'de'">
+  <ep-set var=Title val="Warteschlange '$action->name$'">
+  <ep-set var=Reload val="Neu laden">
+<ep-else>
+  <ep-set var=Title val="Queue $action->name$">
+  <ep-set var=Reload val="Reload">
+</ep-if>
+<head><title>$Title$</title>
+<ep-if eval="$config->cache$">
+  <meta http-equiv="refresh" content="$config->cache$; URL=queue.ep?language=$_ep_language$&faction=$#cgi->faction$">
+</ep-if>
+<script language=JavaScript>
+  function Action (job, sb) {
+    var val = sb.options[sb.selectedIndex].value;
+    if (val) {
+      location = "queue.ep?language=$#_ep_language$&job=" + escape(job) +
+	"&script=" + escape(val) + "&faction=$#action->name$";
+    }
+  }
+</script>
+</head>
+<body bgcolor=#ffffff>
+<h1>$Title$</h1>
+<div align=center>
+<ep-if eval="$status_num$">
+  <form name=myform>
+  <table border=1>
+    <tr><th><ep-language de="Nr." en="Rank"></th>
+	<th><ep-language de="Benutzer" en="Owner"></th>
+	<th><ep-language de="Job-Nr." en="Job"></th>
+	<th><ep-language de="Dateiname" en="File name"></th>
+	<th><ep-language de="Größe" en="Size"></th>
+      <ep-if eval="@{$_->{'status_actions'}}">
+	<th><ep-language de="Aktion" en="Action"></th>
+      </ep-if>
+    </tr>
+  <ep-list items=status item=s>
+    <tr><td>$s->rank$</td><td>$s->owner$</td><td>$s->job$</td>
+	<td>$s->file$</td><td>$s->size$</td>
+      <ep-if eval="@{$_->{'status_actions'}}">
+	<td><select name=job_$i$ onChange="Action($s->job$, this)">
+	      <option value="">------
+	    <ep-list items=status_actions item=sa>
+	      <option value="$sa->name$">$sa->name$
+	    </ep-list>
+	    </select>
+        </td>
+      </ep-if>
+    </tr>
+  </ep-list>
+  </table>
+  </form>
+<ep-else>
+  <p>
+    <ep-language de="Die Warteschlange ist leer." en="The queue is empty.">
+  </p>
+</ep-if>
+<p>
+  <ep-if eval="$config->cache$">
+    <ep-language language="de">
+      Diese Seite lädt sich selbst neu in $config->cache$ Sekunden.
+    <ep-language language="en">
+      This page will reload itself in $config->cache$ seconds.
+    </ep-language>
+  </ep-if>
+</p>
+<p>
+  <a href="queue.ep?language=$_ep_language$&faction=$#cgi->faction$">$Reload$</a>
+</p>
+</div>
+</body></html>

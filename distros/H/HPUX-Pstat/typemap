@@ -1,0 +1,7 @@
+TYPEMAP
+pst_static *	T_PACKED
+pst_dynamic *	T_PACKED
+pst_vminfo *	T_PACKED
+my_swapinfo *	T_PACKED
+my_status *     T_PACKED
+my_processor *	T_PACKED

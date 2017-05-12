@@ -1,0 +1,18 @@
+<%args>
+$agr_cat => undef
+$per  => undef
+$num  => undef
+$gend => undef
+$tag  => undef
+</%args>\
+<% defined $tag ? sprintf('\\@{%s} ', $tag) : ''%>\
+% if( defined $agr_cat ){
+\[ {\it <% $agr_cat %>}\\ 
+   PER  & <% $per %>\\ 
+   NUM  & <% $num %>\
+%   if( $gend && $agr_cat eq '3sing' ){
+\\ 
+   GEND & <% $gend %>
+%   }
+\]
+% }

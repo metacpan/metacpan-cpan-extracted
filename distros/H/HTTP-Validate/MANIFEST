@@ -1,0 +1,17 @@
+Build.PL
+Changes
+lib/HTTP/Validate.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-rulesets.t
+t/02-params.t
+t/03-validators.t
+t/04-require.t
+t/05-docstrings.t
+t/06-messages.t
+t/manifest.t
+t/pod.t
+Makefile.PL
+META.yml
+META.json

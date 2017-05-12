@@ -1,0 +1,21 @@
+---
+abstract: 'formats plain names of high energy physics (HEP) particles to LaTeX'
+author:
+  - 'Philipp Hamer <philha@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HEP-Names-LaTeX
+requires:
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/ponzellus/HEP-Names-LaTeX/issues
+  homepage: https://github.com/ponzellus/HEP-Names-LaTeX
+  repository: https://github.com/ponzellus/HEP-Names-LaTeX.git
+version: '0.01'

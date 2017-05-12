@@ -1,0 +1,57 @@
+{
+   "abstract" : "Simplify the HTML::Element clone() - push_content() ritual ",
+   "author" : [
+      "Michael Accardo <accardo@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-Element-Replacer",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::Element::Library" : "0",
+            "HTML::TreeBuilder" : "0",
+            "Moose" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "File::Slurp" : "0",
+            "FileHandle" : "0",
+            "HTML::PrettyPrinter" : "0",
+            "Test::More" : "0",
+            "lib" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mixedconnections/html-element-replacer/issues"
+      },
+      "homepage" : "https://github.com/mixedconnections/html-element-replacer",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mixedconnections/html-element-replacer.git",
+         "web" : "https://github.com/mixedconnections/html-element-replacer"
+      }
+   },
+   "version" : "0.08"
+}
+

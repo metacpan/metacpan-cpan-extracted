@@ -1,0 +1,20 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         HTML-SearchPage
+version:      0.05
+version_from: lib/HTML/SearchPage.pm
+installdirs:  site
+requires:
+    CGI:                           0
+    CGI::Session:                  0
+    DBI:                           0
+    List::Util:                    0
+    LWP::Simple:                   0
+    Spreadsheet::WriteExcel:       0
+    Storable:                      0
+    Test::More:                    0
+    Tie::IxHash:                   0
+    Time::Format:                  0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

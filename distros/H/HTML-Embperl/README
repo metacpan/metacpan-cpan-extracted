@@ -1,0 +1,242 @@
+
+HTML::Embperl - Building dynamic Websites with Perl
+---------------------------------------------------
+
+Copyright (c) 1997-2002 Gerald Richter / ecos gmbh (www.ecos.de)
+
+You may distribute under the terms of either the GNU General Public 
+License or the Artistic License, as specified in the Perl README file.
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED 
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+$Id: README,v 1.31.2.1 2003/01/22 08:23:35 richter Exp $
+
+
+OVERVIEW
+========
+
+Embperl gives you the power to embed Perl code in your HTML documents
+and the ability to build your Web site out of small reusable objects in
+an object-oriented style. You can also take advantage of all the
+usual Perl modules, (including DBI for database access) use their
+functionality and easily include their output in your web pages.
+
+Embperl has several features which are especially useful for creating
+HTML, including dynamic tables, form field processing, URL
+escaping/unescaping, session handling, and more.
+
+Embperl is a server-side tool, which means that it's browser-independent. 
+It can run in various ways: under mod_perl, as a CGI script, or offline.
+
+For database access, there is a module called DBIx::Recordset, which 
+works well together with Embperl and simplifies creating web pages
+with database content.
+
+
+DOCUMENTATION
+=============
+
+The following documentation is available within the distribution
+
+Features of Embperl:            perldoc Features.pod
+Introduction to Embperl:        perldoc Intro.pod
+Introduction to EmbperlObject:  perldoc IntroEmbperlObject.pod
+Installation of Embperl:        perldoc INSTALL.pod
+Full documentation:             perldoc Embperl.pod
+                                perldoc EmbperlObject.pm
+                                perldoc Embperl/Mail.pm
+Frequent Asked Questions:       perldoc Faq.pod
+Tips and Tricks:                perldoc TipsAndTricks.pod
+Changes:                        perldoc Changes.pod
+Examples:		        eg/x/README
+Sourcecode encryption:          crypto/README
+
+All the above and further information can be found at the Embperl website 
+
+    http://perl.apache.org/embperl/
+
+The following documentation is available in GERMAN
+
+Features of Embperl:        perldoc FeaturesD.pod
+Introduction to Embperl:    perldoc IntroD.pod
+Full documentation:         perldoc EmbperlD.pod
+
+All the above and further information can be found at the german Embperl website 
+
+    http://www.ecos.de/embperl/
+
+
+FEATURES
+========
+
+* Lets you embed Perl code into HTML documents. Perl code is
+  evaluated at the server side and the result is sent to the browser.
+
+* Offers various meta-commands for conditional and loop 
+  processing of the HTML documents.
+
+* Automatically generates dynamic HTML tables/lists from Perl arrays or
+  function calls (e.g. DBI fetch)
+
+* Form data send to your document is placed in a hash
+
+* Automatically inserts data from the form hash into HTML input,
+  textarea and select tags
+
+* Understands HTML and URL escaping and unescaping
+
+* Handles per-user and per-module persistent session data for you.
+  All you need to do is store and retrieve them to and from
+  a special hash.
+
+* Allows you to build your web-site out of components. Frequently used 
+  elements can be defined once and included in every page.
+
+* EmbperlObject allows you to define the standard layout of your site just
+  once and includes the neccessary components based on the uri. Your HTML
+  documents just have to contain the unique stuff and not the common stuff
+  like headers/footers or navigation bars. Also these common element can 
+  be overwritten in each subdirectory.
+
+* Gives you the possibility to build libraries with a set of frequently used 
+  Elements or components, and make them available to the whole web-site in the
+  same way as Perl modules are - well, modularized.
+
+* Supports debugging of pages by generating a very detailed
+  log file and making it accessible via the browser with a single click.
+
+* Generates verbose error pages in which every error can link 
+  to the log file. This is ideal for debugging.
+
+* Offers a lot of options for maximum configurability according to your 
+  personal tastes and needs.
+
+* Fully integrated into Apache and mod_perl to acheive the best
+  performance. Can also run as a CGI-script, offline or called from
+  another Perl program.
+
+* The Perl module DBIx::Recordset offers high level, easy to handle
+  database access for Embperl.
+
+* If you are concerned about security you can configure Embperl to use
+  Safe.pm. This way, your documents can run in a safe namespace which
+  can allow or disallow certain Perl opcodes.
+
+* I<HTML::Embperl::Mail> gives you the possibility to send the result directly
+  to a email address
+
+
+
+COMPATIBILITY
+=============
+
+I have tested Embperl successfully
+
+on Linux 2.x with
+
+perl5.004_04
+perl5.005_01/02/03
+perl5.6.0
+perl5.6.1
+perl5.7.1
+perl5.7.2
+perl5.8.0
+apache_1.3.0 - apache_1.3.27
+apache + mod_ssl
+apache_ssl (Ben SSL)
+Stronghold 2.2
+Stronghold 2.4.1
+
+on Windows NT/2000 with
+
+perl5.004_04
+perl5.005_xx 
+perl5.6.0
+perl5.6.1
+perl5.8.0
+apache_1.3.0 - apache_1.3.27
+
+on Windows 95/98 with
+
+perl5.004_02 (binary distribution)
+Offline mode
+perl5.005_03 + apache_1.3.6 
+
+I know from other people that it works on many other UNIX systems
+
+
+FEEDBACK and BUG REPORTS
+========================
+
+Please let me know if you use or test this module.  Bugs, questions,
+suggestions for things you would find useful, etc., are discussed on
+the Embperl mailing list. If you have a site that is using Embperl,
+I would love to mention it in the list of sites using Embperl 
+(http://perl.apache.org/embperl/Sites.pod.1.html). Please drop
+me a mail with a short description, if your site uses Embperl.
+
+
+The Embperl mailing list (embperl@perl.apache.org) is available for Embperl users
+and developers to share ideas, solve problems and discuss things related to Embperl
+To subscribe to this list, send mail to embperl-subscribe@perl.apache.org.
+To unsubscribe send email to embperl-unsubscribe@perl.apache.org . 
+
+There is an archive for the Embperl mailing list at http://www.ecos.de/~mailarc/embperl/
+
+For mod_perl related questions you may search the mod_perl mailing list
+archive at http://forum.swarthmore.edu/epigone/modperl
+
+
+
+COMMERICAL SUPPORT
+==================
+
+You can get free support on the Embperl mailing list (see above).  If
+you need commercial support, ecos can provide it for you. We offer:
+
+* Consulting, assitance and training for you and your programmers
+
+* Planning of your dynamic website
+
+* Creating of parts or a whole website
+
+* Fixing bugs in Embperl (also available for mod_perl)
+
+* Adding new features
+
+You can reach us via http://www.ecos.de or info@ecos.de 
+For more information about our support see 
+
+http://www.ecos.de/x/index.htm/support/eng_r_support.htm
+
+
+
+HOW TO SUPPORT THE DEVELOPEMENT OF EMBPERL
+==========================================
+
+If you use and like Embperl and want to support it's ongoing developement
+you have two possibilities:
+
+1. Send me patches for things you like to see in Embperl
+
+2. Buy commercial support (see above). Also you _may_ get the same answers
+   to your questions on the mailing list, by buying the commercial support
+   you not only buy support for yourself and can be sure you get an answer,
+   you also give us the possibility to put more power in the further
+   developement of Embperl.
+
+
+LOGO
+====
+
+The Embperl distribution contains a "Powered by Embperl" Logo
+(EmbperlLogo.gif) which you may place at your Web-site if you like.
+
+
+AUTHOR
+======
+
+G. Richter (richter@dev.ecos.de)
+

@@ -1,0 +1,560 @@
+ <html>
+ <head>
+ <title>Example</title>
+ </head>
+ <body>
+  <h1>head from foo</h1>
+
+
+
+Include epodiv.htm from this file, to check if this @ISA is correctly setup in the next request
+
+
+<html>
+<head>
+<title>Some Plain tests Embperl</title>
+</head>
+
+<body>
+
+Here it starts with some HTML Text<P>
+
+All values should be undefined:
+
+$a =  <BR>
+$b =  <BR>
+$c =  <BR>
+$d =  <BR>
+$e =  <BR>
+
+
+First of all assign a value:
+<BR>
+
+Now we have some 'Umlaute':
+
+
+Now lets look what we are getting from this:<BR>
+(this is the value in $a) (this is the value in $a) &auml;&ouml;&uuml;<BR>
+
+And now a and b together: (this is the value in $a)(this is the value in $a) &auml;&ouml;&uuml;<P>
+
+Here we have some HTML tags within the perl code, Embperl will delete them!<BR>
+
+57
+Embperl will also translate HMTL escapes to the right characters i.e. $a &amp;lt; 6 will get the perl expression $a &lt; 6: <BR>
+
+1
+Now they should have a value
+
+$a = (this is the value in $a) <BR>
+$b = (this is the value in $a) &auml;&ouml;&uuml; <BR>
+$c = 57 <BR>
+$d = 1 <BR>
+$e = 2 <BR>
+
+a <br>
+a <br>
+a <br>
+    b is null <br>
+    a <br>
+    b is null <br>
+    a<br>
+    b is null <br>
+    <table></table>
+
+
+<p> $tabmode = default <p>
+
+<hr><p>Display an two dimensional array with one, two and three columns !<BR>
+Please take a look at the source in your browser to see the difference<BR>
+
+$a[0][0] = '1/1' ;<BR>
+   $a[1][0] = '2/1' ;<BR>
+   $a[1][1] = '2/2' ;<BR>
+   $a[2][0] = '3/1' ;<BR>
+   $a[2][1] = '3/2' ;<BR>
+   $a[2][2] = '3/3' ;<BR>
+
+<P>$tabmode = default <P>
+
+<table border="1" width="100%">
+    <tr>
+        <td>a1/1 </td>
+    </tr> 
+
+    <tr>
+        <td>a2/1 </td>
+    
+        <td>a2/2 </td>
+    </tr> 
+
+    <tr>
+        <td>a3/1 </td>
+    
+        <td>a3/2 </td>
+    
+        <td>a3/3 </td>
+    </tr> 
+</table>
+
+<table border="2" width="100%">
+    <tr>
+        <td>a1/1 </td>
+    </tr> 
+
+    <tr>
+        <td>a2/1 </td>
+    
+        <td>a2/2 </td>
+    </tr> 
+
+    <tr>
+        <td>a3/1 </td>
+    
+        <td>a3/2 </td>
+    
+        <td>a3/3 </td>
+    </tr> 
+</table>
+
+<table border="3" width="100%">
+    <tr>
+        <td>a1/1 </td>
+    </tr> 
+
+    <tr>
+        <td>a2/1 </td>
+    
+        <td>a2/2 </td>
+    </tr> 
+
+    <tr>
+        <td>a3/1 </td>
+    
+        <td>a3/2 </td>
+    
+        <td>a3/3 </td>
+    </tr> 
+</table>
+
+<table  border="4" >
+    <tr>
+        <td>
+            <table  border="5" >
+    		<tr>
+                    <td>b1/1 </td>
+    		</tr> 
+	    
+    		<tr>
+                    <td>b2/1 </td>
+    		
+                    <td>b2/2 </td>
+    		</tr> 
+	    
+    		<tr>
+                    <td>b3/1 </td>
+    		
+                    <td>b3/2 </td>
+    		
+                    <td>b3/3 </td>
+    		</tr> 
+	    </table>
+
+        a1/1 </td>
+    </tr> 
+
+    <tr>
+        <td>
+            <table  border="5" >
+    		<tr>
+                    <td>b1/1 </td>
+    		</tr> 
+	    
+    		<tr>
+                    <td>b2/1 </td>
+    		
+                    <td>b2/2 </td>
+    		</tr> 
+	    
+    		<tr>
+                    <td>b3/1 </td>
+    		
+                    <td>b3/2 </td>
+    		
+                    <td>b3/3 </td>
+    		</tr> 
+	    </table>
+
+        a2/1 </td>
+    
+        <td>
+            <table  border="5" >
+    		<tr>
+                    <td>b1/1 </td>
+    		</tr> 
+	    
+    		<tr>
+                    <td>b2/1 </td>
+    		
+                    <td>b2/2 </td>
+    		</tr> 
+	    
+    		<tr>
+                    <td>b3/1 </td>
+    		
+                    <td>b3/2 </td>
+    		
+                    <td>b3/3 </td>
+    		</tr> 
+	    </table>
+
+        a2/2 </td>
+    </tr> 
+
+    <tr>
+        <td>
+            <table  border="5" >
+    		<tr>
+                    <td>b1/1 </td>
+    		</tr> 
+	    
+    		<tr>
+                    <td>b2/1 </td>
+    		
+                    <td>b2/2 </td>
+    		</tr> 
+	    
+    		<tr>
+                    <td>b3/1 </td>
+    		
+                    <td>b3/2 </td>
+    		
+                    <td>b3/3 </td>
+    		</tr> 
+	    </table>
+
+        a3/1 </td>
+    
+        <td>
+            <table  border="5" >
+    		<tr>
+                    <td>b1/1 </td>
+    		</tr> 
+	    
+    		<tr>
+                    <td>b2/1 </td>
+    		
+                    <td>b2/2 </td>
+    		</tr> 
+	    
+    		<tr>
+                    <td>b3/1 </td>
+    		
+                    <td>b3/2 </td>
+    		
+                    <td>b3/3 </td>
+    		</tr> 
+	    </table>
+
+        a3/2 </td>
+    
+        <td>
+            <table  border="5" >
+    		<tr>
+                    <td>b1/1 </td>
+    		</tr> 
+	    
+    		<tr>
+                    <td>b2/1 </td>
+    		
+                    <td>b2/2 </td>
+    		</tr> 
+	    
+    		<tr>
+                    <td>b3/1 </td>
+    		
+                    <td>b3/2 </td>
+    		
+                    <td>b3/3 </td>
+    		</tr> 
+	    </table>
+
+        a3/3 </td>
+    </tr> 
+</table>
+
+^<P>(1.3|2.0)
+
+<P>17<P>
+<P>1<P>
+
+<P>
+
+0
+
+    1
+
+    2
+A = 1<br>
+
+    B = 2<br>
+
+    C = 3<br>
+@a[0] = a<br>
+	
+    @a[1] = b<br>
+	
+    @a[2] = c<br>
+	
+    @a[3] = d<br>
+	@a[0] = a<br>
+	
+    @a[1] = b<br>
+	
+    @a[2] = c<br>
+	
+    @a[3] = d<br>
+	a <br>
+
+	b <br>
+
+	c <br>
+
+	d <br>
+1 <br>
+
+	3 <br>
+
+	5 <br>
+
+	7 <br>
+
+	9 <br>
+1 <br>
+
+	2 <br>
+
+	3 <br>
+
+	4 <br>
+
+	5 <br>
+
+	6 <br>
+
+	7 <br>
+
+	8 <br>
+
+	9 <br>
+
+	10 <br>
+2:1 <br>
+
+	2:2 <br>
+
+	2:3 <br>
+
+	2:4 <br>
+
+	2:5 <br>
+3:a <br>
+
+	3:b <br>
+
+	3:c <br>
+@a[0] = a<br>
+	A = 1<br>
+		1 <br>
+		
+			3 <br>
+		
+			5 <br>
+		
+			7 <br>
+		
+			9 <br>
+		
+		B = 2<br>
+		1 <br>
+		
+			3 <br>
+		
+			5 <br>
+		
+			7 <br>
+		
+			9 <br>
+		
+		C = 3<br>
+		1 <br>
+		
+			3 <br>
+		
+			5 <br>
+		
+			7 <br>
+		
+			9 <br>
+		
+    @a[1] = b<br>
+	A = 1<br>
+		1 <br>
+		
+			3 <br>
+		
+			5 <br>
+		
+			7 <br>
+		
+			9 <br>
+		
+		B = 2<br>
+		1 <br>
+		
+			3 <br>
+		
+			5 <br>
+		
+			7 <br>
+		
+			9 <br>
+		
+		C = 3<br>
+		1 <br>
+		
+			3 <br>
+		
+			5 <br>
+		
+			7 <br>
+		
+			9 <br>
+		
+    @a[2] = c<br>
+	A = 1<br>
+		1 <br>
+		
+			3 <br>
+		
+			5 <br>
+		
+			7 <br>
+		
+			9 <br>
+		
+		B = 2<br>
+		1 <br>
+		
+			3 <br>
+		
+			5 <br>
+		
+			7 <br>
+		
+			9 <br>
+		
+		C = 3<br>
+		1 <br>
+		
+			3 <br>
+		
+			5 <br>
+		
+			7 <br>
+		
+			9 <br>
+		
+    @a[3] = d<br>
+	A = 1<br>
+		1 <br>
+		
+			3 <br>
+		
+			5 <br>
+		
+			7 <br>
+		
+			9 <br>
+		
+		B = 2<br>
+		1 <br>
+		
+			3 <br>
+		
+			5 <br>
+		
+			7 <br>
+		
+			9 <br>
+		
+		C = 3<br>
+		1 <br>
+		
+			3 <br>
+		
+			5 <br>
+		
+			7 <br>
+		
+			9 <br>
+		x
+
+ y
+
+<table>
+    <tr>
+            <td>ii[0] = 0 </td>
+    </tr> 
+
+    <tr>
+            <td>ii[1] = 1 </td>
+    </tr> 
+
+    <tr>
+            <td>ii[2] = 2 </td>
+    </tr> 
+
+    <tr>
+            <td>ii[3] = 3 </td>
+    </tr> 
+
+    <tr>
+            <td>ii[4] = 4 </td>
+    </tr> 
+
+    <tr>
+            <td>ii[5] = 5 </td>
+    </tr> 
+
+    <tr>
+            <td>ii[6] = 6 </td>
+    </tr> 
+
+    <tr>
+            <td>ii[7] = 7 </td>
+    </tr> 
+
+    <tr>
+            <td>ii[8] = 8 </td>
+    </tr> 
+
+    <tr>
+            <td>ii[9] = 9 </td>
+    </tr> 
+</table>
+
+</body>
+</html>
+
+--- END ---
+
+
+ <hr> Footer <hr>
+ 
+ 
+
+</body>
+ </html>
+

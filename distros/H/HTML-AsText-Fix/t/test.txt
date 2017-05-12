@@ -1,0 +1,171 @@
+HTML::AsText::Fix
+
+
+
+NAME
+
+VERSION
+
+SYNOPSIS
+
+DESCRIPTION
+Distinction between block/inline nodes
+
+
+
+FUNCTIONS
+as_text
+
+global
+
+object
+
+
+
+SEE ALSO
+
+ACKNOWLEDGEMENTS
+
+AUTHOR
+
+COPYRIGHT AND LICENSE
+
+
+
+NAME
+
+HTML::AsText::Fix - extends HTML::Element::as_text() to render text properly
+VERSION
+
+version 0.003
+SYNOPSIS
+
+    # fix individual objects
+    my $tree = HTML::TreeBuilder::XPath->new_from_content($html);
+    my $guard = HTML::AsText::Fix::object($tree);
+
+    # fix deeply nested objects
+    use URI;
+    use Web::Scraper;
+
+    # First, create your scraper block
+    my $tweets = scraper {
+        process "li.status", "tweets[]" => scraper {
+            process ".entry-content", body => 'TEXT';
+            process ".entry-date", when => 'TEXT';
+            process 'a[rel="bookmark"]', link => '@href';
+        };
+    };
+
+    my $res;
+    {
+        my $guard = HTML::AsText::Fix::global();
+        $res = $tweets->scrape( URI->new("http://twitter.com/creaktive") );
+    }
+DESCRIPTION
+
+Consider the following HTML sample:
+    <p>
+        <span>AAA</span>
+        BBB
+    </p>
+    <h2>CCC</h2>
+    DDD
+    <br>
+    EEE
+HTML::Element::as_text()
+ method stringifies it as AAABBBCCCDDDEEE
+. Despite being correct, this is far from the actual renderization within a "real" browser. links(1)
+, lynx(1)
+ & w3m(1)
+ break lines this way:
+    AAABBB
+    CCC
+    DDD
+    EEE
+This module tries to implement the same behavior in the method "as_text" in HTML::Element
+. By default, $/
+ value is inserted in place of line breaks, and "\x{200b}"
+ (Unicode zero-width space) separates text from adjacent inline elements.
+Distinction between block/inline nodes
+
+"span", for instance, is an inline node:
+    <p><span>A</span>pple</p>
+In that case, there really shouldn't be a space between "A" and "pple". To handle inline nodes properly, only block nodes are separated by line break. Following nodes are currently assumed being blocks:
+p
+h1 h2 h3 h4 h5 h6
+dl dt dd
+ol ul li
+dir
+address
+blockquote
+center
+del
+div
+hr
+ins
+noscript script
+pre
+br (just to make sense)
+
+(source: http://en.wikipedia.org/wiki/HTML_element#Block_elements
+)
+FUNCTIONS
+
+as_text
+
+The replacement function. Not to be used separately. It is injected inside HTML::Element
+.
+global
+
+Hook into every HTML::Element
+ within the lexical scope. Returns the guard object, destroying it will unhook safely.
+Accepts following options:
+lf_char
+: character inserted between block nodes (by default, $/
+);
+zwsp_char
+: character inserted between inline nodes (by default, "\x{200b}"
+, Unicode zero-width space);
+trim
+: trim heading/trailing spaces (considers "\x{A0}"
+ as space!);
+extra_chars
+: extra characters to trim;
+skip_dels
+: if true, then text content under "del" nodes is not included in what's returned.
+
+For example, to completely get rid of separation between inline nodes:
+    my $guard = HTML::AsText::Fix::global(zwsp_char => '');
+object
+
+Hook object instance. Accepts the same options as "global"
+:
+    my $guard = HTML::AsText::Fix::object($tree, zwsp_char => '');
+SEE ALSO
+
+HTML::Element
+
+HTML::Tree
+
+HTML::FormatText
+
+Monkey::Patch
+
+
+ACKNOWLEDGEMENTS
+
+Αριστοτέλης Παγκαλτζής
+
+Toby Inkster
+
+
+AUTHOR
+
+Stanislaw Pusep <stas@sysd.org>
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Stanislaw Pusep.
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
+
+

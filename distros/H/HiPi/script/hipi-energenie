@@ -1,0 +1,14 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use HiPi::Energenie::Command;
+
+our $VERSION ='0.65';
+
+my $result = HiPi::Energenie::Command->new->handle_command;
+
+print $result . qq(\n);
+
+1;
+
+__END__

@@ -1,0 +1,13 @@
+1.1	2014-01-15
+
+	Add HTML::Native::JSON
+
+	Fix problems due to use of multi-line qw() strings
+
+1.0.1	2011-06-10
+
+	Fix compatibility with some older Perl versions
+
+1.0	2011-06-08
+
+	First released version

@@ -1,0 +1,51 @@
+Revision history for Hypothesis-API
+
+0.13    2015-11-30
+        Improved error handling of JSON parsing, remote server errors, and timeouts.
+        Added methods to set server timeout length and employed this in test code.
+
+0.12    2015-09-08
+        Signifacantly simplified search and fixed a bug with it (thanks Simeon Warner). 
+        Added search_total function and test.
+        Added search infinite test while concurrently inserting.
+        Changed delete_id to have non-fatal error when unauthorized.
+
+0.11    2015-08-20
+        Fixed a bug introduced in search that occurs when only one item is
+        returned.
+
+0.10    2015-07-10
+        Changed null 'target' format (may help created annotations show in plugin).
+        Minor improvement of edge cases in search limits, particularly limit=inf.
+
+0.09    2015-06-26
+	Added 'update_id' function so annotations can be updated.
+	Minor doc change for search to include 'uri.parts'.
+	Slightly improved build procedure regarding META packaging.
+
+0.08    2015-06-20
+        Removed MYMETA.* from distribution.
+	Removed unnecessary 'use Term::ReadKey' in search.t.
+
+0.07    2015-06-19
+        Now properly include LWP::Protocol::https as a dependency.
+
+0.06    2015-06-18
+        Fixed metadata to now include META as well as MYMETA.
+
+0.05    2015-06-18
+        Updating read_id and corresponding tests to reflect 
+        server-side change in hypothes.is: /api/annotations/
+        with no parameters now appears identical to
+        /api/search with no parameters.
+
+0.04    2015-06-18
+        Updated documentation and metadata.
+
+0.01    2015-06-17
+        First release; supports:
+        * create
+        * delete
+        * login
+        * read
+        * search

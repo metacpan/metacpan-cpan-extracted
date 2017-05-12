@@ -1,0 +1,13 @@
+CHANGES
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README.md
+dist.ini
+lib/HTML/Meta/Robots.pm
+t/001-base.t
+t/002-simple.t
+t/003-parse.t
+t/998-pod.t
+t/999-pod-coverage.t

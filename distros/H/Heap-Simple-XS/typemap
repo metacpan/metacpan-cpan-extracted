@@ -1,0 +1,10 @@
+TYPEMAP
+heap		T_PTROBJ_HEAP
+
+INPUT
+T_PTROBJ_HEAP
+        $var = C_HEAP($arg, \"$var\");
+
+OUTPUT
+T_PTROBJ_HEAP
+	sv_setref_pv($arg, \"Heap::Simple::XS\", (void*)$var);

@@ -1,0 +1,51 @@
+The file is the README for HTML::Rainbow version 0.06
+
+INSTALLATION
+
+perl Makefile.PL
+make
+make test
+make install
+
+TESTING
+
+This module requires the following modules for thorough testing:
+
+    Test::More
+    Test::Pod
+    Test::Pod::Coverage
+
+It can also make use of Devel::Cover if available.
+
+UNINSTALLATION
+
+This is a pure-Perl module. The following one-liner should print
+out the canonical path of the file:
+
+  perl -MHTML::Rainbow -le 'print $INC{"HTML/Rainbow.pm"}'
+
+Just delete this file. There is also the question of the man page.
+Finding that is left as an exercise to the reader.
+
+USAGE
+
+use HTML::Rainbow;
+
+STATUS
+
+This module is considered stable. Further additions in functionality
+are unlikely (but patches are always welcome).
+
+AUTHOR
+
+David Landgren
+
+COPYRIGHT
+
+This module is copyright (C) David Landgren 2005-2009.
+All rights reserved.
+
+LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

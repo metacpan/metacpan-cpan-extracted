@@ -1,0 +1,145 @@
+2.16      2016-12-07 09:12:41+00:00 Europe/London
+    - Public release after a period on test with the smokers
+
+2.15      2016-12-01 15:40:16+00:00 Europe/London (TRIAL RELEASE)
+    - Deal with some relatively harmless test failures
+    - RT#11783 fixes for Markdown fragment issues
+    - Series of changes for UTF support from Sam Kington
+    - Better travis handling
+
+2.14      2015-10-13 14:46:01+01:00 Europe/London
+    - Added Travis CI status to main documentation
+    - First official release under new distribution name following trial release.
+
+2.13      2015-10-12 16:26:46+01:00 Europe/London (TRIAL RELEASE)
+    - Renamed distribution from HTML-Format -> HTML-Formatter
+    - Documentation update within the main POD to reflect name change
+    - No functional changes
+
+2.12      2015-10-10 17:49:45+01:00 Europe/London
+    - Minor test related fixes
+    - Transition to using File::Slurper in place of File::Slurp
+      Thanks to Karen Etheridge for the patch
+    - Add Travis CI integration
+
+2.11      2013-10-27 20:57:23 Europe/London
+    - Typo fixes from dsteinbrunner
+      https://github.com/nigelm/html-format/pull/2
+    - Markdown support from mrallen1
+      https://github.com/nigelm/html-format/pull/1
+
+2.10      2011-07-18 17:07:35 Europe/London
+    - Tests reworked to not use subtests.  Development versions
+      of Test::More do not support subtests, and the smokers
+      that are running with these dev versions then send me
+      confusing test failures.  This is a pain.
+
+2.09      2011-07-15 14:20:12 Europe/London
+    - Reworking of HTML quote issue in FormatPS
+    - Now remap all double quotes to " in FormatPS (which is not
+      really right, but the best I can do with latin1 output)
+
+2.08      2011-07-13 16:20:54 Europe/London
+    - RT#69426 - issues with HTML quotes
+    - UTF8 handling requires perl 5.8, so minimum requirement bumped
+
+2.07      2011-04-20 16:08:15 Europe/London
+    - Release unchanged except for version number after a period
+      to see if test release threw up any issues...
+
+2.06      2011-04-15 12:01:33 Europe/London
+    - Code gardening - no functionality modifications - includes:-
+    - Moved old DEBUG framework to Smart::Comments
+    - Ensured variables are declared my as much as possible
+    - Ensure strict/warnings used as far as possible
+    - use base rather than playing games with @ISA
+    - Changes above enforce a requirement of perl 5.6.1
+    - Robo-reformatted by perltidy
+    - Stripped function prototypes where used
+    - Passes standard perl critic with one exclusion
+    - Tweaks for comprehensibility - splitting sections etc
+
+2.05      2011-02-18 11:28:33 Europe/London
+    - Smoke tests on windows showed needed make PS tests less strict
+    - Changed the github location to be all lowercase
+    - Releasing this as a stop gap - will do further work now
+      incompatibilities dealt with
+
+2.04.02   2011-02-16 11:30:24 Europe/London
+    - Added dependancies for font metrics files
+    - Documentation tidy up - but needs further work
+    - new TRIAL release - intend to push this as full release if OK
+
+2.04.01   2011-02-14 20:26:07 Europe/London
+    - Git conversion
+    - Dist::Zilla conversion
+    - RT#54636 - UNIVERSAL::Can deprecated
+    - RT#56278 - RTF formatting parameters ignored by new
+    - Start of a new test harness
+    - TRIAL release pushed out.  Aiming to improve docs and maybe
+      hit rest of RT queue before a full release.
+
+2.04      2004-06-01   Sean M. Burke <sburke@cpan.org>
+    - just cosmetic doc changes
+    - Also, bumping all the version numbers up to 2.04 just for fun.
+
+
+2.03      2002-11-22   Sean M. Burke <sburke@cpan.org>
+    - minor bugfix
+      The lack of \plain's in HTML::FormatRTF's output was confusing some
+      formatters.  Fixed.
+
+
+2.02      2002-11-16   Sean M. Burke <sburke@cpan.org>
+    - minor bugfix
+      Changed the set_version_tag method in HTML::Formatter to avoid some
+      undef warnings that "James W. Durkin" <jwd@phonogram.net> found.
+
+      No big bug reports on the previous version, so maybe it's not so
+      experimental after all!
+
+
+2.01      2002-11-07   Sean M. Burke <sburke@cpan.org>
+    - experimental major version change
+    - Added HTML::FormatRTF.
+    - Lots of internal changes to HTML::FormatPS and HTML::Formatter.
+    - Added format_file and format_string methods to HTML::Formatter.
+    - Lots of little tidying up in the docs.
+
+
+1.24      2002-10-29   Sean M. Burke <sburke@cpan.org>
+    - Just taking it over from Gisle, and releasing this to make sure
+      CPAN et al register this change.
+
+
+1.23      2000-06-09   Gisle Aas <gisle@ActiveState.com>
+    - Skip <script> and <style> stuff.
+
+
+1.22      1999-12-16   Gisle Aas <gisle@aas.no>
+    - Release HTML-Format-1.22
+    - Splitted off HTML::Format* modules from HTML-Tree when Sean M. Burke
+      took over maintainance.  You should have HTML-Tree version 0.61 or
+      better installed before installing this.
+    - Added some simple formatter tests.
+
+
+0.53      1999-12-15   Gisle Aas <gisle@aas.no>
+    - Release HTML-Tree-0.53
+    - Make it compatible with HTML-Parser-3.00
+
+
+0.52      1999-11-10   Gisle Aas <gisle@aas.no>
+    - Fix SYNOPSIS for HTML::FormatText as suggested by
+      Michael G Schwern <schwern@pobox.com>
+    - Updated my email address.
+
+
+0.51      1998-07-07   Gisle Aas <aas@sn.no>
+    - Avoid new warnings introduced by perl5.004_70
+
+
+0.50 1998-04-01   Gisle Aas <aas@sn.no>
+    - The HTML::* modules the dealt with HTML syntax trees
+      was unbundled from libwww-perl-5.22.
+

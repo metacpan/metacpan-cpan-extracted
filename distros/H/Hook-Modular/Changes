@@ -1,0 +1,67 @@
+Revision history for Perl extension Hook-Modular
+
+1.101050  2010-04-15 18:01:17 Europe/Vienna
+
+1.101010  2010-04-11 12:43:43 Europe/Vienna
+    - use parent instead of use base
+    - don't use Module::Pluggable::Fast anymore, just Module::Pluggable
+    - remove unused variables
+
+1.100820  2010-03-23 16:49:02 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.09  Thu 2010.02.11 16:17:27 CET (Marcel Gruenauer <marcel@cpan.org>)
+     - Added Hook::Modular::Builder.
+
+0.08  Wed 2010.02.10 11:33:09 CET (Marcel Gruenauer <marcel@cpan.org>)
+     - Changed dist style and Changes back to standard. People didn't like it -
+       the nail that sticks out gets hammered down.
+     - Added standard test files; this will also help with CPANTS.
+
+0.07  Thu, 29 May 2008 12:05:44 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - Converted Changes file to YAML style
+     - .shipit: added Twitter step
+     - Makefile.PL: added auto_install() and process_templates()
+     - lib/*: converted to template
+     - updated MANIFEST
+     - updated t/perlcriticrc
+     - added attribute-based hooks (not working yet)
+     - .shipit: fixed svk.tagpattern
+     - tags: NEWFEATURE
+
+0.06  Thu, 18 Oct 2007 10:09:39 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - fixed version requirement of Test::More
+
+0.05  Fri, 28 Sep 2007 13:46:18 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - updated all modules' $VERSION to 0.05
+     - now uses Module::Install::StandardTests (without 'pod_coverage')
+     - added MANIFEST.SKIP
+     - added tests
+     - added documentation for Hook::Modular::Plugin
+     - fixed a bug in how Hook::Modular::Rules finds rules modules
+     - fixed some typos with config hash key 'rule_namespaces'
+
+0.04  Sat, 22 Sep 2007 12:13:26 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - next attempt at fixing annoying CPAN testers' pseudo-bug reports: they
+       still ran tests with 5.6.2 even though I specified that 5.8 is needed,
+       and there were some strange Perl::Critic failures with messages that
+       aren't even in Perl::Critic
+     - more documentation
+     - added t/00_pod_coverage.t, but it skips all for now
+     - updated all modules' $VERSION to 0.04
+     - only run t/00_critic.t if $ENV{TEST_AUTHOR} is set
+
+0.03  Fri, 21 Sep 2007 23:10:28 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - updated requirements in Makefile.PL
+     - more ideas in TODO
+     - t/00_critic.t now checks for the desired version of Perl::Critic
+     - updated all modules' $VERSION to 0.03
+
+0.02  Thu, 20 Sep 2007 14:28:17 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - requires perl 5.8
+     - more tests
+     - more documentation
+     - rewriting the config file is now optional, turned off by default
+
+0.01  Thu, 20 Sep 2007 00:05:55 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - original version

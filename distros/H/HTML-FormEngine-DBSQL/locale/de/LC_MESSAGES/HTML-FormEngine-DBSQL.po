@@ -1,0 +1,29 @@
+domain "HTML-FormEngine"
+
+msgid "Statement was"
+msgstr "Befehl lautete"
+
+msgid "can't be displayed"
+msgstr "kann nicht angezeigt werden"
+
+msgid "Error number"
+msgstr "Fehlernummer"
+
+msgid "Error"
+msgstr "Fehler"
+
+msgid "Can't update record(s) due to missing primary key checksum"
+msgstr "Auf Grund der fehlenden Prim&auml;rschl&uuml;ssel-Pr&uuml;fsumme k&ouml;nnen keine Datens&auml;tze aktualisiert werden"
+
+msgid "already exists"
+msgstr "existiert bereits"
+
+msgid "Primary key is missing for table"
+msgstr "Primär Schlüssel fehlt für Tabelle"
+
+msgid "Can't update record(s) due to primary key cheksum mismatch"
+msgstr "Auf Grund nicht &uuml;bereinstimmender Pr&uuml;fsummen k&ouml;nnen keine Datens&auml;tze aktualisiert werden"
+
+msgid "SQL failure"
+msgstr "SQL Fehler"
+

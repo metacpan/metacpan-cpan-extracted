@@ -1,0 +1,55 @@
+HTML::StripTags
+
+Perl port of PHP 5.3.3 strip_tags()
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc HTML::StripTags
+
+You can also look for information at:
+
+    HTML::StripTags Homepage
+        <http://www.hinnerk-altenburg/perl-strip_tags/>
+
+    Code Repository on GitHub
+        <http://github.com/hinnerk-a/perl-strip_tags>
+
+    GitHub Issue Tracker
+        <http://github.com/hinnerk-a/perl-strip_tags/issues>
+
+    AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/HTML-StripTags>
+
+    CPAN Ratings
+        <http://cpanratings.perl.org/d/HTML-StripTags>
+
+    Search CPAN
+        <http://search.cpan.org/dist/HTML-StripTags>
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 by Hinnerk Altenburg <hinnerk@cpan.org>.
+
+HTML::StripTags is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Terms of the Perl programming language system itself
+
+a) the GNU General Public License as published by the Free
+   Software Foundation; either version 1, or (at your option) any
+   later version, or
+b) the "Artistic License" which comes with this Kit.
+
+For full license see file ./LICENSE

@@ -1,0 +1,5 @@
+[%# $Id%]
+[% USE hdlo = Handel.Order %]
+<body>
+	<p>[% hdlo.uuid %]</p>
+</body>

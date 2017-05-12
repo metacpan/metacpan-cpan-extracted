@@ -1,0 +1,41 @@
+$Id: INSTALL,v 1.12 2003/04/26 15:17:21 m_ilya Exp $
+
+PREREQUISITES
+
+* Perl 5.005 or later
+* libwww 5.60 or later
+* libnet (is included in Perl 5.8.0 and later)
+* Test::More (is included in Perl 5.8.0 and later)
+* Text::Balanced (is included in Perl 5.8.0 and later)
+* Pod::Usage (is included in Perl 5.6.1 and later)
+* Pod::Man 1.14 (is included in Perl 5.6.1 and later)
+* Time::HiRes (is included in Perl 5.8.0 and later)
+
+If you want SSL support you need one of these modules
+
+* Crypt::SSLeay
+* IO::Socket::SSL
+
+See README.SSL file in libwww distro for details.
+
+If you want to run test suite ('make test') you need also
+
+* Algorithm::Diff
+* Test::Builder::Tester
+* Test::MockObject
+
+INSTALLATION
+
+Installing HTTP-WebTest:
+
+    perl Makefile.PL
+    make
+    make test # optional - runs test suite for this module
+    make install       
+
+On Win32 systems you should use 'nmake' instead of make'. 'nmake' is
+Windows version of Unix 'make' utility which may be downloaded from
+ftp.microsoft.com for free.
+
+For more information see README and POD documentation in
+HTTP::WebTest.

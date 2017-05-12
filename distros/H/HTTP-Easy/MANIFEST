@@ -1,0 +1,23 @@
+Changes
+lib/HTTP/Easy.pm
+lib/HTTP/Easy/Cookies.pm
+lib/HTTP/Easy/Cookies/PP.pm
+lib/HTTP/Easy/Headers.pm
+lib/HTTP/Easy/Headers/PP.pm
+lib/HTTP/Easy/Status.pm
+lib/HTTP/Easy/URI.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-headers-decode.t
+t/02-headers-encode.t
+t/03-cookie-decode.t
+t/04-cookie-encode.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

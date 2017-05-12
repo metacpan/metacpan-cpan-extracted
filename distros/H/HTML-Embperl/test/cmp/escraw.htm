@@ -1,0 +1,69 @@
+
+<html>
+<head>
+<title>Some tests for Embperl escaping</title>
+</head>
+
+<body>
+
+
+$optRawInput  0
+$escmode      0
+'here is a \ '              -> here is a \ 
+'here is a \\ '             -> here is a \ 
+'here is a \\\ '            -> here is a \\ 
+'here is a \\\\ '           -> here is a \\ 
+'here is a <tag> '          -> here is a 
+'here is a \<tag> '         -> here is a <tag>
+'here is a \\<tag> '        -> here is a \<tag>
+'here is a \\\<tag> '       -> here is a \<tag>
+'here is a \\\\<tag> '      -> here is a \\<tag>
+'here is a \<tag\> '        -> here is a <tag\>
+'here is a \\<tag\\> '      -> here is a \<tag\>
+'here is a \\\<tag\\\> '    -> here is a \<tag\\>
+'here is a \\\\<tag\\\\> '  -> here is a \\<tag\\>
+$optRawInput  1
+$escmode      0
+'here is a \ '              -> here is a \ 
+'here is a \\ '             -> here is a \ 
+'here is a \\\ '            -> here is a \\ 
+'here is a \\\\ '           -> here is a \\ 
+'here is a <tag> '          -> here is a <tag>
+'here is a \<tag> '         -> here is a \<tag>
+'here is a \\<tag> '        -> here is a \<tag>
+'here is a \\\<tag> '       -> here is a \\<tag>
+'here is a \\\\<tag> '      -> here is a \\<tag>
+'here is a \<tag\> '        -> here is a \<tag\>
+'here is a \\<tag\\> '      -> here is a \<tag\>
+'here is a \\\<tag\\\> '    -> here is a \\<tag\\>
+'here is a \\\\<tag\\\\> '  -> here is a \\<tag\\>
+$optRawInput  0
+$escmode      1
+'here is a \ '              -> here is a  
+'here is a \\ '             -> here is a  
+'here is a \\\ '            -> here is a \ 
+'here is a \\\\ '           -> here is a \ 
+'here is a <tag> '          -> here is a 
+'here is a \<tag> '         -> here is a &lt;tag&gt;
+'here is a \\<tag> '        -> here is a <tag&gt;
+'here is a \\\<tag> '       -> here is a <tag&gt;
+'here is a \\\\<tag> '      -> here is a \&lt;tag&gt;
+'here is a \<tag\> '        -> here is a &lt;tag>
+'here is a \\<tag\\> '      -> here is a <tag>
+'here is a \\\<tag\\\> '    -> here is a <tag\&gt;
+'here is a \\\\<tag\\\\> '  -> here is a \&lt;tag\&gt;
+$optRawInput  1
+$escmode      1
+'here is a \ '              -> here is a  
+'here is a \\ '             -> here is a  
+'here is a \\\ '            -> here is a \ 
+'here is a \\\\ '           -> here is a \ 
+'here is a <tag> '          -> here is a &lt;tag&gt;
+'here is a \<tag> '         -> here is a <tag&gt;
+'here is a \\<tag> '        -> here is a <tag&gt;
+'here is a \\\<tag> '       -> here is a \&lt;tag&gt;
+'here is a \\\\<tag> '      -> here is a \&lt;tag&gt;
+'here is a \<tag\> '        -> here is a <tag>
+'here is a \\<tag\\> '      -> here is a <tag>
+'here is a \\\<tag\\\> '    -> here is a \&lt;tag\&gt;
+'here is a \\\\<tag\\\\> '  -> here is a \&lt;tag\&gt;

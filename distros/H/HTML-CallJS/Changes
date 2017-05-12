@@ -1,0 +1,11 @@
+Revision history for Perl extension HTML-CallJS
+
+0.02 2013-11-07T23:26:13Z
+
+    - Fixed deps
+      (syohex)
+
+0.01 2013-11-07T08:36:51Z
+
+    - original version
+

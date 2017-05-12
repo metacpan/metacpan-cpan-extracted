@@ -1,0 +1,34 @@
+HTTP/Proxy/BodyFilter/Adnix version 0.01
+========================================
+
+Last update: 20/06/2004 Cosimo
+
+This class implements a HTTP::Proxy body filter which blocks images
+based on some rules you specify (or built-in default rules), and
+replaces it with custom image you specify (or again, a built-in one).
+
+Without installing HTTP::Proxy and all its components, you won't
+be able to do anything useful with this software.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires:
+
+  HTTP::Proxy (at least version 0.12 I think)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Cosimo Streppone <cosimo@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

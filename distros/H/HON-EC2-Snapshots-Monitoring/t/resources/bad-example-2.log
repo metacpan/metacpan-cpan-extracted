@@ -1,0 +1,46 @@
+--------------------------------------------------------------------------------
+Starting KAAHE Backup -- 01-09-2015
+Starting rsync btrees
+rsync done
+Starting mysqldump
+Mysqldump done
+Snapshots taken by ec2-automate-backup-awscli.sh will be eligible for purging after the following date (the purge after date given in seconds from epoch): 1451268192.
+Tagging Snapshot snap-XXXXXXX with the following Tags:  Key=Name,Value=ec2ab_vol-XXXXXXXX_1450404192 Key=PurgeAfterFE,Value=1451268192 Key=PurgeAllow,Value=true
+Tagging Snapshot snap-XXXXXXX with the following Tags:  Key=Name,Value=ec2ab_vol-XXXXXXXX_1450404192 Key=PurgeAfterFE,Value=1451268192 Key=PurgeAllow,Value=true
+Snapshot Purging is Starting Now.
+Snapshot "snap-XXXXXXX" with the PurgeAfterFE date of "1448071385" will be deleted.
+Backup done
+--------------------------------------------------------------------------------
+Starting KAAHE Backup -- 12-09-2015
+Starting rsync btrees
+sending incremental file list
+.........
+.........
+
+sent 561401178 bytes  received 1806 bytes  48817650.78 bytes/sec
+total size is 4864036897  speedup is 8.66
+rsync error: some files/attrs were not transferred (see previous errors) (code 23) at main.c(1070) [sender=3.0.9]
+rsync done
+Starting mysqldump
+mysqldump database XXXXXXXXXXX.sql
+mysqldump database XXXXXXXXXXX.sql
+mysqldump database XXXXXXXXXXX.sql
+mysqldump database XXXXXXXXXXX.sql
+mysqldump database XXXXXXXXXXX.sql
+mysqldump database XXXXXXXXXXX.sql
+mysqldump database XXXXXXXXXXX.sql
+Mysqldump done
+Backup done
+--------------------------------------------------------------------------------
+Starting KAAHE Backup -- 13-09-2015
+Starting rsync btrees
+rsync done
+Starting mysqldump
+Mysqldump done
+Snapshots taken by ec2-automate-backup-awscli.sh will be eligible for purging after the following date (the purge after date given in seconds from epoch): 1451268192.
+Tagging Snapshot snap-XXXXXXX with the following Tags:  Key=Name,Value=ec2ab_vol-XXXXXXXX_1450404192 Key=PurgeAfterFE,Value=1451268192 Key=PurgeAllow,Value=true
+Tagging Snapshot snap-XXXXXXX with the following Tags:  Key=Name,Value=ec2ab_vol-XXXXXXXX_1450404192 Key=PurgeAfterFE,Value=1451268192 Key=PurgeAllow,Value=true
+Snapshot Purging is Starting Now.
+Snapshot "snap-XXXXXXX" with the PurgeAfterFE date of "1448071385" will be deleted.
+Backup done
+--------------------------------------------------------------------------------

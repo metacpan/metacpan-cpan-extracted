@@ -1,0 +1,31 @@
+0.2.8   2014-01-30
+    * Minimum version of perl (CPANTS).
+    * Add t/cpan-changes.t and t/style-trailing-space.t .
+
+0.2.7   2012-03-11
+    * Modernized t/use.t and converted it from Test.pm to Test::More.
+    * Add "use warnings;" to the core code and modernized it a little (there
+    are still many issues left).
+    * Add some dependencies, resources and keywords to Build.PL.
+
+0.2.6   2009-04-04
+    * Fixed the html-to-hd script to use HTML::Links::Localize instead of
+    HTML::Hard::Disk.
+        - https://rt.cpan.org/Ticket/Display.html?id=41518
+
+0.2.5   2006-10-14
+
+    * Specified the license.
+    * Added pod.t and pod-coverage.t
+        - prefixed the inner functions with underscores
+    * Added a Buile.PL file.
+    * Added the examples directory
+
+0.2.4   2003-07-13
+
+    * Added the Changes file to the MANIFEST.
+
+0.2.3   2003-06-30
+
+    * Fixed a documentation bug that said HTML::Hard::Disk instead of
+    HTML::Links::Localize.

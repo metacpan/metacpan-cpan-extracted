@@ -1,0 +1,79 @@
+{
+   "abstract" : "Generate a curl command from an HTTP::Request object.",
+   "author" : [
+      "Eric Johnson <eric.git@iijo.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v1.0.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTTP-Request-AsCurl",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter::Shiny" : "0",
+            "String::ShellQuote" : "0",
+            "Win32::ShellQuote" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Request::Common" : "0",
+            "Test::More" : "0.98",
+            "Test::Most" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "HTTP::Request::AsCurl" : {
+         "file" : "lib/HTTP/Request/AsCurl.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kablamo/HTTP-Request-AsCurl/issues"
+      },
+      "homepage" : "https://github.com/kablamo/HTTP-Request-AsCurl",
+      "repository" : {
+         "url" : "git://github.com/kablamo/HTTP-Request-AsCurl.git",
+         "web" : "https://github.com/kablamo/HTTP-Request-AsCurl"
+      }
+   },
+   "version" : "0.03"
+}

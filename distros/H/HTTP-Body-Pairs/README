@@ -1,0 +1,12 @@
+
+
+This archive contains the distribution HTTP-Body-Pairs, version
+0.3:
+
+  methods for getting body params in the order they were sent
+
+This software is copyright (c) 2010 by Paul Driver.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

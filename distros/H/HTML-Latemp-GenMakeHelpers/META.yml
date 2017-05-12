@@ -1,0 +1,48 @@
+---
+abstract: 'A Latemp Utility Module.'
+author:
+  - 'Shlomi Fish <shlomif@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+  blib: '1.01'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-Latemp-GenMakeHelpers
+provides:
+  HTML::Latemp::GenMakeHelpers:
+    file: lib/HTML/Latemp/GenMakeHelpers.pm
+    version: v0.5.0
+  HTML::Latemp::GenMakeHelpers::Base:
+    file: lib/HTML/Latemp/GenMakeHelpers.pm
+    version: v0.5.0
+  HTML::Latemp::GenMakeHelpers::Error:
+    file: lib/HTML/Latemp/GenMakeHelpers.pm
+    version: v0.5.0
+  HTML::Latemp::GenMakeHelpers::Error::UncategorizedFile:
+    file: lib/HTML/Latemp/GenMakeHelpers.pm
+    version: v0.5.0
+  HTML::Latemp::GenMakeHelpers::HostEntry:
+    file: lib/HTML/Latemp/GenMakeHelpers.pm
+    version: v0.5.0
+requires:
+  Class::XSAccessor: '0'
+  File::Basename: '0'
+  File::Find::Rule: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-Latemp-GenMakeHelpers
+  repository: ssh://hg@bitbucket.org/shlomif/latemp
+version: v0.5.0

@@ -1,0 +1,22 @@
+Revision history for HTTP-Cookies.  The HTTP::Cookies module used to be bundled
+with the libwww-perl distribution.
+
+6.03      2017-04-03 11:35:35-04:00 America/Toronto
+    - No changes since TRIAL release 6.02
+
+6.02      2017-01-12 18:02:49-05:00 America/Toronto (TRIAL RELEASE)
+    - Document the lack of Public Suffix https://publicsuffix.org/ support
+    - Add TODO tests for lack of Public Suffix support
+    - Improve "maxage" documentation
+    - Update the GitHub repository location
+    - Use GitHub Issues instead of RT
+    - Stop using bareword filehandles
+    - Various internal distribution management and testing changes
+
+6.01 2012-02-15
+    - Restore 5.8.1 compatiblity.
+
+6.00 2011-02-27
+    - Initial release of HTTP-Cookies as a separate distribution. There are no
+      code changes besides incrementing the version number since
+      libwww-perl-5.837.

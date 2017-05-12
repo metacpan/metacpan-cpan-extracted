@@ -1,0 +1,25 @@
+HTTP::Recorder
+--------------
+
+WHAT THIS IS
+
+This is a browser-independent recorder for recording interactions with
+web sites.
+
+INSTALLATION
+
+Set HTTP::Recorder as the agent for your web proxy.
+
+Optionally, it uses javascript to open a window to display the script.
+
+PROBLEMS
+
+This software is barely out of the "proof of concept" stage.  Caveat
+user.
+
+AUTHOR
+
+Copyright 2003-2004 by Linda Julien <leira@cpan.org>
+
+Released under the GNU Public License.
+

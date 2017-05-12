@@ -1,0 +1,26 @@
+1. Call block by explicitly given name: <TMPL_call "foo">
+
+2. Call blocks by name:
+<TMPL_loop blocks>
+	<TMPL_var __CONTENT__>: <TMPL_call __CONTENT__>
+</TMPL_loop>
+
+1
+<TMPL_block "foo">Hello from block "Foo".</TMPL_block>
+2
+<TMPL_block "bar">
+Hello from block "Bar!"
+</TMPL_block>
+3
+<TMPL_block "baz">
+#
+# Hello from block "Baz!"
+#
+</TMPL_block>
+4
+<TMPL_block "boo">
+Call block with variables.
+This is block <TMPL_var __CONTENT__> (should be "boo").
+</TMPL_block>
+5
+

@@ -1,0 +1,30 @@
+ <html>
+  <script language="JavaScript">
+  var ReqFields = new init_reqfields('F1', 'F2');
+
+  function init_reqfields() {
+    window.alert("Initializing global required fields\n");
+
+    this.length = init_reqfields.arguments.length;
+    for (var i = 0; i < this.length; i++)
+      this[i] = init_reqfields.arguments[i];
+  };
+
+  function print_reqfields() {
+    var result = "<table><tr><td>1</td></tr><tr><td>2</td></tr></table>";
+
+    for (i = 0;  i < ReqFields.length; i++)
+      result += ReqFields[i] + "\n";
+
+    window.alert(result);
+  };
+  </script>
+
+
+  <script>
+    for (var j = 0; j < select2loc[i].length; j++){   }
+  </script>
+
+
+  </html>
+

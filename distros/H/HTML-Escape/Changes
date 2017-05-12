@@ -1,0 +1,58 @@
+Revision history for Perl extension HTML::Escape
+
+1.10 2016-03-15T03:16:39Z
+
+    - Performance improvement.
+      Aaron Crane <arc@cpan.org>
+
+1.09 2014-04-14T07:34:14Z
+
+    - Escape '{' && '}' by default.
+      https://github.com/angular/angular.js/issues/5601
+      (tokuhirom)
+
+1.08 2013-06-08T16:02:51Z
+
+    - Escape backquote character for IE
+      (Requested by John Siracusa)
+      https://rt.cpan.org/Public/Bug/Display.html?id=84971
+
+1.07 2013-06-08T04:59:08Z
+
+    - use Minilla(no feature changes)
+
+1.06
+
+    - use M::B::Pluggable(No feature changes)
+
+1.05
+
+    - Fixed ppport.h generation logic.
+      (tokuhirom)
+
+1.04
+
+    - fixed typo in dependency list.
+      (Reported by syohex++)
+
+1.03
+
+	- depend to perl 5.8.5, gfx was tested on it.
+      (gfx)
+
+1.02
+
+    [BUG FIX]
+    - works on ithread enabled perl.
+
+1.01
+
+    - use Text::Xslate style pure perl module loading
+
+1.00
+    
+    [INCOMPATIBLE CHANGE]
+    - s/html_escape/escape_html/g
+
+0.01    Sun Sep 30 15:09:52 2012
+    - original version

@@ -1,0 +1,14 @@
+Makefile.PL
+MANIFEST
+lib/HTTP/UserAgentString/Parser.pm
+lib/HTTP/UserAgentString/Robot.pm
+lib/HTTP/UserAgentString/Browser.pm
+lib/HTTP/UserAgentString/OS.pm
+lib/HTTP/UserAgentString/Sys.pm
+INSTALL
+README
+Changes
+t/00_objects.t
+t/10_opera_linux.t
+t/11_yandex.t
+t/12_chrome.t

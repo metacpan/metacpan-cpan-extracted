@@ -1,0 +1,11 @@
+0.1 
+---
+Initial Release
+
+0.2 
+---
+Namespace indexer didn't like the way I declared packages.
+
+0.3
+---
+Geeze, obviously this depends on HTTP::Body.  Getting a bit sloppy...

@@ -1,0 +1,7 @@
+0.02 20160526
+    . Only disable warnings for experimental signatures, not all
+      experimental features
+
+0.01 20160425
+    . Released on an unsuspecting world
+    . Spun out of App::ImageStream (unreleased)

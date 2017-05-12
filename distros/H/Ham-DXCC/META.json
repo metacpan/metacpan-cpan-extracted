@@ -1,0 +1,53 @@
+{
+   "abstract" : "DXCC cty.xml fetching & parsing",
+   "author" : [
+      "Roger Pettett <rmp@psyphi.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4203",
+   "license" : [
+      "gpl_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Ham-DXCC",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "TAP::Harness::JUnit" : "0.41",
+            "Test::More" : "0.62"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.04",
+            "English" : "1.02",
+            "LWP::Simple" : "6.00",
+            "XML::XPath" : "1.13",
+            "base" : "2.07",
+            "strict" : "1.03",
+            "warnings" : "1.05"
+         }
+      }
+   },
+   "provides" : {
+      "Ham::DXCC" : {
+         "file" : "lib/Ham/DXCC.pm",
+         "version" : "1.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt"
+      ]
+   },
+   "version" : "1.2"
+}

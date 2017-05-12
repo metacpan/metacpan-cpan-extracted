@@ -1,0 +1,15 @@
+Build.PL
+Changes
+lib/HTTP/DAV/Browse.pm
+MANIFEST
+META.yml
+README
+script/hdb-build-tarballs
+t/00_compile.t
+t/01_HTTP-DAV-Browse.t
+t/distribution.t
+t/fixme.t
+t/pod-coverage.t
+t/pod-spell.t
+t/pod.t
+SIGNATURE    Added here by Module::Build

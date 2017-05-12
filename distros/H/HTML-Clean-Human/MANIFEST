@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+Makefile.PL
+bin/htmlclean
+lib/HTML/Clean/Human.pm
+lib/HTML/Clean/Human.pod
+t/00.t
+t/01.t
+t/0_in.html
+t/1_in.html
+t/2_in.html
+t/bigmess.html
+t/mess.html
+META.yml                                 Module meta-data (added by MakeMaker)

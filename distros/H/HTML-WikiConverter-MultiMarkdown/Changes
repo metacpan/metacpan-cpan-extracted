@@ -1,0 +1,9 @@
+0.02    2009-09-22
+
+- Fixed so that parent class's attributes (like link_style) are passed
+  on. This fixes a failure in the _link method.
+
+
+0.01    2009-09-22
+
+- First version, released on an unsuspecting world.

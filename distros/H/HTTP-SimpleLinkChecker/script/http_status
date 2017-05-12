@@ -1,0 +1,128 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+=encoding utf8
+
+=head1 NAME
+
+http_status - check the HTTP status of a URL
+
+=head1 SYNOPSIS
+
+	% http_status URL [URL ...]
+
+=head1 DESCRIPTION
+
+http_status gets the HTTP status of a URL as returned by the
+server. It actually works with more than HTTP links since it
+uses the C<LWP> Perl module which treats all URLs the same.
+This works too:
+
+	% perl script/http_status file:///Users/brian/.login
+
+If you have C<Term::ANSIColor>, it will color the output. If
+you have C<HTML::SimpleLinkExtor>, it will parse the HTML of
+the resource and then check all of those links.
+
+=head1 SOURCE AVAILABILITY
+
+This source is in Github:
+
+	http://github.com/briandfoy/http-simplelinkchecker
+
+If, for some reason, I disappear from the world, one of the other
+members of the project can shepherd this module appropriately.
+
+=head1 AUTHOR
+
+brian d foy, C<< <bdfoy@cpan.org> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright © 2007-2016, brian d foy <bdfoy@cpan.org>. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+use HTTP::SimpleLinkChecker qw(check_link);
+use HTTP::Status;
+
+foreach my $url ( @ARGV ) {
+	my $status = check_link( $url );
+
+	print_line( $url, $status );
+	next unless is_success( $status );
+
+	check_links( $url );
+	}
+
+BEGIN {
+
+my %colors = (
+	is_success     => 'green',
+	is_error       => 'red',
+	is_redirect    => 'yellow',
+	is_bad_request => 'cyan',
+	);
+
+sub print_line {
+	my( $url, $status ) = @_;
+
+	foreach my $sub_name ( keys %colors ) {
+		no strict 'refs';
+		next unless &{ $sub_name }( $status );
+		print color( $colors{ $sub_name } );
+		}
+
+	print "$url ... $status\n";
+
+	print color( 'reset' );
+	}
+
+}
+
+sub is_bad_request
+	{
+	my $status = shift;
+
+	return $status == 400;
+	}
+
+BEGIN { # load optional modules, set stubs otherwise
+eval "use HTML::SimpleLinkExtor";
+*check_links = do {
+	if( $@ ) {
+		sub { 0 }
+		}
+	else {
+		my $extor = HTML::SimpleLinkExtor->new;
+
+		sub {
+			my $url = shift;
+
+			my %seen = ();
+			$extor->parse_url( $url );
+
+			foreach my $link ( $extor->absolute_links )
+				{
+				next if $seen{$link}++;
+				my $status = check_link( $link );
+				print_line( "\t$link", $status );
+				}
+
+			$extor->clear_links
+			}
+
+		}
+	};
+
+eval "use Term::ANSIColor qw(color)";
+if( $@ ) { *color = sub { '' } };
+}
+
+# these ensure that the color is reset at exit
+BEGIN { $SIG{'INT'} = sub { exit } }
+END { print color( 'reset' ) }

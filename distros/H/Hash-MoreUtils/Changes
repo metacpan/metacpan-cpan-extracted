@@ -1,0 +1,26 @@
+Revision history for Hash-MoreUtils
+
+0.05	2013-12-09
+    - Fix hashsort with sort block (Koichi Nakashima - http://nksm.name)
+
+0.04	2013-10-04
+    - add slice_map family
+    - Changes reformatted as per CPAN::Changes::Spec
+
+0.03	2013-09-07
+    - Add documentation about intended behaviour of slice* when no
+      list given (fixing RT#77429 and RT#57095), thanks to Titi Ala'ilima
+      and Bernhard Graf
+    - Changes reformatted as per CPAN::Changes::Spec
+    - Move to GitHub.com
+
+0.02	2010-04-28
+    - Taking maintainership (Jens Rehsack)
+    - Implement optimized versions for slice, slice_exists and
+      slice_def
+    - Add test for each function to work proper with default keys
+    - Add safe_reverse as wished in RT#48403 (Ed Davis)
+    - Add test for hashsort
+
+0.01	2005-11-05
+    - First version, released on an unsuspecting world.

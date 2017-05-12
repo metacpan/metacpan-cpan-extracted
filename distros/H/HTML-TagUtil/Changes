@@ -1,0 +1,10 @@
+Revision history for Perl extension HTML::TagUtil.
+
+1.4  Fri Aug 19 19:28:53 2005
+	- original version
+
+1.42 - added extra methods; more OO-support
+
+1.43 - added more methods.
+
+1.45 - added new methods; even more OO support.

@@ -1,0 +1,169 @@
+Revision history HTML::Lint and Test::HTML::Lint.
+
+NOTE: All bugs and requests are now being handled through GitHub.
+
+    https://github.com/petdance/html-lint/issues
+
+Please DO NOT send bug reports to http://rt.cpan.org/.
+
+2.26    Thu Dec 29 22:36:54 CST 2016
+    Stable release.  No changes from previous release.
+
+
+2.25_02 Tue Dec 27 14:34:22 CST 2016
+    [FIXES]
+    html_fragment_ok() was not properly excluding document-level errors.
+    It was effectively the same as html_ok().
+
+
+2.25_01 Fri Dec 23 22:36:17 CST 2016
+    [ENHANCEMENTS]
+    Added two new types of errors to let you know you're using the
+    API incorrectly.  You should be parsing files like this:
+
+        my $lint = HTML::Lint->new;
+        $lint->newfile( $filename );
+        $lint->parse( $line );
+        $lint->eof();
+        my @errors = $lint->errors();
+
+    If you neglect to call ->parse or ->eof, you'll get an error returned
+    in the list of errors from ->errors().
+
+    [FIXES]
+    Test::HTML::Lint::html_fragment_ok() was not properly calling ->eof.
+
+
+2.24    Wed Dec  7 22:20:13 CST 2016
+    Official release.  No changes from 2.23_01.
+
+
+2.23_01 Tue Dec  6 22:48:56 CST 2016
+    [ENHANCEMENTS]
+    Added detection of unknown HTML entities, like "known &unclosed
+    &entities are not found".  Also fixes the case where HTML::Lint
+    gets confused by an entity like "&sup2;" which it thought was an
+    unterminated "&sup;" entity.  Thanks, Klaus S. Madsen.
+
+    [FIXES]
+    Errors of the type doc-tag-required did not come out in any defined
+    order.  They are now sorted by tag name.  This was discovered
+    because hash randomization caused tests to fail on Perl 5.18 and
+    above. Thanks, Slaven Rezic, Andrew Main and Lisa Hare.
+
+    Handle some warnings that get thrown if certain values are undef.
+    Thanks, Yves Lavoie.
+
+    Handle characters that are not handled by HTML::Entities. (GitHub
+    issue #13) Thanks, Tim Landscheidt.
+
+    [INTERNALS]
+    Add a test to verify a fixed bug. Thanks to Lance Wicks as part of
+    the CPAN Pull Request Challenge.
+
+
+2.22    Mon Apr  6 15:47:11 CDT 2015
+    [CHANGES THAT COULD BREAK YOUR CODE]
+    Previously, html_ok() would not check the entire structure of a web
+    page to check for <html>, <head>, <title> and <body> tags.  Now it
+    will.  If you want to check fragments of HTML for validity but know
+    that they are not valid HTML documents on their own, use the new
+    html_fragment_ok().
+
+    [ENHANCEMENTS]
+    Added new error, elem-input-alt-missing, that warns of <input
+    type="image"> tags that are missing an alt="" attribute.  This helps
+    for accessability to make sure that any images have alternate text
+    for screen readers.
+
+    Added ability to modify HTML::Lint's table of known tags and
+    attributes, so you could do this:
+
+        # Add an attribute that your company uses.
+        HTML::Lint::HTML4::add_attribute( 'body', 'proprietary-attribute' );
+
+        # Add the HTML 5 <canvas> tag.
+        HTML::Lint::HTML4::add_tag( 'canvas' );
+        HTML::Lint::HTML4::add_attribute( 'canvas', $_ ) for qw( height width );
+
+    [FIXES]
+    Test::HTML::Lint::html_ok() would not call the HTML::Lint eof()
+    method, which meant it wouldn't do document-wide tests.
+
+2.20    Fri Apr  6 00:49:51 CDT 2012
+    [ENHANCEMENTS]
+    Sometimes creating HTML::Lint-compliant HTML just isn't possible.
+    Now, you can now turn individual errors on and off in your HTML
+    via comment directives, like so:
+
+        <!-- html-lint elem-img-sizes-missing: off, attr-unknown: off -->
+
+    And if you have a batch of code that's hopeless:
+
+        <!-- html-lint all: off -->
+
+    Added check for unknown entities, such as "&foo;".
+
+    Added check for unclosed entitities, such as "&amp" without the
+    closing semicolon.
+
+    Added a check for a bare ampersand that should be written as &amp;
+
+
+2.10    Tue Dec  6 11:16:16 CST 2011
+    [FIXES]
+    Tags that were self-closed were being ignored.  For example, if you had
+
+        <img src="blah.jpg" />
+
+    then HTML::Lint would ignore the tag.  This has been fixed.
+
+    [LICENSE]
+    HTML::Lint is now explicitly licensed under Artistic License 2.0,
+    instead of the vague "same terms as Perl itself."
+
+
+2.06    Thu Dec 18 00:07:54 CST 2008
+    [FIXES]
+    Added attributes to <frameset>.
+
+    <strong> tag didn't allow any attributes.  Now it does.
+
+    Removed the <listing> tag.
+
+
+2.04    Mon Jun  2 11:41:16 CDT 2008
+    [FIXES]
+    <textarea> now knows about the wrap attribute.
+
+    [INTERNALS]
+    Lots of enhancements pointed out by Perl::Critic.
+
+
+2.02    Thu Nov  3 11:49:18 CST 2005
+    [ENHANCEMENTS]
+    * The warnings for missing ALT and HEIGHT/WIDTH on your images
+        now give the SRC attribute.
+
+
+2.00    Tue Sep 20 23:10:39 CDT 2005
+    [CHANGES THAT COULD BREAK YOUR CODE]
+    * I've changed the object structure.  HTML::Lint now has-a
+        HTML::Parser, and no longer is-a HTML::Parser.
+
+    * weblint-cgi and weblint-original are no longer distributed
+        with HTML::Lint.
+
+    * Now requires Perl 5.6.0.
+
+    [FIXES]
+    * Line numbering is now correct if you parse more than one file.
+
+    * Changed t/*.*.t so that they only had one period in the
+        filename. Apparently VMS doesn't like filenames with multiple
+        dots.
+
+
+Pre-2.00
+    I've thrown away previous history because really, nobody cares
+    what changed in this module prior to 2005.

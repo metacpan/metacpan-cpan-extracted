@@ -1,0 +1,21 @@
+<wmmeta name="Title" value="The &lt;webmake&gt; Tag" />
+<wmmeta name="Section" value="02-tags_attrs" />
+<wmmeta name="Score" value="10" />
+<wmmeta name="Abstract">
+the webmake section
+</wmmeta>
+
+The &lt;webmake&gt; section is required in a WebMake file.  Any text
+before or after this section will be ignored.
+
+In the current implementation, you __can__ leave these tags
+out, but it isn't advised; their requirement may be enforced later.
+
+Example
+=======
+
+<safe>
+  <webmake>
+    [...WebMake file omitted...]
+  </webmake>
+</safe>

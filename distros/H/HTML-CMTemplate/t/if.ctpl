@@ -1,0 +1,19 @@
+<?=if 1:?>
+TRUE!
+<?=else:?>
+FALSE
+<?=endif?>
+<?=if 0:?>
+FIRST PART
+<?=elif 1:?>
+SECOND PART
+<?=else:?>
+THIRD PART
+<?=endif?>
+<?=if 0:?>
+FIRST PART
+<?=elif 0:?>
+SECOND PART
+<?=else:?>
+THIRD PART
+<?=endif?>

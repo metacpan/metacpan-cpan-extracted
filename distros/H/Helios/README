@@ -1,0 +1,59 @@
+Helios version 2.80
+===================
+
+INSTALLATION
+
+To install this module type the following:
+
+   export HELIOS_INI=/path/to/helios.ini
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you don't set the $HELIOS_INI env var, 'make test' will skip its 
+configuration testing step.
+
+See the INSTALL file in this distribution for more detailed installation 
+instructions.
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Config::IniFiles
+DBD::mysql
+DBI
+Data::ObjectDriver
+Error
+TheSchwartz
+XML::Simple
+
+
+COPYRIGHT AND LICENSE
+
+This version of the software is based on Helios 2.23, which is 
+Copyright (C) 2007-8 by CEB Toolbox, Inc., and is available from 
+CPAN at:  http://search.cpan.org/~lajandy/Helios-2.23/
+
+Portions of this software are Copyright (C) 2012-4 by Logical Helion, LLC
+where noted.
+
+Portions of this software are Copyright (C) 2009-12 by Andrew Johnson
+where noted.
+
+Portions of this software are Copyright (C)2007-8 CEB Toolbox, Inc.
+
+Portions of this software are Copyright (C) 2005-6 by Six Apart, 
+cpan@sixapart.com, where noted.
+
+Portions of this software are Copyright (C) 2007, Six Apart Ltd, 
+cpan@sixapart.com, where noted.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+See the LICENSE file included in this distribution for more details.
+

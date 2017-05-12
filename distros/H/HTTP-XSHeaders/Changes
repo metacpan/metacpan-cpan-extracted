@@ -1,0 +1,50 @@
+0.400003    2015-12-29
+            * Add LICENSE file (MIT license).
+            * Use C89 instead of C99.
+            * Require minimal version of Perl: 5.8.9.
+              (Earliest successfully tested.)
+            * Previous release also fixed a MANIFEST entry which broke testing.
+
+0.400002    2015-10-28
+            * Do not accidentally require Test::Fatal to install.
+
+0.400001    2015-10-26
+            * Whoops, include typemap file in the release!
+
+0.400000    2015-10-26
+            * HTTP::XSHeaders is now thread-safe. (Christian Hansen)
+            * _header() now handles non-string args better.
+            * init_header() now checks for valid type argument.
+            * Use magic to store the internal state. (Christian Hansen)
+            * Use typemaps. (Christian Hansen)
+            * Internal cleanups. (Christian Hansen)
+            * Use Test::More for the tests.
+
+0.300000    2015-10-13
+            * Add simple GET op implementation of internal method _header()
+              used by HTTP::Cookies::extract_cookies().
+            * Handle uninitialized value warning caused by XS typemap when
+              calling scan() with an undef for a coderef.
+            * Improve tests.
+
+0.201000    2015-09-29
+            * Added all missing methods. Noted them in docs.
+            * Remove all dependency on HTTP::Headers::Fast.
+
+0.200002    2015-09-27
+            * Actually include the Changes file in the dist.
+
+0.200001    2015-09-27
+            * Fix POD and English syntax errors.
+            * Fix MANIFEST file.
+
+0.200000    2015-09-25
+            * Override HTTP::Headers too.
+            * Make HTTP::Headers and HTTP::Headers::Fast optional require.
+            * Add more docs, include benchmarks.
+            * Make tests use HTTP::XSHeaders directly.
+            * Fix all skipped tests.
+            * Remove dependency in tests on Test::Requires.
+
+0.11        2015-09-25
+            * First version.

@@ -1,0 +1,90 @@
+
+=head1 NAME
+
+HTML::DOM::Element::TR - A Perl class for representing table rows in an HTML DOM tree
+
+=head1 VERSION
+
+Version 0.054
+
+=head1 SYNOPSIS
+
+  use HTML::DOM;
+  $doc = HTML::DOM->new;
+  $elem = $doc->createElement('tr');
+  
+  $elem->vAlign('top'); # set attribute
+  $elem->align;         # get attribute
+  $elem->tagName;
+  # etc
+  
+  $elem->cells->[0]; # first cell
+  ($elem->cells)[0]; # same
+  
+  $cell = $elem->insertCell(7);
+  $elem->deleteCell(1);
+
+=head1 DESCRIPTION
+
+This class implements 'tr' elements in an HTML::DOM 
+tree. 
+It 
+implements the HTMLTableRowElement DOM interface and inherits from 
+L<HTML::DOM::Element> (q.v.).
+
+=head1 METHODS
+
+In addition to those inherited from HTML::DOM::Element and its 
+superclasses, this class implements the following DOM methods:
+
+=over 4
+
+=item rowIndex
+
+Returns the index of this row within the table.
+
+=item sectionRowIndex
+
+Returns the index of this row within its parent table section. (See
+L<HTML::DOM::Element::TableSection>.)
+
+=item cells
+
+This returns a collection of the table row's cells.
+
+=item align
+
+=item bgColor
+
+=item ch
+
+=item chOff
+
+=item vAlign
+
+Each of these returns the corresponding HTML attribute. (C<ch> and C<chOff>
+correspond to 'char' and 'charoff,' respectively.) If you pass an
+argument, it will become the new value of the attribute, and the old value
+will be returned.
+
+=item insertCell
+
+Insert a new cell at the given index and returns it.
+
+=item deleteCell
+
+Deletes the cell at the given index.
+
+=back
+
+=head1 SEE ALSO
+
+L<HTML::DOM>
+
+L<HTML::DOM::Element>
+
+L<HTML::DOM::Element::Table>
+
+L<HTML::DOM::Element::TableSection>
+
+L<HTML::DOM::Element::TableCell>

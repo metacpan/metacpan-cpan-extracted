@@ -1,0 +1,19 @@
+.releaserc
+Changes
+examples/placeholder.pl
+lib/HTTP/Cookies/Chrome.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/_get_rows.t
+t/compile.t
+t/load.t
+t/pod.t
+t/pod_coverage.t
+t/save.t
+t/test_manifest
+test-corpus/Cookies
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

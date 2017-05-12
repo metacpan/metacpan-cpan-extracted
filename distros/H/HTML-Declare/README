@@ -1,0 +1,252 @@
+NAME
+
+    HTML::Declare - For When Template Systems Are Too Huge And Heredocs Too
+    Messy
+
+VERSION
+
+    version 2.6
+
+SYNOPSIS
+
+        # Import all constructors
+        use HTML::Declare ':all';
+    
+        # A simple hello world
+        print HTML { 
+            _ => [
+                HEAD { _ => TITLE { _ => 'Hello World!' } },
+                BODY { _ => 'Hello World!' } 
+            ]   
+        };
+    
+        # Import specific constructors
+        use HTML::Declare qw/DIV A/;
+    
+        # A simple anchor nested in a div
+        my $tree = DIV {
+            _ => [
+                A {
+                    href => 'http://127.0.0.1',
+                    _    => '<< Home Sweet Home!'
+                }
+            ]
+        };
+        print "$tree";
+
+DESCRIPTION
+
+    A very simple micro language to generate HTML.
+
+    This is not a real template system like Template or HTML::Mason, it's
+    just a simple (and fun) way to avoid those messy heredocs. ;)
+
+METHODS
+
+    HTML::Declare instances have the following methods.
+
+ new
+
+ as_html
+
+ attributes
+
+ children
+
+ tag
+
+FUNCTIONS
+
+    All exported functions work the same, they expect a hashref as first
+    argument which contains attributes for the tag to generate.
+
+    The special attribute _ contains the content for the tag. The content
+    may be a single string (in this case entities are auto encoded), a
+    arrayref containing strings that shouldn't be encoded or HTML::Declare
+    instances.
+
+        <TAG> { attribute => 'value' }
+        DIV { id => 'foo', _ => 'lalala<<encode me>>' }
+        DIV { id => 'link' _ => [ '<b>Don't encode me!</b>' ] }
+        DIV { _ => [ A { href => 'http://127.0.0.1', _ => 'Home!' } ] }
+        DIV { _ => [ A { href => 'http://host', _ => H1 { _ => 'Test' } } ] }
+
+ A
+
+ ABBR
+
+ ACRONYM
+
+ ADDRESS
+
+ AREA
+
+ B
+
+ BASE
+
+ BDO
+
+ BIG
+
+ BLOCKQUOTE
+
+ BODY
+
+ BR
+
+ BUTTON
+
+ CAPTION
+
+ CITE
+
+ CODE
+
+ COL
+
+ COLGROUP
+
+ DD
+
+ DEL
+
+ DIV
+
+ DFN
+
+ DL
+
+ DT
+
+ EM
+
+ FIELDSET
+
+ FORM
+
+ FRAME
+
+ FRAMESET
+
+ H1
+
+ H2
+
+ H3
+
+ H4
+
+ H5
+
+ H6
+
+ HEAD
+
+ HR
+
+ HTML
+
+ I
+
+ IFRAME
+
+ IMG
+
+ INPUT
+
+ INS
+
+ KBD
+
+ LABEL
+
+ LEGEND
+
+ LI
+
+ LINK
+
+ MAP
+
+ META
+
+ NOFRAMES
+
+ NOSCRIPT
+
+ OBJECT
+
+ OL
+
+ OPTGROUP
+
+ OPTION
+
+ P
+
+ PARAM
+
+ PRE
+
+ Q
+
+ SAMP
+
+ SCRIPT
+
+ SELECT
+
+ SMALL
+
+ SPAN
+
+ STRONG
+
+ STYLE
+
+ SUB
+
+ SUP
+
+ TABLE
+
+ TAG
+
+ TBODY
+
+ TD
+
+ TEXTAREA
+
+ TFOOT
+
+ TH
+
+ THEAD
+
+ TITLE
+
+ TR
+
+ TT
+
+ UL
+
+ VAR
+
+THANK YOU
+
+    Tatsuhiko Miyagawa
+
+AUTHOR
+
+    Sebastian Riedel, sri@oook.de
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Sebastian Riedel, C.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

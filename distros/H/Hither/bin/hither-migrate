@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+echo
+echo "THIS HITHER COMMAND NOT YET IMPLEMENTED"
+echo
+
+fmt="%-20s %s\n"
+printf "$fmt" "Hither Command:" "$(basename $0)"
+printf "$fmt" "Command Path:" "$0"
+if [ $# -gt 0 ]; then
+  echo Command Arguments:
+  for arg; do
+    echo "  $((++i)): $arg"
+  done
+else
+  printf "$fmt" "Command Arguments:" None
+fi
+
+echo
+
+# vim: set ft=sh:

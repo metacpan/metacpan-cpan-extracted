@@ -1,0 +1,6 @@
+name = "Hash-BulkKeyCopy"
+# badges = ["travis"]
+authority="cpan:ITSUSONY"
+
+module_maker="ModuleBuildTiny"
+

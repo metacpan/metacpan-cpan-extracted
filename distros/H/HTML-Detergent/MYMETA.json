@@ -1,0 +1,55 @@
+{
+   "abstract" : "Clean the gunk off an HTML document",
+   "author" : [
+      "Dorian Taylor, C<< <dorian at cpan.org> >>",
+      "Dorian Taylor <dorian@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.06, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-Detergent",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::HTML5::Parser" : "0",
+            "Moose" : "0",
+            "MooseX::Types" : "0",
+            "XML::LibXML" : "0",
+            "XML::LibXML::LazyBuilder" : "0",
+            "XML::LibXSLT" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://apache.org/licenses/LICENSE-2.0"
+      ]
+   },
+   "version" : "0.06"
+}

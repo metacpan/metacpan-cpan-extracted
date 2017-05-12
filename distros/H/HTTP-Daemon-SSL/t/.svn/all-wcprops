@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/repos/!svn/ver/354/tags/v1_04/perl/HTTP-Daemon-SSL/t
+END
+testmodule.t
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/repos/!svn/ver/354/tags/v1_04/perl/HTTP-Daemon-SSL/t/testmodule.t
+END
+ssl_settings.req
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/repos/!svn/ver/354/tags/v1_04/perl/HTTP-Daemon-SSL/t/ssl_settings.req
+END
+loadmodule.t
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/repos/!svn/ver/354/tags/v1_04/perl/HTTP-Daemon-SSL/t/loadmodule.t
+END

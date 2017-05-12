@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README.md
+SIGNATURE
+dist.ini
+lib/HTML/Mason/PlackHandler.pm
+t/basic.t
+t/tpl/autohandler
+t/tpl/dhandler
+t/tpl/headers
+t/tpl/index.html
+t/tpl/params

@@ -1,0 +1,25 @@
+
+<{perl
+    define_tag ("bar", \&mk_bar, qw(name));
+    define_empty_tag ("baz", \&mk_baz, qw(name value text));
+
+    sub mk_bar {
+      my ($tagname, $attrs, $text) = @_;
+      "<b>bar: name=".$attrs->{name}."</b>\n";
+    }
+
+    sub mk_baz {
+      my ($tagname, $attrs, $text) = @_;
+      "<b>baz: name=".$attrs->{name}." value=".$attrs->{value}."</b>\n";
+    }
+}>
+
+<content name=foo format="text/et">
+
+	<bar name="glorp"> foop </bar>
+	<baz name="foop" value="yep" text="nope" />
+
+</content>
+
+<out file=log/deftags.html>${foo}</out>
+

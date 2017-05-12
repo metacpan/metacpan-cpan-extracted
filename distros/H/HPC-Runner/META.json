@@ -1,0 +1,83 @@
+{
+   "abstract" : "HPC Runner::Slurm, Runner::MCE and Runner::Threads base class",
+   "author" : [
+      "Jillian Rowe, C<< <jillian.e.rowe at gmail.com> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.16, Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "HPC-Runner",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.16",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Carp::Always" : "0",
+            "Cwd" : "0",
+            "Data::Dumper" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::Duration" : "0",
+            "File::Path" : "0",
+            "File::Temp" : "0",
+            "IO::File" : "0",
+            "IO::Select" : "0",
+            "IPC::Open3" : "0",
+            "Log::Log4perl" : "0",
+            "Moose" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "MooseX::Getopt" : "0",
+            "MooseX::Getopt::Usage::Role::Man" : "0",
+            "MooseX::Object::Pluggable" : "0",
+            "MooseX::SimpleConfig" : "0",
+            "Slurp" : "0",
+            "Symbol" : "0",
+            "Template" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "2.48",
+   "x_contributors" : [
+      "Jillian Rowe <jillian.e.rowe@gmail.com>",
+      "Jillian Rowe <jir2004@qatar-med.cornell.edu>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

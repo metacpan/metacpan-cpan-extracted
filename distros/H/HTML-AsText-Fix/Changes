@@ -1,0 +1,14 @@
+Changelog for HTML-AsText-Fix
+
+0.003 2014-06-23T10:25:06
+ - Dist::Zilla maintenance (Stanislaw Pusep)
+ - drop PWP::Encoding dependency (Сергей Романов)
+ - Changelog update (Stanislaw Pusep)
+
+0.002 2012-01-23T19:31:19
+ - oops (Stanislaw Pusep)
+ - fixes + full HTML test (Stanislaw Pusep)
+
+0.001 2012-01-19T16:21:33
+ - INIT (Stanislaw Pusep)
+

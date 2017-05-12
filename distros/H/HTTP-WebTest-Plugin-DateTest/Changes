@@ -1,0 +1,31 @@
+Revision history for Perl extension DateTest.
+
+1.01 Thu Mar 6 17:42:24 2003 UTC
+	- fix for "argument isn't numeric" warning
+	  solves error if a date couldn't be parsed
+	- release on CPAN Fri May 16 2003
+
+1.00 Tue Dec 31 13:57:47 CET 2002
+	- improved human readable result output
+	- added TODO list
+	- prepared for release on CPAN
+
+0.99 Mon Dec 30 18:49:36 CET 2002
+	- compatibility with HTTP::WebTest 2.00 (IlyaM)
+		- API change from 1.XX, be sure to upgrade!
+	- fixed time zone issues in testcases (IlyaM)
+	- fixed behaviour for empty date string
+
+0.91 Thu Oct 10 00:02:49 CEST 2002
+	- use same time units as test spec for return value 
+	- added corresponding unit testcases
+	- changed failure message: 55 > 50 instead of 55 < 50 
+	  actual situation (fact) v.s. test condition. hmm...
+
+0.90 Thu Sep 12 14:24:09 CEST 2002
+	- 1st beta release
+	- check in to sourceforge CVS
+
+0.01  Mon Jul 22 10:09:49 2002
+	- original version; created by h2xs 1.21 with options
+		-f -b 5.005.03 -n DateTest

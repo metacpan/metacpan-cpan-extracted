@@ -1,0 +1,6 @@
+content: <%= content %>
+<%if child %>
+<%with child %>
+<%include recurse.html %>
+<%/with child %>
+<%/if child %>

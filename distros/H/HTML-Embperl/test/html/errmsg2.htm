@@ -1,0 +1,27 @@
+<html>
+<head>
+<title>Tests for Embperl - ErrorDocument</title>
+</head>
+
+<body>
+
+This page is shown due to an ErrorDocument redirection<p>
+
+
+main: [+ $req_rec -> main +]
+prev: [+ $req_rec -> prev +]
+next: [+ $req_rec -> next +]
+last: [+ $req_rec -> last +]
+
+[-
+$errors = $req_rec -> prev -> pnotes('EMBPERL_ERRORS') ;
+-]
+
+There are [+ scalar(@$errors) +] errormessages:
+
+<table border=1>
+	<tr><td>[+ $errors -> [$row] +]</td></tr>
+</table>
+
+</body>
+</html>

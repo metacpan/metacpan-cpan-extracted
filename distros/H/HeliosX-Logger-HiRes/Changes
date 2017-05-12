@@ -1,0 +1,13 @@
+Revision history for Perl extension HeliosX::Logger::HiRes.
+
+1.00  Sun Aug 16 08:50:38 EDT 2015
+    - First production release.  Happy CPAN Day!  #cpanday
+0.10_3270  Sun Aug  9 18:14:10 EDT 2015
+    - Added more tests (t/2.t).
+    - heliosx_logger_hires_search - Added JSON, pipe-separated, and
+      tab-separated output formats.  Added ability to search for multiple
+      specific log priorities.  Added more parameter sanity checking.
+0.10_2751  Fri Jul  3 14:22:56 2015
+    - First release to CPAN.
+0.10_0000  Sun May 17 16:32:58 2015
+    - Initial public version.

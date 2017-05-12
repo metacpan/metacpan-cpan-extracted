@@ -1,0 +1,118 @@
+NAME
+    HTTP::MessageParser - Parse HTTP Messages
+
+SYNOPSIS
+        use HTTP::MessageParser;
+
+        my ( $message, @request );
+
+        while ( my $line = $client->getline ) {
+            next if !$message && $line eq "\x0D\x0A"; # RFC 2616 4.1
+            $message .= $line;
+            last if $message =~ /\x0D\x0A\x0D\x0A$/;
+        }
+
+        eval {
+            @request = HTTP::MessageParser->parse_request($message);
+        };
+
+        if ( $@ ) {
+            # 400 Bad Request
+        }
+
+        # ...
+
+DESCRIPTION
+    Parse HTTP/1.0 and HTTP/1.1 Messages.
+
+METHODS
+    parse_headers( $string )
+            my @headers = HTTP::MessageParser->parse_headers($string);
+            my $headers = HTTP::MessageParser->parse_headers($string);
+
+        Parses "Message Headers". "field-name"'s are lowercased. Leading and
+        trailing "LWS" is removed. "LWS" occurring between "field-content"
+        are replaced with a single "SP". Takes one argument, a string or a
+        reference to a string, if it's a reference it will be consumed.
+
+    parse_request( $string )
+            my ( $Method, $Request_URI, $HTTP_Version, $Headers, $Body )
+              = HTTP::MessageParser->parse_request($string);
+
+        Parses a Request. Expects a "Request-Line" followed by zero more
+        header fields and an empty line. Content occurring after end of
+        header fields is returned as a string reference, $Body. Takes one
+        argument, a string or a reference to a string, if it's a reference
+        it will be consumed.
+
+        Throws an exception upon failure.
+
+    parse_request_line( $string )
+            my ( $Method, $Request_URI, $HTTP_Version )
+              = HTTP::MessageParser->parse_request_line($string);
+
+        Parses a "Request-Line". Any leading "CRLF" is ignored. Takes one
+        argument, a string or a reference to a string, if it's a reference
+        it will be consumed.
+
+        Throws an exception upon failure.
+
+    parse_response( $string )
+            my ( $HTTP_Version, $Status_Code, $Reason_Phrase, $Headers, $Body )
+              = HTTP::MessageParser->parse_response($string);
+
+        Parses a Response. Expects a "Status-Line" followed by zero more
+        header fields and an empty line. Content occurring after end of
+        header fields is returned as a string reference, $Body. Takes one
+        argument, a string or a reference to a string, if it's a reference
+        it will be consumed.
+
+        Throws an exception upon failure.
+
+    parse_response_line( $string )
+            my ( $HTTP_Version, $Status_Code, $Reason_Phrase )
+              = HTTP::MessageParser->parse_response_line($string);
+
+        Parses a "Status-Line". Takes one argument, a string or a reference
+        to a string, if it's a reference it will be consumed.
+
+        Throws an exception upon failure.
+
+    parse_version( $string )
+            my ( $major, $minor ) = HTTP::MessageParser->parse_version($string);
+            my $version = HTTP::MessageParser->parse_version($string);
+
+        Parses a "HTTP-Version" string. In scalar context it returns a
+        version number ( "major * 1000 + minor" ). In list context it
+        returns "major" and "minor" as two separate integers.
+
+        Throws an exception upon failure.
+
+EXPORTS
+    Nothing by default. Following subroutines can be exported:
+
+    parse_headers
+    parse_request
+    parse_request_line
+    parse_response
+    parse_response_line
+    parse_version
+
+SEE ALSO
+    <http://www.w3.org/Protocols/rfc2616/rfc2616.html>
+
+    HTTP::Request
+
+    HTTP::Response
+
+    HTTP::Message
+
+    HTTP::Parser
+
+AUTHOR
+    Christian Hansen "chansen@cpan.org"
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

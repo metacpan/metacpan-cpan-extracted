@@ -1,0 +1,9 @@
+#!perl
+
+use warnings;
+use strict;
+
+use HTTP::Server::Simple::CGI;
+
+my $server = HTTP::Server::Simple->new();
+$server->run();

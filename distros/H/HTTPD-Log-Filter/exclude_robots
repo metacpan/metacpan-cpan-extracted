@@ -1,0 +1,116 @@
+#!/usr/bin/perl
+
+#------------------------------------------------------------------------------
+#
+# Standard pragmas
+#
+#------------------------------------------------------------------------------
+
+use strict;
+use warnings;
+
+require v5.6.0;
+
+use LWP::Simple;
+use Getopt::Long;
+
+use HTTPD::Log::Filter;
+
+use vars qw( $opt_exclusions_file $opt_log_file $opt_url );
+
+sub usage() 
+{ 
+    die <<EOF;
+Usage: $0 
+    -url <robot exclusions URL> 
+    [ -exclusions_file <exclusions file> ]
+EOF
+}
+
+usage unless GetOptions qw( log_file=s exclusions_file=s url=s );
+usage unless $opt_url;
+
+my $agent_list = get( $opt_url ) or die "can't get $opt_url\n";
+my $agent_re = 
+    '(?i:' . 
+    join( '|', map( { quotemeta } split( /[\n\r]+/, $agent_list ) ) ) . 
+    ')'
+;
+
+my $filter = HTTPD::Log::Filter->new(
+    exclusions_file     => $opt_exclusions_file,
+    format              => 'XLF',
+    agent_re            => $agent_re,
+    invert              => 1,
+);
+
+while( <> )
+{
+    my $line = $filter->filter( $_ );
+    die "Badly formatted line at line $.\n" unless defined $line;
+    print $line if $line;
+}
+
+#------------------------------------------------------------------------------
+#
+# Start of POD
+#
+#------------------------------------------------------------------------------
+
+=head1 NAME
+
+exclude_robot.pl - a simple filter script to filter robots out of logfiles
+
+=head1 SYNOPSIS
+
+    exclude_robot.pl
+        -url <robot exclusions URL>
+        [ -exclusions_file <exclusions file> ]
+        <httpd log file>
+    
+    OR
+
+    cat <httpd log file> | exclude_robot.pl -url <robot exclusions URL>
+
+=head1 DESCRIPTION
+
+This script filters HTTP log files to exclude entries that correspond to know
+webbots, spiders, and other undesirables.  The script requires a URL as a
+command line option which should point to a text file containing a linebreak
+separated list of lowercase strings to match on for bots. This is based on the
+format used by ABC (L<http://www.abc.org.uk/exclusionss/exclude.html>).
+
+The script filters httpd logfile entries either from a filename specified on
+the command line, or from STDIN. It outputs filtered entries to STDOUT.
+
+=head1 OPTIONS
+
+=over 4
+
+=item -url <robot exclusions URL>
+
+Specify the URL of file to grab which contains the list of agents to exclude.
+The option is REQUIRED.
+
+=item -exclusions_file <exclusions file>
+
+Specify a file to save excluded entries from the logfile. This option is
+OPTIONAL.
+
+=head1 AUTHOR
+
+Ave Wrigley <Ave.Wrigley@itn.co.uk>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001 Ave Wrigley. All rights reserved. This program is free
+software; you can redistribute it and/or modify it under the same terms as Perl
+itself.
+
+=cut
+
+#------------------------------------------------------------------------------
+#
+# End of POD
+#
+#------------------------------------------------------------------------------

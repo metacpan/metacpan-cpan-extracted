@@ -1,0 +1,98 @@
+<wmmeta name="Title" value="Defining Tags" />
+<wmmeta name="Section" value="02-tags_attrs" />
+<wmmeta name="Score" value="120" />
+<wmmeta name="Abstract">
+defining tags for use in content items
+</wmmeta>
+
+Like Roxen or Java Server Pages, WebMake allows you to define your own tags;
+these cause a perl function to be called whenever they are encountered in
+either content text, or inside the WebMake file itself.
+
+Defining Content Tags
+=====================
+
+You do this by calling the "**##define_tag()##**" [def_tag] function from
+within a <a href=$(perl)>&lt;{perl}&gt;</a> section in the WebMake file.  This
+will set up a tag, and indicates a reference to the handler function to call
+when that tag is encountered, and the list of attributes that are required to
+use that tag.
+
+Any occurrences of this tag, with at least the set of attributes defined in
+the **##define_tag()##** call, will cause the handler function to be called.
+
+Handler functions are called as fcllows:
+
+<safe>
+        handler ($tagname, $attrs, $text, $perlcodeself);
+</safe>
+
+Where &wmdollar;tagname is the name of the tag, &wmdollar;attrs is a reference
+to a hash containing the attribute names and the values used in the tag, and
+&wmdollar;text is the text between the start and end tags.
+
+&wmdollar;perlcodeself is the PerlCode object, allowing you to write proper
+object-oriented code that can be run in a threaded environment or from
+mod_perl. This can be ignored if you like.
+
+Note that there are two variations, one for conventional tag pairs with a
+start and end tag, the other for stand-alone empty tags with no end tag.  The
+latter variation is called "**##define_empty_tag()##**" [def_empty_tag].
+
+	"**##define_empty_tag()##**" [def_empty_tag]:	define a standalone
+	content tag
+
+	"**##define_tag()##**" [def_tag]:	define a content tag with a
+	start and end
+
+    [def_tag]: $(PerlCodeLibrary.pm.html)#item_define_tag
+    [def_empty_tag]: $(PerlCodeLibrary.pm.html)#item_define_empty_tag
+
+Defining WebMake Tags
+=====================
+
+This is identical to using content tags, above, but the functions are as
+follows:
+
+	"**##define_empty_wmk_tag()##**" [def_empty_wmk_tag]:	define a
+	standalone WebMake tag
+
+	"**##define_wmk_tag()##**" [def_wmk_tag]:	define a WebMake tag
+	with a start and end
+
+    [def_wmk_tag]: $(PerlCodeLibrary.pm.html)#item_define_wmk_tag
+    [def_empty_wmk_tag]: $(PerlCodeLibrary.pm.html)#item_define_empty_wmk_tag
+
+Example
+=======
+
+Let's say you've got the following in your WebMake file.
+
+<safe>
+  <{perl
+   define_tag ("thumb", \&make_thumbnail, qw(img thumb));
+  }>
+
+  <content name="foo">
+    <thumb img="big.jpg" thumb="big_thumb.jpg">
+      Picture of a big thing
+    </thumb>
+  </content>
+</safe>
+
+When the **foo** content item comes to be included in an output file, the tag
+will be replaced with a call to a perl function, as follows:
+
+<safe>
+  make_thumbnail ("thumb",
+     { img => 'big.jpg', thumb => 'big_thumb.jpg' },
+     'Picture of a big thing', $perlcodeself);
+</safe>
+
+Note that if the tag omitted one of the 2 required attributes, __img__ or
+__thumb__, it would result in an error message.
+
+For more serious examples of tag definition, the WebMake distribution comes
+with several "plugins" [$(use)], such as <a
+href=safe_tag.wmk.html>safe_tag.wmk</a> which define their own tags.
+

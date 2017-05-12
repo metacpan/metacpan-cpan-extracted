@@ -1,0 +1,279 @@
+=head1 NAME
+
+HTTP::Server::VirtualHost - base-class for virtual host definitions
+
+=head1 INHERITANCE
+
+ HTTP::Server::VirtualHost is extended by
+   HTTP::Server::VirtualHost::LocalHost
+
+=head1 SYNOPSIS
+
+ use HTTP::Server::Multiplex;
+
+ my $vhost  = HTTP::Server::VirtualHost->new(@vhost_opts);
+ my $daemon = HTTP::Server::Multiplex->new
+   ( @other_options
+   , vhosts => $vhost
+   );
+
+ # or
+ my $daemon = HTTP::Server::Multiplex->new(@other_opts);
+ $daemon->addVirtualHost($vhost);
+ $daemon->addVirtualHost(@vhost2_opts);
+
+ # create object which extends HTTP::Server::VirtualHost
+ my $myvhost = MyVHost->new(...);
+ $daemon->addVirtualHost($myvhost);
+
+=head1 DESCRIPTION
+
+These virtual host definitions are used by L<HTTP::Server::Multiplex|HTTP::Server::Multiplex>, to
+implement (server) name based data seperation.  Its features resemble those
+of Apache virtual hosts.
+
+Each virtual host usually has to L<HTTP::Server::Directory|HTTP::Server::Directory> slaves: one
+which describes the permissions for user directories (url paths in the
+form C< /~user/ >) and one for data outside the user space.
+
+=head1 METHODS
+
+=head2 Constructors
+
+You may avoid the creation of extension classes for each virtual host,
+by using these options.
+
+HTTP::Server::VirtualHost-E<gt>B<new>(OPTIONS|HASH-of-OPTIONS)
+
+=over 4
+
+ Option        --Default
+ aliases         []
+ directories     <see text>
+ directory_list  <false>
+ documents       <undef>
+ handlers        {}
+ index_file      ['index.html', 'index.htm']
+ name            <required>
+ rewrite         <undef>
+ user_dirs       <see text>
+
+. aliases => HOSTNAME|ARRAY-of-HOSTNAMES
+
+. directories => OBJECT|HASH|ARRAY
+
+=over 4
+
+Pass one or more L<HTTP::Server::Directory|HTTP::Server::Directory> OBJECTS, or HASHes which will
+be used to initialize them.  If no information is provided, then only C<<
+/~user >> urls and scripts can be used.
+
+=back
+
+. directory_list => BOOLEAN
+
+=over 4
+
+Enables the display of a directory, when it does not contain one of the
+C<index_file> prepared defaults.
+
+=back
+
+. documents => DIRECTORY
+
+=over 4
+
+An absolute DIRECTORY for the location of the source files.  Creates the
+most free L<HTTP::Server::Directory|HTTP::Server::Directory> object.  If you need things like
+access restrictions, then do not use this option but the C<directories>
+option.
+
+=back
+
+. handlers => HASH
+
+=over 4
+
+The keys are path names, part of the request URIs.  The values are
+CODE-references, called when that URI is addressed.  The access rules
+are taken from the directory definition which is selected by the path,
+for that's all.
+
+The handlers are called with a the connection (L<HTTP::Server::Connection|HTTP::Server::Connection>),
+request (HTTP::Request), uri object (URI).
+
+=back
+
+. index_file => STRING|ARRAY
+
+=over 4
+
+When a directory is addressed, it is scanned whether one of these files
+exist.  If so, the content will be shown.
+
+=back
+
+. name => HOSTNAME
+
+. rewrite => CODE
+
+=over 4
+
+See L<rewrite()|HTTP::Server::VirtualHost/"Basic daemon actions">.
+
+=back
+
+. user_dirs => undef|OBJECT|HASH
+
+=over 4
+
+If not specified, a L<HTTP::Server::Directory::UserDirs|HTTP::Server::Directory::UserDirs> is created for
+you, with standard Apache behavior.  You may provide your own OBJECT or
+a HASH which contains the parameters to create it.  When you explicitly
+specify an C<undef> value, then user directories will not be allowed.
+
+=back
+
+=back
+
+=head2 Attributes
+
+$obj-E<gt>B<aliases>
+
+=over 4
+
+Returns a list of all aliases (alternative names) for this server.
+
+=back
+
+$obj-E<gt>B<name>
+
+=over 4
+
+Returns the primary name for this server.
+
+=back
+
+=head2 Handler
+
+$obj-E<gt>B<handleRequest>(CONNECTION, REQUEST)
+
+=over 4
+
+=back
+
+$obj-E<gt>B<requestForMe>(URI)
+
+=over 4
+
+Re-check whether a request is really for this virtual host.
+
+=back
+
+$obj-E<gt>B<showDirectory>(CONNECTION, REQUEST, PATH, LIST)
+
+=over 4
+
+Overrule this method with the way you would like to display an
+automatically generated directory index.
+
+=back
+
+=head2 Basic daemon actions
+
+$obj-E<gt>B<allow>(CLIENT, SESSION, REQUEST, URI)
+
+=over 4
+
+BE WARNED that the URI is the rewrite of the REQUEST uri, and therefore
+you should use that URI.  The SESSION represents a user.
+
+See L</Allow access>.
+
+=back
+
+$obj-E<gt>B<rewrite>(URI)
+
+=over 4
+
+Returns an URI object as result, which may be the original in case of
+no rewrite was needed.  See L</URI Rewrite>.
+
+=back
+
+=head2 Directories
+
+$obj-E<gt>B<addDirectory>(OBJECT|OPTIONS)
+
+=over 4
+
+Either pass a L<HTTP::Server::Directory|HTTP::Server::Directory> OBJECT or the OPTIONS to create
+the object.
+
+=back
+
+$obj-E<gt>B<directoryOf>(PATH)
+
+=over 4
+
+Find the best matching L<HTTP::Server::Directory|HTTP::Server::Directory> object.
+
+=back
+
+$obj-E<gt>B<filename>(URI)
+
+=over 4
+
+Translate the URI into a filename, without checking for existence.  Returns
+<undef> is not possible.
+
+=back
+
+=head2 Access permissions
+
+=head1 DETAILS
+
+=head2 URI Rewrite
+
+For each request, the L<rewrite()|HTTP::Server::VirtualHost/"Basic daemon actions"> method is called to see whether a
+rewrite of the URI is required.  The method must return the original URI
+object (the only parameter) or a new URI object.
+
+example: rewrite URI
+
+  package My::Virtual::Host;
+  use base 'HTTP::Server::VirtualHost';
+
+  my %lookup =
+    ( '/'     => '/index-en.html'
+    , '/news' => 'http://news.example.org/index.html'
+    );
+
+  sub rewrite($)
+  {  my ($self, $uri) = @_;
+
+     # with lookup table
+     $uri = URI->new_abs($lookup{$uri->path}, $uri)
+         if exists $lookup{$uri->path};
+
+     # whole directory trees
+     $uri = URI->new_abs('/somewhere/else'.$1, $uri)
+         if $uri->path =~ m!^/some/dir(/.*|$)!;
+     
+     # maybe more work in the base class
+     $uri->SUPER::rewrite($uri);
+  }
+
+=head1 SEE ALSO
+
+This module is part of HTTP-Server-Multiplex distribution version 0.11,
+built on October 01, 2008. Website: F<http://perl.overmeer.net/httpd-multiplex/>
+
+=head1 LICENSE
+
+Copyrights 2008 by Mark Overmeer. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

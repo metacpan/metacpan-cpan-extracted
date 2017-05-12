@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>
+      WebMake: Documentation: Using webmake.cgi
+    </title>
+    <meta name="generator" content="WebMake/2.2" />
+    <style>
+      body {
+       background-color: #ffffff; 
+       color: #000000; 
+       font-size: medium;
+       font-family: verdana,lucida,helvetica,sans-serif;
+      }
+      code, samp, pre {
+       font-family: Courier New,courier,fixed-width,monospace;
+      }
+      H1 { font-size: x-large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFCC66; }
+      H2 { font-size: large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFDD77; }
+      H3 { font-size: medium; font-family: Garamond,Book Antiqua,Times,serif; background: #FFEE88; }
+      H4 { font-size: small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H5 { font-size: x-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H6 { font-size: xx-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      A:link {
+       font-weight: bold;
+       color: #004000;
+       text-decoration: underline; 
+      }
+      A:visited {
+       font-weight: normal;
+       color: #008000;
+       text-decoration: underline; 
+      }
+      A:active {
+       font-weight: bold;
+       color: #800000;
+       text-decoration: underline; 
+      }
+      dt {
+       font-size: medium;
+       font-weight: bold;
+       padding-top: 8px; padding-bottom: 8px;
+      }
+      dd {
+       padding-top: 8px; padding-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body bgcolor="#ffffff" text="#000000" link="#3300cc" vlink="#660066">
+    <font face="lucida,verdana,sans-serif">
+      <div align="center">
+         <img src="images/WebMakeTitle.png" alt="WebMake" width="500" height="122" />
+      </div>
+      <table width="100%">
+        <tr>
+          <td valign="top">
+             <strong><a href="http://webmake.taint.org/">WebMake</a>
+             Documentation</strong> (version 2.2)
+             
+          </td>
+          <td valign="top">
+            <div align="right">
+              
+               [ <a href="cvshowto.html">Back</a> | <a href="index_08-pod.html">Forward</a> | <a href="index.html">Index</a>
+               | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+               
+            </div>
+          </td>
+        </tr>
+      </table>
+<!-- yes, it's that Mozilla black-border code again ;) -->
+      <!-- stolen from www.mozilla.org via rc3.org -->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td bgcolor="#aaaaaa">
+            <table border="0" cellspacing="4" cellpadding="4" width="100%">
+              <tr>
+                <td bgcolor="#ffffff">
+                  <table border="0" cellspacing="4" cellpadding="4" width="100%">
+                    <tr>
+                      <td>
+                         <h1>Using webmake.cgi</h1><p>
+                          First of all, after typing the <code><a href="cgistart.html">webmake.cgi</a></code> URL, you'll see a login dialog:
+                          
+                        </p>
+                        <div align="center">
+                           <img src="shots/login.png" width="323" height="228" />
+                        </div>
+                        <p>
+                          Type your username and password, and (assuming they're right) you'll see
+                          the <em>Choose Site</em> page. Choose the site (ie. the .wmk file) you wish
+                          to edit and click on its <strong>Edit</strong> link.
+                          
+                        </p>
+                        <table border="0" cellpadding="0" cellspacing="0" align="center">
+                          <tr>
+                            <td bgcolor="#333333">
+                              <table border="0" cellpadding="2" cellspacing="2">
+                                <tr>
+                                  <td bgcolor="#ffffff">
+                                    <table border="0" cellpadding="2" cellspacing="2">
+                                      <tr>
+                                        <td>
+                                           <img src="shots/choose_site.png" width="411" height="189" />
+                                        </td>
+                                      </tr>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                        </table>
+                        <p>
+                          The site you've chosen will appear in the <em>Edit Site</em> page:
+                          
+                        </p>
+                        <table border="0" cellpadding="0" cellspacing="0" align="center">
+                          <tr>
+                            <td bgcolor="#333333">
+                              <table border="0" cellpadding="2" cellspacing="2">
+                                <tr>
+                                  <td bgcolor="#ffffff">
+                                    <table border="0" cellpadding="2" cellspacing="2">
+                                      <tr>
+                                        <td>
+                                           <img src="shots/edit_site.png" width="469" height="431" />
+                                        </td>
+                                      </tr>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                        </table>
+                        <p>
+                          If you've set up CVS, it's probably good manners to ensure you do a <em>cvs
+                          update</em> immediately before changing anything. If you click on the <strong>Update
+                          From CVS</strong> link, you'll see the <em>CVS Update</em> page:
+                          
+                        </p>
+                        <table border="0" cellpadding="0" cellspacing="0" align="center">
+                          <tr>
+                            <td bgcolor="#333333">
+                              <table border="0" cellpadding="2" cellspacing="2">
+                                <tr>
+                                  <td bgcolor="#ffffff">
+                                    <table border="0" cellpadding="2" cellspacing="2">
+                                      <tr>
+                                        <td>
+                                           <img src="shots/cvs_update.png" width="473" height="423" />
+                                        </td>
+                                      </tr>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                        </table>
+                        <p>
+                          Once this is done, click on the <strong>return to WebMake file</strong> link to return to
+                          the <em>Edit Site</em> page.
+                          
+                        </p>
+                         <a name="Editing_Content_Items"><h1>Editing Content Items</h1></a><p>
+                          If you have any items that contain text, such as &lt;content&gt; items, an
+                          <strong>Edit</strong> button will appear beside them. If you click this, you can edit the
+                          text of that item, and any embedded <a href="metadata.html">metadata</a>, in a textbox like so:
+                          
+                        </p>
+                        <table border="0" cellpadding="0" cellspacing="0" align="center">
+                          <tr>
+                            <td bgcolor="#333333">
+                              <table border="0" cellpadding="2" cellspacing="2">
+                                <tr>
+                                  <td bgcolor="#ffffff">
+                                    <table border="0" cellpadding="2" cellspacing="2">
+                                      <tr>
+                                        <td>
+                                           <img src="shots/edit_item_page.png" width="474" height="376" />
+                                        </td>
+                                      </tr>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                        </table>
+                        <p>
+                          This allows you to edit the text of the item, and even upload new text from
+                          your local disk, if you so wish. Hit the <strong>Save</strong> button to save the changes,
+                          or just hit your browser's <strong>Back</strong> button to avoid saving.
+                          
+                        </p>
+                        <p>
+                          The <em>Edit Site</em> page doesn't currently allow you to create new tags
+                          in the WebMake file, or change parameters to WebMake tags. To do this,
+                          use the <strong>Edit This File As Text</strong> link, which will present you with the
+                          entire Webmake XML file in the <em>Edit Page</em>:
+                          
+                        </p>
+                        <table border="0" cellpadding="0" cellspacing="0" align="center">
+                          <tr>
+                            <td bgcolor="#333333">
+                              <table border="0" cellpadding="2" cellspacing="2">
+                                <tr>
+                                  <td bgcolor="#ffffff">
+                                    <table border="0" cellpadding="2" cellspacing="2">
+                                      <tr>
+                                        <td>
+                                           <img src="shots/edit_page.png" width="470" height="541" />
+                                        </td>
+                                      </tr>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                        </table>
+                         <a name="Editing_Directories"><h1>Editing Directories</h1></a><p>
+                          WebMake tags that load content from directories, such as the &lt;contents&gt;
+                          tag, appear with a link beside them reading <strong>Browse Source Dir</strong>. If you
+                          click this, you'll be presented with the <em>Edit Directory</em> file browser
+                          window:
+                          
+                        </p>
+                        <table border="0" cellpadding="0" cellspacing="0" align="center">
+                          <tr>
+                            <td bgcolor="#333333">
+                              <table border="0" cellpadding="2" cellspacing="2">
+                                <tr>
+                                  <td bgcolor="#ffffff">
+                                    <table border="0" cellpadding="2" cellspacing="2">
+                                      <tr>
+                                        <td>
+                                           <img src="shots/edit_dir.png" width="376" height="417" />
+                                        </td>
+                                      </tr>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                        </table>
+                        <p>
+                          This allows you to navigate about the directory tree (although you cannot
+                          go above the directory you've named as <strong>$FILE_BASE</strong> in the
+                          <code><a href="cgistart.html">webmake.cgi</a></code> script), and perform some other operations, such as
+                          editing files in the <em>Edit Page</em>, create new files, and delete files:
+                          
+                        </p>
+                        <table border="0" cellpadding="0" cellspacing="0" align="center">
+                          <tr>
+                            <td bgcolor="#333333">
+                              <table border="0" cellpadding="2" cellspacing="2">
+                                <tr>
+                                  <td bgcolor="#ffffff">
+                                    <table border="0" cellpadding="2" cellspacing="2">
+                                      <tr>
+                                        <td>
+                                           <img src="shots/delete_file.png" width="296" height="227" />
+                                        </td>
+                                      </tr>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                        </table>
+                         <a name="Building_The_Site"><h1>Building The Site</h1></a><p>
+                          If you click the <strong>Build Site</strong> or <strong>Build Fully</strong> links on any of the
+                          pages, WebMake will build the site and present you with what was built
+                          (and what went wrong, if anything did!):
+                          
+                        </p>
+                        <table border="0" cellpadding="0" cellspacing="0" align="center">
+                          <tr>
+                            <td bgcolor="#333333">
+                              <table border="0" cellpadding="2" cellspacing="2">
+                                <tr>
+                                  <td bgcolor="#ffffff">
+                                    <table border="0" cellpadding="2" cellspacing="2">
+                                      <tr>
+                                        <td>
+                                           <img src="shots/built_site.png" width="427" height="416" />
+                                        </td>
+                                      </tr>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                        </table>
+                         <a name="Committing_Your_Changes_To_CVS"><h1>Committing Your Changes To CVS</h1></a><p>
+                          Once you're satisfied with the changes, hit the <strong>Commit Changes To CVS</strong>
+                          link. This will, firstly, ask you for a message describing your changes:
+                          
+                        </p>
+                        <table border="0" cellpadding="0" cellspacing="0" align="center">
+                          <tr>
+                            <td bgcolor="#333333">
+                              <table border="0" cellpadding="2" cellspacing="2">
+                                <tr>
+                                  <td bgcolor="#ffffff">
+                                    <table border="0" cellpadding="2" cellspacing="2">
+                                      <tr>
+                                        <td>
+                                           <img src="shots/cvs_commit_msg.png" width="394" height="321" />
+                                        </td>
+                                      </tr>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                        </table>
+                        <p>
+                          And, once you've provided that, will send your changes back to the
+                          CVS server.
+                          
+                        </p>
+                        <table border="0" cellpadding="0" cellspacing="0" align="center">
+                          <tr>
+                            <td bgcolor="#333333">
+                              <table border="0" cellpadding="2" cellspacing="2">
+                                <tr>
+                                  <td bgcolor="#ffffff">
+                                    <table border="0" cellpadding="2" cellspacing="2">
+                                      <tr>
+                                        <td>
+                                           <img src="shots/cvs_commit.png" width="471" height="432" />
+                                        </td>
+                                      </tr>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                        </table>
+                        <p>
+                          Note that WebMake tracks any files you've added or deleted using hidden CGI
+                          variables, so once you've done a commit, you're given a choice between
+                          clearing out this list (if the commit was successful), or keeping them (if it
+                          failed in some way).
+                          
+                        </p>
+                        <p>
+                          
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+      <table width="100%">
+        <tr>
+          <td valign="top">
+             <strong><a href="http://webmake.taint.org/">WebMake</a>
+             Documentation</strong> (version 2.2)
+             
+          </td>
+          <td valign="top">
+            <div align="right">
+              
+               [ <a href="cvshowto.html">Back</a> | <a href="index_08-pod.html">Forward</a> | <a href="index.html">Index</a>
+               | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+               
+            </div>
+          </td>
+        </tr>
+      </table>
+      <div align="right">
+         <a href="http://webmake.taint.org/"> <img src="images/BuiltWithWebMake.png" alt="Built With WebMake" border="0" width="88" height="31" /></a>
+      </div>
+    </font>
+  </body>
+</html>

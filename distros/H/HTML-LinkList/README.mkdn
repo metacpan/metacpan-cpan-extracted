@@ -1,0 +1,952 @@
+# NAME
+
+HTML::LinkList - Create a 'smart' list of HTML links.
+
+# VERSION
+
+version 0.1701
+
+# SYNOPSIS
+
+    use HTML::LinkList qw(link_list);
+
+    # default formatting
+    my $html_links = link_list(current_url=>$url,
+                               urls=>\@links_in_order,
+                               labels=>\%labels,
+                               descriptions=>\%desc);
+
+    # paragraph with ' :: ' separators
+    my $html_links = link_list(current_url=>$url,
+        urls=>\@links_in_order,
+        labels=>\%labels,
+        descriptions=>\%desc,
+        links_head=>'<p>',
+        links_foot=>'</p>',
+        pre_item=>'',
+        post_item=>''
+        pre_active_item=>'<em>',
+        post_active_item=>'</em>',
+        item_sep=>" :: ");
+
+    # multi-level list
+    my $html_links = link_tree(
+        current_url=>$url,
+        link_tree=>\@list_of_lists,
+        labels=>\%labels,
+        descriptions=>\%desc);
+
+# DESCRIPTION
+
+This module contains a number of functions for taking sets of URLs and
+labels and creating suitably formatted HTML.  These links are "smart"
+because, if given the url of the current page, if any of the links in
+the list equal it, that item in the list will be formatted as a special
+label, not as a link; this is a Good Thing, since the user would be
+confused by clicking on a link back to the current page.
+
+While many website systems have plugins for "smart" navbars, they are
+specialized for that system only, and can't be reused elsewhere, forcing
+people to reinvent the wheel. I hereby present one wheel, free to be
+reused by anybody; just the simple functions, a backend, which can be
+plugged into whatever system you want.
+
+The default format for the HTML is to make an unordered list, but there
+are many options, enabling one to have a flatter layout with any
+separators you desire, or a more complicated list with differing
+formats for different levels.
+
+The "link\_list" function uses a simple list of links -- good for a
+simple navbar.
+
+The "link\_tree" function takes a set of nested links and makes the HTML
+for them -- good for making a table of contents, or a more complicated
+navbar.
+
+The "full\_tree" function takes a list of paths and makes a full tree of
+all the pages and index-pages in those paths -- good for making a site
+map.
+
+The "breadcrumb\_trail" function takes a url and makes a "breadcrumb trail"
+from it.
+
+The "nav\_tree" function creates a set of nested links to be
+used as a multi-level navbar; one can give it a list of paths
+(as for full\_tree) and it will only show the links related
+to the current URL.
+
+# FUNCTIONS
+
+To export a function, add it to the 'use' call.
+
+    use HTML::LinkList qw(link_list);
+
+To export all functions do:
+
+    use HTML::LinkList ':all';
+
+## link\_list
+
+    $links = link_list(
+        current_url=>$url,
+        urls=>\@links_in_order,
+        labels=>\%labels,
+        descriptions=>\%desc,
+        pre_desc=>' ',
+        post_desc=>'',
+        links_head=>'<ul>',
+        links_foot=>'</ul>',
+        pre_item=>'<li>',
+        post_item=>'</li>'
+        pre_active_item=>'<em>',
+        post_active_item=>'</em>',
+        item_sep=>"\n");
+
+Generates a simple list of links, from list of urls
+(and optional labels) taking into account of the "current" URL.
+
+This provides a large number of options to customize the appearance
+of the list.  The default setup is for a simple UL list, but setting
+the options can enable you to make it something other than a list
+altogether, or add in CSS styles or classes to make it look just
+like you want.
+
+Required:
+
+- urls
+
+    The urls in the order you want them displayed.  If this list
+    is empty, then nothing will be generated.
+
+Options:
+
+- current\_url
+
+    The link to the current page.  If one of the links equals this,
+    then that is deemed to be the "active" link and is just displayed
+    as a label rather than a link.
+
+- descriptions
+
+    Optional hash of descriptions, to put next to the links.  The keys
+    of this hash are the urls.
+
+- hide\_ext
+
+    If a site is hiding link extensions (such as using MultiViews with
+    Apache) you may wish to hide the extensions (while using the full URLs
+    to check various things). (default: 0 (false))
+
+- item\_sep
+
+    String to put between items.
+
+- labels
+
+    A hash whose keys are links and whose values are labels.
+    These are the labels for the links; if no label
+    is given, then the last part of the link is used
+    for the label, with some formatting.
+
+- links\_head
+
+    String to begin the list with.
+
+- links\_foot
+
+    String to end the list with.
+
+- pre\_desc
+
+    String to prepend to each description.
+
+- post\_desc
+
+    String to append to each description.
+
+- pre\_item
+
+    String to prepend to each item.
+
+- post\_item
+
+    String to append to each item.
+
+- pre\_active\_item
+
+    An additional string to put in front of each "active" item, after pre\_item.
+    The "active" item is the link which matches 'current\_url'.
+
+- pre\_item\_active
+
+    INSTEAD of the "pre\_item" string, use this string for active items
+
+- post\_active\_item
+
+    An additional string to append to each active item, before post\_item.
+
+- prefix\_url
+
+    A prefix to prepend to all the links. (default: empty string)
+
+## link\_tree
+
+    $links = link_tree(
+        current_url=>$url,
+        link_tree=>\@list_of_lists,
+        labels=>\%labels,
+        descriptions=>\%desc,
+        pre_desc=>' ',
+        post_desc=>'',
+        links_head=>'<ul>',
+        links_foot=>'</ul>',
+        subtree_head=>'<ul>',
+        subtree_foot=>'</ul>',
+        pre_item=>'<li>',
+        post_item=>'</li>'
+        pre_active_item=>'<em>',
+        post_active_item=>'</em>',
+        item_sep=>"\n",
+        tree_sep=>"\n",
+        formats=>\%formats);
+
+Generates nested lists of links from a list of lists of links.
+This is useful for things such as table-of-contents or
+site maps.
+
+By default, this will return UL lists, but this is highly
+configurable.
+
+Required:
+
+- link\_tree
+
+    A list of lists of urls, in the order you want them displayed.
+    If a url is not in this list, it will not be displayed.
+
+Options:
+
+- current\_url
+
+    The link to the current page.  If one of the links equals this,
+    then that is deemed to be the "active" link and is just displayed
+    as a label rather than a link.
+
+- descriptions
+
+    Optional hash of descriptions, to put next to the links.  The keys
+    of this hash are the urls.
+
+- exclude\_root\_parent
+
+    If this is true, then the "current\_parent" display options are
+    not used for the "root" ("/") path, it isn't counted as a "parent"
+    of the current\_url.
+
+- formats
+
+    A reference to a hash containing advanced format settings. For example:
+
+        my %formats = (
+                   # level 1 and onwards
+                   '1' => {
+                   tree_head=>"<ol>",
+                   tree_foot=>"</ol>\n",
+                   },
+                   # level 2 and onwards
+                   '2' => {
+                   tree_head=>"<ul>",
+                   tree_foot=>"</ul>\n",
+                   },
+                   # level 3 and onwards
+                   '3' => {
+                   pre_item=>'(',
+                   post_item=>')',
+                   item_sep=>",\n",
+                   tree_sep=>' -> ',
+                   tree_head=>"<br/>\n",
+                   tree_foot=>"",
+                   }
+                  );
+
+    The formats hash enables you to control the formatting on a per-level basis.
+    Each key of the hash corresponds to a level-number; the sub-hashes contain
+    format arguments which will apply from that level onwards.  If an argument
+    isn't given in the sub-hash, then it will fall back to the previous level
+    (or to the default, if there is no setting for that format-argument
+    for a previous level).
+
+    The only difference between the names of the arguments in the sub-hash and
+    in the global format arguments is that instead of 'subtree\_head' and subtree\_foot'
+    it uses 'tree\_head' and 'tree\_foot'.
+
+- hide\_ext
+
+    If a site is hiding link extensions (such as using MultiViews with
+    Apache) you may wish to hide the extensions (while using the full URLs
+    to check various things). (default: 0 (false))
+
+- item\_sep
+
+    The string to separate each item.
+
+- labels
+
+    A hash whose keys are links and whose values are labels.
+    These are the labels for the links; if no label
+    is given, then the last part of the link is used
+    for the label, with some formatting.
+
+- links\_head
+
+    The string to prepend the top-level tree with.
+    (default: <ul>)
+
+- links\_foot
+
+    The string to append to the top-level tree.
+    (default: </ul>)
+
+- pre\_desc
+
+    String to prepend to each description.
+
+- post\_desc
+
+    String to append to each description.
+
+- pre\_item
+
+    String to prepend to each item.
+    (default: <li>)
+
+- post\_item
+
+    String to append to each item.
+    (default: </li>)
+
+- pre\_active\_item
+
+    An additional string to put in front of each "active" item, after pre\_item.
+    The "active" item is the link which matches 'current\_url'.
+    (default: <em>)
+
+- pre\_item\_active
+
+    INSTEAD of the "pre\_item" string, use this string for active items
+
+- post\_active\_item
+
+    An additional string to append to each active item, before post\_item.
+    (default: </em>)
+
+- pre\_current\_parent
+
+    An additional string to put in front of a link which is a parent
+    of the 'current\_url' link, after pre\_item.
+
+- pre\_item\_current\_parent
+
+    INSTEAD of the "pre\_item" string, use this for links which are parents
+    of the 'current\_url' link.
+
+- post\_current\_parent
+
+    An additional string to append to a link which is a parent
+    of the 'current\_url' link, before post\_item.
+
+- prefix\_url
+
+    A prefix to prepend to all the links. (default: empty string)
+
+- subtree\_head
+
+    The string to prepend to lower-level trees.
+    (default: <ul>)
+
+- subtree\_foot
+
+    The string to append to lower-level trees.
+    (default: </ul>)
+
+- tree\_sep
+
+    The string to separate each tree.
+
+## full\_tree
+
+    $links = full_tree(
+        paths=>\@list_of_paths,
+        labels=>\%labels,
+        descriptions=>\%desc,
+        hide=>$hide_regex,
+        nohide=>$nohide_regex,
+        start_depth=>0,
+        end_depth=>0,
+        top_level=>0,
+        preserve_order=>0,
+        preserve_paths=>0,
+        ...
+        );
+
+Given a set of paths this will generate a tree of links in the style of
+_link\_tree_.   This will figure out all the intermediate paths and construct
+the nested structure for you, clustering parents and children together.
+
+The formatting options are as for ["link\_tree"](#link_tree).
+
+Required:
+
+- paths
+
+    A reference to a list of paths: that is, URLs relative to the top
+    of the site.
+
+    For example, if the full URL is http://www.example.com/foo.html
+    then the path is /foo.html
+
+    If the full URL is http://www.example.com/~frednurk/foo.html
+    then the path is /foo.html
+
+    This does not require that every possible path be given; all the intermediate
+    paths will be figured out from the list.
+
+Options:
+
+- append\_list
+
+    Array of paths to append to the top-level links.  They are used
+    as-is, and are not part of the processing done to the "paths" list
+    of paths. (see ["prepend\_list"](#prepend_list))
+
+- descriptions
+
+    Optional hash of descriptions, to put next to the links.  The keys
+    of this hash are the paths.
+
+- end\_depth
+
+    End your tree at this depth.  If zero, then go all the way.
+    (see ["start\_depth"](#start_depth))
+
+- exclude\_root\_parent
+
+    If this is true, then the "current\_parent" display options are
+    not used for the "root" ("/") path, it isn't counted as a "parent"
+    of the current\_url.
+
+- hide
+
+    If the path matches this string, don't include it in the tree.
+
+- hide\_ext
+
+    If a site is hiding link extensions (such as using MultiViews with
+    Apache) you may wish to hide the extensions (while using the full URLs
+    to check various things). (default: 0 (false))
+
+- labels
+
+    Hash containing replacement labels for one or more paths.
+    If no label is given for '/' (the root path) then 'Home' will
+    be used.
+
+- last\_subtree\_head
+
+    The string to prepend to the last lower-level tree.
+    Only used if end\_depth is not zero.
+
+- last\_subtree\_foot
+
+    The string to append to the last lower-level tree.
+    Only used if end\_depth is not zero.
+
+- nohide
+
+    If the path matches this string, it will be included even if it matches
+    the 'hide' string.
+
+- prefix\_url
+
+    A prefix to prepend to all the links. (default: empty string)
+
+- prepend\_list
+
+    Array of paths to prepend to the top-level links.  They are used
+    as-is, and are not part of the processing done to the "paths" list
+    of paths.
+
+- preserve\_order
+
+    Preserve the ordering of the paths in the input list of paths;
+    otherwise the links will be sorted alphabetically.  Note that if
+    preserve\_order is true, the structure is at the whims of the order
+    of the original list of paths, and so could end up odd-looking.
+    (default: false)
+
+- preserve\_paths
+
+    Do not extract intermediate paths or reorder the input list of paths.
+    This speeds things up, but assumes that the input paths are complete
+    and in good order.
+    (default: false)
+
+- start\_depth
+
+    Start your tree at this depth.  Zero is the root, level 1 is the
+    files/sub-folders in the root, and so on.
+    (default: 0)
+
+- top\_level
+
+    Decide which level is the "top" level.  Useful when you
+    set the start\_depth to something greater than 1.
+
+## breadcrumb\_trail
+
+    $links = breadcrumb_trail(
+                current_url=>$url,
+                labels=>\%labels,
+                descriptions=>\%desc,
+                links_head=>'<p>',
+                links_foot=>"\n</p>",
+                subtree_head=>'',
+                subtree_foot=>"\n",
+                pre_item=>'',
+                post_item=>'',
+                pre_active_item=>'<em>',
+                post_active_item=>'</em>',
+                item_sep=>"\n",
+                tree_sep=>' &gt; ',
+        ...
+        );
+
+Given the current url, make a breadcrumb trail from it.
+By default, this is laid out with '>' separators, but it can
+be set up to give a nested set of UL lists (as for ["full\_tree"](#full_tree)).
+
+The formatting options are as for ["link\_tree"](#link_tree).
+
+Required:
+
+- current\_url
+
+    The current url to be made into a breadcrumb-trail.
+
+Options:
+
+- descriptions
+
+    Optional hash of descriptions, to put next to the links.  The keys
+    of this hash are the urls.
+
+- exclude\_root\_parent
+
+    If this is true, then the "current\_parent" display options are
+    not used for the "root" ("/") path, it isn't counted as a "parent"
+    of the current\_url.
+
+- hide\_ext
+
+    If a site is hiding link extensions (such as using MultiViews with
+    Apache) you may wish to hide the extensions (while using the full URLs
+    to check various things). (default: 0 (false))
+
+- labels
+
+    Hash containing replacement labels for one or more URLS.
+    If no label is given for '/' (the root path) then 'Home' will
+    be used.
+
+## nav\_tree
+
+    $links = nav_tree(
+        paths=>\@list_of_paths,
+        labels=>\%labels,
+        current_url=>$url,
+        hide=>$hide_regex,
+        nohide=>$nohide_regex,
+        preserve_order=>1,
+        descriptions=>\%desc,
+        ...
+        );
+
+This takes a list of links, and the current URL, and makes a nested navigation
+tree, consisting of (a) the top-level links (b) the links leading to the
+current URL (c) the links on the same level as the current URL,
+(d) the related links just above this level, depending on whether
+this is an index-page or a content page.
+
+Optionally one can hide links which match match the 'hide' option.
+
+The formatting options are as for ["link\_tree"](#link_tree), with some additions.
+
+Required:
+
+- current\_url
+
+    The link to the current page.  If one of the links equals this, then that
+    is deemed to be the "active" link and is just displayed as a label rather
+    than a link.  This is also used to determine which links to show and which
+    ones to filter out.
+
+- paths
+
+    A reference to a list of paths: that is, URLs relative to the top
+    of the site.
+
+    For example, if the full URL is http://www.example.com/foo.html
+    then the path is /foo.html
+
+    This does not require that every possible path be given; all the intermediate
+    paths will be figured out from the list.
+
+Options:
+
+- append\_list
+
+    Array of paths to append to the top-level links.  They are used
+    as-is, and are not part of the processing done to the "paths" list
+    of paths. (see ["prepend\_list"](#prepend_list))
+
+- descriptions
+
+    Optional hash of descriptions, to put next to the links.  The keys
+    of this hash are the paths.
+
+- end\_depth
+
+    End your tree at this depth.  If zero, then go all the way.
+    By default this is set to the depth of the current\_url.
+
+- exclude\_root\_parent
+
+    If this is true, then the "current\_parent" display options are
+    not used for the "root" ("/") path, it isn't counted as a "parent"
+    of the current\_url.
+
+- hide
+
+    If a path matches this string, don't include it in the tree.
+
+- hide\_ext
+
+    If a site is hiding link extensions (such as using MultiViews with
+    Apache) you may wish to hide the extensions (while using the full URLs
+    to check various things). (default: 0 (false))
+
+- labels
+
+    Hash containing replacement labels for one or more paths.
+    If no label is given for '/' (the root path) then 'Home' will
+    be used.
+
+- last\_subtree\_head
+
+    The string to prepend to the last lower-level tree.
+
+- last\_subtree\_foot
+
+    The string to append to the last lower-level tree.
+
+- nohide
+
+    If the path matches this string, it will be included even if it matches
+    the 'hide' string.
+
+- prefix\_url
+
+    A prefix to prepend to all the links. (default: empty string)
+
+- prepend\_list
+
+    Array of paths to prepend to the top-level links.  They are used
+    as-is, and are not part of the processing done to the "paths" list
+    of paths.
+
+- preserve\_order
+
+    Preserve the ordering of the paths in the input list of paths;
+    otherwise the links will be sorted alphabetically.
+    (default: true)
+
+- preserve\_paths
+
+    Do not extract intermediate paths or reorder the input list of paths.
+    This speeds things up, but assumes that the input paths are complete
+    and in good order.
+    (default: false)
+
+- start\_depth
+
+    Start your tree at this depth.  Zero is the root, level 1 is the
+    files/sub-folders in the root, and so on.
+    (default: 1)
+
+- top\_level
+
+    Decide which level is the "top" level.  Useful when you
+    set the start\_depth to something greater than 1.
+
+# Private Functions
+
+These functions cannot be exported.
+
+## make\_item
+
+$item = make\_item(
+	this\_label=>$label,
+	this\_link=>$link,
+	hide\_ext=>0,
+	current\_url=>$url,
+	current\_parents=>\\%current\_parents,
+	descriptions=>\\%desc,
+	format=>\\%format,
+    );
+
+%format = (
+	pre\_desc=>' ',
+	post\_desc=>'',
+	pre\_item=>'<li>',
+	post\_item=>'</li>'
+	pre\_active\_item=>'<em>',
+	post\_active\_item=>'</em>',
+	pre\_current\_parent=>'<em>',
+	post\_current\_parent=>'</em>',
+	item\_sep=>"\\n");
+);
+
+Format a link item.
+
+See ["link\_list"](#link_list) for the formatting options.
+
+- this\_label
+
+    The label of the required link.  If there is no label,
+    this uses the base-name of the last part of the link,
+    capitalizing it and replacing underscores and dashes with spaces.
+
+- this\_link
+
+    The URL of the required link.
+
+- current\_url
+
+    The link to the current page.  If one of the links equals this,
+    then that is deemed to be the "active" link and is just displayed
+    as a label rather than a link.
+
+- current\_parents
+
+    URLs of the parents of the current item.
+
+- descriptions
+
+    Optional hash of descriptions, to put next to the links.  The keys
+    of this hash are the links (not the labels).
+
+- defer\_post\_item
+
+    Don't add the 'post\_item' string if this is true.
+    (needed for nested lists)
+    (default: false)
+
+- no\_link
+
+    Don't make a link for this, just a label.
+
+## make\_canonical
+
+my $new\_url = make\_canonical($url);
+
+Make a URL canonical; remove the 'index.\*' and add on a needed
+'/' -- this assumes that directory names never have a '.' in them.
+
+## get\_index\_path
+
+my $new\_url = get\_index\_path($url);
+
+Get the "index" part of this path.  That is, if this path
+is not for an index-page, then get the parent index-page
+path for this path.
+(Removes the trailing slash).
+
+## get\_index\_parent
+
+my $new\_url = get\_index\_parent($url);
+
+Get the parent of the "index" part of this path.
+(Removes the trailing slash).
+
+## path\_depth
+
+my $depth = path\_depth($url);
+
+Calculate the "depth" of the given path.
+
+## link\_is\_active
+
+    if (link_is_active(this_link=>$link, current_url=>$url))
+    ...
+
+Check if the given link is "active", that is, if it
+matches the 'current\_url'.
+
+## traverse\_lol
+
+$links = traverse\_lol(\\@list\_of\_lists,
+    labels=>\\%labels,
+    tree\_depth=>$depth
+    current\_format=>\\%format,
+    ...
+    );
+
+Traverse the list of lists (of urls) to produce 
+a nested collection of links.
+
+This consumes the list\_of\_lists!
+
+## extract\_all\_paths
+
+my @all\_paths = extract\_all\_paths(paths=>\\@paths,
+    preserve\_order=>0);
+
+Extract all possible paths out of a list of paths.
+Thus, if one has
+
+/foo/bar/baz.html
+
+then that would make
+
+/
+/foo/
+/foo/bar/
+/foo/bar/baz.html
+
+If 'preserve\_order' is true, this preserves the ordering of
+the paths in the input list; otherwise the output paths
+are sorted alphabetically.
+
+## extract\_current\_parents
+
+    my %current_parents = extract_current_parents(current_url=>$url,
+                                              exclude_root_parent=>0);
+
+Extract the "parent" paths of the current url
+
+/foo/bar/baz.html
+
+then that would make
+
+/
+/foo/
+/foo/bar/
+
+If 'exclude\_root\_parent' is true, then the '/' is excluded from the
+list of parents.
+
+## build\_lol
+
+    my @lol = build_lol(
+        paths=>\@paths,
+        current_url=>$url,
+        navbar_type=>'',
+    );
+
+Build a list of lists of paths, given a simple list of paths.
+Assumes that this list has already been filtered.
+
+- paths
+
+    Reference to list of paths; this is consumed.
+
+## filter\_out\_paths
+
+    my @filtered_paths = filter_out_paths(
+        paths=>\@paths,
+        current_url=>$url,
+        hide=>$hide,
+        nohide=>$nohide,
+        start_depth=>$start_depth,
+        end_depth=>$end_depth,
+        top_level=>$top_level,
+        navbar_type=>'',
+    );
+
+Filter out the paths we don't want from our list of paths.
+Returns a list of the paths we want.
+
+## make\_default\_format
+
+    my %default_format = make_default_format(%args);
+
+Make the default format hash from the args.
+Returns a hash of format options.
+
+## make\_extra\_formats
+
+    my %formats = make_extra_formats(%args);
+
+Transforms the subtree\_head and subtree\_foot into the "formats"
+method of formatting.
+Returns a hash of hashes of format options.
+
+# REQUIRES
+
+    Test::More
+
+# INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+Or, if you're on a platform (like DOS or Windows) that doesn't like the
+"./" notation, you can do this:
+
+    perl Build.PL
+    perl Build
+    perl Build test
+    perl Build install
+
+In order to install somewhere other than the default, such as
+in a directory under your home directory, like "/home/fred/perl"
+go
+
+    perl Build.PL --install_base /home/fred/perl
+
+as the first step instead.
+
+This will install the files underneath /home/fred/perl.
+
+You will then need to make sure that you alter the PERL5LIB variable to
+find the modules.
+
+Therefore you will need to change the PERL5LIB variable to add
+/home/fred/perl/lib
+
+        PERL5LIB=/home/fred/perl/lib:${PERL5LIB}
+
+# SEE ALSO
+
+perl(1).
+
+# BUGS
+
+Please report any bugs or feature requests to the author.
+
+# AUTHOR
+
+    Kathryn Andersen (RUBYKAT)
+    perlkat AT katspace dot com
+    http://www.katspace.com/tools/html_linklist/
+
+# COPYRIGHT AND LICENCE
+
+Copyright (c) 2006 by Kathryn Andersen
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

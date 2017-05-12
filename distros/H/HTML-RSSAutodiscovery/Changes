@@ -1,0 +1,33 @@
+Revision history for Perl extension HTML::RSSAutodiscovery
+
+1.21	 Sun Oct 17 2004
+
+	 - FIXED t/003-noparse.t and t/005-syndic8
+	   to skip is XMLRPC::Lite is not installed
+	   per RT bug # 7975
+
+1.2	 Mon Feb 09, 2004
+
+	 - Fixed RT bug #4288
+
+	 - Fixed RT bug #4473
+
+	 - Removed use of CPAN::MakeMaker
+
+	 - Updated POD
+
+1.1	 Wed Oct 30, 2002
+
+	 - Added hooks to check anchors ending in xml,rdf or rss for RSS-ness
+
+	 - Added hooks to check syndic8 for additional RSS feeds
+
+	 - Replaced test.pl with *.t and Test::More
+
+	 - Replaced ExtUtils::MakeMaker with CPAN::MakeMaker
+
+	 - Updated POD
+
+1.0	 Mon Jun 03, 2002
+
+	 - Initial revision.

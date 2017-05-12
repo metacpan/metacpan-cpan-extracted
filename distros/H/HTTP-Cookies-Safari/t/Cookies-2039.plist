@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>Domain</key>
+		<string>.cnn.com</string>
+		<key>Expires</key>
+		<date>2039-08-13T02:12:00Z</date>
+		<key>Name</key>
+		<string>CNNid</string>
+		<key>Path</key>
+		<string>/</string>
+		<key>Value</key>
+		<string>18c15c9e-1045-1041996715-381</string>
+	</dict>
+</array>
+</plist>

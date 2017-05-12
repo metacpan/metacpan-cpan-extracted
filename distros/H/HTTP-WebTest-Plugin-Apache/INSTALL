@@ -1,0 +1,27 @@
+$Id: INSTALL,v 1.1.1.1 2002/11/15 21:46:57 m_ilya Exp $
+
+PREREQUISITES
+
+* Perl 5.005 or later
+* File::Temp (is included in Perl 5.6.1 and later)
+* HTTP::WebTest 2.00 or later
+
+If you want to run test suite ('make test') you need also
+
+* Algorithm::Diff
+
+INSTALLATION
+
+Installing this plugin:
+
+    perl Makefile.PL
+    make
+    make test # optional - runs test suite for this module
+    make install       
+
+On Win32 systems you should use 'nmake' instead of make'. 'nmake' is
+Windows version of Unix 'make' utility which may be downloaded from
+ftp.microsoft.com for free.
+
+For more information see POD documentation in
+HTTP::WebTest::Plugin::Apache.

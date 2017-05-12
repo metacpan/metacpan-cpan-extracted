@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/00basic.t
+t/98podsyn.t
+t/99podcov.t
+eg/sniffer.pl 
+lib/HTML/Doctype.pm
+META.yml                                 Module meta-data (added by MakeMaker)

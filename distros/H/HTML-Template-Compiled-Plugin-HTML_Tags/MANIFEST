@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+Build.PL
+MANIFEST
+README
+t/01_HTML-Template-Compiled-Plugin-HTML_Tags.t
+t/02_pod.t
+t/03_pod_cover.t
+t/04_cache.t
+lib/HTML/Template/Compiled/Plugin/HTML_Tags.pm
+examples/table_and_options.pl
+examples/table_and_options.html
+META.yml                                 Module meta-data (added by MakeMaker)

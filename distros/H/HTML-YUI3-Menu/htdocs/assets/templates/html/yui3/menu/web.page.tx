@@ -1,0 +1,30 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+<head>
+
+<title>HTML::YUI3::Menu</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<script type="text/javascript" charset="utf-8" src="<: $yui_url :>/yui-min.js"></script>
+<script type="text/javascript" charset="utf-8">
+
+<: $switch_functions :>
+</script>
+
+</head>
+
+<body class="yui3-skin-sam">
+
+<h3 align="center">HTML::YUI3::Menu</h3>
+
+<: $menu :>
+
+<script type="text/javascript" charset="utf-8">
+
+<: $yui_js :>
+</script>
+
+</body>
+</html>

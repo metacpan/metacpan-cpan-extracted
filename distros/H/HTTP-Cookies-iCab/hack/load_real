@@ -1,0 +1,10 @@
+#!/usr/bin/perl
+
+use lib qw(../blib/lib);
+
+use HTTP::Cookies::iCab;
+
+my $file = "$ENV{HOME}/Library/Preferences/iCab Preferences/iCab Cookies";
+
+my $jar = HTTP::Cookies::iCab->new( file => $file );
+

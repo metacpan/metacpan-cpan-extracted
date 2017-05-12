@@ -1,0 +1,16 @@
+---
+elements:
+  - type: Multi
+    model_config:
+      label: title
+
+    elements:
+
+      - type: Hidden
+        name: id
+
+      - type: Text
+        name: name
+
+      - type : Submit
+        name: submit

@@ -1,0 +1,270 @@
+NAME
+    HTML::EscapeEvil - Escape tag
+
+VERSION
+    0.05
+
+SYNPSIS
+        use HTML::EscapeEvil;
+        my $escapeevil = HTML::EscapeEvil->new;
+        my $evil_html = <<HTML;
+        <script type="text/javascript">
+        <!--
+        alert("script is evil tags!!");
+        //-->
+        </script>
+        <iflame src="deny.html" width="100" height="100"></iframe>
+        HTML
+
+        $escapeevil->parse($html); #from string
+        $escapeevil->parse_file($html_file); #from file or file handle
+
+        my $clean_html = $escapeevil->filtered_html;
+        $escapeevil->clear;
+
+DESCRIPTION
+    The tag that doesn't want to permit escapes all.
+
+METHOD
+  new
+    create instance
+
+    Example :
+
+        my $escapeevil = HTML::EscapeEvil->new(
+                                             allow_comment => 1,
+                                             allow_declaration => 0,
+                                             allow_process => 0,
+                                             allow_tags => [qw(a l l o w t a g s)],
+                                             #allow_tags => "one",# OK
+                                            );
+
+    Option :
+
+    allow_comment : allow comment. default 0.
+
+    allow_declaration : allow_declaration. default 0.
+
+    allow_process : allow_process. default 0.
+
+    allow_tags : set allow tags
+
+    allow_script : allow script tag. default 0(is_allow_tags("script") OK)
+
+    allow_style : allow style tag. default 0(is_allow_tags("style") OK)
+
+    allow_entity_reference : allow entity reference. default 1
+
+    collection_process : collection process. default 0
+
+    When tag is not specified for allow_tags, default makes all tag invalid.
+
+  set_allow_tags
+    The setting is returned to default.
+
+    Example :
+
+        $escapeevil->set_allow_tags(qw(t a g s));
+
+  add_allow_tags
+    The tag that wants to permit is added.
+
+    Example :
+
+        $escapeevil->add_allow_tags(qw(t a g s));
+
+  deny_tags
+    The specified tag is not permitted.
+
+    Example :
+
+        $escapeevil->deny_tags(qw(t a g s));
+
+  get_allow_tags
+    The list of the tag that has been permitted is returned.
+
+    Example :
+
+        my @list = $escapeevil->get_allow_tags;
+
+  is_allow_tags
+    Whether it is tag that has been permitted is checked.
+
+    Example :
+
+        print 'script is ', ($escapeevil->is_allow_tags('script')) ? 'allowed' : 'not allowed';
+
+  deny_all
+    No permission of all
+
+    Example :
+
+        $escapeevil->deny_all;
+
+  allow_comment
+    Whether the comment has been permitted is checked. Or, the setting
+    change of the comment permission.
+
+    Example :
+
+        print 'comment is ', ($escapeevil->allow_comment) ? 'allowed' : 'not allowed';
+        $escapeevil->allow_comment(1); ## allow comment!
+
+  allow_declaration
+    Whether the DOCTYPE declaration has been permitted is checked. Or, the
+    setting change of the DOCTYPE declaration permission.
+
+    Example :
+
+        print 'declaration is ', ($escapeevil->allow_declaration) ? 'allowed' : 'not allowed';
+        $escapeevil->allow_declaration(1); ## allow declaration!
+
+  allow_process
+    Whether the processing instruction has been permitted is checked. Or,
+    the setting change of the processing instruction.
+
+    Example :
+
+        print 'process is ', ($escapeevil->allow_process) ? 'allowed' : 'not allowed';
+        $escapeevil->allow_process(1); ## allow process!
+
+  allow_entity_reference
+    Whether the substance reference has been permitted is checked. Or, the
+    setting change of the substance reference.
+
+    Example :
+
+        print 'entity_reference is ', ($escapeevil->allow_entity_reference) ? 'allowed' : 'not allowed';
+        $escapeevil->allow_entity_reference(1); ## allow entity_reference!
+
+  allow_script
+    Whether it permits is checked script tag. Or, the setting change of
+    script tag.
+
+    Example :
+
+        print 'script is ', ($escapeevil->allow_script) ? 'allowed' : 'not allowed';
+        $escapeevil->allow_script(1); ## allow script!
+
+  allow_style
+    Whether it permits is checked style tag. Or, the setting change of style
+    tag.
+
+    Example :
+
+        print 'style is ', ($escapeevil->allow_style) ? 'allowed' : 'not allowed';
+        $escapeevil->allow_style(1); ## allow style!
+
+  collection_process
+    The setting change whether to collect process is done. Or, a present
+    setting is acquired.
+
+    Example :
+
+        print 'collection_process is ', ($escapeevil->collection_process) ? 'collection' : 'no collection';
+        $escapeevil->collection_process(1); ##colloction process!
+
+  processes
+    The reference of the array of the processing instruction list is
+    acquired. (reading exclusive use)
+
+    Example :
+
+        foreach(@{$escapeevil->processes}){
+
+            my $process = $_;
+            #example: eval $process ,system $process etc..
+        }
+
+  filtered_html
+    HTML that escapes in the tag not permitted is returned.
+
+    Example :
+
+        print $escapeevil->filetered_html;
+
+  filtered_file
+    HTML that escapes in the tag not permitted is written file.
+
+    Example :
+
+        (e.g.1)
+        $escapeevil->filtered_file("./filtered_file.html");
+        (e.g.2)
+        $escapeevil->filtered_file(*FILEHANDLE);
+
+  filtered
+    version 0.02 new method. parse(parse_file) and
+    filtered_html(filtered_file) and eof,clear_process do.
+
+    Example :
+
+        my $html = "<script type=\"text/javascript\"><!--alert(\"hello!\");//--></script>";
+        (e.g.1)
+        my $cleanhtml = $escapeevil->filtered($html);
+        (e.g.2)
+        $escapeevil->filtered($html,"writefile.html");
+        (e.g.3)
+        open FILEHANDLE,"< evil.html" or die $!;
+        $escapeevil->filtered(*FILEHANDLE,"writefile.html");
+
+  clear_process
+    Collected process is annulled.
+
+    Example :
+
+        $escapeevil->clear_process;
+
+  clear
+    Initialization of variable that liberates of HTML::Parser object and is
+    internal. Please execute it when processing is completed.
+
+    Example :
+
+        $escapeevil->clear;
+
+NEW OPTION
+    VERSION 0.03.Javascript of event handler becomes invalid at
+    allow_script(0) though event handler of javascript is defined in the tag
+    that has been permitted, too.
+
+    Example :
+
+        <a href="javascript:alert(1234)">hello</a> => <a href="javascript:void(0)">hello</a>
+        <body onload="alert(5678)"> => <body onload="void(0)">
+
+    The definition of event handler is described in %HTML::Escape::JS_EVENT.
+
+CAUTION
+    Please filtered_file must specify passing the file and specify the
+    correct one. Die is executed when there are neither passing nor a
+    writing authority that cannot be.
+
+    Processes is a method only for reading. When the value is set, die is
+    done.
+
+    Carp http://search.cpan.org/~nwclark/perl-5.8.8/lib/Carp.pm
+
+    Class::Accessor
+    http://search.cpan.org/~kasei/Class-Accessor-0.22/lib/Class/Accessor.pm
+
+    HTML::Element
+    http://search.cpan.org/~petdance/HTML-Tree-3.1901/lib/HTML/Element.pm
+
+    HTML::Filter
+    http://search.cpan.org/~gaas/HTML-Parser-3.46/lib/HTML/Filter.pm
+
+    HTML::Parser http://search.cpan.org/~gaas/HTML-Parser-3.46/Parser.pm
+
+SEE ALSO
+    Carp Class::Accessor HTML::Element HTML::Filter HTML::Parser
+
+AUTHOR
+    Akira Horimoto <kurt0027@gmail.com>
+
+COPYRIGHT
+    Copyright (C) 2006 Akira Horimoto
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,80 @@
+
+=head1 NAME
+
+HTML::DOM::Element::A - A Perl class for representing 'a' elements in an HTML DOM tree
+
+=head1 VERSION
+
+Version 0.054
+
+=head1 SYNOPSIS
+
+  use HTML::DOM;
+  $doc = HTML::DOM->new;
+  $elem = $doc->createElement('a');
+
+  $elem->href('about:blank'); # set attribute
+  $elem->target;              # get attribute
+  $elem->tagName;
+  # etc
+
+  $elem->focus();
+  $elem->blur();
+
+=head1 DESCRIPTION
+
+This class implements 'a' elements in HTML::DOM trees. It 
+implements the HTMLAnchorElement DOM interface and inherits from 
+L<HTML::DOM::Element> (q.v.).
+
+=head1 METHODS
+
+In addition to those inherited from HTML::DOM::Element and its 
+superclasses, this class implements the following DOM methods:
+
+=over
+
+=item accessKey
+
+=item charset
+
+=item coords
+
+=item href
+
+=item hreflang
+
+=item name
+
+=item rel
+
+=item rev
+
+=item shape
+
+=item tabIndex
+
+=item target
+
+=item type
+
+Each of these returns the corresponding HTML attribute. If you pass an
+argument, it will become the new value of the attribute, and the old value
+will be returned.
+
+=item blur
+
+=item focus
+
+Each of these triggers the corresponding event.
+
+=back
+
+And L<HTML::DOM::Node>'s C<trigger_event> method is overridden to call the
+default event handler for links when the DOMActivate event occurs.
+
+=head1 SEE ALSO
+
+L<HTML::DOM>
+
+L<HTML::DOM::Element>

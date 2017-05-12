@@ -1,0 +1,4 @@
+table#status thead tr th#status_col1 { width: 200px }
+table#status thead tr th#status_col2 { width: 100px }
+table#status thead tr th#status_col3 { width: 100px }
+table#status thead tr th#status_col4 { width: 35px }

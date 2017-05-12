@@ -1,0 +1,11 @@
+Changes
+eg/simple.pl
+lib/Here/Template.pm
+Makefile.PL
+MANIFEST
+MYMETA.json
+MYMETA.yml
+README
+t/00-use.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,189 @@
+NAME
+    HTML::Acid - Reformat HTML fragment to strict criteria
+
+VERSION
+    This document describes HTML::Acid version 0.0.3
+
+SYNOPSIS
+        use HTML::Acid;
+        my $acid = HTML::Acid->new;
+        return $acid->burn($html)
+  
+DESCRIPTION
+    Fragments of HTML returned by a rich text editor tend to be not entirely
+    standards compliant. `img' tags tend not to be closed. Paragraphs breaks
+    might be represented by double `br' tags rather than `p' tags. Of course
+    we also need to do all the XSS avoidance an HTML clean up routine would,
+    such as controlling `href' tags, removing javascript and inline styling.
+    Furthermore what one often wants is not simply a standards compliant
+    cleaned up version of the input HTML. Sometimes one wants to know that
+    the HTML conforms to a much tighter standard, as then it will be easier
+    to style.
+
+    So this module, given a fragment of HTML, will rewrite it into a very
+    restricted subset of XHTML. The default dialect has the following
+    properties.
+
+    * Documents consist entirely of `p' elements and `h3' elements.
+    * Every header will have `id' attribute automatically generated from the
+    header contents.
+    * Every paragraph may consist of text, `a' elements, `img' elements,
+    `strong' and `em' elements.
+    * Anchors must have an `href' attribute referring to an internal URL.
+    They may also have a `title' attribute.
+    * Images must have `src', `title', `alt', `height' and `width'
+    attributes. The `src' attribute must match the same regular expression
+    as `href'. If any of these tags are missing the image is replaced by the
+    contents of the `alt' attribute, so long as it consists only of
+    alphanumeric characters, spaces, full stops and commas. Otherwise the
+    image is removed.
+    * All other tags must have no attributes and may only contain text.
+    * Double `br' elements in the source will be interpreted as paragraph
+    breaks.
+
+INTERFACE
+  new
+    This constructor takes a number of optional named parameters.
+
+    *url_regex*
+        This is a regular expression that controls what `href' and `src'
+        tags are permitted. It defaults to an expression that restricts
+        access to internal absolute paths with an optional sub-reference.
+
+    *tag_hierarchy*
+        This is a hash reference that for each supported tag specifies what
+        the containing tag must be. Standards based HTML is not as strict as
+        this. This defaults to the value returned by the
+        `default_tag_hierarchy' method.
+
+    *img_height_default*
+        If set this creates a default height value for all images. If not
+        set images without height attributes will be rejected.
+
+    *img_width_default*
+        If set this creates a default width value for all images. If not set
+        images without width attributes will be rejected.
+
+    *text_manip*
+        If set this must be subroutine reference. It takes text (and the
+        `alt' attribute from invalid images) and what is returned will be
+        used instead.
+
+    *text_container*
+        If set this must be subroutine reference. It takes the `alt'
+        (modified by *text_manip* if present) and returns what would be used
+        in the event of an invalid image.
+
+  burn
+    This method takes the input HTML as an input and returns the cleaned up
+    HTML.
+
+  default_tag_hierarchy
+    This is a class method that returns the default tag hierarchy. So if you
+    want to add support for a tag you can use a modified copy of the output
+    when setting up the HTML::Acid instance. The default mapping is as
+    follows:
+
+        {
+            h3 => '',
+            p => '',
+            a => 'p',
+            img => 'p',
+            em => 'p',
+            strong => 'p',
+        }
+
+    Mapping an element onto the empty string implies that the element
+    appears at the top-level of an HTML fragment. So for example
+
+        h3 => '',
+        p => '',
+
+    implies that <h3> and <p> can be at the top of the document fragment.
+    Mapping onto another element implies that the element must always be
+    contained within that element. So
+
+        a => 'p',
+        img => 'p',
+        em => 'p',
+        strong => 'p',
+    
+    implies that <a>, <img>, <em> and <strong> must be within a <p> element.
+    It is also possible to specify alternatives:
+
+        img => ['p','a'],
+
+    which implies that <img> can be within a <p> or an <a>. Note that this
+    code does not check for loops. So doing something like
+
+        div => 'span',
+        span => 'div',
+
+    is unsupported.
+
+CONFIGURATION AND ENVIRONMENT
+    HTML::Acid requires no configuration files or environment variables.
+
+DEPENDENCIES
+    This module works by subclassing HTML::Parser. Also it assumes that the
+    input will be in utf8 format, that is it sets the *utf8_mode* flag on
+    the HTML::Parser constructor.
+
+INCOMPATIBILITIES
+    None reported.
+
+TO DO
+    * I think this module could do with an XS back-end for a speed up.
+    * There is one bit of the code that the test scripts are not currently
+    covering. I need some time to think of a reasonably plausible
+    configuration that will trigger those cases.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests to
+    `bug-html-acid@rt.cpan.org', or through the web interface at
+    http://rt.cpan.org.
+
+SEE ALSO
+    There are many other modules that do something similar. Of those I think
+    the most complete is HTML::StripScripts::Parser. You can also see
+    HTML::Declaw, HTML::Clean, HTML::Defang, HTML::Restrict, HTML::Scrubber,
+    HTML::Laundary, HTML::Detoxifier, Marpa::HTML, HTML::Tidy. People also
+    often refer to HTML::Santitizer.
+
+AUTHOR
+    Nicholas Bamber `<nicholas@periapt.co.uk>'
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2010-2011, Nicholas Bamber `<nicholas@periapt.co.uk>'. All
+    rights reserved.
+
+    The unordered list in the test files `(t/*/5*)' is issued under the
+    Creative Common Attribution-ShareAlike 3.0 Unported License (wikipedia).
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

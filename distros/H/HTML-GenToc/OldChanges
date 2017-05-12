@@ -1,0 +1,231 @@
+Revision history for HTML::GenToc
+=================================
+
+3.10 Thu 27 November 2008
+-------------------------
+
+  * (2008-11-27) Updated documentation.
+  * (2008-11-26) Makefile.PL is auto-generated, so should not be under revision-control.
+  * (2008-11-26) 1. fixed bug with outputting to string
+    2. improved anchor making (thanks to Dan Dascalescu)
+  * (2007-12-17) Make svk ignore generated files.
+  * (2007-12-16) revamped depot
+
+3.00 Sun 27 May 2007
+--------------------
+
+  * (27 May 2007) refactor
+  	Massive rewrite; now everything is done in one pass with
+  one generate_toc method, and it uses HTML::LinkList to generate
+  the actual Table-of-Contents list.
+
+2.31 Wed 06 September 2006
+--------------------------
+
+  * (22 Apr 2006) tweak docs
+  	Removed duplicate header, is all.
+
+  * (25 Oct 2004) documentation tweak
+
+  * (24 Oct 2004) argfile option
+  	Using Getopt::ArgvFile 1.09, now use --argfile as an option
+  to get Options Files, instead of having to use the @ prefix.
+
+2.30 Fri 22 October 2004
+------------------------
+
+  * (22 Oct 2004) documentation and README
+  	Now auto-generate the README from the module PoD; which entailed
+  rewriting and improving it.
+
+  * (22 Oct 2004) updated TODO
+
+  * (22 Oct 2004) optional tests
+  	Added optional tests using Test::Distribution, Test::Pod and
+  Test::Pod::Coverage which only run if you have those modules installed.
+
+  * (22 Oct 2004) improving Pod
+  	Some things which additional optional tests complained about,
+  such as Pod about every function, and the usage of =back, fixed.
+  (Needed to commit this before adding the actual tests which tested
+  this, because otherwise the tests failed)
+
+  * (22 Oct 2004) use_id option
+  	Add option to use IDs instead of anchors in generate_anchors
+  and also recognise IDs in generate_toc.
+
+  * (10 Oct 2004) change auto-build stuff to Module::DevAid
+  	Now that I've written a proper module for it, use it.
+
+
+2.22 Wed 06 October 2004
+------------------------
+Wed Oct  6 07:45:31 EST 2004  perlkat AT katspace dot com
+  * arrgh! more overlooks
+  	(blush) I forgot to change the README file!
+
+2.21 Wed 06 October 2004
+------------------------
+Wed Oct  6 07:38:31 EST 2004  perlkat AT katspace dot com
+  * correcting documentation
+  	Just a few things I overlooked earlier.
+
+2.20 Wed 06 October 2004
+------------------------
+Sat Oct  2 20:53:31 EST 2004  perlkat AT katspace dot com
+  * enable OL on all levels
+  	Added --ol_num_levels option (and tests for same) and
+  improved documentation.
+
+Thu Sep 30 21:07:56 EST 2004  perlkat AT katspace dot com
+  * improved behaviour
+  	Fixed problems with doing both --gen_anchors and --gen_toc
+  in one pass; it now no longer stomps on the backup file, as it passes
+  the data from the gen_anchors pass to the gen_toc pass.
+  	Fixed odd behaviour with STDOUT always being sent to even if
+  a file of '' was given (now '' works to disable output to STDOUT).
+  	Also changed the 'option' method in HTML::GenToc to 'setting' instead.
+  	And improved documentation.
+
+Wed Sep 29 09:13:59 EST 2004  perlkat AT katspace dot com
+  * added 'option' method to HTML::GenToc
+  	Now options are isolated a bit more, and can be queried with
+  the 'option' method; set them with ->args, get them with ->option.
+
+Wed Sep 29 08:40:21 EST 2004  perlkat AT katspace dot com
+  * documentation and deprecation
+  	Improved documentation, including more examples.
+  Also went through and added notes and warnings about deprecation of
+  --tocmap option and the old way of calling the HTML::GenToc methods.
+  Also removed the HISTORY section of hypertoc, because it's better for
+  all changes to be documented in one spot, namely, here.
+
+Mon Sep 27 07:15:47 EST 2004  perlkat AT katspace dot com
+  * enable test of script
+
+Mon Sep 27 07:06:02 EST 2004  perlkat AT katspace dot com
+  * clearing out remnant of configPL
+
+Sat Sep 25 21:38:32 EST 2004  perlkat AT katspace dot com
+  * fix OL oddness and invisible list items in TOC
+  	Kevin Brannen pointed out some oddness with ToC which had
+  OL lists instead of UL lists, and didn't like the "invisible"
+  list items in TOC lists; and the two problems turned out to be related.
+  Rewrote the TOC stuff to keep more information, nest list items better,
+  and only use "invisible" list items when absolutely necessary.
+
+Sat Sep 25 14:09:53 EST 2004  perlkat AT katspace dot com
+  * testing and fixing tocmap
+
+2.16 Fri 24 September 2004
+--------------------------
+Fri Sep 24 15:43:33 EST 2004  perlkat AT katspace dot com
+  * oops changes fix
+
+Fri Sep 24 15:42:16 EST 2004  perlkat AT katspace dot com
+  * tweaking auto-release stuff
+  	I forgot that the TODO file isn't under revision control
+  (just the .todo file...)
+
+2.15 Fri 24 September 2004
+--------------------------
+Fri Sep 24 15:39:07 EST 2004  perlkat AT katspace dot com
+  * update release notes
+
+Fri Sep 24 15:36:57 EST 2004  perlkat AT katspace dot com
+  * things for the automated release process
+
+Fri Sep 24 15:03:45 EST 2004  perlkat AT katspace dot com
+  * added .todo file (the devtodo program)
+  	With intent to automatically generate a TODO file from it.
+
+Fri Sep 24 15:00:39 EST 2004  perlkat AT katspace dot com
+  * correcting error in darcs test stuff
+
+Fri Sep 24 14:58:55 EST 2004  perlkat AT katspace dot com
+  * change over to Module::Build
+
+2.10 Tue 12th August 2003
+-------------------------
+	- added --to_string and --in_string options to HTML::GenToc
+generate_anchors and generate_toc to enable using strings rather
+than files, so that one can use the module in perl scripts which
+are doing additional processing.
+
+2.02 Sat 15th February 2003
+---------------------------
+	- removed heavily spammed email address from documentation.
+
+2.01 Sun 8th December 2002
+--------------------------
+	- Bug fix in hypertoc, to fix the way Getopt::ArgvFile is called.
+
+2.00 Sun 8th December 2002
+--------------------------
+	- no longer using the AppConfig module, but the old style of
+calling the methods should still work.  Some of the options which were
+synonyms have been removed.
+	- the hypertoc script is now part of this distribution. It now
+uses Getopt::Long and Getopt::ArgvFile instead of AppConfig.  This
+gives it the full power of Getopt::Long, while config files are taken
+care of by Getopt::ArgvFile.  This means a slightly different format
+for config files.
+
+1.4  Wed 20th November 2002
+---------------------------
+	- CPAN testers complained about a lack of explicitly stating
+all the dependencies of AppConfig, which either means that AppConfig
+has changed desperately, or their testing methods have changed, since
+I didn't think it was possible to get the AppConfig module without getting
+all its dependent modules, but, oh well.
+
+1.3  Sun 17th November 2002
+---------------------------
+	- fixed minor bug where the filename was always included in
+the table of contents even when it was an inline TOC and the filename
+in question was the containing file. (Only a minor bug because the link
+still worked, but it messed up things when the file in question was
+a .shtml file which had query arguments to it; presumably would mess up
+things like .php files as well.)
+
+1.2  Sat 26th October 2002
+--------------------------
+	- fixed bug which would produce rubbish in the TOC if
+there happened to be an element which had an *attribute* which
+had content which matched a TOC entry; this would make it start
+collecting content for that, and never find an end-tag for it.
+
+1.1  Wed 28th August 2002
+-------------------------
+	- fixed bug with requirements which prevented working with perl 5.5
+
+1.0  Fri 24th May 2002
+----------------------
+	- cleaned up the tests (now uses Test::Simple and compares test files
+nicely)
+	- rearranged the documentation
+	- added --help and --manpage options
+
+0.3  Fri 1st Mar 2002
+---------------------
+	- added --notoc_match option to suppress ToC for individual tags
+
+0.2  Sat 23rd Feb 2002
+----------------------
+	- added README file
+	- updated documentation
+	- made the generated ToC more XHTML compliant
+	- changed tests slightly
+
+0.1  Mon 28th Jan 2002
+----------------------
+	- conversion of htmltoc to a module
+	- use HTML::SimpleParse to parse the HTML
+	- split the ToC generation into two phases; generate_anchors
+and generate_toc
+	- expanded the --inline option to place the ToC after the first
+instance of any tag, or to replace a given tag
+	- no longer use prefix + $$ to make anchor names unique; instead
+derive them from the content of the significant element.
+	- various other slight improvements
+

@@ -1,0 +1,285 @@
+---
+len: 21
+count: 13
+seq:
+ - approx: 31
+   score: 9
+   inst: |
+    <table>
+      <tr>
+        <td>
+          <font>
+            <a href="http://images.google.cz/images?hl=cs&q=Acer+notebook&btnG=Vyhledat+Googlem&lr=&ie=UTF-8&oe=ISO-8859-2&um=1&sa=N&tab=wi">
+            </a>
+            <a href="http://groups.google.cz/groups?hl=cs&q=Acer+notebook&btnG=Vyhledat+Googlem&lr=&ie=ISO-8859-2&oe=ISO-8859-2&um=1&sa=N&tab=wg">
+            </a>
+    
+          </font>
+        </td>
+      </tr>
+    </table>
+ - approx: 125
+   inst: |
+    <a href="/url?sa=L&ai=Bpctn6htHRsGDD6SGQuuJtOwOzLj3EfC04u0BjOSAtgmQ58gBCAAQAhgCKAIwATgBUP3t8uv4_____wFgzOHtgfwGmAGchwGYAYWcBpgB850GyAEBqQLCH_8ipaBpPtkDwC3KyLqC6PrgAwg&q=http://www.czechcomputer.cz/fulltext.jsp%3Fquery%3DAcer%26type%3Dstockitem&usg=AFrqEzeSGBUORY5PaprUc_EtH2KJE9uSsA">
+    </a>
+    
+    <table>
+      <tr>
+        <td>
+          <font>
+            <a href="/search?q=Acer+notebook&hl=cs&ie=UTF-8&lr=lang_cs&sa=X&oi=lrtip&ct=restrict&cad=7">
+            </a>
+            <a href="/preferences?q=Acer+notebook&hl=cs&lr=&ie=UTF-8&sa=X&oi=lrtip&ct=preferences&cad=7">
+            </a>
+          </font>
+        </td>
+      </tr>
+    </table>
+ - exact: 146
+   inst: |
+    <div>
+      <a href="http://www.acer.com/">
+      </a>
+      <table>
+        <tr>
+          <td>
+            <font>
+              <br/>
+              <span>
+              </span>
+              <nobr>
+                <a href="http://216.239.59.104/search?q=cache:Y2L1m4bHSCwJ:www.acer.com/+Acer+notebook&hl=cs&ct=clnk&cd=1&gl=cz&ie=UTF-8">
+                </a>
+                <a href="/search?hl=cs&lr=&ie=UTF-8&q=related:www.acer.com/">
+                </a>
+              </nobr>
+            </font>
+          </td>
+        </tr>
+      </table>
+    </div>
+ - exact: 167
+   inst: |
+    <div>
+      <a href="http://notebook.cz/model/Acer">
+      </a>
+      <table>
+        <tr>
+          <td>
+            <font>
+              <br/>
+              <span>
+              </span>
+              <nobr>
+                <a href="http://216.239.59.104/search?q=cache:fSX7dYIE0SIJ:notebook.cz/model/Acer+Acer+notebook&hl=cs&ct=clnk&cd=2&gl=cz&ie=UTF-8">
+                </a>
+                <a href="/search?hl=cs&lr=&ie=UTF-8&q=related:notebook.cz/model/Acer">
+                </a>
+              </nobr>
+            </font>
+          </td>
+        </tr>
+      </table>
+    </div>
+ - exact: 188
+   inst: |
+    <div>
+      <a href="http://global.acer.com/PRODUCTS/notebook/index.htm">
+      </a>
+      <table>
+        <tr>
+          <td>
+            <font>
+              <br/>
+              <span>
+              </span>
+              <nobr>
+                <a href="http://216.239.59.104/search?q=cache:Yj2_b8ryvPoJ:global.acer.com/PRODUCTS/notebook/index.htm+Acer+notebook&hl=cs&ct=clnk&cd=3&gl=cz&ie=UTF-8">
+                </a>
+                <a href="/search?hl=cs&lr=&ie=UTF-8&q=related:global.acer.com/PRODUCTS/notebook/index.htm">
+                </a>
+              </nobr>
+            </font>
+          </td>
+        </tr>
+      </table>
+    </div>
+ - exact: 209
+   inst: |
+    <div>
+      <a href="http://www.ciao.de/Notebooks_538900_2-acer">
+      </a>
+      <table>
+        <tr>
+          <td>
+            <font>
+              <br/>
+              <span>
+              </span>
+              <nobr>
+                <a href="http://216.239.59.104/search?q=cache:aD3v3e8iyYUJ:www.ciao.de/Notebooks_538900_2-acer+Acer+notebook&hl=cs&ct=clnk&cd=4&gl=cz&ie=UTF-8">
+                </a>
+                <a href="/search?hl=cs&lr=&ie=UTF-8&q=related:www.ciao.de/Notebooks_538900_2-acer">
+                </a>
+              </nobr>
+            </font>
+          </td>
+        </tr>
+      </table>
+    </div>
+ - exact: 230
+   inst: |
+    <div>
+      <a href="http://astore.amazon.de/acer-notebook-21/">
+      </a>
+      <table>
+        <tr>
+          <td>
+            <font>
+              <br/>
+              <span>
+              </span>
+              <nobr>
+                <a href="http://216.239.59.104/search?q=cache:RxIeoCFntm8J:astore.amazon.de/acer-notebook-21/+Acer+notebook&hl=cs&ct=clnk&cd=5&gl=cz&ie=UTF-8">
+                </a>
+                <a href="/search?hl=cs&lr=&ie=UTF-8&q=related:astore.amazon.de/acer-notebook-21/">
+                </a>
+              </nobr>
+            </font>
+          </td>
+        </tr>
+      </table>
+    </div>
+ - exact: 251
+   inst: |
+    <div>
+      <a href="http://zbozi.seznam.cz/?q=notebook+acer">
+      </a>
+      <table>
+        <tr>
+          <td>
+            <font>
+              <br/>
+              <span>
+              </span>
+              <nobr>
+                <a href="http://216.239.59.104/search?q=cache:6Ij52CgULuQJ:zbozi.seznam.cz/%3Fq%3Dnotebook%2Bacer+Acer+notebook&hl=cs&ct=clnk&cd=6&gl=cz&ie=UTF-8">
+                </a>
+                <a href="/search?hl=cs&lr=&ie=UTF-8&q=related:zbozi.seznam.cz/%3Fq%3Dnotebook%2Bacer">
+                </a>
+              </nobr>
+            </font>
+          </td>
+        </tr>
+      </table>
+    </div>
+ - approx: 272
+   score: 38
+   inst: |
+    <div>
+      <a href="http://zbozi.seznam.cz/searchScreen?q=notebook%20acer&order=relevance&minPrice=5000">
+      </a>
+      <table>
+        <tr>
+          <td>
+            <font>
+              <br/>
+              <span>
+              </span>
+              <nobr>
+                <a href="http://216.239.59.104/search?q=cache:EIVOyG5ceHMJ:zbozi.seznam.cz/searchScreen%3Fq%3Dnotebook%2520acer%26order%3Drelevance%26minPrice%3D5000+Acer+notebook&hl=cs&ct=clnk&cd=7&gl=cz&ie=UTF-8">
+                </a>
+                <a href="/search?hl=cs&lr=&ie=UTF-8&q=related:zbozi.seznam.cz/searchScreen%3Fq%3Dnotebook%2520acer%26order%3Drelevance%26minPrice%3D5000">
+                </a>
+              </nobr>
+    
+            </font>
+          </td>
+        </tr>
+      </table>
+    </div>
+ - exact: 296
+   inst: |
+    <div>
+      <a href="http://www.acersupport.com/notebook/">
+      </a>
+      <table>
+        <tr>
+          <td>
+            <font>
+              <br/>
+              <span>
+              </span>
+              <nobr>
+                <a href="http://216.239.59.104/search?q=cache:oMCO1L2s10gJ:www.acersupport.com/notebook/+Acer+notebook&hl=cs&ct=clnk&cd=8&gl=cz&ie=UTF-8">
+                </a>
+                <a href="/search?hl=cs&lr=&ie=UTF-8&q=related:www.acersupport.com/notebook/">
+                </a>
+              </nobr>
+            </font>
+          </td>
+        </tr>
+      </table>
+    </div>
+ - exact: 317
+   inst: |
+    <div>
+      <a href="http://www.notebookinfo.de/suche_vorgang/hersteller/Acer/orderby/test_vorhanden%20DESC/">
+      </a>
+      <table>
+        <tr>
+          <td>
+            <font>
+              <br/>
+              <span>
+              </span>
+              <nobr>
+                <a href="http://216.239.59.104/search?q=cache:ixcODuV9B18J:www.notebookinfo.de/suche_vorgang/hersteller/Acer/orderby/test_vorhanden%2520DESC/+Acer+notebook&hl=cs&ct=clnk&cd=9&gl=cz&ie=UTF-8">
+                </a>
+                <a href="/search?hl=cs&lr=&ie=UTF-8&q=related:www.notebookinfo.de/suche_vorgang/hersteller/Acer/orderby/test_vorhanden%2520DESC/">
+                </a>
+              </nobr>
+            </font>
+          </td>
+        </tr>
+      </table>
+    </div>
+ - exact: 338
+   inst: |
+    <div>
+      <a href="http://www.tigerdirect.com/applications/category/category_slc.asp?MfrId=12&CatId=17">
+      </a>
+      <table>
+        <tr>
+          <td>
+            <font>
+              <br/>
+              <span>
+              </span>
+              <nobr>
+                <a href="http://216.239.59.104/search?q=cache:s2FrOtT2nRUJ:www.tigerdirect.com/applications/category/category_slc.asp%3FMfrId%3D12%26CatId%3D17+Acer+notebook&hl=cs&ct=clnk&cd=10&gl=cz&ie=UTF-8">
+                </a>
+                <a href="/search?hl=cs&lr=&ie=UTF-8&q=related:www.tigerdirect.com/applications/category/category_slc.asp%3FMfrId%3D12%26CatId%3D17">
+                </a>
+              </nobr>
+            </font>
+          </td>
+        </tr>
+      </table>
+    </div>
+ - approx: 442
+   score: 9
+   inst: |
+    <table>
+      <tr>
+        <td>
+          <font>
+            <a href="/">
+            </a>
+            <a href="/intl/cs/ads/">
+            </a>
+    
+          </font>
+        </td>
+      </tr>
+    </table>

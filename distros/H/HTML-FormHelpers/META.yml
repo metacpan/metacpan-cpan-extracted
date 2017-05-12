@@ -1,0 +1,28 @@
+---
+abstract: 'Useful routines for generating HTML form elements'
+author:
+  - 'Jonathan Scott Duff <duff@pobox.com>'
+build_requires:
+  Test::More: 0
+  Test::XPath: 0
+  perl: v5.10.0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300032, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-FormHelpers
+requires:
+  Exporter: 0
+  Scalar::Util: 0
+  Try::Tiny: 0
+  parent: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://github.com/perlpilot/HTML-FormHelpers/issues
+  repository: git://github.com/perlpilot/HTML-FormHelpers.git
+version: 0.004

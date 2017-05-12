@@ -1,0 +1,14 @@
+---
+name: HTML-Menu-Select
+version: 1.00
+author:
+  - Carl Franks <cpan@fireartist.com>
+abstract: Create HTML for select menus to simplify your templates.
+license: perl
+requires:
+  Test::More: 0
+provides:
+  HTML::Menu::Select:
+    file: lib/HTML/Menu/Select.pm
+    version: 1.00
+generated_by: Module::Build version 0.2611

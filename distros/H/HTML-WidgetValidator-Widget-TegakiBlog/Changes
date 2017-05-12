@@ -1,0 +1,6 @@
+Revision history for Perl extension HTML::WidgetValidator::Widget::TegakiBlog.
+
+0.01  Sat Aug  2 15:27:34 2008
+	- original version; created by h2xs 1.23 with options
+		-AX -n HTML::WidgetValidator::Widget::TegakiBlog
+

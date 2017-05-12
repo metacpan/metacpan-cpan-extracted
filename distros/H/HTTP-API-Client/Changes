@@ -1,0 +1,15 @@
+2015-01-20 - v0.04
+    + Update POD
+    + Remove unwanted perltidy message
+
+2015-01-20 - v0.04
+    + Fix test
+
+2015-01-19 - 0.03
+    + Add ENVIRONMENT VARIABLE usage
+
+2015-01-18 - 0.02
+    + Cleanup
+
+2015-01-18 - 0.01
+    + First version

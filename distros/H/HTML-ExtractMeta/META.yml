@@ -1,0 +1,24 @@
+---
+abstract: 'Helper class for extracting useful meta data from HTML pages.'
+author:
+  - 'Tore Aursand <toreau@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '7.24'
+  File::Slurper: '0.009'
+  FindBin: '0'
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-ExtractMeta
+requires:
+  Mojolicious: '7.08'
+  Moose: '2.1806'
+  namespace::autoclean: '0.28'
+version: '0.21'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,0 +1,71 @@
+[% page.yui.push('button', 'calendar', 'container', 'slider') %]
+[% page.scripts.push('/static/scripts/task/enqueue.js') %]
+[% page.styles.push('enqueue.css') %]
+
+<form method="GET" id="tasksel">
+	<input type="hidden" name="name" />
+</form>
+
+<form id="enqueue" method="POST">
+	<h2>Enqueue a Task</h2>
+
+	<table>
+		<tr>
+			<th>Task</th>
+			<td>
+				<select id="task" name="task" onchange="document.getElementById('tasksel').name.value=this.options[this.selectedIndex].value; document.getElementById('tasksel').submit();">
+					[% FOREACH name = tasks %]
+						<option value="[% name %]" [% 'selected="selected"' IF c.req.params.name == name %]>[% name %]</option>
+					[% END %]
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<th>Date/Time</th>
+			<td>
+				<input type="text" name="date_to_execute" id="date_to_execute" value="[% now %]" />
+				<img id="btn_date_to_execute" src="/static/images/time.png" style="cursor:pointer" />
+			</td>
+		</tr>
+		<tr>
+			<th>Priority</th>
+			<td>
+				<input id="priority" type="hidden" name="priority" value="5" />
+				<div id="priority-slider-bg"><div id="priority-slider-thumb"><img src="/static/yui/build/slider/assets/thumb-n.gif" /></div></div>
+				<div id="priority-text"></div>
+			</td>
+		</tr>
+	</table>
+
+	<h2>Options</h2>
+	[% IF optloaderr %]
+		<div>
+			An option source was set, but an error occurred while 
+			attempting to retrieve them.
+		</div>
+	[% END %]
+
+	<table>
+		[% FOREACH option = task.options %]
+			<tr>
+				<th>[% option.name %]</th>
+				<td>
+					[% SWITCH option.type %]
+						[% CASE 'bool' %]
+							<input type="checkbox" name="option_[% option.name %]" value="1" [% 'checked="checked"' IF option.value %] />
+						[% CASE 'combo' %]
+							<select name="option_[% option.name %]">
+								[% FOREACH choice = option.choices.all %]
+									<option value="[% choice.value %]">[% choice.name %]</option>
+								[% END %]
+							</select>
+						[% CASE %]
+							<input type="text" name="option_[% option.name %]" value="[% option.value %]" />
+					[% END %]
+				</td>
+			</tr>
+		[% END %]
+	</table>
+
+	<button type="submit" id="button_enqueue" value="enqueue">enqueue</button>
+</form>

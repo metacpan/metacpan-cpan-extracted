@@ -1,0 +1,132 @@
+=head1 NAME
+
+HTML::HTML5::DOM::HTMLTableElement - implementation of the HTMLTableElement interface of the HTML DOM
+
+=head1 DESCRIPTION
+
+HTML::HTML5::DOM::HTMLTableElement is an implementation of the HTMLTableElement interface of the HTML DOM. See L<HTML::HTML5::DOM> for a list of the conventions that have been used when translating the DOM to Perl.
+
+=head2 HTML Elements
+
+This class applies to the following HTML elements.
+
+=over
+
+=item * C<< {http://www.w3.org/1999/xhtml}table >>
+
+=back
+
+=head2 Inheritance
+
+HTML::HTML5::DOM::HTMLTableElement inherits methods from the following Perl classes.
+
+=over
+
+=item * L<HTML::HTML5::DOM::HTMLElement>
+
+=item * L<XML::LibXML::Augment::Element>
+
+=item * L<XML::LibXML::Augment::Node>
+
+=item * L<XML::LibXML::Element>
+
+=item * L<XML::LibXML::Node>
+
+=item * L<XML::LibXML::QuerySelector>
+
+=item * L<HTML::HTML5::DOMutil::FancyISA>
+
+=back
+
+=head2 Additional Methods
+
+As well as its inherited methods, this class provides the following methods.
+
+=over
+
+=item * C<< border >>
+
+@@TODO - not implemented yet
+
+=item * C<< caption >>
+
+returns the C<< <caption> >> element (if any)
+
+=item * C<< createCaption >>
+
+returns the C<< <caption> >> element, creating one if there is none
+
+=item * C<< createTBody >>
+
+@@TODO - not implemented yet
+
+=item * C<< createTFoot >>
+
+@@TODO - not implemented yet
+
+=item * C<< createTHead >>
+
+@@TODO - not implemented yet
+
+=item * C<< deleteCaption >>
+
+delete the C<< <caption> >> element (if any), and returns a boolean indicating whether anything was deleted
+
+=item * C<< deleteRow >>
+
+@@TODO - not implemented yet
+
+=item * C<< deleteTFoot >>
+
+@@TODO - not implemented yet
+
+=item * C<< deleteTHead >>
+
+@@TODO - not implemented yet
+
+=item * C<< insertRow >>
+
+@@TODO - not implemented yet
+
+=item * C<< rows >>
+
+@@TODO - not implemented yet
+
+=item * C<< tBodies >>
+
+@@TODO - not implemented yet
+
+=item * C<< tFoot >>
+
+@@TODO - not implemented yet
+
+=item * C<< tHead >>
+
+@@TODO - not implemented yet
+
+=back
+
+=head1 BUGS
+
+L<http://rt.cpan.org/Dist/Display.html?Queue=HTML-HTML5-DOM>.
+
+=head1 SEE ALSO
+
+L<HTML::HTML5::DOM>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2012, 2014 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+
+

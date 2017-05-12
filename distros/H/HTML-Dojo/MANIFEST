@@ -1,0 +1,13 @@
+Changes
+DOJO_LICENSE
+lib/HTML/Dojo.pm
+lib/HTML/Dojo/common.pm
+lib/HTML/Dojo/editions.pm
+lib/HTML/Dojo/src.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/file.t
+t/HTML-Dojo.t
+t/list.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,33 @@
+Revision history for Perl extension HTTP::CryptoCookie.
+
+1.14  Mon Feb 25 15:23:45 2008
+    - Added compress function to Ascii::Armour
+    - Used a shorter AA header
+	- modified new() to add -header argument to be compatible
+	  with Crypt::CBC 2.17.
+    - modified Makefile.PL to require Crypt::CBC 2.17
+    - updated Makefile.PL to correct inaccurate prereq announcing
+
+1.13  Mon Jun 26 11:37:18 2006
+	- modified ASCII Armouring header
+
+1.12  Tue May 16 13:52:55 2006
+	- added Digest::SHA256 to Makefile.PL due to build failure
+
+1.11  Fri Feb 24 14:03:32 2006
+	- fixup of problem in del_cookie method.
+	- cleanup of POD
+	- moved from Digest::SHA256 to Digest::SHA2 (due to deprecation)
+	- fixup for CGI::Cookie 1.26
+
+1.10  Fri Dec 02 07:45:56 2005
+	- moved to HTTP tree in CPAN
+	- cleaned up some tests
+	- cleaned up code
+	- improved POD and included die caveat when used
+	  under mod_perl.
+
+0.01  Wed May 28 23:26:26 2003
+	- original version; created by h2xs 1.22 with options
+		-AXc -n CryptoCookie -v 0.01 --use-new-tests -b 5.6.1 -O
+

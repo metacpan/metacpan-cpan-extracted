@@ -1,0 +1,61 @@
+
+0.004 Tue Nov 24 14:52:48 GMT 2009
+  - Newer Module::Install less broken auto_install.
+
+0.003 Wed Jun 17 12:08:33 BST 2009
+  - Fix license in bundled selective_proxy script.
+
+0.002 Mon Jun 15 15:47:45 BST 2009
+
+  0.7 August 2008 - NON CPAN RELEASE
+  - SSL traffic was being sent to port 80/http on the destination server. 
+    This has been corrected, and any traffic inside a MITM'd CONNECT method 
+    will be sent to 443 by default (or what the user specifies), and requests
+    are forced to be HTTPs.
+
+  0.6 Auguest 2008 - NON CPAN RELEASE
+  - Add proxying of SSL traffic via MITM.
+
+  0.5 July 2008 - NON CPAN RELEASE
+  - Add an upstream_proxy flag to the configuration, which, if present, is the
+    hostname and port number of the upstream proxy server to use.
+  - Add script to pack to a .exe on Win32
+
+0.001 Tue Jun  9 21:56:45 BST 2009
+
+Inital CPAN release as open source. This code was generously Open Sourced
+by Venda whoo paid for 100% of it's development.
+
+A binary release of the latest version of this software for Windows may be
+found at:
+	  http://www.venda.com/page/developertools
+
+  0.4 July 2008 - NON CPAN RELEASE
+  - Add a debug flag to the configuration, which prints out match table, and
+    attempts to match in detail for user debugging.
+  A binary release of the latest version of this software for Windows may be
+  found at:
+  http://www.venda.com/page/developertools
+
+  0.3 July 2008 - NON CPAN RELEASE
+  - Change mime type detection to just use the file extension of the file 
+    being served from local disk (rather than magic). Windows doesn't have
+    a magic file...
+  - Eliminate a bug when you map a specific file, local disk path was getting 
+    / appended, this is now removed.
+  - Fix a bug which sometimes caused partial content to be served.
+  - Insist on new HTTP::Headers, as we need it's ->if_modified_since method
+    to return an epochtime.
+  - Shake on a little binmode sauce, to make Windows play nicely when serving
+    binary files.
+
+  0.2 July 2008 - NON CPAN RELEASE
+    - Fixed t/03_pod_coverage.t - I'd ripped this off from another one of my modules, and it still had references to that module,
+      and therefore didn't work without this module installed.
+    - Added relevant requires, so that the HTTP::Proxy::Engine classes get
+      bundled with the script.
+    - Change packing instructions so that we don't pack just the .par
+
+  0.1 July 2008 - NON CPAN RELEASE
+    - Initial version
+  

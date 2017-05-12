@@ -1,0 +1,59 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: HTTP-Link-Parser
+Upstream-Contact: Toby Inkster <tobyink@cpan.org>
+Source: https://metacpan.org/release/HTTP-Link-Parser
+
+Files: Changes
+ META.json
+ META.yml
+ dist.ini
+ doap.ttl
+Copyright: Copyright 2014 Toby Inkster.
+License: Expat
+
+Files: README
+ lib/HTTP/Link/Parser.pm
+ t/02rdf.t
+Copyright: Copyright (C) 2009-2011, 2014 by Toby Inkster.
+License: Expat
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: CONTRIBUTING
+ INSTALL
+ LICENSE
+Copyright: Unknown
+License: Unknown
+
+Files: t/01basic.t
+Copyright: Copyright (C) 2014 by Toby Inkster.
+License: Expat
+
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Expat
+ This software is Copyright (c) 2014 by Toby Inkster.
+ 
+ This is free software, licensed under:
+ 
+   The MIT (X11) License
+
+License: Artistic-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

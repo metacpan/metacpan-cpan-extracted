@@ -1,0 +1,12 @@
+HTML::Bare Changelog
+
+0.02
+  - Correct bugs related to self closing nodes. ( name stack was not being properly maintained for them )
+  - Add a unit test, Bug_self_closing.t, to test fixed bugs
+  - Fix existing bug carried over from XML::Bare regarding incorrect _z values
+  - Create a new function 'raw' to give you the original string of text for a specific node.
+    This is important for HTML as the exact contents of nodes are often useful.
+
+0.01
+  - Made to parse HTML by way of an open node name stack
+  - Forked from XML::Bare 0.53

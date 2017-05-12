@@ -1,0 +1,17 @@
+---
+abstract: 'Moose-based interface to dialog (simple text based GUI)'
+author:
+  - 'Adam Flott <adam@npjh.com>'
+build_requires: {}
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200015, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Hobocamp
+requires:
+  ExtUtils::CChecker: 0
+  Moose: 0
+  Sub::Exporter: 0
+version: 0.600

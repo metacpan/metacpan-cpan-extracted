@@ -1,0 +1,49 @@
+HTTP/Server/Singlethreaded version 0.11
+==================================
+A single-threaded HTTP server suitable for building
+stand-alone web applications around. On systems without
+working non-blocking listening sockets, we can only
+accept one new client per select interation, and the
+module figures out what is available and uses does single
+or multiple accept calls depending on the platform.
+
+Tested under glibc linux and activestate on win2000.
+
+This version is still very early, but the following command
+line is able to produce a server on port 8000 that exports
+the files in my /tmp directory and provides a clock service:
+
+perl -we 'use HTTP::Server::Singlethreaded \
+   static => {"/tmp/" => "/tmp"},\
+   function => {"/d/" => sub { \
+  "Content-type: text/plain\n\n$_{QUERY_STRING}\n".localtime \
+  }};Serve while 1'
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Alternately, just create a HTTP/Server directory under
+somwhere in your Perl installation's include path and
+copy Singlethreaded.pm there.
+
+You may want to edit the module some to make it a
+little less chatty to STDOUT.
+
+DEPENDENCIES
+
+This module requires no modules or libraries not
+distributed with core Perl.
+
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2004,2006,2008 David Nicol.  GPL/AL. 
+

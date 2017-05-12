@@ -1,0 +1,16 @@
+<form method="post">
+<table>
+<tr><th>Emp ID</th><td>123<input name="emp_id" type="hidden" value="123" /></td></tr>
+<tr><th>Emp Salutation</th><td><select name="emp_salutation"><option value="NONE">None</option><option value="Mr">Mr</option><option value="Ms">Ms</option><option value="Mrs">Mrs</option><option value="Miss">Miss</option><option value="Dr">Dr</option><option value="Sir">Sir</option><option value="Prof">Professor</option></select></td></tr>
+<tr><th>Emp Name</th><td><input name="emp_name" type="text" value="Fred Flintstone" /></td></tr>
+<tr><th>Emp Title</th><td><input name="emp_title" type="text" value="CEO" /></td></tr>
+<tr><th>Emp Addr ID</th><td><input name="emp_addr_id" type="text" value="225" /></td></tr>
+<tr><th>Emp Birth Dt</th><td><input name="emp_birth_dt" type="text" value="20-10-55" /></td></tr>
+<input name="emp_modify_ts" type="hidden" value="" />
+<input name="emp_modify_uid" type="hidden" value="1003" />
+</table>
+<p>
+<input name="save" type="submit" value="Save" />
+<input name="cancel" type="submit" value="Cancel" />
+</p>
+</form>

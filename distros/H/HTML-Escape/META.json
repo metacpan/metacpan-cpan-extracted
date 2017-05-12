@@ -1,0 +1,91 @@
+{
+   "abstract" : "Extremely fast HTML escaping",
+   "author" : [
+      "Goro Fuji"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.5.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-Escape",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Devel::PPPort" : "3.20",
+            "ExtUtils::CBuilder" : "0",
+            "Module::Build::Pluggable::PPPort" : "0.04",
+            "Test::More" : "0.98",
+            "Test::Requires" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Devel::PPPort" : "3.20",
+            "Module::Build" : "0.4005",
+            "Module::Build::Pluggable::PPPort" : "0.01"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "XSLoader" : "0",
+            "parent" : "0",
+            "perl" : "5.008008"
+         }
+      }
+   },
+   "provides" : {
+      "HTML::Escape" : {
+         "file" : "lib/HTML/Escape.pm",
+         "version" : "1.10"
+      },
+      "HTML::Escape::PurePerl" : {
+         "file" : "lib/HTML/Escape/PurePerl.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/HTML-Escape/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/HTML-Escape",
+      "repository" : {
+         "url" : "git://github.com/tokuhirom/HTML-Escape.git",
+         "web" : "https://github.com/tokuhirom/HTML-Escape"
+      }
+   },
+   "version" : "1.10",
+   "x_contributors" : [
+      "Fuji, Goro <fuji.goro@dena.jp>",
+      "Shlomi Fish <shlomif@shlomifish.org>",
+      "Aaron Crane <arc@cpan.org>",
+      "Tokuhiro Matsuno <tokuhirom@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

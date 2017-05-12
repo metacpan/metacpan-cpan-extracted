@@ -1,0 +1,1862 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="../IRstyle.css">
+<title>Síntesis y crítica de las evaluaciones de la efectividad de los motores de búsqueda en la Web. (Synthesis and critical review of evaluations of the effectiveness of Web search engines)</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="keywords" content="effectiveness, information retrieval, World Wide Web, search engines, relevance, information needs, evaluation">
+<meta name="description" content="A considerable number of proposals for measuring the effectiveness of information retrieval systems have been made since the early days of such systems. The consolidation of the World Wide Web as the paradigmatic method for developing the Information Society, and the continuous multiplication of the number of documents published in this environment, has led to the implementation of the most advanced, and extensive information retrieval systems, in the shape of web search engines. Nevertheless, there is an underlying concern about the effectiveness of these systems, especially when they usually present, in response to a question, many documents with little relevance to the users' information needs. The evaluation of these systems has been, up to now, dispersed and various. The scattering is due to the lack of uniformity in the criteria used in evaluation, and this disparity derives from their a periodicity and variable coverage. In this review, we identify three groups of studies: explicit evaluations, experimental evaluations and, more recently, several proposals for the establishment of a global framework to evaluate these systems.">
+<meta name="VW96.objecttype" content="Document">
+<meta name="ROBOTS" content="ALL">
+<meta name="DC.Title" content="Síntesis y crítica de las evaluaciones de la efectividad de los motores de búsqueda en la Web. (Synthesis and critical review of evaluations of the effectiveness of Web search engines)">
+<meta name="DC.Creator" content="Francisco Javier Martínez Méndez, José Vicente Rodríguez Muñoz">
+<meta name="DC.Creator" content="Ed Summers">
+<meta name="DC.Subject" content="effectiveness, information retrieval, World Wide Web, search engines, relevance, information needs, evaluation">
+<meta name="DC.Description" content="A considerable number of proposals for measuring the effectiveness of information retrieval systems have been made since the early days of such systems. The consolidation of the World Wide Web as the paradigmatic method for developing the Information Society, and the continuous multiplication of the number of documents published in this environment, has led to the implementation of the most advanced, and extensive information retrieval systems, in the shape of web search engines. Nevertheless, there is an underlying concern about the effectiveness of these systems, especially when they usually present, in response to a question, many documents with little relevance to the users' information needs. The evaluation of these systems has been, up to now, dispersed and various. The scattering is due to the lack of uniformity in the criteria used in evaluation, and this disparity derives from their a periodicity and variable coverage. In this review, we identify three groups of studies: explicit evaluations, experimental evaluations and, more recently, several proposals for the establishment of a global framework to evaluate these systems.">
+<meta name="DC.Publisher" content="Professor T.D. Wilson">
+<meta name="DC.Date.created" content="2003.03.15">
+<meta name="DC.Coverage.PlaceName" content="Global">
+
+<script language="JavaScript" type="text/JavaScript">
+<!--
+function MM_preloadImages() { //v3.0
+  var d=document; if(d.images){ if(!d.MM_p) d.MM_p=new Array();
+    var i,j=d.MM_p.length,a=MM_preloadImages.arguments; for(i=0; i<a.length; i++)
+    if (a[i].indexOf("#")!=0){ d.MM_p[j]=new Image; d.MM_p[j++].src=a[i];}}
+}
+
+function MM_findObj(n, d) { //v4.01
+  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+    d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+  for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document);
+  if(!x && d.getElementById) x=d.getElementById(n); return x;
+}
+
+function MM_nbGroup(event, grpName) { //v6.0
+  var i,img,nbArr,args=MM_nbGroup.arguments;
+  if (event == "init" && args.length > 2) {
+    if ((img = MM_findObj(args[2])) != null && !img.MM_init) {
+      img.MM_init = true; img.MM_up = args[3]; img.MM_dn = img.src;
+      if ((nbArr = document[grpName]) == null) nbArr = document[grpName] = new Array();
+      nbArr[nbArr.length] = img;
+      for (i=4; i < args.length-1; i+=2) if ((img = MM_findObj(args[i])) != null) {
+        if (!img.MM_up) img.MM_up = img.src;
+        img.src = img.MM_dn = args[i+1];
+        nbArr[nbArr.length] = img;
+    } }
+  } else if (event == "over") {
+    document.MM_nbOver = nbArr = new Array();
+    for (i=1; i < args.length-1; i+=3) if ((img = MM_findObj(args[i])) != null) {
+      if (!img.MM_up) img.MM_up = img.src;
+      img.src = (img.MM_dn && args[i+2]) ? args[i+2] : ((args[i+1])? args[i+1] : img.MM_up);
+      nbArr[nbArr.length] = img;
+    }
+  } else if (event == "out" ) {
+    for (i=0; i < document.MM_nbOver.length; i++) {
+      img = document.MM_nbOver[i]; img.src = (img.MM_dn) ? img.MM_dn : img.MM_up; }
+  } else if (event == "down") {
+    nbArr = document[grpName];
+    if (nbArr)
+      for (i=0; i < nbArr.length; i++) { img=nbArr[i]; img.src = img.MM_up; img.MM_dn = 0; }
+    document[grpName] = nbArr = new Array();
+    for (i=2; i < args.length-1; i+=2) if ((img = MM_findObj(args[i])) != null) {
+      if (!img.MM_up) img.MM_up = img.src;
+      img.src = img.MM_dn = (args[i+1])? args[i+1] : img.MM_up;
+      nbArr[nbArr.length] = img;
+  } }
+}
+//-->
+</script>
+<style>
+<!--
+ table.MsoNormalTable
+	{mso-style-parent:"";
+	font-size:10.0pt;
+	font-family:"Times New Roman"}
+-->
+</style>
+</head>
+
+<body bgcolor="#ffffff" onLoad="MM_preloadImages('../figs/iauthori1.gif','../figs/isubji1.gif','../figs/isearch1.gif','../figs/ihome1.gif','../figs/contents1.gif')">
+<table align="center" border="0" cellpadding="0" cellspacing="0">
+<tr><td height="30" align="center" colspan="5"><h4>Information Research, Vol. 8 No. 2, January 2003</h4></td></tr>
+  <tr> 
+    <td><a href="infres82.html" target="_top" onClick="MM_nbGroup('down','group1','contents','',1)" onMouseOver="MM_nbGroup('over','contents','../figs/contents1.gif','',1)" onMouseOut="MM_nbGroup('out')"><img name="contents" src="../figs/contents.gif" border="0" alt="" onLoad=""></a></td>
+    <td><a href="../iraindex.html" target="_top" onClick="MM_nbGroup('down','group1','authorindex','',1)" onMouseOver="MM_nbGroup('over','authorindex','../figs/iauthori1.gif','',1)" onMouseOut="MM_nbGroup('out')"><img src="../figs/iauthori.gif" alt="" name="authorindex" width="120" height="20" border="0" onload=""></a></td>
+    <td><a href="../irsindex.html" target="_top" onClick="MM_nbGroup('down','group1','subjindex','',1)" onMouseOver="MM_nbGroup('over','subjindex','../figs/isubji1.gif','',1)" onMouseOut="MM_nbGroup('out')"><img src="../figs/isubji.gif" alt="" name="subjindex" width="120" height="20" border="0" onload=""></a></td>
+    <td><a href="../search.html" target="_top" onClick="MM_nbGroup('down','group1','search','',1)" onMouseOver="MM_nbGroup('over','search','../figs/isearch1.gif','',1)" onMouseOut="MM_nbGroup('out')"><img src="../figs/isearch.gif" alt="" name="search" width="120" height="20" border="0" onload=""></a></td>
+    <td><a href="http://InformationR.net/ir/" target="_top" onClick="MM_nbGroup('down','group1','home','',1)" onMouseOver="MM_nbGroup('over','home','../figs/ihome1.gif','',1)" onMouseOut="MM_nbGroup('out')"><img name="home" src="../figs/ihome.gif" border="0" alt="" onLoad=""></a></td>
+  </tr>
+</table>
+<hr color=#ff00ff SIZE=3>
+
+<h1>S&iacute;ntesis y cr&iacute;tica de las evaluaciones de la efectividad de 
+los motores de b&uacute;squeda en la Web.</h1>
+
+<h4><a href="mailto:javima@um.es">Francisco Javier Mart&iacute;nez M&eacute;ndez</a> y <a href="mailto:jovi@um.es">Jos&eacute; Vicente Rodr&iacute;guez Mu&ntilde;oz</a><br>
+Grupo de Tecnolog&iacute;as de la Informaci&oacute;n, Universidad de Murcia.<br> Campus 
+Universitario de Espinardo s/n 30.071-Murcia (Espa&ntilde;a).</h4>
+
+<div align="center"><b>Resumen</b></div>
+
+<blockquote>La necesidad de un an&aacute;lisis cr&iacute;tico de la evaluaci&oacute;n de los sistemas de recuperaci&oacute;n de informaci&oacute;n subyace tras su traslado al contexto de la web. En este nuevo escenario han surgido nuevos tipos de sistemas y de problemas que han dado lugar, al desarrollo de una serie de trabajos espec&iacute;ficamente concebidos para analizar la viabilidad de la recuperaci&oacute;n de informaci&oacute;n. En estos trabajos destacan tres grandes grupos: los dedicados a analizar las caracter&iacute;sticas formales o externas del sistemas, los que someten a estos sistemas a alg&uacute;n tipo de ensayo o experimentaci&oacute;n y finalmente, una serie de propuestas orientadas a proponer una metodolog&iacute;a cient&iacute;fica de car&aacute;cter global para su evaluaci&oacute;n. </blockquote>
+
+<div align="center"><b><a href="#abs">Abstract in English</a></b></div>
+
+  <br>
+
+<h2>Introducci&oacute;n.</h2>
+
+<p>El paralelismo existente entre el crecimiento de la informaci&oacute;n depositada en 
+diversas fuentes de la web y la proliferaci&oacute;n del n&uacute;mero de motores de b&uacute;squeda 
+o directorios que aseguran poseer la mayor cantidad de recursos debidamente 
+indexados y accesibles a trav&eacute;s de ellos, ha sido un fen&oacute;meno imposible de 
+evitar en tanto que, al poco tiempo de la aparici&oacute;n de estos ingenios y su 
+popularizaci&oacute;n en el seno de los usuarios de la red de redes, se gener&oacute; la 
+siguiente inc&oacute;gnita: &quot;&iquest;cu&aacute;l es el mejor de estos sistemas?&quot;. De hecho, casi todos los usuarios de Internet creen poseer la respuesta a esta pregunta, pero 
+se deber&iacute;a reflexionar detenidamente antes de contestar, &iquest;cu&aacute;les son las bases 
+sobre las que fundamentar&iacute;an su respuesta? </p>
+
+<p>El conjunto de argumentos a utilizar puede ser variado: familiaridad con un 
+motor determinado, pleno convencimiento de su calidad, desconocimiento del 
+resto, costumbre de uso de un sistema, etc. Sea cual fuere la respuesta, lo que 
+est&aacute; claro es que sobre estos nuevos sistemas de recuperaci&oacute;n de informaci&oacute;n 
+sigue latente una necesidad intr&iacute;nseca de evaluaci&oacute;n. </p>
+
+<p>Con el fin de hallar una respuesta, ha proliferado la producci&oacute;n cient&iacute;fica 
+en este campo, as&iacute; Oppenheim opina que estos trabajos “han ganado popularidad a 
+medida que la web ha crecido” (<a href="#Oppenheim, C.">Oppenheim, 2000</a>), en tanto que el mayor n&uacute;mero de recursos est&aacute; repercutiendo en la calidad de la respuesta ofrecida por estos 
+sistemas. </p>
+
+<p>Los resultados que ofrecen estos estudios de evaluaci&oacute;n muestran resultados 
+dispares y dispersos. La <i>disparidad</i> proviene de la obtenci&oacute;n de 
+conclusiones diferentes entre la mayor parte de los estudios, aunque siempre se 
+pueden identificar algunas reflexiones comunes en todos ellos. La <i>dispersi&oacute;n</i> 
+surge cuando el conjunto de motores evaluados es funcionalmente distinto, lo que 
+dificulta la especificaci&oacute;n de conclusiones v&aacute;lidas y generales, al evaluar en 
+cada estudio un conjunto de motores que poco tiene que ver con el evaluado por 
+otro. Incide tambi&eacute;n en esta dispersi&oacute;n la no repetici&oacute;n de estos estudios en el 
+tiempo, lo que conlleva a que los mismos ofrezcan conclusiones v&aacute;lidas sobre una 
+situaci&oacute;n determinada, al mismo tiempo que resultan incapaces de percibir la 
+evoluci&oacute;n de esta tecnolog&iacute;a, aspecto verdaderamente preocupante si se 
+consideran los continuos cambios que se producen en este campo, tanto de 
+car&aacute;cter t&eacute;cnico como de incremento de informaci&oacute;n. </p>
+<p>Tambi&eacute;n existen grandes diferencias entre los m&eacute;todos de evaluaci&oacute;n aplicados 
+y en el alcance. De hecho, existe una considerable cantidad de trabajos donde la 
+evaluaci&oacute;n se limita a aspectos expl&iacute;citos: externos, formales o testimoniales, 
+del motor de b&uacute;squeda (amigabilidad de la interfase, velocidad de respuesta, 
+formatos de presentaci&oacute;n, documentaci&oacute;n existente, ayuda del sistema, etc.). Si 
+bien estos aspectos poseen su importancia, no permiten interpretar, en modo 
+alguno, la efectividad de las operaciones de recuperaci&oacute;n de informaci&oacute;n. </p>
+<p>Un segundo conjunto de trabajos se centra m&aacute;s profundamente en el estudio de 
+esta efectividad, haciendo uso, en la mayor&iacute;a los casos, de las medidas basadas 
+en la realizaci&oacute;n de juicios de relevancia, exhaustividad y precisi&oacute;n 
+generalmente (<a href="#Lancaster, F. W.">Lancaster, 1973</a>). El uso de estas medidas, por s&iacute; solas, tampoco llega a ofrecer conclusiones definitivas y concluyentes sobre las prestaciones 
+de los motores de b&uacute;squeda (sin olvidar la subjetividad que presentan ambas 
+ratios), aunque s&iacute; proporcionan resultados mucho m&aacute;s s&oacute;lidos y argumentados que 
+las evaluaciones meramente formales. </p>
+
+<p>A la hora de abordar el dise&ntilde;o de un estudio de este tipo, junto a los 
+juicios de relevancia hay que tener presente la serie de problemas vinculados 
+con la propia naturaleza de la web, contexto donde se presentan situaciones que 
+en el entorno de los SRI tradicionales resultar&iacute;an de dif&iacute;cil imaginaci&oacute;n. Esto 
+se debe, entre otras muchas razones, a que el propio origen de la web poco tiene 
+que ver con la estructura de un SRI, sino m&aacute;s bien con la de un sistema 
+orientado a la difusi&oacute;n de informaci&oacute;n y de trabajo en grupo. Oppenheim presenta 
+varios de estos problemas: presencia de registros duplicados, tendencia a 
+recuperar documentos poco relevantes, recuperaci&oacute;n de enlaces a p&aacute;ginas web que 
+ya no existen, el &quot;spamming&quot;, alineaci&oacute;n inadecuada de los documentos 
+recuperados, etc. Con todo ello, para este autor “el problema fundamental de la 
+web es su tama&ntilde;o, heterogeneidad e inconsistencia; los recursos cambian y se 
+multiplican y la impresionante velocidad de respuesta de los motores de b&uacute;squeda 
+no est&aacute; ligada, generalmente, a una efectiva recuperaci&oacute;n de informaci&oacute;n” (<a href="#Oppenheim, C.">Oppenheim, 2000</a>). </p>
+
+<p>Esta at&iacute;pica naturaleza propicia que no puedan emplearse exclusivamente las 
+medidas basadas en la relevancia, sino que sea necesario establecer un grupo de 
+medidas espec&iacute;ficas al nuevo contexto, tales como la ratio de enlaces fallidos, 
+el grado de solapamiento, acierto &uacute;nico y cobertura del motor. El c&aacute;lculo de 
+estas medidas, unidas generalmente a la precisi&oacute;n y la exhaustividad, conforman 
+un segundo grupo de estudios, que pueden denominarse como estudios 
+experimentales, en tanto que suelen llevar a cabo alg&uacute;n ensayo antes de mostrar 
+sus conclusiones. </p>
+<p>Recientemente ha proliferado un tercer grupo de trabajos orientados hacia el 
+establecimiento de un marco global para la evaluaci&oacute;n de los motores de 
+b&uacute;squeda, m&aacute;s que a un an&aacute;lisis comparativo de la efectividad de unos motores 
+frente a otros. Aunque el objeto principal de estos trabajos var&iacute;a 
+considerablemente de uno a otro y, por lo tanto, resulta complicado establecer 
+una l&iacute;nea com&uacute;n entre ellos, s&iacute; coinciden en su pretensi&oacute;n de no ofrecer como 
+resultado qu&eacute; motor es m&aacute;s preciso o cu&aacute;l de ellos ha crecido m&aacute;s en el &uacute;ltimo 
+trimestre, sino en la idea de concebir una propuesta integral de evaluaci&oacute;n de 
+estos sistemas. </p>
+
+<h2>Estudios expl&iacute;citos.</h2>
+
+<p>Las primeras evaluaciones expl&iacute;citas de los motores de b&uacute;squeda datan del a&ntilde;o 
+1995, aproximadamente un a&ntilde;o despu&eacute;s de la aparici&oacute;n de los primeros motores. A 
+continuaci&oacute;n se discutir&aacute;n los par&aacute;metros m&aacute;s utilizados en estas evaluaciones, con referencia a los estudios que han contado con ellos en su realizaci&oacute;n y las 
+conclusiones generales de cada uno de ellos.</p>
+
+
+<h3>Aspectos formales y prestaciones en la recuperaci&oacute;n de informaci&oacute;n.</h3>
+
+<p>Los primeros estudios suelen basarse, preferentemente, en las caracter&iacute;sticas 
+formales del motor de b&uacute;squeda y en las descripciones t&eacute;cnicas del sistema. Chu 
+y Rosenthal (<a href="#Chu, H">Chu, 1996</a>), mencionan a Courtois, Baer y Stark, quienes destacan la 
+potencialidad del motor Webcrawler en todo lo relacionado con su flexibilidad a 
+la hora de plantear las ecuaciones de b&uacute;squeda y su r&aacute;pida respuesta, resaltando 
+adem&aacute;s, su interfase como muy adecuada para usuarios poco iniciados. Bas&aacute;ndose 
+tambi&eacute;n en la idea de la flexibilidad de la interfase, Scoville apuesta por los 
+motores Excite, Infoseek y Lycos. Chu y Rosenthal citan tambi&eacute;n el trabajo de 
+Kimmel, quien califica a Lycos como el mejor a partir del estudio de la 
+documentaci&oacute;n aportada y de sus caracter&iacute;sticas externas. </p>
+<p>Davis considera el tama&ntilde;o del &iacute;ndice del motor y las posibilidades de 
+recuperaci&oacute;n de informaci&oacute;n, decant&aacute;ndose por Alta Vista, Hot Bot e Infoseek, 
+sobre un total de siete motores evaluados (<a href="#Davis, E">Davis, 1996</a>). Westera analiza las 
+posibilidades que ofrece la interfase de usuario en la recuperaci&oacute;n de 
+informaci&oacute;n. La autora divide las capacidades de b&uacute;squeda en dos grupos: b&aacute;sicas 
+y especiales, en el primero destacan Alta Vista y Google y en el segundo Alta 
+Vista y Hot Bot (<a href="#Westera, G">Westera, 2001</a>). </p>
+
+<p>Chu y Rosenthal comentan finalmente que C|net, empresa de evaluaci&oacute;n de 
+servicios de informaci&oacute;n en l&iacute;nea, compar&oacute; diecinueve motores de b&uacute;squeda, 
+considerando el acierto, la facilidad de uso y la cantidad de opciones avanzadas 
+que proporcionaban. Como resultado final destacaban a Alta Vista (<a href="#Chu, H">Chu,
+1996</a>)).</p>
+
+<p>Slot analiz&oacute; exhaustivamente, en 1996, los contenidos manejados por diecis&eacute;is 
+motores de b&uacute;squeda y directorios, considerando tambi&eacute;n objeto de su estudio, 
+entre otras variables, el tiempo de respuesta y la claridad de la interfase. En 
+un segundo nivel de an&aacute;lisis, estudi&oacute; en profundidad las posibilidades que cada 
+motor ofrec&iacute;a en la recuperaci&oacute;n de informaci&oacute;n. En el primer apartado 
+consideraba a Alta Vista y Yahoo como excelentes; en el segundo apartado segu&iacute;a 
+destacando Alta Vista ligeramente sobre los dem&aacute;s (Slot, 1996). </p>
+<p>Tambi&eacute;n en 1996, Zorn, Emanoil y Marshall comparan cuatro motores de b&uacute;squeda 
+(Alta Vista, Infoseek, Lycos y Opentext), analizando el n&uacute;mero de documentos 
+estimado de sus &iacute;ndices, su documentaci&oacute;n, la porci&oacute;n de p&aacute;gina indexada, sus caracter&iacute;sticas de b&uacute;squeda, la presencia de documentos duplicados en el &iacute;ndice y, finalmente, si empleaban alg&uacute;n m&eacute;todo de alineamiento en la presentaci&oacute;n de los documentos (<a href="#Zorn, P">Zorn, 1996</a>). Los resultados de este estudio mostraron a Alta Vista y Lycos como los motores de mayor tama&ntilde;o, y mucha similitud en cuanto a las capacidades de b&uacute;squeda y formatos de presentaci&oacute;n de los documentos. La 
+documentaci&oacute;n aportada por Alta Vista y Opentext se considera excelente y todos 
+indexan la p&aacute;gina completa a excepci&oacute;n de Lycos. </p>
+
+<h3>Tama&ntilde;o del &iacute;ndice del motor de b&uacute;squeda.</h3>
+
+<p>Idealmente, si un motor de b&uacute;squeda recopilara en su &iacute;ndice la totalidad de 
+los documentos de la web (o un porcentaje cercano), sin duda alguna, ese motor 
+ser&iacute;a el predilecto de todos los usuarios de Internet, otorg&aacute;ndose a este 
+par&aacute;metro un valor prioritario por encima de otros. La realidad es bien 
+distinta, “el constante cambio y expansi&oacute;n de la web, provoca que ninguno de los 
+motores de b&uacute;squeda pueda indexar la totalidad de sus documentos. Muchos 
+estudios, realizados para estimar el tama&ntilde;o de la web, han determinado que los 
+motores recopilan entre el 5% y el 30% de la totalidad de documentos de la web, 
+y la uni&oacute;n de los once principales motores de b&uacute;squeda no alcanza el 50%” (<a href="#Chang, G. et al">Chang,
+2001</a>). A&uacute;n as&iacute;, la estimaci&oacute;n del tama&ntilde;o de los &iacute;ndices de los motores y la 
+determinaci&oacute;n aproximada del porcentaje de web recopilada, ha sido objeto de 
+inter&eacute;s de varios autores. </p>
+<p>Uno de los trabajos m&aacute;s citados es el realizado por Lebedev en 1996, quien 
+realiz&oacute; ocho preguntas a distintos motores. Cada pregunta la formaba s&oacute;lo una 
+palabra clave, relacionada con la Qu&iacute;mica o con la F&iacute;sica, posteriormente 
+procedi&oacute; a la suma del total de los documentos devueltos por cada motor en cada 
+b&uacute;squeda. Lebedev tambi&eacute;n analiz&oacute; la incorporaci&oacute;n de nuevas p&aacute;ginas al motor. 
+Anteriormente se ha citado que Slot tambi&eacute;n analiz&oacute; el tama&ntilde;o del &iacute;ndice en su 
+estudio, resaltando el inmenso tama&ntilde;o de Alta Vista frente a los dem&aacute;s 
+analizados. (<a href="#Slot, M.">Slot, 1996</a>). </p>
+<p>El tama&ntilde;o del &iacute;ndice del motor, el n&uacute;mero de documentos devueltos, 
+caracter&iacute;sticas relacionadas con el modo de almacenar las referencias y el 
+formato de salida de los documentos, constituyen el objeto del trabajo de 
+Peterson. Este autor tom&oacute; datos en tres per&iacute;odos de tiempo distintos (febrero, 
+mayo y noviembre del a&ntilde;o 1996), interrogando a ocho motores por medio de dos 
+expresiones de b&uacute;squeda, una conformada por un t&eacute;rmino individual y la otra por 
+una frase literal. El resultado de esta parte del experimento mostraba al motor 
+Hot Bot como el de mayor n&uacute;mero de documentos (<a href="#Peterson">Peterson, 1997</a>). El n&uacute;mero de 
+documentos y las posibilidades de b&uacute;squeda tambi&eacute;n son objeto de inter&eacute;s para 
+Maldonado y Fern&aacute;ndez, quienes han hecho uso en esta estimaci&oacute;n, de una utilidad 
+presente en los motores Alta Vista e Infoseek que permite recuperar p&aacute;ginas que 
+apuntan (enlazan) a una determinada direcci&oacute;n. El c&oacute;mputo final de los 
+resultados situaba a Yahoo (un directorio), como el sistema que m&aacute;s p&aacute;ginas 
+ten&iacute;a recogidas, seguido por los motores Alta Vista y Excite. El an&aacute;lisis de las 
+posibilidades de b&uacute;squeda estableci&oacute; grandes similitudes entre Alta Vista e 
+Infoseek. </p>
+<p>La obsolescencia que posee esta medida, implica la necesidad de actualizar 
+los estudios con cierta frecuencia, tal como realiza Notess en la web 
+Searchengine Showdown (<a href="#Notess, 2002a">Notess, 2002a</a>), donde presenta, entre otra serie de datos, el n&uacute;mero de documentos recuperados por distintos motores tras la 
+realizaci&oacute;n de veinticinco consultas (Tabla 1):</p>
+
+<table bgcolor="#FBFFDF" align="center" cellpadding="4">
+<caption align="bottom"><strong>Tabla 1:</strong> Clasificaci&oacute;n de los 
+motores seg&uacute;n tama&ntilde;o y determinaci&oacute;n de diferencias entre tama&ntilde;o estimado y declarado. Fuente: <a href="#Notess, 2002d">Notess, 2002d</a>.</caption>
+<tr><th>Motor</th>	<th>Tama&ntilde;o estimado</th>	<th>Extensi&oacute;n anunciada</th>	<th>
+  % diferencia</th></tr>
+<tr><td>Google</td><td align="center">968</td><td align="center">1.500</td><td align="center">
+  54,9</td></tr>
+<tr><td>WISEnut</td><td align="center">579</td><td align="center">1.500</td><td align="center">
+  159</td></tr>
+<tr><td>Alltheweb (Fast)</td><td align="center">580</td><td align="center">507</td><td align="center">	
+  -13,5</td></tr>
+<tr><td>Northern Light</td><td align="center">417</td><td align="center">358</td><td align="center">
+  -15,2</td></tr>
+<tr><td>Altavista</td><td align="center">397</td><td align="center">500</td><td align="center">
+  25,9</td></tr>
+<tr><td>Hotbot</td><td align="center">332</td><td align="center">500</td><td align="center">
+  50,6</td></tr>
+<tr><td>MSN Search</td><td align="center">292</td><td align="center">500</td><td align="center">
+  71,23</td></tr>
+</table>
+
+<p>La siguiente ilustraci&oacute;n recoge la estimaci&oacute;n del tama&ntilde;o del &iacute;ndice de los 
+motores de b&uacute;squeda, que ha realizado Sullivan en la web <i>Searchenginewatch</i>.</p>
+
+
+<div align="center"><img src="p148fig1.gif" width="368" height="240" hspace="5" vspace="5" border="1" align="center" alt="Clasificaci&oacute;n de Sullivan de los motores de b&uacute;squeda seg&uacute;n tama&ntilde;o"></div>
+
+<div align="center">GG=Google, FAST=FAST, AV=AltaVista 
+INK=Inktomi NL=Northern Light. <br>
+Ilustraci&oacute;n 1 Clasificaci&oacute;n de los motores de b&uacute;squeda seg&uacute;n tama&ntilde;o.<br>
+&nbsp;Fuente: <a href="#sul01a">Sullivan, 2001a</a></div>
+
+<p align="justify">Este estudio sit&uacute;a a Google en primer lugar destacado y a 
+Fast en segundo lugar. Estos resultados coinciden con el anterior de Notess (con 
+la excepci&oacute;n del motor WISEnut). Google aparece con dos cifras distintas porque 
+realmente “Google s&oacute;lo ha indexado 1 bill&oacute;n y medio de p&aacute;ginas (1000 millones es 
+1 bill&oacute;n), pero gracias al uso extensivo de los enlaces que realiza este motor, 
+puede actualmente devolvernos listas de p&aacute;ginas adicionales que nunca ha 
+visitado” (<a href="#Sullivan , 2001a">Sullivan, 2001a</a>). Otro caso particular es Inktomi, que diferencia 
+entre dos conjuntos de p&aacute;ginas: “Lo mejor del web”, que agrupa a 110 millones de 
+documentos y el “resto del web”, que agrupa 390 millones de p&aacute;ginas.</p>
+
+<div align="center">
+<img border="1" src="p148fig2.gif" width="450" height="405" alt="Evoluci&oacute;n en el tiempo del tama&ntilde;o de los motores de b&uacute;squeda seg&uacute;n Sullivan"></div>
+
+<div align="center">Ilustraci&oacute;n 2 Evoluci&oacute;n en el tiempo del tama&ntilde;o 
+de los motores de b&uacute;squeda. <br>
+Fuente: <a href="#not02b">Notess, 2002b</a></div>
+
+<p align="justify">Este informe de Sullivan analiza tambi&eacute;n la evoluci&oacute;n del 
+tama&ntilde;o de &iacute;ndice a lo largo del tiempo (Ilustraci&oacute;n 2). Alta Vista era el motor 
+de mayor tama&ntilde;o, siendo igualado a partir de junio de 2000 por Fast, siendo 
+ambos motores rebasados en septiembre de 2000 por la vertiginosa ascensi&oacute;n de 
+Google. Esta evoluci&oacute;n es similar a la presentada por Notess en el trabajo 
+anteriormente citado. </p>
+
+<h3>Audiencia del motor.</h3>
+
+<p>Otro criterio expl&iacute;cito empleado en las evaluaciones de los motores de 
+b&uacute;squeda es su nivel de audiencia, es decir, el n&uacute;mero de accesos que computan 
+sus sitios web. </p>
+<p>En la web <i>Searchengineswatch.com</i> se recogen diversos trabajos de Sullivan 
+donde se utiliza esta medida, sintetizando datos procedentes de empresas 
+especializadas en c&aacute;lculos de audiencia. El primero que presenta es el realizado 
+por Jupiter Media Matrix , a partir de los accesos que m&aacute;s de cien mil usuarios 
+de Internet realizan sobre los motores o directorios analizados. Este informe 
+muestra como motor m&aacute;s popular a Yahoo (64.8%) seguido por Microsoft Network 
+(58.3%) y American Online (46%) (<a href="#Sullivan , 2001b">Sullivan, 2001b)</a>. Si bien este estudio viene 
+avalado por su interactividad con los usuarios y por su actualizaci&oacute;n, introduce 
+una considerable distorsi&oacute;n al mezclar directorios con motores. No obstante, del 
+mismo se desprende los tres motores anteriormente mencionados siguen una 
+perceptible tendencia de crecimiento positivo de su audiencia. Otro dato 
+interesante es la clara evoluci&oacute;n positiva de Google y la negativa de Alta 
+Vista, aspecto ya destacado por otros autores. </p>
+<p>Sullivan analiza tambi&eacute;n el estudio confeccionado por <a href="#NetRatings">Nielsen/NetRatings</a>, de 
+actualizaci&oacute;n semanal donde se mide el porcentaje de usuarios que visitan los 
+distintos sitios web junto al tiempo medio que le dedican, adem&aacute;s de medir la 
+audiencia seg&uacute;n el n&uacute;mero de accesos computados. No todos los sitios web que 
+presenta este an&aacute;lisis son motores de b&uacute;squeda, incorporando tambi&eacute;n directorios 
+y sitios web de otra naturaleza, tales como las web de Microsoft, Amazon o 
+Disney, por ejemplo. La serie de datos ofrecidos sit&uacute;a a Yahoo en primer lugar 
+(48%) y a Microsoft Network en segundo lugar (38,5%). El primer motor que 
+encontramos es Google (16,2%), situado en tercer lugar, seguido de Lycos en 
+cuarto lugar con algo m&aacute;s de un once por ciento (<a href="#Sullivan , 2001b">Sullivan, 2001c</a>).</p>
+<h3>N&uacute;mero de consultas realizadas.</h3>
+<p>En otro trabajo, Suiilvan proporciona una clasificaci&oacute;n 
+del n&uacute;mero de consultas que reciben cada d&iacute;a los motores, aportando un elemento 
+adicional: la utilidad de cada motor para sus usuarios (<a href="#Sullivan, 2001d">Sullivan, 2001d</a>). Los resultados 
+certifican que Google mantiene su posici&oacute;n de predominio, sorprendiendo la 
+segunda posici&oacute;n de Inktomi, aunque si se tienen en cuenta las alianzas 
+estrat&eacute;gicas que se vienen desarrollando entre directorios, motores y portales 
+de Internet, no debe sorprender tanto (este motor es empleado por varios 
+portales generalistas).</p>
+<h3>Tr&aacute;fico redirigido.</h3>
+<p>En un tercer trabajo, Sullivan clasifica los motores a partir del tr&aacute;fico que 
+estos sistemas generan hacia distintos sitios web. Sullivan toma sus datos del 
+informe <i>StatMarket Search Engine Ratings,</i> estudio que analiza los registros de 
+accesos de m&uacute;ltiples sitios web (m&aacute;s de cien mil) para verificar de d&oacute;nde 
+proceden las visitas recibidas (<a href="#Sullivan, 2002.">Sullivan, 2002</a>). El resultado del trabajo 
+original de Sullivan era claramente favorable a Yahoo, pero la actualizaci&oacute;n 
+realizada en mayo de 2002 sit&uacute;a muy pr&oacute;ximos a Yahoo (36%) y a Google (32%). 
+Este tipo de criterio muestra las tendencias o modas presentes entre los 
+usuarios de la web pero presenta el problema de una r&aacute;pida obsolescencia.</p>
+<h3>Porci&oacute;n de la p&aacute;gina indexada.</h3>
+<p>En un estudio de 1995, Winsip estudia cuatro motores de b&uacute;squeda: WWWWorm, 
+Webcrawler, Lycos y Harvest; junto a dos directorios: Yahoo y Galaxy, 
+centr&aacute;ndose en la porci&oacute;n de p&aacute;gina indexada por cada uno de ellos, en la 
+interfase del sistema, en sus capacidades de b&uacute;squeda, en los formatos de 
+presentaci&oacute;n de los documentos y en el n&uacute;mero de documentos recuperados, 
+destacando en primer lugar a Lycos, ligeramente por encima de Harvest (<a href="#Winship, I">Winship, 1995</a>).</p>
+<h3>Fidelidad.</h3>
+<p>Stobart y Kerridge desarrollaron un estudio sobre un conjunto de 
+cuatrocientos usuarios de Internet (profesores e investigadores universitarios 
+en su mayor parte), quienes indicaban cu&aacute;les eran los motores de b&uacute;squeda que 
+m&aacute;s empleaban (obteni&eacute;ndose como respuesta Alta Vista, Yahoo y Lycos), de forma 
+preferente; y en segundo lugar, se preguntaba a quienes aseguraban usar m&aacute;s de 
+un motor de b&uacute;squeda cu&aacute;l era al que acud&iacute;an primero, siendo Alta Vista el 
+preferido con una ampl&iacute;sima diferencia. En &uacute;ltimo lugar se interrogaba a los 
+participantes en el estudio sobre las posibles causas de su fidelidad 
+reconocida, y las tres principales razones (todas ellas en torno a un 20%) que 
+formaron parte de la respuesta eran, por este orden: velocidad, tama&ntilde;o del 
+&iacute;ndice y costumbre (<a href="#Stobart, S">Stobart, 1996</a>).</p>
+<h2>Sinopsis de estudios expl&iacute;citos.</h2>
+<p>La presente revisi&oacute;n de criterios empleados en evaluaciones expl&iacute;citas 
+compendia 20 trabajos que han empleado trece variables diferentes en sus 
+an&aacute;lisis. Las referencias a estos trabajos, y la serie de variables empleadas en 
+cada uno de ellos, est&aacute;n recogidas en la Tabla 2. La &uacute;ltima columna de la tabla 
+indica el motor que recibe mejor valoraci&oacute;n en cada estudio.</p>
+<table bgcolor="#FBFFDF" align="center" cellpadding="4">
+<caption align="bottom"><br><strong>Tabla 2:&nbsp; </strong>Sinopsis de los 20 
+estudios expl&iacute;citos analizados que eval&uacute;an los motores de b&uacute;squeda. PB: 
+posibilidades de b&uacute;squeda. T: tiempo de respuesta. GI: Interface gr&aacute;fica de 
+usuario. DOC: documentaci&oacute;n. TI: tama&ntilde;o del &iacute;ndice. CRE: crecimiento porcentual 
+del tama&ntilde;o del &iacute;ndice ACI: acierto. FA: frecuencia de actualizaci&oacute;n. AUD: 
+audiencia. TR: tr&aacute;fico redirigido. PO: porci&oacute;n de p&aacute;gina indexada. FO: formato 
+de presentaci&oacute;n y alineamiento. FID: fidelidad. NC: consultas recibidas por 
+motor</caption>
+<tr><th>&nbsp;</th>	<th>PB</th>	<th>T</th>	<th>GU</th>	<th>DO</th>	<th>TI</th>	<th>
+  CR</th>	<th>ACI</th>	<th>FA</th>	<th>AU</th>	<th>TR</th>	<th>PO</th>	<th>
+  FO</th>	<th>FID</th>	<th>NC</th>	<th>&nbsp;</th></tr>
+<tr><td>Courtois</td><td align="center">X</td><td align="center">X</td><td align="center">
+  X</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">
+  Webcrawler</td></tr>
+<tr><td>Scoville</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">
+  X</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">
+  Excite</td></tr>
+<tr><td>Kimmel</td><td align="center">	&nbsp;</td><td align="center">	&nbsp;</td><td align="center">	
+  X</td><td align="center">	X</td><td align="center">	&nbsp;</td><td align="center">	&nbsp;</td><td align="center">	&nbsp;</td><td align="center">	&nbsp;</td><td align="center">	&nbsp;</td><td align="center">	&nbsp;</td><td align="center">	&nbsp;</td><td align="center">	&nbsp;</td><td align="center">	&nbsp;</td><td align="center">	&nbsp;</td><td align="center">	
+  Lycos</td></tr>
+<tr><td>Davis</td><td align="center">X</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">
+  X</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">
+  Alta Vista</td></tr>
+<tr><td>Westera</td><td align="center">X</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">
+  Alta Vista</td></tr>
+<tr><td>C | Net</td><td align="center">X</td><td align="center">&nbsp;</td><td align="center">
+  X</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">
+  X</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">
+  Alta Vista</td></tr>
+<tr><td>Slot</td><td align="center">&nbsp;</td><td align="center">X</td><td align="center">
+  X</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">
+  Alta Vista</td></tr>
+<tr><td>Zorn</td><td align="center">X</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">
+  X</td><td align="center">X</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">
+  Alta Vista</td></tr>
+<tr><td>Lebedev</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">
+  X</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">
+  Alta Vista</td></tr>
+<tr><td>Peterson</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">
+  X</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">
+  Hot Bot</td></tr>
+<tr><td>Maldonado</td><td align="center">X</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">
+  X</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">
+  Alta Vista</td></tr>
+<tr><td>Notess (a)</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">
+  X</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">
+  Google</td></tr>
+<tr><td>Notess (b)</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">
+  X</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">
+  Google</td></tr>
+<tr><td>Sullivan (a)</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">
+  X</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">
+  Google</td></tr>
+<tr><td>Jupiter Media</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">
+  X</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">
+  MSN</td></tr>
+<tr><td>Nielsen Ratings</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">
+  X</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">
+  MSN</td></tr>
+<tr><td>Statmarket</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">
+  X</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">
+  Alta Vista</td></tr>
+<tr><td>Sullivan (d)</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">
+  X</td><td align="center">
+  Google</td></tr>
+<tr><td>Winsip</td><td align="center">X</td><td align="center">&nbsp;</td><td align="center">
+  X</td><td align="center">&nbsp;</td><td align="center">X</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">
+  X</td><td align="center">X</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">
+  Lycos</td></tr>
+<tr><td>Stobart</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">&nbsp;</td><td align="center">
+  X</td><td align="center">&nbsp;</td><td align="center">
+  Alta Vista</td></tr>
+</table>
+
+<p>El n&uacute;mero medio de caracter&iacute;sticas empleadas por estudio es, a nuestro 
+parecer, bastante bajo (1.9 por trabajo). Las caracter&iacute;sticas m&aacute;s utilizadas 
+son: tama&ntilde;o del &iacute;ndice (7 veces) , posibilidades de b&uacute;squeda (6 veces) e 
+interfase de usuario (5 veces). Hasta siete motores aparecen citados como los 
+mejores seg&uacute;n el objeto del estudio. </p>
+<p>Una agrupaci&oacute;n con base en esta serie de caracter&iacute;sticas m&aacute;s estudiadas, 
+permite extraer una serie de coincidencias: </p>
+<ul>
+  <li>En los estudios que analizan el tama&ntilde;o del &iacute;ndice, los resultados eran 
+  favorables al motor Alta Vista hasta que en los mismos se reflej&oacute; la presencia 
+  de Google, siendo este motor el que ocupa la posici&oacute;n de privilegio desde 
+  entonces. </li>
+  <li>Cuando los estudios se basan en el an&aacute;lisis de las posibilidades de 
+  b&uacute;squeda, es Alta Vista el m&aacute;s veces destacado </li>
+  <li>No existe una tendencia com&uacute;n de resultados en los estudios analizan la 
+  interfase gr&aacute;fica de usuario. </li>
+</ul>
+<h2>Estudios experimentales.</h2>
+
+<p>A continuaci&oacute;n se presentan los estudios m&aacute;s significativos que, dentro de 
+este campo, han sido desarrollados en los &uacute;ltimos cinco a&ntilde;os. El prop&oacute;sito de 
+esta revisi&oacute;n no es otro que mostrar c&oacute;mo han evolucionado estos procesos de 
+an&aacute;lisis y c&oacute;mo se han ido incorporando medidas cada vez m&aacute;s complejas, que van 
+adapt&aacute;ndose a las caracter&iacute;sticas del contexto en el que trabajamos, la web.</p>
+
+<h3>Chu y Rosenthal (1996).</h3>
+<p>El punto de partida de esta revisi&oacute;n, no puede ser otro que el trabajo 
+elaborado por Chu y Rosenthal para la Conferencia Anual de ASIS de 1996, quienes 
+comentaban que las diferencias de opini&oacute;n de los estudios expl&iacute;citos resid&iacute;an 
+b&aacute;sicamente en la ausencia de una metodolog&iacute;a clara para la evaluaci&oacute;n y se 
+preguntaban &quot;si pod&iacute;amos llegar a pensar en desarrollar esa metodolog&iacute;a que 
+facilite unos resultados que ayuden al usuario a discernir qu&eacute; herramienta es la 
+m&aacute;s apropiada para sus necesidades&quot; (<a href="#Chu, H">Chu, 1996</a>)). </p>
+<p>Los autores reutilizan las medidas propuestas por Cleverdon (cobertura, 
+exhaustividad, precisi&oacute;n, tiempo de respuesta, esfuerzo del usuario y formato de 
+presentaci&oacute;n de los documentos), adaptadas al entorno de la web, considerando 
+que siguen siendo v&aacute;lidas casi cuatro d&eacute;cadas despu&eacute;s de enunciarse. As&iacute;, los 
+autores plantean un m&eacute;todo de evaluaci&oacute;n donde se valoran cuatro criterios: </p>
+<ol>
+  <li>Composici&oacute;n de los &iacute;ndices: la Cobertura, la Frecuencia de actualizaci&oacute;n y 
+  la Porci&oacute;n de p&aacute;gina indexada. </li>
+  <li>Capacidades de b&uacute;squeda: las prestaciones que los distintos motores poseen 
+  a la hora de recuperar informaci&oacute;n y la serie de operadores de b&uacute;squeda 
+  disponibles. </li>
+  <li>Ejecuci&oacute;n de la recuperaci&oacute;n de informaci&oacute;n: la Precisi&oacute;n, la 
+  Exhaustividad y el Tiempo de respuesta, procedentes todos ellos de las 
+  propuestas cl&aacute;sicas de Lancaster y Fayen (<a href="#Lancaster, F. W.">Lancaster, 1973</a>). </li>
+  <li>Esfuerzo del usuario: la Documentaci&oacute;n y la Interfase del sistema (<a href="#Chu, H">Chu,
+    1996</a>)). </li>
+</ol>
+<p>Esta propuesta constituye un substancial salto cualitativo frente a las 
+anteriores evaluaciones expl&iacute;citas, al mismo tiempo que se aprovecha de aqu&eacute;llas 
+los par&aacute;metros m&aacute;s fiables, se incorpora una serie de cuantificaciones que 
+proporcionan una mejor ponderaci&oacute;n de la efectividad de los SRI en la web. Otro 
+aspecto a resaltar de este estudio es su fecha de realizaci&oacute;n, apenas dos a&ntilde;os 
+despu&eacute;s de la popularizaci&oacute;n de los sitios web y casi contempor&aacute;neo al 
+desarrollo de los primeros motores de b&uacute;squeda, lo que le confiere un car&aacute;cter 
+ciertamente embrionario dentro de una l&iacute;nea seguida a continuaci&oacute;n por otros 
+autores. El &uacute;nico aspecto negativo a se&ntilde;alar de este estudio es el escaso n&uacute;mero 
+de motores analizados: Alta Vista, Lycos y Excite, por lo que hace falta 
+recurrir a otras experimentaciones para alcanzar una idea m&aacute;s completa sobre el 
+estado de la cuesti&oacute;n, aunque quiz&aacute; el escaso n&uacute;mero de motores desarrollados en 
+ese momento limit&oacute; el alcance del mismo.</p>
+<h3>Leighton y Srivastava (1995-1999).</h3>
+<p>De similar importancia al trabajo anterior son las aportaciones de Leighton y 
+Srivastava. En el primero de sus trabajos, Leighton evaluaba cuatro motores: 
+Infoseek, Lycos, Webcrawler y WWWWorm. Tras la formulaci&oacute;n y ejecuci&oacute;n de ocho 
+preguntas, calculaba una serie de medidas basadas en la relevancia, considerando 
+adem&aacute;s la ratio de acierto &uacute;nico (documentos recuperados s&oacute;lo en un motor), y el 
+n&uacute;mero de enlaces err&oacute;neos junto al n&uacute;mero de documentos duplicados. El 
+resultado final de este estudio destaca a Lycos e Infoseek sobre los otros dos. 
+El impacto de este trabajo sorprendi&oacute; hasta al mismo autor, quien al principio 
+de la p&aacute;gina web donde se recoge una copia de este art&iacute;culo, indica 
+textualmente: “me encuentro sorprendido con la popularidad de este estudio”. 
+Sorprendido porque los datos incluidos en el mismo ten&iacute;an un corto per&iacute;odo de 
+vida y estoy seguro de que los resultados se encuentran absolutamente obsoletos” 
+(<a href="#Leighton, 1995">Leighton, 1995</a>). </p>
+<p>Esta plena conciencia de obsolescencia le lleva a realizar otros trabajos en 
+el mismo campo, contando ya con la colaboraci&oacute;n de Srivastava. En el primero de 
+ellos procede a la evaluaci&oacute;n de cinco motores de b&uacute;squeda: Alta Vista, Excite, 
+Hotbot, Infoseek, y Lycos . El per&iacute;odo de evaluaci&oacute;n abarcaba de enero a marzo 
+de 1997 y en el mismo, los autores introdujeron una interesante variante a la 
+t&iacute;pica manera de calcular la precisi&oacute;n, dise&ntilde;ando una funci&oacute;n de evaluaci&oacute;n que 
+confiere un peso espec&iacute;fico a la capacidad de colocar documentos relevantes 
+dentro de los primeros veinte entregados como respuesta al usuario. Esta 
+funci&oacute;n, denominada “First 20 Precision” mide, al mismo tiempo, la precisi&oacute;n y 
+el acierto de mostrar los documentos relevantes antes que los documentos que no 
+son relevantes. En este estudio se penaliza la existencia de enlaces inactivos, 
+de manera que aquellas p&aacute;ginas que no hayan sido actualizadas hace bastante 
+tiempo influir&aacute;n de forma decisiva en los resultados (<a href="#Leighton, 1997">Leighton, 1997</a>). Los 
+resultados obtenidos en el estudio de la precisi&oacute;n destacan a Alta Vista, Excite 
+e Infoseek (por este orden). Cuando se considera el alineamiento, se aprecian 
+pocas diferencias pero cambia el orden: Infoseek, Excite y Alta Vista (<a href="#Leighton, 1999">Leighton, 
+1999</a>). </p>
+<h3>Arents (1995-2001).</h3>
+<p>Algunos estudios expl&iacute;citos han evolucionado en estudios experimentales en 
+sus sucesivas repeticiones. Un ejemplo es el trabajo desarrollado por Arents 
+desde 1995. Este autor selecciona distintos motores de b&uacute;squeda y los clasifica 
+seg&uacute;n una escala: {Mejor-Muy bueno-Bueno-Útil}, basando sus apreciaciones en la 
+facilidad de uso y en la efectividad del motor, entendida &eacute;sta como la cantidad, 
+precisi&oacute;n y legibilidad de los documentos recuperados.</p>
+<h3>Bharat y Broder (1997).</h3>
+<p>Este estudio pretende medir “los tama&ntilde;os relativos de los &iacute;ndices de los 
+motores de b&uacute;squeda analizados y su grado de solapamiento” (<a href="#Bharat, 1998a">Bharat,
+1998a)</a>. Los 
+motores analizados fueron cuatro: Alta Vista, Excite, Hot Bot e Infoseek, y se 
+tomaron datos en dos per&iacute;odos de tiempo, junio y noviembre de 1997. Con relaci&oacute;n 
+al solapamiento, los cambios producidos en este per&iacute;odo de seis meses fueron 
+insignificantes, estim&aacute;ndose del 1.4%. Los tama&ntilde;os relativos estimados presentan 
+cifras consistentes de un experimento a otro, aunque cambia el orden, ya que en 
+junio Hot Bot supera a Alta Vista, Excite e Infoseek (por este orden) y en 
+noviembre, Alta Vista supera a Hot Bot. </p>
+<h3>Ralph (1997).</h3>
+<p>Ralph realiz&oacute; veinticinco preguntas, la mayor parte de ellas correspondientes 
+a t&eacute;rminos individuales, nombres de personas o instituciones o materias, sobre 
+siete motores y un directorio (Yahoo). As&iacute; analiz&oacute; el n&uacute;mero de documentos 
+recuperados, la precisi&oacute;n, la exhaustividad relativa y el alineamiento. Para 
+estudiar este &uacute;ltimo aspecto, valoraron la presencia de los documentos 
+relevantes al principio de la secuencia de documentos entregados como resultado. 
+Los resultados de la precisi&oacute;n obtenidos en este estudio dividen a los motores 
+analizados en dos grupos claramente diferenciados. El primero de ellos agrupa a 
+Alta Vista, Excite, Hot Bot e Infoseek (que alcanzan porcentajes superiores al 
+60%), frente al resto de motores cuyos valores oscilan entre el 30% de Lycos y 
+el 35% de Webcrawler. El motor que mejor porcentaje alcanza de exhaustividad 
+relativa es Hot Bot, que supera ligeramente el 25%. La ponderaci&oacute;n del 
+alineamiento de los documentos igualaba a Hot Bot y Excite. </p>
+<h3><a href="#Wishard">Wishard</a> (1998).</h3>
+<p>Wishard determin&oacute; la precisi&oacute;n de diecisiete motores de b&uacute;squeda, realizando 
+sobre ellos una serie de preguntas relacionadas con la Geolog&iacute;a y no encuentra 
+diferencias significativas entre todos ellos.</p>
+<h3>Lawrence y Giles (1998).</h3>
+<p>La cobertura de los motores de b&uacute;squeda centra el principal inter&eacute;s de este 
+estudio. Sus autores estimaron tambi&eacute;n el tama&ntilde;o de los distintos &iacute;ndices, su 
+grado de solapamiento y el porcentaje de enlaces err&oacute;neos que proporcionaba cada 
+motor. El conjunto de seis motores evaluados era: Alta Vista, Excite, Hot Bot, 
+Infoseek, Lycos y Northern Light. </p>
+<p>Como resultado de este an&aacute;lisis, se deduce que el motor Hot Bot, con un 
+57.5%, es el motor que m&aacute;s documentos comunes posee en su relaci&oacute;n, seguido de 
+Alta Vista (con un 46.5%). En la estimaci&oacute;n del tama&ntilde;o de la web, se tasa en un 
+34% el porcentaje indexado por Hot Bot. La uni&oacute;n del &iacute;ndice de este motor y del 
+&iacute;ndice de Alta Vista, producir&iacute;a un conjunto de m&aacute;s de 320 millones de p&aacute;ginas, 
+mientras que la uni&oacute;n de Infoseek y Lycos producir&iacute;a un &iacute;ndice de 90 millones de 
+p&aacute;ginas y la de Excite y Northern Light alcanzar&iacute;a los 230 millones, “otras 
+evaluaciones realizadas con anterioridad han subestimado el tama&ntilde;o de la web” 
+(<a href="#Lawrence, S.">Lawrence, 1998</a>). En el an&aacute;lisis del n&uacute;mero de enlaces err&oacute;neos facilitados por 
+cada motor, Hot Bot destaca por ser el que m&aacute;s proporciona (5%) frente a Lycos 
+(1.6%), es decir, al menos en este estudio, el &iacute;ndice de tama&ntilde;o m&aacute;s peque&ntilde;o 
+proporciona menos errores entre sus enlaces que el de mayor tama&ntilde;o. </p>
+<h3>Gordon y Pathak (1999).</h3>
+<p>Gordon y Pathak desarrollan un estudio donde analizan siete motores de 
+b&uacute;squeda: Hot Bot, Magellan, Infoseek, Excite, Lycos, Alta Vista y Open Text; 
+junto a un directorio, Yahoo (<a href="#Gordon, M">Gordon, 1999</a>). Estos autores consideraban muy 
+importante la naturaleza intr&iacute;nseca de los motores, de manera que no ve&iacute;an 
+viable extrapolar los tests desarrollados sobre los SRI tradicionales, al tener 
+estos sistemas unas bases de datos mucho m&aacute;s estructuradas y una naturaleza 
+informativa m&aacute;s homog&eacute;nea que en el contexto de la web. Es por ello que abogan 
+por la necesidad de emplear una serie de caracter&iacute;sticas m&aacute;s espec&iacute;ficas, para 
+complementar los par&aacute;metros tradicionales empleados en la evaluaci&oacute;n de la 
+recuperaci&oacute;n de informaci&oacute;n. </p>
+<p>En su experimento, Gordon y Pathak examinaron el comportamiento de la 
+exhaustividad y precisi&oacute;n ofreciendo un importante n&uacute;mero de conclusiones, entre 
+las que se pueden destacar: </p>
+<ol>
+  <li>La efectividad media en la recuperaci&oacute;n de informaci&oacute;n es baja, alrededor 
+  del 10% en los primeros diez documentos recuperados. </li>
+  <li>Se detectan diferencias estad&iacute;sticas considerables entre la precisi&oacute;n de 
+  los motores analizados. Alta Vista, Open Text y Lycos resultan los mejores y 
+  Yahoo ocupa el &uacute;ltimo lugar. Otra cuesti&oacute;n importante a destacar es la amplia 
+  distancia entre el primero y el segundo (m&aacute;s de 20 puntos porcentuales). </li>
+  <li>En la exhaustividad no se detectan diferencias sustanciales. </li>
+  <li>La realizaci&oacute;n de una b&uacute;squeda aparece m&aacute;s fuertemente vinculada al 
+  algoritmo de localizaci&oacute;n de la informaci&oacute;n que a los tipos de b&uacute;squeda que 
+  permite. </li>
+  <li>Aunque los motores siguen, en l&iacute;neas generales, los principios generales 
+  de la recuperaci&oacute;n de informaci&oacute;n, su funcionamiento var&iacute;a de alguna manera ya 
+  que es clara la tendencia a recuperar documentos irrelevantes o lejanamente 
+  relevantes de algunos de ellos, hecho dif&iacute;cilmente producible en el caso de un 
+  sistema tradicional. </li>
+</ol>
+<p>Gordon y Pathak aportan otras conclusiones no menos importantes: los &iacute;ndices 
+de los motores poseen tama&ntilde;os muy diferentes (algunos son diez veces m&aacute;s grandes 
+que otros) y (aunque alg&uacute;n motor, en su publicidad afirme lo contrario), ninguno 
+pretende realmente indexar toda la web. Asimismo, los motores tambi&eacute;n difieren 
+en la actualizaci&oacute;n peri&oacute;dica de los datos, en la posibilidad de que los 
+usuarios a&ntilde;adan p&aacute;ginas por su cuenta, en el plazo de tiempo para incorporar una 
+nueva p&aacute;gina indexada tras tener noticia de su existencia y en el seguimiento de 
+la disponibilidad de los enlaces. </p>
+<p>Tambi&eacute;n estudian el solapamiento detectado bajo dos perspectivas, (a) el 
+grado de solapamiento existente entre los documentos recuperados por los ocho 
+motores analizados y (b) el grado de solapamiento existente entre los documentos 
+recuperados por los ocho motores analizados, que han sido considerados 
+relevantes. Resultan sorprendentemente bajos los resultados del primer tipo, 
+inferior al 10% de solapamiento, manteni&eacute;ndose constante cuando el an&aacute;lisis se 
+prolonga a los 50, 100 y 200 primeros documentos recuperados. El segundo tipo de 
+solapamiento presenta unos valores mucho mayores de coincidencia que el 
+anterior, ya que el n&uacute;mero de documentos relevantes recuperados por un &uacute;nico 
+motor oscila entre el 22.45% y el 25.4%, es decir que el grado de solapamiento 
+no desciende nunca del 70%. Esta serie de datos permite suponer que los motores 
+muestran muchos documentos distintos unos de otros pero, en principio, un 
+porcentaje importante de los relevantes forman parte de la respuesta de cada uno 
+de ellos. </p>
+<h3>Gwizdka, J. and Chignell (1999).</h3>
+<p>Estos autores ponen en duda la tradicional asignaci&oacute;n binaria de los valores 
+de la relevancia (documento relevante-documento no relevante), ya que un 
+documento dif&iacute;cilmente ser&aacute; relevante o no relevante en t&eacute;rminos absolutos. En 
+su estudio analizan un considerable n&uacute;mero de aspectos: la precisi&oacute;n (entendida 
+en los t&eacute;rminos de la funci&oacute;n definida por Leighton y Srivastava), el 
+alineamiento de los documentos (estableciendo una funci&oacute;n diferencial de la 
+precisi&oacute;n conforme aparezcan alineados), el esfuerzo del usuario, la longitud 
+esperada de b&uacute;squeda, el n&uacute;mero de enlaces err&oacute;neos y el n&uacute;mero de enlaces 
+duplicados. </p>
+<p>Como resultados globales de este experimento, Alta Vista presenta mejores 
+resultados que los otros dos motores analizados, en t&eacute;rminos de precisi&oacute;n y de 
+diferencial de precisi&oacute;n . El solapamiento es bajo, fundamentalmente porque los 
+motores “emplean diferentes procedimientos de localizaci&oacute;n de los documentos y 
+porque sus m&eacute;todos de recopilaci&oacute;n e indizaci&oacute;n son sustancialmente distintos” (<a href="#Gwizdka, J">Gwizdka, 
+1999</a>). El experimento no detecta efectos significativos de la precisi&oacute;n entre 
+los motores y los dominios geogr&aacute;ficos analizados, siendo Alta Vista el que 
+presenta mejores &iacute;ndices de cobertura en todos ellos. </p>
+<h3>Ming (2000).</h3>
+<p>Este completo estudio analiza la precisi&oacute;n, el tiempo de respuesta del 
+sistema, la interface de usuario, el n&uacute;mero de aciertos e introduce un factor 
+que denomina sensibilidad, factor sobre el cual incide la calidad de los enlaces 
+devueltos por el motor de b&uacute;squeda. Por desgracia, este estudio s&oacute;lo afecta a 
+Yahoo, Alta Vista y Lycos, y ofrece como resultados m&aacute;s destacados el hecho de 
+no encontrar diferencias significativas en el n&uacute;mero de documentos devuelto por 
+cada sistema; prefiere el interface y el tiempo de respuesta ofrecido por Yahoo 
+(aunque reconoce que es una opini&oacute;n subjetiva). En lo relacionado con el 
+an&aacute;lisis de la precisi&oacute;n, destaca que el valor medio de los tres motores 
+evaluados en los primeros diez documentos devueltos es ligeramente superior al 
+obtenido cuando s&oacute;lo se toman en cuenta los cinco primeros documentos devueltos. 
+En relaci&oacute;n al par&aacute;metro de la sensibilidad, Ming afirma que Yahoo supera a los 
+otros dos, resaltando los pobres valores de Alta Vista (<a href="#Ming, H">Ming, 2000</a>).</p>
+<h3>Notess (2000).</h3>
+<p>Dentro del campo de los estudios experimentales, este autor proporciona 
+c&aacute;lculos de solapamiento, acierto &uacute;nico y enlaces fallidos. El solapamiento 
+detectado es ligeramente superior que en el estudio de Gordon y Pathak, debido 
+al crecimiento de los &iacute;ndices y al alto n&uacute;mero de motores analizados. El 
+porcentaje de enlaces fallidos determinado se recoge en la Tabla 3, siendo 
+ligeramente elevado en el caso del motor Alta Vista:</p>
+<table bgcolor="#FBFFDF" align="center" cellpadding="4">
+<caption align="bottom"><strong>Tabla 3:</strong>Porcentajes de fallos en 
+las referencias ofrecidas por los motores de b&uacute;squeda. <br>
+Fuente: Notess, G. R. Search Engine Statistics (En l&iacute;nea). Bozeman, MT: 
+Notes.com, 2000.<br>
+&lt;<a href="http://www.searchengineshowdown.com/stats/dead.shtml">http://www.searchengineshowdown.com/stats/dead.shtml</a>&gt;<br>
+  (Consulta: 12 Dic. 2002)</caption>
+<tr><th>Motor</th>	<th>% enlaces fallidos</th>	<th>% error tipo 400</th></tr>
+<tr><td>Alta Vista</td><td align="center">13,7</td><td align="center">9,3</td></tr>
+<tr><td>Excite</td><td align="center">8,7</td><td align="center">5,7</td></tr>
+<tr><td>Northern Light</td><td align="center">5,7</td><td align="center">	2</td></tr>
+<tr><td>Google</td><td align="center">4,3</td><td align="center">3,3</td></tr>
+<tr><td>Hot Bot</td><td align="center">2,3</td><td align="center">2</td></tr>
+<tr><td>All the Web (Fast)</td><td align="center">2,3</td><td align="center">1,8</td></tr>
+<tr><td>MSN (Inktomi)</td><td align="center">1,7</td><td align="center">1</td></tr>
+<tr><td>Anzwers</td><td align="center">1,3</td><td align="center">0,7</td></tr>
+</table>
+
+<p class="MsoNormal" style="margin-top:6.0pt;margin-right:0cm;margin-bottom:0cm;
+margin-left:0cm;margin-bottom:.0001pt;text-align:justify">&nbsp;</p>
+<h3 style="margin-top:6.0pt;margin-right:0cm;margin-bottom:0cm;
+margin-left:0cm;margin-bottom:.0001pt;text-align:justify">Ljosland (1999-2000).</h3>
+<p>De los trabajos realizados en los &uacute;ltimos a&ntilde;os, destacan especialmente los 
+llevados a cabo por la investigadora noruega Ljosland. Resaltan principalmente 
+dos contribuciones: la primera de ellas analiza las cuestiones m&aacute;s importantes a 
+considerar en la evaluaci&oacute;n de los motores de b&uacute;squeda, la segunda analiza el 
+funcionamiento de un importante n&uacute;mero de motores de b&uacute;squeda cuando se les 
+interroga por palabras de uso poco corriente. </p>
+<p>El primero de los trabajos, presentado en la Conferencia SIGIR’99 (acr&oacute;nimo 
+de la reuni&oacute;n “22th International Conference of Research and Development in 
+Information Retrieval”, celebrada en Berkeley), estudia la relevancia de los 
+documentos recuperados, introduci&eacute;ndose un nivel intermedio de relevancia: 0, 
+0.5 y 1 (<a href="#Ljosland, 2000">Ljosland, 1999</a>). Otro aspecto muy importante es el planteamiento previo 
+que realiza la autora sobre c&oacute;mo reaccionar ante situaciones muy frecuentes en 
+la web, tales como encontrarnos en la respuesta de un motor dos p&aacute;ginas de igual 
+contenido pero alojadas en sitios web distintos o mirrors; la autora se pregunta 
+“&iquest;son p&aacute;ginas relevantes ambas o s&oacute;lo una?” (<a href="#Ljosland, 2000b">Ljosland, 2000</a>). Los contenidos 
+seguramente s&iacute;, pero la segunda p&aacute;gina no va a ser de ning&uacute;n inter&eacute;s para el 
+usuario, as&iacute; que su relevancia, para Ljosland es nula. Esta decisi&oacute;n, aunque 
+susceptible de discusi&oacute;n y de posibles reinterpretaciones, no puede pasar 
+desapercibida, en tanto que el an&aacute;lisis de la relevancia que se lleva a cabo en 
+este estudio se encuentra estrechamente vinculado al contexto en el que se 
+desarrolla: la web, considerando este no presente en la mayor&iacute;a de estudios 
+anteriores. </p>
+<p>Es fundamentalmente, este aspecto del estudio de Ljosland, el que le confiere 
+una mayor representatividad frente a otros estudios que simplemente trasladan 
+los criterios empleados en los estudios realizados sobre los tradicionales SRI a 
+la web si entrar a considerar situaciones de nuevo cu&ntilde;o. </p>
+<p>La autora compara &uacute;nicamente tres motores: Alta Vista, Google y All the Web, 
+siendo el primero un motor de consolidada posici&oacute;n y los otros dos, nuevos 
+proyectos que buscan hacerse un hueco dentro de este amplio conjunto . El 
+experimento muestra que, cuando no se considera la relevancia parcial, se 
+obtienen valores de precisi&oacute;n media de 0.4 para Alta Vista, 0.7 para Google y de 
+0.4 para All the Web. Si se considera la relevancia parcial, suben un poco todos 
+los valores. Otro dato importante medido es la posibilidad de encontrar un 
+documento relevante en el primer lugar de la lista de documentos devueltos por 
+cada motor, siendo de nuevo a Google el motor que m&aacute;s destaca (80% frente al 50% 
+del All the Web y el 30% obtenido por Alta Vista). </p>
+<p>El segundo trabajo de Ljosland analiza la efectividad de la recuperaci&oacute;n de 
+informaci&oacute;n de veinte sistemas entre los que mezcla motores, directorios y meta 
+buscadores. A todos les pide que localicen documentos con palabras de uso poco 
+frecuente. </p>
+<table bgcolor="#FBFFDF" align="center" cellpadding="4">
+<caption align="bottom"><strong>Table 4: </strong>Resultados del estudio de 
+Ljosland de b&uacute;squeda de palabras raras. Fuente: Lojslund, M. <i>Evaluation of 
+twenty Web search engines on ten rare words ranking algorithms</i>. (En l&iacute;nea). 
+Trondheim: Sør-Trøndelag University, 2000. &lt;<a href="http://www.aitel.hist.no/~mildrid/dring/paper/Comp20.doc">http://www.aitel.hist.no/~mildrid/dring/paper/Comp20.doc</a>&gt;
+  (Consulta: 12 May. 2002)</caption>
+<tr><th>&nbsp;</th>	<th>Documentos recuperados</th>	<th>Documentos relevantes 
+  con duplicados</th>	<th>Documentos relevantes sin duplicados</th>	<th>
+  B&uacute;squedas no vac&iacute;as</th></tr>
+<tr><td>Fast</td><td align="center">93</td><td align="center">74</td>
+  <td align="center">70</td><td align="center">9</td></tr>
+<tr><td>Askjeeves</td><td align="center">86</td><td align="center">56</td>
+  <td align="center">49</td><td align="center">10</td></tr>
+<tr><td>Northernlight</td><td align="center">81</td><td align="center">44</td>
+  <td align="center">38</td><td align="center">	9</td></tr>
+<tr><td>Inferencefind</td><td align="center">69</td><td align="center">53</td>
+  <td align="center">41</td><td align="center">	9</td></tr>
+<tr><td>Egosurf</td><td align="center">66</td><td align="center">50</td>
+  <td align="center">41</td><td align="center">7</td></tr>
+<tr><td>Excite</td><td align="center">66</td><td align="center">47</td>
+  <td align="center">35</td><td align="center">9</td></tr>
+<tr><td>Oingo</td><td align="center">55</td><td align="center">43</td>
+  <td align="center">35</td><td align="center">9</td></tr>
+<tr><td>Alta Vista</td><td align="center">50</td><td align="center">45</td>
+  <td align="center">38</td><td align="center">9</td></tr>
+<tr><td>MSN</td><td align="center">47</td><td align="center">37</td>
+  <td align="center">27</td><td align="center">8</td></tr>
+<tr><td>Yahoo</td><td align="center">40</td><td align="center">34</td>
+  <td align="center">28</td><td align="center">8</td></tr>
+<tr><td>Infotiger</td><td align="center">39</td><td align="center">36</td>
+  <td align="center">29</td><td align="center">9</td></tr>
+<tr><td>Google</td><td align="center">38</td><td align="center">33</td>
+  <td align="center">27</td><td align="center">6</td></tr>
+<tr><td>snap.com</td><td align="center">38</td><td align="center">30</td>
+  <td align="center">22</td><td align="center">8</td></tr>
+<tr><td>Hot Bot</td><td align="center">29</td><td align="center">23</td>
+  <td align="center">19</td><td align="center">7</td></tr>
+<tr><td>DirectHit</td><td align="center">27</td><td align="center">5</td>
+  <td align="center">5</td><td align="center">3</td></tr>
+<tr><td>Infoseek</td><td align="center">18</td><td align="center">13</td>
+  <td align="center">11</td><td align="center">6</td></tr>
+<tr><td>Lycos</td><td align="center">12</td><td align="center">11</td>
+  <td align="center">10</td><td align="center">3</td></tr>
+<tr><td>Goto.com</td><td align="center">9</td><td align="center">6</td>
+  <td align="center">6</td><td align="center">2</td></tr>
+<tr><td>Euroseek</td><td align="center">6</td><td align="center">6</td>
+  <td align="center">6</td><td align="center">4</td></tr>
+<tr><td>Webcrawler</td><td align="center">5</td><td align="center">5</td>
+  <td align="center">4</td><td align="center">5</td></tr>
+</table>
+
+<p>La Tabla 4 recoge los documentos recuperados por cada motor y cu&aacute;ntos son 
+relevantes (sin discernir documentos iguales que aparecen en sitios web 
+distintos, que Ljosland denomina duplicados), la tercera columna elimina esos 
+duplicados y en &uacute;ltimo lugar, se muestra el n&uacute;mero de b&uacute;squedas que no han 
+resultado vac&iacute;as, es decir, que han devuelto al menos un documento. Lojslund no 
+emplea aqu&iacute; la “relevancia parcial” (<a href="#Ljosland, 2000b">Ljosland, 2000</a>). </p>
+<p>Los resultados muestran que tanto Fast como AskJeeves devuelven una mayor 
+cantidad de documentos y poseen mejor precisi&oacute;n. El estudio de la precisi&oacute;n 
+permite deducir que es mejor para los motores que poseen escasa cobertura y que 
+pocas veces presentan listas vac&iacute;as de documentos (es decir, que no devuelven 
+nada). La Tabla 5 resume los resultados obtenidos en ambos ensayos: </p>
+<table bgcolor="#FBFFDF" align="center" cellpadding="4">
+<caption align="bottom"><br><strong>Table 5: Tabla resumen del estudio de 
+Ljosland de b&uacute;squeda de palabras raras ordenados por la precisi&oacute;n.</strong> 
+Fuente: Lojslund, M. <i>Evaluation of twenty Web search engines on ten rare 
+words ranking algorithms</i>. (En l&iacute;nea). Trondheim: Sør-Trøndelag University, 
+2000. &lt;<a href="http://www.aitel.hist.no/~mildrid/dring/paper/Comp20.doc">http://www.aitel.hist.no/~mildrid/dring/paper/Comp20.doc</a>&gt;
+  (Consulta: 12 
+May. 2002) </caption>
+<tr><th>Cobertura</th>	<th>Precisi&oacute;n</th>	<th>Exhaustividad</th>	<th>
+  Exhaustividad &uacute;nica</th></tr>
+<tr><td align="center">Askjeeves (0,39)</td><td align="center">Euroseek, 
+  Webcrawler (1,00)</td><td align="center">Askjeeves (0,43)</td><td align="center">
+  Fast (0,58)</td></tr>
+<tr><td align="center">Fast (0,34)</td><td align="center">&nbsp;</td>
+  <td align="center">Fast (0,42)</td><td align="center">Askjeeves (0,57)</td></tr>
+<tr><td align="center">InferenceFind (0,28)</td><td align="center">Lycos (0,95)</td>
+  <td align="center">InferenceFind (0,38)</td><td align="center">	
+  InferenceFind (0,46)</td></tr>
+</table>
+
+<p>Donde Ljosland resulta verdaderamente innovadora es en comparar los 
+resultados devueltos por los distintos motores por medio de una funci&oacute;n de 
+similitud, la de Jaccard m&aacute;s concretamente (<a href="#Salton , G.">SAL, 1983</a>). As&iacute; pretende averiguar 
+hasta qu&eacute; punto los conjuntos de documentos devueltos por algunos motores son 
+realmente subconjuntos de los devueltos por otros. As&iacute;, m&aacute;s all&aacute; de las cifras 
+obtenidas, en este segundo estudio destaca la originalidad del c&aacute;lculo de la 
+similitud de los resultados devueltos por cada motor, ya que la coincidencia en 
+la composici&oacute;n de los &iacute;ndices de documentos de los distintos motores se ha 
+venido calculando normalmente con base en el porcentaje de solapamiento y de 
+referencia &uacute;nica, siendo esta nueva medida algo m&aacute;s elaborada, ya que adem&aacute;s de 
+determinar el grado de intersecci&oacute;n de la respuesta de dos motores mide la 
+similitud de la misma en cuando a la posici&oacute;n que ocupan los documentos en ella.
+</p>
+<p>Con esta &uacute;ltima aportaci&oacute;n, no hay duda alguna sobre que ambos trabajos de 
+Ljosland pueden considerarse de los m&aacute;s completos de los realizados hasta ahora 
+en este campo, a&uacute;n cuando los resultados no resultan f&aacute;cilmente extrapolables 
+por dos razones: en el conjunto de SRI analizados se entremezclan motores, 
+directorios y meta buscadores, y en segundo lugar, las cuestiones planteadas se 
+refieren a la presencia de t&eacute;rminos de uso poco frecuente en documentos, no a la 
+relevancia o no relevancia de un documento con un tema objeto de una necesidad 
+de informaci&oacute;n. </p>
+<h3>C|NET search site olympics (Thomas, 2002).</h3>
+<p>Thomas, publica en la web de la revista electr&oacute;nica C|NET el resultado de un 
+evaluaci&oacute;n de cinco motores de b&uacute;squeda (Alta Vista, Excite, Google, Lycos y MSN 
+Search), realizada a principios del a&ntilde;o 2002. En la misma med&iacute;a dos conceptos, 
+uno experimental y otro m&aacute;s subjetivo (el dise&ntilde;o art&iacute;stico del sitio web y la 
+presentaci&oacute;n de los resultados). El criterio experimental era la relevancia de 
+los enlaces devueltos. Los resultados otorgan mejores resultados a Google con 
+una amplia ventaja sobre el resto.</p>
+
+<h2>Sinopsis de estudios experimentales.</h2>
+
+<p>La revisi&oacute;n de los estudios de evaluaci&oacute;n de los motores de b&uacute;squeda de tipo 
+experimental ha recopilado un total de catorce trabajos, que han empleado, a lo 
+largo de su desarrollo, diecisiete variables diferentes para llevar a cabo sus 
+procesos de an&aacute;lisis. Estos estudios se han sintetizado en la Tabla 6.</p>
+
+<table bgcolor="#FBFFDF" align="center" cellpadding="4" height="605" width="690">
+<caption align="bottom"><br><strong>Tabla 6:&nbsp; </strong>Sinopsis de los 
+estudios experimentales analizados. PB: posibilidades de b&uacute;squeda. TR: tiempo de 
+respuesta. GI: Interface gr&aacute;fica de usuario. DOC: documentaci&oacute;n. TI: tama&ntilde;o del 
+&iacute;ndice. P: precisi&oacute;n. E: exhaustividad. CO: cobertura. FA: frecuencia de 
+actualizaci&oacute;n. PO: porci&oacute;n de p&aacute;gina indexada. FID: fidelidad. HU: acierto 
+&uacute;nico. EE: enlaces err&oacute;neos. ED: enlaces duplicados. FO: formato de presentaci&oacute;n 
+y alineamiento. SO: solapamiento LO: longitud esperada de b&uacute;squeda AL: 
+alineamiento EN: calidad de los enlaces</caption>
+<tr><th height="19" width="99">&nbsp;</th>	<th height="19" width="22">PB</th>	
+  <th height="19" width="24">TR</th>	<th height="19" width="18">GI</th>	
+  <th height="19" width="24">DO</th>	<th height="19" width="16">TI</th>	
+  <th height="19" width="11">
+  P</th>	<th height="19" width="11">E</th>	<th height="19" width="23">CO</th>	
+  <th height="19" width="20">FA</th>	<th height="19" width="21">PO</th>	
+  <th height="19" width="23">HU</th>	<th height="19" width="20">
+  EE</th>	<th height="19" width="22">ED</th>	<th height="19" width="21">FO</th>	
+  <th height="19" width="21">SO</th>	<th height="19" width="22">LO</th>	
+  <th height="19" width="22">EN</th>	<th height="19" width="60">&nbsp;</th></tr>
+<tr><td height="19" width="99">Chu y Rosenthal</td>
+  <td align="center" height="19" width="22">X</td>
+  <td align="center" height="19" width="24">X</td>
+  <td align="center" height="19" width="18">X</td>
+  <td align="center" height="19" width="24">X</td>
+  <td align="center" height="19" width="16">&nbsp;</td>
+  <td align="center" height="19" width="11">X</td>
+  <td align="center" height="19" width="11">X</td>
+  <td align="center" height="19" width="23">X</td>
+  <td align="center" height="19" width="20">X</td>
+  <td align="center" height="19" width="21">X</td>
+  <td align="center" height="19" width="23">&nbsp;</td>
+  <td align="center" height="19" width="20">&nbsp;</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="21">&nbsp;</td>
+  <td align="center" height="19" width="21">&nbsp;</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="60">
+  Alta Vista</td></tr>
+<tr><td height="19" width="99">Leighton, 1995</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="24">&nbsp;</td>
+  <td align="center" height="19" width="18">&nbsp;</td>
+  <td align="center" height="19" width="24">&nbsp;</td>
+  <td align="center" height="19" width="16">&nbsp;</td>
+  <td align="center" height="19" width="11">X</td>
+  <td align="center" height="19" width="11">X</td>
+  <td align="center" height="19" width="23">&nbsp;</td>
+  <td align="center" height="19" width="20">&nbsp;</td>
+  <td align="center" height="19" width="21">&nbsp;</td>
+  <td align="center" height="19" width="23">X</td>
+  <td align="center" height="19" width="20">X</td>
+  <td align="center" height="19" width="22">X</td>
+  <td align="center" height="19" width="21">&nbsp;</td>
+  <td align="center" height="19" width="21">&nbsp;</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="60">
+  Lycos</td></tr>
+<tr><td height="19" width="99">Leighton, 1999</td>
+  <td align="center" height="19" width="22">	&nbsp;</td>
+  <td align="center" height="19" width="24">	&nbsp;</td>
+  <td align="center" height="19" width="18">	&nbsp;</td>
+  <td align="center" height="19" width="24">	&nbsp;</td>
+  <td align="center" height="19" width="16">	&nbsp;</td>
+  <td align="center" height="19" width="11">	X</td>
+  <td align="center" height="19" width="11">	&nbsp;</td>
+  <td align="center" height="19" width="23">	&nbsp;</td>
+  <td align="center" height="19" width="20">	&nbsp;</td>
+  <td align="center" height="19" width="21">	&nbsp;</td>
+  <td align="center" height="19" width="23">	&nbsp;</td>
+  <td align="center" height="19" width="20">	&nbsp;</td>
+  <td align="center" height="19" width="22">	&nbsp;</td>
+  <td align="center" height="19" width="21">	&nbsp;</td>
+  <td align="center" height="19" width="21">	&nbsp;</td>
+  <td align="center" height="19" width="22">	&nbsp;</td>
+  <td align="center" height="19" width="22">	&nbsp;</td>
+  <td align="center" height="19" width="60">	
+  Alta Vista</td></tr>
+<tr><td height="15" width="99">Arents</td>
+  <td align="center" height="15" width="22">&nbsp;</td>
+  <td align="center" height="15" width="24">&nbsp;</td>
+  <td align="center" height="15" width="18">X</td>
+  <td align="center" height="15" width="24">&nbsp;</td>
+  <td align="center" height="15" width="16">X</td>
+  <td align="center" height="15" width="11">X</td>
+  <td align="center" height="15" width="11">&nbsp;</td>
+  <td align="center" height="15" width="23">&nbsp;</td>
+  <td align="center" height="15" width="20">&nbsp;</td>
+  <td align="center" height="15" width="21">&nbsp;</td>
+  <td align="center" height="15" width="23">&nbsp;</td>
+  <td align="center" height="15" width="20">&nbsp;</td>
+  <td align="center" height="15" width="22">&nbsp;</td>
+  <td align="center" height="15" width="21">X</td>
+  <td align="center" height="15" width="21">&nbsp;</td>
+  <td align="center" height="15" width="22">&nbsp;</td>
+  <td align="center" height="15" width="22">&nbsp;</td>
+  <td align="center" height="15" width="60">
+  Google</td></tr>
+<tr><td height="19" width="99">Bharat</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="24">&nbsp;</td>
+  <td align="center" height="19" width="18">&nbsp;</td>
+  <td align="center" height="19" width="24">&nbsp;</td>
+  <td align="center" height="19" width="16">X</td>
+  <td align="center" height="19" width="11">&nbsp;</td>
+  <td align="center" height="19" width="11">&nbsp;</td>
+  <td align="center" height="19" width="23">&nbsp;</td>
+  <td align="center" height="19" width="20">&nbsp;</td>
+  <td align="center" height="19" width="21">&nbsp;</td>
+  <td align="center" height="19" width="23">&nbsp;</td>
+  <td align="center" height="19" width="20">&nbsp;</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="21">&nbsp;</td>
+  <td align="center" height="19" width="21">X</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="60">
+  Alta Vista</td></tr>
+<tr><td height="19" width="99">Ralph</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="24">&nbsp;</td>
+  <td align="center" height="19" width="18">&nbsp;</td>
+  <td align="center" height="19" width="24">&nbsp;</td>
+  <td align="center" height="19" width="16">X</td>
+  <td align="center" height="19" width="11">X</td>
+  <td align="center" height="19" width="11">X</td>
+  <td align="center" height="19" width="23">X</td>
+  <td align="center" height="19" width="20">&nbsp;</td>
+  <td align="center" height="19" width="21">&nbsp;</td>
+  <td align="center" height="19" width="23">&nbsp;</td>
+  <td align="center" height="19" width="20">&nbsp;</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="21">X</td>
+  <td align="center" height="19" width="21">&nbsp;</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="60">
+  Hot Bot</td></tr>
+<tr><td height="19" width="99">Wishard</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="24">&nbsp;</td>
+  <td align="center" height="19" width="18">&nbsp;</td>
+  <td align="center" height="19" width="24">&nbsp;</td>
+  <td align="center" height="19" width="16">&nbsp;</td>
+  <td align="center" height="19" width="11">X</td>
+  <td align="center" height="19" width="11">&nbsp;</td>
+  <td align="center" height="19" width="23">&nbsp;</td>
+  <td align="center" height="19" width="20">&nbsp;</td>
+  <td align="center" height="19" width="21">&nbsp;</td>
+  <td align="center" height="19" width="23">&nbsp;</td>
+  <td align="center" height="19" width="20">&nbsp;</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="21">&nbsp;</td>
+  <td align="center" height="19" width="21">&nbsp;</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="60">
+  Lycos</td></tr>
+<tr><td height="19" width="99">Lawrence</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="24">&nbsp;</td>
+  <td align="center" height="19" width="18">&nbsp;</td>
+  <td align="center" height="19" width="24">&nbsp;</td>
+  <td align="center" height="19" width="16">X</td>
+  <td align="center" height="19" width="11">&nbsp;</td>
+  <td align="center" height="19" width="11">&nbsp;</td>
+  <td align="center" height="19" width="23">X</td>
+  <td align="center" height="19" width="20">&nbsp;</td>
+  <td align="center" height="19" width="21">&nbsp;</td>
+  <td align="center" height="19" width="23">&nbsp;</td>
+  <td align="center" height="19" width="20">X</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="21">&nbsp;</td>
+  <td align="center" height="19" width="21">X</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="60">
+  Hot Bot</td></tr>
+<tr><td height="19" width="99">Gordon</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="24">&nbsp;</td>
+  <td align="center" height="19" width="18">&nbsp;</td>
+  <td align="center" height="19" width="24">&nbsp;</td>
+  <td align="center" height="19" width="16">X</td>
+  <td align="center" height="19" width="11">X</td>
+  <td align="center" height="19" width="11">X</td>
+  <td align="center" height="19" width="23">&nbsp;</td>
+  <td align="center" height="19" width="20">X</td>
+  <td align="center" height="19" width="21">&nbsp;</td>
+  <td align="center" height="19" width="23">&nbsp;</td>
+  <td align="center" height="19" width="20">&nbsp;</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="21">&nbsp;</td>
+  <td align="center" height="19" width="21">X</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="60">
+  Alta Vista</td></tr>
+<tr><td height="19" width="99">Gwidzka</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="24">&nbsp;</td>
+  <td align="center" height="19" width="18">X</td>
+  <td align="center" height="19" width="24">&nbsp;</td>
+  <td align="center" height="19" width="16">&nbsp;</td>
+  <td align="center" height="19" width="11">X</td>
+  <td align="center" height="19" width="11">&nbsp;</td>
+  <td align="center" height="19" width="23">&nbsp;</td>
+  <td align="center" height="19" width="20">&nbsp;</td>
+  <td align="center" height="19" width="21">&nbsp;</td>
+  <td align="center" height="19" width="23">&nbsp;</td>
+  <td align="center" height="19" width="20">X</td>
+  <td align="center" height="19" width="22">X</td>
+  <td align="center" height="19" width="21">X</td>
+  <td align="center" height="19" width="21">&nbsp;</td>
+  <td align="center" height="19" width="22">X</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="60">
+  Alta Vista</td></tr>
+<tr><td height="19" width="99">Ming</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="24">X</td>
+  <td align="center" height="19" width="18">X</td>
+  <td align="center" height="19" width="24">&nbsp;</td>
+  <td align="center" height="19" width="16">X</td>
+  <td align="center" height="19" width="11">X</td>
+  <td align="center" height="19" width="11">&nbsp;</td>
+  <td align="center" height="19" width="23">&nbsp;</td>
+  <td align="center" height="19" width="20">&nbsp;</td>
+  <td align="center" height="19" width="21">&nbsp;</td>
+  <td align="center" height="19" width="23">&nbsp;</td>
+  <td align="center" height="19" width="20">&nbsp;</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="21">&nbsp;</td>
+  <td align="center" height="19" width="21">&nbsp;</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="22">X</td>
+  <td align="center" height="19" width="60">
+  Alta Vista</td></tr>
+<tr><td height="19" width="99">Notess</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="24">&nbsp;</td>
+  <td align="center" height="19" width="18">&nbsp;</td>
+  <td align="center" height="19" width="24">&nbsp;</td>
+  <td align="center" height="19" width="16">X</td>
+  <td align="center" height="19" width="11">&nbsp;</td>
+  <td align="center" height="19" width="11">&nbsp;</td>
+  <td align="center" height="19" width="23">X</td>
+  <td align="center" height="19" width="20">&nbsp;</td>
+  <td align="center" height="19" width="21">&nbsp;</td>
+  <td align="center" height="19" width="23">X</td>
+  <td align="center" height="19" width="20">X</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="21">&nbsp;</td>
+  <td align="center" height="19" width="21">X</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="60">
+  Fast</td></tr>
+<tr><td height="19" width="99">Lojsland, 1999</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="24">&nbsp;</td>
+  <td align="center" height="19" width="18">&nbsp;</td>
+  <td align="center" height="19" width="24">&nbsp;</td>
+  <td align="center" height="19" width="16">&nbsp;</td>
+  <td align="center" height="19" width="11">X</td>
+  <td align="center" height="19" width="11">&nbsp;</td>
+  <td align="center" height="19" width="23">&nbsp;</td>
+  <td align="center" height="19" width="20">&nbsp;</td>
+  <td align="center" height="19" width="21">&nbsp;</td>
+  <td align="center" height="19" width="23">&nbsp;</td>
+  <td align="center" height="19" width="20">&nbsp;</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="21">&nbsp;</td>
+  <td align="center" height="19" width="21">&nbsp;</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="60">
+  Google</td></tr>
+<tr><td height="19" width="99">Lojsland, 2000</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="24">&nbsp;</td>
+  <td align="center" height="19" width="18">&nbsp;</td>
+  <td align="center" height="19" width="24">&nbsp;</td>
+  <td align="center" height="19" width="16">X</td>
+  <td align="center" height="19" width="11">X</td>
+  <td align="center" height="19" width="11">X</td>
+  <td align="center" height="19" width="23">&nbsp;</td>
+  <td align="center" height="19" width="20">&nbsp;</td>
+  <td align="center" height="19" width="21">&nbsp;</td>
+  <td align="center" height="19" width="23">X</td>
+  <td align="center" height="19" width="20">&nbsp;</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="21">&nbsp;</td>
+  <td align="center" height="19" width="21">X</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="60">
+  Fast</td></tr>
+<tr><td height="19" width="99">Thomas, 2002</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="24">&nbsp;</td>
+  <td align="center" height="19" width="18">&nbsp;</td>
+  <td align="center" height="19" width="24">&nbsp;</td>
+  <td align="center" height="19" width="16">&nbsp;</td>
+  <td align="center" height="19" width="11">X</td>
+  <td align="center" height="19" width="11">&nbsp;</td>
+  <td align="center" height="19" width="23">&nbsp;</td>
+  <td align="center" height="19" width="20">&nbsp;</td>
+  <td align="center" height="19" width="21">&nbsp;</td>
+  <td align="center" height="19" width="23">&nbsp;</td>
+  <td align="center" height="19" width="20">&nbsp;</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="21">X</td>
+  <td align="center" height="19" width="21">&nbsp;</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="22">&nbsp;</td>
+  <td align="center" height="19" width="60">
+  Google</td></tr>
+</table>
+
+<p>El n&uacute;mero de estudios realizados es menor que en el caso de los expl&iacute;citos y 
+se han usado m&aacute;s variables, ocurrencias perfectamente comprensibles ya que un 
+estudio experimental suele ser m&aacute;s complejo en su elaboraci&oacute;n. El n&uacute;mero medio 
+de variables empleadas por trabajo alcanza el valor de 4.21, resultado de 
+dividir las 59 variables entre los 14 estudios, duplicando as&iacute; la cifra obtenida 
+en los estudios expl&iacute;citos. Al igual que en la presentaci&oacute;n de los estudios 
+expl&iacute;citos, en la &uacute;ltima columna de la tabla se indica qu&eacute; motor recibe la mejor 
+valoraci&oacute;n en cada estudio. En esta ocasi&oacute;n aparecen citados cinco motores, dos 
+menos que en el caso anterior. Las caracter&iacute;sticas m&aacute;s veces empleadas son: 
+precisi&oacute;n (12 veces), tama&ntilde;o del &iacute;ndice (8 veces), enlaces err&oacute;neos y 
+solapamiento (5 veces). La mayor&iacute;a de los estudios que emplean la precisi&oacute;n, 
+muestran a Alta Vista como el mejor. Con el tama&ntilde;o del &iacute;ndice no existe una 
+tendencia clara, ya que se proponen hasta cuatro motores distintos. La presencia 
+de Google en los estudios (en los m&aacute;s recientes o actualizados) suele implicar 
+su designaci&oacute;n como el de &iacute;ndice m&aacute;s grande, en cambio, cuando Google no aparece 
+(seguramente por la fecha del estudio, anterior a su puesta en marcha), Alta 
+Vista ocupaba esa posici&oacute;n de privilegio. </p>
+<p>El n&uacute;mero de motores analizados en cada estudio y el n&uacute;mero de variables 
+empleadas es otro par&aacute;metro de inter&eacute;s, ya que sirve para valorar la relevancia 
+de estos trabajos. En la Tabla 7 se observa c&oacute;mo abordan los autores sus 
+an&aacute;lisis: </p>
+
+<table bgcolor="#FBFFDF" align="center" cellpadding="4" width="550">
+<caption align="bottom"><strong>Tabla 7:</strong><span lang="ES">S&iacute;ntesis del 
+n&uacute;mero de caracter&iacute;sticas empleadas en los estudios experimentales.</span></caption>
+<tr><th width="149" rowspan="2">&nbsp;</th>	<th width="243" colspan="6">N&uacute;mero 
+  de motores analizados</th>	<th width="76" rowspan="2">N&uacute;mero de variables 
+  utilizadas</th></tr>
+<tr><th width="40">&lt;=3</th>	<th width="37">4-6</th>	<th width="38">7-9</th>	
+  <th width="49">10-15</th>	<th width="52">15-20</th>	<th width="27">&gt;20</th>	</tr>
+<tr><td height="19" width="99">Chu y Rosenthal</td>
+  <td width="40" align="center">X</td><td width="37" align="center">&nbsp;</td>
+  <td width="38" align="center">&nbsp;</td><td width="49" align="center">&nbsp;</td>
+  <td width="52" align="center">&nbsp;</td><td width="27" align="center">&nbsp;</td>
+  <td align="center" width="76">9</td></tr>
+<tr><td height="19" width="99">Leighton, 1995</td>
+  <td width="40" align="center">&nbsp;</td><td width="37" align="center">X</td>
+  <td width="38" align="center">&nbsp;</td><td width="49" align="center">&nbsp;</td>
+  <td width="52" align="center">&nbsp;</td><td width="27" align="center">&nbsp;</td>
+  <td align="center" width="76">5</td></tr>
+<tr><td height="19" width="99">Leighton, 1999</td>
+  <td width="40" align="center">&nbsp;</td><td width="37" align="center">X</td>
+  <td width="38" align="center">&nbsp;</td><td width="49" align="center">&nbsp;</td>
+  <td width="52" align="center">&nbsp;</td><td width="27" align="center">&nbsp;</td>
+  <td align="center" width="76">	1</td></tr>
+<tr><td height="15" width="99">Arents</td>
+  <td width="40" align="center">&nbsp;</td><td width="37" align="center">&nbsp;</td>
+  <td width="38" align="center">&nbsp;</td><td width="49" align="center">X</td>
+  <td width="52" align="center">&nbsp;</td><td width="27" align="center">&nbsp;</td>
+  <td align="center" width="76">4</td></tr>
+<tr><td height="19" width="99">Bharat</td>
+  <td width="40" align="center">&nbsp;</td><td width="37" align="center">X</td>
+  <td width="38" align="center">&nbsp;</td><td width="49" align="center">&nbsp;</td>
+  <td width="52" align="center">&nbsp;</td><td width="27" align="center">&nbsp;</td>
+  <td align="center" width="76">2</td></tr>
+<tr><td height="19" width="99">Ralph</td>
+  <td width="40" align="center">&nbsp;</td><td width="37" align="center">&nbsp;</td>
+  <td width="38" align="center">X</td><td width="49" align="center">&nbsp;</td>
+  <td width="52" align="center">&nbsp;</td><td width="27" align="center">&nbsp;</td>
+  <td align="center" width="76">5</td></tr>
+<tr><td height="19" width="99">Wishard</td>
+  <td width="40" align="center">&nbsp;</td><td width="37" align="center">&nbsp;</td>
+  <td width="38" align="center">&nbsp;</td><td width="49" align="center">&nbsp;</td>
+  <td width="52" align="center">X</td><td width="27" align="center">&nbsp;</td>
+  <td align="center" width="76">1</td></tr>
+<tr><td height="19" width="99">Lawrence</td>
+  <td width="40" align="center">&nbsp;</td><td width="37" align="center">X</td>
+  <td width="38" align="center">&nbsp;</td><td width="49" align="center">&nbsp;</td>
+  <td width="52" align="center">&nbsp;</td><td width="27" align="center">&nbsp;</td>
+  <td align="center" width="76">4</td></tr>
+<tr><td height="19" width="99">Gordon</td>
+  <td width="40" align="center">&nbsp;</td><td width="37" align="center">&nbsp;</td>
+  <td width="38" align="center">X</td><td width="49" align="center">&nbsp;</td>
+  <td width="52" align="center">&nbsp;</td><td width="27" align="center">&nbsp;</td>
+  <td align="center" width="76">5</td></tr>
+<tr><td height="19" width="99">Gwidzka</td>
+  <td width="40" align="center">X</td><td width="37" align="center">&nbsp;</td>
+  <td width="38" align="center">&nbsp;</td><td width="49" align="center">&nbsp;</td>
+  <td width="52" align="center">&nbsp;</td><td width="27" align="center">&nbsp;</td>
+  <td align="center" width="76">6</td></tr>
+<tr><td height="19" width="99">Ming</td>
+  <td width="40" align="center">X</td><td width="37" align="center">&nbsp;</td>
+  <td width="38" align="center">&nbsp;</td><td width="49" align="center">&nbsp;</td>
+  <td width="52" align="center">&nbsp;</td><td width="27" align="center">&nbsp;</td>
+  <td align="center" width="76">5</td></tr>
+<tr><td height="19" width="99">Notess</td>
+  <td width="40" align="center">&nbsp;</td><td width="37" align="center">&nbsp;</td>
+  <td width="38" align="center">&nbsp;</td><td width="49" align="center">&nbsp;</td>
+  <td width="52" align="center">&nbsp;</td><td width="27" align="center">X</td>
+  <td align="center" width="76">5</td></tr>
+<tr><td height="19" width="99">Lojsland, 1999</td>
+  <td width="40" align="center">X</td><td width="37" align="center">&nbsp;</td>
+  <td width="38" align="center">&nbsp;</td><td width="49" align="center">&nbsp;</td>
+  <td width="52" align="center">&nbsp;</td><td width="27" align="center">&nbsp;</td>
+  <td align="center" width="76">1</td></tr>
+<tr><td height="19" width="99">Lojsland, 2000</td>
+  <td width="40" align="center">&nbsp;</td><td width="37" align="center">&nbsp;</td>
+  <td width="38" align="center">&nbsp;</td><td width="49" align="center">&nbsp;</td>
+  <td width="52" align="center">X</td><td width="27" align="center">&nbsp;</td>
+  <td align="center" width="76">5</td></tr>
+<tr><td height="19" width="99">Thomas, 2002</td>
+  <td width="40" align="center">&nbsp;</td><td width="37" align="center">X</td>
+  <td width="38" align="center">&nbsp;</td><td width="49" align="center">&nbsp;</td>
+  <td width="52" align="center">&nbsp;</td><td width="27" align="center">&nbsp;</td>
+  <td align="center" width="76">2</td></tr>
+</table>
+
+<p>La mayor&iacute;a de las veces se analizan, como m&aacute;ximo, seis motores (9 de 14 
+veces). En cuanto al n&uacute;mero de par&aacute;metros de cada estudio, el de Chu y Rosenthal 
+(curiosamente el primero) llega a emplear nueve, siendo m&aacute;s normal analizar 
+cinco o seis variables (hecho ocurrido 7 de las 12 ocasiones restantes). 
+Siguiendo la l&iacute;nea marcada por este estudio, al analizar un n&uacute;mero considerable 
+de par&aacute;metros en pocos motores, lo normal ser&iacute;a que este grupo mayoritario de 
+estudios analizase un conjunto reducido de motores, aunque no existe una 
+tendencia clara en este punto, ya que su cobertura es muy diversa.</p>
+
+<h2>Propuestas globales de evaluaci&oacute;n.</h2>
+
+<p>Oppenheim presenta una sugerencia de criterios m&iacute;nimos necesarios para el 
+dise&ntilde;o de una metodolog&iacute;a de evaluaci&oacute;n, fruto de una exhaustiva s&iacute;ntesis de las 
+medidas empleadas en otros trabajos anteriores (Oppenheim, 2000). A este trabajo 
+le sigue un interesante estudio realizado por Savoy y Picard (<a href="#Savoy, J.">Savoy, 2001</a>), 
+donde analizan la efectividad de los distintos modelos sobre los que se basan 
+los SRI en la web, en lugar de analizar el comportamiento de un motor espec&iacute;fico 
+frente a otro. El tercero de los trabajos que se presenta expone la necesidad de 
+encontrar una metodolog&iacute;a ajena a los juicios de relevancia, basada en unos 
+par&aacute;metros de sensibilidad y utilidad de los documentos. Por &uacute;ltimo, el cuarto 
+trabajo recogido presenta una propuesta global de evaluaci&oacute;n de los SRI en la 
+web elaborada desde el punto de vista del usuario final (<a href="#Johnson, F.C">Johnson, 2001</a>).</p>
+
+<h3>Oppenheim (2000).</h3>
+
+<p>A partir de la s&iacute;ntesis de estudios de evaluaci&oacute;n anteriores, los autores 
+formulan una metodolog&iacute;a de evaluaci&oacute;n de los motores de b&uacute;squeda, agrupando los 
+m&eacute;todos m&aacute;s empleados en cuatro categor&iacute;as: </p>
+<ul>
+  <li>Evaluaciones a peque&ntilde;a escala </li>
+  <li>Evaluaciones basadas en los tests Cranfield </li>
+  <li>Evaluaciones basadas en los tests Cranfield con estimaci&oacute;n del tama&ntilde;o del 
+  motor </li>
+  <li>Evaluaciones que eluden la exhaustividad </li>
+</ul>
+
+<p>La Tabla 8 sintetiza el conjunto de criterios empleados y las conclusiones 
+que de su estudio se extrajeron.</p>
+
+<table bgcolor="#FBFFDF" align="center" cellpadding="4">
+<caption align="bottom"><strong>Tabla 8: </strong>Resumen de caracter&iacute;sticas 
+empleadas en las evaluaciones de los SRI. Fuente: <a href="#Oppenheim, C.">Oppenheim, 2000</a>.</caption>
+<tr><th>Criterio</th>	<th>Conclusiones generales</th></tr>
+<tr><td align="left"><span lang="ES">N&uacute;mero de p&aacute;ginas 
+  cubiertas y cobertura</span></td><td align="justify">
+  <p align="justify"><span lang="ES">Ning&uacute;n motor de 
+  b&uacute;squeda por s&iacute; solo indexa toda la web. Los resultados adem&aacute;s proyectan 
+  algunas dudas sobre la validez de usar la exhaustividad relativa como medida.</span></td></tr>
+<tr><td align="left"><span lang="ES">Actualizaci&oacute;n del 
+  &iacute;ndice y n&uacute;mero de enlaces err&oacute;neos</span> </td><td align="justify">
+  <span lang="ES">La frecuencia de actualizaci&oacute;n es un 
+  par&aacute;metro casi tan importante como el tama&ntilde;o del &iacute;ndice del motor.</span></td></tr>
+<tr><td align="left"><span lang="ES">Relevancia</span></td>
+  <td align="justify">	<span lang="ES">Normalmente se 
+  hace uso de una visi&oacute;n binaria de la relevancia (s&iacute;-no), aunque otros 
+  introducen escalas.</span></td></tr>
+<tr><td align="left"><span lang="ES">Sintaxis</span></td>
+  <td align="justify"><span lang="ES">Se identifican 
+  tres categor&iacute;as: frases, lenguaje natural y booleanas.</span></td></tr>
+<tr><td align="left"><span lang="ES">Materias</span></td>
+  <td align="justify"><span lang="ES">Campo no muy 
+  estudiado. Es normal que un motor ofrezca mejores resultados en un &aacute;rea que en 
+  otra.</span></td></tr>
+<tr><td align="left"><span lang="ES">La din&aacute;mica 
+  naturaleza de la web</span></td><td align="justify">
+  <span lang="ES">Una p&aacute;gina puede cambiar o 
+  desaparecer al poco de ser indexada. Esto implica que los resultados ofrecidos 
+  por distintos motores sean diferentes. Los experimentos deben contemplar este 
+  dinamismo y las evaluaciones deben hacerse en fechas pr&oacute;ximas y repetirse a 
+  para incorporar los cambios que se vayan produciendo.</span></td></tr>
+<tr><td align="left"><span lang="ES">Tiempo de 
+  respuesta</span></td><td align="justify">
+  <span lang="ES">Par&aacute;metro de dif&iacute;cil c&aacute;lculo y muy 
+  supeditado al tr&aacute;fico de la red</span></td></tr>
+<tr><td align="left"><span lang="ES">Caracter&iacute;sticas 
+  diferentes del sistema</span></td><td align="justify">
+  <span lang="ES">Las caracter&iacute;sticas de cada sistema 
+  influyen considerablemente en sus usuarios. Destacan varios trabajos que 
+  recomiendan hacer uso de motores <i>ad hoc</i> para cada necesidad particular 
+  de informaci&oacute;n.</span></td></tr>
+<tr><td align="left"><span lang="ES">Opciones de 
+  b&uacute;squeda</span></td><td align="justify">
+  <span lang="ES">Si los motores hacen uso de 
+  b&uacute;squedas simples y/o avanzadas. Algunos emplean otros tipos de b&uacute;squedas m&aacute;s 
+  complejas. Tambi&eacute;n se estudian las preferencias de b&uacute;squeda de los usuarios</span></td></tr>
+<tr><td align="left"><span lang="ES">Factores humanos 
+  y cuestiones de la interface</span></td><td align="justify">
+  <span lang="ES">Los motores deben evaluarse bajo una 
+  perspectiva de usuario que evite problemas con la subjetividad. El an&aacute;lisis de 
+  la interface lleva impl&iacute;cito una obsolescencia. Estos ingenios resultan 
+  inaccesibles, en gran medida, para invidentes.</span></td></tr>
+<tr><td align="left"><span lang="ES">Calidad de los 
+  res&uacute;menes</span></td><td align="justify">
+  <span lang="ES">Aspecto que parec&iacute;a relegado a un 
+  papel residual dentro de la evaluaci&oacute;n de los motores. Se han comparado 
+  res&uacute;menes procedentes de motores y directorios con los de bases de datos en 
+  l&iacute;nea de amplia difusi&oacute;n, comparando la longitud y legibilidad. El resultado 
+  indica que los directorios poseen mejores res&uacute;menes</span></td></tr>
+</table>
+
+<h3>Savoy y Picard (2001).</h3>
+
+<p>Este estudio investiga “si las t&eacute;cnicas usadas en los SRI mejoran la 
+efectividad en la recuperaci&oacute;n de informaci&oacute;n cuando se aplican a una colecci&oacute;n 
+de documentos web ” (<a href="#Savoy, J.">Savoy, 2001</a>), poniendo en duda la aplicaci&oacute;n de t&eacute;cnicas 
+tan comunes como el aislamiento de la base de las palabras , la presencia de una 
+lista de palabras vac&iacute;as o la presencia de palabras significativas en el t&iacute;tulo 
+de la p&aacute;gina web. </p>
+<p>Savoy y Picard miden la precisi&oacute;n tras analizar los 10 primeros documentos 
+devueltos por cada modelo y los 20 primeros documentos. Este interesante 
+experimento se desarroll&oacute; sobre la base de datos WT2g, colecci&oacute;n mantenida por 
+TREC con un tama&ntilde;o de 2194 MB y que consta de 247.491 p&aacute;ginas distintas 
+extra&iacute;das de 969 URLs, con m&aacute;s de un 1.850.000 t&eacute;rminos de indizaci&oacute;n. Los 
+resultados de este primer an&aacute;lisis son los siguientes: </p>
+<ul>
+  <li>El modelo probabil&iacute;stico devuelve unos resultados ligeramente superiores a 
+  los obtenidos por el modelo del vector cl&aacute;sico. </li>
+  <li>El modelo vectorial que emplea el esquema tf-idf no arroja resultados muy 
+  satisfactorios. </li>
+  <li>Resultan especialmente pobres los resultados del esquema basado en la 
+  frecuencia de aparici&oacute;n de los t&eacute;rminos en los documentos. </li>
+  <li>La precisi&oacute;n medida desde el punto de vista de promedio resulta muy baja 
+  tras analizar una serie de mil documentos (en torno al 25% en los casos m&aacute;s 
+  precisos). </li>
+</ul>
+<p>Un dato a considerar es el considerable descenso de los valores de la 
+precisi&oacute;n cuando se hace uso de los t&eacute;rminos recogidos en los t&iacute;tulos de las 
+p&aacute;ginas web y en las zonas de descripci&oacute;n de los documentos. Por lo tanto, en 
+contra de una de los consejos m&aacute;s cl&aacute;sicos que se realizan a la hora de editar 
+una p&aacute;gina web, el insertar una breve descripci&oacute;n de la p&aacute;gina en el t&iacute;tulo, no 
+mejora significativamente la precisi&oacute;n en la recuperaci&oacute;n de informaci&oacute;n. 
+Igualmente, asignar un mayor peso a las palabras del t&iacute;tulo o de los encabezados 
+de las p&aacute;ginas, no posee efectos significativos sobre la precisi&oacute;n. </p>
+<p>Casi de forma paralela a la realizaci&oacute;n de este estudio, estos mismos autores 
+analizaron la efectividad de tres modelos de recuperaci&oacute;n de informaci&oacute;n en la 
+web: el cl&aacute;sico (representado por el TRECeval software y que siguen la mayor&iacute;a 
+de los motores), el de extensi&oacute;n de enlaces (el usado por Google) y uno basado 
+en el modelo probabil&iacute;stico (<a href="#Picard">Picard, 2001</a>). Aunque tampoco comparan motores de 
+b&uacute;squeda en particular, s&iacute; eval&uacute;an las prestaciones de Google frente a los 
+motores cl&aacute;sicos. Los valores medios obtenidos, cuando se han considerado los 
+enlaces que salen de las p&aacute;ginas analizadas, se recogen en la Tabla 9: </p>
+<table bgcolor="#FBFFDF" align="center" cellpadding="4">
+<caption align="bottom"><strong>Tabla 9: </strong>Resumen de resultados de 
+la efectividad de los distintos modelos de recuperaci&oacute;n de informaci&oacute;n en la 
+web. Fuente: <i>Picard, J, and Savoy, J. Searching and Classyfing the web using 
+hyperlinks: A logical approach.</i>  (En l&iacute;nea) Neuchatel: III, Universitè, 2001. 
+&lt;<a href="http://www.unine.ch/info/Gi/Papers/ictai.pdf">http://www.unine.ch/info/Gi/Papers/ictai.pdf</a>&gt;
+  (Consulta: 21 Nov. 2002)</caption>
+<tr><th>TRECeval</th>	<th>Extensi&oacute;n enlaces</th>	<th>Probabil&iacute;stico</th>	<th>
+  Probabil&iacute;stico vs<br>
+&nbsp;TRECeval</th>	<th>Probabil&iacute;stico vs<br>
+&nbsp;Extensi&oacute;n Enlaces</th></tr>
+<tr><td align="center">0,253</td><td align="center">0,266</td>
+  <td align="center">0,267</td><td align="center">+5.53%</td><td align="center">
+  <span lang="ES" style="layout-grid-mode: both">+0.37</span></td></tr>
+</table>
+
+<h3>Schlichting y Nilsen (1997).</h3>
+
+<p>Para los autores de este trabajo, las primeras evaluaciones que se realizaron
+de los motores de b&uacute;squeda &quot;pose&iacute;an un escas&iacute;simo nivel
+cient&iacute;fico&quot;. De hecho, Schlichting y Nilsen indican que los trabajos de
+Winsip y de Leighton de 1995 constituyen un avance important&iacute;simo en este campo
+de trabajo. El objetivo de este trabajo es mostrar una metodolog&iacute;a que pueda
+emplearse para comparar motores de b&uacute;squeda y otro tipo de posibles futuros
+sistemas inteligentes de recuperaci&oacute;n de informaci&oacute;n, metodolog&iacute;a que debe
+encontrar alguna manera de medir la calidad de los resultados ofrecidos por un
+motor. Los autores proponen la Metodolog&iacute;a SDA , que proporciona dos medidas:
+d' que mide la sensibilidad del motor de b&uacute;squeda en hallar informaci&oacute;n &uacute;til
+y ß que mide c&oacute;mo de conservador (o de liberal) es el comportamiento de motor
+a la hora de determinar qu&eacute; p&aacute;ginas deben formar parte de la respuesta (mide
+el grado de flexibilidad del motor a la hora de considerar relevante un nuevo
+documento analizado). Este m&eacute;todo &quot;supera el alcance del simple c&oacute;mputo
+de los aciertos, que s&oacute;lo emplea una peque&ntilde;a cantidad de los datos e ignora el
+amplio contexto de la b&uacute;squeda de informaci&oacute;n&quot; (<a href="#Schlichting, C">Schlichting, 2001</a>).&nbsp;</p>
+
+<p>Los motores analizados fueron Alta Vista, Lycos, Infoseek y Excite. Se
+obtuvieron un total de 200 documentos, de los cuales s&oacute;lo 54 fueron
+considerados relevantes, siendo Lycos el que obtuvo un mayor n&uacute;mero. El primer
+paso de esta metodolog&iacute;a es asignar una categor&iacute;a a cada uno de los resultados
+devueltos con base en la relevancia de cada uno (acierto, falsa alarma, perdido
+y rechazado correctamente). En la Tabla 10 aparecen los resultados de estas
+ratios obtenidas en este experimento:</p>
+
+<table bgcolor="#FBFFDF" align="center" cellpadding="4">
+<caption align="bottom"><strong>Tabla 10: </strong>Ratios de acierto y falsa
+  alarma en cuatro motores de b&uacute;squeda. Fuente: <i>Signal Detection Analysis of
+  WWW Search Engines</i>. (En l&iacute;nea) Seattle: Microsoft, 1997. &lt;<a href="http://www.microsoft.com/usability/webconf/schlichting/schlichting.htm">http://www.microsoft.com/usability/webconf/schlichting/schlichting.htm</a>&gt;<br>
+  (Consulta: 21 Nov. 2002)</caption>
+<tr><th>TRECeval</th>	<th>Extensi&oacute;n enlaces</th>	<th>Probabil&iacute;stico</th>	<th>
+  Probabil&iacute;stico vs<br>
+&nbsp;TRECeval</th>	<th>Probabil&iacute;stico vs<br>
+&nbsp;Extensi&oacute;n Enlaces</th></tr>
+<tr><td align="center">0,253</td><td align="center">0,266</td>
+  <td align="center">0,267</td><td align="center">+5.53%</td><td align="center">
+  <span lang="ES" style="layout-grid-mode: both">+0.37</span></td></tr>
+</table>
+
+<p>Esta metodolog&iacute;a no se detiene en este punto, ya que estos valores le sirven
+para la determinaci&oacute;n de la medida de la sensibilidad (d') y de la flexibilidad
+(ß). Los resultados obtenidos en el estudio asignaron a Lycos (con un discreto
+valor de 0.48 sobre 2, aunque muy por encima del resto), como el motor m&aacute;s
+sensible. El m&aacute;s claro resultado de este estudio es que el rendimiento de los
+motores de b&uacute;squeda &quot;est&aacute; muy lejos de ser considerado ideal&quot;(<a href="#Schlichting, C">Schlichting,
+2001</a>).</p>
+
+<h3>Johnson, Griffiths y Hartley (2001).</h3>
+
+<p>En la <i>Universidad Metropolitana de Manchester</i> , se ha desarrollado
+recientemente un estudio orientado a fijar un marco global para la evaluaci&oacute;n
+de los motores de b&uacute;squeda. Tras una descripci&oacute;n de estos sistemas y una
+presentaci&oacute;n de su evoluci&oacute;n, el estudio revisa las evaluaciones previas desde
+una perspectiva sist&eacute;mica que evoluciona hacia un punto de vista centrado en el
+usuario. En &uacute;ltimo lugar, se construye un marco global para la evaluaci&oacute;n
+basado en criterios de satisfacci&oacute;n del usuario, las medidas que se van a
+emplear y el contexto donde se desarrollar&aacute; la evaluaci&oacute;n. Esta propuesta se
+esquematizarse en la Tabla 11:</p>
+
+<table bgcolor="#FBFFDF" align="center" cellpadding="4">
+<caption align="bottom"><strong>Tabla 10: </strong>Propuesta de un marco
+  global de evaluaci&oacute;n de motores de b&uacute;squeda del <i>Informe DEVISE</i>.</caption>
+<tr><th colspan="4">Evaluaci&oacute;n de la satisfacci&oacute;n del usuario de los SRI en la
+    web.<br>
+    (Johnson, Griffiths y Hartley, 2001)</th>	</tr>
+<tr><td><b>Eficacia</b></td><td><b>Eficiencia</b></td><td><b>Utilidad</b></td><td align="center"><b>Interacci&oacute;n</b></td></tr>
+<tr><td><span style="mso-fareast-font-family: Times New Roman; mso-ansi-language: ES; mso-fareast-language: ES; mso-bidi-language: AR-SA">P1:
+    <i style="mso-bidi-font-style:normal">precisi&oacute;n</i></span></td><td><span style="mso-fareast-font-family: Times New Roman; mso-ansi-language: ES; mso-fareast-language: ES; mso-bidi-language: AR-SA">Tiempo
+    empleado en la sesi&oacute;n de b&uacute;squeda</span></td><td><span style="mso-fareast-font-family: Times New Roman; mso-ansi-language: ES; mso-fareast-language: ES; mso-bidi-language: AR-SA">Valor
+    global de los resultados</span></td><td align="left"><span style="mso-fareast-font-family: Times New Roman; mso-ansi-language: ES; mso-fareast-language: ES; mso-bidi-language: AR-SA">Satisfacci&oacute;n
+    del usuario con el formato de salida de los resultados</span></td></tr>
+<tr><td><span style="mso-fareast-font-family: Times New Roman; mso-ansi-language: ES; mso-fareast-language: ES; mso-bidi-language: AR-SA">P2:
+    satisfacci&oacute;n del usuario con la <i style="mso-bidi-font-style:normal">precisi&oacute;n</i></span></td><td><span style="mso-fareast-font-family: Times New Roman; mso-ansi-language: ES; mso-fareast-language: ES; mso-bidi-language: AR-SA">Tiempo
+    de respuesta del sistema</span></td><td><span style="mso-fareast-font-family: Times New Roman; mso-ansi-language: ES; mso-fareast-language: ES; mso-bidi-language: AR-SA">Satisfacci&oacute;n
+    con los resultados</span></td><td align="left">	<span style="mso-fareast-font-family: Times New Roman; mso-ansi-language: ES; mso-fareast-language: ES; mso-bidi-language: AR-SA">Satisfacci&oacute;n
+    del usuario con las posibilidades de manejo de los resultados</span></td></tr>
+<tr><td><span style="mso-fareast-font-family: Times New Roman; mso-ansi-language: ES; mso-fareast-language: ES; mso-bidi-language: AR-SA">P3:
+    comparaci&oacute;n de P1 y P2</span></td><td><span style="mso-fareast-font-family: Times New Roman; mso-ansi-language: ES; mso-fareast-language: ES; mso-bidi-language: AR-SA">Tiempo
+    de establecimiento de la <i style="mso-bidi-font-style:normal">relevancia</i></span></td><td><span style="mso-fareast-font-family: Times New Roman; mso-ansi-language: ES; mso-fareast-language: ES; mso-bidi-language: AR-SA">Grado
+    de resoluci&oacute;n del problema</span></td><td align="center">
+    <p align="left"><span style="mso-fareast-font-family: Times New Roman; mso-ansi-language: ES; mso-fareast-language: ES; mso-bidi-language: AR-SA">Satisfacci&oacute;n
+    del usuario con la visualizaci&oacute;n de la representaci&oacute;n de los documentos</span></td></tr>
+<tr><td><span style="mso-fareast-font-family: Times New Roman; mso-ansi-language: ES; mso-fareast-language: ES; mso-bidi-language: AR-SA">R1:
+    el alineamiento de los documentos que hace el sistema</span></td><td>&nbsp;</td><td><span style="mso-fareast-font-family: Times New Roman; mso-ansi-language: ES; mso-fareast-language: ES; mso-bidi-language: AR-SA">Valor
+    medio de la participaci&oacute;n</span></td><td align="left"><span style="mso-fareast-font-family: Times New Roman; mso-ansi-language: ES; mso-fareast-language: ES; mso-bidi-language: AR-SA">I1:
+    Satisfacci&oacute;n del usuario con la interface del sistema</span></td></tr>
+<tr><td><span style="mso-fareast-font-family: Times New Roman; mso-ansi-language: ES; mso-fareast-language: ES; mso-bidi-language: AR-SA">R2:
+    satisfacci&oacute;n del usuario con el alineamiento R1</span></td><td>&nbsp;</td><td><span style="mso-fareast-font-family: Times New Roman; mso-ansi-language: ES; mso-fareast-language: ES; mso-bidi-language: AR-SA">Calidad
+    de las fuentes</span></td><td align="left"><span style="mso-fareast-font-family: Times New Roman; mso-ansi-language: ES; mso-fareast-language: ES; mso-bidi-language: AR-SA">I2:
+    Satisfacci&oacute;n del usuario con el formato de la pregunta</span></td></tr>
+<tr><td><span style="mso-fareast-font-family: Times New Roman; mso-ansi-language: ES; mso-fareast-language: ES; mso-bidi-language: AR-SA">R3:
+    comparaci&oacute;n de R1 y R2</span></td><td>&nbsp;</td><td><span style="mso-fareast-font-family: Times New Roman; mso-ansi-language: ES; mso-fareast-language: ES; mso-bidi-language: AR-SA">N&uacute;meros
+    de enlaces seguidos</span></td><td align="left"><span style="mso-fareast-font-family: Times New Roman; mso-ansi-language: ES; mso-fareast-language: ES; mso-bidi-language: AR-SA">I3:
+    Satisfacci&oacute;n del usuario con las posibilidades de modificar el<span style="mso-spacerun: yes">&nbsp;
+    </span>formato de la pregunta</span></td></tr>
+<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td align="left"><span style="mso-fareast-font-family: Times New Roman; mso-ansi-language: ES; mso-fareast-language: ES; mso-bidi-language: AR-SA">I4:
+    Satisfacci&oacute;n del usuario con la claridad de la vista global del sistema en
+    la realizaci&oacute;n de una pregunta</span></td></tr>
+<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td align="center">&nbsp;</td></tr>
+</table>
+
+<p>Las medidas de la efectividad del sistema se obtienen a partir de una serie
+de entrevistas realizadas a los usuarios del sistema, una vez realizadas las
+b&uacute;squedas. Los usuarios valoran tanto la precisi&oacute;n como el alineamiento de los
+documentos. La eficiencia del sistema se mide en t&eacute;rminos de tiempo, aunque en
+este caso se diferencia entre el tiempo de respuesta del sistema (el par&aacute;metro
+m&aacute;s utilizado de este grupo en otros estudios anteriores), el tiempo que
+necesita el usuario para la recuperaci&oacute;n de informaci&oacute;n y el tiempo que
+precisa el usuario para discernir la validez del documento recuperado.</p>
+
+<p>La utilidad de los documentos se mide en t&eacute;rminos de valor medio de la
+participaci&oacute;n de los usuarios, a partir de sus propias opiniones sobre el grado
+en el que la informaci&oacute;n recuperada contribuy&oacute; a satisfacer sus necesidades de
+informaci&oacute;n. La interacci&oacute;n con el sistema, &quot;este concepto es a menudo
+citado pero pocas veces ha sido definido. En el contexto de los motores de
+b&uacute;squeda hace referencia a c&oacute;mo el usuario directamente interacciona con el
+sistema para recuperar la informaci&oacute;n que necesita&quot; (<a href="#Johnson, F.C">Johnson, 2001</a>).&nbsp;</p>
+
+<p>En la mayor&iacute;a de los estudios previos, la interactividad se establece por
+medio de la medida I1 (satisfacci&oacute;n del usuario con la interfase del sistema),
+pero Johnson, Griffiths y Hartley destacan la importancia de esta interactividad
+en el momento de la realizaci&oacute;n de una pregunta, para ello definen I2
+(satisfacci&oacute;n del usuario con el formato de la pregunta), I3 (satisfacci&oacute;n del
+usuario con las posibilidades que el sistema le ofrece para modificar la
+pregunta sin tener que repetir toda la consulta) y por &uacute;ltimo, la medida I4
+(satisfacci&oacute;n del usuario con la claridad de la vista global del sistema en el
+momento de realizaci&oacute;n de una pregunta). Tambi&eacute;n se establecen diferencias
+entre el formato de visualizaci&oacute;n de los documentos y el formato de manejo de
+los documentos, conceptos que tradicionalmente siempre han sido considerados
+como uno s&oacute;lo.</p>
+
+<p>Con lo cual, este estudio, viene a representar de forma emp&iacute;rica, las
+principales necesidades de un usuario de un SRI, el usuario necesita
+informaci&oacute;n de valor que cubra sus necesidades de informaci&oacute;n y la misma le
+debe ser entregada en un espacio de tiempo peque&ntilde;o.</p>
+
+<h2>Cr&iacute;tica.</h2>
+
+<p>Uno de los principales problemas de las evaluaciones (de cualquier tipo)
+efectuadas sobre los SRI en la web reside en el hecho de que la mayor&iacute;a se
+centran en analizar la efectividad del acceso f&iacute;sico a los datos, cuando lo que
+verdaderamente cobra importancia hoy en d&iacute;a, es analizar el comportamiento del
+acceso l&oacute;gico a los datos, esto es, el contenido informativo de la
+recuperaci&oacute;n. Si bien se ha desarrollado un amplio conjunto de medidas
+destinadas a llevar a cabo estas evaluaciones, la mayor parte de los estudios
+contin&uacute;an empleando los juicios basados en la relevancia de los documentos para
+valorar esta efectividad. Destacan sobremanera la precisi&oacute;n y la exhaustividad
+(pares de valores E-P). La primera de estas medidas no presenta problemas para
+su determinaci&oacute;n, pero la exhaustividad es una medida de dif&iacute;cil e
+indeterminado c&aacute;lculo. Es por ello que los c&aacute;lculos de la efectividad basados
+en estos pares de valores, no permiten una aproximaci&oacute;n exacta, sino aproximada
+o relativa. A este problema debe a&ntilde;adirse que los pares de valores E-P no
+ofrecen una visi&oacute;n global por si solos, habi&eacute;ndose definido un amplio conjunto
+de medidas de valor simple (basadas, generalmente, en estos pares de valores),
+para medir la efectividad.</p>
+
+<p>La necesidad intr&iacute;nseca de evaluaci&oacute;n de los SRI se ha trasladado al nuevo
+contexto de la web, surgiendo trabajos coet&aacute;neos al desarrollo de los primeros
+directorios y motores de b&uacute;squeda. Al mismo tiempo se han trasladado las dudas
+subyacentes sobre los m&eacute;todos empleados en estas evaluaciones. Otra situaci&oacute;n
+que contribuye a aumentar estas dosis de incertidumbre es la especial naturaleza
+de la web, que propicia situaciones que en el entorno de los SRI tradicionales
+resultar&iacute;an inveros&iacute;miles, propiciando que estos sistemas no est&eacute;n siendo
+correctamente evaluados, ya que no pueden emplearse exclusivamente las medidas
+basadas en la relevancia, sino que resultan necesarias medidas espec&iacute;ficas.</p>
+
+<p>Existen profundas divergencias entre los m&eacute;todos empleados en las evaluaciones
+de motores y directorios. Los trabajos que analizan los aspectos expl&iacute;citos no
+sirven para representar, en modo alguno, la efectividad de la recuperaci&oacute;n de
+informaci&oacute;n. Los estudios experimentales actualizan los criterios empleados en
+los SRI cl&aacute;sicos al entorno de la web y representan mejor la naturaleza
+din&aacute;mica de este nuevo contexto y el funcionamiento de los sistemas analizados,
+aunque realmente las aportaciones a este campo son escasas.</p>
+
+<p>Entre este restringido conjunto de contribuciones destaca el dise&ntilde;o de una
+funci&oacute;n de precisi&oacute;n que considere la posici&oacute;n de los documentos en la
+respuesta, propuesta por Leighton y Srivastava, y el empleo de una funci&oacute;n de
+similitud (Ljosland propone la funci&oacute;n de Jaccard) para determinar en qu&eacute;
+porcentaje las respuestas de un motor forman un subconjunto de las respuestas de
+otro. Con este c&aacute;lculo se establece un nuevo m&eacute;todo de determinaci&oacute;n del
+solapamiento entre los &iacute;ndices de los motores de b&uacute;squeda, tomando como base
+las respuestas que estos motores llevan a cabo a las mismas preguntas, sondeando
+la analog&iacute;a existente entre los conjuntos de documentos gestionados por estos
+sistemas y el orden en el que los mismos se presentan al usuario.</p>
+
+<p>Los trabajos centrados en el establecimiento de un marco global de
+evaluaci&oacute;n de los motores de b&uacute;squeda son sustancialmente distintos y resulta
+complicado hallar una serie de conclusiones comunes entre ellos. De su an&aacute;lisis
+se desprende el convencimiento de la necesidad de aplicar un enfoque
+multidimensional a la evaluaci&oacute;n de la efectividad de la recuperaci&oacute;n de
+informaci&oacute;n en la web, donde exista un cierto grado de relaci&oacute;n entre las
+dimensiones analizadas. Estas metodolog&iacute;as propuestas resultan de dif&iacute;cil
+aplicaci&oacute;n por dos razones: la complejidad del c&aacute;lculo de las medidas
+propuestas y, en segundo lugar, el considerable nivel de abstracci&oacute;n de alguna
+de estas medidas, que las alejan del usuario convencional de la web.</p>
+
+<h2>Conclusiones.</h2>
+
+<p>Para obtener esta adecuada visi&oacute;n, han de evaluarse conjuntamente motores de
+b&uacute;squeda de caracter&iacute;sticas similares, tanto en el tama&ntilde;o de sus &iacute;ndices
+como en sus posibilidades de b&uacute;squeda. Del mismo modo, se deben tener en cuenta
+las restricciones geogr&aacute;ficas que, en algunos casos presentan los motores,
+siendo m&aacute;s conveniente cotejar motores sin ning&uacute;n tipo de restricci&oacute;n. La
+selecci&oacute;n del idioma tambi&eacute;n es importante, en tanto que algunos motores
+pr&aacute;cticamente no pueden ser susceptibles de evaluaci&oacute;n en un idioma distinto
+del ingl&eacute;s. Resulta esencial, antes de proceder a cualquier proceso de
+evaluaci&oacute;n, fijar debidamente la serie de procedimientos a seguir cuando se
+presenten casu&iacute;sticas t&iacute;picas de la web, tales como recuperaci&oacute;n de p&aacute;ginas
+de contenido similar alojadas en distintos sitios, muchas referencias al mismo
+sitio web (situaci&oacute;n muy frecuente en el caso de los portales din&aacute;micos),
+redireccionamientos, etc.&nbsp;</p>
+
+<p>Otra circunstancia que debe clarificarse de antemano es la escala de
+determinaci&oacute;n de la relevancia, contempl&aacute;ndose la posibilidad de emplear
+criterios de relevancia parcial. Creemos que s&iacute; es posible hablar de un
+comportamiento t&iacute;pico de los motores de b&uacute;squeda, independientemente de los
+mejores o peores resultados que ofrezcan en los diversos experimentos
+realizados, ya que los mismos, seguramente, se deben m&aacute;s al espacio sobre el
+cual se definen las vistas l&oacute;gicas de los documentos y las necesidades de
+informaci&oacute;n (de naturaleza difusa y escasamente similar) que a las diferencias
+sustanciales que pueden existir entre un sistema y otro. Finalmente,
+consideramos que las pr&oacute;ximas propuestas de evaluaci&oacute;n de los motores de
+b&uacute;squeda deben abocarnos a encontrar un forma de evaluaci&oacute;n que elimine la
+toma de decisiones, que casi siempre a&ntilde;aden un elemento de subjetividad al
+experimento, y por otro lado permita que de manera simple puedan analizarse
+muestra de resultados suficientemente significativas (en cuanto a su volumen) y
+en periodos cortos en el tiempo. Es en esa direcci&oacute;n donde en la actualidad
+venimos investigando posibles soluciones.</p>
+
+
+<hr color="#ff00ff" SIZE=3>
+
+<div align="center"><strong>To discuss this paper, join the IR-DISCUSS discussion list by subscribing at <a href="http://www.jiscmail.ac.uk/lists/IR-DISCUSS.html">http://www.jiscmail.ac.uk/lists/IR-DISCUSS.html</a></strong></div>
+
+<hr color="#ff00ff" SIZE=3>
+
+<h2>Referencias.</h2>
+
+<ul>
+  <li><a name="Arents, H">Arents, H</a>. (1997) <a href="http://www.lib.rug.ac.be/internet/search.html"><i>A rated selection of Internet search tools</a></i>  Gent: University.  &nbsp; http://www.lib.rug.ac.be/internet/search.html
+(12 feb. 2002)</li>
+
+<li><a name="Bharat, 1998a"></a>Bharat, K. and Broder, A.  (1998)  &quot;<a href="http://www7.scu.edu.au/programme/fullpapers/1937/com1937.htm">A technique for measuring the relative size and overlap of public web search engines</a>&quot;. Paper delivered to the Seventh international World Wide Web conference, Brisbane, Australia, 14-18 April, 1998.  
+http://www7.scu.edu.au/programme/fullpapers/1937/com1937.htm  (21 dic. 2002)</li>
+
+  <li><a name="Bharat, K. and Broder, A."></a>Bharat, K. and Broder, A.  (1998)  <i><a href="http://www.research.compaq.com/src/whatsnew/sem.html">Measuring the Web</a></i>. Palo Alto, CA: Digital Systems Research  Center.   http://www.research.compaq.com/src/whatsnew/sem.html
+  (21 Dic. 2002)</li>
+  
+  <li><a name="Chang, G. et al"></a>Chang, G., Healey, M.J., McHugh, J.A.M. y Wang, J.T.L.  (2001) <i>Mining the World Wide Web: an information search approach&quot;</i>. Norwell, MA: Kluwer Academic Publishers, 2001. </li>
+	
+  <li><a name="Chu, H">Chu, H</a>. and Rosenthal, M.  (1996) &nbsp;<i><a href="http://www.asis.org/annual-96/ElectronicProceedings/chu.html">Search engines for the World Wide Web: a comparative study and evaluation methodology</a></i>. Paper presented at the ASIS 1996 Annual Conference, October 19-24, 1996. http://www.asis.org/annual-96/ElectronicProceedings/chu.html  (4 may. 2002)</li>
+
+  <li><a name="Davis, E"></a>Davis, E.T.  (1996)  <i><a href="http://www.iwaynet.net/~lsci/Search/paper.htm">A comparison of seven search engines</a></i>. Columbus, OH: Kent State University. &nbsp;&nbsp;http://www.iwaynet.net/~lsci/Search/paper.htm  (4 abr. 2002)</li>
+  
+  <li><a name="Delgado Dom&iacute;nguez, A"></a>Delgado Dom&iacute;nguez, A.  (1998) &nbsp;<i><a href="http://dmi.uib.es/people/adelaida/tice/modul6/memfin.pdf">Mecanismos de recuperaci&oacute;n de Informaci&oacute;n en la WWW</a></i>  Mallorca:  Universitat Illes Balears, 1998. (16 Jun. 2002)
+ http://dmi.uib.es/people/adelaida/tice/modul6/memfin.pdf  (15 may. 2002)</li>
+ 
+  <li><a name="Gordon, M"></a>Gordon, M. &amp;  Pathak, P.  (1999)  &quot;Finding information on the World Wide Web: the retrieval effectiveness of search engines.&quot; <i>Information Processing and Management</i> <strong>35</strong>, 141-180</li>
+	
+  <li><a name="Gwizdka, J"></a>Gwizdka, J. &amp; Chignell, M.  (1999) <i><a href="http://www.imedia.mie.utoronto.ca/people/jacek/pubs/webIR_eval1_99.pdf">Towards information retrieval measures for evaluation of Web search engines</a></i>.  Toronto: University of Toronto, Mechanical &amp; Industrial Engineering Department.  (Unpublished manuscript) http://www.imedia.mie.utoronto.ca/people/jacek/pubs/webIR_eval1_99.pdf  (21 mar. 2002)</li>
+  
+  <li><a name="Johnson, F.C"></a>Johnson, F.C., Griffiths, J.R. and Hartley, R.J.  (2001)
+  <i><a href="http://www.mmu.ac.uk/h-ss/cerlim/projects/ devise/devise-report.pdf">DEVISE: a framework for the evaluation of Internet search engines</a>. London: Re:source - The Council for Museums, Archives and Libraries</i>.  http://www.mmu.ac.uk/h-ss/cerlim/projects/ devise/devise-report.pdf  (21 dic. 2002) </li>
+
+  <li><a name="Lancaster, F. W.">Lancaster, F. W.</a> &amp; Warner, A.J.   (1993) <i>Information retrieval today</i>.  Arlington, VA: Information Resources.</li>
+
+  <li><a name="Lawrence, S.">Lawrence, S.</a> &amp; Giles, C.L.  (1998)  &quot;<a href="http://www.neci.nec.com/~lawrence/science98.html">Searching the World Wide Web</a>&quot;.  <i>Science</i>, <strong>280</strong>,(5360), 98-100.   http://www.neci.nec.com/~lawrence/science98.html  (21 dic. 2002)</li>
+	
+  <li><a name="Lebedev, A"></a>Lebedev, A.  (1997) <i><a href="http://www.pharm.unito.it/itcrs/comparis.html">Best search engines for finding scientific information in the Web</a></i>.  Moscow: State University. http://www.pharm.unito.it/itcrs/comparis.html  (21 dic. 2001)</li>
+  
+  <li><a name="Leighton, 1995"></a>Leighton, H. V.  (1995)  <i><a href="http://www.winona.msus.edu/library/webind.htm">Performance of four World Wide Web (WWW) index services: Infoseek, Lycos, WebCrawler, and WWWWorm</a></i>.  Winona, MN: Winona  State University.    http://www.winona.msus.edu/library/webind.htm  (15 dic. 2002)</li>
+
+  <li><a name="Leighton, 1997"></a>Leighton, H.V. &amp; Srivastava, J. (1997) <i><a href="http://www.winona.msus.edu/library/webind2/webind2.htm">Precision among World Wide Web search services (search engines): Alta Vista, Excite, Hotbot, Infoseek, Lycos</a></i>. Winona, MN: Winona  State University.
+ http://www.winona.msus.edu/library/webind2/webind2.htm  (15 dic. 2002)</li>
+ 
+  <li><a name="Leighton, 1999"></a>Leighton, H.V. and Srivastava, J.  (1999)  &quot;First 20 precision among World Wide Web search services (search engines).&quot; <i>Journal of the American Society for Information Science</i> <strong>50</strong>(10), 870-881. </li>
+	
+  <li><a name="Ljosland, 2000"></a>Ljosland, M. (2000) <i><a href="http://www.aitel.hist.no/~mildrid/dring/paper/SIGIR.html">Evaluation of Web search engines and the search for better ranking algorithms</a></i>. Paper presented at the <em>SIGIR99 Workshop on  Evaluation of Web Retrieval</em> August 19, 1999. http://www.aitel.hist.no/~mildrid/dring/paper/SIGIR.html (4 Dic. 2002)</li>
+  
+  <li><a name="Ljosland, 2000b"></a>Ljosland, M. (2000) <i><a href="http://www.aitel.hist.no/~mildrid/dring/paper/Comp20.doc">Evaluation of twenty Web search engines on ten rare words ranking algorithms</a></i>.  http://www.aitel.hist.no/~mildrid/dring/paper/Comp20.doc  (18 dic. 2002)</li>
+  
+  <li><a name="Mart&iacute;nez">Mart&iacute;nez</a> M&eacute;ndez, F.J. (2001) &quot;<a href="http://www.um.es/gtiweb/fjmm/ibersid2000.PDF">Aproximaci&oacute;n general a la evaluaci&oacute;n de la recuperaci&oacute;n de informaci&oacute;n por medio de los motores de b&uacute;squeda en Internet</a>&quot;. <i>Scire</i>, <strong>6</strong>(1),  http://www.um.es/gtiweb/fjmm/ibersid2000.PDF  (6 may. 2002)</li>
+
+  <li><a name="Ming, H"></a>Ming, H.  (2000) &nbsp;<i><a href="http://gypsy.rose.utoronto.ca/people/ming/Three_Internet.pdf">Comparison of three search engines</a></i>.    Toronto: University of Toronto.
+http://gypsy.rose.utoronto.ca/people/ming/Three_Internet.pdf  (12 dic. 2002)</li>
+  
+  <li><a name="NetRatings"></a>NetRatings//Nielsen. (2001)  <i><a href="http://pm.netratings.com/nnpm/owa/NRpublicreports.toppropertiesmonthly">Top 25 parent companies</a></i>. Stanford, CT: NetRatings Inc. &amp; Nielsen Media Research.  http://pm.netratings.com/nnpm/owa/NRpublicreports.toppropertiesmonthly (13 nov. 2002)</li>
+
+  <li><a name="Notess, 1998">Notess</a>, G.R. (1999)  <i><a href="http://www.csu.edu.au/special/online99/proceedings99/103a.htm">Comparing Internet search engines</a></i>. In: <em>Strategies for the next millennium: proceedings of the Ninth Australasian Information Online &amp; On Disc Conference and Exhibition, Sydney, Australia 19–21 January 1999</em>. http://www.csu.edu.au/special/online99/proceedings99/103a.htm (12 may. 2001)</li>
+
+  <li><a name="Notess, 2002a">Notess</a>, G.R. (2002a) &nbsp;<i><a href="http://www.searchengineshowdown.com/stats/">Search engine statistics</a></i>.  Bozeman, MT: Notess.com.    http://www.searchengineshowdown.com/stats/ (4 dic. 2002)</li>
+
+  <li><a name="not02b">Notess</a>, G.R. (2002b)&nbsp; <a href="http://www.searchengineshowdown.com/stats/change.shtml"><em>Search engine database change over time</em></a>.  Notess.com.  http://www.searchengineshowdown.com/stats/change.shtml (4 dic. 2002)</li>
+
+  <li><a name="Notess, 2002c">Notess</a>, G.R.  (2002c)&nbsp; <a href="http://www.searchengineshowdown.com/stats/dead.shtml"><em>Search engine statistics: dead reports.</em></a> Notess.com.     http://www.searchengineshowdown.com/stats/dead.shtml   (4 dic. 2002)</li>
+
+<li><a name="Notess, 2002d">Notess</a>, G.R. (2002d)  &nbsp; <i><a href="http://www.searchengineshowdown.com/stats/sizeest.shtml/v">Search engine statistics: database total size estimates</a></i>. Notess.com.  http://www.searchengineshowdown.com/stats/sizeest.shtml/v (12 Dic. 2002) </li>
+
+  <li><a name="Oppenheim, C."></a>Oppenheim, C., Morris, A., McKnight, C.  &amp; Lowley, S. (2000)  &quot;The evaluation of WWW search engines&quot;. <i>Journal of Documentation</i>, <strong>56</strong>(2), 190-211</li>
+	
+  <li><a name="Peterson">Peterson</a>, R.E. (1997) <i><a href="http://www.firstmonday.dk/issues/issue2_2/peterson/">&quot;Eight internet search engines compared.&quot;</a>  <em>First Monday</em>, <strong>2</strong>(2) http://www.firstmonday.dk/issues/issue2_2/peterson/ (12 Mar. 2002)</li>
+
+  <li><a name="Picard"></a>Picard, J, &amp; Savoy, J.  (2001)  &nbsp;<i><a href="http://www.unine.ch/info/Gi/Papers/ictai.pdf">Searching and classifying the web
+    using hyperlinks: a logical approach</a></i>.  Paper delivered to the 23rd European Colloquium on Information Retrieval Research, 2001. http://www.unine.ch/info/Gi/Papers/ictai.pdf  (18 Dic. 2002)</li>
+  
+  <li><a name="Salton , G."></a>Salton, G. &amp; McGill, M.J.  (1983) &nbsp;<i>Introduction to modern
+information retrieval</i>. New York, NY: Mc Graw-Hill.</li>
+	
+  <li><a name="Savoy, J."></a>Savoy, J. &amp; Picard, J.  (1991) &nbsp;&quot;Retrieval effectiveness on the Web&quot;.  <i>Information Processing and Management</i>, <strong>37</strong>(4), 543-569.</li>
+	
+  <li><a name="Schlichting, C"></a>Schlichting, C. &amp; Nilsen, E. (1997) <i><a href="http://www.microsoft.com/usability/webconf/schlichting/schlichting.htm">Signal detection analysis of WWW search engines</a></i>.Seattle: Microsoft.     http://www.microsoft.com/usability/webconf/schlichting/schlichting.htm (11 Dic. 2002)</li>
+  
+  <li><a name="Sea 2001"></a>SearchEngineWatch.com (2001)  <i><a href="http://www.searchenginewatch.com/links/otherglobal.html">Other global search engines</a></i>  Jupitermedia Corporation.  http://www.searchenginewatch.com/links/otherglobal.html (11 Dic. 2002)</li>
+  
+  <li><a name="SEA 2002"></a>SearchEngineWatch.com (2002) <i><a href="http://www.searchenginewatch.com/links/major.html">The major search engines</a></i> Jupitermedia Corporation. http://www.searchenginewatch.com/links/major.html  (11 Dic. 2002)</li>
+  
+  <li><a name="Slot, M."></a>Slot, M. (1996)  <i><a href="http://people.ambrosiasw.com/~fprefect/matrix/overview.html">Web matrix: overview matrix</a></i>.  Matt Slot.  http://people.ambrosiasw.com/~fprefect/matrix/overview.html  (1 Dic. 2001)</li>
+
+  <li><a name="Stobart, S"></a>Stobart, S. &amp; Kerridge, S. (1996) <i><a href="http://osiris.sunderland.ac.uk/sst/se/">WWW search engine study</a></i>.  Sunderland: University of Sunderland,  http://osiris.sunderland.ac.uk/sst/se/   (1 Dic. 2001) [Page not found 21 Dic. 2002 - see, for an alternative: &quot;<a href="http://www.ariadne.ac.uk/issue6/survey/">An investigation into World Wide Web search engine use from within the UK - preliminary findings</a>&quot;, by S. Stobart and S. Kerridge.  <em>Ariadne</em>, No. 6, 1996. http://www.ariadne.ac.uk/issue6/survey/ (22 Dic. 2002)</li>
+  
+  <li><a name="Sullivan, 2002."></a>Sullivan, D.  (2002)  &nbsp;<i><a href="http://www.searchenginewatch.com/reports/statmarket.html/">StatMarket search engine ratings</a></i>. Jupitermedia Corporation. http://www.searchenginewatch.com/reports/statmarket.html/ (11 Dic. 2002)</li>
+  
+  <li><a name="sul01a"></a>Sullivan, D. (2001a) <i><a href="http://www.searchenginewatch.com/reports/sizes.html">Search engine sizes.</a></i>  Jupitermedia Corporation.  http://www.searchenginewatch.com/reports/sizes.html (11 Dic. 2002)</li>
+  
+  <li><a name="Sullivan , 2001b"></a>Sullivan, D. (2001b) <a href="http://searchenginewatch.com/reports/mediametrix.html"><em>Jupiter Media Metrix search engine ratings.</em></a> Jupitermedia Corporation. http://searchenginewatch.com/reports/mediametrix.html  (11 Dic. 2002)</li>
+  
+  <li><a name="Sullivan , 2001c"></a>Sullivan , D. (2001c)  &nbsp;<i><a href="http://searchenginewatch.com/reports/netratings.html">Nielsen//NetRatings search engine ratings</a></i> http://searchenginewatch.com/reports/netratings.html   (11 Dic. 2002)</li>
+
+  <li><a name="Sullivan, 2001d"></a>Sullivan, D. (2001d)  &nbsp;<i><a href="http://www.searchenginewatch.com/reports/perday.html">Searches per day</a></i>. 
+Jupitermedia Corporation.  http://www.searchenginewatch.com/reports/perday.html  (11 Dic. 2002)</li>
+
+  <li><a name="Thomas, S"></a>Thomas, S.  (2002)  <em><a href="http://www.cnet.com/software/0-352105-8-8741537-1.html?tag=st.sw.352105-8-8741537-9.back2352105-8-8741537-1">5 popular search tools battle for the medal</a></em>.  CNET.com.     http://www.cnet.com/software/0-352105-8-8741537-1.html?tag=st.sw.352105-8-8741537-9.back2352105-8-8741537-1  (16 May. 2002)</li>
+
+  <li><a name="Westera, G"></a>Westera, G. (2001) &nbsp;<i><a href="http://lisweb.curtin.edu.au/staff/gwpersonal/compare.html">Comparison of search engine user interface capabilities.</a></i>  Gillian Westera personal page. http://lisweb.curtin.edu.au/staff/gwpersonal/compare.html  (12 Abr. 2002)</li>
+
+  <li><a name="Winship, I">Winship, I</a>. <a href="http://gti1.edu.um.es:8080/javima/World-Wide-Web-searching-tools-an-evaluation.htm">&quot;World Wide Web searching tools - an evaluation&quot;</a>.   <em>Vine</em> No. 99, 49-54.  http://gti1.edu.um.es:8080/javima/World-Wide-Web-searching-tools-an-evaluation.htm  (4 May. 2002)</li>
+
+  <li><a name="Wishard"></a>Wishard, L.  (1998) &nbsp; <i><a href="http://www.library.ucsb.edu/istl/98-spring/article5.html">&quot;Precision among Internet search engines: an earth sciences case study</a>.&quot;  <em>Issues in Science and Technology Librarianship</em>, No. 18.  http://www.library.ucsb.edu/istl/98-spring/article5.html  (4 May. 2001)</li>
+  
+  <li><a name="Zorn, P"></a>Zorn, P., Emanoil, M., Marshall, L. &amp; Panek, M.  (1996) &nbsp;&quot;<a href="http://www.infotoday.com/online/MayOL/zorn5.html">Advanced searching: tricks of the trade.</a>&quot;  <em>Online</em>, <strong>20</strong>(3) http://www.infotoday.com/online/MayOL/zorn5.html (19 Dic. 2002)</li>
+</ul>
+
+  <hr color="#ff00ff" SIZE=3>
+  <div align="center"><a name="abs"></a><b>Abstract</b></div>
+  
+  <blockquote>A considerable number of proposals for measuring the effectiveness of information retrieval systems have been made since the early days of such systems. The consolidation of the World Wide Web as the paradigmatic method for developing the Information Society, and the continuous multiplication of the number of documents published in this environment, has led to the implementation of the most advanced, and extensive information retrieval systems, in the shape of web search engines. Nevertheless, there is an underlying concern about the effectiveness of these systems, especially when they usually present, in response to a question, many documents with little relevance to the users' information needs. The evaluation of these systems has been, up to now, dispersed and various. The scattering is due to the lack of uniformity in the criteria used in evaluation, and this disparity derives from their a periodicity and variable coverage. In this review, we identify three groups of studies: explicit evaluations, experimental evaluations and, more recently, several proposals for the establishment of a global framework to evaluate these systems.</blockquote>
+
+<hr color="#ff00ff" SIZE=3>
+
+<p style="text-align : center; color : Red; font-weight : bold;">How to cite this paper:</i></p>
+
+<p style="text-align : left; color : black;">Mart&iacute;nez M&eacute;ndez, F. J. &amp; Rodr&iacute;guez Mu&ntilde;oz, J.V. (2003) &quot;S&iacute;ntesis y cr&iacute;tica de las evaluaciones de la efectividad de los motores de b&uacute;squeda en la web.&quot; <i>Information Research</i>, <b>8</b>(2), paper no. 148&nbsp;&nbsp; [Available at http://InformationR.net/ir/8-2/paper148.html]</p>
+
+<hr color="#ff00ff" SIZE=3>
+
+<div align="center">&copy; the authors, 2003. <BR>Updated: (20 December 2002)</div>
+
+<hr color=#ff00ff size=3>
+<table border="0" cellpadding="15" cellspacing="0" align="center">
+<tr> 
+    <td><a href="infres82.html"><h4>Contents</h4></a></td>
+   <td align="center" valign="top"><h5 align="center"><img src="http://counter.digits.com/wc/-d/-z/6/-b/FF0033/paper148" ALIGN=middle  WIDTH=60 HEIGHT=20 BORDER=0 HSPACE=4 VSPACE=2><br><a href="http://www.digits.com/ ">Web Counter</a></h5></td>
+    <td><a href="http://InformationR.net/ir/"><h4>Home</h4></a></td>
+  </tr>
+</table>
+<hr color=#ff00ff size=3>
+
+</body>
+</html>

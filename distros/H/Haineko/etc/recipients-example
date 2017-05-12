@@ -1,0 +1,22 @@
+#                _       _            _       
+#  _ __ ___  ___(_)_ __ (_) ___ _ __ | |_ ___ 
+# | '__/ _ \/ __| | '_ \| |/ _ \ '_ \| __/ __|
+# | | |  __/ (__| | |_) | |  __/ | | | |_\__ \
+# |_|  \___|\___|_| .__/|_|\___|_| |_|\__|___/
+#                 |_|                         
+#
+# Allowed recipients list. Haineko checks that an envelope recipient is in this
+# list or not. If the envelope recipient address is not listed in etc/recipients,
+# Haineko returns error with the message 'Recipient address is not permitted'.
+#
+# If the value of 'open-relay' is 1, Haineko does not check an envelope recipient
+# address with recipients values.
+#
+open-relay: 0
+domainpart:
+    - 'example.org'
+
+recipients:
+    - 'sabatora@example.jp'
+    - 'mi-chan@example.org'
+

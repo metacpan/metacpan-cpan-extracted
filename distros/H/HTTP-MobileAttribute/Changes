@@ -1,0 +1,126 @@
+Revision history for Perl extension HTTP::MobileAttribute
+
+0.23
+
+    - Use of qw(...) as parentheses is deprecated
+
+0.22
+
+    - deprecated.
+
+0.21
+
+    - fixed deps RT#50588
+
+0.20
+
+    - remove deps with Test::Warn
+    - shut up warnings
+
+0.19_02
+
+    - Plugin::GPS: do not use %ENV in plugins. reported by nekokak++
+
+0.19_01
+
+    - added Plugin::Locator
+
+0.18
+
+    - cleanup code(no feature changes)
+
+0.17
+
+    - specify the required perl version. we need 5.8.1 or later =)
+      (related with rt:#43166)
+
+0.16
+
+    - added Plugin::DoCoMo::Browser for detect i-mode broser version
+
+0.15
+    
+    - i miss'ed packaging.
+      added bin/make-docomo-display-map.pl
+      (reported by ZIGUZAGU++)
+
+0.14
+
+    - N-02A みたいな端末のときに端末の横幅がとれない問題に対応
+    - added tools/make-docomo-display-map.pl
+
+0.13
+
+    - support HTTP::Headers::Fast
+
+0.12
+
+    - support apache2
+
+0.11.1
+
+    - supportes_user_id => supports_user_id
+      fixed typo...
+
+0.11
+
+    - Plugin::UserID->is_supported_user_id => supports_user_id
+      (Thanks to Tatsuhiko Miyagawa)
+
+0.10
+
+    - Plugin::UserID->is_supported_id => Plugin::UserID->is_supported_user_id
+
+0.09
+
+    - renamed plugin: Plugin::ID => Plugin::UserID.
+      for compatibility with HTTP::MobileUserID.
+
+0.08
+
+    - added Plugin::CIDR(by yappo++)
+    - added Plugin::ID(by yappo++)
+    - added is_thirdforce(by yappo++)
+
+0.07
+
+    - added Plugin::Encoding.
+    - added plugin dependency auto resolver(thanks to yappo++).
+
+0.06
+
+    No changes.
+
+0.05 It's beta.
+
+    - added Plugin::IS::DoCoMo, Plugin::IS::EZweb(by clouder++)
+    - Plugin::Carrier was renamed to Plugin::CarrierLetter
+    - added docs!
+    - added Agent::* and removed Plugin::Parser::*
+
+0.04 still alpha.
+
+    - default plugin is only Parser::*
+    - Plugin::Display: use $self->config.
+    - fixed dependencies: Class::Component 0.14.
+
+0.03 alpha.
+
+    - performance tuning(by lestrat&yappo&tokuhirom).
+    - added more test codes.
+    - remove GPS from default plugins
+    - document updated.
+    - remove html_version.
+    - renamed Default::* => Parser::*
+    - Agent::*->xhtml_compliant moved to Plugin::XHTMLComplient.
+    - remove Default::DoCoMo->cache_size, Default::DoCoMo->vendor, Default::DoCoMo->series
+    - remove Default::EZweb->is_(win|tuka)
+    - CarrierMethod is now simple.
+
+0.02
+
+        - Performance Tuning(68x faster)
+          by lestrrat++ & yappo++
+
+0.01    Thu Jan  3 01:52:45 2008
+        - original version

@@ -1,0 +1,119 @@
+{
+   "abstract" : "A pure Perl HTTP proxy",
+   "author" : [
+      "Philippe Bruhat (BooK) <book@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTTP-Proxy",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "Fcntl" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "HTTP::Daemon" : "0",
+            "HTTP::Date" : "0",
+            "HTTP::Headers::Util" : "0",
+            "IO::Handle" : "0",
+            "IO::Select" : "0",
+            "LWP::ConnCache" : "0",
+            "LWP::UserAgent" : "0",
+            "POSIX" : "0",
+            "Socket" : "0",
+            "Sys::Hostname" : "0",
+            "constant" : "0",
+            "strict" : "0",
+            "vars" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Find" : "0",
+            "File::Spec" : "0",
+            "File::Spec::Functions" : "0",
+            "HTML::Parser" : "3",
+            "HTTP::Headers" : "0",
+            "HTTP::Request" : "0",
+            "HTTP::Request::Common" : "0",
+            "IO::Socket::INET" : "0",
+            "Test::More" : "0",
+            "base" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-http-proxy@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTTP-Proxy"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/book/HTTP-Proxy.git",
+         "web" : "http://github.com/book/HTTP-Proxy"
+      }
+   },
+   "version" : "0.304",
+   "x_contributors" : [
+      "e477",
+      "Vincenzo Buttazzo <vincenzo.buttazzo@altervista.it>",
+      "Slaven Rezic <srezic@cpan.org>",
+      "Tom Hukins <tomhukins@cpan.org>",
+      "Salve J. Nilsen <sjn@cpan.org>",
+      "Masahiro Nagano <kazeburo@cpan.org>",
+      "Ashley Pond V <ashley@cpan.org>",
+      "Angelos Karageorgiou <angelos@unix.gr>",
+      "Gregor Herrmann <gregoa@cpan.org>",
+      "Maurice Aubrey",
+      "Marek Rouchal <marekr@cpan.org>",
+      "Jimbo",
+      "Roland Stigge",
+      "Gunnar Wolf <gwolf@cpan.org>",
+      "Matsuno Tokuhiro <tokuhirom@cpan.org>",
+      "Ken Williams <kwilliams@cpan.org>",
+      "Max Maischein <corion@cpan.org>",
+      "Mark Tilford",
+      "Chris Dolan <cdolan@cpan.org>",
+      "Randal L. Schwartz <merlyn@cpan.org>",
+      "Simon Cozens <simon@cpan.org>",
+      "Christian Laursen",
+      "Emmanuel Di Prétoro <edipreto@cpan.org>",
+      "Mathieu Arnold <mat@cpan.org>",
+      "Paul Makepeace <paulm@cpan.org>",
+      "Martin Zdila",
+      "Jim Cromie <jcromie@cpan.org>",
+      "Stéphane Payrard <stef@cpan.org>",
+      "David Landgren <dland@cpan.org>",
+      "Éric Cholet <cholet@cpan.org>"
+   ]
+}
+

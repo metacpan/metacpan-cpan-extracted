@@ -1,0 +1,160 @@
+NAME
+    Ham::Reference::Solar - Get basic solar data from the web that's useful
+    for Amateur Radio applications.
+
+VERSION
+    Version 0.03
+
+INSTALLATION
+    To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SYNOPSIS
+      use Ham::Reference::Solar;
+
+      my $solar = new Ham::Reference::Solar;
+      die $solar->error_message if $solar->is_error;
+
+      # access data with a hash reference
+
+      foreach (sort keys %{$solar->get_hashref})
+      {
+         print "$_ = $solar->{$_}\n";
+      }
+
+      # or access data with the get method
+
+      foreach (sort @{$solar->all_item_names})
+      {
+         print "$_ = ".$solar->get($_)."\n";
+      }
+
+DESCRIPTION
+    The "Ham::Reference::Solar" module makes use of WM7D's Solar Resource
+    Page to "scrape" (parse) data and return it for your use.
+
+    Please note that this module depends on the current formatting of the
+    web site, and if it changes, this module will no longer work until I
+    have a chance to update it.
+
+CONSTRUCTOR
+  new()
+     Usage    : my $solar = Ham::Reference::Solar->new();
+     Function : creates a new Ham::Reference::Solar object
+     Returns  : a Ham::Reference::Solar object
+     Args     : a hash:
+                key       required?   value
+                -------   ---------   -----
+                timeout   no          an integer of seconds to wait for
+                                      the timeout of the web site
+                                      default = 10
+
+METHODS
+  get()
+     Usage    : my $sunspots = $solar->get( $data_item_name );
+     Function : gets a single item of solar data
+     Returns  : a Ham::Reference::Solar object
+     Args     : a single item from the list of data items below
+
+  set()
+     Usage    : $solar->set( $data_item_name, $new_value );
+     Function : gets a single item of solar data
+     Returns  : n/a
+     Args     : data-item: see the list of data items below
+                data-value: any value with which you'd like to override the actual value
+
+  get_hashref()
+     Usage    : my $hashref = $solar->get_hashref();
+     Function : get all current solar data
+                (this is probably the easiest way to access data)
+     Returns  : a hash reference
+     Args     : n/a
+
+  all_item_names()
+     Usage    : my $arrayref = $solar->all_item_names();
+     Function : get an array reference of all solar data items available
+                from the object   
+     Returns  : an array reference
+     Args     : n/a
+
+  is_error()
+     Usage    : if ( $solar->is_error() )
+     Function : test for an error if one was returned from the call to the web site
+     Returns  : a string, the error message
+     Args     : n/a
+
+  error_message()
+     Usage    : my $err_msg = $solar->error_message();
+     Function : if there was an error message when trying to call the site, this is it
+     Returns  : a string, the error message
+     Args     : n/a
+
+DATA ITEMS
+    The following items are available from the object. Use them with the
+    get() method or access them with the get_hashref() method.
+
+    sfi Solar flux index.
+
+    a-index
+        The A-index number.
+
+    a-index-text
+        The text interpretation of the A-index.
+
+    k-index
+        The K-index number.
+
+    k-index-text
+        The text interpretation of the K-index.
+
+    forecast
+        Brief text forecast for the next 24 hours
+
+    summary
+        Bried text summary for the past 24 hours.
+
+    sunspots
+        Current sunspot count.
+
+    image
+        URL for the current solar image from the Solar and Heliosphereic
+        Observatory.
+
+    image_thumbnail
+        URL for the current thumbnail sized solar image from the Solar and
+        Heliosphereic Observatory.
+
+    time
+        Time of the last update.
+
+TODO
+    *   Convert date to something more useful.
+
+    *   Add more data items.
+
+    *   Improve documentation and error checking.
+
+    *   Maybe improve the synopsis.
+
+ACKNOWLEDGEMENTS
+    This module gets its data from WM7D's Solar Resource Page at
+    http://www.wm7d.net/hamradio/solar. Thanks to Mark A. Downing!
+
+AUTHOR
+    Brad McConahay N8QQ <brad@n8qq.com>
+
+COPYRIGHT AND LICENSE
+    "Ham::Reference::Solar" is Copyright (C) 2008-2010 Brad McConahay N8QQ.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the terms of the Artistic License 2.0. For details, see the full
+    text of the license in the file LICENSE.
+
+    This program is distributed in the hope that it will be useful, but it
+    is provided "as is" and without any express or implied warranties. For
+    details, see the full text of the license in the file LICENSE.
+

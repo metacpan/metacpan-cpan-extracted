@@ -1,0 +1,6 @@
+name = "HTML-WikiConverter-FreeStyleWiki"
+badges = ["travis"]
+authority="cpan:YWATASE"
+
+module_maker="ModuleBuildTiny"
+

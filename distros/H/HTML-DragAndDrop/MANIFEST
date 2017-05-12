@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/HTML-DragAndDrop.t
+lib/HTML/DragAndDrop.pm
+META.yml                                 Module meta-data (added by MakeMaker)

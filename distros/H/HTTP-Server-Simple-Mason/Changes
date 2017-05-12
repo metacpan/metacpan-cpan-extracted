@@ -1,0 +1,51 @@
+0.14 Sun Sep  5 09:24:13 EDT 2010
+
+    * encode out string only if the string is in utf8
+
+0.13 Fri Oct  9 15:01:07 EDT 2009
+
+    * Better cleanup temp files after tests
+    * No longer add a double / in the path when testing for index.html
+    * Better support for sending custom HTTP statuses in $m->abort
+
+0.12 Tue Jul  7 17:01:55 EDT 2009
+    * Test update. Looks like LWP::Simple now returns undef instead of '' on fail
+
+0.11 Mon Dec  1 09:45:52 EST 2008
+    * The previous release didn't actually fix 30113
+
+0.10 Fri Oct 19 12:37:48 BST 2007
+
+* [rt.cpan.org #30113] Cleaning up /tmp directory; predictable tmp filenames 
+    - Don't use predictable tempfile names for our test dir.
+    - Clean up the test dir after running
+      
+    Reported by ANDK
+
+* [rt.cpan.org #20318] HTTP::Server::Simple::Mason fails tests when http_proxy env variable set - Ian Norton
+
+* Revert most of the 0.07 and 0.08 changes, which were attempts to work around
+  serious bugs in Mason 1.30 that have been fixed in Mason 1.31.
+
+* Create handler_class and setup_escapes hooks in new_handler, so that
+  subclasses don't need to copy-and-paste new_handler
+ 
+* Default content type should be "text/html", not "text/htm"
+
+* Test suite should die on errors
+
+0.08 Thu Aug 18 13:49:47 EDT 2005
+
+* Internal updates for more robustness on 1.30
+
+0.07 Wed Aug 17 13:28:35 EDT 2005
+
+* Updates to work correctly with Mason 1.30
+
+0.06 Mon Jul 25 18:49:23 EDT 2005
+
+* Doc fixes
+
+0.05 Mon May  2 22:12:15 EDT 2005
+
+* Added support for redirects. (Also, added a Hook::LexWrap dependency)

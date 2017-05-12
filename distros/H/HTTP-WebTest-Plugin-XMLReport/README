@@ -1,0 +1,48 @@
+HTTP::WebTest::Plugin::XMLReport version 1.00
+=====================
+
+ABSTRACT
+
+DateTest is a plugin module for the HTTP::WebTest 
+suite. This plugin generates report output in 
+XML format. 
+
+More detail is available from the module's documentation:
+
+  perldoc HTTP::WebTest::Plugin::XMLReport
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  XML::Writer (version 0.4 or newer reccommended)
+  IO::Scalar (version 2.0 or later)
+  HTTP::WebTest (version 2.x, install before this one!)
+
+BUGS
+
+Many potentially. Note that IO::Scalar is only
+require'd at runtime if you request the report
+output as a string (instead of a file handle like
+e.g. STDOUT).
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 - 2003 Johannes la Poutre <japh@lapoutre.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+This package is provided as-is with no warrantee regarding fitness
+of use for any purpose. Use at your own risk!
+

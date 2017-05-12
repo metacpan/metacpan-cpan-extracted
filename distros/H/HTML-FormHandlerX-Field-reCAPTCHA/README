@@ -1,0 +1,123 @@
+NAME
+    HTML::FormHandlerX::Field::reCAPTCHA - A Captcha::reCAPTCHA field for
+    HTML::FormHandler
+
+SYNOPSIS
+    The following is example usage.
+
+    In your HTML::FormHandler subclass, "MyApp::HTML::Forms::MyForm":
+
+        has_field 'recaptcha' => (
+            type=>'reCAPTCHA', 
+            public_key=>'[YOUR PUBLIC KEY]',
+            private_key=>'[YOUR PRIVATE KEY]',
+            recaptcha_message => "You're failed to prove your Humanity!",
+            required=>1,
+        ); 
+
+    Example Catalyst controller:
+
+        my $form = MyApp::HTML::Forms::MyForm->new;
+        my $params = $c->request->body_parameters;
+        if(my $result = $form->process(params=>$params) {
+            ## The Form is totally valid. Go ahead with whatever is next.
+        } else {
+            ## Invalid results, you need to display errors and try again.
+        }
+
+DESCRIPTION
+    Uses Captcha::reCAPTCHA to add a "Check if the agent is human" field.
+    You will need an account from http://recaptcha.net/ to make this work.
+
+    This is a thin wrapper on top of Captcha::reCAPTCHA so you should review
+    the docs for that. However there's not much too it, just register for an
+    account over at http://recaptcha.net and use it.
+
+FIELD OPTIONS
+    We support the following additional field options, over what is
+    inherited from HTML::FormHandler::Field
+
+  public_key
+
+    The public key you get when you create an account on
+    http://recaptcha.net/
+
+  private_key
+
+    The private key you get when you create an account on
+    http://recaptcha.net/
+
+  use_ssl
+
+    control the 'use_ssl' option in Captcha::reCAPTCHA when calling
+    'get_html'.
+
+  recaptcha_options
+
+    control the 'options' option in Captcha::reCAPTCHA when calling
+    'get_html'.
+
+  recaptcha_message
+
+    What to show if the recaptcha fails. Defaults to 'Error validating
+    reCAPTCHA'. This error message is in addition to any other constraints
+    you add, such as 'required'.
+
+    Please note that the recaptcha control also displays an error message
+    internal to itself.
+
+FORM METHODS
+    The following methods or attributes can be set in the form which
+    contains the recapcha field.
+
+  $name_public_key or $name_private_key
+
+    "$name" is the name you gave to the reCAPTCHA field (the word directy
+    after the "has_field" command.
+
+    You may wish to set your public key from a method or attribute contained
+    from within the form. This would make it easier to have one form class
+    and use configuration tools, such as what Catalyst offers, to set the
+    pubic key. For example:
+
+        ## In my form "MyApp::Form::MyForm
+        has ['MY_recaptcha_public_key', 'MY_recapcha_private_key'] => (
+            is=>'ro', isa=>'Str', required=>1,
+        );
+        has_field 'MY_recaptcha' => (
+            type=>'reCAPTCHA', 
+            recaptcha_message => "You're failed to prove your Humanity!",
+            required=>1,
+        ); 
+
+    Then you might construct this in a Catalyst::Controller:
+
+        my $form = MyApp::Form::MyForm->new(
+            MY_recaptcha_public_key => $self->controller_public_key,
+            MY_recaptcha_private_key => $self->controller_private_key,
+        );
+
+        ## 'process', etc.
+
+    Then your controller could populate the attributes
+    'controller_public_key' and 'controller_private_key' from your global
+    Catalyst configuration, allowing you to use one set of keys in
+    development and another for production, or even use different keys for
+    different forms if you wish.
+
+SEE ALSO
+    The following modules or resources may be of interest.
+
+    HTML::FormHandler, Captch::reCAPTCHA
+
+AUTHOR
+    John Napiorkowski `<jjnapiork@cpan.org>'
+
+COPYRIGHT & LICENSE
+    Copyright 2010, John Napiorkowski `<jjnapiork@cpan.org>'
+
+    Original work sponsered by Shutterstock, LLC. http://shutterstock.com
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

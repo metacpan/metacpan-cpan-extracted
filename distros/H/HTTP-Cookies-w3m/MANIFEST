@@ -1,0 +1,11 @@
+Changes
+README
+MANIFEST
+META.yml
+lib/HTTP/Cookies/w3m.pm
+Makefile.PL
+t/00_compile.t
+t/01-process.t
+t/98-pod.t
+t/99-pod-coverage.t
+t/cookie

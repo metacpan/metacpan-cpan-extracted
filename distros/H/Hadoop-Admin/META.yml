@@ -1,0 +1,33 @@
+---
+abstract: 'Module for administration of Hadoop clusters'
+author:
+  - 'Charles A. Wimmmer (charles@wimmer.net)'
+build_requires:
+  English: 0
+  Pod::Coverage::TrustPod: 0
+  TAP::Formatter::JUnit: 0
+  TAP::Harness::JUnit: 0
+  Test::More: 0
+  Test::Perl::Critic: 0
+  Test::Pod::Coverage: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.120351'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Hadoop-Admin
+requires:
+  Data::Dumper: 0
+  JSON: 0
+  LWP::Protocol::https: 0
+  LWP::Protocol::socks: 0
+  LWP::UserAgent: 0
+  Moose: 0
+  strict: 0
+  warnings: 0
+resources:
+  repository: git://github.com/cwimmer/hadoop-admin.git
+version: 0.4

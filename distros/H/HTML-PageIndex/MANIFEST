@@ -1,0 +1,5 @@
+MANIFEST
+Makefile.PL
+PageIndex.pm
+t/01_use.t
+README

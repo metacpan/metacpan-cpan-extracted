@@ -1,0 +1,6 @@
+---
+name: 'Class::C3 Speedup'
+default: 1
+depends:
+    'Class::C3': 0.16
+    'Class::C3::XS': 0.02

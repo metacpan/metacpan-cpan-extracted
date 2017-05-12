@@ -1,0 +1,58 @@
+DateTest version 1.01
+=====================
+
+ABSTRACT
+
+DateTest is a plugin module for the HTTP::WebTest 
+suite. This plugin provides tests for the "age" of 
+embedded date strings in the response body of a
+HTTP request (typically a webpage).
+
+Limited support is available for international
+languages, as long as a Date::Format module
+for this language exists (part of DateTime) and
+the notational convention doesn't differ too much
+from English conventions.
+
+More detail is available from the module's documentation:
+
+  perldoc HTTP::WebTest::Plugin::DateTest
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires the following other modules and libraries:
+
+  HTTP::WebTest (version 2.00 or newer)
+  DateTime (version 1.13 or newer recommended)
+
+BUGS
+
+Many potentially. Note that the ability to parse a 
+date string correctly is entirely dependent on
+Date::Parse for English language strings.
+
+Internationalization support is far more limited.
+
+Please send bug reports to
+http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTTP-WebTest-Plugin-DateTest
+
+This software is provided as-is, with no warrantee
+regarding fitness of use for any purpose. Use at
+your own risk!
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002,2003 Johannes la Poutre <japh@lapoutre.com>
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+

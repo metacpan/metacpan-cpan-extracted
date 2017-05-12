@@ -1,0 +1,34 @@
+Changes
+examples/empty-element.pl
+examples/is-html5.pl
+examples/optional-end-tag.pl
+examples/proprietary.pl
+examples/synopsis.pl
+examples/tagset-synopsis.pl
+guff
+html-valid-perl.c
+lib/HTML/Valid.pm
+lib/HTML/Valid.pod
+lib/HTML/Valid/ok-options.json
+lib/HTML/Valid/Tagset.pm
+lib/HTML/Valid/Tagset.pod
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+ppport.h
+README
+script/htmlok
+script/htmltidy
+t/alt-text.t
+t/attributes.t
+t/html-valid.t
+t/script.t
+t/set-option.t
+t/tag-trim.t
+t/tagset.t
+tidy-html5.c
+tidy-html5.h
+typemap
+Valid.xs
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

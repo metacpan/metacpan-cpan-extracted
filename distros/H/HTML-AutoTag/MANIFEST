@@ -1,0 +1,15 @@
+Changes
+lib/HTML/AutoTag.pm
+Makefile.PL
+MANIFEST			This list of files
+readme.md
+t/00-load.t
+t/01-indentation.t
+t/02-list.t
+t/03-table.t
+t/04-deep-nest.t
+t/05-encodes.t
+t/10-tagset.t
+t/11-svg.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,40 @@
+NAME
+    HTTP::Headers::Fast::XS - XS implementation of HTTP::Headers::Fast
+
+VERSION
+    0.001
+
+SYNOPSIS
+        # load once
+        use HTTP::Headers::Fast::XS;
+
+        # keep using HTTP::Headers::Fast as you wish
+
+DESCRIPTION
+    By loading HTTP::Headers::Fast::XS anywhere, you replace any usage of
+    HTTP::Headers::Fast with the XS implementation.
+
+    You can continue to use HTTP::Headers::Fast and any other module that
+    depends on it just like you did before. It's just faster now.
+
+METHODS
+    Implemented methods in XS:
+
+  push_header
+  _header_get
+  _header_set
+  _standardize_field_name
+CREDITS
+    *   p5pclub
+
+AUTHORS
+    *   Sawyer X "xsawyerx AT cpan DOT org"
+
+    *   Andrei Vereha "avereha AT cpan DOT org"
+
+    *   Steven Lee "stevel AT cpan DOT org"
+
+    *   Gonzalo Diethelm "gonzus AT cpan DOT org"
+
+    *   Rafaël Garcia-Suarez - for asking for it.
+

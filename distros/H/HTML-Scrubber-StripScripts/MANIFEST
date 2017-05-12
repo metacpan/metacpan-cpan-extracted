@@ -1,0 +1,12 @@
+MANIFEST
+Changes
+Makefile.PL
+README
+StripScripts.pm
+t/10default.t
+t/20href.t
+t/30src.t
+t/40mailto.t
+t/50whole.t
+t/60block.t
+t/70attr.t

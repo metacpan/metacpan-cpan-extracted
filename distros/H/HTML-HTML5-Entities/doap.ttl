@@ -1,0 +1,91 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-bugs: <http://ontologi.es/doap-bugs#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Entities/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=HTML-HTML5-Entities>;
+	doap:created         "2011-10-06"^^xsd:date;
+	doap:download-page   <https://metacpan.org/release/HTML-HTML5-Entities>;
+	doap:homepage        <https://metacpan.org/release/HTML-HTML5-Entities>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      [
+		a foaf:Person;
+		foaf:mbox <mailto:tobyink@cpan.org>;
+		foaf:name "Toby Inkster";
+	];
+	doap:name            "HTML-HTML5-Entities";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Entities/v_0-001>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Entities/v_0-002>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Entities/v_0-003>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Entities/v_0-004>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-html-html5-entities>;
+	];
+	doap:shortdesc       "drop-in replacement for HTML::Entities".
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Entities/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:issued            "2011-10-07"^^xsd:date;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Entities-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Entities/v_0-002>
+	a                    doap:Version;
+	dc:issued            "2012-01-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "%char2entity is now a more conservative mapping, based on XHTML 1.0 (but without apos). This makes it safer for serialising XHTML 1.x, HTML4 and HTML5 documents."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Entities/v_0-001>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Entities-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Entities/v_0-003>
+	a                    doap:Version;
+	dc:issued            "2012-06-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [ rdfs:label "Drop non-core dependencies."@en ];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Entities/v_0-002>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Entities-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Entities/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "HTML-HTML5-Entities-0.004"^^xsd:string;
+	dc:issued            "2014-09-13"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Various RT#97659-related fixes.";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/97659>;
+			doap-changeset:thanks [
+				rdfs:label "pa genyon";
+				foaf:mbox <mailto:pagenyon@gmail.com>;
+			];
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Entities-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/97659>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "97659"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=97659>.
+

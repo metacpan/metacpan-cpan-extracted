@@ -1,0 +1,16 @@
+Thu Sep 23 09:52:13 2010 - 1.19
+    * Fix handling of 0 and '' key values (thanks to Fabrice Dulaunoy)
+    * Update docs to reflect behaviour: EscapeSequence=undef
+      doesn't work, you need to use the DisableEscapes Option
+      (thanks to Fischer Ronald)
+
+Tue Apr 11 14:44:55 2006 - 1.16
+    * modified default escape sequence handling (bug fix)
+    * unit tests now change into t/ directory correctly under windows environment
+
+Thu Oct 27 21:13:21 2005 - 1.15
+    Fix for overload thanks to Marcel Grünauer
+
+Fri Oct 22 15:49:15 2004 - 1.35
+    - Public release (CPAN)
+

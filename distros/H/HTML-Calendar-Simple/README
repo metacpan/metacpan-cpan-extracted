@@ -1,0 +1,32 @@
+HTML/Calendar/Simple version 0.04
+=================================
+
+DOCUMENTATION
+
+Once installed, do a perldoc HTML::Calendar::Simple
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Date::Simple - this is A Good Module
+Test::More   - you do write tests, right? 
+               (And do them before you write the code too.)
+CGI          - As long as I have the latest version of CGI, I know that
+               my HTML will be the latest standard! I lurve CGI.pm
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002, mwk
+
+This module is free software; you can redistribute it or modify it
+under the same terms as Perl itself.

@@ -1,0 +1,6 @@
+<wmmeta name="title" value="This is bar." />
+<wmmeta name="score" value=20 />
+
+This is the bar document. The title looks like this: $[this.title]
+This line is used to force a reload: XYY
+

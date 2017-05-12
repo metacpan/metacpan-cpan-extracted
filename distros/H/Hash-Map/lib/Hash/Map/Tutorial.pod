@@ -1,0 +1,467 @@
+package Hash::Map::Tutorial;
+
+=head1 NAME
+
+Hash::Map::Tutorial - What is Hash::Map and how do I use it?
+
+=head2 Hint
+
+When I write
+
+    $obj = $obj->this_example_method;
+
+I mean, that the Hash::Map object itself will be returned.
+So it is possible to build chains like that:
+
+    $obj->this_example_method->next_example_method;
+
+That is typical used for setter or worker methods.
+
+=head2 Why existing both, method_name and method_name_ref?
+
+The methods are existing as normal name and with postfix "_ref".
+The idea is that user code should be clear and free of noise like:
+
+    $obj->name_ref( $hashref );
+    $obj->name( %hash );
+    # instead of
+    $obj->name( %{$hashref} );
+    $obj->name_ref( \%hash );
+
+    %hash     = $obj->target;
+    $hash_ref = $obj->target_ref;
+    # instead of
+    %hash     = %{ $obj->target_ref };
+    $hash_ref = { $obj->target };
+
+=head2 Why source and not set target directly?
+
+In source can stored a hash.
+If that is not done, an empty hash is used instead.
+
+The methods
+
+ copy_keys              copy_keys_ref
+ map_keys               map_keys_ref
+ copy_modify            copy_modify_ref
+ copy_modify_idientical copy_modify_identical_ref
+ map_modify             map_modify_ref
+ map_modify_idientical  map_modify_identical_ref
+
+copy selected data from source to target hash.
+Some methods can modify the data during transport.
+
+=head2 Some methods are only for target available.
+
+In target can stored a hash.
+If that is not done, an empty hash is used instead.
+
+The methods
+
+ combine
+ delete_keys delete_keys_ref
+ modify      modify_ref
+
+modify the target hash.
+
+=head2 Methods
+
+OO style ist typical to use that module.
+
+    require Hash::Map;
+
+    # The constructor "new" is typical not called directly.
+    # Methods "target", "set_target", "target_ref", "set_target_ref",
+    # "source", "set_source", "source_ref", "set_source_ref"
+    # and "combine" are alternative constructors.
+    my $obj = Hash::Map->new;
+
+    # set source hash
+    $obj = $obj->source(b => 2, c => 3);
+    $obj = $obj->set_source(b => 2, c => 3);
+    $obj = $obj->source_ref({b => 2, c => 3});
+    $obj = $obj->set_source_ref({b => 2, c => 3});
+
+    # get source hash
+    %hash     = $obj->source; # get, because no set parameters
+    $hash_ref = $obj->source_ref;
+
+    # set target hash
+    $obj = $obj->target(a => 1);
+    $obj = $obj->set_target(a => 1);
+    $obj = $obj->target_ref({a => 1});
+    $obj = $obj->set_target_ref({a => 1});
+
+    # get target hash
+    %hash     = $obj->target; # get, because no set parameters
+    $hash_ref = $obj->target_ref;
+
+    # keys
+    @array     = $obj->source_keys;
+    $array_ref = $obj->source_keys_ref;
+    @array     = $obj->target_keys;
+    $array_ref = $obj->target_keys_ref;
+
+    # values
+    @array     = $obj->source_values;
+    $array_ref = $obj->source_values_ref;
+    @array     = $obj->target_values;
+    $array_ref = $obj->target_values_ref;
+
+    # exists
+    $boolean = $obj->exists_source;
+    $boolean = $obj->exists_target;
+
+    # combine - merge targets of other Hash::Map objects into $obj target
+    $obj = $obj->combine(@objects);
+
+    # clone
+    $obj = $obj->clone_source;
+    $obj = $obj->clone_target;
+
+    # delete keys in target
+    $obj = $obj->delete_keys( qw(x y) );
+    $obj = $obj->delete_keys_ref([ qw(x y) ]);
+
+    # copy data from source to target using keys
+    $obj = $obj->copy_keys(qw(b c))
+    $obj = $obj->copy_keys_ref([ qw(b c) ]);
+    # including a key rewrite rule as code reference
+    $obj = $obj->copy_keys(
+        qw(b c),
+        sub {
+            my $obj = shift;
+            my $key = $_;
+            return "new $key";
+        },
+    );
+    $obj = $obj->copy_keys_ref(
+        [ qw(b c) ],
+        sub {
+            my $obj = shift;
+            my $key = $_;
+            return "new $key";
+        },
+    );
+
+    # copy data from source (key of map) to target (value of map)
+    $obj = $obj->map_keys(b => 'bb', c => 'cc');
+    $obj = $obj->map_keys_ref({b => 'bb', c => 'cc'});
+
+    # merge the given hash into target hash
+    $obj = $obj->merge_hash(d => 4, e => 5);
+    $obj = $obj->merge_hashref({d => 4, e => 5});
+
+    # modify target inplace by given code
+    # Maybe the combined methods is what you are looking for,
+    # see method "copy_modify_identical" or "map_modify_identical".
+    $obj = $obj->modify(
+        f => sub {
+            my $obj = shift;
+            my $current_value_of_key_f_in_target = $_;
+            return; # $target{f} will be undef because of scalar context
+        },
+        ...
+    );
+    $obj = $obj->modify_ref({
+        f => sub {
+            my $obj   = shift;
+            my $current_value_of_key_f_in_target = $_;
+            return "new $value";
+        },
+        ...
+    });
+
+    # copy data from source to target using keys
+    # and then
+    # modify target inplace by given code
+    # Maybe method "copy_modify_idientical" is what you are looking for.
+    $obj = $obj->copy_modify(
+        f => sub {
+            my $obj = shift;
+            my $current_value_of_key_f_in_target = $_;
+            return; # $target{f} will be undef because of scalar context
+        },
+        ...
+    );
+    $obj = $obj->copy_modify_ref({
+        f => sub {
+            my $obj   = shift;
+            my $current_value_of_key_f_in_target = $_;
+            return "new $value";
+        },
+        ...
+    });
+    $obj = $obj->copy_modify_identical(
+        qw(b c),
+        sub {
+            my $obj = shift;
+            my $current_value_of_each_key_in_target = $_;
+            return; # $target{key} will be undef because of scalar context
+        },
+    );
+    $obj->copy_modify_identical_ref(
+        [ qw(b c) ],
+        sub {
+            my $obj = shift;
+            my $current_value_of_each_key_in_target = $_;
+            return; # $target{key} will be undef because of scalar context
+        },
+    );
+
+    # copy data from source (key of map) to target (value of map)
+    # and then
+    # modify target inplace by given code
+    # Maybe method "map_modify_idientical" is what you are looking for.
+    $obj = $obj->map_modify(
+        f => ff => sub {
+            my $obj = shift;
+            my $current_value_of_key_f_in_source = $_;
+            return; # $target{ff} will be undef because of scalar context
+        },
+        ...
+    );
+    $obj = $obj->map_modify_ref([
+        f => ff => sub {
+            my $obj   = shift;
+            my $current_value_of_key_f_in_source = $_;
+            return "new $value";
+        },
+        ...
+    ]);
+    $obj = $obj->map_modify_identical(
+        (
+            f => ff,
+            ...
+        ),
+        sub {
+            my $obj = shift;
+            my $current_value_of_each_key_in_source = $_;
+            return; # $target{key} will be undef because of scalar context
+        },
+    );
+    $obj = $obj->map_modify_identical_ref(
+        {
+            f => ff,
+            ...
+        },
+        sub {
+            my $obj   = shift;
+            my $current_value_of_each_key_in_source = $_;
+            return "new $value";
+        },
+    );
+
+=head2 Iteration
+
+Use each_...:
+
+    while ( my ($key, $value) = $obj->each_source ) {
+        ...
+    }
+
+    while ( my ($key, $value) = $obj->each_target ) {
+        ...
+    }
+
+Use iterator code:
+
+    my $iterator_code = $obj->source_iterator;
+    while ( my ($key, $value) = $iterator_code->() ) {
+        ...
+    }
+
+    my $iterator_code = $obj->target_iterator;
+    while ( my ($key, $value) = $iterator_code->() ) {
+        ...
+    }
+
+=head2 Automatic construction
+
+Methods "source", "set_source", "source_ref", "set_source_ref"
+"target", "set_target", "target_ref", "set_target_ref"
+and "combine" can work as constructor too.
+
+    Hash::Map->new->target(...);
+    Hash::Map->new->set_target(...);
+    Hash::Map->new->target_ref(...);
+    Hash::Map->new->set_target_ref(...);
+    Hash::Map->new->source(...);
+    Hash::Map->new->set_source(...);
+    Hash::Map->new->source_ref(...);
+    Hash::Map->new->set_source_ref(...);
+    Hash::Map->new->combine(...);
+
+shorter written as:
+
+    Hash::Map->target(...);
+    Hash::Map->set_target(...);
+    Hash::Map->target_ref(...);
+    Hash::Map->set_target_ref(...);
+    Hash::Map->source(...);
+    Hash::Map->set_source(...);
+    Hash::Map->source_ref(...);
+    Hash::Map->set_source_ref(...);
+    Hash::Map->combine(...);
+
+=head2 Also available - functional style
+
+The first idea was to implemnt that functional.
+But OO style is more clear readable.
+But this exists.
+
+    use Hash::Map qw(hash_map hashref_map);
+
+    %target_hash = hash_map(
+        \%source_hash,
+        # The following references are sorted anyway.
+        # Running in order like written.
+        [ qw(key1 key2) ],               # copy_keys from source to target hash
+        [ qw(key3 key4), $code_ref ],    # copy_keys, code_ref to rename keys
+        {
+            source_key1 => 'target_key', # map_keys from source to target hash
+            source_key2 => $code_ref,    # modify values in target hash
+        },
+    );
+
+Similar, only the method name and return value has changed.
+
+    $target_hashref = hashref_map(
+        $source_hashref,
+        ...
+    );
+
+=head2 Code examples
+
+Why are this code examples with Hash::Map longer than the original code?
+
+Because this example is untypical or typical for fist development step.
+The fully code would explode this tutorial.
+If you have nearly 1 type of each mapping.
+Map it like before.
+
+Often that copied code is not produced during first development.
+There are lots of changes and everyone adds lines.
+Then you have lots of nearly equal lines.
+
+This module helps you to refractor,
+makes code readable
+and prevents: Don't repeat yourself.
+
+=head3 Line reduced found code (maybe from fist development step)
+
+    person_data(
+        street       => $form->{street},
+        city         => $form->{city},
+        country_code => $form->{country_code} eq 'D'
+                        ? 'DE'
+                        : $form->{country_code},
+        zip_code     => $form->{zip},
+        name         => "$form->{first_name} $form->{family_name}",
+        account      => $user->get_account,
+        mail_name    => $mail->{name},
+        mail_address => $mail->{address},
+    );
+
+=head3 Implemented with OO interface
+
+    person_data(
+        Hash::Map->combine(
+            Hash::Map
+                ->source_ref($form)
+                ->copy_keys(
+                    qw(street city)
+                )
+                ->copy_modify(
+                    country_code => sub {
+                        return $_ eq 'D' ? 'DE' : $_;
+                    },
+                )
+                ->map_keys(
+                    zip => 'zip_code',
+                )
+                ->merge_hash(
+                    name => "$form->{first_name} $form->{family_name}",
+                ),
+            Hash::Map
+                ->source_ref($user)
+                ->copy_modify(
+                    account => sub {
+                        return $_->get_account;
+                    },
+                ),
+            Hash::Map
+                ->source_ref($mail)
+                ->copy_keys(
+                    qw(name address),
+                    sub {
+                        return "mail_$_";
+                    },
+                ),
+        )->target
+    );
+
+=head3 Implemented with functional interface
+
+    person_data(
+        hash_map(
+            # source_ref,
+            $form,
+            # copy_keys
+            [ qw(street city country_code) ],
+            {
+                # modify
+                country_code => sub {
+                    return $_ eq 'D' ? 'DE' : $_;
+                },
+                # map_keys
+                zip => 'zip_code',
+            },
+        ),
+        # merge_hash
+        name => "$form->{first_name} $form->{family_name}",
+        hash_map(
+            $user,
+            # copy_keys
+            [ qw(account) ],
+            {
+                # modify
+                account => sub {
+                    return $_->get_account;
+                },
+            },
+        ),
+        hash_map(
+            $mail,
+            [
+                # copy_keys
+                qw(name address),
+                sub {
+                    return "mail_$_";
+                },
+            ],
+        ),
+    );
+
+=head3 an example from real code
+
+Rename keys during fetching from database result into a hash reference.
+
+    Hash::Map
+        ->new
+        ->map_modify_identical(
+            qw(
+                vorname  firstname
+                name     lastname
+                zusatz1  name1
+                zusatz2  name2
+                strasse  street
+                ortsteil city_part
+                plz      zipcode
+                ort      city
+            ),
+            method ($source_key) {
+                return $db_result->$source_key;
+            },
+        )
+        ->target_ref;

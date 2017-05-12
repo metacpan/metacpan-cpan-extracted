@@ -1,0 +1,68 @@
+---
+abstract: 'A pluggable Markov engine analogous to MegaHAL'
+author:
+  - 'Hinrik Örn Sigurðsson <hinrik.sig@gmail.com>'
+  - 'Ævar Arnfjörð Bjarmason <avar@cpan.org>'
+build_requires:
+  Bot::Training: 0
+  Bot::Training::MegaHAL: 0
+  Bot::Training::StarCraft: 0
+  Data::Section: 0.101620
+  File::Slurp: 9999.13
+  Test::Exception: 0.29
+  Test::Expect: 0.31
+  Test::More: 0.94
+  Test::Output: 0.16
+  Test::Script: 1.07
+  Test::Script::Run: 0.04
+  Test::Synopsis: 0.06
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Hailo
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+    - utils
+recommends:
+  DBD::Pg: v2.16.1
+  DBD::mysql: 4.013
+requires:
+  Any::Moose: 0.13
+  Class::Load: 0.06
+  DBD::SQLite: 1.29
+  Data::Dump: 1.17
+  Dir::Self: 0.10
+  File::CountLines: v0.0.2
+  File::Spec::Functions: 0
+  Getopt::Long::Descriptive: 0.085
+  IO::Interactive: v0.0.6
+  IPC::System::Simple: 1.21
+  List::MoreUtils: 0.22
+  Moose: 1.08
+  MooseX::Getopt: 0.37
+  MooseX::StrictConstructor: 0.16
+  Mouse: 0.62
+  MouseX::Getopt: 0.33
+  MouseX::StrictConstructor: 0.02
+  Regexp::Common: 2010010201
+  Term::ReadLine: 0
+  Term::Sk: 0.06
+  Time::HiRes: 0
+  autodie: 2.08
+  namespace::clean: 0.18
+  perl: 5.010
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Hailo
+  homepage: http://hailo.org
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/hailo/hailo.git
+version: 0.72
+x_authority: cpan:AVAR

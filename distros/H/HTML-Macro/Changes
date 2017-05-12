@@ -1,0 +1,37 @@
+Revision history for Perl extension HTML::Macro
+
+1.00  Wed Jun  7 10:58:49 2000
+	- original version; created by h2xs 1.18
+
+1.01  Wed Jun  27 10:56 2000
+	- got rid of quoted methods; now use single underscores for no quoting
+
+1.03  Mon Jul 24 2000
+        - added <include> ; # as delimiter
+
+1.04  Mon Jul 24 2000
+        - changed RE to not use $` in effort to be more efficient
+
+1.10 Mon Sep  4 17:11:40 EDT 2000
+        - major change to parsing methodology in order to introduce <quote> and
+        generally simplify REs and ease porting
+
+1.13 Fri Jun 29 2001
+	renamed to HTML::Macro (was IF::Page) prior to upload to CPAN.
+	No longer support '_' as macro delimiter.
+
+1.14 Jan 2002
+        Added support for <if def>.  Now setting '@precompile' to true inhibits
+        processing of tags without trailing underscore (<if_>, <loop_>,
+        etc.)
+
+1.15 Wed Jan 16 2002
+        Added support for <eval> and <define>.
+        get now calls match_token.
+        constructor takes optional filename argument and file argument to
+        process and print is now optional.
+        improved context description when reporting errors
+
+1.20 Sep 07 2002
+        Added file cache; detects updates and reloads when file touched
+        process white space and comments early (when reading files)

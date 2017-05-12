@@ -1,0 +1,13 @@
+Changes
+lib/HTTP/ProxyPAC.pm
+lib/HTTP/ProxyPAC/Functions.pm
+lib/HTTP/ProxyPAC/Result.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00_compile.t
+t/01_proxy.t
+t/02_from_rival.t
+t/example.pac
+t/proxy.pac

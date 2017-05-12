@@ -1,0 +1,20 @@
+#!/usr/bin/perl
+
+use HTML::Seamstress;
+
+my $file = shift || 'file.html';
+
+htmls_compile
+  (
+   file     => $file,
+   preamble => q{
+		 <:
+     use lib '/home/metaperl/hacks/xml-seamstress/xml-seamstress/scripts';
+     use Data::Dumper;
+     use Simple::Class;
+     $s = Simple::Class->new;
+		 :>
+   }
+);
+
+

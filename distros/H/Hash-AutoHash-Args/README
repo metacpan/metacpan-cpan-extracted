@@ -1,0 +1,52 @@
+Hash-AutoHash-Args
+
+This class simplifies the handling of keyword argument lists. It
+replaces Class::AutoClass::Args. The 'new' method accepts a list,
+ARRAY, or HASH of keyword=>value pairs, another Hash::AutoHash::Args
+object, or any object that can be coerced into a HASH . It normalizes
+the keywords to ignore case and leading dashes ('-').
+
+The subclass Hash::AutoHash::Args::V0 is more compatible with the
+original.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Hash::AutoHash::Args
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Hash-AutoHash-Args
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Hash-AutoHash-Args
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Hash-AutoHash-Args
+
+    Search CPAN
+        http://search.cpan.org/dist/Hash-AutoHash-Args/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Nat Goodman
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

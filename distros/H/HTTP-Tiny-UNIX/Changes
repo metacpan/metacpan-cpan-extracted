@@ -1,0 +1,24 @@
+Revision history for HTTP-Tiny-UNIX
+
+0.04    2014-07-04 (SHARYANTO)
+
+        - [Bugfix] Set auth to '' instead of undef, to avoid perl undef warning
+          in HTTP::Tiny.
+
+
+0.03    2014-07-04 (SHARYANTO)
+
+        - No functional changes.
+
+        - Increase prereq version because on older version 0.039 it fails to use
+          Unix socket (ends up using IO::Socket::INET).
+
+
+0.02    2014-06-25 (SHARYANTO)
+
+        - Fix bug that prevented connecting to TCP.
+
+
+0.01    2014-06-20 (SHARYANTO)
+
+        - First release.

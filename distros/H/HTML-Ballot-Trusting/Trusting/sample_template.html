@@ -1,0 +1,63 @@
+<html>
+<head>
+<title>HTML::Ballot::Trusting - sample</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+<!--
+h1 {font-family:Verdana,Arial,Helvetica,Sans; font-size:18px;}
+h2 {font-family:Verdana,Arial,Helvetica,Sans; font-size:14px; width:100%;border:1px solid #CCC;}
+p {font-family:Verdana,Arial,Helvetica,Sans}
+.votebar {  background-color: #990000}
+.votehighscorebar {  background-color: red}
+.chart {		background-color:#eee; size:4px;font-family:Verdana,Arial,Helvetica,Sans; }
+.votequestion {	background-color:#eee; font-family:Verdana,Arial,Helvetica,Sans}
+.votescore { 	background-color:#eee; font-family:"Lucida Console",Courier, "Courier New", Sans; font-size:10pt}
+.votepc 	{ 	background-color:#eee; font-family:"Lucida Console",Courier, "Courier New", Sans; font-size:10pt}
+.voteresults { 	background-color:#fff; font-size:10pt;width:100%; border:1px solid #aaa; padding:5px;margin:0 0 10 0px;}
+.voteoptiontext { background-color:#fff; font-family:Verdana,Arial,Helvetica,Sans;padding:5px;}
+.voteoptionradio { background-color:#fff; font-family:Verdana,Arial,Helvetica,Sans}
+.voteoptionsubmit { font-family:Verdana,Arial,Helvetica,Sans; padding:1px;margin:10px;position:relative;left:40px}
+
+.comment { background-color:pink }
+.votecommentdate {	font-size:8pt; font-family:Verdana,Arial,Helvetica,Sans;padding:5px;}
+.voteusrname { 		font-weight: bold;font-size:10pt;font-family:Verdana,Arial,Helvetica,Sans;padding:5px;}
+.votecommenttext {	font-style: italic; font-size:10pt; font-family:Georgia, "Times New Roman", Times, Serif;padding:5px;}
+
+.listvoteusrname {font-weight: bold;font-size:10pt;font-family:Verdana,Arial,Helvetica,Sans;padding:5px;}}
+
+.ipchartitem {display:block; font-size:8pt; font-family:"Lucida Console",Courier, "Courier New", Sans;padding:5px;}
+-->
+</style>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<H1>This is a Sample Ballot</H1>
+<P>
+	This is a demo page for the Perl <CODE>HTML::Ballot::Trusting</CODE>
+	module, available from <A href="http://search.cpan.org">CPAN</A> or
+	from the author at <A href="mailto:code@leegoddard.com">code@leegoddard.com</A>.
+</P>
+
+<!-- Questions to ask, and the results of the ballot to date, will go below -->
+<TEMPLATEITEM name='QUESTIONS'></TEMPLATEITEM>
+
+<!-- The following TEMPLATEITEM elements are optional:
+	 include them only if you wish to use their functionality -->
+
+<TEMPLATEITEM name='IPCHART'>
+	<H2>Top IP Addresses To Post To This Ballot</H2>
+</TEMPLATEITEM>
+
+<TEMPLATEITEM name='VOTERLIST'>
+	<H2>Votes So Far Received</H2>
+</TEMPLATEITEM>
+
+<TEMPLATEITEM name='COMMENT'>
+	<H2>Comments</H2>
+</TEMPLATEITEM>
+
+
+<P><SMALL>Copyright (C) Lee Goddard 2001. All Rights Reserved. </SMALL></P>
+
+</body>
+</html>

@@ -1,0 +1,76 @@
+{
+   "abstract" : "HTML ã«å«ã¾ããçµµæå­ãç½®æãã",
+   "author" : [
+      "Tokuhiro Matsuno E<lt>tokuhirom@gmail.comE<gt>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-ReplacePictogramMobileJp",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "Encode::JP::Mobile" : "0.22",
+            "File::ShareDir" : "0",
+            "Params::Validate" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "HTML::ReplacePictogramMobileJp" : {
+         "file" : "lib/HTML/ReplacePictogramMobileJp.pm",
+         "version" : "0.07"
+      },
+      "HTML::ReplacePictogramMobileJp::AirHPhone" : {
+         "file" : "lib/HTML/ReplacePictogramMobileJp/AirHPhone.pm",
+         "version" : 0
+      },
+      "HTML::ReplacePictogramMobileJp::Base" : {
+         "file" : "lib/HTML/ReplacePictogramMobileJp/Base.pm",
+         "version" : 0
+      },
+      "HTML::ReplacePictogramMobileJp::DoCoMo" : {
+         "file" : "lib/HTML/ReplacePictogramMobileJp/DoCoMo.pm",
+         "version" : 0
+      },
+      "HTML::ReplacePictogramMobileJp::EZweb" : {
+         "file" : "lib/HTML/ReplacePictogramMobileJp/EZweb.pm",
+         "version" : 0
+      },
+      "HTML::ReplacePictogramMobileJp::Vodafone" : {
+         "file" : "lib/HTML/ReplacePictogramMobileJp/Vodafone.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.07"
+}

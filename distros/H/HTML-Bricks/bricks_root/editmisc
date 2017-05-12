@@ -1,0 +1,39 @@
+%#----------------------------------------------------------------------------
+%# File: editmisc
+%#----------------------------------------------------------------------------
+
+%#----------------------------------------------------------------------------
+%# render_header
+%#----------------------------------------------------------------------------
+<%method render_header>
+<%args>
+  $edit_tag
+  $brick_name
+  $brick_notes => undef
+  $uri
+  $route_tag
+  $fn => undef
+</%args>
+% $fn = 'fn=edit' if !defined $fn;
+<table cellspacing="0" cellpadding="0" border="1">
+  <tr height="1">
+    <td>
+      <table class="edittag" border="0">
+        <tr>
+          <td width="1">
+            <a class="edittag" href="<% $uri . $route_tag %>:<% $fn %>"><% $edit_tag %></a>
+          </td>
+          <td>
+            <% $brick_name %>
+          </td>
+% if (defined $brick_notes) {
+          <td>
+            <% $brick_notes %>
+          </td>
+% }
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</%method>

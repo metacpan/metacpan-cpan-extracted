@@ -1,0 +1,24 @@
+---
+abstract: 'Lightweight general-purpose HTML form generation, with sticky values'
+author:
+  - 'Peter Haworth <pmh@cpan.org>'
+build_requires:
+  CGI: 0
+  ExtUtils::Manifest: 0
+  Test::Builder: 0
+  Test::More: 0
+  Test::NoWarnings: 0
+  XML::LibXML: 0
+  blib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200009, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-StickyForm
+requires:
+  Carp: 0
+version: 0.08

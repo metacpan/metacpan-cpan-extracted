@@ -1,0 +1,6 @@
+: my $x = 1;
+: if ($x > 0) {
+	x is bigger than 1
+: } else {
+	x is not bigger than 1
+: }

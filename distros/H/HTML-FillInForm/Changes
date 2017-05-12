@@ -1,0 +1,264 @@
+
+2.21 - August 14th, 2014
+
+  - Declare CGI.pm as a testing dependency (RT #98012, thanks to Martin McGrath)
+
+2.20 - August 10th, 2013
+
+    - Updated to support HTML5 (RT #75933, thanks to charsbar)
+
+2.11 - June 3rd, 2013
+
+Updated tests so that they pass with Perl 5.18 (Mark Stosberg)
+
+2.1 - August 29th, 2011
+
+Fixed disable_fields option (#52667 Dirk Braun, Goro Fuji)
+
+Add an option to clear absent checkboxes (#44101 Alex Kapranoff)
+
+Fix incorrectly multiple escaped data in list context (#34081 Miika Pekkarinen)
+
+Allow FIF to process the new <input> field  types (URL, email, and number) as defined in the HTML5 draft and already implemented by the iPhone.
+(Michael Fisher)
+
+Allow alternate parsing class (Mark Stosberg)
+
+mark invalid fields (Sam Tregar)
+
+2.0 - September 11th, 2007
+
+Allow passing an arrayref of hashrefs through fdat (Mark Stosberg, Michael Graham)
+
+Several new shortcuts: (Mark Stosberg)
+    Allow calling fill() as a class method as a shortcut.
+    Allow   \$html  as shortcut for   scalarref => \$html
+    Allow   \@html  as shortcut for   arrayref  => \@html
+    Allow   \*html  as shortcut for   file      => \*html
+    Allow   'html'  as shortcut for   file      => 'html'
+    Allow   $q      as shortcut for   fobject   => $q
+    Allow  \%fdat   as shortcut for   fdat      => \%fdat
+
+    In summary, instead of this:
+
+    my $fif = HTML::FillInForm->new;
+    $fif->fill( scalarref => \$html, fdat => \%data );
+
+    You can simply write:
+
+    HTML::FillInForm->fill( \$html, \%data );
+
+Fixed disable_fields bug (Boris Zentner)
+
+Add support for ID attribute on form tags (name attribute is
+deprecated in xhtml) [rt.cpan.org #27376] (Anthony Ettinger)
+
+1.07 - August 2nd, 2007
+
+Added 'disable_fields' method [rt.cpan.org #6342] (Trevor Schellhorn)
+
+Support IE down-level revealed HTML comments [rt.cpan.org #19468] (Michael Peters)
+
+hash is not reset before each() is called [rt.cpan.org #24980] (Simon P. Ditner)
+
+Fix a bug the last plaintext part might be chopped if called via
+scalarref [rt.cpan.org #21750] (Tatsuhiko Miyagawa)
+
+Fix bug when passing 0 in array ref to textfields, also see
+[rt.cpan.org #22195] (Paul Miller)
+
+No longer generate warning if empty array as the value for a select attribute is passed (Dave Rolsky)
+
+1.06 - October 13th, 2005
+
+Distinguish between selects with and without the multiple attribute set (Alexander Hartmaier)
+
+Added warnings to PREREQ_PM
+
+1.05 - December 19th, 2004
+
+Added new tests in 19_extra.t (Vsevolod (Simon) Ilyushchenko)
+as part of Phalanx
+
+Make it clearer that doesn't have a CGI.pm dependency.
+
+1.04 - March 8th, 2004
+
+Now queries passed objects for form fields as it encounters them instead of
+asking for all fields up front.  This allows the type of object passed
+to not have to return all the fields in a empty ->param() call.
+(Dave Rolsky)
+
+Generate XHTML-compliant tags (Dave Rolsky)
+
+Documented behavior when passing undef values.
+
+Fixed bug when HTML form has two or more radio buttons and second or
+higher radio button is selected.  (Dan Kubb)
+
+Made ignore_fields work with fdat, included new test script
+18_ignore_fdat.t (James Tolley)
+
+1.03 - October 15th 2003
+
+Fixed warning messages when textarea doesn't have a name attribute
+(Rob Brown)
+
+1.02 - June 10th 2003
+
+Updated required version number for HTML::Parser to 3.26 in Makefile.PL
+(Ken Williams)
+
+1.01 - December 31st 2002
+
+Fixed issue with HTML::Parser decoding high-bit entities, by setting
+attr_encoded option, now requires HTML::Parser >= 3.26.  (Jonathan Swartz)
+
+1.00 - August 28th 2002
+
+Workaround for Opera 6.01/02 bug with selected radio boxes -
+place space before ending "/>" in <input .. /> (Bill Moseley)
+
+0.29 - May 5th 2002
+
+Added ignore_fields option (Boris Zentner)
+
+0.28 - April 27th 2002
+
+Added missing ! in declaration handler (Boris Zentner)
+
+Fill all values with the same name if one value is passed
+(Boris Zentner, Gabriel Burka)
+
+0.27 - April 20th 2002
+
+Fixes to pass through comments, processing instructions, and
+declarations (Boris Zentner)
+
+0.26 - April 16th 2002
+
+Added fill_password option (Tatsuhiko Miyagawa)
+
+0.25 - April 3rd 2002
+
+Fixed bug with passing single value to multi-valued fields
+(Maurice Aubrey)
+
+0.24 - March 3rd 2002
+
+Added no_debug to use CGI in t/13_warning.t
+
+0.23 - January 4th 2002
+
+Cleaned up warning messages for input fields without a name (Boris Zentner)
+
+0.22 - November 10th 2001
+
+Fixed bug with multiple inputs (Mark Stosberg)
+
+0.21 - October 16th 2001
+
+Updated credits section
+
+0.20 - October 16th 2001
+
+Fixed bug where selected value of '0' were skipped (Trevor Schellhorn)
+
+0.19 - August 25th 2001
+
+Fixed bug where option values between tags had trailing or leading
+whitespace (Ade Olonoh)
+
+Fixed bug for <input ... /> type tags (Andrew Creer)
+
+Fix for error message (object -> fobject) (Mark Stosberg)
+
+0.18 - July 7th 2001
+
+Fix for test on HTML escaping (thanks to Jost Krieger for report)
+
+0.17 - June 29th 2001
+
+Added "fill in target form" feature (Tatsuhiko Miyagawa)
+
+0.16 - June 28th 2001
+
+Fixed problems with HTML escaping (Tatsuhiko Miyagawa)
+
+0.15 - June 18th 2001
+
+Works with checkbox tags that don't have value attribute.  (Philip Mak)
+
+0.14 - May 17th 2001
+
+Removed warning message for submit tags.  (Joseph Yanni)
+
+0.13 - May 13th 2001
+
+Fixed bug when TYPE attr of input tag not set (Martin H. Sluka)
+
+Added docs on password caching (Mark Stosberg)
+
+0.12 - May 11th 2001
+
+Support for multiple fobjects.
+
+Fixed bug where new documents were feed into a used $fif object.
+
+0.11 - March 16th 2001
+
+Fixed problem when fdat maps the name of a textarea to an
+empty string ('').  Thanks to Jim Miner for the patch!
+
+0.10 - January 19th 2001
+
+Fixed problem with empty option tags (e.g. <select name="x"><option></select>)
+Thanks to Ade Olonoh for the patch!
+
+0.09 - January 15th 2001
+
+Text in textarea is now escaped.
+
+0.08 - January 15th 2001
+
+Option tags without "value" attribute get filled in correctly.
+
+Will not croak anymore if fobject's param method returns undef.
+
+0.07 - January 5th 2001
+
+Added support for multiple checkboxes and select fields, thanks
+to Patrick Michael Kane for the patch and test script for checkboxes!
+
+0.06 - October 9th 2000
+
+Fixed bug with "0" value in (hidden) fields
+
+Added docs from using HTML::FillInForm from Apache::ASP and Apache::PageKit
+
+0.05 - August 28th 2000
+
+Added better support for checkboxes.
+
+0.04 - August 10th 2000
+
+Fixed bug with hidden fields
+
+0.03 - August 10th 2000
+
+FillInForm now forces hidden fields to have a value.  So <input type="hidden" name="foo">
+is transformed to <input type="hidden" name="foo" value=""> if no value is set for 'foo'.
+
+Fixed bug with case-sensitivity and missing checkbox.  Thanks to
+Tom Lancaster for this bug report and fix!
+
+Added some test scripts.
+
+0.02 - June 27th 2000
+
+Fixed bug with option tags.  Now displays all 'option' tag attributes, in addition to selected and value.
+Better support for boolean attributes.
+
+0.01 - June 18th 2000
+
+Initial Release of Module.

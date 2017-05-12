@@ -1,0 +1,193 @@
+NAME
+    HTML::Builder - A declarative approach to HTML generation
+
+VERSION
+    This document describes version 0.008 of HTML::Builder - released
+    December 02, 2012 as part of HTML-Builder.
+
+SYNOPSIS
+        use HTML::Builder ':minimal';
+
+        # $html is: <div id="main"><p>Something, huh?</p></div>
+        my $html = div { id gets 'main'; p { 'Something, huh?' } };
+
+DESCRIPTION
+    A quick and dirty set of helper functions to make generating small bits
+    of HTML a little less tedious.
+
+FUNCTIONS
+  our_tags
+    A unique, sorted list of the HTML tags we know about (and handle).
+
+  tag($tag_name, $code_ref)
+    The actual function responsible for handling the tagging. All of the
+    helper functions pass off to tag() (e.g. "div()" is "sub div(&) {
+    unshift 'div'; goto \&tag }").
+
+  html5_tags()
+    The list of tags we think are HTML5.
+
+  html_tags()
+    The list of tags we think are HTML ( < HTML5, that is).
+
+  deprecated_tags()
+    HTML elements considered to be deprecated.
+
+  our_tags()
+    The unique, sorted list of all tags returned by html5_tags() and
+    html_tags().
+
+  html5_minimal_tags()
+    A minimal subset of HTML5 tags as returned by html5_tags():
+
+        article aside footer header nav
+
+  conflicting_tags
+    Returns a HashRef of tags that conflict with Perl builtins: our named
+    exports for the tags are the keys; the tags themselves are the values.
+
+  form_tags
+    A list of tags related to forms, that will belong to the ":form" group.
+
+  table_tags
+    A list of tags related to tables, that will belong to the ":table"
+    group.
+
+  minimal_tags
+    A list of tags we consider a "minimal" set. These will belong to the
+    ":minimal" group.
+
+  our_tags
+    The set of all the tags we know of.
+
+  attr(&)
+    An alternative to using "gets" (or instances where it won't work, e.g.
+    "for gets 'name'"). Takes a coderef, expects that coderef to return a
+    list of attribute => value pairs, e.g.
+
+        div {
+            attr {
+                id  => 'one',
+                bip => 'two',
+            };
+        };
+
+USAGE
+    Each supported HTML tag takes a coderef, executes it, and returns the
+    output the coderef writes to STDOUT with the return value appended.
+
+    That is:
+
+        div { say h1 { 'Hi there! }; p { "Nice day, isn't it?" } }
+
+    Generates:
+
+        <div><h1>Hi there!</h1><p>Nice day, isn't it?</p></div>
+
+    Element attributes are handled by specifying them with "gets". e.g.:
+
+        div { id gets 'main'; 'Hi!' }
+
+    Generates:
+
+        <div id="main">Hi!</div>
+
+    gets may be specified multiple times, for multiple attributes.
+
+  Nested Tags
+    When one tag function is called from within another, the nested tag will
+    print its output to STDOUT rather than returning it. That means that
+    this:
+
+        div { print h1 { 'Hi there! }; p { "Nice day, isn't it?" } }
+
+    ...and this:
+
+        div { h1 { 'Hi there! }; p { "Nice day, isn't it?" } }
+
+    Behave identically, from the perspective of the caller.
+
+RENAMING EXPORTED FUNCTIONS
+    This package uses Sub::Exporter, so you can take advantage of the
+    features that package provides. For example, if you wanted to import the
+    tags in the 'minimal' group, but wanted to prefix each function with
+    'html_', you could do:
+
+        use HTML::Builder -minimal => { -prefix => 'html_' };
+
+EXPORTED FUNCTIONS
+    Each tag we handle is capable of being exported, and called with a
+    coderef. This coderef is executed, and the return is wrapped in the tag.
+    Attributes on the tag can be set from within the coderef by using gets,
+    a la "id gets 'foo'".
+
+    By default we export the ":minimal" group.
+
+  Export Groups
+   :all
+    Everything not conflicting with Perl builtins.
+
+    This isn't an optimal group to use as-is -- it will cause a ton of
+    functions to be imported, including some that will conflict with several
+    Perl builtins. If you use this group, you are highly encouraged to
+    supply a prefix for it, like:
+
+        use HTML::Builder -all => { -prefix => 'html_' };
+
+   :minimal
+    A basic set of the most commonly used tags:
+
+        h1..h4 div p img span script br ul ol li style a
+
+   :html5
+    HTML5 tags ("article", "header", "nav", etc) -- or at least what
+    Wikipedia thinks are HTML5 tags.
+
+   :table
+    The table tags:
+
+        table thead tbody tfoot tr th td
+
+    As "tr" would conflict with a Perl builtin, it is recommended that this
+    group be imported with a prefix ('table_' would seem to suggest itself).
+
+   :header
+    Header tags:
+
+        header hgroup
+
+   :form
+    Form tags:
+
+        form fieldset button input label optgroup option select textarea
+
+ACKNOWLEDGMENTS
+    This package was inspired by Template::Declare::Tags... In particular,
+    our "gets::AUTOLOAD" is pretty much a straight-up copy of
+    Template::Declare::Tags' "is::AUTOLOAD", with some modifications. We
+    also pass off to HTML::Tiny, and allow it to do the work of actually
+    generating the output. Thanks! :)
+
+SEE ALSO
+    Please see those modules/websites for more information related to this
+    module.
+
+    *   HTML::Tiny
+
+    *   Template::Declare::Tags
+
+    *   HTML::HTML5::Builder
+
+AUTHOR
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+CONTRIBUTOR
+    Olaf Alders <olaf@wundersolutions.com>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2012 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

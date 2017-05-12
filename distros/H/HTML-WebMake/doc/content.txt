@@ -1,0 +1,92 @@
+<wmmeta name="Title" value="The &lt;content&gt; Tag" />
+<wmmeta name="Section" value="02-tags_attrs" />
+<wmmeta name="Score" value="30" />
+<wmmeta name="Abstract">
+one chunk of textual content
+</wmmeta>
+
+The &lt;content&gt; tag has one required attribute: its name, which is used to
+substitute in that section's text, by inserting it in other sections or out
+tags in a "curly-bracket reference" [content_refs], like so:
+
+	&wmdollar;{foo}
+
+The following attributes are supported.  These can also be set using the
+"&lt;attrdefault&gt;" [attrdefault] tag.
+
+	__format__:	This allows the user to define what format the content
+	is in.  This allows markup languages other than HTML to be used;
+	webmake will convert to HTML format, or other output formats, as
+	required using the HTML::WebMake::FormatConvert module.  The default
+	value is ''__text/html__''.  
+
+	__asis__:	This will block any interpretation of content or URL
+	references in the content item, until after it has been converted into
+	HTML format.  This is useful for POD documentation, which may be
+	embedded inside a file containing other text; without ''asis'', the
+	text would be scanned for content references before the POD converter
+	stripped out the extraneous bits.  The default value is ''__false__''.
+
+	__map__:	Whether the content item should be mapped in a "site
+	map" [sitemap], or not. The default value is ''__true__''.
+
+	__up__:	The name of the content item which is this content item's
+	parent, in the "site map" [sitemap].
+
+	__isroot__:	Whether or not this content item is the root of the
+	"site map" [sitemap]. The default value is ''__false__''.
+
+If you wish to define a number of content sections at once, they can be
+searched for and loaded en masse using the "&lt;contents&gt;" [1] tag.
+
+Every content item can have "metadata" associated with it.  See the
+"metadata documentation" [metadata] for details.
+
+Defining Content Items On-The-Fly
+---------------------------------
+
+The "&lt;{set}&gt; processing instruction" [3] can be used to define small
+pieces of content on the fly, from within other content or "&lt;out&gt;
+sections" [4].
+
+In addition, Perl code can create content items using the "set_content()" [2]
+function.
+
+Using Content From Perl Code
+----------------------------
+
+Perl code can obtain the text of content items using the "get_content()" [2]
+function, and can treat content items as whitespace-separated lists using
+"get_list()" [2].
+
+In addition, each content item has a range of properties and associated
+"metadata"; the "get_content_object()" [2] method allows Perl code to retrieve
+an object of type "HTML::WebMake::Content" [contobj] representing the content
+item.
+
+	[1]: $(contents)
+	[2]: $(PerlCodeLibrary.pm.html)
+	[3]: $(set)
+	[4]: $(out)
+	Auto: [content_refs]: $(content_refs)
+	[contobj]: $(Content.pm.html)
+	Auto: [metadata]: $(metadata)
+	Auto: [sitemap]: $(sitemap)
+	Auto: [metadefault]: $(metadefault)
+	[attrdefault]: $(attrdefault)
+
+Example
+=======
+
+<safe>
+  <content name="foo" format="text/html">
+  <em>This is a test.</em>
+  </content>
+
+  <content name="bar" format="text/et">
+  Still Testing
+  -------------
+
+  So is this!
+  </content>
+</safe>

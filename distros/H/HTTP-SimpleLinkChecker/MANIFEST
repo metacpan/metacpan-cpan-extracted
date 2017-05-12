@@ -1,0 +1,22 @@
+Changes
+examples/README
+INSTALL.SKIP
+lib/HTTP/SimpleLinkChecker.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.pod
+script/http_status
+t/200.t
+t/403.t
+t/export.t
+t/load.t
+t/pod.t
+t/pod_coverage.t
+t/test_manifest
+t/user_agent.t
+t/www.perl6.org.t
+xt/changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

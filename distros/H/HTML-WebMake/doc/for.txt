@@ -1,0 +1,44 @@
+<wmmeta name="Title" value="The &lt;for&gt; Tag" />
+<wmmeta name="Section" value="02-tags_attrs" />
+<wmmeta name="Score" value="70" />
+<wmmeta name="Abstract">
+iteration construct
+</wmmeta>
+
+The &lt;for&gt; tag provides a quick way to iterate through a list of items.
+
+It requires two attributes, __name__ and __values__; the content item named
+__name__ is set to each space-separated value in the __values__ string, and
+the text inside the block is processed.
+
+Supported Attributes
+====================
+
+	__name__:	The name of the variable which will be set to each
+	value in the __values__ list in turn  (if you know your comp-sci
+	lingo, the iterator).
+
+	__values__:	A space-separated list of values which is iterated
+	through.
+
+	__namesubst__:	A Perl s/// substitution; each value in the __values__
+	list will be processed by this, if set.
+
+Variable references to **&wmdollar;{__name__}** are processed immediately, so
+you can use this variable inside another variable reference, like this:
+##&wmdollar;{all_&wmdollar;{name}_text}## .
+
+Example
+=======
+
+Here's an example, taken from my own <a href=http://jmason.org/>home site</a>:
+
+<safe>
+	<!-- Create output for files in top dir -->
+	<for name="out" values="index contact work nonwork home">
+	  <out file="${out}.html" name="${out}">
+	    ${jmason_template}
+	  </out>
+	</for>
+</safe>
+

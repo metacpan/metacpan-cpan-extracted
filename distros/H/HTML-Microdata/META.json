@@ -1,0 +1,85 @@
+{
+   "abstract" : "Extractor of microdata from HTML.",
+   "author" : [
+      "cho45 <cho45@lowreal.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v1.0.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-Microdata",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36",
+            "JSON" : "0",
+            "Test::Differences" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::TreeBuilder::LibXML" : "0",
+            "Hash::MultiValue" : "0",
+            "JSON" : "0",
+            "Scalar::Util" : "0",
+            "URI" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "HTML::Microdata" : {
+         "file" : "lib/HTML/Microdata.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "ssh://git@github.com/cho45/HTML-Microdata/issues"
+      },
+      "homepage" : "ssh://git@github.com/cho45/HTML-Microdata",
+      "repository" : {
+         "url" : "ssh://git@github.com/cho45/HTML-Microdata.git",
+         "web" : "ssh://git@github.com/cho45/HTML-Microdata"
+      }
+   },
+   "version" : "0.05",
+   "x_contributors" : [
+      "Syohei YOSHIDA <syohex@gmail.com>",
+      "Vaclav Haisman <vhaisman@gmail.com>"
+   ]
+}

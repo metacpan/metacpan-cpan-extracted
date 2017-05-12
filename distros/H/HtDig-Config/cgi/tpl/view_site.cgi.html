@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <%$style_sheet_link%>
+    <title>ConfigDig: An ht://Dig Admin Tool</title>
+  </head>
+
+  <body>
+    <h1 align=center>ConfigDig</h1>
+    <h2 align=center>Indexed Site Administration</h2>
+<center>
+<form action="view_site.cgi" method="POST">
+<input type="hidden" name="site" value="<%$safe_site_name%>">
+<table align=center border=1>
+<tr>
+	  <td colspan=2 align="center">Current Site: <%$site_name%><BR>(<%$site_path%>) </td>
+<tr>
+	  <td colspan=2 align="center"><a href="index.cgi">Choose another site</a></td>
+</tr>
+	  <td align="center"><FONT class="cdStatus"><%$status_msg%></FONT></td>
+<tr>
+<tr>	  <td><input type="radio" name="action" value="edit">
+		Modify configuration</td></tr>
+<tr>	  <td>
+		<input type="radio" name="action" value="fuzzy">
+		Create fuzzy index of type: 
+		<select name="index_type">
+		    <%$fuzzy_type_list%>
+		</select>
+	  </td>
+</tr>
+<tr>	  <td><input type="radio" name="action" value="dig_later">
+		Schedule an indexing run at time: <input name="dig_time"><BR>
+		<input type="checkbox" name="notify_later" value="1"> 
+		Notify when complete</P></td>
+</tr>
+<tr>	  <td><input type="radio" name="action" value="dig_now">
+		Index now<BR>
+		<input type="checkbox" name="notify_now" value="1"> 
+		Notify when complete</P></td>
+</tr>
+<tr>	  <td><input type="radio" name="action" value="merge">
+		Merge another htdig database into this one: 
+		<select name="merge_site">
+		    <%$other_site_list%>
+		</select>
+	   </td>
+</tr>
+<tr>
+	  <td align="center" colspan="2"><input type="submit" value="Begin" name="action"></td>
+</tr>
+</table>
+</form>
+</center>
+  </body>
+</html>

@@ -1,0 +1,64 @@
+Revision history for HTML::ExtractMeta
+
+0.21    2016-10-11
+        - Fixed an error in the documentation.
+
+0.20    2016-10-01
+        - Totally redesigned the API and the inner workings of the module.
+
+0.11    2014-05-26
+        - Added missing dependency.
+        - Improved documentation.
+
+0.10    2013-10-26
+        - Updated Mojolicious requirement to version 4.50.
+        - Updated Mouse requirement to version 1.13.
+        - Fixed deprecated requirements.
+        - Updated the documentation.
+
+0.09    2013-03-08
+        - Cleaned up prereqs.
+        - Improved tests.
+
+0.08    2013-02-08
+        - Changed the behavior of get_title() and get_description().
+          They now returns the shortest value found, as a lot of news
+          sites add their name at the end of some of the title tags.
+        - Modified the extraction tests.
+        - Now requires Mouse 1.05.
+        - Now requires Mojolicious 3.84.
+
+0.07    2013-01-11
+        - Replaced Moose requirement with Mouse.
+        - Added more tests.
+        - Improved the documentation.
+
+0.06    2013-01-07
+        - Added the get_author() method.
+        - Improved the get_locale() method.
+        - Improved the get_title() method.
+        - Improved the get_authors() method.
+        - Improved the get_keywords() method.
+        - Added more tests.
+        - Now requires Mojolicious 3.71 because of memory leak fix in Mojo::DOM.
+        - Improved the "locale" identification method.
+        - Improved the documentation.
+
+0.05    2012-12-31
+        - Improved the documentation.
+        - Added requirements and their versions to dist.ini.
+
+0.04    2012-12-30
+        - Added the get_locale() method.
+        - Added the get_image_urls() method.
+        - Added the get_authors() method.
+        - Added more tests.
+
+0.03    2012-12-30
+        - Minor fixes in the documentation.
+
+0.02    2012-12-30
+        - Added documentation.
+
+0.01    2012-12-30
+        - First version, released on an unsuspecting world.

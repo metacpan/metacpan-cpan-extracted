@@ -1,0 +1,45 @@
+NAME
+       HTML::FormsDj - Web Forms Module for Dancer and others.
+
+
+DESCRIPTION
+
+       The HTML::FormsDj module provides a comfortable way to maintain
+       HTML form input. Its main use is for Dancer but can be used with
+       other perl application servers as well, since it doesn't require
+       Dancer to run at all.
+       
+       HTML::FormsDj aims to behave as much as Django's Forms system
+       with the excpetion to do it the perl way and without a save feature.
+
+
+
+INSTALLATION
+
+	to install, type:
+	  perl Makefile.PL
+	  make
+	  make test
+	  make install
+
+	to read the complete documentation, type:
+	perldoc HTML::FormsDj
+
+
+
+COPYRIGHT
+       HTML::FormsDj
+           Copyright (c) 2012 by T. Linden <tlinden AT cpan DOT org>
+
+       This library is free software; you can redistribute it
+       and/or modify it under the same terms as Perl itself.
+
+
+
+
+AUTHOR
+       T. Linden <tlinden |AT| cpan.org>
+
+
+VERSION
+	0.02

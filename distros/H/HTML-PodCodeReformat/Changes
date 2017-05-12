@@ -1,0 +1,13 @@
+Revision history for HTML-PodCodeReformat
+
+0.20000       2011-05-26 09:04:25 Europe/Rome
+
+   * "line_numbers" option added.
+
+   * Doc enhancements.
+
+   * Updated abstract.
+
+0.10000       2011-05-25 07:41:02 Europe/Rome
+
+   * Initial release.

@@ -1,0 +1,16 @@
+0.05      Nov 01 2016
+- Require latest HTTP::Tiny to get overridable peer IP
+- Pass through resolved IP via overridable peer IP
+
+0.04      Sep 29 2015
+          Protect against DNS rebind attacks
+
+0.03      Jun 04 2014
+          Declare dependency on HTTP::Tiny
+          Doc fixes
+
+0.02      Jun 03 2014
+          Fix build
+
+0.01      Jun 03 2014
+          First release

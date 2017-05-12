@@ -1,0 +1,18 @@
+<ep-package name="HTML::EP::Shop">
+<ep-database dsn="DBI:CSV:f_dir=$env->DOCUMENT_ROOT$/outdoor/shop/var">
+<ep-shop-upload table="$cgi->table$" cgivar="data" result="rows"
+                names="names" template="template">
+<HTML><HEAD><TITLE>
+<ep-language de="Upload" en="Upload"></TITLE></HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<BR><BR><BR>
+<H1><ep-language de="Upload" en="Upload"></H1>
+<p>
+The following data was submitted:
+<TABLE>
+  <TR><ep-list items="names" item="n"><TH>$n$</TH></ep-list></TR>
+  <ep-list items="rows" item=r template="<TR>$@template$</TR>">
+</TABLE>
+</p>
+</BODY>
+</HTML>

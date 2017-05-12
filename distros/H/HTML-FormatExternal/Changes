@@ -1,0 +1,77 @@
+Copyright 2008, 2009, 2010, 2011, 2013, 2015 Kevin Ryde
+
+This file is part of HTML-FormatExternal.
+
+HTML-FormatExternal is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3, or (at
+your option) any later version.
+
+HTML-FormatExternal is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with HTML-FormatExternal.  If not, see http://www.gnu.org/licenses/
+
+
+
+Version 26, August 2015
+    - tests again fix no "http:" on cygwin
+
+Version 25, August 2015
+    - tests don't attempt filename like "http:" on Mac, MS-DOS, etc
+      since on cygwin it depends on the external program also being a
+      cygwin build
+
+Version 24, June 2015
+    - Netrik allow for no TERM environment variable (RT #105221 and
+      Debian #788639)
+
+Version 23, April 2015
+    - new wide char handling
+    - Lynx new unique_links option
+    - Netrik avoid program_full_version() opening start page of ~/.netrikrc
+
+Version 22, June 2013
+    - really don't distribute file "http:" this time
+
+Version 21, June 2013
+    - don't distribute file "http:" as it won't unpack on CP/M and similar,
+      per report by Alexandr Ciornii RT#86008
+
+Version 20, June 2013
+    - escape strange filenames like "-" or "%"
+    - new HTML::FormatText::Vilistextum
+    - use IPC::Run
+
+Version 19, February 2011
+    - fix Makefile.PL for perl 5.6 and earlier
+
+Version 18, September 2010
+    - test manifest only as an author test
+
+Version 17, March 2010
+    - newer File::Temp to avoid mutual misfeatures between it and File::Copy
+
+Version 16, March 2010
+    - new "base" option
+
+Version 15, February 2010
+    - new home page
+
+Version 14, February 2009
+    - new Html2text
+
+Version 13, December 2008
+    - new justify option for lynx
+    - ignore unrecognised options, for safety
+    - fix tests qr//m no good pre perl 5.10
+
+Version 12, December 2008
+    - mucho test count fixes
+    - cope with older links and lynx without nomargin
+
+Version 11, December 2008
+    - the first version

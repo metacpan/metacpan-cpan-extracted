@@ -1,0 +1,4 @@
+Name: {{{ nomen est omen }}}
+{{{ iterate over list }}}War: Bellum {{{ nomen est bellum }}}
+{{{ end of iterate }}}
+{{{ occupy filter_included.htc }}}

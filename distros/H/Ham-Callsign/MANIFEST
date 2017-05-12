@@ -1,0 +1,16 @@
+cs
+dist/convertcty
+lib/Ham/Callsign.pm
+lib/Ham/Callsign/Base.pm
+lib/Ham/Callsign/DB.pm
+lib/Ham/Callsign/DB/DX.pm
+lib/Ham/Callsign/DB/QRZ.pm
+lib/Ham/Callsign/DB/US.pm
+lib/Ham/Callsign/Display/Dump.pm
+lib/Ham/Callsign/Display/Format.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+META.yml                                 Module meta-data (added by MakeMaker)

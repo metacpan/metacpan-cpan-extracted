@@ -1,0 +1,12 @@
+TODO list for Perl module HTTP::CheckProxy
+
+- Convert to use LWP::Paralell::UserAgent
+- modify new() to use named parameters
+  so that both are optional and independent
+- Add testing for open (anonymous access) SOCKS proxy.
+  This is not compatible with LWP, it does not know about SOCKS.
+  The optimal solution is to modify or subclass LWP so it has this extra transport.
+.
+ 
+
+

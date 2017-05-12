@@ -1,0 +1,33 @@
+Revision history for Perl module HTML::Gumbo
+
+0.17 2015-01-13
+
+    - fix for threaded perl
+
+0.16 2016-01-12
+
+    - fragments parsing
+    - fix unreferenced scalar error with 'tree' format
+
+0.14 2015-12-28
+
+    - croak in case we don't know what to do
+
+0.13 2014-07-17
+
+    - Additional fix for threaded perl
+
+0.12 2013-10-09
+
+    - perl 5.10 compatibility
+
+0.11 2013-10-09
+
+    - use c89 scoping of iterator in for loops
+    - fixes for threaded perls
+    - skip test if HTML::TreeBuilder is not installed
+
+0.1 2013-09-30
+
+    - first release to CPAN
+

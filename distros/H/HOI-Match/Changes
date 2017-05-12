@@ -1,0 +1,22 @@
+Revision history for Perl extension HOI::Match.
+
+0.01  Mon Feb 10 10:07:33 2014
+	- original version; created by h2xs 1.23 with options
+		-XAn HOI::Match
+0.02  Mon Feb 10 2014
+    - Fixed readme format.
+0.03  Mon Feb 10 2014
+    - Fixed readme format.
+0.04  Wed Feb 12 2014
+    - Removed unused parameters and functions. Add README and license metadata.
+0.05  Wed Feb 26 2014
+    - Added constant (decimal integers & floats, strings) matching.
+0.06  Sat Mar 22 2014
+    - Added multiple type constructor for ADTs.
+0.07  Thu Dec 11 2014
+    - Added alias support.
+0.071 Sun Feb 15 2015
+    - Removed inline code.
+0.072 Sun May 31 2015
+    - Bugfix: Empty string matching.
+    - Feature: String as a pseudo-list

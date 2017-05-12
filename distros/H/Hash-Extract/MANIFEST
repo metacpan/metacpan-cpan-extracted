@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+SIGNATURE
+inc/ExtUtils/MY_Metafile.pm
+lib/Hash/Extract.pm
+lib/Hash/Extract.mlpod
+lib/Hash/Extract/JA.pod
+t/00-load.t
+t/01-basic.t
+t/02-wrongs.t
+t/03-named-capture-buffer.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

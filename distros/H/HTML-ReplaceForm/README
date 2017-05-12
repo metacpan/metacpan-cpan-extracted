@@ -1,0 +1,55 @@
+NAME
+    HTML::ReplaceForm - easily replace HTML form fields with corresponding
+    values
+
+SYNOPSIS
+      use HTML::ReplaceForm;
+     $modified_html = replace_form($html,$data_href);
+
+DESCRIPTION
+    This is useful for creating an HTML email message from a web form, while
+    sharing a single template that is used for both purposes.
+
+    Keep the form in an include file that is used both on the web and in an
+    email template.
+
+    The real, regular HTML in the form will automatically have the form
+    fields replaced with corresponding values by the "replace_form()"
+    function, which you can then use to send the HTML email.
+
+FUNCTIONS
+  replace_form
+     $modified_html = replace_form($html,$data_href);
+
+    Replace form elements with with a hashref of corresponding data.
+
+    Note: For now, replace radio and checkboxes with an X if they are
+    marked. They are troublesome because there are multiple inputs with the
+    same name, and they have labels next to them.
+
+    Args:
+
+     $html       - Any kind of HTML data structure that HTML::TokeParser::Simple accepts 
+     $data_href  a hashref of data that corresponds to the form
+
+  TODO
+    There are small bits of HTML design which are currently embedded in
+    here. The user should have control over these.
+
+     - $data is displayed as <strong>$data</strong>
+     - A selected checkbox or radio button is displayed as [<strong>X</strong>]
+     - An unselected checkbox or radio button is displayed as  [ ]
+
+AUTHOR
+            Mark Stosberg C<< mark at summersault.com >> 
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    perl(1).
+

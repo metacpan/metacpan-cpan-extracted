@@ -1,0 +1,11 @@
+Revision history for HTML-ExtractText-Extra
+
+1.001003  2015-04-20
+        - Fixed Issue #1: impossible to set options via ->new
+
+1.001002  2015-04-15
+        - Added explicit version in prereqs, to
+            avoid CPANTESTER test failures
+
+1.001001  2015-04-15
+        - First version released on an unsuspecting world

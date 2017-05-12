@@ -1,0 +1,60 @@
+{
+   "abstract" : "HTML::Template::Compiled::Filter::Whitespace - whitespace filter for HTML output",
+   "author" : [
+      "Steffen Winkler <steffenw at cpan.org>, Volker Voit <volker.voit at googlemail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-Template-Compiled-Filter-Whitespace",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "HTML::Template::Compiled" : "0.84",
+            "Test::Differences" : "0.60",
+            "Test::More" : "0",
+            "Test::NoWarnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Test::Pod" : "1.14",
+            "Test::Pod::Coverage" : "1.04"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Cwd" : "0",
+            "English" : "0",
+            "Exporter::Tiny" : "0",
+            "parent" : "0",
+            "perl" : "5.006",
+            "version" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "HTML::Template::Compiled::Filter::Whitespace" : {
+         "file" : "lib/HTML/Template/Compiled/Filter/Whitespace.pm",
+         "version" : "0.09"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

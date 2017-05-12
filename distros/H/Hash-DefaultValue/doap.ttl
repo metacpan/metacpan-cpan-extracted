@@ -1,0 +1,162 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Hash-DefaultValue/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [ doap-deps:on "strict"^^doap-deps:CpanId ], [ doap-deps:on "warnings"^^doap-deps:CpanId ], [ doap-deps:on "utf8"^^doap-deps:CpanId ], [ doap-deps:on "constant 1.06"^^doap-deps:CpanId ], [ doap-deps:on "Tie::Hash"^^doap-deps:CpanId ], [ doap-deps:on "Carp"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ], [ doap-deps:on "Test::Exception"^^doap-deps:CpanId ], [ doap-deps:on "Test::Warn"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Hash-DefaultValue>;
+	doap:created         "2012-05-18"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Hash-DefaultValue>;
+	doap:homepage        <https://metacpan.org/release/Hash-DefaultValue>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>, <http://purl.org/NET/cpan-uri/person/voj>;
+	doap:name            "Hash-DefaultValue";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Hash-DefaultValue/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Hash-DefaultValue/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Hash-DefaultValue/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Hash-DefaultValue/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Hash-DefaultValue/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Hash-DefaultValue/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Hash-DefaultValue/v_0-007>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-hash-defaultvalue>;
+	];
+	doap:shortdesc       "create a hash where the default value ain't undef".
+
+<http://purl.org/NET/cpan-uri/dist/Hash-DefaultValue/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Hash-DefaultValue-0.001"^^xsd:string;
+	dc:issued            "2012-05-18"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Hash-DefaultValue-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Hash-DefaultValue/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Hash-DefaultValue-0.002"^^xsd:string;
+	dc:issued            "2012-10-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Show how the 'aliased' module can be used with Hash::DefaultValue.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "No warning on $hash{$key} where $key is undef.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Hash::Missing";
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/voj>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Hash-DefaultValue-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Hash-DefaultValue/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "Hash-DefaultValue-0.003"^^xsd:string;
+	dc:issued            "2012-10-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Add build dependency on Test::Warn.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Hash-DefaultValue-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Hash-DefaultValue/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "Hash-DefaultValue-0.004"^^xsd:string;
+	dc:issued            "2012-10-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "t/03warnings.t was testing for specific warning text that changed between Perl 5.8 and Perl 5.10. It now passes both forms of the warning.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Hash-DefaultValue-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Hash-DefaultValue/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "Hash-DefaultValue-0.005"^^xsd:string;
+	dc:issued            "2012-11-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Correct unparsable abstract for Hash::DefaultValue.";
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/rjbs>;
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Correct misspelt abstract for Hash::Missing.";
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/mauke>;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Add link to repo.";
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/mauke>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Hash-DefaultValue-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Hash-DefaultValue/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "Hash-DefaultValue-0.006"^^xsd:string;
+	dc:issued            "2012-12-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix, doap-changeset:Packaging;
+			rdfs:label "Require at least version 1.06 of constant.pm.";
+			rdfs:seeAlso <http://cpantesters.org/cpan/report/dec43aa8-3277-11e2-971e-da98d11eac00>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Hash-DefaultValue-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Hash-DefaultValue/v_0-007>
+	a                    doap:Version;
+	dc:identifier        "Hash-DefaultValue-0.007"^^xsd:string;
+	dc:issued            "2014-09-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Hash-DefaultValue-0.007.tar.gz>;
+	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/mauke>
+	a                    foaf:Person;
+	foaf:nick            "MAUKE";
+	foaf:page            <https://metacpan.org/author/MAUKE>.
+
+<http://purl.org/NET/cpan-uri/person/rjbs>
+	a                    foaf:Person;
+	foaf:nick            "RJBS";
+	foaf:page            <https://metacpan.org/author/RJBS>.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+
+<http://purl.org/NET/cpan-uri/person/voj>
+	a                    foaf:Person;
+	foaf:nick            "VOJ";
+	foaf:page            <https://metacpan.org/author/VOJ>.
+

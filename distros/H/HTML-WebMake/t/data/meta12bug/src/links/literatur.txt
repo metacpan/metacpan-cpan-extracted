@@ -1,0 +1,40 @@
+<wmmeta name="ltitle">Literatur</wmmeta>
+<wmmeta name="stitle">Literatur</wmmeta>
+<wmmeta name="author">J&ouml;rn Clausen</wmmeta>
+<wmmeta name="cdate">2001-04-23</wmmeta>
+<wmmeta name="mdate">2001-04-23</wmmeta>
+
+<ul>
+  <li>
+    <p><em>Grundlagen der Dokumentenverarbeitung</em><br>
+        Reinhard Wilhelm, Reinhold Heckmann<br>
+          Addison-Wesley, 1996</p>
+  </li>
+  <li>
+    <p><em>Mut zur Typographie</em><br>
+        J&uuml;rgen Gulbins, Christine Kahrmann<br>
+          Springer Verlag, 1992</p>
+  </li>
+  <li>
+    <p><em>The SGML Handbook</em><br>
+        Charles Goldfarb<br>
+          Clarendon Press, 1992</p>
+  </li>
+  <li>
+    <p><em>Informationsmodellierung in XML und SGML</em><br>
+        Henning Lobin<br>
+          Springer Verlag, 2000</p>
+  </li>
+  <li>
+    <p><em>LaTeX: A Document Preparation System</em><br>
+        Leslie Lamport<br>
+          Addison-Wesley, 1994<br>
+            deutsch: <em>Das LaTeX-Handbuch</em>, Addison-Wesley, 1995</p>
+  </li>
+  <li>
+    <p><em>The LaTeX Companion</em><br>
+        Michel Goossens, Frank Mittelbach, Alexander Samarin<br>
+          Addison-Wesley, 1994<br>
+            deutsch: <em>Der LaTeX-Begleiter</em>, Addison-Wesley, 1996</p>
+  </li>
+</ul>

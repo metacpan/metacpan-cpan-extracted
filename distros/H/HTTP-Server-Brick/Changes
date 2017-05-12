@@ -1,0 +1,48 @@
+Revision history for HTTP-Server-Brick
+
+$Id$
+
+0.1.7  Mon August 31 2015
+       Honour timeout argument as per RT #101629
+
+0.1.6  Mon August 31 2015
+       Fixed test to not use out of bound server port as per RT #106745.
+       
+0.1.5  Wed August 26 2015
+       Added trailing slash to directories in directory listing to remove redirection. Pull request
+       from github/polettix.
+
+0.1.4  Sat May 11 2013
+       Changed mount to return $self and added mount_root as per suggestions from Gintautas Grigelionis
+
+0.1.3  Mon June 16 2008
+       Fixed bug in test where incorrect # tests were reported without SSL installed
+
+0.1.2  Sun June 15 2008
+       Fixed bug RT #29042 which caused a failure when no explicit port in url
+       Added better logging for failed handlers
+
+0.1.1  Sat June 14 2008
+       Implemented X-Brick-Remote-IP header patch, submitted by hdp, and test for same
+
+0.1.0  Sat July 21
+       Implemented forking and SSL changes submitted by hdp
+
+0.0.9  Thur Jun 28
+       fixed 'broken pipe' issue and also Build.PL dependency for people using Makefile.PL in CPAN shell
+
+0.0.8  Mon Jun 25
+       fixed mount_path issue and added test
+
+0.0.7  Mon Jun 25
+       Minor pod changes
+
+0.0.6  Mon Jun 25
+       Minor pod and build changes
+
+0.0.5  Sun Jun 24
+       Initial public release 
+
+0.0.1  Fri Jun 22 21:25:56 2007
+       Initial release.
+

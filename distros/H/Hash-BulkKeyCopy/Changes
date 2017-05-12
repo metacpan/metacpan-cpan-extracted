@@ -1,0 +1,20 @@
+Revision history for Perl extension Hash-BulkKeyCopy
+
+0.022 2016-09-20T02:13:23Z
+    - add deps of Test::LeakTrace
+    - edit readme
+
+0.021 2016-09-16T07:26:09Z
+    - usage format fix
+
+0.02 2016-09-16T07:20:09Z
+    - target hash's keys can be an empty array
+
+0.011 2016-09-16T06:41:23Z
+    - typo fix
+    - add usage
+
+0.01 2016-09-16T06:02:50Z
+
+    - original version
+

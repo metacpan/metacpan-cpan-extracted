@@ -1,0 +1,45 @@
+HTML/XHTML/DVSM version 1.1
+===========================
+
+HTML::XHTML::DVSM A perl module that uses a simple scripting language embedded 
+within XML/XHTML markup to change the markup by adding, removing and changing 
+tags and attributes. The obvious application is for generating dynamic web sites. 
+But other applications would be generating XUL gui screens (using XULs such as 
+thinlet), or B2B XML documents.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+On windows install the dmake ppm package and then:
+
+   perl Makefile.PL
+   dmake
+   dmake test
+   dmake install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  strict
+  Carp
+  
+Unit tests require IO:String module.  
+
+CHANGES
+
+V1.1 handles CDATA sections in XHTML
+V1.2 don't cleardown cache and other server level variables in sbInit() to aid mod_perl
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007-2010 Stuart Butler (perldev@yahoo.co.uk) 
+and Grant Holman (grant@collegeroad.eclipse.co.uk).  All rights reserved. 
+This program is free software; you can redistribute it and/or modify it under the 
+same terms as Perl itself.

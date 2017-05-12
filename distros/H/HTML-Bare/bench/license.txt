@@ -1,0 +1,17 @@
+All included executable are copyright of their respective owners.
+Please see the author's pages for license information.
+Note that these projects are GPL compatible.
+
+TinyXML: http://www.sourceforge.net/projects/tinyxml
+  Included tinyxml.cpp used for basic test program of library
+
+EzXML: http://sourceforge.net/projects/ezxml
+  Included ezxml.exe built using EZ_XMLTEST define on main library
+
+XMLIO: http://sourceforge.net/projects/xmlio
+  Included xmlio_testread.cpp used for basic test reading
+
+The included XML files are test data generated for the purpose
+of benchmarking XML performance from things approaching real
+world XML. They do no represent data of any value.
+  

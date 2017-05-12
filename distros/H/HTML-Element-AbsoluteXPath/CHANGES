@@ -1,0 +1,107 @@
+==================================================
+Changes from 2015-01-21 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 1.0 at 2016-01-21 02:12:37 +0000
+----------------------------------------
+
+  Change: 9073dd84cdffbe4c614a2097b517d23c57c4456c
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2016-01-21 11:10:57 +0000
+
+    fix test 
+
+  Change: b1a7a49b104589285f71d130d1d5fe84e1212479
+  Author: HyunSeung Kim <sng2nara@hanmail.net>
+  Date : 2013-03-15 15:13:46 +0000
+
+    fix error - comparing element 
+
+  Change: 9d36dc2bcd9d6f58287ba54f07cf283f95523704
+  Author: HyunSeung Kim <sng2nara@hanmail.net>
+  Date : 2013-03-15 14:40:45 +0000
+
+    fix bug 
+
+  Change: dd45bc3d765e7b7d73dd3a5ef4810ea23cea1af5
+  Author: HyunSeung Kim <sng2nara@hanmail.net>
+  Date : 2013-03-15 14:38:01 +0000
+
+    up to 0.01
+
+    add code to remove whitespaces of attributes. 
+
+  Change: c635618f7144885dea15a303e92400cb5e3a16cc
+  Author: HyunSeung Kim <sng2nara@hanmail.net>
+  Date : 2013-03-15 14:32:33 +0000
+
+    remove necessary codes 
+
+  Change: 819b7ee7af5119a33e0803ab23d2a9f398086fb0
+  Author: HyunSeung Kim <sng2nara@hanmail.net>
+  Date : 2013-03-13 17:23:45 +0000
+
+    fix error on test 
+
+  Change: 26f99d22e8858b20f96d472215f7fbe8227c336e
+  Author: HyunSeung Kim <sng2nara@hanmail.net>
+  Date : 2013-03-13 17:21:25 +0000
+
+    fix errors on examples
+
+    update requirements right. 
+
+  Change: 4ee06b6341c81fed489fcdbec1f58b24c909cbe1
+  Author: HyunSeung Kim <sng2nara@hanmail.net>
+  Date : 2013-03-13 15:20:40 +0000
+
+    update README.md 
+
+  Change: 94bf6effcdc92555945534c0cb668141f179ceec
+  Author: HyunSeung Kim <sng2nara@hanmail.net>
+  Date : 2013-03-13 15:19:06 +0000
+
+    add use HTML::Element in module.
+
+    modify dist.ini to fill Changes. 
+
+  Change: ad15808064338cd9d7bb3faa8f4bf0b06cca8e26
+  Author: HyunSeung Kim <sng2nara@hanmail.net>
+  Date : 2013-03-13 14:53:00 +0000
+
+    remove backslash in POD. 
+
+  Change: 70b994298700a78e31e4266db00a4258c0ebb7ce
+  Author: HyunSeung Kim <sng2nara@hanmail.net>
+  Date : 2013-03-13 14:47:49 +0000
+
+    add [1] to root path. 
+
+  Change: 36859729ff53f061c655b584586b5003f1053966
+  Author: HyunSeung Kim <sng2nara@hanmail.net>
+  Date : 2013-03-13 14:30:19 +0000
+
+    fix README 
+
+  Change: 936969ba7f816a5aab7a29cf473e32ed0bee0e60
+  Author: HyunSeung Kim <sng2nara@hanmail.net>
+  Date : 2013-03-13 14:28:17 +0000
+
+    fix error on example. 
+
+  Change: 66b7ae13c16b7af877b00dbb2a91ab91f69b3d27
+  Author: HyunSeung Kim <sng2nara@hanmail.net>
+  Date : 2013-03-13 14:24:57 +0000
+
+    modify dist.ini 
+
+  Change: 157167b5676ef33383a26e2b0186e1c16b4faf1f
+  Author: HyunSeung Kim <sng2nara@hanmail.net>
+  Date : 2013-03-13 14:21:56 +0000
+
+    initial 
+
+================
+End of releases.
+================

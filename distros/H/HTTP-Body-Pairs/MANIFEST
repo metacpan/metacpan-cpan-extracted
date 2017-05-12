@@ -1,0 +1,11 @@
+CHANGES
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/HTTP/Body/Pairs.pm
+t/01-basic.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

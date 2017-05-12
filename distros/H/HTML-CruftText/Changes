@@ -1,0 +1,11 @@
+Revision history for HTML-CruftText
+
+0.02    2014-01-21
+        * Use regexp-based HTML comment fixer subroutine because it's faster. (Linas Valiukas)
+        * Modify the comment removal unit tests so that they actually test
+          whether or not comments get removed. (Linas Valiukas)
+        * Move a list of ignored files to ".gitignore". (Linas Valiukas)
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

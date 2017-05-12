@@ -1,0 +1,10 @@
+# HTTP Cookie File
+# http://www.netscape.com/newsref/std/cookie_spec.html
+# This is a generated file!  Do not edit.
+# To delete cookies, use the Cookie Manager.
+
+.ebay.com	TRUE	/	FALSE	1196107526	lucky9	THIS_FILE_WAS_COPIED_FROM_THE_HTTP_COOKIES_DISTRIBUTION
+.ebay.com	TRUE	/	FALSE	1069877124	nonsession	THIS_COOKIE_IS_EXPIRED
+.usatoday.com	TRUE	/	FALSE	1293836456	RMID	0cf726bf3ddf1180
+.usatoday.com	TRUE	/	FALSE	1767153600	UID	0cf726bf3ddf1180
+.usatoday.com	TRUE	/	FALSE	1767153600	USATINFO	UID%3D0cf726bf3ddf1180

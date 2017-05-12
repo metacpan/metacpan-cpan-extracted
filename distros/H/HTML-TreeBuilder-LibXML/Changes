@@ -1,0 +1,190 @@
+Revision history for Perl extension HTML::TreeBuilder::LibXML
+
+0.26 2016-10-19T15:03:00Z
+
+    - Improve `HTML::TreeBuilder::LibXML::Node->new` compatibility
+      with `HTML::Element->new`
+      https://github.com/tokuhirom/HTML-TreeBuilder-LibXML/issues/12
+      (reported by nanto++)
+
+0.25 2015-04-21T23:39:33Z
+
+    commit 5c46775d50678e611729135f3601b66e6a0d10cd
+    Author: Yanick Champoux <yanick@babyl.dyndns.org>
+    Date:   Thu Jan 15 14:15:04 2015 -0500
+
+        silence warnings
+
+        ... as the arguments can be undefined
+
+        Fixes #10
+
+0.24 2014-09-22T09:31:26Z
+
+    - Removed Web::Scraper from runtime dependencies.
+      https://github.com/tokuhirom/HTML-TreeBuilder-LibXML/issues/9
+
+0.23 2013-05-17T00:16:48Z
+
+    - fixed guts(), clone() and replace_with() to properly handle XML::LibXML::Dtd nodes    
+      - guts() now includes the Dtd node in the returned document (unless it were implicitly created)
+      - clone() calls createInternalSubset() on the new document
+      - replace_with() calls createInternalSubset() if the replacement is a XML::LibXML::Dtd (can't import Dtd node)
+        (cafe01)
+
+0.22 2013-05-13T00:04:09Z
+
+    - improved guts(), calling nonBlankChildNodes() instead of childNodes()
+    - improved HTML::TreeBuilder::LibXML::Node documentation
+      (cafe01)
+
+0.21 2013-05-12T19:12:53Z
+
+    - fixed guts(), 
+      - now returning nodes from <head> and <body> instead of just <body>
+      - now returning text and comment nodes instead of just element nodes
+      - returned nodes now belong to the same document
+    - fixed to_HTML to render valid html, not xml
+      (cafe01)
+
+0.20 2013-05-10T20:44:16Z
+
+    - improved replace_with() on document node.
+    - fixed push_content() and unshift_content() to work with document mode.
+    (cafe01)
+
+0.19 2013-05-10T01:03:58Z
+
+    - fixed replace_with() and parent(), 
+      to avoid calling appendChild() on a Document node, which is not supported by XML::LibXML.
+      (cafe01)
+
+0.18 2013-05-09T20:49:04Z
+
+    - implemented all node methods needed for Web::Query::LibXML to work
+      - clone_list
+      - detach
+      - delete_content
+      - content_list
+      - replace_with
+      - push_content
+      - unshift_content
+      - postinsert
+      - preinsert
+      - disembowel (HTML::TreeBuilder::LibXML)
+      (cafe01)
+      
+    - modified parse_file() to read file content, then call parse_content()
+      - thats because parse_content() will detect (heuristically) when the parser will add implict <html><body> tags, so guts() can work properly.
+      (cafe01)
+
+0.18 2013-05-09T01:27:46Z
+
+    - implemented matches(), parent(), guts() node method
+      (Carlos Fernando Avila Gratz)
+
+0.17
+
+    handle /(de)?objectify_text/ for <script> extraction
+    (Stanislaw Pusep)
+
+0.16
+
+
+    commit 07b40205fd03564d476eff7675e9f19196939f2f
+    Author: Oleg G <verdrehung@gmail.com>
+    Date:   Sat Mar 31 13:26:11 2012 +0700
+
+    added few methods to support Web::Query
+
+0.15
+
+    * Add additional methods to better match
+      HTML::TreeBuilder::XPath::Node API:
+      - exists($xpath)
+      - find($elem_name)
+      - findvalues($xpath)
+      - findnodes_as_string($xpath)
+      - findnodes_as_strings($xpath)
+      (genehack)
+
+0.14
+
+    * added workaround for Web::Scraper 0.36
+      (tokuhirom)
+
+0.13
+     * Added 'getValue' node's method as in HTML::TreeBuilder::XPath for
+       comment nodes in web-scraper module
+     * Added dummy method 'store_comments' as in HTML::TreeBuilder
+       for web-scraper module (for comment nodes) and for
+       HTML::TreeBuilder::XPath working in tests with comment nodes
+     * Now this module requires HTML::TreeBuilder::XPath v.0.14 (before 0.14
+       there getValue() didn't work for comment nodes)
+
+0.12
+
+     * no Test::Base(tokuhirom)
+     * depend to latest libraries(tokuhirom)
+       ref. http://d.hatena.ne.jp/mikeda/20100622/1277229060
+     * fixed typo in pod(tokuhirom)
+
+0.11 Tue Oct  6 10:47:16 PDT 2009
+     - Fix parse when a content is truly an empty string
+
+0.10
+     - added as_trimmed_text(chiba)
+
+0.09 Sun Aug  2 06:02:01 PDT 2009
+     - Fixed parse_html method when parsing whitespace strings so it won't break and consistent with HTML::TB
+       (Reported by otsune)
+
+0.08 Mon Jul 20 10:00:19 PDT 2009
+        - Updated POD document
+
+0.07
+        - Implemented all_attr, all_attr_names, all_external_attr and all_external_attr_names (miyagawa)
+
+0.06
+
+        - Added new_from_content and new_from_file to for more compat. with HTML::TreeBuilder(miyagawa)
+
+0.05
+
+        - fixed deps
+
+0.04
+
+        - support more look_down() params(miyagawa)
+        - added ->id support(tokuhirom)
+        - call ->eof automatically for compatibility.(tokuhirom)
+        - added ->findvalue support(tokuhirom)
+        - added ->eof(tokuhirom)
+
+0.03
+
+        - [FEATURE] added to restore hacked constructor(suggested by miyagawa++).
+
+0.02
+
+        - [MISC] $parser->no_network(1)
+
+0.01_03
+
+        - [BUG] Node->delete is unbound()
+        - [FEATURE] added getFirstChild() method
+        - [FEATURE] added Node->as_HTML
+        - [MISC] added THANKS secion in the pod(感謝の意)
+
+0.01_02
+
+        - more loose check(libxml is too strict)
+        - added benchmark script
+        - added benchmark result into pod
+
+0.01_01
+
+        - initial dev. release
+
+0.01    Tue Mar 24 21:26:10 2009
+        - original version

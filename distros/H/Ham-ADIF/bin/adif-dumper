@@ -1,0 +1,46 @@
+#!/usr/local/bin/perl
+# -*- mode: cperl; tab-width: 8; indent-tabs-mode: nil; basic-offset: 2 -*-
+# vim:ts=8:sw=2:et:sta:sts=2
+#########
+# Author:        rmp
+# Last Modified: $Date: 2013-05-19 20:25:48 +0100 (Sun, 19 May 2013) $
+# Id:            $Id: adif-dumper 203 2013-05-19 19:25:48Z rmp $
+# $HeadURL: svn+ssh://psyphi.net/repository/svn/iotamarathon/trunk/bin/adif-dumper $
+#
+use strict;
+use warnings;
+use lib qw(lib);
+use Ham::ADIF;
+use Data::Dumper;
+use Getopt::Long;
+
+my $opts = {};
+GetOptions($opts, qw(display=s filter=s));
+my $display = [split /,/smx, $opts->{display}||q[]];
+my $filter  = {
+	       map { $_->[0] => $_->[1] }
+	       map { [split /=/smx] }
+	       split /,/smx, $opts->{filter}||q[]
+	      };
+for my $fn (@ARGV) {
+  my $adif = Ham::ADIF->new();
+
+  my $records = $adif->parse_file($fn);
+ REC: for my $record (@{$records}) {
+    if(scalar keys %{$filter}) {
+      while(my ($f, $val) = each %{$filter}) {
+	if(!exists $record->{$f} ||
+	   (defined $val && $val ne q[] && $record->{$f} ne $val)) {
+	  next REC;
+	}
+      }
+    }
+
+    if($opts->{display}) {
+      print join q[ ], map { "$_=@{[$record->{$_}||q[]]}" } @{$display};
+      print "\n";
+    } else {
+      print Dumper($record);
+    }
+  }
+}

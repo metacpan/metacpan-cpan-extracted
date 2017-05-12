@@ -1,0 +1,19 @@
+#!/bin/sh
+
+WEBDIR=/home/jm/webmake.taint.org
+
+VERS=`./build/get_version` ; export VERS
+# ./build/update_devel
+
+sudo cp $WEBDIR/devel/HTML-WebMake-$VERS.tar.gz \
+	/usr/src/redhat/SOURCES/HTML-WebMake-$VERS.tar.gz
+
+sed -e 's/__VERSION__/'"$VERS"'/g' < specfile.raw > WebMake.spec
+
+sudo rpm -ba WebMake.spec 
+
+cp /usr/src/redhat/RPMS/noarch/WebMake-${VERS}-1.noarch.rpm \
+   /usr/src/redhat/SRPMS/WebMake-${VERS}-1.src.rpm \
+   .
+
+rm WebMake.spec

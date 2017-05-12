@@ -1,0 +1,11 @@
+Changes
+lib/HTTP/Method.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00_use_ok_and_methods.t
+t/01_http_methods.t
+t/02_http_methods_case_insensitive.t
+ignore.txt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

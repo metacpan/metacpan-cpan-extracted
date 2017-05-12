@@ -1,0 +1,13 @@
+# Change log for HTML::WikiConverter::PmWiki
+
+version: 0.51
+date:    Thu Jul 20 2006
+changes:
+  - (bug 18562) Line breaks converted to "[[<<]]" within tables (thanks pcascon)
+  - (bug 18287) Fixed <br> tag problem in connection with new line in HTML
+  - require HTML::WikiConverter 0.60
+
+version: 0.50
+date:    Tue Jan 10 2006
+changes:
+  - Branched from main HTML::WikiConverter codebase.

@@ -1,0 +1,31 @@
+Revision history for HTTP-Daemon-Patch-IPv6
+
+0.06    2012-08-11 (SHARYANTO)
+
+        No functional change. Forgot to increase version requirement of
+        Module::Patch to 0.12.
+
+
+0.05    2012-08-09 (SHARYANTO)
+
+        Rename module HTTP::Daemon::{patch::ipv6,Patch::IPv6}.
+
+
+0.04    2012-08-03 (SHARYANTO)
+
+        No functional changes. Update to Module::Patch 0.10 (v=3).
+
+
+0.03    2012-07-17 (SHARYANTO)
+
+        No functional changes. Update to Module::Patch 0.07 (v=2).
+
+
+0.02    2012-04-03 (SHARYANTO)
+
+        Workaround for PAUSE indexing failure.
+
+
+0.01    2012-04-03 (SHARYANTO)
+
+        First release.

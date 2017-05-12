@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/HTML/Entities/ImodePictogram.ja.pod
+lib/HTML/Entities/ImodePictogram.pm
+t/00_pictogram.t
+t/01_ext.t

@@ -1,0 +1,15 @@
+Revision history for Perl extension Harvey::Word.
+
+0.01  Mon Jan  7 17:34:22 2002
+	- original version; created by h2xs 1.21 with options
+		-X -A -n Harvey::Word
+
+1.02 Tue Feb 6 - improved support for finding dictionary forms of words for
+  nouns, verbs, adjectives and adverbs.  Added choice method which allows 
+  user to find the 1st, 2nd, 3rd etc. choices for which part of speech a
+  give word object is based on its frequency.  Added argument to the
+  verb_dictionary function which allows the verb type to be passed in to
+  help determine which infinitive is the correct one: e.g. fell could be 
+  the present of to fell 'to fell a tree' or the past of to fall 'i fell
+  down the hill.'
+

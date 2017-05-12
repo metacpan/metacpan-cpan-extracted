@@ -1,0 +1,10 @@
+^Makefile$
+^Makefile[.]old$
+^blib/
+^HTTP-Soup-
+^pm_to_blib$
+[.]gitignore
+^[.]git/
+^xs/.*[.][oc]$
+^build/
+^Soup[.]bs$

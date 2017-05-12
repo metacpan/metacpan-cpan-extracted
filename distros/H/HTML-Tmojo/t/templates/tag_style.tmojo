@@ -1,0 +1,14 @@
+<: PERL my $var_1 = 1; -:>
+Var is: <: $var_1 :>
+<: TAG_STYLE {: :} $ :>
+$ my $var_2 = 2;
+Var is: {: $var_2 :}
+{: TAG_STYLE [% %] % :}
+% my $var_3 = 3;
+Var is: [% $var_3 %]
+[% TAG_STYLE <tmojo: > >> %]
+>> my $var_4 = 4;
+Var is: <tmojo: $var_4 >
+<tmojo: TAG_STYLE default >
+: my $var_5 = 5;
+Var is: <: $var_5 :>

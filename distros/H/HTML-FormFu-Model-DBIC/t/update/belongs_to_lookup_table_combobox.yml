@@ -1,0 +1,21 @@
+---
+auto_fieldset: 1
+
+elements:
+  - type: Hidden
+    name: id
+
+  - type: Text
+    name: text_col
+
+  - type: ComboBox
+    name: type
+    # set this, so options_from_model() populates the menu,
+    # so we can test the correct default is set
+    model_config:
+        resultset: Type
+        select_column: id
+        text_column: type
+
+  - type: Submit
+    name: submit

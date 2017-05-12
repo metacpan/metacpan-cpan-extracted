@@ -1,0 +1,4 @@
+<wmmeta name="ltitle">Veranstaltungen und Termine</wmmeta>
+<wmmeta name="stitle">Termine</wmmeta>
+
+test (timetable)

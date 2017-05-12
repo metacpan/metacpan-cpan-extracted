@@ -1,0 +1,33 @@
+<html>
+<head>
+<title>Some tests for Embperl</title>
+</head>
+
+
+<body>
+
+[- use Cwd  -]
+
+Script  CWD: [+ $script = getcwd +] <BR>
+Embperl CWD: [+ $ep =     $HTML::Embperl::cwd +] <BR>
+$0: [+ $abs = $0 +]
+
+[- $abs = $ep . '/' . $0  if (!($0 =~ /^(\w:)?\//)) ; -]
+$0 (absolut): [+ $abs +]
+
+Equal: [+ $script eq $ep?'Yes':'No' +]<BR>
+Diff CWD: [+ do { $script =~ /$ep/ ; ">$'<" } +]<BR>
+Diff $0: [+ do { $abs =~ /$ep/ ; ">$'<" } +]<BR>
+
+[- @ks = sort keys %fdat -]
+
+	<table>
+		<tr>
+			<td>[+ $ks[$row] +]</td><td>[+ $fdat{$ks[$row] || ''} +]</td>
+		</tr>
+	</table>
+
+
+
+</body>
+</html>

@@ -1,0 +1,51 @@
+{
+   "abstract" : "a subclass of HTML::Table to easily generate a HTML table from the result of a database query",
+   "author" : [
+      "David Precious <davidp@preshweb.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-Table-FromDatabase",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::Table" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/bigpresh/HTML-Table-FromDatabase/issues"
+      },
+      "homepage" : "https://github.com/bigpresh/HTML-Table-FromDatabase/",
+      "repository" : {
+         "url" : "https://github.com/bigpresh/HTML-Table-FromDatabase"
+      }
+   },
+   "version" : "1.11",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

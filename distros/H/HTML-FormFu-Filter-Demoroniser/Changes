@@ -1,0 +1,8 @@
+Revision history for Perl extension HTML::FormFu::Filter::Demoroniser.
+
+0.02  2011-05-23
+    - pod fix
+    - make it compatible with HTML::FormFu 0.09
+
+0.01  2009-08-11
+    - original version

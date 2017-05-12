@@ -1,0 +1,10 @@
+Revision history for Perl module Heritable::Types
+
+1.00 Sun Aug 31 11:53:00 2003
+        - Finally settled on the right name
+        - No other changes. Ship it.
+
+0.01 Fri Jul 25 14:04:42 2003
+	- original version; created by ExtUtils::ModuleMaker 0.32
+
+

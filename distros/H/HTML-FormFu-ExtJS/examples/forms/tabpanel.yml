@@ -1,0 +1,38 @@
+---
+attrs:
+  standardSubmit: 1
+elements:
+  - type: ExtJS::TabPanel
+    attrs:
+       enableTabScroll: 1
+       animScroll: 1
+       border: 1
+       minTabWidth: 150
+       resizeTabs: true
+       height: 300
+       activeTab: 1
+       resizeTabs: 1
+       tabWidth: 200
+    elements:
+      - type: ExtJS::Panel
+        label: Tab1
+        attrs:
+          layout: form
+        elements:
+          - type: Text
+            name: tab1input1
+            label: Tab1-Input1
+          - type: Text
+            name: tab1input2
+            label: Tab1-Input2
+      - type: ExtJS::Panel
+        label: Tab2
+        attrs:
+          layout: form
+        elements:
+          - type: Text
+            name: tab2input1
+            label: Tab2-Input1
+          - type: Text
+            name: tab2input2
+            label: Tab2-Input2

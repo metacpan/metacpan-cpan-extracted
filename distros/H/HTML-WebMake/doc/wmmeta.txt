@@ -1,0 +1,42 @@
+<wmmeta name="Title" value="The &lt;wmmeta&gt; Tag" />
+<wmmeta name="Section" value="05-meta" />
+<wmmeta name="Score" value="20" />
+<wmmeta name="Abstract">
+defining meta-data inside the tagged content object
+</wmmeta>
+
+WebMake can load "meta-data" [$(metadata)] directly from the content text,
+using the &lt;wmmeta&gt; tag.
+
+This tag is automatically stripped from the content when the content is
+referenced.  It can be used either as an XML-style empty tag, similar to the
+HTML &lt;meta&gt; tag, if it ends in __/&gt;__:
+
+<pre>
+  &lt;wmmeta name="Title" value="Story 1, blah blah" /&gt;
+</pre>
+
+or with start and end tags, for longer bits of content:
+
+<pre>
+  &lt;wmmeta name="Abstract"&gt;
+    Story 1, just another story. Blah blah blah foo bar baz etc.
+  &lt;/wmmeta&gt;
+</pre>
+
+As you can see, each item of metadata needs a __name__ and a __value__. The
+latter format reads the __value__ from the text between the start and end tags.
+
+Example
+=======
+
+<safe>
+  <content name="foo">
+    < wmmeta name="Title" value="Foo" />
+    < wmmeta name="Abstract">
+      Foo is all about fooing.
+    </ wmmeta>
+
+    Foo foo foo foo bar. etc.
+  </content>
+</safe>

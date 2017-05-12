@@ -1,0 +1,62 @@
+0.47 - adjust memory retry increment and usage reporting when multiple cpus
+       are used for one stage (assumes that the requested number were actually
+	   provided - that might not match the configured environment definition;
+	   but in our lab at least, the accounting info always returns undefined
+	   value for the slots allocated)
+
+0.46 - documented retry_mem_percent attribute, added another error text to
+       detect memocry overrun failure
+
+0.45 - changed the magic number 99 to a stage attribute that can be set to
+       allow causing retry with additional memory for a different threshold
+	   when the 'Out of memofy!' message is not generated.
+
+0.44 - fix DRMAARun - it was re-using a variable for every stage instead of
+       having an object private one that re-initialized to undef, leaking
+	   values
+
+0.43 - edit the diagnostic when drmaa_wait fails to get status info
+       - that seems to be a timing bug in the drmaa library interaction with
+         the sge code
+
+0.42 - added stage name ad run index to warn message, in case running at
+         log_level 'WARN' the message needs to be self-sufficient
+
+0.41 - add memory_too_small function ref attribute to allow a user-specified
+         method to decide that the job was killed for using too much memory (in
+         case the standard test misses some cases)
+
+0.40 - fix testing of extra_sge_args_string to correctly detect collisions
+         with internally provided values
+     - fix test 07-extra.args.t to pass its args with the right name
+
+0.39 - fix typo - _drmaa_job_id ->  _drmaa_jobid
+
+0.38 - update MANIFEST
+
+0.37 - work around drmaa handling of -q arg differently from qsub
+
+0.36 - removed some extraneous use MODULEs
+     - fallback to qacct if drmaa fails to get exit_status info
+     - added missing required modules to Build.PL
+
+0.35 - map generic time specifiers (e.g. '3d2h10m') to native SGE permitted
+    form
+
+0.34 - typo bugfixes
+
+0.33 - added support for -pe to submit parallel jobs
+
+0.32 - improved detection for job terminated because of using too much memory
+    - added support for abort for when drmaa says a job was not accepted
+    - added direct support for kill, killsignal rather than leaving them
+        tangled in exit_status and subject to local interpretation
+    - rearranged a number of methods and modifiers so that they could be
+        overridden in drivers smoothly
+    - removed modules_to_load(Perl-BL) from tests, they only work in BoutrosLab,
+        not elsewhere
+    - adjusted to make HPCI::ModuleLoad not automatically loaded, use a config
+        wrapper module for your lab if needed, similarily for HPCI::ScriptSource
+    - added support for using DRMAA to run jobs
+
+TODO: move historical change info into here

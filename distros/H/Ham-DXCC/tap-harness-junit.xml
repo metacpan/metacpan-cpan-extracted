@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuites>
+  <testsuite name="t_00_pod_t" errors="0" failures="0" tests="2" time="0.000748872756958008">
+    <system-out>1..2
+ok 1 - POD test for blib/lib/Ham/DXCC.pm
+ok 2 - POD test for blib/script/dxcc-update (no pod)
+</system-out>
+    <testcase name="POD test for blib/lib/Ham/DXCC.pm" classname="t_00_pod_t" time="0.000212192535400391" />
+    <testcase name="POD test for blib/script/dxcc-update (no pod)" classname="t_00_pod_t" time="0.000218868255615234" />
+  </testsuite>
+  <testsuite name="t_00_podcoverage_t" errors="0" failures="0" tests="1" time="0.135528087615967">
+    <system-out>1..1
+ok 1 - Pod coverage on Ham::DXCC
+</system-out>
+    <testcase name="Pod coverage on Ham::DXCC" classname="t_00_podcoverage_t" time="0.132312059402466" />
+  </testsuite>
+  <testsuite name="t_00_compile_pm_t" errors="0" failures="0" tests="1" time="0.182671070098877">
+    <system-out>1..1
+ok 1 - Compile test for blib/lib/Ham/DXCC.pm
+</system-out>
+    <testcase name="Compile test for blib/lib/Ham/DXCC.pm" classname="t_00_compile_pm_t" time="0.181400060653687" />
+  </testsuite>
+  <testsuite name="t_00_compile_pl_t" errors="0" failures="0" tests="1" time="0.2327880859375">
+    <system-out>1..1
+bin/dxcc-update syntax OK
+ok 1 - Compile test for bin/dxcc-update
+</system-out>
+    <testcase name="Compile test for bin/dxcc-update" classname="t_00_compile_pl_t" time="0.0143730640411377" />
+  </testsuite>
+  <testsuite name="t_00_distribution_t" errors="0" failures="0" tests="9" time="0.22946310043335">
+    <system-out>1..9
+ok 1 - Checking MANIFEST integrity
+ok 2 - use Ham::DXCC;
+ok 3 - Ham::DXCC defines a version
+ok 4 - POD test for blib/lib/Ham/DXCC.pm
+ok 5 - MANIFEST exists
+ok 6 - README exists
+ok 7 - Changes(.pod)? or ChangeLog(.pod)? exists
+ok 8 - Build.PL or Makefile.PL exists
+ok 9 - Pod Coverage ok
+</system-out>
+    <testcase name="Checking MANIFEST integrity" classname="t_00_distribution_t" time="0.0151760578155518" />
+    <testcase name="use Ham::DXCC;" classname="t_00_distribution_t" time="0.144865989685059" />
+    <testcase name="Ham::DXCC defines a version" classname="t_00_distribution_t" time="0.00131082534790039" />
+    <testcase name="POD test for blib/lib/Ham/DXCC.pm (2)" classname="t_00_distribution_t" time="0.0372350215911865" />
+    <testcase name="MANIFEST exists (2)" classname="t_00_distribution_t" time="0.000573158264160156" />
+    <testcase name="README exists (2)" classname="t_00_distribution_t" time="0.025148868560791" />
+    <testcase name="Changes(.pod)? or ChangeLog(.pod)? exists (2)" classname="t_00_distribution_t" time="0.000457048416137695" />
+    <testcase name="Build.PL or Makefile.PL exists (2)" classname="t_00_distribution_t" time="0.000240087509155273" />
+    <testcase name="Pod Coverage ok (2)" classname="t_00_distribution_t" time="0.000175952911376953" />
+  </testsuite>
+  <testsuite name="t_00_critic_t" errors="0" failures="0" tests="0" time="0.000323057174682617">
+    <system-out>1..0 # SKIP Author test.  Set $ENV{TEST_AUTHOR} to a true value to run.
+</system-out>
+  </testsuite>
+  <testsuite name="t_10_ham_dxcc_t" errors="0" failures="0" tests="2" time="0.198801040649414">
+    <system-out>1..2
+ok 1 - use Ham::DXCC;
+ok 2 - parsed DXCC/cty.xml
+</system-out>
+    <testcase name="use Ham::DXCC; (2)" classname="t_10_ham_dxcc_t" time="0.164036989212036" />
+    <testcase name="parsed DXCC/cty.xml (2)" classname="t_10_ham_dxcc_t" time="0.0311570167541504" />
+  </testsuite>
+</testsuites>

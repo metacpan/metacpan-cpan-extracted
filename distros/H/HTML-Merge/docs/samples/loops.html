@@ -1,0 +1,23 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>Loop example</title>
+</head>
+
+<body>
+<br>
+<$RCOUNT.i=1:10>
+	<$RCOUNT.j=1:10>
+		<$RSET.number=' <$RVAR.i> * <$RVAR.j> '>				
+		<$RIF.' <$RVAR.number> < 10 '>
+			0<$RVAR.number>
+		<$RELSE>
+			<$RVAR.number>
+		<$REND_IF>
+	</$RCOUNT>			
+	<br>
+</$RCOUNT>
+
+</body>
+</html>

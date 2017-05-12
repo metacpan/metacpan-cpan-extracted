@@ -1,0 +1,99 @@
+Revision history for Perl extension HTML::Prototype
+
+1.48  Fri Sep 22 20:14:16 2006
+        - fixed auto_complete_field bug: s/min_chars/minChars
+
+1.47  Mon Jul 14 01:57:12 2006
+        - use strict added
+        - DATA handles closed
+
+1.46  Mon May 22 22:03:00 2006
+        - cpan permissions fixed;
+
+1.45  Mon May 22 21:31:00 2006
+        - cpan permissions fixed;
+
+1.44  Mon May 22 20:09:00 2006
+        - fixed #19403:	visual_effect function includes extra ";"
+        - fixed #18636: typo in POD
+        - fixed #17590: form_remote_tag returns wrongly encoded
+          (HTML::Entities::encode_entities) string
+        - fixes #14590: postBody and evalScripts breaks link_to_remote
+        - added tests
+
+1.43  Fri Feb 03 21:37:00 2006
+        - Fixed borked version 1.42
+
+1.42  Fri Feb 03 21:30:00 2006
+        - Fixed Changes dates
+        - validate 'entities' key in html_options for as_HTML output
+        - validate 'confirm' key in internal _remote_function
+
+1.41  Sun Jan 15 01:27:45 2006
+        - Fixed load_text_url feature in in_place_editor
+
+1.40  Thr Jan 05 01:55:00 2006
+        - Added 'value' to the explicit parameter list of in_place_editor
+          callback function
+
+1.39  Sat Dec 31 19:07:00 2005
+        - Fixed bug in _options_for_javascript
+        - Added click_to_edit_text option to the in_place_editor options
+
+1.38  Sat Dec 31 05:01:00 2005
+        - Added :select option for auto_complete_field that makes it easier
+          to only use part of the auto-complete suggestion as the value
+          for insertion
+        - Added in_place_editor_stylesheet
+        - Updated to prototype V1.4
+
+1.37  Tue Dec 27 03:26:00 2005
+        - Fixed output in HTML::Prototype::Helper::Tag::_content_tag
+
+1.36  Fri Dec 02 01:55:00 2005
+        - Keep up with RoR
+        - Added HTML::Prototype::Helper.pm
+          and Added HTML::Prototype::Helper::Tag.pm for *some* reasons
+
+1.34 or 1.35
+        - Applied patches to D&D positioning.
+
+1.33  Fri Aug 26 11:00:00 2005
+        - Added auto_complete_stylesheet
+        - Improved description (dstorrs)
+        - Missing dependency on HTML::Tree
+
+1.32  Mon Jul 12 13:40:00 2005
+        - Updated js files
+        - Fixed bug in sortable_element
+        - added auto_complete_stylesheet
+
+1.31  Mon Jul 11 13:40:00 2005
+        - Updated to script-aculo.us 1.0
+        - Update to prototype 1.3.1
+        - Fix observer for delays.
+        - bugfix for js options
+
+1.30  Tue May 03 17:02:00 2005
+        - updated to prototype.js 1.30
+        - added script.aculo.us extensions
+        - added controls.js for auto_completion
+        - added docs for js syntax additions.
+        - updated documentation.
+
+1.23  Tue May 03 17:02:00 2005
+        - updated MANIFEST to include missing files.
+1.22  Tue May 03 17:02:00 2005
+        - minor doc fix
+        - Added documentation for Javascript functions
+1.21  Wed Apr 20 23:00:00 2005
+        - updated to Prototype 1.21
+
+1.20  Mon Apr 18 23:00:00 2005
+        - updated to Prototype 1.20
+
+1.11  Sun Apr 17 15:00:00 2005
+        - s/remote_function/_remote_function/ (Leon Brocard)
+
+1.10  Wed Apr 14 12:00:00 2005
+        - original version.

@@ -1,0 +1,299 @@
+<html>
+<head>
+<title>Test for interpretation of input tag</title>
+</head>
+
+[-
+@regs = () ;
+$regs[0]{Id} = 'Pfalz' ;
+$regs[1]{Id} = 'Rheinhessen' ;
+
+@kats = () ;
+$kats[0]{Id} = 'Kultur' ;
+$kats[1]{Id} = 'Sport' ;
+$kats[2]{Id} = 'Veranstaltungen' ;
+
+-]
+
+<form action="inhalt.htm" method="POST">
+    <p>&nbsp;</p>
+
+    <input name=neu1 value="[+ 1 > 2?'yes':'no' +]" >
+    <input name=[+ $name || 'undef' +] value="[+ 1 > 2?'yes':'no' +]">
+
+    <input>
+    <input  >
+    <input name="feld1">
+    <input name="feld5">
+    <input name="feld1" value="Wert1">
+    <input name="feld5" value="Wert15">
+    <input name="feld1" value="">
+    <input name="feld5" value="">
+    <input type="text">
+    <input type = "text">
+    <input typo="text2">
+    <input typo = "text2" >
+    <input foo>
+    <input foo >
+  
+    <input name=neu2 value="[+ 1 > 2 +]">
+    <input name='neu3' value=">>">
+  
+    <input type="text" name="feld1" value="Wert1">
+    <input type="text" name="feld2">
+    <input type="text" size=10 name="feld3">
+    <input type="text" name="feld4" size=10>
+    
+	<input type="text" name="feld5" value="Wert5">
+    <input type="text" name="feld6">
+    <input type="text" size=10 name="feld7">
+    <input type="text" name="feld8" size=10>
+    
+	
+	<input type="checkbox" value="cbv1" name="cb1" checked>
+    <input type="checkbox" checked name="cb2" value="cbv2">
+    <input type="checkbox" name="cb3" value="cbv3">
+    <input type="checkbox" value="cbv4" name="cb4">
+    
+	<input type="checkbox" value="cbv5" name="cb5" checked>
+    <input type="checkbox" checked name="cb6" value="cbv6">
+    <input type="checkbox" name="cb7" value="cbv7">
+    <input type="checkbox" value="cbv8" name="cb8">
+    
+	<input type="checkbox" value="cbv9" name="cb9" checked>
+	<input type="checkbox" checked name="cb10" value="cbv10">
+    <input type="checkbox" name="cb11" checked value="cbv11">
+
+
+    [- $fdat{dec} = 'a & b' -]	
+    <input type="checkbox" name="dec" checked value="a & b">
+    <input type="checkbox" name="dec" checked value="a &amp; b">
+
+
+    <textarea Name=feld1></textarea>
+    <textarea Name=feld5></textarea>
+
+    <textarea Name=feld1>text1</textarea>
+    <textarea Name=feld5>text5</textarea>
+
+
+    <table border="0" width="100%">
+        <tr>
+            <td><table border="0">
+                <tr>
+                    <td valign="top"><input type="checkbox"
+                    name="Region"
+                    value="[+$regs[$row]{Id}+]"><a 
+                    href="inhalt.htm?Region=[+$regs[$row]{Id}+]">[+$regs[$row]{Id}+]</a></td>
+                </tr>
+            </table>
+            </td>
+            <td><table border="0">
+                <tr>
+                    <td valign="top"><p align="left"><input  
+                    type="checkbox" name="Kategorie"
+                    value="[+$kats[$row]{Id}+]"><a 
+                    href="inhalt.htm?Kategorie=[+$kats[$row]{Id}+]">[+$kats[$row]{Id}+]</a></p>
+                    </td>
+                </tr>
+            </table>
+            </td>
+        </tr>
+    </table>
+
+	<select name="foo">
+		<option value="feld1">feld1</option>
+		<option value="feld2">feld2</option>
+		<option value="feld3">feld3</option>
+		<option value="feld4">feld4</option>
+		<option value="feld5">feld5</option>
+		<option value="feld6">feld6</option>
+		<option value="feld7">feld7</option>
+		<option value="feld8">feld8</option>
+	</select>
+
+	<select name="feld5">
+		<option value="Wert1">Wert1</option>
+		<option value="Wert2">Wert2</option>
+		<option value="Wert3">Wert3</option>
+		<option value="Wert4">Wert4</option>
+		<option value="Wert5">Wert5</option>
+		<option value="Wert6">Wert6</option>
+		<option value="Wert7">Wert7</option>
+		<option value="Wert8">Wert8</option>
+	</select>
+
+	<select name="feld5">
+		<option value="Wert3">Wert3
+		<option value="Wert4">Wert4
+		<option value="Wert5">Wert5
+	</select>
+
+	<select name="feld5">
+		<option>Wert3</option>
+		<option>Wert4</option>
+		<option>Wert5</option>
+	</select>
+
+	<select name="feld5">
+		<option>Wert3
+		<option>Wert4
+		<option>Wert5
+	</select>
+
+	<select name="mult" multiple>
+		<option value="Wert1">Wert1</option>
+		<option value="Wert2">Wert2</option>
+		<option value="Wert3">Wert3</option>
+		<option value="Wert4">Wert4</option>
+		<option value="Wert5">Wert5</option>
+		<option value="Wert6">Wert6</option>
+		<option value="Wert7">Wert7</option>
+		<option value="Wert8">Wert8</option>
+	</select>
+
+	<select name="mult" multiple>
+		<option value="Wert1" selected>Wert1</option>
+		<option value="Wert2" selected>Wert2</option>
+		<option value="Wert3" selected>Wert3</option>
+		<option value="Wert4" selected>Wert4</option>
+		<option value="Wert5" selected>Wert5</option>
+		<option value="Wert6" selected>Wert6</option>
+		<option value="Wert7" selected>Wert7</option>
+		<option value="Wert8" selected>Wert8</option>
+	</select>
+
+	
+	ks = [+ do { @ks = sort keys %idat ; "@ks" } +]<p>
+
+	<table border=9>
+		<tr>
+			<td>[+ $ks[$i=$row] +]</td><td>[+ $idat{$ks[$i] || '<undef>'} +]</td>
+		</tr>
+	</table>
+
+
+
+	<select name="feld5">
+		<option value="Wert1">Wert1</option>
+		<option value="Wert2">Wert2</option>
+		<option value="Wert3">Wert3</option>
+		<option value="Wert4">Wert4</option>
+		<option value="Wert5">Wert5</option>
+		<option value="Wert6">Wert6</option>
+		<option value="Wert7">Wert7</option>
+		<option value="Wert8">Wert8</option>
+	</select>
+
+	<select name="[- $eld = 'eld' -]f[+ $eld +][+ 5 +]">
+		<option value="Wert1">Wert1</option>
+		<option value="Wert2">Wert2</option>
+		<option value="Wert3">Wert3</option>
+		<option value="Wert4">Wert4</option>
+		<option value="Wert5">Wert5</option>
+		<option value="Wert6">Wert6</option>
+		<option value="Wert7">Wert7</option>
+		<option value="Wert8">Wert8</option>
+	</select>
+
+	<input type="checkbox" value="Wert1" name="mult" checked>
+	<input type="checkbox" value="Wert1" name="mult">
+	<input type="checkbox" value="Wert2" name="mult" checked>
+	<input type="checkbox" value="Wert2" name="mult">
+	<input type="checkbox" value="Wert3" name="mult" checked>
+	<input type="checkbox" value="Wert3" name="mult">
+	<input type="checkbox" value="Wert4" name="mult" checked>
+	<input type="checkbox" value="Wert4" name="mult">
+	<input type="checkbox" value="Wert5" name="mult" checked>
+	<input type="checkbox" value="Wert5" name="mult">
+	<input type="checkbox" value="Wert6" name="mult" checked>
+	<input type="checkbox" value="Wert6" name="mult">
+	<input type="checkbox" value="Wert7" name="mult" checked>
+	<input type="checkbox" value="Wert7" name="mult">
+    
+
+	<input type="checkbox" value="cbv1" name="cb1">
+		<input type="checkbox" value="cbv1" name="cb1">
+		<input type="checkbox" value="cbv2" name="cb1">
+		<input type="checkbox" value="cbv3" name="cb1">
+		<input type="checkbox" value="cbv4" name="cb1">
+		<input type="checkbox" value="cbv5" name="cb1">
+		<input type="checkbox" value="cbv6" name="cb1">
+	<input type="checkbox" value="cbv5" name="cb5">
+		<input type="checkbox" value="cbv1" name="cb5">
+		<input type="checkbox" value="cbv2" name="cb5">
+		<input type="checkbox" value="cbv3" name="cb5">
+		<input type="checkbox" value="cbv4" name="cb5">
+		<input type="checkbox" value="cbv5" name="cb5">
+		<input type="checkbox" value="cbv6" name="cb5">
+
+
+	<INPUT TYPE="CHECKBOX" VALUE="cbv1" NAME="cb1">
+		<INPUT TYPE="CHECKBOX" VALUE="cbv1" NAME="cb1">
+		<INPUT TYPE="CHECKBOX" VALUE="cbv2" NAME="cb1">
+		<INPUT TYPE="CHECKBOX" VALUE="cbv3" NAME="cb1">
+		<INPUT TYPE="CHECKBOX" VALUE="cbv4" NAME="cb1">
+		<INPUT TYPE="CHECKBOX" VALUE="cbv5" NAME="cb1">
+		<INPUT TYPE="CHECKBOX" VALUE="cbv6" NAME="cb1">
+	<INPUT TYPE="CHECKBOX" VALUE="cbv5" NAME="cb5">
+		<INPUT TYPE="CHECKBOX" VALUE="cbv1" NAME="cb5">
+		<INPUT TYPE="CHECKBOX" VALUE="cbv2" NAME="cb5">
+		<INPUT TYPE="CHECKBOX" VALUE="cbv3" NAME="cb5">
+		<INPUT TYPE="CHECKBOX" VALUE="cbv4" NAME="cb5">
+		<INPUT TYPE="CHECKBOX" VALUE="cbv5" NAME="cb5">
+		<INPUT TYPE="CHECKBOX" VALUE="cbv6" NAME="cb5">
+
+
+
+	<input type="checkbox" value="cbv2" name="cb2">
+		<input type="checkbox" value="cbv1" name="cb2">
+		<input type="checkbox" value="cbv2" name="cb2">
+		<input type="checkbox" value="cbv3" name="cb2">
+		<input type="checkbox" value="cbv4" name="cb2">
+		<input type="checkbox" value="cbv5" name="cb2">
+		<input type="checkbox" value="cbv6" name="cb2">
+	<input type="checkbox" value="cbv6" name="cb6">
+		<input type="checkbox" value="cbv1" name="cb6">
+		<input type="checkbox" value="cbv2" name="cb6">
+		<input type="checkbox" value="cbv3" name="cb6">
+		<input type="checkbox" value="cbv4" name="cb6">
+		<input type="checkbox" value="cbv5" name="cb6">
+		<input type="checkbox" value="cbv6" name="cb6">
+
+
+	[$ foreach $i (1,5,2,6) $]
+		<input type="checkbox" value="cbv[+ $i +]" name="cb[+ $i +]">
+		<input type="checkbox" value="cbv1" name="cb[+ $i +]">
+		<input type="checkbox" value="cbv2" name="cb[+ $i +]">
+		<input type="checkbox" value="cbv3" name="cb[+ $i +]">
+		<input type="checkbox" value="cbv4" name="cb[+ $i +]">
+		<input type="checkbox" value="cbv5" name="cb[+ $i +]">
+		<input type="checkbox" value="cbv6" name="cb[+ $i +]">
+		<input type="text"     name="feld[+ $i +]" value="[+ $i > 2?"feld$i":'' +]">
+        <input type="text"     name="feld[+ $i +]">
+
+	[$endforeach$]
+
+
+	[$ foreach $i (5,2,6,1) $]
+        <p>
+        i = [+ $i +] fdat{feld5} [+ $fdat{feld5} +]<br>
+		<input type="checkbox" value="cbv[+ $i +]" name="cb[+ $i +]">
+		<input type="text"     name="feld[+ $i +]" value="[+ $i > 2?"feld$i":'' +]">
+		<input type="text"     name="feld[+ $i +]">
+        </p>
+	[$endforeach$]
+
+
+	ks = [+ do { @ks = sort keys %idat ; "@ks" } +]<p>
+
+	<table border=10>
+		<tr>
+			<td>[+ $ks[$i=$row] +]</td><td>[+ $idat{$ks[$i] || '<undef>'} +]</td>
+		</tr>
+	</table>
+
+</form>
+
+</body>
+</html>

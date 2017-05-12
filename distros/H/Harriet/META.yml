@@ -1,0 +1,42 @@
+---
+abstract: 'Daemon manager for testing'
+author:
+  - 'tokuhirom <tokuhirom@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Harriet
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::Prove::Plugin::Harriet:
+    file: lib/App/Prove/Plugin/Harriet.pm
+  Harriet:
+    file: lib/Harriet.pm
+    version: '00.05'
+requires:
+  Pod::Usage: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/tokuhirom/Harriet/issues
+  homepage: https://github.com/tokuhirom/Harriet
+  repository: git://github.com/tokuhirom/Harriet.git
+version: '00.05'
+x_contributors:
+  - 'Ichinose Shogo <shogo82148@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.017'

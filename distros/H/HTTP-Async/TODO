@@ -1,0 +1,28 @@
+TODOs for HTTP::Async
+
+  * Add ability to pass in a file handle that will be used to store the
+    content in. Aimed at people downloading large files that would otherwise
+    fill up the memory. Could be done so that downloads greater than a certain
+    size get sent to file rather than to memory. How to return this in the
+    HTTP::Response though.
+
+  * Do what is needed to get CPANTS tests to pass / run.
+
+  * Make sending non blocking - both the data and the initial DNS lookup.
+
+  * Integrate the changes from Egor - set alarm to catch connection timeout.
+
+  * Change max_redirects to max_redirect to be consistent with LWP::UserAgent
+
+  * Add a max_content_size that will break connections if the content is to
+    big - default is no limit.
+
+  * Switch to using Test::Class so that the tests are faster as they don't
+    spend so much time starting and stopping the test server(s).
+
+  * Change the user agent so that if it is not set in the request passed in then
+    it defaults to 'HTTP::Async vx.xx' or some such. Should also be possible to
+    set it in the opts or in the HTTP::Request.
+
+  * Add 'info' sub that can be linked to SIGINFO to provide a summary of what is
+    going on eg "print $async->info( 'terse' )".

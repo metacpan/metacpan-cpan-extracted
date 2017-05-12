@@ -1,0 +1,19 @@
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+If you are on a windows box you should use 'nmake' rather than 'make'.
+
+
+For documentation, try
+
+    perldoc HTML::LinkExtractor
+    perldoc LinkExtractor.pm
+
+
+pod2text LinkExtractor.pm >>README

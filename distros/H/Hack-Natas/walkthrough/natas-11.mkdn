@@ -1,0 +1,113 @@
+Level 11
+--------
+
+"XOR encryption" is... not encryption. Let's look in the
+cookies to find out they have XOR-ed, so we can mess with it:
+
+    ClVLIh4ASCsCBE8lAxMacFMZV2hdVVotEhhUJQNVAmhSEV4sFxFeaAw%3D
+
+Now we need to know what they XOR-ed it with, so open up the
+source view.
+
+Let's walkthrough the PHP code and see what it does:
+
+  - We first define an array with the following values
+    - showpassword: no
+    - bgcolor: #ffffff
+  - Then, we create an `xorencrypt` function, which
+    takes a string as input and performs an XOR operation
+    with a censored key.
+  - We then create a `loadData` function which loads the
+    default array into `$mydata`, checks to see if there
+    is data in our cookie, and if so attempts to `base64_decode`
+    it, perform the XOR operation on it, and decode the JSON
+    into an array.
+  - If this is indeed an array, and the proper values are found,
+    the values of `$mydata` are updated with the values from
+    the cookie. If not, the default values are kept.
+  - The value of `$mydata` is returned.
+  - We then create a `saveData` function which is used to set
+    a cookie to data which is JSON encoded, XOR'd, and then
+    `base64_encode`d.
+  - The execution of the PHP first calls `loadData` to process
+    any cookie data.
+  - Then the background color request value is handled.
+  - Finally, whatever data has been loaded is set as our cookie value.
+
+We can see at the end of the source that if `$data['showpassword']`
+is set to 'yes', then the password will be displayed. That's our goal.
+
+Let's stop and think about exactly what we need to do, and what we have
+to do it. We want to obtain the password for natas12, which is only
+displayed if the 'showpassword' key of `$data` is set to 'yes'. This
+would only occur if during the `loadData` function our cookie
+contained the encoded, encrypted version of the array. However, to
+get the encrypted version of any input, we first need the key so that
+when it is unencrypted by the `loadData` function, it will be usable.
+
+We are given the following pieces of data:
+  - The default array used to generate the default cookie value
+  - The default cookie value
+  - The functions used to encrypt and encode our data
+
+The key to this challenge is to realize that we don't need to brute
+force the key. The property of XOR encryption that will drastically
+help us in this challenge is that while:
+
+    plaintext XOR key = ciphertext
+
+The following is also true:
+
+    plaintext XOR ciphertext = key
+
+This helps us because we can see above that we are given the default
+original data, as well as the default encrypted data. Let's use the
+following PHP code (recycling some of their functions) to generate our key:
+
+In this example, we are using the `base64_decoded` value of our cookie
+as our ciphertext and we are using the `json_encoded` default array
+as our plaintext. We know these are the two values to use because
+these are the values sent to the XOR function in the `loadData` and
+`saveData` functions.
+
+    $ php -a
+    Interactive shell
+
+    php > function xor_encrypt($in) {
+    php {         $text = $in;
+    php {         $key = json_encode(array( "showpassword"=>"no", "bgcolor"=>"#ffffff"));
+    php {         $out_text = '';
+    php {
+    php {         for($i=0; $i<strlen($text); $i++) { // Iterate through each character
+    php {             $out_text .= $text[$i] ^ $key[$i % strlen($key)];
+    php {         }
+    php {         return $out_text;
+    php {     }
+    php > $orig_cookie = base64_decode('ClVLIh4ASCsCBE8lAxMacFMZV2hdVVotEhhUJQNVAmhSEV4sFxFeaAw');
+    php > print xor_encrypt($orig_cookie) . "\n";
+    qw8Jqw8Jqw8Jqw8Jqw8Jqw8Jqw8Jqw8Jqw8Jqw8Jq
+
+We can see that this key is the value 'qw8j' repeated many times.
+Therefore, we can deduce that 'qw8j' is our key, which we can
+use on any input to generate the encrypted output.
+
+Let's adjust our PHP code to XOR the `json_encode`d new array,
+which sets the 'showpassword' value to 'yes':
+
+    $ php -a
+    Interactive shell
+
+    php >     function xor_encrypt($text) {
+    php {         $key = "qw8J";
+    php {         $out_text = '';
+    php {
+    php {         for($i=0; $i<strlen($text); $i++) { // Iterate through each character
+    php {             $out_text .= $text[$i] ^ $key[$i % strlen($key)];
+    php {         }
+    php {         return $out_text;
+    php {     }
+    php >     $text = json_encode(array( "showpassword"=>"yes", "bgcolor"=>"#ffffff"));
+    php >     print base64_encode(xor_encrypt($text)) . "\n";
+    ClVLIh4ASCsCBE8lAxMacFMOXTlTWxooFhRXJh4FGnBTVF4sFxFeLFMK
+
+Let's use this value as our cookie and see what happens.

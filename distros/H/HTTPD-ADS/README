@@ -1,0 +1,40 @@
+NAME
+    HTTPD::ADS - Perl module for Attack Detection and Prevention System
+
+SYNOPSIS
+        use HTTPD::ADS
+
+DESCRIPTION
+        Attack Detection System
+
+Uses Postgresql dbms to store its data . Adds reject routes for
+hosts it decides need to be blacklisted. 
+USAGE
+You will need to run the createdb.sql within psql,as the regular db user who is to own the database, to setup all tables.
+Run DefenseServer.pl as root, and run LogReader.pl as the same unix user who
+owns the database.
+BUGS
+
+Documentation needs a lot of work.
+The database interface is a bit fragile.
+There may be bugs in the logfile parsing in LogReader
+
+SUPPORT
+AUTHOR
+        Dana Hudes
+        CPAN ID: DHUDES
+        dhudes@hudes.org
+      http://www.hudes.org
+
+COPYRIGHT
+        This program is free software licensed under the...
+
+        The General Public License (GPL)
+        Version 2, June 1991
+
+        The full text of the license can be found in the
+        LICENSE file included with this module.
+
+SEE ALSO
+        perl(1).
+

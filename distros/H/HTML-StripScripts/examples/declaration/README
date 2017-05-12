@@ -1,0 +1,38 @@
+Overriding HTML::StripScripts to allow DDTs (Document Type Declarations)
+------------------------------------------------------------------------
+
+A Document Type Declaration is the first line of an HTML (or X-HTML) document
+which describes the particular version of HTML that will be used in the
+document. (See http://www.w3.org/TR/html4/struct/global.html#h-7.2)
+
+For instance, strict HTML 4.01 has this declaration:
+
+    <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+    "http://www.w3.org/TR/html4/strict.dtd">
+
+By default, DTDs are rejected by HTML::StripScripts.  If you would like to
+accept them, you will need to subclass HTML::StripScripts
+(or HTML::StripScripts::Parser) to allow them.
+
+IMPORTANT: More than just allowing them, you should also check the values that
+           are passed in.
+
+--------------------------------------------------------------------------------
+
+To run the example:
+
+ - change to the examples/declaration directory:
+
+     cd examples/declaration
+
+ - then type:
+
+     perl declaration.pl
+
+The example parses the same HTML, first with HTML::StripScripts::Parser, then
+with MyStripScripts (a subclass of HTML::StripScripts::Parser) and prints out
+the two versions.
+
+No checking of the values is done.
+
+The example script requires HTML::StripScripts::Parser to work.

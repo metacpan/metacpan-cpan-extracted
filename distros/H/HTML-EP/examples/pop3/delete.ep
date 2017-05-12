@@ -1,0 +1,21 @@
+<ep-debug>
+<ep-package name="HTML::EP::Examples::POP3Client">
+<ep-language language="de">
+  <ep-set var="ListButton" val="Zurück zur Mailboxliste">
+<ep-language language="en">
+  <ep-set var="ListButton" val="Back to the mailbox list">
+</ep-language>
+<ep-examples-pop3client-delete>
+<html><head><title><ep-language de="Mail gelöscht" en="Mail deleted"></title>
+</head>
+<body onLoad="document.listform.submit()">
+  <form name=listform action=list.ep method=post>
+    <input type=hidden name=pop3server value="$cgi->pop3server$">
+    <input type=hidden name=pop3user value="$cgi->pop3user$">
+    <input type=hidden name=pop3password value="$cgi->pop3password$">
+    <input type=hidden name=start value="$start$">
+    <input type=submit value="$ListButton$">
+  </form>
+</body>
+<script language=Javascript>document.listform.submit()</script>
+</html>

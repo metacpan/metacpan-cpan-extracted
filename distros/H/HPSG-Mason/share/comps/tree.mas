@@ -1,0 +1,29 @@
+<%args>
+%root
+</%args>
+\begin{avmtree}
+<& render_node, node => \%root &>
+\end{avmtree}
+
+\\
+<%def render_node>\
+<%args>
+$node
+</%args>\
+% if( ref $node ){
+\br{\
+<% exists $node->{head} ? '\\textbf{H} ' : '' %>\
+<% exists $node->{tag} ? sprintf('\\@{%s} ', $node->{tag}) : '' %>\
+<& '/expression.mas', %{ $node->{expression_arg} } &>}{
+% foreach my $daughter ( @{ $node->{daughters} } ){
+<& render_node, node => $daughter &>\
+% }
+}\
+% }else{
+%   if( $node =~ /\s/ ){
+\tlf{<% $node %>}\
+%   }else{
+\lf{<% $node %>}\
+%   }
+% }
+</%def>\

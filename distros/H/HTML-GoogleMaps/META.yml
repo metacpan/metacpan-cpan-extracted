@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                HTML-GoogleMaps
+version:             10
+abstract:            a simple wrapper around the Google Maps API
+license:             ~
+author:              
+    - Nathan Mueller <nate@cs.wisc.edu>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Geo::Coder::Google:            0.02
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

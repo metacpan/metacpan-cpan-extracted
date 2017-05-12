@@ -1,0 +1,47 @@
+Revision history for Hash-AutoHash-AVPairsSingle
+
+1.17	2013-10-05
+	No functional changes
+	Updated depdendencies
+        Fixed boilerplate & pod tests
+
+1.16	2012-12-11
+	Fixed tests that were failing because of hash key randomization 
+	introduced in 5.16
+
+1.15	skipped
+
+1.14	2012-09-18
+	- Fixed Hash::AutoHash prerequisite in Build.PL. Needs 1.15
+	- Reverted version numbers in helper and tie package. PAUSE upload
+	  wasn't failing - it was just a warning
+
+1.13	2012-09-02
+	Fixed problem with version numbers in helper and tie packages causing
+	PAUSE upload to fail
+
+1.12	2012-09-03
+	- INCOMPATIBLE CHANGE: no longer possible to use method notation for keys
+	  with the same names as methods inherited from UNIVERSAL (the base  
+	  class of everything). These are  'can', 'isa', 'DOES', and 'VERSION'.
+	  The reason is that as of Perl 5.9.3, calling UNIVERSAL methods as
+	  functions is deprecated and developers are encouraged to use method
+	  form instead. Previous versions of module are incompatible with CPAN
+	  modules that adopt this style.
+	- Added test for version number in POD
+	- Changes to Build.PL
+	  Removed redundant 'dist_version_from' param
+          Added Module::Build to configure_requires
+	  Changed create_makefile_pl from deprecated 'passthrough' to 'small'
+
+1.11    2010-02-24
+	Minor documentation cleanup and reformatting
+
+1.10    2009-10-30
+	This should be stable release assuming CPAN testers find no problems
+        Fixed Build prereqs
+        Refactored perl 5.10 dependent test code
+
+1.00    2009-10-30
+        First version, released on an unsuspecting world.
+

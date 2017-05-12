@@ -1,0 +1,65 @@
+=head1 NAME
+
+B<Helios> - a distributed job processing system
+
+=head1 DESCRIPTION
+
+Helios is a system for building asynchronous distributed job processing 
+applications.  Applications that need to process hundreds, thousands, even 
+millions of small units of work in parallel can use the Helios system to 
+distribute your workload across the multiple processes and servers that form 
+a Helios collective.  Helios may also be used to improve the user experience 
+on websites.  By utilizing the framework's APIs, potential timeout issues can 
+be eliminated and response times decreased for larger tasks invoked in response 
+to user input.  The web server application can "fire and forget" to the 
+background, immediately returning control to the user.  Using Helios, simple 
+Perl applications can be written to distribute massive workloads throughout 
+the Helios collective while still retaining centralized management.
+
+=head1 REQUIREMENTS
+
+Helios requires:
+
+=over 4
+
+=item * A Unix/Linux-style OS 
+
+=item * Perl 5.8.8 or later
+
+=item * MySQL or Oracle database
+
+=item * Apache or other CGI-capable web server for web admin console (packaged 
+separately) and job submission via HTTP (if needed)
+
+=back
+
+=head1 INSTALLATION
+
+See the INSTALL.* files included in this distribution for specific 
+installation instructions for various databases and operating systems.
+
+=head1 AUTHOR
+
+Andrew Johnson, E<lt>lajandy at cpan dotorgE<gt>
+
+=head1 COPYRIGHTS AND LICENSE
+
+Copyright (C) 2012-4 by Logical Helion, LLC.
+
+Copyright (C) 2007-9 CEB Toolbox, Inc.
+
+For full copyright information, see the README file included in this 
+distribution.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+See the LICENSE file included in this distribution for more details.
+
+=head1 WARRANTY
+
+This software comes with no warranty of any kind.
+
+=cut
+

@@ -1,0 +1,29 @@
+0.3  Mar 25 2010
+
+     * Add CONFIG_REQUIRES EU::MM 6.56 to work around a FAIL from a 
+       tester with an old EU::MM that didn't understand BUILD_REQUIRES.
+     * Updated t/01test.t to use a proper URL so it tests getting 
+       a .pac file from the net.
+     * Optimized reading file from the internet for new(URL).
+     * Eliminated dependence on POSIX.
+
+0.2  Mar 13 2010
+
+     updated by Craig MacKenna:
+     * improved JavaScript to perl translation:
+       ** enclosed single statements after if()/for()/while()/else/do
+          in {} as required by perl but not JavaScript or C
+       ** translated JavaScript 'else if' to perl 'elsif'
+       ** translated JavaScript relational operators '==', '<', etc.
+          to perl 'eq', 'lt', etc.
+       ** improved variable recognition/translation
+     * 'new' takes path to file as well as URL as its operand
+     * included fatal error message if the JS->perl translation is bad
+       (easier for user to see problem)
+     * fixed regexp character escapes in shExpMatch function
+     * added two lightweight tests
+
+0.1  May 2001
+  - First version.  You can't talk to a pac file that has anything
+    that is even remotely JavaScript except for the functions that
+    are explicity defined for this.

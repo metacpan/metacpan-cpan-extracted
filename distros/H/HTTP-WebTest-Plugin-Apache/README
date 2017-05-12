@@ -1,0 +1,68 @@
+NAME
+    HTTP::WebTest::Plugin::Apache - Plugin for local web file tests
+
+DESCRIPTION
+    This plugin adds support for local web file test mode to HTTP::WebTest. In
+    this mode Apache is started on a private/dynamic port with a configuration
+    file in a temporary directory and HTTP::WebTest runs its tests against
+    local web files using this temporary local instance of Apache.
+
+    Data flow diagram for "HTTP::WebTest" using a local web file:
+
+              --------------           ---------------------
+              |            |           |                   |
+              | Input      |           |  Web page code    |
+              | parameters |           |  (Perl/HTML/etc.) |
+              |            |           |                   |
+              --------------           ---------------------
+                  |                              |
+                  |  -----------------------------
+                  |  |
+                  V  V                ------------------------
+              -------------           |                      |
+              |           |---------->| Temporary Apache     |
+              |  WebTest  |           | directories (htdocs, |
+              |           |<----------| conf, logs)          |
+              -------------           |                      |
+                  |  ^                ------------------------
+                  |  |                        |    ^
+                  V  |                        V    |
+              ------------             ----------------------
+              |          |   request   |                    |
+              |   HTTP   |------------>| Temporary local    |
+              |   user   |             | instance of Apache |
+              |   agent  |<------------|                    |
+              |          |   response  ----------------------
+              ------------
+
+
+RESTRICTIONS / BUGS
+    Local file test mode unlikely to work on Win32 systems (at least it have
+    never been tested by authors there and nobody confirmed it to work).
+
+AUTHORS
+    Richard Anderson <richard@richard-anderson.org> wrote HTTP::WebTest 1.xx,
+    using some ideas from the CPAN Monkeywrench module.
+
+    Ilya Martynov <ilya@martynov.org> implemented the plug-in concept, the
+    extended API and completely rewrote HTTP::WebTest.
+
+    Later this plugin module was removed from HTTP::WebTest distribution and
+    released separately.
+
+    Please don't email authors directly. Use the SourceForge "HTTP::WebTest"
+    mail list (see SUPPORT, next section).
+
+SUPPORT
+    Please email bug reports, suggestions, questions, etc. to the SourceForge
+    "HTTP::WebTest" maillist. You can sign up at
+    http://lists.sourceforge.net/lists/listinfo/http-webtest-general . The
+    email address is "http-webtest-general@lists.sourceforge.net".
+
+COPYRIGHT
+    Copyright (c) 2000-2001 Richard Anderson. All rights reserved.
+
+    Copyright (c) 2001-2002 Ilya Martynov. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.

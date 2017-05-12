@@ -1,0 +1,16 @@
+Changes
+DISCLAIMER
+MANIFEST
+Makefile.PL
+Puzzle.pm
+Puzzle.pod
+Puzzle/DBTable.pm
+Puzzle/DBTable.pod
+Puzzle/Format.pm
+Puzzle/Format.pod
+README
+TODO
+t/01__DBTable.t
+t/02___Format.t
+t/99___DropTT.t
+templates/format_simple.tmpl

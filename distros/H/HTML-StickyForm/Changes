@@ -1,0 +1,67 @@
+2011-11-01 0.08 More select() improvements:
+  Add attributes for <option>s, including per-value values
+
+2011-10-18 0.07_02 Preview release of improvements to select():
+  Add option group capability
+
+2011-10-08 0.07_01 Preview release of improvements to radio_group():
+  Per-value attribute values can now be passed as hashrefs
+  New radio() method for generating a single radio button
+  
+  Switch from plain EU::MM to Dist::Zilla for maintenance
+  Switch from CVS to github
+  Sort out some issues with the test suite
+
+2005-10-19 0.07 First release of the new API
+  The focus has shifted towards a slightly more general form generation class,
+    which includes methods for all input types, as well as the form element
+    itself. This requires a slight, but backwards-incompatible API change,
+    so HTML::StickyForms is now deprecated in favour of the new HTML::StickyForm
+  Sticky parameters can now be retrieved from any object supporting a compatible
+    param() method, or even unblessed arrayrefs or hashrefs
+  Stickiness can be easily overridden on a per-method basis
+  Removed argument aliases, which means that any given argument name only
+    triggers one type of special behaviour, no matter which method it's sent to
+  Improved documentation (I hope)
+  Actual tests!
+
+2002-04-09 0.06 Sixth release
+  Add well_formed() method to control trailing slash in elements
+	(unfortunately defaults to false - thanks, Netscape)
+  Make sure everything is otherwise XHTML compliant
+  Fix text() and textarea() examples
+
+2001-06-15 0.05 Fifth release
+  Add set_sticky() method to allow re-counting of parameters/forcing stickiness
+  Add values_as_labels() attribute/method
+  Add values_as_labels overrides to checkbox_group()/radio_group()/select()
+
+2000-11-10 0.04 Fourth release
+  Fixed behaviour of select() and checkbox_group() with default => 0
+
+2000-08-30 0.03 Third release
+  Fixed trim_params() under Apache::Request
+
+2000-06-27 0.02 Second release
+  Add select()
+
+2000-06-21 0.01_01
+  Combine checkbox_group() and radio_group()
+  Add documentation
+
+2000-06-15 0.01 First release!
+  Add copyright notices
+
+2000-06-09 0.00_03
+  Add Todo
+  Add _escape()
+  Use _escape() to escape NAME and VALUE attribute values
+  Use -escape() to escape labels if (escape => 1) is passed to *_group()
+
+2000-06-08 0.00_02
+  Add README
+  Allow CGI::State request delegate and null request delegate
+  Add radio_group()
+
+2000-06-70 0.00_01
+  new, trim_params, text, password, textarea, checkbox, checkbox_group

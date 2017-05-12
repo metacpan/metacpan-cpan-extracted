@@ -1,0 +1,5 @@
+lib/HTML/HashTable.pm
+Makefile.PL
+MANIFEST
+README
+test.pl

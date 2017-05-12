@@ -1,0 +1,84 @@
+NAME
+    Ham::Reference::Qsignals - A quick reference for Q Signals.
+
+VERSION
+    Version 0.02
+
+INSTALLATION
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SYNOPSIS
+     my $q = new Ham::Reference::Qsignals;
+
+     # use the get() function to get a single meaning for a particular Q signal
+
+     print $q->get('qrp');
+     print "\n";
+
+     # use a hash reference to get all Q signals at once
+     # the following will display all signals and meanings
+
+     my $hashref = $q->get_hashref();
+     foreach (sort keys %$hashref)
+     {
+            print "$_ = $hashref->{$_}\n";
+     }
+
+DESCRIPTION
+    The "Ham::Reference::Qsignals" module is a quick reference to the ARRL
+    suggested Q signal set. Other Q signal sets may be added in the future,
+    but the primary mission of this module is for Amateur Radio
+    applications.
+
+CONSTRUCTOR
+  new()
+     Usage    : my $q = Ham::Reference::Qsignals->new();
+     Function : creates a new Ham::Reference::Qsignals object
+     Returns  : A Ham::Reference::Qsignals object
+     Args     : an anonymous hash:
+                key         required?   value
+                -------     ---------   -----
+                signal_set  no          select the set of Q signals
+                                        the only set for now, and the default set
+                                        is arrl
+
+METHODS
+  get()
+     Usage    : my $description = $q->get( 'qrp' );
+     Function : gets a single meaning for a given Q signal
+     Returns  : a string
+     Args     : you can get a full list of Q signals by accessing the keys of
+                of the hashref returned by get_hashref() function
+                (see the synopsis for example)
+
+  get_hashref()
+     Usage    : my $hashref = $q->get_hashref();
+     Function : get all q signals
+     Returns  : a hash reference
+     Args     : n/a
+
+ACKNOWLEDGEMENTS
+    The arrl Q signal set is from
+    http://www.arrl.org/files/bbs/general/q-sigs, courtesy of the American
+    Radio Relay League.
+
+AUTHOR
+    Brad McConahay N8QQ, "<brad at n8qq.com>"
+
+COPYRIGHT & LICENSE
+    "Ham::Reference::Qsignals" is Copyright (C) 2008-2010 Brad McConahay
+    N8QQ.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the terms of the Artistic License 2.0. For details, see the full
+    text of the license in the file LICENSE.
+
+    This program is distributed in the hope that it will be useful, but it
+    is provided "as is" and without any express or implied warranties. For
+    details, see the full text of the license in the file LICENSE.
+

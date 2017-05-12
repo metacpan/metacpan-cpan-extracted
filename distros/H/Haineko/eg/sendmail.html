@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns = 'http://www.w3.org/1999/xhtml' xml:lang = 'en' lang = 'en'>
+<head>
+    <meta http-equiv = 'Content-Type' content = 'text/html; charset=UTF-8' />
+    <meta http-equiv = 'Content-Style-Type' content = 'text/css' />
+    <title>
+        Haineko/eg/sendmail.html - Sample code for sending an email via Haineko
+    </title>
+    <!--[if lt IE 9]>
+        <script src = 'http://html5shim.googlecode.com/svn/trunk/html5.js'></script>
+    <![endif]-->
+    <script type = 'text/javascript' src = 'http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js'></script>
+    <style type = 'text/css'>
+        body { padding-top: 0px; padding-bottom: 10px; font-family: 'Gill Sans'; }
+        div { width: 640px; }
+        div.response { border: 1px #ccc solid; border-radius: 8px; }
+        h1 {
+            font-family: 'Gill Sans Ultra Bold';
+            font-size: 40px;
+            color: #a0a0a0;
+            text-shadow: 0 -1px 0 #757575;
+        }
+        h2 { color: #757575; }
+        fieldset { 
+            padding: 8px 4px 32px 4px;
+            border: 1px #ccc solid;
+            border-radius: 8px;
+        }
+        legend { color: #ccc; margin: 2px 8px; }
+        tr th { 
+            text-align: right;
+            color: #222;
+            margin: 8px;
+            padding: 8px 12px 4px 0;
+            vertical-align: top;
+        }
+        tr td p { margin: 0 4px 24px 4px; color: #959595; }
+        input[type=text] {
+            width: 480px;
+            padding: 8px;
+            border: 1px #a0a0a0 solid;
+            color: #222;
+            border-raduis: 4px;
+        }
+        textarea { padding: 8px; font-size: 12px; }
+        button { font-size: 18px; font-weight: bold; padding: 8px 16px; }
+    </style>
+    <script type = 'text/javascript'>
+        /*! jQuery JSON plugin 2.4.0 | code.google.com/p/jquery-json */
+        (function($){'use strict';var escape=/["\\\x00-\x1f\x7f-\x9f]/g,meta={'\b':'\\b','\t':'\\t','\n':'\\n','\f':'\\f','\r':'\\r','"':'\\"','\\':'\\\\'},hasOwn=Object.prototype.hasOwnProperty;$.toJSON=typeof JSON==='object'&&JSON.stringify?JSON.stringify:function(o){if(o===null){return'null';}
+        var pairs,k,name,val,type=$.type(o);if(type==='undefined'){return undefined;}
+        if(type==='number'||type==='boolean'){return String(o);}
+        if(type==='string'){return $.quoteString(o);}
+        if(typeof o.toJSON==='function'){return $.toJSON(o.toJSON());}
+        if(type==='date'){var month=o.getUTCMonth()+1,day=o.getUTCDate(),year=o.getUTCFullYear(),hours=o.getUTCHours(),minutes=o.getUTCMinutes(),seconds=o.getUTCSeconds(),milli=o.getUTCMilliseconds();if(month<10){month='0'+month;}
+        if(day<10){day='0'+day;}
+        if(hours<10){hours='0'+hours;}
+        if(minutes<10){minutes='0'+minutes;}
+        if(seconds<10){seconds='0'+seconds;}
+        if(milli<100){milli='0'+milli;}
+        if(milli<10){milli='0'+milli;}
+        return'"'+year+'-'+month+'-'+day+'T'+
+        hours+':'+minutes+':'+seconds+'.'+milli+'Z"';}
+        pairs=[];if($.isArray(o)){for(k=0;k<o.length;k++){pairs.push($.toJSON(o[k])||'null');}
+        return'['+pairs.join(',')+']';}
+        if(typeof o==='object'){for(k in o){if(hasOwn.call(o,k)){type=typeof k;if(type==='number'){name='"'+k+'"';}else if(type==='string'){name=$.quoteString(k);}else{continue;}
+        type=typeof o[k];if(type!=='function'&&type!=='undefined'){val=$.toJSON(o[k]);pairs.push(name+':'+val);}}}
+        return'{'+pairs.join(',')+'}';}};$.evalJSON=typeof JSON==='object'&&JSON.parse?JSON.parse:function(str){return eval('('+str+')');};$.secureEvalJSON=typeof JSON==='object'&&JSON.parse?JSON.parse:function(str){var filtered=str.replace(/\\["\\\/bfnrtu]/g,'@').replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g,']').replace(/(?:^|:|,)(?:\s*\[)+/g,'');if(/^[\],:{}\s]*$/.test(filtered)){return eval('('+str+')');}
+        throw new SyntaxError('Error parsing JSON, source is not valid.');};$.quoteString=function(str){if(str.match(escape)){return'"'+str.replace(escape,function(a){var c=meta[a];if(typeof c==='string'){return c;}
+        c=a.charCodeAt();return'\\u00'+Math.floor(c/16).toString(16)+(c%16).toString(16);})+'"';}
+        return'"'+str+'"';};}(jQuery));
+
+        function submit() {
+            var hainekourl = "http://127.0.0.1:2794/submit";
+            var messageset = { 
+                "ehlo": '[127.0.0.1]',
+                "mail": $("#email").find("#mail").val(),
+                "rcpt": [ $("#email").find("#rcpt").val() ],
+                "header": {
+                    "subject": $("#email").find("#subject").val(),
+                    "from": " Haineko Example <"+$("#email").find("#mail").val()+">",
+                    "charset": "UTF-8"
+                },
+                "body": $("#email").find("#body").val()
+            };
+            var htresponse = {};
+            var jsonstring = $.toJSON( messageset );
+
+            $("#serverresponse").css( "display", "none" );
+
+            $.ajax( {
+                url: hainekourl,
+                type: "POST",
+                data: jsonstring,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                processData: false,
+                success: function(r) {
+                    htresponse = $.toJSON(r);
+                    $("#response").text(htresponse);
+                },
+                error: function(r) {
+                    htresponse = $.toJSON(r.responseText);
+                    $("#response").text(htresponse);
+                },
+                complete: function() {
+                    $("#serverresponse").css( "display", "block" );
+                }
+            } );
+            return 1;
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Haineko/eg/sendmail.html</h1>
+    <div id = 'emaildata'>
+        <h2>Email Data</h2>
+        <fieldset>
+            <legend>Email</legend>
+            <table id = 'email'>
+                    <tr>
+                        <th style = 'text-align: right;'>
+                            <button type = 'submit' id = 'sendmail' onclick = 'submit();'>
+                                Send
+                            </button>
+                        </th>
+                        <td>
+                            <p>
+                                This sample sends an email via <strong>http://127.0.0.1:2794/submit</strong>
+                                except Google Chrome for due to 
+                                <a href = 'http://stackoverflow.com/questions/5938842/cross-domain-ajax-post-in-chrome'
+                                    target = 'new'>security reason</a>.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr class = 'header'>
+                        <th>From: </th>
+                        <td>
+                            <input type = 'text' name = 'mail' id = 'mail' 
+                                value = 'you@example.co.jp' />
+                            <p>
+                                Envelope sender address. The address will be set as the value of
+                                "From" header.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr class = 'header'>
+                        <th>To: </th>
+                        <td>
+                            <input type = 'text' name = 'rcpt' id = 'rcpt' 
+                                value = 'who@example.com'
+                            />
+                            <p>
+                                Envelope recipient address. The address or the domain part of the address
+                                should be listed in etc/recipients file.
+                                <!--
+                                <br />
+                                However, when both the server address and the client address are '127.0.0.1',
+                                Any recipient address is permitted to send.
+                                -->
+                            </p>
+                        </td>
+                    </tr>
+                    <tr class = 'header'>
+                        <th>Subject: </th>
+                        <td>
+                            <input type = 'text' name = 'subject' id = 'subject' value = 'Test' />
+                            <p>
+                                Empty subject is not allowed.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr class = 'header'>
+                        <th>Body:</th>
+                        <td>
+                            <input type = 'text' name = 'body' id = 'body' value = 'Message body(TEST)' />
+                            <p>
+                                Empty body is not allowed. Multi-byte character is dealt as UTF-8.
+                            </p>
+                        </td>
+                    </tr>
+            </table>
+        </fieldset>
+    </div>
+
+    <div id = 'serverresponse' style = 'display: none;'>
+        <h2>Server Response</h2>
+        <textarea id = 'response' cols = '87' rows = '16' ></textarea>
+    </div>
+</body>
+</html>
+

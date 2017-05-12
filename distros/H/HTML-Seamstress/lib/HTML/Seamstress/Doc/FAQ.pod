@@ -1,0 +1,34 @@
+=head1 Philosophy 
+
+=head2 Since you're using 'id' attributes to rewrite elements, you can't put a single value in multiple places
+
+I would recommend using a class attribute or custom attribute. I often use klass myself.
+
+=head2 It looks like you are using id and class tags to find and rewrite parts of HTML
+
+Well, we can use id and class tags to find and rewrite parts of HTML.  But in fact, we can do anything the L<HTML::Element> look_down
+method can do to find elements. 
+
+
+=head1 Practice
+
+=head2 What the freak is guts()? highlander()? passover?
+
+They are tree processing methods. Seamstress is an open-ended API for OO tree processing. Here are good places to search for methods:
+
+=over 4
+
+=item * L<HTML::TreeBuilder>
+
+=item * L<HTML::Element>
+
+=item * L<HTML::Element::Library>
+
+=item * L<HTML::Element::Replacer>
+
+=cut
+
+=head2 What does HTML::Seamstress inherit from?
+
+It inherits from L<HTML::TreeBuilder> and L<HTML::Element> and it uses
+L<HTML::Element::Library>. It probably should use L<HTML::Element::Replacer> as well!

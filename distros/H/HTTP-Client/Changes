@@ -1,0 +1,48 @@
+Revision history for Perl module HTTP::Client
+
+1.57 2014-06-20
+    - If you're running an old version of ExtUtils::MakeMaker, we put
+      the TEST_REQUIRES into PREREQ_PM. Had a couple of CPAN Testers
+      failures from setups running EU::MM < 6.64.
+
+1.56 2014-02-04
+
+    - Moved testsuite (such as it is) into t/,
+      and refactored to use Test::More
+    - use LWP::Online to only run online tests if online
+    - Min perl version 5.6.0 (was set to 5.8)
+    - Added min perl version to metadata
+    - Added strict and warnings to PREREQ_PM
+    - Added github repo to pod
+    - Various pod tidy-ups
+
+1.55 2013-11-10
+
+    - Specified license as 'perl' in metadata (via Makefile.PL)
+    - Added github repo to metadata (via Makefile.PL)
+
+1.54 2012-09-27
+
+    - Fixed bug where doing multiple requests with the same instance
+      would return all results from previous requests concatenated together.
+      RT#79889 reported by Alex K.
+
+1.53 2012-09-01
+
+    - Updated Documentation and Makefile.PL to acknowledge the original
+      author (Lincoln Ombelets), now I know who he is.
+
+1.52 2012-01-15
+
+    - Neil Bowers took over maintenance
+    - removed code which referred to an undeclared variable in get() method
+    - the get() method was always appending a '/' to the URL, which caused
+      an URL containing a filename to fail.
+    - the testsuite didn't include a trailing '/' on the test URL, so once
+      the previous hack was removed, the testsuite failed. This is due to
+      a limitation in HTTP::Lite
+    - Formatted this file according to CPAN::Changes::Spec
+
+1.43 2005-08-23
+
+	- original version

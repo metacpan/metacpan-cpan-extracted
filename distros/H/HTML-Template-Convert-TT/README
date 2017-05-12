@@ -1,0 +1,33 @@
+HTML-Template-Convert-TT version 0.01
+=====================================
+
+There is often need quickly change web-template engine
+of one site. In case of using HTML::Template it has become
+simply to use this module to convert templates to Template
+Toolkit syntax.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	HTML::Template
+	Template
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by A. D. Solovets 
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

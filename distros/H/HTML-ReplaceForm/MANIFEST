@@ -1,0 +1,10 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+Makefile.PL
+lib/HTML/ReplaceForm.pm
+t/basic.t
+META.yml
+README

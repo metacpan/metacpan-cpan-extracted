@@ -1,0 +1,73 @@
+<webmake>
+
+<{!--
+
+     A quick demo of using WebMake to generate a news site.
+
+  --}>
+
+<{!-- ------------------------------------------------------------------- --}>
+
+<include file="data/test_stories.inc" />
+
+<{perlpostdecl
+        # create a ${all_stories} variable containing the list
+        # of all text files just loaded.
+        $_ = '';
+        foreach my $pg (sorted_content_matching ("score title", "*.txt"))
+	{
+          $pg =~ s/\.txt$//; $_ .= "$pg ";
+        }
+        set_content ("all_stories", $_);
+        '';
+}>
+
+<{!-- ------------------------------------------------------------------- --}>
+
+<content name=header>
+  <html>
+  <head><title>$[this.title]</title></head>
+  <body bgcolor=#ffffff>
+</content>
+
+<content name=footer>
+  <hr /><p>
+  <em>Sorry about the crappy formatting BTW, this is just a demo. ;)</em>
+  </p>
+  </body>
+  </html>
+</content>
+
+<{!-- ------------------------------------------------------------------- --}>
+
+<content name=index_list_item>
+  <li>
+    <a href=$(${item})>$[${item}.txt.title]</a><br />
+    <p>$[${item}.txt.abstract]</p>
+  </li>
+</content>
+
+<content name=index_chunk>
+  <wmmeta name=title value="WebMake Sample: a news site" />
+  <ul>
+  <{perlout
+    print make_list ('index_list_item', split (' ', get_content ("all_stories")));
+  }>
+  </ul>
+
+</content>
+
+<{!-- ------------------------------------------------------------------- --}>
+
+<for name=pg values="${all_stories}">
+  <out name="${pg}" file="log/perlout_${pg}.html">
+    ${header}${${pg}.txt}${footer}
+  </out>
+</for>
+
+<out name=mainindex file=log/perlout.html>
+  ${header}${index_chunk}${footer}
+</out>
+
+</webmake>
+

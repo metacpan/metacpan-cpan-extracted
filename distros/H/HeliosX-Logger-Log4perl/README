@@ -1,0 +1,33 @@
+HeliosX-Logger-Log4perl version 1.00
+====================================
+
+HeliosX::Logger::Log4perl implements a Helios::Logger class to provide 
+a shim between Helios and Log::Log4perl.  This allows Helios 
+applications to use Log4perl logging facilities.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Helios 2.40 or newer
+  Log::Log4perl 
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2009-12 by Andrew Johnson, except as noted.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

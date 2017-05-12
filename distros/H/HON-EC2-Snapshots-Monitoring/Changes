@@ -1,0 +1,7 @@
+Revision history for HON-EC2-Snapshots-Monitoring
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.04    08 Mar 2016
+        Remove checking of snapshots purging

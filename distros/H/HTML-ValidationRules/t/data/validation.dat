@@ -1,0 +1,166 @@
+#html
+<input name=foo maxlength=3>
+#input
+foo=hog
+
+#html
+<input name=foo maxlength=3>
+#input
+foo=hoge
+#invalid
+foo
+
+#html
+<input name=foo required>
+#input
+foo=
+#invalid
+foo
+
+#html
+<input type=radio name=hoge value=1 required>
+<input type=radio name=hoge value=2>
+#input
+hoge=1
+
+#html
+<input type=radio name=hoge value=1 required>
+<input type=radio name=hoge value=2>
+#input
+hoge=2
+
+#html
+<input type=radio name=hoge value=1 required>
+<input type=radio name=hoge value=2>
+#input
+#invalid
+hoge
+
+#html
+<input name=abc pattern="[0-9]+">
+#input
+abc=12345
+
+#html
+<input name=abc pattern="[0-9]+">
+#input
+abc=12345.12
+#invalid
+abc
+
+#html
+<input name=abc pattern="[0-9]+\.a">
+#input
+abc=12345.a
+
+#html
+<input name=abc pattern="[0-9]+\.a">
+#input
+abc=12345.abc
+#invalid
+abc
+
+#html
+<input name=abc pattern="[0-9]+">
+#input
+abc=xyz
+#invalid
+abc
+
+#html
+<input name=abc pattern="[0-9]+">
+#input
+
+#html
+<input name=abc pattern="[0-9]+">
+#input
+abc=
+
+#html
+<input type=number name=n>
+#input
+n=120
+
+#html
+<input type=number name=n>
+#input
+n=abc
+#invalid
+n
+
+#html
+<input type=range name=n>
+#input
+n=120
+
+#html
+<input type=range name=n>
+#input
+n=-120
+
+#html
+<input type=range name=n>
+#input
+n=120.12
+
+#html
+<input type=range name=n>
+#input
+n=abc
+#invalid
+n
+
+#html
+<input type=range name=n>
+#input
+n=
+
+#html
+<input type=range name=n>
+#input
+
+#html
+<input type=number name=n min=120>
+#input
+n=120
+
+#html
+<input type=number name=n min=120>
+#input
+n=110
+#invalid
+n
+
+#html
+<input type=number name=n min=120>
+#input
+n=121
+
+#html
+<input type=number name=n max=120>
+#input
+n=120
+
+#html
+<input type=number name=n max=120>
+#input
+n=110
+
+#html
+<input type=number name=n max=120>
+#input
+n=121
+#invalid
+n
+
+#html
+<input type=number name=n min=12e+2>
+#input
+n=1200
+
+#html
+<input type=number name=n min=12e+2>
+#input
+n=1199
+#invalid
+n

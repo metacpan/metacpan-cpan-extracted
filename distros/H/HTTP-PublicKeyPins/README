@@ -1,0 +1,168 @@
+NAME
+
+    HTTP::PublicKeyPins - Generate RFC 7469 HTTP Public Key Pin (HPKP)
+    header values
+
+VERSION
+
+    Version 0.14
+
+SYNOPSIS
+
+    Make it more difficult for the bad guys to Man-In-The-Middle your users
+    TLS sessions
+
+        use HTTP::Headers();
+        use HTTP::PublicKeyPins qw( pin_sha256 );
+    
+        ...
+        my $h = HTTP::Headers->new();
+        $h->header( 'Public-Key-Pins-Report-Only',
+                'pin-sha256="'
+              . pin_sha256('/etc/pki/tls/certs/example.pem')
+              . '"; pin-sha256="'
+              . pin_sha256('/etc/pki/tls/certs/backup.req')
+              . '"; report-uri="https://example.com/pkp-report.pl' );
+
+DESCRIPTION
+
+    This module allows the calculation of RFC 7469 HTTP Public Key Pin
+    header values. This can be used to verify your TLS session to a remote
+    server has not been hit by a Man-In-The-Middle attack OR to instruct
+    your users to ignore any TLS sessions to your web service that does not
+    use your Public Key
+
+EXPORT
+
+ pin_sha256
+
+    This function accepts the path to a X.509 Certificate
+    <http://tools.ietf.org/html/rfc5280>. It will load the public key from
+    the certificate and prepare the appropriate value for the pin_sha256
+    parameter of the Public-Key-Pins value. This function will also make an
+    attempt to read public keys (in PEM (SubjectPublicKeyInfo
+    <http://tools.ietf.org/html/rfc5280#section-4.1.2.7> or PKCS#1
+    <https://tools.ietf.org/html/rfc2437>) or DER format), private keys (in
+    PEM PKCS#1 or DER format) and PKCS#10 Certificate Requests
+    <https://tools.ietf.org/html/rfc2986> in PEM or DER format.
+
+SUBROUTINES/METHODS
+
+    None. This module only has the one exported function.
+
+DIAGNOSTICS
+
+    Failed to open %s for reading
+
+      Failed to open the supplied X.509 Certificate, PKCS10 Certificate
+      Request, Private or Public Key file
+
+    Failed to read from %s
+
+      Failed to read from the X.509 Certificate, PKCS10 Certificate
+      Request, Private or Public Key file
+
+    %s is not an X.509 Certificate, PKCS10 Certificate Request, Private or
+    Public Key
+
+      The supplied input file does not look like X.509 Certificate File,
+      PKCS10 Certificate Request, Private or Public Key. These files may be
+      encoded in PEM or DER format. A PEM encoded X.509 Certificate file
+      has the following header
+
+        -----BEGIN CERTIFICATE-----
+
+      A PEM encoded PKCS#10 Certificate Request has the following header
+
+        -----BEGIN CERTIFICATE REQUEST-----
+
+      A PEM encoded PKCS#1 Public Key has the following header
+
+        -----BEGIN RSA PUBLIC KEY-----
+
+      A PEM encoded PKCS#1 Private Key has the following header
+
+        -----BEGIN RSA PRIVATE KEY-----
+
+      A PEM encoded SubjectPublicKeyInfo Public Key has the following
+      header
+
+        -----BEGIN PUBLIC KEY-----
+
+CONFIGURATION AND ENVIRONMENT
+
+    HTTP::PublicKeyPins requires no configuration files or environment
+    variables.
+
+DEPENDENCIES
+
+    HTTP::PublicKeyPins requires the following non-core modules
+
+      Convert::ASN1
+      Crypt::PKCS10
+      Crypt::OpenSSL::RSA
+      Crypt::OpenSSL::X509
+      Digest
+     
+
+INCOMPATIBILITIES
+
+    None known.
+
+SEE ALSO
+
+    RFC 7469 - Public Key Pinning Extension for HTTP
+    <http://tools.ietf.org/html/rfc7469>
+
+    X.509 Certificate <http://tools.ietf.org/html/rfc5280>
+
+    PKCS#1 <https://tools.ietf.org/html/rfc2437>
+
+    PKCS#10 <https://tools.ietf.org/html/rfc2986>
+
+AUTHOR
+
+    David Dick, <ddick at cpan.org>
+
+BUGS AND LIMITATIONS
+
+    Please report any bugs or feature requests to bug-http-publickeypins at
+    rt.cpan.org, or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=HTTP-PublicKeyPins. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc HTTP::PublicKeyPins
+
+    You can also look for information at:
+
+      * RT: CPAN's request tracker (report bugs here)
+
+      http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTTP-PublicKeyPins
+
+      * AnnoCPAN: Annotated CPAN documentation
+
+      http://annocpan.org/dist/HTTP-PublicKeyPins
+
+      * CPAN Ratings
+
+      http://cpanratings.perl.org/d/HTTP-PublicKeyPins
+
+      * Search CPAN
+
+      http://search.cpan.org/dist/HTTP-PublicKeyPins/
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2015 David Dick.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. This program is distributed in the
+    hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+    implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+    PURPOSE.
+

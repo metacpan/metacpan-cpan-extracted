@@ -1,0 +1,105 @@
+HTML::Template::Default - provide multiple template sources and use a default
+===============================================
+
+SYNOPSIS
+
+   use HTML::Template::Default;
+   
+   $ENV{HTML_TEMPLATE_ROOT} = "$ENV{DOCUMENT_ROOT}/.templates";
+   
+   my $tmpl = HTML::Template::Default->new(
+      filename => 'gallery.html',
+      scalarref => \q{
+         <html>
+         <head>
+         <title><TMPL_VAR TITLE></title>
+         </head>
+         <body>
+         <h1><TMPL_VAR TITLE></h1>
+         <p><TMPL_VAR CONTENT></p>   
+         </body>
+         </html>
+      },
+      # ... other options just as you would pass to HTML::Template ...
+   );
+
+
+
+DESCRIPTION
+
+I have code, scripts, and CGI::Application apps, that are in use by multiple clients.
+It may be in a shared hosting environment, for example.
+
+Clients, users, want to be able to have radically different looks for an application.
+So, I want my scripts to use HTML::Template, to let a web designer make changes to 
+the template without knowing code.
+
+The most useful way I have of doing this is with this module.
+
+It allows you to provide a default template source as a scalarref, arrayref, or filehandle, in
+addition to providing a filename source. 
+And what this code does, is that if it finds the filename on disk, it will use that, otherwise,
+your default provided is used.
+
+Usually HTML::Template crashes if it looks for a filename source and it is not on disk.
+It also crashes if you provide multiple sources for a template.
+
+   Essentially, this allows you to provide multiple template sources to HTML::Template, the priority
+   is to use filename source if found, otherwise it uses another source provided.
+
+
+The files are sought in $ENV{HTML_TEMPLATE_ROOT}, and any 'path' arguments provided to constructor.
+Just like HTML::Template works.
+
+So, if the webdesigner or user wants to provide their own template, they simply create the file
+on disk, and it's done. No code change, no change of config files, etc.
+If anything is wrong, they just delete their template file.
+
+An alternative to using this module..
+
+   This module allows me to specify a template for the user without having a file on disk.
+
+   Because the other option which should work.. would be to provide multiple paths, and the user's
+   path first, and then lastly a place where I will have my default template.
+
+   Here's how you would use normal HTML::Template to do that..
+
+      use HTML::Template;
+      
+      my $template = HTML::Template->new(
+         filename => 'gallery.html',
+         paths => [
+            "$ENV{DOCUMENT_ROOT}/.templates",
+            '/shared/.templates',
+            ],
+      );
+
+   This example should work, provided there is a gallery.html file in '/shared/.templates'.
+   If one is found in "$ENV{DOCUMENT_ROOT}/.templates" first, that one would be used.
+
+   The disadvantage of this approach, is that you must have a file on disk at some location 
+   where all users can read, etc.
+
+
+INSTALLATION
+
+perl Makefile.PL
+make test
+make install
+
+DEPENDENCIES
+
+   Carp
+   Cwd
+   HTML::Template
+   LEOCHARRE::Debug
+   Test::Simple
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Leo Charre leocharre at cpan dot org
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+   

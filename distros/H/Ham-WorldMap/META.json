@@ -1,0 +1,47 @@
+{
+   "abstract" : "Creates an Imager image containing an equirectangular projection of the world map, with optional Maidenhead locator grid and day/night illumination showing the area of enhanced propagation known as the 'grey line'. Also utility methods for adding dots at locator positions or lat/long coords, and filling grid squares with colour to provide a 'heat map' of activity from these squares.",
+   "author" : [
+      "Matt Gumbley <devzendo@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Ham-WorldMap",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "1.28",
+            "File::ShareDir" : "1.102",
+            "Ham::Locator" : "0.1000",
+            "Imager" : "1.005",
+            "Math::Trig" : "1.23",
+            "POSIX" : "1.30",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.01"
+}

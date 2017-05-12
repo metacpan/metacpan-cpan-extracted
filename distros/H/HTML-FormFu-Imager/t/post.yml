@@ -1,0 +1,12 @@
+---
+elements:
+  - type: File
+    name: 100x100_gif
+    inflators: 
+      - type: Imager
+    validators:
+      - type: Imager::Size
+        pixels: 100
+    transformers:
+      - type: Imager
+        scale: { xpixels: 150 }

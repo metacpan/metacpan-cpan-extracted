@@ -1,0 +1,54 @@
+Revision history for Perl extension HTTP::Parser::XS.
+
+0.17
+	- update picohttpparser (runs faster / does slightly more strict parsing)
+
+0.16
+	- documentation about PATH_INFO
+
+0.15
+	- deny HTTP header field with an empty name
+
+0.14
+	- do not include '#' and the following characters in URI in PATH_INFO or QUERY_STRING
+
+0.13
+	- fix compile error on GCC < 3 (RT #63074)
+
+0.12
+	- fix undeclared dependency on URI::Escape (RT #62716)
+	- fix parsing of protocol version in the pure perl impl to exactly match that of XS
+
+0.11
+	- fix build error due to the use of Module::Install::ReadmeMarkdownFromPod (RT #62589)
+
+0.10
+	- support for HTTP response parsing (by gfx,mala,tokuhirom)
+
+0.09
+	- improve compatibility (mainly Windows, RT #61133)
+
+0.08
+	- improve compatibility (mainly Solaris, thanks to gfx)
+
+0.07  Tue Mar 02 15:40:00 2010
+	- fix build error when using older versions of Pod::Text
+
+0.06  Tue Feb 23 06:16:00 2010
+	- fix memory leak, add more checks (thanks to charsbar)
+	- prereq Test::More (RT #54358)
+
+0.05  Fri Oct 23 21:12:00 2009
+	- no more (implicitly) depend on Exporter 5.63 (RT #50607)
+
+0.04  Fri Oct 16 08:15:00 2009
+	- fix memory leak (thanks to nothingmuch for writing the patch)
+
+0.03  Fri Oct 02 06:30:00 2009
+	- add REQUEST_URI to response
+
+0.02  Tue Sep 29 12:55:00 2009
+	- url-decode PATH_INFO
+
+0.01  Mon Sep 14 11:45:00 2009
+	- initial version

@@ -1,0 +1,71 @@
+{
+   "abstract" : "Reformat HTML fragment to strict criteria",
+   "author" : [
+      "Nicholas Bamber <nicholas@periapt.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110580",
+   "keywords" : [
+      "HTML",
+      "Clean",
+      "XSS",
+      "end tags",
+      "YUI rich text editor"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-Acid",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Benchmark" : 0,
+            "Perl6::Slurp" : 0,
+            "Test::Differences" : 0,
+            "Test::More" : "0.94",
+            "Test::NoWarnings" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::Parser" : "3",
+            "Readonly" : 0,
+            "String::Dirify" : 0,
+            "version" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Data::FormValidator::Filters::HTML::Acid" : {
+         "file" : "lib/Data/FormValidator/Filters/HTML/Acid.pm",
+         "version" : "v0.0.3"
+      },
+      "HTML::Acid" : {
+         "file" : "lib/HTML/Acid.pm",
+         "version" : "v0.0.3"
+      },
+      "HTML::Acid::Buffer" : {
+         "file" : "lib/HTML/Acid/Buffer.pm",
+         "version" : "v0.0.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/periapt/HTML-Acid/tree"
+      }
+   },
+   "version" : "v0.0.3"
+}

@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <%$style_sheet_link%>
+    <title>ConfigDig: An ht://Dig Admin Tool</title>
+  </head>
+
+  <body>
+    <h1 align="center">ConfigDig</h1>
+    <h2 align="center">Indexed Site Administration</h2>
+<center>
+<form action="view_site.cgi" method="POST">
+<center><font color="#FF0000"><%$status_msg%></font></center>
+<table align=center border=1>
+<tr>
+	  <td>Manage ht://Dig Site: </td>
+	  <td><select name="site"><%$site_list%></select>
+</td>
+</tr>
+<tr>
+	  <td colspan=2 align=center><input type="submit" name="action" value="Configure"> | <input type="submit" name="action" value="Unregister"></form></td>
+<tr>
+	    <td colspan=2 align="center"><form action="new_site.cgi" method="POST"><input type="submit" name="action" value="Register New"></form></td>
+</tr>
+<tr>
+	    <td colspan="2" align="center"><form action="edit_conf.cgi" method="POST"><input type="submit" name="action" value="Modify Global Settings"></form></td>
+</tr>
+<tr>
+	    <td colspan=2 align="center"><form action="autodetect.cgi" method="POST"><input type="submit" name="action" value="Autodetect ht://Dig Conf Files"></form></td>
+</tr>
+</table>
+</center>
+
+
+  </body>
+</html>

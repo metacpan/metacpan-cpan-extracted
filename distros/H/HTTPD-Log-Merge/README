@@ -1,0 +1,34 @@
+HTTPD::Log::Merge
+==================
+
+Description
+-----------
+
+
+HTTPD::Log::Merge is a simple module for merging httpd logfiles. It takes a
+list of log files and merges them based on the date of each entry in the
+logfile. It works for NSCA style httpd logs (Common Log Format, Extended Log
+Format and the like) - see the HTTPD::Log::Filter manpage for more information
+on supported log formats
+
+Installation
+------------
+
+The usual ...
+
+> perl Makefile.PL
+> make
+[ > make test ]
+> make install
+
+Copyright
+---------
+
+Copyright (c) 2001 Ave Wrigley. All rights reserved. This program is free
+software; you can redistribute it and/or modify it under the same terms as Perl
+itself.
+
+Author
+------
+
+Ave Wrigley <Ave.Wrigley@itn.co.uk>

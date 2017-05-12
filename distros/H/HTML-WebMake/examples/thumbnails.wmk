@@ -1,0 +1,57 @@
+<webmake>
+<!--
+
+     Generate a site with pages of thumbnails linking to full-sized images.
+
+     Note that this example is incomplete, to save download time; it will not
+     work correctly unless you download and extract the sample images from:
+
+     	http://webmake.taint.org/released/example_data.zip
+
+-->
+
+<!-- ----------------------------------------------------------------- -->
+
+<use plugin=thumbnail_tag />
+
+<template name="thumbnail.thumbsize">100</template>
+<template name="thumbnail.bordercolor">#000000</template>
+<template name="thumbnail.borderwidth">2</template>
+
+<!-- ----------------------------------------------------------------- -->
+
+<!--
+  Do a search for image files under the 'data/images' subdirectory.
+  Ignore any existing thumbnail files.
+  While we're there, search for metadata files called 'metadata.csv'.
+
+  Also, modify the names so they always begin with 'data/images'
+	namesubst="s,^,data/images/," listname=all_images
+-->
+  
+<media src=data/images name="*.jpg"
+	skip="*_thumb.jpg"
+	metatable="metadata.csv" delimiter="|"
+	listname=all_images
+	/>
+
+<!-- sort the filename list, by name -->
+<{perl
+  my @list = get_list ("all_images");
+  set_list ("all_images", sort @list);
+  '';
+}>
+
+<!-- and now write the output, directly to the output file, using the
+  helper 'make_thumbnail_table' function to lay it out in a 2-cell-wide
+  table -->
+
+<out file="thumbnails.html">
+  <html><head></head><body><table>
+
+  <{perl make_thumbnail_table (2, get_list ('all_images')); }>
+
+  </table></body></html>
+</out>
+
+</webmake>

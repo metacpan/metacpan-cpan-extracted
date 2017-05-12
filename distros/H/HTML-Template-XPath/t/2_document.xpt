@@ -1,0 +1,14 @@
+Header
+<CONTENT_VAR NAME="/aaa/bbb">
+<CONTENT_VAR NAME="document('2_document_b.xml')/aaa/bbb">
+<CONTENT_VAR NAME="document('2_document_a.xml')/aaa/bbb">
+<CONTENT_VAR NAME="document('../2_document_c.xml')/aaa/bbb">
+<CONTENT_VAR NAME="document('dir/2_document_d.xml')/aaa/bbb">
+<CONTENT_VAR NAME="document('/dir/dir/2_document_d.xml')/aaa/bbb">
+<CONTENT_VAR NAME="bbb">
+<CONTENT_VAR NAME="document('2_document_b.xml')bbb">
+<CONTENT_VAR NAME="document('2_document_a.xml')bbb">
+<CONTENT_VAR NAME="document('../2_document_c.xml')bbb">
+<CONTENT_VAR NAME="document('dir/2_document_d.xml')bbb">
+<CONTENT_VAR NAME="document('/dir/dir/2_document_d.xml')bbb">
+Footer

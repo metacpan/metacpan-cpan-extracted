@@ -1,0 +1,182 @@
+NAME
+    HTML::Table::FromDatabase - a subclass of HTML::Table to easily generate
+    a HTML table from the result of a database query
+
+SYNOPSIS
+     my $sth = $dbh->prepare('select * from my_table')
+        or die "Failed to prepare query - " . $dbh->errstr;
+     $sth->execute() or die "Failed to execute query - " . $dbh->errstr;
+
+     my $table = HTML::Table::FromDatabase->new( -sth => $sth );
+     $table->print;
+
+DESCRIPTION
+    Subclasses HTML::Table, providing a quick and easy way to produce HTML
+    tables from the result of a database query.
+
+    I often find myself writing scripts which fetch data from a database and
+    present it in a HTML table; often resulting in pointlessly repeated code
+    to take the results and turn them into a table.
+
+    HTML::Table itself helps here, but this module makes it even simpler.
+
+    Column headings are taken from the field names returned by the query,
+    unless overridden with the *-override_headers* or *-rename_headers*
+    options.
+
+    All options you pass to the constructor will be passed through to
+    HTML::Table, so you can use all the usual HTML::Table features.
+
+INTERFACE
+    new Constructor method - consult HTML::Table's documentation, the only
+        difference here is the addition of the following parameters:
+
+        `-sth'
+            (required) a DBI statement handle which has been executed and is
+            ready to fetch data from
+
+        `-callbacks'
+            (optional) specifies callbacks/transformations which should be
+            applied as the table is built up (see the CALLBACKS section
+            below).
+
+        `-html'
+            (optional) can be *escape* or *strip* if you want HTML to be
+            escaped (angle brackets replaced with &lt; and &gt;) or stripped
+            out with HTML::Strip.
+
+        `-override_headers'
+            (optional) provide a list of names to be used as the column
+            headings, instead of using the names of the columns returned by
+            the SQL query. This should be an arrayref containing the heading
+            names, and the number of heading names must match the number of
+            columns returned by the query.
+
+        `-rename_headers'
+            (optional) provide a hashref of oldname => newname pairs to
+            rename some or all of the column names returned by the query
+            when generating the table headings.
+
+        `-pad_empty_cells'
+            (optional, default 1) pad empty cells with an `&nbsp;' to ensure
+            they're rendered with borders appropriately. Many browsers
+            "skip" empty cells, leading to missing borders around them,
+            which many people consider broken. To stop this, by default
+            empty cells receive a non-breaking space as their content. If
+            you don't want this behaviour, set this option to a false value.
+
+CALLBACKS
+  Per-cell callbacks
+    You can pass an arrayref of hashrefs describing callbacks to be
+    performed as the table is built up, which can modify the data before the
+    table is produced.
+
+    Each callback receives the value and, as of 0.04, the $row hashref
+    (normally you will only want to look at the value, but occasionally I've
+    found cases where the callback needs to see the rest of the row, for
+    various reasons).
+
+    This can be very useful; one example use-case would be turning the
+    values in a column which contains URLs into clickable links:
+
+     my $table = HTML::Table::FromDatabase->new(
+        -sth => $sth,
+        -callbacks => [
+            {
+                column => 'url',
+                transform => sub { $_ = shift; qq[<a href="$_">$_</a>]; },
+            },
+        ],
+     );
+
+    You can match against the column name using a key named `column' in the
+    hashref (as illustrated above) or against the actual value using a key
+    named `value'.
+
+    You can pass a straight scalar to compare against, a regex (using qr//),
+    or a coderef which will be executed to determine if it matches.
+
+    You pass a coderef to be called for matching cells via the `transform'
+    key. You can use `callback' instead if you want your coderef to be
+    called but its return value to be discarded (i.e. you don't intend to
+    modify the value, but do something else).
+
+    Another example - displaying all numbers to two decimal points:
+
+     my $table = HTML::Table::FromDatabase->new(
+        -sth => $sth,
+        -callbacks => [
+            {
+                value => qr/^\d+$/,
+                transform => sub { return sprintf '%.2f', shift },
+            },
+        ],
+     );
+
+    It is hoped that this facility will allow the easiness of quickly
+    creating a table to still be retained, even when you need to do things
+    with the data rather than just displaying it exactly as it comes out of
+    the database.
+
+  Per-row callbacks
+    You can also supply callbacks which operate on an entire row at a time
+    with the `-row_callbacks' option, which simply takes an arrayref of
+    coderefs, each of which will be called in turn, will receive the row
+    hashref as its first parameter, and can modify the row in whatever way
+    is desired.
+
+      my $table = HTML::Table::FromDatabase->new(
+          -sth => $sth,
+          -row_callbacks => [
+              sub {
+                my $row = shift;
+                # Do things with $row here
+              },
+          ],
+      ):
+
+    If a row callback sets the `$row' hashref to undef, that row will be
+    skipped.
+
+    A more in-depth, if somewhat contrived, example:
+
+      my $table = HTML::Table::FromDatabase->new(
+          -sth => $sth,
+          -row_callbacks => [
+              sub {
+                my $row = shift;
+                if ($row->{name} eq 'Bob') {
+                    # Hide this row
+                    $row = undef;
+                } elsif ($row->{name} eq 'John') {
+                    # John likes to be called Jean these days:
+                    $row->{name} = 'Jean';
+                }
+              },
+          ],
+      );
+
+DEPENDENCIES
+    HTML::Table, obviously :)
+
+    HTML::Strip is required if you use the `-html => 'strip'' option.
+
+    HTML::Entities is required if you use the `-html => 'encode'' option.
+
+AUTHOR
+    David Precious, <davidp@preshweb.co.uk>
+
+    Feel free to contact me if you have any comments, suggestions or bugs to
+    report.
+
+THANKS
+    Thanks to Ireneusz Pluta for reporting bug with -override_headers /
+    -rename_headers option and supplying patch in RT ticket #50164.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2008-2011 by David Precious
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.7 or, at
+    your option, any later version of Perl 5 you may have available.
+

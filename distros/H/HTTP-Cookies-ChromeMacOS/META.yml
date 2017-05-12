@@ -1,0 +1,26 @@
+---
+abstract: "MacOSç³»ç»�è¯»å��Chrome Cookies"
+author:
+  - 'MC Cheung <mc.cheung@aol.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTTP-Cookies-ChromeMacOS
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Crypt::CBC: '0'
+  Crypt::OpenSSL::AES: '0'
+  DBI: '0'
+  PBKDF2::Tiny: '0'
+  perl: '5.006'
+version: '0.02'

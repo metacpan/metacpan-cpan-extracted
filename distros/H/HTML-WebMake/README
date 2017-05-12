@@ -1,0 +1,185 @@
+
+Welcome to WebMake!
+-------------------
+
+WebMake is a simple content management system, based around a templating system
+for HTML documents, with lots of built-in smarts about what a "typical"
+informational website needs in the way of functionality; metadata,
+sitemapping, navigational aids, and (of course) embedded perl code. ;)
+
+It requires no dynamic scripting capabilities on the server; WebMake sites can
+be deployed to a plain old FTP site without any problems.
+
+It allows the separation of responsibilities between the content editors, the
+HTML page designers, and the site architect; only the site architect needs to
+edit the WebMake file itself, or know perl or WebMake code.
+
+A multi-level website can be generated entirely from 1 or more WebMake files.
+Text can be edited as standard HTML or converted from other formats, including
+plain text (using the Text::EtText module).
+
+WebMake is GNU software -- see the included file "LICENSE" for details.
+
+Name           DSLI  Description                                  Info
+-------------  ----  -------------------------------------------- -----
+HTML::WebMake  RmpO  a simple web site management system          JMASON
+
+---------------------------------------------------------------------------
+
+INSTALLATION
+------------
+
+WebMake works best with the following Perl modules installed.  It will work
+without them, but some features may not be available.
+
+Text::EtText
+
+Required to use the "text/et" format for content items. Strongly recommended.
+
+HTML::Parser
+
+Required to support the WebMake HTML cleaner filter, which will clean up
+your HTML for you.  Also provides the HTML::Entities module, required by
+Text::EtText.  So if you don't have this module, you won't be able to have
+your HTML beautified, or use the "text/et" format for content items.
+
+IO::String
+
+Required to use the <{perlout}> tag.
+
+Image::Size
+
+Required to automatically add image size information using the
+${IMGSIZE} tag.  If you don't have this installed, you won't be able to
+use this magic variable.
+
+DB_File
+
+Provided with most UNIX versions of perl; more efficient than the other
+supported database formats that WebMake will use if it's not installed.
+
+---------------------------------------------------------------------------
+
+For all UNIX platforms:
+-----------------------
+
+Untar the .tar.gz file, and "cd" into the directory. Then run:
+
+	perl Makefile.PL
+	make
+	make install		(as root)
+
+That will install the HTML::WebMake modules and the "webmake" command.
+
+To install the optional modules, do this:
+
+	perl -MCPAN -e shell
+	install Text::EtText
+	install Image::Size
+	install HTML::Parser
+	install IO::String
+	quit
+
+---------------------------------------------------------------------------
+
+For Windows using ActiveState Perl or IndigoPerl:
+-------------------------------------------------
+
+Unzip the .zip distribution, and "cd" into the directory created. Then
+run:
+
+	perl windows_install.pl
+
+This will generate some .bat files which allow you to run the scripts
+from that directory.
+
+If this command fails, you probably do not have Perl installed, or the
+directory it's installed in is not in your PATH.  Check this and try
+again.
+
+Installing Text::EtText, Image::Size, IO::String and HTML::Parser is a little
+more difficult; it'll depend on which version of Windows Perl you're using.
+
+For ActivePerl, the Perl documentation on the "ActiveState website"
+[ActivePerl], provides information on how to use PPM to install Perl
+modules.
+
+	[ActivePerl]: http://www.activestate.com/
+
+IndigoPerl includes a pair of Package Manager applications which can
+easily be used to install Perl modules. Check out "the IndigoPerl site"
+[IndigoPerl] for more info.
+
+	[IndigoPerl]: http://www.indigostar.com/indigoperl.htm
+
+Text::EtText can also be downloaded directly from the "EtText download page".
+
+	[EtText home site]: http://ettext.taint.org/download.html
+
+---------------------------------------------------------------------------
+
+For Windows using ActiveState Perl, or IndigoPerl, and NMAKE:
+-------------------------------------------------------------
+
+Another way to install WebMake is as a traditional Perl module, using
+"perl Makefile.PL" and Microsoft's NMAKE, included with MS DevStudio.
+Here's what one user has to say on this subject:
+
+    nmake works nicely, and the installation process looks the same as on
+    other platforms.
+
+    My understanding is that nmake.exe is available for free from Redmond.
+    In fact I downloaded it just a few minutes ago, following the
+    suggestion found on the IndigoPerl home page:
+
+      Installing CPAN modules requires that you have Microsoft DevStudio
+      or nmake.exe installed.  If you are installing modules that contain
+      xs files, then you need DevStudio, otherwise you only need
+      nmake.exe.  You can download nmake from [the url below].
+
+      Run the self-extracting exe and copy nmake.exe to the perl\bin
+      directory.
+
+[the URL is:
+http://download.microsoft.com/download/vc15/Patch/1.52/W95/EN-US/Nmake15.exe
+]
+
+    Nmake15.exe expands to nmake.exe (64K) and Nmake.Err (5k) - a text
+    file.  I copied both to C:\perl\bin, then renamed nmake.exe to
+    make.exe and now I can pretend to be on Unix:
+
+        H:\devperl\webmake\HTML-WebMake-0.5>makefile
+        Writing Makefile for HTML::WebMake
+
+	H:\devperl\webmake\HTML-WebMake-0.5>make ...
+
+        H:\devperl\webmake\HTML-WebMake-0.5>make test
+        ...
+
+The upshot is: if you download NMAKE, rename it to "make.exe", and install
+it in your path, Perl can install modules just fine using the traditional
+perl module install procedure on Windows.  In fact, it may be possible to
+simply use NMAKE as "nmake.exe" instead of "make.exe", from the look of
+it.
+
+---------------------------------------------------------------------------
+
+For Macs using MacPerl:
+-----------------------
+
+(haven't tried yet. TODO)
+
+You will probably need to install quite a few perl modules.  Start with the
+CPAN-MAC set (see the MacPerl FAQ), and try to ensure you have the following
+modules installed:
+
+	HTML::Parser
+	File::Spec
+	Text::EtText	(optional)
+	Image::Size	(optional)
+	IO::String	(optional)
+
+
+
+---------------------------------------------------------------------------
+

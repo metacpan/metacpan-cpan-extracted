@@ -1,0 +1,48 @@
+#!/usr/bin/perl -w
+use strict;
+
+sub report {
+    my($desc, $count, $sub) = @_;
+    print STDERR "[[ timing ]] $desc\n";
+    print STDERR timestr(timeit($count, $sub))."\n";
+}
+
+sub mark {
+    print STDERR "------\n";
+}
+
+my %options = @ARGV;
+srand(delete $options{srand}) if exists $options{srand};
+defined(my $size   = delete $options{size})   || die "No size option";
+defined(my $string = delete $options{string}) || die "No string option";
+defined(my $inc    = delete $options{INC})    || die "No INC option";
+die "Unknown option ", join(",", keys %options) if %options;
+@INC = map { s/%(\d+)/chr($1)/eg; $_ } split /:/, $inc;
+eval '
+    use Benchmark;
+
+    use Heap::Binomial;
+    use Heap::Elem::Num qw(NumElem);
+    use Heap::Elem::Str qw(StrElem);
+    1' || die $@;
+
+my @input;
+if ($string) {
+    for (1..$size) {
+        push @input, StrElem("A" . rand(2*$size));
+    }
+} else {
+    for (1..$size) {
+        push @input, NumElem(rand(2*$size));
+    }
+}
+
+my $heap = Heap::Binomial->new;
+mark;
+report("Insert of $size elements into Heap::Binomial",
+       $size,
+       sub { $heap->add(pop @input) });
+undef @input;
+report("Extract $size elements from Heap::Binomial",
+       $size,
+       sub { $heap->extract_minimum });

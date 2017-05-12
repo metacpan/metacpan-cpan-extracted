@@ -1,0 +1,33 @@
+<wmmeta name="Title" value="The &wmdollar;{WebMake.*} Magic Variables" />
+<wmmeta name="Section" value="06-magic_vars" />
+<wmmeta name="Score" value="30" />
+<wmmeta name="Abstract">
+information about the environment WebMake is run in, such as the version of WebMake, the timestamp, the user who ran it, etc.
+</wmmeta>
+
+WebMake defines several magic variables that expand to useful information about
+the current environment.  These are as follows.  Each one is illustrated with
+the value at the time this documentation was generated.
+
+	**WebMake.Version**:	The version of WebMake
+	that generated this site.  (${WebMake.Version})
+
+	**WebMake.GeneratorString**:	A __generator string__ for
+	WebMake; this is in the form **WebMake/v.vv** where __v.vv__
+	is the version number of WebMake.  (${WebMake.GeneratorString})
+
+	**WebMake.Who**:	The username of the person who generated
+	the site.  (${WebMake.Who})
+
+	**WebMake.Time**:	The time the site was last generated.
+	(${WebMake.Time})
+
+	**WebMake.OutFile**:	The filename used in the current &lt;out&gt; tag.
+	(${WebMake.OutFile})
+
+	**WebMake.OutName**:	The name used in the current &lt;out&gt; tag.
+	(${WebMake.OutName})
+
+	**WebMake.PerlLib**:	The directory WebMake expects to find
+	Perl code library files (ie. plugins) in. (${WebMake.PerlLib})
+

@@ -1,0 +1,56 @@
+[% MACRO form_field BLOCK %]
+<!-- widget : [% field.widget %], has errors ? [% field.has_errors %] -->
+[%- IF field.has_errors; SET error_class = 'error'; END; %]
+<div class="control-group  [% error_class %]">
+[% IF field.widget == "Radiobox" %]
+  <label class="control-label" for="[% field.id %]">[% field.label %]</label>
+  <div class="controls [% error_class %]">
+  <ul class="inputs-list">
+  [% FOR option IN field.options %]
+    <li>
+     <label>
+[% name.replace('\W+', '_') %]
+     <input type="radio" value="[% option.value.replace('"', '\"') %]"
+        name="[% field.name %]"
+     [% IF option.value == field.fif %]
+        checked="checked"
+     [% END %]>
+     [% option.label %]
+        <span>[% option.label %]</span>
+      </label>
+    </li>
+   [% END %]
+   </ul>
+[% ELSE %]
+  <label class="control-label" for="[% field.id %]">[% field.label %]</label>
+  <div class="controls">
+  [% SWITCH field.widget %]
+  [% CASE 'Text' %]
+  <input type="text" name="[% field.html_name %]" id="[% field.id %]" value="[% field.fif.replace('"', '\"') %]" class="[%error_class%]" [% IF field.required %]class="required"[% END %]>
+  [% CASE 'select' %]
+  <select name="[% field.html_name %]" class="medium" id="[% field.id %]" class="[%error_class%]" [% IF field.required %]class="required"[% END %]>
+     [% FOR option IN field.options %]
+       <option value="[% option.value.replace('"', '\"') %]"
+       [% IF option.value == field.fif %]
+          selected="selected"
+       [% END %]>
+       [% option.label %]
+       </option>
+     [% END %]
+   </select>
+  [% CASE 'Checkbox' %]
+  <input type="checkbox" name="[% field.html_name %]" id="[% field.id %]" value="1" class="[%error_class%]" />
+  [% CASE 'Textarea' %]
+  <textarea name="[% field.html_name %]" id="[% field.id %]" class="xlarge [% error_class %]"
+        rows="[% field.rows %]" cols="[% field.cols %]" [% IF field.required %]class="required"[% END %]>[% field.fif %]</textarea>
+  [% CASE 'Hidden' %]
+  <input type="hidden" name="[% field.html_name %]" id="[% field.id %]"
+       value="[% field.fif %]" [% IF field.required %]class="required"[% END %] />
+  [% END %]
+  [% IF field.required %]*[% END %]
+[% END %]
+[% IF field.has_errors %]<span class="help-inline">[% field.errors.join(',') %]</span>[% END %]
+   </div>
+</div>
+[% END %]
+

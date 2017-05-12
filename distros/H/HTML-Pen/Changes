@@ -1,0 +1,6 @@
+Revision history for Perl extension Pen.
+
+0.01  Thu Sep  8 09:33:30 2011
+	- original version; created by h2xs 1.23 with options
+		-A Pen
+

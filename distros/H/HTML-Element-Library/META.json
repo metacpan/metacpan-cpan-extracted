@@ -1,0 +1,61 @@
+{
+   "abstract" : "HTML::Element convenience functions",
+   "author" : [
+      "Terrence Brannon <metaperl@gmail.com>",
+      "Marius Gavrilescu <marius@ieval.ro>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-Element-Library",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Slurp" : "0",
+            "HTML::PrettyPrinter" : "0",
+            "HTML::TreeBuilder" : "0",
+            "Test::More" : "0",
+            "Test::XML" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Array::Group" : "0",
+            "Data::Rmap" : "0",
+            "HTML::Element" : "0",
+            "HTML::FillInForm" : "0",
+            "List::MoreUtils" : "0",
+            "List::Rotation::Cycle" : "0",
+            "List::Util" : "0",
+            "Params::Validate" : "0",
+            "Scalar::Listify" : "0",
+            "perl" : "5.006000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://git.ieval.ro/?p=html-element-library.git"
+      }
+   },
+   "version" : "5.220000",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

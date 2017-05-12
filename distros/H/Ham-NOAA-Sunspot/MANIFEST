@@ -1,0 +1,16 @@
+Build.PL
+Changes
+lib/Ham/NOAA/Sunspot.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/data/predicted-sunspot-radio-flux.txt
+t/dist/critic.t
+t/dist/distribution.t
+t/dist/pod.t
+t/dist/podcoverage.t
+t/flux_by_year_month.t
+t/sunspot_by_year_month.t
+tap-harness-junit.xml

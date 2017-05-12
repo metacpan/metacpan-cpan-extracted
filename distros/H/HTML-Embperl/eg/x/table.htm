@@ -1,0 +1,116 @@
+
+<html>
+<head>
+<title>Embperl Examples - Dynamic Tables</title>
+</head>
+<body background="../images/jazzbkgd.gif">
+
+<h1>Embperl Examples - Dynamic Tables</h1>
+<hr><h3>This is a example of using the table tag to show the array @arr = ( 'A', 'B', 'C')</h3>
+
+[- @arr = ( 'A', 'B', 'C') ; -]
+<table border=1>
+   <tr>
+	<td> [+ $arr[$row] +] </td>
+   </tr>
+</table>
+
+
+
+<hr><h3>This is a example of using the table tag in embperl to show the environement</h3>
+
+[- @k = keys %ENV -]
+
+<h4>Using $row (one value per row)</h4>
+
+<table>
+  <TR>
+    <TH>Row</TH>
+    <TH>Var</TH>
+    <TH>Content</TH>
+  </TR>
+    <tr>
+        <td>[+ $i=$row +] </td>
+        <td>[+ $k[$row] +] </td>
+        <td>[+ $ENV{$k[$i]} +] </td>
+    </tr> 
+</table>
+
+<hr>
+<h4>Using $col (one value per column, only one row)</h4>
+
+[-$maxcol=99-]
+<table>
+    <tr>
+        <td>[+ $i=$col +] </td>
+        <td>[+ $k[$col] +] </td>
+        <td>[+ $ENV{$k[$i]} +] </td>
+    </tr> 
+</table>
+
+
+<hr><h4>Using $cnt and $maxcol (three values per row)</h4>
+
+[-$maxcol=3-]
+<table>
+    <tr>
+        <td>[+ $i=$cnt +] </td>
+        <td>[+ $k[$cnt] +] </td>
+        <td>[+ $ENV{$k[$i]} +] </td>
+    </tr> 
+</table>
+
+<hr><h3>Display an two dimensional array with one, two and three columns !</h3>
+<h4>Please take a look at the source in your browser to see the difference</h4>
+
+[-
+   $a[0][0] = '1/1' ;
+   $a[1][0] = '2/1' ;
+   $a[1][1] = '2/2' ;
+   $a[2][0] = '3/1' ;
+   $a[2][1] = '3/2' ;
+   $a[2][2] = '3/3' ;
+
+   $maxcol=99 ;
+-]
+   $a[[0][[0] = '1/1' ;<BR>
+   $a[[1][[0] = '2/1' ;<BR>
+   $a[[1][[1] = '2/2' ;<BR>
+   $a[[2][[0] = '3/1' ;<BR>
+   $a[[2][[1] = '3/2' ;<BR>
+   $a[[2][[2] = '3/3' ;<BR>
+
+<h4>$tabmode = default </h4>
+
+<table>
+    <tr>
+        <td>[+ $a[$row][$col] +] </td>
+    </tr> 
+</table>
+
+
+<hr><h4>$tabmode=3 + 48 ; $maxcol = 4; $maxrow = 4 </h4>
+[- $tabmode=3 + 48 ; $maxcol = 4; $maxrow = 4 -]
+
+<table>
+    <tr>
+        <td>[+ $a[$row][$col] +] </td>
+    </tr> 
+</table>
+
+<hr><h4> $tabmode=1 + 32 ; </h4>
+[- $tabmode=1 + 32 ; -]
+
+<table>
+    <tr>
+        <td>[+ $a[$row][$col] +] </td>
+    </tr> 
+</table>
+
+<p><hr>
+
+<small>HTML::Embperl (c) 1997-1998 G.Richter</small>
+
+
+</body>
+</html>

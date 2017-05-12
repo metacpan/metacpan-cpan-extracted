@@ -1,0 +1,36 @@
+<html>
+<head>
+<title>Tests for Embperl - Session Data (%mdat)</title>
+</head>
+
+
+<body>
+
+        [- if ($fdat{cnt} == 0)
+			{
+			$Apache::Session::Win32::sessions = {} if ($HTML::Embperl::TEST::loop++) ;
+			$mdat{cnt} = 0 ;
+			}
+		-]
+
+        $mdat{cnt} = [+ $mdat{cnt}  +] <br>
+        $fdat{cnt} = [+ $fdat{cnt}  +] <br>
+
+        equal ? [+ ($mdat{cnt} == $fdat{cnt})?'yes':'no'  +] <br>
+
+		[- @ks = grep (!/^_/, sort (keys %mdat)) ; $num = keys (%mdat) - $#ks - 1 ; -]
+		[+ $num > 0?"ok (num=$num)":"Not a session hash (num=$num)" +]<p>
+
+        [- $mdat{cnt}++  -]
+
+		[#
+		tied (%mdat) [+ $m = tied (%mdat) +]  <br>
+		ref          [+ ref ($m) +]  <br>
+		content      [+ do { my @tmp = map { "$_ = $mdat{$_}" } keys (%mdat) ; join (', ', @tmp) } +]  <br>
+		tied (%udat) [+ $u = tied (%udat) +]  <br>
+		ref          [+ ref ($u) +]  <br>
+		content      [+ do { my @tmp = map { "$_ = $udat{$_}" } keys (%udat) ; join (', ', @tmp) } +]  <br>
+		#]
+
+</body>
+</html>

@@ -1,0 +1,27 @@
+<wmmeta name="ltitle">Web Application / Content Management Systems</wmmeta>
+<wmmeta name="stitle">Cont. Man.</wmmeta>
+<wmmeta name="author">J&ouml;rn Clausen</wmmeta>
+<wmmeta name="cdate">2001-04-23</wmmeta>
+<wmmeta name="mdate">2001-04-23</wmmeta>
+
+    <ul>
+      <li>
+	<a href="http://xml.apache.org/cocoon/index.html">Cocoon</a>
+      </li>
+      <li>
+	<a href="http://axkit.org/">AxKit</a>
+      </li>
+      <li>
+	<a href="http://www.steelblue.com/">SteelBlue</a>
+      </li>
+      <li>
+	<a href="http://www.allaire.com/products/coldfusion/index.cfm">
+	  ColdFusion</a>
+      </li>
+      <li>
+	<a href="http://www.zope.org/">Zope</a>
+      </li>
+      <li>
+	<a href="http://www.midgard-project.org/">Midgard</a>
+      </li>
+    </ul>

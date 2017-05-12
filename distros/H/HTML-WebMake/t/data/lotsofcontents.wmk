@@ -1,0 +1,10 @@
+
+<contents src="log/lots_of_contents.tmp" name=".../*.html"
+	listname="all_files" />
+
+<for name=file values="${all_files}">
+  <out file="log/lotsofcontents.out/${file}">
+  ${${file}}
+  </out>
+</for>
+

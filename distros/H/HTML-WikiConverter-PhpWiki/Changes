@@ -1,0 +1,11 @@
+# Change log for HTML::WikiConverter::PhpWiki
+
+version: 0.51
+date:    Wed June 07 15:00:00 EST 2006
+changes:
+  - (bug 17550) "<br><br>" now becomes "%%% %%%"
+
+version: 0.50
+date:    Tue Jan 10 2006
+changes:
+  - Branched from main HTML::WikiConverter codebase.

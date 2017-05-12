@@ -1,0 +1,25 @@
+Build.PL
+Changes
+lib/HTTPD/ADS.pm
+lib/HTTPD/ADS/AbuseNotify.pm
+lib/HTTPD/ADS/Blocker.pm
+lib/HTTPD/ADS/DBI.pm
+lib/HTTPD/ADS/OpenProxyDetector.pm
+lib/HTTPD/ADS/Times.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml
+README
+scripts/createdb.sql
+scripts/dbstructure.html
+scripts/DefenseServer.pl
+scripts/EventServer.pl
+scripts/LogReader.pl
+t/001_load.t
+t/003_load.t
+t/004_load.t
+t/005_load.t
+Todo
+
+SIGNATURE    Added here by Module::Build

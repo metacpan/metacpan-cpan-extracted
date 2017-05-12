@@ -1,0 +1,41 @@
+Quick note:
+
+I have just taken over maintenance of HTTP::Daemon::SSL. This
+release fixes various bugs:
+ * http://rt.cpan.org/Ticket/Display.html?id=28417
+ * http://rt.cpan.org/Ticket/Display.html?id=21395
+ * http://rt.cpan.org/Ticket/Display.html?id=15470
+
+The todo list, in no particular order, is:
+
+ * convert build system to Module::Build
+ * change tests to use Test::More
+ * improve test cases
+
+Latest versions are available on CPAN. My subversion repository is
+also available:
+
+  http://cvs.pumptheory.com/ (browse)
+  http://cvs.pumptheory.com/repos/ (repository)
+
+Mark Aufflick, <mark@aufflick.com>
+
+-------
+
+HTTP::Daemon::SSL is a descendant of HTTP::Daemon that uses SSL
+sockets (via IO::Socket::SSL) instead of cleartext sockets.  It
+also handles SSL-specific problems, such as dealing with HTTP
+clients that attempt to connect to it without using SSL.
+
+In order to use HTTP::Daemon::SSL, you need to have IO::Socket::SSL
+v0.93 or newer installed as well as a recent version of libwww-perl.
+
+installation:
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+--
+(Peter Behroozi, behrooz at fas.harvard.edu (sic))

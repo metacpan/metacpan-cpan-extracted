@@ -1,0 +1,94 @@
+
+<html>
+<head>
+<title>Some Plain tests for Embperl</title>
+</head>
+
+<!-- Here is a comment -->
+
+<body>
+
+Here it starts with some HTML Text<P>
+
+All values should be undefined:
+
+$a = [+ $a || '' +] <BR>
+$b = [+ $b || '' +] <BR>
+$c = [+ $c || '' +] <BR>
+$d = [+ $d || '' +] <BR>
+$e = [+ $e || '' +] <BR>
+
+ARRAY @d = [+ do { my @tmp1 = @d; "@tmp1" } +] num = [+ @d +] <BR>
+ARRAY @x = [+ do { my @tmp1 = %x; "@tmp1" } +] num = [+ @x +]  <BR>
+HASH  %a = [+ do { my @tmp1 = %a; my @tmp11 = sort @tmp1 ; "@tmp11" } +]  num = [+ keys %a +] <BR>
+HASH  %y = [+ do { my @tmp2 = %y; my @tmp21 = sort @tmp2 ; "@tmp21" } +]  num = [+ keys %y +] <BR>
+
+
+First of all assign a value:
+[- $a = '(this is the value in $a)' -] <BR>
+[- @d = (1, 2, 3) ; @x = (9, 8, 7) -]
+[- %a = (1 => 'a', 2 => 'b', 3 => 'c') ; %y = (9 => 'x', 8 => 'y', 7 => 'z') -]
+
+
+Now we have some 'Umlaute':
+
+
+[- $b = "$a &auml;&ouml;&uuml;" -]
+
+Now lets look what we are getting from this:<BR>
+[+ $a +] [+ $b +]<BR>
+
+ARRAY @d = [+ "@d" +] num = [+ @d +] <BR>
+ARRAY @x = [+ "@x" +] num = [+ @x +]  <BR>
+HASH  %a = [+ do { my @tmp1 = %a; my @tmp11 = sort @tmp1 ; "@tmp11" } +]  num = [+ keys %a +] <BR>
+HASH  %y = [+ do { my @tmp2 = %y; my @tmp21 = sort @tmp2 ; "@tmp21" } +]  num = [+ keys %y +] <BR>
+
+And now a and b together: [+ "$a$b" +]<P>
+
+Here we have some HTML tags within the perl code, Embperl will delete them!<BR>
+
+[+ $c = <BR> 6 + 17 <font size="3"> * 3 </font> &nbsp;&nbsp; + 0 +]
+[+ "SELECT * <br> FROM a ORDER BY b USING <; Hi There>" +]
+
+Here we have something which looks like a HTML tag, but does not start with<br>
+a character, Embperl does not change them!<BR>
+
+[+ "SELECT * FROM a ORDER BY b USING <; Hi There>" +]
+
+Embperl will also translate HMTL escapes to the right characters i.e. $a &amp;lt; 6 will get the perl expression $a &lt; 6: <BR>
+
+[- $e = 2 # here is a perl comment -]
+[+ $d = $e &lt; 6 +]
+
+Now they should have a value
+
+$a = [+ $a +] <BR>
+$b = [+ $b +] <BR>
+$c = [+ $c +] <BR>
+$d = [+ $d +] <BR>
+$e = [+ $e +] <BR>
+
+Input Separator = [+ ord($/) +]<br>
+
+[-=pod
+
+blabla
+
+=cut-]
+
+[-
+=pod
+
+blabla
+
+=cut
+-]
+
+
+
+
+<P>Ok.<P>
+
+
+</body>
+</html>

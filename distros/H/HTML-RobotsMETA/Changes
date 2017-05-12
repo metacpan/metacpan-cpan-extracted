@@ -1,0 +1,15 @@
+Changes
+=======
+
+0.00004 - Dec 01 2007
+  - HTML::RobotsMETA is no longer a subclass of HTML::Parser
+
+0.00003 - Oct 29 2007
+  - Don't die even if rules turns out to be undef
+
+0.00002 - Oct 18 2007
+  - Silence warnings
+  - Put minimum perl version requirements
+
+0.00001 - Oct 16 2007
+  - Initial release

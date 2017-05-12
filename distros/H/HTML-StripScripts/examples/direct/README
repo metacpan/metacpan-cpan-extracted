@@ -1,0 +1,17 @@
+Using HTML::StripScripts directly
+---------------------------------
+
+HTML::StripScripts expects a stream of tokens.  Normally, to parse HTML, you
+would use HTML::StripScripts::Parser or HTML::StripScripts::LibXML.
+
+If, however, you are generating the tags yourself, and want to use
+HTML::StripScripts directly, you need to pass it the tokens in order.
+
+Look at examples/direct/direct.pl for an example of how to do this.
+
+To run the example, type:
+
+   perl examples/direct/direct.pl
+
+This script passes <ul> and <li> tags, along with one bad </li> tag, ie there is
+no corresponding opening <li>, so this tag is filtered.

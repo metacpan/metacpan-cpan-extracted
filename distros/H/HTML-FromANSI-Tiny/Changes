@@ -1,0 +1,27 @@
+Revision history for HTML-FromANSI-Tiny
+
+0.104     2016-04-25T05:37:30Z
+
+  - Add colors for 256 palette.
+    Bump prereq on Parse::ANSIColor::Tiny to get them.
+
+0.103     2014-03-16T01:56:14Z
+
+  - Remove many terminal escape sequences not related to color
+    (by bumping the prereq on Parse::ANSIColor::Tiny to 0.500).
+    Thanks to Taiki Kawakami for the pull request!
+
+0.102     2013-08-17T17:20:37Z
+
+  - Sort css entries for consistent output on 5.18+ (to facilitate testing).
+    Thanks Stephen Thirlwall!
+
+0.101     2013-07-09T14:12:55Z
+
+  - Add 'inline_style' boolean to enable output using style=""
+    instead of class="".
+  - Add 'styles' attribute for customizing styles.
+
+0.100     2011-11-19T18:20:55Z
+
+  - Initial release

@@ -1,0 +1,43 @@
+---
+abstract: 'Generate a curl command from an HTTP::Request object.'
+author:
+  - 'Eric Johnson <eric.git@iijo.org>'
+build_requires:
+  HTTP::Request::Common: 0
+  Test::More: 0.98
+  Test::Most: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v1.0.0, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTTP-Request-AsCurl
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  HTTP::Request::AsCurl:
+    file: lib/HTTP/Request/AsCurl.pm
+    version: 0.03
+requires:
+  Exporter::Shiny: 0
+  String::ShellQuote: 0
+  Win32::ShellQuote: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/kablamo/HTTP-Request-AsCurl/issues
+  homepage: https://github.com/kablamo/HTTP-Request-AsCurl
+  repository: git://github.com/kablamo/HTTP-Request-AsCurl.git
+version: 0.03

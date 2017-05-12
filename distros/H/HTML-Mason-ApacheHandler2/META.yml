@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         HTML-Mason-ApacheHandler2
+version:      0.01
+version_from: lib/HTML/Mason/ApacheHandler2.pm
+installdirs:  site
+requires:
+    Apache::Cookie:                2.02-dev
+    Apache::Request:               2.02-dev
+    HTML::Mason:                   1.25
+    mod_perl:                      1.991
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

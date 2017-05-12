@@ -1,0 +1,61 @@
+NAME
+    HTML::Template::Compiled::Plugin::Nuber::Format - Number::Format plugin
+    for HTML::Template::Compiled
+
+VERSION
+    $VERSION = "0.02"
+
+SYNOPSIS
+        use HTML::Template::Compiled::Plugin::NumberFormat;
+        my $plugin = HTML::Template::Compiled::Plugin::NumberFormat->new({
+            formatter => Number::Format->new(...),
+        });
+
+        my $htc = HTML::Template::Compiled->new(
+            plugin => [$plugin],
+            ...
+        );
+        my $out = $htc->output;
+        $plugin->formatter($another_number_format_object);
+        $out = $htc->output;
+
+DESCRIPTION
+    This plugin implements escapes ("filters") for easy use and tag names if
+    you need more arguments.
+
+        use HTML::Template::Compiled::Plugin::NumberFormat;
+        my $plugin = HTML::Template::Compiled::Plugin::NumberFormat->new({
+            formatter => Number::Format->new(...),
+        });
+        my $htc = HTML::Template::Compiled->new(
+            plugin => [$plugin],
+            scalarref => \<<"EOM",
+    number with different precision than the one set in the object:
+    <%format_number .nums.big_dec precision=3 %>
+
+    escapes using the object settings: <%= .nums.big escape=format_number %>
+    <%= .nums.price escape=format_price %> <%= .nums.bytes1
+    escape=format_bytes %> <%= .nums.bytes2 escape=format_bytes %> <%=
+    .nums.bytes3 escape=format_bytes %> EOM ); $htc->param( ... ); print
+    $htc->output;
+
+METHODS
+    register
+        gets called by HTC
+
+    format_number
+        calls $number_format->format_number
+
+    format_bytes
+        calls $number_format->format_bytes
+
+    format_price
+        calls $number_format->format_price
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2012 by Tina Mueller
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.3 or, at
+    your option, any later version of Perl 5 you may have available.
+

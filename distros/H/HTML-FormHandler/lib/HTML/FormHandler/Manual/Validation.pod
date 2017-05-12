@@ -1,0 +1,350 @@
+package HTML::FormHandler::Manual::Validation;
+# ABSTRACT: validating fields
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+HTML::FormHandler::Manual::Validation - validating fields
+
+=head1 VERSION
+
+version 0.40067
+
+=head1 SYNOPSIS
+
+L<Manual Index|HTML::FormHandler::Manual>
+
+There are many options for validating fields in FormHandler. Some validation
+is from field attributes, some from form or field methods, some from
+'apply' actions on the fields.
+
+=head1 Field attributes for validation
+
+Each individual field may have additional attributes that relate to validation,
+which are not documented here. See the individual field documentation, linked
+from L<HTML::FormHandler::Manual::Fields>.
+
+=head2 required, required_when
+
+Setting the 'required' flag on a field initiates a check for the existence
+of some value. If the field does not have a value, the 'required' error
+message is issued.
+
+   has_field 'section' => ( required => 1,
+       messages => { required => 'Please provide a section' } );
+
+Note that a required flag on a subfield -- a field inside a compound field
+or repeatable field -- does not cause the containing field to be required.
+You need to set 'required' all the way up, if that's the behavior that you
+want.
+
+If a field is empty and *not* required, no other field validation will be
+performed unless the 'validate_when_empty' flag (see below) is set. The form's
+'validate' method, however, will always be called.
+
+There is also the 'required_when' attribute, which works the same way as the
+'when' key on the apply actions.
+
+    has_field 'fee' => ( required_when => { 'fie' => 2 } );
+
+When a 'required' or 'required_when' check fails, a 'missing' flag is set
+in the result:
+
+    if ( $field->missing ) { ... }
+
+=head2 range_start, range_end
+
+Starting and ending range for number fields.
+
+=head2 unique
+
+Attribute used by the DBIC model to check for uniqueness.
+
+=head2 validate_when_empty
+
+If its 'validate_when_empty' flag is set to a true value, then a field will
+always undergo validation when its form is processed, even when that field
+is empty.
+
+=head1 Validation methods
+
+=head2 validate_method
+
+You can provide a validation method for a field by setting a coderef with
+'validate_method'.
+
+    has_field 'fox' => ( validate_method => \&check_fox );
+    sub check_fox {
+        my $self = shift; # self is the fox field
+        unless( $self->value eq .... ) {
+            $self->add_error('....');
+        }
+    }
+
+=head2 validate_<field_name>
+
+If you provide a 'validate_<field_name>' method it will be automatically used.
+
+    has_field 'cat';
+    sub validate_cat {
+        my ( $self, $field ) = @_; # self is the form
+        unless ( $field->value eq  ... ) {
+            $field->add_error( '...' );
+        }
+    }
+
+If the field name has periods in it, they should be replaced with underscores.
+
+=head2 form validate method
+
+A form validation method can be used to do cross-validation or validation
+checks that need information from more than one field.
+
+    sub validate {
+        my $self = shift;
+        $self->field('foo')->add_error('....')
+            if( $self->field('foo')->value eq '..' &&
+                    $self->field('bar')->value eq '..' );
+    }
+
+=head2 field validate method
+
+You can create a custom field to contain a commonly used validation. The
+validation in a custom field can be done with 'apply' or by using a
+'validate' method.
+
+    package MyApp::Form::Field::Custom;
+    use HTML::FormHandler::Moose;
+    extends 'HTML::FormHandler::Field'; # or a subclass of Field
+
+    sub validate {
+        ....
+    }
+
+=head1 Apply Actions: Filters, transformations, and constraints
+
+The actions in the 'apply' array (stored in the 'actions' attribute) will be
+performed in the order they are specified, allowing fine-grained control over
+inflation and validation. You can check constraints after transformations and
+vice versa. You can weave all three types of actions in any order you need.
+
+The two valid 'apply' array elements are 1) Moose types and 2) hashrefs with one of three
+keys: 'check', 'transform', and 'type'. The hashrefs will usually also have an additional
+key, 'message', with a string, array or coderef providing an error message,
+which is localized.
+
+The 'check' key can point to a regex, arrayref of strings, or coderef. The value of
+the 'transform' key should be a coderef. The value of the 'type' key is a Moose type.
+
+In addition to the check and type keys, you can provide a 'when' key to only
+perform this validation when a particular field is a particular value:
+
+    has_field 'fee';
+    has_field 'fie' => ( apply => [
+        { when => { fee => 1 }, check => qr/when/, message => 'Wrong fie' },
+    ]);
+    has_field 'fo';
+    has_field 'fum_comp' => ( type => 'Compound' );
+    has_field 'fum_comp.one';
+    has_field 'fum_comp.two' => ( apply => [
+        { when => { '+fee' => [1,2,3] }, check => qr/when/, message => 'Wrong two' },
+    ]);
+
+The field name key in the 'when' hashref is assumed to be a field at the same
+"level" as this field (i.e. a sibling field in a compound). If you want to
+specify a field name from the form, prepend the name with a '+'.
+
+The 'when' hashref can contain multiple key/value pairs. This simply extends its
+test across multiple fields; all fields named in the hashref's keys must match
+their respective values in order for the overall 'when' test to pass.
+
+     when => { foo => 3 }        # when the foo field value is 3
+     when => { foo => [1,2,3]}   # when foo is 1, 2, or 3
+     when => { foo => sub { $_[0] > 0 }}  # when foo is greater than 0
+     when => { foo => sub { $_[0] ne ''}} # when foo is the empty string
+
+Transformations and coercions are called in an eval
+to catch the errors. Warnings are trapped in a sigwarn handler.
+
+If the conditions get too complicated to easily fit into a when condition, you
+can always create a validation method instead.
+
+See also L<HTML::FormHandler::Field> and L<HTML::FormHandler::Validate>.
+See L<HTML::FormHandler::Manual::InflationDeflation> for information
+on inflation and deflation.
+
+=head2 Moose types
+
+Moose types can be used to do both constraints and transformations. If a coercion
+exists it will be applied, resulting in a transformation. After coercing, the
+result is checked.  You can use type constraints from L<MooseX::Types>
+libraries or defined using L<Moose::Util::TypeConstraints>.
+
+FormHandler supplies a library of Moose types in L<HTML::FormHandler::Types>.
+
+    use HTML::FormHandler::Types ('NotAllDigits');
+    has_field 'foo' => ( apply => [ NotAllDigits ] );
+
+You can create your own library of types, too. Or you can create a type
+constraint in the form:
+
+  use Moose::Util::TypeConstraints;
+  subtype 'GreaterThan10'
+     => as 'Int'
+     => where { $_ > 10 }
+     => message { "This number ($_) is not greater than 10" };
+
+  has_field 'text_gt' => ( apply=> [ 'GreaterThan10' ] );
+
+Moose types can also be used for their coercions to do transformations.
+
+  subtype 'MyInt'
+      => as 'Int';
+  coerce 'MyInt'
+      => from 'MyStr'
+      => via { return $1 if /(\d+)/ };
+
+You can also use the 'type' keyword with a Moose type if you want to
+change the message:
+
+    has_field 'text_gt' => ( apply => [
+        { type => 'GreaterThan10',
+          message => 'Number is too small' } ] );
+
+=head2 transform
+
+A 'transform' changes the format of a field's value, and does not
+need a message. It takes a coderef.
+
+   has_field 'another_field' => (
+      apply => [ { transform => sub{ sprintf '<%.1g>', $_[0] } } ]
+   );
+
+Note that transformed values are not displayed in the HTML form unless
+the 'fif_from_value' flag is set. The transformed values are saved
+to the database or returned in C<< $form->value >>.
+
+=head2 'check' regex
+
+Checks that field value matches the regex.
+
+   has_field 'some_field' => (
+      apply => [ { check => qr/aaa/, message => 'Must contain aaa' } ],
+   );
+
+You can use regex libraries like L<Regexp::Common> too:
+
+    use Regexp::Common ('URI');
+    ...
+    has_field 'my_url' => ( apply => [
+        { check => qr/$RE{URI}{HTTP}/,
+           message => 'Invalid URL' } ] );
+
+=head2 'check' arrayref (matches)
+
+Provide an arrayref of strings to match against.
+
+   has_field 'set_error' => (
+      apply => [
+         { check   => [ 'abc', 'bbb' ],
+            message => 'Must be "aaa" or "bbb"' }
+      ]
+   );
+
+=head2 'check' coderef
+
+Provide a validation function to check. A 'check' coderef will be passed the
+current value of the field and should return true or false. Note that the field
+is passed in as the second argument, to allow simple functions to work properly.
+
+   has_field 'callback_pass' => (
+      apply => [
+         { check => \&check_callback_pass,
+             message => 'Must contain number greater than 10', }
+       ]
+   );
+   sub check_callback_pass {
+       my ( $value, $field ) = @_;
+       if( $value =~ /(\d+)/ ) {
+           return $1 > 10;
+       }
+   }
+
+=head2 message
+
+The message for the above checks can also be an arrayref or coderef.
+The arrayref is useful for localized messages. You can also provide error
+messages for Moose types.
+
+   has_field 'message_sub' => (
+      apply => [
+         { check   => [ 'abc' ],
+            message => \&err_message }
+      ]
+   );
+   sub err_message {
+       my ($value, $field ) = @_;
+       return $field->name . ': Must be "abc"';
+   }
+   has_field 'message_arrayref' => (
+      apply => [ { check => qr/aaa/,
+          message => ['Must contain [_1]', 'aaa'] } ],
+   );
+   has_field 'my_moose_type_field' => (
+      apply => [ { type => SomeType,
+         message => 'Invalid ...' } ] );
+
+=head2 actions in a field class
+
+To declare actions inside a field class use L<HTML::FormHandler::Moose> and
+'apply' sugar:
+
+   package MyApp::Field::Test;
+   use HTML::FormHandler::Moose;
+   extends 'HTML::FormHandler::Field;
+
+   apply [ 'SomeConstraint', { check => ..., message => .... } ];
+
+   1;
+
+Actions specified with apply are cumulative. Actions may be specified in
+field classes and additional actions added in the 'has_field' declaration.
+
+You can see examples of field classes with 'apply' actions in the source for
+L<HTML::FormHandler::Field::Money> and L<HTML::FormHandler::Field::Email>, and
+in t/constraints.t.
+
+=head1 Dependency
+
+The 'dependency' attribute is an array of arrays of field names.
+During validation, if any field in a given group has a value that
+matches the pattern /\S/ (non-blank), the 'required' flag
+is set for all of the fields in the group.
+
+   has '+dependency' => ( default => sub {
+            [
+               ['address', 'city', 'state', 'zip'],
+               ['cc_no', 'cc_expires'],
+            ],
+        },
+    );
+
+You can also use the 'required_when' flag to do something similar.
+
+=head1 AUTHOR
+
+FormHandler Contributors - see HTML::FormHandler
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Gerda Shank.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

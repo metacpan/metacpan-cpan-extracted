@@ -1,0 +1,85 @@
+{
+   "abstract" : "An HTML content extractor with scoring heuristics",
+   "author" : [
+      "INA Lintaro <tarao at cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-ExtractContent",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Lite" : "0",
+            "Exporter::Lite" : "0",
+            "HTML::Entities" : "0",
+            "HTML::Strip" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Slurp" : "0",
+            "Test::Base" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "HTML::ExtractContent" : {
+         "file" : "lib/HTML/ExtractContent.pm",
+         "version" : "0.12"
+      },
+      "HTML::ExtractContent::Util" : {
+         "file" : "lib/HTML/ExtractContent/Util.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tarao/perl5-HTML-ExtractContent/issues"
+      },
+      "homepage" : "https://github.com/tarao/perl5-HTML-ExtractContent",
+      "repository" : {
+         "url" : "git://github.com/tarao/perl5-HTML-ExtractContent.git",
+         "web" : "https://github.com/tarao/perl5-HTML-ExtractContent"
+      }
+   },
+   "version" : "0.12",
+   "x_authority" : "cpan:TARAO",
+   "x_contributors" : [
+      "yubessy <yubessy0@gmail.com>",
+      "INA Lintaro <tarao.gnn@gmail.com>"
+   ]
+}

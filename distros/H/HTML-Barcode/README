@@ -1,0 +1,133 @@
+NAME
+    HTML::Barcode - Render HTML representations of barcodes
+
+SYNOPSIS
+      # HTML::Barcode::Code93 is just one example, there are others.
+      my $code = HTML::Barcode::Code93->new(text => 'MONKEY');
+      print $code->render;
+
+    See the documentation for the specific types of barcodes for detailed
+    instructions.
+
+DESCRIPTION
+    This is a base class for creating HTML representations of barcodes. Do
+    not use it directly. If you are looking to generate a barcode, please
+    see one of the following modules instead:
+
+  Known Types
+
+    Here are the types of barcodes you can generate with this distribution.
+    Others may exist, so try searching CPAN.
+
+    HTML::Barcode::QRCode - Two dimensional QR codes.
+    HTML::Barcode::DataMatrix - Two dimensional Data Matrix barcodes.
+    HTML::Barcode::Code93 - Code 93 barcodes.
+    HTML::Barcode::Code128 - Code 128 barcodes.
+  Subclassing
+
+    To add a new type of barcode, create a subclass of either
+    HTML::Barcode::1D for traditional barcodes, HTML::Barcode::2D for
+    2-dimensional barcodes, or HTML::Barcode if neither of those suit your
+    needs.
+
+    Use one of the existing modules as a starting point.
+
+    Required methods for your subclass
+    barcode_data
+        You need to either override this, or override the `render_barcode'
+        method so it does not use this.
+
+        This should return an arrayref of true and false values (for "on"
+        and "off"), or an arrayref of arrayrefs (for 2D).
+
+        It is not recommended to publish this method in your API.
+
+    Other methods
+        Feel free to override any other methods, or use method modifiers
+        (`around', `before', `after') as you see fit.
+
+METHODS
+  new (%attributes)
+
+    Default constructor provided by Moose or Mouse, which can take values
+    for any of the attributes.
+
+  render
+
+    This is a convenience routine which returns `<style>...</style>' tags
+    and the rendered barcode.
+
+    If you are printing multiple barcodes or want to ensure your `style'
+    tags are in your HTML headers, then you probably want to output the
+    barcode and style separately with the render_barcode and css entries
+    elsewhere in this document.
+
+  render_barcode
+
+    Returns only the rendered barcode. You will need to provide stylesheets
+    separately, either writing them yourself or using the output of css.
+
+  css
+
+    Returns CSS needed to properly display your rendered barcode.
+
+ATTRIBUTES
+    These attributes can be passed to new, or used as accessors.
+
+  text
+
+    Required - The information to put into the barcode.
+
+  foreground_color
+
+    A CSS color value (e.g. '#000' or 'black') for the foreground. Default
+    is '#000'.
+
+  background_color
+
+    A CSS color value background. Default is '#fff'.
+
+  bar_width
+
+    A CSS value for the width of an individual bar. Default is '2px'.
+
+  bar_height
+
+    A CSS value for the height of an individual bar. Default is '100px'.
+
+  show_text
+
+    Boolean. Indicates whether or not to render the text below the barcode.
+
+  css_class
+
+    The value for the `class' attribute applied to any container tags in the
+    HTML (e.g. `table' or `div'). `td' tags within the table will have
+    either css_class_on or css_class_off classes applied to them.
+
+    For example, if css_class is "barcode", you will get `<table
+    class="barcode">' and its cells will be either `<td class="barcode_on">'
+    or `<td class="barcode_off">'.
+
+  embed_style
+
+    Rather than rendering CSS stylesheets, embed the style information in
+    HTML `style' attributes. You should not use this option without good
+    reason, as it greatly increases the size of the generated markup, and
+    makes it impossible to override with stylesheets.
+
+AUTHOR
+    Mark A. Stratman, `<stratman@gmail.com>'
+
+SOURCE REPOSITORY
+    http://github.com/mstratman/HTML-Barcode
+
+LICENSE AND COPYRIGHT
+    Copyright 2011 Mark A. Stratman.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

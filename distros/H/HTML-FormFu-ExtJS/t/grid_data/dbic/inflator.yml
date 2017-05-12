@@ -1,0 +1,12 @@
+---
+  elements:
+    - name: artistid
+    - name: birthday
+      type: Date
+      inflator:
+        - type: DateTime
+          parser:
+            strptime: '%d.%m.%Y'
+      deflator:
+        - type: Strftime
+          strftime: '%Y-%m-%d'

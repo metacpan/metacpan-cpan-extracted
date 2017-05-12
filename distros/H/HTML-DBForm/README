@@ -1,0 +1,33 @@
+HTML::DBForm
+
+A Perl module for creating an HTML interface to a database table.
+Supports searching, updating, inserting, and deleting rows.
+
+INSTALLATION
+
+To install this module perform the typical four-part Perl salute:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+HTML::SuperForm
+HTML::Template
+CLass::Factory
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2004 Ken Railey.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+AUTHORS
+
+Ken Railey <ken_railey@yahoo.com>
+
+

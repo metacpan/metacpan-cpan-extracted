@@ -1,0 +1,18 @@
+Revision history for Perl extension HeliosX::Logger::Log4perl.
+
+1.00  Thu Jun 14 10:00:00 2012
+	-Promoted 0.05_2431 to first Official Release
+0.05_2431  Wed Jun 13 15:15:00 2012
+	-RELEASE CANDIDATE 1
+	-added log4perl_priority_threshold config option
+	-documentation cleanup
+0.03_4931  Wed Dec  7 18:41:00 2011
+    - Upgraded to work with Helios::Logger in Helios 2.3x
+0.02_0771  Sun Feb 15 12:00:00 2009
+    - HeliosX::Logger::Log4perl separated into its own distribution
+    - actually works!
+    - lots of documentation!  Some of it even coherent!
+0.01  Sat Feb 14 21:05:57 2009
+	- original version; created by h2xs 1.23 with options
+		-XA -b 5.8.0 HeliosX::Logger::Log4perl
+

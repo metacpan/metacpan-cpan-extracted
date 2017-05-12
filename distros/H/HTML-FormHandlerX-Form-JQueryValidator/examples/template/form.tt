@@ -1,0 +1,24 @@
+[% MACRO form_header BLOCK %]
+    <form name="[% id %]" id="[% id %]" method="post" action="[% action %]" class="form-horizontal[% IF jquery_validate %] jquery-validate-form[% END %]">
+    <fieldset>
+        <legend>[% legend %]</legend>
+      [% IF form.errors %]
+          <div class="alert alert-error">
+            <a class="close" data-dismiss="alert">×</a>
+          <p>
+          <b>There was a problem, please check the highlighted fields in the form below</b>
+        </div>
+      [% END %]
+	     <div class="control-group">
+[% END %]
+
+[% MACRO form_footer BLOCK %]
+	     <div class="control-group">
+              <input type="hidden" name="submitted" value="1"/>
+              <input type="submit" value="[% submit_label %]" class="btn btn-primary"/>
+         </div>              
+     </div>
+   </fieldset>
+  </form>
+[% END %]
+

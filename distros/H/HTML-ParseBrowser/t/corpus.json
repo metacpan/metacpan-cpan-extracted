@@ -1,0 +1,339 @@
+[
+   {
+      "user_agent":"Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_2; en-us) AppleWebKit/525.18 (KHTML, like Gecko) Version/3.1.1 Safari/525.18",
+      "name":"Safari",
+      "major":"3",
+      "minor":"1",
+      "lang":"en",
+      "language":"English"
+   },
+   {
+      "user_agent":"Mozilla/5.0 (Macintosh; U; Intel Mac OS X; en-US; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14",
+      "name":"Firefox"
+   },
+   {
+      "user_agent":"Mozilla/5.0 (Macintosh; U; Intel Mac OS X; en; rv:1.8.1.14) Gecko/20080512 Camino/1.6.1 (like Firefox/2.0.0.14)",
+      "name":"Camino"
+   },
+   {
+      "user_agent":"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9) Gecko/2008052906 Firefox/3.0",
+      "name":"Firefox"
+   },
+   {
+      "user_agent":"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) AppleWebKit/525.19 (KHTML, like Gecko) Version/3.1.2 Safari/525.21",
+      "name":"Safari",
+      "major":"3",
+      "minor":"1"
+   },
+   {
+      "user_agent":"Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)",
+      "name":"Internet Explorer",
+      "osvers":"Vista"
+   },
+   {
+      "user_agent":"Opera/9.51 (Windows NT 6.0; U; en)",
+      "name":"Opera"
+   },
+   {
+      "user_agent":"Lynx/2.8.5rel.1 libwww-FM/2.14 SSL-MM/1.4.1 GNUTLS/1.0.16",
+      "name":"Lynx"
+   },
+   {
+      "user_agent":"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30; .NET CLR 3.0.04506.648)",
+      "name":"Internet Explorer"
+   },
+   {
+      "user_agent":"Mozilla/5.0 (compatible; Konqueror/3.5; Linux) KHTML/3.5.5 (like Gecko) (Debian)",
+      "name":"Konqueror",
+      "os":"Linux"
+   },
+   {
+      "user_agent":"Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.0.14eol) Gecko/20070505 (Debian-1.8.0.15~pre080323b-0etch2) Epiphany/2.14",
+      "name":"Epiphany"
+   },
+   {
+      "user_agent":"Mozilla/4.0 WebTV/2.6 (compatible; MSIE 4.0)",
+      "name":"WebTV"
+   },
+   {
+      "user_agent":"Mozilla/5.0 (Windows; U; Windows NT 6.1; de-DE) AppleWebKit/534.10 (KHTML, like Gecko) Chrome/8.0.552.224 Safari/534.10",
+      "name":"Chrome",
+      "osvers":"7",
+      "language":"German",
+      "lang":"de"
+   },
+   {
+      "user_agent":"Mozilla/5.0 (Windows NT 6.2; rv:9.0.1) Gecko/20100101 Firefox/9.0.1",
+      "name":"Firefox",
+      "osvers":"8"
+   },
+   {
+      "user_agent":"Mozilla/5.0 (X11; U; Linux x86_64; fr; rv:1.9.2.13) Gecko/20101203 Iceweasel/3.6.7 (like Firefox/3.6.13)",
+      "name":"Iceweasel",
+      "major":"3",
+      "os":"Linux",
+      "osarc":"x86_64",
+      "language":"French",
+      "lang":"fr"
+   },
+   {
+      "user_agent":"Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.1.1) Gecko/20090730 Iceweasel/3.5.1 (Debian-3.5.1-1)",
+      "name":"Iceweasel",
+      "major":"3",
+      "os":"Linux",
+      "osarc":"x86_64"
+   },
+   {
+      "user_agent":"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1) Opera 7.51 [ru]",
+      "name":"Opera",
+      "major":"7",
+      "language":"Russian"
+   },
+   {
+      "user_agent":"Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)",
+      "name":"Internet Explorer",
+      "major":"10"
+   },
+   {
+      "user_agent":"Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/5.0; chromeframe/11.0.696.57)",
+      "name":"Internet Explorer",
+      "major":"9"
+   },
+   {
+      "user_agent":"Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; .NET CLR 1.0.3705; .NET CLR 1.1.4322)",
+      "name":"Internet Explorer",
+      "major":"8"
+   },
+   {
+      "user_agent":"Opera/9.80 (Macintosh; Intel Mac OS X 10.7.2; U; en) Presto/2.9.168 Version/11.51",
+      "name":"Opera",
+      "major":"11",
+      "minor":"51"
+   },
+   {
+      "user_agent":"Mozilla/4.79 [en] (X11; U; SunOS 5.10 i86pc)",
+      "name":"Netscape",
+      "major":"4",
+      "minor":"79",
+      "ostype":"Solaris",
+      "osvers":"5.10",
+      "osarc":"i86pc"
+   },
+   {
+      "user_agent":"Mozilla/5.0 (Windows; U; Windows NT 6.1; es-ES; rv:1.9.2.3) Gecko/20100401 Firefox/3.6.3 GTB7.1",
+      "name":"Firefox",
+      "major":"3",
+      "minor":"6",
+      "ostype":"Windows NT",
+      "osvers":"7",
+      "language":"Spanish",
+      "lang":"es"
+   },
+   "# !defined $ua->osvers",
+   {
+      "user_agent":"Mozilla/5.0 (Macintosh; U; PPC Mac OS X; it-IT) AppleWebKit/125.4 (KHTML, like Gecko, Safari) OmniWeb/v563.15",
+      "name":"OmniWeb",
+      "major":"563",
+      "minor":"15",
+      "ostype":"Macintosh",
+      "language":"Italian",
+      "lang":"it"
+   },
+   {
+      "user_agent":"Opera/9.64 (X11; Linux i686; U; da) Presto/2.1.1",
+      "name":"Opera",
+      "major":"9",
+      "minor":"64",
+      "os":"Linux",
+      "ostype":"Linux",
+      "osarc":"i686",
+      "language":"Danish",
+      "lang":"da"
+   },
+   {
+      "user_agent":"Mozilla/5.0 (Windows; U; Windows NT 6.0; ja-JP) AppleWebKit/533.20.25 (KHTML, like Gecko) Version/5.0.4 Safari/533.20.27",
+      "name":"Safari",
+      "major":"5",
+      "minor":"0",
+      "ostype":"Windows NT",
+      "language":"Japanese",
+      "lang":"ja"
+   },
+   {
+      "user_agent":"Opera/9.80 (Series 60; Opera Mini/6.0.24095/24.760; U; en) Presto/2.5.25 Version/10.54",
+      "name":"Opera Mini",
+      "major":"6",
+      "minor":"0",
+      "language":"English",
+      "lang":"en"
+   },
+   {
+      "user_agent":"Mozilla/4.0 (compatible; MSIE 8.0; AOL 9.6; AOLBuild 4340.5001; Windows NT 5.1; Trident/4.0)",
+      "name":"AOL",
+      "major":"9",
+      "minor":"6"
+   },
+   {
+      "user_agent":"Mozilla/5.0 (Windows NT 6.1) AppleWebKit/535.1 (KHTML, like Gecko)  Iron/13.0.800.1 Chrome/13.0.800.1 Safari/535.1",
+      "name":"Iron",
+      "major":"13",
+      "minor":"0",
+      "v":"13.0.800.1",
+      "ostype":"Windows NT",
+      "osvers":"7"
+   },
+   {
+      "user_agent":"Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko",
+      "name":"Internet Explorer",
+      "major":"11",
+      "minor":"0",
+      "v":"11.0",
+      "ostype":"Windows NT",
+      "osvers":"8.1"
+   },
+   {
+      "user_agent":"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.52 Safari/537.36 OPR/15.0.1147.100",
+      "name":"Opera",
+      "major":"15",
+      "minor":"0",
+      "v":"15.0.1147.100",
+      "ostype":"Windows NT",
+      "osvers":"7"
+   },
+   {
+      "user_agent":"Mozilla/5.0 (BB10; Touch) AppleWebKit/537.35+ (KHTML, like Gecko) Version/10.2.1.2141 Mobile Safari/537.35+",
+      "name":"BlackBerry",
+      "major":"10",
+      "minor":"2",
+      "v":"10.2.1.2141",
+      "ostype":"BlackBerry",
+      "os":"BlackBerry 10",
+      "osvers":"10"
+   },
+   {
+      "user_agent":"Mozilla/5.0 (BlackBerry; U; BlackBerry 9860; en-US) AppleWebKit/534.11+ (KHTML, like Gecko) Version/7.0.0.254 Mobile Safari/534.11+",
+      "name":"BlackBerry",
+      "major":"7",
+      "minor":"0",
+      "v":"7.0.0.254",
+      "os":"BlackBerry 7",
+      "ostype":"BlackBerry",
+      "osvers":"7"
+   },
+   {
+      "user_agent":"Mozilla/5.0 (iPhone; U; CPU iPhone OS 5_1_1 like Mac OS X; en) AppleWebKit/534.46.0 (KHTML, like Gecko) CriOS/19.0.1084.60 Mobile/9B206 Safari/7534.48.3",
+      "name":"Chrome",
+      "major":"19",
+      "minor":"0",
+      "v":"19.0.1084.60",
+      "os":"iOS",
+      "ostype":"iOS",
+      "osvers":"5.1.1"
+   },
+   {
+      "user_agent":"Mozilla/5.0 (iPhone; CPU iPhone OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5376e Safari/8536.25",
+      "name":"Safari",
+      "major":"6",
+      "minor":"0",
+      "v":"6.0",
+      "os":"iOS",
+      "osvers":"6.0"
+   },
+   {
+      "user_agent":"Mozilla/5.0 (iPhone; CPU iPhone OS 6_1_3 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10B329 Safari/8536.25",
+      "name":"Safari",
+      "major":"6",
+      "minor":"0",
+      "v":"6.0",
+      "os":"iOS",
+      "osvers":"6.1.3"
+   },
+   {
+      "user_agent":"Mozilla/5.0 (iPad; CPU OS 6_1_3 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10B329 Safari/8536.25",
+      "name":"Safari",
+      "major":"6",
+      "minor":"0",
+      "v":"6.0",
+      "os":"iOS",
+      "osvers":"6.1.3"
+   },
+   {
+      "user_agent":"Mozilla/5.0 (iPhone; CPU iPhone OS 5_0 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9A334 Safari/7534.48.3",
+      "name":"Safari",
+      "major":"5",
+      "minor":"1",
+      "v":"5.1",
+      "os":"iOS",
+      "osvers":"5.0"
+   },
+   {
+      "user_agent":"Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_0 like Mac OS X; en-us) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8A293 Safari/6531.22.7",
+      "name":"Safari",
+      "major":"4",
+      "minor":"0",
+      "v":"4.0.5",
+      "os":"iOS",
+      "osvers":"4.0"
+   },
+   {
+      "user_agent":"Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.133 Mobile Safari/535.19",
+      "name":"Chrome",
+      "major":"18",
+      "minor":"0",
+      "v":"18.0.1025.133",
+      "os":"Android",
+      "osvers":"4.0.4",
+      "ostype":"Linux"
+   },
+   {
+      "user_agent":"Mozilla/5.0 (Linux; Android 4.2.1; Galaxy Nexus Build/JOP40D) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.58 Mobile Safari/537.31",
+      "name":"Chrome",
+      "major":"26",
+      "minor":"0",
+      "v":"26.0.1410.58",
+      "os":"Android",
+      "osvers":"4.2.1",
+      "ostype":"Linux"
+   },
+   {
+      "user_agent":"Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.10136",
+      "name":"Edge",
+      "major":"12",
+      "minor":"10136",
+      "v":"12.10136",
+      "os":"Windows NT 10.0",
+      "osvers":"10",
+      "ostype":"Windows NT"
+   },
+   "# Is this really Safari on Android?",
+   {
+      "user_agent":"Mozilla/5.0 (Linux; U; Android 3.2; en-us; GT-P7300 Build/HTJ85B) AppleWebKit/534.13 (KHTML, like Gecko) Version/4.0 Safari/534.13",
+      "name":"Safari",
+      "major":"4",
+      "minor":"0",
+      "v":"4.0",
+      "os":"Android",
+      "osvers":"3.2",
+      "ostype":"Linux"
+   },
+   {
+      "user_agent":"Mozilla/5.0 (Windows Phone 10.0; Android 4.2.1; NOKIA; Lumia 830)Kit/537.36 (KHTML, like Gecko) Chrome/46.0.2486.0 Mobile Safari/537.36 Edge/13.10586",
+      "name":"Edge",
+      "major":"13",
+      "minor":"10586",
+      "v":"13.10586",
+      "os":"Windows Phone 10.0",
+      "osvers":"10.0",
+      "ostype":"Windows Phone"
+    },
+    {
+      "user_agent":"Mozilla/5.0 (iPod touch; CPU iPhone OS 10_0 like Mac OS X) AppleWebKit/602.1.50 (KHTML, like Gecko) Version/10.0 Mobile/14A5346a Safari/602.1",
+      "name":"Safari",
+      "major":"10",
+      "minor":"0",
+      "v":"10.0",
+      "os":"iOS",
+      "ostype":"iOS",
+      "osvers":"10.0"
+    }
+]

@@ -1,0 +1,461 @@
+rev 10-Sep_09-08_10
+
+rev 09-Nov_09-19_19
+
+Revision history for Perl extension HTML::WikiConverter::DokuWikiFCK.
+
+0.07  Fri Jan 25 18:13:06 2008
+	- original version; created by h2xs 1.23 with options
+		-XA -n HTML::WikiConverter::DokuWikiFCK
+
+0.08 Mon Jan 28 11:47:00 2008
+       - removed 'use 5.00.08' from Makefile.PL, causing the make to fail with
+         earlier versions of Perl       
+
+0.09 Tue Jan 29 07:56:41 2008	 
+      - fixed image urls so that they retain size info, which would be lost after re-saving
+        of files
+      - removed superfluous runs of  <align left> tags followed by DokuWiki line breaks, as in:
+           <align left>
+	   </align>\\
+
+0.10 Thu Jan 31 2008
+        -Revised indent.php (in fckg/syntax) to compensate for what may be a bug in IE, where
+         it does not recognize the color attribute of the <indent> tag, so that the middle dots
+         are printed to the screen.  Now we use middle dots in DokuWikiFCK, but convert them to &nbsp;
+         in indent.php for putput to the screen.  The &nbsp; are converted back to middle dots for
+         saving to the DokuWiki file.
+
+	-Removed Term::ReadLine from Makefile.PL, after Perl Tests on freebsd reported 
+         failures. Used <STDIN> instead.
+
+        -Removed empty <indent> tags during postprocess (DokuWikiFCK.pm)
+
+        -Fixed image handling so that when image is fetched from root namespace a colon
+         is prepended to the file name:  {{:root_image.gif}}
+         Otherwise, when the image is accessed from a subdirectory of root, it is accessed
+         as though the image is in the media directory for that subdirectory and so not found 
+
+        -Fixed failure of FCKeditor fck_image.js to find namespace when openining DokuWiki
+        mediamanager for uploading images.  Problem was with finding  'top' window.
+        Added to fckeditor/fckconfig.js:
+			FCK.getCurrentWikiNS = function () {
+			 var ns = "";
+			 if(top.getCurrentWikiNS) {
+			     ns = top.getCurrentWikiNS();
+			 }
+
+			  return ns;
+			}
+         top.getCurrentWikiNS is output by fckg/helper.php into main.php and returns 
+         the current namespace.  
+
+0.12 Mon Feb 4 2008
+	 -Fixed image handling so that external (and possibly internal) images (starting
+	  with http://) are handled output correctly.
+	 -Continued to work on indent feature.  There is a difference between FireFox and IE
+	  in the handlng of &nbsp; characters in the FCKeditor.  I believe this is now fixed
+	  so that &nbsp; characters in both browsers work the same.
+	   
+0.13 Sat Feb 9 2008
+         -Added check-box to edit form to disable lock-timer by groups designated in Configuration Manager.
+          The default setting is ANY (i.e. anyone has permission).  
+
+0.15 Monday Feb 11 2008   
+	-Added action/cache and re-worked syntax/indent.php. Addresses inconsistencies between
+	 IE and Firefox in handling of space character (this is ongoing: see 0.10 and 0.12 above) 
+        -Added DokuWiki header styles to fckeditor/editor/css/fck_editorarea.css
+
+0.17 Thursday Feb 21 2008
+        -Added plugin tool to FCK toolbar, which allows user to select syntax text for syntax 
+         DokuWiki plugins so as to maintain their integrity -- keps them from disappearing, or
+         getting corrupted, or having any text permanently written to the DokuWiki text file.
+        -Added buttons which enable user to switch between DokuWiki Editor and FCKeditor and
+         gives user choice of whether to backup the FCK file (with its exteneded syntax) and to
+         start the DokuWiki editor with a clean file of the same name.
+         -Fixed bug in _span_contents() which accidentally deleted the beginning of the text contents
+          when more than one color tag was passed into the function's text node.
+        -Cleaned up some syntactical issues in DokuWikiFCK.pm:
+		1. additional code for the the _indent function, which now insures that
+            the entire parentage of indent tags is searched for background colors. 
+            This assists the FireFox FCKeditor problem where the indent characters
+            sometimes print as '?' or middle dots to the screen.
+	       2. code in postprocess_output() to removed duplicate unused indent tags
+               3. similar code in _span to handle color tags   
+
+0.18  Sunday Feb 24 2008
+      - Restored <br /> pattern to indent.php, which is used for tables where a <td> has more
+        than one line in cell.
+      -  Now return empty string from _plugin(), where the plugin element is passed through without
+         a syntax pattern between the tags.
+
+     Monday Feb 25 2008
+      - Added code to postprocess_output() to handle URL's that have not been set using the FCK
+        toolbar item for URL's. 
+      - In _span_contents(): added code to escape regex for $current_text and code to add $current_text
+        back to $text string where no font or color attributes have been set. $current_text 
+        is any font or color information already formatted into FCK syntax when the string is passed
+        in to _span_contents(). 
+      - Added new function _formats() to deal with bold, underline, ins, and italic formats. It cleans up
+        formatted text, makes sure its valid, i.e. that what is being formatted is in fact
+        text (not non-text characters), and eliminates duplicate formatting markup. 
+
+     Tuesday Feb 26 2008
+      - Added facility to convert FCK extended syntax to native DokuWiki Syntax.       
+
+0.20  Tuesday April 8 2008
+      There have been various undocumented changes made to DokuWikiFCK.pm to fix anomolies and
+      irregularities in the translation of FCKeditor the extended markup.  The lock timer
+      has been hidden from the user and is now automatically disabled.  There have been improvements
+      to image uploading and inserting from the FCK editor toolbar image tool. This includes
+      an improved facility to create multliple userfile directories where there is more than
+      one DW installation on a server. 
+
+0.21 Thursday May 8 2008
+     - Added facility for creating table header elements.  These are consistent with the standard
+        DokWiki TH style.   
+
+     Friday May 9 2008
+     - Corrected Section 4 of README with respect to handling of path to /userfiles/ directory in
+     situations where the userfiles directory is not found in the Document Root directory. 
+
+0.22 Monday May 26 2008
+    - Fixed url formatting for FCKeditor's smileys     
+    - major upgrade to plugin tool
+    
+0.23 Saturday June 14 2008
+    - Completed Table Formatting Tool   
+
+0.24 Sunday June 29 2008
+    - Tied the lock timer into DokuWiki's draft saving system
+
+     Saturday Jul 5 2008
+    -  Added Trim Tool To toolbar for removing extra spaces and extra paragraphs
+    -  Made some changes to regexes for space-bar positioning in DokuWikiFCK.pm 
+    
+    Friday Jul 11 2008    
+    - Completed Trim Tool
+    - mediamanager.php:  removed filetype check and added css for #all div (body) so that colors recur
+      on window reload 
+    
+    -Added a "Refresh" button to the editor,which will refresh a page after the timeout alert appears.
+
+    Saturday Jul 12 2008
+    - Added facility for embedding external images into editor by using the FCKeditor's Link tab of the 
+     FCKeditor's media manager. 
+
+    Tuesday Jul 14 2008
+    - Fixed IE problem with unrecognized tags in both editor's handling of <indent> and <plugin> tags. 
+    In plugintool/fckplugin.js the <plugin> tags are now put through the ProtectTags() function which
+    re-casts <plugin . . > as <FCK:plugin . . .> and </plugin> as </FCK:plugin>.  The indent tag is
+    handled by the DokuWiki action pugin indent.php, which converts <indent  to <FCK:indent and       
+    </indent> to </FCK:indent>.  This insures that the tags are recognizedand in the editor are
+    applied to the content they are supposed to enclose.  Otherwise they are separated from their
+    content and appear as older siblings to their content rather than as containers and
+    hence parents to their content.   
+
+   Thursday Sep 4 2008
+     - Many fixes since last entry, including handling of internal and external links, code blocks,
+   blockquotes, and lists.
+
+    - Most important change is splitting off of DokuWikiFCK from DokuWikiFCKN after the appearance of
+    Firefox 3, which now implements the &nbsp; in the editor.  See README.  
+
+0.25
+   September 07 2008
+   - modified image alignment to handle right-align and toolbar-set indents correctly 
+   - fixed external url's to recognize underscore characters
+   - fixed regex that distinguishes between horizontal rule and numbered list markup (dash), 
+     so HR doesn't corrupt lists  
+   - remove forced line-breaks from ends of table cells   
+
+  08 Sep 2008
+   - fckeditor/editor/plugins/tableformat/table.html 
+	 fixed: failure to append new column to end of table
+   - accommodated tables pasted from MS Word into FCKeditor by converting MS Word line-breaks to
+     HTML breaks and deleting end-of-line MS Word breaks from cells
+
+  09-12 Sep 2008
+   -  fckg/helper:
+      Changed auto-draft recovery mode so that when section editing is in effect, original text is
+      restored to editor instead of draft text. Reason: Except for draft section the rest of the 
+      document is saved as DW/FCK markup instead of HTML. Text is corrupted when restored to FCKeditor's
+      editing space. 
+  - fckg/action/meta:
+    	 As above in function  insertFormElement()
+   	 As above for recoveries which contain code blocks 
+  - Fixed markup for links which contain font and color tags, so that the tags don't get inserted 
+    into the name field of the DokuWiki link markup and corrupt the resulting output   
+
+
+0.28
+
+
+12-14 May 2009
+	Fixed default attributes for WikiConverter.pm based on new info from
+	David Iberry, developeer of WikiConverter. Now html2wiki can be used
+	from command line without raising error: Can't use string ('ANY') as a
+	HASH ref 	
+
+	Added facility to handle large files for OS'es that cannot handle them.
+	(On systems where the shell cannot pass through large files, the files
+	would be lost; here large files are now saved to a tmp file in save.php
+	and reloaded for processing by dwfck in saveFCK.pl)
+
+	Added configuration options for handling large files. The 'big_files�
+	config setting defaults to FALSE and must be set to TRUE in the
+	configuation manager for large files facility to take effect. Options
+	included to set the time-out value and the file size limit, above which
+	the large file facility comes into play.
+
+
+15 May 2009
+	Disabled footnotes when converting from standard Dokuwiki
+	markup to DokuWikiFCK, so as to prevent corruption of markup.
+
+	Disabled FCK Preview mode when a big file is being edited, because the
+	file doesn't appear in the preview window when the preview button is
+	clicked--although it is not lost. 
+
+26 July 2009
+	--Added facility for selecting language dictionary using the FCKeditor's 'SpellerPages' facility, which
+        is set in fckconfig.js and uses gnu's aspell
+        --a new file was added, fckeditor/aspell.php, which serves as pop-up for selecting languages;
+          this script automatically detects all available aspell dictionaries and is accessed
+          via a new "Language" buttons on the editing page
+30 July 2009
+        Disabled the FCK_Preview Button on edit page. It is now hidden from view unless
+        the user belongs to the group “fck_preview”.  Or to an administrator specified group
+        set in the Configuration Manager.
+
+1 Aug 2009
+      Added line-break at end of tables for FireFox, so that cursor could be placed outside
+      table structure; otherwise it was locked inside the table if table wasn't followed by text. 
+
+3 Aug 2009
+     Fixed widowed back-slash that occurs in FireFox when the paragrah-to-line break
+    tool is used.
+    
+7 Aug 2009
+  Added '.button.btn_source { display: none; }' to style.css, so that visitors without edit
+  permission cannot use the 'Show Source' button, which poses a vulnerability by exposing
+  the FCKeditor and the editing buttons.    
+  
+9 Aug 2009
+  Added regex support to handle cases where an unmatched forward double slash would cause everything
+  following to be treated as italics.  This happened when the user  might enter something like
+             // comment
+  It also happened because of a bug in the way url's were marked up.  
+
+17 Aug 2009
+  Revised Style -> Code definition
+  Enabled use of HTML tags in Code Blocks
+  
+20 Aug 2009
+  Installed feature that backs up FCK files when user switches over to standard DokuWiki
+  editing mode 
+
+  Fixed feature that disables appearance of FCKeditor toolbar when non user clicks on 
+  "Show pagesource" button.  Security fix.  Only users can have access to toolbar.
+
+25-28  Aug 2009
+  Added function in action/edit.php to test if current file is fckg or native DW.  This prevents 
+  syntax plugin classes (at moment code.php) from being called when file is native DW and so
+  corrupting text.  Various checks are made.  But placed tag <fckg><fckg> at top of fckg
+  file to identify it, from DokuWikiFCK.pm postprocess().  
+
+1 Sep - 12 Sep 2009
+  Converted over to FCKeditor 2.6
+  Fiddled with Code blocks (see 25-28 Aug above).  Removed internal tag identifier identifying
+  code block, since all files without <align>  tags are prefaced with <fckg> tag, as noted
+  above (25-28 Aug).  The code.php syntax plugin still has code to remove the identifier when
+  producing htm, for backward compatiblity. But any file which goes back through DokuWikiFCK.pm
+  will automatically have the identifier dropped.
+  
+14 Sep 2009  
+  Corrected bug in edit.php funtion fckg_edit_meta() which cause a return before scripts
+  were loaded when there was no INFO['userinfo'] array, making the editor unworkable in
+  an open wiki, where one does not have to be a user to make edits.
+
+16 Sep 2009
+   Added support for positioning of table--right, center, left.
+    
+  
+17 Sep 2009
+  
+
+  Updated Javascript in edit.php, call back function repl_cb(), so that it accommodates
+  urls in tables.
+     
+  Added <br /> to end of file as simple way to accommodate block elements (code,table)
+  that come at end of file.
+  Note: code blocks and tables at top of file also capture FCKeditor's cursor.  
+    
+18 Sep 2009
+  Updated Javascript in edit.php, call back function repl_cb(), so that it accommodates
+  urls in code blocks.
+       
+2 Oct 2009
+  Fixed broken smiley image url, in _clean_url, by returning url with prepended {{,
+  which got removed by the regex
+
+ 
+ In _formats(), removed trim() of spaces on either side of formatted character sequences, 
+ so that spacing  remains true to text; otherwise when adjacent space characters are selected,
+ the  spaces are lost:  this is**bold**, instead of this is** bold**
+
+01 Oct 2009
+    Temporary fix to security in media and link tools, preventing any user access to toolbar
+    who is not a registered user. In edit.php fckg_edit_meta:  returns if non-user, so that
+    editor doesn't load.
+      
+03 Oct 2009
+fixed security hole in media and link tools  
+    1. Added new configuration options to conf/metadata.php: guest_toolbar and guest_media.
+    These work in conjunction with two new toolbars are defined in fckconfig.js, DokuwikiNoGuest
+    and DokuwikiGuest for non_registered users: 
+      		guest_toolbar == 0:  DokuwikiNoGuest
+      		guest_media == 1:    DokuwikiGuest
+   2. Defined two new user types in registerOnLoad() of fckg/helper.php: visitor and user; the
+   appropriate type is assigned to the FCKeditor's editorInstance in the Javascript function
+   FCKeditor_OnComplete() which is written to the browser from registerOnLoad().  This makes
+   the distinction between a visitor and a registered user available to FCKeditor, so that
+   the upload facilities can be turned off for visitors in the link and media tools.  This
+   required modifications to fckeditor/editor/filemanager/browser/default:
+            browser.html, frmcreatefolder.html, frmupload.html
+   and to fckeditor/editor/dialog/
+           fck_image/fck_image.js and fck_link/fck_link.js   
+     
+   3.  Added newline after image for conversion from DWFCK to DW in action/edit.php: 
+   fck_convert_text()
+     Also in conversion replaced newline with two newlines so that new paragraph is assured
+       
+04 Oct 2009
+ Fixed bug in tables in edit.php Javascript function repl_cb(), which caused
+ HTML brackets to output as &lt; and &gt; entities instead of being output as
+ brackets, causing the bracket to p;rint to the screen.
+ 
+05 Oct 2009
+ Added Support for Samba Shares (fckeditor/dialog/fck_link.html,
+  fckeditor/dialog/fck_link/fck_link.js, DokuWikiFCK.pm)
+  
+06 0ct 2009
+ Added fit window tool to toolbar
+
+ 
+07 Oct 2009   
+ Re-coded margin styles in table.php, which had been margin: left, right and center.
+ Now left and right alignments get alignments from the align attribute while the
+ margins get 12px on the side adjacent to the text that  wraps around table and the
+ other margins are 6px.  The center align remains as both margin:center and align=center.
+ Only IE accepts align=center when the margins are set to other values; the other browsers
+ all shift to the left no matter what the align attribute is.
+ 
+08 Oct 2009
+ Fixed regex bug in DokuWikiFCK.pm which prevented tables with both table header and 
+ table alignment from implementing alignment code,  in _table() function. Change:
+         @cols = $row=~/[\|]/    to     @cols = $row=~/[\|\^]/
+ 
+07 Nov 2009
+ Added bug fix in save.php and one place in edit.php for checking whether $INFO['userinfo] 
+ isset before accessing $INFO['userinfo']['grps'].  Otherwise caused PHP warning
+ in open wiki's, where there is no 'userinfo' array.
+
+ Back to the drawing board on 04 Oct 2009 for both tables and code blocks.  Made changes to
+ syntax/code.php and syntax/indent.php which properly converts the DowkuWikiFCK markup to HTML
+ and edit.php's javascript repl_cb() handles any FCKeditor issues with the HTML for inserting into
+ editor area.
+ 
+ 
+09 Nov 2009
+ Worked out image alignment.  Added baseline class to fck_editorarea.css and revised
+ baseline attribute output in fck_image.js and baseline option in fck_image.html.
+ When baseline is selected from fack_image.html option list, the images below the
+ image stack under it instead of positioning to its right.  The baseline class
+ also serves the purpose in the editor of removing the influence of the
+ img.mediacenter class, which would hang ohn even after the class was changed to
+ 'media'.
+ 
+ Updated DokuWikiFCK to handle new alignment protocol. Added prepended colon to
+ names of all images--only images in top-level directory had been preded by colon.
+
+10 Nov 2009
+ Updated fck_editor.css to match with DW's design.css and to work in conjunction
+ with the image alignmment facilility of the Image Browser.  Adde help screen
+ to Image Browser and updated fck_image.js to output correct css classes
+ to images.
+ 
+12 Nov 2009
+  Added support to table cells for justification toolbar items: left, center, right,
+  instead of users having to use the table alignment tools, i,e the toolbar pop-up
+  or the right click cell properties menu.
+  
+13 Nov 2009
+  Updated conversion tool both stand-alone and in edit.php to handle table alignment headers
+
+14 Nov 2009
+   Implemented new protocol for connecting image and file browsers to data/media; this
+   autodetects OS and should work on either Windows or Unix-based systems. This is
+   implemented in the config.php file found in fckeditor/editor/filemanagers/connectors/php
+   
+   Added a Configuration option to enable Windows type connector to be used in Unix systems,
+   in the event that the default connector doesn't work.  
+
+15 Nov 2009
+  Added Support for back-slashes.  They have to be escaped using either italic or
+  bold.  In DokuWiki.pm _formats, they are replaced by fckgBACKSLASH. In code blocks
+  these are replaced by back-slashes in edit.php repl_cb() and otherwise in 
+  syntax/indent.php
+  
+  Implemented Editor Window re-sizing by subsituting out own size_ctrl div for DW's
+  
+  Improved back-slash handling by returning all backslashes from DokuWikiFCK.pm _format,
+  each with it own <em> tag to escape it individually. 
+  
+  Added smb icon to fckeditor images and smb css to fck_editorarea.css
+  
+  Added tooltip to smaller and larger buttson for Editor window re-sizing
+  
+  
+ 16 Nov
+ 8:36  Removed autogrow plugin from FCKeditor, now that edit window is resizable.  This
+ also improves functioning of fit window tool, which no longer collapses to the
+ autogrow maximum height.
+  
+ 1 Dec
+  Removed Save buttons from DW editor when switching between FCKeditor and DW, to prevent
+  corrupting of text on a Save.  Now it is necessary to exit from DE editor and go back
+  in before being able to Edit and Save.
+ 
+ 11 Dec
+  Brought fck_convert (edit.php) and conversion script (extra/fckg_convert.php) into
+  line with current DWFCK syntax and sought to fix any outstanding anomalies.
+  
+ Disabled DW Edit button and its checkboxes when a section edit is in progess.  This is
+ a more secure fix for 1 Dec fix and prevents corruption of text which sometimes when
+ moving between FCK editor and DW editor, because Save is automatic when fck conversion
+ is selected. 
+ 
+ 21 Dec
+ Upgraded link tools to give fie borwser listings for both internal links and
+ non-dokuwiki mime types in data/media and brought DokuWikiFCK.pm into line
+ with those changes so that it handles other mime types correctly (in _link).
+ 
+ Fixed bug which prevented users from saving when in section edit, caused by changes on 
+ 11 Dec
+ 
+ 22 Dec
+ Fixed problem with url formats, where format syntax appeared on page instead of actually
+ being used as formatting characters.  This was result of having changed method of
+ handling formatting characters in earlier update.
+ 
+ 12 Jan 2010
+ Fixed bug in commands.php FileUpload which lower-cased only image files
+
+ 22 January
+ Integrated DokuWikiFCK with fckgLite's FCKeditor and adapted to DokuWikiFCK the
+ fckgLite handling of plugin syntax, i.e. it is now built in and doesn't need the
+ plugin tool for escaping plugin syntax.
+
+Feb 26 2013  
+fckg converted to dwfckg

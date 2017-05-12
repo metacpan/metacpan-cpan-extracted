@@ -1,0 +1,6 @@
+<table border="0" class="table">
+<tr class="thtr"><th>Emp ID</th><th>Name</th><th>Emp Title</th></tr>
+<tr class="tr"><td>123</td><td>FRED FLINTSTONE</td><td>CEO</td></tr>
+<tr class="tr"><td>456</td><td>BARNEY RUBBLE</td><td>Lackey</td></tr>
+<tr class="tr"><td>789</td><td>DINO</td><td>Pet</td></tr>
+</table>

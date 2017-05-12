@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+SimpleTemplate.pm
+test.pl
+testtpl/test.tpl
+testtpl/test2.tpl
+testtpl/test3.tpl
+testtpl/declined.tpl
+README

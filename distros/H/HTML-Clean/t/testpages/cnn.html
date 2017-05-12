@@ -1,0 +1,1400 @@
+<HTML>
+<HEAD>
+<TITLE>CNN Interactive</TITLE>
+
+<SCRIPT LANGUAGE="JavaScript">
+<!--Hide JavaScript from Java-Impaired Browsers
+
+function openWindow (earl,name,widgets) {
+	host = location.hostname;
+	if (host.indexOf('customnews') != -1) {
+		var url = 'http://customnews.cnn.com' + earl;
+		} else {
+			var url = earl;
+			}
+	popupWin = window.open (url,name,widgets);
+	popupWin.opener.top.name="opener";
+	popupWin.focus();
+	}
+	
+function closeWindow () {
+	parent.close ();
+	}
+
+function goTW(){
+    var URL = document.pathfinder.site.options[document.pathfinder.site.selectedIndex].value;
+    window.location.href = URL;
+}
+
+
+// tg	
+function livevideo (url,streamtitle,customfeatures) {
+windowFeatures = 'toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,width=200,height=450';
+
+//Browser Detection
+var browser = "";
+var browsername = navigator.appName;
+var browserversion = parseInt(navigator.appVersion);
+if (browsername == "Netscape") {
+    browser = "ns" + browserversion;
+} else {
+    if (browsername == "Microsoft Internet Explorer") {
+        if (browserversion >= 4) {
+            browser = "ie" + browserversion;
+        } else {
+            browser = "ie3";
+        }
+    }
+}
+
+//if (customfeatures != '') {
+//	windowFeatures = customfeatures;
+//}
+
+if (url.indexOf("real") != -1) {
+	if (browser != 'ie3') {
+		hasplugin = 'false';
+		numPlugins = navigator.plugins.length;
+		for (i = 0; i < numPlugins; i++) {
+			plugin = navigator.plugins[i];
+			if (plugin.name.substring(0,10)=="RealPlayer") {
+				hasplugin = 'true';
+			}
+		}
+		if (browser.substring(0,2) == 'ie') {
+			hasplugin = 'true';
+		}
+		if (hasplugin == 'true') {
+			videoWin = window.open (url , 'video', windowFeatures);
+			if (streamtitle != '') {
+   		 		videoWin.streamtitle=streamtitle;
+   		 	}
+   		 	videoWin.document.close();		
+		} else {
+		stream = url.charAt((url.length-6))
+		location.href='/video/live/live' + stream + '.rm28.ram';
+		}
+	} else {
+		videoWin = window.open (url , 'video', windowFeatures);
+		if (document.images) {
+			if (streamtitle != '') {
+   				videoWin.streamtitle=streamtitle;
+   			 }
+   		}
+   		videoWin.document.close();			
+	}		
+} else {
+	videoWin = window.open (url , 'video', windowFeatures);
+	if (document.images) {
+		if (streamtitle != '') {
+	    	videoWin.streamtitle=streamtitle;
+	    }
+	}
+    videoWin.document.close();
+}
+}
+
+//tg
+
+function vod (url,streamtitle,customfeatures) {
+windowFeatures = 'toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,width=200,height=450';
+
+//Browser Detection
+var browser = "";
+var browsername = navigator.appName;
+var browserversion = parseInt(navigator.appVersion);
+if (browsername == "Netscape") {
+    browser = "ns" + browserversion;
+} else {
+    if (browsername == "Microsoft Internet Explorer") {
+        if (browserversion >= 4) {
+            browser = "ie" + browserversion;
+        } else {
+            browser = "ie3";
+        }
+    }
+}
+
+if ((customfeatures) && customfeatures != '') {
+	windowFeatures = customfeatures;
+}
+
+
+if (url.indexOf(".rm",(url.length-10)) != -1) {
+	if (browser != 'ie3') {
+		hasplugin = 'false';
+		numPlugins = navigator.plugins.length;
+		for (i = 0; i < numPlugins; i++) {
+			plugin = navigator.plugins[i];
+			if (plugin.name.substring(0,10)=="RealPlayer") {
+				hasplugin = 'true';
+			}
+		}
+		if (browser.substring(0,2) == 'ie') {
+			hasplugin = 'true';
+		}
+		if (hasplugin == 'true') {
+			videoWin = window.open (url , 'video', windowFeatures);
+			if (streamtitle != '') {
+   		 		videoWin.streamtitle=streamtitle;
+   		 	}
+  		 	videoWin.document.close();		
+		} else {
+		stream = url.substring(0,(url.length-5));
+		location.href=stream + '.ram';
+		}
+	} else {
+		videoWin = window.open (url , 'video', windowFeatures);
+		if (document.images) {
+			if (streamtitle != '') {
+   				videoWin.streamtitle=streamtitle;
+   			 }
+   		}
+   		videoWin.document.close();			
+	}		
+} else {
+	videoWin = window.open (url , 'video', windowFeatures);
+	if (document.images) {
+		if (streamtitle != '') {
+	    	videoWin.streamtitle=streamtitle;
+	    }
+	}
+    videoWin.document.close();
+}
+}
+
+
+function openWin(url) {
+	var newFrame = window.open (url,'map','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=no,width=550,height=400');
+	newFrame.focus();
+    newFrame.document.close();
+}
+
+// End Hiding -->
+
+</SCRIPT>
+
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+//Browser Detection
+var browser = "";
+var browsername = navigator.appName;
+var browserversion = parseInt(navigator.appVersion);
+if (browsername == "Netscape") {
+    browser = "ns" + browserversion;
+} else {
+    if (browsername == "Microsoft Internet Explorer") {
+        if (browserversion >= 4) {
+            browser = "ie" + browserversion;
+        } else {
+            browser = "ie3";
+        }
+    }
+}
+
+function popNav(url,name,features) {
+   if ((browser == "ns3","ns4") || (browser == "ie4")) {
+   popBox = window.open(url,name,features);
+   popBox.focus();
+     } else {
+          if (browser == "ie3") {
+          popBox = window.open(url,name,features);
+          }  
+   }
+}
+//-->
+</SCRIPT>
+
+<META HTTP-EQUIV="Refresh" CONTENT="1800, URL=/index.html">
+<!-- LINK REL="stylesheet" HREF="/virtual/1998/code/cnn.css" TYPE="text/css" -->
+</HEAD>
+<BODY BGCOLOR="white" LINK="#3333cc" VLINK="#777777" ONLOAD="if(parent.frames.length!=0)top.location='http://cnn.com';">
+<A NAME="top"></A>
+
+<TABLE WIDTH=600 CELLPADDING="0" CELLSPACING="0" BORDER="0">
+<TR><TD COLSPAN="3">
+<TABLE BORDER="0" WIDTH="600" CELLSPACING="0" CELLPADDING="0">
+
+<TR><TD WIDTH="120" valign=top><table width="100%" cellpadding=0 cellspacing=0 border=0><tr><td>
+
+<!-- ÇA HREF="/feedback/help/basic/home.html"ÈÇIMG SRC="/images/1998/08/start120.gif" WIDTH=120 HEIGHT=60 BORDER=1 ALT="Make CNN your homepage"ÈÇ/AÈÇBRÈÇfont face="verdana,ARIAL,sans-serif" size=1ÈÇa href="/feedback/help/basic/home.html" target="_top"ÈClick HereÇ/aÈÇ/fontÈ -->
+
+<SCRIPT language="javascript">
+<!--                            
+function goShopPromo(){
+    if (document.shoppromo.category.options[document.shoppromo.category.selectedIndex].value == "")
+            return;
+        else {
+        var URL = "/SHOP/" + document.shoppromo.category.options[document.shoppromo.category.selectedIndex].value;
+        popBox = window.open(URL,'shop','scrollbars=no,resizable=no,width=510,height=400,left=100,top=100');
+        popBox.focus();
+    }
+}
+//-->
+</SCRIPT>
+<FORM name="shoppromo"><TABLE width="120" cellpadding="0" cellspacing="0" height=62 bgcolor="#000066" border="0"><TR><TD bgcolor="#000000" align="center"><FONT face="arial,helvetica" color="#FF8000"><B>SHOP</B></FONT><FONT face="arial,helvetica" color="#FFFFFF"><B>@CNN</B></FONT></TD></TR><TR><TD align="center"><FONT face="arial,helvetica" color="#ffffff" size="2">Browse by<BR><SELECT name="category" onChange="goShopPromo();"><OPTION value="">category<OPTION value="books/">books<OPTION value="music/">music<OPTION value="travel/">travel</SELECT></TD></TR></TABLE></FORM>
+<!-- /shoppromo --></TD><TD valign=top><A HREF="/ads/e.market/"><IMG SRC="/images/1998/05/homepage/ad.info.gif" WIDTH=7 HEIGHT=62 BORDER=0 ALT="ad info"></A></td></tr></table></TD><TD WIDTH="8" valign=top ALIGN=RIGHT></TD><TD WIDTH="468" valign=top><!-- top ad tag --><A HREF="/event.ng/Type=click&RunID=11888&ProfileID=34&AdID=8572&GroupID=15&FamilyID=1100&TagValues=145.249.434.435.594.598.606.629&Redirect=http:%2F%2Fcgi.pathfinder.com%2Fcgi-bin%2Fmagsubs%2Fcc%2Fsubs%2Fsi_riskfree_nocc%3FEFFORT%3EKEY%3DSID3MC9%3EORTKEY%3DSID3MC9%20" target="_top"><img src="http://images.cnn.com/ads/advertiser/cnnsi/9811/4free.gif" border=1 height=60 width=468 alt="Click here to try four free issues of Sports Illustrated."></a><table width="100%" cellpadding=0 cellspacing=0 border=0><td align="right"><font face="verdana,ARIAL,sans-serif" size=1><a href="/event.ng/Type=click&RunID=11888&ProfileID=34&AdID=8572&GroupID=15&FamilyID=1100&TagValues=145.249.434.435.594.598.606.629&Redirect=http:%2F%2Fcgi.pathfinder.com%2Fcgi-bin%2Fmagsubs%2Fcc%2Fsubs%2Fsi_riskfree_nocc%3FEFFORT%3EKEY%3DSID3MC9%3EORTKEY%3DSID3MC9%20" target="_top">Click here to try four free issues of Sports Illustrated.</a></font></td></table></TD></TR></TABLE><HR NOSHADE WIDTH="600" SIZE="1" ALIGN="LEFT"></TD></TR>
+
+<TR VALIGN=TOP><TD WIDTH="125">
+
+
+<a href="/index.html"><img src="/images/1998/05/homepage/cnnin.logo.gif" alt="CNNin" width="125" height="76" border="0" hspace="0" vspace="0"></a><br>
+
+<!--TOP-LEVEL NAVIGATION-->  
+
+<table border="0" width="125" cellspacing="0" cellpadding="2" bgcolor="#CCCCFF">
+
+<tr>
+  <td bgcolor="#333399"><img src="/images/1998/05/homepage/icon.arrow.left.gif" width="15" height="15" align="RIGHT" alt="*"><b><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/index.html"><font color="#FFFFFF">MAIN PAGE</font></a></font></b></td>
+</tr>
+
+<tr> 
+  <td><b><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/WORLD/"><font color="#000000">WORLD</font></a></font></b></td>
+</tr>
+
+<tr> 
+  <td><b><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/US/"><font color="#000000">U.S.</font></a></font></b></td>
+</tr>
+
+<tr> 
+  <td><b><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/LOCAL/"><font color="#000000">LOCAL</font></a></font></b></td>
+</tr>
+
+<tr> 
+  <td><b><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/ALLPOLITICS/index.html"><font color="#000000">POLITICS</font></a></font></b></td>
+</tr>
+
+<tr> 
+  <td><b><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/WEATHER/"><font color="#000000">WEATHER</font></a></font></b></td>
+</tr>
+
+<tr> 
+  <td><b><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/cnnfn/"><font color="#000000">BUSINESS</font></a></font></b></td>
+</tr>
+
+<tr> 
+  <td><b><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/cnnsi/"><font color="#000000">SPORTS</font></a></font></b></td>
+</tr>
+
+<tr> 
+  <td><b><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/TECH/"><font color="#000000">SCI-TECH</font></a></font></b></td>
+</tr>
+
+<tr> 
+  <td><b><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/SHOWBIZ/"><font color="#000000">ENTERTAINMENT</font></a></font></b></td>
+</tr>
+
+<tr> 
+  <td><b><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/books/"><font color="#000000">BOOKS</font></a></font></b></td>
+</tr>
+
+<tr> 
+  <td><b><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/TRAVEL/"><font color="#000000">TRAVEL</font></a></font></b></td>
+</tr>
+
+<tr> 
+  <td><b><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/FOOD/"><font color="#000000">FOOD</font></a></font></b></td>
+</tr>
+
+<tr> 
+  <td><b><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/HEALTH/"><font color="#000000">HEALTH</font></a></font></b></td>
+</tr>
+
+<tr> 
+  <td><b><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/STYLE/"><font color="#000000">STYLE</font></a></font></b></td>
+</tr>
+
+<tr> 
+  <td><b><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/SPECIALS/"><font color="#000000">IN-DEPTH</font></a></font></b></td>
+</tr>
+
+<tr>
+	<td><hr size=1 noshade></td>
+</tr>
+
+<tr> 
+  <td><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="http://cnn.com/CustomNews/"><font color="#000000">custom news</font></a></font></td>
+</tr>
+
+<tr> 
+  <td><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/QUICKNEWS/"><font color="#000000">Headline News brief</font></a></font></td>
+</tr>
+
+<tr> 
+  <td><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/almanac/daily/"><font color="#000000">daily almanac</font></a></font></td>
+</tr>
+
+
+<tr> 
+  <td><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/CNN/"><font color="#000000">CNN networks</font></a></font></td>
+</tr>
+
+
+
+<tr> 
+  <td><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/TRANSCRIPTS/"><font color="#000000">on-air transcripts</font></a></font></td>
+</tr>
+
+<tr> 
+  <td><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/SEARCH/quiz/quiz.html"><font color="#000000">news quiz</font></a></font></td>
+</tr>
+
+<tr> 
+  <td><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/JOBS/"><font color="#000000">jobs</font></a></font></td>
+</tr>
+
+<tr> 
+  <td><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/ads/e.market/"><font color="#000000">ad info</font></a></font><br><br></td>
+</tr>
+
+</table>
+
+<!-- CNN WEB SITES NAV -->
+
+<table border="0" width="125" cellspacing="0" cellpadding="2" bgcolor="#CCCCFF">
+
+<tr bgcolor="#000000"> 
+    <td><font face="Helvetica, Arial,sans-serif" size="1" color="#FFFFFF">&nbsp; CNN WEB SITES:</font></td>
+</tr>
+
+<tr><td bgcolor="#FFFFFF">
+
+<map name="sites">
+
+			<area shape="rect" coords="0, 82, 55, 95"
+				href="http://cnn.vg.no/">
+			<area shape="rect" coords="0, 69, 66, 82"
+				href="http://cnn.passagen.se/">
+			<area shape="rect" coords="0, 55, 84, 69"
+				href="/cnnpt/">
+			<area shape="rect" coords="0, 40, 75, 55"
+				href="/cnnes/">
+			<area shape="rect" coords="64, 20, 121, 40"
+				href="/cnnfn/">
+			<area shape="rect" coords="0, 20, 64, 40"
+				href="/ALLPOLITICS/">
+			<area shape="rect" coords="64, 0, 121, 20"
+				href="/cnnsi/">
+			<area shape="rect" coords="0, 0, 64, 20"
+				href="/CustomNews/">
+
+</map>
+
+	<img src="/images/1999/01/homepage/cnn.web.site.gif" alt="CNN Websites" width="121" height="95" border="0" usemap="#sites">
+
+</td></tr>
+<!-- ÇtrÈÇtdÈÇfont face="Helvetica, Arial,sans-serif" size="1"È&nbsp;Ça href="http://barnesandnoble.bfast.com/booklink/click?sourceid=15368&categoryid=homepage"ÈÇfont color="#000000"ÈBuy holiday books atÇBRÈ&nbsp;BarnesandNoble.comÇ/fontÈÇ/aÈÇ/fontÈÇbrÈÇ/tdÈ
+Ç/trÈ -->
+</table>
+
+<!-- /CNN WEB SITES NAV -->
+
+<!--/TOP-LEVEL NAVIGATION -->
+
+
+
+<!-- 3ads - keep a copy of this somewhere-->
+
+<!-- 	Çmap name="3ads"È
+			Çarea shape="rect" coords="-8, 102, 125, 152"
+			href="http://barnesandnoble.bfast.com/booklink/click?sourceid=11764&categoryid=homepage"È
+			Çarea shape="rect" coords="-21, 51, 126, 102"
+				href="http://www-cgi.cnn.com/cgi-bin/redirect?BIGYELLOW"È
+			Çarea shape="rect" coords="-10, -10, 126, 51"
+				href="http://app1.firstusa.com/card.cfm/2PL35P01T/6801"È
+		Ç/mapÈ
+
+ÇcenterÈ
+Çimg src="/images/ad.home.gif" width="125" height="152" border=0 usemap="#3ads"È
+Ç/centerÈ -->
+
+<!-- /3ads - keep a copy of this somewhere-->
+
+</TD><TD WIDTH="15"><IMG SRC="/images/1998/05/homepage/white.gif" WIDTH=15 HEIGHT=1 HSPACE=0 VSPACE=0 BORDER=0 ALT=""></TD>
+
+<TD WIDTH="460">
+
+<!-- ======================== Search Table ============================ -->
+
+<map name="roof">
+	<area shape="rect" coords="370, 3, 459, 17"
+		href="http://email.cnn.com/member/login.page"
+		alt="Free Email"
+		onMouseOver="window.status='Free Email'; return true;"
+		onMouseOut="window.status=''; return true;">
+	<area shape="rect" coords="261, 4, 368, 17"
+		href="/desktop/"
+		alt="Open a pop-up controller to bring you CNN news anytime"
+		onMouseOver="window.status='Open a pop-up controller to bring you CNN news anytime'; return true;"
+		onMouseOut="window.status=''; return true;">
+	<area shape="rect" coords="166, 4, 259, 17"
+		href="/CustomNews/"
+		alt="Personalize your CNN Home Page"
+		onMouseOver="window.status='Personalize your CNN Home Page'; return true;"
+		onMouseOut="window.status=''; return true;">
+	<area shape="rect" coords="84, 4, 164, 17"
+		href="/audioselect/"
+		alt="Listen to the CNN Networks LIVE on your desktop"
+		onMouseOver="window.status='Listen to the CNN Networks LIVE on your desktop'; return true;"
+		onMouseOut="window.status=''; return true;">
+	<area shape="rect" coords="0, 4, 81, 17"
+		href="/videoselect/"
+		alt="View video news and CNN Programs on demand"
+		onMouseOver="window.status='View video news and CNN Programs on demand'; return true;"
+		onMouseOut="window.status=''; return true;">
+</map>
+
+<FORM NAME="seek_top" METHOD=GET ACTION="http://search.cnn.com:8765/query.html"><IMG SRC="/images/1998/08/homepage/roof.gif" WIDTH=460 HEIGHT=17 BORDER=0 USEMAP="#roof" ALT="Video, Audio, Customize, Remote, Email"><TABLE BORDER="0" WIDTH="460" CELLSPACING="0" CELLPADDING="0"><TR><TD VALIGN="middle" BGCOLOR="#CCCCFF"><NOBR> &nbsp; &nbsp;<A HREF="/QUICKNEWS/"><FONT FACE="Helvetica, Arial,sans-serif" COLOR="#000000" SIZE="1">For a QUICK read of the Headline News, click here.</FONT></A></NOBR></TD><TD VALIGN="bottom" ALIGN=RIGHT BGCOLOR="#CCCCFF"><TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0"><TR VALIGN="bottom"><TD BGCOLOR="#333399">&nbsp;<A HREF="/SEARCH/"><IMG SRC="/images/1998/08/homepage/search_graphic.gif" WIDTH=57 HEIGHT=17 ALT="Search CNN" BORDER="0" HSPACE="0" VSPACE="0"></A>&nbsp;</TD><TD VALIGN="middle" BGCOLOR="#333399"><INPUT TYPE=TEXT NAME="qt" SIZE=10 VALUE="" MAXLENGTH=50><INPUT TYPE=HIDDEN NAME="qc" VALUE=""><INPUT TYPE=HIDDEN NAME="col" VALUE="cnni"><INPUT TYPE=HIDDEN NAME="qm" VALUE="0"><INPUT TYPE=HIDDEN NAME="st" VALUE="1"><INPUT TYPE=HIDDEN NAME="nh" VALUE="10"><INPUT TYPE=HIDDEN NAME="lk" VALUE="1"><INPUT TYPE=HIDDEN NAME="rf" VALUE="1">&nbsp;<A HREF="javascript:document.seek_top.submit()"><FONT FACE="Helvetica, Arial,sans-serif" COLOR="#FFFFFF" SIZE="2">go</FONT></A></TD><TD BGCOLOR="#333399">&nbsp;</TD></TR></TABLE></TD></TR><TR><TD COLSPAN="2"><FONT FACE="Helvetica, Arial,sans-serif" SIZE="1">
+
+<!-- date -->
+
+<A HREF="/almanac/daily/">January 29, 1999</A> -- Updated 4:55 a.m. EST, 0955 GMT,<A HREF="/WEATHER/worldtime/"> @455</A>
+
+<!-- /date -->
+		<map name="swatch">
+			<area shape="rect" coords="60, 0, 114, 12" href="/WEATHER/worldtime/">
+			<area shape="rect" coords="0, 0, 59, 12" href="http://www.swatch.com">
+		</map>
+
+<img src="/images/1998/10/swatch.internet.time.gif" width=114 height=12 hspace=0 vspace=0 border=0 alt="Swatch internet time" align="absbottom" HSPACE="0" VSPACE="0" usemap="#swatch">
+</FONT></TD></TR></TABLE></FORM>
+
+<!-- ======================== /Search Table =========================== -->
+
+<!-- ======================= Top Table T1-T2-T3 ======================= -->
+
+<TABLE BORDER="0" WIDTH="460" CELLSPACING="0" CELLPADDING="0"><TR VALIGN="top"><TD WIDTH="290" VALIGN="top">
+
+<!-- t1 -->
+
+<A HREF="/ALLPOLITICS/stories/1999/01/28/impeachment.01/"><IMG SRC="/ALLPOLITICS/stories/1999/01/28/impeachment.01/top.impeachment.jpg" ALT="Impeachment" ALIGN=TOP WIDTH="280" HEIGHT="170" BORDER="0" HSPACE="0" VSPACE="0"></A><br>
+
+<A HREF="/ALLPOLITICS/stories/1999/01/28/impeachment.01/"><FONT FACE="arial, helvetica, sans-serif" size="4" COLOR="#000000"><B>Republicans force through their trial road map</B></FONT></A><br><br>
+
+<P>
+In a party-line 54-44 vote, Republicans Thursday pushed through their proposal for proceeding with the deposition phase of the impeachment trial of President Bill Clinton. Under the plan, witnesses will be deposed starting Monday and February 12 has been set as the trial's target end date.
+</P>
+<P>
+The Senate's OK of the Republican plan was the last of three rapid-fire votes Thursday evening after negotiations failed to yield a bipartisan agreement. The Democrats' proposal was first rejected, also by a 54-44 margin. The senators next voted down a Democratic attempt to move immediately to a final vote on the articles of impeachment.
+</P>
+<FONT FACE="arial, helvetica, sans-serif" COLOR="#000000" size=2>
+<P>
+<A HREF="/ALLPOLITICS/stories/1999/01/28/impeachment.01/">FULL STORY</A> <IMG SRC="/images/9808/icons/video_icon.gif" WIDTH="14" ALT="video icon" HEIGHT="9" BORDER="0">
+</P>
+
+<!-- Live: Watch the trial ÇIMG SRC="/images/9808/icons/video_icon.gif" WIDTH="14" ALT="video icon" HEIGHT="9" BORDER="0"È: ÇA HREF="javascript:vod('/video/live/real4.html','The Impeachment Trial')"ÈRealÇ/AÈ or ÇA HREF="javascript:vod('/video/live/netshow4.html','The Impeachment Trial')"ÈWindows MediaÇ/AÈ -->
+
+<!-- /t1 -->
+
+<FONT face="arial, helvetica, sans-serif" size=1><UL>
+<li><a href="/ALLPOLITICS/stories/1999/01/28/impeach.reax/">Senate Democrats, White House critical of GOP witness plan</a>
+<li><a href="/ALLPOLITICS/stories/1999/01/27/poll/">Poll: Clinton still riding high, but Senate slipping</a>
+<li><A HREF="/ALLPOLITICS/stories/1999/01/28/feingold.01/">Democrat bucks party line to vote with GOP in Clinton hearing</A>
+<LI><A HREF="/ALLPOLITICS/resources/1998/lewinsky/">In-depth: The impeachment trial</A>
+
+<!-- ÇLIÈÇA HREF="/US/9901/27/us.colombia/"ÈU.S. to give $2 million to Colombia quake victimsÇ/AÈ
+ÇLIÈÇA HREF="http://community.cnn.com/cgi-bin/WebX?13@@.ee7be95"ÈMessage board: Colombia's futureÇ/AÈ -->
+
+</UL></FONT>
+
+<BR>
+
+</TD><TD WIDTH="10">&nbsp;</TD><TD WIDTH="160" VALIGN="top">
+
+<!-- t2 Table -->
+
+<TABLE bgcolor="#ff9900" width=160 align=top cellpadding=0 cellspacing=0 border=0 BORDERCOLOR="ff9900">
+<TR><TD Valign=MIDDLE ALIGN=CENTER><FONT FACE="arial, helvetica, sans-serif" color="#AAAAAA" SIZE="-1">
+<CENTER><a href="/US/9901/28/fringe/saw.artist/"><FONT COLOR="#FFFFFF">An artist on the cutting edge</FONT></A></CENTER></FONT></TD><TD VALIGN=BOTTOM><A HREF="/US/9901/28/fringe/saw.artist/"><IMG SRC="/images/9901/t2.saw.artist.jpg" WIDTH=62 HEIGHT=75 ALT="saw artist" BORDER=0 ALIGN="BOTTOM"></A></TD></TR></TABLE>
+
+
+<!-- /t2 Table -->
+<br><FONT FACE="arial, helvetica, sans-serif"><P><B>In other news:</B></FONT></P><FONT FACE="arial, helvetica, sans-serif" size=2>
+<!-- t2 -->
+
+<A HREF="/WORLD/europe/9901/29/kosovo.01/">Kosovo crisis talks launched as military threat looms</A>
+
+<!-- /t2 -->
+<HR SIZE=1 NOSHADE>
+<!-- t2.5 -->
+
+<a href="/WORLD/americas/9901/28/colombia.quake.02/">Magnitude of Colombian quake 'exceeds all calculations'</a> <IMG SRC="/images/9808/icons/video_icon.gif" WIDTH="14" ALT="video icon" HEIGHT="9" BORDER="0">
+
+<!-- /t2.5 -->
+
+<HR SIZE=1 NOSHADE>
+<!-- t3 -->
+
+<A HREF="/WORLD/asiapcf/9901/29/east.timor.01/">Violence sweeps East Timor as independence drive gains momentum</A>
+
+<!-- /t3 -->
+<HR SIZE=1 NOSHADE>
+<!-- t4 -->
+
+<A HREF="/WORLD/meast/9901/28/turkey.iraq.01/">U.S. fighters attack Iraqi anti-aircraft site</A>
+
+<!-- /t4 -->
+<HR SIZE=1 NOSHADE>
+<!-- t5 -->
+
+<a href="/US/9901/28/olympic.probe/">Investigators on Salt Lake Olympic money trail</a>
+
+<!-- /t5 -->
+<HR SIZE=1 NOSHADE>
+
+<a href="/cnnfn/hotstories/washun/wires/9901/28/surplus_wg/">Federal budget surplus tops $100 billion</a>
+
+<HR SIZE=1 NOSHADE>
+
+<a href="/WORLD/europe/9901/28/charles.camilla.reut/">Charles, Camilla appear together for first time</a>
+
+<BR><BR>
+</FONT>
+</FONT></font></TD></TR></TABLE>
+</FONT></TD></TR></TABLE>
+
+
+<!-- DIVIDER BETWEEN THE TOP AND BOTTOM HALVES OF THE PAGE-->
+
+<TABLE WIDTH=600 CELLPADDING="0" CELLSPACING="0" BORDER="0" align=top><TR VALIGN=TOP>
+<TD WIDTH="125">
+
+<!--PATHFINDER NAV -->
+
+<table border="0" width="125" cellspacing="0" cellpadding="2" bgcolor="#CCCCFF">
+<FORM name="pathfinder">
+<tr bgcolor="#000000"> 
+        <td><font face="Helvetica, Arial,sans-serif" color="#FFFFFF" size="1">&nbsp;PATHFINDER SITES:</font></td>
+</tr>
+
+<tr> 
+        <td align=center>
+		<SELECT NAME="site" SIZE=1 onChange ="goTW()">
+		<OPTION VALUE=""> Go To ... 
+		<OPTION VALUE="http://www.pathfinder.com/time/">Time
+		<OPTION VALUE="http://www.pathfinder.com/people/">People
+		<OPTION VALUE="http://jcgi.pathfinder.com/money/plus/index.oft">Money
+		<OPTION VALUE="http://www.pathfinder.com/fortune/">Fortune
+		<OPTION VALUE="http://cgi.pathfinder.com/ew/">EW
+        <OPTION VALUE="http://cgi.pathfinder.com/drweil/">Dr. Weil
+		</SELECT>
+		</td>
+</tr>
+</FORM>
+</table>
+
+<!--/PATHFINDER NAV --> 
+
+<!--MORE SERVICES NAV -->
+
+<table border="0" width="125" cellspacing="0" cellpadding="2" bgcolor="#CCCCFF">
+
+<tr bgcolor="#000000"> 
+        <td><font face="Helvetica, Arial,sans-serif" color="#FFFFFF" size="1">&nbsp;MORE SERVICES:</font></td>
+</tr>
+
+<tr> 
+        <td><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/videoselect/"><font color="#000000">video on demand</font></a></font></td>
+</tr>
+
+<tr> 
+        <td><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/video_vault/"><font color="#000000">video archive</font></a></font></td>
+</tr>
+
+<tr> 
+        <td><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/audioselect/"><font color="#000000">audio on demand</font></a></font></td>
+</tr>
+
+<tr> 
+        <td><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/EMAIL/"><font color="#000000">news email services</font></a></font></td>
+</tr>
+
+<tr> 
+        <td><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="http://email.cnn.com/member/login.page"><font color="#000000">free email accounts</font></a></font></td>
+</tr>
+
+
+<tr> 
+        <td><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/desktop/"><font color="#000000">desktop headlines</font></a></font></td>
+</tr>
+
+<tr> 
+        <td><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="http://www.pointcast.com/special/affiliates/cnn.html"><font color="#000000">pointcast</font></a></font><br></td>
+</tr>
+
+<tr>
+        <td><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/ads/pagenet/"><font color="#000000">pagenet</font></a></font><br><br></td>
+</tr>
+
+</table>
+
+<!--/MORE SERVICES NAV --> 
+
+
+<!--DISCUSSION NAV -->
+
+<table border="0" width="125" cellspacing="0" cellpadding="2" bgcolor="#CCCCFF">
+
+<tr bgcolor="#000000"> 
+    <td><font face="Helvetica, Arial,sans-serif" size="1" color="#FFFFFF">&nbsp;DISCUSSION:</font></td>
+</tr>
+
+<tr> 
+    <td><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/boards/"><font color="#000000">message boards</font></a></font></td>
+</tr>
+
+<tr> 
+    <td><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/chat/"><font color="#000000">chat</font></a></font></td>
+</tr>
+
+<tr> 
+    <td><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/feedback/"><font color="#000000">feedback</font></a></font><br><br></td>
+</tr>
+
+</table>
+
+<!--/DISCUSSION NAV -->
+
+
+<!-- SITE GUIDES NAV -->
+
+<table border="0" width="125" cellspacing="0" cellpadding="2" bgcolor="#CCCCFF">
+
+<tr bgcolor="#000000"> 
+    <td><font face="Helvetica, Arial,sans-serif" size="1" color="#FFFFFF">&nbsp;SITE GUIDES:</font></td>
+</tr>
+
+<tr> 
+    <td><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/feedback/help/"><font color="#000000">help</font></a></font></td>
+</tr>
+
+<tr> 
+    <td><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/INDEX/"><font color="#000000">contents</font></a></font></td>
+</tr>
+
+<tr> 
+    <td><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="/SEARCH/"><font color="#000000">search</font></a></font><br><br></td>
+</tr>
+
+</table>
+
+<!-- /SITE GUIDES NAV -->
+
+<!-- FASTER ACCESS NAV -->
+
+<table border="0" width="125" cellspacing="0" cellpadding="2" bgcolor="#CCCCFF">
+
+<tr bgcolor="#000000"> 
+        <td><font face="Helvetica, Arial,sans-serif" size="1" color="#FFFFFF">&nbsp;FASTER ACCESS:</font></td>
+</tr>
+
+<tr> 
+        <td><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="http://europe.cnn.com/"><font color="#000000">europe</font></a></font></td>
+</tr>
+
+<tr> 
+        <td><font face="Helvetica, Arial,sans-serif" size="1">&nbsp;<a href="http://japan.cnn.com"><font color="#000000">japan</font></a></font><br><br></td>
+</tr>
+
+</table>
+
+<!-- /FASTER ACCESS NAV -->
+
+<!-- WEB SERVICES NAV -->
+
+<table border="0" width="125" cellspacing="0" cellpadding="2" bgcolor="#CCCCFF">
+<tr bgcolor="#000000"> 
+    <td><font face="Helvetica, Arial,sans-serif" size="1" color="#FFFFFF">&nbsp;WEB SERVICES:</font></td>
+</tr>
+</table>
+
+<center>
+
+<a href="http://app1.firstusa.com/card.cfm/2EC01EC10/68E7"><IMG SRC="/ads/advertiser/first.usa/2EC01_115x90.gif" WIDTH="115" HEIGHT="90" BORDER="0"></a><br>
+
+<img src="/images/1998/08/homepage/gray.bar.gif" width="125" height="1" border=0><br>
+
+<table width="117" bgcolor="#cccc99" height="90" bordercolor="black" bordercolorlight="gray" bordercolordark="black"
+cellspacing="0" cellpadding="0" border="1" rules="none">
+<tr>
+<td colspan="1" bgcolor="white">
+<a href="http://barnesandnoble.bfast.com/booklink/click?sourceid=11764">
+<img src="/images/9812/gutter117.gif" width="117" height="50" border="0" alt="barnesandnoble.com" align="top"></a>
+</td>
+</tr>
+<tr>
+
+<td bordercolor="black" width="130">
+<form action="http://barnesandnoble.bfast.com/booklink/click">
+<input type="hidden" name="sourceid" value="266324">
+<input type=hidden name="categoryid" value="categorydropdown">
+<font size="2">
+<select name="Subjects" size=3>
+<!-- 		<option value="4">Books on: -->
+        	<option value="300">Business
+        	<option value="500">Tech
+		<option value="900">Fiction
+		<option value="1400">Health
+	        <option value="400">Kids
+		<option value="2300">Travel
+		<option value="600">Food
+		<option value="200">Bios
+		<option value="703">Humor																<option value="5004">Mags
+		<option value="4000">Software
+		<option value="3000">Gifts
+		<option value="4">Other
+
+		</select>
+		&nbsp;
+<input type="image" value="Go" src="/images/9812/go25.gif" width="25" height="25" align="absmiddle" border="0">
+</font>
+</td>
+</form>
+</tr>
+
+</table>
+
+<!-- WEB SERVICES NAV -->
+
+
+<!-- shop -->
+<SCRIPT language="javascript">
+
+<!--                            
+function goShop(){
+    if (document.shopping.category.options[document.shopping.category.selectedIndex].value == "")
+            return;
+        else {
+        var URL = "/SHOP/" + document.shopping.category.options[document.shopping.category.selectedIndex].value;
+        popBox = window.open(URL,'shop','scrollbars=no,resizable=no,width=510,height=400,left=100,top=100');
+        popBox.focus();
+    }
+}
+// -->
+
+</SCRIPT><br><br><form name="shopping"><table width="125" cellpadding="0" cellspacing="0" bgcolor="#000066" border="0"><tr><td bgcolor="#000000" align="center"><font face="arial,helvetica" color="#FF8000"><b>SHOP</b></font><font face="arial,helvetica" color="#FFFFFF"><b>@CNN</b></font></td></tr><tr><td align="center"><font face="arial,helvetica" color="#ffffff" size="2">Browse by<br><select name="category" onChange="goShop();"><option value="">category<option value="books/">books<option value="music/">music<option value="travel/">travel</select><hr noshade size="1">SPECIAL DEAL:<br></font><FONT FACE="Arial, Helvetica, sans-serif" SIZE=-1 color="#ffffff"><A HREF="/event.ng/Type=click&RunID=14458&ProfileID=605&AdID=9025&GroupID=1&FamilyID=1687&TagValues=433.435.487.598.629.851&Redirect=http:%2F%2Fbarnesandnoble.bfast.com%2Fbooklink%2Fclick%3Fsourceid=299482%26ISBN=006019409X"><IMG SRC="http://barnesandnoble.bfast.com/booklink/serve?sourceid=299482&ISBN=006019409X" BORDER="0" WIDTH="1" HEIGHT="1"><FONT FACE="Arial, Helvetica, sans-serif" SIZE=-1 color="#ffcc00">HOW TO GET WHAT YOU WANT...</FONT></A><BR>by John Gray<BR>(hardcover)<BR><BR>Our Price: <A HREF="/event.ng/Type=click&RunID=14458&ProfileID=605&AdID=9025&GroupID=1&FamilyID=1687&TagValues=433.435.487.598.629.851&Redirect=http:%2F%2Fbarnesandnoble.bfast.com%2Fbooklink%2Fclick%3Fsourceid=299482%26ISBN=006019409X"><IMG SRC="http://barnesandnoble.bfast.com/booklink/serve?sourceid=299482&ISBN=006019409X" BORDER="0" WIDTH="1" HEIGHT="1"><FONT FACE="Arial, Helvetica, sans-serif" SIZE=-1 color="#ff0000">$17.46</FONT></A><BR>(30% off!)</FONT><br><a href="/event.ng/Type=click&RunID=14458&ProfileID=605&AdID=9025&GroupID=1&FamilyID=1687&TagValues=433.435.487.598.629.851&Redirect=http:%2F%2Fbarnesandnoble.com"><img src="/SHOP/books/bn.logo.gif" width=119 height=27 alt="Barnes and Noble" border="0"></a></td></tr></table></form>
+<!-- /shop -->
+
+</TD><TD WIDTH="15">&nbsp;</TD>
+<TD WIDTH="460">
+
+<!-- ======================== Search Table ============================ -->
+
+<!-- ===================== Custom News and On-Air ===================== -->
+
+<TABLE WIDTH="460" CELLPADDING="2" CELLSPACING="0" BORDER="0"><TR VALIGN=TOP>
+<TD WIDTH="225" valign=top BGCOLOR="#FFCC00"><A NAME="qv"><FONT FACE="Helvetica, Arial, sans-serif" SIZE="2"><B>&nbsp; QUICK VOTE:</B></FONT></A> <IMG SRC="/POLL/images/poll.compaq.gif"  WIDTH="108" HEIGHT="12" BORDER="0" HSPACE="5" VSPACE="0"></TD>
+<TD WIDTH="10">&nbsp;</TD>
+<TD WIDTH="225" BGCOLOR="#FF9900"><FONT FACE="Helvetica, Arial, sans-serif" SIZE="2"><B>&nbsp; ON CNN:</B></FONT></TD></TR>
+<TR VALIGN="top">
+<TD BGCOLOR="#ffffcc" WIDTH="225">
+ 
+<!-- Poll begins -->
+<TABLE BORDER=0 ALIGN=CENTER CELLPADDING=1 CELLSPACING=0>
+<FORM METHOD=POST ACTION="http://poll.cnn.com/poll?89721">
+<INPUT TYPE=HIDDEN NAME="Poll" VALUE="8972">
+<!-- Question 1 -->
+<TR>
+<TD ALIGN=CENTER COLSPAN=2>
+<INPUT TYPE=HIDDEN NAME="Question" VALUE="1">
+<FONT FACE="arial,helvetica,sans-serif" SIZE="-1"><BR>Should people avoid using words that sound like slurs but aren't -- like "niggardly"?<BR><BR></FONT>
+</TD>
+</TR>
+<TR>
+<TD><FONT FACE="arial,helvetica,sans-serif" SIZE="2">
+Yes -- it's what people hear that counts</FONT></TD>
+<TD align=center><INPUT TYPE=RADIO NAME="Answer8973" VALUE=1></TD>
+</TR><TR>
+<TD><FONT FACE="arial,helvetica,sans-serif" SIZE="2">
+No -- it's what people mean that counts</FONT></TD>
+<TD align=center><INPUT TYPE=RADIO NAME="Answer8973" VALUE=2></TD>
+</TR>
+<!-- /end Question 1 -->
+<TR>
+<TD ALIGN=CENTER>
+<A HREF="http://poll.cnn.com/poll?89721"><FONT FACE="arial,helvetica,sans-serif" SIZE="-1">View Results</A>
+</TD>
+<TD ALIGN=CENTER>
+<INPUT TYPE=SUBMIT VALUE="vote">
+</TD>
+</FORM>
+</TR>
+</TABLE>
+<!-- Poll ends -->
+
+</CENTER></TD><TD WIDTH="10" ROWSPAN=2></TD>
+<TD BGCOLOR="#cccccc" WIDTH="225"><FONT FACE="Helvetica, Arial, sans-serif" SIZE="2">
+
+<IMG SRC="/images/1998/05/homepage/tv.generic.gif" WIDTH=55 HEIGHT=45 HSPACE=0 VSPACE=0 BORDER=0 ALIGN="right" ALT="tv">
+<a href="/CNNPromos/cnn.html">What's on CNN?</a> <BR>
+<a href="/CNNI/Programs/Schedules/">What's on CNN Int'l?</a> <BR>
+<a href="/CNN/Programs/Schedules/cnnregular.html">Domestic Schedule</a><BR>
+
+<UL>
+<li> <a href="/CNNPromos/cnn.html">Watch CNN for gavel-to-gavel coverage of the Senate trial</a>
+<li> <a href="/crossfire/">Crossfire, 7:30 p.m. ET</a>
+<li> <a href="/larryking/">Larry King talks about the Senate trial, 9 p.m. ET</a>
+<li> <a href="/CNNPromos/NewsStand/">NewsStand: CNN &amp; TIME</a>
+</UL>
+
+</FONT></TD>
+</TR></TABLE>
+
+<!-- ===================== /Custom News and On-Air ==================== -->
+<BR>
+<!-- =========================== WORLD and US ========================= -->
+
+<TABLE WIDTH="460" CELLPADDING="0" CELLSPACING="0" BORDER="0"><TR VALIGN=TOP>
+<TD WIDTH="225"><A HREF="/WORLD/"><FONT FACE="helvetica, arial, sans-serif" SIZE="2" COLOR="#ff0000">WORLD:</FONT></A></TD>
+<TD WIDTH="10">&nbsp;</TD>
+<TD WIDTH="225"><A HREF="/US/"><FONT FACE="helvetica, arial, sans-serif" SIZE="2" COLOR="#ff0000">U.S.:</FONT></A></TD>
+</TR><TR VALIGN="top">
+<TD WIDTH="225">
+<FONT FACE="helvetica, arial, sans-serif" SIZE="2">
+<UL>
+<li><a href="/WORLD/asiapcf/9901/29/skorea.amnesty/">Amnesty recommended for S. Korean political prisoners</a>
+<LI><a href="/WORLD/asiapcf/9901/28/cricket.01/">Pakistan, India cricketers go to bat for improved relations</a>
+<LI><a href="/WORLD/meast/9901/28/king.hussein.health/">Hussein's cancer relapse prompts 10 more days of chemotherapy</a>
+<LI><a href="/WORLD/meast/9901/28/iraq.mystery.man/">Albright introduces diplomat tapped to help oust Saddam Hussein</a>
+
+</UL></FONT></TD>
+<TD WIDTH="10"></TD><TD WIDTH="225">
+<FONT FACE="helvetica, arial, sans-serif" SIZE="2">
+<UL>
+<li><A HREF="/US/9901/29/velazquez.01/">Long-missing Velazquez painting to be sold</A>
+<LI><A HREF="/US/9901/29/capano.01/">Jury backs death penalty in missing secretary murder</A>
+<LI><a href="/US/9901/28/mumia.concert.01/">Bands play to fund Mumia Abu-Jamal's appeal</a>
+<LI><a href="/US/9901/28/rudolph.search/">Cave expert helps in Rudolph search</a>
+
+</UL></FONT></TD>
+</TR></TABLE>
+
+<!-- =========================== /WORLD and US ======================== -->
+<BR>
+<!-- ================== B1 and B2 ================ -->
+
+<TABLE WIDTH="460" CELLPADDING="0" CELLSPACING="0" BORDER="0"><TR VALIGN=TOP>
+<TD WIDTH="225" BGCOLOR="#ff9900"><FONT FACE="helvetica, arial, sans-serif" SIZE="2"><B>&nbsp; LINK OF THE DAY:</B></FONT></TD>
+<TD WIDTH="10">&nbsp;</TD>
+<TD WIDTH="225" BGCOLOR="#ffcc00"><FONT FACE="helvetica, arial, sans-serif" SIZE="2"><B>&nbsp; CUSTOM NEWS:</B></FONT></TD>
+</TR><TR VALIGN="top">
+<TD BGCOLOR="#cccccc" WIDTH="225">
+
+<font face="Arial, Helvetica, sans-serif" size="2">
+<A HREF="http://reservationdesk.com"><IMG SRC="/images/lotd/resdesk.gif" ALT="Link of the day" ALIGN=RIGHT WIDTH="73" HEIGHT="61" BORDER="0" HSPACE="0" VSPACE="0"></A>
+<BR><br>FIND LOW FARES FAST WITH:
+<BR><BR>
+Air deals at a glance<BR>
+Speedy roundtrip flight search<BR>
+Low-fare desktop ticker
+<BR><BR>The <A HREF="http://reservationdesk.com">online booking source</A> for busy people
+</font>
+<br>
+
+
+<br>
+
+
+
+</TD> <TD WIDTH="10"></TD><TD BGCOLOR="#ffffcc" WIDTH="225" valign=center>
+<FONT FACE="Helvetica, Arial, sans-serif" SIZE="2">
+<A HREF="/CustomNews">Personalize CNN.com</A><BR>
+<A HREF="/CustomNews">Visit YOUR CustomNews</A><BR>
+&nbsp; sample stories:</FONT>
+<BR><BR>
+<FONT FACE="helvetica, arial, sans-serif" SIZE="2">
+<UL>
+<li><a href="http://customnews.cnn.com/cnews/pna.show_story?p_art_id=3380524&p_section_name=Showbiz">Ticketmaster gets online competition</a>
+<li><a href="http://customnews.cnn.com/cnews/pna.show_story?p_art_id=3378809&p_section_name=Sci-Tech">Auction houses take their rivalry to the Internet</a>
+<li><a href="http://customnews.cnn.com/cnews/pna.show_story?p_art_id=3377065&p_section_name=Sci-Tech">Microchip may replace painful jabs and pills</a>
+</UL>
+</FONT>
+
+</FONT></TD>
+</TR>
+</TABLE>
+
+<!-- ================= /B1 and B2 ================ -->
+<BR>
+<!-- ======================= Sports and Business ====================== -->
+
+<TABLE WIDTH="460" CELLPADDING="0" CELLSPACING="0" BORDER="0"><TR VALIGN=TOP>
+<TD WIDTH="225"><A HREF="/cnnsi/"><FONT FACE="helvetica, arial, sans-serif" SIZE="2" COLOR="#ff0000">SPORTS:</FONT></A></TD>
+<TD WIDTH="10">&nbsp;</TD>
+<TD WIDTH="225"><A HREF="/cnnfn/"><FONT FACE="helvetica, arial, sans-serif" SIZE="2" COLOR="#ff0000">BUSINESS:</FONT></A></TD>
+</TR><TR VALIGN="top">
+<TD WIDTH="225">
+<FONT FACE="helvetica, arial, sans-serif" SIZE="2">
+<UL>
+<LI><A HREF="/tennis/1999/australian_open/news/1999/01/28/australia_kafelnikov/">Kafelnikov advances to men's final of Australian Open</A>
+<LI><A HREF="/cnnsi/hockey/nhl/news/1999/01/28/coyotes_flyers/">LeClair leads Flyers past Phoenix</A>
+<LI><A HREF="/cnnsi/basketball/college/news/1999/01/28/uga_tenn/">No. 1 Lady Vols whip Georgia 95-79</A>
+<LI><A HREF="/cnnsi/basketball/nba/news/1999/01/28/lakers_bryant/">Reports: Bryant, Lakers near 6-year, $70 million deal</A>
+
+<!-- Do not remove this bullet -->
+<LI><a href="/cnnsi/scoreboards/">Check the scores here</a>
+<!-- Do not remove this bullet -->
+</UL>
+</FONT>
+</TD><TD WIDTH="10"></TD><TD WIDTH="225">
+<FONT FACE="helvetica, arial, sans-serif" SIZE="2">
+<UL>
+<li><A HREF="/cnnfn/markets/9901/29/europe_open/">European markets upbeat in early trade</A>
+<li><a href="/cnnfn/markets/9901/29/asiawrap/">Wall Street lifts Asian markets</a>
+<li><a href="/cnnfn/worldbiz/asia/wires/9901/28/japanjobless_wg/">Japan jobless rate eases from record</a>
+<li><a href="/cnnfn/digitaljam/9901/28/fcc/">FCC stands pat on high-speed Internet access</a>
+
+<!-- Do not remove this bullet -->
+<LI><a href="/cnnfn/markets/quotes.html">Check stocks and mutual funds</a>
+<!-- Do not remove this bullet -->
+</UL>
+</FONT>
+</TD></TR>
+</TABLE>
+
+<!-- ======================= /Sports and Business ===================== -->
+<BR>
+<!-- ======================= Politics and Weather ===================== -->
+
+<TABLE WIDTH="460" CELLPADDING="0" CELLSPACING="0" BORDER="0"><TR VALIGN=TOP>
+<TD WIDTH="225"><A HREF="/ALLPOLITICS/"><FONT FACE="helvetica, arial, sans-serif" SIZE="2" COLOR="#ff0000">POLITICS:</FONT></A></TD>
+<TD WIDTH="10">&nbsp;</TD>
+<TD WIDTH="225"><A HREF="/WEATHER/"><FONT FACE="helvetica, arial, sans-serif" SIZE="2" COLOR="#ff0000">WEATHER:</FONT></A></TD>
+</TR><TR VALIGN="top">
+<TD WIDTH="225">
+<FONT FACE="helvetica, arial, sans-serif" SIZE="2">
+<UL>
+<li><a href="/ALLPOLITICS/stories/1999/01/28/greenspan.ap/">Greenspan says saving Social Security could require tough medicine</a>
+<li><a href="/ALLPOLITICS/stories/1999/01/28/clinton.jobs/">Clinton promotes job-training expansion</a>
+<li><a href="/ALLPOLITICS/stories/1999/01/28/military.pay.ap/">Military pay raise on GOP agenda</a>
+<li><a href="/ALLPOLITICS/stories/1999/01/28/clinton.chiles.ap/">Clinton eulogizes Lawton Chiles</a>
+
+</UL>
+</FONT>
+</TD><TD WIDTH="10"></TD><TD WIDTH="225">
+<FONT FACE="helvetica, arial, sans-serif" SIZE="2">
+<UL>
+<li><a href="/WEATHER/9901/28/weather.page.pm.ap/">Cold and snowy across northern U.S.; rain elsewhere</a>
+<LI><A HREF="/WEATHER/">Forecasts for 7,200 cities</A>
+<LI><A HREF="/WEATHER/video/">Watch CNN's forecasts in streaming video</A>
+
+</UL>
+</FONT>
+</TD></TR>
+</TABLE>
+
+<!-- ======================= Politics and Weather ==================== -->
+<BR>
+<!-- ========================== B3 and B4 ======================== -->
+
+<TABLE WIDTH="460" CELLPADDING="0" CELLSPACING="0" BORDER="0"><TR VALIGN=TOP>
+
+<TD WIDTH="225" BGCOLOR="#ffcc00"><FONT FACE="helvetica, arial, sans-serif" SIZE="2" color="#000000"><B>&nbsp;ROMANTIC CAPERS:</B></FONT></TD><TD WIDTH="10">&nbsp;</TD><TD WIDTH="225" BGCOLOR="#ff9900"><FONT FACE="helvetica, arial, sans- serif" SIZE="2" color="#000000"><B>&nbsp;MOVIES:</B></FONT></TD></TR>
+<TR VALIGN="top"><TD BGCOLOR="#ffffcc" VALIGN="TOP" WIDTH="225">
+<a href="/TRAVEL/NEWS/9901/28/valentines.kidnap.lat/"><IMG SRC="/TRAVEL/images/1998/t3/t3.heart.jpg" ALT="Cleopatra" ALIGN=RIGHT WIDTH="65" HEIGHT="50" BORDER="0" HSPACE="3" vspace="3"></a>
+<BR>
+<FONT FACE="helvetica, arial, sans-serif" SIZE="2">
+Ideas for planning <a href="/TRAVEL/NEWS/9901/28/valentines.kidnap.lat/"> a surprise Valentine's escape</a>
+</FONT></TD>
+
+<TD WIDTH="10">&nbsp;</TD>
+<TD BGCOLOR="#cccccc" VALIGN="TOP" WIDTH="225"><a href="/SHOWBIZ/Music/9901/28/james.horner.lat/"><IMG SRC="/SHOWBIZ/Music/9901/28/james.horner.lat/thumbnail.jpg" ALT="horner" ALIGN=right WIDTH="55" HEIGHT="45" BORDER="0" HSPACE="3" VSPACE="3"></A><BR>
+<FONT FACE="helvetica, arial, sans-serif" SIZE="2">
+Oscar has already recognized him, as have the Golden Globes. <A HREF="/SHOWBIZ/Music/9901/28/james.horner.lat/">Is a Grammy next for this "Titanic" composer?</A>
+</FONT>
+</TD>
+</TR>
+</TABLE>
+
+<!-- ========================== /B3 and B4 ======================= -->
+<BR>
+<!-- ==================== Sci-Tech and Computing ==================== -->
+
+<TABLE WIDTH="460" CELLPADDING="0" CELLSPACING="0" BORDER="0"><TR VALIGN=TOP>
+<TD WIDTH="225"><A HREF="/TECH/"><FONT FACE="helvetica, arial, sans-serif" SIZE="2" COLOR="#ff0000">&nbsp;SCIENCE AND NATURE:</FONT></A></TD> 
+<TD WIDTH="10">&nbsp;</TD>
+<TD WIDTH="225"><A HREF="/TECH/computing/"><FONT FACE="helvetica, arial, sans-serif" SIZE="2" COLOR="#ff0000">&nbsp;COMPUTING:</FONT></A></TD>
+</TR><TR VALIGN="top">
+<TD WIDTH="225">
+<FONT FACE="helvetica, arial, sans-serif" SIZE="2">
+<UL>
+<li><A HREF="/TECH/science/9901/28/science.life.reut/">Oldest fossil found: 3.7 billion year-old plankton</A>
+<li><A HREF="/TECH/science/9901/27/antarctica.ap/">Antarctic summit wraps up without firm action</A> 
+<LI><A HREF="/TECH/science/9901/27/sea.invaders.ap/">Exotic invaders threaten ocean fishing</A>
+<LI><A HREF="/TECH/science/9901/27/lanina.enn/">La Ni&#241a may loiter through June</A>
+
+</UL>
+</FONT>
+</TD><TD WIDTH="10"></TD><TD WIDTH="225">
+<FONT FACE="helvetica, arial, sans-serif" SIZE="2">
+<UL>
+<li><a href="/TECH/computing/9901/28/internet.decency/">Internet decency law awaits judge's ruling</a>
+<li><a href="/TECH/computing/9901/28/frame.ent.idg/">Can frame relay survive the Internet?</a>
+<li><a href="/TECH/computing/9901/28/eip.ent.idg/">Web opens enterprise portals</a>
+<li><a href="/TECH/computing/9901/28/silalley.idg/">Silicon Alley holds first software summit</a>
+<li><a href="/TECH/computing/9901/28/jiniwish.idg/">Will Sun's Jini grant your wishes?</a>
+
+</UL>
+</FONT>
+</TD></TR>
+</TABLE>
+
+<!-- ==================== Sci-Tech and Computing =================== -->
+<BR>
+<!-- ========================= Space and ISS ======================== -->
+
+<TABLE WIDTH="460" CELLPADDING="0" CELLSPACING="0" BORDER="0"><TR VALIGN=TOP>
+<TD WIDTH="225"><A HREF="/TECH/space/"><FONT FACE="helvetica, arial, sans-serif" SIZE="2" COLOR="#ff0000">SPACE:</FONT></A></TD>
+<TD WIDTH="10">&nbsp;</TD>
+<TD WIDTH="225"><A HREF="/SPECIALS/"><FONT FACE="helvetica, arial, sans-serif" SIZE="2" COLOR="#ff0000">IN-DEPTH:</FONT></A></TD>
+</TR><TR VALIGN="top">
+<TD WIDTH="225">
+<FONT FACE="helvetica, arial, sans-serif" SIZE="2">
+<UL>
+<LI><A HREF="/TECH/space/9901/28/russia.mir.ap/">Back to Mir: Crew prepares for liftoff</A>
+<li><A HREF="/TECH/space/9901/27/space.ark.ap/">A matter of gravity: tooling plants, animals for space</A> 
+<LI><A HREF="/TECH/space/9901/28/dewitt.obit.reut/">Man who first bounced radar off moon dies</A>
+
+</UL>
+</FONT>
+</TD><TD WIDTH="10"></TD><TD WIDTH="225">
+<FONT FACE="helvetica, arial, sans-serif" SIZE="2">
+<UL>
+<li><A HREF="/SPECIALS/1999/pope">Biography: Pope John Paul II</A>
+<li><A HREF="/SPECIALS/1999/pope/photo.essay/">The Pope Gallery: Images and Vignettes</A>
+<li><A HREF="/SPECIALS/1999/pope/bio/early/">The Man Behind the Pope</A>
+<li><A HREF="/interactive/specials/9901/pope.map/">Journey with the Pope: VideoActive Map</A>
+<li><A HREF="/SPECIALS/1999/pope/legacy/">Measuring the Pontiff's Impact</A>
+
+</UL>
+</FONT>
+</TD></TR>
+</TABLE>
+
+<!-- ========================= /Space and ISS ======================= -->
+<BR>
+<!-- ========================= Health and Entertainment ======================== -->
+
+<TABLE WIDTH="460" CELLPADDING="0" CELLSPACING="0" BORDER="0"><TR VALIGN=TOP>
+<TD WIDTH="225"><A HREF="/HEALTH/"><FONT FACE="helvetica, arial, sans-serif" SIZE="2" COLOR="#ff0000">HEALTH:</FONT></A></TD>
+<TD WIDTH="10">&nbsp;</TD>
+<TD WIDTH="225"><A HREF="/SHOWBIZ/"><FONT FACE="helvetica, arial, sans-serif" SIZE="2" COLOR="#ff0000">ENTERTAINMENT:</FONT></A></TD>
+</TR><TR VALIGN="top">
+<TD WIDTH="225">
+<FONT FACE="helvetica, arial, sans-serif" SIZE="2">
+<UL>
+<li><a href="/HEALTH/9901/28/colon.cancer.vaccine/">Colon cancer vaccine appears to prevent recurrence</a>
+<li><a href="/HEALTH/9901/27/best.hospitals/">Teaching hospitals better at treating heart attacks</a>
+<li><a href="/HEALTH/9901/28/folic.acid/">March of Dimes promotes B vitamin to curb birth defects</a>
+
+</UL>
+</FONT>
+</TD><TD WIDTH="10"></TD><TD WIDTH="225">
+<FONT FACE="helvetica, arial, sans-serif" SIZE="2">
+<UL>
+<LI><A HREF="/SHOWBIZ/TV/9901/29/ventura.funding.01/">Gov. Ventura wants to scrap state aid for public radio, TV</A>
+<LI><A HREF="/SHOWBIZ/Movies/9901/28/double.nominees/">Oscar race: Choosing between Tom Hanks and Tom Hanks</A>
+<LI><A HREF="/SHOWBIZ/TV/9901/28/view/">An inside look at auditioning for 'The View'</A>
+<LI><A HREF="/SHOWBIZ/Movies/9901/28/review.anotherday/">Review: Shooting guns, heroin in 'Another Day in Paradise'</A>
+
+</UL>
+</FONT>
+</TD></TR>
+</TABLE>
+
+<!-- ========================= /Health and Entertainment ======================= -->
+<BR><A NAME="podt"></A>
+<!-- ========================== B5 and B6 ======================== -->
+
+<TABLE WIDTH="460" CELLPADDING="0" CELLSPACING="0" BORDER="0"><TR VALIGN=TOP><TD WIDTH="225" BGCOLOR="#ffcc00"><FONT FACE="helvetica, arial, sans-serif" SIZE="2"><B>&nbsp; PICTURE OF THE DAY:</B></FONT></TD><TD WIDTH="10">&nbsp;</TD>
+<TD WIDTH="225"  BGCOLOR="#ff9900"><FONT FACE="helvetica, arial, sans- serif" SIZE="2" color="#000000"><B>&nbsp;COMPUTING:</B></FONT></TD></TR><TR VALIGN="top"><TD BGCOLOR="#ffffcc" VALIGN="TOP" WIDTH="225"><A HREF="javascript:popNav('/resources/potd/frameset.html','potd','scrollbars=no,resizable=no,width=510,height=400,left=30,top=100');">
+<IMG SRC="/resources/potd/1999/01/28/tease.baby.zebra.jpg" ALT="Staying close to mom" ALIGN=RIGHT WIDTH="73" HEIGHT="61" BORDER="0">
+</A><BR><FONT FACE="helvetica, arial, sans-serif" SIZE="2"><A HREF="javascript:popNav('/resources/potd/frameset.html','potd','scrollbars=no,resizable=no,width=510,height=400,left=30,top=100');">Staying close to mom</A></FONT>
+<HR size=1 noshade width=95%>
+<IMG SRC="resources/potd/images/presented.by.oracle.gif" ALT="Presented by Oracle" ALIGN=left WIDTH="128" HEIGHT="17" BORDER="0"></TD>
+<TD WIDTH="10">&nbsp;</TD>
+<TD BGCOLOR="#cccccc" VALIGN="TOP" WIDTH="225">
+<A HREF="/TECH/computing/9901/28/chaos.idg/"><IMG SRC="/images/9901/chaosnet.jpg" ALT="chaos" ALIGN=RIGHT WIDTH="55" HEIGHT="45" BORDER="0" HSPACE="3" VSPACE="3"></A>
+<FONT FACE="helvetica, arial, sans-serif" SIZE="2"><BR>
+Chaos theory can bring <a href="/TECH/computing/9901/28/chaos.idg/">more privacy to Internet communications</a>
+</FONT></TD>
+</TR>
+</TABLE>
+
+<!-- ========================== /B5 and B6 ======================= -->
+<BR>
+<!-- ==================== Style and Travel ==================== -->
+
+<TABLE WIDTH="460" CELLPADDING="0" CELLSPACING="0" BORDER="0"><TR VALIGN=TOP>
+<TD WIDTH="225"><A HREF="/STYLE/"><FONT FACE="helvetica, arial, sans-serif" SIZE="2" COLOR="#ff0000">STYLE:</FONT></A></TD> 
+<TD WIDTH="10">&nbsp;</TD>
+<TD WIDTH="225"><A HREF="/TRAVEL/"><FONT FACE="helvetica, arial, sans-serif" SIZE="2" COLOR="#ff0000">TRAVEL:</FONT></A></TD>
+</TR><TR VALIGN="top">
+<TD WIDTH="225">
+<FONT FACE="helvetica, arial, sans-serif" SIZE="2">
+<UL>
+<li><a href="/STYLE/9901/28/wakita.house/">Light plays with space and form in artist's beach home</a>
+<LI><A HREF="/STYLE/9901/27/torii.table/">Table toppers -- designer sets ideas for fine Asian dining</A>
+<li><a href="/STYLE/9901/26/matsushima.ss.99/">Putting fashion in its place</a>
+<li><A HREF="/STYLE/ELLE/">ELLE: As time goes buy</A>
+
+</UL>
+</FONT>
+</TD><TD WIDTH="10"></TD><TD WIDTH="225">
+<FONT FACE="helvetica, arial, sans-serif" SIZE="2">
+<UL>
+<LI><a href="/TRAVEL/NEWS/9901/28/colossal.columbus.ap/">Plans for towering Columbus statue threaten Puerto Rico neighborhood</a>
+<LI><a href="/TRAVEL/NEWS/9901/28/valentines.kidnap.lat/">Surprise your sweetheart with a Valentine's getaway</a>
+<LI><a href="/TRAVEL/NEWS/9901/28/pitching.paradise.ap/">Hawaii hires sumo wrestler to throw his weight around</a>
+<LI><a href="http://wreservationdesk.itn.net/cgi/get?itn/cb/reservationdesk/index">ReservationDesk: Low fares without the login</a>
+
+</UL>
+</FONT>
+</TD></TR>
+</TABLE>
+
+<!-- ==================== /Style and Travel =================== -->
+<BR>
+<!-- ======================= Books and Food ====================== -->
+
+<TABLE WIDTH="460" CELLPADDING="0" CELLSPACING="0" BORDER="0"><TR VALIGN=TOP>
+<TD WIDTH="225"><A HREF="/BOOKS/"><FONT FACE="helvetica, arial, sans-serif" SIZE="2" COLOR="#ff0000">BOOKS:</FONT></A></TD>
+<TD WIDTH="10">&nbsp;</TD>
+<TD WIDTH="225"><A HREF="/FOOD/"><FONT FACE="helvetica, arial, sans-serif" SIZE="2" COLOR="#ff0000">FOOD:</FONT></A></TD>
+</TR><TR VALIGN="top">
+<TD WIDTH="225">
+<FONT FACE="helvetica, arial, sans-serif" SIZE="2">
+<UL>
+<LI><a href="/books/news/9901/28/ed.ball/">Edward Ball: A warrior in scholarly clothing?</a>
+<li><a href="/books/news/9901/28/stowe.house/">Harriet Beecher Stowe home sold at auction</a>
+<LI><a href="/books/news/9901/27/dalai.lama/">Writer searches for happiness with the Dalai Lama</a>
+<LI><a href="/books/reviews/9901/28/learned.pigs/">Reviewer lauds paean to memorable and bizarre performers</a>
+
+</UL></FONT>
+</TD>
+<TD WIDTH="10"></TD><TD WIDTH="225">
+<FONT FACE="helvetica, arial, sans-serif" SIZE="2">
+<UL>
+<LI><a href="http://www.digitalchef.com/partners/cnn/index.cfm?RecipeID=5186&EDKID=456&AID=13076">Recipe: Steamed halibut with puttanesca sauce </a>
+<LI><a href="/FOOD/news/9901/28/chefs.contest/">Norwegian judged top chef at French cook-off</a>
+<LI><a href="/FOOD/news/9901/28/orange.freeze/">Implanted gene may help crops survive freeze</a>
+<LI><a href="/FOOD/news/9901/28/britain.food.reut/">Dispute overshadows plans for UK food safety agency</a>
+
+</UL>
+</FONT>
+</TD></TR>
+</TABLE>
+
+<!-- ======================= /Books and Food ===================== -->
+<BR>
+<!-- ========================== B7 and B8 ======================== -->
+
+<TABLE WIDTH="460" CELLPADDING="0" CELLSPACING="0" BORDER="0"><TR VALIGN=TOP>
+
+<TD WIDTH="225" BGCOLOR="#ffcc00"><FONT FACE="helvetica, arial, sans-serif" SIZE="2" color="#000000"><B>&nbsp;ALLPOLITICS TOONS:</B></FONT></TD><TD WIDTH="10">&nbsp;</TD><TD WIDTH="225" BGCOLOR="#ff9900"><FONT FACE="helvetica, arial, sans- serif" SIZE="2" color="#000000"><B>&nbsp;RECIPE:</B></FONT></TD></TR>
+<TR VALIGN="top"><TD BGCOLOR="#ffffcc" VALIGN="TOP" WIDTH="225">
+<A HREF="/ALLPOLITICS/analysis/toons/1999/01/28/luckovich/"><IMG SRC="/images/9901/yellow2.gif" ALIGN=RIGHT ALT="Allpolitics toon" WIDTH="50" HEIGHT="45" BORDER="0" HSPACE="3" VSPACE="3"></A>
+<FONT FACE="helvetica, arial, sans-serif" SIZE="2"><br>
+Political 'toonist <A HREF="/ALLPOLITICS/analysis/toons/1999/01/28/luckovich/">Mike Luckovich </a> has a question for Monica Lewinsky
+</FONT></TD>
+
+<TD WIDTH="10">&nbsp;</TD>
+<TD BGCOLOR="#cccccc" VALIGN="TOP" WIDTH="225"><a href="http://www.digitalchef.com/partners/cnn/index.cfm?RecipeID=5048&EDKID=455&AID=13076"><IMG SRC="/FOOD/promo/box.teases/recipes/apple.box.jpg" ALT="Apple Crisp" ALIGN=right WIDTH="55" HEIGHT="45" BORDER="0" HSPACE="3" VSPACE="3"></A>
+<FONT FACE="helvetica, arial, sans-serif" SIZE="2"><BR>
+Break out the vanilla ice cream for this one:<br>
+<A HREF="http://www.digitalchef.com/partners/cnn/index.cfm?RecipeID=5048&EDKID=455&AID=13076">Apple crisp</A>
+ 
+</FONT>
+</TD>
+</TR>
+</TABLE>
+
+<!-- ========================== /B7 and B8 ======================= -->
+<BR>
+<!-- ======================= Countdown to 2000 and Cold War ====================== -->
+
+<TABLE WIDTH="460" CELLPADDING="0" CELLSPACING="0" BORDER="0"><TR VALIGN=TOP>
+<TD WIDTH="225"><A HREF="/SPECIALS/1999/2K/"><FONT FACE="helvetica, arial, sans-serif" SIZE="2" COLOR="#ff0000">COUNTDOWN TO 2000:</FONT></A></TD>
+<TD WIDTH="10">&nbsp;</TD>
+<TD WIDTH="225"><A HREF="/SPECIALS/cold.war"><FONT FACE="helvetica, arial, sans-serif" SIZE="2" COLOR="#ff0000">COLD WAR:</FONT></A></TD>
+</TR><TR VALIGN="top">
+<TD WIDTH="225">
+<FONT FACE="helvetica, arial, sans-serif" SIZE="2">
+<UL>
+<LI><A HREF="/SPECIALS/1999/2K/">Vote: Should developed nations help developing nations on Y2K?</A>
+<LI><A HREF="/TECH/computing/9901/27/y2k.thirdworld/">World Bank: Few developing nations geared for Y2K bug</A>
+<LI><A HREF="/SPECIALS/1999/2K/">Voices of the millennium</A>
+<LI><A HREF="/SPECIALS/1999/2K/">This day this century -- check daily for updates</A>
+
+</UL>
+</FONT>
+</TD>
+<TD WIDTH="10">&nbsp;</TD><TD WIDTH="225">
+<FONT FACE="helvetica, arial, sans-serif" SIZE="2">
+<UL>
+
+<LI><A HREF="/SPECIALS/cold.war/episodes/15">This week: China - See the multimedia recap, an interactive map and more</A>
+<LI><A HREF="/SPECIALS/cold.war/kbank/">Interactive Timeline: The flashpoints from Yalta to Malta</A>
+<LI><A HREF="/SPECIALS/cold.war/games/figureheads/">Challenge: Do you know the Cold War "Figureheads" of the 1970's?</A>
+<LI><A HREF="http://community.cnn.com/cgi-bin/WebX?13@@.ee715fe">What's your most vivid Cold War memory?</A>
+
+
+</UL>
+</FONT>
+</TD></TR>
+</TABLE>
+
+<!-- ======================= /Countdown to 2000 and Cold War ===================== -->
+<BR>
+<!-- ======================= Views and Media Showcase ====================== -->
+
+<TABLE WIDTH="460" CELLPADDING="0" CELLSPACING="0" BORDER="0"><TR VALIGN=TOP>
+<TD WIDTH="225"><A HREF="/SPECIALS/views/"><FONT FACE="helvetica, arial, sans-serif" SIZE="2" COLOR="#ff0000">VIEWS:</FONT></A></TD>
+<TD WIDTH="10">&nbsp;</TD>
+<TD WIDTH="225"><A HREF="/SPECIALS/multimedia/"><FONT FACE="helvetica, arial, sans-serif" SIZE="2" COLOR="#ff0000">MEDIA SHOWCASE:</FONT></A></TD>
+</TR><TR VALIGN="top">
+<TD WIDTH="225">
+<FONT FACE="helvetica, arial, sans-serif" SIZE="2">
+<UL>
+<li><A HREF="/SPECIALS/views/y/1999/01/flock.jordan.jan22/">y: CNN's Jeff Flock with one Chicogoan's take on retirement of 'His Airness'</A>
+<LI><A HREF="/SPECIALS/views/">y: More CNN correspondent analysis -- find by name</A>
+
+</UL>
+</FONT>
+</TD>
+<TD WIDTH="10"></TD><TD WIDTH="225">
+<FONT FACE="helvetica, arial, sans-serif" SIZE="2">
+<UL>
+<LI><A HREF="/TECH/space/9901/19/x38/">How to escape from a space station</A>
+<LI><A HREF="/SPECIALS/multimedia/vrml/hubble/">VRML: Get a close-up view of Hubble</A>
+<LI><A HREF="/SPECIALS/multimedia/">Experience Shockwave, IPIX, VRML, and more</A>
+
+</UL>
+</FONT>
+</TD></TR>
+</TABLE>
+
+<!-- ======================= /Views and Media Showcase ===================== -->
+<BR>
+<!-- ======================= Fringe and Community ====================== -->
+
+<TABLE WIDTH="460" CELLPADDING="0" CELLSPACING="0" BORDER="0"><TR VALIGN=TOP>
+<TD WIDTH="225"><A HREF="/EMAIL/#fringe"><FONT FACE="helvetica, arial, sans-serif" SIZE="2" COLOR="#ff0000">&nbsp;FRINGE:</FONT></A></TD>
+<TD WIDTH="10">&nbsp;</TD>
+<TD WIDTH="225"><A HREF="/discussion/"><FONT FACE="helvetica, arial, sans-serif" SIZE="2" COLOR="#ff0000">&nbsp;DISCUSSION: </FONT></A></TD>
+</TR><TR VALIGN="top">
+<TD WIDTH="225">
+<FONT FACE="helvetica, arial, sans-serif" SIZE="2">
+<UL>
+<li><a href="/US/9901/28/fringe/saw.artist/">Cutting-edge artist</a>
+<li><A HREF="/WORLD/asiapcf/9901/27/fringe/3.headed.turtle/">Three-headed turtle destined not to go far</A>
+<li><a href="/WORLD/americas/9901/26/fringe/canada.escape/">Short-lived escape gets tied up by oversight</a>
+<li><a href="/US/9901/26/fringe/mystery.object/">Mysteries of the deep</a>
+
+</UL>
+</FONT>
+</TD>
+<TD WIDTH="10"></TD><TD WIDTH="225">
+<FONT FACE="helvetica, arial, sans-serif" SIZE="2">
+<UL>
+<li><A HREF="/chat/cnn.html">Join our chat room!</A> 
+<li><A HREF="http://community.cnn.com/cgi-bin/WebX?13@@.ee7611f">Travel: Mail from the trail</A>
+<li><A HREF="http://community.cnn.com/cgi-bin/WebX?13@@.ee7c1a0">North Korea: A security threat?</A>
+<li><A HREF="http://community.cnn.com/cgi-bin/WebX?13@@.ee79dff">Golden Globe awards</A> 
+<li><A HREF="http://community.cnn.com/cgi-bin/WebX?13@@.ee6eabb">Year 2000 computer bug</A>
+<li><A HREF="/discussion/">More discussions</A>
+
+</UL>
+</FONT>
+</TD></TR>
+</TABLE>
+
+<!-- ======================= /Fringe and Community ===================== -->
+<BR>
+<!-- ======================= AUDIO VIDEO ===================== -->
+
+<TABLE WIDTH="460" CELLPADDING="2" CELLSPACING="0" BORDER="0"><TR VALIGN=TOP>
+
+<TD WIDTH="225" BGCOLOR="#ffcc00"><FONT FACE="helvetica, arial, sans-serif" SIZE="2"><B>&nbsp;AUDIO:</B></FONT></TD>
+<TD WIDTH="10">&nbsp;</TD>
+<TD WIDTH="225" BGCOLOR="#ff9900"><FONT FACE="helvetica, arial, sans- serif" SIZE="2"><B>&nbsp;VIDEO ON-DEMAND:</B></FONT></TD>
+
+</TR><TR VALIGN="top">
+<TD BGCOLOR="#ffffcc" WIDTH="225">
+<TABLE>
+<TR>
+<td>
+      <div align="left"> 
+        <p><font face="helvetica, arial, sans-serif" size="2">
+          Listen to CNN live...</font></p>
+        <p><font face="Arial, Helvetica, sans-serif" size="2">Plus sports, technology, 
+          health and entertainment news on-demand.</font></p>
+        <p><font face="Arial, Helvetica, sans-serif" size="2">All in <a href="/audioselect/">Audioselect</a></font></p>
+      </div>
+    </td>
+</TR>
+</TABLE>
+
+</TD>
+<TD WIDTH="10">&nbsp;</TD>
+<TD BGCOLOR="#cccccc" WIDTH="225" VALIGN="TOP">
+
+<TABLE>
+<TR><TD colspan=2><FONT face="helvetica, arial, sans-serif" SIZE=2><B><A HREF="/videoselect/">Videoselect</A></B></FONT></TD></TR>
+<TR><TD colspan=2>
+<IMG SRC="/images/9901/naji.anwar.folo.reut.vs.jpg" ALIGN=LEFT BORDER="0" WIDTH="55" HEIGHT="45" HSPACE="2" VSPACE="2">
+Judge expected to decide <a href="/videoselect/">on charges against Anwar</a></FONT><BR clear=all>
+<FONT face="helvetica, arial, sans-serif" SIZE=2><B><a href="/CNN/Programs/larry.king.live/">Larry King Live</a></B></FONT><BR>
+<FONT face="helvetica, arial, sans-serif" SIZE=2><B><A HREF="/CNN/Programs/crossfire/">Crossfire</A></B></FONT>
+
+</TD>
+</TR>
+</TABLE>
+</UL>
+</FONT>
+</FONT></TD>
+</TR>
+</TABLE>
+<!-- ======================= /AUDIO VIDEO ===================== -->
+<BR>
+</TD></TR>
+</TABLE>
+
+<HR NOSHADE WIDTH="600" SIZE="1" ALIGN="LEFT">
+<TABLE BORDER="0" WIDTH="600" CELLSPACING="0" CELLPADDING="0"><TR><TD WIDTH="120">&nbsp;<A HREF="http://www.pointcast.com/special/affiliates/cnn.html"><IMG SRC="/images/1998/11/pointcast.gif" WIDTH="88" HEIGHT="31" BORDER="0" HSPACE="0" VSPACE="0"></A></TD><TD WIDTH="8" ALIGN=RIGHT>&nbsp;</TD><TD WIDTH="468">
+<center>
+<font face="HELVETICA, ARIAL, sans-serif" size="2">
+<a href="#top"> Back to the top</a>
+</font>
+<font face="HELVETICA, ARIAL, sans-serif" size="1">
+<BR>&#169; 1999 Cable News Network. All Rights Reserved.<br>
+<a href="/interactive_legal.html">Terms</a> under which this service is provided to you.<br>
+Read our <A HREF="/privacy.html">privacy guidelines</A>.</font><br>
+</center></TD></TR></TABLE>
+<script language="JavaScript">
+<!-- Hide from old browsers.
+
+var search = "CNNid=";
+var origin = "cnn";
+
+if(document.cookie.length > 0) {
+  offset = document.cookie.indexOf(search);
+  if(offset != -1) {
+    offset += search.length;
+    end = document.cookie.indexOf(";", offset);
+    if(end == -1) {
+      end = document.cookie.length;
+    }
+    document.write("<img src=\"http://www.cnnaudience.com/pixel.gif?cookie=" + 
+                    unescape(document.cookie.substring(offset,end)) +
+                    "&origin=" + origin + "\" width=1 height=1>");
+  }
+}
+ 
+// end hiding -->
+</script>
+
+
+</BODY>
+</HTML>
+

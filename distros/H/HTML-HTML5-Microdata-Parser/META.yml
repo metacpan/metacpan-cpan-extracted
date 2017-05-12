@@ -1,0 +1,47 @@
+---
+abstract: "fairly experimental parser for HTML 'microdata'"
+author:
+  - 'Toby Inkster <tobyink@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.61
+  Test::RDF: 0.23
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.02'
+keywords:
+  - HTML
+  - HTML5
+  - Microdata
+  - RDF
+  - 'Semantic Web'
+  - Trine
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: HTML::HTML5::Microdata::Parser
+name: HTML-HTML5-Microdata-Parser
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+requires:
+  Encode: 0
+  HTML::HTML5::Parser: 0.107
+  HTML::HTML5::Sanity: 0.102
+  RDF::Trine: 0.135
+  Scalar::Util: 0
+  URI::Escape: 0
+  URI::URL: 0
+  XML::LibXML: 1.70
+  perl: 5.10.0
+resources:
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=HTML-HTML5-Microdata-Parser
+  homepage: https://metacpan.org/release/HTML-HTML5-Microdata-Parser
+  license: http://dev.perl.org/licenses/
+  repository: http://goddamn.co.uk/svn-web/perlmods/browse/HTML-HTML5-Microdata-Parser/
+version: 0.100

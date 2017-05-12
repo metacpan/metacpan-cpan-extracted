@@ -1,0 +1,38 @@
+Revision history for Perl extension HTML::WWWTheme.
+
+1.00  Fri Aug 13 11:41:58 1999
+	- original version; created by h2xs 1.18
+
+	Based on the module used at the Joint Astronomy Centre and
+	developed by Chad Hogan.  This module was released under
+	the GNU Public License:  See LICENSE and gpl.txt for more
+	details.
+
+1.02  Thu Sep 16 18:46:52 1999
+
+	-release version, with trivial corrections.
+	-all sorts of minor cosmetic stuff, including adding templates,
+	 and fixing ambiguities in the documentation.
+
+1.03  Sun Jan 30 22:33:21 2000
+
+	-added support for SetMoreLinksTitle(), which supports the 
+	 @MORELINKSTITLE directive in the config files.  Added at the
+	 request of Chris Davis at JACH.  
+	-integrated some cleanups.
+
+1.04  Mon Jan 31 12:35:11 2000
+	
+	-added top and bottom navigation bars at the request of the 
+	 JAC.
+
+1.05  Mon Feb 14 17:07:12 2000
+	
+	-added support for the "printable version" link at the bottom
+	 of the page.
+
+1.06  Fri Mar 24 09:51:33 2000
+
+	-added support for setting width of sidebar
+	-added support for toggling sidebar extras
+        -added support for escaped semi-colons. (ie \; -> ;)

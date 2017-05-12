@@ -1,0 +1,58 @@
+Hash-ConsistentHash
+
+Hash::ConsistentHash algorithm distributes keys over fixed number of buckets. 
+Constant hash distribution means that if we add a bucket to a hash with N 
+buckets filled with M keys we have to reassign only M/(N+1) keys to new 
+buckets.
+
+What puts apart this module from all similar modules available is that you
+could ask for non-repeatable series of buckets. Using this property you 
+could implement not only consistent distribution but also redundancy - one
+key to be directed to more than one bucket.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Hash::ConsistentHash
+
+You can also look for information at:
+
+    GIT repository with the latest stuff
+        https://github.com/luben/Hash-ConsistentHash
+        git://github.com/luben/Hash-ConsistentHash.git
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Hash-ConsistentHash
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Hash-ConsistentHash
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Hash-ConsistentHash
+
+    Search CPAN
+        http://search.cpan.org/dist/Hash-ConsistentHash/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Luben Karavelov
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

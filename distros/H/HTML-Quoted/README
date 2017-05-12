@@ -1,0 +1,66 @@
+NAME
+    HTML::Quoted - extract structure of quoted HTML mail message
+
+SYNOPSIS
+        use HTML::Quoted;
+        my $html = '...';
+        my $struct = HTML::Quoted->extract( $html );
+
+DESCRIPTION
+    Parses and extracts quotation structure out of a HTML message. Purpose
+    and returned structures are very similar to Text::Quoted.
+
+SUPPORTED FORMATS
+    Variouse MUAs use quite different approaches for quoting in mails.
+
+    Some use *blockquote* tag and it's quite easy to parse.
+
+    Some wrap text into *p* tags and add '>' in the beginning of the
+    paragraphs.
+
+    Things gettign messier when it's an HTML reply on plain text mail
+    thread.
+
+    If you found format that is not supported then file a bug report via
+    rt.cpan.org with as short as possible example. Test file is even better.
+    Test file with patch is the best. Not obviouse patches without tests
+    suck.
+
+METHODS
+  extract
+        my $struct = HTML::Quoted->extract( $html );
+
+    Takes a string with HTML and returns array reference. Each element in
+    the array either array or hash. For example:
+
+        [
+            { 'raw' => 'Hi,' },
+            { 'raw' => '<div><br><div>On date X wrote:<br>' },
+            [
+                 { 'raw' => '<blockquote>' },
+                 { 'raw' => 'Hello,' },
+                 { 'raw' => '<div>How are you?</div>' },
+                 { 'raw' => '</blockquote>' }
+            ],
+            ...
+        ]
+
+    Hashes represent a part of the html. The following keys are meaningful
+    at the moment:
+
+    *   raw - raw HTML
+
+    *   quoter_raw, quoter - raw and decoded (entities are converted) quoter
+        if block is prefixed with quoting characters
+
+  combine_hunks
+      my $html = HTML::Quoted->combine_hunks( $arrayref_of_hunks );
+
+    Takes the output of "extract" and turns it back into HTML.
+
+AUTHOR
+    Ruslan.Zakirov <ruz@bestpractical.com>
+
+LICENSE
+    Under the same terms as perl itself.
+

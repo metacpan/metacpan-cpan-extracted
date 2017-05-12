@@ -1,0 +1,138 @@
+Heap-MinMax version 1.03
+========================
+
+This is an implementation of a Min-Max Binary Heap, based on 1986 article
+"Min-Max Heaps and Generalized Priority Queues" by Atkinson, Sack, 
+Santoro, and Strothotte, published in Communications of the ACM.
+
+In a Min-Max heap, objects are stored in partial order such that both the
+minimum element and maximum element are available in constant time.  This 
+is accomplished through a modification of the standard heap algorithm that
+introduces the notion of 'min' (even) levels and 'max' (odd) levels in the
+binary tree structure of the heap.  
+
+With a Min-Max heap you get all this, plus insertion into a Min-Max heap is 
+actually *faster* than with a normal heap (by a constant factor of 0.5).
+
+For further information about the algorithm, please see the article "Min-Max 
+Heaps and Generalized Priority Queues" by Atkinson, Sack,  Santoro, and 
+Strothotte, published in Communications of the ACM in 1986.
+
+  ################################################################
+  #
+  # Example 1
+  #
+  # shows basic (default constructor) behavior of heap.
+  # the default comparison function is numeric.
+  #  
+  ################################################################
+
+  use Heap::MinMax;
+
+  my $mm_heap = Heap::MinMax->new();
+  my @vals = (2, 1, 3, 7, 9, 5, 8);
+  foreach my $val (@vals){    
+    $mm_heap->insert($val);
+  }
+  $mm_heap->print_heap();
+  my $min = $mm_heap->pop_min(); # returns 1
+  print "min was: $min\n\n";
+  my $max = $mm_heap->pop_max(); # returns 9
+  print "max was: $max\n\n";
+  $mm_heap->print_heap(); # outputs:
+                          # 2
+			  # 7
+			  # 8
+			  # 5
+			  # 3
+			  
+
+
+
+  my $mm_heap2 = Heap::MinMax->new();
+  my @vals2 = (19.1111111, 19.111112, 15, 17);
+  $mm_heap2->insert(@vals2);
+  $mm_heap2->insert(19.11110);
+  $mm_heap2->print_heap();
+  print $mm_heap2->max() . "\n"; # output 19.111112
+  print $mm_heap2->min() . "\n"; # output 15
+
+  exit
+
+  ################################################################
+  #
+  # Example 2
+  #
+  # shows how you can store any set of comparable objects in heap.
+  #
+  #
+  #  Note: in this example, anonymous subroutines are
+  #  passed in to the constructor, but you can just as well supply
+  #  your own object's comparison methods by name-   i.e.,
+  #
+  #  $avltree = Heap::MinMax->new(
+  #          fcompare => \&MyObj::compare,
+  #           
+  #          . . . 
+  #           
+  #          etc...
+  #
+  ################################################################
+
+  use Heap::MinMax;
+
+  my $elt1 = { _name => "Bob",
+  	     _phone => "444-4444",};
+  my $elt2 = { _name => "Amy",
+	     _phone => "555-5555",};
+  my $elt3 = { _name => "Sara",
+	     _phone => "666-6666",}; 
+
+  my $mm_heap3 = Heap::MinMax->new(
+
+      fcompare => sub{ my ($o1, $o2) = @_;
+  		     if($o1->{_name} gt $o2->{_name}){ return 1}
+  		     elsif($o1->{_name} lt $o2->{_name}){ return -1}
+  		     return 0;},
+
+      feval     => sub{ my($obj) = @_;
+  		       return $obj->{_name} . ", " . $obj->{_phone};},   
+      );
+
+
+  $mm_heap3->insert($elt1);
+  $mm_heap3->insert($elt2);
+  $mm_heap3->insert($elt3);
+
+  $mm_heap3->print();
+
+
+
+  exit;
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   none.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Matthias Beebe
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,31 @@
+---
+abstract: "interface to mercurial's command server"
+author:
+  - 'Diab Jerius <djerius@cpan.org>'
+build_requires:
+  CPAN::Meta: 0
+  ExtUtils::MakeMaker: 6.59
+  Moo::Role: 0
+  Test::More: 0
+configure_requires:
+  CPAN::Meta: 0
+  ExtUtils::MakeMaker: 6.59
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Hg-Lib
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Moo: 0
+  MooX::Attributes::Shadow: 0
+  perl: 5.010001
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://bitbucket.org/djerius/hg-lib
+version: 0.01

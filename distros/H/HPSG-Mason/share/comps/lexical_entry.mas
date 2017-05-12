@@ -1,0 +1,5 @@
+<%args>
+$word
+%data
+</%args>\
+<& '/list.mas', element => [ $word, $m->scomp( '/expression.mas', %data ) ] &>\

@@ -1,0 +1,57 @@
+{
+   "abstract" : "perl I18N Converter",
+   "author" : [
+      "Samia Chahlal <samia.chahlal@yahoo.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HON-I18N-Converter",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : "0.31",
+            "Test::File" : "1.35",
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.26",
+            "Encode" : "2.4201",
+            "File::Temp" : "0.22",
+            "IO::All" : "0.46",
+            "JSON::XS" : "2.33",
+            "Object::InsideOut" : "3.98",
+            "Spreadsheet::ParseExcel" : "0.59"
+         }
+      }
+   },
+   "provides" : {
+      "HON::I18N::Converter" : {
+         "file" : "lib/HON/I18N/Converter.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/healthonnet/HON-I18N-Converter"
+      }
+   },
+   "version" : "0.03"
+}

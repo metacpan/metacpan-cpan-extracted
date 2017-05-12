@@ -1,0 +1,61 @@
+{
+   "abstract" : "Your robot to parse webpages",
+   "author" : [
+      "Hernan Lopes (hernan@cpan.org)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-Robot-Scrapper",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Load" : "0",
+            "Data::Dumper" : "0",
+            "Data::Printer" : "0",
+            "DateTime" : "0",
+            "Digest::SHA" : "0",
+            "Digest::SHA1" : "0",
+            "Encode" : "0",
+            "Encode::Guess" : "0",
+            "HTML::Entities" : "0",
+            "HTML::TreeBuilder::XPath" : "0",
+            "HTTP::Headers::Util" : "0",
+            "HTTP::Tiny" : "0",
+            "Moose" : "0",
+            "Path::Class" : "0",
+            "Test::Simple" : "0.44",
+            "Time::HiRes" : "0",
+            "Try::Tiny" : "0",
+            "URI" : "0",
+            "XML::XPath" : "0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.11"
+}

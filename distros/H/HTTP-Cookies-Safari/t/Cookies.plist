@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>Domain</key>
+		<string>.usatoday.com</string>
+		<key>Expires</key>
+		<date>2020-02-19T14:28:00Z</date>
+		<key>Name</key>
+		<string>v1st</string>
+		<key>Path</key>
+		<string>/</string>
+		<key>Value</key>
+		<string>3E1B9B935912A908</string>
+	</dict>
+	<dict>
+		<key>Domain</key>
+		<string>.cnn.com</string>
+		<key>Expires</key>
+		<date>2017-08-13T02:12:00Z</date>
+		<key>Name</key>
+		<string>CNNid</string>
+		<key>Path</key>
+		<string>/</string>
+		<key>Value</key>
+		<string>18c15c9e-1045-1041996715-381</string>
+	</dict>
+	<dict>
+		<key>Domain</key>
+		<string>.usatoday.com</string>
+		<key>Expires</key>
+		<date>2025-12-31T06:00:00Z</date>
+		<key>Name</key>
+		<string>UID</string>
+		<key>Path</key>
+		<string>/</string>
+		<key>Value</key>
+		<string>0cf723a23e1b9b90</string>
+	</dict>
+	<dict>
+		<key>Domain</key>
+		<string>.usatoday.com</string>
+		<key>Expires</key>
+		<date>2025-12-31T06:00:00Z</date>
+		<key>Name</key>
+		<string>USATINFO</string>
+		<key>Path</key>
+		<string>/</string>
+		<key>Value</key>
+		<string>UID%3D0cf723a23e1b9b90</string>
+	</dict>
+</array>
+</plist>

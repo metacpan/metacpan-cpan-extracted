@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: Hash-Tally
+version: 0.02
+author:
+  - Adam Paynter <adapay@cpan.org>
+abstract: Compute the tallies of hash values
+license: perl
+generated_by: Module::Build version 0.2611, without YAML.pm

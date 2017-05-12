@@ -1,0 +1,3 @@
+before
+% $m->call_next;
+after

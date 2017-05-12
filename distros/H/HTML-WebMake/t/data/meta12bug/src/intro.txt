@@ -1,0 +1,4 @@
+<wmmeta name="ltitle">Dokumentenverarbeitung (Sommersemester 2001)</wmmeta>
+<wmmeta name="stitle">Startseite</wmmeta>
+
+test (intro)

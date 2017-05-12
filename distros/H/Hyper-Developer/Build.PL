@@ -1,0 +1,60 @@
+use Module::Build;
+my $build = Module::Build->new(
+    dist_abstract      => 'Hyper Developer Tools',
+    dist_name          => 'Hyper-Developer',
+    dist_version       => '0.07',
+    dist_author        => 'Andreas Specht <acid@cpan.org>',
+    module_name        => 'Hyper::Developer',
+    license            => 'artistic',
+    create_makefile_pl => 'passthrough',
+    requires           => {
+        Class::Std::Storable             => 0,
+        Class::Std                       => 0,
+        Config::IniFiles                 => 0,
+        Cwd                              => 0,
+        Data::Dumper                     => 0,
+        English                          => 0,
+        File::Basename                   => 0,
+        File::Find                       => 0,
+        File::Path                       => 0,
+        File::Spec                       => 0,
+        Getopt::Long                     => 0,
+        Hyper::Config::Reader::Container => 0,
+        Hyper::Config::Reader::Flow      => 0,
+        Hyper::Error                     => 0,
+        Hyper::Functions                 => 0,
+        Hyper::Singleton::Context        => 0,
+        Parse::RecDescent                => 0,
+        Pod::Usage                       => 0,
+        Template                         => 0,
+        Time::HiRes                      => 0,
+        version                          => 0,
+        HTTP::Server::Simple::CGI        => 0,
+        HTTP::Server::Simple::Static     => 0,
+        Hyper::Control::Container        => 0,
+        Hyper::Control::Flow             => 0,
+        Graph::Easy                      => 0,
+        Graph::Easy::As_svg              => 0,
+        Hyper                            => 'v0.03',
+        IO::Scalar                       => 0,
+        Module::Refresh                  => 0,
+    },
+    build_requires => {
+        Test::Prereq::Build => 0,
+        Test::Exception     => 0,
+        Test::More          => 0,
+        Test::Pod           => 1.00,
+        Test::Pod::Coverage => 1.00,
+        Test::Class         => 0,
+        IO::Scalar          => 0,
+    },
+    recursive_test_files => 1,
+    meta_add => {
+        no_index => {
+            namespace => 'Hyper::Developer::var',
+        },
+    }
+);
+$build->add_build_element($_) for qw(tpl htc);
+
+$build->create_build_script;

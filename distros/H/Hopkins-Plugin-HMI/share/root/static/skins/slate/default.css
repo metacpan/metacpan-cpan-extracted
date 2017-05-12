@@ -1,0 +1,253 @@
+/* defaults and body tag */
+
+* { margin: 0; padding: 0 }
+
+body
+{
+	background-color:	#333;
+	color:				#000;
+	font-family:		Tahoma, Arial, Helvetica, sans-serif;
+	font-size:			11px;
+	line-height:		2em;
+}
+
+br { clear: both }
+
+/* margins for common elements */
+
+h1, ul, p	{ margin: 1.5em 0 0 0 }
+ul			{ margin: 0 0 3em 0 }
+
+/* common classes */
+
+.good { color: green }
+.bad { color: red }
+.warn { color: orange }
+
+/* text headers */
+
+h1 { font-size: 3.5em }
+h2 { font-size: 2.2em }
+h3 { font-size: 1.5em }
+h4 { font-size: 1em }
+
+h2
+{
+	padding:		5px 0 10px 0;
+	border-bottom:	1px dotted #ccc;
+	text-transform:	lowercase;
+	font-weight:	normal;
+}
+
+/* link and image decorations */
+
+a		{ color: #000; text-decoration: none; }
+a:hover	{ color: #000; text-decoration: underline; }
+img		{ border: 0 }
+
+hr
+{
+	border-width:			0 0 2px 0;
+	border-bottom-style:	dotted;
+	border-bottom-color:	#cfcfcf;
+	margin-top:				5px;
+	margin-bottom:			5px;
+}
+
+/* definition lists */
+
+dt
+{
+	width:			100px;
+	float:			left;
+	font-weight:	bold;
+}
+
+dd
+{
+}
+
+/* table styles */
+
+table#layout tr td
+{
+	background:		none;
+	border:			none;
+	vertical-align:	top;
+}
+
+table#layout tr td#sidebar
+{
+	width:			250px;
+	padding:		0 20px;
+	border-right:	1px solid #888;
+}
+
+table#layout tr td#content
+{
+	width:			450px;
+	padding:		0 20px;
+}
+
+table#layout tr td#content table.table
+{
+	margin:				1em 0;
+	width:				100%;
+	border-collapse:	collapse;
+	border:				1px solid #b08c5e;
+}
+
+table tr th
+{
+	text-align:		left;
+}
+
+table#layout tr td#content table.table tr th
+{
+	padding:		1px 3px;
+	line-height:	1.5em;
+	text-transform:	lowercase;
+	border:			1px solid #b08c5e;
+	text-align:		left;
+}
+
+table#layout tr td#content table.table tr td
+{
+	padding:		1px 3px;
+	line-height:	1.5em;
+	text-transform:	lowercase;
+	border:			1px dotted #ccc;
+}
+
+table#layout tr td#content table.table tbody tr td.alert
+{
+	text-align:		center;
+	font-size:		1.5em;
+}
+
+table#layout tr td#content table.table tbody tr td { background-color: #ffe }
+table#layout tr td#content table.table thead tr th { background-color: #e6bf8c }
+
+table#layout tr td#content table.table img { vertical-align: -25% }
+
+/* common element-agnostic styles */
+
+.left	{ float: left }
+.right	{ float: right }
+.error	{ color: #b00 }
+
+/* header style */
+
+#header
+{
+	width:		800px;
+	height:		100px;
+	margin:		0 auto;
+}
+
+#header h1
+{
+	margin:			0;
+	padding:		40px 0 12px 50px;
+	background:		url(images/gear.png) no-repeat left 30px;
+	text-transform:	lowercase;
+	font-weight:	normal;
+	color:			#fff;
+}
+
+/* menu styles */
+
+#menu
+{
+	width:			800px;
+	height:			40px;
+	background:		url(images/menu.png) no-repeat left top;
+	border-bottom:	5px solid #aaa;
+}
+
+#menu strong
+{
+	color:			#fff;
+	font-size:		1.5em;
+	padding:		8px 20px;
+	display:		block;
+}
+
+#menu ul
+{
+	margin:		0 25px;
+	list-style:	none;
+	padding:	10px 0;
+}
+
+#menu li
+{
+	display: inline;
+}
+
+#menu a
+{
+	margin:				0;
+	padding:			0 30px 0 10px;
+	background:			url(images/menu-sep.png) no-repeat right -1px;
+	text-decoration:	none;
+	color:				#fff;
+	font-weight:		bold;
+}
+
+#menu a:hover
+{
+	color:				#ffc373;
+}
+
+#menu li.first a	{ padding-left: 0 }
+#menu li.last a		{ background: none }
+
+/* content styles */
+
+#body
+{
+	width:		800px;
+	margin:		0 auto;
+	padding:	0;
+}
+
+#body-top
+{
+	background:		#fff url(imagses/page-bg.png) no-repeat center;
+	padding-top:	20px;
+}
+
+#tail
+{
+	background:	url(images/tail.png) no-repeat bottom;
+	height:		20px;
+}
+
+#tail span.version
+{
+	float:			right;
+	color:			#aaa;
+	margin-right:	20px;
+	text-transform:	lowercase;
+}
+
+#sidebar ul
+{
+	list-style:	none;
+	margin:		0;
+	padding:	0;
+}
+
+#sidebar li
+{
+	margin:			0;
+	padding:		10px 0;
+	border-bottom:	1px dotted #ccc;
+}
+
+body#root span.yui-button-hover,
+body#root span.yui-button-hover span
+{
+	border-color:	#b08c5e;
+}

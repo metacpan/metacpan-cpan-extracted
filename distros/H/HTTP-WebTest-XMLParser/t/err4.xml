@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<WebTest version="1.0">
+  <params />
+  <test>
+    <list name="character_data_in_list_element">this is forbidden</list>
+  </test>
+</WebTest>

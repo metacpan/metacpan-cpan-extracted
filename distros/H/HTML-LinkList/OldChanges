@@ -1,0 +1,204 @@
+Revision history for HTML-LinkList
+==================================
+
+0.1503 Sun 07 September 2008
+----------------------------
+
+  * (2008-09-07) A few tweaks with TODO and Changes.
+
+0.1502 Sun 07 September 2008
+----------------------------
+
+  * (2008-09-07) Make the Build make a traditional Makefile.PL
+  * (2008-09-07) Tweak to improve prettifying links.
+
+0.1501 Sat 26 May 2007
+----------------------
+
+  * (26 May 2007) fix formats
+  	Fixed a bug in the advanced formats stuff.
+
+0.15 Tue 22 May 2007
+--------------------
+
+  * (22 May 2007) advanced formats
+  	Added "formats" option for advanced formatting.
+
+0.14 Sat 19 May 2007
+--------------------
+
+  * (19 May 2007) uneven lists
+  	Enable this to deal with lists of lists where the first item
+  isn't a normal item, but a sub-list, but the next item is a normal
+  item.
+
+0.13 Mon 11 September 2006
+--------------------------
+
+  * (11 Sep 2006) hide_ext
+  	Added the 'hide_ext' option, to hide extensions of files in
+  links (useful for MultiViews sites).
+
+0.12 Tue 23 May 2006
+--------------------
+
+  * (23 May 2006) description improvements
+  	Added 'pre_desc' and 'post_desc' options to enable one to
+  put a string before and after the descriptions.
+
+0.11 Thu 20 April 2006
+----------------------
+
+  * (20 Apr 2006) preserve_paths option
+  	Added the 'preserve_paths' option; if this is true, then the
+  input paths are not sorted, nor do they have intermediate paths extracted.
+  This speeds things up slightly, and can be useful if you already have a full
+  list of paths and don't need to do that processing on it again.
+
+0.1002 Mon 17 April 2006
+------------------------
+
+  * (17 Apr 2006) navbar fix
+  	If there are paths that are too similar, such as one subdir
+  in a directory being called "foo", and another called "foobar", then
+  it would pick up the foobar stuff in foo when it shouldn't.
+
+0.1001 Thu 13 April 2006
+------------------------
+
+  * (12 Apr 2006) fixed nohide bug
+  	The 'nohide' option was being ignored in some circumstances.
+
+0.10 Sat 01 April 2006
+----------------------
+
+  * (1 Apr 2006) breadcrumb-navbar
+  	Added a hybrid breadcrumb-navbar: nav_tree(navbar_type=>'breadcrumb')
+  which starts off like a breadcrumb-trail, showing the parent(s) of
+  the current URL, but also showing the current level, not just the current
+  URL.  Useful in situations where you don't want a full-blown navigation
+  tree.
+
+0.09 Thu 16 March 2006
+----------------------
+
+  * (16 Mar 2006) documentation tweaking
+
+  * (16 Mar 2006) exclude_root_parent
+  	Added the 'exclude_root_parent' option, which excludes the root "/"
+  path from being counted as a "parent" to the current_url when using the
+  'pre_current_parent' and 'post_current_parent' options.
+  	This can be useful if you want to use those options but don't
+  want the root/Home link to be displayed differently.
+
+  * (16 Mar 2006) prepend_list and append_list
+  	Added new options (to 'full_tree', 'nav_tree') 'prepend_list'
+  and 'append_list' which enable you to prepend or append a list of links
+  to be added to your "top level" as-is.
+
+  * (16 Mar 2006) removed nav_bar
+  	Removed the 'nav_bar' function because it was horrible and made
+  yucky navbars.  With use of CSS and choice of levels and separators, the
+  'nav_tree' should be sufficient, since while the UL list is the default,
+  it can be set up to use paragraphs and so on.
+
+0.08 Thu 16 February 2006
+-------------------------
+
+  * (16 Feb 2006) top_level option
+  Added a new 'top_level' option, useful for starting a navigation
+  tree further down its hierarchy.
+
+0.07 Thu 02 February 2006
+-------------------------
+
+  * (2 Feb 2006) depth fixes
+  	- enabled start_depth and end_depth to be changed for nav_tree
+  without wierdness happening.  It used to be that end_depth was ignored,
+  and if start_depth was anything other than 1, one would get too many links.
+
+  * (25 Jan 2006) empty lists
+  	Added a check to see that the generated list wasn't empty;
+  before this, it would *always* put on the list_head and list_foot
+  stuff even if there was nothing there.  Which meant that you
+  could end up with something like <ul></ul> which is Not Nice.
+
+  * (25 Jan 2006) parent_item_sep
+  	Added the 'parent_item_sep' parameter to 'nav_bar'.
+
+0.0601 Thu 19 January 2006
+--------------------------
+
+  * (19 Jan 2006) corrected error in changelog
+
+0.06 Thu 19 January 2006
+------------------------
+
+  * (19 Jan 2006) mostly nav_bar
+  	- added new function nav_bar, which does an across-the-top navbar
+  	- added new option 'nohide' to override 'hide'
+  	- renamed a number of options
+  	- restructured the way some things were done
+
+0.0502 Tue 17 January 2006
+--------------------------
+
+  * (17 Jan 2006) futher correction to navbar
+  	This time fer shure!
+
+0.0501 Tue 17 January 2006
+--------------------------
+
+  * (17 Jan 2006) corrected navbar error
+  	My feature enhancement... didn't do what I thought it did.  Oops.
+
+0.05 Tue 17 January 2006
+------------------------
+
+  * (17 Jan 2006) improved navbar
+  	Now the navbar shows the next level up when the current page
+  is not an index page; the siblings of its parent.
+
+0.04 Fri 13 January 2006
+------------------------
+
+  * (13 Jan 2006) improved nav_tree
+  	Revamped the logic and the options to make nav_tree more sensible
+  and simpler to use.
+
+  * (12 Jan 2006) nomenclature
+  	Stop referring to directories; they're index pages.
+  	Renamed 'dir_tree' to 'full_tree'.
+
+0.03 Thu 12 January 2006
+------------------------
+
+  * (12 Jan 2006) renames,additions,nav_tree
+  	- renamed breadcrumb_tree to breadcrumb_trail
+  	- added the 'preserve_order' option to dir_tree
+  	- added new function 'nav_tree' to make a nested navbar
+  	- updated documentation
+  	- fixes and tweaks
+
+0.02 Wed 11 January 2006
+------------------------
+
+  * (11 Jan 2006) breadcrumb_tree
+  	Added the 'breadcrumb_tree' function which makes a breadcrumb
+  trail from the current_url.
+
+  * (11 Jan 2006) minor fixes
+  	Made the checking of the 'current_url' better.
+
+0.01 Mon 09 January 2006
+------------------------
+
+  * (9 Jan 2006) tweaking documentation
+
+  * (9 Jan 2006) commit tweaking
+  	The ModDevAid stuff needed to not try to chmod non-existant scripts.
+
+  * (9 Jan 2006) fixing tests
+  	Just some minor bugs with the tests.
+
+  * (9 Jan 2006) initial checkin

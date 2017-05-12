@@ -1,0 +1,41 @@
+---
+abstract: 'Cookie storage and management for Mozilla'
+author:
+  - 'brian d foy <bdfoy@cpan.org>'
+build_requires:
+  File::Spec::Functions: '0'
+  Test::More: '0.94'
+  Text::Diff: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec::Functions: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTTP-Cookies-Mozilla
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  DBD::SQLite: '0'
+  DBI: '0'
+  Data::Dumper: '0'
+  HTTP::Cookies: '1.25'
+  base: '0'
+  constant: '0'
+  lib: '0'
+  perl: '5.008'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/briandfoy/HTTP-Cookies-Mozilla/issues
+  homepage: https://github.com/briandfoy/HTTP-Cookies-Mozilla
+  repository: https://github.com/briandfoy/HTTP-Cookies-Mozilla.git
+version: '2.032'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

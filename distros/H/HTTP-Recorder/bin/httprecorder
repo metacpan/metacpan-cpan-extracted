@@ -1,0 +1,65 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use HTTP::Proxy;
+use HTTP::Recorder;
+use Getopt::Long;
+use Pod::Usage;
+
+my $port = 8080;
+my $filename = "http_traffic";
+my $show_help = '';
+
+GetOptions ("port=i" => \$port, "file=s" => \$filename, "help" => \$show_help);
+pod2usage(1) if ($show_help);
+
+print "httprecorder - quick script for recording HTTP traffic\n";
+
+my $proxy = HTTP::Proxy->new( port => $port );
+print "Proxy server host:port  ".$proxy->host.":".$proxy->port."\n";
+
+# create a new HTTP::Recorder object
+my $agent = new HTTP::Recorder;
+print "Proxy control panel     http://" . $agent->control . "/\n";
+
+# set the log file (optional)
+$agent->file($filename);
+print "Recording to file       $filename\n";
+
+# set HTTP::Recorder as the agent for the proxy
+$proxy->agent( $agent );
+
+# start the proxy
+$proxy->start();
+
+=head1 NAME
+
+httprecorder - quick script for recording HTTP traffic
+
+=head1 SYNOPSIS
+
+    httprecorder [ --port=8080 ] [ --file=http_traffic ] [ --help ]
+
+    Options:
+    --help    brief help message
+    --port    Port number to use for the proxy server (default 8080)
+    --file    filename to record the traffic to (default "http_traffic")
+
+=head1 DESCRIPTION
+
+This is a quick script for using HTTP::Recorder module. If you need customizing
+please see the module itself
+
+=head1 Author
+
+Shmuel Fomberg <semuelf@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2011 Shmuel Fomberg.
+
+This program is free software; Released under the GNU Public License.
+
+=cut

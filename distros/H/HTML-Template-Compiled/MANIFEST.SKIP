@@ -1,0 +1,11 @@
+develop
+.bak
+.swp
+README.md
+examples/bench.pdf
+examples/dprof.pl
+scripts/htprecompile.pl
+lib/HTML/Template/Compiled/Plugin/Translate.pm
+t/25_translate.t
+t/templates/translate.html
+t/templates/translate_included.html

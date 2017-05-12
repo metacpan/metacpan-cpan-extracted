@@ -1,0 +1,39 @@
+<ep-package name="HTML::EP::Glimpse" lib="admin/lib">
+<html><head><title>
+<ep-language en="Glimpse Search Page"
+             de="Suchseite mit Glimpse"></title></head>
+<body bgcolor=#ffffff>
+  <div align=center>
+    <a href="index.ep?language=de">
+      <img border=0 src="de.jpg" alt="Deutsch">
+    </a>
+    <a href="index.ep?language=en">
+      <img border=0 src="en.jpg" alt="English">
+    </a>
+  </div>
+  <h1><ep-language en="Glimpse Search Page"
+             de="Suchseite mit Glimpse"></h1>
+<ep-language language="de">
+  Auf dieser Seite können Sie nach Stichworten suchen lassen. Einfach die
+  Stichworte in das Textfeld eingeben und die Eingabetaste betätigen.
+  Auch eine <a href="advanced.ep?language=$_ep_language$">erweiterte
+  Suchseite</a> steht zu Ihrer Verfügung, falls Sie eine feinere
+  Auswahl benötigen.
+</ep-language>
+<ep-language language="en">
+  On this page you can search for certain key words. Just insert them
+  into the text field below and hit 'Enter'. If a simple search is
+  insufficient, you might as well try the
+  <a href="advanced.ep?language=$_ep_language$">advanced search</a>
+  page.
+</ep-language>
+<form action=search.ep method=get>
+  <input type=hidden name=language value="$_ep_language$">
+  <input size=20 name=search>
+  <select name=opt_or>
+    <option value=0><ep-language en="Find all my words" de="Alle Worte suchen">
+    <option value=1><ep-language en="Find any word" de="Ein Wort genügt">
+  </select>
+</form>
+</body>
+</html>

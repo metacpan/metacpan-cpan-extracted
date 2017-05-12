@@ -1,0 +1,21 @@
+Revision history for Perl extension Heimdal::Kadm5.
+
+0.01  Sun Feb  9 22:01:22 2003
+	- original version; created by h2xs 1.21 with options
+		-n Heimdal::Kadm5
+
+0.04  Wed Nov 19 23:43:39 CET 2003
+	- patches from Alf Wachsman <alfw@slac.stanford.edu>
+
+0.07  Thu Dec 10 17:56:28 PST 2009
+	- Changed dump() to better model get kadmin command output
+	- Fixed bug with modifyPrincipal not checking for empty mask
+	  and setting it to 0 if empty
+	- Added Alf Wachsman <alfw@slac.stanford.edu> patch to delete
+	  enctypes from a principal
+
+0.08  Wed Jan 13 13:12:51 PST 2010
+	- Additions to dump() for parsing out attributes and ticket 
+	  lifetimes
+	- getAttributeNames to give an array of attributes by name
+	- Wrapped some code and perldocs

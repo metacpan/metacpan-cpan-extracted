@@ -1,0 +1,244 @@
+
+=head1 NAME
+
+ HTML::Transmorgify::Attributes - HTML transformation compiler
+
+=head1 SYNOPSIS
+
+ use HTML::Transmorgify::Attributes;
+
+ my $attr = HTML::Transmorgify::Attributes->new($tag, \@atvals, $closed);
+
+ print "$attr";
+
+ my $tag = $attr->tag;
+
+=head1 DESCRIPTION
+
+This module provides the objects that hold the data about 
+E<lt>tagsE<gt>
+parsed by L<HTML::Transmorgify>.
+
+=head2 Construction
+
+Usually HTML::Transmorgify::Attributes objects are created by 
+L<HTML::Transmorgify> in the process of compiling HTML 
+transformations.
+
+If you want to create one yourself, the arguments are:
+
+=over 10
+
+=item $tag
+
+This is the name of the tag. 
+C<E<lt>$tagsE<gt>>.
+
+=item \@atvals
+
+This is an array of pairs that could be turned into a hash
+through simple assingment.  The I<key> side of the pair is the
+attribute name.  The I<value> side of the pair is the atribute
+value.  For attributes that do not have a value, like C<checked> in
+
+ <input type=checkbox name=checky value=valued checked />
+
+the value should be undef.  Eg:
+
+ my $attr = HTML::Transmorgify::Attributes->new("input",
+ 	[ type => 'checkbox, name => 'checky', 
+	value => 'valued', checked => undef ],
+	1)
+
+=item $closed
+
+Closed should be true if this is a self-closed tag like
+
+ <hr />
+
+=back
+
+=head2 Methods
+
+Several of the lookup methods (C<raw>, C<static>, C<get>) 
+all take the same set of arguments: the attribute name
+to be retrieved, an optional positional location to look
+for the attribute, and a optional hash of options.
+
+The positional location is for use with non-HMTL markup
+in an HTML context.  For example if you allow
+
+ <for thing things>
+
+as an alternative form for
+
+ <for iter=thing in=things>
+
+then you will need to specify a positional parameter.  Only
+the first attributes following a tag can be positional.  The
+first non-positional attribute blocks any positional lookups
+at its postion or beyond.  Positions are numbered from zero.
+
+The following object methods are provided:
+
+=over
+
+=item $attr-E<gt>get($attribute_name, $position, %options)
+
+Lookup an attribute.  If the attribute value has HTML
+tags in it, then use L<HTML::Transmorgify> to process
+the value before returning it.
+
+For attributes that do not have values, like 
+C<checked> in 
+
+ <input type=checkbox name=foo value=bar checked>
+
+the name of the attribute will be returned.
+
+=item $attr-E<gt>raw($attribute_name, $position, %options)
+
+Lookup an attribute.  Return the value without processing
+it with L<HTML::Transmorgify>.
+
+For attributes that do not have values, like 
+C<checked> in 
+
+ <input type=checkbox name=foo value=bar checked>
+
+the name of the attribute will be returned.
+
+=item $attr-E<gt>static($attribute_name, $position, %options)
+
+Lookup an attribute.  Only return the value if the value does
+not have any HTML tags in it.
+
+For attributes that do not have values, like 
+C<checked> in 
+
+ <input type=checkbox name=foo value=bar checked>
+
+the name of the attribute will be returned.
+
+=item $attr-E<gt>boolean($attribute_name, $position, $default_value, %options)
+
+Look up an attribute using 
+C<$attr-E<gt>get($attribute_name, $position, %options)>
+(unless C<$options{raw}> is set, in which case
+C<$attr-E<gt>raw($attribute_name, $position, %options)>
+is used instead).
+
+Evaluate the value with the boolean() function from L<HTML::Transmorgify>:
+C<no>, C<false>, C<0> are false, other values are true.
+
+=item $attr-E<gt>as_string(%options);
+
+Converts the tag and its attributes into a string.  Any attribute
+values will be processed with L<HTML::Transmorgify>.   This method
+is used to override stringification for the 
+HTML::Transmorgify::Attributes object.
+
+=item $attr-E<gt>set(%new_values)
+
+Sets new values for one or more attributes.  This can be used to 
+add additional attributes to the tag.
+
+=item $attr-E<gt>hide()
+
+Marks an attribute as hidden.  This will cause the attribute to
+be skipped by $attr-E<gt>as_string().
+
+=item $attr-E<gt>hide_position()
+
+Marks an attribute by position as hidden.  This will cause the attribute to
+be skipped by $attr-E<gt>as_string().
+
+If you looked up an attribute by name and position, then you may not know
+how it was found.  To hide such an attribute, use hide() and hide_position().
+
+=item $attr-E<gt>tag()
+
+Returns the value of C<$tag> that was used when constructing 
+the object.
+
+=item $attr-E<gt>closed()
+
+Returns the value of C<$closed> that was used when constructing 
+the object.
+
+=item $attr-E<gt>location()
+
+At the time that the HTML::Transmorgify::Attributes object is created, it 
+takes note of the current values of
+C<$HTML::Transmorgify::textref>,
+C<pos($HTML::Transmorgify::textref)>,
+C<$HTML::Transmorgify::input_line>, 
+and
+C<$HTML::Transmorgify::input_file>.
+It uses this construct a string that can be used to give context to 
+any error messages involving the tag.
+This method returns that string.   Calling this function can be
+expensive since it calculates the line number of the error.
+
+=item $attr-E<gt>needs_cooking()
+
+This method returns a reference to a hash that maps 
+attribute name to a boolean value: does the attribute
+in question have any HTML tags embedded in its value?
+It is true for those that do.
+
+=item $attr-E<gt>add_to_result()
+
+This method causes the tag to be "compiled".  The tag is pushed 
+into L<HTML::Transmorgify>'s run buffer (C<@$rbuf>).  Depending
+on whether any attribute values have any embedded HTML tags or
+if 
+C<$attr-E<gt>eval_at_runtime(1)> has been called, the tag can
+be pushed as either a literal string or as a CODE callback.
+
+=item $attr-E<gt>eval_at_runtime($newvalue)
+
+This gets or sets a flag: does this attribute need to be 
+evaluated at runtime or can it be turned into a string at
+compile time?
+
+Addon module writers should be careful about this: this should
+be set to true unless you can tell at compile time that it is
+not needed.  Do not set it to false.
+
+=item $attr-E<gt>output_callback(@callbacks)
+
+Add CODE reference callbacks to be invoked if 
+C<$attr-E<gt>as_string()> is called.
+Any defined return value from a callback will
+be used as the return value from as_string().  Only
+one callback is allowed to return a defined value.
+The callback will receive C<$attr> as its only
+argument.
+
+=item $attr-E<gt>static_action($attributes, $coderefs)
+
+This is a wrapper function for tag callbacks to use.   It looks at
+C<$attributes> which can be either a single attribute name or a reference to an
+array of attribute names.  If the attribute (or attributes) values
+do not have any HTML markup in them, then C<$coderefs> is evaluated
+immediately.
+
+If not then C<$coderefs> is pushed on the end of 
+@$HTML::Transmorgify::rbuf for evaluation at runtime.
+
+=item $attr-E<gt>vals()
+
+Returns a reference to the hash of raw attribute/value pairs.
+
+=item $attr-E<gt>last_position()
+
+Returns the last position at which a positional attribute
+may be found.  This is zero-based: if there are no positional
+attributes then this returns -1.
+
+With an argument, this returns true if the argument is less
+than or equal to the last position.
+
+=back
+

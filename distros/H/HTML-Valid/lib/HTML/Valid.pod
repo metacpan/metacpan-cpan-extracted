@@ -1,0 +1,1343 @@
+
+
+=encoding UTF-8
+
+=head1 NAME
+
+HTML::Valid - tidy/validate HTML
+
+=head1 SYNOPSIS
+
+    
+    use FindBin '$Bin';
+    use HTML::Valid;
+    my $html = <<EOF;
+    <ul>
+    <li>Shape it up
+    <li>Get straight
+    <li>Go forward
+    <li>Move ahead
+    <li>Try to detect it
+    <li>It's not too late
+    EOF
+    my $htv = HTML::Valid->new ();
+    my ($output, $errors) = $htv->run ($html);
+    print "$output\n";
+    print "$errors\n";
+
+
+outputs
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <meta name="generator" content=
+    "HTML Tidy for HTML5 for FreeBSD version 5.0.0">
+    <title></title>
+    </head>
+    <body>
+    <ul>
+    <li>Shape it up</li>
+    <li>Get straight</li>
+    <li>Go forward</li>
+    <li>Move ahead</li>
+    <li>Try to detect it</li>
+    <li>It's not too late</li>
+    </ul>
+    </body>
+    </html>
+    
+    line 1 column 1 - Warning: missing <!DOCTYPE> declaration
+    line 1 column 1 - Warning: inserting implicit <body>
+    line 1 column 1 - Warning: missing </ul>
+    line 1 column 1 - Warning: inserting missing 'title' element
+    Info: Document content looks like HTML5
+    Tidy found 4 warnings and 0 errors!
+    
+    
+
+
+=head1 VERSION
+
+This documents HTML::Valid version 0.06
+corresponding to git commit L<453a1be0d5696738e405061f5ed1ad475b04c443|https://github.com/benkasminbullock/html-valid/commit/453a1be0d5696738e405061f5ed1ad475b04c443> released on Thu Mar 2 14:23:28 2017 +0900.
+
+This Perl module is built on top of the L</HTML Tidy> library version
+5.4.0.
+
+
+=head1 DESCRIPTION
+
+Validate/repair HTML. This module is based on L</HTML Tidy>, but not
+on the Perl module L<HTML::Tidy>. However, you do not need to install
+HTML Tidy before installing this, because the library is contained in
+the distribution.
+
+=head1 FUNCTIONS
+
+=head2 new
+
+    my $htv = HTML::Valid->new ();
+
+Make a new HTML::Valid object.
+
+It's also possible to supply options, as described in L</OPTIONS>:
+
+    $htv->new (
+        show_body_only => 1,
+        alt_text => 'An image of a polar bear',
+    );
+
+=head2 run
+
+    my ($output, $errors) = $htv->run ($content);
+
+Get the tidy HTML output and errors. This is basically the same thing
+as running the "tidy" utility with the given options.
+
+=head2 set_filename
+
+    $htv->set_filename ('file.html');
+
+Set the file name for error reporting to F<file.html>.
+
+=head2 set_option
+
+    $htv->set_option ('omit-optional-tags', 1);
+
+Most of the options of L</HTML Tidy> are supported.
+
+=head1 OPTIONS
+
+The following options can be set with L</set_option>. In this
+documentation they are given with a hyphen, but underscores can also
+be used. Options taking true or false values test for truth or
+falsehood using the standard Perl tests, so empty strings, the
+undefined value, or zero are all valid "false" values.
+
+Please note the following documentation of the options is
+automatically extracted from the L</HTML Tidy> documentation.
+
+=over
+
+=item accessibility-check
+
+    $htv->set_option ('accessibility-check', <value>);
+
+Type: integer
+
+Default: 0
+
+This option specifies what level of accessibility checking, if any, that Tidy should perform. 
+
+Level C<< 0 (Tidy Classic) >> is equivalent to Tidy Classic's accessibility checking. 
+
+For more information on Tidy's accessibility checking, visit L<Tidy's Accessibility Page|http://www.html-tidy.org/accessibility/>.
+
+=item add-xml-decl
+
+    $htv->set_option ('add-xml-decl', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should add the XML declaration when outputting XML or XHTML. 
+
+Note that if the input already includes an C<< <?xml ... ?> >> declaration then this option will be ignored. 
+
+If the encoding for the output is different from C<< ascii >>, one of the utf encodings or C<< raw >>, the declaration is always added as required by the XML standard.
+
+=item add-xml-space
+
+    $htv->set_option ('add-xml-space', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should add C<< xml:space="preserve" >> to elements such as C<< <pre> >>, C<< <style> >> and C<< <script> >> when generating XML. 
+
+This is needed if the whitespace in such elements is to be parsed appropriately without having access to the DTD.
+
+=item alt-text
+
+    $htv->set_option ('alt-text', <value>);
+
+Type: string
+
+Default: <empty>
+
+This option specifies the default C<< alt= >> text Tidy uses for C<< <img> >> attributes. 
+
+Use with care, as this feature suppresses further accessibility warnings.
+
+=item anchor-as-name
+
+    $htv->set_option ('anchor-as-name', <value>);
+
+Type: true or false
+
+Default: true
+
+This option controls the deletion or addition of the C<< name >> attribute in elements where it can serve as anchor. 
+
+If set to C<< yes >> a C<< name >> attribute, if not already existing, is added along an existing C<< id >> attribute if the DTD allows it. 
+
+If set to C<< no >> any existing name attribute is removed if anC<< id >> attribute exists or has been added.
+
+=item ascii-chars
+
+    $htv->set_option ('ascii-chars', <value>);
+
+Type: true or false
+
+Default: false
+
+Can be used to modify behavior of the C<< clean >> option when set to C<< yes >>. 
+
+If set to C<< yes >> when C<< clean >>, C<< &emdash; >>, C<< &rdquo; >>, and other named character entities are downgraded to their closest ASCII equivalents.
+
+=item assume-xml-procins
+
+    $htv->set_option ('assume-xml-procins', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should change the parsing of processing instructions to require C<< ?> >> as the terminator rather than C<< > >>. 
+
+This option is automatically set if the input is in XML.
+
+=item bare
+
+    $htv->set_option ('bare', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should strip Microsoft specific HTML from Word 2000 documents, and output spaces rather than non-breaking spaces where they exist in the input.
+
+=item break-before-br
+
+    $htv->set_option ('break-before-br', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should output a line break before each C<< <br> >> element.
+
+=item clean
+
+    $htv->set_option ('clean', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should perform cleaning of some legacy presentational tags (currently C<< <i> >>, C<< <b> >>, C<< <center> >> when enclosed within appropriate inline tags, and C<< <font> >>). If set to C<< yes >> then legacy tags will be replaced with CSS C<< <style> >> tags and structural markup as appropriate.
+
+=item coerce-endtags
+
+    $htv->set_option ('coerce-endtags', <value>);
+
+Type: true or false
+
+Default: true
+
+This option specifies if Tidy should coerce a start tag into an end tag in cases where it looks like an end tag was probably intended; for example, given 
+
+C<< <span>foo <b>bar<b> baz</span> >> 
+
+Tidy will output 
+
+C<< <span>foo <b>bar</b> baz</span> >>
+
+=item css-prefix
+
+    $htv->set_option ('css-prefix', <value>);
+
+Type: string
+
+Default: <empty>
+
+This option specifies the prefix that Tidy uses for styles rules. 
+
+By default, C<< c >> will be used.
+
+=item decorate-inferred-ul
+
+    $htv->set_option ('decorate-inferred-ul', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should decorate inferred C<< <ul> >> elements with some CSS markup to avoid indentation to the right.
+
+=item doctype
+
+    $htv->set_option ('doctype', <value>);
+
+Type: string
+
+Default: <empty>
+
+This option specifies the DOCTYPE declaration generated by Tidy. 
+
+If set to C<< omit >> the output won't contain a DOCTYPE declaration. Note this this also implies C<< numeric-entities >> is set to C<< yes >>
+
+If set to C<< html5 >> the DOCTYPE is set to C<< <!DOCTYPE html> >>.
+
+If set to C<< auto >> (the default) Tidy will use an educated guess based upon the contents of the document.
+
+If set to C<< strict >>, Tidy will set the DOCTYPE to the HTML4 or XHTML1 strict DTD.
+
+If set to C<< loose >>, the DOCTYPE is set to the HTML4 or XHTML1 loose (transitional) DTD.
+
+Alternatively, you can supply a string for the formal public identifier (FPI).
+
+For example: 
+
+C<< doctype: "-//ACME//DTD HTML 3.14159//EN" >>
+
+If you specify the FPI for an XHTML document, Tidy will set the system identifier to an empty string. For an HTML document, Tidy adds a system identifier only if one was already present in order to preserve the processing mode of some browsers. Tidy leaves the DOCTYPE for generic XML documents unchanged. 
+
+This option does not offer a validation of document conformance.
+
+=item drop-empty-elements
+
+    $htv->set_option ('drop-empty-elements', <value>);
+
+Type: true or false
+
+Default: true
+
+This option specifies if Tidy should discard empty elements.
+
+=item drop-empty-paras
+
+    $htv->set_option ('drop-empty-paras', <value>);
+
+Type: true or false
+
+Default: true
+
+This option specifies if Tidy should discard empty paragraphs.
+
+=item drop-font-tags
+
+    $htv->set_option ('drop-font-tags', <value>);
+
+Type: true or false
+
+Default: false
+
+Deprecated; I<do not use>. This option is destructive to C<< <font> >> tags, and it will be removed from future versions of Tidy. Use the C<< clean >> option instead. 
+
+If you do set this option despite the warning it will perform as C<< clean >> except styles will be inline instead of put into a CSS class. C<< <font> >> tags will be dropped completely and their styles will not be preserved. 
+
+If both C<< clean >> and this option are enabled, C<< <font> >> tags will still be dropped completely, and other styles will be preserved in a CSS class instead of inline. 
+
+See C<< clean >> for more information.
+
+=item drop-proprietary-attributes
+
+    $htv->set_option ('drop-proprietary-attributes', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should strip out proprietary attributes, such as Microsoft data binding attributes.
+
+=item enclose-block-text
+
+    $htv->set_option ('enclose-block-text', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should insert a C<< <p> >> element to enclose any text it finds in any element that allows mixed content for HTML transitional but not HTML strict.
+
+=item enclose-text
+
+    $htv->set_option ('enclose-text', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should enclose any text it finds in the body element within a C<< <p> >> element.
+
+This is useful when you want to take existing HTML and use it with a style sheet.
+
+=item escape-cdata
+
+    $htv->set_option ('escape-cdata', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should convert C<< <![CDATA[]]> >> sections to normal text.
+
+=item fix-backslash
+
+    $htv->set_option ('fix-backslash', <value>);
+
+Type: true or false
+
+Default: true
+
+This option specifies if Tidy should replace backslash characters C<< \ >> in URLs with forward slashes C<< / >>.
+
+=item fix-bad-comments
+
+    $htv->set_option ('fix-bad-comments', <value>);
+
+Type: true or false
+
+Default: true
+
+This option specifies if Tidy should replace unexpected hyphens with C<< = >> characters when it comes across adjacent hyphens. 
+
+The default is C<< yes >>. 
+
+This option is provided for users of Cold Fusion which uses the comment syntax: C<< <!--- ---> >>.
+
+=item fix-uri
+
+    $htv->set_option ('fix-uri', <value>);
+
+Type: true or false
+
+Default: true
+
+This option specifies if Tidy should check attribute values that carry URIs for illegal characters and if such are found, escape them as HTML4 recommends.
+
+=item force-output
+
+    $htv->set_option ('force-output', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should produce output even if errors are encountered. 
+
+Use this option with care; if Tidy reports an error, this means Tidy was not able to (or is not sure how to) fix the error, so the resulting output may not reflect your intention.
+
+=item gdoc
+
+    $htv->set_option ('gdoc', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should enable specific behavior for cleaning up HTML exported from Google Docs.
+
+=item gnu-emacs
+
+    $htv->set_option ('gnu-emacs', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should change the format for reporting errors and warnings to a format that is more easily parsed by GNU Emacs.
+
+=item hide-comments
+
+    $htv->set_option ('hide-comments', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should print out comments.
+
+=item hide-endtags
+
+    $htv->set_option ('hide-endtags', <value>);
+
+Type: true or false
+
+Default: false
+
+This option is an alias for C<< omit-optional-tags >>.
+
+=item indent
+
+    $htv->set_option ('indent', <value>);
+
+Type: integer
+
+Default: 0
+
+This option specifies if Tidy should indent block-level tags. 
+
+If set to C<< auto >> Tidy will decide whether or not to indent the content of tags such as C<< <title> >>, C<< <h1> >>-C<< <h6> >>, C<< <li> >>, C<< <td> >>, or C<< <p> >> based on the content including a block-level element. 
+
+Setting C<< indent >> to C<< yes >> can expose layout bugs in some browsers. 
+
+Use the option C<< indent-spaces >> to control the number of spaces or tabs output per level of indent, and C<< indent-with-tabs >> to specify whether spaces or tabs are used.
+
+=item indent-attributes
+
+    $htv->set_option ('indent-attributes', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should begin each attribute on a new line.
+
+=item indent-cdata
+
+    $htv->set_option ('indent-cdata', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should indent C<< <![CDATA[]]> >> sections.
+
+=item indent-spaces
+
+    $htv->set_option ('indent-spaces', <value>);
+
+Type: integer
+
+Default: 2
+
+This option specifies the number of spaces or tabs that Tidy uses to indent content when C<< indent >> is enabled. 
+
+Note that the default value for this option is dependent upon the value of C<< indent-with-tabs >> (see also).
+
+=item indent-with-tabs
+
+    $htv->set_option ('indent-with-tabs', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should indent with tabs instead of spaces, assuming C<< indent >> is C<< yes >>. 
+
+Set it to C<< yes >> to indent using tabs instead of the default spaces. 
+
+Use the option C<< indent-spaces >> to control the number of tabs output per level of indent. Note that when C<< indent-with-tabs >> is enabled the default value of C<< indent-spaces >> is reset to C<< 1 >>. 
+
+Note C<< tab-size >> controls converting input tabs to spaces. Set it to zero to retain input tabs.
+
+=item input-xml
+
+    $htv->set_option ('input-xml', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should use the XML parser rather than the error correcting HTML parser.
+
+=item join-classes
+
+    $htv->set_option ('join-classes', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should combine class names to generate a single, new class name if multiple class assignments are detected on an element.
+
+=item join-styles
+
+    $htv->set_option ('join-styles', <value>);
+
+Type: true or false
+
+Default: true
+
+This option specifies if Tidy should combine styles to generate a single, new style if multiple style values are detected on an element.
+
+=item language
+
+    $htv->set_option ('language', <value>);
+
+Type: string
+
+Default: <empty>
+
+Currently not used, but this option specifies the language Tidy would use if it were properly localized. For example: C<< en >>.
+
+=item literal-attributes
+
+    $htv->set_option ('literal-attributes', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies how Tidy deals with whitespace characters within attribute values. 
+
+If the value is C<< no >> Tidy normalizes attribute values by replacing any newline or tab with a single space, and further by replacing any contiguous whitespace with a single space. 
+
+To force Tidy to preserve the original, literal values of all attributes and ensure that whitespace within attribute values is passed through unchanged, set this option to C<< yes >>.
+
+=item logical-emphasis
+
+    $htv->set_option ('logical-emphasis', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should replace any occurrence of C<< <i> >> with C<< <em> >> and any occurrence of C<< <b> >> with C<< <strong> >>. Any attributes are preserved unchanged. 
+
+This option can be set independently of the C<< clean >> option.
+
+=item lower-literals
+
+    $htv->set_option ('lower-literals', <value>);
+
+Type: true or false
+
+Default: true
+
+This option specifies if Tidy should convert the value of an attribute that takes a list of predefined values to lower case. 
+
+This is required for XHTML documents.
+
+=item markup
+
+    $htv->set_option ('markup', <value>);
+
+Type: true or false
+
+Default: true
+
+This option specifies if Tidy should generate a pretty printed version of the markup. Note that Tidy won't generate a pretty printed version if it finds significant errors (see C<< force-output >>).
+
+=item merge-divs
+
+    $htv->set_option ('merge-divs', <value>);
+
+Type: integer
+
+Default: 2
+
+This option can be used to modify the behavior of C<< clean >> when set to C<< yes >>.
+
+This option specifies if Tidy should merge nested C<< <div> >> such as C<< <div><div>...</div></div> >>. 
+
+If set to C<< auto >> the attributes of the inner C<< <div> >> are moved to the outer one. Nested C<< <div> >> with C<< id >> attributes are I<not> merged. 
+
+If set to C<< yes >> the attributes of the inner C<< <div> >> are discarded with the exception of C<< class >> and C<< style >>.
+
+=item merge-emphasis
+
+    $htv->set_option ('merge-emphasis', <value>);
+
+Type: true or false
+
+Default: true
+
+This option specifies if Tidy should merge nested C<< <b> >> and C<< <i> >> elements; for example, for the case 
+
+C<< <b class="rtop-2">foo <b class="r2-2">bar</b> baz</b> >>, 
+
+Tidy will output C<< <b class="rtop-2">foo bar baz</b> >>.
+
+=item merge-spans
+
+    $htv->set_option ('merge-spans', <value>);
+
+Type: integer
+
+Default: 2
+
+This option can be used to modify the behavior of C<< clean >> when set to C<< yes >>.
+
+This option specifies if Tidy should merge nested C<< <span> >> such as C<< <span><span>...</span></span> >>. 
+
+The algorithm is identical to the one used by C<< merge-divs >>.
+
+=item ncr
+
+    $htv->set_option ('ncr', <value>);
+
+Type: true or false
+
+Default: true
+
+This option specifies if Tidy should allow numeric character references.
+
+=item new-blocklevel-tags
+
+    $htv->set_option ('new-blocklevel-tags', <value>);
+
+Type: string
+
+Default: <empty>
+
+This option specifies new block-level tags. This option takes a space or comma separated list of tag names. 
+
+Unless you declare new tags, Tidy will refuse to generate a tidied file if the input includes previously unknown tags. 
+
+Note you can't change the content model for elements such as C<< <table> >>, C<< <ul> >>, C<< <ol> >> and C<< <dl> >>. 
+
+This option is ignored in XML mode.
+
+=item new-empty-tags
+
+    $htv->set_option ('new-empty-tags', <value>);
+
+Type: string
+
+Default: <empty>
+
+This option specifies new empty inline tags. This option takes a space or comma separated list of tag names. 
+
+Unless you declare new tags, Tidy will refuse to generate a tidied file if the input includes previously unknown tags. 
+
+Remember to also declare empty tags as either inline or blocklevel. 
+
+This option is ignored in XML mode.
+
+=item new-inline-tags
+
+    $htv->set_option ('new-inline-tags', <value>);
+
+Type: string
+
+Default: <empty>
+
+This option specifies new non-empty inline tags. This option takes a space or comma separated list of tag names. 
+
+Unless you declare new tags, Tidy will refuse to generate a tidied file if the input includes previously unknown tags. 
+
+This option is ignored in XML mode.
+
+=item new-pre-tags
+
+    $htv->set_option ('new-pre-tags', <value>);
+
+Type: string
+
+Default: <empty>
+
+This option specifies new tags that are to be processed in exactly the same way as HTML's C<< <pre> >> element. This option takes a space or comma separated list of tag names. 
+
+Unless you declare new tags, Tidy will refuse to generate a tidied file if the input includes previously unknown tags. 
+
+Note you cannot as yet add new CDATA elements. 
+
+This option is ignored in XML mode.
+
+=item newline
+
+    $htv->set_option ('newline', <value>);
+
+Type: integer
+
+Default: 0
+
+The default is appropriate to the current platform. 
+
+Genrally CRLF on PC-DOS, Windows and OS/2; CR on Classic Mac OS; and LF everywhere else (Linux, Mac OS X, and Unix).
+
+=item numeric-entities
+
+    $htv->set_option ('numeric-entities', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should output entities other than the built-in HTML entities (C<< &amp; >>, C<< &lt; >>, C<< &gt; >>, and C<< &quot; >>) in the numeric rather than the named entity form. 
+
+Only entities compatible with the DOCTYPE declaration generated are used. 
+
+Entities that can be represented in the output encoding are translated correspondingly.
+
+=item omit-optional-tags
+
+    $htv->set_option ('omit-optional-tags', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should omit optional start tags and end tags when generating output. 
+
+Setting this option causes all tags for the C<< <html> >>, C<< <head> >>, and C<< <body> >> elements to be omitted from output, as well as such end tags as C<< </p> >>, C<< </li> >>, C<< </dt> >>, C<< </dd> >>, C<< </option> >>, C<< </tr> >>, C<< </td> >>, and C<< </th> >>. 
+
+This option is ignored for XML output.
+
+=item output-html
+
+    $htv->set_option ('output-html', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should generate pretty printed output, writing it as HTML.
+
+=item output-xhtml
+
+    $htv->set_option ('output-xhtml', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should generate pretty printed output, writing it as extensible HTML. 
+
+This option causes Tidy to set the DOCTYPE and default namespace as appropriate to XHTML, and will use the corrected value in output regardless of other sources. 
+
+For XHTML, entities can be written as named or numeric entities according to the setting of C<< numeric-entities >>. 
+
+The original case of tags and attributes will be preserved, regardless of other options.
+
+=item output-xml
+
+    $htv->set_option ('output-xml', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should pretty print output, writing it as well-formed XML. 
+
+Any entities not defined in XML 1.0 will be written as numeric entities to allow them to be parsed by an XML parser. 
+
+The original case of tags and attributes will be preserved, regardless of other options.
+
+=item preserve-entities
+
+    $htv->set_option ('preserve-entities', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should preserve well-formed entities as found in the input.
+
+=item punctuation-wrap
+
+    $htv->set_option ('punctuation-wrap', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should line wrap after some Unicode or Chinese punctuation characters.
+
+=item quiet
+
+    $htv->set_option ('quiet', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should output the summary of the numbers of errors and warnings, or the welcome or informational messages.
+
+=item quote-ampersand
+
+    $htv->set_option ('quote-ampersand', <value>);
+
+Type: true or false
+
+Default: true
+
+This option specifies if Tidy should output unadorned C<< & >> characters as C<< &amp; >>.
+
+=item quote-marks
+
+    $htv->set_option ('quote-marks', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should output C<< " >> characters as C<< &quot; >> as is preferred by some editing environments. 
+
+The apostrophe character C<< ' >> is written out as C<< &#39; >> since many web browsers don't yet support C<< &apos; >>.
+
+=item quote-nbsp
+
+    $htv->set_option ('quote-nbsp', <value>);
+
+Type: true or false
+
+Default: true
+
+This option specifies if Tidy should output non-breaking space characters as entities, rather than as the Unicode character value 160 (decimal).
+
+=item repeated-attributes
+
+    $htv->set_option ('repeated-attributes', <value>);
+
+Type: integer
+
+Default: 1
+
+This option specifies if Tidy should keep the first or last attribute, if an attribute is repeated, e.g. has two C<< align >> attributes.
+
+=item replace-color
+
+    $htv->set_option ('replace-color', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should replace numeric values in color attributes with HTML/XHTML color names where defined, e.g. replace C<< #ffffff >> with C<< white >>.
+
+=item show-body-only
+
+    $htv->set_option ('show-body-only', <value>);
+
+Type: integer
+
+Default: 0
+
+This option specifies if Tidy should print only the contents of the body tag as an HTML fragment. 
+
+If set to C<< auto >>, this is performed only if the body tag has been inferred. 
+
+Useful for incorporating existing whole pages as a portion of another page. 
+
+This option has no effect if XML output is requested.
+
+=item show-errors
+
+    $htv->set_option ('show-errors', <value>);
+
+Type: integer
+
+Default: 6
+
+This option specifies the number Tidy uses to determine if further errors should be shown. If set to C<< 0 >>, then no errors are shown.
+
+=item show-info
+
+    $htv->set_option ('show-info', <value>);
+
+Type: true or false
+
+Default: true
+
+This option specifies if Tidy should display info-level messages.
+
+=item show-warnings
+
+    $htv->set_option ('show-warnings', <value>);
+
+Type: true or false
+
+Default: true
+
+This option specifies if Tidy should suppress warnings. This can be useful when a few errors are hidden in a flurry of warnings.
+
+=item skip-nested
+
+    $htv->set_option ('skip-nested', <value>);
+
+Type: true or false
+
+Default: true
+
+This option specifies that Tidy should skip nested tags when parsing script and style data.
+
+=item slide-style
+
+    $htv->set_option ('slide-style', <value>);
+
+Type: string
+
+Default: <empty>
+
+This option has no function and is deprecated.
+
+=item sort-attributes
+
+    $htv->set_option ('sort-attributes', <value>);
+
+Type: integer
+
+Default: 0
+
+This option specifies that Tidy should sort attributes within an element using the specified sort algorithm. If set to C<< alpha >>, the algorithm is an ascending alphabetic sort.
+
+=item split
+
+    $htv->set_option ('split', <value>);
+
+Type: true or false
+
+Default: false
+
+This option has no function and is deprecated.
+
+=item tab-size
+
+    $htv->set_option ('tab-size', <value>);
+
+Type: integer
+
+Default: 8
+
+This option specifies the number of columns that Tidy uses between successive tab stops. It is used to map tabs to spaces when reading the input.
+
+=item tidy-mark
+
+    $htv->set_option ('tidy-mark', <value>);
+
+Type: true or false
+
+Default: true
+
+This option specifies if Tidy should add a C<< meta >> element to the document head to indicate that the document has been tidied. 
+
+Tidy won't add a meta element if one is already present.
+
+=item uppercase-attributes
+
+    $htv->set_option ('uppercase-attributes', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should output attribute names in upper case. 
+
+The default is C<< no >>, which results in lower case attribute names, except for XML input, where the original case is preserved.
+
+=item uppercase-tags
+
+    $htv->set_option ('uppercase-tags', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should output tag names in upper case. 
+
+The default is C<< no >> which results in lower case tag names, except for XML input where the original case is preserved.
+
+=item vertical-space
+
+    $htv->set_option ('vertical-space', <value>);
+
+Type: integer
+
+Default: 0
+
+This option specifies if Tidy should add some extra empty lines for readability. 
+
+The default is C<< no >>. 
+
+If set to C<< auto >> Tidy will eliminate nearly all newline characters.
+
+=item word-2000
+
+    $htv->set_option ('word-2000', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should go to great pains to strip out all the surplus stuff Microsoft Word 2000 inserts when you save Word documents as "Web pages". It doesn't handle embedded images or VML. 
+
+You should consider using Word's "Save As: Web Page, Filtered".
+
+=item wrap
+
+    $htv->set_option ('wrap', <value>);
+
+Type: integer
+
+Default: 68
+
+This option specifies the right margin Tidy uses for line wrapping. 
+
+Tidy tries to wrap lines so that they do not exceed this length. 
+
+Set C<< wrap >> to C<< 0 >>(zero) if you want to disable line wrapping.
+
+=item wrap-asp
+
+    $htv->set_option ('wrap-asp', <value>);
+
+Type: true or false
+
+Default: true
+
+This option specifies if Tidy should line wrap text contained within ASP pseudo elements, which look like: C<< <% ... %> >>.
+
+=item wrap-attributes
+
+    $htv->set_option ('wrap-attributes', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should line-wrap attribute values, meaning that if the value of an attribute causes a line to exceed the width specified by C<< wrap >>, Tidy will add one or more line breaks to the value, causing it to be wrapped into multiple lines. 
+
+Note that this option can be set independently of C<< wrap-script-literals >>. By default Tidy replaces any newline or tab with a single space and replaces any sequences of whitespace with a single space. 
+
+To force Tidy to preserve the original, literal values of all attributes, and ensure that whitespace characters within attribute values are passed through unchanged, set C<< literal-attributes >> to C<< yes >>.
+
+=item wrap-jste
+
+    $htv->set_option ('wrap-jste', <value>);
+
+Type: true or false
+
+Default: true
+
+This option specifies if Tidy should line wrap text contained within JSTE pseudo elements, which look like: C<< <# ... #> >>.
+
+=item wrap-php
+
+    $htv->set_option ('wrap-php', <value>);
+
+Type: true or false
+
+Default: true
+
+This option specifies if Tidy should line wrap text contained within PHP pseudo elements, which look like: C<< <?php ... ?> >>.
+
+=item wrap-script-literals
+
+    $htv->set_option ('wrap-script-literals', <value>);
+
+Type: true or false
+
+Default: false
+
+This option specifies if Tidy should line wrap string literals that appear in script attributes. 
+
+Tidy wraps long script string literals by inserting a backslash character before the line break.
+
+=item wrap-sections
+
+    $htv->set_option ('wrap-sections', <value>);
+
+Type: true or false
+
+Default: true
+
+This option specifies if Tidy should line wrap text contained within C<< <![ ... ]> >> section tags.
+
+
+
+=back
+
+(The above options were generated from the documentation of HTML Tidy
+5.1.25, so they may be outdated relative to the current version.)
+
+=head1 SCRIPT
+
+There are two scripts, "htmlok", which runs on files or URLs and
+prints errors found to standard output, and "htmltidy", which runs on
+files or URLs and prints the reformatted HTML to standard output, with
+errors going to standard error. To use these scripts with URL
+validation, you need to have L<Data::Validate::URI> and L<LWP::Simple>
+installed.
+
+=head1 SEE ALSO
+
+=head2 HTML Tidy
+
+This is a program and a library in C for improving HTML. It was
+originally written by Dave Raggett of the W3 Consortium. HTML::Valid
+is based on this project.
+
+=over
+
+=item * L<HTML Tidy web page|http://www.html-tidy.org/>
+
+=item * L<HTML Tidy git repository|https://github.com/htacg/tidy-html5>
+
+=back
+
+Please note that this is not the Perl module L<HTML::Tidy> by Andy
+Lester, although that module is also based on the above library.
+
+
+=head2 HTML standards
+
+This section gives links to the HTML standards which HTML::Valid supports.
+
+=head3 HTML 2.0
+
+HTML 2.0 was described in RFC ("Request For Comments") 1866, a
+standard of the Internet Engineering Task Force. See
+L<http://www.ietf.org/rfc/rfc1866.txt>.
+
+=head3 HTML 3.2
+
+This was described in the HTML 3.2 Reference Specification. See
+L<http://www.w3.org/TR/REC-html32>. 
+
+=head3 HTML 4.01
+
+This was described in the HTML 4.01 Specification. See
+L<http://www.w3.org/TR/html401/>.
+
+=head3 HTML5
+
+=over
+
+=item Dive into HTML5
+
+L<http://diveintohtml5.info/>.
+
+This isn't a standards document, but "Dive into HTML 5" may be good
+background reading before trying to read the standards documents.
+
+=item HTML: The Living Standard
+
+This is at L<https://developers.whatwg.org/>. It says
+
+=over 
+
+This specification is intended for authors of documents and scripts
+that use the features defined in this specification.
+
+=back
+
+=item HTML5 - A vocabulary and associated APIs for HTML and XHTML
+
+This is at L<http://www.w3.org/TR/html5/>. It's the W3 consortium's
+version of the WHATWG documents.
+
+=back
+
+
+
+=head2 Online HTML validators
+
+You may like to try these validators for checking your HTML.
+
+=over
+
+=item L<http://www.onlinewebcheck.com/>
+
+Commercial HTML validator.
+
+=item L<http://watson.addy.com/>
+
+=item L<https://validator.w3.org/>
+
+W3 Consortium validator.
+
+=item L<https://validator.w3.org/nu/>
+
+New W3 Consortium validator.
+
+=back
+
+=head2 CPAN modules
+
+=over
+
+=item L<HTML::Tidy>
+
+=item L<HTML::Lint>
+
+=item HTML::Validator
+
+There is another module called HTML::Validator, but it can only found
+on Backpan, dating from 2000. It uses an external XML validating tool.
+
+=back
+
+=head2 Other
+
+=over
+
+=item L<JWZ's validate script|https://www.jwz.org/hacks/validate.pl>
+
+From the documentation:
+
+=over
+
+A small HTML validator: really all this does is make sure your tags are balanced, that your tables aren't missing TRs around the TDs, and that the local files that any relative URLs point to exist. There are much more fully-featured validators out there, but I haven't found them very useful: when all I want to know is "you left out a </UL>", they tend to spend their time whining at me about "where's your DTD?" and similar nonsense.
+
+=back
+
+=back
+
+=head1 BUILD PROCESS
+
+This module is built from L</HTML Tidy> source code using a script
+which converts the HTML Tidy library into a single C file. This is
+available in the github repository as L<F<tools/make-c-file.pl>|https://github.com/benkasminbullock/html-valid/blob/453a1be0d5696738e405061f5ed1ad475b04c443/tools/make-c-file.pl>, but is not in the CPAN distribution. This also includes extra C
+functions in L<F<extra.c>|https://github.com/benkasminbullock/html-valid/blob/453a1be0d5696738e405061f5ed1ad475b04c443/extra.c> into the library to access
+internals which are not part of the public interface. This is used for
+creating the machine-readable file of option documentation included
+above in L</OPTIONS> and for creating the tables of tags and
+attributes in L<HTML::Valid::Tagset>.
+
+=head1 AUTHOR
+
+Ben Bullock <bkb@cpan.org>
+
+=head1 COPYRIGHT AND LICENCE
+
+HTML::Valid is based on HTML Tidy, which is under the following copyright:
+
+    Copyright (c) 1998-2008 World Wide Web Consortium
+    (Massachusetts Institute of Technology, European Research
+    Consortium for Informatics and Mathematics, Keio University).
+    All Rights Reserved.
+
+    COPYRIGHT NOTICE:
+
+    This software and documentation is provided "as is," and
+    the copyright holders and contributing author(s) make no
+    representations or warranties, express or implied, including
+    but not limited to, warranties of merchantability or fitness
+    for any particular purpose or that the use of the software or
+    documentation will not infringe any third party patents,
+    copyrights, trademarks or other rights.
+
+    The copyright holders and contributing author(s) will not be held
+    liable for any direct, indirect, special or consequential damages
+    arising out of any use of the software or documentation, even if
+    advised of the possibility of such damage.
+
+    Permission is hereby granted to use, copy, modify, and distribute
+    this source code, or portions hereof, documentation and executables,
+    for any purpose, without fee, subject to the following restrictions:
+
+    1. The origin of this source code must not be misrepresented.
+    2. Altered versions must be plainly marked as such and must
+    not be misrepresented as being the original source.
+    3. This Copyright notice may not be removed or altered from any
+    source or altered source distribution.
+
+
+
+
+
+
+
+The Perl parts of this distribution are copyright (C) 
+2015-2017
+Ben Bullock and may be used under either the above licence terms, or
+the usual Perl conditions, either the GNU General Public Licence or
+the Perl Artistic Licence.
+

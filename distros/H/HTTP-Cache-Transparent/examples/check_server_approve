@@ -1,0 +1,35 @@
+#!/usr/bin/perl -w 
+
+use strict;
+
+use LWP::Simple;
+use HTTP::Cache::Transparent;
+
+if( scalar( @ARGV ) != 1 )
+{
+  print << "EOD";
+usage: check_server <url>
+
+Fetches a url via the HTTP::Cache::Transparent module in verbose mode. 
+Uses an ApproveContent sub that only approves responses with a
+successful response-code.
+
+EOD
+
+  exit;
+}
+
+my( $url ) = @ARGV;
+
+HTTP::Cache::Transparent::init( { 
+  BasePath  => "/tmp/cache", # Directory to store the cache in. 
+  Verbose   => 1,            # Print messages to STDERR. Default is 0.
+  NoUpdate  => 0,
+  ApproveContent => sub { return $_[0]->is_success(); },
+} );
+
+# Fetch once
+my $data = get( $url );
+
+print $data;
+

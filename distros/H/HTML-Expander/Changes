@@ -1,0 +1,35 @@
+Revision history for Perl extension HTML::Expander.
+
+2.7 Fri Jan 25 02:24:24 EET 2013
+
+    - fixed broken visited tags/vars logic, pretty stupid :)
+    - renamed internal function names to follow expand_* scheme.
+    - define_var() now accepts multiple (hash) entries.
+
+2.6 Sun Apr 30 00:47:58 EEST 2006
+
+    - exec tag is now forbidden by default
+    - added add_inc_paths() and del_inc_paths()
+    - include tag allow only filenames ( a-z A-Z 0-9 - _ )
+
+2.4 Fri Nov 18 02:37:29 EET 2005
+
+    - removed 'STYLE' notion, keyword replaced with MODE to avoid
+      HTML's 'STYLE' tag.
+    - %ENV is not used by default anymore. if you want old behaviour
+      merge %ENV inside Expander's internal environment.   
+
+2.3 Wed Sep 22 13:11:16 EEST 2004
+
+    - fixed recursion stop logic
+    - removed debug prints
+
+2.2 Wed Sep 22 00:15:06 EEST 2004
+
+    - fixed (%VAR) interpolation before %arg tag interpolation
+
+0.01  Sun Nov 11 03:46:59 2001
+    
+    - original version; created by h2xs 1.21 with options
+        -X HTML::Expander
+

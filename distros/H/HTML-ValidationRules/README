@@ -1,0 +1,141 @@
+NAME
+    HTML::ValidationRules - Extract Validation Rules from HTML Form Element
+
+SYNOPSIS
+      # form.html
+      <!doctype html>
+      <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>HTML5::ValidationRules</title>
+        </head>
+        <body>
+          <form method="post" action="/post">
+            <input type="text" name="text" pattern="[A-Za-z0-9]+" maxlength="255" />
+            <input type="url" name="url" maxlength="255" required />
+            <input type="email" name="email" maxlength="255" required="required" />
+            <input type="number" name="number" min="200" max="800" />
+            <textarea name="textarea" maxlength="1000" required></textarea>
+            <input type="range"" name="range" min="20" max="80" />
+            <input type="submit" value="submit" />
+          </form>
+        </body>
+      </html>
+
+      # in your code
+      use HTML::ValidationRules;
+
+      my $parser = HTML::ValidationRules->new;
+      my $rules  = $parser->load_rules(file => 'form.html');
+
+      # rules will be extracted as follows:
+      # [
+      #     text     => [ [ HTML_PATTERN => '[A-Za-z0-9]+' ], [ HTML_MAXLENGTH => 255 ] ],
+      #     url      => [ HTML_URL    => [ HTML_MAXLENGTH => 255 ], 'NOT_BLANK'         ],
+      #     email    => [ HTML_EMAIL  => [ HTML_MAXLENGTH => 255 ], 'NOT_BLANK'         ],
+      #     number   => [ HTML_NUMBER => [ HTML_MIN => 200 ], [ HTML_MAX => 800 ]       ],
+      #     textarea => [ [ HTML_MAXLENGTH => 1000 ], 'NOT_BLANK'                       ],
+      #     range    => [ HTML_RANGE => [ HTML_MIN => 20 ], [ HTML_MAX => 80 ]          ],
+      # ]
+
+      # then do validation using FormValidator::Simple
+      use FormValidator::Simple qw(HTML);
+
+      my $query  = CGI->new;
+      my $result = FormValidator::Simple->check($query => $rules);
+
+      # or FormValidator::Lite
+      use FormValidator::Lite;
+      FormValidator::Lite->load_constraints('HTML');
+
+      my $query     = CGI->new;
+      my $validator = FormValidator::Lite->new($query);
+      my $result    = $validator->check(@$rules);
+
+DESCRIPTION
+    HTML::ValidationRules regards HTML form element as validation rules
+    definition and extract rules from it.
+
+WARNING
+    This software is under the heavy development and considered ALPHA
+    quality now. Things might be broken, not all features have been
+    implemented, and APIs will be likely to change. YOU HAVE BEEN WARNED.
+
+METHODS
+  new(%args)
+          my $parser = HTML::ValidationRules->new(
+              options => { ... } #=> options for HTML::Parser
+          );
+
+        Returns a new HTML::ValidationRules object.
+
+  load_rules(%args)
+          my $rules = $parser->load_rules(file => 'form.html');
+
+        Parse HTML and extract validation rules from form element (defined
+        as HTML5 client-side form validation spec, but not all of them).
+        $rules has compatible form as args for FormValidator::Simple and
+        FormValidator::Lite's check() method.
+
+        %args are supposed to contain one of them below:
+
+        *   file
+
+            Path to a file or filehandle.
+
+        *   html
+
+            String of HTML.
+
+SUPPORTED ATTRIBUTES
+    HTML "input", "textare", and "select" elements can have some attributes
+    related to validation. This module hasn't support all the attrs defined
+    in HTML5 spec yet, just has done below so far:
+
+    *   max (input)
+
+    *   maxlength (input, textarea)
+
+    *   min (input)
+
+    *   pattern (input)
+
+    *   required (input, textarea, select)
+
+    *   type (input)
+
+        *   type:url
+
+        *   type:email
+
+        *   type:number
+
+        *   type:range
+
+BUGS
+    The "pattern" attribute is interpreted as a Perl regular expression, not
+    a JavaScript regular expression as defined by the HTML spec. Please use
+    common subset of Perl and JavaScript regular expression languages to
+    keep compatibility with both Perl and Web browsers.
+
+AUTHORS
+    *   Kentaro Kuribayashi <kentarok@gmail.com>
+
+    *   Wakaba <w@suika.fam.cx>
+
+SEE ALSO
+    *   <http://www.whatwg.org/specs/web-apps/current-work/multipage/#client
+        -side-form-validation>
+
+    *   <http://www.whatwg.org/specs/web-apps/current-work/multipage/#the-in
+        put-element>
+
+    *   <http://www.whatwg.org/specs/web-apps/current-work/multipage/#the-te
+        xtarea-element>
+
+LICENSE
+    Copyright (C) Kentaro Kuribayashi
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

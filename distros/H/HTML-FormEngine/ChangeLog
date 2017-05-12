@@ -1,0 +1,116 @@
+0.7
+---
+	
+Till version 0.6.1 gaff was an php tool. When i started programming perl
+and recognized that it is much more powerfull than php, i ported gaff to
+perl. I completly rewrote it and thereby added many new features:
+
+	- flexible template engine for writing skins
+	- check routines with translatable error messages (using gettext)
+	- a more modular design, so that gaff can easily be extended and
+	enhanced
+	- a more detailed documentation
+0.7.1
+-----
+
+Till version 0.7 FormEngine was called gaff.
+	
+	- new method add_checks
+	- enhanced documentation
+	
+0.7.2
+-----
+
+	- added 2 easy tests (make test)
+	- fixed bug in _handle_error (Handler.pm)
+	- fixed bug in _parse (FormEngine.pm)
+	- added _add_to_output method
+	- implemented multi skin management
+	- enhanced documentation
+
+0.7.3
+-----
+	- fixed bug in _check_email (Checks.pm)
+	- added 'print' template
+	- added 'check_uniq' template
+	- added 'button' template
+	- added 'confirm' method
+	- implemented '<!.*![A-Za-z_ |]+!>' template syntax
+	- added new check methods
+	- enhanced handler system
+        - enhanced documentation
+
+0.7.3b
+------
+This is a CPAN release only. I forgot to delete the 'blib' directory before
+packaging the 0.7.3 release. CPAN doesn't like this.
+
+0.7.4
+-----
+	- fixed bug in _handle_error
+	- template parsing is now done from left to right and from top to
+	bottom, independend of wether a variable, a handler call, a loop
+	etc. is found
+	- second argument of _handle_value changed its meaning!
+	- template variables are now valid for all subtemplates too!
+	- enhanced documentation
+
+0.7.5
+-----
+	- fixed confirm() related bug (added resetting)
+
+1.0
+-----
+	- redesign: skins are now represented by classes
+	- because of that the following methods are not in FormEngine anymore:
+	    - set_skin
+	    - add_skin
+	    - set_default
+	    - add_default
+	    - set_handler
+	    - add_handler
+	    - add_checks
+	    - set_confirm_skin
+	    - add_confirm_skin
+	    - set_confirm_handler
+	    - add_confirm_handler
+	- instead they're replaced by methods of the skin classes. see MIGRATING for more.
+	- the following new methods were added to FormEngine:
+	    - set_skin_obj
+	    - get_skin_obj
+	    - set_seperate
+	    - confirmation_canceled
+	    - del_main_vars
+	- the skin templates are completly rewritten
+	- template system extended:
+	       - handler calls can now be nested
+	       - loops without loop variables loop over all variables in the loops body
+	- the "check_uniq" template and the "emb_text" template don't exist anymore
+	- new templates: select_flexible, select_optgroup, optgroup, optgroup_flexible, fieldset, print_option
+	- all handlers have been renamed, you have to add a '#' infront of the old names.
+	- new handlers:
+	     - #gettext_var for translating the contents of a template variable
+	     - #label for generating a label tag
+	     - #decide
+	     - #readonly
+	     - #multiple
+	     - #confirm_check_prepare
+	     - #seperate
+	     - #encentities
+	     - #save_to_global
+	     - #not_null
+	     - #html2text
+	     - #arg
+	- the following handlers don't exist anymore:
+	     - checked_uniq
+	     - confirm_checked
+	     - confirm_checked_uniq
+	- the "check_email" check is renamed to "email"
+	- new checks:
+	     - match
+	     - unique
+
+1.01
+-----
+	- fixed bug in Skin.pm (it was askin for HTML::FormEngine::SkinText which is not available and also not needed)
+	

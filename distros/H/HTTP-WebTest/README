@@ -1,0 +1,78 @@
+NAME
+    HTTP::WebTest - Testing static and dynamic web content
+
+DESCRIPTION
+  Introduction
+    This module runs tests on remote URLs containing
+    Perl/JSP/HTML/JavaScript/etc. and generates a detailed test report. This
+    module can be used "as-is" or its functionality can be extended using
+    plugins. Plugins can define test types and provide additional report
+    capabilities. This module comes with a set of default plugins but can be
+    easily extended with third party plugins.
+
+    The wt script is provided for running "HTTP::WebTest" from the command
+    line.
+
+    The test specifications can be read from a parameter file in wtscript
+    format or input as method arguments. The test results can be displayed on
+    the terminal, directed to a file, stored in a scalar variable. The test
+    results can also be emailed. The report can be modified and extended using
+    report plugins.
+
+    Each URL/web file is tested by fetching it from the web server using a
+    local instance of an HTTP user agent. The basic test is simply whether or
+    not the fetch was successful. You may also test using literal strings or
+    regular expressions that are either required to exist or forbidden to
+    exist in the fetched page. You may also specify tests for the minimum and
+    maximum number of bytes in the returned page. You may also specify tests
+    for the minimum and maximum web server response time.
+
+    Data flow for "HTTP::WebTest":
+
+              --------------              -------------
+              |            |              |           |
+              | Input      |------------->|  WebTest  |
+              | parameters |              |           |
+              |            |              -------------
+              --------------                  |   ^
+                                              |   |
+                                              V   |
+              -------------               ------------
+              |           |    request    |          |
+              | Remote    |<--------------|   HTTP   |
+              | webserver |-------------->|   user   |
+              |           |    response   |   agent  |
+              -------------               |          |
+                                          ------------
+
+RESTRICTIONS / BUGS
+    This module have been tested only on Unix (e.g., Solaris, Linux, AIX,
+    etc.) but it should work on Win32 systems.
+
+    If you want to test https:// web sites you may have to install additional
+    modules to enable SSL support in LWP. In short you may have to install
+    Crypt::SSLeay module. For details see README.SSL file in LWP distro.
+
+AUTHORS
+    Richard Anderson <richard@richard-anderson.org> wrote "HTTP::WebTest
+    1.xx", using some ideas from the CPAN Monkeywrench module.
+
+    Ilya Martynov <ilya@martynov.org> implemented the plug-in concept, the
+    extended API and completely rewrote "HTTP::WebTest".
+
+    Please don't email authors directly. Use the SourceForge "HTTP::WebTest"
+    mail list (see SUPPORT, next section).
+
+SUPPORT
+    Please email bug reports, suggestions, questions, etc. to the SourceForge
+    "HTTP::WebTest" maillist. You can sign up at
+    http://lists.sourceforge.net/lists/listinfo/http-webtest-general . The
+    email address is "http-webtest-general@lists.sourceforge.net".
+
+COPYRIGHT
+    Copyright (c) 2000-2001 Richard Anderson. All rights reserved.
+
+    Copyright (c) 2001-2003 Ilya Martynov. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.

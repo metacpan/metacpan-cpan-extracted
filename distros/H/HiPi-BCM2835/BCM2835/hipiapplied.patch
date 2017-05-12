@@ -1,0 +1,98 @@
+diff -ru bcm2835-1.50/src/bcm2835.c module/BCM2835/src/src/bcm2835.c
+--- src/src/bcm2835.c	2016-02-28 02:05:35.000000000 +0000
++++ src/src/bcm2835.c	2016-03-07 12:36:23.117324400 +0000
+@@ -18,6 +18,7 @@
+ #include <time.h>
+ #include <unistd.h>
+ #include <sys/types.h>
++#include <sys/utsname.h>
+ 
+ #define BCK2835_LIBRARY_BUILD
+ #include "bcm2835.h"
+@@ -1301,8 +1302,9 @@
+ {
+     int  memfd;
+     int  ok;
+-    FILE *fp;
+-
++    
++    struct utsname utsbuf;
++    
+     if (debug) 
+     {
+         bcm2835_peripherals = (uint32_t*)BCM2835_PERI_BASE;
+@@ -1318,22 +1320,6 @@
+ 	return 1; /* Success */
+     }
+ 
+-    /* Figure out the base and size of the peripheral address block
+-    // using the device-tree. Required for RPi2, optional for RPi 1
+-    */
+-    if ((fp = fopen(BMC2835_RPI2_DT_FILENAME , "rb")))
+-    {
+-        unsigned char buf[4];
+-	fseek(fp, BMC2835_RPI2_DT_PERI_BASE_ADDRESS_OFFSET, SEEK_SET);
+-	if (fread(buf, 1, sizeof(buf), fp) == sizeof(buf))
+-	  bcm2835_peripherals_base = (uint32_t *)(buf[0] << 24 | buf[1] << 16 | buf[2] << 8 | buf[3] << 0);
+-	fseek(fp, BMC2835_RPI2_DT_PERI_SIZE_OFFSET, SEEK_SET);
+-	if (fread(buf, 1, sizeof(buf), fp) == sizeof(buf))
+-	  bcm2835_peripherals_size = (buf[0] << 24 | buf[1] << 16 | buf[2] << 8 | buf[3] << 0);
+-	fclose(fp);
+-    }
+-    /* else we are prob on RPi 1 with BCM2835, and use the hardwired defaults */
+-
+     /* Now get ready to map the peripherals block 
+      * If we are not root, try for the new /dev/gpiomem interface and accept
+      * the fact that we can only access GPIO
+@@ -1341,6 +1327,26 @@
+      */
+     memfd = -1;
+     ok = 0;
++
++    if (uname(&utsbuf) == -1)
++    {
++        fprintf(stderr, "bcm2835_init: Unable to read uname\n") ;
++        goto exit;
++    }
++    
++    if(strncmp(utsbuf.machine, "armv7", 5) == 0)
++    {
++        bcm2835_peripherals_base = (uint32_t *)BCM2836_PERI_BASE;
++    }
++    else if(strncmp(utsbuf.machine, "armv6", 5) == 0)
++    {
++        bcm2835_peripherals_base = (uint32_t *)BCM2835_PERI_BASE;
++    }
++    else {
++        fprintf(stderr, "bcm2835_init: Unknown peripherals base for machine %s\n", utsbuf.machine) ;
++        goto exit;
++    }
++    
+     if (geteuid() == 0)
+     {
+       /* Open the master /dev/mem device */
+diff -ru bcm2835-1.50/src/bcm2835.h module/BCM2835/src/src/bcm2835.h
+--- src/src/bcm2835.h	2016-02-28 03:28:03.000000000 +0000
++++ src/src/bcm2835.h	2016-03-07 12:36:23.110820100 +0000
+@@ -465,9 +465,8 @@
+    However, not all versions of gcc in all distros support the dmb assembler instruction even on conmpatible processors.
+    This test is so any ARMv7 or higher processors with suitable GCC will use DMB.
+ */
+-#if __ARM_ARCH >= 7
+-#define BCM2835_HAVE_DMB
+-#endif
++
++/* never define BCM2835_HAVE_DMB because we want a portable build */
+ 
+ /*! \defgroup constants Constants for passing to and from library functions
+   The values here are designed to be passed to various functions in the bcm2835 library.
+@@ -497,6 +496,9 @@
+ */
+ /*! Peripherals block base address on RPi 1 */
+ #define BCM2835_PERI_BASE               0x20000000
++
++#define BCM2836_PERI_BASE               0x3F000000
++
+ /*! Size of the peripherals block on RPi 1 */
+ #define BCM2835_PERI_SIZE               0x01000000
+ 

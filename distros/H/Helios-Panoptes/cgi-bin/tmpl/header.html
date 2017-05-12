@@ -1,0 +1,187 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html lang="en">
+<head>
+<title><tmpl_var title></title>
+<style type="text/css" media="screen, tv, projection">
+BODY {
+ color: black;
+ background-color: white;
+ font-family: sans-serif;
+ font-size: 10pt;
+ padding: 0;
+ margin: 0;
+}
+.class {
+ color: white;
+ background-color: midnightblue;
+ font-weight: bold;
+ padding: 5px;
+ border-right: solid 2px black;
+ border-bottom: solid 2px black;
+}
+.job {
+ margin-left: 10px;
+ border: solid 1px gray;
+}
+.job_header {
+ background-color: #E0E0E0;
+ padding: 5px;
+}
+.job_header_failed {
+ background-color: yellow;
+ padding: 5px;
+}
+.job_args {
+ font-family: sans-serif;
+ font-size: 11px;
+ width: 100%;
+}
+.service_header {
+ color: white;
+ background-color: midnightblue;
+ font-weight: bold;
+ text-decoration: none;
+}
+
+
+.filter_settings {
+ font-size: 10pt;
+ padding: 5px; 
+ border-bottom: solid 1px #000000;
+ background-color: #EEEEEE;
+}
+
+.nav_bar {
+ font-size: 10pt;
+ padding: 5px;
+ border-bottom: solid 1px #DDDDDD;
+ background-color: #EEEEEE;
+}
+
+.pagination {
+ width: 100%;
+ text-align: center;
+}
+
+.pagination ul {
+ padding: 0;
+ margin: 0px;
+ display: inline;
+}
+
+
+.pagination li {
+ padding: 0 2px 0 2px;
+ margin: 0px;
+ display: inline;
+ font-size: 10pt;
+}
+
+li.page a
+{
+ color: #0000CC;
+}
+
+li.page_sel
+{
+ color: #CC0000;
+}
+
+.nav_bar ul {
+ padding: 0;
+ margin: 0;
+ display: inline;
+}
+
+.nav_bar a {
+ color: #0000CC;
+}
+
+.nav_bar li {
+ padding: 0 5px 0 5px;
+ margin: 0;
+ display: inline;
+}
+
+form
+{
+ padding: 0px;
+ margin: 0px;
+}
+
+.data_head
+{
+ background-color: #E0E0E0;
+ text-align: center;
+ color: #0000CC;
+ font-size: 10pt;
+ font-weight: bold;
+ padding-left: 5px;
+ padding-right: 5px;
+ padding-top: 2px;
+ padding-bottom: 2px;
+}
+
+.data_form_head
+{
+ background-color: #E0E0E0;
+ vertical-align: top;
+ text-align: left;
+ color: #0000CC;
+ font-size: 10pt;
+ font-weight: bold;
+ padding-left: 5px;
+ padding-right: 5px;
+ padding-top: 2px;
+ padding-bottom: 2px;
+}
+
+.data_form_table
+{
+ border: solid 1px #000000;
+}
+
+.data_table
+{
+ border: solid 1px #000000;
+}
+
+.content {
+ padding: 10px;
+}
+
+.data_number
+{
+ font-size: 10pt;
+ text-align: right;
+ padding: 4px;
+ vertical-align: top;
+}
+
+.data_text
+{
+ font-size: 10pt;
+ text-align: left;
+ padding: 4px;
+ vertical-align: top;
+}
+.value_field { 
+ background-color: #F0F0F0; 
+ border: 0px; 
+ padding: 3px; 
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="nav_bar">
+<b>HELIOS:</b>	<ul>
+		<li><a href="panoptes.pl?rm=job_queue_view">Job Queue</a></li>
+		<li><a href="errorlog.pl">Error Log</a></li>
+		<li><a href="panoptes.pl?rm=collective">Collective Admin</a></li>
+		<li><a href="panoptes.pl?rm=ctrl_panel">Ctrl Panel</a></li>
+		<li><a href="panoptes.pl?rm=job_submit">Submit Job</a></li>
+	</ul>
+</div>

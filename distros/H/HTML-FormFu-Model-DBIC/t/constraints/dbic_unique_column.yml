@@ -1,0 +1,21 @@
+---
+auto_fieldset: 1
+
+elements:
+  - type: Hidden
+    name: id
+
+  - type: Text
+    name: username
+    constraints:
+      - Required
+      - type:      DBIC::Unique
+        resultset: User
+        column:    name
+
+  - type: Text
+    name: title
+
+  - type: Submit
+    name: submit
+

@@ -1,0 +1,79 @@
+=head1 NAME
+
+HTML::HTML5::DOM::ReleaseNotes - not quite a change log
+
+=head1 DESCRIPTION
+
+These release notes will not be updated for every release (see minor) but
+are intended to provide important news, announce major new features, etc.
+For a full change log, see the "Changes" file included in the distribution.
+
+=head1 NEWS
+
+=head2 HTML::HTML5::DOM 0.002
+
+June 2014.
+
+All methods that returned a L<Web::Magic> object (such as
+HTMLFormElement's C<submit> method) now return an L<HTTP::Request>
+object instead.
+
+=head2 HTML::HTML5::DOM 0.001
+
+July 2012.
+
+HTML::HTML5::DOM is the culmination of an idea I've been working on in some
+form or another for about six months. The idea is to build an HTML DOM layer
+on top of L<XML::LibXML>.
+
+XML::LibXML is not really designed to be extensible in this way, so to start
+with I needed to write L<XML::LibXML::Augment>, a module to assist in
+subclassing XML::LibXML's node classes.
+
+With that in place I was free to start implementing the HTML5 DOM. Version
+0.001 is a relatively modest proof of concept. There are still a number of
+methods that are only partially implemented. Many more have not even been
+attempted yet. But it's my hope that eventually the whole HTML5 DOM will be
+covered.
+
+=head3 Major Features Planned
+
+Plans can change.
+
+=over
+
+=item *
+
+Lots of methods marked "@@TODO" will be implemented.
+
+=item *
+
+W3C RDFa API.
+
+=item *
+
+W3C Microdata API.
+
+=back
+
+=head1 SEE ALSO
+
+"Changes", L<HTML::HTML5::DOM>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2012, 2014 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under the
+same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

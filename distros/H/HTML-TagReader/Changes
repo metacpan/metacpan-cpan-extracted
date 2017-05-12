@@ -1,0 +1,127 @@
+Revision history for Perl extension HTML::TagReader.
+
+0.01  Tue Oct  2 23:38:11 2001
+	- original version; created by h2xs 1.19
+
+0.02  Sun Jul 7 15:55:51 CEST 2002
+       - added blck as example program
+
+0.03  Sun Jul 14 16:59:41 CEST 2002
+       - first public version
+
+0.04  Mon Jul 15 18:55:10 MET DST 2002
+       - changed name space to HTML::Tagreader
+
+0.05  Fri Jul 19 17:05:10 MET DST 2002
+       - documentation updates
+       - bug fix: blck tries to check abs link with anchor
+       - function signatures changed: No more optional arguments.
+
+0.06  Fri Jul 19 18:10:39 CEST 2002
+      - name changed from HTML::Tagreader to HTML::TagReader
+
+0.07  Sat Jul 20 22:52:11 CEST 2002
+      - bug fixes and changes in the applications llnk and xlnk
+
+0.08  Sun Jul 21 22:59:32 CEST 2002
+     - bug fix xlnk, option -v0 does not work
+     - bug fix blck, <a name=xx href=...> is a valid tag.
+     - unlimited file length
+     - TagReader.xs re-written to use PerlIO
+
+0.09 Mon Jul 22 22:02:18 CEST 2002
+     - mvlnk added
+
+0.10 Sun Aug 11 22:49:13 CEST 2002
+     - renamed included programs to tr_something
+       e.g tr_mvlnk
+     - added tr_staticssi
+
+0.11 Sun Sep  1 21:53:30 CEST 2002
+     - tr_blck add option -d for checking of abs file system links
+     - tr_llnk cleanup path components with ".." xx/../yy -> yy
+
+0.12 Mon Sep  2 19:51:16 MET DST 2002
+     - tr_llnk function flattenpath changed
+     - tr_httpcheck be more tollerant about the input
+     - do not remove // after things like http://...
+
+0.13 Sun Oct  6 09:55:55 CEST 2002
+     -"Warning, single '>' should be..." was printed even if showerrors
+      was not set.
+     - tr_tagcontentgrep added
+     - logo added (html_trbutton_small.png)
+
+0.14 Sun Oct  6 15:22:49 CEST 2002 
+     - tr_tagcontentgrep was missing in the package
+
+0.15 Fri Oct 18 23:19:08 CEST 2002
+     - tr_fixltgt added
+
+==========
+0.50 Wed Oct 23 22:15:09 CEST 2002
+     - added tr_imgaddsize
+     - Interface change: In an array context one more element is
+       returned. This is the column position on the line where the
+       Tag starts.
+
+0.51 Fri Oct 25 21:08:57 MET DST 2002
+     - IO:Handle requires that the file descriptor is flushed before closing
+       otherwise you can loose data when writing. Somehow the close does 
+       not seem to flush correctly. I don't know if this is a bug in perl.
+
+0.52 Mon Fri Dec  6 21:58:19 CET 2002
+     - check in makefile for Image::Size
+     - help text of tr_staticssi updated
+     - tr_staticssi: -d optional
+
+0.53 Wed Feb 26 20:45:43 CET 2003
+     - updated readme
+     - update tr_mvllnk, do not die in case of syntax error in expression
+
+1.00 Fri Mar  7 19:35:04 MET 2003
+     This is now a pretty stable software so we can set it to
+     version 1.00
+     - updated tr_blck: incorrect handling of empty links
+     - disable use of locale
+     - updated TagReader.xs for c++ compatibility
+     - pod sections updated to fix syntax errors
+
+1.01 Thu Jul  3 21:46:21 CEST 2003
+     - tr_delfont added
+
+1.02 Sat Jul 19 15:38:35 CEST 2003
+     - wrong tagtype if tag contained numbers such as e.g <h2>
+
+1.03 Sun Jul 20 15:29:19 CEST 2003
+     - more test cases
+
+1.04 Sun Aug  3 04:23:40 CEST 2003
+     - make it compile under windows
+
+1.05 Sat Aug 16 04:37:04 CEST 2003
+     - TagReader.xs updated to print warning about too long tag only once
+     - spelling errors in sample scripts updated
+     - new flag for verbosity introduced in sample scripts
+
+1.06 Tue Oct  8 06:14:14 CEST 2003
+    - tr_delfont updated
+    - bugfix in tr_imgaddsize
+
+1.07 Sat Jul 31 23:45:41 CEST 2004
+    - ERROR: filename must be a string scalar at ... was printed in some cases even
+      if a scalar was provided.
+
+1.08 Sun Aug 22 19:01:44 CEST 2004
+    - add url decoding as suggested by Gerrit Renker
+
+1.09 Sun Oct  3 17:29:51 CEST 2004
+    - improved flattenpath subroutine in tr_llnk
+    - setenv QUERY_STRING in tr_staticssi
+
+1.10 Wed Dec  7 19:25:06 CET 2005
+    - man-page editorial update
+
+1.11 Fri Sep  9 12:00:12 EDT 2016
+    - fix bug in tr_blck (stripping a dot off ".." in links to anchors)
+# end of changes

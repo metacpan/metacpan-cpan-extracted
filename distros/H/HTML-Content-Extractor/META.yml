@@ -1,0 +1,22 @@
+---
+abstract: 'Recieving a main text of publication from HTML page and main media content that is bound to the text'
+author:
+  - 'Alexander Borisov <lex.borisov@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-Content-Extractor
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: 5.008
+version: 0.17

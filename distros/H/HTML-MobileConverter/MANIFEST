@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/HTML-MobileConverter.t
+lib/HTML/MobileConverter.pm
+META.yml                                 Module meta-data (added by MakeMaker)

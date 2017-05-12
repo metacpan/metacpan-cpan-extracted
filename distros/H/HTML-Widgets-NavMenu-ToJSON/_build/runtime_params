@@ -1,0 +1,4 @@
+do{ my $x = {
+       'prefix' => '/home/shlomif/apps/perl/modules'
+     };
+$x; }

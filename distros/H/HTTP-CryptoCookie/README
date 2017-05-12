@@ -1,0 +1,70 @@
+HTTP::CryptoCookie version 1.10
+=========================
+
+HTTP::CryptoCookie provides a method for the secure storage and
+transmitting of any perl data structure (except coderefs or other
+objects, as are the normal restrictions for FreezeThaw).
+
+The structure is frozen, compressed, encrypted, then ASCII-armoured
+and finally sent to the browser.  The order reverses itself when
+a cookie is read.
+
+Multiple cookies may be sent simultaneously.  This module was
+originally created for use under mod_perl and has been used under
+both HTML::Mason and Template::Toolkit.
+
+READ THE POD DOCUMENTATION.  YOU HAVE BEEN WARNED.
+
+The tests use the following data structure:
+
+my $struct = {
+        foo  => 'bar',
+        sing => [qw(do re me fa so la ti da)],
+        sung => {
+                one => 1,
+                two => 2,
+        },
+        blargh => [1..25],
+};
+
+On a 1.2GHz PPC (Mac OS X 10.4.X iBook) the average time to set this cookie
+(not including the transmit to the HTTP client) is between 4ms and 5.5ms
+(depending on what else the machine is doing).  Yes, Virginia, despite the
+numerous steps this module takes, it *is* fast.  Expect much faster
+performance on relatively recent hardware.
+
+I've run it on x86, PPC, and SPARC.  You should have no portability issues,
+even when setting the cookie on one architecture and reading the cookie
+on another.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test::More
+  CGI::Cookie
+  Crypt::CBC
+  Crypt::Rijndael
+  Digest::SHA256
+  Convert::ASCII::Armour
+  Compress::Zlib
+  FreezeThaw
+  Time::HiRes
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003-2005, Dave Paris (a-mused) <amused@pobox.com>.
+All Rights Reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

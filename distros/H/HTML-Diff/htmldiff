@@ -1,0 +1,38 @@
+#!/usr/bin/perl
+
+#
+# htmldiff uses HTML::Diff to create an HTML file that shows the difference
+# between two HTML files, given on the command line.
+#
+# Contributed by Maurice Aubrey <maurice@redweek.com>
+#
+
+use strict;
+use HTML::Diff;
+
+@ARGV == 2 or die "Usage: $0 <file1> <file2>\n";
+
+my @txt;
+foreach (@ARGV) {
+  open my $fh, $_ or die "unable to read '$_': $!";
+  local $/;
+  push @txt, scalar <$fh>;
+}
+
+print qq{<style type="text/css"><!-- ins{color: green} del{color:red}--></style>\n};
+foreach (@{ html_word_diff(@txt) }) {
+  my($type, $left, $right) = @$_;
+
+  # debug
+  #$left =~ s/\n/ /g;
+  #$right =~ s/\n/ /g;
+  #print "TYPE:$type\nLEFT: $left\nRIGHT: $right\n\n";
+  #next;
+
+  if ($type eq 'u') {
+    print $left;
+  } else {
+    print "<del>$left</del>" if length $left;
+    print "<ins>$right</ins>" if length $right;
+  }
+}

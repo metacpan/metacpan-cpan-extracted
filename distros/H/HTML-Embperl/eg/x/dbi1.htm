@@ -1,0 +1,50 @@
+
+<html>
+<head>
+<title>Embperl Examples - DBI access using Dynamic Tables</title>
+</head>
+<body background="../images/jazzbkgd.gif">
+
+<h1>Embperl Examples - DBI access using Dynamic Tables</h1>
+<hr><b>NOTE:</b><br>
+You must set the database and table to something which exists on your system<br>
+Maybe it's necessary to insert a PerlModule DBI into your srm.conf to get this working<br>
+
+<hr>
+
+[-
+
+$DSN   = 'dbi:mysql:test' ;
+$table = 'dbixrs1' ;
+
+use DBI ;
+
+# connect to database
+ $dbh = DBI->connect($DSN) or die "Cannot connect to '$DSN'" ;
+
+# prepare the sql select
+ $sth = $dbh -> prepare ("SELECT * from $table")  or die "Cannot SELECT from '$table'" ;
+
+# excute the query
+ $sth -> execute  or die "Cannot execute SELECT from '$table'";
+
+# get the fieldnames for the heading in $head
+ $head = $sth -> {NAME} ;
+
+# get the result in $dat
+ $dat = $sth -> fetchall_arrayref ;
+
+-]
+
+<table border=1>
+	<tr><th>[+ $head->[$col] +]</th></tr>
+	<tr><td>[+ $dat -> [$row][$col] +]</td></tr>
+</table>
+
+<p><hr>
+
+<small>HTML::Embperl (c) 1997-1998 G.Richter</small>
+
+
+</body>
+</html>

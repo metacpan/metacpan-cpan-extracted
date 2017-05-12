@@ -1,0 +1,6 @@
+<table border="0" class="table">
+<tr bgcolor="#000066" class="thtr"><th class="th">Emp Name</th><th class="th">Dob</th><th class="th">Emp Title</th><th class="th"><a href="edit.html?id=Emp%20ID">Emp ID</a></th></tr>
+<tr bgcolor="#111111" class="tr"><td class="td">Fred Flintstone</td><td class="td">19710430</td><td class="td">CEO</td><td class="td">123</td></tr>
+<tr bgcolor="#222222" class="tr"><td class="td">Barney Rubble</td><td class="td">19750808</td><td class="td">Lackey</td><td class="td">456</td></tr>
+<tr bgcolor="#333333" class="tr"><td class="td">Dino</td><td class="td">&nbsp;</td><td class="td">Pet</td><td class="td">789</td></tr>
+</table>

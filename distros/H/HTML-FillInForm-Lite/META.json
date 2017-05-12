@@ -1,0 +1,93 @@
+{
+   "abstract" : "Lightweight FillInForm module in Pure Perl",
+   "author" : [
+      "Goro Fuji (藤 吾郎) <gfuji(at)cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-FillInForm-Lite",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Minilla" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "CGI" : "0",
+            "Test::More" : "0.62",
+            "Test::Requires" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "HTML::FillInForm::Lite" : {
+         "file" : "lib/HTML/FillInForm/Lite.pm",
+         "version" : "1.15"
+      },
+      "HTML::FillInForm::Lite::Compat" : {
+         "file" : "lib/HTML/FillInForm/Lite/Compat.pm",
+         "version" : "1.15"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gfx/p5-HTML-FillInForm-Lite/issues"
+      },
+      "homepage" : "https://github.com/gfx/p5-HTML-FillInForm-Lite",
+      "repository" : {
+         "url" : "git://github.com/gfx/p5-HTML-FillInForm-Lite.git",
+         "web" : "https://github.com/gfx/p5-HTML-FillInForm-Lite"
+      }
+   },
+   "version" : "1.15",
+   "x_contributors" : [
+      "Fuji, Goro <fuji.goro@dena.jp>",
+      "tokuhirom <tokuhirom@gmail.com>",
+      "Fuji, Goro <g.psy.va@gmail.com>",
+      "mono <mono@mono0x.net>",
+      "Todd Rinaldo <toddr@cpanel.net>",
+      "FUJI Goro (gfx) <gfuji@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

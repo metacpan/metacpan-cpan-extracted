@@ -1,0 +1,21 @@
+---
+abstract: 'HTML::Mason handler using Plack::Request and Plack::Response'
+author:
+  - 'Graham Barr'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102341, CPAN::Meta::Converter version 2.101670'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-Mason-PlackHandler
+requires:
+  HTML::Mason: 1.45
+  Plack: 0.9913
+  parent: 0.223
+resources:
+  repository: git://github.com/gbarr/HTML-Mason-PlackHandler.git
+version: 0.103070

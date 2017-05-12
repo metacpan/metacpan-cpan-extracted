@@ -1,0 +1,48 @@
+<wmmeta name="ltitle">Extensible Markup Language (XML)</wmmeta>
+<wmmeta name="stitle">XML</wmmeta>
+<wmmeta name="author">J&ouml;rn Clausen</wmmeta>
+<wmmeta name="cdate">2001-04-23</wmmeta>
+<wmmeta name="mdate">2001-05-04</wmmeta>
+
+    <ul>
+      <li>
+	<a href="http://www.oasis-open.org/cover/xml.html">The XML Cover
+	  Pages</a>
+      </li>
+      <li>
+	<a href="http://www.w3.org/XML/">W3C: Extensible Markup Language
+	  (XML)</a>
+      </li>
+      <li>
+	<a href="http://www.w3.org/TR/REC-xml">Extensible Markup Language
+	  (XML) 1.0 (Second Edition)</a>
+      </li>
+      <li>
+	<a href="http://www.xml.com/axml/axml.html">The Annotated XML
+	  Specification</a>
+      </li>
+      <li>
+	<a href="http://www.w3.org/TR/REC-xml-names/">Namespaces in XML</a>
+      </li>
+      <li>
+	<a href="http://www.w3.org/XML/Schema">XML Schema</a>
+      </li>
+      <li>
+        <a href="http://www.xml.com/pub/a/2001/02/28/eightytwenty.html">XML
+          Ain't What It Used To Be</a>
+      </li>
+      <li>
+	<a href="http://www.megginson.com/SAX/">SAX 2.0: The Simple API for
+	  XML</a>
+      </li>
+      <li>
+	<a href="http://www.w3.org/DOM/">Document Object Model (DOM)</a>
+      </li>
+      <li>
+	<a href="http://expat.sourceforge.net/">expat</a>
+      </li>
+      <li>
+	<a href="http://xml.apache.org/xerces-j/index.html">Xerces Java
+	  Parser</a>
+      </li>
+    </ul>

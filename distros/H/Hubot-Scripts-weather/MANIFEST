@@ -1,0 +1,10 @@
+INSTALL
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README.md
+dist.ini
+hubot-scripts.json
+lib/Hubot/Scripts/weather.pm
+t/00_compile.t

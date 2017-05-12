@@ -1,0 +1,19 @@
+===test.html 1==========================================
+name: [% name %] look ma: ~
+name with "": [% name %]
+INCLUDE: ((([% INCLUDE "included.xslate" %])))
+---------------
+loop a:
+[% FOREACH var IN loopa %]first?[% loop.first() %] or last?[% loop.last() %]
+-----num:[% loop.index() %]
+ item: [% var.a %]
+[% END %]
+loop b:[% FOREACH var IN loopb %]item: ROOT:[% (!loop.first && !loop.last)%][% END %]
+loop c
+---------------
+[% FOREACH var IN c %]----num:[% loop.index() %]
+[% FOREACH var IN d %]*[% IF loop.first() %]first[% END %][% IF loop.last() %]last [% END %][% IF (!loop.first && !loop.last) %]inner[% END %] item: [% F %][% IF (loop.index % 2) %]odd[% END %]
+[% END %][% END %]
+---------------------
+[% IF if2 %]if.if2![% END %] [% IF if3 %]if.if3!  [% ELSE %]no if.if3![% END %] [% UNLESS if3 %]no if.if3!![% END %]
+===test.html ende==========================================

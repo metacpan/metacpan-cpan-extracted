@@ -1,0 +1,96 @@
+HTML::WikiConverter::PbWiki version 0.01
+========================================
+
+HTML::WikiConverter::PbWiki adds the PbWiki dialect to HTML::WikiConverter, allowing the conversion of HTML to PbWiki markup, which you can post on pbwiki.com.
+
+========
+SYNOPSIS
+========
+
+Converting HTML to wiki markup is easy:
+
+  use HTML::WikiConverter;
+  my $wc = new HTML::WikiConverter( dialect => 'PbWiki' );
+  print $wc->html2wiki( $html );
+
+Or from the command line:
+
+  % html2wiki --dialect PbWiki --base-uri=http://yoursite.pbwiki.com/ index.html > output.wiki
+
+David Iberri has also put up a web interface at
+
+  http://diberri.dyndns.org/html2wiki.html
+
+=======
+VERSION
+=======
+
+This is HTML::WikiConverter::PbWiki 0.01, the first release. It also happens to be my very first open source contribution :).
+
+============
+DEPENDENCIES
+============
+
+  * HTML::WikiConverter version 0.50 or later.
+
+============
+INSTALLATION
+============
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+You will probably also want to have a copy of HTML::WikiConverter installed, which you can get from CPAN.
+
+=========================
+SUPPORT AND DOCUMENTATION
+=========================
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc HTML::WikiConverter::PbWiki
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/HTML-WikiConverter-PbWiki
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-WikiConverter-PbWiki
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/HTML-WikiConverter-PbWiki
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/HTML-WikiConverter-PbWiki
+
+Or email the author, dschaefer [at] cpan.org.
+
+====
+TODO
+====
+
+More features will be added shortly.
+
+- <raw> escape [] brackets and other important characters.
+- Fix external links so they aren't removed.
+- Expand the test suite to include all of David Iberri's test cases.
+
+=========
+THANKS TO
+=========
+
+Many thanks to David Iberri for his wonderful help and advice.
+Thanks to the PbWiki team for creating pbwiki.com. It rocks.
+
+=====================
+COPYRIGHT AND LICENCE
+=====================
+
+Copyright (C) 2006 Dave Schaefer.
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

@@ -1,0 +1,31 @@
+---
+abstract: 'Cookie storage and management for Safari'
+author:
+  - 'brian d foy <bdfoy@cpan.org>'
+build_requires:
+  Test::More: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec::Functions: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTTP-Cookies-Safari
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Date::Calc: '0'
+  HTTP::Cookies: '1.25'
+  Mac::PropertyList: '1.33'
+  Text::Diff: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/briandfoy/http-cookies-safari/issues
+  homepage: https://github.com/briandfoy/http-cookies-safari
+  repository: https://github.com/briandfoy/http-cookies-safari.git
+version: '1.152'

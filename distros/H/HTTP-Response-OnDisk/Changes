@@ -1,0 +1,19 @@
+Changes
+=======
+
+0.02002 - Fri 26 May 2007
+  - deps directory was missing. baaaah.
+
+0.02001 - Fri 25 May 2007
+  - require File::Temp >= 0.17, otherwise it does not inherit from IO::Seekable
+
+0.02 - Thu 24 May 2007
+  - Add missing methods: base(), is_success(), is_info(), is_redirect(),
+    is_error(), decoded_contnet()
+  - Add content_ref() for completeness, but this method raises an
+    exception. You shouldn't be using this.
+  - Make deps directory for optional dependencies
+  - Properly use HTTP::Status, so that it doesn't clobber our namespace
+
+0.01 - Thu 24 May 2007
+  - Initial release.

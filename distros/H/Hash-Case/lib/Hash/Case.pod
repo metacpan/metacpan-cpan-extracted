@@ -1,0 +1,112 @@
+=head1 NAME
+
+Hash::Case - base class for hashes with key-casing requirements
+
+=head1 INHERITANCE
+
+ Hash::Case
+   is a Tie::StdHash
+
+ Hash::Case is extended by
+   Hash::Case::Lower
+   Hash::Case::Preserve
+   Hash::Case::Upper
+
+=head1 SYNOPSIS
+
+ use Hash::Case::Lower;
+ tie my(%lchash), 'Hash::Case::Lower';
+ $lchash{StraNGeKeY} = 3;
+ print keys %lchash;  # strangekey
+
+=head1 DESCRIPTION
+
+Hash::Case is the base class for various classes which tie special
+treatment for the casing of keys.  Be aware of the differences in
+implementation: C<Lower> and C<Upper> are tied native hashes:
+these hashes have no need for hidden fields or other assisting
+data structured.  A case C<Preserve> hash will actually create
+three hashes.
+
+The following strategies are implemented:
+
+=over 4
+
+=item * Hash::Case::Lower (native hash)
+
+Keys are always considered lower case. The internals of this
+module translate any incoming key to lower case before it is used.
+
+=item * Hash::Case::Upper (native hash)
+
+Like the ::Lower, but then all keys are always translated into
+upper case.  This module can be of use for some databases, which
+do translate everything to capitals as well.  To avoid confusion,
+you may want to have you own internal Perl hash do this as well.
+
+=item * Hash::Case::Preserve
+
+The actual casing is ignored, but not forgotten.
+
+=back
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item $obj-E<gt>B<addHashData>(HASH)
+
+Add the data of a hash (passed as reference) to the created tied hash.  The
+existing values in the hash remain, the keys are adapted to the needs of the
+the casing.
+
+=item $obj-E<gt>B<addPairs>(PAIRS)
+
+Specify an even length list of alternating key and value to be stored in
+the hash.
+
+=item $obj-E<gt>B<setHash>(HASH)
+
+The functionality differs for native and wrapper hashes.  For native
+hashes, this is the same as first clearing the hash, and then a call
+to L<addHashData()|Hash::Case/"Constructors">.  Wrapper hashes will use the hash you specify here
+to store the data, and re-create the mapping hash.
+
+=item B<tie>(HASH, TIE, [VALUES,] OPTIONS)
+
+Tie the HASH with the TIE package which extends L<Hash::Case>.  The OPTIONS
+differ per implementation: read the manual page for the package you actually
+use.  The VALUES is a reference to an array containing key-value pairs,
+or a reference to a hash: they fill the initial hash.
+
+example: 
+
+ my %x;
+ tie %x, 'Hash::Case::Lower';
+ $x{Upper} = 3;
+ print keys %x;       # 'upper'
+
+ my @y = (ABC => 3, DeF => 4);
+ tie %x, 'Hash::Case::Lower', \@y;
+ print keys %x;       # 'abc' 'def'
+
+ my %z = (ABC => 3, DeF => 4);
+ tie %x, 'Hash::Case::Lower', \%z;
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Hash-Case distribution version 1.02,
+built on March 09, 2012. Website: F<http://perl.overmeer.net/hash-case/>
+
+=head1 LICENSE
+
+Copyrights 2002-2003,2007-2012 by Mark Overmeer. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

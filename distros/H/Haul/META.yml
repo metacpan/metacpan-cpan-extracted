@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name: Haul
+version: 2.24
+license: perl
+distribution_type: module
+requires:
+  CPAN::DistnameInfo: 0
+  IPC::Run3: 0
+  Module::Depends: 0.03
+  Test::More: 0.01
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  Haul:
+    file: lib/Haul.pm
+    version: 2.24
+generated_by: Module::Build version 0.21

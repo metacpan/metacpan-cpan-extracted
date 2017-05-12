@@ -1,0 +1,14 @@
+#HPC jobname=thing1
+perl testioselect.pl 1
+perl testioselect.pl 2
+perl testioselect.pl 3
+perl testioselect.pl 4
+perl testioselect.pl 5
+perl testioselect.pl 6
+perl testioselect.pl 7
+perl testioselect.pl 8
+perl testioselect.pl 9
+perl testioselect.pl 10
+perl testioselect.pl 11
+perl testioselect.pl 12
+perl testioselect.pl 13

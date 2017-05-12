@@ -1,0 +1,19 @@
+Revision history for HTML::FormHighlight.
+
+0.03  Thu Mar 15 2001
+        - added "mark" option to control where the highlight is placed
+
+        - added "all_in_group" option to control whether or not all
+            options in a radio or checkbox groups are highlighted
+
+        - fixed bug where comments, markup declarations and processing
+            instructions were lost
+
+
+0.02  Thu Mar 08 2001
+        - added "use Carp" since croak() is called on an error
+
+
+0.01  Wed Jan 19 2001
+        - original version
+

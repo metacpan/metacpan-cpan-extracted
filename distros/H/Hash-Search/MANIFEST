@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/Hash-Search.t
+lib/Hash/Search.pm

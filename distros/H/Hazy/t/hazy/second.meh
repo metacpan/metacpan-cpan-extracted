@@ -1,0 +1,4 @@
+.foo {
+	color: @two;
+	font-size: 10px;
+}

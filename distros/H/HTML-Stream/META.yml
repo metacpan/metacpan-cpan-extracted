@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                HTML-Stream
+version:             1.60
+abstract:            HTML output stream class, and some markup utilities
+license:             ~
+author:              
+    - Daniel T. Staal <DStaal@usa.net>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

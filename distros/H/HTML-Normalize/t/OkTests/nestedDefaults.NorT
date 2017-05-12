@@ -1,0 +1,18 @@
+-selfrender=1
+-default=font foo="bar"
+-default=font bar="1"
+<p>
+    <font foo="bar" bar="1">bar 1
+        <font foo="baz">baz 1
+            <font foo="bar" bar="1">bar 1
+            </font>
+        </font>
+    </font>
+</p>
+<!--expected-->
+<p>bar 1
+    <font foo="baz">baz 1
+        <font foo="bar">bar 1
+        </font>
+    </font>
+</p>

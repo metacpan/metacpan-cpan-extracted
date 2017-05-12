@@ -1,0 +1,116 @@
+
+An HTML::EP example:	Unix user administration
+------------------------------------------------
+
+This is an example I have created for user administration of a small
+german company, EuWid GmbH, Gernsbach.
+
+The idea is to manage users in a MySQL database via a WWW server. The
+script "usersModified" can be called at any time to get database and
+related files in sync, The script is designed for a Red Hat Linux 5.1
+machine.
+
+If you like to use it, you are welcome, see Installation below, but
+note:
+
+                        NO WARRANTY
+
+THIS PROGRAM IS LICENSED FREE OF CHARGE AND THERE IS NO WARRANTY FOR THE
+PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW.  EXCEPT WHEN OTHERWISE
+STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE
+PROGRAM "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED,
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS FOR A PARTICULAR PURPOSE.  THE ENTIRE RISK AS TO THE QUALITY
+AND PERFORMANCE OF THE PROGRAM IS WITH YOU.  SHOULD THE PROGRAM PROVE
+DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR
+CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL
+ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE
+THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY
+GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE
+USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED TO LOSS OF
+DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD
+PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS),
+EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.
+
+
+Installation
+------------
+
+  - Create the MySQL tables:
+
+        CREATE TABLE USERS (
+            USER VARCHAR(20) NOT NULL,
+            UID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+            REALNAME VARCHAR(20) NOT NULL,
+            SHELL VARCHAR(20) NOT NULL,
+            HOMEDIR VARCHAR(40) NOT NULL,
+            PASSWORD VARCHAR(20) NOT NULL,
+            ALIASES VARCHAR(255),
+            FORWARD VARCHAR(80),
+            CUSTOM VARCHAR(80)
+        )
+        ALTER TABLE USERS ADD UNIQUE USER_INDEX (USER)
+
+        CREATE TABLE GROUPS (
+            GROUPNAME VARCHAR(20) NOT NULL,
+            MEMBER VARCHAR(20) NOT NULL
+        )
+
+  - Adjust the DBI DSN, user and password settings in the files of this
+    directory.
+  - Create a password protected directory in your WWW server, /admin
+    say.
+  - Move the files index.ep, user.ep, group.ep, rmuser.ep and
+    rmgroup.ep to that directory.
+  - If you are not using Red Hat Linux, carefully inspect the script
+    usersModified whether it is acceptable for your local systems.
+    In particular you should verify that
+
+	* the path settings at the top are correct
+	* it is safe to assume UID's >600 being free on your machine,
+          otherwise change the respective values in user.ep
+	* the program chpasswd is present and supports a
+
+		echo <unencrypted_password> | chpasswd <user>
+
+	* the commands
+
+		useradd -c <realname> -d <homedir> -u <uid>
+			-s <shell> <username>
+		userdel -c <username>
+
+	  are supportted.
+
+
+  - Move the script "usersModified" to /usr/local/bin and make it
+    suid root:
+
+	mv usersModified /usr/local/bin
+	chown root /usr/local/bin/usersModified
+	chgrp root /usr/local/bin/usersModified
+	chmod 4755 /usr/local/bin/usersModified
+
+  - That's it!
+
+
+Author and Copyright
+--------------------
+
+    This program is
+
+        Copyright (C) 1998    Jochen Wiedmann
+                              Am Eisteich 9
+                              72555 Metzingen
+                              Germany
+
+                              Phone: +49 7123 14887
+                              Email: joe@ispsoft.de
+
+    All rights reserved.
+
+    You may distribute this module under the terms of either the GNU General
+    Public License or the Artistic License, as specified in the Perl README
+    file.

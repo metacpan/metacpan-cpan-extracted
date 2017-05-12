@@ -1,0 +1,15 @@
+Revision history for Perl extension HTML::Revelation.
+
+1.03  Sun Feb 21 12:55:19 2010
+	- Remove text 'All rights reserved' (for Debian licensing).
+	- Remove POD heads 'Required Modules' and 'Changes'.
+
+1.02  Wed Feb 10 13:52:46 2010
+	- Add META.yml. Update MANIFEST.SKIP. Add MANIFEST and MYMETA.yml.
+
+1.01  Thu Feb 19 11:11:00 2009
+	  - Stop outputting <hr /> as <hr / = "/"> </hr>
+	  - Rename Changes.txt to CHANGES because search.cpan.org won't display Changes.txt
+
+1.00  Wed Dec 10 11:30:45 2008
+	  - Original version

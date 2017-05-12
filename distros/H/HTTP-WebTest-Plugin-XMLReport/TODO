@@ -1,0 +1,20 @@
+TODO HTTP::WebTest::Plugin::XMLReport
+
+In no particular order:
+
+o Add plugin parameter "time_zone" for date calculations
+  This is needed for DateTest anyway, so why not?
+
+o Enhance output to feed back into WebTest, so we can do
+  retries on failure.
+
+o Add sample scripts for post-processing of XML output
+
+o Add XML input module, either as script (proof of concept
+  is done) or as an inherited WebTest module.
+
+o Implement missing functionality from DefaultReport:
+  - show_headers
+  - show_html
+  - show_cookies
+

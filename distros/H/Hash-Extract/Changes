@@ -1,0 +1,8 @@
+Revision history for Hash-Extract
+
+0.02    Wed Dec 19 15:15:44 JST 2007
+        support for extracting from %+ (named capture buffer).
+
+0.01    Tue Nov 14 14:43:32 JST 2006
+        First version.
+

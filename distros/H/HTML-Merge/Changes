@@ -1,0 +1,60 @@
+Revision history for Perl extension HTML::Merge.
+
+0.01  Mon Sep 24 10:06:03 2001
+	- original version; created by h2xs 1.19
+
+3.26  Wed Feb  6 18:27:59 2002
+        - Backend security
+
+3.27  Thu Feb  7 19:30:45 2002
+        - Samples. Cookies.
+
+3.30  Tue Mar 19 15:58:31 2002
+        - Syntax error reporting works now
+
+3.31  Thu Mar 21 14:19:44 2002
+        - Freezing option for all templates in an instance
+
+3.35  Thu Jun 25 20:30:00 2002
+	- Dynamic engine naming is now available
+
+3.36  Mon Jul  1 18:41:36 IDT 2002
+	- Sticky cookie interface enhancement 
+	- Content type feature in INI file
+	- Dynamic page header by using the content_type key in the URL string
+	- No more use of autoflush in merge
+
+3.44  Mon Nov 15 06:31:25 IDT 2004
+	- Adapted for perl 5.8
+	- Term::Inkey is not used any more
+
+3.45  Sat Nov 20 19:11:13 IDT 2004  
+	- New grid in the repository sample application
+   
+3.47  Sat Dec 18 12:22:14 ITD 2004
+	- Updated documentation
+
+3.50  Mon Dec 12 19:08:22 ITD 2005
+	- Minor installation bug fix
+	- mergecreateinstance changed 
+
+3.51  Fri Oct 14 12:07:44 ITD 2005
+	- mergecreateinstance write logs
+	- mergecreateinstance creates *.inc files
+	- mergecreateinstance allow to create instance directory
+
+3.52  Sat Aug 19 22:03:22 ITD 2006
+	- mergecreateinstance keeps users settings on reinstall
+	- added contributed documents
+        - added PIC.C tag
+
+3.53  Fri Aug 10 20:30:44 ITD 2007
+	- Meta generator message was replaced by HTML remark
+        - SOURCE in now an output tag (can now be modified by PIC)
+
+3.54  Fri Mar 21 12:04:14 ITD 2008
+	- fixes installation with DESTDIR set, and post processing
+          for cpan2rpm (contrib from Tal Kelrich).
+          If you upgrade from older version of HTML::Merge please remove old install
+          as this version installs to new locations.
+

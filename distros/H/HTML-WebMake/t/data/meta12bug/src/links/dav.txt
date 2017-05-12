@@ -1,0 +1,18 @@
+<wmmeta name="ltitle">Distributed Authoring and Versioning</wmmeta>
+<wmmeta name="stitle">DAV</wmmeta>
+<wmmeta name="author">J&ouml;rn Clausen</wmmeta>
+<wmmeta name="cdate">2001-04-23</wmmeta>
+<wmmeta name="mdate">2001-04-23</wmmeta>
+
+    <ul>
+      <li>
+	<a href="http://www.webdav.org/">WebDAV Resources</a>
+      </li>
+      <li>
+	<a href="http://www.ics.uci.edu/pub/ietf/webdav/">IETF WEBDAV
+	  Working Group</a>
+      </li>
+      <li>
+	<a href="http://www.ics.uci.edu/pub/ietf/webdav/protocol/rfc2518_A4.pdf">RFC 2518: HTTP Extensions for Distributed Authoring -- WEBDAV (PDF)</a>
+      </li>
+    </ul>

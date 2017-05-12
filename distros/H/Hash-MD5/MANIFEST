@@ -1,0 +1,15 @@
+Changes
+lib/Hash/MD5.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README.md
+t/001-base.t
+t/002-hash.t
+t/003-array.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

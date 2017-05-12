@@ -1,0 +1,43 @@
+CHANGES file for HTML::TagCloud:
+
+0.38 Fri Apr 19 21:49:02 2013
+  - added a correction for unit test failures submitted by Bruno Buss
+
+0.37 Fri Jun 17 17:30:47 MST 2011
+  - added a fix suggested by Juan Antonio Raygoza Garay
+  - added some missing documentation
+  - added a list of known contributors
+
+0.36 Wed Feb 16 15:10:49 MST 2011
+  - use different styles to distinguish adjacent tags.
+
+0.35 Wed Feb 16 10:27:55 MST 2011
+  - make tag URLs optional.
+
+0.34 Tue Nov  7 21:00:33 GMT 2006
+  - Internet Explorer fix, which addresses issues with Japanese text
+    (thanks to Tatsuhiko Miyagawa)
+
+0.33 Mon Mar 13 20:26:36 GMT 2006
+  - add a 'tags' method that extracts most of the logic from the html
+    method. It also adds support for setting levels as a parameter to the
+    constructor.  It defaults to the before-hardcoded 24.
+    (thanks to Marcus Ramberg)
+
+0.32 Mon Aug 22 16:32:29 BST 2005
+  - make html_and_css have type="text/css" in the script tag
+    (patch by Dean Wilson)
+  - use log() instead of sqrt() to have a different distribution of tag sizes
+  - linear scaling of tag counts: will be less ugly if you have few tags
+  - put tags in a div with text-align: center and fixed line-height
+
+0.31 Fri Jul  8 22:46:22 BST 2005
+  - fix division by zero bug when all tags have the same count
+    (spotted by glasser)
+
+0.30 Mon Jul  4 13:49:13 BST 2005
+  - fix division by zero bug when there is only one tag (spotted by
+    marcus)
+
+0.29 Tue Jun 28 22:35:38 BST 2005
+  - first release (prompted by Jesse Vincent)

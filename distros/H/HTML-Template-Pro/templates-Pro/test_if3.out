@@ -1,0 +1,12 @@
+<HTML>
+<body>
+<H1> test_if3 </H1>
+
+We test that hash/array ref should be true
+
+ 
+test passed
+ 
+
+</body>
+</HTML>

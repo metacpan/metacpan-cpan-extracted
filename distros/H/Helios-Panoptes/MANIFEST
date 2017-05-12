@@ -1,0 +1,23 @@
+cgi-bin/errorlog.pl
+cgi-bin/joblog.pl
+cgi-bin/panoptes.pl
+cgi-bin/tmpl/ctrl_panel.html
+cgi-bin/tmpl/error_log.html
+cgi-bin/tmpl/footer.html
+cgi-bin/tmpl/header.html
+cgi-bin/tmpl/job_log.html
+cgi-bin/tmpl/job_queue_view.html
+cgi-bin/tmpl/job_submit.html
+cgi-bin/tmpl/collective_host.html
+cgi-bin/tmpl/collective_service.html
+Changes
+lib/Helios/Panoptes.pm
+lib/Helios/Panoptes/ErrorLog.pm
+lib/Helios/Panoptes/Helper.pm
+lib/Helios/Panoptes/JobLog.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/Helios-Panoptes.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,254 @@
+=head1 NAME
+
+HTML::HTML5::DOM::HTMLElement - implementation of the HTMLElement interface of the HTML DOM
+
+=head1 DESCRIPTION
+
+HTML::HTML5::DOM::HTMLElement is an implementation of the HTMLElement interface of the HTML DOM. See L<HTML::HTML5::DOM> for a list of the conventions that have been used when translating the DOM to Perl.
+
+=head2 HTML Elements
+
+This class applies to the following HTML elements.
+
+=over
+
+=item * C<< {http://www.w3.org/1999/xhtml}abbr >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}address >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}article >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}aside >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}b >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}bdi >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}bdo >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}cite >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}code >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}dd >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}dfn >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}dt >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}em >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}figcaption >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}figure >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}footer >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}header >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}hgroup >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}i >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}kbd >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}mark >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}nav >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}noscript >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}rp >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}rt >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}ruby >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}s >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}samp >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}section >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}small >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}strong >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}sub >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}summary >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}sup >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}u >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}var >>
+
+=item * C<< {http://www.w3.org/1999/xhtml}wbr >>
+
+=back
+
+=head2 Inheritance
+
+HTML::HTML5::DOM::HTMLElement inherits methods from the following Perl classes.
+
+=over
+
+=item * L<XML::LibXML::Augment::Element>
+
+=item * L<XML::LibXML::Augment::Node>
+
+=item * L<XML::LibXML::Element>
+
+=item * L<XML::LibXML::Node>
+
+=item * L<XML::LibXML::QuerySelector>
+
+=item * L<HTML::HTML5::DOMutil::FancyISA>
+
+=back
+
+=head2 Additional Methods
+
+As well as its inherited methods, this class provides the following methods.
+
+=over
+
+=item * C<< accessKey >>
+
+Called with no arguments, is a shortcut for C<< $elem->getAttribute("accesskey") >>. Called with a defined argument, acts as C<setAttribute>. Called with undef as an argument, acts as C<removeAttribute>.
+
+=item * C<< classList >>
+
+Splits C<< $elem->getAttribute("class") >> into a list on whitespace.
+
+=item * C<< className >>
+
+Called with no arguments, is a shortcut for C<< $elem->getAttribute("class") >>. Called with a defined argument, acts as C<setAttribute>. Called with undef as an argument, acts as C<removeAttribute>.
+
+=item * C<< compareDocumentPosition >>
+
+Compares this node with another based on document order.
+
+=item * C<< dataset >>
+
+Gets a hashref based on C<< data-foo >> attributes. This is currently read-only, but in future may be implemented as a tied hash to allow read/write access.
+
+=item * C<< dir >>
+
+Called with no arguments, is a shortcut for C<< $elem->getAttribute("dir") >>. Called with a defined argument, acts as C<setAttribute>. Called with undef as an argument, acts as C<removeAttribute>.
+
+=item * C<< getElementById >>
+
+The world-famous C<getElementById> method. The default XML::LibXML implementation of this does not work with HTML::HTML5::Parser documents, because HTML::HTML5::Parser lacks the ability to inform libxml which element to use as an ID. (libxml defaults to xml:id.) This implementation is XPath-based, thus slower.
+
+=item * C<< getElementsByClassName >>
+
+Given one or more class names, returns a list of elements bearing those classes.
+
+=item * C<< getFeature >>
+
+Acts as a shortcut for C<< $element->ownerDocument->implementation->getFeature >>.
+
+=item * C<< getUserData >>
+
+Not implemented - perhaps never will be. Try C<dataset> instead.
+
+=item * C<< hidden >>
+
+Called with no arguments, is a shortcut for C<< $elem->hasAttribute("hidden") >>. If called with a true argument, will C<setAttribute>; if called with a false argument will C<removeAttribute>.
+
+=item * C<< id >>
+
+Called with no arguments, is a shortcut for C<< $elem->getAttribute("id") >>. Called with a defined argument, acts as C<setAttribute>. Called with undef as an argument, acts as C<removeAttribute>.
+
+=item * C<< innerHTML >>
+
+When called without arguments, serialises the contents of the element (but not the element itself) to a single string. When called with a string argument, parses the string as HTML and uses it to set the content of this element. When possible, attempts to use polyglot HTML (i.e. markup that works as HTML and XHTML).
+
+=item * C<< isDefaultNamespace >>
+
+Given a URI, returns true if that is the default namespace prefix.
+
+=item * C<< isSupported >>
+
+Acts as a shortcut for C<< $element->ownerDocument->implementation->hasFeature >>.
+
+=item * C<< lang >>
+
+Called with no arguments, is a shortcut for C<< $elem->getAttribute("lang") >>. Called with a defined argument, acts as C<setAttribute>. Called with undef as an argument, acts as C<removeAttribute>.
+
+=item * C<< lookupPrefix >>
+
+Alias for C<lookupNamespacePrefix>.
+
+=item * C<< outerHTML >>
+
+As per innerHTML, but includes the element itself. Can be used as a setter, but that's a bit of a weird thing to do.
+
+=item * C<< p5_ancestors >>
+
+Returns a (Perl or XML::LibXML::NodeList) list of this element's ancestors - i.e. the parentNode, the parentNode of the parentNode, etc.
+
+=item * C<< p5_contains >>
+
+Given an argument, returns true if that argument is an element nested within this element.
+
+=item * C<< schemaTypeInfo >>
+
+Not implemented.
+
+=item * C<< setIdAttribute >>
+
+Not implemented.
+
+=item * C<< setIdAttributeNS >>
+
+Not implemented.
+
+=item * C<< setIdAttributeNode >>
+
+Not implemented.
+
+=item * C<< setUserData >>
+
+Not implemented - perhaps never will be. Try C<dataset> instead.
+
+=item * C<< tabIndex >>
+
+Called with no arguments, is a shortcut for C<< $elem->getAttribute("tabindex") >>. Called with a defined argument, acts as C<setAttribute>. Called with undef as an argument, acts as C<removeAttribute>.
+
+=item * C<< title >>
+
+Called with no arguments, is a shortcut for C<< $elem->getAttribute("title") >>. Called with a defined argument, acts as C<setAttribute>. Called with undef as an argument, acts as C<removeAttribute>.
+
+=item * C<< translate >>
+
+Called with no arguments, is a shortcut for C<< $elem->hasAttribute("translate") >>. If called with a true argument, will C<setAttribute>; if called with a false argument will C<removeAttribute>.
+
+=back
+
+=head1 BUGS
+
+L<http://rt.cpan.org/Dist/Display.html?Queue=HTML-HTML5-DOM>.
+
+=head1 SEE ALSO
+
+L<HTML::HTML5::DOM>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2012, 2014 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+
+

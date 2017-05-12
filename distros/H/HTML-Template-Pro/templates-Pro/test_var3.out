@@ -1,0 +1,14 @@
+<HTML><BODY>
+<H1> test_var3 </H1>
+ &foo"bar'</script>=-;+ \<>"; %FAhidden:
+end 
+ 
+ %26foo%22bar%27%3C%2Fscript%3E%3D-%3B%2B%20\%3C%3E%22%3B%20%25FAhidden%3A%0D%0Aend 
+ 
+ &amp;foo&quot;bar&#39;&lt;/script&gt;=-;+ \&lt;&gt;&quot;; %FAhidden:
+end 
+ 
+ \u0026foo\u0022bar\u0027\u003c/script\u003e\u003d\u002d\u003b\u002b \u005c\u003c\u003e\u0022\u003b %FAhidden:\u000d\u000aend 
+ 
+<H1> END test_var3 </H1>
+</body></html>

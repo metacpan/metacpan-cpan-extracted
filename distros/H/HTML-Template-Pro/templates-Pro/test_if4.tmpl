@@ -1,0 +1,31 @@
+<HTML><BODY>
+<H1> test_if4 </H1>
+we test that tmpl_else should be invisible in invisible context
+<tmpl_iF VAR4> <tmpl_var naMe="VAR4"> failed 1-0
+<Tmpl_If VAR2> <tmpl_var naMe="VAR2"> failed 1-1
+<tmpl_else> <tmpl_var naMe="VAR2"> failed 1-2
+</tmpl_if>
+</tmpl_if>
+
+<tmpl_unless VAR1> failed 2-0
+<Tmpl_If VAR2> <tmpl_var naMe="VAR2"> failed 2-1
+<tmpl_else> <tmpl_var naMe="VAR2"> failed 2-2
+</tmpl_if>
+</tmpl_unless>
+
+<tmpl_iF VAR2>
+<tmpl_else>  failed 3-0
+<Tmpl_If VAR2> <tmpl_var naMe="VAR2"> failed 3-1
+<tmpl_else> <tmpl_var naMe="VAR2"> failed 3-2
+</tmpl_if>
+</tmpl_if>
+
+<tmpl_unless VAR4> 
+<tmpl_else>  failed 4-0
+<Tmpl_If VAR2> <tmpl_var naMe="VAR2"> failed 4-1
+<tmpl_else> <tmpl_var naMe="VAR2"> failed 4-2
+</tmpl_if>
+</tmpl_unless>
+
+<H1> END test_if4 </H1>
+</body></html>

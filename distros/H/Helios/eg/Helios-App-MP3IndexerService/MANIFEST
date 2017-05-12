@@ -1,0 +1,10 @@
+Changes
+config.sh
+lib/Helios/App/MP3IndexerService.pm
+LICENSE
+Makefile.PL
+MANIFEST
+mp3submit4index.pl
+README
+sql/schema.sql
+t/Helios-App-MP3IndexerService.t

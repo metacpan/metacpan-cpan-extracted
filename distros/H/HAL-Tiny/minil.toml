@@ -1,0 +1,4 @@
+name = "HAL-Tiny"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

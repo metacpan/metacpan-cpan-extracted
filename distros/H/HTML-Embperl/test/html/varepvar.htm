@@ -1,0 +1,30 @@
+
+<html>
+<head>
+<title>Test for predefined Embperl variables and [ $ var $ ]</title>
+</head>
+
+[$ var $conf $ar $]
+
+$conf = [+ defined ($conf)?$conf:'<undef>' +] <br> 
+$_[0] = [+ defined ($_[0])?$_[0]:'<undef>' +] <br> 
+$_[1] = [+ defined ($_[1])?$_[1]:'<undef>' +] <br> 
+
+$rec_rec  = [+ $req_rec +]<br>
+$$rec_rec = [+ $$req_rec +]<br>
+
+[- $ar = eval { Apache->request } ; $@ = '' -]
+
+Apache->request    = [+ $ar +]<br>
+${Apache->request} = [+ $$ar +]<br>
+
+${Apache->request} = $$req_rec ?  [+ ($$ar == $$req_rec)?'yes':'no' +] <br>
+
+[+ $req_rec -> filename +]
+
+<table>
+    <tr><td>[+ $ffld[$row] +]</td><td>[+ $fdat{$ffld[$row]} +] </td></tr>
+</table>
+
+</body>
+</html>

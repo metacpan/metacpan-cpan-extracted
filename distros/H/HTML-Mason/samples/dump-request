@@ -1,0 +1,439 @@
+<table border=1 cellpadding=0 cellspacing=0>
+<tr>
+	<th bgcolor=salmon>Request Information</th>
+	<th bgcolor=salmon>Connection Information</th>
+</tr>
+<td valign=top rowspan=3>
+	$r-><a href="#method">method</a>(&nbsp;[$meth]&nbsp;)&nbsp;=&nbsp;<% $r->method()  %><BR>
+	$r-><a href="#method_number">method_number</a>(&nbsp;[$num]&nbsp;)&nbsp;=&nbsp;<% $r->method_number()  %><BR>
+	$r-><a href="#bytes_sent">bytes_sent</a>&nbsp;=&nbsp;<% $r->bytes_sent %><BR>
+	$r-><a href="#the_request">the_request</a>&nbsp;=&nbsp;<% $r->the_request %><BR>
+	$r-><a href="#proxyreq">proxyreq</a>&nbsp;=&nbsp;<% $r->proxyreq %><BR>
+	$r-><a href="#header_only">header_only</a>&nbsp;=&nbsp;<% $r->header_only %><BR>
+	$r-><a href="#protocol">protocol</a>&nbsp;=&nbsp;<% $r->protocol %><BR>
+	$r-><a href="#uri">uri</a>(&nbsp;[$uri]&nbsp;)&nbsp;=&nbsp;<% $r->uri()  %><BR>
+	$r-><a href="#filename">filename</a>(&nbsp;[$filename]&nbsp;)&nbsp;=&nbsp;<% $r->filename() %><BR>
+	$r-><a href="#path_info">path_info</a>(&nbsp;[$path_info]&nbsp;)&nbsp;=&nbsp;<% $r->path_info()  %><BR>
+	$r-><a href="#args">args</a>&nbsp;=&nbsp;<% $r->args %><BR>
+	$r-><a href="#header_in">header_in</a>(&nbsp;$header_name,&nbsp;[$value]&nbsp;)&nbsp;=&nbsp;<% $r->header_in("Content-type")  %><BR>
+	$r-><a href="#get_remote_host">get_remote_host</a>&nbsp;=&nbsp;<% $r->get_remote_host %><BR>
+	$r-><a href="#requires">requires</a>&nbsp;=&nbsp;<% $r->requires %><BR>
+	$r-><a href="#auth_type">auth_type</a>&nbsp;=&nbsp;<% $r->auth_type %><BR>
+	$r-><a href="#auth_name">auth_name</a>&nbsp;=&nbsp;<% $r->auth_name %><BR>
+	$r-><a href="#document_root">document_root</a>&nbsp;=&nbsp;<% $r->document_root %><BR>
+	$r-><a href="#allow_options">allow_options</a>&nbsp;=&nbsp;<% $r->allow_options %>
+</td>
+<td valign=top>
+% my $c = $r->connection;
+	$c-><a href="#remote_host">remote_host</a>&nbsp;=&nbsp;<%$c->remote_host%><BR>
+	$c-><a href="#remote_ip">remote_ip</a>&nbsp;=&nbsp;<%$c->remote_ip %><BR>
+	$c-><a href="#local_addr">local_addr</a>&nbsp;=&nbsp;<%$c->local_addr %><BR>
+	$c-><a href="#remote_addr">remote_addr</a>&nbsp;=&nbsp;<%$c->remote_addr %><BR>
+	$c-><a href="#remote_logname">remote_logname</a>&nbsp;=&nbsp;<%$c->remote_logname%><BR>
+	$c-><a href="#user">user</a>&nbsp;=&nbsp;<%$c->user %><BR>
+	$c-><a href="#auth_type">auth_type</a>&nbsp;=&nbsp;<%$c->auth_type %><BR>
+	$c-><a href="#aborted">aborted</a>&nbsp;=&nbsp;<%$c->aborted %>
+</td>
+</tr><tr>
+	<th bgcolor=salmon>Server Configuration</th>
+</tr><tr>
+<td valign=top>
+% my $s = $r->server;
+	$s-><a href="#server_admin">server_admin</a>&nbsp;=&nbsp;<% $s->server_admin %><BR>
+	$s-><a href="#server_hostname">server_hostname</a>&nbsp;=&nbsp;<%$s->server_hostname%><BR>
+	$s-><a href="#port">port</a>&nbsp;=&nbsp;<%$s->port%><BR>
+	$s-><a href="#is_virtual">is_virtual</a>&nbsp;=&nbsp;<%$s->is_virtual%><BR>
+	$s-><a href="#names">names</a>&nbsp;=&nbsp;<%$s->names%>
+</td>
+</tr></table>
+
+<P>
+<a name="method">
+$r->method( [$meth] )
+<blockquote>
+The $r->method method will return the request method. It will be a
+string such as ``GET'', ``HEAD'' or ``POST''. Passing an argument will
+set the method, mainly used for internal redirects.
+</blockquote>
+
+<a name="method_number">
+$r->method_number( [$num] )
+<blockquote>
+The $r->method_number method will return the request method
+number. The method numbers are defined by the M_GET,
+M_POST,... constants available from the Apache::Constants
+module. Passing an argument will set the method_number, mainly used
+for internal redirects and testing authorization restriction masks.
+</blockquote>
+
+<a name="bytes_sent">
+$r->bytes_sent
+<blockquote>
+The number of bytes sent to the client, handy for logging, etc. 
+</blockquote>
+
+<a name="the_request">
+$r->the_request
+<blockquote>
+The request line send by the client, handy for logging, etc. 
+</blockquote>
+
+<a name="proxyreq">
+$r->proxyreq
+<blockquote>
+Returns true if the request is proxy http. Mainly used during the
+filename translation stage of the request, which may be handled by a
+PerlTransHandler.
+</blockquote>
+
+<a name="header_only">
+$r->header_only
+<blockquote>
+Returns true if the client is asking for headers only, e.g. if the
+request method was HEAD.
+</blockquote>
+
+<a name="protocol">
+$r->protocol
+<blockquote>
+The $r->protocol method will return a string identifying the protocol
+that the client speaks. Typical values will be ``HTTP/1.0'' or
+``HTTP/1.1''.
+</blockquote>
+
+<a name="uri">
+$r->uri( [$uri] )
+<blockquote>
+The $r->uri method will return the requested URI, optionally changing
+it with the first argument.
+</blockquote>
+
+<a name="filename">
+$r->filename( [$filename] )
+<blockquote>
+The $r->filename method will return the result of the URI --> filename
+translation, optionally changing it with the first argument if you
+happen to be doing the translation.
+</blockquote>
+
+<a name="path_info">
+$r->path_info( [$path_info] )
+<blockquote>
+The $r->path_info method will return what is left in the path after
+the URI --> filename translation, optionally changing it with the
+first argument if you happen to be doing the translation.
+</blockquote>
+
+<a name="args">
+$r->args
+<blockquote>
+The $r->args method will return the contents of the URI query
+string. When called in a scalar context, the entire string is
+returned. When called in a list context, a list of parsed key => value
+pairs are returned, i.e. it can be used like this:
+</blockquote>
+
+<pre>
+   $query = $r->args;
+   %in    = $r->args;
+</pre>
+<%doc>
+<a name="headers_in">
+$r->headers_in 
+The $r->headers_in method will return a %hash of client request headers. This can be used to initialize
+a perl hash, or one could use the $r->header_in() method (described below) to retrieve a specific
+header value directly. 
+</%doc>
+
+<a name="header_in">
+$r->header_in( $header_name, [$value] )
+<blockquote>
+Return the value of a client header. Can be used like this: 
+</blockquote>
+
+<pre>
+   $ct = $r->header_in("Content-type");
+   $r->header_in($key, $val); #set the value of header '$key'
+</pre>
+
+<a name="content">
+$r->content
+<blockquote>
+The $r->content method will return the entity body read from the
+client, but only if the request content type is
+application/x-www-form-urlencoded. When called in a scalar context,
+the entire string is returned. When called in a list context, a list
+of parsed key => value pairs are returned. *NOTE*: you can only ask
+for this once, as the entire body is read from the client.
+</blockquote>
+
+<a name="read_client_block">
+$r->read_client_block($buf, $bytes_to_read) 
+Read from the entity body sent by the client. Example of use: 
+
+   $r->read_client_block($buf, $r->header_in('Content-length'));
+
+<a name="get_remote_host">
+$r->get_remote_host= <% $r->get_remote_host %>
+<blockquote>
+Lookup the client's DNS hostname. If the configuration directive
+HostNameLookups is set to off, this returns the dotted decimal
+representation of the client's IP address instead. Might return undef
+if the hostname is not known.
+</blockquote>
+
+<a name="get_remote_logname">
+$r->get_remote_logname = NOT IMPLEMENTED BY MOD_PERL
+<blockquote>
+Lookup the remote user's system name. Might return undef if the remote
+system is not running an RFC 1413 server or if the configuration
+directive IdentityCheck is not turned on.
+</blockquote>
+
+More information about the client can be obtained from the
+Apache::Connection object, as described below.
+<P>
+$c = $r->connection
+<blockquote>
+The $r->connection method will return a reference to the request
+connection object (blessed into the Apache::Connection package). This
+is really a conn_rec* in disguise. The following methods can be used
+on the connection object:
+</blockquote>
+
+<a name="remote_host">
+$c->remote_host
+<blockquote>
+If the configuration directive HostNameLookups is set to on: then the
+first time $r->get_remote_host is called the server does a DNS lookup
+to get the remote client's host name. The result is cached in
+$c->remote_host then returned. If the server was unable to resolve the
+remote client's host name this will be set to ``''. Subsequent calls
+to $r->get_remote_host return this cached value.
+<P>
+If the configuration directive HostNameLookups is set to off: calls to
+$r->get_remote_host return a string that contains the dotted decimal
+representation of the remote client's IP address.  However this string
+is not cached, and $c->remote_host is undefined. So, it's best to to
+call $r->get_remote_host instead of directly accessing this variable.
+</blockquote>
+
+<a name="remote_ip">
+$c->remote_ip
+<blockquote>
+The dotted decimal representation of the remote client's IP
+address. This is set by then server when the connection record is
+created so is always defined.
+</blockquote>
+
+<a name="local_addr">
+$c->local_addr
+<blockquote>
+A packed SOCKADDR_IN in the same format as returned by Socket,
+containing the port and address on the local host that the remote
+client is connected to. This is set by the server when the connection
+record is created so it is always defined.
+</blockquote>
+
+<a name="remote_addr">
+$c->remote_addr
+<blockquote>
+A packed SOCKADDR_IN in the same format as returned by Socket,
+containing the port and address on the remote host that the server is
+connected to. This is set by the server when the connection record is
+created so it is always defined.
+<P>
+Among other things, this can be used, together with $c->local_addr, to
+perform RFC1413 ident lookups on the remote client even when the
+configuration directive IdentityCheck is turned off.
+<P>
+
+Can be used like: 
+<pre>
+   use Net::Ident qw (lookupFromInAddr);
+   ...
+   my $remoteuser = lookupFromInAddr ($c->local_addr,
+  $c->remote_addr, 2);
+</pre>
+
+Note that the lookupFromInAddr interface does not currently exist in
+the Net::Ident module, but the author is planning on adding it soon.
+</blockquote>
+
+<a name="remote_logname">
+$c->remote_logname
+<blockquote>
+If the configuration directive IdentityCheck is set to on: then the
+first time $r->get_remote_logname is called the server does an RFC
+1413 (ident) lookup to get the remote users system name. Generally for
+UNI* systems this is their login. The result is cached in
+$c->remote_logname then returned. Subsequent calls to
+$r->get_remote_host return the cached value.
+<P>
+If the configuration directive IdentityCheck is set to off: then
+$r->get_remote_logname does nothing and $c->remote_logname is always
+undefined.
+</blockquote>
+
+<a name="user">
+$c->user
+<blockquote>
+If an authentication check was successful, the authentication handler
+caches the user name here.
+</blockquote>
+
+<a name="auth_type">
+$c->auth_type
+<blockquote>
+Returns the authentication scheme that successfully authenticate
+$c->user, if any.
+</blockquote>
+
+<a name="aborted">
+$c->aborted
+<blockquote>
+Returns true if the client stopped talking to us.
+</blockquote>
+
+<h2>SERVER CONFIGURATION INFORMATION </h2>
+
+The following methods are used to obtain information from server
+configuration and access control files.
+
+<a name="dir_config">
+$r->dir_config( $key )
+<blockquote>
+Returns the value of a per-directory variable specified by the
+PerlSetVar directive.
+</blockquote>
+<PRE>
+   # <Location /foo/bar>
+   # SetPerlVar  Key  Value
+   # </Location>
+
+   my $val = $r->dir_config('Key');
+
+</PRE>
+
+<a name="requires">
+$r->requires
+<blockquote>
+Returns an array reference of hash references, containing information
+related to the require directive.  This is normally used for access
+control, see Apache for an example.
+</blockquote>
+
+<a name="auth_type">
+$r->auth_type
+<blockquote>
+Returns a reference to the current value of the per directory
+configuration directive AuthType.  Normally this would be set to Basic
+to use the basic authentication scheme defined in RFC 1945, Hypertext
+Transfer Protocol -- HTTP/1.0. However, you could set to something
+else and implement your own authentication scheme.
+</blockquote>
+
+<a name="auth_name">
+$r->auth_name
+<blockquote>
+Returns a reference to the current value of the per directory
+configuration directive AuthName. The AuthName directive creates
+protection realm within the server document space. To quote RFC 1945
+``These realms allow the protected resources on a server to be
+partitioned into a set of protection spaces, each with its own
+authentication scheme and/or authorization database.'' The client uses
+the root URL of the server to determine which authentication
+credentials to send with each HTTP request.  These credentials are
+tagged with the name of the authentication realm that created
+them. Then during the authentication stage the server uses the current
+authentication realm, from $r->auth_name, to determine which set of
+credentials to authenticate.
+</blockquote>
+
+<a name="document_root">
+$r->document_root
+<blockquote>
+Returns a reference to the current value of the per server
+configuration directive DocumentRoot. To quote the Apache server
+documentation, ``Unless matched by a directive like Alias, the server
+appends the path from the requested URL to the document root to make
+the path to the document.'' This same value is passed to CGI scripts
+in the DOCUMENT_ROOT environment variable.
+</blockquote>
+
+<a name="allow_options">
+$r->allow_options
+<blockquote>
+The $r->allow_options method can be used for checking if it is OK to
+run a perl script. The Apache::Options module provides the constants
+to check against.
+</blockquote>
+
+<pre>
+   if(!($r->allow_options & OPT_EXECCGI)) {
+ $r->log_reason("Options ExecCGI is off in this directory", 
+    $filename);
+   }
+</pre>
+
+$s = $r->server
+<blockquote>
+Return a reference to the server info object (blessed into the
+Apache::Server package). This is really a server_rec* in disguise. The
+following methods can be used on the server object:
+</blockquote>
+
+$s = Apache->server
+<blockquote>
+Same as above, but only available during server startup for use in
+<Perl> sections, PerlScript or PerlModule.
+<blockquote>
+
+<a name="server_admin">
+$s->server_admin
+<blockquote>
+Returns the mail address of the person responsible for this server.
+</blockquote>
+
+<a name="server_hostname">
+$s->server_hostname
+<blockquote>
+Returns the hostname used by this server.
+</blockquote>
+
+<a name="port">
+$s->port
+<blockquote>
+Returns the port that this servers listens too.
+</blockquote>
+
+<a name="is_virtual">
+$s->is_virtual
+<blockquote>
+Returns true if this is a virtual server. 
+</blockquote>
+
+<a name="names">
+$s->names
+<blockquote>
+Returns the wild-carded names for HostAlias servers. 
+</blockquote>
+
+<a name="warn">
+$s->warn
+<blockquote>
+Alias for Apache::warn. 
+</blockquote>
+
+<a name="log_error">
+$s->log_error
+<blockquote>
+Alias for Apache::log_error. 
+</blockquote>
+
+
+
+
+
+
+

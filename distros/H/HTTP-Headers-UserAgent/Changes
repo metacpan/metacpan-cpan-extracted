@@ -1,0 +1,56 @@
+Revision history for Perl module HTTP::Headers::UserAgent
+
+3.09 2015-11-11 NEILB
+    - Updated github repo URL after changing my github username
+    - Added [MetaJSON] to dist.ini so META.json is included in releases
+
+3.08 2015-03-10
+    - I should have specified min version for HTTP::BrowserDetect as 1.77,
+      since switching to work with HTTP::BrowserDetect 1.77 meant tests
+      fail with 1.76 and earlier. Thanks to SREZIC for pointing this out.
+
+3.07 2015-03-09
+    - Changes needed to get tests passing after a new version of
+      HTTP::BrowserDetect (1.77) was released by OALDERS.
+
+3.06 2015-01-08
+
+    - Added x_deprecated to the dist's metadata.
+
+3.05 2014-01-27
+
+    - specified min perl version 5.6.0
+
+3.04 2013-11-17
+
+    - Updated SEE ALSO to suggest current best selection of other modules
+    - added [GithubMeta] to dist.ini so github repo will appear in metadata
+
+3.03 2013-08-15
+
+    - The doc was mistakenly saying that HTTP::BrowserDetect had been
+      deprecated, instead of HTTP::Headers::UserAgent :-)
+      Pull request from OALDERS, the current maintainer of HTTP::BrowserDetect
+
+3.02 2011-11-08
+
+    - changed the doc for browser(): previously said it returned browser
+      name and version, but it was just returning browser name.
+    - added "use warnings" and tidied up code
+    - updated README and pod to refer to review of similar modules
+    - added basic testsuite
+    - added testsuite for GetPlatform
+    - switched to use Dist::Zilla
+
+3.01 2002-01-20
+	- fix for pre-5.6 perl
+
+3.00 2001-08-08
+	- deprecated; rewrite as wrapper around HTTP::BrowserDetect
+
+2.00 1999-08-05
+	- free reimplementation by Ivan Kohler, name/API used with permission
+
+1.00 1998-09-30
+	- original (non-free) HTTP::Headers::UserAgent by John Neystadt
+

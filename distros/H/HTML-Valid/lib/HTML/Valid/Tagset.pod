@@ -1,0 +1,665 @@
+
+=head1 NAME
+
+HTML::Valid::Tagset - data tables useful in parsing HTML
+
+=head1 SYNOPSIS
+
+    
+    use HTML::Valid::Tagset ':all';
+    for my $tag (qw/canvas a li moonshines/) {
+        if ($isHTML5{$tag}) {
+            print "<$tag> is ok\n";
+        }
+        else {
+            print "<$tag> is not HTML5\n";
+        }
+    }
+    
+
+
+produces output
+
+    <canvas> is ok
+    <a> is ok
+    <li> is ok
+    <moonshines> is not HTML5
+
+
+(This example is included as L<F<tagset-synopsis.pl>|https://api.metacpan.org/source/BKB/HTML-Valid-0.06/examples/tagset-synopsis.pl> in the distribution.)
+
+
+=head1 VERSION
+
+This documents HTML::Valid::Tagset version 0.06
+corresponding to git commit L<453a1be0d5696738e405061f5ed1ad475b04c443|https://github.com/benkasminbullock/html-valid/commit/453a1be0d5696738e405061f5ed1ad475b04c443> released on Thu Mar 2 14:23:28 2017 +0900.
+
+This Perl module is built on top of the L</HTML Tidy> library version
+5.4.0.
+
+
+=head1 DESCRIPTION
+
+This module contains several data tables useful in various kinds of
+HTML parsing operations.
+
+All tag names used are lowercase.
+
+=head2 This module and HTML::Tagset
+
+This is a drop-in replacement for L<HTML::Tagset>. However,
+HTML::Valid::Tagset is mostly not based on HTML::Tagset. It uses the
+tables of HTML elements from a C program called L</HTML Tidy> (this is
+not the Perl module L<HTML::Tidy>).
+
+As far as possible, this module tries to be compatible with
+HTML::Tagset. Incompatibilities with HTML::Tagset are discussed in
+L</Issues with HTML::Tagset>.
+
+=head2 Validation
+
+If you need to validate tags, you should use, for example,
+L</%isHTML5> for HTML 5 tags, or L</%isKnown> if you want to check
+whether a tag is a known one.
+
+=head2 Terminology
+
+In the following documentation, a "hashset" is a hash being used as a
+set. The actual values associated with the keys are not significant.
+
+=head1 VARIABLES
+
+None of these variables are exported by default. See L</EXPORTS>. The
+compatibility with HTML::Tagset is listed. In all cases, the
+compatibility with HTML::Tagset refers to HTML::Tagset version 3.20.
+
+=head2 @allTags
+
+This contains all the tags as an array. The tags are sorted in
+order. It is exactly the same thing as the keys of L</%isKnown>.
+
+This is only in HTML::Valid::Tagset, not in HTML::Tagset.
+
+=head2 %canTighten
+
+This is copied from HTML::Tagset.
+
+=head2 %emptyElement
+
+This hashset has as values the tag names of elements that cannot have
+content.  For example, "base", "br", or "hr".
+
+    
+    use HTML::Valid::Tagset '%emptyElement';
+    for my $tag (qw/hr dl br snakeeyes/) {
+        if ($emptyElement{$tag}) {
+            print "<$tag> is empty.\n";
+        }
+        else {
+            print "<$tag> is not empty.\n";
+        }
+    }
+    
+
+
+outputs
+
+    <hr> is empty.
+    <dl> is not empty.
+    <br> is empty.
+    <snakeeyes> is not empty.
+
+
+This is compatible with HTML::Tagset.
+
+=head2 %isBlock
+
+This hashset contains all block elements.
+
+This is only in HTML::Valid::Tagset, not in HTML::Tagset.
+
+=head2 %isBodyElement
+
+This hashset contains all elements that are to be found only in/under
+the "body" element of an HTML document.
+
+This is compatible with the undocumented
+C<%HTML::Tagset::isBodyElement> in HTML::Tagset and the documentation
+for C<%HTML::Tagset::isBodyMarkup>. See also L</Issues with
+HTML::Tagset>. C<%isBodyMarkup> is not implemented in HTML::Tagset, so
+it's not provided for compatibility here.
+
+=head2 %isCDATA_Parent
+
+This hashset includes all elements whose content is CDATA.
+
+This is copied from HTML::Tagset.
+
+=head2 %isFormElement
+
+This hashset contains all elements that are to be found only in/under
+a "form" element.
+
+This is compatible with HTML::Tagset.
+
+=head2 %isHeadElement
+
+This hashset contains elements that can be present in the 'head'
+section of an HTML document.
+
+This is compatible with the contents of
+C<%HTML::Tagset::isHeadElement>, but not its documentation. See also
+L</Issues with HTML::Tagset>.
+
+=head2 %isHeadOrBodyElement
+
+This hashset includes all elements that can fall either in the head or
+in the body.
+
+This is compatible with HTML::Tagset.
+
+=head2 %isHTML2
+
+This is true for elements which are in L</HTML 2.0>.
+
+This is only in HTML::Valid::Tagset, not in HTML::Tagset.
+
+=head2 %isHTML3
+
+This is true for elements which are in L</HTML 3.2>.
+
+This is only in HTML::Valid::Tagset, not in HTML::Tagset.
+
+=head2 %isHTML4
+
+This is true for elements which are in L</HTML 4.01>.
+
+This is only in HTML::Valid::Tagset, not in HTML::Tagset.
+
+=head2 %isHTML5
+
+    
+    use utf8;
+    use FindBin '$Bin';
+    use HTML::Valid::Tagset '%isHTML5';
+    if ($isHTML5{canvas}) {
+        print "<canvas> is OK.\n"; 
+    }
+    if ($isHTML5{a}) {
+        print "<a> is OK.\n";
+    }
+    if ($isHTML5{plaintext}) {
+        print "OH NO!"; 
+    }
+    else {
+        print "<plaintext> went out with scrambled eggs.\n";
+    }
+
+
+outputs
+
+    <canvas> is OK.
+    <a> is OK.
+    <plaintext> went out with scrambled eggs.
+
+
+This is true for elements which are valid in L</HTML5>. It is not
+true for obsolete elements like the <plaintext> tag (see
+L</%isObsolete>), or proprietary elements such as the <blink> tag
+which have never been part of any HTML standard (see
+L</%isProprietary>). Further, some elements neither marked as obsolete
+nor proprietary are also not present in HTML5. For example the
+<isindex> tag is not present in HTML5.
+
+This is only in HTML::Valid::Tagset, not in HTML::Tagset.
+
+=head2 %isKnown
+
+This hashset lists all known HTML elements. See also L</@allTags>.
+
+This is compatible with HTML::Tagset.
+
+=head2 %isList
+
+This hashset contains all elements that can contain "li" elements.
+
+This is copied from HTML::Tagset.
+
+=head2 %isInline
+
+This hashset contains all inline elements. It is identical to
+C<%isPhraseMarkup>.
+
+This is only in HTML::Valid::Tagset, not in HTML::Tagset.
+
+=head2 %isObsolete
+
+    $isObsolete{canvas};
+    # Undefined
+    $isObsolete{plaintext};
+    # True
+
+This is true for HTML elements which were once part of HTML standards,
+like C<plaintext>, but have now been declared obsolete. Note that
+C<%isObsolete> is not true for elements like the <blink> tag which
+were never part of any HTML standard. See L</%isProprietary> for these
+tags.
+
+This is only in HTML::Valid::Tagset, not in HTML::Tagset.
+
+=head2 %isPhraseMarkup
+
+This hashset contains all inline elements. It is identical to
+C<%isInline>.
+
+This is compatible with HTML::Tagset.
+
+=head2 %isProprietary
+
+This is true for elements which are not part of any HTML standard, but
+were added by computer companies.
+
+    
+    use utf8;
+    use FindBin '$Bin';
+    use HTML::Valid::Tagset '%isProprietary';
+    my @tags = qw/a blink plaintext marquee/;
+    for my $tag (@tags) {
+        if ($isProprietary{$tag}) {
+            print "<$tag> is proprietary.\n";
+        }
+        else {
+            print "<$tag> is not a proprietary tag.\n";
+        }
+    }
+    
+
+
+outputs
+
+    <a> is not a proprietary tag.
+    <blink> is proprietary.
+    <plaintext> is not a proprietary tag.
+    <marquee> is proprietary.
+
+
+This is only in HTML::Valid::Tagset, not in HTML::Tagset.
+
+=head2 %isTableElement
+
+This hashset contains all elements that are to be found only in/under
+a "table" element.
+
+This is compatible with HTML::Tagset.
+
+=head2 %optionalEndTag
+
+Elements in this hashset are not empty (see L</%emptyElement>), but their
+end-tags are generally, "safely", omissible.
+
+    
+    use HTML::Valid::Tagset qw/%optionalEndTag %emptyElement/;
+    for my $tag (qw/li p a br/) {
+        if ($optionalEndTag{$tag}) {
+            print "OK to omit </$tag>.\n";
+        }
+        elsif ($emptyElement{$tag}) {
+            print "<$tag> does not ever take '</$tag>'\n";
+        }
+        else {
+            print "Cannot omit </$tag> after <$tag>.\n";
+        }
+    }
+    
+
+
+outputs
+
+    OK to omit </li>.
+    OK to omit </p>.
+    Cannot omit </a> after <a>.
+    <br> does not ever take '</br>'
+
+
+This is compatible with HTML::Tagset.
+
+=head1 FUNCTIONS
+
+=head2 all_attributes
+
+    my $attr = all_attributes ();
+
+This returns an array reference containing all known attributes. The
+attributes are not sorted.
+
+=head2 attributes
+
+    my $attr = attributes ('a');
+
+This returns an array reference containing all valid attributes for
+the specified tag (as decided by the WWW Consortium). The attributes
+are not sorted. By default this returns the valid tags for HTML 5.
+
+It is also possible to choose a value for standard which specifies
+which standard one wants:
+
+    my $attr = attributes ('a', standard => 'html5');
+
+Possible values for standard are
+
+=over
+
+=item html5
+
+This returns valid attributes for L</HTML5>.
+
+This is the default
+
+=item html4
+
+This returns valid attributes for L</HTML 4.01>.
+
+=item html3
+
+This returns valid attributes for L</HTML 3.2>.
+
+=item html2
+
+This returns valid attributes for L</HTML 2.0>.
+
+=back
+
+=head2 tag_attr_ok
+
+    my $ok = tag_attr_ok ('a', 'onmouseover');
+    # $ok = 1
+    my $ok = tag_attr_ok ('table', 'cellspacing');
+    # $ok = undef, because "cellspacing" is not a valid attribute for
+    # table in HTML 5.
+
+This returns a true value if the attribute is allowed for the
+specified tag. The default version is HTML 5. Another version of HTML
+can be specified using the parameter C<standard>:
+
+    my $ok = tag_attr_ok ('html', 'onload', standard => 'html2');
+
+The possible versions are as in L</attributes>.
+
+=head2 attr_type
+
+     my $type = attr_type ('onmouseover');
+     # $type = 'script'
+
+This returns a text string containing likely type information for the
+attribute. This content is extracted from the internals of L</HTML Tidy>,
+and it may or may not be correct. This interface is experimental, and
+likely to change.
+
+=head1 COMPATIBILITY-ONLY VARIABLES
+
+These variables are present in this module for compatibility with
+existing programs which use HTML::Tagset. However, they are
+fundamentally flawed and should not be used for new projects.
+
+=head2 %is_Possible_Strict_P_Content
+
+In HTML::Valid::Tagset, this is identical to L</%isInline>.
+
+This is a mistake in HTML::Tagset which is preserved in name only for
+backwards compatibility.  See also L</Issues with HTML::Tagset>.
+
+=head2 @p_closure_barriers
+
+In HTML::Valid::Tagset, this resolves to an empty list.
+
+This is a mistake in HTML::Tagset which is preserved in name only for
+backwards compatibility. See also L</Issues with HTML::Tagset>.
+
+=head1 UNIMPLEMENTED
+
+The following parts of HTML::Tagset are not implemented in version 0.06 of HTML::Valid::Tagset.
+
+=head2 %boolean_attr
+
+This is not implemented in HTML::Valid::Tagset.
+
+=head2 %linkElements
+
+This is not implemented in HTML::Valid::Tagset.
+
+=head1 SEE ALSO
+
+=head2 HTML Tidy
+
+This is a program and a library in C for improving HTML. It was
+originally written by Dave Raggett of the W3 Consortium. HTML::Valid
+is based on this project.
+
+=over
+
+=item * L<HTML Tidy web page|http://www.html-tidy.org/>
+
+=item * L<HTML Tidy git repository|https://github.com/htacg/tidy-html5>
+
+=back
+
+Please note that this is not the Perl module L<HTML::Tidy> by Andy
+Lester, although that module is also based on the above library.
+
+
+=head2 CPAN modules
+
+L<HTML::Tagset>, L<HTML::Element>, L<HTML::TreeBuilder>, L<HTML::LinkExtor>
+
+=head2 HTML standards
+
+This section gives links to the HTML standards which HTML::Valid supports.
+
+=head3 HTML 2.0
+
+HTML 2.0 was described in RFC ("Request For Comments") 1866, a
+standard of the Internet Engineering Task Force. See
+L<http://www.ietf.org/rfc/rfc1866.txt>.
+
+=head3 HTML 3.2
+
+This was described in the HTML 3.2 Reference Specification. See
+L<http://www.w3.org/TR/REC-html32>. 
+
+=head3 HTML 4.01
+
+This was described in the HTML 4.01 Specification. See
+L<http://www.w3.org/TR/html401/>.
+
+=head3 HTML5
+
+=over
+
+=item Dive into HTML5
+
+L<http://diveintohtml5.info/>.
+
+This isn't a standards document, but "Dive into HTML 5" may be good
+background reading before trying to read the standards documents.
+
+=item HTML: The Living Standard
+
+This is at L<https://developers.whatwg.org/>. It says
+
+=over 
+
+This specification is intended for authors of documents and scripts
+that use the features defined in this specification.
+
+=back
+
+=item HTML5 - A vocabulary and associated APIs for HTML and XHTML
+
+This is at L<http://www.w3.org/TR/html5/>. It's the W3 consortium's
+version of the WHATWG documents.
+
+=back
+
+
+
+=head1 EXPORTS
+
+The hashes and arrays are exported on demand. Everything can be
+exported with C<:all>:
+
+    export HTML::Valid::Tagset ':all';
+
+=head1 BUGS
+
+=head2 Issues with HTML::Tagset
+
+There are several problems with HTML::Tagset version 3.20 which mean
+that it's difficult to be fully compatible with it.
+
+=over
+
+=item C<@p_closure_barriers> should be an empty set
+
+There is a long-winded argument in the documentation of HTML::Tagset,
+which has been there since version 3.01, released on Aug 21 2000,
+about why it's possible for a p element to contain another p
+element. However, the specification for HTML4.01, which HTML::Tagset
+seems to be based on, from 1999, states
+
+=over
+
+The P element represents a paragraph. It cannot contain block-level
+elements (including P itself).
+
+=back
+
+Thus, it is simply not possible for any block element to legally be
+part of a paragraph, and the mechanism that HTML::Tagset suggests for
+how a paragraph element can contain a table which can contain a
+paragraph element, like this:
+
+     <p>
+     <table>
+
+is not and was not legal HTML, since <table> itself is a block level
+element, and the HTML rule is that in the above case, if a new block
+level element is seen, a </p> is inserted automatically, so it always
+becomes
+
+     <p>
+     </p>
+     <table>
+
+anyway. See L</%isBlock> for testing for whether an element is a block
+level element.
+
+So in this module, L</@p_closure_barriers> is an empty set.
+
+=item C<%is_Possible_Strict_P_Content> doesn't really make sense
+
+The comments for HTML::Tagset version 3.20 read
+
+    # I've no idea why there's these latter exceptions.
+    # I'm just following the HTML4.01 DTD.
+
+and following this it lists the C<form> tag in this hash. However, the
+form tag is a block level element, so the purpose of this hash seems
+to be misguided. Since, as noted above, a p tag can contain any inline
+element, in this module, for compatibility,
+L</%is_Possible_Strict_P_Content> is just the same thing as
+L</%isInline>.
+
+=item C<%isBodyMarkup> doesn't exist
+
+The documented C<%isBodyMarkup> doesn't exist, in its place is
+C<%isBodyElement>.
+
+This is reported as
+L<https://rt.cpan.org/Public/Bug/Display.html?id=109024>.
+
+=item The documentation of C<%isHeadElement> is misleading
+
+The documentation of C<%isHeadElement> claims
+
+=over
+
+This hashset contains all elements that elements that should be
+present only in the 'head' element of an HTML document.
+
+=back
+
+However, in fact it actually contains elements that can be present
+either only in the head, like <title>, or both in the head and the
+body, like <script>. In this module, L</%isHeadElement> copies the
+contents of HTML::Tagset rather than its documentation.
+
+The issue in HTML::Tagset is reported as
+L<https://rt.cpan.org/Ticket/Display.html?id=109044>.
+
+=item Some elements of C<%isHeadElement> are not head elements
+
+This is reported as
+L<https://rt.cpan.org/Public/Bug/Display.html?id=109018>.
+
+=back
+
+=head1 COPYRIGHT & LICENSE
+
+Portions of this module are taken from L<HTML::Tagset>, which bears
+the following copyright notice.
+
+Copyright 1995-2000 Gisle Aas.
+
+Copyright 2000-2005 Sean M. Burke.
+
+Copyright 2005-2008 Andy Lester.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+However, the bulk of HTML::Valid::Tagset is not a fork of
+HTML::Tagset, it is based on L</HTML Tidy>.
+
+HTML::Valid is based on HTML Tidy, which is under the following copyright:
+
+    Copyright (c) 1998-2008 World Wide Web Consortium
+    (Massachusetts Institute of Technology, European Research
+    Consortium for Informatics and Mathematics, Keio University).
+    All Rights Reserved.
+
+    COPYRIGHT NOTICE:
+
+    This software and documentation is provided "as is," and
+    the copyright holders and contributing author(s) make no
+    representations or warranties, express or implied, including
+    but not limited to, warranties of merchantability or fitness
+    for any particular purpose or that the use of the software or
+    documentation will not infringe any third party patents,
+    copyrights, trademarks or other rights.
+
+    The copyright holders and contributing author(s) will not be held
+    liable for any direct, indirect, special or consequential damages
+    arising out of any use of the software or documentation, even if
+    advised of the possibility of such damage.
+
+    Permission is hereby granted to use, copy, modify, and distribute
+    this source code, or portions hereof, documentation and executables,
+    for any purpose, without fee, subject to the following restrictions:
+
+    1. The origin of this source code must not be misrepresented.
+    2. Altered versions must be plainly marked as such and must
+    not be misrepresented as being the original source.
+    3. This Copyright notice may not be removed or altered from any
+    source or altered source distribution.
+
+
+
+
+
+
+The Perl parts of this distribution are copyright (C) 
+2015-2017
+Ben Bullock and may be used under either the above licence terms, or
+the usual Perl conditions, either the GNU General Public Licence or
+the Perl Artistic Licence.
+

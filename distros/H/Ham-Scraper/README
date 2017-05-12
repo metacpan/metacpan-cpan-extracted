@@ -1,0 +1,64 @@
+NAME
+    Ham::Scrape - Perl extension for scraping Amateur Radio callsign info
+    and real-time positional information from the Internet. This module
+    scrapes the information from three web sites (QRZ, FindU and APRSWorld),
+    and supports printing of the key fields to console to file as raw ASCII
+    or formatted in an XML document structure.
+
+SYNOPSIS
+      use Ham::Scraper;
+  
+      # Retreive QRZ information for callsign
+      my %qrz = Ham::Scraper::QRZ($callsign);
+      my $name = $qrz{Name};
+      my $location = $qrz{CityStateZip};
+      my $timeZone = $qrz{TimeZone};
+      my $gmtOffset = $qrz{GMTOffset};
+      my $grid = $qrz{Grid};
+      # Use name, location, grid, etc. in program.
+
+      # Scrape real-time position report information (as XML) from FindU
+      my $aprsXml = Ham::Scraper::FindUXml($callsign);
+
+    Whether you are looking to scrape QRZ, Findu or APRSWorld information,
+    you can have the results return in a hash or as simple XML document. A
+    subroutine returning XML is suffixed with Xml.
+
+DESCRIPTION
+    This basic Perl module uses the following Web sites to scrape
+    information relating to real-time position and call sign detail of
+    Amateur Radio operators:
+
+        http://aprsworld.net
+        http://www.findu.com
+        http://www.qrz.com
+
+  EXPORT
+    FindU FindUXml
+
+    APRSWorld APRSWorldXml
+
+    Qrz QrzXml
+
+SEE ALSO
+    For further information on APRS or Ham Radio, please visit the following
+    web wites:
+
+        http://www.arrl.org
+        http://aprsworld.net
+        http://www.findu.com
+        http://www.qrz.com
+
+    If you want to verify whether this module is the latest version that is
+    available, then please check CPAN.
+
+AUTHOR
+    Kevin Wittmer, <kevinwittme7 at hotmail.com<gt>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006 by Kevin Wittmer
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

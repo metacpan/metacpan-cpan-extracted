@@ -1,0 +1,82 @@
+#!perl
+
+use strict;
+use warnings;
+
+use lib 'lib';
+
+use File::Find qw( find );
+use HTTP::Headers;
+use HTTP::Headers::ActionPack;
+
+my $pack = HTTP::Headers::ActionPack->new();
+
+find(
+    {
+        wanted   => \&process,
+        no_chdir => 1,
+    },
+    'headers',
+);
+
+my $count = 0;
+sub process {
+    my $file = $_;
+    return unless -f $_;
+
+    $count++;
+
+    open my $fh, '<', $file;
+
+    # First line is the request itself, not headers
+    scalar <$fh>;
+
+    my @h;
+    while (<$fh>) {
+        last unless /\S/;
+        $_ =~ s/[\r\n]//g;
+
+        push @h, $_;
+    }
+
+    _check_inflate(\@h);
+
+    warn "\nProcessed $count files\n"
+        if $count % 1000 == 0;
+
+    return;
+}
+
+sub _check_inflate {
+    my $headers
+        = HTTP::Headers->new( map { split /:\s*/, $_, 2 } @{ $_[0] } );
+
+    my @warnings;
+
+    my $e;
+    {
+        local $SIG{__WARN__} = sub { push @warnings, @_ };
+        local $@;
+        eval {
+            my ( $name, $value ) = split /:\s*/, $_[0], 2;
+            $pack->inflate($headers);
+        };
+
+        $e = $@;
+    }
+
+    if ($e) {
+        warn "** Error **\n";
+        warn "     $_\n" for @{ $_[0] };
+        warn "\n";
+        warn "     $e\n";
+        warn "\n\n";
+    }
+
+    if (@warnings) {
+        warn "** Warnings **\n";
+        warn "     $_[0]\n";
+        warn "     $_\n" for @warnings;
+        warn "\n\n";
+    }
+}

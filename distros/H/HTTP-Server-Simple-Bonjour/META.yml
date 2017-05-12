@@ -1,0 +1,18 @@
+abstract: Bonjour plugin for HTTP::Server::Simple
+author: Tatsuhiko Miyagawa <miyagawa@cpan.org>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: HTTP-Server-Simple-Bonjour
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  HTTP::Server::Simple: 0
+  NEXT: 0
+  Net::Rendezvous::Publish: 0
+  perl: 5.8.1
+version: 0.02

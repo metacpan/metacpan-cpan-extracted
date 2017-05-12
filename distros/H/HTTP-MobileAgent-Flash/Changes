@@ -1,0 +1,114 @@
+Revision history for Perl extension HTTP::MobileAgent::FlashLite
+
+0.20
+  - update flashmap
+  - update for Module::Install 1.06 for perl5.16 (thanks report from miyagawa)
+
+0.19
+  - update flashmap
+  - does not use Module::Install::TestBase.
+
+0.18
+  - update flashmap
+
+0.17
+  - update DoCoMoFlashMap
+
+0.16
+  - update FlashMap
+
+0.15 
+  - update FlashMap
+  -- DoCoMo: added F-05C, SH-08C, SH-09C
+  -- EZWeb : added SN3T
+  -- SoftBank: added 001P, 002P
+
+0.14 Wed Feb  2 06:16:03 JST 2011
+  - update flash_map.
+
+0.13 Tue Dec 21 08:34:06 JST 2010
+  - update flash_map
+  -- DoCoMoFlashMap: added L-01C, P-03C, SH04-C,
+  -- EZWebFlashMap: added  CA-3J
+  -- SoftBankFlashMap: added 002SH
+
+0.12 Thu Nov 25 10:54:36 JST 2010
+  - update FlashMap
+  -- DoCoMoFlashMap: F-01C, F-02C, F-03C, N-01C, N-02C, P-01C, P-02C,SH-01C, SH-02C
+  -- EZWebFlashMap: CA3I, KC41, SH3J, SH3K, SN3Q, SN3R, TS3V, TS3W
+  -- SoftBankFlashMap: 001N, 001SH, 840Z, DM007SH
+
+0.11 Wed Sep  8 10:57:00 JST 2010
+  - update added -10B, P-07B, KC3Z, 841N, 843SH, 941SC
+
+0.10  Mon Aug  9 09:31:09 JST 2010
+  - update FlashMap.
+
+0.09  Thu Jul 29 12:46:42 JST 2010
+  - fixed problem that softbank website change (thanks tokuhirom)
+
+0.08 Mon Nov 16 14:11:29 2009
+  - Added F-01B, F-02B, F-08A, F-09A, F-10A, L-04A, L-06A, N-07A, 
+    N-09A, P-08A, P-09A, P-10A, SH-01B, SH-05A, SH-06A, SH-07A, SH-08A
+    in HTTP::MobileAgent::Flash::DoCoMoFlashMap (auto-generated)
+  - Added CA002, CA003, CA004, Mobile Hi-Vision CAM Wooo, K002, 
+    K003, misora[iida], SA001, E07K, E06SH, SH002, Sportio water beat, 
+    SH003, S002, biblio, T002, PLY[iida], T003
+    in HTTP::MobileAgent::Flash::EZWebFlashMap (auto-generated)
+  - Added 831N, 832P, 832SH, 832T, 930N, 931P, 931SC, 933SH, 
+    934SH, 935SH, 936SH, DM004SH
+    in HTTP::MobileAgent::Flash::SoftBankFlashMap (auto-generated)
+  - MAKEFILE.PL was changed to modern age. (Thanks to Keiji, Yoshimi)
+
+0.07 Mon May 25 13:47:39 2009
+  - Added N-06A, N-08A, P-07A
+    in HTTP::MobileAgent::Flash::DoCoMoFlashMap (auto-generated)
+  - Added CA001, E05SH, G9[iida], H001, K001, NS01, NS02, P001, Premier3,
+    S001, SH001, T001
+    in HTTP::MobileAgent::Flash::EZWebFlashMap (auto-generated)
+  - Added 830N, 831P, 831SH, 930CA, 930P, 932SH
+    in HTTP::MobileAgent::Flash::SoftBankFlashMap (auto-generated)
+
+0.06 Fri Nov  7 19:20:28 2008
+    - FlashLite1.1 and FlashLite2.0 can have been distinguished in SoftBank. 
+    - Added F-01A,F706I,F883IS,F884IES,F906I,L706IE,L852I,N706I,N706IE,
+    N706III,N906I,N906IL,N906IMYU,P706IE,P706IMYU,P906I,SH706I,SH706IE,
+    SH706IW,SH906I,SH906ITV,SO706I,SO906I,D705I,D705IMYU,F705I,F883IESS,
+    F884I,F905IBIZ,L705I,L705IX,N705I,N705IMYU,P705I,P705ICL,P705IMYU,
+    P905ITV,SH705I,SH705III,SH905ITV,SO705I,SO905ICS
+    in HTTP::MobileAgent::Flash::DoCoMoFlashMap (auto-generated)
+    - Added W63H,W65T,W63CA,W64SH,W65K,W64S,W62P,W64T,W63K(non-camera),
+    URBANO,W62PT,W64SA,W62CA,W62H,W62SH,re,W63K,Sportio,W62T,W63SA,W62K,
+    W61S,W61SA,W62S,W61T,W61H,W62SA,W61PT,W61P,W61CA,W61K,W54SA
+    in HTTP::MobileAgent::Flash::EZWebFlashMap (auto-generated)
+
+0.05  Wed Jan  9 14:40:47 2008
+    - FlashLite1.1 and FlashLite2.0 can have been distinguished in EZWeb. 
+    (Thanks to Tokuhiro, Matsuno)
+    - remake making map tool(make_map_flash_lite.pl)
+
+0.04  Thu Dec  6 17:37:44 2007
+    - Fixed problem that lwp_flash_lite_map_docomo.pl programs had invalid url.
+    - Added D704I,D904I,D905I,F704I,F883IES,F905I,L704I,N703I,N703IMYU,N704IMYU,
+    N905I,N905IMYU,P703IMYU,P704I,P704IMYU,P905I,SH704I,SH851I,SH905I,SO505I,
+    SO902IWP,SO902IWP+,SO905I
+    in HTTP::MobileAgent::Flash::DoCoMoFlashMap (auto-generated)
+    (Thanks to Tokuhiro, Matsuno)
+
+0.03  Fri Jul 13 13:06:46 2007
+    - Fixed problem that lwp_flash_lite_map_docomo.pl programs had invalid url.
+    - Added D702I,D702IBCL,D702IF,D703I,D800IDS,D851IWM,D902IS,D903I,D903ITV,
+    F702ID,F703I,F882IES,F883I,F902IS,F903I,F903IBSC,F903IX,F904I,M702IG,
+    M702IS,N506ISII,N601I,N701IECO,N702ID,N702IS,N703I,N703ID,N902IL,N902IS,
+    N902IX,N903I,N904I,P506ICII,P702I,P702ID,P703I,P901ITV,P902IS,P903I,P903ITV,
+    P903IX,P904I,SA702I,SA800I,SH702ID,SH702IS,SH703I,SH902IS,SH902ISL,SH903I,
+    SH903ITV,SH904I,SO505I,SO702I,SO703I,SO704I,SO902I,SO902IWP,SO903I, SO903ITV 
+    in HTTP::MobileAgent::Flash::DoCoMoFlashMap (auto-generated)
+    (Thanks to Tokuhiro, Matsuno)
+
+0.02  Thu Feb 16 16:51:34 2006
+    - Change in method name. is_support() are now is_supported().
+    (Thanks to #catalyst-ja)
+
+0.01  Thu Feb 16 11:49:27 2006
+    - original version

@@ -1,0 +1,11 @@
+Revision history for HTML::Debug
+
+0.10  Fri Sep 14 14:00:00 2007
+	- original version
+
+0.11  Mon Sep 17 08:30:00 2007
+    - No longer require the DBI module.  If it isn't present,
+	  the user simply won't be able to debug queries.
+
+0.12  Mon Sep 17 10:30:00 2007
+    - Added HTML::Mason config section in Pod.

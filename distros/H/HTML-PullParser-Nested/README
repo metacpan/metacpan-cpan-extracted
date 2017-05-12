@@ -1,0 +1,32 @@
+$Id: README 4608 2010-03-09 13:47:00Z chris $
+
+INTRODUCTION
+============
+
+TODO
+
+
+INSTALLATION
+============
+
+   1 perl Makefile.PL
+   2 make
+   3 make test
+   4 make install # as superuser
+
+
+DEPENDENCIES
+============
+
+HTML::PullParser
+
+
+COPYRIGHT AND LICENCE
+=====================
+
+Copyright (C) 2010 Christopher Key <cjk32@cam.ac.uk>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+

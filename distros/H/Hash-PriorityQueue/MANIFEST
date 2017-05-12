@@ -1,0 +1,12 @@
+benchmark
+Build.PL
+lib/Hash/PriorityQueue.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+t/01_modules_load.t
+t/02_pop.t
+t/03_same_prio.t
+t/04_update.t
+t/05_delete.t
+t/06_warnings.t

@@ -1,0 +1,65 @@
+NAME
+
+HTML::PageIndex - Class to create HTML page index objects.
+
+SYNOPSIS
+
+ use HTML::PageIndex;
+
+ $foo = new HTML::PageIndex;
+
+ $zog = $foo->makeindex([total pages],[current page],[base url],[url arguement],[show prev/next]);
+
+ print $zog;
+
+DESCRIPTION
+
+Will return an object which will display a dynamic index of html pages. It would look like:
+
+	[Prev] 1 2 3 4 5 6 [Next]
+
+makeindex([total pages],[current page],[base url],[url arguement],[show prev/next]);
+
+This is currently the only public method. The args are as follows:
+
+	[total pages] - How many total pages are there. 
+
+	[current page] - What the current page is. It is expected that the using script
+			 would generate this.
+
+	[base url] - The base url to link to.
+
+	[url arguement] - May be "", but if it isn't it will build a 
+			  URL with ?[URL arguement]=[page number]
+
+	[show prev/next] - Default is 0. If 0 it will not show [Prev] if you are on the
+			first page, or [Next] if you are on the last page. If 1, it will 
+			show [Prev] and [Next] as text.
+
+
+INSTALLATION
+
+You install HTML::PageIndex, as you would install any perl module library,
+by running these commands:
+
+   perl Makefile.PL
+   make
+   make install
+   make clean
+
+
+BUGS
+
+None knows at time of writing.
+
+=head1 AVAILABILITY
+
+The latest version of HTML::PageIndex should always be available from:
+
+    $CPAN/modules/by-authors/id/K/KM/KMELTZ/
+
+Visit http://www.perl.com/CPAN/ to find a CPAN
+site near you.
+
+Or, from http://www.perlguy.com/perl.
+

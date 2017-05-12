@@ -1,0 +1,95 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use lib qw(../lib);
+use WWW::MobileCarrierJP::DoCoMo::CIDR;
+use WWW::MobileCarrierJP::EZWeb::CIDR;
+use WWW::MobileCarrierJP::ThirdForce::CIDR;
+use WWW::MobileCarrierJP::AirHPhone::CIDR;
+use HTTP::MobileAgent::Plugin::CIDR;
+
+my @nametable = (
+    DoCoMo =>     "DoCoMo",
+    EZWeb  =>     "EZweb",
+    ThirdForce => "Vodafone",
+    AirHPhone  => "AirHPhone",
+);
+
+open my $out, '>', '../lib/HTTP/MobileAgent/Plugin/CIDR/RegEx.pm';
+open my $tst, '>', '../t/01.chkip.t';
+
+print $out <<CODE1;
+package HTTP::MobileAgent::Plugin::CIDR::RegEx;
+
+use strict;
+use warnings;
+
+CODE1
+
+print $tst <<TEST1;
+use strict;
+use Test::Base;
+plan tests => 5 * blocks;
+
+use HTTP::MobileAgent::Plugin::CIDR;
+
+my \$ma = HTTP::MobileAgent->new("Dummy");
+
+run {
+    my \$block = shift;
+    my (\$class,\$ip)         = split(/\\n/,\$block->input);
+
+    foreach my \$eachclass (qw(DoCoMo EZweb Vodafone AirHPhone NonMobile)) {
+        bless \$ma, "HTTP::MobileAgent::\$eachclass";
+
+        is \$ma->check_network(\$ip), \$eachclass eq "NonMobile" ? 1 :
+                                    \$eachclass eq \$class      ? 1 :
+                                                                0;
+    }
+};
+
+__END__
+TEST1
+
+while (my ($wmclass,$haclass) = splice(@nametable,0,2)) {
+    my $wm    = "WWW::MobileCarrierJP::${wmclass}::CIDR";
+    my $cidrs = $wm->scrape();
+
+    my @masked_ipbits = ();
+    foreach my $cidr (@{$cidrs}) {
+        my $masked_ipbit = HTTP::MobileAgent::masked_ipbit($cidr->{ip},$cidr->{subnetmask},1);
+        push (@masked_ipbits,$masked_ipbit);
+
+        my $ip = $cidr->{ip};
+        print $tst <<TEST2
+===
+--- input
+$haclass
+$ip
+--- expected
+
+TEST2
+    }
+
+    my $regex = "^(?:" . join("|",@masked_ipbits) . ")\$";
+    
+    print $out <<CODE2;
+package  # hide from PAUSE
+       HTTP::MobileAgent::$haclass;
+
+sub __network_regex { qr($regex) }
+
+CODE2
+}
+
+print $out <<CODE3;
+1;
+
+__END__
+
+=head1 SEE ALSO
+
+=cut
+CODE3
+

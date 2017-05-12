@@ -1,0 +1,6 @@
+---
+elements:
+    - name: id
+
+    - type: Checkbox
+      name: checkbox_col

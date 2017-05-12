@@ -1,0 +1,4 @@
+name = "HTML-Lint-Pluggable"
+badges = ["travis"]
+authority="cpan:KARUPA"
+module_maker="ModuleBuildTiny"

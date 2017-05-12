@@ -1,0 +1,13 @@
+HTTP/1.1 200 OK
+Date: Thu, 23 Sep 2004 21:57:05 GMT
+Server: Apache/1.3.31 (Unix) PHP/4.3.8
+P3P: policyref="http://www.w3.org/2001/05/P3P/p3p.xml"
+Cache-Control: max-age=600
+Expires: Thu, 23 Sep 2004 22:07:05 GMT
+Last-Modified: Tue, 21 Sep 2004 18:10:14 GMT
+ETag: "41506e86"
+Accept-Ranges: bytes
+Content-Length: 0
+Connection: close
+Content-Type: text/html; charset=utf-8
+

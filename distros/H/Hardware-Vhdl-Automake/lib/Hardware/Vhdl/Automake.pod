@@ -1,0 +1,201 @@
+=head1 NAME
+
+Hardware::Vhdl::Automake - Automate the compilation of VHDL projects
+
+=head1 SYNOPSIS
+
+See Hardware::Vhdl::Automake::Tutorial for a more detailed walk-through of how to set up a project and compile it.
+
+To create a create a new project:
+
+    my $project = Hardware::Vhdl::Automake::Project->new();
+ 
+    # add some files to it
+    $project->add_sourcefiles(
+        $project_dir . '/src/adder.vhd', 
+        { 
+            # explicitly specifying target library and source language
+            file => $project_dir . '/src/count_up.vhd', 
+            library => 'work', 
+            language => 'vhdl-93',
+        }, 
+    );
+ 
+    # change the directory used for the generated hdl files (default would be ~/vhdl/uart/uart_hdlproj_files)
+    $project->hdl_dir($project_dir . '/hdl');
+ 
+    # save the project
+    $project->save($project_dir . '/tutorial.hdlproj');
+
+To do an automated compilation:
+
+    use strict;
+    use warnings;
+    use Hardware::Vhdl::Automake::Project;
+    use Hardware::Vhdl::Automake::Compiler::ModelSim;
+ 
+    my $project_dir = 'C:/hva_tutorial';
+    my $modelsim_path = 'C:\ProgramFiles\Modeltech\win32pe';
+ 
+    # create a new project
+    my $project = Hardware::Vhdl::Automake::Project->new();
+ 
+    # load the project
+    $project->load($project_dir . '/tutorial.hdlproj');
+ 
+    # Tell the project how to report status
+    $project->set_status_callback( \&output_status );
+ 
+    # Generate the HDL files
+    $project->generate_all;
+ 
+    # create a ModelSim compiler instance, and tell it where to put its compilation data
+    my $compiler = Hardware::Vhdl::Automake::Compiler::ModelSim->new({basedir => $project_dir."/sim"});
+ 
+    # Tell the compiler object where to find the compiler binaries
+    $compiler->set_modelsim_path($modelsim_path);
+ 
+    # Tell the compiler how to report status (see the tutorial for an example output_status sub)
+    $compiler->set_status_callback( \&output_status );
+ 
+    # Compile the HDL files
+    $project->compile($compiler);
+ 
+    # save the project, using the last save filename
+    $project->save;
+
+=head1 DESCRIPTION
+
+With this package you can set up a 'project', consisting of a number of VHDL source files, and then with a small script you can
+compile all the VHDL design units, without worrying about compilation order.  Edit your source files, and then the same script will 
+recompile only those VHDL design units that have changed.
+
+You can also benefit from
+
+=over 4
+
+=item *
+
+Automatic insertion of component declarations (so you don't need to edit these every time the entity changes)
+
+=item *
+
+Optional C-style preprocessor
+
+=item *
+
+Per-unit ModelSim compiler options can be set in the source code
+
+=back
+
+This is working code - I regularly use it for my own VHDL projects.
+
+=head1 BACKGROUND AND OVERVIEW
+
+I spend a lot of time using ModelSim to design and simulate electronic hardware in VHDL, and
+I wanted a way to automatically compile only those design units that need to be recompiled, and to do it in the right order.
+Hardware::Vhdl::Automake is a set of modules to do this, which also allow for pre-processing and the setting of compiler options in the 
+source code.  It is developed to the point where I actually find it useful to use, and 
+it works reliably for me.  On the other hand, it doesn't have the level of documentation and test code that I would usually
+consider necessary before uploading to CPAN.  I always have too many Perl developments on the go, on top of the work I am actually 
+meant to be doing!
+
+So I'm putting it up as-is, with very little test code but with a tutorial which should be sufficient for people to start
+getting some productive use out of it.  By doing this I'm hoping to get some feedback on whether people find it useful, what
+features are missing, and what needs to be better documented.  So please have a look at it, and tell me whether you found it
+useful, or confusing, or useless, or what - because if I get no feedback, it will only ever do what I find useful myself.  And
+even that won't be well documented.
+
+I have to warn you that it is currently dependent on using ModelSim, however - although the architecture of the modules allows 
+for different compilers to be used, this would not be simple to add and I can't really develop interfaces for tools that I don't 
+have.  
+
+=head2 Some notes on how my "auto-compile" tool works
+
+I looked at using 'make', but the problem is working out the dependencies.  Every time you add an instantiation of another 
+entity to an architecture, you change the dependencies.  A C program tends not to have so many dependency changes during 
+development, but with VHDL you really need to check all the dependencies every time you do a compile.  And working out which 
+architecture is used where needs a lot of parsing work, especially when you consider the complexity of 'configuration' 
+statements.  I realised there is actually an easier way.  If you can split up the design units (e.g. compile entities and 
+architectures, package headers and package bodies, separately), then all you need to do is compile the package headers, then 
+package bodies, then entities, then architectures, then configurations.  And no need to compile ones that haven't changed.  
+(Actually this isn't quite true: dependencies between package headers need to be considered.  But each of the other groups of 
+design unit type can be compiled in any order).
+
+So what my tool does is to take all the source files in a project and split them up into design units (running them through a 
+pre-processor first if desired), works out which ones have changed since the last compile (by making a digest of significant 
+code tokens), and compiles what needs to be compiled, in the right order.  I found it simplest to just always ensure that all 
+the project code is compiled, rather than trying to work out dependencies for a particular target: this avoids the need to parse 
+configurations.
+
+=head2 Relationship with Hardware::Vhdl::Lexer and Hardware::Vhdl::Parser
+
+My Lexer module was developed to act as part of these tools.
+
+Hardware::Vhdl::Parser was written (by someone else) before my Lexer, and my Lexer doesn't use it.  The Parser does a complete parse of the VHDL code - 
+which would be great, except that it is very slow.  It takes a long time to even start up, because of the complexity of building 
+the parser.  What I needed this tool to do was to split up the design units so that they could be compiled separately, and 
+that needed just enough parsing to recognise where each design unit ended.  The Hardware::Vhdl::Tidy module also does "just enough" 
+parsing to recognise keywords that affect indentation.  Both tools use Hardware::Vhdl::Lexer to split up source code into lexical
+tokens.
+
+=head1 AUTHOR
+
+Michael Attenborough, C<< <michaelattenborough at yahoo doht co doht uk> >>
+
+=head1 DEPENDENCIES
+
+This module requires the following modules to be available:
+
+=over 4
+
+=item Hardware::Vhdl::Lexer (version 1.0 or later)
+
+=item YAML (version 0.62 or later)
+
+=item Test::More
+
+=item File::Spec::Functions
+
+=item File::Path
+
+=item File::Temp
+
+=item File::Copy
+
+=item File::Temp
+
+=item File::Basename
+
+=item Digest::MD5
+
+=item Math::Expression
+
+=item List::Util
+
+=item Carp
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+Please report any bugs or feature requests to
+C<bug-hardware-vhdl-automake at rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Hardware-Vhdl-Automake>.
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+=head1 SUPPORT
+
+Just email me at C<< <michaelattenborough at yahoo doht co doht uk> >> - knowing that someone is interested will spur me to writing 
+further features and documentation.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2009 Michael Attenborough, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+

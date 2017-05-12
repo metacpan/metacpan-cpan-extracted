@@ -1,0 +1,18 @@
+---
+auto_fieldset: 1
+elements: 
+  - type: SimpleTable
+    headers:
+      - foo
+      - bar
+    rows: 
+      - 
+          - type: Text
+            name: foo
+          - type: Text
+            name: bar
+      - 
+          - type: Radio
+            name: foo
+          - type: Radio
+            name: bar

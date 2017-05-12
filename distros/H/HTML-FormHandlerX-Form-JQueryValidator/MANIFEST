@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+CREDITS
+t/01basic.t
+t/api.t
+t/lib/My/Form/Story.pm
+lib/HTML/FormHandlerX/Form/JQueryValidator.pm
+examples/css/jquery-validation.css
+examples/js/add_form_validation.js
+examples/perl/Story.pm
+examples/template/form.tt
+examples/template/field.tt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

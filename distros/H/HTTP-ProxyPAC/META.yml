@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               HTTP-ProxyPAC
+version:            0.31
+abstract:           use a PAC (Proxy Auto Config) file to get proxy info
+author:
+    - Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  6.52
+build_requires:
+    FindBin:     0
+    Test::More:  0.32
+requires:
+    LWP:           5.834
+    Scalar::Util:  0
+    URI:           1.3
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,51 @@
+---
+abstract: 'faster implementation of HTTP::Headers'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.9, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTTP-Headers-Fast
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  HTTP::Headers::Fast:
+    file: lib/HTTP/Headers/Fast.pm
+    version: '0.21'
+requires:
+  HTTP::Date: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/tokuhirom/HTTP-Headers-Fast/issues
+  homepage: https://github.com/tokuhirom/HTTP-Headers-Fast
+  repository: git://github.com/tokuhirom/HTTP-Headers-Fast.git
+version: '0.21'
+x_contributors:
+  - 'yappo <yappo@d0d07461-0603-4401-acd4-de1884942a52>'
+  - 'daisuke <daisuke@d0d07461-0603-4401-acd4-de1884942a52>'
+  - 'tokuhirom <tokuhirom@d0d07461-0603-4401-acd4-de1884942a52>'
+  - 'Mark Stosberg <mark@summersault.com>'
+  - 'Mark Stosberg <mark@stosberg.com>'
+  - 'Neil Bowers <neil@bowers.com>'
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+  - 'Sawyer X <xsawyerx@cpan.org>'
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
+  - 'Tatsuhiko Miyagawa <miyagawa@gmail.com>'
+  - 'Nigel Gregoire <nigelgregoire@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

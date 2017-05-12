@@ -1,0 +1,26 @@
+v0.05 20161001
+. Update requirements - Test::Base is only needed for the tests
+. Remove MYMETA.* from MANIFEST
+. No code changes
+
+v0.04 20160909
+. No code changes
+. Fix test suite which always was broken?!
+. Also distribute examples with the module
+. Upgrade Makefile.PL to latest version
+. Add META information
+
+v0.03 20071111
+- Packaging changes only, no need to upgrade
+- Added missing prerequisite Class::Accessor
+- Realized that the order of headers cannot be fixed
+  without rewriting deep parts of LWP because those
+  parts cannot be changed by containment
+  or inheritance
+
+v0.02 20051019
+- Tried to fix TODO header-order test
+- Header-order test had the wrong expected results anyway
+
+v0.01 20051018
+- The module escapes

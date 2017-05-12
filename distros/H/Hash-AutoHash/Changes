@@ -1,0 +1,66 @@
+Revision history for Hash-AutoHash
+
+1.17	2013-10-05
+	No functional changes
+	Updated depdendencies
+        Fixed boilerplate & pod tests
+
+1.16	2012-12-11
+	Fixed more deprecated syntax: defined @array deprecated in 5.16 or so
+	Fixed tests that were failing because of hash key randomization 
+	introduced in 5.16
+
+1.15	2012-09-18
+	Changed version number in helper package for consistency with other
+	AutoHash modules
+
+1.14	2012-09-02
+	INCOMPATIBLE CHANGE: no longer possible to use method notation for keys
+   	with the same names as methods inherited from UNIVERSAL (the base class 
+	of everything). These are  'can', 'isa', 'DOES', and 'VERSION'. The 
+	reason is that as of Perl 5.9.3, calling UNIVERSAL methods as functions 
+	is deprecated and developers are encouraged to use method form instead. 
+	Previous versions of AutoHash are incompatible with CPAN modules that
+	adopt this style.
+
+1.13	2012-09-01
+	Added test for version number in POD
+	Changed tests to correct errors found by CPAN testers that look like
+	'deprecated use of qw(...) as parentheses' although the actual error
+	message is 'Global symbol "$test" requires explicit package name'
+	Changes to Build.PL
+	- Removed redundant 'dist_version_from' param
+        - Added Module::Build to configure_requires
+	- Changed create_makefile_pl from deprecated 'passthrough' to 'small'
+
+1.12    2010-03-01
+	Added perl 5.8.3 as prerequisite. needed by autohash_empty and 
+	autohash_notempty when operating on a tied hash. these functions test
+	for emptiness by referencing the hash in scalar context. this doesn't
+	work in perls prior to 5.8.3. thanks to CPAN smoke testers for finding
+	this!
+
+1.11    2010-02-23
+	Minor documentation cleanup and reformatting
+
+1.10    2009-10-30
+	This should be stable release assuming CPAN testers find no problems
+        Refactored perl 5.10 dependent test code
+	Reversed order of revisions in this file
+	
+1.02	2009-10-29
+	Documentation changes only. 
+	- Changed module names AVP_Single, AVP_Multi to AVPairsSingle, AVPairsMulti
+          in SEE ALSO to better match CPAN naming style
+
+1.01	2009-10-28
+	Fixed 'make test' - bug found by CPAN testers
+	Fixed version number failure in tests on perl 5.10 - bug found by CPAN 
+	testers
+	Added DOES to special methods delegated to base class. Needed for 
+	perl 5.10, which added DOES to methods inherited from UNIVERSAL
+
+1.00    2009-10-26
+        First version, released on an unsuspecting world.
+
+

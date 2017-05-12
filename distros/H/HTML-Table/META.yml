@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                HTML-Table
+version:             2.08a
+abstract:            produces HTML tables
+license:             perl
+author:              
+    - Anthony Peacock <a.peacock@chime.ucl.ac.uk
+generated_by:        ExtUtils::MakeMaker version 6.42_01
+distribution_type:   module
+requires:     
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

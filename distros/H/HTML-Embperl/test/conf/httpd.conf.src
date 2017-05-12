@@ -1,0 +1,555 @@
+print OFH <<EOD ;
+#
+# Testconfig for HTML::Embperl make test
+#
+
+ServerRoot \"$EPPATH/test\"
+ServerName localhost
+DocumentRoot \"$EPPATH/test\"
+Port $EPPORT
+EOD
+
+if ($^O ne 'MSWin32')
+	{
+print OFH <<EOD ;
+
+User $EPUSER
+Group $EPGROUP
+
+MinSpareServers 1
+MaxSpareServers 2
+StartServers 2
+MaxClients 2
+MaxRequestsPerChild 0
+
+
+#PerlFixupHandler test::handler
+
+#PerlInitHandler Apache::Reload 
+
+#PerlInitHandler Apache::StatINC 
+
+
+EOD
+    }
+
+
+
+print OFH <<EOD ;
+
+$EPMODPERL
+
+DirectoryIndex index.htm  
+
+
+$EPSTRONGHOLDKEY
+
+#-Tw
+PerlTaintCheck On
+PerlWarn On
+
+
+
+SetEnv EMBPERL_DEBUG $EPDEBUG
+PerlSetEnv EMBPERL_DEBUG $EPDEBUG
+SetEnv EMBPERL_VIRTLOG /embperl/log
+PerlSetEnv EMBPERL_LOG \"$EPPATH/test/tmp/test.log\"
+SetEnv EMBPERL_LOG \"$EPPATH/test/tmp/test.log\"
+
+PerlSetEnv EMBPERL_SRC \"$EPPATH\"
+SetEnv EMBPERL_SRC \"$EPPATH\"
+
+EOD
+
+
+if ($^O eq 'MSWin32' && $EPMODPERLVERSION >= 1.24)
+	{ # ActiveState workarounds...
+        print OFH "SetEnv EMBPERL_OPTIONS 0\n" ;
+        print OFH "SetEnv EMBPERL_ESCMODE 3\n" ;
+        }
+
+if ($EPSESSIONXVERSION)
+    {
+    if ($^O eq 'MSWin32' && $EPMODPERLVERSION >= 1.24)
+	    { # ActiveState workarounds...
+            print OFH "SetEnv EMBPERL_SESSION_HANDLER_CLASS Apache::SessionX\n" ;
+            print OFH "PerlSetEnv EMBPERL_SESSION_HANDLER_CLASS Apache::SessionX\n" ;
+            }
+if ($EPSESSIONVERSION)
+	{
+print OFH <<EOD ;
+
+PerlSetEnv EMBPERL_SESSION_CLASS $EPSESSIONCLASS
+SetEnv EMBPERL_SESSION_CLASS $EPSESSIONCLASS
+PerlSetEnv SESSION_FILE_DIRECTORY \"$EPPATH/test/tmp\"
+PerlSetEnv SESSION_DBI_DATASOURCE $EPSESSIONDS
+
+PerlSetEnv EMBPERL_MAILDEBUG 1
+
+EOD
+	}
+
+if ($EPSESSIONVERSION && ($EPSESSIONVERSION =~ /^1\.0\d$/))
+	{
+print OFH <<EOD ;
+
+#PerlSetEnv EMBPERL_SESSION_CLASSES "MemoryStore NullLocker"
+PerlSetEnv EMBPERL_SESSION_CLASSES "FileStore NullLocker"
+PerlSetEnv EMBPERL_SESSION_ARGS "'Directory=$EPPATH/test/tmp'"
+SetEnv EMBPERL_SESSION_CLASSES "FileStore NullLocker"
+SetEnv EMBPERL_SESSION_ARGS "'Directory=$EPPATH/test/tmp'"
+EOD
+	}
+elsif ($EPSESSIONVERSION && ($EPSESSIONVERSION > 1))
+	{
+print OFH <<EOD ;
+
+PerlSetEnv EMBPERL_SESSION_CLASSES "File Null"
+PerlSetEnv EMBPERL_SESSION_ARGS "'Directory=$EPPATH/test/tmp'"
+SetEnv EMBPERL_SESSION_CLASSES "File Null"
+SetEnv EMBPERL_SESSION_ARGS "'Directory=$EPPATH/test/tmp'"
+EOD
+	}
+  }
+else
+	{
+print OFH <<EOD ;
+
+SetEnv EMBPERL_SESSION_HANDLER_CLASS "no"
+PerlSetEnv EMBPERL_SESSION_HANDLER_CLASS "no"
+EOD
+	}
+
+
+
+print OFH <<EOD ;
+
+SetEnv EMBPERL_ALLOW asc|\\.htm\$
+
+PerlScript \"$EPPATH/test/conf/$EPSTARTUP\"
+
+<Location /embperl/log>
+SetHandler perl-script
+PerlHandler HTML::Embperl
+Options ExecCGI
+</Location>
+
+ 
+AddType text/html .html
+AddType text/html .htm
+AddType text/html .xhtm
+
+Alias /embperl/uidurl/ \"$EPPATH/test/html/sidurl/\"
+
+Alias /embperl/suidurl/ \"$EPPATH/test/html/sidurl/\"
+
+Alias /embperl/sub/ \"$EPPATH/test/html/\"
+Alias /embperl/ \"$EPPATH/test/html/\"
+Alias /embperl2/ \"$EPPATH/test/html2/\"
+Alias /eg/ \"$EPPATH/eg/\"
+Alias /embperldbg/ \"$EPPATH/test/html/\"
+Alias /registrydbg/ \"$EPPATH/test/html/registry/\"
+
+<Location /embperl/sub>
+SetHandler perl-script
+PerlHandler HTML::Embperl
+Options ExecCGI
+PerlSetEnv LOC embperl_sub
+</Location>
+
+<Location /embperl>
+SetHandler perl-script
+PerlHandler HTML::Embperl
+Options ExecCGI
+PerlSetEnv LOC embperl
+</Location>
+
+<Location /embperl2>
+SetHandler perl-script
+PerlHandler HTML::Embperl
+Options ExecCGI
+PerlSetEnv LOC embperl
+</Location>
+
+<Location /embperl/safe>
+SetHandler perl-script
+PerlHandler HTML::Embperl
+Options ExecCGI
+PerlSetEnv EMBPERL_OPTIONS 4
+</Location>
+
+<Location /embperl/opmask>
+SetHandler perl-script
+PerlHandler HTML::Embperl
+Options ExecCGI
+PerlSetEnv EMBPERL_OPTIONS 12
+PerlSetEnv EMBPERL_COMPARTMENT TEST
+PerlSetEnv EMBPERL_PACKAGE TEST
+</Location>
+
+<Location /embperl/rawinput>
+SetHandler perl-script
+PerlHandler HTML::Embperl
+Options ExecCGI
+PerlSetEnv EMBPERL_OPTIONS 16
+</Location>
+
+<Location /embperl/nochdir>
+SetHandler perl-script
+PerlHandler HTML::Embperl
+Options ExecCGI
+PerlSetEnv EMBPERL_OPTIONS 384
+</Location>
+
+<Location /embperl/nph>
+SetHandler perl-script
+PerlHandler HTML::Embperl
+Options ExecCGI
+PerlSetEnv EMBPERL_OPTIONS 64
+</Location>
+
+<Location /embperl/stdout>
+SetHandler perl-script
+PerlHandler HTML::Embperl
+Options ExecCGI
+PerlSetEnv EMBPERL_OPTIONS 16400
+PerlSetEnv EMBPERL_ESCMODE 0
+PerlSetupEnv Off
+</Location>
+
+<Location /embperl/allform>
+SetHandler perl-script
+PerlHandler HTML::Embperl
+Options ExecCGI
+PerlSetEnv EMBPERL_OPTIONS 8192
+</Location>
+
+<Location /embperl/noerr>
+SetHandler perl-script
+PerlHandler HTML::Embperl
+Options ExecCGI
+PerlSetEnv EMBPERL_OPTIONS 2
+</Location>
+
+<Location /embperl/errdoc>
+SetHandler perl-script
+PerlHandler HTML::Embperl
+Options ExecCGI
+PerlSetEnv EMBPERL_OPTIONS 262144
+ErrorDocument 500 /html/errmsg.htm
+</Location>
+
+<Location /embperl/errdoc/epl>
+SetHandler perl-script
+PerlHandler HTML::Embperl
+Options ExecCGI
+PerlSetEnv EMBPERL_OPTIONS 262144
+ErrorDocument 500 /embperl/errmsg2.htm
+</Location>
+
+
+
+<Location /embperl/match>
+SetHandler perl-script
+PerlHandler HTML::Embperl
+Options ExecCGI
+PerlSetEnv EMBPERL_FILESMATCH \\.htm\$
+</Location>
+
+<Location /embperl/ifunc>
+SetHandler perl-script
+PerlHandler HTML::Embperl
+Options ExecCGI
+PerlSetEnv EMBPERL_INPUT_FUNC \"ProxyInput, /embperl/ifunc, http://localhost:$EPPORT/embperl/ifuncsrc\"
+</Location>
+
+
+<Location /embperl/ifuncsrc>
+SetHandler server-parsed
+Options +Includes
+</Location>
+
+AddType text/html .ehtml
+
+#<FilesMatch \".*\.ehtml\$\">
+#SetHandler perl-script
+#PerlHandler HTML::Embperl
+#Options ExecCGI
+#PerlSetEnv EMBPERL_INPUT_FUNC \"ProxyInput, , http://localhost:8529/src\"
+#</FilesMatch>
+
+<Location /src>
+SetHandler server-parsed
+Options +Includes
+</Location>
+
+#
+# Configuration for mod_inlcude via ProxyInput on two ports
+#
+#Listen $EPPORT
+#Listen $EPPORT2
+#
+#<VirtualHost www:$EPPORT>
+#
+#<FilesMatch \".*\\.ehtml\$\">
+#SetHandler perl-script
+#PerlHandler HTML::Embperl
+#Options ExecCGI
+#PerlSetEnv EMBPERL_INPUT_FUNC \"ProxyInput, , http://www:$EPPORT2\"
+#</FilesMatch>
+#
+#</VirtualHost>
+#
+#
+#<VirtualHost www:$EPPORT2>
+#
+#AddType text/html .ehtml
+#AddHandler server-parsed .ehtml
+#Options +Includes
+#
+#</VirtualHost>
+#
+
+<Location /embperl/ofunc>
+SetHandler perl-script
+PerlHandler HTML::Embperl
+Options ExecCGI
+PerlSetEnv EMBPERL_OUTPUT_FUNC \"LogOutput, $EPPATH/test/tmp/log.out\"
+</Location>
+
+
+Alias /cgi-bin/uidurl/ \"$EPPATH/test/html/sidurl/\"
+
+Alias /cgi-bin/suidurl/ \"$EPPATH/test/html/sidurl/\"
+
+Alias /cgi-bin/ \"$EPPATH/test/html/\"
+Alias /cgi-bin-32/ \"$EPPATH/test/html/\"
+ScriptAlias /cgi/ \"$EPPATH/\"
+
+<Location /cgi-bin>
+Action text/html /cgi/embpcgi.test.pl
+Options ExecCGI
+</Location>
+
+
+SetEnv CGIEMBPERL_OBJECT_BASE epobase.htm
+SetEnv CGIEMBPERL_OBJECT_FALLBACK epofallback.htm
+
+<Location /cgi-bin/EmbperlObject>
+Action text/html /cgi/epocgi.test.pl
+Options ExecCGI
+</Location>
+
+
+<Location /cgi-bin-32>
+Action text/html /cgi/embpcgi.test.bat
+Options ExecCGI
+</Location>
+
+<Location /perl/perl-status>
+SetHandler perl-script
+PerlHandler Apache::Status
+</Location>
+
+<Location /embperl/registry>
+SetHandler perl-script
+PerlHandler Apache::Registry
+Options ExecCGI
+</Location>
+
+#<Location /registrydbg/>
+#PerlFixupHandler Apache::DB
+#SetHandler perl-script
+#PerlHandler Apache::Registry
+#Options ExecCGI
+#</Location>
+#
+#<Location /embperldbg/>
+#PerlFixupHandler Apache::DB
+#SetHandler perl-script
+#PerlHandler HTML::Embperl
+#Options ExecCGI
+#</Location>
+
+
+
+<Location /embperl/EmbperlObject/base3>
+PerlSetEnv EMBPERL_OBJECT_BASE epobase3.htm
+PerlSetEnv EMBPERL_OBJECT_STOPDIR \"$EPPATH/test/html/EmbperlObject\"
+PerlSetEnv EMBPERL_OBJECT_ADDPATH \"$EPPATH/test/html/EmbperlObject/lib\"
+PerlSetEnv EMBPERL_OBJECT_FALLBACK epofallback.htm
+PerlSetEnv EMBPERL_FILESMATCH \"\\.htm.?\$|\\.epl\$\"
+SetHandler perl-script
+PerlHandler HTML::EmbperlObject 
+Options ExecCGI
+</Location>
+
+<Location /embperl/EmbperlObject/base2>
+PerlSetEnv EMBPERL_OBJECT_BASE epobase2.htm
+PerlSetEnv EMBPERL_OBJECT_STOPDIR \"$EPPATH/test/html/EmbperlObject\"
+PerlSetEnv EMBPERL_OBJECT_ADDPATH \"$EPPATH/test/html/EmbperlObject/lib\"
+PerlSetEnv EMBPERL_OBJECT_FALLBACK epofallback.htm
+PerlSetEnv EMBPERL_FILESMATCH \"\\.htm.?\$|\\.epl\$\"
+SetHandler perl-script
+PerlHandler HTML::EmbperlObject 
+Options ExecCGI
+</Location>
+
+<Location /embperl/EmbperlObject>
+PerlSetEnv EMBPERL_OBJECT_BASE epobase.htm
+PerlSetEnv EMBPERL_OBJECT_FALLBACK epofallback.htm
+PerlSetEnv EMBPERL_FILESMATCH \"\\.htm.?\$|\\.epl\$\"
+SetHandler perl-script
+PerlHandler HTML::EmbperlObject 
+Options ExecCGI
+</Location>
+
+
+<Location /embperl/SSI/>
+PerlSetEnv EMBPERL_SYNTAX SSI
+</Location>
+
+<Location /embperl/SSIEP/>
+PerlSetEnv EMBPERL_SYNTAX "Embperl SSI"
+</Location>
+
+<Location /eg>
+SetHandler perl-script
+PerlHandler HTML::Embperl
+Options ExecCGI
+</Location>
+
+<Location /mp>
+SetHandler perl-script
+PerlHandler "sub { print 'Hello' }"
+Options ExecCGI
+</Location>
+
+ErrorLog tmp/httpd.err.log
+PidFile tmp/httpd.pid
+AccessConfig conf/null
+ResourceConfig conf/null
+TypesConfig conf/null
+#TransferLog $EPNULL
+#ScoreBoardFile $EPNULL
+LockFile tmp/httpd.lock
+
+<IfModule apache_ssl.c>
+SSLDisable
+SSLCacheServerPort gcache_port
+SSLCacheServerPath \"$EPAPACHESRC/modules/ssl/gcache\"
+</IfModule>
+
+
+EOD
+
+if (!$EPSTRONGHOLDKEY && $EPSSLDISABLE)
+    {
+print OFH <<EOD ;
+<IfModule mod_ssl.c>
+SSLDisable
+SSLCacheServerPort $EPPORT2
+SSLCacheServerPath tmp
+</IfModule>
+EOD
+    }
+
+if ($EPSESSIONVERSION)
+
+	{
+
+print OFH <<EOD ;
+
+
+
+
+
+<Location /embperl/sidurl>
+
+SetHandler perl-script
+
+PerlHandler HTML::Embperl
+
+Options ExecCGI
+
+PerlSetEnv EMBPERL_OPTIONS 0x6000000
+
+</Location>
+
+
+
+<Location /embperl/uidurl>
+
+SetHandler perl-script
+
+PerlHandler HTML::Embperl
+
+Options ExecCGI
+
+PerlSetEnv EMBPERL_OPTIONS 0x5000000
+
+</Location>
+
+
+
+<Location /embperl/suidurl>
+
+SetHandler perl-script
+
+PerlHandler HTML::Embperl
+
+Options ExecCGI
+
+PerlSetEnv EMBPERL_OPTIONS 0x7000000
+
+</Location>
+
+
+
+
+
+
+
+EOD
+
+
+
+       }
+
+
+
+
+print OFH <<EOD ;
+<IfModule mod_jserv.c>
+ApJServManual on
+ApJServSecretKey DISABLED
+ApJServLogFile /dev/null
+</IfModule>
+EOD
+
+print OFH <<EOD ;
+
+<Location /embperl/hw>
+SetHandler perl-script
+PerlHandler HTML::Embperl
+Options ExecCGI
+PerlSetEnv EMBPERL_OPTIONS 8083
+PerlSetEnv EMBPERL_DEBUG 0
+</Location>
+
+<Location /embperl/asp>
+SetHandler perl-script
+PerlHandler Apache::ASP
+PerlSetVar Global  \"$EPPATH/test/tmp\"
+PerlSetVar Debug  0
+PerlSetVar CookiePath  /
+PerlSetVar NoState 1
+PerlSetVar StatScripts 0
+#PerlSetVar DynamicIncludes 1
+#PerlSetVar SessionTimeout  .5
+#PerlSetVar AllowSessionState  1 
+</Location>
+
+
+EOD
+

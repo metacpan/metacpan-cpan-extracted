@@ -1,0 +1,108 @@
+
+=head1 NAME
+
+HTML::DOM::Element::TextArea - A Perl class for representing 'textarea' elements in an HTML DOM tree
+
+=head1 VERSION
+
+Version 0.054
+
+=head1 SYNOPSIS
+
+  use HTML::DOM;
+  $doc = HTML::DOM->new;
+  $elem = $doc->createElement('textarea');
+
+  $elem->focus();
+  $elem->blur();
+  # etc.
+
+  $elem->value('some text') # set attribute
+  $elem->rows;              # get attribute
+  $elem->tagName;
+  # etc.
+
+=head1 DESCRIPTION
+
+This class implements 'textarea' elements in an HTML::DOM tree. It 
+implements the HTMLTextAreaElement DOM interface and inherits from 
+L<HTML::DOM::Element> (q.v.).
+
+=head1 METHODS
+
+In addition to those inherited from HTML::DOM::Element and its 
+superclasses, this class implements the following DOM methods:
+
+=over 4
+
+=item accessKey
+
+=item cols
+
+=item disabled
+
+=item name
+
+=item readOnly
+
+=item rows
+
+=item tabIndex
+
+Each of these returns the corresponding HTML attribute. If you 
+pass an
+argument, it will become the new value of the attribute, and the old value
+will be returned.
+
+=item defaultValue
+
+Returns the text content of the element. B<This currently does not work if
+the 'textarea' element has more than one child>.
+
+=item form
+
+Returns the form containing this input element.
+
+=item type
+
+Returns the string 'textarea'.
+
+=item value
+
+This method allows one to change the current value of the input field. The 
+change 
+is not reflected in the HTML tree. This will be called with the 
+value of C<defaultValue> when the form's C<reset> method is invoked.
+
+=item blur
+
+=item focus
+
+=item select
+
+Each of these triggers the corresponding event.
+
+=back
+
+In addition, the following methods are provided for compatibility with 
+L<WWW::Mechanize>:
+
+=over 4
+
+=item possible_values
+
+This returns an empty list.
+
+=item form_name_value
+
+Returns a list of two items: (0) the name of the field and (1) the value.
+
+=back
+
+=head1 SEE ALSO
+
+L<HTML::DOM>
+
+L<HTML::DOM::Element>
+
+L<HTML::DOM::Element::Form>

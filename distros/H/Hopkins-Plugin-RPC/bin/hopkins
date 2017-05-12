@@ -1,0 +1,144 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+=head1 NAME
+
+hopkins - control script
+
+=head1 DESCRIPTION
+
+this script is a command-line interface to hopkins.  this
+control script communicates with a running hopkins instance
+via the SOAP RPC session that the hopkins daemon exposes.
+
+=head1 SYNOPSIS
+
+    $ hopkins status
+    $ hopkins enqueue <task name> [ -o opt1=val1 -o opt1=val2 -o opt2=val3 ... ]
+    $ hopkins queue start <queue name>
+    $ hopkins queue stop <queue name>
+
+=cut
+
+use Getopt::Attribute;
+use Getopt::Long qw(GetOptionsFromArray :config pass_through);
+use Pod::Usage;
+use String::Escape qw(string2list list2string);
+use SOAP::Lite;
+use Term::ReadLine;
+use YAML 'Dump';
+
+our $host : Getopt(host=s localhost);
+our $port : Getopt(port=i 8080);
+
+my $soap	= SOAP::Lite->uri("http://$host:$port");
+my $proxy	= $soap->proxy("http://$host:$port?session=rpc");
+
+if (scalar @ARGV == 0) {
+	my $term	= new Term::ReadLine 'hopkins';
+	my $history	= ((getpwuid($<))[7]) . '/.hopkins_history';
+
+	if ($term->can('ReadHistory')) {
+		$term->ReadHistory($history);
+	} else {
+		print "hopkins: install Term::ReadLine::Gnu for history file support\n";
+	}
+
+	while (defined(my $line = $term->readline('hopkins> '))) {
+		my @args	= string2list($line);
+		my $action	= shift @args;
+
+		$term->addhistory($line);
+
+		handle_request($action, @args);
+	}
+
+	print "\n";
+} else {
+	handle_request(shift, @ARGV);
+}
+
+sub handle_request
+{
+	my @action	= ();
+	my $ref		= undef;
+
+	do {
+		push @action, shift;
+		$ref = handler($action[$#action], $ref);
+	} while ($ref && ref($ref) ne 'CODE');
+
+	if ($ref) {
+		my $response	= $ref->(@_);
+		my $result		= $response->result;
+
+		print Dump($result);
+	} else {
+		my $action	= join ' ', @action;
+		my $message	= "hopkins: unhandled request for '$action'\n";
+
+		pod2usage({ -message => $message });
+	}
+}
+
+sub handler
+{
+	my $name = shift;
+
+	my $ref	= shift ||
+	{
+		status	=> sub { return $proxy->status },
+		enqueue	=> \&hopkins_enqueue,
+		queue	=>
+		{
+			start		=> sub { return $proxy->queue_start(shift) },
+			halt		=> sub { return $proxy->queue_halt(shift) },
+			continue	=> sub { return $proxy->queue_continue(shift) },
+			freeze		=> sub { return $proxy->queue_freeze(shift) },
+			thaw		=> sub { return $proxy->queue_thaw(shift) },
+			shutdown	=> sub { return $proxy->queue_shutdown(shift) },
+			flush		=> sub { return $proxy->queue_flush(shift) }
+		}
+	};
+
+	return $ref->{$name};
+}
+
+sub hopkins_status
+{
+	return $proxy->status();
+}
+
+sub hopkins_enqueue
+{
+	my $job = shift;
+	my $opts = {};
+
+	if (not defined $job) {
+		print "usage: enqueue <task name> [ option1=value1 option2=value2 ... ]\n";
+		return;
+	}
+
+	my @def = ( 'o=s%' => sub { push @{ $opts->{$_[1]} }, $_[2] } );
+	my $res = GetOptionsFromArray(\@_, @def);
+
+	foreach my $key (keys %$opts) {
+		$opts->{$key} = $opts->{$key}->[0] if scalar @{ $opts->{$key} } == 1;
+	}
+
+	return $proxy->enqueue($job, $opts);
+}
+
+=head1 AUTHOR
+
+Mike Eldridge <diz@cpan.org>
+
+=head1 LICENSE
+
+This program is free software; you may redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=cut
+

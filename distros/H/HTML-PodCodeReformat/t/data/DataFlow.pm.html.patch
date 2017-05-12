@@ -1,0 +1,48 @@
+@@ -103,23 +103,23 @@
+ name="SYNOPSIS"
+ >SYNOPSIS <img alt='^' src='http://st.pimg.net/tucs/img/up.gif'></a></h1>
+ 
+-<pre class="sh_perl">        use DataFlow::Node;
+-        use DataFlow::Chain;
++<pre class="sh_perl">use DataFlow::Node;
++use DataFlow::Chain;
+ 
+-        my $chain = DataFlow::Chain-&#62;new(
+-                DataFlow::Node-&#62;new(
+-                        process_item =&#62; sub {
+-                                ... do something
+-                        }
+-                ),
+-                DataFlow::Node-&#62;new(
+-                        process_item =&#62; sub {
+-                                ... do something else
+-                        }
+-                ),
+-        );
++my $chain = DataFlow::Chain-&#62;new(
++        DataFlow::Node-&#62;new(
++                process_item =&#62; sub {
++                        ... do something
++                }
++        ),
++        DataFlow::Node-&#62;new(
++                process_item =&#62; sub {
++                        ... do something else
++                }
++        ),
++);
+ 
+-        my $output = $chain-&#62;process($input);</pre>
++my $output = $chain-&#62;process($input);</pre>
+ 
+ <h1><a class='u' href='#___top' title='click to go to top of document'
+ name="DESCRIPTION"
+@@ -163,7 +163,7 @@
+ 
+ <p>You can find documentation for this module with the perldoc command.</p>
+ 
+-<pre class="sh_perl">  perldoc DataFlow</pre>
++<pre class="sh_perl">perldoc DataFlow</pre>
+ 
+ <h2><a class='u' href='#___top' title='click to go to top of document'
+ name="Websites"

@@ -1,0 +1,13 @@
+Revision history for HTML-Acid
+
+0.0.3  Mon 7th March 2011
+       Restructured code so that an element can have a choice of parents.      
+       Changed from Test::CheckChanges to Test::ConsistentVersion
+
+0.0.2  Thu 7th October 2010
+       Upped dependency on Test::Simple to fix certain subtest failures
+       Reviewed documentation
+
+0.0.1  Sun Sep 26 18:01:02 2010
+       Initial release.
+

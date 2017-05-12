@@ -1,0 +1,286 @@
+NAME
+    HTML::PhotoAlbum - Create web photo albums and slideshows
+
+SYNOPSIS
+        use HTML::PhotoAlbum;
+
+        # Create a new album object, specifying the albums we have
+
+        my $album = HTML::PhotoAlbum->new(
+                          albums => {
+                             sf_trip => 'San Francisco Trip',
+                             sjc_vac => 'San Jose Vacation',
+                             puppy_1 => 'Puppy - First Week',
+                             puppy_2 => 'Puppy - Second Week'
+                          }
+                    );
+
+        # By using the "selected" method, we can change what each one
+        # looks like. However, note these if statements are optional!
+
+        if ($album->selected eq 'sf_trip') {
+            print $album->render(
+                             header => 1,
+                             eachrow => 3,
+                             eachpage => 12
+                          );
+        } elsif ($album->selected eq 'sjc_vac') {
+            print $album->render(
+                             header => 1,
+                             eachrow => 5,
+                             eachpage => 20,
+                             font_face => 'times'
+                             body_bgcolor => 'silver',
+                          );
+        } else {
+            # Standard album just uses the defaults
+            # You can leave out the if's above and just use this
+            print $album->render(header => 1);
+        }
+
+REQUIREMENTS
+    This module requires CGI::FormBuilder 3.0 or later.
+
+DESCRIPTION
+    Admittedly a somewhat special-purpose module, this is designed to
+    dynamically create and display a photo album. Actually, it manages
+    multiple photo albums, each of which can be independently formatted and
+    navigated.
+
+    Basic usage of this module amounts to the examples shown above. This
+    module supports table-based thumbnail pages, auto-pagination, and
+    slideshows. The HTML produced is fully-customizable. It should be all
+    you need for creating online photo albums (besides the pictures, of
+    course).
+
+    The directory structure of a basic album looks like this:
+
+        albums/
+            index.cgi           (your script)
+            hawaii_trip/
+                captions.txt    (optional)
+                intro.html      (optional)
+                image001.jpg 
+                image001.sm.jpg 
+                image002.gif
+                image002-mini.jpg
+                pict0003.jpeg
+                pict0003.sm.png
+                dsc00004.png
+                dsc00004.thumb.gif
+            xmas_2001/
+                captions.txt
+                pic0001.jpg
+                pic0001.sm.jpg
+                pic0002.jpg
+                pic0002.sm.jpg
+                pic0004.png
+                pic0004.mini.png
+
+    You'll probably end up choosing just one naming scheme for your images,
+    but the point is that "HTML::PhotoAlbum" is flexible enough to handle
+    all of them or any combination thereof. What happens is that the module
+    looks in the dir that you specify and does an ASCII sort on the files.
+    Anything that looks like a valid web image (ends in ".jpe?g", ".gif", or
+    ".png") will be indexed and displayed. Then, it does basenames on the
+    images and looks for their thumbnails, if present. If there are no
+    thumbnails you get a generic link that says "Image 4" or whatever.
+
+    An optional "captions.txt" file can be included in the directory as
+    well. If this file is present, you can specify captions that will be
+    placed beneath each of the images. For example:
+
+        # Sample captions.txt file
+        image001    Us atop Haleakala
+        image002    Sunset from Maui
+        pict0003    Hiking on Kauai
+        dsc00004    Snorkeling on Hawaii
+
+    Also, if the optional "intro.html" file is present in the directory,
+    then that will be shown as the first page, with a link at the bottom
+    that says "See the Pictures". This allows you to put introductory HTML
+    to tell about your photos. You can put any HTML you want into this file.
+
+    This module attempts to give you a lot of fine-grained control over
+    image placement and layout while still keeping it simple. You should be
+    able to place images and cells in tables fairly precisely.
+
+FUNCTIONS
+  new(opt => val, opt => val)
+    Create a new "HTML::PhotoAlbum" object. Typically, the only option you
+    need to specify is the "albums" option, which tells this module which
+    albums you're going to allow indexing:
+
+        my $album = HTML::PhotoAlbum->new(
+                          albums => {
+                               dir1 => "My First Album",
+                               dir2 => "My Second Album"
+                          }
+                    );
+
+    The "new()" method accepts the following options:
+
+    albums => { dir => 'Title', dir => 'Title' }
+        This accepts a hashref holding subdir and title pairs. Each of the
+        subdirs must live beneath "." (or whatever you set "dir" to below).
+        The title is what will be displayed as the album title both in the
+        thumbnails page as well as the navigation bar.
+
+        You can also specify a filename, in which case it will be read for
+        the names of the albums. The format is the same as the
+        "captions.txt" file:
+
+            # Sample albums.txt file
+            sf_trip     San Francisco Trip
+            sjc_vac     San Jose Vacation
+
+        You would then use this like so:
+
+            my $album = HTML::PhotoAlbum->new(albums => 'albums.txt');
+
+        If you have a lot of albums, this will allow less code maintenance
+        in the long run.
+
+    dir => $path
+        The directory holding the images. This defaults to ".", meaning it
+        assumes your CGI script lives at the top level of your albums
+        directory (as shown above). If you mess with this, you must
+        understand that this directory must be visible from the web as a
+        URL. It is recommended that you don't mess with this.
+
+  render(opt => val, opt => val)
+    The "render()" method is responsible for formatting the HTML for the
+    actual pages. It returns a string, which can then be printed out like
+    so:
+
+        print $album->render(header => 1);
+
+    This method takes a number of options which allow you to tweak the
+    formatting of the HTML produced:
+
+    eachrow => $num
+        The number of images to put in each row of the thumbnail page.
+        Defaults to 4.
+
+    eachpage => $num
+        The number of images to display on each thumbnail page. Defaults to
+        16. This should be a multiple of "eachrow", but doesn't have to be.
+
+    header => 1 | 0
+        If set to 1, a "Content-type" header and HTML title will be printed
+        out, meaning you don't have to do this yourself. Defaults to 0.
+
+    navwrap => 1 | 0
+        If set to 1, the navigation bar will wrap from last page to the
+        first for both thumbnails and full-size images. Defaults to 0.
+
+    navfull => 1 | 0
+        If set to 0, then a navigation page will *not* be created for the
+        full-size images. Instead, the thumbnail pages will link to the
+        full-size images directly.
+
+    linktext => $string
+        Printed out followed by a number if no thumbnail is found. Defaults
+        to "Image".
+
+    nexttext => $string
+        The text for the "next page" link. Defaults to "Next". Note you can
+        do snazzy navigation by doing something tricky like this:
+
+            nexttext => "<img src=/images/next.gif>"
+
+        But don't tell anyone I said that.
+
+    prevtext => $string
+        The text for the "previous page" link. Defaults to "Prev".
+
+    In addition, you can specify tags for any HTML element in one of two
+    ways. This is stolen directly from HTML::QuickTable. First, you can
+    specify them as "tag_attr", for example:
+
+        body_alink => 'silver'      # <body alink="silver">
+
+        td_bgcolor => 'white'       # <td bgcolor="white">
+
+        font_face  => 'arial',      # <font face="arial" size="3">
+        font_size  => '3'
+
+    Or, you can point the tag name to an attr hashref. These would have the
+    same effect as the above:
+
+        body => { alink => 'silver' }
+
+        td => { bgcolor => 'white' }
+
+        font => { face => 'arial', size => 3 }
+
+    These tags will then be changed appropriately in the HTML, allowing you
+    to completely manipulate what the HTML that is printed out looks like.
+    Several of these options are set by default to make the standard HTML
+    look as nice as possible.
+
+  selected
+    This returns the name of the selected album, allowing you to
+    conditionally change its layout:
+
+        if ($album->selected eq 'sf_trip') { ... }
+
+    If no album is selected, this will return undef.
+
+EXAMPLE
+    Here's a simple photo album script that I use to manage my albums. Note
+    that it dynamically builds a list of the albums from a file in the
+    top-level albums directory, since I have a lot of albums.
+
+        #!/usr/bin/perl -w
+
+        use HTML::PhotoAlbum;
+
+        my $album = HTML::PhotoAlbum->new(
+                          albums => 'albums.txt',
+                          nexttext => '&gt;&gt;',   # >>
+                          prevtext => '&lt;&lt;',   # <<
+                          font_color => 'white',
+                          body => {
+                               bgcolor => 'black',
+                               link  => 'orange',
+                               alink => 'silver',
+                               vlink => 'gray',
+                          },
+                          table_width => '95%'
+                    );
+
+        if ($album->selected eq 'sf_trip') {
+            # Larger images in this album
+            print $album->render(header  => 1, table_width => '100%',
+                                 eachrow => 3, eachpage => 9);
+        } else {
+            # All other albums standard
+            print $album->render(header => 1, table_width => '100%');
+        }
+
+    If you put this script in "~/public_html/albums", then people would
+    access your photo albums via "http://yourserver/~yourname/albums". Easy
+    enough.
+
+NOTES
+    On an error condition, a 404 Not Found page will be printed in the
+    browser. If the error is suspected to be the programmer's fault, a
+    message will be printed to the error_log. Some errors are not logged
+    because they can be triggered by users trying to screw around
+    (specifying a large page number or image number, for example).
+
+    There are a number of other photo albums on CPAN that are worth looking
+    at, and the PHP "Gallery" alternative is nice too (albeit SLOW).
+
+VERSION
+    $Id: PhotoAlbum.pm,v 1.20 2005/07/13 20:48:42 nwiger Exp $
+
+AUTHOR
+    Copyright (c) 2000-2005, Nathan Wiger, <nate@wiger.org>. All Rights
+    Reserved.
+
+    This module is free software; you may copy this under the terms of the
+    GNU General Public License, or the Artistic License, copies of which
+    should have accompanied your Perl kit.
+

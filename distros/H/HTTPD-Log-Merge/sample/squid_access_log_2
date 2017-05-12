@@ -1,0 +1,10 @@
+992829308.575 29 212.158.80.11 TCP_CLIENT_REFRESH/200 1705 GET http://itn.co.uk/media/news_ticker/ticker_text.txt - DIRECT/192.168.1.2 text/plain
+992829309.445 30 217.32.158.23 TCP_MISS/200 1705 GET http://itn.co.uk/media/news_ticker/ticker_text.txt - DIRECT/192.168.1.2 text/plain
+992829310.785 29 212.158.80.11 TCP_CLIENT_REFRESH/200 1704 GET http://itn.co.uk/media/news_ticker/ticker_text.txt - DIRECT/192.168.1.2 text/plain
+992829313.709 4 132.185.132.12 TCP_CLIENT_REFRESH/304 249 GET http://www.itn.co.uk/images/background.gif - DIRECT/192.168.1.2 image/gif
+992829314.100 4 62.189.94.193 TCP_IMS_MISS/304 247 GET http://www.itn.co.uk/images/spacer.gif - DIRECT/192.168.1.2 image/gif
+992829317.011 3 132.185.132.12 TCP_CLIENT_REFRESH/304 247 GET http://www.itn.co.uk/images/nav_archive_NEW.GIF - DIRECT/192.168.1.2 image/gif
+992829317.168 3 216.35.116.91 TCP_MISS/200 312 GET http://www3.itn.co.uk/robots.txt - DIRECT/192.168.1.2 text/plain
+992829317.733 4 132.185.132.12 TCP_CLIENT_REFRESH/304 248 GET http://www.itn.co.uk/news/20010617/pics/winning_mini.jpg - DIRECT/192.168.1.2 image/jpeg
+992829318.204 3 132.185.132.12 TCP_CLIENT_REFRESH/304 246 GET http://www.itn.co.uk/images/pixel_clear.gif - DIRECT/192.168.1.2 image/gif
+992829318.252 3 132.185.132.12 TCP_CLIENT_REFRESH/304 246 GET http://www.itn.co.uk/images/menu_arrow_off.gif - DIRECT/192.168.1.2 image/gif

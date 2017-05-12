@@ -1,0 +1,59 @@
+Release history for Perl module HTML::Diff
+
+0.60 2015-10-30 NEILB
+    - meta-spec was set to '2.0' in Makefile.PL, which was causing
+      CPAN Testers Unknowns on Strawberry Perl.
+
+0.59 2015-10-29 NEILB
+    - Updated github repo URL after changing my github username
+
+0.58 2014-03-27
+    - Makefile.PL: bugtracker wasn't being specified right in META_MERGE
+    - Added XML::Diff to SEE ALSO
+
+0.57 2014-03-26
+    - Module now uses warnings
+    - Added license to pod and to metadata
+    - Min perl version 5.6.0
+    - Added github repo to metadata and pod
+    - Fixed up pod to have a conventional abstract
+    - Reformatted this file as per CPAN::Changes::Spec
+    - Added TEST_REQUIRES and CONFIGURE_REQUIRES to Makefile.PL
+    - Makefile.PL get version from module source
+
+0.561 2006-11-07
+    - Unknown content
+
+0.56 2006-11-06
+    - In build process, fixed dependency check for prerequisite
+      Algorithm::Diff (#7340).
+    - Produce correct output when a diff chunk is precisely '0'
+      (#6756).
+    - Install the htmldiff tool into your bin directory on make 
+      install (#7341).
+    - Fixed some bugs where html_word_diff gave the wrong flag for a
+      chunk (e.g. ['+', 'b', 'b c']).
+
+0.55 2004-04-28
+    - Fixed a problem where some "same" chunks were considered
+      "different."  This occured if you had container tags that used
+      uppercase letters.
+    - First element of result always contained a 'different' chunk
+      between undef values. It's now suppressed.
+
+0.54 2003-06-15
+    - Following XTHML spec, added all the "single" (unclosable) tags, such
+      as IMG, BASE, LINK, etc. to the list of such tags used by the module.
+    - Converted this list into an exposed package variable, so that 
+      push @HTML::Diff::UNBALANCED_TAGS, $new_tag_name allows you to modify
+      the list of "single" tags.
+
+0.52 2003-04-17
+    - Switched to Makefile.PL, thereby fixing broken tests.
+
+0.51 2003-04-16
+    - Added htmldiff script contributed by Maurice Aubrey.
+
+0.5 2003-03-31
+    - Initial release
+

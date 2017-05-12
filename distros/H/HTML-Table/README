@@ -1,0 +1,51 @@
+NAME
+    HTML::Table - Create HTML tables using simple interface
+
+INSTALL
+    In order to install and use this package you will need Perl version
+    5.002 or better.  Installation as usual:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+DESCRIPTION
+    HTML::Table is used to generate HTML tables for
+    CGI scripts.  By using the methods provided fairly
+    complex tables can be created, manipulated, then printed
+    from Perl scripts.  The module also greatly simplifies
+    creating tables within tables from Perl.  It is possible
+    to create an entire table using the methods provided and
+    never use an HTML tag.
+
+    HTML::Table also allows for creating dynamically sized
+    tables via its addRow and addCol methods.  These methods
+    automatically resize the table if passed more cell values
+    than will fit in the current table grid.
+
+    Methods are provided for nearly all valid table, row, and
+    cell tags specified for HTML 3.0.
+
+HISTORY
+    This module was originally created in 1997 by Stacy Lacy and whose last 
+	version was uploaded to CPAN in 1998.  The module was adopted in July 2000 
+	by Anthony Peacock in order to distribute a revised version.  This adoption 
+	took place without the explicit consent of Stacy Lacy as it proved impossible 
+	to contact them at the time.  Explicit consent for the adoption has since been 
+	received.
+
+AUTHOR
+    Anthony Peacock, a.peacock@chime.ucl.ac.uk
+    Stacy Lacy (Original author)
+    
+    See the Changes file for a full listing of those authors who have 
+    contributed patches.
+
+COPYRIGHT
+    Copyright (c) 1998-2007 Anthony Peacock, CHIME.
+    Copyright (c) 1997 Stacy Lacy
+
+    This library is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+

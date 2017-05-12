@@ -1,0 +1,9 @@
+<html>
+<head>
+<title><CONTENT_VAR NAME="Title"></title>
+</head>
+There are <CONTENT_VAR NAME="/Page/DATA/users/ROWCOUNT"> Users:<br><br>
+<CONTENT_LOOP NAME="/Page/DATA/users/ROW">
+    Username: <CONTENT_VAR NAME="User">
+</CONTENT_LOOP>
+</html>

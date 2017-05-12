@@ -1,0 +1,14 @@
+<HTML><BODY>
+<H1> test_if7</H1>
+we test elsif here.
+test 1
+ VAR2 var2 defined (TRUE)
+end if test 1.
+
+test 2
+  var4 undefined (TRUE)
+end if test 2.
+
+
+<H1> END test_if7 </H1>
+</body></html>

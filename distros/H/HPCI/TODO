@@ -1,0 +1,22 @@
+Short term:
+
+- add pod docs to ModuleLoad
+
+- add pod docs about resources_required
+
+- module load
+    - option to get modules from $ENV{LOADEDMODULES}
+      - instead of user-provided list
+
+- add stage param extra_submit_args
+  - make -extra_sge_args_string a synonym
+
+Medium term:
+
+- write a porting guide for driver writers
+
+- design interface for file transport
+  - send input files, return output files
+  - needed for cluster
+
+- write a 'driver' to display ordering from stage pre_req/dep info

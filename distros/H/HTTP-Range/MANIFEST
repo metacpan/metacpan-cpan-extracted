@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+Todo
+lib/HTTP/Range.pm
+lib/HTTP/Range.pod
+scripts/get.pl
+t/01_load.t
+t/02_split.t
+t/03_join.t
+t/99_pod.t

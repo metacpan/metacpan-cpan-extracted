@@ -1,0 +1,78 @@
+==== version history of Hash::Case
+All change made by Mark Overmeer.
+
+version 1.02: Fri Mar  9 09:24:30 CET 2012
+
+	Fixes:
+
+	- typo in docs.  rt.cpan.org#75630 [Florian Schlich]
+
+	- remove unused nested Makefile.PL
+	  rt.cpan.org#75630 [Florian Schlich]
+
+version 1.01: Mon Feb 15 10:21:42 CET 2010
+
+	Fixes:
+
+	- do not use /bin/pwd in t/pod.t
+
+	Improvements:
+
+	- use Log::Report for error handling.
+
+version 1.006: Thu Jun 19 08:40:46 CEST 2008
+
+	- perl5.005 does not understand "use 5.6.0" and tie bug in 5.6.2.
+	  So require 5.008 [cpantesters]
+
+version 1.005: Wed Jun 18 09:02:28 CEST 2008
+
+	- require perl 5.6.0 [cpantesters]
+
+	- minor distribution clean-ups
+
+version 1.004: Fri Jun  8 15:37:31 CEST 2007
+
+	- fixed 2 typo's in POD (Thanks to CPANTS)
+
+	- add t/pod.t
+
+	- use oodist to create docs.
+
+version 1.003: Mon Oct 27 07:58:44 CET 2003
+
+	- Added methods addPairs() and addHashData() to initialize a
+	  hash with values.
+
+	- Use Test::More i.s.o. Test
+
+	- Move pm files to a new lib/ directory
+
+	- Copyrights also in 2003
+
+version 1.002: Fri Aug  2 16:48:23 CEST 2002
+
+	- Changed my e-mail address to mark@overmeer.net
+
+	- Added Hash::Case::init() as dummy.
+
+	- Some configuration problems fixed.
+
+	- An array passed as initializer for the hash was cleaned in
+	  the process, which is not nice, of course.
+	  Reported by [Jenda Krynicky]
+
+version 1.001: Sat Jun 15 13:29:55 CEST 2002
+
+	This code is fully tested, and too simple to be true, so I release
+	it without hesitation as stable.
+
+	- Initial implementation of Hash::Case
+
+	- Initial implementation of Hash::Case::Lower, tests in t/10lower.t
+
+	- Initial implementation of Hash::Case::Upper, tests in t/20upper.t
+
+	- Initial implementation of Hash::Case::Preserve, tests in t/30pres1.t
+
+	- Initial implementation of Hash::Case::Preserve, tests in t/31pres2.t

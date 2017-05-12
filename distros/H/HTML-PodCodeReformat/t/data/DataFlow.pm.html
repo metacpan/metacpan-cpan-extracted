@@ -1,0 +1,304 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+ <head>
+  <link rel="stylesheet" href="http://st.pimg.net/tucs/style.css" type="text/css" />
+  <link rel="stylesheet" href="http://st.pimg.net/tucs/shjs/sh_cpan.css" type="text/css" />
+
+<link rel="stylesheet" href="http://st.pimg.net/tucs/print.css" type="text/css" media="print" />
+  <link rel="alternate" type="application/rss+xml" title="RSS 1.0" href="http://search.cpan.org/uploads.rdf" />
+  <link rel="search" href="http://st.pimg.net/tucs/opensearch.xml" type="application/opensearchdescription+xml" title="SearchCPAN" />
+  <title>&#68;&#97;&#116;&#97;&#70;&#108;&#111;&#119; - search.cpan.org</title>
+ <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-3528438-1']);
+    _gaq.push(["_setCustomVar",2,"Distribution","DataFlow",3]);
+    _gaq.push(["_setCustomVar",5,"Release","DataFlow-0.91.08",3]);
+    _gaq.push(["_setCustomVar",3,"Module","DataFlow",3]);
+    _gaq.push(["_setCustomVar",1,"Author","RUSSOZ",3]);
+    _gaq.push(['_trackPageview']);
+  </script>
+ </head>
+ <body id="cpansearch">
+<center><div class="logo"><a href="/"><img src="http://st.pimg.net/tucs/img/cpan_banner.png" alt="CPAN"></a></div></center>
+<div class="menubar">
+ <a href="/">Home</a>
+&middot; <a href="/author/">Authors</a>
+&middot; <a href="/recent">Recent</a>
+&middot; <a href="http://log.perl.org/cpansearch/">News</a>
+&middot; <a href="/mirror">Mirrors</a>
+&middot; <a href="/faq.html">FAQ</a>
+&middot; <a href="/feedback">Feedback</a>
+</div>
+<form method="get" action="/search" name="f" class="searchbox">
+<input type="text" name="query" value="" size="35">
+<br>in <select name="mode">
+ <option value="all">All</option>
+ <option value="module" >Modules</option>
+ <option value="dist" >Distributions</option>
+ <option value="author" >Authors</option>
+</select>&nbsp;<input type="submit" value="CPAN Search">
+</form>
+
+
+ <a name="_top"></a>
+  <div class=path>
+<div id=permalink class="noprint"><a href="/perldoc?DataFlow">permalink</a></div>
+  <a href="/~russoz/">&#65;&#108;&#101;&#120;&#101;&#105; &#90;&#110;&#97;&#109;&#101;&#110;&#115;&#107;&#121;</a> &gt;
+  <a href="/~russoz/DataFlow-0.91.08/">&#68;&#97;&#116;&#97;&#70;&#108;&#111;&#119;-0.91.08</a> &gt;
+  &#68;&#97;&#116;&#97;&#70;&#108;&#111;&#119;
+ </div>
+
+<div class="noprint" style="float:right;align:left;width:19ex">
+<a href="http://hexten.net/cpan-faces/"><img src="http://www.gravatar.com/avatar.php?gravatar_id=41f34c7ef528b1e38062c862c64c3ad3&rating=G&size=80&default=http%3A%2F%2Fst.pimg.net%2Ftucs%2Fimg%2Fwho.png" width=80 height=80 
+style="float:right"
+/></a>
+<br style="clear:both"/>
+<p style="text-align:right">Download:<br/> <a href="/CPAN/authors/id/R/RU/RUSSOZ/DataFlow-0.91.08.tar.gz">DataFlow-0.91.08.tar.gz</a></p>
+<p style="text-align:right"><a href="http://deps.cpantesters.org/?module=DataFlow;perl=latest">Dependencies</a></p>
+<p style="text-align:right"><a href="http://www.annocpan.org/~RUSSOZ/DataFlow-0.91.08/lib/DataFlow.pm">Annotate this POD
+</a></p>
+     <p style="text-align:right"><a href="&#104;&#116;&#116;&#112;://&#103;&#105;&#116;&#104;&#117;&#98;.&#99;&#111;&#109;/&#114;&#117;&#115;&#115;&#111;&#122;/&#68;&#97;&#116;&#97;&#70;&#108;&#111;&#119;/&#105;&#115;&#115;&#117;&#101;&#115;">View/Report&nbsp;Bugs</a></p>
+</div>
+  Module Version:  0.91.08 &nbsp;
+<span class="noprint">
+  <a href="/src/RUSSOZ/DataFlow-0.91.08/lib/DataFlow.pm">Source</a> &nbsp;
+</span>
+<a name="___top"></a>
+<div class=pod>
+<div class=toc>
+<div class='indexgroup'>
+<ul   class='indexList indexList1'>
+  <li class='indexItem indexItem1'><a href='#NAME'>NAME</a>
+  <li class='indexItem indexItem1'><a href='#VERSION'>VERSION</a>
+  <li class='indexItem indexItem1'><a href='#SYNOPSIS'>SYNOPSIS</a>
+  <li class='indexItem indexItem1'><a href='#DESCRIPTION'>DESCRIPTION</a>
+  <li class='indexItem indexItem1'><a href='#AUTHOR'>AUTHOR</a>
+  <li class='indexItem indexItem1'><a href='#COPYRIGHT_AND_LICENSE'>COPYRIGHT AND LICENSE</a>
+  <li class='indexItem indexItem1'><a href='#SUPPORT'>SUPPORT</a>
+  <ul   class='indexList indexList2'>
+    <li class='indexItem indexItem2'><a href='#Perldoc'>Perldoc</a>
+    <li class='indexItem indexItem2'><a href='#Websites'>Websites</a>
+    <li class='indexItem indexItem2'><a href='#Internet_Relay_Chat'>Internet Relay Chat</a>
+  </ul>
+  <li class='indexItem indexItem1'><a href='#BUGS_AND_LIMITATIONS'>BUGS AND LIMITATIONS</a>
+  <li class='indexItem indexItem1'><a href='#AVAILABILITY'>AVAILABILITY</a>
+  <li class='indexItem indexItem1'><a href='#DISCLAIMER_OF_WARRANTY'>DISCLAIMER OF WARRANTY</a>
+</ul>
+</div>
+</div>
+
+<h1><a class='u' href='#___top' title='click to go to top of document'
+name="NAME"
+>NAME <img alt='^' src='http://st.pimg.net/tucs/img/up.gif'></a></h1>
+
+<p>DataFlow - A framework for dataflow processing</p>
+
+<h1><a class='u' href='#___top' title='click to go to top of document'
+name="VERSION"
+>VERSION <img alt='^' src='http://st.pimg.net/tucs/img/up.gif'></a></h1>
+
+<p>version 0.91.08</p>
+
+<h1><a class='u' href='#___top' title='click to go to top of document'
+name="SYNOPSIS"
+>SYNOPSIS <img alt='^' src='http://st.pimg.net/tucs/img/up.gif'></a></h1>
+
+<pre class="sh_perl">        use DataFlow::Node;
+        use DataFlow::Chain;
+
+        my $chain = DataFlow::Chain-&#62;new(
+                DataFlow::Node-&#62;new(
+                        process_item =&#62; sub {
+                                ... do something
+                        }
+                ),
+                DataFlow::Node-&#62;new(
+                        process_item =&#62; sub {
+                                ... do something else
+                        }
+                ),
+        );
+
+        my $output = $chain-&#62;process($input);</pre>
+
+<h1><a class='u' href='#___top' title='click to go to top of document'
+name="DESCRIPTION"
+>DESCRIPTION <img alt='^' src='http://st.pimg.net/tucs/img/up.gif'></a></h1>
+
+<p>This is a framework for data flow processing. It started as a spinoff project from <a href="http://www.opendatabr.org/" class="podlinkurl"
+>OpenData-BR</a>.</p>
+
+<p>As of now (Mar, 2011) it is still a &#39;work in progress&#39;, and there is a lot of progress to make. It is highly recommended that you read the tests, and also the documentation for <a href="/~russoz/DataFlow-0.91.08/lib/DataFlow/Node.pm" class="podlinkpod"
+>DataFlow::Node</a> and <a href="/~russoz/DataFlow-0.91.08/lib/DataFlow/Chain.pm" class="podlinkpod"
+>DataFlow::Chain</a>, to start with.</p>
+
+<p>An article has been recently written in Brazilian Portuguese about this framework, per the S&#227;o Paulo Perl Mongers &#34;Equin&#243;cio&#34; (Equinox) virtual event. Although an English version of the article in in the plans, you can figure a good deal out of the original one at</p>
+
+<p><a href="http://sao-paulo.pm.org/equinocio/2011/mar/5" class="podlinkurl"
+>http://sao-paulo.pm.org/equinocio/2011/mar/5</a></p>
+
+<p>Any doubts, feel free to get in touch.</p>
+
+<h1><a class='u' href='#___top' title='click to go to top of document'
+name="AUTHOR"
+>AUTHOR <img alt='^' src='http://st.pimg.net/tucs/img/up.gif'></a></h1>
+
+<p>Alexei Znamensky &#60;russoz@cpan.org&#62;</p>
+
+<h1><a class='u' href='#___top' title='click to go to top of document'
+name="COPYRIGHT_AND_LICENSE"
+>COPYRIGHT AND LICENSE <img alt='^' src='http://st.pimg.net/tucs/img/up.gif'></a></h1>
+
+<p>This software is copyright (c) 2011 by Alexei Znamensky.</p>
+
+<p>This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.</p>
+
+<h1><a class='u' href='#___top' title='click to go to top of document'
+name="SUPPORT"
+>SUPPORT <img alt='^' src='http://st.pimg.net/tucs/img/up.gif'></a></h1>
+
+<h2><a class='u' href='#___top' title='click to go to top of document'
+name="Perldoc"
+>Perldoc</a></h2>
+
+<p>You can find documentation for this module with the perldoc command.</p>
+
+<pre class="sh_perl">  perldoc DataFlow</pre>
+
+<h2><a class='u' href='#___top' title='click to go to top of document'
+name="Websites"
+>Websites</a></h2>
+
+<p>The following websites have more information about this module, and may be of help to you. As always, in addition to those websites please use your favorite search engine to discover more resources.</p>
+
+<ul>
+<li>Search CPAN
+<p><a href="http://search.cpan.org/dist/DataFlow" class="podlinkurl"
+>http://search.cpan.org/dist/DataFlow</a></p>
+</li>
+
+<li>AnnoCPAN: Annotated CPAN documentation
+<p><a href="http://annocpan.org/dist/DataFlow" class="podlinkurl"
+>http://annocpan.org/dist/DataFlow</a></p>
+</li>
+
+<li>CPAN Ratings
+<p><a href="http://cpanratings.perl.org/d/DataFlow" class="podlinkurl"
+>http://cpanratings.perl.org/d/DataFlow</a></p>
+</li>
+
+<li>CPAN Forum
+<p><a href="http://cpanforum.com/dist/DataFlow" class="podlinkurl"
+>http://cpanforum.com/dist/DataFlow</a></p>
+</li>
+
+<li>CPANTS Kwalitee
+<p><a href="http://cpants.perl.org/dist/overview/DataFlow" class="podlinkurl"
+>http://cpants.perl.org/dist/overview/DataFlow</a></p>
+</li>
+
+<li>CPAN Testers Results
+<p><a href="http://cpantesters.org/distro/D/DataFlow.html" class="podlinkurl"
+>http://cpantesters.org/distro/D/DataFlow.html</a></p>
+</li>
+
+<li>CPAN Testers Matrix
+<p><a href="http://matrix.cpantesters.org/?dist=DataFlow" class="podlinkurl"
+>http://matrix.cpantesters.org/?dist=DataFlow</a></p>
+</li>
+</ul>
+
+<h2><a class='u' href='#___top' title='click to go to top of document'
+name="Internet_Relay_Chat"
+>Internet Relay Chat</a></h2>
+
+<p>You can get live help by using IRC ( Internet Relay Chat ). If you don&#39;t know what IRC is, please read this excellent guide: <a href="http://en.wikipedia.org/wiki/Internet_Relay_Chat" class="podlinkurl"
+>http://en.wikipedia.org/wiki/Internet_Relay_Chat</a>. Please be courteous and patient when talking to us, as we might be busy or sleeping! You can join those networks/channels and get help:</p>
+
+<ul>
+<li>irc.perl.org
+<p>You can connect to the server at &#39;irc.perl.org&#39; and join this channel: #opendata-br to get help.</p>
+</li>
+</ul>
+
+<h1><a class='u' href='#___top' title='click to go to top of document'
+name="BUGS_AND_LIMITATIONS"
+>BUGS AND LIMITATIONS <img alt='^' src='http://st.pimg.net/tucs/img/up.gif'></a></h1>
+
+<p>No bugs have been reported.</p>
+
+<p>Please report any bugs or feature requests through the web interface at <a href="http://github.com/russoz/DataFlow/issues" class="podlinkurl"
+>http://github.com/russoz/DataFlow/issues</a>.</p>
+
+<h1><a class='u' href='#___top' title='click to go to top of document'
+name="AVAILABILITY"
+>AVAILABILITY <img alt='^' src='http://st.pimg.net/tucs/img/up.gif'></a></h1>
+
+<p>The latest version of this module is available from the Comprehensive Perl Archive Network (CPAN). Visit <a href="http://www.perl.com/CPAN/" class="podlinkurl"
+>http://www.perl.com/CPAN/</a> to find a CPAN site near you, or see <a href="http://search.cpan.org/dist/DataFlow/" class="podlinkurl"
+>http://search.cpan.org/dist/DataFlow/</a>.</p>
+
+<p>The development version lives at <a href="http://github.com/russoz/DataFlow" class="podlinkurl"
+>http://github.com/russoz/DataFlow</a> and may be cloned from <a href="git://github.com/russoz/DataFlow.git" class="podlinkurl"
+>git://github.com/russoz/DataFlow.git</a>. Instead of sending patches, please fork this project using the standard git and github infrastructure.</p>
+
+<h1><a class='u' href='#___top' title='click to go to top of document'
+name="DISCLAIMER_OF_WARRANTY"
+>DISCLAIMER OF WARRANTY <img alt='^' src='http://st.pimg.net/tucs/img/up.gif'></a></h1>
+
+<p>BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE SOFTWARE &#34;AS IS&#34; WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION.</p>
+
+<p>IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</p>
+
+</div>
+
+
+<div class="footer"><div class="cpanstats">65844 Uploads, 22178 Distributions
+90996 Modules, 8813 Uploaders
+</div>
+hosted by <a href="http://www.yellowbot.com">YellowBot</a><br/>
+<a href="http://www.yellowbot.com"><img alt="do. tag. write. share." src="http://st.pimg.net/tucs/img/yellowbot_logo.gif"></a>
+</div>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript" src="http://ipv4.v6test.develooper.com/cdn/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript" src="http://ipv4.v6test.develooper.com/js/v1/v6test.js"></script>
+<script type="text/javascript" src="http://st.pimg.net/tucs/jquery-cookie-67fb34f6a.min.js"></script>
+<script type="text/javascript" src="http://st.pimg.net/tucs/shjs/sh_main.min.js"></script>
+<script type="text/javascript" src="http://st.pimg.net/tucs/shjs/sh_perl.min.js"></script>
+
+<script type="text/javascript">
+   // v6.target = '';
+   if (!v6.target) { v6.only_once = true }
+   v6.site = '7A0D89A6-2B82-11DF-B9DA-F61CBD13F020';
+   v6.api_server = 'http://ipv4.v6test.develooper.com';
+   try {
+     v6.test();
+   } catch(err) {}
+</script>
+<script type="text/javascript">
+  $(document).ready(function(){
+    $("a[href^=http:]").click(function(){
+      var href = $(this).attr('href');
+      var m = href.match('\/\/([^\/:]+)');
+      _gaq.push(['_trackEvent','External',m[1],'Module']);
+    });
+    $("a[href^=/CPAN/]").click(function(){
+      var href = $(this).attr('href');
+      _gaq.push(['_trackEvent','Download',href,'Module']);
+    });
+
+    if ($.cookie("pretty")) {
+      sh_highlightDocument();
+    }
+    $('.cpanstats').click(function() {
+      $.cookie("pretty", $.cookie("pretty") ? null : "1", { path: "/"});
+      location.reload();
+    });
+  });
+</script>
+<!-- Wed Mar  9 01:07:06 2011 GMT (0.0271618366241455) @cpansearch1 -->
+ </body>
+</html>

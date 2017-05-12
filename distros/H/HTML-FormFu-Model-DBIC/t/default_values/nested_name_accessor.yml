@@ -1,0 +1,9 @@
+---
+elements:
+  - name: name
+
+  - type: Block
+    nested_name: foo
+
+    elements:
+      - name: value

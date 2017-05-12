@@ -1,0 +1,5 @@
+~$
+^blib/
+^Makefile(.old)?$
+^lib/HTML/EP/Glimpse/Config.pm$
+^pm_to_blib$

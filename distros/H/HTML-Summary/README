@@ -1,0 +1,57 @@
+HTML::Summary
+=============
+
+Description
+-----------
+
+The HTML::Summary module produces summaries from the textual content of
+web pages. It does so using the location heuristic, which determines the value
+of a given sentence based on its position and status within the document; for
+example, headings, section titles and opening paragraph sentences may be
+favoured over other textual content. A LENGTH option can be used to restrict
+the length of the summary produced.
+
+This distribution contains the HTML::Summary module, and some supporting
+modules. The full list of modules is:
+
+HTML::Summary
+Text::Sentence
+Lingua::JA::Jtruncate
+
+I have bundled these modules together because this is an early release, and I
+am still open to suggestions on changes to the structure / interface.
+
+The HTML::Summary module provides the ability to generate summaries of HTML
+pages.
+
+Copyright
+---------
+
+Copyright (c) 1997 Canon Research Centre Europe (CRE). All rights reserved.
+This script and any associated documentation or files cannot be distributed
+outside of CRE without express prior permission from CRE.
+
+Prerequisites
+-------------
+
+HTML::TreeBuilder
+
+Installation
+------------
+
+> perl Makefile.PL
+> make
+
+... and if you like
+
+> make test
+
+... and then
+
+> make install
+> perldoc HTML::Summary
+
+Author
+------
+
+Ave Wrigley <wrigley@cre.canon.co.uk>

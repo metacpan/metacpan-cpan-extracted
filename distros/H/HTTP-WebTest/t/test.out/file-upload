@@ -1,0 +1,47 @@
+Failed  Succeeded  Test Name
+   0          5    *** no name ***
+   0          5    *** no name ***
+   0          6    *** no name ***
+
+
+Test Name: N/A
+URL: http://http.web.test/show-request
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  REQUIRED TEXT
+    Method: <POST>                                               SUCCEED
+    Query: <>                                                    SUCCEED
+  REQUIRED REGEX
+    (?-xism:Content: <.*Content-Disposition: form-data; name="f  SUCCEED
+    (?-xism:Content: <.*29: test file uploading capability.*>)   SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/show-request
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  REQUIRED TEXT
+    Method: <POST>                                               SUCCEED
+    Query: <>                                                    SUCCEED
+  REQUIRED REGEX
+    (?-xism:Content: <.*Content-Disposition: form-data; name="f  SUCCEED
+    (?-xism:Content: <.*29: test file uploading capability.*>)   SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/show-request
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  REQUIRED TEXT
+    Method: <POST>                                               SUCCEED
+    Query: <>                                                    SUCCEED
+  REQUIRED REGEX
+    (?-xism:Content: <.*Content-Disposition: form-data; name="f  SUCCEED
+    (?-xism:Content: <.*Content-Type: foo/bar.*>)                SUCCEED
+    (?-xism:Content: <.*29: test file uploading capability.*>)   SUCCEED
+
+
+Total web tests failed: 0  succeeded: 16

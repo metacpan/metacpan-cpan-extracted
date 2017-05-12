@@ -1,0 +1,34 @@
+---
+auto_fieldset: 1
+
+elements:
+  - name: band
+
+  - type: Hidden
+    name: count
+
+  - type: Repeatable
+    nested_name: users
+    counter_name: count
+
+    elements:
+      - type: Hidden
+        name: id
+
+      - type: Text
+        name: name
+
+      - type: Hidden
+        name: count
+
+      - type: Repeatable
+        nested_name: addresses
+        counter_name: count
+        elements:
+            - type: Hidden
+              name: id
+
+            - name: address
+
+  - type: Submit
+    name: submit

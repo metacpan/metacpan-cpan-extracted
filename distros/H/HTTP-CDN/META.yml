@@ -1,0 +1,26 @@
+---
+abstract: 'Serve static files with unique URLs and far-future expiry'
+author:
+  - 'Martyn Smith <martyn@dollyfish.net.nz>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTTP-CDN
+requires:
+  MIME::Types: 1.28
+  Moose: 2
+  Path::Class: 0.24
+  URI: 1.58
+  perl: 5.010
+resources:
+  bugtracker: https://github.com/martynsmith/HTTP-CDN/issues
+  homepage: https://github.com/martynsmith/HTTP-CDN
+  repository: https://github.com/martynsmith/HTTP-CDN.git
+version: 0.8

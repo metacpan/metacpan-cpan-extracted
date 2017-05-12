@@ -1,0 +1,6 @@
+Revision history for Perl extension HTTP::AppServer.
+
+0.01  Thu Nov  4 11:06:46 2010
+	- original version; created by h2xs 1.23 with options
+		-X -A HTTP::AppServer
+

@@ -1,0 +1,32 @@
+cache/
+Changes
+lib/HTML/Robot/Scrapper.pm
+lib/HTML/Robot/Scrapper/Benchmark/Base.pm
+lib/HTML/Robot/Scrapper/Benchmark/Default.pm
+lib/HTML/Robot/Scrapper/Cache/Base.pm
+lib/HTML/Robot/Scrapper/Cache/Default.pm
+lib/HTML/Robot/Scrapper/Encoding/Base.pm
+lib/HTML/Robot/Scrapper/Encoding/Default.pm
+lib/HTML/Robot/Scrapper/Log/Base.pm
+lib/HTML/Robot/Scrapper/Log/Default.pm
+lib/HTML/Robot/Scrapper/Parser/Base.pm
+lib/HTML/Robot/Scrapper/Parser/Default.pm
+lib/HTML/Robot/Scrapper/Parser/HTML/TreeBuilder/XPath.pm
+lib/HTML/Robot/Scrapper/Parser/XML/XPath.pm
+lib/HTML/Robot/Scrapper/Queue/Array.pm
+lib/HTML/Robot/Scrapper/Queue/Base.pm
+lib/HTML/Robot/Scrapper/Queue/Default.pm
+lib/HTML/Robot/Scrapper/Reader.pm
+lib/HTML/Robot/Scrapper/Reader/TestReader.pm
+lib/HTML/Robot/Scrapper/UserAgent/Base.pm
+lib/HTML/Robot/Scrapper/UserAgent/Default.pm
+lib/HTML/Robot/Scrapper/Writer/TestWriter.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/001_load.t
+TODO
+Todo
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

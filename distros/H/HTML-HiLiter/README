@@ -1,0 +1,54 @@
+HTML::HiLiter
+====================
+
+HTML::HiLiter is intended for use with the CrayDoc product,
+version 4 and later. It may also be used with any kind of HTML
+highlighting you wish. SWISH::API users may find it most useful.
+
+Check out SWISH::HiLiter as well.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+       HTML::Parser
+       HTML::Entities
+       HTML::Tagset
+       HTTP::Request (only if fetching HTML via http)
+       LWP::UserAgent (only if fetching HTML via http)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Cray Inc 
+	
+ ###############################################################################
+ #    CrayDoc 4
+ #    Copyright (C) 2004 Cray Inc swpubs@cray.com
+ #
+ #    This program is free software; you can redistribute it and/or modify
+ #    it under the terms of the GNU General Public License as published by
+ #    the Free Software Foundation; either version 2 of the License, or
+ #    (at your option) any later version.
+ #
+ #    This program is distributed in the hope that it will be useful,
+ #    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ #    GNU General Public License for more details.
+ #
+ #    You should have received a copy of the GNU General Public License
+ #    along with this program; if not, write to the Free Software
+ #    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ ###############################################################################
+
+
+# Send email to swpubs@cray.com.
+

@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/repos/!svn/ver/354/tags/v1_04/perl/HTTP-Daemon-SSL/certs
+END
+test-ca.pem
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/repos/!svn/ver/354/tags/v1_04/perl/HTTP-Daemon-SSL/certs/test-ca.pem
+END
+server-cert.pem
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/repos/!svn/ver/354/tags/v1_04/perl/HTTP-Daemon-SSL/certs/server-cert.pem
+END
+server-key.pem
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/repos/!svn/ver/354/tags/v1_04/perl/HTTP-Daemon-SSL/certs/server-key.pem
+END

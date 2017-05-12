@@ -1,0 +1,68 @@
+body {
+  font-family: monospace, arial, helvetica;
+  font-size: 9px;
+  background: gray;
+  color: #9f9f9f;
+}
+
+.title {
+  font-size: 45px;
+  font-family: arial;
+  color: #775533;
+}
+
+.subtitle {
+  font-size: 13px;
+  font-family: arial;
+  color: #775533
+}
+
+.mtitle {
+  font-size: 25px;
+  font-family: arial;
+}
+
+.footer {
+  font-size: 7pt;
+  font-family: arial;
+}
+
+.photoalbum {
+  color: #9f9f9f;
+  background: #666666;
+}
+
+.weblog {
+  color: #9f9f9f;
+  background: #666666;
+}
+
+.weblog_date {
+  color: #898989;
+}
+
+TD {
+  font-family: verdana,arial,sans-serif;
+  font-size: 12px;
+}
+
+A:link    { 
+  text-decoration: none; 
+  color: #CCCCCC;
+}
+
+A:active  { 
+  text-decoration: none;
+  color: #666666;
+}
+ 
+A:visited { 
+  text-decoration: none;
+  color: #CCCCCC 
+}
+
+A:hover {
+  text-decoration: none;
+  color: #EEEEEE
+}
+

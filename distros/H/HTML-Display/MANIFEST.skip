@@ -1,0 +1,12 @@
+\.lwpcookies$
+\.releaserc$
+blib
+HTML-Display-*
+HTML-Display-*/
+CVS/
+pm_to_blib
+pm_to_blib.ts
+cvstest
+Makefile
+cover_db/
+blibdirs.ts

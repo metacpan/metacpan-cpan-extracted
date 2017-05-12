@@ -1,0 +1,11 @@
+<%args>
+%head_arg
+%val_arg  => ()
+</%args>
+\[ {\it syn-cat}\\ 
+   HEAD & <& '/head.mas', %head_arg &>\
+% if( %val_arg ){
+\\ 
+   VAL  & <& '/val.mas', %val_arg &>\
+% }
+\]

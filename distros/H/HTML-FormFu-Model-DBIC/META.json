@@ -1,0 +1,70 @@
+{
+   "abstract" : "Integrate HTML::FormFu with DBIx::Class",
+   "author" : [
+      "Carl Franks <cpan@fireartist.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "HTML-FormFu-Model-DBIC",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "t",
+         "t-aggregate",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0.88",
+            "Test::PAUSE::Permissions" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "DBIx::Class" : "0.08108",
+            "HTML::FormFu" : "2.00",
+            "List::MoreUtils" : "0",
+            "Storable" : "0",
+            "Task::Weaken" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DateTime::Format::SQLite" : "0",
+            "Locale::Maketext" : "0",
+            "SQL::Translator" : "0.11016",
+            "Test::More" : "0.99"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/fireartist/HTML-FormFu-Model-DBIC.git",
+         "web" : "https://github.com/fireartist/HTML-FormFu-Model-DBIC"
+      }
+   },
+   "version" : "2.02"
+}
+

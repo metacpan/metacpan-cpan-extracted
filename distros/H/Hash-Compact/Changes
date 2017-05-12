@@ -1,0 +1,35 @@
+Revision history for Perl extension Hash::Compact
+
+0.06    2012-10-20
+
+        [DISTRIBUTING ISSUE]
+        - distribute with new Module::Install
+        - http://weblog.bulknews.net/post/33907905561/do-not-ship-modules-with-module-install-1-04
+
+0.05    2011-11-10
+
+        [FEATURE CHANGES]
+        - added: keys(), original()
+        - added: compact() as an alias to to_hash()
+
+        [IMPORTANT NOTICE]
+        - to_hash() is now deprecated and will be removed at later version
+
+0.04    2011-11-04
+
+        [TRIBIAL CHANGES]
+        - fixed non-appropriate examples in synopsis
+        - changed the key name of the internal options parameter
+
+0.03    2011-11-04
+
+        [TRIBIAL CHANGES]
+        - suppressed warnings when value is undef
+
+0.02    2011-10-19
+
+        [TESTING ISSUE]
+        - added tests whether compact hashes will be correctly expanded
+
+0.01    2011-06-23
+        - original version

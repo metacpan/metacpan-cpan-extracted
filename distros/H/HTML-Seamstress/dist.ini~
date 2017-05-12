@@ -1,0 +1,22 @@
+name = HTML-Seamstress
+author = Terrence Brannon <metaperl@gmail.com>
+license = Perl_5
+copyright_holder = Terrence Brannon
+
+
+[@Basic]
+
+[AutoVersion]
+major = 6
+
+
+
+[AutoPrereqs]
+skip = (Test::XML|Arsenal|SimpleClass|SelectData|TestUtils|data::table2)
+
+
+
+[TestRelease]
+[ConfirmRelease]
+[UploadToCPAN]
+

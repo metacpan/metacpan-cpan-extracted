@@ -1,0 +1,43 @@
+<ep-package name=HTML::EP::Explorer accept-language="de,en">
+<ep-if cnd="'$_ep_language$' eq 'de'">
+  <ep-set var="Title" val="EP-Explorer: Administration">
+<ep-else>
+  <ep-set var="Title" val="EP-Explorer: Administration">
+</ep-if>
+<html><head><title>$Title$</title></head>
+<body bgcolor=#ffffff>
+  <h1>$Title$</h1>
+<p>
+  <ep-language language="de">
+    Diese Seite ist das Administrationsmenü des HTML::EP-Explorers.
+  <ep-language language="en">
+    This page is the administration menu of the HTML::EP Explorer.
+  </ep-language>
+</p>
+<ol>
+  <li>
+    <ep-language de="Die" en="You may adjust the">
+    <a href="prefs.ep?language=$_ep_language$">
+      <ep-language de="Systemeinstellungen" en="System preferences">
+    </a>
+    <ep-language de="können Sie hier verändern."
+                 en=".">
+  </li>
+  <li>
+    <ep-language de="Auch Ihre"
+                 en="Your">
+    <a href="../prefs.ep?language=$_ep_language$">
+      <ep-language de="persönlichen Einstellungen" en="private settings">
+    </a>.
+    <ep-language de="können Sie ändern."
+                 en="may be modified as well.">
+  </li>
+  <li>
+    <ep-language de="Die Ansicht Ihrer Benutzer finden Sie"
+                 en="Your users view is">
+    <a href="../index.ep?language=$_ep_language$">
+      <ep-language de="hier" en="here">
+    </a>.
+  </li>
+</ol>
+</body></html>

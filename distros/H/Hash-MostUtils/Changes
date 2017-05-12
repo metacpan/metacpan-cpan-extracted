@@ -1,0 +1,17 @@
+---
+version: 1.07
+date: 2015-07-09
+changes:
+- fixes to tests that test warnings: some test changes, some deletes
+- fix to leach() to detect when subject data structure has changed size
+- add hashsort()
+---
+version: 1.06
+date:    2013-04-29
+changes:
+- break up 'package' lines in submodules to bypass indexer
+---
+version: 1.05
+date:    2013-04-20
+changes:
+- version sync between a work CPAN mirror and real-world CPAN

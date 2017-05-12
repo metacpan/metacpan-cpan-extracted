@@ -1,0 +1,30 @@
+HTML-Template-Compiled-Plugin-LineBreak version 0.02
+====================================================
+
+HTML::Template::Compiled::Plugin::LineBreak
+        - HTC Plugin to replaces any newlines with <br> HTML tags.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  HTML::Template::Compiled
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007-2008 by hagy <hagy@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+

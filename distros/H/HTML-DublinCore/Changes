@@ -1,0 +1,33 @@
+Revision history for Perl extension HTML::DublinCore
+
+0.4   Mon Nov 15 12:45:13 CST 2004
+        - modified to use new DublinCore::Record framework (thanks Brian
+          Cassidy)
+
+0.3   Mon Aug 25 09:42:01 2003
+	- Doc fix (thanks Brian Cassidy)
+	- Fixed test warnings under new Test::Harness.
+
+0.2   Sun May 25 12:01:45 2003
+	- added note about support list dc@inkdroid.org
+
+0.1   Thu Mar 20 06:36:12 2003
+	- documentation changes
+	- made element() return empty HTML::DublinCore::Element object 
+	  instead of undef to support chaining when requested element does 
+	  not exist. This makes chaining more stable:
+	  $dc->element('title')->content()
+
+0.04  Sun Mar 16 02:06:00 2003
+	- added element() method (good idea from Brian Cassidy)
+	- added docs to HTML::DublinCore::Element
+
+0.03  Sat Mar 15 06:05:00 2003
+	- added test.html to Manifest
+
+0.02  Thu Mar 13 01:43:00 2003
+	- escape < > & in RSS
+
+0.01  Thu Mar 13 19:50:47 2003
+	- original version
+

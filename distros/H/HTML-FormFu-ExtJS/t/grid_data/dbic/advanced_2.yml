@@ -1,0 +1,11 @@
+---
+    elements:
+        - type: Text
+          name: name
+        - type: Radiogroup
+          name: sex
+          options:
+              - [0, 'male']
+              - [1, 'female']
+        - type: Text
+          name: cds

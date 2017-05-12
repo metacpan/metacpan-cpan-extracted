@@ -1,0 +1,212 @@
+<wmmeta name="Title" value="Concepts" />
+<wmmeta name="Section" value="01-intro" />
+<wmmeta name="Score" value="15" />
+<wmmeta name="Abstract">
+Concepts behind WebMake's design
+</wmmeta>
+
+<a name=top></a>
+
+Here's a list of the main concepts behind WebMake's design and implementation.
+Before using WebMake, it'll probably help to have a read of this, so you
+can understand where the functionality is coming from.
+
+
+1. Templating
+~~~~~~~~~~~~~~
+
+  When you start working with the web, it's easy enough to write a few pages and
+  put them on your site.  However, you quickly realise that they all look
+  different; there's nothing binding them together as one ''site''.
+
+  The next step is to add some common elements to tie the pages together, so you
+  add some header text or graphics, and maybe a table on one side listing the
+  other pages in the site, allowing your users to quickly find the other pages.
+  Maybe you add some information at the bottom of the page, describing who you
+  are, that kind of thing.
+
+  After a while, you'll have quite a few pages, each with a different piece of
+  **main content**, but a lot of them sharing some, or all, of the shared
+  elements -- the **templates**.
+
+  One day, you need to change the templates -- but there's no easy way to do
+  this, without manually editing each of the files and changing them by hand.
+  Wouldn't it be easier to just change this once, and be done with it?
+
+  That's one of the main features of WebMake: **templating**.  It allows you to
+  define the templates in one place, then generate pages containing the
+  **content** wrapped in those templates.
+
+  There's quite a few products that do this; WebMake differs in that it's
+  __very__ flexible in how you can include your content text in the templates.
+  Often, other products are limited to just setting a header and a footer to be
+  added to each page; WebMake takes its cues from traditional UNIX tools by
+  allowing very deep recursion in its templating, so your templates can include
+  other templates, etc. etc.
+
+
+2. Edit Text As Text, Not HTML
+~~~~~~~~~~~~~~
+
+  In some situations, you'll want to write HTML; but in others, text is
+  best, for ease of editing, and reading while you're editing.  WebMake
+  supports **Text::EtText** and **POD** formats, converting them to
+  HTML on-the-fly.
+
+  **Text::EtText** aims to support most of the de-facto conventions we've
+  been using in mail and in USENET for years, converting them into HTML
+  in a sensible way.
+
+
+3. Breaking Down the File-Per-Page Mapping
+~~~~~~~~~~~~~~
+
+  Another annoyance comes from the default way a web servers serves web pages;
+  normally, each web page is loaded from a separate file.
+
+  This is fine for some sites, but in other circumstances you might want to
+  produce lots of small pages, or include identical text in several pages; or
+  you may just prefer editing your entire site in one editor, rather than having
+  to switch from one window to another.
+
+  WebMake allows you to specify several **content items** inside a single
+  **WebMake .wmk file** (the .wmk file uses WebMake's XML-based file format),
+  and/or load content from a data source, such as a comma-separated values file,
+  a directory tree, or (possibly in future) an SQL database.
+
+  You can then include these content items into the generated web pages,
+  whichever way you wish, based on the outputs and templates you specify in the
+  WebMake file.
+
+
+4. Support URL Changes
+~~~~~~~~~~~~~~
+
+  At some stage, you may feel like rearranging your site, changing
+  one URL that's always bothered you, so that it becomes more aesthetically
+  pleasing or descriptive.  Or maybe some directive might suddenly appear,
+  ordering you to do so for policy reasons (ugh).  Whatever!
+
+  WebMake allows you to track output pages or media, such as images, or
+  non-WebMake generated pages, using URL references; references to the name
+  will be converted to the correct URL for that page or image.
+
+
+5. Site Mapping and Indices
+~~~~~~~~~~~~~~
+
+  The obvious next step is to allow site maps, indexes, and navigational
+  information to be generated automatically.
+
+  WebMake accomplishes this using metadata; in other words, if you tag your
+  content items with information like its title, its ''parent'' content item,
+  and its precedence compared to its neighbours (to specify the order of items),
+  WebMake can automatically use this information to generate the following maps:
+
+      - **dynamically-generated indexes**, such as "the front page of this
+	documentation" [idx]
+
+      - **site maps**, such as "this one of the WebMake documentation" [map]
+
+      - **breadcrumb trails**, as seen on <a href=http://www.yahoo.com/>
+	Yahoo!</a>
+
+      - **back/forward navigation links**, as seen at the <a href=#top>top of
+	this page</a>
+
+      [map]: docmap.html
+      [idx]: index.html
+
+
+6. HTML Cleaning
+~~~~~~~~~~~~~~
+
+  Often, the HTML you'll have to work with may be crufty, with __img__
+  tags that have no size information, or other inefficiencies.
+
+  WebMake includes a **HTML cleaner** which will rewrite your HTML until it
+  sparkles.  It can also be turned off for a ''HTML verite'' effect, if you feel
+  so inclined.  (Alright, it's also a little faster with the cleaner off. Not
+  much though ;)
+
+
+7. Plugins, User-Defined Tags And Perl Code
+~~~~~~~~~~~~~~
+
+  You can define your own tags, similar to how JSPs support taglibs; this
+  provides a way to add scripted components to your pages, without
+  making things too messy or confusing, or arbitrarily peppering code
+  into the text.
+
+  Or, if you __like__ peppering code into your text, WebMake provides support
+  for Perl code embedded directly into the text or WebMake file, similar to PHP,
+  ePerl, HTML::Mason, or ASPs.   It also provides an API for that code to
+  examine or alter WebMake's behaviour.
+
+  There's a plugin architecture as well, providing an easy way to load code on
+  demand from self-contained components.
+
+
+8. The Web Is ''Read-Mostly'': Bake, Don't Fry
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  Several other similar web site management systems revolve around dynamic
+  code running on the web server, which assembles the pages as they're
+  requested by the client.  In the terminology used <a
+  href=http://www.salon.com/contact/staff/idk/print.html>by Ian Kallen of
+  Salon.Com</a>, they ''fry'' the pages on-demand.
+
+  For most sites, the pages do not change based on which client is accessing
+  them, or if they do, they don't change entirely; perhaps an extra set of
+  links becomes available in the page footer allowing a logged-in user to make
+  modifications using CGI, or PHP or Perl code, but that would be it.  The
+  page just isn't volatile enough to require continual re-generation for each
+  request.
+
+  As a result, all this churning about, generating pages on the fly from its
+  raw components each time, is wasted; it just eats the server's CPU and
+  memory for no real gain, and introduces yet another breakage point
+  (databases, memory usage, the /. effect...) where things can go wrong, just
+  when you're not looking at it.
+
+  WebMake takes the ''baking'' approach, generating virtually all its output
+  __before__ the web server gets involved.  The web site admin runs the
+  ##webmake## command, and this generates the pages.
+
+  Note that WebMake doesn't preclude dynamic content in the pages, however.
+  PHP, CGI, ASP or embedded Perl code can be used, and WebMake will not
+  interfere.  In fact, a future version of WebMake will probably provide some
+  ''fried'' features of its own...
+
+
+9. Site Replication
+~~~~~~~~~~~~~~
+
+  You can replicate web sites quickly, easily, and securely over the internet.
+  WebMake does this using CVS and SSH, two standard UNIX utilities that have
+  been used for years to do exactly the same thing for other types of data;
+  why not web sites?
+
+  A bonus of using CVS is that you also get seamless version control and
+  conflict management, so users can edit a WebMake site at any replicated
+  point, check in the changes, and it won't overwrite everyone else's
+  modifications.
+
+
+10. Edit-In-Browser
+~~~~~~~~~~~~~~
+
+  The WebMake distribution includes a CGI script which provides a simple
+  interface allowing a WebMake site to be edited over the web, and the changes
+  to be checked in to CVS.  At the moment, it's not too user-friendly, so it's
+  not quite suitable for a newbie to use without some instruction -- but it's
+  getting there, and it'll improve.
+
+  It's certainly handy for an experienced user who wishes to correct a typo or
+  add a new page to their site, without requiring command-line access to the
+  server; so if you check out your site in an internet cafe and spot a typo, you
+  can immediately fix it without downloading an SSH client! ;)
+
+
+
+

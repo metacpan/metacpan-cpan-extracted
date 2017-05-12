@@ -1,0 +1,19 @@
+---
+0.10 2007-2-25:
+ - Added tests and documentation.
+
+0.06 2007-2-19
+ - Added HTML::Convert::Element::parse_content which will extract content and then delete the element from the tree
+ - Added HTML::Convert::Element::parse_child_content (beta)
+ - Added HTML::Convert::Element::extract_child_content (beta)
+
+0.05:
+ - 2007-2-19
+ - Added HTML::Convert::Element::extract_content which will extract and parse JSON or YAML of the element
+
+0.02 2007-2:
+ - Switched from using Class::XPath to HTML::TreeBuilder::XPath
+ - Removed "[@class=...]"-hack thanks to switch
+
+0.01 2007-2:
+ - Initial release

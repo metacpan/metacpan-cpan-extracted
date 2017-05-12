@@ -1,0 +1,80 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
+SHA1 b60301e01c4920d3bb9b05127265c613f7ad7dda Changes
+SHA1 e55c822eebd0cedfdfcff32b7eaa0d69c8d2b12c MANIFEST
+SHA1 d73f6910c2283dca6aa23a5d820950745dcb76f6 MANIFEST.SKIP
+SHA1 7e6340c659b1a3b2627fce31a7dde91ccfe96a91 META.json
+SHA1 009eb19db8e3de38af44033385fc371bcb9b25ac META.yml
+SHA1 6377f445cdab5c5c84fcbed54b4cf9d4bedfa0e4 Makefile.PL
+SHA1 5add845396738af399dd7808883a7fda1d4c80e8 README
+SHA1 acb7777c22cc3cea3d7b456d0c8e3d639690cadd debian/changelog
+SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
+SHA1 46814236aef21590d7a903d26717da1cdc2df162 debian/control
+SHA1 060b5f139132e105700a70176f9cd3e25be23513 debian/copyright
+SHA1 c1a523266cee9adfcc694ccd5187077066eb388f debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 97b2a7bbf231ad7c6576c2120da6e217be4e98eb debian/watch
+SHA1 40aaa9775e1dc755939e88641412d535ae66c7ac devel/base-utf16.html
+SHA1 a4c6e4a53f16f587e8b05793b94cf0dd0dbe2e1d devel/base.html
+SHA1 043f4d3097f8cdcb9e7cc23b720ad6d03211a68e devel/element-format.pl
+SHA1 8abf536e7140fa7b5494c28c16e15465a6cf8ff9 devel/margin12.html
+SHA1 baa88351b5df57e74e42566676ef567c58a64f5e devel/output-charset.pl
+SHA1 340c6d269f1434e4ba39d53b84548f0450821ec3 devel/run.pl
+SHA1 48e454ace186317f76e0f466c2c54baa362db46a devel/slurp.pl
+SHA1 2af40e15b8891946e9a23d762137c0d0e6e19b04 devel/utf.pl
+SHA1 73ad4b5ef1db680ce6d417d3d044585068efc392 devel/wide.pl
+SHA1 5a4e96028a3ba555b32972a14d16c084e140c688 examples/demo.pl
+SHA1 2c31f38013695c85f0a75eb2c783989978aa298b inc/my_pod2html
+SHA1 3fd51ba4bdc736f72e287581c208786f42c126ed lib/HTML/FormatExternal.pm
+SHA1 2fe6c9c3b5bfbc5d026eb2e00b452b2538ebe171 lib/HTML/FormatText/Elinks.pm
+SHA1 804311a7c6b97311c7ed5ec0f362683cc53c4911 lib/HTML/FormatText/Html2text.pm
+SHA1 cf71bb6ebabc68dec470eea56b5425591c161a70 lib/HTML/FormatText/Links.pm
+SHA1 a10f4cdbdb45d599d8937170fab20382ee2dddaf lib/HTML/FormatText/Lynx.pm
+SHA1 b12b6abd08eaadf5a370aec2ef28a6cab2c64112 lib/HTML/FormatText/Netrik.pm
+SHA1 adce9e9dbea3543cede0197f78aa3c384e0c927f lib/HTML/FormatText/Vilistextum.pm
+SHA1 0fe01500f991348ae2185a46f869b5583b121319 lib/HTML/FormatText/W3m.pm
+SHA1 7dc6314817cab2964c5e22c029f718fabc0a4722 lib/HTML/FormatText/Zen.pm
+SHA1 e8a2275baca79d8f458cce09170da1d2c2b8651c t/Elinks.t
+SHA1 8ebd16f20ba737d55c1edc6d2cad47272eeb078e t/FormatExternal.t
+SHA1 25b65048806e411ff8ffd64748cccaf1c51afaf5 t/Links.t
+SHA1 3855de075da37f5bc4e6a5534b2f00cc14872a98 t/MyTestHelpers.pm
+SHA1 a64779ce2de9b19b81091a52beecb50bf46fe758 t/taint.t
+SHA1 0fb013243968897bbd52d598c020d1c6d580c01d t/test.html
+SHA1 b8b3fa6c4c55938ca8fbff6dd0df7bea900469c9 t/wide.t
+SHA1 f2ceb7bb4bf68bd24728b90918e63d251fd06183 xt/0-META-read.t
+SHA1 c9e7a47e1f397eb5f46d7e4ef21754d9df76e36e xt/0-Test-ConsistentVersion.t
+SHA1 d9e7f38a8dcfdb76c56951e4214be8eeda2e2289 xt/0-Test-DistManifest.t
+SHA1 9496e4a2a2734c7093ab6961900dd7a55800976e xt/0-Test-Pod.t
+SHA1 083242d959c1a9242c874982e4585872a95bec93 xt/0-Test-Synopsis.t
+SHA1 63abbc3297914cd38081e95588fd794f9d1f0306 xt/0-Test-YAML-Meta.t
+SHA1 1cafa4e23b7a691e09161c0927e6920dd663e2ce xt/0-examples-xrefs.t
+SHA1 4a897c9b09f37290f507d151e84b6a3c8defd496 xt/0-file-is-part-of.t
+SHA1 aeb6f41dfae96d04459448f6c3e3dee44691e722 xt/0-no-debug-left-on.t
+SHA1 4a96ea4a349a7b8364308e377f53d32092087f7b xt/More.t
+SHA1 e4a15f9b4bcf1d087de2d9ed8e87bf92b0469a6c xt/my-manifest.sh
+SHA1 cd18ddee73ad0007ba667f0e472ea9d73d0dfa89 xtools/my-check-copyright-years.sh
+SHA1 b12199bcc70c569ff43f8d8e2ea1c896f587c62f xtools/my-check-spelling.sh
+SHA1 475e8eb08eac6eecec94a0f9e9928af7d467d2d0 xtools/my-deb.sh
+SHA1 830acfc76ae9239a2c36143c437a3ec7c6736a0a xtools/my-pc.sh
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iD8DBQFV4TayLFMCIV9q3ToRAshQAJ9+/OwJPRfJXCKkIbyjG7bJC1fdagCfaBlc
+tMSvYYlL+ErFY8EMpzhh+BQ=
+=hbr2
+-----END PGP SIGNATURE-----

@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/hopkins
+dist.ini
+lib/Hopkins/Plugin/RPC.pm
+t/00-compile.t
+t/release-eol.t
+t/release-pod-syntax.t

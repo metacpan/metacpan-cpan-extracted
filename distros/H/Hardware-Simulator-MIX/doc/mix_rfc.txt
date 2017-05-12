@@ -1,0 +1,105 @@
+========================================================================
+                              RFC 473
+========================================================================
+
+Network Working Group                                          D. Walden
+Request for Comments: 473                                        BBN-NET
+NIC: 14811                                              28 February 1973
+
+
+                             MIX and MIXAL?
+
+   Is there an interpreter for Knuth's hypothetical computer, MIX,
+   together with an assemble for the MIX assembly language, MIXAL,
+   available on any ARPA Network Host? If not, will not some Network
+   Host make them available (cheaply)?--it would be considerable service
+   to all of us who are students of the "Art of Computer Programming."
+
+
+========================================================================
+                              RFC 485
+========================================================================
+
+Network Working Group                                    John R. Pickens
+RFC # 485                                                UCSB
+NIC # 15063                                              19 March 1973
+References NWG/RFC #473
+
+
+                         MIX and MIXAL at UCSB
+
+The following, in response to David Walden's MIX query (RFC#473) was
+written by a graduate student at UCSB.  Questions regarding "cheap"
+usage should be directed to Roland F. Bryan (RFB) at UCSB.
+-----------------------------------------------------------------------
+
+Mark Scott Johnson
+18 March 1973
+
+    I wrote a MIXAL assembler and a MIX simulator last summer.  The
+assembler is written in SNOBOL4 and, unfortunately, is fairly expensive
+to run.  The assembler has been fairly well debugged and is documented.
+However, although the MIX simulator is written (in 360 Assembler), it
+has only been partially debugged.  Due to the resumption of school and
+other commitments, I was unable to give the simulator a thorough
+debugging.  All the simulated instructions except I/O instructions have
+been tested somewhat and appear to be operating well.  Also, card reader
+input and printer output are operational, but my simulation of disk
+files and magnetic tape has not been completed.  There is presently no
+documentation for the simulator.  Very little documentation is needed,
+however, since the simulator follows almost to the letter the
+specifications detailed in _Fundamental_Algorithms_.
+
+    If anyone is interested in using the assembler and/or the simulator,
+I will be happy to supply what documentation exists plus some
+information on how the programs can be accessed.  Also, if anyone is
+interested in the source code for the programs, I will be happy to send
+it.  I hope to be able to finish the simulator this next quarter.  If
+anyone wants to use the system and if they should find any bugs, I will
+do my best to maintain and correct the programs.
+
+
+
+========================================================================
+                              RFC 494
+========================================================================
+
+Network Working Group                                          D. Walden
+Request for Comments: 494                                        BBN-NET
+NIC: 15359                                                 20 April 1973
+References: RFCs 473, 485
+
+
+               Availability of MIX and MIXAL in the Network
+
+   In RFC 473 I requested information on the existence of assemblers and
+   interpreters for Knuth's hypothetical MIX computer.  Following is a
+   summary of the responses to my earlier RFC.
+
+   First the rumors: (1) There is rumored to be a MIX interpreter
+   available on the University of Utah PDP-10, but not assembler; and
+   (2) There is rumored to be a MIX interpreter available on the SU-AI
+   PDP-10.
+
+      Now the facts:
+
+   A fairly well debugged and documented MIXAL assembler exists for the
+   UCSB 360/75.  A partially debugged MIX interpreter also exists.  See
+   RFC 485 for additional information.
+
+   Box MIX and MIXAL are available on the UCSD B6700; although,
+   according to Ken Bowles, they are not currently being handled as
+   fully supported products, and there may be some remaining bugs in the
+   systems. However, MIX and MIXAL are available for network users, and
+   Ken says they will be happy to receive notification of any errors
+   found in the MIX and MIXAL and will attempt to get corrections made
+   in due course. Contact Ken Bowles at UCSD for further information.
+
+   MIX and an assembler for MIX are available for network use on the
+   UCLA 360/91.  These systems have had considerable use, and they are
+   documented.  Contact Bob Braden at CCN for further information.
+
+   Finally: The Computer Science Center at Stanford University
+   apparently has available a standard package for exporting the MIX
+   systems to 360s and 370s.
+

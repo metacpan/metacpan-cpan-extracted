@@ -1,0 +1,26 @@
+# This file provides instructions for packaging.
+
+@prefix : <http://purl.org/NET/cpan-uri/terms#> .
+
+<http://purl.org/NET/cpan-uri/dist/HTTP-LRDD/project>
+	:perl_version_from _:main ;
+	:version_from _:main ;
+	:readme_from _:main ;
+	:test_requires "Test::More 0.61" ;
+	:requires
+		"HTML::HTML5::Parser 0.107" ,
+		"HTML::HTML5::Sanity 0.102" ,
+		"HTTP::Link::Parser 0.102" ,
+		"HTTP::Status 0" ,
+		"Object::AUTHORITY 0" ,
+		"RDF::RDFa::Parser 1.096" ,
+		"RDF::TrineX::Functions 0" ,
+		"RDF::Query 0",
+		"Scalar::Util 0" ,
+		"URI 0" ,
+		"URI::Escape 0" ,
+		"XML::Atom::OWL 0.100",
+		"XRD::Parser 0.101".
+
+_:main <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#fileName> "lib/HTTP/LRDD.pm" .
+

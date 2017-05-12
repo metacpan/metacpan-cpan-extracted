@@ -1,0 +1,38 @@
+form#login
+{
+	margin-top:		15px;
+	margin-left:	75px;
+	margin-right:	75px;
+	margin-top:		50px;
+}
+
+form#login fieldset
+{
+	border: none;
+}
+
+form#login fieldset input
+{
+	background-color:	rgb(198, 226, 255);
+	border:				1px solid rgb(54, 100, 139);
+	float:				right;
+	width:				190px;
+}
+
+form#login fieldset label
+{
+	line-height:	1.5em;
+	font-weight:	bold;
+	float:			left;
+}
+
+form#login fieldset span#button_login
+{
+	float:			right;
+}
+
+form#login fieldset label.error
+{
+	font-weight:		normal;
+}
+

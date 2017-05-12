@@ -1,0 +1,33 @@
+<wmmeta name="Title" value="The &lt;cache&gt; Tag" />
+<wmmeta name="Section" value="02-tags_attrs" />
+<wmmeta name="Score" value="112" />
+<wmmeta name="Abstract">
+tell WebMake where to keep its cache files
+</wmmeta>
+
+The &lt;cache&gt; tag takes one attribute, __dir__, which names the
+directory where the WebMake site cache is kept.
+
+WebMake will store data about the site in this directory in order
+to speed up later rebuilds of the site.
+
+The following special characters and escapes are supported:
+
+	**~**:	the user's home directory on UNIX.
+
+	**%u**:	the user's username.
+
+	**%f**:	.wmk filename, non-alphanums replaced with _ .
+
+	**%F**:	.wmk full path, non-alphanums replaced with _ .
+
+	**%l**:	perl lib dir for plugins.
+
+The default setting is ##~/.webmake/%F##.
+
+Example
+=======
+
+<safe>
+  <cache file="../webmake.cache" />
+</safe>

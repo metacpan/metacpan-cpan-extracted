@@ -1,0 +1,139 @@
+package HTML::FormHandler::Widget::Field::CheckboxGroup;
+# ABSTRACT: checkbox group field role
+$HTML::FormHandler::Widget::Field::CheckboxGroup::VERSION = '0.40067';
+use Moose::Role;
+use namespace::autoclean;
+use HTML::FormHandler::Render::Util ('process_attrs');
+
+
+sub render {
+    my ( $self, $result ) = @_;
+    $result ||= $self->result;
+    die "No result for form field '" . $self->full_name . "'. Field may be inactive." unless $result;
+    my $output = $self->render_element( $result );
+    return $self->wrap_field( $result, $output );
+}
+
+sub render_element {
+    my ( $self, $result ) = @_;
+    $result ||= $self->result;
+
+
+    # loop through options
+    my $output = '';
+    foreach my $option ( @{ $self->{options} } ) {
+        if ( my $label = $option->{group} ) {
+            $label = $self->_localize( $label ) if $self->localize_labels;
+            my $attr = $option->{attributes} || {};
+            my $attr_str = process_attrs($attr);
+            my $lattr = $option->{label_attributes} || {};
+            my $lattr_str= process_attrs($lattr);
+            $output .= qq{\n<div$attr_str><label$lattr_str>$label</label>};
+            foreach my $group_opt ( @{ $option->{options} } ) {
+                $output .= $self->render_option( $group_opt, $result );
+            }
+            $output .= qq{\n</div>};
+        }
+        else {
+            $output .= $self->render_option( $option, $result );
+        }
+    }
+    $self->reset_options_index;
+    return $output;
+}
+
+sub render_option {
+    my ( $self, $option, $result ) = @_;
+    $result ||= $self->result;
+
+    # get existing values
+    my $fif = $result->fif;
+    my %fif_lookup;
+    @fif_lookup{@$fif} = () if $self->multiple;
+
+    # create option label attributes
+    my $lattr = $option->{label_attributes} || {};
+    push @{ $lattr->{class} }, 'checkbox';
+    if ( $self->get_tag('inline') ) {
+        my $class = 'inline';
+        $class = 'checkbox-inline' if $self->has_flag('is_b3');
+        push @{ $lattr->{class} }, $class;
+    }
+    my $lattr_str = process_attrs( $lattr );
+    my $id = $self->id . '.' . $self->options_index;
+    my $output .= qq{\n<label$lattr_str for="$id">};
+    my $value = $option->{value};
+    $output .= qq{\n<input type="checkbox"};
+    $output .= qq{ value="} . $self->html_filter($value) . '"';
+    $output .= qq{ name="} . $self->html_name . '"';
+    $output .= qq{ id="$id"};
+
+    # handle option attributes
+    my $attr = $option->{attributes} || {};
+    if( defined $option->{disabled} && $option->{disabled} ) {
+        $attr->{disabled} = 'disabled';
+    }
+    if ( defined $fif &&
+         ( ( $self->multiple && exists $fif_lookup{$value} ) ||
+             ( $fif eq $value ) ) ) {
+        $attr->{checked} = 'checked';
+    }
+    $output .= process_attrs($attr);
+    $output .= " />\n";
+
+    # handle label
+    my $label = $option->{label};
+    $label = $self->_localize($label) if $self->localize_labels;
+    $output .= $self->html_filter($label);
+    $output .= "\n</label>";
+    $self->inc_options_index;
+
+    if ($self->get_tag('checkbox_element_wrapper')) {
+        $output = qq{<div class="checkbox">$output</div>};
+    }
+    return $output;
+}
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+HTML::FormHandler::Widget::Field::CheckboxGroup - checkbox group field role
+
+=head1 VERSION
+
+version 0.40067
+
+=head1 SYNOPSIS
+
+Checkbox group widget for rendering multiple selects.
+
+Checkbox element label class is 'checkbox', plus 'inline'
+if the 'inline' tag is set.
+
+Options hashrefs must have the keys 'value', and 'label'.
+They may have an 'attributes' hashref key. The 'checked'
+attribute should not be set in the options hashref. It should
+be set by supplying a default value or from params input.
+
+See L<HTML::FormHandler::Field::Select> for documentation on
+select fields and options.
+
+=head1 AUTHOR
+
+FormHandler Contributors - see HTML::FormHandler
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Gerda Shank.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

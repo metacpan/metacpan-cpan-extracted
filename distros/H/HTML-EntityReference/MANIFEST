@@ -1,0 +1,14 @@
+Build.PL
+Changes
+ignore.txt
+lib/HTML/EntityReference.pm
+lib/HTML/Entity-HTML5_draft.pl.inc
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod.t
+t/tests.t
+Makefile.PL
+META.yml
+META.json

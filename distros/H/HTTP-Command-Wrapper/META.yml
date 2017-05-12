@@ -1,0 +1,58 @@
+---
+abstract: 'The command based HTTP client (wget/curl wrapper). Too minimum dependencies!'
+author:
+  - '-2016 Pine Mizune'
+build_requires:
+  Capture::Tiny: '0.30'
+  Data::Section::Simple: '0.07'
+  File::Slurp: '9999.19'
+  File::Temp: '0.2304'
+  Module::Find: '0.13'
+  Perl::Critic: '1.126'
+  Plack: '1.0037'
+  Sys::Info: '0.78'
+  Test::Deep: '1.120'
+  Test::Exception: '0.40'
+  Test::Mock::Guard: '0.10'
+  Test::More: '0.98'
+  Test::Perl::Critic: '1.03'
+  Test::TCP: '2.12'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTTP-Command-Wrapper
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  HTTP::Command::Wrapper:
+    file: lib/HTTP/Command/Wrapper.pm
+    version: '0.08'
+  HTTP::Command::Wrapper::Curl:
+    file: lib/HTTP/Command/Wrapper/Curl.pm
+  HTTP::Command::Wrapper::Wget:
+    file: lib/HTTP/Command/Wrapper/Wget.pm
+requires:
+  File::Which: '1.19'
+  perl: '5.008008'
+resources:
+  bugtracker: https://github.com/pine/p5-HTTP-Command-Wrapper/issues
+  homepage: https://github.com/pine/p5-HTTP-Command-Wrapper
+  repository: git://github.com/pine/p5-HTTP-Command-Wrapper.git
+version: '0.08'
+x_authority: cpan:PINE
+x_contributors:
+  - 'Pine Mizune <pinemz@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

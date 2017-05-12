@@ -1,0 +1,13 @@
+2013-07-05 HTML-HTML5-Parser-0.300
+==================================
+
+Fixed (DORIAN++) some major memory leaks at the expense of some minor API
+changes.
+
+
+2012-03-15 HTML-HTML5-Parser-0.109
+==================================
+
+We now bundle the tree construction parts of the html5lib test suite, and
+pass more than half of it.
+

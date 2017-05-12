@@ -1,0 +1,32 @@
+---
+abstract: 'A HTTP client that fetchs all URIs in parallel'
+author:
+  - 'Marlon Bailey <mbailey@cpan.org>'
+build_requires:
+  LWP::Online: 1.06
+  Test::More: 0.42
+distribution_type: module
+generated_by: 'Module::Install version 0.76'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: HTTP::Client::Parallel
+name: HTTP-Client-Parallel
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Exporter: 0
+  File::Spec: 0.80
+  HTTP::Request: 0
+  IO::File: 0
+  POE: 1.000
+  POE::Component::Client::HTTP: 0
+  Params::Util: 0.24
+  Scalar::Util: 0
+  perl: 5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

@@ -1,0 +1,26 @@
+---
+abstract: 'Log file monitoring'
+author:
+  - 'William Belle <william.belle@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4216, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HON-EC2-Snapshots-Monitoring
+provides:
+  HON::EC2::Snapshots::Monitoring:
+    file: lib/HON/EC2/Snapshots/Monitoring.pm
+    version: '0.04'
+requires:
+  IO::All: '0.86'
+  Time::Piece: '1.31'
+resources:
+  repository: https://github.com/healthonnet/hon-ec2-snapshots-monitoring
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

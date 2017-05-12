@@ -1,0 +1,12 @@
+Changes
+lib/HTTP/Daemon.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/chunked.t
+t/local/http.t
+t/misc/httpd
+t/misc/httpd_term.pl
+t/robot/ua-get.t
+t/robot/ua.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,14 @@
+<tmpl_loop simple>Foo is <tmpl_if expr="(foo > 10)">greater than<tmpl_else>less than</tmpl_if> 10.
+</tmpl_loop>
+
+<tmpl_loop complex>
+   <tmpl_if expr="color eq 'blue'"><blue></tmpl_if>
+   Name: <tmpl_var expr="ucfirst(fname)"> <tmpl_var expr="ucfirst(lname)">
+   Stats:
+   <tmpl_if expr="color eq 'blue'"><blue></tmpl_if>
+   <tmpl_loop inner><tmpl_var stat_name> <tmpl_if expr="stat_value > 10">[high]<tmpl_else><tmpl_if expr="stat_value < 1">[low]<tmpl_else>[medium]</tmpl_if></tmpl_if>
+   Color: <tmpl_var color>
+   </tmpl_loop>
+   <tmpl_if expr="color eq 'blue'"></blue></tmpl_if>
+   <tmpl_if expr="color eq 'blue'"></blue></tmpl_if>
+</tmpl_loop>

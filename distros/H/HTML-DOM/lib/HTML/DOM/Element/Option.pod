@@ -1,0 +1,125 @@
+
+=head1 NAME
+
+HTML::DOM::Element::Option - A Perl class for representing 'option' elements in an HTML DOM tree
+
+=head1 VERSION
+
+Version 0.054
+
+=head1 SYNOPSIS
+
+  use HTML::DOM;
+  $doc = HTML::DOM->new;
+  $elem = $doc->createElement('select');
+
+  $elem->focus();
+  $elem->blur();
+  
+  # $elem->add(...)    # not yet
+  # $elem->remove(...) # implemented
+
+  $elem->options; # a list of 'option' elements
+
+  $elem->name('foo') # set attribute
+  $elem->type;       # get attribute
+  $elem->tagName;
+  # etc.
+
+=head1 DESCRIPTION
+
+This class implements 'select' elements in an HTML::DOM tree. It 
+implements the HTMLSelectElement DOM interface and inherits from 
+L<HTML::DOM::Element> (q.v.).
+
+=head1 METHODS
+
+In addition to those inherited from HTML::DOM::Element and its 
+superclasses, this class implements the following DOM methods:
+
+=over 4
+
+=item defaultSelected
+
+=item disabled
+
+=item label
+
+Each of these returns the corresponding HTML attribute (the 'selected'
+attribute in the case of C<defaultSelected>). If you 
+pass an
+argument, it will become the new value of the attribute, and the old value
+will be returned.
+
+=item form
+
+Returns the form containing this input element.
+
+=item text
+
+Returns the option's text label.
+
+=item index
+
+Returns the index of this option in it's 'select' element's C<options>
+array. You can pass an argument to set it. In that case, the option will be
+moved to a different place in the tree. (This is actually contrary to the
+DOM Level 2 specification, which makes it read-only, but Level 1 supported
+this, and I find feature deletion very disagreeable.)
+
+=item selected
+
+Returns a boolean indicating whether the option is selected. If an argument
+is passed, it becomes the new state and the old is returned.
+
+=item value
+
+Returns the value of the option, that is, the 'value' attribute, if
+present, or the text content otherwise.
+
+If the calling package 
+is HTML::Form or
+WWW::Mechanize, the return value will be undef if the option is not 
+selected.
+With an undef argument the option will be deselected. If an argument is 
+given
+that is the same as the value, the box will be checked. If any
+other argument is passed, it will die.
+
+=back
+
+In addition, the following methods are provided for compatibility with C<WWW::Mechanize>:
+
+=over 4
+
+=item type
+
+Returns the string 'option'.
+
+=item name
+
+Returns the name of the enclosing 'select' element.
+
+=item possible_values
+
+This returns a list with C<undef> for the first element and the option's
+value for the second.
+
+=item form_name_value
+
+Returns a list of two items: (0) the name of the field and (1) the value,
+*if* it is selected.
+
+=back
+
+=head1 SEE ALSO
+
+L<HTML::DOM>
+
+L<HTML::DOM::Element>
+
+L<HTML::DOM::Element::Form>
+
+L<HTML::DOM::Element::Select>
+
+L<HTML::DOM::Collection::Options>

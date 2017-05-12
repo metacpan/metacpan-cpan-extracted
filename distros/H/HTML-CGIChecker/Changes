@@ -1,0 +1,32 @@
+
+0.90 08/15/2001
+    
+    - The parser was rewritten to be much faster. Now it uses only one
+      regexp in a split() instead of a whole bunch of regexps in a loop.
+      Some other optimizations were also done.
+
+    - Much better auto-correction of unescaped HTML brackets.
+      The module now can autocorrect both opening and closing unmatched 
+      HTML brackets.
+    
+    - Tagclasses were updated to include all relevant 
+      elements from current XHTML DTD.
+
+    - By default more harmless inline tags are allowed:
+    
+        B I A U STRONG BR
+        EM CITE VAR ABBR Q DFN CODE SUB SUP SAMP KBD ACRONYM
+
+    - The automatic HTML escaping was improved by
+      godless@hermes.slipstream.com.
+      Now the user can use HTML entities, but an ampersand that is not
+      part of a HTML entity is still properly escaped.
+
+    - Small fixes of some regexps.
+      
+    - Some documentation improvements.
+
+    - A new, much better test suite.
+
+0.80 06/02/2001
+	- first CPAN release

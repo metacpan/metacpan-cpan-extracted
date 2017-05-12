@@ -1,0 +1,10 @@
+<HTML><BODY>
+<H1> test unescape in func args </H1>
+arglist('\'','s\a\\nki')=['][sa\nki]
+arglist('\'','\a\\n')=['][a\n]
+arglist('\'','\a\\')=['][a\]
+arglist('\a\\')=[a\]
+arglist('\a')=[a]
+arglist('\\')=[\]
+arglist('\'')=[']
+</body></html>

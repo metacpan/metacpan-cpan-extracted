@@ -1,0 +1,51 @@
+Revision history for Perl extension HTML::Copy.
+
+1.31 2013-06-27
+    * Remove devendencies on Cwd package.
+    * Broken links are not unescaped.
+    * Ignore template toolikit's variables in links.
+    * Fixed spelling mistakes in the document.
+        * Thanks to gregor herrmann.
+    * Fixed failing tests with Perl 5.18.
+        * Thanks to gregor hermman.
+
+1.3 2008-02-20
+    * HTML::Copy can accept file handles instead file pathes.
+    * htmlcopy can use standard input and output.
+    * The working in MS Windows platform is expected again.
+        * Thanks to Taro Nishino.
+    
+1.24 2008-01-24
+    * The test may success in MS Windows platform.
+
+1.23 2008-01-16
+    * Add error handling routine when a souce file can't be opened.
+
+1.22 2007-08-10
+    * add HTTP::Headers to Makefile.PL as a prerequired module(PREREQ_PM).
+
+1.21 2007-08-09
+    * copy_to and parse_to can be accept a path of directory.
+    * automatically make missing directory
+    
+1.2 2007-05-31
+    * support XHTML
+    * process with taking account of <base> tag
+    * use URI module instead of File::Spec to convert link path.
+        * HTML::Copy may work on non-unix platform.
+    
+1.13 2007-03-22
+    * fix a problem that processing a link including an anchor is not correct.
+
+1.12 2007-02-22
+    * fix error in POD
+    * use Class::Accessor
+    * fix invalid warnning when a file does not exist
+    
+1.11 2007-02-19
+    * blush up POD
+    * blush up code
+    * add use 5.008
+    
+1.1
+    * First version to update CPAN

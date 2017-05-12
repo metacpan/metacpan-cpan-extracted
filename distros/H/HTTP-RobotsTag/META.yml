@@ -1,0 +1,22 @@
+--- 
+abstract: Parse Robots Tag In HTTP Headers
+author: 
+  - Copyright (c) 2007 Daisuke Maki <daisuke@endeworks.jp>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: HTTP-RobotsTag
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Carp: 0
+  DateTime::Format::Strptime: 0
+  HTTP::Headers: 0
+version: 0.00001

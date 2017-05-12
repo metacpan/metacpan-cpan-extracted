@@ -1,0 +1,40 @@
+<wmmeta name="Title" value="The &lt;media&gt; Tag" />
+<wmmeta name="Section" value="02-tags_attrs" />
+<wmmeta name="Score" value="50" />
+<wmmeta name="Abstract">
+load many URLs from one data source
+</wmmeta>
+
+WebMake allows you to refer to files and web pages symbolically, separating
+the site layout from the URL structure, and avoiding later problems with
+dangling links when a page's URL is changed.  This is done using <a
+href=$(url_refs)>&wmdollar;(url_refs)</a>.
+
+This works well for content items defined in WebMake, such as output files
+defined using the <a href=$(out)>&lt;out&gt;</a> tag.  However it is not handy
+when dealing with a images or other files that are not
+generated using WebMake.
+
+Therefore media files, such as images, and external, non-WebMake-controlled
+files, can be searched for using the &lt;media&gt; tag. This tag allows you to
+search a "data source" [ds] (directory, etc.) for a pattern.
+
+	[ds]: $(datasources)
+
+    Note that data sources which do not map to files in a filesystem, or other
+    methods accessible to a web browser browsing your site, do not make sense
+    for the &lt;media&gt; tag; so, for example, the __svfile:__ protocol is
+    not supported, as a web browser cannot load an image from a CSV file.
+    As a result, currently only one data source protocol can be used with
+    the &lt;media&gt; tag, namely __file:__.
+
+${datasource_attrs.inc}
+${datasource_file_protocol.inc}
+
+Example
+=======
+
+<safe>
+  <media src="file:images" name=".../*.gif" />
+  <media src="file:images" name=".../*.jpg" />
+</safe>

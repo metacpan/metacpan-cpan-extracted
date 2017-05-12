@@ -1,0 +1,47 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+
+use Sys::Hostname;
+use File::Spec;
+
+my $host = hostname();
+my $default_webapp_dir =
+  $host =~ /habitatoc/
+    ? '/var/www/diberri/cgi-bin/html2wiki'
+    : $host =~ /Schonlein/
+        ? '/Users/diberri/Sites/cgi-bin/html2wiki'
+        : '';
+
+my $webapp_dir = prompt( 'Path to web application:', $default_webapp_dir );
+die "no path specified" unless $webapp_dir;
+
+doit( "mkdir -p $webapp_dir" ) if ! -d $webapp_dir;
+doit( "cp -R cgi/* $webapp_dir" );
+
+my $index_cgi = File::Spec->catfile( $webapp_dir, 'index.cgi' );
+my $template_path = File::Spec->catdir( $webapp_dir, 'templates/' );
+doit( "sed -ie 's#__PATH_TO_TEMPLATES__#$template_path#' $index_cgi" );
+
+if( $host =~ /habitatoc/ ) {
+  my $main_html = File::Spec->catfile( $template_path, 'main.html' );
+  doit( "sed -ie 's#FIXME_TMPL_INCLUDE#TMPL_INCLUDE#' $main_html" );
+}
+
+sub doit {
+  my $cmd = shift;
+  print $cmd, "\n";
+  system $cmd;
+}
+
+sub prompt {
+  my( $prompt, $default ) = @_;
+  $default ||= '';
+
+  printf( '%s [%s]: ', $prompt, $default );
+  chomp( my $input = <STDIN> );
+  $input =~ s/^\s+//;
+  $input =~ s/\s+$//;
+
+  return $input || $default || '';
+}

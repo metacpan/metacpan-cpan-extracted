@@ -1,0 +1,26 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Hardware/Vhdl/Automake.pod
+lib/Hardware/Vhdl/Automake/Tutorial.pod
+lib/Hardware/Vhdl/Automake/CLI.pm
+lib/Hardware/Vhdl/Automake/CompileTool.pm
+lib/Hardware/Vhdl/Automake/DesignUnit.pm
+lib/Hardware/Vhdl/Automake/PreProcessor.pm
+lib/Hardware/Vhdl/Automake/Project.pm
+lib/Hardware/Vhdl/Automake/SourceFile.pm
+lib/Hardware/Vhdl/Automake/UnitName.pm
+lib/Hardware/Vhdl/Automake/Compiler/ModelSim.pm
+lib/Hardware/Vhdl/Automake/PreProcessor/Cish.pm
+t/00-load.t
+t/boilerplate.t
+t/pod.t
+tutorial/README
+tutorial/create_project.pl
+tutorial/generate_hdl.pl
+tutorial/compile_hdl.pl
+tutorial/generate_compile.pl
+tutorial/src/adder.vhd
+tutorial/src/count_up.vhd

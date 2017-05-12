@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         HTML-FromMail
+version:      0.11
+version_from: 
+installdirs:  site
+requires:
+    HTML::FromText:                2.03
+    Mail::Box:                     2.051
+    OODoc::Template:               0.01
+    Test::Pod:                     1
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

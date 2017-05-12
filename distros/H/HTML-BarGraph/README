@@ -1,0 +1,49 @@
+HTML::BarGraph
+--------------
+A Perl module which creates bar graphics for one or more datasets, using plain
+HTML and, optionally, "stretched" pixel images.
+
+Features
+--------
+- it can display more than one data set on the same graphic
+- one can change the direction of the bars (vertical, horizontal) by simply 
+  changing one parameter
+- when used in plain HTML mode, the graphic (and the module) is completely 
+  independent - it doesn't require any graphic or graphic library
+- when used in plain HTML mode, the graphic is entirely included in the page, so
+  by saving the webpage, the whole graphic is saved with it
+- highly customizable
+- graphics for web polls and such simple data sets can be quickly created, 
+  without the overhead implied by "on the fly" graphic generation
+
+
+Screenshots ;)
+--------------
+A sample of what the module can do is included in the distribution (sample.html).
+The source of this HTML file contains the parameters that each graph was generated
+from.
+
+
+Install
+-------
+HTML::BarGraph is plain Perl, and so far has no dependencies, so install it like:
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+
+Pixels
+------
+Before using the module with 'bartype' set to 'pixel', you need to install 
+the various color pixels which will be used to draw the bars.  As a start, you 
+can use the pixels provided in the module's distribution (pixels/*.png).  You 
+need to install these manually, since there's no way to know the location where
+you want them to live.
+
+
+Enjoy.
+
+dec 2002
+cpan@podgurschi.org
+

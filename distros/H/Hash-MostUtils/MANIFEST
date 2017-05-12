@@ -1,0 +1,24 @@
+lib/Hash/MostUtils.pm
+lib/Hash/MostUtils/leach.pm
+lib/Hash/MostUtils/leach/v5_08.pm
+lib/Hash/MostUtils/leach/v5_13.pm
+README.pod
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+t/hashgrep.t
+t/hashapply.t
+t/hashmap.t
+t/lfuncs.t
+t/hashslice.t
+t/leach.t
+t/sparse.t
+t/hash.t
+t/once.t
+t/array.t
+LICENSE
+lib/Hash/MostUtils/leach/v5_10.pm
+Changes
+t/hashsort.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

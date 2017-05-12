@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!DOCTYPE OmniWebCookies SYSTEM "http://www.omnigroup.com/DTDs/OmniWebCookies.dtd">
+<OmniWebCookies>
+<domain name=".ebay.com">
+  <cookie name="lucky9" value="196606" expires="918345384" />
+</domain>
+<domain name=".usatoday.com">
+  <cookie name="RMID" value="0cf723a23dec2500" expires="615532799" />
+  <cookie name="UID" value="0cf723a23dec2500" expires="788853600" />
+  <cookie name="USATINFO" value="UID%3D0cf723a23dec2500" expires="788853600" />
+</domain>
+</OmniWebCookies>

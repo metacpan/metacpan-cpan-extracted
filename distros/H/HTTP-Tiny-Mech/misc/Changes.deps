@@ -1,0 +1,97 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+1.001002
+ [Added / configure requires]
+ - perl 5.006
+
+ [Added / test requires]
+ - lib
+ - perl 5.006
+
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+1.001001 2014-08-15T06:11:34Z
+ [Added / test requires]
+ - File::Spec
+
+ [Changed / configure requires]
+ - ExtUtils::MakeMaker 6.30 → 0
+
+ [Removed / test requires]
+ - File::Spec::Functions
+ - List::Util
+ - version
+
+1.001000 2014-07-17T15:22:19Z
+ [Added / test requires]
+ - HTTP::Response
+
+ [Removed / runtime requires]
+ - Class::Tiny
+
+1.000000 2014-05-10T02:41:46Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker 6.30
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec::Functions
+ - List::Util
+ - version
+
+ [Changed / test requires]
+ - Test::More 1.001002 → 0.89
+
+ [Removed / build requires]
+ - Module::Build 0.4202
+
+ [Removed / configure requires]
+ - Module::Build 0.4202
+
+0.2.1 2013-11-24T00:55:35Z
+ [Added / test requires]
+ - HTTP::Tiny 0.022
+
+ [Changed / runtime requires]
+ - HTTP::Tiny 0 → 0.022
+
+0.2.0 2013-11-24T00:18:47Z
+ [Added / runtime requires]
+ - Class::Tiny
+ - parent
+
+ [Removed / runtime requires]
+ - Moose
+ - MooseX::NonMoose
+
+0.1.4 2013-11-21T07:32:56Z
+ [Changed / build requires]
+ - Module::Build 0.4003 → 0.4202
+
+ [Changed / configure requires]
+ - Module::Build 0.4003 → 0.4202
+
+ [Changed / test requires]
+ - Test::More 0.98 → 1.001002
+
+ [Removed / test requires]
+ - File::Find
+ - File::Temp
+
+0.1.3 2012-11-08T14:06:30Z
+ [Added / runtime requires]
+ - perl 5.006
+
+ [Changed / build requires]
+ - Module::Build 0.3601 → 0.4003
+
+ [Changed / configure requires]
+ - Module::Build 0.3601 → 0.4003
+
+ [Changed / test requires]
+ - Test::More 0.88 → 0.98
+
+0.1.2 2011-10-17T09:42:07Z
+
+0.1.1 2011-10-17T03:48:43Z

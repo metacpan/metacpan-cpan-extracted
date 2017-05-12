@@ -1,0 +1,39 @@
+NAME
+    Hook::Heckle - create pre and post hooks
+
+DESCRIPTION
+    Creating hooks to subroutines is issued by many other cpan modules. See
+
+    *   the Class::Hook manpage
+
+    *   the Hook::Scope manpage
+
+    *   the Hook::WrapSub manpage
+
+    *   the Hook::LexWrap manpage
+
+    *   the Hook::PrePostCall manpage
+
+    But this didnt kept me from writing a new one. It is a base class and
+    can be inherited.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Class::Maker
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 M. Uenalan
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

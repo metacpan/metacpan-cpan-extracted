@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.38.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7f7a2c8910750ae5626108df5fa2399b4e9ab19e Build.PL
+SHA1 959aa082e7377f513c59ee37f933cc3ab2398b38 Changes
+SHA1 c299db91f71478907ac59c6dd41c243fa5f0bfc2 LICENSE
+SHA1 32c9efb63cd517570ca46c484bcb7966d6370d2b MANIFEST
+SHA1 fe9bd3d5677b5b7759cb1f616eff668fe1b2adbe META.yml
+SHA1 7e9e2553e95913392d02f7841987ce8b9fb01d1d Makefile.PL
+SHA1 00c94285d8dfc1a3ff3211c57acc29a37457a938 README
+SHA1 0d073dd90358938434d2e9caf8bbacd4a539635b Todo
+SHA1 a92d354fea223d3408ce9b1f258080083539dc3d lib/HTTPD/ADS.pm
+SHA1 3e3ac3b381feec68da52ff998f5bf08e6e12e57e lib/HTTPD/ADS/AbuseNotify.pm
+SHA1 2782b52c42fd55c6f170674eb49ab7da6222c0ef lib/HTTPD/ADS/Blocker.pm
+SHA1 da713a28f44abe12121aca4244fb1ec8eed8264a lib/HTTPD/ADS/DBI.pm
+SHA1 6ad78067b0d442e3a86aa0adae74c21f5870a9e9 lib/HTTPD/ADS/OpenProxyDetector.pm
+SHA1 3d37ca5aa27e30fd0b0912714af2a76e8bd70240 lib/HTTPD/ADS/Times.pm
+SHA1 ef177ba197ea23291a422ee34192adb08b82f27f scripts/DefenseServer.pl
+SHA1 952c8fa4bc7c7d21dc3095a82756f9c79cfdcf00 scripts/EventServer.pl
+SHA1 027a7d82c8e08bfd9b468deb7d7db8b1e702abcf scripts/LogReader.pl
+SHA1 99385e3cb96259d51c99600a5762acc96585fb21 scripts/createdb.sql
+SHA1 70d27b81ec6fde874e0fdd502278c084b8c32303 scripts/dbstructure.html
+SHA1 4d88879e49e5edafe36c392bf17c814d0889b9ae t/001_load.t
+SHA1 a2a141c5b208d1e1db0480ad04dad7231f1696e4 t/003_load.t
+SHA1 aedd4c468a2e5708fd8bc82012045405f5be4106 t/004_load.t
+SHA1 a7c3f7ea180e4e20e4f7b71bc10c522a20d38d80 t/005_load.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.2 (GNU/Linux)
+
+iD8DBQFAQlOHTrCJ0LbjxzoRApcxAKChuTFLI9e6yszy+E/OUNb3f0YPVwCfeWOi
+lVDW+9i6WEa8xBhmKGEib+E=
+=Fx+W
+-----END PGP SIGNATURE-----

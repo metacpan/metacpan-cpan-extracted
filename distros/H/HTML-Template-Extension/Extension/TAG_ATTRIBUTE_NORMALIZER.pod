@@ -1,0 +1,51 @@
+=head1 NAME
+
+HTML::Template::Extension::TAG_ATTRIBUTE_NORMALIZER - Remove unknown H::T attribute
+
+=head1 SYNOPSIS
+
+ use HTML::Template::Extension;
+
+ my $text = qq
+    |
+     TAG_ATTRIBUTE_NORMALIZER plugin example
+     =======================================
+     If all is ok you can read this here --> <TMPL_VAR NAME="test" class="tmpl">a placeholder</TMPL_VAR>
+
+    |;
+
+ my $comp       = new HTML::Template::Extension(
+                                            scalarref => \$text,
+                                            plugins=>["SLASH_VAR","TAG_ATTRIBUTE_NORMALIZER"],
+                        );
+
+ $comp->param('test' => "It works!!!");
+ print $comp->output;
+
+ #   OUTPUT:
+ #
+ #   SLASH_VAR plugin example
+ #   ========================
+ #   If all is ok you can read this here --> It works!!!
+
+
+=head1 DESCRIPTION
+
+TAG_ATTRIBUTE_NORMALIZER add syntax to remove unknown HTML::Template TAG attribute.
+So you can better identify you HTML::Template tags with visual effects like a 
+peculiar style sheet.
+
+=head1 AUTHOR
+
+Bruni Emiliano, <info@ebruni.it>
+
+=head1 SEE ALSO
+
+ HTML::Template
+ HTML::Template::Extension::DO_NOTHING
+ HTML::Template::Extension::SLASH_VAR
+ HTML::Template::Extension::CSTART
+ HTML::Template::Extension::DOC
+ HTML::Template::Extension::HEAD_BODY
+
+=cut

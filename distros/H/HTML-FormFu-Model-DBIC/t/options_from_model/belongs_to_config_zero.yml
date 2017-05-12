@@ -1,0 +1,17 @@
+---
+auto_fieldset: 1
+
+elements:
+  - type: Hidden
+    name: id
+
+  - type: Text
+    name: text_col
+
+  - type: Select
+    name: type
+    model_config:
+      options_from_model: 0
+
+  - type: Submit
+    name: submit

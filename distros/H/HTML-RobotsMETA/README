@@ -1,0 +1,4 @@
+HTML::RobotsMETA parses HTML fails and look for robots directive inside
+META tags
+
+perldoc HTML::RobotsMETA for more info

@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 58a84cdc4f1a68d621a173222b8f156748ec8868 Changes
+SHA1 1907f0caadc642dede735a41860b342ce5cae1bc MANIFEST
+SHA1 e476d8bd724d46eb9e255cc8afc98b92269e2255 MANIFEST.SKIP
+SHA1 2b2897c7e56142ec0769a2d3f067937d5e080019 META.yml
+SHA1 86fbfbd339277162b49efdd58a0568c6895ec300 Makefile.PL
+SHA1 02be3a74017679a35b0df586169777fa305664a7 ex/sample_server.pl
+SHA1 fd5f3c4f0418efee3b9b16cf8c3902e8374909df inc/Module/Install.pm
+SHA1 7cd7c349afdf3f012e475507b1017bdfa796bfbd inc/Module/Install/Base.pm
+SHA1 ba186541bbf6439111f01fc70769cf24d22869bf inc/Module/Install/Can.pm
+SHA1 aaa50eca0d7751db7a4d953fac9bc72c6294e238 inc/Module/Install/Fetch.pm
+SHA1 3e83972921d54198d1246f7278f08664006cd65d inc/Module/Install/Makefile.pm
+SHA1 12bf1867955480d47d5171a9e9c6a96fabe0b58f inc/Module/Install/Metadata.pm
+SHA1 f7ee667e878bd2faf22ee9358a7b5a2cc8e91ba4 inc/Module/Install/Win32.pm
+SHA1 8ed29d6cf217e0977469575d788599cbfb53a5ca inc/Module/Install/WriteAll.pm
+SHA1 c5b2a151ab1be93339c916fd64a598779416b2ed lib/HTTP/Server/Simple/Mason.pm
+SHA1 c465222b356e9f0af0721ac0e6473eb534f2d90c t/00smoke.t
+SHA1 6667b5a7d2c5c1c9582930d8eb784fbea15672e5 t/01live.t
+SHA1 aca95653cfce68912e08c57b3a4566207e2f99b3 t/02pod.t
+SHA1 90f0be3e6b0fab021155953742f5cc5c5e47a5aa t/03podcoverage.t
+SHA1 1562a9be9217ee832f2e12d7b7992438b878044c t/04unhandlederrors.t
+SHA1 69ac9d80ff673410c3fd19b832c2828b0ed85648 t/05handlederrors.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAkrPiYsACgkQEi9d9xCOQEY4hQCeMbt+emsNJb8tyTQcD7OYTycw
+0UoAoJKE2zsoiNhIW1cIY9KJGFoKvFkn
+=OXUc
+-----END PGP SIGNATURE-----

@@ -1,0 +1,12 @@
+Changes
+File.pm
+File.pm.submitted
+File.pod
+GetString.pl
+MANIFEST
+Makefile.PL
+hidden-email
+savepage.html.template
+savepage.cgi.template
+test.pl
+META.yml                                Module meta-data (added by MakeMaker)

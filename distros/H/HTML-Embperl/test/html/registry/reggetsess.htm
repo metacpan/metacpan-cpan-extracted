@@ -1,0 +1,42 @@
+#
+# run this under mod_perl / Apache::Registry
+#
+
+
+use HTML::Embperl ;
+
+my($r) = @_;
+
+$HTML::Embperl::DebugDefault = 811005 ;
+
+
+$r -> status (200) ;
+$r -> send_http_header () ;
+
+print "<HTML><TITLE>Test for HTML::Embperl::Req::SetupSession</TITLE><BODY>\n" ;
+
+
+my $session = HTML::Embperl::Req::SetupSession ($r) ;
+
+$off = 0 ; $off-- if ($HTML::Embperl::SessionMgnt == 2 && !defined (tied (%$session) -> getid)) ; 
+@ks = grep (!/^_/, sort (keys %$session)) ; $num = keys (%$session) - $#ks - 1 + $off ; 
+
+foreach (@ks)
+    {
+    print "$_ = $session->{$_} <BR>\n" ;
+    }
+
+$tst1 = '<P>Here is some text inside of Execute</P>' ;
+
+
+HTML::Embperl::Execute ({input		=> \$tst1,
+						 mtime      => 1,  
+						 inputfile	=> 'Some text session test',
+						 }) ;
+
+
+
+
+
+
+print "</BODY></HTML>\n" ;

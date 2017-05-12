@@ -1,0 +1,9 @@
+2002-04-14  IKEBE Tomohiro  <ikebe@edge.co.jp>
+
+	* use Inline::Ruby directly.
+	* fixed ERuby tag regexp (Thanks to Tatsuhiko Miyagawa)
+	* evaluate Perl variables in ERuby document.
+
+2002-04-13  IKEBE Tomohiro  <ikebe@edge.co.jp>
+
+	* original version

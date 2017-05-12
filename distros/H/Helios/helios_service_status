@@ -1,0 +1,185 @@
+#!/usr/bin/env perl
+
+use 5.008;
+use strict;
+use warnings;
+use Getopt::Long;
+use Sys::Hostname ();
+
+use Helios::Service;
+
+our $VERSION = '2.82';
+
+our $Service_Name = '';
+our $Hostname     = '';
+our $Help_Mode    = 0;
+our $OPT_Epoch_Time = 0;
+
+GetOptions(
+	"service=s"  => \$Service_Name,
+	"H|hostname=s" => \$Hostname,
+	"epoch-time" => \$OPT_Epoch_Time, 
+	"help"       => \$Help_Mode,
+);
+
+# help mode
+if ($Help_Mode) {
+	require Pod::Usage;
+	Pod::Usage::pod2usage(-verbose => 2, -exitstatus => 0);
+}
+
+# this is a little old school, but we'll 
+# instantiate the base Helios::Service to 
+# get a collective database connection
+my $s = Helios::Service->new();
+$s->prep();
+my $dbh = $s->dbConnect();
+
+my @placeholders;
+my $sql = q{
+	SELECT 
+		worker_class, 
+		worker_version, 
+		host, 
+		process_id, 
+		start_time, 
+		register_time
+	FROM
+		helios_worker_registry_tb
+	WHERE
+		register_time > ?
+		
+};
+push(@placeholders, time() - 300 );
+
+if ($Service_Name) { 
+	$sql .= ' AND worker_class = ? ';
+	push(@placeholders, $Service_Name);
+}
+
+if ($Hostname && $Hostname ne '*') {
+	$sql .= ' AND host = ? ';
+	push(@placeholders, $Hostname);
+} elsif ($Hostname eq '*'){
+	# do nothing
+} else {
+	# --hostname wasn't specified, default to the localhost
+	$sql .= ' AND host = ? ';
+	push(@placeholders, Sys::Hostname::hostname());	
+}
+
+my $rs;
+eval {
+	$rs = $dbh->selectall_arrayref($sql, undef, @placeholders);
+	1;
+} or do {
+	my $E = $@;
+	warn "$0: ERROR: $E\n";
+	exit(1);
+};
+
+foreach (@$rs) {
+	print 'Service: ',$_->[0],"\n";
+	if (!defined($_->[1]) || $_->[1] eq '') {
+		print "Version: (none)\n";
+	} else {
+		print 'Version: ',$_->[1],"\n";
+	}
+	print 'Host: ',$_->[2],"\n";
+	print 'PID: ',$_->[3],"\n";
+	print "Online Since: ", $OPT_Epoch_Time ? $_->[4] : scalar localtime($_->[4]),"\n";
+	print 'Last Registered: ', $OPT_Epoch_Time ? $_->[5] : scalar localtime($_->[5]),"\n";
+	print "\n";
+}
+
+$dbh->disconnect();
+
+
+exit(0);
+
+
+=head1 NAME
+
+helios_service_status - check the status of services running in a Helios collective
+
+=head1 SYNOPSIS
+
+ helios_service_status [--service=<service name>] [--hostname=<hostname>] [--epoch-time]
+ 
+ # list status of all service instances running on current host
+ helios_service_status 
+ 
+ # list status of all service instances running on host wrkhost1
+ helios_service_status --hostname=wrkhost1
+ 
+ # list status of all service instances running on all hosts in the collective
+ helios_service_status --hostname=*
+ 
+ # list status of all instances of MyService
+ # -H is shortcut for --hostname
+ helios_service_status --service=MyService -H=*
+
+ # list information on the MyService instance running on wrkhost1
+ # report the start and last check in times in epoch seconds
+ helios_service_status -s MyService -H wrkhost1 --epoch-time
+
+=head1 DESCRIPTION
+
+The helios_service_status command reports status information on services 
+running in a Helios collective.  You can use this command for general 
+administration purposes or to build monitoring scripts for services.
+
+The helios_service_status command currently reports 6 key pieces of 
+information:
+
+=over 4
+
+=item Service
+
+name of the service.
+
+=item Version
+
+the version of the service, if one is set.
+
+=item Host
+
+the hostname of the host on which the service is running.
+
+=item PID
+
+The process id of the service daemon.
+
+=item Online Since
+
+the start time of the service daemon.
+
+=item Last Registered
+
+the last time the service daemon "checked in" to the collective.  How often 
+this happens is controlled by the "registration_interval" configuration 
+parameter.  The default is 60 sec, which should be fine for most purposes.
+
+=back
+
+This command basically reports the same type of information as the 
+Helios::Panoptes Collective Admin view, but having it available at the 
+command line adds convenience and enhances the Helios system's scriptability.
+
+=head1 AUTHOR
+
+Andrew Johnson, E<lt>lajandy at cpan dot orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013-4 by Logical Helion, LLC.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=head1 WARRANTY
+
+This software comes with no warranty of any kind.
+
+=cut

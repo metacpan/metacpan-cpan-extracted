@@ -1,0 +1,26 @@
+--- 
+abstract: Configurable Tag Cloud Generator
+author: Copyright (c) 2007 Daisuke Maki <daisuke@endeworks.jp>
+distribution_type: module
+generated_by: Module::Install version 0.67
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: HTML-TagClouder
+no_index: 
+  directory: 
+    - inc
+    - t
+recommends: 
+  Class::C3: 0.16
+  Class::C3::XS: 0.02
+  Template: 0
+requires: 
+  Class::Accessor::Fast: 0
+  Class::C3: 0
+  Class::Inspector: 0
+  UNIVERSAL::isa: 0
+  UNIVERSAL::require: 0
+  overload: 0
+version: 0.02

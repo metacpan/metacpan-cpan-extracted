@@ -1,0 +1,34 @@
+---
+auto_fieldset: 1
+
+elements:
+  - type: Text
+    name: text_col
+
+  - type: Repeatable
+    nested_name: schedules
+    counter_name: count
+    model_config:
+      empty_rows: 1
+      new_rows_max: 1
+
+    elements:
+      - type: Hidden
+        name: id
+
+      - type: Date
+        name: date
+        auto_inflate: 1
+        constraints:
+          - Required
+
+      - name: note
+        constraints:
+          - Required
+
+  - type: Hidden
+    name: count
+
+  - type: Submit
+    name: submit
+

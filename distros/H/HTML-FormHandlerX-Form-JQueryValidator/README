@@ -1,0 +1,30 @@
+HTML-FormHandlerX-Form-JQueryValidator
+======================================
+
+This perl Trait allows you to re-use some form validation rules with the
+ JQuery Validation plugin (http://docs.jquery.com/Plugins/Validation)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  HTML::FormHandler
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 by Aaron Trevena
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

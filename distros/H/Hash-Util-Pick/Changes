@@ -1,0 +1,24 @@
+Revision history for Perl extension Hash-Util-Pick
+
+0.11 2016-11-24T00:40:10Z
+    - fix document style
+
+0.10 2016-11-12T07:27:00Z
+    - add omit/omit_by methods
+
+0.06 2016-09-06T14:59:11Z
+    - change to dereference safely
+
+0.05 2016-08-29T13:43:29Z
+    - fix readme sample code
+
+0.03 2016-08-28T15:07:37Z
+    - fix xs builder
+
+0.02 2016-08-28T13:07:31Z
+    - fix required perl version
+
+0.01 2016-08-27T08:50:00Z
+
+    - original version
+

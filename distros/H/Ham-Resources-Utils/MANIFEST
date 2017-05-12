@@ -1,0 +1,18 @@
+Changes
+lib/Ham/Resources/Utils.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/date_split.t
+t/compass.t
+t/dec2sexag.t
+t/sexag2dec.t
+t/degree2loc.t
+t/cicle_sun.t
+t/data_by_coordinates.t
+t/data_by_locator.t
+t/Ham-Resources-Utils-test.pm

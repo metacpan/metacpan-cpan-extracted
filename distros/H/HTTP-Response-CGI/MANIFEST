@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/basic.t
+t/parse-cgi.t
+t/parse-regular-http.t
+t/parse-spacing.t
+lib/HTTP/Response/CGI.pm
+META.yml                                 Module meta-data (added by MakeMaker)

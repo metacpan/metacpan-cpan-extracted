@@ -1,0 +1,48 @@
+Revision history for Perl module HTML::Summary
+
+0.022 2016-07-03 NEILB
+    - Was explicitly setting $VERSION in all modules, instead of letting
+      Dist::Zilla do it for me. Thanks to MANWAR for pointing this out.
+
+0.021 2015-10-25 NEILB
+    - Switched to Dist::Zilla, prompted by a PR to add a LICENSE file --
+      better to have DZ handle that for me. Thanks to MANWAR for the nudge.
+
+0.020 2015-10-21 NEILB
+    - Changed URL repos to reflect my changed github username
+    - Got rid of use of indirect method notation from doc
+    - Fixed USE_META - was producing a warning if there wasn't
+      a <meta name=description> but there was a different meta tag.
+      Added test t/02-use-meta.t. Thanks to Paul Ryan for RT#92320
+
+0.019 2014-01-19
+    - Added github repo to metadata (via Makefile.PL) and to pods
+    - Dropped Lingua::JA::Jcode, and now use the Jcode module from CPAN
+      (which was originally based on the same code used in Lingua::JA::Jcode).
+      If you were using Lingua::JA::Jcode, just switch to using Jcode.
+    - Changed licence to 'perl' in doc
+    - Specified licence in Makefile.PL
+    - Changed relevant header in pod from COPYRIGHT to COPYRIGHT AND LICENSE
+
+0.018 2014-01-13
+    - Gave all modules the same version number
+    - MIN_PERL_VERSION as 5.6.0 in Makefile.PL
+    - Added all prereqs to PREREQ_PM in Makefile.PL
+    - added "use warnings" to all modules
+    - Updated doc: tweaked format, noted new maintainer
+    - Reformatted Changes (this file) as per CPAN::Changes::Spec
+
+0.017 1999-07-01
+    - improved handling of JIS in Lingua::JA::Jtruncate
+
+0.016 1999-04-19
+    - text.pl moved to t/all.t to invoke Test::Harness
+    - changes to bugs in the test script (from Lupe Christoph)
+
+0.015 1999-03-30
+    - README changed to include a description of what HTML::Summary does.
+    - bug in test.pl for Mac fixed by using File::Spec to create path.
+
+0.01  1998-09-17
+    - original version; created by h2xs 1.18
+

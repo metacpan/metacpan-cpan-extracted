@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 ad979fb661e7a8c62edf30ad29f1eaaad96c79f5 Changes
+SHA1 9ef726de20e381285c90b42fbbc5325be1f7f67a INSTALL
+SHA1 062871100d8097d0f764471ee3465d2cb30dcc11 LICENSE
+SHA1 14091bcf0196a9c75a0527c8bd7ad1690f1df50c MANIFEST
+SHA1 ee5a793ba64fac59a87e9d6c2dfb32c43b8fc895 MANIFEST.SKIP
+SHA1 acbbab163ea3f6c1c614f30864bda3def829526c META.json
+SHA1 2d53d90e406fd43bbde2496f8ae96b404e5ba8f0 META.yml
+SHA1 fc9c07d36f0c25227dabd4dcc189005054ed5979 Makefile.PL
+SHA1 37ed136f650457c13eb3956615a91ef10dd4118b README
+SHA1 4229b28620dbfc1716f5f68a721f9c968b7e4587 README.md
+SHA1 115789e5d741143c35808378dc60754f56d3ada1 dist.ini
+SHA1 8b18aa593be9ac10ce7251daff6d3d61cf3b4ea4 lib/Homer.pm
+SHA1 66a7b2c8aa290bc858ce3b1a1416916d8292aa5e t/00-load.t
+SHA1 dc3d1e5b968d7132cdff36a0e18923cd5de53997 t/01-simple.t
+SHA1 560bc7c1ce955fdadf9d04b117f7e9db8c9220ff t/release-dist-manifest.t
+-----BEGIN PGP SIGNATURE-----
+
+iHQEAREIAB0WIQTYtJGMHsdqxHuiCD1rg4dAAUzXRwUCWJjgDQAKCRBrg4dAAUzX
+R5jkAPoDuarjV3237Wu3ukJ1SRS6oiPPsfGNTiAewwNu9je3dwD44TTLTArD6/KG
+vjSOr4vNqCA9PZlREuVQnBZ8Gh/Sjg==
+=Yrxe
+-----END PGP SIGNATURE-----

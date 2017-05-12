@@ -1,0 +1,9 @@
+Revision history for Perl extension HTML::TagTree.
+
+0.02  Thu Sep 03 14:14:00 2014
+   - Fixed bad auto newline before certain end tags. (eg textarea, span).
+
+0.01  Sun Jul 24 19:02:31 2011
+	- original version; created by h2xs 1.23 with options
+		-XA -n HTML::TagTree
+

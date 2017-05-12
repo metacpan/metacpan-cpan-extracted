@@ -1,0 +1,96 @@
+$Id: /html-treebuilder-xpath/Changes 40 2006-05-15T07:42:34.182385Z mrodrigu  $
+Revision history for Perl extension HTML::TreeBuilder::XPath.
+
+version 0.14
+date: 2011-09-20
+# bug fix
+fix:   comment() did not work, as the text was in {text} not {_text}
+       report and initial patch by perlover
+
+version 0.13
+date: 2011-06-19
+# minor improvement
+added: make the link _parent a weakref
+       sent by Graham Barr https://rt.cpan.org/Public/Bug/Display.html?id=68896
+
+version 0.12
+date:   2010-09-29
+# minor bug fix
+fix:    added getLocalName on elements
+        see https://rt.cpan.org/Public/Bug/Display.html?id=61746
+        found and fixed by Tokuhiro Matsuno
+added:  a few tests
+
+version 0.11
+date:  	2009-05-19
+# minor bug fixes
+added:  mention $tree->delete in docs to warn about memory leaks
+fix:    pod fix (https://rt.cpan.org/Ticket/Display.html?id=46203)
+
+version: 0.10
+date: 2008-02-11
+# minor feature addition
+new: find_nodes_as_strings method which returns a list of strings
+new: findvalues method which returns a list of values  
+new: as_XML_compact method, a replacement for HTML::TreeBuilder as_XML
+new: as_XML_indented method, same as as_XML_compact, except indents the output
+   
+
+version: 0.09
+date: 2007-11-20
+# 2 bug fixes
+fix:
+         added support for the id function, see RT #30792 
+         at https://rt.cpan.org/Ticket/Display.html?id=30792 bug reported, and
+         a fix proposed by tokuhirom 
+
+fix:     a bug where the as_XML method on text nodes returned non escaped
+         text, spotted by Tatsuhiko Miyagawa
+         at the moment the output is quite ugly, as ugly as HTML::Element as_XM.
+
+
+version: 0.08
+date: 2007-01-20
+# bug fixes
+fix:     a bug that prevented the 'following' and 'preceding' axis to work
+fix:     set version dependency with XML::XPathEngine 
+
+version: 0.07
+date:    2007-01-05
+# bug fix
+fix:     a bug that prevented the 'following' axis to be used
+
+version: 0.06
+date:    2006-08-07
+# bug fix
+fix: 
+         a bug that caused a crash when an element had a value of 0 
+         (patch by Martin Sarfy)
+
+version: 0.05 
+date:    2006-05-17
+# more tests
+tests:   added pod and pod coverage tests
+
+version: 0.04 
+date:    2006-05-15
+# extended perl version support
+fix:     changed the required version of perl from 5.8.4 to 5.6.0
+
+version: 0.03 
+date:    2006-04-20
+# bug fix
+fix:     bug that caused results not to be ordered properly when
+         there were more than 10 results (cf RT #18705) spotted by rnapier
+
+version: 0.02 
+date:    2006-02-27
+# bug fix
+fix:     dependency to XML::XPathEngine in the Makefile
+
+version: 0.01 
+date:    2006-02-15
+new:     original version; created by h2xs 1.23 with options
+           -A -X -nHTML::TreeBuilder::XPath --use-new-tests --skip-exporter
+           --skip-autoloader
+

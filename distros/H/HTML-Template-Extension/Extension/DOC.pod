@@ -1,0 +1,58 @@
+=head1 NAME
+
+HTML::Template::Extension::DOC - Plugins for comments in template
+
+=head1 SYNOPSIS
+
+ use HTML::Template::Extension;
+
+ my $text = qq
+    |
+     <HTML><HEAD></HEAD><BODY>
+     <H1>This is a template example...</H1>
+     <TMPL_DOC>An example use of TMPL_DOC tag </TMPL_DOC>
+     The sum between 1+1 is: <TMPL_VAR NAME="result">
+     </BODY></HTML>
+    |;
+
+ my $comp       = new HTML::Template::Extension(
+                                            scalarref => \$text,
+                                            plugins=>["DOC"],
+                                            );
+
+ $comp->param('result' => 1+1);
+
+ print $comp->output;
+
+ #   OUTPUT:
+ #
+ #   <HTML><HEAD></HEAD><BODY>
+ #   <H1>This is a template example...</H1>
+ #        The sum between 1+1 is: 2
+ #   </BODY></HTML>
+
+
+=head1 DESCRIPTION
+
+DOC plugin add a <TMPL_DOC>some comments</TMPL_DOC> to standard HTML::Template
+syntax to permit to add comments to template that, for indeed, a web graphic
+designer can view in a WYSIWYG environment.
+
+All text between <TMPL_DOC> and </TMPL_DOC>  and tag itself will be deleted
+before HTML::Template parsing and retuning template output.
+
+
+=head1 AUTHOR
+
+Bruni Emiliano, <info@ebruni.it>
+
+=head1 SEE ALSO
+
+ HTML::Template
+ HTML::Template::Extension::DO_NOTHING
+ HTML::Template::Extension::SLASH_VAR
+ HTML::Template::Extension::CSTART
+ HTML::Template::Extension::DOC
+ HTML::Template::Extension::HEAD_BODY
+
+=cut

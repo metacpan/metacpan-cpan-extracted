@@ -1,0 +1,515 @@
+#!/usr/bin/env perl
+
+use 5.008;
+use strict;
+use warnings;
+use Getopt::Long;
+use Time::Local;
+use Time::Piece;
+use JSON::Tiny qw(encode_json decode_json);
+$JSON::Tiny::TRUE  = 1;
+$JSON::Tiny::FALSE = 0;
+
+use Helios::ObjectDriver;
+use Helios::LogEntry::Levels ':all';
+use Helios::JobType;
+use HeliosX::Logger::HiRes::LogEntry;
+
+our $VERSION = '1.00';
+
+our @LOG_PRIORITIES = qw(EMERG ALERT CRIT ERR WARNING NOTICE INFO DEBUG);
+our %LOG_PRIORITY_MAP = (
+     EMERG   => 0,
+	 ALERT   => 1,
+	 CRIT    => 2,
+	 ERR     => 3,
+	 WARNING => 4,
+	 NOTICE  => 5,
+	 INFO    => 6,
+	 DEBUG   => 7
+);
+our $LIMIT_DEFAULT = 50;
+
+our ($OPT_START_DATE, $OPT_END_DATE, $OPT_HOSTNAME, $OPT_PID, $OPT_JOBID,
+    $OPT_JOBTYPE, $OPT_SERVICE, @OPT_PRIORITY, $OPT_MESSAGE, $OPT_LIMIT,
+    $OPT_SORT, $OPT_TAIL, $OPT_FOLLOW, $OPT_OUTPUT_FORMAT);
+our ($OPT_HELP, $OPT_VERSION, $OPT_DEBUG);
+
+our $DEBUG_MODE       = 0;
+our $FOLLOW_MODE      = 0;
+our $TAIL_MODE        = 0;
+our $LAST_LOGID       = 0;
+our $OUTPUT_FORMAT    = 'log';
+our $OUTPUT_SEPARATOR = '';
+
+GetOptions(
+    "start-date=s"    => \$OPT_START_DATE,
+    "end-date=s"      => \$OPT_END_DATE,
+
+    "hostname=s"      => \$OPT_HOSTNAME,
+    "pid=i"           => \$OPT_PID,
+    "jobid=s"         => \$OPT_JOBID,
+    "jobtype=s"       => \$OPT_JOBTYPE,
+    "service=s"       => \$OPT_SERVICE,
+    "message=s"       => \$OPT_MESSAGE,
+    "priority=s"      => \@OPT_PRIORITY,
+
+    "n|lines|limit=i" => \$OPT_LIMIT,
+    "sort=s"          => \$OPT_SORT,
+    "tail"            => \$OPT_TAIL,
+    "follow"          => \$OPT_FOLLOW,
+
+    "output-format=s" => \$OPT_OUTPUT_FORMAT,
+    
+    "help"            => \$OPT_HELP,
+    "version"         => \$OPT_VERSION,
+    "debug"           => \$OPT_DEBUG,
+);
+
+# SPECIAL MODES
+
+# Help mode
+if ($OPT_HELP) {
+    require Pod::Usage;
+    Pod::Usage::pod2usage(-verbose => 2, -exitstatus => 0);
+}
+
+# Debug mode
+$DEBUG_MODE = 1 if $OPT_DEBUG;
+
+# Follow mode
+$FOLLOW_MODE = 1 if $OPT_FOLLOW;
+
+# Sorting & Tail mode
+my $sort_order = 'ascend';
+if ($OPT_SORT && $OPT_SORT =~/^desc/ ) {
+    $sort_order = 'descend';
+}
+
+if ( $OPT_TAIL ) {
+    $TAIL_MODE = 1;
+    $sort_order = 'descend';
+}
+
+
+# Setup search options
+
+my %search_opts;
+
+if ($OPT_PID) {
+    $search_opts{pid} = $OPT_PID;
+}
+
+if ($OPT_JOBID) {
+    if ($OPT_JOBID !~ /\D/) {
+        $search_opts{jobid} = $OPT_JOBID;
+    } else {
+        print STDERR "ERROR: Not a valid jobid: ",$OPT_JOBID,"\n";
+        exit(1);
+    }
+}
+
+if ($OPT_HOSTNAME) {
+    if ( length($OPT_HOSTNAME) < 256 ) {
+        $search_opts{host} = $OPT_HOSTNAME;
+    } else {
+        print STDERR "ERROR: Not a valid hostname: ", $OPT_HOSTNAME,"\n";
+        exit(1);
+    }
+}
+
+if ($OPT_SERVICE) {
+    if ($OPT_SERVICE =~ /^[A-Za-z]([A-Za-z0-9_\-]|:{2})*[A-Za-z0-9_\-]$/) {
+        $search_opts{service} = $OPT_SERVICE;
+    } else {
+        print STDERR "ERROR: Not a valid service name: ",$OPT_SERVICE,"\n";
+        exit(1);
+    }
+}
+
+if ($OPT_JOBTYPE) {
+    eval {
+        if (length($OPT_JOBTYPE) > 255) { die("Jobtype too long."); }
+        my $jt = Helios::JobType->lookup(name => $OPT_JOBTYPE);
+        if (!defined($jt)) { die("Jobtype not found."); }
+        $search_opts{jobtypeid} = $jt->getJobtypeid();
+        1;
+    } or do {
+        print STDERR "ERROR: Not a valid jobtype: ", $OPT_JOBTYPE,"\n";
+        exit(1);
+    };
+}
+
+if ( scalar @OPT_PRIORITY ) {
+    my @p = split(/,/, join(','=> @OPT_PRIORITY) );
+    if (scalar @p == 1) {
+        if ( defined $LOG_PRIORITY_MAP{$p[0]} ) {
+            $search_opts{priority} = $LOG_PRIORITY_MAP{$p[0]};
+        } else {
+            print STDERR "ERROR: Not a valid priority: ",$p[0],"\n";
+            exit(1);            
+        }
+    } elsif ( scalar @p > 1) {
+        my @p_opts;
+        foreach my $p (@p) {
+            $p = uc($p);
+            if ( defined $LOG_PRIORITY_MAP{$p} ) {
+                push(@p_opts, $LOG_PRIORITY_MAP{$p});
+            } else {
+                print STDERR "ERROR: Not a valid priority: ",$p,"\n";
+                exit(1);
+            }
+        }
+        $search_opts{priority} = \@p_opts;
+    } else {
+        print STDERR "ERROR: Not a valid priority: ",join(','=> @OPT_PRIORITY),"\n";
+        exit(1);
+    }    
+}
+
+# set the default limit NOW, before we process the date and
+# other options that can modify the limit
+my $limit = $LIMIT_DEFAULT;
+
+if ($OPT_START_DATE || $OPT_END_DATE) {
+    my $sd_epoch = '';
+    my $ed_epoch = '';
+    
+    if ($OPT_START_DATE && $OPT_START_DATE =~ /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}$/) {
+        # convert Ts and Zs to spaces
+        my ($sd, $st) = split(/[ T]/, $OPT_START_DATE);
+        my ($yyyy, $mm, $dd) = split('-', $sd);
+        my ($hh24, $mi, $ss) = split(':', $st);
+        $sd_epoch = timelocal($ss, $mi, $hh24, $dd, $mm - 1, $yyyy);
+    }
+    
+    if ($OPT_END_DATE && $OPT_END_DATE =~ /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}$/) {
+        # convert Ts and Zs to spaces
+        my ($ed, $et) = split(/[ T]/, $OPT_END_DATE);
+        my ($yyyy, $mm, $dd) = split('-', $ed);
+        my ($hh24, $mi, $ss) = split(':', $et);
+        $ed_epoch = timelocal($ss, $mi, $hh24, $dd, $mm - 1, $yyyy);
+    }
+    
+    if ($sd_epoch && $ed_epoch) {
+        $search_opts{log_time} = \"between $sd_epoch and $ed_epoch"
+    } elsif ($sd_epoch) {
+        $search_opts{log_time} = \">= $sd_epoch";
+    } elsif ($ed_epoch) {
+        $search_opts{log_time} = \"<= $ed_epoch";        
+    }
+    
+    # start-date or end-date turns off limit
+    if ($sd_epoch || $ed_epoch) {
+        $limit = undef;
+    }
+    
+}
+
+# handle -n/--limit/--lines
+if ($OPT_LIMIT) {
+    if ($OPT_LIMIT !~ /\D/) {
+        $limit = $OPT_LIMIT;
+    } else {
+        print STDERR "ERROR: Not a valid limit: ",$OPT_LIMIT,"\n";
+        exit(1);
+    }
+    
+}
+
+# Follow Mode
+# --follow doesn't work with --sort=descend
+# UNLESS we have --tail --follow,
+# because we have special code for that
+if ($FOLLOW_MODE) {
+    if (!$TAIL_MODE) {    
+        if ($sort_order eq 'descend') {
+            print STDERR "Cannot --follow if --sort is set to 'descend'\n";
+            exit(1);
+        }
+    }
+}
+
+# output format switches
+if ($OPT_OUTPUT_FORMAT) {
+    my $fmt = uc($OPT_OUTPUT_FORMAT);
+    SWITCH : {
+        if ($fmt eq 'PIPE') {
+            $OUTPUT_FORMAT = 'pipe';
+            $OUTPUT_SEPARATOR = '|';
+            last;
+        }
+        if ($fmt eq 'TAB') {
+            $OUTPUT_FORMAT = 'tab';
+            $OUTPUT_SEPARATOR = "\t";
+            last;
+        }
+        if ($fmt eq 'JSON') {
+            $OUTPUT_FORMAT = 'json';
+            last;
+        }
+        # default
+        print STDERR "ERROR: Not a valid output format: ",$OPT_OUTPUT_FORMAT,"\n";
+        exit(1);
+    }
+    if ($FOLLOW_MODE) {
+        print STDERR "ERROR: --follow will not work with --output-format=",$OPT_OUTPUT_FORMAT,"\n";
+        exit(1);
+    }
+    
+}
+
+if ($DEBUG_MODE) {
+    print "SEARCH OPTIONS:\n";
+    foreach my $opt (sort keys %search_opts) {
+        print $opt,' => ',$search_opts{$opt},"\n";
+    }
+}
+
+eval {
+    my $drvr = Helios::ObjectDriver->getDriver();
+    my @logs = $drvr->search('HeliosX::Logger::HiRes::LogEntry' =>
+        { %search_opts },
+        { sort => 'log_time', direction => $sort_order, limit => $limit }
+    );
+
+    if ($TAIL_MODE) {
+        @logs = reverse @logs;
+    }
+
+    # we have results; get them to the user
+    foreach ( @logs ) {
+        # fix up some of the info to make it presentable
+        my $tp = localtime $_->log_time;
+        my ($sec, $fract) = split(/\./, $_->log_time);
+        my $date = $tp->ymd.' '.$tp->hms.'.'.$fract;
+        my $jobinfo = $_->jobid ? ' [Jobid '.$_->jobid.']' : '';
+        $LAST_LOGID = $_->logid;
+        
+        # output the log message in the format the user asked for
+        SWITCH: {
+            
+            # output:  JSON
+            if ($OUTPUT_FORMAT eq 'json') {
+            
+                my $log_struct = {
+                    logid    => $_->logid,
+                    logdate  => $date,
+                    host     => $_->host,
+                    service  => $_->service,
+                    pid      => $_->pid,
+                    priority => $LOG_PRIORITIES[$_->priority],
+                    jobid    => $_->jobid,
+                    message  => $_->message,
+                };
+                print encode_json($log_struct),"\n";
+                last;
+            }
+            
+            # output:  delimited values
+            if ($OUTPUT_FORMAT eq 'tab' || $OUTPUT_FORMAT eq 'pipe') {
+                print $_->logid.$OUTPUT_SEPARATOR if $DEBUG_MODE;
+                print join($OUTPUT_SEPARATOR => ($date, $_->host, $_->service, $_->pid, $LOG_PRIORITIES[$_->priority], $_->jobid ? $_->jobid : '', $_->message)), "\n";
+                last;
+            }
+            
+            # default output:  log
+            print $_->logid.' ' if $DEBUG_MODE;
+            print '[',$date,'] ',$_->host,' ',$_->service,'[',$_->pid,']: ',$LOG_PRIORITIES[$_->priority],$jobinfo,' ',$_->message,"\n";
+            
+        }
+    }    
+    1;
+} or do {
+    print STDERR 'ERROR: ',$@,"\n";
+    exit (42);
+};
+
+if ($FOLLOW_MODE) {
+    while (1) {
+        eval {
+            $search_opts{logid} = \"> $LAST_LOGID";
+            my $drvr = Helios::ObjectDriver->getDriver();
+            my @logs = $drvr->search('HeliosX::Logger::HiRes::LogEntry' =>
+                { %search_opts },
+                { sort => 'log_time', direction => 'ascend' }
+            );    
+            foreach ( @logs ) {
+                my $tp = localtime $_->log_time;
+                my ($sec, $fract) = split(/\./, $_->log_time);
+                my $date = $tp->ymd.' '.$tp->hms.'.'.$fract;
+                my $jobinfo = $_->jobid ? ' [Jobid '.$_->jobid.']' : '';
+                $LAST_LOGID = $_->logid;
+                print $_->logid.' ' if $DEBUG_MODE;
+                print '[',$date,'] ',$_->host,' ',$_->service,'[',$_->pid,']: ',$LOG_PRIORITIES[$_->priority],$jobinfo,' ',$_->message,"\n";
+            }
+            1;
+        } or do {
+            print STDERR 'ERROR: ',$@, "\n";
+            exit(1);
+        };
+        sleep 1;
+    }
+}
+
+exit(0);
+
+
+=head1 NAME
+
+heliosx_logger_hires_search - search the Helios high resolution log
+
+=head1 SYNOPSIS
+
+ # display the log messages for jobid 12345
+ heliosx_logger_hires_search --jobid=12345
+
+ # heliosx_logger_hires_search normally displays only the first 50 messages
+ # use the -n or --lines option to increase/decrease that limit
+ heliosx_logger_hires_search --jobid=12345 -n 100
+ 
+ # display the last 10 MyService errors, sorted by most recent first
+ heliosx_logger_hires_search --service=MyService --priority=ERR -n 10 --sort=desc
+ 
+ # display all the MyService log messages for May 29, 2015
+ # all dates are in ISO8601 format
+ # specifying dates will turn off the message limit,
+ # so you will get all the messages for the specified date range
+ heliosx_logger_hires_search --service=MyService --start-date=2015-05-29T00:00:00 --end-date=2015-05-29T23:59:59
+
+ # "tail" and "follow" the log, like 'tail -f' in Unix
+ heliosx_logger_hires_search --tail --follow
+ 
+ # display the last 100 log messages logged by MyService,
+ # then follow the log and display any new MyService messages
+ heliosx_logger_hires_search --service=MyService -t -n 100 -f
+
+=head1 DESCRIPTION
+
+The heliosx_logger_hires_search command can be used to display log messages
+matching specified criteria in the enhanced Helios log provided by
+L<HeliosX::Logger::HiRes>.  It provides a much more convenient way of accessing
+log messages than using SQL queries from a database client like SQL*Plus or
+sqlite3.
+
+=head1 RUN OPTIONS
+
+=head2 --start-date="YYYY-MM-DDTHH24:MI:SS"
+
+=head2 --end-date="YYYY-MM-DDTHH24:MI:SS"
+
+Specify a date range of log messages to display.  Dates should be in ISO8601
+format.  If only --start-date is specified, log messages will be displayed from
+that date forward until there are no more log messages.  If only --end-date is
+specified, log messages will be displayed from the earliest through the
+end date specified.
+
+Normally, heliosx_logger_hires_search displays a maximum number of log
+messages.  The default is 50, but this limit can be raised or lowered with the
+-n switch.  Specifying a date range, however, turns off this limit; if you
+ask for the log messages in a date range, you will get I<all> the log messages
+matching your criteria in that range.
+
+=head2 -n, --lines=number_of_lines
+
+Specify the maximum number of log messages to display.  The default is 50
+lines.
+
+This switch can be combined with the --tail and --follow options to
+approximate an output similar to the Unix tail command with -n and -f switches.
+
+=head2 --tail
+
+Display the last log messages matching the given criteria.  Similar to using
+the Unix 'tail' command on a log file.  Defaults to retrieving the last 50
+messages, which can be increased or decreased using the -n switch.
+
+=head2 --follow
+
+After the initial log messages have been displayed, the --follow switch
+causes heliosx_logger_hires_search to remaining running, displaying any new
+log messages that meet the given criteria.  This option is similar to the -f
+switch of the Unix 'tail' command.
+
+The --follow switch is incompatible with the sort order set to descending
+(--sort=desc).
+
+=head2 --sort=asc|desc
+
+Specify the order in which the log messages matching the given criteria are
+displayed, either ascending date or descending date order.
+
+You cannot specify --sort=desc with the --follow option, for obvious reasons.
+
+=head1 SEARCH CRITERIA OPTIONS
+
+=head2 --hostname=name_of_host
+
+Display only log messages logged by services on a particular host.
+
+=head2 --pid=process_id
+
+Display only log messages logged by a particular PID.  To properly isolate
+messages from a specific PID on a specific host, use with the --hostname
+option.
+
+=head2 --jobid=jobid
+
+Display only the log messages logged for a particular jobid.
+
+=head2 --jobtype=jobtype_name
+
+Display only the log messages logged for jobs belonging to a particular
+jobtype.
+
+=head2 --service=service_name
+
+Display only the log messages logged by a particular service.  This will
+include NOTICE messages logged by the service agent daemon; if you want to
+limit the messages to those associated with a particular job, use --service
+with the --jobtype switch.
+
+=head2 --priority=priority_name[,priority_name][,priority_name]...
+
+Display only log messages of a given priority.  The priority names are:
+
+=over 4
+
+=item * EMERG - Emergency
+
+=item * ALERT - Alert
+
+=item * CRIT - Critical
+
+=item * ERR - Error
+
+=item * WARNING - Warning
+
+=item * NOTICE - Notice
+
+=item * INFO - Informational
+
+=item * DEBUG - Debug
+
+=back
+
+To search for log messages of multiple, specific priorities, separate them on
+the command line by spaces or specify multiple --priority options.
+
+=head1 AUTHOR
+
+Andrew Johnson, E<lt>lajandy at cpan dot orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2015 by Logical Helion, LLC.
+
+This library is free software; you can redistribute it and/or modify it under 
+the terms of the Artistic License 2.0.  See the included LICENSE file for 
+details.
+
+=head1 WARRANTY
+
+This software comes with no warranty of any kind.
+
+=cut

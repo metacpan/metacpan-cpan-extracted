@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name:                Helios-Panoptes
+version:             1.44
+abstract:            Web administration interface to the Helios distributed job processing system
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    CGI::Application:              4.06
+    CGI::Application::Plugin::DBH: 4
+    DBD::Mock:                     0.11
+    Helios:                        2
+    HTML::Template:                2.9
+    HTML::Template::Expr:          0.04
+    Parse::RecDescent:             
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Andrew Johnson <ajohnson at ittoolbox dotcom>

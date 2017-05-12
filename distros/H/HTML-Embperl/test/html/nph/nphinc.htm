@@ -1,0 +1,32 @@
+
+<html>
+<head>
+<title>Embperl Tests - Include with optEarlyHttpHeaders</title>
+</head>
+
+<body>
+
+<h1>Embperl Tests - Include with optEarlyHttpHeaders</h1>
+
+forinc in main = [+ $fdat{forinc} +]<br>
+
+Before Execute<br>
+[- Execute('incshort.htm', 'Inside Execute') -]
+After Execute
+
+[- $fdat{forinc} = 'message' -]
+
+forinc in main = [+ $fdat{forinc} +]<br>
+
+<table>
+<tr><td>
+In Table Before Execute<br>
+[- Execute('incshort.htm', 'In Table Inside Execute') -]
+In Table After Execute
+</td></tr>
+</table>
+
+
+</body>
+</html>
+

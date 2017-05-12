@@ -1,0 +1,34 @@
+<HTML><BODY>
+<H1> test string expr </H1>
+ONE lt THREE=1
+ONE gt THREE=0
+ONE ne THREE=1
+ONE eq THREE=0
+'1' lt '3'=1
+'1' gt '3'=0
+'1' ne '3'=1
+'1' eq '3'=0
+'1' lt THREE=1
+'1' gt THREE=0
+'1' ne THREE=1
+'1' eq THREE=0
+ONE lt '3'=1
+ONE gt '3'=0
+ONE ne '3'=1
+ONE eq '3'=0
+'100' lt '3'=1
+'100' lt '30'=1
+'100' le '30'=1
+'100' gt '30'=0
+'100' ge '30'=0
+100 lt '30'=1
+100 lt 30=1
+'aaa' le 'b'=1
+'aaa' ge 'b'=0
+'bbb' le 'a'=0
+'bbb' ge 'a'=1
+'bbb' cmp 'a'=1
+'aaa' cmp 'b'=-1
+ONE=1
+foo=foo
+</body></html>

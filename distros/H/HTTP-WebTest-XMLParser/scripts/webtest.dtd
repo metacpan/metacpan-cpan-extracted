@@ -1,0 +1,22 @@
+<!ELEMENT WebTest (params*, test+)>
+<!ATTLIST WebTest
+    version CDATA #REQUIRED
+    title CDATA #IMPLIED >
+
+<!ELEMENT params (param | list | code)* >
+<!ELEMENT test (param | list | code | comment)* >
+
+<!ELEMENT param (#PCDATA) >
+<!ATTLIST param
+    name CDATA #IMPLIED >
+
+<!ELEMENT code (#PCDATA) >
+<!ATTLIST code
+    name CDATA #IMPLIED >
+ 
+<!ELEMENT list (param | code | list)* >
+<!ATTLIST list
+    name CDATA #IMPLIED >
+
+<!ELEMENT comment (#PCDATA) >
+ 

@@ -1,0 +1,30 @@
+HPUX/LVM version 0.01
+=========================
+
+This object oriented module extracts the data from several hpux LVM commands
+and hashes the results in a single, multi-level hash as documented in the
+POD docs included with the source.  It supports remote system data gathering
+via ssh or remsh and uses the persistance module to save any data you'd rather
+not get again over the net.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Storable.pm
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2001 Christopher White.  All rights reserved.  this program is free software;  you can redistribute it and/or modify it under the same terms as perl itself.
+

@@ -1,0 +1,19 @@
+Changes
+examples/README
+examples/update_dates.pl
+hack/load_real
+lib/HTTP/Cookies/iCab.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/compile.t
+t/Cookies.dat
+t/Cookies2.dat
+t/load.t
+t/pod.t
+t/pod_coverage.t
+t/prereq.t
+t/save.t
+t/test_manifest
+META.yml                                 Module meta-data (added by MakeMaker)

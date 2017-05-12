@@ -1,0 +1,33 @@
+---
+abstract: 'nested hashref serializable to the file'
+author:
+  - 'Vyacheslav Matyukhin <me@berekuk.ru>'
+  - 'Andrei Mishchenko <druxa@yandex-team.ru>'
+  - 'Artyom V. Kulikov <breqwas@yandex-team.ru>'
+build_requires:
+  IPC::System::Simple: '0'
+  Test::Fatal: '0'
+  Test::More: '0.95'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Hash-Persistent
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  JSON: '0'
+  Lock::File: '1.01'
+  Storable: '0'
+  autodie: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/berekuk/Hash-Persistent/issues
+  repository: git://github.com/berekuk/Hash-Persistent.git
+version: '1.02'

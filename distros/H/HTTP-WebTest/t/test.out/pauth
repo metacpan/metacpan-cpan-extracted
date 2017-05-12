@@ -1,0 +1,38 @@
+Failed  Succeeded  Test Name
+   1          0    *** no name ***
+   1          0    *** no name ***
+   1          0    *** no name ***
+   0          2    *** no name ***
+
+
+Test Name: N/A
+URL: http://proxy.test/pauth-test-user-passwd
+
+  STATUS CODE CHECK
+    Expected '200' and got: 407 Proxy Authentication Required    FAIL
+
+
+Test Name: N/A
+URL: http://proxy.test/pauth-test-user-passwd
+
+  STATUS CODE CHECK
+    Expected '200' and got: 407 Proxy Authentication Required    FAIL
+
+
+Test Name: N/A
+URL: http://proxy.test/pauth-test-user-passwd
+
+  STATUS CODE CHECK
+    Expected '200' and got: 407 Proxy Authentication Required    FAIL
+
+
+Test Name: N/A
+URL: http://proxy.test/pauth-test-user-passwd
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  REQUIRED TEXT
+    URL: <http://proxy.test/pauth-test-user-passwd>              SUCCEED
+
+
+Total web tests failed: 3  succeeded: 2

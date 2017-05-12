@@ -1,0 +1,189 @@
+NAME
+    HTML::HTML5::Writer - output a DOM as HTML5
+
+SYNOPSIS
+     use HTML::HTML5::Writer;
+ 
+     my $writer = HTML::HTML5::Writer->new;
+     print $writer->document($dom);
+
+DESCRIPTION
+    This module outputs XML::LibXML::Node objects as HTML5 strings. It works
+    well on DOM trees that represent valid HTML/XHTML documents; less well
+    on other DOM trees.
+
+  Constructor
+    "$writer = HTML::HTML5::Writer->new(%opts)"
+        Create a new writer object. Options include:
+
+        *   markup
+
+            Choose which serialisation of HTML5 to use: 'html' or 'xhtml'.
+
+        *   polyglot
+
+            Set to true in order to attempt to produce output which works as
+            both XML and HTML. Set to false to produce content that might
+            not.
+
+            If you don't explicitly set it, then it defaults to false for
+            HTML, and true for XHTML.
+
+        *   doctype
+
+            Set this to a string to choose which <!DOCTYPE> tag to output.
+            Note, this purely sets the <!DOCTYPE> tag and does not change
+            how the rest of the document is output. This really is just a
+            plain string literal...
+
+             # Yes, this works...
+             my $w = HTML::HTML5::Writer->new(doctype => '<!doctype html>');
+
+            The following constants are provided for convenience:
+            DOCTYPE_HTML2, DOCTYPE_HTML32, DOCTYPE_HTML4 (latest stable
+            strict HTML 4.x), DOCTYPE_HTML4_RDFA (latest stable HTML
+            4.x+RDFa), DOCTYPE_HTML40 (strict), DOCTYPE_HTML40_FRAMESET,
+            DOCTYPE_HTML40_LOOSE, DOCTYPE_HTML40_STRICT, DOCTYPE_HTML401
+            (strict), DOCTYPE_HTML401_FRAMESET, DOCTYPE_HTML401_LOOSE,
+            DOCTYPE_HTML401_RDFA10, DOCTYPE_HTML401_RDFA11,
+            DOCTYPE_HTML401_STRICT, DOCTYPE_HTML5, DOCTYPE_LEGACY
+            (about:legacy-compat), DOCTYPE_NIL (empty string),
+            DOCTYPE_XHTML1 (strict), DOCTYPE_XHTML1_FRAMESET,
+            DOCTYPE_XHTML1_LOOSE, DOCTYPE_XHTML1_STRICT, DOCTYPE_XHTML11,
+            DOCTYPE_XHTML_BASIC, DOCTYPE_XHTML_BASIC_10,
+            DOCTYPE_XHTML_BASIC_11, DOCTYPE_XHTML_MATHML_SVG,
+            DOCTYPE_XHTML_RDFA (latest stable strict XHTML+RDFa),
+            DOCTYPE_XHTML_RDFA10, DOCTYPE_XHTML_RDFA11.
+
+            Defaults to DOCTYPE_HTML5 for HTML and DOCTYPE_LEGACY for XHTML.
+
+        *   charset
+
+            This module always returns strings in Perl's internal utf8
+            encoding, but you can set the 'charset' option to 'ascii' to
+            create output that would be suitable for re-encoding to ASCII
+            (e.g. it will entity-encode characters which do not exist in
+            ASCII).
+
+        *   quote_attributes
+
+            Set this to a true to force attributes to be quoted. If not
+            explicitly set, the writer will automatically detect when
+            attributes need quoting.
+
+        *   voids
+
+            Set this to true to force void elements to always be terminated
+            with '/>'. If not explicitly set, they'll only be terminated
+            that way in polyglot or XHTML documents.
+
+        *   start_tags and end_tags
+
+            Except in polyglot and XHTML documents, some elements allow
+            their start and/or end tags to be omitted in certain
+            circumstances. By setting these to true, you can prevent them
+            from being omitted.
+
+        *   refs
+
+            Special characters that can't be encoded as named entities need
+            to be encoded as numeric character references instead. These can
+            be expressed in decimal or hexadecimal. Setting this option to
+            'dec' or 'hex' allows you to choose. The default is 'hex'.
+
+  Public Methods
+    "$writer->document($node)"
+        Outputs (i.e. returns a string that is) an XML::LibXML::Document as
+        HTML.
+
+    "$writer->element($node)"
+        Outputs an XML::LibXML::Element as HTML.
+
+    "$writer->attribute($node)"
+        Outputs an XML::LibXML::Attr as HTML.
+
+    "$writer->text($node)"
+        Outputs an XML::LibXML::Text as HTML.
+
+    "$writer->cdata($node)"
+        Outputs an XML::LibXML::CDATASection as HTML.
+
+    "$writer->comment($node)"
+        Outputs an XML::LibXML::Comment as HTML.
+
+    "$writer->pi($node)"
+        Outputs an XML::LibXML::PI as HTML.
+
+    "$writer->doctype"
+        Outputs the writer's DOCTYPE.
+
+    "$writer->encode_entities($string, characters=>$more)"
+        Takes a string and returns the same string with some special
+        characters replaced. These special characters do not include any of
+        '&', '<', '>' or '"', but you can provide a string of additional
+        characters to treat as special:
+
+         $encoded = $writer->encode_entities($raw, characters=>'&<>"');
+
+    "$writer->encode_entity($char)"
+        Returns $char entity-encoded. Encoding is done regardless of whether
+        $char is "special" or not.
+
+    "$writer->is_xhtml"
+        Boolean indicating if $writer is configured to output XHTML.
+
+    "$writer->is_polyglot"
+        Boolean indicating if $writer is configured to output polyglot HTML.
+
+    "$writer->should_force_start_tags"
+    "$writer->should_force_end_tags"
+        Booleans indicating whether optional start and end tags should be
+        forced.
+
+    "$writer->should_quote_attributes"
+        Boolean indicating whether attributes need to be quoted.
+
+    "$writer->should_slash_voids"
+        Boolean indicating whether void elements should be closed in the
+        XHTML style.
+
+BUGS AND LIMITATIONS
+    Certain DOM constructs cannot be output in non-XML HTML. e.g.
+
+     my $xhtml = <<XHTML;
+     <html xmlns="http://www.w3.org/1999/xhtml">
+      <head><title>Test</title></head>
+      <body><hr>This text is within the HR element</hr></body>
+     </html>
+     XHTML
+     my $dom    = XML::LibXML->new->parse_string($xhtml);
+     my $writer = HTML::HTML5::Writer->new(markup=>'html');
+     print $writer->document($dom);
+
+    In HTML, there's no way to serialise that properly in HTML. Right now
+    this module just outputs that HR element with text contained within it,
+    a la XHTML. In future versions, it may emit a warning or throw an error.
+
+    In these cases, the HTML::HTML5::{Parser,Writer} combination is not
+    round-trippable.
+
+    Outputting elements and attributes in foreign (non-XHTML) namespaces is
+    implemented pretty naively and not thoroughly tested. I'd be interested
+    in any feedback people have, especially on round-trippability of SVG,
+    MathML and RDFa content in HTML.
+
+    Please report any bugs to <http://rt.cpan.org/>.
+
+SEE ALSO
+    HTML::HTML5::Parser, HTML::HTML5::Builder, HTML::HTML5::ToText,
+    XML::LibXML.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2010-2012 by Toby Inkster.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

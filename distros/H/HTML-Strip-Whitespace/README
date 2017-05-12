@@ -1,0 +1,30 @@
+HTML-Strip-Whitespace version 0.2.0
+===================================
+
+This module eliminates redundant whitespace out of HTML code. It should be safe
+in the sense that it won't strip whitespace where it matters like in
+<pre>...</pre> blocks.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+* The Test::More module.
+* The HTML::TokeParser::Simple module.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Shlomi Fish
+
+This library is free software; you can redistribute it and/or modify it
+under the terms of the MIT X11 license.
+

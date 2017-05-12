@@ -1,0 +1,57 @@
+<!--
+=head1 NAME
+
+safe_tag.wmk - "make safe" WebMake, EtText or HTML data
+
+=head1 LOADING
+
+  < use plugin="safe_tag" />
+
+=head1 HTML TAGS
+
+  < safe>
+  ...some data with HTML tags or WebMake references
+  < /safe>
+
+=head1 PERL CODE
+
+  <{perl
+
+    $safe_text = make_safe ($unsafe_text);
+
+  }>
+
+=head1 DESCRIPTION
+
+This WebMake Perl library provides a way to "make safe" WebMake, EtText or HTML
+data, escaping all metacharacters appropriately so that content references,
+EtText links or HTML tags are not interpreted.
+
+=cut
+
+-->
+
+<{perl
+
+  sub make_safe {
+    my ($text) = @_;
+
+    $text =~ s/\&/\&amp;/gs;
+    $text =~ s/\</\&lt;/gs;
+    $text =~ s/\>/\&gt;/gs;
+    $text =~ s/\$/\&#36;/gs;
+    $text =~ s/\[/\&#91;/gs;
+    $text =~ s/\]/\&#93;/gs;
+
+    '<!--etsafe--><pre>'.$text.'</pre><!--/etsafe-->';
+  }
+
+  define_preformat_tag ("safe", \&handle_safe_tag, qw());
+
+  sub handle_safe_tag {
+    my ($tagname, $attrs, $text) = @_;
+    make_safe ($text);
+  }
+
+}>
+

@@ -1,0 +1,22 @@
+NAME
+    HTTP::Daemon::Patch::IPv6 - Avoid error when IO::Socket::INET6 is around
+
+VERSION
+    version 0.06
+
+SYNOPSIS
+     use HTTP::Daemon::Patch::IPv6;
+
+DESCRIPTION
+    This module contains patch for HTTP::Daemon::url() for
+    https://rt.cpan.org/Ticket/Display.html?id=71395
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

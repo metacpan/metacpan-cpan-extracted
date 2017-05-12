@@ -1,0 +1,55 @@
+NAME
+    HTML::Table::Compiler - Extension for HTML::Table to tabularize data
+
+SYNOPSIS
+        use HTML::Table::Compiler;
+        $table = HTML::Table::Compiler->new(2, 25);
+        $table->compile([1..50]);
+        print "$table";
+
+DESCRIPTION
+    HTML::Table, while making it easy to create and manipulate tabular data,
+    doesn't allow such obvious functionality as tabularizing existing array
+    of data.
+
+    One comes across this challenge a lot in building Web applications such
+    as galleries, where you know how many items you want to display, you
+    know how many rows and columns you want. Challenge becomes to split the
+    data set into rows and columns and display it as an HTML table.
+
+    HTML::Table::Compiler introduces this functionality through its
+    compile() method.
+
+  EXPORT
+
+    None
+
+  METHODS
+
+    compile(\@dataset)
+        Builds an HTML::Table::Compiler object (which really IS A
+        HTML::Table) with elements of the \@dataset. Row and column numbers
+        should be defined in new():
+
+            @dataset = (1..50);
+
+            $table = new HTML::Table::Compiler->new(2, 10);
+            $table->compile(\@dataset);
+
+        In the above example HTML::Table::Compiler may add additional rows
+        to accommodate all the data, otherwise only first 20 elements of the
+        @dataset would be tabularized. If this is not a desired behavior,
+        you should turn autoGrow() feature off:
+
+            $table = new HTML::Table::Compiler->new(2, 10);
+            $table->autoGrow(0);
+            $table->compile(\@dataset);
+
+        For all the available methods consult HTML::Table's online manual.
+
+AUTHOR
+    Sherzod B. Ruzmetov <sherzodr@cpan.org> http://author.handalak.com/
+
+SEE ALSO
+    the perl manpage.
+

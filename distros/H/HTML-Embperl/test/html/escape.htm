@@ -1,0 +1,204 @@
+[- $r = shift -]
+<html>
+<head>
+<title>Some tests for Embperl escaping</title>
+</head>
+
+<body>
+
+Here it starts with some HTML Text<P>
+
+First of all assign a value:
+[- $a = '(this is the value in $a)' -] <BR>
+
+Now we have some 'Umlaute':
+
+
+[- $b = "$a &auml;&ouml;&uuml;הצü???&lt;\&+  " -]
+[- $id = "abcdefghijklmnopqrstuvwxyz" ; $text = "This is a text ? \& + - %21" -]
+
+Now lets look what we are getting from this:<BR>
+[+ $a +] [+ $b +]<BR>
+
+What is the EscMode? [+ $escmode +]
+
+Now a Url: <A HREF="http://localhost/tests?id=[+%20$id +]&text=[+$text+]">Here it goes</A>
+A Tag 2:   <A HREF="http://localhost/tests?id=[+%20$id +]&text=[+$text+]" TARGET="http://localhost/tests?id=[+$id +]&text=[+$text+]">a2</A>
+A Tag 3:   <A  TARGET="http://localhost/tests?id=[+$id +]&text=[+$text+]" HREF="http://localhost/tests?id=[+%20$id +]&text=[+$text+]" TARGET="http://localhost/tests?id=[+ $id +]&text=[+$text+]">a3</A>
+A Tag 4:   <A TARGET="http://localhost/tests?id=[+ $id +]&text=[+$text+]" HREF="http://localhost/tests?id=[+%20$id +]&text=[+$text+]">a4</A>
+A Tag 5:   <A  TARGET="http://localhost/tests?id=[+ $id +]&text=[+$text+]">a5</A>
+A Tag 6:   <A>a6</A>
+A Tag 7:   <A  HREF="7">x</A>
+A Tag 8:   <A TARGET=8 HREF="8">x</A>
+A Tag 9:   <A HREF="9" TARGET="9">x</A>
+A Tag 10:  <A TARGET="10" HREF="10" TARGET="10">x</A>
+A Tag 11:  <A  HREF="11"  >x</A>
+A Tag 12:  <A HREF=12>x</A>
+A Tag 12b: <A HREF=12b >x</A>
+A Tag 13:  <A HREF="[+ "abcd"+]%20[+ "%3e" +]">x</A>
+A Tag 14:  <A HREF="[+ "abcd"+]%20[+ "&gt;" +]">x</A>
+FRAME:	   <FRAME SRC="http://localhost/tests?id=[+%20$id +]&text=[+$text+]"  name="%20foo">
+IFRAME:    <IFRAME SRC="http://localhost/tests?id=[+%20$id +]&text=[+$text+]" name="%20foo">
+EMBED:     <EMBED SRC="http://localhost/tests?id=[+%20$id +]&text=[+$text+]"  name="%20foo">
+LAYER:	   <LAYER SRC="http://localhost/tests?id=[+%20$id +]&text=[+$text+]"  name="%20foo">
+IMG:	   <IMG SRC="http://localhost/tests?id=[+%20$id +]&text=[+$text+]"    name="%20foo">
+FORM:	   <FORM action="http://localhost/tests?id=[+%20$id +]&text=[+$text+]"    name="%20foo">
+
+[- %A = (A => 1, B => 2) ; @A = (X, 9, Y, 8, Z, 7) -]
+Hash in  A <A HREF="http://localhost/tests?[+ [ %A ] +]">
+Array in A <A HREF="http://localhost/tests?[+ \@A +]">
+
+[- %H = (A => 1, B => 2) ; @H = (X, 9, Y, 8, Z, 7) -]
+Hash in  H <A HREF="http://localhost/tests?[+ \\%H +]">
+Array in H <A HREF="http://localhost/tests?[+ scalar { @H } +]">
+
+
+[-
+%fdat = ( par1 => 1, par2 => 2 );
+-]
+
+
+<a href="tst.html?[+ \\%fdat +]">1</a>
+<a href="tst.html?[+ scalar ({ par3 => 3, %fdat }) +]">2</a>
+<a href="tst.html?[+ scalar ({ %fdat }) +]">3</a>
+<a href="tst.html?[+ scalar ({ %fdat, par3 => 3 }) +]">4</a>
+
+
+		
+[+ $escmode = 1 +]
+
+Now lets look what we are getting from this:<BR>
+[+ $a +] [+ $b +]<BR>
+
+What is the EscMode? [+ $escmode +]
+
+Now a Url: <A HREF="http://localhost/tests?id=[+%20$id +]&text=[+$text+]">Here it goes</A>
+
+[+ $escmode = 2 +]
+
+Now lets look what we are getting from this:<BR>
+[+ $a +] [+ $b +]<BR>
+
+What is the EscMode? [+ $escmode +]
+
+Now a Url: <A HREF="http://localhost/tests?id=[+%20$id +]&text=[+$text+]">Here it goes</A>
+
+[+ $escmode = 0 +]
+
+Now lets look what we are getting from this:<BR>
+[+ $a +] [+ $b +]<BR>
+
+What is the EscMode? [+ $escmode +]
+
+Now a Url: <A HREF="http://localhost/tests?id=[+%20$id +]&text=[+$text+]">Here it goes</A>
+
+[+ $escmode = 3 +]
+
+Now lets look what we are getting from this:<BR>
+[+ $a +] [+ $b +]<BR>
+
+What is the EscMode? [+ $escmode +]
+
+Now a Url: <A HREF="http://localhost/tests?id=[+%20$id +]&text=[+$text+]">Here it goes</A>
+
+What is the EscMode? [+ $escmode +]
+
+[!
+    sub foo($)
+        {
+    	my @name ;
+    	my @data ;
+    
+    	$name[0] = 'abcd' ;
+    	$data[0] = 'xyz' ;
+    
+        my $bar = $_[0];
+        return "file.html?name=$name[$bar]&data=$data[$bar]";
+        }
+!]
+
+
+[+ foo (0) +]
+
+Now we localy set $escmode:<BR>
+[+  do { local $escmode = 0 ; $b . "  \\\\<a>" } +]<BR>
+[+  do { local $escmode = 1 ; $b . "  \\\\<a>" } +]<BR>
+[+  do { local $escmode = 2 ; $b . "  \\\\<a>" } +]<BR>
+[+  do { local $escmode = 3 ; $b . "  \\\\<a>" } +]<BR>
+[+  do { local $escmode = 4 ; $b . "  \\\\<a>" } +]<BR>
+[+  do { local $escmode = 5 ; $b . "  \\\\<a>" } +]<BR>
+[+  do { local $escmode = 6 ; $b . "  \\\\<a>" } +]<BR>
+[+  do { local $escmode = 7 ; $b . "  \\\\<a>" } +]<BR>
+
+Same without local:
+[+  $escmode = 0 , $b . "  \\\\<a>" +]<BR>
+[+  $escmode = 1 , $b . "  \\\\<a>"  +]<BR>
+[+  $escmode = 2 , $b . "  \\\\<a>"  +]<BR>
+[+  $escmode = 3 , $b . "  \\\\<a>"  +]<BR>
+[+  $escmode = 4 , $b . "  \\\\<a>"  +]<BR>
+[+  $escmode = 5 , $b . "  \\\\<a>"  +]<BR>
+[+  $escmode = 6 , $b . "  \\\\<a>"  +]<BR>
+[+  $escmode = 7 , $b . "  \\\\<a>"  +]<BR>
+
+
+Control Chars 0x80-0x9f:
+[+  do { local $escmode = 7 ; foreach (127..160) { $cc .= chr ($_) }; $cc } +]<BR>
+
+Control Chars 129 & 130:
+[+  do  { local $escmode = 7 ; "&#129;&#130;" } +]<BR>
+
+[+ $n = 'My Name צהü' , $escmode = 0 +]
+
+<A HREF='http://host/script?name=[+ $escmode=3, $n +]'>
+
+<A HREF='http://host/script?name=[+ $n+]'>
+
+[+ $escmode = 0 +]
+
+<A HREF='http://host/script?name=[+ do { local $escmode=3; $n } +]'>
+
+<A HREF='http://host/script?name=[+ $n +]'>
+
+<br>
+
+
+We can avoid interpreting [[- foo -] with a double [[[[ <br>
+
+This should also work for [[* foo *]  <br>
+
+
+<A HREF="[+ "abcd"+]%20[+ "%3e" +]">x</A>
+
+[- $dat = [[1], [2], [3]] -]
+
+<table>
+<TR>
+ <TD><a href="[+$dat-&gt;[$row][0]+]">Link</a></TD>
+</TR>
+</table>
+
+<table>
+<TR>
+ <TD><a href="[+$dat-%3e[$row][0]+]">Link</a></TD>
+</TR>
+</table>
+
+Escape method:
+
+[- $escmode = 0 -]
+
+0: [+ $r -> Escape($b, 0) +] 
+1: [+ $r -> Escape($b, 1) +] 
+2: [+ $r -> Escape($b, 2) +] 
+3: [+ $r -> Escape($b, 3) +] 
+4: [+ $r -> Escape($b, 4) +] 
+5: [+ $r -> Escape($b, 5) +] 
+6: [+ $r -> Escape($b, 6) +] 
+7: [+ $r -> Escape($b, 7) +] 
+
+
+<P>Ok.<P>
+
+
+</body>
+</html>

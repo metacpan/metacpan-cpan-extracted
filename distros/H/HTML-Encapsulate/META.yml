@@ -1,0 +1,41 @@
+---
+abstract: 'rewrites an HTML page as a self-contained set of files'
+author:
+  - 'Nick Woolley <npw@cpan.org>'
+build_requires:
+  LWP::UserAgent::Snapshot: '0'
+  Module::Build: '0.28'
+configure_requires:
+  Module::Build: '0.40'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.150005'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-Encapsulate
+provides:
+  HTML::Encapsulate:
+    file: lib/HTML/Encapsulate.pm
+    version: v0.3.0
+recommends:
+  Encode::Detect: '0'
+  Encode::Detect::Detector: '0'
+  Test::Files: '0.14'
+requires:
+  HTML::Entities: '0'
+  HTML::HeadParser: '0'
+  HTML::Tidy: '0'
+  HTML::TreeBuilder::XPath: '0'
+  HTTP::Headers::Util: '0'
+  HTTP::Request: '0'
+  HTTP::Response::Encoding: '0'
+  LWP::UserAgent: '0'
+  Test::More: '0'
+  URI: '0'
+  perl: v5.6.1
+  version: '0'
+resources:
+  license: http://www.perlfoundation.org/artistic_license_1_0
+version: v0.3.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

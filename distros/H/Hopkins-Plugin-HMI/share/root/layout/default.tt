@@ -1,0 +1,32 @@
+<div id="body">
+	<div id="menu">
+		[% IF page.modal %]
+			<strong>[% page.modal %]</strong>
+		[% ELSE %]
+			<ul>
+				<li class="first"><a href="[% c.uri_for('/status') %]">Status</a></li>
+				<li class="last"><a href="[% c.uri_for('/task/enqueue') %]">Enqueue</a></li>
+			</ul>
+		[% END %]
+	</div>
+
+	<div id="body-top">
+		<table id="layout">
+			<tr>
+				<td id="sidebar">
+					[% PROCESS "sidebar/${page.sidebar}.tt" %]
+				</td>
+				<td id="content">
+					[% content %]
+				</td>
+			</tr>
+		</table>
+	</div>
+
+	<div id="tail">
+		<span class="version">
+			Hopkins/HMI [% version.plugin.hmi %]; Hopkins [% version.hopkins %]
+		<span>
+	</div>
+</div>
+

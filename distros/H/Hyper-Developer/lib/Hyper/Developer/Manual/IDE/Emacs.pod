@@ -1,0 +1,155 @@
+=pod
+
+=head1 NAME
+
+Hyper::Developer::Manual::IDE::Emacs - Hints for Emacs Users
+
+=head1 VERSION
+
+This document describes Hyper::Developer::Manual::IDE::Emacs 0.01
+
+=head1 DESCRIPTION
+
+=over
+
+=item AUTO GENERATOR
+
+You can use could use the auto-generator feature of hyper to
+generate code on configuration save.
+
+Just put the following code into your .emacs file and replace
+the $BASE_PATH thing with your application base path.
+
+    (add-hook
+     'after-save-hook
+     (lambda ()
+      (if (string-match "$BASE_PATH/etc/" buffer-file-name)
+          (shell-command
+             (concat
+                "hyper.pl --file="
+                (shell-quote-argument buffer-file-name)
+             )
+          )
+      )
+     )
+    )
+
+=item QUICK SWITCH BETWEEN TEMPLATE/CONFIG/CODE
+
+If you are a power user of Hyper you may like it to switch with a shortcut
+between your Control parts.
+
+This example uses the following shortcuts
+
+    C-xv    var - Template
+    C-xe    etc - Config
+    C-xl    lib - Code
+
+You have to add the following content into your .emacs file
+
+    (defun hyper-var ()
+       (interactive)
+       (if (string-match
+              "/lib\\(/[^/]+/Control/[^/]+/[^\.]+\\).pm"
+              buffer-file-name)
+           (find-file (
+              replace-regexp-in-string
+                "/lib\\(/[^/]+/Control/[^/]+/[^\.]+\\).pm"
+                "/var\\1.htc" buffer-file-name))
+       )
+       (if (string-match
+              "/etc\\(/[^/]+/Control/[^/]+/[^\.]+\\).ini"
+              buffer-file-name)
+           (find-file (
+              replace-regexp-in-string
+                "/etc\\(/[^/]+/Control/[^/]+/[^\.]+\\).ini"
+                "/var\\1.htc" buffer-file-name))
+       )
+    )
+    (define-key minibuffer-local-completion-map " " 'hyper-var)
+    (global-set-key "\C-xv" 'hyper-var)
+    (defun hyper-etc ()
+       (interactive)
+       (if (string-match
+              "/lib\\(/[^/]+/Control/[^/]+/[^\.]+\\).pm"
+              buffer-file-name)
+           (find-file (
+              replace-regexp-in-string
+                "/lib\\(/[^/]+/Control/[^/]+/[^\.]+\\).pm"
+                "/etc\\1.ini" buffer-file-name))
+       )
+       (if (string-match
+              "/var\\(/[^/]+/Control/[^/]+/[^\.]+\\).htc"
+              buffer-file-name)
+           (find-file (
+              replace-regexp-in-string
+              "/var\\(/[^/]+/Control/[^/]+/[^\.]+\\).htc"
+              "/etc\\1.ini" buffer-file-name))
+       )
+    )
+    (define-key minibuffer-local-completion-map " " 'hyper-etc)
+    (global-set-key "\C-xe" 'hyper-etc)
+    (defun hyper-lib ()
+       (interactive)
+       (if (string-match
+              "/etc\\(/[^/]+/Control/[^/]+/[^\.]+\\).ini"
+              buffer-file-name)
+           (find-file (
+              replace-regexp-in-string
+                "/etc\\(/[^/]+/Control/[^/]+/[^\.]+\\).ini"
+                "/lib\\1.pm" buffer-file-name))
+       )
+       (if (string-match
+              "/var\\(/[^/]+/Control/[^/]+/[^\.]+\\).htc"
+              buffer-file-name)
+           (find-file (
+              replace-regexp-in-string
+                "/var\\(/[^/]+/Control/[^/]+/[^\.]+\\).htc"
+                "/lib\\1.pm"
+                buffer-file-name))
+       )
+    )
+    (define-key minibuffer-local-completion-map " " 'hyper-lib)
+    (global-set-key "\C-xl" 'hyper-lib)
+
+=back
+
+=head1 RCS INFORMATIONS
+
+=over
+
+=item Last changed by
+
+ $Author: ac0v $
+
+=item Id
+
+ $Id: Emacs.pod 333 2008-02-18 22:59:27Z ac0v $
+
+=item Revision
+
+ $Revision: 333 $
+
+=item Date
+
+ $Date: 2008-02-18 23:59:27 +0100 (Mon, 18 Feb 2008) $
+
+=item HeadURL
+
+ $HeadURL: http://svn.hyper-framework.org/Hyper/Hyper-Developer/branches/0.07/lib/Hyper/Developer/Manual/IDE/Emacs.pod $
+
+=back
+
+=head1 AUTHOR
+
+Andreas Specht  C<< <ACID@cpan.org> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2007, Andreas Specht C<< <ACID@cpan.org> >>.
+All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut

@@ -1,0 +1,18 @@
+<HTML><BODY>
+<H1> test_if7</H1>
+we test elsif here.
+test 1
+<tmpl_iF VAR4> <tmpl_var naMe="VAR4"> var4 defined (FALSE)
+<tMpl_elsiF VAR2> <tmpl_var naMe="VAR2"> var2 defined (TRUE)
+<tmpl_else> else (FALSE)
+</tmpl_if>end if test 1.
+
+test 2
+<tmpl_unless VAR4> <tmpl_var naMe="VAR4"> var4 undefined (TRUE)
+<tMpl_elsiF VAR2> <tmpl_var naMe="VAR2"> var2 defined (should be skipped)
+<tmpl_else> else (FALSE)
+</tmpl_if>end if test 2.
+
+
+<H1> END test_if7 </H1>
+</body></html>

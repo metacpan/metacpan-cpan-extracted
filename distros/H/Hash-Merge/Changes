@@ -1,0 +1,69 @@
+Revision history for Perl extension Hash::Merge.
+
+0.200	2013-11-03
+    - modernize toolchain
+    - reformat changes as per CPAN::Changes::Spec
+    - move repository to GitHub
+
+0.12	2010-02-15
+    - rt 39183 fallback to Clone::PP if needed/possible (thanks to MONS)
+    - rt 43056 OO support for more sane behavior non-trampling (thanks to MONS)
+    
+    - Added tests for OO behavior.
+    - Cleaned up POD a little
+    - perltidy
+    
+0.11	2009-04-09
+    - fix ||= typo, thanks GWADEJ or bringing it to my attention
+
+0.10	2007-04-08
+    - DMUEY rt.cpan.org id 13390
+    - POD Synopsis cleanup
+
+0.09	2007-04-03
+    - DMUEY: Merge.pm - refactored code as per rt.cpan.org id 26076
+      (passes all tests)
+    - DMUEY: removed 'HISTORY' from POD since its in the Changes file
+      (IE less room to get the data out of sync)
+    - DMUEY: Makefile.PL - general cleanup, note pinned to Clone prereq
+    - DMUEY: README: Updated version from 0.07 to 0.09
+
+
+0.08	2006-08-08
+    - Fixed hash reference issue (per Perl 5.8.8) in test sequence
+
+0.07	2002-02-19
+    - Fixed problem with ActiveState Perl's Clone.pm implementation.
+    - Fixed typo in POD.
+    - Fixed formatting of code in general.
+
+0.06	2001-11-10
+    - Version 0.06 release (and more CVS fixes)
+
+0.05.02.1	2001-11-08
+    - Fixing CVS problems
+
+0.05.01.2	2001-11-06
+    - Fixed some undefined variable problems for 5.005.
+    - Added cloning of data and set/get_clone_behavior functions
+    - Added associated testing of data cloning
+    - Fixed some problems with POD
+
+0.05	2001-11-02
+    - Yet another fix to Test::More requirement (=> 0.33)
+
+0.04	2001-10-31
+    - Forced Test::More requirement in makefile
+    - Fixed problems with pod documentation
+
+0.03	2001-10-28
+    - CPAN Release with CVS fixes
+
+0.02	2001-10-28 23:05:03
+    - CPAN release
+
+0.01.1.1  2001/10/23 03:01:34  mneylon
+    - Slight fixes
+
+0.01  2001/10/23 03:00:21  mneylon
+    - Initial Release to PerlMonks

@@ -1,0 +1,218 @@
+<HTML>
+<HEAD>
+<TITLE>Priority.pm</TITLE>
+<LINK REL="stylesheet" HREF="../html/docs.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Priority.pm</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+    <UL>
+
+        <LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+        <LI><A HREF="#description">DESCRIPTION</A></LI>
+        <LI><A HREF="#efficiency">EFFICIENCY</A></LI>
+        <LI><A HREF="#object interface">OBJECT INTERFACE</A></LI>
+        <LI><A HREF="#methods">METHODS</A></LI>
+        <UL>
+
+            <LI><A HREF="#new()"><CODE>new()</CODE></A></LI>
+            <LI><A HREF="#add($item,[$priority])"><CODE>add($item,[$priority])</CODE></A></LI>
+            <LI><A HREF="#pop()"><CODE>pop()</CODE></A></LI>
+            <LI><A HREF="#fifo()"><CODE>fifo()</CODE></A></LI>
+            <LI><A HREF="#lifo()"><CODE>lifo()</CODE></A></LI>
+            <LI><A HREF="#highest_first()"><CODE>highest_first()</CODE></A></LI>
+            <LI><A HREF="#lowest_first()"><CODE>lowest_first()</CODE></A></LI>
+            <LI><A HREF="#modify_priority($item,[$priority])"><CODE>modify_priority($item,[$priority])</CODE></A></LI>
+            <LI><A HREF="#delete_item($item,[$priority])"><CODE>delete_item($item,[$priority])</CODE></A></LI>
+            <LI><A HREF="#delete_priority_level($priority)"><CODE>delete_priority_level($priority)</CODE></A></LI>
+            <LI><A HREF="#get_priority_levels()"><CODE>get_priority_levels()</CODE></A></LI>
+            <LI><A HREF="#get_level($priority)"><CODE>get_level($priority)</CODE></A></LI>
+            <LI><A HREF="#get_heap()"><CODE>get_heap()</CODE></A></LI>
+            <LI><A HREF="#raise_error($n)"><CODE>raise_error($n)</CODE></A></LI>
+            <LI><A HREF="#err_str()"><CODE>err_str()</CODE></A></LI>
+        </UL>
+
+        <LI><A HREF="#export">EXPORT</A></LI>
+        <LI><A HREF="#bugs">BUGS</A></LI>
+        <LI><A HREF="#author">AUTHOR</A></LI>
+    </UL>
+
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H2><A NAME="synopsis">SYNOPSIS</A></H2>
+<PRE>
+    use Heap::Priority;
+    my $h = new Heap::Priority;
+    $h-&gt;add($item,[$priority]); # add an item to the heap
+    $next_item = $h-&gt;pop;       # get an item back from heap
+    $h-&gt;fifo;                   # set first in first out ie a queue (default)
+    $h-&gt;lifo;                   # set last in first out ie a stack
+    $h-&gt;highest_first;          # set pop() in high to low priority order (default)
+    $h-&gt;lowest_first;           # set pop() in low to high priority order</PRE>
+<PRE>
+    $h-&gt;modify_priority($item, $priority);
+    $h-&gt;delete_item($item,[$priority]);
+    $h-&gt;delete_priority_level($priority);
+    @levels    = $h-&gt;get_priority_levels;
+    @items     = $h-&gt;get_level($priority);
+    @all_items = $h-&gt;get_heap;
+    $h-&gt;raise_error(1);
+    my $error_string = $h-&gt;err_str;</PRE>
+<P>
+<H2><A NAME="description">DESCRIPTION</A></H2>
+<P>This module implements a priority queue or stack. The main functions are <CODE>add()</CODE>
+and <CODE>pop()</CODE> which add and remove from the heap according to the rules you
+choose. When you <CODE>add()</CODE> an item to the heap you can assign a priority level to
+the item or let the priority level default to 0.</P>
+<P>What happens when you call <CODE>pop()</CODE> depends on the configuration you choose. By
+default the highest priority values will be popped off in first in first
+out order. <CODE>fifo()</CODE> and <CODE>lifo()</CODE> set First in First Out and Last In First Out
+respectively. <CODE>highest_first()</CODE> and <CODE>lowest_first()</CODE> allow you to choose to <CODE>pop()</CODE>
+the highest priority values first or the lowest priority values first.</P>
+<P>The internal object model remains constant so you can modify the behavior of
+<CODE>pop()</CODE> with impunity during the life of a heap object.</P>
+<P><CODE>modify_priority()</CODE> allows you to change the priority of a item already in
+the heap. A range of other functions are also available to manipulate
+the heap.</P>
+<P>
+<H2><A NAME="efficiency">EFFICIENCY</A></H2>
+<P>The algorithm used in this module is only efficient where the number of
+priority levels is either small in absolute terms or some small fraction
+of the total number of items. Efficiency drops off over a few thousand
+priority levels.</P>
+<P>
+<H2><A NAME="object interface">OBJECT INTERFACE</A></H2>
+<P>This is an OO module. You begin by creating a new heap object</P>
+<PRE>
+    use Heap::Priority;
+    my $h = new Heap::Priority;</PRE>
+<P>You then simply call methods on your heap object:</P>
+<PRE>
+    $h-&gt;add($item, $priority);      # add $item with $priority level
+    $h-&gt;lifo;                       # set Last In First Out (ie stack)
+    my $next_item = $h-&gt;pop;        # get the next item off the heap</PRE>
+<P>
+<H2><A NAME="methods">METHODS</A></H2>
+<P>
+<H3><A NAME="new()"><CODE>new()</CODE></A></H3>
+<PRE>
+    my $h = new Heap::Priority;</PRE>
+<P>The constructor takes no arguments and simply returns an empty default heap.
+The default configuration is FIFO (ie a queue) with highest integer priority
+values popped first</P>
+<P>
+<H3><A NAME="add($item,[$priority])"><CODE>add($item,[$priority])</CODE></A></H3>
+<PRE>
+    $h-&gt;add($item, [$priority]);</PRE>
+<P><CODE>add()</CODE> will add $item to the heap. Optionally a an integer $priority level may
+be assigned (default priority level is 0).</P>
+<P>
+<H3><A NAME="pop()"><CODE>pop()</CODE></A></H3>
+<PRE>
+    my $next_item = $h-&gt;pop;</PRE>
+<P><CODE>pop()</CODE> takes no arguments. In default configuration <CODE>pop()</CODE> will
+return those values having the highest integer priority level first in FIFO
+order. This behavior can be modified using the methods outlined below.</P>
+<P>
+<H3><A NAME="fifo()"><CODE>fifo()</CODE></A></H3>
+<PRE>
+    $h-&gt;fifo;</PRE>
+<P>Set <CODE>pop()</CODE> to work on a First In First Out  basis, otherwise known as a queue.
+This is the default configuration.</P>
+<P>
+<H3><A NAME="lifo()"><CODE>lifo()</CODE></A></H3>
+<PRE>
+    $h-&gt;lifo;</PRE>
+<P>Set <CODE>pop()</CODE> to work on a Last In First Out  basis, otherwise known as a stack.</P>
+<P>
+<H3><A NAME="highest_first()"><CODE>highest_first()</CODE></A></H3>
+<PRE>
+    $h-&gt;highest_first;</PRE>
+<P>Set <CODE>pop()</CODE> to retrieve items in highest to lowest integer priority order. This
+is the default configuration.</P>
+<P>
+<H3><A NAME="lowest_first()"><CODE>lowest_first()</CODE></A></H3>
+<PRE>
+    $h-&gt;lowest_first;</PRE>
+<P>Set <CODE>pop()</CODE> to retrieve items in lowest to highest integer priority order</P>
+<P>
+<H3><A NAME="modify_priority($item,[$priority])"><CODE>modify_priority($item,[$priority])</CODE></A></H3>
+<PRE>
+    $h-&gt;modify_priority($item, $priority);</PRE>
+<P>This method allows you to modify the priority of an item in the queue/stack.
+All it actually does is call <CODE>delete_item($item)</CODE> and then <CODE>add($item,$priority)</CODE>
+so all the instances of $item in the heap will be removed and replaced with
+a single instance of $item at $priority level</P>
+<P>
+<H3><A NAME="delete_item($item,[$priority])"><CODE>delete_item($item,[$priority])</CODE></A></H3>
+<PRE>
+    $h-&gt;delete_item($item,[$priority]);</PRE>
+<P>This method will delete $item from the heap. If the optional $priority
+is not supplied all instances $item will be removed from the heap. If
+$priority is supplied then only instances of $item at that priority level
+will be removed.</P>
+<P>
+<H3><A NAME="delete_priority_level($priority)"><CODE>delete_priority_level($priority)</CODE></A></H3>
+<PRE>
+    $h-&gt;delete_priority_level($priority);</PRE>
+<P>Delete all items of priority level $priority</P>
+<P>
+<H3><A NAME="get_priority_levels()"><CODE>get_priority_levels()</CODE></A></H3>
+<PRE>
+    my @levels = $h-&gt;get_priority_levels;</PRE>
+<P>Returns list of priority levels in current <CODE>pop()</CODE> order in list context and
+number of priority levels in scalar context</P>
+<P>
+<H3><A NAME="get_level($priority)"><CODE>get_level($priority)</CODE></A></H3>
+<PRE>
+    my @items = $h-&gt;get_level($priority);</PRE>
+<P>Returns entire priority level in <CODE>pop()</CODE> order in list context or number of
+items at that level in scalar context</P>
+<P>
+<H3><A NAME="get_heap()"><CODE>get_heap()</CODE></A></H3>
+<PRE>
+    my @all_items = $h-&gt;get_heap;</PRE>
+<P>Returns entire heap in <CODE>pop()</CODE> order in list context or total number of items
+on heap in scalar context</P>
+<P>
+<H3><A NAME="raise_error($n)"><CODE>raise_error($n)</CODE></A></H3>
+<PRE>
+    $h-&gt;raise_error(1);</PRE>
+<P>Set error level $n =&gt; 2 = croak, 1 = carp, 0 = silent (default)</P>
+<P>
+<H3><A NAME="err_str()"><CODE>err_str()</CODE></A></H3>
+<PRE>
+    $h-&gt;err_str;</PRE>
+<P>Return error string if any.</P>
+<P>
+<H2><A NAME="export">EXPORT</A></H2>
+<P>Nothing: it's an OO module.</P>
+<P>
+<H2><A NAME="bugs">BUGS</A></H2>
+<P>Probably. If you find one let me know...</P>
+<P>
+<H2><A NAME="author">AUTHOR</A></H2>
+<P>Dr James Freeman &lt;<A HREF="mailto:jfreeman@tassie.net.au">jfreeman@tassie.net.au</A>&gt;</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Priority.pm</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

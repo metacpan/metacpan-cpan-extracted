@@ -1,0 +1,54 @@
+---
+abstract: 'HTML::TreeBuilder and XPath compatible interface with libxml'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-TreeBuilder-LibXML
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  HTML::TreeBuilder::LibXML:
+    file: lib/HTML/TreeBuilder/LibXML.pm
+    version: '0.26'
+  HTML::TreeBuilder::LibXML::Node:
+    file: lib/HTML/TreeBuilder/LibXML/Node.pm
+requires:
+  HTML::TreeBuilder::XPath: '0.14'
+  LWP::UserAgent: '6'
+  URI: '0'
+  XML::LibXML: '1.7'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/tokuhirom/HTML-TreeBuilder-LibXML/issues
+  homepage: https://github.com/tokuhirom/HTML-TreeBuilder-LibXML
+  repository: git://github.com/tokuhirom/HTML-TreeBuilder-LibXML.git
+version: '0.26'
+x_contributors:
+  - 'Masahiro Chiba <nihen@megabbs.com>'
+  - 'kimura.hideo <kimurahideo@Administrator.local>'
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+  - 'Perlover <perlover@perlover.com>'
+  - 'John SJ Anderson <johna@farematrix.com>'
+  - 'Oleg G <verdrehung@gmail.com>'
+  - 'Stanislaw Pusep <creaktive@gmail.com>'
+  - 'Carlos Fernando Avila Gratz <cafe01@gmail.com>'
+  - 'Carlos Fernando Avila Gratz <cafe@q1software.com>'
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'

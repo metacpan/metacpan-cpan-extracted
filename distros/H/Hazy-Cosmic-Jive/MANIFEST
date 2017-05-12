@@ -1,0 +1,15 @@
+bcd.c
+Changes
+hazy-cosmic-jive-perl.c
+Jive.xs
+lib/Hazy/Cosmic/Jive.pm
+lib/Hazy/Cosmic/Jive.pod
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+ppport.h
+README
+split-double.h
+t/hazy-cosmic-jive.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

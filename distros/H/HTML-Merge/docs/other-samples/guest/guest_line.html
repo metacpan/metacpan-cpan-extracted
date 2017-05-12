@@ -1,0 +1,369 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<$RSET.base='"http://www.raz.co.il"'>
+<HEAD>
+	<TITLE>guest_line.html</TITLE>
+	<link href="<$RVAR.base>/razinf/style.css" rel="stylesheet" type="text/css">
+	<META HTTP-EQUIV="Content-Type" CONTENT="text/html;charset=windows-1255">
+</HEAD>
+<BODY BACKGROUND="<$RVAR.base>/razinf/gif/frmback.gif">
+
+<SCRIPT LANGUAGE="JavaScript" SRC="<$RVAR.base>/razinf/javascript/razinfunc.js"></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="<$RVAR.base>/razinf/javascript/razglobal.js"></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="<$RVAR.base>/razinf/javascript/cookies.js"></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="<$RVAR.base>/razinf/javascript/vfuncstr.js"></SCRIPT>
+
+<script type="text/javascript">
+<!--
+// Globals /////////////////////////////
+
+var step='<$RVAR.step>';	// holds the fetch size from the query
+
+////////////////////////////////////////
+function Initialize(rid)
+{
+	if('<$RVAR.order_by>' != '' && rid !='' && '<$RVAR.mod>' != 'PRE_UPDATE')
+	{
+		document.images['<$RVAR.order_by>'].src='<$RVAR.image>';
+		document.images['<$RVAR.order_by>'].width=12;
+		document.images['<$RVAR.order_by>'].height=12;
+	}
+}
+////////////////////////////////////////
+function InitDbFields()
+{
+	document.LineForm.lname.value="<$RVAR.lname>";
+	document.LineForm.fname.value="<$RVAR.fname>";
+	document.LineForm.mrktbl_code_val.value="<$RVAR.mrktbl_code_val>";
+	document.LineForm.intrst_code_val.value="<$RVAR.intrst_code_val>";
+	document.LineForm.comment.value="<$RVAR.comment>";
+}
+////////////////////////////////////////
+//-->
+</script>
+<FORM NAME="LineForm">
+<input type="Hidden" name="template">
+<input type="Hidden" name="rid">
+<input type="Hidden" name="mod">
+<input type="Hidden" name="order_by" value="<$RVAR.order_by>">
+<input type="Hidden" name="order_direction" value="<$RVAR.order_direction>">
+<input type="Hidden" name="step" value="<$RVAR.step>">
+<input type="Hidden" name="start" value="<$RVAR.start>">
+<input type="Hidden" name="end" value="<$RVAR.end>">
+<input type="Hidden" name="direction" value="<$RVAR.direction>">
+<input type="Hidden" name="location_line" value="<$RVAR.location_line>">
+<input type="Hidden" name="location_head" value="<$RVAR.location_head>">
+<input type="Hidden" name="image" value="<$RVAR.image>">
+<input type="Hidden" name="notes" value="<$RVAR.notes>">
+<!--database param-->
+<input type="Hidden" name="lname">
+<input type="Hidden" name="fname">
+<input type="Hidden" name="mrktbl_code_val">
+<input type="Hidden" name="intrst_code_val">
+<input type="Hidden" name="comment">
+<input type="Hidden" name="sid" value="<$RVAR.sid>">
+
+<$RPERL.B>
+# update the db fields if in search or delete mode 
+if('<$RVAR.mod>' eq 'SEARCH' || '<$RVAR.mod>' eq 'DELETE')
+{
+print <<EOM;
+<script type="text/javascript" language="JavaScript">
+	InitDbFields();
+</script>
+EOM
+}
+</$RPERL>
+
+<$RIF.'"<$RVAR.mod>" eq "DELETE"'>
+<!-- Do delete row -->
+<$RS='DELETE FROM guests WHERE rid=<$RVAR.rid>'>
+<$REND_IF>
+
+<$RIF.'"<$RVAR.mod>" eq "INSERT"'>
+<!-- Do insert row -->
+<$RS='INSERT INTO guests 
+				(date,lname,fname,comment,mrktbl_code,intrst_code,
+				note,email,cityname,streetname,housenum,zipcode,
+				 phone1,phone2,sid) VALUES 
+				("<$RVAR.date>","<$RVAR.lname>","<$RVAR.fname>",
+				 "<$RVAR.comment>","<$RVAR.mrktbl_code_val>",
+				 "<$RVAR.intrst_code_val>","<$RVAR.note>","<$RVAR.email>",
+				 "<$RVAR.cityname>","<$RVAR.streetname>",
+				 "<$RVAR.housenum>","<$RVAR.zipcode>",
+				 "<$RVAR.phone1>","<$RVAR.phone2>","<$RVAR.sid>")'>
+<$REND_IF>
+
+<$RIF.'"<$RVAR.mod>" eq "UPDATE"'>
+<!-- Do update row -->
+<$RS='UPDATE guests SET date="<$RVAR.date>",lname="<$RVAR.lname>",
+				  fname="<$RVAR.fname>",comment="<$RVAR.comment>",
+				  mrktbl_code="<$RVAR.mrktbl_code_val>",
+				  intrst_code="<$RVAR.intrst_code_val>",
+				  note="<$RVAR.note>",email="<$RVAR.email>",
+				  cityname="<$RVAR.cityname>",
+				  streetname="<$RVAR.streetname>",
+				  housenum="<$RVAR.housenum>",
+				  zipcode="<$RVAR.zipcode>",
+				  phone1="<$RVAR.phone1>",phone2="<$RVAR.phone2>"
+				  WHERE rid=<$RVAR.rid>'>
+<$REND_IF>
+
+<$RPERL.B>
+# if updated return to the original search
+if ('<$RVAR.mod>' eq 'UPDATE')	
+{
+print <<EOM;
+<script type="text/javascript" language="JavaScript">
+	var dt = new Date() -1;	
+	window.parent.HEADER.location.href=document.LineForm.location_head.value;
+	location.href=document.LineForm.location_line.value+'&dt='+dt;
+</script>
+EOM
+}
+</$RPERL>
+
+<$RPERL.C>
+	# do the currect select 
+	my $buf;
+	my $order_by='';
+	my $i=0;
+	my $n; 
+	my @search_where;		# holds all the parts of the dynamic range
+	my $search_where='';	# holds the where string
+	my @multi_select;		# holds the multi select part of the search where
+	my @multi_select2;		# holds the multi select part of the search where
+	my $multi_buf='<$RVAR.mrktbl_code_val>';	# holds the relevent part of the multi string
+	my $multi_buf2='<$RVAR.intrst_code_val>';	# holds the relevent part of the multi string
+	my $step='<$RVAR.step>';
+	my $limit=(('<$RVAR.start>' ne '' && '<$RVAR.start>' ne '  ')?"limit <$RVAR.start>,$step":"limit 0,$step");
+	if('<$RVAR.comment>' ne '' && '<$RVAR.comment>' ne '  '){$search_where[$i]='comment LIKE "<$RVAR.comment>"';$i++;}
+	if('<$RVAR.lname>' ne '' && '<$RVAR.lname>' ne '  '){$search_where[$i]='lname LIKE "<$RVAR.lname>"';$i++;}
+	if('<$RVAR.fname>' ne '' && '<$RVAR.fname>' ne '  '){$search_where[$i]='fname LIKE "<$RVAR.fname>"';$i++;}	
+	
+	# multi select 
+	if('<$RVAR.mrktbl_code_val>' ne '0.0' && '<$RVAR.mrktbl_code_val>' ne '' && '<$RVAR.mrktbl_code_val>' ne '  ')
+	{
+		if(($n=index($multi_buf,'|'))>=0)
+		{
+			$multi_buf=substr($multi_buf,0,$n);
+		}
+		
+		# split the string to an array
+		@multi_select=split(/\,/,$multi_buf);
+		
+		# add sql text to the elements
+		for($n=0;$n<=$#multi_select;$n++)
+		{
+			$multi_select[$n]="mrktbl_code=$multi_select[$n]";
+		}
+	}
+	
+	# multi select 
+	if('<$RVAR.intrst_code_val>' ne '0.0' && '<$RVAR.intrst_code_val>' ne '' && '<$RVAR.intrst_code_val>' ne '  ')
+	{
+		if(($n=index($multi_buf2,'|'))>=0)
+		{
+			$multi_buf2=substr($multi_buf2,0,$n);
+		}
+		
+		# split the string to an array
+		@multi_select2=split(/\,/,$multi_buf2);
+		
+		# add sql text to the elements
+		for($n=0;$n<=$#multi_select2;$n++)
+		{
+			$multi_select2[$n]="intrst_code=$multi_select2[$n]";
+		}
+	}
+	
+	# create the search where string
+	$search_where=join(' AND ',@search_where);
+	
+	# add the AND stub if there is a statment
+	if($search_where ne ''){$search_where='WHERE '.$search_where;}
+	
+	# create the multi select search where string
+	$multi_buf=join(' OR ',@multi_select);
+	
+	# create the multi select search where string
+	$multi_buf2=join(' OR ',@multi_select2);
+	
+	 # add the multi select part to the dynamic search where
+      if($multi_buf ne '')
+      {
+	      if($search_where ne '')
+          {
+    	      $search_where.=' AND ('.$multi_buf.')';
+          }
+          else
+          {
+         	  $search_where.='WHERE ('.$multi_buf.')';
+          }
+	  }
+	  
+	  # add the multi select part to the dynamic search where
+      if($multi_buf2 ne '')
+      {
+	      if($search_where ne '')
+          {
+    	      $search_where.=' AND ('.$multi_buf2.')';
+          }
+          else
+          {
+         	  $search_where.='WHERE ('.$multi_buf2.')';
+          }
+	  }
+	
+	if('<$RVAR.order_by>' ne '')
+	{
+		$order_by='ORDER BY <$RVAR.order_by> <$RVAR.order_direction>';
+	}
+	else
+	{
+		$order_by='ORDER BY a.rid desc';
+	}
+	
+	# PRE_UPDATE special mode for changing the table before going to update	
+
+	if('<$RVAR.mod>' eq 'PRE_UPDATE')	
+	{	
+		$buf="RQ=\'SELECT a.*,b.name mrktbl_desc,b.number mrktbl_num,c.name intrst_desc FROM guests a
+					LEFT JOIN tbl b ON a.mrktbl_code=b.code AND b.tbl='MRKTBL' 
+						and b.LANGUG_CODE='en' 
+					LEFT JOIN tbl c ON a.intrst_code=c.code AND c.tbl='INTRST'
+						and c.LANGUG_CODE='en'
+				   WHERE a.rid=<$RVAR.rid>";
+	}
+	elsif('<$RVAR.mod>' eq 'SEARCH' || '<$RVAR.mod>' eq 'DELETE')	
+	{
+		$buf="RQ=\'SELECT a.*,b.name mrktbl_desc,b.number mrktbl_num,c.name intrst_desc FROM guests a
+					LEFT JOIN tbl b ON a.mrktbl_code=b.code AND b.tbl='MRKTBL' 
+						and b.LANGUG_CODE='en'
+					LEFT JOIN tbl c ON a.intrst_code=c.code AND c.tbl='INTRST'
+						and c.LANGUG_CODE='en'
+				    $search_where $order_by $limit";
+	}
+	elsif('<$RVAR.mod>' ne 'UPDATE')
+	{
+		$buf="RQ=\'SELECT a.*,b.name mrktbl_desc,
+						  b.number mrktbl_num,
+						  c.name intrst_desc 
+						  FROM guests a
+					LEFT JOIN tbl b ON a.mrktbl_code=b.code AND b.tbl='MRKTBL' 
+						and b.LANGUG_CODE='en'
+					LEFT JOIN tbl c ON a.intrst_code=c.code AND c.tbl='INTRST'
+						and c.LANGUG_CODE='en'
+			  		$order_by $limit";
+	}
+
+	$buf='<$'.$buf.'\'>';
+	return $buf;
+</$RPERL>
+
+<$RPERL.B>
+# create the location
+my $start=0;
+my $step='<$RVAR.step>';
+my $end;
+
+if('<$RSQL.rid>' ne '')
+{
+	if('<$RVAR.start>' ne '')
+	{
+		$start='<$RVAR.start>';
+	}
+	
+	$end=$start+$step;
+	$start++;
+	print "<div align='left' class='sText'><b>Records $start to $end</b></div>\n";
+}
+elsif('<$RVAR.mod>' ne 'UPDATE')
+{
+		print"<div align='left' class='sText'><b>End of records</b></div>";
+}
+</$RPERL>
+
+<TABLE BORDER=1 BORDERCOLOR="Black" BGCOLOR="White" ALIGN="RIGHT" WIDTH=100%>
+<$RPERL.B>
+# print the header if only there are allready lines in table
+if('<$RSQL.rid>' ne '')
+{
+print <<EOM;
+<tr bgcolor="Navy">
+	<td width="5%" align="center" nowrap><div class="sText" style="color: White;">Delete</DIV></TD>
+	<td width="5%" align="center" nowrap><div class="sText" style="color: White;">Update</DIV></TD>
+<td width="10%" align="center" nowrap onMouseMove='javascript:this.bgColor="Black"' onMouseOut='javascript:this.bgColor="Navy"'><a href="javascript:OrderTable('date','<$RVAR.mod>','<$RVAR.notes>')" title="sort"><div class="sText" style="color: White;"><img src="<$RVAR.base>/razinf/gif/space.gif" name="date" alt="sort" border=0 width=0 height=0>Date</DIV></a></TD>
+	<td width="15%" align="center" nowrap onMouseMove='javascript:this.bgColor="Black"' onMouseOut='javascript:this.bgColor="Navy"'><a href="javascript:OrderTable('lname','<$RVAR.mod>','<$RVAR.notes>')" title="sort"><div class="sText" style="color: White;"><img src="<$RVAR.base>/razinf/gif/space.gif" name="lname" alt="sort" border=0 width=0 height=0>Last name</DIV></a></TD>
+	<td width="18%" align="center" nowrap onMouseMove='javascript:this.bgColor="Black"' onMouseOut='javascript:this.bgColor="Navy"'><a href="javascript:OrderTable('fname','<$RVAR.mod>','<$RVAR.notes>')" title="sort"><div class="sText" style="color: White;"><img src="<$RVAR.base>/razinf/gif/space.gif" name="fname" alt="sort" border=0 width=0 height=0>First name</DIV></a></TD>
+	<td width="12%" align="center" nowrap onMouseMove='javascript:this.bgColor="Black"' onMouseOut='javascript:this.bgColor="Navy"'><a href="javascript:OrderTable('intrst_desc','<$RVAR.mod>','<$RVAR.notes>')" title="sort"><div class="sText" style="color: White;"><img src="<$RVAR.base>/razinf/gif/space.gif" name="intrst_desc" alt="sort" border=0 width=0 height=0>Areas of interest</DIV></a></TD>
+	<td width="22%" align="center" nowrap onMouseMove='javascript:this.bgColor="Black"' onMouseOut='javascript:this.bgColor="Navy"'><a href="javascript:OrderTable('comment','<$RVAR.mod>','<$RVAR.notes>')" title="sort"><div class="sText" style="color: White;"><img src="<$RVAR.base>/razinf/gif/space.gif" name="comment" alt="sort" border=0 width=0 height=0>Comments</DIV></a></TD>	
+	<td width="3%" align="center" nowrap onMouseMove='javascript:this.bgColor="Black"' onMouseOut='javascript:this.bgColor="Navy"'><a href="javascript:OrderTable('mrktbl_num','<$RVAR.mod>','<$RVAR.notes>')" title="sort"><div class="sText" style="color: White;"><img src="<$RVAR.base>/razinf/gif/space.gif" name="mrktbl_num" alt="sort" border=0 width=0 height=0>Grade</DIV></a></TD>
+</TR>
+EOM
+}
+else
+{
+print <<EOM;
+<script type="text/javascript" language="JavaScript">
+<!--
+	if(document.LineForm.end.value==0)
+	{
+		document.LineForm.end.value=document.LineForm.start.value;
+	}
+	
+	if(document.LineForm.direction.value=='f')
+	{
+		document.LineForm.start.value=document.LineForm.end.value;
+	}
+//-->
+</script>
+EOM
+}		
+</$RPERL>
+
+<$RLOOP>
+
+<TR onMouseMove='javascript:this.bgColor="#999FF"' onMouseOut='javascript:this.bgColor=""'>
+<script type="text/javascript" language="JavaScript">
+	var buf;
+	if('<$RVAR.sid>' == '<$RSQL.sid>')
+	{
+		buf = "<TD ALIGN='center'><A HREF=javascript:DoSub('DELETE','<$RSQL.rid>','<$RVAR.mod>','<$RVAR.notes>','AUTHORIZE')><div class='RepText'><IMG SRC='<$RVAR.base>/razinf/gif/bullet_d.gif' name='bullet_d' BORDER=0 ALT='delete'></DIV></A></TD>";	
+		buf = buf + "<TD ALIGN='center'><A HREF=javascript:DoSub('UPDATE','<$RSQL.rid>','<$RVAR.mod>','<$RVAR.notes>','AUTHORIZE')><div class='RepText'><IMG SRC='<$RVAR.base>/razinf/gif/greenball.gif' BORDER=0 ALT='update'></DIV></A></TD>";	
+		buf = buf + "<TD onClick=javascript:DoSub('UPDATE','<$RSQL.rid>','<$RVAR.mod>','<$RVAR.notes>','AUTHORIZE')><div class='RepText' align='left' dir='rtl'><$RSQL.date></DIV><IMG SRC='<$RVAR.base>/razinf/gif/space.gif' WIDTH=1 HEIGHT=1 BORDER=0></TD>";	
+   		buf = buf +	"<TD onClick=javascript:DoSub('UPDATE','<$RSQL.rid>','<$RVAR.mod>','<$RVAR.notes>','AUTHORIZE')><div class='RepText'><$RSQL.lname></DIV><IMG SRC='<$RVAR.base>/razinf/gif/space.gif' WIDTH=1 HEIGHT=1 BORDER=0></TD>";
+		buf = buf + "<TD onClick=javascript:DoSub('UPDATE','<$RSQL.rid>','<$RVAR.mod>','<$RVAR.notes>','AUTHORIZE')><div class='RepText'><$RSQL.fname></DIV><IMG SRC='<$RVAR.base>/razinf/gif/space.gif' WIDTH=1 HEIGHT=1 BORDER=0></TD>";	
+		buf = buf + "<TD onClick=javascript:DoSub('UPDATE','<$RSQL.rid>','<$RVAR.mod>','<$RVAR.notes>','AUTHORIZE')><div class='RepText'><$RSQL.intrst_desc></DIV><IMG SRC='<$RVAR.base>/razinf/gif/space.gif' WIDTH=1 HEIGHT=1 BORDER=0></TD>";	
+		buf = buf +	"<TD onClick=javascript:DoSub('UPDATE','<$RSQL.rid>','<$RVAR.mod>','<$RVAR.notes>','AUTHORIZE')><div class='RepText'><$RSQL.comment></DIV><IMG SRC='<$RVAR.base>/razinf/gif/space.gif' WIDTH=1 HEIGHT=1 BORDER=0></TD>";
+		buf = buf + "<TD onClick=javascript:DoSub('UPDATE','<$RSQL.rid>','<$RVAR.mod>','<$RVAR.notes>','AUTHORIZE')><div class='NumText'><$RPIC.R '0.0'=''.'<$RSQL.mrktbl_desc>'></DIV><IMG SRC='<$RVAR.base>/razinf/gif/space.gif' WIDTH=1 HEIGHT=1 BORDER=0></TD>";
+	}
+	else
+	{
+		buf = "<TD ALIGN='center'><A HREF=javascript:DoSub('DELETE','<$RSQL.rid>','<$RVAR.mod>','<$RVAR.notes>','NO_AUTHORIZE')><div class='RepText'><IMG SRC='<$RVAR.base>/razinf/gif/ball.gray.gif' name='bullet_d' BORDER=0 ALT='delete'></DIV></A></TD>";	
+		buf = buf + "<TD ALIGN='center'><A HREF=javascript:DoSub('UPDATE','<$RSQL.rid>','<$RVAR.mod>','<$RVAR.notes>','NO_AUTHORIZE')><div class='RepText'><IMG SRC='<$RVAR.base>/razinf/gif/ball.gray.gif' BORDER=0 ALT='update'></DIV></A></TD>";	
+		buf = buf + "<TD onClick=javascript:DoSub('UPDATE','<$RSQL.rid>','<$RVAR.mod>','<$RVAR.notes>','NO_AUTHORIZE')><div class='RepText' align='left' dir='rtl'><$RSQL.date></DIV><IMG SRC='<$RVAR.base>/razinf/gif/space.gif' WIDTH=1 HEIGHT=1 BORDER=0></TD>";
+   		buf = buf +	"<TD onClick=javascript:DoSub('UPDATE','<$RSQL.rid>','<$RVAR.mod>','<$RVAR.notes>','NO_AUTHORIZE')><div class='RepText'><$RSQL.lname></DIV><IMG SRC='<$RVAR.base>/razinf/gif/space.gif' WIDTH=1 HEIGHT=1 BORDER=0></TD>";	
+		buf = buf + "<TD onClick=javascript:DoSub('UPDATE','<$RSQL.rid>','<$RVAR.mod>','<$RVAR.notes>','NO_AUTHORIZE')><div class='RepText'><$RSQL.fname></DIV><IMG SRC='<$RVAR.base>/razinf/gif/space.gif' WIDTH=1 HEIGHT=1 BORDER=0></TD>";	
+		buf = buf + "<TD onClick=javascript:DoSub('UPDATE','<$RSQL.rid>','<$RVAR.mod>','<$RVAR.notes>','NO_AUTHORIZE')><div class='RepText'><$RSQL.intrst_desc></DIV><IMG SRC='<$RVAR.base>/razinf/gif/space.gif' WIDTH=1 HEIGHT=1 BORDER=0></TD>";	
+		buf = buf +	"<TD onClick=javascript:DoSub('UPDATE','<$RSQL.rid>','<$RVAR.mod>','<$RVAR.notes>','NO_AUTHORIZE')><div class='RepText'><$RSQL.comment></DIV><IMG SRC='<$RVAR.base>/razinf/gif/space.gif' WIDTH=1 HEIGHT=1 BORDER=0></TD>";
+		buf = buf + "<TD onClick=javascript:DoSub('UPDATE','<$RSQL.rid>','<$RVAR.mod>','<$RVAR.notes>','NO_AUTHORIZE')><div class='NumText'><$RPIC.R '0.0'=''.'<$RSQL.mrktbl_desc>'></DIV><IMG SRC='<$RVAR.base>/razinf/gif/space.gif' WIDTH=1 HEIGHT=1 BORDER=0></TD>";			
+	}
+	document.writeln(buf);
+</script>
+</TR>
+<$REND>
+</TABLE>
+</FORM>
+
+<$RPERL.B>
+# initilize from here 
+print <<EOM;
+<script type="text/javascript" language="JavaScript">
+	Initialize('<$RSQL.rid>');
+</script>
+EOM
+</$RPERL>
+
+</BODY>
+</HTML>

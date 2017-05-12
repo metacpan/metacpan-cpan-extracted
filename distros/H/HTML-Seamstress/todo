@@ -1,0 +1,20 @@
+- move Seamstress things to HTML::Element::Library - done: all generics
+are moved. things related to templating stay in Seamstress.
+
+- understand what HTML::ElementExtended does, perhaps extending 
+HTML::Element::Library along the way. this is important for deciding
+on cleaning up iters and integrating with Extended.
+
+- test table
+  - doc/test select unroll + add selected feature
+  - doc/test li unroll
+
+- note the callback features of
+	Template
+	HTML::Template
+	CGI::Prototype
+	Class::DBI
+
+  with the intent of addressing common look and feel within Seamstress
+
+- clean up iters

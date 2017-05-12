@@ -1,0 +1,100 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<title>Lists</title>
+</head>
+
+<body bgcolor="#FFFFFF">
+
+[- @k = (1, 2, 3, 4, 5, 6) -]
+[- @v = ('A', 'B', 'C', 'D', 'E', 'F') -]
+</p>
+<hr>
+<P>OL Tag</P>
+<ol>
+    <li>[+ $k[$row] +] = [+ $v[$row] +]</li>
+</ol>
+
+<hr>
+<P>UL Tag</P>
+<ul>
+    <li>[+ $k[$row] +] = [+ $v[$row] +]</li>
+</ul>
+
+<hr>
+<form method="POST">
+  <P>Select Tag</P>
+
+    If you request this document with list.htm?sel=n you can specify that the
+    nth element of the dropdownlist is initialy selected
+    
+
+    <p><select name="D1" size="1">
+        <option value="[+ $v[$row] +]" [+ $row + 1 == $fdat{sel}?'SELECTED':'' +]>[+ $k[$row] +]</option>
+    </select></p>
+</form>
+
+
+<form method="POST">
+  <P>Select Tag</P>
+
+    If you request this document with list.htm?sel1=x you can specify that the
+    element of the dropdownlist is initialy selected
+    
+
+    <p><select name="SEL1">
+        <option value="[+ $v[$row] +]">[+ $k[$row] +]</option>
+    </select></p>
+</form>
+
+<form method="POST">
+  <P>Select Tag</P>
+
+    If you request this document with list.htm?sel2=x you can specify that the
+    element of the dropdownlist is initialy selected
+    
+
+    <p><select name="SEL2">
+        <option selected value="[+ $v[$row] +]">[+ $k[$row] +]</option>
+        <option value="[+ $v[$row] +]" selected>[+ $k[$row] +]</option>
+        <option value="[+ $v[$row] +]" selected size=5>[+ $k[$row] +]</option>
+    </select></p>
+    <p><select name="SEL3">
+        <option selected value="[+ $v[$row] +]">[+ $k[$row] +]</option>
+        <option value="[+ $v[$row] +]" selected>[+ $k[$row] +]</option>
+        <option value="[+ $v[$row] +]" selected size=5>[+ $k[$row] +]</option>
+    </select></p>
+    <p><select name="SEL4">
+        <option selected value="aa">aaaa</option>
+        <option value="bb" selected>bbbb</option>
+        <option value="cc" selected size=5>cccc</option>
+        <option value="dd">aaaa</option>
+        <option value="ee">bbbb</option>
+        <option value="cc" size=5>cccc</option>
+    </select></p>
+</form>
+
+
+
+<hr>
+<P>DL Tag</P>
+<dl>
+    <dt>[+ $k[$row] +]</dt>
+    <dd>[+ $v[$row] +]</dd>
+</dl>
+
+<hr>
+<P>MENU Tag</P>
+<menu>
+    <li>[+ $k[$row] +] = [+ $v[$row] +]</li>
+</menu>
+
+<hr>
+<P>DIR Tag</P>
+<dir>
+    <li>[+ $k[$row] +] = [+ $v[$row] +]</li>
+</dir>
+</body>
+</html>

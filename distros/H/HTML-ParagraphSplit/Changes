@@ -1,0 +1,28 @@
+Revision history for Perl module HTML::ParagraphSplit
+
+1.05 Sun Sep 30 19:31:00 2007
+    - Bumped the version number to a one-point-ex level because it's complete.
+    - Added a test for dependencies.
+    - Added a test for POD Coverage.
+    - Added two new sub-tests to reveal a bug in 0.04 in entity handling.
+    - Fixed entity handling so that &lt; (et. al.) does not become < on output.
+    - Removed a call to UNIVERSAL::isa() to a method call ->isa().
+    - Added a preference for blessed() over ref(), in a couple places.
+
+0.04 Sun Aug 26 21:45:00 2007
+    - Fixed a minor documentation bug.
+    - Switched to using Module::Install instead of Module::Build.
+
+0.03 Sun Jul 30 16:52:00 2006
+    - [rt.cpan.org #20759] FIXED: HTML::ParagraphSplit properly handles nested
+      content that does not contain any breaks.
+
+0.02 Sat Jul 22 21:43:00 2006
+    - Fixed a bug that caused HTML::ParagraphSplit to fail in actual use even
+      though all tests passed because the tests used HTML::TreeBuilder, but
+      HTML::ParagraphSplit does not.
+
+0.01 Wed Jul 19 22:10:40 2006
+    - original version; created by ExtUtils::ModuleMaker 0.47
+
+

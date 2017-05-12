@@ -1,0 +1,5 @@
+<table align="center" border="0" cellpadding="5" cellspacing="3" class="render1">
+<tr bgcolor="#999999" class="render1"><th class="foobar">Col1</th><th class="foobar">Col2</th><th class="foobar">Col3</th><th class="foobar">Col4</th></tr>
+<tr><td>one</td><td>two</td><td>three</td><td>four</td></tr>
+<tr bgcolor="#999999"><td>a</td><td>b</td><td>c</td><td>&nbsp;</td></tr>
+</table>

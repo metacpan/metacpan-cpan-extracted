@@ -1,0 +1,7 @@
+* <ifndef>
+* try caching expressions (after substitution)
+they may often be constant
+* limit size of file cache - also test efficacy.
+** test on RedHat 9 showed no effect
+Loading the same file repeatedly; the cache had no appreciable effect.
+probably just uses extra memory.

@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<WebTest version="1.0">
+  <params />
+  <test>
+    <param name="parent">
+     <list name="no_element_within_param_allowed">
+      <param>1</param>
+      <param>en_US</param>
+      <param>3</param>
+     </list>
+    </param>
+  </test>
+</WebTest>

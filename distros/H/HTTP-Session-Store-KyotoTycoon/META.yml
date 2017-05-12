@@ -1,0 +1,29 @@
+---
+abstract: 'HTTP::Session with Cache::KyotoTycoon'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom AAJKLFJEF GMAIL COM>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  File::Which: 0
+  Test::More: 0.96
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTTP-Session-Store-KyotoTycoon
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Cache::KyotoTycoon: 0
+  HTTP::Session: 0.4
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

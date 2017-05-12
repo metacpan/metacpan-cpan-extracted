@@ -1,0 +1,21 @@
+
+
+[! $subs = Execute ({'isa' => '../eposubs.htm'}) !]
+
+
+[!
+
+sub txt1 { "txt1 from same dir in eposubs2" } ;
+
+!]
+
+
+** same dir **
+
+
+[$ sub eposub1 $]
+
+[- $n = 1 -]
+<h1>eposub[+ $n +]</h1>
+
+[$endsub$]

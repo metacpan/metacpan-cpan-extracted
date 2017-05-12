@@ -1,0 +1,9 @@
+^Makefile(\.old)?$
+~$
+^lib/HTML/EP/Config.pm$
+^blib/
+^ep.cgi$
+^pm_to_blib$
+^HTML-EP-\d+\.\d+
+^examples/glimpse/var/
+\bCVS\b

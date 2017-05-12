@@ -1,0 +1,30 @@
+---
+abstract: 'HTTP MultiPart Parser'
+author:
+  - 'Christian Hansen C<chansen@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Deep: 0
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.18'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTTP-MultiPartParser
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  Scalar::Util: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/chansen/p5-http-multipartparser
+version: '0.02'

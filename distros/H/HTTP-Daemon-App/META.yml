@@ -1,0 +1,18 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         HTTP-Daemon-App
+version:      v0.0.9
+version_from: lib/HTTP/Daemon/App.pm
+installdirs:  site
+requires:
+    Acme::Spork:                   0
+    File::Spec:                    0
+    HTTP::Daemon:                  0
+    HTTP::Daemon::SSL:             0
+    HTTP::Response:                0
+    HTTP::Status:                  0
+    Unix::PID:                     0
+    version:                       0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

@@ -1,0 +1,13 @@
+[-
+sub error_check {
+        $error = &lt;&lt;END if ($units == 0);
+To Create a duplicate entry you must first fill in the units field.
+END
+        }
+
+-]
+<HTML>
+HELLO
+[- error_check -]
+[+ $error +]
+</HTML>

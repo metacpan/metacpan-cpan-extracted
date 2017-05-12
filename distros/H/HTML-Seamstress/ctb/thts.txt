@@ -1,0 +1,29 @@
+XML::DOM
+? More familiar with TReeBuilder but XML::Generator::DOM is nice.
+
+--
+
+classes or prototypes
+
+a/ a call should get the node:
+   
+b/ autoload
+-- context-sensitive XML generation?
+
+@children = 
+
+--
+
+callbacks?
+
+
+--
+
+a package seems to be the natural way to encapsulate the id locations
+
+my $tree = HTML::Seamstress->new_from_file('html/x/y/hello_world.html');
+$tree->content_handler(name => $name)->content_handler(date => `date`);
+$tree->as_HTML;
+
+my $tree = $S->load('html/main/hello_world.html');
+$tree->name('bob')->date(`date`)

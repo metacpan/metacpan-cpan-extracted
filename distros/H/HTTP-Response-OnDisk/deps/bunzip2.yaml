@@ -1,0 +1,6 @@
+---
+name: 'Bunzip2 Support'
+default: 1
+depends:
+    'IO::Uncompress::Bunzip2': 0
+

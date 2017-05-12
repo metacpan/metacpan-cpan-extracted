@@ -1,0 +1,42 @@
+{
+   "abstract" : "HackaMol extension for running Autodock Vina",
+   "author" : [
+      "Demian Riccardi <demianriccardi@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.035, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HackaMol-X-Vina",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0.27",
+            "File::chdir" : "0.1010",
+            "HackaMol" : "0.031",
+            "HackaMol::X::Roles::ExtensionRole" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/demianriccardi/HackaMol-X-Vina",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/demianriccardi/HackaMol-X-Vina.git",
+         "web" : "https://github.com/demianriccardi/HackaMol-X-Vina"
+      }
+   },
+   "version" : "0.012"
+}
+

@@ -1,0 +1,348 @@
+=head1 Tutorial for using Hardware::Vhdl::Automake
+
+=head2 Step 1: Installing the modules
+
+First ensure that you have the required dependency modules installed.  These are:
+
+=over 4
+
+=item Hardware::Vhdl::Lexer (version 1.0 or later)
+
+=item YAML (version 0.62 or later)
+
+=item Test::More
+
+=item File::Spec::Functions
+
+=item File::Path
+
+=item File::Temp
+
+=item File::Copy
+
+=item File::Temp
+
+=item File::Basename
+
+=item Digest::MD5
+
+=item Math::Expression
+
+=item List::Util
+
+=item Carp
+
+=back
+
+Installation of Hardware::Vhdl::Automake should be done in the usual way for unpacking a CPAN distribution:
+
+=over 4
+
+=item *
+
+Unzip and untar the distribution archive
+
+=item *
+
+Change dir to the location where the files were unpacked and run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+=back
+
+=head2 Step 2: Set up a VHDL project
+
+=over 4
+
+=item *
+
+Create a working directory for the VHDL project, for example F<C:\hva_tutorial>.
+
+=item *
+
+Copy the example source file folder F<tutorial\src> into the working directory, so that you have a folder called F<C:\hva_tutorial\src> containing some .vhd files.
+
+=item *
+
+Create an empty directory called ‘hdl’ in the working directory.
+
+=item *
+
+Copy the file F<create_project.pl> from the tutorial folder into F<C:\hva_tutorial>.
+
+=item *
+
+Edit F<C:\hva_tutorial\create_project.pl>, and change the definition of C<$project_dir> to match the name of your working directory.
+
+=back
+
+Let’s look at what F<create_project.pl> does.
+
+=over 4
+
+=item *
+
+It creates a new Hardware::Vhdl::Automake::Project object
+
+=item *
+
+It calls a method C<add_sourcefiles>, which tells the project to ensure that the given source files are included when compiling the project.  The first file is specified simply by its filename, but the second also has some other settings given: the library that it is to be compiled into (‘work’ is the default) and the language (there are some hooks in the code to handle Verilog, but support isn’t complete because I don’t use Verilog).
+
+=item *
+
+If calls a method C<save(filename)> to save the project.
+
+=item *
+
+If calls a method C<hdl_dir(dir_name)> to set where the generated HDL is saved.  “Generated HDL” is the set of VHDL files, one per design unit, which is generated from the source code that you write.  These files are the ones that are used by the compiler or synthesiser tools, and are not meant to be edited by hand.
+
+=item *
+
+It calls the C<save()> method without arguments: this saves the changes to the project, using the same filename as before.  (There was no need to save the project twice, this was just to demonstrate that C<save()> can remember the filename.)
+
+=back
+
+Run the F<create_project.pl> script.
+
+It should not generate any console output, but a file called F<C:\hva_tutorial\ tutorial.hdlproj> should be created.
+
+=head2 Step 3: Generating the HDL files
+
+=over 4
+
+=item *
+
+Copy the file create F<generate_hdl.pl> from the tutorial folder into F<C:\hva_tutorial>.
+
+=item *
+
+Edit F<C:\hva_tutorial\generate_hdl.pl>, and change the definition of C<$project_dir> to match the name of your working directory.
+
+=back
+
+This perl script loads the project that we created in step 2, tells the project how to output the status reports that it generates (for now it just prints the basic information to STDOUT, but I’ll provide something more user-friendly in a later step), and then tells it to generate all the HDL files.  
+It then saves the project again: this is important, as the project file stores information about the code that has been compiled, so that it will know whether it needs recompiling later.
+
+=over 4
+
+=item *
+
+Run F<generate_hdl.pl>.  You should get output like this:
+
+    Considering generating (pass 1): C:/hva_tutorial/src/adder.vhd
+    Generating (pass 1): C:/hva_tutorial/src/adder.vhd
+    New design unit code generated: entity work.adder
+    New design unit code generated: architecture work.adder(rtl)
+    Considering generating (pass 1): C:/hva_tutorial/src/count_up.vhd
+    Generating (pass 1): C:/hva_tutorial/src/count_up.vhd
+    New design unit code generated: entity work.count_up
+    New design unit code generated: architecture work.count_up(struct)
+    Considering generating (pass 2): architecture work.count_up(struct)
+    Generating (pass 2): architecture work.count_up(struct)
+    Considering generating (pass 2): architecture work.adder(rtl)
+    New design unit code copied to HDL dir: entity work.count_up: C:\hva_tutorial\hdl\entity work count_up.vhd
+    New design unit code copied to HDL dir: architecture work.count_up(struct): C:\hva_tutorial\hdl\architecture work count_up struct.vhd
+    New design unit code copied to HDL dir: entity work.adder: C:\hva_tutorial\hdl\entity work adder.vhd
+    New design unit code copied to HDL dir: architecture work.adder(rtl): C:\hva_tutorial\hdl\architecture work adder rtl.vhd 
+
+=item *
+
+Look in the hdl directory.  You should see four files, one for each design unit in the two original files.  Each file is simply named after the type of design unit it is, the library name, and the design unit name(s).
+
+=item *
+
+Look at ‘F<hdl/architecture work count_up struct.vhd>’, and compare to F<src/count_up.vhd>.
+Note that the specially formed comment “C<--< COMPONENT work.adder >-->” has been replaced by a full definition of the interface for ‘adder’, taken from its entity declaration.  This is a good labour-saver if you use component instantiations.  (This is why there are two passes to the generation: the second pass inserts the component declarations.)
+
+=item *
+
+Run F<generate_hdl.pl> again.  You should get output like this:
+
+    Considering generating (pass 1): C:/hva_tutorial/src/adder.vhd
+    Considering generating (pass 1): C:/hva_tutorial/src/count_up.vhd
+    Considering generating (pass 2): architecture work.count_up(struct)
+    Considering generating (pass 2): architecture work.adder(rtl)
+
+=item *
+
+Note that it considers some generation, but decides that it doesn’t need to do any: this is because it has worked out that nothing has changed in the source files.
+
+=back
+
+=head2 Step 4: Compiling the HDL
+
+=over 4
+
+=item *
+
+Copy the file create F<compile_hdl.pl> from the tutorial folder into F<C:\hva_tutorial>.
+
+=item *
+
+Create an empty directory called ‘sim’ in the working directory.  This will be ModelSim’s working directory for the project, into which it will compile all its libraries.
+
+=item *
+
+In F<compile_hdl.pl>, change the definition of C<$project_dir> to match the name of your working directory. 
+
+=item *
+
+In F<compile_hdl.pl>, change the definition of C<$modelsim_path> to match the name of the directory where the ModelSim executables for ‘vlib’, ‘vcom’ etc. can be found.
+
+The F<compile_hdl.pl> script does the following things:
+
+=over 4
+
+=item *
+
+It loads the project file again
+
+=item *
+
+It creates a Hardware::Vhdl::Automake::Compiler::ModelSim object, and tells it where its working directory is.
+
+=item *
+
+It tells the compiler object where the ModelSim binaries are.
+
+=item *
+
+It tells both the project and the compiler objects how to report status
+
+=item *
+
+It tells the compiler object to compile the project, using the compiler object that we have just created and configured.
+
+=item *
+
+It saves the project again.  This is necessary because the project object stores information about the compilation status.
+
+=back
+
+=item *
+
+Run F<compile_hdl.pl>.  You should get output like this:
+
+    Starting ModelSim compilation
+    Updating modelsim.ini
+    Creating ModelSim library
+    Updating modelsim.ini
+    Doing ModelSim compile: entity work.count_up: C:\hva_tutorial\hdl\entity work count_up.vhd
+    Doing ModelSim compile: entity work.adder: C:\hva_tutorial\hdl\entity work adder.vhd
+    Doing ModelSim compile: architecture work.count_up(struct): C:\hva_tutorial\hdl\architecture work count_up struct.vhd
+    ModelSim compile warning;  (vcom-1074) Non-locally static OTHERS choice is allowed only if it is the only choice of the only association.: architecture work.count_up(struct)
+    Doing ModelSim compile: architecture work.adder(rtl): C:\hva_tutorial\hdl\architecture work adder rtl.vhd
+    Finished ModelSim compilation 
+
+=item *
+
+Note that the tool has created the ‘work’ library, and a modelsim.ini file that holds the library mappings, and then compiles all the design units.
+
+=item *
+
+Run F<compile_hdl.pl> again.  You should get output like this:
+
+    Starting ModelSim compilation
+    Updating modelsim.ini
+    Skipping ModelSim compile: entity work.count_up: C:\hva_tutorial\hdl\entity work count_up.vhd
+    Skipping ModelSim compile: entity work.adder: C:\hva_tutorial\hdl\entity work adder.vhd
+    Skipping ModelSim compile: architecture work.count_up(struct): C:\hva_tutorial\hdl\architecture work count_up struct.vhd
+    Skipping ModelSim compile: architecture work.adder(rtl): C:\hva_tutorial\hdl\architecture work adder rtl.vhd
+    Finished ModelSim compilation
+
+=item *
+
+Note that the tool has done no library creation or compilation, because everything is up-to date.
+
+=item *
+
+You should be able to load the design into ModelSim: start ModelSim, cd to F<C:\hva_tutorial\sim>, and ‘C<vsim work.count_up>’.
+
+=item *
+
+Try making changes to the files in F<src/>, then running the F<generate_hdl.pl> and F<compile_hdl.pl> scripts again.  You should find that the hdl files are updated and recompiled only when they need to be.
+
+=back
+
+=head2 Step 5: A script to generate and compile
+
+Usually there is no need to generate and compile separately: you want to generate all the hdl, and then compile any new or changed design units.  The script F<generate_compile.pl> does a load-generate-compile-save sequence, and also reports more detail on the process and any error reports.
+
+=over 4
+
+=item *
+
+Copy the file F<generate_compile.pl> from the tutorial folder into F<C:\hva_tutorial>.
+
+=item *
+
+In F<generate_compile.pl>, change the definition of C<$project_dir> to match the name of your working directory. 
+
+=item *
+
+In F<generate_compile.pl>, change the definition of C<$modelsim_path> to match the name of the directory where the ModelSim executables for ‘vlib’, ‘vcom’ etc. can be found.
+
+=item *
+
+Delete the contents of F<C:\hva_tutorial\hdl> and F<C:\hva_tutorial\sim>, leaving them as empty directories.  This is so that you can see the generation and compilation of all files happening again.
+
+=item *
+
+Run F<generate_compile.pl>.  You should get output like this:
+
+    Generating HDL from source file C:/hva_tutorial/src/adder.vhd
+      generated entity work.adder
+      generated architecture work.adder(rtl)
+    Generating HDL from source file C:/hva_tutorial/src/count_up.vhd
+      generated entity work.count_up
+      generated architecture work.count_up(struct)
+    Generating (pass 2) architecture work.count_up(struct)
+    copying new HDL for entity work.count_up at C:\hva_tutorial\hdl\entity work count_up.vhd line 1
+    copying new HDL for architecture work.count_up(struct) at C:\hva_tutorial\hdl\architecture work count_up struct.vhd line 1
+    copying new HDL for entity work.adder at C:\hva_tutorial\hdl\entity work adder.vhd line 1
+    copying new HDL for architecture work.adder(rtl) at C:\hva_tutorial\hdl\architecture work adder rtl.vhd line 1
+
+    Starting ModelSim compilation
+    Updating modelsim.ini
+    Creating ModelSim library
+    Updating modelsim.ini
+      compiling entity work.count_up	(because design unit is not listed in library info)
+      compiling entity work.adder	(because design unit is not listed in library info)
+      compiling architecture work.count_up(struct)	(because design unit is not listed in library info)
+    WARNING: ModelSim compile warning;  (vcom-1074) Non-locally static OTHERS choice is allowed only if it is the only choice of the only association.
+        line:      const_1 <= (0 => '1', others => '0');
+        src: at C:\hva_tutorial\src\count_up.vhd line 30
+        gen: at C:\hva_tutorial\hdl\architecture work count_up struct.vhd line 24
+      compiling architecture work.adder(rtl)	(because design unit is not listed in library info)
+    Finished ModelSim compilation 
+
+=item *
+
+Note that the messages are a now bit more human-readable.  Note also that the warning from the compiler is accompanied by the line in error, the source file and line number, and the generated HDL file and line number.    This output format was optimised for use with the ‘SciTE’ text editor, which recognises lines that end with “at <filename> line <number>” and allows you to double-click on these to load the file and jump to the line. 
+
+=item *
+
+The project knows how to map a line number in any generated hdl file to a line in a source file.  This is especially important if you start using the pre-processor, and C<#include> other files.
+
+=back
+
+=head2 What's not been covered
+
+I still haven't shown you:
+
+=over 4
+
+=item *
+
+How your source code can be fed through a preprocessor during the generation stage
+
+=item *
+
+How you can set ModelSim compiler options in your source code.
+
+=back
+
+Just email me at C<< <michaelattenborough at yahoo doht co doht uk> >> - knowing that someone is interested will spur me to writing further documentation.

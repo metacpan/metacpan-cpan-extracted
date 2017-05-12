@@ -1,0 +1,30 @@
+---
+abstract: 'Hypatia Bindings for GraphViz2'
+author:
+  - 'Jack Maney <jack@jackmaney.com>'
+build_requires:
+  Hypatia: 0
+  Hypatia::DBI::Test::SQLite: 0
+  Scalar::Util: 0
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Hypatia-GraphViz2
+requires:
+  Data::Dumper: 0
+  GraphViz2: 2.05
+  Hypatia: 0.027
+  Hypatia::Base: 0
+  Moose: 0
+  Moose::Util::TypeConstraints: 0
+  MooseX::Aliases: 0
+  namespace::autoclean: 0
+version: 0.015

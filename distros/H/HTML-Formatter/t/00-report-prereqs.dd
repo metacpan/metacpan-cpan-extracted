@@ -1,0 +1,68 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::CPAN::Meta' => '0',
+                                      'Test::EOL' => '0',
+                                      'Test::More' => '0.88',
+                                      'Test::NoTabs' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Portability::Files' => '0',
+                                      'Test::Spelling' => '0.12',
+                                      'Test::Synopsis' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Data::Dumper' => '0',
+                                      'Encode' => '0',
+                                      'Font::Metrics::Courier' => '0',
+                                      'Font::Metrics::CourierBold' => '0',
+                                      'Font::Metrics::CourierBoldOblique' => '0',
+                                      'Font::Metrics::CourierOblique' => '0',
+                                      'Font::Metrics::Helvetica' => '0',
+                                      'Font::Metrics::HelveticaBold' => '0',
+                                      'Font::Metrics::HelveticaBoldOblique' => '0',
+                                      'Font::Metrics::HelveticaOblique' => '0',
+                                      'Font::Metrics::TimesBold' => '0',
+                                      'Font::Metrics::TimesBoldItalic' => '0',
+                                      'Font::Metrics::TimesItalic' => '0',
+                                      'Font::Metrics::TimesRoman' => '0',
+                                      'HTML::Element' => '3.15',
+                                      'HTML::TreeBuilder' => '0',
+                                      'IO::File' => '0',
+                                      'base' => '0',
+                                      'integer' => '0',
+                                      'parent' => '0',
+                                      'perl' => '5.008',
+                                      'strict' => '0',
+                                      'utf8' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Slurper' => '0',
+                                   'File::Spec' => '0',
+                                   'FindBin' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Test::More' => '0.96',
+                                   'Test::Warnings' => '0',
+                                   'blib' => '1.01',
+                                   'bytes' => '0',
+                                   'lib' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

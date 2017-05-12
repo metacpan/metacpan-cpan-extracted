@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                HPSG-Mason
+version:             0.01
+abstract:            Head-driven Phrase Structure Grammar templates
+license:             perl
+generated_by:        cjac
+distribution_type:   module
+requires:     
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - C.J. Adams-Collier <cjac@u.washington.edu>

@@ -1,0 +1,150 @@
+Revision history for Perl extension HTML::Shakan
+
+2.10 2017-04-25T07:37:58Z
+    - Allow simple customization of label's class attributes (GeJ++)
+
+2.02 2015-08-19T04:42:04Z
+    - fix xss of textarea widget (shogo82148++)
+
+2.01 2015-07-20T15:40:39Z
+    - Introduce Model::Teng (GeJ++)
+
+2.00 2013-11-20T07:22:24Z
+    - Bump up major version
+
+1.999 2013-11-19T06:25:46Z
+    - TRIAL release
+    - fix documents and tests about HTML::Shakan::Field::Choice#choices
+      (HTML::Shakan::Field::Choice#choices accepts array ref of key-value pairs only)
+    - add documentation of `param` and `params`.
+    - [INCOMPATIBLE] change `param` method behaviour if multiple values are assigned.
+    - depends on Hash::MultiValue.
+
+1.00 2013-11-17T09:18:48Z
+
+    - Use HTML::Escape while escaping HTML chars.
+      It makes HTML::Shakan faster.
+
+      You need to care while updating this module.
+      HTML::Escape escapes more characters by default.
+      (Masayuki Matsuki)
+
+0.18 2013-08-13T01:07:41Z
+
+    - changed to show numerical zero value in the text box.
+      (moznion)
+
+0.17 2013-07-03T19:21:48Z
+
+    - zero value support
+      (toritori0318)
+
+0.16 2013-04-05T06:35:26Z
+
+    - use Mouse; remove Any::Moose
+      (Masayuki Matsuki)
+    - widget checkbox
+      (Masayuki Matsuki)
+
+
+0.15
+
+    - fixed testing issue
+
+0.14
+
+    - fixed testing issue
+
+0.13
+
+    - submit check with form including one file field, and with plack request
+      (lopnor++)
+
+0.12
+
+    - switch to M::B
+
+0.11
+
+    - [BUG] Apply multiple field filters correctly(hirobanex)
+      https://github.com/tokuhirom/html-shakan/pull/2
+
+0.10
+
+    - remove auto_include() in Makefile.PL
+    - depend to latest FV::L(0.23 was broken)
+    - do not depend on Test::Base.
+    - specify the required perl version
+
+0.09
+
+    [BUG FIX]
+    - Filed::Choice: output id and other attributes correctly (ysasaki, karupanerura)
+
+0.08
+
+    - fixed some testing issues.
+    - depended on some latest modules.
+
+0.07
+
+    - tuneup model::*
+    - do not fill undef to not validated parameters in Model::*.
+
+0.06
+
+    - do not modify form information in ::Widgets::*(reported by id:libkenta)
+    - depend to latest Mouse/Any::Moose
+
+0.05
+
+    - added $shakan->render_field($name), suggested by nekokak++
+
+0.04
+
+    - added HTML::Shakan::Model::DBIxSkinny
+
+0.03
+
+    - fixed wrong weak_ref(gfx++)
+
+0.02
+
+        - oops... fixed bug in test
+
+0.01_07
+
+        - fixed deps
+
+0.01_06
+
+        - this project doesn't use P::Validate
+
+0.01_05
+
+        - depend to latest FV::L
+
+0.01_04
+
+        - fixed mojibake in docs!
+        - this module requires Email::Valid::Loose
+
+0.01_03
+
+        - fixed test count
+        - fixed mojibake
+        - fixed test skipping
+        - added Duplication() function
+
+0.01_02
+
+        - added custom_validation for field & form
+        - added submitted & submitted_and_valid(thanks to lestrrat++)
+        - don't use HTML::Entities. this is too slow
+
+0.01_01
+
+        - initial dev. release to cpan
+
+0.01    Thu Mar  5 10:13:13 2009
+        - original version

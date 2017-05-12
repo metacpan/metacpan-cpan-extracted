@@ -1,0 +1,43 @@
+@prefix :        <http://usefulinc.com/ns/doap#> .
+@prefix author:  <http://purl.org/NET/cpan-uri/person/> .
+@prefix dbug:    <http://ontologi.es/doap-bugs#> .
+@prefix dcs:     <http://ontologi.es/doap-changeset#> .
+@prefix dc:      <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix my:      <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Parser/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix toby:    <http://tobyinkster.co.uk/#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+my:project
+	a               :Project ;
+	:name           "HTML-HTML5-Parser" ;
+	:shortdesc      "parse HTML reliably"@en ;
+	:programming-language  "Perl" ;
+	:homepage       <https://metacpan.org/release/HTML-HTML5-Parser> ;
+	:download-page  <https://metacpan.org/release/HTML-HTML5-Parser> ;
+	:bug-database   <http://rt.cpan.org/Dist/Display.html?Queue=HTML-HTML5-Parser> ;
+	:repository     [ a :SVNRepository ; :browse <http://goddamn.co.uk/svn-web/perlmods/browse/HTML-HTML5-Parser/> ] ;
+	:maintainer     toby:i ;
+	:developer      toby:i , my:dev-wakaba ;
+	:documenter     toby:i ;
+	:tester         toby:i ;
+	:created        "2009-11-26"^^xsd:date ;
+	:license        <http://dev.perl.org/licenses/> ;
+	:category
+		[ rdfs:label "Web"@en ] ,
+		[ rdfs:label "HTML"@en ] ,
+		[ rdfs:label "HTML5"@en ] .
+
+toby:i
+	a               foaf:Person ;
+	foaf:name       "Toby Inkster" ;
+	foaf:homepage   <http://tobyinkster.co.uk/> ;
+	foaf:page       <https://metacpan.org/author/TOBYINK> ;
+	foaf:mbox       <mailto:tobyink@cpan.org> ;
+	<http://www.w3.org/2002/07/owl#sameAs> author:tobyink .
+
+my:dev-wakaba
+	a               foaf:Person ;
+	foaf:name       "Wakaba" ;
+	foaf:page       <http://suika.fam.cx/>.

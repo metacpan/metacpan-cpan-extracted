@@ -1,0 +1,20 @@
+Failed  Succeeded  Test Name
+   1          0    *** no name ***
+   1          0    *** no name ***
+
+
+Test Name: N/A
+URL: http://http.web.test/redirect
+
+  STATUS CODE CHECK
+    Expected '200' and got: 302 Found                            FAIL
+
+
+Test Name: N/A
+URL: http://http.web.test/redirect
+
+  STATUS CODE CHECK
+    Expected '200' and got: 302 Found                            FAIL
+
+
+Total web tests failed: 2  succeeded: 0

@@ -1,0 +1,26 @@
+requires "AnyEvent";
+requires "AnyEvent::Campfire::Client";
+requires "AnyEvent::HTTP";
+requires "AnyEvent::HTTP::ScopedClient";
+requires "AnyEvent::HTTPD";
+requires "AnyEvent::IRC::Client";
+requires "Cwd";
+requires "Encode";
+requires "File::Slurp";
+requires "Getopt::Long::Descriptive";
+requires "HTTP::Request";
+requires "JSON::XS";
+requires "LWP::Protocol::https";
+requires "LWP::UserAgent";
+requires "Moose";
+requires "Pod::Usage";
+requires "Time::HiRes";
+requires "Try::Tiny";
+requires "URI";
+requires "URI::QueryParam";
+requires "namespace::autoclean";
+requires "Hubot::Scripts::Bundle";
+
+on test => sub {
+    requires 'Test::More', 0.88;
+};

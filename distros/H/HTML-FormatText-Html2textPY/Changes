@@ -1,0 +1,9 @@
+Revision history for Perl extension HTML::FormatText::Html2textPY.
+0.13  Fri Nov 22 21:00:00 2013
+  - added MRO::Compat into PREREQ_PM
+0.12  Thu Nov 21 20:30:00 2013
+  - fixed tests
+0.11  Thu Nov 21 15:30:00 2013
+  - add no wrap support via rightmargin < 0
+0.10  Thu Nov 21 15:00:00 2013
+  - first release

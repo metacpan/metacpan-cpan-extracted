@@ -1,0 +1,12 @@
+Failed  Succeeded  Test Name
+   1          0    *** no name ***
+
+
+Test Name: N/A
+URL: http://http.web.test/test?test
+
+  STATUS CODE CHECK
+    Expected '200' and got: 404 Not Found                        FAIL
+
+
+Total web tests failed: 1  succeeded: 0

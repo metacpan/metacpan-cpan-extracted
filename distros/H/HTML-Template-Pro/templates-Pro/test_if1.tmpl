@@ -1,0 +1,28 @@
+<H1> test_if1 </H1>
+<tmpl_iF VAR4> <tmpl_var naMe="VAR4"> defined (FALSE)
+ (if test 1) </tmpl_if>
+
+<tMpl_iF VAR2> <tmpl_var naMe="VAR2"> defined (TRUE)
+ (if test 2) </tmpl_if>
+
+<tmpl_iF VAR1> <tmpl_var naMe="VAR1"> defined (if test 3 level 1)
+<tMpl_iF VAR2> <tmpl_var naMe="VAR2"> defined (if test 3 level 2)
+<tMpl_iF VAR2> <tmpl_var naMe="VAR2"> defined (if test 3 level 3)
+<tMpl_iF VAR4> <tmpl_var naMe="VAR4"> defined (if test 3 level 4 FALSE)
+</tmpl_if>
+</tmpl_if> </tmpl_if> </tmpl_if>
+
+------------------ <hr>
+<tmpl_unLess VAR4> <tmpl_var naMe="VAR4"> defined (TRUE)
+ (if test 1) </tmpl_unless>
+
+<tmpl_unLess VAR2> <tmpl_var naMe="VAR2"> defined (FALSE)
+ (if test 2) </tmpl_unless>
+
+<tmpl_if VAR1> <tmpl_var naMe="VAR1"> defined (if test 3 level 1)
+<tmpl_if VAR2> <tmpl_var naMe="VAR2"> defined (if test 3 level 2)
+<tmpl_if VAR2> <tmpl_var naMe="VAR2"> defined (if test 3 level 3)
+<tmpl_unless VAR4> <tmpl_var naMe="VAR4"> defined (if test 3 level 4)
+</tmpl_unless>
+</tmpl_if> </tmpl_if> </tmpl_if>
+

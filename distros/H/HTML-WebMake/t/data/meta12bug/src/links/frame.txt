@@ -1,0 +1,12 @@
+<wmmeta name="ltitle">Adobe FrameMaker</wmmeta>
+<wmmeta name="stitle">FrameMaker</wmmeta>
+<wmmeta name="author">J&ouml;rn Clausen</wmmeta>
+<wmmeta name="cdate">2001-04-23</wmmeta>
+<wmmeta name="mdate">2001-04-23</wmmeta>
+
+    <ul>
+      <li>
+	<a href="http://www.adobe.com/products/framemaker/main.html">
+	  Produktinformation von Adobe</a>
+      </li>
+    </ul>

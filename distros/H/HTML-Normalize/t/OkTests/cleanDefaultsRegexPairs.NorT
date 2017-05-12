@@ -1,0 +1,24 @@
+-default=font bar1=1
+-default=font bar2='2'
+-default=font bar3="3"
+-default=font bar4="'4'"
+-default=font bar5='"5"'
+-default=font bar6="<6>"
+-default=font foo1=qr<^Bar>i
+-default=font foo2=qr[^Bar]i
+-default=font foo3=qr{^Bar}i
+-default=font foo4=qr(^Bar)i
+-default=font foo5=qr/^Bar/i
+-default=font foo6=qr /^Bar/i
+-default=font foo7=qr z^Barzi
+<p>
+    <font foo1="bar boo" bar1="1">foo1</font>
+    <font foo2="bar boo" bar2=2>foo2</font>
+    <font foo3="bar boo" bar3='3'>foo3</font>
+    <font foo4="bar boo" bar4="'4'">foo4</font>
+    <font foo5="bar boo" bar5='"5"'>foo5</font>
+    <font foo6="bar boo" bar6='<6>'>foo6</font>
+    <font foo7="bar boo">foo7</font>
+</p>
+<!--expected-->
+<p>foo1 foo2 foo3 foo4 foo5 foo6 foo7</p>

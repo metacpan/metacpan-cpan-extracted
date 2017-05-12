@@ -1,0 +1,61 @@
+Revision history for Perl extension Hash::FieldHash
+
+0.15 2017-02-06T01:10:09Z
+    - Fix #1: t/orig/03_class.t fails if FamilyTreeInfo-2.3.24 is installed
+
+0.14 2013-05-18T23:54:21Z
+    - Fix a build issue on 5.8.x
+
+0.13 2013-04-13T11:09:06Z
+    - Use Module::Build instead of Module::Install with minil(1)
+    - No code changes
+
+0.12 2011-10-18 13:37:07
+    - Mention to what accessors return (RT #68408 by Ron Savage)
+
+0.11 2011-10-18 13:28:07
+    - Update M::I::XSUtil to 0.41
+    - Skip system depended tests
+
+0.10 Sun Jan 10 15:27:10 2010
+    - Add parent.pm to dependencies
+
+0.09 Wed Jan  6 15:06:58 2010
+	- Make warnings on subroutine redefinition (RT #52073)
+	- Minimum perl version is now 5.8.5
+	- Modernize Makefile.PL
+
+0.08 Mon Jun 15 22:45:02 2009
+	- update ppport.h to 3.19
+
+0.07 Sat Jun  6 08:52:44 2009
+	- pod fix
+	- make from_hash()/to_hash() exportable
+
+0.06 Sat Mar 28 12:30:51 2009
+	- support for named fields
+		- add fieldhash(my %foo => 'foo') syntax as an accessor generator
+		- add Hash::FieldHash::from_hash($obj, \%params) function
+		- add Hash::FieldHash::to_hash($obj) function
+	- fix some bugs
+
+0.05 Fri Mar 13 11:29:16 2009
+	- performance improvement
+	- now IDs are zero origin
+	- internal cleanup
+	- use Test::LeakTrace for testing
+
+0.04 Mon Feb 16 12:29:09 2009
+	- fix issues on bleadperl (5.11)
+	- update ppport.h
+
+0.03 Wed Feb  4 11:51:32 2009
+	- change an object id from refaddr to be an arbitrary natural number
+	- improve performance
+
+0.02 Mon Feb  2 12:48:16 2009
+	- add some type checks
+	- fix a double-free problem (checked in t/11_panic_malloc.t)
+
+0.01 Wed Jan 28 10:09:03 2009
+	- original version; created by Module::Setup

@@ -1,0 +1,26 @@
+---
+abstract: 'Provide access methods to HTML tables by indicating row and column'
+author:
+  - 'Takeru INOUE <takeru.inoue _ gmail.com>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+  Test::NoWarnings: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-TableParser-Grid
+provides:
+  HTML::TableParser::Grid:
+    file: lib/HTML/TableParser/Grid.pm
+    version: v0.0.5
+requires:
+  HTML::TableParser: 0
+  version: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.0.5

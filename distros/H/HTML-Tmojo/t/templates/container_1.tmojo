@@ -1,0 +1,5 @@
+Title:  <: $Next->title :>
+Author: <: $Next->author :>
+
+<: $Next->main :>
+__END__

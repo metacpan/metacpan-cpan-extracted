@@ -1,0 +1,35 @@
+---
+abstract: 'check for HTML errors in a string or file'
+author:
+  - 'Andy Lester <andy@petdance.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-Lint
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: '0'
+  File::Find: '0'
+  HTML::Entities: '0'
+  HTML::Parser: '3.47'
+  HTML::Tagset: '3.03'
+  Test::Builder: '0'
+  Test::Builder::Tester: '0'
+  Test::More: '0'
+resources:
+  bugtracker: https://github.com/petdance/html-lint/issues
+  homepage: http://search.cpan.org/dist/html-lint
+  license: http://www.opensource.org/licenses/artistic-license-2.0.php
+  repository: https://github.com/petdance/html-lint
+version: '2.26'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

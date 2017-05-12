@@ -1,0 +1,28 @@
+---
+len: 6
+count: 3
+seq:
+ - exact: 11
+   inst: |
+    <tr>
+      <td>
+      </td>
+      <td>
+      </td>
+    </tr>
+ - exact: 17
+   inst: |
+    <tr>
+      <td>
+      </td>
+      <td>
+      </td>
+    </tr>
+ - exact: 23
+   inst: |
+    <tr>
+      <td>
+      </td>
+      <td>
+      </td>
+    </tr>

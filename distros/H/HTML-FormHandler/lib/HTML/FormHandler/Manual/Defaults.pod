@@ -1,0 +1,166 @@
+package HTML::FormHandler::Manual::Defaults;
+# ABSTRACT: form defaults documentation
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+HTML::FormHandler::Manual::Defaults - form defaults documentation
+
+=head1 VERSION
+
+version 0.40067
+
+=head1 SYNOPSIS
+
+L<Manual Index|HTML::FormHandler::Manual>
+
+How to set defaults for your fields.
+
+=head1 Defaults
+
+Defaults for form fields come from a number of different places. The simplest
+way to set a field's default is on the field definition:
+
+   has_field 'foo' => ( type => 'Text', default => 'my_foo' );
+   has_field 'select_many' => ( type => 'Multiple', default => [1, 2, 3] );
+
+You can also set the default for a field with a method in the form with the name
+'default_<field_name>', where any periods in the field name are replaced
+with underscores.
+
+   has_field 'foo';
+   sub default_foo { 'my_default' }
+
+Like other field attributes, the 'default' attribute can be modified on
+new with the 'field_list' attribute, or on 'process' with the 'update_field_list'
+parameter (or the shorthand form 'defaults').
+
+   my $form => MyApp::Form->new( field_list => { '+foo' => { default => 'my_foo' } } );
+   $form->process( update_field_list => { foo => { default => 'my_foo' } } );
+   $form->process( defaults => { foo => 'my_foo' }, params => $params );
+
+For forms where you pass in an 'item' (usually a database row object), the
+values in that object will be used preferentially; if an accessor exists
+in the 'item' object, then the defaults won't be used. (If an accessor
+doesn't exist, the defaults *will* be used.)
+
+   $form->process( item => $row, params => {} );
+
+For the above call the 'default' on the field will not be used, which is
+usually what you want.
+
+When creating a new database record with your form, if you don't pass in an
+empty row, then the field defaults will be used, or you can provide defaults
+in an 'init_object'.
+
+   note: the form class has 'item_class' set already.
+   $form->process( schema => $schema, init_object => $obj ... );
+
+If you provide an empty row object for 'create' type
+actions, however, you might want some defaults filled in. This can
+be done by filling the values into the row object or by turning on the form
+flag 'use_defaults_over_obj'.
+
+   $form->process( item => $empty_row, use_defaults_over_obj => 1 );
+
+If you always want new DBIC results to be ignored, you could set the flag in
+a base form method:
+
+    sub set_active {
+        my $self = shift;
+        $self->next::method;
+        if ( $self->item and ! $self->item->in_storage ) {
+            $self->use_defaults_over_obj(1);
+        }
+    }
+
+You could also pass in another object or hashref in the 'init_object' attribute,
+and set the 'use_init_obj_over_item' flag:
+
+   $form->process( item => $empty_row, init_object => $example,
+                   use_init_obj_over_item => 1 );
+
+Note that the 'use_init_obj_over_item' and 'use_defaults_over_obj' flags
+are automatically cleared (if you're using persistent forms).
+
+For forms where some defaults come from a database row, and some defaults
+come from some other dynamic source (so that putting them into the field
+definitions doesn't make sense), you can use the
+'use_init_obj_when_no_accessor_in_item' flag to provide two different
+sets of defaults, one set in the 'item' (usually a db row) and one set in
+the init_obj. If the 'item' is undefined, the values in the init_object
+are used.
+
+    in form: has '+use_init_obj_when_no_accessor_in_item' => ( default => 1 );
+    $form->process( item => $item, init_object => { foo => '...' }, .. );
+
+There is a convenience method for setting 'defaults' on a number of fields at
+once, the form's 'defaults' attribute, which uses the same mechanism as
+'update_field_list' but only sets defaults. Note that this hashref is
+structured like the update_field_list with regard to field names,
+while the 'init_object' uses "structured" data:
+
+   my $defaults = {
+       model => 'standard',
+       'opts.color' => 'Red',
+       'opts.size'  => 'Big',
+   };
+   my $init_object => {
+       model => 'standard',
+       opts  => { color => 'Red', size => 'Big' }
+   };
+
+   $form->process( defaults => $defaults, ... );
+   $form->process( init_object => $init_object ... );
+
+In addition, the 'defaults' actually changes the 'default' stored in
+the field definitions, while the init_object does not.
+
+There is also an alternative attribute in the fields, 'default_over_obj', but
+the new 'use_defaults_over_obj' and 'use_init_obj_over_item' flags, make it less
+necessary. Note that the 'default_over_obj' attribute only provides a default if
+an item/init_object and accessor exists.
+
+=head2 Defaults when processing params
+
+Normally when a form is posted, the params will contain all the values
+that are necessary to fill in the form. However, when a form is used in
+an API-like fashion, such as complex search forms, sometimes it is
+convenient to only provide particular params and let the others use
+defaults. However when the results are built from input, fields with
+no input are skipped unless the field has a value for 'input_without_param'.
+There is an additional form-level flag, 'use_fields_for_input_without_param'
+which will cause fields with no param entry to be built from the fields.
+This means that 'defaults' on the field will be used to provide a value
+and an input for the field.
+
+=head2 Query parameters for defaults
+
+You can use either the 'defaults' hashref or the 'init_object' to provide query
+parameter 'defaults'. They should not be provided in the 'params' hash, because
+then FormHandler will assume that the form has been posted and attempt to validate,
+which you don't want to do until the form has been submitted. Or you can use
+the 'posted' flag, to indicate whether or not to perform validation:
+
+    $form->process( posted => ( $c->req->method eq 'POST' ), params => $c->req->params );
+
+Note that in Catalyst, there are 'query_parameters' and 'body_parameters'. The
+'parameters' contains both 'query_parameters' and 'body_parameters'.
+
+=head1 AUTHOR
+
+FormHandler Contributors - see HTML::FormHandler
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Gerda Shank.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

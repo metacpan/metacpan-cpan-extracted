@@ -1,0 +1,26 @@
+---
+abstract: 'CGI/Catalyst::Request-like parameter-hash accessor/mutator'
+author:
+  - 'Robert Krimen, C<< <rkrimen at cpan.org> >>'
+build_requires:
+  Test::Most: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.760'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Hash-Param
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp::Clan: 0
+  Hash::Slice: 0.03
+  Moose: 0
+  MooseX::MakeImmutable: 0.02
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/robertkrimen/hash-param/tree/master
+version: 0.04

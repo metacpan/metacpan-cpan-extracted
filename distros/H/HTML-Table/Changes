@@ -1,0 +1,308 @@
+Revision history for Perl extension HTML::Table.
+
+2.08a 23 June 2008
+	- Fixed outputing row class attribute twice.
+	  Request and fix from Reinhard Mutz
+
+2.08  10 April 2008
+	- Added delRow and delSectionRow methods.
+	  Request from Kyle Davenport <kyle.davenport at fmr.com>
+	- Fixed error in getTable, which output the wrong section attributes.
+	  Request and fix from Colin Fine <colin.fine at pace.co.uk>
+	- Added getSection method to modularize the creation of Section HTML.
+	- Created new set of methods which apply Cell attributes across a row.  This is to make
+	  a clear distinction from those methods that set row attributes (tr).
+	  Suggest by Colin Fine <colin.fine at pace.co.uk>
+
+2.07b
+	  05 February 2008
+	- Fixed error in setSectionRowWidth.
+	  Request from Ravi Kondamuru <ravikondamuru at gmail.com>
+
+2.07a
+	  04 February 2008
+	- Changed status from beta to full.
+	- Fixed error in setCellHeight.
+	  Request from Ravi Kondamuru <ravikondamuru at gmail.com>
+	  
+2.07-b2
+	  09 October 2007
+	- Removed text output when empty table is printed.
+	  Request from Erik Tank <erik at atjeu.com>
+	
+2.07-b1
+	  17 September 2007
+	- Changed order of output for table sections, to comply with the HTML 4.01 standard.
+	  
+2.07-beta
+	  13 September 2007
+	- Added THEAD, TFOOT and TBODY sections.
+	  Request from Miguel Santinho <msantinho at simplicidade.com>.
+	  
+	  There are now methods that take a section and section number as parameters.
+	  ie. setSectionCell ( 'tbody', 0, 2, 3, 'Cell 2,3'); 
+	  
+	  Existing methods default to working on the first tbody section, for backwards 
+	  compatibility.
+	  
+	  You can have only one each of tfoot and thead sections, but multiple tbody sections.
+
+2.06
+	  4 June 2007
+	- Added patch for even/odd row class support, supplied by Chris Weyl
+	  Thanks to Chris Weyl <cweyl at alumni.drew.edu> for this patch.
+
+2.05
+	  15 March 2007
+	- Fixed code so that all HTML tags and attributes are in lower case.
+
+2.04
+	  23 January 2006
+	- AUTOLOAD method was making the module sliently ignore calls to invalid
+	  methods.
+	  Thanks to Gordon Lack <gml4410 at ggr.co.uk> for the fix.
+
+2.03
+      6 December 2005
+    - Added get methods for Style attributes.
+      Thanks to Douglas Riordan <doug.riordan at gmail.com> for this.
+
+2.02
+      18 March 2004
+    - Changed the history section in the POD to add the original author's consent for
+      the adoption of the module by Anthony Peacock.
+      Thanks to Stacy Lacey <stacy-lacy at computer.org> for this.
+    - Beta testing over, promote this version to production.
+    
+2.02-beta
+	  18 Feb 2004
+	- Bug in getTable method, when using row attributes.  
+	  Thanks to Piotr Kodizis <Piotr.Kodzis at inteligo.pl> for bug report and fix
+	  
+2.01-beta
+	  19 Nov 2003
+	- Bug in sort routine caused by change to new data structure.  
+	  Thanks to Brad Rubenstein <Brad at bradrubenstein.com> for bug report and fix
+	  
+2.00-beta
+	  24 Oct 2003
+	- First beta test version of the 2.xx strand.  This version introduces a 
+	  new internal representation for the table data and attributes which 
+	  should make maintenance and development much easier.
+
+1.20  22 Oct 2003
+	- Changed setRowVAlign to set the attribute in the TR tag instead of in each 
+	  TD tag.
+	  Fixed by Anthony Peacock <a.peacock at chime.ucl.ac.uk>
+	- Changed setRowNoWrap to set the attribute in the TR tag instead of in each 
+	  TD tag.
+	  Fixed by Anthony Peacock <a.peacock at chime.ucl.ac.uk>
+	- Changed all of the set* methods to accept -1 as a col or row reference.
+	  Where -1 is used, the method will work on the last row or col.
+	  Fixed by Anthony Peacock <a.peacock at chime.ucl.ac.uk>
+	- Updated the documentation to include the setLast methods (added July 2002!)
+	  and the -1 col/row parameter change.
+	  Fixed by Anthony Peacock <a.peacock at chime.ucl.ac.uk>
+
+1.19  22 Aug 2003
+    - Added MIDDLE and BASELINE parameters to setCellVAlign.
+   	  Thanks to Alejandro Juarez <alex at BSDCoders.Org> for adding this
+
+1.18a 9 May 2003
+    - Fixed bug in new method, where specifying -rows and -head or -data caused
+      unexpected behaviour.
+   	  Thanks to Tom Brown <rvvs30 at email.sps.mot.com> for finding this
+
+1.18  6 May 2003
+    - Improved sort method.
+   	  Thanks to David Link <dvlink at yahoo.com> for this addition
+   	  
+1.17  2 September 2002
+	- Added the 'head' parameter to the new method.
+	  Thanks to Tommi Maekitalo <t.maekitalo at epgmbh.de> for this addition
+	- Added the ability to initialise the table from an array ref to the new 
+	  method.
+	  Thanks to Tommi Maekitalo <t.maekitalo at epgmbh.de> for this addition
+
+1.16  22 July 2002
+	- Method setCellSpan was documented but not implemented.
+	  Thanks to David Link <dvlink at yahoo.com> for finding this
+
+	- Added methods setClass|setCellClass|setRowClass|setColClass.
+	  Thanks to Al Tobey <albert.tobey at priority-health.com> for suggesting this
+
+	- Added method sort.  Sorts a table by the values of a specified column.
+	  Sort can be numeric or alphanumeric, ascending or descending.
+	  Thanks to David Link <dvlink at yahoo.com> for this addition
+
+	- Added versions of the setCell|Row|Col methods, setLastCell|Row|Col.
+	  These automatically apply the method to the last Cell|Row|Col in the table.
+	  Thanks to Paul Vernaza <vernaza at stwing.upenn.edu> for this addition
+
+	- Added quotes around caption style parameter.
+	  Thanks to Ville Skyttä <ville.skytta at iki.fi> for fixing this
+	  
+  	- Changed the <br> tag to <br /> in _getTableHashValues.
+	  Thanks to Ville Skyttä <ville.skytta at iki.fi> for fixing this
+
+1.15  6 March 2002
+	- Method setStyle missing although documented.
+	  Thanks to Hendrik Frenzel <hfrenzel at scunc.net> for finding this
+
+1.14  27 Feb 2002
+	- Spurious double quote in the output after user defined table attributes
+	  Thanks to Benjamin Longuet <longuet at ill.fr> for fixing this
+
+	- Table align wasn't working
+	  Thanks to Benjamin Longuet <longuet at ill.fr> for fixing this
+
+	- setColHeight was actually setting the column width
+	  Thanks to Benjamin Longuet <longuet at ill.fr> for fixing this
+
+	- setColAttr was documented but didn't actually exist
+	  Thanks to Benjamin Longuet <longuet at ill.fr> for fixing this
+
+1.13  10 Jan 2002
+	- Added methods to set the style attribute of tables, rows, cols and cells
+	  Thanks to Arno Teunisse <Arno.Teunisse at Simac.nl> for this modification
+	  
+	- setRowBGColor and setRowAlign are now more efficient
+	  Thanks to Arno Teunisse <Arno.Teunisse at Simac.nl> for this modification
+
+	- Added method to set the rules and align attributes for tables
+	  Thanks to Arno Teunisse <Arno.Teunisse at Simac.nl> for this modification
+
+1.12a 24 Oct 2001
+	- Fixed small bug in attribute quotiung code, that showed up with spanned cells.
+
+1.12  23 Oct 2001
+	- Changed _is_integer to _is_validnum.
+	  Thanks to Terrence Brown <terrence at terrencebrown.com> for this modification
+	  
+	- Changed faulty behaviour of numeric parameters to the new method.  They 
+	  where treating a value of 0 as false, and using the default value.
+	  Thanks to Terrence Brown <terrence at terrencebrown.com> for this modification
+	  
+	- Changed all tags and attributes to print in lowercase.
+	  Thanks to Terrence Brown <terrence at terrencebrown.com> for this modification
+	  
+	- All attribute values are now surounded by quotes.
+	  Thanks to Terrence Brown <terrence at terrencebrown.com> for this modification
+	
+	- Small documentation changes.
+	  
+1.11  10 Aug 2001
+	- getTable was returning 0 (zero) for an empty table, now just plain 
+	  returns.
+	  Suggested by Adrian Bridgett <adrian at dyadic.com>
+	  
+1.10  06 Aug 2001
+	- Added getTableRows and getTableCols.
+	  Suggested by Joerg Jaspert <joerg at goliathbbs.dnsalias.net>
+
+1.09  23 May 2001
+	- Fixed bug in setRowHeight, which was mistakenly setting the width.
+	  Thanks to Rodger Allen <r.allen at awayweb.com> for pointing this out
+	  
+1.08  15 May 2001
+	- Fixed bug in autoGrow method, that failed to switch off autoGrow
+	  when called with the integer 0.
+	  
+1.07d 15 May 2001
+	- Fixed minor bug in setCaption that issued unwarrented warnings
+	  under use warnings, if the optional second parameter was 
+	  missing.
+	  	  
+1.07c 15 May 2001
+	- Fixed bug in setCellRowSpan and setCellColSpan, with 'autogrow' 
+	  enabled.  This failed to properly autogrow the table if a span 
+	  went outside the current table limits.
+	  Thanks to Mike Laufer <mikepl at nortelnetworks.com> for pointing 
+	  this out
+
+1.07b 7 March 2001
+	- Fixed bug in getTable method, not outputing cell contents of '0'.
+	  Thanks to Venkataramana Mokkapati <mvr707 at hotmail.com> for pointing 
+	  this out
+
+1.07a 1 March 2001
+	- Fixed bug in new method, rows and cols parameters were not being 
+	  accepted
+
+1.07  23 February 2001
+	- Some general tidying up of both the documentation and code
+
+	- Added methods setCellFormat, setRowFormat and setColFormat.  These 
+	  set cell formatting strings that will be appended and prepended to 
+	  the cell contents.
+	  
+	- Created Row and Col versions of all relevant methods, this makes the 
+	  interface more consistent.	 
+
+1.06  13 February 2001
+	- Some general tidying up of both the documentation and code
+
+	- Method setCell will now automatically increase the table size if the 
+	  row/col parameters are larger than the current table size 
+	  (this can be turned off using the autoGrow method)
+	  **** NB This new behaviour may break existing code  ****
+	  Thanks to John Stumbles <john at uk.stumbles.org> for this modification.
+
+	- New method autoGrow used to control the behaviour of the setCell method
+	  Thanks to John Stumbles <john at uk.stumbles.org> for this modification.
+
+	- Error checking for parameters is now case-independent
+	  Thanks to John Stumbles <john at uk.stumbles.org> for this suggestion.
+
+	- All error messages now end in a newline (\n)
+	  Thanks to John Stumbles <john at uk.stumbles.org> for this modification.
+
+	- New method setColBGColor
+	  Thanks to Jay Flaherty <fty at mediapulse.com> for this modification.
+
+	- New methods setCellHead, setColHead
+	  Thanks to Jay Flaherty <fty at mediapulse.com> for this modification.
+
+	- The new method can now take a hash of parameters (see the documentation)
+	  Thanks to Jay Flaherty <fty at mediapulse.com> for this modification.
+
+1.05a 8 February 2001
+	- Small corection to the documentation.  
+	  Thanks to John Stumbles <j.d.stumbles at reading.ac.uk> for pointing this 
+	  out.
+
+1.05  6 February 2001
+	- Fix to prevent warnings if cell content is undefined.  
+	  Thanks to Boris Zentner <boris at m2b.de> for this suggestion.
+
+	- Fix to allow cell widths to be defined using percentage values.
+	  Thanks to Boris Zentner <boris at m2b.de> for this suggestion.
+	  
+1.04a 4 December 2000
+	- Changed documentation, added reference to Japanese translation.
+
+1.04  17 August 2000
+	- Minor change to remove 'uninitialized variable' warning when working 
+	  with -w
+
+1.03  13 July 2000
+	- Overloaded the "" string interpolation operator onto the getTable method.
+	  This alows the use of the object reference 'in-line' in strings.
+	  Thanks to "B. K. Oxley" <binkley at bigfoot.com> for this suggestion.
+
+1.02  12 July 2000
+	- Changed setBorder, setCellPadding, setCellSpacing code to allow the 
+	  attribute to take zero (0) values.
+
+1.01  7th July 2000
+	- Minor changes to the documentation section of Table.pm
+
+1.00  5th July 2000
+	- New maintainer, Anthony Peacock (a.peacock at chime.ucl.ac.uk)
+
+	- Added method - getCell(row_num, col_num) - to return the contents of 
+	  the specified cell as a string. (a.peacock at chime.ucl.ac.uk)
+
+0.90  27th January 1998
+	- original version created by Stacy Lacy
+ 

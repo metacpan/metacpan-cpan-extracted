@@ -1,0 +1,29 @@
+Revision history for Hook-Output-Tiny
+
+0.05    2016-04-30
+        - replaced $h with $output in SYNOPSIS for hopefully a better
+          description (closes #1)
+        - DESC update in POD (closes #2)
+        - EXAMPLE fixed in POD (closes #3)
+        - code cleanup (closes #5 & #6)
+        - added appveyor Windows testing
+        - added _validate_param() and added param tests (closes #7)
+        - added SEE ALSO POD section (closes #4)
+
+
+0.04    2016-04-29
+        - ugh, SYNOPSIS fix
+        - Test::BrewBuild happy across random perls on MSWin, Ubuntu, FBSD
+
+0.03    2016-04-29
+        - added Travis & Coveralls
+        - updated Makefile.PL with repo/bug trackers
+
+0.02    2016-04-29
+        - solidify API
+        - write tests
+        - prep for release
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

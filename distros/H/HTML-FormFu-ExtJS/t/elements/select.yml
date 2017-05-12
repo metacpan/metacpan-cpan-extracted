@@ -1,0 +1,35 @@
+---
+elements:
+  - type: Select
+    name: subjects
+    options:
+      - [1, Math]
+      - [2, Science]
+      - [3, English]
+
+  - type: Select
+    name: range
+    value_range:
+      - 1
+      - 12
+    attrs_xml:
+      emptyText: test
+    attrs:
+      something: else
+  - type: Select
+    name: empty
+    empty_first: 1
+    value_range:
+      - 1
+      - 12
+  - type: Select
+    name: store
+    attrs_xml:
+      store: customStore
+
+  - type: Select
+    name: remote_store
+    id: remote_store
+    attrs_xml:
+      url: /foobar
+      loading: Wird geladen

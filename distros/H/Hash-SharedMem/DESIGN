@@ -1,0 +1,389 @@
+requirements
+------------
+
+Objective: key-value store (hash, in Perl terms), with keys and values
+all being strings, in memory shared between user processes, with no
+reliance on user processes not hanging/crashing.
+
+Keys and values may be restricted to octet strings, but handling arbitrary
+Unicode strings would be a bonus.
+
+The shared hash must not require explicit initialisation.
+
+If a user process crashes or hangs, other processes must continue to
+operate correctly.
+
+A user process that has write permission can be trusted to write correctly
+(although not to complete its write operations).
+
+Read and write operations must be atomic.
+
+The shared hash must not occupy many times more memory than necessary
+for the data stored.
+
+Read operations must be fast.
+
+The shared hash must be efficient when it contains a large number of
+small items.
+
+The shared hash must be capable of handling large values.
+
+principles
+----------
+
+A shared hash will be referred to as a "shash".
+
+There should be no requirement to lock anything in order to read from
+the shash.  This implies that all data representations larger than
+a word must be functionally immutable: data written and published is
+never overwritten.
+
+This implies that memory cannot be reclaimed by overwriting.  Memory can
+only be reclaimed by being unlinked from the filesystem and unmapped by
+all user processes.  The shash must periodically migrate from one file
+to another, in the manner of copying gc.
+
+Writes must be completed by means of atomically replacing a root pointer,
+using a conditional-set instruction.  Writers must be prepared to retry,
+in case another writer got in first.  This mode of writing makes it easy
+to implement high-level conditional setting, with a write occurring only
+if some subset of the shash (up to all of it) is in an expected state.
+
+A snapshot of the root pointer acts as a snapshot of the entire shash,
+permitting reading of a consistent state.  ACI semantics are readily
+achieved.
+
+For nice behaviour on SMP systems, data that will be frequently read
+should where possible be separated from physically-mutable data, in
+order to go in a separate cache line.  (Physically-mutable data can
+occur within functionally-immutable data structures.)
+
+design
+------
+
+The whole shash should be encapsulated as a single file.  Since it can't
+actually be just a single file (see below), it should be encapsulated
+as a directory, which contains all the constituent files.
+
+Encapsulation as a directory means that the shash can be referenced as
+a single filesystem entity, can be renamed as a whole, and generally
+basic filesystem operations work as desired.  Provided that users of
+the shash keep a file handle open on the directory and use openat(2)
+et al on the constituent files, rather than repeatedly using a pathname
+referring to the directory, open handles on the shash will continue to
+work across the shash being renamed.
+
+By having only regular files within the directory, other aspects
+of filesystem regularity are achieved.  The entire shash can live
+on essentially any kind of filesystem, and deletion of a shash can
+be accomplished by a standard means (rm -r).  However, by virtue of
+being a directory, the shash cannot be directly unlinked, nor can it
+be multiply linked, or at least doing either of these would result in
+filesystem irregularities.  Renaming a shash cannot atomically replace
+either a regular file or another shash.
+
+There should be a single master file.  It can be a single page and
+never grow.  It must contain a reference to the current data file.
+
+Normally there will be only one data file active.  The shash's root
+pointer is contained in the current data file.  Periodically the shash
+content will be migrated from one data file to another, and during the
+transition two data files will be active.  The root pointer in one data
+file can take a special form to indicate that handoff is in progress.
+
+Within each data file, any user (being a potential writer) must be able
+to allocate lines, which can be easily arranged as atomic modification
+of a next-line counter.  Allocating a line doesn't imply that it is,
+or will be, usefully filled: the writer might crash or need to abort the
+write attempt.  After an abort, an allocated line can be reused by the
+same writer for a later write attempt.  It is only when data is published,
+by changing the root pointer to point (directly or indirectly) at it,
+that it must be well-formed and becomes immutable.
+
+Structures are designed for 64-bit systems, and rely on having a 64-bit
+conditional-set instruction.  All sizes are inherently limited by 64-bit
+addressing.  The size terms that matter are:
+
+	* byte = octet = 8 bits
+
+	* word = 8 bytes = 64 bits
+
+	* line is some power of two number of bytes, at least one word
+
+	* page is some power of two number of bytes, at least one line
+
+The line size is meant to match the native cache line size, and the
+page size is meant to match the native memory page size.  These are
+64 bytes and 4096 bytes on current amd64 machines.  These sizes are
+parameters to the design.  All users of a particular shash must agree
+on these parameters.
+
+All word quantities are in native byte order, and must be word-aligned.
+They are to be treated as unsigned integers unless otherwise specified.
+
+A pointer to a data object is represented as a word quantity.  A pointer
+can only be stored in a data file, and points to a word-aligned object
+in the same file.  It is represented as a byte offset from the start of
+the data file, and so necessarily has its lowest three bits all zero.
+
+A string (key or value) is represented as a structure consisting of a word
+count of bytes in the string, immediately followed by the string's bytes,
+followed by a NUL byte.  (The terminating NUL is not part of the string,
+but included to satisfy Perl's requirements for an SV buffer, so that an
+SV can be constructed to represent the string without needing to copy the
+string.)  The string can contain octets of any value, including NUL; the
+explicit length is the canonical way to determine where the string ends.
+A string in the data file cannot contain anything that's not an octet
+(or, via Perl's aliasing, a Latin-1 character).
+
+A collection of keys and values is represented as a btree (actually a
+B+-tree), in which the keys are sorted lexicographically.  The maximum
+number of entries in a btree node is a parameter to the design, called
+MAXFANOUT, on which all users of a shash must agree.  It must be odd,
+and between 3 and 255 inclusive.  (Lower limit is inherent in btree
+structure; upper limit is to fit in a byte.)  A suggested value for
+it is 15.  Each btree node except for the root node contains between
+(MAXFANOUT+1)/2 and MAXFANOUT (inclusive) entries.  The root node
+contains between 2 and MAXFANOUT (inclusive) entries if there is at
+least one layer of btree nodes below it, or between 0 and MAXFANOUT
+(inclusive) entries if its entries are individual key/value pairs.
+A btree node begins with a word header, in which bits are allocated thus:
+
+	0-5   layer (0 = pointing directly to key/value pairs)
+	6-7   zero padding
+	8-15  fanout (range 0 to MAXFANOUT inclusive)
+	16-63 zero padding
+
+(Note: six bits for the layer number is enough to accommodate the maximum
+possible number of addressable nodes in a btree with the minimum possible
+fanout.  Trees in practice are unlikely to get anywhere near this height.)
+
+The node header is immediately followed by an array of entries, as
+many as indicated by the header.  Each entry consists of two words.
+The first word is a pointer to a string object representing the first
+(lexicographically earliest) key in the collection represented by the
+entry.  The second word is a pointer to either a btree node of the next
+layer down (if this node is not level zero) or a string representing a
+value (if this node is level zero).  The key to which the entry refers
+is either the first key in the collection represented by the subnode,
+or the key under which the value is stored, respectively.
+
+String and btree node objects are permitted to be multiply referenced.
+(The key arrangement implies that a btree node cannot appear more than
+once in a single tree, but it is expected that nodes will appear in
+multiple trees.)  It is also permitted for their representations to
+overlap, with each other or even with the file header, provided that
+they do not use lines that contain mutable data.  (Overlapping isn't
+very useful, except that the empty btree node and empty string, whose
+representations are all-bits-zero, can sensibly be aliased to padding
+in the header.)
+
+For compatibility checking purposes, the design parameters (other than
+endianness) are encapsulated as a word quantity, in which bits are
+allocated thus:
+
+	0-7   log2(line/byte)
+	8-15  log2(page/byte)
+	16-23 MAXFANOUT
+	24-63 zero padding
+
+If, in the future, there is any change in the file formats, it should be
+indicated by setting bits in what is currently zero padding.  This might
+be formulated as setting bit flags, or as changing a version number.
+ext2's concept of readonly-compatible changes may be useful, but
+comprehensibility of a shash to old code is not generally a priority.
+
+A data file begins with this header:
+
+	* word: magic number 0xc693dac5ed5e47c2
+
+	* word: design parameters
+
+	* word: total file length in bytes (must be page-aligned, and
+	  must match physical file length)
+
+	* zero pad to line alignment
+
+	* word: offset of next point in file that may be allocated (must
+	  be line-aligned; if equal to total file length then the file
+	  is full)
+
+	* zero pad to line alignment
+
+	* word: root pointer and handoff flag (see notes below)
+
+	* zero pad to line alignment
+
+The earliest point at which the next-allocation word can point is the
+end of the header.
+
+A process wishing to write data into the file must allocate space for
+it by (atomically) moving the next-allocation pointer.  It owns the
+lines located between the old and new positions of the pointer.  It may
+initially write arbitrarily to lines that it owns.  However, once a line
+has been made reachable from the root pointer (by containing (part of)
+a reachable object), that line must not be written to again, even if it
+later becomes unreachable from the root.  (It remains reachable to anyone
+who read the root pointer when it was reachable.)  A process may give
+back allocated lines, by moving the next-allocation pointer backwards.
+Such lines must not have been made reachable (i.e., must still be legal
+to write to), and (due to the single allocation pointer arrangement)
+can only be given back when they immediately precede the current
+next-allocation position.
+
+There are no restrictions on the content of file space that is neither
+part of the header nor has ever been part of a reachable object.
+This includes parts of reachable lines that don't form objects, lines
+owned by some process that have not been made reachable, and the unowned
+lines following the next-allocation position.
+
+A data file is identified, among the data files in a single shash, by a
+word quantity.  Identifier zero has special significance, and identifiers
+are otherwise assigned sequentially by means described below.  Data file
+identifiers are permitted to wrap.  This design does not protect against
+race conditions that span a large fraction of a data file identifier
+cycle.
+
+The root pointer word contains both a pointer and a one-bit flag to
+control handoff.  The handoff flag is bit 0, and the rest of the word must
+be a valid pointer (with bits 1 and 2 necessarily zero).  The pointer is
+read by masking off the handoff flag from the word.  The shash's root is
+pointed to by the pointer part of the root pointer word in the current
+data file.  The handoff flag governs how a root can be superseded.
+
+When the handoff flag is clear, a process wishing to replace the shash
+root does so by atomically modifying the root pointer word to point to
+the new root node in the same data file.  If a process finds that there
+is insufficient space in the data file for the data it wants to write,
+it must initiate handoff, by atomically setting the handoff flag (without
+changing the root pointer).  When the handoff flag has been set, the root
+pointer word in this data file must not be changed again; the root can
+then only be replaced by superseding the data file with a new data file.
+
+The master file has this form:
+
+	* word: magic number 0xa58afd185cbf5af7
+
+	* word: design parameters
+
+	* zero pad to line alignment
+
+	* word: last-allocated data file identifier
+
+	* zero pad to line alignment
+
+	* word: identifier of current data file
+
+	* zero pad to page alignment
+
+The data files and master file are arranged in a directory.  The
+directory provides the identity of the shash.  The master file is named
+"iNmv0,m\$%3".  The data files are each named "&\"JBLMEgGm" followed by
+their identifier as 16 lowercase hexadecimal digits.  Temporary files
+created during shash creation can exist in the directory with names
+beginning "DNaM6okQi;".  Files whose names begin with "." may also exist
+in the directory, and are not part of shash operations: they may be
+created by revision control systems and the like.  No other filenames
+may exist in the directory.
+
+When the handoff flag in the current data file is clear, the choice
+of current data file referenced by the master file cannot be changed.
+The shash root can then only be changed by modifying the root pointer
+word in the current data file.  To supersede the current data file,
+the handoff flag in its root pointer word must first be set.  When the
+handoff flag in the current data file is set, the choice of current data
+file referenced by the master file may be atomically changed.
+
+When the handoff flag in the current data file is set, a process wishing
+to replace the shash root does so by creating a new data file with the
+new data and atomically changing the master file to refer to it as the
+current data file.  The process that does this successfully is expected
+to then unlink the old data file.  A process that creates a new data
+file and fails to install it is expected to unlink its failed data file.
+
+The data file identifier zero has a special meaning.  Rather than
+referring to a real data file, if it is current it means that the
+shash is empty.  The zero data file can always be superseded by
+atomically changing the current file identifier to refer to a real file.
+Effectively, the zero data file is one in which the root pointer always
+refers to an empty btree and the handoff flag is always set.
+
+When a process wishes to create a new data file, as a prospective
+replacement for the current data file, it must first assign an identifier
+for it.  This is done by atomically adding one to the "last-allocated data
+file identifier" word in the master file.  This word should initially
+be zero in a new shash.  After incrementing the word, the incremented
+value is the assigned identifier owned by the incrementing process.
+If the word reaches all-bits-one (2^63 - 1), the next process wanting
+a data file identifier must `increment' it to 1, skipping the special
+identifier 0.  Allocating a data file identifier only grants permission
+to create a file with the allocated identifier; it does not inherently
+put the file into use, and does not mean that the file will necessarily
+ever be the shash's current data file.
+
+A new data file should be created directly with its proper data file name.
+This means that it will initially not have the format of a complete data
+file.  This is permitted.  A data file (file with data-style filename)
+is required to be well-formed if and only if it is, or has previously
+been, current.  A process other than the data file's creator cannot
+allocate space in the file, and must not write to it, unless it is,
+or has been, current.
+
+When superseding the current data file, the current file identifier
+must only be increased, aside from when the file identifiers wrap.
+The current file identifier does not have to increase only to the next
+possible identifier; it is permitted to skip identifiers.  It is normal
+to skip identifiers where concurrent processes are each attempting to
+switch data file, so that they have competing new files of which only
+one will be installed.  It is never permitted to switch to the special
+data file identifier zero; that can only be current in a new shash to
+which content has never been written.
+
+Creation of a shash is unavoidably non-atomic, but by following a
+protocol it can pretend to be atomic.  A writer that wants to create
+a shash must be willing not only to create from scratch, but also
+to resume an incomplete creation, and to cooperate with simultaneous
+creators.  To create a shash, it is necessary to create the directory,
+then the master file.  The master file must be written as a temporary
+file and then atomically moved into place (using link(2) semantics to
+avoid replacing a file already in place).  Any file in place with the
+master filename must be a well-formed master file.  The master file
+must initially use the special data file identifier zero as the current
+data file identifier.  Creators must accept directory creation having
+already happened.  The creator that is credited with creating the shash
+is the one that put the master file into place, which must be the last
+step of creation.  Data files must not be created until the master file
+is in place to manage data file identifier allocation.
+
+It follows from the above protocol that certain files in the shash
+directory can be identified as obsolete.  Specifically, any temporary
+file is obsolete once the master file exists, and any data file whose
+identifier (modulo wrapping) is below that of the current data file
+is obsolete.  Normally these files should be cleaned up by the process
+that created them or (in the case of a formerly-current data file) the
+process that superseded them.  However, if a process gets interrupted,
+an obsolete file might persist.  Any writer may unlink any identifiably
+obsolete file, and it is encouraged to periodically do this.
+
+If a process wishes to allocate space for temporary data as part of
+a shash, it can create a file in the shash directory and immediately
+unlink it.  It should be unlinked as soon as it no longer needs to have
+a name.  There are two options for the filename.  Firstly, a data file
+identifier can be allocated, and the resulting data filename used.
+It is not necessary that the file at all resemble a shash data file
+in its format or usage.  Secondly, a temporary filename can be used,
+at the risk of collision with other processes.  A temporary filename
+is always interpreted as obsolete in a fully-created shash, and so is
+liable to be unlinked immediately by another process.
+
+compatibility
+-------------
+
+The design inherently requires that the OS support mmap(2), and that the
+CPU support atomic reading and conditional writing of 64-bit quantities.
+When implementing in C, the compiler must provide a 64-bit data type,
+and must support the atomic operations on it.  The Intel-specified
+built-in __sync_bool_compare_and_swap() suffices for conditional setting;
+inline assembler and library functions are other possible approaches.
+Clean filename resolution semantics for shared hashes requires that the
+OS support openat(2) et al.

@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/HTTP/WebTest/Plugin/TagAttTest.pm
+t/1.t
+t/lib/HTTP/WebTest/Plugin/Cookies.pm
+t/lib/HTTP/WebTest/Plugin/FileRequest.pm
+t/utils.pl

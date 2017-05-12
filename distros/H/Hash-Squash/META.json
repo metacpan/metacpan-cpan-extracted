@@ -1,0 +1,76 @@
+{
+   "abstract" : "Remove numbered keys from a nested hash/array",
+   "author" : [
+      "Shin Kojima <shin@kojima.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.1.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Hash-Squash",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "List::Util" : "0",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Hash::Squash" : {
+         "file" : "lib/Hash/Squash.pm",
+         "version" : "v0.0.4"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ernix/p5-Hash-Squash/issues"
+      },
+      "homepage" : "https://github.com/ernix/p5-Hash-Squash",
+      "repository" : {
+         "url" : "git://github.com/ernix/p5-Hash-Squash.git",
+         "web" : "https://github.com/ernix/p5-Hash-Squash"
+      }
+   },
+   "version" : "v0.0.4"
+}

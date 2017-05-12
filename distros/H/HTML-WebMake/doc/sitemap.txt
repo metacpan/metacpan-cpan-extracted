@@ -1,0 +1,194 @@
+<wmmeta name="Title" value="The &lt;sitemap&gt; Tag" />
+<wmmeta name="Section" value="02-tags_attrs" />
+<wmmeta name="Score" value="90" />
+<wmmeta name="Abstract">
+generate a site map
+</wmmeta>
+
+The &lt;sitemap&gt; tag is used to generate a content item containing a map,
+in a tree structure, of the current site.
+
+It does this by traversing every content item you have defined, looking for
+one tagged with a **isroot=true** attribute. This will become the root of the
+site map tree.
+
+While traversing, it also searches for content items with a metadatum
+[metadatum] called **up**. This is used to tie all the content together into a
+tree structure.
+
+	Auto: [metadatum]: $(metadata)
+	Auto: [metadata]: $(metadata)
+
+  __Note:__ content items that do not have an **up** "metadatum" are considered
+  children of the root by default.  If you do not want to map a piece of
+  content, declare it with the attribute **map=false**.
+
+By default, the content items are arranged by their score and title "metadata"
+at each level. The sort criteria can be overridden by setting the
+__sortorder__ attribute.
+
+  __Note:__ if you wish to include external HTML pages into the sitemap, you
+  will need to load them as URL references using the &lt;media&gt; tag and use
+  the &lt;metatable&gt; tag to associate "metadata" with them.
+  __t/data/sitemap_with_metatable.wmk__ in the WebMake test suite demonstrates
+  this.  This needs more documentation (TODO).
+
+The &lt;sitemap&gt; tag takes the following required attributes:
+
+	__name__:	The name of the sitemap item, used to refer to it
+	later.  Sitemaps are referred to, in other content items or in out
+	files, using the normal &wmdollar;{foo} style of "content reference"
+	[ref].
+
+		[ref]: $(content)
+
+	__node__:	The name of the template item to evaluate for each
+	node with children in the tree. See **Processing**, below.
+
+	__leaf__:	The name of the template item to evaluate for each leaf
+	node, ie. a node with no children, in the tree. See **Processing**,
+	below.
+
+And the following optional attributes:
+
+	__rootname__:	The root content item to start traversing at.  The
+	default root is whichever content item has the **isroot** attribute
+	set to **true**.
+
+	__all__:	Whether or not all content items should be mapped.
+	Normally dynamic content, such as "metadata" and perl-code-defined
+	content items, are not included. (default: false)
+
+	__dynamic__:	The name of the template item to evaluate for
+	dynamic content items, required if the __all__ attribute is set
+	to **true**.
+
+	__grep__:	Perl code to evaluate at each step of the tree.
+	See the __Grep__ section below.
+
+	__sortorder__:	A "sort string" [$(sorting)] specifying what metadata
+	should be used to sort the items in the tree, for example ''__section
+	score title__''.
+
+Note that the __root__ attribute is deprecated; use __rootname__ instead.
+
+The sitemap can be declared either as an empty element, with **/&gt;** at the
+end, or with a pair of starting and ending tags and text between.  If the
+sitemap is declared using the latter style, any text between the tags will be
+prepended to the generated site map.  It's typically only useful if you wish
+to set metadata on the map itself.
+
+
+Processing
+----------
+
+Here's the key to sitemap generation.  Once the internal tree structure of the
+site has been determined, WebMake will run through each node from the root
+down up to 20 levels deep, and for each node, evaluate one of the 3 content
+items named in the &lt;sitemap&gt; tag's attributes:
+
+	1. __node__:	For pages with pages beneath them;
+
+	2. __leaf__:	For ''leaf'' pages with no pages beneath them;
+
+	3. __dynamic__:	For dynamic content items, defined by perl code
+	or "metadata".
+
+By changing the template content items you name in the tag's attributes, you
+have total control over the way the sitemap is rendered.  For efficiency,
+these should be declared using the &lt;template&gt; tag instead of the
+&lt;content&gt; tag.
+
+The following variables (ie. content items) are set for each node:
+
+	__name__:	the content name
+
+	__title__:	the content's **Title** "metadatum", if set
+
+	__score__:	the content's **Score** "metadatum", if set
+
+	__list__:	the text for all children of this node (__node__
+	items only)
+
+	__is_node__:	whether the content is a node or a leaf (1 for
+	node, 0 for leaf)
+
+In addition, the following "URL reference" [2] is set:
+
+	__url__:	the first URL listed in a WebMake &lt;out&gt; tag
+	to refer to the content item.
+
+	[2]: $(url_refs)
+
+Confused?  Don't worry, there's an example below.
+
+
+Grep
+--------
+
+The __grep__ attribute is used to filter which content items are included in
+the site map.
+
+The ''grep'' code is evaluated once for every node in the sitemap, and ##$_##
+is the name of that node; you can then decide to display/not display it, as
+follows.
+
+##$_## is set to the current content item's name.  If the perl code returns 0,
+the node is skipped; if the perl code sets the variable ##$PRUNE## to 1, all
+nodes at this level and below are skipped.
+
+Example
+=======
+
+If you're still not sure how it works, take a look at __examples/sitemap.wmk__
+in the distribution.  Here's the important bits from that file.
+
+Firstly, two content items are necessary -- a template for a sitemap node, and
+a template for a leaf. Note the use of **&wmdollar;(url)**,
+**&wmdollar;{title}**, etc., which are filled in by the sitemap code.
+
+<pre>
+	&lt;content name=sitemapnode map=false&gt;
+	  &lt;li&gt;
+	    &lt;a href=&wmdollar;(url)&gt;&wmdollar;{title}&lt;/a&gt;: &wmdollar;[&wmdollar;{name}.abstract]&lt;br&gt;
+	    &lt;!-- don't forget to list the sub-items --&gt;
+	    &lt;ul&gt; &wmdollar;{list} &lt;/ul&gt;
+	  &lt;/li&gt;
+	&lt;/content&gt;
+</pre>
+
+And the template for the leaf nodes.  Note that the **&wmdollar;{list}**
+reference is not needed here.
+
+<pre>
+	&lt;content name=sitemapleaf map=false&gt;
+	  &lt;li&gt;
+	    &lt;a href=&wmdollar;(url)&gt;&wmdollar;{title}&lt;/a&gt;: &wmdollar;[&wmdollar;{name}.abstract]&lt;br&gt;
+	  &lt;/li&gt;
+	  &lt;/li&gt;
+	&lt;/content&gt;
+</pre>
+
+Finally, the sitemap itself is declared.
+
+<pre>
+	&lt;sitemap name=mainsitemap node=sitemapnode leaf=sitemapleaf /&gt;
+</pre>
+
+From then on, it's just a matter of including the sitemap content item in
+an output file:
+
+<pre>
+	&lt;out name=map file=sitemap_html/map.html&gt;
+	  &wmdollar;{header}&wmdollar;{mainsitemap}&wmdollar;{footer}
+	&lt;/out&gt;
+</pre>
+
+And that's it.
+
+This documentation includes a sitemap, by the way.  It's used to generate
+the navigation links.  Take a look "here" [docmap].
+
+	[docmap]: $(docmap)
+
+

@@ -1,0 +1,81 @@
+NAME
+    Hash::Tally - Compute the tallies of hash values
+
+SYNOPSIS
+        use Hash::Tally qw( tally );
+    
+        my $data = {
+            Shipping => {
+                English => {
+                     Canada         => 8,
+                    'United States' => 13,
+                },
+                French => {
+                     Canada         => 26,
+                    'United States' => 3,
+                },
+            },
+            Receiving => {
+                English => 56,
+                French  => {
+                     Canada         => 12,
+                    'United States' => 5,
+                },
+            },
+        };
+    
+        tally( $data );
+    
+        # $data now has the following value:
+        $data = {
+            Shipping => {
+                English => {
+                     Canada         => 8,
+                    'United States' => 13,
+                     tally          => 21,
+                },
+                French => {
+                     Canada         => 26,
+                    'United States' => 3,
+                     tally          => 29,
+                },
+                tally => {
+                     Canada         => 34,
+                    'United States' => 16,
+                     tally          => 50,
+                },
+            },
+            Receiving => {
+                English => 56,
+                French  => {
+                     Canada         => 12,
+                    'United States' => 5,
+                     tally          => 17,
+                },
+                tally => 73,
+            },
+            tally => {
+                English => 77,
+                French  => {
+                     Canada         => 38,
+                    'United States' => 8,
+                     tally          => 46,
+                },
+                tally => 123,
+            },
+        };
+    
+DESCRIPTION
+  tally ( @data )
+    A method designed to calculate the tallies of hashes. It was originally
+    designed for reporting and statistical purposes.
+
+AUTHOR
+    Adam Paynter <adapay@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2006 by Adam Paynter
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

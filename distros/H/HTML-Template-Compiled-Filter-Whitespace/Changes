@@ -1,0 +1,31 @@
+Revision history for Perl extension HTML::Template::Compiled::Filter::Whitespace.
+
+0.09  Sun Jun 26 08:30:00 2016
+- fixed bug https://rt.cpan.org/Ticket/Display.html?id=115324
+  because the same here
+
+0.08  Sat Jun 06 07:00:00 2009
+- bugfix build dependencies
+
+0.07  Sat May 30 08:00:00 2009
+- bugfix build dependencies
+
+0.06  Thu May 21 18:00:00 2009
+- Perl critic
+
+0.05  Mon Aug 04 22:15:00 2008
+- change POD
+- add example
+- better Kwalitee
+
+0.04  Sat Jan 12 08:15:00 2008
+- change POD, describe use and import
+
+0.03  Sun Dec 02 23:00:00 2007
+- sikp test if HTML::Template::Compiled is not installed
+
+0.02  Mon Nov 26 23:00:00 2007
+- add HTML::Template::Compiled to build_requires
+
+0.01  Sun Nov 25 23:00:00 2007
+- fist version

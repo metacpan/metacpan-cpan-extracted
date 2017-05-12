@@ -1,0 +1,8 @@
+Build.PL
+CHANGES
+lib/HTTP/Server/Simple/Kwiki.pm
+MANIFEST			This list of files
+README
+run.pl
+t/pod.t
+META.yml

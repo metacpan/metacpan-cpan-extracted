@@ -1,0 +1,1247 @@
+=encoding utf8
+
+=head1 NAME
+
+HTTP::LoadGen - a HTTP load generator toolset
+
+=head1 SYNOPSIS
+
+ use HTTP::LoadGen;
+
+ use HTTP::LoadGen qw/:all/;
+
+ # ask import() to replace the built-in 'rand' operator by our
+ # thread-specific RNG (uses *CORE::GLOBAL::rand)
+ use HTTP::LoadGen qw/-rand :all/;
+
+ ######################
+ # the load generator #
+ ######################
+
+ HTTP::LoadGen::loadgen \%config;
+
+ #######################
+ # auxiliary functions #
+ #######################
+
+ # process management
+
+ # create a collection of worker processes
+ $handle=HTTP::LoadGen::create_proc $nproc, $inithnd, $handler, $exithnd;
+
+ # start main processing and wait for then to finish
+ %result=%{HTTP::LoadGen::start_proc $handle};
+
+ # thread management
+
+ # create a collection of threads
+ $sem=HTTP::LoadGen::ramp_up
+     $procnr, $nproc, $start, $max, $duration, $handler;
+
+ # wait for them to finish
+ $sem->down;
+
+ # idle a bit
+ HTTP::LoadGen::delay $prefix, \%param;
+
+ # get current thread number
+ $nr=HTTP::LoadGen::threadnr;
+
+ # get the configuration hash
+ $config=HTTP::LoadGen::options;
+
+ # get/set thread-specific user data
+ $data=HTTP::LoadGen::userdata;
+ HTTP::LoadGen::userdata=$data;
+
+ # get/set thread specific random number generator
+ $rng=HTTP::LoadGen::rng;
+ HTTP::LoadGen::rng=$rng;
+
+ # next random number
+ $random=HTTP::LoadGen::rnd $max;
+
+=head1 DESCRIPTION
+
+This module implements a multi-process and multi-thread load generator
+for HTTP. It uses L<Coro> threads. So, in reality it does not
+use threads but event-based IO.
+
+=head2 Features
+
+=over 4
+
+=item * limited support for SSL connections
+
+=item * keep-alive connections
+
+=item * configurable delay before and after each request
+
+=item * run a list of URLs many times
+
+=item * compute next URL based on the current request
+
+=item * DNS cache can be preinitialized
+
+=item * slow ramp up
+
+=item * request bodies
+
+=item * custom request headers
+
+=back
+
+=head2 Overview
+
+Note, this POD is best view via L<Apache2::PodBrowser>.
+
+=head3 Parallelism
+
+The load generator follows a 2-level supervisor-worker pattern. The central
+function, C<loadgen>, creates a certain number of child processes. Each
+child process then creates in a slow ramp up phase worker threads up to
+a configurable total upper thread limit.
+
+The thread limit is configured independent on the number of worker processes.
+You configure a number of processes that is about 1.5-5 times the number
+of available CPUs. The number of threads can then be say 50 or 500 or even
+5996 or so. Processes and threads are numbered starting from 0.
+
+So, assuming there are 3 processes and 10 threads configured the following
+table shows how the threads are spread among the processes:
+
+ Process | Threads
+ --------+------------
+       0 | 0 3 6 9
+       1 | 1 4 7
+       2 | 2 5 8
+
+Process 0 will run 4 threads, the other 2 processes 3 threads each.
+The number of threads per process can be calculated as:
+
+ $TotalThreadCount / $NProc + ($ProcNr < $TotalThreadCount % $NProc)
+
+where C<$NProc> is the number of processes used, C<$ProcNr> the number
+of the current process and C<$TotalThreadCount> the system-wide thread
+number. C<$ProcNr> ranges from C<0> to C<$NProc - 1>.
+
+At the beginning ot the ramp-up phase each process starts up a certain number
+of threads (maybe C<0>) to reach the configured start-up thread number.
+The configured ramp-up duration then determines in which intervals new
+threads are added. So assuming the threads run long enough you start up
+with a certain level of parallelism which increases linearly over a
+certain time interval up to the configured maximum.
+
+=head3 The Scoreboard
+
+The multi-process model of C<HTTP::LoadGen> means that each process knows
+only about its own threads. Sometimes you may want to log for example
+the overall number of active requests when a new request is started.
+Or you may want to increment a shared variable for each request to see the
+progress of an active load run.
+
+L<HTTP::LoadGen::ScoreBoard> or L<IPC::ScoreBoard> may be used to achieve
+that.
+
+=head3 The Logger
+
+C<HTTP::LoadGen> doesn't have logging built-in. Instead
+L<HTTP::LoadGen::Logger> is provided.
+
+=head3 Random numbers and repeatable results
+
+C<loadgen> needs for certain operations random numbers. If you need repeatable
+results that is you want to repeat the same test with the same delays between
+requests later then you need the same sequence of random numbers for each
+thread. But the random number generator built-in to Perl is process-wide.
+
+C<HTTP::LoadGen> provides an interface to set an RNG per thread.
+CPAN modules like L<Math::Random::MT> use an object oriented approach.
+So, it may be a good idea to create such an object for each thread and
+register it with C<HTTP::LoadGen>. A C<ThreadInit> handler is a good place
+to do that.
+
+If the C<import> function of C<HTTP::LoadGen> is called with the C<-rand>
+parameter (C<use HTTP::LoadGen qw/-rand/>) the Perl built-in C<rand> operator
+is overwritten (by means of C<*CORE::GLOBAL::rand>) to use the thread-specific
+RNG. Though, occurences of C<rand> in the code that have been compiled before
+C<HTTP::LoadGen> is loaded continue to use the built-in operator.
+
+=head3 Phases
+
+There are several phases in the lifetime of a load run, a process, a thread
+or a request that can be hooked. A hook is a code reference.
+
+=begin :html
+
+=head4 Process related phases
+
+=end :html
+
+=for html <img src="./HTTP::LoadGen/phases.png" style="width: 550px; float: left;">
+
+=over 4
+
+=item ParentInit and ParentExit
+
+these 2 hooks run in the parent process. The C<loadgen> function checks the
+configuration and then calls C<ParentInit>. C<ParentExit> is called just before
+C<loadgen> returns.
+
+C<ParentInit> can start L<Coro> threads. They will run while the process
+is waiting for the worker children to finish.
+
+One thing to consider to do in a C<ParentInit> hook is the creation of
+a L<HTTP::LoadGen::ScoreBoard>.
+
+=item ProcInit and ProcExit
+
+these 2 hooks are called in each worker process. When a worker process is
+started C<ProcInit> is called. But before the actual load generation is
+started the process waits for a signal from the parent process that is
+sent when every worker process has finished its C<ProcInit> phase. So,
+even if the C<ProcInit> phase takes a bit longer it does not influence
+the load generation other than it is started a bit later.
+
+C<ProcInit> can start L<Coro> threads. They will run while the process
+is waiting for the signal from the parent process to start load generation
+and of course after that until they finish.
+
+One thing that should probably be done in a C<ProcInit> handler is
+reseeding of the random number generator. If you need repeatable results
+then you need a random number generator per thread. The built-in RNG is
+no help then. However, there are several object oriented RNGs on CPAN.
+Use the C<rng> function to set a thread-specific RNG and C<rnd> instead
+of the built-in C<rand> to call it.
+
+Another one is the creation of a logger, see L<HTTP::LoadGen::Logger>.
+
+C<ProcExit> is called after the load generation is over just before the
+worker process exists.
+
+If a C<ProcExit> hook is installed its return value determines the
+exit code of the worker process.
+
+Closing the logger would be good here.
+
+=back
+
+=for html <div style="clear: both;"></div>
+
+=begin :html
+
+=head4 Thread related phases
+
+=end :html
+
+=for html <img src="./HTTP::LoadGen/thread.png" style="margin-right: 2em; width: 374px; float: left;">
+
+=over 4
+
+=item ThreadInit and ThreadExit
+
+these 2 hooks wrap the load generation phase of each thread. If a thread
+needs private data the C<ThreadInit> handler can create and return it.
+It is then passed to all other hooks called during the lifetime of the
+thread.
+
+Things to consider to do in a C<ThreadInit> handler would include
+
+=over 4
+
+=item 1. registration of a thread-specific random number generator
+
+=item 2. registration of the thread with the scoreboard
+
+=back
+
+=item InitURLs
+
+during the load generation phase each thread fetches a list of URLs
+several times. The actual list is not given as an array or similar
+but as an interator generator, that is a function that returns a
+function that returns an URL to be fetched. The C<InitURLs> iterator
+generator is called each time a thread starts another round of fetching
+URLs. The iterator itself is then called to get the next URL to be
+fetched. If it returns C<undef> or the empty list the current round
+is over. Then if the configured number of rounds is reached the thread
+ends or the next round is started (and the C<InitURLs> handler is
+called again).
+
+In most cases this complex URL handling is not necessary. Instead one
+simply needs to check off all items of a predefined list. For these
+situations a few predefined iterator generators exist.
+
+=item ReqStart and ReqDone
+
+these 2 hooks wrap each HTTP request.
+
+Here the request would be accounted with the scoreboard. In C<ReqDone>
+logging would occur.
+
+=back
+
+=for html <div style="clear: both;"></div>
+
+=head2 HTTP::LoadGen::loadgen \%data
+
+C<loadgen> is the central function of this module. It starts up child
+processes, creates threads, generates the load and waits for that all to
+finish. It returns when all is done.
+
+The C<%data> hash passed by reference configures C<loadgen> and describes
+what to do. C<loadgen> copies the hash so that the original hash is
+not changed but the copying is not recursive. If a hash value is an array
+and one of the hooks changes it that change will be reflected in the
+original C<%data> hash. However, if you add new hash elements in a hook
+function they won't show up in C<%data> after C<loadgen> returns.
+
+=head3 Request descriptor and return element
+
+A number of elements of the C<%data> hash are hook functions.
+Some of them are passed parametes C<$rq> and/or C<$rc>.
+Both are lists. L<HTTP::LoadGen::Run> exports constants to access the
+list elements. The structure of the request descriptor C<$rq> is
+explained under
+L<URLList|/URLList (either InitURLs or URLList or both must be present)>
+below.
+
+For the lack of a better place the C<$rc> element is described here.
+
+=over 4
+
+=item RC_STATUS (0)
+
+the HTTP status code. If the request failed because the connection couldn't
+be established a code C<599> is set here. C<RC_STATUSLINE> describes the
+problem in more detail in that case.
+
+=item RC_STATUSLINE (1)
+
+the HTTP status message. If the server responds with the following first line
+for example:
+
+ HTTP/1.1 501 Method Not Implemented
+
+C<RC_STATUS> is C<501> while C<RC_STATUSLINE> is C<Method Not Implemented>.
+
+=item RC_HTTPVERSION (2)
+
+the server HTTP protocol version. Normally C<1.1> or C<1.0>.
+
+=item RC_STARTTIME (3)
+
+when the request has been started, fractional number.
+
+=item RC_CONNTIME (4)
+
+when the connection has been established, fractional number.
+
+=item RC_FIRSTTIME (5)
+
+when the first line of output has been received, fractional number.
+
+=item RC_HEADERTIME (6)
+
+when the response HTTP header has been completely received, fractional number.
+
+=item RC_BODYTIME (7)
+
+when the response body has been completely received, fractional number.
+
+=item RC_HEADERS (8)
+
+a hash containing the response HTTP headers. The values of this hash are
+arrays since HTTP header fields can be given multiple times. Keys
+(header names) are converted to lower case.
+
+Example:
+
+ {
+  'content-type' => ['text/html; charset=iso-8859-1'],
+  'connection' => ['close'],
+  'date' => ['Sun, 04 Jul 2010 18:21:12 GMT'],
+  'content-length' => ['217'],
+  'allow' => ['GET,HEAD,POST,OPTIONS,TRACE'],
+  'server' => ['Apache'],
+ }
+
+=item RC_BODY (9)
+
+the response body
+
+=item RC_DNSCACHED (10)
+
+boolean: has the DNS cache lookup resulted in a hit (C<1>) or miss (C<0>)?
+
+=item RC_CONNCACHED (11)
+
+boolean: has the has a kept-alive connection been used?
+
+=back
+
+=head3 The %data hash
+
+So, what can be specified in C<%data>? Note, all keys here are case
+sensitive.
+
+=over 4
+
+=item NWorker (optional)
+
+specifies the number of worker processes to be used. Default is C<1>.
+
+=item RampUpStart (optional)
+
+the number of threads to started up immediately (after the C<ProcInit>
+phase is over). Default is 1 thread per worker process, that is C<NWorker>.
+
+=item RampUpMax (optional)
+
+the number of threads that have to be started up after the ramp-up
+phase is over. That means all processes together will start this number
+of threads. If a thread finishes before the ramp-up phase is over this
+maximum level of parallelism will never be reached.
+
+Default is the same as C<RampUpStart>.
+
+=item RampUpDuration (optional)
+
+the duration of the ramp-up phase in seconds (may be fraction).
+
+Default is C<300> (5 minutes).
+
+=item ParentInit (optional)
+
+the C<ParentInit> handler called as
+
+ $data->{ParentInit}->();
+
+One thing to do here is to create a scoreboard for interprocess
+communication, see L<HTTP::LoadGen::ScoreBoard> or
+L<IPC::ScoreBoard>.
+
+Example:
+
+ ParentInit=>sub {
+   # no parameters
+
+   # create scoreboard
+   # options() returns the config hash itself. The NWorker parameter
+   # is known. SbSlotsz and SbExtra are new. This is to demonstrate
+   # that the hook routines can access the configuration and evaluate
+   # and even add custom parameters.
+   HTTP::LoadGen::ScoreBoard::init_once
+       @{HTTP::LoadGen::options()}{qw/NWorker SbSlotsz SbExtra/};
+ }
+
+=item ParentExit (optional)
+
+the C<ParentExit> handler called as
+
+ $data->{ParentExit}->();
+
+If a scoreboard is used remember to disconnect.
+
+Example:
+
+ ParentExit=>sub {
+   # no parameters
+   undef HTTP::LoadGen::ScoreBoard::scoreboard;
+ }
+
+=item ProcInit (optional)
+
+the C<ProcInit> handler called as
+
+ $data->{ProcInit}->($procnr);
+
+C<$procnr> is the C<0> based number of the process. It ranges up to
+C<NWorker - 1>.
+
+If you plan to use the built-in random number generator this hook is a
+good place to reseed it.
+
+Another good thing to do here is to acquire a logger. L<HTTP::LoadGen::Logger>
+may help here.
+
+If a scoreboard is used save C<$procnr> as slot number.
+
+Example:
+
+ ProcInit=>sub {
+   my ($procnr)=@_;
+
+   # set my slot number
+   HTTP::LoadGen::ScoreBoard::slot=$procnr;
+
+   # acquire a logger
+   $logger=HTTP::LoadGen::Logger::get;
+ }
+
+=item ProcExit (optional)
+
+the C<ProcExit> handler called as
+
+ $rc=$data->{ProcExit}->($procnr);
+
+The return value of this hook determines the exit code of the process.
+If omitted the exit code is C<0>.
+
+The thing to do here is perhaps to close the logger.
+
+Example:
+
+ ProcExit=>sub {
+   my ($procnr)=@_;
+   $logger->();		# close the logger
+ }
+
+=item ThreadInit (optional)
+
+the C<ThreadInit> handler called as
+
+ $userdata=$data->{ThreadInit}->();
+
+The return value of this hook is saved as thread-specific user data.
+
+This hook is a good place to initialize a thread specific random number
+generator if you need repeatable results.
+
+Example:
+
+ ThreadInit => sub {
+   # no parameters
+
+   # thread accounting with the scoreboard
+   HTTP::LoadGen::ScoreBoard::thread_start;
+
+   # set a thread specific RNG
+   HTTP::LoadGen::rng=Math::Random::MT->new(@seed);
+
+   return [];		  # initializes thread specific user data
+ }
+
+=item ThreadExit (optional)
+
+the C<ThreadExit> handler called as
+
+ $data->{ThreadExit}->();
+
+Remember to notify the scoreboard.
+
+Example:
+
+ ThreadExit=>sub {
+   # no parameters
+   HTTP::LoadGen::ScoreBoard::thread_done;
+ }
+
+=item ReqStart (optional)
+
+the C<ReqStart> handler called as
+
+ $data->{ReqStart}->($rq);
+
+C<$rq> is an array specifying the current request. It is generated by the
+URL iterator. The C<ReqStart> handler is allowed modify the array.
+
+If a scoreboard is used check in the request. One can also save
+some current state from the scoreboard to the thread-specific storage
+to log it later.
+
+Example:
+
+ ReqStart=>sub {
+   my ($rq)=@_;
+   HTTP::LoadGen::ScoreBoard::req_start;
+   @{HTTP::LoadGen::userdata()}=(HTTP::LoadGen::ScoreBoard::thread_count,
+				 HTTP::LoadGen::ScoreBoard::req_started,
+				 HTTP::LoadGen::ScoreBoard::req_success,
+				 HTTP::LoadGen::ScoreBoard::req_failed);
+ }
+
+=item ReqDone (optional)
+
+the C<ReqDone> handler called as
+
+ $data->{ReqDone}->($rc, $rq);
+
+C<$rc> is the request result. See C<run_url> in L<HTTP::LoadGen::Run>.
+The C<ReqDone> handler may modify this array. But it's not recommended to
+do that.
+
+C<$rq> is an array specifying the current request.
+
+Here you do request accounting and of course logging.
+
+Example:
+
+ ReqDone=>sub {
+   my ($rc, $rq)=@_;
+
+   HTTP::LoadGen::ScoreBoard::req_done
+       scalar($rc->[RC_STATUS]=~/^[23]/), $rc->[RC_HEADERS], $rc->[RC_BODY];
+
+   $logger->(HTTP::LoadGen::threadnr,
+	     @{$rc}[RC_DNSCACHED, RC_CONNCACHED],
+	     @{HTTP::LoadGen::userdata()},
+	     HTTP::LoadGen::ScoreBoard::req_success,
+	     HTTP::LoadGen::ScoreBoard::req_failed,
+	     HTTP::LoadGen::ScoreBoard::header_count,
+	     HTTP::LoadGen::ScoreBoard::header_bytes,
+	     HTTP::LoadGen::ScoreBoard::body_bytes,
+	     $rc->[RC_STARTTIME],
+	     $rc->[RC_CONNTIME]-$rc->[RC_STARTTIME],
+	     $rc->[RC_FIRSTTIME]-$rc->[RC_STARTTIME],
+	     $rc->[RC_HEADERTIME]-$rc->[RC_STARTTIME],
+	     $rc->[RC_BODYTIME]-$rc->[RC_STARTTIME],
+	     $rc->[RC_STATUS], $rc->[RC_STATUSLINE],
+	     length($rc->[RC_BODY]),
+	     sprintf('%s(%s://%s:%s%s)',
+		     @{$rq}[RQ_METHOD, RQ_SCHEME, RQ_HOST, RQ_PORT, RQ_URI]));
+ }
+
+=item times (optional)
+
+the number of times the URL iterator is charged. That many times the URL list
+is fetched.
+
+If omitted or C<< <=0 >> the test runs forever.
+
+=item dnscache (optional)
+
+C<loadgen> caches DNS query results. One can prevent DNS queries completely in
+2 ways. One of them is to provide a hash here that maps names to IP addresses.
+The other is to have the URL iterator generate IP addresses instead of host
+names and optionally C<Host> request header fields.
+
+Another use of this item is to cheat host name resolution. One can for example
+test a newly installed or development server while the real server continues
+to work unaffected.
+
+Example:
+
+ dnscache=>{
+	    'foertsch.name'=>'127.0.0.1',
+	   },
+
+
+=item InitURLs (either InitURLs or URLList or both must be present)
+
+C<InitURLs> initializes the URL iterator. It may be a string describing
+one of the predefined iterators or a C<CODE> reference.
+
+In the latter case it is called without parameters as
+
+ $it=$data->{InitURLs}->();
+
+It is expected to return a function that when called as
+
+ $new_rq=$it->($rc, $rq);
+
+returns the next request item or C<undef> when it runs out of items.
+The parameters C<$rc> and C<$rq> describe the previous request (C<$rq>)
+and its result (C<$rc>).
+
+For a description of the C<$rq> and C<$new_rq> format see
+L<URLList|/URLList (either InitURLs or URLList or both must be present)> below.
+
+Example:
+
+ InitURLs=>sub {
+   my $url=[qw!GET http foertsch.name 80 /-redir!,
+	    {
+	     keepalive=>KEEPALIVE,
+	     headers=>[
+		       'X-auth'=>1, # necessary to trigger 401 for that URL
+		      ],            # it also shows a custom request header
+	    }];
+   return sub {
+     my ($rc, $rq)=@_;
+     if( $rc->[RC_STATUS]==401 ) {
+       # redo with Authorization header
+       push @{$rq->[RQ_PARAM]->{headers}}, Authorization=>'Basic YmxhOmJsdWI=';
+       return $rq;
+     }
+     my $new_rq=$url;
+     undef $url;		# next time return undef (out-of-requests)
+     return $new_rq;
+   };
+ }
+
+The iterator generator initializes the variable C<$url> and then returns
+a closure. Hence, C<$url> is a static variable with respect to the returned
+iterator.
+
+The iterator itself checks the HTTP code of the previous request. In case of
+a C<401> (Authorization Required) it adds an C<Authorization> header to
+the request header list and retries the operation.
+
+If the previous operation has ended with an other HTTP code it copies
+C<$url> to an auxiliary variable, undefines it and returns the auxiliary
+variable. Thus, only the first time the iterator is called it returns C<$url>.
+After that it is always C<undef> which signals I<Out-of-Requests>.
+
+If C<InitURLs> is a string it is the name of a predefined iterator generator.
+
+Example:
+
+ InitURLs=>'follow'
+
+There are currently 4 such generators. All of them expect an C<URLList>
+(see below) to be provided.
+
+=over 4
+
+=item default
+
+simply walks the C<URLList> from start to end.
+
+This one is also used if C<InitURLs> is omitted.
+
+=item random_start
+
+similar to C<default> but starts at a random offset in C<URLList>. At the
+end of the list it continues at the beginning until all C<URLList> elements
+are done once.
+
+=item follow
+
+similar to C<default> but if a request results in a C<3xx> HTTP code and a
+C<Location> header is provided by the server it tries to follow it
+recursively.
+
+If the request starting a series of redirections contains a C<postdelay>
+statement (see below) the delay is postponed until after the last
+request of the series. Subsequent requests are issues without delay.
+
+Subsequent requests inherit the C<User-Agent> and C<Referer> HTTP headers
+of the originating request, see
+L<follow_3XX()|/$new_rq=HTTP::LoadGen::follow_3XX $rc, $rq> below.
+
+This iterator is a bit special in that can turn other iterators into
+following ones. Normally an iterator generator is called without parameters.
+This one can take one parameter that in turn may be an iterator.
+It returns then a following iterator based on the passed one.
+
+Infact, the built-in C<random_start_follow> iterator is implemented for
+example as
+
+ register_iterator random_start_follow=>sub {
+    @_=get_iterator('random_start')->();
+    goto &{get_iterator 'follow'};
+ };
+
+To turn your own iterator into a following you could write:
+
+ InitURLs=>sub {
+   return get_iterator->('follow')->($my_own_iterator);
+ }
+
+where C<$my_own_iterator> is an iterator function.
+
+=item random_start_follow
+
+a combination of the 2 above.
+
+=back
+
+You can register your own named iterators by calling
+L<register_iterator|/register_iterator> below.
+
+=item URLList (either InitURLs or URLList or both must be present)
+
+See also
+L<InitURLs|/InitURLs (either InitURLs or URLList or both must be present)>
+above.
+
+An C<URLList> is an array of arrays. Each of these sub-arrays describes
+one request. If consists of 6 elements:
+
+ [$method, $scheme, $host, $port, $uri, $param]
+
+C<$method> is the HTTP request method, e.g. C<GET>, C<POST>, ...
+
+C<$scheme> is either C<http> or C<https>.
+
+C<$host> is the hostname or IP address of the server, e.g.
+C<foertsch.name> or C<109.73.51.50>.
+
+C<$port> is the server port to connect. Usually port C<80> is used for
+C<http> and port C<443> for C<https>.
+
+C<$uri> is the request URI normally starting with a slash (C</>), e.g.
+C</impressum.html>.
+
+C<$param> is a hash with further options.
+
+To access the elements of a request description L<HTTP::LoadGen::Run>
+exports a few constants. They may be used to increase readability.
+
+ RQ_METHOD == 0
+ RQ_SCHEME == 1
+ RQ_HOST   == 2
+ RQ_PORT   == 3
+ RQ_URI    == 4
+ RQ_PARAM  == 5
+
+Example:
+
+ URLList=>[
+           [qw!GET http 109.73.51.50 80 /-redir!,
+	    {
+	     keepalive=>KEEPALIVE,
+	     headers=>[
+		       Authorization=>'Basic YmxhOmJsdWI=',
+                       Host=>'foertsch.name',
+		      ],
+	    }],
+           [qw!HUGO https www.kabatinte.net 443 /!,
+	    {
+	     keepalive=>KEEPALIVE,
+             predelay=>0.5,
+             prejitter=>1,
+             postdelay=>3,
+             postjitter=>1.5,
+             body=>'blablub',
+	    }]
+          ]
+
+This C<URLList> contains 2 requests, one for a server with the IP address
+C<109.73.51.50> and one for the host C<www.kabatinte.net>.
+
+The first one will send the following HTTP request to the server
+(IP C<109.73.51.50>, port C<80>):
+
+ GET /-redir HTTP/1.1
+ Authorization: Basic YmxhOmJsdWI=
+ Host: foertsch.name
+
+If you need more header fields, C<User-Agent> for example, add them to the
+C<headers> array of the options hash.
+
+The second request is converted into the following HTTP message sent
+over SSL to C<84.38.75.176:443> assuming that C<www.kabatinte.net>
+resolves to C<84.38.75.176>:
+
+ HUGO / HTTP/1.1
+ Host: www.kabatinte.net
+ Content-Length: 7
+
+ blablub
+
+Although no C<Host> header is specified in the request element one is sent.
+If the request element does not contain a C<Host> header one is added
+automatically based on C<$host> and C<$port>.
+
+You may also notice the C<Content-Length> header. It is sent because a
+request body is specified (the C<body> item in C<$param>).
+
+So, what can be specified in the C<$param> part?
+
+=over 4
+
+=item keepalive
+
+L<HTTP::LoadGen::Run> exports 3 constants to be used as values.
+C<KEEPALIVE_USE> permits to use a previously kept alive connection.
+C<KEEPALIVE_STORE> allows to keep the connection alive after the request.
+C<KEEPALIVE> combines both of the above.
+
+If you hate readability you can also use the numerical values:
+
+ KEEPALIVE_USE==1
+ KEEPALIVE_STORE==2
+ KEEPALIVE==3
+
+=item predelay and prejitter
+
+These statements define a period to wait before sending the request.
+The wait is done after the request description has been pulled off
+the iterator but before the C<ReqStart> handler is run.
+
+Both numbers can be fractions. Read them as
+
+ predelay ± prejitter
+
+The actual waiting time is calculated as
+
+ interval = predelay - prejitter + rand( 2 * prejitter )
+
+If C<< prejitter >= predelay >> interval can become negative. In this cases
+you won't jump back in time but simply not wait.
+
+To achieve repeatable results a thread-specific random number generator
+must be used. See the C<rng> function below.
+
+=item postdelay and postjitter
+
+The same as C<predelay> but waiting occurs after the request is done or
+more precisely after the C<ReqDone> handler returns.
+
+=item headers
+
+an array (not a hash!) of header fields to be appended to the HTTP
+request.
+
+=item body
+
+a request body
+
+=item conn_timeout
+
+here you can specify the return value of the prepare-callback function
+passed to C<AnyEvent::Socket::tcp_connect> when establishing a connection.
+
+See L<AnyEvent::Socket> for more information.
+
+=item timeout
+
+the C<timeout> parameter used when a connection is converted into a
+L<AnyEvent::Handle> object.
+
+See L<AnyEvent::Handle> for more information.
+
+=item tls_ctx
+
+the C<tls_ctx> parameter used when a connection is converted into a
+L<AnyEvent::Handle> object.
+
+See L<AnyEvent::Handle> for more information.
+
+By now L<AnyEvent::Handle> supports SSL features like client certificates
+and server certificate verification. However, some things are still missing
+like SSL session caching. How about server initiates renegotiations I am
+not sure.
+
+Note, C<conn_timeout>, C<timeout> and C<tls_ctx> are not very well tested
+by now.
+
+=back
+
+=back
+
+=head2 Useful functions to be used in hooks
+
+=head3 HTTP::LoadGen::threadnr
+
+returns the number of the thread currently running.
+
+=head3 HTTP::LoadGen::userdata
+
+returns the thread-specific user data. Normally this is assigned to by
+returning something useful from a C<ThreadInit> handler. But it's a
+lvalue-function. Hence the following will work too:
+
+ # assign new thread-specific data
+ HTTP::LoadGen::userdata={something=>'useful'};
+
+=head3 HTTP::LoadGen::options
+
+returns the copy of the configuration hash used by C<loadgen()>.
+
+=head3 HTTP::LoadGen::rng
+
+returns and sets the thread-specific random number generator. It sets the
+RNG used by C<HTTP::LoadGen::rnd>.
+
+=head3 HTTP::LoadGen::rnd $upper_limit
+
+use the thread-specific random number generator or if none set the built-in
+one.
+
+Returns a pseudo-random number.
+
+=head3 HTTP::LoadGen::delay $prefix, $param
+
+this function implements the C<predelay> and C<postdelay> operations.
+
+C<$prefix> is a prefix, e.g. C<pre> or C<post>.
+
+C<$param> is a C<RQ_PARAM> hash of a request descriptor containing keys
+C<$prefix.'delay'> and C<$prefix.'jitter'>.
+
+=head3 HTTP::LoadGen::done
+
+if a thread needs a preliminary exit call
+
+ HTTP::LoadGen::done=1
+
+in a C<ReqStart> or C<ReqDone> handler. The current request will be performed
+except for C<postdelay>. Then the thread finishes. This can be used to
+stop the run when a certain load level has been reached.
+
+=head3 $new_rq=HTTP::LoadGen::follow_3XX $rc, $rq
+
+This function implements the following part of the built-in C<follow>
+iterator.
+
+It is called with the result and the request descriptor of the previous
+request and returns a new request descriptor if the result is a HTTP
+redirect.
+
+Otherwise an empty list is returned.
+
+The new request preserves the C<User-Agent> and C<Referer> request header
+fields.
+
+=head2 Other auxiliary functions
+
+=head3 HTTP::LoadGen::register_iterator $name, $code_ref
+
+registers a known iterator. This can be used by other modules, e.g.
+
+ package My::Iterator;
+ use HTTP::LoadGen ':all';
+ BEGIN {
+   register_iterator 'my_iterator'=>sub {
+     ...
+   };
+ }
+
+=head3 $code_ref=HTTP::LoadGen::get_iterator $name
+
+returns an iterator by name.
+
+=head3 $handle=HTTP::LoadGen::create_proc $nproc, $init_hnd, $hnd, $exit_hnd
+
+create C<$nproc> child processes and have them finish the C<ProcInit>
+phase C<$init_hnd>.
+
+C<$init_hnd> and C<$hnd> are passed just one parameter, the C<0>-based
+process number. C<$exit_hnd> get that plus the scalar return value of
+C<$hnd>. The return value of C<$exit_hnd> determines the exit code of
+the child process.
+
+C<$init_hnd> and C<$exit_hnd> may be C<undef>. C<$hnd> may not.
+
+Returns an opaque handle that can be passed to C<start_proc>.
+
+=head3 $status=HTTP::LoadGen::start_proc $handle
+
+When C<create_proc> returns all children have finished their C<$init_hnd>
+and wait for a signal to continue with C<$hnd>. C<start_proc> sends that
+signal and waits for all children to finish.
+
+It returns a hash that maps operating system process IDs to their exit
+code, killing signal and a coredump flag.
+
+Example:
+
+ {
+  '7273' => [7, 0, 0],     # PID 7273 exits normally with code 7
+  '7275' => [0, 11, 1],    # PID 7275 has been killed by signal 11
+                           #   + core has been dumped
+  '7274' => [8, 0, 0],     # PID 7274 exits normally with code 8
+ }
+
+=head3 $semaphore=HTTP::LoadGen::ramp_up $procnr, $nproc, $start, $max, $duration, $handler
+
+implements the ramp-up phase.
+
+returns a semaphore that can be used to wait for the created threads to
+finish. It waits only for the threads running in the current process:
+
+ $semaphore->down;      # wait for my threads to finish
+
+C<ramp_up> may finish almost immediately but may also take some time
+while the load generation is already running. It depends on the
+C<$duration> parameter. Don't expect it to return before the load
+generation starts.
+
+=head2 Internal functions
+
+=over 4
+
+=item HTTP::LoadGen::conncache
+
+=item HTTP::LoadGen::tlscache
+
+=back
+
+=head1 DEBUGGING
+
+Sometimes its useful to see what requests are made. If the environment
+variable C<HTTP__LoadGen__Run__dbg> is set when L<HTTP::LoadGen::Run>
+is compiled a source filter is used to compile in debugging output to
+STDERR.
+
+=head1 EXPORT
+
+The following L<Exporter> tags are defined:
+
+=over 4
+
+=item common
+
+exports C<loadgen>, C<threadnr>, C<done>, C<userdata>, C<options>,
+C<rng>, C<rnd> and C<delay>
+
+=item const
+
+exports all symbols that L<HTTP::LoadGen::Run> exports by default.
+
+=item all
+
+all of the above.
+
+Additionally it pulls in L<HTTP::LoadGen::ScoreBoard> and exports all
+that is exported by it.
+
+Also, L<HTTP::LoadGen::ScoreBoard> is loaded. Then function named
+C<get_logger> is created as an alias for C<HTTP::LoadGen::Logger::get>
+and exported.
+
+=back
+
+=head1 EXAMPLE CONFIGURATION
+
+ #!/usr/bin/loadgen
+ # -*-perl-*-
+
+ use strict;
+ use Math::Random::MT;
+ use Coro;
+ use Coro::Timer ();
+ no warnings 'ambiguous';
+
+ # possible hook parameters:
+ # $procnr   -- the current process number 0 .. NWorker-1
+ # $el       -- an URL element to fetch (ARRAY)
+ #              use RQ_* constants from HTTP::LoadGen::Run to access
+ # $rc       -- an result element (ARRAY)
+ #              use RC_* constants from HTTP::LoadGen::Run to access
+
+ my $logger;
+ +{
+   NWorker=>3,	                # use 3 processes
+   RampUpStart=>2,              # start 2 threads immediately
+   RampUpMax=>13,      	        # then add 11 threads over 5 seconds
+   RampUpDuration=>5,           # that makes 2.2 new threads per second
+
+   ParentInit=>sub {
+     # no parameters
+
+     # create scoreboard
+     sbinit undef, options->{NWorker};
+   },
+   ParentExit=>sub {
+     # no parameters
+     undef scoreboard;
+   },
+
+   ProcInit=>sub {
+     my ($procnr)=@_;
+
+     # set my slot number
+     slot=$procnr;
+
+     # acquire a logger
+     my $fmt='%-2d %d %d %2d %2d %3d %3d %.3f %.3f %.3f %.3f %.3f %s %d '.
+             "%s(%s://%s:%s%s) %s\n";
+     $logger=get_logger undef, sub {sprintf $fmt, @_};
+   },
+   ProcExit=>sub {
+     my ($procnr)=@_;
+     $logger->();               # close the logger
+   },
+
+   ThreadInit=>sub {
+     # no parameters
+
+     # thread accounting
+     thread_start;
+
+     # set a thread specific RNG
+     rng=Math::Random::MT->new(threadnr);
+
+     return [];                 # initializes thread specific user data
+   },
+   ThreadExit=>sub {
+     # no parameters
+     thread_done;
+   },
+
+   ReqStart=>sub {
+     my ($el)=@_;
+
+     # request accounting
+     req_start;
+
+     # started - succeeded - failed = currently pending number of requests
+     @{userdata()}=(thread_count, req_started-req_success-req_failed);
+   },
+
+   ReqDone=>sub {
+     my ($rc, $el)=@_;
+
+     # request accounting: HTTP status 2xx and 3xx are successful
+     #                     other requests are counted as failures.
+     req_done +($rc->[RC_STATUS]=~/^[23]/), $rc->[RC_HEADERS], $rc->[RC_BODY];
+
+     $logger->(threadnr,
+               @{$rc}[RC_DNSCACHED, RC_CONNCACHED],
+               @{userdata()},
+               req_success,
+               req_failed,
+               $rc->[RC_STARTTIME],
+               $rc->[RC_CONNTIME]-$rc->[RC_STARTTIME],
+               $rc->[RC_FIRSTTIME]-$rc->[RC_STARTTIME],
+               $rc->[RC_HEADERTIME]-$rc->[RC_STARTTIME],
+               $rc->[RC_BODYTIME]-$rc->[RC_STARTTIME],
+               $rc->[RC_STATUS],
+               length($rc->[RC_BODY]),
+               @{$el}[RQ_METHOD, RQ_SCHEME, RQ_HOST, RQ_PORT, RQ_URI],
+               $rc->[RC_STATUSLINE]);
+   },
+
+   dnscache=>{
+              localhost=>'127.0.0.1',
+              'kabatinte.net'=>'84.38.75.176',
+              'www.kabatinte.net'=>'84.38.75.176',
+              'foertsch.name'=>'109.73.51.50',
+             },
+
+   times=>3,			# run the URL list 3 times
+
+   InitURLs=>'random_start',
+
+   URLList=>do {
+     my $o={
+            keepalive=>KEEPALIVE,
+            qw!predelay 0.05 prejitter 0.1 postdelay 0.5 postjitter 1!,
+           };
+     [[qw!GET http foertsch.name 80 /-redir!, $o],
+      [qw!HUGO https www.kabatinte.net 443 /!, $o]
+     ];
+   },
+  }
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<HTTP::LoadGen::Run>
+
+=item * L<HTTP::LoadGen::ScoreBoard>
+
+=item * L<HTTP::LoadGen::Logger>
+
+=item * L<loadgen>
+
+=back
+
+=head1 AUTHOR
+
+Torsten Förtsch, E<lt>torsten.foertsch@gmx.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2010 by Torsten Förtsch
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

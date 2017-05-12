@@ -1,0 +1,66 @@
+---
+abstract: 'parse microformats in HTML'
+author:
+  - 'Toby Inkster <tobyink@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.61
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06'
+keywords:
+  - Atom
+  - HTML
+  - JSON
+  - Microformats
+  - POSH
+  - RDF
+  - 'Semantic Web'
+  - XHTML
+  - iCalendar
+  - vCard
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: HTML::Microformats
+name: HTML-Microformats
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+recommends:
+  RDF::KML::Exporter: 0
+  RDF::iCalendar::Exporter: 0.002
+  RDF::vCard::Exporter: 0.006
+  XML::Atom::FromOWL: 0
+requires:
+  CGI: 0
+  CGI::Util: 0
+  DateTime: 0
+  DateTime::Duration: 0
+  DateTime::Format::Builder: 0
+  DateTime::Format::Natural: 0
+  DateTime::Format::Strptime: 0
+  DateTime::Span: 0
+  HTML::HTML5::Parser: 0.200
+  HTML::HTML5::Sanity: 0.100
+  HTTP::Date: 0
+  JSON: 2.00
+  Locale::Country: 0
+  Module::Pluggable: 0
+  Object::AUTHORITY: 0
+  RDF::Trine: 0.130
+  URI: 1.30
+  URI::URL: 0
+  XML::LibXML: 1.60
+  perl: 5.10.0
+resources:
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=HTML-Microformats
+  homepage: https://metacpan.org/release/HTML-Microformats
+  license: http://dev.perl.org/licenses/
+  repository: https://bitbucket.org/tobyink/p5-html-microformats
+version: 0.105

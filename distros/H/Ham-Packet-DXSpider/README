@@ -1,0 +1,55 @@
+Ham-Packet-DXSpider
+
+This is a small module designed to connect to a DXSpider server and 
+enable the storage and retrieval of messages from that server.
+DXSpider forms part of the DXCluster network where Radio Hams share
+DX Spots. These messages are also received and can be acted upon.
+The module allows for hooks so that code can be run when messages arrive.
+
+For more information on DXSpider and the DXCluster, see:-
+
+* http://wiki.dxcluster.org/index.php/Main_Page
+* http://www.dxcluster.org/main/index.html
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Ham::Packet::DXSpider
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Ham-Packet-DXSpider
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Ham-Packet-DXSpider
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Ham-Packet-DXSpider
+
+    Search CPAN
+        http://search.cpan.org/dist/Ham-Packet-DXSpider/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Bruce James
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

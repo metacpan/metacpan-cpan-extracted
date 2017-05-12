@@ -1,0 +1,41 @@
+<html>
+<head>
+<title>Tests for Embperl - Importing subs from a Perl module</title>
+</head>
+
+
+<body>
+
+<h1>Tests for Embperl - Importing  from a Perl module</h1>
+
+[! 
+use lib qw{ . } ;
+use subimp ;
+!]
+
+First sub:
+[- tfirst -]
+
+Second sub:
+params in main  = [+ "@_" +]
+
+[- tsecond (1, 2, 3) -]
+
+
+[- @cell = (['a1', 'a2'], ['b1', 'b2']) -]
+
+And now a table splitted into several subs:
+
+<table>
+<tr><th>1</th><th>2></th></tr>
+<tr>
+[- tabcell (\@cell) -]
+</tr>
+</table>
+
+And done!
+
+
+
+</body>
+</html>

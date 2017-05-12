@@ -1,0 +1,5 @@
+[%# $Id%]
+[% USE hdlc = Handel.Cart %]
+<body>
+	<p>[% hdlc.uuid %]</p>
+</body>

@@ -1,0 +1,13 @@
+Changelog for HTML-Widget-Plugin-Combo
+
+0.004     2013-09-14 18:33:07 America/New_York
+        - fix bugs in metadata
+
+0.003     2013-09-14 13:11:01 America/New_York
+        - repackage, update bugtracker and repo
+
+0.002     2006-12-14
+        - fix bug: unknown options did not result in start with input
+
+0.001     2006-12-14
+        - first release

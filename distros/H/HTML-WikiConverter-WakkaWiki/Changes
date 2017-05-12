@@ -1,0 +1,6 @@
+# Change log for HTML::WikiConverter::WakkaWiki
+
+version: 0.50
+date:    Tue Jan 10 2006
+changes:
+  - Branched from main HTML::WikiConverter codebase.

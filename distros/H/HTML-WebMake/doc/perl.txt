@@ -1,0 +1,64 @@
+<wmmeta name="Title" value="The &lt;{perl}&gt; Directives" />
+<wmmeta name="Section" value="03-proc_logic" />
+<wmmeta name="Score" value="30" />
+<wmmeta name="Abstract">
+embed arbitrary perl logic
+</wmmeta>
+
+Arbitrary perl code can be executed using this directive.
+
+It works like perl's ##eval## command; the return value from the perl block is
+inserted into the file, so a perl code block like this:
+
+<pre>
+	&lt;{perl
+	  &wmdollar;_ = '';
+	  for my &wmdollar;fruit (qw(apples oranges pears)) {
+	    &wmdollar;_ .= " ".&wmdollar;fruit;
+	  }
+	  &wmdollar;_;
+	}&gt;
+</pre>
+
+will be replaced with the string '' apples oranges pears''.  Note that the
+##&wmdollar;_## variable is declared as local when you enter the perl block,
+you don't have to do this yourself.
+
+If you don't like the eval style, you can use a more PHP/JSP/ASP-like
+construct using the ##perlout## directive, which replaces the perl code text
+with anything that the perl code prints on the default output filehandle, like
+so:
+
+<pre>
+	&lt;{perlout
+	  for my &wmdollar;fruit (qw(apples oranges pears)) {
+	    print " ", &wmdollar;fruit;
+	  }
+	}&gt;
+</pre>
+
+Note that this is not STDOUT, it's a local filehandle called ##$outhandle##.
+It __is__ selected as the default output handle, however, so just ##print##
+without a filehandle name will work.
+
+Also, it should be noted that ##perl## is a little more efficient than
+##perlout##, so if you're going all-out for speed, you should use that.
+
+<a href=$(perl)>&lt;{perl}&gt;</a> sections found at the top level of the
+WebMake file will be evaluated during the file-parsing pass, as they
+are found.
+
+<a href=$(perl)>&lt;{perl}&gt;</a> sections embedded inside content chunks
+or other tagged blocks will be evaluated only once they are referenced.
+
+Perl code can access content variables and URLs using the <a
+href=$(PerlCodeLibrary.pm.html)>library functions provided</a>.
+
+The library functions are available both as normal perl functions in the
+default ##main## package, or, if you want to write thread-safe or mod_perl-safe
+perl code, as methods on the ##&wmdollar;self## object.  The ##&wmdollar;self##
+object is available as a local variable in the perl code block.
+
+A good example of perl use inside a WebMake file can be found in the
+##news_site.wmk## file in the __examples__ directory.
+

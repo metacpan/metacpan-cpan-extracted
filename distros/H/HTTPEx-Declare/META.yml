@@ -1,0 +1,27 @@
+---
+abstract: 'Declarative HTTP::Engine'
+author:
+  - 'Kazuhiro Osawa <ko@yappo.ne.jp>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.760'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTTPEx-Declare
+no_index:
+  directory:
+    - inc
+    - t
+    - examples
+recommends:
+  HTTP::Engine::Compat: 0
+requires:
+  Carp: 0
+  HTTP::Engine: 0.0.14
+  Sub::Exporter: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

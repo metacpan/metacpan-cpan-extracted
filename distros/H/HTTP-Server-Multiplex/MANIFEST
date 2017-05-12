@@ -1,0 +1,23 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+examples/default
+lib/HTTP/Server/Connection.pm
+lib/HTTP/Server/Connection.pod
+lib/HTTP/Server/Directory.pm
+lib/HTTP/Server/Directory.pod
+lib/HTTP/Server/Directory/UserDirs.pm
+lib/HTTP/Server/Directory/UserDirs.pod
+lib/HTTP/Server/Multiplex.pm
+lib/HTTP/Server/Multiplex.pod
+lib/HTTP/Server/Session.pm
+lib/HTTP/Server/Session.pod
+lib/HTTP/Server/VirtualHost.pm
+lib/HTTP/Server/VirtualHost.pod
+lib/HTTP/Server/VirtualHost/LocalHost.pm
+lib/HTTP/Server/VirtualHost/LocalHost.pod
+lib/HTTP/Server/index.html
+t/01use.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

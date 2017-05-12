@@ -1,0 +1,5 @@
+---
+name: 'Template support (required for Render::TT)'
+default: 1
+depends:
+    'Template': 0

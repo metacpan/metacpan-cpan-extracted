@@ -1,0 +1,26 @@
+<html>
+<head>
+<title>Tests for Embperl - Recursion via Execute</title>
+</head>
+
+<body>
+<h1>Tests for Embperl - Recursion via Execute</h1>
+
+[* local $deep ; *]
+
+[- $deep = $param[0] -]
+
+[$if $deep++ < 4 $]
+    Call Execute; deep = [+ $deep +]<br>
+    [- Execute ('recursexec.htm', $deep) -]
+    End Execute; deep = [+ $deep +]<br>
+[$else$]
+    End Recursion; deep = [+ $deep +]<br>
+[$endif$]
+
+[$if $deep > 5 $]
+	Endless Recursion; deep = [+ $deep +]<br> 
+[$endif$]
+    
+</body>
+</html>

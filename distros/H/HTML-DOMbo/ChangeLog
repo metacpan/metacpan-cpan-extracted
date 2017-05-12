@@ -1,0 +1,19 @@
+Revision history for Perl extension HTML::DOMbo
+                                        Time-stamp: "2005-01-04 21:16:01 AST"
+
+2005-01-04  Sean M. Burke  sburke@cpan.org
+
+	* Release 3.10 -- Making the makefile clearer.  No changes to
+	the actual module code.  Also, putting in a better test module,
+	in case we need to report the module versions on the system.
+
+
+2004-12-29  Sean M. Burke  sburke@cpan.org
+
+	* Release 3.09 -- just rebundling.
+
+	
+2000-11-03  Sean M. Burke  sburke@netadventure.net
+
+	* Release 3.08 -- First public release.
+

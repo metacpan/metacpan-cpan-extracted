@@ -1,0 +1,500 @@
+NAME
+
+    HTTP::AnyUA - An HTTP user agent programming interface unification
+    layer
+
+VERSION
+
+    version 0.900
+
+SYNOPSIS
+
+        my $any_ua = HTTP::AnyUA->new(ua => LWP::UserAgent->new);
+        # OR: my $any_ua = HTTP::AnyUA->new(ua => Furl->new);
+        # OR: my $any_ua = HTTP::AnyUA->new(ua => HTTP::Tiny->new);
+        # etc...
+    
+        my $response = $any_ua->get('http://www.example.com/');
+    
+        print "$response->{status} $response->{reason}\n";
+    
+        while (my ($k, $v) = each %{$response->{headers}}) {
+            for (ref $v eq 'ARRAY' ? @$v : $v) {
+                print "$k: $_\n";
+            }
+        }
+    
+        print $response->{content} if length $response->{content};
+    
+        ### Non-blocking user agents cause Future objects to be returned:
+    
+        my $any_ua = HTTP::AnyUA->new(ua => HTTP::Tiny->new, response_is_future => 1);
+        # OR: my $any_ua = HTTP::AnyUA->new(ua => 'AnyEvent::HTTP');
+        # OR: my $any_ua = HTTP::AnyUA->new(ua => Mojo::UserAgent->new);
+        # etc...
+    
+        my $future = $any_ua->get('http://www.example.com/');
+    
+        $future->on_done(sub {
+            my $response = shift;
+    
+            print "$response->{status} $response->{reason}\n";
+    
+            while (my ($k, $v) = each %{$response->{headers}}) {
+                for (ref $v eq 'ARRAY' ? @$v : $v) {
+                    print "$k: $_\n";
+                }
+            }
+    
+            print $response->{content} if length $response->{content};
+        });
+    
+        $future->on_fail(sub { print STDERR "Oh no!!\n" });
+
+DESCRIPTION
+
+    This module provides a small wrapper for unifying the programming
+    interfaces of several different actual user agents (HTTP clients) under
+    one familiar interface.
+
+    Rather than providing yet another programming interface for you to
+    learn, HTTP::AnyUA follows the HTTP::Tiny interface. This also means
+    that you can plug in any supported HTTP client (LWP::UserAgent, Furl,
+    etc.) and use it as if it were HTTP::Tiny.
+
+    There are a lot of great HTTP clients available for Perl, each with
+    different goals, different feature sets, and of course different
+    programming interfaces! If you're an end user, you can just pick one of
+    these clients according to the needs of your project (or personal
+    preference). But if you're writing a module that needs to interface
+    with a web server (like perhaps a RESTful API wrapper) and you want
+    your users to be able to use whatever HTTP client they want,
+    HTTP::AnyUA can help you support that!
+
+    It's a good idea to let the end user pick whatever HTTP client they
+    want to use, because they're the one who knows the requirements of
+    their application or script. If you're writing an event-driven
+    application, you'll need to use a non-blocking user agent like
+    Mojo::UserAgent. If you're writing a simple command-line script, you
+    may decide that your priority is to minimize dependencies and so may
+    want to go with HTTP::Tiny.
+
+    Unfortunately, many modules on CPAN are hardcoded to work with specific
+    HTTP clients, leaving the end user unable to use the HTTP client that
+    would be best for them. Although the end user won't -- or at least
+    doesn't need to -- use HTTP::AnyUA directly, they will benefit from
+    client choice if their third-party modules use HTTP::AnyUA or something
+    like it.
+
+    The primary goal of HTTP::AnyUA is to make it easy for module
+    developers to write HTTP code once that can work with any HTTP client
+    the end user may decide to plug in. A secondary goal is to make it easy
+    for anyone to add support for new or yet-unsupported user agents.
+
+ATTRIBUTES
+
+ ua
+
+    Get the user agent that was passed to "new".
+
+ response_is_future
+
+    Get and set whether or not responses are Future objects.
+
+ backend
+
+    Get the backend instance. You normally shouldn't need this.
+
+METHODS
+
+ new
+
+        $any_ua = HTTP::AnyUA->new(ua => $user_agent, %attr);
+        $any_ua = HTTP::AnyUA->new($user_agent, %attr);
+
+    Construct a new HTTP::AnyUA.
+
+ request
+
+        $response = $any_ua->request($method, $url);
+        $response = $any_ua->request($method, $url, \%options);
+
+    Make a request, get a response.
+
+    Compare to "request" in HTTP::Tiny.
+
+ get, head, put, post, delete
+
+        $response = $any_ua->get($url);
+        $response = $any_ua->get($url, \%options);
+        $response = $any_ua->head($url);
+        $response = $any_ua->head($url, \%options);
+        # etc.
+
+    Shortcuts for "request" where the method is the method name rather than
+    the first argument.
+
+    Compare to "get|head|put|post|delete" in HTTP::Tiny.
+
+ post_form
+
+        $response = $any_ua->post_form($url, $formdata);
+        $response = $any_ua->post_form($url, $formdata, \%options);
+
+    Does a POST request with the form data encoded and sets the
+    Content-Type header to application/x-www-form-urlencoded.
+
+    Compare to "post_form" in HTTP::Tiny.
+
+ mirror
+
+        $response = $http->mirror($url, $filepath, \%options);
+        if ($response->{success}) {
+            print "$filepath is up to date\n";
+        }
+
+    Does a GET request and saves the downloaded document to a file. If the
+    file already exists, its timestamp will be sent using the
+    If-Modified-Since request header (which you can override). If the
+    server responds with a 304 (Not Modified) status, the success field
+    will be true; this is usually only the case for 2XX statuses. If the
+    server responds with a Last-Modified header, the file will be updated
+    to have the same modification timestamp.
+
+    Compare to "mirror" in HTTP::Tiny. This version differs slightly in
+    that this returns internal exception responses (for cases like being
+    unable to write the file locally, etc.) rather than actually throwing
+    the exceptions. The reason for this is that exceptions as responses are
+    easier to deal with for non-blocking HTTP clients, and the fact that
+    this method throws exceptions in HTTP::Tiny seems like an inconsistency
+    in its interface.
+
+ register_backend
+
+        HTTP::AnyUA->register_backend($user_agent_package => $backend_package);
+        HTTP::AnyUA->register_backend('MyAgent' => 'MyBackend');    # HTTP::AnyUA::Backend::MyBackend
+        HTTP::AnyUA->register_backend('LWP::UserAgent' => '+SpecialBackend');   # SpecialBackend
+
+    Register a backend for a new user agent type or override a default
+    backend. Backend packages are relative to the HTTP::AnyUA::Backend::
+    namespace unless prefixed with a +.
+
+    If you only need to set a backend as a one-off thing, you could also
+    pass an instantiated backend to "new".
+
+SUPPORTED USER AGENTS
+
+      * AnyEvent::HTTP
+
+      * Furl
+
+      * HTTP::AnyUA - a little bit meta, but why not?
+
+      * HTTP::Tiny
+
+      * LWP::UserAgent
+
+      * Mojo::UserAgent
+
+      * Net::Curl::Easy
+
+    Any HTTP client that inherits from one of these in a well-behaved
+    manner should also be supported.
+
+    Of course, there are many other HTTP clients on CPAN that HTTP::AnyUA
+    doesn't yet support. I'm more than happy to help add support for
+    others, so send me a message if you know of an HTTP client that needs
+    support. See HTTP::AnyUA::Backend for how to write support for a new
+    HTTP client.
+
+NON-BLOCKING USER AGENTS
+
+    HTTP::AnyUA tries to target the HTTP::Tiny interface, which is a
+    blocking interface. This means that when you call "request", it is
+    supposed to not return until either the response is received or an
+    error occurs. This doesn't jive well with non-blocking HTTP clients
+    which expect the flow to reenter an event loop so that the request can
+    complete concurrently.
+
+    In order to reconcile this, a Future will be returned instead of the
+    normal hashref response if the wrapped HTTP client is non-blocking
+    (such as Mojo::UserAgent or AnyEvent::HTTP). This Future object may be
+    used to set up callbacks that will be called when the request is
+    completed. You can call "response_is_future" to know if the response is
+    or will be a Future.
+
+    This is typically okay for the end user; since they're the one who
+    chose which HTTP client to use in the first place, they should know
+    whether they should expect a Future or a direct response when they make
+    an HTTP request, but it does add some burden on you as a module writer
+    because if you ever need to examine the response, you may need to write
+    code like this:
+
+        my $resp = $any_ua->get('http://www.perl.org/');
+    
+        if ($any_ua->response_is_future) {
+            $resp->on_done(sub {
+                my $real_resp = shift;
+                handle_response($real_resp);
+            });
+        }
+        else {
+            handle_response($resp);     # response is the real response already
+        }
+
+    This actually isn't too annoying to deal with in practice, but you can
+    avoid it if you like by forcing the response to always be a Future.
+    Just set the "response_is_future" attribute. Then you don't need to do
+    an if-else because the response will always be the same type:
+
+        $any_ua->response_is_future(1);
+    
+        my $resp = $any_ua->get('http://www.perl.org/');
+    
+        $resp->on_done(sub {            # response is always a Future
+            my $real_resp = shift;
+            handle_response($real_resp);
+        });
+
+    Note that this doesn't make a blocking HTTP client magically
+    non-blocking. The call to "request" will still block if the client is
+    blocking, and your "done" callback will simply be fired immediately.
+    But this does let you write the same code in your module and have it
+    work regardless of whether the underlying HTTP client is blocking or
+    non-blocking.
+
+    The default behavior is to return a direct hashref response if the HTTP
+    client is blocking and a Future if the client is non-blocking. It's up
+    to you to decide whether or not to set response_is_future, and you
+    should also consider whether you want to expose the possibility of
+    either type of response or always returning Future objects to the end
+    user of your module. It doesn't matter for users who choose
+    non-blocking HTTP clients because they will be using Future objects
+    either way, but users who know they are using a blocking HTTP client
+    may appreciate not having to deal with Future objects at all.
+
+FREQUENTLY ASKED QUESTIONS
+
+ How do I set up proxying, SSL, cookies, timeout, etc.?
+
+    HTTP::AnyUA provides a common interface for using HTTP clients, not for
+    instantiating or configuring them. Proxying, SSL, and other custom
+    settings can be configured directly through the underlying HTTP client;
+    see the documentation for your particular user agent to learn how to
+    configure these things.
+
+    AnyEvent::HTTP is a bit of a special case because there is no
+    instantiated object representing the client. For this particular user
+    agent, you can configure the backend to pass a default set of options
+    whenever it calls http_request. See "options" in
+    HTTP::AnyUA::Backend::AnyEvent::HTTP:
+
+        $any_ua->backend->options({recurse => 5, timeout => 15});
+
+    If you are a module writer, you should probably receive a user agent
+    from your end user and leave this type of configuration up to them.
+
+ Why use HTTP::AnyUA instead of some other HTTP client?
+
+    Maybe you shouldn't. If you're an end user writing a script or
+    application, you can just pick the HTTP client that suits you best and
+    use it. For example, if you're writing a Mojolicious app, you're not
+    going wrong by using Mojo::UserAgent; it's loaded with features and is
+    well-integrated with that particular environment.
+
+    As an end user, you could wrap the HTTP client you pick in an
+    HTTP::AnyUA object, but the only reason to do this is if you prefer
+    using the HTTP::Tiny interface.
+
+    The real benefit of HTTP::AnyUA (or something like it) is if module
+    writers use it to allow end users of their modules to be able to plug
+    in whatever HTTP client they want. For example, a module that
+    implements an API wrapper that has a hard dependency on LWP::UserAgent
+    or even HTTP::Tiny is essentially useless for non-blocking
+    applications. If the same hypothetical module had been written using
+    HTTP::AnyUA then it would be useful in any scenario.
+
+ Why use the HTTP::Tiny interface?
+
+    The HTTP::Tiny interface is simple but provides all the essential
+    functionality needed for a capable HTTP client and little more. That
+    makes it easy to provide an implementation for, and it also makes it
+    straightforward for module authors to use.
+
+    Marrying the HTTP::Tiny interface with Future gives us these benefits
+    for both blocking and non-blocking modules and applications.
+
+SPECIFICATION
+
+    This section specifies a standard set of data structures that can be
+    used to make a request and get a response from a user agent. This is
+    the specification HTTP::AnyUA uses for its programming interface. It is
+    heavily based on HTTP::Tiny's interface, and parts of this
+    specification were adapted or copied verbatim from that module's
+    documentation. The intent is for this specification to be written such
+    that HTTP::Tiny is already a compliant implementor of the specification
+    (at least as of the specification's publication date).
+
+ The Request
+
+    A request is a tuple of the form (Method, URL) or (Method, URL,
+    Options).
+
+  Method
+
+    Method MUST be a string representing the HTTP verb. This is commonly
+    "GET", "POST", "HEAD", "DELETE", etc.
+
+  URL
+
+    URL MUST be a string representing the remote resource to be acted upon.
+    The URL MUST have unsafe characters escaped and international domain
+    names encoded before being passed to the user agent. A user agent MUST
+    generated a "Host" header based on the URL in accordance with RFC 2616;
+    a user agent MAY throw an error if a "Host" header is given with the
+    "headers".
+
+  Options
+
+    Options, if present, MUST be a hash reference containing zero or more
+    of the following keys with appropriate values. A user agent MAY support
+    more options than are specified here.
+
+   headers
+
+    The value for the headers key MUST be a hash reference containing zero
+    or more HTTP header names (as keys) and header values. The value for a
+    header MUST be either a string containing the header value OR an array
+    reference where each item is a string. If the value for a header is an
+    array reference, the user agent MUST output the header multiple times
+    with each value in the array.
+
+    User agents MAY may add headers, but SHOULD NOT replace user-specified
+    headers unless otherwise documented.
+
+   content
+
+    The value for the content key MUST be a string OR a code reference. If
+    the value is a string, its contents will be included with the request
+    as the body. If the value is a code reference, the referenced code will
+    be called iteratively to produce the body of the request, and the code
+    MUST return an empty string or undef value to indicate the end of the
+    request body. If the value is a code reference, a user agent SHOULD use
+    chunked transfer encoding if it supports it, otherwise a user agent MAY
+    completely drain the code of content before sending the request.
+
+   data_callback
+
+    The value for the data_callback key MUST be a code reference that will
+    be called zero or more times, once for each "chunk" of response body
+    received. A user agent MAY send the entire response body in one call.
+    The referenced code MUST be given two arguments; the first is a string
+    containing a chunk of the response body, the second is an in-progress
+    response.
+
+ The Response
+
+    A response MUST be a hash reference containg some required keys and
+    values. A response MAY contain some optional keys and values.
+
+  success
+
+    A response MUST include a success key, the value of which is a boolean
+    indicating whether or not the request is to be considered a success
+    (true is a success). Unless otherwise documented, a successful result
+    means that the operation returned a 2XX status code.
+
+  url
+
+    A response MUST include a url key, the value of which is the URL that
+    provided the response. This is the URL used in the request unless there
+    were redirections, in which case it is the last URL queried in a
+    rediretion chain.
+
+  status
+
+    A response MUST include a status key, the value of which is the HTTP
+    status code of the response. If an internal exception occurs (e.g.
+    connection error), then the status code MUST be 599.
+
+  reason
+
+    A response MUST include a reason key, the value of which is the
+    response phrase returned by the server OR "Internal Exception" if an
+    internal exception occurred.
+
+  content
+
+    A response MAY include a content key, the value of which is the
+    response body returned by the server OR the text of the exception if an
+    internal exception occurred. This field MUST be missing or empty if the
+    server provided no response OR if the body was already provided via
+    "data_callback".
+
+  headers
+
+    A response SHOULD include a headers key, the value of which is a hash
+    reference containing zero or more HTTP header names (as keys) and
+    header values. Keys MUST be lowercased. The value for a header MUST be
+    either a string containing the header value OR an array reference where
+    each item is the value of one of the repeated headers.
+
+  redirects
+
+    A response MAY include a redirects key, the value of which is an array
+    reference of one or more responses from redirections that occurred to
+    fulfill the current request, in chronological order.
+
+ENVIRONMENT
+
+      * PERL_HTTP_ANYUA_DEBUG - If 1, print some info useful for debugging
+      to STDERR.
+
+CAVEATS
+
+    Not all HTTP clients implement the same features or in the same ways.
+    While the point of HTTP::AnyUA is to hide those differences, you may
+    notice some (hopefully) insignificant differences when plugging in
+    different clients. For example, LWP::UserAgent sets some headers on the
+    response such as client-date and client-peer that won't appear when
+    using other clients. Little differences like these probably aren't big
+    deal. Other differences may be a bigger deal, depending on what's
+    important to you. For example, some clients (like HTTP::Tiny) may do
+    chunked transfer encoding in situations where other clients won't
+    (probably because they don't support it). It's not a goal of this
+    project to eliminate all of the differences, but if you come across a
+    difference that is significant enough that you think you need to detect
+    the user agent and write special logic, I would like to learn about
+    your use case.
+
+SEE ALSO
+
+    These modules share similar goals or provide overlapping functionality:
+
+      * Future::HTTP
+
+      * HTTP::Any
+
+      * HTTP::Tinyish
+
+      * Plient
+
+BUGS
+
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/chazmcgarvey/HTTP-AnyUA/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+
+    Charles McGarvey <chazmcgarvey@brokenzipper.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Charles McGarvey.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

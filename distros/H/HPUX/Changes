@@ -1,0 +1,14 @@
+Revision history for Perl extension HPUX::LVM.
+
+0.01  Tue Nov 20 15:47:34 2001
+	- original version; created by h2xs 1.21 with options
+		-XA -n HPUX::LVM
+
+0.02	Repackaged
+
+0.03	Fixed multiple new calls
+	Commented out use warnings
+	Added Stipe Order method
+0.04	updated hp_disk_info.cgi with
+	updated postscript output
+	Added hp_disk_info_text.pl to contrib dir

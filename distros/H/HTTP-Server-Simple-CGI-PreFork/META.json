@@ -1,0 +1,48 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Rene Schickbauer <rene.schickbauer@magnapowertrain.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTTP-Server-Simple-CGI-PreFork",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Server::Simple" : "0.44",
+            "IO::Socket::INET6" : "0",
+            "Net::SSLeay" : "0",
+            "Net::Server" : "2",
+            "Net::Server::PreFork" : "0",
+            "Net::Server::Proto::SSLEAY" : "0",
+            "Net::Server::Single" : "0",
+            "Socket6" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : 6
+}

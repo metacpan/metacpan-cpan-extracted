@@ -1,0 +1,10 @@
+<form method="post">
+<table cellpadding="2">
+<tr><td>123<input name="emp_id" type="hidden" value="123" /></td></tr>
+<tr><td><input maxlength="255" name="emp_name" size="40" type="text" value="Fred Flintstone" /></td></tr>
+<tr><td><input maxlength="255" name="emp_title" size="40" type="text" value="CEO" /></td></tr>
+<tr><td align="center">
+<input id="submit" name="submit" type="submit" value="Submit" />
+</td></tr>
+</table>
+</form>

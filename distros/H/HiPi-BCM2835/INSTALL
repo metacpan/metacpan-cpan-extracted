@@ -1,0 +1,7 @@
+
+Get a packaged deb from http:/raspberry.znix.com
+
+or
+
+cpan -i HiPi::BCM2835
+

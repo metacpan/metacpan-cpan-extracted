@@ -1,0 +1,6 @@
+<?=def mydef( a, b, c ):?>
+<?=$a?> <?=$b?> <?=$c?>
+
+<?=enddef?>
+<?=call mydef( '1', '2', '3' )?>
+<?=call mydef( 'a', 'b', 'c' )?>

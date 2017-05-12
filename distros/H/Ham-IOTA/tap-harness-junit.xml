@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuites>
+  <testsuite name="t_00_critic_t" errors="0" failures="0" tests="0" time="0.000383853912353516">
+    <system-out>1..0 # SKIP Author test.  Set $ENV{TEST_AUTHOR} to a true value to run.
+</system-out>
+  </testsuite>
+  <testsuite name="t_10_ham_iota_t" errors="0" failures="0" tests="2" time="0.190117120742798">
+    <system-out>1..2
+ok 1 - use Ham::IOTA;
+ok 2 - deep parsed data
+</system-out>
+    <testcase name="use Ham::IOTA;" classname="t_10_ham_iota_t" time="0.169262886047363" />
+    <testcase name="deep parsed data" classname="t_10_ham_iota_t" time="0.0177509784698486" />
+  </testsuite>
+  <testsuite name="t_00_compile_pl_t" errors="0" failures="0" tests="1" time="0.234454870223999">
+    <system-out>1..1
+bin/iota-update syntax OK
+ok 1 - Compile test for bin/iota-update
+</system-out>
+    <testcase name="Compile test for bin/iota-update" classname="t_00_compile_pl_t" time="0.00863313674926758" />
+  </testsuite>
+  <testsuite name="t_00_distribution_t" errors="0" failures="0" tests="9" time="0.209455966949463">
+    <system-out>1..9
+ok 1 - Checking MANIFEST integrity
+ok 2 - use Ham::IOTA;
+ok 3 - Ham::IOTA defines a version
+ok 4 - POD test for blib/lib/Ham/IOTA.pm
+ok 5 - MANIFEST exists
+ok 6 - README exists
+ok 7 - Changes(.pod)? or ChangeLog(.pod)? exists
+ok 8 - Build.PL or Makefile.PL exists
+ok 9 - Pod Coverage ok
+</system-out>
+    <testcase name="Checking MANIFEST integrity" classname="t_00_distribution_t" time="0.0116438865661621" />
+    <testcase name="use Ham::IOTA; (2)" classname="t_00_distribution_t" time="0.136168956756592" />
+    <testcase name="Ham::IOTA defines a version (2)" classname="t_00_distribution_t" time="0.000202178955078125" />
+    <testcase name="POD test for blib/lib/Ham/IOTA.pm (2)" classname="t_00_distribution_t" time="0.0366199016571045" />
+    <testcase name="MANIFEST exists (2)" classname="t_00_distribution_t" time="0.000294923782348633" />
+    <testcase name="README exists (2)" classname="t_00_distribution_t" time="0.000146150588989258" />
+    <testcase name="Changes(.pod)? or ChangeLog(.pod)? exists (2)" classname="t_00_distribution_t" time="0.000144004821777344" />
+    <testcase name="Build.PL or Makefile.PL exists (2)" classname="t_00_distribution_t" time="0.0210938453674316" />
+    <testcase name="Pod Coverage ok (2)" classname="t_00_distribution_t" time="0.000432014465332031" />
+  </testsuite>
+  <testsuite name="t_00_podcoverage_t" errors="0" failures="0" tests="1" time="0.135797023773193">
+    <system-out>1..1
+ok 1 - Pod coverage on Ham::IOTA
+</system-out>
+    <testcase name="Pod coverage on Ham::IOTA (2)" classname="t_00_podcoverage_t" time="0.132548093795776" />
+  </testsuite>
+  <testsuite name="t_00_compile_pm_t" errors="0" failures="0" tests="1" time="0.159509181976318">
+    <system-out>1..1
+ok 1 - Compile test for blib/lib/Ham/IOTA.pm
+</system-out>
+    <testcase name="Compile test for blib/lib/Ham/IOTA.pm (2)" classname="t_00_compile_pm_t" time="0.15825080871582" />
+  </testsuite>
+  <testsuite name="t_00_pod_t" errors="0" failures="0" tests="2" time="0.000969886779785156">
+    <system-out>1..2
+ok 1 - POD test for blib/lib/Ham/IOTA.pm
+ok 2 - POD test for blib/script/iota-update (no pod)
+</system-out>
+    <testcase name="POD test for blib/lib/Ham/IOTA.pm (3)" classname="t_00_pod_t" time="0.000162839889526367" />
+    <testcase name="POD test for blib/script/iota-update (no pod) (3)" classname="t_00_pod_t" time="0.000341176986694336" />
+  </testsuite>
+</testsuites>

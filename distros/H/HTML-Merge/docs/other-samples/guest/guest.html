@@ -1,0 +1,403 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<$RSET.base='"http://www.raz.co.il"'>
+<link href="<$RVAR.base>/razinf/style.css" rel="stylesheet" type="text/css">
+<HEAD>
+	<TITLE><$RTEMPLATE></TITLE>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html;charset=windows-1255">
+<SCRIPT LANGUAGE="JavaScript" SRC="<$RVAR.base>/razinf/javascript/vfuncb.js"></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="<$RVAR.base>/razinf/javascript/vfuncstr.js"></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="<$RVAR.base>/razinf/javascript/razinfunc.js"></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="<$RVAR.base>/razinf/javascript/razglobal.js"></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="<$RVAR.base>/razinf/javascript/cookies.js"></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="<$RVAR.base>/razinf/javascript/object.js"></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="<$RVAR.base>/razinf/javascript/cleanstr.js"></SCRIPT>
+</HEAD>
+
+<BODY BACKGROUND="<$RVAR.base>/razinf/gif/frmback.gif" onLoad="Initialize()">
+
+<$RIF.'"<$RVAR.mod>" eq "UPDATE"'>
+<$RQ='SELECT * FROM guests WHERE rid=<$RVAR.rid>'>
+<$REND_IF>
+
+<SCRIPT LANGUAGE="JavaScript">
+<!--	
+// Globals ///////////////////////////////////////
+
+var step='<$RVAR.step>';	// holds the fetch size from the query
+
+//////////////////////////////////////////////////
+function Initialize()
+{
+	var browser_name = navigator.appName;
+	
+	if (browser_name == "Microsoft Internet Explorer") 
+	{
+		// populate the multi select in the combo
+		if(document.SubmitForm.mrktbl_code_multi.value)
+		{
+			PopulateCombo(document.SubmitForm.mrktbl_code,document.SubmitForm.mrktbl_code_multi.value,'ENGLISH')	
+		}				
+		if(document.SubmitForm.intrst_code_multi.value)
+		{
+			PopulateCombo(document.SubmitForm.intrst_code,document.SubmitForm.intrst_code_multi.value,'ENGLISH')	
+		}				
+	}
+	
+	if ('<$RVAR.mod>'=='UPDATE')
+	{
+		document.SubmitForm.mrktbl_code.selectedIndex=GetSelectedIndex(document.SubmitForm.mrktbl_code,'<$RSQL.mrktbl_code>');
+		document.SubmitForm.intrst_code.selectedIndex=GetSelectedIndex(document.SubmitForm.intrst_code,'<$RSQL.intrst_code>');
+	}
+	else if('<$RVAR.mod>'=='SEARCH')
+	{
+		document.SubmitForm.lname.value="<$RVAR.lname>";
+		document.SubmitForm.fname.value="<$RVAR.fname>";
+		document.SubmitForm.comment.value="<$RVAR.comment>";
+		document.SubmitForm.email.value="<$RVAR.email>";
+		document.SubmitForm.note.value="<$RVAR.note>";
+		document.SubmitForm.cityname.value="<$RVAR.cityname>";
+		document.SubmitForm.streetname.value="<$RVAR.streetname>";		
+		document.SubmitForm.housenum.value="<$RVAR.housenum>";		
+		document.SubmitForm.zipcode.value="<$RVAR.zipcode>";		
+		document.SubmitForm.phone1.value="<$RVAR.phone1>";		
+		document.SubmitForm.phone2.value="<$RVAR.phone2>";				
+		document.SubmitForm.mrktbl_code.selectedIndex="<$RVAR.mrktbl_selected_index>";
+		document.SubmitForm.intrst_code.selectedIndex="<$RVAR.intrst_selected_index>";
+	}
+	
+	document.SubmitForm.lname.focus();
+}
+//////////////////////////////////////////////////
+//the function validate the form
+function ChkSubmit()
+{
+	var selected_index=document.SubmitForm.mrktbl_code.selectedIndex;
+	var selected_index2=document.SubmitForm.intrst_code.selectedIndex;
+	var email = document.SubmitForm.email.value;
+	
+	if(document.SubmitForm.mrktbl_code.options[selected_index].text=='Multi Select')
+	{
+		alert('it`s not possible to use multi select option for UPDATE or INSERT');
+		document.SubmitForm.mrktbl_code.focus();
+		return false;
+	}
+	if(document.SubmitForm.intrst_code.options[selected_index2].text=='Multi Select')
+	{
+		alert('it`s not possible to use multi select option for UPDATE or INSERT');
+		document.SubmitForm.intrst_code.focus();
+		return false;
+	}
+	
+	if(document.SubmitForm.fname.value=='')
+	{
+		alert('First name must be filled!');
+		document.SubmitForm.fname.focus();
+		return false;
+	}
+	if(email!='' && !CheckEmail())
+	{
+		alert('The Email address is illegal');
+		document.SubmitForm.email.focus();
+		return false;
+	}
+	
+	return true;
+}
+//////////////////////////////////////////////////
+// change zero and null to 0.0 zero is like null when you pass through a form
+function InitFields()
+{
+	var selected_index=document.SubmitForm.mrktbl_code.selectedIndex;
+	var selected_index2=document.SubmitForm.intrst_code.selectedIndex;
+	var mrktbl_code = document.SubmitForm.mrktbl_code.value;			
+	var intrst_code = document.SubmitForm.intrst_code.value;			
+	var zipcode = document.SubmitForm.zipcode.value;	
+	var mrktbl_code_multi=document.SubmitForm.mrktbl_code_multi;
+	var intrst_code_multi=document.SubmitForm.intrst_code_multi;
+	var mrktbl_selected_index=document.SubmitForm.mrktbl_selected_index;
+	var intrst_selected_index=document.SubmitForm.intrst_selected_index;
+	
+	var d = new Date();
+	var month =  (d.getMonth() + 1);
+	var day = d.getDate();
+	var browser_name = navigator.appName;
+	var year;
+	
+	CleanPage();
+	
+	document.SubmitForm.fname.value = Trim(document.SubmitForm.fname.value);
+	document.SubmitForm.lname.value = Trim(document.SubmitForm.lname.value);
+	document.SubmitForm.comment.value = Trim(document.SubmitForm.comment.value);
+	document.SubmitForm.note.value = Trim(document.SubmitForm.note.value);
+	document.SubmitForm.phone1.value = Trim(document.SubmitForm.phone1.value);
+	document.SubmitForm.phone2.value = Trim(document.SubmitForm.phone2.value);	
+	document.SubmitForm.email.value = Trim(document.SubmitForm.email.value);		
+	document.SubmitForm.cityname.value = Trim(document.SubmitForm.cityname.value);		
+	document.SubmitForm.streetname.value = Trim(document.SubmitForm.streetname.value);		
+	document.SubmitForm.location_head.value = Trim(document.SubmitForm.location_head.value);		
+	document.SubmitForm.location_line.value = Trim(document.SubmitForm.location_line.value);		
+	document.SubmitForm.str.value = Trim(document.SubmitForm.str.value);		
+	document.SubmitForm.date.value = Trim(document.SubmitForm.date.value);
+	
+	if(mrktbl_code=='' || mrktbl_code==0){document.SubmitForm.mrktbl_code.value='0.0';}	
+	if(zipcode=='' || zipcode==0){document.SubmitForm.zipcode.value='0.0';}	
+		
+    if (browser_name == "Microsoft Internet Explorer") 
+	{
+		year = d.getYear();
+	}
+	else	
+	{
+		year = d.getYear()+1900;
+		//year = d.toString();
+		//year = year.substr((year.indexOf(')')+1));
+	}
+	
+	document.SubmitForm.date.value = year + "-" + month + "-" + day;
+	
+	document.SubmitForm.mrktbl_code_val.value = document.SubmitForm.mrktbl_code.options[selected_index].value;
+	document.SubmitForm.intrst_code_val.value = document.SubmitForm.intrst_code.options[selected_index2].value;
+	
+	document.SubmitForm.mrktbl_selected_index.value = selected_index;
+	document.SubmitForm.intrst_selected_index.value = selected_index2;
+	
+	if(document.SubmitForm.mrktbl_code.options[1].text=='Multi Select')
+		mrktbl_code_multi.value=document.SubmitForm.mrktbl_code.options[1].value;
+	
+	
+	if(document.SubmitForm.intrst_code.options[1].text=='Multi Select')
+		intrst_code_multi.value=document.SubmitForm.intrst_code.options[1].value;
+}
+//////////////////////////////////////////////////
+// validate field using specific picture
+function ValidateField(field)
+{
+	if(field=="mrktbl_code")
+	{
+		var mrktbl_code = document.SubmitForm.mrktbl_code.value;
+	
+		if(mrktbl_code && vnum('HEBREW',mrktbl_code,'NN',1,10)==-1)
+		{
+			document.SubmitForm.mrktbl_code.value='';
+			document.SubmitForm.mrktbl_code.focus();
+		}
+	}
+	if(field=="zipcode")
+	{
+		var zip = document.SubmitForm.zipcode.value;
+	
+		if(zip && vnum('HEBREW',zip,'NNNNN')==-1)
+		{
+			document.SubmitForm.zipcode.value='';
+			document.SubmitForm.zipcode.focus();
+		}
+	}
+}
+//////////////////////////////////////////////////
+//-->
+</SCRIPT>
+
+<form action="<$RMERGE>" method="GET" target="LINE" name="SubmitForm">
+<input type="Hidden" name="template" value="guest_line.html">
+<input type="Hidden" name="mod">
+<input type="Hidden" name="location_line">
+<input type="Hidden" name="location_head">
+<input type="Hidden" name="rid" value="<$RVAR.rid>">
+<input type="Hidden" name="step" value="<$RVAR.step>">
+<input type="Hidden" name="start" value="<$RVAR.start>">
+<input type="Hidden" name="end" value="<$RVAR.end>">
+<input type="Hidden" name="direction" value="<$RVAR.direction>">
+<input type="Hidden" name="order_direction" value="<$RVAR.order_direction>">
+<input type="Hidden" name="notes" value="<$RVAR.notes>">
+<input type="Hidden" name="date">
+<input type="Hidden" name="str">
+<input type="Hidden" name="sid" value="<$RVAR.sid>">
+<input type="Hidden" name="mrktbl_code_multi" value="<$RVAR.mrktbl_code_multi>">
+<input type="Hidden" name="intrst_code_multi" value="<$RVAR.intrst_code_multi>">
+<input type="Hidden" name="mrktbl_code_val">
+<input type="Hidden" name="intrst_code_val">
+<input type="Hidden" name="mrktbl_selected_index">
+<input type="Hidden" name="intrst_selected_index">
+
+<TABLE BORDER=0 WIDTH=760 ALIGN="LEFT" CELLSPACING=0 cellpadding="0">
+<tr>
+	<TD ALIGN="RIGHT" COLSPAN=6 HEIGHT=2 BACKGROUND="<$RVAR.base>/razinf/gif/sandstone.gif">
+<IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=1 HEIGHT=7 BORDER=0></TD>
+	<td><IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=1 HEIGHT=1 BORDER=0></td>
+</tr>
+<TR>
+<$RPERL.B>
+if('<$RVAR.mod>' eq 'UPDATE')
+{
+	print'<td width="150" ALIGN="LEFT" valign="BOTTOM" BACKGROUND="<$RVAR.base>/razinf/gif/sandstone.gif"><div class="H1Text"><$RVAR.name>&nbsp;Update</div></TD>';;
+}
+elsif('<$RVAR.mod>' eq 'SEARCH')
+{
+	print'<td width="150" ALIGN="LEFT" valign="BOTTOM" BACKGROUND="<$RVAR.base>/razinf/gif/sandstone.gif"><div class="H1Text"><$RVAR.name>&nbsp;Search</div></TD>';
+}
+else
+{
+	print'<td width="150" ALIGN="LEFT" valign="BOTTOM" BACKGROUND="<$RVAR.base>/razinf/gif/sandstone.gif"><div class="H1Text"><$RVAR.name>&nbsp;Add</div></TD>';
+}
+</$RPERL>
+<td colspan="5" align="RIGHT" BACKGROUND="<$RVAR.base>/razinf/gif/sandstone.gif">
+<IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=2 HEIGHT=2 BORDER=0>
+<A HREF="javascript:Exit()" title="Exit"><IMG SRC="<$RVAR.base>/razinf/gif/raz/logo_s.gif" BORDER=0 WIDTH=32 HEIGHT=37 HSPACE=0 VSPACE=0 alt="Exit"></A>
+<IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=5 HEIGHT=2 BORDER=0>
+<A HREF="javascript:SubmitFrm('UNDO','<$RVAR.rid>','<$RVAR.notes>')" title="Cancel"><IMG SRC="<$RVAR.base>/razinf/gif/cancel.gif" WIDTH=31 HEIGHT=31 BORDER=0 HSPACE=0 VSPACE=0 alt="Cancel"></A>
+<IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=5 HEIGHT=2 BORDER=0>
+<A HREF="javascript:SubmitFrm('INSERT','<$RVAR.rid>','<$RVAR.notes>')" title="Add"><IMG SRC="<$RVAR.base>/razinf/gif/new.gif" WIDTH=39 HEIGHT=16 BORDER=0 HSPACE=0 VSPACE=0 alt="Add record"></A>
+<IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=5 HEIGHT=2 BORDER=0>
+<A HREF="javascript:SubmitFrm('UPDATE','<$RVAR.rid>','<$RVAR.notes>')" title="Upadte"><IMG SRC="<$RVAR.base>/razinf/gif/update.gif" WIDTH=32 HEIGHT=32 BORDER=0 HSPACE=0 VSPACE=0 alt="Update record"></A>
+<IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=5 HEIGHT=2 BORDER=0>
+<A HREF="javascript:SubmitFrm('SEARCH','<$RVAR.rid>','<$RVAR.notes>')" title="Search"><IMG SRC="<$RVAR.base>/razinf/gif/search.gif" WIDTH=50 HEIGHT=37 BORDER=0 HSPACE=0 VSPACE=0 alt="Search"></A>
+<IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=5 HEIGHT=2 BORDER=0>
+<A HREF="javascript:Print()" title="Print"><IMG SRC="<$RVAR.base>/razinf/gif/print.gif" BORDER=0 HSPACE=0 VSPACE=0 alt="Print"></A>
+<IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=5 HEIGHT=2 BORDER=0>
+<A HREF="javascript:MoveRecords('b','<$RVAR.mod>','<$RVAR.notes>')" title="Back"><IMG SRC="<$RVAR.base>/razinf/gif/back.gif" WIDTH=31 HEIGHT=31 BORDER=0 HSPACE=0 VSPACE=0 alt="Back"></A>
+<IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=10 HEIGHT=2 BORDER=0>
+<A HREF="javascript:MoveRecords('f','<$RVAR.mod>','<$RVAR.notes>')" title="Forward"><IMG SRC="<$RVAR.base>/razinf/gif/forword.gif" WIDTH=31 HEIGHT=31 BORDER=0 HSPACE=0 VSPACE=0 alt="Forward"></A>
+<IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=12 HEIGHT=2 BORDER=0>
+<A HREF="javascript:Help('ENGLISH')" title="Help"><IMG SRC="<$RVAR.base>/razinf/gif/help.gif" WIDTH=24 HEIGHT=24 BORDER=0 HSPACE=0 VSPACE=0 alt="Help"></A>
+</td>
+<td bgcolor="black"><IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=1 HEIGHT=1 BORDER=0></td>
+</TR>
+<tr>
+<td ALIGN="LEFT" BACKGROUND="<$RVAR.base>/razinf/gif/sandstone.gif">&nbsp;<IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=1 HEIGHT=2 BORDER=0></TD>
+<td colspan="5" align="RIGHT" BACKGROUND="<$RVAR.base>/razinf/gif/sandstone.gif">
+<A HREF="javascript:Exit()" title="Exit"><IMG SRC="<$RVAR.base>/razinf/gif/eng-exit.gif" BORDER=0 alt="Exit"></A>
+<IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=1 HEIGHT=2 BORDER=0>
+<A HREF="javascript:SubmitFrm('UNDO','<$RVAR.rid>','<$RVAR.notes>')" title="Cancel"><IMG SRC="<$RVAR.base>/razinf/gif/eng-cancel.gif" BORDER=0 alt="Cancel"></A>
+<IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=5 HEIGHT=2 BORDER=0>
+<A HREF="javascript:SubmitFrm('INSERT','<$RVAR.rid>','<$RVAR.notes>')" title="Add"><IMG SRC="<$RVAR.base>/razinf/gif/eng-add.gif" BORDER=0 alt="Add record"></A>
+<IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=5 HEIGHT=2 BORDER=0>
+<A HREF="javascript:SubmitFrm('UPDATE','<$RVAR.rid>','<$RVAR.notes>')" title="Upadte"><IMG SRC="<$RVAR.base>/razinf/gif/eng-update.gif" BORDER=0 alt="Update record"></A>
+<IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=7 HEIGHT=2 BORDER=0>
+<A HREF="javascript:SubmitFrm('SEARCH','<$RVAR.rid>','<$RVAR.notes>')" title="Search"><IMG SRC="<$RVAR.base>/razinf/gif/eng-search.gif" BORDER="0" alt="Search"></A>
+<IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=7 HEIGHT=2 BORDER=0>
+<A HREF="javascript:Print()" title="Print"><IMG SRC="<$RVAR.base>/razinf/gif/eng-print.gif" BORDER=0 alt="Print"></A>
+<IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=12 HEIGHT=2 BORDER=0>
+<A HREF="javascript:MoveRecords('b','<$RVAR.mod>','<$RVAR.notes>')" title="Back"><IMG SRC="<$RVAR.base>/razinf/gif/eng-back.gif" BORDER=0 alt="Back"></A>
+<A HREF="javascript:MoveRecords('f','<$RVAR.mod>','<$RVAR.notes>')" title="Forward"><IMG SRC="<$RVAR.base>/razinf/gif/eng-forward.gif" BORDER=0 alt="Forward"></A>
+<A HREF="javascript:Help('ENGLISH')" title="Help"><IMG SRC="<$RVAR.base>/razinf/gif/eng-help.gif" border=0 alt="Help"></A>
+</td>
+<td bgcolor="black"><IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=1 HEIGHT=1 BORDER=0></td>
+<TR>
+	<TD ALIGN="RIGHT" COLSPAN=6 HEIGHT=2 BACKGROUND="<$RVAR.base>/razinf/gif/frmback.gif">
+<IMG SRC="<$RVAR.base>/razinf/gif/black.gif" WIDTH=748 HEIGHT=4 BORDER=0></TD>
+	<td bgcolor="black"><IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=1 HEIGHT=1 BORDER=0></td>
+</TD>
+</TR>
+<TR>
+	<TD ALIGN="LEFT" COLSPAN=7 HEIGHT=2><IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=3 HEIGHT=5 BORDER=0></TD>
+</TR>
+<TR>
+<td colspan="7" align="center" valign="BOTTOM"><div class="bText"><font color="#008200"><u>Guest Book - Merge Demo Application</font></u></div></TD>
+</tr>
+<TR>
+	<TD ALIGN="LEFT"><div class="sText">Last name</div></TD>
+	<td ALIGN="LEFT"><div class="sText"><input type="Text" name="lname" value="<$RSQL.lname>" size="20" maxlength="50" tabindex=1></div></TD>
+	<TD ALIGN="LEFT"><div class="sText"><div>First name</div></TD>
+	<td ALIGN="LEFT"><div class="sText"><input type="Text" name="fname" value="<$RSQL.fname>" size="10" maxlength="16"  tabindex=2></div></TD>
+	<td align="LEFT"><div class="sText"><div>Grade</div></td>
+	<td ALIGN="LEFT"><div class="sText">
+	<script type="text/javascript" language="JavaScript">
+	var browser_name = navigator.appName;
+	
+   	if (browser_name == "Microsoft Internet Explorer") 
+	{
+		document.writeln("<input type='button' name='B_mrktbl_code' value='...' tabindex='3' onClick=MultiSelect(document.SubmitForm.mrktbl_code,'ltr','grades','SubmitForm','<$RVAR.base>/razinf/javascript',200,250,'ENGLISH')>");
+    }           
+	</script>		
+	<$R[1].Q='SELECT code,number FROM tbl WHERE tbl="MRKTBL" and LANGUG_CODE='en' ORDER BY number'>
+		<select name="mrktbl_code" tabindex=3>
+		<option value="0.0"></option>
+		<$R[1].LOOP>
+			<option value="<$R[1].SQL.code>"><$RPIC.N(.0).'<$R[1].SQL.number>'></option>
+		<$R[1].END>
+	</select>
+	</div></TD>
+	<TD ALIGN="LEFT"><IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=1 HEIGHT=2 BORDER=0></TD>
+</TR>
+<TR>
+	<TD width="60" ALIGN="LEFT"><div class="sText" >Areas of interest</div></TD>
+	<td ALIGN="LEFT"><div class="sText" >
+	<script type="text/javascript" language="JavaScript">
+	var browser_name = navigator.appName;
+	
+   	if (browser_name == "Microsoft Internet Explorer") 
+	{
+		document.writeln("<input type='button' name='B_intrst_code' value='...' tabindex='3' onClick=MultiSelect(document.SubmitForm.intrst_code,'ltr','areas&nbsp;of&nbsp;interest','SubmitForm','<$RVAR.base>/razinf/javascript',200,250,'ENGLISH')>");
+    }           
+	</script>
+	<$R[1].Q='SELECT code,LEFT(name,14) name FROM tbl WHERE tbl="INTRST" and LANGUG_CODE='en' order by name'>
+		<select name="intrst_code" tabindex=3>
+		<option value="0.0"></option>
+			<$R[1].LOOP>
+				<option value="<$R[1].SQL.code>"><$R[1].SQL.name></option>
+			<$R[1].END>
+		</select>
+	</div></TD>
+	<TD ALIGN="LEFT"><div class="sText" >Comments</div></TD>
+	<td ALIGN="LEFT"><div class="sText" ><input type="Text" name="comment" value="<$RSQL.comment>" size="20" maxlength="50" tabindex=4></div></TD>
+	<TD ALIGN="LEFT"><IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=3 HEIGHT=2 BORDER=0></TD>
+	<TD ALIGN="LEFT"><IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=3 HEIGHT=2 BORDER=0></TD>
+	<TD ALIGN="LEFT"><IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=1 HEIGHT=2 BORDER=0></TD>
+</TR>
+<TR>
+	<TD ALIGN="LEFT"><IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=1 HEIGHT=2 BORDER=0></TD>
+	<TD ALIGN="LEFT"><IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=1 HEIGHT=2 BORDER=0></TD>
+	<TD ALIGN="LEFT"><IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=1 HEIGHT=5 BORDER=0></TD>
+	<TD ALIGN="LEFT"><IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=1 HEIGHT=5 BORDER=0></TD>
+	<TD ALIGN="LEFT"><IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=1 HEIGHT=5 BORDER=0></TD>
+	<TD ALIGN="LEFT"><IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=1 HEIGHT=5 BORDER=0></TD>
+	<TD ALIGN="LEFT"><IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=1 HEIGHT=5 BORDER=0></TD>
+</tr>
+<TR>
+	<td ALIGN="LEFT" colspan=4><div class="sText"><big><u><b><font color="brown">Contact details - for your eyes only</font></u></b></big></div></td>
+	<TD ALIGN="LEFT"><IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=3 HEIGHT=5 BORDER=0></TD>
+	<TD ALIGN="LEFT"><IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=3 HEIGHT=5 BORDER=0></TD>
+	<TD ALIGN="LEFT"><IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=3 HEIGHT=2 BORDER=0></TD>
+</TR>
+<TR>
+	<td ALIGN="LEFT"><div class="sText">City</div></td>
+	<td ALIGN="LEFT">
+		<div class="sText">
+		<input type="hidden" name="cityid" value="" size="10" maxlength="10">
+		<input type="Text" name="cityname"  value="<$RSQL.cityname>" size="20" maxlength="25" tabindex=5>
+		</div>
+	</td>
+	<td ALIGN="LEFT"><div class="sText">Street</div></td>
+	<td ALIGN="LEFT">
+		<div class="sText">
+		<input type="hidden" name="streetid" value="" size="10" maxlength="10">
+		<input type="text" name="streetname"   value="<$RSQL.streetname>" size="9" maxlength="25" tabindex=6>
+		Num
+		<input type="text" name="housenum"  value="<$RSQL.housenum>" size="4" maxlength="6" tabindex=7>
+		</div>
+	</td>		
+	<TD ALIGN="LEFT"><div class="sText" >Zipcode</div></TD>
+	<td ALIGN="LEFT"><div class="sText"><input type="Text" name="zipcode" value="<$RSQL.zipcode>" size="10" maxlength="16" tabindex=8 onBlur="ValidateField('zipcode')"></div></TD>
+	<TD ALIGN="LEFT"><IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=1 HEIGHT=2 BORDER=0></TD>
+</TR>
+<TR>
+	<TD ALIGN="LEFT"><div class="sText" >E-mail</div></TD>
+	<td ALIGN="LEFT"><div class="sText" ><input type="Text" name="email" value="<$RSQL.email>" size="23" maxlength="50" tabindex=9></div></TD>
+	<TD ALIGN="LEFT"><div class="sText" >Phone</div></TD>
+	<td ALIGN="LEFT"><div class="sText"><input type="Text" name="phone1" value="<$RSQL.phone1>" size="12" maxlength="16" tabindex=10></div></TD>
+	<TD ALIGN="LEFT"><div class="sText" >Cellular</div></TD>
+	<td ALIGN="LEFT"><div class="sText"><input type="Text" name="phone2" value="<$RSQL.phone2>" size="10" maxlength="16" tabindex=11></div></TD>
+	<TD ALIGN="LEFT"><IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=1 HEIGHT=2 BORDER=0></TD>	
+</TR>
+<TR>
+	<TD width="75" ALIGN="LEFT"><div class="sText" >Purpose of contact</div></TD>
+	<td ALIGN="LEFT" colspan=3><div class="sText" ><input type="Text" name="note" value="<$RSQL.note>" size="40" maxlength="50" tabindex=12></div></TD>	
+	<TD ALIGN="LEFT"><IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=3 HEIGHT=2 BORDER=0></TD>
+	<TD ALIGN="LEFT"><IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=3 HEIGHT=2 BORDER=0></TD>
+	<TD ALIGN="LEFT"><IMG SRC="<$RVAR.base>/razinf/gif/space.gif" WIDTH=1 HEIGHT=2 BORDER=0></TD>
+</TR>
+</TABLE>
+</FORM>
+</BODY>
+</HTML>

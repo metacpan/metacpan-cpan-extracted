@@ -1,0 +1,13 @@
+perl t/example/test002/testioselect.pl 1
+perl t/example/test002/testioselect.pl 2
+perl t/example/test002/testioselect.pl 3
+
+wait
+
+perl t/example/test002/testioselect.pl 4
+perl t/example/test002/testioselect.pl 5
+perl t/example/test002/testioselect.pl 6
+perl t/example/test002/testioselect.pl 7
+perl t/example/test002/testioselect.pl 8
+perl t/example/test002/testioselect.pl 9
+perl t/example/test002/testioselect.pl 10

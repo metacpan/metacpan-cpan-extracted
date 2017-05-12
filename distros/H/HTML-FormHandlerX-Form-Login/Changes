@@ -1,0 +1,41 @@
+Revision history for HTML-FormHandlerX-Form-Login
+
+0.17    26 May 2012 - fixed tests for openid and using single password
+
+0.16    26 May 2012 - allow login with just a single password field
+
+0.15    15 May 2012 - castaway patch to support openid
+
+0.14    23 April 2012 - register
+
+0.13    reduce minlength for password, not our place to impose anything.
+        added todo list
+        
+0.12    removed own validation of email, type => Email does that anyway
+
+0.11    2012-03-21
+        change password label when changing or resetting password
+ 
+0.10    reverted back without the role and got the submit value changing on active
+
+0.09    use the simple render role to change the submit button value upon rendering
+
+0.08    auto-change the submit button value depending on usage
+
+0.07    fix munge_params
+
+0.06    removing my svn foolders
+
+0.05    2012-03-21
+        Removing next::method to ensure tests work
+ 
+0.04    Fixing version
+ 
+0.03    Tiny POD changes.
+
+0.02    2012-03-20
+        Expanded docs, included next::method in _munge_params, thanks gshank.
+
+0.01    2012-03-20
+        First version, released.
+

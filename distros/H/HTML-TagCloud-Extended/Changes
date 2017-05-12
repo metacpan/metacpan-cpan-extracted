@@ -1,0 +1,40 @@
+Revision history for Perl extension HTML::TagCloud::Extended.
+
+0.10  Sun Dec 4 22:00:00 2005
+    - added 'size_suffix' parameter.
+      Tanks to Masahiro Nagano.
+
+0.09  Man Oct  3 01:00:00 2005
+    - fixed documentation
+
+0.08  San Oct  2 21:00:00 2005
+    - change to be able to set 'hot' by both 'name' and 'size'
+
+0.07  San Oct  2 21:00:00 2005
+    - Now this module can handle 'hot' tags.
+
+0.06  Mon Aug 29 23:00:00 2005
+    - add some test
+
+0.05  Sun Aug 28 23:00:00 2005
+    - refactored
+      and now, this module doesn't depend on HTML::TagCloud
+
+    - fixed and add some features
+      to use multiple tag-cloud in a single process of html-publishing.
+      required by Yasuhiro Horiuchi
+
+0.04  Sat Aug 27 03:00:00 2005
+    - fixed bug: error caused when html() method is called with no tag.
+          reported by Yasuhiro Horiuchi
+
+0.03  Sun Jul 24 16:14:00 2005
+    - fixed Makefile.PL add Class::Data::Inheritable to prerequired modules list
+
+0.02  Sun Jul 17 12:36:06 2005
+    - bugfix
+
+0.01  Fri Jul 15 12:36:06 2005
+    - original version; created by h2xs 1.23 with options
+        -X -A HTML::TagCloud::Extended
+

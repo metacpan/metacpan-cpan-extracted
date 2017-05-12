@@ -1,0 +1,18 @@
+<wmmeta name="ltitle">Portable Document Format (PDF)</wmmeta>
+<wmmeta name="stitle">PDF</wmmeta>
+<wmmeta name="author">J&ouml;rn Clausen</wmmeta>
+<wmmeta name="cdate">2001-04-23</wmmeta>
+<wmmeta name="mdate">2001-04-23</wmmeta>
+
+    <ul>
+      <li>
+	<a href="http://partners.adobe.com/asn/developer/technotes/acrobatpdf.html">Acrobat/PDF Technical Notes</a>
+      </li>
+      <li>
+	<a href="file:/vol/lehre/Dokumentenverarbeitung/docs/PDFRef.pdf">PDF
+	  Reference, second edition (lokale Kopie)</a>
+      </li>
+      <li>
+	<a href="http://www.pdflib.com/">PDFlib home page</a>
+      </li>
+    </ul>

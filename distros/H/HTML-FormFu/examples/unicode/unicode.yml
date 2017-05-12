@@ -1,0 +1,14 @@
+---
+name: unicode
+
+'Controller::HTML::FormFu':
+  constructor:
+    tt_args:
+      ENCODING: UTF-8
+
+'View::TT':
+  ENCODING: UTF-8
+
+'View::TT::Alloy':
+  TEMPLATE_EXTENSION: '.tt'
+  ENCODING: UTF-8

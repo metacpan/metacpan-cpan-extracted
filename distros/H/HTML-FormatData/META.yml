@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         HTML-FormatData
+version:      0.10
+version_from: lib/HTML/FormatData.pm
+installdirs:  site
+requires:
+    Carp:                          0
+    DateTime:                      0.22
+    DateTime::Format::Strptime:    1.0601
+    HTML::Entities:                1.27
+    HTML::Parser:                  3.35
+    URI::Escape:                   3.22
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

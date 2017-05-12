@@ -1,0 +1,64 @@
+NAME
+    HTTP::Request::Params - Retrieve GET/POST Parameters from HTTP Requests
+
+SYNOPSIS
+      use HTTP::Request::Params;
+  
+      my $http_request = read_request();
+      my $parse_params = HTTP::Request::Params->new({
+                           req => $http_request,
+                         });
+      my $params       = $parse_params->params;
+
+DESCRIPTION
+    This software does all the dirty work of parsing HTTP Requests to find
+    incoming query parameters.
+
+  new
+      my $parser = HTTP::Request::Params->new({
+                      req => $http_request,
+                   });
+
+    "req" - This required argument is either an "HTTP::Request" object or a
+    string containing an entire HTTP Request.
+
+    Incoming query parameters come from two places. The first place is the
+    "query" portion of the URL. Second is the content portion of an HTTP
+    request as is the case when parsing a POST request, for example.
+
+  params
+      my $params = $parser->params;
+
+    Returns a hash reference containing all the parameters. The keys in this
+    hash are the names of the parameters. Values are the values associated
+    with those parameters in the incoming query. For parameters with
+    multiple values, the value in this hash will be a list reference. This
+    is the same behaviour as the "CGI" module's "Vars()" function.
+
+  req
+      my $req_object = $parser->req;
+
+    Returns the "HTTP::Request" object.
+
+  mime
+      my $mime_object = $parser->mime;
+
+    Returns the "Email::MIME" object.
+
+    Now, you may be wondering why we're dealing with an "Email::MIME"
+    object. The answer is simple. It's an amazing parser for MIME compliant
+    messages, and RFC 822 compliant messages. When parsing incoming POST
+    data, especially file uploads, "Email::MIME" is the perfect fit. It's
+    fast and light.
+
+SEE ALSO
+    "HTTP::Daemon", HTTP::Request, Email::MIME, CGI, perl.
+
+AUTHOR
+    Casey West, <casey@geeknest.com>.
+
+COPYRIGHT
+      Copyright (c) 2005 Casey West.  All rights reserved.
+      This module is free software; you can redistribute it and/or modify it
+      under the same terms as Perl itself.
+

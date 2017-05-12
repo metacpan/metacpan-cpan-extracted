@@ -1,0 +1,10 @@
+Revision history for Perl extension HTML::Template::Compiled::Plugin::LineBreak.
+
+0.02  Mon Mar 10 21:03:57 2008
+	- fixed a bug #33945
+	  Reported by STEFFENW
+
+0.01  Thu Jul 12 23:03:57 2007
+	- original version; created by h2xs 1.23 with options
+		-A -X -n HTML::Template::Compiled::Plugin::LineBreak
+

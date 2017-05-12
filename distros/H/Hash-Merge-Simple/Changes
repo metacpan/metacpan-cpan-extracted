@@ -1,0 +1,27 @@
+TODO:
+    - merge => _merge
+    - merge( clone => ...
+    - merge( dclone / deep_clone / storable_clone  => ...
+    - merge( [] ) # Transform even-element array into a hash
+    - merge( [], [], ... ) # Merge even-element arrays (at the top level only)
+
+0.051 Tuesday December 07 12:21:04 PST 2010:
+    - Duh, require Exporter. Thanks, EVERYBODY/KENTNL
+
+0.050 Thursday May 13 11:24:29 PDT 2010:
+    - Conversion to Dist::Zilla (Dzpl), losing auto_install
+
+0.04 Saturday February 21 23:22:34 PST 2009:
+    - Addressed bug 41738: https://rt.cpan.org/Ticket/Display.html?id=41738 (thanks Uri) 
+    - Updated boilerplate and Makefile.PL
+    - Conversion of repository to git (github)
+
+0.03 Sunday May 04 02:39:59 PDT 2008:
+    - Tweak acknowledgements
+    - Reference Hash::Merge in SEE ALSO
+
+0.02 Wednesday April 23 14:34:59 PDT 2008:
+    - Minor documentation tweak
+
+0.01 Monday April 21 22:12:45 PDT 2008:
+    - Initial release

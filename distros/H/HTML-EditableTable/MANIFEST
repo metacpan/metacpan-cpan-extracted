@@ -1,0 +1,21 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/HTML/EditableTable.pm
+lib/HTML/EditableTable/Horizontal.pm
+lib/HTML/EditableTable/Vertical.pm
+lib/HTML/EditableTable/Javascript.pm
+t/00-load.t
+t/pod.t
+t/table_html.t
+example/example_1.cgi
+example/example_2.cgi
+example/example_3.cgi
+example/example_4.cgi
+example/example_5.cgi
+example/example_6.cgi
+example/example_7.cgi
+example/example_8.cgi
+example/example_9.cgi
+META.yml                                 Module meta-data (added by MakeMaker)

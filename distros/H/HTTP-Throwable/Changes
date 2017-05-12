@@ -1,0 +1,94 @@
+Revision history for Perl extension HTTP::Throwable
+
+0.026     2016-01-07 23:03:30-05:00 America/New_York
+        - fix documentation (abstract) on 429 / TooManyRequests
+
+0.025     2016-01-02 17:51:15-05:00 America/New_York
+        - add support for 429 (thanks, Chris Prather)
+        - add roles_for_status_code to Factory (thanks, Chris Prather)
+        - make it possible for factory to throw by status code, rather than
+          short ident string
+
+0.024     2015-08-10 08:47:31-04:00 America/New_York
+        - update Package::Variant requirement based on CPAN testers reports
+
+0.023     2015-08-08 09:08:51-04:00 America/New_York
+        - fix one last bit of Moose that snuck through
+
+0.022     2015-08-02 21:50:02-04:00 America/New_York
+        - non-trial release of v0.021; now uses Moo instead of Moose
+
+0.021     2015-07-11 18:45:56-04:00 America/New_York (TRIAL RELEASE)
+        - experimentally replace Moose with Moo (thanks, Fitz Elliot, Graham
+          Knop, and others)
+
+0.020     2015-07-01 09:44:49-04:00 America/New_York
+        - a 304 does not require a Location header!
+
+0.019     2014-09-25 22:33:49-04:00 America/New_York
+        - added a role for response 308, from RFC 7238
+
+0.018     2013-11-19 19:54:21 America/New_York
+        - removed use of deprecated enum syntax
+
+0.017     2013-09-17 09:04:45 Asia/Tokyo
+        - removed use of deprecated Class::MOP::load_class
+
+0.016     2011-06-17 20:39:10 America/New_York
+        - fix a test regex to work with DOS-style paths
+
+0.015     2011-06-16 12:03:01 America/New_York
+        - require Moose 1.23 to avoid bugs both various and sundry
+
+0.014     2011-04-30 07:41:49 America/New_York
+        - remove the use of // from a test, restoring perl 5.8 compatibility
+
+0.013     2011-04-25 10:52:47 America/New_York
+        - MooseX::StrictConstructor has changed API; track it
+
+0.011
+        - fix Dist::Zilla configuration so that we get per-package $VERSION
+          vars
+
+0.010
+         [NOT BACKWARD COMPATIBLE]
+        - significantly rewritten by rjbs, in terms of roles rather than
+          subclasses - re-read the documentation!
+        - HTTP::Throwable::Factory is now the piece intended most for end users
+        - should be significantly easier to both use and extend
+
+0.005 Sat. Feb. 12, 2011
+        - add proper support for RFC 2324 (thanks rjbs)
+        - allowing more than one Proxy-Authenticate header
+          (thanks to chansen for pointing this out, though he
+          could have mentioned it before I released 0.004 :P)
+
+0.004 Sat. Feb. 12, 2011
+        - allowing more than one WWW-Authenticate header
+          (thanks to chansen for pointing this out)
+
+0.003 Fri. Feb. 11, 2011
+        - introspection for status code via is_redirect, is_client_error and
+          is_server_error (Brian Cassidy)
+
+0.002 Tues. Feb. 8, 2011
+        - normalize *_location attributes to all be
+          called location, since that is the name of the
+          header
+        - any time we allow additional headers to be
+          passed in, the attribute is now called
+          additional_headers instead of whatever it was
+          before (usually cache_headers)
+        - change the valid_methods attribute in
+          HTTP::Throwable::MethodNotAllowed to be just
+          allow (which is what the header is)
+            - improved the type check on this as well
+        - make the exceptions also function as PSGI apps
+            - add to_app method
+            - support &{} overload
+            - added tests for this
+        - overload stringification
+            - added tests for this
+
+0.001 Tues. Feb. 8, 2011
+        - first release

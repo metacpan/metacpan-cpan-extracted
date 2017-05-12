@@ -1,0 +1,20 @@
+---
+name: HTML-Prototype-Useful
+version: 0.05
+author: []
+abstract: Some useful additions for the Prototype library.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  HTML::Prototype: 1.45
+provides:
+  HTML::Prototype::Useful:
+    file: lib/HTML/Prototype/Useful.pm
+    version: 0.05
+  HTML::Prototype::Useful::Js:
+    file: lib/HTML/Prototype/Useful/Js.pm
+generated_by: Module::Build version 0.2801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

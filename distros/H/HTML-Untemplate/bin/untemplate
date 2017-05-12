@@ -1,0 +1,322 @@
+#!/usr/bin/env perl
+# ABSTRACT: analyze several HTML documents based on the same template
+# PODNAME: untemplate
+use 5.010;
+use strict;
+use utf8::all;
+use warnings qw(all);
+
+use Carp qw(croak);
+use File::Basename;
+use File::Temp;
+use Getopt::Long;
+use HTML::Linear;
+use IO::Interactive qw(is_interactive);
+use Class::Load qw(try_load_class);
+use Pod::Usage;
+use Term::ANSIColor qw(:constants);
+use Tie::IxHash;
+
+## no critic (ProhibitDeepNests, ProhibitPackageVars)
+
+our $VERSION = '0.019'; # VERSION
+
+
+GetOptions(
+    q(help)         => \my $help,
+    q(color!)       => \my $color,
+    q(16)           => \my $sixteen,
+    q(html!)        => \my $html,
+    q(encoding=s)   => \my $encoding,
+    q(partial!)     => \my $partial,
+    q(shrink!)      => \my $shrink,
+    q(strict!)      => \my $strict,
+    q(unmangle=s)   => \my @unmangle,
+) or pod2usage(q(-verbose) => 1);
+pod2usage(q(-verbose) => 1)
+    if $help or $#ARGV < 1;
+
+$color //= is_interactive(*STDOUT);
+
+if ($html) {
+    (%HTML::Linear::Path::xpath_wrap) = (%{$HTML::Linear::Path::Colors::scheme{html}});
+    $color = 0;
+    print $HTML::Linear::Path::Colors::html[0];
+} elsif ($color) {
+    (%HTML::Linear::Path::xpath_wrap) = (%{$HTML::Linear::Path::Colors::scheme{($sixteen // 0) ? q(terminal) : q(terminal256)}});
+    $html = 0;
+}
+
+try_load_class('YADA')
+    and fetch_documents();
+
+tie my %elem, 'Tie::IxHash';
+parse_files(\%elem);
+
+tie my %xpath, 'Tie::IxHash';
+build_xpath(\%elem, \%xpath);
+
+for my $xpath (keys %xpath) {
+    dump_diffs($xpath, \%xpath);
+}
+
+print $HTML::Linear::Path::Colors::html[1]
+    if $html;
+
+sub fetch_documents {
+    my (@local, @remote);
+    for (@ARGV) {
+        if (m{^https?://}x) {
+            push @remote, $_;
+        } else {
+            push @local, $_;
+        }
+    }
+    return unless @remote;
+
+    ## no critic (RequireLocalizedPunctuationVars)
+    @ARGV = @local;
+
+    my $q = YADA->new;
+    for (@remote) {
+        my $tmp = File::Temp->new(
+            SUFFIX      => '.html',
+            TEMPLATE    => 'doc-XXXX',
+            TMPDIR      => 1,
+        );
+        $q->append(sub {
+            YADA::Worker->new({
+                initial_url => $_,
+                on_init     => sub {
+                    $_[0]->setopt(writedata => $tmp);
+                },
+                on_finish   => sub {
+                    $tmp->flush;
+                    push @ARGV, $tmp unless $_[0]->has_error;
+                },
+            })
+        });
+    }
+    $q->wait;
+    return;
+}
+
+sub parse_files {
+    my ($elem) = @_;
+    for my $file (@ARGV) {
+        my $hl = HTML::Linear->new;
+
+        $hl->set_shrink
+            if $shrink // 1;
+
+        $hl->set_strict
+            if $strict // 0;
+
+        open(my $fh, '<:' . ($encoding ? "encoding($encoding)" : 'utf8' ), $file)
+            or croak "Can't open $file: $!";
+        $hl->parse_file($fh);
+        close $fh;
+
+        push @{$elem->{$_}}, [ $_ => basename($file) ]
+            for $hl->as_list;
+    }
+    return;
+}
+
+sub build_xpath {
+    my ($elem, $xpath) = @_;
+    while (my ($key, $list) = each %$elem) {
+        for (@{$list}) {
+            my ($el, $file) = @{$_};
+
+            if (@unmangle) {
+                for my $path (@{$el->path}) {
+                    for my $attr (keys %{$path->attributes}) {
+                        ## no critic (ProtectPrivateSubs)
+                        next unless HTML::Linear::Path::_isgroup($el->path->[-1], $attr);
+                        for my $unmangle (@unmangle) {
+                            $path->attributes->{$attr} =~ s/$unmangle//x;
+                        }
+                    }
+                }
+            }
+
+            my $hash = $el->as_hash;
+            ++$xpath->{$_}->{$hash->{$_}}{$file}
+                for keys %{$hash};
+        }
+    }
+    return;
+}
+
+sub dump_diffs {
+    my ($xpath, $xpath_ref) = @_;
+
+    my %file;
+    my $m = 0;
+    my $n = 0;
+    for my $p (keys %{$xpath_ref->{$xpath}}) {
+        for my $q (keys %{$xpath_ref->{$xpath}->{$p}}) {
+            push @{$file{$q}}, $p;
+            ++$m;
+        }
+        ++$n;
+    }
+
+    my $flag = 0;
+    $flag = 1
+        if $n == $m / scalar @ARGV;
+    $flag = 1
+        if
+            not ($partial // 0)
+            and scalar keys %file != scalar @ARGV;
+    return if $flag;
+
+    if (1 < scalar keys %file) {
+        if ($html) {
+            say '<tr><td colspan="2">' . HTML::Linear::Path::Colors::wrap_xpath($xpath) . '</td></tr>';
+        } else {
+            say $xpath;
+        }
+
+        for my $file (sort keys %file) {
+            for (@{$file{$file}}) {
+                if ($html) {
+                    say '<tr><td><span class="doc">' . $file . '</span></td><td>'
+                        . HTML::Linear::Path::Colors::wrap_content($_, 1)
+                        . '</td></tr>';
+                } else {
+                    if ($color) {
+                        print GREEN . $file . RESET;
+                        $_ = HTML::Linear::Path::Colors::wrap_content($_);
+                    } else {
+                        print $file;
+                    }
+                    say "\t${_}";
+                }
+            }
+        }
+
+        if ($html) {
+            say '<tr><td colspan="2" class="spacer"></td></tr>';
+        } else {
+            say '';
+        }
+    }
+
+    return;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+untemplate - analyze several HTML documents based on the same template
+
+=head1 VERSION
+
+version 0.019
+
+=head1 SYNOPSIS
+
+    untemplate [options] HTML1 HTML2 [HTML3] [...]
+
+=head1 DESCRIPTION
+
+Takes multiple HTML documents generated using the same template and attempts to extract only the data inserted into original template.
+
+Accepts URL if L<AnyEvent::Net::Curl::Queued> is present.
+
+=head1 OPTIONS
+
+=over 4
+
+=item --help
+
+This.
+
+=item --encoding=name
+
+Specify the HTML document encoding (C<latin1>, C<utf8>).
+UTF-8 is assumed by default.
+
+=item --[no]color
+
+Enable syntax highlight for XPath.
+By default, enabled automatically on interactive terminals.
+
+=item --16
+
+Use 16 system colors.
+By default, try to use 256-color ANSI palette.
+
+=item --[no]html
+
+Disables the C<--color> option and highlights using HTML/CSS.
+
+=item --[no]partial
+
+Enable the display of "partial" templates, that is, nodes present in B<some> documents.
+By default, only the nodes present in B<all> documents are displayed.
+
+=item --[no]shrink
+
+Shrink the XPath to the minimal unique identifier.
+For example:
+
+    /html/body[@id='cpansearch']/form[@class='searchbox']/input[@name='query']
+
+Could be shortened as:
+
+    //input[@name='query']
+
+The shrinking is enabled by default.
+
+=item --[no]strict
+
+Strict mode disables grouping by C<id>, C<class> or C<name> attributes.
+The grouping is enabled by default.
+
+=item --unmangle=regex
+
+Specify regex(es) to unmangle C<id>/C<class> attributes.
+Some CMS (WordPress) insert unique identifiers into HTML elements, like:
+
+    <body class="post-id-12345">
+
+This tend to break HTML tree analysis.
+To fix the above case, use C<--unmangle 'post-id-\d+'>.
+Multiple unmanglers are accepted (C<--unmangle a --unmangle b>).
+
+=back
+
+=head1 EXAMPLES
+
+    untemplate --color http://bash.org/?1839 http://bash.org/?2486 | less -R
+
+=head1 CAVEATS
+
+Trying to I<untemplate> HTML documents B<not> based on the same template, the results will be empty.
+
+Unfortunately, employing any kind of document identifier as part of element class/id
+(common practice in L<WordPress|http://wordpress.org/> themes)
+is enough to constitute "not same template".
+
+See the C<--unmangle> option for a work-around.
+
+=head1 AUTHOR
+
+Stanislaw Pusep <stas@sysd.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Stanislaw Pusep.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

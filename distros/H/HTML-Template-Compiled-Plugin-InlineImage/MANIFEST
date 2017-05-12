@@ -1,0 +1,15 @@
+Changes
+Makefile.PL
+Build.PL
+MANIFEST
+README
+t/01_HTML-Template-Compiled-Plugin-InlineImage.t
+t/02_pod.t
+t/03_pod_cover.t
+lib/HTML/Template/Compiled/Plugin/InlineImage.pm
+examples/gd.pl
+examples/gd.html
+examples/raw.pl
+examples/raw.html
+examples/punk_smiley.gif
+META.yml                                 Module meta-data (added by MakeMaker)

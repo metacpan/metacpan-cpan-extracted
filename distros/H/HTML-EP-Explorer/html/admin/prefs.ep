@@ -1,0 +1,182 @@
+<ep-package name=HTML::EP::Explorer accept-language="de,en">
+<ep-explorer-config maysafe=1>
+<ep-if cnd="'$_ep_language$' eq 'de'">
+  <ep-set var="Title" val="EP-Explorer: Systemeinstellungen">
+  <ep-set var="Ok" val="Einstellungen speichern">
+  <ep-set var="Yes" val="Ja">
+  <ep-set var="No" val="Nein">
+<ep-else>
+  <ep-set var="Title" val="EP-Explorer: System Preferences">
+  <ep-set var="Ok" val="Save these settings">
+  <ep-set var="Yes" val="Yes">
+  <ep-set var="No" val="No">
+</ep-if>
+<html><head><title>$Title$</title></head>
+<body bgcolor=#ffffff>
+<h1>$Title$</h1>
+<p>
+  <ep-language language="de">
+    Auf dieser Seite können Sie die Systemeinstellungen des
+    <a href="http://www.ispsoft.de/products/ep/explorer/">EP-Explorer</a>
+    festlegen.
+  <ep-language language="en">
+    This page allows you to customize the system settings of the
+    <a href="http://www.ispsoft.de/products/ep/explorer/">EP-Explorer</a>.
+  </ep-language>
+</p>
+<div align=center>
+<p>
+  <form action="prefs.ep" method=POST>
+  <table>
+    <tr><th><ep-language de="E-Mail-Adresse des Administrators:" en="Admins e-mail address:">
+        </th>
+        <td><input name="explorer_config_email"
+		   value="$config->email$" size=50>
+        </td>
+    </tr>
+    <tr><th><ep-language de="Aktionen:" en="Actions:"></th>
+        <td>
+	  <table>
+            <tr><th valign=top>Name</th>
+                <th valign=top>Icon<br><font size=-1>(Optional)</font></th>
+                <th>Skript<br><font size=-1>($file = Filename,<br>
+                  $user = User)</font></th>
+		<th><ep-language de="Status-Skript" en="Status script"><br>
+		    <font size=-1>($user = User)</font></th>
+		<th>Logfile</th>
+		<th>Variablen</th>
+	    </tr>
+            <ep-list items=actions item=a>
+              <tr><td><input name=explorer_action_name value="$a->name$"
+                             size=20></td>
+                  <td><input name=explorer_action_icon value="$a->icon$"
+                             size=15></td>
+                  <td><input name=explorer_action_script value="$a->script$"
+                             size=25></td>
+		  <td><input name=explorer_action_status value="$a->status$"
+			     size=25></td>
+		  <td><input name=explorer_action_logfile value="$a->logfile$"
+			     size=20></td>
+		  <td><textarea name=explorer_action_vars>$a->vars$</textarea></td>
+	      </tr>
+            </ep-list>
+              <tr><td><input name=explorer_action_name size=20></td>
+                  <td><input name=explorer_action_icon size=15></td>
+                  <td><input name=explorer_action_script size=25></td>
+		  <td><input name=explorer_action_status size=25></td>
+		  <td><input name=explorer_action_logfile size=20></td>
+		  <td><textarea name=explorer_action_vars></textarea></td>
+          </table>
+        </td>
+    <tr><th><ep-language de="Status-Aktionen:" en="Status actions:"></th>
+        <td>
+	  <table>
+	    <tr><th valign=top>Name</th>
+		<th valign=top>Icon<br><font size=-1>(Optional)</font></th>
+		<th>Skript<br>
+		    <font size=-1>
+		      <ep-language language="de">
+			($job = Jobnummer, $user = User,
+			andere Variablen nach Liste aus Aktionen)
+		      <ep-language language="en">
+			($job = Job number, $user = User,
+			other variables as in list of actions)
+		      </ep-language>
+		    </font>
+		</th>
+	    </tr>
+	  <ep-list items=status_actions item=sa>
+	    <tr><td><input name=explorer_status_action_name
+	                   value="$sa->name$"></td>
+	        <td><input name=explorer_status_action_icon
+                           value="$sa->icon$"></td>
+	        <td><input name=explorer_status_action_script
+                           value="$sa->script$"></td>
+	    </tr>
+	  </ep-list>
+	    <tr><td><input name=explorer_status_action_name></td>
+	        <td><input name=explorer_status_action_icon></td>
+	        <td><input name=explorer_status_action_script></td>
+	    </tr>
+	  </table>
+        </td>
+    </tr>
+    <tr><th><ep-language de="Status-Cache:" en="Status cache:"><br>
+	    <font size=-1>
+	      <ep-language de="(Sekunden, nach denen ein Reload erfolgt)"
+			   en="(Seconds to wait for a reload)"><br>
+	      <ep-language de="(Caching unterbinden mit 0)"
+			   en="(0 to disable)"><br>
+
+	    </font>
+	</th>
+        <td>
+	  <input size=5 name=explorer_config_cache value=$config->cache$>
+	</td>
+    </tr>
+    <tr><th><ep-language de="Startverzeichnisse:" en="Initial directories:">
+	</th>
+	<td>
+	  <table>
+	    <tr><th valign=top><ep-language de="Name" en="Name"></th>
+		<th valign=top><ep-language de="Verzeichnis"
+				en="Directory"></th>
+	    <ep-list items=directories item=d>
+	      <tr><td><input size=20 name=explorer_directory_name
+			value="$d->name$"></td>
+		  <td><input size=40 name=explorer_directory_dir
+			value="$d->dir$"></td></tr>
+	    </ep-list>
+	    <tr><td><input size=20 name=explorer_directory_name></td>
+		<td><input size=40 name=explorer_directory_dir></td>
+	    </tr>
+	  </table>
+	</td></tr>
+<ep-if eval="$num_directories$">
+    <tr><th><ep-language de="Zugriff auf andere Verzeichnisse erlaubt:"
+			 en="Allow access to other directories:"></th>
+	<td><select name=explorer_config_dirs_restricted>
+	      <option value=0>$Yes$
+	      <option value=1 $&SELECTED->config->dirs_restricted$>$No$
+	    </select></td>
+    </tr>
+</ep-if>
+    <tr><th><ep-language de="Dateitypen:" en="File types:"></th>
+        <td>
+	  <table>
+	    <tr><td valign=top><b>Name</b></td>
+                <td valign=top><b>Icon</b><br><font size=-1>(Optional)</font></td>
+                <td><b><ep-language de="Regulärer Ausdruck"
+	                            en="Regular Expression"></b><br>
+	            <font size=-1>(z.B. \.(jpg|jpeg)$ für *.jpg|*.jpeg)</font>
+                </td>
+            <ep-list items=filetypes item=ft>
+              <tr><td><input name=explorer_filetype_name value="$ft->name$"
+                             size=20></td>
+                  <td><input name=explorer_filetype_icon value="$ft->icon$"
+                             size=15></td>
+                  <td><input name=explorer_filetype_re value="$ft->re$"
+                             size=25></td>
+            </ep-list>
+              <tr><td><input name=explorer_filetype_name size=20></td>
+                  <td><input name=explorer_filetype_icon size=15></td>
+                  <td><input name=explorer_filetype_re size=25></td>
+          </table>
+        </td>
+    <tr><th><ep-language de="&Uuml;berschrift der Hauptseite:"
+                         en="Header of the main page:"></th>
+        <td><input name="explorer_config_header_main"
+		   value="$config->header_main$" size=50></td>
+    </tr>
+    <tr><th><ep-language de="&Uuml;berschrift der Dateienseite:"
+                         en="Header of the files page:">
+        </th>
+        <td><input name="explorer_config_header_files"
+		   value="$config->header_files$" size=50></td>
+    </tr>
+  </table>
+  <input type=submit name="save" value="$Ok$">
+  </form>
+</p>
+</div>
+</body></html>

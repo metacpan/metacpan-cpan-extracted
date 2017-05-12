@@ -1,0 +1,10 @@
+Revision history for HTTP-Tiny-SPDY
+
+0.020     2014-05-03
+          Updated to work with the recent version of HTTP::Tiny.
+
+0.013     2013-10-14
+          Version bump due to fixed release process.
+
+0.012     2013-10-14
+          First version, released on an unsuspecting world.

@@ -1,0 +1,51 @@
+{
+   "abstract" : "generate a summary from a web page",
+   "author" : [
+      "Ave Wrigley <awrigley@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "HTML-Summary",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Jcode" : "0",
+            "constant" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTML::TreeBuilder" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/HTML-Summary",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/HTML-Summary.git",
+         "web" : "https://github.com/neilb/HTML-Summary"
+      }
+   },
+   "version" : "0.022"
+}
+

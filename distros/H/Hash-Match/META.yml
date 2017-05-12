@@ -1,0 +1,35 @@
+---
+abstract: 'match contents of a hash against rules'
+author:
+  - 'Robert Rothenberg, C<< <rrwo at cpan.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Exception: 0
+  Test::More: 0.98
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Hash-Match
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Carp: 0
+  List::MoreUtils: 0.07
+  namespace::autoclean: 0
+  perl: 5.01
+  version: 0.77
+resources:
+  bugtracker: https://github.com/robrwo/Hash-Match/issues
+  homepage: http://rrwo.tumblr.com
+  license: http://www.perlfoundation.org/artistic_license_2_0
+  repository: git://github.com/robrwo/Hash-Match.git
+version: 0.005003

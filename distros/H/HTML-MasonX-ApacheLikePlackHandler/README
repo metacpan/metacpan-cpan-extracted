@@ -1,0 +1,229 @@
+NAME
+    HTML::MasonX::ApacheLikePlackHandler - An evil mod_perl-like Mason
+    handler under Plack
+
+SYNOPSIS
+        # Configure HTML::MasonX::ApacheLikePlackHandler to use
+        # our mock classes instead of Apache2::$WHATEVER.
+        #
+        # This is horribly ugly but allows us to diverge less
+        # in HTML::MasonX::ApacheLikePlackHandler from the
+        # upstream HTML::Mason::ApacheHandler.
+        local $ENV{HTML_MASONX_APACHELIKEPLACKHANDLER_MOCK_APACHE2_REQUEST_CLASS}          = 'Your::ApacheLikePlackHandler::Compat::Apache2::Request';
+        local $ENV{HTML_MASONX_APACHELIKEPLACKHANDLER_MOCK_APACHE2_REQUEST_INSTANCE_CLASS} = 'Your::Mock::Apache2::Request';
+        local $ENV{HTML_MASONX_APACHELIKEPLACKHANDLER_MOCK_APACHE2_SERVERUTIL_CLASS}       = 'Your::ApacheLikePlackHandler::Compat::Apache2::ServerUtil';
+        local $ENV{HTML_MASONX_APACHELIKEPLACKHANDLER_MOCK_APACHE2_STATUS_CLASS}           = 'Your::ApacheLikePlackHandler::Compat::Apache2::Status';
+        require HTML::MasonX::ApacheLikePlackHandler;
+
+DESCRIPTION
+    This is a forked HTML::Mason::ApacheHandler suitable for running under
+    Plack with a mock Apache 2 request object that you have to provide
+    yourself.
+
+    This is not a module intended to write new Mason applications under
+    Plack, you probably want something like HTML::Mason::PlackHandler for
+    that, or better yet if you're writing something new use Mason 2.0, or
+    don't use Mason at all.
+
+    There's many possible ways to transition a HTML::Mason application
+    running under Apache 2 and mod_perl to a Plack stack running outside of
+    Apache, but the one I went for for the Booking.com codebase was to:
+
+    *   Provide a fake Apache Request object
+
+        This is an object similar to Plack::App::FakeApache::Request (but
+        ours is more complete and not open source yet) which basically wraps
+        Plack::Request and Plack::Response and provides an API that mocks
+        the Apache $r object
+
+    *   Run existing code written for Apache/mod_perl on Plack
+
+        Using the fake Apache Request object above, for easy reverts back &
+        forth between running the application on Apache2/mod_perl and
+        nginx/uWSGI/Plack without having to change all the application logic
+        to use the Plack API instead of the Apache API.
+
+    When I started trying to convert our Mason apps to
+    HTML::Mason::PlackHandler I found various incompatibilities and
+    differences in behavior in that module compared to
+    HTML::Mason::ApacheHandler. At least one of these has since been patched
+    by GBARR
+    <https://github.com/gbarr/HTML-Mason-PlackHandler/commit/3801966121c7318
+    00b72f07bb11471143171ab2e> but I wasn't looking forward to finding more.
+
+    Rather than having to debug these I just created this module, which is
+    just a copy of HTML::Mason::ApacheHandler. By using something
+    bug-compatible with HTML::Mason::ApacheHandler I didn't have to worry
+    that bugs that were cropping up during the transition were due to
+    migrating from this ~1000 line class to Graham Barr entirely different
+    HTML::Mason::PlackHandler.
+
+    This module has the following changes from HTML::Mason::ApacheHandler:
+
+    *   Changed the $VERSION number to the version of this distro
+
+    *   "s/HTML::Mason::ApacheHandler/HTML::MasonX::ApacheLikePlackHandler/g
+        "
+
+    *   "s/HTML::Mason::Request::ApacheHandler/HTML::MasonX::Request::Apache
+        LikePlackHandler/g"
+
+    *   Removed code that wasn't run when APACHE2 was false.
+
+        I was already running on Apache 1 anyway, and didn't want to bother
+        with the Apache 1 parts of this API. So away it goes!
+
+    *   Removed loading of mod_perl libraries
+
+    But most importantly: Instead of requiring various Apache2::* modules we
+    require that you define
+    "HTML_MASONX_APACHELIKEPLACKHANDLER_MOCK_APACHE2_{REQUEST,REQUEST_INSTAN
+    CE,STATUS,SERVERUTIL}_CLASS" in %ENV before requiring this module.
+
+    Those %ENV entries should be the name of already loaded Perl packages
+    implement an API emulating the Apache2 API this package needs. The
+    "APACHE2_REQUEST_INSTANCE" variable is a special case though, it's the
+    package your request object (implementing the Apache2 API) will be
+    blessed into.
+
+    This makes for a rather convoluted API, but the goal was to modify the
+    upstream code as little as possible, both to avoid accidentally
+    introducing bugs, and to make it easier to incorporate future upstream
+    patches.
+
+EXAMPLE
+    Here's an example of the source of packages you could as the
+    "HTML_MASONX_APACHELIKEPLACKHANDLER_MOCK_*" variables. These are just
+    bare-minimal implementations of the Apache API that
+    HTML::MasonX::ApacheLikePlackHandler expects uses.
+
+  Fake APR::Table class
+        # http://perl.apache.org/docs/2.0/api/APR/Table.html
+        package Your::MasonCompat::APR::Like::Table;
+        use strict;
+        use warnings;
+
+        sub new {
+            my ($class, $table) = @_;
+
+            # XXX: This is very naive, in reality an APR::Table maybe
+            # can't be represented as a hash (multiple values for the same
+            # key?). Or at least we need magic to implement a similar
+            # Tie-interface.
+            bless $table => $class;
+        }
+
+        sub get {
+            my ($self, $key) = @_;
+
+            die "PANIC: Someone's trying to get a key ($key) that we don't have" unless exists $self->{$key};
+
+            if (ref $self->{$key} eq 'ARRAY') {
+                # Our dumb emulation for PerlAddVar without supporting all
+                # of APR::Table.
+                return @{$self->{$key}};
+            } else {
+                return $self->{$key};
+            }
+        }
+
+  HTML_MASONX_APACHELIKEPLACKHANDLER_MOCK_APACHE2_REQUEST_CLASS
+    You're going to have to use Plack::App::FakeApache::Request, or pester
+    me to generalize and open source the version I'm using. See the
+    description section.
+
+  HTML_MASONX_APACHELIKEPLACKHANDLER_MOCK_APACHE2_REQUEST_CLASS
+        package Your::ApacheLikePlackHandler::Compat::Apache2::Request;
+        use strict;
+        use warnings;
+        use Scalar::Util qw(blessed);
+
+        # NEEDED because of HTML::MasonX::ApacheLikePlackHandler code that
+        # does $this_pkg->VERSION. We should never need to change this.
+        our $VERSION = 1.2345;
+
+        # This is only used for:
+        #
+        #    sub { Apache2::Request->new( $_[0] ) };
+        #
+        # So just return the original object. The reason for this being
+        # called at all is because the mod_perl 1 API would do something
+        # different
+        sub new {
+            my ($class, $blessed_request_object) = @_;
+
+            die "PANIC: We should only get an already blessed object as an argument"
+                unless blessed($blessed_request_object);
+
+            return $blessed_request_object;
+        }
+
+        # We do nothing except the above in this class from
+        # HTML::MasonX::ApacheLikePlackHandler as of writing this.
+
+  HTML_MASONX_APACHELIKEPLACKHANDLER_MOCK_APACHE2_SERVERUTIL_CLASS
+        package Your::ApacheLikePlackHandler::Compat::Apache2::ServerUtil;
+        use strict;
+        use warnings;
+        use Your::WebServerConfiguration qw(
+            PLACK_WEBSERVER_CONFIGURATION_VARIABLES
+        );
+
+        sub server {
+            my $class = shift;
+
+            die "PANIC: We should have no extra arguments to server()" if @_;
+
+            return bless {
+                # So it's obvious where this came from if it turns up somewhere else
+                THIS_IS_A_MOCK_CLASS_FOR_ONE_DIR_CONFIG_CALL => 1337
+            } => $class;
+        }
+
+        sub dir_config {
+            my $self = shift;
+
+            should_have_no_extra_arguments(\@_);
+
+            my %PLACK_WEBSERVER_CONFIGURATION_VARIABLES = PLACK_WEBSERVER_CONFIGURATION_VARIABLES;
+            return Your::MasonCompat::APR::Like::Table->new({
+                # Used by HTML::MasonX::ApacheLikePlackHandler::_startup()
+                # which only requests the MasonArgsMethod.
+                MasonArgsMethod => $PLACK_WEBSERVER_CONFIGURATION_VARIABLES{MasonArgsMethod},
+            });
+        }
+
+        sub server_root {
+            # DO we even support this? Probably not.
+            die "PANIC: We don't support the server_root() function";
+        }
+
+        # We do nothing except the above in this class from
+        # HTML::MasonX::ApacheLikePlackHandler as of writing this.
+
+  HTML_MASONX_APACHELIKEPLACKHANDLER_MOCK_APACHE2_STATUS_CLASS
+        package Your::ApacheLikePlackHandler::Compat::Apache2::Status;
+        use strict;
+        use warnings;
+
+        # This package is to mock Apache2::Status which provides a
+        # /perl-status.
+        #
+        # We don't want this, so we just provide a dummy menu_item method
+        # here.
+        #
+        # We *DON'T* set the version because that's what
+        # HTML::MasonX::ApacheLikePlackHandler checks to see if it should
+        # set it up properly later on. Don't do that.
+
+        sub menu_item { return }
+
+        # We do nothing except the above in this class from
+        # HTML::MasonX::ApacheLikePlackHandler as of writing this.
+
+AUTHOR
+    Ævar Arnfjörð Bjarmason <avar@cpan.org> is responsible for
+    "HTML::MasonX::ApacheLikePlackHandler", but as described above it's
+    almost exactly the same as derived from HTML::Mason::ApacheHandler.
+    Refer to that package for the original authorship & copyright.
+

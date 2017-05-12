@@ -1,0 +1,10 @@
+<table>
+<tr><th>Txn</th><th>Description</th><th>Debit</th><th>Credit</th></tr>
+<tfoot align="right" id="tfoot">
+<tr><td></td><td class="total">Total</td><td id="total_debit">5000</td><td id="total_credit">110.12</td></tr>
+</tfoot>
+<tbody>
+<tr><td>1</td><td>Wages</td><td>5000</td><td></td></tr>
+<tr><td>2</td><td>Groceries</td><td></td><td>110.12</td></tr>
+</tbody>
+</table>

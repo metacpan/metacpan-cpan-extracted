@@ -1,0 +1,51 @@
+$Id: Component_Heirarchy.txt,v 1.10 1998/04/16 16:21:11 sfarrell Exp $
+
+This is the inheretence heirarchy for classes in the tablelayout
+manager.  Widgets can generally be derived from anything from
+Component down.  The bracketed stuff is new methods introduced, the
+curly-braced stuff is instance data.  The stuff with *'s you'll
+probably need to override (this is not a hard & fast rule--you may not
+need to, and you many need to override others.)
+
+The deal with the "tl" prefix is that it appears iff the method (a) IS
+part of the baseclass (b) it is NOT external.  The idea is that if we
+can avoid obvious name collisions this is a good thing, as long as we
+don't make an obfuscated external interface (which is a bad thing).
+
+                        TL_BASE  [ _isa(), new()*, tl_getParameters(),
+                           |       delete(), setParams(),
+                           |       tl_inheritParamsFrom(), 
+                           |       tl_getLocalParameters() ] 
+                           |     { "TL_PARAMS", "TL_PARAMS_ISA" }
+                           |
+                           |
+                           |
+                        Component [ tl_setContext(), tl_getContainer(),
+                           |        tl_getWindow(), tl_getForm(), 
+                           |        tl_setup()*, tl_print()*
+                           |        tl_breakAfter() ]
+                           |      { "TL_CONTAINER", "TL_WINDOW", "TL_FORM" }
+                           |
+                           |
+               +-----------+-------------------------+
+               |                                     |
+               |                                     |
+       ComponentContainer                            |
+   [ insert()*, insertLn()* ]                        |
+   { "TL_COMPONENTS" }                               |
+               |                                     |
+               |                                     |
+               |                                     | 
+      +--------+-------+                         FormComponent 
+      |                |                     [ tl_getName(), tl_setName(),
+      |                |                       tl_getValue(), tl_setValue(),
+      |                |                       tl_setDefaultValue() ]
+ComponentTable      ComponentCell            { "TL_PARAMS"->"name",
+                                               "TL_PARAMS"->"value" }
+                                              (overrides tl_create())
+                                                     |
+                                                     |
+                                              FormComponentMulti 
+                                             { "TL_DEFAULT_VALUE"
+                                               "TL_OPS" }
+                                             (overrides tl_setDefaultValue())

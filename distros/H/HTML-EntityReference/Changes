@@ -1,0 +1,10 @@
+Revision history for HTML-EntityReference
+
+0.011
+        Improve test situation
+		Fix carp-correctness tests to work on Windows.
+		Rename include files to avoid .pl/.PL confusion on a case-sensitive system
+
+0.010    14 May 2011
+        First version, released on an unsuspecting world.
+

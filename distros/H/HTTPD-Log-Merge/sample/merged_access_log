@@ -1,0 +1,30 @@
+192.168.1.20 - - [14/Jun/2001:00:07:59 +0100] "HEAD /images/spacer.gif HTTP/1.0" 304 - "http://itn.co.uk/news/20010613/world/01israel.shtml" "Mozilla/4.0 (compatible; MSIE 5.01; Windows NT 5.0)" "cookie_id=Apache=132.233.247.6.7234992473668633" 132.233.247.6
+192.168.1.20 - - [14/Jun/2001:00:07:59 +0100] "HEAD /Adverts/ITN/120x60/daljitandrew.gif HTTP/1.0" 304 - "-" "Mozilla/4.75 [en] (Win98; U)" "cookie_id=Apache=192.168.1.21.22532992473134745" 142.28.182.57
+192.168.1.20 - - [14/Jun/2001:00:07:59 +0100] "GET /election/pics/taylor_richard_sm.jpg HTTP/1.0" 304 - "-" "Mozilla/3.0 (Liberate DTV 1.1)" "cookie_id=-" 194.6.2.152
+192.168.1.21 - - [14/Jun/2001:00:07:59 +0100] "HEAD /Adverts/ITN/120x60/daljit.gif HTTP/1.0" 304 - "-" "Mozilla/4.76 [en] (WinNT; U)" "cookie_id=-" 32.97.136.237
+192.168.1.21 - - [14/Jun/2001:00:07:59 +0100] "HEAD /Adverts/ITN/31x60/Live_micro.GIF HTTP/1.0" 304 - "-" "Mozilla/4.77 (Macintosh; U; PPC)" "cookie_id=Apache=24.151.24.31.9285992442176392" 24.151.24.31
+192.168.1.21 - - [14/Jun/2001:00:07:59 +0100] "HEAD /Adverts/ITN/31x60/Live_micro.GIF HTTP/1.0" 304 - "-" "Mozilla/4.61 [en] (X11; U; HP-UX B.10.20 9000/712)" "cookie_id=RMID=8b55164a3905b340; Apache=139.85.59.17.1036992460503940" 139.85.59.17
+192.168.1.20 - - [14/Jun/2001:00:07:59 +0100] "HEAD /Adverts/ITN/Race-to-No10_banner_v02.GIF HTTP/1.0" 304 - "-" "Mozilla/4.76 [en] (WinNT; U)" "cookie_id=-" 32.97.136.237
+192.168.1.20 - - [14/Jun/2001:00:07:59 +0100] "HEAD /Adverts/ITN/31x60/Live_micro.GIF HTTP/1.0" 304 - "-" "Mozilla/4.76 [en] (X11; U; AIX 4.3)" "cookie_id=RMID=c68516443a9d2ce0; Apache=192.168.1.20.25138992462681213" 198.133.22.89
+192.168.1.20 - - [14/Jun/2001:00:07:59 +0100] "GET /news/20010613/pics/pitchfootball_sm.jpg HTTP/1.0" 304 - "-" "Mozilla/3.0 (Liberate DTV 1.1)" "cookie_id=-" 194.6.2.152
+192.168.1.20 - - [14/Jun/2001:00:07:59 +0100] "GET /css/story2.css HTTP/1.0" 304 - "-" "Mozilla/4.61 (Macintosh; I; PPC)" "cookie_id=Apache=165.121.73.168.22573992473649920" 165.121.73.168
+205.188.209.139 - - [14/Jun/2001:00:08:01 +0100] "GET / HTTP/1.0" 200 1960
+192.168.1.20 - - [14/Jun/2001:00:08:02 +0100] "GET /nav.htm HTTP/1.0" 200 3783
+192.168.1.20 - - [14/Jun/2001:00:08:02 +0100] "GET /tonight.htm HTTP/1.0" 200 7834
+192.168.1.21 - - [14/Jun/2001:00:08:04 +0100] "HEAD /graphics/c4n_logo_new.gif HTTP/1.0" 200 0
+192.168.1.20 - - [14/Jun/2001:00:08:05 +0100] "HEAD /graphics/prog_weds.gif HTTP/1.0" 200 0
+192.168.1.21 - - [14/Jun/2001:00:08:05 +0100] "HEAD /graphics/prog_tues.gif HTTP/1.0" 200 0
+192.168.1.20 - - [14/Jun/2001:00:08:06 +0100] "HEAD /graphics/prog_mon.gif HTTP/1.0" 200 0
+192.168.1.20 - - [14/Jun/2001:00:08:06 +0100] "HEAD /graphics/prog_fri.gif HTTP/1.0" 200 0
+192.168.1.21 - - [14/Jun/2001:00:08:07 +0100] "HEAD /graphics/special.gif HTTP/1.0" 200 0
+192.168.1.21 - - [14/Jun/2001:00:08:08 +0100] "HEAD /graphics/contact2.gif HTTP/1.0" 200 0
+62.255.32.4 - - [14/Jun/2001:00:08:23 +0100] "GET / HTTP/1.1" 200 38716
+192.168.1.22 - - [14/Jun/2001:00:08:31 +0100] "GET /adcode.js HTTP/1.1" 304 -
+207.188.29.248 - - [14/Jun/2001:00:08:41 +0100] "GET /lbc.ram HTTP/1.0" 200 57
+192.168.1.22 - - [14/Jun/2001:00:08:50 +0100] "GET /graphics/lbc_logo.gif HTTP/1.1" 304 -
+192.168.1.22 - - [14/Jun/2001:00:08:53 +0100] "GET /graphics/headers/index_hd_lg.gif HTTP/1.1" 304 -
+192.168.1.21 - - [14/Jun/2001:00:08:54 +0100] "GET /adcode.js HTTP/1.0" 304 -
+165.247.231.11 - - [14/Jun/2001:00:08:54 +0100] "GET / HTTP/1.0" 200 38716
+207.188.29.248 - - [14/Jun/2001:00:08:55 +0100] "GET /lbc.ram HTTP/1.0" 200 57
+192.168.1.22 - - [14/Jun/2001:00:08:58 +0100] "GET /graphics/lbc_logo.gif HTTP/1.0" 200 1329
+192.168.1.22 - - [14/Jun/2001:00:08:58 +0100] "GET /graphics/headers/index_hd_lg.gif HTTP/1.0" 200 1573

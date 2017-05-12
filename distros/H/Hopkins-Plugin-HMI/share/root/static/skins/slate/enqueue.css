@@ -1,0 +1,47 @@
+form#enqueue th,
+form#enqueue td
+{
+	border: none;
+	background: none;
+}
+
+form#enqueue th
+{
+	width:	150px;
+}
+
+textarea#options
+{
+	width:	100%;
+	height:	300px;
+}
+
+form#enqueue select#task
+{
+	width:	300px;
+}
+
+#container_dialog .ft .button-group { text-align: center }
+#container_dialog .bd form { clear: left }
+#container_date { border: none; clear: both }
+#container_time { margin: auto; text-align: center; clear: both }
+#container_time select option { padding-right:10px; }
+
+/* Prevent border-collapse:collapse from bleeding through in IE6, IE7 */
+#container_dialog_c.yui-overlay-hidden table { *display:none; }
+
+#priority-slider-bg
+{
+	background: url(/static/yui/build/slider/assets/bg-fader.gif) 5px 0 no-repeat;
+	width:		170px;
+	position:	relative;
+	left:		-7px;
+	float:		left;
+}
+
+#priority-text
+{
+	padding-top:	4px;
+	margin-left:	5px;
+	float:			left;
+}

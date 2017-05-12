@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/HTML-TreeBuilder-XPath.t
+lib/HTML/TreeBuilder/XPath.pm
+t/pod.t
+t/pod_coverage.t
+t/test_following.t
+t/test_preceding.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

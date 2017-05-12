@@ -1,0 +1,47 @@
+<html>
+
+<head>
+<title>Embperl Tests - Include literal text</title>
+</head>
+
+<body>
+
+
+Start
+<html>
+
+<head>
+<title>Embperl Tests - Mixed Embperl and SSI syntax</title>
+</head>
+
+<body>
+
+<!-- Normal Comment -->
+
+<!--#set var="EPSSITEST" value="1 + foo + bar" -->
+
+EPSSITEST 1 SSI: <!--#echo  var="EPSSITEST" -->
+
+
+EPSSITEST 1 EP:  [+ $ENV{EPSSITEST} +]
+
+[- @X = ('a', 'b', 'c') ; -]
+
+<table>
+    <tr>
+        <td>Embperl</td><td>[+ $ENV{X} = $X[$row] +]</td> 
+        <td>SSI</td>    <td><!--#echo  var="X" --></td> 
+    </tr>
+</table>
+
+Embperl inside  SSI: <!--#echo  var="[+ 'EP' . 'SSI' . 'TEST' +]" -->
+
+</body>
+</html>
+
+
+End
+</body>
+</html>
+
+

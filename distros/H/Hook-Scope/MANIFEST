@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+Scope.pm
+Scope.xs
+t/1.t
+t/2_leak.t
+t/3-pre.t

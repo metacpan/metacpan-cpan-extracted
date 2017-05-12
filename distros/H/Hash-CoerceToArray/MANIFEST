@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Hash-CoerceToArray.t
+lib/Hash/CoerceToArray.pm

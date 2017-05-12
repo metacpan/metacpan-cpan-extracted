@@ -1,0 +1,52 @@
+# Demian Riccardi, May 21, 2014
+#
+# YAML configuration file for virtual screen:
+# 
+#   perl broadcast.pl this.yaml 
+# 
+# will generate a configuration yaml in 'scratch' and broadcast a call on ligands_dock.pl 
+# for each json file contained in 'data' to the PBS queueing system. Docking output will 
+# be written to a json file in 'scratch'.  'scratch' and 'data' can point to the same path,
+# and often they will be. I recommend keeping a pristine starting set of jsons for spawning
+# "new beginnings" (i.e. let them be separate for the first screen and then switch data from
+# the pristine to your new dirty scratch space) 
+#
+# See broadcast.pl and ligands_dock.pl for more info.
+#
+# The receptors and centers will be changed most frequently, so we start here
+receptors:
+- /some/path/receptors/rec1.pdbqt
+centers:
+# can be written this way
+- [ -11.18, 0.06, -0.28]
+# or this way
+- - 9.85
+  - 3.7
+  - -5.55
+#
+#
+# PBS information read by PBS::Client
+queue: md8 
+nodes: 1
+wallt: '24:00:00'
+#   full path for script makes it easier to work in different directories
+#   at arbitrary depth. cmd is concatenated with a generated yaml file
+cmd: 'perl /some/path/ligands_dock.pl'
+#   prefix, optional, 
+#     1. used to adjust names of PBS jobs
+#     2. used to adjust the names of the out_json 
+#     this is very useful for distinguishing runs/sets 
+prefix: nci
+#
+# Vina configuration.. cpu for Vina -> ppn for PBS::Client 
+cpu: 4 
+exhaustiveness: 12
+size: [20,20,20]
+# Configuration for ligands_dock.pl
+#
+overwrite_json: 1
+rerun: 1
+be_cutoff: -8.0
+dist_cutoff: 4.0
+scratch:  test/some/path
+data:     /some/path/ligands/NCI_diversitySet2

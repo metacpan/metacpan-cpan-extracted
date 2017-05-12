@@ -1,0 +1,21 @@
+Level 8
+-------
+
+Another "Input secret" form. Let's examine the source again.
+OK, now there is an "encoded" secret. Let's try to reverse
+engineer this. They're using `bin2hex`, `strrev`, and
+`base64_encode` -- those are all trivially reversible.
+
+So, to reverse the encoding of `$encodedSecret`, we just
+have to do:
+
+    $ php -a
+    Interactive shell
+
+    php > function decodeSecret($str) { return base64_decode(strrev(hex2bin($str))); }
+    php > $encodedSecret = "3d3d516343746d4d6d6c315669563362";
+    php > echo decodeSecret($encodedSecret) . "\n";
+    oubWYf2kBq
+
+Now we can use `oubWYf2kBq` as the secret in the form to
+obtain the next password.

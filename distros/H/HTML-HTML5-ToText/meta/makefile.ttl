@@ -1,0 +1,27 @@
+# This file provides instructions for packaging.
+
+@prefix : <http://purl.org/NET/cpan-uri/terms#> .
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-ToText/project>
+	:perl_version_from
+		_:main;
+	:version_from
+		_:main;
+	:readme_from
+		_:main;
+	:test_requires
+		"Test::More 0.61";
+	:requires
+		"common::sense",
+		"HTML::HTML5::Parser 0.108",
+		"List::Util",
+		"Moose",
+		"MooseX::Traits",
+		"namespace::autoclean",
+		"POSIX",
+		"Text::Wrap",
+		"utf8",
+		"XML::LibXML::PrettyPrint".
+
+_:main <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#fileName> "lib/HTML/HTML5/ToText.pm" .
+

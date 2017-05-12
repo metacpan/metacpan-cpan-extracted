@@ -1,0 +1,31 @@
+HTML/TableExtractor version 0.1
+============================
+
+This module can be used to parse tables in HTML text. Each type of tag that is
+commonly found in a table (such as tr, td) will trigger callbacks provided at
+the application level.
+
+The module inherits from HTML::Parser, which does all the grunt work. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  HTML::Parser
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002  Simon Drabble   <simon@thebigmachine.org>
+
+This software is released under the same terms as perl. It may be freely
+copied provided this file remains intact.
+

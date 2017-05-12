@@ -1,0 +1,38 @@
+---
+abstract: 'OAI-PMH Validator used for http://www.openarchives.org/pmh/validate'
+author:
+  - 'Simeon Warner <simeon@cpan.org>'
+build_requires:
+  Test::Exception: '0.38'
+  Test::Pod: '1.48'
+  Test::Simple: '1.001'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTTP-OAIPMH-Validator
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CGI: '3.5'
+  Class::Accessor::Fast: '0.34'
+  Crypt::SSLeay: '0.72'
+  Data::UUID: '1.22'
+  Date::Manip: '6.48'
+  HTTP::Headers: '6.05'
+  HTTP::Request: '6'
+  HTTP::Request::Common: '6.04'
+  HTTP::Status: '6.03'
+  JSON: '2.9'
+  LWP::Protocol::https: '6.06'
+  LWP::UserAgent: '6.06'
+  Try::Tiny: '0.19'
+  URI::Escape: '3.31'
+  XML::DOM: '1.44'
+version: '1.05'

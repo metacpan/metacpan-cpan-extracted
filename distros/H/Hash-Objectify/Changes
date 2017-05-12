@@ -1,0 +1,45 @@
+Revision history for Hash-Objectify
+
+0.008     2016-09-23 20:42:05-04:00 America/New_York
+
+    - No changes from 0.007.
+
+0.007     2016-09-14 09:17:08-04:00 America/New_York (TRIAL RELEASE)
+
+    [Added]
+
+    - Adds 'objectify_lax' to create an object that returns undef instead
+      of throwing an exception for unknown methods.
+
+    [Bug fixes]
+
+    - Pushes Hash::Objectified onto supplied package name @ISA rather than
+      replacing @ISA.
+
+    [Docs]
+
+    - Adds CAVEATS section.
+
+    [Prereqs]
+
+    - Drops Sub::Install as a prerequisite.
+
+0.006     2016-09-12 21:21:35-04:00 America/New_York
+
+    [Bug fixes]
+
+    - Make can() return undef for a missing method, even in list context.
+
+0.004     2016-09-12 19:12:15-04:00 America/New_York
+
+    [Bug fixes]
+
+    - Fix fatal error calling 'can' on non-existent keys.
+
+0.002     2013-08-21 15:30:12 America/New_York
+
+    - Fix documentation typos and tidy code
+
+0.001     2012-07-24 14:40:35 America/New_York
+
+    - First release

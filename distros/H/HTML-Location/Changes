@@ -1,0 +1,38 @@
+Revision history for Perl extension HTML::Location
+
+1.03  Wed  9 Jul 2008
+	- Legacy release. This is still deprecated.
+	- Moving back to Module::Install (broke META.yml)
+
+1.02  Tue Dec 11 2007
+	- Legacy release. This is still deprecated.
+	- Removed the use of Module::Install.
+
+1.01  Wed Sep 28 2005
+	- Deprecated. This API has been renamed to URI::ToDisk
+	- My apologies for any inconvenience. This package will
+	  remain on CPAN indefinately for compatibility purposes.
+
+1.00 ??? Jul 19 2005
+	- Moving to stable version 1.00
+
+0.7  Tue Feb 15 2005
+	- Removing braindead Build.PL
+
+0.6  Tue Oct 12 2004
+	- Fixed Param::Coerce support for subclasses
+
+0.5  Sat Oct  2 2004
+	- Added support for URI coercion via Param::Coerce
+
+0.4  Sat Sep 18 2004
+	- Added the ->param static method
+
+0.3  Sat Mar 20 2004
+	- Some documentation fixes
+
+0.2  Fri Dec 12 2003
+	- Added a missing dependency on Clone
+
+0.1  Sun Dec  7 2003
+	- original version

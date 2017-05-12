@@ -1,0 +1,79 @@
+{
+   "abstract" : "create a hash where the default value ain't undef",
+   "author" : [
+      "TOBYINK <tobyink@cpan.org>",
+      "VOJ <voj@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Moose::Meta::Class::__ANON__::SERIAL::11 version , CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Hash-DefaultValue",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Tie::Hash" : "0",
+            "constant" : "1.06",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0.61",
+            "Test::Warn" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Hash::DefaultValue" : {
+         "file" : "lib/Hash/DefaultValue.pm",
+         "version" : "0.007"
+      },
+      "Hash::Missing" : {
+         "file" : "lib/Hash/Missing.pm",
+         "version" : "0.007"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/Hash-DefaultValue/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Hash-DefaultValue"
+      },
+      "homepage" : "https://metacpan.org/release/Hash-DefaultValue",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-hash-defaultvalue.git",
+         "web" : "https://github.com/tobyink/p5-hash-defaultvalue"
+      }
+   },
+   "version" : "0.007"
+}

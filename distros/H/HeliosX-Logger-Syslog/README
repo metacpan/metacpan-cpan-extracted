@@ -1,0 +1,36 @@
+HeliosX-Logger-Syslog version 1.00
+==================================
+
+HeliosX::Logger::Syslog extends the Helios::Logger class to allow 
+Helios applications to log messages to syslogd. 
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Helios 2.30 or later
+  Sys::Syslog 0.23
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2009-12 by Andrew Johnson.
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the Artistic License 2.0.  See the 
+included LICENSE file for details.
+
+This program is distributed in the hope that it will be useful,
+but without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.

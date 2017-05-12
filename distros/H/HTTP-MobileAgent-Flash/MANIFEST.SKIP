@@ -1,0 +1,6 @@
+.git/
+.svn/
+blib
+Makefile.old
+MANIFEST.old
+MANIFEST.bak

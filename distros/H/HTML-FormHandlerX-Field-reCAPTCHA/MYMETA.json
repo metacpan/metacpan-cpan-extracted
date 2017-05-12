@@ -1,0 +1,46 @@
+{
+   "abstract" : "A Captcha::reCAPTCHA field for HTML::FormHandler",
+   "author" : [
+      "John Napiorkowski C<< <jjnapiork@cpan.org> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-FormHandlerX-Field-reCAPTCHA",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "Test::More" : "0.94"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Captcha::reCAPTCHA" : "0.92",
+            "Crypt::Blowfish" : "2.10",
+            "Crypt::CBC" : "2.30",
+            "HTML::FormHandler" : "0.30002",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.04"
+}

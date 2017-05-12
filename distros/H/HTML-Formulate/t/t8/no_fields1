@@ -1,0 +1,10 @@
+<h2>Warning!</h2>
+<p>Are you really sure you want to eat the children?</p>
+<form method="post">
+<table cellpadding="2">
+<tr><td align="center" colspan="2">
+<input name="_submit" type="submit" value="Yes" />
+<input name="_submit" type="submit" value="No" />
+</td></tr>
+</table>
+</form>

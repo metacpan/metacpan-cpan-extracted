@@ -1,0 +1,455 @@
+NAME
+    Hash::Ordered - A fast, pure-Perl ordered hash class
+
+VERSION
+    version 0.012
+
+SYNOPSIS
+        use Hash::Ordered;
+
+        my $oh = Hash::Ordered->new( a => 1 );
+
+        $oh->get( 'a' );
+        $oh->set( 'a' => 2 );
+
+        $oh->exists( 'a' );
+        $val = $oh->delete( 'a' );
+
+        @keys  = $oh->keys;
+        @vals  = $oh->values;
+        @pairs = $oh->as_list
+
+        $oh->push( c => 3, d => 4 );
+        $oh->unshift( e => 5, f => 6 );
+
+        ( $k, $v ) = $oh->pop;
+        ( $k, $v ) = $oh->shift;
+
+        $iter = $oh->iterator;
+        while( ( $k, $v ) = $iter->() ) { ... }
+
+        $copy     = $oh->clone;
+        $subset   = $oh->clone( qw/c d/ );
+        $reversed = $oh->clone( reverse $oh->keys );
+
+        @value_slice = $oh->values(  qw/c f/ ); # qw/3 6/
+        @pairs_slice = $oh->as_list( qw/f e/ ); # qw/f 6 e 5/
+
+        $oh->postinc( 'a' );          # like $oh{a}++
+        $oh->add( 'a', 5 );           # like $oh{a} += 5
+        $oh->concat( 'a', 'hello' );  # like $oh{a} .= 'hello'
+        $oh->or_equals( 'g', '23' );  # like $oh{g} ||= 23
+        $oh->dor_equals( 'g', '23' ); # like $oh{g} //= 23
+
+DESCRIPTION
+    This module implements an ordered hash, meaning that it associates keys
+    with values like a Perl hash, but keeps the keys in a consistent order.
+    Because it is implemented as an object and manipulated with method
+    calls, it is much slower than a Perl hash. This is the cost of keeping
+    order.
+
+    However, compared to other ordered hash implementations, Hash::Ordered
+    is optimized for getting and setting individual elements and is
+    generally faster at most other tasks as well. For specific details, see
+    Hash::Ordered::Benchmarks.
+
+METHODS
+  new
+        $oh = Hash::Ordered->new;
+        $oh = Hash::Ordered->new( @pairs );
+
+    Constructs an object, with an optional list of key-value pairs.
+
+    The position of a key corresponds to the first occurrence in the list,
+    but the value will be updated if the key is seen more than once.
+
+    Current API available since 0.009.
+
+  clone
+        $oh2 = $oh->clone;
+        $oh2 = $oh->clone( @keys );
+
+    Creates a shallow copy of an ordered hash object. If no arguments are
+    given, it produces an exact copy. If a list of keys is given, the new
+    object includes only those keys in the given order. Keys that aren't in
+    the original will have the value "undef".
+
+  keys
+        @keys = $oh->keys;
+        $size = $oh->keys;
+
+    In list context, returns the ordered list of keys. In scalar context,
+    returns the number of elements.
+
+    Current API available since 0.005.
+
+  values
+        @values = $oh->values;
+        @values = $oh->values( @keys );
+
+    Returns an ordered list of values. If no arguments are given, returns
+    the ordered values of the entire hash. If a list of keys is given,
+    returns values in order corresponding to those keys. If a key does not
+    exist, "undef" will be returned for that value.
+
+    In scalar context, returns the number of elements.
+
+    Current API available since 0.006.
+
+  get
+        $value = $oh->get("some key");
+
+    Returns the value associated with the key, or "undef" if it does not
+    exist in the hash.
+
+  set
+        $oh->set("some key" => "some value");
+
+    Associates a value with a key and returns the value. If the key does not
+    already exist in the hash, it will be added at the end.
+
+  exists
+        if ( $oh->exists("some key") ) { ... }
+
+    Test if some key exists in the hash (without creating it).
+
+  delete
+        $value = $oh->delete("some key");
+
+    Removes a key-value pair from the hash and returns the value.
+
+  clear
+        $oh->clear;
+
+    Removes all key-value pairs from the hash. Returns undef in scalar
+    context or an empty list in list context.
+
+    Current API available since 0.003.
+
+  push
+        $oh->push( one => 1, two => 2);
+
+    Add a list of key-value pairs to the end of the ordered hash. If a key
+    already exists in the hash, it will be deleted and re-inserted at the
+    end with the new value.
+
+    Returns the number of keys after the push is complete.
+
+  pop
+        ($key, $value) = $oh->pop;
+        $value = $oh->pop;
+
+    Removes and returns the last key-value pair in the ordered hash. In
+    scalar context, only the value is returned. If the hash is empty, the
+    returned key and value will be "undef".
+
+  unshift
+        $oh->unshift( one => 1, two => 2 );
+
+    Adds a list of key-value pairs to the beginning of the ordered hash. If
+    a key already exists, it will be deleted and re-inserted at the
+    beginning with the new value.
+
+    Returns the number of keys after the unshift is complete.
+
+  shift
+        ($key, $value) = $oh->shift;
+        $value = $oh->shift;
+
+    Removes and returns the first key-value pair in the ordered hash. In
+    scalar context, only the value is returned. If the hash is empty, the
+    returned key and value will be "undef".
+
+  merge
+        $oh->merge( one => 1, two => 2 );
+
+    Merges a list of key-value pairs into the ordered hash. If a key already
+    exists, its value is replaced. Otherwise, the key-value pair is added at
+    the end of the hash.
+
+  as_list
+        @pairs = $oh->as_list;
+        @pairs = $oh->as_list( @keys );
+
+    Returns an ordered list of key-value pairs. If no arguments are given,
+    all pairs in the hash are returned. If a list of keys is given, the
+    returned list includes only those key-value pairs in the given order.
+    Keys that aren't in the original will have the value "undef".
+
+  iterator
+        $iter = $oh->iterator;
+        $iter = $oh->iterator( reverse $oh->keys ); # reverse
+
+        while ( my ($key,$value) = $iter->() ) { ... }
+
+    Returns a code reference that returns a single key-value pair (in order)
+    on each invocation, or the empty list if all keys are visited.
+
+    If no arguments are given, the iterator walks the entire hash in order.
+    If a list of keys is provided, the iterator walks the hash in that
+    order. Unknown keys will return "undef".
+
+    The list of keys to return is set when the iterator is generator. Keys
+    added later will not be returned. Subsequently deleted keys will return
+    "undef" for the value.
+
+  preinc
+        $oh->preinc($key);      # like ++$hash{$key}
+
+    This method is sugar for incrementing a key without having to call "set"
+    and "get" explicitly. It returns the new value.
+
+    Current API available since 0.005.
+
+  postinc
+        $oh->postinc($key);     # like $hash{$key}++
+
+    This method is sugar for incrementing a key without having to call "set"
+    and "get" explicitly. It returns the old value.
+
+    Current API available since 0.005.
+
+  predec
+        $oh->predec($key);      # like --$hash{$key}
+
+    This method is sugar for decrementing a key without having to call "set"
+    and "get" explicitly. It returns the new value.
+
+    Current API available since 0.005.
+
+  postdec
+        $oh->postdec($key);      # like $hash{$key}--
+
+    This method is sugar for decrementing a key without having to call "set"
+    and "get" explicitly. It returns the old value.
+
+    Current API available since 0.005.
+
+  add
+        $oh->add($key, $n);     # like $hash{$key} += $n
+
+    This method is sugar for adding a value to a key without having to call
+    "set" and "get" explicitly. With no value to add, it is treated as "0".
+    It returns the new value.
+
+    Current API available since 0.005.
+
+  subtract
+        $oh->subtract($key, $n);  # like $hash{$key} -= $n
+
+    This method is sugar for subtracting a value from a key without having
+    to call "set" and "get" explicitly. With no value to subtract, it is
+    treated as "0". It returns the new value.
+
+    Current API available since 0.005.
+
+  concat
+        $oh->concat($key, $str); # like $hash{$key} .= $str
+
+    This method is sugar for concatenating a string onto the value of a key
+    without having to call "set" and "get" explicitly. It returns the new
+    value. If the value to append is not defined, no concatenation is done
+    and no warning is given.
+
+    Current API available since 0.005.
+
+  or_equals
+        $oh->or_equals($key, $str); # like $hash{$key} ||= $str
+
+    This method is sugar for assigning to a key if the existing value is
+    false without having to call "set" and "get" explicitly. It returns the
+    new value.
+
+    Current API available since 0.005.
+
+  dor_equals
+        $oh->dor_equals($key, $str); # like $hash{$key} //= $str
+
+    This method is sugar for assigning to a key if the existing value is not
+    defined without having to call "set" and "get" explicitly. It returns
+    the new value.
+
+    Current API available since 0.005.
+
+OVERLOADING
+  Boolean
+        if ( $oh ) { ... }
+
+    When used in boolean context, a Hash::Ordered object is true if it has
+    any entries and false otherwise.
+
+  String
+        say "$oh";
+
+    When used in string context, a Hash::Ordered object stringifies like
+    typical Perl objects. E.g. "Hash::Ordered=ARRAY(0x7f815302cac0)"
+
+    Current API available since 0.005.
+
+  Numeric
+        $count = 0 + $oh;
+
+    When used in numeric context, a Hash::Ordered object numifies as the
+    decimal representation of its memory address, just like typical Perl
+    objects. E.g. 140268162536552
+
+    For the number of keys, call the "keys" method in scalar context.
+
+    Current API available since 0.005.
+
+  Fallback
+    Other overload methods are derived from these three, if possible.
+
+TIED INTERFACE
+    Using "tie" is slower than using method calls directly. But for
+    compatibility with libraries that can only take hashes, it's available
+    if you really need it:
+
+        tie my %hash, "Hash::Ordered", @pairs;
+
+    If you want to access the underlying object for method calls, use
+    "tied":
+
+        tied( %hash )->unshift( @data );
+
+    Tied hash API available since 0.005.
+
+CAVEATS
+  Deletion and order modification with push, pop, etc.
+    This can be expensive, as the ordered list of keys has to be updated.
+    For small hashes with no more than 25 keys, keys are found and spliced
+    out with linear search. As an optimization for larger hashes, the first
+    change to the ordered list of keys will construct an index to the list
+    of keys. Thereafter, removed keys will be marked with a "tombstone"
+    record. Tombstones will be garbage collected whenever the number of
+    tombstones exceeds the number of valid keys.
+
+    These internal implementation details largely shouldn't concern you. The
+    important things to note are:
+
+    *   The costs of efficient deletion are deferred until you need it
+
+    *   Deleting lots of keys will temporarily appear to leak memory until
+        garbage collection occurs
+
+MOTIVATION
+    For a long time, I used Tie::IxHash for ordered hashes, but I grew
+    frustrated with things it lacked, like a cheap way to copy an IxHash
+    object or a convenient iterator when not using the tied interface. As I
+    looked at its implementation, it seemed more complex than I though it
+    needed, with an extra level of indirection that slows data access.
+
+    Given that frustration, I started experimenting with the simplest thing
+    I thought could work for an ordered hash: a hash of key-value pairs and
+    an array with key order.
+
+    As I worked on this, I also started searching for other modules doing
+    similar things. What I found fell broadly into two camps: modules based
+    on tie (even if they offered an OO interface), and pure OO modules. They
+    all either lacked features I deemed necessary or else seemed
+    overly-complex in either implementation or API.
+
+    Hash::Ordered attempts to find the sweet spot with simple
+    implementation, reasonably good efficiency for most common operations,
+    and a rich, intuitive API.
+
+    After discussions with Mario Roy about the potential use of
+    Hash::Ordered with MCE, I optimized deletion of larger hashes and
+    provided a tied interface for compatibility. Mario's suggestions and
+    feedback about optimization were quite valuable. Thank you, Mario!
+
+SEE ALSO
+    This section describes other ordered-hash modules I found on CPAN. For
+    benchmarking results, see Hash::Ordered::Benchmarks.
+
+  Tie modules
+    The following modules offer some sort of tie interface. I don't like
+    ties, in general, because of the extra indirection involved over a
+    direct method call. Still, you can make any tied interface into a faster
+    OO one with "tied":
+
+        tied( %tied_hash )->FETCH($key);
+
+    Tie::Hash::Indexed is implemented in XS and thus seems promising if
+    pure-Perl isn't a criterion; it generally fails tests on Perl 5.18 and
+    above due to the hash randomization change. Despite being XS, it is
+    slower than Hash::Ordered at everything exception creation and deletion.
+
+    Tie::IxHash is probably the most well known and includes an OO API.
+    Given the performance problems it has, "well known" is the only real
+    reason to use it.
+
+    These other modules below have very specific designs/limitations and I
+    didn't find any of them suitable for general purpose use:
+
+    *   Tie::Array::AsHash — array elements split with separator; tie API
+        only
+
+    *   Tie::Hash::Array — ordered alphabetically; tie API only
+
+    *   Tie::InsertOrderHash — ordered by insertion; tie API only
+
+    *   Tie::LLHash — linked-list implementation; quite slow
+
+    *   Tie::StoredOrderHash — ordered by last update; tie API only
+
+  Other ordered hash modules
+    Other modules stick with an object-oriented API, with a wide variety of
+    implementation approaches.
+
+    Array::AsHash is essentially an inverse implementation from
+    Hash::Ordered. It keeps pairs in an array and uses a hash to index into
+    the array. This indirection would already make hash-like operations
+    slower, but the specific implementation makes it even worse, with
+    abstractions and function calls that make getting or setting individual
+    items up to 10x slower than Hash::Ordered.
+
+    However, "Array::AsHash" takes an arrayref to initialize, which is very
+    fast and can return the list of pairs faster, too. If you mostly create
+    and list out very large ordered hashes and very rarely touch individual
+    entries, I think this could be something to very cautiously consider.
+
+    These other modules below have restrictions or particularly complicated
+    implementations (often relying on "tie") and thus I didn't think any of
+    them really suitable for use:
+
+    *   Array::Assign — arrays with named access; restricted keys
+
+    *   Array::OrdHash — overloads array/hash deref and uses internal tied
+        data
+
+    *   Data::Pairs — array of key-value hashrefs; allows duplicate keys
+
+    *   Data::OMap — array of key-value hashrefs; no duplicate keys
+
+    *   Data::XHash — blessed, tied hashref with doubly-linked-list
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/Hash-Ordered/issues>. You will be notified
+    automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/Hash-Ordered>
+
+      git clone https://github.com/dagolden/Hash-Ordered.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+CONTRIBUTORS
+    *   Benct Philip Jonsson <bpjonsson@gmail.com>
+
+    *   Mario Roy <marioeroy@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2014 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

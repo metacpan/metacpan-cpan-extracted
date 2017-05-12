@@ -1,0 +1,22 @@
+---
+auto_fieldset: 1
+
+elements:
+  - type: Hidden
+    name: id
+
+  - type: Text
+    name: text_col
+
+  - type: ComboBox
+    name: type
+    model_config:
+      aaa : aaa
+
+  - type: ComboBox
+    name: type2_id
+    model_config:
+      resultset: Type2
+
+  - type: Submit
+    name: submit

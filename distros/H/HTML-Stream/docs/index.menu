@@ -1,0 +1,20 @@
+MENU perlmod
+
+SECTION Overview
+
+ITEM HTML::Stream
+HREF HTML/Stream.pm.html
+
+SECTION Programs
+
+ITEM html2perlstream
+HREF html2perlstream.html
+
+SECTION Examples
+
+ITEM giggles
+HREF giggles.html
+
+ITEM latin
+HREF latin.html
+

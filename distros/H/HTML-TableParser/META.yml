@@ -1,0 +1,31 @@
+---
+abstract: 'Extract data from an HTML table'
+author:
+  - 'Diab Jerius (djerius@cpan.org)'
+build_requires:
+  ExtUtils::MakeMaker: '6.59'
+  Test::More: '0.32'
+configure_requires:
+  CPAN::Meta: '0'
+  ExtUtils::MakeMaker: '6.59'
+dynamic_config: '0'
+generated_by: 'Module::Install version 1.16, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-TableParser
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  HTML::Entities: '0'
+  HTML::Parser: '3.26'
+  perl: v5.8.1
+resources:
+  license: http://opensource.org/licenses/gpl-3.0.html
+  repository: http://bitbucket.org/djerius/html-tableparser
+version: '0.41'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

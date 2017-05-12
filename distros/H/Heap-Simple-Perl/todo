@@ -1,0 +1,9 @@
+Plan:
+  - Deleting
+  - Tied interface
+  - Special handling for duplicate keys (error, share, overwrite, separate)
+  - add a callback for elements lost in max_count overflow
+  - _make should probably also do the followup call. the current way is too
+    error prone
+  - The "self-absorb" test may in fact give false positives on systems where
+    addresses can be so big they don't fit in an NV with full resolution.

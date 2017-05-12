@@ -1,0 +1,27 @@
+[% page.yui.push('button') %]
+[% page.scripts.push('/static/scripts/login.js') %]
+[% page.styles.push('login.css') %]
+
+[% page.modal	= 'authentication required' %]
+[% page.sidebar	= 'warning' %]
+
+<form id="login" method="post">
+	<fieldset>
+		<label>username:</label>
+		<input type="text" name="username" value="[% c.req.params.username %]" />
+
+		<br />
+
+		<label>password:</label>
+		<input type="password" name="password" />
+	</fieldset>
+
+	<hr />
+
+	<fieldset>
+		[% IF error %]
+			<label class="error">[% error %]</label>
+		[% END %]
+		<button type="button" id="button_login" value="login">login</button>
+	</fieldset>
+</form>

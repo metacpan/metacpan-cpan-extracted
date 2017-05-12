@@ -1,0 +1,13 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+cpanfile.snapshot
+lib/HTTP/Request/AsCurl.pm
+minil.toml
+t/00_compile.t
+t/basic.t
+META.yml
+MANIFEST

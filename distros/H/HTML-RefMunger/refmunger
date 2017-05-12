@@ -1,0 +1,81 @@
+#!/usr/bin/perl
+    eval 'exec /usr/bin/perl -S $0 ${1+"$@"}'
+	if $running_under_some_shell;
+=pod
+
+=head1 NAME
+
+refmunger - Mangles HREF links within HTML documents
+
+=head1 SYNOPSIS
+
+    refmunger --help --infile=<name> --outdir=<name>
+              --verbose --wipe-cache
+
+=head1 DESCRIPTION
+
+Mangles HREF and IMG links within HTML documents to conform to a given filename
+convention. For example, can mangle HTML document names to fit the MS-DOS
+convention of 8.3, the 32-character limit for MacOS and even the 14-character
+UNIX limitations.
+
+=head1 ARGUMENTS
+
+refmunger takes the following arguments:
+
+=over 4
+
+=item help
+
+  --help
+
+Displays the usage message.
+
+=item infile
+
+  --infile=name
+
+Specify the HTML file to convert.  Input is taken from STDIN if no
+infile is specified.
+
+=item outfile
+
+  --outdir=name
+
+Specify the output directory for munged HTML files to be written to.
+
+=item wipe-cache
+
+    --wipe-cache
+
+Wipes any cache files clean before starting up.
+
+=item verbose
+
+  --verbose
+
+Display progress messages.
+
+=back
+
+=head1 AUTHOR
+
+Alligator Descartes E<lt>descarte@arcana.co.ukE<gt>.
+
+=head1 BUGS
+
+See L<HTML::RefMunger> for a list of known bugs.
+
+=head1 SEE ALSO
+
+L<HTML::Parser>, L<HTML::TokeParser>
+
+=head1 COPYRIGHT
+
+This program is distributed under the Artistic License.
+
+=cut
+
+use HTML::RefMunger;
+
+refmunger @ARGV;

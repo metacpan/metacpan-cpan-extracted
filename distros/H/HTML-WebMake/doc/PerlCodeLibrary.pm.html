@@ -1,0 +1,491 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>
+      WebMake: Documentation: HTML::WebMake::PerlCodeLibrary
+    </title>
+    <meta name="generator" content="WebMake/2.2" />
+    <style>
+      body {
+       background-color: #ffffff; 
+       color: #000000; 
+       font-size: medium;
+       font-family: verdana,lucida,helvetica,sans-serif;
+      }
+      code, samp, pre {
+       font-family: Courier New,courier,fixed-width,monospace;
+      }
+      H1 { font-size: x-large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFCC66; }
+      H2 { font-size: large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFDD77; }
+      H3 { font-size: medium; font-family: Garamond,Book Antiqua,Times,serif; background: #FFEE88; }
+      H4 { font-size: small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H5 { font-size: x-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H6 { font-size: xx-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      A:link {
+       font-weight: bold;
+       color: #004000;
+       text-decoration: underline; 
+      }
+      A:visited {
+       font-weight: normal;
+       color: #008000;
+       text-decoration: underline; 
+      }
+      A:active {
+       font-weight: bold;
+       color: #800000;
+       text-decoration: underline; 
+      }
+      dt {
+       font-size: medium;
+       font-weight: bold;
+       padding-top: 8px; padding-bottom: 8px;
+      }
+      dd {
+       padding-top: 8px; padding-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body bgcolor="#ffffff" text="#000000" link="#3300cc" vlink="#660066">
+    <font face="lucida,verdana,sans-serif">
+      <div align="center">
+         <img src="images/WebMakeTitle.png" alt="WebMake" width="500" height="122" />
+      </div>
+      <table width="100%">
+        <tr>
+          <td valign="top">
+             <strong><a href="http://webmake.taint.org/">WebMake</a>
+             Documentation</strong> (version 2.2)
+             
+          </td>
+          <td valign="top">
+            <div align="right">
+              
+               [ <a href="Main.pm.html">Back</a> | <a href="index_09-man.html">Forward</a> | <a href="index.html">Index</a>
+               | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+               
+            </div>
+          </td>
+        </tr>
+      </table>
+<!-- yes, it's that Mozilla black-border code again ;) -->
+      <!-- stolen from www.mozilla.org via rc3.org -->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td bgcolor="#aaaaaa">
+            <table border="0" cellspacing="4" cellpadding="4" width="100%">
+              <tr>
+                <td bgcolor="#ffffff">
+                  <table border="0" cellspacing="4" cellpadding="4" width="100%">
+                    <tr>
+                      <td>
+                         <h1>HTML::WebMake::PerlCodeLibrary</h1><!-- INDEX BEGIN -->
+                        <ul>
+                          <li>
+                            <a href="#NAME">NAME</a><li>
+                              <a href="#SYNOPSIS">SYNOPSIS</a><li>
+                                <a href="#DESCRIPTION">DESCRIPTION</a><li>
+                                  <a href="#METHODS">METHODS</a>
+                                </ul>
+<!-- INDEX END -->
+                                                                <hr />
+                                 <h1><a name="NAME">NAME</a></h1><p>
+                                  
+                                  PerlCodeLibrary - a selection of functions for use by perl code embedded in
+                                  a WebMake file.
+                                  <hr />
+                                   <h1><a name="SYNOPSIS">SYNOPSIS</a></h1><p>
+                                    <pre>  &lt;{perl
+</pre><p>
+                                      <pre>    $foo = get_content ($bar);
+    [... etc.]
+</pre><p>
+                                        <pre>    # or:
+</pre><p>
+                                          <pre>    $foo = $self-&gt;get_content ($bar);
+    [... etc.]
+</pre><p>
+                                            <pre>  }&gt;
+</pre><hr />
+                                             <h1><a name="DESCRIPTION">DESCRIPTION</a></h1><p>
+                                              
+                                              These functions allow code embedded in a &lt;{perl}&gt; or
+                                              &lt;{perlout}&gt; section of a WebMake file to be used to script the
+                                              generation of content.
+                                              <p>
+                                                
+                                                Each of these functions is defined both as a standalone function, or as a
+                                                function on the PerlCode object. Code in one of the &lt;{perl*}&gt; sections can access this PerlCode object as the <code>$self</code> variable. If you plan to use WebMake from mod_perl or in a threaded
+                                                environment, be sure to call them as methods on <code>$self</code>.
+                                                <hr />
+                                                 <h1><a name="METHODS">METHODS</a></h1><dl>
+                                                  <dt>
+                                                    <strong><a name="item__expandedtext">$expandedtext = expand ($text);</a></strong>
+                                                  </dt>
+                                                  <dd>
+                                                    <p>
+                                                      
+                                                      Expand a block of text, interpreting any references, user tags, or any
+                                                      other WebMake markup contained within.
+                                                      
+                                                    </dd>
+                                                    <dt>
+                                                      <strong><a name="item__names">@names = content_matching ($pattern);</a></strong>
+                                                    </dt>
+                                                    <dd>
+                                                      <p>
+                                                        
+                                                        Find all items of content that match the glob pattern <code>$pattern</code>. If
+                                                        <code>$pattern</code> begins with the prefix <strong>RE:</strong>, it is treated as a regular expression. The list of items returned is not
+                                                        in any logical order.
+                                                        
+                                                      </dd>
+                                                      <dt>
+                                                        <strong><a name="item__objs">@objs = content_names_to_objects (@names);</a></strong>
+                                                      </dt>
+                                                      <dd>
+                                                        <p>
+                                                          
+                                                          Given a list of content names, convert to the corresponding list of content
+                                                          objects, ie. objects of type <code>HTML::WebMake::Content</code>.
+                                                          
+                                                        </dd>
+                                                        <dt>
+                                                          <strong><a name="item__obj">$obj = get_content_object ($name);</a></strong>
+                                                        </dt>
+                                                        <dd>
+                                                          <p>
+                                                            
+                                                            Given a content name, convert to the corresponding content object, ie.
+                                                            objects of type <code>HTML::WebMake::Content</code>.
+                                                            
+                                                          </dd>
+                                                          <dt>
+                                                            <strong>@names = content_objects_to_names (@objs);</strong>
+                                                          </dt>
+                                                          <dd>
+                                                            <p>
+                                                              
+                                                              Given a list of objects of type <code>HTML::WebMake::Content</code>, convert to the corresponding list of content name strings.
+                                                              
+                                                            </dd>
+                                                            <dt>
+                                                              <strong><a name="item__sortedobjs">@sortedobjs = sort_content_objects ($sortstring, @objs);</a></strong>
+                                                            </dt>
+                                                            <dd>
+                                                              <p>
+                                                                
+                                                                Sort a list of content objects by the sort string <code>$sortstring</code>. See ''sorting.html'' in the WebMake documentation for details on sort
+                                                                strings.
+                                                                
+                                                              </dd>
+                                                              <dt>
+                                                                <strong>@names = sorted_content_matching ($sortstring, $pattern);</strong>
+                                                              </dt>
+                                                              <dd>
+                                                                <p>
+                                                                  
+                                                                  Find all items of content that match the glob-style pattern <code>$pattern</code>. The list of items returned is ordered according to the sort string <code>$sortstring</code>. If <code>$pattern</code> begins with the prefix <strong>RE:</strong>, it is treated as a regular expression.
+                                                                  <p>
+                                                                    
+                                                                    See ''sorting.html'' in the WebMake documentation for details on sort
+                                                                    strings.
+                                                                    <p>
+                                                                      
+                                                                      This, by the way, is essentially implemented as follows:
+                                                                      <p>
+                                                                        <pre>        my @list = $self-&gt;content_matching ($pattern);
+        @list = $self-&gt;content_names_to_objects (@list);
+        @list = $self-&gt;sort_content_objects ($sortstring, @list);
+        return $self-&gt;content_objects_to_names (@list);
+</pre>
+                                                                      </dd>
+                                                                      <dt>
+                                                                        <strong><a name="item__str">$str = get_content ($name);</a></strong>
+                                                                      </dt>
+                                                                      <dd>
+                                                                        <p>
+                                                                          
+                                                                          Get the item of content named <code>$name</code>. Equivalent to a $ {content_reference}.
+                                                                          
+                                                                        </dd>
+                                                                        <dt>
+                                                                          <strong><a name="item__list">@list = get_list ($name);</a></strong>
+                                                                        </dt>
+                                                                        <dd>
+                                                                          <p>
+                                                                            
+                                                                            Get the item of content named, but in Perl list format. It is assumed that
+                                                                            the list is stored in the content item in whitespace-separated format.
+                                                                            
+                                                                          </dd>
+                                                                          <dt>
+                                                                            <strong><a name="item_set_content">set_content ($name, $value);</a></strong>
+                                                                          </dt>
+                                                                          <dd>
+                                                                            <p>
+                                                                              
+                                                                              Set a content chunk to the value provided. This content will not appear in
+                                                                              a sitemap, and navigation links will never point to it.
+                                                                              <p>
+                                                                                
+                                                                                Returns the content object created.
+                                                                                
+                                                                              </dd>
+                                                                              <dt>
+                                                                                <strong><a name="item_set_list">set_list ($name, @values);</a></strong>
+                                                                              </dt>
+                                                                              <dd>
+                                                                                <p>
+                                                                                  
+                                                                                  Set a content chunk to a list containing the values provided, separated by
+                                                                                  spaces. This content will not appear in a sitemap, and navigation links
+                                                                                  will never point to it.
+                                                                                  <p>
+                                                                                    
+                                                                                    Returns the content object created.
+                                                                                    
+                                                                                  </dd>
+                                                                                  <dt>
+                                                                                    <strong><a name="item_set_mapped_content">set_mapped_content ($name, $value, $upname);</a></strong>
+                                                                                  </dt>
+                                                                                  <dd>
+                                                                                    <p>
+                                                                                      
+                                                                                      Set a content chunk to the value provided. This content will appear in a
+                                                                                      sitemap and the navigation hierarchy. <code>$upname</code> should be the name of it's parent content item. This item must not be
+                                                                                      metadata, or other dynamically-generated content; only first-class mapped
+                                                                                      content can be used.
+                                                                                      <p>
+                                                                                        
+                                                                                        Returns the content object created.
+                                                                                        
+                                                                                      </dd>
+                                                                                      <dt>
+                                                                                        <strong><a name="item_del_content">del_content ($name);</a></strong>
+                                                                                      </dt>
+                                                                                      <dd>
+                                                                                        <p>
+                                                                                          
+                                                                                          Delete a named content chunk.
+                                                                                          
+                                                                                        </dd>
+                                                                                        <dt>
+                                                                                          <strong>@names = url_matching ($pattern);</strong>
+                                                                                        </dt>
+                                                                                        <dd>
+                                                                                          <p>
+                                                                                            
+                                                                                            Find all URLs (from &lt;out&gt; and &lt;media&gt; tags) whose name matches the glob-style pattern <code>$pattern</code>. The names of the URLs, not the URLs themselves, are returned. If <code>$pattern</code> begins with the prefix <strong>RE:</strong>, it is treated as a regular expression.
+                                                                                            
+                                                                                          </dd>
+                                                                                          <dt>
+                                                                                            <strong><a name="item__url">$url = get_url ($name);</a></strong>
+                                                                                          </dt>
+                                                                                          <dd>
+                                                                                            <p>
+                                                                                              
+                                                                                              Get a named URL. Equivalent to an $ (url_reference).
+                                                                                              
+                                                                                            </dd>
+                                                                                            <dt>
+                                                                                              <strong><a name="item_set_url">set_url ($name, $url);</a></strong>
+                                                                                            </dt>
+                                                                                            <dd>
+                                                                                              <p>
+                                                                                                
+                                                                                                Set an URL to the value provided.
+                                                                                                
+                                                                                              </dd>
+                                                                                              <dt>
+                                                                                                <strong><a name="item_del_url">del_url ($name);</a></strong>
+                                                                                              </dt>
+                                                                                              <dd>
+                                                                                                <p>
+                                                                                                  
+                                                                                                  Delete an URL.
+                                                                                                  
+                                                                                                </dd>
+                                                                                                <dt>
+                                                                                                  <strong><a name="item__listtext">$listtext = make_list ($itemname, @namelist);</a></strong>
+                                                                                                </dt>
+                                                                                                <dd>
+                                                                                                  <p>
+                                                                                                    
+                                                                                                    Generate a list by iterating through the <code>@namelist</code>, setting the content item
+                                                                                                    <code>item</code> to the current name, and interpreting the content chunk named
+                                                                                                    <code>$itemname</code>. This content chunk should refer to <code></code> appropriately.
+                                                                                                    <p>
+                                                                                                      
+                                                                                                      Each resulting block of content is appended to a $listtext, which is
+                                                                                                      finally returned.
+                                                                                                      <p>
+                                                                                                        
+                                                                                                        See the <code>news_site.wmk</code> sample site for an example of this in use.
+                                                                                                        
+                                                                                                      </dd>
+                                                                                                      <dt>
+                                                                                                        <strong><a name="item_define_tag">define_tag ($tagname, \&amp;amp;handlerfn, @required_attributes);</a></strong>
+                                                                                                      </dt>
+                                                                                                      <dd>
+                                                                                                        <p>
+                                                                                                          
+                                                                                                          Define a tag for use in content items. Any occurrences of this tag, with at
+                                                                                                          least the set of attributes defined in @required_attributes, will cause the
+                                                                                                          handler function referred to by handlerfn to be called.
+                                                                                                          <p>
+                                                                                                            
+                                                                                                            Handler functions are called as fcllows:
+                                                                                                            <p>
+                                                                                                              <pre>        handler ($tagname, $attrs, $text, $perlcode);
+</pre><p>
+                                                                                                                
+                                                                                                                Where <code>$tagname</code> is the name of the tag, <code>$attrs</code> is
+                                                                                                                a reference to a hash containing the attribute names and the values used in
+                                                                                                                the tag, and <code>$text</code> is the text between the start and end tags.
+                                                                                                                <p>
+                                                                                                                   <code>$perlcode</code> is the PerlCode object, allowing you to write proper
+                                                                                                                  object-oriented code that can be run in a threaded environment or from
+                                                                                                                  mod_perl. This can be ignored if you like.
+                                                                                                                  <p>
+                                                                                                                    
+                                                                                                                    This function returns an empty string.
+                                                                                                                    
+                                                                                                                  </dd>
+                                                                                                                  <dt>
+                                                                                                                    <strong><a name="item_define_empty_tag">define_empty_tag ($tagname, \&amp;amp;handlerfn, @required_attributes);</a></strong>
+                                                                                                                  </dt>
+                                                                                                                  <dd>
+                                                                                                                    <p>
+                                                                                                                      
+                                                                                                                      Define a tag for use in content items. This is identical to define_tag
+                                                                                                                      above, but is intended for use to define ''empty'' tags, ie. tags which
+                                                                                                                      occur alone, not as part of a start and end tag pair.
+                                                                                                                      <p>
+                                                                                                                        
+                                                                                                                        The handler in this case is called with an empty string for the
+                                                                                                                        <code>$text</code> argument.
+                                                                                                                        
+                                                                                                                      </dd>
+                                                                                                                      <dt>
+                                                                                                                        <strong><a name="item_define_preformat_tag">define_preformat_tag ($tagname, \&amp;amp;handlerfn, @required_attributes);</a></strong>
+                                                                                                                      </dt>
+                                                                                                                      <dd>
+                                                                                                                        <p>
+                                                                                                                          
+                                                                                                                          Identical to <em>define_tag</em>, above, with one difference; these tags will be interpreted <strong>before</strong> the content undergoes any format conversion.
+                                                                                                                          
+                                                                                                                        </dd>
+                                                                                                                        <dt>
+                                                                                                                          <strong><a name="item_define_empty_preformat_tag">define_empty_preformat_tag ($tagname, \&amp;amp;handlerfn, @required_attributes);</a></strong>
+                                                                                                                        </dt>
+                                                                                                                        <dd>
+                                                                                                                          <p>
+                                                                                                                            
+                                                                                                                            Identical to <em>define_empty_tag</em>, above, with one difference; these tags will be interpreted <strong>before</strong> the content undergoes any format conversion.
+                                                                                                                            
+                                                                                                                          </dd>
+                                                                                                                          <dt>
+                                                                                                                            <strong><a name="item_define_wmk_tag">define_wmk_tag ($tagname, \&amp;amp;handlerfn, @required_attributes);</a></strong>
+                                                                                                                          </dt>
+                                                                                                                          <dd>
+                                                                                                                            <p>
+                                                                                                                              
+                                                                                                                              Define a tag for use in the WebMake file.
+                                                                                                                              <p>
+                                                                                                                                
+                                                                                                                                Aside from operating on the WebMake file instead of inside content items,
+                                                                                                                                this is otherwise identical to define_tag above,
+                                                                                                                                
+                                                                                                                              </dd>
+                                                                                                                              <dt>
+                                                                                                                                <strong><a name="item_define_empty_wmk_tag">define_empty_wmk_tag ($tagname, \&amp;amp;handlerfn, @required_attributes);</a></strong>
+                                                                                                                              </dt>
+                                                                                                                              <dd>
+                                                                                                                                <p>
+                                                                                                                                  
+                                                                                                                                  Define an empty, aka. standalone, tag for use in the WebMake file.
+                                                                                                                                  <p>
+                                                                                                                                    
+                                                                                                                                    Aside from operating on the WebMake file instead of inside content items,
+                                                                                                                                    this is otherwise identical to define_tag above,
+                                                                                                                                    
+                                                                                                                                  </dd>
+                                                                                                                                  <dt>
+                                                                                                                                    <strong>$obj = get_root_content_object();</strong>
+                                                                                                                                  </dt>
+                                                                                                                                  <dd>
+                                                                                                                                    <p>
+                                                                                                                                      
+                                                                                                                                      Get the content object representing the ''root'' of the site map. Returns
+                                                                                                                                      undef if no root object exists, or the WebMake file does not contain a
+                                                                                                                                      &amp;lt;sitemap&amp;gt; command.
+                                                                                                                                      
+                                                                                                                                    </dd>
+                                                                                                                                    <dt>
+                                                                                                                                      <strong><a name="item__name">$name = get_current_main_content();</a></strong>
+                                                                                                                                    </dt>
+                                                                                                                                    <dd>
+                                                                                                                                      <p>
+                                                                                                                                        
+                                                                                                                                        Get the ''main'' content on the current output page. The ''main'' content
+                                                                                                                                        is defined as the most recently referenced content item which (a) is not
+                                                                                                                                        generated content (perl code, sitemaps, breadcrumb trails etc.), and (b)
+                                                                                                                                        has its
+                                                                                                                                        <code>map</code> attribute set to ``true''.
+                                                                                                                                        <p>
+                                                                                                                                          
+                                                                                                                                          Note that this API should only be called from a deferred content reference;
+                                                                                                                                          otherwise the ''main'' content item may not have been referenced by the
+                                                                                                                                          time this API is called.
+                                                                                                                                          <p>
+                                                                                                                                             <code>undef</code> is returned if no main content item has been referenced.
+                                                                                                                                            
+                                                                                                                                          </dd>
+                                                                                                                                          <dt>
+                                                                                                                                            <strong><a name="item__main">$main = get_webmake_main_object();</a></strong>
+                                                                                                                                          </dt>
+                                                                                                                                          <dd>
+                                                                                                                                            <p>
+                                                                                                                                              
+                                                                                                                                              Get the current WebMake interpreter's instance of <code>HTML::WebMake::Main</code>
+                                                                                                                                              object. Virtually all of WebMake's functionality and internals can be
+                                                                                                                                              accessed through this.
+                                                                                                                                              
+                                                                                                                                            </dd>
+                                                                                                                                          </dl>
+                                                                                                                                        </td>
+                                                                                                                                      </tr>
+                                                                                                                                    </table>
+                                                                                                                                  </td>
+                                                                                                                                </tr>
+                                                                                                                              </table>
+                                                                                                                            </td>
+                                                                                                                          </tr>
+                                                                                                                        </table>
+                                                                                                                        <table width="100%">
+                                                                                                                          <tr>
+                                                                                                                            <td valign="top">
+                                                                                                                               <strong><a href="http://webmake.taint.org/">WebMake</a>
+                                                                                                                               Documentation</strong> (version 2.2)
+                                                                                                                               
+                                                                                                                            </td>
+                                                                                                                            <td valign="top">
+                                                                                                                              <div align="right">
+                                                                                                                                
+                                                                                                                                 [ <a href="Main.pm.html">Back</a> | <a href="index_09-man.html">Forward</a> | <a href="index.html">Index</a>
+                                                                                                                                 | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+                                                                                                                                 
+                                                                                                                              </div>
+                                                                                                                            </td>
+                                                                                                                          </tr>
+                                                                                                                        </table>
+                                                                                                                        <div align="right">
+                                                                                                                           <a href="http://webmake.taint.org/"> <img src="images/BuiltWithWebMake.png" alt="Built With WebMake" border="0" width="88" height="31" /></a>
+                                                                                                                        </div>
+                                                                                                                      </font>
+                                                                                                                    </body>
+                                                                                                                  </html>

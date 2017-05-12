@@ -1,0 +1,23 @@
+---
+name: HTTP-MobileAgent-Plugin-RoamingZone
+version: 0.0.3
+author:
+  - 'OHTSUKA Ko-hei <nene@kokogiko.net>'
+abstract: 日本の携帯電話から国内/海外のアクセス地域情報を得る
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  HTTP::MobileAgent: 0.27
+  Mobile::Data::ITU: 0
+  Mobile::Data::SID: 0
+  Test::Base: 0
+  version: 0
+provides:
+  HTTP::MobileAgent::Plugin::RoamingZone:
+    file: lib/HTTP/MobileAgent/Plugin/RoamingZone.pm
+    version: 0.0.3
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

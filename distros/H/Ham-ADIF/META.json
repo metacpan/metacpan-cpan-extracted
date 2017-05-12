@@ -1,0 +1,62 @@
+{
+   "abstract" : "ADIF (ADI and ADX) processing",
+   "author" : [
+      "Roger Pettett <rmp@psyphi.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "gpl_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Ham-ADIF",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "TAP::Harness::JUnit" : "0.41",
+            "Test::More" : "0.62"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.04",
+            "English" : "1.02",
+            "LWP::Simple" : "6.00",
+            "XML::LibXML" : "2.0107",
+            "base" : "2.07",
+            "strict" : "1.03",
+            "warnings" : "1.05"
+         }
+      }
+   },
+   "provides" : {
+      "Ham::ADIF" : {
+         "file" : "lib/Ham/ADIF.pm",
+         "version" : "v1.5.1"
+      },
+      "Ham::ADIF::ADI" : {
+         "file" : "lib/Ham/ADIF/ADI.pm",
+         "version" : "344"
+      },
+      "Ham::ADIF::ADX" : {
+         "file" : "lib/Ham/ADIF/ADX.pm",
+         "version" : "160"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt"
+      ]
+   },
+   "version" : "v1.5.1",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

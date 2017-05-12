@@ -1,0 +1,14 @@
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+bin/hostfiles
+lib/Hostfile/Manager.pm
+t/fixtures/fragments/f1
+t/fixtures/fragments/f1a
+t/fixtures/hosts/1
+t/fixtures/hosts/2
+t/fixtures/hosts/3
+t/run.t
+t/tests/Test/Hostfile/Manager.pm
+META.yml                                 Module meta-data (added by MakeMaker)

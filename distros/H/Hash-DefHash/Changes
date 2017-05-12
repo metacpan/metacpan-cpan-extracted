@@ -1,0 +1,40 @@
+Revision history for Hash-DefHash
+
+0.06    2016-07-12 (PERLANCAR)
+
+	- Update to DefHash 1.0.10.
+
+
+0.05    2015-09-06 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.04    2014-12-10 (PERLANCAR)
+
+	- No functional changes.
+
+	- Use new name of renamed/split module SHARYANTO::String::Util ->
+	  String::Trim::More.
+
+
+0.03    2012-11-10 (SHARYANTO)
+
+        - Follow DefHash 1.0.3 (getting default value for default_lang from
+          LANG).
+
+
+0.02    2012-09-26 (SHARYANTO)
+
+        - Allow defhash() to accept and return Hash::DefHash object, so you can
+          use it without fear of "double wrapping".
+
+
+0.01    2012-09-14 (SHARYANTO)
+
+        - First version. Most methods have been implemented except
+          get_prop_all_langs() and set_prop_lang().

@@ -1,0 +1,82 @@
+---
+abstract: 'An HTTP user agent programming interface unification layer'
+author:
+  - 'Charles McGarvey <chazmcgarvey@brokenzipper.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test2::API: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  blib: '1.01'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTTP-AnyUA
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  HTTP::AnyUA:
+    file: lib/HTTP/AnyUA.pm
+    version: '0.900'
+  HTTP::AnyUA::Backend:
+    file: lib/HTTP/AnyUA/Backend.pm
+    version: '0.900'
+  HTTP::AnyUA::Backend::AnyEvent::HTTP:
+    file: lib/HTTP/AnyUA/Backend/AnyEvent/HTTP.pm
+    version: '0.900'
+  HTTP::AnyUA::Backend::Furl:
+    file: lib/HTTP/AnyUA/Backend/Furl.pm
+    version: '0.900'
+  HTTP::AnyUA::Backend::HTTP::AnyUA:
+    file: lib/HTTP/AnyUA/Backend/HTTP/AnyUA.pm
+    version: '0.900'
+  HTTP::AnyUA::Backend::HTTP::Tiny:
+    file: lib/HTTP/AnyUA/Backend/HTTP/Tiny.pm
+    version: '0.900'
+  HTTP::AnyUA::Backend::LWP::UserAgent:
+    file: lib/HTTP/AnyUA/Backend/LWP/UserAgent.pm
+    version: '0.900'
+  HTTP::AnyUA::Backend::Mojo::UserAgent:
+    file: lib/HTTP/AnyUA/Backend/Mojo/UserAgent.pm
+    version: '0.900'
+  HTTP::AnyUA::Backend::Net::Curl::Easy:
+    file: lib/HTTP/AnyUA/Backend/Net/Curl/Easy.pm
+    version: '0.900'
+  HTTP::AnyUA::Util:
+    file: lib/HTTP/AnyUA/Util.pm
+    version: '0.900'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  Fcntl: '0'
+  Future: '0'
+  MIME::Base64: '0'
+  Module::Loader: '0'
+  Scalar::Util: '0'
+  Time::Local: '0'
+  bytes: '0'
+  parent: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/chazmcgarvey/HTTP-AnyUA/issues
+  homepage: https://github.com/chazmcgarvey/HTTP-AnyUA
+  repository: https://github.com/chazmcgarvey/HTTP-AnyUA.git
+version: '0.900'
+x_authority: cpan:CCM
+x_serialization_backend: 'YAML::Tiny version 1.70'

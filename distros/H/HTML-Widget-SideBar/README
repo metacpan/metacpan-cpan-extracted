@@ -1,0 +1,30 @@
+NAME
+
+HTML::Widget::SideBar - Creates the HTML (and possibly some Javascript) for a navigational or otherwise active (hierarchical) sidebar for a web page.
+
+DESCRIPTION
+
+This module helps in creation of the Javascript, CSS and HTML required to produce a sidebar.See the documentation for this module.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Mandatory - Tree::Numbered
+
+Will warn of a missing dependency if you don't have Tree::Numbered::DB, but you can ignore that if you don't need it. If you do, you won't be able to use Javascript::Menu->readDB.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Yosef Meller
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

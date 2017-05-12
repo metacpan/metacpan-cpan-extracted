@@ -1,0 +1,12 @@
+Level 2
+-------
+
+There is nothing on the page, nor anything *in* the page
+this time. But let's look at the source so we know what
+we're dealing with.
+
+There's a CSS file, and an image. The image is new, so
+let's see if we can exploit that.
+
+The image itself is nothing helpful, but if you try a
+directory listing, there is a file containing the password.

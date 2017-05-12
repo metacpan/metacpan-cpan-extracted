@@ -1,0 +1,78 @@
+I'm running "dzil release --trial", and it looks to be extracting the archive into a directory that it doesn't expect.
+
+
+(zjt@photon) 3:16pm ~/HTTP-DAV-Xythos
+> /usr/local/bin/dzil test
+[DZ] building test distribution under .build/tNVZhv4xvX
+[DZ] beginning to build HTTP-DAV-Xythos
+[DZ] guessing dist's main_module is lib/HTTP/DAV/Xythos.pm
+[DZ] extracting distribution abstract from lib/HTTP/DAV/Xythos.pm
+[@Basic/ExtraTests] rewriting release test xt/release/pod-syntax.t
+[DZ] writing HTTP-DAV-Xythos in .build/tNVZhv4xvX
+Checking if your kit is complete...
+Looks good
+Writing Makefile for HTTP::DAV::Xythos
+cp lib/HTTP/DAV/Xythos.pm blib/lib/HTTP/DAV/Xythos.pm
+Manifying blib/man3/HTTP::DAV::Xythos.3pm
+PERL_DL_NONLAZY=1 /usr/bin/perl "-MExtUtils::Command::MM" "-e" "test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/001_load.t ............ ok   
+t/002_ticket.t .......... ok   
+t/release-pod-syntax.t .. ok   
+All tests successful.
+Files=3, Tests=7,  0 wallclock secs ( 0.02 usr  0.01 sys +  0.28 cusr  0.03 csys =  0.34 CPU)
+Result: PASS
+[DZ] all's well; removing .build/tNVZhv4xvX
+                                                                                                                                                                     
+(zjt@photon) 3:20pm ~/HTTP-DAV-Xythos                                                                                                              
+> /usr/local/bin/dzil build
+[DZ] beginning to build HTTP-DAV-Xythos
+[DZ] guessing dist's main_module is lib/HTTP/DAV/Xythos.pm
+[DZ] extracting distribution abstract from lib/HTTP/DAV/Xythos.pm
+[@Basic/ExtraTests] rewriting release test xt/release/pod-syntax.t
+[DZ] writing HTTP-DAV-Xythos in HTTP-DAV-Xythos-1.101110
+[DZ] writing archive to HTTP-DAV-Xythos-1.101110.tar.gz
+                                                                                                                                                                     
+(zjt@photon) 3:20pm ~/HTTP-DAV-Xythos
+> /usr/local/bin/dzil release --trial
+[DZ] beginning to build HTTP-DAV-Xythos
+[DZ] guessing dist's main_module is lib/HTTP/DAV/Xythos.pm
+[DZ] extracting distribution abstract from lib/HTTP/DAV/Xythos.pm
+[@Basic/ExtraTests] rewriting release test xt/release/pod-syntax.t
+[DZ] writing HTTP-DAV-Xythos in HTTP-DAV-Xythos-1.101110
+[DZ] writing archive to HTTP-DAV-Xythos-1.101110-TRIAL.tar.gz
+[@Basic/TestRelease] Extracting /home/zjt/HTTP-DAV-Xythos/HTTP-DAV-Xythos-1.101110-TRIAL.tar.gz to .build/EVSqAephN6
+Can't chdir to /home/zjt/HTTP-DAV-Xythos/.build/EVSqAephN6/t: No such file or directory at /usr/local/share/perl/5.10.0/Dist/Zilla.pm line 765
+                                                                                                                                                                     
+(zjt@photon) 3:21pm ~/HTTP-DAV-Xythos
+> ls -la .build/EVSqAephN6
+total 12
+drwx------ 3 zjt zjt 4096 Apr 21 15:21 .
+drwxr-xr-x 7 zjt zjt 4096 Apr 21 15:21 ..
+drwxr-xr-x 4 zjt zjt 4096 Apr 21 15:21 HTTP-DAV-Xythos-1.101110
+                                                                                                                                                                     (zjt@photon) 3:21pm ~/HTTP-DAV-Xythos
+> ls -la .build/EVSqAephN6/HTTP-DAV-Xythos-1.101110
+total 56
+drwxr-xr-x 4 zjt zjt  4096 Apr 21 15:21 .
+drwx------ 3 zjt zjt  4096 Apr 21 15:21 ..
+-rw-r--r-- 1 zjt zjt 18258 Apr 21 15:21 LICENSE
+-rw-r--r-- 1 zjt zjt   127 Apr 21 15:21 MANIFEST
+-rw-r--r-- 1 zjt zjt   428 Apr 21 15:21 META.yml
+-rw-r--r-- 1 zjt zjt  1363 Apr 21 15:21 Makefile.PL
+-rw-r--r-- 1 zjt zjt   348 Apr 21 15:21 README
+-rw-r--r-- 1 zjt zjt   175 Apr 21 15:21 dist.ini
+drwxr-xr-x 3 zjt zjt  4096 Apr 21 15:21 lib
+drwxr-xr-x 2 zjt zjt  4096 Apr 21 15:21 t
+                                                                                                                                                                     (zjt@photon) 3:21pm ~/HTTP-DAV-Xythos
+> cat dist.ini 
+name             = HTTP-DAV-Xythos
+license          = Perl_5
+copyright_holder = Jesse Thompson
+
+[AutoVersion]
+[AutoPrereq]
+[PkgVersion]
+[PodVersion]
+[PodSyntaxTests]
+[@Basic]
+
+

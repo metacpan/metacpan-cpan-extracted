@@ -1,0 +1,37 @@
+<html>
+<head>
+<title>test</title>
+</head>
+<body>
+
+<!-- FIRST ITERATION -->
+<p>TEST: $TEST</p>
+<p>TEST_ALPHA: $TEST_ALPHA</p>
+<p>TEST_BETA: $TEST_BETA</p>
+<p>TEST_GAMMA: $TEST_GAMMA</p>
+
+<!-- SECOND ITERATION -->
+<p>TEST: $TEST</p>
+<p>TEST_ALPHA: $TEST_ALPHA</p>
+<p>TEST_BETA: $TEST_BETA</p>
+<p>TEST_GAMMA: $TEST_GAMMA</p>
+
+<!-- SET ITERATION -->
+<p>SET: $SET</p>
+$SET(SET_TEST_ALPHA, "Set Test Alpha")
+<p>SET_TEST_ALPHA: $SET_TEST_ALPHA</p>
+$SET(SET_TEST_BETA , "Set Test Beta")
+<p>SET_TEST_BETA: $SET_TEST_BETA</p>
+$SET(SET_TEST_GAMMA ,"Set Test Gamma")
+<p>SET_TEST_GAMMA: $SET_TEST_GAMMA</p>
+
+<!-- INCLUDE ITERATION -->
+<p>INCLUDE: $INCLUDE</p>
+<p>INCLUDE_PATH: $INCLUDE_PATH</p>
+<p>INCLUDE(INCLUDE_PATH): $INCLUDE($INCLUDE_PATH)</p>
+<p>INCLUDE(t/templates/include.tmpl): $INCLUDE(t/templates/include.tmpl)</p>
+<p>INCLUDE(t/templates/include2.tmpl): $INCLUDE(t/templates/include2.tmpl)</p>
+<p>INCLUDE(t/templates/infinite.tmpl): $INCLUDE(t/templates/infinite.tmpl)</p>
+
+</body>
+</html>

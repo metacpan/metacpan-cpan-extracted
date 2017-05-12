@@ -1,0 +1,79 @@
+
+=head1 NAME
+
+HTML::DOM::Element::TableSection - A Perl class for representing table sections in an HTML DOM tree
+
+=head1 VERSION
+
+Version 0.054
+
+=head1 SYNOPSIS
+
+  use HTML::DOM;
+  $doc = HTML::DOM->new;
+  $elem = $doc->createElement('thead');
+  
+  $elem->vAlign('top'); # set attribute
+  $elem->align;         # get attribute
+  $elem->tagName;
+  # etc
+  
+  $elem->rows->[0]; # first row
+  ($elem->rows)[0]; # same
+  
+  $row = $elem->insertRow(7);
+  $elem->deleteRow(1);
+
+=head1 DESCRIPTION
+
+This class implements 'thead,' 'tfoot' and 'tbody' elements in an HTML::DOM 
+tree. 
+It 
+implements the HTMLTableSectionElement DOM interface and inherits from 
+L<HTML::DOM::Element> (q.v.).
+
+=head1 METHODS
+
+In addition to those inherited from HTML::DOM::Element and its 
+superclasses, this class implements the following DOM methods:
+
+=over 4
+
+=item align
+
+=item ch
+
+=item chOff
+
+=item span
+
+=item vAlign
+
+Each of these returns the corresponding HTML attribute. (C<ch> and C<chOff>
+correspond to 'char' and 'charoff,' respectively.) If you pass an
+argument, it will become the new value of the attribute, and the old value
+will be returned.
+
+=item rows
+
+This returns a collection of the table's rows.
+
+=item insertRow
+
+Inserts a new row at the given index and returns it.
+
+=item deleteRow
+
+Deletes the row at the given index.
+
+=back
+
+=head1 SEE ALSO
+
+L<HTML::DOM>
+
+L<HTML::DOM::Element>
+
+L<HTML::DOM::Element::Table>
+
+L<HTML::DOM::Element::TR>

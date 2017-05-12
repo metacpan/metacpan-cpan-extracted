@@ -1,0 +1,1347 @@
+=head1 NAME
+
+HTML::YaTmpl - Yet Another Template Processor
+
+=head1 SYNOPSIS
+
+ use HTML::YaTmpl;
+
+ my $t=HTML::YaTmpl->new( file=>'template.tmpl' );
+ $t->evaluate( key1=>$value1,
+               key2=>[$val21, $val22, ...]
+               ... );
+ $t->evaluate_to_file( $outputfilename,
+                       key1=>$value1,
+                       key2=>[$val21, $val22, ...]
+                       ... );
+
+=head1 ABSTRACT
+
+C<HTML::YaTmpl> aims mainly to provide a HTML template processor that saves
+the template writer typing.
+
+There are general template processors like C<Text::Template> and tools to
+embed perl in HTML like C<HTML::Embperl> or HTML template processors
+like C<HTML::Template>. Why have I decided to start yet another? Well,
+C<Text::Template> is not really convenient when it comes to process
+repeating data records like HTML tables. With C<HTML::Embperl> no professional
+"WEB Designer" will be able to "enhance" the pages. And C<HTML::Template>
+enforces a strict division of design and programming. Thus, it enforces
+changes to the programming logic even if you only want to exchange a long
+number like 2835067264068365493 with a more human readable
+2,835,067,264,068,365,493.
+
+C<HTML::YaTmpl> attempts to make simple things easy but complexity feasible.
+
+=head1 DESCRIPTION
+
+C<HTML::YaTmpl> follows the object oriented paradigm, i.e. you have to
+create a template processor prior to using it. A template processor is not
+bound to any particular template. You can use one processor to evaluate
+various templates. But other properties like error handling are bound to
+the processor.
+
+=head2 Constructor
+
+=over 2
+
+=item B<new( attrname=E<gt>attrval, ... )>
+
+creates a new C<HTML::YaTmpl> object. These attributes can be set:
+
+=over 2
+
+=item B<template> [optional]
+
+is the actual template text. It is used for programmatically generated
+templates. It is overridden by template() and open() methods.
+
+=item B<file> [optional]
+
+sets a file to read the template from. Setting this attribute via new()
+causes the open() method to be called. If open() fails new() will return
+undef instead of an object.
+
+=item B<path> [optional]
+
+is an ARRAY (passed as reference) to be used as template search path. If
+omitted the environment variable C<HTML_TMPL_SEARCH_PATH> is split by your path
+separator (see the L<Config|Config/path_sep> module documentation) (on UNIX
+a ':' on Windows ';'). The C<path> attribute is used by open().
+
+=item B<package> [optional]
+
+specify a package to evaluate template code fragments. If omitted the caller
+package of the constructor is used. Thus, the package can be used to define
+convenience functions to be called from within a template.
+
+=item B<no_eval_cache> [optional]
+
+C<HTML::YaTmpl> wraps all code fragments from templates into subroutines and
+calls then these subroutines. Normally the subroutines are cached to avoid
+multiple calls of the perl interpreter. If C<no_eval_cache> is set the cache
+is turned off. This can be useful for long running applications that process
+user provided templates. On the other hand there is the method
+clear_cache() to clear that cache from time to time.
+
+=item B<onerror> [optional]
+
+=item B<eprefix> [optional]
+
+=item B<errors> [optional]
+
+see L<ERROR HANDLING|/"ERROR HANDLING"> below
+
+=item B<compress> [optional]
+
+This attribute let you choose a compression method given by a file name
+suffix. By now only C<gz> is defined.
+
+C<evaluate()> returns compressed output. C<evaluate_to_file()> writes
+compressed output. The output file name is extented with a suffix indicating
+the compression method.
+
+Only the tailing characters of the given string are evaluated to select
+the compression method but the complete string is used as file name suffix.
+Thus:
+
+ $t->compress='.gz' or
+ $t->compress='-gz' or
+ $t->compress='gz'
+
+all select the C<gzip> compression method. But
+C<$t-E<gt>evaluate_to_file( "out.html" )> will write C<out.html.gz> or
+C<out.html-gz> or C<out.htmlgz> respectivly.
+
+=back
+
+If the constructor is called as instance method rather than as class method
+the new object inherits all attributes from the old instance.
+Naturally, explicitely named attributes are overridden.
+
+=back
+
+=head2 Attribute Access Methods
+
+These methods have got the C<:lvalue> attribute. They can be
+assigned using C<$self-E<gt>method=$new_value> syntax. Called without
+parameter they return the actual attribute value. Calling with parameter
+sets the attribute value.
+
+=over 2
+
+=item B<template>
+
+=item B<file>
+
+=item B<path>
+
+=item B<package>
+
+=item B<no_eval_cache>
+
+=item B<compress>
+
+see L<new()|/"Constructor"> above
+
+=item B<onerror>
+
+=item B<eprefix>
+
+=item B<errors>
+
+see L<ERROR HANDLING|/"ERROR HANDLING"> below
+
+=back
+
+=head2 Template Evaluation Methods
+
+=over 2
+
+=item B<evaluate($private_data, key1=E<gt>$val1, key2=E<gt>$val2, ...)>
+
+This function evaluates the current template (set via template() or open())
+and returns the result. B<Note>, simply setting the current file via
+C<$self-E<gt>file=$newfile> will not change the current template. Only after
+a call to the open() method the template is changed.
+
+C<$private_data> is an optional argument that can be
+used to pass additional data to and from the template. From within the
+template it is accessible as C<$p>.
+
+All other parameters are key=E<gt>value pairs that provide variables to
+the template. Internally they are gathered in a hash that is accessible
+from within the template as C<$h>.
+
+=item B<evaluate_to_file($file, \%private_data, key1=E<gt>$val1, ...)>
+
+This function calls evaluate() and writes the result to C<$file>. If C<$file>
+is a GLOB reference the evaluation result is written to that file handle.
+If it is a CODE reference the referenced function is called with the
+evaluation result as C<$_[0]>. The return value is returned. If C<$file>
+is an object and the object UNIVERSAL::can print() then that print method
+is called. Otherwise C<$file> is interpreted as the name of a file where
+the evaluation result is to be written. If the template evaluation throws
+an exception C<$file> remains untouched. evaluate_to_file() returns false
+if something went wrong, e.g. no space left on device or no permission to
+write the file.
+
+=back
+
+=head2 Configuration File Evaluation Methods
+
+=over 2
+
+=item B<evaluate_as_config($private_data, key1=E<gt>$val1, key2=E<gt>$val2, ...)>
+
+This function is similar to evaluate(). However, it treats the template
+as some kind of configuration file. Here is an example how it works. Given
+the template:
+
+ <=key1>Value1</=key1>
+ <=key2>Value2</=key2>
+
+evaluate_as_config() will return an hash reference:
+
+ { key1=>'Value1', key2=>'Value2' }
+
+B<Note>, this function is experimental.
+
+=back
+
+=head2 Cache Management Methods
+
+C<HTML::YaTmpl> uses a cache to avoid multiple compilation of the same
+code fragment or multiple parsing of the same template.
+Simply hashing each compiled code or template fragment can lead to memory
+leaks for long running processes that use user provided templates. To
+prevent that the cache is assigned a high and a low water mark. If the
+number of cache elements reaches the high water mark elements are
+deleted on a LRU basis so that it drops to the low water mark.
+The cache is not bound to a C<HTML::YaTmpl> object but is shared by all objects.
+
+The cache is implemented as 2 independent HASHes for compiled code
+and template fragments respectively. The high and low water marks are use
+for both of them.
+
+=over 2
+
+=item B<clear_cache>
+
+deletes all cache entries.
+
+=item B<cache_highwatermark>
+
+returns and sets the high water mark. It is set by default to 10000.
+This function is assigned the :lvalue attribute. It can thus be called
+C<HTML::YaTmpl->cache_highwatermark=$newvalue>.
+
+=item B<cache_lowwatermark>
+
+returns and sets the low water mark. It is set by default to 5000.
+This function is assigned the :lvalue attribute. It can thus be called
+C<HTML::YaTmpl->cache_lowwatermark=$newvalue>.
+
+=item B<cache_sizes>
+
+returns the actual number of cached code fragments.
+
+=back
+
+=head2 Other Methods
+
+=over 2
+
+=item B<open>
+
+opens the current file and sets it's content as the current template.
+You can construct a C<HTML::YaTmpl> object without any template and later
+set the C<file> and possibly the C<path> attribute and call open() to
+set the template from the file's content.
+
+open() can be called with arguments:
+ $self->open( file=>$filename, path=>$path );
+to set the current file and template path in one call. Both parameters are
+optional.
+
+If the current file cannot be read for any reason open() returns undef.
+C<$!> will indicate the reason.
+If a template file was read successfully C<$self> is returned.
+
+=item B<clear_errors>
+
+clears the objects error list returning it's content.
+
+=back
+
+=head1 TEMPLATE SYNTAX AND EVALUATION
+
+As for other templare processors a template is a file containing
+normal content and some special template sequences that will be exchanged with
+computed values during template evaluation.
+Since this is mainly a HTML template engine these sequences are chosen
+similar to HTML tags. There are 3 kinds of sequences:
+
+=over 2
+
+=item Sequences starting with B<< <= >>
+
+are used for variable expansion.
+
+=item Sequences starting with B<< <: >>
+
+are used to control further evaluation, e.g. including other template files,
+evaluate only parts of the template depending on some variables, ...
+
+=item Sequences starting with B<< <# >>
+
+are used as comments
+
+=back
+
+Template sequences as other HTML/XML sequences are opened with an opening
+tag and closed with a closing tag, e.g.
+
+ <=variable_name parameter_list> body </=variable_name>
+
+But if C<body> is empty this sequence can be abbreviated to
+
+ <=variable_name parameter_list/>
+
+where the trailing C<< /> >> instead of the simple C<< > >> is essential.
+Thus, here come some valid template sequences:
+
+=over 2
+
+=item B<< <=name/> >>
+
+this is probably the most used form. It simply inserts the value of the
+key C<name> provided to evaluate() instead of C<< <=name/> >>.
+
+=item B<< <=name type="array"/> >>
+
+now the parameter C<type> is set. It specifies that this sequence should be
+expanded only if the value provided to evaluate as C<name> is a reference
+to a non-empty array. In that case the string consisting of all elements of
+the array concatenated is inserted. Otherwise the template sequence is simply
+deleted from the output.
+
+=item B<< <:include other_template.tmpl inherit a=b x=y/> >>
+
+this is an example of a control sequence. It reads and evaluates the template
+file C<other_template.tmpl>. This new evaluation inherits all variables from
+the current evaluation and adds 2 new variables C<a> and C<x> with the values
+C<b> and C<y>.
+
+=item B<< <:include other_template.tmpl><:set a>b</:set></:include> >>
+
+just the same but with closing tags. The only variable C<other_template.tmpl>
+sees is C<a>.
+
+=back
+
+=head2 Simple Variable Substitution
+
+=head3 Basics
+
+The basic form of variable substitution is C<< <=name/> >> or
+C<< <=name></=name> >>. Given the template:
+
+ some text '<=var/>' other text
+
+If evaluate is called as
+
+ $t->evaluate( var=>'computed text' );
+
+it will return
+
+ some text 'computed text' other text
+
+But you can provide also an ARRAY reference to evaluate instead of the
+scalar to achieve the same result.
+
+ $t->evaluate( var=>['com', 'pu', 'ted', ' ', 'text'] );
+
+=head3 Scalar, Array and Empty Processing
+
+How does this work? If evaluate receives an ARRAY ref as a variable's value
+it sort of evaluates C<< <=var/> >> for each array element and concatenates
+the results. But you can specify that a variable substitution should be done
+only if the provided value is of a particular type. 4 such types are available
+
+=over 2
+
+=item B<scalar>
+
+only if the provided value is a non-empty scalar (ref() does not return
+C<ARRAY> and length() returns something not equal zero) it is substituted.
+Otherwise an empty string is substitued.
+
+=item B<array>
+
+only if the provided value is a non-empty array (ref() returns
+C<ARRAY> and it consists of at least one element) it is substituted.
+Otherwise an empty string is substitued.
+
+=item B<empty>
+
+a value is empty if it is not a scalar nor an array as described above, i.e.
+if it is either an empty string or an array without any element.
+
+=item B<given>
+
+a value is given if it is a non-empty array or string. If this type is
+specified special list handling is turned off. It is usefull if you want
+for example generate a link list to array items that are processed in detail
+elsewhere. For example a table should be printed somewhere on a page and
+on top of that page a shortcut link to that table should be printed but
+only if the table is not empty.
+
+=back
+
+The template
+
+ some text '<=var type=scalar/>' other text
+
+will show the result seen above only if evaluate() is called as
+
+ $t->evaluate( var=>'computed text' );
+
+The other case will produce
+
+ some text '' other text
+
+If a variable substitution is valid for multiple types they can be
+concatenated with a comma (,):
+
+ <=var type=scalar,array/>
+
+is evaluated if C<var> is an array or a scalar but not if it's empty.
+
+Further,
+
+ <=var type=given>Link</=var>
+
+evaluates to C<Link> if C<var> is a non-empty list or a non-empty string.
+Even if C<var> is a list containing multiple values only one occurence of
+C<Link> is substituted.
+
+=head3 Modifying the substituted value on the fly
+
+There are cases when it would be really useful to modify the substituted
+value a little from within the template. Imagine you want to make big
+numbers more readable (52345635476 should be displayed as 52,345,635,476)
+or you want to substitute a list (passed as array reference, see above) and
+don't want the elements simply be concatenated but displayed as HTML list
+elements (C<< <li>element</li> >>). C<HTML::YaTmpl> provides 2 ways for doing
+this.
+
+=head3 Using C<< <:/> >>
+
+Given the template
+
+ fruits comprise
+ <ul>
+ <=fruits><li><:/></li>
+ </=fruits></ul>
+
+the call
+
+ $t->evaluate( fruits=>[qw{apples pears plums cherries}] );
+
+will generate
+
+ fruits comprise
+ <ul>
+ <li>apples</li>
+ <li>pears</li>
+ <li>plums</li>
+ <li>cherries</li>
+ </ul>
+
+Now we are using the long form of variable substitution (<=var></=var>). The
+tag body describes the actual substitution. Within the tag body the control
+sequence C<< <:/> >> stands for the actual value. Of course C<< <:/> >> can
+be given several times within a substitution body:
+
+ <=fruits><:/> and <:/> give <:/>
+ </=fruits>but
+ men and women give children
+
+generates
+
+ apples and apples give apples
+ pears and pears give pears
+ plums and plums give plums
+ cherries and cherries give cherries
+ but
+ men and women give children
+
+=head3 Using Perl code fragments
+
+The same result can be achieved using Perl inside the C<< <:/> >> control
+sequence:
+
+ <=fruits><:"$v and $v give $v\n"/></=fruits>but
+ men and women give children
+
+Now we see the C<< <:/> >> control sequence in action. It can contain perl
+code fragments that change the substituted value. The code fragment is called
+with C<$v> set to the actual variable. If the evaluate() call was passed the
+optional C<$private_data> parameter it is available as C<$p> from within these
+code fragments. Otherwise C<$p> points to a HASH that is created once
+for each evaluate() call. Thus, code fragments can communicate with each
+other using this hash:
+
+ <=fruits><: ++$p->{fruitcounter} />. <:/>
+ </=fruits>total: <:$p->{fruitcounter}/> fruits
+
+produces
+
+ 1. apples
+ 2. pears
+ 3. plums
+ 4. cherries
+ total: 4 fruits
+
+Maybe you have noticed the total counter in the last line was generated without
+any surrounding C<< <=var></=var> >> sequence. Yes, that works too. In this
+case C<$v> is C<undef>.
+
+=head3 Supplying Perl fragments using C<code=...>
+
+By now the most examples have used the long variable substitution form
+(C<< <=var>...</=var> >>). In most cases this is probably the *right*
+thing but you can use the short form even when modifying the substitution
+value:
+
+ <=fruits code="<: ++$p->{fruitcounter} />. <:/>
+ "/>total: <:$p->{fruitcounter}/> fruits
+
+will produce exactly the same result as above but it's almost not readable.
+Whereas:
+
+ <html><body>
+ <table>
+ <=fruits code="<tr><td><: ++$p->{counter} /></td><td><:/></td></tr>"/>
+ <tr><td>total number of fruits</td><td><:$p->{counter}/></td></tr>
+ </table>
+ </body></html>
+
+generate perfectly valid (but not easy human readable) HTML text.
+
+You see, the C<code=...> parameter to a C<< <=var .../> >> sequence does the
+trick. It can comprehend any text but should in most cases be surrounded by
+double quote characters (E<quot>). Within this surrounding double quote
+and backslash characters must be quoted with backslashes, all other can.
+Thus:
+
+ <=fruits code="<li><:\"\\u$v\"/></li>"/>
+
+generates a HTML list of capitalized fruits:
+
+ <li>Apples</li><li>Pears</li><li>Plums</li><li>Cherries</li>
+
+However, I believe, this kind of code fragments is the wrong way. But it can be
+even worse. You can omit the surrounding double quotes but then you must
+quote almost anything except characters matching C<\w> with backslashes.
+The previous example without surrounding quotes looks like:
+
+ <=fruits code=\<li\>\<:\"\\u$v\"/\>\</li\>/>
+
+=head3 Special list processings
+
+When a list is to be substituted often special treatment is required for the
+first and the last list element or some text should be prepended or
+appended to the substitution result:
+
+ <=fruits first="<: ucfirst $v/>" last=" and <:/>" code=", <:/>"/>
+ are fruits.
+
+generates
+
+ Apples, pears, plums and cherries
+ are fruits.
+
+You see, if there are C<first=...> and C<last=...> parameters to a
+variable substitution they affect the first respectively last list element.
+
+On the other side there are C<pre=...> and C<post=...> parameters. They
+are evaluated before the first respectivly after the last list element:
+
+ <=fruits pre="<select name=\"fruit\"><:\"\\n\"/>"
+          code="<option><:/></option><:\"\\n\"/>"
+          post="</select><:\"\\n\"/>"/>
+
+produces
+
+ <select name="fruit">
+ <option>apples</option>
+ <option>pears</option>
+ <option>plums</option>
+ <option>cherries</option>
+ </select>
+
+Using the long substitution form these examples would look like:
+
+ <=fruits>
+ <:first><:"\u$v"/></:first>
+ <:last> and <:/></:last>
+ <:code>, <:/></:code>
+ </=fruits>
+ are fruits.
+
+respectively:
+
+ <=fruits>
+ <:pre><select name="fruit">
+ </:pre>
+ <:post></select>
+ </:post>
+ <:code><option><:/></option>
+ </:code>
+ </=fruits>
+
+I think, the C<< <:first> >>, C<< <:last> >>, C<< <:prev> >> and
+C<< <:post> >> semantics are intuitively clear. C<< <:code> >> needs some
+explanation. In the previous examples using the long form the text between
+C<< <=var> >> and C<< </=var> >> has described what to substitute. That will
+remain to work. If no C<< <:code> >> section is found all text between
+C<< <=var> >> and C<< </=var> >> save the control sequences will be used.
+But this results in many unnecessary newlines since the previous example
+without C<< <:prev> >> and C<< <:post> >> look like:
+
+ <=fruits>
+                                               # empty line
+                                               # empty line
+ <option><:/></option>
+ </=fruits>
+
+Thus, C<< <:code> >> can be used for convenience.
+
+=head3 More special list processings
+
+Perl knows list operations such as C<map>, C<grep> and C<sort>. These are
+also useful in templates. Why the program logic should know about the
+order in which a list is displayed? It must supply the list. That's it.
+
+Just to arrange our fruits alphabetically we can write:
+
+ <=fruits sort="$a cmp $b">
+ <:code><:/>, </:code>
+ <:last><:/></:last>
+ </=fruits>
+
+and get
+
+ apples, cherries, pears, plums
+
+But can we order reverse fruits, i.e. selppa instead of apples?
+
+ <=fruits map="scalar reverse $_" sort="$a cmp $b">
+ <:code><:/>, </:code>
+ <:last><:/></:last>
+ </=fruits>
+
+give
+
+ seirrehc, selppa, smulp, sraep
+
+But I want:
+
+ cherries, apples, plums, pears
+
+ok, here comes the template:
+
+ <=fruits map="scalar reverse $_"
+          sort="$a cmp $b"
+          map="scalar reverse $_">
+ <:code><:/>, </:code>
+ <:last><:/></:last>
+ </=fruits>
+
+But I don't like plums! Ok then:
+
+ <=fruits grep="!/plum/i"
+          map="scalar reverse $_"
+          sort="$a cmp $b"
+          map="scalar reverse $_">
+ <:code><:/>, </:code>
+ <:last><:/></:last>
+ </=fruits>
+
+results in
+
+ cherries, apples, pears
+
+Of course these parameters can also be written in long form and even mixed:
+
+ <=fruits grep="!/plum/i">
+ <:map>scalar reverse $_</:map>
+ <:sort>$a cmp $b</:sort>
+ <:code><:/>, </:code>
+ <:last><:/></:last>
+ </=fruits>
+
+produces
+
+ seirrehc, selppa, sraep
+
+There can be as many as you like grep/sort/map fragments. The source list
+is first processed by the fragments passed as parameters
+(C<< <=var grep=... map=... sort=... ...> >>) in left to right order and
+then by the fragments given in long form (C<< <:sort>...</:sort> >>) in top
+down order.
+
+=head3 Real World Example
+
+Suppose you want to create a WEB application with an input field to put
+the name of a town. The user would first see a simple
+C<< <input type="text"> >> field. He types in some characters and submits
+the form. Now your program matches the user input with a database. There
+can be 3 results. The user input can non-ambiguously match a database record
+or there are several matches or no match at all. In the first case your
+program should answer the user with a page simply showing the matching
+record. In the second case it should display a select field and in the 3rd
+the C<< <input type="text"> >> field. Your template would look like:
+
+ <=town type=empty><input type="text" name="town"></=town>
+ <=town type=array pre="<select name=\"town\">"
+                   post="</select>">
+ <option><:/></option>
+ </=town>
+ <=town type=scalar><b><:/></b></=town>
+
+and you get a text field C<town> is passed as C<undef>, an empty string
+or an empty array. A selection field is generated if C<town> is passed
+as a non-empty array and the town set in bold is produced if it is passed
+as non-empty string.
+
+=head2 Control Statements
+
+Many control sequences have been shown in the previous chapter. Here the are
+listed again:
+
+=over 2
+
+=item B<< <:/> or <:></:> >>
+
+is used to execute perl code. C<< <: some perl code /> >> and
+C<< <:> some perl code </:> >> are equivalent. Within the perl code the
+variables C<$v>, C<$p> and C<$h> can be used. C<$v> contains the current
+variable to be substituted. C<$p> holds the C<private_data> parameter. C<$h>
+points at a HASH containing all parameters passed to the current scope (see
+C<< <:eval> >> for an example of using it).
+
+=item B<< <:code></:code> >>
+
+is used to mark the actual template code within variable substitution
+or C<< <:eval> >> or C<< <:for> >> blocks. This can be used for convenience.
+
+=item B<< <:pre></:pre> >>
+
+=item B<< <:post></:post> >>
+
+=item B<< <:first></:first> >>
+
+=item B<< <:last></:last> >>
+
+=item B<< <:map></:map> >>
+
+=item B<< <:grep></:grep> >>
+
+=item B<< <:sort></:sort> >>
+
+see L<previous chapter|"More special list processings">.
+
+=item B<< <:for ...>...</:for> >>
+
+The C<< <:for> >> statement is used to evaluate a part of the template
+with changed parameters. For example you want to make up a HTML table that
+is passed as list of lists:
+
+ $t->evaluate( fruit_colors=>[[qw{apples red/green}],
+			      [qw{pears green}],
+			      [qw{plums blue/yellow}],
+			      [qw{cherries red}]] );
+
+with the template
+
+ <table>
+ <=fruit_colors><:for f="<:/>">
+ <:code><tr><=f><td><:/></td></=f></tr>
+ </:code>
+ </:for></=fruit_colors></table>
+
+generates
+
+ <table>
+ <tr><td>apples</td><td>red/green</td></tr>
+ <tr><td>pears</td><td>green</td></tr>
+ <tr><td>plums</td><td>blue/yellow</td></tr>
+ <tr><td>cherries</td><td>red</td></tr>
+ </table>
+
+Here the opening C<< <=fruit_colors> >> begins a scope of substituting
+C<fruit_colors>. As C<fruit_colors> is an array the tag body is evaluated
+for each element. The tag body contains a single C<< <:for> >> statement
+used to assign C<f> temporarily the current value of C<fruit_colors>, i.e.
+C<f> is assigned in turn each element of the C<fruit_colors> list. Within
+to C<< <:for> >> statement we see the evaluation of C<< <=f> >> surrounded
+by C<< <tr> >>. As C<f> is also an array it generated C<< <td> >>'s for
+each element.
+
+The C<< <:for> >> statement features a template within a template. The inner
+template can be given as a C<< <:code> >> statement or if omitted the body
+of the tag is used. Thus, the following template is almost equivalent to the
+previous one:
+
+ <table>
+ <=fruit_colors><:for f="<:/>">
+ <tr><=f><td><:/></td></=f></tr>
+ </:for></=fruit_colors></table>
+
+In fact it generates an empty line before each table row.
+
+The parameter list for the inner template (the one that is passed to the
+evaluate() function) is completely made anew. In our example the inner
+template receives only one variable: C<f>. But there is a way to bequeath
+all current variables to the inner template. Just put the reserved word
+C<:inherit> or C<:inheritparms> in the parameter list of the C<< <:for> >>
+statement. With
+
+ <:for f="<:/>" :inherit>
+
+the inner template would see also C<fruit_colors> and all other outer
+variables.
+
+All parameters containing an unquoted equal sign (=) are used to set up the
+parameter list for the include template. The simplest form of a parameter is
+a string like
+
+ <:for some_fruit="plum">
+
+Slightly more complex is passing an outer variable with an other name:
+
+ <:for inner_fruits="<=fruits/>">
+
+This evaluates C<fruits> and stores the result as C<inner_fruits>.
+If C<fruits> is an array so does C<inner_fruits>. If the substitution
+statement of C<fruits> contains C<pre> or C<post> components C<inner_fruits>
+will contain them as first / last list element. You also can surround the
+variable substitution with plain text. In this case each element of
+C<inner_fruits> gets surrounded by this text. And you can include in the
+definition of one inner variable multiple outer variables. In this case
+each outer list variable is expanded and the resulting number of list
+elements is the mathematical product of the numbers of elements of all
+outer lists. The template (B<Note:> The sequence C<< <#.../> >> is a comment
+and used in this example to hide the newline in the template. For more
+details on comments see below.):
+
+ <:for inner_fruits="PRE <=fruits pre=pre1
+                                  post=post1
+                                  grep=\"/l/\"/> <#
+                   />BETWEEN <=fruits pre=pre2
+                                      post=post2
+                                      grep=\"/r/\"/> POST">
+ <:code><=inner_fruits last="(<:/>)">(<:/>)
+ </=inner_fruits></:code>
+
+generates a total of 16 lines:
+
+ (PRE pre1 BETWEEN pre2 POST)
+ (PRE pre1 BETWEEN pears POST)
+ (PRE pre1 BETWEEN cherries POST)
+ (PRE pre1 BETWEEN post2 POST)
+ (PRE apples BETWEEN pre2 POST)
+ (PRE apples BETWEEN pears POST)
+ (PRE apples BETWEEN cherries POST)
+ (PRE apples BETWEEN post2 POST)
+ (PRE plums BETWEEN pre2 POST)
+ (PRE plums BETWEEN pears POST)
+ (PRE plums BETWEEN cherries POST)
+ (PRE plums BETWEEN post2 POST)
+ (PRE post1 BETWEEN pre2 POST)
+ (PRE post1 BETWEEN pears POST)
+ (PRE post1 BETWEEN cherries POST)
+ (PRE post1 BETWEEN post2 POST)
+
+Due to the C<grep> statements the first expansion of C<fruits> contains
+only elements with an C<l> letter, i.e. C<apples> and C<plums>, whereas
+the second expansion consists of elements with an C<r> letter, i.e C<pears>
+and C<cherries>.
+As shown each C<fruits> list is expanded with a C<pre> and C<post> elements.
+Thus, the total number of elements of the C<inner_fruits> list is 4*4=16.
+
+By now we have seen in this chapter assigning of simple strings and 
+expanded arrays to inner variables. But what happens if C<< <:for> >> is
+placed within a variable substitution scope like in the prefacing example
+to this chapter? The template (provided with line numbers)
+
+  1  <:>
+  2  sub fac {
+  3    use Math::BigInt;
+  4    my $x=shift;
+  5    my $res=Math::BigInt->new(1);
+  6    for( my $i=1; $i<=$x; $i++ ) {
+  7      $res*=$i;
+  8    }
+  9    return $res;
+ 10  }
+ 11  </:><html><body>
+ 12  <table>
+ 13  <:for x="<:[map {[$_, $_**2, $_**3, fac $_]} 1..30]/>"
+ 14        h="<:[qw{n n^2 n^3 n!}]/>">
+ 15  <:code>
+ 16      <tr>
+ 17        <=h><th><:/></th> </=h>
+ 18      </tr>
+ 19    <=x>
+ 20      <:code>
+ 21        <tr>
+ 22          <:for y="<:/>">
+ 23            <:code><=y><td><:/></td> </=y></:code>
+ 24          </:for>
+ 25        </tr>
+ 26      </:code>
+ 27    </=x></:code>
+ 28  </:for></table>
+ 29  </body></html>
+
+generates a HTML page containing a table of the first 30 square and
+cube numbers and factorials. The first control sequence (lines 1-11) is
+substituted with nothing as the value of this code fragment is C<undef>. It
+just defines a C<fac> function. Lines 13 and 14 opens a C<< <:for> >> scope
+that is closed at line 28. Within this scope the variables C<x> and C<h> are
+valid. Both are list variables since the C<< <:/> >> control sequences return
+ARRAY references. Within that scope at line 17 C<h> is evaluated to a list
+of C<< <th> >> statements. That is more or less what we have seen before.
+But now in line 19 a variable substitution scope is opened. That means for
+each element of the C<x> list lines 21 to 25 are evaluated repeatedly. Since
+C<x> consists of arrays the evaluation of C<< <:/> >> produces an array.
+That is used in a nested C<< <:for> >> scope at lines 22 to 24 to 
+subsequently assign to a variable C<y> each of them. Now the body of our
+nested C<< <:for> >> can evaluate C<y> and create a list of C<< <td> >>
+statements.
+
+By now we have seen parameter lists formed like
+
+ <:for a="b" c="d" ... />
+
+This can lead to a lot of quoting backslashes within strings. A little
+foreboding give the last C<inner_fruits> example. There we had to write
+C<grep=\"/l/\"> to quote the double quotes. This can be avoided using the
+C<< <:set> >> control sequence.
+
+ <:for>
+ <:set inner_fruits>PRE <=fruits pre=pre1
+                                 post=post1
+                                 grep="/l/"/> <#
+                  />BETWEEN <=fruits pre=pre2
+                                     post=post2
+                                     grep="/r/"/> POST</:set>
+ <:code><=inner_fruits last="(<:/>)">(<:/>)
+ </=inner_fruits></:code>
+ </:for>
+
+generates exactly the same result without quoting any character.
+
+Well, I believe, these examples are enough to show what can be done with
+C<< <:for> >>. BTW, all these examples are contained in the file
+F<t/5_fruits.t> of the distribution. The module is tested against them.
+
+=item B<< <:eval ...>...</:eval> >>
+
+works exactly the same as the C<< <:for> >> statement but resulting text is
+evaluated again. This can be useful in some rare cases, e.g.:
+
+  1  <:for fruits="<:[qw/apple pear/]/>"
+  2        books="<:['The Silmarillion',
+  3                  'The Lord of the Rings',
+  4                  'The Hobbit or There And Back Again']/>"><#
+  5  /><:eval what="<:[qw/book fruit/]/>"><#
+  6  /><=what><#
+  7  /><=<:/>s>
+  8  <<#/>:pre>Select a <: ucfirst $v />:
+  9  <select name="<:/>"><<#/>/:pre>
+ 10  <<#/>:post></select>
+ 11  <<#/>/:post>
+ 12  <<#/>:code><option><<#/>:/></option>
+ 13  <<#/>/:code>
+ 14  </=<:/>s><#
+ 15  /></=what><#
+ 16  /></:eval><#
+ 17  /></:for>
+
+Consider you get a lot of specialized variables that need to be treated all
+the same way. In the example above the outer C<< <:for> >> scope built with
+lines 1-4 and 17 creates 2 variables. For both of them a C<< <select> >> box
+should be generated. Of course one could write
+
+ <=books>...</=books><=fruits>...</=fruits>
+
+but it's also possible to let the template system generate the actual template
+and then evaluate it. That's what C<< <:eval> >> is for. Within the
+C<< <:eval> >> scope between lines 5 and 16 the variable C<what> contains a
+list of 2 elements C<book> and C<fruit>. Variable substitution then occurs
+at lines 7, 14, 8 and 9. Lines 7 and 14 are evaluated to C<< <=books> >> and
+C<< <=fruits> >> and C<< </=books> >> and C<< </=fruits> >> respectively thus
+creating something looking very similar to a template. Further, all comments
+are eliminated. Here the C<< <#/> >> comments are important. They prevent
+constructs like C<<< <<#/>:/> >>> to be evaluated as C<< <:/> >> in the
+first run. They sort of quote template sequences.
+In fact the generated template is:
+
+ <=books>
+ <:pre>Select a Book:
+ <select name="book">
+ </:pre>
+ <:post></select>
+ </:post>
+ <:code><option><:/></option>
+ </:code>
+ </=books><=fruits>
+ <:pre>Select a Fruit:
+ <select name="fruit">
+ </:pre>
+ <:post></select>
+ </:post>
+ <:code><option><:/></option>
+ </:code>
+ </=fruits>
+
+This template is then evaluated with the parameter list of the C<< <:eval> >>'s
+outer scope, i.e. it sees C<fruits> and C<books> but not C<what>.
+
+One could argument that the same result can be achieved avoiding an
+intermediate template. In fact
+
+  1  <:for fruits="<:[qw/apple pear/]/>"
+  2        books="<:['The Silmarillion',
+  3                  'The Lord of the Rings',
+  4                  'The Hobbit or There And Back Again']/>"><#
+  5  /><:for what="<:[qw/book fruit/]/>" :inherit><#
+  6  /><=what><#
+  7  />Select a <: ucfirst $v />:
+  8  <select name="<:/>">
+  9  <:for el="<:$h->{$v.'s'}/>" :inherit><#
+ 10  /><=el>
+ 11  <:code><option><:/></option>
+ 12  </:code>
+ 13  </=el></select>
+ 14  </:for><#
+ 15  /></=what><#
+ 16  /></:for><#
+ 17  /></:for>
+
+produces exactly the same output. But it needs the special variable C<$h>
+to do the trick. Anyhow, C<< <:eval> >> is useful if parts of a template
+are fetched from a database for example.
+
+=item B<< <:include file .../> or <:include file>...</:include> >>
+
+evaluates another template and inserts the result. The include directive
+expects a parameter list containing at least on item without an unquoted
+equal sign (=). The first such element is used as name of the template file.
+Templates are searched according to the given search path.
+
+All other parameters are used to make up the parameter list for the include
+template, see L<< <:for>|/"<:for ...>...</:for>" >> above. The tag body
+is ignored save C<< <:set>...</:set> >> statements which are also used to
+form the parameter list.
+
+=item B<< <:cond ...><:case ...>...</:case>...</:cond> >>
+
+is used to allow conditionally evaluation of templates. The statement somehow
+resembles Lisp's C<cond> statement or C's C<switch>. The template
+
+  1  <:for>
+  2  <:set goods><:
+  3  [
+  4   [apple=>'300'],
+  5   [pear=>'90'],
+  6   [cherry=>'82'],
+  7   [plum=>'120'],
+  8  ]
+  9  /></:set>
+ 10  <:code><=goods pre="<table>" post="
+ 11  </table>">
+ 12  <tr><:for x="<:/>"><=x><td><:/></td></=x><td></:for><:cond>
+ 13  <:case "$v->[1]>150"><b>very expensive</b></:case>
+ 14  <:case "$v->[1]<100"><b>bargain</b></:case>
+ 15  <:case 1>normal prize</:case>
+ 16  </:cond></td></tr></=goods></:code>
+ 17  </:for>
+
+generates a table of goods marking a few of them as very expensive or bargain
+buy depending on their prizes. The C<< <=goods> >> statement at line 10 opens
+a variable substitution scope. Within this scope at line 12 starts a
+C<< <:cond> >> statement thus C<$v> references to one list element. The
+C<< <:case> >> statements at lines 13, 14 and 15 are then evaluated top down.
+The first C<< <:case> >>'es body whose condition evaluates to true builds
+the value of the whole C<< <:cond> >> statement.
+
+The example above shows C<< <:cond> >> without parameters. If it is called
+with parameters they name variables that are to be used in the C<< <:case> >>
+conditions. Thus you can compare more than one variable in C<< <:case> >>es.
+
+Consider you often want to display thumbnails and only some of them
+should link to the originals. It would be useful to write an include
+template that can be called:
+
+ <:include thumb.tmpl name=img321 link=yes/>
+
+to create a thumbnail that links to it's original or
+
+ <:include thumb.tmpl name=img322/>
+
+to create a thumbnail without a link.
+
+F<thumb.tmpl> could look like:
+
+  1  <:cond link>
+  2  <:case "$link eq 'yes'">
+  3    <a href="orig/<=name/>.jpg><img src="<=name/>.jpg"></a>
+  4  </:case>
+  5  <:case 1>
+  6    <img src="<=name/>.jpg">
+  7  </:case>
+  8  </:cond>
+
+Now the C<< <:cond> >> at line 1 names C<link>. Thus C<$link> can be used
+at line 2 in the C<< <:case: >> condition.
+
+=item B<< <:m name .../> or <:m file>...</:m> or >>
+=item B<< <:macro name .../> or <:macro file>...</:macro> >>
+=item B<< <:defmacro name>...</:defmacro> >>
+
+C<< <:defmacro> >> defines a macro. For example, one can define a macro as
+
+ <:defmacro td><td align="center"><=val/></td></:defmacro>
+
+Later on it can be invoked as
+
+ <:m td val="..."/> or <:macro td val="..."/>
+
+Our previous example then can be written as
+
+  1  <:defmacro td><td align="center"><=val/></td></:defmacro><#
+  2  /><:defmacro tr><tr><:for x="<:/>"><#
+  3  /><=x><:m td val="<:/>"/></=x></:for><:macro td>
+  4  <:set val><:cond>
+  5  <:case "$v->[1]>150"><b>very expensive</b></:case>
+  6  <:case "$v->[1]<100"><b>bargain</b></:case>
+  7  <:case 1>normal prize</:case>
+  8  </:cond></:set>
+  9  </:macro></tr> </:defmacro><#
+ 10  /><:for>
+ 11  <:set goods><:
+ 12  [
+ 13   [apple=>'300'],
+ 14   [pear=>'90'],
+ 15   [cherry=>'82'],
+ 16   [plum=>'120'],
+ 17  ]
+ 18  /></:set>
+ 19  <:code><=goods pre="<table>" post="
+ 20  </table>">
+ 21  <:m tr/></=goods></:code>
+ 22  </:for>
+
+Line 1 defines a macro named C<td> that prints one HTML table cell. It uses
+the variable C<val>. Lines 2 to 9 define a macro called C<tr> that
+implements a table row. It is designed to be used in a substitution scope
+as it assigns the current value C<< <:/> >> to a variable C<x> to build
+a C<< <:for> >> scope. In line 3 the macro defined in line 1 is used twice,
+once as C<< <:m/> >> and once as C<< <:macro> >>. Then in line 21 the C<tr>
+macro is invoked and generates all table rows.
+
+Macros are bound to a C<HTML::YaTmpl> instance. That means you can define a
+set of macros in one template, evaluate it and then evaluate another template
+with the same instance using macros defined in the first template.
+
+=item B<< <:set></:set> >>
+
+is used to make up the parameter list for C<< <:for> >>, C<< <:eval> >>,
+C<< <:include> >> and C<< <:macro> >> statements. Outside one of these
+scopes or inside a C<< <:code> >> segment C<< <:set> >> can be used to
+manipulate the current parameter list.
+
+Thus, the example above can be rewritten as:
+
+  1  <:set goods><:
+  2  [
+  3   [apple=>'300'],
+  4   [pear=>'90'],
+  5   [cherry=>'82'],
+  6   [plum=>'120'],
+  7  ]
+  8  /></:set><=goods pre="<table>" post="
+  9  </table>">
+ 10  <:m tr/></=goods>
+
+reusing the macros as described above.
+
+=back
+
+=head1 Commenting templates
+
+Writing templates is very similar to writing programs. And as programs should
+contain comments to be maintainable so do templates. You can even put POD
+sections into a template and generate documentation using POD translators.
+
+When thinking about comments within templates I first thought that using
+
+ <:# any comment/>
+
+or
+
+ <:># any comment</:>
+
+would be appropriate. It invokes the perl interpreter to evaluate just
+
+ # any comment
+
+which is a perl comment and evaluates to C<undef>. Although it works it
+can slow down template eveluation. Hence I decided to let comments look like
+
+ <# this is a comment />
+
+or
+
+ <#> this is a comment </#>
+
+Thus, to put a longer comment (POD section) into your template surround it
+with C<< <#> >> and C<< </#> >>:
+
+ <#>
+ 
+ =head1 NAME
+ 
+ My very cute template
+ 
+ ...
+ 
+ </#>
+
+=head1 ERROR HANDLING
+
+There are various error conditions that can occur while evaluating a template.
+Operating system errors like I<Template File not found> or I<No space left
+on device> can be recognized by the return codes of open() or
+evaluate_to_file(). But what to do if the evaluation of a template code
+fragment dies. Abort the whole process, insert nothing in place of the
+failed fragment, ...? Well, that's the subject of this chapter.
+
+There are 3 object attributes to specify what to do in case of an error
+during template evaluation.
+
+=over 2
+
+=item B<onerror>
+
+defines what to do if a template code fragment dies during compilation or at
+runtime. C<onerror> can be assigned the following values:
+
+=over 2
+
+=item B<"warn">
+
+report the error via a C<warn> statement, continue template evaluation and
+insert nothing instead of the failed fragment.
+
+=item B<"die">
+
+report the error via a C<die> statement aborting further
+temlpate evaluation.
+
+=item B<"output">
+
+continue template evaluation and insert the error message instead of the
+code fragment.
+
+=item B<a CODE reference>
+
+the specified function is called in scalar context receiving the actual
+error message as $_[0]. It's return value is inserted instead of the code
+fragment. If the function dies the whole template evaluation is aborted.
+
+=back
+
+In either case the error message is appended to list of errors occured
+during template evaluation. This list can be retrieved after evaluate()
+has returned via the errors() method.
+
+=item B<eprefix>
+
+That string will be prepended to each error message. This can be used to
+distinguish between errors from different object using all the same error
+list.
+
+=item B<errors>
+
+contains the reference to the object's error list. This list is empty after
+a new object is created. If an error occur while evaluating a template
+with that object the error message is appended to that array. The error list
+is not cleared between calls to evaluate(). Thus, if an object is used
+to evaluate multiple templates or one templates several times it is
+recommended to clear this list between evaluate() using either clear_errors()
+or C<$self-E<gt>errors=[]>.
+
+=back
+
+=head1 TODO
+
+=over 2
+
+=item *
+
+Since our parse function can parse our templates why not use it to read
+configuration files or even files that contain data to be filled in other
+templates?
+
+=item *
+
+output options: filters, gzip compression, ...
+
+=item *
+
+plugins. fetch variable content directly from a database
+
+=item *
+
+more testing
+
+=item *
+
+mod_perl support. (maybe it is only a matter of testing)
+
+=item *
+
+optional using Safe compartments to evaluate template code fragments.
+
+=item *
+
+It would be nice if some native speaker could correct my english.
+
+=back
+
+=head1 CAVEATS
+
+The template parser is completely based on perl regular expressions. Though
+I have spent some effort to let the parsing process finish quickly even if the
+template is erroneous, it is certainly possible to construct malicious
+templates that will be parsed infinitely. Please let me know if you find
+such a template. I will try to fix it.
+
+=head1 AUTHOR
+
+Torsten FE<ouml>rtsch E<lt>Torsten.Foertsch@gmx.netE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2003 Torsten FE<ouml>rtsch.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+

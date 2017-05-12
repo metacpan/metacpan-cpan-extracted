@@ -1,0 +1,281 @@
+NAME
+
+    HPC::Runner::Scheduler - Base Library for HPC::Runner::Slurm and
+    HPC::Runner::PBS
+
+SYNOPSIS
+
+        pbsrunner.pl/slurmrunner.pl/mcerunner.pl --infile list_of_commands
+
+DESCRIPTION
+
+    HPC::Runner::Scheduler is a base library for creating templates of HPC
+    Scheduler (Slurm, PBS, etc) submission scripts.
+
+    All the scheduler variables: memory, cpus, nodes, partitions/queues,
+    are abstracted to a template. Instead of writing an entire submission
+    template
+
+        slurmrunner.pl --infile list_of_commands #with list of optional parameters
+
+    Please see the indepth usage guide at HPC::Runner::Usage
+
+User Options
+
+    User options can be passed to the script with script --opt1 or in a
+    configfile. It uses MooseX::SimpleConfig for the commands
+
+ configfile
+
+    Config file to pass to command line as --configfile /path/to/file. It
+    should be a yaml or xml (untested) This is optional. Paramaters can be
+    passed straight to the command line
+
+  example.yml
+
+        ---
+        infile: "/path/to/commands/testcommand.in"
+        outdir: "path/to/testdir"
+        module:
+            - "R2"
+            - "shared"
+
+ infile
+
+    infile of commands separated by newline
+
+  example.in
+
+        cmd1
+        cmd2 --input --input \
+        --someotherinput
+        wait
+        #Wait tells slurm to make sure previous commands have exited with exit status 0.
+        cmd3  ##very heavy job
+        newnode
+        #cmd3 is a very heavy job so lets start the next job on a new node
+
+ module
+
+    modules to load with slurm Should use the same names used in 'module
+    load'
+
+    Example. R2 becomes 'module load R2'
+
+ afterok
+
+    The afterok switch in slurm. --afterok 123 will tell slurm to start
+    this job after job 123 has completed successfully.
+
+ cpus_per_task
+
+    slurm item --cpus_per_task defaults to 4, which is probably fine
+
+ commands_per_node
+
+    --commands_per_node defaults to 8, which is probably fine
+
+ nodes_count
+
+    Number of nodes to use on a job. This is only useful for mpi jobs.
+
+    PBS: #PBS -l nodes=nodes_count:ppn=16 this
+
+    Slurm: #SBATCH --nodes nodes_count
+
+ partition
+
+    #Should probably have something at some point that you can specify
+    multiple partitions....
+
+    Specify the partition. Defaults to the partition that has the most
+    nodes.
+
+ walltime
+
+    Define PBS walltime
+
+ mem
+
+ submit_slurm
+
+    Bool value whether or not to submit to slurm. If you are looking to
+    debug your files, or this script you will want to set this to zero.
+    Don't submit to slurm with --nosubmit_to_slurm from the command line or
+    $self->submit_to_slurm(0); within your code
+
+ first_pass
+
+    Do a first pass of the file to get all the stats
+
+ template_file
+
+    actual template file
+
+    One is generated here for you, but you can always supply your own with
+    --template_file /path/to/template
+
+ serial
+
+    Option to run all jobs serially, one after the other, no parallelism
+    The default is to use 4 procs
+
+ user
+
+    user running the script. Passed to slurm for mail information
+
+ use_threads
+
+    Bool value to indicate whether or not to use threads. Default is uses
+    processes
+
+    If using threads your perl must be compiled to use threads!
+
+ use_processes
+
+    Bool value to indicate whether or not to use processes. Default is uses
+    processes
+
+ use_gnuparallel
+
+    Bool value to indicate whether or not to use processes. Default is uses
+    processes
+
+ use_custom
+
+    Supply your own command instead of mcerunner/threadsrunner/etc
+
+Internal Variables
+
+    You should not need to mess with any of these.
+
+ template
+
+    template object for writing slurm batch submission script
+
+ cmd_counter
+
+    keep track of the number of commands - when we get to more than
+    commands_per_node restart so we get submit to a new node. This is the
+    number of commands within a batch. Each new batch resets it.
+
+ node_counter
+
+    Keep track of which node we are on
+
+ batch_counter
+
+    Keep track of how many batches we have submited to slurm
+
+ batch
+
+    List of commands to submit to slurm
+
+ cmdfile
+
+    File of commands for mcerunner/parallelrunner Is cleared at the end of
+    each slurm submission
+
+ slurmfile
+
+    File generated from slurm template
+
+ slurm_decides
+
+    Do not specify a node or partition in your sbatch file. Let Slurm
+    decide which nodes/partition to submit jobs.
+
+ job_stats
+
+    HashRef of job stats - total jobs submitted, total processes, etc
+
+ job_deps
+
+    #HPC jobname=assembly #HPC job_deps=gzip,fastqc
+
+ job_scheduler_id
+
+    Job Scheduler ID running the script. Passed to slurm for mail
+    information
+
+ jobname
+
+    Specify a job name, and jobs will be jobname_1, jobname_2, jobname_x
+
+ jobref
+
+    Array of arrays details slurm/process/scheduler job id. Index -1 is the
+    most recent job submissisions, and there will be an index -2 if there
+    are any job dependencies
+
+SUBROUTINES/METHODS
+
+ run()
+
+    First sub called Calling system module load * does not work within a
+    screen session!
+
+ do_stats
+
+    Do some stats on our job stats Foreach job name get the number of
+    batches, and have a put that in batches->batch->job_batches
+
+ check_files()
+
+    Check to make sure the outdir exists. If it doesn't exist the entire
+    path will be created
+
+ parse_file_slurm
+
+    Parse the file looking for the following conditions
+
+    lines ending in `\` wait nextnode
+
+    Batch commands in groups of $self->cpus_per_task, or smaller as wait
+    and nextnode indicate
+
+ check_meta
+
+    allow for changing parameters mid through the script
+
+    #Job1 echo "this is job one" && \ bin/dostuff bblahblahblah
+
+    #HPC cpu_per_task=12
+
+    echo "This is my new job with new HPC params!"
+
+ work
+
+    Get the node #may be removed but we'll try it out Process the batch
+    Submit to slurm Take care of the counters
+
+ collect_stats
+
+    Collect job stats
+
+ process_batch()
+
+    Create the slurm submission script from the slurm template Write out
+    template, submission job, and infile for parallel runner
+
+ process_batch_command
+
+    splitting this off from the main command
+
+AUTHOR
+
+    Jillian Rowe <jillian.e.rowe@gmail.com>
+
+COPYRIGHT
+
+    Copyright 2016- Jillian Rowe
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+
+    HPC::Runner::Slurm HPC::Runner::PBS HPC::Runner::MCE
+

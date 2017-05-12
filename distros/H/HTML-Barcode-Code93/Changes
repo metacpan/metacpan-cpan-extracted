@@ -1,0 +1,44 @@
+Revision history for HTML-Barcode-Code93
+
+0.14    Fri Mar 25 10:04:54 CDT 2016
+        - Distribution tweaks: Fixed RT #108947
+
+0.13    Thu Mar 24 15:03:44 CDT 2016
+        - Switched from Any::Moose to Moo
+
+0.12    Thu Jun 21 08:36:54 CDT 2012
+        - Use Module::Install::Repository because metacpan doesn't
+          display the repository correctly as set by GithubMeta.
+
+0.11    Thu Jun 21 08:15:39 CDT 2012
+        - Do not auto_include(), and do not include Test::More
+
+0.10    Mon Jul  4 01:09:20 CDT 2011
+        - Move author tests to xt to avoid failed tests.
+
+0.09    Sat Jul  2 13:36:27 EDT 2011
+        - Broke off into its own distribution from HTML::Barcode
+
+0.08    Tue Apr  5 19:33:19 CDT 2011
+        - Fixed(?) tests for cpantesters failure
+
+0.07    Mon Apr  4 15:44:08 CDT 2011
+        - Moved Code93 logic into Barcode::Code93
+        - added embed_style option
+        - rendered POD examples with embed_style
+          in hopes that search.cpan.org will stop stripping it out.
+
+0.06    Thu Mar 31 20:18:56 CDT 2011
+        - Fixed string interpolation issues for perl 5.6(?)
+
+0.05    Thu Mar 31 18:46:41 CDT 2011
+        - Add synopsis to HTML::Barcode (it wasn't immediately 
+          clear how to use this module)
+
+0.04    Wed Mar 30 13:27:24 CDT 2011
+        - use Any::Mouse
+
+0.03    Tue Mar 29 19:18:38 CDT 2011
+        - Initial release
+
+

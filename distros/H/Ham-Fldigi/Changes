@@ -1,0 +1,8 @@
+Revision history for Perl extension Ham::Fldigi.
+
+0.001 Mon Feb  6 17:18:42 2012
+	- original version; created by h2xs 1.23 with options
+		-X Ham::Fldigi
+
+0.002	Thu Feb  9 22:38:00 2012
+  - Inital version for CPAN.

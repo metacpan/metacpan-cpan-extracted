@@ -1,0 +1,129 @@
+NAME
+    HTML::DynamicTemplate - HTML template class.
+
+SYNOPSIS
+      use HTML::DynamicTemplate;
+      my $template = new HTML::DynamicTemplate 'path/to/template';
+      $template->set_recursion_limit($integer);
+      $template->set(NAME => $value);
+      $template->set(NAME_1 => $value_1,
+                     NAME_2 => $value_2,
+                     NAME_3 => $value_3);
+
+      $template->clear();
+      $template->render();
+      $template->render(@variables);
+
+      path/to/template
+      ----------------
+      <html>
+      <body>
+      <h1>$HEADING</h1>
+
+      <p><font color="$HIGHLIGHT_COLOR">This is standard HTML with
+      arbitrary embedded variable references which are substituted
+      with actual values when the template is rendered.</font></p>
+
+      <p>Template variables may be set within the template itself
+      with the special $SET directive. This is useful when setting
+      variables for use by included templates. Example:
+      $SET(PAGE_TITLE, "What's New"). Note: Be sure to escape
+      quotes (&quot;) and closing parantheses (&#41;) as HTML
+      entities.</p>
+
+      <p>Additionally, templates may be recursively included by
+      specifying a template with the special $INCLUDE directive.
+      Example: $INCLUDE(templates/example.tmpl). Template paths may
+      be variable references as in $INCLUDE($EXAMPLE_FILE). Note:
+      Any variable references found in included templates will be
+      substituted as in the original template.
+
+      <p>Usage note: variable and directive names are always
+      specified in uppercase.</p>
+
+      </body>
+      </html>
+
+DESCRIPTION
+    The `HTML::DynamicTemplate' is a class implementing a HTML
+    template in perl. Significant features include the ability to
+    set template variables from within the template itself, the
+    ability to recursively include other templates, and the ability
+    to selectively render a specified subset of variables.
+
+METHODS
+    $template = new HTML::DynamicTemplate $template_filename;
+        Constructor for the template. Returns a reference to a
+        HTML::DynamicTemplate object based on the specified template
+        file.
+
+    $template->set_recursion_limit($integer);
+        A default recursion limit for template includes is
+        implemented to prevent infinite recursions. Use this method
+        to override the default value (10).
+
+    $template->set(NAME => $value);
+        Sets template variable to given value.
+
+    $template->clear();
+        Clears template variables. Useful when processing table row
+        templates.
+
+    $template->render();
+        Renders template by performing variable substitutions.
+
+    $template->render(@variables);
+        Renders template by performing variable substitutions on
+        only those variable names specified in @variables.
+
+AUTHOR
+    Copyright (c) 1999 Brian Ng. All rights reserved. This program
+    is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+
+    Created May 10, 1999 by Brian Ng <brian@m80.org>.
+
+    Based on original work by Brian Slesinsky.
+
+version 0.94
+------------
+
+- Added support for selective variable substitution in render()
+- Changed name of package to HTML::DynamicTemplate to avoid
+  confusion with Sam Tregar's HTML::Template
+
+version 0.93
+------------
+
+- Added support for $SET directive
+
+version 0.92
+------------
+
+- Added default recursion limit for template includes
+- Added set_recursion_limit($integer) to override default
+- Handles open errors on initial template instantiation
+
+version 0.91
+------------
+
+- Removed template filename suffix requirement
+- Expanded pod synopsis and refreshed README
+
+version 0.90
+------------
+
+- Tweaked version for better incremental release numbering
+- Removed use of English module
+
+version 0.9
+-----------
+
+- Added recursive include support
+- Removed unnecessary loop in render()
+- Updated pod documentation and refreshed README
+
+version 0.5
+-----------
+
+- Initial release

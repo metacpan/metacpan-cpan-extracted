@@ -1,0 +1,41 @@
+NAME
+    HTML::XSSLint - audit XSS vulnerability of web pages
+
+SYNOPSIS
+      use HTML::XSSLint;
+
+      my $agent   = HTML::XSSLint->new;
+
+      # there may be multiple forms in a single HTML
+      # if there's no from, @result is empty
+      my @result  = $agent->audit($url);
+
+      for my $result (grep { $_->vulnerable } @result) {
+          my $action  = $result->action;
+          my @names   = $result->names;
+          my $example = $result->example;
+      }
+
+DESCRIPTION
+    HTML::XSSLint is a subclass of LWP::UserAgent to audit Cross Site
+    Scripting (XSS) vulnerability by generating random input against HTML
+    forms in a web page.
+
+    Note that the way this module works is not robust, so you can't say a
+    web page is XSS free because it passes HTML::XSSLint audit.
+
+    This module is a backend for command line utility "xsslint" bundled in
+    the distribution. See the xsslint manpage for details.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    This module comes with NO WARRANTY.
+
+SEE ALSO
+    the xsslint manpage, the HTML::XSSLint::Result manpage, the LWP manpage,
+    the HTML::Form manpage
+

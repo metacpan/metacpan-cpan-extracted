@@ -1,0 +1,36 @@
+---
+abstract: 'Store multiple values per key'
+author:
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.030, Dist::Milla version v1.0.14, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Hash-MultiValue
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/miyagawa/Hash-MultiValue/issues
+  homepage: https://github.com/miyagawa/Hash-MultiValue
+  repository: https://github.com/miyagawa/Hash-MultiValue.git
+version: 0.16
+x_contributors:
+  - 'Aristotle Pagaltzis <pagaltzis@gmx.de>'
+  - 'chansen <chansen@cpan.org>'
+  - 'Hans Dieter Pearcey <hdp@weftsoar.net>'
+  - 'Peter Rabbitson <ribasushi@cpan.org>'
+  - 'Tatsuhiko Miyagawa <miyagawa@gmail.com>'

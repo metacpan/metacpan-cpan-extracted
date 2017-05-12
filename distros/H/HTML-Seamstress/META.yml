@@ -1,0 +1,38 @@
+---
+abstract: "HTML::Tree subclass for HTML templating via tree rewriting\r"
+author:
+  - 'Terrence Brannon <metaperl@gmail.com>'
+build_requires:
+  Class::Prototyped: 0
+  Exporter: 0
+  FileHandle: 0
+  HTML::PrettyPrinter: 0
+  Test::More: 0
+  vars: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200012, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-Seamstress
+requires:
+  Carp: 0
+  Cwd: 0
+  Data::Dumper: 0
+  File::Basename: 0
+  File::Find: 0
+  File::Path: 0
+  File::Slurp: 0
+  File::Spec: 0
+  Getopt::Long: 0
+  HTML::Element: 0
+  HTML::Element::Library: 0
+  HTML::Element::Replacer: 0
+  HTML::TreeBuilder: 0
+  Pod::Usage: 0
+  Set::Array: 0
+  perl: 5.006
+version: 6.112830

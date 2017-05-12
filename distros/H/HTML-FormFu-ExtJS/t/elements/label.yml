@@ -1,0 +1,7 @@
+---
+attrs:
+  standardSubmit: 1
+elements:
+  - type: Label
+    name: labelname
+    default: My First ExtJS Label

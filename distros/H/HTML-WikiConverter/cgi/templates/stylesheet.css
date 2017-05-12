@@ -1,0 +1,42 @@
+body { font-family: verdana, arial; font-size: 10pt }
+
+h1 { font-size: 16pt }
+h2 { font-size: 14pt }
+h3 { font-size: 12pt }
+
+#wrapper {
+  margin: 5px;
+  padding: 10px;
+  border: 1px solid #ccccff;
+  background: #eeeeff;
+}
+
+#notes {
+  float: right;
+  width: 100px;
+}
+
+textarea {
+  width: 100%;
+  height: 30%;
+}
+
+table#html_source td:last-child {
+  width: 100%;
+}
+
+div#error {
+  margin: 10px;
+  padding-left: 10px;
+  background: #ffcccc;
+  border: 1px solid #990000;
+}
+
+#logos img {
+  border: 0;
+  margin: 5px;
+}
+
+input[type='submit'] {
+  text-align: left;
+}

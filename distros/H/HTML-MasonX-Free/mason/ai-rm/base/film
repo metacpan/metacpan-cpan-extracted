@@ -1,0 +1,2 @@
+<%method main><& SELF:title &></%method>
+<%method title>Movie</%method>

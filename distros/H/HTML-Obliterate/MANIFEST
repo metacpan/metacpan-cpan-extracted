@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/HTML-Obliterate.t
+lib/HTML/Obliterate.pm
+META.yml                                 Module meta-data (added by MakeMaker)

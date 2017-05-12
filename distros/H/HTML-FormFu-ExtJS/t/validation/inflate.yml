@@ -1,0 +1,13 @@
+---
+elements:
+  - type: Text
+    name: test
+  - type: Text
+    name: date
+    deflator:
+        - type: Strftime
+          strftime: '%Y-%m-%d'
+    inflator:
+        - type: DateTime
+          parser:
+            strptime: '%d.%m.%Y'

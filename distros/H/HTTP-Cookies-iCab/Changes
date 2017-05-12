@@ -1,0 +1,44 @@
+# This is the Changes file for HTTP::Cookies::iCab
+
+1.131 - Wed Apr 20 13:55:38 2011
+	-* Update required version to Perl 5.8 for the :raw 
+	encoding.
+
+1.130 - Mon Apr 18 17:03:23 2011
+	* Update the cookie expiry times so the tests pass
+	* Everything else works the same as before
+
+1.120 - Wed Aug  6 08:46:38 2008
+	* Fix to Cookies.dat file to ensure the cookies don't expire
+	so the tests don't fail
+	* Note in docs that this does not yet support iCab 4
+
+1.09 - Wed Jan 10 18:07:32 2007
+	* Fixed endian bug in date reading. Now that Macs have Intel, that
+	matters.
+	* Updated license stuff.
+	* Everyone should upgrade.
+
+1.07 - Thu Jul 20 16:52:24 2006
+	* Fixed up one of the tests which failed due to an expiring cookie
+	in the test test. Three years ago seems like a long time now. :)
+	* No need to upgrade if you already have this installed.
+
+1.05 - Sat Mar 12 00:08:29 2005
+	* Added POD coverage tests
+	* no code changes: no need to upgrade
+
+0.91 - Sat Mar 12 00:03:34 2005
+	* Added POD coverage tests
+	* no code changes: no need to upgrade
+
+0.91 - Fri Sep 17 13:22:59 2004
+ * distribution cleanups: no need to upgrade
+ * this is a non-developer release, although it might still have
+ problems
+
+0.90_01 - Thu Jan  9 04:30:48 2003
+	* DEVELOPER'S RELEASE - the save() function does not work, but
+	the load() function does (should, might, etc.).  I still do not
+	understand the entire format, but I can pull out the stuff that
+	HTTP::Cookies needs.

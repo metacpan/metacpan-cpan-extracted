@@ -1,0 +1,34 @@
+<aaa>
+	<bbb xml:lang="de"><fff>A-de</fff></bbb>
+	<bbb xml:lang="en-US"><fff>A-en</fff></bbb>
+	<bbb xml:lang="es"><fff>A-es</fff></bbb>
+	<bbb xml:lang="de"><fff>B-de</fff></bbb>
+	<bbb><fff>B-en</fff></bbb>
+	<bbb xml:lang="es"><fff>B-es</fff></bbb>
+        <ccc>
+		<bbb xml:lang="de"><fff>C-de</fff></bbb>
+		<bbb xml:lang="en"><fff>C-en</fff></bbb>
+		<bbb xml:lang="es"><fff>C-es</fff></bbb>
+		<bbb xml:lang="de"><fff>D-de</fff></bbb>
+		<bbb><fff>D-en</fff></bbb>
+		<bbb xml:lang="es"><fff>D-es</fff></bbb>
+	</ccc>
+	<ddd xml:lang="de">
+		<bbb><fff>E-de</fff></bbb>
+	</ddd>
+	<ddd xml:lang="en-UK">
+		<bbb><fff>E-en</fff></bbb>
+	</ddd>
+	<ddd xml:lang="es">
+		<bbb><fff>E-es</fff></bbb>
+	</ddd>
+	<eee xml:lang="de">
+		<bbb><fff>F-de</fff></bbb>
+	</eee>
+	<eee>
+		<bbb><fff>F-en</fff></bbb>
+	</eee>
+	<eee xml:lang="es">
+		<bbb><fff>F-es</fff></bbb>
+	</eee>
+</aaa>

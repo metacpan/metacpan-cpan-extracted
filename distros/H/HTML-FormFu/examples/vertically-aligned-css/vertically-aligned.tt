@@ -1,0 +1,21 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Vertically Aligned</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style type="text/css" media="all">
+	@import "vertically-aligned.css";
+</style>
+<!--[if IE]>
+	<style type="text/css" media="all">
+		@import "vertically-aligned-ie.css";
+	</style>
+<![endif]-->
+</head>
+<body>
+
+[% form %]
+
+</body>
+</html>

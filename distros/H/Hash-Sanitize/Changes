@@ -1,0 +1,10 @@
+Revision history for Hash-Sanitize
+
+0.01    11/12/2012
+        First version
+
+0.02    12/12/2012
+        Min perl version required is 5.10.0 (because we use smatmatch)
+
+0.03    18/07/2013
+        removed smatmatch in favour of grep

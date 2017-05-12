@@ -1,0 +1,10 @@
+---
+auto_fieldset: 1
+
+elements:
+  - type: ComboBox
+    name: user
+    model_config:
+      resultset: User
+      condition_from_stash:
+        master: master_id

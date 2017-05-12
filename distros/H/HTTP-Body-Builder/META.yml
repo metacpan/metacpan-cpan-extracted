@@ -1,0 +1,45 @@
+---
+abstract: HTTP::Body::Builder!
+author:
+  - 'tokuhirom <tokuhirom@gmail.com>'
+build_requires:
+  File::Temp: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTTP-Body-Builder
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  HTTP::Body::Builder:
+    file: lib/HTTP/Body/Builder.pm
+    version: '0.04'
+  HTTP::Body::Builder::MultiPart:
+    file: lib/HTTP/Body/Builder/MultiPart.pm
+  HTTP::Body::Builder::UrlEncoded:
+    file: lib/HTTP/Body/Builder/UrlEncoded.pm
+requires:
+  URI: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/tokuhirom/HTTP-Body-Builder/issues
+  homepage: https://github.com/tokuhirom/HTTP-Body-Builder
+  repository: git://github.com/tokuhirom/HTTP-Body-Builder.git
+version: '0.04'
+x_contributors:
+  - 'Kenichi Ishigaki <ishigaki@cpan.org>'
+  - 'Dave Rolsky <autarch@urth.org>'

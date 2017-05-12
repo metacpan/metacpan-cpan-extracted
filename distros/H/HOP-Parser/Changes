@@ -1,0 +1,32 @@
+Revision history for HOP-Parser
+
+0.03    2012-05-28
+      * Added the plus() parser.
+      * Addd the lookahead() and neg_lookahead() parsers.
+      * Fixed a backward compatibility issue introduced in 0.02 where iterator
+        streams were no longer properly handled.
+
+0.02_05
+      * At last fixed Build.PL dependancy on HOP::Lexer (due to t/30-evaluate.t test).
+        Many thanks to ANDK for the hint via RT #76544.
+
+0.02_04
+      * Silly fixes.
+
+0.02_03
+      * Silly fixes.
+
+0.02_02
+      * Added t/30-evaluate.t test.
+
+0.02_01 2009-04-05    
+      * Fixed nasty bug whereby optional() would truncate concatenated streams.  
+        In unusual cases, this might change the interface.  (rt 35997 - 
+        reported by XAV <xcaron [...] gmail.com>)
+
+0.02    2009-04-05
+      * Rely on HOP-Steam 0.03.  This fixes (rt 37367), reported by RUDY
+        <rlippan [...] remotelinux.com>.
+
+0.01    2005-10-28
+      * First version, released on an unsuspecting world.

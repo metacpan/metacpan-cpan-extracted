@@ -1,0 +1,10 @@
+Revision history for HTML-Widget-JavaScript
+
+0.02    Wed Apr 22 02:31:44 2009
+        * Fix ASCII rule compatibility with HTML::Widget
+        * Fix tests cases
+        * Add UNMAINTAINED notice
+
+0.01    Sat Mar 11 03:28:52 2006
+        First public version.
+

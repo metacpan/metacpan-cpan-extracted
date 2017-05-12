@@ -1,0 +1,12 @@
+Failed  Succeeded  Test Name
+   0          1    *** no name ***
+
+
+Test Name: N/A
+URL: http://http.web.test/test.shtml
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+
+
+Total web tests failed: 0  succeeded: 1

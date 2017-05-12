@@ -1,0 +1,7 @@
+
+<contents src="data/contentsfind.data" name=".../*.txt" />
+
+<out file=log/contentsfind.html>
+	${foo.txt}${dir1/bar.txt}${dir2/dir2a/baz.txt}
+</out>
+

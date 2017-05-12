@@ -1,0 +1,14 @@
+Revision history for Perl extension HTML-WikiConverter-FreeStyleWiki
+
+0.03 2015-06-18T10:04:38Z
+
+    - fix : cpantester failed (#3)
+
+0.02 2015-06-18T05:37:27Z
+
+    - fix : fail to convert link (#1)
+
+0.01 2015-06-17T01:12:14Z
+
+    - original version
+

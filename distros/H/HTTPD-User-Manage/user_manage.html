@@ -1,0 +1,1295 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>user_manage.cgi Manual</title>
+</head>
+
+<body bgcolor="#FFDAB9">
+
+<h1><cite>user_manage</cite>: The All-Purpose Web Server User
+Management Script</h1>
+
+<h2>Description</h2>
+
+For obscure reasons, there isn't a satisfactory remote tool for the
+Apache Web server that allows authorized users to change their
+passwords remotely.  As a result, the onerous task of managing the
+password and group files falls on the Webmaster.
+<cite>user_manage</cite> was written to fill this need.  In addition
+to its basic role as a password changer, this script allows the
+Webmaster to add, edit and delete users and groups, all via a
+form-based interface.
+
+<p>
+
+<cite>user_manage</cite> handles most variants of the Apache "Basic"
+and "Digest" authentication scheme.  Using one simple interface, it
+manages each of the following types of password and group files:
+
+<ol>
+  <li>Human readable text files.
+  <li>DBM database files.
+  <li>Berkeley DB database files.
+  <li>SQL databases.
+</ol>
+
+In addition to running as a CGI script, <cite>user_manage</cite> can
+be used from the command-line to manipulate users and groups,
+replacing both <cite>dbmmanage</cite> and <cite>htpasswd</cite> with a
+simple and consistent interface.  Furthermore, by allowing you to
+define security "realms" consisting of paired password and group
+files, it avoids operator errors that often result in the incorrect
+password file being modified.
+
+<p>
+
+Many of <cite>user_manage's</cite> functions will also work with other
+Unix Web servers, including NCSA httpd, and the CERN server.  There is
+support for Netscape user (but not group) databases. This script
+has not been tested with Windows NT servers.
+
+<h2>Downloading</h2>
+
+The entire package is available as a gzipped tar archive at this link:
+
+<a
+href="http://www.genome.wi.mit.edu/~lstein/user_manage/user_manage.tar.gz">http://www.genome.wi.mit.edu/~lstein/user_manage/user_manage.tar.gz</a>
+
+<h2>System Requirements</h2>
+
+<cite>user_manage</cite> requires the following components to be
+installed on the webserver machine in order to run:
+
+<dl>
+  <dt><a href="http://www.perl.com/CPAN/">The Perl interpreter</a>
+  <dd>Perl5.003 or higher is recommended.
+      <p>
+  <dt>HTTPD Modules
+  <dd>This set of Perl modules, written by Doug MacEachern and
+      enhanced by myself, provides core
+      file manipulation routines.  For your convenience, it is
+      included with this distribution.  The modules must be installed
+      in the Perl library directory as described below.  
+      <p>
+  <dt><a href="http://www.genome.wi.mit.edu/ftp/pub/software/WWW/">CGI.pm and CGI::Carp</a>
+  <dd>These Perl modules provide various utilities to the
+      program when running as a CGI script.  They can be obtained at
+      the link above.
+</dl>
+
+<hr>
+
+<h2><a name="install">Installation</a></h2>
+
+This section explains how to install <cite>user_manage</cite>.
+
+<h3>Unpack the Distribution</h3>
+
+Unpack the distribution using the <cite>tar</cite> and
+<cite>zcat</cite> programs.
+
+<blockquote><pre>
+<b>% zcat user_manage.tar.gz | tar xvf -</b>
+drwxr-xr-x lstein/lstein     0 Dec 22 20:14 1997 HTTPD-User-Manage-1.5/
+drwxr-xr-x lstein/lstein     0 Dec 22 20:14 1997 HTTPD-User-Manage-1.5/lib/
+drwxr-xr-x lstein/lstein     0 Dec 22 20:14 1997 HTTPD-User-Manage-1.5/lib/HTTPD/
+drwxr-xr-x lstein/lstein     0 Dec 22 20:14 1997 HTTPD-User-Manage-1.5/lib/HTTPD/UserAdmin/
+-r--r--r-- lstein/lstein  1934 Dec 22 18:49 1997 HTTPD-User-Manage-1.5/lib/HTTPD/UserAdmin/Text.pm
+-r--r--r-- lstein/lstein  5847 Dec 11 17:30 1997 HTTPD-User-Manage-1.5/lib/HTTPD/UserAdmin/SQL.pm
+...
+</pre></blockquote>
+
+This will unpack the distribution in a directory named
+<cite>HTTPD-User-Manage-X.X</cite>, where <cite>X.X</cite> is the
+current version number.  
+
+<h3>Install the HTTPD::* Modules</h3>
+
+Change to the distribution directory
+(<cite>HTTPD-User-Manage-X.X</cite>), and type the following:
+
+<blockquote><pre>
+% <b>perl Makefile.PL</b>
+% <b>make</b>
+% <b>make test</b>
+% <b>make install</b>
+</pre></blockquote>
+
+This will copy the HTTPD modules to the correct location within the
+Perl library directory.  You may need to be root in order to do this.
+
+<p>
+
+The HTTPD modules are useful in their own right. During the
+installation process, Perl will have created man pages for them which
+you can read with the <cite>perldoc</cite> command.  Read the manual
+page for HTTPD::Realm first, then HTTPD::RealmManager.
+
+<h3>Install the <cite>user_manage</cite> Script</h3>
+
+Copy <cite>user_manage</cite> into your server's <cite>cgi-bin</cite>
+directory, or another directory that allows CGI scripts.  Make sure
+that it is executable and that the top line points to the correct
+location of Perl on your system, e.g.
+
+<blockquote><pre>
+#!/usr/local/bin/perl
+</pre></blockquote>
+
+<h3>Work Out Permissions for the Password and Group Files</h3>
+
+If you plan to run <cite>user_manage</cite> as a CGI script, then
+you'll need to worry about file permissions.  When the script is
+executed by the server, it runs with the server's effective user ID,
+usually an unprivileged user such as "nobody".  However, this user
+usually does not have permission to write to the server's password and
+group files.  Thus the script will fail.  In order for the script to
+be able to update password and group files, not only must it have
+write access to the files themselves, but to the directory that
+contains them.  This last requirement is because the script creates
+lock and other temporary files within the directory.
+
+<p>
+
+Several workable configurations are possible:
+
+<h4>Make <cite>user_manage</cite> Run as a SUID Script</h4>
+
+Perl is capable of safely running scripts set-user-id (suid).  When
+the script runs, Perl temporarily changes to a different user ID and
+executes the script.  <cite>user_manage</cite> has been written to be
+safe when running in this way.
+
+<p>
+
+Designate a directory that will hold the various password and group
+files, for example /etc/httpd/security.  Make it owned and writable by
+a specially-designated "web administrator" account, for example "www".
+Now, running as root, change the ownership of <cite>user_manage</cite>
+to "www" and set its "s" bit:
+
+<blockquote><pre>
+# <b>chown www user_manage</b>
+# <b>chmod u+s user_manage</b>
+# <b>ls -l user_manage</b>
+-rwsr-xr-x   1 www   users      18928 Jan 14 03:47 user_manage*
+</pre></blockquote>
+
+In order for suid to work, this feature needs to be configured into
+Perl when it is compiled.  You may need to reinstall Perl if suid was
+not enabled, particularly if Perl came preinstalled on your system.
+There is also a bug in perl 5.003 when running under some versions of
+OSF/1 (Digital Unix) that causes suid scripts to exit silently without
+producing any output.  To fix this bug, apply the patch located in the
+file <a href="suid.patch">suid.patch</a> included with this
+distribution to the Perl source tree and recompile.
+
+<h4>Make <cite>user_manage</cite> Run as a SGID Script</h4>
+
+An alternative to running the script suid is to set the set-group-id
+bit instead.  This will cause the script to execute with the
+permissions of its owning group.  You can then arrange for the
+password and group files to reside within a group-writable directory,
+such as one belonging to a web administrators' "www" group.
+
+<p>
+
+<blockquote><pre>
+# <b>chgrp www user_manage</b>
+# <b>chmod g+s user_manage</b>
+# <b>ls -l user_manage</b>
+-rwxr-sr-x   1 root   www      18928 Jan 14 03:47 user_manage*
+</pre></blockquote>
+
+Under this scheme it may be convenient to have the script create new
+password and group files with group writable permissions.  To do this,
+change the script global $CREATE_MODE to "0664".  (See <a
+href="#configure_script">Configuring the Script</a>.
+
+<h4>Keep the Password and Group Files in a Directory writable by
+"nobody"</h4>
+
+If you prefer not to run <cite>user_manage</cite> as a suid or
+sgid script, you can place the password and group files in a directory
+that is owned and writable by the Web server's effective user ID
+and/or group.  If you wish for the password files to be modifiable
+from the command line, you should also make this directory group
+writable by a group that you belong to.
+
+<p>
+
+While this strategy is effective, it has the disadvantage that it
+gives the web server and all other CGI scripts the ability to modify
+the password and group files.  A remote user exploiting a security
+hole in the server or one of its CGI scripts could then take advantage
+of this fact to alter the password file.
+
+<h3>Restrict Access to the Script</h3>
+
+Because you don't want everyone in the world to view and edit
+your server's password files, <cite>user_manage</cite> must be
+placed under some kind of access restrictions.  You can do this
+either by placing the script in a restricted directory to use
+the server's access restrictions, or by allowing the script to
+do its own user authentication.
+
+<h3><a name="configure_script">Configure the Script</a></h3>
+
+There are several global variables towards the top of the script that
+will need to be modified to suit your site.  Open the script with a
+text editor and make the changes if need be.
+
+<dl>
+  <dt><code>$CONFIG_FILE</code>
+  <dd>This variable is set to the full pathname of the script's <a
+      href="#config_file">realm configuration file</a>.  This file
+      holds the definitions of all the security realms at your site.
+      It's set to '/etc/httpd/conf/realms.conf' by default.
+      Change it according to your preferences (I like
+      to keep the config file in the same place as the other web
+      server configuration files).
+      <p>
+  <dt><code><a name="admin_group">$ADMIN_GROUP</a></code>
+  <dd>This global defines the name of an administrator's group.  When
+      a user who belong to this group invokes the script remotely, she
+      is granted special privileges to add, edit and remove users.
+      The default is "administrators".  Set this to an empty string to
+      disable this feature entirely.
+      <p>
+  <dt><code>$PROTECT_ADMINS</code>
+  <dd>This global controls whether changes to administrators' accounts 
+      are restricted. When set to 1, the password of an administrator's 
+      account may only be changed by himself. Membership in the 
+      privileged $ADMIN_GROUP may only be granted or revoked by the 
+      webmaster using conventional command line tools, but no longer by 
+      this script. Administrators thus cannot deny each other access, and 
+      they can't grant privileged access to others without the webmaster's 
+      consent.
+      <p>
+  <dt><code><a name="default_group">$DEFAULT_GROUP</a></code>
+  <dd>This is the default group to assign newly-created users to,
+      "users" by default.  Set it to an empty string to disable
+      automatic group assignment.
+      <p>
+  <dt><code>$REQUIRE_ACCESS_CONTROL</code>
+  <dd>
+      This global affects the manner in which the script interacts
+      with Apache's access control facilities.  Ordinarily the script
+      first checks the environment to determine
+      whether the user has already provided a user name and
+      password in order to access the script.  If it finds this
+      to be the case, it takes the current user name directly from the
+      environment and allows the user to change her password.  If access
+      to the script has not been restricted, it performs its own
+      access control by prompting the user for a valid user name and password.
+
+      <p>
+
+      With this variable set to a non-zero value, the script will
+      refuse to run at all unless it is in a password-protected
+      directory.  Both GET and POST methods must be restricted.
+      Here's a typical excerpt from Apache's <cite>access.conf</cite>
+      file:
+      
+      <blockquote>
+      <pre>
+&lt;Location /cgi-bin/admin&gt;
+  AuthUserFile   /etc/httpd/security/passwd
+  AuthGroupFile  /etc/httpd/security/group
+  AuthType       Basic
+  AuthName       Main
+
+  &lt;Limit GET POST&gt;
+    order allow,deny
+    allow from all
+    require valid-user
+  &lt;/Limit&gt;
+&lt;/Location&gt;
+      </pre>
+      </blockquote>
+
+      Placing the script under access control provides a small amount
+      of additional security at the cost of an extra layer of
+      complexity.  It is ordinarily unnecessary.
+      <p>
+      
+  <dt><code>$CREATE_MODE</code>
+  <dd>These are the file permissions to use for newly-created password
+      and group files.  By default, this variable is set to mode 0644,
+      which grants the owner read/write permission and others
+      read-only permission.  If you wish to grant edit access to a
+      group of local users, such as designated web administrators, you
+      might want to change this value to 0664, to give the group
+      read/write access.
+      <p>
+  <dt><code>$STTY</code>
+  <dd>When this script is run from the command line, it uses the
+      "stty" program to turn off command echo so that you can type in
+      passwords invisibly.  The location of this program may differ from
+      system to system.  If you encounter problems with this part of
+      the script, check the location of stty and correct the value of
+      this variable.
+</dl>
+
+<h3><a name="config_file">Create the Realm Configuration File</a></h3>
+
+Rather than force you to remember the paths to individual password
+files, <cite>user_manage</cite> uses a "security realm" scheme to
+group related password and group files under meaningful nicknames.
+Before you can use this scheme, you must create a configuration file
+and save it in the location indicated by the <code><a
+href="#configure_script">$CONFIG_FILE</a></code> global.
+
+<p>
+
+A sample configuration file, <a href="realms.conf">realms.conf</a> is
+included in this distribution.  Its format is similar to that used by
+Apache for its access control file.  Blank lines and lines beginning
+with the "#" character are ignored.  The file should contain a series
+of realm definitions, each beginning with a &lt;Realm&gt; directive
+and ending with a &lt;/Realm&gt; directive.  For example:
+
+<blockquote><pre>
+&lt;Realm main&gt;
+	Users      /etc/httpd/security/passwd
+	Groups     /etc/httpd/security/group
+	Type       Text
+&lt;/Realm&gt;
+
+&lt;Realm development&gt;
+	Users     /etc/httpd/security/devel.passwd
+	Groups    /etc/httpd/security/devel.group
+	Type      DBM
+&lt;/Realm&gt;
+</pre></blockquote>
+
+This example shows the definitions for two security realms, one named
+"main" and the other named "development".  Each realm section contains
+the three directives <cite>Users</cite>, <cite>Groups</cite>, and
+<cite>Type</cite>:
+
+<p>
+
+<table border>
+  <caption>Required Directives in the &lt;Realm&gt; Section</caption>
+  <tr><th>Directive   <th>Example Parameters            <th>Description
+  <tr><th>Users       <td><code>/etc/httpd/passwd</code><td>Path to the user password file
+  <tr><th>Groups      <td><code>/etc/httpd/group</code> <td>Path to the group file
+  <tr><th>Type        <td><code>DBM</code>             <td>Type of file to use
+</table>
+
+<p>
+
+The <cite>Users</cite> and <cite>Groups</cite> directives should
+contain absolute path names (except when using SQL databases for
+authentication; see <a href="#SQL">below</a>).  Relative path names
+will be rejected.  <cite>Type</cite> may be one of <cite>Text</cite>,
+<cite>DBM</cite>, <cite>DB</cite>, or <cite>SQL</cite>.  These
+correspond to Apache's flat file, DBM file, DB file, and mSQL
+authentication formats respectively.  Please be careful that the user
+and group files that you declare in Apache's access.conf file
+correspond to the type declared in the <cite>user_manage</cite>
+configuration file:
+
+<p>
+
+<table border>
+  <caption>Correspondence between Realm Type and Apache access.conf Directives</caption>
+  <tr><th>Type     <th>Password File Directive   <th>Group File Directive
+  <tr><td>Text     <td>AuthUserFile              <td>AuthGroupFile
+  <tr><td>DBM      <td>AuthDBMUserFile           <td>AuthDBMGroupFile
+  <tr><td>DB       <td>AuthDBUserFile            <td>AuthDBGroupFile
+  <tr><td>SQL      <td><a href="#SQL">see below</a> <td><a href="#SQL">see below</a>
+</table>
+
+For the purposes of compatibility with future versions of Apache,
+<cite>user_manage</cite> recognizes and works with other types of
+DBM-like databases as well, including <cite>GDBM</cite>,
+<cite>ODBM</cite>, and <cite>SDBM</cite>, as well as any SQL database
+for which there is a Perl driver.
+
+<p>
+
+The first realm defined in the configuration file becomes the default,
+unless otherwise specified by a Default directive (see the next section).
+
+<h4>Other Configuration File Directives</h4>
+
+In addition to the required realm directives, there are several optional
+ones that customize the security realm in various ways.  The complete
+list of directives is given in the table below:
+
+<p>
+
+<table border>
+  <caption>Full List of configuration file directives</caption>
+  <tr><th>Directive    <th>Example Param        <th>Description
+  <tr><td>Authentication <td>Basic             <td>Authentication scheme
+  <tr><td>Database       <td>www@capricorn.com <td>Location of SQL db
+  <tr><td>Default        <td><i>none</i>       <td>Default realm
+  <tr><td>Driver         <td>mSQL              <td>DBI SQL driver
+  <tr><td>Fields         <td>name age paid     <td>Additional user fields
+  <tr><td>Groups         <td>/etc/httpd/group  <td>Path to group database
+  <tr><td>GroupType      <td>SQL               <td>Database type
+  <tr><td>Server         <td>NCSA              <td>Type of server
+  <tr><td>Type           <td>DBM               <td>Database type
+  <tr><td>Users          <td>/etc/httpd/passwd <td>Path to user database
+  <tr><td>UserType       <td>DB                <td>Database type
+</table>
+<p>
+
+<dl>
+  <dt>Authentication
+  <dd>This directives specifies the type of authentication to use.  It
+      can be either "Basic" or "Digest."  Digest, part of the
+      HTTP/1.1 protocol, is much more secure than basic
+      authentication, but is implemented by few browsers currently.
+      <p>
+  <dt>Database
+  <dd>This directive is valid for SQL databases only and indicates where the
+      authentication database can be found.  It should be in the format
+      <i>database@host</i>.  If the hostname is omitted, "localhost" is
+      assumed.  For mSQL databases, performance will be much better if
+      database and Web server are on the same machine because in this case,
+      the client and server use a Unix socket to communicate rather than a
+      TCP/IP socket.
+      <p>
+  <dt>Driver
+  <dd>For SQL databases only, this directive specifies what DBD (database
+      driver) module to use.  It defaults to "mSQL".  You can use any
+      database for which a DBD module is available.  You must also, of
+      course, compile and configure the Web server to correctly use the
+      driver.
+      <p>
+  <dt>Default
+  <dd>If this directive is present, the current realm becomes the default to
+      use when no realm is explicitly indicated.  If no section in the
+      configuration file contains this directive, the first defined realm
+      becomes the default.  It is a fatal error for Default to appear in
+      more than one section.
+      <p>
+  <dt>Fields
+  <dd>This directive lists other fields that can be
+      found in the user table.  These fields can then be read and set
+      by <cite>user_manage</cite>, both in its command line and CGI
+      script forms.
+      <p>
+      The Fields directive specifies a list of field names of the form
+      <i>name</i>[:<i>type</i>][<i>width</i>].  Only the name is
+      required.  The field type and width are optional hints that help
+      <cite>user_manage</cite> format the field values correctly on
+      the Web page.  The type can be one of "i", for an integer value,
+      "s" for a string
+      value and "f" for a floating point number.  If not specified, the
+      field is assumed to be of type string.  The field value must be an
+      integer.
+      <p>
+      In the example below we define three fields named "Name", "Age" and
+      "Paid".  The first is a string value of default length.  The second is
+      an integer.  The third is a string of length one (it's assumed to be a
+      "Y" or "N"):
+      <pre>
+      Fields   Name Age:i Paid:s1
+      </pre>
+      Many more fields may be present in SQL databases than are listed
+      in the Fields directive.  The Fields directive just
+      tells the user_manage script which fields should be made visible to
+      the user interface.
+      <p>
+  <dt>Groups
+  <dd>Path to the file that holds the database of groups.  Both
+      relative and absolute
+      paths are accepted, but absolute paths are preferred.  This
+      directive has a special format when using SQL databases, see <a
+      href="#SQL">below</a>.
+      <p>
+  <dt>GroupType
+  <dd>The type of the group database only, allowing you to use separate
+      types for the user and group databases.  May be any of DBM, DB,
+      SQL, NDBM, GDBM, ODBM or SDBM.  If not provided, the value of Type is
+      used instead.
+      <p>
+  <dt>Server
+  <dd>Web servers differ slightly in the format of the users and groups
+      databases.  This directive indicates which server you are using.
+      Recognized values include "apache", "ncsa", "cern" and "netscape."
+      Example:
+      <pre>
+      Server cern
+      </pre>
+      If no server is specified, "apache" is assumed.  If your server is not
+      on this list, try "ncsa".
+      <p>
+  <dt>Type
+  <dd>The database type.  May be any of DBM, DB, SQL, NDBM, GDBM, ODBM
+      or SDBM.  This directive applies to both the user and group
+      databases.
+      <p>
+  <dt>Users
+  <dd>Path to the file that holds the database of users, their
+      passwords and other information.  Both relative and absolute
+      paths are accepted, but absolute paths are preferred.  This
+      directive has a special format when using SQL databases, see <a
+      href="#SQL">below</a>.
+      <p>
+  <dt>UserType
+  <dd>The type of the user database only, allowing you to use separate
+      types for the user and group databases.  May be any of DBM, DB,
+      SQL, NDBM, GDBM, ODBM or SDBM.  If not provided, the value of Type is
+      used instead.
+</dl>
+
+<h4><a name="SQL">SQL Databases</a></h4>
+
+<cite>user_manage</cite> can also communicate with various SQL
+databases using Tim Bunce's DBI database interface (ODBC is
+<em>not</em> currently supported, but a future version may do so).
+The Apache Web server can use the inexpensive <a
+href="http://Hughes.com.au/">mSQL</a> and <a
+href="http://www.tcx.se/">MySQL</a> databases for access control.
+Future versions of Apache may be able to access other SQL databases as
+well.
+
+<p>
+
+When using SQL databases, the Users and Groups directives in the
+realms configuration file have a different format.  Instead of
+pointing to a physical file, these directives contain information
+about what table and field the user, password and group information is
+stored in.  A typical Users directive looks like this:
+
+<blockquote>
+<pre>
+Users table=users uid=name password=pass
+</pre>
+</blockquote>
+
+The directive consists of three tags.  The "table" tag designates the
+database table that contains the user information.  "uid" indicates
+the field that contains the user name, and "password" names the field
+that contains the user's password.  For performance reasons, the user
+name field should be declared the primary index.
+
+<p>
+
+The Groups directive has a similar structure:
+
+<blockquote>
+<pre>
+Groups table=groups group=grp
+</pre>
+</blockquote>
+
+"table" contains the name of the database table in which the group
+information can be found.  "group" contains the name of the field in
+which the group name is stored.  You do not have to provide a "uid"
+tag in this case, because it is automatically inherited from the uid
+field in the Users directive.  If you do provide a "uid" tag, it must
+be the same as the corresponding field in the users table (this is an
+Apache limitation; not a <cite>user_manage</cite> limitation).  Note
+that ANSI SQL forbids you from using the word "group" as a field name.
+Some databases, including mySQL will not allow you to create a table
+with a column named "group."
+
+<p>
+
+A typical mSQL user table looks like this:
+
+<pre>
+                               users
+ +--------------+---------------+----------------------+------+------+
+ | name         | password      | full_name            | age  | paid |
+ +--------------+---------------+----------------------+------+------+
+ | agnes        | nLMOlUUs0/3GM | Agnes Smith          | 20   | Y    |
+ | lstein       | 85yefVEyK06Is | Lincoln Stein        | 37   | Y    |
+ | phillip      | y/iH4JfAbyLS2 | Phillip Smith        | 19   | N    |
+ | wanda        | xKEzzIfvHdMug | Wanda Smith          | 19   | Y    |
+ +--------------+---------------+----------------------+------+------+
+</pre>
+
+A typical groups table looks like this:
+
+<pre>
+                      groups
+ +----------------------+--------------------------------+
+ | name                 | grp                            |
+ +----------------------+--------------------------------+
+ | agnes                | users                          |
+ | agnes                | authors                        |
+ | agnes                | engineers                      |
+ | lstein               | administrators                 |
+ | lstein               | authors                        |
+ | phillip              | users                          |
+ | wanda                | users                          |
+ +----------------------+--------------------------------+
+</pre>
+
+In this example, agnes belongs to groups named "users," "authors,"
+and "engineers."  lstein belongs to "authors" and "administrators,"
+while phillip and wanda each belong to "users" only.
+
+<p>
+
+You may use the same table for both users and their groups.  However
+if you want to assign a user to more than one group, then you must use
+separate tables.  This is because each user record must be unique in
+the user table, whereas the same user will appear once in the group
+table for each group that he or she belongs to.  Another implication
+of this is that the user ID field in the group table cannot be a
+primary key, otherwise it would be forced to be unique.
+
+<p>
+
+As in the Fields directive, you can provide optional field widths for
+each of the field declarations in the Users and Groups directives.
+The field widths are used as hints by the CGI script version of
+<cite>user_manage</cite> to format the fill-out form nicely.  Follow
+the field name with a colon and the field width, as in:
+
+<blockquote><pre>
+Users table=users uid=name:30 password=pass:13
+</pre></blockquote>
+
+There is no need to declare the field type since they must be strings,
+but it doesn't hurt to do so.
+
+<p>
+
+You will also need to declare the location of the database and its DBI
+driver using Database and Driver directive.  If these directives do
+not appear, they default to "www@localhost" and "mSQL" respectively.
+
+<p>
+
+Unlike other database types, <cite>user_manage</cite> does not
+automatically create SQL database tables for you.  You will need to
+create the tables manually before you use <cite>user_manage</cite> for
+the first time.  If you wish, the <cite>user_manage</cite> "setup"
+command will output the necessary SQL table creation commands for you.
+
+<hr>
+
+<h2><a name="using">Using <cite>user_manage</cite> as a CGI Script</a></h2>
+
+<h3>Allowing an Ordinary User to Change Her Password</h3>
+
+In the simplest case, an ordinary (unprivileged) user can use
+<cite>user_manage</cite> to change her password on-line.  To
+make this possible, create an HTML page with a link like this one:
+
+<blockquote><pre>
+&lt;A HREF="/cgi-bin/user_manage?realm=development"&gt;
+    Change Your Password
+&lt;/A&gt;
+</pre></blockquote>
+
+<p>
+
+This link invokes the <cite>user_manage</cite> script with the
+single parameter <cite>realm</cite> set to the security realm you
+wish to modify.  If you don't provide this argument, the first realm
+defined in the script's <a href="#config_file">configuration file</a>
+will be assumed.
+
+<p>
+
+To create a button that does the same thing, adapt the following
+fragment of HTML:
+
+<blockquote><pre>
+&lt;FORM ACTION="/cgi-bin/user_manage" METHOD=POST&gt;
+    &lt;INPUT TYPE="hidden" NAME="realm" VALUE="development"&gt;
+    &lt;INPUT TYPE="submit" VALUE="Change Password"&gt;
+&lt;/FORM&gt;
+</pre></blockquote>
+
+When the user selects this link, she will be presented with a page
+similar to the one shown here, which prompts her to type in her name
+and password.
+
+<p>
+
+<div align=CENTER>
+<img src="figs/simple_change.1.gif" alt="figure 1" align=CENTER><br>
+<cite>Password prompt</cite>
+</div>
+
+<p>
+
+After the script confirs that the user's name and correct password are
+found in the password file, the user will be prompted to enter a new
+password with a page like the one shown here:
+
+<p>
+
+<div align=CENTER>
+<img src="figs/simple_change.2.gif" alt="figure 2" align=CENTER><br>
+<cite>New password prompt</cite>
+</div>
+
+<p>
+
+The user enters her new password twice in order to avoid typing
+errors.  The script then confirms that the password was successfully
+changed.
+
+<p>
+
+<div align=CENTER>
+<img src="figs/simple_change.3.gif" alt="figure 3" align=CENTER><br>
+<cite>Password confirmation screen</cite>
+</div>
+
+<p>
+
+If an error occurred while updating the password file, the user will
+be given a generic error message.  A more specific error message
+containing diagnostic output will be found in the server's error log.
+
+<h3>Managing Users Remotely</h3>
+
+If the user who accesses the password changing script belongs to the
+special group "administrators" (or whatever is set in the <code><a
+href="#admin_group">$ADMIN_GROUP</a></code> global), a different
+screen will appear similar to the screenshot shown here. This screen
+contains a pop-up menu of all currently defined users (it turns into a
+scrolling list when the number of user exceeds eight).  It also
+contains a blank textfield for adding entirely new users.  From this
+screen you can edit the passwords and groups of existing users, define
+new users, and delete users entirely.
+
+
+<p>
+
+<div align=CENTER>
+<img src="figs/administrator.1.gif" alt="figure 4"><br>
+<cite>Administrator's user management screen</cite>
+</div>
+
+
+<h4>Adding a New User</h4>
+
+To add a new user, type his or her user name into the text field
+labeled <em>New User</em> and press <em>Edit/Add</em>.  A screen like
+this one will appear:
+
+<p>
+
+<div align=CENTER>
+<img src="figs/administrator.2.gif" alt="figure 5"><br>
+<cite>Adding a new user</cite>
+</div>
+
+<p>
+
+The checkboxes labeled <em>Set Groups</em> contains all the groups
+currently defined.  Toggle all the groups that you wish the user to
+belong to.  If a group isn't already defined, you can type in its name
+in the text field labeled <em>Other:</em>.  Enter and reenter the
+password for this user in the text fields labeled <em>Password
+Enter</em> and <em>Confirm</em>.  When you are satisifed, press the
+<cite>Set Values</cite> button.  A confirmation will appear at the top
+of the page, and the script will display the "User Edit" page
+described in the next section.  You can re-edit the user (to define
+new groups, for example), edit a different user, or add another new
+user.
+
+<p>
+
+If any additional user fields are defined in the configuration file,
+they will appear as a series of text fields in a section labeled
+"Other Information".  In the example shown here there are three
+labeled "name", "age" and "paid."
+
+<p>
+
+If there are more than five groups defined, the list of checkboxes
+will turn into a scrolling list in order to save space.
+
+<h4>Editing an Existing User</h4>
+
+To edit an existing user, just select the user from the user list and
+press <em>Edit/Add</em>.  This will bring up the page shown below.
+The top portion of the screen contains a duplicate of the user
+selection page, while the bottom portion contains the entry for the
+selected user.  Edit the user's assigned groups and/or passwords and
+press <cite>Set Values</cite>.  If you inadvertently make a change
+that you do not want to keep, press <cite>Reset Values</cite> to
+revert to the original values.
+
+<p>
+
+The screenshot below also shows how the popup menu of existing users
+turns into a scrolling list when the number becomes large.
+
+<p>
+
+<div align=CENTER>
+<img src="figs/administrator.3.gif" alt="figure 6"><br>
+<cite>Editing an existing user</cite>
+</div>
+
+<h4>Deleting a User</h4>
+
+Select the user you wish to delete from the user list and press the
+<cite>Delete</cite> button.
+
+<hr>
+
+<h3>Managing Users from the Command Line</h3>
+
+<cite>user_manage</cite> can be used from the command line to
+add, edit, and delete users.  It's also a handy way to view the
+contents of a DB or DBM file.
+
+<p>
+
+The syntax for invoking the script from the command line is:
+
+<blockquote>
+user_manage [<em>realm</em>] <em>command</em> <em>argument1 argument2 argument3</em>
+</blockquote>
+
+The first argument to the command is the security realm.  You can, if
+you wish, omit the realm name entirely.  If you do so, the script
+will default to the first realm defined in its configuration file.
+This is followed by a command indicating the action you want the
+script to take.  Following this are zero or more additional arguments,
+the meaning of which depend on the command that's being issued.
+
+<p>
+
+Here's a summary of the commands and their arguments:
+
+<p>
+
+<table border>
+<caption>Commands recognized by <cite>user_manage</cite></caption>
+<tr><th>Command   <th>Arguments         <th>Description
+<tr><th>setup     <td>(none)                    <td>First-time setup
+    for a database
+<tr><th>add       <td><em>user password [group1,group2...] [field1=value1,field2=value2...]</em> <td>Add or edit a user's password & groups
+<tr><th>delete    <td><em>user1 user2...</em>     <td>Delete named users
+<tr><th>edit      <td><em>user password [group1,group2...]  [field1=value1,field2=value2...]</em> <td>A synonym for "add"
+<tr><th>realms   <td>(none)            <td>Concise list of all defined realms
+<tr><th>group     <td><em>user [group1,group2...]</em> <td>Set the user's groups
+<tr><th>group     <td><em>user [field1=value1,field2=value2...]</em> <td>Set the user's values
+<tr><th>view      <td><em>user1 user2...</em>   <td>View users' entries
+<tr><th>view      <td>(none)                    <td>View all users
+<tr><th>format    <td>(none)                    <td>Create a formatted
+    entry for access.conf
+</table>
+
+<h4>Initial Setup of a Security Realm</h4>
+
+If you issue the "setup" command, <cite>user_manage</cite> will
+create a new database for you containing a single
+administrative user.  It will prompt you for the administrator's name,
+and the name of the administrative group.  For example:
+
+<blockquote><pre>
+$ user_manage -r development setup
+Pick a name for the administrative group [administrators]: 
+Pick a name for the administrative account: lstein
+New password: ********
+Re-type new password: *******
+Added lstein to database development in group administrators.
+</pre></blockquote>
+
+If the database already exists, its other user entries will not be
+erased.  However, if the name you chose for the administrative account
+already exists in the database it will be overwritten.
+
+<p>
+
+If you are using an SQL database, "setup" will not make any changes
+directly to the database.  Instead, it prints out a series of SQL
+commands suitable for feeding to the database via a command-line or
+batch tool.  For example:
+
+<blockquote><pre>
+$ user_manage -r wizards setup
+Pick a name for the administrative group [administrators]: 
+Pick a name for the administrative account: lstein
+New password: ******
+Re-type new password: ******
+Create database www and feed it this code:
+
+CREATE TABLE users (
+   uid	char(12)	primary key,
+   password	char(3)	not null,
+    name	char(30),
+    age	        int,
+    paid	char(1)
+)\g
+
+INSERT INTO users (uid,password)
+   VALUES('lstein','TTvO6DRt2phqc')\g
+CREATE TABLE groups (
+   uid	char(12),
+   grp	char(20)
+)\g
+INSERT INTO groups (uid,grp)
+   VALUES('lstein','administrators')\g
+</pre></blockquote>
+
+<h4>Viewing the Contents of a Security Realm</h4>
+
+To get the listing of a security realm, issue the "view" command.
+With no user names, this will dump out the entire contents of the passwd
+and groups files in a convenient tabular file.  To see the entries on
+selected users, list their names.  For example:
+
+<blockquote><pre>
+$ user_manage -r development view
+Name            Password         Groups                Info
+----            --------         ------                ----
+ben             Yr.a3p6C/3Rlg    users
+ebuliah         DZlBiw41ZDmo2    users
+joshua          9Fb2NkZe4xY4I    authors,users         name=Joshua Canaan,age=20,paid=Y
+leigh           krIfoqNKkpyho    users                 name=Leigh Deacon,age=28,paid=Y
+lois            aBIdyi3Q2FdTw    users                 name=Lois Lane,age=24,paid=Y
+lstein          xfPti/KeINcC2    administrators,authors,
+                                 users
+
+$ user_manage development view lois joshua
+Name            Password         Groups               Info
+----            --------         ------               ----
+joshua          9Fb2NkZe4xY4I    authors,users        name=Joshua Canaan,age=20,paid=Y
+lois            aBIdyi3Q2FdTw    users                name=Lois Lane,age=24,paid=Y
+</pre></blockquote>
+
+Note that the passwords appear in encrypted form.  All passwords are
+encrypted <strong>before</strong> being placed into the password
+file.  Once encrypted, there is no easy way of recovering the original
+password.
+
+<h4>Adding a New User</h4>
+
+Issue the <em>add</em> command, giving the name of the new user, her
+initial password, a comma-delimited list of groups you want her to
+belong to, and zero or more field=value pairs.  If you don't specify
+any groups, the script will assign the user to the default group
+defined by the <code><a
+name="#default_group">$DEFAULT_GROUP</a></code> global variable.  If
+you specify an empty group using any of "-", '' or "", the user will
+be assigned to no groups.
+
+<p>
+
+If the realm has additional fields defined by a Fields directive, you
+can set this information here by passing <cite>user_manage</cite> a
+comma-delimited series of field name = value pairs.  Be careful if
+field values contain embedded white space or shell metacharacters.  If
+this is the case, you'll need to protect the entire series of
+name=value pairs with quotation marks.  Field names that are not
+explicitly listed in the configuration file will be silently ignored.
+
+<p>
+
+If you do not enter the user name or password on the command line, you
+will be prompted for it.  It's actually safer not to type passwords
+on the command line as they can be easily intercepted by other users
+of the system.
+
+<p>
+
+In each of these examples, the realm has been omitted, allowing
+<cite>user_manage</cite> to use the default realm.
+
+<blockquote><pre>
+<cite>Add a user and password, accepting default group assignment</cite>
+$ user_manage add joseph open-sesame
+Password successfully changed for joseph.
+Group set to users.
+
+<cite>Add a new user and password, setting groups explicitly</cite>
+$ user_manage add leigh greenman users,authors
+Password successfully changed for leigh.
+Group set to users authors.
+
+<em>Add a new user and password, setting groups and extra info</em>
+$ user_manage add george xyzzy users,authors "name=George Jetson,paid=Y"
+Password successfully changed for george.
+Group set to users authors.
+
+<em>Let the script prompt for missing values</em>
+$ user_manage add
+User name: duncan
+Enter password:
+Re-type password:
+Password successfully changed for duncan.
+Group set to users.
+</pre></blockquote>
+
+<h4>Changing the Password of an Existing User</h4>
+
+Use the <em>add</em> command as described above.  You can also change
+the group assignments at the same time.  For your convenience, the
+command <em>edit</em> is also available.  However it is identical in
+functionality to <em>add</em>.
+
+<h4>Changing Group Assignments without Affecting the Password</h4>
+
+If you wish to change a user's group assignments without resetting her
+password, issue the <em>group</em> command with the user's name and
+the list of groups to assign her to (separated either by white space
+or by commas).  Use any of "-", '' or "" to assign the user to
+<strong>no</strong> groups.
+
+<p>
+
+Example:
+
+<blockquote><pre>
+$ user_manage group joseph users,authors,administrators
+Groups set for joseph.
+</pre></blockquote>
+
+If you omit the user name or list of groups, the program will prompt
+you for their values.
+
+<h4>Changing User Information without Affecting the Password or Groups</h4>
+
+If you wish to change a user's additional field information without
+resetting the other information, issue the <em>info</em> command with
+the user's name and a comma-delimited set of field_name=value pairs.
+If you do not provide the field pairs, the program will prompt for
+them.  Fields that are not listed in a Fields directive in the
+configuration file will be silently ignored.
+
+<p>
+
+Example:
+
+<blockquote><pre>
+$ user_manage info george age=20
+Info successfully changed for george.
+
+$ user_manage info george
+Enter comma-separated list of field=value pairs for george: age=80
+Info successfully changed for george.
+</pre></blockquote>
+
+If you don't specify the user name, the program will prompt for it.
+
+<h4>Deleting a User</h4>
+
+Issue the <em>delete</em> command with a list of users to remove
+entirely (whitespace-delimited).  If you do not enter at least one
+name, the program will prompt you.
+
+<h4>Obtaining the List of Defined Realms</h4>
+
+Issue the <em>realms</em> command with no arguments.  This will list
+all the realms defined in the script's configuration file.
+
+<blockquote><pre>
+$ user_manage realms
+Name                        Type
+----                        ----
+development                 DB
+*main                       File
+test                        DBM
+</pre></blockquote>
+
+The default realm is indicated with an asterisk.
+
+<h4>Formatting a .htaccess or access.conf Entry</h4>
+
+The <cite>format</cite> command will produce an access control entry
+suitable for cutting and pasting into your Web server's access control
+file.  The basic entry allows access to all valid users.  You should
+modify this entry to reflect your intent.
+
+<p>
+
+Here are some examples:
+
+<blockquote><pre>
+$ user_manage -r development format
+AuthName	development
+AuthType	Basic
+AuthDBUserDB	./devel.passwd
+AuthDBGroupDB	./devel.group
+&lt;Limit GET POST PUT DELETE&gt;
+require valid-user
+&lt;/Limit&gt;
+
+$ user_manage -r wizards format
+AuthName	wizards
+AuthType	Basic
+Auth_MSQLHost		localhost
+Auth_MSQLDatabase	www
+Auth_MSQLpwd_table	users
+Auth_MSQLuid_field 	uid
+Auth_MSQLpwd_field	password
+Auth_MSQLgrp_table	groups
+Auth_MSQLgrp_field	grp
+&lt;Limit GET POST PUT DELETE&gt;
+require valid-user
+&lt;/Limit&gt;
+</pre></blockquote>
+
+This can be a real time-saver, particularly if you have trouble
+remembering the spelling of all those directives!
+
+<h4>Restrictions on Using <cite>user_manage</cite> from the Command Line</h4>
+
+As explained earlier, file permissions are a big issue when running
+<cite>user_manage</cite> as a CGI script.  One solution is to make
+the script run as set-group-id or set-user-id.  When run from the
+command line, the script will disable the sgid and suid bits and run
+with the effective ID of the user launching it.  This prevents local
+users from wantonly changing the password files without appropriate
+permissions.
+
+<p>
+
+The one exception to this rule is that if the user's UNIX login name
+matches the name of a user who belongs to the "administrators" group,
+the script will honor the sgid and suid bits.  This mimics the
+behavior of the script when it's running as a CGI program.
+
+<hr>
+
+<h2>Bugs and Caveats</h2>
+
+<h3>File Locking</h3>
+
+Because <cite>user_manage</cite> is used as a CGI script, it is
+possible that several users will try to update the password and group
+files simultaneously.  In order to prevent files from becoming
+scrambled by this, the script implements a form of file locking that
+allows only one user to have write access to the files at any time.
+
+<p>
+
+The file locking used by this script is based on the Unix fcntl()
+call, which does <strong>not</strong> work correctly across NFS
+mounted volumes.  Because of this, the password and group files must
+reside on one of the web server's local disks.  For the same reason,
+if you use <cite>user_manage</cite> from the command line, you
+should do it from the web server's host machine.
+
+<p>
+
+If the script exits prematurely for some reason, it may leave lock
+files lying around.  These appear as files with the extension ".TMP"
+in the directory holding the password and group files.  You can safely
+ignore these files or delete them.  Their presence will not adversely
+affect the script's operation.  If the script consistently fails to
+clean up lock files, please contact me.  There's probably a bug.
+
+<p>
+
+Another thing to be aware of is that the Apache server itself doesn't
+honor the file locks.  If a user updates a password or group file at
+the same time that Apache is trying to read it, the server may read
+partial or outdated information.  This may cause rare intermittent
+user authentication errors.  (The same is also true of the htpasswd
+and dbmmanage scripts, which don't use any sort of locking at all).
+
+<h3>Apache Doesn't Recognize Security Realms</h3>
+
+Security realms are a good way of organizing your site's access
+policies by keeping related password and group files together.  Apache
+would benefit from this concept, but currently doesn't.  You're still
+responsible for maintaining correct paths to the password and group
+files in <cite>access.conf</cite>.
+
+<p>
+
+An Apache module that works with Doug MacEachern's mod_perl is in the
+works to correct this deficiency 
+
+<h3>No Support for Netscape Group Files</h3>
+
+The Netscape server stores group information using a scheme that is
+somewhat more complex than other servers do.  No support is currently
+provided for these group files.  You can still define an
+administration group to manage users remotely with this tool, but the
+groups are not honored by the Netscape server.
+
+<h3>Don't Use This Script to Change /etc/passwd or /etc/group !!</h3>
+
+The file formats are different.  You will destroy your system if you
+try it.
+
+<h3>The Script Doesn't Handle NIS, POP or System Passwords</h3>
+
+It's designed for updating passwords on the Web only.  If you want to
+allow users to change their POP, NIS or system passwords via a Web
+interface, you're going to have to roll your own.
+
+<hr>
+
+<h2>Modification History</h2>
+
+<h3>Version 1.56 - May 6, 1999</h3>
+<ol>
+  <li>Added support for authenticating to SQL databases.
+</ol>
+
+<h3>Version 1.51 - December 30, 1997</h3>
+<ol>
+  <li>Fixed support for the Netscape server and added caveats about
+      not supporting Netscape groups.
+</ol>
+
+<h3>Version 1.50 - December 30, 1997</h3>
+
+<ol>
+  <li>Fully integrated with Doug MacEachern's HTTPD::* modules.
+  <li>Handles SQL databases.
+  <li>Allows you to get and set additional field information.
+</ol>
+
+
+<h3>Version 1.00 - January 15, 1997</h3>
+
+<ol>
+  <li>First release
+</ol>
+
+<h3>Version 1.01 - March 8, 1997</h3>
+
+<ol>
+  <li>Changed group list from scrolling list to checkbox group if
+      small enough.
+  <li>Turned off suid and sgid bits if run by unprivileged user from
+      command line.
+</ol>
+
+<h2>Author and Distribution Information</h2>
+
+The current version of this package can be found at:
+
+<blockquote>
+<a href="http://www.genome.wi.mit.edu/~lstein/user_manage/">http://www.genome.wi.mit.edu/~lstein/user_manage/</a>
+</blockquote>
+
+If you are having trouble with the script, check here for updates.
+
+<p>
+
+<cite>user_manage</cite> was written by <a
+href="http://www.genome.wi.mit.edu/~lstein/">Lincoln D. Stein</a>.  It
+can be freely distributed and modified, so long as this documentation
+accompanies it and the following copyright statement is displayed in
+the source code:
+
+<blockquote><pre>
+Copyright 1997-2000 Lincoln D. Stein.  All rights reserved.
+See the accompanying HTML file for usage and distribution
+information.  The master version can be found at:
+http://www.genome.wi.mit.edu/ftp/pub/software/WWW/passwd/
+</pre></blockquote>
+
+<hr>
+
+<address>Lincoln D. Stein, lstein@w3.org<br>
+<a href="/">Whitehead Institute/MIT Center for Genome Research</a></address>
+<!-- hhmts start -->
+Last modified: Mon Nov 21 13:15:07 EST 2005
+<!-- hhmts end -->
+</body> </html>

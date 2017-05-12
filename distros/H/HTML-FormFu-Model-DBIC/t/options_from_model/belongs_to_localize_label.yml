@@ -1,0 +1,15 @@
+---
+auto_fieldset: 1
+localize_class: 'HTMLFormFu::I18N'
+
+elements:
+  - type: Hidden
+    name: id
+
+  - type: Select
+    name: type
+    model_config:
+      localize_label: 1
+
+  - type: Submit
+    name: submit

@@ -1,0 +1,93 @@
+0.04006   2014-02-14 00:27:50+01:00 Europe/Berlin
+    typo fix (thanks dsteinbrunner)
+    
+0.04005   2014-02-14 00:03:43+01:00 Europe/Berlin
+    corrected Encoding in dist.ini,
+        due to CPAN Testers reporting an invalid byte sequence in the Makefile
+
+0.04004   2012-08-17 01:00:11 Europe/Berlin
+    Dist::Zilla::Plugin::GitHub::Meta extracts correct Metainfos now
+
+0.04003   2012-08-17 00:38:56 Europe/Berlin
+    Versions are now handled by Dist::Zilla::Plugin::PkgVersion
+    deleted 2 unused testclasses
+    
+0.04002   2012-08-17 00:08:19 Europe/Berlin
+    RT 79021: Eliminate warnings about "subroutine redefined"
+        * subroutine redefined warnings under mod_perl silenced
+        * created testcase "emulating" mod_perl
+    removed shebang in authortests
+
+0.04001   2012-02-24 22:55:01 Europe/Berlin
+    RT 75271: AutoPrereq of Dist::Zilla found too many dependencies,
+        * fixed by stating dependencies explicitly
+        (thanks jquelin)
+
+0.04      2012-02-18 22:04:20 Europe/Berlin
+    HTTP::Status 6.03 added a status, that broke this module
+    moved to Dist::Zilla
+
+0.03001 2010-03-11
+    Fixed tests not to emit warnings anymore
+
+0.03000 2010-03-11
+    Added possibility to import only specific error ranges
+    Added tests and Pod for this
+
+0.02006 2010-03-08
+    Added minimum version requirements to prerequisites
+
+0.02005 2010-03-05
+    Added Pod VERSION sections back in, thanks to ShipIt::Step::ChangePodVersion ;) 
+
+0.02004 2010-03-04
+    Corrected $VERSION for changed modules
+
+0.02003 2010-03-04
+    Removed parent.pm - dependency
+    Added base.pm - dependency, works better and is longer in Core
+    HTTP::Request::Common required for t/05-plack.t, othwerwise skipped
+
+0.02002 2010-03-04
+    Some small POD enhancements for H::E::Base and H::E::Loader
+
+0.02001 2010-03-04
+    Fixed POD for HTTP::Exception::nXX-Classes (again copy/paste)
+    Updated README
+
+0.02000 2010-03-03
+    Added "Tween-Classes" to the hierarchy (1XX .. 5XX)
+    Added Tests for "Tween-Classes" to the hierarchy (1XX .. 5XX)
+    Fixed t/06-is_methods.t not to use Plack::Test anymore
+    Changed HTTP::Exception::Base to use as_string from Exception::Class::Base
+    Added location field for 3XX Exceptions
+    Added message and error as synonym for status_message (compat for Exception::Class)
+    Fixed t/06-is_methods.t to not include Plack::Test anymore (evil copy/paste)
+    Forgot dates in the Changes-File :\
+
+0.01007 2010-03-03
+    fixed some POD
+
+0.01006 2010-03-02
+    changed EMail-Address in packages to my CPAN-EMail
+
+0.01005 2010-03-02
+    removed VERSION from pod, too much hassle to keep in sync with $VERSION
+
+0.01004 2010-03-02
+    still trying to shipit
+
+0.01003 2010-03-02
+    no changes to the module itself, just trying to get shipit to work
+
+0.01002 2010-03-02
+    removed MANIFEST.SKIP from MANIFEST
+    Corrected BuildRequirements in Build.PL (added Test::Exception)
+    Corrected Requirements in Makefile.PL, thought it is recreated automatically
+    fixed t/05.plack to be skipped on systems without Plack
+
+0.01001 2010-03-02
+    Corrected Requirements in Build.PL
+
+0.01000 2010-02-29
+    First Implementation of HTTP::Exceptions

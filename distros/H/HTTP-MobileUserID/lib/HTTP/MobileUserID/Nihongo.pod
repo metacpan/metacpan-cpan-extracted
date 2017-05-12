@@ -1,0 +1,88 @@
+=encoding utf-8
+
+=head1 NAME
+
+HTTP::MobileUserID::Nihongo - 携帯端末のユーザIDを取得する
+
+=head1 概要
+
+  use HTTP::MobileUserID;
+  use HTTP::MobileAgent;
+  
+  my $agent  = HTTP::MobileAgent->new;
+  my $userid = HTTP::MobileUserID->new($agent);
+  
+  if ( $userid->supported ) {
+    print $userid->id;
+  }
+
+=head1 説明
+
+携帯端末のユーザIDを取得します。
+
+DoCoMoの場合は端末ID、SoftBankの場合はユーザID、AUの場合はサブスクライバIDを返します。
+
+=head1 メソッド
+
+=over 4
+
+=item user_id()
+
+=item id()
+
+ユーザIDを返します。
+
+ユーザIDが取得できなかった場合は未定義値を返します。
+
+=item supported()
+
+=item unsupported()
+
+その端末がそもそも固有のユーザIDを取得できるかどうかを判定します。
+
+unsupportedが真になるのは以下のケース
+
+=over 2
+
+=item * DoCoMoのHTMLバージョンが2.0以下の端末はutn属性が使えないので端末固有のIDを取得することは不可能。
+
+=item * SoftBankのC型端末はユーザIDの取得ができない。（公式サイトなら可能、だったはず）
+
+=back
+
+=item has_user_id()
+
+=item no_user_id()
+
+端末IDの取得には対応しているが何らかの理由でユーザIDが取得できないケースがあるのでそれを判定します。
+
+no_user_idが真になるのは以下のケース
+
+=over 2
+
+=item * DoCoMoでutn属性のリンクを経由しなかった場合
+
+=item * SoftBankでユーザIDの通知設定を行わなかった場合
+
+=item * AUでサブスクライバIDの通知設定を行わなかった場合
+
+=back
+
+=back
+
+=head1 作者
+
+Ittetsu Miyazaki E<lt>ittetsu.miyazaki@gmail.comE<gt>
+
+Thanks to Dan Kogai
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<HTTP::MobileAgent>
+
+=cut

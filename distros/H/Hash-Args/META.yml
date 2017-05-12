@@ -1,0 +1,29 @@
+---
+abstract: 'Coerces argument lists into HASH references for convenience'
+author:
+  - 'jason hord <pravus@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Hash-Args
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  Exporter: 0
+  Scalar::Util: 0
+  parent: 0
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+version: 0.02

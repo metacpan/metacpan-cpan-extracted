@@ -1,0 +1,7 @@
+Revision history for Heap::Fibonacci::Fast.
+
+0.01	2009-09-20
+		- initial release
+
+0.0101	2009-09-21
+		- fix compilation under Solaris

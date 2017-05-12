@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>
+      WebMake: Documentation: Contents
+    </title>
+    <meta name="generator" content="WebMake/2.2" />
+    <style>
+      body {
+       background-color: #ffffff; 
+       color: #000000; 
+       font-size: medium;
+       font-family: verdana,lucida,helvetica,sans-serif;
+      }
+      code, samp, pre {
+       font-family: Courier New,courier,fixed-width,monospace;
+      }
+      H1 { font-size: x-large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFCC66; }
+      H2 { font-size: large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFDD77; }
+      H3 { font-size: medium; font-family: Garamond,Book Antiqua,Times,serif; background: #FFEE88; }
+      H4 { font-size: small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H5 { font-size: x-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H6 { font-size: xx-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      A:link {
+       font-weight: bold;
+       color: #004000;
+       text-decoration: underline; 
+      }
+      A:visited {
+       font-weight: normal;
+       color: #008000;
+       text-decoration: underline; 
+      }
+      A:active {
+       font-weight: bold;
+       color: #800000;
+       text-decoration: underline; 
+      }
+      dt {
+       font-size: medium;
+       font-weight: bold;
+       padding-top: 8px; padding-bottom: 8px;
+      }
+      dd {
+       padding-top: 8px; padding-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body bgcolor="#ffffff" text="#000000" link="#3300cc" vlink="#660066">
+    <font face="lucida,verdana,sans-serif">
+      <div align="center">
+         <img src="images/WebMakeTitle.png" alt="WebMake" width="500" height="122" />
+      </div>
+      <table width="100%">
+        <tr>
+          <td valign="top">
+             <strong><a href="http://webmake.taint.org/">WebMake</a>
+             Documentation</strong> (version 2.2)
+             
+          </td>
+          <td valign="top">
+            <div align="right">
+              
+               [ | <a href="index_01-intro.html">Forward</a> | <a href="index.html">Index</a>
+               | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+               
+            </div>
+          </td>
+        </tr>
+      </table>
+<!-- yes, it's that Mozilla black-border code again ;) -->
+      <!-- stolen from www.mozilla.org via rc3.org -->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td bgcolor="#aaaaaa">
+            <table border="0" cellspacing="4" cellpadding="4" width="100%">
+              <tr>
+                <td bgcolor="#ffffff">
+                  <table border="0" cellspacing="4" cellpadding="4" width="100%">
+                    <tr>
+                      <td>
+                         <h1>Contents</h1><ul>
+                          <li>
+                             <h2><a href="index_01-intro.html">Introduction</a></h2><ul>
+                              <li>
+                                <p>
+                                  <a href="blurb.html">The Blurb</a> - What it is, and what it does
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="concepts.html">Concepts</a> - Concepts behind WebMake's design
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="making.html">WebMake Operation</a> - what happens when you run WebMake
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="firsttime.html">How to Migrate to WebMake</a> - how to write a WebMake file
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="invoking.html">Invoking Webmake</a> - how to run WebMake
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="cms.html">WebMake as a CMS</a> - WebMake's content-management features, and shortcomings
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="using.html">Tips On Using WebMake</a> - Some tips on using WebMake
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="contributors.html">Contributors to WebMake</a> - Contributors to WebMake
+                                </p>
+                              </li>
+                            </ul>
+                          </li>
+                          <li>
+                             <h2><a href="index_02-tags_attrs.html">Tags and Their Attributes</a></h2><ul>
+                              <li>
+                                <p>
+                                  <a href="webmake_tag.html">The &lt;webmake&gt; Tag</a> - the webmake section
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="include.html">The &lt;include&gt; Tag</a> - include another file into the current WebMake file
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="use.html">The &lt;use&gt; Tag</a> - use a WebMake plugin
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="content.html">The &lt;content&gt; Tag</a> - one chunk of textual content
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="template.html">The &lt;template&gt; Tag</a> - non-text content, such as HTML templates
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="contenttable.html">The &lt;contenttable&gt; Tag</a> - Define several small content items quickly, using a table
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="contents.html">The &lt;contents&gt; Tag</a> - load many chunks of content from one data source
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="templates.html">The &lt;templates&gt; Tag</a> - load many chunks of non-text content, such as HTML templates, from a data
+                                  source
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="media.html">The &lt;media&gt; Tag</a> - load many URLs from one data source
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="datasources.html">Data Sources</a> - the protocols supported by &lt;contents&gt;, &lt;templates&gt; and &lt;media&gt;
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="for.html">The &lt;for&gt; Tag</a> - iteration construct
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="out.html">The &lt;out&gt; Tag</a> - an output file and URL
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="sitemap.html">The &lt;sitemap&gt; Tag</a> - generate a site map
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="navlinks.html">The &lt;navlinks&gt; Tag</a> - generate back and forward navigation links
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="breadcrumbs.html">The &lt;breadcrumbs&gt; Tag</a> - generate a ''breadcrumb trail'' navigational aid
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="cache.html">The &lt;cache&gt; Tag</a> - tell WebMake where to keep its cache files
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="option.html">The &lt;option&gt; Tag</a> - set options controlling WebMake behaviour
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="tags.html">Defining Tags</a> - defining tags for use in content items
+                                </p>
+                              </li>
+                            </ul>
+                          </li>
+                          <li>
+                             <h2><a href="index_03-proc_logic.html">Processing Logic</a></h2><ul>
+                              <li>
+                                <p>
+                                  <a href="order.html">The Order of Processing</a> - the order of processing
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="set.html">The &lt;{set}&gt; Directive</a> - set a content chunk while inside another content chunk's scope
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="perl.html">The &lt;{perl}&gt; Directives</a> - embed arbitrary perl logic
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="globs.html">Globs and Regexps</a> - glob patterns, regular expressions and pattern matching
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="sorting.html">Sorting Lists of Content Items</a> - how, and where, it is done
+                                </p>
+                              </li>
+                            </ul>
+                          </li>
+                          <li>
+                             <h2><a href="index_04-var_refs.html">Variable References</a></h2><ul>
+                              <li>
+                                <p>
+                                  <a href="content_refs.html">${content_refs} - References to Content Chunks</a> - references to content chunks
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="url_refs.html">$(url_refs) - References to URLs</a> - references to URLs
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="deferred_content_refs.html">$[deferred_content refs] - Deferred Content References</a> - deferred references to content chunks
+                                </p>
+                              </li>
+                            </ul>
+                          </li>
+                          <li>
+                             <h2><a href="index_05-meta.html">Meta Tags and Meta-Data</a></h2><ul>
+                              <li>
+                                <p>
+                                  <a href="metadata.html">Metadata</a> - meta-data for content items, and how to use it
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="wmmeta.html">The &lt;wmmeta&gt; Tag</a> - defining meta-data inside the tagged content object
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="metadefault.html">The &lt;metadefault&gt; Tag</a> - Specify default metadata to attach to content
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="metatable.html">The &lt;metatable&gt; Tag</a> - Attach metadata to another content item
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="attrdefault.html">The &lt;attrdefault&gt; Tag</a> - Specify default attributes for content items
+                                </p>
+                              </li>
+                            </ul>
+                          </li>
+                          <li>
+                             <h2><a href="index_06-magic_vars.html">Magic Variables</a></h2><ul>
+                              <li>
+                                <p>
+                                  <a href="imgsize.html">The ${IMGSIZE} Magic Variable</a> - automatically add image size information to an &lt;img&gt; tag
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="topslash.html">The $(TOP/) Magic Variable</a> - a relative path to the top-level of the site, for URLs
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="webmake_vars.html">The ${WebMake.*} Magic Variables</a> - information about the environment WebMake is run in, such as the version of WebMake, the timestamp, the user who ran it, etc.
+                                </p>
+                              </li>
+                            </ul>
+                          </li>
+                          <li>
+                             <h2><a href="index_07-fmt_converters.html">Format Converters</a></h2><ul>
+                              <li>
+                                <p>
+                                  <a href="ettext.html">The Text::EtText Format Converter</a> - A simple plain-text format, easily converted to HTML (format: <em>text/et</em>)
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="pod.html">The POD Format Converter</a> - Perl ''plain old documentation'' support (format: <em>text/pod</em>)
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="cleaner.html">The HTML Cleaner</a> - the HTML cleaning filter
+                                </p>
+                              </li>
+                            </ul>
+                          </li>
+                          <li>
+                             <h2><a href="index_075-cgi.html">Using WebMake.cgi</a></h2><ul>
+                              <li>
+                                <p>
+                                  <a href="cgi.html">Using webmake.cgi</a> - How to use WebMake as a CGI script
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="cgiinstall.html">Installing webmake.cgi</a> - How to install the WebMake CGI script in your web server
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="cvshowto.html">Setting up CVS and ssh for webmake.cgi HOWTO</a> - A step-by-step guide to setting up version-control for your WebMake site
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="cgistart.html">Using webmake.cgi</a> - How to navigate and use the ''edit-in-browser'' interface
+                                </p>
+                              </li>
+                            </ul>
+                          </li>
+                          <li>
+                             <h2><a href="index_08-pod.html">Module Documentation</a></h2><ul>
+                              <li>
+                                <p>
+                                  <a href="Content.pm.html">HTML::WebMake::Content</a> - module documentation
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="Main.pm.html">HTML::WebMake::Main</a> - module documentation
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="PerlCodeLibrary.pm.html">HTML::WebMake::PerlCodeLibrary</a> - module documentation
+                                </p>
+                              </li>
+                            </ul>
+                          </li>
+                          <li>
+                             <h2><a href="index_09-man.html">Manual Pages</a></h2><ul>
+                              <li>
+                                <p>
+                                  <a href="webmake.html">webmake(1)</a> - manual page
+                                </p>
+                              </li>
+                            </ul>
+                          </li>
+                          <li>
+                             <h2><a href="index_10-perllib.html">Plugins and Libraries</a></h2><ul>
+                              <li>
+                                <p>
+                                  <a href="csvtable_tag.wmk.html">csvtable_tag.wmk</a> - define a HTML table using comma-separated values
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="download_tag.wmk.html">download_tag.wmk</a> - Tag for quick download links to files
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="dump_vars.wmk.html">dump_vars.wmk</a> - dump all WebMake variables and content items
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="navtree.wmk.html">navtree.wmk</a> - WebMake tag to generate an alternative per-page sitemap
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="safe_tag.wmk.html">safe_tag.wmk</a> - Tag to ''make safe'' WebMake, EtText or HTML data
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="sitetree.wmk.html">sitetree.wmk</a> - WebMake tag to generate a per-page sitemap
+                                </p>
+                              </li>
+                              <li>
+                                <p>
+                                  <a href="thumbnail_tag.wmk.html">thumbnail_tag.wmk</a> - Tag to create ''thumbnail'' links for photo albums
+                                </p>
+                              </li>
+                            </ul>
+                          </li>
+                        </ul>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+      <table width="100%">
+        <tr>
+          <td valign="top">
+             <strong><a href="http://webmake.taint.org/">WebMake</a>
+             Documentation</strong> (version 2.2)
+             
+          </td>
+          <td valign="top">
+            <div align="right">
+              
+               [ | <a href="index_01-intro.html">Forward</a> | <a href="index.html">Index</a>
+               | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+               
+            </div>
+          </td>
+        </tr>
+      </table>
+      <div align="right">
+         <a href="http://webmake.taint.org/"> <img src="images/BuiltWithWebMake.png" alt="Built With WebMake" border="0" width="88" height="31" /></a>
+      </div>
+    </font>
+  </body>
+</html>

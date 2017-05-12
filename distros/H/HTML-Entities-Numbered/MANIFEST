@@ -1,0 +1,18 @@
+Changes
+lib/HTML/Entities/Numbered.pm
+lib/HTML/Entities/Numbered/Table.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_compile.t
+t/01_name2decimal.t
+t/02_name2hex.t
+t/03_decimal2name.t
+t/04_hex2name.t
+t/05_hex2name_lc.t
+t/06_invalid.t
+t/07_cross.t
+t/08_name2decimal_xml.t
+t/09_name2hex_xml.t
+t/entities.txt
+META.yml                                 Module meta-data (added by MakeMaker)

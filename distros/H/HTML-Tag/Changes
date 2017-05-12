@@ -1,0 +1,63 @@
+01.07 (2007/06/24)
+- Add RADIO Tag.
+
+01.07 (2006/10/17)
+- Some problem in some variables that sometimes are string and sometime HTMLElement make setToday not to work. Solved
+- If you set "now" as value, visible hour and minutes fields are wrong because in the hidden value seconds has missed.
+
+01.06 (2006/10/10)
+- The DATE Javascript has been completely rewrote.
+- DATE.pm has been changes (and now is more simple) owing to above change.
+- Add DATETIME.pm and TIME.pm to support time and datetime controls.
+- Removed test 090_Lang_by_defaul.t because fails depending by locale.
+
+01.05 (2006/07/02)
+- The DATE element now accept a value "now" that automatically set date to current date.
+
+01.04 (2005/10/21)
+- Add the id attribute for all widgets.
+
+01.03 (2005/10/21)
+- If there was more DATE widgets with same name in an HTML page, there was some javascript errors owing to a not unique HTML id attribute in DATE control items.
+
+01.02 (2005/10/12)
+- Add size and maxlength attribute to TEXTFIELD.
+
+01.01 (2005/10/08)
+- Add javascript, style and class attribute to all modules.
+- In SELECT.pm module, we use value attribute only if it's a hashref element (option_key => option_value for every options).
+- Removed a bug in MONTH.pm that cannot hide unpermitted months if the array of permitted months have written in string form with a zero before number with one digit.
+- Add the missing value attribute to YEAR.pm.
+- Removed unused value attribute in BOOLSELECT.pm.
+- Begin to write documentation.
+- Add the README file.
+
+01.00 (2005/10/06)
+- Removed Class::Builder request. 
+- Added Class::AutoAccess request.
+- Now HTML::Tag::* works in a better Object Oriented way.
+- Added some other tests.
+- If it's found a language that haven't a module available in namespace HTML::Tag::Lang::*, English (en) is now used instead of raise an error. 
+
+00.05 (2005/10/02)
+- MONTH widget now use HTML::Tag::Lang for localized months name.
+- Add a "permitted" method to MONTH.pm that show only months in the permitted arrayref and exclude all others.
+- Add a "permitted" method to YEAR.pm that show only years in the permitted arrayref and exclude all others.
+
+00.04 (2005/10/01)
+- Add modules to support different language in HTML and javascript generated text.
+- Add BOOLSELECT, a module to generate a YES/NO combobox.
+00.03 (2005/09/27)
+- Added strict and warnings directive to all modules.
+
+00.02 (2005/09/27)
+- In DATE.pm you can now combo and textbox to input date. If you press a digit key in the combo, it will be converted in a textbox form field.
+- Converted HTML tags in lowercase.
+- Changed tests to lowercase tags
+- Added validation for day/month/year fields
+- Added prerequisites for Class::Builder and Tie::IxHash.
+- Add Changes file
+- Remove a bug in DATE.pm that opens the calendar instead of submit form if you press the "enter" key in whatever form field.
+
+00.01 (2005-09-12)
+- First public release

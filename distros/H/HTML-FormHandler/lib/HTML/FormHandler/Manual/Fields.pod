@@ -1,0 +1,612 @@
+package HTML::FormHandler::Manual::Fields;
+# ABSTRACT: brief documentation of available fields
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+HTML::FormHandler::Manual::Fields - brief documentation of available fields
+
+=head1 VERSION
+
+version 0.40067
+
+=head1 SYNOPSIS
+
+L<Manual Index|HTML::FormHandler::Manual>
+
+See also L<HTML::FormHandler::Field> for a description of the base
+field attributes.
+
+The inheritance hierarchy of HTML::FormHandler Fields
+
+   Text
+      Money
+      Password
+      Hidden
+      Integer
+         PosInteger
+      Float
+      Date
+         DateMDY
+      Email
+      TextCSV
+   TextArea
+   Select
+      Multiple
+      SelectCSV
+      BoolSelect
+      IntRange
+         Hour
+         Minute
+         MonthDay
+         Month
+         Second
+         Year
+      MonthName
+      Weekday
+   Checkbox
+      Boolean
+   Compound
+      Repeatable
+      Duration
+      DateTime
+   NoValue
+      Submit
+      Reset
+      Button
+      Display
+      AddElement
+      RmElement
+      NonEditable
+   PrimaryKey
+   Upload
+   File
+
+=head1 DESCRIPTION
+
+A form's fields are created from the 'has_field' and 'field_list' definitions.
+FormHandler processes the field lists and creates an array of
+L<HTML::FormHandler::Field> objects. The "type" of a field
+determines which field class to use. The field class determines which
+attributes are valid for a particular field. A number of field classes are
+provided by FormHandler. You can customize the validation in your form on a
+per field basis, but validation that will be used for more than one field
+might be more easily handled in a custom field class.
+
+Fields are accessed with C<< form->field('name') >>.
+Field errors are in C<< $field->errors >>.
+
+If the 'field_name_space' is not set, fields will be loaded from the
+HTML::FormHandler::Field name space. If you provide a 'field_name_space'
+it will be searched before FormHandler. If you want to explicitly list the
+field's package, prefix it with a plus sign. The field_name_space plus the
+default name spaces 'HTML::FormHandler::Field' and 'HTML::FormHandlerX::Field'
+will be searched for fields.
+
+    has '+field_name_space' => ( default => 'MyApp::Form::Field' );
+    has_field 'name' => ( type => 'Text' ); # HTML::FormHandler::Field::Text
+    has_field 'name' => ( type => '+My::FieldType' ); # My::Fieldtype
+    has_field 'foo'  => ( type => '+Foo' );  # MyApp::Form::Field::Foo
+      or
+    has_field 'foo'  => ( type => 'Foo' );  # MyApp::Form::Field::Foo
+
+The most basic type is "Text", which is usually a 'text' HTML element and
+a string data type. (If the type of a field is not specified, it will be set to
+'Text'.)  A "Select" field type is a HTML select element, and validates against
+the list of values provided in the 'options'. A "Multiple" type is like "Select"
+but it allows selecting more than one value at a time.
+
+Many field classes contain only a list of constraints and transformations
+to apply. Some use the 'validate' method, which is called after the actions
+are applied. Some build a custom select list using 'build_options'.
+
+There are two rough categories of Field classes: those that do extra processing
+and those that are simple validators. The 'Compound', 'Repeatable', and
+'Select' fields are fields that are functional.
+
+=head1 Field names
+
+The standard way to use FormHandler is with field names that match your
+database accessors. If you want to prepend the HTML field names with a
+name plus dot, you can set the form 'name' and use the 'html_prefix'
+flag. "$name." will be stripped from the beginning of the HTML fields
+before processing by HFH, and will be added back in 'fif'. The field's
+'html_name' convenience attribute will return this name for use in templates.
+
+If you want the FormHandler field name to be different than the
+database accessor, set 'accessor' on your fields. (It defaults to the field
+name.) You could then use any name that you want for your field.
+
+There are a number of name-related field attributes. The 'name' is
+the name used to identify this particular field in this fields array.
+The 'full_name' includes the names of all parents of this field,
+like 'address.street.streetname'. The 'html_name' is the same as the
+'full_name' unless you have set the 'html_prefix' flag, in which case
+it includes the form name: 'myform.address.street.streetname'.
+
+To retrieve a field by name, you can use either the full_name or a
+chain: C<< $form->field('address')->field('street')->field('streetname') >>
+or: C<< $form->field('address.street.streetname') >>.
+
+=head1 Creating custom fields
+
+Subclass a custom field from L<HTML::FormHandler::Field>, or one of the
+existing subclasses. Almost everything that is done in a custom field
+class can also be done in a form. The advantage of a field class
+is that it can simplify declaration of often-repeated sets of attributes.
+
+The simplest subclasses contain only a 'validate' routine or an 'apply' attribute,
+which is called by the base Field class from 'process'. Look at
+L<HTML::FormHandler::Field::Email>, for example.
+
+If the field's value will be an object instead of a simple scalar, such
+as a DateTime, and you want to use the transformed value to fill in the
+form, then you will also need a deflation or field class 'deflate' method
+to reformat the object into a form suitable for an HTML form field.
+See L<HTML::FormHandler::Manual::InflationDeflation> for more info.
+
+Some custom fields might only require setting certain attributes to
+defaults, such as the L<HTML::FormHandler::Field::Hour> field, which
+set 'range_start' to 0 and 'range_end' to 23. A 'select' field might
+override the 'build_options' builder for the 'options' array, like
+L<HTML::FormHandler::Field::IntRange>. A field may add additional
+attributes, such as 'label_format' in L<HTML::FormHandler::Field::IntRange>,
+or set the 'required' message.
+
+An alternative to new field classes for many field validations might
+be roles with collections of validations.
+
+=head1 Other field packages
+
+Some custom fields are supplied as CPAN packages, in the HTML::FormHandlerX
+name space.
+
+L<reCAPTCHA|HTML::FormHandlerX::Field::reCAPTCHA>
+
+L<DateTimeNatural|HTML::FormHandlerX::Field::DateTimeNatural>
+
+L<URI::HTTP|HTML::FormHandlerX::Field::URI::HTTP>
+
+=head1 Fields supplied by FormHandler
+
+=head2 Basic Fields
+
+Although there are a lot of fields provided (probably too many) a lot of them
+are "convenience" fields or "name" fields, where the main benefit is
+that the field type is a name that gives the main purpose of the field.
+Most of these fields could be replaced by a basic field with a bit of validation
+or some select options. A few of the fields are special purpose fields
+that won't be used very often.
+
+The fields in this section are the basic fields, the commonly used fields
+that will be most often used in a form.
+
+=head3 Text
+
+A string data type that will be formatted as an HTML text field. Has 'minlength'
+and 'maxlength' attributes.
+
+L<HTML::FormHandler::Field::Text>
+
+=head3 Select
+
+A field formatted as a select element.
+
+L<HTML::FormHandler::Field::Select>
+
+=head3 Checkbox
+
+A field formatted as a checkbox. If not in params, will be forced to
+'false' value by 'input_without_param' attribute (0 by default).
+
+L<HTML::FormHandler::Field::Checkbox>
+
+=head3 Hidden
+
+A hidden field.
+
+L<HTML::FormHandler::Field::Hidden>
+
+=head3 Password
+
+A password field. The value is not re-displayed.
+
+L<HTML::FormHandler::Field::Password>
+
+=head3 TextArea
+
+A textarea field.  Has 'cols' and 'rows' attributes.
+
+L<HTML::FormHandler::Field::TextArea>
+
+=head3 Upload
+
+A file upload field that takes a filehandle or a Catalyst upload object (an
+object with a 'size' method).
+
+L<HTML::FormHandler::Field::Upload>
+
+=head3 Submit
+
+A submit field.
+
+L<HTML::FormHandler::Field::Submit>
+
+=head3 Reset
+
+A reset field.
+
+L<HTML::FormHandler::Field::Reset>
+
+=head2 Complex Fields (Compound and Repeatable)
+
+These fields are complex fields which contain a fair amount of
+special code. They do not map to a single HTML element; they contain
+multiple subfields.
+
+=head3 Compound
+
+A compound field is a field that has sub-fields. Compound fields can be
+created in two ways: 1) using a field class, 2) by declaration.
+
+To create a compound field class, you must extend
+L<HTML::FormHandler::Field::Compound> and use L<HTML::FormHandler::Moose> to
+allow declaring fields:
+
+  package MyApp::Field::Duration;
+
+  use HTML::FormHandler::Moose;
+  extends 'HTML::FormHandler::Field::Compound';
+
+  has_field 'month' => (type => 'Integer');
+  has_field 'day' => ( type => 'Integer' );
+  has_field 'minutes' => ( type => 'Integer' );
+
+Then in the form:
+
+  has_field 'my_duration' => ( type => '+Duration' );
+
+To create a compound field by declaration, declare the containing
+compound field and subfields, prefixing the subfield names
+with the name of the containing compound field plus a dot:
+
+   package MyApp::Form;
+
+   use HTML::FormHandler::Moose;
+   extends 'HTML::FormHandler';
+
+   has_field 'duration' => ( type => 'Compound' );
+   has_field 'duration.month' => ( type => 'Integer' );
+   has_field 'duration.day' => ( type => 'Integer' );
+   has_field 'duration.year' => ( type => 'Integer' );
+
+In an HTML form the name of the field must be the complete name
+with dots. The 'html_name' field attribute can be used to get
+this name, C<< $field->html_name >>.
+
+A compound field can be used for a database relation that will have only
+one row (belongs_to or has_one). If the relation has a compound primary
+key, you may need to provide the primary key columns, either through
+hidden fields or by setting them in the C<< $form->value >> hash before
+'update_model' is called.
+
+See also L<HTML::FormHandler::Field::Compound>.
+
+=head3 Repeatable
+
+Repeatable fields are used for arrays of compound fields.
+
+   has_field 'addresses' => ( type => 'Repeatable' );
+   has_field 'addresses.address_id' => ( type => 'PrimaryKey' );
+   has_field 'addresses.street';
+   has_field 'addresses.city';
+   has_field 'addresses.country' => ( type => 'Select' );
+
+The arrays will be built from arrays passed in the params, or from
+related ('has_many') rows in the database.
+
+It is also used for arrays of single fields using the 'contains' keyword:
+
+  has_field 'tags' => ( type => 'Repeatable' );
+  has_field 'tags.contains' => ( type => '+Tag' );
+
+See L<HTML::FormHandler::Field::Repeatable> for more information.
+
+=head2 Text Fields
+
+Fields subclassed from the Text field.
+
+=head3 Text
+
+Text field.
+
+L<HTML::FormHandler::Field::Text>
+
+=head3 Money
+
+Positive or negative real value, formatted to two decimal places.
+
+L<HTML::FormHandler::Field::Money>
+
+=head3 Date
+
+Date field that can be used by jQuery datepicker plugin.
+
+L<HTML::FormHandler::Field::Date>
+
+=head3 DateMDY
+
+A subclass of 'Date' with the "%m/%d/%Y" format.
+
+L<HTML::FormHandler::Field::DateMDY>
+
+=head3 Email
+
+Uses Email::Valid for validation.
+
+L<HTML::FormHandler::Field::Email>
+
+=head3 Integer
+
+Positive and negative integers. Can use range_start and range_end.
+
+L<HTML::FormHandler::Field::Integer>
+
+=head3 PosInteger
+
+A positive integer field.
+
+L<HTML::FormHandler::Field::PosInteger>
+
+=head3 Float
+
+Float field that allows you to set size, precision, decimal_symbol, and
+decimal_symbol_for_db.
+
+L<HTML::FormHandler::Field::Float>
+
+=head3 TextCSV
+
+A text field that takes multiple values from a database and converts
+them to comma-separated values. This is intended for javascript fields
+that require that, such as 'select2'. This is the only 'multiple' text
+field. This text field would be a select-type field for the user.
+
+L<HTML::FormHandler::Field::TextCSV>
+
+=head2 Compound Fields
+
+Fields subclassed from 'Compound'.
+
+=head3 Compound
+
+L<HTML::FormHandler::Field::Compound>
+
+=head3 Repeatable
+
+L<HTML::FormHandler::Field::Repeatable>
+
+=head3 Duration
+
+Compound field with possible subfields: years, months, weeks, days, hours,
+minutes, seconds, nanoseconds.
+
+L<HTML::FormHandler::Field::Duration>
+
+=head3 DateTime
+
+A compound field that requires you to provide the subfields that
+you want. (month/day/year/hour/minutes)
+
+L<HTML::FormHandler::Field::DateTime>
+
+=head2 Checkbox Fields
+
+Fields that inherit from 'Checkbox'.
+
+=head3 Checkbox
+
+L<HTML::FormHandler::Field::Checkbox>
+
+=head3 Boolean
+
+Checkbox that return 1 or 0.
+
+L<HTML::FormHandler::Field::Boolean>
+
+=head2 Select Fields
+
+Fields that inherit from 'Select'.
+
+=head3 Select
+
+L<HTML::FormHandler::Field::Select>
+
+=head3 Multiple
+
+Multiple select. Also sorts the selected options to the top of
+the select list.
+
+L<HTML::FormHandler::Field::Multiple>
+
+=head2 SelectCSV
+
+A multiple select field for comma-separated values in the database.
+It expects database values like: '1,5,7'. The string will be inflated
+into an arrayref for validation and form filling, and will be deflated
+into a comma-separated string in the output value.
+
+L<HTML::FormHandler::Field::SelectCSV>
+
+=head3 BoolSelect
+
+A field with three possible values: empty/0/1.
+
+L<HTML::FormHandler::Field::BoolSelect>
+
+=head3 Hour
+
+Integer select range field from 0-23.
+
+L<HTML::FormHandler::Field::Hour>
+
+=head3 Second
+
+Select field with range from 0-59.
+
+L<HTML::FormHandler::Field::Second>
+
+=head3 IntRange
+
+An integer select field. Can set label format with 'label_format'.
+
+L<HTML::FormHandler::Field::IntRange>
+
+=head3 Month
+
+Select field with range from 1 - 12.
+
+L<HTML::FormHandler::Field::Month>
+
+=head3 MonthDay
+
+Select field with range from 1 - 31.
+
+L<HTML::FormHandler::Field::MonthDay>
+
+=head3 MonthName
+
+Select field with month name labels, value 1-12.
+
+L<HTML::FormHandler::Field::MonthName>
+
+=head3 Minute
+
+Select field with range from 0-59.
+
+L<HTML::FormHandler::Field::Minute>
+
+=head3 Weekday
+
+A select field where the labels are the names of the week, and the
+values are 0-6.
+
+L<HTML::FormHandler::Field::Weekday>
+
+=head3 Year
+
+Select field providing year list 5 years back and 10 years forward.
+
+L<HTML::FormHandler::Field::Year>
+
+=head2 NoValue fields
+
+Fields that inherit from 'NoValue'. None of these fields will
+provide a 'value' in the C<< $form->value >> hashref.
+
+=head3 NoValue
+
+Base class for fields that don't produce a 'value'.
+
+L<HTML::FormHandler::Field::NoValue>
+
+=head3 Submit
+
+L<HTML::FormHandler::Field::Submit>
+
+=head3 Reset
+
+L<HTML::FormHandler::Field::Reset>
+
+=head3 Button
+
+Button field that is rendered by the Button widget.
+
+L<HTML::FormHandler::Field::Button>
+
+=head3 Display
+
+Non-data field used for inserting HTML into the form. Probably
+now better handled by a Block or a rendering tag.
+
+L<HTML::FormHandler::Field::Display>
+
+=head3 AddElement
+
+Example field for adding a repeatable element.
+
+L<HTML::FormHandler::Field::AddElement>
+
+=head3 RmElement
+
+Example field for removing a repeatable element
+
+L<HTML::FormHandler::Field::RmElement>
+
+=head3 NonEditable
+
+For Bootstrap-style non-editable fields.
+
+=head2 TextArea fields
+
+Fields that inherit from 'TextArea'.
+
+=head3 TextArea
+
+L<HTML::FormHandler::Field::TextArea>
+
+=head2 Password fields
+
+=head3 Password
+
+Password field. Sets 'noupdate' flag if empty and not required.
+
+L<HTML::FormHandler::Field::Password>
+
+=head3 PasswordConf
+
+Password confirmation field.
+
+L<HTML::FormHandler::Field::PasswordConf>
+
+=head2 Other fields
+
+These fields inherit just from 'Field'.
+
+=head3 File
+
+A file field that does no processing. Most people probably want to
+use 'Upload' instead.
+
+L<HTML::FormHandler::Field::File>
+
+=head3 PrimaryKey
+
+Hidden field that provides the primary key for Repeatable fields.
+
+L<HTML::FormHandler::Field::PrimaryKey>
+
+=head3 Captcha
+
+A Captcha field using GD::SecurityImage. Requires the use of the
+L<HTML::FormHandler::TraitFor::Captcha> role, or similar code.
+
+L<HTML::FormHandler::Field::Captcha>
+
+=head1 AUTHOR
+
+FormHandler Contributors - see HTML::FormHandler
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Gerda Shank.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

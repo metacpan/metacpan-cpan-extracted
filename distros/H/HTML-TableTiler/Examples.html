@@ -1,0 +1,393 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html;charset=iso-8859-1">
+<title>HTML::TableTiler - Examples</title>
+</head>
+<body bgcolor="#ffffff">
+<h1>HTML::TableTiler - Examples</h1>
+<p>The examples below show you some possibilities of <b>HTML::TableTiler</b> module.</p>
+<p>All the examples use the code below:</p>
+<table border="0" cellspacing="0" cellpadding="8" bgcolor="#000066">
+<tr>
+<td colspan="2" valign="top"><font color="white"><b>common code for all the examples</b></font></td>
+</tr>
+<tr>
+<td valign="top" bgcolor="#ccccff"><code>01<br>
+02<br>
+03<br>
+04<br>
+05<br>
+06<br>
+07<br>
+08<br>
+09<br>
+10<br>
+</code></td>
+<td valign="top" bgcolor="#cccccc">
+<p><code>$matrix=[<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ 'Descr.',&nbsp;'Item',&nbsp;'Quant.','Cost',&nbsp;'Price'&nbsp;],<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ 'Balls',&nbsp;&nbsp;'A001',&nbsp;'101',&nbsp;&nbsp;&nbsp;'2.75',&nbsp;'4.95'&nbsp;&nbsp;],<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ 'Cubes',&nbsp;&nbsp;'A002',&nbsp;'102',&nbsp;&nbsp;&nbsp;'3.75',&nbsp;'5.95'&nbsp;&nbsp;],<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ 'Cones',&nbsp;&nbsp;'A003',&nbsp;'103',&nbsp;&nbsp;&nbsp;'4.75',&nbsp;'6.75'&nbsp;&nbsp;],<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ 'Tubes',&nbsp;&nbsp;'A004',&nbsp;'104',&nbsp;&nbsp;&nbsp;'5.75',&nbsp;'7.95'&nbsp;&nbsp;]<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;];<br>
+</code></p>
+<p><code>use HTML::TableTiler qw(tile_table);<br>
+	print tile_table($matrix, $tile, $modes);</code></p>
+</td>
+</tr>
+</table>
+<p>See <b>tile</b> and <b>modes</b> in each example to understand how both work in combination.<code><br>
+</code>Placeholders are optional, but very useful to preview the final result. </p>
+<hr>
+<h3>Example #1</h3>
+<table>
+<tr>
+<td>Descr.</td>
+<td>Item</td>
+<td>Quant.</td>
+<td>Cost</td>
+<td>Price</td>
+</tr>
+<tr>
+<td>Balls</td>
+<td>A001</td>
+<td>101</td>
+<td>2.75</td>
+<td>4.95</td>
+</tr>
+<tr>
+<td>Cubes</td>
+<td>A002</td>
+<td>102</td>
+<td>3.75</td>
+<td>5.95</td>
+</tr>
+<tr>
+<td>Cones</td>
+<td>A003</td>
+<td>103</td>
+<td>4.75</td>
+<td>6.75</td>
+</tr>
+<tr>
+<td>Tubes</td>
+<td>A004</td>
+<td>104</td>
+<td>5.75</td>
+<td>7.95</td>
+</tr>
+</table>
+<p><b>Tile</b>: <code>undef (default: '&lt;table&gt;&lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;')</code><br>
+</p>
+<p><b>Modes</b>: <code>not allowed with default tile<br>
+</code></p>
+<hr>
+<h3>Example #2</h3>
+<table border="0" cellspacing="1" cellpadding="3">
+<tr>
+<td bgcolor="#9999cc"><b>Descr.</b></td>
+<td bgcolor="#9999cc"><b>Item</b></td>
+<td bgcolor="#9999cc"><b>Quant.</b></td>
+<td bgcolor="#9999cc"><b>Cost</b></td>
+<td bgcolor="#9999cc"><b>Price</b></td>
+</tr>
+<tr>
+<td bgcolor="#ccccff">Balls</td>
+<td bgcolor="#ccccff">A001</td>
+<td bgcolor="#ccccff">101</td>
+<td bgcolor="#ccccff">2.75</td>
+<td bgcolor="#ccccff">4.95</td>
+</tr>
+<tr>
+<td bgcolor="#ccccff">Cubes</td>
+<td bgcolor="#ccccff">A002</td>
+<td bgcolor="#ccccff">102</td>
+<td bgcolor="#ccccff">3.75</td>
+<td bgcolor="#ccccff">5.95</td>
+</tr>
+<tr>
+<td bgcolor="#ccccff">Cones</td>
+<td bgcolor="#ccccff">A003</td>
+<td bgcolor="#ccccff">103</td>
+<td bgcolor="#ccccff">4.75</td>
+<td bgcolor="#ccccff">6.75</td>
+</tr>
+<tr>
+<td bgcolor="#ccccff">Tubes</td>
+<td bgcolor="#ccccff">A004</td>
+<td bgcolor="#ccccff">104</td>
+<td bgcolor="#ccccff">5.75</td>
+<td bgcolor="#ccccff">7.95</td>
+</tr>
+</table>
+<p><b>Tile</b>:<br>
+</p>
+<table border="0" cellspacing="1" cellpadding="3">
+<tr>
+<td bgcolor="#9999cc"><b>placeholder</b></td>
+</tr>
+<tr>
+<td bgcolor="#ccccff">placeholder</td>
+</tr>
+</table>
+<p><b>Modes</b>:<code> undef (default: PULL_H PULL_V)<br>
+</code></p>
+<hr>
+<h3>Example #3</h3>
+<table border="0" cellspacing="1" cellpadding="3">
+<tr>
+<td bgcolor="#9999cc">Descr.</td>
+<td bgcolor="#9999cc">Item</td>
+<td bgcolor="#9999cc">Quant.</td>
+<td bgcolor="#9999cc">Cost</td>
+<td bgcolor="#9999cc">Price</td>
+</tr>
+<tr>
+<td bgcolor="#ccccff">Balls</td>
+<td bgcolor="#ccccff">A001</td>
+<td bgcolor="#ccccff">101</td>
+<td bgcolor="#ccccff">2.75</td>
+<td bgcolor="#ccccff">4.95</td>
+</tr>
+<tr>
+<td bgcolor="#9999cc">Cubes</td>
+<td bgcolor="#9999cc">A002</td>
+<td bgcolor="#9999cc">102</td>
+<td bgcolor="#9999cc">3.75</td>
+<td bgcolor="#9999cc">5.95</td>
+</tr>
+<tr>
+<td bgcolor="#ccccff">Cones</td>
+<td bgcolor="#ccccff">A003</td>
+<td bgcolor="#ccccff">103</td>
+<td bgcolor="#ccccff">4.75</td>
+<td bgcolor="#ccccff">6.75</td>
+</tr>
+<tr>
+<td bgcolor="#9999cc">Tubes</td>
+<td bgcolor="#9999cc">A004</td>
+<td bgcolor="#9999cc">104</td>
+<td bgcolor="#9999cc">5.75</td>
+<td bgcolor="#9999cc">7.95</td>
+</tr>
+</table>
+<p><b>Tile</b>:<br>
+</p>
+<table border="0" cellspacing="1" cellpadding="3">
+<tr>
+<td bgcolor="#9999cc">placeholder</td>
+</tr>
+<tr>
+<td bgcolor="#ccccff">placeholder</td>
+</tr>
+</table>
+<p><b>Modes</b>:<code> TILE_V (default: PULL_H)<br>
+</code></p>
+<hr>
+<h3>Example #4</h3>
+<table border="0" cellspacing="1" cellpadding="3">
+<tr>
+<td bgcolor="#9999cc"><b>Descr.</b></td>
+<td bgcolor="#ccccff">Item</td>
+<td bgcolor="#ccccff">Quant.</td>
+<td bgcolor="#ccccff">Cost</td>
+<td bgcolor="#ccccff">Price</td>
+</tr>
+<tr>
+<td bgcolor="#9999cc"><b>Balls</b></td>
+<td bgcolor="#ccccff">A001</td>
+<td bgcolor="#ccccff">101</td>
+<td bgcolor="#ccccff">2.75</td>
+<td bgcolor="#ccccff">4.95</td>
+</tr>
+<tr>
+<td bgcolor="#9999cc"><b>Cubes</b></td>
+<td bgcolor="#ccccff">A002</td>
+<td bgcolor="#ccccff">102</td>
+<td bgcolor="#ccccff">3.75</td>
+<td bgcolor="#ccccff">5.95</td>
+</tr>
+<tr>
+<td bgcolor="#9999cc"><b>Cones</b></td>
+<td bgcolor="#ccccff">A003</td>
+<td bgcolor="#ccccff">103</td>
+<td bgcolor="#ccccff">4.75</td>
+<td bgcolor="#ccccff">6.75</td>
+</tr>
+<tr>
+<td bgcolor="#9999cc"><b>Tubes</b></td>
+<td bgcolor="#ccccff">A004</td>
+<td bgcolor="#ccccff">104</td>
+<td bgcolor="#ccccff">5.75</td>
+<td bgcolor="#ccccff">7.95</td>
+</tr>
+</table>
+<p><b>Tile</b>:<br>
+</p>
+<table border="0" cellspacing="1" cellpadding="3">
+<tr>
+<td bgcolor="#9999cc"><b>placeholder</b></td>
+<td bgcolor="#ccccff">placeholder</td>
+</tr>
+</table>
+<p><b>Modes</b>:<code> undef (default: PULL_H PULL_V)<br>
+</code></p>
+<hr>
+<h3>Example #5</h3>
+<table border="0" cellspacing="1" cellpadding="3">
+<tr>
+<td bgcolor="#9999cc">Descr.</td>
+<td bgcolor="#ccccff">Item</td>
+<td bgcolor="#9999cc">Quant.</td>
+<td bgcolor="#ccccff">Cost</td>
+<td bgcolor="#9999cc">Price</td>
+</tr>
+<tr>
+<td bgcolor="#9999cc">Balls</td>
+<td bgcolor="#ccccff">A001</td>
+<td bgcolor="#9999cc">101</td>
+<td bgcolor="#ccccff">2.75</td>
+<td bgcolor="#9999cc">4.95</td>
+</tr>
+<tr>
+<td bgcolor="#9999cc">Cubes</td>
+<td bgcolor="#ccccff">A002</td>
+<td bgcolor="#9999cc">102</td>
+<td bgcolor="#ccccff">3.75</td>
+<td bgcolor="#9999cc">5.95</td>
+</tr>
+<tr>
+<td bgcolor="#9999cc">Cones</td>
+<td bgcolor="#ccccff">A003</td>
+<td bgcolor="#9999cc">103</td>
+<td bgcolor="#ccccff">4.75</td>
+<td bgcolor="#9999cc">6.75</td>
+</tr>
+<tr>
+<td bgcolor="#9999cc">Tubes</td>
+<td bgcolor="#ccccff">A004</td>
+<td bgcolor="#9999cc">104</td>
+<td bgcolor="#ccccff">5.75</td>
+<td bgcolor="#9999cc">7.95</td>
+</tr>
+</table>
+<p><b>Tile</b>:<br>
+</p>
+<table border="0" cellspacing="1" cellpadding="3">
+<tr>
+<td bgcolor="#9999cc">placeholder</td>
+<td bgcolor="#ccccff">placeholder</td>
+</tr>
+</table>
+<p><b>Modes</b>:<code> TILE_H (default: PULL_V)<br>
+</code></p>
+<hr>
+<h3>Example #6</h3>
+<table border="0" cellspacing="1" cellpadding="3">
+<tr>
+<td align="center" bgcolor="#ccccff">Descr.</td>
+<td align="center" bgcolor="#9999cc">Item</td>
+<td align="center" bgcolor="#ccccff">Quant.</td>
+<td align="center" bgcolor="#9999cc">Cost</td>
+<td align="center" bgcolor="#ccccff">Price</td>
+</tr>
+<tr>
+<td align="center" bgcolor="#9999cc">Balls</td>
+<td align="center" bgcolor="#ccccff">A001</td>
+<td align="center" bgcolor="#9999cc">101</td>
+<td align="center" bgcolor="#ccccff">2.75</td>
+<td align="center" bgcolor="#9999cc">4.95</td>
+</tr>
+<tr>
+<td align="center" bgcolor="#ccccff">Cubes</td>
+<td align="center" bgcolor="#9999cc">A002</td>
+<td align="center" bgcolor="#ccccff">102</td>
+<td align="center" bgcolor="#9999cc">3.75</td>
+<td align="center" bgcolor="#ccccff">5.95</td>
+</tr>
+<tr>
+<td align="center" bgcolor="#9999cc">Cones</td>
+<td align="center" bgcolor="#ccccff">A003</td>
+<td align="center" bgcolor="#9999cc">103</td>
+<td align="center" bgcolor="#ccccff">4.75</td>
+<td align="center" bgcolor="#9999cc">6.75</td>
+</tr>
+<tr>
+<td align="center" bgcolor="#ccccff">Tubes</td>
+<td align="center" bgcolor="#9999cc">A004</td>
+<td align="center" bgcolor="#ccccff">104</td>
+<td align="center" bgcolor="#9999cc">5.75</td>
+<td align="center" bgcolor="#ccccff">7.95</td>
+</tr>
+</table>
+<p><b>Tile</b>:<br>
+</p>
+<table border="0" cellspacing="1" cellpadding="3">
+<tr>
+<td align="center" bgcolor="#ccccff">placeholder</td>
+<td align="center" bgcolor="#9999cc">placeholder</td>
+</tr>
+<tr>
+<td align="center" bgcolor="#9999cc">placeholder</td>
+<td align="center" bgcolor="#ccccff">placeholder</td>
+</tr>
+</table>
+<p><b>Modes</b>:<code> TILE_H TILE_V<br>
+</code></p>
+<hr>
+<h3>Example #7</h3>
+<table border="0" cellspacing="1" cellpadding="3">
+<tr bgcolor="#666699">
+<td align="left"><b><font color="white">Descr.</font></b></td>
+<td align="center"><b><font color="white">Item</font></b></td>
+<td align="center"><b><font color="white">Quant.</font></b></td>
+<td align="center"><b><font color="white">Cost</font></b></td>
+<td align="center"><b><font color="white">Price</font></b></td>
+</tr>
+<tr>
+<td align="left" bgcolor="#9999cc"><b>Balls</b></td>
+<td align="center" bgcolor="#ccccff">A001</td>
+<td align="center" bgcolor="#ccccff">101</td>
+<td align="center" bgcolor="#ccccff">2.75</td>
+<td align="center" bgcolor="#ccccff">4.95</td>
+</tr>
+<tr>
+<td align="left" bgcolor="#9999cc"><b>Cubes</b></td>
+<td align="center" bgcolor="#ccccff">A002</td>
+<td align="center" bgcolor="#ccccff">102</td>
+<td align="center" bgcolor="#ccccff">3.75</td>
+<td align="center" bgcolor="#ccccff">5.95</td>
+</tr>
+<tr>
+<td align="left" bgcolor="#9999cc"><b>Cones</b></td>
+<td align="center" bgcolor="#ccccff">A003</td>
+<td align="center" bgcolor="#ccccff">103</td>
+<td align="center" bgcolor="#ccccff">4.75</td>
+<td align="center" bgcolor="#ccccff">6.75</td>
+</tr>
+<tr>
+<td align="left" bgcolor="#9999cc"><b>Tubes</b></td>
+<td align="center" bgcolor="#ccccff">A004</td>
+<td align="center" bgcolor="#ccccff">104</td>
+<td align="center" bgcolor="#ccccff">5.75</td>
+<td align="center" bgcolor="#ccccff">7.95</td>
+</tr>
+</table>
+<p><b>Tile</b>:<br>
+</p>
+<table border="0" cellspacing="1" cellpadding="3">
+<tr bgcolor="#666699">
+<td align="left"><b><font color="white">placeholder</font></b></td>
+<td align="center"><b><font color="white">placeholder</font></b></td>
+</tr>
+<tr>
+<td align="left" bgcolor="#9999cc"><b>placeholder</b></td>
+<td align="center" bgcolor="#ccccff">placeholder</td>
+</tr>
+</table>
+<p><b>Modes</b>:<code> undef (default: PULL_H PULL_V)<br>
+</code></p>
+</body>
+</html>

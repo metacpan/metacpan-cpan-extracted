@@ -1,0 +1,25 @@
+=== README for HTML-FromMail version undef
+=   Generated on Fri Jun  8 16:27:13 2007 by OODoc 1.00
+
+There are various ways to install this module:
+
+ (1) if you have a command-line, you can do:
+       perl -MCPAN -e 'install <any package from this distribution>'
+
+ (2) if you use Windows, have a look at http://ppm.activestate.com/
+
+ (3) if you have downloaded this module manually (as root/administrator)
+       gzip -d HTML-FromMail-undef.tar.gz
+       tar -xf HTML-FromMail-undef.tar
+       cd HTML-FromMail-undef
+       perl Makefile.PL
+       make          # optional
+       make test     # optional
+       make install
+
+For usage, see the included manual-pages or
+    http://search.cpan.org/dist/HTML-FromMail-undef/
+
+Please report problems to
+    http://rt.cpan.org/Dist/Display.html?Queue=HTML-FromMail
+

@@ -1,0 +1,73 @@
+HTTP-Server-Brick version 0.1.6
+
+$Id$
+
+HTTP::Server::Brick allows you to quickly wrap a prototype web server around some
+Perl code. The underlying server daemon is HTTP::Daemon and the performance should
+be fine for demo's, light internal systems, etc.
+
+See the POD documentation in the module for more information.
+
+INSTALLATION
+
+To install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+Alternatively, run the following commands (Module::Build is still
+required, this is just a wrapper):
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+DEPENDENCIES
+
+    LWP
+    Test::More
+    version
+
+BUGS AND LIMITATIONS
+
+It's version 0.1.6 - there's bound to be some bugs!
+
+The tests fail on windows due to forking limitations. I don't see any
+reason why the server itself won't work but I haven't tried it
+personally, and I have to figure out a way to test it from a test
+script that will work on Windows.
+
+In forking mode there is no attempt to limit the number of forked
+children - beware of forking yourself ;)
+
+No attention has been given to propagating any exception text into the
+http error (although the exception/die message will appear in the
+error_log).
+
+Versions 1.02 and earlier of HTTP::Daemon::SSL has a
+feature/documentation conflict where it will never timeout. This means
+your server won't respond to a HUP signal until the next request is
+served. Version 1.03_01 (developer release) and later do not have this
+issue.
+
+Latest versions are always available from CPAN. Development versions
+are available from my CVS repository:
+
+http://cvs.pumptheory.com/viewcvs/viewcvs.cgi/perl/HTTP-Server-Brick/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, Mark Aufflick <mark@aufflick.com> http://mark.aufflick.com
+Portions Copyright (c) 2007, Hans Dieter Pearcey C<< <hdp@pobox.com> >>
+
+All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

@@ -1,0 +1,6 @@
+# $Id: good.wt.in,v 1.1.1.1 2002/01/24 12:26:11 m_ilya Exp $
+
+test_name = Some name here
+    url = <<SERVER_URL>>test-file1
+    regex_require = ( TEST TEST )
+end_test

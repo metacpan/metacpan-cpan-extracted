@@ -1,0 +1,111 @@
+<ep-package name="HTML::EP::Locale">
+<ep-perl>
+    my $self = $_;
+
+    my $prefs_file = $self->{'env'}->{'PATH_TRANSLATED'};
+    $prefs_file =~ s/(.*)\/.*/$1/;
+    $prefs_file .= "/var/prefs";
+    if ($self->{'debug'}) {
+	$self->print("Setting preferences file to $prefs_file\n");
+    }
+
+    $self->{'config'} = do $prefs_file  ||  {};
+    if ($@) {
+	$self->{'warnings'} = "Couldn't read prefs file $prefs_file: $@";
+    }
+
+    my $cgi = $self->{'cgi'};
+    if (defined($cgi->param('mail2group_active'))) {
+	# Save data
+	my $o = $self->{'config'}->{'mail2group'} || {};
+	$o->{'active'}  = ($cgi->param('mail2group_active') ? 1 : 0);
+	$o->{'weekend'} = ($cgi->param('mail2group_weekend') ? 1 : 0);
+	$o->{'delay'}   = $cgi->param('mail2group_delay');
+	$self->{'config'}->{'mail2group'} = $o;
+	require Data::Dumper;
+	my $dump = Data::Dumper->new([$self->{'config'}], ['PREFS']);
+	$dump->Indent(1);
+	require Symbol;
+	my $fh = Symbol::gensym();
+	if ($self->{'debug'}) {
+	    $self->print("Saving data:\n", $dump->Dump(), "\n");
+	}
+	if (!open($fh, ">$prefs_file")  ||  !(print $fh $dump->Dump())  ||
+	    !close($fh)) {
+	    $self->{'errors'} = "Couldn't save data: $!";
+	}
+    }
+
+    package HTML::EP::Locale;
+    sub _format_SELECTED {
+	my $self = shift; my $option = shift;
+        $option ? " SELECTED" : "";
+    };
+    '';
+</ep-perl>
+<html><head><title>
+<ep-language de="Mailweiterleitung" en="Mail forwarding"></title></head>
+<body BGCOLOR=#FFFFFF>
+<h1><ep-language de="Mailweiterleitung" en="Mail forwarding"></h1>
+<ep-if eval="$errors$">
+    <h2><ep-language de="Fehlermeldungen sind aufgetreten"
+                     en="Error messages have been encountered">
+        <pre>$errors$</pre>
+</ep-if>
+<ep-if eval="$warnings$">
+    <h2><ep-language de="Warnungen sind aufgetreten"
+                     en="Warnings have been encountered">
+        <pre>$warnings$</pre>
+</ep-if>
+<h2><ep-language de="Einstellungen" en="Preferences"></h2>
+<form action="mail2group.ep" method=POST>
+  <div align=center>
+    <table>
+      <tr><th><ep-language de="Das System ist" en="The system is">:<br>
+            <font size=-1>
+            <ep-language
+              de="(Vor Feiertagen sollte das System deaktiviert werden)"
+              en="(You should disable outside of the working days)">
+            </font>
+          </th>
+          <td><select name="mail2group_active">
+                <option value=0>
+                  <ep-language de="Nicht Aktiv" en="Disabled">
+                <option value=1$&SELECTED->config->mail2group->active$>
+                  <ep-language de="Aktiv" en="Enabled">
+              </select>
+          </td>
+      <tr><th><ep-language de="Am Wochenende ist das System"
+                           en="At the weekend the system is">:<br>
+              <font size=-1>
+                <ep-language de="(Nur gültig, falls System insgesamt aktiv)"
+                             en="(Valid only, if system active)">
+              </font>
+          </th>
+          <td><select name="mail2group_weekend">
+                <option value=0>
+                  <ep-language de="Nicht Aktiv" en="Disabled">
+                <option value=1$&SELECTED->config->mail2group->weekend$>
+                  <ep-language de="Aktiv" en="Enabled">
+              </select>
+          </td>
+      <tr><th><ep-language de="Mail weiterleiten, wenn älter als"
+                           en="Forward mail if older than">
+          </th>
+          <td><ep-select range="1..5" item=r name="mail2group_delay"
+                selected="$config->mail2group->delay$">
+                <OPTION VALUE="$r$" $selected$>$r$
+              </ep-select> <ep-language de="Tage" en="Days">
+          </td>
+    </table>
+    <input type=hidden name="language" value="$_ep_language$">
+<ep-language language="de">
+    <input type=submit value="Einstellungen sichern">
+</ep-language>
+<ep-language language="en">
+    <input type=submit value="Save Preferences">
+</ep-language>
+  </div>
+</form>
+</body>
+</html>

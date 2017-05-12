@@ -1,0 +1,221 @@
+UPGRADE GUIDE for Mason
+
+Hints about upgrading to various major revisions of Mason. To be
+completely safe, always read carefully through the Changes file and
+upgrade first on a test server.
+
+VERSION 1.3x (1.4?)
+
+- The minimum version of mod_perl is now 1.24.
+
+
+VERSION 1.1x
+
+Installation and Configuration
+
+- *** Don't use PerlFreshRestart! *** Please see the FAQ, which
+details a variety of error messages you might get when using
+PerlFreshRestart.  Turn it off and check out Apache::Reload instead.
+
+- The HTML::Mason::Parser class no longer exists.  If you were
+creating one with the default options in your handler.pl file, you can
+remove the Parser-related code entirely.  Otherwise see the
+HTML::Mason::Compiler and HTML::Mason::Compiler::ToObject
+documentation for more details.
+
+- If you use a handler.pl that creates an Interp object and then
+passes that object to the ApacheHandler constructor, this will no
+longer work.  Instead, simply pass all of the parameters for both the
+Interp and ApacheHandler to the ApacheHandler constructor.
+
+So this:
+
+  my $interp = HTML::Mason::Interp->new( comp_root => ..., data_dir =>... );
+
+  my $ah = HTML::Mason::ApacheHandler->new( interp => $interp );
+
+becomes this:
+
+  my $ah = HTML::Mason::ApacheHandler->new( comp_root => ..., data_dir =>... );
+
+- The use_reload_file parameter has been removed.  See the
+documentation on the static_source parameter, which is intended to
+provide a similar performance enhancement.
+
+- Previous versions of Mason split the POD documentation into separate
+.pod files from the code, which was in .pm files.  Now, these have
+been combined into one file, the .pm file.  However, perldoc will look
+for a .pod file before a .pm file.
+
+During the install, we try to find these old .pod files and delete
+them.  However, if that isn't successful, you may see the old
+documentation for the following modules: HTML::Mason::Interp,
+HTML::Mason::Request, HTML::Mason::ApacheHandler,
+HTML::Mason::Component.  If you are experiencing this problem after
+installing this new version of Mason, you will need to delete the old
+.pod files manually.
+
+- The taint_check parameter no longer exists in any form.  We
+now automatically detect taint mode and act appropriately to untaint
+component source and object files.
+
+- The use_autohandlers, use_dhandlers, and
+allow_recursive_autohandlers parameters have been removed, and the
+autohandler_name and dhandler_name parameters no longer accept undef
+as a valid value.
+
+- The top_level_predicate parameter has been removed.  If you would
+like to filter requests you can do this via the new prepare_request
+method, which will give you a Request object that you can manipulate
+before deciding to serve a request.
+
+- The error_mode parameter has been replaced with two parameters,
+error_format and error_mode, allowing more control over how errors are
+processed.
+
+- The args_method parameter has changed from being an import parameter, as in
+
+  use HTML::Mason::ApacheHandler (args_method => 'mod_perl');
+
+to a regular constructor parameter, as in
+
+  my $ah = HTML::Mason::ApacheHandler->new(args_method => 'mod_perl');
+
+You should preload the Apache::Request or CGI module in your handler
+or httpd.conf, in order to save memory.
+
+- The default HTTP argument processor is now Apache::Request instead
+of CGI.pm. This entails several differences:
+
+  - Apache::Request treats parameters case-insensitively for purposes
+    of grouping. This would  only be a problem if you expect two arguments
+    that differ only by case (e.g. "mode" and "MODE").
+
+  - Apache::Request always parses the query string, even for POST requests.
+
+- The out_mode parameter (batch vs. stream) has been replaced with
+the autoflush parameter, which is a much simpler version of the same
+idea.  See the Request class documentation for details.
+
+- The ApacheHandler module now requires a minimum of mod_perl 1.22
+(though using something more up to date is highly recommended).
+
+- The ApacheHandler module will take care of chown'ing files created
+during server startup, when needed. If you have a line like
+
+   chown (Apache->server->uid, Apache->server->gid, $interp->files_written);
+
+in your handler.pl, it is now unnecessary (but harmless).
+
+- The MasonMultipleConfig parameter is no longer needed, and will
+cause an error if given.  Mason can now figure out for itself whether
+or not multiple ApacheHandler objects should be created.
+
+- The debug file feature has been removed, as it could not accurately
+support multiple versions of the Apache API. Use Apache::DB to run
+your server through the debugger.
+
+- The Previewer feature has been removed, as it relied on specific
+internals that were changed. It will hopefully return better and
+stronger in a future release.
+
+
+Data Caching
+
+Data caching has been completely rebuilt on top of Cache::Cache.
+This means:
+
+- The syntax of $m->cache and $m->cache_self have changed.  However,
+the original API can still be used for a while by setting
+data_cache_api to '1.0'.
+
+- Cache files have a different pathname and format; old cache files
+can be removed.
+
+- The access_data_cache utility is no longer supported. See
+"Accessing a Cache Externally" in the Developer's manual for
+instructions on how to replace access_data_cache.
+
+
+Semantics
+
+- In older versions of Mason, calls to $m->flush_buffer were
+ineffective when output needed to go through a <%filter>.  In 1.1x,
+the filter may be called multiple times, each time with new output.
+
+
+Component Syntax
+
+- The "mc_" style commands, deprecated in 0.8, are no longer supported.
+You will need to update to $m methods. The utility bin/convert0.8.pl
+can help with this.
+
+- The "perl_" prefix for Mason tags (like <%perl_args>), deprecated in 0.6,
+is no longer supported. You will need to remove this prefix. The utility
+bin/convert0.6.pl can help with this.
+
+- The |h escape flag now uses HTML::Entities::encode instead of just
+encoding <, >, ", and &.  This module escapes control and high-ascii
+characters properly for ISO-8859-1 pages. However, it will wreak
+havoc with different encodings. You can get the 1.0x behavior with
+
+   $ah->interp->set_escape( h => \&HTML::Mason::Escapes::basic_html_escape );
+
+- The backslash character now eliminates a newline at the end of
+any line, not just before %-lines and section tags.
+
+- The run_count and first_time component object methods have been
+deprecated, as they cannot be implemented reliably (see bug #209).
+Use a manual counter variable declared in <%once> instead.
+
+- $m->top_args and $m->top_comp have been renamed to $m->request_args
+and $m->request_comp, respectively.  The old method names have been
+deprecated but will continue to work for a while.
+
+- The Component class's create_time method has been renamed to
+load_time, which better reflects its semantics. create_time is
+deprecated but will continue to work for a while.
+
+- The Interp class's time method and current_time parameters are
+deprecated but will continue to work for a while.
+
+VERSION 0.85
+
+- Autohandlers are now recursive by default. If your site uses
+directory-specific autohandlers depending on the default value of
+allow_recursive_autohandlers=0, you must explicitly pass
+allow_recursive_autohandlers=>0 when creating the Interp.
+
+- All applicable autohandlers now get a chance to run. If your site
+has multiple autohandlers in parent/child directories, you'll likely
+get display problems when upgrading (e.g. multiple templates showing
+up per page). For a short-term fix, place
+
+    <%flags>
+    inherit=>undef
+    </%flags>
+
+in every autohandler. Ideally, in the long-term you'll be able to
+make the autohandlers work well together.
+
+- When calling components, base_comp now gets set to the called
+components, _unless_ you call a component with a component object or
+your component call starts with SELF: or PARENT:.  So a call like
+this:
+
+  <& /some/comp, foo => 1 &>
+
+causes the return value of $m->base_comp to be the "/some/comp"
+component object inside the "/some/comp" component.  But this:
+
+  <& $some_comp_obj, foo => 1 &>
+
+does not change what $m->base_comp returns.
+
+VERSION 0.8
+
+- Version 0.8 sports a new request API. $m now contains the current
+request object, and all mc_ commands have been incorporated into $m
+methods. The utility bin/convert0.8.pl converts existing components to
+use the new syntax. See Commands.pod for a manual conversion guide and
+a list of rare conversion problems.

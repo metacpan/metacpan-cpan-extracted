@@ -1,0 +1,226 @@
+
+<html>
+<head>
+<title>Some Plain tests Embperl</title>
+</head>
+
+<body>
+
+Here it starts with some HTML Text<P>
+
+All values should be undefined:
+
+$a = [+ $a +] <BR>
+$b = [+ $b +] <BR>
+$c = [+ $c +] <BR>
+$d = [+ $d +] <BR>
+$e = [+ $e +] <BR>
+
+
+First of all assign a value:
+[- $a = '(this is the value in $a)' -] <BR>
+
+Now we have some 'Umlaute':
+
+
+[- $b = "$a &auml;&ouml;&uuml;" -]
+
+Now lets look what we are getting from this:<BR>
+[+ $a +] [+ $b +]<BR>
+
+And now a and b together: [+ "$a$b" +]<P>
+
+Here we have some HTML tags within the perl code, Embperl will delete them!<BR>
+
+[+ $c = <BR> 6 + 17 <font size="3"> * 3 +]
+
+Embperl will also translate HMTL escapes to the right characters i.e. $a &amp;lt; 6 will get the perl expression $a &lt; 6: <BR>
+
+[- $e = 2 -]
+[+ $d = $e &lt; 6 +]
+
+Now they should have a value
+
+$a = [+ $a +] <BR>
+$b = [+ $b +] <BR>
+$c = [+ $c +] <BR>
+$d = [+ $d +] <BR>
+$e = [+ $e +] <BR>
+
+[- $a = 1; $b = 0; $c = 5; $d = 'txt' -]
+
+
+[$if $a$]
+    a <br>
+[$ endif$]
+
+
+[$if $a $]
+    a <br>
+[$else$]
+    not a<br>
+[$ endif $]
+
+
+[$ if $a$]
+    a <br>
+    [$if $b == 0$]
+        b is null <br>
+    [$else$]    
+        b is not null <br>
+    [$endif$]
+[$ else$]
+    not a<br>
+[$ endif $]
+
+
+[$ if $a$]
+    a <br>
+    [$if $b == 0$]
+        b is null <br>
+    [$else$]    
+        b is not null <br>
+    [$endif$]
+[$ else$]
+    not a<br>
+    [$if $b == 0$]
+        b is null <br>
+    [$else$]    
+        b is not null <br>
+    [$endif$]
+[$ endif $]
+
+
+[$ if !$a$]
+    not a <br>
+    [$if $b == 0$]
+        b is null <br>
+    [$else$]    
+        b is not null <br>
+    [$endif$]
+[$ else$]
+    a<br>
+    [$if $b == 0$]
+        b is null <br>
+    [$else$]    
+        b is not null <br>
+    [$endif$]
+[$ endif $]
+
+
+[- $i = 0 -]
+[$ while $i &lt;= $#ffld $]
+    [+ $ffld[$i] +] = [+ $fdat{$ffld[$i]} +]
+    [- $j = 0 -]
+    [$ while $j &lt;= $i $]
+        [+ $j++ +] 
+    [$ endwhile $]
+    <BR>
+    [- $i++ -]
+[$ endwhile $]
+
+
+
+<table>
+    <tr>
+        <td>[+ $c[$row][$col] +] </td>
+    </tr> 
+</table>
+
+
+<p> $tabmode = default <p>
+
+<hr><p>Display an two dimensional array with one, two and three columns !<BR>
+Please take a look at the source in your browser to see the difference<BR>
+
+[-
+   undef @a ;
+   undef @b ;
+
+   $a[0][0] = 'a1/1' ;
+   $a[1][0] = 'a2/1' ;
+   $a[1][1] = 'a2/2' ;
+   $a[2][0] = 'a3/1' ;
+   $a[2][1] = 'a3/2' ;
+   $a[2][2] = 'a3/3' ;
+
+   $b[0][0] = 'b1/1' ;
+   $b[1][0] = 'b2/1' ;
+   $b[1][1] = 'b2/2' ;
+   $b[2][0] = 'b3/1' ;
+   $b[2][1] = 'b3/2' ;
+   $b[2][2] = 'b3/3' ;
+
+   $maxcol=99 ;
+-]
+   $a[0][[0] = '1/1' ;<BR>
+   $a[1][[0] = '2/1' ;<BR>
+   $a[1][[1] = '2/2' ;<BR>
+   $a[2][[0] = '3/1' ;<BR>
+   $a[2][[1] = '3/2' ;<BR>
+   $a[2][[2] = '3/3' ;<BR>
+
+<P>$tabmode = default <P>
+
+<table border="2" width="100%">
+    <tr>
+        <td>[+ $a[$row][$col] +] </td>
+    </tr> 
+</table>
+
+<table border="2" width="100%">
+    <tr>
+        <th>1</th>
+        <th>2</th>
+        <th>3</th>
+    </tr> 
+    <tr>
+        <td>[+ $a[$row][$col] +] </td>
+    </tr> 
+</table>
+
+<table border="2" width="100%">
+    <tr>
+        <th>[+ $b[2][$col] +]</th>
+    </tr> 
+    <tr>
+        <td>[+ $a[$row][$col] +] </td>
+    </tr> 
+</table>
+
+<table>
+    <tr>
+        <td>
+            <table>
+    		<tr>
+                    <td>[+ $b[$row][$col] +] </td>
+    		</tr> 
+	    </table>
+
+        [+ $a[$row][$col] +] </td>
+    </tr> 
+</table>
+
+<P>[+ $HTML::Embperl::VERSION +]<P>
+
+<P>[+ $tabmode +]<P>
+<P>[+ local $tabmode = 1 +]<P>
+
+<P>
+
+[- $i = 0 ; while ($i < 10) { $ii[$i++] = "ii[$i] = $i" ; } -]
+
+<table>
+    <tr>
+            <td>[+ $ii[$row] +] </td>
+    </tr> 
+</table>
+
+[- @fe = (1, 10, 100, 1000) -]
+[$ foreach $fe @fe $]
+    [+ $fe +]
+[$ endforeach $]
+
+
+</body>
+</html>

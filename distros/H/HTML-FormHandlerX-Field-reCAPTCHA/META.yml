@@ -1,0 +1,32 @@
+---
+abstract: 'A Captcha::reCAPTCHA field for HTML::FormHandler'
+author:
+  - 'John Napiorkowski C<< <jjnapiork@cpan.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.94
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: HTML::FormHandlerX::Field::reCAPTCHA
+name: HTML-FormHandlerX-Field-reCAPTCHA
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Captcha::reCAPTCHA: 0.92
+  Crypt::Blowfish: 2.10
+  Crypt::CBC: 2.30
+  HTML::FormHandler: 0.30002
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/jjn1056/HTML-FormHandlerX-Field-reCAPTCHA.git
+version: 0.04

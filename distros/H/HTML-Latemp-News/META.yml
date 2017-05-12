@@ -1,0 +1,43 @@
+---
+abstract: 'News Maintenance Module for Latemp (and possibly other web frameworks)'
+author:
+  - 'Shlomi Fish <shlomif@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+  blib: '1.01'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.040, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-Latemp-News
+provides:
+  HTML::Latemp::News:
+    file: lib/HTML/Latemp/News.pm
+    version: v0.1.10
+  HTML::Latemp::News::Base:
+    file: lib/HTML/Latemp/News.pm
+    version: v0.1.10
+  HTML::Latemp::News::Item:
+    file: lib/HTML/Latemp/News.pm
+    version: v0.1.10
+requires:
+  CGI: '0'
+  Class::Accessor: '0'
+  XML::RSS: '0'
+  base: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-Latemp-News
+  repository: ssh://hg@bitbucket.org/shlomif/latemp
+version: 0.1.10

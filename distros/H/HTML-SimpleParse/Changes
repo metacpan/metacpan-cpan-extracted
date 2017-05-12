@@ -1,0 +1,99 @@
+Revision history for Perl extension HTML::SimpleParse.
+
+0.12  Wed Jul  9 12:19:38 CDT 2003
+
+ - Clarify the relationship between this module and HTML::TreeBuilder
+   in the documentation. [suggested by Gisle Aas]
+
+ - Moved regression tests from test.pl to t/basic.t
+
+0.11  Sun Jan 26 10:00:41 CST 2003
+
+ - Use Test.pm to output testing results.
+
+ - Avoid an 'undefined value' warning when creating a SimpleParse
+   object with an empty string.
+
+ - Fixed a problem that caused an infinite loop in certain bizarre
+   (and as yet unduplicated by me) situations.  Reported by Peter Suschlik.
+
+ - Added a Build.PL script to build & install via Module::Build.
+
+0.10  Sat Jul  1 14:47:07 EDT 2000
+   - Added the 'offset' attribute to each tree element, which tells you how
+     many bytes the current tag is from the beginning of the HTML text.
+     Idea from azamani@design-matters.com (Adrien Zamani).
+
+   - &parse_args will now recognize bare end tags correctly.  Thanks to
+     Paul.Makepeace@realprogrammers.com (Paul Makepeace).
+
+0.09  Sat May 27 12:18:38 EDT 2000
+   - HTML tag attribute names should contain only letters, digits, periods,
+     or hyphens.  I've made this change to parse_args().
+
+   - parse_args() handles single-quoted data now. [tim.holt@qsent.com (Tim Holt)]
+
+   - parse_args() now respects a new flag 'fix_case', which can be set
+     either as a package global or a class data member, which controls
+     whether attribute names are upper-cased or lower-cased or left alone.
+     Previously everything was left alone, which was incorrect because HTML
+     tag attribute names are supposed to be case-insensitive.  Now the
+     default is to upper-case everything.  [spot: tim.holt@qsent.com (Tim Holt)]
+
+0.08  Sat Jan 29 03:16:48 EST 2000
+    - Avoid warning when new() is called without feeding HTML to it
+      [jerome.oneil@activeindexing.com (Jerome O'Neil)]
+
+0.07  Wed Dec  1 17:09:23 EST 1999
+
+    - The parse_args routine will now allow whitespace between an attribute
+      and its value (on both sides of the equal sign).  I believe this
+      is compliant with the SGML spec at
+      http://www.w3.org/MarkUp/SGML/sgml-lex/sgml.l .  Thanks to
+      jo@homepage-design.net (Joachim Seibert) for the spot.
+      
+0.06  Fri Feb  5 18:22:15 EST 1999
+    - Fixed a bug in the parse_args routine that should properly handle
+      escaping of parameters like var="a \"value\"" [thanks, Philippe
+      Chiasson]
+
+0.05  Thu Aug 20 12:11:53 EDT 1998
+    - Fixed a bug in HTML::SimpleParse->parse_args('a="b=c"').  Thanks
+      to Shenghuo ZHU for finding it.
+
+0.04  Tue Aug 18 19:46:01 EDT 1998
+
+    - added execute() method that lets you do:
+      foreach ($p->tree) {
+         print $p->execute($_);
+      }
+      This lets Apache::OutputChain and Apache::SSIChain output their results in
+      the correct order.
+
+0.03  Fri Aug  7 13:03:34 EDT 1998
+    - changed the output_* methods so that they return their
+      output, instead of printing it.  There's a new method, get_output(),
+      which returns a string containing the parsed output.  The
+      output() method then prints the result of get_output().
+      This lets the module work with Apache::OutputChain.  Thanks to 
+      Honza Pazdziora for the patches (which I modified a little).
+    
+    - fixed the processing of markup declarations (e.g. <!DOCTYPE ...>)
+    
+    - parse_args method can handle leading whitespace now:
+      my %hash=HTML::SimpleParse->parse_args(' A="xx" B');
+      used to return an empty hash (thanks to Ben Laurie again).
+      
+    - parse_args makes sure that it starts matching at the beginning
+      of the string you give it, by setting pos() to 0.
+    
+    I'm also going to update Apache::SSI so that it can use this new version.
+
+0.02  Thu Aug  6 16:08:22 EDT 1998
+    - fixed bug in parse_args method pointed out by Ben Laurie:
+       %hash=HTML::SimpleParse->parse_args('A="xx" B');
+       did not include B in %hash.
+
+0.01  Fri Jun 26 17:42:41 1998
+    - original version; created by h2xs 1.18
+

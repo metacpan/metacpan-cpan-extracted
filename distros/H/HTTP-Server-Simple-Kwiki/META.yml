@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name: HTTP-Server-Simple-Kwiki
+version: 0.29
+author:
+  - Leon Brocard, C<< <acme@astray.com> >>
+abstract: Standalone Kwiki server
+license: perl
+requires:
+  HTTP::Server::Simple::CGI: 0
+  HTTP::Server::Simple::Static: 0
+  IO::Capture::Stdout: 0
+  Kwiki: 0
+  Test::More: 0
+provides:
+  HTTP::Server::Simple::Kwiki:
+    file: lib/HTTP/Server/Simple/Kwiki.pm
+    version: 0.29
+generated_by: Module::Build version 0.2605

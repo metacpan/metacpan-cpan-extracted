@@ -1,0 +1,10 @@
+Changes
+Tagset.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00_about_verbose.t
+t/01_old_junk.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

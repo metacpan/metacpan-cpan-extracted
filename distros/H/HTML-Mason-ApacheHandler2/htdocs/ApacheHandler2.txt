@@ -1,0 +1,55 @@
+NAME
+    HTML::Mason::ApacheHandler2 - experimental (alpha) Mason/mod_perl2
+    interface
+
+SYNOPSIS
+        use HTML::Mason::ApacheHandler2;
+ 
+        my $ah = HTML::Mason::ApacheHandler2->new (..name/value params..);
+        ...
+        sub handler {
+         my $r = shift;
+         $ah->handle_request($r);
+        }
+
+DESCRIPTION
+    HTML::Mason::ApacheHandler2 is highly experimental ( alpha ) and should
+    only be used in a test environment.
+
+    HTML::Mason::ApacheHandler2 is a clone of HTML::Mason::ApacheHandler
+    changed to work under a pure mod_perl2 environment. The external
+    interface is unchanged, see HTML::Mason::ApacheHandler.
+
+    The actual changes I made can be found in the distribution in
+    diff/ApacheHandler.diff ( made with 'diff -Naru' ... ).
+
+    A HOTWO for HTML::Mason::ApacheHandler2 may be found at HOWTO Run Mason
+    with mod_perl2.
+
+PREREQUISITES
+    You must have the following packages installed:
+
+        mod_perl        => 1.9910
+        HTML::Mason'    => 1.25
+        libapreq2       => 2.02-dev
+
+    Please refer to the original packages' documentation for instructions.
+
+SEE ALSO
+    My documents, including: HOWTO Run Mason with mod_perl2,
+    MasonX::Request::WithApacheSession2, MasonX::Request::WithMultiSession2,
+
+    Original Mason documents, including: HTML::Mason::ApacheHandler,
+    MasonX::Request::WithApacheSession, MasonX::Request::WithMultiSession.
+
+    Also see the Mason documentation at <http://masonhq.com/docs/manual/>.
+
+AUTHOR
+    Beau E. Cox <beau@beaucox.com> <http://beaucox.com>.
+
+    The real authors (I just made mod_perl2 changes) are the Mason crew,
+    including: Jonathan Swartz <swartz@pobox.com>, Dave Rolsky
+    <autarch@urth.org>, Ken Williams <ken@mathforum.org>.
+
+    Version 0.01 as of January, 2004.
+

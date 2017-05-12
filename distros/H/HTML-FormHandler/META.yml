@@ -1,0 +1,50 @@
+---
+abstract: 'HTML forms using Moose'
+author:
+  - 'FormHandler Contributors - see HTML::FormHandler'
+build_requires:
+  PadWalker: 0
+  Test::Differences: 0
+  Test::Exception: 0
+  Test::Memory::Cycle: 1.04
+  Test::More: 0.94
+  Test::Warn: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+  File::ShareDir::Install: 0.06
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-FormHandler
+requires:
+  Carp: 0
+  Class::Load: 0.06
+  Data::Clone: 0
+  DateTime: 0
+  DateTime::Format::Strptime: 0
+  Email::Valid: 0
+  File::ShareDir: 0
+  File::Spec: 0
+  HTML::Entities: 0
+  HTML::TreeBuilder: 3.23
+  JSON::MaybeXS: 1.003003
+  List::Util: 1.33
+  Locale::Maketext: 1.09
+  Moose: 2.1403
+  MooseX::Getopt: 0.16
+  MooseX::Types: 0.20
+  MooseX::Types::Common: 0
+  MooseX::Types::LoadableClass: 0.006
+  Sub::Exporter: 0
+  Sub::Name: 0
+  Try::Tiny: 0
+  aliased: 0
+  namespace::autoclean: 0.09
+resources:
+  bugtracker: http://github.com/gshank/html-formhandler/issues
+  repository: git://github.com/gshank/html-formhandler.git
+version: 0.40067
+x_serialization_backend: 'YAML::Tiny version 1.56'

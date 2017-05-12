@@ -1,0 +1,36 @@
+NAME
+    HTML::FormatText::Html2textPY - format HTML as plain text using
+    html2text python script
+
+SYNOPSIS
+     use HTML::FormatText::Html2textPY;
+     $text = HTML::FormatText::Html2textPY->format_file ($filename);
+     $text = HTML::FormatText::Html2textPY->format_string ($html_string);
+
+     $formatter = HTML::FormatText::Html2textPY->new;
+     $tree = HTML::TreeBuilder->new_from_file ($filename);
+     $text = $formatter->format ($tree);
+
+     #if you don't want wrapping do this
+     $formatter = HTML::FormatText::Html2textPY->new( rightmargin => -1 );
+     $formatter->format_string ($html_string);
+
+DESCRIPTION
+    "HTML::FormatText::Html2textPY" turns HTML into plain text using the
+    "html2text" python script. Please make sure you have it installed before
+    using this package.
+
+SEE ALSO
+    HTML::FormatExternal
+
+AUTHOR
+    Alex Pavlovic, "alex.pavlovic@taskforce-1.com"
+
+COPYRIGHT
+    Copyright (c) 2013 the HTML::FormatText::Html2textPY "AUTHOR" as listed
+    above.
+
+LICENSE
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

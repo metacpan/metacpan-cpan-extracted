@@ -1,0 +1,43 @@
+Short-Term:
+-----------
+
+* Make sure H::W::NM will associate the breadcrumbs trail with a category,
+if this category expands there. So, for example:
+
+http://www.shlomifish.org/philosophy/case-for-file-swapping/
+
+will generate the breadcrumbs trail of:
+
+Shlomi Fish -> Philosophy.
+
+* Create a 'show' directive - like 'show_always' only with a predicate.
+
+Long-Term:
+----------
+
+* Add a way to manage sub-menu objects, where a navigation menu can refer
+to a sub-navigation menu.
+    - Perhaps it should be done by simply adding a reference to the tree?
+
+* Make the module support URLs with CGI GET parameters properly.
+
+* Add support for more attributes other than class="" to the ul and li
+tags.
+    - like id=""
+
+* Add a host-based regexp arbitrator to the predicate:
+    { 'host_re' => { 't2' => "^home/", 'vipe' => "^home2/" } }
+
+* In HTML::Widgets::NavMenu::Tree::Node - make sure url_type accepts only
+its enum values.
+
+* Give an option to render a sub-set of the navigation-menu, starting
+at a certain coords/url-path.
+
+* Release on CPAN as version 0.8.0.
+   - change the version in $VERSION.
+   - document the changes in Changes.
+   - update the readme.
+
+* Maybe make a way to implement a generic backend to the data using various
+kinds of databases/etc.

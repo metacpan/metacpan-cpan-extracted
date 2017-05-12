@@ -1,0 +1,28 @@
+<wmmeta name="Title" value="The &lt;template&gt; Tag" />
+<wmmeta name="Section" value="02-tags_attrs" />
+<wmmeta name="Score" value="35" />
+<wmmeta name="Abstract">
+non-text content, such as HTML templates
+</wmmeta>
+
+The &lt;template&gt; tag is identical in most respects to the
+"&lt;content&gt;" [$(content)] tag.
+
+Typically, one will want to differentiate textual content, such as news
+articles, from template content, such as page templates.  This tag allows
+those semantic differences to be expressed at a high level; use
+"&lt;content&gt;" [$(content)] blocks for textual content, and
+&lt;template&gt; blocks for template content.
+
+It is implemented as a content item with the ##map## attribute set to
+##false##.
+
+Example
+=======
+
+<safe>
+  <template name="page_header" format="text/html">
+  <html><head><title> $[this.title] </title></head>
+  </template>
+
+</safe>

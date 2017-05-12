@@ -1,0 +1,7 @@
+Changes
+lib/Hal/Cdroms.pm
+Makefile.PL
+MANIFEST
+t/00basic.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

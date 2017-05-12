@@ -1,0 +1,36 @@
+	       o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o
+	      o                                       o
+	     o         Hook::PrePostCall - 1.2         o
+	      o                                       o
+	       o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o
+
+___________
+DESCRIPTION
+
+With the Hook::PrePostCall class you can hook pre and post actions on
+a routine.
+
+Copyright (c) 1995-1997 Philippe Verdret. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+-- 
+philippe.verdret@sonovision-itep.fr
+
+___________________________
+HOW TO BUILD and INSTALL IT
+
+				
+% perl Makefile.PL
+% make 
+% make test	
+% make install
+
+_____________________________________
+CHANGES, ESPECIALLY INCOMPATIBILITIES
+
+o Change from the 1.1 version
+
+  - new() used as a class or an object method.
+  - minor enhancements of the documentation and implementation
+

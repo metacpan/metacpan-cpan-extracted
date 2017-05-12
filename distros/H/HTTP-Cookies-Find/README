@@ -1,0 +1,24 @@
+HTTP::Cookies::Find
+===================
+
+Finds cookies for the current user on the local machine.
+Optionally, only returns cookies that match a hostname.
+Only works for MSIE and Netscape on Windows, and Netscape 4 on Unix.
+
+
+INSTALLATION
+
+To install this module use CPAN.pm, or type the following:
+
+   perl Makefile.PL
+   nmake test
+   nmake install
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2003-2005 Martin Thurn
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

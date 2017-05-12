@@ -1,0 +1,7 @@
+Header
+<CONTENT_LOOP NAME="document('4_other.xml')/content/company/news/items/item">
+<CONTENT_VAR NAME="title"><br>
+<CONTENT_VAR NAME="test"><br>
+<CONTENT_VAR NAME="bla"><br>
+</CONTENT_LOOP>
+Footer

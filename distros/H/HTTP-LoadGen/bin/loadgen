@@ -1,0 +1,82 @@
+#!perl
+#line 3
+
+use strict;
+
+use HTTP::LoadGen qw/:all -rand/;
+
+my ($o, $fn);
+my $usage=<<'USAGE';
+Usage: loadgen configfile
+       loadgen - <configfile
+       loadgen <configfile
+       loadgen -h[elp]
+  -h - print this message
+  otherwise read config either from specified file or from STDIN and
+  behave accordingly.
+USAGE
+
+my @param;
+
+if( @ARGV and $ARGV[0]!~/^--?h/ ) {
+  @param=do ($fn=$ARGV[0]);
+} elsif( !@ARGV or $ARGV[0] eq '-' ) {
+  $fn="STDIN";
+  my $buf='';
+  while(defined (my $l=readline STDIN)) {
+    last if $l=~/\A__(?:END|DATA)__\z/;
+    $buf.=$l;
+  }
+  @param=eval "#line 1 STDIN\n".$buf;
+} else {
+  warn $usage;
+  exit 0;
+}
+
+die "Cannot parse $fn: ".($@||"$!\n")."\n".$usage
+  if @param==1 and !defined $param[0];
+
+HTTP::LoadGen::loadgen @param;
+exit 0;
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+loadgen - a HTTP load generator
+
+=head1 SYNOPSIS
+
+ loadgen configfile
+ loadgen <configfile
+ loadgen - <configfile
+ loadgen -h[elp]
+
+can also be used in a shebang line to make the config file executable:
+
+ #!/usr/bin/loadgen
+ ...
+
+=head1 DESCRIPTION
+
+C<loadgen> is just a very simple frontend to L<HTTP::LoadGen>.
+
+=head1 SEE ALSO
+
+L<HTTP::LoadGen>
+
+=head1 AUTHOR
+
+Torsten Förtsch, E<lt>torsten.foertsch@gmx.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2010 by Torsten Förtsch
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

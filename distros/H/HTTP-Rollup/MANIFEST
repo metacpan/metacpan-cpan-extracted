@@ -1,0 +1,6 @@
+Makefile.PL
+Changes
+MANIFEST
+Rollup.pm
+t/00basic.t
+t/01pod.t

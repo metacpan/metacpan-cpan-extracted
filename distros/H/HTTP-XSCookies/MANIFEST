@@ -1,0 +1,29 @@
+baker.xs
+buffer.h
+Changes
+cookie.c
+cookie.h
+date.c
+date.h
+gmem.c
+gmem.h
+lib/HTTP/XSCookies.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+ppport.h
+README.md
+uri_tables.h
+uri.c
+uri.h
+t/10_bake_crush.t
+t/20_cookie_baker_bake.t
+t/20_cookie_baker_crush.t
+t/30_cookie_baker_xs.t
+t/80_memory_leak.t
+tools/bench.pl
+tools/encode/encode.c
+tools/encode/Makefile
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

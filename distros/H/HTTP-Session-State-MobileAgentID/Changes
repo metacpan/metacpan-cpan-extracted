@@ -1,0 +1,33 @@
+Revision history for Perl extension HTTP::Session::State::MobileAgentID
+
+0.46
+
+    - lazy to get mobile_agent in get_session_id().
+      (clouder)
+
+0.45
+
+    - better error message for maintenance
+
+0.44
+
+        - doc enhancements(no feacure changes)
+
+0.43
+
+        - fixed testing issue(no feature changes)
+
+0.42
+
+        - refactorign
+
+0.41
+
+        - fixed testing issue(no feature changes)
+
+0.40
+
+        - split from HTTP::Session core distribution.
+
+0.01    Mon Jun 14 01:56:11 2010
+        - original version

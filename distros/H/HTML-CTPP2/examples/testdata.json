@@ -1,0 +1,33 @@
+   {
+	"d" : 11111,
+	"s1"   : "Hello, World!"  ,
+	"s2"   : +1,
+	"s3"   : -100,
+	"s4"   : 123.45E+3,
+	"s5"   : -123.0,
+	"s6"   : true,
+	"s7"   : false,
+	"s8"   : null,
+	"Escape" : "Need to escape \' \\u0027 \u0059 -=(&\":\"&)=-",
+	"E.s.c.a.p.e" : "New variable syntax",
+
+	"loop" : [ { "a" : 1, "s1" : "First loop!" },
+	           { "a" : 2, "s1" : "Second loop!", "inner_loop" : [ { "a" : "1" }, { "a" : 2.0 }, { "a" : 3 } ] },
+	           { "a" : 3 },
+	           { "a" : 4 }
+	         ],
+
+	"loop_content" : [ "one", "two", 3, "4", "five"],
+
+	// For block operator
+	"blocks" : ["boo", "bar", "baz", "boo"],
+	// Non-existent block
+	"blocks.err" : ["boo", "error", "baz" ],
+
+	"x1"    : 1,
+	"x2"    : 2,
+	"x3"    : 3,
+	"x4"    : 4,
+	"x5"    : 5.0
+   }
+

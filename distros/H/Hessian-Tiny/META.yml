@@ -1,0 +1,78 @@
+---
+abstract: 'Hessian RPC Client implementation in pure Perl'
+author:
+  - 'DUL <ling.du@gmail.com>'
+build_requires:
+  Test::More: 0.94
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Hessian-Tiny
+provides:
+  Hessian::Tiny::Client:
+    file: lib/Hessian/Tiny/Client.pm
+    version: 0.12
+  Hessian::Tiny::ConvertorV1:
+    file: lib/Hessian/Tiny/ConvertorV1.pm
+  Hessian::Tiny::ConvertorV2:
+    file: lib/Hessian/Tiny/ConvertorV2.pm
+  Hessian::Tiny::Type:
+    file: lib/Hessian/Tiny/Type.pm
+  Hessian::Type::Binary:
+    file: lib/Hessian/Tiny/Type.pm
+  Hessian::Type::Class:
+    file: lib/Hessian/Tiny/Type.pm
+  Hessian::Type::Date:
+    file: lib/Hessian/Tiny/Type.pm
+  Hessian::Type::Double:
+    file: lib/Hessian/Tiny/Type.pm
+  Hessian::Type::False:
+    file: lib/Hessian/Tiny/Type.pm
+  Hessian::Type::Fault:
+    file: lib/Hessian/Tiny/Type.pm
+  Hessian::Type::Header:
+    file: lib/Hessian/Tiny/Type.pm
+  Hessian::Type::Integer:
+    file: lib/Hessian/Tiny/Type.pm
+  Hessian::Type::List:
+    file: lib/Hessian/Tiny/Type.pm
+  Hessian::Type::Long:
+    file: lib/Hessian/Tiny/Type.pm
+  Hessian::Type::Map:
+    file: lib/Hessian/Tiny/Type.pm
+  Hessian::Type::Null:
+    file: lib/Hessian/Tiny/Type.pm
+  Hessian::Type::Object:
+    file: lib/Hessian/Tiny/Type.pm
+  Hessian::Type::Remote:
+    file: lib/Hessian/Tiny/Type.pm
+  Hessian::Type::String:
+    file: lib/Hessian/Tiny/Type.pm
+  Hessian::Type::True:
+    file: lib/Hessian/Tiny/Type.pm
+  Hessian::Type::XML:
+    file: lib/Hessian/Tiny/Type.pm
+requires:
+  Config: 0
+  Encode: 0
+  File::Temp: 0
+  HTTP::Headers: 0
+  HTTP::Request: 0
+  HTTP::Response: 0
+  IO::File: 0
+  IO::Handle: 0
+  LWP::UserAgent: 0
+  List::Util: 0
+  Math::BigInt: 0
+  Scalar::Util: 0
+  Switch: 0
+  Tie::RefHash: 0
+  URI: 0
+  perl: v5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.12

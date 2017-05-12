@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<WebTest version="1.0">
+  <params />
+  <test>
+    <list name="parent">
+     <list name="named_list_forbidden_here">
+      <param>1</param>
+      <param>en_US</param>
+      <param>3</param>
+     </list>
+    </list>
+  </test>
+</WebTest>

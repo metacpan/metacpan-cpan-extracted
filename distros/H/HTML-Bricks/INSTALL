@@ -1,0 +1,44 @@
+
+INSTALLATION INSTRUCTIONS FOR BRICKS SITE BUILDER
+
+The latest version of Bricks Site Builder can be obtained from the following
+URI:
+
+  http://www.sourceforge.net/projects/bricks
+
+System requirements:
+
+  1. You must be running Unix (see www.redhat.com, www.freebsd.org, etc.)
+  2. You must have the Perl scripting language installed (see www.perl.com)
+  3. You must have the Apache web-server installed (see www.apache.org)
+  4. You must have mod_perl for Apache installed (see perl.apache.org)
+ 
+To install:
+
+untar HTML-Bricks-x.xx.tgz.   
+cd to HTML-Bricks-x.xx.  
+then type the following:
+
+  perl Makefile.PL
+  make
+  make install
+
+Then modify Apache's httpd.conf to something like the following:
+
+<Location />
+      SetHandler perl-script
+      PerlHandler HTML::Bricks
+</Location>
+
+You can readup on the above changes in the Apache documentation.
+
+Restart your web-server.
+
+Then http://your.web.server/ and see if you get the 'Congratulations!' page.
+
+-------------------------------------------------------------------------------
+
+It would be a great service to the developers of Bricks Site Builder if you could
+report any installation problems as bugs on www.sourceforge.net/projects/bricks.
+The faster we know about these bugs, the faster we can fix them.
+

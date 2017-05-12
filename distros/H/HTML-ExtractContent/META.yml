@@ -1,0 +1,47 @@
+---
+abstract: 'An HTML content extractor with scoring heuristics'
+author:
+  - 'INA Lintaro <tarao at cpan.org>'
+build_requires:
+  File::Slurp: '0'
+  Test::Base: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-ExtractContent
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  HTML::ExtractContent:
+    file: lib/HTML/ExtractContent.pm
+    version: '0.12'
+  HTML::ExtractContent::Util:
+    file: lib/HTML/ExtractContent/Util.pm
+requires:
+  Class::Accessor::Lite: '0'
+  Exporter::Lite: '0'
+  HTML::Entities: '0'
+  HTML::Strip: '0'
+resources:
+  bugtracker: https://github.com/tarao/perl5-HTML-ExtractContent/issues
+  homepage: https://github.com/tarao/perl5-HTML-ExtractContent
+  repository: git://github.com/tarao/perl5-HTML-ExtractContent.git
+version: '0.12'
+x_authority: cpan:TARAO
+x_contributors:
+  - 'yubessy <yubessy0@gmail.com>'
+  - 'INA Lintaro <tarao.gnn@gmail.com>'

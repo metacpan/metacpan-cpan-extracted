@@ -1,0 +1,25 @@
+---
+abstract: 'A minimal, abstract, and reusable list of HTML entities'
+author:
+  - 'John M. Dlugosz <john@dlugosz.com>'
+build_requires:
+  Test::Fatal: 0.005
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110580'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-EntityReference
+provides:
+  HTML::EntityReference:
+    file: lib/HTML/EntityReference.pm
+    version: 0.011
+requires:
+  perl: 5.010001
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.011

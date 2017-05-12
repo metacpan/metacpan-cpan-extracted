@@ -1,0 +1,18 @@
+---
+    auto_fieldset: 1
+    elements:
+        - type: Select
+          name: select
+          label: a Select with optgroups
+          options:
+            - group: [[1, one], [2, two]]
+              label: opt1
+            - [3, non-optgroup]
+            - group: [[4, four], [5, five]]
+              label: opt2
+        - type: ComboBox
+          name: combo
+          label: a ComboBox with optgroups
+          values:
+              - yes
+              - no

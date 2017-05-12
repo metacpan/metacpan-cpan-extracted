@@ -1,0 +1,66 @@
+Revision history for HTML-AutoTag
+
+1.06    
+    - require Tie::Hash::Attribute v1.04
+    - update copyright date
+
+1.05    
+    - require Tie::Hash::Attribute v1.03
+    - update copyright date
+    - fix bug tracker location
+
+1.04    
+    - return empty string if tag not defined
+
+1.03    
+    - require Tie::Hash::Attribute v1.02
+    - added example for <select> list in docs
+
+1.02    
+    - added encode param to make interface more clear
+      encode is a boolean that will augment the existing
+      encodes param. The behavior of the encodes param remains
+      the same with the exception that setting to empty string
+      or a false value will no longer produce encoding UNLESS
+      the encode param is additional set to a true value.
+
+1.01    
+    - removed sprintf (should be a smidge faster)
+    - require Tie::Hash::Attribute v1.01
+
+1.00    
+    - version 1.00
+    - require Tie::Hash::Attribute v1.00
+
+0.09    
+    - added github meta to Makefile
+    - removed mandatory sort from docs limitations
+
+0.08    
+    - minor speed improvements
+
+0.07    
+    - added sorted param (for sorting attr names via Tie::Hash::Attribute)
+    - require Tie::Hash::Attribute v0.08
+
+0.06    
+    - require latest version of HTML::Entities
+
+0.05    
+    - defactored level and indent from subs to global vars
+        (slight speed increase)
+    - require Tie::Hash::Attribute v0.06
+
+0.04    
+    - short-circuit from tie-ing simple hashes (speed increase)
+    - added HTML::Tagset tests
+
+0.03    
+    - implemented encodes
+
+0.02    
+    - more tests
+    - implemented indent
+
+0.01    
+    - First version, released on an unsuspecting world.

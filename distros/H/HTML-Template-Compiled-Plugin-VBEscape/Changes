@@ -1,0 +1,10 @@
+Revision history for Perl extension HTML::Template::Compiled::Plugin::VBEscape.
+
+0.03  Sat May 30 08:00:00 2009
+- bugfix build dependencies
+
+0.02  Thu May 21 07:30:20 2009
+- add examples
+
+0.01  Sun Nov 25 23:00:00 2007
+- fist version

@@ -1,0 +1,11 @@
+Changes
+examples/auto_proxy.pl
+Makefile.PL
+MANIFEST
+README
+lib/HTTP/ProxyAutoConfig.pm
+t/01test.t
+t/02from_rival.t
+t/example.pac
+t/proxy.pac
+META.yml                                 Module meta-data (added by MakeMaker)

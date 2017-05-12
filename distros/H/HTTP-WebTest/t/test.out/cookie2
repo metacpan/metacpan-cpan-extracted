@@ -1,0 +1,28 @@
+Failed  Succeeded  Test Name
+   0          5    *** no name ***
+   0          3    *** no name ***
+
+
+Test Name: N/A
+URL: http://http.web.test/show-cookies
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  REQUIRED TEXT
+    <c4>=<v4>                                                    SUCCEED
+    <c5>=<v5>                                                    SUCCEED
+    <c6>=<v6>                                                    SUCCEED
+    <c7>=<v7>                                                    SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/show-cookies
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  FORBIDDEN TEXT
+    <c8>=<v8>                                                    SUCCEED
+    <c9>=<v9>                                                    SUCCEED
+
+
+Total web tests failed: 0  succeeded: 8

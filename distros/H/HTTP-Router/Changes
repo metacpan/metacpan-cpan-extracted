@@ -1,0 +1,20 @@
+Revision history for Perl extension HTTP::Router
+
+0.05
+        - fixed method-missing problem. Tests used Test::MockObject
+          which accidentally imports blessed() into its namespace,
+          which makes `blessed $req` works as `$req->blessed`. (miyagawa)
+
+0.04
+        - no Mo*se
+
+0.03
+        - fixed dependencies
+
+0.02
+        - switched from Mouse to Any::Moose
+        - moved DSL route definitions to HTTP::Router::Declare
+        - added Test::HTTP::Router
+
+0.01
+        - original version

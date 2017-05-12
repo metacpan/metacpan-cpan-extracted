@@ -1,0 +1,59 @@
+HTML-Template-Pro TODO.
+=======================
+
+1. A few wrappers for languages other then perl and mono
+(php, java, maybe high-level C/glib and C++ wrappers)
+to prove the API is designed good enough to fit a vast majority of languages.
+
+2. query() support.
+
+3. Parsing of variable contents as well, 
+allowing truly dynamic template generation.
+Example:
+$t->register_function( f1 => sub {
+return $filename ? "<TMPL_INCLUDE NAME=filename>" :
+"some text"} );
+
+Variants of proposed syntax:
+<TMPL_INCLUDE_VAR as in HTML-Template-Compiled.
+
+Note, that this change will not require underlying C library API changes
+but an extra {malloc()+memcopying}/free() management of the memory area.
+(we can't guarantee that this memory area will not be destroyed if it itself has
+at least a tmpl_var).
+
+4. support of HTML::Template::SET:
+<TMPL_SET NAME="name" VALUE="value">
+This change will require the change of C library API.
+It requires either callback for (add name/value pair to a current scope)
+or built-in json-c or libjson
+or both, as in case of assignments like 
+someVAR=someNativeLOOPorOBJECT.
+something like scope 
+-2 for built-in json root
+-1 for wrapper-dependent set root
+ 0 for wrapper-dependent param root
+Proscope: add is_scope_writeable flag.
+
+5.
+add Pro::Compat (Compat::Pro??)
+	1) Compat inherits most of its code from Pro
+	1) Compat is_a HTML::Template, HTML::Template::Expr.
+	2) use old param_to_lowercase 
+	3) has default case_sensitive=0
+	4) has option html_template_strict_mode=1 (enables use of perl _find_file);
+
+6.
+add option
+expr: logical should return one of args
+
+7. C htmltmplpro C API:
+add interface call 
+ABSTRACT_MAP* get_root_scope (param, int POS);
+FLAGS can be user-provided SET scope, main root scope, case_transform flags etc.
+
+8. Rewrite documentation - split C API documentation or merge perl and C docs.
+Find a place to document template_root hack.
+
+10. rewrite scanner using re2c
+

@@ -1,0 +1,17 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         HTML-Template-JIT
+version:      0.05
+version_from: JIT.pm
+installdirs:  site
+requires:
+    Digest::MD5:                   0
+    File::Path:                    0
+    File::Spec:                    0
+    HTML::Template:                2.8
+    Inline:                        0.43
+    Inline::C:                     0
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

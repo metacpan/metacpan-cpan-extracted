@@ -1,0 +1,12 @@
+BarGraph.pm
+Changes
+Makefile.PL
+MANIFEST
+README
+sample.html
+test.pl
+pixels/blue.png
+pixels/green.png
+pixels/lightblue.png
+pixels/red.png
+pixels/yellow.png

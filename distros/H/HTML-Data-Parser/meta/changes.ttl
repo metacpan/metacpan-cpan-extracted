@@ -1,0 +1,75 @@
+@prefix :        <http://usefulinc.com/ns/doap#> .
+@prefix dcs:     <http://ontologi.es/doap-changeset#> .
+@prefix dc:      <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix my:      <http://purl.org/NET/cpan-uri/dist/HTML-Data-Parser/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix toby:    <http://tobyinkster.co.uk/#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+my:project :release my:v_0-001.
+my:v_0-001
+	a               :Version ;
+	dc:issued       "2010-12-16"^^xsd:date ;
+	:revision       "0.001"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Data-Parser-0.001.tar.gz> ;
+	rdfs:comment    "Original version"@en .
+
+my:project :release my:v_0-002.
+my:v_0-002
+	a               :Version ;
+	dc:issued       "2010-12-19"^^xsd:date ;
+	:revision       "0.002"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Data-Parser-0.002.tar.gz> ;
+	dcs:changelog [
+		dcs:versus my:v_0-001 ;
+		dcs:item [ rdfs:label "Support for HTML::HTML5::Outline."@en ; a dcs:Addition ]
+	] .
+
+my:project :release my:v_0-003.
+my:v_0-003
+	a               :Version ;
+	dc:issued       "2010-12-19"^^xsd:date ;
+	:revision       "0.003"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Data-Parser-0.003.tar.gz> ;
+	dcs:changelog [
+		dcs:versus my:v_0-002 ;
+		dcs:item [ rdfs:label "options_outline option that is passed through to HTML::HTML5::Outline."@en ; a dcs:Addition ] ;
+		dcs:item [ rdfs:label "HTML5 outline data was going into the microformats graph."@en ; a dcs:Bugfix ] ;
+		dcs:item [ rdfs:label "parse_n3 method was being referred to as parse_turtle in places."@en ; a dcs:Bugfix ]
+	] .
+
+my:project :release my:v_0-004.
+my:v_0-004
+	a               :Version ;
+	dc:issued       "2011-12-07"^^xsd:date ;
+	:revision       "0.004"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Data-Parser-0.004.tar.gz> ;
+	dcs:changelog [
+		dcs:versus my:v_0-003 ;
+		dcs:item   [ rdfs:label "Module::Package::RDF."@en ; a dcs:Packaging ] ;
+		dcs:item   [ rdfs:label "use 5.010"@en ; a dcs:Update ] ;
+		dcs:item   [ rdfs:label "use Object::AUTHORITY"@en ; a dcs:Update ]
+	] .
+
+my:project :release my:v_0-005.
+my:v_0-005
+	a               :Version;
+	dc:issued       "2011-12-08"^^xsd:date;
+	:revision       "0.005"^^xsd:string;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Data-Parser-0.005.tar.gz>;
+	dcs:changelog [
+		dcs:versus my:v_0-004;
+		dcs:item   [ rdfs:label "Add dependency on Object::AUTHORITY."@en; a dcs:Packaging, dcs:Bugfix ]
+	] .
+
+my:project :release my:v_0-006.
+my:v_0-006
+	a               :Version;
+	dc:issued       "2012-07-03"^^xsd:date;
+	:revision       "0.006"^^xsd:string;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Data-Parser-0.006.tar.gz>;
+	dcs:changelog [
+		dcs:versus my:v_0-005;
+		dcs:item   [ rdfs:label "Test case was relying on RDFa 1.0 parsing, but RDF::RDFa::Parser now defaults to RDFa 1.1."@en ; a dcs:Bugfix ]
+	] .

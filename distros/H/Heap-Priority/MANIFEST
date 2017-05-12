@@ -1,0 +1,8 @@
+MANIFEST
+Priority.pm
+Makefile.PL
+Changes
+misc/make_manifest.pl
+t/test.t
+html/docs.css
+html/Priority.html

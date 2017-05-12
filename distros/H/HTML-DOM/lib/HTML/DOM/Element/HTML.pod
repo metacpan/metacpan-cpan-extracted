@@ -1,0 +1,43 @@
+
+=head1 NAME
+
+HTML::DOM::Element::HTML - A Perl class for representing <html> elements in an HTML DOM tree
+
+=head1 VERSION
+
+Version 0.054
+
+=head1 SYNOPSIS
+
+  use HTML::DOM;
+  $doc = HTML::DOM->new;
+  $elem = $doc->createElement('html');
+
+  $elem->version('-//IETF//DTD HTML 2.0//EN'); # set attribute
+  $elem->version;                              # get attribute
+  $elem->tagName;
+  # etc
+
+=head1 DESCRIPTION
+
+This class implements the <html> element in an HTML::DOM tree. It 
+implements the HTMLHtmlElement DOM interface and inherits from 
+L<HTML::DOM::Element> (q.v.).
+
+=head1 THE METHOD
+
+The only method that this class implements itself and does not inherit is:
+
+=over 4
+
+=item version
+
+Returns (and optionally sets) the C<version> attribute.
+
+=back
+
+=head1 SEE ALSO
+
+L<HTML::DOM>
+
+L<HTML::DOM::Element>

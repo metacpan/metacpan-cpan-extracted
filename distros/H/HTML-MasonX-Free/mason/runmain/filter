@@ -1,0 +1,1 @@
+<%method main><% scalar reverse $m->content %></%method>

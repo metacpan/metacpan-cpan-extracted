@@ -1,0 +1,22 @@
+Revision history for HTML-ExtractMain
+
+0.63    May 9, 2013
+        Fixed missing "blessed()" for HTML::TreeBuilder input
+        Fixed undecoded UTF-8 warning in test cases
+        Added 'output_type' option and tests
+
+0.62    December 13, 2010
+        Fixed error with build requirements
+
+0.61    December 13, 2010
+        Fixed the other half of the memory leak
+
+0.60    December 13, 2010
+        Fixed a memory leak thanks to David Guthrie; documentation fixes
+
+0.50    April 15, 2010
+        Added tests of real content, details to documentation
+
+0.10    August 1, 2009
+        First version
+

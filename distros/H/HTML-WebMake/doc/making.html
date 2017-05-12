@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>
+      WebMake: Documentation: WebMake Operation
+    </title>
+    <meta name="generator" content="WebMake/2.2" />
+    <style>
+      body {
+       background-color: #ffffff; 
+       color: #000000; 
+       font-size: medium;
+       font-family: verdana,lucida,helvetica,sans-serif;
+      }
+      code, samp, pre {
+       font-family: Courier New,courier,fixed-width,monospace;
+      }
+      H1 { font-size: x-large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFCC66; }
+      H2 { font-size: large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFDD77; }
+      H3 { font-size: medium; font-family: Garamond,Book Antiqua,Times,serif; background: #FFEE88; }
+      H4 { font-size: small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H5 { font-size: x-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H6 { font-size: xx-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      A:link {
+       font-weight: bold;
+       color: #004000;
+       text-decoration: underline; 
+      }
+      A:visited {
+       font-weight: normal;
+       color: #008000;
+       text-decoration: underline; 
+      }
+      A:active {
+       font-weight: bold;
+       color: #800000;
+       text-decoration: underline; 
+      }
+      dt {
+       font-size: medium;
+       font-weight: bold;
+       padding-top: 8px; padding-bottom: 8px;
+      }
+      dd {
+       padding-top: 8px; padding-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body bgcolor="#ffffff" text="#000000" link="#3300cc" vlink="#660066">
+    <font face="lucida,verdana,sans-serif">
+      <div align="center">
+         <img src="images/WebMakeTitle.png" alt="WebMake" width="500" height="122" />
+      </div>
+      <table width="100%">
+        <tr>
+          <td valign="top">
+             <strong><a href="http://webmake.taint.org/">WebMake</a>
+             Documentation</strong> (version 2.2)
+             
+          </td>
+          <td valign="top">
+            <div align="right">
+              
+               [ <a href="concepts.html">Back</a> | <a href="firsttime.html">Forward</a> | <a href="index.html">Index</a>
+               | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+               
+            </div>
+          </td>
+        </tr>
+      </table>
+<!-- yes, it's that Mozilla black-border code again ;) -->
+      <!-- stolen from www.mozilla.org via rc3.org -->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td bgcolor="#aaaaaa">
+            <table border="0" cellspacing="4" cellpadding="4" width="100%">
+              <tr>
+                <td bgcolor="#ffffff">
+                  <table border="0" cellspacing="4" cellpadding="4" width="100%">
+                    <tr>
+                      <td>
+                         <h1>WebMake Operation</h1><p>
+                          First of all, WebMake relies on a <strong>WebMake file</strong>. This is an XML file, with
+                          a filename ending in <strong>.wmk</strong>, containing most of the important data on the
+                          structure, inputs and files that make up your site.
+                          
+                        </p>
+                         <a name="Finding_The_WebMake_File"><h3>Finding The WebMake File</h3></a><p>
+                          If you run WebMake without a <strong>-f</strong> or <strong>-R</strong> switch on its command-line,
+                          it'll first search for a file ending with <strong>.wmk</strong> in the current directory,
+                          then in the parent directory, and so on 'til it hits the root directory.
+                          
+                        </p>
+                        <p>
+                          You can specify exactly which file to build from by using the <strong>-f</strong> switch.
+                          Alternatively if you use the <strong>-R</strong> switch, it'll search relative to the
+                          filename specified on the command-line; this is <em>very</em> handy if you're
+                          calling WebMake from a macro in your editor or IDE, as it means you don't even
+                          have to be running the editor in the same working directory as the files
+                          you're working on.
+                          
+                        </p>
+                         <a name="The_WebMake_File_Structure"><h3>The WebMake File Structure</h3></a><p>
+                          A WebMake file is made up of several conceptual chunks, as follows:
+                          
+                        </p>
+                        <ul>
+                          <li>
+                            the header
+                            
+                          </li>
+                          <li>
+                            options and libraries (optional)
+                            
+                          </li>
+                          <li>
+                            inputs: searching directories and data sources
+                            
+                          </li>
+                          <li>
+                            inputs: content embedded directly inside the WebMake file
+                            
+                          </li>
+                          <li>
+                            <a href="metadata.html">metadata</a> (optional)
+                            
+                          </li>
+                          <li>
+                            catalog generation (optional)
+                            
+                          </li>
+                          <li>
+                            outputs
+                            
+                          </li>
+                          <li>
+                            the footer
+                            
+                          </li>
+                        </ul>
+                        <p>
+                          <strong>The header</strong>: Every WebMake file must start with a <a href="format.html"><strong>&lt;webmake&gt;</strong></a> tag.
+                          
+                        </p>
+                        <p>
+                          <strong>Options and libraries</strong>: Quite often, you may want to use some of the <a href="use.html">optional plug-ins</a> provided with WebMake, or occasionally, you
+                          might need to <a href="option.html">set options</a> to control WebMake's
+                          behaviour. The top of the WebMake file is a good place to do this.
+                          
+                        </p>
+                        <p>
+                          <strong>Inputs: searching directories and data sources</strong>: The important bit!
+                          WebMake allows you to load <a href="contents.html">content text</a>, <a href="templates.html">HTML templates</a>, or <a href="media.html">URLs of media
+                          files</a> (such as images), from directories in the filesystem.
+                          
+                        </p>
+                        <p>
+                          <strong>Inputs embedded in the WebMake file</strong>: Another key area. <a href="content.html">Content text</a>, <a href="template.html">HTML templates</a> and
+                          tables of small items of <a href="contenttable.html">content</a> or <a href="metatable.html">metadata</a> can be embedded directly into the WebMake file,
+                          for ease of editing.
+                          
+                        </p>
+                        <p>
+                          <strong>Metadata</strong>: If you want your site to contain pages which list details about,
+                          or links to, other pages, generated on-the-fly, <a href="metadata.html">metadata</a> is
+                          the way to do it. WebMake supports several ways of tagging your content with
+                          <a href="metadata.html">metadata</a> to provide this. Metadata can be <a href="wmmeta.html">embedded into the
+                          content text</a>, or <a href="metatable.html"> tagged onto the content</a> after
+                          its already been declared.
+                          
+                        </p>
+                        <p>
+                          <strong>Catalog generation</strong>: once you've tagged your content text with <a href="metadata.html">metadata</a>,
+                          WebMake can generate catalogs -- indexes, sitemaps, and the like -- from this.
+                          Built-in catalog types include <a href="sitemap.html">a site map</a>, <a href="navlinks.html">back and forward navigation links</a>, and <a href="breadcrumbs.html">"breadcrumb trails"</a>. You can also write your own <a href="perl.html">Perl</a> code to generate custom indexes using the <a href="PerlCodeLibrary.pm.html">library functions</a>, if you prefer.
+                          
+                        </p>
+                        <p>
+                          <strong>Outputs</strong>: Finally, all that data needs to be written somewhere. The <a href="out.html">out</a> tag takes care of this. Each <a href="out.html">out</a> block
+                          is roughly equivalent to a <em>target</em> in traditional UNIX <em>make(1)</em>
+                          terminology; the text inside the tag is expanded (by expanding <a href="content_refs.html">${content references}</a>) and written to the
+                          named file. Since quite a lot of output is typically almost identical in
+                          terms of the templates it uses and they way it converts the output filename to
+                          the name of the content text to insert, the <a href="for.html">for tag</a> is
+                          useful here to automate the process.
+                          
+                        </p>
+                        <p>
+                          <strong>The footer</strong>: Finally, the WebMake file ends with a 
+                          <a href="format.html"><strong>&lt;/webmake&gt;</strong></a> tag.
+                          
+                        </p>
+                         <a name="Which_Outputs_Are_Created"><h3>Which Outputs Are Created?</h3></a><p>
+                          Normally, all outputs named in the WebMake file are scanned, and possibly
+                          re-generated. However, if a target has been specified on the command line,
+                          only that file will be "made".
+                          
+                        </p>
+                         <a name="Dependencies_And_Other_Optimisations"><h3>Dependencies And Other Optimisations</h3></a><p>
+                          "Making" the target is not the end of it -- strictly speaking, the target
+                          may or may not be updated. WebMake tracks the dependencies of each file, and
+                          if these have not changed, the file will not be rebuilt.
+                          
+                        </p>
+                        <p>
+                          That's the first optimisation. However it doesn't always work; if some of the
+                          file's text is generated by, or depends on text that contains dynamic Perl
+                          code, WebMake will always have to rebuild the file, as it cannot determine
+                          exactly what the Perl code is going to do!
+                          
+                        </p>
+                        <p>
+                          To avoid continually "churning" the file, regenerating it every time WebMake
+                          is run, a comparison step takes place. Before the file is written to disk,
+                          WebMake compares the file in memory with the file on disk; if there are no
+                          changes, the on-disk file will not be modified in any way. This means tools
+                          like <em>rsync(1)</em>, <em>rdist(1)</em> or even <em>make(1)</em> itself will work fine with
+                          a WebMake site.
+                          
+                        </p>
+                        <p>
+                          All of these optimisations can be overridden by using the <strong>-F</strong> (freshen)
+                          command-line switch; this will force output whether or not the files have
+                          changed.
+                          
+                        </p>
+                         <a name="Ensuring_A_Seamless_Transition"><h3>Ensuring A Seamless Transition</h3></a><p>
+                          A very large (or very complicated) WebMake site can take a while to update.
+                          To avoid broken links while updating the site, WebMake generates all output
+                          into temporary files called <strong><em>filename</em>.new</strong>; once all the output
+                          has been generated, these are renamed into place. This minimises the
+                          time during which there may be inconsistencies in the site.
+                          
+                        </p>
+                         <a name="Caching"><h3>Caching</h3></a><p>
+                          Since WebMake uses dependencies to avoid rebuilding the entire site
+                          every time, it needs to cache <a href="metadata.html">metadata</a> and dependency information
+                          somewhere.
+                          
+                        </p>
+                        <p>
+                          Currently this data is stored in a file called <strong><em>filename</em>/cache.db</strong>,
+                          where <em>filename</em> is a sanitised version of the WebMake file's name, in the
+                          <strong>.webmake</strong> subdirectory of your home directory.
+                          
+                        </p>
+                        <p>
+                          
+                        </p>
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+    <table width="100%">
+      <tr>
+        <td valign="top">
+           <strong><a href="http://webmake.taint.org/">WebMake</a>
+           Documentation</strong> (version 2.2)
+           
+        </td>
+        <td valign="top">
+          <div align="right">
+            
+             [ <a href="concepts.html">Back</a> | <a href="firsttime.html">Forward</a> | <a href="index.html">Index</a>
+             | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+             
+          </div>
+        </td>
+      </tr>
+    </table>
+    <div align="right">
+       <a href="http://webmake.taint.org/"> <img src="images/BuiltWithWebMake.png" alt="Built With WebMake" border="0" width="88" height="31" /></a>
+    </div>
+  </font>
+</body>
+</html>

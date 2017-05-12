@@ -1,0 +1,48 @@
+Failed  Succeeded  Test Name
+   0          3    *** no name ***
+   1          2    *** no name ***
+   1          2    *** no name ***
+   0          3    *** no name ***
+
+
+Test Name: N/A
+URL: http://http.web.test/test-file1
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  CONTENT SIZE CHECK
+    Number of returned bytes (    52 ) is > or =    10 ?         SUCCEED
+    Number of returned bytes (    52 ) is < or =   100 ?         SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/test-file2
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  CONTENT SIZE CHECK
+    Number of returned bytes ( 14138 ) is > or =    10 ?         SUCCEED
+    Number of returned bytes ( 14138 ) is < or =   100 ?         FAIL
+
+
+Test Name: N/A
+URL: http://http.web.test/test-file1
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  CONTENT SIZE CHECK
+    Number of returned bytes (    52 ) is > or =   100 ?         FAIL
+    Number of returned bytes (    52 ) is < or = 50000 ?         SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/test-file2
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  CONTENT SIZE CHECK
+    Number of returned bytes ( 14138 ) is > or =   100 ?         SUCCEED
+    Number of returned bytes ( 14138 ) is < or = 50000 ?         SUCCEED
+
+
+Total web tests failed: 2  succeeded: 10

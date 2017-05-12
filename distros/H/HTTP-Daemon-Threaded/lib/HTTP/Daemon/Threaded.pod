@@ -1,0 +1,446 @@
+=pod
+
+=head1 NAME
+
+HTTP::Daemon::Threaded - Apartment threaded HTTP::Daemon-based server
+
+=head1 SYNOPSIS
+
+	#
+	# create content handler class
+	#
+	package TestHTTPReq;
+
+	use HTTP::Date qw(time2str);
+	use HTTP::Response;
+	use HTTP::Daemon::Threaded::Content;
+	use base ('HTTP::Daemon::Threaded::Content');
+
+	use strict;
+	use warnings;
+
+	sub new {
+		my $class = shift;
+		return $class->SUPER::new(@_);	# use default constructor
+	}
+
+	sub getContent {
+		my ($self, $fd, $request, $uri, $params, $session) = @_;
+
+		return $fd->send_error(404)
+			unless (($uri eq 'posted') || ($uri eq 'postxml'));
+
+		my $html = '<html><body>';
+		my $ct = 'text/html';
+		if ($uri eq 'posted') {
+			$html .= "$_ is $$params{$_}<br>\n"
+				foreach (sort keys %$params);
+			$html .= "</body></html>\n";
+		}
+		else {
+			$ct = 'text/xml';
+			$html = $params;	# reflect the content
+		}
+		my $res = HTTP::Response->new(200, 'OK',
+			[ 'Content-Type' => $ct,
+				'Content-Length' => length($html),
+				'Last-Modified' => time2str(time())
+			]);
+		$res->request($req);
+		$res->content($html);
+		return $fd->send_response($res);
+	}
+
+	sub getHeader {
+		my ($self, $fd, $request, $uri, $params, $session) = @_;
+
+		return $fd->send_error(404)
+			unless (($uri eq 'posted') || ($uri eq 'postxml'));
+
+		my $html = '<html><body>';
+		my $ct = 'text/html';
+		if ($uri eq 'posted') {
+			$html .= "$_ is $$params{$_}<br>\n"
+				foreach (sort keys %$params);
+			$html .= "</body></html>\n";
+		}
+		else {
+			$ct = 'text/xml';
+			$html = $params;	# its the content
+		}
+		my $res = HTTP::Response->new(200, 'OK',
+			[ 'Content-Type' => $ct,
+				'Content-Length' => length($html),
+				'Last-Modified' => $mtime
+			]);
+		$res->request($req);
+		return $fd->send_response($res);
+	}
+	#
+	#	a container for content-specific parameters
+	#
+	package MyContentParams;
+
+	use HTTP::Daemon::Threaded::ContentParams;
+	use base qw(HTTP::Daemon::Threaded::ContentParams);
+
+	...implementation goes here...
+	#
+	#	an event logger
+	#
+	package MyEventLog;
+
+	use HTTP::Daemon::Threaded::Logger;
+	use base qw(HTTP::Daemon::Threaded::Logger);
+
+	...implementation goes here...
+	#
+	#	a web request logger
+	#
+	package MyWebLog;
+
+	use HTTP::Daemon::Threaded::Logger;
+	use base qw(HTTP::Daemon::Threaded::Logger);
+
+	...implementation goes here...
+	#
+	# create CGI based content handler class
+	#
+	package TestCGI;
+
+	use HTTP::Date qw(time2str);
+	use HTTP::Response;
+	use HTTP::Daemon::Threaded::CGIHandler;
+	use base ('HTTP::Daemon::Threaded::CGIHandler');
+
+	use strict;
+	use warnings;
+
+	sub new {
+		my $class = shift;
+		return $class->SUPER::new(@_);	# use default constructor
+	}
+
+	sub handleCGI {
+		my ($self, $cgi, $session) = @_;
+
+		return $fd->send_error(404)
+			unless (($uri eq 'posted') || ($uri eq 'postxml'));
+
+		my $html = '<html><body>';
+		my $ct = 'text/html';
+		if ($uri eq 'posted') {
+			$html .= "$_ is $$params{$_}<br>\n"
+				foreach (sort keys %$params);
+			$html .= "</body></html>\n";
+		}
+		else {
+			$ct = 'text/xml';
+			$html = $params;	# reflect the content
+		}
+		my $res = HTTP::Response->new(200, 'OK',
+			[ 'Content-Type' => $ct,
+				'Content-Length' => length($html),
+				'Last-Modified' => time2str(time())
+			]);
+		$res->request($req);
+		$res->content($html);
+		return $fd->send_response($res);
+	}
+
+	sub getHeader {
+		my ($self, $fd, $request, $uri, $params, $session) = @_;
+
+		return $fd->send_error(404)
+			unless (($uri eq 'posted') || ($uri eq 'postxml'));
+
+		my $html = '<html><body>';
+		my $ct = 'text/html';
+		if ($uri eq 'posted') {
+			$html .= "$_ is $$params{$_}<br>\n"
+				foreach (sort keys %$params);
+			$html .= "</body></html>\n";
+		}
+		else {
+			$ct = 'text/xml';
+			$html = $params;	# its the content
+		}
+		my $res = HTTP::Response->new(200, 'OK',
+			[ 'Content-Type' => $ct,
+				'Content-Length' => length($html),
+				'Last-Modified' => $mtime
+			]);
+		$res->request($req);
+		return $fd->send_response($res);
+	}
+	#
+	#	now fire up a server
+	#
+	package main;
+
+	use HTTP::Daemon::Threaded;
+	use HTTP::Daemon::Threaded::SessionCache;
+	use MyContentParams;
+	use MyEventLog;
+	use MyWebLog;
+	use TestCGI;
+
+	use strict;
+	use warnings;
+	#
+	# create a SessionCache object using default implementation
+	#
+	my $session = HTTP::Daemon::SessionCache->new();
+	#
+	# create a ContentParams container
+	#
+	my $contparams = MyContentParams->new( @someArgs );
+
+	my $evtlog = MyEventLog->new();
+	my $weblog = MyWebLog->new();
+
+	my $httpd = HTTP::Daemon::Threaded->new(
+		Port			=> 8080,
+		MaxClients		=> 20,
+		ContentParams	=> $contparams,
+		SessionCache	=> $sessions,
+		LogLevel		=> 3,		# full info logging
+		EventLogger		=> $evtlog,
+		WebLogger		=> $weblog,
+		DocRoot			=> './',	# root directory for default file handler
+		Handlers		=> [
+			'^\/posted$', 'TestCGI',		# uses CGI
+			'^\/postxml$', 'TestHTTPReq',	# uses HTTP::Request/Response directly
+			'^.*\/scripty\.js$', '*',	# default file handler
+			'^.*\/\w+\.html$', '*',		# default file handler
+		],
+		MediaTypes		=> {
+			'text/xml'	=> [ 'xml', 'dtd' ],
+		}
+	) || die "Unable to create web server, exitting.";
+
+	...do other stuff...
+	#
+	# all done, shutdown
+	#
+	$httpd->shutdown();
+
+=head1 DESCRIPTION
+
+HTTP::Daemon::Threaded provides an apartment threaded version of HTTP::Daemon,
+with some additional extensions to simplify the process of providing content
+handlers, logging, and session management. A port monitor object ('Listener')
+spawns on or more worker thread objects ('WebClient's). As the Listener accepts
+connection requests they are passed to the next available WebClient, which
+reads requests, provides session management as needed, and dispatches the
+requests to application specific content handler objects, or serves
+file-based content directly by default.
+
+HTTP::Daemon::Threaded is not intended as a replacement for high-volume
+web servers (e.g., Apache); rather, it provides a more robust alternative
+to L<HTTP::Daemon> (or other such single threaded) web server
+solutions for embedding in standalone applications. In addition,
+HTTP::Daemon::Threaded provides a (hopefully)
+easier to use/configure interface than fully configuring an Apache server
+(or other external web server application), or coding to the bare-bones
+interfaces provided by L<HTTP::Daemon>. Possible uses include (e.g.)
+browser based GUI apps (e.g., L<Devel::Psichedb>), web-based application management
+for non-web-server applications, etc.
+
+=head1 METHODS
+
+Refer to the classdocs at L<http://www.presicient.com/httpdthrd> for
+detailed method descriptions for all classes.
+
+=head1 THEORY OF OPERATION
+
+HTTP::Daemon::Threaded implements a multithreaded web server using apartment threading.
+I<Refer to> L<Thread::Apartment> I<for the basic concepts of apartment threading.>
+
+The following classes are defined within the package:
+
+=head3 HTTP::Daemon::Threaded
+
+A simple facade class to wrap the L<Thread::Apartment> constructor for the
+HTTP::Daemon::Threaded::Listener class
+
+=head3 HTTP::Daemon::Threaded::Listener
+
+A port monitor that creates a pool of HTTP::Daemon::Threaded::WebClient
+objects to handle client HTTP requests, then listens on a defined port,
+accepts the connection, allocates any free WebClient object, and installs
+the connection in it. If no WebClients are available, the connection is closed.
+
+=head3 HTTP::Daemon::Threaded::Logger
+
+Base class defining the interfaces for logging. HTTP::Daemon::Threaded defines
+2 types of loggers: event loggers, which record general event information,
+including errors, warnings, and diagnostic messages, and web loggers, which are
+used solely to record client web requests.
+
+=head3 HTTP::Daemon::Threaded::SessionCache
+
+Base class for managing session context; acts as a factory and container class for
+HTTP::Daemon::Threaded::Session objects. Should be a threads::shared object which
+can be shared between all the apartment threads. While a minimal cookie-based
+implementation is provided, applications requiring session management capability
+are expected to implement an appropriate subclass.
+
+=head3 HTTP::Daemon::Threaded::Session
+
+Base class for managing and maintaining any state needed for a single session.
+Should be a threads::shared object which can be shared between all apartment threads.
+Applications requiring session management capability
+are expected to implement an appropriate subclass.
+
+=head3 HTTP::Daemon::Threaded::ContentParams
+
+Base container class for any persistent information required for content handlers.
+May be threads::shared if shared context is needed.
+
+=head3 HTTP::Daemon::Threaded::Content
+
+Base class for content handlers. When a URI matches a corresponding regular expression,
+the request is forwarded to an instance of this class to generate either the
+content or header, or to save content for PUT requests. Each WebClient will create
+its own private instance of each defined content handler class. SessionCache,
+ContentParams, EventLogger, and WebLogger instances are installed in content handler
+classes, and thus Content objects should not retain any persistent state of their own.
+
+=head3 HTTP::Daemon::Threaded::WebClient
+
+Manages a single client connnection. During construction, it accepts
+a content handler map, HTTP::Daemon::Threaded::ContentParams instance,
+and a HTTP::Daemon::Threaded::SessionCache instance.
+
+The content handler map is an array of pairs of regular expression strings
+and HTTP::Daemon::Threaded::Content or HTTP::Daemon::Threaded::CGIHandler
+classes that are used to select a
+content handler object for a given client request URI. The regular expressions
+are evaluated against the URI in sequential order, and, if a match occurs,
+one of the content handler's C<getContent(), getHeader(), putContent()> I<(for HDT::Content
+subclasses)>, or C<handleCGI()> I<(for HDT::CGIHandler subclasses)> methods
+is called to process the request. I<Note> that the regular expressions strings
+must be provided as true string literals, B<not> as "qr//" compiled expressions,
+as the L<Thread::Apartment> method of marshalling the handler map to WebClient
+constructors causes them to be "frozen" and "thawed" via L<Storable>, which does
+not yet properly handle thawing regular expression values (except by using the
+L<Regexp::Storable> package, which Thread::Apartment's default marshalling does
+not yet support).
+
+Static file based content may be served using the special classname B<'*'>, which indicates
+the request should be handled by WebClient's default content handler, which
+uses the configured DocRoot property to locate the URI as a file and return it.
+
+Two types of dynamic content handlers are supported: the L<HTTP::Request>/L<HTTP::Response>
+based HTTP::Daemon::Threaded::Content class, and the CGI based
+HTTP::Daemon::Threaded::CGIHandler class.
+
+HTTP::Daemon::Threaded::Content is a simple abstract class with a default
+implementation that returns a 404 HTTP status for any request.
+Applications are expected to implement subclasses of the Content class for the
+various URIs.
+
+HTTP::Daemon::Threaded::CGIHandler is also a simple abstract class with a default
+implementation that returns a 404 HTTP status for any request.
+Note that applications wishing to use the CGI interface B<must>
+subclass HDT::CGIHandler in order for HDT::WebClient to perform the needed CGI
+environment setup prior to invoking the handler's C<handleCGI()> method.
+Also note that legacy CGI implementations which explicity C<exit()> will need
+to be modified to C<return> instead (much like FastCGI).
+
+Content handler classes should avoid maintaining state; any content-related
+state should be managed with the installed ContentParams object, and any session related
+state should be managed with any provided Session object.
+
+Client connection requests are received as L<HTTP::Request> objects, and
+processed as follows:
+
+=over 4
+
+=item *
+
+If a SessionCache was provided, the client is checked for a cookie; if one exists,
+WebClient invokes the SessionCache to retrieve or create a Session object for the client.
+
+=item *
+
+The URI and method headers are retrieved and validated. If url-form-encoded
+parameters are provided, they are extracted; if the request is a multipart POST
+request, the parts are collected. If the request is a PUT, the decoded request
+content is collected.
+
+=item *
+
+The URI is successively applied to the content handler map regular expressions until
+a match is found. If no match is found, a 404 HTTP status is returned to the client.
+
+=item *
+
+If the matching handler object implements HDT::CGIHandler, a CGI environment
+and L<CGI> object are constructed, and STDIN/STDOUT/STDERR are rerouted to
+scalar buffers (via PerlIO C<:scalar> layer, before the handlers'
+C<handleCGI()> method is called. On return, the scalar buffers are used
+to generate the response and send it to the client.
+
+=item *
+
+If the matching handler object implements HDT::Content, the client connection
+object, URI, request object, URI parameters,
+and the session object (if any) are passed to the content handler,
+which is responsible for producing the content into an HTTP::Response object
+and sending it back to the client.
+
+=back
+
+WebClient objects will hold onto a client connection (in conformance with
+HTTP 1.1 connection persistance) until either the client explicitly disconnects,
+or any configured inactivity timer expires, at which point any session for
+the connection is closed, the connection is closed, and the WebClient returns
+itself to the free pool.
+
+=head1 SEE ALSO
+
+L<Thread::Apartment>
+
+L<HTTP::Daemon>
+
+L<HTTP::Request::AsCGI> was used as a reference for implementing CGI
+support.
+
+=head1 TO DO
+
+=over 4
+
+=item SSL Support
+
+Via Crypt::SSLeay(or IO::Socket::SSL) + OpenSSL
+
+=item Default User Auth support
+
+Currently no user authorization/authentication classes are defined;
+some abstract class is needed to encapsulate such functionality.
+
+=item More/Better Session/SessionCache subclasses
+
+The current session management implementation is non-persistent,
+and cookie based. Persistent, URI-rewrite or other mechanisms
+are desirable.
+
+=item Multiplex WebClient
+
+Permit a WebClient to handle multiple open sockets.
+
+=item DBI Connection/Statement ppols
+
+Add DBIPool object to contain both DBI (rather, DBIx::Threaded)
+connection and statement pools
+
+=back
+
+=head1 AUTHOR, COPYRIGHT, AND LICENSE
+
+Copyright(C) 2006-2008, Dean Arnold, Presicient Corp., USA. All rights reserved.
+
+Licensed under the Academic Free License version 3.0, as at OpenSource.org
+L<http://www.opensource.org/licenses/afl-3.0.php>.

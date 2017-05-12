@@ -1,0 +1,103 @@
+CHANGE LOG
+    Version 1.60 (2008/08/06)
+        Fixed up the tests some more, updated changelog. (Which I'd
+        forgotten about...)
+
+    Version 1.59 (2008/06/01)
+        Better tests, better Meta.yml.
+
+    Version 1.58 (2008/05/28)
+        Another attempt at cleanup, as well expanding the Meta.yml file.
+
+    Version 1.57 (2008/05/28)
+        Cleaned up the Mac-specific files that were getting created in the
+        archive.
+
+    Version 1.56 (2008/05/27)
+        Added the start of a testing suite. In the process, I found an
+        error: HTML defines the tag 'NOFRAMES', not 'NOFRAME'. Both are
+        currently in the tag list, but consider 'NOFRAME' depriciated.
+
+        The test suite requires Test::More and Test::Output.
+
+    Version 1.55 (2003/10/28)
+        New maintainer: Daniel T. Staal. No major changes in the code,
+        except to complete the tag list to HTML 4.01 specifications. (With
+        the exception of the 'S' tag, which I want to test, and is
+        depreciated anyway. Note that the DOCTYPE is not actually a HTML
+        tag, and is not currently included.)
+
+    Version 1.54 (2001/08/20)
+        The terms-of-use have been placed in the distribution file
+        "COPYING". Also, small documentation tweaks were made.
+
+    Version 1.51 (2001/08/16)
+        No real changes to code; just improved documentation, and removed
+        HTML::Entities and HTML::Parser from ./etc at CPAN's request.
+
+    Version 1.47 (2000/06/10)
+        No real changes to code; just improved documentation.
+
+    Version 1.45 (1999/02/09)
+        Cleanup for Perl 5.005: removed duplicate typeglob assignments.
+
+    Version 1.44 (1998/01/14)
+        Win95 install (5.004) now works. Added SYNOPSIS to POD.
+
+    Version 1.41 (1998/01/02)
+        Removed $& for efficiency. *Thanks, Andreas!*
+
+        Added support for OPTION, and default now puts newlines after SELECT
+        and /SELECT. Also altered "TELEM" syntax to put newline after
+        end-tags of list element tags (like /OPTION, /LI, etc.). In theory,
+        this change could produce undesireable results for folks who embed
+        lists inside of PRE environments... however, that kind of stuff was
+        done in the days before TABLEs; also, you can always turn it off if
+        you really need to. *Thanks to John D Groenveld for these patches.*
+
+        Added text_nbsp(). *Thanks to John D Groenveld for the patch.* This
+        method may also be invoked as nbsp_text() as in the original patch,
+        but that's sort of a private tip-of-the-hat to the patch author, and
+        the synonym may go away in the future.
+
+    Version 1.37 (1997/02/09)
+        No real change; just trying to make CPAN.pm happier.
+
+    Version 1.32 (1997/01/12)
+        NEW TOOL for generating Perl code which uses HTML::Stream! Check
+        your toolkit for html2perlstream.
+
+        Added built-in support for escaping 8-bit characters.
+
+        Added "LATIN_1" auto-escape, which uses HTML::Entities to generate
+        mnemonic entities. This is now the default method for
+        HTML::Stream::Latin1.
+
+        Added "auto_format()," so you can now turn auto-formatting off/on.
+
+        Added "private_tags()", so it is now possible for HTML streams to
+        each have their own "private" copy of the %Tags table, for use by
+        "set_tag()".
+
+        Added "set_tag()". The tags tables may now be modified dynamically
+        so as to change how formatting is done on-the-fly. This will
+        hopefully not compromise the efficiency of the chocolate interface
+        (until now, the formatting was compiled into the method itself), and
+        *will* add greater flexibility for more-complex programs.
+
+        Added POD documentation for all subroutines in the public interface.
+
+    Version 1.29 (1996/12/10)
+        Added terminating newline to comment(). *Thanks to John D Groenveld
+        for the suggestion and the patch.*
+
+    Version 1.27 (1996/12/10)
+        Added built-in HTML::Stream::Latin1, which does a very simple
+        encoding of all characters above ASCII 127.
+
+        Fixed bug in accept_tag(), where 'my' variable was shadowing
+        argument. *Thanks to John D Groenveld for the bug report and the
+        patch.*
+
+    Version 1.26 (1996/09/27)
+        Start of history.

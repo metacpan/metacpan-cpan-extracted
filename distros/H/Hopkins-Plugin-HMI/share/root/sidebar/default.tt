@@ -1,0 +1,24 @@
+<h2>Hopkins Job Manager</h2>
+
+<ul>
+	<li>
+		Welcome to Hopkins, an extensible job management
+		system written in pure perl capable of executing
+		native perl as well as arbitrary system commands.
+	</li>
+
+	<li>
+		You are using the HMI (Human Machine Interface)
+		plugin for Hopkins.  The version you are running is
+		[% version.plugin.hmi %].
+	</li>
+
+	<li>
+		This plugin, as with the rest of Hopkins, utilizes
+		the <a href="http://search.cpan.org/search?q=POE">
+		POE</a> framework for perl.  For more information on
+		how to configure Hopkins, consult the POD.
+	</li>
+
+	<li>system time: <strong>[% now.iso8601 %]</strong></li>
+</ul>

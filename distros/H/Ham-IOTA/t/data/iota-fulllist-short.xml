@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><!DOCTYPE iotaxml [
+    <!ENTITY deg " degrees ">
+]>
+<iotaxml xmlns="http://www.rsgbiota.org/xml/"  xmlns:gml="http://www.opengis.net/gml">
+ <head> <created v="1.7">2013-01-04T18:48:05+00:00</created> <copyright>Includes IOTA Group Information, copyright (c) 1985-2013 Radio Society of Great Britain</copyright> </head> <body>
+
+<groupInfo>
+<grpRef>AF-001</grpRef>
+<grpName>Agalega Islands</grpName>
+<grpContent>
+<island id="00012428">Agalega Islands</island>
+<island id="00000493">North</island>
+<island id="00000492">South</island>
+</grpContent>
+<grpExcludes>
+</grpExcludes>
+<position>
+<gml:Polygon>
+<gml:outerBoundaryIs>
+<gml:LinearRing>
+<gml:coordinates>
+-10.00, 56.25 -10.75, 56.25 -10.75, 57.00 -10.00, 57.00 -10.00, 56.25
+</gml:coordinates>
+</gml:LinearRing>
+</gml:outerBoundaryIs>
+</gml:Polygon>
+</position>
+<prefixes>3B6</prefixes>
+<pc_credited>42.1</pc_credited>
+<dxcc id="4">AGALEGA &amp; ST BRANDON</dxcc>
+<region/>
+</groupInfo>
+
+<groupInfo>
+<grpRef>AF-002</grpRef>
+<grpName>Amsterdam &amp; St Paul Islands</grpName>
+<grpContent>
+<island id="00000491">Amsterdam</island>
+<island id="00000490">Deux Freres</island>
+<island id="00000489">Milieu</island>
+<island id="00000488">Nord</island>
+<island id="00000487">Ouest</island>
+<island id="00000486">Phoques</island>
+<island id="00000485">Quille</island>
+<island id="00000484">St Paul</island>
+</grpContent>
+<grpExcludes>
+</grpExcludes>
+<position>
+<gml:Polygon>
+<gml:outerBoundaryIs>
+<gml:LinearRing>
+<gml:coordinates>
+-37.75, 77.25 -39.00, 77.25 -39.00, 77.75 -37.75, 77.75 -37.75, 77.25
+</gml:coordinates>
+</gml:LinearRing>
+</gml:outerBoundaryIs>
+</gml:Polygon>
+</position>
+<prefixes>FT*Z</prefixes>
+<pc_credited>48.3</pc_credited>
+<dxcc id="10">AMSTERDAM &amp; ST PAUL</dxcc>
+<region/>
+</groupInfo>
+
+<groupInfo>
+<grpRef>AF-003</grpRef>
+<grpName>Ascension Island</grpName>
+<grpContent>
+<island id="00000483">Ascension</island>
+<island id="00000482">Boatswain-bird</island>
+</grpContent>
+<grpExcludes>
+</grpExcludes>
+<position>
+<gml:Polygon>
+<gml:outerBoundaryIs>
+<gml:LinearRing>
+<gml:coordinates>
+-7.75, -14.25 -8.00, -14.25 -8.00, -14.50 -7.75, -14.50 -7.75, -14.25
+</gml:coordinates>
+</gml:LinearRing>
+</gml:outerBoundaryIs>
+</gml:Polygon>
+</position>
+<prefixes>ZD8</prefixes>
+<pc_credited>86.6</pc_credited>
+<dxcc id="205">ASCENSION ISLAND</dxcc>
+<region/>
+</groupInfo>
+</body>
+</iotaxml>

@@ -1,0 +1,97 @@
+HTML-TreeStructured version 1.01
+================================
+
+HTML::TreeStructured is a module to generate tree structure HTML.
+Data and reports can be see via Window file explorer style layout.
+
+
+        use HTML::TreeStructured;
+
+        ### Describe tree via collection of Node and its properties
+
+        ### Method 1: Via ArrayRef
+        ###
+        ### Node can be a string or '/' concatenated strings to show ancestry
+        ### Properties are name/value pairs
+
+        my $tree1 = [
+                ['/aaa',        color => 'green'],
+                ['/aaa/bbb'     mouseover => 'This is addl info'],
+                ['/aaa/ccc',    color => 'red', active => 0]
+        ];
+
+        ### Method 2: Via Hashref
+
+        my $tree2 = {
+                aaa => {
+                        color => 'green',
+                        bbb   => {
+                                mouseover => 'This is addl info',
+                        },
+                        ccc   => {
+                                color   => 'red',
+                                active  => 0,
+                        },
+        };
+
+        Interpreted Node Properties:
+
+        color           = Color of the node name
+        mouseover       = Mouse Over text for the node (Info image is displayed next to node)
+        active          = 0 would cause strike thru on node
+        highlight       = color code used for marker highlight of node
+        url             = URL to hyperlink the node
+        tooltip         = popup when mouse is over the link (together with url) (See HTML::Tooltip::Javascript)
+        closed          = 1 if node be closed on default display (default, all nodes are open)
+        comment         = Text to display next to node in bold
+        weight          = A numeric value on node which will be used for sorting node position in at sibling level
+                          (Default, nodes are sorted in ascending order per dictionary order)
+
+
+        ### Now get HTML equivalent for the tree
+        ### The associated JavaScript for nodes close/open and ExpandAll/CollapseAll is generated alongside
+
+        $tree_html = HTML::TreeStructured->new(
+                name         => 'tree_name',
+                image_path   => '/images/',
+                data         => $tree1,
+                title        => "My Tree",
+                title_width  => 300,
+                level        => {},     ### If scalar, close BEYOND this depth. Depth start at 0.
+                                        ### If Hash, close for depths specified in keys
+        )->output;
+
+        ### The same module can be used to generate FAQ - see "examples/faq.cgi"
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+   Copy images/ directory to webserver's root.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   HTML::Template
+
+I have been using HTML tables for structuring HTML presentation.
+After seeing HTML::PopupTreeSelect from Sam Tregar <sam@tregar.com>
+I liked the idea of stylesheets to indent HTML.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Ramana Mokkapati (mvr@cpan.org)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

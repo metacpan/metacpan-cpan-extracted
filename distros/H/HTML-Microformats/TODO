@@ -1,0 +1,15 @@
+* Documentation is pretty sketchy.
+
+* More test cases.
+
+* AUTOLOADed get methods:
+	- document them better
+		+ can auto-generate much docs using ->format_signature 
+	- ensure they can be called as get_X and get_Y where X is the microformat
+          class/rel name, and Y is the hash key from ->data which sometimes differ.
+		+ make sure any such differences are clearly documented
+
+* Microformats 2.0???
+
+* Drop dependencies on CGI/CGI::Util and URI::URL.
+

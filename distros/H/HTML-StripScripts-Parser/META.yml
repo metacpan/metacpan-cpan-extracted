@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                HTML-StripScripts-Parser
+version:             1.03
+abstract:            XSS filter using HTML::Parser
+license:             perl
+author:              
+    - Nick Cleaton <nick@cleaton.net>, Clinton Gormley <clint@traveljury.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    HTML::Parser:                  3.56
+    HTML::StripScripts:            1.05
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

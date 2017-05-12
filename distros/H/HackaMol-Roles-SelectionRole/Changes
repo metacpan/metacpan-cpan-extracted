@@ -1,0 +1,7 @@
+Revision history for HackaMol-Roles-SelectionRole
+
+0.002     2016-04-11 10:57:43-04:00 America/Indiana/Indianapolis
+    * fixed dependencies
+    * added test for selection attributes
+    * selections renamed to selections_cr  to reflect coderef 
+

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+<head>
+  <link rel="start" href="http://orezdnu.org/" />
+  <link rev="made" href="http://orezdnu.org/" />
+  <title>Sample for content extraction test (2)</title>
+</head>
+<body>
+  <div id="content">
+    <h1>Sample for content extraction test (2)</h1>
+
+    <div class="entry">
+      <div class="entry-header">
+        <h2>About this file</h2>
+        <span class="author">INA Lintaro</span>
+        <span class="timestamp">2008-10-10T1120+0900</span>
+      </div>
+      <div class="article">
+        <p>This file is for a simple test that the multiple contents of the
+        page (like blog pages) can appropriately be extracted.</p>
+      </div>
+      <div class="comments">
+        <div class="comment-entry">
+          <div class="comment-entry-header">
+            <span class="by">tarao</span>
+            <span class="timestamp">2008-10-10T1124+0900</span>
+          </div>
+          <div class="comment-article">
+            <p>Comments on the article should not be regarded as a content.</p>
+          </div>
+        </div>
+        <div class="comment-entry">
+          <div class="comment-entry-header">
+            <span class="by">tarao</span>
+            <span class="timestamp">2008-10-10T1126+0900</span>
+          </div>
+          <div class="comment-article">
+            <p>Or, should be?</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="entry">
+      <div class="entry-header">
+        <h2>The second entry</h2>
+        <span class="author">INA Lintaro</span>
+        <span class="timestamp">2008-10-10T1127+0900</span>
+      </div>
+      <div class="article">
+        <p>The second entry in the blog like page should not be regarded as the
+        main content of the page. Or, if the entires seem to be continuous,
+        the scoring heuristics may regard them as a single content.</p>
+      </div>
+      <div class="comments">
+        <div class="comment-entry">
+          <div class="comment-entry-header">
+            <span class="by">tarao</span>
+            <span class="timestamp">2008-10-10T1137+0900</span>
+          </div>
+          <div class="comment-article">
+            <p>You can adjust parameters of the scoreing heuristics.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

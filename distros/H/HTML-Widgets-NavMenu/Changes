@@ -1,0 +1,135 @@
+Revision history for Perl extension HTML::Widgets::NavMenu.
+
+1.0703  2015-06-10
+    - Fix broken links to the examples' version control repositories.
+        - Thanks to Anne for inspiring it.
+
+1.0702  2013-05-21
+    - Add t/cpan-changes.t
+        - Correct this file.
+    - Add scripts/bump-version-number.pl .
+
+1.0701  2012-12-09
+    - Fix typo: https://rt.cpan.org/Ticket/Display.html?id=81840
+        - Thanks to GUIMARD and lintian.
+
+1.0700  2012-12-09
+    - Add the li_id attribute to the tree's nodes to add an id="..." attribute
+    to the <li> tags.
+
+1.0603  2012-09-18
+    - Update the URLs to the repository, and sites.
+
+1.0602  2012-09-17
+    - Get rid of trailing space.
+    - Update the contact details.
+
+1.0601  2012-09-05
+    - Moved away tag-release.pl to scripts/tag-release.pl so it won't
+    be installed by default.
+    - Moved away output.pl under examples.
+
+1.0600  2011-04-16
+    - Add HTML::Widgets::NavMenu::JQueryTreeView for generating navigation
+    menu that this jQuery plugin can handle well:
+        - http://bassistance.de/jquery-plugins/jquery-plugin-treeview/
+
+1.0501  2010-11-14
+    - Now generating the Makefile.PL from the Build.PL using
+    create_makefile_pl (less error-prone).
+
+1.0500  2010-11-12
+    - Convert from Class::Accessor to Class::XSAccessor for extra speed.
+    - Add the tag-release.pl file.
+
+1.0400  2009-12-09
+    - Got rid of the dependency on Error.pm.
+    - moved the HTML/ directory with the test scripts-support code from
+    the root of the distribution to unde t/lib .
+
+1.0302  2009-06-25
+    - Fixed some broken links and other inaccuracies in the POD of
+    lib/HTML/Widgets/NavMenu.pm .
+
+1.0301  2009-06-23
+    - Changed the 'license' in Build.PL from "bsd" to the more accurate
+    "mit".
+    - Added keywords and links to the META.yml.
+
+1.0300  2009-06-14
+    - Refactoring: Made HTML::Widgets::NavMenu::Object a sub-class of
+    Class::Accessor to remove many "use base" calls to it.
+    - In progress - converting a flat %args hash (splatted into the @_)
+    into a single $args hash-ref.
+    - Removed a use lib "." from HTML::Widgets::NavMenu - it's a leftover
+    statement that could be a subtle bug.
+    - Refactoring: converted direct $self->{'field'} accesses to
+    accessors. (from all the classes).
+    - Fixed a bug with the HeaderRole where an empty <ul> was created.
+
+1.0201  2008-03-28
+    - Fixed a case where a non-capturing expand in a node inside a
+    capturing expand caused the upper node to be non-capturing too.
+
+1.0200  2008-03-23
+    - Removed trailing whitespace from "# TEST" lines - this can confuse
+    early versions of Test-Count
+    - Fixed a "# TEST" instead of a "# TESTbr" line that confused Test-Count.
+    - Added the no_leading_dot option with a test.
+
+1.0100  2008-02-08
+    - Fixed a bug in HTML::Widgets::NavMenu::Url:
+    relative URL from a non-dir to a dir. It accidently had an
+    extraneous "../".
+    - Fixed the _get_leading_path_of_coords function in HTML::Widgets::NavMenu
+    to properly generate the topmost item of the breadcrumbs trail, which
+    should be in coords = [0] and not coord = []. The latter is meaningless
+    and ignored. This caused a subtle bug in combining the breadcrumbs
+    trails of my homesite.
+        - it became apparent when the URL of the [0] item was not empty.
+    - Added the 'capt' key to the 'expand' => keys for "capturing" regex.
+
+1.0001  2006-09-11
+    - Added "use strict" and "use warnings" to all modules.
+    - Added a Test::Pod based test.
+    - Added a Test::Pod::Coverage test, and added POD to all modules.
+        - Some internal methods were prefixed with an underscore.
+    - Added the examples directory.
+
+1.0000  2005-11-06
+    - Made sure that the breadcrumbs trail in expanded sections will
+    display the components of the expanded sections.
+    - Fixed the POD.
+    - Added the link to the article to the POD.
+    - Bumped the major version number to 1.x and kept some digits into the
+    future to make CPAN and CPAN.pm happy.
+
+0.10.2  2005-08-24
+    (backdated - module was released on 17-August-2005)
+    - Added IO::Scalar to the Perl modules this module depends on. (it
+    is needed by the tests, but was not explicitly specified yet, because
+    it was believed to be part of the core distribution).
+
+0.10.1  2005-07-25
+    - Fixed the building using "perl Makefile.PL" and "make".
+
+0.10.0  2005-07-12
+    - Added tests and refactored the code to have a 100% test coverage.
+
+0.8.0   2005-04-23
+    - get_cross_host_rel_url is now part of the API.
+    - Now returning nav_links_obj
+    - Added some tests
+
+0.6.0   2005-03-24
+    - no longer making use of the CGI.pm module.
+    - extracted two methods in HTML::Widgets::NavMenu::Iterator::NavMenu
+      that can now be over-rided by the user.
+
+0.4.0   2005-01-20
+    - Added the url_is_abs option to the nodes.
+    - Many code cleanups.
+
+0.2.0   2005-01-02
+    - First non-developer CPAN Release.
+

@@ -1,0 +1,13 @@
+Revision history for Perl extension Hash-Inflator
+
+1.100820  2010-03-23 18:05:26 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.02  Wed 2010.02.10 15:58:58 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - Changed dist style and Changes back to standard. People didn't like it -
+      the nail that sticks out gets hammered down.
+    - Added standard test files; this will also help with CPANTS.
+
+0.01  Thu, 29 May 2008 12:05:32 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - original version
+    - .shipit: fixed svk.tagpattern

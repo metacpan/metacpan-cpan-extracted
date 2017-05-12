@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+cpanfile
+dist.ini
+lib/HTTP/Server/Simple/PSGI.pm
+lib/Plack/Handler/HTTP/Server/Simple.pm
+t/00_compile.t
+t/release-pod-syntax.t
+xt/plack-handler.t
+xt/pod.t

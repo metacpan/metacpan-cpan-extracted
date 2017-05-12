@@ -1,0 +1,22 @@
+This module automatically inserts data from a previous HTML form into the HTML input and select
+tags. It is a subclass of HTML::Parser and uses it to parse the HTML and insert the values into the form
+tags.
+
+One useful application is after a user submits an HTML form without filling out required field.
+HTML::FillInForm can be used to redisplay the HTML form with all the form elements containing the
+submitted info.
+
+Please note that this module requires HTML::Parser 3.26 or greater.
+
+HTML::FillInForm installed by default by several web hosting providers,
+including pair.com - see
+http://www.pair.com/pair/support/library/serverconfig/perlmods.html
+
+It is also available as a package for some Linux distribution, including Mandrake.
+See:
+http://rpmfind.net/linux/RPM/cooker/cooker/i586/Mandrake/RPMS/perl-HTML-FillInForm-0.29-2mdk.noarch.html
+
+Copyright (c) 2002-2007 Thomas J. Mather, tjmather@maxmind.com 
+
+All rights reserved. This package is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself. 

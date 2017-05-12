@@ -1,0 +1,44 @@
+---
+abstract: 'Perl extension for stripping whitespace out of'
+author:
+  - 'Shlomi Fish, L<http://www.shlomifish.org/> (E-mail C<shlomif@cpan.org> ).'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830'
+keywords:
+  - bandwidth
+  - compression
+  - html
+  - reduce
+  - remove
+  - size
+  - space
+  - strip
+  - tags
+  - whitespace
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-Strip-Whitespace
+provides:
+  HTML::Strip::Whitespace:
+    file: lib/HTML/Strip/Whitespace.pm
+    version: v0.1.8
+  HTML::Strip::Whitespace::State:
+    file: lib/HTML/Strip/Whitespace.pm
+requires:
+  Exporter: 0
+  HTML::TokeParser::Simple: 0
+  perl: 5.008
+  strict: 0
+  vars: 0
+  warnings: 0
+resources:
+  homepage: http://web-cpan.shlomifish.org/modules/HTML-Strip-Whitespace/
+  license: http://www.opensource.org/licenses/mit-license.php
+  repository: http://bitbucket.org/shlomif/perl-html-strip-whitespace
+version: v0.1.8

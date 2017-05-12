@@ -1,0 +1,21 @@
+Hoobot
+
+   Access h2g2 automatically!
+
+For installation details, see INSTALL (which doesn't exist, try following
+perlmodinstall for now).
+
+For usage, see the doco. Either use perldoc or view it
+on the web at:
+    <http://search.cpan.org/author/BSMITH/Hoobot/>
+
+Changes for 0.5.0 (26 July 2003)
+  - Initial release
+  - Fifth generation of the Hoobot idea, but a totally new code style!
+
+This module may eventually become WWW::H2G2.
+
+For a complete list of changes, see the Changes file (when it's written).
+
+
+by Benjamin Smith.

@@ -1,0 +1,53 @@
+{
+   "abstract" : "Dumps variables into clickable HTML output",
+   "author" : [
+      "Tina Mueller"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-Template-Compiled-Plugin-DHTML",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28",
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::TreeDumper" : 0,
+            "Data::TreeDumper::Renderer::DHTML" : 0,
+            "HTML::Template::Compiled" : "1",
+            "perl" : "v5.8.1"
+         }
+      }
+   },
+   "provides" : {
+      "HTML::Template::Compiled::Plugin::DHTML" : {
+         "file" : "lib/HTML/Template/Compiled/Plugin/DHTML.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/perlpunk/HTML-Template-Compiled-Plugin-DHTML"
+      }
+   },
+   "version" : "0.03"
+}

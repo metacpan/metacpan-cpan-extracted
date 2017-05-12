@@ -1,0 +1,173 @@
+NAME
+    HTML::Menu::Select - Create HTML for select menus to simplify your
+    templates.
+
+SYNOPSIS
+      use HTML::Menu::Select qw( menu options );
+  
+      my $html = menu(
+        name   => 'myMenu',
+        values => [ 'yes', 'no' ],
+      );
+  
+      $tmpl->param( select_menu => $html );
+  
+DESCRIPTION
+    This modules creates HTML for form "select" items.
+
+    Traditionally, if you wanted to dynamically generate a list of options
+    in a "select" menu, you would either have to use CGI's HTML generation
+    routines, or use a complicated template such as this:
+
+      <select name="day">
+      <TMPL_LOOP day>
+              <option value="<TMPL_VAR value>" <TMPL_VAR selected>>
+                <TMPL_VAR label>
+              </option>
+            </TMPL_LOOP>
+      </select>
+
+    This module allows you to quickly prototype a page, allowing the CGI to
+    completely generate the HTML, while allowing you at a later stage to
+    easily change how much HTML it generates.
+
+INSTALLATION
+    To install this module, run the following commands:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+    Alternatively, to install with Module::Build, you can use the following
+    commands:
+
+      perl Build.PL
+      ./Build
+      ./Build test
+      ./Build install
+
+METHODS
+  menu()
+    Use "menu()" to generate the entire HTML for a select menu.
+
+    This allows you to have a very simple template tag, such as:
+
+      <TMPL_VAR select_menu>
+
+    "menu()" accepts the following parameters:
+
+    name
+        This is used in the "select" tag's "name=""" attribute.
+
+    values
+        This is an array-ref of values used for each of the "option" tags.
+
+    default
+        This selects which (if any) "option" tag should have a
+        "selected="selected"" attribute.
+
+    labels
+        This is a hash-ref of values to provide different values for the
+        user-visible label of each "option" tag. Each key should match a
+        value provided by the "values" parameter.
+
+        If this parameter is not provided, or for any "value" which doesn't
+        have a matching key here, the user-visible label will be the
+        "option"'s "value".
+
+          print menu(
+            values => [1, 2],
+            labels => {
+              1 => 'one'},
+              2 => 'two'},
+            },
+          );
+  
+          # will output
+  
+          <select name="">
+          <option name="1">one</option>
+          <option name="2">two</option>
+          </select>
+
+    attributes
+        This is a hash-ref of values to provide extra HTML attributes for
+        the "option" tags. Like the "labels" parameter, the keys should
+        match a value provided by the c<values> parameter.
+
+        Each value of this hash-ref should be a hash-ref representing the
+        name and value of a HTML attribute.
+
+          print menu(
+            values     => ['one', 'two'],
+            attributes => {
+              one => {onSubmit => 'do(this);'},
+              two => {style => 'color: #000;'},
+            },
+          );
+  
+          # will output
+  
+          <select name="">
+          <option onSubmit="do(this);" name="one">one</option>
+          <option style="color: #000;" name="two">two</option>
+          </select>
+
+    All parameters are optional, though it doesn't make much sense to not
+    provide anything for "values".
+
+    Any unrecognised parameters will be used to provide extra HTML
+    attributes for the "select" tag. For example:
+
+      print menu(
+        id       => 'myID',
+        values   => ['one'],
+        onChange => 'do(this);',
+      );
+  
+      # will output
+  
+      <select name="" id="myID" onChange="do(this);">
+      <option name="one">one</option>
+      </select>
+
+  options()
+    Use "options()" to generate the HTML for only the "option" tags,
+    allowing you to keep the outer "select" tag in the template, so that,
+    for example, a designer can easily make changes to the CSS or JavaScript
+    handlers.
+
+    You would have something like the following in your template:
+
+      <select name="day">
+        <TMPL_VAR menu_options>
+      </select>
+
+    "options()" accepts the same parameters as "menu()", but the "name"
+    parameter is ignored.
+
+  popup_menu()
+    "popup_menu()" is an alias for "menu()" for those familiar with CGI.
+
+SUPPORT / BUGS
+    Please log bugs, feature requests and patch submissions at
+    <http://sourceforge.net/projects/html-menu>.
+
+    Support mailing list: html-menu-users@lists.sourceforge.net
+
+SEE ALSO
+    HTML::Menu::DateTime, HTML::Template, Template, Template::Magic,
+    DateTime::Locale.
+
+AUTHOR
+    Carl Franks <cpan@fireartist.com>
+
+COPYRIGHT AND LICENSE
+    Copyright 2005, Carl Franks. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    Licenses are in the files "Artistic" and "Copying" in this distribution.
+

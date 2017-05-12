@@ -1,0 +1,34 @@
+---
+abstract: "Simple pure perl http/https server for prototyping \"in the style of\" Ruby's WEBrick"
+author:
+  - 'Mark Aufflick <mark@aufflick.com>'
+build_requires: {}
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTTP-Server-Brick
+provides:
+  HTTP::Server::Brick:
+    file: lib/HTTP/Server/Brick.pm
+    version: v0.1.7
+recommends:
+  HTTP::Daemon::SSL: '1.02'
+requires:
+  HTTP::Daemon: '0'
+  HTTP::Status: '0'
+  IO::Handle: '0'
+  LWP: '0'
+  LWP::MediaTypes: '0'
+  LWP::UserAgent: '0'
+  Module::Build: '0'
+  Test::More: '0'
+  version: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.1.7
+x_serialization_backend: 'CPAN::Meta::YAML version 0.017'

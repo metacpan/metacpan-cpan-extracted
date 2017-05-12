@@ -1,0 +1,42 @@
+HTML::Puzzle README File
+========================
+
+Introduction
+------------
+
+This module is a framework to build web component based on database. It can be useful for create forums, guestbook, news sections and others.
+
+For more information and updates about this module you can point your browser 
+to http://www.ebruni.it/en/software/perl/cpan/html/puzzle/index.htm
+or to whatever CPAN mirror site.
+
+Installation
+------------
+
+0.  Prerequisites:
+	- Perl version 5.005_03 or more recent.
+	- CPAN DBI module.
+	- HTML::Template::Extension
+	- A CPAN DBD driver module (currenty only Mysql are tested)
+
+1.  Installation steps:
+	- from the directory where this file is located, type:
+		perl Makefile.PL
+		make (and ask to questions to you db configuration)
+		make test
+		make install
+
+Examples
+--------
+
+Have a look to 
+	http://www.ebruni.it/en/software/perl/cpan/html/puzzle/examples/ex1.htm
+to see some examples on what you can simply do using this module.
+		
+Disclaimer
+----------
+*** This is beta software -- use at your own risks ***
+
+--
+Bruni Emiliano <info@ebruni.it>
+2002-08-09

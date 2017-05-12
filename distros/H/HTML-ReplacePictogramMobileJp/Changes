@@ -1,0 +1,33 @@
+Revision history for Perl extension HTML::ReplacePictogramMobileJp
+
+0.07
+
+    - modernized package
+
+0.06
+
+    - willcom phone can display sjis hex cref.
+
+0.05
+
+    - ezweb can display <img localsrc="1" /> in utf8.
+      (reported by yappo++)
+
+0.04
+
+    - added docomo sjis dec cref support.
+
+0.03
+
+    - au phone can display <img localsrc="1" />
+    - oops. added PREREQS.
+
+0.02
+
+    - au phone can display docomo sjis hex cref
+    - au phone can display kddi unicode hex cref
+    - softbank phone can display unicode hex cref
+    - oops. return value is bytes instead of unicode string.
+
+0.01    Fri Jan 18 20:39:18 2008
+        - original version

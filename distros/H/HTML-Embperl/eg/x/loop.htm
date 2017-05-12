@@ -1,0 +1,52 @@
+
+<html>
+<head>
+<title>Embperl Examples - Loop Metacommands</title>
+</head>
+<body background="../images/jazzbkgd.gif">
+
+<h1>Embperl Examples - Loop Metacommands</h1>
+<hr><h3>This is a example of using the while metacommand in embperl to show the environement</h3>
+
+[$ while ($k, $v) = each (%ENV) $]
+	[+ $k +] = [+ $v +] <BR>
+[$ endwhile $]
+
+<hr><h3>This is a example of using the while metacommand to show the loaded
+modules, with using an index</h3>
+
+[- $i = 0; @k = keys %INC -]
+[$ while ($i &lt; $#k) $]
+[+ $k[$i] +] = [+ $INC{$k[$i]} +]<BR>
+[- $i++ -]
+[$ endwhile $]
+
+<hr><h3>This is a example of using the do .. until metacommand to show the array @arr = (3,5,7)</h3>
+
+[- @arr = (3, 5, 7); $i = 0 -]
+[$ do $]
+[+ $arr[ $i++ ] +]
+[$ until $i > $#arr $]
+
+
+<hr><h3>This is a example of using the foreach metacommand to show the list (1..10)</h3>
+
+[$ foreach $v (1..10) $]
+[+ $v +]
+[$ endforeach $]
+
+[$ if $ENV{MOD_PERL} $]
+<hr><h3>This is a example of using the while metacommand in embperl to show the http headers send from the browser</h3>
+
+[- %hdr = $req_rec -> headers_in ; -]
+[$ while ($k, $v) = each (%hdr) $]
+	[+ $k +] = [+ $v +] <BR>
+[$ endwhile $]
+[$endif$]
+
+<p><hr>
+
+<small>HTML::Embperl (c) 1997-1998 G.Richter</small>
+
+</body>
+</html>

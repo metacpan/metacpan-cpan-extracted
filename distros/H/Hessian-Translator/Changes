@@ -1,0 +1,82 @@
+Revision history for Hessian::Translator
+
+
+1.00  Tue Mar 2 2010
+        Changing the main class to Hessian::Translator since it is really the
+        heart of it all.  While I'm at it, I also need to change the version
+        number from the "dotted integer" to the "real number" style.
+              
+
+0.2.0  Sun Oct 25 2009
+        Actually implemented handling of 32 bit longs (up till now this had
+        just thrown an exception).  This was made possible by a helpful post
+        that I stumbled upon in an forum (vielen Dank 'hp', whoever you are).  I
+        also had to make a small work around for object serialization that was
+        causing objects not to be serialized properly.  The "work around" is
+        to instead serialize them as "typed maps". I hope to eventually come
+        back to proper objects instead eventually. Who knows when I'll get
+        back around to work on this again though. 
+
+0.1.15 Sat Aug 08 2009
+        Edited the README so that it is at least relevant.
+
+0.1.15 Wed Apr 22 2009
+        Experimenting with a technique to deal with endian problem.
+
+0.1.14 Sun Apr 19 2009
+        Trying out a new way to get the proper integer out on 64 bit int
+        machines
+
+0.1.13 Sun Apr 19 2009
+        Want to see if the integer problems I'm having are due to endian-ness
+        of different platforms. Maybe having the error from the test display
+        the value for the particular platform might help.
+
+0.1.12 Sat Apr 4 2009
+        Trying to debug some of the platform dependent problems that seem to
+        be coming up.  Most of the CPAN Testers reports I've been getting say
+        that a lot of the numerical deserialization methods fail.  Don't know
+        if I'll find a fix for this in the near future, so for now I'm just
+        going to throw an exception.
+
+0.1.9 Sun Mar 28 2009
+        Fixed a problem with untyped arrays in which the "length" bit was
+        clashing with the "End of datastructure" symbol (z).
+
+
+0.1.8 Sat Mar 27 2009
+        Revised Hessian version 2 serialization/deserialization to conform to
+        http://hessian.caucho.com/doc/hessian-ws.html.  
+
+0.1.6 Thu Mar 16 2009
+        Added logic to check the length to read from the handle against the
+        remaining length of the string.  If the remaining string is too short,
+        the translator now throws a MessageIncomplete::X.  This is mainly for
+        integration into a POE filter. If the message is incomplete then the
+        internal buffer should return to some initial position and wait for
+        the next call to process_message.  
+        
+
+0.1.5 Thu Mar 12 2009
+        Completely rewrote version 2 serialization/deserilization modules to
+        conform to http://www.caucho.com/resin-3.1/doc/hessian-2.0-spec.xtp.
+
+0.1.4 Sun Feb 08 2009
+        Throw an exception for any Hessian Fault received from service.
+        Serialization for objects
+
+0.1.2 Thu Jan 29 2009
+        Bugfix for installation script.
+
+
+0.1.1 Thu Jan 29 2009
+        Bugfix for installation script.
+
+
+0.1.0 Wed Jan 28 2009
+        First CPAN release
+
+
+
+
+

@@ -1,0 +1,116 @@
+
+=encoding UTF-8
+
+=head1 NAME
+
+Hazy::Cosmic::Jive - stringify floating point numbers
+
+=head1 SYNOPSIS
+
+    use Hazy::Cosmic::Jive float_to_string;
+    my $string = float_to_string (0.1);
+
+=head1 VERSION
+
+This document describes Hazy::Cosmic::Jive version 0.02
+corresponding to git commit 769de3b79334706126eeb913508d0ae17656f609.
+
+=head1 DESCRIPTION
+
+This is an experimental module related to "stringification"
+(converting an NV into a PV) of floating point numbers.
+
+This module is a helper for the L</JSON::Create> serializer, intended
+to test out floating point serialization without inconveniencing users
+of that module with a multiplicity of testing versions.
+
+=head1 FUNCTIONS
+
+=head2 float_to_string
+
+    my $string = float_to_string (0.1);
+
+Convert an internal representation of a floating point number into a
+string representation, bypassing Perl's system in favour of our own
+method.
+
+If the argument is not a floating point number, this prints a warning
+L</Not a number> and returns the undefined value.
+
+=head1 DIAGNOSTICS
+
+=over
+
+=item Not a number
+
+The input is not a number.
+
+=item Error %d printing number %g
+
+An unexpected condition occurred printing a number.
+
+=back
+
+=head1 HISTORY
+
+=over
+
+=item 0.01
+
+=over
+
+=item * Test whether the methodology for splitting 64 bit floating point
+numbers is valid for a variety of CPAN testers' machines.
+
+=item * Test whether sprintf results are consistent over CPAN testers'
+machines.
+
+=back
+
+=item 0.02
+
+=over
+
+=item * Test handling of 10.0
+
+=item * Test with uint64_t rather than bit flags
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+=head2 CPAN modules
+
+=over
+
+=item L<JSON::Create>
+
+=item L<Data::Float>
+
+=back
+
+=head2 Other references
+
+=over
+
+=item L<http://babbage.cs.qc.cuny.edu/IEEE-754.old/Decimal.html>
+
+Convert decimal to floating point binary representation.
+
+=back
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2016
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.

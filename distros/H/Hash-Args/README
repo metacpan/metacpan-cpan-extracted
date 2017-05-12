@@ -1,0 +1,8 @@
+Hash::Args - Coerces argument lists into HASH references for convenience
+
+To install this module, use the following steps:
+
+  perl Makefile.PL
+  make
+  make test
+  make install

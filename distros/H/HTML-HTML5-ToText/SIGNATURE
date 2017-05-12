@@ -1,0 +1,75 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 294505f858f11dd062e9916e3f50d88210a9ef54 CONTRIBUTING
+SHA1 c1ebc30336de62c4e2ce6e7b1b40ff4d853c1b82 COPYRIGHT
+SHA1 70b4b8fc0c26513d2551880477f43cc88fac1700 CREDITS
+SHA1 c4004c9a6aea8329d83505e6156a6c0b90eb0fd5 Changes
+SHA1 937d452c5c4069f4cda9ffaf45a33f1eb5f060e8 LICENSE
+SHA1 5f66451389dcaf2907166f5a33485bb35c414ced MANIFEST
+SHA1 69275863d23dda37a853f20f9d7ba1c979c93775 META.ttl
+SHA1 0d27a4e89d5723ce7afecbcfc18d54ec84121c33 META.yml
+SHA1 5847ba4f788090acc163ed1eb21b34ec3f2ce244 Makefile.PL
+SHA1 d4c05cc9455cab014c76ee675b585d763f7edc48 README
+SHA1 96b7f351ce6844bc3d08b88090207d006a09a193 examples/basic.pl
+SHA1 6b8edbf9b62dceff4085abd3d3f93615ba5f782b examples/definitions.pl
+SHA1 843b8707731313e8f5690860a50888ec3aacb7db examples/table-stuff.pl
+SHA1 06c410f05488c1612ed66b06d3a86b2580581e4a inc/Module/AutoInstall.pm
+SHA1 8a924add836b60fb23b25c8506d45945e02f42f4 inc/Module/Install.pm
+SHA1 61ab1dd37e33ddbe155907ce51df8a3e56ac8bbf inc/Module/Install/AutoInstall.pm
+SHA1 c04f94f91fa97b9f8cfb5a36071098ab0e6c78e3 inc/Module/Install/AutoManifest.pm
+SHA1 2d0fad3bf255f8c1e7e1e34eafccc4f595603ddc inc/Module/Install/Base.pm
+SHA1 f0e01fff7d73cd145fbf22331579918d4628ddb0 inc/Module/Install/Can.pm
+SHA1 9e4cc10c7f138a3f2c60d9ee1f34261f0d8c5aae inc/Module/Install/Contributors.pm
+SHA1 7328966e4fda0c8451a6d3850704da0b84ac1540 inc/Module/Install/Fetch.pm
+SHA1 66d3d335a03492583a3be121a7d888f63f08412c inc/Module/Install/Include.pm
+SHA1 b62ca5e2d58fa66766ccf4d64574f9e1a2250b34 inc/Module/Install/Makefile.pm
+SHA1 1aa925be410bb3bfcd84a16985921f66073cc1d2 inc/Module/Install/Metadata.pm
+SHA1 3b9281ddf7dd6d6f5de0a9642c69333023193c80 inc/Module/Install/Package.pm
+SHA1 41f76ff6b39368a65da86377e43b34bacc2fb0eb inc/Module/Install/TrustMetaYml.pm
+SHA1 e4196994fa75e98bdfa2be0bdeeffef66de88171 inc/Module/Install/Win32.pm
+SHA1 c3a6d0d5b84feb3280622e9599e86247d58b0d18 inc/Module/Install/WriteAll.pm
+SHA1 26d58a041cd6b3d21db98b32e8fd1841aae21204 inc/Module/Package.pm
+SHA1 5a2f84a7a82eee0d1e5ed3628fe503a608efc10f inc/Module/Package/Dist/RDF.pm
+SHA1 feb933cefe2e3762e8322bd6071a2499f3440da1 inc/YAML/Tiny.pm
+SHA1 df6c5c72d2e10fdfaef1b25e83c1b111469ed244 lib/HTML/HTML5/Table.pm
+SHA1 b4be416e5c4d9cfa39c4ce5c815bf8163aa477aa lib/HTML/HTML5/Table/Body.pm
+SHA1 6892e88539907384977c804e6e7b6867451e6e17 lib/HTML/HTML5/Table/Cell.pm
+SHA1 ff1871c3943d98088e0f56f218f84570f77d748d lib/HTML/HTML5/Table/Col.pm
+SHA1 68fad085acf0f51fc113df5d7b61146ae86f08c1 lib/HTML/HTML5/Table/ColGroup.pm
+SHA1 1d657adf1c0a392cf05e2c943b80be0756b544eb lib/HTML/HTML5/Table/Foot.pm
+SHA1 df7d0b01efd2e7d067edcfb1284909fd24d6cca0 lib/HTML/HTML5/Table/Head.pm
+SHA1 aeb241f060075cf2b6ba330a7818c881e0475c1b lib/HTML/HTML5/Table/HeadCell.pm
+SHA1 967cb479b0a2908139c7cbe09d0b6f77642f1605 lib/HTML/HTML5/Table/Row.pm
+SHA1 30f56f49481f474bdbda47a8eac8bbd378809c90 lib/HTML/HTML5/Table/Section.pm
+SHA1 d3a90f6b2c776466ffca42b2325938a0eb76cdb1 lib/HTML/HTML5/ToText.pm
+SHA1 343a28c8a0c1e9b85f3a90f193830d143ad0ea1a lib/HTML/HTML5/ToText/Trait/RenderTables.pm
+SHA1 2e5e3ca35cd111e0bda2a1891b381092bebe13d0 lib/HTML/HTML5/ToText/Trait/ShowImages.pm
+SHA1 20fd3c3973853578ac76c77becada1d8ff7e71a9 lib/HTML/HTML5/ToText/Trait/ShowLinks.pm
+SHA1 7bf1dec6c9f13fdb3322bc4956f8753068552642 lib/HTML/HTML5/ToText/Trait/TextFormatting.pm
+SHA1 36c8e599a3bca2640100c169248fdd28780030ee meta/changes.ttl
+SHA1 c9701db6859dea6aab0d497516c97732fc2f36ba meta/doap.ttl
+SHA1 1df63e7ed102d69ed051b30966d52a4e1c142229 meta/makefile.ttl
+SHA1 77d11040c6db4da4e9b1d747352f0fc85daefdbf t/01basic.t
+SHA1 a02ce2223e8d87cde62250c449d5b461d3528adf t/02simple.t
+SHA1 b18154b423ef1099bdd735f35a6781ee12e22807 t/03tables.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iEYEARECAAYFAlG7FesACgkQzr+BKGoqfTnVywCfUjgmBjyhJypSKE9leY6RB3BO
+Q4QAnR84cyxoanUXucFoYvO/DoH5fxH5
+=XGJm
+-----END PGP SIGNATURE-----

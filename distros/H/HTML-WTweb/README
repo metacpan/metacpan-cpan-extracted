@@ -1,0 +1,33 @@
+HTML-WTweb version 0.01
+=======================
+
+This module must be interpretated as a preliminary release of a more complete package suite.
+Using WTweb make easy to detach the crummy html tags from the beauty of perl, in a simply and synthetic way.
+It won't be the top of efficiency, but it's simply and intended to reliate headache arised from the tedious web applications.
+It may also used as generic text-template system.
+
+See man HTML::WTweb for further details.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module require no other non-standard modules. 
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Gian Maria Gamboni 
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

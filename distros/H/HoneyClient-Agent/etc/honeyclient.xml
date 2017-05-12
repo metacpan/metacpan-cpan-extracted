@@ -1,0 +1,524 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+#######################################################################
+HoneyClient Configuration File
+
+This configuration file is used by the HoneyClient perl modules in
+order to specify and use the following global configuration options.
+
+For information about the syntax of this file format, please type
+"perldoc XML::Simple".
+
+CVS: $Id: honeyclient.xml 776 2007-07-26 20:01:07Z kindlund $
+
+#######################################################################
+
+Syntax Notes:
+
+Note: During processing, if the HoneyClient expects a module-specific
+variable to be present within this configuration file (e.g., "address")
+but it is not listed or commented out, then the code will attempt
+to look for the same variable within any of the module's parents.
+
+For example, the code may expect:
+<HoneyClient>
+    <Agent>
+        <Driver>
+            <address>localhost</address>
+        </Driver>
+    </Agent>
+</HoneyClient>
+
+But the following will work as well:
+<HoneyClient>
+    <Agent>
+        <address>localhost</address>
+    </Agent>
+</HoneyClient>
+
+<HoneyClient>
+    <address>localhost</address>
+</HoneyClient>
+
+Keep in mind, though, that some variables should remain module-specific
+(i.e., "port") in order to avoid collisions between modules.
+
+-->
+<HoneyClient>
+    <!-- Global Options -->
+    <!-- Note: This timeout should be long enough so that the Agent watchdog code will properly let the integrity checking code finish, before detecting a faulty timeout in processing. -->
+    <timeout description="Default timeout used for all communications between each module (in seconds)." default="900">
+        3600
+    </timeout>
+    <log_config description="The global Log4perl configuration file, used throughout all modules.  This setting should not need to be changed." default="etc/honeyclient_log.conf">
+        etc/honeyclient_log.conf
+    </log_config>
+    <syslog_address description="The IP address of the syslog server that all logging messages will be sent to by both Agent and Manager processes over UDP port 514." default="10.0.0.1">
+        10.0.0.1
+    </syslog_address>
+    <!-- HoneyClient::Agent Options -->
+    <Agent>
+        <!-- TODO: Update this. -->
+        <address description="The IP or hostname that all Agent modules should use, when accepting SOAP requests." default="0.0.0.0">
+            0.0.0.0
+        </address>
+        <!-- TODO: Update this. -->
+        <!-- Note: This port should be unique and not already in use by other modules, services, or daemons running inside the VM. -->
+        <port description="The TCP port number that the SOAP server for all Agent modules will listen on for requests." default="9000">
+            9000
+        </port>
+        <allowed_drivers description="List of implemented Drivers that the Agent is allowed to run directly.">
+            <name>HoneyClient::Agent::Driver::Browser::IE</name>
+            <name>HoneyClient::Agent::Driver::Browser::FF</name>
+        </allowed_drivers>
+        <!-- HoneyClient::Agent::Driver Options -->
+        <Driver>
+            <!-- TODO: Update this. -->
+            <timeout description="How long the Driver waits during a drive operation, before timing out (in seconds)." default="60">
+                20 
+            </timeout>
+            <ActiveContent>
+                <enable description="Enables active content parsing. 1 enables, 0 disables." default="1">
+                    1
+                </enable>
+                <Flash>
+                    <flasm_exec description="Path to the flasm executable." default="thirdparty/flasm/flasm.exe">
+                        thirdparty/flasm/flasm.exe
+                    </flasm_exec>
+                </Flash>
+            </ActiveContent>
+            <Browser>
+                <!-- HoneyClient::Agent::Driver::IE Options -->
+                <!-- TODO: Update this. -->
+                <ignore_links_timed_out description="If this parameter is 1, then the browser will never attempt to revisit any links that caused the browser to initially time out." default="0">
+                    1
+                </ignore_links_timed_out>
+                <!-- TODO: Update this. -->
+                <process_name description="The name of the Internet Explorer application process, as it appears in the Task Manager." default="iexplore.exe">
+                    iexplore.exe
+                </process_name>
+                <max_relative_links_to_visit description="An integer, representing the maximum number of relative links that the browser should visit, before moving onto another website.  If negative, then the browser will exhaust all possible relative links found, before moving on.  This functionality is best effort; it's possible for the browser to visit new links on previously visited websites." default="-1">
+                    -1
+                </max_relative_links_to_visit>
+                <positive_words description="If a link contains any number of these words, then its probability of being visited (its score) will increase.">
+                    <word>news</word>
+                    <word>new</word>
+                    <word>big</word>
+                    <word>latest</word>
+                    <word>main</word>
+                    <word>update</word>
+                    <word>sell</word>
+                    <word>free</word>
+                    <word>buy</word>
+                    <word>science</word>
+                </positive_words>
+                <negative_words description="If a link contains any number of these words, then its probability of being visited (its score) will decrease.">
+                    <word>archive</word>
+                    <word>privacy</word>
+                    <word>legal</word>
+                    <word>disclaim</word>
+                    <word>about</word>
+                    <word>contact</word>
+                    <word>copyright</word>
+                    <word>jobs</word>
+                    <word>careers</word>
+                </negative_words>
+                <IE>
+                    <!-- HoneyClient::Agent::Driver::Browser::IE Options -->
+                    <process_exec description="The absolute path to the Internet Explorer application process, as it sits in the VM filesystem." default="C:\Program Files\Internet Explorer\iexplore.exe">
+                        C:\Program Files\Internet Explorer\iexplore.exe
+                    </process_exec>
+                    <process_name description="The name of the Internet Explorer executable, as it appears on the VM filesystem." default="iexplore.exe">
+                        iexplore.exe
+                    </process_name>
+                </IE>
+                <FF>
+                    <!-- HoneyClient::Agent::Driver::Browser::FF Options -->
+                    <process_exec description="The absolute path to the Mozilla Firefox application process, as it sits in the VM filesystem." default="C:\Program Files\Mozilla Firefox\firefox.exe">
+                        C:\Program Files\Mozilla Firefox\firefox.exe
+                    </process_exec>
+                    <process_name description="The name of the Mozilla Firefox executable, as it appears on the VM filesystem." default="firefox.exe">
+                        firefox.exe
+                    </process_name>
+                </FF>
+            </Browser>
+            <EmailClient>
+            </EmailClient>
+        </Driver>
+        <perform_integrity_checks description="An integer, representing whether the Agent should perform any integrity checks. 1 enables, 0 disables." default="1">
+            1
+        </perform_integrity_checks>
+        <!-- HoneyClient::Agent::Integrity Options -->
+        <Integrity>
+            <changes_found_file description="When an integrity check fails, all changes will be written to this file within the compromized honeyclient VM's filesystem." default="/tmp/changes.txt">
+                /tmp/changes.txt
+            </changes_found_file>
+            <!-- HoneyClient::Agent::Integrity::Filesystem Options -->
+            <Filesystem>
+                <directories_to_check description="List of base directories on the filesystem to recursively analyze.  Use a regular slash (/) instead of a backslash (\) as a directory separator character.">
+                    <name>C:/</name>
+                </directories_to_check>
+                <exclude_list description="List of regular expressions that match files/directories to exclude from analysis.  These entries match files/directories that change normally during the course of driving the target application.  As such, they are excluded from analysis in order to reduce false positives.  Use a regular slash (/) instead of a backslash (\) as a directory separator character.  Never prefix any entry with a carat (^) before the drive letter, such as '^C:/', and never add the regex suffix ($) to the end of an expression, such as 'C:/Temp$'.  All comparisons are case-insensitive.">
+                    <regex>C:/Documents and Settings/All Users/Application Data/Microsoft/Network/Downloader.*</regex>
+                    <regex>C:/Documents and Settings/Administrator/Application Data/Mozilla/Firefox/Profiles.*</regex>
+                    <regex>C:/Documents and Settings/Administrator/Cookies.*</regex>
+                    <regex>C:/Documents and Settings/Administrator/Local Settings/Application Data/Macromedia/Flash Player.*</regex>
+                    <regex>C:/Documents and Settings/Administrator/Local Settings/Application Data/Microsoft/Windows Media.*</regex>
+                    <regex>C:/Documents and Settings/Administrator/Local Settings/Application Data/Mozilla/Firefox/Profiles.*</regex>
+                    <regex>C:/Documents and Settings/Administrator/Local Settings/History/History.IE5.*</regex>
+                    <regex>C:/Documents and Settings/Administrator/Local Settings/Temporary Internet Files/Content.IE5.*</regex>
+                    <regex>C:/Documents and Settings/Administrator/Local Settings/Temp</regex>
+                    <regex>C:/Documents and Settings/Administrator/Recent.*</regex>
+                    <regex>C:/Documents and Settings/Administrator/ntuser.dat.LOG</regex>
+                    <regex>C:/Program Files/Mozilla Firefox/active-update.xml</regex>
+                    <regex>C:/Program Files/Mozilla Firefox/updates</regex>
+                    <regex>C:/WINDOWS/PCHEALTH/HELPCTR/DataColl.*</regex>
+                    <regex>C:/WINDOWS/Prefetch.*</regex>
+                    <regex>C:/WINDOWS/Debug/UserMode/userenv.log</regex>
+                    <regex>C:/WINDOWS/SchedLgU.txt</regex>
+                    <regex>C:/WINDOWS/SoftwareDistribution/DataStore.*</regex>
+                    <regex>C:/WINDOWS/SoftwareDistribution/ReportingEvents.log</regex>
+                    <regex>C:/WINDOWS/SoftwareDistribution/WuRedir.*</regex>
+                    <regex>C:/WINDOWS/SYSTEM32</regex>
+                    <regex>C:/WINDOWS/SYSTEM32/config/SecEvent.evt</regex>
+                    <regex>C:/WINDOWS/SYSTEM32/config/SysEvent.evt</regex>
+                    <regex>C:/WINDOWS/SYSTEM32/config/software</regex>
+                    <regex>C:/WINDOWS/SYSTEM32/config/software.log</regex>
+                    <regex>C:/WINDOWS/SYSTEM32/config/system.LOG</regex>
+                    <regex>C:/WINDOWS/SYSTEM32/Macromed/Flash.*</regex>
+                    <regex>C:/WINDOWS/SYSTEM32/perfc009.dat</regex>
+                    <regex>C:/WINDOWS/SYSTEM32/perfd009.dat</regex>
+                    <regex>C:/WINDOWS/SYSTEM32/perfh009.dat</regex>
+                    <regex>C:/WINDOWS/SYSTEM32/perfi009.dat</regex>
+                    <regex>C:/WINDOWS/SYSTEM32/PerfStringBackup.INI</regex>
+                    <regex>C:/WINDOWS/SYSTEM32/wbem.*</regex>
+                    <regex>C:/WINDOWS/WindowsUpdate.log</regex>
+                    <regex>C:/WINDOWS/wmsetup.log</regex>
+                    <!-- To exclude entries inside cygwin, use the following format. -->
+                    <regex>/cygdrive/c/cygwin/tmp.*</regex>
+                    <regex>/cygdrive/c/cygwin/home/Administrator/honeyclient.*</regex>
+                </exclude_list>
+                <!-- HoneyClient::Agent::Integrity::Filesystem::Test Options -->
+                <Test>
+                    <!--
+                        Note: you should *never* need to change *any* values
+                        within this section of the configuration.  All contents
+                        are *only* used for unit testing.
+                    -->
+                    <monitor_dir description="The relative path to the test directory, that's used during unit testing." default="t/test_filesystem">
+                        t/test_filesystem
+                    </monitor_dir>
+                </Test>
+            </Filesystem>
+            <!-- HoneyClient::Agent::Integrity::Registry Options -->
+            <Registry>
+                <hives_to_check description="List of registry hives to analyze.">
+                    <name>HKEY_LOCAL_MACHINE</name>
+                    <name>HKEY_CLASSES_ROOT</name>
+                    <name>HKEY_CURRENT_USER</name>
+                    <name>HKEY_USERS</name>
+                    <name>HKEY_CURRENT_CONFIG</name>
+                </hives_to_check>
+                <exclude_list description="List of perl regular expressions, each matching one or more registry key directory names to exclude from analysis.  These entries match registry key directories that change normally during the course of driving the target application.  As such, they are excluded from analysis in order to reduce false positives.  As in normal regular expressions, each backslash (\) must be escaped (\\) and each regex must not end with any backslash character.">
+                    <regex>^HKEY_CURRENT_USER\\SessionInformation.*$</regex>
+                    <regex>^HKEY_CURRENT_USER\\Software\\Microsoft\\ActiveMovie\\devenum.*$</regex>
+                    <regex>^HKEY_CURRENT_USER\\Software\\Microsoft\\Internet Explorer\\IntelliForms$</regex>
+                    <regex>^HKEY_CURRENT_USER\\Software\\Microsoft\\Internet Explorer\\International$</regex>
+                    <regex>^HKEY_CURRENT_USER\\Software\\Microsoft\\Internet Explorer\\International\\CpMRU$</regex>
+                    <regex>^HKEY_CURRENT_USER\\Software\\Microsoft\\Internet Explorer\\Main$</regex>
+                    <regex>^HKEY_CURRENT_USER\\Software\\Microsoft\\Internet Explorer\\Security\\AntiPhishing.*$</regex>
+                    <regex>^HKEY_CURRENT_USER\\Software\\Microsoft\\Internet Explorer\\TypedURLs$</regex>
+                    <regex>^HKEY_CURRENT_USER\\Software\\Microsoft\\MediaPlayer.*$</regex>
+                    <regex>^HKEY_CURRENT_USER\\Software\\Microsoft\\Multimedia.*$</regex>
+                    <regex>^HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\MenuOrder\\Favorites\\Links.*$</regex>
+                    <regex>^HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\MenuOrder\\Start Menu2\\Programs.*$</regex>
+                    <regex>^HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\MountPoints2.*$</regex>
+                    <regex>^HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\RunMRU.*$</regex>
+                    <regex>^HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\.+\\Count.*$</regex>
+                    <regex>^HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Ext\\Stats\\.*$</regex>
+                    <regex>^HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\Connections.*$</regex>
+                    <regex>^HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\5.0\\Cache.*$</regex>
+                    <regex>^HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\ShellNoRoam\\DUIBags\\ShellFolders\\.*$</regex>
+                    <regex>^HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\ShellNoRoam\\BagMRU.*$</regex>
+                    <regex>^HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\ShellNoRoam\\MUICache.*$</regex>
+                    <regex>^HKEY_CURRENT_USER\\Software\\Microsoft\\Windows Media\\WMSDK\\General.*$</regex>
+                    <regex>^HKEY_CURRENT_USER\\Volatile Environment$</regex>
+                    <regex>^HKEY_LOCAL_MACHINE\\SOFTWARE\\Macromedia$</regex>
+                    <regex>^HKEY_LOCAL_MACHINE\\SOFTWARE\\Macromedia\\FlashPlayer$</regex>
+                    <regex>^HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Cryptography\\RNG$</regex>
+                    <regex>^HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Dfrg\\BootOptimizeFunction$</regex>
+                    <regex>^HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Direct3D\\MostRecentApplication$</regex>
+                    <regex>^HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\PCHealth\\PchSvc$</regex>
+                    <regex>^HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\SystemCertificates\\.*$</regex>
+                    <regex>^HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\WBEM.*$</regex>
+                    <regex>^HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\BITS$</regex>
+                    <regex>^HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Group Policy\\State\\Machine\\Extension-List\\.*$</regex>
+                    <regex>^HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Group Policy\\State\\S.+\\Extension-List\\.*$</regex>
+                    <regex>^HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\WindowsUpdate\\.*$</regex>
+                    <regex>^HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\WindowsUpdate\\Auto Update.*$</regex>
+                    <regex>^HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Prefetcher$</regex>
+                    <regex>^HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Notify\\WgaLogon\\Settings$</regex>
+                    <regex>^HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet.+\\Services\\.+\\Parameters\\Tcpip.*$</regex>
+                    <regex>^HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet.+\\Services\\Dhcp\\Parameters.*$</regex>
+                    <regex>^HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet.+\\Services\\Eventlog\\Application\\ESENT.*$</regex>
+                    <regex>^HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet.+\\Services\\SharedAccess\\Epoch.*$</regex>
+                    <regex>^HKEY_LOCAL_MACHINE\\SYSTEM\\ControlSet.+\\Services\\Tcpip\\Parameters\\Interfaces\\.*$</regex>
+                    <regex>^HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Dhcp\\Parameters.*$</regex>
+                    <regex>^HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Eventlog\\Application\\ESENT.*$</regex>
+                    <regex>^HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\SharedAccess\\Epoch$</regex>
+                    <regex>^HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces\\.*$</regex>
+                    <regex>^HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\.+\\Parameters\\Tcpip.*$</regex>
+                    <regex>^HKEY_USERS\\.+\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\.+\\Count.*$</regex>
+                    <regex>^HKEY_USERS\\.+\\Software\\Microsoft\\Windows\\ShellNoRoam\\BagMRU.*$</regex>
+                    <regex>^HKEY_USERS\\.+\\UNICODE Program Groups.*$</regex>
+                    <regex>^HKEY_USERS\\S.+\\SessionInformation$</regex>
+                    <regex>^HKEY_USERS\\S.+\\Software\\Microsoft\\ActiveMovie\\devenum.*$</regex>
+                    <regex>^HKEY_USERS\\S.+\\Software\\Microsoft\\Internet Explorer\\IntelliForms$</regex>
+                    <regex>^HKEY_USERS\\S.+\\Software\\Microsoft\\Internet Explorer\\International$</regex>
+                    <regex>^HKEY_USERS\\S.+\\Software\\Microsoft\\Internet Explorer\\International\\CpMRU$</regex>
+                    <regex>^HKEY_USERS\\S.+\\Software\\Microsoft\\Internet Explorer\\Main$</regex>
+                    <regex>^HKEY_USERS\\S.+\\Software\\Microsoft\\Internet Explorer\\Security\\AntiPhishing.*$</regex>
+                    <regex>^HKEY_USERS\\S.+\\Software\\Microsoft\\Internet Explorer\\TypedURLs$</regex>
+                    <regex>^HKEY_USERS\\S.+\\Software\\Microsoft\\MediaPlayer.*$</regex>
+                    <regex>^HKEY_USERS\\S.+\\Software\\Microsoft\\Multimedia.*$</regex>
+                    <regex>^HKEY_USERS\\S.+\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\MenuOrder\\Favorites\\Links.*$</regex>
+                    <regex>^HKEY_USERS\\S.+\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\MenuOrder\\Start Menu2\\Programs.*$</regex>
+                    <regex>^HKEY_USERS\\S.+\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\MountPoints2.*$</regex>
+                    <regex>^HKEY_USERS\\S.+\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\RunMRU.*$</regex>
+                    <regex>^HKEY_USERS\\S.+\\Software\\Microsoft\\Windows\\CurrentVersion\\Ext\\Stats\\.*$</regex>
+                    <regex>^HKEY_USERS\\S.+\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\Connections.*$</regex>
+                    <regex>^HKEY_USERS\\S.+\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\5.0\\Cache.*$</regex>
+                    <regex>^HKEY_USERS\\S.+\\Software\\Microsoft\\Windows\\ShellNoRoam\\DUIBags\\ShellFolders\\.*$</regex>
+                    <regex>^HKEY_USERS\\S.+\\Software\\Microsoft\\Windows\\ShellNoRoam\\MUICache.*$</regex>
+                    <regex>^HKEY_USERS\\S.+\\Software\\Microsoft\\Windows Media\\WMSDK\\General.*$</regex>
+                </exclude_list>
+                <!-- HoneyClient::Agent::Integrity::Registry::Test Options -->
+                <Test>
+                    <!--
+                        Note: you should *never* need to change *any* values
+                        within this section of the configuration.  All contents
+                        are *only* used for unit testing.
+                    -->
+                    <before_registry_file description="The relative path to a (before) sample registry dump, that's used during unit testing." default="t/test_registry/before.reg">
+                        t/test_registry/before.reg
+                    </before_registry_file>
+                    <after_registry_file description="The relative path to an (after) sample registry dump, that's used during unit testing." default="t/test_registry/after.reg">
+                        t/test_registry/after.reg
+                    </after_registry_file>
+                </Test>
+                <Parser>
+                    <!-- HoneyClient::Agent::Integrity::Registry::Parser::Test Options -->
+                    <Test>
+                        <!--
+                            Note: you should *never* need to change *any* values
+                            within this section of the configuration.  All contents
+                            are *only* used for unit testing.
+                        -->
+                        <registry_file description="The relative path to a sample registry dump, that's used during unit testing." default="t/test_registry/dump.reg">
+                            t/test_registry/dump.reg
+                        </registry_file>
+                    </Test>
+                </Parser>
+            </Registry>
+        </Integrity>
+    </Agent>
+    <!-- HoneyClient::DB Options -->
+    <DB>
+        <enable description="Enables database operations. 1 enables, 0 disables." default="0">
+            0
+        </enable>
+        <host description="The system providing the HoneyClient database.  If the database is installed on the same host system as the Manager, then localhost should be used." default="127.0.0.1">
+            172.16.164.1
+        </host>
+        <dbname description="The name of the HoneyClient database." default="HoneyClient">
+            HoneyClient
+        </dbname>
+        <user description="The username to use, when connecting to the HoneyClient database.">
+            honeyclient_user
+        </user>
+        <pass description="The password to use, when connecting to the HoneyClient database.">
+            honeyclient_password 
+        </pass>
+        <port description="The default TCP port number used to communicate with the database." default="3306">
+            3306
+        </port>
+    </DB>
+    <Manager>
+        <!-- TODO: Update this. -->
+        <manager_state description="Upon termination, the Manager will attempt to save a complete copy of its state into this file, if specified." default="">
+            Manager.dump
+        </manager_state>
+        <!-- TODO: Update this. -->
+        <address description="The IP or hostname that all Manager modules should use, when accepting SOAP requests." default="localhost">
+            localhost
+        </address>
+        <!-- TODO: Update this. -->
+        <!-- Note: This port should be unique and not already in use by other modules, services, or daemons running on the host system. -->
+        <port description="The TCP port number that the SOAP server for all Manager modules will listen on for requests." default="8089">
+            8089
+        </port>
+        <vmnet_nat_router_address description="The IP address assigned to the VMware NAT interface (usually called vmnet8)." default="192.168.0.1">
+            192.168.0.1
+        </vmnet_nat_router_address>
+        <!-- TODO: Update this. -->
+        <conffile description="Logging options that can be applied to specify the layout of the logging messages.">
+            etc/honeyclient_log.conf
+        </conffile>
+        <!-- HoneyClient::Manager::FW Options -->
+        <FW>
+            <!-- TODO: Update this. -->
+            <address description="eth0 interface static IP">
+                192.168.0.128
+            </address>
+            <!-- TODO: Update this. -->
+            <port description="Default FW port number" default="8083">
+                8083
+            </port>
+            <!-- TODO: Update this. -->
+            <primaryDns description="Primary DNS IP Address">
+                128.29.154.150
+            </primaryDns>
+            <!-- TODO: Update this. -->
+            <secondaryDns description="Secondary DNS IP address">
+                128.29.40.1
+            </secondaryDns>
+            <!-- TODO: Update this. -->
+            <gsx_gateway description="IP address of GSX or VMware Server">
+                10.0.0.1/32
+            </gsx_gateway>
+            <!-- TODO: Update this. -->
+            <fwGateway description="Gateway IP address of the Firewall">
+                10.0.0.254/32
+            </fwGateway>
+            <!-- TODO: Update this. -->
+            <honeyclientnet description="CIDR notation for honeyclient netblock">
+                10.0.0.0/24
+            </honeyclientnet>
+            <!-- TODO: Update this. -->
+            <fwconfig description="Location of Firewall VM configuration file">
+                /vm/honeywall-test/honeywall.vmx
+            </fwconfig>
+            <!-- TODO: Update this. -->
+            <outputdir description="Output directory where logs will go on Firewall">
+                fw-output
+            </outputdir>
+            <!-- TODO: Update this. -->
+            <argus description="Argus binary location">
+                /usr/local/sbin/argus
+            </argus>
+            <!-- TODO: Update this. -->
+            <argusconfig description="Argus configuration file.">
+                /etc/argus.conf
+            </argusconfig>
+            <!-- TODO: Update this. -->
+            <argusoutput description="Argus logging directory">
+                /var/log/argus
+            </argusoutput>
+            <!-- TODO: Update this. -->
+            <arguspid description="Argus Process ID">
+                /var/run/argus.pid
+            </arguspid>
+            <!-- TODO: Update this. -->
+            <tcpdumplog description="Tcpdump log location directory">
+                /var/log/tcpdump
+            </tcpdumplog>
+            <!-- TODO: Update this. -->
+            <tcpdump description="Tcpdump binary">
+                /usr/sbin/tcpdump
+            </tcpdump>
+            <!-- TODO: Update this. -->
+            <dnspath description="DNS nameserver file">
+                /etc/resolv.conf
+            </dnspath>
+            <!-- TODO: Update this. -->
+            <dnsport description="DNS port number">
+                53
+            </dnsport>
+            <!-- TODO: Update this. -->
+            <LOCALHOST description="localhost address">
+                127.0.0.1
+            </LOCALHOST>
+            <!-- TODO: Update this. -->
+            <sshport description="SSH port number listening on">
+                22
+            </sshport>
+            <!-- TODO: Update this. -->
+            <debug description="Debug value (0 for no debugging, 1 for debugging output)">
+                0
+            </debug>
+            <!-- TODO: Update this. -->
+            <fwprocess description="Name of external SOAP listener.">
+                startFWListener.pl
+            </fwprocess>
+            <!-- TODO: Update this. -->
+            <config_file description="Location of config_file">
+                etc/honeyclient_log.conf
+            </config_file>
+        </FW>
+        <!-- HoneyClient::Manager::VM Options -->
+        <VM>
+            <master_vm_config description="The full absolute path to the VM configuration file on the host system that will be used by all subsequent cloned VMs.">
+                /vm/master-vms/Agent.Master-23/winXPPro.cfg
+            </master_vm_config>
+            <port description="The TCP port number that the SOAP server of the VM daemon will listen on for requests.  Note: This port should be unique and not already be used by other modules, services, or daemons running on the host system." default="8089">
+                8089
+            </port>
+            <datastore_path description="The absolute path to the parent directory, where all HoneyClient VM data is stored on the host server.  It is assumed that individual VM data is stored in separate subdirectories within this parent directory." default="/vm">
+                /vm/clones
+            </datastore_path>
+            <snapshot_path description="The absolute path to the directory that contains all snapshot data, associated with every HoneyClient VM." default="/vm/snapshots">
+                /vm/snapshots
+            </snapshot_path>
+            <vmware_port description="The TCP port that VMware Server / GSX uses for console communication.  By default, this TCP port is 902.  Unless you've explicitly changes this port during the vmware-config.pl setup process, leave this setting as the default." default="902">
+                902
+            </vmware_port>
+            <bin_tar description="The absolute path to the 'tar' executable, accessible on the host filesystem." default="/bin/tar">
+                /bin/tar
+            </bin_tar>
+            <vm_id_length description="The length of each corresponding VM identifier (VMID).  This value can be any integer between 1 and 32, inclusive.  The VMID is a hexadecimal string that represents the VM's name.  It is designed to be generated once per clone and remain for the life of the VM (regardless of where it runs).  The VMID is used externally by HoneyClient::Manager and HoneyClient::Manager::FW.  The HoneyClient::Manager::FW package uses IPTables and binds each rule to a specific VMID.  However, IPTable's firewall rule labels can only be a maximum of 30 characters in length.  Thus, 26 is specified here, to account for 'VMID-OUT' as a possible chain name." default="26">
+                26
+            </vm_id_length>
+            <dhcp_log description="The absolute path to the file that contains the DHCP logs, when a new VM gets a DHCP lease from the VMware Server / GSX server." default="/var/log/messages">
+                /var/log/messages
+            </dhcp_log>
+            <!-- HoneyClient::Manager::VM::Test Options -->
+            <Test>
+                <!--
+                    Note: you should *never* need to change *any* values
+                    within this section of the configuration.  All contents
+                    are *only* used for unit testing.
+                -->
+                <test_vm_config description="The relative path to the (empty) test VM, that's used during unit testing." default="t/test_vm/winXPPro.vmx">
+                    t/test_vm/winXPPro.vmx
+                </test_vm_config>
+            </Test>
+        </VM>
+    </Manager>
+    <!-- HoneyClient::Util Options -->
+    <Util>
+        <!-- HoneyClient::Util::Config Options -->
+        <Config>
+            <!-- HoneyClient::Util::Config::Test Options -->
+            <Test>
+                <!--
+                    Note: you should *never* need to change *any* values
+                    within this section of the configuration.  All contents
+                    are *only* used for unit testing.
+                -->
+                <address description="The IP or hostname that this module should use, when performing unit tests." default="localhost" zing="foobar">localhost</address>
+                <zingers>foobar</zingers>
+                <Foo>
+                    <Bar>
+                        <address>baz</address>
+                    </Bar>
+                </Foo>
+                <Yok>
+                    <childA>12345678</childA>
+                    <childA>ABCDEFGH</childA>
+                    <childB>09876543</childB>
+                    <childB>ZYXVTUWG</childB>
+                </Yok>
+            </Test>
+        </Config>
+    </Util>
+</HoneyClient>

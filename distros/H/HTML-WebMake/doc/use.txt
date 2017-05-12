@@ -1,0 +1,34 @@
+<wmmeta name="Title" value="The &lt;use&gt; Tag" />
+<wmmeta name="Section" value="02-tags_attrs" />
+<wmmeta name="Score" value="25" />
+<wmmeta name="Abstract">
+use a WebMake plugin
+</wmmeta>
+
+WebMake supports ''plugin'' libraries, which are generally other .wmk files or
+Perl modules which can be loaded to extend WebMake's functionality.
+
+For example, there are standard plugins to provide support for ''download''
+links, which allows links to files including their size, ownership
+information, etc.; there's also a plugin which allows HTML tables to be
+defined using a comma-separated value list.
+
+It has one attribute, __plugin__, which names the plugin to load.
+
+Plugins can be loaded from the WebMake perl library directory, or from the
+user's home directory.  The search path for a plugin is as follows:
+
+	- **~/.webmake/plugins/__plugin__.wmk**
+
+	- **&wmdollar;{WebMake.PerlLib}/__plugin__.wmk**
+
+The set of standard plugins are listed in the __Included Library Code__
+section of the "index page" [$(index)].
+
+Example
+=======
+
+<safe>
+  <use plugin="safe_tag" />
+</safe>
+

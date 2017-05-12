@@ -1,0 +1,89 @@
+Changes			History of this package
+README			The Instructions
+README.md		The Instructions
+MANIFEST		This file
+Makefile.PL		Will create 'Makefile' to build this extention
+MyHTML.pm	    Bootstrap & documentation
+MyHTML.xs	    XS binding
+t/000_create.t  Base test file
+typemap			
+
+examples/detect_encoding.pl
+examples/clear_text.pl
+examples/callback.pl
+
+xs/tree.xs
+xs/tree_attr.xs
+xs/tree_node.xs
+xs/token_node.xs
+xs/incoming_buffer.xs
+
+source/myhtml/api.h
+source/myhtml/api_encoding.h
+source/myhtml/callback.c
+source/myhtml/callback.h
+source/myhtml/charef.c
+source/myhtml/charef.h
+source/myhtml/charef_resource.h
+source/myhtml/data_process.c
+source/myhtml/data_process.h
+source/myhtml/def.h
+source/myhtml/encoding.c
+source/myhtml/encoding.h
+source/myhtml/encoding_detect.c
+source/myhtml/encoding_detect_resource.h
+source/myhtml/encoding_resource.h
+source/myhtml/incoming.c
+source/myhtml/incoming.h
+source/myhtml/myhtml.c
+source/myhtml/myhtml.h
+source/myhtml/mynamespace.c
+source/myhtml/mynamespace.h
+source/myhtml/mynamespace_resource.h
+source/myhtml/myosi.c
+source/myhtml/myosi.h
+source/myhtml/mystring.c
+source/myhtml/mystring.h
+source/myhtml/parser.c
+source/myhtml/parser.h
+source/myhtml/perf.c
+source/myhtml/rules.c
+source/myhtml/rules.h
+source/myhtml/stream.c
+source/myhtml/stream.h
+source/myhtml/tag.c
+source/myhtml/tag.h
+source/myhtml/tag_const.h
+source/myhtml/tag_init.c
+source/myhtml/thread.c
+source/myhtml/thread.h
+source/myhtml/token.c
+source/myhtml/token.h
+source/myhtml/tokenizer.c
+source/myhtml/tokenizer.h
+source/myhtml/tokenizer_doctype.c
+source/myhtml/tokenizer_doctype.h
+source/myhtml/tokenizer_end.c
+source/myhtml/tokenizer_end.h
+source/myhtml/tokenizer_script.c
+source/myhtml/tokenizer_script.h
+source/myhtml/tree.c
+source/myhtml/tree.h
+source/myhtml/utils/mchar_async.c
+source/myhtml/utils/mchar_async.h
+source/myhtml/utils/mcobject.c
+source/myhtml/utils/mcobject.h
+source/myhtml/utils/mcobject_async.c
+source/myhtml/utils/mcobject_async.h
+source/myhtml/utils/mcsimple.c
+source/myhtml/utils/mcsimple.h
+source/myhtml/utils/mcsync.c
+source/myhtml/utils/mcsync.h
+source/myhtml/utils/mctree.c
+source/myhtml/utils/mctree.h
+source/myhtml/utils/resources.h
+source/myhtml/utils.c
+source/myhtml/utils.h
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

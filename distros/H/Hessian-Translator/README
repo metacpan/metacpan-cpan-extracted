@@ -1,0 +1,25 @@
+Hessian version 0.1.15
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+Installing Moose would be a good start
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008, William Travis Holton
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

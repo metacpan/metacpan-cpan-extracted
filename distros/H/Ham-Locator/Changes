@@ -1,0 +1,16 @@
+Revision history for Perl extension Ham::Locator.
+
+0.1000	Sun Jan 16 15:35:00 2011
+	- Version 0.1000 for beta releas
+
+0.0003  Sat Jan 15 19:35:00 2011
+	- Updated documentation
+
+0.0002  Sat Jan 15 19:20:00 2011
+	- latlng2loc implemented
+	- output precision option added (see 'set_precision')
+	- updated tests
+
+0.0001  Fri Dec 17 21:04:00 2010
+	- Initial module release.
+	- Added POD documentation

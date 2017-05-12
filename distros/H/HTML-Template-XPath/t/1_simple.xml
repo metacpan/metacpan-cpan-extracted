@@ -1,0 +1,14 @@
+<ddd>
+	<aaa bbb="ccc"/>
+	<eEe>jjj</eEe>
+	<fFf ttt="uuu">
+		<ggg>sss</ggg>
+		<hhh qqq="rrr">lll</hhh>
+		<iii>mmm</iii>
+	</fFf>
+	<fFf ttt="vvv">
+		<ggg>nnn</ggg>
+		<hhh>ooo</hhh>
+		<iii>ppp</iii>
+	</fFf>
+</ddd>

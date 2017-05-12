@@ -1,0 +1,13 @@
+<p class="big_bad_error">Emp Name is an invalid value</p>
+<p class="big_bad_error">Emp Birth Dt is missing</p>
+<form method="post">
+<table cellpadding="2">
+<tr><th style="color:red"><span class="error_field">Emp Name</span></th><td><input name="emp_name" type="text" value="Fred Flintstone" /></td></tr>
+<tr><th>Emp Title</th><td><input name="emp_title" type="text" value="CEO" /></td></tr>
+<tr><th style="color:red"><span class="error_field">Emp Birth Dt</span></th><td><input name="emp_birth_dt" type="text" value="20-10-55" /></td></tr>
+<tr><td align="center" colspan="2">
+<input name="_submit" type="submit" value="Submit" />
+</td></tr>
+</table>
+<input name="emp_id" type="hidden" value="123" />
+</form>

@@ -1,0 +1,92 @@
+
+<html>
+<head>
+  <title><!--{subject}--></title>
+  <style type="text/css2">
+  </style>
+</head>
+<body>
+
+<h1><!--{subject}--></h1>
+
+<p>The message <strong>by structure</strong>.<br />
+The message <a href="index.html">by content</a>.</p>
+
+<!--{message}-->
+
+   <!--{inline}-->
+      <p>Inlined <a href="<!--{url}-->" target="_blank">attachment</a>
+      [<!--{url}-->, <!--{type}-->, <!--{size}--> bytes]</p>
+      <table>
+      <!--{head}-->
+      <tr><td valign="top"><!--{name}--></td>
+          <td>&nbsp;</td>
+          <td valign="top"><!--{body}--></td></tr>
+      <!--{/head}-->
+      <tr><td colspan="3">&nbsp;</td></tr>
+      </table>
+   <!--{/inline}-->
+
+   <!--{attach}-->
+      <p><a href="<!--{url}-->" target="_blank">attachment</a>
+      [<!--{url}-->, <!--{type}-->, <!--{size}--> bytes]</p>
+      <table>
+      <!--{head}-->
+      <tr><td valign="top"><!--{name}--></td>
+          <td>&nbsp;</td>
+          <td valign="top"><!--{body}--></td></tr>
+      <!--{/head}-->
+      <tr><td colspan="3">&nbsp;</td></tr>
+      </table>
+   <!--{/attach}-->
+
+   <!--{preview}-->
+      <p>Previewable <a href="<!--{url}-->" target="_blank">attachment</a>
+      [<!--{url}-->, <!--{type}-->, <!--{size}--> bytes]</p>
+      <table>
+      <!--{head}-->
+      <tr><td valign="top"><!--{name}--></td>
+          <td>&nbsp;</td>
+          <td valign="top"><!--{body}--></td></tr>
+      <!--{/head}-->
+      <tr><td colspan="3">&nbsp;</td></tr>
+      </table>
+   <!--{/preview}-->
+
+   <!--{multipart}-->
+      <table>
+      <!--{head}-->
+      <tr><td valign="top"><!--{name}--></td>
+          <td>&nbsp;</td>
+          <td valign="top"><!--{body}--></td></tr>
+      <!--{/head}-->
+      <tr><td colspan="3">&nbsp;</td></tr>
+      </table>
+      <dl>
+      <!--{foreachPart}-->
+      <dt>Part <!--{part_number}-->
+      <dd><!--{part}-->
+      </dd>
+      <!--{/foreachPart}-->
+      </dl>
+   <!--{/multipart}-->
+
+   <!--{nested}-->
+      <table>
+      <!--{head}-->
+      <tr><td valign="top"><!--{name}--></td>
+          <td>&nbsp;</td>
+          <td valign="top"><!--{body}--></td></tr>
+      <!--{/head}-->
+      <tr><td colspan="3">&nbsp;</td></tr>
+      </table>
+      <dl>
+      <dt>Part <!--{part_number}-->, RFC822 encapsulated message</dt>
+      <dd><!--{part}--></dd>
+      </dl>
+   <!--{/nested}-->
+
+<!--{/message}-->
+
+</body>
+</html>

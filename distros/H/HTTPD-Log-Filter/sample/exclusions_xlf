@@ -1,0 +1,4 @@
+192.168.1.21 - - [25/May/2001:00:04:32 +0100] "HEAD /images/email_businessbulletin.gif HTTP/1.1" 304 - "-" "Mozilla/4.0 (compatible; MSIE 5.01; Windows NT 5.0)" "cookie_id=-" 208.160.253.7
+192.168.1.22 - - [25/May/2001:00:04:32 +0100] "HEAD /js/javascripts2.js HTTP/1.0" 304 - "-" "Mozilla/3.01 (compatible;)" "cookie_id=-" 131.3.128.2
+192.168.1.21 - - [25/May/2001:00:04:32 +0100] "HEAD /news/20010524/pics/rail1_sm.jpg HTTP/1.0" 200 0 "-" "Mozilla/4.77 [en]C-RR032399  (Win98; U)" "cookie_id=-" 208.59.247.9
+192.168.1.20 - - [25/May/2001:00:04:32 +0100] "HEAD /js/fader.js HTTP/1.1" 304 - "http://www.itn.co.uk/" "Mozilla/4.0 (compatible; MSIE 5.0; MSNIA; Windows 98; DigExt)" "cookie_id=Apache=63.15.192.169.2796990745464496" 63.15.192.169

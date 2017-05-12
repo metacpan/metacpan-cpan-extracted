@@ -1,0 +1,60 @@
+Failed  Succeeded  Test Name
+   0          1    *** no name ***
+   0          1    *** no name ***
+   0          1    *** no name ***
+   1          0    *** no name ***
+   1          0    *** no name ***
+   1          0    *** no name ***
+   0          1    *** no name ***
+
+
+Test Name: N/A
+URL: http://http.web.test/test-file1
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/test-file1
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/test-file2
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/yyy/zzz
+
+  STATUS CODE CHECK
+    Expected '200' and got: 404 Not Found                        FAIL
+
+
+Test Name: N/A
+URL: http://http.web.test/yyy/aaa
+
+  STATUS CODE CHECK
+    Expected '200' and got: 404 Not Found                        FAIL
+
+
+Test Name: N/A
+URL: http://http.web.test/ccc
+
+  STATUS CODE CHECK
+    Expected '200' and got: 404 Not Found                        FAIL
+
+
+Test Name: N/A
+URL: http://http.web.test/test-file1
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+
+
+Total web tests failed: 3  succeeded: 4

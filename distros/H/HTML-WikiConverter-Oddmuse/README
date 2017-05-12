@@ -1,0 +1,63 @@
+HTML::WikiConverter::Oddmuse
+============================
+
+HTML::WikiConverter::Oddmuse adds the Oddmuse dialect to
+HTML::WikiConverter allowing the conversion of HTML to Oddmuse markup.
+
+SYNOPSIS
+
+Converting HTML to wiki markup is easy:
+
+  use HTML::WikiConverter;
+  my $wc = new HTML::WikiConverter( dialect => 'Oddmuse' );
+  print $wc->html2wiki( $html );
+
+Or from the command line:
+
+  % html2wiki --dialect Oddmuse input.html > output.wiki
+
+There's also a web interface if you're so inclined:
+
+  http://diberri.dyndns.org/wikipedia/html2wiki/
+
+CHANGES IN 0.52
+
+  * Require HTML::WikiConverter 0.60
+  * Require Params::Validate
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc HTML::WikiConverter::Oddmuse
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/HTML-WikiConverter-Oddmuse
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-WikiConverter-Oddmuse
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/HTML-WikiConverter-Oddmuse
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/HTML-WikiConverter-Oddmuse
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 David J. Iberri
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

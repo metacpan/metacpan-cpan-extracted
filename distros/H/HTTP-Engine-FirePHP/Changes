@@ -1,0 +1,9 @@
+Revision history for Perl extension HTTP-Engine-FirePHP
+
+0.02 Sun Jun  7 10:11:26 CEST 2009 (Marcel Gruenauer <marcel@cpan.org>)
+     - explained the motivation behind the dist
+     - added HTTP::Engine::Middleware::FirePHP
+     - added HTTP::Engine::Response::get_fire_php_fh
+
+0.01 Sat Jun  6 22:25:01 CEST 2009 (Marcel Gruenauer <marcel@cpan.org>)
+     - original version

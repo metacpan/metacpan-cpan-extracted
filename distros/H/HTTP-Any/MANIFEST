@@ -1,0 +1,11 @@
+Makefile.PL
+MANIFEST
+README
+Changes
+HTTP/Any.pm
+HTTP/Any/Curl.pm
+HTTP/Any/AnyEvent.pm
+HTTP/Any/LWP.pm
+test.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

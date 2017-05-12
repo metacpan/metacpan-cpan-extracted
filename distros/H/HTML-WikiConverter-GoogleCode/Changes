@@ -1,0 +1,12 @@
+Revision history for HTML-WikiConverter-GoogleCode
+
+0.10    Mon May 12 2008
+  * Initial release
+
+0.11    Tue May 13 2008
+	* Removed failing test (regression.t)
+	* Fixed summary wiki element (removed extra whitespace)
+	* Added labels wiki element
+
+0.12		Tue May 13 2008
+	* Added LICENSE file

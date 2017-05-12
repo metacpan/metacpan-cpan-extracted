@@ -1,0 +1,89 @@
+---
+name: HTML-GUI
+version: 0.04
+author:
+  - 'Jean-Christian Hassler <jhassler@free.fr>'
+abstract: Create and control GUI for web application
+license: perl
+resources:
+  license: ~
+build_requires:
+  Data::Compare: 0
+  HTML::Template: 0
+  JSON: 0
+  Locale::TextDomain: 0
+  Log::Log4perl: 0
+  POSIX: 0
+  Test::More: 0
+  YAML::Syck: 0
+provides:
+  HTML::GUI::actionbar:
+    file: lib/HTML/GUI/actionbar.pm
+    version: 0.01
+  HTML::GUI::br:
+    file: lib/HTML/GUI/br.pm
+    version: 0.01
+  HTML::GUI::button:
+    file: lib/HTML/GUI/button.pm
+    version: 0.01
+  HTML::GUI::checkbox:
+    file: lib/HTML/GUI/checkbox.pm
+    version: 0.01
+  HTML::GUI::constraint:
+    file: lib/HTML/GUI/constraint.pm
+    version: 0.01
+  HTML::GUI::container:
+    file: lib/HTML/GUI/container.pm
+    version: 0.01
+  HTML::GUI::fieldset:
+    file: lib/HTML/GUI/fieldset.pm
+    version: 0.01
+  HTML::GUI::header:
+    file: lib/HTML/GUI/header.pm
+    version: 0.01
+  HTML::GUI::hidden:
+    file: lib/HTML/GUI/hidden.pm
+    version: 0.01
+  HTML::GUI::input:
+    file: lib/HTML/GUI/input.pm
+    version: 0.01
+  HTML::GUI::log::debug:
+    file: lib/HTML/GUI/log/debug.pm
+    version: 0.01
+  HTML::GUI::log::error:
+    file: lib/HTML/GUI/log/error.pm
+    version: 0.01
+  HTML::GUI::log::event:
+    file: lib/HTML/GUI/log/event.pm
+    version: 0.01
+  HTML::GUI::log::eventList:
+    file: lib/HTML/GUI/log/eventList.pm
+    version: 0.01
+  HTML::GUI::log::info:
+    file: lib/HTML/GUI/log/info.pm
+    version: 0.01
+  HTML::GUI::password:
+    file: lib/HTML/GUI/password.pm
+    version: 0.01
+  HTML::GUI::screen:
+    file: lib/HTML/GUI/screen.pm
+    version: 0.01
+  HTML::GUI::select:
+    file: lib/HTML/GUI/select.pm
+    version: 0.01
+  HTML::GUI::table::basic:
+    file: lib/HTML/GUI/table/basic.pm
+    version: 0.01
+  HTML::GUI::tag:
+    file: lib/HTML/GUI/tag.pm
+    version: 0.01
+  HTML::GUI::text:
+    file: lib/HTML/GUI/text.pm
+    version: 0.01
+  HTML::GUI::widget:
+    file: lib/HTML/GUI/widget.pm
+    version: 0.04
+generated_by: Module::Build version 0.32
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

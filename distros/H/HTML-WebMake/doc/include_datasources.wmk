@@ -1,0 +1,265 @@
+<template name="datasource_attrs.inc" format=text/et>
+
+Attributes Supported By Datasource Tags
+=======================================
+
+	__src__:	All datasources require this attribute, which
+	specifies a protocol and path, in a URL-style syntax:
+	**protocol**:**path** . file: [1] is the default protocol, if none is
+	specified.
+
+	__name__:	This attribute is used to specify the pattern of data,
+	under this path, which will be converted into content or media items.
+	The part of the data's location which matches this name pattern will
+	become the name of the item. Typically, "WebMake glob patterns"
+	[globs], such as ''*.txt'' or ''.../*.html'' are used.
+
+	__skip__:	A pattern which should match filenames that should be
+	skipped.  Files that match this pattern will not be included as content
+	or media items, or as metatables. "Glob patterns" [globs], again, are
+	used here.
+
+	__prefix__:	The items' names can be further modified by specifying
+	a __prefix__ and/or __suffix__; these strings are prepended or
+	appended to the raw name to make the name the content is given.
+
+	__suffix__:	See above.
+
+	__namesubst__:	a Perl-formatted s// substitution, which is used to
+	convert source filenames to content names.  See the example under
+	**The File: Protocol**, below.
+
+	__nametr__:	a Perl tr// translation, which is used to convert
+	source filenames to content names.
+
+	__listname__:	a name of a content item.  This content item will be
+	created, and will contain the names of all content items picked up by
+	the "&lt;contents&gt;" [contents] or "&lt;media&gt;" [media] search.
+
+	__metatable__:	a search pattern, similar to __name__ above, which
+	provides filenames from which metadata will be loaded.
+
+In addition, the attributes supported by the "content tag" [content] can
+be specified as attributes to "&lt;contents&gt;" [contents], including
+__format__, __up__, __map__, etc.
+
+Also, the attributes supported by the "&lt;metatable&gt;" [metatable] tag
+can be used if you've specified a __metatable__ attribute.
+
+	Auto: [metatable]: $(metatable)
+
+The content blocks picked up from a "&lt;contents&gt;" [contents] search can
+also contain meta-data, such as headlines, visibilty dates, workflow approval
+statuses, etc. by including metadata [meta].
+
+	[contents]: $(contents)
+	[meta]: $(wmmeta)
+
+</template>
+<template name="datasource_file_protocol.inc" format=text/et>
+
+<a name=file>
+
+The file: Protocol
+==================
+
+</a>
+
+The file: protocol loads content from a directory; each file is made into one
+content chunk.  The __src__ attribute indicates the source directory, the
+__name__ attribute indicates the "glob pattern" [globs] that will pick up the
+content items in question.
+
+        &lt;contents src="stories" name="*.txt" /&gt;
+
+The filename of the file will be used as the content chunk's name -- unless
+you use the __namesubst__ command; see below for details on this.
+
+Note that, for efficiency, the files in question are not actually opened until
+their content chunks are referenced using &wmdollar;{name} or
+get_content(''name'').
+
+Searching Recursively Through A Directory Tree
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Normally only the top level of files inside the __src__ directory are added to
+the content set. However, if the __name__ pattern starts with **.../**, the
+directory will be searched recursively:
+
+        &lt;contents src="stories" name="<strong>.../</strong>*.txt" /&gt;
+
+The resulting content items will contain the full path from that directory
+down, i.e. the file **stories/dir1/foo/bar.txt** exists, the example above
+would define a content item called **&wmdollar;{dir1/foo/bar.txt}**.
+
+The namesubst Option
+~~~~~~~~~~~~~~~~~~~~
+
+If you use the __namesubst__ command, the filename will be modified using that
+substitution, to give the content item's name.  So, for example, this contents
+tag:
+
+        &lt;contents src="stories" name="*.txt" namesubst="s/.txt//" /&gt;
+
+will load these example files as follows:
+
+<blockquote>
+<table>
+<tr>
+<th> __Filename__ </th><th> __Content Name__ </th>
+</tr>
+<tr>
+<td> stories/index.txt </td><td> &wmdollar;{index} </td>
+</tr>
+<tr>
+<td> stories/foo.txt </td><td> &wmdollar;{foo} </td>
+</tr>
+<tr>
+<td> stories/directory/bar.txt </td><td> &wmdollar;{directory/bar} </td>
+</tr>
+<tr>
+<td> stories/zz/gum/baz.txt </td><td> &wmdollar;{zz/gum/baz} </td>
+</tr>
+</table>
+</blockquote>
+
+Loading Metadata Using the Metatable Attribute
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can now load metadata from external files while searching a directory tree
+for content items or media files.  This allows you to load image titles, etc.
+from files which match the filename pattern you specify in the __metatable__
+attribute.
+
+The attributes supported by the "&lt;metatable&gt;" [metatable] tag can be
+used in the datasource tag's attribute set, if you've specified a
+__metatable__ attribute, allowing you to define the format of the
+metatable files you expect to find.
+
+There's one major difference between normal metatables and metatables
+found via a data source; the names in this kind of metatable refer to
+the content or media object's __filename__, not its __content name__.
+
+In other words, the names of any content items referred to in the metatable
+files will be modified, as follows:
+
+    - if the __name__ attribute contains ##.../##, then the content items
+      could be deep in a subdirectory.  The metatable file does not have
+      to contain the full path to the content item's name; it can just
+      contain the item's filename __relative to the metatable itself__.
+
+    - if a __namesubst__ or __nametr__ function is specified, the content
+      names in the metatable will be processed with this.  Again, this
+      means that the metatable data just has to provide the __filename__,
+      not whatever the resulting content item will be called.
+
+These features will hopefully make the operation a little more intuitive, as
+users who add files to a media or contents directory will not have to figure
+out what the resulting content item will be called; they can just refer to
+them by their filename, when tagging them with metadata.
+
+	[globs]: $(globs)
+	[media]: $(media)
+
+</template>
+<template name="datasource_svfile_protocol.inc" format=text/et>
+
+<a name=svfile>
+
+The svfile: Protocol
+====================
+
+</a>
+
+The svfile: protocol loads content from a delimiter-separated-file; the
+__src__ attribute is the name of the file, the __name__ is the "glob
+pattern" [globs] used to catch the relevant content items.  The __namefield__
+attribute specifies the field number (counting from 1) which the __name__
+pattern is matched against, and the __valuefield__ specifies the number of
+the field from which the content chunk is read.  The __delimiter__
+attribute specifies the delimiter used to separate values in the file.
+
+        &lt;contents src="svfile:stories.csv" name="*"
+                namefield=1 valuefield=2 delimiter="," /&gt;
+
+	[globs]: $(globs)
+	[media]: $(media)
+
+</template>
+<template name="datasource_adding_new_protocols.inc" format=text/et>
+
+Adding New Protocols
+====================
+
+New data sources for &lt;contents&gt; and &lt;media&gt; tags are added by
+writing an implementation of the __DataSourceBase.pm__ module, in the
+__HTML::WebMake::DataSources__ package space (the
+__lib/HTML/WebMake/DataSources__ directory of the distribution).
+
+Every data source needs a __protocol__, an alphanumeric lowercase identifier
+to use at the start of the __src__ attribute to indicate that a data source is
+of that type.
+
+Each implementation of this module should implement these methods:
+
+	##new ($parent)##:	instantiate the object, as usual.
+
+	##add ()##:	add all the items in that data source as content
+	chunks.  (See below!)
+
+	##get_location_url ($location)##:	get the location (in URL
+	format) of a content chunk loaded by ##add()##.
+
+	##get_location_contents ($location)##:	get the contents of the
+	location. The location, again, is the string provided by ##add()##.
+
+	##get_location_mod_time ($location)##:	get the current modification
+	date of a location for dependency checking.  The location, again, is
+	in the format of the string provided by ##add()##.
+
+Notes:
+
+	- If you want ##add()## to read the content immediately, call
+	  ##$self->{parent}->add_text ($name, $text, $self->{src},
+	  $modtime)##.
+
+	- ##add()## can defer opening and reading content chunks straight away.
+	  If it calls ##$self->{parent}->add_location ($name, $location,
+	  $lastmod)##, providing a location string which starts with the data
+	  source's protocol identifier, the content will not be loaded until
+	  it is needed, at which point ##get_location_contents()## is called.
+
+	- This location string should contain all the information needed to
+	  access that content chunk later, even if ##add()## was not been
+	  called.  Consider it as similar to a URL.  This is required so that
+	  ##get_location_mod_time()## (see below) can work.
+
+	- All implementations of ##add()## should call ##$fixed =
+	  $self->{parent}->fixname ($name);## to modify the name of each
+	  content chunk appropriately, followed by
+	  ##$self->{parent}->add_file_to_list ($fixed);## to add the content
+	  chunk's name to the __filelist__ content item.
+
+	- Data sources that support the &lt;media&gt; tag need to implement
+	  ##get_location_url##, otherwise an error message will be output.
+
+	- Data sources that support the &lt;contents&gt; tag, and defer
+	  reading the content until it's required, need to implement
+	  ##get_location_contents##, which is used to provide content from a
+	  location set using ##$self->{parent}->add_location()##.
+
+	- Data sources that support the &lt;contents&gt; tag need to implement
+	  ##get_location_mod_time##. This is used to support dependency
+	  checking, and should return the modification time (in UNIX
+	  ##time_t## format) of that location.  Note that since this is used
+	  to compare the modification time of a content chunk from the
+	  previous time webmake was run, and the current modification time,
+	  this is called before the **real** data source is opened.
+
+
+	[globs]: $(globs)
+	[templates]: $(templates)
+	[contents]: $(contents)
+	[media]: $(media)
+
+</template>

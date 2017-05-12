@@ -1,0 +1,299 @@
+<!DOCTYPE HTML PUBLIC "-//W3O/DTD HTML//EN">
+
+<html>
+<head>
+<title>Example for creating a wizard with Embperl</title>
+</head>
+<body background="../images/jazzbkgd.gif">
+<p>[- $escmode = 7 -][- $b = defined($fdat{back})-][- $c =
+defined($fdat{cont})-][-$kn = $fdat{Kundennummer} eq 'Ja'-][-$p =
+$fdat{page}<br>
+-][$if $p==0 or ($p==2 and $b) or ($p==4 and $b and !$kn)$]</p>
+<h1 align="center">Eintragen eines neuen Objekts</h1>
+<div align="center"><center>
+<table border="2" cellpadding="3" cellspacing="6" width="500">
+    <tr>
+        <td width="100%">Um eine neues Objekt welches Sie
+        anbieten, mieten oder kaufen m&ouml;chten einzutragen
+        ben&ouml;tigen wir zuerst Ihre pers&ouml;nlichen Daten. 
+        <p>Haben Sie bereits eine Kundennummer bei uns? </p>
+        <form action="neu.htm" method="GET">
+            <input type="hidden" name="page" value="1">
+            <blockquote>
+                <p align="left"><input type="radio"
+                name="Kundennummer" value="Ja">Ja, ich habe
+                bereits eine Kundennummer<br>
+                <input type="radio" checked name="Kundennummer"
+                value="Nein">Nein, ich habe keine Kundennummer</p>
+            </blockquote>
+            <p align="center"><input type="submit" name="back"
+            value="&lt;&lt; Zur&uuml;ck"> <input type="submit"
+            name="cont" value="Weiter &gt;&gt;"> <input
+            type="submit" name="cancel" value="Abbrechen">[$hidden$]</p>
+        </form>
+        </td>
+    </tr>
+</table>
+</center></div>
+<p>&#160;</p>
+<p>&#160;[$elsif $kn and (($p==1 and $c) or ($p==3 and $b))$] </p>
+<div align="center"><center>
+<table border="2" cellpadding="3" cellspacing="6" width="500">
+    <tr>
+        <td width="100%">Geben Sie bitte Ihre Kundennummer ein,
+        wenn Sie diese nicht zur Hand haben k&ouml;nnen Sie auch
+        nach Ihrere Kundennummer suchen, indem Sie die Felder
+        Name und/oder Firma ausf&uuml;llen. 
+        <form action="neu.htm" method="POST">
+            <input type="hidden" name="page" value="2">
+            <blockquote>
+                <p align="left">&#160;</p>
+            </blockquote>
+            <table width="100%">
+                <tr>
+                    <td width="50%">
+                    <p align="right">Kundennummer: </p>
+                    </td>
+                    <td width="50%"><input type="text" size="20"
+                    maxlength="20" name="kdnr"></td>
+                </tr>
+                <tr>
+                    <td width="50%">
+                    <p align="right">Name: </p>
+                    </td>
+                    <td width="50%"><input type="text" size="20"
+                    maxlength="20" name="Name"></td>
+                </tr>
+                <tr>
+                    <td width="50%">
+                    <p align="right">Firma: </p>
+                    </td>
+                    <td width="50%"><input type="text" size="20"
+                    maxlength="20" name="Firma"></td>
+                </tr>
+            </table>
+            <p align="center"><input type="submit" name="back"
+            value="&lt;&lt; Zur&uuml;ck"> <input type="submit"
+            name="cont" value="Weiter &gt;&gt;"> <input
+            type="submit" name="cancel" value="Abbrechen">[$hidden$]</p>
+        </form>
+        </td>
+    </tr>
+</table>
+</center></div>
+<p>&#160;</p>
+<p>&#160;</p>
+<p>&#160;[$elsif $kn and (($p==2 and $c) or ($p==5 and $b))$]</p>
+<p>&#160;</p>
+<div align="center"><center>
+<table border="2" cellpadding="3" cellspacing="6" width="500">
+    <tr>
+        <td width="100%">Es wurden mehere Personen gefunden die
+        auf Ihrer Angaben zutreffen. Bitte w&auml;hlen Sie die
+        richtige aus. 
+        <form action="neu.htm" method="POST">
+            <input type="hidden" name="page" value="3">
+            <blockquote>
+                <div align="center"><center>
+                [- $AdrData[0]{Kdnr} = 123; $AdrData[0]{Name} = 'Mr. X'; $AdrData[0]{Ort} = 'Somewhere'; 
+                   $AdrData[1]{Kdnr} = 234; $AdrData[1]{Name} = 'Mr. Y'; $AdrData[1]{Ort} = 'Anywhere'; 
+                   $AdrData[2]{Kdnr} = 345; $AdrData[2]{Name} = 'Note: Database query is missing'; $AdrData[2]{Ort} = ''; 
+                   $AdrData[3]{Kdnr} = 456; $AdrData[3]{Name} = 'This are only '; $AdrData[3]{Ort} = 'dummys'; -]
+				<table width="90%">
+                    <tr>
+                        <td width="100%"><input type="radio"
+                        name="kdnr"
+                        value="[+$AdrData[$row]{Kdnr}+]">
+						[+$AdrData[$row]{Name}+]
+                        [+$AdrData[$row]{Ort} +]</td>
+                    </tr>
+                </table>
+                </center></div>
+            </blockquote>
+            <p align="center"><input type="submit" name="back"
+            value="&lt;&lt; Zur&uuml;ck"> <input type="submit"
+            name="cont" value="Weiter &gt;&gt;"> <input
+            type="submit" name="cancel" value="Abbrechen">[$hidden$]</p>
+        </form>
+        </td>
+    </tr>
+</table>
+</center></div>
+<p>&#160;</p>
+<p>&#160;</p>
+<p>&#160;[$elsif !$kn and<br>
+(($p==1 and $c) or<br>
+($p==5 and $b))$]</p>
+<div align="center"><center>
+<table border="2" cellpadding="3" cellspacing="6" width="500">
+    <tr>
+        <td width="100%">Geben Sie bitte hier pers&ouml;nnlichen
+        Daten ein. 
+        <form action="neu.htm" method="POST">
+            <input type="hidden" name="page" value="4"><div
+            align="center"><center>
+            <table width="100%">
+                <tr>
+                    <td align="right" width="15%">Firma: </td>
+                    <td colspan="3" width="35%"><input
+                    type="text" size="70" maxlength="70"
+                    name="Firma"></td>
+                    <td align="right" width="15%">
+                    <p align="right">&#160;</p>
+                    </td>
+                    <td width="35%"></td>
+                </tr>
+                <tr>
+                    <td align="right" width="15%">Anrede: </td>
+                    <td width="35%"><input type="text" size="30"
+                    maxlength="40" name="Anrede"></td>
+                    <td align="right" width="15%">
+                    <p align="right">&#160;</p>
+                    </td>
+                    <td width="35%"></td>
+                </tr>
+                <tr>
+                    <td align="right" width="15%">Name: </td>
+                    <td width="35%"><input type="text" size="30"
+                    maxlength="40" name="Name"></td>
+                    <td align="right" width="15%">
+                    <p align="right">Vorname: </p>
+                    </td>
+                    <td width="35%"><input type="text" size="30"
+                    maxlength="40" name="Vorname"></td>
+                </tr>
+                <tr>
+                    <td align="right" width="15%">Stra&szlig;e: </td>
+                    <td width="35%"><input type="text" size="30"
+                    maxlength="40" name="Strasse"></td>
+                    <td align="right" width="15%">
+                    <p align="right">Postfach: </p>
+                    </td>
+                    <td width="35%"><input type="text" size="30"
+                    maxlength="40" name="Postfach"></td>
+                </tr>
+                <tr>
+                    <td align="right" width="15%">Plz: </td>
+                    <td width="35%"><input type="text" size="30"
+                    maxlength="40" name="Plz"></td>
+                    <td align="right" width="15%">
+                    <p align="right">Ort: </p>
+                    </td>
+                    <td width="35%"><input type="text" size="30"
+                    maxlength="40" name="Ort"></td>
+                </tr>
+                <tr>
+                    <td align="right" width="15%">Telefon: </td>
+                    <td width="35%"><input type="text" size="30"
+                    maxlength="40" name="Telefon"></td>
+                    <td align="right" width="15%">
+                    <p align="right">Telefax: </p>
+                    </td>
+                    <td width="35%"><input type="text" size="30"
+                    maxlength="40" name="Telefax"></td>
+                </tr>
+                <tr>
+                    <td align="right" width="15%">E-Mail: </td>
+                    <td width="35%"><input type="text" size="30"
+                    maxlength="40" name="EMail"></td>
+                    <td align="right" width="15%">
+                    <p align="right">WWW Adresse:</p>
+                    </td>
+                    <td width="35%"><input type="text" size="30"
+                    maxlength="40" name="WWW"></td>
+                </tr>
+            </table>
+            </center></div>
+            <p align="center"><input type="submit" name="back"
+            value="&lt;&lt; Zur&uuml;ck"> <input type="submit"
+            name="cont" value="Weiter &gt;&gt;"> <input
+            type="submit" name="cancel" value="Abbrechen">[$hidden$]</p>
+        </form>
+        </td>
+    </tr>
+</table>
+</center></div>
+<p>&#160;</p>
+<p>[$elsif ($p==4 &amp;&amp; $c) || ($p==3 &amp;&amp; $c)$]</p>
+<div align="center"><center>
+<table border="2" cellpadding="3" cellspacing="6" width="500">
+    <tr>
+        <td width="100%">Wenn Sie jetzt auf <strong>Abspeichern</strong>
+        klicken, werden folgende Daten von Ihnen gespeichert:<br>
+        <div align="center"><center> 
+        <table width="100%">
+            <tr>
+                <td align="right" width="15%"><strong>Firma:</strong> </td>
+                <td colspan="3" width="35%">[+$fdat{Firma}+]</td>
+                <td align="right" width="15%">
+                <p align="right">&#160;</p>
+                </td>
+                <td width="35%"></td>
+            </tr>
+            <tr>
+                <td align="right" width="15%"><strong>Anrede:</strong> </td>
+                <td width="35%">[+$fdat{Anrede}+]</td>
+                <td align="right" width="15%">
+                <p align="right">&#160;</p>
+                </td>
+                <td width="35%"></td>
+            </tr>
+            <tr>
+                <td align="right" width="15%"><strong>Name:</strong> </td>
+                <td width="35%">[+$fdat{Name}+]</td>
+                <td align="right" width="15%">
+                <p align="right"><strong>Vorname:</strong> </p>
+                </td>
+                <td width="35%">[+$fdat{Vorname}+]</td>
+            </tr>
+            <tr>
+                <td align="right" width="15%"><strong>Stra&szlig;e:</strong> </td>
+                <td width="35%">[+$fdat{Strasse}+]</td>
+                <td align="right" width="15%">
+                <p align="right"><strong>Postfach:</strong> </p>
+                </td>
+                <td width="35%">[+$fdat{Postfach}+]</td>
+            </tr>
+            <tr>
+                <td align="right" width="15%"><strong>Plz:</strong> </td>
+                <td width="35%">[+$fdat{Plz}+]</td>
+                <td align="right" width="15%">
+                <p align="right"><strong>Ort:</strong> </p>
+                </td>
+                <td width="35%">[+$fdat{Ort}+]</td>
+            </tr>
+            <tr>
+                <td align="right" width="15%"><strong>Telefon:</strong> </td>
+                <td width="35%">[+$fdat{Telefon}+]</td>
+                <td align="right" width="15%">
+                <p align="right"><strong>Telefax:</strong> </p>
+                </td>
+                <td width="35%">[+$fdat{Telefax}+]</td>
+            </tr>
+            <tr>
+                <td align="right" width="15%"><strong>E-Mail:</strong> </td>
+                <td width="35%">[+$fdat{EMail}+]</td>
+                <td align="right" width="15%">
+                <p align="right"><strong>WWW Adresse:</strong></p>
+                </td>
+                <td width="35%">[+$fdat{WWW}+]</td>
+            </tr>
+        </table>
+        </center></div> 
+        <form action="neu.htm" method="POST">
+            <input type="hidden" name="page" value="5">
+            <p align="center"><input type="submit" name="back"
+            value="&lt;&lt; Zur&uuml;ck"> <input type="submit"
+            name="cont" value="Abspeichern"> <input type="submit"
+            name="cancel" value="Abbrechen">[$hidden$]</p>
+        </form>
+        </td>
+    </tr>
+</table>
+</center></div>
+<p>&#160;</p>
+<p>[$endif$]&#160;</p>
+<p>&#160;</p>
+<p>&#160;</p>
+</body>
+</html>

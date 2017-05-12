@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+<title>Untitled Document</title>
+<style type="text/css">
+<!--
+
+* {
+line-height:20px;
+}
+
+div#id-one {
+color:#990033;
+font-size:18px;
+width:800px;	
+}
+
+div#id-one h1[title]{
+font-size:60px;	
+}
+
+div#id-one h1[class=example]{
+font-size:100px;	
+}
+
+h1.another {
+font-style:italic;
+}
+
+h1.one {
+color:#FF3399;
+}
+
+p.class-one {
+color:#0000CC;
+font-size:11px;
+width:600px;	
+}
+
+div#id-one p.class-one {
+color:#FF33CC;
+font-size:11px;
+background-color:#FFFFCC;
+width:400px;	
+}
+
+div#id-one p.class-one, p.class-one span, p.class-two {
+font-style:italic;	
+}
+
+div#id-one p.class-two * {
+color:#00CC66;
+}
+
+p.class-two em {
+font-size:24px;
+}
+
+div#id-one p.class-one > span {
+font-weight:bold;
+padding-left:100px;
+}
+
+
+div em {
+text-decoration:underline;
+}
+
+
+div>em {
+text-decoration:line-through;
+}
+
+div#id-one div p>em {
+text-decoration:overline;
+}
+
+div#id-one div p>em span[class|=sub] {
+color:#FFFF00;
+}
+
+div#id-one div p>em span[class=sub-class2] + span[class=under_class2] {
+color:#33FF66;
+}
+
+div#id-one div.class-three p>em span[class|=sub-class2] + span[class=under_class2] {
+color:#FF6600;
+}
+
+div.class-three + div.class-four {
+margin-left:200px;
+}
+
+div#id-one * span + span.sub-class2 > strong {
+color:#30ff00;	
+}
+
+div#id-one div.class-three p>em span[class=under_class2] + span[class~=under_class3] {
+color:#0088dc;
+}
+
+div#id-one div[class=class-three] span[class=sub-class2] strong[class=class-four] {
+font-size:30px;    
+}
+
+h1[title][class=last-one][rel=last] {
+color:#b34b22;
+}
+
+a, a:link, a:visited { 
+  font-size:30px;
+  color:#f5a100; 
+  font-weight:bold; 
+  text-decoration:underline; 
+}
+
+-->
+</style></head>
+
+<body>
+ (body)
+ <div id="id-one">
+  (div id="id-one")
+  <h1>(h1)(/h1)</h1>
+  <h1 title="lorum">(h1 title="lorum")(/h1)</h1>
+  <h1 class="example">(h1 class="example")(/h1)</h1>
+  <h1 class="another one">(h1 class="another one")(/h1)</h1>
+  <h1 title="myheading" class="last-one" rel="last">(h1 title="myheading" class="last-one" rel="last")(/h1)</h1>
+  <h1 class="last-one">(h1 class="last-one)</h1>
+  <div>
+   (div)
+   <p>
+    (p)
+    <em>
+     (em)
+     <span class="sub-class">(span class="sub-class")(/span)</span>
+     <span class="sub-class2">(span class="sub-class2")(/span)</span>
+     <span class="under_class2">(span class="under_class2")(/span)</span>
+     <span class="sub-class2 under_class3">(span class="sub-class2 under_class3")(/span)</span>
+     (/em)
+    </em>
+    (/p)
+   </p>
+   (/div)
+  </div>
+
+  <div class="class-three">
+   (div class="class-three")
+   <p>
+    (p)
+    <em>
+     (em)
+     <span class="sub-class">(span class="sub-class")(/span)</span>
+     <span class="sub-class2">(span class="sub-class2")<strong>(strong)(/strong)</strong><strong class="class-four">(strong class="class-four")(/strong)</strong>(/span)</span>
+     <span class="under_class2">(span class="under_class2")(/span)</span>
+    (/em)
+    </em>
+    (/p)
+   </p>
+   (/div)
+  </div>
+
+  <div class="class-four">
+   (div class="class-four")
+   <p>(p)(/p)</p>
+   <em>(em)(/em)</em>
+   (/div)
+  </div>
+
+  <p class="class-two">
+   (p class="class-two")(/p)
+  </p>
+
+  <p class="class-one">
+   (p class="class-one")
+   <span>(span)(/span)</span> text <span>(span)(/span)</span>
+   (/p)
+  </p>
+
+  <div class="class-four">
+   (div class="class-four")
+   <p>(p)(/p)</p>
+   <em>(em)(/em)</em>
+   (/div)
+  </div>
+
+  <p class="class-two">
+   (p class="class-two")(/p)
+  </p>
+  (/div)
+ </div>
+
+ <p class="class-one">
+  (p class="class-one")<span>(span)(/span)</span> text <span>(span)(/span)</span>(/p)
+ </p>
+
+ <p class="class-two">
+  (p class="class-two")
+  <em>(em)(/em)</em> text <span>(span)(/span)</span><a href="#">(a href="#")(/a)</a>
+  (/p)
+ </p>
+(/body)
+</body>
+</html>
+

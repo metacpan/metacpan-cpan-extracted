@@ -1,0 +1,32 @@
+Revision history for Perl extension Hoppy
+
+0.01005   2009/08/21
+        - fix a encoding bug (Hoppy::Formatter::JSON)
+
+0.01004   2009/08/21
+        - fix a bug again (Hoppy::Formatter::JSON)
+
+0.01003   2009/08/20
+        - fix a bug (Hoppy::Formatter::JSON)
+
+0.01002   2009/08/17
+        - remove Encode from Hoppy::Formatter::JSON
+        - use EV before use POE
+        - fix many bugs
+
+0.01001   2009/07/05
+        - add Hook point(Base class)
+        - add auto login
+        - changed some inner APIs ( slightly)
+        - fix many bugs
+
+0.00003   2009/05/18
+        - fix a bug ( regist_service() method does wrong behavior )
+        - fix a POD
+        - add client command 'exit'
+
+0.00002   2009/05/08
+        - fix a typo in Makefile.PL
+
+0.00001   2009/04/25
+        - original version

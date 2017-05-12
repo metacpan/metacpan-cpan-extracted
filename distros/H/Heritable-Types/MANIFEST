@@ -1,0 +1,9 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+Todo
+lib/Heritable/Types.pm
+t/001_load.t
+t/002_inherit.t

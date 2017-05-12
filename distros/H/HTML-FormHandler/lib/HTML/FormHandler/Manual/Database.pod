@@ -1,0 +1,154 @@
+package HTML::FormHandler::Manual::Database;
+# ABSTRACT: FormHandler use recipes
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+HTML::FormHandler::Manual::Database - FormHandler use recipes
+
+=head1 VERSION
+
+version 0.40067
+
+=head1 SYNOPSIS
+
+L<Manual Index|HTML::FormHandler::Manual>
+
+Information on interfacing FormHandler forms and fields with a database.
+Also see L<HTML::FormHandler::TraitFor::Model::DBIC>.
+
+=head1 Form Models
+
+For a database form, use a model base class that interfaces with the
+database, such as L<HTML::FormHandler::Model::DBIC>, which needs to
+be installed as a separate package. There's also a sample 'object' model
+in L<HTML::FormHandler::Model::Object>, which will update a simple object.
+
+When using a database model, form field values for the row are retrieved from
+the database using the field 'accessor' attributes (defaults to field name)
+as database class accessors.
+
+FormHandler will use relationships to populate single and multiple
+selection lists, and validate input. A 'single' relationship is processed
+by L<HTML::FormHandler::Field::Compound>. A 'has_many' relationship is
+processed by L<HTML::FormHandler::Field::Repeatable>.
+
+Do not use database row method names, such as 'delete', as field names in
+a database form.
+
+You can pass in either the primary key or a row object to the form. If a
+primary key (item_id) is passed in, you must also provide the schema.
+The model will use the item_class (DBIC source name) to fetch the row from the
+database. If you pass in a row object (item), the schema, item_class, and
+item_id will be set from the row.
+
+Executing C<< $form->process( item => $row, params => $params ); >> will validate
+the parameters and then update or create the database row object.
+
+=head1 Fields that map to database relationships
+
+=head2 Select
+
+A select field will automatically retrieve a select list from the database,
+if the proper column names are provided. Single selects handle 'belongs_to'
+relationships, where the related table is used to construct a selection list
+from the database.
+
+See also L<HTML::FormHandler::Field::Select> and 'lookup_options' in
+L<HTML::FormHandler::TraitFor::Model::DBIC>.
+
+=head2 Multiple Select
+
+A multiple select is either a 'Select' with multiple => 1 set, or a field
+of the 'Multiple' type. The name of a Multiple select which pulls options
+from the database automatically should be the name of the 'many_to_many'
+relationship. The 'value' of the field is derived from the 'has_many'
+part of the relationship.
+
+The primary key is used for the 'id' of the select. The 'label' column of
+the select is assumed to be 'name'. If the label column has a different
+name, it must be specified with 'label_column'.
+
+Pertinent attributes:
+
+   label_column
+   active_column
+   sort_column
+
+See also L<HTML::FormHandler::Field::Select> and
+L<HTML::FormHandler::Model::DBIC>.
+
+=head2 Compound fields
+
+A compound field represents a single relationship to another table.
+Although most compound relations can be handled without providing a
+primary key, in some circumstances you may need to provide a
+PrimaryKey field, or add extra values in update_model.
+
+See also L<HTML::FormHandler::Field::Compound>.
+
+The default for compound fields is that if all subfields are empty,
+the value of the compound field is set to undef (null). For some types
+of relations, you may want to set the 'not_nullable' flag to force
+the field to contain all subfields anyway, such as when the related
+rows are not deleted when empty. See test t/compound/empty.t for a
+demonstration of the difference in output.
+
+=head2 Repeatable fields
+
+The 'Repeatable' field type allows you to update arrays of columns from related tables
+easily. You will need to provide a 'PrimaryKey' hidden field in the
+compound field contained in the Repeatable.
+
+  has_field 'addresses' => ( type => 'Repeatable' );
+  has_field 'addresses.address_id' => ( type => 'PrimaryKey' );
+  has_field 'addresses.street';
+  has_field 'addresses.city';
+  has_field 'addresses.state';
+
+There are some complications with creating Repeatable elements (with
+the PrimaryKey field set to undef) in a database and re-presenting the form.
+See L<HTML::FormHandler::Field::Repeatable> for more info.
+
+=head1 Flags
+
+=head2 writeonly
+
+Do not read the value from the 'item' when populating the form.
+
+=head2 noupdate
+
+Do not update the database with this field, i.e. do not include it in
+C<< $form->value >>.
+
+=head1 Form generator
+
+A DBIC form generator is installed with the L<HTML::FormHandler::Model::DBIC>
+package. See L<HTML::FormHandler::Generator::DBIC>.
+
+There's also a role, L<HTML::FormHandler::TraitFor::DBICFields>, that allows
+simple form fields to be auto-generated from a DBIC result class.
+
+    my $form = HTML::FormHandler::Model::DBIC->new_with_traits(
+        traits => ['HTML::FormHandler::TraitFor::DBICFields'],
+        includes => ['title', 'author' ],
+        field_list => [ 'submit' => { type => 'Submit', value => 'Save', order => 99 } ],
+        item => $book );
+
+=head1 AUTHOR
+
+FormHandler Contributors - see HTML::FormHandler
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Gerda Shank.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

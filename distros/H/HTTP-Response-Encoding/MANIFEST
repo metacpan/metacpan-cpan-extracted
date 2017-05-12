@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/HTTP/Response/Encoding.pm
+t/00-load.t
+t/01-file.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+t/t-euc-jp.html
+t/t-iso-2022-jp.html
+t/t-null.html
+t/t-shiftjis.html
+t/t-utf-8.html

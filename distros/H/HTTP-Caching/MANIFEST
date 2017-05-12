@@ -1,0 +1,16 @@
+Changes
+lib/HTTP/Caching.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+t/00_use_ok_and_methods.t
+t/01_modify_cache_control_headers.t
+t/02_store_respone.t
+t/03_retrieve_response.t
+t/04_naive_roundtrip.t
+t/05_may_store_in_cache.t
+t/06_may_reuse_from_cache.t
+t/07_revalidate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

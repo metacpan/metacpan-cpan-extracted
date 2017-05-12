@@ -1,0 +1,621 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>HTTP::ProxyCheck - a class to check the functionality of HTTP proxy servers.</title>
+<link rel="stylesheet" href="style.css" type="text/css" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#constructor">CONSTRUCTOR</a></li>
+	<ul>
+
+		<li><a href="#new___attribute_____value________">new( [attribute =&gt; $value, ...] )</a></li>
+	</ul>
+
+	<li><a href="#methods">METHODS</a></li>
+	<ul>
+
+		<li><a href="#check___attribute_____value________">check( [attribute =&gt; $value, ...] )</a></li>
+		<li><a href="#get_answer___">get_answer( )</a></li>
+		<li><a href="#get_error___">get_error( )</a></li>
+		<li><a href="#get_proxy___">get_proxy( )</a></li>
+		<li><a href="#set_proxy___proxy__">set_proxy( $proxy )</a></li>
+		<li><a href="#get_check_proxy___">get_check_proxy( )</a></li>
+		<li><a href="#set_check_proxy___check__">set_check_proxy( $check )</a></li>
+		<li><a href="#get_url___">get_url( )</a></li>
+		<li><a href="#set_url___url__">set_url( $url )</a></li>
+		<li><a href="#get_check_url___">get_check_url( )</a></li>
+		<li><a href="#set_check_url___check__">set_check_url( $check )</a></li>
+		<li><a href="#get_answer_size___">get_answer_size( )</a></li>
+		<li><a href="#set_answer_size___answer_size__">set_answer_size( $answer_size )</a></li>
+	</ul>
+
+	<li><a href="#error_handling">ERROR HANDLING</a></li>
+	<li><a href="#support">SUPPORT</a></li>
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#version">VERSION</a></li>
+	<li><a href="#changes">CHANGES</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright">COPYRIGHT</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>HTTP::ProxyCheck - a class to check the functionality of HTTP proxy servers.</p>
+<p>
+<a href="#__index__"><small>[ back to top ]</small></a>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+    use HTTP::ProxyCheck;
+    
+    my $proxy       = 'proxy:8080';
+    my $url         = '<a href="http://search.cpan.org/">http://search.cpan.org/</a>';
+    my $proxy_check = new HTTP::ProxyCheck(
+        proxy       =&gt; $proxy,
+        url         =&gt; $url,
+        answer_size =&gt; 'header',
+        print_error =&gt; 0,
+    ) 
+    or die $HTTP::ProxyCheck::error;
+    
+    print &quot;Trying to connect to '$proxy' and retrieve '$url'\n&quot;;
+    
+    if ( $proxy_check-&gt;check() ) {
+        print &quot;'$proxy' returns:\n\n&quot;, $proxy_check-&gt;get_answer(), &quot;\n\n&quot;;
+    }
+    else {
+        print &quot;Error: &quot;, $proxy_check-&gt;get_error(), &quot;\n&quot;;
+    }</pre>
+<p>
+<a href="#__index__"><small>[ back to top ]</small></a>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>HTTP::ProxyCheck is a class to check HTTP proxy servers. It connects to given 
+HTTP proxy servers and tries to retrieve a provided URL through them.</p>
+<p>
+<a href="#__index__"><small>[ back to top ]</small></a>
+</p>
+<hr />
+<h1><a name="constructor">CONSTRUCTOR</a></h1>
+<p>
+</p>
+<h2><a name="new___attribute_____value________">new( [attribute =&gt; $value, ...] )</a></h2>
+<p><code>new()</code> is the HTTP::ProxyCheck object constructor.</p>
+<p>If an error happens while constructing the object, use 
+<code>$HTTP::ProxyCheck::error</code> to get the error message.</p>
+<p>All named attributes of <code>new()</code> are optional.</p>
+<p><strong>Attributes</strong></p>
+<ul>
+<li><strong><a name="item_proxy__3d_3e__24proxy">proxy =&gt; $proxy</a></strong><br />
+</li>
+Specifies the address of the proxy server to check. This can also be done with 
+<code>set_proxy()</code>.
+<p>The proxy server address has to match the patter 'host:port'. Host and port are
+tested whether they are valid. If you want to disable this test, you can set
+<code>check_proxy =&gt; 0</code>.</p>
+<p></p>
+<li><strong><a name="item_check_proxy__3d_3e_1_7c0">check_proxy =&gt; 1|0</a></strong><br />
+</li>
+Set <code>check_proxy =&gt; 0</code> to disable the check whether the proxy server 
+address is valid.
+<p>The default value of <code>check_proxy</code> is <code>1</code> which means, the proxy server 
+address gets tested.</p>
+<p>This attribute can also be set with <code>set_check_proxy()</code>.</p>
+<p></p>
+<li><strong><a name="item_url__3d_3e__24url">url =&gt; $url</a></strong><br />
+</li>
+Specifies the URL to use for the proxy server check. This can also be done 
+with <code>set_url()</code>.
+<p>The URL has to be of a valid form, e.g. 'http://search.cpan.org'. It gets 
+tested whether it is valid. If you want to disable this test, you can set
+<code>check_url =&gt; 0</code>.</p>
+<p></p>
+<li><strong><a name="item_check_url__3d_3e_1_7c0">check_url =&gt; 1|0</a></strong><br />
+</li>
+Set <code>check_url =&gt; 0</code> to disable the check whether the URL is valid.
+<p>The default value of <code>check_url</code> is <code>1</code> which means, the URL gets tested.</p>
+<p>This attribute can also be set with <code>set_check_url()</code>.</p>
+<p></p>
+<li><strong><a name="item_answer_size__3d_3e_short_7cheader_7cfull">answer_size =&gt; short|header|full</a></strong><br />
+</li>
+Defines the size of the proxy server answer.
+<p><code>short</code> means that only the HTTP status code, e.g.</p>
+<pre>
+    HTTP/1.0 200 OK</pre>
+<p>is returned.</p>
+<p>With <code>header</code> the full HTTP header gets returned, e.g.</p>
+<pre>
+    HTTP/1.0 200 OK
+    Date: Tue, 12 Aug 2003 12:19:46 GMT
+    Server: Apache/1.3.27 (Unix) mod_perl/1.27
+    Cache-Control: max-age=3600
+    Expires: Tue, 12 Aug 2003 13:19:46 GMT
+    Last-Modified: Tue, 12 Aug 2003 12:19:46 GMT
+    Content-Type: text/html
+    X-Cache: MISS from search.cpan.org
+    X-Cache: MISS from hactar.earth.net
+    X-Cache-Lookup: HIT from hactar.earth.net:8080
+    Proxy-Connection: close</pre>
+<p>Use <code>full</code> if you want the HTTP header including the whole data from the
+proxy server.</p>
+<p>The default value of <code>answer_size</code> is <code>header</code>.</p>
+<p>This attribute can also be set with <code>set_answer_size()</code>.</p>
+<p></p>
+<li><strong><a name="item_user_agent__3d_3e__24user_agent">user_agent =&gt; $user_agent</a></strong><br />
+</li>
+Specifies the name of the user agent sent to the proxy.
+<p>If you don't specify a user agent, ``HTTP::ProxyCheck/1.4'' is used.</p>
+<p></p>
+<li><strong><a name="item_verbose_errors__3d_3e_0_7c1">verbose_errors =&gt; 0|1</a></strong><br />
+</li>
+Set <code>verbose_errors =&gt; 1</code> to enable verbose error messages.
+<p>Verbose error messages look like this:</p>
+<pre>
+    $method failed: $error_message</pre>
+<p>And non-verbose error messages like this:</p>
+<pre>
+    $error_message</pre>
+<p>The default value of <code>verbose_errors</code> is <code>0</code>.</p>
+<p>For more information see <a href="#error_handling">ERROR HANDLING</a>.</p>
+<p></p>
+<li><strong><a name="item_print_error__3d_3e_1_7c0">print_error =&gt; 1|0</a></strong><br />
+</li>
+Set <code>print_error =&gt; 0</code> to disable that error messages are displayed with
+<code>Carp::carp()</code>.
+<p>The default value of <code>print_error</code> is <code>1</code>.</p>
+<p>For more information see <a href="#error_handling">ERROR HANDLING</a>.</p>
+<p></p>
+<li><strong><a name="item_raise_error__3d_3e_0_7c1">raise_error =&gt; 0|1</a></strong><br />
+</li>
+Set <code>raise_error =&gt; 1</code> to enable that error messages are displayed with 
+<code>Carp::croak()</code> and the program is brought to an end.
+<p>The default value of <code>raise_error</code> is <code>0</code>.</p>
+<p>For more information see <a href="#error_handling">ERROR HANDLING</a>.</p>
+<p></p></ul>
+<p><strong>Return values</strong></p>
+<ul>
+<li><strong><a name="item_okay">Okay</a></strong><br />
+</li>
+Blessed reference
+<p></p>
+<li><strong><a name="item_error">Error</a></strong><br />
+</li>
+<code>undef</code>
+<p>The error message can be retrieved with <code>$HTTP::ProxyCheck::error</code>.</p>
+<p></p></ul>
+<p>
+<a href="#__index__"><small>[ back to top ]</small></a>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<p>
+</p>
+<h2><a name="check___attribute_____value________">check( [attribute =&gt; $value, ...] )</a></h2>
+<p><code>check()</code> does the actual proxy server checking. It connects to a specified
+proxy server and tries to get a defined URL through it.</p>
+<p>All named attributes of <code>check()</code> are optional, but <code>proxy</code> and <code>url</code>
+must be either set as object or method attribute.</p>
+<p><strong>Attributes</strong></p>
+<ul>
+<li><strong>proxy =&gt; $proxy</strong><br />
+</li>
+Defines the proxy server to check.
+<p><a href="#item_proxy__3d_3e__24proxy"><code>proxy =&gt; $proxy</code></a> has higher precedence than the object attribute 
+<code>proxy</code>. It is only used by this method call. It doesn't get saved as object
+attribute or changes the object attribute. If you want to do this use 
+<code>set_proxy()</code>.</p>
+<p>For more information see <a href="#constructor">CONSTRUCTOR</a>.</p>
+<p></p>
+<li><strong>check_proxy =&gt; 1|0</strong><br />
+</li>
+Set <code>check_proxy =&gt; 0</code> to disable the check whether the proxy server 
+address is valid. If <code>check_proxy =&gt; 1</code> is set the proxy server 
+address gets tested.
+<p>This method attribute has higher precedence than the object attribute 
+<code>check_proxy</code>. It is only used by this method call. It doesn't get saved as 
+object attribute or changes the object attribute. If you want to do this use 
+<code>set_check_proxy()</code>.</p>
+<p></p>
+<li><strong>url =&gt; $url</strong><br />
+</li>
+Defines the URL to use with the proxy server check.
+<p><a href="#item_url__3d_3e__24url"><code>url =&gt; $url</code></a> has higher precedence than the object attribute 
+<code>url</code>. It is only used by this method call. It doesn't get saved as object 
+attribute or changes the object attribute. If you want to do this use 
+<code>set_url()</code>.</p>
+<p>For more information see <a href="#constructor">CONSTRUCTOR</a>.</p>
+<p></p>
+<li><strong>check_url =&gt; 1|0</strong><br />
+</li>
+Set <code>check_url =&gt; 0</code> to disable the check whether the URL is valid. If 
+<code>check_url =&gt; 1</code> is set the URL gets tested.
+<p>This method attribute has higher precedence than the object attribute 
+<code>check_url</code>. It is only used by this method call. It doesn't get saved as 
+object attribute or changes the object attribute. If you want to do this use 
+<code>set_check_url()</code>.</p>
+<p></p>
+<li><strong>answer_size =&gt; short|header|full</strong><br />
+</li>
+Defines the size of the proxy server answer.
+<p>This method attribute has higher precedence than the object attribute 
+<code>answer_size</code>. It is only used by this method call. It doesn't get saved as 
+object attribute or changes the object attribute. If you want to do this use 
+<code>set_answer_size()</code>.</p>
+<p>For more information see <a href="#constructor">CONSTRUCTOR</a>.</p>
+<p></p></ul>
+<p><strong>Return values</strong></p>
+<ul>
+<li><strong>Okay</strong><br />
+</li>
+<code>1</code>
+<p>The answer of the proxy server can be retrieved with <code>get_answer()</code> or
+<code>$HTTP::ProxyCheck::answer</code></p>
+<p></p>
+<li><strong>Error</strong><br />
+</li>
+<code>undef</code>
+<p>The error message can be retrieved with <code>get_error()</code> or 
+<code>$HTTP::ProxyCheck::error</code></p>
+<p></p></ul>
+<p>
+</p>
+<h2><a name="get_answer___">get_answer( )</a></h2>
+<p><code>get_answer()</code> gets the most recent proxy server answer.</p>
+<p>The proxy server answer is in the form specified by the <code>answer_size</code> 
+attribute of the HTTP::ProxyCheck object or the <code>check()</code> method.</p>
+<p>For more information see <a href="#constructor">CONSTRUCTOR</a>.</p>
+<p><strong>Return values</strong></p>
+<ul>
+<li><strong>Okay</strong><br />
+</li>
+<code>$proxy_check-&gt;{answer}</code>
+<p>This is the most recent proxy server answer.</p>
+<p></p>
+<li><strong>Error</strong><br />
+</li>
+<code>undef</code>
+<p>The error message can be retrieved with <code>get_error()</code> or 
+<code>$HTTP::ProxyCheck::error</code></p>
+<p></p></ul>
+<p>
+</p>
+<h2><a name="get_error___">get_error( )</a></h2>
+<p><code>get_error()</code> gets the most recent error message.</p>
+<p>For more information see <a href="#error_handling">ERROR HANDLING</a>.</p>
+<p><strong>Return values</strong></p>
+<ul>
+<li><strong>Okay</strong><br />
+</li>
+<code>$proxy_check-&gt;{error}</code>
+<p>This is the most recent error message.</p>
+<p></p></ul>
+<p>
+</p>
+<h2><a name="get_proxy___">get_proxy( )</a></h2>
+<p><code>get_proxy()</code> gets the current value of the object attribute <code>proxy</code>.</p>
+<p><strong>Return values</strong></p>
+<ul>
+<li><strong>Okay</strong><br />
+</li>
+<code>$proxy_check-&gt;{proxy}</code>
+<p>This is the current proxy server address.</p>
+<p></p>
+<li><strong>Error</strong><br />
+</li>
+<code>undef</code>
+<p>The error message can be retrieved with <code>get_error()</code> or 
+<code>$HTTP::ProxyCheck::error</code></p>
+<p></p></ul>
+<p>
+</p>
+<h2><a name="set_proxy___proxy__">set_proxy( $proxy )</a></h2>
+<p><code>set_proxy()</code> sets the value of the object attribute <code>proxy</code>.</p>
+<p><strong>Attributes</strong></p>
+<ul>
+<li><strong><a name="item__24proxy">$proxy</a></strong><br />
+</li>
+The proxy server address has to match the patter 'host:port'. Host and port are
+tested whether they are valid. If you want to disable this test, you can set
+the object attribute <code>check_proxy =&gt; 0</code> or use <code>set_check_proxy(0)</code>.
+<p></p></ul>
+<p><strong>Return values</strong></p>
+<ul>
+<li><strong>Okay</strong><br />
+</li>
+<code>1</code>
+<p></p>
+<li><strong>Error</strong><br />
+</li>
+<code>undef</code>
+<p>The error message can be retrieved with <code>get_error()</code> or 
+<code>$HTTP::ProxyCheck::error</code></p>
+<p></p></ul>
+<p>
+</p>
+<h2><a name="get_check_proxy___">get_check_proxy( )</a></h2>
+<p><code>get_check_proxy()</code> gets the current value of the object attribute <code>check_proxy</code>.</p>
+<p><strong>Return values</strong></p>
+<ul>
+<li><strong>Okay</strong><br />
+</li>
+<code>$proxy_check-&gt;{check_proxy}</code>
+<p>This is the current value of the <code>check_proxy</code> attribute.</p>
+<p></p></ul>
+<p>
+</p>
+<h2><a name="set_check_proxy___check__">set_check_proxy( $check )</a></h2>
+<p><code>set_check_proxy</code> sets the object attribute <code>check_proxy</code>.</p>
+<p><strong>Attributes</strong></p>
+<ul>
+<li><strong><a name="item__24check">$check</a></strong><br />
+</li>
+Use <code>0</code> to disable the check whether the proxy server address is valid and <code>1</code>
+to enable it.
+<p></p></ul>
+<p><strong>Return values</strong></p>
+<ul>
+<li><strong>Okay</strong><br />
+</li>
+<code>1</code>
+<p></p>
+<li><strong>Error</strong><br />
+</li>
+<code>undef</code>
+<p>The error message can be retrieved with <code>get_error()</code> or 
+<code>$HTTP::ProxyCheck::error</code></p>
+<p></p></ul>
+<p>
+</p>
+<h2><a name="get_url___">get_url( )</a></h2>
+<p><code>get_url()</code> gets the current value of the object attribute <code>url</code>.</p>
+<p><strong>Return values</strong></p>
+<ul>
+<li><strong>Okay</strong><br />
+</li>
+<code>$proxy_check-&gt;{url}</code>
+<p>This is the current URL.</p>
+<p></p>
+<li><strong>Error</strong><br />
+</li>
+<code>undef</code>
+<p>The error message can be retrieved with <code>get_error()</code> or 
+<code>$HTTP::ProxyCheck::error</code></p>
+<p></p></ul>
+<p>
+</p>
+<h2><a name="set_url___url__">set_url( $url )</a></h2>
+<p><code>set_url</code> sets the object attribute <code>url</code>.</p>
+<p><strong>Attributes</strong></p>
+<ul>
+<li><strong><a name="item__24url">$url</a></strong><br />
+</li>
+The URL has to be of a valid form, e.g. 'http://search.cpan.org'. It gets 
+tested whether it is valid. If you want to disable this test, you can set
+the object attribute <code>check_url =&gt; 0</code> or use <code>set_check_url(0)</code>.
+<p></p></ul>
+<p><strong>Return values</strong></p>
+<ul>
+<li><strong>Okay</strong><br />
+</li>
+<code>1</code>
+<p></p>
+<li><strong>Error</strong><br />
+</li>
+<code>undef</code>
+<p>The error message can be retrieved with <code>get_error()</code> or 
+<code>$HTTP::ProxyCheck::error</code></p>
+<p></p></ul>
+<p>
+</p>
+<h2><a name="get_check_url___">get_check_url( )</a></h2>
+<p><code>get_check_url()</code> gets the current value of the object attribute <code>check_url</code>.</p>
+<p><strong>Return values</strong></p>
+<ul>
+<li><strong>Okay</strong><br />
+</li>
+<code>$proxy_check-&gt;{check_url}</code>
+<p>This is the current value of the <code>check_url</code> attribute.</p>
+<p></p></ul>
+<p>
+</p>
+<h2><a name="set_check_url___check__">set_check_url( $check )</a></h2>
+<p><code>set_check_url</code> sets the object attribute <code>check_url</code>.</p>
+<p><strong>Attributes</strong></p>
+<ul>
+<li><strong>$check</strong><br />
+</li>
+Use <code>0</code> to disable the check whether the URL is valid and <code>1</code> to enable it.
+<p></p></ul>
+<p><strong>Return values</strong></p>
+<ul>
+<li><strong>Okay</strong><br />
+</li>
+<code>1</code>
+<p></p>
+<li><strong>Error</strong><br />
+</li>
+<code>undef</code>
+<p>The error message can be retrieved with <code>get_error()</code> or 
+<code>$HTTP::ProxyCheck::error</code></p>
+<p></p></ul>
+<p>
+</p>
+<h2><a name="get_answer_size___">get_answer_size( )</a></h2>
+<p><code>get_answer_size()</code> gets the current value of the object attribute <code>answer_size</code>.</p>
+<p><strong>Return values</strong></p>
+<ul>
+<li><strong>Okay</strong><br />
+</li>
+<code>$proxy_check-&gt;{answer_size}</code>
+<p>This is the current answer size.</p>
+<p></p>
+<li><strong>Error</strong><br />
+</li>
+<code>undef</code>
+<p>The error message can be retrieved with <code>get_error()</code> or 
+<code>$HTTP::ProxyCheck::error</code></p>
+<p></p></ul>
+<p>
+</p>
+<h2><a name="set_answer_size___answer_size__">set_answer_size( $answer_size )</a></h2>
+<p><code>set_answer_size</code> sets the object attribute <code>answer_size</code>.</p>
+<p><strong>Attributes</strong></p>
+<ul>
+<li><strong><a name="item__24answer_size">$answer_size</a></strong><br />
+</li>
+Defines the size of the proxy server answer. Use either <code>short</code>, <code>header</code> or 
+<code>full</code> as value.
+<p>For more information see <a href="#constructor">CONSTRUCTOR</a>.</p>
+<p></p></ul>
+<p><strong>Return values</strong></p>
+<ul>
+<li><strong>Okay</strong><br />
+</li>
+<code>1</code>
+<p></p>
+<li><strong>Error</strong><br />
+</li>
+<code>undef</code>
+<p>The error message can be retrieved with <code>get_error()</code> or 
+<code>$HTTP::ProxyCheck::error</code></p>
+<p></p></ul>
+<p>
+<a href="#__index__"><small>[ back to top ]</small></a>
+</p>
+<hr />
+<h1><a name="error_handling">ERROR HANDLING</a></h1>
+<p>HTTP::ProxyCheck has a highly configurable error handling system. It is 
+configured with the attributes <code>verbose_errors</code>, <code>print_error</code> and 
+<code>raise_error</code> at object creation:</p>
+<pre>
+    my $proxy_check = new HTTP::ProxyCheck(
+        proxy          =&gt; 'proxy:8080',
+        url            =&gt; '<a href="http://search.cpan.org">http://search.cpan.org</a>',
+        verbose_errors =&gt; 1,
+        print_error    =&gt; 0,
+        raise_error    =&gt; 1,
+    );</pre>
+<p>Every time you call a method of HTTP::ProxyCheck and an error happens, which 
+means the method returns <code>undef</code>, the error message can be retrieved with 
+<code>get_error()</code> or <code>$HTTP::ProxyCheck::error</code>:</p>
+<pre>
+    $proxy_check-&gt;set_answer_size( 'full' )
+      or die $proxy_check-&gt;get_error();
+    
+    $proxy_check-&gt;check()
+      or die $HTTP::ProxyCheck::error;</pre>
+<p>If there's an error during the object construction, you can't get the error 
+message through <code>get_error()</code>. Use <code>$HTTP::ProxyCheck::error</code> instead:</p>
+<pre>
+    my $proxy_check = new HTTP::ProxyCheck( proxy =&gt; 'proxy' )
+      or die $HTTP::ProxyCheck::error;</pre>
+<p>The object attribute <code>verbose_errors</code> configures the verbosity of the error 
+message. Set <code>verbose_errors =&gt; 1</code> to enable verbose error messages and 
+<code>verbose_errors =&gt; 0</code> to disable verbose error messages.</p>
+<p>Verbose error messages look like this:</p>
+<pre>
+    $method failed: $error_message</pre>
+<p>And non-verbose error messages like this:</p>
+<pre>
+    $error_message</pre>
+<p>The default value of <code>verbose_errors</code> is <code>0</code>.</p>
+<p>With <code>print_error</code> and <code>raise_error</code> you can set the degree of automation of
+the error handling.</p>
+<p>If <code>print_error</code> is set to <code>1</code>, the error message is displayed with 
+<code>Carp::carp()</code>. Set <code>print_error</code> to <code>0</code> to disable this feature.</p>
+<p>If <code>raise_error</code> is set to <code>1</code>, the error message is displayed with 
+<code>Carp::croak()</code> and the program is brought to an end. If <code>raise_error</code>
+is set to <code>0</code>, this feature is disabled.</p>
+<p>The default value of <code>print_error</code> is <code>1</code> and of <code>raise_error</code> it is <code>0</code>.</p>
+<p>
+<a href="#__index__"><small>[ back to top ]</small></a>
+</p>
+<hr />
+<h1><a name="support">SUPPORT</a></h1>
+<p>Contact the <a href="#author">AUTHOR</a>.</p>
+<p>
+<a href="#__index__"><small>[ back to top ]</small></a>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p>Unknown</p>
+<p>
+<a href="#__index__"><small>[ back to top ]</small></a>
+</p>
+<hr />
+<h1><a name="version">VERSION</a></h1>
+<pre>
+    HTTP::ProxyCheck version 1.2</pre>
+<p>
+<a href="#__index__"><small>[ back to top ]</small></a>
+</p>
+<hr />
+<h1><a name="changes">CHANGES</a></h1>
+<pre>
+    1.4 Thu May 25 10:47:42 CEST 2006
+        - Added installation instructions to README
+    
+    1.3 Sun May  7 11:51:50 CEST 2006
+        - Charles Longeau &lt;chl attuxfamily dot org&gt; made a small patch to 
+          specify the user agent, instead of a fixed &quot;HTTP::ProxyCheck/$VERSION&quot;
+          one.
+    
+    1.2 Sat May  8 09:38:02 CEST 2004
+        - Fix to unset the error message of a previous IO::Socket::INET run
+          Thanks to Ben Schnopp &lt;ben at schnopp dot com&gt;
+    
+    
+    1.1 Tue Aug 12 19:45:00 CEST 2003
+        - rewrote the module
+        - added better error handling
+        - updated POD
+    
+    1.0  Fri Feb 21 17:09:32 CET 2003
+        - gone stable after detailed testing 
+        - updated POD (synopsis)
+    
+    0.2  Fri Feb 21 11:57:43 CET 2003
+        - added check(answer =&gt; $type)
+        - renamed methods to gain more consistency
+        - updated POD (synopsis, methods)
+    
+    0.1  Wed Feb  5 14:35:25 CET 2003
+        - original version</pre>
+<p>
+<a href="#__index__"><small>[ back to top ]</small></a>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<pre>
+    Thomas Weibel
+    cpan@beeblebrox.net
+    <a href="http://beeblebrox.net/">http://beeblebrox.net/</a></pre>
+<p>
+<a href="#__index__"><small>[ back to top ]</small></a>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<p>Copyright (c) 2004 - 2006 Thomas Weibel. All rights reserved.</p>
+<p>This library is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.</p>
+<p><a href="#__index__"><small>[ back to top ]</small></a></p>
+
+</body>
+
+</html>

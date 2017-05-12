@@ -1,0 +1,17 @@
+2010-05-17  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.0.3:
+	* MANIFEST.SKIP
+	- add .svn/
+
+2010-05-17  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.0.2:
+	* Build.PL
+	- fix dependency
+	* t/perlcritic.t
+	- check $ENV{TEST_CRITIC} whether to execute this test
+
+2007-06-11  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+        * release 0.0.1: created by Module::Starter

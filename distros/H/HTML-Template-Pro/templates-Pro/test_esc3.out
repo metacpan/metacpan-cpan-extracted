@@ -1,0 +1,4 @@
+<H1> test_esc3 </H1>
+ &amp;foo&quot;bar&#39;&lt;/script&gt;=-;+ \&lt;&gt;&quot;; %FAhidden:
+end 
+ 

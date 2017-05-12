@@ -1,0 +1,22 @@
+---
+name: HTML-KhatGallery-Plugin-SortNaturally
+version: 0.01
+author:
+  - Kathryn Andersen
+abstract: Plugin for khatgallery to use Natural sort for index lists.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  HTML::KhatGallery: 0
+  Sort::Naturally: 0
+build_requires:
+  Test::More: 0
+provides:
+  HTML::KhatGallery::Plugin::SortNaturally:
+    file: lib/HTML/KhatGallery/Plugin/SortNaturally.pm
+    version: 0.01
+generated_by: Module::Build version 0.28
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

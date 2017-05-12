@@ -1,0 +1,8 @@
+Revision history for HTTP-AcceptLanguage
+
+0.02  2013-10-17 20:12:17 JST
+        - change the match method detect of priority (tokuhirom++)
+        -   priority order of the Accept-Language header
+
+0.01  2013-04-25 12:34:29 JST
+        - Initial release

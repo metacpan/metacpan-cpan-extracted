@@ -1,0 +1,89 @@
+<wmmeta name="Title" value="The &lt;metatable&gt; Tag" />
+<wmmeta name="Section" value="05-meta" />
+<wmmeta name="Score" value="40" />
+<wmmeta name="Abstract">
+Attach metadata to another content item
+</wmmeta>
+
+Metadata is usually embedded inside a content item using the &lt;wmmeta&gt;
+tag.  However, sometimes you may want to tag a content item with metadata from
+outside, if the text of the content is not under your control; or you may want
+to tag metadata to an object that is not text-based, such as an image.
+
+The metatable tag allows you to do this, and in bulk.  You list a table of
+content names and the metadata you want to attach to each content item, in
+tab-, comma-, pipe-separated-value, or XML format.
+
+By default, the table is read from between the &lt;metatable&gt; and
+&lt;/metatable&gt; tags.  However, if you set the __src__ attribute,
+the table will be read from the location specified, instead.
+
+Use the __format__ attribute to specify whether the metatable is in
+XML (**xml**) or Delimiter-Separated-Value (**csv**) format.
+
+Delimiter-Separated-Value Format
+--------------------------------
+
+Firstly, pick a delimiter character, such as ##|##.  Set the __delimiter__
+attribute to this character.
+
+Next, the first line of the metatable lists the metadata you wish to set; it
+must start with the value ##.##.  This indicates to WebMake that it's
+defining the metadata to be set.
+
+Finally, list as many lines of metadata as you like; the first value on the
+line is the name of the content item you wish to attach the metadata to. From
+then on, the other values on the line are the values of the metadata.
+
+So, for example, consider this table, from the WebMake documentation:
+
+ &lt;metatable delimiter="|"&gt;
+ .|title|abstract
+ Main.pm|HTML::WebMake::Main|module documentation
+ PerlCodeLibrary.pm|HTML::WebMake::PerlCodeLibrary|module documentation
+ Content.pm|HTML::WebMake::Content|module documentation
+ EtText2HTML.pm|Text::EtText::EtText2HTML|module documentation
+ HTML2EtText.pm|Text::EtText::HTML2EtText|module documentation
+ webmake|webmake(1)|script documentation
+ ettext2html|ettext2html(1)|script documentation
+ ethtml2text|ethtml2text(1)|script documentation
+ &lt;/metatable&gt;
+
+This will set **Main.pm.title** to **HTML::WebMake::Main**,
+**Main.pm.abstract** to **module documentation**, etc.
+
+XML Format
+----------
+
+The XML block is surrounded with a &lt;metaset&gt; tag, and contains
+&lt;target&gt; blocks naming the content items the enclosed metadata items are
+associated with.
+
+Inside the &lt;target&gt; blocks, &lt;meta&gt; tags name each metadatum, and
+enclose the metadatum's value.
+
+<safe>
+        <metaset>
+          <target id="foo.txt">
+            <meta name="title">
+              This is Foo.txt's title.
+            </meta>
+          </target>
+        </metaset>
+</safe>
+
+Using &lt;metatable&gt; To Tag Non-Content Items
+------------------------------------------------
+
+Previously, WebMake required you to create phoney content items, in order to
+tag metadata onto images or other non-content items.  This is no longer
+required.   Just load the URLs of the items using a "&lt;media&gt;" [media]
+tag, and each one will have a ''phoney'' content item created with the same
+name automatically.
+
+Then use a metatable, as above, to set the metadata you wish to use.
+
+	[media]: $(media)
+	[for]: $(for)
+
+

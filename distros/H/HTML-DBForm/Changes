@@ -1,0 +1,18 @@
+Revision history for Perl extension HTML::DBWebForm.
+
+1.04 Mon 3 Jan 2005
+    - Added set_template methods to Dropdown.pm and TableList.pm
+
+1.03 Sun 5 Dec 2004
+    - Fixed incorrect search docs 
+    - Added DBI requirement notice to Makefile.PL
+
+1.02 22 Nov 2004 
+    - Add TableList Search Method
+    - Fix documentation
+    - Add set_stylesheet method, update HTML::Templates
+	  to use CSS instead of tables for layout
+
+1.00 08 Nov 2004 
+    - Upload to CPAN
+

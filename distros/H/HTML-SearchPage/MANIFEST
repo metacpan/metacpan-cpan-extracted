@@ -1,0 +1,15 @@
+Changes
+DISCLAIMER.txt
+MANIFEST
+Makefile.PL
+README
+examples/html_searchpage_sample1
+examples/html_searchpage_sample2
+examples/html_searchpage_sample.sql
+examples/README
+lib/HTML/SearchPage.pm
+lib/HTML/SearchPage/Files.pm
+lib/HTML/SearchPage/Param.pm
+lib/HTML/SearchPage/Tutorial.pm
+t/00-load.t
+META.yml                                 Module meta-data (added by MakeMaker)

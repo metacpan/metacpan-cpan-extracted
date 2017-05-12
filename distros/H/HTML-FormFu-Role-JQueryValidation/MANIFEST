@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/HTML/FormFu/Role/JQueryValidation.pm
+t/jquery_validation_errors_join.t
+t/jquery_validation_errors_join.yml
+t/jquery_validation_profile.t
+t/jquery_validation_profile.yml
+t/release-pod-coverage.t
+t/release-pod-syntax.t

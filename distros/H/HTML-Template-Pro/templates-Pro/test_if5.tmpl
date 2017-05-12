@@ -1,0 +1,16 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>HTML::Template::Pro test template</title>
+</head>
+
+<body>
+	TMPL_IF in &quot;&lt;&gt;&quot;:<br>
+	<TMPL_IF var1>Variable 1 set!<TMPL_ELSE>Variable 1 not set!</TMPL_IF><br>
+
+	TMPL_IF in &quot;&lt;!-- --&gt;&quot;:<br>
+	<!-- TMPL_IF var1 -->Variable 1 set!<!-- TMPL_ELSE -->Variable 1 not set!<!-- /TMPL_IF --><br>
+</body>
+</html>

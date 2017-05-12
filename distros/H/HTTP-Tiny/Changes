@@ -1,0 +1,632 @@
+Release notes for HTTP-Tiny
+
+0.070     2016-10-09 23:23:28-04:00 America/New_York
+
+    - No changes from 0.069-TRIAL.
+
+0.069     2016-10-05 11:35:58-04:00 America/New_York (TRIAL RELEASE)
+
+    [INTERNAL]
+
+    - Lazy load Carp only if needed.
+
+0.068     2016-09-23 16:10:03-04:00 America/New_York
+
+    - No changes from 0.067-TRIAL.
+
+0.067     2016-09-14 11:43:14-04:00 America/New_York (TRIAL RELEASE)
+
+    [FIXED]
+
+    - Includes redirect history when issuing a 599 internal error.
+
+0.065     2016-09-09 22:42:43-04:00 America/New_York (TRIAL RELEASE)
+
+    [TESTS]
+
+    - Try harder to clean up environment in t/140_proxy.t (needed for VMS)
+
+0.064     2016-08-16 21:37:51-04:00 America/New_York
+
+    - No changes from 0.063-TRIAL
+
+0.063     2016-08-08 12:18:03-04:00 America/New_York (TRIAL RELEASE)
+
+    [FIXED]
+
+    - Fixed chunked transfer encoding, which previously omitted a trailing
+      CRLF.
+
+0.061     2016-08-05 12:10:19-04:00 America/New_York (TRIAL RELEASE)
+
+    [FIXED]
+
+    - Avoid overwriting 'If-Modified-Since' header in mirror() if
+      the header already exists in something other than lower-case.
+
+    [TESTS]
+
+    - Normalize CRLF when reading test data files in t\150-post_form.t
+      on Win32
+
+0.059     2016-07-29 16:10:32-04:00 America/New_York (TRIAL RELEASE)
+
+    [FIXED]
+
+    - Timeout can now be set as a constructor argument again.
+
+    - CVE-2016-1238: avoid loading optional modules from
+      @INC path with `.` at the end.
+
+    [TESTS]
+
+    - Updated tests for a future perl which may omit `.` from
+      the list of directories in @INC by default.
+
+0.058     2016-05-03 11:29:57-04:00 America/New_York
+
+    - No changes from 0.057
+
+0.057     2016-04-18 10:17:00-04:00 America/New_York (TRIAL RELEASE)
+
+    [ADDED]
+
+    - Added support for the SSL_CERT_FILE environment variable.
+
+    - Added 'peer' attribute to force a connection to a particular
+      server.
+
+    - Added 'connected' method to allow introspection of persistent
+      connections.
+
+    - An array reference of redirection result hash references is included
+      in the final response hash reference (but only if redirects occur).
+
+    [CHANGED]
+
+    - Because folded headers are obsoleted in the revised RFCs, if CRLF is
+      found in header values followed by one or more spaces, they are all
+      replaced by a single space.
+
+    [FIXED]
+
+    - Per the RFC, control headers are now sent first before other headers
+      (which are sent in arbitrary order).
+
+    - Only well-known headers have their case canonicalized; all other
+      headers are sent in the case provided by the user.
+
+    - The 'keep_alive' option now also sets the SO_KEEPALIVE option
+      on the underlying socket to help with long-lived, idle connections.
+
+    - Request header field values are now validated against the RFC rules
+      (i.e. empty or else space-or-tab separated tokens of printable
+      characters).
+
+0.056     2015-05-19 06:00:40-04:00 America/New_York
+
+    - No changes from 0.055
+
+0.055     2015-05-07 18:13:41-04:00 America/New_York (TRIAL RELEASE)
+
+    [ADDED]
+
+    - Added 'can_ssl' method to detect SSL support before trying and
+      failing with a fatal exception.
+
+    - Added support for 308 redirects
+
+    [FIXED]
+
+    - When specifying a custom CA file, if that file is missing or
+      unreadable, HTTP::Tiny will no longer fall back to a default CA
+
+    [DOCUMENTED]
+
+    - Noted units are bytes for max_size
+
+0.054     2015-01-27 07:18:19-05:00 America/New_York
+
+    [ADDED]
+
+    - Added more fallback paths to find CA files (thanks golang)
+
+    [DOCUMENTED]
+
+    - Fixed a typo
+
+0.053     2014-12-11 23:42:17-05:00 America/New_York
+
+    [FIXED]
+
+    - Defended tests against HTTP_PROXY set in the environment
+
+0.052     2014-12-11 15:23:54-05:00 America/New_York
+
+    [CHANGED]
+
+    - Proxy allowed from environment variable HTTP_PROXY (uppercase) unless
+      REQUEST_METHOD is also set.
+
+0.051     2014-11-17 22:58:44-05:00 America/New_York
+
+    [FIXED]
+
+    - Checks for threads without loading threads.pm
+
+0.050     2014-09-23 15:30:18-04:00 America/New_York
+
+    [FIXED]
+
+    - Fixed CONNECT requests for some proxies
+
+0.049     2014-09-02 11:20:07-04:00 America/New_York
+
+    [FIXED]
+
+    - 'keep_alive' is now fork-safe and thread-safe
+
+0.048     2014-08-21 13:19:51-04:00 America/New_York
+
+    [FIXED]
+
+    - Protected proxy tests from ALL_PROXY in the environment
+
+0.047     2014-07-29 14:09:05-04:00 America/New_York
+
+    [CHANGED]
+
+    - Updated Mozilla::CA module recommendation version to 20130114
+
+    [FIXED]
+
+    - Fixed t/00-report-prereqs.t when CPAN::Meta is not installed
+
+0.046     2014-07-21 10:32:32-04:00 America/New_York
+
+    [FIXED]
+
+    - Empty header fields are now allowed; headers with the 'undef' value
+      will be rendered as an empty header.
+
+    [DOCUMENTED]
+
+    - Updated HTTP/1.1 spec description from RFC 2616 to RFC 7230-7235
+
+0.045     2014-07-19 23:17:28-04:00 America/New_York (TRIAL RELEASE)
+
+    [FIXED]
+
+    - Fixed t/002_croakage.t for various operating systems.
+
+0.044     2014-07-16 23:46:09-04:00 America/New_York
+
+    [CHANGED]
+
+    - Providing a custom 'Host' header is now a fatal exception.  Previously, it
+      was silently ignored, as the RFC mandates that Host be set from the
+      URL, but ignoring it could lead to unexpected, confusing errors.
+
+    - optimized URL splitting
+
+    - Passing 'undef' for any proxy attribute will prevent HTTP::Tiny from
+      setting the proxy from the environment.
+
+0.043     2014-02-20 20:40:23-05:00 America/New_York
+
+    [FIXED]
+
+    - Does not send absolute request URI when tunneling SSL via proxy
+
+    - Fixes regression in setting host name to verify SSL
+
+    - Protects tests from https_proxy and all_proxy when doing mock testing
+
+0.042     2014-02-18 11:23:17EST-0500 America/New_York
+
+    [ADDED]
+
+    - If IO::Socket::IP 0.25+ is installed, HTTP::Tiny will use it for
+      transparent IPv4 or IPv6 support.
+
+0.041     2014-02-17 13:07:54-05:00 America/New_York
+
+    [no code change, only an amended Changes file]
+
+    [INCOMPATIBLE CHANGES (from 0.039)]
+
+    - The 'proxy' attribute no longer takes precedence over the
+      'http_proxy' environment variable.  With the addition of http_proxy
+      and https_proxy attributes (and corresponding environment variable
+      defaults), the legacy 'proxy' attribute now maps to the
+      all_proxy/ALL_PROXY environment variable and only takes effect when
+      other proxy attributes are not defined.
+
+    [ADDED (since 0.039)]
+
+    - Added 'keep_alive' attribute for single-server persistent connections
+      (Clinton Gormley)
+
+    - Added support for Basic authorization with proxies
+
+    - Added support for https proxies via CONNECT
+
+    [FIXED (since 0.039)]
+
+    - Requests are made with one less write for lower latency (Martin
+      Evans)
+
+0.040     2014-02-17 13:02:47-05:00 America/New_York
+
+    [INCOMPATIBLE CHANGES]
+
+    - The 'proxy' attribute no longer takes precedence over the
+      'http_proxy' environment variable.  With the addition of http_proxy
+      and https_proxy attributes (and corresponding environment variable
+      defaults), the legacy 'proxy' attribute now maps to the
+      all_proxy/ALL_PROXY environment variable and only takes effect when
+      other proxy attributes are not defined.
+
+    [ADDED]
+
+    - Added support for Basic authorization with proxies
+
+    - Added support for https proxies via CONNECT
+
+0.039     2013-11-27 19:48:29 America/New_York
+
+    [FIXED]
+
+    - Temporary file creating during mirror() is now opened with O_EXCL
+      for added security
+
+0.038     2013-11-18 12:56:26 America/New_York
+
+    [FIXED]
+
+    - Fixed a bug where authentication parameters in the URL would override
+      an existing Authorization header
+
+0.037     2013-10-28 13:26:21 America/New_York
+
+    [FIXED]
+
+    - Basic authentication in the URL is now unescaped before being encoded
+      into the authentication header
+
+    [DOCUMENTED]
+
+    - Added HTTP::Tiny::UA to SEE ALSO and suggested it as the appropriate
+      place for new features
+
+0.036     2013-09-25 12:10:06 America/New_York
+
+    [FIXED]
+
+    - Compile test could hang on Windows
+
+    [PREREQS]
+
+    - Dropped configure_requires for ExtUtils::MakeMaker to 6.17
+
+    [META]
+
+    - Updated support files
+
+0.035     2013-09-10 12:29:28 America/New_York
+
+  [CHANGED]
+
+  - Encoded from data from 'post_form' preserves term order if data is
+    provided as an array reference.  (They are still sorted for consistency
+    if provided as a hash reference.)
+
+0.034     2013-06-26 19:02:25 America/New_York
+
+  [ADDED]
+
+  - Added support for 'Basic' authorization from
+    user:password parameters in the URL
+
+0.033     2013-06-21 06:26:51 America/New_York
+
+  [FIXED]
+
+  - Modifying the 'agent' attribute with the accessor will append the
+    default agent string, just like setting it during construction
+
+0.032     2013-06-20 11:41:24 America/New_York
+
+  [ADDED]
+
+  - Added 'no_proxy' attribute, defaulting to $ENV{no_proxy}
+
+0.031     2013-06-16 23:18:18 America/New_York
+
+  [FIXED]
+
+  - Fixed bug receiving 0-length content bodies
+
+0.030     2013-06-13 11:46:15 America/New_York
+
+  [FIXED]
+
+  - Requests with the empty string as body content no longer generate
+    'content-type' and 'content-length' headers.
+
+0.029     2013-04-17 13:49:07 America/New_York
+
+  [FIXED]
+
+  - Checks for new enough OpenSSL library before using SNI (otherwise
+    IO::Socket::SSL throws warnings)
+
+0.028     2013-03-05 14:11:57 America/New_York
+
+  [SUPPORT]
+
+  - Fix repository/issue links to reflect proper repo name
+
+0.027     2013-03-05 12:02:58 America/New_York
+
+  [SUPPORT]
+
+  - Changed metadata to point to the chansen github repository
+    for code and issues
+
+  [DOCUMENTATION]
+
+  - Added hyperlink for HTTP::CookieJar
+
+0.026     2013-03-04 22:53:39 America/New_York
+
+  [ADDED]
+
+  - Added cookie support if an HTTP::CookieJar object is provided in the
+    'cookie_jar' attribute [Edward Zborowski]
+
+0.025     2012-12-26 12:09:43 America/New_York
+
+  [ADDED]
+
+  - Agent string appends default if it ends in a space, just like LWP
+    [Chris Weyl]
+
+0.024     2012-10-09 20:44:53 America/New_York
+
+  [ADDED]
+
+  - SSL connections now auto-retry I/O after SSL renegotiation [Alan
+    Gardner]
+
+  [FIXED]
+
+  - User-specified CA bundles take precedence over Mozilla::CA [Alan
+    Gardner]
+
+  [PREREQS]
+
+  - SSL support now requires Net::SSLeay 1.49 or greater to support
+    auto-retry [Mike Doherty]
+
+  - Downgraded IO::Socket::SSL and related prereqs to 'suggests' again
+
+0.023     2012-09-19 09:55:46 America/New_York
+
+  [PREREQS]
+
+  - IO::Socket::SSL and related prereqs changed to 'required' for dev
+    release to get better failure diagnostics from CPAN Testers
+
+  [TESTING]
+
+  - Skip live SSL testing unless IO::Socket::SSL 1.56+ installed
+
+0.022     2012-06-01 23:31:40 America/New_York
+
+  [ADDED]
+
+  - Supports local_address option to set local socket interface
+    [Chris Nehren, David Golden]
+
+0.021     2012-05-15 22:38:57 America/New_York
+
+  [TESTING]
+
+  - Skip live SSL testing if $ENV{http_proxy} is set
+
+0.020     2012-05-14 15:24:37 America/New_York
+
+  [TESTING]
+
+  - Capture prerequisite versions under AUTOMATED_TESTING to help
+    chase down some failures from CPAN Testers
+
+0.019     2012-05-14 07:14:00 America/New_York
+
+  [ADDED]
+
+  - Require IO::Socket::SSL 1.56 (which added SSL_hostname support) when
+    doing HTTPS.  [Mike Doherty]
+
+  [TESTING]
+
+  - Provide better diagnostic output in t/210_live_ssl.t [Mike
+    Doherty]
+
+0.018     2012-04-18 09:39:50 America/New_York
+
+  [ADDED]
+
+  - Add verify_SSL option to do more secure SSL operations, incl.
+    attempting to validate against a CA bundle (Mozilla::CA
+    recommended, but will attempt to find some OS bundles). Also
+    add SSL_opts, which passes through IO::Socket::SSL's SSL_*
+    options to control SSL verification. (GH #6, #9) [Mike Doherty]
+
+
+  - Reponse hashref includes final URL (including any redirections)
+    [Lukas Eklund]
+
+0.017     2012-02-22 21:57:37 EST5EDT
+
+  [DOCUMENTATION]
+
+  - Clarified how max_size exceptions work [rt.cpan.org #75142]
+
+  - Clarify that 2XX is success for most methods (except mirror
+    where 304 is also success) [rt.cpan.org #75141]
+
+0.016     2011-10-26 23:05:50 America/New_York
+
+  [BUG FIXES]
+
+  - Fixed Perl 5.6 compatibility by emulating utf8::encode [David Golden]
+
+0.015     2011-10-26 16:42:26 America/New_York
+
+  [BUG FIXES]
+
+  - Make sure PERL_UNICODE doesn't affect PUT test data [Tony Cook]
+
+  [DOCUMENTATION]
+
+  - Fixed typo
+
+0.014     2011-10-20 13:54:13 America/New_York
+
+  [NEW FEATURES]
+
+  - Adds additional shorthand methods for all common HTTP verbs
+    (HEAD, PUT, POST, DELETE) [David Golden]
+
+  - post_form() method for POST-ing x-www-form-urlencoded data
+    [David Golden]
+
+  - www_form_urlencode() utility method [David Golden]
+
+0.013     2011-07-17 23:14:22 America/New_York
+
+  [NEW FEATURES]
+
+  - $ENV{http_proxy} support added [Claes Jakobsson]
+
+  [OTHER]
+
+  - Internal/private errors converted from "croak" to "die" as internal
+    errors are caught by "eval"
+
+0.012     2011-03-31 15:48:02 America/New_York
+
+  [BUG FIXES]
+
+  - mirror() now uses binmode during output (RT #67118) [Serguei Trouchelle]
+
+  [DOCUMENTATION]
+
+  - noted that SSL certificates are not verified against CA's
+    (RT #66907)
+
+0.011     2011-03-19 20:48:39 America/New_York
+
+  [BUG FIXES]
+
+  - Made t/000_load.t less verbose under harness (RT#65507) [Dave Mitchell]
+
+  - Removed 'Errno' as an explicit prefix (it is a core module, but not
+    indexed by PAUSE, which might confuse some installers)
+
+0.010     2011-02-04 02:45:31 EST5EDT
+
+  [BUG FIXES]
+
+  - Fixed test errors on VMS (RT#65430) [Craig Berry]
+
+0.009     2011-01-17 16:29:22 EST5EDT
+
+  - Added workaround for IO::Socket::SSL certificate verification bug
+
+  - Minor documentation improvements
+
+  - POST example added to the eg/ directory in the distribution tarball
+
+0.008     2011-01-14 06:34:55 EST5EDT
+
+  - Added support for direct 'https' connections if IO::Socket::SSL
+    is installed
+
+  - Added support for a callback to provide trailing headers for
+    chunked transfer encoding
+
+  - Data callbacks receive the response hashref as a second argument
+    for greater flexibility
+
+  - Additional limitations documented
+
+0.007     2011-01-12 04:56:16 EST5EDT
+
+  - Added support for redirecting 303 and 307 response codes
+
+  - Retry (once) a request that fails due to a closed socket
+    (per RFC2616 8.1.4)
+
+  - Automatically sets request Content-Type to 'application/octet-stream'
+    if there is content the user has not defined its type
+
+  - Trailing headers from chunked transfer encoding are now merged
+    into the response headers instead of ignored
+
+  - Improved handling of malformed or unsupported HTTP protocols
+
+  - Expanded http:///.../ as http://localhost/.../ and set Host header
+
+  - Documented that URL's must be escaped/encoded
+
+  - Documented that the headers hash option may contain an array reference
+    to output multiple values of the same header field
+
+  - Improved documentation of limitations
+
+  - Added numerous new tests to ensure compliance with the HTTP/1.1 spec
+
+0.006     2011-01-10 07:28:11 EST5EDT
+
+  - Transfer-Encodings are case insensitive
+
+  - Add additional test for proper behavior when both Content-Length
+    and Transfer-Encoding headers are received
+
+0.005     2011-01-08 06:32:05 EST5EDT
+
+  - Fixed bug getting content for servers which do not sent Content-Length
+
+  - Add test coverage for get(), mirror() and request()
+
+  - Add test coverage for requests with static and generated content
+
+0.004     2010-12-15 22:53:59 EST5EDT
+
+  - Renamed 'ok' response field to 'success'
+
+  - Handle all required HTTP/1.1 date formats
+
+  - Documented how callbacks are supposed to work
+
+0.003     2010-12-15 12:30:42 EST5EDT
+
+  - Added 'ok' response field to simplify checking success
+
+  - Added a 'mirror' method mirror content to a file, but shortcut
+    if not modified
+
+0.002     2010-12-13 21:59:39 EST5EDT
+
+  - Added some initial documentation
+
+  - Skips utf8::* code on Perls older than 5.8
+
+0.001     2010-12-11 07:59:16 EST5EDT
+
+  - Initial CPAN release
+
+# vim: ts=2 sts=2 sw=2 et:

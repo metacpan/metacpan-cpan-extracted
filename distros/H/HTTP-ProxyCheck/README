@@ -1,0 +1,44 @@
+HTTP::ProxyCheck version 1.4
+============================
+
+DESCRIPTION
+
+HTTP::ProxyCheck is a class to check HTTP proxy servers. It connects to
+given HTTP proxy servers and tries to retrieve a provided URL through
+them.
+    
+For more information see "docs/HTTP_ProxyCheck.txt" or 
+"docs/HTTP_ProxyCheck.html".
+
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Validate::Net version 0.4 or higher
+
+
+AUTHOR
+
+Thomas Weibel
+cpan@beeblebrox.net
+http://beeblebrox.net/
+
+
+COPYRIGHT
+
+Copyright (c) 2004-2006 Thomas Weibel. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/HTML/FormatData.pm
+t/test.t
+META.yml

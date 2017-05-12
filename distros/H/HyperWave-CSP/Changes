@@ -1,0 +1,27 @@
+Revision history for Perl extension HyperWave::CSP.
+
+0.03.1 Sun Apr  5 17:13:33 EST 1998
+  - Finally fixed the install bug - everything ends up in the
+  right directories.
+
+0.03  Fri Mar 20 21:24:01 EST 1998
+   - Fixed up some documentation, mastly README and the
+   copyright notices.
+
+   - Patch from Amarendranath Vadlamudi <nath@isr.umd.edu>
+   fixing a bunch of stuff.
+
+0.02  Mon Mar  2 15:19:50 EST 1998
+   - added insert_object(), insert_collection(), insert_image(),
+   insert_text() and insert_html() (incomplete) functions.
+
+   - added error() and error_message() functions.
+
+   - major cleanup to debug code and debug levels.
+
+   - some language support.
+
+0.01  Thu Feb 19 11:25:29 1998
+	- original version.  Never distributed on CPAN, sent via email to
+     a few brave souls.
+

@@ -1,0 +1,13 @@
+abstract: add the mukti days event view for CalendarMonthSimple
+author: Hsin-Chan Chien <hcchien@hcchien.org>
+distribution_type: module
+generated_by: Module::Install version 0.50
+license: perl
+name: HTML-CalendarMonthSimple-MultiDaysEvent
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  HTML::CalendarMonthSimple: 0
+version: 0.03

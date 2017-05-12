@@ -1,0 +1,85 @@
+# $Id: simple.wt,v 1.10 2002/08/22 07:21:12 m_ilya Exp $
+
+# some comments here
+
+text_require = ( Require some
+                 text )
+
+# more comments
+
+text_forbid = ( Another => syntax
+                for list
+                elements )
+
+ignore_case =
+    no
+
+test_name = Some name here
+    # another comment here
+    url = www.dot.com
+    regex_require = (
+                      'Quoted text " test'
+                      # comment inside of list parameter
+                      "We can => quote '"
+                      "test \""
+                      'test \''
+                      'test $a'
+                      'test @a'
+                      "test \$a"
+                      "test \@a"
+                      "\$a"
+                      "\\\$a"
+                      "$test1")
+    regex_forbid =  ( More = tests
+                      Some @#$%^&* chars
+                      "more" => tests and fun
+                      abcdef 1234 => " a b c d ' e f "
+	              "$undefined"
+                    )
+    auth = ( name => value )
+    ignore_case =yes
+    show_cookies= yes
+    show_html=no
+end_test
+
+test_name = Another name # this is not a comment
+    url = www.tiv.net
+    cookie = ( 0
+               webtest
+               This is the cookie value
+               /
+               .unixscripts.com
+               ''
+               0
+               ''
+               2592000
+               ''
+               Comment
+               What a tasty cookie! )
+    cookie = ( 0
+               webtest1
+               This is the cookie value
+               /
+               .unixscripts.com
+               ''
+               0
+               ''
+               2592000
+               ''
+               Comment
+               What a tasty cookie! )
+end_test
+
+test_name = { 'Some evals are here' }
+    file = { 1 + 2 + 3 . '.ext' }
+    params = ( { 'name' } => value
+               name1
+               { my $a = 'blabla'; $a =~ s/bla//; $a } )
+    auth = { [ http => 'http://some.proxy.com/' ] }
+end_test
+
+test_name = Nested
+    params = ( upload => ( file => /a/myfile
+                           filename => myfile
+                           Content-Type => text/plain ) )
+end_test

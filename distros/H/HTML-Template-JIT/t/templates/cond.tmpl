@@ -1,0 +1,21 @@
+foo: <tmpl_if true>foo</tmpl_if>.
+bar: <tmpl_if true>bar</tmpl_if>.
+black: <tmpl_if true>dark<tmpl_else>light</tmpl_if>.
+white: <tmpl_if false>dark<tmpl_else>light</tmpl_if>.
+
+<tmpl_unless undef>sam was here.</tmpl_unless>
+<tmpl_unless false_loop>sam wuz here.</tmpl_unless>
+
+bing: <tmpl_if true_loop>bong</tmpl_if>.
+bing: <tmpl_if false_loop>boom</tmpl_if>.
+
+<tmpl_loop true_loop><tmpl_var var></tmpl_loop>
+<tmpl_loop false_loop><tmpl_var var></tmpl_loop>
+
+<tmpl_loop values>
+  <tmpl_if even>
+     <tmpl_var value> is even
+  <tmpl_else>
+     <tmpl_var value> is odd
+  </tmpl_if>
+</tmpl_loop>

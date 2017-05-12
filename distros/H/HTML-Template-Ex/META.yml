@@ -1,0 +1,31 @@
+---
+name: HTML-Template-Ex
+version: 0.08
+author:
+  - 'Masatoshi Mizuno E<lt>lusheE<64>cpan.orgE<gt>'
+abstract: lib/HTML/Template/Ex.pm
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Devel::StackTrace: 1.1
+  Digest::MD5: 2.3
+  HTML::Entities: 3.5
+  HTML::Template: 2.9
+  Test::More: 0
+  Test::Perl::Critic: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+provides:
+  HTML::Template::Ex:
+    file: lib/HTML/Template/Ex.pm
+    version: 0.08
+  HTML::Template::Ex::DummyObject:
+    file: lib/HTML/Template/Ex.pm
+  HTML::Template::Ex::Filter:
+    file: lib/HTML/Template/Ex/Filter.pm
+    version: 0.02
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

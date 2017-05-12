@@ -1,0 +1,42 @@
+version 0.94
+------------
+
+- Added support for selective variable substitution in render()
+- Changed name of package to HTML::DynamicTemplate to avoid
+  confusion with Sam Tregar's HTML::Template
+
+version 0.93
+------------
+
+- Added support for $SET directive
+
+version 0.92
+------------
+
+- Added default recursion limit for template includes
+- Added set_recursion_limit($integer) to override default
+- Handles open errors on initial template instantiation
+
+version 0.91
+------------
+
+- Removed template filename suffix requirement
+- Expanded pod synopsis and refreshed README
+
+version 0.90
+------------
+
+- Tweaked version for better incremental release numbering
+- Removed use of English module
+
+version 0.9
+-----------
+
+- Added recursive include support
+- Removed unnecessary loop in render()
+- Updated pod documentation and refreshed README
+
+version 0.5
+-----------
+
+- Initial release

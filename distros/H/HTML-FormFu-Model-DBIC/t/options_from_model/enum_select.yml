@@ -1,0 +1,20 @@
+---
+auto_fieldset: 1
+
+elements:
+  - type: Hidden
+    name: id
+
+  - type: Text
+    name: text_col
+
+  - type: Select
+    name: enum_col
+    model_config:
+      options_from_model: 1
+      resultset: Master
+    constraint:
+      - AutoSet
+
+  - type: Submit
+    name: submit

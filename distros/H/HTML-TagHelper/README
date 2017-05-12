@@ -1,0 +1,23 @@
+HTML-TagHelper version 0.1
+
+Easy HTML tags for your templates.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+	
+DEPENDENCIES
+
+- HTML::Element
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Gitte Wange Olrik
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

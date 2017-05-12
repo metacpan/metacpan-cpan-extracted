@@ -1,0 +1,30 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/ReadmeFromPod.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/HTML/RewriteAttributes.pm
+lib/HTML/RewriteAttributes/Links.pm
+lib/HTML/RewriteAttributes/Resources.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/000-synopsis.t
+t/001-basic.t
+t/002-resources.t
+t/003-links.t
+t/004-misc.t
+t/005-links-code.t
+t/010-resolvelink.t
+t/020-inline-css.t
+t/021-import.t
+t/022-import-off.t
+t/023-import-comment.t
+SIGNATURE                                Public-key signature (added by MakeMaker)

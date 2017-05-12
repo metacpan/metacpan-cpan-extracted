@@ -1,0 +1,34 @@
+Changes
+Extension.pm
+Extension.pod
+Extension/CSTART.pm
+Extension/CSTART.pod
+Extension/DO_NOTHING.pm
+Extension/DO_NOTHING.pod
+Extension/DOC.pm
+Extension/DOC.pod
+Extension/HEAD_BODY.pm
+Extension/HEAD_BODY.pod
+Extension/IF_TERN.pm
+Extension/IF_TERN.pod
+Extension/ObjBase.pm
+Extension/SLASH_VAR.pm
+Extension/SLASH_VAR.pod
+Extension/TAG_ATTRIBUTE_NORMALIZER.pm
+Extension/TAG_ATTRIBUTE_NORMALIZER.pod
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01_Extension.t
+t/templates/format_simple.tmpl
+t/templates/html_cstart.tmpl
+t/templates/html_doc.tmpl
+t/templates/html_js.tmpl
+t/templates/if_tern.tmpl
+t/templates/simple.tmpl
+t/templates/simple_expr.tmpl
+t/templates/simple_html.tmpl
+t/templates/simple_vanguard.tmpl
+t/templates/standard.tmpl
+t/templates/tag_normalizer.tmpl
+META.yml                                 Module meta-data (added by MakeMaker)

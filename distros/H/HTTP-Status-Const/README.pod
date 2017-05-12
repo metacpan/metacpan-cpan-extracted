@@ -1,0 +1,148 @@
+=head1 NAME
+
+HTTP::Status::Const - interpolable HTTP status constants
+
+=head1 VERSION
+
+v0.3.0
+
+=head1 SYNOPSIS
+
+  use HTTP::Status::Const;
+
+  ...
+
+  $response->status( $HTTP_NOT_FOUND );
+
+  ...
+
+  my %handlers = (
+    $HTTP_OK      => sub { ... },
+    $HTTP_CREATED => sub { ... },
+    ...
+  );
+
+=head1 DESCRIPTION
+
+This module is basically a wrapper around L<HTTP::Status> that allows
+you to use the constants as read-only scalar variables instead of
+function names.
+
+This means the constants can be used in contexts where you need
+interpolated variables, such as hash keys or in strings.
+
+=head2 Do I really need this?
+
+No. You can get interpolated constants already, with some ugly syntax:
+
+  my %handlers = (
+    HTTP_OK() => sub { ... },
+  );
+
+or
+
+  "Status code ${ \HTTP_OK }"
+
+So all this module gives you is some stylistic convenience, at the
+expense of additional dependencies (although ones that may be used
+by other modules).
+
+=head1 INSTALLATION
+
+See
+L<How to install CPAN modules|http://www.cpan.org/modules/INSTALL.html>.
+
+=head2 Required Modules
+
+This distribution requires Perl v5.10.1.
+
+This distribution requires the following modules:
+
+=over 4
+
+=item * L<Const::Exporter>
+
+=item * L<HTTP::Status>
+
+=item * L<Package::Stash>
+
+=back
+
+This distribution recommends the following modules:
+
+=over 4
+
+=item * L<Package::Stash::XS>
+
+=back
+
+=head1 RECENT CHANGES
+
+=head2 Incompatabilities
+
+=over 4
+
+=item * 
+
+Increased minimum version to Perl v5.10.1.
+
+=back
+
+=head2 Other Changes
+
+=over 4
+
+=item * 
+
+Updated copyright year.
+
+=item * 
+
+Use Perl::Critic tests are part of build process.
+
+=item * 
+
+Clean up prereqs in build.
+
+=item * 
+
+Added author and release tests.
+
+=item * 
+
+Use Dist::Zilla TravisYML plugin.
+
+=back
+
+See the F<Changes> file for a longer revision history.
+
+=head1 EXPORTS
+
+By default, only the HTTP constants are exported.
+
+For convenience, the tags from L<HTTP::Status> are supported so that
+the C<:is> and C<status_message> functions are exported.
+
+=head1 SEE ALSO
+
+L<HTTP::Status>
+
+=head1 AUTHOR
+
+Robert Rothenberg, C<< <rrwo at cpan.org> >>
+
+=head2 Acknowledgements
+
+Several people who pointed out that this module is unnecessary.
+(Yes, it's written to scratch an itch.)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2014-2015 Robert Rothenberg.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+

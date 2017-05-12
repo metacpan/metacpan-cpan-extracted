@@ -1,0 +1,28 @@
+HTTP::Cookies::PhantomJS - read and write PhantomJS cookies file
+
+DESCRIPTION
+
+This is just HTTP::Cookies subclass, so it has all same methods,
+but reloads load() and save() to make available reading and writing
+of PhantomJS cookies file. You can easily transform (if you need)
+HTTP::Cookies object to HTTP::Cookies::PhantomJS or vice versa by
+reblessing (dirty way) or with code like this:
+
+	use strict;
+	use HTTP::Cookies;
+	use HTTP::Cookies::PhantomJS;
+	
+	 my $plain_cookies = HTTP::Cookies->new;
+	 # fill it with LWP or other way
+	 ....
+	 # transform
+	 my $phantom_cookies = HTTP::Cookies::PhantomJS->new;
+	 $plain_cookies->scan(sub {
+		$phantom_cookies->set_cookie(@_);
+	 });
+
+INSTALLATION
+
+perl Makefile.PL
+make test
+make install

@@ -1,0 +1,11 @@
+Revision history for {{$dist->name}}
+
+{{$NEXT}}
+    * adjusted API, added tests and examples 
+
+0.002      2015-05-01 
+    * added docs and adjusted API
+
+0.001      2015-04-30 
+    * first release: 0.01
+

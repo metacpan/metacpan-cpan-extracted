@@ -1,0 +1,6 @@
+---
+name: 'MIME::Base64 Support'
+default: 0
+depends:
+    'MIME::Base64': 0
+

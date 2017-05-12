@@ -1,0 +1,4 @@
+This directory (./etc) contains modules which the HTML::Stream
+toolkit might depend on.  They are NOT automatically installed
+for you.  You are encouraged to get newer copies of these modules 
+from the CPAN (http://www.perl.com).

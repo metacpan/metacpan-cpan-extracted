@@ -1,0 +1,110 @@
+<wmmeta name="Title" value="The &lt;navlinks&gt; Tag" />
+<wmmeta name="Section" value="02-tags_attrs" />
+<wmmeta name="Score" value="95" />
+<wmmeta name="Abstract">
+generate back and forward navigation links
+</wmmeta>
+
+A common site structure strategy is to provide __Back__, __Forward__ and
+__Up__ links between pages.  This is especially frequent in papers or
+manuals, and (as you can see above) is used in this documentation.
+WebMake supports this using the &lt;navlinks&gt; tag.
+
+To use this, first define a "sitemap". This tells WebMake how to order the page
+hierarchy, and which pages to include.
+
+Next, define 3 templates, one for __previous__, one for __next__ and one
+for __up__ links. These should contain references to **&wmdollar;{url}**
+(note: __not__ **&wmdollar;(url)**), which will be replaced with the URL for
+the next, previous, or parent content item, whichever is applicable for the
+direction in question.
+
+Also, references to **&wmdollar;{name}** will be expanded to the name of the
+content item in that direction, allowing you to retrieve metadata for that
+content like so: **&wmdollar;&etsqi;&wmdollar;{name}.title&etsqo;** .
+
+You can also add templates to be used when there is no __previous__,
+__next__ or __up__ content item; for example, the ''top'' page of a site has
+no __up__ content item.  These are strictly optional though.
+
+Then add a **&lt;navlinks&gt;** tag to the WebMake file as follows.
+
+<pre>
+	&lt;navlinks name=__mynavlinks__ map=__sitemapname__
+		up=__uptemplatename__
+		next=__nexttemplatename__
+		prev=__prevtemplatename__
+		noup=__nouptemplatename__
+		nonext=__nonexttemplatename__
+		noprev=__noprevtemplatename__&gt;
+	__content text__
+	&lt;/navlinks&gt;
+</pre>
+
+The content text acts just like a normal content item, but references to
+**&wmdollar;{nexttext}**, **&wmdollar;{prevtext}** or **&wmdollar;{uptext}**
+will be replaced with the appropriate template; e.g. **&wmdollar;{uptext}**
+will be replaced by either **&wmdollar;{__uptemplatename__}** or
+**&wmdollar;{__nouptemplatename__}** depending on if this is the top page or
+not.
+
+You can then add references to **&wmdollar;&etsqi;__mynavlinks__&etsqo;** in
+other content items, and the navigation links will be inserted.
+
+	__Note:__ navlinks content items __must__ be included as a deferred
+	reference!
+
+Attribute Reference
+-------------------
+
+These are the attributes accepted by the **&lt;navlinks&gt;** tag.
+
+	__name__:	the name of the navigation-links content item.
+	Required.
+
+	__map__:	the name of the sitemap used to determine page
+	ordering. Required.
+
+	__up__:	the name of the template used to draw __Up__
+	links. Required.
+
+	__next__:	the name of the template used to draw __Next__
+	links. Required.
+
+	__prev__:	the name of the template used to draw __Prev__
+	links. Required.
+
+	__noup__:	the name of the template used when there is
+	no __Up__ link, ie. for the page at the top level of the
+	site. Optional -- the default is an empty string.
+
+	__nonext__:	the name of the template used when there is
+	no __Next__ link, ie. the last page in the site.
+	Optional -- the default is an empty string.
+
+	__noprev__:	the name of the template used when there is
+	no __Prev__ link, ie. for the first page in the site.
+	Optional -- the default is an empty string.
+
+
+
+Example
+=======
+
+This will generate an extremely simple set of &lt;a href&gt; links, no frills.
+The sitemap it uses isn't detailed here; see the "sitemap documentation"
+[sitemap] for details on how to make a site map.
+
+<pre>
+	&lt;template name=up&gt;&lt;a href=&wmdollar;{url}&gt;Up&lt;/a&gt;&lt;/template&gt;
+
+	&lt;template name=next&gt;&lt;a href=&wmdollar;{url}&gt;Next&lt;/a&gt;&lt;/template&gt;
+
+	&lt;template name=prev&gt;&lt;a href=&wmdollar;{url}&gt;Prev&lt;/a&gt;&lt;/template&gt;
+
+	&lt;navlinks name=__name__ map=__sitemapname__ up=up next=next prev=prev&gt;
+	  &wmdollar;{prevtext} | &wmdollar;{uptext} | &wmdollar;{nexttext}
+	&lt;/navlinks&gt;
+</pre>
+
+	[sitemap]: $(sitemap)

@@ -1,0 +1,23 @@
+TagReader.xs
+TagReader.pm
+Makefile.PL
+test.pl
+Changes
+MANIFEST
+README
+typemap
+bin/tr_blck.PL
+bin/tr_xlnk.PL
+bin/tr_llnk.PL
+bin/tr_mvlnk.PL
+bin/tr_httpcheck.PL
+bin/tr_staticssi.PL
+bin/run_without_installing
+html_trbutton_small.png
+html_trbutton_small.xcf
+bin/tr_tagcontentgrep.PL
+bin/tr_fixltgt.PL
+bin/tr_imgaddsize.PL
+bin/tr_mailtoexpand.PL
+bin/tr_delfont.PL
+META.yml                                 Module meta-data (added by MakeMaker)

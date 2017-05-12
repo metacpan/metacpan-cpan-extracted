@@ -1,0 +1,123 @@
+HTML::Entities::Numbered version 0.04
+=====================================
+
+NAME
+    HTML::Entities::Numbered - Conversion of numbered HTML entities
+
+SYNOPSIS
+     use HTML::Entities::Numbered;
+ 
+     $html    = 'Hi Honey<b>&hearts;</b>';
+ 
+     # convert named HTML entities to numbered (decimal)
+     $decimal = name2decimal($html);    # Hi Honey<b>&#9829;</b>
+ 
+     # to numbered (hexadecimal)
+     $hex     = name2hex($html);        # Hi Honey<b>&#x2665;</b>
+ 
+     $content = 'Copyright &#169; Larry Wall';
+ 
+     # convert numbered HTML entities (decimal) to named
+     $name1   = decimal2name($content); # Copyright &copy; Larry Wall
+ 
+     $content = 'Copyright &#xA9; Larry Wall';
+     # convert numbered HTML entitites (hexadecimal) to named
+     $name2   = hex2name($content);     # Copyright &copy; Larry Wall
+ 
+     $xml     = '&quot;Give me &yen;10,000&quot; &gt; cherie&spades;';
+ 
+     # convert named HTML entities to numbered
+     # except valid XML entities (decimal)
+     $decimal = name2decimal_xml($xml); # &quot;Give me &#165;10,000&quot;
+                                        # &gt; cherie&#9824;
+ 
+     # to numbered except valid XML entities (hexdecimal)
+     $hex     = name2hex_xml($xml);     # &quot;Give me &#xA5;10,000&quot;
+                                        # &gt; cherie&#x2660;
+
+DESCRIPTION
+    HTML::Entities::Numbered is a content conversion filter for named HTML
+    entities (symbols, mathmetical symbols, Greek letters, Latin letters,
+    etc.). When an argument of "name2decimal()" or "name2hex()" contains
+    some nameable HTML entities, they will be replaced to numbered HTML
+    entities. And when an argument of "name2decimal_xml()" or
+    "name2hex_xml()" contains some nameable numbered HTML entities, they
+    will be replaced to numbered HTML entities except valid XML entities
+    (the excepted "valid XML entities" are the following five entities:
+    "&lt;", "&gt;", "&amp;", "&quot;", "&apos;"). By the same token, when an
+    argument of "decimal2name()" or "hex2name()" contains some nameable
+    numbered HTML entities, they will be replaced to named HTML entities.
+
+    (the exception "valid XML entities" means the following five entities:
+    "&lt;", "&gt;", "&amp;", "&quot;", "&apos;")
+
+    On version 0.03, the entities hash table is imported from HTML::Entities
+    (with obsolete class "HTML::Entities::Numbered::Extra" for older
+    releases of Perl). At the moment, 0.04 (or later) is included
+    HTML::Entities::Numbered::Table to import HTML entities table, and
+    thereby we do not need to have HTML::Entities (included in HTML::Parser
+    distribution).
+
+    This may be also useful for making valid XML (corrects the undefined
+    entity references, and enhanced by addition of functions conform to the
+    XML).
+
+FUNCTIONS
+    Following all functions are exported by default.
+
+    * name2decimal
+        Some included named HTML entities in argument of "name2decimal()"
+        will be replaced to decimal numbered HTML entities.
+
+    * name2hex
+        Some included named HTML entities in argument of "name2hex()" will
+        be replaced to hexadecimal numbered HTML entities.
+
+    * decimal2name
+        Some include decimal numbered HTML entities in argument of
+        "decimal2name()" will be replaced to named HTML entities (If they're
+        nameable).
+
+    * hex2name
+        Some include hexadecimal numbered HTML entities in argument of
+        "hex2name()" will be replaced to named HTML entities (If they're
+        nameable).
+
+    * name2decimal_xml
+        Some included named HTML entities in argument of
+        "name2decimal_xml()" will be replaced to decimal numbered HTML
+        entities except valid XML entities.
+
+    * name2hex_xml
+        Some included named HTML entities in argument of "name2hex_xml()"
+        will be replaced to hexadecimal numbered HTML entities except valid
+        XML entities.
+
+    If you'd prefer not to import them functions into the caller's
+    namespace, you can call them as below:
+
+     use HTML::Entities::Numbered ();
+ 
+     $decimal = HTML::Entities::Numbered::name2decimal($str);
+     $hex     = HTML::Entities::Numbered::name2hex($str);
+     $named1  = HTML::Entities::Numbered::decimal2name($str);
+     $named2  = HTML::Entities::Numbered::hex2name($str);
+     $decimal = HTML::Entities::Numbered::name2decimal_xml($str);
+     $hex     = HTML::Entities::Numbered::name2hex_xml($str);
+
+AUTHOR
+    Koichi Taniguchi <taniguchi@livedoor.jp>
+
+    Develop triggered by IKEBE Tomohiro <ikebe@cpan.org>
+
+    Many thanks to Tatsuhiko Miyagawa <miyagawa@cpan.org>
+
+COPYRIGHT
+    Copyright (c) 2004 Koichi Taniguchi. Japan. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    HTML::Entities, <http://www.w3.org/TR/REC-html40/sgml/entities.html>
+

@@ -1,0 +1,162 @@
+<body>
+<div>
+<h2><a name="p0">見出し</a></h2>
+<p>行を!ではじめると見出しになります。見出しは３レベルあります。<br>
+</p>
+<pre>!!!大見出し
+!!中見出し
+!小見出し
+</pre>
+<h2><a name="p1">大見出し</a></h2>
+<h3><a name="p2"><span class="sanchor">&nbsp;</span>中見出し</a></h3>
+<h4><a name="p3">小見出し</a></h4>
+<br>
+<h2><a name="p4">テキスト装飾</a></h2>
+<pre>シングルクォート２つで囲むと''イタリック''になります。
+シングルクォート３つで囲むと'''ボールド'''になります。
+これは==打ち消し線==です。
+これは__下線__です。
+</pre>
+<p>シングルクォート２つで囲むと<em>イタリック</em>になります。<br>
+シングルクォート３つで囲むと<strong>ボールド</strong>になります。<br>
+これは<del>打ち消し線</del>です。<br>
+これは<ins>下線</ins>です。<br>
+</p>
+<h2><a name="p5">引用</a></h2>
+<pre>&quot;&quot;これは引用です。
+&quot;&quot;これも引用です。
+</pre>
+<blockquote><p>これは引用です。</p>
+<p>これも引用です。</p>
+</blockquote>
+<br>
+<h2><a name="p6">説明</a></h2>
+<pre>:項目:説明文
+</pre>
+<dl>
+<dt>項目</dt>
+<dd>説明文</dd>
+</dl>
+<br>
+<pre>::項目
+:::説明文は複数行にわけて書くこともできます。
+:::こんな感じで。
+</pre>
+<dl>
+<dt>項目</dt>
+<dd>説明文は複数行にわけて書くこともできます。こんな感じで。</dd>
+</dl>
+<br>
+<h2><a name="p7">項目</a></h2>
+<p>行を*ではじめるとリストになります。リストは*の個数に応じて３段階までネストすることができます。<br>
+</p>
+<pre>*項目1-1
+**項目2-1
+**項目2-2
+***項目3-1
+*項目1-2
+**項目2-3
+</pre>
+<ul>
+<li>項目1-1<ul>
+<li>項目2-1</li>
+<li>項目2-2<ul>
+<li>項目3-1</li>
+</ul>
+</li>
+</ul>
+<li>項目1-2<ul>
+<li>項目2-3</li>
+</ul>
+</ul>
+<p>行を+ではじめると番号付きリストになります。<br>
+</p>
+<pre>+番号付き項目1
+++番号付き項目1-1
++番号付き項目2
++番号付き項目3
+</pre>
+<ol>
+<li>番号付き項目1<ol>
+<li>番号付き項目1-1</li>
+</ol>
+<li>番号付き項目2</li>
+<li>番号付き項目3</li>
+</ol>
+<br>
+<h2><a name="p8">リンク</a></h2>
+<pre>*http://www.yahoo.co.jp/
+*[Google|http://www.google.co.jp/]
+*[[FrontPage]]
+*[[トップ|FrontPage]]
+</pre>
+<ul>
+<li><a href="http://www.yahoo.co.jp/">http://www.yahoo.co.jp/</a></li>
+<li><a href="http://www.google.co.jp/">Google</a></li>
+<li><a href="wiki.cgi?page=FrontPage" class="wikipage">FrontPage</a></li>
+<li><a href="wiki.cgi?page=FrontPage" class="wikipage">トップ</a></li>
+</ul>
+<br>
+<h2><a name="p9">テーブル</a></h2>
+<p>CSVはテーブルになります。１行目がヘッダになります。<br>
+</p>
+<pre>,1-1,1-2,1-3
+,2-1,2-2,2-3
+</pre>
+<table>
+<tr>
+<th>1-1</th>
+<th>1-2</th>
+<th>1-3</th>
+</tr>
+<tr>
+<td>2-1</td>
+<td>2-2</td>
+<td>2-3</td>
+</tr>
+</table>
+<br>
+<h2><a name="p10">整形済テキスト</a></h2>
+<p>行頭をスペースまたはタブではじめると整形済テキストとして扱われます。<br>
+</p>
+<pre>これは整形済テキストです。
+入力したとおりに表示されます。
+</pre>
+<br>
+<h2><a name="p11">水平線</a></h2>
+<p>行頭に----と書くと水平線になります。<br>
+</p>
+<pre>----
+</pre>
+<hr>
+<br>
+<h2><a name="p12">コメント</a></h2>
+<p>行を//ではじめるとその行はコメントとみなされます。コメント行は一切出力されません。<br>
+</p>
+<pre>//これはコメントになります。画面には出力されません。
+</pre>
+<br>
+<h2><a name="p13">InterWiki</a></h2>
+<p>まずは<a href="wiki.cgi?page=InterWikiName">InterWikiName</a>にサーバを記述します。URLの別名アンカをリストとして記述します。必要に応じて別名アンカのあとに続けて文字コードを指定します。<br>
+</p>
+<pre>*[Google|http://www.google.co.jp/search?hl=ja&amp;btnG=Google+%8C%9F%8D%F5&amp;lr=lang_ja&amp;q=] sjis
+*[YukiWiki|http://www.hyuki.com/yukiwiki/wiki.cgi?] euc
+</pre>
+<p>次のように使用します。<br>
+</p>
+<pre>[[YukiWiki:Perl]]
+[[Google:Perl]]
+</pre>
+<p>別名でアンカを作成することも可能です。<br>
+</p>
+<pre>[[Googleで検索|Google:Perl]]
+</pre>
+<br>
+<h2><a name="p14">Keyword</a></h2>
+<p><a href="wiki.cgi?page=Keyword">Keyword</a>にキーワードを記述しておくと任意のテキストに自動的にリンクがはられます。キーワードは通常の別名アンカをリストで記述しておくだけです。URLとWikiページのどちらでもOKです。<br>
+</p>
+<pre>*[Google|http://www.google.co.jp]
+*[[Wiki|Wikiクローン]]
+</pre>
+</div>
+</body>

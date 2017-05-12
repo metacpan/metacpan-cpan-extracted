@@ -1,0 +1,23 @@
+#!/usr/bin/perl
+
+# Converts the cty.dat file from http://www.country-files.com/cty/
+
+$/ = ";";
+
+while (<>) {
+    @info = split(/:\s*/,$_);
+    s/^\s*//;
+    s/;.*//;
+    my @prefixes = $info[$#info-1];
+    push @prefixes, (split(/,/,$info[$#info]));
+    foreach my $prefix (@prefixes) {
+	$info[0] =~ s/^\s+//;
+	$prefix =~ s/\s+//g;
+	$prefix =~ s/^\*//;
+	$prefix =~ s/[\(\[].*//;
+	$prefixes{$prefix} = $info[0];
+    }
+}
+
+use Data::Dumper;;
+print Dumper(\%prefixes);

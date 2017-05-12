@@ -1,0 +1,82 @@
+Harvey/Word version 1.02
+=======================
+
+INSTALLATION NOTES:  
+
+Version 1.02 comes with 3 modules: Word.pm, Verb.pm and Harvey.pm.
+Word makes word objects with informtion about the word.  Verb makes
+verb objects from sentences, which give information about the parsed
+verb structure in the sentence.  Harvey provides a simple dialog 
+routine to test and work with the parsings.  Install Word, then Verb 
+and then Harvey.
+
+With version 1.02, the Verb.pm module has been created which
+receives sentences in the form of arrays of Word objects and
+parses the verb.  A Harvey module has been sent along to test
+the functionality of the verb parser. 
+
+The Word.pm module is the first module of the Harvey series
+which will be a suite of modules for parsing English 
+sentences and generating sentences.
+
+The Word.pm module takes a word as an argument and makes a 
+word object which can be queried for characteristics about 
+the word, see the documentation in the module itself for 
+details.  
+
+Usage:  
+  use Harvey::Word;
+
+  my $W = Word->new("table");
+
+  print "It's a noun!\n" if ($W->noun());
+
+The Word.pm module requires the word.db TIE file to be
+present in the working directory.  The word.db file can be
+exported to an ASCII file named word.txt using the 'export_word'
+function in the module.  An 'import_word' function exists for 
+the opposite operation.
+
+NOTE: The word.pm module depends on the word.db database.  Once
+the word.pm module is installed, move the word.db database to
+your development directory.  If you would like to set up a special
+data directory, modify the following line of the 'tie_hash'
+routine as follows:
+
+  tie %t_word,'MLDBM',"(YOUR PATH)word.db", O_CREAT|O_RDWR,0666;
+
+My heartfelt thanks to Adam Kilgarriff for his work on the BNC 
+(British National Corpus) which forms the basis for the word.db.
+I have added and massaged it a bit, but I would never have gotten
+this far without it.  The BNC can be visited at
+http://www.itri.brighton.ac.uc/~Adam.Kilgarriff/bnc-readme.html.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ Storable-1.0.14
+ Data-Dumper-2.101
+ DB_File-1.801
+ MLDBM-2.00 
+
+ Requires the word.db file which is TIED to the module.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Chris Meyer.  All rights reserved.  This is 
+free software and may be distributed under the same Terms as Perl
+itself.
+
+CONTACT 
+
+Chris Meyer, chris@mytechs.com and www.mytechs.com.

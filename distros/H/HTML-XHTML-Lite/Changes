@@ -1,0 +1,20 @@
+Revision history for Perl extension HTML::XHTML::Lite.
+
+0.01  Sun May 29 09:47:22 2005
+	- original version; created by h2xs 1.23 with options
+		-XAn HTML::XHTML::Lite
+0.02  Sun June 05 13:13:00 2005
+	- Bug Fix: getvars() was returning a hashref, not a
+		hash as stated in the documentation.  It now
+		returns a hash as intended.
+0.03  Fri June 10 09:45:00 2005
+	- Cosmetic changes: make created code easier to read.
+	- Include sample application in documentation.	
+0.04  Tue June 14 16:51:00 2005
+	- Fix bug when end_page() was not given an argument
+	- Insert missing documentation for end_page()
+0.05  Mon June 05 09:00:00 2006
+	- Correct presentation of Dublin Core metadata
+	  to incorporate correct DCTERMS stuff.
+0.06  Mon June 05 09:00:01 2006
+	- Bugfix for 0.05; module breaks due to missing "

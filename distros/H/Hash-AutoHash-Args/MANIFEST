@@ -1,0 +1,23 @@
+Build.PL
+Changes
+lib/Hash/AutoHash/Args.pm
+lib/Hash/AutoHash/Args/V0.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/autoargs.000.code_exists.t
+t/autoargs.001.boilerplate.t
+t/autoargs.002.pod.t
+t/autoargs.010.basics.t
+t/autoargs.020.class_methods.t
+t/autoargs.020.special_keys.t
+t/autoargs.020.universal.t
+t/autoargs.030.functions.t
+t/autoargs.030.v0_methods.t
+t/autoargs.031.alias.t
+t/autoargs.098.docs.t
+t/autoargs.099.v0_docs.t
+t/autoargs.100.grow_slot.t
+t/autohashUtil.pm

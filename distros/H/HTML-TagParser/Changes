@@ -1,0 +1,42 @@
+# HTML::TagParser Changes
+
+2012/05/03 (0.20)
+    * "AUTHORS AND CONTRIBUTORS" section added
+    * requires Perl 5.8.1 at least
+
+2012/05/03 (0.16.4) [not released]
+    * Don't die on encodings that don't exist [twilde]
+    * Regression test for bogus character set detection [twilde]
+    * Make Encode mandatory, remove Jcode [twilde]
+
+2012/05/01 (0.16.3) [not released]
+    * moved to github
+    * https://github.com/kawanet/HTML-TagParser
+
+2008/10/28 [not released]
+    * drry: fixed regexes. removed subversion properties. et cetera.
+    * http://coderepos.org/share/changeset/22252
+
+2008/10/27 (0.16.1) [not released]
+    * HTML-TagParser-0.16-subtree.diff patch from Juergen Weigert 
+    * http://coderepos.org/share/changeset/22229
+
+2008/10/27 (0.16) [not released]
+    * imported to CodeRepos
+    * http://svn.coderepos.org/share/lang/perl/HTML-TagParser/trunk/
+    * http://coderepos.org/share/changeset/22228
+
+2006/11/01 (0.14)
+    * FB_XMLCREF -> XMLCREF changed. see [Jcode5 802]
+    * POD typo fixed.
+
+2006/05/06 (0.13)
+    * CPAN release
+
+2006/03/08 (0.01)
+    * first version
+
+# http://search.cpan.org/dist/HTML-TagParser/
+# https://github.com/kawanet/HTML-TagParser
+# http://www.kawa.net/works/perl/html/tagparser-e.html       (English)
+# http://www.kawa.net/works/perl/html/tagparser.html#changes (Japanese)

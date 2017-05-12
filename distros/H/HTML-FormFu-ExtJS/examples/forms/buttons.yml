@@ -1,0 +1,17 @@
+---
+elements:
+  - type: Text
+  - type: Button
+    value: Default Button
+  - type: ContentButton
+    name: cnb1
+    content: <i>some</i> <b>markup</b>
+  - type: Submit
+    name: submit
+    value: Submit
+  - type: Reset
+    value: Reset
+  - type: Button
+    value: Handler
+    attrs:
+      handler: function() { alert("click") }

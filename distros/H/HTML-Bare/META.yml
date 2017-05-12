@@ -1,0 +1,30 @@
+---
+abstract: 'A minimal HTML parser / schema checker / pretty-printer using C internally.'
+author:
+  - 'David Helkowski <cpan@codechild.com>'
+build_requires:
+  Data::Dumper: '0'
+  English: '0'
+  File::Find: '0'
+  File::Temp: '0'
+  Scalar::Util: '0'
+  Test::Harness: '0'
+  Test::More: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-Bare
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  DynaLoader: '0'
+  Exporter: '0'
+version: '0.02'

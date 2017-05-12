@@ -1,0 +1,46 @@
+Revision History for HTML-GenToc
+================================
+
+v3.20 2011-04-02
+----------------
+
+* 2011-04-02 18:36:31 +1100
+  tweak
+* 2011-03-29 22:02:49 +1100
+  Added "ignore_only_one" option.
+* 2011-03-29 17:27:49 +1100
+  Added "ignore_sole_first" option.
+* 2011-03-29 16:26:45 +1100
+  Need git to ignore more files.
+* 2011-03-29 16:22:47 +1100
+  Changed SEO anchors. Tweaks to make tests work.
+* 2011-03-29 15:38:27 +1100
+  changed over to use Dist::Zilla
+* 2009-11-27 05:14:22 +0000
+  tidy up a few things
+
+v3.10 2009-11-27
+----------------
+
+* 2008-11-27 07:36:18 +0000
+  generate README file
+* 2008-11-27 07:36:13 +0000
+  bump version to 3.10
+* 2008-11-27 07:36:08 +0000
+  update release notes
+* 2008-11-27 07:30:19 +0000
+  Updated documentation.
+* 2008-11-26 09:26:51 +0000
+  1. fixed bug with outputting to string 2. improved anchor making (thanks to Dan Dascalescu)
+* 2007-12-16 09:05:15 +0000
+  revamped depot
+
+v3.00 2009-11-27
+----------------
+
+* 2007-12-16 09:05:15 +0000
+  revamped depot
+
+====================================
+End of changes in the last 1000 days
+====================================

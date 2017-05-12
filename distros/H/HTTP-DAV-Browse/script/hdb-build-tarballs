@@ -1,0 +1,326 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+hdb-build-tarballs - discover Subversion tags/ folders and build tarballs from the lastes tag inside
+
+=head1 SYNOPSIS
+
+    hdb-build-tarballs --status-file=tmp/visited-tags.json --output-folder=tmp/tarballs http://svn/repo/
+    
+        --new-status     create new status file or start from scratch
+        --status-file    location of status file
+        --output-folder  folder where tarballs will be put
+        --lookin         colon separated list of folders where to look for project/tags/
+                         (default is to look in the base url)
+        --trunks         build/look for trunks instead of tags
+        --pid-dir DIR    folder where the pid file will be stored
+        --mcpani         add to CPAN::Mini::Inject
+    
+    Note: for repositories with basic authentication set DAVUSER, DAVPASS and DAVREALM
+          environment variables
+
+=head1 DESCRIPTION
+
+The purpose is to discover SVN tags/ folders and then find the latest tag
+folder inside (based on revision version). This folder will be checkedout
+to temporary folder where `perl Build.PL && perl Build distmeta && perl Build dist`
+will be executed to get tarball. This tarball will be then copied to
+--output-folder.
+
+=cut
+
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+use HTTP::DAV::Browse;
+use File::Spec;
+use JSON::XS;
+use File::Slurp 'read_file', 'write_file';
+use File::Temp 0.21;
+use IPC::Run qw( run timeout );
+use File::Find::Rule;
+use File::Basename 'basename';
+use Proc::PID::File;
+use File::Which 'which';
+
+exit main();
+
+sub main {    
+    my $help;
+    my $status_filename = 'visited-tags.json';
+    my $output_folder   = File::Spec->curdir();
+    my $new_status      = 0;
+    my $lookin          = '';
+    my $cleanup_folder;
+    my $trunks;
+    my $pid_dir;
+    my $mcpani;
+    GetOptions(
+        'help|h'            => \$help,
+        'status-file|s=s'   => \$status_filename,
+        'new-status|n'      => \$new_status,
+        'output-folder|f=s' => \$output_folder,
+        'cleanup-folder|c=s' => \$cleanup_folder,
+        'lookin|l=s'        => \$lookin,
+        'trunks'            => \$trunks,
+        'pid-dir=s'         => \$pid_dir,
+        'mcpani'            => \$mcpani,
+    ) or pod2usage;
+    pod2usage if $help;
+    $output_folder   = File::Spec->rel2abs($output_folder);
+    $cleanup_folder  = ($cleanup_folder ? File::Spec->rel2abs($cleanup_folder) : $output_folder);
+    $status_filename = File::Spec->rel2abs($status_filename);
+    $pid_dir         = File::Spec->rel2abs($pid_dir);
+
+    die "Already running!\n" if Proc::PID::File->running($pid_dir ? ('dir' => $pid_dir) : ());
+    
+    my $base_uri = shift @ARGV;
+    pod2usage if not $base_uri;
+
+    # create output folder if not exists
+    mkdir($output_folder)
+        if not -d $output_folder;
+
+    my $json = JSON::XS->new->pretty->utf8;
+    my $browser = HTTP::DAV::Browse->new(
+        'base_uri' => $base_uri,
+        'username' => $ENV{'DAVUSER'},
+        'password' => $ENV{'DAVPW'},
+        'realm'    => $ENV{'DAVREALM'},
+    );
+    
+    my %visited_status = (
+        $new_status
+        ? ()
+        : %{$json->decode(scalar read_file($status_filename))}
+    );
+
+    my @lookin = split(/\s*,\s*/, $lookin);
+    @lookin = ('')
+        if not @lookin;
+    
+    foreach my $folder (@lookin) {
+        my @folders =
+            grep { not exists $visited_status{$_} }    # only interrested in not jet discovered folders
+            map { $folder.$_.($trunks ? 'trunk/' : 'tags/') }                 # prefix with current folder
+            grep { $_ =~ m{/$} }                       # only interrested in folders
+            $browser->ls($folder)                      # get list of all files
+        ;
+
+        # loop through newly discovered folders
+        foreach my $folder (@folders) {
+            my @tags =
+                grep {                                # only interrested in folders of tags
+                    $trunks
+                    || ($_->{'rel_uri'} =~ m{/$})
+                }
+                eval {                                # eval as it will throw an exception if there is no tags folder
+                    $browser->ls_detailed($folder)    # get list of tags
+                }
+            ;
+            
+            # no tags no interrest
+            if (not @tags) {
+                $visited_status{$folder} = undef;
+                next;
+            }
+            
+            # found tags, mark for processing
+            $visited_status{$folder} = {
+                'revision' => 0,
+                'author'   => 'anonymous',
+            };
+        }
+    }
+
+    # write back the status file
+    write_file($status_filename, $json->encode(\%visited_status));
+    
+    foreach my $tag_folder (keys %visited_status) {
+        # skip non tags folders
+        next if not defined $visited_status{$tag_folder};
+
+        # get the lastest tag (one with the greates revision number)
+        my ($last_tag) =
+            sort { $b->{'version-name'} <=> $a->{'version-name'} }    # sort desc by revision number
+            grep {                                                    # only interrested in folders of tags
+                $trunks
+                || ($_->{'rel_uri'} =~ m{/$})
+            }
+            eval {                                                    # eval as it will throw an exception if there is no tags folder
+                $browser->ls_detailed($tag_folder)                    # get list of tags
+            }
+        ;
+        
+        # no folders or list fail => nothing to do
+        next if not $last_tag;
+
+        # process 
+        if ($last_tag->{'version-name'} > $visited_status{$tag_folder}->{'revision'}) {
+            # cleanup
+            unlink(File::Spec->catfile($cleanup_folder, $visited_status{$tag_folder}->{'tarball'}))
+                if $visited_status{$tag_folder}->{'tarball'};
+            $visited_status{$tag_folder} = {};
+            
+            # path to latest tag
+            my $last_tag_path = $tag_folder.($trunks ? '' : $last_tag->{'rel_uri'}->as_string);
+            print 'processing ', $last_tag_path, ' made by ', ($last_tag->{'creator-displayname'} || 'unknown'), "\n";
+            
+            # create tarball
+            my $tarball = eval {
+                make_tarball($base_uri.$last_tag_path, $output_folder, ($trunks ? $last_tag->{'version-name'} : ()));
+            };            
+            if ($@) {
+                print '`perl Build dist` failed - ', $@;
+                $visited_status{$tag_folder}->{'fail'} = $@;
+            }
+            else {
+                $visited_status{$tag_folder}->{'tarball'} = $tarball;
+            }
+            
+            # mark processed
+            $visited_status{$tag_folder}->{'revision'} = $last_tag->{'version-name'};
+            $visited_status{$tag_folder}->{'author'}   = $last_tag->{'creator-displayname'};
+            $visited_status{$tag_folder}->{'tag'}      = $base_uri.$last_tag_path;
+            $visited_status{$tag_folder}->{'time'}     = time();
+            
+            # write back the status file
+            write_file($status_filename, $json->encode(\%visited_status));
+            
+            # add file via CPAN::Mini::Inject
+            if ($mcpani and $visited_status{$tag_folder}->{'tarball'}) {
+                my @build_daily = (
+                    $trunks
+                    ? ('-MBuild::Daily=version,'.$last_tag->{'version-name'})
+                    : ()
+                );
+                
+                my ($input, $output);
+                run [
+                    'perl',
+                    @build_daily,
+                    which('mcpani'),
+                    '--authorid',
+                    'LOCAL',
+                    '--add',
+                    '--discover-packages',
+                    '--file',
+                    File::Spec->catfile($output_folder, $tarball),
+                ], \$input, \$output, \$output, timeout( 5*60 )
+                    or chdirdie('mcpani failed: '.$output."\n");
+            }
+        }
+    }
+    
+    # write back the status file
+    write_file($status_filename, $json->encode(\%visited_status));
+    
+    return 0;
+}
+
+
+=head1 Perl functions
+
+=head2 make_tarball($url, $output_folder, $revision)
+
+Functions will checkout C<$url> try to make tarball and copy it to
+C<$output_folder>. Throws exceptions on failures.
+
+Returns name of the created tarball.
+
+=cut
+
+sub make_tarball {
+    my $url           = shift;
+    my $output_folder = shift;
+    my $revision      = shift;
+    
+    my $file_temp_dir = File::Temp->newdir();;
+    my $tmp_folder = $file_temp_dir->dirname();
+    #$tmp_folder = '/tmp/build-test/';
+
+    chdir($tmp_folder) or die 'chdir to tmp folder '.$tmp_folder.' failed: '.$!."\n";
+    
+    my $input  = '';
+    my $output = '';
+    
+    # checkout the trunk
+    my @cmd = ('svn', 'co', '--non-interactive', '--quiet', $url, $tmp_folder);
+    run \@cmd, \$input, \$output, \$output, timeout( 30*60 )
+        or die '`'.join(' ',@cmd).'` failed: '.$output."\n";
+    
+    my @build_daily = (
+        $revision
+        ? ('-MBuild::Daily=version,'.$revision)
+        : ()
+    );
+    
+    my @cmds;
+    if (-e 'Build.PL') {
+        @cmds = (
+            [ 'perl', @build_daily, 'Build.PL' ],
+            [ 'rm', '-f', 'MANIFEST' ],
+            [ 'perl', @build_daily, 'Build', 'manifest' ],
+            [ 'perl', @build_daily, 'Build', 'distmeta' ],
+            [ 'perl', @build_daily, 'Build', 'dist' ]
+        );
+    }
+    elsif (-e 'Makefile.PL') {
+        @cmds = (
+            [ 'perl', @build_daily, 'Makefile.PL' ],
+            [ 'rm', '-f', 'MANIFEST' ],
+            [ 'make', 'manifest' ],
+            [ 'make', 'distmeta' ],
+            [ 'make', 'dist' ]
+        );
+    }
+    # nothing to do if there is no Build.PL or Makefile.PL
+    else {
+        chdirdie('no Build.PL or Makefile.PL'."\n");
+    }
+    
+    foreach my $perl_cmd (@cmds) {
+        run $perl_cmd, \$input, \$output, \$output, timeout( 5*60 )
+            or chdirdie('`'.join(' ',@{$perl_cmd}).'` failed: '.$output."\n");
+    }
+    
+    my @tarballs =
+        File::Find::Rule
+        ->file()
+        ->maxdepth(1)
+        ->name( '*.tar.gz' )
+        ->in($tmp_folder)
+    ;
+    die 'no tarball found in '.$tmp_folder."\n"
+        if not @tarballs;
+    die 'more than one tarball found '.join(', ', @tarballs)."\n"
+        if @tarballs > 1;
+
+    my $tarball = pop @tarballs;
+    @cmd = ('cp', '-f', $tarball, $output_folder);
+    run \@cmd, \$input, \$output, \$output, timeout( 5*60 )
+        or chdirdie('`'.join(' ',@cmd).'` failed: '.$output."\n");
+    
+    chdir(File::Spec->tmpdir());
+    
+    return basename($tarball);
+}
+
+sub chdirdie {
+    my $msg = shift;
+    
+    chdir(File::Spec->tmpdir());
+    die $msg;
+}
+
+__END__
+
+=head1 AUTHOR
+
+Jozef Kutej, C<< <jkutej at cpan.org> >>
+
+=cut

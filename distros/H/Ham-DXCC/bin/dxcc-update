@@ -1,0 +1,39 @@
+#!/usr/local/bin/perl
+# -*- mode: cperl; tab-width: 8; indent-tabs-mode: nil; basic-offset: 2 -*-
+# vim:ts=8:sw=2:et:sta:sts=2
+#########
+# Author:        rmp
+# Last Modified: $Date: 2013-12-21 22:40:31 +0000 (Sat, 21 Dec 2013) $
+# Id:            $Id: dxcc-update 311 2013-12-21 22:40:31Z rmp $
+# $HeadURL$
+#
+use strict;
+use warnings;
+use lib qw(lib);
+use Carp;
+use English qw(-no_match_vars);
+use Ham::DXCC;
+use Data::Dumper;
+
+our $CTY_XML = q[data/cty.xml];
+my $dxcc     = Ham::DXCC->new;
+
+$dxcc->fetch($CTY_XML);
+
+my $parsed = $dxcc->parse($CTY_XML);
+
+for my $exception_in (@{$parsed->{exceptions}}) {
+  print Dumper($exception_in) or croak $ERRNO;
+}
+
+for my $prefix_in (@{$parsed->{prefixes}}) {
+  print Dumper($prefix_in) or croak $ERRNO;
+}
+
+for my $invalid_in (@{$parsed->{invalid_operations}}) {
+  print Dumper($invalid_in) or croak $ERRNO;
+}
+
+for my $zone_exception_in (@{$parsed->{zone_exceptions}}) {
+  print Dumper($zone_exception_in) or croak $ERRNO;
+}

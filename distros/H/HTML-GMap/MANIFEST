@@ -1,0 +1,15 @@
+Changes
+DISCLAIMER.txt
+MANIFEST
+Makefile.PL
+README
+examples/html_gmap_hires_sample
+examples/html_gmap_hires_sample.sql
+examples/html_gmap_piechart_sample
+examples/html_gmap_piechart_sample.sql
+examples/README
+lib/HTML/GMap.pm
+lib/HTML/GMap/Files.pm
+lib/HTML/GMap/Tutorial.pm
+t/00-load.t
+META.yml                                 Module meta-data (added by MakeMaker)

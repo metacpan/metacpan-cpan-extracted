@@ -1,0 +1,56 @@
+HTML::TableTiler README File
+============================
+
+
+Description
+-----------
+
+HTML::TableTiler uses a minimum HTML table as a tile to generate a complete
+HTML table from a bidimensional array of data. It can easily produce simple or
+complex graphic styled tables with minimum effort and maximum speed.
+
+Think about the table tile as a sort of tile that automatically expands itself
+to contain the whole data. You can control the final look of a table by choosing
+either the HORIZONTAL and the VERTICAL tiling mode among: PULL, TILE and TRIM.
+
+The main advantages to use it are:
+
+* automatic table generation
+  Pass only a bidimensional array of data to generate a complete HTML table.
+  No worry to decide in advance the quantity of cells (or rows) in the table.
+
+* complex graphic patterns generation without coding
+  Just prepare a simple table tile in your preferred WYSIWYG HTML editor
+  and let the module do the job for you.
+
+* simple to maintain
+  You can indipendently change the table tile or the code, and everything
+  will go as you would expect.
+
+
+Installation
+------------
+
+0. Prerequisites:
+- Perl version >= 5.005
+- HTML::PullParser >= 1.0
+- IO::Util >= 1.2
+
+
+1. Standard installation
+- from the directory where this file is located, type:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+2. Manual installation
+- if your OS does not have any 'make' support, just copy the
+  content of the /lib dir into perl installation site dir, maintaining the
+  same hierarchy
+
+--
+Domizio Demichelis perl.4pro.net
+2004-03-27

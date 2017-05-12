@@ -1,0 +1,212 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Sanity/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-recommendation [
+		doap-deps:on "HTML::HTML5::Parser 0.107"^^doap-deps:CpanId;
+	];
+	doap-deps:runtime-requirement [ doap-deps:on "XML::LibXML 1.70"^^doap-deps:CpanId ], [ doap-deps:on "Locale::Country"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ], [
+		doap-deps:on "XML::LibXML::Debugging"^^doap-deps:CpanId;
+	];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=HTML-HTML5-Sanity>;
+	doap:category        [ rdfs:label "Namespaces" ], [ rdfs:label "XML" ], [ rdfs:label "DOM" ], [ rdfs:label "Lang" ], [ rdfs:label "Language" ], [ rdfs:label "HTML" ], [ rdfs:label "HTML5" ], [ rdfs:label "Markup" ], [ rdfs:label "Fixer" ], [ rdfs:label "Fix" ], [ rdfs:label "Attributes" ];
+	doap:created         "2009-11-30"^^xsd:date;
+	doap:developer       <http://tobyinkster.co.uk/#i>;
+	doap:documenter      <http://tobyinkster.co.uk/#i>;
+	doap:download-page   <https://metacpan.org/release/HTML-HTML5-Sanity>;
+	doap:homepage        <https://metacpan.org/release/HTML-HTML5-Sanity>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://tobyinkster.co.uk/#i>;
+	doap:name            "HTML-HTML5-Sanity";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Sanity/v_0-01>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Sanity/v_0-02>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Sanity/v_0-03>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Sanity/v_0-04>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Sanity/v_0-100>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Sanity/v_0-101>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Sanity/v_0-102>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Sanity/v_0-103>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Sanity/v_0-104>, <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Sanity/v_0-105>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-html-html5-sanity>;
+	];
+	doap:shortdesc       "make HTML5 DOM trees less insane"@en;
+	doap:tester          <http://tobyinkster.co.uk/#i>.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Sanity/v_0-01>
+	a                    doap:Version;
+	dc:issued            "2009-12-03"^^xsd:date;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Sanity-0.01.tar.gz>;
+	doap:revision        "0.01"^^xsd:string;
+	rdfs:comment         "Original version"@en.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Sanity/v_0-02>
+	a                    doap:Version;
+	dc:issued            "2009-12-23"^^xsd:date;
+	doap-changeset:changeset [
+		a doap-changeset:ChangeSet;
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Update build system; sign distribution."@en;
+			rdfs:seeAlso <http://tobyinkster.co.uk/#key_pgp_6A2A7D39>;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Handling for invalid language attributes."@en;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Improve tests."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Sanity/v_0-01>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Sanity-0.02.tar.gz>;
+	doap:revision        "0.02"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Sanity/v_0-03>
+	a                    doap:Version;
+	dc:issued            "2010-01-08"^^xsd:date;
+	doap-changeset:changeset [
+		a doap-changeset:ChangeSet;
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Mention HTML::Entities dependency in Makefile.PL."@en;
+			doap-changeset:fixes [
+				rdfs:seeAlso <http://rt.cpan.org/Public/Bug/Display.html?id=53160>;
+			];
+		], [
+			a doap-changeset:Update;
+			rdfs:label "Use Turtle for Changes file."@en;
+			doap-changeset:file <file:///home/tai/perl5/hg/p5-html-html5-sanity/meta/changes.pret>;
+			doap-changeset:implements <http://ontologi.es/doap-changeset#>;
+		], [
+			a doap-changeset:Update;
+			rdfs:label "Add 2010 copyright notice."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Sanity/v_0-02>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Sanity-0.03.tar.gz>;
+	doap:revision        "0.03"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Sanity/v_0-04>
+	a                    doap:Version;
+	dc:issued            "2010-04-28"^^xsd:date;
+	doap-changeset:changeset [
+		a doap-changeset:ChangeSet;
+		doap-changeset:item [ rdfs:label "Split out XML-LibXML-Debugging."@en ];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Sanity/v_0-03>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Sanity-0.04.tar.gz>;
+	doap:revision        "0.04"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Sanity/v_0-100>
+	a                    doap:Version;
+	dc:issued            "2010-06-23"^^xsd:date;
+	doap-changeset:changeset [
+		a doap-changeset:ChangeSet;
+		doap-changeset:item [
+			a doap-changeset:Removal;
+			rdfs:label "Remove deprecated debugging functions."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Sanity/v_0-04>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Sanity-0.100.tar.gz>;
+	doap:revision        "0.100"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Sanity/v_0-101>
+	a                    doap:Version;
+	dc:issued            "2011-01-20"^^xsd:date;
+	doap-changeset:changeset [
+		a doap-changeset:ChangeSet;
+		doap-changeset:item [
+			a doap-changeset:Removal;
+			rdfs:label "No longer rely on HTML::Entities."@en;
+		], [
+			a doap-changeset:Removal;
+			rdfs:label "No longer make fix_element and fix_attribute functions exportable. They're fairly obscure and pretty confusing to use."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Sanity/v_0-100>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Sanity-0.101.tar.gz>;
+	doap:revision        "0.101"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Sanity/v_0-102>
+	a                    doap:Version;
+	dc:issued            "2011-10-20"^^xsd:date;
+	doap-changeset:changeset [
+		a doap-changeset:ChangeSet;
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "use 5.010."@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Module::Package::RDF."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Sanity/v_0-101>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Sanity-0.102.tar.gz>;
+	doap:revision        "0.102"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Sanity/v_0-103>
+	a                    doap:Version;
+	dc:issued            "2011-12-08"^^xsd:date;
+	doap-changeset:changeset [
+		a doap-changeset:ChangeSet;
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "use Object::AUTHORITY"@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Update test cases to cope with changes to XML::LibXML::Debugging."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Sanity/v_0-102>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Sanity-0.103.tar.gz>;
+	doap:revision        "0.103"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Sanity/v_0-104>
+	a                    doap:Version;
+	dc:issued            "2013-05-13"^^xsd:date;
+	doap-changeset:changeset [
+		a doap-changeset:ChangeSet;
+		doap-changeset:item [
+			a doap-changeset:Removal;
+			rdfs:label "Object::AUTHORITY"@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Newer version of build system; avoid bundling ancient Scalar::Util."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Sanity/v_0-103>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Sanity-0.104.tar.gz>;
+	doap:revision        "0.104"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Sanity/v_0-105>
+	a                    doap:Version;
+	dc:identifier        "HTML-HTML5-Sanity-0.105"^^xsd:string;
+	dc:issued            "2014-09-13"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Fix dependency metadata (still included Object::AUTHORITY).";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Minor tidying.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Sanity-0.105.tar.gz>;
+	doap:revision        "0.105"^^xsd:string.
+
+<http://tobyinkster.co.uk/#i>
+	a                    foaf:Person;
+	foaf:homepage        <http://tobyinkster.co.uk/>;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:page            <https://metacpan.org/author/TOBYINK>;
+	owl:sameAs           <http://purl.org/NET/cpan-uri/person/tobyink>.
+

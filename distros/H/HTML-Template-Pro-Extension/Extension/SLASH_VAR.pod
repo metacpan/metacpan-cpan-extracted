@@ -1,0 +1,68 @@
+=head1 NAME
+
+HTML::Template::Extension::SLASH_VAR - Plugins for </TMPL_VAR> syntax
+
+=head1 SYNOPSIS
+
+ use HTML::Template::Extension;
+
+ my $text = qq
+    |
+     SLASH_VAR plugin example
+     ========================
+     If all is ok you can read this here --> <TMPL_VAR NAME="test">a placeholder</TMPL_VAR>
+
+    |;
+
+ my $comp       = new HTML::Template::Extension(
+                                            scalarref => \$text,
+                                            plugins=>["SLASH_VAR"],
+                        );
+
+ $comp->param('test' => "It works!!!");
+ print $comp->output;
+
+ #   OUTPUT:
+ #
+ #   SLASH_VAR plugin example
+ #   ========================
+ #   If all is ok you can read this here --> It works!!!
+
+
+=head1 DESCRIPTION
+
+SLASH_VAR add syntax for an extended version of standard TMPL_VAR HTML::Template
+tag. It adds possibility to have a placeholder text between this tag and an
+end-tag </TMPL_VAR> to permit graphic web designer to format text in an
+WYSIWYG environement and have the same visual result when template is processed
+by HTML::Template and placeholder is replaced with dynamic text.
+
+There is an internal parameter for the class costructor 'ecp_compatibility_mode'
+This is used by me because i've an old project called 'ecp' that use a modified
+vanguard_compatibility_mode that use two '%' chars to delimitate params name 
+(%%parameter_name%%). 
+
+So with this plugin you canuse one of this syntax to insert a dynamical text:
+
+ <TMPL_VAR NAME="parameter_name">
+
+ <TMPL_VAR NAME="parameter_name">a placeholder</TMPL_VAR>
+
+ %parameter_name%
+
+ %%parameter_name%% (only valid if 'ecp_compatibility_mode' is set to 1)
+
+=head1 AUTHOR
+
+Bruni Emiliano, <info@ebruni.it>
+
+=head1 SEE ALSO
+
+ HTML::Template
+ HTML::Template::Extension::DO_NOTHING
+ HTML::Template::Extension::SLASH_VAR
+ HTML::Template::Extension::CSTART
+ HTML::Template::Extension::DOC
+ HTML::Template::Extension::HEAD_BODY
+
+=cut

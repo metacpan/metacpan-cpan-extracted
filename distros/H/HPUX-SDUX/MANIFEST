@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+SDUX.pm
+sdux_make
+t/sdux.t

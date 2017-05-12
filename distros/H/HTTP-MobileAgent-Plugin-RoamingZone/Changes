@@ -1,0 +1,11 @@
+Revision history for HTTP-MobileAgent-Plugin-RoamingZone
+
+0.0.3  Thu Sep 30 2008
+       Use Mobile::Data::ITU and Mobile::Data::SID modules.
+
+0.0.2  Sat Aug 30 2008
+       Add HTTP::MobileAgent, Test::Base to require modules.
+
+0.0.1  Thu Aug 28 04:42:26 2008
+       Initial release.
+

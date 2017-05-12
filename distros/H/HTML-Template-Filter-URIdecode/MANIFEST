@@ -1,0 +1,11 @@
+MANIFEST
+README
+LICENSE
+Changes
+t/pod.t
+Build.PL
+Makefile.PL
+lib/HTML/Template/Filter/URIdecode.pm
+t/00.load.t
+t/basic.t
+META.yml

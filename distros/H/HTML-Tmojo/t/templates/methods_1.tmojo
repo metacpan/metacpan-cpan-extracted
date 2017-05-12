@@ -1,0 +1,16 @@
+<: METHOD title :>
+	Test Document
+<: /METHOD :>
+
+<: METHOD name :>
+	Will Conant
+<: /METHOD :>
+
+<title><: $Self->title :></title>
+
+<body>
+	Dear <: $Self->name :>,
+	
+	This is a simple test letter that
+	uses methods.
+</body>

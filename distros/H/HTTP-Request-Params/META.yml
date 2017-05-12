@@ -1,0 +1,28 @@
+---
+abstract: 'Retrieve GET/POST Parameters from HTTP Requests'
+author:
+  - 'Casey West <casey@geeknest.com>'
+  - 'Ian Stuart <Ian.Stuart@ed.ac.uk>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTTP-Request-Params
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CGI: 3.00
+  Class::Accessor::Fast: 0.19
+  Email::MIME: 1.42
+  Email::MIME::ContentType: 1.0
+  HTTP::Request: 1.40
+  HTTP::Request::Common: 1.26
+version: 1.02

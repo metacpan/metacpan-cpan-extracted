@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               HTML-Template-Default
+version:            1.10
+abstract:           provide multiple template sources and use a default
+author:
+    - Leo Charre leocharre at cpan dot org
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:              0
+    HTML::Template:    1.9
+    LEOCHARRE::Debug:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

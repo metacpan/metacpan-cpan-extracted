@@ -1,0 +1,331 @@
+=head1 NAME
+
+HTTP::Server::Multiplex - single process multi serve HTTP daemon
+
+=head1 INHERITANCE
+
+=head1 SYNOPSIS
+
+  # see examples directory in the distribution!
+  use HTTP::Server::Multiplex;
+  my $daemon = HTTP::Server::Multiplex->new
+    ( daemon     => {}
+    , connection => {}
+    , vhosts     => {}
+    );
+
+  $daemon->addVirtualHost('My::VHost');
+
+  $daemon->run;
+
+=head1 DESCRIPTION
+
+This full stand-alone HTTP daemon serves all requests from B<one single
+process>.  See the L</DETAILS> about the back-ground, advantages and
+backdraws of this approach.  You should read that section at least once
+before you start.
+
+B<This is the first release: please test and report bugs and wish-lists!>
+
+=head1 METHODS
+
+$obj-E<gt>B<_configDaemon>(OPTIONS)
+
+=over 4
+
+ Option   --Default
+ detach     <false>
+ group      $EGID
+ pid_file   <undef>
+ server_id  <shows hostname and some versions>
+ user       $ENV{USER} or $EUID
+
+. detach => BOOLEAN
+
+=over 4
+
+When true, the daemon will detach from the terminal and run in
+the background.  STDIN, STDOUT, STDERR will get closed; errors
+go to syslog via Log::Report subroutine dispatcher.
+
+=back
+
+. group => STRING
+
+=over 4
+
+The group(s) under which the daemon will be run.
+
+=back
+
+. pid_file => FILENAME
+
+. server_id => STRING
+
+. user => STRING
+
+=over 4
+
+The username under which the daemon will be run.
+
+If you are the super-user and you want this daemon to run as such
+(which is dangerous!), then you must explicitly provide the name of the
+super-user username.
+
+=back
+
+=back
+
+$obj-E<gt>B<_configNetwork>(SOCKET|HASH-of-OPTIONS)
+
+=over 4
+
+Set-up a listener waiting for new connections to arrive.  This is an
+internal helper routine for L<new()|HTTP::Server::Multiplex/"METHODS">.
+
+ Option--Default
+ host    <all interfaces>
+ listen  SO_MAXCONN
+ port    80
+
+. host => STRING
+
+=over 4
+
+Needed to get the interface IP addresses from.
+
+=back
+
+. listen => INTEGER
+
+. port => INTEGER
+
+=back
+
+HTTP::Server::Multiplex-E<gt>B<new>(OPTIONS)
+
+=over 4
+
+ Option    --Default
+ connection  <required>
+ deamon      <required>
+ vhosts      <HTTP::Server::VirtualHost::Default>
+
+. connection => SOCKET|HASH-of-OPTIONS|ARRAY
+
+=over 4
+
+For OPTIONS, see L<_configNetwork()|HTTP::Server::Multiplex/"METHODS">.  You can provide an ARRAY
+of SOCKETs or socket configuration OPTIONS, which will be handled
+in parallel.
+
+=back
+
+. deamon => HASH-of-OPTIONS
+
+=over 4
+
+For OPTIONS, see L<_configDaemon()|HTTP::Server::Multiplex/"METHODS">
+
+=back
+
+. vhosts => VHOST|HASH-of-OPTIONS|PACKAGE|ARRAY
+
+=over 4
+
+For OPTIONS, see L<addVirtualHost()|HTTP::Server::Multiplex/"Virtual host administration">.  Provide one or an ARRAY of
+virtual host configurations, either by L<HTTP::Server::VirtualHost|HTTP::Server::VirtualHost>
+objects or by the OPTIONS to create such objects.
+
+=back
+
+=back
+
+=head2 Accessors
+
+$obj-E<gt>B<mux>
+
+=over 4
+
+Returns the core multiplexer object, an IO::Multiplex.
+
+=back
+
+=head2 Daemon control
+
+$obj-E<gt>B<run>
+
+=over 4
+
+Start the daemon.
+
+=back
+
+=head2 Virtual host administration
+
+$obj-E<gt>B<addVirtualHost>(VHOST|PACKAGE|HASH-of-OPTIONS|OPTIONS)
+
+=over 4
+
+Adds a new virtual host to the knowledge of the daemon.  Can be used
+at run-time.  See L<HTTP::Server::VirtualHost::new()|HTTP::Server::VirtualHost/"Constructors"> for OPTIONS.
+The added virtual host object is returned.
+
+=back
+
+$obj-E<gt>B<removeVirtualHost>(VHOST|NAME|ALIAS)
+
+=over 4
+
+Remove all name and alias registrations for the indicated virtual host.
+Silently ignores non-existing vhosts.  The removed virtual host object
+is returned.
+
+=back
+
+$obj-E<gt>B<virtualHost>(NAME)
+
+=over 4
+
+=back
+
+=head1 DETAILS
+
+=head2 HTTP::Daemon/mod_perl differ from this approach
+
+The LWP network library is very solid and provides a full HTTP/1.1
+daemon named HTTP::Daemon.  The logic of that daemon was used to
+create the code for this module.  Both LWP and Apache's mod_perl start
+many processes, for each requesting client one.  What we do here is to
+have only one process to serve many clients at the same time.
+
+HTTP::Daemon and mod_perl are based on processes and threads to handle
+requests in parallel.  The advantage is that disturbances and delays in
+handling one client's request are not brothering the other processes, the
+other clients.  As disadvantage, it quite hard to share user session
+information and do caching.  Solutions are found in databases and the
+mem-cache daemon to share data, and use locking to synchronize.
+
+This L<HTTP::Server::Multiplex|HTTP::Server::Multiplex> module uses only one process to handle
+all requests, by serving many client connections together.  The base
+is laid in IO::Multiplex, which is a smart C<select(2)> call (you may
+need to read-up on that Operating System feature).  The single process
+spends all its time handling one request, until IO has to be done.
+When waiting for that IO to happen, it will handle available request
+from other connections.
+
+Advantages of this approach: no heavy forking, no complex synchronizing
+between processes and very simple caching.  Most importantly: the whole
+code is a critical section which avoid the need for locking.  Very fast
+and very simple -in concept.
+
+Disadvantages are also plentifold: you have to be careful with any IO
+to use the IO::Multiplex select loop, and busy-waits (for reading files,
+acquiring locks, database output, hostname lookups, sleep) are blocking
+all other clients.  Any bug in your software can break the daemon,
+and therewith the whole service.
+
+=head2 Features
+
+The following common needs for http servers are implemented:
+
+=over 4
+
+=item HTTP/1.1 (and 1.0 and older)
+
+Multiple requests can use one connection. Requests can arrive asynchronously
+from the processing, queuing-up while processed in order.
+
+=item Virtual Hosts
+
+Configure multiple websites, handled by this single daemon.  See
+L<HTTP::Server::VirtualHost|HTTP::Server::VirtualHost>.  Each website (virtual host) has its own
+directories where the information is taken from, each with a set access
+restrictions (allow/deny), rewrite rules, location, etc.  See
+L<HTTP::Server::Directory|HTTP::Server::Directory>
+
+=item Critical section
+
+With forking servers, it is difficult to synchronize between threads and
+processes: you have to lock or use databases to create critical sections.
+In this implementation, the whole program runs in one big critical
+section, unless you do IO. Of course, each processing should take little
+time, to avoid long response delays for other connections.
+
+=item Asynchronous processing
+
+In case you task does difficult I/O or long computation, you can start
+a seperate process with L<HTTP::Server::Connection::async()|HTTP::Server::Connection/"Constructors">.  Be aware
+that this comes with a penalty.
+
+=item Sessions
+
+The same user can have multiple connections to the daemon, which use a
+single session definition.  This way, the cache of the user's information
+cannot get out-of-sync.  See L<HTTP::Server::Session|HTTP::Server::Session>.
+
+=back
+
+=head3 Missing features
+
+=over 4
+
+=item CGI
+
+Asynchronous execution of external scripts, according to the CGI
+protocol.  This is not too hard to implement, it just takes some
+time.
+
+=back
+
+=head2 Microsoft Windows Limitations
+
+Microsofts POSIX implementation does support the select() call, which
+is the base of IO::Multiplex used as event loop in the daemon.
+However, that implementation does not support the use of FILE and PIPE
+handles in the select() as seen on UNIX systems: it only supports
+sockets.  As a result, the readFile, writeFile and async methods of
+L<HTTP::Server::Connection|HTTP::Server::Connection> will (probably) not work.  Please, users of
+Windows: explain me how to implement work-arounds.
+
+=head2 General Misconceptions
+
+People apparently think that executing requests in parallel processes
+is faster than executing all requests in one process; this cannot be
+true (in a single processor system): processing takes computational effort
+and there is only one processor to run these tasks.  Parallel processes
+do not run in parallel, but interleaved.  It is the same amount of work
+to be done, so runs in comparible total time.
+
+The most important difference between the one-process and the parallel
+implementation, is that the latter can sleep much easier: waiting for
+disk, interrupts and such in one parallel thread does not hold-up the
+other threads.  In the one-process implementation, we need to code just
+like graphical interfaces work: in small fragments, triggered by (file
+IO) events.
+
+When you implement your "CGI" logic within the virtual host frame-work
+of this daemon, your code gets compiled before the daemon starts
+accepting requests.  The same, of course, for mod_perl.  Once running,
+it is quite hard to fill a time-slice of availability of the processor;
+the OS interleaves parallel processes with rather long time-spans of
+(usually) around on tenth of a second.  You can do an enormous amount
+of work in such a long time-slice.  Most tasks, however, will not consume
+the whole span, because they have to wait for more data from disk,
+some event, or are completed.  Concluding that an IO-driven approach is
+rarely giving slower "interactive" response to clients than a parallel
+implementation.  At least in theory, when implemented correctly.
+
+=head1 SEE ALSO
+
+This module is part of HTTP-Server-Multiplex distribution version 0.11,
+built on October 01, 2008. Website: F<http://perl.overmeer.net/httpd-multiplex/>
+
+=head1 LICENSE
+
+Copyrights 2008 by Mark Overmeer. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

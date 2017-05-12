@@ -1,0 +1,29 @@
+=head1 TITLE
+
+The Design Of MIX simulator and its assembler
+
+=head1 REQUIREMENT
+
+
+=head1 IO System
+
+The IO devices of MIX is 60s era. 
+
+Fortunately, we only have to know how they function with the MIX core.
+We know that each io device has a unit number, and has a flat storage.
+The device also has to maintain the ready bit.
+Some device can tell when the current activity will end.
+But some not. For example, if the card reader is waiting for card, 
+or reading the teletype client.
+
+when simulation began, it is assumed that all cards should be already 
+correctly handed in.
+
+Hand a card deck in, so the other day you will get some result.
+
+We have to understand how the programmers ran programs in the 1960s.
+They could not have their own. When they wrote program on cards,
+they hand the card deck to a operator. ANd the operator will then
+run the program for them, and report the result.
+
+   So device has some common interfaces.

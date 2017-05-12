@@ -1,0 +1,29 @@
+#!/bin/bash
+#
+#PBS -N [% JOBNAME %]
+[% IF self.has_queue %]
+#PBS -q [% self.queue %]
+[% END %]
+#PBS -l nodes=1:ppn=[% CPU %]
+[% IF self.has_walltime %]
+#PBS -l walltime=[% self.walltime %]
+[% END %]
+#PBS -j oe
+#PBS -o localhost:[% OUT %]
+[% IF self.has_mem %]
+#PBS -l mem=[% self.mem %]
+[% END %]
+
+[% IF AFTEROK %]
+#PBS -W depend=afterok:[% AFTEROK %]
+[% END %]
+
+#MY SPECIAL TEMPLATE
+
+[% IF MODULE %]
+    [% FOR d = MODULE %]
+module load [% d %]
+    [% END %]
+[% END %]
+
+[% COMMAND %]

@@ -1,0 +1,28 @@
+Revision history for Perl extension Harriet
+
+00.05 2016-01-08T06:42:16Z
+
+    commit b56340eefcae9c44eed6739f542211244ea9a974
+    Author: Ichinose Shogo <shogo82148@gmail.com>
+    Date:   Fri Jan 8 00:05:24 2016 +0900
+
+        avoid buffing of STDOUT
+
+0.04 2014-02-03T07:40:24Z
+
+    - Handle SIGINT on harriet command.
+      (Reported by sugyan++)
+
+0.03 2013-06-04T10:57:49Z
+
+    - Fixed shell quoting issues
+      (Reported by sugyan++)
+
+0.02 2013-05-16T10:59:12Z
+
+    - Doc enhancements, and brush up-ed example code.
+
+0.01 2013-05-16T10:01:36Z
+
+    - original version
+

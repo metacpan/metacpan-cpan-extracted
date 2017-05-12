@@ -1,0 +1,25 @@
+Revision history for HTTP-Tiny-UA
+
+0.004     2015-08-12 10:22:46-04:00 America/New_York
+
+    [CHANGED]
+
+    - Copies response headers in header accessors to ensure original is
+      immutable
+
+0.003     2014-11-13 16:32:41-05:00 America/New_York
+
+    [CHANGED]
+
+    - Drop perl prereq from v5.10 to v5.6
+
+0.002     2014-02-22 07:19:14-05:00 America/New_York
+
+    [FIXED]
+
+    - Tests were failing with new HTTP::Tiny 0.043+ with keep_alive support
+
+0.001     2013-10-05 22:20:37 America/New_York
+
+    - First release
+

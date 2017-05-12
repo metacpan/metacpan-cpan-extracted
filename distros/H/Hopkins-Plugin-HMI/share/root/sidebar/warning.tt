@@ -1,0 +1,13 @@
+<h2>Hopkins Job Manager</h2>
+
+<ul>
+	<li>
+		This system is private and is intended for authorized
+		users only. Unauthorized access or use is prohibited
+		and may lead to prosecution under Section 2(d) of the
+		Computer Fraud and Abuse Act of 1986 18 U.S.C.
+		1030(a)(5)(A)(1988)
+	</li>
+
+	<li>system time: <strong>[% now.iso8601 %]</strong></li>
+</ul>

@@ -1,0 +1,20 @@
+Revision history for HTML-FromArrayref
+
+1.01    2011-12-05
+        First version, released on an unsuspecting world.
+
+1.02	2012-09-26
+	Output valid HTML 4.01 instead of reverse-compatible XHTML
+	Add doctype functions
+
+1.03	2012-09-26
+	Update POD
+
+1.04	2012-09-27
+	Add HTML::Entities to prerequisites
+
+1.05	2012-10-04
+	Archive with GNU tar
+
+1.06	2013-10-29
+	Don't skip false content

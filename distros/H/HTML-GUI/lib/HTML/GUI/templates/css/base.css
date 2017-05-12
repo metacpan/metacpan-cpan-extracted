@@ -1,0 +1,155 @@
+/*base css for the HTML::GUI::widget framework */
+
+html {
+		font-size : 100%;
+}
+body {
+		font-family: 'Arial';
+		background-color:#FFFFF9;
+		margin			: 0px;
+}
+label {
+		width			 : 12em;
+		text-align : right;
+		display		 : block;
+		float : left;
+		margin : 0;
+		padding-right : 0.4em;
+}
+p {
+		width			 : 21em;
+		height	   : 1.6em;
+		margin		:  0.1em;
+		padding		:  0px;
+		border			: 0px solid #000000;
+}
+h1 {
+		text-align : center;
+		color				:  #6f8ee6;
+		margin-bottom	: 0.1em;
+}
+.actionBar {
+		text-align	: center;
+		padding			: 0.2em;
+		width				: auto;
+}
+.float {
+		float : left;
+}
+.spacer {
+		float : none;
+		clear: both;
+		visibility: hidden;
+		height : 0px;
+}
+input {
+		text-align	: left;
+		display			: block;
+		float				: left;
+		margin			: 0em;
+		padding			: 0.1em 0.2em;
+		border : solid 2px #abb9e1;
+		max-width		: 8em;
+}
+.ckbx{
+		width			: 1em;
+		height			: 1em;
+		background	: #FFFFFF;
+}
+fieldset {
+		background-color:#E5ECFF;
+		border-color:#BFD1FF;
+		margin			: 0.4em 0.5em;
+		padding			: 1em 1ex;
+}
+form {
+		background-color : #ffffff;
+		max-width : 65em;
+}
+legend {
+		font-weight : bold;
+		font-size:   1.4em;
+		padding : 0.1em;
+}
+.btn:hover {
+		background-color : #ffce58;
+}
+.btn {
+		text-align : center;
+		width: 8em; 
+		margin : 0.1em;
+		border : solid 1px #878580;
+		background-color : #ede8dd;
+		float			: none;
+		display : inline;
+}
+#bli{
+		width			: 20ex;
+}
+.dataGrid {
+		background		: #ffffff;
+		border-collapse : collapse ;
+		text-align	  : center;
+		border			: 2px solid #abb9e1;
+		margin			: 1em auto;
+}
+table.dataGrid * tr * input{
+		border		: 0px ;
+		background-color:transparent;
+		text-align	: right;
+}
+table.dataGrid * tr * {
+		border			: 1px solid #abb9e1;
+		padding			: 0.3ex 1ex;
+		text-align	: center;
+}
+table.dataGrid thead th {
+		background : #EEEEEE;
+}
+table.dataGrid tbody tr:hover {
+		background-color : #ffce58;
+}
+.coltxt {
+		background-color:#f3f6ff;
+}
+/* reserved for fields just visible for  browser 
+ * without javascript.
+ * the propertie display:none is added by javascript 
+ * when the page iѕ loaded */
+.txtOnly {
+	/*	display : none; */
+}
+
+/*********************************************
+ * styles for an error list
+ * *******************************************/
+div.errorList {
+		border: 2px solid #ff5035;
+		margin			: 0.4em 0.5em;
+		padding			: 1ex 1ex;
+}
+h2.errorList {
+		margin	: 0em 0.6em;
+}
+
+dl.errorList {
+		list-style-type: disc;
+		list-style-position: inside;
+		margin	: 0em;
+}
+
+dl.errorList dt{
+		font-weight : bold;
+		color : #00136a;
+}
+
+dl.errorList dd a{
+		border : solid 1px #878580;
+		background : #ede8dd;
+		padding			: 0.1em 0.2em;
+		color : #000000;
+		text-decoration:none;
+}
+dl.errorList dd a:hover {
+		background-color : #ffce58;
+}

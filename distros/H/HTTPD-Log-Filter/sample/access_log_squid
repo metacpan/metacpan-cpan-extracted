@@ -1,0 +1,10 @@
+992742974.891 1298 216.165.10.195 TCP_HIT/200 393 GET http://www.itn.co.uk/images/spacer.gif - NONE/- image/gif
+992742974.939 1345 207.107.254.61 TCP_MISS/200 5450 GET http://www.itn.co.uk/stamps/bon-jovi.gif - DIRECT/192.168.1.2 image/gif
+992742974.976 1381 209.144.230.210 TCP_IMS_MISS/304 248 GET http://www.itn.co.uk/js/adcode.js - DIRECT/192.168.1.2 -
+992742974.977 1383 38.32.161.135 TCP_MISS/200 3149 GET http://www.itn.co.uk/js/adcode.js - DIRECT/192.168.1.2 -
+992742974.997 69 212.158.80.11 TCP_CLIENT_REFRESH/200 1703 GET http://itn.co.uk/media/news_ticker/ticker_text.txt - DIRECT/192.168.1.2 text/plain
+992742975.373 36 200.11.182.250 TCP_MISS/200 5586 GET http://itn.co.uk/news/20010616/pics/madonna_ritchie2_sm.jpg - DIRECT/192.168.1.2 image/jpeg
+992742975.627 30 130.246.74.118 TCP_MISS/200 1703 GET http://itn.co.uk/media/news_ticker/ticker_text.txt - DIRECT/192.168.1.2 text/plain
+992742975.751 827 200.56.67.111 TCP_HIT/200 8211 GET http://itn.co.uk/js/javascripts2.js - NONE/- -
+992742975.943 40 200.11.182.250 TCP_MISS/200 6028 GET http://itn.co.uk/news/20010615/pics/puffycombs_sm.jpg - DIRECT/192.168.1.2 image/jpeg
+992742976.262 545 209.185.143.138 TCP_MISS/200 16895 GET http://www.lbc.co.uk/news_archive/mayor/mayor991127.htm - DIRECT/192.168.1.2 text/html

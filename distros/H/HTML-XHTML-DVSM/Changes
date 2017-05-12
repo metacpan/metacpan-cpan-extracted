@@ -1,0 +1,12 @@
+Revision history for Perl extension HTML::XHTML::DVSM.
+
+0.01  Wed Apr 25 10:10:16 2007
+    - original version; created by h2xs 1.22 with options
+        -AX --skip-exporter --use-new-tests -n HTML::XHTML::DVSM
+
+1.1   Tue Jan 13 10:50:00 2009
+    - Handle CDATA sections in XHTML
+    - Improved documentation.
+    
+1.2   Wed Jan 20 14:40:00 2010
+    - Don't cleardown the server level cache for markup/subs in sbInit()

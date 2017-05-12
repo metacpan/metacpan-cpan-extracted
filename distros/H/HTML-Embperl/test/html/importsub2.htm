@@ -1,0 +1,36 @@
+<html>
+<head>
+<title>Tests for Embperl - Importing subs 2</title>
+</head>
+
+
+<body>
+
+<h1>Tests for Embperl - Importing subs</h1>
+
+[! Execute({inputfile => 'subimp.htm', import => 1}) !]
+
+
+Second sub:
+[- tsecond -]
+
+First sub:
+[- tfirst -]
+
+[- @cell = (['2a1', '2a2'], ['2b1', '2b2']) -]
+
+And now a table splitted into several subs:
+
+<table>
+<tr><th>1</th><th>2></th></tr>
+<tr>
+[- tabcell (\@cell) -]
+</tr>
+</table>
+
+And done!
+
+
+
+</body>
+</html>

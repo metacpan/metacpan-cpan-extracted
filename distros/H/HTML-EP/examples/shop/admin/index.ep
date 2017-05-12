@@ -1,0 +1,95 @@
+<ep-package name="HTML::EP::Shop">
+<ep-database dsn="DBI:CSV:f_dir=$env->DOCUMENT_ROOT$/outdoor/shop/var">
+<ep-perl>
+  my $self = $_;
+  $self->{'tables'} = [sort map { $_ =~ s/.*?\.//;
+				  ($_ =~ /^\w+$/) ? ($_) : ()  }
+		       $self->{'dbh'}->tables()];
+  '';
+</ep-perl>
+<HTML><HEAD><TITLE>
+<ep-language de="Administration" en="Administration"></TITLE></HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<DIV ALIGN=CENTER>
+<A HREF="index.ep?language=de">
+  <IMG SRC=/outdoor/de.jpg ALT=Deutsch BORDER=0></A>
+<A HREF="index.ep?language=en">
+  <IMG SRC=/outdoor/en.jpg ALT=English BORDER=0></A>
+</DIV>
+<BR><BR><BR>
+<H1><ep-language de="Administration" en="Administration"></H1>
+<p>
+<ep-language language="de">
+Hier findet die Verwaltung Ihres Shops statt. Die folgenden Möglichkeiten
+werden Ihnen angeboten:
+<ul>
+  <li><a href="prefs.ep?language=$_ep_language$">Pflege der Stammdaten</a>
+  <li><a href="#upload">Einspeisen neuer Daten</a>
+  <li><a href="#download">Download der derzeit aktuellen Daten</a>
+</ul>
+</ep-language>
+<ep-language language="en">
+This is the administration page of your shop. The following possibilities
+are avilable:
+<ul>
+  <li><a href="prefs.ep?language=$_ep_language$">Edit the preferences</a>
+  <li><a href="#upload">Upload new data</a>
+  <li><a href="#download">Download the current data</a>
+</ul>
+</ep-language>
+</p>
+
+<a name="upload">
+<h2><ep-language de="Upload" en="Upload"></h2>
+<DIV ALIGN=CENTER>
+<FORM ACTION="upload.ep" METHOD=POST ENCTYPE="multipart/form-data">
+<INPUT TYPE=hidden NAME=language VALUE="$_ep_language$">
+<INPUT TYPE=hidden NAME=table VALUE="articles">
+<TABLE>
+  <TR><TH><ep-language en="Separator" de="Trennzeichen">:</TH>
+      <TD><INPUT NAME=sep VALUE=";" SIZE=1></TD>
+      <TH><ep-language en="Escape Char" de="Begrenzungszeichen"></TH>
+      <TD><INPUT NAME=escape VALUE="&quot;" SIZE=1></TD>
+  <TR><TH><ep-language en="Filename:" de="Dateiname"></TH>
+      <TD COLSPAN=3 ALIGN=LEFT><INPUT TYPE=file SIZE=30 NAME=data></TD></TR>
+  <TR><TD COLSPAN=4 ALIGN=CENTER>
+        <ep-language language="de">
+          <INPUT TYPE=submit VALUE="Upload durchführen">
+        </ep-language>
+        <ep-language language="en">
+          <INPUT TYPE=submit VALUE="Start Upload">
+        </ep-language>
+      </TD></TR>
+</TABLE>
+</FORM>
+</DIV>
+
+
+<a name="download">
+<h2><ep-language de="Download" en="Download"></h2>
+<DIV ALIGN=CENTER>
+<FORM ACTION="download.ep" METHOD=POST>
+<INPUT TYPE=hidden NAME=language VALUE="$_ep_language$">
+<TABLE>
+  <TR><TH><ep-language de="Zu speichernde Tabelle" en="Table being saved">:
+      </TH>
+      <TD>
+        <ep-select name=table items=tables item=t><OPTION>$t$</ep-select>
+      </TD>
+  </TR>
+  <TR><TH><ep-language en="Separator" de="Trennzeichen">:</TH>
+      <TD><INPUT NAME=sep VALUE=";" SIZE=1></TD>
+      <TH><ep-language en="Escape Char" de="Begrenzungszeichen"></TH>
+      <TD><INPUT NAME=escape VALUE="&quot;" SIZE=1></TD>
+  </TR>
+</TABLE>
+<ep-language language="de">
+<INPUT TYPE=submit VALUE="Download durchführen">
+</ep-language>
+<ep-language language="en">
+<INPUT TYPE=submit VALUE="Start Download">
+</ep-language>
+</FORM>
+</DIV>
+</BODY>
+</HTML>

@@ -1,0 +1,8 @@
+Revision history for Perl extension HTTP::Response::Maker
+
+0.02    Thu Apr 19 20:39:39 JST 2012
+        - fixed "location" for HTTP::Response::Maker::Exception
+        - fixed rt.cpan.org bug #76671 "Undeclared dependency on parent.pm"
+
+0.01    Wed Mar 21 10:13:05 2012
+        - original version

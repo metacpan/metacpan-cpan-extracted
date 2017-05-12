@@ -1,0 +1,240 @@
+@@ -128,48 +128,48 @@
+ <p>This is a simple aggregate function which returns a variance.
+ It is adapted from an example implementation in pysqlite.</p>
+ 
+-<pre class="sh_perl">  package variance;
+-  
+-  sub new { bless [], shift; }
+-  
+-  sub step {
+-      my ( $self, $value ) = @_;
+-  
+-      push @$self, $value;
+-  }
+-  
+-  sub finalize {
+-      my $self = $_[0];
+-  
+-      my $n = @$self;
+-  
+-      # Variance is NULL unless there is more than one row
+-      return undef unless $n || $n == 1;
+-  
+-      my $mu = 0;
+-      foreach my $v ( @$self ) {
+-          $mu += $v;
+-      }
+-      $mu /= $n;
+-  
+-      my $sigma = 0;
+-      foreach my $v ( @$self ) {
+-          $sigma += ($x - $mu)**2;
+-      }
+-      $sigma = $sigma / ($n - 1);
+-  
+-      return $sigma;
+-  }
+-  
+-  # NOTE: If you use an older DBI (&#60; 1.608),
+-  # use $dbh-&#62;func(..., &#34;create_aggregate&#34;) instead.
+-  $dbh-&#62;sqlite_create_aggregate( &#34;variance&#34;, 1, &#39;variance&#39; );</pre>
++<pre class="sh_perl">package variance;
+ 
++sub new { bless [], shift; }
++
++sub step {
++    my ( $self, $value ) = @_;
++
++    push @$self, $value;
++}
++
++sub finalize {
++    my $self = $_[0];
++
++    my $n = @$self;
++
++    # Variance is NULL unless there is more than one row
++    return undef unless $n || $n == 1;
++
++    my $mu = 0;
++    foreach my $v ( @$self ) {
++        $mu += $v;
++    }
++    $mu /= $n;
++
++    my $sigma = 0;
++    foreach my $v ( @$self ) {
++        $sigma += ($x - $mu)**2;
++    }
++    $sigma = $sigma / ($n - 1);
++
++    return $sigma;
++}
++
++# NOTE: If you use an older DBI (&#60; 1.608),
++# use $dbh-&#62;func(..., &#34;create_aggregate&#34;) instead.
++$dbh-&#62;sqlite_create_aggregate( &#34;variance&#34;, 1, &#39;variance&#39; );</pre>
++
+ <p>The function can then be used as:</p>
+ 
+-<pre class="sh_perl">  SELECT group_name, variance(score)
+-  FROM results
+-  GROUP BY group_name;</pre>
++<pre class="sh_perl">SELECT group_name, variance(score)
++FROM results
++GROUP BY group_name;</pre>
+ 
+ <h2><a class='u' href='#___top' title='click to go to top of document'
+ name="Variance_(Memory_Efficient)"
+@@ -177,52 +177,52 @@
+ 
+ <p>A more efficient variance function, optimized for memory usage at the expense of precision:</p>
+ 
+-<pre class="sh_perl">  package variance2;
+-  
+-  my $sum   = 0;
+-  my $count = 0;
+-  my %hash;
+-  
+-  sub new { bless [], shift; }
+-  
+-  sub step {
+-      my ( $self, $value ) = @_;
+-  
+-      # by truncating and hashing, we can comsume many more data points
+-      $value = int($value); # change depending on need for precision
+-                            # use sprintf for arbitrary fp precision
+-      if (defined $hash{$value}) {
+-          $hash{$value}++;
+-      } else {
+-          $hash{$value} = 1;
+-      }
+-      $sum += $value;
+-      $count++;
+-  }
+-  
+-  sub finalize {
+-      my $self = $_[0];
+-  
+-      # Variance is NULL unless there is more than one row
+-      return undef unless $count &#62; 1;
+-  
+-      # calculate avg
+-      my $mu = $sum / $count;
+-  
+-      my $sigma = 0;
+-      foreach my $h (keys %hash) {
+-          $sigma += (($h - $mu)**2) * $hash{$h};
+-      }
+-      $sigma = $sigma / ($count - 1);
+-  
+-      return $sigma;
+-  }</pre>
++<pre class="sh_perl">package variance2;
+ 
++my $sum   = 0;
++my $count = 0;
++my %hash;
++
++sub new { bless [], shift; }
++
++sub step {
++    my ( $self, $value ) = @_;
++
++    # by truncating and hashing, we can comsume many more data points
++    $value = int($value); # change depending on need for precision
++                          # use sprintf for arbitrary fp precision
++    if (defined $hash{$value}) {
++        $hash{$value}++;
++    } else {
++        $hash{$value} = 1;
++    }
++    $sum += $value;
++    $count++;
++}
++
++sub finalize {
++    my $self = $_[0];
++
++    # Variance is NULL unless there is more than one row
++    return undef unless $count &#62; 1;
++
++    # calculate avg
++    my $mu = $sum / $count;
++
++    my $sigma = 0;
++    foreach my $h (keys %hash) {
++        $sigma += (($h - $mu)**2) * $hash{$h};
++    }
++    $sigma = $sigma / ($count - 1);
++
++    return $sigma;
++}</pre>
++
+ <p>The function can then be used as:</p>
+ 
+-<pre class="sh_perl">  SELECT group_name, variance2(score)
+-  FROM results
+-  GROUP BY group_name;</pre>
++<pre class="sh_perl">SELECT group_name, variance2(score)
++FROM results
++GROUP BY group_name;</pre>
+ 
+ <h2><a class='u' href='#___top' title='click to go to top of document'
+ name="Variance_(Highly_Scalable)"
+@@ -230,32 +230,32 @@
+ 
+ <p>A third variable implementation, designed for arbitrarily large data sets:</p>
+ 
+-<pre class="sh_perl">  package variance;
+-  
+-  my $mu = 0;
+-  my $count = 0;
+-  my $S = 0
+-  
+-  sub new { bless [], shift; }
+-  
+-  sub step {
+-      my ( $self, $value ) = @_;
+-      $count++;
+-      $delta = $value - $mu;
+-      $mu = $mu + $delta/$count
+-      $S = $S + $delta*($value - $mu);
+-  }
+-  
+-  sub finalize {
+-      my $self = $_[0];
+-      return $S / ($count - 1);
+-  }</pre>
++<pre class="sh_perl">package variance;
+ 
++my $mu = 0;
++my $count = 0;
++my $S = 0
++
++sub new { bless [], shift; }
++
++sub step {
++    my ( $self, $value ) = @_;
++    $count++;
++    $delta = $value - $mu;
++    $mu = $mu + $delta/$count
++    $S = $S + $delta*($value - $mu);
++}
++
++sub finalize {
++    my $self = $_[0];
++    return $S / ($count - 1);
++}</pre>
++
+ <p>The function can then be used as:</p>
+ 
+-<pre class="sh_perl">  SELECT group_name, variance3(score)
+-  FROM results
+-  GROUP BY group_name;</pre>
++<pre class="sh_perl">SELECT group_name, variance3(score)
++FROM results
++GROUP BY group_name;</pre>
+ 
+ <h1><a class='u' href='#___top' title='click to go to top of document'
+ name="FTS3_fulltext_indexing"

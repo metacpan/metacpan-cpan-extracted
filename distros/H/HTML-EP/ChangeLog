@@ -1,0 +1,358 @@
+2001-01-05  Jochen Wiedmann  <joe@ispsoft.de> (0.2011)
+
+	* ep.cgi.PL: Minor compatibility fix for Win32: Now treating
+	  / and \ as a path separator.
+
+1999-12-15  Jochen Wiedmann  <joe@ispsoft.de> (0.2010)
+
+	* t/errors.t: Minor fixes for Windows compatibility of the
+	  test suite.
+
+1999-12-05  Jochen Wiedmann  <joe@ispsoft.de> (0.2008)
+
+	* lib/HTML/EP.pm (_ep_set): Added "noparse" attribute.
+
+1999-11-25  Jochen Wiedmann  <joe@ispsoft.de>
+
+	* Added lib/HTML/EP/CGIEncryptForm.pm, contributed by
+         Peter Marelas <maral@phase-one.com.au>.
+
+1999-11-17  Jochen Wiedmann  <joe@ispsoft.de> (0.2007)
+
+	* lib/HTML/EP.pm (_ep_set): Fixed bugs in multiline ep-set,
+	  ep-query and ep-mail.
+
+1999-11-17  Jochen Wiedmann  <joe@ispsoft.de> (0.2006)
+
+	* lib/HTML/EP.pm (_ep_list): Ranges like 1..5,7..9 are now
+	  allowed.
+	* lib/HTML/EP.pm (_ep_list): One can now use list="session->item"
+	  rather than the simple list="item". Jason McMullan <jmcc@ontv.com>.
+
+1999-11-08  Jochen Wiedmann  <joe@ispsoft.de> (0.2005)
+
+	* Added $self->escapeHTML() in favour of
+	  HTML::Entities::encode_entities.
+
+1999-11-08  Jochen Wiedmann  <joe@ispsoft.de> (0.2004)
+
+	* lib/HTML/EP.pm (EncodeByAttr): Fixed a bug in HTML output
+	  ("= ~" instead of "=~")
+
+1999-09-28  Jochen Wiedmann  <joe@ispsoft.de> (0.20_02)
+
+	* Added hints for installation with IIS.
+	* ep.cgi.PL: $ARGV[0] is now setting $ENV{'PATH_TRANSLATED'}
+	  for use with IIS.
+	* lib/HTML/EP.pm: ep-elseif may now be called as ep-elsif
+	  Jason McMullan <jmcc@ontv.com>.
+	* lib/HTML/EP.pm: ep-package may now be called many times;
+	  $self is blessed into a new package that inherits from all.
+	  Suggested by Jason McMullan <jmcc@ontv.com>.
+
+1999-09-27  Jochen Wiedmann  <joe@ispsoft.de> (0.20_01)
+
+	* Makefile.PL: Fixed a missing "require Data::Dumper".
+
+1999-09-24  Jochen Wiedmann  <joe@ispsoft.de> (0.20_00)
+
+	* Merged in patches of Jason McMullan (jmcc@ontv.com) for
+	  nested ep-list. A major update!
+	* Replaced URI::Escape::uri_escape with CGI->escape
+
+1999-09-19  Jochen Wiedmann  <joe@ispsoft.de> (0.1135)
+
+	* lib/HTML/EP.pm (_ep_input): Added handling of NULL dates.
+	* lib/HTML/EP.pm: Added ep-input-sql-query.
+
+1999-08-31  Jochen Wiedmann  <joe@ispsoft.de> (0.1134)
+  
+        * lib/HTML/EP/Install.pm: Added InstallFiles and InstallCgiFiles.
+  
+1999-08-27  Jochen Wiedmann  <joe@ispsoft.de> (0.1133)
+
+	* lib/HTML/EP/Session.pm: Added support for multiple sessions.
+	* lib/HTML/EP/Session.pm (_ep_session_delete): Renamed subclass
+	  methods delete, open and store to Delete, Open and Store, in
+	  order to avoid confusion with Perl's builtin functions of the
+	  same names.
+	* lib/HTML/EP.pm (ParseVar): Forcing uri_escape to escape anything
+	  besides \w. Seems some browsers have problems with
+	  certain other characters.
+
+1999-08-23  Jochen Wiedmann  <joe@ispsoft.de> (0.1132)
+
+	* Added HTML::EP::Install.
+	* lib/HTML/EP/Session/DBI.pm: Moved DBI session to an external file.
+	* Added HTML::EP::Session::DBIq. Suggested by Ilya Ketris
+	  <ilya@gde.to>.
+	* Added HTML::EP::Session::Dumper.
+
+1999-08-13  Jochen Wiedmann  <joe@ispsoft.de> (0.1131)
+
+	* lib/HTML/EP.pm (_ep_debug): Allowed empty $ENV{REMOTE_ADDR}
+	  for debugging for debugging from the shell.
+	* lib/HTML/EP.pm (_ep_elseif): Fixed error message for ep-elseif
+	  without ep-if.
+	* lib/HTML/EP/Session.pm: Fixed a bug in the docs of Cookie
+	  sessions. ("name" was requested for the cookie name instead
+	  of "id".)
+	* lib/HTML/EP/EP.pm: Added $self->SetCookies(), which is used
+	  in _ep_redirect.
+
+1999-05-05  Jochen Wiedmann  <joe@ispsoft.de> (0.1130)
+
+	* lib/HTML/EP.pm: Added '$' to the set of encoded
+	  entities to work around problems where $...$ was
+	  erroneously interpreted as an EP variable.
+	* Now using HTML::Entities::char2entity rather than
+	  HTML::Entities::encode_entities.
+
+1999-04-04  Jochen Wiedmann  <joe@ispsoft.de> (0.1129)
+
+	* lib/HTML/EP/Examples/Glimpse.pm (glimpse_create):
+	  $matchesDirsIgnored did by default return a TRUE value.
+	  (Richard Dice <rdice@www.shad.ca>)
+	* lib/HTML/EP.pm: HTML::Entities::encode_entities is
+	  now called with '<&>"' as second argument. This should
+	  enable working with other character sets that ISO-8859-1.
+	  Thanks to Jiri Novak <bati@podvodnik.cz> for the hint.
+
+1999-02-26  Jochen Wiedmann  <joe@ispsoft.de> (0.1128)
+
+	* lib/HTML/EP/Session/Cookie.pm (encode): Added support for
+	  Compress::Zlib and MIME::Base64.
+
+1999-02-23  Jochen Wiedmann  <joe@ispsoft.de> (0.1127)
+
+	* lib/HTML/EP/Session/Cookie.pm (store): Fixed a bug that caused
+	  Cookies to be too short.
+
+1999-02-08  Jochen Wiedmann  <joe@ispsoft.de> (0.1126)
+
+	* lib/HTML/EP/Examples/Glimpse.pm: Fixed a bug in the parser of
+	  glimpse's output: Files without title (that is, files, where
+	  glimpseindex doesn't detect a title) have not been handled.
+	* lib/HTML/EP.pm (_ep_if_eval): Fixed a possible read-only-value
+	  modification.
+
+1999-02-07  Jochen Wiedmann  <joe@ispsoft.de> (0.1125)
+
+	* lib/HTML/EP.pm (ep_if): Added neval and cnd attributes.
+	* Further work on POP3 client.
+	* Work on the docs.
+	* Made BUILTIN_FUNCS a lot smaller by creating the 'default'
+	  attribute of $func dynamically.
+	* lib/HTML/EP/Locale.pm (_ep_language): The multiline version
+	  of _ep_language should now hopefully be equivalent to
+	  <ep-if cnd="'$_ep_language'eq'lang'> ... </ep-if>. It is
+	  no longer required to terminate any ep-language, only the
+	  last one must be terminated.
+	* lib/HTML/EP.pm (CgiRun): Fixed bug: ParseVars was not
+	  called with _ep_exit.
+	* lib/HTML/EP.pm: Added ep-debug.
+
+1999-02-01  Jochen Wiedmann  <joe@ispsoft.de> (0.1124)
+
+	* Added partial POP3 client example.
+
+1999-01-13  Jochen Wiedmann  <joe@ispsoft.de> (0.1123)
+
+	* lib/HTML/EP.pm (_ep_query): $start_at was not set to 0 when using
+	  LIMIT.
+	* lib/HTML/EP.pm (_ep_set): Fixed missing "if $debug".
+	* Added CGI::Cookie and URI::Escape to prerequisited.
+	* lib/HTML/EP.pm (CgiRun): $ENV{'DOCUMENT_ROOT'} was not correctly
+	  handled.
+
+1999-01-09  Jochen Wiedmann  <joe@ispsoft.de> (0.1122)
+
+	* lib/HTML/EP.pm: Added ep-redirect.
+	* lib/HTML/EP.pm: Added ep-set.
+
+1998-12-31  Jochen Wiedmann  <joe@ispsoft.de> (0.1121)
+
+	* Added examples/admin/squid_simple.ep.
+	* Makefile.PL: Added option --config.
+
+1998-12-31  Jochen Wiedmann  <joe@ispsoft.de> (0.1120)
+
+	* lib/HTML/EP/Examples/Admin.pm (_ep_html_ep_examples_admin_squid):
+	  Added call of /usr/local/bin/usersModified --squid.
+
+1998-12-17  Jochen Wiedmann  <joe@ispsoft.de> (0.1119)
+
+	* lib/HTML/EP.pm (ParseVar): _ep_custom_formats now defaults
+	  to calling $self->_format_METHODNAME.
+	* lib/HTML/EP.pm (_ep_package): Fixed error handling in
+	  _ep_package.
+	* Added examples/glimpse and lib/HTML/EP/Examples/Glimpse.pm.
+	* lib/HTML/EP.pod: Fixed ep-error docs.
+	* examples/admin/mail2group: Fixed some bugs that are
+	  resending mails too frequently.
+
+1998-12-03  Jochen Wiedmann  <joe@ispsoft.de> (0.1118)
+
+	* Added $self->{'_ep_headers'}. Request by Uri Bruck
+	  (bruck@actcom.co.il).
+	* Moved $self->{'_ep_cookies'} to $self->{'_ep_headers'}->{'-cookie'}.
+	* lib/HTML/EP.pm: Moved SimpleError and most of ep.cgi and Apache::EP
+	  to HTML::EP::SimpleError and HTML::EP::CgiRun.
+
+1998-11-29  Jochen Wiedmann  <joe@ispsoft.de> (0.1117)
+
+	* lib/HTML/EP.pm (new): Added $self->{'_ep_config'}.
+	* lib/HTML/EP.pm (_ep_mail): Added debugging mode. Requested by
+          Michael Bauer (michael@h-net.com).
+	* Added lib/HTML/EP/Examples/Admin.pm and examples/admin/squid.ep.
+
+1998-11-04  Jochen Wiedmann  <joe@ispsoft.de> (0.1116)
+
+	* lib/HTML/EP.pm (_ep_input): Added type 's' (Set).
+	* lib/HTML/EP.pm (_ep_query): Added resulttype single_array
+	  and single_hash.
+
+1998-11-03  Jochen Wiedmann  <joe@ispsoft.de> (0.1115)
+
+	* lib/HTML/EP.pm (_ep_package): Changed $self->init() to
+	  $self->init($attr).
+
+1998-10-27  Jochen Wiedmann  <joe@ispsoft.de> (0.1114)
+
+	* Added HTML::EP::Session::Cookie and $self->{'_ep_cookies'}.
+	* ep.cgi.PL: Fixed 'debughosts' handling to use $ENV{REMOTE_ADDR}
+	  and not $ENV{REMOTE_HOST}.
+	* ep.cgi.PL: Error messages have been reported incorrect when
+	  setting errhandler.
+	* examples/admin: Added mail2group.ep and mail2group.
+
+1998-10-19  Jochen Wiedmann  <joe@ispsoft.de> (0.1113)
+
+	* Added HTML::EP::Shop and examples/shop (To be finished).
+
+1998-10-13  Jochen Wiedmann  <joe@ispsoft.de> (0.1112)
+
+	* lib/HTML/EP/Locale.pm (init): Fixed typo in default language.
+	* Added examples/admin.
+	* Added examples/edit.ep.
+
+1998-10-13  Jochen Wiedmann  <joe@ispsoft.de> (0.1111)
+
+	* ep-error mismatched user and system error.
+ 	* ep-error was not looking in DOCUMENT_ROOT.
+ 	* Added optional removal of selfloader code.
+	* Added HTML::EP::Config and Bundle::HTML::EP.
+	* Added debughosts and ok_templates to Config.
+
+1998-10-11  Jochen Wiedmann  <joe@ispsoft.de> (0.1110)
+  
+      * lib/HTML/EP/Locale.pm: Made default language configurable.
+      * Added $&NBSP->var$
+
+1998-10-06  Jochen Wiedmann  <joe@ispsoft.de> (0.1109)
+
+	* EP.pm.in (_ep_mail): Requires MailTools 1.12 now.
+
+1998-09-17  Jochen Wiedmann  <joe@ispsoft.de> (0.1108)
+
+	* lib/HTML/EP/Locale.pm (_ep_language): Added debugging.
+	* lib/HTML/EP/Session.pm (store): Now using bind_param() for
+	  parameter binding of blob's.
+
+1998-09-13  Jochen Wiedmann  <joe@ispsoft.de> (0.1107)
+
+	* EP.pm.in (_ep_select): Added handling of Non-EP attributes like
+	  onChange.
+	* lib/HTML/EP/Session.pm (store): Added 'locked' attribute.
+
+1998-09-12  Jochen Wiedmann  <joe@ispsoft.de> (0.1106)
+
+	* ep.pm.PL: Added startat and limit to ep-query.
+	* EP.pm.in: $self->{_ep_funcs} required only for non-standard
+	  methods.
+	* EP.pm.in: Added custom formats.
+	* lib/HTML/EP/Locale.pm: Added custom format for german DM.
+
+1998-09-11  Jochen Wiedmann  <joe@ispsoft.de> (0.1105)
+
+	* ep.cgi.PL: Rats! _ep_exit was trapped in ep.cgi and not in
+	  ep.cgi.PL. :-(
+	* EP.pm.in (DESTROY): Removed explicit $dbh->disconnect(), because
+	  disconnect() was called twice if ep-include is used. Instead we
+	  now set $dbh->{'Warn'} to 0, so warnings are prevented anyways.
+
+1998-09-09  Jochen Wiedmann  <joe@nt.ispsoft.de> (0.1104)
+
+	* EP.pm.in: _ep_exit is now based on exceptions.
+	* EP.pm.in: Added DESTROY method for calling dbh->disconnect().
+
+1998-09-07  Jochen Wiedmann  <joe@ispsoft.de> (0.1103)
+
+	* EP.pm.in: Added WarnHandler to trap compile errors.
+	* ep.cgi: Added SIGDIE handler to trap compile errors.
+	* lib/HTML/EP/Session.pm: Added "hex" mode to ep-session.
+	* Added ep-exit and ep-include.
+	* No longer depends on HTML::Parser.
+
+1998-08-27  Jochen Wiedmann  <joe@ispsoft.de> (0.1101)
+
+	* EP.pm.in (_ep_perl): Removed the default Safe compartment in
+	  favour of an attribute "safe". It's too nasty and one seems
+	  to be using "package=temp" almost always. :-(
+	* EP.pm.in (_ep_query): Documented $attr->{'resulttype'}.
+	* Added HTML::EP::Session.
+
+1998-07-24  Jochen Wiedmann  <joe@ispsoft.de> (0.1100)
+
+	* lib/HTML/EP.pod: Documented mod_perl integration.
+	* EP.pm.in: Removed epparse- and epperl-
+
+1998-07-18  Jochen Wiedmann  <joe@ispsoft.de> (0.1007)
+
+	* Makefile.PL: More minor patches for fixing the same problem ...
+
+1998-07-18  Jochen Wiedmann  <joe@ispsoft.de> (0.1006)
+
+	* Makefile.PL: Minor patches for fixing the test suite.
+
+1998-07-04  Jochen Wiedmann  <joe@ispsoft.de> (0.1005)
+
+	* Added HTML::EP::Locale.
+	* Added list attribute to ep-input.
+	* Added init method.
+	* EP.pm.in (_ep_list): Added $self->{i}.
+	* Added $self->Stop()
+	* Added ep-select
+
+1998-07-04  Jochen Wiedmann  <joe@ispsoft.de> (0.1003)
+
+	* EP.pm.in (_ep_perl): Forgot to set $_ before evaluating in
+	  package mode.
+	* EP.pm.in: src attribute of ep-perl now adds DOCUMENT_ROOT,
+	  if required.
+	* Added Apache::EP for mod_perl support. 
+	* EP.pm.in: Fixed {eval}, {package} and {comment} to
+	  {'eval'}, {'package} and {'comment}
+
+1998-06-26  Jochen Wiedmann  <joe@ispsoft.de> (0.1002)
+
+	* lib/HTML/EP.pod: Added isa attribute to ep-package.
+	* EP.pm.in: Added support for $self->{debug}.
+	* ep.cgi.PL: Added setting of $self->{debug} if "debug" variable
+	  is passed.
+	* EP.pm.in (_ep_query): Added resulttype attribute.
+
+1998-06-25  Jochen Wiedmann  <joe@ispsoft.de> (0.1001)
+
+	* lib/HTML/EP.pod: Forgot to document ep-if and frieds
+	* Added $self->{_ep_state}
+	* Makefile.PL: Added check for MailTools, my thanks to Michael
+	  Bauer <michael@h-net.com>
+	* lib/HTML/EP.pod: Fixed bug in ep-query docs; a "query"
+	  attribute was used instead of "statement", thanks to Michael
+	  Bauer <michael@h-net.com>
+
+1998-06-22  Jochen Wiedmann  <joe@ispsoft.de> (0.1000)
+
+	* Initial version.
+

@@ -1,0 +1,33 @@
+---
+abstract: 'Interface to WiringPi library'
+author:
+  - 'Mark Dootson <mdootson@cpan.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: '0'
+  perl: v5.14.0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HiPi-Wiring
+no_index:
+  directory:
+    - inc
+    - modlib
+    - userbin
+provides:
+  HiPi::Wiring:
+    file: lib/HiPi/Wiring.pm
+    version: '0.61'
+  HiPi::Wiring::Pin:
+    file: lib/HiPi/Wiring/Pin.pm
+    version: '0.61'
+requires:
+  HiPi: '0.60'
+resources:
+  homepage: http://raspberry.znix.com/
+  license: http://www.gnu.org/licenses/gpl-3.0.txt
+version: '0.61'

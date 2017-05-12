@@ -1,0 +1,37 @@
+---
+abstract: 'Easy read/write access to your jar of HTTP::Cookies'
+author:
+  - 'Olaf Alders <olaf@wundercounter.com>'
+build_requires:
+  Data::Serializer: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.021, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTTP-CookieMonster
+requires:
+  Carp: '0'
+  HTTP::Cookies: '0'
+  Moo: '1.000003'
+  Safe::Isa: '0'
+  Scalar::Util: '0'
+  Sub::Exporter: '0'
+  URI::Escape: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  Prepan_author: http://prepan.org/user/3Yz7PYrBzQ
+  Prepan_module: http://prepan.org/module/429En4oFdi
+  bugtracker: http://github.com/oalders/HTTP-CookieMonster/issues
+  homepage: https://github.com/oalders/http-cookiemonster
+  repository: https://github.com/oalders/http-cookiemonster.git
+version: '0.09'

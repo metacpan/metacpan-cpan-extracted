@@ -1,0 +1,8 @@
+---
+id: form
+elements:
+  - type: Text
+    name: t1
+    label: a Text element
+  - type: Src
+    content: <hr>Insert raw <a href="#">html</a>

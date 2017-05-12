@@ -1,0 +1,1 @@
+<textarea name="[% f.html_name %]" id="[% f.id %]" rows="[% f.rows %]" cols="[% f.cols %]" [% process_attrs(f.attributes) %]>[% f.fif %]</textarea>

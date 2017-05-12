@@ -1,0 +1,453 @@
+=pod 
+
+=head1 NAME
+
+Helios::Configuration - Helios configuration parameter reference
+
+=head1 DESCRIPTION
+
+The Helios system defines a large number of configuration parameters.  Some of 
+these affect the operation of the helios.pl daemon, others affect worker 
+processes, and some can affect both.  Aside from these reserved parameter 
+names, the configuration parameters your Helios service uses are largely up to 
+you.  
+
+Helios configuration parameters that affect worker process launching and 
+management are usually in ALL CAPS.  This helps set them apart from other 
+application-level parameters.
+
+=head1 helios.pl PARAMETERS
+
+=head2 Collective Database Configuration Parameters
+
+These are the most important parameters in helios.ini.  They must be declared 
+in the [global] section.  Without them, helios.pl will be unable to connect to 
+the collective database and will fail to start.
+
+=head3 dsn
+
+ dsn=dbi:Oracle:SHARDEV
+
+The dsn parameter is the DBI datasource name of the Helios collective database.
+
+=head3 user
+
+ user=scott
+
+The user parameter is the user to use when connecting to the Helios 
+collective database.
+
+=head3 password
+
+ password=tiger
+
+The password parameter is the password to use when connecting to the Helios
+collective database.
+
+=head3 options
+
+ options=private_option=>'string',private_option2=>'another string'
+
+The options parameter is used when special DBI options are needed when 
+connecting to the Helios collective database.  Normally, this parameter should 
+not be necessary but is made available for users who may need to specify 
+special parameters in their database connections anyway.
+
+=head2 Other [global] Parameters
+
+=head3 pid_path
+
+ pid_path=/home/helios/run
+
+Sets the path where helios.pl daemon will write its PID files.  This should be 
+an absolute path to a directory writable by the Helios user (the user the 
+helios.pl daemon will run as).  Each helios.pl service daemon will write a PID 
+file incorporating the name of the service class it has loaded into this 
+directory.  
+
+If this directory does not exist or is not writable by the Helios user, the 
+helios.pl daemon will fail to start.
+
+DEFAULT:  /var/run/helios
+
+=head3 registration_interval
+
+The number of seconds to wait before a helios.pl service daemon "checks in" to 
+the collective database.  Periodically helios.pl will update a table in the 
+Helios collective database for monitoring purposes.  This allows the 
+Helios::Panoptes admin console to provide the Collective Admin view, and 
+enables Panoptes and other utilities to see if a helios.pl service daemon has 
+crashed or has encountered some other type of error.  The default 60 seconds 
+should be fine for most purposes, but can be increased to reduce database load 
+if necessary.
+
+DEFAULT:  60
+
+=head2 Service-specific Tuning Parameters for helios.pl
+
+There are several parameters useful for tuning the helios.pl service daemon to 
+work better with your Helios service.  Helios and the helios.pl daemon default 
+to behavior that should work well for processing jobs that last a short amount 
+of time (generally 30 seconds or less).  If your jobs consistently last longer
+than a minute, or can potentially put a strain on resources like a database or 
+a file server, you may wish to adjust the following parameters.
+
+These parameters are not dynamic and should be set in the Helios conf file, 
+either in the [global] section or a section matching your service's name.  
+
+=head3 master_launch_interval
+
+ master_launch_interval=5
+
+The master_launch_interval is the amount of time in seconds helios.pl waits 
+after launching workers before it attempts to launch workers again.  Normally 
+the default of 1 second is fine, but if you need to slow how quickly new worker 
+processes are started, you can increase this number.
+
+DEFAULT:  1
+
+=head3 zero_launch_interval
+
+ zero_launch_interval=30
+
+The zero_launch_interval is the amount of time in seconds helios.pl waits 
+to launch workers again after the MAX_WORKERS limit has been reached.  Once 
+helios.pl launches the MAX_WORKERS number of workers, it will not launch more 
+even if there are available jobs in the queue.  If a particular service's jobs 
+usually take longer than the default of 10 seconds, or you are using OVERDRIVE 
+mode so your worker processes persist until no more jobs available, increasing 
+zero_launch_interval may decrease needless database queries.  For most cases, 
+the default of 10 seconds should be adequate.
+
+DEFAULT:  10
+
+=head3 zero_sleep_interval
+
+ zero_sleep_interval=20
+
+The zero_sleep_interval is the amount of time between checks for available 
+jobs in the job queue when the job queue is empty.  If the helios.pl daemon 
+determines there are no available jobs for a service, it sleeps 
+zero_sleep_interval seconds and then checks again.  If there are available 
+jobs, it starts to launch workers; if there are still none, it sleeps another 
+zero_sleep_interval seconds and checks again.  This can cause jobs to "sit" in 
+the queue for some seconds before workers are launched to service them.  If 
+you do not have enough jobs consistently entering the job queue to keep workers 
+running in OVERDRIVE mode, decreasing this number will make helios.pl more 
+responsive by launching workers for your jobs sooner (at the expense of extra 
+repeated queries of the job queue in the database).  If your jobs can wait in 
+the job queue for awhile and you do not have many entering the system, 
+increasing this number can reduce the number of needless queries to your 
+database.
+
+DEFAULT:  10
+
+=head1 WORKER PROCESS MANAGEMENT
+
+The following configuration parameters affect the management of workers and 
+how they run services and process jobs.  These are most typically set in the 
+collective database configuration table for each service, thus they are ALL 
+CAPS to separate them from your services' own configuration parameters.  Unlike
+the parameters in the previous section, these configuration parameters are 
+dynamic and can be changed via Helios::Panoptes, the helios_config_* shell 
+commands, or SQL commands to your collective database.
+
+=head2 HOLD
+
+ HOLD=1
+
+Puts a Helios service in Hold Mode.  All worker processes shut down after 
+finishing the current job, and the helios.pl service daemon ignores avaliable 
+jobs in the job queue.  Set HOLD to 0 or delete it from the configuration to 
+cause Helios to return to Normal Mode.
+
+DEFAULT:  0
+
+=head2 HALT
+
+ HALT=1
+
+Causes a helios.pl service daemon and all its workers to shutdown.  When HALT 
+is set for a service, worker processes exit after the current job is finished.  
+The helios.pl service daemon waits MAX_WORKER_TTL_WAIT_INTERVAL seconds for 
+workers to finish, and sends any remaining workers a SIGKILL signal to 
+eliminate any stragglers.  The daemon then removes its registration entry from 
+the collective database and exits.
+
+Warning:  BE CAREFUL about setting a HALT for a service for all hosts 
+(hostname='*').  This will shutdown all instances of that Helios service in 
+the ENTIRE collective, and the only way to restart them is to log into the 
+host and start them manually.  If you need to perform maintenance on hosts in 
+a production Helios collective, you most likely want to HOLD all instances of 
+a service and then HALT each instance individually as needed. 
+
+DEFAULT:  none (the presence of HALT in the config causes a shutdown regardless
+of its value)
+
+=head2 MAX_WORKERS
+
+ MAX_WORKERS=10
+
+Along with OVERDRIVE, MAX_WORKERS is the most powerful configuration 
+parameter in the Helios framework.  Setting MAX_WORKERS allows a helios.pl 
+service daemon to launch multiple workers at a time to service jobs, up to the 
+MAX_WORKERS limit.  
+
+Normally, when the helios.pl service daemon sees available jobs in the job 
+queue, it starts to launch worker processes to service the jobs.  Normally, 
+it launches workers gradually, one at a time, in order to prevent overtaxing 
+resources (and to allow the launched workers time to do actually run the 
+jobs).  If there are the same or more jobs in the queue as the MAX_WORKERS 
+value, helios.pl will "blitz" (launch the maximum amount of workers) to attempt 
+to run the jobs in the queue as quickly as possible.  This "blitzing" feature 
+is controlled by the WORKER_BLITZ_FACTOR parameter, so if you want want Helios 
+to blitz workers B<before> there are that many jobs available in the queue, 
+adjust WORKER_BLITZ_FACTOR downward to allow helios.pl to launch more worker 
+processes faster.
+
+DEFAULT:  1
+
+=head2 OVERDRIVE
+
+ OVERDRIVE=1
+
+Setting OVERDRIVE causes a worker process to persist in memory continuing to 
+run jobs from the job queue until all available jobs for the loaded service 
+are exhausted.  Coupled with MAX_WORKERS, allows you to maximize job 
+throughput by eliminating repeated process startup procedures and enabling 
+caching of database connections and other data structures.
+
+Unless your service is designed to run long-running jobs lazily, you almost 
+certainly want to set OVERDRIVE to 1.  It is set to 0 by default because 
+indiscriminately running untested, potentially unsafe services can cause 
+unexpected, even disasterous behavior.  Make sure your service runs in Normal 
+Mode first, then test it in Overdrive Mode throughly before you deploy it.
+
+DEFAULT:  0
+
+=head2 WORKER_LAUNCH_PATTERN
+
+ WORKER_LAUNCH_PATTERN=dynamic
+
+In order to service jobs, the helios.pl daemon launches worker processes that 
+instantiate your service class and pass the service object the job(s) to 
+perform.  There are several process launching algorithms to choose from:
+ 
+=over 4
+
+=item linear
+
+With the "linear" launch pattern, when jobs are available, helios.pl will
+launch one worker at a time to service them, up to the MAX_WORKERS limit.  
+This allows the number of worker processes to build gradually.  However, this 
+one-launch-at-a-time pattern will also cause jobs to sit in the queue longer 
+before they are serviced.  This is the Helios 2.x default pattern.
+
+=item dynamic
+
+With the "dynamic" launch pattern, helios.pl will try to keep as many 
+workers running as there are jobs available, up to the MAX_WORKERS limit.  For 
+example, if there are 10 jobs available but only 6 workers running, helios.pl 
+will launch 4 more workers.  This pattern allows Helios to react relatively 
+quickly to new jobs and dynamically adjust the number of running workers as 
+needed.
+
+=item optimistic
+
+With the "optimistic" launch pattern, helios.pl will launch as many workers as
+there are jobs available, up to the MAX_WORKERS limit.  For example, if there 
+are 10 available jobs in the queue, helios.pl will launch 10 new workers.  If
+the number of workers to launch would cause the running workers to exceed the 
+MAX_WORKERS limit, the difference between the running workers and MAX_WORKERS
+limit is launched.  While this pattern allows Helios to react quickly to 
+new jobs in the queue, it can also launch more workers than really needed and 
+thus increase job contention between workers.  Also, if your service uses a 
+shared resource such as an FTP or database server, launching so many incoming 
+connections at once can cause contention on the shared resource as well.  Thus,
+the 'optimistic' pattern is best used for services whose jobs 1) have a very 
+short runtime (< 2 sec), 2) and need to be run as soon as possible once they 
+enter the job queue, and 3) make minimal use of shared resources, or use a 
+shared resource that can handle being swamped quickly with new connections.
+
+=back
+
+Regardless of the current launch pattern, if the number of jobs available 
+in the job queue equals or exceeds the MAX_WORKERS limit, helios.pl will 
+"blitz" and launch enough workers to reach the MAX_WORKERS limit.
+
+DEFAULT:  linear (workers are launched one at a time when jobs are available)
+
+=head2 PRIORITIZE_JOBS
+
+ PRIORITIZE_JOBS=low
+ 
+Normally with the Helios::TS job queuing system, workers pull jobs from the 
+job queue at random to reduce job contention between workers.  However, you 
+can set priorities for jobs by using the Helios::Job->setPriority() method 
+before a job is submitted, and then enabling PRIORITIZE_JOBS for the service 
+that will run those jobs.  PRIORITIZE_JOBS has 3 possible values:
+
+=over 4
+
+=item low
+
+If PRIORITIZE_JOBS is set to 'low', jobs with lower valued priorities will be 
+given precedence. 
+
+=item high
+
+If PRIORITIZE_JOBS is set to 'high', jobs with higher valued priorities will be
+given precedence.
+
+=item undef
+
+If PRIORITIZE_JOBS is not set, jobs' priority values will be ignored and jobs 
+will be pulled from the job queue at random.
+
+=back
+
+Generally, it is best to leave PRIORITIZE_JOBS turned off.  There are 
+significant drawbacks and gotchas to using the feature:
+
+=over 4
+
+=item *
+
+Even with job prioritization turned on, prioritization is only approximate.  
+To reduce job contention between workers, each worker selects up to 50 
+available jobs from the job queue and randomly picks one to pass to your 
+service to run.  Even though all the selected jobs will be of the highest 
+(or lowest) priority, the job that is ultimately run will still be randomly 
+chosen from the selected group.
+
+=item *
+
+The priority field in the default collective database schema only accepts very 
+small integer values (0-9999).  This can be changed by using SQL ALTER TABLE 
+commands to allow datatypes with larger values (BIGINT instead of SMALLINT, 
+for example), or use a different kind of datatype altogether (i.e. VARCHARs). 
+
+=back
+
+
+DEFAULT:  undef (jobs are pulled from the job queue at random)
+
+=head2 LAZY_CONFIG_UPDATE
+
+ LAZY_CONFIG_UPDATE=1
+
+Use LAZY_CONFIG_UPDATE to increase worker process performance by reducing the 
+number of configuration parameter refreshes a worker process performs in 
+Overdrive Mode.  In Overdrive Mode, a worker process refreshes the service 
+configuration from the collective database just before it calls the service's 
+run() method.  With LAZY_CONFIG_UPDATE set to 1, this configuration refresh is 
+performed only before every 10th job the worker process runs, reducing 
+database queries and thus increasing performance.
+
+NOTE:  The configuration refresh is where worker processes pick up HOLD and 
+HALT parameters, so using LAZY_CONFIG_UPDATE will cause worker processes to be 
+less responsive when holding jobs or halting the service.  If your service's 
+configuration does not change often, you can activate LAZY_CONFIG_UPDATE and 
+see if your service experiences a noticable increase. 
+
+DEFAULT:  0
+
+=head2 WORKER_MAX_TTL
+
+ WORKER_MAX_TTL=300
+
+The maximum amount of time in seconds to allow a worker process for a service 
+to run.  If a worker process continues to run past this threshold, the 
+helios.pl service daemon will assume it has become stuck in some way and will 
+send it a SIGKILL signal (9) to kill it (real world situations have shown 
+softer signals are unreliable in such situations).  If you set this and find 
+worker processes not experiencing problems are being unnecessarily killed, you 
+may need to increase the WORKER_MAX_TTL_WAIT_INTERVAL (below).
+
+DEFAULT:  none; workers running in Normal Mode run until their job is complete; 
+workers in Overdrive Mode work until no more jobs are available in the job 
+queue.
+
+=head2 WORKER_MAX_TTL_WAIT_INTERVAL
+
+Number of seconds a helios.pl service daemon will wait for a worker that has 
+reached its WORKER_MAX_TTL to exit.  If a worker process continues running 
+past WORKER_MAX_TTL + WORKER_MAX_TTL_WAIT_INTERVAL seconds, helios.pl will 
+assume the worker process has hung in some way and will send it a SIGKILL (9) 
+signal to kill it.
+
+DEFAULT:  30
+
+=head2 DOWNSHIFT_ON_NONZERO_RUN
+
+ DOWNSHIFT_ON_NONZERO_RUN=1
+
+This to support certain legacy behaviors for Helios services developed before 
+Helios 2.40.  You almost certainly do not need to set this.
+
+DEFAULT:  0 (ignore the return value of the service's run() method)
+
+=head1 LOGGING
+
+=head2 loggers
+
+ loggers=HeliosX::Logger::Syslog,HeliosX::Logger::Log4perl
+
+Specify a comma-separated list of external logging classes to use to log 
+information.  Each of the modules listed should implement the Helios::Logger 
+interface class.  
+
+Each logger class likely will have its own configuration parameters; see the 
+logger's documentation for the appropriate configuration information.
+
+The Helios internal logger (Helios::Logger::Internal) is automatically added 
+to this list, unless internal_logger (below) is turned off.
+
+DEFAULT:  None 
+
+=head2 internal_logger
+
+ internal_logger=off
+
+Whether the Helios internal logger (Helios::Logger::Internal) should be used 
+to log information.  The internal logger logs information to a table in the 
+Helios collective database, and is the log system used by the Helios::Panoptes 
+System Log view.  If you want to only use an external logging system such as 
+HeliosX::Logger::Log4perl, you can turn off Helios logging completely by 
+setting internal_logger to 0 or 'off'.
+
+DEFAULT:  on
+
+=head2 log_priority_threshold
+
+ log_priority_threshold=5
+
+The log level above which the internal logger discards log messages.  
+Specifying a log_priority_threshold will cause log messages of a lower priority 
+(higher numeric value) to be discarded.  For example, a log_priority_threshold
+of 6 (LOG_INFO) will cause log messages with a priority of 7 (LOG_DEBUG) to be 
+discarded.
+
+See the Helios::Logger::Internal documentation for more information on log 
+thresholds.
+
+DEFAULT:  undefined (all log messages are logged)
+
+=head1 AUTHOR
+
+Andrew Johnson, E<lt>lajandy at cpan dot orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012-4 by Logical Helion, LLC.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=head1 WARRANTY
+
+This software comes with no warranty of any kind.
+
+=cut
+

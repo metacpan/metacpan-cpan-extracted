@@ -1,0 +1,36 @@
+bin/Makefile.PL
+bin/t/twepx.t
+bin/twepc.c
+bin/twepc.rc
+bin/twepl.c
+bin/twepl.rc
+bin/twres.ico
+Changes
+EmbeddedPerl.xs
+lib/HTML/EmbeddedPerl.pm
+#lib/HTML/EmbeddedPerl/Vars.pm
+LICENSE
+LICENSE.v3
+Makefile.PL
+MANIFEST			This list of files
+README
+mod_twepl/build
+mod_twepl/COPYING
+mod_twepl/LICENSE
+mod_twepl/Makefile.PL.OFF
+mod_twepl/mod_twepl.c
+mod_twepl/mod_twepl.h
+mod_twepl/modules.mk
+mod_twepl/ppport.h
+mod_twepl/README
+mod_twepl/TW_mod_twepl.conf
+mod_twepl/TW_mod_twepl.spec
+mod_twepl/twepl_parse.c
+mod_twepl/twepl_parse.h
+mod_twepl/twepl_xcore.c
+mod_twepl/twepl_xsubs.xs
+mod_twepl/unuse/twepl_icomm.c
+mod_twepl/XSUBTRIM.PL
+t/HTML-EmbeddedPerl.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

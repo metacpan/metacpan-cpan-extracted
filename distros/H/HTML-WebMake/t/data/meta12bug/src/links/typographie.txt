@@ -1,0 +1,14 @@
+<wmmeta name="ltitle">Typographie</wmmeta>
+<wmmeta name="stitle">Typographie</wmmeta>
+<wmmeta name="author">J&ouml;rn Clausen</wmmeta>
+<wmmeta name="cdate">2001-04-23</wmmeta>
+<wmmeta name="mdate">2001-04-23</wmmeta>
+
+    <ul>
+      <li>
+	<a href="http://www.typebooks.org/">Type Books</a>
+      </li>
+      <li>
+	<a href="http://www.adobe.com/support/techguides/printpublishing/main.html">Print Publishing Technical Guides</a>
+      </li>
+    </ul>

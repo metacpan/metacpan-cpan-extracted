@@ -1,0 +1,250 @@
+HTML/Processor version 0.2.1
+============================
+
+    HTML::Processor HTML Template Processor
+    
+
+DESCRIPTION
+
+Processor.pm is primarily an HTML template processing utility.
+It is designed to remove html from perl 
+scripts without putting too much Perl into the html. 
+The tag syntax (configurable) is somewhat verbose in order to 
+not scare off html coders, while retaining some Perl logic and 
+functionality. The Perl interface is OO for flexibility and 
+clarity and has a fairly basic set of methods. While its not 
+as heavy duty as some of the other Template modules, it 
+occupies a firm middle ground with all the essential data
+replacement funtions.
+
+  Functionality:
+    - File includes
+    - Optional content
+    - If/Else blocks
+    - Variable substitution
+    - Loops (nested recursively)
+      - Loop Optional content
+      - Loop If/else blocks
+    - Data sorting (columns)
+    - Debugging, Perl and Object data
+    
+    
+DOCUMENTATION
+
+All documentation, with examples, is in Processor.pm, additionally in Processor.html
+which was generated via pod2html from Processor.pm
+See also provided example script.
+
+VERSION HISTORY
+
+13/11/200x == Version 0.2.1 ------------------
+13/11/2002
+  looping bug fix: first element disappeared
+06/11/2002
+  Clenup of uninitialised vars
+
+05/11/2002 == Version 0.2 ------------------
+01/11/2002
+    Removed globals for mod_perl functionality
+29/10/2002
+    Added path stacking for template processing
+    and lookup of includes
+15/03/2002
+    fixed bug in nested loops
+20/03/2002 
+    added 'LIKE' and 'NOT LIKE' logic to the
+    IF/ELSE comparisons
+08/04/2002
+    added sorting for arrays with 'bgcolor' and 'bgcolour'
+    $tpl->sort( [array_name] ); now works with bg colours
+
+09/08/2001 == Version 0.0.1 -------------------
+
+EXAMPLE
+
+    PERL
+    ------------------------------------------------------
+
+	use HTML::Processor;
+
+	$tpl = new HTML::Processor;
+    
+	-or with config options-
+    
+	$tpl = new HTML::Processor ({ 
+	   debug     => "Normal",
+	   footprint => 1,
+	   clean     => 0
+	});
+
+	# data
+	%animals = (
+	    mammals    => {
+	       types => [qw(monkey lion zebra elephant)],
+	       count => 120
+	    },
+	    fish       => {
+	       types => [qw(swordfish shark guppy tuna marlin tunny)],
+	       count => 85
+	    },
+	    reptiles   => {
+	       types => [qw(monitor python crocodile tortoise)],
+	       count => 25
+	    },
+	    birds      => {
+	       types => [qw(eagle pigeon kite crow owl sparrow)],
+	       count => 57
+	   }
+	
+	);
+
+	# create parent loop object
+	my $animals = $tpl->new_loop("animals");
+	foreach my $animal_type( keys %animals){
+	   # add data to the parent loop
+	   $animals->array("animal_type", $animal_type);
+	   $animals->array("count", $animals{$animal_type}{ count });
+
+	   # create new nested loop object 'keyed' on
+	   # the parent via $animal_type
+	   my $types = $tpl->new_loop("types", $animal_type);
+	   foreach my $type ( @{ $animals{$animal_type}{types} }){
+	      # populate each 'child' loop
+	      $types->array("type", $type);
+	   }
+	}
+	# set variables
+	$tpl->variable("what", "ANIMALS");
+	$tpl->variable("count", 2);
+	
+	# process and print parsed template
+	print $tpl->process("templates/animals.html");
+
+    HTML
+    ------------------------------------------------------
+
+	<html>
+	<head>
+		<title>Sample</title>
+	</head>
+	<body>
+	[TPL variable='what']:<br>
+	<table width="200">
+	[TPL LOOP name='animals']
+	   <tr>
+	      <td>[TPL array='animal_type'] [[TPL array='count']]</td>
+	   </tr>
+	   <tr>
+	      <td align="right">
+	      [TPL LOOP name='types']
+	         [TPL array='type']<br>
+	      [TPL LOOP END]
+	      </td>
+	   </tr>
+	[TPL LOOP END]
+	</table>
+	<br><br>
+	   [TPL IF count == '2']
+	      count is  2
+	   [TPL ELSE]
+	      count is not 2
+	   [TPL ENDIF]
+	<br><br>
+	
+	[TPL include='footer.inc']
+
+    OUTPUT
+    ------------------------------------------------------
+
+	<!--- TEMPLATE: templates/animals.html --->
+	<html>
+	<head>
+	<title>Sample</title>
+	</head>
+	<body>
+	ANIMALS:<br>
+	<table width="200">
+	<tr>
+	<td>mammals [120]</td>
+	</tr>
+	<tr>
+	<td align="right">
+				monkey<br>
+				lion<br>
+				zebra<br>
+				elephant<br>
+	</td>
+	</tr>
+	<tr>
+	<td>fish [85]</td>
+	</tr>
+	<tr>
+	<td align="right">
+				swordfish<br>
+				shark<br>
+				guppy<br>
+				tuna<br>
+				marlin<br>
+				tunny<br>
+	</td>
+	</tr>
+	<tr>
+	<td>birds [57]</td>
+	</tr>
+	<tr>
+	<td align="right">
+				eagle<br>
+				pigeon<br>
+				kite<br>
+				crow<br>
+				owl<br>
+				sparrow<br>
+	</td>
+	</tr>
+	<tr>
+	<td>reptiles [25]</td>
+	</tr>
+	<tr>
+	<td align="right">
+				monitor<br>
+				python<br>
+				crocodile<br>
+				tortoise<br>
+	</td>
+	</tr>
+	</table>
+	<br><br>
+			count is  2
+	<br><br>
+	<!--- INCLUDED: templates/footer.inc --->
+	<br>
+	COMMON FOOTER
+	</body>
+	</html>
+    
+    
+
+INSTALLATION
+
+Requires: Data::Dumper
+
+Install with the usual:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+        
+AUTHOR
+
+    Paul Schnell <pschnell@touchpowder.com>
+    Any comments, questions or feeback welcome
+
+
+LICENSE
+
+Copyright (c) 2001 Paul Schnell. All rights reserved. 
+This program is free software; you can redistribute it and/or 
+modify it under the same terms as Perl itself.
+

@@ -1,0 +1,22 @@
+0.008  Wed Aug 10 22:19:35 PDT 2016
+  Docs
+  * Typo fixes. (David Steinbrunner) [github #3]
+
+  Test Fixes
+  * Silenced eich deprecation warnings. (Schwern)
+
+  Distribution
+  * Added a license file (Schwern)
+  * Testing using Travis and AppVeyor (Schwern)
+  * No longer depending on Fennec, using Test2 instead, reducing the
+    dependency chain. (Schwern)
+  * Repository metadata (David Steinbrunner) [github #4]
+
+0.007  Thu Jul 04 15:39:22 PDT 2013
+  Bug Fixes
+  * Fixed a warning in hmap(). (Chad Granum)
+
+0.006  Tue Jun 18 20:35:09 PDT 2013
+  Features
+  * Deprecated eich(), replaced with iterator(). (Chad Granum)
+  * Deprecated eech(), replaced with hmap(). (Chad Granum)

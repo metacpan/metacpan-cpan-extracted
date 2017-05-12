@@ -1,0 +1,228 @@
+﻿HTML::Merge::App::Repository – A sample of a complex application
+© RAZ Information Systems Ltd 1999 – 2004. Version 3.46
+
+1.Overview
+The goal of the HTML::Merge::App::Repository is to provide a form builder multi language design environment. In order to accomplish that all form design meta data are stored in a databases where each record represent a form element. A rendering engine has been created to render the form from the database. The project is lacking a GUI interface for populating the form meta data database.
+
+2.Database
+the entire project is stored on tables residing on HTML::Merge system database (tested only on SQLite and MySQL). The table creation and initing code  reside in the class HTML::Merge::App::Repository and it is being utilize in the mergecreateinstance script. HTML::Merge::App::Repository also relay on definition stored on the tbl table populated by the 'private/sql/tbl.dat' pipe delimited file. This actually break the possibility of treating the Repository as an add-on module since it taints the mergecreateinstance and relay on default data from the basic system tbl table, but this design flows can easily be repaired.
+
+2.1. tbl – master table
+     	FLDTYP - contains all form elements types.
+		example of a text field:
+		tbl: “FLDTYP”
+		langug_code: “” - nothing, not language dependent information.
+		code: “1” - unique identifier.
+		name: “TEXT_FIELD” - widget description.
+		number: “1” - A boolean value indicating if this object requires a text label 
+				to accompany the widget.
+		note: “<input type=text #fldstatus# value=``#value#`` size=``#size#`` maxlength=``#maxlength#`` @STDATR@ @STDEVNT@ #field_data#>|0|” - this data is what the rendering engine will use to create the HTML result. 
+		realm_id: “” - Not used.
+	MACROS – contain macros to support the FLDTYP methodology.
+		example of standard events macro:
+		tbl: “MACROS”
+		langug_code: “” - nothing, not language dependent information.
+		code: “1” - unique identifier.
+		name: “STDATR” - widget description.
+		number: “0” - Not used.
+		note: “name=``#field_name#`` id=``#field_name#`` style=``width: #width#; height: #height#; background-color: #background#`` #field_data#” - this data is what the rendering engine will use to create the HTML result. 
+		realm_id: “” - Not used.
+	FLDSTS – Look up for the HTML::Merge::App::Repository field status.
+		      contains: 1 – normal
+			          2 – read only
+		                      3 – disabled
+			          4 - hidden 
+	FLDMTX – A per language matrix for describing field status.
+	LANGUG – All supported languages and definitions: ISO code, direction.
+	STATUS – Record state.
+		       contains: 0 – deleted
+			           1 – blocked
+				2 - active
+	FRMSTR – Form strings, holds form elements basic text according to the selected 		 	system language. For instance the grid 'alt' text for sorting or the 				record left text at the grid bottom.
+
+2.2. templates_t – System templates catalog
+id: Unique identifier.
+templatename: The template file name relative to the template directory.
+description: The template description.
+tag: extra data associated with the template – never been used.
+epitaph: Mark deleted templates.
+instance_id: the instance id from instance_t table indicating which merge instance this template belong to (in case of a multi instance environment)
+
+2.3. instance_t – HTML::Merge instances catalog
+id: Unique identifier.
+instancename: The instance merge.conf file path.
+description: The instance description.
+tag: extra data associated with the instance – never been used.
+epitaph: Mark deleted instances.
+
+this table is managed automatically by merge.
+
+2.4. repository_t – forms meta repository
+rid: Unique identifier.
+template_id: The specific template
+field_parent_repository_id: Mark an rid value of a repository entry which it's					    template_id equals zero. All of the row data is 					    inherited to the non filled fields 
+       in the current row.
+field_name: The description of the field – will be used as the HTML field id 			   and name value.
+fldtyp_code: The tbl table FLDTYP code field value.
+note: A place for comments.
+src: Used for widgets which have an external data source – image, combo box 	 and data grid.
+	     value: Used for all widget which their HTML code contain a value key.
+  	     size: Used for all widget which their HTML code contain a size key and also 			  for the data grid to indicate number of visible rows.
+  	     maxlength: Used for all widget which their HTML code contain a maxlength 				 key and also for the data grid to indicate the maximum number of 			 rows fetched in a single request.
+  	     width: Used by all widgets – style sheet width.
+  	     height: Used by all widgets – style sheet width.
+  	     class: Used by all widgets – the widget encapsulating DIV class key;
+  	     fldsts_code: The tbl table field status code.
+  	     realm_id: field creation permissions based on HTML::Merge security module.
+  	     arrangement: The drawing and placement order of the widgets in the form 
+		   	   (z order).
+  	     onBlur: The content of the HTML result onBlur key.
+  	     onClick: The content of the HTML result onClick key.
+  	     onDblClick: The content of the HTML result onDblClick key.
+  	     onChange: The content of the HTML result onChange key.
+  	     onMouseOver: The content of the HTML result onMouseOver key.
+  	     onMouseMove The content of the HTML result onMouseMove key.
+  	     onMouseOut The content of the HTML result onMouseOut key.	
+	     field_data: Extra data to the HTML result which can't be created using the 				other fields. for example giving class data to the widget and no the 			encapsulating DIV.
+  	     pos_x: The screen x position in pixels.
+  	     pos_y: The screen y position in pixels.
+  	     background: The widget background in HTML keyword or RGB notation 				  (#xxyyzz).
+  	     border: The encapsulating DIV border in CSS notation. 
+		      example: “1px solid black”.
+  	     pos_delta: The length delta in pixels of the length between the widget and it's 			lablel.
+  	     status_code: The tbl table code indicating the record state only value of “2” 				   will be drawn.
+2.5. repository_language_matrix – widgets multi lingual captions
+rid: Unique identifier.
+repository_id: The repository_t rid value.
+  	     langug_code: The tbl table language code value.
+  	     caption: The form caption.
+
+
+3.The repository rendering engine
+The rendering engine is the template “Repository/build_form.inc” which is included in pages usually Between a form element. The engine then: 
+1.Load all macros from the tbl table.  
+2.Invokes the template “Repository/repository_query.inc” - which loads the specific template data from the database repository_t + the field type definition from the tbl table + all user_realm data curtsey's of the “Reposiotry/get_user_realms.inc” template.
+3.Replace all “@”  encapsulated fields in the field definition with the corresponding macro. For example @STATR@.
+4.Replace all “#”  encapsulated fields in the field definition with specific database 
+value. For example #class# will be replaced with the current record value of the class field.
+5.Replace all “``” with '“' to avoid placement problems.
+6.Replace all '`' with “'” to avoid placement problems.
+7.Run the result through Merge so Merge tag like RINCLUDE will be translated.
+8.Create two DIV elements: [field_name]_fld – which holds the widget, [field_name]_cap which holds the label if needed by the widget.
+
+      Since there is a sub form widget which let us encapsulate other forms inside the 	    
+      current form, The engine handle a stack for saving all different query engines that will    
+      be used in the page creation so no query data will interfere with top level queries.
+      This is done using the “Repository/repush.inc” and  “Repsoiotry/repop.inc”  		          
+       templates.
+       
+       the engine uses the following RVAR as init variants:
+1.dir – The direction of the rendering. Option are “rtl” ( right to left) or “ltr” (left to right)
+2.__DEBUG__ - Paints border on all encapsulating DIV element.
+3.repository_query_engine – Specify your own query engine.
+4.repository_template – Specify the template to be rendered. Default: the current template.
+      
+
+
+
+
+
+
+
+
+
+
+
+4.The repository widgets – The widget list based on the tbl table
+1. TEXT_FIELD – HTML standard text field + corresponding caption.
+2. LABEL – A <pre></pre> encapsulated text.
+3. COMBO BOX - HTML standard combo box + corresponding caption. The src field		    		 is used to specify a template which will create (usually by 				 querying the db) the <option> section of the select. Source 				 templates are usually marked with “bnd” file extension.
+4. IMAGE -  HTML standard image.
+5. BUTTON - HTML standard button.
+6. CHECK_BOX - HTML standard check box + corresponding caption.
+7. RADIO - HTML standard radio button + corresponding caption.
+8. PASSWORD - HTML standard password field + corresponding caption.
+9. RECTANGLE – Used to create boxes using the border and background attribute.
+Perfect for grouping elements. 
+10. GRID – A complex combination of HTML::Merge and Javascript that create a data   		 grid based on an SQL query. The grid builds an array of objects called  		 	 “grid_array” from the query and render itself based  on that array. 
+ The grid also support triggering of events an automatic ordering of the 
+  grid  by manipulating the SQL query.
+     
+ parameters: size – number of shown records.
+                     maxlength – maximum number of record to fetch in a request.
+  src – The template which needs to contain an RVAR called     
+           “qrid_query” which holds the SQL query that the grid    
+            is bases upon.
+  width – specify a fix width.
+  height – override the size definition and specify the grid 	  		height in pixels.
+   field_data – is used to specify in a key=value;key=vale ...
+                   notation special parameters to the grid.
+                   uid: the specific name of the field in the sql 		               query which is used as a unique row    			    identifier.
+                   quote_data: boolean if true all function  			               returning field data will return the 		               data quoted with semicolons.
+background – The background color of the field titles.
+		 events: On all supported events you can specify a pointer to a Javascript 				  function (the name without the parameters section). when this  
+                                      function  will be invoked the grid will send an object to the 				   function containing three elements: 
+			   uid: The referred row uid database val.
+			   rowid: The physical position of the row in the grid.
+			   flag: Boolean actioned or not actioned. 		
+
+			   onDblClick –  Triggered when double clicking the grid row (also 					    referred to as zooming) the function will be 						    invoked.
+			   onChange – Triggered when pressing on the side control for 					  	highlighting a row.
+			   onClick – Triggered when pressing on the title for sorting (never 				        been tested).
+		 API: The grid is a class. The automatic created instance is named as 			          follows: “c_[field_name]_grid” the following methods where design 
+		          to help the programmer interact with the grid.
+		          Refresh(line_offset): Redraw the grid based on the “grid_array” 			          		starting from a specify line_offset First line is 1.
+		          Rebuild(extra,obj,suppress_header_rebuild,line_offset,form):
+				Rebuild the grid from the database.
+				extra – Name of a template the should be run before the 						fetching the data from the database. Usually used for  					doing Insert or Update.
+				obj – An object  containing element which should be 					         passed to the extra template.
+				suppress_header_rebuild – don't redraw the fields title line.
+				 line_offset – Same as in the refresh method.
+				 form – name of a form which can be used to transfer the 						 data to the server through. if not defined a url string 					 will be created, and the location.href method will be 					 used (limited to 255 charecters).
+			GetMarkedUid() - Return all highlighted rows “uid” as an array.
+			GetMarkedUidAsStr() -  Return all highlighted rows ”uid” as a 							     coma delimited row.
+			GetMarkedRowid() - Return all highlighted rows “rowid” as an 							array.
+			GetMarkedUidAsStr() -  Return all highlighted rows ”rowid” as a 							     coma delimited row.
+			GetZoomedUid() - Return zoomed row “uid”.
+			GetZoomedRowid() - Return zoomed row “rowid”.
+			SetHeaderCaptionByID(id) – Change the title caption.
+			SetHeaderCaptionByFieldName(field_name) – Change the title 										      caption.
+			GetHeaderCaptionByID(id) – Get the title caption.
+			GetHeaderCaptionByFieldName(field_name) – Get the title 										      caption.
+			GetFieldByRowAndCol(row,col) – Get the grid data of a specific 								cell.
+			DelColumnByID(id) – Dells an entire column based on the id.
+			DelColumnByFieldName(field_name) – Dells an entire column 									       based on the column 									       name.
+			GetZoomColor() - Get the grid zoom color (the row color when 						      double clicking).
+			SetZoomColor(color) – Set the zoom color automatically.
+			GetCursorColor() - Get the grid cursor color.
+			SetCursorColor(color) - Set the grid cursor color.
+		
+			
+			
+		Stracture: “Repository/Grid/grid.inc” - Basic CSS and constructor initting.
+			     “Repository/Grid/grid_build_data.inc” - Do the actual build of 			      	the “grid_array” from the database.
+			     “Repository/Grid/grid_refresh.html” - The request to the 					server triggered when sorting or calling the Rebuild 					method.
+			     “javascript/Repository/Grid/grid.js” - The grid class.
+			          
+11. SUMBIT - HTML standard submit button.
+12. LINE  - Create horizontal and vertical lines based on the 					     pos_x,pos_y,width,height attributes
+13. TEXT – Just plain text.
+     14. DATE_BOX – Not finished should open our standard date box automatically.
+15. SUB_FORM – creates a sub form which runs inside the template specified in t	     the “src” element. 
+
+The road ahead
+- Add a delta_y column.
+- Change the grid “grid_arr” to a faster created storage type.
+-  Render all CSS attribute as a style sheet (INPUT:my_field). that way the code will     
+   be more consistent and more important it will be possible not to render empty    
+   attributes. and cut down the result HTML size dramatically.
+- rewrite “build_form.inc” when HTML::Merge performance issues will be solved.
+- render the result of the build_form operation so that it won't have to be rendered from   
+  the database everytime. Could be done inside HTML::Merge (compilation time) Or   
+  outside HTML::Merge by dynamically creating templates for the rendered result Or   
+  even compiled templates in the cache directory.
+
+- The HTML::Merge::App::Repository is licensed under the same terms Perl is licensed.
+
+- The copyright licensing notice below applies to this text. 
+Permission is granted to copy, distribute, and/or modify this document under the terms of the GNU Free Documentation License, Version 1.1 or any later version published by the Free Software Foundation. 

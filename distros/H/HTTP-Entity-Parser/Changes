@@ -1,0 +1,66 @@
+Revision history for Perl extension HTTP-Entity-Parser
+
+0.19 2017-02-07T08:19:45Z
+
+   - Adjust tests for module load from a relative path when . is not in @INC (Thank you toddr)
+
+0.18 2016-10-03T04:36:04Z
+
+   - Use a better tempdir, fix some documentation, and make json test more readable #4 (Thank you karenetheridge)
+
+0.17 2015-11-19T03:38:19Z
+
+   - requires WWW::Form::UrlEncoded 0.23
+
+0.16 2015-11-18T05:20:09Z
+
+   - add chansen's Content-Disposition header parser and test
+
+0.15 2015-11-17T05:31:45Z
+
+   - [INCOMPATIBLE CHANGE from 0.14] make buffer length configurable perl instance
+   - increase buffer length to 64k
+
+0.14 2015-11-17T01:29:43Z
+
+    - make buffer length configurable
+
+0.13 2015-11-15T06:22:36Z
+
+    - create tempdir for store upload data
+
+0.12 2014-02-24T14:05:33Z
+
+    - use parse_urlencoded_arrayref. requires WWW::Form::UrlEncoded >= 0.17
+
+0.11 2014-02-19T15:38:51Z
+
+    - cache loaded parser and tune a bit
+
+0.10 2014-02-19T06:29:13Z
+
+    - requires WWW::Form::UrlEncoded >= 0.13 for backward compatibility
+
+0.05 2014-02-17T07:00:27Z
+
+    - requires WWW::Form::UrlEncoded >= 0.10  that does not use xs
+
+0.04 2014-02-07T08:05:16Z
+
+    - fix a documentation bug about Plack::Request::Upload
+
+0.03 2014-02-07T07:09:03Z
+
+    - use WWW::Form::UrlEncoded for parsing POST data
+    - update benchmark
+
+0.02 2014-02-06T02:34:25Z
+
+    - fix test on Windows #2 (Thank you chorny)
+      use :unix perlio
+    - fix a document bug (Thank you moznion)
+
+0.01 2014-02-05T02:00:47Z
+
+    - original version
+

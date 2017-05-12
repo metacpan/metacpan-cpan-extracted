@@ -1,0 +1,26 @@
+HTML-Inject
+===========
+
+Created:      2012-08-05
+Home page:    <https://metacpan.org/release/HTML-Inject>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=HTML-Inject>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.004	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.003	2013-04-03
+
+ [ Bug Fixes ]
+ - Bleadperl v5.17.10-30-g0f539b1 breaks CPAN
+   Fixes RT#84343.
+   Andreas J. König++
+   <https://rt.cpan.org/Ticket/Display.html?id=84343>
+
+0.002	2012-10-16
+
+ - Added: Use Scalar::Does for type constraint checking.
+
+0.001	2012-08-05	Initial release

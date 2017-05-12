@@ -1,0 +1,19 @@
+Hash::Flatten v1.19
+
+(c) BBC 2004. This program is free software; you can redistribute it and/or
+modify it under the GNU GPL.
+
+See the file COPYING in this distribution, or http://www.gnu.org/licenses/gpl.txt
+
+QUICK START:
+
+Install Hash::Flatten by unpacking the tarball and running the following
+commands in the source directory:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+    Then delete the source directory tree since it's no longer needed.
+
+    run 'perldoc Hash::Flatten' to read the full documentation.

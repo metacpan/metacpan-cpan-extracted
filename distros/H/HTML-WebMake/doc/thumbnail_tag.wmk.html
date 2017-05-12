@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>
+      WebMake: Documentation: thumbnail_tag.wmk
+    </title>
+    <meta name="generator" content="WebMake/2.2" />
+    <style>
+      body {
+       background-color: #ffffff; 
+       color: #000000; 
+       font-size: medium;
+       font-family: verdana,lucida,helvetica,sans-serif;
+      }
+      code, samp, pre {
+       font-family: Courier New,courier,fixed-width,monospace;
+      }
+      H1 { font-size: x-large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFCC66; }
+      H2 { font-size: large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFDD77; }
+      H3 { font-size: medium; font-family: Garamond,Book Antiqua,Times,serif; background: #FFEE88; }
+      H4 { font-size: small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H5 { font-size: x-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H6 { font-size: xx-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      A:link {
+       font-weight: bold;
+       color: #004000;
+       text-decoration: underline; 
+      }
+      A:visited {
+       font-weight: normal;
+       color: #008000;
+       text-decoration: underline; 
+      }
+      A:active {
+       font-weight: bold;
+       color: #800000;
+       text-decoration: underline; 
+      }
+      dt {
+       font-size: medium;
+       font-weight: bold;
+       padding-top: 8px; padding-bottom: 8px;
+      }
+      dd {
+       padding-top: 8px; padding-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body bgcolor="#ffffff" text="#000000" link="#3300cc" vlink="#660066">
+    <font face="lucida,verdana,sans-serif">
+      <div align="center">
+        <img src="images/WebMakeTitle.png" alt="WebMake" width="500" height="122" />
+      </div>
+      <table width="100%">
+        <tr>
+          <td valign="top">
+            <strong><a href="http://webmake.taint.org/">WebMake</a>
+             Documentation</strong> (version 2.2)
+             
+          </td>
+          <td valign="top">
+            <div align="right">
+              
+               [ <a href="sitetree.wmk.html">Back</a> | <a href="docmap.html">Forward</a> | <a href="index.html">Index</a>
+               | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+               
+            </div>
+          </td>
+        </tr>
+      </table>
+<!-- yes, it's that Mozilla black-border code again ;) -->
+      <!-- stolen from www.mozilla.org via rc3.org -->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td bgcolor="#aaaaaa">
+            <table border="0" cellspacing="4" cellpadding="4" width="100%">
+              <tr>
+                <td bgcolor="#ffffff">
+                  <table border="0" cellspacing="4" cellpadding="4" width="100%">
+                    <tr>
+                      <td>
+                        <h1>thumbnail_tag.wmk</h1><!-- INDEX BEGIN -->
+                        <ul>
+                          <li>
+                            <a href="#LOADING">LOADING</a><li>
+                              <a href="#HTML_TAGS">HTML TAGS</a><li>
+                                <a href="#PERL_CODE">PERL CODE</a><li>
+                                  <a href="#DESCRIPTION">DESCRIPTION</a><li>
+                                    <a href="#PERL_FUNCTIONS">PERL FUNCTIONS</a><li>
+                                      <a href="#EXAMPLES">EXAMPLES</a><li>
+                                        <a href="#OPTIONS_WHICH_AFFECT_THIS_TAG">OPTIONS WHICH AFFECT THIS TAG</a>
+                                      </ul>
+<!-- INDEX END -->
+                                                                            <hr />
+                                      <h1><a name="LOADING">LOADING</a></h1><p>
+                                        <pre>
+  &lt; use plugin=&quot;thumbnail_tag&quot; /&gt;
+                                      </pre>
+                                      <hr />
+                                      <h1><a name="HTML_TAGS">HTML TAGS</a></h1><p>
+                                        <pre>
+  &lt; thumbnail name=&quot;filename.jpg&quot; [text=&quot;template&quot;]
+        [bordercolor=&quot;black&quot;] [borderwidth=&quot;1&quot;] [format=&quot;jpg&quot;] /&gt;
+                                      </pre>
+                                      <hr />
+                                      <h1><a name="PERL_CODE">PERL CODE</a></h1><p>
+                                        <pre>
+  &lt;{perl
+                                      </pre>
+                                      <p>
+                                        <pre>
+    make_thumbnail_table (3, @names_of_images);
+                                      </pre>
+                                      <p>
+                                        <pre>
+  }&gt;
+                                      </pre>
+                                      <hr />
+                                      <h1><a name="DESCRIPTION">DESCRIPTION</a></h1><p>
+                                        
+                                        This WebMake Perl library provides a quick shortcut to make thumbnail links
+                                        to full-sized images, suitable for use in a photo album site or similar.
+                                        <p>
+                                          
+                                          The library provides support for a &lt; thumbnail &gt; tag, which creates a
+                                          thumbnail of one image, and some helper functions for creating thumbnail
+                                          pages with lots of images.
+                                          <p>
+                                            
+                                            The attributes supported by the &lt; thumbnail &gt; tag are as follows:
+                                            <dl>
+                                              <dt>
+                                                <strong><a name="item_name">name=&quot;imagename&quot;</a></strong>
+                                              </dt>
+                                              <dd>
+                                                <p>
+                                                  
+                                                  The image to link to. This should be the name of a URL reference, loaded
+                                                  from a &lt; media &gt; search, <strong>not</strong> the filename of the image itself.
+                                                  
+                                                </dd>
+                                                <dt>
+                                                  <strong><a name="item_borderwidth">borderwidth=&quot;n&quot;</a></strong>
+                                                </dt>
+                                                <dd>
+                                                  <p>
+                                                    
+                                                    If you wish to draw a border around the images, this specifies the border
+                                                    width (in pixels). The default value is 1. This can also be specified by
+                                                    setting a template content item called <code>thumbnail.borderwidth</code>.
+                                                    
+                                                  </dd>
+                                                  <dt>
+                                                    <strong><a name="item_bordercolor">bordercolor=&quot;#xxxxxx&quot;</a></strong>
+                                                  </dt>
+                                                  <dd>
+                                                    <p>
+                                                      
+                                                      The border colour to draw image borders in. The default value is ``black''
+                                                      (or
+                                                      <code>#000000</code>). This can also be specified by setting a template content item called <code>thumbnail.bordercolor</code>.
+                                                      
+                                                    </dd>
+                                                    <dt>
+                                                      <strong><a name="item_format">format=&quot;fmt&quot;</a></strong>
+                                                    </dt>
+                                                    <dd>
+                                                      <p>
+                                                        
+                                                        The format to use for thumbnail images; default is ``jpg''. Also available:
+                                                        ``gif'' or ``png''. Any reasonable ImageMagick-supported format will work.
+                                                        
+                                                      </dd>
+                                                      <dt>
+                                                        <strong><a name="item_text">text=&quot;template&quot;</a></strong>
+                                                      </dt>
+                                                      <dd>
+                                                        <p>
+                                                          
+                                                          The template text to be used for the thumbnail link and img tags. The
+                                                          following content items are defined for use inside the template text. This
+                                                          can also be specified by setting a template content item called
+                                                          <code>thumbnail.template</code>.
+                                                          <dl>
+                                                            
+                                                          </dd>
+                                                          <dt>
+                                                            <strong><a name="item_thumbnail">thumbnail.name</a></strong>
+                                                          </dt>
+                                                          <dd>
+                                                            <p>
+                                                              
+                                                              The name of the image (not the filename, the &lt; media &gt; item name).
+                                                              
+                                                            </dd>
+                                                            <dt>
+                                                              <strong><a name="item_thumbnail">thumbnail.path</a></strong>
+                                                            </dt>
+                                                            <dd>
+                                                              <p>
+                                                                
+                                                                The image file's path, with directories.
+                                                                
+                                                              </dd>
+                                                              <dt>
+                                                                <strong><a name="item_thumbnail">thumbnail.filename</a></strong>
+                                                              </dt>
+                                                              <dd>
+                                                                <p>
+                                                                  
+                                                                  The image file's name, without directories.
+                                                                  
+                                                                </dd>
+                                                                <dt>
+                                                                  <strong><a name="item_thumbnail">thumbnail.href</a></strong>
+                                                                </dt>
+                                                                <dd>
+                                                                  <p>
+                                                                    
+                                                                    The path to the full-sized image file, relative to the current output file.
+                                                                    
+                                                                  </dd>
+                                                                  <dt>
+                                                                    <strong><a name="item_thumbnail">thumbnail.thumb_src</a></strong>
+                                                                  </dt>
+                                                                  <dd>
+                                                                    <p>
+                                                                      
+                                                                      The path to the thumbnail-sized version of the image file, relative to the
+                                                                      current output file.
+                                                                      
+                                                                    </dd>
+                                                                    <dt>
+                                                                      <strong><a name="item_thumbnail">thumbnail.size_in_k</a></strong>
+                                                                    </dt>
+                                                                    <dd>
+                                                                      <p>
+                                                                        
+                                                                        The full-sized image file's size, in kilobytes (rounded up).
+                                                                        
+                                                                      </dd>
+                                                                      <dt>
+                                                                        <strong><a name="item_thumbnail">thumbnail.size</a></strong>
+                                                                      </dt>
+                                                                      <dd>
+                                                                        <p>
+                                                                          
+                                                                          The full-sized image file's size, in bytes.
+                                                                          
+                                                                        </dd>
+                                                                        <dt>
+                                                                          <strong><a name="item_thumbnail">thumbnail.full_height / thumbnail.full_width</a></strong>
+                                                                        </dt>
+                                                                        <dd>
+                                                                          <p>
+                                                                            
+                                                                            The full-sized image file's height and width, in pixels.
+                                                                            
+                                                                          </dd>
+                                                                          <dt>
+                                                                            <strong><a name="item_thumbnail">thumbnail.height / thumbnail.width</a></strong>
+                                                                          </dt>
+                                                                          <dd>
+                                                                            <p>
+                                                                              
+                                                                              The thumbnail-sized image file's height and width, in pixels.
+                                                                              
+                                                                            </dd>
+                                                                            <dt>
+                                                                              <strong><a name="item_thumbnail">thumbnail.tag_attrs</a></strong>
+                                                                            </dt>
+                                                                            <dd>
+                                                                              <p>
+                                                                                
+                                                                                The remaining attributes of the thumbnail tag.
+                                                                                
+                                                                              </dd>
+                                                                            </dl>
+                                                                            <p>
+                                                                              <code>template</code> can be, and should often be, a $ {content_reference}. The default template
+                                                                              is:
+                                                                              <p>
+                                                                                <pre>
+        &lt; div align=center &gt;
+          &lt; a href=&quot;$ {thumbnail.href}&quot; &gt;&lt; img
+              src=&quot;$ {thumbnail.thumb_src}&quot; alt=&quot;[$ {thumbnail.filename}]&quot;
+              height=&quot;$ {thumbnail.height}&quot; width=&quot;$ {thumbnail.width}&quot;
+              border=&quot;0&quot; $ {thumbnail.tag_attrs} / &gt;&lt; /a &gt;
+          &lt; br / &gt;
+          $ [$ {thumbnail.name}.title]
+          &lt; br / &gt;
+        &lt; /div &gt;
+                                                                              </pre>
+                                                                              <p>
+                                                                                
+                                                                                Note that this means that any unrecognised attributes of the thumbnail tag
+                                                                                itself will become attributes of the IMG tag.
+                                                                                <hr />
+                                                                                <h1><a name="PERL_FUNCTIONS">PERL FUNCTIONS</a></h1><p>
+                                                                                  
+                                                                                  The following Perl functions are provided:
+                                                                                  <dl>
+                                                                                    
+                                                                                  </dd>
+                                                                                  <dt>
+                                                                                    <strong><a name="item__text">$text = make_thumbnail_table ($pics_per_row, @names_of_images);</a></strong>
+                                                                                  </dt>
+                                                                                  <dd>
+                                                                                    <p>
+                                                                                      
+                                                                                      This function will lay out a table containing thumbnails, with up to
+                                                                                      <code>$pics_per_row</code> pictures on each row. The following template content items can be set to
+                                                                                      customise the behaviour of this tag:
+                                                                                      <dl>
+                                                                                        
+                                                                                      </dd>
+                                                                                      <dt>
+                                                                                        <strong><a name="item__">$ {thumbnail.table.td}</a></strong>
+                                                                                      </dt>
+                                                                                      <dd>
+                                                                                        <p>
+                                                                                          
+                                                                                          The template used to wrap each thumbnail. References to $
+                                                                                          {thumbnail.table.item} will be replaced with the output from the &lt;
+                                                                                          thumbnail &gt; tag itself. Default setting:
+                                                                                          <p>
+                                                                                            <pre>
+        &lt; td valign=top &gt; $ {thumbnail.table.item} &lt; /td &gt;
+                                                                                          </pre>
+                                                                                        </dd>
+                                                                                        <dt>
+                                                                                          <strong>$ {thumbnail.table.tr}</strong>
+                                                                                        </dt>
+                                                                                        <dd>
+                                                                                          <p>
+                                                                                            
+                                                                                            The template used to wrap each row of thumbnails. References to $
+                                                                                            {thumbnail.table.tds} will be replaced with the output from the $
+                                                                                            {thumbnail.table.td} templates so far for this row. Default setting:
+                                                                                            <p>
+                                                                                              <pre>
+        &lt; tr &gt; $ {thumbnail.table.tds} &lt; /tr &gt;
+                                                                                            </pre>
+                                                                                          </dd>
+                                                                                        </dl>
+                                                                                        <p>
+                                                                                          
+                                                                                          Note that you will have to wrap this up in a &lt; table &gt; tag yourself
+                                                                                          ;)
+                                                                                          
+                                                                                        </dl>
+                                                                                        <hr />
+                                                                                        <h1><a name="EXAMPLES">EXAMPLES</a></h1><p>
+                                                                                          
+                                                                                          The file <code>examples/thumbnails.wmk</code> in the WebMake distribution.
+                                                                                          <hr />
+                                                                                          <h1><a name="OPTIONS_WHICH_AFFECT_THIS_TAG">OPTIONS WHICH AFFECT THIS TAG</a></h1><p>
+                                                                                            <code>FileSearchPath</code> - WebMake option
+                                                                                          </td>
+                                                                                        </tr>
+                                                                                      </table>
+                                                                                    </td>
+                                                                                  </tr>
+                                                                                </table>
+                                                                              </td>
+                                                                            </tr>
+                                                                          </table>
+                                                                          <table width="100%">
+                                                                            <tr>
+                                                                              <td valign="top">
+                                                                                <strong><a href="http://webmake.taint.org/">WebMake</a>
+                                                                                 Documentation</strong> (version 2.2)
+                                                                                 
+                                                                              </td>
+                                                                              <td valign="top">
+                                                                                <div align="right">
+                                                                                  
+                                                                                   [ <a href="sitetree.wmk.html">Back</a> | <a href="docmap.html">Forward</a> | <a href="index.html">Index</a>
+                                                                                   | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+                                                                                   
+                                                                                </div>
+                                                                              </td>
+                                                                            </tr>
+                                                                          </table>
+                                                                          <div align="right">
+                                                                            <a href="http://webmake.taint.org/"><img src="images/BuiltWithWebMake.png" alt="Built With WebMake" border="0" width="88" height="31" /></a>
+                                                                          </div>
+                                                                        </font>
+                                                                      </body>
+                                                                    </html>

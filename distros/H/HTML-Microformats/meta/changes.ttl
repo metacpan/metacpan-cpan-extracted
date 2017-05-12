@@ -1,0 +1,307 @@
+@prefix :        <http://usefulinc.com/ns/doap#> .
+@prefix dcs:     <http://ontologi.es/doap-changeset#> .
+@prefix dc:      <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix my:      <http://purl.org/NET/cpan-uri/dist/HTML-Microformats/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix toby:    <http://tobyinkster.co.uk/#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+my:project :release my:v_0-00_00.
+my:v_0-00_00
+	a               :Version ;
+	dc:issued       "2010-02-19"^^xsd:date ;
+	:revision       "0.00_00"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Microformats-0.00_00.tar.gz> ;
+	rdfs:comment    "Original version, forked from Swignition. Supports hCard, adr, geo and rel-tag."@en .
+
+my:project :release my:v_0-00_01.
+my:v_0-00_01
+	a               :Version ;
+	dc:issued       "2010-02-24"^^xsd:date ;
+	:revision       "0.00_01"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Microformats-0.00_01.tar.gz> ;
+	rdfs:comment    "Adds XFN, species and hMeasure."@en ;
+	dcs:changeset [
+		dcs:versus my:v_0-00_00 ;
+		dcs:item
+			[ rdfs:label "Figure out which hCard on a page is the 'representative' one (for the purposes of XFN)."@en ; a dcs:Addition ] ,
+			[ rdfs:label "XFN support."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Copyright statements now reflect the fact that much of this code comes from 2008."@en ] ,
+			[ rdfs:label "Draft 'species' microformat support."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Improve hCard type+value property parsing."@en ] ,
+			[ rdfs:label "Draft 'hMeasure' microformat support."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Document HTML::Microformats::hCard."@en ]
+	] .
+
+my:project :release my:v_0-00_02.
+my:v_0-00_02
+	a               :Version ;
+	dc:issued       "2010-03-01"^^xsd:date ;
+	:revision       "0.00_02"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Microformats-0.00_02.tar.gz> ;
+	rdfs:comment    "Adds rel-license, rel-enclosure, hAtom and hNews."@en ;
+	dcs:changeset [
+		dcs:versus my:v_0-00_01 ;
+		dcs:item
+			[ rdfs:label "Split out some common rel-X parsing into HTML::Microformats::_rel."@en ] ,
+			[ rdfs:label "rel-license support."@en ; a dcs:Addition ] ,
+			[ rdfs:label "rel-enclosure support."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Support for hAtom and hNews."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Document geo, adr, XFN and hAtom support."@en ] 
+	] .
+
+my:project :release my:v_0-00_03.
+my:v_0-00_03
+	a               :Version ;
+	dc:issued       "2010-03-09"^^xsd:date ;
+	:revision       "0.00_03"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Microformats-0.00_03.tar.gz> ;
+	rdfs:comment    "Adds hCalendar."@en ;
+	dcs:changeset [
+		dcs:versus my:v_0-00_02 ;
+		dcs:item
+			[ rdfs:label "Rename _base.pm to BASE.pm; _simple_parser.pm to Mixin/Parser.pm; _simple_rdf.pm to Mixin/RDF.pm; _rel.pm to BASEREL.pm."@en ] ,
+			[ rdfs:label "hCalendar support."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Document BASE microformat class."@en ] ,
+			[ rdfs:label "RecurringDateTime datatype."@en ; a dcs:Addition ]
+	] .
+
+my:project :release my:v_0-00_04.
+my:v_0-00_04
+	a               :Version ;
+	dc:issued       "2010-03-20"^^xsd:date ;
+	:revision       "0.00_04"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Microformats-0.00_04.tar.gz> ;
+	rdfs:comment    "Adds hResume, hReview and xFolk."@en ;
+	dcs:changeset [
+		dcs:versus my:v_0-00_03 ;
+		dcs:item
+			[ rdfs:label "Problems parsing hCard org properties resolved."@en ; a dcs:Bugfix ] ,
+			[ rdfs:label "hMeasure.pm wasn't inheriting properly from BASE.pm."@en ; a dcs:Bugfix ] ,
+			[ rdfs:label "Implement class=value-title support."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Implement implied date for hCalendar dtend and hAtom updated properties."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Improvements in natural language date parsing."@en ] ,
+			[ rdfs:label "UTF8 fixes."@en ; a dcs:Bugfix ] ,
+			[ rdfs:label "hResume support."@en ; a dcs:Addition ] ,
+			[ rdfs:label "hReview and xFolk support."@en ; a dcs:Addition ]
+	] .
+
+my:project :release my:v_0-00_05.
+my:v_0-00_05
+	a               :Version ;
+	dc:issued       "2010-04-16"^^xsd:date ;
+	:revision       "0.00_05"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Microformats-0.00_05.tar.gz> ;
+	rdfs:comment    "Adds hAudio, hReview-aggregate, hListing and hProduct."@en ;
+	dcs:changeset [
+		dcs:versus my:v_0-00_04 ;
+		dcs:item
+			[ rdfs:label "hAudio support."@en ; a dcs:Addition ] ,
+			[ rdfs:label "hReview-aggregate support."@en ; a dcs:Addition ] ,
+			[ rdfs:label "hListing support."@en ; a dcs:Addition ] ,
+			[ rdfs:label "hProduct support."@en ; a dcs:Addition ]
+	] .
+
+my:project :release my:v_0-00_06.
+my:v_0-00_06
+	a               :Version ;
+	dc:issued       "2010-04-16"^^xsd:date ;
+	:revision       "0.00_06"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Microformats-0.00_06.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-00_05 ;
+		dcs:item
+			[ rdfs:label "Packaging fix."@en ; a dcs:Bugfix ]
+	] .
+
+my:project :release my:v_0-00_07.
+my:v_0-00_07
+	a               :Version ;
+	dc:issued       "2010-04-28"^^xsd:date ;
+	:revision       "0.00_07"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Microformats-0.00_07.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-00_06 ;
+		dcs:item
+			[ rdfs:label "Support http://microformats.org/profile/specs profile URI."@en ; a dcs:Update ] ,
+			[ rdfs:label "our @HTML::Microformats::Formats instead of 'my'."@en ]
+	] .
+
+my:project :release my:v_0-00_08.
+my:v_0-00_08
+	a               :Version ;
+	dc:issued       "2010-04-29"^^xsd:date ;
+	:revision       "0.00_08"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Microformats-0.00_08.tar.gz> ;
+	dcs:changeset [
+		rdfs:comment "These changes are for the benefit of XML-Atom-Microformats."@en ;
+		dcs:versus my:v_0-00_07 ;
+		dcs:item
+			[ rdfs:label "Introduce a context-unique component to blank node identifiers."@en ; rdfs:comment "This means that two runs of HTML::Microformats will result in different identifiers."@en ] ,
+			[ rdfs:label "Distinguish between base URI and document/context URI."@en ]
+	] .
+
+my:project :release my:v_0-00_09.
+my:v_0-00_09
+	a               :Version ;
+	dc:issued       "2010-05-12" ;
+	:revision       "0.00_09"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Microformats-0.00_09.tar.gz> ;
+	rdfs:comment    "Adds XOXO, OpenURL COinS and figure."@en ;
+	dcs:changeset [
+		dcs:versus my:v_0-00_08 ;
+		dcs:item
+			[ rdfs:label "XOXO support."@en ; a dcs:Addition ] ,
+			[ rdfs:label "OpenURL COinS support."@en ; rdfs:comment "Not technically a microformat."@en ; a dcs:Addition ] ,
+			[ rdfs:label "figure support."@en ; a dcs:Addition ] ,
+			[ rdfs:label "adr RDF output now better differentiates between the addresses and the places they represent."@en ] ,
+			[ rdfs:label "Document the rel-* microformat implementations and OpenURL COinS."@en ] ,
+			[ rdfs:label "Document the ISO8601 datetime parser."@en ]
+	] .
+
+my:project :release my:v_0-00_10.
+my:v_0-00_10
+	a               :Version ;
+	dc:issued       "2010-05-13" ;
+	:revision       "0.00_10"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Microformats-0.00_10.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-00_09 ;
+		dcs:item
+			[ rdfs:label "Packaging fix - include figure.pm in the distribution."@en ; a dcs:Bugfix ] ,
+			[ rdfs:label "Document hCard helper modules."@en ]
+	] .
+
+my:project :release my:v_0-00_11.
+my:v_0-00_11
+	a               :Version ;
+	dc:issued       "2010-06-23" ;
+	:revision       "0.00_11"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Microformats-0.00_11.tar.gz> ;
+	rdfs:comment    "Adds XMDP and VoteLinks."@en ;
+	dcs:changeset [
+		dcs:versus my:v_0-00_10 ;
+		dcs:item
+			[ rdfs:label "Improve calculation of representative hCard."@en ] ,
+			[ rdfs:label "Support for VoteLinks microformat, including special support for VoteLinks inside hAtom entries."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Find contact hCard for a page - i.e. an hCard in an <address> element."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Support XMDP."@en ; a dcs:Addition ]
+	] .
+
+my:project :release my:v_0-00_12.
+my:v_0-00_12
+	a               :Version ;
+	dc:issued       "2010-06-25" ;
+	:revision       "0.00_12"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Microformats-0.00_12.tar.gz> ;
+	dcs:changeset [
+			dcs:versus my:v_0-00_11 ;
+			dcs:item
+				[ rdfs:label "VoteLinks.pm wasn't included in the 0.00_11 distribution."@en ; a dcs:Bugfix ]
+		] .
+
+my:project :release my:v_0-00_13.
+my:v_0-00_13
+	a               :Version ;
+	dc:issued       "2010-10-18" ;
+	:revision       "0.00_13"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Microformats-0.00_13.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-00_12 ;
+		dcs:item
+			[ rdfs:label "Minor bugfixes, cleanups and documentation improvements."@en ] ,
+			[ rdfs:label "Add serialise_model method to HTML::Microformats and HTML::Microformats::BASE."@en ; a dcs:Addition ]
+	] .
+
+my:project :release my:v_0-100.
+my:v_0-100
+	a               :Version ;
+	dc:issued       "2010-12-16" ;
+	:revision       "0.100"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Microformats-0.100.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-00_13 ;
+		dcs:item
+			[ rdfs:label "Rename loads of modules - in fact every module except the mixins and HTML::Microformats itself."@en ] ,
+			[ rdfs:label "Avoid UNIVERSAL::can and UNIVERSAL::isa."@en ] ,
+			[ rdfs:label "HTML::Microformats->formats and HTML::Microformats->modules. (use Module::Pluggable)"@en ; a dcs:Addition ] ,
+			[ rdfs:label "Lots of test cases."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Handle dates like 1pm - i.e with am/pm designator but without minutes."@en ; a dcs:Bugfix ]
+	] .
+
+my:project :release my:v_0-101.
+my:v_0-101
+	a               :Version ;
+	dc:issued       "2010-12-22" ;
+	:revision       "0.101"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Microformats-0.101.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-100 ;
+		dcs:item
+			[ rdfs:label "Stop printing warnings about DESTROY method not being defined."@en ; a dcs:Bugfix ] ,
+			[ rdfs:label "Don't assume each rel=me link refers to a different 'me'!"@en ; a dcs:Bugfix  ]
+	] .
+
+my:project :release my:v_0-102.
+my:v_0-102
+	a               :Version ;
+	dc:issued       "2011-02-05" ;
+	:revision       "0.102"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Microformats-0.102.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-101 ;
+		dcs:item
+			[ rdfs:label "Deprecated set_X/add_X/clear_X property accessors for microformat objects."@en ] ,
+			[ rdfs:label "Include awol:Person, awol:name, awol:email and awol:uri in RDF output for hAtom entries."@en ] ,
+			[ rdfs:label "Prefer to parse tel and email in hCard as URLs."@en ] ,
+			[ rdfs:label "Provide hEntry output using RDF iCalendar vocabulary, as a ical:Vjournal."@en ] ,
+			[ rdfs:label "Export hCards in vCard 3.0 format."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Export hCards in vCard 4.0 format."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Export hCards in vCard XML format."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Export hAtom as Atom feeds."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Export geo in KML format."@en ; a dcs:Addition ] ,
+			[ rdfs:label "Export hCalendar in iCalendar format."@en ; a dcs:Addition ]
+	] .
+
+my:project :release my:v_0-103.
+my:v_0-103
+	a               :Version ;
+	dc:issued       "2011-02-16" ;
+	:revision       "0.103"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Microformats-0.103.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-102 ;
+		dcs:item
+			[ rdfs:label "hCalendar attachments."@en ; a dcs:Bugfix ] ,
+			[ rdfs:label "Profile management."@en ; a dcs:Bugfix ]
+	] .
+
+my:project :release my:v_0-104.
+my:v_0-104
+	a               :Version ;
+	dc:issued       "2011-12-06" ;
+	:revision       "0.104"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Microformats-0.104.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-103 ;
+		dcs:item
+			[ rdfs:label "Module::Package::RDF"@en ; a dcs:Packaging ] ,
+			[ rdfs:label "Include some examples."@en ; a dcs:Packaging ] ,
+			[ rdfs:label "use Object::AUTHORITY"@en ; a dcs:Update ] ,
+			[ rdfs:label "use 5.010"@en ; a dcs:Update ]
+	] .
+
+my:project :release my:v_0-105.
+my:v_0-105
+	a               :Version ;
+	dc:issued       "2012-07-05" ;
+	:revision       "0.105"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Microformats-0.105.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-104 ;
+		dcs:item   [ rdfs:label "Drop common::sense dependency."@en ];
+		dcs:item   [ rdfs:label "Fix link to ocoins.info."@en ; a dcs:Bugfix, dcs:Documentation ; dcs:fixes <http://purl.org/NET/cpan-uri/rt/ticket/76623> ];
+		dcs:item   [ rdfs:label "Corrected pod errors in three files."@en ; a dcs:Bugfix, dcs:Documentation ; dcs:fixes <http://purl.org/NET/cpan-uri/rt/ticket/73336> ];
+	] .
+

@@ -1,0 +1,88 @@
+Compiling and using either perl module HTML::Template::Pro or
+C library backend htmltmplpro.dll under win32/win64.
+----------------------------------------------------------
+Note that issues related to other languages' bindings 
+are discussed in corresponding bindings.
+
+Release 0.82 and later have full native support for win32 
+and win64. The source of HTML-Template-Pro should be ANSI C portable,
+except unix/win specific sections of file loadfile.inc.
+Those sections can be enabled with MMAP=1 or disabled with MMAP=0.
+If MMAP=0 (--without-mmap) slow ANSI C buffered read will be used instead.
+
+There is ifdef-ed section of win32/win64-specific code, with code fixes 
+and improved section of WIN32 code of Viacheslav Sheveliov.
+Also, it is known to build successfully on WIN64, thanks to 
+Robert Henniger.
+
+Windows memory mapping code use MapViewOfFile/UnmapViewOfFile WIN32 system calls.
+It was disabled by default, because it might not be compatible with
+original HTML-Template when dealing with CRLF-ed templates
+(It opens them in binary mode instead of text one).
+[UPD: I think there should be no difference, at least for C library.
+Windows users, please, test and enlighten me!]
+Nevertheless, compiling with MMAP=1 (--with-mmap, -DUSE_MMAP) should
+improve perfomance and/or memory consumption.
+
+Latest releases of htmltmplpro, built with mingw32 for win32 are 
+avaliable on sourceforge and in sisyphus.ru: see
+http://www.sisyphus.ru/en/srpm/Sisyphus/mingw32-htmltmplpro
+http://www.sisyphus.ru/en/srpm/Sisyphus/mingw32-pcre
+
+If you want to compile htmltmplpro from sources and you do want to use 
+regexps in EXPR="..." you need an optional PCRE library.
+
+Optional PCRE library for win32 can be obtained either from Sisyphus,
+http://www.sisyphus.ru/en/srpm/Sisyphus/mingw32-pcre
+or from http://gnuwin32.sourceforge.net/packages/pcre.htm (seems to be too old)
+Unpack it into pcre subdirectory.
+
+Perl module should be built using Makefile.PL.
+It is known to compile and work properly under Strawberry Perl.
+
+The C library can be built for Windows using CMake
+http://www.cmake.org/cmake/resources/software.html
+which has a GUI interface and can generate projects for
+# Visual Studio 6
+# Visual Studio 7
+# Visual Studio 7 .NET 2003
+# Visual Studio 8 2005
+# Visual Studio 8 2005 Win64
+# Visual Studio 9 2008
+# Visual Studio 9 2008 Win64
+# Watcom WMake
+# CodeBlocks - MinGW Makefiles
+# Eclipse CDT4 - MinGW Makefiles
+# Eclipse CDT4 - NMake Makefiles
+# Eclipse CDT4 - Unix Makefiles
+# Borland Makefiles
+# MSYS Makefiles
+# MinGW Makefiles
+# NMake Makefiles
+
+Also autotools-based minGW cross-compilation from linux to win32 
+is also known to work. Maybe autotools-based cygwin and minGW 64
+compilation will work too, please, report your success.
+
+Example CMake usage.
+
+Unpack source tree. Run CMakeSetup.exe, set up path to the source tree,
+set up path to the build tree to the same value.
+press configure button, choose, for example, 
+Visual Studio 9 2008. verify red-labelled configuration
+options. Change, for example, CMAKE_INSTALL_PREFIX.
+press configure button again, press generate button.
+Then open generated config in Visual Studio 9 2008
+and compile it.
+
+If you want to use another build system, 
+be sure to define properly int64_type, used in EXPR internally.
+for list of possible defines consult CMakeLists.txt and configure.ac/config.h.in
+in the library source distribution.
+
+If you will try to complie this code on a win system, 
+and will get a trouble, be so kind to send me a bugreport
+including logs of failed build.
+Note that I often have no place to test win32/win64 code,
+so patches are always welcome.
+

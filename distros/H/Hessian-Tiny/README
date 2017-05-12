@@ -1,0 +1,57 @@
+Hessian-Tiny
+
+a pure perl implementation of the hessian protocol.
+
+only a client is included in this release, which should
+serve most people who wants to user hessian protocol in perl.
+(server may come later, if necessary at all)
+
+this package aim to make itself usable with little
+dependencies outside core modules (and LWP).
+
+best use with a reasonably recent Perl, i.e. 5.8.0 or later, although
+5.6.0+ should also work.
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Hessian::Tiny::Client
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Hessian-Tiny
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Hessian-Tiny
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Hessian-Tiny
+
+    Search CPAN
+        http://search.cpan.org/dist/Hessian-Tiny/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 DUL
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

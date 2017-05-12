@@ -1,0 +1,29 @@
+HTTP-Retry version 0.04
+=======================
+
+Another HTTP client library.
+LWP is too complex and too slow.
+HTTP::Tiny and Furl is wonderful, but no autoretry.
+HTTP::Retry resloves this, then make your code clearer.
+Enjoy it!
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2014 by Chen Gang
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.16.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

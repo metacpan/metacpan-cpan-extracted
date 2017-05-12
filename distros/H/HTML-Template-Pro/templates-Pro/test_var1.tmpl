@@ -1,0 +1,23 @@
+<H1> test_var1 </H1>
+------------------ <br>
+<bar Name>
+
+<tmPl_var VAR1> step1
+
+<tmpl_var 
+"VAR1"> <tmpl_var NAME=   "VAR1" >  step3 <Tmpl_var NAME   ="VAR1"  >   <TMPL_vAr
+ NAME   ="VAR2" > step5 <tmpl_Var NAME
+="VAR3" > step6 <tmpl_var NAME=   VAR10 > step7
+<BR> <tmpl_var NAME=VAR10 > step8  <tmpl_var NAME   =VAR10> step9
+
+<tmpl_var NAME= 'VAR1' > step10
+
+<tmpl_var NAME = "VAR4" default="test 1 passed. ':)">
+
+template tags could be decorated as html comments
+<!-- tmpl_var NAME = "VAR4" default="test 2 passed. ':)"   -->
+
+template tags could also be decorated as xml (starting from version 0.90)
+<tmpl_var name="VAR1" /> no trailing slash here.
+----- end ------- <br>
+<H1> end test_var1 </H1>

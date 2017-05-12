@@ -1,0 +1,19 @@
+Revision history for Hatena-API-Auth
+
+0.05    2007-06-11T12:29:00+09:00
+	fixed PREREQ_PM in Makefile.PL
+
+0.04    2006-05-04T10:14:44+09:00
+        Added ua() method for getting/settting a user-agent from a
+        foreign class.
+
+0.03    2006-05-02T15:16:11+09:00
+        Now uri_to_login can take extra URI parameters as argument.
+
+0.02    2006-04-24T17:52:02+09:00
+        Changed the name of the error flag from "status" to
+        "has_error"
+
+0.01    2006-04-24T17:01:52+09:00
+        First version, released on an unsuspecting world.
+

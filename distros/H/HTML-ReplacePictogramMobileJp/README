@@ -1,0 +1,33 @@
+NAME
+    HTML::ReplacePictogramMobileJp - HTML に含まれる絵文字を置換する
+
+SYNOPSIS
+        use HTML::ReplacePictogramMobileJp;
+
+        HTML::ReplacePictogramMobileJp->replace(
+            carrier  => 'I',
+            html     => "foo",
+            charset  => 'sjis', # or utf8
+            callback => sub {
+                my ( $unicode, $carrier ) = @_;
+                # なにかする
+            },
+        );
+
+DESCRIPTION
+    HTML::ReplacePictogramMobileJp は HTML に含まれる絵文字を置換するライブラリです。
+    どのように置換するかは、コールバック関数で指定します。
+
+AUTHOR
+    Tokuhiro Matsuno <tokuhirom@gmail.com>
+
+THANKS TO
+    Kazuhiro Osawa
+
+SEE ALSO
+    Encode::JP::Mobile, Moxy
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

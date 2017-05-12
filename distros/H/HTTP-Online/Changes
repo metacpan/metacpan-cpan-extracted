@@ -1,0 +1,7 @@
+Changes for Perl extension HTTP-Online
+
+0.02 Mon Oct 1 2012
+	- Added :skip_all compatible with LWP::Online
+
+0.01 Mon Oct 1 2012
+	- Created initial version

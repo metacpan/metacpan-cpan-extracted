@@ -1,0 +1,21 @@
+Changes
+examples/README
+INSTALL.SKIP
+lib/HTTP/Cookies/Safari.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README.pod
+t/compile.t
+t/Cookies-2039.plist
+t/Cookies.plist
+t/epoch-limit.t
+t/load.t
+t/pod.t
+t/pod_coverage.t
+t/save.t
+t/test_manifest
+xt/changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

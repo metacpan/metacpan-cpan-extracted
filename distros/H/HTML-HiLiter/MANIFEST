@@ -1,0 +1,20 @@
+Changes
+examples/lightfile.cgi
+examples/lightfile.pl
+lib/HTML/HiLiter.pm
+Makefile.PL
+META.yml
+MANIFEST
+README
+t/001.t
+t/002.t
+t/003.t
+t/004-encoding.t
+t/005-nohiliter.t
+t/006-wildcard.t
+t/docs/latin1.html
+t/docs/test.html
+t/docs/karman-cpan.html
+t/pod-coverage.t
+t/pod.t
+META.json                                Module JSON meta-data (added by MakeMaker)

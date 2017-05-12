@@ -1,0 +1,159 @@
+NAME
+
+    HTML::Formatter - Base class for HTML formatters
+
+VERSION
+
+    version 2.16
+
+SYNOPSIS
+
+      use HTML::FormatSomething;
+      my $infile  = "whatever.html";
+      my $outfile = "whatever.file";
+      open OUT, ">$outfile"
+       or die "Can't write-open $outfile: $!\n";
+    
+      print OUT HTML::FormatSomething->format_file(
+        $infile,
+          'option1' => 'value1',
+          'option2' => 'value2',
+          ...
+      );
+      close(OUT);
+
+DESCRIPTION
+
+    HTML::Formatter is a base class for classes that take HTML and format
+    it to some output format. When you take an object of such a base class
+    and call $formatter-format( $tree )> with an HTML::TreeBuilder (or
+    HTML::Element) object, they return the appropriately formatted string
+    for the input HTML.
+
+    HTML formatters are able to format a HTML syntax tree into various
+    printable formats. Different formatters produce output for different
+    output media. Common for all formatters are that they will return the
+    formatted output when the format() method is called. The format()
+    method takes a HTML::Element object (usually the HTML::TreeBuilder root
+    object) as parameter.
+
+    The distribution name has been changed to HTML-Formatter as detailed in
+    "DISTRIBUTION NAME"
+
+METHODS
+
+ new
+
+        my $formatter = FormatterClass->new(
+            option1 => value1, option2 => value2, ...
+        );
+
+    This creates a new formatter object with the given options.
+
+ format_file
+
+ format_from_file
+
+        $string = FormatterClass->format_file(
+            $html_source,
+            option1 => value1, option2 => value2, ...
+            );
+
+    Return a string consisting of the result of using the given class to
+    format the given HTML file according to the given (optional) options.
+    Internally it calls SomeClass->new( ... )->format( ... ) on a new
+    HTML::TreeBuilder object based on the given HTML file.
+
+ format_string
+
+ format_from_string
+
+        $string = FormatterClass->format_string(
+            $html_source,
+            option1 => value1, option2 => value2, ...
+            );
+
+    Return a string consisting of the result of using the given class to
+    format the given HTML source according to the given (optional) options.
+    Internally it calls SomeClass->new( ... )->format( ... ) on a new
+    HTML::TreeBuilder object based on the given source.
+
+ format
+
+        my $render_string = $formatter->format( $html_tree_object );
+
+    This renders the given HTML object according to the options set for
+    $formatter.
+
+    After you've used a particular formatter object to format a particular
+    HTML tree object, you probably should not use either again.
+
+DISTRIBUTION NAME
+
+    This module was originally named HTML-Format despite not containing a
+    HTML::Format module within it. As rules on naming have been taken more
+    seriously, and the PAUSE <https://pause.perl.org/> toolchain adapted so
+    that getting the distribution indexed was more difficult, it became
+    obvious that I should rename the distribution to HTML-Formatter
+    matching the base HTML::Formatter module.
+
+    As of release 2.13 this is released as the HTML-Formatter distribution
+    with corresponding changes to the git repository name and associated
+    items.
+
+    Due to the way that the module is put together this should have no
+    effect on code using the module. The only issues will be where the
+    distribution name was used within dependancies.
+
+SEE ALSO
+
+    The three specific formatters:-
+
+    HTML::FormatText
+
+      Format HTML into plain text
+
+    HTML::FormatPS
+
+      Format HTML into postscript
+
+    HTML::FormatRTF
+
+      Format HTML into Rich Text Format
+
+    Also the HTML manipulation libraries used - HTML::TreeBuilder,
+    HTML::Element and HTML::Tree
+
+SUPPORT
+
+ Bugs / Feature Requests
+
+    Please report any bugs or feature requests through the issue tracker at
+    http://rt.cpan.org/Public/Dist/Display.html?Name=HTML-Formatter. You
+    will be notified automatically of any progress on your issue.
+
+ Source Code
+
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    https://github.com/nigelm/html-formatter
+
+      git clone https://github.com/nigelm/html-formatter.git
+
+AUTHORS
+
+      * Nigel Metheringham <nigelm@cpan.org>
+
+      * Sean M Burke <sburke@cpan.org>
+
+      * Gisle Aas <gisle@ActiveState.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2016 by Nigel Metheringham, 2002-2005
+    Sean M Burke, 1999-2002 Gisle Aas.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

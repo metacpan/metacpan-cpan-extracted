@@ -1,0 +1,57 @@
+{
+   "abstract" : "Extract the main content of a web page",
+   "author" : [
+      "Anirvan Chatterjee <anirvan@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.112621",
+   "keywords" : [
+      "readability"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-ExtractMain",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Slurp" : "9999.12",
+            "HTML::FormatText" : "2.04",
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "HTML::TreeBuilder" : "3.23",
+            "Object::Destroyer" : "2",
+            "Scalar::Util" : "1.18"
+         }
+      }
+   },
+   "provides" : {
+      "HTML::ExtractMain" : {
+         "file" : "lib/HTML/ExtractMain.pm",
+         "version" : "0.63"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/anirvan/html-extractmain"
+      }
+   },
+   "version" : "0.63"
+}

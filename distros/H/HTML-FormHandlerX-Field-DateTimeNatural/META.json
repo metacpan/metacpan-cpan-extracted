@@ -1,0 +1,57 @@
+{
+   "abstract" : "a datetime field with natural language parsing.",
+   "author" : [
+      "Roman F. <romanf@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-FormHandlerX-Field-DateTimeNatural",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::NoTabs" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime::Format::Natural" : "0",
+            "HTML::FormHandler::Field::Text" : "0",
+            "HTML::FormHandler::Moose" : "0",
+            "MooseX::Types::DateTime" : "0",
+            "namespace::autoclean" : "0",
+            "version" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FindBin" : "0",
+            "HTML::FormHandler" : "0",
+            "Test::More" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/moltar/HTML-FormHandlerX-Field-DateTimeNatural.git",
+         "web" : "https://github.com/moltar/HTML-FormHandlerX-Field-DateTimeNatural"
+      }
+   },
+   "version" : "v0.6"
+}
+

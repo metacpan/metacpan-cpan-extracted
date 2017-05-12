@@ -1,0 +1,113 @@
+
+
+=head1 NAME
+
+HTML::WikiConverter::DokuWikiFCK - A WikiConverter Dialect supporting the FCKeditor in DokuWiki
+
+
+=head1 SYNOPSIS
+
+DokuWikiFCK is not designed to be used independently of DokuWiki and the dwfckg plugin, of
+which it is a part.  It sits between the FCKeditor and DokuWiki and converts the HTML
+created by the FCKeditor into an extended DokuWiki markup.
+
+It has no public programming interface. It is a subclass of
+HTML::WikiConverter::DokuWiki and may be itself subclassed to add
+functionality.
+
+=head1 DESCRIPTION
+
+
+DokuWikiFCK subclasses HTML::WikiConverter::DokuWiki in order to support
+the FCKeditor. Its aim is to support as many as possible of the graphic
+capabilities of the FCKeditor, giving users of DokuWiki access to layout
+and design featuires. DokuWikiFCK currently supports font selection,
+color choice (text-color and background-color), tables lists, text sizes
+and weights, block elements, etc. In all of these it is possible to
+apply, where applicable, background colors (as in tables) and all font
+attributes. 
+
+It supports both text and image positioning. The FCKeditor enables a
+number of fixed positioning features: --left, right, and center
+justification and fixed pixel width indents and outdents. DokuWikiFCK
+supports all of these. One of its unique features is that it supports
+space-bar positioning--i.e. pushing elements to the right one space at a
+time and moving them backward with the delete key.
+
+
+
+=head1 INSTALLATION
+
+=over
+
+=item Installing from CPAN
+
+    perl -MCPAN -e 'install HTML::WikiConverter::DokuWikiFCK'
+    
+    This will install all of the Perl dependencies you need as well as
+    the dwfckg DokuWiki plugin. 
+   
+
+    This method makes sense for a first-time install.
+
+=item Installing from  the Command Line
+ 
+    You can download the current version of DokuWikiFCK from either CPAN or
+    http://www.mturner.org/development and then install the module manually.
+    
+    This method makes sense if you have already installed a previous version
+    and are upgrading.  Then you can consult the README before installing for
+    any instructions applying the upgrade.  
+
+    The standard instructions for installing manually are:
+
+    gzip -dc  HTML-WikiConverter-DokuWikiFCK-0.<nn>.tar.gz  | tar -xvf -
+           OR
+    tar -xzf HTML-WikiConverter-DokuWikiFCK-0.<nn>.tar.gz
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+=item Installation of the image manager
+
+
+To implement inserting and uploading of images:
+
+	1.replace the copy of DokuWiki's mediamanager.php in tpl/<default> with 
+the one included in this package. Either of the above two installation methods
+will try to do this for you.
+
+        2. Create a userfiles directory in your doucment root directory.  Inside userfiles,
+create a symbolic link that points to the dokuwiki media directory:
+             userfiles
+                image -> <dokuwiki_directory>/data/media
+ 
+
+=back
+
+=head1 SEE ALSO
+
+See the README file.
+
+Illustrations and information are currently available at the following web site:
+     http://www.mturner.org/development
+
+=head1 AUTHOR
+
+Myron Turner E<lt>turnermm02@shaw.caE<gt>
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2008 by Myron Turner
+License: GPL2 or Perl
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut

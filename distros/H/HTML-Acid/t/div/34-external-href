@@ -1,0 +1,21 @@
+<h3 id="the-first-test">The first test</h3>
+<p><em>This</em> is a very conformant
+<a href="http://www.w3c.org" title="eXtended HyperText Markup Language">XHTML</a>
+fragment. I hope you like it. I will be using it as test material
+during the development of this module. Actually not just <em>development</em>
+but subsequent <strong>support</strong> will both use this and variant 
+files for regression tests. </p><h3 id="play_havoc">Blah</h3><p>This paragraph is intended to include all the
+features permitted in our restricted subset of HTML. Therefore I need to
+include an utterly gratuitous
+</p><div><img alt="a gratuitous image" height="100000" src="http://www.google.co.uk" title="a gratuitous image" width="100000" /></div><p>
+at no extra cost.</p>
+<p>This second paragraph is likely to be a bit shorter. However I cannot
+entirely guarantee that. That is I might have to revise that prediction
+once the paragraph is complete.</p>
+<h3 id="test2">The big idea</h3>
+<p>Actually I am sorry to admit it, but I am running out of ideas for 
+test material. I mean I really needed a second header and so I had to 
+have yet another paragraph. I do apologize for any inconvenience reading 
+this <strong>material may have caused you.
+
+</strong></p>

@@ -1,0 +1,11 @@
+Revision history for Perl extension HTML::Template::Compiled::Plugin::InlineImage.
+
+0.02 Sun Aug 27 12:45:08 CEST 2006
+- Change: $SIZE_WARNING
+- Change: changed output to src="..." width="..." height="..."
+- Documentation
+
+0.01  Sat Aug 26 15:54:00 2006
+	- original version; created by h2xs 1.23 with options
+		-AX -n HTML::Template::Compiled::Plugin::InlineImage
+

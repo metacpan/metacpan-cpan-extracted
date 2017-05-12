@@ -1,0 +1,15 @@
+Revision history for Perl module HTTP::CheckProxy
+
+0.1 Mon Mar  1 11:43:14 2004
+	- original version; created by ExtUtils::ModuleMaker 0.32
+
+0.4	Now supporting tests on more than just port 80. specifically
+	does not test 1080, thats SOCKS. But it checks a lot of others.
+	Commonly, hits are achieved on port 80 and 8080.
+	new() now does not -require- its parameter. If you want to test
+	more than one proxy don't bother making a new object just use
+	the test() method. new() also now takes a 2nd optional parameter
+	which is the url to try to get the proxy to fetch.
+
+
+

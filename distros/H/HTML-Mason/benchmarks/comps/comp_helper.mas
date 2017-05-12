@@ -1,0 +1,4 @@
+bar!
+% my $x = 2;
+<% $x %>
+bar again!

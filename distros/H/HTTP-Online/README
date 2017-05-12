@@ -1,0 +1,108 @@
+NAME
+    HTTP::Online - Detect full "Internet" (HTTP) access using Microsoft NCSI
+
+SYNOPSIS
+        if ( HTTP::Online->new->online ) {
+            print "Confirmed internet connection\n";
+        } else {
+            print "Internet is not available\n";
+            exit(0);
+        }
+        
+    # Now do your task that needs the internet...
+
+DESCRIPTION
+    HTTP::Online is a port of the older LWP::Online module to HTTP::Tiny
+    that uses only the (most accurate) methodology, <Microsoft NCSI>.
+
+  Test Mode
+      use LWP::Online ':skip_all';
+
+    As a convenience when writing tests scripts base on Test::More, the
+    special ':skip_all' param can be provided when loading LWP::Online.
+
+    This implements the functional equivalent of the following.
+
+            BEGIN {
+                    unless ( HTTP::Online->new->online ) {
+                            require Test::More;
+                            Test::More->import(
+                                    skip_all => 'Test requires a working internet connection'
+                            );
+                    }
+            }
+
+METHODS
+  new
+            my $internet = HTTP::Online->new;
+
+            my $custom = HTTP::Online->new(
+                    http    => $custom_http_client,
+                    url     => 'http://my-ncsi-server.com/',
+                    content => 'Our Custom NCSI Server',
+            );
+
+    The "new" constructor creates a query object.
+
+    By default, it will be configured to use the same Microsoft NCSI service
+    that the Windows Network Awareness system does (from Windows Vista
+    onwards).
+
+    Returns a HTTP::Online object.
+
+  http
+    The "http" method returns the HTTP client that will be used for the
+    query.
+
+  url
+    The "url" method returns a string with the location URL of the NCSI
+    file.
+
+  content
+    The "content" method returns a string with the expected string to be
+    returned from the NCSI server.
+
+  online
+    The "online" method issues a "Pragma: no-cache" request to the server,
+    and examines the response to confirm that no redirects have occurred,
+    and that the returned content matches the expected value.
+
+    Returns true if full HTTP internet access is available, or false
+    otherwise.
+
+  offline
+    The "offline" method is a convenience which currently returns the
+    opposite of the "online" method, returning false if full HTTP internet
+    access is available, or true otherwise.
+
+    This may change in future to only return true if we are completely
+    offline, and true in situations where we have partial internet access or
+    the user needs to fill out some web form or view advertising to get full
+    internet access.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=HTTP-Online>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    LWP::Online
+
+    HTTP::Tiny
+
+    <http://technet.microsoft.com/en-us/library/cc766017.aspx>
+
+COPYRIGHT
+    Copyright 2012 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

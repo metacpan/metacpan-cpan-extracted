@@ -1,0 +1,250 @@
+0.52 2017-03-31
+  - Add . to lib in Makefile.PL to support perl 5.25.11
+
+0.51 2015-09-16
+
+  - add OPTIONS as a valid method
+  - better compatibility with CGI.pm < 3.36
+  - fix tests for freebsd and IPv6
+  - repository info
+
+0.50    2015-02-02
+  - All collected changes since 0.44
+
+0.45_08 2015-01-29
+ - IPv6 skipping code always turned off tests, rather than just
+   skipping on bad hosts.
+
+0.45_07 2015-01-27T22:24Z
+ - Skip IPv6 tests in 01live.t on machines where IPv6 isn't configured
+
+0.45_06 2015-01-23T17:55Z
+ - Further test iteration and diagnostics for smoke failures
+
+0.45_05 2015-01-22T16:23Z
+ - Test diagnostics for cpantester failures
+ - Hopefully better localhost handling
+
+0.45_04 2015-01-20T17:40Z
+ - Fix compatibility for the IPv6 support in .45_02
+ - Hopefully improve the live tests
+
+0.45_03 2015-01-14T19:48Z
+ - Remove useless VERSION from HTTP::Server::Simple::CGI and
+   HTTP::Server::Simple::CGI::Environment
+
+0.45_02 2012-05-20T18:15Z
+ - Support for IPv6 - Daniel Kahn Gillmor [rt.cpan.org #61200]
+
+0.45_01 2011-09-22T10:10:41Z
+ - Support full URIs as required by RFC2616 - penfold [rt.cpan.org #69445]
+
+0.44 2011-04-04T16:59:59Z
+ - Fix tests to run in a FreeBSD Jail - Tom Hukins [rt.cpan.org #49807]
+
+0.43 2010-05-01T22:23:55Z
+ - Support for getting REMOTE_PORT -- rgs
+
+0.42_01 2010-04-02T12:59:48Z
+ - Patch to t/01live.t to prevent spurious win32 test failures.
+
+0.42 2010-02-18T10:13:11Z
+ - Inline uri_unescape to drop URI::Escape which is the only non-core
+   dependency of this distribution. -- miyagawa
+ - Do not special case COOKIE and sets Cookie header to HTTP_COOKIE. --
+   miyagawa O'Reilly's WebSite server misuses COOKIE environment instead of
+   HTTP_COOKIE. We don't need to replicate that bug since
+   HTTP::Server::Simple is a server, not a CGI library like CGI.pm.
+
+0.41_01 2010-02-02T12:08:15Z
+ - Pluggable CGI class support based on a patch from NANIS
+
+0.41 2009-09-29T23:05:04Z
+ - HTTP header concatenation fixes from miyagawa
+
+0.40 2009-08-17T22:01:07Z
+ - After a fork, we need to reset the random seed lest we have	  
+   duplicated random numbers in both forks.
+
+0.39 2009-08-17T09:41:05Z
+ - Added signature tests
+
+0.38_04 2009-08-12T20:15:14Z
+ - Another pass at the Win32 fixes from KMX
+
+0.38_03 2009-04-11T18:47:29Z
+ - Subject: [rt.cpan.org #44961] [PATCH] xdg reports select() is
+   problematic on win32 						 
+
+0.38_02 2009-04-10T20:57:19Z
+ - Specify an HTTP version for our GETs should get escaping to wokr
+
+0.38_01 2009-03-02T18:11:46Z
+ - http://rt.cpan.org/Ticket/Attachment/568795/286902/ from confound++ for 
+   http://rt.cpan.org/Public/Bug/Display.html?id=28122
+
+0.38 2009-01-11T14:42:57Z
+ - Improve startup banner generation
+
+0.37 2009-01-02T12:21:30Z
+ - Several fixes for [rt.cpan.org #38011] designed to help get HSS to pass
+   tests on Strawberry Perl
+
+0.36
+ - Documentation fixups
+
+0.35
+ - Pass arguments to ->run through to Net::Server->run
+
+0.34
+ - Call setup_environment if a Net::Server is being used, for consistency.
+ - Don't print_banner if a Net::Server is being used.
+ - Make header parsing comply with RFC 2616. [rt.cpan.org #21411]
+
+0.33 2008-04-25T13:57:30Z
+ - The new support for background processes notifying the parent didn't
+   quite work right for some apps using HSS. It's been reverted for now and
+   the tests TODOED
+
+0.32 2008-04-24T09:45:14Z
+ - At least Apache and lighttpd put unencoded strings into PATH_INFO, so so
+   should we.
+ - Patch from ntyni@iki.fi to make backgrounding of the standalone server's
+   server process deterministic. [rt.cpan.org #28122]
+
+0.31 2008-03-16T20:51:04Z
+ - Test suite parallelization fixes. Thanks to Slaven Rezic
+
+0.30 2008-03-11T12:14:24Z
+ - Minor doc fix from Paul Miller. 
+ - Fixing doc style from "$this" to "$self" like any self-respecting perl
+   code
+
+0.29 2008-02-15T11:43:29Z
+ - new example section from almut on perlmonks
+
+0.28 2008-01-15T09:33:58Z
+ - New restartability support from Mark Stosberg After reviewing the code
+   in HTTP::Server::Simple, Catalyst::Engine::HTTP and HTTP::Server::Brick,
+   I found and implemented an updated signal handling approach that I like
+   and understand, and actually works. The current code restarted
+   immediately if a SIGHUP came in, no matter what was happening, including
+   if a request was in process of being fulfilled. The new code works more
+   like "apachectl graceful". It waits for the current request cycle to
+   finish, and then restarts the server. This code has to be integrated in
+   the core, but its just about the same amount of signal handling code
+   that was there... it just works better.  It's also written in such a way
+   I think subclass/mixin authors could rewrite just these parts if they
+   wanted. Also, it looks like a Net::Server based sub-class would already
+   be doing its own thing with SIGHUP handling, and should continue to be
+   unaffected.
+
+0.27
+ - 0.26 release apparently didn't get to cpan correctly
+
+0.26
+ - Supports multi-line encoded values in query_sting (like foo%0Abar) --
+   Dobrica Pavlinusic 
+ - Fixes to URI unescaping to behave like apache does
+
+0.24
+ - Hopefully deal with an odd case where a poorly behaved Internet Explorer
+   could crash the server. Thanks to the Catalyst project.
+
+0.23
+ - Fix a release-engineering messup. Thanks to ANDK
+
+0.22 2006-10-18T23:36:34Z
+ - Query string processing improvements
+
+0.21 2006-10-18T23:31:42Z
+ - [rt.cpan.org #21727] [PATCH] Support for Perl 5.004 -- SÃ©bastien
+   Aperghis-Tramoni 
+
+0.20
+ - Require POSIX only if we need it, rather than "use" it all the time
+ - [cpan #17533] - Brad Bowman
+
+0.19
+ - Catch and ignore SIGPIPE, so broken pipes from the client don't cause 
+ - Standalone to drop all the way back to the shell.
+
+0.18
+ - new method: valid_http_method() from Chris Dent to make it easier to 
+ - create servers handling non-standard HTTP verbs.
+
+0.17
+ - Workaround for Class::Spiffy classloading order issue
+ - Better handling for completely mangled requests.
+
+0.16 2005-11-07T14:40:43Z
+ - SIG{'HUP'} does not exist on Win32 (cpan #15606)
+
+0.15 2005-10-06T21:11:02Z
+ - Precompute the local host's hostname and IP to save on DNS lookups at
+   runtime 
+
+0.14 2005-10-06T20:48:49Z
+ - Split out HTTP::Server::Simple::CGI::Environment to support non-CGI.pm
+   CGIs
+ - Ignore SIGPIPE
+ - Signal handlers are now installed on ->run, not on new. Also, they're 
+ - documented. Thanks to Mark Fowler.
+ - We no longer lookup $ENV{'REMOTE_HOST'} by hostname, as it can cause
+   huge performance problems.
+
+0.13 2005-08-09T21:25:20Z
+ - Signal handlers should be 'localed', so as not to mess with others' 
+ - code. -- Thanks to David Wheeler
+
+0.12 2005-07-17T02:14:57Z
+ - Test suite improvements from Mattia Barbon
+
+0.11 2005-07-08T22:56:01Z
+ - Bogus META.yml broke signature checks. Thanks to sungo.
+
+0.10 2005-06-28T11:27:58Z
+ - Allow separate treatment of STDIN and STDOUT handles to the server. 
+   This gives support for HTTP::Server::Simple::Recorder.
+
+0.09 2005-04-19T21:43:31Z
+ - Now we set the GATEWAY_INTERFACE metavariable in H:S:S:CGI.
+
+0.08 2005-04-16T01:27:17Z
+ - New tests for HTTP::Server:Simple::CGI from hide.
+
+0.07 2005-03-26T14:25:38Z
+ - PAUSE broke :/
+
+0.05 2005-03-26T14:14:54Z
+ - Fix a bug in HTTP::Server::Simple::CGI that clobbered CGI ENV variables
+   in some cases. Thanks, Hide.
+ - New public subclass-overridable method ->net_server() that can
+   optionally take a Net::Server subclass name and use it to replace the
+   default ->run() method. -- Autrijus Tang
+
+0.04 2005-03-22T23:34:36Z
+ - Changed ->headers calling conventions. This may break backwards compat,
+   but is cleaner and safer.
+ - Fixed bugs in ::CGI that broke http header handling
+ - Refactored code to be more transparent
+ - Patch from Sebastian Riedel to do proper parsing of form data from STDIN
+
+0.03_03 2005-03-18T15:09:52Z
+ - Finish fixes from http://rt.cpan.org/NoAuth/Bug.html?id=11409
+
+0.03_02 2005-02-17T23:34:00Z
+ - Make test script not depend on LWP
+ - Add ->header(), and various generic hook capabilities
+ - Made HTTP::Server::Simple::CGI use those hooks
+ - Add ->bad_request(), for protocol errors
+
+0.03_01 2005-02-17T21:39:34Z
+ - Add ->setup() and ->handler()
+ - Add support for specifying a host to bind listener to
+ - Split out CGI.pm support into sub-class
+ - Add Changes file to MANIFEST
+
+0.03 2005-01-26T08:55:34Z
+ - Test fixes for Win32
+

@@ -1,0 +1,37 @@
+HTML-SiteTear
+======================
+
+HTML::SiteTear make a separated copy of a part of web site in local file system. All linked files (HTML file, image file, javascript, cascading style shieet) from a source HTML file will be copied under a new file.
+
+HTML::SiteTear will be useful to make a destributable copy of a part of a web site.
+
+== INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+== DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  HTML::Parser
+  HTML::Copy
+  Class::Accessor
+  URI
+
+== COPYRIGHT
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2007-2016 by Tetsuro KURITA
+mailto:tkurita@mac.com
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

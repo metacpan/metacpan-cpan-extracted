@@ -1,0 +1,10 @@
+992829313.305 25 202.134.94.17 TCP_MISS/200 6254 GET http://www.itn.co.uk/news/20010616/pics/hakkinen_sm.jpg - DIRECT/192.168.1.2 image/jpeg
+992829318.393 3 132.185.132.13 TCP_CLIENT_REFRESH/304 248 GET http://www.itn.co.uk/images/ITN_logo_arrows.gif - DIRECT/192.168.1.2 image/gif
+992829318.585 4 132.185.132.13 TCP_CLIENT_REFRESH/304 248 GET http://www.itn.co.uk/stamps/Live-gen-stamp.GIF - DIRECT/192.168.1.2 image/gif
+992829318.766 3 132.185.132.13 TCP_CLIENT_REFRESH/304 247 GET http://www.itn.co.uk/images/livebar_channel_logo.gif - DIRECT/192.168.1.2 image/gif
+992829318.925 7 132.185.132.13 TCP_CLIENT_REFRESH/304 247 GET http://www.itn.co.uk/images/rlaudioloff.gif - DIRECT/192.168.1.2 image/gif
+992829319.079 6 132.185.132.13 TCP_CLIENT_REFRESH/304 247 GET http://www.itn.co.uk/news/20010617/pics/nonitn_ten1_mini.jpg - DIRECT/192.168.1.2 image/jpeg
+992829321.759 1 193.82.139.245 TCP_HIT/200 1141 GET http://ntl.itn.co.uk/images/1.gif - NONE/- image/gif
+992829322.789 1 193.82.139.245 TCP_HIT/200 699 GET http://ntl.itn.co.uk/images/btn3.gif - NONE/- image/gif
+992829322.939 1 193.82.139.245 TCP_HIT/200 693 GET http://ntl.itn.co.uk/images/btn4.gif - NONE/- image/gif
+992829323.239 1 193.82.139.245 TCP_HIT/200 5640 GET http://ntl.itn.co.uk/images/promo/dtv_suchet2.gif - NONE/- image/gif

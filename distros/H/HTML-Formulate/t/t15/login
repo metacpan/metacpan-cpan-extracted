@@ -1,0 +1,9 @@
+<form method="post">
+<table cellpadding="2">
+<tr><th style="color:blue"><span class="required">Username</span></th><td><input name="username" type="text" /></td></tr>
+<tr><th style="color:blue"><span class="required">Password</span></th><td><input name="password" type="password" /></td></tr>
+<tr><td align="center" colspan="2">
+<input id="login" name="login" type="submit" value="Login" />
+</td></tr>
+</table>
+</form>

@@ -1,0 +1,15 @@
+Revision history for Perl extension HCKit::Template.
+
+0.02  Fri Oct 10, 2003
+
+	- bug fixes
+	- new builtin functions (if, include, set, default)
+	- new op (list-remove-last, list-last, not, eq, or, and, 
+    	  concat, lookup, [range literal])
+	- support for nested block construct
+	- support for CDATA section in data
+
+0.01  Wed Sep 17 00:02:45 2003
+	- original version; created by h2xs 1.22 with options
+		-AX -b 5.5.3 -n HCKit::Template
+

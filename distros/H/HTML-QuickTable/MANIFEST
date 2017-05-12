@@ -1,0 +1,7 @@
+lib/HTML/QuickTable.pm
+Makefile.PL
+README
+t/alltests.t
+t/alltests.t,v
+Changes
+MANIFEST

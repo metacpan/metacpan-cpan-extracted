@@ -1,0 +1,116 @@
+#TODO for Embperl
+
+Features
+--------
+
+- Apache::Symbol::undef (avoid function redefinition warning)
+
+- @param -> @_  -> done in 2.0
+
+- make optUndefToEmptyValue default [Steve Willer] -> done in 2.0
+
+- whitespace intention [Todd Eigenshink]
+
+- make checkbox and option work without value attribute -> done in 2.0
+
+- used named subroutines for debugging [Ert Dredge]
+
+- use ap_r.. instead of ap_b... ?
+
+- Remove space at the start and end of the line [Dirk Lutzebaeck]
+
+- gzip output [Andreas Koenig]
+
+- custom html tags -> done in 2.0
+
+- url rewriting for session id -> planned for 2.x
+
+- disableHTMLScan inside <script>
+
+- optKeepSpaces in <pre>
+
+- BEGIN/END Blocks [Jason Bodnar 6.10.99]
+
+- return value from sub -> done in 2.0
+
+- remove \n in perl code? when and how?
+
+- url/html escaping [Eugene B. Byrganov 4.11.99]
+
+- accpect unclosed html structs [Eugene B. Byrganov 9.11.99]
+
+- use APXS for LIBEXECDIR etc. [Matthias Ulrichs 22.11.99]
+
+- url escape <input src>
+
+- handle input image (add field.x/y to %idat) [Pierre Etchemaite 13.12.99]
+
+- make multifiled delimiter \t configurabel [Jean-Philippe FAUVELLE 13.12.99]
+
+- move default logfile to a safer place then /tmp [Christain Gilmore 20.01.00]
+
+- last, next for Embperl loops [Christian Gilmore 4.2.2000] -> planned for 2.0
+
+- return custom error code to Apache [Alan Gutierrez 11.2.00]
+
+- send last modified header if no perl in the doc [Christain Gilmore 23.02.00]
+
+- turn off all perl processin [Kee Hinckley 22.03.00]
+
+- accpect \0 as separator for multiple with same name in %fdat (as CGI->Vars)
+  [Ilia Lobsanov 8.4.00]
+
+- Execute backtrace [Jon Brisbin 12.8.00]
+
+- pre header function [Alvar Freude 25.10.00]
+
+- discard output [ Roman Maeder 28.11.00]
+
+- patch for multiple headers [Maxwell Krohn 15.3.01]
+
+- Save/restore globals before Execute [Gavin Carr 10.7.01]
+
+Test
+----
+- test FORBIDDEN
+
+- test Embperl_debug 0
+
+- Perl 5.6.1 [Gary Ashton-Jones 16.3.01]
+
+Bugs
+----
+
+- [* *] inside if [Vasco Chita 1.5.99] -> done in 2.0
+
+- StackFree in offline mode
+
+- SIG DIE missing message arg [Alex Schmelkin 24.8.99]
+
+- var cleanup of in imported subs [Lai Yiu Fai 14.3.00] 
+
+- using outputfile inside a outputfile crashs
+
+- errdoc2 sv count (-> loop)
+
+
+
+Docs
+----
+- [- -] [+ +] etc all turns into _perl_code_ in html [S Page 13.9.99]
+
+- Execute -> object, isa
+
+1.3
+---
+
+- restrict number of iterations in search
+
+- make [+ +] configurable [ Christian Gilmore 16.10.99] -> done in 2.0
+
+- "$urlprefix" [Steve Willer 14.2.99]
+
+2.0
+__
+
+- Parse Posted XML data [Alex Schmelkin 4.2.2000]

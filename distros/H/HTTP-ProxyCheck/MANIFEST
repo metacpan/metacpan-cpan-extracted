@@ -1,0 +1,10 @@
+Changes
+docs/HTTP_ProxyCheck.html
+docs/HTTP_ProxyCheck.txt
+docs/mk_docu.sh
+docs/style.css
+lib/HTTP/ProxyCheck.pm
+Makefile.PL
+MANIFEST
+README
+t/1.t

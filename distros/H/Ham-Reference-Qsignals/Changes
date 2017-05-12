@@ -1,0 +1,10 @@
+Revision history for Ham-Reference-Qsignals
+
+0.01    2008-07-28
+        - First version, released on an unsuspecting world.
+
+0.02    2010-12-19
+        - Added LICENSE file, and updated docs and configs to use the Artistic 2.0
+          license.
+        - Created git repostitory.
+

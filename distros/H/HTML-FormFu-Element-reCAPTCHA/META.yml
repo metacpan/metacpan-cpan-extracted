@@ -1,0 +1,25 @@
+---
+abstract: "\"Are you human\" tester!"
+author:
+  - 'Carl Franks <cpan@fireartist.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-FormFu-Element-reCAPTCHA
+requires:
+  Captcha::reCAPTCHA: 0.93
+  Clone: 0.31
+  HTML::FormFu: 1.00
+  Moose: 1.00
+  MooseX::Attribute::Chained: v1.0.1
+  Scalar::Util: 0
+resources:
+  repository: git://github.com/fireartist/HTML-FormFu-Element-reCAPTCHA.git
+version: 1.00

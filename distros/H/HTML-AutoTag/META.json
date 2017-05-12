@@ -1,0 +1,49 @@
+{
+   "abstract" : "Just another HTML tag generator.",
+   "author" : [
+      "Jeff Anderson <jeffa@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-AutoTag",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::Entities" : "3.69",
+            "Tie::Hash::Attribute" : "1.04",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/jeffa/HTML-AutoTag",
+      "repository" : {
+         "url" : "https://github.com/jeffa/HTML-AutoTag.git"
+      }
+   },
+   "version" : "1.06"
+}

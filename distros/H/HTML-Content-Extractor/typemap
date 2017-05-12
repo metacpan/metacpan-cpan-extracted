@@ -1,0 +1,4 @@
+TYPEMAP
+htmltag_t * T_PTROBJ
+HTML::Content::Extractor T_PTROBJ
+

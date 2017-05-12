@@ -1,0 +1,11 @@
+<form method="post">
+<table cellpadding="2">
+<tr><th style="color:blue"><span class="required">Firstname</span></th><td><input name="firstname" type="text" /></td></tr>
+<tr><th style="color:blue"><span class="required">Surname</span></th><td><input name="surname" type="text" /></td></tr>
+<tr><th>Email</th><td><input name="email" type="text" /></td></tr>
+<tr><th>Position</th><td><input name="position" type="text" /></td></tr>
+<tr><td align="center" colspan="2">
+<input id="submit" name="submit" type="submit" value="Submit" />
+</td></tr>
+</table>
+</form>

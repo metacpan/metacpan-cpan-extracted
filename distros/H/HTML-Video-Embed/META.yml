@@ -1,0 +1,36 @@
+---
+abstract: 'convert a url into a html embed string'
+author:
+  - 'Mark Ellis <markellis@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.12'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: HTML::Video::Embed
+name: HTML-Video-Embed
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Data::Validate::URI: 0
+  Module::Find: 0
+  Moo: 0
+  Moo::Role: 0
+  URI: 0
+  URI::Escape::XS: 0
+  URI::QueryParam: 0
+  perl: 5.8.0
+resources:
+  bugtracker: https://github.com/markwellis/html-video-embed/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/markwellis/html-video-embed.git
+version: '0.016000'

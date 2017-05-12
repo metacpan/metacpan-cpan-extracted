@@ -1,0 +1,28 @@
+Revision history for Perl extension exclude_robots.
+
+1.00  Thu May 24 18:01:13 BST 2001
+	- original version
+
+1.01  Fri May 25 17:21:22 BST 2001
+        - lots of tests and doc added
+
+1.02  Fri May 25 17:21:22 BST 2001
+        - updated README
+
+1.03  Fri Jun 15 17:37:31 BST 2001
+        - added auto-detection of format
+
+1.04  Mon Jun 18 13:52:35 BST 2001
+        - added support for squid logs
+
+1.05  Mon Jun 18 17:16:53 BST 2001
+        - added format method
+
+1.06  Tue Jun 19 10:01:10 BST 2001
+        - bug fixes; added capture & filter; added format method
+
+1.07  Tue Jun 19 17:15:11 BST 2001
+        - added support for .gz files in detect_format
+
+1.08  Mon Apr 26 15:44:55 BST 2004
+        - fixed bug in prerequisite dependencies in Makefile.PL

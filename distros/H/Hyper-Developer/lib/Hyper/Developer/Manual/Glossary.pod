@@ -1,0 +1,122 @@
+=pod
+
+=head1 NAME
+
+Hyper::Developer::Manual::Glossary - Glossary of terms
+
+=head1 VERSION
+
+This document describes Hyper::Developer::Manual::Glossary 0.01
+
+=head1 DESCRIPTION
+
+A glossary of terms used in the documentation of Hyper.
+This glossary defines each word, which is not part of simplified English
+or L<perlglossary>.
+
+=head1 TERMS
+
+=over 4
+
+=item attribute
+
+An attribute is an entity that defines a property of an object, or element.
+An attribute usually consists of a name and a value.
+
+=item container
+
+A container is an object that can hold things.
+
+=item control
+
+A control is an interface element that a computer user interacts with,
+such as a window, a text box, or a submit button. A control can consist of other controls.
+
+=item field
+
+A field is a part of data.
+For example, the name of a person may consist of two distinct fields:
+first name, and last name.
+
+=item framework
+
+A framework is a set of classes.
+
+=item label
+
+A label is a brief description given for purposes of identification.
+In Hyper a label is the text displayed in combination with a control.
+
+=item method
+
+A method is a piece of code associated with a class or object to perform a task.
+
+=item namespace
+
+A namespace is a space (or context) which restricts the validity of a name to this space.
+
+=item service
+
+A service is a part of a website. A service consists of usecases.
+Example: The website of a company offers the services hosting, mail, and domain.
+
+=item step
+
+A step is a part of a usecase.
+
+=item template
+
+A template is a ...
+
+=item transition
+
+A transition is a definition of the next step.
+
+=item usecase
+
+A usecase is a single interaction between an actor (an user) and other (secondary) actors,
+and the system itself. A usecase is a sequence of steps.
+Example: The service mail has the usecases create account, configure spam filter,
+and configure mail forward.
+
+=back
+
+=head1 RCS INFORMATIONS
+
+=over
+
+=item Last changed by
+
+ $Author: ac0v $
+
+=item Id
+
+ $Id: Glossary.pod 333 2008-02-18 22:59:27Z ac0v $
+
+=item Revision
+
+ $Revision: 333 $
+
+=item Date
+
+ $Date: 2008-02-18 23:59:27 +0100 (Mon, 18 Feb 2008) $
+
+=item HeadURL
+
+ $HeadURL: http://svn.hyper-framework.org/Hyper/Hyper-Developer/branches/0.07/lib/Hyper/Developer/Manual/Glossary.pod $
+
+=back
+
+=head1 AUTHOR
+
+Helmut Wollmersdorfer C<< <helmut@wollmersdorfer.at> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2007, Helmut Wollmersdorfer C<< <helmut@wollmersdorfer.at> >>.
+All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut

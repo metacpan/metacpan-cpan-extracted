@@ -1,0 +1,30 @@
+HTML-HTML5-Entities
+===================
+
+Created:      2011-10-06
+Home page:    <https://metacpan.org/release/HTML-HTML5-Entities>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=HTML-HTML5-Entities>
+Maintainer:   Toby Inkster <tobyink@cpan.org>
+
+0.004	2014-09-13
+
+ [ Bug Fixes ]
+ - Various RT#97659-related fixes.
+   Fixes RT#97659.
+   mailto:pagenyon@gmail.com++
+   <https://rt.cpan.org/Ticket/Display.html?id=97659>
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.003	2012-06-26
+
+ - Drop non-core dependencies.
+
+0.002	2012-01-16
+
+ - %char2entity is now a more conservative mapping, based on XHTML 1.0 (but
+   without apos). This makes it safer for serialising XHTML 1.x, HTML4 and
+   HTML5 documents.
+
+0.001	2011-10-07	Initial release

@@ -1,0 +1,26 @@
+Revision history for Perl extension HTTP::RecordedSession.
+
+0.05  Sun May 19 00:45:00 2002
+    - added PREREQ_PM = 'Storable', to Makefile.PL to force install
+      of Storable.pm.
+
+0.04  Tue May 14 16:04:00 2002
+    - added methods to interface with HTTP::WebTest
+    - added a parameter to allow user to specify location of config file
+      to increase portability
+    - fixed the formatting of the array ref returned by $self->get_clicks
+      so that it was an arrayref of hashrefs, rather than an arrayref
+      of arrayrefs or hashrefs
+    - update documentation
+    - added a number of additional tests
+
+0.03  Wed Feb 27 16:35:49 2002
+    - changed name from HTTP::SessionConfig to HTTP::RecordedSession
+    - updated documentation
+
+0.02  Thu Jan 22 10:08:00 2002
+    - updated documentation
+    - added 4 tests to test.pl to check for required libraries
+
+0.01  Mon Nov  5 06:56:41 2001
+    - original version; created by h2xs 1.19

@@ -1,0 +1,13 @@
+------------0xKhTmLbOuNdArY
+Content-Disposition: form-data; name="upload"; filename="hello.foo.txt"
+Content-Type: text/plain
+
+Some random junk
+
+------------0xKhTmLbOuNdArY
+Content-Disposition: form-data; name="upload2"; filename="C:\Documents\foo.bar\baz.txt"
+Content-Type: text/plain
+
+blah blah
+
+------------0xKhTmLbOuNdArY--

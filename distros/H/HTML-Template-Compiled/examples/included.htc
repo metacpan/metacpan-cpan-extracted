@@ -1,0 +1,8 @@
+-----INCLUDED!!!
+inc: <TMPL_VAR NAME="blubber">
+-----INCLUDED END!!!
+loop a:
+<TMPL_LOOP loopa>
+ item: <TMPL_VAR NAME=a>
+</TMPL_LOOP>
+

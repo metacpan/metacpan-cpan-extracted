@@ -1,0 +1,6 @@
+<%args>
+@element
+$join => ' , '
+$wrap => ''
+</%args>
+\q<\ <% $wrap %><% join($join, map { /^[\dA-Z]+$/ ? "\\\@{$_}" : $_ } @element) %><% $wrap %>\ \q>

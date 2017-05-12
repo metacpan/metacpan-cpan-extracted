@@ -1,0 +1,12 @@
+MANIFEST
+LICENSE
+README
+Todo
+Changes
+lib/HTTP/CheckProxy.pm
+t/001_load.t
+Build.PL
+META.yml
+Makefile.PL
+
+SIGNATURE    Added here by Module::Build

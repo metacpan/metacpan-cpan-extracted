@@ -1,0 +1,80 @@
+#!/usr/bin/perl 
+###################################################################################
+#
+#   Embperl - Copyright (c) 1997-2001 Gerald Richter / ECOS
+#
+#   You may distribute under the terms of either the GNU General Public
+#   License or the Artistic License, as specified in the Perl README file.
+#   For use with Apache httpd and mod_perl, see also Apache copyright.
+#
+#   THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
+#   IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+#   WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+#
+#   $Id: embpexec.pl.templ,v 1.3 2001/05/10 19:08:13 richter Exp $
+#
+###################################################################################
+
+
+use HTML::Embperl;
+
+die "Do not use as CGI script. Use 'embpcgi.pl' instead" if ($ENV{PATH_TRANSLATED}) ;
+
+HTML::Embperl::run (@ARGV) ;
+
+
+__END__
+
+=head1 NAME
+
+embpexec.pl - Run an HTML::Embperl file offline
+
+=head1 SYNOPSIS
+
+embpexec.pl [B<-o> I<outputfile>] [B<-l> I<logfile>] [B<-d> I<debugflags>] I<htmlfile> [I<query_string>]
+
+=head1 DESCRIPTION
+
+Converts an HTML file (or any other ascii file) with embedded Perl statements into a standard
+HTML file.
+
+I<htmlfile> is the full pathname of the HTML file which should be
+processed by Embperl.
+
+I<query_string> is optional and has the same meaning as the
+environment variable C<QUERY_STRING> when invoked as a CGI
+script. That is, C<QUERY_STRING> contains everything following the
+first "?" in a URL. I<query_string> should be URL-encoded. The default
+is no query string.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-o> I<outputfile>
+
+Optional. Gives the filename to which the output is written. The
+default is stdout.
+
+=item B<-o> I<logfile>
+
+Optional. Gives the filename of the logfile. The default is
+F</tmp/embperl.log>.
+
+=item B<-d> I<debugflags>
+
+Optional. Specifies the level of debugging (what is written to the log
+file). The default is nothing. See L<HTML::Embperl/EMBPERL_DEBUG> for
+exact values.
+
+=back
+
+=head1 SEE ALSO
+
+L<HTML::Embperl>
+
+=head1 AUTHOR
+
+G. Richter (richter@dev.ecos.de)
+
+=end

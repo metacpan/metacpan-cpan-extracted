@@ -1,0 +1,27 @@
+---
+abstract: 'Simple prototype-based object system'
+author:
+  - 'Ido Perlmuter <ido@ido50.net>'
+build_requires:
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.143240'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Homer
+requires:
+  Carp: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/ido50/Homer/issues
+  repository: git://github.com/ido50/Homer.git
+version: '1.000001'
+x_serialization_backend: 'YAML::Tiny version 1.62'

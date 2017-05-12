@@ -1,0 +1,3 @@
+- add a README file
+
+- binary interface using Scheduler::DRMAAx instead of system(qsub/qdel/qacct)

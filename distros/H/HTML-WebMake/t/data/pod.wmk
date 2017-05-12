@@ -1,0 +1,74 @@
+
+<content name=foo format="text/pod">
+
+=head1 NAME
+
+Blah foo etc.
+
+=head1 DESCRIPTION
+
+argh etc.
+
+</content>
+
+<content name=bar format="text/pod" podargs="--noindex">
+
+=head1 BAR_NAME
+
+Blah bar etc.
+
+=head1 BAR_DESCRIPTION
+
+argh etc.
+
+</content>
+
+<content name=baz format="text/pod" asis="true">
+
+=head1 NAME
+
+Content - a content item.
+
+=head1 SYNOPSIS
+
+...
+
+=head1 DESCRIPTION
+
+This object allows manipulation of WebMake content items directly.
+
+=head1 METHODS
+
+=over 4
+
+=cut
+
+blah blah, this should not appear. $[this.should] not be expanded
+either.
+
+=item $text = $cont->get_name();
+
+Return the content item's name.
+
+=item $text = $cont->as_string();
+
+A textual description of the object for debugging purposes; currently it's
+name.
+
+=item $fname = $cont->get_filename();
+
+Get the filename or datasource location that this content was loaded from.
+Datasource locations look like this:
+C<proto>:C<protocol-specific-location-data>, e.g. C<file:blah/foo.txt> or
+C<http://webmake.taint.org/index.html>.
+
+=back
+
+=head1 END
+
+that's it.
+
+</content>
+
+<out file=log/pod.html>${foo}${bar}${baz}</out>
+

@@ -1,0 +1,91 @@
+
+<html>
+<head>
+<title>Some Plain tests for Embperl using optRawInput</title>
+</head>
+
+<body>
+
+Here it starts with some HTML Text<P>
+
+All values should be undefined:
+
+$a = [+ $a || '' +] <BR>
+$b = [+ $b || '' +] <BR>
+$c = [+ $c || '' +] <BR>
+$d = [+ $d || '' +] <BR>
+$e = [+ $e || '' +] <BR>
+
+
+First of all assign a value:
+[- $a = '(this is the value in $a)' -] <BR>
+
+Now we have some 'Umlaute':
+
+
+[- $b = "$a 
+ &auml;&ouml;&uuml;" -]
+
+Now lets look what we are getting from this:<BR>
+[+ $a +] [+ $b +]<BR>
+
+And now a and b together: [+ "$a$b" +]<P>
+
+Here we have some HTML tags within the perl code, <br>
+Embperl will not delete them when optRawInput is set !<BR>
+
+[+ $c = "<BR> 6 + 17 <font size=\"3\"> * 3" +]
+
+Here we have something which looks like a HTML tag, but does not start with<br>
+a character, Embperl does not change them!<BR>
+
+[+ "SELECT * FROM a ORDER BY b USING <; Hi There>" +]
+
+Embperl will not translate HMTL escapes to the right characters <br>
+when optRawInput is set<BR>
+
+[- $e = 2 -]
+[+ $d = "$e &lt; 6" +]
+
+Now they should have a value
+
+$a = [+ $a +] <BR>
+$b = [+ $b +] <BR>
+$c = [+ $c +] <BR>
+$d = [+ $d +] <BR>
+$e = [+ $e +] <BR>
+
+<P>Ok.<P>
+
+
+optRawInput is now: [+ $optRawInput +] <BR>
+optRawInput is set now to: [+ $optRawInput = 1 +] <BR>
+optRawInput is now: [+ $optRawInput +] <BR>
+
+[+ $c = "<BR> 6 + 17 <font size=\"3\"> * 3" +]
+
+[- $b = "$a 
+ &auml;&ouml;&uuml;" -]
+
+Now lets look what we are getting from this:<BR>
+$a = [+ $a +] <BR>
+$b = [+ $b +] <BR>
+$c = [+ $c +] <BR>
+
+optRawInput is now: [+ $optRawInput +] <BR>
+optRawInput is set now to: [+ $optRawInput = 0 +] <BR>
+optRawInput is now: [+ $optRawInput +] <BR>
+
+[+ $c = "<BR> 6 + 17 <font size=\"3\"> * 3" +]
+
+[- $b = "$a 
+ &auml;&ouml;&uuml;" -]
+
+Now lets look what we are getting from this:<BR>
+$a = [+ $a +] <BR>
+$b = [+ $b +] <BR>
+$c = [+ $c +] <BR>
+
+
+</body>
+</html>

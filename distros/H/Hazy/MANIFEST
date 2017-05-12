@@ -1,0 +1,22 @@
+Changes
+ignore.txt
+lib/Hazy.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-basics.t
+t/02-_read_spec.t
+t/03-lookup_dir.t
+t/04-min_css.t
+t/05-make_replacements.t
+t/hazy/config
+t/hazy/second.meh
+t/hazy/test.meh
+t/lemon/empty
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

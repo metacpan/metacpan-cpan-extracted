@@ -1,0 +1,23 @@
+<webmake>
+
+<contenttable delimiter="|">
+index.title|scoop websites onto your PalmPilot
+scoops.title|Scoops
+similar.title|Similar Projects
+administrivia.title|Administrivia
+reviews.title|Reviews
+tips.title|Tips and Tricks
+hacking.title|Hacking on Sitescooper
+cvs.title|CVS Access
+download.title|Download
+</contenttable>
+
+<out file=log/contenttable.html>
+${index.title}<br>
+${download.title}<br>
+${cvs.title}<br>
+${reviews.title}<br>
+${similar.title}<br>
+</out>
+
+</webmake>

@@ -1,0 +1,67 @@
+INSTALL NOTES FOR HTTP::DAVServer
+--------------------------------------
+
+Install this module as usual
+
+ perl Makefile.PL
+ make
+ make test      # there are no tests
+ make install
+
+WARNING! WARNING! DANGER! DANGER!
+
+  This code intends to manipulate the contents of your file system based on HTTP requests.
+  The code executes as your CGI user (often "nobody"). Make sure you backup ALL important data
+  on your server. Due to unknown bugs on my part or misconfiguration of your server on your part
+  this code coulde delete, move, or alter any files on your machine unintentionally.
+
+  YOU HAVE BEEN WARNED and by proceeding beyond this stage you agree that you won't blame, whine,
+  complain, flame or otherwise point your finger at me for any unintentional consequences 
+  of using this code.
+
+/WARNING! WARNING! DANGER! DANGER!
+
+With that dire message out of the way ...
+
+
+To try your hand at running this via Apache** you will need to:  
+
+    ** configuration of other servers is welcome - please supply description and/or screen shots
+
+ a - copy "nph-req" to your cgi directory; check the path to Perl and make sure it is executable
+
+ b - See docs in HTTP::DAVServer::AuthDigest for some notes about authentication options...
+
+ c - add the following directives to relevant section of your httpd.conf
+
+   Script PROPFIND  /cgi-bin/nph-req
+   Script PROPPATCH /cgi-bin/nph-req
+   Script MKCOL     /cgi-bin/nph-req
+   Script DELETE    /cgi-bin/nph-req
+   Script COPY      /cgi-bin/nph-nph
+   Script PUT       /cgi-bin/nph-req
+   Script MOVE      /cgi-bin/nph-nph
+   # Script LOCK      /cgi-bin/nph-nph   ; LOCK and UNLOCK aren't even considered at this point
+   # Script UNLOCK    /cgi-bin/nph-nph
+ 
+   # Script OPTIONS   /cgi-bin/nph-req   ; My version of Apache doesn't seem to pass OPTIONS via script
+   Header set DAV "1"                    ; so I set this output header explicitly instead
+
+Then you should be able to try it out with your favorite DAV client ...
+
+If things are failing mysteriously then add to nph-req before handle is called:
+
+  $HTTP::DAVServer::WARN=1;
+  $HTTP::DAVServer::TRACE=1;
+
+Maybe there will be more info as to what is happening / blowing up.
+
+
+
+A very very useful testing tool for WebDAV is litmus
+
+ http://www.webdav.org/neon/litmus/
+
+I use it a lot - but tests still fail while I work on the code.
+
+

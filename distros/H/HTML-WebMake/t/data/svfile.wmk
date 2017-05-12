@@ -1,0 +1,22 @@
+<webmake>
+<contents src="data/svfile.data" name="*.txt" format="text/et" />
+
+<contents src="svfile:data/svfile.data/titles.csv" name="*"
+        namefield=1 valuefield=2 delimiter="|" />
+
+<content name=template>
+  <html><head><title>$[page_title]</title></head><body>
+  Foo header
+  Title: $[page_title]
+  Body: ${body}
+  Foo footer
+  </body></html>
+</content>
+
+<out file="log/svfile.html" name="svfile">
+  <{set page_title="${foo.title}"}>
+  <{set body="${foo.txt}"}>
+  ${template}
+</out>
+</webmake>
+

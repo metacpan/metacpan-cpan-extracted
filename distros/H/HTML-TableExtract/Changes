@@ -1,0 +1,152 @@
+Revision history for HTML::TableExtract
+
+2.14  Thu May 21 12:20:46 EDT 2015
+        - bundled examples html page
+
+2.12  Fri Jan  9 11:29:08 EST 2015
+        - tightened up logic pertaining to tree mode and keep_html
+        - documentation fixes
+
+2.11  Tue Aug 23 16:01:04 EDT 2011
+        - added parsing context, override for eof() and parse() for
+          memory clear on new docs or post-eof()
+        - fixed some long standing test warnings
+
+2.10  Sat Jul 15 20:50:41 EDT 2006
+        - minor bug fixed in HTML repair routines (thanks to Dave Gray)
+
+2.09  Thu Jun  8 15:46:17 EDT 2006
+        - Tweaked rasterizer to handle some situations where the HTML is
+          broken but tables can still be inferred.
+        - Fixed TREE() definition for situations where import() is
+          not invoked. (thanks to DDICK on cpan.org)
+
+2.08  Wed May  3 17:17:33 EDT 2006
+        - Implemented new rasterizer for grid mapping. Thanks to Roland
+          Schar for a tortuous example of span issues.
+        - This also fixes a bug the old skew method had when it
+          encountered ridiculously large spans (out of memory). Thanks
+          to Andreas Gustafsson.
+        - Regular extraction and TREE mode are using the same
+          rasterizer now.
+        - Fixed HTML stripping for a header matching bug on single word
+          text in keep_html mode (thanks to Michael S. Muegel for
+          pointing the bug out)
+
+2.07  Sun Feb 19 13:40:44 EST 2006
+        - Fixed subtable slicing bug
+        - Fixed hrow() attachment bug
+        - Added tests
+
+2.06  Tue Oct 18 13:13:52 EDT 2005
+        - Tightened up element interactions in TREE() mode when
+          examining rows, columns, cells, etc. Was running into trouble
+          with dereferencing scalars vs objects.
+        - Documented space() H::TE::T method, added tests
+        - Added POD tests
+        - Documentation updates and fixes
+
+2.05  Tue Oct  4 16:00:02 EDT 2005
+        - Fixed a TREE() definition bug and class method assignments
+        - Fixed a 'row above header' bug, added tests
+
+2.04  Wed Aug  3 14:42:23 EDT 2005
+        - Fixed some conditional optional dependency tests in order to
+          avoid falure assertions on some test boxes.
+
+2.03  Wed Jul 20 12:45:56 EDT 2005
+        - Fixed greedy attribute bug (non qualifying tables were being
+          selected under certain circumstances)
+        - Moved more completely to File::Spec operations in testload.pm
+          in order to make windows boxes happy.
+
+2.02  Thu Jun 23 12:42:44 EDT 2005
+        - squelched TREE() creation warnings for subclasses
+        - fixed a rows() bug involving keep_headers
+
+2.01  Tue Jun 21 22:05:53 EDT 2005
+        - fixed some test changes
+
+2.00  Fri Jun 17 17:28:10 EDT 2005
+        - Can now return parsed tables as HTML::TableElement objects
+          within an HTML::Element tree structure (via HTML::TreeBuilder)
+          for such purposes as in-line editing of table content within
+          documents. Invoked via 'use HTML::TableExtract qw(tree);'.
+        - Added columns(), row(), column(), and cell() methods.
+        - Added some handy reporting methods: tables_report() and
+          tables_dump(). These are almost always handy while first
+          analyzing a new HTML document for table content.
+        - Debugging and error output can now be assigned to arbitrary
+          file handles.
+        ! Old 'table_state' methods are now merely 'table' methods,
+          though the old table_state style is still supported.
+        ! Chains have been dropped. Though interesting (think xpath),
+          they needlessly complicated matters as they were nearly
+          universally unused.
+
+1.09  Fri Feb 25 17:49:00 EST 2005
+        - Tables can now be selected by table tag attributes
+        - lineage() method now returns row and column information, as
+          well as depth and count, for each ancestor (potential
+          backwards incompatability, entries are now 4 element arrays
+          now rather than 2)
+        - header matching and column retention enhancements
+        - header retention
+        - old-style procedures deprecated in prepration for them to
+          become methods
+        - various bug fixes
+
+1.08  Thu Apr  4 11:26:27 CST 2002
+        - Added some more crufty HTML tolerance -- not PC (puristicly
+          correct) but HTML correctness is probably of no interest to
+          those merely trying to extract information *out* of HTML.
+        - Fixed a mapback problem with the legacy methods
+
+1.07  Wed Aug 22 06:14:24 CDT 2001
+        - Added keep_html option for HTML retention
+        - bug fix for depth/count targets
+
+1.06  Thu Nov  2 15:29:49 CST 2000
+        - Added <br> translation to newlines (enabled by default)
+        - cleaned up some warnings
+
+1.05  Sun Aug  6 06:38:14 CDT 2000
+        - minor bug fix involving empty cells
+
+1.04  Sat Jul 15 02:18:04 CDT 2000
+        - fixed gridmap bug involving skew calcs on unwanted columns
+        - added example page reference in README
+
+1.03  Tue Jul  7 03:43:30 CDT 2000
+        - gridmap option, columns are really columns regardless of
+          cell span skew
+        - Added chains for relative targeting
+          * Terminus-matching by default
+          * Elasticity option
+          * Waypoint retention option
+          * Lineage tracking (match record along chain)
+        - Significant tests added to 'make test'
+        - Documentation rewrite
+
+0.05  Tue Mar 21 08:11:54 CST 2000
+        - Fixed -w init warnings for dangling columns in header mode
+        - added 'decode' option to turn off text decoding when desired
+        - internally stores real slices right now rather than sparse
+          tables that later get massaged.
+
+0.03  Thu Mar  9 13:10:03 CST 2000
+        - Fixed bug regarding incomplete defaults
+        - Tables, rows, and cells that are either empty or contain no
+          text are now properly noted
+        - Header patterns now match across stripped tags
+        - In some cases, mangled HTML tables are properly
+          scanned by inferring missing <TR> tags.
+        - Depth/Count votes are now properly honored.
+        - Cleaned up some -w noise.
+
+0.02  Thu Feb 10 13:43:04 CST 2000
+        - Fixed some problems tracking counts at revisited depths.
+        - Minor doc fix, added mailing list
+
+0.01  Wed Feb  2 18:24:07 CST 2000
+        - Initial version.

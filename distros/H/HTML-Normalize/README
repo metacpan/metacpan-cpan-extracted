@@ -1,0 +1,28 @@
+NAME
+    HTML::Normalize - HTML light weight cleanup
+
+VERSION
+    Version 1.0003
+
+SYNOPSIS
+        my $norm = HTML::Normalize->new ();
+        my $cleanHtml = $norm->cleanup (-html => $dirtyHtml);
+
+DESCRIPTION
+    HTML::Normalize uses HTML::TreeBuilder to parse an HTML string then
+    processes the resultant tree to clean up various structural issues in
+    the original HTML. The result is then rendered using HTML::Element's
+    as_HTML member or an internal renderer.
+
+    Key structural clean ups fix tag soup ("<b><i>foo</b></i>" becomes
+    "<b><i>foo</i></b>") and inline/block element nesting
+    ("<span><p>foo</p></span>" becomes "<p><span>foo</span></p>"). "<br>"
+    tags at the start or end of a link element are migrated out of the
+    element.
+
+    HTML::Normalize can also remove attributes set to default values and
+    empty elements. For example a "<font face="Verdana" size="1"
+    color="#FF0000">" element would become and "<font color="#FF0000">" and
+    "<font face="Verdana" size="1">" would be removed if Verdana size 1 is
+    set as the default font.
+

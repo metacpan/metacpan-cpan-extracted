@@ -1,0 +1,19 @@
+# This file contains general metadata about the project.
+
+@prefix : <http://usefulinc.com/ns/doap#>.
+
+`HTML-Zoom-Parser-HH5P`
+	:programming-language "Perl" ;
+	:shortdesc            "use HTML::HTML5::Parser with HTML::Zoom";
+	:homepage             <https://metacpan.org/release/HTML-Zoom-Parser-HH5P>;
+	:download-page        <https://metacpan.org/release/HTML-Zoom-Parser-HH5P>;
+	:bug-database         <http://rt.cpan.org/Dist/Display.html?Queue=HTML-Zoom-Parser-HH5P>;
+	:repository           [ a :GitRepository; :browse <https://metacpan.org/release/HTML-Zoom-Parser-HH5P> ];
+	:created              2012-12-21;
+	:license              <http://dev.perl.org/licenses/>;
+	:maintainer           cpan:TOBYINK;
+	:developer            cpan:TOBYINK.
+
+<http://dev.perl.org/licenses/>
+	dc:title  "the same terms as the perl 5 programming language system itself".
+

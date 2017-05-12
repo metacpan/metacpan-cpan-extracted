@@ -1,0 +1,51 @@
+{
+   "abstract" : "A safer HTTP::Tiny",
+   "author" : [
+      "Robert Norris <rob@eatenbyagrue.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "HTTP-Tiny-Paranoid",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Method::Modifiers" : "0",
+            "HTTP::Tiny" : "0.070",
+            "Net::DNS::Paranoid" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-xml-spice@rt.cpan.org",
+         "web" : "https://github.com/robn/HTTP-Tiny-Paranoid/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/robn/HTTP-Tiny-Paranoid.git",
+         "web" : "http://github.com/robn/HTTP-Tiny-Paranoid"
+      }
+   },
+   "version" : "0.05",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

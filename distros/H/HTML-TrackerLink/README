@@ -1,0 +1,205 @@
+NAME
+    HTML::TrackerLink - Autogenerates links to Bug/Tracker systems
+
+SYNOPSIS
+      # Create a linker for only #12345 for a single tracker system
+      my $linker = HTML::TrackerLink->new( 'http://host/path?id=%n' );
+  
+      # Create a linker for a single named ( 'Bug #12345' ) system
+      $linker = HTML::TrackerLink->new( 'bug', 'http://host/path?id=%n' );
+  
+      # Create a linker for multiple named systems
+      $linker = HTML::TrackerLink->new(
+              'bug'     => 'http://host1/path?id=%n',
+              'tracker' => 'http://host2/path?id=%n',
+              );
+  
+      # For the multiple linker, make it default to an arbitrary system
+      $linker->default( 'http://host/path?id=%n' );
+  
+      # For the multiple linker, make it default to one of the keywords
+      $linker->default_keyword( 'bug' );
+  
+      # Process a string, and add links
+      my $string = 'Fix for bug 1234, described in client request CT #1234';
+      $string = $linker->process( $string );
+
+DESCRIPTION
+    HTML::TrackerLink is a package for automatically generating links to one
+    or more external systems from references found in ordinary text, such as
+    CVS commit messages. It tries to do this as intelligently and as
+    flexibly as possible.
+
+  Tracker URL Format
+    Most tracking systems ( bugs, client requests etc, henceforth known as a
+    'Tracker' ) use a numeric ID number as a key for the tracker item. Web
+    interfaces to these systems will generally contain a URL like the
+    following.
+
+      Mozilla Bugzilla 100,000th Bug Example URL
+      http://bugzilla.mozilla.org/show_bug.cgi?id=100000
+
+    HTML::TrackerLink takes as arguments a generic form of this URL, created
+    by replacing the number of the tracker item, with the symbol '%n'. For
+    the previous example.
+
+      HTML::TrackerLink URL for Mozilla Bugzilla
+      http://bugzilla.mozilla.org/show_bug.cgi?id=%n
+
+    When HTML::TrackerLink find a valid reference while processing, it will
+    replace the %n with the id it finds, and replace the reference in the
+    source string with a resulting link.
+
+    Any tracker URL arguments passed to HTML::TrackerLink will be checked to
+    make sure that they actually contain the %n placeholder.
+
+  Default Tracker and Keyworded Trackers
+    HTML::TrackerLink does two types of searches in the source text, a
+    'default' search, and 'keyword' searches.
+
+    A default search will look only for a number with a preceding hash, like
+    '#12345'. Note that the default search will NOT match with naked
+    numbers, such as '12345'.
+
+    A keyword search is a little more flexible. For a 'bug' keyword search,
+    the following would all be valid, and matched against.
+
+      bug 12345        # Simplest form
+      Bug 12345        # Case insensitive
+      BuG     12345    # Case insensitive and allows multiple spaces
+      bug #12345       # Normal hashed number form
+      Bug #12345       # Again, case insensitive
+
+    The keyword search would NOT match with the following
+
+      bug12345         # Must be seperated by whitespace
+      bug#12345        # Even in this case
+      bigbug 12345     # 'bug' must be a seperate word
+
+    All of these searches are performed condurrently, meaning that given
+    both a default search, and a 'bug' keyword search, the following would
+    match the way you would expect it to.
+
+      Client issue #435 ( Bug #1532 ) fixed
+
+    The 'Bug #1532' would link to your bug tracking system, and the '#435'
+    would link to your client feedback tracking system, which is the
+    default.
+
+  Keyword Format
+    The keyword can be up to 32 characters long, containing only word
+    characters, and cannot start with a number. Irrelevant of the case
+    passed, the keywords are stored internally in lowercase. As such, you
+    cannot have two seperate keyword searchs for 'bug', and 'BUG'.
+
+METHODS
+  new
+    The "new" constructor takes a variety of arguments and returns a new
+    HTML::TrackerLink processing object.
+
+    Arguments to "new" are accepted in one of the following formats.
+
+    new A empty HTML::LinkTracker object is created without any trackers set
+
+    new $tracker_url
+        If a single argument is passed, the argument is assume be the
+        tracker URL for a the default search.
+
+    new $keyword => $tracker_url
+        If two arguments are passed, they are assumed to be a single keyword
+        search. In the case where the HTML::TrackerLink object is created
+        with only one keyword, the default search will ALSO be set to the
+        same tracker, so that in systems with only one possible place to
+        link to, people that forget the keyword will still get their
+        references linked to.
+
+        It also catches a cases where there is a message like "'This
+        resolves Bug #12, #13, #14 and #15'".
+
+    new $keyword1 => $tracker_url1, $keyword2 => $tracker_url2 [, ...]
+        If more than two arguments are passed, they are assumed to be a set
+        of keyword searches. In this case, the default search will NOT be
+        set, as we cannot be sure *which* case the default should go to.
+
+        To assign the default in this case, you should use the "default" or
+        "default_keyword" methods.
+
+    In all cases, the "new" method will returns a new HTML::TrackerLink
+    object on success, or "undef" if an error has occured. ( Invalid
+    keyword/URL formats etc ).
+
+  keywords
+    Returns a list containing all current defined keywords
+
+  keyword $keyword [, $tracker_url ]
+    If passed a single argument, returns the current URL for the keyword, or
+    "undef" if the keyword does not exist.
+
+    If passed two arguments, it will add a new keyword search, or replace an
+    existing one, returning true on success, or "undef" if the keyword or
+    tracker URL are invalid.
+
+  default [ $tracker_url ]
+    If passed, explicitly sets the tracker URL to be used for the default
+    search.
+
+    Returns the default search URL
+
+    Returns "undef" if attempting to set an invalid tracker_url
+
+  default_keyword $tracker_url
+    Sets the default search to be the same as an already existing keyword
+    search.
+
+    Returns true on success.
+
+    Returns "undef" if the keyword does not exist.
+
+  process $string
+    The "process" methods takes a string as argument, and applies the
+    searches to it.
+
+    Returns the processed string on success.
+
+    Returns "undef" on error.
+
+  errstr
+    When an error occurs, the "errstr" method allows you to get access to
+    the error message. "errstr" can be called as either a static or object
+    method.
+
+    i.e. The following are equivalent
+
+      # Calling errstr as a static method
+      my $linker = HTML::TrackerLink->new( 'badurl' );
+      die HTML::TrackerLink->errstr;
+
+      # Calling errstr as an object method
+      my $linker = HTML::TrackerLink->new( 'badurl' );
+      die $linker->errstr;
+
+TO DO
+    Although the code for this module was extracted from a known working
+    application, this package itself has only basic tests. Please report any
+    bugs encountered.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=HTML-TrackerLink>
+
+    For other issues, or commercial enhancement or support, contact the
+    author.
+
+AUTHORS
+    Adam Kennedy <adamk@cpan.org>
+
+COPYRIGHT
+    Copyright 2002 - 2008 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

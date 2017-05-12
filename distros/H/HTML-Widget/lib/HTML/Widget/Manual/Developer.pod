@@ -1,0 +1,36 @@
+=head1 NAME
+
+HTML::Widget::Manual::Developer
+
+=head1 perltidy
+
+Suggested C<>perltidyrc> settings, derived from Perl Best Practises.
+
+    -l=80   # Max line width
+    -i=4    # Indent level is 4 cols
+    -ci=4   # Continuation indent is 4 cols
+    -vt=2   # Maximal vertical tightness
+    -cti=0  # No extra indentation for closing brackets
+    -pt=1   # Medium parenthesis tightness
+    -bt=1   # Medium brace tightness
+    -sbt=1  # Medium square bracket tightness
+    -bbt=1  # Medium block brace tightness
+    -nsfs   # No space before semicolons
+    -nolq   # Don't outdent long quoted strings
+    -wbb="% + - * / x != == >= <= =~ !~ < > | & >= < = **= += *= &= <<= &&= -= /= |= >>= ||= .= %= ^= x="
+            # Break before all operators
+    -sot    # Stack opening tokens
+    -sct    # Stack closing tokens
+
+=head1 AUTHOR
+
+Carl Franks C<cfranks@cpan.org>
+
+=head1 LICENSE
+
+This library is free software, you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+
+1;

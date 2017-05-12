@@ -1,0 +1,58 @@
+Revision history for Perl module HTTP::Size
+
+1.15 2015-08-26T15:46:15Z
+	* Doc and distribution refreshmentsâno code changes
+
+1.14 - 2014-05-28
+	* Promote to a release version
+
+1.13_01 - 2008-10-14
+	* Future-proofing the tests that check the size of certain
+	remote resources. People keep changing their size :(
+
+1.13 - 2007-12-14
+	* updated for the move from CVS to SVN
+	* distro cleanups
+	* no need to upgrade
+
+1.12 - 2007-01-09
+	* updated copyright and license info
+	* no code changes, so no need to upgrade
+
+1.11 - 2006-06-08
+	* Distro cleanup - bumped version to stable number. No need to
+	upgrade.
+
+0.00 - 2006-06-08
+	* Distro cleanup, bumped version number to stable release.
+	No need to upgrade.
+
+0.94 - 2006-04-07
+	* Updated the Makefile.PL for various nits
+	* No need to upgrade
+
+0.93 - 2006-04-06
+	* The MANIFEST was missing the Changes file, so I've fixed that
+	so you can read this statement.
+	* There's no need to upgrade
+
+0.92 - 2006-03-21
+	* I moved my personal web account to Pair.com, so I had to update some
+	of the test addresses in the test files
+	* I fixed a couple of doc nits
+	* No need to upgrade if you already have this installed
+
+0.91 - 2004-10-08
+	* no need to upgrade - just added strictures
+
+0.91 - 2004-09-07
+	* cleaned up distro and added README
+	* no need to upgrade
+
+0.9 - 2004-07-04
+	* get_sizes() now returns the hash reference in list context
+	* get_sizes() should download javascript and style sheets, but doesn't
+	* updated tests to use Test::More goodness
+
+0.04 - 2002-09-30
+	* initial version

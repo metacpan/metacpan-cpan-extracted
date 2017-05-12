@@ -1,0 +1,839 @@
+Revision history for HTML::DOM
+
+0.057   10 July, 2016
+        Bug fix:  $doc->base now returns the URL of the page if it is
+        a data URL, instead of just ‘data:’.
+
+0.056   28 February, 2016
+        Bug fix: $doc->title no longer dies when setting the title of
+        a document with no head node.
+        Miscellaneous:  The make_request  method of form elements has
+        been tweaked to work with  Encode 2.80.  Technically,  it was
+        working, but, due to changed output in Encode 2.80, the tests
+        started failing.  So now the MIME encoding is  skipped  on  a
+        string consisting solely of spaces and printable ASCII. (This
+        was easier than having two sets of tests.)
+
+0.055   8 November, 2015
+        Bug fixes:
+        • getElementsByClassName now works correctly when class names
+          contain hyphens,  instead of treating hyphens within  class
+          attributes as boundaries. This was based on a patch by Sean
+          Dodger (thank you!).
+        • $doc->body used to return a text node in some  cases,  caus-
+          ing methods like aLink to die.
+
+0.054   26 October, 2014
+        New feature: The named node map returned by $elem->attributes
+        can now be used as an array  or  hash  reference.  This  also
+        means that  JavaScript  code  run  by  WWW::Scripter  can  do
+        form.attributes['action'].value, etc.
+
+0.053   April Fools’ Day, 2012
+        Bug fixes:
+        • An extraneous  <body>  tag with event attributes now  calls
+          the event_attr_handler on the body, not the preceding tag’s
+          element, and actually supplies the value of  the  attribute,
+          rather than undef  (RT #75997).  Thanks again to Tomki Camp
+          for the report.
+        • When DOMAttrModified events were triggered, if it happened
+          that no event listeners were triggered, the event object
+          that HTML::DOM::EventTarget passed to the
+          default_event_handler would not have its type set and its
+          cancellability would be set to true instead of false. This
+          has been fixed.
+
+0.052   25 March, 2012
+        Bug fixes:
+        • An extraneous  <body>  tag no longer closes currently  open
+          tags, turning <form><body><input> into <form></form><input>
+          (RT #75997).  Thanks to Tomki Camp for the report.
+        • The weird colour methods of the document (fgColor, etc.) no
+          longer die when there is no body element.
+
+0.051   11 March, 2012
+        Bug fix:  write()  no longer dies inside an  element  handler
+        (e.g.,  <script> element) if the document has no root element.
+        Miscellaneous:
+        • t/html-form.t  no  longer  fails  with  HTTP::Message  6.03
+          (RT #75312).
+        • This version drops the dependency on HTML::Tree.  HTML::DOM
+          is trying to extend it in a way that  HTML::Tree  was never
+          designed for. The result is a pile of hacks upon hacks that
+          is very hard to manage. So forked versions of HTML::Element
+          and HTML::TreeBuilder are now included  (whose forked names
+          remain undocumented in case anyone is tempted to  use  them
+          directly). This is the first step toward refactoring things
+          and merging the  two  HTML  parsers  (what  we  essentially
+          have) together.
+
+0.050   1 January, 2012
+        Bug fixes:
+        • $doc->cookie  no longer  lists  cookies  from  the  request
+          object in addition to those from the  cookie  jar  (usually
+          resulting in duplicates).
+        • HTML::DOM::Interface now makes sure that all modules provid-
+          ing constants are loaded.
+
+0.049   4 Sepember, 2011
+        New feature:  <button>  elements are now treated as real  but-
+        tons, instead of being ignored by most form-handling function-
+        ality.  Thanks to a certain Martin for providing a patch upon
+        which this was based (RT #70499).
+
+0.048   27 March, 2011
+        Bug fix:  Area elements now trigger a DOMActivate  event when
+        the click method is called.  (This means that a default event
+        handler for links gets called with area elements,  as well as
+       ‘a’ elements.)
+
+0.047   13 February, 2011
+        Bug fix:  Implicitly-closed forms were being associated  with
+        inputs in subsequent forms,  resulting  in  there  being  two
+        forms that contain the same input element in their ->elements
+        and ->inputs arrays (RT #65363).
+
+0.046   23 January, 2011
+        Bug fixes:
+        • Setting innerHTML and calling the  insertAdjacent*  methods
+          now cause node lists and collections to be updated.
+        • Calling  ->checked(1)  on a radio button now unchecks other
+          radio buttons in the same group.
+        • Checking  a  radio  button  via  the  HTML::Form  interface
+          ($form->value(...), $form->find_input(...)->value(...)) now
+          causes other radio buttons in  the  same  group  to  become
+          unchecked.
+
+0.045   21 November, 2010
+        Incompatible change:  event_parent now holds a weak reference.
+        New feature: weaken_response constructor argument to indicate
+        that the HTML::DOM object should hold a weak reference to the
+        response object.
+
+0.044   26 September, 2010
+        Bug fixes:
+        • Fixed to work with HTML::Tree 4
+
+0.043   15 August, 2010
+        Bug fixes:
+        • Fixed to work with HTML::Tree 3.23_x
+        • HTML::DOM::Element  can now  be  loaded  without  HTML::DOM
+          already loaded.
+
+0.042   18 July, 2010
+        One bug fix:  Unmatched </td> and </th>  tags no longer close
+        elements that  are  outside  the  innermost  enclosing  table.
+
+0.041   13 June, 2010
+        Bug fixes:
+        • A CharacterData node’s data method now stringifies its argu-
+          ment,  to avoid  tripping  up  HTML::Element  methods  like
+          as_text by storing a reference in the attribute.  This also
+          affects other methods,  including a  title  element’s  text
+          method and a document’s title method.
+        • Setting the selected attribute of an  orphaned  option  ele-
+          ment  (one that is not inside  a  select  elem)  no  longer
+          causes errors.
+        • innerText is now listed in %HTML::DOM::Interface.
+        • $element->getElementsByTagName  used to start searching  at
+          the $element itself, instead of its children. Now it starts
+          with the children.
+        • $element->setAttribute  now  stringifies  the  value.  This
+          solves the problem of getAttributeNode’s returning just the
+          value instead of an Attr node,  if the value happened to be
+          a reference.
+        • cloneNode  with a true argument  (deep clone)  now sets the
+          ownerDocument properly.
+        • Setting a boolean attribute through the DOM 0 interface now
+          works properly:  instead of being set to whatever value you
+          pass in converted to a string, it is set to the name of the
+          attribute (for true values)  or deleted  (for false values).
+
+0.040   23 May, 2010
+        Bug fix:  Calling $doc->write from an elem handler now parses
+        the HTML code immediately instead of buffering it and waiting
+        for the elem handler to return.  This allows aberrations like
+          $doc->write("<img id='i1'>"); $doc->getElementById('i1')...
+        to work.
+
+0.039   18 April, 2010
+        Bug fix:  Submitting a GET form with a data: URL  (or any URI
+        object without a  query_form  method)  now just uses the  URL
+        itself, discarding any data.
+
+0.038   28 March, 2010
+        Bug fix:  A run-time  require  that was causing  problems  in
+        taint mode has been removed.
+
+0.037   3 January, 2010
+        New feature: getElementsByClassName
+
+0.036   27 December, 2009
+        Incompatible change:
+        • A newly-created HTML::DOM  object no longer has html,  head
+          and body elements.  These are not created until open, write
+          or parse_file is called.
+        New features:
+        • New innerText method on HTML elements
+        • css_url_fetcher  used to  have  no  return  value.  Now  it
+          returns a previously assigned callback function.
+        • css_url_fetcher no longer clobbers an existing link element
+          handler,  because it now uses  a  new,  separate  mechanism.
+        Bug fixes:
+        • $elem->innerHTML  now encodes HTML  character  entities  in
+          text nodes that are the element’s direct children.
+        • Modifying the  href  attribute of a link element whose  rel
+          attribute is set to stylesheet now resets the  style  sheet.
+        • The target and  currentTarget  methods of events now return
+          empty lists  (instead of  lists  containing  undef)  before
+          event dispatch.
+        • If an  elem_handler  removes the root element from the docu-
+          ment,  it no longer causes an  error  when  HTML::DOM  next
+          tries to call an elem_handler.
+        • parse_file no longer dies if called after  ‘close’  or when
+          the root element has been removed.
+        • The close,  innerHTML and elem_handler  methods of the docu-
+          ment no longer die if the root  element  has  been  removed.
+        • HTML::DOM’s innerHTML (as opposed to Element’s) now returns
+          an empty string when the document has no children.  It used
+          to return undef.
+        Other changes:
+        • HTML::DOM::Interface no longer lists HTML::DOM::TreeBuilder,
+          as that internal-only class has gone.
+
+0.035   1 November, 2009
+        Bug fixes:
+        • Silly me.  I fixed a bug in getElementById  in the previous
+          release,  and in doing so caused  a  more  serious  bug.  I
+          blinded  getElementById  to sub-elements of forms.  This is
+          now  fixed.
+        • The note below under 0.033 about base being ‘better at deal-
+          ing with invalid documents’ is wrong.  That change actually
+          made it worse.  Sometimes it would work,  and sometimes not,
+          depending on previous regular expression matches.  (This is
+          now fixed, of course.)
+
+0.034   25 October, 2009
+        Incompatible change:
+        • Node insertion methods no longer produce WRONG_DOCUMENT_ERR
+          errors.  It turns out that every web browser  (except IE 6)
+          completely disregards the DOM spec in this regard.
+        • When attr_event_listener was renamed event_handler, the old
+          name was kept for  temporary  backward  compatibility.  The
+          internals still used the old name, so subclasses overriding
+          it would have to use it. Now the internals use the new name,
+          so subclasses have to change.
+        Bug fixes:  
+        • HTML::DOM’s title  method no longer dies when the title ele-
+          ment does not exist.
+        • Event dispatch no longer leaves junk in $@.
+        • Whitespace is now preserved when a  <pre>  element’s  inner-
+          HTML is assigned to.  We fixed this by preserving all white-
+          space everywhere,  which is what  web  browsers  do  anyway.
+        • The event handler wrapper that get_event_listeners  returns
+          no longer closes over the event target,  but gets  it  from
+          the event object passed as its first argument.  This allows
+          the listener to be used on another object  (e.g.,  if a sub-
+          class overrides  get_event_listeners  to retrieve listeners
+          from another object).
+        • getElementById now works when the element’s ID attribute is
+          set to a reference.
+
+0.033   18 October, 2009
+        New features:
+        • HTML::DOM’s base  method now falls back to the HTTP headers
+          (of the response object)  if the document  lacks  a  <base>
+          elem.  It is also better at dealing with invalid  documents
+          that include a <base target> before a <base href>.
+        • Coderefs registered via elem_handler are now triggered when
+          a node is inserted  into  the  document,  as  well  as  dur-
+          ing parsing.
+        Bug fix:
+        • HTML::DOM::Interface now includes the contentWindow  method
+          in the HTMLFrameElement  and  HTMLIFrameElement  interfaces.
+
+0.032   9 October, 2009
+        Incompatible change:
+        • An  event_attr_handler  that provides a  subroutine  ending
+          with a line like
+            defined $ret and !$ret and $event->preventDefault
+          will now end  up  triggering  preventDefault  in  the  case
+          of an undefined  $ret.  This is the  result  of  the  first
+          new feature:
+        New features:
+        • The event  dispatch  mechanism  now  distinguishes  between
+          event listeners (added via addEventListener)  and event han-
+          dlers (those assigned via attr_event_listener or one of the
+          on*  methods),  calling preventDefault as appropriate based
+          on the latter’s return value. To achieve this, we have made
+          get_event_listeners  return not the  event  handler  itself,
+          but a closure that calls the event handler and  checks  its
+          return value.
+        • The closure returned  by  get_event_listeners  also  checks
+          whether the handler is an object with  a  call_with  method.
+          If it is,  it calls it with the current event target as its
+          first argument and the event object as the second.
+        • insertAdjacentHTML and insertAdjacentElement
+        Bug fixes:
+        • HTML::DOM::Interface now exports the UTF16 constant.
+        • innerHTML no longer omits </p> before <table>. (In fact, it
+          simply turns off TreeBuilder’s tag-omitting feature,  which
+          has bugs in it.)
+        • as_text and as_HTML used not to pass arguments to the super-
+          class’s methods.
+        Other changes:
+        • attr_event_listener has been renamed to event_handler  (the
+          original name was a big mistake).  The old  name  is  still
+          available but will be removed in a future release.
+        • Makefile.PL  now lists  Date::Format,  which  I  forgot  to
+          include in 0.030 (lastModified uses it).  Thanks to Andreas
+          König for reporting this (RT #50273).
+
+0.031   4 October, 2009
+        Bug fix:  To conform to what ‘real’ web browsers do, a form’s
+        elements collection no longer includes image buttons.  Thanks
+        to Steven Nikkel for reporting this problem.
+
+0.030   17 September, 2009
+        New features:
+        • EventTarget’s attr_event_listener method
+        • The  body  element now delegates attribute  event  handlers
+          to the  ownerDocument’s  ‘event_parent’  if  there  is  one.
+          (This makes the ‘onload’  in  <body onload='...'>  apply to
+          the window.)
+        • The  init  method of event objects now  accepts  target  as
+          an argument.
+        • The same  init  method now returns the event object  itself.
+        • The write and writeln methods now accept multiple arguments.
+        • lastModified
+        • Form’s encoding method
+        • A and area elements now have hash,  host,  etc.  properties
+          that refer to parts of the linked URL.
+        Bug fixes:
+        • HTML::DOM’s title  method no longer dies when the title ele-
+          ment is empty.
+        • EventTarget methods beginning with  ‘on’  (like  ‘onclick’)
+          used to return a  hash  ref  of  all  non-capture  handlers
+          assigned to the named event.  (Assignment  always  worked.)
+        • Invalid method calls on any class inheriting from  EventTar-
+          get used to have a scrambled error message.
+        • HTML::DOM::Interface now includes getComputedStyle.
+
+0.029   28 August, 2009
+        Bug fixes:
+        • HTML::DOM::Element::Form’s elements method,  when called in
+          list context,  was ignoring the magic associations added in
+          the previous version. Thanks to Terry Simons once more, for
+          the bug report.
+
+0.028   25 August, 2009
+        New features:
+        • Form elements are now associated during  parsing  with  the
+          last-opened form element,  even if it has  been  implicitly
+          closed.  This is to deal with badly-formed  documents  that
+          contain aberrations like  <td><form><td><input>.  Thanks to
+          Terry Simons for bringing this to my attention.
+
+0.027   16 August, 2009
+        • Updated a test to match a change in CSS::DOM with regard to
+          !important user agent rules.  CSS::DOM 0.07 is now required.
+        New features:
+        • createEvent now accepts  HTMLEvents  as an event type. trig-
+          ger_event now has the defaults for all the HTML event types
+          listed in the DOM Level 2 Events specification.  (These may
+          need to be changed later to conform to HTML 5,  which  more
+          closely resembles reality.)
+        Bug fixes:
+        • HTML collections and  node  lists  created  by  getElements-
+          By(Tag)Name  used not to be updated when the  write  method
+          was  called  or  when  an  element  handler  was  triggered.
+
+0.026   27 July, 2009
+        Incompatible change:
+        • The  sheet  method of link elements used to create an empty
+          CSS::DOM object and would not allow assignment, which behav-
+          iour  became  utterly  useless  with  the  API  changes  of
+          CSS::DOM 0.03.  This behaviour has been removed.  sheet  is
+          now a simple accessor  (except that it only works when  the
+         ‘rel’ attribute contains  ‘stylesheet’).
+        New features:
+        • css_url_fetcher:  Provide  a  URL-fetching  subroutine  and
+          external style  sheets  will  be  parsed  and  turned  into
+          CSS::DOM objects.
+        • Comments are now included in the HTML tree, as requested by
+          an anonymous individual who filed RT #48168.
+
+0.025   24 June, 2009
+        Bug fixes:
+        • HTML::DOM::Interface  now  maps  HTML::DOM::TreeBuilder  to
+          HTMLHtmlElement,  instead of  HTMLElement.  (This class  is
+          used for the <html>  element when the tree is being built.)
+        • innerHTML  no longer dies when serialising a text node that
+          was created from an object with string overloading.
+
+0.024   8 April, 2009
+        Forgot to increase the  CSS::DOM  required version to 0.06 in
+        the previous release.
+
+0.023   8 April, 2009
+        New features:
+        • getComputedStyle
+        Bug fixes:
+        • A form element’s value method is now capable of  unchecking
+          a checkbox.
+        • If the document was rewritten  (via close and write)  after
+          styleSheets had already been accessed,  a subsequent access
+          would return the first list of style sheets  again.
+        • form-charset.t  no  longer  leaves  temporary  files  lying
+          around (RT #41470).
+
+0.022   17 October, 2008
+        A few memory leak fixes:
+        • Whitespace after the </body> tag would cause the close meth-
+          od to create a circularity.
+        • Accessing an attribute node’s text node  (i.e.,  autovivify-
+          ing it) would create a circularity.
+        • Deep clones were indestructible.
+        • replaceChild would create a circular reference.
+
+0.021   25 September, 2008
+        New feature:
+        • (I)frame elements now have a contentWindow attribute, which
+          you  can  set,  although  it  is  listed  as  read-only  in
+          H:D:Interface. contentDocument now uses this.
+        Bug fixes:
+        • Fixed some tests that failed on Windoze because they relied
+          on an  LWP  bug that was fixed in 5.810  (filenames in file
+          upload fields not being escaped)
+
+0.020   20 September, 2008
+        Incompatible changes:
+        • HTML::DOM’s defaultView attribute no longer has anything
+          assigned to it by default.
+        • The defaultView attribute now holds a weak reference to the
+          view, and the view holds a strong reference to the document.
+        New features:
+        • HTML::DOM now has an event_parent method, with which you
+          can add an object to the top of the event dispatch chain.
+        • HTML::DOM::NodeList::Magic’s constructor is now officially
+          public.  (For those of you who read  the  source,  it  now
+          accepts a second arg; which it didn’t before). Use this if
+          you need to create a custom ‘live’ node list.
+        • HTML::DOM now has an  event_listeners_enabled  method that
+          allows event handlers to be disabled.  (Default event  han-
+          dlers still run.) EventTarget uses this method, so any sub-
+          class can implement it to achieve the same effect.
+        Bug fixes:
+        • HTML::DOM’s defaultView method and  HTML::DOM::View’s docu-
+          ment method now return empty list (as opposed to lists con-
+          taining undef)  if called in list context when there is no
+          object assigned.
+        • When there  is  no  view  object,  HTML::DOM::Node’s
+          trigger_event method no longer mangles the arguments
+          passed to the superclass (preventing default actions
+          and causing the event’s properties  other  than  the
+          event type not to be set).
+        • innerHTML no longer dies when there are event attributes in
+          the HTML code fed to it.
+
+0.019   7 September, 2008
+        New feature:
+        • EventTarget is now listed as a separate interface in
+          %H:D:Interface.
+        Whether you call this a bug fix or a new feature is up to you:
+        • The DOM Level 0 methods for accessing HTML  attributes  now
+          trigger DOMAttrModified events. (So mutation events are fin-
+          ished;  the implementation object also claims to support it
+          now.)  By fixing this I accidentally uncovered another bug:
+        Two bug fixes:
+        • Event attribute methods ($elem->onclick, etc.) are now list-
+          ed in %HTML::DOM::Interface.
+        • Unspecified attribute nodes  (attribute nodes corresponding
+          to HTML attributes that are not specified in  the  document
+          but have default values in the DTD) are not supposed to be--
+          and are no longer-- created if  the  attribute  *is*  speci-
+          fied but set to the empty  string.  This  problem  affected
+          getAttribute, but not getAttributeNode.
+
+0.018   4 September, 2008
+        New features/miscellaneous changes:
+        • HTML::DOM’s defaultView attribute is now writable.
+        • HTML::DOM::View is now an inside-out class, so anything can
+          subclass it; and its ‘document’ attribute is writable.  The
+          constructor has been removed.
+        • The location method has been added to HTML::DOM.
+        Bug fixes:
+        • innerHTML is now listed in %HTML::DOM::Interface.
+        • An element’s innerHTML now serialises text nodes that are
+          direct children of the element properly.
+        • When the removeAttribute method is called and the attribute
+          has previously been accessed as a node,  the  event  object
+          corresponding to the DOMAttrModified  event that occurs now
+          has its  attrName  set  to  the  attribute's  name,  rather
+          than undef,  and its  attrChange  set  to  REMOVAL,  rather
+          than ADDITION.
+
+0.017   2 September, 2008
+        New features/miscellaneous changes:
+        • innerHTML is now writable.
+        • Mutation events are  now  triggered  automatic-
+          ally by  HTML::DOM::Element’s various get/set/
+          removeAttribute(node) methods. It does not yet
+          happen with the shorthand methods (those named
+          after  the  attributes;  aka  the  DOM Level 0
+          interface).
+        • Modification of the contents of a text or comment node now
+          triggers a DOMCharacterDataModified event.
+        • The EventTarget interface is now a separate module from
+          Node,  so that anything can inherit from it.
+        • Event attribute methods ($elem->onclick, etc.) have
+          been added.
+        • An Attr node can now be used as an EventTarget.
+        • Assigning a value to an Attr node now modifies its child
+          text node in place instead of replacing it.
+        Bug fixes:
+        • Modifying a style object (as returned by an element’s style
+          method)  now immediately causes the corresponding attribute
+          to be updated.  (It used only to be  updated  on  calls  to
+          getAttribute[Node]).
+        • Modifying an attribute node for the style attribute or its
+          child text node now updates the corresponding style object.
+        • The child text node of an attr node now has its parentNode
+          set correctly.
+        • HTML::DOM::Element’s removeAttribute and setAttributeNode
+          methods no longer die when the attribute is set to some ran-
+          dom object (e.g., $elem->setAttribute(foo => bless [])).
+        • An element’s innerHTML method no longer includes the tags of
+          the element itself (oops!);  nor does it have a  line  break
+          tacked on the end.
+        • A node’s push_content method no longer dies when called with
+          no arguments while the node is empty.
+        • Direct changes to an event attribute node’s text node  now
+          reset the event handler,  instead of leaving it as  it  is.
+          (For those who don’t understand  my  obtuse  jargon,  this
+          applies to $elem->getAttributeNode('onclick')->lastChild->
+          data("...").)
+
+0.016   28 August, 2008
+        New features/miscellaneous changes:
+        • The UIEvent, MouseEvent and MutationEvent interfaces have
+          been added. (Mutation events for attributes and character
+          data  modified  are  not  yet  automatically  triggered.)
+        • Events now have an init method that works like initEvent,
+          but takes named args.
+        • trigger_event has been extended to allow named args specify-
+          ing the event type and which default  action  to  take.  It
+          also chooses the right event class and reasonable  defaults
+          for the event name passed to it.
+        • default_event_handler_for’s submit_button and reset_button
+          event types have been removed,  and default default  event
+          handlers for specific event types (i.e., default event han-
+          dlers already in place by default)  have been replaced  by
+          another mechanism (not part of the public API).
+        • The innerHTML has been added to HTML::DOM and
+          HTML::DOM::Element. It is currently read-only.
+        • Triggering a form’s reset event  (or calling its reset
+          method, which in turn triggers the event) now actually
+          resets the form.
+        Bug fixes:
+        • A  table  cell  following  an  unclosed  table  cell
+          (<td><TD>) no longer mangles the tree.  This was bro-
+          ken in  0.011 which turned that into the nonsensical
+          <tr><td></td><tr><td></td></tr></tr>. (This may have
+          affected other elements, as well.)
+        • HTMLOptionsCollection is now listed as acting as a hash and
+          as an array in HTML::DOM::Interface.
+        • The trigger_event method now works on the document with a
+          string arg, instead of dying.
+
+0.015   20 August, 2008
+        • Removed every last reference to CSS::DOM::StyleDecl, which
+          was renamed in 0.03.
+
+0.014   20 August, 2008
+        • Fixed the Makefile.PL so it installs properly and doesn’t
+          downgrade CSS::DOM after installing 0.03.
+        • HTML::DOM->createEvent now dies if the arg passed to it is
+          an unsupported event category.
+
+0.013   19 August, 2008
+        New features:
+        • HTML::DOM::Interface now indicates which members have UTF-16
+          equivalents.
+        • Changes to conform to the Level-2 HTML DOM module:
+          • HTML::DOM::Element::Input’s ‘type’ method is no longer
+            read-only.
+          • HTML::DOM::Element::Object now has a contentDocument,
+            which returns nothing for now.
+          • HTML::DOM::Element::Table’s caption, tHead and tFoot meth-
+            ods now die when passed something other an element of the
+            right type.
+          • The  insertRow  methods of  HTML::DOM::Element::Table  and
+            ::TableSection and the insertCell method of ::TableRow now
+            die if the index is out of range.
+          • Frame and iframe elements now each have a contentDocument
+            method, which, for now, returns an empty HTML::DOM object.
+            Later I need to add support for  callback  routines  that
+            create the object.
+        • HTML::DOM::Exception now has a ‘code’ method.
+        • The brand new shiny  default_event_handler_for  method has
+          been added. It makes it less cumbersome to provide default
+          behaviours for different event types.
+        • All HTML elements now have a click method--something from
+          HTML 5 (I seem to be getting ahead of myself).
+        Bug fixes:
+        • removeChild now works on the document tree.
+        • Modification of an Attr object for an event attribute now
+          modifies the event handler itself.
+        • HTML::DOM::Interface no longer lists the index property of
+          the HTMLOptionsElement interface as read-only.
+        • HTML::DOM::Table’s and ::TableSection’s insertRow methods
+          and ::TableRow’s insertCell method now insert the new row
+          or cell into the right place when called  with  an  index
+          other than 0 or -1.
+        • HTML::DOM::Implementation->hasFeature now returns true for
+          Core 1.0, and not just Core 2.0. (Oops!)
+
+0.012   29 July, 2008
+        Incompatible changes:
+        • The parse_file method now uses HTML::Encoding to detect the
+          encoding of the file,  if given a file  name,  and  if  the
+          encoding has not been set with the new ‘charset’  method or
+          the constructor’s new ‘charset’  option.  It used to assume
+          ISO  Latin  1.  It  still  treats  file  handles  the  same
+          way, though;  that is, it assumes the file handle is produc-
+          ing Unicode text (you have to ‘binmode’ to set the encoding
+          if that’s not the case).
+        New features:
+        • The constructor now accepts a ‘charset’ option which is used
+          by  parse_file  and  by  the  make_request  method  of  form
+          form elements.
+        • A ‘charset’ method has been added to HTML::DOM,  which
+          returns the encoding passed to the constructor or that
+          parse_file  used.  You can  also  use  it  to  set  it.
+        • parse_file’s return value is now useful: true upon success;
+          false upon failure (to open the file)
+        • Upward references in the object tree are now weak
+          references.
+        • I’ve started work on Level-2 HTML features. So far,
+          • HTML::DOM::Interface lists HTMLOptionsCollection as a sepa-
+            rate interface from HTMLCollection and
+          • HTML::DOM::Collection::Options now throws an error if
+            length is set.
+        • A callback routine passed to event_attr_handler now receives
+          the offset within the source of the attribute’s value as the
+          fourth argument.
+        • Attribute methods of elements now support  implicit  attri-
+          butes (those with default values in the DTD).
+        Bug fixes:
+        • Suppressed an erroneous warning triggered in bleadperl (5.11
+          to be) by HTML::DOM::Element::Form’s inputs method.
+        • HTML::DOM’s close method had an erroneous eval, which would
+          catch errors that should have been propagated,  in addition
+          to the specific error it was intended to catch.
+        • HTML::DOM::Collection::Option’s name and form_name_value
+          methods no longer die when there are no options.
+        • HTML::DOM::Element::Option’s text method now supports multi-
+          ple child nodes,  and no longer assumes that there is  just
+          one text node within the option.
+        • In cases where the HTML DTD specifies a list of alternates
+          for an attribute’s value,  the corresponding DOM 0 methods
+          return a normalised (lc) value.
+        • HTML::DOM::Element’s removeAttributeNode method used to emit
+          warnings when the node did not belong to the element and the
+          element either had no attribute with the node’s name  or  an
+          attribute that had never been accessed as a node.
+
+0.011   19 May, 2008
+        New features:
+        • Link and style elements now have their ‘sheet’ attribute (in
+          other words, the LinkStyle interface has been added).
+        • HTML::DOM now has a C<styleSheets> method (the DocumentStyle
+          interface has been implemented).
+        One bug fix:
+        • The so-called  ‘content_offset’  bug (RT  #34404) has been
+          fixed.  It actually had nothing to do with  content_offset
+          (which merely exposed the bug), but text after the </html>
+          tag that was inserted in the  document,  rather  than  the
+          HTML element.
+
+0.010   23 December, 2007
+        New features:
+        • HTML::DOM::Node’s trigger_event method now returns nothing.
+          (It used to return the return value of the  default  event
+          handler.)  As  a  side  effect,  this  fixes  a  few  bugs.
+        • The classes for HTML tables and frames have been added.
+        • HTML::DOM::Element now has a content_offset method.
+        • HTML::DOM::Element::Form now has its reset method.
+        • The DOM Level-2 core interfaces are now supported.
+        • I’ve started work on CSS features. So far, elements have a
+         ‘style’ method.
+        • You can now access forms by using an HTML::DOM object as
+          a hash ref.
+        • A checkbox’s click method now toggles the checkbox’s state.
+        Fixed bugs:
+        • HTML::DOM::Element::Form’s submit method now
+          returns nothing.
+        • HTML::DOM::Element::Select’s blur and focus methods now
+          return nothing.
+        • HTML::DOM::Element::Button’s type method now works.
+        • HTML::DOM::Element::Label’s htmlFor method now works.
+        • Heading elements (h1..h6) are now blessed into the
+          HTML::DOM::Element::Heading class,  so  the  align
+          method works.
+        • HTML::DOM::Element::Object’s useMap method now works.
+        • HTML::DOM::Element::Applet’s codeBase method now works.
+        • tbody elements are now inserted into the tree if a <tr>
+          occurs directly within a <table>.
+        • HTML::DOM::Interface now includes  HTML::DOM::TreeBuilder,
+          which is used for the document’s <html> element while the
+          HTML code is being parsed.
+        • The as_text and as_HTML methods now work on the document’s
+          <html> element during parsing.
+        • The <html> element’s ‘version’ method now works dur-
+          ing parsing.
+        • getElementById and getElementsByTagName now stringify the
+          name or ID  (in order to make  HTML::Element’s  look_down
+          method happy).  These both used to return false negatives
+          when passed objects with string overloading.
+        • HTML::DOM::Element’s normalize method (which has been moved
+          to HTML::DOM::Node) now actually does something.
+        • HTML::DOM::Node’s cloneNode method used not  to  erase  the
+          clone’s parentNode attribute unless the  cloning  was  deep.
+          Nor did it erase the list of child nodes in a shallow clone,
+          so those nodes would have multiple parents.
+        • cloneNode now works with HTML elements (the attributes are
+          now cloned).
+        • HTML::DOM::CharacterData’s deleteData16  method  now  works
+          properly, instead of getting offsets wrong and then convert-
+          ing all the text into UTF-16.
+        • HTML::DOM::Collection’s namedItem method used to return
+          undef for form, img and map elements.
+        • HTML::DOM::Collection::Elements’s namedItem method used to
+          die if there were multiple form fields with the same  name.
+        • HTML::DOM’s open method no longer clobbers element handlers.
+
+0.009   23 November, 2007
+        Changes/new features:
+        *  You can do something with errors produced by event handlers
+           by passing a coderef to the new error_handler method.  That
+           coderef will be called for each error. (Before, such errors
+           were ignored.)
+        *  HTML::DOM::Interface has been modified, such that
+          'Document' is no longer a separate interface--since there is
+           no corresponding HTML::DOM module--,  but all  its  members
+           are  now under HTMLDocument,  which inherits directly  from
+           Node. Likewise, 'Element' has been merged into HTMLElement.
+        *  HTML::DOM::Element::Select now has 'add' and
+          'remove' methods.
+        * 'Select' elements can now be used as array refs, so you can
+           write $select->[0] instead of $select->options->[0].
+        *  You can now assign undef to such an array element to delete
+           it,  so  '$select->[0] = undef'  does  the  same  thing  as
+          'shift @$select'. 'delete $select->[0]' also works.
+        Bug fixes:
+        * $form->action now works when the document has no base url
+          (used to die)
+        * HTML::DOM::Element::Select's type method now works.
+        * HTML::DOM::Element::Select's  selectedIndex  method  and
+          HTML::DOM::Element::Option's selected method should work
+          reliably now.
+        * HTML::DOM::Collection::Options is now listed by
+          HTML::DOM::Interface.
+        * HTML::DOM::Element::Input's click method now returns an
+          empty list.
+        * HTML::DOM's event_attr_handler is now actually useful. (It
+          used to be ignored most of the time.)
+
+0.008   5 October, 2007
+        * New HTML::DOM::Interface module
+        * Added type and value methods to HTML::DOM::Element::Button
+        * Added the charset, coords and tabIndex methods to 
+          HTML::DOM::Element::A.
+        * HTML::DOM's createElement method now throws an 
+          HTML::DOM::Exception.
+
+0.007   29 September, 2007
+        Two bug fixes:
+        * The URL method no longer warns if there is no URL.
+        * The previous release broke parsing of forms. (The rest of
+          the document would be within the form element.) Now it
+          should work.
+
+0.006   27 September, 2007
+      - The following interfaces have been implemented:
+            HTMLFormElement
+            HTMLSelectElement
+            HTMLOptGroupElement
+            HTMLOptionElement
+            HTMLInputElement
+            HTMLTextAreaElement
+            HTMLButtonElement
+            HTMLLabelElement
+            HTMLFieldSetElement
+            HTMLLegendElement
+            HTMLUListElement
+            HTMLOListElement
+            HTMLDListElement
+            HTMLDirectoryElement
+            HTMLMenuElement
+            HTMLLIElement
+            HTMLDivElement
+            HTMLParagraphElement
+            HTMLHeadingElement
+            HTMLQuoteElement
+            HTMLPreElement
+            HTMLBRElement
+            HTMLBaseFontElement
+            HTMLFontElement
+            HTMLHRElement
+            HTMLModElement
+            HTMLAnchorElement
+            HTMLImageElement
+            HTMLObjectElement
+            HTMLParamElement
+            HTMLAppletElement
+            HTMLMapElement
+            HTMLAreaElement
+            HTMLScriptElement
+      - Some methods have also been added for compatibility with 
+        WWW::Mechanize.
+      - The 'open' method no longer stops the ownerDocument method
+        from working properly.
+      - Furthermore,  'open' is no longer anywhere near as powerful as
+        it was; it used to obliterate the coderefs that were passed to
+        event_attr_handler and default_event_handler.
+      - &HTML::DOM::base has been added.
+      - The parse and eof methods have been deleted, since write and
+        close do the same thing.
+
+0.005   26 August, 2007
+        The HTMLCollection interface has now been implemented, and so
+        have the attribute  methods  of  the  HTMLDocument  interface
+        (Level 1). The HTMLHtmlElement, HTMLHeadElement,
+        HTMLLinkElement, HTMLTitleElement, HTMLMetaElement,
+        HTMLBaseElement, HTMLIsIndexElement, HTMLStyleElement and
+        HTMLBodyElement interfaces (again, Level 1) have also been
+        implemented.
+
+0.004   22 July, 2007
+        Fixed infinite recursion triggered by element handlers calling
+        $dom_tree->write($html)  when  $html contains elements handled
+        by the same handler. E.g.,
+        <script>document.write('<script>...<\/script>')</script>
+
+0.003   15 July, 2007
+      - HTML::DOM::Text now has its nodeValue method, which I forgot
+        about before. (Actually, I moved HTML::DOM::Comment's
+        nodeValue to HTML::DOM::CharacterData.)
+      - as_text and as_HTML have been overridden and now work.
+
+0.002   9 July, 2007
+        The basic mechanism for event handling has been implemented.
+        The various different flavours of event objects still  need
+        to be added.
+
+0.001   27 June, 2007
+        The first version. So far, most of the level-1 core DOM is
+        implemented,  and a couple of HTML-specific  methods,  but
+        that's all.

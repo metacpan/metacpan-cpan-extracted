@@ -1,0 +1,13 @@
+Changes
+examples/mojo_map.pl
+examples/output_map.pl
+lib/HTML/GoogleMaps/V3.pm
+Makefile.PL
+MANIFEST
+out.html
+README.md
+t/001_compiles_pod.t
+t/003_changes.t
+t/HTML-GoogleMaps.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

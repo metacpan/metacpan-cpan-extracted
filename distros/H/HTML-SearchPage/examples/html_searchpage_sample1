@@ -1,0 +1,144 @@
+#!/usr/bin/perl
+
+our $VERSION = '0.05';
+
+# $Id: html_searchpage_sample1,v 1.4 2007/09/19 21:30:18 canaran Exp $
+
+use warnings;
+use strict;
+
+use HTML::SearchPage;
+use HTML::SearchPage::Param;
+
+# Search page object
+my $sp = HTML::SearchPage->new(
+    page_title     => 'HTML::SearchPage Demo',
+    header         => '[Placeholder for header]',
+    css            => '',
+    temp_dir       => qq[/usr/local/demo/html/demo/tmp],
+    temp_dir_eq    => qq[http://localhost:8080/demo/tmp],
+    instructions   => '[Placeholder for instructions]',
+    footer         => '[Placeholder for footer]',
+    base_sql_table => qq[
+        html_searchpage_experiment hse
+        JOIN html_searchpage_person hsp ON (hsp.person_id = hse.person_id)
+    ],
+    base_sql_fields => [
+        'hsp.name',
+        'hse.temperature',
+        'hse.sample_size',
+        'hse.attribute',
+        'hse.result',
+        'hse.comments',
+    ],
+    base_output_headers => [
+        'Researcher:hsp.name',
+        'Temperature (F):hse.temperature',
+        'Sample Size:hse.sample_size',
+        'Attribute:hse.attribute',
+        'Result:hse.result',
+        'Comments',
+    ],
+    sort_fields => 2,
+    method      => 'GET',
+    page_size   => 20,
+    db_access_params =>
+      ['DBI:mysql:database=temp;host=localhost;port=3306', 'test', 'test'],
+    debug_level => 1,
+);    # Displays error page if fails
+
+# Param fields
+my $pf;
+
+$pf = HTML::SearchPage::Param->new(
+    -label            => 'Temperature (F):',
+    -sql_column       => 'hse.temperature',
+    -form_name        => 'temperature',
+    -operator_list    => ['<:less than', '=:equals', '>:greater than'],
+    -operator_default => '<',
+    -param_type       => 'text:12',
+    -param_list       => 'first',
+) or $sp->display_error_page($@);
+
+$sp->param_field('temperature', $pf);
+
+$pf = HTML::SearchPage::Param->new(
+    -label            => 'Sample Size:',
+    -sql_column       => 'hse.sample_size',
+    -form_name        => 'sample_size',
+    -operator_list    => ['<:less than', '=:equals', '>:greater than'],
+    -operator_default => '>',
+    -param_type       => 'text:12',
+) or $sp->display_error_page($@);
+
+$sp->param_field('sample_size', $pf);
+
+$pf = HTML::SearchPage::Param->new(
+    -label         => 'Attribute:',
+    -sql_column    => 'hse.attribute',
+    -form_name     => 'attribute',
+    -operator_list => ['=:equals'],
+    -param_type    => 'drop_down',
+    -param_list =>
+      ['DISTINCT:SELECT DISTINCT attribute FROM html_searchpage_experiment'],
+    -auto_all  => 1,
+    -auto_null => 1,
+) or $sp->display_error_page($@);
+
+$sp->param_field('attribute', $pf);
+
+$pf = HTML::SearchPage::Param->new(
+    -label         => 'Result:',
+    -sql_column    => 'hse.result',
+    -form_name     => 'result',
+    -operator_list => ['=:equals'],
+    -param_type    => 'drop_down',
+    -param_list =>
+      ['DISTINCT:SELECT DISTINCT result FROM html_searchpage_experiment'],
+    -auto_all  => 1,
+    -auto_null => 1,
+) or $sp->display_error_page($@);
+
+$sp->param_field('result', $pf);
+
+# Call display method
+$sp->display_page;
+
+=head1 NAME
+
+html_searchpage_sample1 - Sample CGI script for HTML::SearchPage
+
+=head1 SYNOPSIS
+
+html_searchpage_sample1
+
+=head1 DESCRIPTION
+
+Sample code for demonstrating use of HTML::SearchPage.
+
+=head1 USAGE
+
+Please refer to HTML::SearchPage::Tutorial for details on this script.
+
+=head1 AUTHOR
+
+Payan Canaran <pcanaran@cpan.org>
+
+=head1 BUGS
+
+=head1 VERSION
+
+Version 0.05
+
+=head1 ACKNOWLEDGEMENTS
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2005-2007 Cold Spring Harbor Laboratory
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. See DISCLAIMER.txt for
+disclaimers of warranty.
+
+=cut
+

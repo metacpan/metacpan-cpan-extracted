@@ -1,0 +1,20 @@
+TYPEMAP
+
+shandle_t                  * T_shandle_t
+sprincipal_t	           * T_sprincipal_t
+
+INPUT
+
+T_shandle_t
+	$var = sv2server_handle($arg)
+
+T_sprincipal_t
+	$var = sv2sprincipal($arg)
+
+OUTPUT
+
+T_shandle_t	
+	sv_setref_pv($arg, \"Heimdal::Kadm5::SHandle\", (void *)$var);
+
+T_sprincipal_t
+	sv_setref_pv($arg, \"Heimdal::Kadm5::Principal\", (void *)$var);

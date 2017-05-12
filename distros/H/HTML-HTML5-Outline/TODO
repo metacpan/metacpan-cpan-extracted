@@ -1,0 +1,3 @@
+TODO:
+* Make the list of elements that are treated as sections, headings, etc configurable?
+* Double check that no changes have been made to the HTML5 spec that would affect this distribution.

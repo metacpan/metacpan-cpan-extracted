@@ -1,0 +1,4 @@
+
+<content name=foo> Foo! </content>
+
+<out file=log/basic.html>${foo}</out>

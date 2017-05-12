@@ -1,0 +1,2755 @@
+=pod
+
+=head1 NAME
+
+HTML::Embperl_ - Erstellen dynamischer Websites mit Perl
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+I<Embperl> ist ein Perlmodul welches es erlaubt beliebigen Perlcode
+in HTML Dokumente einzufügen.
+
+Wenn Sie mehr als eine einzelne Webseite erstellen, sollten Sie auch
+einen Blick auf L<"perldoc EmbperlObject"|"EmbperlObject.pod">  werfen,
+welches es erlaubt Websites aus wiederverwendbaren Objketen zusammenzusetzen.
+Zusätzlich erlaubt es L<"perldoc HTML::Embperl::Mail"|"Mail.pod"> die
+resultierenden Seiten per EMail zu verschicken.
+
+=head1 Aufrufen/Konfigurieren von Embperl
+
+=head2 mod_perl Konfiguration
+
+Um I<HTML::Embperl> als content handler unter I<mod_perl>
+laufen zu lassen, sind folgende Zeilen in der Apache Konfigurationsdatei F<httpd.conf> nötig:
+
+
+Beipiel für Apache B<httpd.conf>:
+
+
+    SetEnv EMBPERL_DEBUG 2285
+
+    <Location /embperl/x>
+        SetHandler  perl-script
+        PerlHandler HTML::Embperl
+        Options     ExecCGI
+    </Location>
+
+
+Diese Konfiguration bewirkt, dass I<mod_perl> I<Embperl> für
+alle Dateien, die im Unterverzeichnis, das mittels der URI <l>/embperl/x</l>
+angesprochen wird, liegen, als content handler aufruft. I<Embperl>
+kann dann die Datei entsprechend bearbeiten und das Ergebnis zum Browser
+schicken.
+
+
+Eine andere Möglichkeit ist, alle Dateien mit einer bestimmten Endung
+von Embperl bearbeiten zu lassen. Eine Konfiguration dafür würde wie folgt
+aussehen:
+
+
+    SetEnv EMBPERL_DEBUG 2285
+
+    <Files *.epl>
+        SetHandler  perl-script
+        PerlHandler HTML::Embperl
+        Options     ExecCGI
+    </files>
+
+    AddType text/html .epl
+
+B<HINWEIS>: Wenn I<mod_perl> mit C<USE_DSO> übersetzt ist, darf I<Embperl> B<nicht>
+beim Starten des Server geladen werden!
+
+=head2 Andere Arten Embperl zu nutzen
+
+
+Embperl kann ebenso von der Befehlszeile aus aufgerufen werden oder
+als normales CGI Skript ausgeführt werden. Weiterhin können
+andere Perlprogramme oder -module es direkt aufrufen.
+
+
+Der Aufruf von der Befehlszeile sieht folgendermaßen aus (erste Zeile Unix, zweite Zeile Windows): 
+
+
+
+C<embpexec.pl [-o outputfile] [-l logfile] [-d debugflags] htmlfile [query_string]>
+
+C<embpexec.bat [-o outputfile] [-l logfile] [-d debugflags] htmlfile [query_string]>
+
+
+=over 4
+
+=item B<htmlfile>
+
+Datei welche von Embperl bearbeitet werden soll.
+
+=item B<query_string>
+
+Optional. Hat die selbe Bedeutung wie die Umgebungsvariable
+B<QUERY_STRING> eines CGI Skripts.  B<QUERY_STRING> beinhaltet alles
+nach dem ersten "?" in der URL. B<query_string> sollte URL kodiert sein.
+Default ist kein query_string.
+
+=item B<-o outputfile>
+
+Optional. Gibt den Dateinamen an, in den das Ergebnis geschrieben wird.
+Default ist die Standardausgabe.
+
+=item B<-l logfile>
+
+Optional. Name der Logdatei. Default ist C</tmp/embperl.log>.
+
+=item B<-d debugflags>
+
+Optional. Gibt an, welche Debuginformationen  in die Logdatei
+geschrieben werden. (siehe L<"EMBPERL_DEBUG"> für mögliche Werte)
+
+=back
+
+Um I<Embperl> als B<CGI Skript> zu nutzen, müssen Sie die Datei
+C<embpcgi.pl> (bzw. C<embpcgi.bat> unter Windows) in Ihr CGI
+Verzeichnis kopieren (oft C</cgi-bin>). Zur Benutzung mit FastCGI
+zusammen, verwenden Sie die Datei embpfastcgi.pl.
+Zum Aufrufen verwenden Sie die URL
+
+ http://www.domain.de/cgi-bin/embpcgi.pl/uri/ihres/embperl/dokuments
+
+Die extra Pfadinformationen die C<embpcgi.pl> übergeben werden, geben
+dabei den Ort des Embperl Dokuments an.
+
+Unter Apache kann C<embpcgi.pl> auch als Handler definiert werden:
+
+    <Directory /pfad/zu/ihren/embperl/dokumenten>
+    Action text/html /cgi-bin/embperl/embpcgi.pl
+    </Directory>
+
+B<HINWEIS 1> Die Datei embpexec.pl darf aus Sicherheitsgründen nicht mehr als
+CGI Skript genutzt werden!
+
+B<HINWEIS 2>: Um die Sicherheit von CGI Skripten sicher zustellen, empfiehlt es sich
+mittels L<EMBPERL_ALLOW> den Zugriff zu beschränken.
+
+
+=head2 Embperl aus Embperl Dokumenten oder anderen Perl Programmen/Modulen aufrufen
+
+Die Funktion C<Execute> kann genutzt werden, um I<Embperl> aus anderen
+Perlmodulen oder -programmen aufzurufen. Ebenso ist es möglich andere
+Dokumente (z.B. Kopf- oder Fußzeilen) in Embperlseiten einzufügen.
+
+Die Kurzform müssen lediglich Dateinamen und ggf. Parameter für das
+aufzurufende Dokument als Argumente angegeben werden:
+
+  Execute ($filename, @params) ;
+
+Die Langform erwartet eine Referenz auf einen Hash als Argument:
+
+  Execute (\%params) ;
+
+Die Kurzform entspricht folgendem Aufruf in der Langform:
+
+  Execute ({inputfile => $filename,
+            param     => \@params}) ;
+
+Parameter für die Langform sind:
+
+=over 4
+
+=item B<inputfile>
+
+Mittels C<inputfile> wird die Datei angegeben, die
+von I<Embperl> bearbeitet werden soll. Ist der Parameter C<input>
+ebenso vorhanden, sollte C<inputfile> einen eindeutigen Namen
+spezifizieren. Jedesmal wenn I<Embperl> den selben Namen sieht, geht es davon
+aus, daß die Quelle die selbe ist und verwendet den selben Packagenamen,
+sowie compiliert die Perlteile nur wenn C<mtime> sich ändert oder
+undefiniert ist.
+
+=item B<sub>
+
+Ruft die durch diesen Parameter angegebene Funktion auf (siehe auch [$ B<"sub"> $]).
+Momentan muß
+die Funktion entweder in der selben Embperldatei definiert sein oder 
+die Embperldatei muß vorher importiert worden sein.
+
+=item B<input>
+
+Referenz auf einen Skalar, welcher den Quellentext enthält. B<inputfile>
+sollte ebenso angegeben werden, um die Quelle zu benennen. Der Name
+kann dabei beliebiger Text sein.
+
+=item B<mtime>
+
+Zeitpunkt der letzten Änderung des Quellentextes. Der Quellentext
+wird nur dann neu übersetzt, wenn sich B<mtime> ändert oder wenn
+B<mtime> C<undef> ist.
+
+
+=item B<outputfile>
+
+Datei, in die die Ausgabe geschrieben wird. Ist keine Datei angegeben,
+wird die Standardausgabe benutzt.
+
+=item B<output>
+
+Referenz auf einen Skalar, in welchen die Ausgabe geschrieben werden soll.
+
+=item B<import>
+
+Ein Wert von Null veranlasst I<Embperl> die Seite nicht auszuführen, sondern alle
+darin enthaltenen Funktionen zu definieren. Dies ist nötig, um sie mittels des
+B<sub> Parameters der Execute Funktion aufrufen zu können oder als Vorbereitung
+für einen späteren Import.
+
+Ein Wert von Eins veranlasst I<Embperl> die Seite nicht auszuführen, sondern alle
+darin enthaltenen Funktionen zu definieren B<und> diese in das aktuelle Package zu importieren.
+
+Siehe auch C<[$ sub $]> Metacommand.
+
+
+=item B<cleanup>
+
+Dieser Wert gibt an, ob and wann das "Cleanup" des Packages ausgeführt werden soll.
+(Siehe auch L<"Variablen Gültigkeitsbereich und Cleanup">)
+
+=over 4
+
+=item B<cleanup = -1>
+
+Es wird kein Cleanup ausgeführt.
+
+=item B<cleanup = 0> oder nicht spezifiziert
+
+Unter I<mod_perl> wird das Cleanup erst ausgeführt, B<nachdem> die Verbindung zum
+Client beendet wurde, auch wenn C<Execute> mehrfach während eines
+Request aufgerufen wird.
+
+In allen anderen Fällen wird das Cleanup sofort ausgeführt.
+
+=item B<cleanup = 1>
+
+Cleanup wird sofort ausgeführt.
+
+=back
+
+=item B<param>
+
+Eine Referenz auf ein Array, um dem aufgerufenen Dokument Parameter zu übergeben.
+
+
+ Beispiel:
+
+    HTML::Embperl::Execute(..., param => [1, 2, 3]) ;
+    HTML::Embperl::Execute(..., param => \@parameters) ;
+
+Über das Array C<@param> kann die aufgerufene Seite auf die Parameter zugreifen.
+Siehe F<eg/x/Excute.pl> aus der Embperl Distribution für ein detailliertes Beispiel.
+
+=item B<ffld and fdat>
+
+Kann benutzt werden, um die beiden Embperlvariablen L<@ffld> und L<%fdat> zu setzen.
+
+=item B<firstline>
+
+Gibt die erste Zeilennummer der Quellendatei an (Default: 1)
+
+=item B<options>
+
+Wie L<"EMBPERL_OPTIONS"> (siehe unten), außer für Cleanup.
+
+B<HINWEIS:> B<optDisableFormData> sollte gesetzt werden, wenn die Formulardaten
+eines B<POST> Request bereits von der Standardeingabe eingelesen wurden, ansonsten
+versucht C<Execute> die Daten ein zweites Mal einzulesen, was dazu führt, das der Request
+hängt.
+
+=item B<debug>
+
+Wie L<"EMBPERL_DEBUG"> (siehe unten).
+
+=item B<escmode>
+
+Wie L<"EMBPERL_ESCMODE"> (siehe unten).
+
+=item B<package>
+
+Wie L<"EMBPERL_PACKAGE"> (siehe unten).
+
+=item B<virtlog>
+
+Wie L<"EMBPERL_VIRTLOG"> (siehe unten). Wenn B<virtlog> gleich B<uri> ist, wird
+die Embperl Logdatei gesendet.
+
+=item B<allow (ab 1.2b10)>
+
+Wie L<"EMBPERL_ALLOW"|"EMBPERL_ALLOW (ab 1.2b10)"> (siehe unten)
+
+=item B<path (ab 1.3b1)>
+
+Wie L<"EMBPERL_PATH"|"EMBPERL_PATH (ab 1.3b6)"> (siehe unten)
+
+=item B<uri>
+
+Die URI des Request. Wird nur für Virtlog Feature benötigt.
+
+=item B<compartment>
+
+Wie L<"EMBPERL_COMPARTMENT"> (siehe unten).
+
+=item B<input_func>
+
+Wie L<"EMBPERL_INPUT_FUNC"> (siehe unten).
+Zusätzlich ist es möglich eine Codereferenz anzugeben, die entsprechende
+Funktion wird dann als Eingabefunktion aufgerufen. Ebenso ist die Angabe
+einer Arrayreferenz möglich, wobei das erste Element dann die Codereferenz
+enthält und alle weiteren Elemente als Parameter der Funktion übergeben werden.
+
+=item B<output_func>
+
+Wie L<"EMBPERL_OUTPUT_FUNC"> (siehe unten).
+Zusätzlich ist es möglich eine Codereferenz anzugeben, die entsprechende
+Funktion wird dann als Ausgabefunktion aufgerufen. Ebenso ist die Angabe
+einer Arrayreferenz möglich, wobei das erste Element dann die Codereferenz
+enthält und alle weiteren Elemente als Parameter der Funktion übergeben werden.
+
+=item B<cookie_name>
+
+Wie L<"EMBPERL_COOKIE_NAME"> (siehe unten).
+
+=item B<cookie_path>
+
+Wie L<"EMBPERL_COOKIE_PATH"> (siehe unten).
+
+=item B<cookie_domain>
+
+Wie L<"EMBPERL_COOKIE_DOMAIN"> (siehe unten).
+
+=item B<cookie_expires>
+
+Wie L<"EMBPERL_COOKIE_EXPIRES"> (siehe unten).
+
+=item B<errors>
+
+Erwartet eine Referenz auf ein Array. Nach der Rückkehr der Funktion enthält das Array
+alle Fehlermeldungen der aufgerufenen Seite, soweit welche aufgetreten sind.
+
+=item B<object> (ab 1.3.1b1)
+
+Erwartet einen Dateinamen und liefert eine Hashreferenz zurück, die in das 
+Package der Datei "geblessed" ist, d.h. die Hashreferenze kann dazu genutzt
+werden, um Funktionen die in der Datei definiert sind, also Methoden
+aufzurufen. Zusätzlich kann durch den C<isa> Parameter (siehe unten) eine
+Vererbungshierachie zwischen Embperlseiten aufgebaut werden. Außerdem ist
+es möglich in dem Hash Objektdaten zu speichern.
+
+  Beispiel:
+
+  [# Die Datei eposubs.htm definiert zwei Funktionen: txt1 und txt2 #]
+  [# Als erstes erstellen wir ein neues Objekt #]
+  [- $subs = Execute ({'object' => 'eposubs.htm'}) -]
+
+  [# Nun kann man Methoden aufrufen #]
+  txt1: [+ $subs -> txt1 +] <br>
+
+  txt2: [+ $subs -> txt2 +] <br>
+
+
+=item B<isa>  (ab 1.3.1b1)
+
+Erwarten den Namen einer Datei und schiebt den Packagename der Datei
+auf das @ISA Array der aktuellen Seite. Dadurch wird es möglich eine
+Vererbung zwischen Embperlseiten aufzubauen. Dies ist auch innerhalb
+von I<EmbperlObject> hilfreich.
+
+  Beispiel:
+
+    [! Execute ({'isa' => '../eposubs.htm'}) !]
+
+=item B<syntax>  (ab 1.3.2)
+
+In der Version 1.3.x wird lediglich der Wert 'Text' akzetiert, dieser
+führt dazu, dass das Verhalten von Embperl 2.0 emuliert wird und 
+der Text lediglich durchgereicht wird und keine Verarbeitung
+stattfindet.
+
+=back
+
+
+=head2 Hilfsfunktionen für Execute
+
+=over 4
+
+=item B<HTML::Embperl::Init ($Logfile, $DebugDefault)>
+
+Diese Funktion dient dazu, die Logdatei sowie
+die Debugflags, die für die folgenden Aufrufe von C<Execute> genutzt werden,
+zu setzen. Es kann immer nur eine Logdatei existieren, der Pfad kann jedoch jederzeit
+geändert werden.
+
+=item B<HTML::Embperl::ScanEnvironment (\%params)>
+
+Durchsucht alle Umgebungsvariablen (B<%ENV>) und setzt B<%params> für die Benutzung von C<Execute>. Alle
+Embperl Konfigurationsvariablen, außer EMBPERL_LOG, werden erkannt.
+
+=back
+
+
+=head2 Beispiele für Execute:
+
+ # Quellentext steht unter /pfad/zu/seite.html und
+ # das Ergebnis wird in /pfad/zu/ausgabe.html geschrieben
+
+ HTML::Embperl::Execute ({ inputfile  => '/pfad/zu/seite.html',
+                           outputfile => '/pfad/zu/ausgabe.html'}) ;
+
+
+ # Quellentext steht in einem Skalar und das Ergebnis wird auf der
+ # Standardausgabe ausgegeben
+ # Vergessen Sie nicht, mtime zu ändern wenn $src sich ändert
+
+ $src = '<html><head><title>Seite [+ $no +]</title></head>' ;
+
+ HTML::Embperl::Execute ({ inputfile  => 'irgendein name',
+                           input      => \$src,
+                           mtime      => 1 }) ;
+
+ # Quellentext steht in einem Skalar und das Ergebnis wird in
+ # einen zweiten Skalar geschrieben
+ 
+ my $src = '<html><head><title>Seite [+ $no +]</title></head>' ;
+ my $out ;
+
+ HTML::Embperl::Execute ({ inputfile  => 'anderer name',
+                           input      => \$src,
+                           mtime      => 1,
+                           output     => \$out }) ;
+
+ print $out ;
+
+
+ # Einfügen eines gemeinsammen Kopfes in eine Embperlseite
+ # der sich in /pfad/zu/kopf.html befindet
+ 
+ [- Execute ('/pfad/zu/kopf.html') -]
+ 
+
+
+
+
+=head1 Runtime Konfiguration
+
+Die Runtimekonfiguration wird mittels Umgebungsvariablen eingestellt,
+entweder auf der Befehlszeile oder in der Webserverkonfigurationsdatei.
+Die meisten HTTP Server verstehen
+
+SetEnv <var> <wert>
+
+Wenn Sie I<Apache> und I<mod_perl> nutzen, funktioniert auch
+
+PerlSetEnv <var> <wert>
+
+Der Vorteil von C<PerlSetEnv> gegenüber C<SetEnv> ist, daß unterschiedliche Werte für
+verschiedene Verzeichnisse oder virtuelle Hosts gesetzt werden kann.
+
+
+=head2 EMBPERL_FILESMATCH
+
+Wenn vorhanden, werden von I<Embperl> nur Dateien bearbeitet, die der angegebenen
+B<Perl regular expression> entsprechen. Alle anderen Dateien werden an den Standard
+Apachehandler weitergereicht. Dies ist nütztlich, um Embperl Dokumente und Nicht-Embperl
+Dokumente (z.B. Gifs) in einem Verzeichnis abzulegen.
+EMBPERL_FILESMATCH funktioniert nur unter I<mod_perl>. Beispiel:
+ 
+ # Nur Dateien mit der Endung .htm werden von Embperl bearbeitet
+ PerlSetEnv EMBPERL_FILESMATCH \.htm$
+
+=head2 EMBPERL_ALLOW (ab 1.2b10)
+
+Wenn vorhanden, werden von I<Embperl> nur Dateien bearbeitet, die der angegebenen
+B<Perl regular expression> entsprechen. Die Bearbeitung anderer Dateien wird mit 
+dem Fehlercode FORBIDDEN verweigert. Dies ist vorallem in CGI Mode nützlich, um
+die Serversicherheit zu erhöhen.
+
+=head2 EMBPERL_PATH (ab 1.3b6)
+
+Hier kann eine durch Semikolon (unter Unix auch Doppelpunkte) getrennte Liste von
+Verzeichnissen angegeben werden,
+die I<Embperl> durchsucht, wenn eine Datei verabeitet werden soll und
+der Dateiname keine absolute Pfadangabe enthält und nicht mit
+C<./> (bzw. C<.\> unter Windows) anfängt. Verzeichnisse müssen mit einem
+Slash (C</> bzw. C<\>) abgeschlossen werden, andernfalls wird der Teil als
+Dateiprefix interpretiert. Eine spezielle Behandlung findet statt, wenn
+der Dateiname mit C<../> (bzw. C<..\>) beginnt. Dann wird die selbe Anzahl
+Elemente wie C<../> im Dateinamen sind im Pfad übersprungen.
+
+=head2 EMBPERL_COMPARTMENT
+
+Gibt dem Namen des Compartments für die Opcodemaske an.
+(Siehe L<"(Sichere-)Namensräume und Opcode Restriktionen"> für Details.)
+
+
+=head2 EMBPERL_ESCMODE
+
+Gibt den Anfangswert für L<"$escmode"> an (siehe unten).
+
+
+=head2 EMBPERL_LOG
+
+Pfad für die Embperl Logdatei. Diese enthält Informationen darüber, wie
+Embperl den eingebetteten Perlcode ausführt. Wieviele Informationen geschrieben
+werden hängt von der Einstellung der Debugflags ab  (siehe L<"EMBPERL_DEBUG">).
+Default ist F</tmp/embperl.log>.
+
+B<HINWEIS:> Unter I<mod_perl> muß C<EMBPERL_LOG> mittels C<PerlSetEnv> gesetzt werden,
+damit es schon bei Serverstart wahrgenommen wird.
+
+
+=head2 EMBPERL_PACKAGE
+
+Name des Packages in dem der Code ausgeführt wird. Wenn kein Package
+angegeben ist, erzeugt Embperl für jede Datei einen eindeutigen Packagenamen.
+Dies verhindert, dass globale Variablen zweier Skripts miteinander in
+Konflikt geraten. 
+
+=head2 EMBPERL_VIRTLOG
+
+Gibt eine URI an, unter der die Embperl Logdatei mittels des Browsers abgerufen
+werden kann. Dieses Feature ist gesperrt, wenn C<EMBPERL_VIRTLOG> nicht gesetzt ist.
+Siehe auch L<"EMBPERL_DEBUG"> und L<"dbgLogLink"> für ein Beispiel, wie dies in
+Webserverkonfiguration eingestellt werden kann.
+
+
+=head2 EMBPERL_OPTIONS
+
+Diese Bitmaske gibt diverse Optionen für die Ausführung von Embperl an.
+Damit können bestimmte Features von I<Embperl> gesperrt oder freigegeben
+sowie das Verhalten von Embperl beeinfluß werden. Um mehrere Optionen anzugeben
+sind die Werte zu addieren.
+
+=over 4
+
+=item optDisableVarCleanup = 1
+
+Cleanup wird nicht nach jedem Request ausgeführt.
+
+=item optDisableEmbperlErrorPage = 2
+
+Führt dazu, dass I<Embperl> im Fehlerfall nicht seine eigene Fehlerseite
+anzeigt, sondern so viel wie möglich der Seite. Fehler werden
+lediglich in die Logdatei geschrieben.
+Ohne diese Option sendet I<Embperl> seine eigne Fehlerseite, die
+alle Fehler, die aufgetreten sind, anzeigt. Wenn L<"dbgLogLink">
+gesetzt ist,werden alle Fehler als Links auf die Logdatei dargestellt.
+Diese Option hat keinen Effekt, wenn L<"optReturnError"> gesetzt ist.
+
+=item optReturnError = 262144
+
+Wenn diese Option gesetzt ist, sendet Embperl keine Fehlerseite, sondern
+liefert den Fehlercode an Apache oder das aufrufende Programm zurück.
+Unter I<Apache> ermöglicht dies die C<ErrorDocument> Anweisung zu benutzen,
+um eine eigene Fehlerseite anzuzeigen. Innerhalb des ErrorDokuments ist es
+möglich die Embperlfehlermeldungen mittels
+
+  $errors = $req_rec -> prev -> pnotes('EMBPERL_ERRORS') ;
+
+zu ermitteln, wobei C<$errors> eine Arrayreferenz ist. (1.3b5+)
+
+=item optShowBacktrace = 0x8000000
+
+Wenn gesetzt wird bei der Ausgabe von Fehlermeldungen zusätzlich eine Liste
+aller Dateien ausgegeben diese die aktulle Sourcedatei aufgerufen haben.
+
+=item optSafeNamespace = 4
+
+Veranlasst I<Embperl> den Code in einem sicheren Namensraum auszuführen.
+Dadurch ist es nicht mehr möglich auf Daten außerhalb des Packages zuzugreifen.
+(Siehe L<"(Sichere-)Namensräume und Opcode Restriktionen"> für Details.)
+
+=item optOpcodeMask = 8
+
+Veranlasst I<Embperl> eine Operator Maske anzuwenden. Dadurch ist es möglich,
+bestimmte, unsichere, Opcodes zu sperren.
+(Siehe L<"(Sichere-)Namensräume und Opcode Restriktionen"> für Details.)
+
+
+=item optRawInput = 16
+
+Veranlasst I<Embperl> den Quellentext unangetastet zu lassen, lediglich
+Return-Zeichen werden entfernt, da Perl 5.004 dies nicht akzeptiert.
+Diese Option sollte aufjeden Fall gesetzt werden, wenn Sie Ihren Quellentext
+mit einem Ascii Editor schreiben.
+
+Wenn Sie jedoch einen (WYSIWYG) HTML-Editor benutzen, welcher unerwünschte HTML Tags
+in den Perlcode einfügt und spezielle Zeichen HTML-Kodiert (z.B. '<' als &lt;), dann
+sollten Sie diese Option B<nicht> setzen.
+I<Embperl> konvertiert dann das HTML automatisch in den Perlcode zurück, wie Sie ihn
+im Editor eingegeben haben.
+
+=item optEarlyHttpHeader = 64
+
+Normalerweise werden die HTTP Header von I<Embperl> gesendet, nachdem der Request
+bearbeitet wurde. Dies ermöglicht, während der Bearbeitung des Dokuments beliebige
+Header zu setzen und Embperl kann den C<Content-Length> Header berechnen.
+Außerdem erzeugt Embperl eine Fehlerseite, statt des Dokuments, falls Fehler
+auftreten. 
+Um dies zu erreichen, wird die Ausgabe zwischengespeichert bis der Request abgearbeitet wurde,
+dann werden zuerst die HTTP Header und danach das Dokument gesendet.
+Dieses Flag führt dazu, das die Header sofort, vor der Ausführung des Dokuments, gesendet
+werden und die Ausgabe nicht gepuffert ist.
+
+=item optDisableChdir = 128
+
+Ohne diese Option setzt I<Embperl> das aktuelle Verzeichnis entsprechend dem
+Verzeichnis, in dem das ausgeführte Skript steht. Dies ermöglicht es innerhalb
+der Embperlseite relative Pfadnamen zu benutzen. Da der Verzeichniswechsel,
+u.U. einige Zeit in Anspruch nimmt, kann er mit dieser Option verhindert werden.
+
+=item optDisableFormData = 256
+
+Diese Option verhindert das Setzen von %fdat und @Z<>ffld. I<Embperl> ignoriert
+die gesendeten Formulardaten vollständig.
+
+=item optDisableHtmlScan = 512
+
+Wenn gesetzt, verhindet diese Option das Bearbeiten B<aller> HTML Tags vollständig.
+I<Embperl> sucht dann nur noch nach <[+/-/!/$ ... $/!/-/+]> Blöcken. Dies schaltet
+dynamische Tabellen, Formularbearbeitung usw. ab.
+
+=item optDisableInputScan = 1024
+
+Verhindert die Bearbeitung aller Eingabe Tags. (<INPUT><TEXTAREA><OPTION>)
+
+=item optDisableTableScan = 2048
+
+Verhindert die Bearbeitung aller Tabellen Tags. (<TABLE><TH><TR><TD><MENU><OL><UL>)
+
+=item optDisableSelectScan = 8388608 (0x800000) (ab 1.3b7)
+
+Verhindert die Bearbeitung aller SELECT Tags. (<SELECT>)
+
+=item optDisableMetaScan = 4096
+
+Verhindert die Bearbeitung aller Meta Tags. (<META HTTP-EQUIV>)
+
+=item optAllFormData = 8192
+
+Diese Option veranlasst I<Embperl> all Formularfelder in L<%fdat> und L<@ffld> einzufügen,
+auch wenn sie leer sind. Leere Formularfelder werden als leere Zeichenkette eingefügt.
+Ohne diese Option werden leere Formularfelder nicht zu %fdat und @Z<>ffld hinzufügt.
+
+
+=item optRedirectStdout = 16384
+
+Leitet die Standardausgabe vor jedem Request auf dem Embperlausgabestrom um und setzt sie
+anschließend zurück. Wenn die Option gesetzt ist kann das normale Perl B<print> benutzt 
+werden, um Ausgaben vorzunehmen. Ansonsten sind Ausgaben nur mittels eines [+ ... +] Blocks
+oder durch Ausgeben auf die Dateihandle B<OUT> möglich.
+
+
+=item optUndefToEmptyValue = 32768
+
+Normalerweise, wenn Embperl für ein Eingabefeld keinen Wert in B<%fdat> findet, läßt
+es das HTML Tag unverändert. Mit dieser Option behandelt Embperl das Feld so, als
+wäre eine leere Zeichenkette in %fdat für dieses Feld, d.h. wenn kein C<VALUE>
+Attribut vorhanden ist fügt Embperl ein C<VALUE=""> ein.
+
+=item optNoHiddenEmptyValue = 65536 (ab 1.2b2)
+
+Mit dieser Option erzeugt I<Embperl> beim Hidden Metacommand keine Hidden-Felder
+für leere Zeichenketten.
+
+=item optAllowZeroFilesize = 131072 (ab 1.2b2)
+
+Dokumente der Dateilänge Null führen normalerweise zu einem Fehler "NOT_FOUND (404)".
+Mit dieser Option liefert Embperl ein leeres Dokument zurück.
+
+=item optKeepSrcInMemory =  524288  (ab 1.2b5) 
+
+Veranlasst I<Embperl> den Quellencode des Dokuments im Speicher zuhalten.
+(Der compilierte Perlcode wird immer im Speicher gehalten, unabhänig von diesem
+Flag). 
+
+=item optKeepSpaces = 1048576 (ab 1.2b5) 	       = 0x100000,
+
+Verhindert das Entfernen von Leerzeilen und Zwischenräumen. Dies ist
+sinnvoll für Nicht-HTML-Dokumente.
+
+=item optOpenLogEarly =  2097152 (ab 1.2b5) 
+
+Diese Option veranlaßt I<Embperl> die Logdatei zu öffnen, sobald es geladen wird.
+Dies kann genutzt werden, wenn I<Embperl> unter I<mod_perl> mittels C<PerlModule>
+geladen wird, um die Logdatei als B<root>, statt des nicht-privilegierter
+Benutzers, zu öffnen.
+
+=item optUncloseWarn =   4194304 (ab 1.2b6) 
+
+Verhindert das I<Embperl> eine Warnung über nicht abgeschlossene C<if>, C<while>, C<table>, etc.
+am Dateiende ausgibt.
+
+
+=back
+
+
+
+=head2 EMBPERL_DEBUG
+
+Diese Bitmaske gibt an, welche Informationen in die Logdatei geschrieben werden.
+Um mehrere Optionen anzugeben
+sind die Werte zu addieren.
+
+=over 4
+
+=item dbgStd = 1
+
+Minimale Informationen.
+
+=item dbgMem = 2
+
+Speicherverwaltung.
+
+=item dbgEval = 4
+
+Zeigt den Code und das Resultat beim Ausführen von Perl.
+
+=item dbgCmd = 8
+
+Schreibt alle Metacommands und HTML Tags, die ausgeführt werden, in die Logdatei.
+
+=item dbgEnv = 16,
+
+Listet alle Umgebungsvariablen.
+
+=item dbgForm = 32
+
+Listet die an das Dokument gesandten Formulardaten.
+
+=item dbgTab = 64
+
+Zeigt die Bearbeitung von dynamischen Tabellen.
+
+=item dbgInput = 128
+
+Zeigt die Bearbeitung von Eingabefeldern.
+
+=item dbgFlushOutput = 256
+
+Führt ein C<flush> nach jeder Ausgabe aus.
+Dies dient lediglich zum Debuggen von Abstürzen und führt normalerweise
+zu einer deutlichen Verlangsamung der Ausgabe.
+
+=item dbgFlushLog = 512
+
+Führt ein C<flush> nach jedem Schreiben in die Logdatei aus.
+Dies dient lediglich zum Debuggen von Abstürzen und führt normalerweise
+zu einer deutlichen Verlangsamung der Verarbeitung.
+
+=item dbgAllCmds  = 1024
+
+Schreibt alle Metacommands und HTML Tags in die Logdatei, unabhänig davon
+ob sie ausgeführt werden oder nicht. Ein '+' kennzeichnet dabei, dass Embperl
+diesen Befehl ausführt. 
+
+=item dbgSource = 2048
+
+Schreibt jeweils den nächsten Teil des Quellencodes in die Logdatei, der
+ausgeführt wird. (Dadurch kann die Logdatei recht umfangreich werden)
+
+=item dbgFunc = 4096
+
+Diese Option ist nur verfügbar, wenn I<Embperl> mit C<-DEPDEBUGALL>
+übersetzt wurde. Wenn gesetzt, werden alle Embperl internen Funktionsaufrufe
+in die Logdatei geschrieben. Dient dem Debuggen von I<Embperl> selbst.
+
+=item dbgLogLink = 8192
+
+Fügt oben auf jeder Seite einen Link ein, der dazu benutzt werden kann,
+die Logdatei für diesen Request anzuzeigen. Siehe auch L<"EMBPERL_VIRTLOG">.
+
+ Beispiel:
+
+    SetEnv EMBPERL_DEBUG 10477
+    SetEnv EMBPERL_VIRTLOG /embperl/log
+
+    <Location /embperl/log>
+    SetHandler perl-script
+    PerlHandler HTML::Embperl
+    Options ExecCGI
+    </Location>
+
+=item dbgDefEval = 16384
+
+Erzeugt jedesmal einen Eintrag in der Logdatei, wenn neuer Perlcode übersetzt wird.
+
+
+=item dbgHeadersIn = 262144
+
+Schreibt alle  HTTP Header in die Logdatei.
+
+=item dbgShowCleanup = 524288
+
+Gibt jede Variable, sowie deren Wert, die am Ende des Request "aufgeräumt"
+wird, aus.
+
+=item dbgProfile = 1048576 (ab 1.2b4) 
+
+Wenn gesetzt, wird für jede Quellencodezeile die Zeit, seit dem Start des
+Requests, ausgegeben. (B<dbgSource> muß ebenfalls gesetzt sein)
+
+=item dbgSession = 2097152 (ab 1.2b4) 
+
+Empfangen und Senden von Session cookies wird geloggt.
+
+=item dbgImport =  4194304 (ab 1.2b5) 
+
+Zeigt, wie Funktionen in andere Packages importiert werden.
+
+
+=back
+
+Ein guter Wert für den Anfang ist C<2285> oder C<10477>. Letzteres ermöglicht das
+Anzeigen der Logdatei via Browser (C<EMBPERL_VIRTLOG> muß ebenfalls gesetzt sein.)
+
+
+=head2 EMBPERL_INPUT_FUNC
+
+Diese Konfigurationsanweisung ermöglicht, statt den Quellentext
+aus einer Datei zu lesen (oder ihn einem Skalar zu entnehmen), die 
+angegebene Funktion aufzurufen, welche für das Bereitstellen des
+Quellentextes verantwortlich ist.
+Die Funktion muß folgendermaßen aussehen:
+
+ InputFunc ($r, $in, $cacheargs, weitere Parameter...) ;
+
+=over 4
+
+=item B<$r>
+
+Apache Request Record (siehe B<perldoc Apache>)
+
+=item B<$in>
+
+eine Referenz auf einen Skalar, in welchen der Quellentext abgelegt werden soll.
+
+ Beispiel:
+
+ open F, "filename" ;
+ local $/ = undef ;
+ $$in = <F> ;
+ close F ;
+
+=item B<$cacheargs>
+
+eine Referenz auf einen Skalar, welcher den Zeitpunkt der letzten Änderungen zurück liefern soll,
+alternativ kann (ab 1.2.1) eine Hashreferenz mit den Elementen C<mtime> und C<inputfile> angegeben werden,
+um das korrekte cachen des vorcompilierten Perlcodes zu ermöglichen.
+
+ Beispiel:
+
+ $$cacheargs = -M "filename" ;
+
+ oder
+
+ $$cacheargs = { mtime => -M "filename", inputfile => "filename" }  ;
+
+
+=back
+
+Es können B<weitere Parameter> (Kommasepariert) in B<EMBPERL_INPUT_FUNC>
+angegeben werden, welche dann an die Funktion durchgereicht werden.
+
+  Beispiel:
+
+  PerlSetEnv EMBPERL_INPUT_FUNC "InputFunc, foo, bar"
+
+  wird zu folgendem Funktionsaufruf
+
+  InputFunc ($r, $in, $mtime, 'foo', 'bar') ;
+
+
+Beispiel für eine Funktion, die das gleiche macht wie I<Embperl>:
+
+ sub Input
+
+    {
+    my ($r, $in, $mtime) = @_ ;
+
+    open F, $r -> filename or return NOT_FOUND ;
+    local $\ = undef ;
+    $$in = <F> ;
+    close F ;
+
+    $$mtime = -M $r -> filename ;
+    
+    return 0 ;
+    }
+
+
+
+Siehe auch L<ProxyInput|"ProxyInput ($r, $in, $mtime, $src, $dest)">,
+für eine Funktion die von I<Embperl> bereit gestellt wird.
+
+HINWEIS: Es gibt weiterhin zwei Module (I<HTML::EmbperlChain> und I<Apache::EmbperlFilter>)
+die die Möglichkeit bieten I<Embperl> und andere Module zu verketten.
+
+
+=head2 EMBPERL_OUTPUT_FUNC
+
+Diese Konfigurationsvariable erlaubt das Angeben einer Funktion, die die
+Ausgabe erledigt. Die Funktion muß folgende Form haben:
+
+ OutputFunc ($r, $out, weitere Parameter...) ;
+
+
+=over 4
+
+=item B<$r>
+
+Apache Request Record (siehe B<perldoc Apache>)
+
+=item B<$out>
+
+Referenz auf einen Skalar, welcher die Ausgabe von I<Embperl> enthält.
+
+
+=back
+
+Es können B<weitere Parameter> (Kommasepariert) in B<EMBPERL_INPUT_FUNC>
+angegeben werden, welche dann an die Funktion durchgereicht werden.
+
+  Beispiel:
+
+  PerlSetEnv EMBPERL_OUTPUT_FUNC "OutputFunc, foo, bar"
+
+  wird zu folgendem Funktionsaufruf
+
+  OutputFunc ($r, $out, 'foo', 'bar') ;
+
+
+Beispiel für eine Funktion, die das gleiche macht wie I<Embperl>:
+
+ sub Output
+
+    {
+    my ($r, $out) = @_ ;
+
+    $r -> send_http_header ;
+
+    $r -> print ($$out) ;
+
+    return 0 ;
+    }
+
+
+
+Siehe auch L<LogOutput|"LogOutput ($r, $out, $basepath)">,
+für eine Funktion die von I<Embperl> bereit gestellt wird.
+
+HINWEIS: Es gibt weiterhin zwei Module (I<HTML::EmbperlChain> und I<Apache::EmbperlFilter>)
+die die Möglichkeit bieten I<Embperl> und andere Module zu verketten.
+
+=head2 EMBPERL_MAILHOST
+
+Gibt den Rechner an, der von der L<MailFormTo|"MailFormTo($MailTo, $Subject, $ReturnField)"> 
+Funktion als SMTP Server genutzt wird.
+Default ist B<localhost>.
+
+=head2 EMBPERL_MAILHELO (ab 1.3b4)
+
+Gibt den Rechner/die Domain an, der von der L<MailFormTo|"MailFormTo($MailTo, $Subject, $ReturnField)"> 
+Funktion im HELO/EHLO Befehl angegeben wird.
+Normalerweise setzt I<Net::SMTP> einen sinnvollen Defaultwert ein. In
+Abhänigkeit von der Installation kann es jedoch manchmal nötig sein
+diesen Wert von Hand zu setzen.
+
+=head2 EMBPERL_MAILFROM (ab 1.2.1)
+
+Gibt die Absender EMail-Adresse an die von der L<MailFormTo|"MailFormTo($MailTo, $Subject, $ReturnField)"> 
+Funktion genutzt wird.
+Default ist B<www-server@server_name>.
+
+=head2 EMBPERL_MAILDEBUG (ab 1.2.1)
+
+Debugeinstellung für Net::SMTP. Default ist 0.
+
+=head2 EMBPERL_MAIL_ERRORS_TO (ab 1.2b6) 
+
+Wenn hier eine E-Mail Adresse angegeben ist, wird beim Auftreten eines
+Fehlers, ein E-Mail mit den
+Fehlermeldungen an diese Adresse versandt.
+
+=head2 EMBPERL_SESSION_CLASSES
+
+Hier wird, durch Leerzeichen getrennt, die Klasse für Object Store und Lock Manager (und
+optional für die Serialisierung und das Generieren der ID) von 
+I<Apache::Session> angegeben (siehe L<"Session Handling"|"Session Handling (ab 1.2b2)">)
+
+=head2 EMBPERL_SESSION_ARGS
+
+Liste von zusätzlichen Parametern für I<Apache::Session> Klassen (Leerzeichen getrennt)
+(siehe L<"Session Handling"|"Session Handling (ab 1.2b2)">). 
+Argumente die Leerzeichnen enthalten, müssen in Anführungszeichen geschriebene werden.
+Beispiel:
+
+  PerlSetEnv EMBPERL_SESSION_ARGS "DataSource=dbi:mysql:session UserName=www 'Password=secret word'"
+
+=head2 EMBPERL_SESSION_HANDLER_CLASS (ab 1.3b3)
+
+Bestimmt die Klasse die das Session Handling für I<Embperl> durchführt.
+Default war bis 1.3.3 I<HTML::Embperl::Session>. Ab 1.3.4 ist der Default 
+I<Apache::SessionX>. Um das alte Sessionhandling zu verwenden, können Sie den
+Parameter auf I<HTML::Embperl::Session> setzen. Sie können eine eigene Klasse von 
+I<Apache::SessionX> ableiten und diese hier angeben um Ihr eigenes
+Session Handling zu implementieren.
+
+=head2 EMBPERL_COOKIE_NAME (ab 1.2b4) 
+
+Gibt den Namen des Cookies an, das I<Embperl> benutzt, um die Session Id zu senden.
+Default ist EMBPERL_UID.
+
+=head2 EMBPERL_COOKIE_DOMAIN (ab 1.2b4) 
+
+Gibt die Domain des Cookies an, das I<Embperl> benutzt, um die Session Id zu senden.
+Default ist keine Domain.
+
+=head2 EMBPERL_COOKIE_PATH (ab 1.2b4) 
+
+Gibt den Pfad des Cookies an, das I<Embperl> benutzt, um die Session Id zu senden.
+Default ist kein Pfad.
+
+=head2 EMBPERL_COOKIE_EXPIRES (ab 1.2b4) 
+
+Gibt den Ablaufzeitpunkt des Cookies an, das I<Embperl> benutzt, um die Session Id zu senden.
+Es kann ein vollständiges Datum oder (ab 1.3b5) relative Werte angegeben werden.
+Beispiele: +30s +10m +1h -1d +3M +10y
+Default ist kein Ablaufzeitpunkt.
+
+
+
+=head1 Syntax
+
+Embperl versteht zwei Katagorien von Befehlen. Die erste Kategorie sind
+spezielle I<Embperl> Befehle, die zweite besteht aus einer Reihe von
+HTML Tags, die spezielle Funktionen anstoßen.
+
+Bevor I<Embperl> Befehle bearbeitet (ebenso für Argumente von HTML Tags,
+die von I<Embperl> bearbeitet werden), werden alle HTML Tags, die sich innerhalb des
+Perlcodes befinden, entfernt und HTML kodierte Zeichen werden in ihre Ascii
+Äquvivalente umgewandelt, so daß sie der Perlinterpreter versteht.
+Dies ist nötig, um HTML Seiten, die von (WYSIWYG) HTML-Editoren erzeugt werden,
+zu verarbeiten. (z.B. um ein <BR> innerhalb des Perlcodes zu entfernen, welches
+der HTML Editor in den Perlcode eingefügt hat, an einer Stelle, wo lediglich ein
+Zeilenumbruch sein sollte.) 
+Um dieses zu unterbinden, können HTML Tags und HTML kodierten Zeichen (beides nur
+innerhalb des Perlcodes) ein Backslash ('\') vorangestellt werden.
+
+B<WICHTIGER HINWEIS:> Wenn Sie einen Ascii Editor benutzen, um Ihre HTML Dokumente
+zu schreiben, sollten Sie die Option L<optRawInput> setzen. Dies verhindert das 
+I<Embperl> den Quellentext in der oben beschriebenen Weise vorverarbeitet.
+
+B<Sollten Sie Probleme mit Ihrem Code haben, speziell mit HTML Tags oder
+Dateihandles, versichern Sie sich, daß Sie die Ein- und Ausgabekodierung und
+-dekodierung, die Embperl durchführt, verstanden haben. Weitere Hinweise finden sich
+im Abschnitt L<"Inside Embperl"|"Inside Embperl - Wie der Embedded Perl Code intern ausgeführt wird">
+und in den FAQs.>
+
+Alle I<Embperl> Befehle fangen mit einer eckigen Klammer ('[') an und Enden mit
+der geschlossenen eckigen Klammer (']'). Um eine normale '[' im HTML Text zu erhalten,
+ist es nötig '[[' zu schreiben.
+
+I<Embperl> benutzt keine HTML Kommentare (z.B. <! ... !>) oder andere spezielle
+HTML Tags, da es mit manchen HTML Editoren nicht, oder nur sehr umständlich,
+möglich ist, diese zu erzeugen. Da '[' von den HTML Editoren als normaler Text interpretiert wird,
+sollte es damit keinerlei Probleme geben, es vereinfacht in den meisten Fällen das schreiben 
+der Dokumente erheblich.
+
+
+=head2 [+ Perl Code +]
+
+Ersetzt den Befehl durch das Resultat der Ausführung des Perl codes.
+C<Perl Code> kann dabei beliebiger Perl code sein.
+
+Beispiel:
+
+
+ [+ $a +]        Ersetzt [+ $a +] mit dem Inhalt der Variablen $a.
+
+ [+ $a+1 +]      Beliebige Ausdrücke können benutzt werden.
+
+ [+ $x[$i] +]    Auch Arrays, Hashs oder komplexere Ausdrücke sind kein Problem
+
+B<HINWEIS:> Leerzeichen werden ignoriert.  Die Ausgabe wird automatisch HTML kodiert
+(z.B. wird '<' zu '&lt;'). Die Ausgabekodierung kann mit der Variablen
+L<$escmode> gesteuert werden.
+
+
+=head2 [- Perl Code -]
+
+Führt den C<Perl Code> aus. In der Ausgabe wird dieser Befehl jedoch vollständig entfernt.
+
+Beispiel:
+
+ [- $a=1 -]            Setzt die Variable $a auf 1.
+
+ [- use SomeModule -]  Andere Perlmodule können genutzt werden.
+
+ [- $i=0; while ($i<5) {$i++} -]  Auch komplexer Code kann verwendet werden.
+ 
+B<HINWEIS:> Perlbefehle, wie C<if>, C<while>, C<for>, etc., müssen innerhalb eines
+I<Embperl> Blockes abgeschlossen werden. Es ist nicht möglich das C<if> in einem
+Block zu schreiben und die abschließenden Klammer ('}') in einem anderen Block.
+Dies ist nur mit L<[* Perl Code *]> Blöcken möglich.
+
+B<HINWEIS:> Um Perlfunktionen zu definieren, benutzen Sie L<"[! Perl Code !]"> (siehe unten)
+da dies vermeidet, dass die Funktion bei jedem Aufruf neu übersetzt wird.
+
+
+=head2 [! Perl Code !]
+
+Wie L<[- Perl Code -]> wird aber nur beim ersten Aufruf des Dokuments ausgeführt.
+Dies kann genutzt werden, um Perlfunktionen zu definieren oder einmalige Initialisierungen
+auszuführen.
+
+
+=head2 [* Perl Code *]
+
+(ab 1.2b2)
+
+Ähnlich wie L<C<[- Perl Code -]>>. Der Hauptunterschied ist, daß C<[- Perl Code -]> Blöcke immer
+ihren eigenen Gültigkeitsbereich haben, während C<[* Perl Code *]> Blöcke im selben 
+Gültigkeitsbereich ablaufen.
+Dies ermöglicht lokale Variablen (mit C<local>) mit einem Gültigkeitsbereich, der die ganze Seite
+umfasst, zu definieren. Normalerweise ist es nicht nötig lokale Variablen zu definieren, da
+Embperl jedem Dokument einen eigenen Namensraum zuordnet und die globalen Variablen nach jedem
+Request wieder aufgeräumt werden. In speziellen Fällen (z.B. um eine I<Embperl> Seite rekursiv mittes L<Execute>
+aufzurufen), ist es jedoch hilfreich.
+
+Ein zweiter Grund ist, die Möglichkeit Perlbefehle zu nutzen, die sich über
+mehrere Blöcke hinziehen. Perls C<if>, C<while>, C<for>, etc. können sich
+nicht über mehrere L<C<[- Perl Code -]>> Blöcke hinziehen, jedoch sehr wohl
+über mehrere L<C<[* Perl Code *]>> Blöcke.
+
+Beispiel:
+
+  [* foreach $i (1..10) { *]
+    
+    [- $a = $i + 5 -]
+    Schleifenzähler + 5 = [+ $a +] <br>
+
+  [* } *]
+
+Folgendes hingegen funktioniert B<nicht>:
+
+  [- foreach $i (1..10) { -]
+    irgendwelcher Text <br>
+  [- } -]
+
+Der selbe Effekt kann mit  I<Embperl> L<Meta Commands|"[$ Cmd Arg $]  (Meta-Commands)">
+erzielt werden (siehe unten)
+
+  [$ foreach $i (1..10) $]
+    
+    [- $a = $i + 5 -]
+    Schleifenzähler + 5 = [+ $a +] <br>
+
+  [$ endforeach $]
+
+B<HINWEIS 1:> C<[* ... *]> Blöcke B<müssen> immer mit B<;>,B<{> oder B<}> enden!
+
+B<HINWEIS 2:> C<[* ... *]> Blöcke können nicht innerhalb eines HTML Tags, welches
+von I<Embperl> interpretiert wird, verwendet werden.
+(Außer die Bearbeitung des entsprechden Tags wurde ausgeschaltet)
+
+B<HINWEIS 3:> Da die Ausführung von C<[- ... -]> Blöcken durch I<Embperl> gesteuert
+wird, kann I<Embperl> deutlich detailliertere debugging Ausgaben in der Logdatei
+dafür erzeugen. Außerdem existieren für C<[- ... -]> keinerlei Restriktionen, wo sie
+genutzt werden können.
+
+
+=head2 [# Text #]  (Kommentar)
+
+(ab1.2b2)
+
+Dies ist ein Kommentarblock. Alles zwischen C<[#> und C<#]> wird aus dem HTML Dokument
+entfernt, bevor es zum Browser gesandt wird.
+
+B<HINWEIS 1:> C<[* ... *]> Blöcke werden vor Kommentarblöcken ausgewertet, deshalb werden
+sie auch innerhalb von Kommentarblöcken ausgeführt.
+
+B<HINWEIS 2:> Alles innerhalb des Komentarblocks (außer C<[* ... *]>) wird aus dem Quellentext entfernt,
+deshalb ist es möglich, Teile des Dokuments damit auszukommentieren.
+
+
+=head2 [$ Cmd Arg $]  (Meta-Commands)
+
+Ausführen eines I<Embperl> Meta-Commands.  B<Cmd> kann einer der folgenden
+Befehle sein:
+(B<Arg> variiert, je nach Befehl).
+
+=over 4
+
+=item B<if>, B<elsif>, B<else>, B<endif>
+
+Alles nach dem B<if> Meta-Command bis zum B<else>,
+B<elsif> oder B<endif> wird nur ausgegeben, wenn der Perlausdruck, welcher durch
+B<Arg> gegeben ist, I<wahr> ist.  B<else> und B<elsif> funktionieren entsprechend.
+
+Beispiel:
+
+ [$ if $ENV{REQUEST_METHOD} eq 'GET' $]
+ Methode ist GET<BR>
+ [$ else $]
+ Andere Methode als GET wurde benutzt<BR>
+ [$ endif $]
+
+Dieses Beispiel sendet einen der zwei Sätze zum Browser, in Abhänigkeit davon,
+ob die GET-Methode benutzt wurde, um dieses Dokument abzurufen.
+
+=item B<while>, B<endwhile>
+
+Führt eine Schleife aus, bis B<Arg> des B<while> Befehls I<falsch> ist.
+
+Beispiel: (siehe auch eg/x/loop.htm aus der Embperl Distribution)
+
+ [- $i = 0; @k = keys %ENV -]
+ [$ while ($i &lt; $#k) $]
+ [+ $k[$i] +] = [+ $ENV{$k[$i]} +]<BR>
+ [- $i++ -]
+ [$ endwhile $]
+
+Dies sendet alle Umgebungsvariablen zum Browser.
+
+B<HINWEIS>: '&lt;' wird zu '<' bevor es vom Perlinterpreter ausgeführt wird,
+außer L<optRawInput> ist gesetzt.
+
+=item B<do>, B<until>
+
+Führt eine Schleife aus, bis B<Arg> des B<until> Befehls I<wahr> ist.
+
+Beispiel:
+
+ [- $i = 0 -]
+ [$ do $]
+     [+ $i++ +] <BR>
+ [$ until $i > 10 $]
+
+=item B<foreach>, B<endforeach>
+
+Führt eine Schleife aus, für jedes Element des Array, welches als zweites
+in B<Arg> steht, wobei die Variable, die als erstes in B<Arg> angegeben ist,
+auf den entsprechenden Wert gesetzt wird.
+
+Beispiel:
+
+ [- @arr = (1, 3, 5) -]
+ [$ foreach $v @arr $]
+     [+ $v +] <BR>
+ [$ endforeach $]
+
+
+=item B<hidden>
+
+B<Arg> gibt keinen, einen oder zwei Hashs an (mit oder ohne
+führendes '%' Zeichen) und ein optionales Array als dritten Parameter.
+C<hidden> erzeugt versteckte Eingabefelder für alle Werte, die im ersten Hash,
+jedoch nicht im zweiten Hash, enthalten sind. Default ist
+C<%fdat> und C<%idat>. Wenn der dritte Parameter angegeben ist, gibt er die
+Reihenfolge der Felder an. Default ist C<@ffld>.
+Wenn Sie keine Parameter angeben, erzeugt I<Embperl> für alle Werte, die
+an dieses Dokument geschickt wurden (in C<%fdat> stehen), verstecke
+Eingabefelder, soweit dafür nicht schon andere Eingabefelder existieren.
+Dies ist nützlich, um Werte zwischen mehreren Formularen zu transportieren.
+
+
+Beispiel: (siehe auch eg/x/input.htm aus der Embperl Distribution)
+
+    <FORM ACTION="inhalt.htm" METHOD="GET">
+	<INPUT TYPE="TEXT" NAME="field1">
+    [$ hidden $]
+    </FORM>
+
+Wenn Sie dieses Dokument mit 
+    
+    http://host/doc.htm?field1=A&field2=B&field3=C
+
+aufrufen, erzeugt I<Embperl> folgende Ausgabe:
+
+    <FORM ACTION="inhalt.htm" METHOD="GET">
+	<INPUT TYPE="TEXT" NAME="feld1" VALUE="A">
+	
+    <INPUT TYPE="HIDDEN" NAME="field2" VALUE="B">
+    <INPUT TYPE="HIDDEN" NAME="field3" VALUE="C">
+    </FORM>
+
+
+
+=item B<var>
+
+Das C<var> Meta-Command definert eine oder mehrere Variablen zur Benutzung
+innerhalb dieser Embperlseite und setzt das 
+B<strict> Pragma. Die Variablennamen müssen durch Leerzeichen getrennt werden.
+
+Beispiel:
+	
+	[$var $a %b @c $]
+
+Dies entspricht dem folgendem Perl code:
+
+	use strict ;
+	use vars qw($a %b @c) ;
+
+B<HINWEIS>: 'use strict' innerhalb eines I<Embperl> Dokuments gilt nur innerhalb des Blockes, 
+in dem es erscheint.
+
+
+=item B<sub>
+
+(ab Embperl 1.2b5)
+
+Definiert eine Embperl-Funktion. Beispiel:
+
+  [$ sub foo $]
+    <p> Hier steht was </p>
+  [$ endsub $]
+
+Diese Funktion kann entweder als normale Perlfunktion aufgerufen werden:
+
+  [- foo -]
+
+oder mittels der L<HTML::Embperl::Execute> Funktion.
+
+  [- Execute ('#foo')           # Kurzform -]
+  [- Execute ({ sub => 'foo'})  # Langform -]
+
+Der Unterschied ist, das I<Embperl> nach dem Aufruf einer Embperl-Funktion
+mittels C<Execute>, die internen Zustände (Optionen, Debugflags etc.) 
+wieder auf die Werte vor dem Aufruf zurücksetzt. Außerdem ist es möglich
+mittels C<Execute> rekursive Funktionsaufrufe zu implementieren.
+
+Es ist ebenfalls möglich Parameter an eine Embperl-Funktion zu übergeben:
+
+  [$ sub foo $]
+    [- $p = shift -]
+    <p> Hier zeigen wir den ersten Parameter [+ $p +]</p>
+  [$ endsub $]
+
+  
+  [- foo ('value') -]
+
+
+Wenn Sie eine Reihe von oft benötigten Funktionen haben, können Sie sie in
+einer I<Embperl> Datei definieren und in Ihre Dokumente importieren:
+
+  [- Execute ({ inputfile => 'mylib.htm', import => 1 }) -]
+
+Dies importiert alle Embperl-Funktionen, die in der Datei F<mylib.htm> 
+definiert sind, in die aktuelle Seite, wo sie dann als normale Perlfunktionen
+aufgerufen werden können.
+
+
+=back
+
+=head2 HTML Tags
+
+I<Embperl> behandelt die folgenden HTML Tags speziell.
+
+=over 4
+
+=item B<TABLE>, B</TABLE>, B<TR>, B</TR>
+
+I<Embperl> kann dynamische Tabellen erzeugen (ein- oder zweidimensional). Dazu
+ist es lediglich nötig, eine Zeile oder Spalte anzugeben, I<Embperl> expandiert
+die Tabelle so weit wie nötig.
+Dies geschieht durch die Benutzung der "magischen" Variablen C<$row>, C<$col>
+oder C<$cnt>. Solange Sie nicht eine der drei Variablen innerhalb einer Tabelle
+benützen, läßt I<Embperl> die Tabelle unverändert.
+
+I<Embperl> überprüft ob C<$row>, C<$col> oder C<$cnt> benutzt werden und wiederholt
+allen Text zwischen <TABLE> und </TABLE>, solange der Block in dem
+C<$row> oder C<$cnt> enthalten sind, ein Ergebnis ungleich I<undef> zurück gibt.
+Aller Text zwischen <TR> und </TR> wird wiederholt, wenn die Variable C<$col>
+benutzt wird und der Block, indem sie vorkommt, einen definierten Rückgabewert hat.
+Rückgabewert ist dabei immer das Ergebnis des letzten Ausdrucks innerhalb des Blocks.
+
+Mittels L<$tabmode> (siehe unten) kann das Tabellenendekriterium variiert werden.
+
+Beispiel: (siehe eg/x/table.htm in der Embperl Distribution für weitere Beispiele)
+
+ [- @k = keys %ENV -]
+ <TABLE>
+     <TR>
+         <TD>[+ $i=$row +]</TD>
+         <TD>[+ $k[$row] +]</TD>
+         <TD>[+ $ENV{$k[$i]} +]</TD>
+     </TR> 
+ </TABLE>
+
+
+Der obige Code zeigt alle Elemente des Array C<@k> (das die Schlüssel von 
+C<%ENV> enthält) an, so dass alle Umgebungsvariablen (wie im Beispiel
+zu I<while>) angezeigt werden. Dabei enthält die erste Spalte den
+Index (ab Null zählend), die zweite Spalte den Variablennamen und
+die dritte Spalte den Wert der Umgebungsvariablen.
+
+
+=item B<TH>, B</TH>
+
+Das <TH> Tag wird als Tabellenüberschrift interpretiert. Wenn die ganze 
+Zeile aus <TH> und </TH>, statt aus <TD> und </TD> besteht, werden die
+Zellen als Spaltenüberschriften interpretiert und nur einmal ausgegeben.
+
+=item B<DIR>, B<MENU>, B<OL>, B<UL>, B<DL>, B<SELECT>, B</DIR>, B</MENU>,
+B</OL>, B</UL>, B</DL>, B</SELECT>
+
+Listen, Menüs und Listboxen werden genau wie eindimensionale Tabellen
+behandelt. Nur L<"$row">, L<"$maxrow">, L<"$col">, L<"$maxcol"> und L<"$tabmode">
+werden beachtet, L<$col> und L<$maxcol> werden ignoriert.  Siehe auch
+F<eg/x/lists.htm> aus der I<Embperl> Distribution für ein Beispiel.
+
+=item B<OPTION>
+
+I<Embperl> prüft ob ein Wert für die entsprechende Option in den
+Formulardaten (C<%fdat>) vorhanden ist. Wenn ja wird die
+Option als I<ausgewählt> angezeigt.
+
+Beispiel:
+
+    <FORM METHOD="POST">
+      <P>Select Tag</P>
+
+      Wenn Sie dieses Dokument mit list.htm?SEL1=x aufrufen,
+      können Sie die Option bestimmen, die angewählt erscheint.
+
+      <P><SELECT NAME="SEL1">
+         <OPTION VALUE="[+ $v[$row] +]">
+            [+ $k[$row] +]
+         </OPTION>
+      </SELECT></P>
+    </FORM>
+
+
+=item B<INPUT>
+
+Das C<INPUT> Tag arbeitet mit den Hashs C<%idat> und C<%fdat> zusammen.
+Wenn das C<INPUT> Tag kein C<VALUE> Attribute hat, jedoch in C<%fdat> ein
+Element, das dem C<NAME> Attribute entspricht, existiert, erzeugt I<Embperl>
+ein C<VALUE> Attribute mit dem Wert aus C<%fdat>.
+Alle Werte der C<INPUT> Tags werden in dem Hash C<%idat>, mit dem Namen 
+des C<INPUT> Tags als Schlüssel und ihrem Wert, gespeichert.
+Für Radiobuttons und Checkboxen (C<TYPE=RADIO> und C<TYPE=CHECKBOX>), wird
+das C<CHECKED> Attribute eingefügt, wenn der Wert des C<VALUE> Attributes
+mit dem Wert in C<%fdat> übereinstimmt, andernfalls wird C<CHECKED>
+entfernt.
+
+Das bedeutet, wenn Sie die Formulardaten an das Dokument selbst schicken
+(die URL des C<ACTION> Attributes entspricht dem aktuellen  Dokument
+oder fehlt ganz), zeigen alle C<INPUT> Tags automatisch die selben 
+Werte an, die der Benutzer vor dem Absenden eingegeben hat.
+
+
+=item B<TEXTAREA>, B</TEXTAREA>
+
+Das C<TEXTAREA> Tag wird genau wie ein normales C<INPUT> Tag behandelt (siehe oben)
+
+
+=item B<META HTTP-EQUIV= ...>
+
+C<META HTTP-EQUIV= ... > überschreibt den entsprechenden HTTP Header. Dies
+verhindert, das Netscape nachfragt, ob das Dokument neu geladen werden soll,
+wenn der Content-Type zwischen C<META HTTP-EQUIV> und HTTP Header unterschiedlich
+ist.
+
+Dies kann ebenfalls benutzt werden, um beliebige HTTP Header zu setzen.
+Unter I<mod_perl> können HTTP Header auch mit der Funktion C<header_out>
+gesetzt werden.
+
+Beispiel:
+
+    <META HTTP-EQUIV="Language" CONTENT="DE">
+
+Das entspricht der Apachefunktion:
+
+    [- $req_rec ->  header_out("Language" => "DE"); -]
+
+=item B<A>, B<EMBED>, B<IMG>, B<IFRAME>, B<FRAME>, B<LAYER>
+
+Die Ausgaben von Perlblöcken innerhalb des C<HREF> Attributes des C<A> Tags und des
+C<SRC> Attributes der anderen Tags werden URL Kodiert, statt HTML Kodiert.
+(siehe auch L<$escmode>). Des weiteren expandiert I<Embperl> Array- und Hashreferenzen
+innerhalb solcher URLs zur URL Parametersyntax. Beispiel:
+
+  [-
+  $A = {A => 1, B => 2} ;  # Hashreference
+  @A = (X, 9, Y, 8, Z, 7)
+  -]
+
+  <A HREF="http://localhost/tests?[+ $A  +]">
+  <A HREF="http://localhost/tests?[+ \@A +]">
+
+wird von I<Embperl> zu Folgendem expandiert:
+
+  <A HREF="http://localhost/tests?A=1&B=2">
+  <A HREF="http://localhost/tests?X=9&Y=8&Z=7">
+
+
+=back
+
+
+=head1 Gültigkeitsbereiche von Variablen und Cleanup
+
+
+Der Gültigkeitsbereich von Variablen, die mit C<my> oder C<local>
+deklariert wurden, endet am Ende des umschließenden C<[+/- ... -/+]>
+Blocks. Der C<[+/- ... -/+]> Block verhält sich in dieser hinsicht
+wie Perls C<{ ... }>.
+
+Globale Variablen (alles was nicht mittels C<my> oder C<local>
+deklariert wurde) werden am Ende jedes Request automatisch wieder
+gelöscht (insofern verhalten sie sich wie Variablen, deren Gültigkeitsbereich
+das gesamte Dokument ist). Dies verhindert Probleme mit Variablen,
+die ihren Wert aus dem vorangegangenen Request behalten haben.
+Das Cleanup wird nur für Variablen innerhalb des Packages, der gerade
+ausgeführten Embperlseite, durchgeführt, d.h. alle Variablen die ohne expliziten
+Packagenamen deklariert wurden. Alle Variablen in anderen Packages
+(z.B. andere Perl Module) bleiben gültig. 
+
+Der Packagename der aktuellen Seite wird normalerweise von I<Embperl>
+eindeutig vergeben, kann aber mittels L<EMBPERL_PACKAGE> explizit
+angegeben werden.
+
+Da CGI Skripte sowieso immer als eigenständiger Prozeß ausgeführt werden,
+ist ein Cleanup bei CGI Skripten nicht nötig.
+
+Sollen Variablen nicht am Ende des Request aufgeräumt werden, müssen sie
+entweder im Hash C<%CLEANUP> (mit Wert 0) eingetragen sein oder innerhalb eines anderen
+Packages (z.B. C<$Persistent::handle>) deklariert werden.
+
+Wenn Sie das C<strict> Pragma (C<use strict>) nutzen wollen, können sie
+Ihre Variablen mittels des C<var> Meta-Commands deklarieren.
+
+B<HINWEIS:> Da I<Apache::DBI>, wie jedes andere Perlmodul, seinen eigenen
+Namensraum hat, funktioniert es ohne Problem zusammen mit I<Embperl>.
+
+Das automatische Cleanup kann mittels L<EMBPERL_OPTIONS> bzw. dem
+L<cleanup> Parameter der L<Execute> Funktion abgeschaltet werden.
+
+Ausnahmen für Variablen, die B<nicht> oder zusätzlich aufgeräumt werden sollen, können
+mittels des Hash L<%CLEANUP> angegeben werden.
+
+Es ist ebenfalls möglich eine Funktion aufrufen zulassen, wenn I<Embperl>
+sein Cleanup durchführt. Soweit definiert, wird die Funktion B<CLEANUP>
+aufgerufen, direkt bevor die weiteren Variablen aufgeräumt werden.
+
+ Beispiel:
+
+  [! sub CLEANUP { $obj -> term ; } !]
+
+
+=head1 Vordefinierte Variablen
+
+I<Embperl> hat einige spezielle Variablen mit einer vorgegebenen Bedeutung.
+
+
+=head2 %ENV
+
+Enthält die selben Umgebungsvariablen, wie bei einem CGI Skript.
+
+=head2 %fdat
+
+Enthält alle Formulardaten, die an das Dokument gesendet wurden.
+Das C<NAME> Attribute bildet den Schlüssel und das C<VALUE>
+Attribute den Wert des Hashelements. Dabei ist es egal, ob die Daten mittels
+C<GET> oder C<POST> übetragen wurden. Existieren mehrere Werte mit dem selben Namen,
+werden diese mittels C<TAB> getrennt. Diese können z.B. mittels folgenden Code in
+ein Array zerlegt werden:
+
+  @array = split (/\t/, $fdat{'fieldname'}) ;
+
+I<Embperl> unterstützt ebenfalls den Kodierungstyp B<multipart/form-data>,
+der für Dateiuploads benutzt wird. Das Element in C<%fdat> enthält dann
+eine Dateihandle (entsprechend CGI.pm), die benutzt werden kann, um die 
+Datei auszulesen.
+
+Dateiupload Beispiel:
+
+HTML Formular:
+
+    <FORM METHOD="POST" ENCTYPE="multipart/form-data">
+      <INPUT TYPE="FILE" NAME="ImageName">
+    </FORM>
+
+Embperl ACTION:
+
+    [- if (defined $fdat{ImageName}) {
+         open FILE, "> /tmp/file.$$";
+	 print FILE $buffer
+           while read($fdat{ImageName}, $buffer, 32768);
+         close FILE;
+       }
+    -]
+	
+Wenn I<CGI.pm> 2.46 oder höher installiert ist, ist es weiterhin möglich den
+Dateinamen (den B<lokalen> Dateinamen, wie er auf seiten des Browsers heißt)
+und Informationen, die von der I<CGI.pm> Funktion C<uploadInfo> zur Verfügung 
+gestellt werden, zu erhalten. Der Dateiname ist in dem entsprechenden
+C<%fdat> Element direkt enthalten. Um auf die B<uploadInfos> zuzugreifen, muß man 
+dem Feldnamen einen Bindestrich voranstellen:
+
+Beispiel:
+
+  # ImageName ist der NAME des Feldes. 
+  # Er durch den im HTML Code angegeben ersetzt werden.
+  Dateiname:     [+ $fdat{ImageName} +] <br>
+  Content-Type:  [+ $fdat{-ImageName} -> {'Content-Type'} +] <br>
+
+B<HINWEIS:> Der Zugriff auf die B<Upload-Infos> erfolgte vor 1.2b11 auf andere
+Art und Weise, die nicht mehr unterstützt wird.
+
+B<HINWEIS:> Dies funktioniert ebenfalls in die andere Richtung. Bei Inputtags deren
+Name einem %fdat Schlüssel entspricht und die kein Value Attribute haben wird
+automatisch der Wert aus %fdat als Value eingesetzt. Siehe L<"HTML Tags"> C<INPUT/OPTION/TEXTAREA>. 
+
+=head2 @ffld
+
+Enthält alle Formularfeldnamen in der Reihenfolge, wie sie vom Browser 
+geschickt wurden. Dies entspricht normalerweise der Reihenfolge, wie
+sie im Formular erscheinen.
+
+=head2 %idat
+
+Enthält alle Werte von allen C<INPUT>, C<TEXTAREA> und C<SELECT/OPTION> Tags,
+die in der Seite vorangehen.
+
+=head2 %udat (ab 1.2b1)
+
+Sie können C<%udat> benutzen, um Daten pro Benutzer zu speichern. Solange Sie nicht
+auf C<%udat> zugreifen passiert gar nichts, sobald jedoch Daten in C<%udat>
+geschrieben werden, erzeugt I<Embperl> eine Session Id und sendet sie mittels eines
+Cookies zum Browser. Die Daten die in C<%udat> abgelegt wurden, werden mittels
+I<Apache::Session> gespeichert. Wenn der B<selbe> Benutzer die nächste I<Embperl> Seite
+aufruft, sendet der Browser den Cookie mit der Session Id zurück und I<Embperl>
+stellt die Daten in C<%udat> wieder her. (siehe auch Abschnitt über L<"Session Handling"|"Session Handling (ab 1.2b2)">)
+
+=head2 %mdat (ab 1.2b2)
+
+C<%mdat> speichert Daten je Seite. Solange Sie nicht
+auf C<%mdat> zugreifen passiert gar nichts, sobald jedoch Daten in C<%mdat>
+geschrieben werden, erzeugt I<Embperl> eine Seiten Id und speichert die Daten mittels
+I<Apache::Session>. Wenn ein Benutzer die B<selbe> I<Embperl> Seite
+aufruft, stellt I<Embperl> die Daten in C<%mdat> wieder her.
+(siehe auch Abschnitt über L<"Session Handling"|"Session Handling (ab 1.2b2)">)
+
+=head2 $row, $col
+
+Reihen und Spaltenzähler für dynamische Tabellen.
+(Siehe L<"HTML Table Tag"|"HTML Tags">.)
+
+=head2 $maxrow, $maxcol
+
+Maximale Anzahl von Reihen oder Spalten einer dynamischen Tabelle.
+Diese Werte werden per default auf 100 für C<$maxrow> und 10 für
+C<$maxcol> gesetzt um Endlosschleifen zuverhindern.
+(Siehe L<"HTML Table Tag"|"HTML Tags">.)
+
+=head2 $cnt
+
+Enthält die Anzahl der Tabellenzellen, die bis jetzt angezeigt wurden.
+(Siehe L<"HTML Table Tag"|"HTML Tags">.)
+
+=head2 $tabmode
+
+Entscheidet, wann das Tabellenende erreicht ist. Dynamische Tabellen
+werden immer durch $maxrow und $maxcol begrenzt. Zusätzlich können
+folgende Bedinungen für das Tabellenende festgelegt werden:
+
+=over 4
+
+=item $tabmode = 1
+
+Ende, wenn B<ein> Block der C<$row> enthält, C<undef> als Ergebnis hat.
+Die Reihe, die den undefinierten Ausdruck enthält, wird B<nicht> mehr angezeigt.
+
+=item $tabmode = 2
+
+Ende, wenn B<ein> Block der C<$row> enthält, C<undef> als Ergebnis hat.
+Die Reihe, die den undefinierten Ausdruck enthält, B<wird> angezeigt.
+
+=item $tabmode = 4
+
+Ende, wenn C<$maxrow> Reihen angezeigt wurden.
+
+=back
+
+B<Spaltenende:>
+
+=over 4
+
+=item $tabmode = 16
+
+Ende, wenn B<ein> Block der C<$col> enthält, C<undef> als Ergebnis hat.
+Die Spalte, die den undefinierten Ausdruck enthält, wird B<nicht> mehr angezeigt.
+
+=item $tabmode = 32
+
+Ende, wenn B<ein> Block der C<$col> enthält, C<undef> als Ergebnis hat.
+Die Spalte, die den undefinierten Ausdruck enthält, B<wird> angezeigt.
+
+=item $tabmode = 64
+
+Ende, wenn C<$maxcol> Spalten angezeigt wurden.
+
+=back
+
+Der Defaultwert von B<17> ist korrekt zum Anzeigen von Arrays. Es dürfte selten nötig
+sein diesen Wert zu ändern. Die Werte für Tabellen- und Spaltenende können addiert werden.
+
+=head2 $escmode
+
+Schaltet die HTML und URL Kodierung der Ausgabe ein und aus.
+Default ist ein (C<$escmode> = 3).
+
+B<Hinweis:> Normalerweise kann die Kodierung durch Voranstellen eines Backslashes ('\')
+vor das entsprechende Zeichen verhindert werden. Das ist recht nützlich, ist aber
+in Situation, wo eine Benutzereingabe nochmal angezeigt wird, sehr gefährlich, da dies
+dem Benuter ermöglich beliebiges HTML einzugeben. Um dies zu verhindern muß zu den
+unten aufgeführten Werten jeweils eine 4 addiert werden. Dies führt dazu, dass I<Embperl>
+den Backslash bei der Ausgabe nicht gesondert behandelt. (ab 1.3b4)
+
+B<Hinweis 2:>Um binäre Daten auszugeben muß escmode auf Null gesetzt werden (ab 1.3b6)
+
+=over 4
+
+=item B<$escmode = 8 (oder 15)> (2.0b4 und höher)
+
+Das Resultat von Perlausdrücken wird immer XML Kodiert 
+(z.B. '>' wird zu '&gt;' und ' zu &apos;).
+
+=item $escmode = 3 (oder 7)
+
+Das Resultat von Perlausdrücken wird HTML Kodiert (z.B. '>' wird zu '&gt;')
+und URL Kodiert ('&' wird zu '%26') innerhalb von C<A>, C<EMBED>, C<IMG>, C<IFRAME>, C<FRAME> und C<LAYER> Tags.
+
+=item $escmode = 2 (oder 6)
+
+Das Resultat von Perlausdrücken wird immer URL Kodiert ('&' wird zu '%26').
+
+=item $escmode = 1 (oder 5)
+
+Das Resultat von Perlausdrücken wird immer HTML Kodiert (z.B. '>' wird zu '&gt;').
+
+=item $escmode = 0
+
+Keine HTML oder URL Kodierung findet statt.
+
+=back
+
+=head2 $req_rec
+
+Diese Variable ist nur vorhanden, wenn I<Embperl> unter I<mod_perl>
+läuft und enthält eine Referenz auf den Apache Request Record.
+Damit ist es möglich, alle Apache internen Funktionen zu nutzen.
+(siehe B<perldoc Apache> für weitere Informationen)
+
+=head2 LOG
+
+Dies ist die Dateihandle der I<Embperl> Logdatei. Durch schreiben auf
+diese Dateihandle ist es möglich, Zeilen in die I<Embperl> Logdatei
+zu schreiben.
+
+Beispiel: print LOG "[$$]ABCD: your text\n" ;
+
+Wenn Sie ein Modul schreiben, das ebenfalls die Embperl Logdatei nutzen 
+soll, können Sie folgendermaßen eine Dateihandle dafür bekommen:
+
+    tie *LOG, 'HTML::Embperl::Log';
+
+
+=head2 OUT
+
+Diese Dateihandle ist an den I<Embperl> Ausgabestrom gebunden. Ausgaben an diese Handle
+haben den selben Effekt wie ein C<[+ ... +]> Block.
+(Siehe auch L<optRedirectStdout|"EMBPERL_OPTIONS">)
+
+=head2 @param
+
+Wird durch den C<param> Parameter der C<Execute> Funktion gesetzt. Kann genutzt werden,
+um Parameter an ein I<Embperl> Dokument zuübergeben oder zurückzugegben.
+(siehe L<Execute|"By calling HTML::Embperl::Execut">)
+
+=head2 %http_headers_out (ab 1.2b10)
+
+Dieser Hash ermöglicht es HTTP Header anzugeben, die I<Embperl> vor dem Dokument senden soll.
+Ist ein "Location" Header angegeben, setzt I<Embperl> den Status automatisch auf 301. Beispiel:
+
+  [- $http_headers_out{'Location'} = "http://www.ecos.de/embperl/" -]
+
+
+Ab 1.3.2 können alle HTTP Header (außer "Location" und "Content-Type") auch 
+mehrere Werte erhalten. Um z.B. mehrere Cookie zu setzen, kann man folgendes schreiben:
+
+
+  [- $http_headers_out{'Set-Cookie'} = 
+      ['name=cook1;value=2;','name=cook2;value=b'] ; -]
+
+Für "Location" und "Content-Type" wird nur der erste Wert berücksichtigt. Leere
+Arrays werden ignoriert. Z.B. führt Folgendes B<nicht> zu einem Redirect:
+
+  [- $http_headers_out{'Location'} = [] ; -]
+
+
+
+
+siehe auch L<META HTTP-EQUIV= ...>
+
+=head2 $optXXX $dbgXXX
+
+Alle Optionen (see L<"EMBPERL_OPTIONS">) und alle Debugflags (siehe L<"EMBPERL_DEBUG">)
+können durch entsprechende Variablen innerhalb der Seite gelesen und gesetzt werden.
+ 
+Beispiel:
+
+    [- $optRawInput = 1 -]  # Anschalten von RawInput 
+    [- $optRawInput = 0 -]  # Abschalten von RawInput 
+    [+ $dbgCmd +]           # Ausgeben des Zustandes des dbgCmd Flags
+
+
+Es gibt einige Ausnahmen, bei denen die Optionen lediglich gelesen werden können. Das Setzen solcher
+Optionen ist nur in den Konfigurationsdateien möglich. Folgende Optionen können nur gelesen werden:
+
+=over 4
+
+=item $optDisableVarCleanup 
+
+=item $optSafeNamespace     
+
+=item $optOpcodeMask        
+
+=item $optDisableChdir      
+
+=item $optEarlyHttpHeader   
+
+=item $optDisableFormData   
+
+=item $optAllFormData       
+
+=item $optRedirectStdout    
+
+=item $optAllowZeroFilesize 
+
+=item $optKeepSrcInMemory   
+
+=back
+
+
+=head2 %CLEANUP
+
+I<Embperl> räumt nur Variablen auf, die innerhalb der I<Embperl> Seite definiert wurden. Sollen
+weitere Variablen aufgeräumt werden, können diese dem Hash C<%CLEANUP>, mit dem Variablennamen
+als Schlüssel und einem Wert von B<1>, hinzugefügt werden. Umgedreht ist es möglich das Aufräumen
+zu verhindern, wenn der Variablennamen mit einem Wert von B<0> hinzugefügt wird.
+
+=head2 %CLEANUPFILE (ab 1.2b6)
+
+Hat die selbe Aufgabe wie C<%CLEANUP>, jedoch können hier Dateinamen hinzugefügt werden und
+alle Variable die in diesen Dateien definiert wurden, werden am jedes des entsprechenden
+Requests aufgeräumt.
+
+
+=head1 Session Handling (ab 1.2b2)
+
+I<Embperl> ist in der Lage, Daten pro Benutzer für Sie zu verwalten. Sobald
+Sie Daten in den Hash C<%udat> schreiben, sorgt I<Embperl> dafür, dass die
+selben Daten wieder verfügbar sind, sobald der selbe Benutzer eine weitere
+Seite aufruft.
+
+Weiterhin können Sie Daten in dem Hash C<%mdat> ablegen, diese sind der
+aktuellen Seite zugeordnet und werden wieder hergestellt, sobald ein
+beliebiger Benutzer die selbe Seite aufruft.
+
+Im Gegensatz zu einfachen globalen Variablen, ist der Zugriff auf die Inhalte
+von C<%udat> und C<%mdat> bei entsprechender Konfiguration, auch über Prozeß-
+oder sogar Rechnergrenzen hinweg möglich. I<Embperl> bedient sich dazu
+des Perlmodules I<Apache::Session>.
+
+Ab 1.3.4 verwendet I<Embperl> I<Apache::SessionX> für das Sessing handling.
+Dadurch ist keine weitere Konfiguration mehr nötig. Wenn Sie das alte 
+Sessionhandling (ohne I<Apache::SessionX>) beibehalten wollen, müssen
+Sie 
+
+    PerlSetEnv EMBPERL_SESSION_HANDLER_CLASS HTML::Embperl::Session
+
+in Ihrer httpd.conf eintragen und folgende Parameter konfigurieren. Sie
+können die folgenden Parameter auch zum überschreiben der 
+Standardkonfiguration von I<Apache::SessionX> benutzen.
+
+Um das Session Management zu aktivieren muß I<Apache::Session> (Version 1.53
+oder höher) installiert sein. Außerdem müssen Sie I<Embperl>, via 
+C<EMBPERL_SESSION_CLASSES>, mitteilen, welcher
+Speicher- und Lockingmechanismus genutzt werden soll, ggf. müssen Sie
+auch weitere Argumente für I<Apache::Session> setzen.
+Um z.B. eine MySQL Datenbank zur Speicherung der Sessions zu benutzen, könnte
+die Datei F<startup.pl> folgendermaßen aussehen:
+
+ BEGIN
+    {
+    $ENV{EMBPERL_SESSION_CLASSES} = "MySQL Semaphore" ;
+    $ENV{EMBPERL_SESSION_ARGS}    = "DataSource=dbi:mysql:session UserName=test" ;
+    } ;
+ use HTML::Embperl ;
+
+
+Dass selbe kann stattdessen auch direkt in die F<httpd.conf> eingetragen werden:
+
+ PerlSetEnv EMBPERL_SESSION_CLASSES "MySQL Semaphore"
+ PerlSetEnv EMBPERL_SESSION_ARGS "DataSource=dbi:mysql:session UserName=test"
+ PerlModule HTML::Embperl ;
+
+
+Konsultieren Sie die Dokumentation von I<Apache::Session> (in diesem Fall
+I<Apache::Session::Store::MySQL>) für Informationen wie die Datenbanktabellen
+dazu aussehen müssen.
+
+C<EMBPERL_SESSION_ARGS> ist eine Leerzeichen separierte Liste von Name/Wert Paaren
+die zusätzlich Parameter für die I<Apache::Session> Klassen angeben können.
+
+Hier ist ein weiteres Beispiel für die Speicherung der Sessiondaten im Dataisystem:
+
+PerlSetEnv EMBPERL_SESSION_CLASSES "File Semaphore"
+PerlSetEnv EMBPERL_SESSION_ARGS "Directory=/path/to/your/sessions"
+
+Konsultieren Sie die Dokumentation von I<Apache::Session> um zu erfahren welche
+weiteren Speichermöglichkeiten es gibt.
+
+Zusätzlich (optional) zur zur Speicher- und Lockingklasse können in C<EMBPERL_SESSION_CLASSES>
+zwei weitere Klassen angegeben werden. Die erste ist für die Serialisierung der Daten zuständig
+(Default: C<Storable>) und die zweite für sas erzeugen der ID
+(Default: C<MD5>).
+
+
+B<HINWEIS:> Die obige Konfiguration funktioniert nur mit I<Apache::Session> 1.52 und 
+I<Embperl> 1.3b5 oder
+höher. Ältere Konfigurationen mit I<Apache::Session> werden weiterhin unterstützt,
+Ältere Versionen von Embperl unterstützen nur I<Apache::Session> 1.0x, welches
+eine andere Konfiguartion von C<$ENV{EMBPERL_SESSION_CLASSES}> erfordert
+(z.B. C<$ENV{EMBPERL_SESSION_CLASSES} = "DBIStore SysVSemaphoreLocker" ; >).
+
+
+
+Damit ist das Session Handling eingerichtet und der Benutzung der
+Hashs C<%udat> und C<%mdat> steht nichts mehr im Wege. Dabei wird
+das Session Handling nur dann aktiv, wenn Sie auf einen der zwei Hashs
+zugreifen. Beim ersten Zugriff erzeugt I<Embperl> bzw. I<Apache::Session>
+eine Session ID. Für Benutzerbezogene Session wird diese Id mittels eines
+Cookies zum Browser gesandt. Außerdem veranlasst I<Embperl> I<Apache::Session>
+die Daten zu speichern. Empfängt I<Embperl> einen solchen Cookie mit einer
+Id, wird diese zunächst nur abgespeichert, erst bei einem Zugriff auf C<%udat>,
+werden die Daten tatsächlich von I<Apache::Session> angefordert. Ebenso
+werden die Daten für C<%mdat> erst von I<Apache::Session> angefordert, wenn
+auf diesen Hash zugegriffen wird.
+
+=head2 Funktionen/Methoden fürs Session Handling
+
+=head2 HTML::Embperl::Req::SetupSession ($req_rec, $Inputfile) [1.3b6+]
+
+Diese Funktion kann von Skripten benutzt werden die in ihrem Verlauf
+L<HTML::Embperl::Execute|Execute> aufrufen, jedoch vorher schon auf die Sessiondaten
+von Embperl zugreifen wollen.
+
+=over 4
+
+=item $req_rec
+
+Apache request record soweit das Skript unter I<mod_perl> läuft, ansonsten C<undef>.
+
+=item $Inputfile
+
+Name der Datei die später von I<Embperl> bearbeitet werden soll. Dient dazu L<%mdat> zu
+initialsieren. Wird C<%mdat> nicht benötigt, kann dieser Parameter weggelassen werden.
+
+=back
+
+Liefert eine Referenz auf L<%udat> oder, wenn es in einem Arraykontext aufgerufen wird,
+eine Referenz auf L<%udat> und L<%mdat> zurück. Siehe auch C<CleanupSession>.
+
+=head2 HTML::Embperl::Req::GetSession / $r -> GetSession [1.3b6+]
+
+Liefert eine Referenz auf L<%udat> oder, wenn es in einem Arraykontext aufgerufen wird,
+eine Referenz auf L<%udat> und L<%mdat> zurück.
+Dies Funktion kann benutzt werden um auf die Embperl Sessiondaten aus einem Modul
+zuzugreifen, wenn das Session Handling bereits initialisiert ist.
+Wenn es als eine Methode aufgerufen wird muß C<$r> ein C<HTML::Embperl::Req> Objekt sein.
+Dieses wird als erster Parameter in @_ an jede Seite übergeben.
+
+=head2 HTML::Embperl::Req::CleanupSession / $r -> CleanupSession [1.3b6+]
+
+Muß am Ende B<jedes> Skripts aufgerufen werden, welches C<SetupSession> benutzt, danach aber nicht
+L<HTML::Embperl::Execute|Execute> aufruft.
+Wenn es als eine Methode aufgerufen wird muß C<$r> ein C<HTML::Embperl::Req> Objekt sein.
+Dieses wird als erster Parameter in @_ an jede Seite übergeben.
+
+=head2 HTML::Embperl::Req::DeleteSession / $r -> DeleteSession [1.3b6+]
+
+Löscht die Sessiondaten und entfernt den Cookie vom Browser.
+Wenn es als eine Methode aufgerufen wird muß C<$r> ein C<HTML::Embperl::Req> Objekt sein.
+Dieses wird als erster Parameter in @_ an jede Seite übergeben.
+
+=head2 HTML::Embperl::Req::RefreshSession / $r -> RefreshSession [1.3b6+]
+
+Stößt das nochmalige senden des Cookies an. Normalerweise wird der Cookie nur beim ersten
+Mal gesendet.
+Wenn es als eine Methode aufgerufen wird muß C<$r> ein C<HTML::Embperl::Req> Objekt sein.
+Dieses wird als erster Parameter in @_ an jede Seite übergeben.
+
+=head2 HTML::Embperl::Req::SetSessionCookie / $r -> SetSessionCookie [1.3b7+]
+
+Muß von Skripts aufgerufen werden, welches C<SetupSession> benutzen, danach aber nicht
+L<HTML::Embperl::Execute|Execute> aufrufen, um den Cookie für sie Session-Id zu setzen.
+Dies wird normalerweise durch L<HTML::Embperl::Execute|Execute> erledigt.
+Wenn es als eine Methode aufgerufen wird muß C<$r> ein C<HTML::Embperl::Req> Objekt sein.
+Dieses wird als erster Parameter in @_ an jede Seite übergeben.
+
+
+=head1 (Sichere-)Namensräume und Opcode Restriktionen
+
+
+Da die meisten Web Server mehr als ein Dokument verwalten, ist es nötig,
+die Dokumente gegeneinander zu schützen. I<Embperl> benutzt dazu Perl
+Namensräume (Packages). Standardmäßig führt Embperl jedes
+Dokument in seinem eigenen Namensraum aus. Das verhindert, das globale
+Variablen, sich gegenseitig überschreiben oder beeinflussen.
+Mittels der Konfigurationsanweisung L<EMBPERL_PACKAGE> ist es möglich
+einen expliziten Packagenamen für ein oder mehere Dokumente vorzugeben.
+Dies alles verhindert aber nicht, das durch die Angabe eines Variablennamen
+incl. Packagenamen eine Embperlseite auf andere Namensräume zugreifen kann.
+
+
+Manchmal, z.B. wenn mehrere Personnen Zugriff auf die Webserverinhalte
+haben sollen, ist es notwendig Dokumente tatsächlich gegenseitig zuschützen.
+Für solche Fällen kann I<Embperl> I<Safe.pm> nutzen um sichere Namensräume
+bereit zu stellen. Ein Dokument, das in einem solchen sicheren Namensraum
+abläuft, kann dann nicht mehr auf andere Namensräume zugreifen. (Für weitere
+Informationen zu sicheren Namensräumen lesen Sie bitte die Dokumentation
+zu I<Safe.pm>)
+
+
+Um ein Dokument in einem sicheren Namensraum ablaufen zu lassen, müssen
+Sie lediglich die Option L<optSafeNamespace> setzen.
+Der Packagename wird dabei weiterhin automatisch von I<Embperl> erzeugt
+oder kann mittels L<EMBPERL_PACKAGE> gesetzt werden.
+
+B<HINWEIS:> Für das ausgeführte Dokument erscheint es so, als würde
+der Code im Package B<main> ausgeführt!
+
+Eine weitere Möglichkeit, um I<Embperl> Seiten sicher zu machen, ist die
+Benutzung von Opcode Restriktionen. Dazu ist es nötig, zuerst ein
+B<Safe Compartment> zu erstellen:
+
+
+ B<$cp = HTML::Embperl::AddCompartment($name);>
+
+Dies erstellt ein neues Compartment mit einer Default Opcode Maske und dem
+Namen $name (Der Name wird später verwendet, damit Embperl weiss, welches
+Compartment es benutzen soll). Nun können
+Sie die Opcode Maske ändern. Zum Beispiel:
+
+ B<$cp->deny(':base_loop');>
+
+In Ihrer Konfiguration müssen Sie die Option L<optOpcodeMask> in
+L<EMBPERL_OPTIONS> setzen
+und spezifizieren aus welchem Compartment die Opcode Maske (durch setzen von
+L<EMBPERL_COMPARTMENT>) genommen werden soll.
+
+Beispiel (beim Gebrauch mit mod_perl):
+
+  B<srm.conf:>
+
+    PerlScript startup.pl
+
+    SetEnv EMBPERL_DEBUG 2285
+
+    Alias /embperl /path/to/embperl/eg
+
+    <Location /embperl/x>
+    SetHandler perl-script
+    PerlHandler HTML::Embperl
+    Options ExecCGI
+    PerlSetEnv EMBPERL_OPTIONS 12
+    PerlSetEnv EMBPERL_COMPARTMENT test
+    </Location>
+
+  B<startup.pl:>
+
+    $cp = HTML::Embperl::AddCompartment('test');
+    $cp->deny(':base_loop');
+
+
+Beim Starten des Server wird dadurch die Datei F<startup.pl> ausgeführt.
+F<startup.pl> erstellt einen Compartment mit Namen
+'test', in dem Schleifen gesperrt sind. Alle Seiten die unter
+C</embperl/x> liegen, werden nun in einem sicheren Namensraum, mit
+gesperrten Schleifen, ausgeführt.
+
+Hinweis: Das Package Name des Compartments wird B<nicht> genutzt!
+
+Mehr Information zum Setzen der Opcode Mask finden Sie in der Dokumentation von Safe.pm und
+I<Opcode.pm>.
+
+
+=head1 Utility Funktionen
+
+=head2 AddCompartment($Name)
+
+Fügt ein Compartment zum Gebrauch mit Embperl hinzu. Embperl nutzt nur
+die Opcode Maske und
+nicht den Packagenamen des Compartements. C<AddCompartment> gibt den
+neu erstellten Compartment zurück, so daß die Methoden zum Freigeben oder
+Sperren bestimmter Opcodes aufgerufen werden können.
+(siehe auch L<"(Sichere-)Namesräume und Opcode Restriktionen">)
+
+Beispiel:
+
+	$cp = HTML::Embperl::AddCompartment('TEST');
+	$cp->deny(':base_loop');
+
+
+=head2 MailFormTo($MailTo, $Subject, $ReturnField)
+
+Sendet den Inhalt des Hashs C<%fdat>, in der durch C<@ffld> angegebenen
+Reihenfolge, zur, durch C<$MailTo> angegeben, E-Mail Adresse, mit
+C<$Subject> als Betreff. Ist C<$ReturnField> angegeben, wird die in
+diesem Feld enthaltene E-Mail Adresse als C<Return-Path> in der
+Mail angegeben. C<$ReturnField> sollte normalerweise das Feld angeben
+in das der Benutzer seine E-Mail Adresse einträgt.
+
+
+
+Wenn Sie nachfolgenden Beispielcode als C<Action> in Ihrem Formular angeben:
+
+  <FORM ACTION="x/feedback.htm" METHOD="POST"
+        ENCTYPE="application/x-www-form-urlencoded">
+
+wird der Inhalt des Formulars zur angegebenen E-mail Adresse versandt.
+
+L<"EMBPERL_MAILHOST"> gibt den SMTP Server an den C<MailFormTo> benutzt.
+Default ist B<localhost>.
+
+Beispiel:
+
+ <HTML>
+ <HEAD>
+ <TITLE>Feedback</TITLE>
+ </HEAD>
+ <BODY>
+        [- MailFormTo('webmaster@domain.xy',
+		      'Mail von WWW Formular', 'email') -]
+	Ihre Daten wurden erfolgreich versandt!
+ </BODY>
+ </HTML>
+
+Das Beispiel sendet eine Mail mit allen Feldinhalten des Formulars
+(das Formular muß als Action die URL des obigen Beispiels angeben)
+zu der Mailadresse 'webmaster@domain.xy'. Als Betreff wird
+'Mail von WWW Formular' verwendet und der
+Return-Path wird auf die Adresse gesetzt, welche im Feld 'email'
+eingegeben wurde.
+
+B<HINWEIS:> Sie müssen Net::SMTP (aus dem libnet Package) installiert haben,
+wenn Sie diese Funktion nutzen wollen.
+
+=head2 exit
+
+C<exit> überschreibt die standard Perl C<exit> Funktion.
+C<exit> beendet die Ausführung des Dokuments und sendet alle bis dahin
+ausgeführten Ausgaben zum Browser.
+
+B<Hinweis 1:> exit beendet nur die aktuelle Datei. Wurde die Datei von
+einer anderen mittels Execute aufgerufen, wird die aufrufende Datei fortgesetzt.
+
+B<Hinweis 2:> Innerhalb eines Perlmoduls, das von einer I<Embperl> Seite
+aus aufgerufenen wird, sollten sie C<Apache::exit> verwenden, da das normale
+Perl C<exit> ansonsten den kompletten Childprozeß beendet. C<Apache::exit>
+führt dazu, dass die Ausführung des Moduls, wie auch der I<Embperl> Seite,
+abgebrochen wird, jedoch alle Ausgaben noch zum Browser gelangen.
+
+
+=head1 Ein-/Ausgabefunktionen
+
+=head2 ProxyInput ($r, $in, $mtime, $src, $dest)
+
+Konfiguration in srm.conf:
+
+ <Location /embperl/ifunc>
+ SetHandler perl-script
+ PerlHandler HTML::Embperl
+ Options ExecCGI
+ PerlSetEnv EMBPERL_INPUT_FUNC "ProxyInput, /embperl/ifunc, http://otherhost/otherpath"
+ </Location>
+
+
+C<ProxyInput> dient dazu den Quellentext von I<Embperl> Dokumenten, von einer
+anderen URL anzufordern, statt sie direkt von der Platte zu lesen.
+Im obigen Beispiel würde eine Anfrage für C</embperl/ifunc/foo.html> z.B.
+die URL C<http://otherhost/otherpath/foo.html> als Quelle für die Bearbeitung
+durch I<Embperl> verwenden.
+
+Eine mögliche Anwendung ist, die Ausgabe von I<mod_include> durch I<Embperl>
+weiter bearbeiten zu lassen.
+
+Beispielkonfiguration in B<srm.conf> für B<SSI> und B<Embperl>:
+
+ <Location /embperl>
+ SetHandler perl-script
+ PerlHandler HTML::Embperl
+ Options ExecCGI
+ PerlSetEnv EMBPERL_INPUT_FUNC "ProxyInput, /embperl, http://localhost/src"
+ </Location>
+
+
+ <Location /src>
+ SetHandler server-parsed
+ Options +Includes
+ </Location>
+
+
+Die Quellen müssen unter C</src> abgelegt sein. Die eigentliche HTTP Anfrage
+wird jedoch an C</embperl> gerichtet.
+Eine Anfrage an  C</embperl/foo.html> erzeugt z.B. eine Proxy-Anfrage an
+C</src/foo.html>, welche von I<mod_include> ausgeführt wird. Die resultierende
+Seite wird dann von I<Embperl> weiterverarbeitet.
+Es ist ebenfalls möglich zwei unterschiedliche Ports für I<mod_include>
+und I<Embperl> zu benutzen, dadurch bleiben die URIs gleich.
+
+
+=head2 LogOutput ($r, $out, $basepath)
+
+Beispielkonfiguration in srm.conf:
+
+ <Location /embperl/ofunc>
+ SetHandler perl-script
+ PerlHandler HTML::Embperl
+ Options ExecCGI
+ PerlSetEnv EMBPERL_OUTPUT_FUNC "LogOutput, /usr/msrc/embperl/test/tmp/log.out"
+ </Location>
+
+C<LogOutput> ist eine Ausgabefunktion. Sie sendet die Ausgaben zum Browser
+B<und> schreibt sie in einer eindeutige Datei, die den Namen
+C<"$basepath.$$.$LogOutputFileno"> bekommt, wobei C<$LogOutputFileno> jedesmal
+um eins erhöht wird.
+
+
+
+=head1 Inside Embperl - Wie der Embedded Perl Code intern ausgeführt wird
+
+
+Wenn I<Embperl> auf einen Block mit Perl Code trifft
+  B<([+/-/!/$ .... $/!/-/+])>
+führt es folgende Bearbeitungsschritte aus:
+
+=over 4
+
+=item 1. Alles, was wie ein HTML Tag aussieht, entfernen.
+
+=item 2. Transformieren HTML/URL kodierter Zeichen in entsprechende ASCII Zeichen.
+
+=item 3. Entfernen aller Carriage Returns.
+
+=item 4. Übersetzen des Perl Codes als eigenständige Funktion.
+
+=item 5. Aufrufen der Funktion.
+
+=item 6. URL/HTML kodieren von entsprechenden Sonderzeichen im Rückgabewert.
+
+=item 7. Senden des Rückgabewertes (an Browser oder Datei etc.)
+
+=back
+
+Die Schritte 1-4 werden nur beim ersten Mal, wenn I<Embperl> auf den Perl Code
+trifft, ausgeführt. Wird die Seite das zweite mal abgerufen, bzw. liegt der Block
+in einer Schleife, muß I<Embperl> lediglich die vorkompilierte Funktion
+aufrufen.
+
+Schritte 6 und 7 werden nur bei Ausgaben, d.h. C<[+ ... +]> Blöcken,
+ausgeführt.
+
+
+=head2 Was bedeutet das im Detail?
+
+Als Beispiel nehmen wir folgenden Code:
+
+ [+ <BR>
+ $a = "Dies '&gt;' ist ein  Größerzeichen"
+ <BR> +]
+
+=head2 1. Entfernen der HTML Tags. Danach sieht es folgendermaßen aus:
+
+ [+
+ $a = "Dies '&gt;' ist ein  Größerzeichen"
+ +]
+
+Die <BR>'s in diesem Fall machen keinen Sinn, sie kommen höchstwahrscheinlich
+von einem WYSIWYG HTML Editor, dadurch das der Benutzer zur besseren Übersicht
+hier eine neue Zeile beginnen wollte.
+Solche Editoren fügen u.U. auch ungewollte Tags wie C<<FONT>> o.ä. in den
+Perl Code ein. Durch das entfernen solcher Tags, stellt I<Embperl> sicher,
+dass Designer, die mit solchen Editoren arbeiten, den Perl Code dadurch
+nicht zerstören können.
+
+
+Es gibt auch Fälle, wo HTML Tags wirklich gebraucht werden.
+Zum Beispiel:
+Nehmen wir an, Sie wollen folgendes Ausgeben:
+
+ [+ "<FONT COLOR=$col>" +]
+
+Ohne weitere Maßnahmen, würde I<Embperl> folgendes daraus machen:
+
+ [+ "" +]
+
+
+Um aber dennoch HTML Tags zu verwenden gibt es verschiedene Möglichkeiten:
+
+=over 4
+
+=item a. <FONT COLOR=[+$col+]>
+
+Schreiben Sie nur den wirklich notwendigen Teil innerhalb des C<[+ ... +]>
+Blocks und verlagern sie das HTML Tag nach außerhalb.
+Dies ist der unproblematischste Weg und sollte wenn immer möglich gewählt
+werden.
+
+=item b. [+ "\<FONT COLOR=$col>" +]
+
+Durch Voranstellen eines Backslashs ('\').
+
+=item c. [+ "&lt;FONT COLOR=$col&gt;" +]
+
+Sie können HTML kodierte Zeichen benutzen.
+Die meisten HTML Editoren machen dies automatisch.
+(In diesem Fall brauchen Sie sich nicht weiter darum zu kümmern.)
+
+=item d. Die Option C<optRawInput> setzen.
+
+Dies verhindert grundsätzlich das Entfernen von HTML Tags.
+
+=back
+
+B<HINWEIS:> In den Fällen b-d sollten Sie ebenfalls die Ausgabe-HTML-Kodierung
+beachten (siehe unten).
+
+Zu beachten ist ebenfalls, daß I<Embperl> den Perl Dateihandle Operator (<>)
+als HTML Tag interpretiert und ihn damit entfernt.
+
+Anstelle von
+
+  [- $line = <STDIN>; -]
+
+sollten Sie eine der folgenden Schreibweise verwenden:
+
+
+=over 4
+
+=item a. [- $line = \<STDIN>; -]
+
+=item b. [- $line = &lt;STDIN&gt;; -]
+
+=back
+
+Benutzen Sie einen High-Level HTML Editor, wird er wahrscheinlich Version (b)
+automatisch erzeugen.
+
+
+=head2 2. Transformieren HTML/URL kodierter Zeichen in entsprechende ASCII Zeichen.
+
+Da Perl HTML kodierte Zeichen, wie C<$a &lt; $b>, nicht versteht, übersetzt
+I<Embperl> dies zu C<$a < $b>. Nehmen wir das Beispiel
+von vorhin, dann sieht es jetzt so aus:
+
+ [+
+ $a = "Dies '>' ist ein Größerzeichen"
+ +]
+
+Dies dient wiederum der Unterstützung von High-Level Editoren.
+Dadurch ist es unerheblich, wenn Ihr Editor C<&gt;> statt  > im Quellentext
+schreibt.
+
+Auch hier ist es manchmal nötig, die HTML kodierten Zeichen zu erhalten.
+Dazu bietet I<Embperl> folgende Möglichkeiten:
+
+
+=over 4
+
+
+=item a. \&gt;
+
+Durch Voranstellen eines Backslashs ('\').
+
+=item b. &amp;gt;
+
+Schreiben Sie das erste '&' als HTML kodiertes Zeichen (&amp;).
+Ein HTML Editor wird dies von sich machen, wenn Sie C<&gt;> als Text eingeben.
+
+=item c. Die Option C<optRawInput> setzen.
+
+Dies verhindert grundsätzlich das Dekodieren von HTML kodierten Zeichen.
+
+=back
+
+Da nicht jeder einen High Level oder WYSIWYG HTML Editor benutzt,
+gibt es eine Option, um Schritt 1 und 2 vollständig zu sperren.
+Durch setzen von L<optRawInput> in L<EMBPERL_OPTIONS> läßt
+I<Embperl> den Perl Code unberührt. Diese Option sollten Sie setzen,
+wenn Sie einen ASCII Editor benutzen, bei Benutzung eines HTML Editors,
+sollte diese Option nicht nötig sein.
+
+Sie können L<optRawInput> auch innerhalb Ihres Dokument ein-/ausschalten, indem Sie
+B<$optRawInput> 1 oder 0 zuweisen, wobei zu beachten ist, daß die Änderung
+erst ab dem nächsten Block wirksam wird. Beispiel:
+
+ [- $optRawInput = 1 -]
+ [- $line = <FILEHANDLE> -]
+
+
+
+=head2 3. Entfernen Sie aller Carriage Returns
+
+I<Embperl> entfernt vor dem Übersetzen alle Carriage Returns (B<\r>),
+um sicherzustellen, daß Programme die unter DOS/Windows erstellt wurden,
+auch unter Perl 5.004 und Unix laufen.
+
+
+=head2 4. Übersetzen des Perl Codes als eigenständige Funktion.
+
+Der nächste Schritt generiert eine Funktion aus Ihrem Perl Code.
+Das obige Beispiel sieht danach wie folgt aus:
+
+sub foo
+    {
+    $a = "Dies '>' ist ein Größerzeichen"
+    }
+
+Die Funktion wird vom Perlinterpreter in einem internen vorkompilierten Format
+gespeichert und kann
+somit später immer wieder aufgerufen werden, ohne die Schritte 1-4 wiederholen
+zu müssen. I<Embperl> erkennt, wenn das gleiche Dokument ein zweites mal
+angefordert wird und ruft lediglich die
+bereits kompilierte Funktion auf. Dadurch wird auch die Ausführung von
+dynamischen Tabellen und Schleifen beschleunigt,
+da der Perl Code nur bei der ersten Iteration kompiliert werden muss.
+
+
+=head2 5. Aufrufen der Funktion
+
+Nun kann die Funktion aufgerufen werden, um den Code tatsächlich auszuführen.
+
+Falls B<nicht> ein C<[+ ... +]> Block ausgeführt wird, ist die Bearbeitung
+damit abgeschlossen.
+
+
+=head2 6. URL/HTML kodieren von entsprechenden Sonderzeichen im Rückgabewert.
+
+Unser Beispiel erzeugt die Zeichenkette:
+
+ "Dies '>' ist ein Größerzeichen"
+
+Das Größerzeichen hier ist normaler Text (und nicht das Ende eines HTML Tags),
+gemäss HTML Spezifikation muss es als C<&gt;> zum Browser gesendet werden.
+In vielen Fällen entsteht
+kein Problem, wenn man direkt das Größerzeichen sendet, da der Browser
+höchstwahrscheinlich das '>' als normalen Text ausgeben wird.
+In diesem Fall wäre es auch möglich gleich C<&gt;>
+in unseren Perl Code schreiben, wenn jedoch die Zeichenkette z.B. Ergebnis
+einer Datenbankabfrage ist und/oder nationale Sonderzeichen enthält,
+ist es notwendig eine HTML Kodierung der Zeichen durchzuführen.
+
+
+Weiterhin werden Tags, die URLs enthalten (wie C<<A>> oder C<<FRAME>>),
+insofern speziell behandelt, als dass Ausgaben innerhalb des Parameters
+der die URL enthält, URL kodiert werden. (z.B. wird '&' zu C<%26> und
+Leerzeichen zu '+'). Dies ist nötig, damit der Browser Sonderzeichen
+korrekt interpretiert.
+
+Beispiel:
+
+   <A HREF="http://host/script?name=[+$n+]">
+
+Falls C<$n> den Wert C<"Mein Name"> enthält, wird die resultierende URL:
+
+   http://host/script?name=Mein+Name
+
+
+In einigen Fällen ist es nützlich, die Ausgabekodierung abzuschalten.
+Dies kann mit der Variablen L<$escmode> geschehen.
+
+Beispiel: (Um das Beispiel einfacher lesbar zu machen,
+setzen wir voraus, daß C<optRawInput> gesetzt ist.
+Andernfalls sind die in 1 - 3 beschriebenen Punkte zu beachten)
+
+    [+ "<FONT COLOR=5>" +]
+
+Dies würde zum Browser als C<&lt;FONT COLOR=5&gt;> gesandt, was dazu führt
+das der Tag exakt so auf dem Bildschirm zusehen ist, statt das sich die
+Farbe des folgenden Textes ändert.
+
+
+    [+ local $escmode=0 ; "<FONT COLOR=5>" +]
+
+Dies schalten die HTML Kodierung (lokal) ab und das Tag wird exakt so wie
+Sie es geschrieben haben zum Browser geschickt.
+
+B<HINWEIS>: C<$escmode> kann nur einmal innerhalb eines C<[+ ... +]> Blocks
+gesetzt werden. Der erste Wert der C<$escmode> zugewiesen wird, gilt für
+B<alle> Ausgaben, innerhalb des Blocks. Möchten Sie C<$escmode> hin- und
+herschalten, müssen Sie mehrere C<[+ ... +]> Blöcke verwenden.
+
+
+=head2 7. Senden des Rückgabewertes (an Browser oder Datei etc.)
+
+An diesem Punkt ist die Ausgabe fertig aufbereitet und kann zum Browser
+gesandt werden. Falls Sie nicht die Option C<optEarlyHttpHeader> gesetzt
+haben, werden alle Ausgaben bis zur vollständigen Ausführung des Dokuments
+zwischengespeichert. Ist das ganze Dokument abgearbeitet, werden zuerst
+alle HTTP Header gesendet (dies erlaubt während der Erstellung des Dokuments
+zusätzliche HTTP Header hinzuzufügen) und anschließend der eigentliche
+Inhalt. Tritt während der Verarbeitung ein Fehler auf, wird statt dem
+Inhalt eine Fehlerseite zum Browser gesandt.
+
+
+=head1 Performance
+
+Um die beste Performance von I<Embperl> zu erzielen, ist es notwendig, das Logging auf ein Minimum
+zu beschränken. Sie können Embperl drastisch verlangsamen, wenn Sie alle
+Logging Option einschalten.
+Vorallem sollten Sie B<niemals> L<dbgFlushOutput> oder L<dbgFlushLog>
+auf einen Produktionsserver einschalten.
+Während der geringfügige Performanceverlust beim Debuggen nicht auffällt, kann
+er auf einem stark belasteten Server durchaus ins Gewicht fallen.
+Auch die Optionen L<optDisableChdir>, L<optDisableHtmlScan>, L<optDisableCleanup>
+haben Auswirkungen auf die Performance.
+
+Lesen Sie ebenfalls B<mod_perl_tuning.pod> für weitere Ideenen zur
+Performancesteigerung.
+
+
+
+=head1 Bugs
+
+Fehler sind keine bekannt.
+
+Es wird jedoch empfohlen mindestens Perl 5.004_04 und mod_perl 1.08
+einzusetzen, da ältere Versionen Speicherlecks aufweisen.
+
+=head1 Kompabilität
+
+I<Embperl> wurde erfolgreich getestet
+
+=head2 unter Linux 2.x mit
+
+=over 4
+
+=item perl5.004_04
+
+=item perl5.005_03
+
+=item perl 5.6.0
+
+=item perl 5.6.1
+
+=item perl 5.7.1
+
+=item perl 5.7.2
+
+=item perl5.8.0
+
+=item apache_1.3.0 - apache_1.3.27
+
+=item apache_ssl (Ben SSL)
+
+=item Stronghold 2.2
+
+=item Stronghold 2.4.1
+
+=item Apache_1.3.x with mod_ssl 2.x.x
+
+=back
+
+Rückmeldungen bestätigen, dass es ebenfalls auf fast allen anderen Unix Varianten
+problemlos läuft.
+
+=head2 unter Windows NT/2000 mit
+
+=over 4
+
+=item perl5.004_04
+
+=item perl5.005
+
+=item perl 5.6.0
+
+=item perl 5.6.1
+
+=item perl5.8.0
+
+=item apache_1.3.0 - apache_1.3.27
+
+=back
+
+=head2 unter Windows 95/98 mit
+
+=over 4
+
+=item perl5.004_02 (Binary Distribution, nur Offline Mode)
+
+=item perl5.005_02 + apache_1.3.6
+
+
+=back
+
+=head1 Support
+
+=head2 Rückmeldungen/Anregungen/Probleme/Fehlerreports
+
+Diskussionen zu allen Fragen/Problemen rund um I<Embperl> werden auf
+der Embperl Mailingliste (embperl@perl.apache.org) geführt. Sollten Sie Probleme mit
+I<Embperl> haben, die sich nach der Lektüre dieser Dokumentation sowie der L<FAQs|"faq_pod">
+nicht lösen lassen, ist die Mailingliste der richtige Ort um nachzufragen.
+Oft wurden Probleme schon diskutiert, deshalb lohnt sich ein Blick in
+die Archive der Liste.
+
+ http://www.ecos.de/~mailarc/embperl/
+
+oder in das Archiv der mod_perl Mailingliste für Fragen in Zusammenhang mit mod_perl
+
+ http://forum.swarthmore.edu/epigone/modperl
+
+Um die Mailingliste zu abbonieren, senden Sie eine Mail an
+embperl-subscribe@perl.apache.org, zum von der Liste gestrichen zu werden
+genügt eine Mail an embperl-unsubscribe@perl.apache.org .
+
+Haben Sie eine Website die Embperl benutzt, würde ich mich über eine
+Rückmeldung freuen und diese ggf. in die Liste der Sites die Embperl
+nutzen ( http://perl.apache.org/embperl/Sites.pod.1.html ) aufnehmen.
+
+
+=head2 Kommerzieller Support
+
+I<ecos> bietet die Möglichkeit, Support für Embperl zu kaufen. Dies umfasst: 
+
+=over 4
+
+=item * Beratung und Unterstützung Ihrer Programmierer
+
+=item * Konzeptionierung und Plannung von dynamischen Websites
+
+=item * Erstellung von teilweisen oder kompletten Webangeboten
+
+=item * Beseitigung von Fehler in Embperl (auch für mod_perl und Apache)
+
+=item * Implementierung neuer Features
+
+=back
+
+Sie erreichen uns via http://www.ecos.de oder info@ecos.de
+Für weiter Informationen zu unserem Supportangebot, siehe
+
+http://www.ecos.de/x/index.htm/support/r_support.htm
+
+
+=head2 Wie kann ich die Entwicklung von Embperl unterstützen
+
+Wenn Sie I<Embperl> einsetzen und dessen weitere Entwicklung unterstützen
+möchten, gibt es zwei Möglichkeiten:
+
+=over 4
+
+=item 1 
+
+Sie implementieren ihr Wunschfeature selbst und senden uns einen Patch.
+
+=item 2
+
+Sie kaufen kommerziellen Support (siehe oben). Auch wenn sie B<vielleicht>
+die selben Antworten auf ihre Fragen auf der Mailingliste bekommen würden,
+macht es Sinn Support zu kaufen. Zum einen können sie sich dann sicher sein,
+B<immer> eine Antwort auf ihre Fragen zu bekommen, zum anderen unterstützen
+sie damit die weitere Entwicklung von I<Embperl> und ermöglichen uns
+mehr Zeit und Resourcen dafür aufzubringen.
+
+=back
+
+
+=head1 Links
+
+=head2 Informationen
+
+ mod_perl                           http://perl.apache.org/
+ mod_perl FAQ                       http://perl.apache.org/faq
+ Embperl                            http://perl.apache.org/embperl/
+ Embperl (deutsch)                  http://www.ecos.de/embperl/
+ DBIx::Recordset	            ftp://ftp.dev.ecos.de/pub/perl/dbi
+ Apache Webserver                   http://www.apache.org/
+ ben-ssl (freier httpsd)            http://www.apache-ssl.org/
+ mod_ssl (freier httpsd)            http://www.modssl.org/
+ stronghold (kommerizieller httpsd) http://www.c2.net/
+    Europa                          http://www.eu.c2.net/
+ weitere Apache module              http://perl.apache.org/src/apache-modlist.html
+
+=head2 Download
+
+ mod_perl               http://www.perl.com/CPAN/modules/by-module/Apache
+ Embperl                ftp://ftp.dev.ecos.de/pub/perl/embperl
+ DBIx::Recordset	ftp://ftp.dev.ecos.de/pub/perl/dbi
+ 
+ Win NT/95/98 Binaries
+ Apache/perl/
+ mod_perl/Embperl	ftp://theoryx5.uwinnipeg.ca/pub/other/ 
+    europe              http://www.robert.cz/misc/
+
+ RPM
+    source              ftp://ftp.akopia.com/pub/support/srpm/
+    binary redhat 6.0   ftp://ftp.akopia.com/pub/support/6.0/
+    binary redhat 6.1   ftp://ftp.akopia.com/pub/support/6.1/
+
+ Debian packages        http://www.cse.unsw.edu.au/~gusl/embperl
+ 
+ PPM für ActiveState    http://theoryx5.uwinnipeg.ca/ppmpackages/
+
+=head2 CVS
+
+Die aktuelle Entwicklerversion ist via CVS verfügbar.
+Weitere Informationen dazu stehen in L<"perldoc CVS.pod"|CVS/"INTRO">.
+
+=head1 Syntaxmodes für verschiedene Editoren
+
+=head2 Emacs
+
+Von: Erik Arneson [erik@mind.net]
+
+Man braucht mmm.el von
+http://members.tripod.com/gchen2/xemacs/
+
+Anschließend muß man mein mmm-embperl.el downloaden von
+http://www.aarg.net/erik/mmm-embperl.el
+
+Dokumentation ist in den Dateien enthalten.
+
+=head2 VIM
+
+Vim Syntaxfile für Vim 5.x & 6.x von Lukas Zapletal mit syntax highliting für JavaScript, VBScript,
+Perl+Embperl, CSS und HTML, gelbem Hintergrund für Perl code (wie M$ Interdev) und
+funktionierendem Perl folding:
+http://vim.sourceforge.net/scripts/search_results.php?keywords=Embperl
+
+Vim Syntaxfile von Steve Willer: http://www.interlog.com/~willer/embperl.vim
+
+Vim Syntaxfile von Kee Hinckley: http://www.somewhere.com/software/
+
+=head2 Dreamweaver
+
+Dreamweaverextention welche Dreamweaver veranlasst den Embperl code in Ruhe zu lassen
+befindet sich unter http://www.somewhere.com/software/
+
+
+=head1 Author
+
+G. Richter (richter@dev.ecos.de)
+
+

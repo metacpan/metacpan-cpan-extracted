@@ -1,0 +1,87 @@
+Revision history for Perl extension Heap::Simple::XS.
+
+Plan:
+	- dirty strings
+        - add tests for self-locking
+        - taint (and utf8 ?) propegation testing of accessors
+	- calling perlops without being sure there is a pad target is a bug
+        - Deleting/adjusting
+	- Higher splitfactor (better for the cache). Maybe go for 4
+          (highest factor that doesn't increase the amount of compares)
+	- Stop being a flat distribution
+
+0.10	2008-01-13
+	- Pure bug fix release, no functional changes
+	- Added MANIFEST.SKIP
+	- added "ppm_install" and "ppm_update" make targets
+	- Fix for perl 5.10 which doesn't have PP_SLT and PP_SGT anymore
+	- Added PackageTools based versioning
+	- XS.pm used "our" making it incompatible with old perls. Fixed
+	- Newer version of ppport.h
+	- Fix an indexing (and infinite loop) bug in _key_absorb
+
+0.09	2005-11-30
+	- order_name called with unknown order reported wrong id.
+	  (bug, but one that should be impossible to ever trigger)
+	- added a #define packWARN for older perls that don't have it yet
+
+0.08	2005-11-20
+	- Remove pointless sv_reftype test from object access.
+	- Add extract_all
+	- absorb and key_absorb now take any number of heaps as argument
+          instead of absorbing exactly one.
+        - Add mass insert/key_insert/_key_insert. Use them in absorb
+	- Added merge_arrays
+
+0.07	2005-07-27
+	- removed a stray print from t/speed_array
+	- added a forgotten static to option()
+        - call_method -> call_sv for Object types
+	- use no-stealing mortalcopies
+	- Start using PERL_NO_GET_CONTEXT.
+	- Replaced :: by - in author email address (easier quoting for mailers)
+	- use size_t to index the data array. This should select the minimal
+	  sensible data width.
+	- Replaced sv_derived_from object access by much more sophisticated
+          tests
+        - Don't run benchmarks unless asked for during Makefile.PL
+
+0.06	2004-11-12
+	- perl 5.6.1 doesn't yet have XST_mUV or XSRETURN_UV, nor were they in
+	  the distributed ppport.h. Updated to a new ppport.h
+	- Some tests triggered a 5.6.1 issue where -0 differs from 0
+	- One of the ties in the magic test was one reference too deep
+
+0.05	2004-11-07
+	- Removed a few unused variables
+        - Add a few returns at unreachable places after croak to shut up
+          compilers that think not all control paths return a value
+	- Call pp_xxx through the ppaddr table so we don't need to link them
+
+0.04	2004-11-06
+	- A few declaration were in the middle of code which is an error
+          on strict C compilers
+	- Try to define infinity in a more portable way
+        - Added a basic "load the module directly" test since the indirection
+          through Heap::Simple hides load errors.
+        - Remove "use warnings" everywhere to give people a fighting chance to
+          get the module working on perls before 5.6
+
+0.03	2004-11-05
+	- self-lock during DESTROY too
+	- Added a few forgotten aTHX_ arguments to key_insert (reported by
+          Mike Castle, thanks).
+	- dropped useless load of Carp in XS.pm
+
+0.02	2004-10-26
+	- Document that dirty Array and Hash types for numeric orders will
+          be effectively wrapped.
+	- Document the use of dirty NV keys for types Any and Object.
+        - Didn't properly free stuff already allocated if new croaks (bugfix)
+
+0.01	2004-10-25
+        - First releasable version.
+
+0.00	2004-10-12
+	- original version; created by h2xs 1.23 with options
+		-n Heap::Simple::XS

@@ -1,0 +1,46 @@
+HTTP-Server-Simple-Dispatched
+
+Eases some of the pain of using HTTP::Server::Simple by providing a concise
+and regular way to dispatch url requests (via regexes) and handlers that
+receive HTTP::Response and HTTP::Request objects.  Please see the POD
+documentation at Search CPAN for more details.
+
+CAVEAT
+
+This module is in a very early, unstable state.  Its API may change a whole
+lot in subsequent releases!
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+CONTRIBUTING
+
+The development branch lives at 
+http://helios.tapodi.net/~pdriver/Bazaar/HTTP-Server-Simple-Dispatched/. 
+Creating your own branch and sending me the URL is the preferred way to send 
+patches.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc HTTP::Server::Simple::Dispatched
+
+Or at Search CPAN:
+
+    http://search.cpan.org/dist/HTTP-Server-Simple-Dispatched
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Paul Driver
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,9 @@
+Changes
+MANIFEST			This list of files
+Makefile.PL
+lib/HTML/FormStructure.pm
+lib/HTML/FormStructure/Query.pm
+lib/HTML/FormStructure/Validation.pm
+t/00_compile.t
+t/01_exec.t
+META.yml                                 Module meta-data (added by MakeMaker)

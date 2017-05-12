@@ -1,0 +1,24 @@
+---
+abstract: 'add XPath support to HTML::TreeBuilder'
+author:
+  - 'Michel Rodriguez <mrodrigu@localdomain>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.58, CPAN::Meta::Converter version 2.110930001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-TreeBuilder-XPath
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  HTML::TreeBuilder: 0
+  List::Util: 0
+  XML::XPathEngine: 0.12
+version: 0.14

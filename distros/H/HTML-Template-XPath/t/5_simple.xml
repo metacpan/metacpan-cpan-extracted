@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<Page NAME="Home">
+   <Title>XML Page!</Title>
+   <DATA>
+      <users ID="0">
+            <ROW ID="0">
+                  <User>root</User>
+                  <Password>aaaaaa</Password>
+            </ROW>
+            <ROW ID="1">
+                  <User>matt</User>
+                  <Password>bbbbbb</Password>
+            </ROW>
+            <ROWCOUNT>2</ROWCOUNT>
+      </users>
+   </DATA>
+</Page>

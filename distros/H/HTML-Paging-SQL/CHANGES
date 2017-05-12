@@ -1,0 +1,7 @@
+Revision history for Perl extension HTML::Paging::SQL.
+
+1.0	2002-01-15 9:37
+		- original version
+
+1.11	2002-01-18 9:43
+		- fix bug for post method

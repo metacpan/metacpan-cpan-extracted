@@ -1,0 +1,104 @@
+{
+   "abstract" : "Determine Web browser, version, and platform from an HTTP user agent string",
+   "author" : [
+      "Lee Semel <lee@semel.net>",
+      "Peter Walsham",
+      "Olaf Alders <olaf@wundercounter.com> (current maintainer)"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "HTTP-BrowserDetect",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Build" : "0.28"
+         },
+         "suggests" : {
+            "JSON::PP" : "2.27300"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0.19",
+            "Test::Code::TidyAll" : "0.24",
+            "Test::More" : "0.88"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FindBin" : "0",
+            "JSON::PP" : "0",
+            "Path::Tiny" : "0",
+            "Test::FailWarnings" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0",
+            "Test::NoWarnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/oalders/HTTP-BrowserDetect/issues"
+      },
+      "homepage" : "https://metacpan.org/release/HTTP-BrowserDetect",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/oalders/http-browserdetect.git",
+         "web" : "https://github.com/oalders/http-browserdetect"
+      }
+   },
+   "version" : "3.14",
+   "x_contributors" : [
+      "Andrew Moise <andrew.moise@gmail.com>",
+      "Aran Deltac <bluefeet@gmail.com>",
+      "ben hengst <notbenh@cpan.org>",
+      "cho45 <cho45@lowreal.net>",
+      "Daniel Stadie <daniel.stadie@online.de>",
+      "David Ihnen <davidihnen@gmail.com>",
+      "Douglas Christopher Wilson <doug@somethingdoug.com>",
+      "Graham Barr <gbarr@pobox.com>",
+      "Hao Wu <hwu@intellisurvey.com>",
+      "joatis <joatis3@gmail.com>",
+      "Jon Jensen <jon@endpoint.com>",
+      "ktat <ktat.is@gmail.com>",
+      "lsaunders <lsaunders@dev05.backbone.i5invest.com>",
+      "Marco Fontani <MFONTANI@cpan.org>",
+      "Maros Kollar <maros@k-1.com>",
+      "Nicolas Doye <nic@worldofnic.org>",
+      "Olaf Alders <olaf@wundersolutions.com>",
+      "Olivier Bilodeau <olivier@bottomlesspit.org>",
+      "Paul Findlay <paul@findlay.net.nz>",
+      "Perlover <perlover@perlover.com>",
+      "Ramanan Balakrishnan <ramanan90@gmail.com>",
+      "Robin Smidsr\u00f8d <robin@smidsrod.no>",
+      "Ronald J Kimball <rkimball@pangeamedia.com>",
+      "Surikov Alexey <surikov@alexey-pc.kiteventures.local>",
+      "Thom Blake <thom@odonnellpdc.com>",
+      "Uwe <uwe@uwevoelker.de>",
+      "vti <viacheslav.t@gmail.com>",
+      "yeahoffline <frank.gasser@gmail.com>"
+   ]
+}
+

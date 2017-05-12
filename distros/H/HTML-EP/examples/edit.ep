@@ -1,0 +1,512 @@
+<ep-comment> -*- perl -*-
+
+    An example for working with the new DBI attributes and HTML::EP:
+    Editing a generic SQL table.
+
+    The general idea is as follows: We read out the complete table
+    contents and store the old values in a parameter array. Then we
+    create an editable line for any row.
+
+    Once this is done we do an
+
+	 UPDATE table SET <new_values> WHERE <old_values>
+
+    The HTML::EP system helps us greatly in reading input.
+
+
+    Author:    Jochen Wiedmann
+               Am Eisteich 9
+               72555 Metzingen
+               Germany
+
+               Phone: +49 7123 14887
+               Email: joe@ispsoft.de
+
+</ep-comment>
+<ep-package name="HTML::EP::Locale">
+<ep-perl>{
+    my $self = $_;
+    my $cgi = $self->{'cgi'};
+    my $accept_nulls = $self->{'accept_nulls'} = $cgi->param("accept_nulls");
+    my $show_delete = $cgi->param('show_delete') ? 1 : 0;
+
+    if ($cgi->param('source')) {
+	local $/ = undef;
+	my $contents;
+	my $fh = Symbol::gensym();
+	if (!open($fh, "<" . $ENV{'PATH_TRANSLATED'})  ||
+	    !defined($contents = <$fh>)  &&  !close($fh)) {
+	    die "Error while reading " . $ENV{'PATH_TRANSLATED'} . "$!";
+	}
+	$self->print("content-type: text/plain\n\n");
+	$self->print($contents);
+	$self->Stop();
+	$self->_ep_exit({});
+    }
+
+    my $errors = '';
+    my $table = $cgi->param('table');
+    my $dbh;
+    my $debug = $self->{'debug'};
+
+    if (my $dsn = $cgi->param('dsn')) {
+	if ($debug) {
+	    $self->print("DSN = $dsn\n");
+	}
+	$self->_ep_database({'dsn' => $dsn,
+			     'user' => $cgi->param("user"),
+			     'password' => $cgi->param("pass")});
+	$dbh = $self->{'dbh'};
+	$dbh->{'RaiseError'} = $dbh->{'PrintError'} = $dbh->{'Warn'} = 0;
+	print "dbh = $dbh\n";
+    }
+    $self->{'modifiedRows'} = 0;
+    $self->{'deletedRows'} = 0;
+    $self->{'insertedRows'} = 0;
+    my $startat = $cgi->param("startat")  ||  0;
+    $cgi->param("startat", $startat);
+    my $limit = $cgi->param("limit");
+    if (!defined($limit)) {
+	$limit = 20;
+    } elsif (!$limit) {
+	$limit = 0;
+    }
+    $cgi->param("limit", $limit);
+
+    if ($dbh  &&  defined($table)) {
+        if ($cgi->param('edit')) {
+            my (@set, $type);
+            my $num_fields = $cgi->param("num_of_fields");
+            my($names, $types);
+            for (my $i = 0;  $i < $num_fields;  $i++) {
+                push(@$names, $cgi->param("names_$i"));
+                push(@$types, $cgi->param("types_$i"));
+            }
+
+	    # Look at the values to guess whether they want to insert
+	    # a record.
+	    my $insert_me;
+	    for (my $i = 0;  $i < $num_fields;  $i++) {
+		my $val = $cgi->param("insert_$i");
+		if (defined($val)  &&  $val ne '') {
+		    $insert_me = 1;
+		}
+		push(@set, $dbh->quote($val, $types->[$i]));
+	    }
+	    if ((!$show_delete  &&  $insert_me)  ||
+		($show_delete  &&  $cgi->param("insert_me"))) {
+		my $query = sprintf("INSERT INTO $table (%s) VALUES (%s)",
+				    join(", ", @$names), join(", ", @set));
+		if ($self->{'debug'}) {
+		    $self->print("INSERT query: $query");
+		}
+		if (!$dbh->do($query)) {
+		    $errors .= "Error while inserting row: " .
+			$dbh->errstr() . ".\n";
+		    $errors .= "Query was: $query\n";
+		} else {
+		    ++$self->{'insertedRows'};
+		}
+	    }
+
+            for (my $i = 0;  $cgi->param("rows_${i}_0");  $i++) {
+                my(@set, @where, $modified);
+                for (my $j = 0;  $j < $num_fields;  $j++) {
+                    my $old = $cgi->param("oldrows_${i}_$j");
+                    if ($accept_nulls  &&  $old  &&  $old eq 'NULL') {
+                        $old = undef;
+                    }
+                    my $new = $cgi->param("rows_${i}_$j");
+                    if ($accept_nulls  &&  $new  &&  $new eq 'NULL') {
+                        $new = undef;
+                    }
+                    if ((!defined($old)  &&  defined($new))  ||
+                        (defined($old)  &&
+                         (!defined($new)  ||
+                          (defined($new)  &&  $old ne $new)))) {
+                        $modified = 1;
+                    }
+		    if ($debug) {
+			$self->print("Quoting $old, type $types->[$j], result "
+				     . $dbh->quote($old, $types->[$j]) . "\n");
+		    }
+                    push(@where,
+                         $names->[$j] . " = " .
+                         $dbh->quote($old, $types->[$j]));
+		    if ($debug) {
+			$self->print("Quoting $new, type $types->[$j], result "
+				     . $dbh->quote($new, $types->[$j]) . "\n");
+		    }
+                    push(@set,
+                         $names->[$j] . " = " .
+                         $dbh->quote($new, $types->[$j]));
+                }
+		my($query, $delete);
+		if ($delete = $cgi->param("rows_${i}_delete")) {
+		    $query = "DELETE FROM $table WHERE ";
+		} elsif ($modified) {
+		    $query = "UPDATE $table SET " . join(", ", @set)
+			. " WHERE ";
+		}
+		if ($query) {
+		    $query .= join(" AND ", @where);
+		    if ($debug) {
+			$self->print("UPDATE query: $query\n");
+		    }
+		    if (!$dbh->do($query)) {
+			$errors .= "Error while modifiying row $i: " .
+			    $dbh->errstr() . ".\n";
+			$errors .= "Query was: $query\n";
+		    } else {
+			if ($delete) {
+			    $self->{'deletedRows'}++;
+			} else {
+			    $self->{'modifiedRows'}++;
+			}
+		    }
+                }
+            }
+        }
+
+        my $query = "SELECT * FROM $table";
+        if (defined(my $where = $cgi->param("where"))) {
+            if ($where !~ /^\s*$/  &&  $where !~ /^\s+order\s+by/i) {
+                $where = "WHERE $where";
+            }
+            $query .= " $where";
+        }
+        $self->{'query'} = $query;
+        $self->{'next'} = $limit ? ($startat + $limit) : 0;
+	if ($self->{'debug'}) {
+	    $self->print("Setting next to " . $self->{'next'} . "\n");
+	}
+        $self->{'prev'} = $startat ? ($startat - $limit) : 0;
+
+        if ($dbh->{'ImplementorClass'} eq "DBD::mysql::db"  &&
+            ($startat  ||  $limit)) {
+            $query .= " LIMIT $startat";
+            $startat = 0;
+            if ($limit) {
+                $query .= ", " . ($limit+1);
+            }
+        }
+
+	if ($debug) {
+	    $self->print("SELECT query is: $query\n");
+	}
+        my $sth = $dbh->prepare($query);
+        if (!$sth) {
+            $errors .= "Error while preparing SELECT: " . $dbh->errstr()
+                . "\n";
+            $errors .= "Query is $query\n";
+        } else {
+            if (!$sth->execute()) {
+                $errors .= "Error while executing SELECT: " . $sth->errstr()
+                    . "\n";
+		$errors .= "Query is $query\n";
+            } else {
+                my($ref, $done, @rows);
+                $self->{'names'} = $sth->{'NAME'};
+                $self->{'types'} = $sth->{'TYPE'};
+                $self->{'num_of_fields'} = $sth->{'NUM_OF_FIELDS'};
+		my @sizes;
+		for (my $i = 0;  $i < $self->{'num_of_fields'};  $i++) {
+		    push(@sizes, 1);
+		}
+
+		if ($debug) {
+		    $self->print("Query returned " . $sth->rows() .
+				 " rows.\n");
+		}
+
+                while (!$done  &&  $startat--) {
+		    $ref = $sth->fetchrow_arrayref();
+		    if ($self->{'debug'}) {
+			$self->print("Skipping: " . ($ref || "undef") . "\n");
+		    }
+                    if (!$ref) {
+                        $done = 1;
+                        last;
+                    }
+                }
+		if (!$limit) {
+		    $limit = -1;
+		}
+                while (!$done  &&  $limit--) {
+		    $ref = $sth->fetchrow_arrayref();
+		    if ($self->{'debug'}) {
+			$self->print("Fetching: " . ($ref || "undef") . "\n");
+		    }
+                    if (!$ref) {
+                        $done = 1;
+                        last;
+                    } else {
+                        push(@rows, [@$ref]);
+			for (my $i = 0;  $i < $self->{'num_of_fields'};
+			     $i++) {
+			    my $len = length($ref->[$i]);
+			    if ($len > 20) { $len = 20 }
+			    if ($len > $sizes[$i]) {
+				$sizes[$i] = $len;
+			    }
+			}
+                    }
+                }
+                if ($done  ||  !($ref = $sth->fetchrow_arrayref())) {
+		    if ($self->{'debug'}) {
+			$self->print("Setting next to 0\n");
+		    }
+		    $self->{'next'} = 0;
+                }
+                $self->{'rows'} = \@rows;
+
+                my $template = "<TR>";
+		my $itemplate = "<TR>";
+		if ($show_delete) {
+		    $template .= qq{<TD><INPUT TYPE=checkbox}
+		        . qq{ NAME=rows_\$i\$_delete></TD>\n};
+		    $itemplate .= qq{<TD><INPUT TYPE=checkbox}
+		        . qq{ NAME=insert_me></TD>};
+		}
+                for (my $i = 0;  $i < @{$self->{'names'}};  $i++) {
+                    $template .= qq{<INPUT TYPE=hidden NAME="oldrows_\$i\$_$i"}
+                        . qq{ VALUE="\$&NULL->r->$i\$">\n}
+                        . qq{<TD><INPUT NAME="rows_\$i\$_$i" SIZE="}
+                        . $sizes[$i]
+                        . qq{" VALUE="\$&NULL->r->$i\$"></TD>\n};
+		    $itemplate .= qq{<TD><INPUT NAME="insert_$i"}
+		        . qq{ SIZE=} . ($sizes[$i] < 5 ? 5 : $sizes[$i])
+			. qq{></TD>};
+                }
+		$self->{'itemplate'} = $itemplate . "</TR>";
+                $self->{'template'} = $template . "</TR>";
+            }
+        }
+    } else {
+	if (!defined($cgi->param("dsn"))) {
+	    $cgi->param("dsn", "DBI:CSV:");
+	}
+	if (!defined($table)) {
+	    $cgi->param("table", "addresses");
+	}
+    }
+    $self->{'errors'} = $errors;
+
+    package HTML::EP;
+    sub _format_NULL {
+	my $self = shift; my $str = shift;
+	if (!defined($str)) {
+	    $str = $self->{'accept_nulls'} ? "NULL" : "";
+	} else {
+	    $str = $self->escapeHTML($str);
+	}
+	$str;
+    };
+
+    '';
+}</ep-perl>
+<HTML><HEAD><TITLE>
+<ep-language en="The Table Editor" de="Der Tabelleneditor">
+</TITLE></HEAD>
+<BODY BGCOLOR=#ffffff>
+  <H1><ep-language en="The Table Editor" de="Der Tabelleneditor"></H1>
+<ep-if eval="$errors$">
+  <H2><ep-language en="Errors encountered" de="Fehler sind aufgetreten"></H2>
+  <ep-language language="en">
+    Your last query returned the following errors:
+  </ep-language>
+  <ep-language language="de">
+    Ihre letzte Query ergab die folgenden Fehlermeldungen:
+  </ep-language>
+  <PRE>
+$errors$
+  </PRE>
+<ep-elseif eval="$cgi->edit$">
+  <H2><ep-language en="Success!" de="Ok!"></H2>
+  <ep-language language="en">
+    Your last query was executed and $modifiedRows$ row(s) have been updated,
+    $deletedRows$ have been deleted and $insertedRows$ have been inserted.
+  </ep-language>
+  <ep-language language="de">
+    Ihre letzte Query wurde ausgeführt und $modifiedRows$ Reihe(n) wurde(n)
+    geändert, $deletedRows$ Reihe(n) wurde(n) gelöscht und $insertedRows$
+    Reihe(n) wurde(n) eingefügt.
+  </ep-language>
+<ep-elseif eval="$rows$">
+<ep-else>
+  <H2>Intro</H2>
+  <ep-language language="en">
+  <P>
+    This is a nice application for the new methods and attributes of DBI
+    1.xy: If your driver supports $dbh->quote($str, $val), you can use this
+    form for editing your database tables.
+  </P>
+  <P>
+    Start with filling the form fields below and then hit the
+    "Show me"-Button.
+  </P>
+  </ep-language>
+  <ep-language language="de">
+  <P>
+    Dies ist eine nette, kleine Anwendung der neuen Methoden und
+    Attribute von DBI 1.xy: Wenn Ihr Datenbanktreiber die Methode
+    $dbh->quote($str, $val) unterstützt, dann können Sie dieses
+    Formular für die Bearbeitung Ihrer Tabellen benützen.
+  </P>
+  <P>
+    Füllen Sie einfach mal die unten stehenden Felder aus und dann
+    betätigen Sie den "Anzeigen"-Knopf.
+  </P>
+  </ep-language>
+</ep-if>
+  <FORM ACTION="edit.ep" METHOD=GET>
+      <INPUT TYPE=hidden NAME=language VALUE="$_ep_language$">
+  <H2><ep-language en="Database data" de="Datenbankauswahl"></H2>
+  <TABLE>
+    <TR>
+      <TH>DBI DSN:</TH>
+      <TD><INPUT SIZE=20 NAME=dsn VALUE="$cgi->dsn$"></TD>
+      <TH>Login:</TH>
+      <TD><INPUT SIZE=10 NAME=user VALUE="$cgi->user$"></TD>
+      <TH><ep-language en="Password" de="Paßwort">:</TH>
+      <TD><INPUT SIZE=10 TYPE=password NAME=pass VALUE="$cgi->pass$"></TD>
+    </TR>
+    <TR>
+      <TH><ep-language en="Table name" de="Tabelle">:</TH>
+      <TD><INPUT SIZE=10 NAME=table VALUE="$cgi->table$"></TD>
+      <TH><ep-language en="WHERE clause" de="WHERE-Klausel">:</TH>
+      <TD><INPUT SIZE=20 NAME=where VALUE="$cgi->where$"></TD>
+    </TR>
+    <TR>
+      <TH><ep-language en="Start at" de="1. Reihe">:</TH>
+      <TD><INPUT SIZE=5  NAME=startat VALUE="$cgi->startat$"></TD>
+      <TH><ep-language en="Max rows" de="Anzahl Reihen">:</TH>
+      <TD><INPUT SIZE=5  NAME=limit VALUE="$cgi->limit$"></TD>
+    </TR>
+    <TR>
+      <TH><ep-language language=en>Treat "NULL" string<BR>as NULL value:
+          </ep-language>
+          <ep-language language=de>Wort "NULL"<BR>gilt als NULL-Wert:
+          </ep-language>
+      </TH>
+      <TD><ep-if eval="$cgi->accept_nulls$">
+            <INPUT TYPE=checkbox NAME="accept_nulls" CHECKED>
+          <ep-else>
+            <INPUT TYPE=checkbox NAME="accept_nulls">
+          </ep-if>
+      </TD>
+      <TH><ep-language language=en>Create "DELETE" boxes</ep-language>
+          <ep-language language=de>Erzeuge "Löschen"-Felder</ep-language>
+      </TH>
+      <TD><ep-if eval="$cgi->show_delete$">
+            <INPUT TYPE=checkbox NAME="show_delete" CHECKED>
+          <ep-else>
+            <INPUT TYPE=checkbox NAME="show_delete">
+          </ep-if>
+      </TD>
+  </TABLE>
+<ep-language language="en">
+  <DIV ALIGN=CENTER><INPUT TYPE=submit VALUE="Show me"></DIV>
+</ep-language>
+<ep-language language="de">
+  <DIV ALIGN=CENTER><INPUT TYPE=submit VALUE="Anzeigen"></DIV>
+</ep-language>
+  </FORM>
+  <ep-if eval="$rows$">
+  <H2><ep-language en="Data section" de="Daten"></H2>
+  <DIV ALIGN=CENTER>
+  <TABLE><TR><TD>
+  <ep-if eval="$cgi->startat$">
+    <FORM ACTION=edit.ep METHOD=POST>
+      <INPUT TYPE=hidden NAME=language VALUE="$_ep_language$">
+      <INPUT TYPE=hidden NAME=show_delete VALUE="$cgi->show_delete$">
+      <INPUT TYPE=hidden NAME=accept_nulls VALUE="$cgi->accept_nulls$">
+      <INPUT TYPE=hidden NAME="dsn" VALUE="$cgi->dsn$">
+      <INPUT TYPE=hidden NAME="user" VALUE="$cgi->user$">
+      <INPUT TYPE=hidden NAME="pass" VALUE="$cgi->pass$">
+      <INPUT TYPE=hidden NAME="table" VALUE="$cgi->table$">
+      <INPUT TYPE=hidden NAME="where" VALUE="$cgi->where$">
+      <INPUT TYPE=hidden NAME="startat" VALUE="$prev$">
+      <INPUT TYPE=hidden NAME="limit" VALUE="$cgi->limit$">
+<ep-language language="en">
+      <INPUT TYPE=submit VALUE="Last $cgi->limit$ rows">
+</ep-language>
+<ep-language language="en">
+      <INPUT TYPE=submit VALUE="Die vorigen $cgi->limit$ Reihen">
+</ep-language>
+    </FORM>
+  </ep-if>
+  </TD><TD>
+  <ep-if eval="$next$">
+    <FORM ACTION=edit.ep METHOD=POST>
+      <INPUT TYPE=hidden NAME=language VALUE="$_ep_language$">
+      <INPUT TYPE=hidden NAME=show_delete VALUE="$cgi->show_delete$">
+      <INPUT TYPE=hidden NAME=accept_nulls VALUE="$cgi->accept_nulls$">
+      <INPUT TYPE=hidden NAME="dsn" VALUE="$cgi->dsn$">
+      <INPUT TYPE=hidden NAME="user" VALUE="$cgi->user$">
+      <INPUT TYPE=hidden NAME="pass" VALUE="$cgi->pass$">
+      <INPUT TYPE=hidden NAME="table" VALUE="$cgi->table$">
+      <INPUT TYPE=hidden NAME="where" VALUE="$cgi->where$">
+      <INPUT TYPE=hidden NAME="startat" VALUE="$next$">
+      <INPUT TYPE=hidden NAME="limit" VALUE="$cgi->limit$">
+<ep-language language="en">
+      <INPUT TYPE=submit VALUE="Next $cgi->limit$ rows">
+</ep-language>
+<ep-language language="en">
+      <INPUT TYPE=submit VALUE="Die nächsten $cgi->limit$ Reihen">
+</ep-language>
+    </FORM>
+  </ep-if>
+  </TD></TABLE>
+  </DIV>
+  <FORM ACTION=edit.ep METHOD=POST>
+      <INPUT TYPE=hidden NAME=language VALUE="$_ep_language$">
+    <INPUT TYPE=hidden NAME=show_delete VALUE="$cgi->show_delete$">
+    <INPUT TYPE=hidden NAME=accept_nulls VALUE="$cgi->accept_nulls$">
+    <INPUT TYPE=hidden NAME="dsn" VALUE="$cgi->dsn$">
+    <INPUT TYPE=hidden NAME="user" VALUE="$cgi->user$">
+    <INPUT TYPE=hidden NAME="pass" VALUE="$cgi->pass$">
+    <INPUT TYPE=hidden NAME="table" VALUE="$cgi->table$">
+    <INPUT TYPE=hidden NAME="where" VALUE="$cgi->where$">
+    <INPUT TYPE=hidden NAME="startat" VALUE="$cgi->startat$">
+    <INPUT TYPE=hidden NAME="limit" VALUE="$cgi->limit$">
+    <INPUT TYPE=hidden NAME="num_of_fields" VALUE="$num_of_fields$">
+  <ep-list items=types item=t>   <INPUT TYPE=hidden NAME="types_$i$" value=$t$>
+</ep-list>
+  <ep-language en="If you want to insert a record of data, do it here:"
+               de="Eine neue Zeile einfügen können Sie hier:">
+  <table border=1>
+    <tr>
+      <ep-if eval="$cgi->show_delete$">
+        <th><ep-language en="Insert" de="Einfügen"></th>
+      </ep-if>
+      <ep-list items=names item=n>
+        <th>$n$</th>
+      </ep-list>
+    </tr>
+    <tr>
+      $@itemplate$
+    </tr>
+  </table>
+  <table border=1>
+    <tr>
+      <ep-if eval="$cgi->show_delete$">
+        <th><ep-language en="Delete" de="Löschen"></th>
+      </ep-if>
+      <ep-list items=names item=n>
+        <input type=hidden name="names_$i$" value=$n$>
+        <th>$n$</th>
+      </ep-list>
+    </tr>
+    <ep-list items=rows item=r template="$@template$">
+  </ep-if>
+  </table>
+<ep-language language="en">
+  <DIV ALIGN=CENTER><INPUT TYPE=submit NAME=edit VALUE="Edit"></DIV>
+</ep-language>
+<ep-language language="de">
+  <DIV ALIGN=CENTER><INPUT TYPE=submit NAME=edit VALUE="Ändern"></DIV>
+</ep-language>
+  </FORM>
+</BODY>
+</HTML>

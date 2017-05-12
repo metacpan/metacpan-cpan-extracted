@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/HTTP-DAV-Nginx.t
+lib/HTTP/DAV/Nginx.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,19 @@
+---
+abstract: 'Find CODE in a hash (hashlike)'
+author:
+  - 'Robert Krimen <robertkrimen@gmail.com>'
+build_requires:
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102345, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Hash-Dispatch
+requires:
+  Any::Moose: 0
+  List::MoreUtils: 0
+version: 0.0010

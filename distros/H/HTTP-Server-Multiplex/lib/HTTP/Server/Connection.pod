@@ -1,0 +1,211 @@
+=head1 NAME
+
+HTTP::Server::Connection - represents a client connection
+
+=head1 INHERITANCE
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+The connection relates to one client.  Each time, a browser connects
+to the socket, a new ::Connection object will be created.  Internally,
+this object maintains a list of received requests, which will be
+handled in the order they arrived.
+
+=head1 METHODS
+
+=head2 Constructors
+
+$obj-E<gt>B<async>(REQUEST, RUN, CALLBACK)
+
+=over 4
+
+The RUN code reference is called in a forked-off process.  The returned
+value (LIST context) is passed to CALLBACK which runs in the daemon
+process.  The CALLBACK must deliver a response.
+
+example: 
+
+ sub handler($$$)
+ {   my ($conn, $request, $uri) = @_;
+     my $fn    = '$rootdir/'.$uri->path;
+     my $fread = sub      # (closure) in other process
+       { my @lines = File::Slurp::read_file($fn);
+         scalar @lines;
+       };
+     my $cb    = sub
+       { my $text = join '#', @_;
+         $conn->sendResponse($request, RC_OK, [], $text);
+       };
+     $conn->async($request, $fread, \&cb);
+     undef;
+  }
+
+=back
+
+$obj-E<gt>B<cancelConnection>
+
+=over 4
+
+Kill connection.
+
+=back
+
+$obj-E<gt>B<closeConnection>
+
+=over 4
+
+No not accept any more requests, but handle which were already received.
+
+=back
+
+$obj-E<gt>B<directoryList>(DIRECTORY, REQUEST, CALLBACK, OPTIONS)
+
+=over 4
+
+Returns file information from a directory.  This is executed in
+a seperate process.  Your CALLBACK should return the response
+object which has already been sent.  Your CALLBACK will not be called,
+when the directory cannot be read.
+
+See L</Return of directoryList> about the returned output.
+
+ Option       --Default
+ filter         <undef>
+ hide_symlinks  <false>
+ names          <skip hidden files>
+
+. filter => CODE
+
+=over 4
+
+For each of the selected names (see  C<names> option) the lstat() is
+called.  That data is expanded into a HASH, but not all additional
+fields are yet filled-in (only the ones which come for free).
+
+=back
+
+. hide_symlinks => BOOLEAN
+
+. names => CODE|Regexp
+
+=over 4
+
+Reduce the returned list.  The CODE reference is called with the found
+filename, and should return true when the name is acceptable.  The
+default regexp (on UNIX) is C<< qr/^[^.]/ >>
+
+=back
+
+=back
+
+$obj-E<gt>B<load>(FILENAME|FILEHANDLE, CALLBACK)
+
+=over 4
+
+Asynchronously read the FILE via the multiplexer, not blocking the
+activities for the other clients.  After everything has been read,
+the CALLBACK will be called with a reference to the data read, or undef
+on failure.  The CALLBACK must continue the work to end in a response.
+
+=back
+
+$obj-E<gt>B<save>(FILE, DATA, CALLBACK)
+
+=over 4
+
+Asynchronously write the FILE via the multiplexer, not blocking the
+activities for the other clients.  The FILE is specified either as file
+name or file handle.  The DATA is a string or SCALAR-ref (the latter
+usually providing a better performance).
+
+After everything has been written, the user CALLBACK will be called.
+The CALLBACK must continue the work to end in a response, because writing
+is just an intermediate activity.
+
+=back
+
+$obj-E<gt>B<sendFile>(REQUEST, FILE, [HEADER-ARRAY, [CALLBACK]])
+
+=over 4
+
+The FILE is either a filename or file handle.  In the latter case,
+you have to specify the content type in the HEADER ARRAY (list of key
+value pairs)
+
+=back
+
+$obj-E<gt>B<sendRedirect>(REQUEST, STATUS, LOCATION, [CONTENT])
+
+=over 4
+
+=back
+
+$obj-E<gt>B<sendResponse>(REQUEST, STATUS, HEADER, [CONTENT])
+
+=over 4
+
+The CONNECTION information is used to figure-out where the REQUEST
+(a HTTP::Request object) came from.  The STATUS code is used in
+the response, preferrable use the constants from HTTP::Status.
+The HEADER is an ARRAY of header line pairs to be used in the answer.
+
+You can use a scalar CONTENT, which will be used as response body.
+In case the CONTENT parameter is a CODE reference, that CODE will
+be called until C<undef> is returned.  The result of every call will
+become a chunk in a chunked transfer encoded response.
+
+=back
+
+$obj-E<gt>B<sendStatus>(REQUEST, STATUS, [TEXT])
+
+=over 4
+
+=back
+
+=head1 DETAILS
+
+=head2 Return of directoryList
+
+The L<directoryList()|HTTP::Server::Connection/"Constructors"> method returns a HASH of HASHes, where the
+primary keys are the directory entries, each refering to a HASH
+with details.  It is designed to ease the connection to template
+systems.
+
+The details contain the C<lstat> information plus some additional
+helpers.  The lstat call provides the fields C<dev>, C<ino>, C<mode>,
+C<nlink>, C<uid>, C<gid>, C<rdev>, C<size>,  C<atime>, C<mtime>,
+C<ctime>, C<blksize>, C<blocks> -as far as supported by your OS.
+The entry's C<name> and C<path> are added.
+
+The C<kind> field contains the string C<DIRECTORY>, C<FILE>, C<SYMLINK>,
+or C<OTHER>.  Besides, you get either an C<is_directory>, C<is_file>,
+C<is_symlink>, or C<is_other> field set to true.  Equivalent are:
+
+   if($entry->{kind} eq 'DIRECTORY')
+   if($entry->{is_directory})
+
+It depends on the kind of entry which of the following fields are added
+additionally.  Symlinks will get C<symlink_dest>, C<symlink_dest_exists>.
+Files hace the C<size_nice>, which is the size in pleasant humanly readable
+format.
+
+Files and directories have the C<mtime_nice> (in localtime).  The C<user> and
+C<group> which are textual representations of the numeric uid and gid are
+added.  The C<flags> represents the UNIX standard permission-bit display,
+as produced by the "ls -l" command.
+
+=head1 SEE ALSO
+
+This module is part of HTTP-Server-Multiplex distribution version 0.11,
+built on October 01, 2008. Website: F<http://perl.overmeer.net/httpd-multiplex/>
+
+=head1 LICENSE
+
+Copyrights 2008 by Mark Overmeer. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

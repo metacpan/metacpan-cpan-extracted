@@ -1,0 +1,47 @@
+TODO HTTP::WebTest::XMLParser
+
+
+In no particular order:
+
+o Write tests for *all* core tests
+
+o Extract code segments and make them work
+
+o Make as_xml fully functional (incl. code blocks)
+
+o Document DTD for xml testfile
+
+o Validate xml against DTD
+
+o Improve error detection in testdef file
+
+
+==========================
+
+Internal working of the *original* parser:
+
+::parse testcollection (start of testgroup seen)
+- initialize hashref
+- loop
+- parse test (name, value)
+- put name on stack (hashref):
+  - if name already defined:
+    - transfrom into array ref
+    - push param to array stack
+  - otherwise: put (name,value) on stack
+- until end of testgroup seen
+*NOTE* - order of tests is not preserved b/c of hash(ref)!
+ 
+
+::parse test param (name, value)
+- name is first "word"
+- if value is complex type:
+  - parse value (rest of element according to syntax)
+  - return value as ref to list (anonymous array)
+- else if value is "code" type
+  - extract code and promote to anymous sub (closure?)
+  - return as subref 
+- otherwise
+  - parse value as simple scalar
+*NOTE* - order of complex types *is* preserved in list.
+

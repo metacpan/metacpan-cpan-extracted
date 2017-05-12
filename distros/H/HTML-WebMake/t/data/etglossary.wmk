@@ -1,0 +1,34 @@
+
+<content name=foo format="text/et">
+
+Glossary test 1: try this link to "slashdot"
+
+	[slashdot]: http://slashdot.org/
+	Auto: [ntk]: http://www.ntk.net/
+
+</content>
+
+<content name=bar format="text/et">
+
+Glossary test 2: refer to that link to "slashdot"
+
+Hmm, this should also work [$(ntk)]
+
+or even this [ntk], using the auto link.
+
+</content>
+
+<content name=baz format="text/et">
+
+Glossary test 3: refer to ntk, without quotes.
+
+will http://ntk.org/ still work OK?
+
+Or this round-bracket <a href="$(ntk)">link</a>?
+
+Here's another one. <img src=ntk.gif />.
+
+</content>
+
+<out file=log/etglossary.html name=ntk>${foo}${bar}${baz}</out>
+

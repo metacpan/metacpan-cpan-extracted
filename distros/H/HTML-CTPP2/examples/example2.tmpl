@@ -1,0 +1,19 @@
+<html>
+<head>
+	<title><TMPL_var title></title>
+</head>
+<body>
+<h1>Hello, World!</h1><TMPL_include  header.tmpl >
+<TMPL_if super("a'b\" c", DUPER(3.14E+1,B,C)) >
+	<TMPL_var abc> <b>2</b>
+<TMPL_else>
+	3
+</TMPL_if> some text
+<TMPL_loop __context_vars__  __no_GloBal_vars__ test >
+	<TMPL_udf HREF_PARAM('a', b)>
+</TMPL_loop>
+
+<TMPL_loop __global_vars__ p> <TMPL_include 'footer.tmpl'> </TMPL_loop>
+<TMPL_unless foo> bar </TMPL_unless> <b>end-of-stream</b>
+
+</html>

@@ -1,0 +1,13 @@
+---
+    elements:
+        - type: Text
+          name: name
+        - type: Checkboxgroup
+          name: sex
+          options:
+              - label: test
+                group:
+                      - [0, 'male']
+                      - [1, 'female']
+        - type: Text
+          name: cds

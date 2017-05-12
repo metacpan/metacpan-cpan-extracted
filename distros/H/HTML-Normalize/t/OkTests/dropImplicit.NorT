@@ -1,0 +1,6 @@
+-selfrender=1
+-keepImplicit=0
+<p>foo</p>
+<p>bar</p>
+<!--expected-->
+<p>foo</p><p>bar</p>

@@ -1,0 +1,34 @@
+Hash::MultiKey
+==============
+
+Hash::MultiKey provides true multi-key hashes.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+In order to run the tests with make test you'll need Test::More. Other
+than that no further modules are needed for using this module.
+
+
+DOCUMENTATION
+
+After installation documentation is available running
+
+   perldoc Hash::MultiKey
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2003, Xavier Noria <fxn@cpan.org>. All rights
+reserved. This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+

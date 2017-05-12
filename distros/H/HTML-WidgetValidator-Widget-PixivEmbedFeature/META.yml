@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                HTML-WidgetValidator-Widget-PixivEmbedFeature
+version:             0.03
+abstract:            Perl extension for validate "pixiv Embed"
+license:             perl
+author:              
+    - pmint <pmint@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42_01
+distribution_type:   module
+requires:     
+    HTML::WidgetValidator::Widget: 0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

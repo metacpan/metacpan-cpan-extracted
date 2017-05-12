@@ -1,0 +1,63 @@
+<wmmeta name="Title" value="Sorting Lists of Content Items" />
+<wmmeta name="Section" value="03-proc_logic" />
+<wmmeta name="Score" value="40" />
+<wmmeta name="Abstract">
+how, and where, it is done
+</wmmeta>
+
+Frequently, you will need to get a list of content items in sorted order.
+WebMake itself does this for the sitemap tag, among others.
+
+Sorting is typically performed using a content item's metadata; some metadata
+that are especially useful are:
+
+	__score__:	A number representing the ''priority'' of a content
+	item; specifically intended for use when sorting. Defaults to **50**
+	if unset.
+
+	__title__:	The title of a content item. Handy for alphabetic
+	lists. Defaults to **(Untitled)** if not set.
+
+	__declared__:	The item's declaration order.  This is a number
+	representing when the content item was first encountered in the
+	WebMake file; earlier content items have a lower declaration order.
+	You do not need to set this; WebMake will do so automatically.
+
+	__mtime__:	The modification date, in UNIX time_t
+	seconds-since-the-epoch format, of the file the content item was
+	loaded from.
+
+	__name__:	The name of the content item.
+
+WebMake provides a built-in mechanism to allow easy sorting of content items,
+called a __sort spec__ or __sort string__.
+
+This is typically used either with the Perl code library's
+"##sort_content_objects()##" [sort_content_objects] call, or using a
+##sortorder## attribute as the sitemap tag does.
+
+A sort string is a text string, containing a space-separated list of metadata
+items.  The first entry in the list is the main sorting criterion; the second
+entry is then used to break deadlocks if two entries match for the main
+criterion, etc.
+
+In addition, a metadata item can be prefixed with a ##!##, to reverse its
+order.
+
+Example
+=======
+
+**score title**:	sort by score, and if two content items have the same
+score, sort by title.
+
+**declared**:	sort by the order in which they were declared in the WebMake
+file.
+
+**score title !mtime**:	sort by score and title, and if more than one content
+item have the same score and title, sort them into oldest-first order.
+
+	[sort_content_objects]: PerlCodeLibrary.pm.html#item__sortedobjs
+
+	Auto: [sort string]: $(sorting)
+	Auto: [sort spec]: $(sorting)
+

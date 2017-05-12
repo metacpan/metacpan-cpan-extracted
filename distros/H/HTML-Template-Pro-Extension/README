@@ -1,0 +1,61 @@
+HTML::Template::Pro::Extension README File
+=====================================
+
+Introduction
+------------
+  This module extends HTML::Template::Pro to easily support methods and tags not 
+implemented in parent module. Piece of code needed to add new tags syntax and 
+new functionality are called plugins. 
+
+  All plugins can be dynamically loaded for supporing needed syntax and 
+functionality. All dynamic plugins live in the HTML::Template::Extension 
+namespace and you can built your own extension to support you prefered tags and 
+functionality.
+
+  A plugin named DO_NOTHING is present in this package and can be use like a 
+skeleton to built your own plugin. DO_NOTHING, as name says, add nothing to 
+standard HTML::Template::Extension but there are other plugins just available:
+
+- HTML::Template::Extension::DOC: to support comment text
+
+- HTML::Template::Extension::SLASH_VAR: to support <TMPL_VAR></TMPL_VAR> syntax
+
+- HTML::Template::Extension::CSTART: to select what parts of your template must 
+be returned by "output" and "html" method
+
+- HTML::Template::Extension::HEAD_BODY: that don't add tag syntax but some 
+method for easily working with html files
+
+- HTML::Template::Extension::TAG_ATTRIBUTE_NORMALIZER to remove unknown 
+HTML::Template attribute to tags.
+
+- HTML::Template::Extension::DO_NOTHING: that do nothing :-)
+
+Installation
+------------
+
+0.  Prerequisites:
+	- Perl version 5.005 or more recent.
+	- CPAN HTML::Template
+
+1.  Installation steps:
+	- from the directory where this file is located, type:
+		perl Makefile.PL
+		make
+		make test
+		make install
+
+More info
+---------
+
+Have a look to 
+	http://www.ebruni.it/en/software/perl/cpan/html/template/extension/index.htm
+to have more info about this module.
+		
+Disclaimer
+----------
+*** This is beta software -- use at your own risks ***
+
+--
+Bruni Emiliano <info AT ebruni DOT it>
+2005-08-16

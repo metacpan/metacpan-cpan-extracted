@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 612e4f07aa2d8069a79402e46b263b9ab88b31c8 Changes
+SHA1 b9cc9f0f9d5d526f015b0ecea32fbbeb0332dac5 LICENSE
+SHA1 5793acc1207c3c413d439b3cc630bc5493bb65ef MANIFEST
+SHA1 92ab048f85ae8b5543754857a5f789d17ffe3472 MANIFEST.SKIP
+SHA1 c0c0cfaec0bf0fd4f20204e40a601193e9818ec6 META.json
+SHA1 63bec1d3c9edcd296b6840b4deecb57538a33763 META.yml
+SHA1 2eab5ed6e1d3a74f87b13bfe2ffa422cc128bca7 Makefile.PL
+SHA1 44d69a40c8430f04686fea7ce6be7fdb6fde4726 README
+SHA1 50c47e4fa44f7b9821b8874981ac18b6c371932e dist.ini
+SHA1 c1e9bfc4e85e4994b173497a9dcf85a0d4d15c40 lib/HTML/Mason/PSGIHandler.pm
+SHA1 a0dd507dffbb88ce1df364f2db583614bcf4ba41 lib/HTML/Mason/PSGIHandler/Streamy.pm
+SHA1 e5b052bb63addb98d77ab059f0c7796dd0e93ab1 t/00-compile.t
+SHA1 24a0dd89d2c74aa1a686019e79a21393ef698e94 t/hello.mhtml
+SHA1 0b764f944db6f369dd350c273977422ae5f6b953 t/hello.t
+SHA1 89a91c7931e33633085d11b8b40e629ecc85aa58 t/leaks.t
+SHA1 87768d177f8c2e2df9c591cde869e7c8a245555e t/release-dist-manifest.t
+SHA1 bf8570ef6888d79ca6a0c9e21b206b904b0775e2 t/release-distmeta.t
+SHA1 a032c41ef6887fab1b900669c2d304fab46680e2 t/release-eol.t
+SHA1 0068bf52fc88b39cc6509199f19a77890edb9bb0 t/release-has-version.t
+SHA1 455d1dd1867212a665ad5ea4126b572411de300c t/release-no-tabs.t
+SHA1 4b471f98a7be51713c8331a647684465226f204b t/release-pod.t
+SHA1 99b0f34fa0bb7f32ef4b6995f872f6eb20db7815 t/release-synopsis.t
+SHA1 7fdcfa4a774a4d249d376ab2455761e25e34cae0 t/streamy.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.14 (Darwin)
+
+iEYEARECAAYFAlIyuwYACgkQvH6dkeDZaS82oACfbR5qqRbFLzgI8UmqK5yeAa3I
+piMAnjNFVO63BWtrwxGbcFBBIBJx0F6b
+=LnIm
+-----END PGP SIGNATURE-----

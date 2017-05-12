@@ -1,0 +1,456 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+html2perlstream - convert an HTML document to Perl code for that document
+
+=head1 SYNOPSIS
+
+    html2perlstream
+    html2perlstream [options] -
+    html2perlstream [options] file.html .. file.html
+
+=head1 DESCRIPTION
+
+Takes an HTML file, and produces from it a Perl script that will
+generate that HTML using the L<HTML::Stream> module.
+
+For usage, just say:
+
+    html2perlstream
+
+The normal form is:
+
+    html2perlstream [-options] [files]
+
+Any named HTML input file F<file.html> will cause output script 
+F<file.html.pl> to be generated.  To read from the standard input,
+specify '-', like this:
+
+    html2perlstream - < test.html
+
+If reading from the standard input, the output Perl code goes to the 
+standard output.  So if you want to run it right away to see the output, 
+just do this:
+
+    html2perlstream - < test.html | perl
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-d>
+
+Automatically load and run the output Perl file, then do a diff on
+that and the input file (you must input from a file and output to a
+file in order to use this).
+
+    html2perlstream -w -d testin/test.html
+
+You'll get fewer differences if you build the code with C<-w>.
+
+=item B<-w>
+
+Try to generate code which will output all whitespace between tags verbatim.  
+The default code only outputs whitespace if it is believed to be 
+needed; e.g., if we are inside a C<PRE> environment.
+
+=back
+
+
+=head1 REQUIRES
+
+To run this, you need:
+
+   HTML::Entities
+   HTML::Parser
+
+
+=head1 VERSION
+
+$Id: html2perlstream,v 1.10 2001/08/17 00:50:00 eryq Exp $
+
+
+=head1 AUTHOR
+
+Eryq, 11 Jan 1997, F<eryq@zeegee.com> or thereabouts.
+
+Thanks (independently) to Tony Cebzanov and John Buckman for suggesting 
+that I write a tool like this.
+
+=cut
+
+# Try this: 
+#
+# perl -I. bin/html2perlstream -w testin/test.html;
+# perl -I. testin/test.html.pl > testin/test2.html 
+# diff testin/test.html testin/test2.html
+
+use HTML::Parser;
+use HTML::Entities;
+use Getopt::Std;
+use FileHandle;
+
+use strict;
+use vars qw($VERSION 
+	    $opt_d 
+	    $opt_w
+	    );
+
+#------------------------------------------------------------
+#
+# Globals...
+#
+#------------------------------------------------------------
+
+# Version...
+( $VERSION ) = '$Revision: 1.10 $ ' =~ /\$Revision:\s+([^\s]+)/;
+
+# Escape-map:
+my %PerlUnescape = (
+		    "\b"=>'b',
+		    "\f"=>'f',
+		    "\r"=>'r',
+		    "\t"=>'t',
+		    "\n"=>'n',
+		    );
+my $PerlEscapePat = join('',keys(%PerlUnescape));
+
+#------------------------------------------------------------
+# str2perl STRING,[QUOTECHAR]
+#------------------------------------------------------------
+# Convert a string to a double-quoted Perl string.
+# Unsafe characters and non-printables are escaped.
+#
+# If QUOTECHAR is nonempty (default is '"'), it is escaped and also 
+# wrapped around the string.
+
+sub str2perl {
+    my ($str, $qq) = @_;
+    defined($qq) or $qq = '"';
+
+    $str =~ s/[\\\$\@]/\\$&/g;                           # unsafe
+    $str =~ s/$qq/\\$qq/g          if $qq;               # quote char
+    $str =~ s/[$PerlEscapePat]/\\$PerlUnescape{$&}/og;   # newlines, tabs...
+    $str =~ s/[\x00-\x1F\x7F-\xFF]/sprintf("\\x%02X", ord($&))/eg;
+    "$qq$str$qq";
+}
+
+
+
+#============================================================
+package Main::Parser;
+#============================================================
+
+use HTML::Stream qw(:funcs);
+use vars qw(@ISA);
+
+@ISA = (qw(HTML::Parser));
+
+
+# Are we inside a preformatter environment?
+my $PREcount = 0;
+
+#------------------------------------------------------------
+# declaration
+#------------------------------------------------------------
+# This method is called when a markup declaration has been
+# recognized. For typical HTML documents, the only declaration you are 
+# likely to find is <!DOCTYPE ...>. The initial ``<!'' and ending ``>'' 
+# is not part of the string passed as argument. Comments
+# are removed and entities have not been expanded yet. 
+
+sub declaration {
+    my ($self, $decl) = @_;    
+
+    print '$HTML->io->print(', ::str2perl("<!$decl>"), ");\n";
+}
+
+#------------------------------------------------------------
+# start
+#------------------------------------------------------------
+# This method is called when a complete start tag has been
+# recognized. The first argument is the tag name (in lower case)
+# and the second argument is a reference to a hash that contain
+# all attributes found within the start tag. The attribute keys
+# are converted to lower case. Entities found in the attribute
+# values are already expanded.
+
+sub start {
+    my ($self, $tag, $attr) = @_;
+ 
+    # Bookkeeping:
+    ++$PREcount if ($tag eq 'pre');
+
+    # Output:
+    if (keys %$attr) {
+
+	# Output and remember first line, up to open paren:
+	my $firstline = "\$HTML -> \U$tag\E(";
+	print $firstline;
+
+	# Determine nice indent:
+	my $indent =  ' ' x length($firstline);
+	$indent =~ s/ {8}/\t/g;
+
+	# Output tag params:
+	my @keys = sort keys %$attr;
+	my $i;
+	for ($i = 0; $i < int(@keys); $i++) {
+	    print "\U$keys[$i]\E => ";
+	    print ::str2perl($attr->{$keys[$i]});
+	    print ",\n$indent" unless ($i == (int(@keys)-1));
+	}
+	print ");\n";
+    }
+    else {
+	print "\$HTML -> \U$tag\E;\n";
+    }
+}
+
+#------------------------------------------------------------
+# end
+#------------------------------------------------------------
+# This method is called when an end tag has been recognized. 
+# The argument is the lower case tag name. 
+
+sub end {
+    my ($self, $tag) = @_;
+    print "\$HTML -> _\U$tag\E;\n";
+
+    # Bookkeeping:
+    --$PREcount if ($tag eq 'pre');
+}
+
+
+#------------------------------------------------------------
+# should_output_whitespace
+#------------------------------------------------------------
+sub should_output_whitespace {
+    $::opt_w || ($PREcount > 0);
+}
+
+#------------------------------------------------------------
+# whitespace
+#------------------------------------------------------------
+sub whitespace {
+    my $ws = shift;
+    
+    return if (!$ws);
+    if ($ws =~ /\A\n*\Z/) {
+	print "\$HTML -> nl";
+	print( (length($ws) > 1) ? '('.length($ws).')' : '');
+	print ";\n";
+    }
+    else {
+	print "\$HTML -> t(", ::str2perl($ws), ");\n";
+    }    
+}
+
+#------------------------------------------------------------
+# text
+#------------------------------------------------------------
+# This method is called as plain text in the document
+# is recognized. The text is passed on unmodified and might contain
+# multiple lines. Note that for efficiency reasons entities in the
+# text are not expanded. You should call
+# HTML::Entities::decode($text) before you process the text any
+# further.
+
+sub text {
+    my ($self, $text) = @_;
+
+    # Do nothing if empty string:
+    return if (!defined($text) or ($text eq ''));
+
+    # Unescape HTML:
+    $text = HTML::Entities::decode($text);
+
+    # Break into WHITE* NONWHITE* WHITE*
+    my ($pre, $in, $dummy, $post) = ($text =~ /\A(\s*)((.|\n)*?)(\s*)\Z/);
+
+    # Output leading whitespace:
+    if ($pre && should_output_whitespace()) {
+	whitespace($pre);
+    }
+
+    # Output main text:
+    if (defined($in) && ($in ne '')) {
+	if (length($in) < 70) {    # output as t()
+	    print "\$HTML -> t(", ::str2perl($in), ");\n";
+	}
+	else {     # output as hereis()
+	    my $hereis = ::str2perl($in, '');
+	    $hereis =~ s/\\n/\n/g;
+
+	    print "output \$HTML <<EOF;\n";
+	    print $hereis;
+	    print "\nEOF\n";
+	}
+    }
+
+    # Output trailing whitespace:
+    if ($post && should_output_whitespace()) {
+	whitespace($post);
+    }
+    1;
+}
+
+#------------------------------------------------------------
+# comment
+#------------------------------------------------------------
+# This method is called as comments are recognized. 
+# The leading and trailing ``--'' sequences has been stripped off 
+# the comment text. 
+
+sub comment {
+    my ($self, $comment) = @_;
+
+    # Remove lead/trail single space (we'll put it back, honest):
+    $comment =~ s/^ //;
+    $comment =~ s/ $//;
+
+    print "\$HTML -> comment(", ::str2perl($comment), ");\n";
+}
+
+
+#============================================================
+package main;
+#============================================================
+
+#------------------------------------------------------------
+# print_header
+#------------------------------------------------------------
+sub print_header {
+    print <<EOF;
+#!/usr/bin/perl -Tw
+
+use HTML::Stream;
+\$HTML = new HTML::Stream \\*STDOUT;
+EOF
+
+    if ($opt_w) {
+	print <<EOF;
+
+# You generated this code with "html2perlstream -w", so we turn off 
+# auto-formatting to make things look right:
+\$HTML->auto_format(0);
+EOF
+    }
+    else {
+	print <<EOF;
+
+# You generated this code without "html2perlstream -w", so we keep
+# auto-formatting on to add some whitespace here and there:
+# \$HTML->auto_format(0);
+EOF
+    }
+
+    print <<EOF;
+
+# BEGIN GENERATED CODE
+EOF
+}
+
+#------------------------------------------------------------
+# print_fooer
+#------------------------------------------------------------
+sub print_footer {
+    print <<EOF;
+# END GENERATED CODE
+1;
+EOF
+}
+
+#------------------------------------------------------------
+# usage
+#------------------------------------------------------------
+sub usage {
+    print STDERR <<EOF;
+
+html2perlstream version $VERSION by Eryq, Jan 1997, eryq\@zeegee.com.
+
+Usage: html2perlstream [options] [files...]
+           -d    automatically run Perl on output, and diff with input
+           -w    output code to output whitespace verbatim
+
+EOF
+    exit(-1);
+}
+
+#------------------------------------------------------------
+# do_diff
+#------------------------------------------------------------
+sub do_diff {
+    my ($htmlfile, $perlfile) = @_;
+    my $html2 = "$perlfile.out";
+    my $diff  = "$perlfile.diff";
+
+    # Sync up output:
+    STDOUT->flush;
+    STDERR->flush;
+
+    # Do it!
+    my $cmd = join(' ', ($^X, (map {"-I$_"} @INC), $perlfile));
+    # print STDERR "diff command = $cmd\n";
+    print STDERR "    Running code: output in $html2\n";
+    system "$cmd > $html2";
+    print STDERR "    Doing diff:   output in $diff\n";
+    system "diff $htmlfile $html2 > $diff";
+}
+
+#------------------------------------------------------------
+# main
+#------------------------------------------------------------
+sub main {
+    my $parser = new Main::Parser;
+
+    # Usage if no args:
+    @ARGV or usage();
+
+    # Get opts:
+    getopts "wd";
+    
+    # Process files:
+    @ARGV or unshift @ARGV, '-';
+    my $infile;
+    while ($infile = shift @ARGV) {
+	my $outfile = (($infile eq '-') ? '-' : "$infile.pl");
+
+	# Trap for bad -d usage:
+	if ($opt_d and (($infile eq '-') || ($outfile eq '-'))) {
+	    die "Cannot use -d if input is from STDIN\n";
+	}
+
+	# Report:
+	print STDERR "Converting ", ($infile  eq '-' ? '<STDIN>' : $infile),
+	             " to "       , ($outfile eq '-' ? '<STDOUT>' : $outfile),
+	             "\n";
+
+	# Open input and output:
+	open INPUT,  "<$infile" or die "$infile: $!";
+	open OUTPUT, ">$outfile" or die "$outfile: $!";
+	select OUTPUT;
+
+	# Header:
+	print_header();
+	$parser->parse_file(\*INPUT);
+	
+	# Footer:
+	print_footer();
+
+	# Close:
+	close OUTPUT;
+	close INPUT;
+	
+	# Do a diff...
+	do_diff($infile, $outfile) if ($opt_d);
+	
+    }
+    print STDERR "Done.\n";
+    1;
+}
+exit (&main ? 0 : -1);
+
+#------------------------------------------------------------
+1;

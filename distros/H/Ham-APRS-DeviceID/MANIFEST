@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+DeviceID.pm
+share/tocalls.yaml
+README
+LICENSE
+t/00load-module.t
+t/01pod.t
+t/02pod-coverage.t
+t/10detect-dstcall.t
+t/21detect-mice.t
+META.yml                                 Module meta-data (added by MakeMaker)

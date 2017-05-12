@@ -1,0 +1,5 @@
+-unformatted=1
+<p>foo</p>
+<p>bar</p>
+<!--expected-->
+<p>foo</p><p>bar</p>

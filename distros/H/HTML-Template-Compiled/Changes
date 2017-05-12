@@ -1,0 +1,622 @@
+Revision history for Perl module HTML::Template::Compiled.
+
+1.003 2016-05-03 14:06:00
+- Bugfix: prevent unexpected Data::Dumper config to mess with the output
+  (github issue #10 bittrine++)
+- Fixed typos (github PR #9 zhouzhen1++)
+- Storable >= 2.05 (CODE refs)
+- fixed issue with parallel testing
+
+1.002 Sun Jul 26 01:43:26 CEST 2015
+- Regular release, see developer versions
+
+1.001_002 Tue Jul 21 20:48:37 CEST 2015
+- Bugfix: Issues with global_vars #6, #7 (rpv-tomsk++)
+- Changed to Dist::Zilla
+
+1.001_001 Tue May 21 00:50:22 CEST 2013
+- New option: optimize
+- Minor optimization
+
+1.001 Sat May  4 12:49:44 CEST 2013
+- Regular release, see developer versions for changes
+
+1.000_006 Fri Jan 25 22:57:24 CET 2013
+- Minor optimizations for file cache
+- Remove ::Plugin::DHTML (own distribution)
+
+1.000_004 Thu Jan 10 00:29:59 CET 2013
+- New features: added options warnings and line_info
+
+1.000_003 Mon Dec 31 19:05:54 CET 2012
+- fix test
+
+1.000_002 Sat Dec  1 21:06:57 CET 2012
+- make parallel testing possible
+- remove ::Plugin::NumberFormat (has its own distribution now)
+
+1.000_001 Tue Nov 27 19:55:00 CET 2012
+- Minor optimizations
+- New Feature: attribute sortby for TMPL_EACH
+
+1.000 Tue Nov 13 20:45:44 CET 2012
+- regular release
+
+0.99_001 Sat Aug  4 17:32:03 CEST 2012
+- Bugfix: reloading changed includes didn't always work
+
+0.99 Mon Jul  2 21:48:39 CEST 2012
+- fixed tests (deprecation in perl 5.17 and Data::TreeDumper prereq)
+- also see developer version changes
+
+0.98_003 Sun Jun 10 19:25:15 CEST 2012
+- removed test cache directory from distribution
+- added some modules to recommends
+
+0.98_002 Wed Jun  6 20:43:05 CEST 2012
+- Workaround for using var names with dollars:
+  local $HTML::Template::Compiled::Compiler::DISABLE_NEW_ALIAS = 1;
+
+0.98_001 Mon Jun  4 23:53:45 CEST 2012
+- require perl 5.8.1
+- Hotfix for include_var and file caching
+
+0.98 Mon Jun  4 18:18:40 CEST 2012
+- IMPORTANT: Change: use aliases (alias=..., SET_VAR) via $aliasname.
+  USE_VARS will be removed in the future. Old alias syntax still works
+  for now.
+
+0.97_006 Sun Jun  3 19:26:50 CEST 2012
+- new plugin HTML::Template::Compiled::Plugin::NumberFormat
+
+0.97_005 Sat Jun  2 12:47:06 CEST 2012
+- New feature: option cache_debug
+- New feature: TMPL_WRAPPER
+- Another bugfix for search_path_on_include
+
+0.97_004 Sun May 20 18:38:32 CEST 2012
+- Change: Implemented searching the path and search_path_on_include like
+  in HTML::Template (finally) and add an additional value. PLEASE TEST!
+- Improved file cache performance
+- Bugfix: old bug with invalid tags in noparse, verbatim, comment
+- Remove old Storable workaround (0.94_002)
+
+0.97_001 Thu May 17 14:54:30 CEST 2012
+- fix HTML::Template::Compiled::Classic: allow every character in template
+  var names (RT 70676)
+- New option expire_time instead of global HTML::Template::Compiled->ExpireTime
+- Added loop context vars __even__, __outer__
+- Change: removed documentation of class methods ->CaseSensitive,
+  ->SearchPathOnInclude, ->UseQuery - will be deprecated
+- Added strict option
+
+0.97 Tue May  8 19:19:00 CEST 2012
+- regular release, see changes from dev version below
+
+0.96_005 Sun May  6 16:24:54 CEST 2012
+- fix t/25_expr.t number of skip tests
+
+0.96_004 Sat May  5 15:56:27 CEST 2012
+- Minor bugfix USE_VARS, module version numbers
+- Bugfix caching: under certain circumstances some template includes
+  were not added to memory cache and reloaded from file cache very time
+
+0.96_003 Fri May  4 17:09:19 CEST 2012
+- Improved Feature: expressions like .path.to.hash{var}
+
+0.96_002 Sun Apr 22 19:23:33 CEST 2012
+- Changed/New feature: chomp whitespaces globally or in tags
+- New feature: SET_VAR (and USE_VARS)
+
+0.96_001 Sat Apr 21 23:17:59 CEST 2012
+- New feature: allow expressions like .path.to.hash{var}
+- Bugfix: allow more than two binary operands in H::T::C::Expr
+
+0.96 Mon Nov 21 20:37:22 CET 2011
+- fixed 05_filter.t
+- fixed t/01_HTML-Template-Compiled.t (problems when test takes longer then
+  cache expiration)
+
+0.95_003 Sat Nov 12 15:12:02 CET 2011
+- Bugfix: Reload includes of includes (required change of caching mechanism -
+  please report any issues if you have problems with caching)
+- New Escape: 'IJSON'
+- Deprecated the use options 'speed', 'compatible' and 'short'
+
+0.95_002 Mon Oct 31 21:00:51 CET 2011
+- HTML::Template Compatibility: lowercase instead of uppercase
+  parameters when case_sensitive 0
+
+0.95_001 Sun Aug 28 19:02:00 CEST 2011
+- Bugfix: escape=js escapes backslash now (RT 66463)
+- Bugfix: H::T::C::Classic ignored case_sensitive (RT 70412)
+- Added Template::AutoFilter to bench.pl
+
+0.95 Wed Apr 27 20:48:13 CEST 2011
+- Just moving developer release to regular release
+
+0.94_002 Thu Aug 19 23:43:41 CEST 2010
+- Fix for 5.12: ignore Storable fatal error abour regexp items.
+  thanks to Daniel Tašov for the hint. just a workaround for now
+
+0.94_001 Wed Sep 16 19:41:01 CEST 2009
+- Fix memory leak when compiling
+  Thanks to Henrik Tougaard
+
+0.94 Thu Sep 10 19:55:04 CEST 2009
+- Fix test
+
+0.93_003
+- remove HTML::Entities dependency
+
+0.93_002 Fri Aug 21 14:47:09 CEST 2009
+- Bugfix: Expressions were only activated when using default
+  tagstyle; using tagstyle would overwrite use_expression option
+- New feaure: in TMPL_LOOP and TMPL_EACH you can set context="list"
+  This is necessary if you call a method that returns a list
+  instead of array- or hashref
+
+0.93_001 Sun Jul 12 17:03:16 CEST 2009
+- Bugfix: single quoted attributes did not allow double quotes in content
+  http://rt.cpan.org/Public/Bug/Display.html?id=43591
+- Bugfix: global vars weren't fetched correctly if case_sensitive off
+  http://rt.cpan.org/Public/Bug/Display.html?id=43591
+- Bugfix: add missing package line
+  http://rt.cpan.org/Public/Bug/Display.html?id=45081
+- Bugfix: added md5sum of paths to cache key so different templates with 
+  the same name are found
+  http://rt.cpan.org/Public/Bug/Display.html?id=28606
+- Bugfix: expressions didn't work in every tag
+
+0.93 Mon Nov  3 20:03:07 CET 2008
+- New Feature: sort-Attribute for TMPL_EACH
+- Change: Allow TMPL_LOOP over an overloaded @{} object 
+  (and TMPL_EACH over %{})
+- Bugfix: closing IF_DEFINED was not recognized
+  http://rt.cpan.org/Ticket/Display.html?id=40341
+
+0.92_001 Sun Aug 10 18:53:48 CEST 2008
+- Bugfix: ESCAPE didn't work always correctly since 0.92
+
+0.92 Sat Jul 26 13:02:28 CEST 2008
+- Change: code in TMPL_WITH is now only executed if the var is defined
+- New Feature: Option no_includes like in HTML::Template
+- For changes since 0.91 see 0.91_001, 0.91_002, 0.91_003
+
+0.91_003 Mon Jun 16 23:03:46 CEST 2008
+- New feature: Debug compiled code (see method debug_code)
+- Bufix: __last__ and __inner__ in included templates (thanks
+  to Henrik Tougaard for the patch)
+- Bugfix: Ternary operator didn't produce correct syntax always
+  (also thanks to Henrik Tougaard)
+- New feature: Expressions like in HTML::Template::Expr
+
+0.91_002
+- Bugfix: option objects
+- Bugfix: object plugins
+
+0.91_001
+- Bugfix: TMPL_IF_DEFINED without TMPL_ELSE
+  http://rt.cpan.org/Public/Bug/Display.html?id=33383
+- New feature: filename debugging (option debug_file)
+- New feature: option objects (strict, nostrict, 0)
+
+0.91 Thu Jan 24 21:50:20 CET 2008
+- Fixed tests: utf8 problems with perl 5.8.[0-7]
+- Change: open_mode without leading '<'
+
+0.90 Thu Nov 15 00:39:35 CET 2007
+- New Feature: use objects as plugins
+- New Feature: option open_mode (e.g. '<:utf8') (thanks to Moritz
+  Lenz and Chris Hagglund)
+- Fixed tests: permission problems on Win32
+
+0.89 Mon Oct 29 21:50:40 CET 2007
+- New Feature: BREAK attribute for loops (see docs)
+- Bugfix: utf8 in scalarrefs (thanks to Chris Hagglund)
+- Experimental feature: chomp newlines before/after tags. See docs.
+
+0.88 Mon Sep 10 22:05:44 CEST 2007
+- Bugfix: file-caching and Storable need B::Deparse >= 0.61.
+  Checking for proper version now.
+- Fix: broken test
+- Bugfix: avoid warnings when using html escape
+- Bugfix: using more than one plugin
+  http://rt.cpan.org/Ticket/Display.html?id=28764
+- Bugfix Plugin::XMLEscape: use numeric entities
+
+0.87 Mon Jul 30 22:46:31 CEST 2007
+- Change: file-caching now stores as Storable. If you get problems
+  with file-caching please report and set $HTML::Template::Compiled::Storable to 0
+  as a workaround.
+- Change: escape=HTML now only escapes '"&<>
+  http://rt.cpan.org/Public/Bug/Display.html?id=27446
+- Change: allow every character for TMPL_* NAMEs
+  http://rt.cpan.org/Ticket/Display.html?id=28094
+- Bugfix: ALIAS did only work for simple varnames
+  http://rt.cpan.org/Ticket/Display.html?id=28430
+- Change: in future versions you should use file_cache and
+  file_cache_dir like in HTML::Template
+
+0.86 Mon Jun 11 22:38:04 CEST 2007
+- Experimental Feature: use Storable for filecaching (set
+  $HTML::Template::Compiled::Storable to 1 if you want to test it.
+  It should be 1.5-2 times as fast as normal filecaching)
+- Fix: a test didn't skip if necessary
+- utf8 in templates (you probably need Encode (and thus 5.8) for that)
+- Fix: recursive includes didn't really work because of compile-time
+  instead of runtime check
+
+0.85 Sun Apr 15 16:15:22 CEST 2007
+- New Feature: JOIN attribute for loop-tag
+- Fix: uri_escape_utf8 for parameters in utf8
+- Fix for DBIx::Class objects ('can' method doesn't work here like expected)
+- Fix: Allow <%= array_of_arrays[0][0] %>
+- New Feature: get count of array elements <%= array# %>
+
+0.84 Sun Feb 11 15:43:38 CET 2007
+- Bugfix: includes in var includes didn't expire cache
+- Bugfix: tagstyle and use_perl weren't correctly passed to includes
+  when using filecache
+- Bugfix: plugins weren't safed in file cache
+
+0.83 Tue Nov 28 22:59:06 CET 2006
+- Added Feature: TMPL_EACH
+- Added missing plugin feature
+
+0.82 Mon Nov  6 21:25:23 CET 2006
+- Added: shorter plugins (omit the HTML::Template::Compiled::Plugin)
+- Added Feature: TMPL_INCLUDE_STRING
+- Added Feature: TMPL_PERL for including perl-code
+
+0.81 Fri Nov  3 22:48:05 CET 2006
+- Minor change in plugin code
+
+0.80 Sun Oct 15 16:39:02 CEST 2006
+- Bugfix: characters like '-' in <tmpl_* foo-bar> lead to
+  compilation errors
+- Bugfix: accessing array elements like <tmpl_var [23]> didn't work
+
+0.79 Sat Oct  7 20:36:55 CEST 2006
+- Change: instead of <tmpl_var name="array.42"> you must
+  now use <tmpl_var name="array[42]". sorry
+- Bugfix: path was not set when using template from a filehandle
+- Bugfix: globalvars did not work in included templates
+- New feature: allow negative indizes array[-1].foo
+- Bugfix: loop_context_vars weren't stored in filecache
+- Bugfix: query() wasn't always corect when doing
+  $template->query(name => ['FOO', 'BAR'])
+- Bugfix: query() now also reports included vars like H::T does
+
+0.78 Wed Oct  4 21:22:09 CEST 2006
+- Bugfix: endless loop when using file cache
+- Bugfix: correctly use cache attribute with filecache
+
+0.77 Mon Oct  2 18:35:52 CEST 2006
+- fixed META.yaml (was broken by E::MakeMaker)
+
+0.76 Mon Oct  2 18:15:29 CEST 2006
+- Change: HTC::Classic: TMPL_IF arrayref will be true if arrayref contains elements
+- Change: __odd__, __first__, __count__ and __index__ work in TMPL_WHILE
+- Bugfix: path attribute
+- Change: deprecate option dumper (use plugin instead)
+
+0.75 Thu Sep 14 22:42:19 CEST 2006
+- Bugfix of bug in 0.74: search_path_on_include didn't work
+
+0.74 Wed Sep 13 20:51:04 CEST 2006
+- Internal Changes
+- Security fix: Escape dangerous characters in template
+- Change: default for search_path_on_include is now 0 like in H::T
+- added examples/objects.pl
+
+0.73 Sat Aug 26 16:07:57 CEST 2006
+- Bugfix: in 0.72 only __first__ worked, but not __FIRST__
+- Change: query() now also reports INCLUDE_VARs
+- New feature: __index__ loop variable
+- New feature: Plugins for escape-attribute
+
+0.72 Fri Aug 18 22:16:35 CEST 2006
+- Documentation: Debugging and Escaping functions are now documented
+  in HTML::Template::Compiled::Utils (Mark Stosberg)
+- Change: Remove deprecated TMPL_IF DEFINED
+- Change: HTC will die if you use wrong syntax in tags (like H::T)
+- Bugfix: HTML::Template::Compiled::Lazy and query()
+- Bugfix: loop variables should survive different template files
+
+0.71 Thu Jul 13 20:54:44 CEST 2006
+- Change: dropped TMPL_LOOP_CONTEXT (not really useful)
+- Bug Fix: Filters didn't work correctly when used with file caching
+- Change: deprecate options
+  method_call, deref and formatter_path. You must use inheritance
+  now instead
+
+0.70 Wed Jul  5 21:12:05 CEST 2006
+- Bug Fix: php-tag style wasn't parsed
+- New Feature: lazy loading with HTML::Template::Compiled::Lazy
+- various documentation fixes
+- use ALIAS with TMPL_WHILE
+
+0.69 Sun Jul  2 19:45:35 CEST 2006
+- Bug Fix: Includes didn't work always correctly in scalarref
+- Bug Fix: Allow 'absolute' filenames that are relative to attribute path
+- Bug Fix: Empty path didn't work properly
+- Bug Fix: make inheritance possible
+- Change: new class HTML::Template::Compiled::Classic for features that
+  can't be used with HTML::Template::Compiled features at the same time
+
+0.68 Wed Jun 21 20:38:05 CEST 2006
+- New Feature: ESCAPE=JS was still missing
+- Bug Fix: parameters stayed in memory cache
+- Documentation fix
+
+0.67 Wed Jun  7 22:19:05 CEST 2006
+- Bug Fix: stack for global_vars wrong when using if-tag
+    http://rt.cpan.org/Ticket/Display.html?id=19662
+- Bug Fix: preloading did not recompile outdated templates
+- Change: undefined files via TMPL_INCLUDE_VAR don't let script die
+- Change: Deprecated setting global variables directly, they must be changed
+    by class-methods:
+    $ENABLE_SUB => EnableSub(bool)
+    $CASE_SENSITIVE_DEFAULT => CaseSensitive(bool)
+    $SEARCHPATH => SearchPathOnInclude(bool)
+    $DEFAULT_QUERY => UseQuery(bool)
+    $NEW_CHECK => ExpireTime(seconds)
+- Documentation: explain case_sensitive and use_query better
+    http://rt.cpan.org/Public/Bug/Display.html?id=19686
+
+0.66 Sun Jun  4 03:49:58 CEST 2006
+- Bug Fix: global_vars didn't work correctly with file-caching
+- Bug Fix: there was no output when last characters in template are a tag.
+- Bug Fix: calling param(%emptyhash) caused error-message
+
+0.65 Fri Jun  2 10:10:06 CEST 2006
+- Bug Fix: Documentation error broke pod
+
+0.64 Thu Jun  1 23:54:32 CEST 2006
+- Bug Fix: undefined filename and INCLUDE_VAR
+- New Feature: alias
+- Change: TMPL_IF DEFINED deprecated
+- Change: TMPL_INCLUDE VAR from deprecated to forbidden
+- New Feature: Define your own tagstyles
+
+0.63 Sat Apr 29 02:39:30 CEST 2006
+- Bug Fix: info for query() got lost with file caching
+- New Feature: TMPL_WHILE
+- Bug Fix: __vars__ when not using loop_context_vars
+- Bug Fix: TMPL_CASE wasn't rendered correctly since 0.61
+
+0.62 Wed Apr 26 23:36:13 CEST 2006
+- New Feature: added method precompile
+- New Feature: implemented query() (from HTML::Template)
+
+0.61 Sat Apr 22 19:34:32 CEST 2006
+- Bug Fix: global_vars and variables that are never set
+  http://rt.cpan.org/Public/Bug/Display.html?id=17851
+- Change: allow CASE default in a list of other strings
+- Bug Fix: weird endless loop when using wrong tags
+
+0.60 Sun Feb 26 18:46:07 CET 2006
+- Clarified docs for TMPL_WITH to explain interaction with global_vars
+- New Feature: TMPL_VERBATIM
+- Bug Fix: error when double TMPL_ELSE
+- New feature: global_vars => 2
+
+0.59 Tue Jan  3 19:40:46 CET 2006
+- $UNTAINT
+- All the "new_" constructor shortcuts were added from HTML::Template, with
+  tests for each. Also, the type/source option syntax to new() is now
+  supported. Tests were added for all these, which were generally missing from
+  the HTML::Template test suite. 
+
+- Bug Fix: Code and Tests were were added to make sure that calls to param()
+  accumulate data, like HTML::Template works.  
+
+- Bug Fix: embedded newlines
+- New Feature: new 'default_escape' option for compatibility with HTML::Template 2.8
+- Added query() tests from HTML::Template suite. (Currently TODO)
+- Change: use dot notation for mehtod calls and dereference
+- Change: literal dots in var names work now; you can't use -> for method calling
+  any more, just use the dot
+
+0.58 Sun Dec 11 23:20:35 CET 2005
+- fixed test with html entities
+- use H::T::C speed => 1
+- tmpl_include_var
+- TMPL_LOOP_CONTEXT
+
+0.57 Wed Dec  7 15:54:05 CET 2005
+- tmpl_comment doesn't output
+- tmpl_noparse does, though
+- various pod- and test-fixes
+
+0.56 Wed Dec  7 01:46:21 CET 2005
+- some include and scalarref  issues fixed
+- <tmpl_comment>
+- <tmpl_switch>, <tmpl_case>
+
+0.55 Wed Nov 23 22:36:58 CET 2005
+- search_path_on_include
+
+0.54 Wed Nov 23 21:21:49 CET 2005
+- fixed path issues
+- better handling of unbalanced tags
+
+0.53 Thu Oct  6 22:12:53 CEST 2005
+- fixed another issue with filter
+- bugfix preload
+
+0.52 Mon Oct  3 18:34:19 CEST 2005
+- bugfix with nonexistant templates and deep recursion
+- bugfix path and filecache
+- bugfix with filter (subrefs)
+- added tmpl_if defined
+
+0.51 Mon Oct  3 00:43:31 CEST 2005
+- clear_filecache
+- fixed tmpl_elsif, line_numbers
+- preload
+
+0.50 Sat Oct  1 01:16:09 CEST 2005
+- added formatter
+- added global_vars
+
+0.49 Sun Sep 25 23:04:38 CEST 2005
+- fixed 05_out_fh.t
+- dynamic includes
+
+0.48 Tue Sep 20 23:54:56 CEST 2005
+- compatible via use statement
+
+0.47 Tue Sep 20 00:43:37 CEST 2005
+- output($fh)
+- filter
+
+0.46 Sat Sep 17 17:01:01 CEST 2005
+- minor internal issues
+- enable subref vars
+- fixed __odd__
+- recursive include limit, thanks sam
+
+0.45 Fri Sep 16 00:20:07 CEST 2005
+- param("var")
+
+0.44 Thu Sep  8 20:56:53 CEST 2005
+- arrayref
+
+0.43 Wed Sep  7 21:11:28 CEST 2005
+- scalarref
+- filehandle
+
+0.42 Fri Sep  2 01:51:14 CEST 2005
+- add: HTML::Template::Compiled::Plugin::DHTML
+
+0.41 Sat Aug 27 12:07:08 CEST 2005
+- test failed because of missing cache dir
+
+0.40 Sat Aug 27 03:05:00 CEST 2005
+- more internal changes
+
+0.39 Mon Aug 22 22:27:52 CEST 2005
+- bug with caching fixed
+
+0.38 Mon Aug 22 21:02:30 CEST 2005
+- __counter__ now correct
+- more internal changes
+
+0.37 Mon Aug 22 00:31:58 CEST 2005
+- case_insensitive removed, use only case_sensitive
+- internal changes
+
+0.36 Sun Aug 21 03:41:45 CEST 2005
+- newlines in tags
+- ESCAPE=DUMP, chaining ESCAPE
+- DEFAULT=...
+- option dumper
+
+0.34 Fri Aug 19 19:58:56 CEST 2005
+- minor bugs, removed debugging statement
+
+0.32 Thu Aug 18 23:52:33 CEST 2005
+- fixed caching bug
+
+0.31 Thu Aug 18 22:48:22 CEST 2005
+- better object syntax
+
+0.30 Mon Aug 15 01:55:29 CEST 2005
+- some internal optimizations
+- case_insensitive for those who want it
+
+0.29 Sun Aug 14 22:51:30 CEST 2005
+- examples directory with bechmark of 4 template modules
+
+0.28 Fri Aug 12 23:32:44 CEST 2005
+- case insensitive TMPL_*
+
+0.27 Thu Aug  4 00:06:34 CEST 2005
+- added <%tag%> feature
+
+0.26 Thu Jul 28 22:11:48 CEST 2005
+- some docs
+- fixed regex and objects
+ 
+0.25 Wed Jul 27 23:18:06 CEST 2005
+- undefstring userdefined
+- fixed TMPL_IF method
+
+0.24 Wed Jul 20 20:57:00 CEST 2005
+- fixed <TMPL_VAR NAME="_" ESCAPE=HTML>
+
+0.23 Mon Jul 18 00:03:08 CEST 2005
+- first step for rendering objects,
+  documentation will follow. (yes, promised =)
+
+0.22 Sun Jul 17 19:15:22 CEST 2005
+- bugfix TMPL_INCLUDE
+
+0.21 Fri Jul  1 21:48:51 CEST 2005
+- fixed ESCAPE=HTML|URI
+- implemented <!-- TMPL_* -->
+
+0.20 Sun Jun 26 18:04:11 CEST 2005
+- Errors for wrong balanced tags
+
+0.19  Sun Jun 26 15:02:37 CEST 2005
+- bugfix NAME=ONE.TWO
+- TMPL_WITH
+- Dumper
+
+0.18  Sun Jun 26 12:36:15 CEST 2005
+- small bugfixes for older perl versions
+- typos
+- TMPL_ELSIF
+
+0.17  Mon Jun 20 23:30:43 CEST 2005
+- small bugfixes, warnings
+- doc
+
+0.16  Mon May 16 15:42:07 CEST 2005
+- TMPL_WITH
+- bugfix with .root
+
+0.15  Mon May 16 15:18:42 CEST 2005
+- bugfix
+
+0.14  Mon May 16 14:27:31 CEST 2005
+- bug in caching removed
+- TMPL_VAR .root
+- TMPL_VAR key.path.with.numbers.23
+
+0.13  Mon May  2 23:49:08 CEST 2005
+- clear_cache()
+
+0.12  Mon May  2 22:18:35 CEST 2005
+- remove warnings
+
+0.10 Mon Apr 18 22:06:10 CEST 2005
+ - HTML_TEMPLATE_ROOT
+ - caching
+ - loop_context_vars
+
+0.09  Fri Apr 15 00:31:23 CEST 2005
+ - </TMPL_IF name>
+ - caching improved (expire)
+
+0.06  Sat Feb 26 00:45:31 CET 2005
+ - ESCAPE=HTML
+
+0.05  Sat Feb 26 00:31:21 CET 2005
+ - TMPL_INCLUDE
+
+0.04  Fri Feb 25 00:29:44 CET 2005
+ - caching improved
+
+0.03  Thu Feb 24 23:17:10 CET 2005
+ - Quote Handling (NAME="var")
+
+0.02  Tue Feb 22 01:18:23 CET 2005
+ - fixed bugs, caching half implemented
+
+0.01  Sun Feb 20 17:44:07 2005
+	- original version; created by h2xs 1.23 with options
+		-AX -n HTML::Template::Compiled

@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/HTML-WidgetValidator-Widget-TegakiBlog.t
+lib/HTML/WidgetValidator/Widget/TegakiBlog.pm
+META.yml                                 Module meta-data (added by MakeMaker)

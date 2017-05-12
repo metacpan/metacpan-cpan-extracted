@@ -1,0 +1,99 @@
+{
+   "abstract" : "plugin system for HTML::Lint",
+   "author" : [
+      "Kenta Sato <karupa@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.6",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-Lint-Pluggable",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "JSON" : "0",
+            "LWP::Simple" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::Entities" : "0",
+            "HTML::Lint" : "0",
+            "List::MoreUtils" : "0",
+            "Module::Load" : "0",
+            "Package::Stash" : "0",
+            "parent" : "0",
+            "perl" : "5.008_001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "HTML::Lint::Pluggable" : {
+         "file" : "lib/HTML/Lint/Pluggable.pm",
+         "version" : "0.08"
+      },
+      "HTML::Lint::Pluggable::HTML5" : {
+         "file" : "lib/HTML/Lint/Pluggable/HTML5.pm",
+         "version" : "0.08"
+      },
+      "HTML::Lint::Pluggable::TinyEntitesEscapeRule" : {
+         "file" : "lib/HTML/Lint/Pluggable/TinyEntitesEscapeRule.pm",
+         "version" : "0.08"
+      },
+      "HTML::Lint::Pluggable::WhiteList" : {
+         "file" : "lib/HTML/Lint/Pluggable/WhiteList.pm",
+         "version" : "0.08"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/karupanerura/p5-HTML-Lint-Pluggable/issues"
+      },
+      "homepage" : "https://github.com/karupanerura/p5-HTML-Lint-Pluggable",
+      "repository" : {
+         "url" : "git://github.com/karupanerura/p5-HTML-Lint-Pluggable.git",
+         "web" : "https://github.com/karupanerura/p5-HTML-Lint-Pluggable"
+      }
+   },
+   "version" : "0.08",
+   "x_authority" : "cpan:KARUPA",
+   "x_contributors" : [
+      "Klaus S. Madsen <ksm@jobindex.dk>",
+      "Doug Bell <preaction@users.noreply.github.com>",
+      "shibayu36 <shibayu36@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

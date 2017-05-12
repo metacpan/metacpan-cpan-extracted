@@ -1,0 +1,249 @@
+<html><head><title>test with dhtml</title>
+	</head>
+	<body>
+<style type='text/css' >
+.data_treedumper_dhtml li {list-style-type:none ; margin:0 ; padding:0 ; line-height: 1em ;}
+
+.data_treedumper_dhtml ul {margin:0 ; padding:0 ;}
+ul.data_treedumper_dhtml {font-family:monospace ; white-space: nowrap ;}
+
+
+
+</style>
+<div class='tdump_button_container'>
+   <input type='button' id='expand_collapse_button_71455' onclick='expand_collapse_data_treedumper_dhtml(true)' value='Collapse'/>
+   <input type='button' id='search_button_71456' onclick='search_data_treedumper_dhtml()' value='Search'/>
+</div>
+
+<ul class = 'data_treedumper_dhtml'>
+   <li class='data_treedumper_dhtml'>
+      <a id='a_71457_ROOT' href='javascript:void(0);' onclick='toggleList_data_treedumper_dhtml("c_71457_ROOT")'>Data</a><a> [H0] &lt;584&gt; HASH(0x82d25ec)</a>
+      <ul id='c_71457_ROOT'>
+         <li>
+            <a id='a_71458_A1' name='A1' href='javascript:void(0);' onclick='toggleList_data_treedumper_dhtml("c_71458_A1")'>|-&nbsp;dhtml</a><a> [A1] &lt;260&gt; ARRAY(0x827d698)</a>
+            <ul id='c_71458_A1'>
+               <li><a id='a_71459_S2' name="S2">|&nbsp;&nbsp;|-&nbsp;0 = array [S2]</a><a /><a> &lt;30&gt; SCALAR(0x83428f0)</a></li>
+               <li><a id='a_71460_S3' name="S3">|&nbsp;&nbsp;|-&nbsp;1 = items [S3]</a><a /><a> &lt;30&gt; SCALAR(0x838d504)</a></li>
+               <li>
+                  <a id='a_71461_A4' name='A4' href='javascript:void(0);' onclick='toggleList_data_treedumper_dhtml("c_71461_A4")'>|&nbsp;&nbsp;`-&nbsp;2</a><a> [A4] &lt;120&gt; ARRAY(0x812c09c)</a>
+                  <ul id='c_71461_A4'>
+                     <li><a id='a_71462_S5' name="S5">|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-&nbsp;0 = inner [S5]</a><a /><a> &lt;30&gt; SCALAR(0x827d704)</a></li>
+                     <li><a id='a_71463_S6' name="S6">|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`-&nbsp;1 = array [S6]</a><a /><a> &lt;30&gt; SCALAR(0x827d620)</a></li>
+                  </ul>
+               </li>
+            </ul>
+         </li>
+         <li>
+            <a id='a_71464_H7' name='H7' href='javascript:void(0);' onclick='toggleList_data_treedumper_dhtml("c_71464_H7")'>`-&nbsp;more</a><a> [H7] &lt;147&gt; HASH(0x832d194)</a>
+            <ul id='c_71464_H7'>
+               <li><a id='a_71465_S8' name="S8">&nbsp;&nbsp;&nbsp;`-&nbsp;hash = keys [S8]</a><a /><a> &lt;29&gt; SCALAR(0x832d1d0)</a></li>
+      </ul>
+   </li>
+</ul>
+
+<script type='text/javascript'>
+<!--
+
+var a_id_array_data_treedumper_dhtml= new Array
+		(
+		"a_71457_ROOT"
+		, "a_71458_A1"
+		, "a_71459_S2"
+		, "a_71460_S3"
+		, "a_71461_A4"
+		, "a_71462_S5"
+		, "a_71463_S6"
+		, "a_71464_H7"
+		, "a_71465_S8"
+		) ;
+
+function search_data_treedumper_dhtml()
+{
+var string_to_search = prompt('DTD::DHTML Search','');
+var regexp = new RegExp(string_to_search, 'i') ;
+
+var i ;
+for (i = 0; i < a_id_array_data_treedumper_dhtml.length; i++)
+	{
+	if (document.getElementById) 
+		{
+		document.getElementById(a_id_array_data_treedumper_dhtml[i]).style.color = '' ;
+		}
+	else if (document.all) 
+		{
+		document.all[a_id_array_data_treedumper_dhtml[0]].style.color = '' ;
+		}
+	else if (document.layers) 
+		{
+		document.layers[a_id_array_data_treedumper_dhtml[0]].style.color = '' ;
+		}
+	}
+
+for (i = 0 ; i < a_id_array_data_treedumper_dhtml.length; i++)
+	{
+	if (document.getElementById) 
+		{
+		if(regexp.test(document.getElementById(a_id_array_data_treedumper_dhtml[i]).text))
+			{
+			show_specific_node_data_treedumper_dhtml(document.getElementById(a_id_array_data_treedumper_dhtml[i])) ;
+			document.getElementById(a_id_array_data_treedumper_dhtml[i]).style.color = '#FF0000' ;
+			break ;
+			}
+		}
+	else if (document.all) 
+		{
+		if(regexp.test(document.all[a_id_array_data_treedumper_dhtml[0]].text))
+			{
+			show_specific_node_data_treedumper_dhtml(document.all[a_id_array_data_treedumper_dhtml[0]]) ;
+			break ;
+			}
+		}
+	else if (document.layers) 
+		{
+		if(regexp.test(document.layers[a_id_array_data_treedumper_dhtml[0]].text))
+			{
+			show_specific_node_data_treedumper_dhtml(document.layers[a_id_array_data_treedumper_dhtml[0]]) ;
+			break ;
+			}
+		}
+	}
+}
+
+function show_specific_node_data_treedumper_dhtml (node)
+{
+/* Hide all first.*/
+collapsed_data_treedumper_dhtml = 0;
+expand_collapse_data_treedumper_dhtml();
+
+do
+	{
+	node = node.parentNode;
+	
+	if (node && node.tagName == 'UL')
+		node.style.display = 'block';
+		
+	} while (node && node.parentNode);
+}
+
+var collapsable_id_array_data_treedumper_dhtml = new Array
+				(
+				"c_71457_ROOT"
+				, "c_71458_A1"
+				, "c_71461_A4"
+				, "c_71464_H7"
+				) ;
+
+var collapsed_data_treedumper_dhtml = 0 ;
+
+function expand_collapse_data_treedumper_dhtml() 
+{
+var style ;
+if(collapsed_data_treedumper_dhtml== 1)
+	{
+	collapsed_data_treedumper_dhtml = 0 ;
+	style = "block" ;
+	replace_button_text("expand_collapse_button_71455", "Collapse") ;
+	}
+else
+	{
+	collapsed_data_treedumper_dhtml = 1 ;
+	style = "none" ;
+	replace_button_text("expand_collapse_button_71455", " Expand ") ;
+	}
+
+var i;
+for (i = 0; i < collapsable_id_array_data_treedumper_dhtml.length; i++)
+	{
+	if (document.getElementById) 
+		{
+		document.getElementById(collapsable_id_array_data_treedumper_dhtml[i]).style.display = style ;
+		}
+	else if (document.all) 
+		{
+		document.all[collapsable_id_array_data_treedumper_dhtml[i]].style.display = style ;
+		}
+	else if (document.layers) 
+		{
+		document.layers[collapsable_id_array_data_treedumper_dhtml[i]].display = style ;
+		}
+	}
+}
+
+function replace_button_text(buttonId, text)
+{
+if (document.getElementById)
+	{
+	var button=document.getElementById(buttonId);
+	if (button)
+		{
+		if (button.childNodes[0])
+			{
+			button.childNodes[0].nodeValue=text;
+			}
+		else if (button.value)
+			{
+			button.value=text;
+			}
+		else //if (button.innerHTML)
+			{
+			button.innerHTML=text;
+			}
+		}
+	}
+}
+
+function toggleList_data_treedumper_dhtml(tree_id) 
+{
+if (document.getElementById) 
+	{
+	var element = document.getElementById(tree_id);
+	
+	if (element) 
+		{
+		if (element.style.display == 'none') 
+			{
+			element.style.display = 'block';
+			}
+		else
+			{
+			element.style.display = 'none';
+			}
+		}
+	}
+else if (document.all) 
+	{
+	var element = document.all[tree_id];
+	
+	if (element) 
+		{
+		if (element.style.display == 'none') 
+			{
+			element.style.display = 'block';
+			}
+		else
+			{
+			element.style.display = 'none';
+			}
+		}
+	}
+else if (document.layers) 
+	{
+	var element = document.layers[tree_id];
+	
+	if (element) 
+		{
+		if (element.display == 'none') 
+			{
+			element.display = 'block';
+			}
+		else
+			{
+			element.display = 'none';
+			}
+		}
+	}
+} 
+
+-->
+</script>
+</body></html>

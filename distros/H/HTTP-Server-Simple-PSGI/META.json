@@ -1,0 +1,60 @@
+{
+   "abstract" : "PSGI handler for HTTP::Server::Simple",
+   "author" : [
+      "Tokuhiro Matsuno"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.3, Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTTP-Server-Simple-PSGI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Server::Simple" : "0.42"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/miyagawa/HTTP-Server-Simple-PSGI/issues"
+      },
+      "homepage" : "https://github.com/miyagawa/HTTP-Server-Simple-PSGI",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/miyagawa/HTTP-Server-Simple-PSGI.git",
+         "web" : "https://github.com/miyagawa/HTTP-Server-Simple-PSGI"
+      }
+   },
+   "version" : "0.16",
+   "x_contributors" : [
+      "Florian Ragwitz <rafl@debian.org>"
+   ]
+}
+

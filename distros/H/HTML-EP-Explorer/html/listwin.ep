@@ -1,0 +1,129 @@
+<ep-package name="HTML::EP::Explorer">
+<ep-explorer-init>
+<ep-explorer-config file="admin/config.pm">
+<ep-explorer-basedir>
+<ep-set var=dir_template>
+  <tr>
+    <td>&nbsp;</td>
+    <td><a href="$env->PATH_INFO$?basedir=$#l->url$">
+          <img border=0 src=folder.gif></a></td>
+    <td><a href="$env->PATH_INFO$?basedir=$#l->url$">$l->name$</a></td>
+    <td>$&MODE->l->mode$</td>
+    <td>$&UID->l->uid$</td>
+    <td>$&GID->l->gid$</td>
+    <td>$l->size$</td>
+    <td align=right>$&DATE->l->mtime$</td></tr>
+</ep-set>
+<ep-set var=file_template>
+  <tr>
+    <td><input type=checkbox onClick="JavaScript:SelectFile('$l->url$', this)"></td>
+<ep-comment>
+    <td><a href="JavaScript:ClickFile('$l->url$')"><img border=0 src="$l->icon$"></a></td>
+    <td><a href="JavaScript:ClickFile('$l->url$')">$l->name$</a></td>
+</ep-comment>
+    <td><img border=0 src="$l->icon$"></td>
+    <td>$l->name$</td>
+    <td>$&MODE->l->mode$</td>
+    <td>$&UID->l->uid$</td>
+    <td>$&GID->l->gid$</td>
+    <td>$l->size$</td>
+    <td align=right>$&DATE->l->mtime$</td>
+  </tr>
+</ep-set>
+<ep-set var=action_template>
+  <td><a href="action.ep?file=$#l->url$&action=$#action->name$">$@icon$</a></td>
+</ep-set>
+
+<html><head>
+<script language=JavaScript>
+  function SortBy (what) {
+    if (document.explorer_list_form) { // Be careful for JavaScript 1.0
+      var current = document.explorer_list_form.sortby.value;
+      if (current == "") {
+	current = "name";
+      }
+      if (current != what) {
+	document.explorer_list_form.sortby.value = what;
+	document.explorer_list_form.submit();
+      }
+    }
+  }
+
+  function ClickFile (filename) {
+    var hisWin = parent.explorer_top_win;
+    if (!hisWin) { return; }
+    var hisForm = hisWin.document.explorer_top_form;
+    if (!hisForm) { return; }
+    var fa = hisForm.faction;
+    if (!fa) { return; }
+    document.explorer_action_form.faction.value = 
+    fa.options[fa.selectedIndex].value;
+    document.explorer_action_form.file.value = filename;
+    document.explorer_action_form.submit();
+  }
+  function SelectFile (filename, cb) {
+    var hisWin = parent.explorer_top_win;
+    if (!hisWin) { return; }
+    var hisForm = hisWin.document.explorer_action_form;
+    if (!hisForm) { return; }
+    var ff = hisForm.files;
+    if (!ff) { return; }
+    var oldVal = ff.value;
+    if (oldVal.split) {
+      var arrayOfFiles = ff.value.split("\n");
+      var val = '';
+      var found = 0;
+      for (var i = 0;  i < arrayOfFiles.length;  ++i) {
+        if (!arrayOfFiles[i]) { continue; }  // Skip empty lines
+        if (arrayOfFiles[i] == filename) {
+	  if (found || !cb.checked) { continue; }
+	  found = 1;
+	}
+	val = val + arrayOfFiles[i] + "\n";
+      }
+      if (cb.checked && !found) { val = val + filename + "\n"; }
+      if (oldVal != val) { ff.value = val; }
+    }
+  }
+</script>
+</head>
+<body bgcolor=#ffffff>
+<h1><ep-if eval="$in_base_dir$">
+      $in_base_dir->name$:
+    </ep-if>
+    <ep-if eval="$config->header_files$">
+      $config->header_files$
+    <ep-else>
+      $display_dir$
+    </ep-if>
+</h1>
+<form name="explorer_action_form" action=action.ep method=GET target=_new>
+  <input type=hidden name="language" value="$_ep_language$">
+  <input type=hidden name="file" value="">
+  <input type=hidden name=faction value="">
+</form>
+<form name="explorer_list_form" action=listwin.ep method=GET>
+  <input type=hidden name="language" value="$_ep_language$">
+  <input type=hidden name="filetype" value="$cgi->filetype$">
+  <input type=hidden name="basedir"  value="$cgi->basedir$">
+  <input type=hidden name="sortby"   value="$cgi->sortby$">
+</form>
+<form name="explorer_files_form">
+<table>
+  <tr><td>&nbsp;</td>
+      <th><a href="JavaScript:SortBy('type')"><ep-language de="Typ" en="Type"></a></th>
+      <th><a href="JavaScript:SortBy('name')">Name</a></th>
+      <th>Unix-Permissions</th>
+      <th><a href="JavaScript:SortBy('uid')">User</a></th>
+      <th><a href="JavaScript:SortBy('gid')"><ep-language de="Gruppe" en="Group"></a></th>
+      <th><a href="JavaScript:SortBy('size')"><ep-language de="Größe" en="Size"></a></th>
+      <th><a href="JavaScript:SortBy('mtime')"><ep-language de="Datum" en="Date"></a></th>
+  </tr>
+<ep-explorer-browse basedir="$env->DOCUMENT_ROOT$" item=l>
+</table>
+</form>
+<div align=center>
+  <a href="prefs.ep?return_to=listwin.ep">
+    <ep-language de="Voreinstellungen" en="Preferences"></a>
+</div>
+</body></html>

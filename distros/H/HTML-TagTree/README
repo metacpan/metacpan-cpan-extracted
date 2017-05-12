@@ -1,0 +1,45 @@
+HTML-TagTree version 0.02
+=========================
+
+   The philosophy of HTML::TagTree is to let you create
+   one region of code with lots of business logic 
+   for rendering many possible resulting HTML files/output.
+   This differs from the approach of using business logic code
+   to decide which HTML template (of many) to render.
+   So rather than maintaining many HTML templates, you
+   maintain a Perl file that does all possible customizations
+   of HTML generation.
+
+   This module strives to minimize typing. Object treeing is
+   just a simple method call, eg:
+      $body->h1->b->i('This is a bold, italic heading');
+
+   HTML::TagTree removes the worries of making simple HTML syntax
+   errors such as no matching closing tag for an open tag.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  blah blah blah
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2011 by daniel debrito
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,5 @@
+---
+name: 'Charset Decoding Support'
+default: 0
+depends:
+    'Encode': 0

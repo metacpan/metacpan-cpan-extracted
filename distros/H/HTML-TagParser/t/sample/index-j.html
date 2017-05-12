@@ -1,0 +1,569 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+<meta name="copyright" content="Copyright 1995-2006 Yusuke Kawasaki. All rights reserved." />
+<meta name="description" content="川崎有亮の制作したプログラムのご紹介・技術情報など。ajax/JavaScript/Perl/CGI/..." />
+<title>Kawa.net xp - Ajax/JavaScript/Perl/CGI（川崎有亮）</title>
+<link rel="alternate" type="application/rss+xml" title="RSS" href="http://www.kawa.net/index.rdf" />
+<link rel="alternate" type="text/html" hreflang="en" title="English" href="index-e.html" />
+<link rel="stylesheet" type="text/css" href="./xp-top.css" />
+<link rel="icon" type="image/jpeg" href="http://www.kawa.net/xp/images/xp-title-128x32.gif" />
+<script src="http://www.kawa.net/works/js/jkl/js/jkl-parsexml.js"></script>
+<script src="http://www.kawa.net/rss/hatena-bookmark.js"></script>
+<script src="http://www.kawa.net/rss/recent-picasaweb.js"></script>
+<script src="http://www.kawa.net/rss/recent-ajaxcom.js"></script>
+<script src="http://www.kawa.net/rss/recent-ajaxtb.js"></script>
+<script src="http://www.kawa.net/rss/recent-delicious.js"></script>
+<script src="http://www.kawa.net/ad/random-banner.js"></script>
+<script src="http://www.kawa.net/ad/random-button1.js"></script>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+</head>
+<body>
+
+<!-- **************************************************************** -->
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr><td align="left">
+<a href="http://www.kawa.net/"><img src="http://www.kawa.net/xp/images/xp-title-256.gif" border="0" alt="Kawa.net xp" width="256" height="48" /></a>
+</td>
+<td align="center" id="top_banner" height="60"></td>
+<script><!--
+	get_banner('top_banner');
+//--></script>
+<td align="right" nowrap>
+<a href="index-j.html"><img border="0" src="http://www.kawa.net/xp/images/lang-jpn-24x16border.gif" alt="Japanese"></a>
+<a href="index-e.html"><img border="0" src="http://www.kawa.net/xp/images/lang-eng-24x16border.gif" alt="English"></a>
+<a href="http://www.kawa.net/index.rdf" target="_blank"><img border="0" src="http://www.kawa.net/rss/images/rss-16x16.gif" alt="RSS"></a>
+</td>
+</tr></table>
+
+<div id="mainarea" style="clear: both; margin-top: 2px; border-top: 1px solid #2C08C5;">
+<!-- **************************************************************** -->
+
+<div class="content">
+<ul id="news">
+
+<li><a href="profile.html">川崎有亮（かわさきゆうすけ）</a>のホームページです。<br>
+このサイトには主に Ajax、JavaScript、Perl、CGI などの技術情報を載せています。<br>
+2007年前半のテーマは『ゆるゆる』です。
+<a href="http://kawa.at.webry.info/">ブログ</a>もどうぞ。</li>
+
+<li>情報処理学会のセミナーで
+<a href="http://www.kawa.net/text/ipsj/200611/html/index.html">「Web 2.0時代の情報アーキテクチャ」</a>
+を講演しました。<br>
+その他、CSS Nite 忘年会、WCAN、Shibuya.js 等でも発表しています。
+<a href="http://www.kawa.net/xp/profile.html#presentations">≫詳しく</a></li>
+
+<li>インプレス
+<a href="http://www.amazon.co.jp/o/ASIN/4844323644/kawanetxp-22/ref=nosim" target="_blank">
+『まるごとJavaScript &amp; Ajax!』</a> の記事執筆に参加しました。<br>
+その他、日経ソフトウェア、MdN、Software Design 等でも執筆しています。
+<a href="http://www.kawa.net/xp/profile.html#publications">≫詳しく</a></li>
+
+<li><a href="http://www.flickr.com/photos/u-suke/" target="_blank">flickr</a>
+の写真が 200枚を超えてしまったので、
+<a href="http://picasaweb.google.com/www.kawa.net/" target="_blank">Picasa Web Album</a>
+に移行しました。</li>
+
+</ul>
+
+<!-- **************************************************************** -->
+<script><!--
+    google_ad_client = "pub-4789454999729711";
+	google_ad_width = 728;
+	google_ad_height = 90;
+	google_ad_format = "728x90_as";
+    google_ad_type    = "text_image";
+    google_ad_channel = "7622526362";
+    google_color_border = "2C08C5";
+    google_color_bg   = "F0F8FF";
+    google_color_link = "0000FF";
+    google_color_url  = "008000";
+    google_color_text = "000000";
+//--></script>
+<div style="text-align: center;">
+<script src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div>
+<!-- **************************************************************** -->
+
+<h2>WHAT'S NEW...</h2>
+
+<!-- ******** kawa.net xp RSS ******** -->
+<ul class="links">
+<script src="http://www.kawa.net/rss/whatsnew-ja.js" charset="UTF-8"></script>
+<noscript><li>（この項目の表示には、JavaScriptが必要です）</li></noscript>
+</ul>
+<!-- ******** kawa.net xp RSS ******** -->
+
+<h2>PERL...</h2>
+<ul>
+
+<li><a href="http://www.kawa.net/works/perl/html/tagparser.html">
+HTML::TagParser - HTMLソースの解析／属性値やinnerTextの取得</a><br/>
+HTML ソースコードの解析を行う Perl モジュールです。<br/>
+DOM 風のインターフェースで、各 HTML タグごとに属性値やinnerText値を取得できます。<br/>
+</li>
+
+<li><a href="http://www.kawa.net/works/perl/romanize/romanize.html">
+Lingua::*::Romanize::* 日中韓／ローマ字変換モジュール</a><br/>
+日本語・中国語(北京語・広東語)・韓国語の読みをローマ字化します。<br/>
+</li>
+
+<li><a href="http://www.kawa.net/works/perl/hatena/bookmarkcount.html">
+WebService::Hatena::BookmarkCount／はてなブックマーク件数取得APIへのインターフェース</a><br>
+はてなブックマーク件数取得APIにアクセスし、
+指定したURLの被ブックマーク件数を取り出すモジュール。<br>
+</li>
+
+<li><a href="http://www.kawa.net/works/perl/feedpp/feedpp.html">
+XML::FeedPP - RSS・RDF・Atomフィードの解析・生成・変換・結合</a><br>
+RSS（RSS 2.0）・RDF（RSS 1.0）・Atom（0.3）の3フォーマットの Web フィードの読み書きに対応したモジュール。フォーマット間の変換や、複数のファイルの結合ができるモジュール。</li>
+
+<li><a href="http://www.kawa.net/works/perl/treepp/treepp.html">
+XML::TreePP - XMLファイル展開モジュール</a><br>
+XML::TreePP モジュールは、 XML ファイルを解析してツリー構造のハッシュに展開します。
+コンパイル不要の Pure Perl 実装なので、
+プロバイダのレンタルサーバ環境でも
+.pm ファイル単体のコピーのみで手軽に利用できます。
+</li>
+
+<li><a href="http://www.kawa.net/works/perl/catch/news.html">
+KCatch.pm - Perl CGI エラーメッセージをブラウザに表示</a><br>
+Perl CGI の Internal Server Error を補足してエラー内容を表示してくれるモジュール。<br>
+エラーのおきた行番号なども表示されるので、サーバ上での開発に最適です。
+</li>
+
+<li><a href="http://www.kawa.net/works/perl/phone/pnews.html">
+phone.pl - 携帯電話キャリア自動判別ライブラリ</a><br>
+携帯電話向け Perl CGI コンテンツでキャリアを自動判別するためのライブラリ。
+</li>
+
+<li>
+<a href="http://www.kawa.net/works/qmail/queue-fast.html">
+queue-fast.pl - qmail のメールキューの閲覧・削除</a><br>
+qmail のメールキューを閲覧・削除する Perl プログラムです。 
+</li>
+
+<li>
+<a href="http://www.kawa.net/works/perl/i18n-emoji/i18n-emoji.html">
+日本語処理・携帯絵文字処理関係のモジュール</a><br>
+日本語を含む多言語処理(主にUTF8、Shift_JIS、ISO-2022-JP。
+その他にLatin1、EUC-JP、EUC-KR、Big5、GB2310などにも対応)や、 
+iモード・ボーダフォン・EZweb 携帯絵文字処理関連のモジュールです。 
+</li>
+
+<li>
+<a href="http://www.kawa.net/works/perl/dbiwrap/dbiwrap.html">
+DBIwrap.pm - データベース処理関係のモジュール</a><br>
+DBI/DBD を用いたデータベース処理を補助するモジュールです。 
+検索系の独自メソッドと、遅延接続用のサブクラスを提供します。
+</li>
+
+<li>
+<a href="http://www.kawa.net/works/jcode/uni-escape.html">
+Shift_JIS に含まれない文字をエスケープするパッチ</a><br>
+川崎の『&#xFA11;』の字や、高梨くんの『&#x9AD9;』の字のような、
+Unicode には含まれるが Shift_JIS に存在しない文字を
+&amp;#xHHHH; 形式にエスケープするためのメモと、Jcode.pm と
+Unicode::Map モジュール用のパッチプログラムです。
+</li>
+
+</ul>
+<h2>AJAX...</h2>
+<ul>
+
+<li>
+<a href="http://www.kawa.net/works/ajax/addrajax/addrajax.html">
+ADDRAjax - Ajaxによる住所ドリルダウン検索</a><br>
+都道府県名→市区町村名→町域とドリルダウンで住所を検索するフォーム作成ライブラリ。<br>
+このライブラリを利用すると、
+<a href="http://www.kawa.net/works/ajax/addrajax/alpscliplet.html">AlpsCliplet</a>
+のような地図連携システムも作れたりします。
+</li>
+
+<li>
+<a href="http://www.kawa.net/works/ajax/ajaxzip2/ajaxzip2.html">
+AjaxZip2 - Ajax郵便番号→住所自動入力フォーム（CGI不要版）</a><br>
+郵便番号から該当する都道府県名・住所を自動的に入力するフォーム作成ライブラリ。<br>
+Ajax を利用しており、JavaScript のみで稼動するため、導入もカンタンです。<br>
+Perl CGIを利用する前バージョンは
+<a href="http://www.kawa.net/works/ajax/zip/ajaxzip.html">こちら</a>。
+</li>
+
+<li><a href="http://www.kawa.net/works/js/xml/objtree.html">
+XML.ObjTree - XML～JavaScriptオブジェクト変換クラス</a><br>
+XML ファイルと JavaScript オブジェクト（連想配列）間の相互変換を行うライブラリ。<br>
+prototype.js または JSAN の HTTP.Request クラスと併用することで、
+↓JKL.ParseXML の後継としても利用できます。
+</li>
+
+<li><a href="http://www.kawa.net/works/js/jkl/parsexml.html">
+JKL.ParseXML - XML→JSON展開クラス</a><br>
+XMLファイルをダウンロードして、JavaScriptオブジェクトに変換するライブラリ。</li>
+
+<li><a href="http://www.kawa.net/works/ajax/romanize/japanese.html">
+日本語（漢字かな混じり文）にローマ字ルビを振る ajax</a><br/>
+日本語にローマ字でルビを振る ajax なウェブサービスです。
+</li>
+
+<li><a href="http://www.kawa.net/works/ajax/romanize/chinese.html">
+中国語にローマ字ルビを振る ajax（ピンイン）</a><br/>
+簡体字・繁体字の中国語にピン音でルビを振る ajax なウェブサービスです。
+</li>
+
+<li><a href="http://www.kawa.net/works/ajax/romanize/hangul.html">
+韓国語（ハングル）にローマ字ルビを振る ajax</a><br/>
+韓国語（ハングル）にルビを振る ajax なウェブサービスです。
+</li>
+
+<li>
+<a href="http://www.kawa.net/works/ajax/ajaxtb/ajaxtb.html">
+AjaxTB／トラックバック機能を静的HTMLページに追加するJavaScript</a><br>
+静的HTMLページにトラックバック機能を追加します。
+</li>
+
+<li>
+<a href="http://www.kawa.net/works/ajax/ajaxcom/ajaxcom.html">
+AjaxCom／静的HTMLページに1行コメントを書き込める掲示板</a><br>
+静的HTMLページに1行コメントを書き込める掲示板機能を追加します。
+</li>
+
+<li><a href="http://kawa.at.webry.info/200511/article_9.html">
+Safari の responseText で UTF-8 コード文字化け回避 </a><br>
+クロスブラウザ対応の ajax を書くための TIPS。数行で Safari 対応に！</li>
+
+<li><a href="http://www.kawa.net/works/ajax/tips/mimetype/content-type.html">
+Content-Type: 許容判定</a><br>
+XML ファイルの Content-Type: 制限の判定と、各ブラウザの状況まとめ</li>
+
+<li><a href="http://www.kawa.net/works/ajax/tips/dump/dom-tree.html">
+Expanding DOM tree (cross browser DOM inspector)</a><br>
+DOM の内容を画面に表示する（iCabとOmniWebの<a href="http://www.kawa.net/works/ajax/tips/dump/icab-omniweb-bug.html">DOM展開処理バグ</a>の検証用に作成）</li>
+
+<li>
+<a href="http://www.kawa.net/works/ajax/rss/rss.html">
+JavaScript版 RSSリーダー (ajax)</a><br>
+ウェブページ内に設置するタイプの RSS リーダーです。<br>
+<a href="http://www.kawa.net/works/ajax/rss/rss-box.html">
+設置手順</a> もまとめておきました。
+</li>
+
+</ul>
+<h2>JAVASCRIPT...</h2>
+<ul>
+
+<li><a href="http://www.kawa.net/works/js/tips/yui-tooltips.html">
+マウスオーバーでリンク先サムネイル表示</a><br>
+Yahoo! UI Library と Simple API のマッシュアップ。</li>
+
+<li><a href="http://www.kawa.net/works/ajax/tips/crash-safari/intelmac.html">
+Safari for Intel Mac専用ブラウザクラッシャー2行</a><br>
+PowerPC 版と Intel Mac 版の Safari の動作の違いについてメモ。
+Intel Mac 専用の2行でブラクラです。</li>
+
+<li><a href="http://www.kawa.net/service/jsan/search/index.html">
+JSAN Search</a><br>
+JSAN に登録されている JavaScript ライブラリを検索します。</li>
+
+<li><a href="http://www.kawa.net/works/js/game/ncross.html">
+ナンバープレイス（数独／ナンバークロス）を解くJavaScript</a><br>
+9×9マスのナンバープレイスを JavaScript で素早く解きます。
+手元の問題集に載っていた上級編の問題は全て解けました。</li>
+
+<li><a href="http://www.kawa.net/works/js/animation/cube.html">
+Animation.Cube - サイコロ回転エフェクト</a> (rotating cube animation)<br>
+アニメーション処理エフェクト第2段。Mac○S Xのユーザ切替えみたいなやつ。</li>
+
+<li><a href="http://www.kawa.net/works/js/animation/raster.html">
+Animation.Raster - ラスタースクロールだ！</a><br>
+JavaScript で擬似ラスタースクロール してみました。うねうねします。</li>
+
+<li><a href="http://www.kawa.net/works/js/date/w3cdtf.html">
+Date.W3CDTF - ISO-8601日時フォーマット対応JavaScriptクラス</a><br>
+Date.W3CDTF クラスは、JavaScript ビルドインの Date オブジェクトを継承して、W3CDTF の入出力に対応します。
+今回はテストスクリプトも書いて、初めて JSAN に登録してみました。</li>
+
+<li><a href="http://www.kawa.net/works/js/8queens/nqueens.html">
+Nクイーン問題（ノンプリエンプティブマルチタスク風）</a><br/>
+JavaScript をノンプリエンプティブマルチタスク風に組むことで、
+ブラウザの動作をロックせずにNクイーン問題を解いてみる習作です。
+</li>
+
+<li><a href="http://www.kawa.net/works/js/data-scheme/base64.html">
+dataスキームURI生成（画像データのBase64変換）</a><br/>
+Greasemonkey のユーザスクリプトなどの JavaScript ソースコード内に画像データを埋め込める、
+『<tt>data:image/gif;base64,～～～</tt>』形式のデータ（dataスキーム）を生成します。
+</li>
+
+<li>
+<a href="http://www.kawa.net/works/js/passwd/gen-passwds.html">
+乱数パスワードを自動生成するJavaScript</a><br>
+複数アカウントの生パスワードの生成作業に使えるサンプルです。
+JavaScript はクライアント PC 上で実行され、
+インターネット側に結果は転送されませんから、
+手軽な乱数発生器としてご利用いただけます。
+</li>
+
+<li><a href="http://www.kawa.net/works/js/learn/basic.html">
+JavaScript ことはじめ</a><br>
+真偽、型変換、比較演算子などの基本について、自分の確認のためにまとめておきます。</li>
+<li><a href="http://www.kawa.net/works/js/jkl/form-updown.html">
+JKL.Form - フォームクラス（セレクト／チェックボックス）</a><br>
+選択中の項目を上下に移動、全項目選択・解除、項目追加・削除などの関数。</li>
+<li><a href="http://www.kawa.net/works/js/jkl/debug.html">
+JKL.Debug - デバッグクラス </a><br>
+JavaScript からデバッグ表示。</li>
+<li><a href="http://www.kawa.net/works/js/jkl/calender.html">
+JKL.Calener - ポップアップのカレンダー表示クラス </a><br>
+日付選択フォームを使いやすくする</li>
+<li><a href="http://www.kawa.net/works/js/jkl/noerror.html">
+jkl-noerror.js - エラー表示の抑止</a><br>
+JavaScript のエラーメッセージ表示を回避します。</li>
+<!--
+    <li><a href="http://www.kawa.net/works/js/jkl/date-w3cdtf.html">
+    jse-date-w3cdtf.js - Date オブジェクトの W3CDTF 拡張</a><br>
+    Date で W3CDTF形式 の入出力に対応する拡張です。</li>
+-->
+<li><a href="http://www.kawa.net/works/ajax/autoruby/autoruby.html">
+自動フリガナ入力フォーム </a><br>
+携帯電話のアドレス帳みたいに、名前を入力するとフリガナ欄も自動入力されます。</li>
+<li><a href="http://www.kawa.net/works/js/jkl/hina.html">
+JKL.Hina - テンプレート展開クラス</a><br>
+HTMLテンプレート展開処理。</li>
+<li><a href="http://www.kawa.net/works/js/jkl/dumper.html">
+JKL.Dumper - JSONデータダンプクラス</a><br>
+変数の内容をJSON形式テキストにダンプ。</li>
+<li><a href="http://www.kawa.net/works/js/jkl/resizable.html">
+JKL.Resizable - サイズ可変エレメント </a><br>
+エレメントの右端・下端・右下隅をマウスでドラッグして、縦・横のピクセル数を変更できるようにします。</li>
+<li><a href="http://www.kawa.net/works/js/jkl/floating.html">
+JKL.Floating - フローティングエレメント（ドラッグ移動）</a><br>
+エレメントをマウスでドラッグして移動できます。 </li>
+<li><a href="http://www.kawa.net/works/js/tips/e4x.html">
+ECMAScript for XML (E4X) を試してみた</a><br>
+JavaScript のソースコード中に XML コードを埋め込めるようになります。 </li>
+
+<li><a href="http://www.kawa.net/works/greasemonkey/myscripts.html">
+Greasemonkey ユーザスクリプト</a><br>
+試しに作ってみた、簡単な Greasemonkey ユーザスクリプトです。
+</li>
+
+</ul>
+
+<h2>ASIAN LANGUAGES...</h2>
+
+<ul>
+
+<li>
+<a href="http://www.kawa.net/works/cantonese/canton.cgi">
+Ruby on Chinese (BIG5)</a><br>
+繁体字(BIG5コード)を入力すると、自動で全部の漢字にルビをふります。<br>
+ルビは広東語読み(Cantonese)と標準語読み(Mandarin Pinyin)が選べます。<br>
+表示には繁体字フォントが必要です。(Windows では MingLiU)<br>
+　　　　    広東語：　日(yat) 本(boon) 人(yan) <br>
+　　　　    標準語：　日(ri)  本(ben)  人(ren)<br>
+Internet Explorer 以外では動作確認できていません。<br>
+BIG5コードのWEBページからコピー＆ペーストして使うことを想定しています。
+あるいは、例えば日本語 IME で「日本人」と普通に入力しても
+IE が自動的に BIG5 に変換して送信してくれるようですから、
+中国語 IME かは特に必要ありません。<br>
+フリーソフト cxterm 添付の辞書を利用しています。
+</li>
+
+<li>
+<a href="http://www.kawa.net/works/cantonese/ccdict.cgi">
+CCDICT Search</a><br>
+こちらもRuby on Chinese 同様ですが、ルビは振らずに結果を一覧表示します。<br>
+広東語読みと標準語読みに加えて、客家読み(Hakka)及び英訳に対応しています。<br>
+文字コードも繁体字、簡体字、Shift_JIS、UTF-8 と多言語で安心(笑)。<br>
+フリーの辞書CCDICTを利用しています。（Thomasさんありがとう）
+</li>
+
+<li>
+<a href="http://www.kawa.net/works/hangul/hangul.cgi">
+Roman-to-Hangul Convertion Service</a><br>
+アルファベットを入力すると、ハングル表記に変換するプログラム。<br>
+</li>
+
+</ul>
+<h2>VISITS...</h2>
+<ul>
+
+<li><a href="http://www.kawa.net/photo/20070101-inuyama/index.html">
+犬山／日本モンキーパーク</a>（2007年1月）<br></li>
+
+<li><a href="http://www.kawa.net/photo/200702-scale5x/index.html">
+ロサンゼルス／SCALE 5x</a>（2007年2月）<br></li>
+
+</ul>
+<h2>EXTRA...</h2>
+<ul>
+
+<li><a href="http://www.kawa.net/text/shibuyajs/jsan/index.html#1">
+アニメーションエフェクトとJSAN</a><br>
+Shibuya.js テクニカルトーク#1（2006/04/15）のライトニングトークで発表させていただいた資料。<br/>
+「パワーポイント禁止令」が出ていたので、HTML＋CSS＋JavaScript で作成しています。
+</li>
+
+<li>
+<a href="http://www.kawa.net/works/perl/contenc/gzip-test.html">
+Content-Encoding: gzipのテスト </a><br>
+HTTP/1.1 では、コンテンツの圧縮転送ができるそうです。
+ブラウザが gzip 圧縮が利用可能かを自動判定して、
+HTML 本文を圧縮転送する CGI サンプルプログラムを作成してみました。 
+</li>
+
+<li>
+<a href="http://www.kawa.net/text/sigmarion3/usb.html">
+シグマリオンIIIでFOMA接続／SDカードリーダ</a><br>
+NTTドコモのシグマリオンⅢ用の USB(mini-A)～USB(A) 変換ケーブルを入手したので、 
+FOMA 接続や PC カードリーダに挑戦してみました。 
+</li>
+
+<li><a href="http://www.kawa.net/index-2001j.html">Kawa.NeT 2001</a><br>
+1999年～2001年の旧バージョン（ほとんど更新していなかった）
+</li>
+</ul>
+
+</div>
+
+<!-- **************************************************************** -->
+<div class="sidebar">
+<dl><dt>
+<a href="profile.html">川崎　有亮　（かわさきゆうすけ）</a></dt>
+<dd style="text-align: center; padding: 8px;">
+<a href="profile.html"><img src="http://www.kawa.net/xp/images/mixi-3.jpg" width="180" height="180" border="0"></a>
+</dd></dl>
+
+<dl><dt>
+<a href="http://b.hatena.ne.jp/entrylist?url=http://www.kawa.net/&sort=hot" target="_blank">注目エントリー10件 - hatena</a>
+</dt><dd id="hatena_bookmark"></dd></dl>
+<script>hatena_load('hatena_bookmark')</script>
+
+<dl><dt>
+<a href="http://picasaweb.google.com/www.kawa.net/" target="_blank">最近の様子9枚 - Picasa Web Album</a>
+</dt><dd id="recent_picasaweb" style="padding: 0;"></dd></dl>
+<script>picasaweb_load('recent_picasaweb')</script>
+
+<dl><dt>
+<a href="http://www.kawa.net/service/com/ajaxcom-data/recent.xml" target="_blank">新着コメント10件</a> -
+<a href="http://www.kawa.net/works/ajax/ajaxcom/ajaxcom.html">ajaxcom</a>
+</dt><dd id="recent_ajaxcom"></dd></dl>
+<script>get_ajaxcom('recent_ajaxcom')</script>
+
+<dl><dt>
+<a href="http://www.kawa.net/service/tb/ajaxtb-data/recent.xml" target="_blank">新着トラックバック10件</a> -
+<a href="http://www.kawa.net/works/ajax/ajaxtb/ajaxtb.html">ajaxtb</a>
+</dt><dd id="recent_ajaxtb"></dd></dl>
+<script>get_ajaxtb('recent_ajaxtb')</script>
+
+<!-- ******** SiteSearch Google ******** -->
+<form method="get" action="http://www.google.co.jp/custom" target="_top" style="padding: 0; margin: 0 0 4px 0;">
+<dl><dt>サイト内検索 - Google</dt><dd style="padding: 8px;">
+<input type="text" name="q" size="20" maxlength="255" value="ここに入力" onFocus="if(this.value=='ここに入力')this.value='';" />
+<input type="submit" name="sa" value="検索" />
+<input type="hidden" name="domains" value="www.kawa.net" />
+<input type="hidden" name="sitesearch" value="www.kawa.net" />
+<input type="hidden" name="client" value="pub-4789454999729711" />
+<input type="hidden" name="forid" value="1" />
+<input type="hidden" name="ie" value="Shift_JIS" />
+<input type="hidden" name="oe" value="UTF-8" />
+<input type="hidden" name="cof" value="GALT:#008000;GL:1;DIV:#336699;VLC:663399;AH:center;BGC:FFFFFF;LBGC:FFFFFF;ALC:0000FF;LC:0000FF;T:000000;GFNT:0000FF;GIMP:0000FF;LH:48;LW:256;L:http://www.kawa.net/xp/images/xp-title-256.gif;S:http://www.kawa.net/;FORID:1;" />
+<input type="hidden" name="lr" value="lang_ja" />
+<input type="hidden" name="hl" value="ja" />
+</dd></dl>
+</form>
+<!-- ******** SiteSearch Google ******** -->
+
+<dl><dt><a href="http://www.kawa.net/index.rdf" target="_blank">RSSリーダーへの登録はこちら</a></dt><dd id="subscribe_rss" style="padding: 6px 0px 4px 6px;">
+<a href="http://fusion.google.com/add?feedurl=http://www.kawa.net/index.rdf" target="_blank" title="Google Homepageに登録"><img border="0" width="38" height="16" src="http://www.kawa.net/rss/images/rss-add-google.gif" alt="Google Homepageに登録"></a>
+<a href="http://add.my.yahoo.co.jp/rss?url=http://www.kawa.net/index.rdf" target="_blank" title="My Yahoo!に登録"><img border="0" width="38" height="16" src="http://www.kawa.net/rss/images/rss-add-yahoo.gif" alt="My Yahoo!に登録"></a>
+<a href="http://www.netvibes.com/subscribe.php?url=http://www.kawa.net/index.rdf" target="_blank" title="netvibesに登録"><img border="0" width="38" height="16" src="http://www.kawa.net/rss/images/rss-add-netvibes.gif" alt="netvibesに登録"></a>
+<a href="http://r.hatena.ne.jp/append/http://www.kawa.net/index.rdf" target="_blank" title="はてなRSSに登録"><img border="0" width="38" height="16" src="http://www.kawa.net/rss/images/rss-add-hatena.gif" alt="はてなRSSに登録"></a>
+<a href="http://reader.livedoor.com/subscribe/http://www.kawa.net/index.rdf" target="_blank" title="livedoor Readerに登録"><img border="0" width="38" height="16" src="http://www.kawa.net/rss/images/rss-add-livedoor.gif" alt="livedoor Readerに登録"></a>
+</dd></dl>
+
+<dl><dt>
+<a href="http://del.icio.us/kawa.net" target="_blank">最近見てきたページ10件 - del.icio.us</a>
+</dt><dd id="recent_delicious"></dd></dl>
+<script>delicious_load('recent_delicious')</script>
+
+<div style="float: left; width: 120px;">
+
+<dl><dt>
+<a href="http://www.amazon.co.jp/o/ASIN/B000HD1BS0/kawanetxp-22/ref=nosim" target="_blank">雑誌に執筆しました!!</a>
+</dt><dd style="padding: 0px;"><a href="http://www.amazon.co.jp/o/ASIN/B000HD1BS0/kawanetxp-22/ref=nosim" target="_blank"><img src="http://www.kawa.net/xp/images/books/nikkei-software-200610.jpg" width="118" height="158" border="0" alt="日経ソフトウエア［2006年10月号］" title="日経ソフトウエア［2006年10月号］" style="margin: 0; padding: 0;"></a></dd></dl>
+
+<dl><dt>
+<a href="http://www.amazon.co.jp/o/ASIN/4844358707/kawanetxp-22/ref=nosim" target="_blank">ムックに執筆しました!!</a>
+</dt><dd style="padding: 0px;"><a href="http://www.amazon.co.jp/o/ASIN/4844358707/kawanetxp-22/ref=nosim" target="_blank"><img src="http://www.kawa.net/xp/images/books/mdn-javascript-118x158.jpg" width="118" height="158" border="0" alt="プロとして恥ずかしくない大原則" title="プロとして恥ずかしくない大原則" style="margin: 0; padding: 0;"></a></dd></dl>
+
+<dl><dt>
+<a href="http://www.amazon.co.jp/o/ASIN/4774125792/kawanetxp-22/ref=nosim" target="_blank">書籍を執筆しました!!</a>
+</dt><dd style="padding: 0px;"><a href="http://www.amazon.co.jp/o/ASIN/4774125792/kawanetxp-22/ref=nosim" target="_blank"><img src="http://www.kawa.net/xp/images/ajax-118x158.jpg" width="118" height="158" border="0" alt="Ajax 実装のための基礎テクニック" title="Ajax 実装のための基礎テクニック" style="margin: 0; padding: 0;"></a></dd></dl>
+
+<ul>
+
+<li><a href="http://www.cross-a.net/x.php?id=201_11_8944_9932" target="_blank"><img border="0" src="http://ad3.cross-a.net/_/cross-a/100x60.gif" width="100" height="60" alt="アフィリエイト Cross-A"></a></li>
+
+<li><a href="http://feedmeter.net/detail.php?r=http%3A//www.kawa.net/index.rdf" target="_blank"><img src="http://feedmeter.net/image.php?r=http%3A//www.kawa.net/index.rdf" border="0" width="60" height="36" alt="RSS feed meter" /></a></li>
+
+</ul>
+
+</div>
+
+<div style="float: right; width: 120px;">
+
+<dl>
+<dt><a href="http://kawa.at.webry.info/200701/article_1.html" target="_blank">2007年は「ゆるゆる」</a></dt>
+<dd style="padding: 0px;"><a href="http://kawa.at.webry.info/200701/article_1.html" target="_blank"><img src="http://www.kawa.net/xp/images/yuruyuru-118.gif" width="118" height="320" border="0" alt="ゆるゆる" title="ゆるゆる" style="margin: 0; padding: 0;"></a></dd>
+</dl>
+
+<!--
+<iframe frameborder="0" allowtransparency="true" height="600" width="120" marginheight="0" scrolling="no" src="http://ad.jp.ap.valuecommerce.com/servlet/htmlbanner?sid=2297337&pid=874229023" marginwidth="0"><script src="http://ad.jp.ap.valuecommerce.com/servlet/jsbanner?sid=2297337&pid=874229023"></script><noscript><a href="http://ck.jp.ap.valuecommerce.com/servlet/referral?sid=2297337&pid=874229023" target="_blank" ><img src="http://ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=2297337&pid=874229023" height="600" width="120" border="0"></a></noscript></iframe>
+-->
+
+<ul>
+
+<li><script type="text/javascript"><!--
+    google_ad_client    = "pub-4789454999729711";
+    google_ad_width     = 120;
+    google_ad_height    = 60;
+    google_ad_format    = "120x60_as_rimg";
+    google_cpa_choice   = "CAAQ7aqdzgEaCOkBK-qb06GEKNnH93M";
+//--></script>
+<script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script></li>
+
+<li><script type="text/javascript"><!--
+    google_ad_client    = "pub-4789454999729711";
+    google_ad_width     = 120;
+    google_ad_height    = 60;
+    google_ad_format    = "120x60_as_rimg";
+    google_cpa_choice   = "CAAQj9n7zwEaCDz0ImVGb7W9KOe693M";
+//--></script>
+<script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script></li>
+
+<li id="skype_status"><a href="skype:kawa.kawa.kawa.kawa?call"><img src="http://mystatus.skype.com/smallclassic/kawa.kawa.kawa.kawa" border="0" width="114" height="20" alt="Skype"></a></li>
+
+<li id="right_button1"></li>
+<script><!--
+	button1_get_ad('right_button1');
+//--></script>
+
+</ul>
+
+</div>
+
+</div>
+</div>
+<!-- **************************************************************** -->
+
+<address>
+Copyright 1995-2007 Kawasaki Yusuke &lt;u-suke [at] kawa.net&gt;
+</address>
+<script type="text/javascript">_uacct="UA-835919-3";urchinTracker();</script>
+</body>
+</html>

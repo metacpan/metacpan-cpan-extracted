@@ -1,0 +1,81 @@
+0.29
+   Fix tests broken because item is now cleared
+
+0.28
+   Remove unnecessary use of Business::ISBN
+
+0.27
+    Bug: dies with multiple pk table with unique field/column
+
+0.26 Sun Jul 21, 2013
+    Enable use of 'messages' hashref for setting unique message
+
+0.25 Wed Jul 3, 2013
+    Fix bug using result source method for select labels
+    Bump prereq of DBIx::Class::ResultSet::RecursiveUpdate
+
+0.24 Sun May 5, 2013
+    Bump prereq version of DBIC to avoid a regression
+
+0.23 Mon Oct 15, 2012
+    Bump pre-req to non-broken HTML::FormHandler
+
+0.22 Sat Oct 13, 2012
+    Ensure field is active and has a result before checking for errors.
+    Allow using arrayref for sort column
+    Remove Catalyst example (see github formhandler-example)
+
+0.21 Mon May 14, 2012
+    Bump prereq version for HTML::FormHandler
+
+0.20 Mon May 14, 2012
+    Update t/related.t test for compatibility with FH changes
+
+0.19 Thu Apr 12, 2012
+    Name conflict between DBICFields and HFH.
+        Rename 'include' & 'exclude' in DBICFields.
+0.18 Thu Mar 8, 2012
+    Remove TestCompile from dist.ini
+0.17 Wed Mar 7, 2012
+    Remove unnecessary broken DateTime tests
+    Added functionality to optionally generate class_prefix, label and label_column
+0.16 Sat Oct 4, 2011
+    Update test to match changes in HTML::FormHandler
+    Fix form_generator package
+0.15 Mon May 16, 2011
+    Tweak t/related.t test for changes to HFH 0.34001
+0.14 Mon Oct 25, 2010
+    RU 0.20 throws errors on fields not in db; use new RU 0.21
+        attr 'ru_flags' to display warnings for fields not in db
+0.13 Wed Oct 20, 2010
+    use Dist::Zilla
+    fix testcase for new RecursiveUpdate
+    Split model code into role
+0.12 Fri June 25, 2010
+    Updated to match tests to new HFH version
+0.11 Tues May 18, 2010
+    Wrong version number pre-req'd
+0.10 Fri May 07, 2010
+    Adjust tests for changing precedence of defaults over item/init_object
+0.09 Sun Feb 19, 2010
+    Initial implementation of automatic fields from DBIC
+       (add DBIC::Model::TypeMap & TraitFor::DBICFields)
+    Remove tests for auto fields
+0.08 Mon Feb 1, 2010
+    Add txn_do to model_update
+    Add skipping unique validation if field has unique => 0
+    Fix tests for empty repeatable element
+0.07 Tues Dec 15, 2009
+    Add handling of composite unique keys
+0.06 Wed Dec 2, 2009
+    Test changes for HFH 0.29
+0.05 Tues Sep 15, 2009
+    Test changes for HFH 0.28
+    bump RU prereq
+0.04002 Tues July 28, 2009
+    Add missing test database (!!!)
+0.04001 Mon July, 27 2009
+    Fix dependency errors
+0.04 Sun July 26, 2009
+    Split from HTML::FormHandler distribution
+

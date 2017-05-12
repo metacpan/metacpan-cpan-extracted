@@ -1,0 +1,5 @@
+0.103070 -- Wed Nov 03 18:36:43 CDT 2010
+  * Fix HTML::Mason typo in dependencies
+
+0.103060 -- Mon Nov 01 19:16:15 CDT 2010
+  * Initial Release

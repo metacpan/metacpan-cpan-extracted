@@ -1,0 +1,31 @@
+---
+abstract: '(beta software) truncate HTML by percentage or character count while preserving well-formedness.'
+author:
+  - 'Ashley Pond V, C<< <ashley@cpan.org> >>.'
+build_requires:
+  Encode: 2
+  ExtUtils::MakeMaker: 6.42
+  File::Spec: 3
+  Test::More: 0.5
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-Truncate
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  HTML::Tagset: 3
+  HTML::TokeParser: 2
+  List::Util: 1
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.20

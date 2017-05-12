@@ -1,0 +1,13 @@
+---
+elements:
+  - type: Select
+    name: foo
+    options:
+      - label: "group 1"
+        group:
+          - [1a, 'item 1a']
+          - [1b, 'item 1b']
+      - label: "group 2"
+        group:
+          - [2a, 'item 2a']
+          - [2b, 'item 2b']

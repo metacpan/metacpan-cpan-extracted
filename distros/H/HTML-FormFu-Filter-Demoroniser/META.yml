@@ -1,0 +1,29 @@
+---
+abstract: "Filter Microsoft \"smart\" characters"
+author:
+  - 'Brian Cassidy <bricas@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-FormFu-Filter-Demoroniser
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  HTML::FormFu: 0.09000
+  Text::Demoroniser: 0
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bricas/html-formfu-filter-demoroniser
+version: 0.02

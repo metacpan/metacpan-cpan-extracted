@@ -1,0 +1,10 @@
+lib/HTML/Pen.pm
+lib/HTML/Pen/Utils.pm
+lib/HTML/Pen/Base64.pm
+lib/HTML/Pen/Iterator/Example.pod
+lib/HTML/Pen/Iterator.pod
+t/Pen.t
+Changes
+MANIFEST
+Makefile.PL
+README

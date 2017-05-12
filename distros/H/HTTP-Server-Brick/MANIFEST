@@ -1,0 +1,15 @@
+Build.PL
+Build_wrapper
+Changes
+lib/HTTP/Server/Brick.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/00.load.t
+t/pod-coverage.t
+t/pod.t
+t/serving.t
+t/test.pem
+META.json

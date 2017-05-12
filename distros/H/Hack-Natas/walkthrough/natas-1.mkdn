@@ -1,0 +1,5 @@
+Level 1
+-------
+
+You can't right-click now, but use CTRL-U to view source,
+and get the next password.

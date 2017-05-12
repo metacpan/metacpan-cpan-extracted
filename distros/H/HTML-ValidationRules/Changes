@@ -1,0 +1,9 @@
+Revision history for Perl extension HTML5::ValidationRules
+
+0.02    2012-10-20
+        [DISTRIBUTING ISSUE]
+        - distribute with new Module::Install
+        - http://weblog.bulknews.net/post/33907905561/do-not-ship-modules-with-module-install-1-04
+
+0.01    Tue Nov  1 12:54:19 2011
+        - original version

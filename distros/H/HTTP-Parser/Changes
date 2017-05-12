@@ -1,0 +1,40 @@
+Revision history for Perl extension HTTP::Parser.
+
+0.06  2011-03-06
+  - fix by frodwith for rt.cpan.org #66298 (path string parsing)
+
+0.05  2009-11-13
+  - two fixes by David Cannings <david@edeca.net>
+  - when parsing responses with no Content-Length header, return a different
+     code to the caller so it can decide whether to keep adding data or not
+     (a slightly more elegant fix to rt.cpan.org #34021)
+  - parse the HTTP response message correctly, it can contain multiple words
+     (rt.cpan.org #34019)
+
+0.04  2007-11-10
+  - when parsing chunks, only remove current chunk from data buffer; don't
+     clear it (rt.cpan.org #30005, patch from David Cannings)
+  - in the "be lenient in what you accept" vein, allow the HTTP response
+     status line to not have a space after the version (contrary to RFC 2616
+     6.1, but apparently broken implementations exist), and strip whitespace
+     from the Content-Length header (rt.cpan.org #30338, patch from David
+     Cannings)
+
+0.03  2007-02-24
+  - reverse change file order (now reverse chronological, newest first)
+  - change chunk parser to skip chunk-extension and allow spaces (rt.cpan.org
+     #14092)
+  - add ability to parse HTTP response into HTTP::Response too (rt.cpan.org
+     #7652, 7654, based on patch from mfr AT hybyte DOT com)
+  - added new tests for new response parsing capability
+
+0.02  2004-01-28
+  - incorporate fixes proposed by Anthony D. Minkoff <adminkoff@cox.net>:
+    literal "HTTP" should be case insensitive (RFC 2616, sections 2.1, 3.1)
+    allow blank lines before Request-Line (RFC 2616, section 4.1; "SHOULD")
+
+0.01  2004-01-03
+  - original author David B. Robins <dbrobins@davidrobins.net>
+  - original version; created by h2xs 1.22 with options -AX -n HTTP::Parser
+  - module originally created November 2003
+

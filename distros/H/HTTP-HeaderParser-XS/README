@@ -1,0 +1,55 @@
+HTTP::HeaderParser::XS
+Perlbal::XS::HTTPHeaders
+========================
+
+This module is a parser for HTTP headers, written in C++.  It uses classes
+internally to provide a fast and easy to use interface to parsing,
+creating, and working with HTTP headers.
+
+This module was originally designed for use in Perlbal, a software HTTP load
+balancer by Danga Interactive.
+
+In order to use this module, you will need the Perl development libraries
+along with a C++ compiler and some random assorted things that convert XS
+files into C (etc).  (Not sure if this is part of the Perl development
+libraries or not... but it should be pretty standard.)
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Alternately, if you're on Debian...
+
+   dh-make-perl --build
+   dpkg -i ../whatever.deb
+
+See the perldoc for HTTP::HeaderParser::XS for more help.
+
+
+DEPENDENCIES
+
+Don't think there are any dependencies for this module.
+
+
+AUTHOR/CONTACT
+
+Written by Mark Smith <mark@xb95.com>.
+
+Please email me or find me on the Perl IRC network as xb95.
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2004-2008 Mark Smith.
+Copyright (C) 2004 Danga Interactive, Inc.
+Copyright (C) 2005-2007 Six Apart, Ltd.
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself, either Perl version 5.8.4 or, at your
+option, any later version of Perl 5 you may have available.

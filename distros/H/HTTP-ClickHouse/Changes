@@ -1,0 +1,36 @@
+Revision history for Perl extension HTTP::ClickHouse.
+
+0.01  Mon Aug  8 22:15:52 2016
+        - original version; created by h2xs 1.23
+      First version.
+      Used only tab-separated data format.
+      Known bugs: 
+        - does not reconnect on loss of connection to ClickHouse; 
+        - value parsing issues.
+
+0.02  Fri Sep  2 2016
+      Second version:
+        - add functions select_array & fetch_array;
+        - used Net::HTTP::NB for non-blocking connection.
+
+0.03  Fri Sep  23  2016
+      Third version:
+        - add debug mode;
+        - bug fixed;
+        - add auto-reconnect on loss of connection.
+
+0.04  Sat Oct  8  2016
+      Fourth version:
+        - add functions select_hash & fetch_ahash;
+        - add function selectall_hash.
+
+0.041 Sun Okt  9  2016
+        -pod fix
+
+0.05 Sun Okt  10  2016
+      Fifth version:
+        - add base class
+
+0.061 Wed Nov  09  2016
+      Sixth version
+        - bug fix for large SELECTs

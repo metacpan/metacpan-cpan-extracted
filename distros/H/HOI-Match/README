@@ -1,0 +1,116 @@
+NAME
+
+HOI::Match - Higher-Order Imperative "Re"features in Perl
+
+SYNOPSIS
+
+  use HOI::Match;
+
+  sub point_extract {
+      HOI::Match::pmatch(
+          "point (x _) :: r" => sub { my %args = @_; $args{x} + point_extract($args{r}) },
+          "nil" => sub { 0 }
+      )->(@_)
+  }
+
+  point_extract(
+      [ 
+          {"type" => "point", "val" => [ 1, 2 ]},
+          {"type" => "point", "val" => [ 2, 4 ]},
+          {"type" => "point", "val" => [ 3, 6 ]},
+      ]
+  ) # we will get 6
+
+
+DESCRIPTION
+
+HOI::Match offers Erlang-like pattern matching in function parameters. 
+Currently only wildcard symbols, lists and algebraic-data-type like hashrefs
+are supported.
+
+A wildcard symbol ([A-Za-z_][A-Za-z0-9_]*) matches exactly one argument.
+A list is represented as an array reference. 
+An algebraic-data-typed object is represented as an hashref with two keys,
+namely "type", which gives its typename, and "val", which is an array reference 
+containing zero or more wildcard symbols, lists, or algebraic-data-typed objects.
+Multiple constructors for a given algebraic data type named A are allowed.
+
+The BNF used to define the pattern grammar is given below:
+
+
+Types: Type 
+     | Type COMMA Types 
+
+
+Type: CONST
+    | IDENT 
+    | Type CONCAT Type 
+    | NIL 
+    | IDENT LPAREN Typelist RPAREN 
+    | IDENT STRCONCAT IDENT
+
+
+Typelist: <eps>
+        | Type Typelist 
+
+
+where
+
+CONST = (?:0(?:\.[0-9]+)?)|(?:[1-9][0-9]*(?:\.[0-9]+)?)|(?:\".*\")|(?:\'.*\')
+
+IDENT = [A-Za-z_][A-Za-z0-9_]*
+
+CONCAT = ::
+
+STRCONCAT = :
+
+NIL = nil
+
+LPAREN = (
+
+RPAREN = )
+
+COMMA = ,
+
+are tokens.
+
+pmatch
+
+The function pmatch takes an hash-formed array, which contains pattern-
+subroutine pairs, where patterns are strings, sequently.
+
+The patterns will be matched sequently. That is,
+
+    "x, y"
+    "point (_ x), y"
+
+on arguments 
+    ( { "type" => "point", "val" => [ 1, 2 ] }, 3 ) 
+will be successfully matched with pattern
+    "x, y" 
+instead of 
+    "point (_ x), y".
+
+On a successful match, the values corresponding to identifiers in the pattern
+will be passed to the subroutine in a hash. You can access them as named arguments with
+
+    my %args = @_;
+
+Identifiers that begin with an underscore ('_') will be ignored. They will not
+be passed to the subroutine.
+
+Version 0.07 offers aliases for identifiers in the pattern.
+See the test files for details.
+
+AUTHOR
+
+withering <withering@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2014 by withering
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.18.2 or,
+at your option, any later version of Perl 5 you may have available.
+

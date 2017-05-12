@@ -1,0 +1,150 @@
+#!/usr/bin/env perl
+
+use 5.008;
+use strict;
+use warnings;
+use Getopt::Long;
+use Config::IniFiles; 	# we'll be using this directly to parse the input file
+
+use Helios::Config;
+use Helios::Error;
+use Helios::ObjectDriver::DBI;	#[] change to H::OD later
+
+our $VERSION = '2.80';
+
+our $Debug = 0;
+our $Help_Mode = 0;
+our $Verbose = 0;
+our $Import_File;
+
+GetOptions(
+	"file=s"  => \$Import_File,
+	"debug"   => \$Debug,
+	"help"    => \$Help_Mode,
+	"verbose" => \$Verbose
+);
+
+if ( $Help_Mode ) {
+	require Pod::Usage;
+	Pod::Usage::pod2usage(-verbose => 2, -exitstatus => 0);
+}
+
+# debug auto-enables verbose
+if ($Debug) { $Verbose = 1; }
+
+my $cif = Config::IniFiles->new( -file => $Import_File );
+unless ( defined($cif) ) { 
+	# @Config::IniFiles::errors contains the parse error(s);
+	my $E = join("\n", @Config::IniFiles::errors);
+	warn("Errors found parsing file $Import_File:\n ".$E);
+	exit(1);
+}
+print "Conf file $Import_File parsed.\n" if $Verbose;
+
+my @sections = $cif->Sections();
+print "Found ",scalar @sections," sections in file.\n" if $Verbose;
+print join("\n", @sections),"\n" if $Debug;
+
+my $config_struct;
+my $param_cnt = 0;
+foreach my $section (@sections) {
+	# skip [global]
+	next if $section =~ /^global/i;
+	my ($sec, $host);
+	if ( $section =~ /\|/) {
+		($sec, $host) = split(/\|/, $section);
+	} else {
+		$sec = $section;
+		$host = '*';
+	}
+
+	foreach ( $cif->Parameters($section) ) {
+		$config_struct->{$sec}->{$host}->{$_} = $cif->val($section, $_);
+		$param_cnt++;
+	}
+}
+
+print "Found $param_cnt parameters for ", 
+	scalar keys %$config_struct, " services.\n";
+
+# OK, we've built the config structure we want to import
+# use Helios::Config to the actual importing
+my $conf = Helios::Config->parseConfig();
+
+my $imp_cnt = 0;
+foreach my $class (keys %$config_struct) {
+	foreach my $host ( keys %{ $config_struct->{$class} }) {
+		foreach my $param (keys %{ $config_struct->{$class}->{$host} } ) {
+			Helios::Config->setParam(
+				service  => $class,
+				hostname => $host,
+				param    => $param,
+				value    => $config_struct->{$class}->{$host}->{$param}
+			);
+			print "$class|$host|$param set to ", $config_struct->{$class}->{$host}->{$param} ,"\n" if $Verbose;
+			$imp_cnt++;
+		}
+	}
+}
+
+print $imp_cnt," config parameters imported to Helios collective database.\n";
+
+exit(0);
+
+
+=head1 NAME
+
+helios_config_import - import a INI-style config file into the Helios database
+
+=head1 SYNOPSIS
+
+ # contents of myservice.ini file
+ [MyService]
+ endpoint_url=http://webserver/app.pl
+ landing_zone=/mnt/documents/upload/
+ email_notification=off 
+
+ # command to import config parameters in myservice.ini into the Helios database
+ helios_config_import --file=myservice.ini
+
+=head1 DESCRIPTION
+
+With the helios_config_import command, you can specify a group of configuration
+parameters in an INI-style configuration file, and then import those parameters
+into your Helios collective database with one shell command.
+
+=head1 COMMAND OPTIONS
+
+=over 4
+
+=item --file [REQUIRED]
+
+The name of the INI file to import.
+
+=item --verbose
+
+Prints extra information during the import process.
+
+=item --help
+
+Displays this man page.
+
+=back
+
+=head1 AUTHOR
+
+Andrew Johnson, E<lt>lajandy at cpan dot orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013-4 by Logical Helion, LLC.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=head1 WARRANTY
+
+This software comes with no warranty of any kind.
+
+=cut

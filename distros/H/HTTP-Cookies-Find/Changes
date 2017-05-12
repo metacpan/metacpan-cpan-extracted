@@ -1,0 +1,53 @@
+2017-04-30  Kingpin  <martin@martin-M17x>
+
+	* Makefile.PL: fixed for Perl 5.26
+
+2010-05-08  Kingpin  <Martin@BLUEMAX>
+
+	* lib/HTTP/Cookies/Find.pm (new): more graceful in case browser(s) not installed
+
+2008-05-01    <Martin@BLUEMAX>
+
+	* lib/HTTP/Cookies/Find.pm (new): fixed for Mozilla and MSIE Vista
+
+2007-04-25    <Daddy@C-3PO>
+
+	* lib/HTTP/Cookies/Find.pm: added pod for methods
+
+2005-12-24    <Daddy@C-3PO>
+
+	* Find.pm (_callback_msie): avoid username substring mis-match
+
+2004-03-06  Kingpin  <mthurn@verizon.net>
+
+	* lib/HTTP/Cookies/Find.pm (errors): new function
+
+2004-03-03  Kingpin  <mthurn@verizon.net>
+
+	* lib/HTTP/Cookies/Find.pm (_get_cookies): new function
+	(new): add support for Mozilla browser on *nix
+
+2004-01-23  Kingpin  <mthurn@verizon.net>
+
+	* t/solaris.t: skip tests if no cookies file found
+
+2003-12-05  Kingpin  <mthurn@verizon.net>
+
+	* VERSION 1.03 RELEASED
+
+2003-12-03  Kingpin  <mthurn@verizon.net>
+
+	* t/solaris.t: new file
+	* lib/HTTP/Cookies/Find.pm: added support for Netscape on Windows
+	* lib/HTTP/Cookies/Find.pm: added support for Netscape 4 on Solaris
+
+2003-12-02  Kingpin  <mthurn@verizon.net>
+
+	* t/msie.t: added tests to get all cookies & report the count
+
+	* lib/HTTP/Cookies/Find.pm (new): added stub code for Solaris/Netscape
+
+2003-12-01  Kingpin  <mthurn@verizon.net>
+
+	* lib/HTTP/Cookies/Find.pm: ready for first public release
+

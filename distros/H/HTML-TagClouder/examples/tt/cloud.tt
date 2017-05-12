@@ -1,0 +1,7 @@
+<div id="tagcloud">
+[%- SET collection = cloud.collection -%]
+[%- SET iterator   = collection.iterator -%]
+[% WHILE (tag = iterator.next) %]
+<span class="tag" style="font-size: [% tag.count_norm | html %]%"><a href="[% tag.uri | html %]">[% tag.label | html %]</a></span>
+[% END %]
+</div>

@@ -1,0 +1,20 @@
+Revision history for Perl extension HTML::Tooltip::Javascript.
+
+0.01  Mon Jun 21 11:29:01 2004
+	- original version; created by h2xs 1.23 with options
+		-AX -n HTML::Tooltip::Javascript
+
+0.02  Wed Jun 23 17:29:01 2004
+        - Changed required version of perl from 5.8.3 to 5.6.0.
+
+0.03  Thu Sep 07 12:04:01 2004
+        - Modified to allow newlines in tooltip text
+        - Modified to check for definedness to allow 0 values in options
+
+0.04  Thu Sep 08 09:15:01 2004
+        - Modified check for definedness to allow for values that can be zero 
+          and those that can't
+
+1.01  Mon Jul 30 13:02:01 2007
+        - Updated documentation to specify versions of Walter Zorn's library 
+	  prior to 4.0

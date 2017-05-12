@@ -1,0 +1,6 @@
+/* /css/global.css */
+@import url(6.css);
+
+.border { 
+  border: 3px solid red;
+}

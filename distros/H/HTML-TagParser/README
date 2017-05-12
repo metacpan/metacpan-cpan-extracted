@@ -1,0 +1,176 @@
+NAME
+    HTML::TagParser - Yet another HTML document parser with DOM-like methods
+
+SYNOPSIS
+    Parse a HTML file and find its <title> element's value.
+
+        my $html = HTML::TagParser->new( "index-j.html" );
+        my $elem = $html->getElementsByTagName( "title" );
+        print "<title>", $elem->innerText(), "</title>\n" if ref $elem;
+
+    Parse a HTML source and find its first <form action=""> attribute's
+    value and find all input elements belonging to this form.
+
+        my $src  = '<html><form action="hoge.cgi">...</form></html>';
+        my $html = HTML::TagParser->new( $src );
+        my $elem = $html->getElementsByTagName( "form" );
+        print "<form action=\"", $elem->getAttribute("action"), "\">\n" if ref $elem;
+        my @first_inputs = $elem->subTree()->getElementsByTagName( "input" );
+        my $form = $first_inputs[0]->getParent();
+
+    Fetch a HTML file via HTTP, and display its all <a> elements and
+    attributes.
+
+        my $url  = 'http://www.kawa.net/xp/index-e.html';
+        my $html = HTML::TagParser->new( $url );
+        my @list = $html->getElementsByTagName( "a" );
+        foreach my $elem ( @list ) {
+            my $tagname = $elem->tagName;
+            my $attr = $elem->attributes;
+            my $text = $elem->innerText;
+            print "<$tagname";
+            foreach my $key ( sort keys %$attr ) {
+                print " $key=\"$attr->{$key}\"";
+            }
+            if ( $text eq "" ) {
+                print " />\n";
+            } else {
+                print ">$text</$tagname>\n";
+            }
+        }
+
+DESCRIPTION
+    HTML::TagParser is a pure Perl module which parses HTML/XHTML files.
+    This module provides some methods like DOM interface. This module is not
+    strict about XHTML format because many of HTML pages are not strict. You
+    know, many pages use <br> elemtents instead of <br/> and have <p>
+    elements which are not closed.
+
+METHODS
+  $html = HTML::TagParser->new();
+    This method constructs an empty instance of the "HTML::TagParser" class.
+
+  $html = HTML::TagParser->new( $url );
+    If new() is called with a URL, this method fetches a HTML file from
+    remote web server and parses it and returns its instance. URI::Fetch
+    module is required to fetch a file.
+
+  $html = HTML::TagParser->new( $file );
+    If new() is called with a filename, this method parses a local HTML file
+    and returns its instance
+
+  $html = HTML::TagParser->new( "<html>...snip...</html>" );
+    If new() is called with a string of HTML source code, this method parses
+    it and returns its instance.
+
+  $html->fetch( $url, %param );
+    This method fetches a HTML file from remote web server and parse it. The
+    second argument is optional parameters for URI::Fetch module.
+
+  $html->open( $file );
+    This method parses a local HTML file.
+
+  $html->parse( $source );
+    This method parses a string of HTML source code.
+
+  $elem = $html->getElementById( $id );
+    This method returns the element which id attribute is $id.
+
+  @elem = $html->getElementsByName( $name );
+    This method returns an array of elements which name attribute is $name.
+    On scalar context, the first element is only retruned.
+
+  @elem = $html->getElementsByTagName( $tagname );
+    This method returns an array of elements which tagName is $tagName. On
+    scalar context, the first element is only retruned.
+
+  @elem = $html->getElementsByClassName( $class );
+    This method returns an array of elements which className is $tagName. On
+    scalar context, the first element is only retruned.
+
+  @elem = $html->getElementsByAttribute( $attrname, $value );
+    This method returns an array of elements which $attrname attribute's
+    value is $value. On scalar context, the first element is only retruned.
+
+HTML::TagParser::Element SUBCLASS
+  $tagname = $elem->tagName();
+    This method returns $elem's tagName.
+
+  $text = $elem->id();
+    This method returns $elem's id attribute.
+
+  $text = $elem->innerText();
+    This method returns $elem's innerText without tags.
+
+  $subhtml = $elem->subTree();
+    This method returns a new object of class HTML::Parser, with all the
+    elements that are in the DOM hierarchy under $elem.
+
+  $elem = $elem->nextSibling();
+    This method returns the next sibling within the same parent. It returns
+    undef when called on a closing tag or on the lastChild node of a
+    parentNode.
+
+  $elem = $elem->previousSibling();
+    This method returns the previous sibling within the same parent. It
+    returns undef when called on the firstChild node of a parentNode.
+
+  $child_elem = $elem->firstChild();
+    This method returns the first child node of $elem. It returns undef when
+    called on a closing tag element or on a non-container or empty container
+    element.
+
+  $child_elems = $elem->childNodes();
+    This method creates an array of all child nodes of $elem and returns the
+    array by reference. It returns an empty array-ref [] whenever
+    firstChild() would return undef.
+
+  $child_elem = $elem->lastChild();
+    This method returns the last child node of $elem. It returns undef
+    whenever firstChild() would return undef.
+
+  $parent = $elem->parentNode();
+    This method returns the parent node of $elem. It returns undef when
+    called on root nodes.
+
+  $attr = $elem->attributes();
+    This method returns a hash of $elem's all attributes.
+
+  $value = $elem->getAttribute( $key );
+    This method returns the value of $elem's attributes which name is $key.
+
+BUGS
+    The HTML-Parser is simple. Methods innerText and subTree may be fooled
+    by nested tags or embedded javascript code.
+
+    The methods with 'Sibling', 'child' or 'Child' in their names do not
+    cache their results. The most expensive ones are lastChild() and
+    previousSibling(). parentNode() is also expensive, but only once. It
+    does caching.
+
+    The DOM tree is read-only, as this is just a parser.
+
+INTERNATIONALIZATION
+    This module natively understands the character encoding used in document
+    by parsing its meta element.
+
+        <meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+
+    The parsed document's encoding is converted as this class's fixed
+    internal encoding "UTF-8".
+
+AUTHORS AND CONTRIBUTORS
+        drry [drry]
+        Juergen Weigert [jnw]
+        Yusuke Kawasaki [kawasaki] [kawanet]
+        Tim Wilde [twilde]
+
+COPYRIGHT AND LICENSE
+    The following copyright notice applies to all the files provided in this
+    distribution, including binary files, unless explicitly noted otherwise.
+
+    Copyright 2006-2012 Yusuke Kawasaki
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

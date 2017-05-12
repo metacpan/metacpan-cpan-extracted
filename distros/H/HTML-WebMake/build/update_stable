@@ -1,0 +1,14 @@
+#!/bin/bash
+
+WEBDIR=/home/jm/webmake.taint.org
+
+vers=`build/get_version`
+
+build/update_devel
+# build/mkrpm
+cp $WEBDIR/devel/HTML-WebMake-$vers.tar.gz $WEBDIR/released/HTML-WebMake-$vers.tar.gz
+cp $WEBDIR/devel/HTML-WebMake-$vers.zip $WEBDIR/released/HTML-WebMake-$vers.zip
+# cp WebMake-${vers}-1.noarch.rpm WebMake-${vers}-1.src.rpm $WEBDIR/released
+
+( cd $WEBDIR/released ; cvs add *WebMake* )
+

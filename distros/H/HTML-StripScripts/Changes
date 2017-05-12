@@ -1,0 +1,51 @@
+1.06  12 May 2016  Added title tag to <a> elements RT 83302
+                   Fixed a bug in the mailto regex RT 87872 (thanks to ANDK and SysPete)
+                   Fixed an unclosed { in the _hss_attval_size regex RT 98110, RT 104221,
+                        RT 107247, (thanks to fraserbn, jplesnik, dtenney, and SysPete)
+                   Fixed a spelling mistake (thanks to gregoa and SysPete)
+
+1.05   5 Nov 2009  Fixed bug where 'false' but valid content was being ignored,
+                   eg "<i>0</i>"  became "<i></i>"
+                   See bug https://rt.cpan.org/Public/Bug/Display.html?id=51116
+                   Thanks to Jim Laney for reporting it
+
+1.04  16 Nov 2007  Fixed bug where mailto links not working when
+                   AllowHref enabled. (Thanks to Menno Blom - 'b10m').
+
+1.03  22 Oct 2007  Altered some syntax in a test to make it work in earlier
+                   versions of Perl
+
+1.02  22 Oct 2007  Added the examples into the POD
+
+1.01  22 Oct 2007  Fixed the attribute regex to recognise attributes
+                   with hyphens eg 'http-equiv'
+
+                   Added examples
+
+1.00   5 Jun 2007  Passed all CPAN tests - bumped version
+
+0.991 29 May 2007  Fixed some Kwalitee issues:
+                     - improved META.yml
+                     - added Test::Pod and Test::Pod::Coverage tests
+
+0.99  28 May 2007  BanList can now be an array ref or a hash ref
+
+                   Repeated attributes are no longer merged, instead
+                   the second value replaces the first
+
+                   Relative URLs can now include query strings
+
+                   Attributes now have CR, LF or TAB replaced by a space
+
+                   Added:
+                     - Rules (for customised tag and attribute handling)
+                     - EscapeFiltered
+                     - AllowMailto
+                     - numerous tests
+
+0.03  27 Apr 2004  Added the AllowRelURL option, in response to RT #6123
+
+0.02  25 Jul 2003  Fixed some spelling errors.
+                   Added a reference to HTML::Scrubber::StripScripts.
+
+0.01  30 Mar 2003  Initial release.

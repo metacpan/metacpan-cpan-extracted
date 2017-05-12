@@ -1,0 +1,16 @@
+<html><head><title>FSBO Open Houses</title><script src="http://maps.google.com/maps?file=api&v=3" type="text/javascript"></script><script type="text/javascript">
+    //<![CDATA[
+  function html_googlemaps_initialize() {    
+    if (GBrowserIsCompatible()) {
+      var map = new GMap2(document.getElementById("map"));
+      map.setCenter(new GLatLng(43.0713085, -89.4063181));
+      map.setZoom(13);
+      map.setMapType(G_NORMAL_MAP);
+      var marker_1 = new GMarker(new GLatLng(43.0713085, -89.4063181) );
+      map.addOverlay(marker_1);
+      var marker_2 = new GMarker(new GLatLng(0, 51) );
+      map.addOverlay(marker_2);
+    }
+  }
+    //]]>
+    </script></head><body onload="html_googlemaps_initialize()"><div id="map" style="width: 600px; height: 400px"></div></body></html>

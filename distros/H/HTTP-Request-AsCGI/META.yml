@@ -1,0 +1,22 @@
+---
+abstract: 'Set up a CGI environment from an HTTP::Request'
+author:
+  - 'Christian Hansen <ch@ngmedia.com>'
+  - 'Hans Dieter Pearcey <hdp@cpan.org>'
+generated_by: 'Dist::Zilla version 1.093400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTTP-Request-AsCGI
+requires:
+  Carp: 0
+  Class::Accessor: 0
+  HTTP::Request: 0
+  HTTP::Response: 1.53
+  IO::File: 0
+  Test::More: 0
+  URI::Escape: 0
+resources:
+  repository: http://dev.catalyst.perl.org/repos/Catalyst/HTTP-Request-AsCGI
+version: 1.2

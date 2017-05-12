@@ -1,0 +1,23 @@
+---
+abstract: 'Wether Script for Hubot.'
+author:
+  - 'Yunchang Kang <codenewb@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Hubot-Scripts-weather
+requires:
+  Data::Printer: 0
+  Encode: 0
+  LWP::UserAgent: 0
+  strict: 0
+  utf8: 0
+  warnings: 0
+version: 0.1.0

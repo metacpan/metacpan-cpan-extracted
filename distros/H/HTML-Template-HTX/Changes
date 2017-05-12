@@ -1,0 +1,26 @@
+Revision history for Perl extension HTML::Template::HTX.
+
+0.01  Sat Apr 20 13:13:28 2002
+	- original version; created by h2xs 1.21
+
+0.02  Mon Jun 24 00:00:00 2002
+	- fixed some minor bugs
+
+0.03  Sun Jul 21 00:00:00 2002
+	- fixed a minor bug
+
+0.04  Sun Jul 21 00:00:00 2002
+	- fixed another minor bug
+
+0.05  Sun Nov 21 00:00:00 2004
+	- added support for output to a scalar
+
+0.06  Mon Apr 18 00:00:00 2005
+        - added UTF-8 support
+
+0.07  Sun May 15 00:00:00 2005
+        - fixed some major bugs with UTF-8 support
+        - added better support for multiple detail sections
+	- added support for input from a scalar
+	- added two escape encoding types
+	- added the common parameters feature

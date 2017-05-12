@@ -1,0 +1,95 @@
+SYNOPSIS
+
+        use HTML::Tree::Create::Callback qw(create_html_tree_using_callback);
+        $tree = create_html_tree_using_callback(
+            sub {
+                my ($level, $seniority) = @_;
+                $id++;
+                if ($level == 0) {
+                    return (
+                        'body',
+                        {}, # attributes
+                        "text before children",
+                        "text after children",
+                        3, # number of children node
+                    );
+                } elsif ($level == 1) {
+                    return ('p', {id=>$id}, "", "", 2);
+                } elsif ($level == 2) {
+                    return (
+                        'span', {id=>$id, class=>"foo".$seniority},
+                        'text3.'.$seniority,
+                        'text4',
+                        0,
+                    );
+                }
+            }
+        );
+        print $tree;
+
+    Sample result:
+
+     <body>
+       text before children
+       <p id="2">
+         <span class="foo0" id="3">
+           text3.0
+           text4
+         </span>
+         <span class="foo1" id="4">
+           text3.1
+           text4
+         </span>
+       </p>
+       <p id="5">
+         <span class="foo0" id="6">
+           text3.0
+           text4
+         </span>
+         <span class="foo1" id="7">
+           text3.1
+           text4
+         </span>
+       </p>
+       <p id="8">
+         <span class="foo0" id="9">
+           text3.0
+           text4
+         </span>
+         <span class="foo1" id="10">
+           text3.1
+           text4
+         </span>
+       </p>
+       text after children
+     </body>
+
+DESCRIPTION
+
+FUNCTIONS
+
+ create_html_tree_using_callback($cb) => str
+
+    Create HTML document using callback for each element. Your callback
+    will be called with these arguments:
+
+     ($level, $seniority)
+
+    where $level starts with 0 for the root element, then 1 for the child
+    element, and so on. $seniority starts with 0 for the first child, 1 for
+    the second child, and so on. The callback is expected to return a list:
+
+     ($element, \%attrs, $text_before, $text_after, $num_children)
+
+    where $element is a string containing element name (e.g. body, p, and
+    so on), \%attrs is a hashref containing list of attributes,
+    $text_before is text to put before the first child element, $text_after
+    is text to put after the last child element, and $num_children is the
+    number of child element to have. The callback will then be called again
+    for each child element. To stop the tree from growing, at the last
+    level you want you should put 0 to the number of children.
+
+SEE ALSO
+
+    The interface of this module is modeled after Tree::Create::Callback.
+

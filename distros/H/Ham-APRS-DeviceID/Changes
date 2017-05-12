@@ -1,0 +1,49 @@
+Revision history for Perl extension Ham::APRS::DeviceID.
+
+1.00
+	- original version
+
+1.01
+	- return more result code
+	- tune tests to log result codes
+	- a few more checks in dstcall and mice tests
+
+1.02
+	- fixed Makefile.PL to require Ham::APRS::FAP 1.16, as this is
+	  what we really need to get the 'format' key right
+
+1.03
+	- added support for Kenwood TH-D72
+	- added APRNOW dstcall for APRSNow, APKRAM for Ham Tracker iphone app
+
+
+1.04
+	- added support for U2APRS, WX3in1, OpenAPRS, APRSdroid
+
+1.05
+	- added support for TrackPoint, BPQ32, ircDDB Gateway, DIXPRS,
+	  dsDIGI, dsTracker, DireWolf, MiniGate, YAAC, MotoTRBO
+1.06
+	- added support for KissOZ, anyfrog, unknown mic-e, SARTrack,
+	  Altus Metrum, SM2APRS, aprsc, NW Digital Radio UDR
+1.07
+	- added support for Numerous Microsat devices, HA9MCQ PICiGATE,
+	  WA0TQG APLM something, AMSAT-LU Oscar satellites, APRSISCE for
+	  Android
+	- updated APWM APRSISCE to accept letters in tocall, changed OS
+	  to Windows Mobile
+2.00
+	- load actual device identification database from a YAML file, which
+	  is maintained separately at https://github.com/hessu/aprs-deviceid
+	  so that the database can be used in other apps and programming
+	  languages than the perl DeviceID module
+	- a number of new detections in the current database
+
+2.01
+	- device database update
+	- mic-e definition changed in database, adjusted parser to match
+
+2.02
+	- device database update
+	- fix tocall matching order (longest match first!)
+

@@ -1,0 +1,30 @@
+#!/usr/local/bin/perl
+# -*- mode: cperl; tab-width: 8; indent-tabs-mode: nil; basic-offset: 2 -*-
+# vim:ts=8:sw=2:et:sta:sts=2
+#########
+# Author:        rmp
+# Last Modified: $Date: 2013-12-21 23:01:03 +0000 (Sat, 21 Dec 2013) $
+# Id:            $Id: iota-update 315 2013-12-21 23:01:03Z rmp $
+# $HeadURL$
+#
+use strict;
+use warnings;
+use lib qw(lib);
+use Carp;
+use English qw(-no_match_vars);
+use Ham::IOTA;
+use Data::Dumper;
+
+our $FULLLIST_XML = q[data/fulllist.xml];
+my $iota     = Ham::IOTA->new;
+$iota->fetch($FULLLIST_XML);
+
+my $parsed = $iota->parse($FULLLIST_XML);
+
+for my $group_in (@{$parsed}) {
+  print Dumper($group_in) or croak $ERRNO;
+
+  for my $island_in (@{$group_in->{islands}}) {
+    print Dumper($island_in) or croak $ERRNO;
+  }
+}

@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/HTTP-AppServer.t
+lib/HTTP/AppServer.pm
+lib/HTTP/AppServer/Base.pm
+lib/HTTP/AppServer/Plugin.pm
+lib/HTTP/AppServer/Plugin/CustomError.pm
+lib/HTTP/AppServer/Plugin/Database.pm
+lib/HTTP/AppServer/Plugin/FileRetriever.pm
+lib/HTTP/AppServer/Plugin/HTTPAuth.pm
+lib/HTTP/AppServer/Plugin/JsonCrud.pm
+lib/HTTP/AppServer/Plugin/PlainHTML.pm
+
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,9 @@
+Build.PL
+Changes
+lib/HTTP/Server/Simple/WebDAO.pm
+Makefile.PL
+MANIFEST
+README
+t/t00.t
+META.yml
+META.json

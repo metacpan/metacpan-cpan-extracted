@@ -1,0 +1,25 @@
+=head1 NAME
+
+TODO
+
+=head1 RT
+
+=head1 TESTERS
+
+=head1 TRUNK
+
+=head2 Standalone
+
+remove
+
+=head2 ModPerl
+
+support $r->send_fd() (suggested by kazeburo++)
+
+=head2 FCGI
+
+mod_fastcgi + apache2 test
+
+nginx support
+
+proxy_request support

@@ -1,0 +1,26 @@
+Failed  Succeeded  Test Name
+   0          2    *** no name ***
+
+
+Test Name: N/A
+URL: http://http.web.test/show-cookies
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  REQUIRED TEXT
+    <webtest>=<This is the cookie value>                         SUCCEED
+
+  PAGE CONTENT:
+<N001>=<V001>
+<N002>=<V002>
+<c1>=<v1>
+<c3>=<v3>
+<c4>=<v4>
+<c5>=<v5>
+<c6>=<v6>
+<c7>=<v7>
+<webtest>=<This is the cookie value>
+
+
+
+Total web tests failed: 0  succeeded: 2

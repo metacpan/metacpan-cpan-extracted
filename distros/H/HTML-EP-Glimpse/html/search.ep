@@ -1,0 +1,38 @@
+<ep-package name="HTML::EP::Glimpse" lib="admin/lib">
+<ep-glimpse-search>
+<html><head><title>
+<ep-language en="Glimpse Search Results"
+             de="Glimpse-Suchergebnisse"></title></head>
+<body bgcolor=#ffffff>
+  <h1><ep-language en="Glimpse Search Results"
+             de="Glimpse-Suchergebnisse"></h1>
+<ep-if eval="@{$_->{'files'}}">
+  <div align=center>
+  <table>
+    <ep-list items=files item=f>
+      <ep-perl>$_->{'lines'} = $_->{'f'}->{'lines'}; ''</ep-perl>
+      <tr><th valign=top>$f->fileNum$)</th>
+          <td><a href="$f->url$">$f->title$</a>
+		<ep-list items=lines item=l>
+		  <br>$l->lineNum$: $l->line$
+	        </ep-list>
+          </td>
+    </ep-list>
+  </table>
+  <ep-if cnd="$@prev$>=0">
+    <a href="$@link_opts$&start=$prev$"><ep-language de="Zurück" en="Back"></a>
+  </ep-if>
+  <ep-if eval="$next$">
+    <a href="$@link_opts$&start=$next$">
+      <ep-language de="Weitere Dateien" en="More hits"></a>
+  </ep-if>
+  </div>
+<ep-elseif eval="$cgi->start$">
+  <ep-language de="Leider wurden keine weiteren Dateien gefunden"
+               en="Sorry, but no more hits have been found">
+<ep-else>
+  <ep-language de="Leider wurden keine passenden Dateien gefunden"
+               en="Sorry, but no hits have been found">
+</ep-if>
+</body>
+</html>

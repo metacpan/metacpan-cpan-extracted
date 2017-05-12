@@ -1,0 +1,175 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://purl.org/NET/cpan-uri/dist/HTTP-Link-Parser/project>
+	a                    doap:Project;
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.010"^^doap-deps:CpanId ], [ doap-deps:on "HTTP::Message"^^doap-deps:CpanId ], [ doap-deps:on "URI"^^doap-deps:CpanId ], [ doap-deps:on "URI::Escape"^^doap-deps:CpanId ];
+	doap-deps:runtime-suggestion [ doap-deps:on "RDF::Trine 0.135"^^doap-deps:CpanId ];
+	doap-deps:test-recommendation [ doap-deps:on "RDF::Trine 0.135"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=HTTP-Link-Parser>;
+	doap:category        [ rdfs:label "Link" ], [ rdfs:label "RDF" ], [ rdfs:label "Semantics" ], [ rdfs:label "Relationships" ], [ rdfs:label "rel" ], [ rdfs:label "RFC5988" ], [ rdfs:label "HTTP" ];
+	doap:created         "2009-10-09"^^xsd:date;
+	doap:developer       <http://tobyinkster.co.uk/#i>;
+	doap:documenter      <http://tobyinkster.co.uk/#i>;
+	doap:download-page   <https://metacpan.org/release/HTTP-Link-Parser>;
+	doap:homepage        <https://metacpan.org/release/HTTP-Link-Parser>;
+	doap:license         <http://www.opensource.org/licenses/mit-license.php>;
+	doap:maintainer      <http://tobyinkster.co.uk/#i>;
+	doap:name            "HTTP-Link-Parser";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/HTTP-Link-Parser/v_0-01>, <http://purl.org/NET/cpan-uri/dist/HTTP-Link-Parser/v_0-02>, <http://purl.org/NET/cpan-uri/dist/HTTP-Link-Parser/v_0-03>, <http://purl.org/NET/cpan-uri/dist/HTTP-Link-Parser/v_0-04>, <http://purl.org/NET/cpan-uri/dist/HTTP-Link-Parser/v_0-05>, <http://purl.org/NET/cpan-uri/dist/HTTP-Link-Parser/v_0-100>, <http://purl.org/NET/cpan-uri/dist/HTTP-Link-Parser/v_0-101>, <http://purl.org/NET/cpan-uri/dist/HTTP-Link-Parser/v_0-102>, <http://purl.org/NET/cpan-uri/dist/HTTP-Link-Parser/v_0-103>, <http://purl.org/NET/cpan-uri/dist/HTTP-Link-Parser/v_0-200>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-http-link-parser>;
+	];
+	doap:shortdesc       "parse HTTP Link headers"@en;
+	doap:tester          <http://tobyinkster.co.uk/#i>.
+
+<http://purl.org/NET/cpan-uri/dist/HTTP-Link-Parser/v_0-01>
+	a                    doap:Version;
+	rdfs:label           "First release"@en;
+	dc:issued            "2009-10-09"^^xsd:date;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTTP-Link-Parser-0.01.tar.gz>;
+	doap:revision        "0.01"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTTP-Link-Parser/v_0-02>
+	a                    doap:Version;
+	dc:issued            "2009-11-24"^^xsd:date;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTTP-Link-Parser-0.02.tar.gz>;
+	doap:revision        "0.02"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTTP-Link-Parser/v_0-03>
+	a                    doap:Version;
+	dc:issued            "2009-11-28"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Provide an RDF::Trine::Model"@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTTP-Link-Parser/v_0-02>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTTP-Link-Parser-0.03.tar.gz>;
+	doap:revision        "0.03"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTTP-Link-Parser/v_0-04>
+	a                    doap:Version;
+	dc:issued            "2009-12-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Support the 'title*' parameter."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTTP-Link-Parser/v_0-03>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTTP-Link-Parser-0.04.tar.gz>;
+	doap:revision        "0.04"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTTP-Link-Parser/v_0-05>
+	a                    doap:Version;
+	dc:issued            "2010-02-07"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Rename parse_header to parse_single_link, and document this."@en;
+		], [ rdfs:label "Clean up @EXPORT and @EXPORT_OK."@en ], [
+			a doap-changeset:Update;
+			rdfs:label "Copyright 2010."@en;
+		], [
+			a doap-changeset:Update;
+			rdfs:label "Use my new build system."@en;
+		], [
+			rdfs:label "General documentation improvements."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTTP-Link-Parser/v_0-04>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTTP-Link-Parser-0.05.tar.gz>;
+	doap:revision        "0.05"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTTP-Link-Parser/v_0-100>
+	a                    doap:Version;
+	dc:issued            "2010-06-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Let the Content-Language header provide a default language for the 'title' property."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTTP-Link-Parser/v_0-05>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTTP-Link-Parser-0.100.tar.gz>;
+	doap:revision        "0.100"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTTP-Link-Parser/v_0-101>
+	a                    doap:Version;
+	dc:issued            "2011-02-19"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [ rdfs:label "Minor cleanups."@en ], [
+			a doap-changeset:Update;
+			rdfs:label "Copyright 2011."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTTP-Link-Parser/v_0-100>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTTP-Link-Parser-0.101.tar.gz>;
+	doap:revision        "0.101"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTTP-Link-Parser/v_0-102>
+	a                    doap:Version;
+	dc:issued            "2011-11-27"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "use 5.010"@en;
+		], [ rdfs:label "Minor tidy"@en ], [
+			a doap-changeset:Packaging;
+			rdfs:label "Module::Package::RDF"@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTTP-Link-Parser/v_0-101>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTTP-Link-Parser-0.102.tar.gz>;
+	doap:revision        "0.102"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTTP-Link-Parser/v_0-103>
+	a                    doap:Version;
+	dc:issued            "2011-12-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix, doap-changeset:Packaging;
+			rdfs:label "Newer version of Module::Package::RDF."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTTP-Link-Parser/v_0-102>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTTP-Link-Parser-0.103.tar.gz>;
+	doap:revision        "0.103"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/HTTP-Link-Parser/v_0-200>
+	a                    doap:Version;
+	dc:issued            "2014-01-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging, doap-changeset:Update;
+			rdfs:label "use Dist::Inkt."@en;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Make RDF::Trine dependency optional."@en;
+		], [
+			a doap-changeset:Documentation, doap-changeset:Update;
+			rdfs:label "Copyright 2014."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/HTTP-Link-Parser/v_0-103>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTTP-Link-Parser-0.200.tar.gz>;
+	doap:revision        "0.200"^^xsd:string.
+
+<http://tobyinkster.co.uk/#i>
+	a                    foaf:Person;
+	foaf:homepage        <http://tobyinkster.co.uk/>;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:page            <https://metacpan.org/author/TOBYINK>;
+	owl:sameAs           <http://purl.org/NET/cpan-uri/person/tobyink>.
+

@@ -1,0 +1,5 @@
+name = "HTML-ExtractContent"
+authority = "cpan:TARAO"
+badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

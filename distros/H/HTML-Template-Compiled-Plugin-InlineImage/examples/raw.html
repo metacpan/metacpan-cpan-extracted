@@ -1,0 +1,105 @@
+
+<html><head>
+    <title>HTML::Template::Compiled::Plugin::InlineImage example</title>
+</head>
+<body bgcolor="#dddddd">
+
+<h2>Images</h2>
+<br>GIF:  <img src="data:image/gif;base64,R0lGODlhHgAbAMIAAP//AP///yAgIAAAAP///////////////yH5BAEAAAIALAAAAAAeABsAAAN1
+KLrc/jDK+QaldmWxLxtbqICeZo7oRGpZa62pA3Np+3UN6NLkqmOj12936emMHBwt+WMeh7Dm7Uk9
+siRPgFZrTXoG2zCA+hWLu8Ut2FxFa9Tr81Nlrs+wdXZbGc9zpRF9XGwlHGdnhYZ/hIlHjIlJcpA5
+bhIJADs=
+" alt="test">
+
+<hr>
+<h2>The Template:</h2>
+<table border=1 bgcolor="#ffffff"><tr><td>
+<pre>
+&lt;html&gt;&lt;head&gt;
+    &lt;title&gt;HTML::Template::Compiled::Plugin::InlineImage example&lt;/title&gt;
+&lt;/head&gt;
+&lt;body bgcolor=&quot;#dddddd&quot;&gt;
+
+&lt;h2&gt;Images&lt;/h2&gt;
+&lt;br&gt;GIF:  &lt;img &lt;%= raw escape=INLINE_IMG_GIF %&gt; alt=&quot;test&quot;&gt;
+
+&lt;hr&gt;
+&lt;h2&gt;The Template:&lt;/h2&gt;
+&lt;table border=1 bgcolor=&quot;#ffffff&quot;&gt;&lt;tr&gt;&lt;td&gt;
+&lt;pre&gt;&lt;%= template escape=html %&gt;&lt;/pre&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
+&lt;hr&gt;
+&lt;h2&gt;The whole script:&lt;/h2&gt;
+&lt;table border=1 bgcolor=&quot;#ffffff&quot;&gt;&lt;tr&gt;&lt;td&gt;
+&lt;pre&gt;&lt;%= code escape=html %&gt;&lt;/pre&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/body&gt;&lt;/html&gt;
+</pre>
+</td></tr></table>
+
+<hr>
+<h2>The whole script:</h2>
+<table border=1 bgcolor="#ffffff"><tr><td>
+<pre>#!/usr/bin/perl
+use strict;
+use warnings;
+use blib;
+use HTML::Template::Compiled 0.73;
+use HTML::Template::Compiled::Plugin::InlineImage;
+use Fcntl qw(:seek);
+
+# ---------- Image --------------
+my $data;
+{
+    open my $fh, &quot;examples/punk_smiley.gif&quot; or die $!;
+    local $/;
+    $data = &lt;$fh&gt;;
+}
+
+# ---------- HTC ----------------
+my ($template, $script);
+#$HTML::Template::Compiled::Plugin::InlineImage::SIZE_WARNING = 0;
+{
+    local $/;
+    $template = &lt;DATA&gt;;
+    seek DATA, 0, SEEK_SET;
+    $script = &lt;DATA&gt;;
+}
+my $htc = HTML::Template::Compiled-&gt;new(
+    scalarref =&gt; \$template,
+    debug =&gt; 0,
+    plugin =&gt; [qw(HTML::Template::Compiled::Plugin::InlineImage)],
+);
+$htc-&gt;param(
+    raw =&gt; $data,
+    template =&gt; $template,
+    code =&gt; $script,
+);
+print $htc-&gt;output;
+
+__DATA__
+
+&lt;html&gt;&lt;head&gt;
+    &lt;title&gt;HTML::Template::Compiled::Plugin::InlineImage example&lt;/title&gt;
+&lt;/head&gt;
+&lt;body bgcolor=&quot;#dddddd&quot;&gt;
+
+&lt;h2&gt;Images&lt;/h2&gt;
+&lt;br&gt;GIF:  &lt;img &lt;%= raw escape=INLINE_IMG_GIF %&gt; alt=&quot;test&quot;&gt;
+
+&lt;hr&gt;
+&lt;h2&gt;The Template:&lt;/h2&gt;
+&lt;table border=1 bgcolor=&quot;#ffffff&quot;&gt;&lt;tr&gt;&lt;td&gt;
+&lt;pre&gt;&lt;%= template escape=html %&gt;&lt;/pre&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+
+&lt;hr&gt;
+&lt;h2&gt;The whole script:&lt;/h2&gt;
+&lt;table border=1 bgcolor=&quot;#ffffff&quot;&gt;&lt;tr&gt;&lt;td&gt;
+&lt;pre&gt;&lt;%= code escape=html %&gt;&lt;/pre&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/body&gt;&lt;/html&gt;
+</pre>
+</td></tr></table>
+</body></html>

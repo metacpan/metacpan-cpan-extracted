@@ -1,0 +1,71 @@
+{
+   "abstract" : "Google's noCAPTCHA reCAPTCHA for HTML::FormHandler",
+   "author" : [
+      "Chuck Larson"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-FormHandlerX-Field-noCAPTCHA",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Captcha::noCAPTCHA" : "0.12",
+            "HTML::FormHandler::Field" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "namespace::autoclean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTML::FormHandler" : "0",
+            "Test::Mock::Class" : "0",
+            "Test::More" : "0.88",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "HTML::FormHandlerX::Field::noCAPTCHA" : {
+         "file" : "lib/HTML/FormHandlerX/Field/noCAPTCHA.pm",
+         "version" : "0.10"
+      },
+      "HTML::FormHandlerX::Widget::Field::noCAPTCHA" : {
+         "file" : "lib/HTML/FormHandlerX/Widget/Field/noCAPTCHA.pm",
+         "version" : "0.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/clarson/html-formhandlerx-field-nocaptcha/issues"
+      },
+      "homepage" : "https://github.com/clarson/html-formhandlerx-field-nocaptcha",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/clarson/html-formhandlerx-field-nocaptcha.git",
+         "web" : "https://github.com/clarson/html-formhandlerx-field-nocaptcha"
+      }
+   },
+   "version" : "0.10"
+}
+

@@ -1,0 +1,89 @@
+Revision history for Perl module HTML::Clean
+--------------------------------------------
+0.8  Tue Sep  5 08:02:05 PDT 2000
+
+	- Fix dequote regex to be stricter.  Make sure quote/double quote
+	  match, only use alpha as the paramater name. Reported by
+          Renzo Tomà.
+
+	- Removed regexes for removing space within tags and border=0 case. 
+	  This Causes text in attributes to fail, and table borders get
+	  messed up on IE. Reported by Gregory Stark.
+
+	- Fix for improper parsing of emptytags from Jens Quade.
+ 
+	- Fix from Tobias Weber to clean javascript
+
+
+0.7  Sat Apr 24 03:04:45 MET DST 1999
+
+	- Add missing 'hairy.html' file to fix broken test cases.
+
+	- Add alt="" items to images without alt tags.
+
+	- Apply same compatibility option to Verdana and Futura font.
+
+
+0.6  Fri Apr 23 14:03:30 MET DST 1999 
+
+	- Now removes whitespace from within tags, like this:
+	   <table  > becomes <table>
+
+	- Do a second pass at whitespace removal
+
+        - Remove some default elements from specific tags
+          border=0 from table, method=get from forms, etc.
+
+	- Remove default port 80 from URLs
+
+        - New option, lowercasetags to make all tags lowercase.
+	  Quantitative testing shows that this improves compressibility,
+	  it should make pages download faster over modems with compression
+	  turned on.
+
+	- Expanded tests.  Use lynx to quickly see if the changed HTML
+	  'looks' correct.
+
+
+0.5  Mon Feb 22 13:12:32 MET 1999 
+
+	- Now removes empty tag sets.  For instance <i><b></b></i> is now
+          eliminated. (From Philippe Verdret)
+
+	- Cleans up excess space in inline javascript functions.  Does
+          a better job of removing javascript comments. (idea from 
+          Phillippe Verdret)
+
+	- Added a larger list of default color names to replace.
+
+
+0.4  Mon Jan 18 15:10:35 MET 1999 
+	- Bug Fix: use upper case filehandle names (from numerous people..)
+
+	- Enabled level and options (patch from Mike Heins)
+	  strip() function changed.  No longer accepts level param.
+          htmlclean shell script takes -1 .. -9 as command line options.
+
+	- Clean up HTML colors, replace with shorter text names.
+
+          For example, bgcolor="#ffffff" -> bgcolor=white
+
+	- When using the iso-8859-1 charset remap character entities
+	  like &Eacute; to the eight bit equivalent.
+
+	- More documentation
+
+0.3  Mon Jan 11 14:05:15 MET 1999        
+	- Fixed serious htmlclean script bug.
+	- Added a little more documentation.
+
+	
+0.2  Tue Dec 29 10:13:16 MET 1998 
+        - expanded number of strip options
+	- First CPAN release..
+
+
+0.1  Fri Apr 17 13:42:11 1998
+	- original version
+
+

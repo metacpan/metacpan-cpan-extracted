@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         HTML-Extract
+version:      0.25
+version_from: lib/HTML/Extract.pm
+installdirs:  site
+requires:
+    HTML::Element:                 3
+    HTML::Tree:                    3
+    HTML::TreeBuilder:             3
+    LWP::UserAgent:                2
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

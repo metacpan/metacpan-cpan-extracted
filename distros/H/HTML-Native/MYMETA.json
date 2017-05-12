@@ -1,0 +1,50 @@
+{
+   "abstract" : "Generate and manipulate HTML as native Perl data structures",
+   "author" : [
+      "Michael Brown <mbrown@fensystems.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-Native",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "JSON" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Carp::Clan" : "0",
+            "Exporter" : "0",
+            "HTML::Entities" : "0",
+            "List::Util" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.009005"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.1"
+}

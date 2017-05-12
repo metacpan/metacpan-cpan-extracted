@@ -1,0 +1,42 @@
+---
+abstract: 'More Liberal HTML Head Section Parsing'
+author:
+  - 'Daisuke Maki <lestrrat>'
+build_requires:
+  HTTP::Headers: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-HeadParser-Liberal
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  HTML::HeadParser::Liberal:
+    file: lib/HTML/HeadParser/Liberal.pm
+    version: '0.03'
+requires:
+  B::Deparse: '0'
+  HTML::HeadParser: '== 3.69'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/lestrrat/p5-HTML-HeadParser-Liberal/issues
+  homepage: https://github.com/lestrrat/p5-HTML-HeadParser-Liberal
+  repository: git://github.com/lestrrat/p5-HTML-HeadParser-Liberal.git
+version: '0.03'
+x_contributors:
+  - 'unknown <jbruce@leapfrogonline.com>'
+  - 'Daisuke Maki <lestrrat+github@gmail.com>'

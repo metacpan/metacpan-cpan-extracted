@@ -1,0 +1,34 @@
+Failed  Succeeded  Test Name
+   0          2    *** no name ***
+   1          1    *** no name ***
+   1          1    *** no name ***
+
+
+Test Name: N/A
+URL: http://http.web.test/sleep-2
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  RESPONSE TIME CHECK
+    Response time (  2.00 ) is < or = 10.00 ?                    SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/sleep-3
+
+  STATUS CODE CHECK
+    Expected '200' and got: 500 read timeout                     FAIL
+  RESPONSE TIME CHECK
+    Response time (  2.00 ) is < or = 10.00 ?                    SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/sleep-4
+
+  STATUS CODE CHECK
+    Expected '200' and got: 500 read timeout                     FAIL
+  RESPONSE TIME CHECK
+    Response time (  1.00 ) is < or = 10.00 ?                    SUCCEED
+
+
+Total web tests failed: 2  succeeded: 4

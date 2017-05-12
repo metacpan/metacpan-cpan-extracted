@@ -1,0 +1,7 @@
+redisAsyncContext *  T_PTROBJ_MG
+redisErrorCode T_ERRORCODE
+
+OUTPUT
+T_ERRORCODE
+	if($var != REDIS_OK)
+            croak("Non-zero error code (%d) returned", $var);

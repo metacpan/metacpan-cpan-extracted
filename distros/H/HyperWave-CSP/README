@@ -1,0 +1,48 @@
+HyperWave::CSP version 0.03.1
+
+   This module is NOT FINISHED!
+
+   It's not even close to being sort of halfway not finished for an
+   alpha release.
+
+   However, some of it -does- work.  Everything in the examples
+   directory works more or less, and should give you an idea of how it
+   can be used.
+
+   CSP stands for Client-Server-Protocol which is the official name
+   for the native HyperWave Protocol.  That also leaves space in the
+   namespace for somebody to write a module for the server-server
+   protocol.
+
+
+INSTALLING
+   To install it:
+      perl Makefile.pl
+      make
+      make test
+      make install
+
+
+DOCS
+   There's .pod form documentation all through the source.  If you want
+   to see it in a different format, check the docs/ subdirectory.
+
+
+KNOWN BUGS
+   Just that it's unfinished.
+
+
+DEVELOPING
+   Anybody who wants to poke at it is welcome.  Submitting fixes and
+   patches is even MORE welcome.
+
+   If you're interested in what's going on, subscribe to the
+   development list.  Just mail hw-perl-request@tertius.net.au with
+   'subscribe' (no quotes) in the message.  It's standard Majordomo,
+   or just poke me <gossamer@tertius.net.au> if it doesn't work.
+
+
+CREDITS
+   Andrew Pam <xanni@xanadu.net>
+   Amarendranath Vadlamudi <nath@isr.umd.edu>
+

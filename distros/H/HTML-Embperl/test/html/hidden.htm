@@ -1,0 +1,91 @@
+<html>
+
+<head>
+<title>Test for hidden meta command</title>
+</head>
+
+
+[-
+$regs{feld1} = 'Pfalz' ;
+$regs{feld2} = 'Rheinhessen' ;
+
+$kats{feld1} = 'Kultur' ;
+
+$sort[0] = 'feld4' ;
+$sort[1] = 'feld3' ;
+$sort[2] = 'feld2' ;
+$sort[3] = 'feld1' ;
+
+-]
+
+<form action="inhalt.htm" method="POST">
+    <p>&nbsp;</p>
+
+	a1[$hidden$]
+	a2[$hidden regs $]
+	a3[$hidden regs, kats $]
+	a4[$hidden regs, kats, sort $]
+	a5[$hidden %regs $]
+	a6[$hidden %regs, %kats $]
+	a7[$hidden %regs, %kats, @sort $]
+	a8[$hidden %fdat, %idat, @sort $]
+    
+	<input type="text" name="feld1">
+
+	b1[$hidden$]
+	b2[$hidden regs $]
+	b3[$hidden regs, kats $]
+	b4[$hidden regs, kats, sort $]
+	b5[$hidden %regs $]
+	b6[$hidden %regs, %kats $]
+	
+
+    <input type="text" name="feld2">
+    
+	c1[$hidden$]
+	c2[$hidden regs $]
+	c3[$hidden regs, kats $]
+	c4[$hidden regs, kats, sort $]
+	c5[$hidden %regs $]
+	c6[$hidden %regs, %kats $]
+
+	<input type="text" name="feld3">
+    <input type="text" name="feld4">
+    
+	d1[$hidden$]
+	d2[$hidden regs $]
+	d3[$hidden regs, kats $]
+	d4[$hidden regs, kats, sort $]
+	d5[$hidden %regs $]
+	d6[$hidden %regs, %kats $]
+	d7[$hidden %regs, %kats, @sort $]
+
+
+	[- $fdat{empty1} = undef ; push @ffld, 'empty1' ; -]
+	[- $fdat{empty2} = '' ;    push @ffld, 'empty2' ; -]
+
+	e1[$hidden $]
+	e2[$hidden %fdat, %idat, @ffld $]
+	optNoHiddenEmptyValue is now [+ $optNoHiddenEmptyValue +]
+	[- $optNoHiddenEmptyValue = 1 -]
+	optNoHiddenEmptyValue is now [+ $optNoHiddenEmptyValue +]
+	e1[$hidden $]
+	e2[$hidden %fdat, %idat, @ffld $]
+	[- $optNoHiddenEmptyValue = 0 -]
+	optNoHiddenEmptyValue is now [+ $optNoHiddenEmptyValue +]
+	e1[$hidden $]
+	e2[$hidden %fdat, %idat, @ffld $]
+
+</form>
+
+
+[$foreach $i (1..4)$]
+<form>
+	l1[$hidden $]
+</form>
+[$endforeach$]
+
+
+
+</body>
+</html>

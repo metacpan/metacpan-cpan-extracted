@@ -1,0 +1,36 @@
+--- #YAML:1.0
+name:               HTML-Tested
+version:            0.58
+abstract:           This module allows creation of different HTML widgets with the built-in means of testing them
+author:
+    - Boris Sukholitko (boriss@gmail.com)
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Class::Accessor:      
+    Class::Data::Inheritable:  
+    Class::Singleton:     
+    Crypt::Blowfish:      
+    Crypt::CBC:           2.22
+    Data::Dumper:         
+    DateTime:             
+    DateTime::Format::Strptime:  
+    Digest::CRC:          
+    File::Slurp:          
+    HTML::Entities:       
+    Math::Combinatorics:  
+    Template:             
+    Test::Simple:         0.44
+    Text::Diff:           
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

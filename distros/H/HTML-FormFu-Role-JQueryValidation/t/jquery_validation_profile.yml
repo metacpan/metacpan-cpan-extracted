@@ -1,0 +1,9 @@
+---
+roles:
+  - JQueryValidation
+
+elements:
+  - type: Email
+    name: foo
+    constraints:
+      - Required

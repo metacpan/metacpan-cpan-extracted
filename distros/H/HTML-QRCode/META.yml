@@ -1,0 +1,23 @@
+---
+abstract: 'Generate HTML based QR Code'
+author:
+  - 'Hideo Kimura <hide <at> hide-k.net>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-QRCode
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  Text::QRCode: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

@@ -1,0 +1,123 @@
+---
+abstract: 'Template System Compiles HTML::Template files to Perl code'
+author:
+  - 'Tina Müller <cpan2@tinita.de>'
+build_requires:
+  File::Copy: '0'
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-Template-Compiled
+provides:
+  HTML::Template::Compiled:
+    file: lib/HTML/Template/Compiled.pm
+    version: '1.003'
+  HTML::Template::Compiled::Classic:
+    file: lib/HTML/Template/Compiled/Classic.pm
+    version: '1.003'
+  HTML::Template::Compiled::Compiler:
+    file: lib/HTML/Template/Compiled/Compiler.pm
+    version: '1.003'
+  HTML::Template::Compiled::Compiler::Classic:
+    file: lib/HTML/Template/Compiled/Compiler/Classic.pm
+    version: '1.003'
+  HTML::Template::Compiled::Exception:
+    file: lib/HTML/Template/Compiled/Exception.pm
+    version: '1.003'
+  HTML::Template::Compiled::Expr:
+    file: lib/HTML/Template/Compiled/Expr.pm
+    version: '1.003'
+  HTML::Template::Compiled::Expression:
+    file: lib/HTML/Template/Compiled/Expression.pm
+    version: '1.003'
+  HTML::Template::Compiled::Expression::Conditional:
+    file: lib/HTML/Template/Compiled/Expression.pm
+    version: '1.003'
+  HTML::Template::Compiled::Expression::Defined:
+    file: lib/HTML/Template/Compiled/Expression/Expressions.pm
+    version: '1.003'
+  HTML::Template::Compiled::Expression::Elsif:
+    file: lib/HTML/Template/Compiled/Expression.pm
+    version: '1.003'
+  HTML::Template::Compiled::Expression::Expressions:
+    file: lib/HTML/Template/Compiled/Expression/Expressions.pm
+    version: '1.003'
+  HTML::Template::Compiled::Expression::Function:
+    file: lib/HTML/Template/Compiled/Expression.pm
+    version: '1.003'
+  HTML::Template::Compiled::Expression::Literal:
+    file: lib/HTML/Template/Compiled/Expression/Expressions.pm
+    version: '1.003'
+  HTML::Template::Compiled::Expression::Method:
+    file: lib/HTML/Template/Compiled/Expression.pm
+    version: '1.003'
+  HTML::Template::Compiled::Expression::SubrefCall:
+    file: lib/HTML/Template/Compiled/Expression.pm
+    version: '1.003'
+  HTML::Template::Compiled::Expression::Ternary:
+    file: lib/HTML/Template/Compiled/Expression/Expressions.pm
+    version: '1.003'
+  HTML::Template::Compiled::Filter:
+    file: lib/HTML/Template/Compiled/Filter.pm
+    version: '1.003'
+  HTML::Template::Compiled::Formatter:
+    file: lib/HTML/Template/Compiled/Formatter.pm
+    version: '1.003'
+  HTML::Template::Compiled::Lazy:
+    file: lib/HTML/Template/Compiled/Lazy.pm
+    version: '1.003'
+  HTML::Template::Compiled::Parser:
+    file: lib/HTML/Template/Compiled/Parser.pm
+    version: '1.003'
+  HTML::Template::Compiled::Plugin::XMLEscape:
+    file: lib/HTML/Template/Compiled/Plugin/XMLEscape.pm
+    version: '1.003'
+  HTML::Template::Compiled::Token:
+    file: lib/HTML/Template/Compiled/Token.pm
+    version: '1.003'
+  HTML::Template::Compiled::Token::Text:
+    file: lib/HTML/Template/Compiled/Token.pm
+    version: '1.003'
+  HTML::Template::Compiled::Token::close:
+    file: lib/HTML/Template/Compiled/Token.pm
+    version: '1.003'
+  HTML::Template::Compiled::Token::open:
+    file: lib/HTML/Template/Compiled/Token.pm
+    version: '1.003'
+  HTML::Template::Compiled::Token::single:
+    file: lib/HTML/Template/Compiled/Token.pm
+    version: '1.003'
+  HTML::Template::Compiled::Utils:
+    file: lib/HTML/Template/Compiled/Utils.pm
+    version: '1.003'
+requires:
+  B::Deparse: '0'
+  Carp: '0'
+  Data::Dumper: '0'
+  Digest::MD5: '0'
+  Encode: '0'
+  Exporter: '0'
+  Fcntl: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  HTML::Entities: '0'
+  Parse::RecDescent: '0'
+  Scalar::Util: '0'
+  Storable: '2.05'
+  URI::Escape: '0'
+  base: '0'
+  constant: '0'
+  overload: '0'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  repository: git://github.com/perlpunk/HTML-Template-Compiled.git
+version: '1.003'

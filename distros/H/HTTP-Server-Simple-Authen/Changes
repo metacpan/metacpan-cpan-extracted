@@ -1,0 +1,18 @@
+Revision history for Perl extension HTTP::Server::Simple::Authen
+
+0.04  2006-01-15T05:55:25Z
+        - NEXT is not needed anymore.
+
+0.03  2006-01-15T03:17:31Z
+        - Oops, handle_request() is typically subclassed, so prior
+          versions are not subject to work.
+        - Now authenticate() should be called explicitly from
+          subclass. Hence some methods like needs_authen() are removed
+          to be more DIY.
+
+0.02  2006-01-14T21:34:25Z
+        - Fixed a bug that you can't use 0 as username or password
+        - Updated document
+
+0.01  Sat Jan 14 17:15:45 2006
+	- original version

@@ -1,0 +1,21 @@
+Revision history for Perl extension HTML::Calendar::Simple.
+
+0.05 Thur Jul 12 09:05:00 2012
+	- Ten years later, I was given a small patch to apply. So I did.
+	  Thanks to Aaron Yorkovitch
+
+0.04 Sat Mar 16 14:05:00 2002
+        - Changed calendar_year interface, so can include a pin-up 
+          and link on any day in any month. Deprecated html call
+          in favour of name change to calendar_month
+
+0.03  Fri Mar 15 9:00:00 2002
+        - Added pin_up, calendar_year and some doc changes.
+
+0.02  Thu Mar 14 10:10:00 2002
+        - Added CGI and Test::More to prerequisites.
+
+0.01  Wed Mar 13 11:25:09 2002
+	- original version; created by h2xs 1.21 with options
+		-X -n HTML::Calendar::Simple
+

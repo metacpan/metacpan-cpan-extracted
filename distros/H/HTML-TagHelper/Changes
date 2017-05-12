@@ -1,0 +1,13 @@
+Revision history for HTML-TagHelper
+
+0.04 2014-06-04
+ - declare min perl version
+
+0.03 2013-11-12
+ - useless carp
+
+0.02 2013-08-23
+ - new taghelpers like mojo-plugin-taghelpers
+
+0.01 2008-04-25
+ - First version, released on an unsuspecting world.

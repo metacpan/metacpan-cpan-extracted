@@ -1,0 +1,40 @@
+{
+   "abstract" : "Atom selections in molecules",
+   "author" : [
+      "Demian Riccardi <demianriccardi@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HackaMol-Roles-SelectionRole",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HackaMol" : "0.038",
+            "Moose" : "2.16"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/demianriccardi/p5-HackaMol-Roles",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/demianriccardi/p5-HackaMol-Roles.git",
+         "web" : "https://github.com/demianriccardi/p5-HackaMol-Roles"
+      }
+   },
+   "version" : "0.002"
+}
+

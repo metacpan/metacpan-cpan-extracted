@@ -1,0 +1,9 @@
+Revision history for Perl extension HTML::Dashboard.
+
+0.03  Thu May 24 2007
+	- Initial release (alpha)
+
+0.01  Sun Apr  8 16:37:22 2007
+	- original version; created by h2xs 1.23 with options
+		-A -X -n HTML::Dashboard
+

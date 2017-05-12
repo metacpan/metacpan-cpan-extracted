@@ -1,0 +1,956 @@
+Revision history for Hailo
+
+0.72 2013-12-01 17:06:55
+
+    - Our tests have been broken on perl 5.19.* (soon to become
+      5.20.*) for a while because of the new warnings about given/when
+      being experimental, which would fail one of the tests where we
+      weren't expecting extra output when testing our command-line
+      invocation.
+
+      But the whole use of given/when and ~~ in the codebase was just
+      a stupid youthful indiscretion, those features of perl suck,
+      this release kills all uses of them with fire in favor of just
+      using if/elsif and =~, which is all we used them for anyway.
+
+0.71 2013-11-29 00:40:38
+
+    - Super minor release, just docs and nuking an old developer
+      script that wasn't even in the CPAN tarball.
+
+    - Bump README.pod with new content from lib/Hailo.pm's POD.
+
+    - Remove unused script that used Class::MOP to close RT #91029
+      ("New Moose may break your code")
+
+0.70 2011-09-18 19:15:17
+
+    - When using --train-fast, remove the "flushing cache" message when done
+
+    - Word tokenizer:
+        * Improve tokenization of email addresses
+        * Use backspace instead of escape as a magic character when
+          capitalizing text in multiple passes, since it's less likely to
+          appear in tokens.
+        * Preserve casing of words like "ATMs"
+
+0.69 2011-05-07 04:02:38
+
+    - Scored engine: Prefer shorter replies, like MegaHAL/cobe do
+
+    - Word tokenizer:
+        * Improve matching/capitalization of filenames and domain names
+        * Match timestamps as single tokens
+        * Match IRC nicks (<foobar>, <@foobar>, etc) as single tokens
+        * Match IRC channel names (#foo, &bar, +baz)
+        * Match various prefixes and postfixes with numbers
+        * Match "#1" and "#1234" as single tokens
+        * Match </foo> as a single token
+
+    - Depend on MouseX::Getopt 0.33 to fix test failures
+
+0.68 2011-05-03 13:16:05
+
+    - Speed up the learning of repetitive sentences by caching more
+
+    - Added Hailo::Engine::Scored, which generates multiple replies (limited
+      by time or number of iterations) and returns the best one. Based on
+      code from Peter Teichman's Cobe project.
+
+    - Fixed a bug which caused the tokenizer to be very slow at capitalizing
+      replies which contain things like "script/osm-to-tilenumbers.pl"
+
+    - Speed up learning quite a bit (up to 25%) by using more efficient SQL.
+
+    - Add --train-fast to speed up learning by up to an additional 45% on
+      large brains by using aggressive caching. This uses a lot of memory.
+      Almost 600MB with SQLite on a 64bit machine for a brain which
+      eventually takes 134MB on disk (trained from a 350k line IRC log).
+
+    - Word tokenizer:
+        * Preserve casing of Emacs key sequences like "C-u"
+        * Don't capitalize words after ellipses (e.g. "Wait... what?")
+        * When adding a full stop to paragraphs which end with a quoted word,
+          add it inside the quotes (e.g. "I heard him say 'hello there.'")
+        * Make it work correctly when the input has newlines
+
+0.67 2011-04-27 23:33:08
+
+    - Word tokenizer: Improve matching of Perl class names
+
+    - Require MooseX::StrictConstructor 0.16 for Moose 2.0 compatibility
+
+0.66 2011-04-27 07:37:45
+
+    - Die when the user tries --stats without a brain
+
+    - Word tokenizer: stopped matching numbers separately in many cases.
+      "95GB", "3D", "800x600" are all single tokens now. This should reduce
+      the volume of nonsensical word-number pairs in the output.
+
+0.65 2011-04-26 19:28:27
+
+    - Expand "~" and such in the brain filename argument.
+
+    - Word tokenizer:
+        * Recognize "e.g." and other abbreviations as single tokens.
+        * Recognize '–' as a word-separating dash.
+        * Put a full stop after words separated by dots, like "sources.list".
+        * Fix capitalization problems caused by "..."
+        * Capitalize "foo!" and "foo."
+        * Preserve casing of words such as "POE-Component-IRC"
+        * Catch "Acme::POE::Tree" as one word, and preserve its casing
+        * Catch "rollin'" as one word when it makes sense
+        * Catch 'foo-" as one word when it makes sense, and capitalize at
+          start of a sentence
+        * Capitalize quoted words at the start of a line
+
+    - The --help option didn't work with Moose >=1.25 (RT #67548). Fixed.
+
+0.64 2010-12-10 11:09:08
+
+    - Say "X lines of Y" instead of "X of Y" when training with
+      hailo(1).
+
+    - Bump README.pod in the distro to 0.59~1
+
+0.63 2010-12-09 09:03:30
+    - Mark the failing tests in t/command/shell.t as TODO for now.
+
+0.62 2010-12-06 03:30:07
+    - Really fix t/command/shell.t this time. I had the arguments to
+      the test function in the wrong order.
+
+0.61 2010-12-03 06:47:22
+
+    - Use Class::Load instead of Class::MOP::load_class and eval'd require()
+
+    - Fix rare test failure in t/command/shell.t
+
+0.60 2010-11-09 01:35:49
+
+    - Match email addresses and don't capitalize them
+
+    - Don't insert additional spaces in some parsing edge-cases
+
+0.59 2010-10-23 21:20:22
+
+    - Word tokenizer: Match combining characters in words on Perl >=5.12
+
+0.58 2010-10-22 03:34:08
+
+    - Forgot to remove "use Text::Unidecode;" from Words.pm after dropping
+      that dependency in the previous release.
+
+    - Skip utf8-text.t on Perl <5.12 due to differences in Unicode matching.
+
+0.57 2010-10-21 01:25:09
+
+    - Fix typo in Schema.pm which messed up the type of the token.text
+      SQL column (only relevant to non-SQLite DBs)
+
+    - More robust matching of non-word immediately following URIs
+
+0.56 2010-10-18 05:15:10
+
+    - Add Test::Expect and Test::Synopsis to TestRequires
+
+    - Use YAML::XS in utf8-text.t for clarity, and make the test
+      optional.
+
+0.55 2010-10-16 17:58:00
+
+    - Scrap the "normal word" matching constraint from the previous release.
+      It was failing to match words like "4.1GB", causing an infinite loop.
+      Instead, we now assign different spacing attributes to components of
+      conjoined words of varying types (e.g. recognizing that "4.1GB" is a
+      normal word ("4.1") followed by a postfix ("GB").
+
+    - Don't match '>' as part of the URI in "<http://google.com>".
+
+0.54 2010-10-16 10:10:19
+
+    - Fix the previously broken `save_on_exit' so that it does what
+      it's supposed to do.
+
+      The `save_on_exit' option in Hailo.pm never worked, and nor did
+      hailo's corresponding --autosave option. Fixed that by
+      correcting some method name confusion, and solved a BUG by
+      finally adding a test for this option.
+
+0.53 2010-10-15 21:29:02
+
+    - hailo command: Fix off-by-one error when reporting the number of lines
+      learned when training.
+
+    - Don't truncate the brain file after loading it with in_memory enabled.
+
+    - Word tokenizer improvements:
+      * Recognize "´" as an apostrophe when matching words.
+      * Recognize a compound word like "anti-scientology" as a single word.
+      * Put additional constraints on where a "normal word" can be matched.
+        This enables it to match things like "3D" and "800x600" as single
+        words.
+      * Fix capitalization of words after sentences which end with dashed
+        words like "anti-scientology".
+      * Convert chunks to ASCII before looking for a URI to work around a
+        limitation in Regexp::Common.
+      * Recognize ssh:// (and foo+ssh://) URIs.
+
+0.52 2010-07-18 22:40:02
+
+    - Hailo no longer passes references to itself to its slave
+      classes, so it's garbage collected at the right time.
+
+      This bug broke the hybrid disk <-> in_memory SQLite mode, it's
+      now fixed again. The test that was supposed to check whether the
+      hybrid in-memory backend worked did the opposite of what it was
+      supposed to do, and didn't work anyway due to how it was set up.
+
+    - Giving arguments to Hailo's save method (they're passed to the
+      Storage class) never worked due to a trivial error. Now it does.
+
+0.51 2010-07-18 15:49:41
+
+    - Bump dependencies for all modules to the latest CPAN
+      versions. This avoids the issues Moose had with I<Can't locate
+      object method "add_method" via package "Moose::Meta::Role">, and
+      various other problems that might be present in older modules.
+
+    - MooseX::Getopt renames its help attribute to help_flag in
+      0.30. That broke hailo --help, work around it by checking if the
+      help_flag attribute exists in
+      any_moose('X::Getopt::GLD')->meta->get_attribute_list. By
+      checking we'll also be compatible if Mouse ever switches to the
+      new system.
+
+    - Mouse now supports MouseX::StrictConstructor, so we can delete
+      code that only used it if we were running under Moose.
+
+    - Put bin/hailo in package hailo, because Moose will whine about
+      not exporting sugar to main.
+
+0.50 2010-05-30 12:44:25
+
+    - Hailo hadn't been installed with the hailo command-line script
+      since release 0.34. Now it's built with MakeMaker::Awesome 0.08
+      with fixes this error.
+
+    - Fix the script compilation test in t/01_compile.t. Test::Script
+      renamed its script_compiles function to script_compiles_ok.
+
+0.49 2010-05-29 19:20:26
+
+    - Term::Sk fixed RT #57902 and RT #57903 which I reported. hailo's
+      progress bar now looks better as a result.
+
+0.48 2010-05-29 15:16:18
+
+    - The hailo(1) command-line interface now has a much better
+      interface. It now supports SQLite-like command syntax, and has a
+      built-in help system.
+
+    - Replace fortune(1) in hailo's --examples output with bot-training(1)
+
+0.47 2010-05-29 13:08:51
+
+    - Optimize Hailo::Tokenizer::Words to use less subroutine calls in
+      critical code. Changed the time being spent in that file from
+      5.14s to 3.72s out of a total runtime of 35.6s when running
+      t/hailo/real_workload.t.
+
+    - The initial tokenizer class is now saved as metadata to the
+      database, and loaded into Hailo from existing brains.
+
+      This means that this now works as expected:
+
+          hailo --brain db.sqlite --tokenizer Chars --train file.trn 
+          hailo --brain db.sqlite --reply foo
+
+      I.e. Hailo will note that it used the Chars tokenizer in the
+      database, and load the correct tokenizer in the future. However
+      this will cause Hailo to die:
+
+          hailo --brain db.sqlite --tokenizer Chars --train file.trn 
+          hailo --brain db.sqlite --tokenizer Words --reply foo
+
+      It spots that you've explicitly said you want a tokenizer that's
+      incompatible with the one in the database for doing replies and
+      dies. This is what it did before if you did the exact same thing
+      with the --order switch.
+
+    - Rename tests file in t/ to drop the DBD- prefix. Tests like
+      Words-*.t are were also moved into
+      sub-directories. e.g. Words/*.t.
+
+0.46 2010-05-27 22:47:45
+
+    - The Regexp::Common pattern added in 0.44 slowed down Hailo by up
+      to 45% in pathological cases (tests doing lots of
+      tokenization), overall test suite slowdown was closer to 10%.
+
+      Now the pattern is only compiled once for the lifetime of the
+      process with /o. This trick has also been applied to a few other
+      patterns.
+
+0.45 2010-05-27 19:56:31
+
+    - The regular expression introduced in 0.44 to check if a word was
+      of MiXeD CaSe was pathological. Changed it to a simpler one that
+      works better.
+
+    - The --no-progress option to hailo to suppress the progress bar
+      now works again. It had been broken since 0.26 at least.
+
+0.44 2010-05-27 15:55:30
+
+    - Removed the backwards-compatible "Pg" and "mysql" aliases for
+      the storage backends and the "DBD::" prefix. This use has been
+      deprecated since 0.31. Simply use "PostgreSQL", "MySQL" or
+      "SQLite" instead.
+
+    - This release contains improvements for the default Words
+      tokenizer. It's recommended that users rebuild their Hailo
+      brains when upgrading. See UPGRADING in the Hailo manual.
+  
+      - Add URI support to the Words tokenizer. It will now use
+        Regexp::Common's URI regex to tokenize URIs as-is.
+  
+        This improves performance a lot on input that contains URIs,
+        previously Hailo would split them up nonsensically, which
+        would inflate the token table a lot with little gain.
+  
+      - Preserve the capitalization of words that change case in the
+        middle of the word. Examples include GumbyBRAIN, WoW, HoRRiBlE
+        etc. Previously these and others that weren't 100% upper-case
+        would all be lower cased.
+  
+      - Preserve the capitalization of words that are all upper-case
+        followed by a non-word character followed by lower-case. This
+        preserves words like KIA'd, FYIQ'ed and other things that are
+        likely to be partial acronyms.
+  
+      - Twitter names. I.e. tokens matching @[A-Za-z0-9_]+ will be
+        tokenized as-is. This ensures that Hailo users like
+        Bot::Twatterhose don't corrupt their Twitter names.
+  
+      - Eliminate some redundant use of the regex engine in the Words
+        tokenizer.
+
+    - Include --help in bin/hailo's POD. It's now easier to read it
+      standalone, and `man hailo' has the same info as `hailo --help`.
+
+    - The utils/hailo-benchmark script had been broken for some time
+      due to a trivial API change in Hailo::Test. Now it works again.
+
+    - Stop pointing to the GitHub issue tracker in the
+      documentation. We now use RT instead.
+  
+0.43 2010-05-11 19:54:36
+
+    - Tests failed on 0.42 without Test::Synopsis due to invalid test plan.
+
+    - Don't test with both Mouse and Moose on Windows. Failed with
+      Strawberry Perl + dmake, see report
+      07242729-b19f-3f77-b713-d32bba55d77f.
+
+    - Skip t/storage/001_meta/switch-order.t on OpenBSD where it's
+      known to fail, see report 07172161-b19f-3f77-b713-d32bba55d77f.
+
+0.42 2010-05-10 21:26:45
+
+    - Hailo should now work on Windows. Dependency on two modules that
+      had Windows failures in their dependencies has been dropped.
+
+    - Remove Term::ProgressBar dependency, use Term::Sk
+      instead. Unlike Term::ProgressBar it doesn't depend on
+      Class::MethodMaker and Term::ReadKey. Those contributed a lot to
+      our failures on Windows.
+    
+    - Don't hard depend on Test::Expect. It depends IO::Tty which does
+      not work under any version of Windows, except under Cygwin (it
+      calls fcntl(*fd, F_DUPFD, 3)).
+
+    - Remove Test::Synopsis dependency. It depends on
+      Filter::Util::Call which had some failures. Now only used if
+      it's installed on the system already.
+
+    - Remove MouseX/MooseX::Types dependency. We don't use any of the
+      fancy type features, so there's no point in using this.
+
+0.41 2010-04-23 00:24:24
+
+    - Don't (optionally) use Sys::Prctl on Perl 5.13.0 and above. It
+      was made redundant in perl core commit 7636ea95c5 by yours
+      truly.
+
+    - A script to benchmark Hailo on different locally installed
+      perls.
+
+    - Correct test count for TEST_EXHAUSTIVE.
+
+    - Update HALBot on the Web link to http://bifurcat.es
+
+0.40 2010-04-13 15:10:23
+
+    - Add --reply-random to the hailo command-line interface. Allows
+      command-line babbling at random.
+
+    - Improved formatting for --train on the command line. Now outputs
+      how many lines/s were trained, e.g. "Trained from 11587 lines in
+      36.97 seconds; 313.40/"
+
+    - Fixed a bug on Mac OS X and probably some other
+      systems. Previously the SQLite code would assume that a file
+      that was `-s $file' was an empty database.
+
+      On Mac OS X these files weren't 0 byte but 1 byte files. Route
+      around this entire issue by creating a new API (->initialized)
+      that checks if the schema has really been created by doing a
+      query on the info table.
+
+    - Solved bug in the t/storage/DBD-SQLite-memory/babble.t test. The
+      test was skipped due to intermittent failures. Failures were due
+      to a programming error in the tests.
+
+    - DBD-SQLite-file-exhaustive-all.t is now run on
+      TEST_EXHAUSTIVE_ALL=1. Previously this test was unreachable.
+
+    - Add example utility to spew random names in random-names.
+
+0.39 2010-04-09 13:21:22
+
+    - Set the homepage field in META.yml to http://hailo.org
+
+    - Add TODO tests for the Words tokenizer. There are some
+      sub-optimal capitalization behaviors we'd like to fix.
+
+    - Use Prereq phases in Dist::Zilla. Hailo will have proper
+      Runtime/Test/Recommends dependencies when META.yml 2.0 comes
+      out.
+
+0.38 2010-04-03 18:15:17
+
+    - Clean up the code in Hailo::Engine::Default. It's now easier to
+      read and doesn't have duplication.
+
+    - Depend on IPC::System::Simple. Used by autodie to run
+      utils/hailo-benchmark-lib-vs-system
+
+    - Link to http://hailo.org and the freshmeat and ohloh pages for
+      hailo.
+
+0.37 2010-03-31 14:28:46
+
+    - Very minor release. Switch to using
+      Dist::Zilla::Plugin::MakeMaker::Awesome for the build tools.
+
+0.36 2010-03-29 00:15:35
+
+    - Add a test to try to smoke out a test failure we've been having
+      for a while. See the commit message for
+      21f68bd79d2fc59505887311042d6d16c5cf79dd for a very long and
+      boring explanation.
+
+0.35 2010-03-27 21:27:33
+
+    - The error "You've manually supplied an order of" error message
+      was always incorrect. It contained variables that weren't being
+      interpolated.
+
+    - Move some of our test data into the new Bot::Training dist.
+
+    - Fix 'v-string in use/require non-portable' warnings from a osx
+      smoker by using 5.010 instead of 5.10.0.
+
+0.34 2010-03-20 23:26:27
+
+    - Reword the UPGRADING section in Hailo's POD to be less
+      confusing.
+
+    - Die if the user manually specified an order that isn't
+      equivalent to the existing database he's loading from.
+
+    - Hailo now uses CPAN's RT as its default bugtracker instead of
+      GitHub's issue tracker. RT sucks but at least we can get at our
+      issues using something that isn't a web interface if we use RT.
+
+    - Link to our new website at http://hailo.github.com and mention
+      the Hailo web interface at http://www.dhdo.org in the POD.
+
+    - Enforce arguments being HashRef[Str] (instead of just HashRef)
+      in Hailo::Role::Arguments.
+
+    - Code cleanup in Hailo.pm to remove duplication.
+
+0.33 2010-03-20 01:57:33
+
+    - Optimize Hailo::Engine::Default to use less method calls. On
+      t/hailo/real_workload.t (i.e. mass replies) this speeds up Hailo
+      by 8%:
+
+                         s/iter System Hailo    lib Hailo
+            System Hailo   74.8           --          -7%
+            lib Hailo      69.4           8%           --
+    
+      Furthermore replace the use of ->fetchall_hashref in a tight
+      loop with ->fetchall_arrayref. This sped up mass replies by
+      almost 60% (added to the 8% above):
+
+                         s/iter System Hailo    lib Hailo
+            System Hailo   68.2           --         -36%
+            lib Hailo      43.6          57%           --
+    
+      But aside from selective benchmarking this made Hailo around 5%
+      faster in the common case:
+        
+                         s/iter System Hailo    lib Hailo
+            System Hailo   21.5           --          -6%
+            lib Hailo      20.3           6%           --
+
+0.32 2010-03-19 12:00:22
+
+    - t/storage/dbd-options.t wasn't updated to take into account the
+      renaming of modules done in 0.31. It would fail on machines that
+      didn't have an older version of Hailo installed when running
+      `make test'.
+
+    - t/hailo/non_standard_plugin.t whines with `Issuing rollback()
+      due to DESTROY without explicit disconnect()' on some systems
+      since it doesn't use the Hailo::Test framework.
+
+      Issuing rollbacks at the right time is an open issue with
+      Hailo. I haven't been able to make it do the right thing by
+      sprinkling around destructors in the main code, that'll cause
+      things to be destroyed prematurely (probably some silly race
+      condition).
+
+    - Re-add Data::Section dependency. We need it for the
+      Words-utf8-text.t test.
+
+0.31 2010-03-18 21:45:25
+
+    - Optimization and cleanup release. Hailo is now much much
+      snappier and eats less memory. Here's how long it takes to run
+      the test suite before/after 0.30:
+
+                      s/iter   0.30 Hailo    0.31 Hailo
+        0.30 Hailo      20.2           --          -16%
+        0.31 Hailo      16.9          19%            --
+
+    - Split out Hailo::Storage::* into Hailo::Engine::* and
+      Hailo::Storage::*. This makes it possible to write pluggable
+      engines again (that ability was removed in 0.09). It's the
+      intent to write a XS version of the Default engine to make Hailo
+      even faster.
+
+    - In addition the storage backends have been moved
+      around. Hailo::Storage::DBD is now just Hailo::Storage and
+      DBD::Pg, DBD::mysql and DBD::SQLite are now directly under the
+      Hailo::Storage namespace as Hailo::Storage::PostgreSQL,
+      Hailo::Storage::MySQL and Hailo::Storage::SQLite.
+
+      For now "Pg" and "mysql" as short names for the storage backends
+      are supported for backwards compatability but this support may
+      be removed in a future release.
+
+    - Rather than use the ad-hoc Data::Section + Template::Toolkit way
+      of generating our SQL just use an ugly pure-perl-based class.
+
+      Hailo now uses ~7.2MB of memory when starting up & replying
+      rather than ~10MB as it did before. The startup time is also
+      reduced from around 250ms to 140ms.
+
+      See http://blogs.perl.org/users/aevar_arnfjor_bjarmason/2010/03/benchmarking-dbixclass-vs-plain-dbi-on-hailo.html
+      for some of the other things that I tried before settling
+      on this hack.
+
+    - Don't manually use SQLite's `SELECT last_insert_rowid()' or
+      PostgreSQL's `INSERT ... RETURNING' in the engine. Instead use
+      DBI's `last_insert_id()' which uses those two automatically.
+
+    - Ditch Module::Pluggable: Hailo now can only load one of its
+      hardcoded core modules as a plugin or alternatively a foreign
+      module if it's prefixed with + before the module name. See
+      Hailo's main documentation for more info.
+
+    - Fix incorrect SYNOPSIS examples in the documentation for the
+      PostgreSQL, SQLite and MySQL backends.
+
+0.30 2010-03-15 15:18:01
+
+    - Don't set EXLOCK on temporary files we create. This completely
+      broke Hailo tests on platforms like FreeBSD which aren't as
+      promiscuous as Linux about file locking.
+
+    - Use Dir::Self in hailo/Hailo::Command to work around the 0.29
+      bug in t/command/shell.t on some platforms like FreeBSD where
+      IPC3::Run calling a script that called FindBin didn't work
+      as expected.
+
+    - Add more testing including a really basic test for DBIx::Class
+      debugging (from the dbix-class branch) and making TAP output
+      more verbose.
+
+    - Run all the tests Hailo::Test runs internally for each engine
+      one-by-one using the DBD::SQLite memory driver. This makes sure
+      the internal tests don't depend on each other in odd ways.
+
+0.29 2010-03-13 10:32:43
+
+    - Remove Data::Random as a dependency. It fails the most tests of
+      all the dists we depend on and we don't really need it for
+      anything.
+
+0.28 2010-03-13 10:05:57
+
+    - Update README.pod which hadn't been bumped since 0.25
+
+    - Fix example in Hailo.pm's SYNOPSIS that didn't work and add an
+      example for a bare ->reply().
+
+    - Fix some code perlcritic whined about.
+
+0.27 2010-03-13 09:41:46
+
+    - Stop depending on Term::ReadLine::Gnu and use Term::ReadLine
+      instead. I tested Term::ReadLine once and found that it was
+      really bad (no history, C-p, C-n etc.) but now with
+      PERL_RL='Perl o=0' everything's magically awesome in it.
+
+      Term::ReadLine::Gnu was the #1 cause of our test failures so
+      it's good not to depend on it.
+
+      Also only set PERL_RL if it isn't set already.
+
+0.26 2010-03-13 08:04:32
+
+    - Split the X::Getopt parts of Hailo into Hailo::Command. This way
+      the speed / memory penalty of loading all the command-line
+      related modules is only applicable if running the command-line
+      interface. using Hailo takes 1MB less memory now and loads a
+      total of 56 modules instead of 74.
+
+    - Due to the split it was possible to rename the `brain_resource'
+      attribute to `brain'. The former is still provided for backwards
+      compatibility.
+
+    - A lot of miscellaneous cleanups in the code made possible by
+      splitting the core of Hailo from the command line UI.
+
+    - DEMOLISH was broken. it would build storage objects during
+      global destruction if they didn't exist.
+
+    - Add --examples switch to be used as --help --examples, examples
+      are now not part of --help by default since they took up most of
+      the terminal & obscured the option help output.
+
+    - A lot has been changed in the test suite. Below is a partial
+      summary:
+
+    - Test the ->run method in Hailo::Command completely. Previously
+      only a subset of its functionality was tested. The only thing
+      that isn't tested completely is the invocation of
+      Hailo::UI::ReadLine via ->run.
+
+    - Completely test the ->train and ->learn methods and make
+      ->learn() die on unknown input like HashRefs.
+
+    - Test the --help output.
+
+0.25 2010-03-12 17:45:42
+
+    - Improved documentation of the Tokenizer role and the DBD class
+
+    - Added more tests for the ReadLine UI
+
+    - Always run the Test::Script::Run tests
+
+0.24 2010-03-12 01:38:56
+
+    - Repository metadata was wrong due to RT#55136 in
+      Dist::Zilla::Plugin::Repository
+
+    - Add some very exhaustive tests for the storage engine. This
+      brings our test coverage up to 94.1% up from 92.5%. The tests
+      aren't run by default to to the time they take.
+
+    - Capitalize the first word of /^but...no/
+
+0.23 2010-03-11 20:08:27
+
+    - Increase test coverage, coverage is now up to 92.5%
+
+    - Random reply tests were disabled for MySQL for no
+      reason. They're now enabled.
+
+    - Rewording the Hailo UPGRADE section
+
+    - Re-arrange the Storage::DBD* code to be more Moosy and use roles
+      as they should be used
+
+    - Remove dead test code in Hailo::Test that was used for flat hash
+      backends who couldn't generate random replies
+
+    - Test the ->ready() storage method on all backends as part of
+      Hailo::Test
+
+    - Test Hailo::stats() on all backends as part of Hailo::Test
+
+    - Test the bin/hailo script directly if Test::Script::Run is
+      available.
+
+0.22 2010-03-10 08:46:54
+
+    - A Bug in Dist::Zilla ruined 0.21. The unpacked tarball contained
+      home/avar/g/hailo/Hailo-0.21 instead just Hailo-0.21 at the top
+      level.
+
+0.21 2010-03-09 18:25:46
+    - Word tokenizer: Various improvements to capitalization
+    - Use Sys::Prctl to set legacy process name under Linux
+    - Added documentation about upgrading Hailo
+    - Hailo now uses Dist::Zilla instead of Module::Install to build
+      releases
+
+0.20 Sun Feb 28 00:29:32 GMT 2010
+
+    - Use Mouse instead of Moose by default but depend on both of
+      them.
+
+      This saves about 8MB of resident memory bringing Hailo's memory
+      usage with SQLite from 28MB to 20MB. Startup time is also
+      reduced with the test suite running around 46% faster.
+
+    - Run tests with Moose and Mouse during `make test`
+
+    - Drop MouseX::Role::Strict / MooseX::Role::Strict. Spotted when
+      switching to Moose but mainly we just didn't care about using
+      it.
+
+    - Word tokenizer: Improve punctuation when words are split with '/'
+
+0.19 Sat Feb 27 04:23:03 GMT 2010
+    - Move File::Slurp from 'requires' to 'test_requires'
+
+    - Make the default pragma logic a bit simpler
+
+    - MySQL backend: Don't make host a required storage_args argument,
+      MySQL will use localhost by default.
+
+    - MySQL backend: Document collation settings that have to be right
+      for Hailo not to blow up.
+
+    - Fix some capitalization/punctuation issues of words with dashes/quotes
+
+    - A new hailo-benchmark-replies utility and documentation in
+      Hailo.pm about its results.
+
+0.18 Fri Feb 26 05:02:17 GMT 2010
+
+    - Don't keep the brain in memory by default anymore, but enable some
+      safety-sacrificing performance optimizations instead
+
+    - DBD::SQLite backend: It's now possible to set any PRAGMA SQLite
+      supports at the start of the connection by supplying C<pragma_*>
+      parameters in in C<storage_args>. See
+      Hailo::Storage::DBD::SQLite documentation for more info.
+
+    - Issue #28: Implement a ready() method for backends. This
+      un-breaks the command-line interface with non-SQLite backends.
+
+    - Word tokenizer: Fix capitalization of the first word in some cases
+
+    - Add more exhaustive tests for the Word tokenizer.
+
+    - Un-break t/storage/DBD-mysql.t test
+
+    - Never test PostgreSQL / MySQL unless explicitly told to do so.
+
+0.17 Tue Feb 23 04:06:50 GMT 2010
+    - Remove all storage engines that weren't DBD::*. I.e. the Perl
+      backend and the flat Perl::Flat & CHI::* backends.
+
+      These backends were added to experiment with alternate backends,
+      but between them they had no redeeming quality aside from
+      increasing our number of backends & tests. The downside is that
+      we constantly had to deal with errors in these backends that
+      weren't present in our primary DBD::* targets.
+
+    - Remove Log::Log4perl. We weren't using it for anything except
+      printing one log line. Maybe we'll add it in the future with
+      proper support. See Issue #15.
+
+    - Hailo now uses less memory by lazy-loading various modules that
+      it previously loaded even if they were redundant.
+
+    - Issue #12: --not-a-valid-option now prints the same help output
+      --help would. MooseX::Getopt::Basic is evil and hard to override
+      so this is done with some hackery.
+
+    - Renamed Hailo::Storage::Mixin::DBD to Hailo::Storage::DBD, since
+      mixin is really a misnomer for this base class.
+
+    - Improved documentation including a new SYNOPSIS with examples.
+
+    - Error on training with an undef argument.
+
+    - t/storage/dbd-switch-order.t didn't clean up the tempfile it was
+      using.
+
+    - More capitalization improvements.
+
+0.16 Mon Feb 22 17:08:46 GMT 2010
+    - Don't seed a reply with a token which is too rare
+    - Make the Word tokenizer split "example.com" into 3 tokens, while still
+      keeping "3.14" as one token. Also accept ',' as a decimal point.
+    - Various improvements to capitalization in the Word tokenizer
+    - Don't run the ReadLine UI if --stats is supplied
+    - Allow keeping the entire SQLite database in memory while running
+    - Make that the default behavior to reduce IO
+    - Declare undeclared File::Slurp dependency
+    - Declare undeclared Test::Script dependency
+    - Fixed utf8 problems with ReadLine UI
+    - Optimize the SQL schema bit, which shaves about 10% off the size of
+      the DB and cuts more than half of the time needed to generate a reply
+
+0.15 Thu Feb 18 23:55:19 GMT 2010
+    - Allow specifying SQLite's cache size with --storage-args
+    - Reduce likelhood of returning a reply which is identical to the input
+    - Instead of depending on version "0" of most modules (i.e. any
+      version) depend on the latest CPAN version. We know this works;
+      but we have no idea if the older modules work.
+    - Changed to word tokenizer so that it doesn't return whitespace tokens,
+      instead returning a flag which dictatesthe whitespace policy of the
+      token in question. Changed the default Markov order to 2 to compensate.
+    - Fixed a bug with the DBD::* backends not retrieving the Markov order
+      from an existing database
+    - Removed Text::Trim dependency due to it not being acceptable for Debian
+    - Learn from the input when using the ReadLine UI
+    - Removed Test::Exit hard dependency for tests: Not in Debian yet
+    - Added a --stats option to print some statistics about the brain
+
+0.14 Sat Feb 13 17:07:30 GMT 2010
+    - Fixed a bug in the test suite preventing optional backends from
+      being tested
+    - All tests now use Hailo::Test, consequently backends now go
+      through much more thorough testing. Lots of other test related
+      since from 0.13.
+    - utils/hailo-benchmark: Rewritten to use Hailo::Test, the
+      benchmark is now more representive of actual Hailo usage.
+    - Hailo->learn() can now take an arrayref
+
+0.13 Sat Feb 13 09:19:52 GMT 2010
+    - Add missing .trn files to the test suite
+    - Fix number of tests in t/storage/all.t
+
+0.12 Sat Feb 13 08:55:25 GMT 2010
+    - If asked for a reply before we've learned anything, return nothing
+      instead of spewing warnings
+    - Issue #19: Ability to ->train() from filehandle as well as from
+      a file
+    - Re-enable t/bug/tokens-repeat.t test disabled in
+      cc189bd7a2dc56561c71868f061307ee5068f904
+    - When replying to some input, pay more attention to rare tokens
+    - Hailo::Storage::Mixin::Hash would inevitably die due to not importing uniq()
+    - Allow Hailo->train() to take an arrayref, filename, or filehandle argument
+
+0.11 Fri Feb 12 09:44:13 GMT 2010
+    - Corrected outdated documentation in some places
+    - Fixed a problem with the SQLite backend not reading some information
+      from an existing brain if reply() is called first
+    - Fix --reply option, its argument was being ignored
+
+0.10 Fri Feb 12 02:31:34 GMT 2010
+    - Normalized the SQL schema some more. This breaks compatability with old
+      brains of course, but training/learning is quite a bit faster now.
+    - Removed Hailo::Engine and moved most of its logic into the storage
+      backends
+    - Fixed module loader picking Perl::Flat when Perl was requested
+    - Always return a reply, even when input tokens are unknown or missing
+
+0.09 Thu Feb 11 02:36:49 GMT 2010
+    - Disable SQLite's journal while training. Speeds up long imports.
+    - Add Perl::Flat backend which keeps things in a simple key-value
+      hash where key and value are both Str. It can be subclassed to
+      store data in e.g. BerkeleyDB, Cache or other key-value
+      backends.
+    - Add CHI backend with File, Memory, BerkeleyDB etc. backends
+    - Use MooseX::Role::Strict instead of Moose::Role
+    - Use Log::Log4perl for logging
+    - SQLite broke if using a :memory: brain if a :memory: file existed
+    - Use Module::Pluggable for finding plugins
+
+0.08 Wed Feb 10 00:06:20 GMT 2010
+    - 0.07 broke the PostgreSQL and MySQL backend. Fixed them.
+    - Made it less likely that non-SQLite backends will be broken in
+      the future by moving the DB-specific SQL out of Pg.pm and
+      mysql.pm into macros in SQL.pm
+    - Use of $. in Hailo.pm broke file-based backends such as Cache.pm
+    - Make MySQL docs copy-pasteable
+    - Add a benchmark script as utils/hailo-benchmark
+
+0.07 Tue Feb  9 15:23:44 GMT 2010
+    - Note: The storage backends for this release have been changed in such
+      a way that it is incompatible with brains created by older releases
+    - Add missing dependencies on Test::Script/MX::Getopt::Dashes
+    - The Words tokenizer now compresses whitespace when tokenizing as
+      well as whitespace-trimming the output it produces
+    - Make start/end expressions only start/end sentences most of the time
+      instead of all the time
+    - Issue #13: `hailo -b brain' will launch an interactive ReadLine
+      terminal
+    - Don't exit() on print_version=> in run(), just return()
+    - Add $VERSION to all .pm files
+    - Use namespace::clean everywhere
+
+0.06 Sat Jan 30 19:21:28 GMT 2010
+    - Construct SQL's dbd_options with lazy_build, not default. This
+      makes it easy to add additional options in the individual
+      storage engines.
+    - Remove some dead code in Hailo::Storage::Perl
+    - Explicitly disconnect sqlite's dbh / sth handles. This should
+      fix some cpantesters FAILs we're getting which print "database
+      is locked" errors.
+
+0.05 Sat Jan 30 13:55:18 GMT 2010
+    - Shuffle key tokens and don't reuse them. Should make for more random
+      replies.
+    - Check for definedness of $self->brain in Hailo::Storage::*
+    - Use autodie to catch open/close errors
+    - Hailo->learn() was broken when print_progress was false
+    - Add tests for Hailo invocation
+    - Use MooseX::StrictConstructor
+
+0.04 Fri Jan 29 17:48:49 GMT 2010
+    - You know that bug we talked about being fixed in 0.03? It was
+      still there now it's actually fixed.
+    - Use Class::MOP::load_class() instead of eval { require $str } to load plugins
+    - Depend on Perl 5.10
+    - Added MySQL storage backend, don't use it.
+
+0.03 Fri Jan 29 14:37:17 GMT 2010
+    - Fixed a fatal error in Hailo::Engine::Default that would
+      inevitable occur on any large brain. When Hailo was given
+      repeating input with such as [ qw(badger ! badger !) ] where
+      the probability of all the given token following each other was
+      100% (i.e. there's nothing to break the loop) it would start
+      generating infinitely long replies.
+
+      This was fixed by adding a guard clause in Hailo::Engine::Default
+      which breaks the loop if we're up to C<$order * 10> and the
+      number of unique tokens in the reply is less than the model
+      C<$order>.
+
+0.02 Fri Jan 29 03:54:32 GMT 2010
+    - Fix typo in NAME in Hailo::Tokenizer::Words which caused the POD
+      not to be displayed on search.cpan.org
+    - Present options in --help output in reverse sort order
+    - Add facility to pass arguments to storage/engine/tokenizer from
+      the command line or via Hailo->new(). Make Hailo::Storage::Pg
+      use this facility for its database connection arguments.
+    - Fix spelling error in Hailo's POD
+    - --reply on the command line didn't work
+
+0.01 Fri Jan 29 00:39:54 GMT 2010
+    - First CPAN release

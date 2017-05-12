@@ -1,0 +1,259 @@
+Revision history for HTTP::DAV
+  v0.48 (released 2015/03/26):
+    *   bug fixes
+
+        "RT#103126", fixed faulty code to add trailing slash to URLs.
+
+  v0.47 (released 2012/03/24):
+    *   bug fixes
+
+        Improve "propfind()" resilience when server response contains
+        broken, truncated or no XML at all. RT#75011.
+
+  v0.46 (released 2012/01/11):
+    *   improvements
+
+        HTTP::DAV should now be working with more WebDAV servers.
+
+        We are more flexible in what content types we consider to be XML.
+        Thanks Ron1 and Adam for the feedback and patches.
+
+  v0.45 (released 2011/09/18):
+    *   bug fixes
+
+          - Fixed RT #69439 (http://rt.cpan.org/Public/Bug/Display.html?id=69439),
+            insecure /tmp files handling in dave client.
+
+    *   improvements
+
+          - Added -tmpdir option to dave client.
+          - Reorganized distribution layout to match usual CPAN practice
+          - Removed remains of svn-era ($Id and such...)
+
+  v0.44 (released 2011/06/19):
+    *   bug fixes
+
+          - Fixed RT #68936 (http://rt.cpan.org/Public/Bug/Display.html?id=68936),
+            Fixed errors() method that would bomb out when the "_errors" attribute
+            wasn't initialized. Thanks to Michael Lackoff for reporting.
+
+  v0.43 (released 2011/04/12):
+    *   bug fixes
+
+          - Fixed RT #38677 (http://rt.cpan.org/Public/Bug/Display.html?id=38677),
+            Intercept correctly 405 (Method now allowed) errors and report them
+            to the clients.
+
+  v0.42 (released 2010/11/07):
+    *   bug fixes
+
+          - Fixed RT #60457 (http://rt.cpan.org/Public/Bug/Display.html?id=60457),
+            Added and documented possibility to pass your own custom HTTP headers.
+          - Fixed errors in the code examples in the synopsis.
+
+  v0.41 (released 2010/07/24):
+    *   bug fixes
+
+          - Fixed RT #59674 (http://rt.cpan.org/Public/Bug/Display.html?id=59674),
+                When SSL support is needed but not installed, a more specific
+            error messages is now displayed, instead of "not DAV enabled or not accessible".
+
+  v0.40 (released 2010/01/27):
+    *   bug fixes
+
+          - Fixed RT #47500 (http://rt.cpan.org/Public/Bug/Display.html?id=47500),
+                HTTP::DAV::Comms->credentials() method erroneously autovivified
+                basic authentication internal values, causing wrong or undefined
+                credentials to be sent out, or credentials to be "forgot" by HTTP::DAV.
+
+  v0.39 (released 2009/12/12):
+    *   bug fixes
+
+          - Fixed RT #52665 (http://rt.cpan.org/Public/Bug/Display.html?id=52665),
+                Using dave or propfind() on URLs containing escaped chars (%xx) could fail,
+                due to upper/lower case differences. Thanks to cebjyre for the patch
+                and the test case.
+
+  v0.38 (released 2009/06/09):
+    *   bug fixes
+
+          - Fixed RT #14506 (http://rt.cpan.org/Public/Bug/Display.html?id=14506),
+            about the missing get_lastresponse() method. It was a documentation bug.
+
+          - Fixed RT #29788 (http://rt.cpan.org/Public/Bug/Display.html?id=29788),
+            avoid file corruptions on Win32 when calling HTTP::DAV::get() method.
+
+          - Fixed RT #31014 (http://rt.cpan.org/Public/Bug/Display.html?id=31014),
+            probably already in v0.34, since it seems related to propfind() "depth" bug.
+
+  v0.37 (released 2009/03/24):
+    *   bug fixes
+
+          - Fixed RT #44409 (http://rt.cpan.org/Public/Bug/Display.html?id=44409),
+            Small bug in HTTP::DAV::put(). Passing a reference as local content resulted
+                in the "SCALAR(0x12345678)" being logged instead of the real scalar.
+
+  v0.36 (released 2009/02/25):
+    *   bug fixes
+
+          - Fixed RT #19616 (http://rt.cpan.org/Public/Bug/Display.html?id=19616),
+            LWP::UserAgent::redirect_ok() is not changed anymore. We're subclassing
+            it from HTTP::DAV::UserAgent and overriding redirect_ok() there.
+
+          - Fixed RT #42877 (http://rt.cpan.org/Public/Bug/Display.html?id=42877),
+            HTTP::DAV::UserAgent::credentials() has been modified to behave like
+            LWP::UserAgent::credentials(), otherwise basic authentication breakages
+            can occur.
+
+          - Fixed a problem with C<-depth> argument to C<HTTP::DAV::propfind()> that
+            could lead to massive performance degradation, especially when running
+                C<propfind()> against large folders.
+                C<-depth> was set to 1 even when passed as zero.
+
+  v0.35 (released 2008/11/03):
+    *   bug fixes
+
+          - Fixed RT #40318 (http://rt.cpan.org/Public/Bug/Display.html?id=40318),
+            about getting single or multiple files directly to \*STDOUT.
+
+  v0.34 (released 2008/09/11):
+    *   bug fixes
+
+          - Fixed RT #39150 (http://rt.cpan.org/Public/Bug/Display.html?id=39150),
+            about downloading multiple files in the same directory.
+
+  v0.33 (released 2008/08/24):
+    *   documentation
+
+          - Clearly state that opera software asa is now co-maintainer of http::dav
+
+          - Fixed various inconsistencies in the v0.32 documentation
+
+  v0.32 (released 2008/08/24):
+    *   incompatibilities
+
+         - Now HTTP::DAV requires Perl 5.6.0+ and Scalar::Util (core in 5.8.x).
+
+    *   bug fixes
+
+         - Now HTTP::DAV objects are correctly released from memory when
+           they go out of scope. Now it should be possible to use multiple instances
+           of HTTP::DAV even in long-running processes.
+
+           Was caused by circular references between HTTP::DAV and HTTP::DAV::Resource.
+
+  v0.31 (released 2002/04/13):
+    *   Apache 2 mod_dav support
+
+         - Now works with mod_dav under Apache 2.
+
+    *   bug fixes
+
+         - Fixed bug to correctly handle the put/get of filenames with spaces in them.
+
+         - Fixed bug to allow the PUT of empty files.
+
+         - put() now uses binmode so that it works under Windows.
+
+         - HTTP redirect code added in the previous release was incorrectly returning a HTTP::Response instead of a HTTP::DAV::Response
+
+         - Fixed bug to allow https for copy and move (http:// was hardcoded).
+
+         - Fixed strange copy/move bug for Apache2.0's mod_dav.
+
+  v0.29 (released 2001/10/31):
+    *   https
+
+        https support as provided from the underlying LWP library has been
+        tested against mod_dav and mod_ssl. Seems to work well. See
+        INSTALLATION for more detail.
+
+    *   Digest authentication
+
+        Requires MD5 to be installed. See INSTALLATION notes.
+
+    *   various bug fixes
+
+    *   more powerful callback support for get()
+
+        Useful for giving progress indicators.
+
+    *   get() to filehandles and scalar references
+
+        the get() routine now allows you to pass by reference a filehandle
+        or scalar in which to save the contents of the GET request.
+
+    *   added namespace abbreviations in proppatch
+
+        Thanks to Jeremy for this patch.
+
+    *   improved redirect handling in Comms.pm
+
+        Thanks to Jeremy for this patch.
+
+  v0.23 (released 2001/09/07):
+    *   file globbing for get and put
+
+        HTTP::DAV::get() and HTTP::DAV::put() now supports file globs. This
+        functionality also propagates to dave. This allows you to do the
+        following:
+
+         dav> put /tmp/index*.html
+         dav> get index[12].htm? /tmp
+
+         ?,* and sets ([]) are supported. See the docs for details.
+
+        HTTP::DAV now requires the Perl module File::Glob which comes
+        bundled with perl5.6 and later.
+
+    *   bug fix in -overwrite flag in HTTP::DAV::copy/move.
+
+  v0.22 (released 2001/09/03)
+    Complete overhaul of API, recursive get and put, addition of dave.
+
+    *   dave -- the new command line client
+
+        I wrote dave (the DAV Explorer) because I needed an end-user
+        application that allowed me to "feel" how well the HTTP::DAV API was
+        performing. dave is quite similar to Joe Orton's C-based DAV client
+        called cadaver (yes, imitation is the best form of flattery).
+
+    *   A new and simpler API
+
+        This new API is accessed directly through the HTTP::DAV module and
+        is based on the core API written in previous releases.
+
+    *   new methods
+
+        The new API now supports, proppatch, recursive get and put.
+
+    *   A substantial core API overhaul
+
+        Moving from v0.05 to v0.22 in one release might indicate the amount
+        of work gone into this release.
+
+    *   A new interoperability test suite
+
+        is now included in PerlDAV. The test suite is built on top of the
+        standard Perl Test::Harness modules. Still in development, the test
+        suite is highlighting interoperability problems with DAV-servers a
+        lot quicker than before. See "the test suite & interoperability"
+        section.
+
+  v0.05 (released 2001/07/24)
+    General bug fixes and addition of proppatch
+
+     - added PROPPATCH method to HTTP::DAV::Resource, thanks to Sylvain Plancon.
+     - fixed uninitialized warnings in test scripts.
+     - fixed new lock bug in DAV::Lock, thanks to Ben Evans
+     - fixed dumb mistake where PUT was calling get instead of put, 
+       thanks to Sylvain and Ben again.
+     - fixed call to Utils::bad, thanks to Sylvain
+
+  v0.04 (released 2000/04/25)
+    Initial Release
+
+     - supports PUT,GET,MLCOL,DELETE,OPTIONS,PROPFIND,LOCK,UNLOCK,steal_lock,lock_discovery
+
+** This file was automatically generated from **
+** doc/Changes.pod. To edit it, see there.    **

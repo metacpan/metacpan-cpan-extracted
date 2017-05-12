@@ -1,0 +1,27 @@
+#!/usr/bin/perl -w
+
+use HTML::Stream; 
+
+# Setup:
+$HTML = new HTML::Stream \*STDOUT;
+$href = "/usr/local/foo";
+$verse = <<EOF;
+        I am the very model of a modern major general,
+        I've information vegetable animal and mineral.
+EOF
+
+# Test:
+sub test {
+    $HTML -> P -> A(HREF=>"$href") 
+	  -> IMG(SRC=>"foo.gif", ALT=>"FOO!") 
+	  -> t("Copyright \251 1997 by me!")
+	  -> _A;
+    $HTML -> P -> text($verse) -> BR -> BR;
+}
+
+$HTML -> H1 -> t("NORMAL") -> _H1;
+&test;
+$HTML -> H1 -> t("NO AUTOFORMAT") -> _H1;
+$HTML->auto_format(0);
+&test;
+

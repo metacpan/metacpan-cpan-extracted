@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Ham-Resources-Propagation.t
+t/Ham-Resources-Propagation-test.pl
+lib/Ham/Resources/Propagation.pm

@@ -1,0 +1,5 @@
+<H1> test_esc4 </H1>
+ \u0026foo\u0022bar\u0027\u003c/script\u003e\u003d\u002d\u003b\u002b \u005c\u003c\u003e\u0022\u003b %FAhidden:\u000d\u000aend 
+ 
+VAR1
+Some&quot;&#39; Txt&#39;

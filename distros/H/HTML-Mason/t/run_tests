@@ -1,0 +1,2 @@
+#!/bin/bash
+PERL_DL_NONLAZY=1 find . -type f -name "*.t" | sort | egrep -v '08-ah|12-taint|16-live_cgi' | xargs /usr/bin/perl -I../lib -e 'use Test::Harness qw(&runtests); runtests @ARGV;'

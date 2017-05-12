@@ -1,0 +1,16 @@
+<wmmeta name="Title" value="The Text::EtText Format Converter" />
+<wmmeta name="Section" value="07-fmt_converters" />
+<wmmeta name="Score" value="10" />
+<wmmeta name="Abstract">
+A simple plain-text format, easily converted to HTML (format: <em>text/et</em>)
+</wmmeta>
+
+This converter converts from Text::EtText, a simple plain-text format, to
+HTML.  Like most simple text markup formats (POD, setext, etc.), EtText markup
+handles the usual things: insertion of __&lt;P&gt;__ tags, header recognition,
+list recognition, and markup. However it adds a powerful link markup system.
+
+EtText is no longer included in WebMake; instead it must be downloaded
+separately from http://ettext.taint.org/, where there is also a more detailed
+set of documentation.
+

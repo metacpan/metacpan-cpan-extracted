@@ -1,0 +1,791 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>HTML-Menu-TreeView</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:feedback@suse.de" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+<!--
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<ul>
+
+		<li><a href="#oo_syntax">OO Syntax</a></li>
+		<li><a href="#fo_syntax">FO Syntax</a></li>
+		<li><a href="#function_sets">function sets</a></li>
+	</ul>
+
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#changes">Changes</a></li>
+	<li><a href="#public">Public</a></li>
+	<ul>
+
+		<li><a href="#new">new</a></li>
+		<li><a href="#css">css</a></li>
+		<li><a href="#documentroot">documentRoot</a></li>
+		<li><a href="#jscript">jscript</a></li>
+		<li><a href="#preload">preload</a></li>
+		<li><a href="#size">size</a></li>
+		<li><a href="#style">Style</a></li>
+		<li><a href="#tree">Tree</a></li>
+		<li><a href="#clasic">clasic</a></li>
+		<li><a href="#columns">columns</a></li>
+		<li><a href="#border">border</a></li>
+		<li><a href="#desc">desc</a></li>
+		<li><a href="#sorttree">sortTree</a></li>
+		<li><a href="#orderby">orderBy</a></li>
+		<li><a href="#orderbycolumn">orderByColumn</a></li>
+		<li><a href="#folderfirst">folderFirst</a></li>
+		<li><a href="#prefix">prefix</a></li>
+		<li><a href="#trover">TrOver</a></li>
+		<li><a href="#savetree">saveTree</a></li>
+		<li><a href="#loadtree">loadTree</a></li>
+		<li><a href="#help">help</a></li>
+		<li><a href="#reserved_attributes_">reserved attributes:</a></li>
+	</ul>
+
+	<li><a href="#backward_compatibility">backward compatibility</a></li>
+	<ul>
+
+		<li><a href="#getdocumentroot">getDocumentRoot</a></li>
+		<li><a href="#setclasic">setClasic</a></li>
+		<li><a href="#setdocumentroot">setDocumentRoot</a></li>
+		<li><a href="#setmodern">setModern</a></li>
+		<li><a href="#setsize">setSize</a></li>
+		<li><a href="#setstyle">setStyle</a></li>
+		<li><a href="#style">style</a></li>
+		<li><a href="#language">language</a></li>
+	</ul>
+
+	<li><a href="#private">Private</a></li>
+	<ul>
+
+		<li><a href="#inittree">initTree</a></li>
+		<li><a href="#_ffolderfirst">_ffolderFirst</a></li>
+		<li><a href="#getself">getSelf</a></li>
+		<li><a href="#appendfolder">appendFolder</a></li>
+		<li><a href="#appendlastfolder">appendLastFolder</a></li>
+		<li><a href="#appendemptyfolder">appendEmptyFolder</a></li>
+		<li><a href="#appendlastemptyfolder">appendLastEmptyFolder</a></li>
+		<li><a href="#appendnode">appendNode</a></li>
+		<li><a href="#appendlastnode">appendLastNode</a></li>
+	</ul>
+
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#license">LICENSE</a></li>
+</ul>
+-->
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>HTML::Menu::TreeView - Create a HTML TreeView from scratch</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+     use HTML::Menu::TreeView qw(Tree);</pre>
+<pre>
+     my @tree =( {</pre>
+<pre>
+     text =&gt; 'Folder',</pre>
+<pre>
+     subtree =&gt; [</pre>
+<pre>
+          {</pre>
+<pre>
+          text =&gt; 'treeview Homepage',</pre>
+<pre>
+          href =&gt; '<a href="http://treeview.lindnerei.de">http://treeview.lindnerei.de</a>'</pre>
+<pre>
+          }</pre>
+<pre>
+            ],</pre>
+<pre>
+     },);</pre>
+<pre>
+     Tree(\@tree);</pre>
+<p>
+</p>
+<h2><a name="oo_syntax">OO Syntax</a></h2>
+<pre>
+     use HTML::Menu::TreeView;</pre>
+<pre>
+     use strict;</pre>
+<pre>
+     my @tree =(</pre>
+<pre>
+          {</pre>
+<pre>
+               image =&gt; 'tar.png',</pre>
+<pre>
+               text =&gt; 'Node'
+          },
+     );</pre>
+<pre>
+     my $Treeview = new HTML::Menu::TreeView();</pre>
+<pre>
+     print $Treeview-&gt;css(&quot;/srv/www/httpdocs&quot;);</pre>
+<pre>
+     print $Treeview-&gt;jscript();</pre>
+<pre>
+     print $Treeview-&gt;preload();</pre>
+<pre>
+     print $Treeview-&gt;Tree(\@tree);</pre>
+<p>
+</p>
+<h2><a name="fo_syntax">FO Syntax</a></h2>
+<pre>
+     use HTML::Menu::TreeView qw(css jscript preload Tree);</pre>
+<pre>
+     print css();</pre>
+<pre>
+     print jscript();</pre>
+<pre>
+     print preload();</pre>
+<pre>
+     print Tree(\@tree,&quot;Crystal&quot;);</pre>
+<p>
+</p>
+<h2><a name="function_sets">function sets</a></h2>
+<p>Here is a list of the function sets you can import:</p>
+<p>:all</p>
+<p>Tree css jscript clasic preload help folderFirst size documentRoot loadTree saveTree sortTree orderBy prefix Style orderByColumn border desc language</p>
+<p>:recommend</p>
+<p>Tree css jscript clasic preload folderFirst size Style documentRoot loadTree saveTree sortTree prefix desc</p>
+<p>:standart</p>
+<p>Tree css jscript preload size Style documentRoot clasic,</p>
+<p>:backward</p>
+<p>setDocumentRoot getDocumentRoot setSize setClasic setStyle style setModern</p>
+<p>:columns</p>
+<p>border columns orderByColumn orderBy</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>HTML::Menu::TreeView is a Modul to build an Html TreeView.</p>
+<p>
+</p>
+<hr />
+<h1><a name="changes">Changes</a></h1>
+<p>1.12</p>
+<p>some fixes (German umlaute <code>help())</code></p>
+<p>1.10</p>
+<p>Overwrought</p>
+<p>1.08</p>
+<p>delete one unnessesary file.</p>
+<p>1.07</p>
+<p>Drag &amp; drop example edit.pl</p>
+<p>new css class dropzone</p>
+<p>Overwrought Documentation</p>
+<p>Overwrought Images</p>
+<p>1.06</p>
+<p>svn moved to <a href="http://lindnerei.svn.sourceforge.net/viewvc/lindnerei/treeview/">http://lindnerei.svn.sourceforge.net/viewvc/lindnerei/treeview/</a></p>
+<p>new Images, german Help</p>
+<p>language function set it to ``de'' for german help</p>
+<p>german documentation droped</p>
+<p>Build install_examples</p>
+<p>
+</p>
+<hr />
+<h1><a name="public">Public</a></h1>
+<p>
+</p>
+<h2><a name="new">new</a></h2>
+<p>if you use the oo interface you can say:</p>
+<pre>
+     my $TreeView = new HTML::Menu::TreeView(\@tree, optional style);</pre>
+<p>and then call Tree without arguments.</p>
+<pre>
+     print $TreeView-&gt;Tree();</pre>
+<p>
+</p>
+<h2><a name="css">css</a></h2>
+<p>return the necessary css part without &lt;style&gt;&lt;/style&gt; tag.</p>
+<p>you can set the DocumentRoot if you pass a parameter</p>
+<pre>
+     css('/document/root/');</pre>
+<p>you can also include it with:</p>
+<pre>
+     &lt;link href=&quot;/style/Crystal/16/html-menu-treeview/Crystal.css&quot; rel=&quot;stylesheet&quot; type=&quot;text/css&quot;&gt;</pre>
+<p>for example.</p>
+<p>
+</p>
+<h2><a name="documentroot">documentRoot</a></h2>
+<p>set or get the Document Root.</p>
+<p>default: this variable is set during make.</p>
+<p>
+</p>
+<h2><a name="jscript">jscript</a></h2>
+<p>return the necessary javascript without &lt;script&gt; tag.</p>
+<p>you can also include it with:</p>
+<pre>
+     &lt;script language=&quot;JavaScript&quot; type=&quot;text/javascript&quot; src=&quot;/style/treeview.js&quot;&gt;&lt;/script&gt;</pre>
+<p>you can set the Document Root if you pass a parameter</p>
+<p>
+</p>
+<h2><a name="preload">preload</a></h2>
+<p>return the necessary javascript for preloading images without &lt;script&gt; tag.</p>
+<p>you can also include it with:</p>
+<pre>
+     &lt;script language=&quot;JavaScript&quot; type=&quot;text/javascript&quot; src=&quot;/style/Crystal/16/html-menu-treeview/preload.js&quot;&gt;&lt;/script&gt;</pre>
+<p>or</p>
+<pre>
+     &lt;script language=&quot;JavaScript&quot; type=&quot;text/javascript&quot; src=&quot;/style/Crystal/preload.js&quot;&gt;&lt;/script&gt;</pre>
+<p>if you use different images sizes.</p>
+<p>you can set the DocumentRoot if you pass a parameter</p>
+<p>
+</p>
+<h2><a name="size">size</a></h2>
+<p>only for Crystal styles</p>
+<p>set or get the size.</p>
+<p>16,32,48,64 and 128 are possible values.</p>
+<p>
+</p>
+<h2><a name="style">Style</a></h2>
+<p>set the style in scalar context or get in void context.</p>
+<pre>
+     Style('simple');</pre>
+<p>simple = redmond like style.</p>
+<p>Crystal = Crystal style (default).</p>
+<p>
+</p>
+<h2><a name="tree">Tree</a></h2>
+<pre>
+     Tree(\@tree,optional $style);</pre>
+<p>Returns the html part of the Treeview without javasript and css.</p>
+<p>
+</p>
+<h2><a name="clasic">clasic</a></h2>
+<p>enable clasic node decoration:</p>
+<pre>
+     clasic(1);</pre>
+<p>disable clasic node decoration:</p>
+<pre>
+     clasic(0);</pre>
+<p>return the status in void context.</p>
+<pre>
+     $status = clasic();</pre>
+<p>
+</p>
+<h2><a name="columns">columns</a></h2>
+<p>set number of columns</p>
+<pre>
+     columns(3);</pre>
+<p>return the count in void context.</p>
+<pre>
+     $count = columns();</pre>
+<p>or set the captions for the columns</p>
+<pre>
+     columns(&quot;Name&quot;,&quot;Column 1&quot;,&quot;Column 2&quot;,&quot;Column 3&quot;);</pre>
+<p>
+</p>
+<h2><a name="border">border</a></h2>
+<p>enable border for columns :</p>
+<pre>
+     border(1);</pre>
+<p>disable border for columns :</p>
+<pre>
+     border(0);</pre>
+<p>return the status in void context.</p>
+<pre>
+     $status = border();</pre>
+<p>
+</p>
+<h2><a name="desc">desc</a></h2>
+<p>reverse sorting</p>
+<p>enable desc :</p>
+<pre>
+     desc(1);</pre>
+<p>disable border:</p>
+<pre>
+     desc(0);</pre>
+<p>return the status in void context.</p>
+<pre>
+     $status = desc();</pre>
+<p>
+</p>
+<h2><a name="sorttree">sortTree</a></h2>
+<p>set or unset sorting treeview Items.</p>
+<p>default is false.</p>
+<p>enable sorting:</p>
+<pre>
+     sortTree(1);</pre>
+<p>disable sorting:</p>
+<pre>
+     sortTree(0);</pre>
+<p>return the status in void context.</p>
+<pre>
+     $status = sortTree();</pre>
+<p>
+</p>
+<h2><a name="orderby">orderBy</a></h2>
+<p>set the attribute which is used by sortTree and folderFirst.</p>
+<p>
+</p>
+<h2><a name="orderbycolumn">orderByColumn</a></h2>
+<p>sort the TreeView by Column</p>
+<pre>
+     orderByColumn(i);</pre>
+<p>-1 to disable;</p>
+<p>
+</p>
+<h2><a name="folderfirst">folderFirst</a></h2>
+<p>set or unset show folders first ?</p>
+<p>default is false.</p>
+<p>enable show folders first:</p>
+<pre>
+     folderFirst(1);</pre>
+<p>disable show folders first:</p>
+<pre>
+     folderFirst(0);</pre>
+<p>return the status of this property in void context.</p>
+<pre>
+     $status = folderFirst();</pre>
+<p>
+</p>
+<h2><a name="prefix">prefix</a></h2>
+<p>prefix used by css.</p>
+<p>use this if you want build a offline website</p>
+<p>for example:</p>
+<pre>
+     prefix('.');</pre>
+<p>return the prefix in void context.</p>
+<p>
+</p>
+<h2><a name="trover">TrOver</a></h2>
+<p>enable mouseover</p>
+<p>tr.trOver{}</p>
+<p>
+</p>
+<h2><a name="savetree">saveTree</a></h2>
+<pre>
+     saveTree('filename',\@ref); # or saveTree()</pre>
+<p>default: ./TreeViewDump.pl</p>
+<p>
+</p>
+<h2><a name="loadtree">loadTree</a></h2>
+<pre>
+     loadTree('filename') or loadTree()</pre>
+<p>default: ./TreeViewDump.pl</p>
+<p>
+</p>
+<h2><a name="help">help</a></h2>
+<p>help for link attributes.</p>
+<p>return a hashref in void context,</p>
+<pre>
+     my $hashref =  help();</pre>
+<pre>
+     foreach my $key (sort(keys %{$hashref})){</pre>
+<pre>
+          print &quot;$key : &quot;, $hashref-&gt;{$key} ,$/;</pre>
+<pre>
+     }</pre>
+<p>or a help Message.</p>
+<pre>
+     print help('href'),$/;</pre>
+<p>if you want german help try</p>
+<pre>
+     language('de')</pre>
+<p>
+</p>
+<h2><a name="reserved_attributes_">reserved attributes:</a></h2>
+<dl>
+<dt><strong><a name="item_href">href</a></strong>
+
+<dd>
+<p>URI for linked resource.</p>
+</dd>
+</li>
+<dt><strong><a name="item_accesskey">accesskey</a></strong>
+
+<dd>
+<p>accessibility key character.</p>
+</dd>
+</li>
+<dt><strong><a name="item_charset">charset</a></strong>
+
+<dd>
+<p>char encoding of linked resource.</p>
+</dd>
+</li>
+<dt><strong><a name="item_class">class</a></strong>
+
+<dd>
+<p>class name or set of class names to an element.</p>
+</dd>
+</li>
+<dt><strong><a name="item_coords">coords</a></strong>
+
+<dd>
+<p>for use with client-side image maps.</p>
+</dd>
+</li>
+<dt><strong><a name="item_dir">dir</a></strong>
+
+<dd>
+<p>the base direction of directionally neutral text.</p>
+</dd>
+</li>
+<dt><strong><a name="item_hreflang">hreflang</a></strong>
+
+<dd>
+<p>language code.</p>
+</dd>
+</li>
+<dt><strong><a name="item_lang">lang</a></strong>
+
+<dd>
+<p>the base language of an elements attribute values and text content.</p>
+</dd>
+</li>
+<dt><strong><a name="item_onblur">onblur</a></strong>
+
+<dd>
+<p>the element lost the focus.</p>
+</dd>
+</li>
+<dt><strong><a name="item_ondblclick">ondblclick</a></strong>
+
+<dd>
+<p>event occurs when the pointing device button is double clicked</p>
+</dd>
+</li>
+<dt><strong><a name="item_onclick">onclick</a></strong>
+
+<dd>
+<p>event occurs when the pointing device button is clicked over an element.</p>
+</dd>
+</li>
+<dt><strong><a name="item_onfocus">onfocus</a></strong>
+
+<dd>
+<p>the element got the focus.</p>
+</dd>
+</li>
+<dt><strong><a name="item_onkeydown">onkeydown</a></strong>
+
+<dd>
+<p>event occurs when a key is pressed down over an element.</p>
+</dd>
+</li>
+<dt><strong><a name="item_onkeypress">onkeypress</a></strong>
+
+<dd>
+<p>event occurs when a key is pressed and released over an element.</p>
+</dd>
+</li>
+<dt><strong><a name="item_onkeyup">onkeyup</a></strong>
+
+<dd>
+<p>event occurs when a key is released over an element.</p>
+</dd>
+</li>
+<dt><strong><a name="item_onmousedown">onmousedown</a></strong>
+
+<dd>
+<p>event occurs when the pointing device button is pressed over an element.</p>
+</dd>
+</li>
+<dt><strong><a name="item_onmousemove">onmousemove</a></strong>
+
+<dd>
+<p>event occurs when the pointing device is moved while it is over an element.</p>
+</dd>
+</li>
+<dt><strong><a name="item_onmouseout">onmouseout</a></strong>
+
+<dd>
+<p>event occurs when the pointing device is moved away from an element.</p>
+</dd>
+</li>
+<dt><strong><a name="item_onmouseover">onmouseover</a></strong>
+
+<dd>
+<p>event occurs when the pointing device is moved onto an element.</p>
+</dd>
+</li>
+<dt><strong><a name="item_onmouseup">onmouseup</a></strong>
+
+<dd>
+<p>event occurs when the pointing device button is released over an element.</p>
+</dd>
+</li>
+<dt><strong><a name="item_rel">rel</a></strong>
+
+<dd>
+<p>forward link types.</p>
+</dd>
+</li>
+<dt><strong><a name="item_rev">rev</a></strong>
+
+<dd>
+<p>reverse link types.</p>
+</dd>
+</li>
+<dt><strong><a name="item_shape">shape</a></strong>
+
+<dd>
+<p>for use with client-side image maps.</p>
+</dd>
+</li>
+<dt><strong><a name="item_style">style</a></strong>
+
+<dd>
+<p>specifies style information for the current element.</p>
+</dd>
+</li>
+<dt><strong><a name="item_tabindex">tabindex</a></strong>
+
+<dd>
+<p>position in tabbing order.</p>
+</dd>
+</li>
+<dt><strong><a name="item_target">target</a></strong>
+
+<dd>
+<p>target frame information.</p>
+</dd>
+</li>
+<dt><strong><a name="item_type">type</a></strong>
+
+<dd>
+<p>advisory content type.</p>
+</dd>
+</li>
+<dt><strong><a name="item_title">title</a></strong>
+
+<dd>
+<p>element title.</p>
+</dd>
+</li>
+<dt><strong><a name="item_id">id</a></strong>
+
+<dd>
+<p>This attribute assigns a name to an element. This name must be unique in a document.</p>
+</dd>
+</li>
+<dt><strong><a name="item_addition">addition</a></strong>
+
+<dd>
+<p>additional text behind the link</p>
+</dd>
+</li>
+<dt><strong><a name="item_subtree">subtree</a></strong>
+
+<dd>
+<p>an array of TreeView Items</p>
+</dd>
+<dd>
+<pre>
+     subtree =&gt; [{
+          text =&gt; 'Fo'},
+          {text =&gt; 'Bar'}
+     ]</pre>
+</dd>
+</li>
+<dt><strong><a name="item_image_2e">image.</a></strong>
+
+<dd>
+<p>a image name, must be placed into /style/mimetypes directory.</p>
+</dd>
+</li>
+<dt><strong><a name="item_folderclass__3a">folderclass :</a></strong>
+
+<dd>
+<p>only for Crystal styles</p>
+</dd>
+<dd>
+<p>possible values:</p>
+</dd>
+<dd>
+<p>folderMan, folderVideo,folderCrystal,</p>
+</dd>
+<dd>
+<p>folderLocked , folderText, folderFavorite,</p>
+</dd>
+<dd>
+<p>folderPrint,folderHtml,</p>
+</dd>
+<dd>
+<p>folderImage,folderSound,folderImportant,</p>
+</dd>
+<dd>
+<p>folderTar,folderYellow ,folderGray,</p>
+</dd>
+<dd>
+<p>folderGreen and folderRed</p>
+</dd>
+<dd>
+<p>see <a href="http://treeview.lindnerei.de/cgi-bin/crystal.pl">http://treeview.lindnerei.de/cgi-bin/crystal.pl</a> for a complete list of possible values for folderclass.</p>
+</dd>
+</li>
+<dt><strong><a name="item_columns">columns</a></strong>
+
+<dd>
+<p>an array of columns</p>
+</dd>
+<dd>
+<p>columns =&gt; [ 1,2,3,4,5]</p>
+</dd>
+</li>
+<dt><strong><a name="item_empty_2e">empty.</a></strong>
+
+<dd>
+<p>set it true if you ant a closed Folder,</p>
+</dd>
+<dd>
+<p>which load a location onclick, you must additional set the href attribute.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="backward_compatibility">backward compatibility</a></h1>
+<p>
+</p>
+<h2><a name="getdocumentroot">getDocumentRoot</a></h2>
+<p>for backward compatibility.</p>
+<p>use documentRoot instead.</p>
+<p>
+</p>
+<h2><a name="setclasic">setClasic</a></h2>
+<p>use <code>clasic()</code> instead.</p>
+<p>for backward compatibility.</p>
+<p>use a classic node decoration</p>
+<p>
+</p>
+<h2><a name="setdocumentroot">setDocumentRoot</a></h2>
+<p>for backward compatibility.</p>
+<p>use documentRoot instead.</p>
+<p>set the local path to the style folder.</p>
+<p>should be the Document Root of your webserver.</p>
+<p>example:</p>
+<pre>
+     setDocumentRoot('/sv/www/htdocs/');</pre>
+<p>default: this property is set during make</p>
+<p>
+</p>
+<h2><a name="setmodern">setModern</a></h2>
+<p>use <code>clasic()</code> instead.</p>
+<p>for backward compatibility.</p>
+<p>use a modern node decoration</p>
+<p>
+</p>
+<h2><a name="setsize">setSize</a></h2>
+<p>for backward compatibility.</p>
+<p>use size instead.</p>
+<p>only for Crystal styles</p>
+<p>16,32,48,64 and 128 are possible values.</p>
+<p>
+</p>
+<h2><a name="setstyle">setStyle</a></h2>
+<p>for backward compatibility.</p>
+<p>use style instead.</p>
+<pre>
+     setStyle('style');</pre>
+<p>simple = redmond like style</p>
+<p>Crystal = Crystal style</p>
+<p>
+</p>
+<h2><a name="style">style</a></h2>
+<p>set the style.</p>
+<pre>
+     style('simple');</pre>
+<p>simple = redmond like style.</p>
+<p>Crystal = Crystal style (default).</p>
+<p>
+</p>
+<h2><a name="language">language</a></h2>
+<p>set the language in scalar context, or get in void context.</p>
+<p>language('de');</p>
+<p>simple = redmond like style.</p>
+<p>Crystal = Crystal style (default).</p>
+<p>
+</p>
+<hr />
+<h1><a name="private">Private</a></h1>
+<p>
+</p>
+<h2><a name="inittree">initTree</a></h2>
+<p>construct the TreeView called by Tree, new or recursive by appendFolder.</p>
+<p>
+</p>
+<h2><a name="_ffolderfirst">_ffolderFirst</a></h2>
+<p>this function is used within initTree for sorting the TreeView if <code>folderFirst(1)</code> is set.</p>
+<p>
+</p>
+<h2><a name="getself">getSelf</a></h2>
+<p>this module use of a Lincoln loader like class system.</p>
+<p>if the first parameter is a HTML::Menu::TreeView object (oo syntax ) this function returns the given parameters.</p>
+<p>or the first parameter it is not a object referenz (fo syntax) it create a new HTML::Menu::TreeView object,</p>
+<p>return it as first value and  @_ as the second value .</p>
+<p>my ($self, @p) = getSelf(@_);</p>
+<p>
+</p>
+<h2><a name="appendfolder">appendFolder</a></h2>
+<p>called by initTree(), append a Folder to the <code>treeView()</code></p>
+<p>
+</p>
+<h2><a name="appendlastfolder">appendLastFolder</a></h2>
+<p>$self-&gt;appendLastFolder(\@tree);</p>
+<p>called by <code>initTree()</code> if the last item of the (sub)Tree is a folder.</p>
+<p>
+</p>
+<h2><a name="appendemptyfolder">appendEmptyFolder</a></h2>
+<p>called by initTree(), append a empty Folder.</p>
+<p>
+</p>
+<h2><a name="appendlastemptyfolder">appendLastEmptyFolder</a></h2>
+<p>$self-&gt;appendLastEmptyFolder($node);</p>
+<p>called by <code>initTree()</code> if the last item of the (sub)Tree is a folder.</p>
+<p>
+</p>
+<h2><a name="appendnode">appendNode</a></h2>
+<p>$self-&gt;appendLastNode(\$node);</p>
+<p>called by <code>initTree()</code> if the current item of the (sub)Tree is a node.</p>
+<p>
+</p>
+<h2><a name="appendlastnode">appendLastNode</a></h2>
+<p>$self-&gt;appendLastNode(\$node);</p>
+<p>called by <code>initTree()</code> if the last item of the current (sub)Tree is a node.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="http://treeview.lindnerei.de,">http://treeview.lindnerei.de,</a> <a href="http://lindnerei.svn.sourceforge.net/viewvc/lindnerei/treeview/">http://lindnerei.svn.sourceforge.net/viewvc/lindnerei/treeview/</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Dirk Lindner &lt;<a href="mailto:lze@cpan.org">lze@cpan.org</a>&gt;</p>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>LGPL</p>
+<p>Copyright (C) 2009 by Hr. Dirk Lindner</p>
+<p>This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public License
+as published by the Free Software Foundation;
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.</p>
+
+</body>
+
+</html>

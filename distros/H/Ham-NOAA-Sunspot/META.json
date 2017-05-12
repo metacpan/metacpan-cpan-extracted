@@ -1,0 +1,53 @@
+{
+   "abstract" : "Sunspot prediction data",
+   "author" : [
+      "Roger Pettett <rmp@psyphi.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Ham-NOAA-Sunspot",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "TAP::Harness::JUnit" : "0.41",
+            "Test::More" : "0.62"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.04",
+            "English" : "1.02",
+            "LWP::UserAgent" : "6.00",
+            "base" : "2.07",
+            "strict" : "1.03",
+            "warnings" : "1.05"
+         }
+      }
+   },
+   "provides" : {
+      "Ham::NOAA::Sunspot" : {
+         "file" : "lib/Ham/NOAA/Sunspot.pm",
+         "version" : "v0.0.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ]
+   },
+   "version" : "v0.0.2",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

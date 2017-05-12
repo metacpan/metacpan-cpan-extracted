@@ -1,0 +1,48 @@
+HTML::Embellish version 1.002, released January 9, 2016
+
+
+HTML::Embellish adds typographical enhancements to HTML text.  It
+converts certain ASCII characters to Unicode characters.  It converts
+quotation marks and apostrophes into curly quotes.  It converts
+hyphens into em-dashes.  It inserts non-breaking spaces between the
+periods of an ellipsis.  (It doesn't use the HORIZONTAL ELLIPSIS
+character (U+2026), because I like more space in my ellipses.)
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+
+DEPENDENCIES
+
+  Package     Minimum Version
+  ----------- ---------------
+  perl         5.8.0
+  Carp         
+  Exporter     5.57
+  HTML::Tree   3.21
+
+
+
+CHANGES
+    Here's what's new in version 1.002 of HTML::Embellish:
+    (See the file "Changes" for the full revision history.)
+
+	- Add 'ay & 'y as special cases
+
+
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Christopher J. Madsen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

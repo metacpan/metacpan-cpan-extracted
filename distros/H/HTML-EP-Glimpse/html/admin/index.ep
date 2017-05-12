@@ -1,0 +1,43 @@
+<ep-package name="HTML::EP::Locale">
+<html><head><title>
+<ep-language en="Glimpse Index Administration"
+             de="Glimpse Index-Administration"></title></head>
+<body bgcolor=#ffffff>
+  <div align=center>
+    <a href="index.ep?language=de">
+      <img border=0 src="../de.jpg" alt="Deutsch">
+    </a>
+    <a href="index.ep?language=en">
+      <img border=0 src="../en.jpg" alt="English">
+    </a>
+  </div>
+  <h1><ep-language en="Glimpse Index Administration"
+                   de="Glimpse Index-Administration"></h1>
+<ep-language language="de">
+  Auf dieser Seite findet die Verwaltung des Glimpse-Index statt.
+  Die folgenden Aktionen stehen Ihnen zur Verfügung:
+</ep-language>
+<ep-language language="en">
+  This page allows you to manage your glimpse index.
+  You may:
+</ep-language>
+  <ul>
+    <li><a href="prefs.ep?language=$_ep_language$">
+	<ep-language en="Modify" de="Modifikation"></a>
+	<ep-language en="the index preferences"
+                     de="der für den Index relevanten Daten">
+    <li><a href="glimpseindex.ep?language=$_ep_language$">
+	<ep-language de="Indizierung" en="Create"></a>
+	<ep-language language="de">
+	  der für den Index relevanten Dateien, sollte nach jeder Änderung
+          aufgerufen werden. Dies wird am besten durch einen Cron-Job
+          automatisch erledigt, ist aber auch hier von Hand möglich.
+        </ep-language>
+        <ep-language language="en">
+          the index now, this action should occur after any modification
+	  of the files being indexed. This is best done by a Cron job,
+	  but you can do it here as well.
+        </ep-language>
+  </ul>
+</body>
+</html>

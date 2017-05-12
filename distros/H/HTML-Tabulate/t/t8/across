@@ -1,0 +1,6 @@
+<table align="center">
+<tr class="tr"><th align="center" class="thtr">Emp ID</th><td>123</td><td>456</td><td>789</td></tr>
+<tr bgcolor="#cccccc" class="tr"><th align="center" class="thtr">Emp Name</th><td>Fred Flintstone</td><td>Barney Rubble</td><td>Dino</td></tr>
+<tr class="tr"><th align="center" class="thtr">Emp Title</th><td>CEO</td><td>Lackey</td><td>Pet</td></tr>
+<tr bgcolor="#cccccc" class="tr"><th align="center" class="thtr">Birth Dt</th><td>19710430</td><td>19751212</td><td>19950906</td></tr>
+</table>

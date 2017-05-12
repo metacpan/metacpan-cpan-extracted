@@ -1,0 +1,34 @@
+---
+abstract: 'HTML to text formatting using external programs.'
+author:
+  - 'Kevin Ryde <user42_kevin@yahoo.com.au>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-FormatExternal
+no_index:
+  directory:
+    - t
+    - inc
+    - devel
+    - xt
+requires:
+  File::Spec: '0.8'
+  File::Temp: '0.18'
+  IPC::Run: '0'
+  URI::file: '0.08'
+  constant::defer: '0'
+  perl: '5.006'
+resources:
+  homepage: http://user42.tuxfamily.org/html-formatexternal/index.html
+  license: http://www.gnu.org/licenses/gpl.html
+version: '26'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

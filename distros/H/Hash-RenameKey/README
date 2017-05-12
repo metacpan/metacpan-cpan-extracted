@@ -1,0 +1,44 @@
+Hash-RenameKey version 0.01
+===========================
+
+A perl module to recusively process a hash and rename all keys matching a 
+regex pattern.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+USAGE
+
+    use Hash::RenameKey
+
+    my $hr = Hash::RenameKey->new;
+
+    $hr->rename_key(\%hash, $old, $new) || die "Unable to rename keys";
+
+The module has a single function, rename_key, which requires three 
+parameters - a hashref, a string containing the pattern to match and a
+string containing the replacement pattern.
+
+The patterns are using in a regex as follows: s/$old/$new/g;
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Class::Accessor
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by Jason Clifford
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,31 @@
+HTTP/ProxySelector version 0.01
+===============================
+
+Automatically selects you an anonymous proxy for use of your UserAgent instance.
+Just hand it your favorite proxy list site, or use the defaults. The package will then
+use your existing useragent instance to access the site and set it's proxy settings according
+to a random entry in the list.
+
+See inline POD documentation for usage.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+The libwwwperl package (LWP). 
+No need to download, it's part of the perl distribution.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Eyal Udassin
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

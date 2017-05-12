@@ -1,0 +1,33 @@
+Revision history for Perl extension HTML::Index.
+
+0.01  Tue Feb 13 14:27:19 2001
+	- original version; created by h2xs 1.20 with options
+		-A -X HTML::Index
+0.04  Wed Jun 20 16:02:41 BST 2001
+        - fixed a bug with "keys" method - thanks to dave@notsoldseparately.com
+0.06  Tue Jan 15 17:51:04 GMT 2002
+        - major rewrite, thanks mainly to suggestions from william ross
+          [will@spanner.org]. Also new using BerkeleyDB, and using a bitstring
+          for the inverted index.
+0.08  Fri Mar 22 14:11:03 GMT 2002
+        - bug fix for reindexing - thanks to Aaron Crane
+          [aaronc@gbdirect.co.uk] for spotting this one!
+0.09  Tue Aug 27 17:45:46 BST 2002
+        - bug fix for >2 word queries - thanks to Aaron Crane (again!)
+          [aaronc@gbdirect.co.uk] for spotting this one!
+0.10  Fri Jan  3 12:16:11 GMT 2003
+        - Added the HTML::Index::Store::DataDumper module
+0.11 Wed Mar  5 13:01:49 GMT 2003
+        - minor bug fix to POD to replace HTML::Indexer -> HTML::Index::Create
+0.12 Thu Mar  6 10:37:35 GMT 2003
+        - removed TempDir dependency in Makefile.PL, and added IO::File
+0.13 Tue Mar 18 12:09:34 GMT 2003
+        - another (less) major rewrite, thanks mainly to suggestions from
+          william ross [will@spanner.org]. Also, now supports stemming via
+          Lingua::Stem.
+0.14 Thu Jun 12 14:13:55 BST 2003
+        - various minor changes and bug fixes, following comments from Tim 
+          Heaney [theaney@cablespeed.com] and David Blumenthal 
+          [david@blumenthal.com]
+0.15 Mon Jun 30 16:33:38 BST 2003
+        - added Carp::Assert to PREREQ_PM in Makefile.PL

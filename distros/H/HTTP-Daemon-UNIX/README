@@ -1,0 +1,52 @@
+SYNOPSIS
+
+     use HTTP::Daemon::UNIX;
+    
+     # arguments will be passed to IO::Socket::UNIX, but Listen=>1 and
+     # Type=>SOCK_STREAM will be added by default. also, HTTP::Daemon::UNIX will try
+     # to delete stale socket first, for convenience.
+     my $d = HTTP::Daemon::UNIX->new(Local => "/path/to/unix.sock");
+    
+     # will print something like: "http:path/to/unix.sock"
+     print "Please contact me at: <URL:", $d->url, ">\n";
+    
+     # after that, use like you would use HTTP::Daemon
+     while (my $c = $d->accept) {
+         while (my $r = $c->get_request) {
+             if ($r->method eq 'GET' and $r->uri->path eq "/xyzzy") {
+                 # remember, this is *not* recommended practice :-)
+                 $c->send_file_response("/etc/passwd");
+             } else {
+                 $c->send_error(RC_FORBIDDEN);
+             }
+         }
+         $c->close;
+         undef($c);
+     }
+    
+     # client side code, using LWP::Protocol::http::SocketUnixAlt
+     use LWP::Protocol::http::SocketUnixAlt;
+     use LWP::UserAgent;
+     use HTTP::Request::Common;
+    
+     my $ua = LWP::UserAgent->new;
+     my $orig_imp = LWP::Protocol::implementor("http");
+     LWP::Protocol::implementor(http => 'LWP::Protocol::http::SocketUnixAlt');
+     my $resp = $ua->request(GET "http:path/to/unix.sock//uri/path");
+     LWP::Protocol::implementor(http => $orig_imp);
+
+DESCRIPTION
+
+    This is a quick hack to enable HTTP::Daemon to serve requests over Unix
+    sockets, by mixing in IO::Socket::UNIX and HTTP::Daemon as parents to
+    HTTP::Daemon::UNIX and overriding IO::Socket::INET-related stuffs.
+
+    Basic stuffs seem to be working, but this module has not been tested
+    extensively, so beware that things might blow up in your face.
+
+SEE ALSO
+
+    HTTP::Daemon
+
+    LWP::Protocol::http::SocketUnixAlt
+

@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+README
+Makefile.PL
+SyntaxHighlighter.pm
+t/basic.t
+t/example.xhtml
+examples/html_highlight.css
+

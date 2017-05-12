@@ -1,0 +1,38 @@
+SYNOPSIS
+
+     use HTTP::Tiny::Patch::LogAny (
+         -log_request          => 1, # default 1
+         -log_response         => 1, # default 1
+         -log_response_content => 1, # default 0
+     );
+
+DESCRIPTION
+
+    This module patches HTTP::Tiny to log various stuffs with Log::Any.
+    Currently this is what gets logged:
+
+      * HTTP request
+
+      Currently *NOT* the raw/on-the-wire request.
+
+      * HTTP response
+
+      Currently *NOT* the raw/on-the-wire response.
+
+CONFIGURATION
+
+ -log_request => BOOL
+
+ -log_response => BOOL
+
+    Content will not be logged though, enable -log_response_content for
+    that.
+
+ -log_response_content => BOOL
+
+FAQ
+
+SEE ALSO
+
+    Log::Any::For::LWP
+

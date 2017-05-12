@@ -1,0 +1,94 @@
+NAME
+    Hash::DefaultValue - create a hash where the default value ain't undef
+
+SYNOPSIS
+      use 5.010;
+      use Hash::DefaultValue;
+  
+      tie my %hash, 'Hash::DefaultValue', 42;
+      say $hash{the_answer};  # says 42
+
+DESCRIPTION
+    Normally, if you try fetching a value from a hash where the key does not
+    exist, you get undef.
+
+      my %hash;
+      if (defined $hash{foobar}) {
+        say "this will not happen!";
+      }
+
+    Hash::DefaultValue allows you to choose another value instead of undef. It
+    tried to avoid changing any other part of the hash's behaviour. For
+    example, it doesn't automatically create any hash keys that Perl wouldn't
+    normally autovivify.
+
+      tie my %hash, 'Hash::DefaultValue', 42;
+      say $hash{the_answer};                    # says 42
+      my $exists = exists $hash{the_answer};    # false
+      say keys %hash;                           # says nothing
+
+    And of course you can still store explicit values in the hash, as you'd
+    expect:
+
+      tie my %hash, 'Hash::DefaultValue', 42;
+      $hash{monkey} = 'Bobo';
+      say $hash{the_answer};     # says 42
+      say $hash{monkey};         # says "Bobo"
+
+    Delete operations on the hash are vaguely interesting:
+
+      tie my %hash, 'Hash::DefaultValue', 42;
+      $hash{monkey} = 'Bobo';
+      my $the_answer = delete $hash{the_answer};  # undef
+      my $monkey     = delete $hash{monkey};      # "Bobo"
+
+  Allowed Default Values
+    Any non-reference scalar can be used as a default value.
+
+    Coderefs can be used too, in which case when a default value is being
+    fetched the coderef will be evaluated (in scalar context) and the return
+    value used as the default. The coderef will have a reference to the tied
+    hash, and the key being fetched passed as arguments. Additionally, the key
+    will be available in $_ which often makes for nicer looking code.
+
+      tie my %hash, 'Hash::DefaultValue', sub { $_ + 10 };
+      say $hash{32};     # says 42
+      say $hash{monkey}; # says 10
+
+    Other references are disallowed, which provides a handy extensibility
+    point in the future. If you want to use some other reference, then wrap it
+    in a coderef.
+
+      tie my %hash, 'Hash::DefaultValue', sub { \@foo };
+
+  Alias
+    The aliased module allows you to define aliases for class names, and works
+    great for tie implementations.
+
+      use aliased 'Hash::DefaultValue' => 'HDV';
+      tie my %hash, HDV, 42;
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Hash-DefaultValue>.
+
+SEE ALSO
+    Hash::Missing is a subclass of this module.
+
+    Hash::WithDefaults allows you to default particular keys by providing a
+    template hashref.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

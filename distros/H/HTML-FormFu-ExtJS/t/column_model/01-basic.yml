@@ -1,0 +1,20 @@
+---
+    default_model: HashRef
+    elements:
+        - type: Text
+          name: name
+        - type: Date
+          name: created
+          label: Created
+          default_natural: today
+          attrs:
+              dateFormat: d.m.Y
+        - type: Radiogroup
+          label: Sex
+          name: sex
+          options:
+              - [0, 'male']
+              - [1, 'female']
+        - type: Text
+          label: CDs
+          name: cds

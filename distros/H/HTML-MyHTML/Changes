@@ -1,0 +1,47 @@
+1.02  Wed Jul 20 2016 09:25:45 GMT+0300
+	Update MyHTML source. up to 1.0.2 - Release version
+	Added method for set tree parse flags myhtml_tree_parse_flags_set
+	Added methods for Node get_nodes_by_attribute_key, get_nodes_by_attribute_value_whitespace_separated, get_nodes_by_attribute_value_begin, get_nodes_by_attribute_value_end, get_nodes_by_attribute_value_contain, get_nodes_by_attribute_value_hyphen_separated, get_nodes_by_tag_id 
+	Added callback methods for Tree: callback_before_token_done_set, callback_after_token_done_set, callback_node_insert_set, callback_node_remove_set
+	Added example for callback: see examples/callback.pl
+	Added Token Node methods
+	Added method for set Tree parse flags: parse_flags_set; MyHTML_TREE_PARSE_FLAGS_WITHOUT_BUILD_TREE, MyHTML_TREE_PARSE_FLAGS_WITHOUT_PROCESS_TOKEN, MyHTML_TREE_PARSE_FLAGS_SKIP_WHITESPACE_TOKEN, MyHTML_TREE_PARSE_FLAGS_WITHOUT_DOCTYPE_IN_TREE
+	Added namespace functions:  namespace_name_by_id, namespace_id_by_name
+	Added Incoming Buffer methods
+
+0.35	Mon Apr 04 2016 22:21:03 GMT+0300
+	Fixes for build in NetBSD
+
+0.33	Tue Mar 29 2016 13:02:03 GMT+0300
+	Removed deprecated structures
+	Fixes for build freebsd and linux
+
+0.32	Mon Mar 28 2016 23:41:03 GMT+0300
+	Fisex for OS Windows. Speed UP for OS Windows
+
+0.31	Mon Mar 28 2016 16:15:03 GMT+0300
+	Build for Windows
+	Now memory is used more wisely.
+	Now for threads can register any number of Trees.
+	Fixed all leaks when creating a large number of Trees.
+	Fixed cmake file. Now build normally in Linux.
+	Fixed many problem with string preprocessing.
+	Now, is not afraid of binary files and other trash.
+	Any fixes to improve stability.
+
+0.27	Wed Mar 23 2016 11:37:03 GMT+0300
+	  Added a forgotten file due to which nothing has worked
+	  Added example clear_text.pl
+	  Added methods for tree: html, head, body -- get nodes
+
+0.26	Tue Mar 22 2016 17:43:03 GMT+0300
+	  Fixes for compile program. Add MyHTML 0.5.2
+
+0.25	Tue Mar 01 2016 09:43:03 GMT+0300
+	  And again, fixes for compile program
+
+0.24	Mon Feb 29 2016 16:16:03 GMT+0300
+	  Fixed compile problem
+
+0.23	Sun Feb 28 2016 19:26:03 GMT+0300
+	  First release

@@ -1,0 +1,101 @@
+Changelog for HTTP-Thin-UserAgent
+
+0.016 2016-01-20T16:08:54
+ - change the default on_error handler to confess the stringification of
+   the exception (Chris Prather)
+ - bump dep on HTTP::Throwable to 0.025 (Chris Prather)
+ - - Fixed broken link to package HTML::TreeBuilder::XPath. (Mohammad S
+   Anwar)
+
+0.015 2015-12-15T22:16:23
+ - pull our pre-reqs from cpanfile like I _thought_ we were doing (Chris
+   Prather)
+ - fix it to show HTTP::Throwable::Role::Status roles (Chris Prather)
+
+0.014 2015-12-11T23:36:03
+ - set an explict dep on HTTP::Headers 6.07 where `flatten()` appears
+   (Chris Prather)
+
+0.013 2015-12-10T21:46:04
+ - add documentation, remove the alpha warnings (Chris Prather)
+ - add a test and fix the errors it found (Chris Prather)
+ - drop back to just `is_error` (Chris Prather)
+ - add HTTP::Throwable exceptions (Chris Prather)
+ - add a default decoder (Chris Prather)
+ - rework the logic in the json decoder so that it falls out better (Chris
+   Prather)
+
+0.012 2015-06-25T19:40:39
+ - we have deprecated decode() probably should not have it in the README
+   then. (Chris Prather)
+ - make request() required (Chris Prather)
+ - deprecate `->decode()` (Chris Prather)
+ - missed importing confess (Chris Prather)
+ - add MooX::ChainedAttributes to allow better chaining (Chris Prather)
+ - kill off Throwable::Factory (Chris Prather)
+ - [@Filter] doesn't pass on the config arguments to [GatherDir]! :o  Let's
+   make this actually work. (Karen Etheridge)
+
+0.011 2015-06-03T22:19:53
+ - move the weaken out of the callbacks (Chris Prather)
+
+0.010 2015-06-03T00:41:47
+ - fix premature removal of Makefile.PL, and simply avoid gathering
+   unwanted files rather than pruning them later (Karen Etheridge)
+ - move the weakening into the callbacks (Chris Prather)
+ - Weaken $self to eliminate circular refs (Marc Mims)
+
+0.009 2014-07-02T16:38:30
+ - prevent the inclusion of local/ in the packaged dist; include META.json
+   v2 data (Karen Etheridge)
+
+0.008 2014-07-02T01:19:32
+ - ignore changes too (Chris Prather)
+ - ignore carton stuff (Chris Prather)
+ - hide HTTP::Thin::UserAgent::Client from dzil and cpan (Chris Prather)
+ - fix the Kevin Bacon test (Chris Prather)
+ - add TRACE=1 feature to assist in debugging HTTP request / response
+   cycles (Chris Prather)
+
+0.007 2013-08-16T05:13:33
+ - add Web::Scraper to the cpanfile (Chris Prather)
+ - use decoded_content rather than the raw content (Chris Prather)
+
+0.006 2013-07-27T00:23:08
+ - decode utf8 by default (Chris Prather)
+
+0.005 2013-07-27T00:04:40
+ - clean the POD up a little (Chris Prather)
+ - add find() and tree() methods for when we want to avoid a full scraper
+   (Chris Prather)
+ - make it work more like as_json() (Chris Prather)
+ - update the documentation (Chris Prather)
+ - add Web::Scraper to the mix (Chris Prather)
+ - add a cpanfile so we can install deps without pulling in all of dzil
+   (Chris Prather)
+
+0.004 2013-05-23T21:30:26
+ - add back decoded_content this time as an alias (Chris Prather)
+ - update README (Chris Prather)
+ - bring in changes from usage at Followerwonk (Chris Prather)
+ - add on_error handling and structured exceptions (Chris Prather)
+ - s/decode/decoded_content/ to match HTTP::Message (Chris Prather)
+
+0.003 2013-02-18T23:43:47
+ - Fix it so that the content-type is set also with add_json (Chris
+   Prather)
+
+0.002 2013-02-18T23:07:26
+ - Add a warning about API breakage (Chris Prather)
+ - split the API out a little (Chris Prather)
+
+0.001 2013-02-18T22:12:05
+ - prepare a bit more for a release (Chris Prather)
+ - remove extra POD that Pod::Weaver will generate (Chris Prather)
+ - add some basic docs (Chris Prather)
+ - fix synopsis to match current code style (Chris Prather)
+ - add Pod::Weaver plugin (Chris Prather)
+ - ignore .swp files too (Chris Prather)
+ - add a better example to the README (Chris Prather)
+ - initial code (Chris Prather)
+ - initial commit (Chris Prather)

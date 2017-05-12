@@ -1,0 +1,15 @@
+Failed  Succeeded  Test Name
+   0          3    *** no name ***
+
+
+Test Name: N/A
+URL: http://http.web.test/show-request?a=b&c=d
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  REQUIRED TEXT
+    Query: <a=b&c=d>                                             SUCCEED
+    Method: <GET>                                                SUCCEED
+
+
+Total web tests failed: 0  succeeded: 3

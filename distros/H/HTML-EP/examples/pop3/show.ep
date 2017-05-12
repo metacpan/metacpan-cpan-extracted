@@ -1,0 +1,70 @@
+<ep-if eval="$cgi->reply$">
+  <ep-include file="reply.ep">
+  <ep-exit>
+<ep-elseif eval="$cgi->delete$">
+  <ep-include file="delete.ep">
+  <ep-exit>
+</ep-if>
+<ep-package name="HTML::EP::Examples::POP3Client">
+<ep-examples-pop3client-show>
+<ep-language language="de">
+  <ep-set var="DeleteButton" val="Löschen">
+  <ep-set var="ReplyButton" val="Beantworten">
+  <ep-set var="BackButton" val="Zurück">
+  <ep-set var="ForwardButton" val="Weiter">
+  <ep-set var="NormalHeaders" val="Normale Header">
+  <ep-set var="AllHeaders" val="Alle Header">
+</ep-language>
+<ep-language language="en">
+  <ep-set var="DeleteButton" val="Delete">
+  <ep-set var="ReplyButton" val="Reply">
+  <ep-set var="BackButton" val="Previous">
+  <ep-set var="ForwardButton" val="Next">
+  <ep-set var="NormalHeaders" val="Normal headers">
+  <ep-set var="AllHeaders" val="All Headers">
+</ep-language>
+<html><head><title><ep-language de="POP3-Mail" en="POP3 Mail">
+</title></head>
+<body bgcolor="#ffffff">
+<h1><ep-language de="POP3-Mail" en="POP3 Mail"></h1>
+<table border=1>
+  <tr>
+    <td align=center>
+      $num$ / $count$<br>
+      <form action=show.ep method=get>
+        <input type=hidden name="pop3server" value="$pop3server$">
+	<input type=hidden name="pop3user" value="$pop3user$">
+	<input type=hidden name="pop3password" value="$pop3password$">
+	<input type=hidden name="id" value="$id$">
+	<input type=hidden name="i" value="$i$">
+<ep-if cnd="$num$>1">
+        <input type=submit name="back" value="$BackButton$"><br>
+</ep-if>
+        <input type=submit name=reply value="$ReplyButton$"><br>
+        <input type=submit name=delete value="$DeleteButton$"><br>
+<ep-if eval="$cgi->all$">
+        <input type=submit value="$NormalHeaders$">
+<ep-else>
+        <input type=submit name=all value="$AllHeaders$">
+</ep-if>
+<ep-if cnd="$num$<$count$">
+        <br><input type=submit name="next" value="$ForwardButton$"><br>
+</ep-if>
+      </form>
+    </td>
+<ep-if eval="$cgi->all$">
+    <td><pre>$headers$</pre>
+<ep-else>
+    <td align=left>
+      From: $from$<br>
+      Subject: $subject$<br>
+      Date: $date$
+    </td> 
+</ep-if>
+  </tr>
+  <tr>
+    <td colspan=2>$&BR->body$</td>
+  </tr>
+</table>
+</body>
+</html>

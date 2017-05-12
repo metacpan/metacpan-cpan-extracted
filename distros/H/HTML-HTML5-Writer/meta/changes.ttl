@@ -1,0 +1,137 @@
+@prefix :        <http://usefulinc.com/ns/doap#> .
+@prefix dcs:     <http://ontologi.es/doap-changeset#> .
+@prefix dc:      <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix my:      <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Writer/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix toby:    <http://tobyinkster.co.uk/#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+my:project :release my:v_0-01 .
+my:v_0-01
+	a               :Version ;
+	dc:issued       "2010-05-02"^^xsd:date ;
+	:revision       "0.01"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Writer-0.01.tar.gz> ;
+	rdfs:label      "First release"@en .
+
+my:project :release my:v_0-02 .
+my:v_0-02
+	a               :Version ;
+	dc:issued       "2010-05-04"^^xsd:date ;
+	:revision       "0.02"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Writer-0.02.tar.gz> ;
+	rdfs:label      "Star Wars Day!"@en ;
+	dcs:changeset [
+		dcs:versus my:v_0-01 ;
+		dcs:item [ rdfs:label "Makefile.PL should specify that we need common::sense."@en ; a dcs:Bugfix ] ;
+		dcs:item [ rdfs:label "Improve documentation."@en  ]
+	] .
+
+my:project :release my:v_0-03 .
+my:v_0-03
+	a               :Version ;
+	dc:issued       "2010-05-19"^^xsd:date ;
+	:revision       "0.03"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Writer-0.03.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-02 ;
+		dcs:item [ rdfs:label "Handle <script> and <style> elements better."@en ; a dcs:Bugfix ] ;
+		dcs:item [ rdfs:label "Don't usually need to entity-encode tab characters!"@en ; a dcs:Bugfix ]
+	] .
+
+my:project :release my:v_0-04 .
+my:v_0-04
+	a               :Version ;
+	dc:issued       "2010-05-21"^^xsd:date ;
+	:revision       "0.04"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Writer-0.04.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-03 ;
+		dcs:item [ rdfs:label "Handle <script> and <style> elements even better."@en ; a dcs:Bugfix ] ;
+		dcs:item [ rdfs:label "Use XML predefined entities for &, <, etc."@en ; a dcs:Bugfix ] ;
+		dcs:item [ rdfs:label "Include the 'x' in hexadecimal numeric character references."@en ; a dcs:Bugfix ]
+	] .
+
+my:project :release my:v_0-100 .
+my:v_0-100
+	a               :Version ;
+	dc:issued       "2010-06-23"^^xsd:date ;
+	:revision       "0.100"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Writer-0.100.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-04 ;
+		dcs:item [ rdfs:label "Document 'charset' option properly."@en ; a dcs:Bugfix ]
+	] .
+
+my:project :release my:v_0-101 .
+my:v_0-101
+	a               :Version ;
+	dc:issued       "2011-01-20"^^xsd:date ;
+	:revision       "0.101"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Writer-0.101.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-100 ;
+		dcs:item [ rdfs:label "More DOCTYPE_* constants are now available."@en ; a dcs:Addition ] ;
+		dcs:item [ rdfs:label "Add support for <track> element."@en ; a dcs:Update ]
+	] .
+
+my:project :release my:v_0-102 .
+my:v_0-102
+	a               :Version ;
+	dc:issued       "2011-03-29"^^xsd:date ;
+	:revision       "0.102"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Writer-0.102.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-101 ;
+		dcs:item [ rdfs:label "Prevent elements from being output with duplicate attributes."@en ; a dcs:Bugfix ; rdfs:comment "Caused by interaction with HTML5 parser."@en ]
+	] .
+
+my:project :release my:v_0-103 .
+my:v_0-103
+	a               :Version ;
+	dc:issued       "2011-10-07"^^xsd:date ;
+	:revision       "0.103"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Writer-0.103.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-102 ;
+		dcs:item [ rdfs:label "use HTML::HTML5::Entities"@en ] ;
+		dcs:item [ rdfs:label "Remove dependency on HTML::HTML5::Parser"@en ]
+	] .
+
+my:project :release my:v_0-104 .
+my:v_0-104
+	a               :Version ;
+	dc:issued       "2011-10-10"^^xsd:date ;
+	:revision       "0.104"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Writer-0.104.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-103 ;
+		dcs:item [ rdfs:label "Handle processing instructions, including special support for <?decode ...?>."@en ] ;
+		dcs:item [ rdfs:label "use Module::Package::RDF"@en ; a dcs:Packaging ] ;
+		dcs:item [ rdfs:label "use 5.010"@en ; a dcs:Update ]
+	] .
+
+my:project :release my:v_0-200 .
+my:v_0-200
+	a               :Version ;
+	dc:issued       "2012-06-12"^^xsd:date ;
+	:revision       "0.200"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Writer-0.200.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-104 ;
+		dcs:item [ rdfs:label "Drop dependencies on parent.pm and common::sense."@en ] ;
+		dcs:item [ rdfs:label "Change default doctype for XHTML from DOCTYPE_HTML5 to DOCTYPE_LEGACY."@en ] ;
+		dcs:item [ rdfs:label "Default to polyglot output for XHTML."@en ]
+	] .
+
+my:project :release my:v_0-201 .
+my:v_0-201
+	a               :Version ;
+	dc:issued       "2012-06-12"^^xsd:date ;
+	:revision       "0.201"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Writer-0.201.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-200 ;
+		dcs:item [ rdfs:label "Polyglot output defaults."@en ; a dcs:Bugfix , dcs:Documentation ]
+	] .

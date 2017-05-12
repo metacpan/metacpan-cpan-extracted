@@ -1,0 +1,673 @@
+=pod
+
+=head1 Content
+
+=over 4
+
+=item    What is Embperl?
+
+=item    Embed Perl Code in HTML Documents
+
+=item    Meta-Commands
+
+=item    Dynamic Tables
+
+=item    Form Processing
+
+=item    Maintaining persistent (session) data
+
+=item    Breaking up your code in components
+
+=item    Debugging
+
+=item    Database Access
+
+=item    Security
+
+=item    Escaping/Unescaping
+
+=back
+
+=head1 What is Embperl?
+
+Embperl has started as a Perl module for simply embedding Perl 
+into HTML and has grown to
+a full featured system to build dynamic content (not only) under 
+mod_perl. The version 1.x focus on HTML documents, also it could be
+used for any sort of ascii files, and brings a lot of features
+especialy usefull in a web-environment. This features includes
+handling of form data and dynamic HTML tables/lists, session management
+and context sensitv escaping and unescaping. More over you can
+break up your documents in small reusable components/objects and build
+a object-oriented website out of such objects, by using inheritence and
+specificly overriding parts of the page. Also Embperl can cope with pages
+that are screw up by high-level HTML editors, so your designer can still
+use there favorite tool.
+
+Embperl 2.0, which is a complete rewrite of the Embperl core, is not
+even much faster then 1.x, but adds new possibilities. You can extent
+or define your own syntax, thus giving the chance to trigger actions
+on certain tags or inventing your own tags (creating a taglib). 
+It is much more modularized, so specific steps could be replaced by
+custom processor and more then one processor can act on a document
+before it goes to the browser (just like a Unix pipe). To enhances
+performance 2.0 indrocuces caching of the output or intermediate steps.
+
+Due to this modularization, it is now possible, to replace Embperl parser
+by an XML parser and to do XML processing, for example by pluging in
+an XSLT processer in the processing pipeline.
+Embperl 2.0 will soon come with modules to use the Apache XERCES C++ 
+XML Parser and XALAN C++ XSLT processor.
+
+All versions of Embperl can be used offline (as a normal CGI script or as a module
+from other Perl code), but its real power comes when running under
+mod_perl and Apache. It's directly integrated with Apache and
+mod_perl to achieve the best performance by directly using Apache
+functions and precompiling your code to avoid a recompile on every
+request.
+
+
+
+=head2 How does it compare to other templating solutions ?
+
+Embperl is not the only processor for embedded Perl code.
+I guess every second webprogrammer builds his own templating
+engine. Most of them are very similar and easy, but do a
+good job in a certain environment. Often after a while these
+programmer discover, they need more features and that other people
+in the same situation has already build a soltuion for their problems.
+At the moment there are five widely used Perl modules for generating
+dynamic web content (HTML::Embperl, Apache::ASP, HTML::Mason,
+Template::Toolkit and AxKit). All of these have their special strength.
+So why to use Embperl? We believe that Embperl, especialy the upcomming
+version 2.0, covers all of the aspects of these modules and integrates them
+in one module with addtionaly benefits that are unique to Embperl.
+Addtionaly Embperl is the fastes of these solutions, because it's engine
+is totaly written in C and is optimized for delivering dynamic content
+online.
+
+A another competitor for Embperl is PHP.
+PHP is developing a strong user base, because it is rumored to be easy
+to learn, and was designed specifically for HTML. Also PHP is probably one
+of the strongest open source alternatives to using Perl in your
+HTML, it's target is very webcentric and you may discover at a certain
+point that is has it's limitations when you try to realize great projects.
+Also it's not true, like some anecdotal stories on the Web might want to make
+you belive, that PHP is faster then Perl. Perl,
+and therfore Embperl also, scales and performs very well for high end solution.
+
+
+=head2 Focus of this document
+
+This tries to be an introduction to the basics of Embperl. 
+L<"perldoc IntroEmbperlObject"|"IntroEmbperlObject.pod"> gives you an
+tutorial about how to build an object-oriented website.
+
+
+=head1 How to Embed Perl Code in HTML Documents
+
+Perl code can be embedded in three ways:
+
+=head2 1.)    [- ... -]    Execute code
+
+    [- $a = 5 -]  [- $b = 6 if ($a == 5) -]
+
+The code between the [- and the -] is executed. No output will be
+generated in the HTML. This is mainly for assignments, function calls,
+database queries, etc.
+
+=head2 2.)    [+ ... +]    Output the result
+
+    [+ $a +]  [+ $array[$b] +] [+ "A is $a" +]
+
+The code between the [+ and the +] is executed and the return
+value (the value of the last expression evaluated) is output (sent
+to the browser in the HTML stream).
+
+=head2 3.)    [! ... !]    Execute code once
+
+    [! sub foo { my ($a, $b) = @_ ; $a * $b + 7 } !]
+
+Same as [- ... -], but the code is only executed for the first
+request.  This is mainly for function definitions and one-time
+initialization.
+
+=head2 Meta-Commands
+
+Embperl support some meta commands to control the "program flow"
+within the Embperl document. This can be compared to preprocessor
+commands in C. The meta commands take the following form:
+
+    [$ <cmd> <arg> $]
+
+=over 8
+
+=item if, elsif, else, endif
+
+The if command is just the same as in Perl.  It is used to
+conditionally output/process parts of the document.
+Example:
+
+ [$ if $ENV{REQUEST_METHOD} eq 'GET' $]
+    This is a GET request
+ [$ elsif $ENV{REQUEST_METHOD} eq 'POST' $]
+    This is a POST request
+ [$ else $]
+    This is not GET and not POST
+ [$ endif $]
+
+This will output one of the three lines depending on the setting
+of $ENV{REQUEST_METHOD}.
+
+
+=item while, endwhile
+
+The while command can be used to create a loop in the HTML
+document.  For example:
+
+ [$ while ($k, $v) = each (%ENV) $]
+    [+ $k +] = [+ $v +] <BR>
+ [$ endwhile $]
+
+The above example will display all environment variables, each
+terminated with a line break.
+
+=item do, until
+
+The do until also create a loop, but with a condition at the end.
+For example:
+
+ [- @arr = (3, 5, 7); $i = 0 -]
+ [$ do $]
+    [+ $arr[ $i++ ] +]
+ [$ until $i > $#arr $]
+
+=item foreach, endforeach
+
+Create a loop iterating over every element of an array/list.
+Example:
+
+ [$ foreach $v (1..10) $]
+    [+ $v +]
+ [$ endforeach $]
+
+=item var <var1> <var2> ...
+
+By default, you do not need to declare any variables you use within an
+Embperl page. Embperl takes care of deleting them at the end of each
+request. Sometimes, though, you want to declare them explicitly.  You
+can do this by using var:
+
+ [$ var $a @b %c $]
+
+Has the same effect as the Perl code:
+
+ use strict ;use vars qw {$a @b %c} ;
+
+=item hidden
+
+hidden is used for creating hidden form fields and is described in
+the form field section below.
+
+=back
+
+=head1 Dynamic Tables
+
+A very powerful feature of Embperl is the processing of dynamic
+tables.  This feature was designed mainly to display Perl arrays (one
+or two dimensional, regular and irregular), but can also be used in
+other ways.
+
+=head2 Display a Perl Array
+
+ [- @a = ( 'A', 'B', 'C') ; -]
+ <TABLE BORDER=1>
+   <TR>
+        <TD> [+ $a[$row] +] </TD>
+   </TR>
+ </TABLE>
+
+The above example simply displays a table with three rows
+containing A, B and C.
+
+The trick is done by using the magical variable $row which contains
+the row count and is incremented for every row. The table ends if the
+expression which contains $row returns <undef>.  The same can be done
+with $col for columns and $cnt can be used if you need a table which
+wraps after a certain number of elements.
+
+This works with table/select/menu/ol/dl/dir
+
+=head2 Simple DBI Example
+
+Here is a simple DBI example that displays the result of a query
+as a two dimension table, with field names as headings in the
+first row:
+
+ [-
+ # connect to database
+  $dbh = DBI->connect($DSN) ;
+
+ # prepare the sql select
+ $sth = $dbh -> prepare ("SELECT * from $table") ;
+
+ # excute the query
+ $sth -> execute ;
+
+ # get the fieldnames for the heading in $head
+ $head = $sth -> {NAME} ;
+
+ #continues on the next page...
+ # get the result in $dat $dat = $sth -> fetchall_arrayref ;
+ -]
+
+ <table>
+    <tr><th>[+ $head->[$col] +]</th></tr>
+    <tr><td>[+ $dat -> [$row][$col] +]</td></tr>
+ </table>
+
+
+=head1 Form fields
+
+=head2 Posted form data available in %fdat/@Z<>ffld
+
+The hash %fdat contains all values of  form fields. The array
+@Z<>ffld contains the names in the order in which they were
+submitted.
+
+=head2 Input/Textarea/Select tags take values from %fdat
+
+If you do not specify a default value for an input tag and a value for
+that input tag is available in %fdat, Embperl will automatically
+insert this value and send it to the browser. This is similar to the
+behavior of CGI.pm.  This means that if you post a form to itself, the
+browser will display the values you just entered.
+
+=head2 [$ hidden $]
+
+[$ hidden $] creates hidden form fields for all fields not in another
+input field. This can be used to transport data through confirmation
+forms.  (For example, a wizard.)
+
+=head2 A simple Text input / Confirmation form
+
+The following example shows many of the possibilities of Embperl.
+It's a simple form where you can enter your name, your email address
+and a message. If you hit the send button, you see the data you just
+entered and can confirm the information by hitting the "send via mail"
+button, or you can go back to the input form to change the data. If
+you confirm your input, the data will be sent to a predefined e-mail
+address. The example also shows how you can implement error
+checking--if you miss your name or your e- mail address, you will get
+a corresponding error message and the input form is shown again.
+
+The first part is the error checking; the second part the confirmation
+form; the third part sends the mail if the input was ok and is
+confirmed; the last part is the input form itself.
+
+Depending on the values of $fdat{check}, $fdat{send} and if
+$fdat{name} and $fdat{email} contains data, the document decides which
+part to show.
+
+ [-  $MailTo = 'richter\@ecos.de' ;
+
+  @errors = () ;
+  if (defined($fdat{check}) || defined($fdat{send}))
+    {
+    push @errors, "**Please enter your name" if (!$fdat{name}) ;
+    push @errors, "**Please enter your e-mail address" if (!$fdat{email}) ;
+    }
+ -]
+
+ [$if (defined($fdat{check}) and $#errors == -1)$]
+ [-
+  delete $fdat{input} ;
+  delete $fdat{check} ;
+  delete $fdat{send}
+ -]
+
+ <hr><h3> You have entered the following data:</h3>
+ <table>
+  <tr><td><b>Name</b></td><td>[+$fdat{name}+]</td></tr>
+  <tr><td><b>E-Mail</b></td><td>[+$fdat{email}+]</td></tr>
+  <tr><td><b>Message</b></td><td>[+$fdat{msg}+]</td></tr>
+  <tr><td align="center" colspan="2">
+     <form action="input.htm" method="GET">
+       <input type="submit" name="send"
+              value="Send to [+ $MailTo +]">
+       <input type="submit" name="input" value="Change your data">
+       [$hidden$]
+    </form>
+    </td></tr>
+ </table>
+
+ [$elsif defined($fdat{send}) and $#errors == -1$]
+
+ [- MailFormTo ($MailTo,'Formdata','email') -]
+ <hr><h3>Your input has been sent</h3>
+
+ [$else$]
+
+ <hr><h3>Please enter your data</h3>
+
+ <form action="input.htm" method="GET">
+  <table>
+    [$if $#errors != -1 $]
+      <tr><td colspan="2">
+      <table>
+    <tr><td>[+$errors[$row]+]</td></tr>
+      </table>
+      </td></tr>
+    [$endif$]
+    <tr><td><b>Name</b></td> <td><input type="text"
+                                        name="name"></td></tr>
+    <tr><td><b>E-Mail</b></td> <td><input type="text"
+                                          name="email"></td></tr>
+    <tr><td><b>Message</b></td> <td><input type="text"
+                                           name="msg"></td></tr>
+    <tr><td colspan=2><input type="submit"
+                             name="check" value="Send"></td></tr>  </table>
+ </form>
+
+ [$endif$]
+
+=head1 Maintaining persistent (session) data
+
+ (Embperl 1.2 or above)
+
+While hidden fields are useful when working with forms, it's often
+necessary to B<store persistent data> in a more general way. Embperl
+utilizes B<Apache::Session> to do this job. Apache::Session is caple
+of storing persistent data in memory, in a textfile or in a database.
+More storage methods may supported in the future. While you can simply
+call Apache::Session from an Embperl page, Embperl can do it for
+you. All you need to do is to put your data in the hash B<%udat>. The
+next time the same user requests any Embperl page %udat will contain
+the same data. You can simply use this to keep state information for
+the user. Depending on your expire settings, the state can also kept
+between mulitiple sessions. A second hash, B<%mdat>, can be used to
+keep a state for one page, but for multiple users. A simple example
+would be a page hit counter:
+
+  The page is requested [+ $mdat{counter}++ +] times
+  since [+ $mdat{date} ||= localtime +]
+
+The above example counts the page hits and shows the date when the
+page is first requested.  You don't need to worry about performance -
+as long as you don't touch %udat or %mdat, no action is taken.
+
+
+=head1 Breaking your code up into components
+
+ (Embperl 1.2 or above)
+
+=head2 Subroutines
+
+It is better to write subroutines than to keep placing repetitive
+pieces of code in your program many times. You can do this with
+Embperl too.  As an example, if you have text input fields with
+labels, this may work better for you:
+
+ [$ sub textinput $]
+    [- ($label, $name) = @_ -]
+    [+ $label +]<input type=text name=[+ $name +]>
+ [$ endsub $]
+
+
+ <form>
+    [- textinput ('Last Name', 'lname')  -]<p>
+    [- textinput ('First Name', 'fname') -]<p>
+ </form>
+
+The B<sub> metacommand starts the subroutine and the parameters are
+passed in the array C<@_>. You can do anything in the subroutine that
+you would normally be able to do inside normal Embperl pages. Embperl
+lets you call this subroutine just like any other Perl subroutine:
+just write its name and, if necessary, the parameter list.
+
+=head2 Execute
+
+If you are working on an entire site rather than just a few pages, you
+are well aware that there are always elements which occur in every
+page or across many pages. Instead of copying the source code to every
+page, you can include other Embperl pages in your page - so you have
+to write the source only once.  Such an included page could be a
+header, a footer, a navigation bar, and so on.  Embperl is not only
+capable of including such partial pages, you can also pass arguments -
+for example, to tell the navigation bar which of its own element to
+highlight:
+
+ Example for a simple navigation bar
+
+ [- @buttons = ('Index', 'Infos', 'Search') -]
+ <table><tr><td>
+     [$if $buttons[$col] eq $param[0]$] <bold> [$endif$]
+     <a href="[+ $buttons[$col] +].html"> [+ $buttons[$col] +] </a>
+     [$if $buttons[$col] eq $param[0]$] </bold> [$endif$]
+ </td></tr></table>
+ <hr>
+
+Now if you are on the "Info" page you can include the navigation bar
+this way:
+
+ [- Execute ('navbar.html', 'Infos') -]
+
+This will include the navigation bar, which is stored in the file
+navbar.html, and pass as its first parameter the string 'Infos'. The
+navigation bar module itself uses a dynamic table to display one
+column - which contains the text and a link - for every item in the
+array @buttons. The text which matches that which is passed as the
+first parameter is displayed in bold. There is also a long form of the
+Execute call, which allows you to control all of the details of how
+the called page is executed.
+
+=head2 Creating Component Libraries
+
+Instead of creating a single file for every piece of HTML-code you
+wish to include, you can pack them together in just one library. To do
+this, split up every piece of code you want to include separately in
+one Embperl subroutine (sub-metacommand). Now, you can use the import
+parameter of the Execute function to import all of the subrountines
+defined in one file, into the namespace of the current
+page. Afterwards, you are able to call them just like any other Perl
+subroutine.
+
+Moreover, if you wish to have some systemwide Embperl subroutines, you
+can put all the Embperl code in a normal Perl module (a foo.pm file),
+install it into your Perl system (or a private library path), and use
+it just like any other Perl module - just by saying
+
+  use mymodule;
+
+
+=head1 Debugging
+
+=head2 Embperl log file
+
+The log file is the main source for debugging. It shows you what
+Embperl does while it processes your page. Depending on the debug flag
+settings, Embperl logs the following things:
+
+=over 4
+
+=item    Source
+
+=item    Environment
+
+=item    Form data
+
+=item    Evals (Source + Result)
+
+=item    Table processing
+
+=item    Input tag processing
+
+=item    HTTP headers
+
+=back
+
+=head2 Embperl log file can be viewed via the browser
+
+For debugging, you can tell Embperl to display a link at the top of
+each page to your log file. If you follow the link, Embperl will show
+the portion of the log file corresponding to that request. The log
+file lines are displayed in different colors to give a better
+overview.
+
+=head2 Embperl error page contains links to the log file
+
+If you have enabled links to the log file, every error displayed in an
+error page is a link to the corresponding position in the logfile, so
+you can easily find the place where something is going wrong.
+
+=head1 Database access
+
+=head2 Plain DBI
+
+This is another example of using plain DBI within Embperl.  In
+opposition to the L<example|"Simple DBI Example"> I gave in the
+chapter about dynamic tables, this example works with explicit loops.
+
+ [-
+ # connect to database
+ $dbh = DBI->connect($DSN) ;
+ # prepare the sql select
+ $sth = $dbh -> prepare ("SELECT * from $table") ;
+
+ # excute the query
+ $sth -> execute ;
+
+ # get the fieldnames for the heading in $head
+ $head = $sth -> {NAME} ;
+ -]
+
+ <table>
+    <tr>
+    [$ foreach $h @$head $]
+        <th>[+ $h +]</th>
+    [$ endforeach $]
+    </tr>
+    [$ while $dat = $sth -> fetchrow_arrayref $]
+        <tr>
+            [$ foreach $v @$dat $]
+                <td>[+ $v +]</td>
+            [$ endforeach $]   
+        </tr>
+    [$ endwhile $]
+ </table>
+
+=head2 DBIx::Recordset
+
+DBIx::Recordset is a module for easy database access.
+
+=head2 Search Example
+
+ [-*set = DBIx::Recordset -> Search ({%fdat,
+				     ('!DataSource'   => $DSN,
+				      '!Table' => $table,
+				      '$max'   => 5,)}) ; -]
+ <table>
+  <tr><th>ID</th><th>NAME</th></tr>
+  <tr>
+    <td>[+ $set[$row]{id} +]</td>
+    <td>[+ $set[$row]{name} +]</td>
+  </tr>
+ </table>
+ [+ $set -> PrevNextForm ('Previous Records',
+			  'Next Records',
+			  \%fdat) +]
+
+=head2 Search sets up a Recordset object
+
+Search will take the values from %fdat and use them to build a SQL
+WHERE expression. This way, what you search for depends on what is
+posted to the document.  For example, if you request the document with
+http://host/mydoc.html?id=5 the above example will display all
+database records where the field 'id' contains the value 5.
+
+=head2 Data can accessed as array or via the current record
+
+The result of the query can be accessed as an array (this does not
+mean that the whole array is actually fetched from the database).
+Alternative, you can directly access the current record just by
+accessing the fields.
+
+    set[5]{id}	 access the field 'id' of the sixth found record
+    set{id}      access the field 'id' of the current record
+
+=head2 Fields can be accessed by name
+
+While normal DBI let you access your data by column numbers,
+DBIx::Recordset uses the field names. This makes your program easier
+to write, more verbose and independent of database changes.
+
+=head2 PrevNextForm generates no/one/two buttons depending if
+there are more records to display
+
+The PrevNextButtons function can be used to generate button for
+showing the previous record or the next records. PrevNextButton
+generates a small form and includes all necessary data as hidden
+fields. To get it to work, it's enough to feed this data to the next
+request to Search.
+
+=head2 As for Search there are methods for Insert/Update/Delete
+
+Example for Insert
+
+If %fdat contains the data for the new record, the following code will
+insert a new record into the database.
+
+ [-*set = DBIx::Recordset -> Insert ({%fdat,
+				      ('!DataSource'   => $DSN,
+				       '!Table' => $table)}) ; -]
+
+
+=head2 Database table can also tied to a hash
+
+DBIx::Recordset can also tie a database table to a hash. You need to
+specify a primary key for the table, which is used as key in the hash.
+
+    $set{5}{name}    access the name with the id=5
+		     (id is primary key)
+
+=head1 Security
+
+When running under mod_perl, all Perl code shares the same
+interpreter.  This means that every application can access data from
+every other application. Embperl maintains a separate namespace for
+every document, which is enough to avoid accidentally overwriting
+other applications data, but there is no real security. You can access
+anything you like if you explicitly specify a package name.
+
+=head2 Safe namespaces
+
+Therefore, Embperl incorporates Safe.pm, which will make it impossible
+to access any packages other than your own. This can be used, for
+example, to calculate something in a Perl module and then pass the
+results to an Embperl document. If the Embperl document runs in a safe
+namespace, it can access the data it has received from the browser,
+but can't access outside itself.  Therefore, it's safe to let
+different people create the layouts for Embperl pages.
+
+=head2 Operator restrictions
+
+Safe.pm also permits the administrator to disable every Perl
+opcode. If you use this, you are able to decide which Perl opcodes are
+permitted to be used by the page creators.
+
+=head1 Escaping/Unescaping
+
+=head2 Input: unescaping
+
+(disable via optRawInput)
+
+- convert HTML escapes to characters (e.g. &lt; to <)
+- remove HTML tags from Perl code (e.g. <br> insert by high level
+editor)
+
+=head2 Output: escaping
+
+(disable via escmode)
+convert special characters to HTML (e.g. < to
+&lt;)
+

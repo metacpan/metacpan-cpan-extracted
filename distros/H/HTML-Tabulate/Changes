@@ -1,0 +1,110 @@
+ChangeLog
+---------
+
+[2016-02-19]
+* Bump $VERSION to 0.45.
+* Switch to using HTML::Entities for html-entity escaping.
+
+[2013-04-24]
+* Bump $VERSION to 0.44.
+* Bah, add DBIx::Class get_column support back to Tabulate cell_value (we need both).
+* Improve t/10_iterator.t unit tests.
+
+[2013-04-24]
+* Bump $VERSION to 0.43.
+* Update Tabulate cell_value to use methods for DBIx::Class, not get_column.
+* Improve t/10_iterator.t unit tests.
+
+[2013-04-23]
+* Bump $VERSION to 0.42.
+* Make Tabulate cell value derivation slightly cleaner (no fall-through).
+
+[2012-03-07]
+* Bump $VERSION to 0.41.
+* Allow [Ff]irst methods to be optional on [Nn]ext iterators.
+
+[2012-01-16]
+* Bump $VERSION to 0.40.
+* Tweak stripe class attributes to merge with tr, not overwrite.
+
+[2011-10-16]
+* Bump $VERSION to 0.39.
+* Add initial tfoot support.
+* Clean up cell_merge_defaults, now called only once per field.
+* Modify Tabulate to call format even on empty data fields.
+
+[2011-10-10]
+* Bump $VERSION to 0.38.
+* Add initial data_prepend support.
+* Add support for a 'derived' fields arrayref and field_attr flag.
+
+[2011-08-26]
+* Bump $VERSION to 0.37.
+* Add first-pass labelgroups support.
+* Refactor row_down for clarity.
+* Refactor cell_wantarray interface to named parameter version.
+* Add initial support for colgroups and cols.
+
+[2011-08-24]
+* Redo Tabulate::cell_value to try 'safe' field methods as fallback.
+* Update Module::Install to 1.0.
+* Tweak cell_value to check $row->get_column() before methods.
+
+[2010-03-05]
+* Bump $VERSION to 0.36.
+* Tweak procedural render to handle blessed datasets.
+
+[2010-02-01]
+* Bump version to 0.35.
+* Add DBIx::Class to 10_iterators.t tests, and update with env-based dsn/user/pass.
+* Use FindBin for finding test results directories.
+* Updates to Changes, EXCLUDE, MANIFEST, and MANIFEST.SKIP.
+
+[2010-01-26]
+* Bump version to 0.34.
+* Convert Makefile.PL to Module::Install.
+
+[2010-01-20]
+* Bump version to 0.33.
+* Add proper handling of minimised attributes in html and xhtml modes.
+* Document 'xhtml' mode, and add an xhtml unit test.
+* Document 'colspan' support.
+
+[2010-01-19]
+* Tweak colspan cell changes to work as before in wantarray contexts.
+* Add first-pass row_down colspan support, and unit tests.
+
+[2008-12-24]
+* Add fix for off-by-one bug in generic subref iterator code (reported by David Giller); bump to 0.32.
+
+[2008-10-23]
+* Add generic subref iterator support (Harry Danilevsky); bump to 0.31.
+
+[2008-09-06]
+* Add some initial perldocs for 'composite' and 'composite_join' for 0.30 release.
+
+[2008-08-22]
+
+[2008-08-19]
+* Tweak tr_attr to pass the full dataset to tr coderefs, if supplied.
+
+[2008-08-16]
+* Add initial tr sub support for across-style tables.
+* Bump VERSION to 0.30, and tweak MANIFEST.
+
+[2008-07-08]
+* Add first-pass composite field support.
+* Tweak comment in 25_data_append.t.
+
+[2008-05-02]
+* Add extra tr id test to t/05_attr.t.
+* Fix problem with intermixed static and subref tx attributes; bump to 0.29.
+
+[2008-02-12]
+* Update MANIFEST for 0.28.
+* Add data_append support; bump to version 0.28.
+* Make dependencies explicit; minor tweaks and cleanups.
+
+[2007-09-22]
+* Fix typo in SYNOPSIS.
+

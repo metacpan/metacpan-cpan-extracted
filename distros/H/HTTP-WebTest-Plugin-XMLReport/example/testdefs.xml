@@ -1,0 +1,62 @@
+<?xml version="1.0" ?>
+<!-- root element WebTest
+  title: describe the purpose of this test suite
+  -->
+<WebTest title="Content tests">
+<!-- param element
+  contains global parameters for HTTP::WebTest and plugins
+  -->
+  <param>
+    <!-- suppress generation of default report -->
+    <default_report>no</default_report>
+    <!-- use the following plugins (default prefix is HTTP::WebTest::Plugin) -->
+    <!-- output results in xml format -->
+    <plugins>::XMLReport</plugins>
+    <!-- follow named links from previous html page -->
+    <plugins>::Click</plugins>
+    <user_agent>Mozilla/5.0 (HTTP-WebTest)</user_agent>
+    <!-- send to these mail addresses (element may be repeated) -->
+    <mail_addresses>NOC &lt;noc@isp.tld&gt;</mail_addresses>
+    <mail_from>WebTest &lt;webtest@isp.tld&gt;</mail_from>
+    <!-- do not specify the email element for now; this will break the XML report -->
+    <!-- basic auth. credentials, used if requested by http server -->
+    <auth>user</auth>
+    <auth>secretpass</auth>
+  </param>
+
+<!-- test groups specify tests to apply to a html page
+  test_name: a distinctive name for the report
+  url: location of the page to test
+  method: get, post (default get)
+  -->
+  <testgroup test_name="Yahoo Home" url="http://www.yahoo.com/">
+    <comment>Test yahoo homepage</comment>
+    <text_require><![CDATA[</html>]]></text_require>
+    <text_require>Yahoo!</text_require>
+    <text_forbid>Internal Server Error</text_forbid>
+  </testgroup>
+
+  <testgroup test_name="Slashdot - Front page" url="http://slashdot.org/">
+    <comment>Front page of Slashdot site</comment>
+    <!-- no explicit tests (response will always be checked) -->
+    <!-- use result page for next testgroup: follow named link -->
+  </testgroup>
+
+  <testgroup test_name="Slashdot 1st article">
+    <comment>Topmost Slashdot story</comment>
+    <!-- parameter for Click plugin: request url targeted by this link -->
+    <!-- NOTE: this is interpreted as Perl regex, so be careful with special chars -->
+    <click_link><![CDATA[.*Read More\.\.\..*]]></click_link>
+    <!-- contrieved example: check if view modifier form is available -->
+    <text_require>Threshold:</text_require>
+  </testgroup>
+
+  <testgroup test_name="This should fail" url="http://www.yahoo.com/thisshouldnotexist">
+    <comment>Test non-existing document</comment>
+    <text_require><![CDATA[</html>]]></text_require>
+    <text_require>Yahoo!</text_require>
+    <text_require>Sorry, the page you requested was not found</text_require>
+    <text_forbid>Internal Server Error</text_forbid>
+  </testgroup>
+
+</WebTest>

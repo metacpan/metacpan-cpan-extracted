@@ -1,0 +1,16 @@
+#!/bin/sh
+if [ -z "$1" ]; then
+	cat << ENDE
+run one of the application programs without having
+HTML::Tagreader already installed.
+
+USAGE: ./run_without_installing program-name
+
+EXAMPLE: ./run_without_installing llnk somehtmlfile.html
+
+ENDE
+	exit 0
+fi
+dir=`pwd`
+dir="$dir/.."
+perl -I$dir/blib/arch -I$dir/blib/lib -w $*

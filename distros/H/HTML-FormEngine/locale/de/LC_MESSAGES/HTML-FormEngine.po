@@ -1,0 +1,31 @@
+domain "HTML-FormEngine"
+
+msgid  "invalid"
+msgstr "ungültig"
+
+msgid  "value missing"
+msgstr "Wert fehlt"
+
+msgid  "failure"
+msgstr "Fehler"
+
+msgid  "Yes"
+msgstr "Ja"
+
+msgid  "No"
+msgstr "Nein"
+
+msgid "doesn't match"
+msgstr "stimmt nicht überein"
+
+msgid "Are you really sure, that you want to submit the following data?"
+msgstr "Sind Sie wirklich sicher, dass sie die folgenden Daten übertragen wollen?"
+
+msgid "Cancel"
+msgstr "Abbrechen"
+
+msgid "standard incompatible"
+msgstr "standard inkompatibel"
+
+msgid "not unique"
+msgstr "existiert bereits"

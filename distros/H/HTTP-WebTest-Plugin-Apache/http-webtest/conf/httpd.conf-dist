@@ -1,0 +1,31 @@
+# $Id: httpd.conf-dist,v 1.2 2002/12/12 22:49:53 m_ilya Exp $
+#
+# This is the Apache configuration file used with the automated web
+# testing Perl module HTTP::WebTest. DO NOT CHANGE any strings in this
+# file that contain "Please_do_not_modify", as the HTTP::WebTest
+# module substitutes for these strings at runtime.
+#
+# This is the main server configuration file. See URL http://www.apache.org/
+# for instructions.
+#
+LoadModule mime_module /usr/lib/apache/1.3/mod_mime.so
+LoadModule includes_module /usr/lib/apache/1.3/mod_include.so
+
+ServerRoot Please_do_not_modify_SERVER_ROOT
+ServerAdmin Please_do_not_modify_EMAIL_ADDRESS
+DocumentRoot Please_do_not_modify_SERVER_ROOT/htdocs
+ServerName Please_do_not_modify_HOST_NAME
+
+Port Please_do_not_modify_PORT
+Listen Please_do_not_modify_PORT
+
+ErrorLog Please_do_not_modify_SERVER_ROOT/logs/error.log
+LogLevel Please_do_not_modify_LOG_LEVEL
+
+PidFile Please_do_not_modify_SERVER_ROOT/apache.pid
+LockFile Please_do_not_modify_SERVER_ROOT/apache.lock
+
+AccessConfig /dev/null
+ResourceConfig /dev/null
+
+AddHandler server-parsed .shtml

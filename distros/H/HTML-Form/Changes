@@ -1,0 +1,30 @@
+_______________________________________________________________________________
+2012-03-30 HTML-Form 6.03
+
+Support the new HTML5 input types without warning
+
+
+
+_______________________________________________________________________________
+2012-02-20 HTML-Form 6.02
+
+Fix test failure when HTTP-Message 6.03 (or better) was installed [RT#75155]
+
+
+
+_______________________________________________________________________________
+2012-02-18 HTML-Form 6.01
+
+Don't pick up label text from textarea [RT#72925]
+
+Restore perl-5.8.1 compatibility.
+
+
+
+_______________________________________________________________________________
+2011-02-27 HTML-Form 6.00
+
+Initial release of HTML-Form as a separate distribution. There are no code
+changes besides incrementing the version number since libwww-perl-5.837.
+
+The HTML::Form module used to be bundled with the libwww-perl distribution.

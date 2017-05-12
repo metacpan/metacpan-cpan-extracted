@@ -1,0 +1,10 @@
+
+@import url(inc.css);
+@import url('inc.css');
+@import url("inc.css");
+@import url("./inc.css");
+@import url( inc.css );
+@import url(   inc.css   );
+@import url(inc.css?query);
+@import url(inc.css#hash);
+@import url(inc.css?#iefix);

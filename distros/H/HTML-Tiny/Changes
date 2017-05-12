@@ -1,0 +1,74 @@
+Revision history for HTML-Tiny
+
+0.1     2007-05-30
+        Initial release.
+    
+0.2     2007-05-30
+        More examples.
+        More documentation.
+        json_encode now uses Scalar::Util::looks_like_number to test for
+        numberness rather than the crappy re-based match.
+    
+0.3     2007-05-31
+        Added empty array ref => empty attribute functionality.
+    
+0.4     2007-05-31
+        Renamed to HTML::Tiny to avoid name clash with TOMC's module
+    
+0.5     2007-05-31
+        Made empty tags generate at least one tag pair.
+    
+0.6     2007-06-01
+        Added validate_tag subclassing hook.
+        Made it possible to specify the open/closed behaviour of tags.
+        Added auto-newline functionality, prefix/suffix specification.
+    
+0.7     2007-06-03
+        Removed non-core dependencies. Oops.
+    
+0.8     2007-06-03
+        Speeded up _str.
+
+0.9     2007-06-08
+        Made everything work with Perl 5.0.4.
+
+0.10    2007-06-09
+        Reinstated Test::More based tests.
+
+0.11    2007-07-17
+        Simplicate and add lightness. Removed a load of cruft that nobody will
+        ever use. The various set_ accessors are gone.
+
+0.901
+        Really must work out what to do with version numbers.
+
+0.902   2007-09-25
+        Added recursion blocker to json_encode. Thanks to Yuval Kogman
+        for the suggestion.
+
+0.903   2007-09-26
+        Added new deferred method call syntax.
+
+0.904   2007-10-23
+        Minor documentation fixes.
+        Fixed (invisible) bug in _set_auto arg handling.
+
+1.00    2007-12-11
+        url_encode now encodes '~' as '~'.
+
+1.01    2007-12-18
+        url_decode now handles uppercase hex correctly.
+
+1.02    2008-08-07
+        Added support for strict HTML output. Fixes #34378. Thanks JUERD
+        and SIGZERO for the report and VRK for the patch that fixes it.
+
+1.03    2008-08-07
+        Forgot the Changelog for 1.02. Oops.
+
+1.04    2009-03-07
+        Make link default to being closed. See #40990.
+
+1.05    2009-03-08
+        Add support for TO_JSON in json_encode.
+

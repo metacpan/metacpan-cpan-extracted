@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>
+      WebMake: Documentation: Defining Tags
+    </title>
+    <meta name="generator" content="WebMake/2.2" />
+    <style>
+      body {
+       background-color: #ffffff; 
+       color: #000000; 
+       font-size: medium;
+       font-family: verdana,lucida,helvetica,sans-serif;
+      }
+      code, samp, pre {
+       font-family: Courier New,courier,fixed-width,monospace;
+      }
+      H1 { font-size: x-large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFCC66; }
+      H2 { font-size: large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFDD77; }
+      H3 { font-size: medium; font-family: Garamond,Book Antiqua,Times,serif; background: #FFEE88; }
+      H4 { font-size: small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H5 { font-size: x-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H6 { font-size: xx-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      A:link {
+       font-weight: bold;
+       color: #004000;
+       text-decoration: underline; 
+      }
+      A:visited {
+       font-weight: normal;
+       color: #008000;
+       text-decoration: underline; 
+      }
+      A:active {
+       font-weight: bold;
+       color: #800000;
+       text-decoration: underline; 
+      }
+      dt {
+       font-size: medium;
+       font-weight: bold;
+       padding-top: 8px; padding-bottom: 8px;
+      }
+      dd {
+       padding-top: 8px; padding-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body bgcolor="#ffffff" text="#000000" link="#3300cc" vlink="#660066">
+    <font face="lucida,verdana,sans-serif">
+      <div align="center">
+        <img src="images/WebMakeTitle.png" alt="WebMake" width="500" height="122" />
+      </div>
+      <table width="100%">
+        <tr>
+          <td valign="top">
+            <strong><a href="http://webmake.taint.org/">WebMake</a>
+             Documentation</strong> (version 2.2)
+             
+          </td>
+          <td valign="top">
+            <div align="right">
+              
+               [ <a href="option.html">Back</a> | <a href="index_03-proc_logic.html">Forward</a> | <a href="index.html">Index</a>
+               | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+               
+            </div>
+          </td>
+        </tr>
+      </table>
+<!-- yes, it's that Mozilla black-border code again ;) -->
+      <!-- stolen from www.mozilla.org via rc3.org -->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td bgcolor="#aaaaaa">
+            <table border="0" cellspacing="4" cellpadding="4" width="100%">
+              <tr>
+                <td bgcolor="#ffffff">
+                  <table border="0" cellspacing="4" cellpadding="4" width="100%">
+                    <tr>
+                      <td>
+                        <h1>Defining Tags</h1><p>
+                          Like Roxen or Java Server Pages, WebMake allows you to define your own tags;
+                          these cause a perl function to be called whenever they are encountered in
+                          either content text, or inside the WebMake file itself.
+                          
+                        </p>
+                        <a name="Defining_Content_Tags"><h2>Defining Content Tags</h2></a><p>
+                          You do this by calling the <a href="PerlCodeLibrary.pm.html#item_define_tag"><strong><code>define_tag()</code></strong></a> function from
+                          within a <a href="perl.html">&lt;{perl}&gt;</a> section in the WebMake file. This
+                          will set up a tag, and indicates a reference to the handler function to call
+                          when that tag is encountered, and the list of attributes that are required to
+                          use that tag.
+                          
+                        </p>
+                        <p>
+                          Any occurrences of this tag, with at least the set of attributes defined in
+                          the <strong><code>define_tag()</code></strong> call, will cause the handler function to be called.
+                          
+                        </p>
+                        <p>
+                          Handler functions are called as fcllows:
+                          
+                        </p>
+                        <p>
+                          <pre>
+<!--etsafe-->
+                          
+        handler (&#36;tagname, &#36;attrs, &#36;text, &#36;perlcodeself);
+<!--/etsafe-->
+                                                  </pre>
+                      </p>
+                      <p>
+                        Where $tagname is the name of the tag, $attrs is a reference
+                        to a hash containing the attribute names and the values used in the tag, and
+                        $text is the text between the start and end tags.
+                        
+                      </p>
+                      <p>
+                        $perlcodeself is the PerlCode object, allowing you to write proper
+                        object-oriented code that can be run in a threaded environment or from
+                        mod_perl. This can be ignored if you like.
+                        
+                      </p>
+                      <p>
+                        Note that there are two variations, one for conventional tag pairs with a
+                        start and end tag, the other for stand-alone empty tags with no end tag. The
+                        latter variation is called <a href="PerlCodeLibrary.pm.html#item_define_empty_tag"><strong><code>define_empty_tag()</code></strong></a>.
+                        
+                      </p>
+                      <dl>
+                        <dt>
+                          <a href="PerlCodeLibrary.pm.html#item_define_empty_tag"><strong><code>define_empty_tag()</code></strong></a>
+                        </dt>
+                        <dd>
+                          <p>
+                            define a standalone
+                             content tag
+                            
+                          </p>
+                        </dd>
+                        <dt>
+                          <a href="PerlCodeLibrary.pm.html#item_define_tag"><strong><code>define_tag()</code></strong></a>
+                        </dt>
+                        <dd>
+                          <p>
+                            define a content tag with a
+                             start and end
+                            
+                          </p>
+                        </dd>
+                      </dl>
+                      <a name="Defining_WebMake_Tags"><h2>Defining WebMake Tags</h2></a><p>
+                        This is identical to using content tags, above, but the functions are as
+                        follows:
+                        
+                      </p>
+                      <dl>
+                        <dt>
+                          <a href="PerlCodeLibrary.pm.html#item_define_empty_wmk_tag"><strong><code>define_empty_wmk_tag()</code></strong></a>
+                        </dt>
+                        <dd>
+                          <p>
+                            define a
+                             standalone WebMake tag
+                            
+                          </p>
+                        </dd>
+                        <dt>
+                          <a href="PerlCodeLibrary.pm.html#item_define_wmk_tag"><strong><code>define_wmk_tag()</code></strong></a>
+                        </dt>
+                        <dd>
+                          <p>
+                            define a WebMake tag
+                             with a start and end
+                            
+                          </p>
+                        </dd>
+                      </dl>
+                      <a name="Example"><h2>Example</h2></a><p>
+                        Let's say you've got the following in your WebMake file.
+                        
+                      </p>
+                      <p>
+                        <pre>
+<!--etsafe-->
+                        
+  &lt;{perl
+   define_tag ("thumb", \&amp;make_thumbnail, qw(img thumb));
+  }&gt;
+
+  &lt;content name="foo"&gt;
+    &lt;thumb img="big.jpg" thumb="big_thumb.jpg"&gt;
+      Picture of a big thing
+    &lt;/thumb&gt;
+  &lt;/content&gt;
+<!--/etsafe-->
+                                              </pre>
+                    </p>
+                    <p>
+                      When the <strong>foo</strong> content item comes to be included in an output file, the tag
+                      will be replaced with a call to a perl function, as follows:
+                      
+                    </p>
+                    <p>
+                      <pre>
+<!--etsafe-->
+                      
+  make_thumbnail ("thumb",
+     { img =&gt; 'big.jpg', thumb =&gt; 'big_thumb.jpg' },
+     'Picture of a big thing', &#36;perlcodeself);
+<!--/etsafe-->
+                                          </pre>
+                  </p>
+                  <p>
+                    Note that if the tag omitted one of the 2 required attributes, <em>img</em> or
+                    <em>thumb</em>, it would result in an error message.
+                    
+                  </p>
+                  <p>
+                    For more serious examples of tag definition, the WebMake distribution comes
+                    with several <a href="use.html">plugins</a>, such as <a href="safe_tag.wmk.html">safe_tag.wmk</a> which define their own tags.
+                    
+                  </p>
+                  <p>
+                    
+                  </p>
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<table width="100%">
+  <tr>
+    <td valign="top">
+      <strong><a href="http://webmake.taint.org/">WebMake</a>
+       Documentation</strong> (version 2.2)
+       
+    </td>
+    <td valign="top">
+      <div align="right">
+        
+         [ <a href="option.html">Back</a> | <a href="index_03-proc_logic.html">Forward</a> | <a href="index.html">Index</a>
+         | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+         
+      </div>
+    </td>
+  </tr>
+</table>
+<div align="right">
+  <a href="http://webmake.taint.org/"><img src="images/BuiltWithWebMake.png" alt="Built With WebMake" border="0" width="88" height="31" /></a>
+</div>
+</font>
+</body>
+</html>

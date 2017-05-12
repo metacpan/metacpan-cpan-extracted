@@ -1,0 +1,83 @@
+<!--
+
+=head1 NAME
+
+dump_vars.wmk - dump all WebMake variables and content items
+
+=head1 LOADING
+
+  < use plugin="dump_vars" />
+
+=head1 CONTENT ITEMS
+
+  $ {DumpVars_names}
+
+  $ {DumpVars_full}
+
+=head1 DESCRIPTION
+
+Some debugging help. If you include this file in your WebMake file, it will
+define these content items:
+
+=over 4
+
+=item $ {DumpVars_names}
+
+This content contains a list of the names of all content items defined.
+
+=item $ {DumpVars_full}
+
+This content contains a dump of all content items defined, including their
+names and their values.  It excludes $ {DumpVars_full} and
+$ {DumpVars_names}.
+
+=back
+
+=cut
+
+<wmmeta name="Title" value="dump_vars.wmk" />
+<wmmeta name="Abstract" value="dump all WebMake variables and content items" />
+-->
+
+<!-- we use the make_safe() function from this. -->
+<include file="${WebMake.PerlLib}/safe_tag.wmk" />
+
+<!-- ----------------------------------------------------------------- -->
+
+<content name=DumpVars_names>
+  <{perl
+
+    $_ = '<ol>';
+    my @names = content_matching ("*");
+    foreach my $name (sort @names) {
+      $_ .= "<li>Content: <strong>\"$name\"</strong>".
+	  "</li>\n";
+    }
+    $_ .= '</ol>';
+    $_;
+
+  }>
+</content>
+
+<!-- ----------------------------------------------------------------- -->
+
+<content name=DumpVars_full>
+  <{perl
+
+    $_ = '<ol>';
+    my @names = content_matching ("*");
+    foreach my $name (sort @names) {
+      next if ($name =~ /DumpVars_/);
+      $_ .= "<li>Content: <strong>\"$name\"</strong><br />".
+	  "<blockquote>\n".
+	  make_safe (get_content($name))."\n".
+	  "</blockquote></li><hr />\n";
+    }
+    $_ .= '</ol>';
+    $_;
+
+  }>
+</content>
+
+<!-- ----------------------------------------------------------------- -->
+

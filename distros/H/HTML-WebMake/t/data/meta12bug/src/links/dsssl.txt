@@ -1,0 +1,22 @@
+<wmmeta name="ltitle">Document Style Semantics and Specification Language
+  (DSSSL)</wmmeta>
+<wmmeta name="stitle">DSSSL</wmmeta>
+<wmmeta name="author">J&ouml;rn Clausen</wmmeta>
+<wmmeta name="cdate">2001-04-23</wmmeta>
+<wmmeta name="mdate">2001-04-23</wmmeta>
+
+    <ul>
+      <li>
+	<a href="ftp://ftp.ornl.gov/pub/sgml/WG8/DSSSL/dsssl96b.pdf">ISO/IEC
+	  10179:1996(E) (PDF, 1.5 MByte)</a>,
+	<a href="ftp://ftp.ornl.gov/pub/sgml/WG8/DSSSL/dsssl96f.pdf">
+	  Inhaltsverzeichnis (PDF)</a>
+      </li>
+      <li>
+	<a href="http://openjade.sourceforge.net/">OpenJade</a>
+      </li>
+      <li>
+	<a href="http://www.mulberrytech.com/dsssl/index.html">Mulberry
+	  Technologies</a>
+      </li>
+    </ul>

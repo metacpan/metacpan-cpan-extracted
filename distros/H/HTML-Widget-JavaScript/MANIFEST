@@ -1,0 +1,23 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/HTML/Widget/JavaScript.pm
+lib/HTML/Widget/JavaScript/Result.pm
+lib/HTML/Widget/JavaScript/Constraint/All.pm
+lib/HTML/Widget/JavaScript/Constraint/AllOrNone.pm
+lib/HTML/Widget/JavaScript/Constraint/Any.pm
+lib/HTML/Widget/JavaScript/Constraint/ASCII.pm
+lib/HTML/Widget/JavaScript/Constraint/Email.pm
+lib/HTML/Widget/JavaScript/Constraint/Equal.pm
+lib/HTML/Widget/JavaScript/Constraint/HTTP.pm
+lib/HTML/Widget/JavaScript/Constraint/In.pm
+lib/HTML/Widget/JavaScript/Constraint/Integer.pm
+lib/HTML/Widget/JavaScript/Constraint/Length.pm
+lib/HTML/Widget/JavaScript/Constraint/Printable.pm
+lib/HTML/Widget/JavaScript/Constraint/Range.pm
+lib/HTML/Widget/JavaScript/Constraint/String.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t

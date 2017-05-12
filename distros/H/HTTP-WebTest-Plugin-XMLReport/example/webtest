@@ -1,0 +1,79 @@
+#!/usr/bin/perl -w
+use HTTP::WebTest;
+use XML::Simple;
+use Getopt::Long;
+
+my %opt;
+GetOptions(\%opt, qw(config=s help verbose dump debug name=s) );
+
+&usage() if ((! -f $opt{config}) || $opt{help});
+
+## read and parse configuration from xml file
+my $cfg = XMLin($opt{config},
+                suppressempty => '',
+                forcecontent => 0,
+                forcearray => &ARRYPARAMS,
+               );
+
+if ($opt{debug}) {
+  $cfg->{param}->{default_report} = 'yes';
+  $cfg->{param}->{plugins} = [];
+  $cfg->{param}->{show_headers} = 'yes';
+  $cfg->{param}->{show_html} = 'yes';
+}
+# delete locally invented <comment/> elements from tests
+# in order to avoid possible name clashes
+foreach my $t (@{$cfg->{testgroup}}) {
+  delete $t->{comment};
+}
+# same for mail_method parameter
+delete $cfg->{param}->{mail_method};
+if ($opt{name}) {
+  my @tests;
+  foreach my $t (@{$cfg->{testgroup}}) {
+    push @tests, $t if ($t->{test_name} =~ /\Q$opt{name}\E/i);
+  }
+  $cfg->{testgroup} = \@tests;
+}
+if ($opt{dump}) {
+  eval { use Data::Dumper; };
+  print Dumper($cfg);
+  exit;
+}
+
+
+my $wt = HTTP::WebTest->new;
+ 
+$wt->run_tests( $cfg->{testgroup}, $cfg->{param});
+
+### UTIL ###
+
+sub usage {
+  print <<"  EU";
+webtest --config=<xmlfile> [options]
+  --config=file  - read webtests from xml file "file"
+  --verbose      - be verbose
+  --dump         - dump parsed configuration, exit
+  --debug        - output full http-headers and html content
+                   in plain text representation
+  --name=string  - run only test group(s) containing "string"
+                   in the name, case-insensitive
+  --help         - this
+  EU
+  exit;
+}
+
+## ARRAYPARAMS
+## all xml elements which need to be expanded to array refs
+## even if they contain only one element:
+sub ARRYPARAMS { return [ qw(
+ testgroup
+ plugins
+ cookie
+ text_require text_forbid
+ regex_require regex_forbid
+ date_maxage date_start date_end
+ mail_addresses
+) ];
+}
+

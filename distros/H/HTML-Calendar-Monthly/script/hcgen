@@ -1,0 +1,401 @@
+#!/usr/bin/perl
+my $RCS_Id = '$Id: hcgen,v 1.2 2009/05/03 22:12:07 jv Exp $ ';
+
+# Author          : Johan Vromans
+# Created On      : Thu Apr 30 22:13:00 2009
+# Last Modified By: Johan Vromans
+# Last Modified On: Mon May  4 00:11:25 2009
+# Update Count    : 75
+# Status          : Unknown, Use with caution!
+
+################ Common stuff ################
+
+use strict;
+
+# Package or program libraries, if appropriate.
+# $LIBDIR = $ENV{'LIBDIR'} || '/usr/local/lib/sample';
+# use lib qw($LIBDIR);
+# require 'common.pl';
+
+# Package name.
+my $my_package = 'Sciurix';
+# Program name and version.
+my ($my_name, $my_version) = $RCS_Id =~ /: (.+).pl,v ([\d.]+)/;
+# Tack '*' if it is not checked in into RCS.
+$my_version .= '*' if length('$Locker:  $ ') > 12;
+
+################ Command line parameters ################
+
+use Getopt::Long 2.13;
+
+# Command line options.
+my $title;			# add titles
+my $title_format = "%M %Y";	# format for title
+my $output;			# output
+my $linkpfx = "";		# link prefix
+my $reverse;			# reverse
+my @forced;			# force this cal
+my $filter;
+my $verbose = 0;		# verbose processing
+
+# Development options (not shown with -help).
+my $debug = 0;			# debugging
+my $trace = 0;			# trace (show process)
+my $test = 0;			# test mode.
+
+# Process command line options.
+app_options();
+
+# Post-processing.
+$trace |= ($debug || $test);
+
+unless ( $title_format =~ /^\</ ) {
+    $title_format = "<p class='hc_title'>$title_format</p>";
+}
+
+################ Presets ################
+
+my $TMPDIR = $ENV{TMPDIR} || $ENV{TEMP} || '/usr/tmp';
+
+################ The Process ################
+
+use HTML::Calendar::Monthly;
+
+my $filter_pat = qr/^([12]\d\d\d)([01]\d)([0123]\d)\.html$/;
+
+my @files;
+foreach ( @forced ) {
+    unless ( /^([12]\d\d\d)([01]\d)$/ ) {
+	warn("Illegal value in force: $_\n");
+	next;
+    }
+    push(@files, [ $1, $2, 00, undef ] );
+}
+
+my $dir = shift || ".";
+opendir(my $dd, $dir) or die("$dir: $!\n");
+while ( my $d = readdir($dd) ) {
+    next unless $d =~ $filter_pat;
+    push(@files, [ $1, $2, $3, $d ]);
+    pop(@files) if $filter && $d !~ /^$filter/;
+}
+
+unless ( @files ) {
+    warn("No files? Nothing to do.\n");
+    exit;
+}
+warn("$dir: ", scalar(@files), " files\n") if $verbose;
+
+@files = sort { $a->[0] <=> $b->[0] or $a->[1] <=> $b->[1] } @files;
+@files = reverse(@files) if $reverse;
+
+my $this = "";
+my $cal;
+my $needhdr = defined($title) ? $title ? 1 : -99 : 0;
+
+my $data = "";
+
+foreach ( @files ) {
+    my ( $y, $m, $d, $file ) = @$_;
+    if ( sprintf("%04d%02d", $y, $m) ne $this ) {
+	if ( $cal ) {
+	    $data .= "<div class='hc'>\n";
+	    $data .= $cal->build_title($title_format) . "\n"
+	      if $needhdr >= 0;
+	    $needhdr++;
+	    $data .= $cal->calendar_month;
+	    $data .= "</div>\n";
+	}
+	$cal = HTML::Calendar::Monthly->new
+	  ({ 'month' => $m, year => $y });
+	$this = sprintf("%04d%02d", $y, $m);
+    }
+    $cal->add_link( $d, $linkpfx.$file );
+}
+
+if ( $cal ) {
+    $data .= "<div class='hc'>\n";
+    $data .= $cal->build_title . "\n" if $needhdr > 0;
+    $data .= $cal->calendar_month;
+    $data .= "</div>\n";
+}
+
+if ( $output ) {
+    if ( update_if_needed($output, $data) ) {
+	warn("$output: written\n");
+    }
+    else {
+	warn("$output: not modified\n");
+    }
+}
+else {
+    print $data;
+}
+exit 0;
+
+################ Subroutines ################
+
+sub HTML::Calendar::Monthly::build_title {
+    my ($self, $fmt) = @_;
+    my $t = $title_format;
+    $t =~ s/\%m/lc($self->month_name)/ge;
+    $t =~ s/\%M/$self->month_name/ge;
+    $t =~ s/\%y/$self->year/gie;
+    return $t;
+}
+
+sub update_if_needed($$) {
+    my ($fname, $new) = @_;
+
+    # Do not overwrite unless modified.
+    if ( -s $fname && -s _ == length($new) ) {
+	local($/);
+	my $hh = do { local *F; *F };
+	my $old;
+	open($hh, "<", $fname) && ($old = <$hh>) && close($hh);
+	if ( $old eq $new ) {
+	    return 0;
+	}
+    }
+
+    open(my $fh, ">", $fname)
+      or die("$fname (create): $!\n");
+    print $fh $new;
+    close($fh);
+    1;
+}
+
+################ Subroutines ################
+
+sub app_options {
+    my $help = 0;		# handled locally
+    my $ident = 0;		# handled locally
+    my $man = 0;		# handled locally
+
+    my $pod2usage = sub {
+        # Load Pod::Usage only if needed.
+        require Pod::Usage;
+        Pod::Usage->import;
+        &pod2usage;
+    };
+
+    # Process options.
+    if ( @ARGV > 0 ) {
+	GetOptions('output=s'	=> \$output,
+		   'prefix=s'	=> \$linkpfx,
+		   'reverse'	=> \$reverse,
+		   'title!'	=> \$title,
+		   'format=s'	=> \$title_format,
+		   'force=s'	=> \@forced,
+		   'filter=s'	=> \$filter,
+		   'ident'	=> \$ident,
+		   'verbose'	=> \$verbose,
+		   'trace'	=> \$trace,
+		   'help|?'	=> \$help,
+		   'man'	=> \$man,
+		   'debug'	=> \$debug)
+	  or $pod2usage->(2);
+    }
+    if ( $ident or $help or $man ) {
+	print STDERR ("This is $my_package [$my_name $my_version]\n");
+    }
+    if ( $man or $help ) {
+	$pod2usage->(1) if $help;
+	$pod2usage->(VERBOSE => 2) if $man;
+    }
+}
+
+__END__
+
+################ Documentation ################
+
+=head1 NAME
+
+hcgen - generate simple HTML month calendar
+
+=head1 SYNOPSIS
+
+hcgen [options] [dir]
+
+ Options:
+   --output=XXX		output file (see below)
+   --reverse		output months in reverse order
+   --[no]title		do [not] provide a title (see below)
+   --format=XXX		title format
+   --prefix=XXX		link prefix (see below)
+   --ident		show identification
+   --help		brief help message
+   --man                full documentation
+   --verbose		verbose information
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--output=>I<XXX>
+
+Write the generated calendars to this file. If the file exists, and
+contains the same calendar, it will not be modified so it is useful as
+a make target.
+
+=item B<--reverse>
+
+Generate the calendars in reverse order, e.g., newest month first.
+
+=item B<--title> B<--notitle>
+
+Request titles above the generated calendars. With B<--title>, titles
+are always provided. With B<--notitle>, titles are never provided.
+Default is to only provide titles when more than one calendar is
+generated.
+
+=item B<--format=>I<XXX>
+
+The format for the titles. It may contain the following substitutions:
+
+  %m       the name of the month, e.g., april
+  %M       same, titlecased, e.g., April
+  %y  %Y   the year, e.g., 2009
+
+If the format does I<not> start with a C<< < >> character, it will be output as a HTML C<< <p> >> element:
+
+  <p class='hc_title'>...</p>
+
+Default format is C<< "%M %Y" >>.
+
+=item B<--prefix=>I<XXX>
+
+A prefix to add to the generated day links.
+
+=item B<--force=>I<YYYYMM>
+
+Force the generation of a calendar for this year/month, even if there
+are no files.
+
+=item B<--filter=>I<YYYYMM>
+
+Process only files for the given year/month.
+
+This option may occur multiple times.
+
+=item B<--help>
+
+Print a brief help message and exits.
+
+=item B<--man>
+
+Prints the manual page and exits.
+
+=item B<--ident>
+
+Prints program identification.
+
+=item B<--verbose>
+
+More verbose information.
+
+=item I<dir>
+
+The directory to process. This directory must contain files (HTML
+documents) with names formatted as C<< YYYYMMDD.html >>.
+
+Default is to process the current directory.
+
+=back
+
+=head1 DESCRIPTION
+
+B<hcgen> will read the given directory and build a list of all files
+that obey the name format C<< YYYYMMDD.html >>. This list will
+determine the years and months for which calendars must be generated.
+
+Each calendar consists of a table of 7 colums. The first row
+contains short day names. The other cells contain the date numbers,
+possibly with a link to a corresponding HTML document.
+
+=head1 CSS CLASSES
+
+The table can be completely formatted with CSS style sheets.
+The CSS classes are shown in the following output excerpt.
+
+  <div class='hc'>
+  <p class='hc_title'>February 2009</p>
+  <table class='hc_month'>
+    <th>Sun</th>
+    ....
+    <th>Sat</th>
+    <tr>
+      <td class='hc_empty'></td>
+      ...
+      <td class='hc_empty'></td>
+      <td class='hc_date'>1</td>
+    </tr>
+    ...
+    <tr>
+      <td class='hc_date_linked'><a href='20090202.html'>2</a></td>
+      ...
+    </tr>
+    <tr>
+      ...
+      <td class='hc_date_linked'><a href='20090228.html'>28</a></td>
+      <td class='hc_empty'></td>
+    </tr>
+  </table>
+  </div>
+
+If more tables are generated, each one gets its own C<< <div> >>.
+
+=head1 EXAMPLES
+
+  hcgen --output=htdocs/cal.html htdocs
+
+  hcgen --force 200902
+
+Example style sheet:
+
+  p.hc_title {
+    font-weight: bold;
+  }
+  table.hc_month {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 14pt;
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  .hc_month th {
+    font-size: 14pt;
+    text-align: center;
+    border: 1px solid black;
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+  .hc_month td {
+    font-size: 14pt;
+    border: 1px solid black;
+    text-align: center;
+    width: 3em;
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+  .hc_month a {
+    text-decoration: none;
+    font-weight: bold;
+  }
+  .hc_empty {
+    background: #e0e0e0;
+  }
+
+=head1 BUGS
+
+The program and its associated module, L<HTML::Calendar::Monthly>
+are currently hard-wired to generate dutch calendars.
+
+=head1 SEE ALSO
+
+L<HTML::Calendar::Monthly>
+
+=head1 AUTHOR
+
+Johan Vromans E<lt>jvromans@squirrel.nlE<gt>
+
+=cut

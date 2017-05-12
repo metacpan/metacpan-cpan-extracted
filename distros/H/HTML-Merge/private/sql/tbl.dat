@@ -1,0 +1,66 @@
+tbl
+tbl|langug_code|code|name|number|note|realm_id|
+|iw|FLDMTX|טבלת תאור מצב שדה|0.000||\N|
+|en|FLDMTX|field status language matrix table|0.000||\N|
+|iw|FLDSTS|מצב שדה|0.000||\N|
+|en|FLDSTS|field status|0.000||\N|
+|iw|FRMSTR|טבלת מחרוזות תצוגה|||\N|
+|en|FRMSTR|Form strings table|||\N|
+|iw|LANGUG|טבלת שפות|0.000||\N|
+|en|LANGUG|labguage table|0.000||\N|
+|iw|LNGMTX|טבלת כותרות לשפות|0.000||\N|
+|en|LNGMTX|Language matrix table|0.000||\N|
+|iw|MACROS|טבלת מקרו|0.000||\N|
+|en|MACROS|macros table|0.000||\N|
+|iw|STATUS|סטטוס רשומה|0.000||\N|
+|en|STATUS|status table|0.000||\N|
+FLDMTX|iw|1|רגיל|0.000||\N|
+FLDMTX|en|1|normal|0.000||\N|
+FLDMTX|en|2|readonly|0.000||\N|
+FLDMTX|iw|2|קריאה בלבד|0.000||\N|
+FLDMTX|en|3|disabled|0.000||\N|
+FLDMTX|iw|3|מבוטל|0.000||\N|
+FLDMTX|en|4|hidden|0.000||\N|
+FLDMTX|iw|4|חבוי|0.000||\N|
+FLDSTS||1||0.000||\N|
+FLDSTS||2||0.000|readonly|\N|
+FLDSTS||3||0.000|disabled|\N|
+FLDSTS||4||0.000|hidden|\N|
+FLDTYP||1|TEXT_FIELD|1.000|<input type=text #fldstatus# value=``#value#`` size=``#size#`` maxlength=``#maxlength#`` @STDATR@ @STDEVNT@ #field_data#>|0|
+FLDTYP||10|GRID|0.000|<$RINCLUDE.``#src#``><$RINCLUDE.``Repository/Grid/grid.inc``>|0|
+FLDTYP||11|SUBMIT|0.000|<input type=``submit`` value=``#value##caption#`` class=``#class#`` #fldstatus# @STDATR@ @STDEVNT@ #field_data#>|0|
+FLDTYP||12|LINE|0.000|<img src=``public/perl/space.pl`` @STDATR@ @STDEVNT@ #field_data#>|0|
+FLDTYP||13|TEXT|0.000|#caption#|0|
+FLDTYP||14|DATE_BOX|0.000|<input type=text name=``#field_name#`` readonly><input type=``button`` name=``#field_name#_btn`` value=``~E`` onclick=``DoDate()``> <$RINCLUDE.``date.inc``>|0|
+FLDTYP||15|SUB_FORM|0.000|<div @STDATR@ @STDEVNT@ style=``overflow: auto`` dir=``<$RVAR.dir>`` #field_data#><$RSET.repository_template=` ``#src#`` `><$RINCLUDE.``#src#``></div>|0|
+FLDTYP||16|TEXT_FIELD_LYNX|1.000|<input type=text name=``#field_name#`` #fldstatus# value=``#value#`` size=``#size#`` maxlength=``#maxlength#``>|0|
+FLDTYP||17|LINE_BREAK_LYNX|0.000|<br>|0|
+FLDTYP||18|COMBO_BOX_LYNX|1.000|<select name=``#field_name#`` #fldstatus# size=``#size#`` <$RIF.` ``#src#`` `><$RINCLUDE.``#src#``></$RIF></select>|0|
+FLDTYP||2|LABEL|0.000|<pre>#caption#</pre>|0|
+FLDTYP||3|COMBO_BOX|1.000|<select #fldstatus# size=``#size#`` @STDATR@ @STDEVNT@ #field_data#><$RIF.` ``#src#`` `><$RINCLUDE.``#src#``></$RIF></select>|0|
+FLDTYP||4|IMAGE|0.000|<img src=``#src#`` @STDATR@ @STDEVNT@ #field_data#>|0|
+FLDTYP||5|BUTTON|0.000|<input type=``button`` value=``#value##caption#`` class=``#class#`` #fldstatus# @STDATR@ @STDEVNT@ #field_data#>|0|
+FLDTYP||6|CHECK_BOX|1.000|<input type=``checkbox``  #fldstatus# value=``#value#`` @STDATR@ @STDEVNT@ #field_data#>|0|
+FLDTYP||7|RADIO|1.000|<input type=radio #fldstatus# value=``#value#`` @STDATR@ @STDEVNT@ #field_data#>|0|
+FLDTYP||8|PASSWORD|1.000|<input type=password #fldstatus# value=``#value#`` size=``#size#`` maxlength=``#maxlength#`` @STDATR@ @STDEVNT@ #field_data#>|0|
+FLDTYP||9|RECTANGLE|0.000|<div id=``#field_name#`` style=``border: none; width:#width#; height: #height#; background-color: #background#`` @STDEVNT@ #field_data#></div>|0|
+LANGUG||en|ISO-8859-1|0.000|LTR|\N|
+LANGUG||iw|windows-1255|0.000|RTL|\N|
+LNGMTX|iw|en|אנגלית|0.000||\N|
+LNGMTX|en|en|English|0.000||\N|
+LNGMTX|en|iw|Hebrew|0.000||\N|
+LNGMTX|iw|iw|עברית|0.000||\N|
+MACROS||1|STDATR|0.000|name=``#field_name#`` id=``#field_name#`` style=``width: #width#; height: #height#; background-color: #background#`` onBlur=``#onBlur#`` onClick=``#onClick#`` onDblClick=``#onDblClick#`` onChange=``#onChange#`` #field_data#|\N|
+MACROS||2|STDEVNT|0.000|onBlur=``#onBlur#`` onClick=``#onClick#`` onDblClick=``#onDblClick#`` onChange=``#onChange#`` onMouseOver=``#onMouseOver#`` onMouseMove=``#onMouseMove#`` onMouseOut=``#onMouseOut#``|NULL|
+STATUS|en|0|canceled|0.000||\N|
+STATUS|iw|0|מבוטל|0.000||\N|
+STATUS|en|1|blocked|0.000||\N|
+STATUS|iw|1|חסום|0.000||\N|
+STATUS|en|2|active|0.000||\N|
+STATUS|iw|2|פעיל|0.000||\N|
+FRMSTR|iw|1|מיון||cap_sort|\N|
+FRMSTR|en|1|Sort||cap_sort|\N|
+FRMSTR|iw|2|...נא המתן||cap_process|\N|
+FRMSTR|en|2|Processing...||cap_process|\N|
+FRMSTR|iw|3|רשומות||cap_record|\N|
+FRMSTR|en|3|records||cap_record|\N|

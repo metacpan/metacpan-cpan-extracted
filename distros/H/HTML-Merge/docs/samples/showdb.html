@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+<head>
+	<title>MySQL table browser</title>
+</head>
+<!-- This template displays MySQL data base structure, your default
+data base must be MySQL or add RDB tag at the beginning -->
+<body>
+<$R[show].Q='show tables'>
+
+<$R[show].LOOP>
+<$R[show].ENUMQUERY.name=value>
+<$RSET.table_name='<$R[show].SQL.<$RVAR.name>>'>
+<h1><$RVAR.table_name></h1>
+</$R[show].ENUMQUERY>
+<BR>
+
+<table border=1>
+<$R[list].Q='select * from <$RVAR.table_name> limit 50'>
+<$R[list].LOOP>
+<$RIF.'"<$R[list].INDEX>" eq "1"'>
+<tr>
+<$R[list].ENUMQUERY.name=value>
+<td><$RVAR.name>,
+<$R[type].Q='describe <$RVAR.table_name> <$RVAR.name>'>
+<$R[type].SQL.Type></td>
+</$R[list].ENUMQUERY>
+</tr>
+<$REND_IF>
+<tr>
+<$R[list].ENUMQUERY.name=value>
+<td><$RVAR.value></td>
+</$R[list].ENUMQUERY>
+</tr>
+<$R[list].END>
+</tr>
+</table>
+<$R[show].END>
+</body>
+</html>

@@ -1,0 +1,39 @@
+Failed  Succeeded  Test Name
+   0          1    *** no name ***
+   1          0    *** no name ***
+
+
+Test Name: N/A
+URL: http://http.web.test/set-cookie-c1-v1
+
+
+
+Test Name: N/A
+URL: http://http.web.test/non-existent
+
+  STATUS CODE CHECK
+    Expected '200' and got: 404 Not Found                        FAIL
+
+  REQUEST HEADERS:
+GET http://http.web.test/non-existent
+User-Agent: HTTP-WebTest/NN
+Cookie: c1=v1
+Cookie2: $Version="1"
+
+  RESPONSE HEADERS:
+HTTP/1.1 404 Not Found
+Date: SOMEDAY
+Server: libwww-perl-daemon/NN
+Content-Length: 53
+Content-Type: text/html
+Title: 404 Not Found
+
+
+  PAGE CONTENT:
+<title>404 Not Found</title>
+<h1>404 Not Found</h1>
+
+
+
+
+Total web tests failed: 1  succeeded: 1

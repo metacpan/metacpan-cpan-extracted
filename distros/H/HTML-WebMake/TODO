@@ -1,0 +1,80 @@
+TODO LIST
+---------
+
+- look at http://www.vodacon.com/users/gabo/index.html - CMS RFC
+
+- HTML::Clean ideas for HTML cleaner --
+  http://search.cpan.org/doc/LINDNER/HTML-Clean-0.8/lib/HTML/Clean.pm .
+  (Probably best to define these as a format conversion so they don't slow down
+  the rewriting of valid HTML; maybe <content name=foo format="text/mshtml"> ?)
+
+  - ensure <font> tags that use Arial, Verdana, Times etc. default to useful
+    UNIXish fonts too
+
+  - strip spurious &nbsp;'s at ends of paragraphs
+
+  - rewrite paras from "foo<p>" to "<p>foo</p>"? may be tricky
+
+  - remove useless <meta>'s: GENERATOR FORMATTER CHARSET Content-Type
+
+  - remove MSHTML comments & FrontPage comments
+
+  - fix bizarre MS high-chars to use proper entities and low-ASCII chars
+
+- Idea from esj:
+
+  - (optionally) remove HTML heads, so they can be inserted into templates
+    correctly. Probably best to use the "preproc" attribute of <content>.
+
+- allow generation of more than one copy of the same output file at the same
+  time, e.g. for mirrors, and to support staging builds and site-test builds.
+
+- Index pages often need to include an auto-generated abstract, e.g. the first
+  paragraph of the text item. Provide a way to do this.
+
+- Nicer way to include content item from just one file; see documentation.wmk,
+  which uses <contents src=".." name="webmake" />, yuck.
+
+- Redo WebMake site, or documentation, with multiple renderings; normal, "Palm
+  version", PQA, etc., as a demo.  Nick templates from weblog package. ;)
+
+- Allow tranclusion of parts of other content items into the current one; ie.
+  not just the entire text, but a range of paragraphs. Do this by (a) allowing
+  refs to include a start and end range, maybe like: ${firsttime.txt:
+  from=Grab_The_Pages_Text to=Convert_To_EtText} -- or look up XPath/XPointer.
+  Current concept: ${trans from=content.txt start=name:startbit end=name:endbit}
+
+
+IDEAS FOR NEW FEATURES
+----------------------
+
+- meta tags: implement visibility range, using W3C date and time format,
+  http://www.w3.org/TR/1998/NOTE-datetime-19980827: "YYYY-MM-DDThh:mm:ssTZD".
+
+- searching interface based on metadata.
+
+- Sitemap writing as RDF, a la Dan Bricklin's paper:
+  http://www.ilrt.bris.ac.uk/discovery/2000/08/bized-meta/
+
+- -w flag to produce warnings if deprecated (non-HTML4) tags are used?
+
+- Look at WebLint to provide lint behaviour:
+  http://www.weblint.org/doc/manpage.html
+
+- MS: internal link verification.  Use LWP? and require a -w3 flag to do this.
+
+- MS: external link verification.  Use LWP and require a -w4 flag to do this.
+
+- MS: download time estimation. -w flag.
+
+- MS: find files that are not linked to. -w2 flag.
+
+- Wiki ideas: Map backlinks
+  (http://www8.org/w8-papers/5b-hypertext-media/surfing/surfing.html) and
+  recently-changed pages inside the site.  Generate pages to map this.  Each
+  output page has a corresponding page for recent changes and backlinks.  (and
+  content item dependencies as well maybe?)
+
+- crit.org idea: Include a "check Altavista for backlinks" feature?
+  http://www.altavista.com/cgi-bin/query?q=%2Blink:http://www.udanax.com/green/index.html
+

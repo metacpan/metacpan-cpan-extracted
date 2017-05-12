@@ -1,0 +1,12 @@
+<form method="post">
+<table cellpadding="2">
+<tr><th>Emp ID</th><td>123<input name="emp_id" type="hidden" value="123" /></td></tr>
+<tr><th>Emp Name</th><td><input name="emp_name" type="text" value="Fred Flintstone" /></td></tr>
+<tr><th>Emp Notes</th><td><textarea cols="60" name="emp_notes" rows="10" wrap="virtual">Started with company in 1983.
+Favourite colour: green.
+</textarea></td></tr>
+<tr><td align="center" colspan="2">
+<input name="_submit" type="submit" value="Submit" />
+</td></tr>
+</table>
+</form>

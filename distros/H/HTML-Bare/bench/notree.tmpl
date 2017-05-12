@@ -1,0 +1,39 @@
+#c
+Parsing without native Perl trees
+
+#0
+require XML::Bare;
+my $ob = new XML::Bare( file => $file );
+
+#-
+require XML::LibXML;
+my $parser = XML::LibXML->new();
+my $doc = $parser->parse_file( $file );
+
+#-
+require XML::Parser;
+my $parser = new XML::Parser();
+my $doc = $parser->parsefile( $file );
+
+#-
+require XML::Parser::Expat;
+my $parser = new XML::Parser::Expat();
+sub noop{}
+$parser->setHandlers('Start' => \&noop, 'End' => \&noop, 'Char' => \&noop);
+open(FOO, $file) or die "Couldn't open $!";
+$parser->parse(*FOO);
+close(FOO);
+
+#-
+require XML::Descent;
+my $p = XML::Descent->new( { Input => $file } );
+$p->on( item => sub {
+                  my ($elem, $attr) = @_;
+                  $p->walk; # recurse
+                }                               );
+$p->walk;
+
+#-
+require XML::DOM;
+my $parser = new XML::DOM::Parser;
+my $doc = $parser->parsefile( $file );

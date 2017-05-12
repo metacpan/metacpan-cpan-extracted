@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name: HTTP-Range
+version: 0.02
+author: ~
+abstract: ~
+license: perl
+requires:
+  HTTP::Message: 1.44
+  HTTP::Request: 1.40
+  HTTP::Response: 1.49
+  HTTP::Status: 1.28
+  IO::String: 1.05
+  Params::Validate: 0.74
+  Set::Infinite: 0.59
+recommends:
+  File::Find::Rule: 0.24
+  Storable: 2.00
+  Test::Pod: 0.95
+provides:
+  HTTP::Range:
+    file: lib/HTTP/Range.pm
+    version: 0.02
+generated_by: Module::Build version 0.25

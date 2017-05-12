@@ -1,0 +1,52 @@
+Revision history for Perl extension HTML::Tidy.
+
+1.56    Sun Sep 22 16:39:40 CDT 2013
+====================================
+[ENHANCEMENTS]
+webtidy's version statement now shows the version number of the underlying
+tidyp library.
+
+[FIXES]
+Fixed an undef warning in parse().  Thanks, Vladimir Timofeev.
+
+utf8 was never encoded correctly.  Thanks, Vladimir Timofeev and Alistair
+Francis.
+
+The ->parse() method would sometimes return false even though everything
+worked fine.  Thanks, @sebaer.
+
+
+
+1.54    Fri Sep 17 00:44:36 CDT 2010
+====================================
+Please note that the bug tracker for HTML::Tidy is now at
+http://github.com/petdance/html-tidy.
+
+[FIXES]
+Fixed incorrect calls to croak().  Thanks, Steve Grazzini.
+
+[DOCUMENTATION]
+Updating all docs referring to libtidyp and Alien::Libtidyp.
+
+
+1.52    Wed May 12 2010
+=======================
+First release since the major overhaul that relies on libtidyp.
+
+Now relies on Perl 5.8.  I'm not at all interested in supporting
+ancient Perl version.
+
+HTML::Tidy now relies on the libtidyp that Andy Lester maintains
+on github.
+
+http://github.com/petdance/libtidyp
+
+[ENHANCEMENTS]
+Now includes support for TIDY_INFO messages.
+
+Improve support for Windows platforms.
+
+[FIXES]
+Fixed a segfault if there are no errors.
+
+Allow for either "tidyp" or "HTML Tidy" as a program name in tests.

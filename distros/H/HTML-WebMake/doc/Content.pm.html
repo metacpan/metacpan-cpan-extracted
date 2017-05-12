@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>
+      WebMake: Documentation: HTML::WebMake::Content
+    </title>
+    <meta name="generator" content="WebMake/2.2" />
+    <style>
+      body {
+       background-color: #ffffff; 
+       color: #000000; 
+       font-size: medium;
+       font-family: verdana,lucida,helvetica,sans-serif;
+      }
+      code, samp, pre {
+       font-family: Courier New,courier,fixed-width,monospace;
+      }
+      H1 { font-size: x-large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFCC66; }
+      H2 { font-size: large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFDD77; }
+      H3 { font-size: medium; font-family: Garamond,Book Antiqua,Times,serif; background: #FFEE88; }
+      H4 { font-size: small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H5 { font-size: x-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H6 { font-size: xx-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      A:link {
+       font-weight: bold;
+       color: #004000;
+       text-decoration: underline; 
+      }
+      A:visited {
+       font-weight: normal;
+       color: #008000;
+       text-decoration: underline; 
+      }
+      A:active {
+       font-weight: bold;
+       color: #800000;
+       text-decoration: underline; 
+      }
+      dt {
+       font-size: medium;
+       font-weight: bold;
+       padding-top: 8px; padding-bottom: 8px;
+      }
+      dd {
+       padding-top: 8px; padding-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body bgcolor="#ffffff" text="#000000" link="#3300cc" vlink="#660066">
+    <font face="lucida,verdana,sans-serif">
+      <div align="center">
+        <img src="images/WebMakeTitle.png" alt="WebMake" width="500" height="122" />
+      </div>
+      <table width="100%">
+        <tr>
+          <td valign="top">
+            <strong><a href="http://webmake.taint.org/">WebMake</a>
+             Documentation</strong> (version 2.2)
+             
+          </td>
+          <td valign="top">
+            <div align="right">
+              
+               [ <a href="index_08-pod.html">Back</a> | <a href="Main.pm.html">Forward</a> | <a href="index.html">Index</a>
+               | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+               
+            </div>
+          </td>
+        </tr>
+      </table>
+<!-- yes, it's that Mozilla black-border code again ;) -->
+      <!-- stolen from www.mozilla.org via rc3.org -->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td bgcolor="#aaaaaa">
+            <table border="0" cellspacing="4" cellpadding="4" width="100%">
+              <tr>
+                <td bgcolor="#ffffff">
+                  <table border="0" cellspacing="4" cellpadding="4" width="100%">
+                    <tr>
+                      <td>
+                        <h1>HTML::WebMake::Content</h1><!-- INDEX BEGIN -->
+                        <ul>
+                          <li>
+                            <a href="#NAME">NAME</a><li>
+                              <a href="#SYNOPSIS">SYNOPSIS</a><li>
+                                <a href="#DESCRIPTION">DESCRIPTION</a><li>
+                                  <a href="#METHODS">METHODS</a>
+                                </ul>
+<!-- INDEX END -->
+                                                                <hr />
+                                <h1><a name="NAME">NAME</a></h1><p>
+                                  
+                                  Content - a content item.
+                                  <hr />
+                                  <h1><a name="SYNOPSIS">SYNOPSIS</a></h1><p>
+                                    <pre>
+  &lt;{perl
+                                  </pre>
+                                  <p>
+                                    <pre>
+    $cont = get_content_object (&quot;foo.txt&quot;);
+    [... etc.]
+                                  </pre>
+                                  <p>
+                                    <pre>
+  }&gt;
+                                  </pre>
+                                  <hr />
+                                  <h1><a name="DESCRIPTION">DESCRIPTION</a></h1><p>
+                                    
+                                    This object allows manipulation of WebMake content items directly.
+                                    <hr />
+                                    <h1><a name="METHODS">METHODS</a></h1><dl>
+                                      <dt>
+                                        <strong><a name="item__text">$text = $cont-&gt;get_name();</a></strong>
+                                      </dt>
+                                      <dd>
+                                        <p>
+                                          
+                                          Return the content item's name.
+                                          
+                                        </dd>
+                                        <dt>
+                                          <strong>$text = $cont-&gt;as_string();</strong>
+                                        </dt>
+                                        <dd>
+                                          <p>
+                                            
+                                            A textual description of the object for debugging purposes; currently it's
+                                            name.
+                                            
+                                          </dd>
+                                          <dt>
+                                            <strong><a name="item__fname">$fname = $cont-&gt;get_filename();</a></strong>
+                                          </dt>
+                                          <dd>
+                                            <p>
+                                              
+                                              Get the filename or datasource location that this content was loaded from.
+                                              Datasource locations look like this:
+                                              <code>proto</code>:<code>protocol-specific-location-data</code>, e.g. <code>file:blah/foo.txt</code> or
+                                              <code>http://webmake.taint.org/index.html</code>.
+                                              
+                                            </dd>
+                                            <dt>
+                                              <strong><a name="item__filenames">@filenames = $cont-&gt;get_deps();</a></strong>
+                                            </dt>
+                                            <dd>
+                                              <p>
+                                                
+                                                Return an array of filenames and locations that this content depends on,
+                                                i.e. the filenames or locations that it contains variable references to.
+                                                
+                                              </dd>
+                                              <dt>
+                                                <strong><a name="item__flag">$flag = $cont-&gt;is_generated_content();</a></strong>
+                                              </dt>
+                                              <dd>
+                                                <p>
+                                                  
+                                                  Whether or not a content item was generated from Perl code, or is metadata.
+                                                  Generated content items cannot themselves hold metadata.
+                                                  
+                                                </dd>
+                                                <dt>
+                                                  <strong><a name="item__val">$val = $cont-&gt;expand()</a></strong>
+                                                </dt>
+                                                <dd>
+                                                  <p>
+                                                    
+                                                    Expand a content item, as if in a curly-bracket content reference. If the
+                                                    content item has not been expanded before, the current output file will be
+                                                    noted as the content item's ''main'' URL.
+                                                    
+                                                  </dd>
+                                                  <dt>
+                                                    <strong>$val = $cont-&gt;expand_no_ref()</strong>
+                                                  </dt>
+                                                  <dd>
+                                                    <p>
+                                                      
+                                                      Expand a content item, as if in a curly-bracket content reference. The
+                                                      current output file will not be used as the content item's ''main'' URL.
+                                                      
+                                                    </dd>
+                                                    <dt>
+                                                      <strong>$val = $cont-&gt;get_metadata($metaname);</strong>
+                                                    </dt>
+                                                    <dd>
+                                                      <p>
+                                                        
+                                                        Get an item of this object's metadata, e.g.
+                                                        <p>
+                                                          <pre>
+        $score = $cont-&gt;get_metadata(&quot;score&quot;);
+                                                        </pre>
+                                                        <p>
+                                                          
+                                                          The metadatum is converted to its native type, e.g. <code>score</code> is return as an integer, <code>title</code> as a string, etc. If the metadatum is not provided, the default value for
+                                                          that item, defined in HTML::WebMake::Metadata, is used.
+                                                          
+                                                        </dd>
+                                                        <dt>
+                                                          <strong><a name="item__score">$score = $cont-&gt;get_score();</a></strong>
+                                                        </dt>
+                                                        <dd>
+                                                          <p>
+                                                            
+                                                            Return a content item's score.
+                                                            
+                                                          </dd>
+                                                          <dt>
+                                                            <strong><a name="item__title">$title = $cont-&gt;get_title();</a></strong>
+                                                          </dt>
+                                                          <dd>
+                                                            <p>
+                                                              
+                                                              Return a content item's title.
+                                                              
+                                                            </dd>
+                                                            <dt>
+                                                              <strong><a name="item__modtime">$modtime = $cont-&gt;get_modtime();</a></strong>
+                                                            </dt>
+                                                            <dd>
+                                                              <p>
+                                                                
+                                                                Return a content item's modification date, in UNIX time_t format, ie.
+                                                                seconds since Jan 1 1970.
+                                                                
+                                                              </dd>
+                                                              <dt>
+                                                                <strong><a name="item__order">$order = $cont-&gt;get_declared();</a></strong>
+                                                              </dt>
+                                                              <dd>
+                                                                <p>
+                                                                  
+                                                                  Returns the content item's declaration order. This is a number representing
+                                                                  when the content item was first encountered in the WebMake file; earlier
+                                                                  content items have a lower declaration order. Useful for sorting.
+                                                                  
+                                                                </dd>
+                                                                <dt>
+                                                                  <strong><a name="item__kidobjs">@kidobjs = $cont-&gt;get_kids ($sortstring);</a></strong>
+                                                                </dt>
+                                                                <dd>
+                                                                  <p>
+                                                                    
+                                                                    Get the child content items for this item. The ''child'' content items are
+                                                                    items that use this content as their <code>up</code> metadatum.
+                                                                    <p>
+                                                                      
+                                                                      Returns a list of content objects in unsorted order.
+                                                                      
+                                                                    </dd>
+                                                                    <dt>
+                                                                      <strong>@kidobjs = $cont-&gt;get_sorted_kids ($sortstring);</strong>
+                                                                    </dt>
+                                                                    <dd>
+                                                                      <p>
+                                                                        
+                                                                        Get the child content items for this item. The ''child'' content items are
+                                                                        items that use this content as their <code>up</code> metadatum.
+                                                                        <p>
+                                                                          
+                                                                          Returns a list of content objects sorted by the provided sort string.
+                                                                          
+                                                                        </dd>
+                                                                        <dt>
+                                                                          <strong>$text = $cont-&gt;get_url();</strong>
+                                                                        </dt>
+                                                                        <dd>
+                                                                          <p>
+                                                                            
+                                                                            Get a content item's URL. The URL is defined as the first page listed in
+                                                                            the WebMake file's out tags which refers to that item of content.
+                                                                            <p>
+                                                                              
+                                                                              Note that, in some cases, the content item may not have been referred to
+                                                                              yet by the time it's <code>get_url()</code> method is called. In this case,
+                                                                              WebMake will insert a symbolic tag, hold the file in memory, and defer
+                                                                              writing the file in question until all other output files have been
+                                                                              processed and the URL has been found.
+                                                                              
+                                                                            </dd>
+                                                                          </dl>
+                                                                        </td>
+                                                                      </tr>
+                                                                    </table>
+                                                                  </td>
+                                                                </tr>
+                                                              </table>
+                                                            </td>
+                                                          </tr>
+                                                        </table>
+                                                        <table width="100%">
+                                                          <tr>
+                                                            <td valign="top">
+                                                              <strong><a href="http://webmake.taint.org/">WebMake</a>
+                                                               Documentation</strong> (version 2.2)
+                                                               
+                                                            </td>
+                                                            <td valign="top">
+                                                              <div align="right">
+                                                                
+                                                                 [ <a href="index_08-pod.html">Back</a> | <a href="Main.pm.html">Forward</a> | <a href="index.html">Index</a>
+                                                                 | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+                                                                 
+                                                              </div>
+                                                            </td>
+                                                          </tr>
+                                                        </table>
+                                                        <div align="right">
+                                                          <a href="http://webmake.taint.org/"><img src="images/BuiltWithWebMake.png" alt="Built With WebMake" border="0" width="88" height="31" /></a>
+                                                        </div>
+                                                      </font>
+                                                    </body>
+                                                  </html>

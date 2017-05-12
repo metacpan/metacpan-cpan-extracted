@@ -1,0 +1,9 @@
+---
+elements:
+  - type: File
+    name: 300x300_gif
+    inflators: 
+      - type: Imager
+    validators:
+      - type: Imager::Size
+        width: 100

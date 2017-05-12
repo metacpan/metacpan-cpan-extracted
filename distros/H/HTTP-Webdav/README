@@ -1,0 +1,114 @@
+
+HTTP::Webdav - Perl interface to Neon HTTP and WebDAV client library
+
+Copyright (c) 2001 Gerald Richter / ecos gmbh (www.ecos.de)
+
+You may distribute under the terms of either the GNU General Public 
+License or the Artistic License, as specified in the Perl README file.
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED 
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+$Id: README,v 1.9 2001/06/11 04:09:46 richter Exp $
+
+
+This is the Perl interface to the neon HTTP and WebDAV client library.
+
+neon has the following features:
+
+  - High-level interface to HTTP and WebDAV methods (PUT, GET, HEAD etc) 
+
+  - Low-level interface to HTTP request handling, to allow implementing new methods easily. 
+
+  - HTTP/1.1 and HTTP/1.0 persistent connections 
+
+  - RFC2617 basic and digest authentication (including auth-int, md5-sess) 
+
+  - Proxy support (including basic/digest authentication) 
+
+  - Generic WebDAV 207 XML response handling mechanism 
+
+  - XML parsing using the expat or libxml parsers 
+
+  - Easy generation of error messages from 207 error responses 
+
+  - WebDAV resource manipulation: MOVE, COPY, DELETE, MKCOL. 
+
+  - WebDAV metadata support: set and remove properties, query any set of properties (PROPPATCH/PROPFIND). 
+
+
+WARNING: This wrapper is alpha code, while neon is around for some time and
+stable to use, not all of the interface functions provided by this Perl module
+has been tested extensivly, but most of them should work without problems (At least
+they do it for me :-).
+
+
+For documentation see 
+---------------------
+
+perldoc Webdav.pod
+
+or after installation
+
+perldoc HTTP::Webdav
+
+
+Installation on UNIX as usual
+-----------------------------
+
+perl Makefile.PL
+make
+make install
+
+
+See in the eg directory for some examples.
+
+
+Installation on Windows
+-----------------------
+
+perl Makefile.PL \path\to\neon-0.15.0 \path\to\expat-lite
+nmake
+nmake install
+
+To use the library you must make sure that the XMLPARSE.DLL from expat
+can be loaded (i.e. is in your PATH)
+
+See in the eg directory for some examples.
+
+
+Prerequisites
+-------------
+
+Neon must be already installed on your computer and compiled as shared library.
+On UNIX this can be done with the following commands in the neon source directory:
+
+./configure --enable-shared
+make install
+
+On Windows this can be done with the following commands in the neon source directory:
+
+nmake /f neon.mak EXPAT_SRC=/path/to/expat-lite
+ 
+
+This version requires neon 0.15.1
+
+Neon can be taken form http://www.webdav.org/neon/
+
+
+SUPPORT
+-------
+
+For any problems, suggestion or feedback, please use the neon mailing list
+
+post to:    neon@webdav.org
+subscribe:  http://mailman.webdav.org/mailman/listinfo/neon/
+
+
+AUTHOR
+------
+
+Gerald Richter / ecos <richter@dev.ecos.de> 
+
+

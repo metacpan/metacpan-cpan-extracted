@@ -1,0 +1,113 @@
+<ep-package name="HTML::EP::Explorer" accept="de,en">
+<ep-explorer-init>
+<ep-explorer-config file="admin/config.pm">
+<ep-explorer-filetype>
+<ep-if cnd="'$_ep_language$' eq 'de'">
+  <ep-set var=SubmitButton val="Dateien ausdrucken">
+<ep-else>
+  <ep-set var=SubmitButton val="Print files">
+</ep-if>
+<html><head>
+<script language=JavaScript>
+  function List (reloadHim) {
+    // In the explorer_list_win, create a listing of the current
+    // directory.
+    var hisForm = parent.explorer_list_win.document.explorer_list_form;
+    if (!hisForm) { return } // JavaScript 1.0 doesn't support the forms array
+    var myForm = document.explorer_top_form;
+    var ft = myForm.filetypes;
+    if (reloadHim  ||
+	(ft.options[ft.selectedIndex].value != hisForm.filetype.value
+	 &&  hisForm.filetype.value)) {
+	hisForm.filetype.value = ft.options[ft.selectedIndex].value;
+	reloadHim = 1;
+    }
+    if (reloadHim) {
+	hisForm.submit();
+    }
+  }
+  function GetAction (f) {
+    if (!document.explorer_top_form  ||
+        !document.explorer_top_form.faction) { return 0; }  // JavaScript 1.0
+    var fa = document.explorer_top_form.faction;
+    f.faction.value = fa.options[fa.selectedIndex].value;
+    return 1;
+  }
+  function GetStatus (f) {
+    var status = f.options[f.selectedIndex].value;
+    var l;
+    if (status == "") {
+      document.explorer_action_form.files.value = "";
+      l = "listwin.ep";
+    } else if (status == "queue") {
+      l = "queue.ep";
+    } else if (status == "logfile") {
+      l = "logfile.ep";
+    }
+    var fa = document.explorer_top_form.faction;
+    parent.explorer_list_win.location = l +
+	"?language=$_ep_language$&faction=" +
+	escape(fa.options[fa.selectedIndex].value);
+  }
+  function GetDir (f) {
+    var dir = f.options[f.selectedIndex].value;
+    var hisForm = parent.explorer_list_win.document.explorer_list_form;
+    if (!hisForm) { return } // JavaScript 1.0 doesn't support the forms array
+    if (hisForm.basedir.value != dir) {
+	hisForm.basedir.value = dir;
+	hisForm.submit();
+    }
+  }
+</script>
+</head>
+<body bgcolor=#ffffff onLoad="List(0)">
+<h1><ep-if eval="$config->header_main$">
+      $config->header_main$
+    <ep-else>
+      <ep-language de="HTML-Explorer" en="HTML Explorer">
+    </ep-if></h1>
+<form name=explorer_top_form action=topwin.ep method=GET>
+  <input type=hidden name=language value="$_ep_language$">
+  <p>
+    <ep-select name=faction items=actions item=a>
+      <option value="$a->name$">$a->name$
+    </ep-select>
+    <select name=status onChange="GetStatus(this)">
+        <option value="">
+	  <ep-language de="Dateiauswahl" en="File selection">
+      <ep-if cnd="'$cgi->status$' eq 'queue'">
+        <option value="queue" selected>
+      <ep-else>
+        <option value="queue">
+      </ep-if>
+	  <ep-language de="Druckerwarteschlange" en="Printer queue">
+      <ep-if cnd="'$cgi->status$' eq 'logfile'">
+        <option value="logfile" selected>
+      <ep-else>
+        <option value="logfile">
+      </ep-if>
+          <ep-language de="Statusdatei" en="Log file">
+    </select>
+    <ep-select name=filetypes items=filetypes item=ft onChange="List(1)">
+      <option value="$ft->name$" $ft->selected$>$ft->name$
+    </ep-select>
+<ep-if cnd="$num_directories$ > 1">
+    <ep-select name=directories items=directories item=d
+	       onChange="GetDir(this)"
+	       selected="$self->in_base_dir">
+      <option value="$d->dir$">$d->name$
+    </ep-select>
+</ep-if>
+  </p>
+</form>
+<form name=explorer_action_form action=action.ep method=GET target=_new
+      onSubmit="return GetAction(this)">
+  <input type=hidden name=language value="$_ep_language$">
+  <input type=hidden name=faction value="">
+  <p>
+    <table><tr><td><textarea name=files rows=5 cols=30></textarea></td>
+               <td><input type=submit value="$SubmitButton$"></td>
+    </table>
+  </p>
+</form>
+</body></html>

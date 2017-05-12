@@ -1,0 +1,99 @@
+HTML::WikiConverter installation
+================================
+
+HTML::WikiConverter is an HTML to wiki converter capable of converting
+HTML source into a variety of wiki dialects. It's aimed at folks who
+are converting vanilla HTML websites into wikis.
+
+The HTML::WikiConverter module itself is an interface to its various
+dialect modules (e.g. HTML::WikiConverter::MediaWiki). To install the
+latest version of HTML::WikiConverter and all of its dialects, install
+Bundle::HTMLWikiConverter from CPAN:
+
+  % perl -MCPAN -e 'install Bundle::HTMLWikiConverter'
+
+For just the interface:
+
+  % perl -MCPAN -e 'install HTML::WikiConverter'
+
+Individual dialects can be installed separately, e.g.:
+
+  % perl -MCPAN -e 'install HTML::WikiConverter::MediaWiki'
+  % perl -MCPAN -e 'install HTML::WikiConverter::UseMod'
+  % perl -MCPAN -e 'install HTML::WikiConverter::Oddmuse'
+
+Installing by hand
+==================
+
+You may also obtain the source as a .tar.gz, in which case you can run
+the following after unpacking:
+
+  % perl Makefile.PL
+  % make && make test && make install
+
+The 'make install' step attempts to install the module and the
+html2wiki utility into something like /usr or /usr/local, which
+probably won't work unless you're an administrator. To work around
+this, you may install into your own local directory like so:
+
+  % perl Makefile.PL PREFIX=~/myperl5
+  % make && make test && make install
+
+Installing the web application
+==============================
+
+Included in this distribution is HTML::WikiConverter::WebApp, which is
+a CGI::Application-based web application that interfaces with
+HTML::WikiConverter and any installed dialects. (Note that you will
+need to have CGI::Application installed to use this feature.)
+
+The H::WC::WebApp module is installed automatically. The remaining
+files necessary for the web application are in the cgi/ directory. To
+install these files, first follow the basic installation instructions
+above. Next, copy the cgi/ directory to your cgi-bin/ directory,
+provide a suitable value for the 'template_path' variable in the
+provided index.cgi instance script, and assign appropriate
+permissions.
+
+These steps can all be accomplished via the included webapp-install
+script, which is excuted like so:
+
+  % ./webapp-install
+
+When complete, be sure to stop and restart your Apache server:
+
+  % sudo apachectl stop
+  % sudo apachectl start
+
+If the webapp-install script does not work or you choose not to use
+it, you may also install the web application by hand. (This is
+essentially what the webapp-install script does.)
+
+1) Copy the cgi/ directory to your cgi-bin/ directory:
+
+  % cp -r cgi /var/www/cgi-bin/html2wiki
+
+2) Assign appropriate permissions:
+
+  % chmod 655 /var/www/cgi-bin/html2wiki/index.cgi
+  % chmod a+r /var/www/cgi-bin/html2wiki/templates/*
+
+3) Edit the index.cgi instance script to provide a suitable template
+path, replacing __PATH_TO_TEMPLATES__ with the location of the
+cgi/templates/ folder:
+
+  # Inside /var/www/cgi-bin/html2wiki/index.cgi:
+  my %config = (
+    template_path => '/var/www/cgi-bin/html2wiki/templates',
+  );
+
+4) Restart your Apache server as appropriate.
+
+5) The template filler should then be available via a standard URL:
+
+  http://www.yourhost.com/cgi-bin/html2wiki/index.cgi
+
+Author
+======
+
+David J. Iberri <diberri@cpan.org>

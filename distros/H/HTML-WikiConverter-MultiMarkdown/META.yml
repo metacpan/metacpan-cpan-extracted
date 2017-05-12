@@ -1,0 +1,24 @@
+---
+name: HTML-WikiConverter-MultiMarkdown
+version: 0.02
+author:
+  - 'Dave Rolsky, E<gt>autarch@urth.orgE<lt>'
+abstract: Converts HTML to MultiMarkdown syntax
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::Differences: 0
+  Test::More: 0
+requires:
+  HTML::WikiConverter::Markdown: 0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  HTML::WikiConverter::MultiMarkdown:
+    file: lib/HTML/WikiConverter/MultiMarkdown.pm
+    version: 0.02
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

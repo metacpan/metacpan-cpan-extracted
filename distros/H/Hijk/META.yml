@@ -1,0 +1,33 @@
+---
+abstract: 'Fast & minimal low-level HTTP client'
+author:
+  - 'Kang-min Liu & Borislav Nikolov'
+build_requires:
+  ExtUtils::MakeMaker: '6.36'
+  Module::Install::CPANfile: '0'
+  Net::Ping: '2.41'
+  Plack: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  CPAN::Meta: '0'
+  ExtUtils::MakeMaker: '6.36'
+dynamic_config: '0'
+generated_by: 'Module::Install version 1.17, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Hijk
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+requires:
+  Time::HiRes: '0'
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+  repository: https://github.com/gugod/Hijk
+version: '0.27'
+x_module_name: Hijk

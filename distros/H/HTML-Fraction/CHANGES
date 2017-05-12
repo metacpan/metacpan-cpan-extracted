@@ -1,0 +1,17 @@
+CHANGES file for HTML::Fraction:
+
+0.50 Fri Jan 20 08:21:12 GMT 2012
+  - add support for 0/3, 1/7, 1/9 and 1/10
+  - add support for .13, .38, .63, and .88 being converted to fractions
+  - refactor to have less lookup tables
+  - improve test suite
+
+0.40 Thu Jun 23 09:03:58 BST 2005
+  - also copes with common fractions in decimal form, such as 0.5
+    thanks to Mark Fowler
+
+0.30 Sun Jun  5 10:32:24 BST 2005
+  - fix silly mistake in the test suite
+
+0.29 Sat Jun  4 22:27:55 BST 2005
+  - first release

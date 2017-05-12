@@ -1,0 +1,27 @@
+Build.PL
+Changelog.ini
+CHANGES
+config/.hthtml.yui3.menu.conf
+htdocs/assets/css/html/yui3/menu/fancy.table.css
+htdocs/assets/css/html/yui3/menu/web.page.css
+htdocs/assets/templates/html/yui3/menu/item.tx
+htdocs/assets/templates/html/yui3/menu/menu.tx
+htdocs/assets/templates/html/yui3/menu/split.buttons.tx
+htdocs/assets/templates/html/yui3/menu/submenu.tx
+htdocs/assets/templates/html/yui3/menu/switch.statement.tx
+htdocs/assets/templates/html/yui3/menu/web.page.tx
+htdocs/assets/templates/html/yui3/menu/yui.js.tx
+lib/HTML/YUI3/Menu.pm
+lib/HTML/YUI3/Menu/Util/Config.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+scripts/copy.config.pl
+scripts/create.table.pl
+scripts/generate.html.pl
+scripts/generate.menu.pl
+scripts/plot.menu.pl
+t/pod.t
+t/test.t

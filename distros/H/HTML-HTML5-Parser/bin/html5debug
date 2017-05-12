@@ -1,0 +1,88 @@
+#!/usr/bin/perl
+## skip Test::Tabs
+
+use Getopt::Long;
+use HTML::HTML5::Parser;
+
+my $output = $ENV{HTML_OUTPUT} || 'debug:json';
+my $help;
+GetOptions(
+	'output|o=s'   => \$output,
+	'help|usage|h' => \$help,
+	);
+
+if ($help)
+{
+	my $name = $0;
+	print <<HELP and exit(1);
+Usage: cat document.html | $0 --output=FORMAT
+
+  Reads HTML from STDIN and prints it out in a format useful for debugging.
+
+Formats:
+
+  clarkml        - ClarkML
+  debug          - Debugging tree
+  debug:json     - Debugging tree as JSON (default)
+  errors         - List of errors
+  html           - HTML
+  parser         - Parser internals
+  parser:json    - Parser internals as JSON
+  xml            - XHTML
+  
+HELP
+}
+
+sub load
+{
+	my ($pkg) = @_;
+	unless (eval "use $pkg; 1;")
+	{
+		die "This output format requires $pkg.\n";
+	}
+}
+
+my $p = HTML::HTML5::Parser->new;
+my $h = join '', <>;
+my $hash;
+
+if ($output =~ /debug/i)
+{
+	load('XML::LibXML::Debugging');
+	$hash = $p->parse_string($h)->toDebuggingHash;
+}
+elsif ($output =~ /clark/i)
+{
+	load('XML::LibXML::Debugging');
+	print $p->parse_string($h)->toClarkML;
+}
+elsif ($output =~ /html/i)
+{
+	load('HTML::HTML5::Writer');
+	print HTML::HTML5::Writer->new->document($p->parse_string($h));
+}
+elsif ($output =~ /parser/i)
+{
+	$p->parse_string($h);
+	$hash = $p;
+}
+elsif ($output =~ /err/i)
+{
+	$p->parse_string($h);
+	print "$_\n" foreach $p->errors;
+}
+else
+{
+	print $p->parse_string($h)->toString;
+}
+
+if (defined $hash and $output =~ /json/)
+{
+	load('JSON');
+	print to_json($hash, {pretty=>1,canonical=>1});
+}
+elsif (defined $hash)
+{
+	load('Data::Dumper');
+	print Dumper($hash);
+}

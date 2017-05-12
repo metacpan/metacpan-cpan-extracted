@@ -1,0 +1,43 @@
+Copyright 2009, 2013 Kevin Ryde
+
+This file is part of HTML-FormatExternal.
+
+HTML-FormatExternal is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published
+by the Free Software Foundation; either version 3, or (at your option) any
+later version.
+
+HTML-FormatExternal is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License along
+with HTML-FormatExternal.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+
+HTML-FormatExternal lets you turn HTML into plain text using one of
+the browsing/formatting programs,
+
+    elinks        http://elinks.cz/
+    html2text     http://www.mbayer.de/html2text/
+    links         http://links.twibright.com/
+    lynx          http://lynx.isc.org/
+    netrik        http://netrik.sourceforge.net/
+    vilistextum   http://bhaak.dyndns.org/vilistextum/
+    w3m           http://sourceforge.net/projects/w3m
+    zen           http://www.nocrew.org/software/zen/
+
+The programming interface is compatible with HTML::FormatText and
+HTML::FormatText::WithLinks, so you can fairly easily switch how you
+want the formatting done.
+
+The programs vary in things like link printing style, levels of
+support for non-ascii input or output, table output, or HTML 4
+constructs.  The compatible programming interface means you can give a
+couple of them a try to find what you like most or are most familiar
+with etc.
+
+http://user42.tuxfamily.org/html-formatexternal/index.html

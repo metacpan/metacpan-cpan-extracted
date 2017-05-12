@@ -1,0 +1,252 @@
+=head1 NAME
+
+HTTP::WebTest::Cookbook - Recipes for typical web tests
+
+=head1 SYNOPSIS
+
+Not Applicable
+
+=head1 DESCRIPTION
+
+This document contains some examples of L<HTTP::WebTest|HTTP::WebTest>
+usage.
+
+Unless otherwise is stated all examples are either runnable programs
+(see L<HTTP::WebTest::API|HTTP::WebTest::API>) or runnable wtscript
+files (see L<perldoc wt|wt>).
+
+=head1 BASICS
+
+=head2 Test Static Web Pages
+
+This wtscript file tests static pages on the author's website:
+
+    test_name = First page
+        url = http://martynov.org/
+        text_require = ( Ilya Martynov's Web Site )
+    end_test
+
+    test_name = Mail-CheckUser page
+        url = http://martynov.org/checkuser
+        text_require = ( Mail-CheckUser
+                         Download )
+        regex_require = ( Mail-CheckUser-[\d\.]+\.tar\.gz )
+    end_test
+
+The same tests in the form of a Perl script:
+
+    use HTTP::WebTest;
+
+    my $webtest = new HTTP::WebTest;
+
+    $webtest->run_tests(
+        [ {
+            test_name     => 'First page',
+            url           => 'http://martynov.org/',
+            text_require  => [ "Ilya Martynov's Web Site" ]
+          },
+          {
+            test_name     => 'Mail-CheckUser page',
+            url           => 'http://martynov.org/checkuser',
+            text_require  => [ 'Mail-CheckUser',
+                               'Download' ],
+            regex_require =>
+                             [ 'Mail-CheckUser-[\d\.]+\.tar\.gz' ]
+          }
+        ]);
+
+=head2 Test a Login Form
+
+This wtscript file tests the login form at http://fsck.com/rt2/:
+
+    test_name = Login page
+        url = http://fsck.com/rt2/
+        text_require = ( Login
+                         Username:
+                         Password:)
+    end_test
+
+    test_name = Submit wrong username & password
+        url = http://fsck.com/rt2/
+        params = ( user => unknownUser
+                   pass => somePassword )
+        text_require = ( Error
+                         Your username or password is incorrect )
+    end_test
+
+    test_name = Submit correct username & password
+        url = http://fsck.com/rt2/
+        params = ( user => guest
+                   pass => guest )
+        regex_require = ( Signed in as.*?guest.*?\. )
+    end_test
+
+=head2 Using link and button names instead of URLs in tests
+
+This wtscript file tests static pages on the author's website.  It is
+similar to the example in section L<Check Static Website> but it uses the test
+parameter C<click_link> to specify the link to be followed on the next test
+request instead of a hardcoded URL:
+
+    # load HTTP::WebTest::Plugin::Click module which provides test
+    # parameter 'click_link'
+    plugins = ( ::Click )
+
+    test_name = First page
+        url = http://martynov.org/
+        text_require = ( Ilya Martynov's Web Site )
+    end_test
+
+    test_name = Mail-CheckUser page
+        click_link = Mail-CheckUser
+        text_require = ( Mail-CheckUser
+                         Download )
+        regex_require = ( Mail-CheckUser-[\d\.]+\.tar\.gz )
+    end_test
+
+This wtscript file tests the login form at http://fsck.com/rt2/.  It is similar
+to the example in section L<Check Login Form> but avoids using a hardcoded
+URL for the page the form should be submitted to by using the test parameter
+C<click_button>:
+
+    # load HTTP::WebTest::Plugin::Click module which provides test
+    # parameter 'click_button'
+    plugins = ( ::Click )
+
+    test_name = Login page
+        url = http://fsck.com/rt2/
+        text_require = ( Login
+                         Username:
+                         Password:)
+    end_test
+
+    test_name = Submit correct username & password
+        click_button = Login
+        params = ( user => guest
+                   pass => guest )
+        regex_require = ( Signed in as.*?guest.*?\. )
+    end_test
+
+=head1 ADVANCED
+
+=head2 Test::Harness Compatible Output
+
+This Perl script reads a test specification from file C<test.wt> and
+generates L<Test::Harness|Test::Harness> compatible output:
+
+    use Test::More qw(no_plan);
+    use HTTP::WebTest;
+
+    my $webtest = new HTTP::WebTest;
+    $webtest->run_wtscript('test.wt',
+                           {
+                             default_report => 'no',
+                             plugins        => [ '::HarnessReport' ]
+                           });
+
+This script uses reporting plugin
+L<HTTP::WebTest::Plugin::HarnessReport|HTTP::WebTest::Plugin::HarnessReport>
+which internally uses L<Test::Builder|Test::Builder> module to
+generate L<Test::Harness|Test::Harness> compatible output.  It should
+be compatible with other testing libraries built using
+L<Test::Builder|Test::Builder> (like L<Test::More|Test::More> or
+L<Test::Differences|Test::Differences>) so you can freely intermix
+them in one test script.
+
+=head2 User-Defined Tests
+
+It is possible to define new tests without writing new plugin
+module.  This is a fragment of a wtscript file that checks if a new record
+has been inserted into a database as a result of the Add Record test.
+
+    # load HTTP::WebTest::Plugin::Hooks module which provides test
+    # parameters 'on_start', 'on_finish' and 'on_response'
+    plugins = ( ::Hooks )
+
+    on_start = {
+        # initialize a database handle used later in the tests
+        require DBI;
+        $dbh = DBI->connect('dbi:mysql:test', 'login', 'password');
+    }
+
+    on_finish = {
+        # disconnect from the database
+        $dbh->disconnect;
+    }
+
+    ....
+
+    test_name = Add Record
+        # request to this URL with parameter 'name' adds new record
+        url = http://some.server/add-record
+        params = ( name => 'John' )
+
+        # define check
+        on_response = {
+            my $has_record = $dbh->selectrow_array(
+                                 'SELECT COUNT(*) FROM USERS ' .
+                                 'WHERE NAME = ?',
+                                 undef, 'John'
+                             );
+
+            # return result of check with a comment
+            [ $has_record > 0 ? 'yes' : 'no', 'Have got John' ];
+        }
+    end_test
+
+=head2 Dynamic Tests
+
+Sometimes you want to feed the results of a previous test into
+the next test.  In this example, C<Add Record> creates a database record,
+emits HTML containing the new record ID, and C<Delete Record> deletes
+the database record using the record ID from C<Add Record>.
+
+    # load HTTP::WebTest::Plugin::Hooks module which provides test
+    # parameter on_response
+    plugins = ( ::Hooks )
+
+    ....
+
+    test_name = Add Record
+        # request to this URL with parameter 'name' adds new record
+        url = http://some.server/add-record
+        params = ( name => 'John' )
+
+        # get ID from a page
+        on_response = {
+            # get webtest object
+            my $webtest = shift;
+
+            # find ID in the returned page
+            ($ID) = $webtest->current_response->content =~ /ID=(\d+)/;
+
+            # because no checks are defined a reference on empty array
+            # must be returned
+            [];
+        }
+    end_test
+
+    ....
+
+    test_name = Delete Record
+        # request to this URL with parameter 'id' deletes record
+        url = http://some.server/delete-record
+        params = ( id => "$ID" )
+    end_test
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001-2003 Ilya Martynov.  All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<HTTP::WebTest|HTTP::WebTest>
+
+L<HTTP::WebTest::API|HTTP::WebTest::API>
+
+L<wt|wt>
+
+=cut

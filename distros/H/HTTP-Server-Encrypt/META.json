@@ -1,0 +1,50 @@
+{
+   "abstract" : "HTTP server can encrypt BODY section",
+   "author" : [
+      "Chen Gang <yikuyiku.com@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.9, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTTP-Server-Encrypt",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Crypt::CBC" : "0",
+            "Data::Dump" : "0",
+            "Digest::MD5" : "0",
+            "HTTP::Date" : "0",
+            "HTTP::Status" : "0",
+            "LWP::MediaTypes" : "0",
+            "LWP::UserAgent" : "0",
+            "Log::Lite" : "0.03",
+            "MIME::Base64" : "0",
+            "Sys::Sendfile" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.12"
+}

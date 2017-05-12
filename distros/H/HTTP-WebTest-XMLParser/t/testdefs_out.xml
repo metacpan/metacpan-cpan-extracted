@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<WebTest version="1.0">
+  <params>
+    <list name="auth">
+      <param>user</param>
+      <param>secretpass</param>
+    </list>
+    <param name="default_report">no</param>
+    <list name="mail_addresses">
+      <param>NOC &lt;noc@isp.tld&gt;</param>
+    </list>
+    <param name="mail_from">WebTest &lt;webtest@isp.tld&gt;</param>
+    <list name="plugins">
+      <param>::XMLReport</param>
+      <param>::Click</param>
+    </list>
+    <param name="user_agent">Mozilla/5.0 (HTTP-WebTest)</param>
+  </params>
+  <test>
+    <param name="test_name">Yahoo Home</param>
+    <list name="text_forbid">
+      <param>Internal Server Error</param>
+    </list>
+    <list name="text_require">
+      <param>&lt;/html&gt;</param>
+      <param>Yahoo!</param>
+    </list>
+    <param name="url">http://www.yahoo.com/</param>
+  </test>
+  <test>
+    <param name="test_name">Front page of Slashdot site</param>
+    <param name="url">http://slashdot.org/</param>
+  </test>
+  <test>
+    <param name="click_link">.*Read More\.\.\..*</param>
+    <param name="test_name">Slashdot 1st article</param>
+    <list name="text_require">
+      <param>Threshold:</param>
+    </list>
+  </test>
+  <test>
+    <param name="test_name">This should fail</param>
+    <list name="text_forbid">
+      <param>Internal Server Error</param>
+    </list>
+    <list name="text_require">
+      <param>Yahoo!</param>
+      <param>Sorry, the page you requested was not found</param>
+    </list>
+    <param name="url">http://www.yahoo.com/thisshouldnotexist</param>
+  </test>
+  <test>
+    <code name="coderef">sub { 'CODE N.A.' }</code>
+    <list name="http_headers">
+      <param>Accept</param>
+      <param>text/html,application/xml+xhtml;q=0.9,text/plain;q=0.5</param>
+      <param>Referer</param>
+      <param>http://webtest.org/</param>
+      <param>Accept-Encoding</param>
+      <param>gzip,deflate</param>
+      <param>Cache-Control</param>
+      <param>max-age=300</param>
+    </list>
+    <list name="params">
+      <param>page</param>
+      <param>1</param>
+      <param>lang</param>
+      <param>en_US</param>
+    </list>
+    <param name="test_name">query_params</param>
+    <param name="url">http://www.yahoo.com/</param>
+  </test>
+</WebTest>

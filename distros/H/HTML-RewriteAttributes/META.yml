@@ -1,0 +1,28 @@
+---
+abstract: 'concise attribute rewriting'
+author:
+  - 'Shawn M Moore, C<< <sartak@bestpractical.com> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-RewriteAttributes
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  HTML::Entities: 0
+  HTML::Parser: 0
+  HTML::Tagset: 0
+  URI: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.05

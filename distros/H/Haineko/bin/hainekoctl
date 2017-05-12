@@ -1,0 +1,171 @@
+#!/usr/bin/env perl
+use feature ':5.10';
+use strict;
+use warnings;
+use lib './lib';
+use File::Basename qw/basename dirname/;
+use Path::Class;
+use Module::Load;
+
+my $subcommand = shift @ARGV;
+my $scriptname = basename $0;
+my $methodargv = {};
+my $hainekocmd = undef;
+my $commandset = undef;
+my $daemonargs = [ 'start', 'stop', 'reload', 'restart', 'status' ];
+
+if( $subcommand ) {
+
+    $commandset = join( ' ', $scriptname, @ARGV );
+    if( grep { $subcommand eq $_ } @$daemonargs ) {
+        #      _                                  
+        #   __| | __ _  ___ _ __ ___   ___  _ __  
+        #  / _` |/ _` |/ _ \ '_ ` _ \ / _ \| '_ \ 
+        # | (_| | (_| |  __/ | | | | | (_) | | | |
+        #  \__,_|\__,_|\___|_| |_| |_|\___/|_| |_|
+        #                                         
+        require Haineko::CLI::Daemon;
+        my $scriptroot = Path::Class::Dir->new( dirname $0 );
+        my $serverroot = $scriptroot->parent->absolute();
+        my $procidfile = sprintf( "%s/run/haineko.pid", $serverroot );
+
+        $procidfile = '/tmp/haineko.pid' unless -w $serverroot.'/run';
+        $methodargv = {
+            'command' => $commandset,
+            'pidfile' => $procidfile,
+        };
+        $hainekocmd = Haineko::CLI::Daemon->new( %$methodargv );
+
+        if( $subcommand eq 'start' ) {
+            # Start haineko server, run as a wrapper of ``plackup'' command.
+            $SIG{'INT'} = sub { 
+                $hainekocmd->removepf;
+                exit(0);
+            };
+
+            $hainekocmd->parseoptions;
+            $hainekocmd->run;
+
+        } else {
+            # Sub command except ``start''
+            $hainekocmd->parseoptions;
+
+            if( $subcommand =~ m/(?:stop|reload|restart)/ ) {
+                # ``stop'' or ``restart''
+                $hainekocmd->ctrl( $subcommand );
+
+            } else {
+                # ``status'' sub command displays process id
+                my $p = $hainekocmd->readpf;
+                printf( STDERR "pid = %d\n", $p ) if defined $p;
+            }
+        }
+    } else {
+        # Sub commands except daemon mode
+        if( $subcommand eq 'help' || $subcommand eq '--help' ) {
+            # ``help'' sub command
+            require Haineko::CLI;
+            require Haineko::CLI::Help;
+            my $climodules = [ 'Daemon', 'Setup', 'Password' ];
+
+            $methodargv = { 'command' => $commandset };
+            $hainekocmd = Haineko::CLI::Help->new( %$methodargv );
+            for my $e ( @$climodules, '' ) {
+                my $c = 'Haineko::CLI';
+                $c .= '::'.$e if length $e;
+                Module::Load::load( $c );
+                $hainekocmd->add( $c->help('subcommand'), 'subcommand' );
+            }
+            $hainekocmd->mesg;
+            help();
+            exit(0);
+
+        } elsif( $subcommand eq 'version' ) {
+            # version
+            require Haineko::CLI;
+            Haineko::CLI->version;
+            exit(0);
+
+        } elsif( $subcommand =~ m/(?:pw|passwd|password)/ ) {
+            # Generate a new password for BASIC-Authentication
+            require Haineko::CLI::Password;
+            $methodargv = { 'command' => $commandset };
+            $hainekocmd = Haineko::CLI::Password->new( %$methodargv );
+            $hainekocmd->parseoptions;
+            print $hainekocmd->make;
+            print "\n";
+            exit(0);
+
+        } elsif( $subcommand eq 'setup' || $subcommand eq 'make-setup-data' ) {
+            # Initialize: Distribute files for Haineko to current directory 
+            # or specified directory.
+            require Haineko::CLI::Setup;
+            $methodargv = { 'command' => $commandset };
+            $hainekocmd = Haineko::CLI::Setup->new( %$methodargv );
+            $hainekocmd->parseoptions;
+
+            if( $subcommand eq 'setup' ) {
+                $hainekocmd->init;
+
+            } else {
+                $hainekocmd->make;
+                exit(0);
+            }
+
+        } else {
+            # Unknown sub command
+            printf( STDERR "Unknown sub command: %s\n", $subcommand );
+            exit(1);
+        }
+    }
+} else {
+    printf( STDERR "Try %s help\n", basename $scriptname );
+}
+
+sub help {
+    printf( STDERR "Try '%s SUBCOMMAND --help'\n", $scriptname );
+}
+
+__END__
+=encoding utf8
+
+=head1 NAME
+
+hainekoctl - Controls haineko server and utilities.
+
+=head1 DESCRIPTION
+
+hainekoctl is a controller script for haineko server and have some utilities.
+
+=head1 SYNOPSYS
+
+    $ hainekoctl --help         # Help message of the script
+    $ hainekoctl start --help   # Help message of "start" sub command
+
+    $ hainekoctl setup          # Setting up files for haineko to current directory
+    $ hainekoctl start -d       # Start haineko server on development mode
+    $ hainekoctl pw             # Generate a new password for Basic Authentication
+
+=head1 SEE ALSO
+
+=over 2
+
+=item *
+L<Haineko::CLI> - Base class for Haineko command line tools
+
+=back
+
+=head1 REPOSITORY
+
+https://github.com/azumakuniyuki/Haineko
+
+=head1 AUTHOR
+
+azumakuniyuki E<lt>perl.org [at] azumakuniyuki.orgE<gt>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify it under 
+the same terms as Perl itself.
+
+=cut

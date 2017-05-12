@@ -1,0 +1,40 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Harriet;
+use Pod::Usage;
+
+my $dir = shift or pod2usage;
+
+my %orig_env = %ENV;
+
+my $harriet = Harriet->new($dir);
+$harriet->load_all();
+
+$| = 1;
+print "\n\n";
+while (my ($k, $v) = each %ENV) {
+    unless (exists $orig_env{$k}) {
+        print "export $k='$v'\n";
+    }
+}
+print "\n\n";
+
+$SIG{INT} = sub { die "Received SIGINT." };
+
+# and long long sleep.
+sleep 10000 while 1;
+
+__END__
+
+=head1 NAME
+
+harriet - daemons runner for testing
+
+=head1 SYNOPSIS
+
+    % harriet t/harriet/
+
+=head1 DESCRIPTION
+
+Run the harriet scripts in t/harriet/.

@@ -1,0 +1,18 @@
+HPCD::SLURM is a driver for HPCI (High Performance Computing Interface).
+An HPCD (High Performance Computing Driver) module translates the
+standard HPCI interface into the appropriate access mechanisms for a
+specific type of cluster that is selected.
+
+In this module, the target cluster type is SLURM (Simple Linux Utility for Resource Management).
+
+This module was derived from HPCD::SGE. This is the initial release, and has
+been tested only on a small test slurm cluster comprising 1 head node and 4
+child nodes. Therefore some problems might arise when it gets tested on a real
+slurm server. That should happen soon.
+
+See the notes for HPCI for most details about usage - the docs within
+this module only describe the SLURM-specific differences.
+
+There is a discussion list available for HPCI.  Subscribe through:
+
+    mailto:BoutrosLabSoftware@oicr.on.ca

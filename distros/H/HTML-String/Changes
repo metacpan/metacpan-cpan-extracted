@@ -1,0 +1,22 @@
+1.000006 - 2013-09-15
+  - Fix to handle no-op escapes such as \\, broken by unicode fix
+
+1.000005 - 2013-09-15
+  - Fix unicode/wide characters confusing the perl compiler
+  - Ensure TT doesn't try and call methods instead of VMethods
+
+1.000004 - 2013-09-12
+  - Fix concatenating undef to HTML::String values.
+
+1.000003 - 2013-09-12
+  - Fix concatenating strings that evaluate to false in a boolean context.
+
+1.000002 - 2013-01-03
+  - Optimise _hsv_dot since it gets called heavily by HTML::String::TT
+
+1.000001 - 2013-01-03
+  - Localize $@ in isa and can in case of modules that mishandle eval {}
+  - Support for single quotes (' to &#39;)
+
+1.000000 - 2012-08-13
+  - Initial release

@@ -1,0 +1,112 @@
+Revision history for Perl extension HTML::Feature
+
+3.00011 2010.05.13
+    - use Scalar::Util::weaken at HTML::Feature::Base to avoid memory leak.
+    - update LDRFullFeed's data(item.st)
+
+3.00010 2009.10.08
+    - fix a bug of Storable's 64bit-compatibility
+    - update LDRFullFeed's data(item.st)
+    - add simpple exception handling mechanism on HTML::Feature::Engine
+
+3.00009 2009.09.09
+    - update LDRFullFeed's data(item.st)
+    - and some bug fix
+    - add a sample script
+
+3.00008 2009.08.29
+    - set HTML::TreeBuilder's option at HTML::Feature::Engine::LDRFullFeed.
+      ( 'no_space_compacting(1)' and 'ignore_ignorable_whitespace(0)' ) 
+
+3.00007 2009.08.21
+    - utf8::encode() the html string before passed to Data::Decode
+
+3.00006 2009.08.19
+    - fix a memory leak
+    - and some bug fix
+    - Oh, today is my wife's birthday! I forgot it!
+
+3.00005 2009.08.03
+    - fix a bug
+        HTML::Feature::Decoder
+
+3.00004 2009.08.03
+    - fix a bug
+        HTML::Feature::Decoder
+
+3.00004 2009.08.02
+    - down the version of Data::Decode  ( from 0.00007_01 to 0.00006 )
+
+3.00003 2009.07.27
+    - fix POD file
+
+3.00002 2009.07.27
+    - fix two bugs
+        HTML::Feature::FrontParser
+        HTML::Feature::Engine::GoogleADSection
+
+3.00001 2009.07.27
+    - Major version up.
+    - Improved it to be able to be equipped with plural engines
+         HTML::Feature::Engine::LDRFullFeed
+         HTML::Feature::Engine::GoogleADSection
+         HTML::Feature::Engine::TagStructure
+    - replace HTML::TreeBuilder to HTML::TreeBuilder::LibXML ( or HTML::TreeBuilder::XPath )
+
+2.00006 2008.10.05
+    - fix a bug that improperty joins of several words
+    - set 'user_agent' option
+    - an object of HTML::Feature::Engine can recognize the base_url
+      via context object ( $c->{base_url} )
+    - add test codes
+
+2.00005 2008.08.15
+    - set 'timeout' option
+
+2.00004 2007.12.9
+    - remove caching mechanism when traversing HTML tree
+    - fix a bug at engine module selector
+
+2.00004_00 (DEVELOPER RELEASE)  2007.11.07
+    - change the calling semantics of parse(). Now it accepts an URI
+      string/object, an HTTP::Response object, or a scalar ref, which in
+      case will be interpreted as raw HTML.
+    - localize $Encode::Guess::NoUTFAutoGuess
+    - no longer store parse data in the instance
+    - introduce HTML::Feature::Result
+    - fix memory leaks caused by HTML::Element
+    - use caching when traversing HTML tree
+
+2.0.3  2007.11.05
+    - add HTML::Element object as data type of return value
+
+2.0.2  2007.10.25
+    - set 'http_proxy' option 
+
+2.0.1  2007.10.16
+    - rewrite all code
+
+1.0.5  2007.07.06
+    - bug fix ( memory leak )
+
+1.0.4  2007.05.24
+    - add some functions and bug fix
+
+1.0.3  2007.03.12
+    - change the encode module from "Encode::Detect" to "Encode::Guess"
+
+1.0.2  2007.02.26
+    - rewrite 'META.xml' and 'Makefile.PL'
+
+1.0.1  2007.02.23
+    - largely changed analysis specifications of the script inside
+
+0.2.0  2007.01.17
+    - add some functions and bug fix
+
+0.1.1  2007.01.08
+    - It is deleted a definition of Data::Dumper by a module
+
+0.0.1  Wed Dec 27 12:49:20 2006
+    - original version; created by h2xs 1.23 with options
+        -AX -n HTML::Feature

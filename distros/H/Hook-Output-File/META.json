@@ -1,0 +1,57 @@
+{
+   "abstract" : "Redirect STDOUT/STDERR to a file",
+   "author" : [
+      "Steven Schubiger <schubiger@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4216",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Hook-Output-File",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "IO::Capture" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Spec" : "0",
+            "Params::Validate" : "0",
+            "Scalar::Util" : "0",
+            "boolean" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "Hook::Output::File" : {
+         "file" : "lib/Hook/Output/File.pm",
+         "version" : "0.08"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/stsc/Hook-Output-File"
+      }
+   },
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

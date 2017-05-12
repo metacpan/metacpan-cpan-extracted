@@ -1,0 +1,46 @@
+<html>
+<head>
+<style type="text/css">
+<!--
+DIV            {font-family: arial; font-size: 12px}
+-->
+</style>
+<title>jamespo's perl page</title>
+</head>
+
+<body bgcolor=white>
+
+<h3 align=center>jamespo's perl page</h3>
+
+<pre>
+Description of Contribution:
+                A module (suggested name HTTP::Browscap) that provides information
+                on a web browsers' capabilities (eg - table support, frame support),
+                the browser being identified by its "User Agent" string. This will 
+                use the existing Microsoft Browscap.ini database, a version of 
+                which is freely downloadable and actively maintained at 
+                http://www.browserhawk.com/browscap/
+
+Name              DSLI  Description                                  Info
+----------------  ----  -------------------------------------------- -------
+HTTP::Browscap    cdpO  Provides info on web browser capabilities    JAMESPO
+</pre>
+
+<div>
+<h4>Downloads</h4>
+<small>(Note: pre-pre-pre Beta - the code will be significantly improved before
+release onto CPAN)</small>
+<ul>
+<li><a href="Browscap.pm">Browscap.pm</a>
+<li><a href="browstest.pl">browstest.pl</a>
+<li> You will need to download browscap.ini from <a
+href="http://www.browserhawk.com/browscap/" TARGET=dlbr>here</a>. <BR> Save it in
+the appropriate text format for your OS (ie CR/LF for Win, LF for Unix)
+</ul>
+
+Mail me: <a
+href="mailto:&#112;erl@james&#112;o.ukshells.co.uk">&#112;erl@james&#112;o.ukshells.co.uk</a>
+
+</div>
+</body>
+</html>

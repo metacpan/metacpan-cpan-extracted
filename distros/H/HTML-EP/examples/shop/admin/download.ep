@@ -1,0 +1,3 @@
+<ep-package name="HTML::EP::Shop">
+<ep-database dsn="DBI:CSV:f_dir=$env->DOCUMENT_ROOT$/outdoor/shop/var">
+<ep-shop-download table="$cgi->table$">

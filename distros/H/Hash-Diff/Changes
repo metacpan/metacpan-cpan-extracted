@@ -1,0 +1,25 @@
+Revision history for Perl module Hash::Diff
+
+0.009 2016-10-15
+  - Remove unnecessary Data::Dump to make tests pass.
+
+0.008 2015-08-27
+  - Added github repo to Makefile.PL so it will appear in META.*
+
+0.007 2015-08-25
+  Better support for undef
+
+0.006 2014-07-11
+  Not including empty hashes
+
+0.005 2010-09-22
+  [Typos]
+
+  * *sigh* more typos
+
+
+0.004 2010-09-21
+
+  [Typo]
+
+  * Fixed some typos in the pod

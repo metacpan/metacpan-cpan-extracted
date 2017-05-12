@@ -1,0 +1,246 @@
+=pod
+
+=head1 NAME
+
+HTML::Template::Default - provide multiple template sources and use a default
+
+=head1 SYNOPSIS
+
+   use HTML::Template::Default;
+   
+   $ENV{HTML_TEMPLATE_ROOT} = "$ENV{DOCUMENT_ROOT}/.templates";
+   
+   my $tmpl = HTML::Template::Default->new(
+      filename => 'gallery.html',
+      scalarref => \q{
+         <html>
+         <head>
+         <title><TMPL_VAR TITLE></title>
+         </head>
+         <body>
+         <h1><TMPL_VAR TITLE></h1>
+         <p><TMPL_VAR CONTENT></p>   
+         </body>
+         </html>
+      },
+      # ... other options just as you would pass to HTML::Template ...
+   );
+
+
+
+=head1 DESCRIPTION
+
+I have code, scripts, and CGI::Application apps, that are in use by multiple clients.
+It may be in a shared hosting environment, for example.
+
+Clients, users, want to be able to have radically different looks for an application.
+So, I want my scripts to use HTML::Template, to let a web designer make changes to 
+the template without knowing code.
+
+The most useful way I have of doing this is with this module.
+
+It allows you to provide a default template source as a scalarref, arrayref, or filehandle, in
+addition to providing a filename source. 
+And what this code does, is that if it finds the filename on disk, it will use that, otherwise,
+your default provided is used.
+
+Usually HTML::Template crashes if it looks for a filename source and it is not on disk.
+It also crashes if you provide multiple sources for a template.
+
+   Essentially, this allows you to provide multiple template sources to HTML::Template, the priority
+   is to use filename source if found, otherwise it uses another source provided.
+
+
+The files are sought in $ENV{HTML_TEMPLATE_ROOT}, and any 'path' arguments provided to constructor.
+Just like HTML::Template works.
+
+So, if the webdesigner or user wants to provide their own template, they simply create the file
+on disk, and it's done. No code change, no change of config files, etc.
+If anything is wrong, they just delete their template file.
+
+=head2 An alternative to using this module
+
+This module allows me to specify a template for the user without having a file on disk.
+
+Because the other option which should work.. would be to provide multiple paths, and the user's
+path first, and then lastly a place where I will have my default template.
+
+Here's how you would use normal HTML::Template to do that..
+
+   use HTML::Template;
+   
+   my $template = HTML::Template->new(
+      filename => 'gallery.html',
+      paths => [
+         "$ENV{DOCUMENT_ROOT}/.templates",
+         '/shared/.templates',
+         ],
+   );
+
+This example should work, provided there is a gallery.html file in '/shared/.templates'.
+If one is found in "$ENV{DOCUMENT_ROOT}/.templates" first, that one would be used.
+
+The disadvantage of this approach, is that you must have a file on disk at some location 
+where all users can read, etc.
+
+=head1 DEPRECATED - FUNCTION ORIENTED API
+
+This is here for backwards compatibility. Use the full object oriented API instead.
+
+=head2 SYNOPSIS
+
+   use HTML::Template::Default 'get_tmpl';
+   
+   $ENV{HTML_TEMPLATE_ROOT} = '/home/myself/public_html/templates';
+   
+   my $default = '
+   <html>
+   <head>
+   <title><TMPL_VAR TITLE></title>
+   </head>
+   <body>
+   <h1><TMPL_VAR TITLE></h1>
+   <p><TMPL_VAR CONTENT></p>   
+   </body>
+   </html>
+   ';
+   
+   # if super.tmpl exists, use it, if not, use my default
+   
+   my $tmpl = get_tmpl('super.tmpl',\$default); 
+   
+   $tmpl->param( TITLE => 'Great Title' );
+   $tmpl->param( CONTENT => 'Super cool content is here.' );
+
+=head2 get_tmpl()
+
+Takes arguments.
+Returns HTML::Template object.
+
+=head3 two argument usage
+
+If there are two arguments, the values are to be at least one of the following..
+
+- A path or filename to an HTML::Template file.
+
+- A scalar ref with default code for the template.
+
+Examples:
+   my $tmpl = get_tmpl('main.html', \$default_tmpl_html );
+   my $tmpl = get_tmpl('main.html');
+   my $tmpl = get_tmpl(\$default_html);
+
+=head3 hash argument usage
+
+arguments are the same as to HTML::Template constructor.
+The difference is that you can set *both* 'filename' and 'scalarref' arguments,
+and we try to instance via 'filename' first (if it is defined), and second
+via 'scalarref'.
+
+If neither filename or scalarref are defined, will throw a nasty exception with confess.
+
+If returns undef if we cannot instance.
+   my $tmpl = get_tmpl( filename => 'main.html', scalarref =>\$default_tmpl_html );
+
+=head4 Erroneous usage
+
+These examples will be interpreted as two argument usage when you meant hash usage..
+
+   my $tmpl = get_tmpl( filename => 'main.html' ); 
+   my $tmpl = get_tmpl( scalarref => \$default_html );
+
+=head2 EXAMPLE USAGE   
+
+=head3 Example 1
+
+In the following example, if main.html does not exist in $ENV{HTML_TEMPLATE_ROOT}, the '$default' 
+code provided is used as the template.
+	my $default = "<html>
+	<head>
+	 <title>Hi.</title>
+	</head> 
+	<body>
+		<TMPL_VAR BODY>		
+	</body>	
+	</html>";
+   
+	my $tmpl = get_tmpl('main.html', \$default);
+
+To override that template, one would create the file main.html in $ENV{HTML_TEMPLATE_ROOT}. The perl
+code need not change. This merely lets you provide a default, optionally.
+
+Again, if main.html is not in $ENV{HTML_TEMPLATE_ROOT}, it will use default string provided- 
+if no default string provided, and filename is not found, croaks.
+
+=head3 Example 2
+
+In the following example, the template file 'awesome.html' must exist in $ENV{HTML_TEMPLATE_ROOT}.
+Or the application croaks. Because no default is provided.
+	my $tmpl = get_tmpl('awesome.html');
+
+=head3 Example 3
+
+If you don't provide a filename but do provide a default code, this is ok..
+   my $tmpl = get_tmpl(\$defalt_code);
+
+
+=head3 Example 4
+   
+If you want to pass arguments to the template..
+   my $tmpl = get_tmpl( filename => 'super.tmpl', scalarref => \$default, case_sensitive => 1 );
+   
+
+=head3 Example 5
+
+In this example we provide both the default code we want, and filename for a file
+on disk that is given higher priority.
+If the file 'main.html' is on disk, it will be loaded.
+   use HTML::Template::Default 'get_tmpl';
+   
+   my $code = '<html><title><TMPL_VAR TITLE></title></html>';
+   
+   my $tmpl = get_tmpl ( 
+      filename => 'main.html',
+      scalarref => \$code,
+      die_on_bad_params => 0,
+      case_sensitive => 1,
+   );
+
+=head2 CAVEATS
+
+In two argument usage, die_on_bad_params is set to 0, if you want to change that, use hash argument.
+   get_tmpl(filename => $filename, scalarref => \$code); # leaves HTML::Template defaults intact
+   get_tmpl( $filename, \$scalarref ) # invokes die_on_bad_params => 0
+
+=cut
+
+=head1 DEBUG
+
+To set debug to on;
+   $HTML::Template::Default::DEBUG = 1;
+
+Gives useful info like if we got from disk or default provided etc to STDERR.
+
+=head1 SEE ALSO
+
+L<HTML::Template>
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=head1 COPYRIGHT
+
+Copyright (c) 2009 Leo Charre. All rights reserved.
+
+=head1 LICENSE
+
+This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, i.e., under the terms of the "Artistic License" or the "GNU General Public License".
+
+=head1 DISCLAIMER
+
+This package is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the "GNU General Public License" for more details.
+
+=cut

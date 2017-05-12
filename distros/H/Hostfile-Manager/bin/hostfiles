@@ -1,0 +1,119 @@
+#! /usr/bin/env perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Hostfile::Manager;
+use Term::Clui;
+
+my @enabled     = ();
+my @disabled    = ();
+my $interactive = 0;
+my $status      = 0;
+my $help        = 0;
+my $man         = 0;
+
+GetOptions(
+    "enable=s"    => \@enabled,
+    "disable=s"   => \@disabled,
+    "interactive" => \$interactive,
+    "status"      => \$status,
+    "help|?"      => \$help,
+    man           => \$man,
+) or pod2usage(2);
+
+pod2usage(1) if $help;
+pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+
+@enabled  = split( /,/, join( ',', @enabled ) );
+@disabled = split( /,/, join( ',', @disabled ) );
+
+pod2usage(1) unless ( @enabled || @disabled || $status || $interactive );
+
+my $manager = Hostfile::Manager->new;
+
+if ($interactive) {
+    my $modified = 0;
+
+    while (
+        my $chosen = choose(
+            "Select a hostfile fragment:",
+            map { get_fragment_status_line($_) } $manager->fragment_list
+        )
+      )
+    {
+        $chosen =~ s/^..//;
+        $manager->toggle_fragment($chosen);
+        $modified = 1;
+    }
+
+    $manager->write_hostfile if $modified;
+}
+else {
+    map { print "Disabling $_\n"; $manager->disable_fragment($_) } @disabled;
+    map { print "Enabling $_\n";  $manager->enable_fragment($_) } @enabled;
+
+    $manager->write_hostfile if ( @disabled || @enabled );
+
+    map { print get_fragment_status_line($_) . "\n" } $manager->fragment_list
+      if $status;
+}
+
+sub get_fragment_status_line {
+    my $fragment_name     = shift;
+    my $flag = $manager->fragment_status_flag($fragment_name);
+    return "$flag $fragment_name";
+}
+
+__END__
+
+=head1 NAME
+
+hostfiles - A simple script to manage multiple sets of hostfiles on *NIX systems
+
+=head1 SYNOPSIS
+
+hostfiles [options]
+
+  Options:
+    --enable        Enable one or more hostfile fragments
+    --disable       Disable one or more hostfile fragments
+    --status        Display the status of various hostfile fragments
+    --interactive   Present an interactive list of hostfile fragments
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--enable>
+
+Enable one or more hostfile fragments.  This option may be specified multiple times and multiple fragments may be specified in a comma-separated list.
+
+=item B<--disable>
+
+Disable one or more hostfile fragments.  This option may be specified multiple times and multiple fragments may be specified in a comma-separated list.
+
+=item B<--status>
+
+Display a list of fragments and their status.  A '+' indicates the fragment is enabled.  A '*' indicates an enabled fragment has been changed in /etc/hosts.
+
+=item B<--interactive>
+
+Presents an interactive list of hostfile fragment to enable or disable.
+
+=back
+
+=head1 DESCRIPTION
+
+B<This program> will read the hostfile fragments specified to be enabled from /etc/hostfiles/<fragment_name> and add them to /etc/hosts.  It will remove any fragments from /etc/hosts that are specified to be disabled.
+
+=head1 LICENSE
+
+Copyright (c) 2010-11 Anthony J. Mirabella. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Anthony J. Mirabella <mirabeaj AT gmail DOT com>

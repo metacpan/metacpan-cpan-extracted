@@ -1,0 +1,590 @@
+=head1 NAME
+
+HTML::FormFu::Manual::Cookbook - Cooking with HTML::FormFu
+
+=head1 VERSION
+
+version 2.05
+
+=head1 DESCRIPTION
+
+Miscellaneous useful recipes for use with HTML::FormFu
+
+=head1 GETTING STARTED
+
+Some useful info for beginners.
+
+=head2 Default search paths for config files
+
+The current working directory (C<cwd>) (see L<HTML::FormFu/"load_config_file">).
+
+If you're using the C<FormConfig> action attribute from
+L<Catalyst::Controller::HTML::FormFu>, forms should be saved in C<root/forms>.
+See L<Catalyst::Controller::HTML::FormFu/SYNOPSIS> and
+L<Catalyst::Controller::HTML::FormFu/config_file_path> for further details.
+
+=head2 YAML
+
+Most examples given in the L<HTML::FormFu> documentation use L<YAML> syntax.
+You can use any configuration file type supported by L<Config::Any>, but
+this author's preferred format is YAML.
+
+A form can be populated by a config file by calling
+L<HTML::FormFu/load_config_file> with the filename as an argument. The
+config file is converted to a perl data-structure, and then passed to
+L<HTML::FormFu/populate>.
+
+The config file must contain a hash-ref, with the keys corresponding to
+form method-names, and the values being the method arguments. For example,
+the following are equivalent:
+
+    ---
+    auto_fieldset: 1
+    elements:
+      - name: foo
+      - name: bar
+
+    # the above YAML is equivalent to the following perl code
+
+    $form->auto_fieldset(1);
+
+    $form->elements([
+        { name => 'foo' },
+        { name => 'bar' },
+    ]);
+
+When writing your config file, remember that perl hashes are unordered and
+cannot have multiple keys with the same name.
+
+See L<HTML::FormFu/load_config_file> and L<HTML::FormFu/populate> for
+more details.
+
+See L<http://www.yaml.org/spec/> for the YAML specification.
+
+=head1 BUILDING A FORM
+
+=head2 Quick single-file prototypes
+
+You can run the following script to quickly view a form's markup - replace
+the contents of the C<__DATA__> section with your own YAML config.
+
+    #!/usr/bin/perl
+    use strict;
+    use warnings;
+    use HTML::FormFu;
+    use YAML::XS qw( LoadFile );
+
+    my $form = HTML::FormFu->new;
+    my $data = LoadFile(\*DATA);
+
+    $form->populate($data);
+
+    print $form;
+
+    __DATA__
+    ---
+    auto_fieldset: 1
+    elements:
+      - type: Text
+        name: foo
+
+=head2 Unsupported HTML tags
+
+You can use the L<HTML::FormFu::Element::Block> element, and set
+the L<tag|HTML::FormFu::Element::Block/tag> to create any arbitrary pair of
+tags.
+
+    ---
+    elements:
+      - type: Block
+        tag: span
+        content_xml: "<b>Hi!</b>"
+
+You can use L<HTML::FormFu::Element::Block/content>,
+L<HTML::FormFu::Element::Block/content_xml> or
+L<HTML::FormFu::Element::Block/content_loc> to add any content you wish, or
+use L<HTML::FormFu::Element::Block/element> to add elements.
+
+=head1 Application-wide default values
+
+You can automatically set defaults using L<HTML::FormFu/default_args>,
+and if you set this in a L<Catalyst> application config file, it'll take
+effect throughout your entire application, for example:
+
+    myapp.yml
+    ---
+    'Controller::HTML::FormFu':
+      constructor:
+        default_args:
+          elements:
+            Textarea:
+              rows: 10
+
+=head1 MODIFYING A FORM
+
+=head2 Insert a new field before existing form fields
+
+See L<HTML::FormFu/insert_before> and L<HTML::FormFu/insert_after>.
+
+    my $fieldset = $form->get_element({ type => 'Fieldset' });
+
+    $fieldset->insert_before(
+        $form->element(\%specs),
+        $form->get_field($name)
+    );
+
+Another way to approach the problem is to use multiple config files, and
+decide which to load at runtime:
+
+    # user_edit.yml
+    ---
+    elements:
+      - type: Text
+        name: email
+
+    # user_username.yml
+    ---
+    elements:
+      - type: Text
+        name: username
+
+     # user_register.yml
+     ---
+     load_config_file:
+      - user_username.yml
+      - user_edit.yml
+
+    # create a user edit form, with only the email field
+
+    $form->load_config_file( 'user_edit.yml' );
+
+    # create a user registration form with username and email fields
+
+    $form->load_config_file( 'user_register.yml' );
+
+=head2 Form and Field attributes
+
+You can add any arbitrary attributes to a form with
+L<HTML::FormFu/attributes>, or to any element with
+L<HTML::FormFu::Element/attributes>.
+
+    ---
+    attributes_xml:
+      onsubmit: "js_function()"
+    elements:
+      - type: Text
+        name: foo
+        attributes_xml:
+          onchange: "js_function()"
+
+=head1 FORM VALIDATION
+
+=head2 Check valid dates
+
+Use L<HTML::FormFu::Inflator::DateTime>. When the inflator is processed, it
+will try to create a DateTime object. An error will be returned if the
+supplied values do not make a valid date.
+
+=head2 Check valid URI / URLs
+
+See L<HTML::FormFu::Element::URL> or L<HTML::FormFu::Constraint::Regex>.
+
+=head2 Implement a custom constraint / validator
+
+If L<HTML::FormFu::Constraint::Callback> or
+L<HTML::FormFu::Validator::Callback> isn't sufficient for your needs, you
+can create your own class that inherits from L<HTML::FormFu::Constraint> or
+L<HTML::FormFu::Validator>, respectively.
+
+It should implement a C<validate_value> method, which returns true is the
+value is valid, or false otherwise.
+
+    package My::Custom::Validator;
+    use Moose;
+    extends 'HTML::FormFu::Validator';
+
+    sub validate_value {
+      my ( $self, $value, $params ) = @_;
+
+      return 1 if value_is_valid( $value );
+
+      return;
+    }
+
+    1;
+
+Then add your custom validator to the form:
+
+    ---
+    elements:
+      - type: Text
+        name: foo
+        validators:
+          - '+My::Custom::Validator'
+
+=head2 Constrain one form field based on the value of another
+
+For example, you have a radiogroup and several text fields, with different text
+fields being required depending on the value of the radiogroup.
+
+This is achieved using the C<when> attribute of a constraint:
+
+    constraints:
+      - type: Length
+        min: 8
+        when:
+          field: bar
+          values: [ 1, 3, 5 ]
+
+In the above example, the Length constraint is only processed when the form
+field named "bar" has a value of either 1, 3 or 5.
+
+You can also test for a negative condition using the C<not> attribute:
+
+    constraints:
+      - type: Length
+        min: 8
+        when:
+          field: bar
+          values: [ 1, 3, 5 ]
+          not: 1
+
+Now the constraint will be processed only if the value of field "bar" is NOT 1,
+3 or 5.
+
+Note: if you rely on the value of a checkbox for a when-restricted
+contraint, you might want to consider setting C<default_empty_value> for
+that checkbox. Take a look at L<HTML::FormFu::Role::Element::Field> to learn more.
+
+Please read L<HTML::FormFu::Constraint> for further information.
+
+=head2 Constrain one form field based on the return value of a callback
+
+You can use the C<when> attribute of a constraint also to decide using a
+callback if the constraint should be applied.
+
+For instance, the following (code) example shows a constraint being applied
+only if the value of another field contains a pattern
+
+    my $apply_if_pattern = sub {
+        my $params = shift;
+        return 1 if $params->{other_field} =~ m/\A ice_cream \z/xms;
+        return 0;
+    };
+
+    $field->{constraints} = {
+        type    => 'Required',
+        when    => {
+            callback    => $apply_if_pattern,
+        }
+    }
+
+
+Please read L<HTML::FormFu::Constraint> for further information.
+
+=head1 HTML MARKUP
+
+=head2 Indented HTML
+
+Use L<HTML::FormFu::OutputProcessor::Indent>:
+
+    ---
+    output_processors:
+      - Indent
+
+=head2 Add a blank div (e.g. for AJAX purposes)
+
+Simply add a Block element in the relevant place, it defaults to a C<DIV>
+tag.
+
+    ---
+    elements:
+      - type: Text
+        name: user
+
+      - type: Block
+        id: foo
+
+      - type: Text
+        name: email
+
+=head1 DISPLAY
+
+=head2 Custom error messages
+
+If you want to display an error message due to an error in your own code,
+such as a database check; something which isn't implemented as a
+L<Constraint|HTML::FormFu::Constraint> or
+L<Validator|HTML::FormFu::Validator>; you can use a
+L<Callback Constraint|HTML::FormFu::Constraint::Callback>.
+
+If you don't provide your own callback routine, the default callback will
+always pass, regardless of user input.
+
+You can take advantage of this by setting
+L<force_errors|HTML::FormFu/force_errors>, to display its error message
+when needed.
+
+Example config:
+
+    ---
+    elements:
+      - type: Text
+      - name: email
+      - constraints:
+        type: Callback
+        message: 'Email address already in use'
+
+Example usage:
+
+    if ( $@ =~ m/duplicate entry for key 'email'/i ) {
+
+        $form->get_field('email')
+             ->get_constraint({ type => 'Callback' })
+             ->force_errors(1);
+
+        $form->process;
+        # then redisplay the form as normal
+    }
+
+=head2 Highlight required fields (or fields with certain types of constraint)
+
+This can be achieved using the form's C<auto_constraint_class> method:
+
+    $form->auto_constraint_class( 'constraint_%t' );
+
+The container divs around any form field with a constraint will then have extra
+CSS classes added, which indicate the type of constraint and allow you to apply
+appropriate styling with CSS:
+
+    /* change background of labels for fields with a Required constraint */
+    fieldset .constraint_required label {
+        background: #f00;
+    }
+
+This technique can also be used to add content before or after the fields in
+question (note this will not work in older browsers with more limited CSS
+support such as IE6):
+
+    /* add an asterisk at the end of the label for required fields */
+    fieldset .constraint_required label:after {
+        content: '*'
+    }
+
+=head2 Add a popup hint to a field
+
+Most display a tooltip when a user hovers their mouse pointer over an HTML
+element with a "title" tag.
+Aural browsers may try to turn the content into speech.
+You can take advantage of this behaviour to provide a hint to the user about
+how to complete a form field.
+
+    elements:
+      - type: URL
+        name: url
+        label: Website
+        title: 'Must start with http:// or https://'
+
+The above will provide a hint when the "url" field receives focus.
+Or you could provide the hint for the container tag around both field and label:
+
+    elements:
+      - type: URL
+        name: url
+        label: Website
+        container_attributes:
+            title: 'Must start with http:// or https://'
+
+=head2 Display filtered values
+
+If you have a Filter on a field, such as L<HTML::FormFu::Filter::Whitespace>
+to strip leading / trailing whitespace, then if you redisplay the form the
+field is normally populated with the value the user originally entered.
+
+If you would like the field to contain the filtered value, use
+L<HTML::FormFu/render_processed_value>.
+
+=head2 Multiple forms using Catalyst::Controller::HTML::FormFu
+
+Sometimes you need to display multiple forms on a single page. If you
+try to use FormConfig on several actions in a chain, or similar, they
+all use C<< $c->stash->{form} >> to store the form, hence you only get the last
+form.
+
+One way to work around such problems is to do a little of the work yourself:
+
+In this example we have a login_form that we want on every page
+
+    # root/forms/login.yml:
+    ---
+        indicator: username
+        elements:
+            -
+                type: Text
+                name: username
+                constraints:
+                    - Required
+    ...
+
+We also have an edit-form
+
+    # root/forms/foo/edit.yml
+    ---
+        indicator: foo
+        elements:
+        -
+            type: Text
+            name: foo
+            constraints:
+                - Required
+    ...
+
+In this example, we want the login form to appear on every page, so
+we load this in the top-most auto action:
+
+    package MyApp::Controller::Root;
+
+    BEGIN { extends 'Catalyst::Controller::HTML::FormFu'; }
+
+    sub auto : Private {
+        my ($self, $c) = @_;
+
+        # We want to utilize a lot of the magic that the controller
+        # gives us, so therefore we call $self->form like this
+
+        my $login_form = $self->form;
+        $login_form->load_config_file('login.yml');
+
+        # Notice how we put it into another stash var, not 'form'
+        $c->stash->{login_form} = $login_form;
+        unless ($c->user_exists) {
+
+            $login_form->process();
+
+            if ($login_form->submitted_and_valid) {
+
+                # Since we set indicator, we should only end up here if we
+                # have a username in the form
+                $c->authenticate({
+                    username => $login_form->param_value('username'),
+                    password => $login_form->param_value('password'),
+                });
+            }
+
+        }
+    }
+
+
+Any other page that wants to load another form, can now do so freely:
+
+    package MyApp::Controller::Foo;
+
+    sub edit : Local FormConfig {
+        my ( $self, $c ) = @_;
+
+        my $form = $c->stash->{form};
+        if ($form->submitted_and_valid) {
+            # Do whatever you want with it :p
+        }
+    }
+
+In the view we now have two stash-variables:
+
+In F<root/foo/edit.tt>:
+    [% login_form %]
+    <h2>edit</h2>
+    [% form %]
+
+=head1 ADVANCED CUSTOMISATION
+
+=head2 Installing the TT templates
+
+It only makes sense to use the template files if you plan on customising
+them, as the default C<string> render-method is faster.
+
+As of C<HTML::FormFu v1.00>, L<TT|Template> is no longer listed a required
+prerequisite - so you'll need to install it manually if you with to use the
+template files.
+
+If you're using the L<Catalyst> web framework, install
+L<Catalyst::Controller::HTML::FormFu> and run the following command:
+
+    $ script/myapp_create.pl HTML::FormFu
+
+This will create a directory, C<root/formfu>, containing the HTML::FormFu
+template files.
+
+If you extend L<Catalyst::Controller::HTML::FormFu> and you don't set
+HTML::FormFu's INCLUDE_PATH yourself, it will automatically be set
+to C<root/formfu> if that directory exists.
+
+If you're not using L<Catalyst>, you can create the template files by
+running the following command:
+
+      $ html_formfu_deploy.pl <target-directory>
+
+Take note that if you choose to customise your own copy of HTML::FormFu's
+template files, you'll need to keep track of the C<Changes> file, when
+updating HTML::FormFu, so that you can update your own templates if the
+core templates are updated.
+
+=head1 PERFORMANCE
+
+=head2 Catalyst::Plugin::StackTrace
+
+If you're using L<Catalyst::Plugin::StackTrace>, make sure you're using at
+least version C<0.09> - earlier versions had performance problems with
+C<HTML::FormFu>.
+
+=head2 Template::Alloy
+
+You can also use L<Template::Alloy> instead of
+L<Template::Toolkit|Template>, it's mostly compatible, and in many cases
+provides a reasonable speed increase. You can do this either by setting the
+C<HTML_FORMFU_TEMPLATE_ALLOY> environment variable to a true value, or by
+passing C<TEMPLATE_ALLOY> to L<HTML::FormFu/tt_args>:
+
+    tt_args:
+      TEMPLATE_ALLOY: 1
+      COMPILE_DIR: /tmp
+      COMPILE_PERL: 1
+
+Template::Alloy's caching is off by default. Switch it on by setting either
+C<COMPILE_EXT> or C<COMPILE_DIR>. If you're running under a persistent
+environment such as modperl or fastcgi, you should also set C<COMPILE_PERL>
+to compile the cached templates down to perl code.
+
+Of cource, if you wish you can still use L<Template::Toolkit|Template> to
+process your own application templates, letting L<Template::Alloy> process
+just the HTML::FormFu templates.
+
+=head2 HTML:FormFu::Preload
+
+To reduce the runtime for each form that uses a previously unused
+element or processor - at the expense of greater memory usage - you
+can preload all FormFu modules - this is only recommended for persistent
+environments such as modperl or fastcgi:
+
+    use HTML::FormFu::Preload;
+
+=head1 FAQs
+
+=head2 Force an element to always have a certain value
+
+See the following:
+
+L<HTML::FormFu::Role::Element::Field/"retain_default">,
+L<HTML::FormFu::Role::Element::Field/"force_default">
+
+=head1 AUTHORS
+
+Will Hawes C<wdhawes@gmail.com>
+
+Carl Franks C<cfranks@cpan.org>
+
+=head1 COPYRIGHT
+
+This document is free, you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

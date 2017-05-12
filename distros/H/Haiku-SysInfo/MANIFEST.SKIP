@@ -1,0 +1,15 @@
+\.gcov$
+\.gcda$
+\.gcno$
+\.o$
+\.bs$
+\.old$
+^SysInfo\.c$
+^Makefile$
+\.bak$
+~$
+^MYMETA\.yml$
+^blib/
+^pm_to_blib$
+^Haiku-SysInfo
+^.git

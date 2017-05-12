@@ -1,0 +1,7 @@
+SOUP_TYPE_MESSAGE_BODY        SoupMessageBody        GBoxed        HTTP::Soup::MessageBody
+SOUP_TYPE_BUFFER              SoupBuffer             GBoxed        HTTP::Soup::Buffer
+SOUP_TYPE_MESSAGE             SoupMessage            GObject       HTTP::Soup::Message
+SOUP_TYPE_MESSAGE_HEADERS     SoupMessageHeaders     GBoxed        HTTP::Soup::MessageHeaders
+SOUP_TYPE_SESSION             SoupSession            GObject       HTTP::Soup::Session
+SOUP_TYPE_SESSION_ASYNC       SoupSessionAsync       GObject       HTTP::Soup::SessionAsync
+SOUP_TYPE_COOKIE              SoupCookie             GBoxed        HTTP::Soup::Cookie

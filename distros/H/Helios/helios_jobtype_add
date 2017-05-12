@@ -1,0 +1,122 @@
+#!/usr/bin/env perl
+
+use 5.008;
+use strict;
+use warnings;
+use Getopt::Long;
+use Sys::Hostname;
+use File::Basename;
+
+use Helios::Config;
+use Helios::Error;
+use Helios::LogEntry::Levels ':all';
+use Helios::JobType;
+
+our $VERSION = '2.80';
+
+our $Help_Mode  = 0;
+our $Debug_Mode = 0;
+
+our $JobType_Name = '';
+our $JobTypeid;
+our $Config;
+
+# if they didn't use '--name' or '-n', that's OK
+if ($ARGV[0] !~ /^-/) {
+	$JobType_Name = shift @ARGV;
+}
+
+GetOptions (
+	"name=s"    => \$JobType_Name,
+	"help"      => \$Help_Mode,
+	"debug"     => \$Debug_Mode
+);
+
+# debug mode
+if ($Debug_Mode) { Helios::Config->debug(1); }
+
+# help mode
+if ($Help_Mode) {
+	require Pod::Usage;
+	Pod::Usage::pod2usage(-verbose => 2, -exitstatus => 0);
+}
+
+# stop if we were not given at least service and param
+unless ($JobType_Name) {
+	warn "$0: A jobtype name is required.\n";
+	exit(1);
+}
+
+# parse the global config; we'll need it
+eval {
+	$Config = Helios::Config->parseConfig();
+	1;	
+} or do {
+	my $E = $@;
+	warn "$0: Helios::Config ERROR: $E\n";
+	exit(1);
+};
+
+# OK, now use Helios::JobType to attempt to 
+# add the jobtype to the collective database
+eval {
+	my $jobtype = Helios::JobType->new(
+		name   => $JobType_Name,
+		config => $Config,
+	);
+
+	$JobTypeid = $jobtype->create();	
+	
+	1;	
+} or do {
+	my $E = $@;
+	warn "$0: Helios::JobType ERROR: $E\n";
+	exit(1);
+};
+
+print "Jobtype: $JobType_Name Jobtypeid: $JobTypeid created.\n";
+
+exit(0);
+
+
+=head1 NAME
+
+helios_jobtype_add - Add a jobtype to the Helios collective database
+
+=head1 SYNOPSIS
+
+ helios_jobtype_add --name=MyService
+
+ # "--name" is optional
+ helios_jobtype_add MyNewService
+
+=head1 DESCRIPTION
+
+Use the helios_jobtype_add command to add a new jobtype to your Helios 
+collective.  Every Helios job has an associated jobtype, which usually has 
+the same name as the Helios service that will run the job.  However, in some 
+more complex configurations a single Helios service can service multiple 
+jobtypes.  In such cases, helios_jobtype_add can be used add new jobtypes
+to the collective database.
+
+=head1 SEE ALSO
+
+L<Helios::JobType>
+
+=head1 AUTHOR
+
+Andrew Johnson, E<lt>lajandy at cpan dot orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013-4 by Logical Helion, LLC.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=head1 WARRANTY
+
+This software comes with no warranty of any kind.
+
+=cut

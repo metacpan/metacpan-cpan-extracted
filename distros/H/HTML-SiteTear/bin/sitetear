@@ -1,0 +1,95 @@
+#!/usr/bin/env perl -w
+
+use strict;
+use File::Basename;
+use File::Spec;
+use Getopt::Long;
+use Pod::Usage;
+
+use HTML::SiteTear;
+
+our $VERSION = '1.44';
+
+{
+    my $man = 0;
+    my $help = 0;
+    my $filter;
+    my $site_root_path = '';
+    my $site_root_uri = '';
+    
+    GetOptions('help|?' => \$help, man => \$man,
+                'siteroot=s' => \$site_root_path,
+                'rooturi=s' => \$site_root_uri,
+                'F=s'=>\$filter) or pod2usage(2);
+
+    pod2usage(-exitstatus => 0, -verbose => 1) if $help;
+    pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+    
+    if (@ARGV > 2) {
+        pod2usage(-message => 'Too many arguments.', 
+              -exitstatus => 1, -verbose => 1)
+    }
+
+    if (@ARGV < 2) {
+        pod2usage(-message => 'Required arguments is not given.', 
+              -exitstatus => 1, -verbose => 1)
+    }
+
+    my ($source_path, $target_path) = @ARGV;
+    
+    my $siteTear = HTML::SiteTear->new('source_path' => $source_path,
+                                    'site_root_path' => $site_root_path,
+                                    'site_root_uri' => $site_root_uri);
+    if ($filter) {
+        $siteTear->page_filter($filter);
+    }
+    
+    $siteTear->copy_to($target_path);
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+sitetear -- Make a separated copy form a part of a web site
+
+=head1 SYNOPSIS
+
+ sitetear [OPTION] SOURCE DESTINATION
+ sitetear [OPTION] SOURCE DIRECTORY
+
+=head1 DESCRIPTION
+
+sitetear make a separated copy of a part of web site in local file system. All linked files (HTML file, image file, javascript, cascading style shieet) from a source HTML file will be copied under a new page.
+
+This command is useful to make a destributable copy of a part of a web site.
+
+=head1 OPTIONS
+
+=over
+
+=item -h, --help
+
+Print a brief help message and exits.
+
+=item -m, --man
+
+Prints the manual page and exits.
+
+=item --siteroot
+
+The root path of the web site including SOURCE
+
+=item --rooturi
+
+The URI of the root path of the web site including SOURCE
+
+=back
+
+=head1 AUTHOR
+
+Tetsuro KURITA <tkurita@mac.com>
+
+=cut

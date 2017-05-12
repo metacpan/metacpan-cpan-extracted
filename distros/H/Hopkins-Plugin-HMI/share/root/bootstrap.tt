@@ -1,0 +1,13 @@
+[% DEFAULT page.skin	= 'slate'	%]
+[% DEFAULT page.layout	= 'default'			%]
+[% DEFAULT page.sidebar	= 'default'			%]
+[% DEFAULT page.title	= ''				%]
+[% DEFAULT page.refresh	= 0					%]
+[% DEFAULT page.styles	= []				%]
+[% DEFAULT page.scripts	= []				%]
+[% DEFAULT page.yui		= []				%]
+
+[% page.styles.push('default.css') %]
+
+[% page.scripts.push('/static/yui/build/yuiloader-dom-event/yuiloader-dom-event.js') %]
+[% page.scripts.push('/static/scripts/hopkins.js') %]

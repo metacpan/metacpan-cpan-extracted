@@ -1,0 +1,84 @@
+NAME
+
+    HTML::Rebase - rewrite HTML links to be relative to a given URL
+
+SYNOPSIS
+
+      use HTML::Rebase qw(rebase_html rebase_css);
+      my $html = <<HTML;
+      <html>
+      <head>
+      <link rel="stylesheet" src="http://localhost:5000/css/site.css" />
+      </head>
+      <body>
+      <a href="http://perlmonks.org">Go to Perlmonks.org</a>
+      <a href="http://localhost:5000/index.html">Go to home page/a>
+      </body>
+      </html>
+      HTML
+    
+      my $local_html = rebase_html( "http://localhost:5000/about.html", $html );
+      print $local_html;
+      __END__
+      <html>
+      <head>
+      <link rel="stylesheet" src="../css/site.css" />
+      </head>
+      <body>
+      <a href="http://perlmonks.org">Go to Perlmonks.org</a>
+      <a href="../index.html">Go to home page/a>
+      </body>
+      </html>
+
+ rebase_html
+
+    Rewrites all HTML links to be relative to the given URL. This only
+    rewrites things that look like src= and href= attributes. Unquoted
+    attributes will not be rewritten. This should be fixed.
+
+ rebase_css
+
+    Rewrites all CSS links to be relative to the given URL. This only
+    rewrites things that look like url( ... ) .
+
+CAVEATS
+
+ Does handle the <base> tag in a specific way
+
+    If the HTML contains a <base> tag, it's href= attribute is used as the
+    page URL relative to which links are rewritten.
+
+ Uses regular expressions to do all parsing
+
+    Instead of parsing the HTML into a DOM, performing the modifications
+    and then writing the DOM back out, this module uses a simplicistic
+    regular expressions to recognize href= and src= attributes and to
+    rewrite them.
+
+REPOSITORY
+
+    The public repository of this module is
+    http://github.com/Corion/html-rebase.
+
+SUPPORT
+
+    The public support forum of this module is http://perlmonks.org/.
+
+BUG TRACKER
+
+    Please report bugs in this module via the RT CPAN bug queue at
+    https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-Rebase or via
+    mail to html-rebase-Bugs@rt.cpan.org.
+
+AUTHOR
+
+    Max Maischein corion@cpan.org
+
+COPYRIGHT (c)
+
+    Copyright 2015 by Max Maischein corion@cpan.org.
+
+LICENSE
+
+    This module is released under the same terms as Perl itself.
+

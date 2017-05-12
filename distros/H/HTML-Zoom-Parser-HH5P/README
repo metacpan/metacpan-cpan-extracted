@@ -1,0 +1,96 @@
+NAME
+    HTML::Zoom::Parser::HH5P - use HTML::HTML5::Parser with HTML::Zoom
+
+SYNOPSIS
+       use HTML::Zoom;
+       use HTML::Zoom::Parser::HH5P;
+   
+       my $template = <<HTML;
+       <!DOCTYPE HTML
+          PUBLIC "-//W3C//DTD HTML 4.01//EN"
+          "http://www.w3.org/TR/html4/strict.dtd">
+       <html></html>
+       HTML
+   
+       my $output = HTML::Zoom
+          -> new({ zconfig => { parser => 'HTML::Zoom::Parser::HH5P' } })
+          -> from_html($template)
+          -> to_html;
+
+DESCRIPTION
+    "HTML::Zoom::Parser::HH5P" is glue between HTML::Zoom and
+    HTML::HTML5::Parser. It is likely to be slower than HTML::Zoom's built
+    in parser and HTML::Zoom::Parser::HTML::Parser, but because
+    HTML::HTML5::Parser uses the HTML5 parsing algorithm, should handle
+    malformed HTML in a manner more consistent with popular desktop web
+    browsers.
+
+  Constructor
+    "new(%attributes)"
+        Moose/Moo-style constructor function.
+
+  Attributes
+    "zconfig"
+        Holds an HTML::Zoom::ZConfig object. Read-only attribute, but a
+        separate "with_zconfig" method id provided to set the zconfig
+        attribute.
+
+    "parse_as_fragment"
+        Tri-state variable. If set to false, then all HTML parsed with this
+        object will be be treated as full HTML documents. Missing optional
+        tags such as "<head>" and "<body>" will be inferred and added to the
+        stream as required by the HTML5 specification. If set to true, then
+        all HTML parsed with the object will be treated as document
+        fragments. If undefined (the default), then this module will attempt
+        to guess the correct behaviour.
+
+        The current guessing heuristic is a case-insensitive search for
+        "<html", "<!doctype" or "<?xml" in the first 512 characters of the
+        string being parsed.
+
+    "ignore_implied_elements"
+        Boolean. If set to true (the default) then regardless of the
+        "parse_as_fragment" setting, elements which have been inferred will
+        not be included in the output stream.
+
+  Methods
+    "html_to_events($string)"
+        Returns an arrayref of hashrefs, where each hashref represents an
+        "event" parsing the HTML. Events correspond to elements, text nodes,
+        DTDs and so on in the HTML document. (Attributes are not events, but
+        are included in the element hashref.)
+
+    "html_to_stream($string)"
+        As per "html_to_events" but returns an HTML::Zoom stream.
+
+    "html_escape($string)"
+        Utility method to escape characters within the string as HTML
+        entities.
+
+    "html_unescape($string)"
+        Utility method to unescape HTML entities.
+
+    "with_zconfig($zconfig)"
+        Writer for "zconfig" attribute.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=HTML-Zoom-Parser-HH5P>.
+
+SEE ALSO
+    HTML::Zoom, HTML::HTML5::Parser.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012-2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

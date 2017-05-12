@@ -1,0 +1,33 @@
+---
+abstract: 'HTTP Body Parser'
+author:
+  - 'Christian Hansen, C<chansen@cpan.org>'
+  - 'Sebastian Riedel, C<sri@cpan.org>'
+  - 'Andy Grundman, C<andy@hybridized.org>'
+  - 'Torsten Raudssus, C<getty@cpan.org>'
+build_requires:
+  Encode: '0'
+  File::Spec::Functions: '0'
+  File::Temp: '0.14'
+  HTTP::Request::Common: '0'
+  Test::Deep: '0'
+  Test::More: '0.86'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTTP-Body
+requires:
+  Carp: '0'
+  Digest::MD5: '0'
+  File::Temp: '0.14'
+  HTTP::Headers: '0'
+  IO::File: '1.14'
+resources:
+  Mailing_list: http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst-dev
+  repository: git://git.shadowcat.co.uk/catagits/HTTP-Body.git
+version: '1.22'

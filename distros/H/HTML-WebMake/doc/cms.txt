@@ -1,0 +1,105 @@
+<wmmeta name="Title" value="WebMake as a CMS" />
+<wmmeta name="Section" value="01-intro" />
+<wmmeta name="Score" value="70" />
+<wmmeta name="Abstract">
+WebMake's content-management features, and shortcomings
+</wmmeta>
+
+WebMake is, arguably, a Content Management System, or "CMS" [CMS].
+
+To be more specific, it's oriented entirely towards generating a relatively
+static site, such as a weblog, a news site (without comments or
+personalisation) or a typical informational site.
+
+It does not have any dynamic, database-driven, features suitable for ''live''
+sites that update frequently with dynamic data; nor does it have support for
+''personalisation'' features, where the site displays different data based on
+what the user presents in their HTTP request.  (Of course, using WebMake does
+not preclude using PHP, mod_perl, Mason etc. to provide these, however.)
+
+Here's the relevant details of what it can do.
+
+WebMake's CMS Features
+======================
+
+  - **Separation between content and layout**
+
+    Since, logically, content and layout are entirely separate tasks, they
+    should be easy to keep separate in the CMS.
+
+    WebMake uses "content references" [refs] to include content into pages, and
+    implement templating.  This allows you to separate the content text from
+    the template layout HTML; the template designers just need to include
+    a content reference, such as ##&wmdollar;{body}##, instead of the
+    text.
+
+  - **No requirement for text editors to know HTML**
+
+    Only the layout staff should really __need__ to know HTML, so the staff who
+    provide text content can do this without HTML knowledge.
+
+    WebMake provides "Text::EtText" [$(ettext)], which provides an
+    easy-to-edit, easy-to-read and intuitive way to write HTML, based on the
+    plain-text markup conventions we've been using for years.
+
+  - **Generation of pages automatically, using metadata from content items**
+
+    It should be possible to generate index pages, sitemaps, navigation links,
+    and other text automatically, based on properties and metadata of the
+    pieces of content loaded.
+
+    WebMake supports this by "allowing any content item to carry arbitrary
+    textual metadata" [$(metadata)].  Perl code can then be used to dynamically
+    request a list of content items that have a particular set of metadata,
+    and any page can refer to another content item's title, description,
+    abstract etc. without itself needing to parse the content text.
+
+  - **Flexible URL support**
+
+    It should be trivial to rearrange a site, if required, totally changing
+    the URLs used in the site's pages.
+
+    WebMake supports this by using "symbolic URL references" [$(url_refs)],
+    which can be modified by changing one line, causing references to that
+    URL throughout the site to change.
+
+  - **Edit-In-Page Functionality**
+
+    Most CMSes boast a nice, browser-based user interface to creating, naming,
+    uploading and filling out content items and media.
+
+    WebMake now provides a "CGI script" [webmake.cgi], which allows a certain
+    degree of web-based maintainance and content editing.  It's not quite as
+    foolproof as some of the bigger CMS systems, but it's a start!
+
+    Auto: [webmake.cgi]: $(cgistart)
+
+What WebMake Is Missing
+======================
+
+  - **Database Support**
+
+    It would be nice if WebMake could load content from a database. It
+    currently cannot, although there's nothing in the architecture that would
+    preclude this; there just has not been a need, just yet.
+
+    Unfortunately, this may not be possible -- "this IBM software patent"
+    [ibm1] details a mechanism whereby a server can dynamically rebuild its
+    pages, based on changes to objects in a database.  WebMake could run
+    afoul of this if database support is added (although there are a few
+    points where this could be avoided).
+
+  - **XSLT Support**
+
+    This will definitely arrive -- as soon as a good XSLT engine becomes part
+    of Perl, or at least becomes easy to install from CPAN.  It's on my list ;)
+
+  - **Workflow**
+
+    There's currently no logic to support workflow.  This would not
+    be difficult to add, though.
+
+	[ibm1]: http://www.delphion.com/details?pn=US06026413__
+	[CMS]: http://www.camworld.com/cms/
+	[refs]: $(content_refs)
+

@@ -1,0 +1,54 @@
+HTML-EntityReference
+
+This is a listing of HTML character entities.  It is intended to be the last time such a list is compiled into a module, being meant to be exposed and usable in any situation.  I found several modules that dealt with Entities, but did not do what I needed, or were for internal use.
+
+The essential characteristic of this data is that "entities exist".
+
+The entity is nothing more than a name for a Unicode character. Everything else having to do with it is attached to the character, and should be something I can find in the Unicode database and related Unicode Perl stuff.  The most fundamental thing is a map of names to code point numbers. I mean the number itself (an integer), not some string representation of the number in hex or decimal or decorated with some other escape system.  From the code point value, it is a single step to get the actual character, or the formatted numeric entity, or whatever.
+
+You can use the supplied hash directly.  Or, this module provides some simple functions that abstract the way the data is actually stored and return the common cases.
+
+The function calls also provide for an easy way to check multiple tables in one go.  So non-standard entities recognised by some browsers or historically are documented here also.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc HTML::EntityReference
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-EntityReference
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/HTML-EntityReference
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/HTML-EntityReference
+
+    Search CPAN
+        http://search.cpan.org/dist/HTML-EntityReference/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 John M. Dlugosz
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

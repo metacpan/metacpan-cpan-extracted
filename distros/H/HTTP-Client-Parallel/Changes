@@ -1,0 +1,11 @@
+Changes for Perl extension HTTP-Client-Parallel
+
+0.02 Sat  5 Jul 2008
+	- Adding a missing dependency on Params::Util
+	- Adding an _init method to do some prep work
+	- Correcting author order so Marlon is correctly
+	  shown as the primary author.
+
+0.01 Wed 18 Jun 2008
+	- Creating initial version
+	- Wrote basic documentation

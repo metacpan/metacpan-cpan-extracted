@@ -1,0 +1,15 @@
+=head1 NAME
+
+HISTORY - public release history for Hardware::PortScanner
+
+=head1 DESCRIPTION
+
+=over 8
+
+=item 0.51 (Sep 6 2009)
+
+Initial Release
+
+=back
+
+=cut

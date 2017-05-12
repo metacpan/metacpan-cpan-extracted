@@ -1,0 +1,21 @@
+---
+abstract: 'Abstract calculator class for HackaMol'
+author:
+  - 'Demian Riccardi <demianriccardi@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.035, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HackaMol-X-Calculator
+requires:
+  HackaMol: '0.031'
+  HackaMol::X::Roles::ExtensionRole: '0'
+resources:
+  homepage: https://github.com/demianriccardi/HackaMol-X-Calculator
+  repository: https://github.com/demianriccardi/HackaMol-X-Calculator.git
+version: '0.012'

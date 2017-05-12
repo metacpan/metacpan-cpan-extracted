@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Hash/Merge/Simple.pm
+t/00-load.t
+t/01-basic.t
+t/9000-bug-41738-merge-with-side-effects.t

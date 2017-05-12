@@ -1,0 +1,8 @@
+Version 0.62  - 20 March 2017
+              - Build errors after release 0.61
+
+Version 0.61  - 19 March 2017
+              - Build errors on non-threaded Perl
+
+Version 0.60  - 15 February 2017
+              - Split from main HiPi modules

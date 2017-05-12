@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d799b9ed8589d1acc5afb7e0dfbfcd29ec0dd07c Changes
+SHA1 86a31bfdcdcd54159cbd433fd8dad4590ea172e9 MANIFEST
+SHA1 900df8090043ab2e861edf274cc6b657bfd5a9e2 META.yml
+SHA1 b27fd7983547b8d5dc5838b31429a14249e4f86c Makefile.PL
+SHA1 ed0c107672daac3bc9e266876666e1059dbe44b7 README
+SHA1 4ea1e9072ca87399184a46233df52a21e285604d ex/sample_server
+SHA1 05a17c51aceb6435a1eac17137f19911a09e5050 inc/Module/Install.pm
+SHA1 dc73c2baf4357ad1cc884146147f557a50a29300 inc/Module/Install/Base.pm
+SHA1 c7f311a5bc5a7f96e9105d5f16a0e13fc596899d inc/Module/Install/Can.pm
+SHA1 8c8f9ff5b0a536af59814e16a901ce39fbc23299 inc/Module/Install/Fetch.pm
+SHA1 4f77eb02e104324b08a047585c498146b045613b inc/Module/Install/Makefile.pm
+SHA1 2f5be6af6098acf6d786a4a7299a34d0c6c04ef9 inc/Module/Install/Metadata.pm
+SHA1 aa6723cc4a8d4475026f6ceb28e1f16459e8a11b inc/Module/Install/Win32.pm
+SHA1 6661285caedfe012cb5a1ca915a422ffc292ae2b inc/Module/Install/WriteAll.pm
+SHA1 fece79a06f46cd4ba35a023cc566657db3e1f757 lib/HTTP/Server/Simple.pm
+SHA1 6c552ef4704ad7ff0acde604fc984982c7bb586e lib/HTTP/Server/Simple/CGI.pm
+SHA1 cb2059aaae64bf98b586ae1a5d7e2edf95aa8b11 lib/HTTP/Server/Simple/CGI/Environment.pm
+SHA1 db064af54cab345a71daec576e32e64b8fb1033d t/00smoke.t
+SHA1 053fe4d227e7cecdc28a259fffab818117407112 t/01live.t
+SHA1 aca95653cfce68912e08c57b3a4566207e2f99b3 t/02pod.t
+SHA1 a7024d0d8e7b80d26f75a3551a1406a797b382f8 t/03podcoverage.t
+SHA1 77cfd507bd58ed91f7b96058a56cd68edee5bb0c t/04cgi.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJY3r79AAoJEBXncVGnZqUU0agH+wVkaug1ovbE4e3bgSG3J9cT
+nzFGnwvzRxoxN+MPHlz6Z3H6YF3Tq3u3oDKYVp4SNdXp3P+km5uGnUPVtnLHjbXd
+IiftWvZah1k+gyIgDti3FdIj5qfCzh8Hp5FSnoD2m3FVc6XdZKFO8kDLfZ4+JKcg
+WfA5h1ftG1kZwVRHeE89V1nlANIHZasmqK8snHay+4rnQTc0lJfQqCK5uw3Q0pH7
+Qyf1a30z1veYxdrtv7Z06sApB/zr93iCMiUUHhl71jiFJXPzLzzX5RjxI7j+Lain
+51NQ/xc9v91dXtGM1FA8ICCFEVHicHJFid/IchzUMoU96NEs5+pG9aQDvK6da2I=
+=U46d
+-----END PGP SIGNATURE-----

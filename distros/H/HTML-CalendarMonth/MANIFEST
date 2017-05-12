@@ -1,0 +1,35 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+lib/HTML/CalendarMonth.pm
+lib/HTML/CalendarMonth/DateTool.pm
+lib/HTML/CalendarMonth/DateTool/Cal.pm
+lib/HTML/CalendarMonth/DateTool/DateCalc.pm
+lib/HTML/CalendarMonth/DateTool/DateManip.pm
+lib/HTML/CalendarMonth/DateTool/DateTime.pm
+lib/HTML/CalendarMonth/DateTool/Ncal.pm
+lib/HTML/CalendarMonth/DateTool/TimeLocal.pm
+lib/HTML/CalendarMonth/Locale.pm
+t/00_basic.t
+t/01_autodetect.t
+t/02_timelocal.t
+t/03_datetime.t
+t/04_datemanip.t
+t/05_datecalc.t
+t/06_cal.t
+t/07_ncal.t
+t/20_i8n.t
+t/21_narrow.t
+t/dat/bulk.dat
+t/dat/head.dat
+t/dat/i8n.dat
+t/dat/i8n_leg1.dat
+t/dat/i8n_leg2.dat
+t/dat/narrow.dat
+t/dat/odd.dat
+t/dat/woy.dat
+t/testload.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

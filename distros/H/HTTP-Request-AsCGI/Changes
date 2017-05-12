@@ -1,0 +1,52 @@
+This file documents the revision history for Perl extension HTTP::Request::AsCGI.
+
+1.2 2010-01-12
+    - Fixed the %ENV concatenation that's broken in 1.1 but wasn't shipped to CPAN (miyagawa)
+    - REQUEST_URI is trying to replicate as raw values as possible, without being canonicalized (miyagawa)
+
+1.1 2009-12-07
+	- added test to check that %ENV is preserved after setup is called
+	- setup now concatenates its environment to %ENV instead of replacing it
+
+1.0 2009-11-30
+    - Change how PATH_INFO is decoded so that everything is decoded, including
+      URI reserved characters (RT#50082)
+
+0.9 2009-04-27
+    - unescape PATH_INFO more safely
+
+0.8 2009-04-27
+    - revert PATH_INFO change, Catalyst tests were failing
+
+0.7 2009-04-26
+    - PATH_INFO is now uri_unescaped
+
+0.6 2009-04-26
+    - Fix long-standing 'enviroment' typo
+    - Switch to Dist::Zilla
+
+0.5_03 2009-04-26
+    - RT#18075: Play more nicely with Perl 5.6's open(). (hdp)
+
+0.5_02 2009-04-26
+    - Avoid mixing buffered and unbuffered IO and flush STDIN after writing
+      request content to it. (hdp)
+
+0.5  2006-01-20
+    - Fixed bug where content was overridden on 500 responses.
+
+0.4  2006-01-19
+    - Fixed #15999 return a 500 response when message is empty, reported by Chris Dolan <cdolan@cpan.org>
+    - Fixed Status header bug
+    - Bumped HTTP::Response requirement to 1.53 and drop our own message parsing.
+
+0.3  2006-01-06
+    - Silence uninitialized warnings when restoring %ENV
+    - Fixed dup and restore of STDIN.
+
+0.2  2005-10-31
+    - Added test for response.
+
+0.1  2005-10-21
+    - First release.
+

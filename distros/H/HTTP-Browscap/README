@@ -1,0 +1,22 @@
+Here is v0.01 of HTTP:Browscap.
+
+It provides information
+on a web browsers' capabilities (eg - table support, frame
+support), the browser being identified by its "User Agent" string.
+This will use the existing Microsoft Browscap.ini database, a 
+version of which is freely downloadable and actively maintained at 
+http://www.browserhawk.com/browscap/
+
+As the version number suggests this is a very early version and
+consequently has no Makefile.PL etc. I will be polishing up this module
+in the next few months and the interface may be subject to change.
+
+Please check the module's homepage at
+http://www.jamespo.ukshells.co.uk/perl/
+or contact me at perl@jamespo.ukshells.co.uk
+
+
+Thanks,
+
+
+James Powell

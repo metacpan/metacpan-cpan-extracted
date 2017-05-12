@@ -1,0 +1,30 @@
+Revision history for Perl extension Hash::MultiKey.
+
+0.06 Wed Jul  7 23:42:41 2004
+    - Added SCALAR, introduced in 5.8.3.
+    - scalar(%hmk) was not being tested properly, fixed.
+
+0.05 Wed Mar 26 20:41:06 2003
+    - Typo in POD was corrected
+
+0.04 Sat Mar 22 10:27:21 2003
+    - Authors' CPAN id were added
+    - Email changed to address in cpan.org
+    - THANKS section was added
+    - Typo in POD was fixed
+
+0.03 Fri Mar 21 22:03:28 2003
+    - POD rewording
+    - POD is more explicit about how keys work
+    - Added t/17croak.t
+    - Calls to croak() if key is [] were added
+    - @mk notation in tests and documentation was unified
+    - Tests use strict, warnings, and data structures instead of symrefs
+
+0.02  Mon Mar 17 00:58:03 2003
+    - Implementation overview was rewritten
+    - Module was completely reimplemented
+
+0.01  Sat Mar  8 13:15:05 2003
+	- original version; created by h2xs 1.21 with options
+		-XA -n Hash::MultiKey

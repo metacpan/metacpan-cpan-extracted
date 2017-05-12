@@ -1,0 +1,44 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'HTML::Element' => '0',
+                                      'HTML::Tagset' => '0',
+                                      'List::MoreUtils' => '0',
+                                      'MRO::Compat' => '0',
+                                      'Module::Load' => '0',
+                                      'Scalar::Util' => '0',
+                                      'Sub::Install' => '0',
+                                      'parent' => '0',
+                                      'perl' => '5.006',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Exporter' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'HTML::TreeBuilder' => '0',
+                                   'Test::More' => '0.96',
+                                   'lib' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

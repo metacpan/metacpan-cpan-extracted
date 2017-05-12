@@ -1,0 +1,12 @@
+Changes
+heliosx_job_json_submit
+lib/HeliosX/Job/JSON.pm
+lib/HeliosX/Job/JSON/Error.pm
+lib/HeliosX/Job/JSON/TestService.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/HeliosX-Job-JSON.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

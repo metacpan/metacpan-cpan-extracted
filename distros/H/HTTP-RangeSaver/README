@@ -1,0 +1,25 @@
+HTTP::RangeSaver
+
+This is a helper class for updating an existing file with data from a
+partial content HTTP response.  It understands both of the partial content
+formats defined in RFC 2616 (a single Content-Range header or a
+multipart/byteranges Content-Type).  For convenience, it also handles
+complete content HTTP responses (status 200 or 203 rather than 206).
+
+
+PREREQUISITES
+
+  libwww-perl (version 5.805 or better)
+
+
+INSTALLATION
+
+The usual four-stroke process:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Testing doesn't require any kind of network connection since it uses
+synthetic HTTP::Response objects.

@@ -1,0 +1,9 @@
+Build.PL
+Changes
+lib/Hash/MoreUtils.pm
+MANIFEST
+META.json
+META.yml
+README
+t/00-load.t
+t/01-hash.t

@@ -1,0 +1,15 @@
+Level 3
+-------
+
+There is still nothing on this page, and now if we look
+at the source, they've removed that image. Now there's a
+taunt that not even Google will find it this time. Well,
+Google is a good little robot puppy who always obeys his
+master, but we are evil attackers. What rules do robots
+have to follow that we don't? robots.txt. Let's look at
+what they don't want Google to see.
+
+They've hidden `/s3cr3t/` from crawlers, but we don't
+have to abide by robots.txt. Let's take a look. Another
+directory listing, which contains a file which contains
+our password.

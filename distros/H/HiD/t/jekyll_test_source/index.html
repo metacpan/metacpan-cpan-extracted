@@ -1,0 +1,23 @@
+---
+layout: default
+title: Tom Preston-Werner
+---
+
+h1. Welcome to my site
+
+h2. Please read our {{site.posts_size}} Posts
+
+<ul>
+{{#each site.posts}}
+    <li>{{this.date}} <a href="{{url}}">{{this.title}}</a></li>
+{{/each}}
+</ul>
+
+{{#with site.posts.[-1]}}
+<div id="first_post">
+  <h1>{{this.title}}</h1>
+  <div>
+    {{this.content}}
+  </div>
+</div>
+{{/with}}

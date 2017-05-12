@@ -1,0 +1,6 @@
+2016/01/04 13:05:43: DEBUG Starting Job: 6 
+Cmd is echo "hello from job6" && sleep 5
+ 2016/01/04 13:05:43: INFO hello from job6
+ 2016/01/04 13:05:48: DEBUG Finishing job 6 with ExitCode 0
+ 2016/01/04 13:05:48: INFO Total execution time 0 years, 00 months, 0 days, 00 hours, 00 minutes, 10 seconds
+ 

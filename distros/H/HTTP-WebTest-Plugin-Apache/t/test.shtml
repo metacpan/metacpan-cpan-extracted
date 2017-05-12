@@ -1,0 +1,2 @@
+<!--#include virtual="/inc/test1.txt" -->
+<!--#include virtual="/inc/test2.txt" -->

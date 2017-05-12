@@ -1,0 +1,1 @@
+Attribute BOOM is not allowed in <IMG>.

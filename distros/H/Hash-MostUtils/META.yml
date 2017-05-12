@@ -1,0 +1,26 @@
+---
+abstract: 'Pairwise list manipulators'
+author:
+  - 'Belden Lyman <belden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Hash-MostUtils
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  provide: '0.02'
+resources:
+  bugtracker: https://github.com/belden/perl-hash-mostutils/issues
+  homepage: https://github.com/belden/perl-hash-mostutils
+  repository: git://github.com/belden/perl-hash-mostutils.git
+version: 1.07

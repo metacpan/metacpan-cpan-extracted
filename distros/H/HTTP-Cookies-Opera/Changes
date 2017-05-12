@@ -1,0 +1,28 @@
+Revision history for HTTP-Cookies-Opera
+
+0.08  Sat Jun  8 05:28:28 UTC 2013
+    - Faked the current time in tests so they will not fail in the
+      future (2036) or on systems with misconfigured times.
+    - Updated link to opera cookie file format.
+
+0.07  Thu Mar 10 01:09:14 UTC 2011
+    - Prevented loading of expired cookies.
+
+0.06  Fri Mar  4 14:38:23 UTC 2011
+    - Fixed an occasionally failing test.
+
+0.05  Wed Mar  2 14:00:15 UTC 2011
+    - Replaced broken cookie file to fix tests.
+    - Prevented uninitialized value warning for Perl < 5.12.
+
+0.04  Tue Feb 22 12:19:58 UTC 2011
+    - Saved secure flag.
+
+0.03  Tue Feb 22 11:35:04 UTC 2011
+    - Implemented save method.
+
+0.02  Fri Feb 18 15:40:57 UTC 2011
+    - Fixed reading of cookie paths.
+
+0.01  Tue Feb 15 08:18:23 UTC 2011
+    - Initial distribution.

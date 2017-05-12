@@ -1,0 +1,192 @@
+NAME
+    HashFiller - Programatically fill elements of a hash based in
+    prerequisites
+
+SYNOPSIS
+      use Hash::Filler;
+
+      my $hf = new Hash::Filler;
+
+                                    # Show how a ->fill() method executes
+                                    # the rules
+      $Hash::Filler::DEBUG = 1;
+
+                                    # Add a set of rules
+
+      $hf->add('key1', sub { my $hr = shift; ... }, ['key2', 'key3'], $pref);
+      $hf->add('key1', sub { my $hr = shift; ... }, [], $pref);
+      $hf->add('key2', sub { my $hr = shift; ... }, ['key1', 'key3'], $pref);
+      $hf->add('key3', sub { my $hr = shift; ... }, ['key1', 'key2'], $pref);
+      $hf->add(undef, sub { ... }, [], $pref);
+
+                                    # Remove rules
+
+      $hf->remove($rule_id);
+
+      $hf->loop(0);                 # Don't try to avoid infinite loops
+
+                                    # Test if a key exists using defined()
+      $hf->method($Hash::Filler::DEFINED);
+
+      my %hash;
+
+      $hf->fill(\%hash, 'key1');    # Calculate the value of $hash{key1}
+      $hash{'key2'} = 'foo';        # Manually fill a hash position
+      $hf->fill(\%hash, 'key2');    # Calculate the value of $hash{key2}
+      $hr->dump_r_tree();           # Print the key tree
+
+      my @stats = $hf->stats();     # Obtain statistics about rule invocation
+      my @prof = $hf->profile();    # Obtain profiling information about the rules
+
+DESCRIPTION
+    `Hash::Filler' provides an interface so that hash elements can be
+    calculated depending in the existence of other hash elements, using
+    user-supplied code references.
+
+    One of the first uses of this module was inside a server. In this
+    server, the responses to commands came from external sources. For each
+    request, the server needed to contact a number of external sources to
+    calculate the proper answer. These calculations sometimes attempted
+    redundant external accesses, thus increased the response time and load.
+
+    To help in this situation, the calculations were rewritten to access a
+    hash instead of the external sources directly and this module was used
+    to fill the hash depending on the requirements of the calculations. The
+    external accesses were also improved so that more than one choice or
+    rule existed for each datum, depending on wether prerequisites existed
+    already in the hash or not.
+
+    Hopefully this explanation will make it easier to understand what this
+    module is about :)
+
+    There are a few relevant methods, described below:
+
+    `->add($key, $code, $r_prereq, $pref)'
+        Adds a new rule to the `Hash::Filler' object. The rule will be used
+        to fill the hash bucket identified with key $key. To fill this
+        bucket, the code referenced by $code will be invoked, passing it a
+        reference to the hash being worked on and the key that is being
+        filled. This will only be called if all of the hash buckets whose
+        keys are in the list referenced by $r_prereq `exist'.
+
+        If the user-supplied code returns a false value, failure is assumed.
+
+        An optional preference can be supplied. This is used to help the
+        internal rule selection choose the better rule.
+
+        Multiple rules for the same $key and the same $r_prereq can be
+        added. The module will attempt to use them both but the execution
+        order will be undefined unless you use $pref. The default $pref is
+        100.
+
+        A special case occurs when $key is undefined. In this case, this
+        rule is said to be a 'wildcard'. This means that the rule applies to
+        any key that needs to be filled. Wildcard rules are applied after
+        any matching rules (ie, after rules that apply specifically to a
+        given $key). Multiple wildcard rules are selected based in the
+        preference and availability of prerequisites.
+
+        This function returns a 'rule identifier'. This identifier is the
+        index that designates a given rule. Generally, it is only used in
+        conjunction with profiling.
+
+    `->remove($id)'
+        Removes the rule whose identifier matches $id. The implementation
+        actually does not remove the rule. Instead it marks the rule as
+        non-usable.
+
+    `->dump_r_tree'
+        This method prints out a representation of the rule tree kept by the
+        object. The tree lists the rules in the order they would be
+        preferred for a given key.
+
+        Output is sent to STDOUT.
+
+    `->profile'
+        Returns an array containing time profiles for the execution of each
+        rule. The index in the array is the identifier assigned for each
+        rule. Each slot in the array contain the accumulated time for all
+        the invocations of that particular rule.
+
+        Slot 0 in the array contains the accumulated time for ALL the
+        invoked rules. This make it easier to find the most important
+        contributors to the accumulated time.
+
+        Note that time is only computed if the user-supplied method must be
+        called. Whenever the hash bucket to be filled by a rule already has
+        a value, this method will not be called and no time will be added to
+        this rule.
+
+    `->stats'
+        This method returns an array which counts the number of times a
+        given rule has been invoked and its user-supplied method has been
+        called. The index into the array is the rule identifier, just as in
+        the case of `->profile'. The 0th element of the array contains the
+        total number of times that `->fill' has been called. This is useful
+        to deduce how many times the rules needed to be invoked.
+
+    `->method($val)'
+        Which method to use to decide if a given key is present in the hash.
+        The accepted values are:
+
+        `$Hash::Filler::EXISTS' (default)
+                The existence of a hash element or key is calculated using a
+                construct like C<exists($hash{$key})>.
+
+        `$Hash::Filler::DEFINED'
+                The existence of a hash element or key is calculated using a
+                construct like C<defined($hash{$key})>.
+
+        `$Hash::Filler::TRUE'
+                The existence of a hash element or key is calculated using a
+                construct like C<$hash{$key}>.
+
+        Reference to a sub
+                This allows the user to specify a function to determine wether a
+                hash bucket must be calculated or not. The function is invoked by
+                passing it a reference to the hash and the key that must be
+                checked. The function must return a TRUE value is the bucket is
+                already populated or false if the corresponding rules must be
+                applied.
+
+        This allow this module to be customized to the particular
+        application in which it is being used. Be advised that changing this
+        might cause a change in which and when the rules are invoked for a
+        particular hash so probably it should only be used before the first
+        call to `->fill'.
+
+        By defult, the module uses exists() to do this check.
+
+    `->loop($val)'
+        Controls if the module should try to avoid infinite loops. A true
+        $val means that it must try (the default). A false value means
+        otherwise.
+
+    `->fill($r_hash, $key)'
+        Attempts to fill the bucket $key of the hash referenced by $r_hash
+        using the supplied rules.
+
+        This method will return a true value if there are rules that allow
+        the requested $key to be calculated (or the $key is in the hash) and
+        the user supplied code returned true.
+
+        To avoid infinite loops, the code will not invoke a rule twice
+        unless `->loop' is called with a true value. The rules will be used
+        starting with the ones with less prerequisites, as these are assumed
+        to be lighter. To use a different ordering, specify $pref. Higher
+        values of $pref are used first.
+
+CAVEATS
+    This code uses recursion to resolve rules. This allows it to figure out
+    the value for a given key with only an incomplete rule specification. Be
+    warned that this might be costly if used with large sets of rules.
+
+AUTHOR
+    Luis E. Munoz < lem@cantv.net>
+
+SEE ALSO
+    perl(1).
+
+WARRANTY
+    Absolutely none.
+

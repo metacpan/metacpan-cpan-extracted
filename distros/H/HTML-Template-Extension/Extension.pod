@@ -1,0 +1,309 @@
+=head1 NAME
+
+HTML::Template::Extension - Module support extension for HTML::Template
+
+=head1 SYNOPSIS
+
+ use HTML::Template::Extension;
+
+ my $text = qq
+    |
+     Standard module emulation
+     =========================
+     If all is ok you can read this here --> <TMPL_VAR NAME="test">
+
+    |;
+
+ my $comp       = new HTML::Template::Extension(
+                                            scalarref => \$text,
+                                            plugins=>["DO_NOTHING"],
+                        );
+
+ $comp->param('test' => "It works!!!");
+ print $comp->output;
+
+ #   OUTPUT:
+ #
+ #   Standard module emulation
+ #   =========================
+ #   If all is ok you can read this here --> It works!!!
+
+ my $text = qq
+    |
+     SLASH_VAR plugin activation
+     ===========================
+     Look to see if SLASH_VAR plugin is active  --> <TMPL_VAR NAME="test">NO</TMPL_VAR>
+
+    |;
+ $comp->plugin_add("SLASH_VAR");
+ $comp->scalarref(\$text);
+ $comp->param('test' => "YES");
+ print $comp->output;
+
+ #   OUTPUT:
+ #
+ #   SLASH_VAR plugin activation
+ #   ===========================
+ #   Look to see if SLASH_VAR plugin is active  --> YES
+
+
+ my $text = qq
+    |
+     <HTML><BODY> HEAD_BODY plugin activation with autoDeleteHeader enabled
+     =========================================================
+     Look to see if SLASH_VAR plugin is active  --> <TMPL_VAR NAME="test">NO</TMPL_VAR>
+     If you don't see HTML and BODY tags then HEAD_BODY plugin is active.
+     </BODY>
+     </HTML>
+     |;
+ $comp->plugin_add("HEAD_BODY");
+ $comp->scalarref(\$text);
+ $comp->autoDeleteHeader(1);
+ print $comp->output;
+ print "and the header is..." . $comp->header. "\n";
+
+ #   OUTPUT:
+ #
+ #   HEAD_BODY plugin activation with autoDeleteHeader enabled
+ #   =========================================================
+ #   Look to see if SLASH_VAR plugin is active  --> YES
+ #   If you don't see HTML and BODY tags then HEAD_BODY plugin is active.
+ #   and the header is...
+ #   <HTML><BODY>
+
+ my $text = qq
+    |
+     DOC plugin activation
+     =====================
+     Look to see if SLASH_VAR plugin is active  --> <TMPL_VAR NAME="test">NO</TMPL_VAR>
+     Look to see if DOC plugin is active  --> <TMPL_DOC>DOC plugin is NOT active</TMPL_DOC>
+
+
+    |;
+ $comp->autoDeleteHeader(0);
+ $comp->scalarref(\$text);
+ $comp->plugin_add("DOC");
+ print $comp->output;
+
+ #   OUTPUT:
+ #
+ #   DOC plugin activation
+ #   =====================
+ #   Look to see if SLASH_VAR plugin is active  --> YES
+ #   Look to see if DOC plugin is active  -->
+
+ print qq
+    |
+     CSTART plugin activation
+     ========================
+    |;
+ my $text = qq
+    |
+     Look to see if SLASH_VAR plugin is active  --> <TMPL_VAR NAME="test">NO</TMPL_VAR>
+     Look to see if DOC plugin is active  --> <TMPL_DOC>DOC plugin is NOT active</TMPL_DOC>
+     <TMPL_CSTART> If you see ONLY this line then CSTART plugin is active.</TMPL_CSTART>
+
+    |;
+ $comp->plugin_add("CSTART");
+ $comp->scalarref(\$text);
+ print $comp->output . "\n";
+
+ #   OUTPUT:
+ #
+ #   CSTART plugin activation
+ #   ========================
+ #   If you see ONLY this line then CSTART plugin is active.
+
+ print qq
+    |
+     IF_TERN plugin activation
+     =========================
+    |;
+
+ my $text = qq
+    |
+     If all is ok you can read this here --> %test?It works!!!:It's BAD%
+    |;
+
+ $comp->plugin_add("IF_TERN");
+ $comp->scalarref(\$text);
+ $comp->param('test' => 1);
+ print $comp->output . "\n";
+
+ #   OUTPUT:
+ #
+ #   IF_TERN plugin activation
+ #   =========================
+ #   If all is ok you can read this here --> It works!!!
+
+
+=head1 DESCRIPTION
+
+This module extends HTML::Template to easily support methods and tags not
+implemented in parent module. Piece of code needed to add new tags syntax and
+new functionality are called plugins. All plugins can be dynamically loaded
+for supporing needed syntax and functionality.
+This module is a derivated class of HTML::Template base module and, like so,
+works exactly ad HTML::Template do.
+But, relative to original module, it differ from:
+
+=over 4
+
+=item * vanguard_compatibility_mode is enabled by default.
+
+I like TMPL_* tags
+but there is scope where %...% costruct is very usefull for readability;
+
+=item * die_on_bad_params is disabled by default.
+
+I don't like errors is i wish not to set params or if i try to set some 
+unexistent parameters;
+
+=item * "output" method is oveloaded
+
+to support an hash item "as" to set params
+directly without setting them  befor using param method;
+
+=item * added a new method "html"
+
+with two arguments, an hash ref for setting
+parameters directly and a scalar argument to set here the file name of template
+to use. If file name is the same of one just setting in, cache is used;
+
+=item * a costructor parameter "plugins" is added
+
+relative to an array ref with all plugins module to load;
+
+=item * a "plugin_add" method was implemented
+
+to add a single plugin to those already loaded. If a string is passed as
+plugin_add argument, then HTML::Template::Extention::*** is loaded. If
+a obj reference is passed, it's used as object Extension.
+The object passed must implements an init and a push_filter extension.
+It's better to wrote you own object plugin implements 
+L<HTML::Template::Extension::ObjBase|HTML::Template::Extension::ObjBase>
+as parent object. 
+
+=item * a "plugins_clear" method was added
+
+to unload all plugins
+
+=item * added "filename","scalarref","arrayref","filehandle"
+
+methods to modify template text after class initialization.
+
+=back
+
+All dynamic plugins live in the HTML::Template::Extension namespace and you can
+built your own extension to support you prefered tags and functionality.
+A plugin named DO_NOTHING is present in this package and can be use like a
+skeleton to built your own plugin.
+DO_NOTHING, as name says, add nothing to standard HTML::Template::Extension but
+there are other plugins just available:
+
+=over 4
+
+=item * HTML::Template::Extension::DOC
+
+to support comment text
+
+=item * HTML::Template::Extension::SLASH_VAR
+
+to support <TMPL_VAR>....</TMPL_VAR> syntax
+
+=item * HTML::Template::Extension::CSTART
+
+to select what parts of your template must be returned by "output" and "html"
+method
+
+=item * HTML::Template::Extension::HEAD_BODY
+
+that don't add tag syntax but some method for easily working with html files
+
+=item * HTML::Template::Extension::IF_TERN
+
+that add syntax for ternary if operator %bool_var?if_is_true:if_is_false%
+
+=item * HTML::Template::Extension::DO_NOTHING
+
+that do nothing :-)
+
+=back
+
+For more information about this plugins see relative pods file.
+
+=head1 METHODS
+
+For method also present in the SUPER class there are only described differens.
+for a complete description of this methods take a look to SUPER class
+HTML::Template.
+
+=head2 output( 'as' => \%params)
+
+Return text present in filename file using %params hash to set TMPL_*
+parameters present in this template
+
+=head2 html(\%params,$filename)
+
+Under costruction
+
+=head2 filename($filepath)
+
+Undef costruction
+
+=head2 scalarref(\$text)
+
+Undef costruction
+
+=head2 arrayref(\@lines)
+
+Undef costruction
+
+=head2 filehandle(*FH)
+
+Undef costruction
+
+
+=head1 DEBUG COMPONENT
+
+There is also two static constants: a DEBUG_FILE_PATH and a DEBUG constant that
+enable debug infos written on DEBUG_FILE_PATH file.
+
+Debug is disable by default.
+
+=head1 LICENSE
+
+HTML::Template::Extension - Module support extension for HTML::Template with Perl 
+Copyright (C) 2001-2002 Bruni Emiliano <info@ebruni.it>
+
+This module is free software; you can redistribute it and/or modify it under the terms of
+either:
+
+a) the GNU General Public License as published by the Free Software Foundation; 
+either version 2, or (at your option) any later version, or
+
+b) the "Artistic License" which comes with this module.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
+either the GNU General Public License or the Artistic License for more details.
+
+You should have received a copy of the Artistic License with this module, 
+in the file ARTISTIC.  If not, I'll be glad to provide one.
+
+You should have received a copy of the GNU General Public License along with this program; if
+not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+02111-1307 USA
+
+=head1 AUTHOR
+
+Bruni Emiliano, <info/at/ebruni_dot_it>
+
+=head1 SEE ALSO
+
+L<HTML::Template>, L<HTML::Template::Extension::DO_NOTHING>,
+L<HTML::Template::Extension::SLASH_VAR>, L<HTML::Template::Extension::CSTART>,
+L<HTML::Template::Extension::DOC>, L<HTML::Template::Extension::HEAD_BODY>,
+L<HTML::Template::Extension::IF_TERN>, L<HTML::Template::Extension::ObjBase>
+
+=cut

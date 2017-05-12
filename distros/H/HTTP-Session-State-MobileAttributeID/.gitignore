@@ -1,0 +1,8 @@
+Makefile
+inc/
+.c
+ppport.h
+*.sw[po]
+*.bak
+*.old
+MANIFEST

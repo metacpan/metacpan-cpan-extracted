@@ -1,0 +1,346 @@
+2005-07-18   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 2.03.
+
+	* Updated HTML::FormTemplate (now v2.03 up from v2.021) to fix a bug in the
+	make_html_input_echo() method where the user input was not being
+	HTML-escaped like in make_html_input_form(), allowing for users to leave
+	deceptive messages, hyperlinks, or script attacks.  After the change, the
+	raw input is always displayed, so viewers see exactly what was entered. 
+	Note that this module was always intended to treat input as plain text, and
+	users should never be entering HTML and expect it to be treated as such on
+	display.  No other functional changes.
+
+	* Note that this fix was actually done on 2004-09-26, but actually releasing 
+	the fix on CPAN was neglected until 2005-07-18.
+
+	* Updated copyright statement range to 2004, when the fix was made.
+
+	* Updated external dependency on CGI::MultiValuedHash to v1.09 from v1.081 
+	(not required to fix the bug, but a good idea none-the-less).
+
+2003-03-16   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 2.021.
+
+	* This is a small maintenance release that is mainly for improving
+	documentation.  Similar maintenance releases are being done with all of my
+	distributions simultaneously.  A lot of it was formatting issues that were
+	easy to miss before; the other bullet points below list the non-formatting
+	issues.  These files had formatting fixes: FormTemplate.pm, ChangeLog.
+
+	* The distribution file layouts have also been standardized, with modules
+	going in a "lib" folder and tests going in a "t" folder.  "test.pl" was
+	changed to "t/HTML-FormTemplate.t" and "FormTemplate.pm" was changed
+	to "lib/HTML/FormTemplate.pm".
+
+	* Updated all Copyright statements to a better (and longer) version, which
+	is dated 1999-2003.  Your rights to use these modules haven't changed, but
+	they may now be easier to understand.  These statements appear once in the
+	ReadMe file at the bottom (under "AUTHOR"), and twice in each module (.pm
+	file), a full version at the bottom (under "AUTHOR") and a shorter version
+	at the top (in code comments).
+
+	* Added the "use warnings" pragma at the top of all files beside "use
+	strict"; every occurance of "use strict" gained a "use warnings" whether it
+	was in the module proper or in its test script or in its SYNOPSIS.  This
+	should save users from having to put -w on the command line for them.
+
+	* Incremented the module $VERSION number by 0.001, and all test scripts to
+	require the new version.  Also, where any of my modules use others of my
+	modules, they now require the latest version as of this writing, for
+	simplicity of maintenance.
+
+	* Updated all test scripts to read $verbose from @ARGV (command line
+	arguments), and other test script improvements.
+
+	* Updated these sections of the ReadMe file: INSTALLATION.
+
+2001-09-03   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 2.02.
+
+	* This release is primarily for making the html that this class outputs more 
+	like W3C's new XHTML standard, and give it better support for stylesheets.  
+	The public interface for this module has not changed, so you can continue 
+	using it as you did before.  You are recommended to use HTML::EasyTags 1.06 
+	or later with this, though version 1.03 will still work.
+
+	* Any code changes are mostly cosmetic.  When generating forms or reports 
+	within tables, this class now generates the table/tr/td html tags without 
+	any attributes; they used align/valign/cellspacing/cellpadding before.  
+	It is recommended that you use a stylesheet to align cell contents the way 
+	that you want, for example: 'TD {text-align: left; vertical-align: top}'.
+
+	* All occurances of the "font" tag and their effects have been removed.  
+	What this means is that form elements which were colored before, such as 
+	each of the required/error/private flags and the error text, are now not 
+	coloured.  However, since all of these are still identifiable by their 
+	character composition, this shouldn't be a serious problem.
+
+	* The SYNOPSIS documentation has been updated such that it's corresponding 
+	sample output has three examples: html for initial run and when Submit is 
+	clicked, plus what the generated email looks like.
+
+	* A BUGS section has been added to the documentation near the top that 
+	mentions remaining compatability issues with the XHTML or HTML standards.  
+	However, this module's output should continue to work with web browsers.
+
+2001-06-04   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 2.01.
+
+	* Fixed bug related to organizing field groups into tables.  Previously the 
+	field definition attributes [table_rows/rows, table_cols/cols, table_acrf] 
+	were not fetched properly, causing strange effects like having a single 
+	table column when two were requested.  The table feature now works properly.
+
+	* Removed a small design flaw where the "type" attribute of field definitions 
+	had needed to be a certain typecase in order to be recognized, due to some 
+	chicken-and-egg scenario where normal definition parsing could only be done 
+	once we knew what field type to parse it as, but to know the type you had to 
+	parse.  The new version removes that restriction so now you can mix the 
+	typecase of "type" as much as any other attribute as is your wish.
+
+	* Small update to the make_table_from_list() method where the HTML code for 
+	each table cell now appears on its own line for greater readability.
+
+	* The module POD was updated, mostly in Name, Synopsis, Properties.
+
+2001-04-03   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 2.0.
+
+	* This release marks the largest update of this module since it was first 
+	released on CPAN; at least half of the code and documentation was re-written.
+	Many things were added and a few things were removed; those that were not 
+	removed should be backwards-compatible with release 1.05.  
+
+	* HTML::FormTemplate is no longer subclassed from HTML::EasyTags, which 
+	means you can no longer call the latter's methods from an object of the 
+	former.  Prime examples of these are the autoloaded methods named after HTML 
+	tags.  Also no longer available are: groups_by_default(), prologue_tag(), 
+	comment_tag(), make_html_tag(), make_html_tag_group(), start_html(), 
+	end_html().  If you want to use any of those then you need to instantiate 
+	an HTML::EasyTags object yourself to call them from.  HTML::FormTemplate 
+	does still *use* the other class internally of course.  This change was made 
+	largely to address a glaring usability issue that is inherent with 
+	autoloading.  That is, a user could mis-spell a method name and they would 
+	not get an appropriate run-time error because an autoloaded HTML-making 
+	method got called instead.
+
+	* Autoloading was completely removed and now there is an explicit method for 
+	each one of the form field types; the method has the same name as the type.
+	However, these are shims, and the real work is still done elsewhere.
+
+	* The lower-level methods that do the actual making of form field HTML saw 
+	the most changes and were completely rewritten.  As part of the rewrite, 
+	functionality that was crammed into 3 methods is now handled by 9 which are 
+	more specialized.
+
+	* All ten single field types now have group counterparts.  Although the 
+	usefulness of some of these may vary, you at least now have the choice.
+	Added are: reset_group, submit_group, popup_menu_group, scrolling_list_group.
+	The latter two cases differ from their single-field equivalents by 
+	distributing any default values so that each group member gets one rather 
+	than one field getting all.  The most useful is probably popup_menu_group.
+
+	* All field definition attributes are now the same between corresponding 
+	single and group fields, except for group-only ones, so you can use the 
+	singular or plural names for definition attributes interchangeably.
+
+	* The POD documentation was greatly improved.  It is now more informative, 
+	better organized, and it's easier to understand what's going on.  The 
+	methods are now arranged in a different order, with logically related ones 
+	appearing together.  Each field-type method now has a full description, 
+	including what positional and named parameters work with it (each is 
+	backwards-compatible with CGI.pm's methods of the same names).  Each 
+	definition parameter has its own description and they are all grouped by 
+	related usage.  Release 1.05 had incomplete information in the above 
+	regards and it was organized haphazardly.
+
+	* These methods are no longer available: make_input_tag(), 
+	make_input_tag_group(), make_attribute_definition().  The first two 
+	were among those completely rewritten and the new versions are private.  
+	The third one was too proprietary and should be handled by calling code 
+	instead.
+
+	* Several values that were hardwired constants in the previous release are 
+	now variable and can be changed with appropriate new or updated methods: 
+	new_form_determinant(), default_field_type(), default_field_name(), 
+	bad_input_marker(), required_field_marker(), private_field_marker().  The 
+	hardwired constants of old are now default values for object properties.
+
+	* Another new methods include field_html_from_defin(), which acts sort of 
+	like the field_html() method in that it returns rendered HTML for single
+	fields, except with the new one you provide a definition as an argument 
+	instead of giving the name of a stored definition.
+
+	* Also new is the utility method make_table_from_list() which will take a 
+	list of elements and arrange them into an HTML table of the dimensions you 
+	specify (either N columns or N rows), either down first or across first.
+
+	* These form field attributes are new: tag_attr, min_grp_count, table_cols, 
+	table_rows, table_acrf, req_min_count, req_max_count, req_opt_match, 
+	str_above_input, str_below_input.  The first five are used when making field 
+	HTML (all but the first one being for groups only), the next three are used 
+	with input validation, and the last two are used when making whole forms.
+
+	* New field attributes allow field groups to be arranged into tables instead 
+	of merely being linebreak-delimited.
+
+	* New field attributes allow you to validate user input based on the number 
+	of group elements that were filled in (eg: must choose three options).  Also 
+	there is validation that user input from selection fields matches the 
+	available options, so you know if they manually changed values.
+
+	* New field attributes place literal HTML above and below rendered fields 
+	so you can do things like applying <DIV> formats.
+
+	* The handling of form field definition parameters is now greatly improved 
+	so now they are much more flexible to your needs regardless of whether you 
+	feed them to the class using field-type methods or field_definitions().
+	In general you can name your parameters anything that Class::ParamParser 
+	can interpret.  But the TYPE parameter is an exception; see its POD.
+
+	* Data::MultiValuedHash objects are always used internally to store 
+	definitions for fields, which means you can use either scalars or array 
+	refs however you like for definition parameter values without choking 
+	the class.  User-input is stored in CGI::MultiValuedHash objects, which 
+	are subclassed from the first type in case you want to provide a raw
+	query string to user_input().  The two types of MVH objects are 
+	interchangeable as far as you providing them as a method arguments.
+
+	* Due to the different way that field definition parameters are handled 
+	internally, you can now add new ones easily without having to change the 
+	code that doesn't use them.
+
+	* Numerous old bugs were fixed and it is quite possible that new ones 
+	have come up.  However, the new code is also a *lot* easier to understand 
+	than the old code, so it is easier to fix and add new features.
+
+	* Note that "test.pl" is incomplete; it only tests that this module will 
+	compile but not that the methods work; it is included so that people can use 
+	the Makefile in the standard way during installation.  This file will be 
+	fleshed out when I have the chance.
+
+	* The module is now 106K including POD, up from the 76K it was before.
+
+2001-03-18   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 1.05.
+
+	* This release is the first one that includes the CPAN standard files 
+	"Makefile.PL", "test.pl", and "MANIFEST", which were all created following 
+	the previous release.  The content of "Manifest" was previously inside the 
+	"ReadMe" file.  Improved the install instructions in my ReadMe file.
+
+	* Note that "test.pl" is incomplete; it only tests that this module will 
+	compile but not that the methods work; it is included so that people can use 
+	the Makefile in the standard way during installation.  "test.pl" will be 
+	fleshed out during major release 2.0 of this module, coming soon.
+
+	* This class now requires Class::ParamParser 1.03, HTML::EasyTags 1.0301, 
+	Data::MultiValuedHash 1.06, and CGI::MultiValuedHash 1.06.  I consider the 
+	first three modules to be stable and well tested, as well as unlikely to 
+	change.  The fourth module is partially tested, but production use of the 
+	other functionality finds it to be working properly.
+
+2001-02-16   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 1.04.
+
+	* This release is entirely to maintain compatability with HTML::EasyTags 
+	1.03, which is a parent class.  Specifically, one of the class properties 
+	and its associated accessor method, positional_by_default(), was removed from
+	HTML::EasyTags because it was no longer needed there.  However, since some 
+	methods of HTML::FormTemplate do use this property, it and the associated 
+	method has been added to HTML::FormTemplate itself.
+
+	* This class now requires versions 1.03 each of Class::ParamParser and 
+	HTML::EasyTags, so you will need to have them installed.  Note that I 
+	consider those two releases to be complete and stable, so they are unlikely 
+	to be changed in the forseeable future.
+
+2001-01-30   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 1.03.
+
+	* This release is entirely for fixing bugs in the coding and the POD.
+
+	* Fixed bug where providing a Hash ref as a "labels" parameter for 
+	radio/field groups doesn't work (acts like explicit labels not provided and 
+	uses values as labels).  Fixed a similar bug that afflicted the "defaults"
+	parameter.  This is the last of the "bugs" that I know of.
+
+	* Fixed bugs in POD that caused display problems with it, including:
+		- Description section too long; now split into itself and Overview.
+		- Ensured a blank line between Synopsis and Description.
+		- Likewise between "HTML Code..." and "Field Types...".
+		- Changed several bulleted lists whose first word of text was boldfaced 
+		into numbered lists; before, some strangeness caused all the text of the 
+		bulleted lists to be boldfaced and in one paragraph and/or strangely 
+		indented in CPAN's HTML version; these should be fixed.
+
+	* Thanks to Geir Johannessen <geir.johannessen@nextra.com> for alerting me to 
+	several obscure bugs in my POD (the first three); these only showed up when 
+	manifying, whereas MacPerl's Shuck and CPAN's HTMLizer rendered it properly.
+
+2001-01-05   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 1.02.
+
+	* This release is the first one following official registrations with 
+	"The Perl 5 Module List".  The updated entry would look like this:
+
+HTML::
+::FormTemplate    adpO Store definition, make persist forms, report DUNCAND
+
+	* This release contains my "HTML::FormTemplate" module, which was previously 
+	a part of the following distributions under the temporary name of 
+	"HTML::FormMaker": 
+		- "libdwg": v1.0 r2000-07-23, v1.11 r2000-08-23
+		- "CGI-FormGenerator": v0.9 r2000-09-04, v0.9201 r2000-12-26
+
+	* This module requires Perl version 5.004.
+	It also requires HTML::EasyTags 1.02, and CGI::MultiValuedHash 1.03.
+
+	* Code changes since HTML::FormMaker consist mainly in accounting for 
+	changes to the other modules that this one uses.  Its public interface is 
+	mostly unchanged.  What did change is that user input and field definitions 
+	can now be passed in any format that CGI::MultiValuedHash can understand as 
+	an initializer.  Also, the inherited start_html() and end_html() methods no 
+	longer exist as they were gratuitious.
+
+	* The POD also received significant updates, particlularly in the Synopsis 
+	and "Parameters by Field Type" sections.
+
+2000-12-26   Darren Duncan <perl@DarrenDuncan.net>
+
+	* CGI-FormGenerator 0.9201, the last version of any distribution to include
+HTML::FormMaker, was released.
+
+2000-07-23   Darren Duncan <perl@DarrenDuncan.net>
+
+	* libdwg 1.0, the first version of any distribution to include
+HTML::FormMaker, was released on CPAN.
+
+2000-04-21   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Completed primary development on this module.
+
+2000-01-30   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Began development on the final version of this module.
+
+	* Module based on a template created by h2xs 1.18.
+
+1999-07 thru 1999-12
+
+	* Worked on second prototype of code that ended up in this module.
+
+1999-02 thru 1999-05
+
+	* Created first prototypes of code that ended up in this module, which were 
+	used in a production environment as part of modules dedicated to doing 
+	either e-mail forms or guest books or threaded discussion boards.

@@ -1,0 +1,87 @@
+=head1 NAME
+
+HTML::Template::Extension::CSTART - Plugins for return only selected sections
+
+=head1 SYNOPSIS
+
+ use HTML::Template::Extension;
+
+ my $text = qq
+    |
+     <HTML><HEAD></HEAD><BODY>
+     <H1>This is a template example...</H1>
+     <TMPL_CSTART>
+     This is the first line returned by template --> <TMPL_VAR NAME="param1"></TMPL_CSTART>
+     This section will not be
+     returned by template --> <TMPL_VAR NAME="param2">
+     <TMPL_CSTART>
+     This is the second line returned by template --> <TMPL_VAR NAME="param3">
+     </TMPL_CSTART>
+     </BODY></HTML>
+    |;
+
+ my $comp       = new HTML::Template::Extension(
+                                            scalarref => \$text,
+                                            plugins=>["CSTART"],
+                                            );
+
+ $comp->param('param1' => "Line 1");
+ $comp->param('param3' => "Line 2");
+
+ print $comp->output;
+
+ #   OUTPUT:
+ #
+ #   This is the first line returned by template --> Line 1
+ #   This is the second line returned by template --> Line 2
+
+=head1 DESCRIPTION
+
+This plugin add to standard syntax a tag <TMPL_CSTART>...</TMPL_CSTART> to
+select sections that will be returned by "output" and "html" method.
+
+All text outside this tag (if present) will be deleted. If this tag is not
+all text will be returned also if module is loaded.
+
+There could be more TMPL_CSTART sections. Only text between these will be
+returned.
+
+Don't use this plugins for extracting body from html files
+
+ <HTML>
+ 	<HEAD>
+ 	</HEAD>
+ 	<BODY>
+ 		<TMPL_CSTART>
+ 		...
+ 		</TMPL_CSTART>
+ 	</BODY>
+ </HTML>
+
+but take a look to HTML::Template::Extension::HEAD_BODY that do this by default
+and have some added values.
+
+There is an internal parameter for the class costructor 'ecp_compatibility_mode'
+This is used by me because i've an old project called 'ecp' that use a different
+syntax to delimitate sections. This syntax use html comment. If this 
+costructor parameter is set to 1 the traslation with standard plugin CSTART 
+syntax is
+
+ <!-- CSTART -->  is mapped to <TMPL_CSTART>
+
+ <!-- CEND --> is mapped to </TMPL_CSTART>
+
+=head1 AUTHOR
+
+Bruni Emiliano, <info@ebruni.it>
+
+=head1 SEE ALSO
+
+ HTML::Template
+ HTML::Template::Extension::DO_NOTHING
+ HTML::Template::Extension::SLASH_VAR
+ HTML::Template::Extension::CSTART
+ HTML::Template::Extension::DOC
+ HTML::Template::Extension::HEAD_BODY
+
+=cut

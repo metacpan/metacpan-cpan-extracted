@@ -1,0 +1,23 @@
+<HTML><BODY>
+<H1> test_include1 </H1>
+  undefined (TRUE), so including test_if2 ...
+<HTML><BODY>
+<H1> test_if2 </H1>
+  undefined (TRUE)
+ (if test 1) 
+
+ VAR2 defined (TRUE)
+  (if test 2) 
+
+ defined (if test 3 level 1) VISIBLE
+ VAR2 VISIBLE (if test 3 level 2)
+ VAR2 defined VISIBLE  (if test 3 level 3)
+ --- visible ---
+  
+  
+
+<H1> END test_if2 </H1>
+</body></html>
+
+ (include test 1) 
+</body></html>

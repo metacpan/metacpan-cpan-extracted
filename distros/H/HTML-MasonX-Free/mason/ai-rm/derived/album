@@ -1,0 +1,3 @@
+<%method main><& SELF:title &> by <& SELF:artist &></%method>
+<%method artist>Elvis Costello</%method>
+<%method title>Imperial Bedroom</%method>

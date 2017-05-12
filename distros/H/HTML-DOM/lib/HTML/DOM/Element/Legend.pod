@@ -1,0 +1,49 @@
+
+=head1 NAME
+
+HTML::DOM::Element::Legend - A Perl class for representing 'legend' elements in an HTML DOM tree
+
+=head1 VERSION
+
+Version 0.054
+
+=head1 SYNOPSIS
+
+  use HTML::DOM;
+  $doc = HTML::DOM->new;
+  $elem = $doc->createElement('legend');
+
+  $elem->align('right') # set attribute
+  $elem->form;          # get attribute
+  $elem->tagName;
+  # etc.
+
+=head1 DESCRIPTION
+
+This class implements 'legend' elements in an HTML::DOM tree. It 
+implements the HTMLLegendElement DOM interface and inherits from 
+L<HTML::DOM::Element> (q.v.).
+
+=head1 METHODS
+
+In addition to those inherited from HTML::DOM::Element and its 
+superclasses, this class implements the following DOM methods (see the DOM
+spec. for descriptions):
+
+=over 4
+
+=item form
+
+=item accessKey
+
+=item align
+
+=back
+
+=head1 SEE ALSO
+
+L<HTML::DOM>
+
+L<HTML::DOM::Element>
+
+L<HTML::DOM::Element::Form>

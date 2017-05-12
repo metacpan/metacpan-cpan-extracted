@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:               Hash-Spy
+version:            0.01
+abstract:           run code when a has is changed
+author:
+    - Salvador Fandino <sfandino@yahoo.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Test::More:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

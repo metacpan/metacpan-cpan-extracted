@@ -1,0 +1,48 @@
+{
+   "abstract" : "Serve static files with HTTP::Server::Simple",
+   "author" : [
+      "Stephen Quinney <sjq-perl@jadevine.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTTP-Server-Simple-Static",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI" : "3.46",
+            "Exporter" : "0",
+            "File::LibMagic" : "0",
+            "File::Spec::Functions" : "0",
+            "HTTP::Date" : "0",
+            "HTTP::Server::Simple" : "0.01",
+            "IO::File" : "0",
+            "URI::Escape" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "HTTP::Server::Simple::Static" : {
+         "file" : "lib/HTTP/Server/Simple/Static.pm",
+         "version" : "0.12"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.12"
+}

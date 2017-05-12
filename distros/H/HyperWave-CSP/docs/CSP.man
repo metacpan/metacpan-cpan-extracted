@@ -1,0 +1,369 @@
+.rn '' }`
+''' $RCSfile$$Revision$$Date$
+'''
+''' $Log$
+'''
+.de Sh
+.br
+.if t .Sp
+.ne 5
+.PP
+\fB\\$1\fR
+.PP
+..
+.de Sp
+.if t .sp .5v
+.if n .sp
+..
+.de Ip
+.br
+.ie \\n(.$>=3 .ne \\$3
+.el .ne 3
+.IP "\\$1" \\$2
+..
+.de Vb
+.ft CW
+.nf
+.ne \\$1
+..
+.de Ve
+.ft R
+
+.fi
+..
+'''
+'''
+'''     Set up \*(-- to give an unbreakable dash;
+'''     string Tr holds user defined translation string.
+'''     Bell System Logo is used as a dummy character.
+'''
+.tr \(*W-|\(bv\*(Tr
+.ie n \{\
+.ds -- \(*W-
+.ds PI pi
+.if (\n(.H=4u)&(1m=24u) .ds -- \(*W\h'-12u'\(*W\h'-12u'-\" diablo 10 pitch
+.if (\n(.H=4u)&(1m=20u) .ds -- \(*W\h'-12u'\(*W\h'-8u'-\" diablo 12 pitch
+.ds L" ""
+.ds R" ""
+'''   \*(M", \*(S", \*(N" and \*(T" are the equivalent of
+'''   \*(L" and \*(R", except that they are used on ".xx" lines,
+'''   such as .IP and .SH, which do another additional levels of
+'''   double-quote interpretation
+.ds M" """
+.ds S" """
+.ds N" """""
+.ds T" """""
+.ds L' '
+.ds R' '
+.ds M' '
+.ds S' '
+.ds N' '
+.ds T' '
+'br\}
+.el\{\
+.ds -- \(em\|
+.tr \*(Tr
+.ds L" ``
+.ds R" ''
+.ds M" ``
+.ds S" ''
+.ds N" ``
+.ds T" ''
+.ds L' `
+.ds R' '
+.ds M' `
+.ds S' '
+.ds N' `
+.ds T' '
+.ds PI \(*p
+'br\}
+.\"	If the F register is turned on, we'll generate
+.\"	index entries out stderr for the following things:
+.\"		TH	Title 
+.\"		SH	Header
+.\"		Sh	Subsection 
+.\"		Ip	Item
+.\"		X<>	Xref  (embedded
+.\"	Of course, you have to process the output yourself
+.\"	in some meaninful fashion.
+.if \nF \{
+.de IX
+.tm Index:\\$1\t\\n%\t"\\$2"
+..
+.nr % 0
+.rr F
+.\}
+.TH CSP 3 "perl 5.004, patch 04" "26/Feb/98" "User Contributed Perl Documentation"
+.UC
+.if n .hy 0
+.if n .na
+.ds C+ C\v'-.1v'\h'-1p'\s-2+\h'-1p'+\s0\v'.1v'\h'-1p'
+.de CQ          \" put $1 in typewriter font
+.ft CW
+'if n "\c
+'if t \\&\\$1\c
+'if n \\&\\$1\c
+'if n \&"
+\\&\\$2 \\$3 \\$4 \\$5 \\$6 \\$7
+'.ft R
+..
+.\" @(#)ms.acc 1.5 88/02/08 SMI; from UCB 4.2
+.	\" AM - accent mark definitions
+.bd B 3
+.	\" fudge factors for nroff and troff
+.if n \{\
+.	ds #H 0
+.	ds #V .8m
+.	ds #F .3m
+.	ds #[ \f1
+.	ds #] \fP
+.\}
+.if t \{\
+.	ds #H ((1u-(\\\\n(.fu%2u))*.13m)
+.	ds #V .6m
+.	ds #F 0
+.	ds #[ \&
+.	ds #] \&
+.\}
+.	\" simple accents for nroff and troff
+.if n \{\
+.	ds ' \&
+.	ds ` \&
+.	ds ^ \&
+.	ds , \&
+.	ds ~ ~
+.	ds ? ?
+.	ds ! !
+.	ds /
+.	ds q
+.\}
+.if t \{\
+.	ds ' \\k:\h'-(\\n(.wu*8/10-\*(#H)'\'\h"|\\n:u"
+.	ds ` \\k:\h'-(\\n(.wu*8/10-\*(#H)'\`\h'|\\n:u'
+.	ds ^ \\k:\h'-(\\n(.wu*10/11-\*(#H)'^\h'|\\n:u'
+.	ds , \\k:\h'-(\\n(.wu*8/10)',\h'|\\n:u'
+.	ds ~ \\k:\h'-(\\n(.wu-\*(#H-.1m)'~\h'|\\n:u'
+.	ds ? \s-2c\h'-\w'c'u*7/10'\u\h'\*(#H'\zi\d\s+2\h'\w'c'u*8/10'
+.	ds ! \s-2\(or\s+2\h'-\w'\(or'u'\v'-.8m'.\v'.8m'
+.	ds / \\k:\h'-(\\n(.wu*8/10-\*(#H)'\z\(sl\h'|\\n:u'
+.	ds q o\h'-\w'o'u*8/10'\s-4\v'.4m'\z\(*i\v'-.4m'\s+4\h'\w'o'u*8/10'
+.\}
+.	\" troff and (daisy-wheel) nroff accents
+.ds : \\k:\h'-(\\n(.wu*8/10-\*(#H+.1m+\*(#F)'\v'-\*(#V'\z.\h'.2m+\*(#F'.\h'|\\n:u'\v'\*(#V'
+.ds 8 \h'\*(#H'\(*b\h'-\*(#H'
+.ds v \\k:\h'-(\\n(.wu*9/10-\*(#H)'\v'-\*(#V'\*(#[\s-4v\s0\v'\*(#V'\h'|\\n:u'\*(#]
+.ds _ \\k:\h'-(\\n(.wu*9/10-\*(#H+(\*(#F*2/3))'\v'-.4m'\z\(hy\v'.4m'\h'|\\n:u'
+.ds . \\k:\h'-(\\n(.wu*8/10)'\v'\*(#V*4/10'\z.\v'-\*(#V*4/10'\h'|\\n:u'
+.ds 3 \*(#[\v'.2m'\s-2\&3\s0\v'-.2m'\*(#]
+.ds o \\k:\h'-(\\n(.wu+\w'\(de'u-\*(#H)/2u'\v'-.3n'\*(#[\z\(de\v'.3n'\h'|\\n:u'\*(#]
+.ds d- \h'\*(#H'\(pd\h'-\w'~'u'\v'-.25m'\f2\(hy\fP\v'.25m'\h'-\*(#H'
+.ds D- D\\k:\h'-\w'D'u'\v'-.11m'\z\(hy\v'.11m'\h'|\\n:u'
+.ds th \*(#[\v'.3m'\s+1I\s-1\v'-.3m'\h'-(\w'I'u*2/3)'\s-1o\s+1\*(#]
+.ds Th \*(#[\s+2I\s-2\h'-\w'I'u*3/5'\v'-.3m'o\v'.3m'\*(#]
+.ds ae a\h'-(\w'a'u*4/10)'e
+.ds Ae A\h'-(\w'A'u*4/10)'E
+.ds oe o\h'-(\w'o'u*4/10)'e
+.ds Oe O\h'-(\w'O'u*4/10)'E
+.	\" corrections for vroff
+.if v .ds ~ \\k:\h'-(\\n(.wu*9/10-\*(#H)'\s-2\u~\d\s+2\h'|\\n:u'
+.if v .ds ^ \\k:\h'-(\\n(.wu*10/11-\*(#H)'\v'-.4m'^\v'.4m'\h'|\\n:u'
+.	\" for low resolution devices (crt and lpr)
+.if \n(.H>23 .if \n(.V>19 \
+\{\
+.	ds : e
+.	ds 8 ss
+.	ds v \h'-1'\o'\(aa\(ga'
+.	ds _ \h'-1'^
+.	ds . \h'-1'.
+.	ds 3 3
+.	ds o a
+.	ds d- d\h'-1'\(ga
+.	ds D- D\h'-1'\(hy
+.	ds th \o'bp'
+.	ds Th \o'LP'
+.	ds ae ae
+.	ds Ae AE
+.	ds oe oe
+.	ds Oe OE
+.\}
+.rm #[ #] #H #V #F C
+.SH "NAME"
+HyperWave::CSP \- Communicate with a HyperWave server
+.SH "SYNOPSIS"
+.PP
+.Vb 4
+\&   use HyperWave::CSP;
+\&     
+\&   $server = HyperWave::CSP->New("my.hyperwave.server");
+\&   $server->quit;
+.Ve
+.SH "DESCRIPTION"
+\f(CWHyperWave\fR is a class implementing a simple HyperWave client in
+Perl.
+.SH "CONSTRUCTOR"
+.Ip "new ( [ \s-1HOST\s0 [, \s-1PORT\s0 [, \s-1USERNAME\s0 [, \s-1PASSWORD\s0 [, \s-1ENCRYPT\s0 [, \s-1LANGUAGE\s0 ] ] ] ] ] ] )" 0
+This is the constructor for a new HyperWave object. \f(CWHOST\fR is the
+name of the remote host to which a HyperWave connection is required.
+If not given the environment variables \f(CWHWHOST\fR and then \f(CWHGHOST\fR
+are checked, and if a host is not found then \f(CWlocalhost\fR is used.
+.PP
+\f(CWPORT\fR is the HyperWave port to connect to, it defaults to the
+environment variable \f(CWHWPORT\fR, then \f(CWHGPORT\fR and then to the
+standard port 418 if nothing else is found.
+.PP
+\f(CWUSERNAME\fR and \f(CWPASSWORD\fR are the HyperWave username and password,
+they default to anonymous.  \f(CWENCRYPT\fR will eventually allow you to
+pass the password in in encrypted form rather than plaintext, but is
+not yet implemented.
+.PP
+\f(CWLANGUGAE\fR also is not yet used, and defaults to the value of the
+environment variable \f(CWHWLANGUAGE\fR and then to English.
+.PP
+The constructor returns the open socket, or \f(CWundef\fR if an error has
+been encountered.
+.SH "METHODS"
+Unless otherwise stated all methods return either a \fItrue\fR or
+\fIfalse\fR value, with \fItrue\fR meaning that the operation was a success.
+When a method states that it returns a value, failure will be returned
+as \fIundef\fR or an empty list.
+.Ip "command_stat ( )" 0
+Returns string containing various statistics for the server.
+.Ip "command_ftstat ( )" 0
+Returns string containing various statistics for the server.
+.Ip "command_dcstat ( )" 0
+Returns string containing various statistics for the server.
+.Ip "command_who ( )" 0
+Returns string containing current users for the server.
+.Ip "get_objnum_by_name ( \s-1NAME\s0 )" 0
+Returns object number for the document with \s-1NAME\s0 as an attribute, 
+or false on error.
+.Ip "get_url ( \s-1OBJNUM\s0 )" 0
+Returns a guess at a \s-1URL\s0 that might work for the document \s-1OBJNUM\s0 to be
+retreived via the HyperWave \s-1HTTP\s0 interface.  Note that it is \s-1ONLY\s0
+a guess.  For one thing, it depends on the HyperWave server running
+a web interface on the default \s-1HTTP\s0 port.
+.Ip "get_attributes ( \s-1OBJNUM\s0 )" 0
+Returns a string containing the attributes for \s-1OBJNUM\s0.  The string
+is in form \f(CWkey1=value1\enkey2=value2\en...\fR.
+.Ip "get_attributes_hash ( \s-1OBJNUM\s0 )" 0
+Like \fIget_attributes()\fR except that the attributes are returned as a 
+hash.
+.Ip "get_text ( \s-1OBJNUM\s0 )" 0
+Returns body text for the objnum passed.  This usually means \s-1HTML\s0
+sans anchors in practical terms.
+.Ip "get_html ( \s-1OBJNUM\s0 )" 0
+Returns \s-1HTML\s0 text, including anchors, for the objnum passed.
+.Ip "exec_cgi ( \s-1OBJNUM\s0 )" 0
+Returns output of the \s-1CGI\s0, for the objnum passed.  Depends on the
+\s-1CGI\s0 script not requiring input.
+.Ip "add_attribute ( \s-1OBJNUM\s0, \s-1NAME\s0, \s-1VALUE\s0 )" 0
+Adds an attribute to the given objnum.  Note that HyperWave allows
+multiple attributes of the same name, so if you add an attribute that
+already exists you'll end up with two.  Use change_attribute if you
+want to overwrite the old one.
+.Ip "remove_attribute ( \s-1OBJNUM\s0, \s-1NAME\s0, \s-1VALUE\s0 )" 0
+Removes an attribute to the given objnum.  Note that you \s-1DO\s0 need to
+know the old value because HyperWave allows multiple attributes with
+the same value.
+.Ip "change_attribute ( \s-1OBJNUM\s0, \s-1NAME\s0, \s-1OLD_VALUE\s0, \s-1NEW_VALUE\s0 )" 0
+Alters an attribute to the given objnum (\s-1NB\s0: needs to know old value).
+.Ip "get_children ( \s-1OBJNUM\s0 )" 0
+Returns objnums for all the children in the objnum passed.  If the
+object was a leaf node (ie: no children) you'll get a 0 back.
+.Ip "get_parents ( \s-1OBJNUM\s0 )" 0
+Returns objnums for all the parents in the objnum passed.  If the
+object had no parents (it was the root collection) you'll get a 0
+back.
+.Ip "get_anchors ( \s-1OBJNUM\s0 )" 0
+Returns objnums for all the anchors in the document passed.
+.Ip "add_collection ( \s-1PARENT_OBJNUM\s0, \s-1NAME\s0 [, \s-1OTHER_PARAMS\s0 ] )" 0
+Inserts a collection on the HyperWave server.  Returns object \s-1ID\s0 of
+the new collection.
+.PP
+\f(CWPARENT_OBJNUM\fR is the object number (probably returned from
+\fIget_objnum_by_name()\fR of the collection to insert this collection into.
+\f(CWNAME\fR is the name attribute, this will become the apparent \s-1URL\s0 to
+somebody using the WaveMaster interface.
+.PP
+\f(CWOTHER_PARAMS\fR should be in the form
+\f(CWAttribute=AttributeValue\enAttr2=Value2\fR and so on.  You might
+particularly want to set a Title for the collection.
+.Ip "add_image ( \s-1OBJNUM\s0, \s-1PARENT\s0, \s-1NAME\s0 )" 0
+Adds a new picture.
+.Ip "add_text ( \s-1OBJNUM\s0, \s-1PARENT\s0 )" 0
+Adds a new text object (no anchors).
+.Ip "add_html ( \s-1OBJNUM\s0 )" 0
+Adds a new html object (we parse the anchors).
+.SH "SEE ALSO"
+.SH "AUTHOR"
+Bek Oberin <gossamer@tertius.net.au>
+.SH "COPYRIGHT"
+Copyright (c) 1998 Bek Oberin.  All rights reserved.
+.PP
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+.rn }` ''
+.IX Title "CSP 3"
+.IX Name "HyperWave::CSP - Communicate with a HyperWave server"
+
+.IX Header "NAME"
+
+.IX Header "SYNOPSIS"
+
+.IX Header "DESCRIPTION"
+
+.IX Header "CONSTRUCTOR"
+
+.IX Item "new ( [ \s-1HOST\s0 [, \s-1PORT\s0 [, \s-1USERNAME\s0 [, \s-1PASSWORD\s0 [, \s-1ENCRYPT\s0 [, \s-1LANGUAGE\s0 ] ] ] ] ] ] )"
+
+.IX Header "METHODS"
+
+.IX Item "command_stat ( )"
+
+.IX Item "command_ftstat ( )"
+
+.IX Item "command_dcstat ( )"
+
+.IX Item "command_who ( )"
+
+.IX Item "get_objnum_by_name ( \s-1NAME\s0 )"
+
+.IX Item "get_url ( \s-1OBJNUM\s0 )"
+
+.IX Item "get_attributes ( \s-1OBJNUM\s0 )"
+
+.IX Item "get_attributes_hash ( \s-1OBJNUM\s0 )"
+
+.IX Item "get_text ( \s-1OBJNUM\s0 )"
+
+.IX Item "get_html ( \s-1OBJNUM\s0 )"
+
+.IX Item "exec_cgi ( \s-1OBJNUM\s0 )"
+
+.IX Item "add_attribute ( \s-1OBJNUM\s0, \s-1NAME\s0, \s-1VALUE\s0 )"
+
+.IX Item "remove_attribute ( \s-1OBJNUM\s0, \s-1NAME\s0, \s-1VALUE\s0 )"
+
+.IX Item "change_attribute ( \s-1OBJNUM\s0, \s-1NAME\s0, \s-1OLD_VALUE\s0, \s-1NEW_VALUE\s0 )"
+
+.IX Item "get_children ( \s-1OBJNUM\s0 )"
+
+.IX Item "get_parents ( \s-1OBJNUM\s0 )"
+
+.IX Item "get_anchors ( \s-1OBJNUM\s0 )"
+
+.IX Item "add_collection ( \s-1PARENT_OBJNUM\s0, \s-1NAME\s0 [, \s-1OTHER_PARAMS\s0 ] )"
+
+.IX Item "add_image ( \s-1OBJNUM\s0, \s-1PARENT\s0, \s-1NAME\s0 )"
+
+.IX Item "add_text ( \s-1OBJNUM\s0, \s-1PARENT\s0 )"
+
+.IX Item "add_html ( \s-1OBJNUM\s0 )"
+
+.IX Header "SEE ALSO"
+
+.IX Header "AUTHOR"
+
+.IX Header "COPYRIGHT"
+

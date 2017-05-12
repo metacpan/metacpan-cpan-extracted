@@ -1,0 +1,129 @@
+
+=head1 NAME
+
+HTML::DOM::Collection::Options - A subclass of HTML::DOM::Collection for 'option' elements
+
+=head1 VERSION
+
+Version 0.054
+
+=head1 SYNOPSIS
+
+  use HTML::DOM;
+  $doc = HTML::DOM->new;
+  $doc->write('
+      <form name=theform>
+        <select name=choice>
+          <option>
+          <option>
+        </select>
+      </form>
+  ');
+  $doc->close;
+  
+  $options = $doc->forms->{theform}{choice}->options;
+  # returns an HTML::DOM::Collection::Options object
+  
+  $options->[0]; # first option
+  $options->item(0); # same
+  
+  $options->[0] = undef; # deletes it
+  delete $options->[0]; # likewise
+  
+  $options->length; # same as scalar @$options
+
+=head1 DESCRIPTION
+
+This inherits from L<HTML::DOM::Collection> and adds a few extra methods
+for compatibility with L<WWW::Mechanize>. This is used to represent a
+'select' element's list of options.
+
+=head1 CONSTRUCTOR
+
+Normally you would simply call L<HTML::DOM::Element::Select>'s C<options>
+method
+(as in the L</SYNOPSIS>). But if you wall to call the constructor anyway, 
+here is
+the syntax:
+
+  $elements = HTML::DOM::Collection::Options->new(
+      $nodelist, $select_elem
+  )
+
+$nodelist should be a node list (L<HTML::DOM::NodeList>) object.
+
+=head1 ARRAY INTERFACE
+
+You can use an options collection as an array reference. You can even
+modify it this way. If you assign C<undef> to an array element or delete
+it, it will be removed completely, so C<< $options->[0] = undef >> will
+cause $options->[1] to become $options->[0], for example.
+
+Don't rely on array manipulation functions, such as C<shift>, C<push>,
+C<splice>, etc. Also, don't rely on list assignments.
+
+=head1 METHODS
+
+=over 4
+
+=item $options->length
+
+Returns the number of items in the collection.
+
+=item $options->item($index)
+
+Returns item number C<$index>, numbered from 0. Note that you call also use
+C<< $elements->[$index] >> for short.
+
+=item $options->namedItem($name)
+
+Returns the item named C<$name>. You can also write C<< $elements->{$name} >>.
+
+=back
+
+These last few are provided for L<WWW::Mechanize> compatibility.
+
+=over 4
+
+=item $options->type
+
+Returns the string 'option'.
+
+=item $options->name
+
+Returns the name of the 'select' element.
+
+=item $options->possible_values
+
+Returns the a list of the options' values. Provided for L<WWW::Mechanize> 
+compatibility.
+
+=item $options->value
+
+=item $options->value('new_value');
+
+Selects the option with the value given and returns the old value, or
+simply returns the value if there is no argument.
+
+=item $options->disabled
+
+Returns true if all the options are disabled, false otherwise.
+
+=item $options->form_name_value;
+
+Returns a list consisting of (0) the name of the 'select' element and (1)
+the value of the selected option.
+
+=back
+
+=head1 SEE ALSO
+
+L<HTML::DOM>
+
+L<HTML::DOM::Collection>
+
+L<HTML::DOM::Element::Select>
+
+L<HTML::DOM::Element::Form>
+
+The source of HTML/DOM/Element/Form.pm, where this is implemented.

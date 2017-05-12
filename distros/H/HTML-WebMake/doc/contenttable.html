@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>
+      WebMake: Documentation: The &lt;contenttable&gt; Tag
+    </title>
+    <meta name="generator" content="WebMake/2.2" />
+    <style>
+      body {
+       background-color: #ffffff; 
+       color: #000000; 
+       font-size: medium;
+       font-family: verdana,lucida,helvetica,sans-serif;
+      }
+      code, samp, pre {
+       font-family: Courier New,courier,fixed-width,monospace;
+      }
+      H1 { font-size: x-large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFCC66; }
+      H2 { font-size: large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFDD77; }
+      H3 { font-size: medium; font-family: Garamond,Book Antiqua,Times,serif; background: #FFEE88; }
+      H4 { font-size: small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H5 { font-size: x-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H6 { font-size: xx-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      A:link {
+       font-weight: bold;
+       color: #004000;
+       text-decoration: underline; 
+      }
+      A:visited {
+       font-weight: normal;
+       color: #008000;
+       text-decoration: underline; 
+      }
+      A:active {
+       font-weight: bold;
+       color: #800000;
+       text-decoration: underline; 
+      }
+      dt {
+       font-size: medium;
+       font-weight: bold;
+       padding-top: 8px; padding-bottom: 8px;
+      }
+      dd {
+       padding-top: 8px; padding-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body bgcolor="#ffffff" text="#000000" link="#3300cc" vlink="#660066">
+    <font face="lucida,verdana,sans-serif">
+      <div align="center">
+        <img src="images/WebMakeTitle.png" alt="WebMake" width="500" height="122" />
+      </div>
+      <table width="100%">
+        <tr>
+          <td valign="top">
+            <strong><a href="http://webmake.taint.org/">WebMake</a>
+             Documentation</strong> (version 2.2)
+             
+          </td>
+          <td valign="top">
+            <div align="right">
+              
+               [ <a href="template.html">Back</a> | <a href="contents.html">Forward</a> | <a href="index.html">Index</a>
+               | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+               
+            </div>
+          </td>
+        </tr>
+      </table>
+<!-- yes, it's that Mozilla black-border code again ;) -->
+      <!-- stolen from www.mozilla.org via rc3.org -->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td bgcolor="#aaaaaa">
+            <table border="0" cellspacing="4" cellpadding="4" width="100%">
+              <tr>
+                <td bgcolor="#ffffff">
+                  <table border="0" cellspacing="4" cellpadding="4" width="100%">
+                    <tr>
+                      <td>
+                        <h1>The &lt;contenttable&gt; Tag</h1><p>
+                          Quite often, it's handy to define small (one-line) content items quickly, in
+                          bulk, directly inside the WMK file itself. The &lt;contenttable&gt; tag
+                          provides a good way to do this.
+                          
+                        </p>
+                        <p>
+                          Firstly, pick a delimiter character, such as <code>|</code>. Set the <em>delimiter</em>
+                          attribute to this character.
+                          
+                        </p>
+                        <p>
+                          Next, list a table of content names and their values, separated by a delimiter
+                          character, one name-value-pair per line.
+                          
+                        </p>
+                        <blockquote>
+                          <p>
+                            <em>Note:</em> if you would prefer to load the content items from a separate
+                             file, the <a href="contents.html">&lt;contents&gt;</a> tag is better suited.
+                            
+                          </p>
+                        </blockquote>
+                        <blockquote>
+                          <p>
+                            <em>Another note:</em> this is not the way to define data <em>about</em> other content
+                             items (in other words, <strong><a href="metadata.html">metadata</a></strong>), such as titles, authorship, or brief
+                             descriptions, as WebMake's built-in <a href="metadata.html">metadata</a> support will not be available
+                             in that case. Embedding the <a href="metadata.html">metadata</a> into the content item using
+                             &lt;wmmeta&gt; tags, or loading them in bulk using &lt;metatable&gt; tags,
+                             should be used instead.
+                            
+                          </p>
+                        </blockquote>
+                        <a name="Example"><h2>Example</h2></a><p>
+                          <pre>
+<!--etsafe-->
+                          
+  &lt;contenttable delimiter="|"&gt;
+  person1|Justin
+  person2|Catherine
+  person3|The cat
+  &lt;/contenttable&gt;
+<!--/etsafe-->
+                                                  </pre>
+                      </p>
+                      <p>
+                        
+                      </p>
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+  <table width="100%">
+    <tr>
+      <td valign="top">
+        <strong><a href="http://webmake.taint.org/">WebMake</a>
+         Documentation</strong> (version 2.2)
+         
+      </td>
+      <td valign="top">
+        <div align="right">
+          
+           [ <a href="template.html">Back</a> | <a href="contents.html">Forward</a> | <a href="index.html">Index</a>
+           | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+           
+        </div>
+      </td>
+    </tr>
+  </table>
+  <div align="right">
+    <a href="http://webmake.taint.org/"><img src="images/BuiltWithWebMake.png" alt="Built With WebMake" border="0" width="88" height="31" /></a>
+  </div>
+</font>
+</body>
+</html>

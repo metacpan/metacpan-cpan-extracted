@@ -1,0 +1,4 @@
+.thing {
+	color: @one;
+	font-size: 10px;
+}

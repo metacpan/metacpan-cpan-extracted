@@ -1,0 +1,107 @@
+2.07
+  - Fixed bug (Ticket 81095)
+    Thanks Sadrak
+
+2.06
+  - Fixed bug (Ticket 43698)
+    Thanks to 'ESSKAR'
+
+2.04
+  - Fixed bug (Ticket 33542)
+    Query parameters should be handled ok now.
+    Thanks to 'gnudist' once again!
+
+2.03
+  - Fixed bug (Ticket 33495)
+    FTP links aren't breaking anything now.
+  - Fixed bug (Ticket 33496)
+    URLs may take up to 2000 characters now, instead of the previous limit 
+    of 500. "2000 should be enough for everybody" ;-)
+    Thanks to 'gnudist' for reporting!
+
+2.02
+  - Fixed bug (Ticket 31927)
+    URIs in the HREF attribute of an A element are now encoded where needed
+    unless and encoding entity is already found (%[A-Fa-f0-9]{2}), for which
+    we then assume the URI is already encoded (like you should!)
+    Thanks to and Fayland Lam for reporting the bug and Clinton Gormley 
+    ('DRTECH') for advice.
+    
+2.01
+  - Removed debugging line
+
+2.00
+    === API CHANGE ===
+    The options html_tags, no_html and no_jslink are  no longer supported 
+    by the new method. It _will_ break your code. The reason for this is the 
+    implementation of scanning the output with HTML::StripScripts::Parser 
+    (and the reason for that are the piling XSS-related bug reports ;-)
+    ==================
+
+  - Bumped up to version 2.00 due to the API CHANGE.
+  - html_tags has been removed
+  - no_html has been removed
+  - no_jslink has been removed
+  - HTML::StripScripts::Parser has been implemented for security reasons
+  - Fixed XSS bug (Ticket 28830)
+    Thanks to Jürgen Peters ('TAULMARIL') for reporting the bug and 
+    helping me fix it (as well as Clinton Gormley ('DRTECH') for offering 
+    help with his module!).
+
+1.06
+  - Fixed XSS bug (Ticket 24448)
+    Thanks to DMUEY for reporting
+
+1.05
+  - Fixed XSS bug (Tiket 17633, "HTML::BBCode XSS Vulnerabilities")
+    Thanks to Alex for reporting.
+  - POD slightly altered
+
+1.04
+  - Really fixed Denny Daugherty's case insensative matching's problem (my bad)
+  - Bug reported by 'Dodger' fixed (no barfing on empty input)
+  - Bugs reported (patched) by YorHel fixed:
+       * Tags no longer substituted with HTML in [code] blocks
+       * No more <br /> in <li></li> (unless needed)
+
+1.03
+  - Unmatched bracket problem fixed (Ticket 14138, "HTML::BBCode bug")
+    Thanks to Josh Schoof for reporting
+
+1.02
+  - Yet more nesting problems fixed (Ticket 12036,
+    "Incorrect work with limited set of tags").
+    Thanks to Igor Lobanov for reporting and Michele Beltrame for helping out.
+  - Added (empty) attribute 'alt' to img-tags, to make it more W3C-valid
+    Thanks to Michele Beltrame for reporting and patching.
+  - Added case insensative tag matching
+    Thanks to Denny Daugherty for reporting and patching. 
+  - Minor code changes (killing unwanted whitespaces).
+
+1.01
+  - Nesting problem patched by monk physi. Thanks!
+  - img nesting problem fixed. Linked images should be ok now.
+
+1.00
+  - This module has basically been built from scratch again, for a lot
+    of problems were spotted by various users (THANKS ALL!). The module now
+    uses a 'poor man's parser' that will fix nesting problems. Also the
+    linebreak options will ignore [code]-blocks.
+
+0.04
+  - 'no_html' option, for "stripping" HTML input
+  - 'linebreaks' option, for inserting '<br />' tags
+
+  Thanx to Ken for pointing these 'flaws' out to me :)
+
+0.03
+  - Better regexps (they still are dreadfull, but slowly improving ;).
+  - Nested tags are handled better.
+  - [code] and [quote] will now be parsed first, thus solving some weird results
+  - More tests during install
+    
+0.02
+  - Fixed stupid requirement for Perl 5.8.4 ... not needed
+
+0.01
+  - initial version; 

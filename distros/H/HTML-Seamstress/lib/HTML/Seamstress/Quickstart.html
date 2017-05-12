@@ -1,0 +1,513 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>HTML::Seamstress::Quickstart - A gentle introduction to HTML::Seamstress</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:rurban@x-ray.at" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#introduction">Introduction</a></li>
+	<ul>
+
+		<li><a href="#sample_files">Sample files</a></li>
+	</ul>
+
+	<li><a href="#pure_treebuilder">Pure TreeBuilder</a></li>
+	<li><a href="#base_bones_seamstress_rework">Base bones Seamstress rework</a></li>
+	<li><a href="#abstract_the_file_and_our_operations_on_it_into_a_perl_loom">Abstract the file and our operations on it into a Perl LOOM</a></li>
+	<ul>
+
+		<li><a href="#quick_and_dirty_loom_building___pm_and__html_in_same_directory">Quick and dirty LOOM building: .pm and .html in same directory</a></li>
+		<ul>
+
+			<li><a href="#cleaning_up_our_perl_class">Cleaning up our Perl class</a></li>
+			<li><a href="#make_path_to_html_file_absolute">Make path to HTML file absolute</a></li>
+		</ul>
+
+		<li><a href="#slow_and_clean_loom_building___pm_and__html_in_different_directory">Slow and clean LOOM building: .pm and .html in different directory</a></li>
+		<ul>
+
+			<li><a href="#slow_and_clean_has_extra_programming_advantages">Slow and clean has extra programming advantages</a></li>
+			<li><a href="#not_recommended_slow_clean_way__inline_the_html">Not recommended slow clean way: Inline the HTML</a></li>
+		</ul>
+
+	</ul>
+
+	<li><a href="#automated_creation_of_seamstressstyle_packages">Automated creation of Seamstress-style packages</a></li>
+	<li><a href="#tips_for_effective_seamstress_use">Tips for effective Seamstress use</a></li>
+	<ul>
+
+		<li><a href="#use_subroutines_and_params__validate_to_componentize_your_operations">Use subroutines and Params::Validate to ``componentize'' your operations</a></li>
+		<li><a href="#identify_html_elements_by_class_tags_if_you_plan_to_loop_them">Identify HTML elements by class tags if you plan to loop them</a></li>
+	</ul>
+
+	<li><a href="#copyright_and_license">COPYRIGHT AND LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>HTML::Seamstress::Quickstart - A gentle introduction to HTML::Seamstress</p>
+<p>
+</p>
+<hr />
+<h1><a name="introduction">Introduction</a></h1>
+<p>This guide is designed to get you started with dynamically generating
+and modifying (``templating'') HTML with
+<a href="/HTML/Seamstress.html">HTML::Seamstress</a>.</p>
+<p>We will work through several examples, with each one increasing your
+ability to work with Seamstress effectively.</p>
+<p>
+</p>
+<h2><a name="sample_files">Sample files</a></h2>
+<p>All the files for the samples are in the directory
+<em>lib/HTML/Seamstress/Quickstart</em></p>
+<p>
+</p>
+<hr />
+<h1><a name="pure_treebuilder">Pure TreeBuilder</a></h1>
+<p>Welcome to the first example. This is our bare-bones example. Let's
+say we want to dynamically modify the following HTML:</p>
+<pre>
+ &lt;html&gt;
+ 
+   &lt;head&gt;
+     &lt;title&gt;Greetings&lt;/title&gt;
+   &lt;/head&gt;
+ 
+   &lt;body&gt;
+ 
+     &lt;h1&gt;Greetings&lt;/h1&gt;
+ 
+     Hello there &lt;span id=name&gt;person&lt;/span&gt;, your lucky number is
+       &lt;span id=lucky_number&gt;666&lt;/span&gt;
+ 
+   &lt;/body&gt;
+ 
+ &lt;/html&gt;</pre>
+<p>Let's not use Seamstress at all in this case. Remember Seamstress just
+makes using <a href="/HTML/Tree.html">HTML::Tree</a> more convenient when writing
+software - it is completely optional and totally non-magical. So
+here's the (admittedly verbose) pure TreeBuilder solution:</p>
+<pre>
+ use strict;
+ use warnings;
+ 
+ use HTML::TreeBuilder;
+ 
+ my $name   = 'Redd Foxx';
+ my $number = 887;
+ 
+ my $tree = HTML::TreeBuilder-&gt;new_from_file('html/greeting.html');
+ 
+ my $name_elem = $tree-&gt;look_down(id =&gt; 'name');
+ $name_elem-&gt;delete_content;
+ $name_elem-&gt;push_content($name);
+ 
+ my $number_elem = $tree-&gt;look_down(id =&gt; 'lucky_number');
+ $number_elem-&gt;delete_content;
+ $number_elem-&gt;push_content($number);
+ 
+ 
+ print $tree-&gt;as_HTML(undef, ' ');</pre>
+<p>There's a convenience function in 
+<a href="/HTML/Element/Library.html">HTML::Element::Library</a> which
+makes it easy to replace all the content of an element. This will make
+our script shorter. If we simply use Seamstress, its
+<code>new_from_file()</code> method will bless the
+HTML tree into a class which inherits from HTML::Element::Library,
+making it easy for us to shorten our program. So let's rework the
+example using bare-bones Seamstress.</p>
+<p>
+</p>
+<hr />
+<h1><a name="base_bones_seamstress_rework">Base bones Seamstress rework</a></h1>
+<p>Since we used HTML::Seamstress instead of HTML::TreeBuilder, our
+<code>$tree</code> was blessed as an instance of <code>HTML::Seamstress</code>. Since
+<code>HTML::Seamstress</code> inherits from <code>HTML::TreeBuilder</code> and
+<code>HTML::Element::Library</code>, we have a <code>$tree</code> which can use the
+methods of both.</p>
+<p>We will take advantage of the <code>replace_content</code> method in 
+<a href="/HTML/Element/Library.html">HTML::Element::Library</a> to shorten our
+program:</p>
+<pre>
+ use strict;
+ use warnings;
+ 
+ use HTML::Seamstress;
+ 
+ my $name   = 'Redd Foxx';
+ my $number = 887;
+ 
+ my $tree = HTML::Seamstress-&gt;new_from_file('html/greeting.html');
+ 
+ 
+ my $elem = $tree-&gt;look_down(id =&gt; 'name');
+ $elem-&gt;replace_content($name);
+ 
+ $elem = $tree-&gt;look_down(id =&gt; 'lucky_number');
+ $elem-&gt;replace_content($number);
+ 
+ 
+ print $tree-&gt;as_HTML(undef, ' ');</pre>
+<p>Now of course, this program is just itching to not repeat itself, so
+we will clean it up just a tad:</p>
+<pre>
+ use strict;
+ use warnings;
+ 
+ use HTML::Seamstress;
+ 
+ my $name    = 'Redd Foxx';
+ my $number  = 887;
+ 
+ my $tree    = HTML::Seamstress-&gt;new_from_file('html/greeting.html');
+ 
+ 
+ my %replace = (
+   name         =&gt; $name,
+   lucky_number =&gt; $number
+  );
+ 
+ 
+ $tree-&gt;look_down(id =&gt; $_)-&gt;replace_content($replace{$_})
+     for (keys %replace) ;
+ 
+ 
+ print $tree-&gt;as_HTML(undef, ' ');</pre>
+<p>
+</p>
+<hr />
+<h1><a name="abstract_the_file_and_our_operations_on_it_into_a_perl_loom">Abstract the file and our operations on it into a Perl LOOM</a></h1>
+<p>Ok sweet, we have a nice tight program. But is this really
+application-level code? As the user of ultra-scaffolded frameworks
+such as <a href="/Class/DBI.html">Class::DBI</a> and <em>Catalyst</em>, I can say
+no. Our inline code must
+be much tighter. It must do no more than <code>use</code>, <code>new</code>, and <code>operation()</code>
+whatever <code>operation()</code> may be.</p>
+<p>The key abstraction technique of the uber-modules is a
+package. Normally a package collects together a set of methods. In our
+case, it is collecting together an HTML file and the object-oriented
+operations on it. <strong>alert, alert: acronym, alert</strong> from this point
+forward, a Perl class 
+abstracting a file and tree operations on the file will be called a
+<em>LOOM</em> - (L)ibrary (O)f (O)bject-oriented (M)ethods for HTML
+files.</p>
+<p>On the whole, there are two ways to build a <code>LOOM</code>. The quick and dirty
+way is to stick a <em>.pm</em> file in the same directory as the html
+file. This is fine for most purposes and is what I like to use.</p>
+<p>However in some cases it is not desirable or possible for the 
+HTML and Perl to be in the same directory. This is the slow and clean
+approach, which does have some additional advantages which will be
+discussed.</p>
+<p>
+</p>
+<h2><a name="quick_and_dirty_loom_building___pm_and__html_in_same_directory">Quick and dirty LOOM building: .pm and .html in same directory</a></h2>
+<p>We have an <code>html::Greeting</code> module like this:</p>
+<pre>
+ package html::Greeting;
+ 
+ use strict;
+ use warnings;
+ 
+ use base qw(HTML::Seamstress);
+ 
+ 
+ sub new {
+   my $tree  = __PACKAGE__-&gt;new_from_file('html/greeting.html');
+   $tree;
+ }
+ 
+ 
+ sub process {
+   
+   my $tree = shift;
+ 
+   my %replace = (
+     name         =&gt; 'Jim Rays',
+     lucky_number =&gt; 222
+    );
+ 
+   $tree-&gt;look_down(id =&gt; $_)-&gt;replace_content($replace{$_})
+     for (keys %replace) ;
+ }
+ 
+ 
+ 1;</pre>
+<p>which we make nice tight application-level use of like this:</p>
+<pre>
+ use html::Greeting;
+ 
+ my $tree = html::Greeting-&gt;new;
+ 
+ $tree-&gt;process;
+ 
+ print $tree-&gt;as_HTML(undef, ' ');</pre>
+<p>
+</p>
+<h3><a name="cleaning_up_our_perl_class">Cleaning up our Perl class</a></h3>
+<p>We are flowing smoothly now with nice tight code in our
+application. But should we be happy with this module? I see a few
+drawbacks which require improvement:</p>
+<ul>
+<li><strong><a name="item_our_file_name_is_given_as_a_relative_path_name">our file name is given as a relative path name</a></strong>
+
+<p>Relative paths are fine as long as we are certain to start in the same
+directory, but we cannot be sure of that when building applications,
+so we need an absolute path.</p>
+</li>
+<li><strong><a name="item_we_had_to_manually_create_this_package">we had to manually create this package</a></strong>
+
+</ul>
+<p>Let's fix the first problem first.</p>
+<p>
+</p>
+<h3><a name="make_path_to_html_file_absolute">Make path to HTML file absolute</a></h3>
+<p>Again, Seamstress just happens to have a subroutine which guesses the
+name of the HTML file associated with a Seamstress-style Perl module.
+It is called <code>html()</code> and here we see it in use to give us the path
+to our file in absolute fashion:</p>
+<pre>
+ package html::GreetingAbs;
+ 
+ use strict;
+ use warnings;
+ 
+ use base qw(HTML::Seamstress);
+ 
+ use Data::Dumper;
+ print Dumper \%INC;
+ 
+ our $html = __PACKAGE__-&gt;html(__FILE__ , 'html'); 
+ 
+ {
+   last;
+   
+ # The stuff in these braces is not for the first reading of this!
+ 
+ # $html is 
+ # /ernest/dev/seamstress/lib/HTML/Seamstress/Quickstart/html/GreetingAbs.html
+ # but the real HTML file is greeting.html not GreetingAbs.html
+ $html =~ s!Abs!!;
+ 
+ # change Greeting to greeting since file is greeting.html not Greeting.html
+ $html =~ s!Greeting!greeting!;
+ }
+ 
+ 
+ 
+ sub new {
+   my $tree  = __PACKAGE__-&gt;new_from_file($html);
+   $tree;
+ }
+ 
+ 
+ sub process {
+   
+   my $tree = shift;
+ 
+   my %replace = (
+     name         =&gt; 'Jim Rays',
+     lucky_number =&gt; 222
+    );
+ 
+   $tree-&gt;look_down(id =&gt; $_)-&gt;replace_content($replace{$_})
+     for (keys %replace) ;
+ }
+ 
+ 
+ 1;</pre>
+<p>and main code body is still the same:</p>
+<pre>
+ use html::GreetingAbs;
+ 
+ my $tree = html::GreetingAbs-&gt;new;
+ 
+ $tree-&gt;process;
+ 
+ print $tree-&gt;as_HTML(undef, ' ');</pre>
+<p>
+</p>
+<h2><a name="slow_and_clean_loom_building___pm_and__html_in_different_directory">Slow and clean LOOM building: .pm and .html in different directory</a></h2>
+<p>Here we need to slip a class in between <code>HTML::Seamstress</code> and our
+LOOM:</p>
+<pre>
+ package Local::Seamstress::Base;
+ 
+ use base qw(HTML::Seamstress);
+ 
+ 
+ sub comp_root {
+   '/ernest/dev/seamstress/lib/HTML/Seamstress/Quickstart/html';
+ }
+ 
+ 1;</pre>
+<p>This class will make it easy to track down the directory of our HTML
+files.</p>
+<p>The LOOM class inherits from it and makes use of it in its
+constructor:</p>
+<pre>
+ package html::Greeting;
+ 
+ use strict;
+ use warnings;
+ 
+ use base qw(Local::Seamstress::Base); # not HTML::Seamstress!
+                                      # we need an intermediate base class
+                                      # with the comp_root() method so that
+                                      # we can get an absolute path to the 
+                                      # HTML file... remember this is an
+                                      # example where the LOOM is in a 
+                                      # different directory to the the HTML
+                                      # file it operates on.
+ 
+ 
+ sub new {
+   my $comp_root = __PACKAGE__-&gt;comp_root();
+   my $html_file = &quot;$comp_root/greeting.html&quot;;
+   warn &quot;html_file: $html_file&quot;;
+   my $tree  = __PACKAGE__-&gt;new_from_file($html_file);
+   $tree;
+ }
+ 
+ 
+ sub process {
+   
+   my $tree = shift;
+ 
+   my %replace = (
+     name         =&gt; 'Slow Clean Greeting Machine',
+     lucky_number =&gt; 737
+    );
+ 
+   $tree-&gt;look_down(id =&gt; $_)-&gt;replace_content($replace{$_})
+     for (keys %replace) ;
+ }
+ 
+ 
+ 1;</pre>
+<p>And out main body code is just as tight. We have a few statements to
+make sure to use the right version of <code>html::Greeting</code>, but other
+than that, no changes:</p>
+<pre>
+ use lib 'lib';
+ use html::Greeting;
+ 
+ use Data::Dumper;
+ 
+ print Dumper \%INC; # shows we are using the hhtml::Greeting which
+                     # obtains its file via HTML::Seamstress::Base::comp_root()
+                     # instead of via __PACKAGE__-&gt;html( )
+ 
+ my $tree = html::Greeting-&gt;new;
+ 
+ $tree-&gt;process;
+ 
+ print $tree-&gt;as_HTML(undef, ' ');</pre>
+<p>
+</p>
+<h3><a name="slow_and_clean_has_extra_programming_advantages">Slow and clean has extra programming advantages</a></h3>
+<p>Slow and clean is not just a different way to do the same
+thing. By creating a local base class, you have full control over how
+to connect an HTML file to your Perl code.</p>
+<p>Your HTML designer can have his files mounted elsewhere. And you dont</p>
+<ul>
+<li><strong><a name="item_infect_his_directory_with_your__2epm_files__3ditem">infect his directory with your <code>.pm</code> files
+=item * infect his HTML with all sorts of dynamic HTML logic</a></strong>
+
+</ul>
+<p>And being infection-free is the way I like it.. in Perl and uhhh... other
+endeavors.</p>
+<p>
+</p>
+<h3><a name="not_recommended_slow_clean_way__inline_the_html">Not recommended slow clean way: Inline the HTML</a></h3>
+<p>There is no Seamstress API or utility support for this. But it is an
+idea and I just wanted to mention it for completeness. You can create
+a <em>.pm</em> with the HTML along the lines of this.</p>
+<pre>
+ package html::hello_world;</pre>
+<pre>
+ sub new {...}</pre>
+<pre>
+ sub process {...}</pre>
+<pre>
+ __HTML__
+ &lt;html&gt;
+  &lt;head&gt;
+    ...
+  &lt;/head&gt;
+  &lt;body&gt;
+    ...
+  &lt;/body&gt;</pre>
+<pre>
+ &lt;/html&gt;</pre>
+<p>And then you could use <a href="/File/Slurp.html">File::Slurp</a> to read it in and 
+submit an appropriate <code>HTML::Seamstress::new_from_content()</code> method
+to do the proper blessings.</p>
+<p>But I don't like this approach. It makes it hard to stay synchronized
+with the designer as he continually makes updates.</p>
+<p>
+</p>
+<hr />
+<h1><a name="automated_creation_of_seamstressstyle_packages">Automated creation of Seamstress-style packages</a></h1>
+<p>Instead of manually creating or copying and pasting packages to create
+Seamstress-style packages, the <em>spkg.pl</em> script in the Seamstress
+was off use. It is designed to help build the slow-clean LOOMs not the
+quick-and-dirty ones.... it really should be updated to support either
+usage mode.</p>
+<p>
+</p>
+<hr />
+<h1><a name="tips_for_effective_seamstress_use">Tips for effective Seamstress use</a></h1>
+<p>
+</p>
+<h2><a name="use_subroutines_and_params__validate_to_componentize_your_operations">Use subroutines and Params::Validate to ``componentize'' your operations</a></h2>
+<p>The final phase in Seamstress best practices is to break each tree
+manipulation down into a separate subroutine whose parameters are
+specified by <a href="/Params/Validate.html">Params::Validate</a>.</p>
+<p>If you do this, then you can control the dynamic HTML generation by
+parameterizing your subs properly. This advice will make more
+sense as you do more complex things with Seamstress</p>
+<p>Now you're ready for the big time! Have fun!</p>
+<p>
+</p>
+<h2><a name="identify_html_elements_by_class_tags_if_you_plan_to_loop_them">Identify HTML elements by class tags if you plan to loop them</a></h2>
+<p>If your dummy HTML has a section which will be used as a sample and cloned
+repeatedly (either by you manually or by an 
+<a href="/HTML/Element/Library.html">HTML::Element::Library</a> method), then locate it
+by a <code>class</code> tag and do not assign it an <code>id</code> tag. This is because HTML
+becomes invalid when an id tag appears more than once in the same document.</p>
+<p>For example here is some <em>Template</em> code:</p>
+<pre>
+ [% FOR column = item.columns('view') %]
+    &lt;b class=&quot;title&quot;&gt;[% column %]&lt;/b&gt;&lt;br/&gt;
+    [% item.$column %]&lt;br/&gt;&lt;br/&gt;
+ [% END %]</pre>
+<p>Here is how I converted it to a Seamstress document:</p>
+<pre>
+ &lt;span class=&quot;columns_view&quot;&gt;
+    &lt;b class=&quot;title&quot;&gt;column_name&lt;/b&gt;&lt;br/&gt;
+    &lt;span class=&quot;item_column&quot;&gt;column_value&lt;/span&gt;&lt;br/&gt;&lt;br/&gt;
+ &lt;/span&gt;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="copyright_and_license">COPYRIGHT AND LICENSE</a></h1>
+<p>Copyright 2002-2006 by Terrence Brannon.</p>
+<p>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</p>
+
+</body>
+
+</html>

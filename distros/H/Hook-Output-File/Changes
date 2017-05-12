@@ -1,0 +1,84 @@
+Revision history for Perl extension Hook::Output::File.
+
+0.08  2016-04-29  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.07_02  2016-04-06  <schubiger@cpan.org>
+
+ - Add metadata repository link.
+
+0.07_01  2016-03-07  <schubiger@cpan.org>
+
+ - Duplicate filehandles instead of tieing to package.
+
+ - Fix Win32 test failure.
+
+ - Major code refactoring.
+
+ - Amend documentation slightly.
+
+ - Adjust file descriptor tests.
+
+ - Update module dependencies.
+
+0.07  2011-05-24  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.06_02  2011-05-21  <schubiger@cpan.org>
+
+ - Allow for either single STDOUT or STDERR to be redirected.
+
+ - Retrieve for relative paths provided the absolute ones.
+
+ - Validation of arguments is now handled by Params::Validate.
+
+ - Use the boolean pragma for true/false values.
+
+ - Return early in DESTROY for Tie::StdHandle.
+
+ - Enhance tests and adjust documentation to reflect changes.
+
+ - Do no longer recommend Test::Pod and Test::Pod::Coverage.
+
+ - Remove File::Spec as prerequisite.
+
+0.06_01  2011-05-16  <schubiger@cpan.org>
+
+ - Fix redirecting output (e.g., stdout) when no filehandle was
+   provided to print by substituting select calls with IO::Handle.
+
+ - Interpolate symbolic references in tie/untie invocations.
+
+ - Test that redirecting without an explicit filehandle works.
+
+ - Skip documentation tests for non-release testing.
+
+ - Remove the testing diagnostic.
+
+ - Update broken license link.
+
+0.06 Tue Mar  3 12:51:34 CET 2009
+
+ - Require perl 5.8.0 or newer. [rt #43501 - Andreas J. König]
+
+0.05 Mon Feb 16 14:04:44 CET 2009
+
+ - Be more concise with both the documentation and code. 
+
+0.04 Sat Feb  9 17:25:37 CET 2008
+
+ - Added test-file redirect.t.
+
+ - Added new build dependencies (File::Temp & IO::Capture).
+
+ - Reformatted documentation.
+
+0.02 Wed Jan 31 23:45:51 CET 2007
+
+ - Replaced STDIN with STDERR in description.
+
+0.01 Thu Wed Jan 31 11:03:00 CET 2007
+
+ - Initial version.

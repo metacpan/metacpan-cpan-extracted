@@ -1,0 +1,15 @@
+---
+attrs:
+  standardSubmit: 1
+elements:
+  - type: Text
+    name: test
+    id: test_id
+    attrs:
+      labelWidth: 10
+  - type: Text
+    name: test2
+    label: Test
+    constraints:
+      Required
+    

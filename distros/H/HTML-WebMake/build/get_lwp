@@ -1,0 +1,123 @@
+#!/usr/bin/perl -w
+#
+# Get the required modules and write them to a "site_perl" directory in the
+# cwd.
+
+@modules = qw(
+      HTML::Parser
+);
+
+use File::Spec;
+use CPAN;
+use Cwd;
+
+$doget = 1;
+
+select STDERR; $| = 1;
+select STDOUT; $| = 1;
+# close STDIN; open (STDIN, "< /dev/null");
+
+# create a tmp dir to hold CPAN files and binaries that we cannot use
+# (we just want the portable perl script bits for bundling).
+
+$deldir  = File::Spec->catdir (getcwd, "getlwp.tmp");
+    $cpanhome = File::Spec->catdir ($deldir, ".cpan");
+	$builddir = File::Spec->catdir ($cpanhome, "build");
+	$sources  = File::Spec->catdir ($cpanhome, "sources");
+
+    $delinst  = File::Spec->catdir ($deldir, "todelete.tmp");
+
+$libinst = File::Spec->catdir (getcwd, "site_perl");
+
+mkdir ($deldir, 0700);
+    mkdir ($cpanhome, 0700);
+    mkdir ($cpanhome."/CPAN", 0700);
+      mkdir ($builddir, 0700);
+      mkdir ($sources, 0700);
+    mkdir ($delinst, 0700);
+mkdir ($libinst, 0700);
+
+# we only want the portable, pure-perl modules for sitescooper-full.  Ditch the
+# rest. Unfortunately HTML::Parser insists on installing pure perl modules into
+# INSTALLSITEARCH. doh!
+
+sub setconfig {
+  $makeargs = join (' ', split (' ', "
+  INSTALLSITEARCH=$delinst
+  INSTALLARCHLIB=$delinst
+  INSTALLBIN=$delinst
+  INSTALLSCRIPT=$delinst
+  INSTALLMAN1DIR=$delinst
+  INSTALLMAN3DIR=$delinst
+
+  INSTALLPRIVLIB=$libinst
+  INSTALLSITELIB=$libinst
+  INSTALLSITEARCH=$libinst
+"));
+
+  $ENV{'HOME'} = $deldir;
+
+  open (OUT, "> $deldir/.cpan/CPAN/MyConfig.pm") or die;
+  while (<DATA>) {
+    s/__cpanhome__/$cpanhome/g;
+    s/__builddir__/$builddir/g;
+    s/__sources__/$sources/g;
+    s/__makeargs__/$makeargs/g;
+    print OUT;
+  }
+  close OUT or die;
+}
+
+for $mod (@modules)
+{
+  &setconfig;
+  print "\n\nFTPing module $mod...\n\n";
+  if ($doget) { CPAN::Shell->get($mod); }
+}
+
+for $dir (<$builddir/*>) {
+  print "\nBuilding module in $dir...\n\n";
+  chdir $dir;
+  system ("perl Makefile.PL $makeargs < /dev/null");
+  system ("make $makeargs");
+  system ("make $makeargs pure_site_install");
+}
+
+# remove any binary bits left over by broken Makefiles
+system ("rm -rf $libinst/auto");
+exit 0;
+
+__END__
+
+$CPAN::Config = {
+  'build_cache' => q[10],
+  'build_dir' => q[__builddir__],
+  'cpan_home' => q[__cpanhome__],
+  'ftp' => q[/usr/bin/ftp],
+  'ftp_proxy' => q[],
+  'getcwd' => q[cwd],
+  'gzip' => q[/usr/bin/gzip],
+  'http_proxy' => q[proxy.clubi.ie],
+  'inactivity_timeout' => q[60],
+  'index_expire' => q[7],
+  'inhibit_startup_message' => q[0],
+  'keep_source_where' => q[__sources__],
+  'lynx' => q[/usr/bin/lynx],
+  'make' => q[/usr/bin/make],
+  'make_arg' => q[__makeargs__],
+  'make_install_arg' => q[__makeargs__],
+  'makepl_arg' => q[__makeargs__],
+  'ncftpget' => q[/usr/bin/ncftpget],
+  'no_proxy' => q[],
+  'pager' => q[cat],
+  'scan_cache' => q[never],
+  'shell' => q[bash],
+  'tar' => q[/bin/tar],
+  'unzip' => q[/usr/bin/unzip],
+  'urllist' => [q[ftp://ftp.cs.colorado.edu/pub/perl/CPAN/]],
+  'wait_list' => [q[wait://ls6.informatik.uni-dortmund.de:1404]],
+
+  'prerequisites_policy' => q[ignore],
+};
+1;
+

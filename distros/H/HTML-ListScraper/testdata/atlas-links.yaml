@@ -1,0 +1,484 @@
+---
+len: 22
+count: 20
+seq:
+ - exact: 111
+   inst: |
+    <div>
+      <table>
+        <tr>
+          <td>
+          </td>
+          <td>
+            <div>
+              <h3>
+                <a href="http://www.qbizm-technologies.cz/kariera">
+                </a>
+              </h3>
+            </div>
+            <p>
+            </p>
+            <div>
+              <a href="http://www.qbizm-technologies.cz/kariera">
+              </a>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+ - exact: 133
+   inst: |
+    <div>
+      <table>
+        <tr>
+          <td>
+          </td>
+          <td>
+            <div>
+              <h3>
+                <a href="http://www.johankazarku.wz.cz/kniha/index.html">
+                </a>
+              </h3>
+            </div>
+            <p>
+            </p>
+            <div>
+              <a href="http://www.johankazarku.wz.cz/kniha/index.html">
+              </a>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+ - exact: 155
+   inst: |
+    <div>
+      <table>
+        <tr>
+          <td>
+          </td>
+          <td>
+            <div>
+              <h3>
+                <a href="http://www.nuda.cz/dopraceNET/data_doprace.aspx">
+                </a>
+              </h3>
+            </div>
+            <p>
+            </p>
+            <div>
+              <a href="http://www.nuda.cz/dopraceNET/data_doprace.aspx">
+              </a>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+ - exact: 177
+   inst: |
+    <div>
+      <table>
+        <tr>
+          <td>
+          </td>
+          <td>
+            <div>
+              <h3>
+                <a href="http://poradna.uspesni.cz/">
+                </a>
+              </h3>
+            </div>
+            <p>
+            </p>
+            <div>
+              <a href="http://poradna.uspesni.cz/">
+              </a>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+ - exact: 199
+   inst: |
+    <div>
+      <table>
+        <tr>
+          <td>
+          </td>
+          <td>
+            <div>
+              <h3>
+                <a href="http://www.foxconn.cz/">
+                </a>
+              </h3>
+            </div>
+            <p>
+            </p>
+            <div>
+              <a href="http://www.foxconn.cz/">
+              </a>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+ - exact: 221
+   inst: |
+    <div>
+      <table>
+        <tr>
+          <td>
+          </td>
+          <td>
+            <div>
+              <h3>
+                <a href="http://www.dreamproduction.cz/default.aspx">
+                </a>
+              </h3>
+            </div>
+            <p>
+            </p>
+            <div>
+              <a href="http://www.dreamproduction.cz/default.aspx">
+              </a>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+ - exact: 243
+   inst: |
+    <div>
+      <table>
+        <tr>
+          <td>
+          </td>
+          <td>
+            <div>
+              <h3>
+                <a href="http://myworld.cz/">
+                </a>
+              </h3>
+            </div>
+            <p>
+            </p>
+            <div>
+              <a href="http://myworld.cz/">
+              </a>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+ - exact: 265
+   inst: |
+    <div>
+      <table>
+        <tr>
+          <td>
+          </td>
+          <td>
+            <div>
+              <h3>
+                <a href="http://www.le-ny.ic.cz/">
+                </a>
+              </h3>
+            </div>
+            <p>
+            </p>
+            <div>
+              <a href="http://www.le-ny.ic.cz/">
+              </a>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+ - exact: 287
+   inst: |
+    <div>
+      <table>
+        <tr>
+          <td>
+          </td>
+          <td>
+            <div>
+              <h3>
+                <a href="http://www.kaktus.cz/Zamestnani.aspx">
+                </a>
+              </h3>
+            </div>
+            <p>
+            </p>
+            <div>
+              <a href="http://www.kaktus.cz/Zamestnani.aspx">
+              </a>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+ - exact: 309
+   inst: |
+    <div>
+      <table>
+        <tr>
+          <td>
+          </td>
+          <td>
+            <div>
+              <h3>
+                <a href="http://www.floreios.tym.cz/">
+                </a>
+              </h3>
+            </div>
+            <p>
+            </p>
+            <div>
+              <a href="http://www.floreios.tym.cz/">
+              </a>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+ - exact: 331
+   inst: |
+    <div>
+      <table>
+        <tr>
+          <td>
+          </td>
+          <td>
+            <div>
+              <h3>
+                <a href="http://www.future.cz/topfuture/ofirme/nabidkazamestnani/CatID2512/default.aspx">
+                </a>
+              </h3>
+            </div>
+            <p>
+            </p>
+            <div>
+              <a href="http://www.future.cz/topfuture/ofirme/nabidkazamestnani/CatID2512/default.aspx">
+              </a>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+ - exact: 353
+   inst: |
+    <div>
+      <table>
+        <tr>
+          <td>
+          </td>
+          <td>
+            <div>
+              <h3>
+                <a href="http://www.inform.cz/kariera/">
+                </a>
+              </h3>
+            </div>
+            <p>
+            </p>
+            <div>
+              <a href="http://www.inform.cz/kariera/">
+              </a>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+ - exact: 375
+   inst: |
+    <div>
+      <table>
+        <tr>
+          <td>
+          </td>
+          <td>
+            <div>
+              <h3>
+                <a href="http://www.sprinx.cz/kariera/?tabindex=1">
+                </a>
+              </h3>
+            </div>
+            <p>
+            </p>
+            <div>
+              <a href="http://www.sprinx.cz/kariera/?tabindex=1">
+              </a>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+ - exact: 397
+   inst: |
+    <div>
+      <table>
+        <tr>
+          <td>
+          </td>
+          <td>
+            <div>
+              <h3>
+                <a href="http://www.inspirit.cz/odkazy.aspx">
+                </a>
+              </h3>
+            </div>
+            <p>
+            </p>
+            <div>
+              <a href="http://www.inspirit.cz/odkazy.aspx">
+              </a>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+ - exact: 419
+   inst: |
+    <div>
+      <table>
+        <tr>
+          <td>
+          </td>
+          <td>
+            <div>
+              <h3>
+                <a href="http://www.javaarena.ic.cz/signup.php">
+                </a>
+              </h3>
+            </div>
+            <p>
+            </p>
+            <div>
+              <a href="http://www.javaarena.ic.cz/signup.php">
+              </a>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+ - exact: 441
+   inst: |
+    <div>
+      <table>
+        <tr>
+          <td>
+          </td>
+          <td>
+            <div>
+              <h3>
+                <a href="http://www.darkov.cz/hledame/">
+                </a>
+              </h3>
+            </div>
+            <p>
+            </p>
+            <div>
+              <a href="http://www.darkov.cz/hledame/">
+              </a>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+ - exact: 463
+   inst: |
+    <div>
+      <table>
+        <tr>
+          <td>
+          </td>
+          <td>
+            <div>
+              <h3>
+                <a href="http://www.anastacia.mixzone.net/anastacia-menu.html">
+                </a>
+              </h3>
+            </div>
+            <p>
+            </p>
+            <div>
+              <a href="http://www.anastacia.mixzone.net/anastacia-menu.html">
+              </a>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+ - exact: 485
+   inst: |
+    <div>
+      <table>
+        <tr>
+          <td>
+          </td>
+          <td>
+            <div>
+              <h3>
+                <a href="http://www.beghelli.cz/web/volna-mista">
+                </a>
+              </h3>
+            </div>
+            <p>
+            </p>
+            <div>
+              <a href="http://www.beghelli.cz/web/volna-mista">
+              </a>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+ - exact: 507
+   inst: |
+    <div>
+      <table>
+        <tr>
+          <td>
+          </td>
+          <td>
+            <div>
+              <h3>
+                <a href="http://jazykove-prekladace.software-programy.cz/Langmaster/LANGMaster+SKOLA+hrou+-+Fyzika+1+-12-16+let-|122/">
+                </a>
+              </h3>
+            </div>
+            <p>
+            </p>
+            <div>
+              <a href="http://jazykove-prekladace.software-programy.cz/Langmaster/LANGMaster+SKOLA+hrou+-+Fyzika+1+-12-16+let-|122/">
+              </a>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+ - exact: 529
+   inst: |
+    <div>
+      <table>
+        <tr>
+          <td>
+          </td>
+          <td>
+            <div>
+              <h3>
+                <a href="http://www.makropulos.cz/job.aspx">
+                </a>
+              </h3>
+            </div>
+            <p>
+            </p>
+            <div>
+              <a href="http://www.makropulos.cz/job.aspx">
+              </a>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>

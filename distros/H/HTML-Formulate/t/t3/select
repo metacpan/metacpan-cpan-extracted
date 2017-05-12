@@ -1,0 +1,11 @@
+<form method="post">
+<table cellpadding="2">
+<tr><th>Emp Salutation</th><td><select name="emp_salutation"><option value="NONE">None</option><option value="Mr">Mr</option><option value="Ms">Ms</option><option value="Mrs">Mrs</option><option value="Miss">Miss</option><option value="Dr">Dr</option><option value="Sir">Sir</option><option value="Prof">Professor</option></select></td></tr>
+<tr><th>Emp Name</th><td><input name="emp_name" type="text" value="Fred Flintstone" /></td></tr>
+<tr><th>Emp Title</th><td><input name="emp_title" type="text" value="CEO" /></td></tr>
+<tr><td align="center" colspan="2">
+<input name="_submit" type="submit" value="Submit" />
+</td></tr>
+</table>
+<input name="emp_id" type="hidden" value="123" />
+</form>

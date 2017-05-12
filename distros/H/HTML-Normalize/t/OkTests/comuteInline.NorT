@@ -1,0 +1,5 @@
+-selfrender=1
+<span boo="foo"><p>foo</p><p>bar</p></span>
+<!--expected-->
+<p><span boo="foo">foo</span></p>
+<p><span boo="foo">bar</span></p>

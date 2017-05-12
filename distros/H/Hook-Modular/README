@@ -1,0 +1,333 @@
+NAME
+    Hook::Modular - Making pluggable applications easy
+
+VERSION
+    version 1.101050
+
+SYNOPSIS
+    In "some_config.yaml"
+
+      global:
+        log:
+          level: error
+        cache:
+          base: /tmp/test-hook-modular
+        # plugin_namespace: My::Test::Plugin
+  
+      plugins:
+        - module: Some::Printer
+          config:
+            indent: 4
+            indent_char: '*'
+            text: 'this is some printer'
+
+    here is the plugin:
+
+      package My::Test::Plugin::Some::Printer;
+      use warnings;
+      use strict;
+      use parent 'Hook::Modular::Plugin';
+  
+      sub register {
+          my ($self, $context) = @_;
+          $context->register_hook($self,
+            'output.print' => $self->can('do_print'));
+      }
+  
+      sub do_print { ... }
+
+    And this is "some_app.pl"
+
+      use parent 'Hook::Modular';
+
+      use constant PLUGIN_NAMESPACE => 'My::Test::Plugin';
+
+      sub run {
+        my $self = shift;
+        $self->SUPER::run(@_);
+        ...
+        $self->run_hook('output.print', ...);
+        ...
+      }
+
+      main->bootstrap(config => $config_filename);
+
+    But also see Hook::Modular::Builder for a domain-specific language to
+    build a configuration.
+
+DESCRIPTION
+    Hook::Modular makes writing pluggable applications easy. Use a config
+    file to specify which plugins you want and to pass options to those
+    plugins. The program to support those plugin then subclasses
+    Hook::Modular and bootstraps itself. This causes the plugins to be
+    loaded and registered. This gives each plugin the chance to register
+    callbacks for any or all hooks the program offers. The program then runs
+    the hooks in the order it desires. Each time a hook is run, all the
+    callbacks the plugins have registered with this particular hook are run
+    in order.
+
+    Hook::Modular does more than just load and call plugins, however. It
+    also supports the following concepts:
+
+    Cache
+        Plugins can cache their settings. Cached items can also expire after
+        a given time.
+
+    Crypt
+        Hook::Lexwrap can go over your config file and encrypt any passwords
+        it finds (as determined by the key "password"). It will then rewrite
+        the config file and make a backup of the original file. Encrypting
+        and rewriting is turned off by default, but subclasses can enable
+        it, or you can enable it from a config file itself.
+
+        At the moment, encrypting is rather basic: The passwords are only
+        turned into base64.
+
+    Rules
+        Hook::Modular supports rule-based dispatch of plugins.
+
+METHODS
+  new
+      my $obj = Hook::Modular->new(config => $config_file_name);
+
+    Creates a new object and initializes it. The arguments are passed as a
+    named hash. Valid argument keys:
+
+    "config"
+        Reads or sets the global configuration.
+
+        If the value is a simple string, it is interpreted as a filename. If
+        the file is readable, it is loaded as YAML. If the filename is "-",
+        the configuration is read from STDIN.
+
+        If the value is a scalar reference, the dereferenced value is
+        assumed to be YAML and is loaded.
+
+        If the value is a hash reference, the configuration is cloned from
+        that hash reference.
+
+        Also see Hook::Modular::Builder for a domain-specific language to
+        build a configuration.
+
+    The constructor also sets the application-wide configuration, which can
+    be accessed using "conf()", to the "global" part of the configuration
+    data that has been passed to the constructor. This configuration is then
+    augmented in various ways:
+
+    "log level"
+          my $level = $self->conf->{log}{level}
+
+        The log level is set to "debug", if it hasn't been set by the
+        configuration data already.
+
+        In the config file, you can specify it this way:
+
+          global:
+            log:
+              level: info
+
+    "log encoding"
+          my $encoding = $self->conf->{log}{encoding}
+
+        The log encoding is set to the current terminal's encoding, if it
+        hasn't been set by the configuration data already.
+
+        In the config file, you can specify it this way:
+
+          global:
+            log:
+              level: info
+
+    "plugin_namespace"
+          my $ns = $self->conf->{plugin_namespace};
+
+        The default plugin namespace is set to whatever the class defines as
+        the "PLUGIN_NAMESPACE" constant, if the configuration data hasn't
+        set it already. See the documentation of "PLUGIN_NAMESPACE" for
+        details.
+
+    "should_rewrite_config"
+          my $should_rewrite_config = $self->conf->{should_rewrite_config};
+
+        If the configuration data hasn't set it already to either 0 or 1,
+        config file rewriting is turned off. See the documentation of
+        "SHOULD_REWRITE_CONFIG" for details.
+
+    "rule_namespaces"
+        If the config file specifies any rule namespaces, they are added to
+        the default rule namespaces. See the documentation of
+        "add_to_rule_namespaces()" for details.
+
+  context, set_context
+      my $context = $self->context;
+      $self->set_context($context);
+
+    Gets and sets (respectively) the global context. It is singular; each
+    program has only one context. This can be used to communicate between
+    the plugins.
+
+  conf
+      my %conf = $self->conf;
+      my $plugin_path = $self->conf->{plugin_path} || [];
+      $self->conf->{log}{level} = 'debug';
+
+    Returns a hash that has the application-wide configuration. It is set
+    during "new()" from the "global" section of the configuration data and
+    augmented with various other settings.
+
+  PLUGIN_NAMESPACE
+      package My::TestApp;
+      use parent 'Hook::Modular';
+      use constant PLUGIN_NAMESPACE => 'My::Test::Plugin';
+
+    A constant that specifies the namespace that is prepended to plugin
+    names found in the configuration. Defaults to "Hook::Modular::Plugin".
+    Subclasses can and probably should override this value. For example, if
+    the plugin namespace is set to "My::Test::Plugin" and the config file
+    specifies a plugin with the name "Some::Printer", we will try to load
+    "My:::Test::Plugin::Some::Printer".
+
+    In the config file, you can specify it this way:
+
+      global:
+        plugin_namespace: My::Test::Plugin
+
+  SHOULD_REWRITE_CONFIG
+      package My::TestApp;
+      use parent 'Hook::Modular';
+      use constant SHOULD_REWRITE_CONFIG => 1;
+
+    Hook::Modular can rewrite your config file, for example, to turn
+    passwords into encrypted forms so they are not easily readable in the
+    plain text. This behaviour is turned off by default, but the config
+    file, or a subclass of Hook::Modular, can turn it on. In a config file,
+    specify it this way:
+
+    In the config file, you can specify it this way:
+
+      global:
+        should_rewrite_config: 1
+
+  add_to_rule_namespace
+      $self->add_to_rule_namespaces(
+        qw/Some::Rule::Namespace Other::Rule::Namespace/);
+
+    Hook::Modular supports multiple rule namespace, that is, package
+    prefixes that are used when looking for rule classes. The reason to
+    allow multiple rule namespace is that Hook::Modular has some rules, and
+    your subclass might well define its own rules, so Hook::Modular needs to
+    know which package it might find rules in.
+
+    There is only one list of rule namespace per program. To add to rule
+    namespaces in your program, don't access "conf()" directly, but use the
+    proper class methods to do so: "add_to_rule_namespaces()" and
+    "rule_namespaces()".
+
+    You can add to rule namespaces using the config file like this:
+
+      global:
+        rule_namespaces:
+          - Some::Thing::Rule
+          - Other::Thing::Rule
+
+    or, if you only want to add one rule namespace:
+
+      global:
+        rule_namespaces: Some::Thing::Rule
+
+  rule_namespaces
+      my @ns = $self->rule_namespaces;
+
+    Returns the list of rule namespaces. See the documentation of
+    "add_to_rule_namespaces" for details.
+
+  add_plugin_path
+    FIXME
+
+  add_rewrite_task
+    FIXME
+
+  add_to_rule_namespaces
+    FIXME
+
+  autoload_plugin
+    FIXME
+
+  dumper
+    FIXME
+
+  error
+    FIXME
+
+  extract_package
+    FIXME
+
+  home_dir
+    FIXME
+
+  init
+    FIXME
+
+  is_loaded
+    FIXME
+
+  load_cache
+    FIXME
+
+  load_plugin
+    FIXME
+
+  load_plugins
+    FIXME
+
+  register_hook
+    FIXME
+
+  rewrite_config
+    FIXME
+
+  run
+    FIXME
+
+  run_hook
+    FIXME
+
+  run_hook_once
+    FIXME
+
+  run_main
+    FIXME
+
+  should_log
+    FIXME
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Hook-Modular>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see <http://search.cpan.org/dist/Hook-Modular/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/Hook-Modular/>. Instead of sending patches,
+    please fork this project using the standard git and github
+    infrastructure.
+
+AUTHORS
+      Marcel Gruenauer <marcel@cpan.org>
+      Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2007 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

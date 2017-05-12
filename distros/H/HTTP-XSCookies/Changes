@@ -1,0 +1,21 @@
+0.000005    2016-01-28
+            * Switch all standard cookie field names to
+              CamelCase, in accordance to RFC6265. Thanks to
+              @SysPete for the error report.
+
+0.000004    2016-01-27
+            * Allow for '=' as part of a value. Thanks to
+              @SysPete and @veryrusty for the error report
+              and confirming what the proper behaviour is.
+            * Add some more test cases.
+
+0.000003    2016-01-26
+            * Fix some tests that depend on the current time,
+              to make them more resistant to clock drift.
+            * Get rid of dangling references to Devel::Cookie.
+
+0.000002    2016-01-26
+            * Change name to HTTP::XSCookies; "thanks", SawyerX.
+
+0.000001    2016-01-25
+            * Initial version.

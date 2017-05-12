@@ -1,0 +1,85 @@
+#!/usr/bin/env perl -w
+
+use strict;
+use File::Basename;
+use File::Spec;
+use HTML::Copy;
+use Getopt::Long;
+use Pod::Usage;
+
+our $VERSION = '1.31';
+
+{
+    my $man = 0;
+    my $help = 0;
+  
+    GetOptions('help|?' => \$help, man => \$man) or pod2usage(2);
+    pod2usage(-exitstatus => 0, -verbose => 1) if $help;
+    pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+
+    if (@ARGV > 2) {
+        pod2usage(-message => 'Too many arguments.', 
+                    -exitstatus => 1, -verbose => 1)
+    }
+
+    if (@ARGV < 1) {
+        pod2usage(-message => 'Required arguments is not given.', 
+                    -exitstatus => 1, -verbose => 1)
+    }
+    
+    my ($source_path, $target_path) = @ARGV;
+    
+    my $in;
+    if ($source_path eq '-' ) {
+        open $in , " -";
+    } else {
+        $in = $source_path;
+    }
+    
+    my $p = HTML::Copy->new($in);
+    #$p->set_encode_suspects(qw/euc-jp shiftjis 7bit-jis/);
+    unless ($target_path) {
+        open $target_path, ">-";
+    }
+    $p->copy_to($target_path);
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+htmlcopy -- Copy a HTML file without breaking links.
+
+=head1 SYNOPSIS
+
+ htmlcopy [OPTION] {SOURCE | -} [DESTINATION]
+
+=head1 DESCRIPTION
+
+htmlcopy a source HTML file into DESTINATION. If the HTML file have links to images, other HTML files, javascripts and cascading style sheets, htmlcopy changing link path in the HTML file to keep the link destination.
+
+When DESTINATION is omitted, the modified HTML is written in the standard output. Also it is assumed that output location is the current working directory.
+
+SOURCE and DESTINATION should be cleanuped pathes. For example, a verbose path like '/aa/bb/../cc' may cause converting links wrongly. This is a limitaion of the URI module's rel method. To cleanup pathes, Cwd::realpath is useful.
+
+=head1 OPTIONS
+
+=over 4
+
+=item -h, --help
+
+Print a brief help message and exits.
+
+=item -m, --man
+
+Prints the manual page and exits.
+
+=back
+
+=head1 AUTHOR
+
+Tetsuro KURITA <tkurita@mac.com>
+
+=cut

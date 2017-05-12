@@ -1,0 +1,269 @@
+<wmmeta name="Title" value="Setting up CVS and ssh for webmake.cgi HOWTO" />
+<wmmeta name="Section" value="075-cgi" />
+<wmmeta name="Score" value="30" />
+<wmmeta name="Abstract">
+A step-by-step guide to setting up version-control for your WebMake site
+</wmmeta>
+
+This document covers setting up Webmake with CVS and SSH.  It's quite
+complicated, but the end result is worth it, providing version control and
+replication of your site.
+
+WHAT YOU WILL NEED
+------------------
+
+You will require a CVS server machine (one with a permanent internet connection
+if possible).  This is where the CVS repository will live.  The repository is
+the central store for all CVS-controlled documents.
+
+Then you will need at least one client machine (it could be the same computer,
+of course).  Each client machine will have a copy of the website, checked out
+from the CVS repository.  Initially, you'll use one of the clients to import
+the website into CVS.
+
+The client machines need to be able to connect to the server machine over the
+network; and if you're planning to use webmake.cgi, they need to be able to do
+this without passwords.  To do this securely, you'll need to set up an SSH
+server and clients, and generate public/private key pairs.  I'll cover some of
+this where possible, but you need to be familiar with SSH in general.
+
+(You don't strictly need to use SSH, but it allows multiple copies of the same
+site across the net, and allows changes made on any of the sites to be
+automatically replicated to all the others.  This is obviously quite handy!
+However, if you don't want to use SSH, you'll still get the benefits of keeping
+the site under version control.)
+
+WARNING: as part of this procedure, you will need to allow CGI scripts on the
+client machine to run cvs commands on the server machine.  If an attacker
+subverted the client machine, they may be able to use this to gain shell
+access to your account on the server machine.  If this is a problem, it would
+probably be better not to set up webmake.cgi.
+
+When illustrating the commands needed to run this, I'll use my username and my
+hostnames.  Wherever you see **jm**, replace with your username, wherever you
+see **localhost**, replace with your server's hostname, and wherever you see
+**/cvsroot**, replace with the path to your CVS repository on the server.
+
+
+CREATING THE REPOSITORY
+-----------------------
+
+First of all, create the repository on the CVS server machine.
+
+<safe>
+	mkdir /cvsroot;
+	cvs -d /cvsroot init
+</safe>
+
+SETTING UP SSH
+--------------
+
+On a client machine, install the SSH client (''ssh''), and install the SSH server
+(''sshd'') on the server machine.  Set them up (as described in the ssh
+documentation).
+
+Next, if you haven't done this before, generate an ssh key pair for yourself
+on all machines:
+
+<safe>
+	ssh-keygen -P "" -N ""
+</safe>
+
+When it asks for the filenames to save the keys in, hit Enter to accept the
+defaults.
+
+Any machines you plan to run webmake.cgi on, you will also need to generate a
+key-pair for, so that the user the web server runs CGI scripts as will be able
+to communicate without passwords. Here's how (run these as root):
+
+<safe>
+	mkdir ~apache/.ssh
+	chmod 700 ~apache/.ssh
+	chown apache ~apache/.ssh
+	su apache -s/bin/sh -c 'ssh-keygen -P "" -N ""'
+</safe>
+
+This will generate a public/private key-pair for the web server user. Note
+that the user the web server runs as on your UNIX may be different (**httpd**,
+**www**, or **nobody** are common usernames for it); in that case replace
+**apache** with the correct username.
+
+Don't worry; the keys you've set up will not compromise your server's
+security, as the SSH daemon will not allow anyone to log in as the web server
+user, since they have a no-login shell.
+
+
+SETTING UP NO-PASSWORD LOGINS
+-----------------------------
+
+This is optional for editing the site by hand using CVS, but if you're using
+webmake.cgi, it will require that this works.
+
+Here's how to set it up for webmake.cgi.  Get the public key you just
+generated for the web user (run this as root):
+
+<safe>
+  	cat ~apache/.ssh/identity.pub
+</safe>
+
+you should get a long stream of gibberish starting with ''1024'' and ending
+with a hostname; that's the public key. Here's mine:
+
+<safe>
+	1024 35
+	15059408357788156311432762154619731093579709369085525651528959
+	33782159340399119075502495847161401527101834823731504521848289
+	07097066749035812105735673062224184578113153987480874569311840
+	34611043915547598874334739513173936291615348136113929611666395
+	3155785517017739076839134463214021324783262900267823081443889
+	apache@mmmkay
+</safe>
+
+On the server, create a file called ##authorized_keys## in your ##~/.ssh##
+directory:
+
+<safe>
+	vi ~/.ssh/authorized_keys
+</safe>
+
+and add this line to to it:
+
+<safe>
+  	command="cvs server",no-port-forwarding,no-pty __...yourpublickey...__
+</safe>
+
+This will allow CGI scripts on the client machine to access cvs on the server
+machine. Add similar lines for any other machines which need access to the
+CVS repository.
+
+Make sure it's read-write only by you, and unreadable to anyone
+else:
+
+<safe>
+	chmod 0600 ~/.ssh/authorized_keys
+</safe>
+
+Setting up no-password logins for manual editing is similar -- but instead of
+reading the public key from ##~apache/identity.pub##, read it from
+##~/.ssh/identity.pub##, and leave out the __command=''command''__ part when
+adding it to ##~/.ssh/authorized_keys## on the server-side.
+
+Next, try it out.  This is required to initialise the client account with a
+host key for the server, and if you omit this step, the CGI script will not be
+able to update or check in code.
+
+<safe>
+	echo test | su apache -s/bin/sh -c 'ssh jm@localhost cvs server'
+</safe>
+
+It will ask you if you wish to accept the host key for server **localhost**.
+Type ''yes'' and hit Enter.  If all goes well, you should see:
+
+<safe>
+error  unrecognized request `test'
+</safe>
+
+Important: you should **not** be prompted for a password.  If you are prompted
+for one, check that the correct key has been entered in the
+**authorized_keys** file.
+
+
+IMPORTING THE SITE INTO CVS
+---------------------------
+
+On a client machine, do this:
+
+<safe>
+	export CVS_RSH=ssh
+</safe>
+
+If possible, add this to your startup scripts (.bashrc or .cshrc), so
+you can't forget to set it.  All further CVS commands in this document
+assume this environment variable is set.
+
+Create a WebMake XML configuration file for the site, if one is not already
+present.  webmake.cgi will __require__ that a site has a .wmk file.
+
+Now, run the ''webmake_cvs_import'' script. This script is a wrapper around
+the ''cvs import'' command which ensures that binary files (such as images
+etc.) are imported into CVS correctly.
+
+You need to provide a name for the CVS module.  I'm using **jmason.org** in
+this example.  You should pick a name that makes sense; I typically use the
+host name of the site I'm importing.
+
+<safe>
+	webmake_cvs_import jm@localhost:/cvsroot jmason.org
+</safe>
+
+Assuming this works, move on to **CHECKING OUT THE SITE**, below.  (Keep a
+copy of the original site tree around just in case!)
+
+
+CHECKING OUT THE SITE
+---------------------
+
+On the clients, create a directory for webmake.cgi to work in, in the web
+server's HTML tree, then check out the CVS tree:
+
+<safe>
+	mkdir /var/www/html/jmason.org
+	cd /var/www/html/jmason.org
+	cvs -d :ext:jm@localhost:/cvsroot checkout jmason.org
+</safe>
+
+__Note:__ cvs checkout has a few idiosyncrasies; notably, the directory you're
+checking out must not exist in your filesystem, otherwise it will not populate
+it with the CVS data files it requires to do check-ins and updates later.
+
+Also, this directory must have the same name it has in the CVS repository
+(**jmason.org** in the example above).  We don't want that, so move them
+nearer:
+
+<safe>
+	mv jmason.org/* . ; rmdir jmason.org
+</safe>
+
+then, as root,
+
+<safe>
+	chown -R apache /var/www/html/jmason.org
+</safe>
+
+so that webmake.cgi can read and write the files.  (You could also chgrp them
+to **www** or whatever the web server user uses as its gid, and **chmod -R
+g+w** them.)
+
+Next, copy the ''webmake.cgi'' script to your web server's cgi-bin directory:
+
+<safe>
+	cp webmake.cgi /cgi-bin/editsite.cgi
+</safe>
+
+and edit the top of the script.  You need to set these variables:
+
+<safe>
+	$FILE_BASE = '/var/www/html/jmason.org';
+</safe>
+
+Note that if you've adopted the same convention as I use for the module name,
+you can use **_<!-- -->_HOST_<!-- -->_** as a shortcut in this line to mean the
+hostname of the site being edited.  This is handy, as it allows you to use the
+same CGI script to edit multiple sites, in different virtual servers.
+
+Load up **http://localhost/cgi-bin/editsite.cgi** in a web browser, and it
+should have worked; you should see a list of ''sites'' (ie. .wmk files) to
+choose from.
+
+Try clicking on a site, scroll down to the bottom of the page, and click on
+the ''&etsqi;Update From CVS&etsqo;'' link. You should see a page of cvs
+messages, indicating that the site has been updated from the latest CVS
+checked-in version.
+
+If this works without errors, you're now set up.  Set up as many more clients
+as you like!
+
+More info on CVS can be found here [cvs].
+
+	[cvs]: http://www.cvshome.org/
+

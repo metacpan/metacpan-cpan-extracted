@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 1511dd7ab3c477cf5eee1b2d44821e124c253f07 Changes
+SHA1 bab8cdf0646595bb7fbc752889d7a52289c167a6 MANIFEST
+SHA1 fefb82de64d42b97a94e1c5621179439ac818aaf META.yml
+SHA1 a50d9e9b1b30b64e803e7507f3de1eb5b1a846c8 Makefile.PL
+SHA1 009cac7fa19316a27d814b1d81218404ad7f9b5e README
+SHA1 86a67931183bd88c683aff141bfc3442cd3e5fac example/add_shy.pl
+SHA1 eece1ae4634506bdb15f3ccb35a71ead17336a82 lib/HTML/Hyphenate.pm
+SHA1 5cbad92002dfd37403cd0db99ec03bcb888b4a56 lib/HTML/Hyphenate/TypeDef.pm
+SHA1 63b7931826c3b7ce1eae7020fc72c9a936450244 t/00_base.t
+SHA1 ad1a5fcbc6c1fd520c3c6553a310fe5a6f6f7d27 t/00_signature.t
+SHA1 622a56d7c770fe408ddcabc899f1fecb25b36cfe t/01_default.t
+SHA1 7a55a70d8ed6173810c6ea133f650c907cd52684 t/02_classes.t
+SHA1 ee48c2a58071091ac9d085fa823f88fabbfe2912 t/03_lang.t
+SHA1 56228ee584b7117374b62d59a5771439c9a098e3 t/09_pod.t
+SHA1 9d414c560650a674892919dcd47e3244429dce02 t/10_pod-coverage.t
+SHA1 a088b84f365d93e34574bea3e5a9f9c2580ffc70 t/11_test-coverage.t
+SHA1 defc15673f7377195978f3b5b9660868a6eb0cea t/12_manifest.t
+SHA1 1b60bd20f719427a9f6a7e6cbe116d051fac0ae1 t/13_critic.t
+SHA1 6d656767778ea66f3537e38e46d62d0503a3b8a6 t/14_kwalitee.t
+SHA1 2b43086932e361f3b9da684efb8bbebb7e1f62a7 t/15_spell.t
+SHA1 7ab35f717c4c3f8acd338080342ce4f030519123 t/perlcriticrc
+SHA1 79c1e5ed5581a9646197d370b844019b21323701 t/rt.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk0RFKgACgkQr7H9zeGP1tWKnQCg3VHwU+9V0f8UYi7z3uazrLfe
+NYIAoK7Olf+rGKekpZOpGa8P8X0oaXGI
+=VZIL
+-----END PGP SIGNATURE-----

@@ -1,0 +1,5 @@
+^MYMETA.yml$
+^.git
+.bak$
+^_build
+^Build$

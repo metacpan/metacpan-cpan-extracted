@@ -1,0 +1,5 @@
+#!/bin/sh
+
+PATH=$PATH:/usr/sbin:/usr/local/sbin
+perlpath=`perl -MConfig -e 'print $Config::Config{archlib}."\n"'`
+apxs -c -I $perlpath/CORE -I . -I .. -I ../.. -L $perlpath/CORE -l perl mod_twepl.c

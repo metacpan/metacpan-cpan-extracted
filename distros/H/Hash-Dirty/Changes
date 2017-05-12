@@ -1,0 +1,13 @@
+0.023 Saturday October 13 15:46:11 PDT 2007:
+ - Another dependency update
+
+0.021 Tuesday October 09 12:16:06 PDT 2007:
+ - Dependency update
+
+0.02 Monday October 08 16:18:49 PDT 2007:
+ - Critical update: the version 0.01 did not work in %hash form because of boneheadedness, but should now (using Tie::ExtraHash vs. Tie::StdHash)
+ - Interface change, ->new will return the object by default, and in list context return both the object and the hash
+ - DELETE handled properly, CLEAR now handled as well
+
+0.01 Saturday October 06 19:26:19 PDT 2007:
+ - Initial version

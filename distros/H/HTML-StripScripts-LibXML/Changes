@@ -1,0 +1,11 @@
+0.12   1 Dec 2007  Fixed a bug in entity encoding, where entities where being
+                   encoded twice. Thanks to Kjetil Kjernsmo for reporting this.
+
+                   Dropped the minimum version of XML::LibXML to 1.58.
+                   Thanks to Kjetil Kjernsmo for suggesting this.
+
+                   Changed min version of HTML::StripScripts::Parser to 1.02
+
+0.11  21 Nov 2007  Changed min version of HTML::StripScripts::Parser to 1.01
+                   because of bugs in HTML::Parser
+0.10   1 Jul 2007  Module created

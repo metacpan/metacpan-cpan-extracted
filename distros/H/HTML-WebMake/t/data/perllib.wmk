@@ -1,0 +1,9 @@
+<webmake>
+
+<content name="foo"> Foo! </content>
+<include file="${WebMake.PerlLib}/dump_vars.wmk" />
+
+<out file=log/perllib.html>${DumpVars_names}</out>
+<out file=log/perllib_2.html>${DumpVars_full}</out>
+
+</webmake>

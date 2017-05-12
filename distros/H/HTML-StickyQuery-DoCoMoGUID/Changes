@@ -1,0 +1,11 @@
+Revision history for Perl extension HTML::StickyQuery::DoCoMoGUID
+
+0.03    2010-12-27T18:42:36+09:00
+        - dependent HTML::StickyQuery 0.13
+        - modern layout.
+
+0.02    2009-11-02T13:14:00+09:00
+        - an option can be passed to HTML::StickyQuery. hidek++
+
+0.01    2008-04-08T21:38:57+09:00
+        - original version

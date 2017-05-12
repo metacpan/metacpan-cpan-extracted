@@ -1,0 +1,26 @@
+Revision history for HPC-Runner-Command
+
+3.1.5  2017-05-01 09:01:42 GST
+	- More logging info
+
+3.1.4  2017-04-30 11:33:17 GST
+	- Minor bug fix for plugins
+
+3.1.3  2017-04-30 11:08:50 GST
+	- Additional logging info on jobs - hostname, job scheduler id, array id
+
+3.1.2  2017-04-01 11:22:06 GST
+	- Made some fixes to environmental variables for slurm
+	- Changed duration from %year %month ... to just %day %hours %minutes
+
+3.1.1  2017-03-12 14:44:10 GST
+	- Bug fix for ManyConfigs
+
+3.1.0  2017-03-12 11:16:13 GST
+	- Official stable release
+
+3.0.1  2017-01-11 10:54:34 GST
+	- Bug fixes for cpan tests
+
+3.0.0  2017-01-05 12:26:17 GST
+        - This is the beta release of HPC::Runner::Command 

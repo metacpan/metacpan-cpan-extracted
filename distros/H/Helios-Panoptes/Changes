@@ -1,0 +1,22 @@
+Revision history for Perl extension Helios::Panoptes.
+
+1.44 Tue Apr 28 17:55:00 2009
+	-JobLog.pm: removed some unnecessary JOINs to greatly improve 
+	performance
+	-Helper.pm: removed dependency on deprecated Helios::Worker
+	-updated contact & copyright info
+1.432 Tue Nov 11 13:00:00 2008
+	-Added "group by" capabilities to collective view; can group 
+	service instances by service name or host
+1.42 Thu Sep 25 15:10:00 2008
+	-Ctrl Panel doesn't bomb if there are no config params in helios_params_tb
+	-Job Submit now reports helios_class_map job type and the associated service
+1.40 Sat Aug  9 03:00:00 2008
+	-First production release
+	-Uses new Helios 2.0 API
+	-Worker Admin view replaced with Collective Admin
+	-Job Queue view now has count only option
+1.29_02 
+	-Fixed Helios::Worker dependency in Makefile.PL (oops)
+1.29_01 Fri May 23 10:00:00 2008
+	-First public release

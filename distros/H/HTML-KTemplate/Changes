@@ -1,0 +1,84 @@
+
++------------------------------------------------------------------+
+|  HTML::KTemplate v1.33 - Perl module to process HTML templates.  |
++------------------------------------------------------------------+
+
+
+CHANGES
+-------
+
+1.33  Sun Nov 09 15:34 2003
+    - Rewrite: some internal changes making this module faster.
+    - Changed: chomped newlines are replaced with a single space as you would
+      expect from a html template module.
+    - Fixed: assigned undefined block variables were not used if a global
+      variable with the same name existed.
+
+1.32  Wed Oct 15 23:29 2003
+    - New: mailing list available for announcements and discussion (see POD
+      documentation for more information).
+    - Fixed: process() method emptied scalar reference passed as template.
+    - Fixed: references to undefined values are skipped instead of raising an
+      error when passed to process() method.
+
+1.31  Fri Oct 10 10:58 2003
+    - Fixed: print() method accepts file hande for compatibility reasons.
+    - Fixed: passing a file handle reference to process() did not work with
+      older Perl versions.
+
+1.30  Thu Oct 09 15:16 2003
+    - Added: process() method accepts a reference to a scalar, array or file
+      handle to initialize the template from memory.
+    - Added: option to replace all template variables inside of a variable with
+      their assigned values.
+    - Added: block loops can be created with the assign() method.
+    - Added: block() method accepts names as a list to create nested blocks.
+    - Changed: file handle has to be passed as a reference to print() method.
+    - Changed: else statement can not be written as ELSE IF, ELSE UNLESS or
+      ELSE LOOP anymore (only ELSE and ELSE COND is allowed).
+    - Fixed: non-default tags were sometimes not recognized in the template.
+    - Fixed: pure ELSE and END caused an error without a space before
+      the ending tag.
+
+1.21  Wed May 21 17:28 2003
+    - Added: option to include template files defined by a variable.
+
+1.20  Sun May 11 02:42 2003
+    - Added: if, else, unless and loop statements for a better control of the 
+      template output and a cleaner template syntax.
+    - Added: blind cache option for some speed improvement over normal caching.
+    - Added: default loop context variables can be changed and are faster now.
+    - Changed: chomp removes the newline before and after a block tag instead 
+      of all preceding whitespace characters.
+    - Changed: more detailed error messages and better syntax checking.
+    - Fixed: inner loops had access to outer loop context variables what
+      resulted in unexpected behavior.
+    - Fixed: include function first checked the path to the enclosing file
+      instead of the default file path.
+
+1.11  Fri Mar 07 16:58 2003
+    - Fixed: print() method did not work with mod_perl. (Rob Cheung)
+
+1.10  Sun Mar 02 15:13 2003
+    - Added: include function to add the output of other template files
+      directly in place of the include tag.
+    - Added: caching option for a persistent environment like mod_perl.
+    - Added: special loop variables for a better control of the loop output.
+    - Added: file handle can be used with the print() method instead of STDOUT.
+    - Added: strict option to raise errors on not defined variables and include
+      tags when disabled.
+
+1.03  Sun Feb 16 16:51 2003
+    - Fixed: fetch() method always returned the same reference.
+      (Johannes Gamperl - www.devshare.de)
+
+1.02  Tue Sep 24 14:37 2002
+    - Rewrite: parsing function is even faster now.
+    - Changed: instead of the error() method croak is used to die on errors.
+
+1.01  Sat Sep 07 15:17 2002
+    - Added: template path can now be set with the new() method.
+
+1.00  Thu Sep 05 10:36 2002
+    - First public release.
+

@@ -1,0 +1,10 @@
+.bzr
+.git
+EXCLUDE
+Makefile.old
+Makefile
+MANIFEST.bak
+blib
+pm_to_blib
+MYMETA*
+var/*

@@ -1,0 +1,6 @@
+-selfrender=1
+-default=font foo="bar"
+-default=font bar="1"
+<p><font foo="bar" bar="1">foo</font></p>
+<!--expected-->
+<p>foo</p>

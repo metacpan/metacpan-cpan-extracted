@@ -1,0 +1,59 @@
+{
+   "abstract" : "Parse nice HTML files without needing a compiler",
+   "author" : [
+      "Ron Savage <ron@savage.net.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-Parser-Simple",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "Moo" : "1.003001",
+            "Tree::Simple" : "1.22",
+            "lib" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "HTML::Parser::Simple" : {
+         "file" : "lib/HTML/Parser/Simple.pm",
+         "version" : "2.02"
+      },
+      "HTML::Parser::Simple::Attributes" : {
+         "file" : "lib/HTML/Parser/Simple/Attributes.pm",
+         "version" : "2.02"
+      },
+      "HTML::Parser::Simple::Reporter" : {
+         "file" : "lib/HTML/Parser/Simple/Reporter.pm",
+         "version" : "2.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ]
+   },
+   "version" : "2.02"
+}

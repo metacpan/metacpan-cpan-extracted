@@ -1,0 +1,32 @@
+--- #YAML:1.0
+name:               HTML-WikiConverter
+version:            0.68
+abstract:           Convert HTML to wiki markup
+author:
+    - David J. Iberri <diberri@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:                 0
+    Class::Data::Inheritable:  0.02
+    CSS:                  1.07
+    Exporter:             0
+    HTML::Element:        0
+    HTML::Entities:       1.27
+    HTML::Tagset:         3.04
+    HTML::Tree:           3.18
+    Params::Validate:     0.77
+    Pod::Usage:           1.16
+    Test::More:           0
+    URI:                  1.35
+    URI::Escape:          0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

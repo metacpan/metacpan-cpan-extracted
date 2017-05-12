@@ -1,0 +1,14 @@
+Revision history for Perl extension HTML::DWT::Simple.
+
+1.02  Fri Apr 05 13:27:38 2002
+	- Added associate functionality
+	- Changes to test suite remove requirement for Test::More
+	  (module is now completely stand-alone)
+	- documentation changes
+
+1.01  Mon Mar 25 17:03:48 2002
+	- minor bugfix and documentation changes
+
+1.00  Wed Mar 13 13:33:04 2002
+	- original version implementation
+

@@ -1,0 +1,98 @@
+
+<html>
+<head>
+  <title><!--{subject}--></title>
+  <style type="text/css2">
+  </style>
+</head>
+<body>
+
+<h1><!--{subject}--></h1>
+
+<table bgcolor="#e0e0ff">
+<tr><td valign="top" rowspan="2" cellpadding="10" cellspacing="0">
+  <table>
+  <tr><td valign="top">Subject</td>
+      <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+      <td valign="top"><!--{subject}--></td></tr>
+  <!--{head select => Date}-->
+  <tr><td valign="top"><!--{name}--></td>
+      <td>&nbsp;</td>
+      <td valign="top"><!--{body}--></td></tr>
+  <!--{/head}-->
+  <tr><td colspan="3">&nbsp;</td></tr>
+  <!--{head select => From|Sender|To|Cc|Bcc|Reply}-->
+  <tr><td valign="top"><!--{name}--></td>
+      <td>&nbsp;</td>
+      <td valign="top"><!--{body}--></td></tr>
+  <!--{/head}-->
+  </table></td>
+<td valign="top">
+  <ul>
+  <li><a href="reply.html">reply</a>&nbsp;&gt;
+  </ul>
+</td></tr>
+<tr><td valign="bottom">
+  <ul>
+  <li>The message <a href="details.html">by structure</a> shows all
+      header fields.
+  </ul>
+<tr><td colspan="2">&nbsp;</td></tr>
+</table>
+
+
+<!--{message}-->
+   <!--{inline}-->
+       [<a href="<!--{url}-->" target="_blank">get this part</a>;
+           <!--{url}-->, <!--{type}-->, <!--{size}--> bytes in body]<br />
+       <!--{html}--><!--{text}--><!--{/html}-->
+   <!--{/inline}-->
+
+   <!--{attach}-->
+       [<!--{url}-->, <!--{type}-->, <!--{size}--> bytes if file]<br />
+       <a href="<!--{url}-->" target="_blank">See attachment</a>.
+   <!--{/attach}-->
+
+   <!--{preview}-->
+       [<a href="<!--{url}-->" target="_blank">view original</a>;
+           <!--{url}-->, <!--{type}-->, <!--{size}--> bytes in file]<br />
+       <!--{html}-->
+          <cite><!--{text}-->&nbsp;...</cite>
+          <a href="<!--{url}-->" target="_blank">read
+               more</a>&nbsp;&gt;&gt;&gt;
+       <!--{/html}-->
+       <!--{image}-->
+          <table>
+          <tr><td width="250" valign="top">
+           <a href="<!--{url}-->" target="_blank"><img
+            src="<!--{smallurl}-->" width="<!--{smallwidth}-->"
+            height="<!--{smallheight}-->" border="0"></a></td>
+              <td valign="top">
+           <a href="<!--{url}-->" target="_blank"><!--{width}--> x
+            <!--{height}--></a>
+          </table>
+       <!--{/image}-->
+   <!--{/preview}-->
+
+   <!--{multipart}-->
+      [<!--{type}-->]
+      <ul>
+      <!--{foreachPart}-->
+      <li><strong>Part <!--{part_number}--></strong>
+          <!--{field name => subject}-->
+          <!--{part}--></li>
+      <!--{/foreachPart}-->
+      </ul>
+    <!--{/multipart}-->
+
+    <!--{nested}-->
+       [rfc822 encapsulated message]<br />
+       &nbsp;<br />
+       <strong>Part <!--{part_number}--></strong>
+       <!--{part}-->
+    <!--{/nested}-->
+
+<!--{/message}-->
+
+</body>
+</html>

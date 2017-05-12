@@ -1,0 +1,27 @@
+HTML-HTML5-ToText
+=================
+
+Created:      2012-01-30
+Home page:    <https://metacpan.org/release/HTML-HTML5-ToText>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=HTML-HTML5-ToText>
+
+0.004  2013-06-14
+
+ - (Bugfix) Cope better with HTML comments in tables.
+ - (Update) Stop using smartmatch operator.
+
+0.003  2013-05-13
+
+ - (Bugfix) Cope better with HTML comments.
+
+0.002  2012-01-31
+
+ - (Addition) Support align attribute on table cells, columns and
+   colgroups. Values 'justify' and 'char' are not supported.
+ - (Documentation) Include examples of how to extend HTML::HTML5::ToText
+   using traits.
+ - Table header cells <th> default to centre alignment.
+
+0.001  2012-01-30  # Initial release
+
+

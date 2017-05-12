@@ -1,0 +1,8 @@
+Header
+Variable (just gets first element from nodelist)
+<CONTENT_VAR NAME="document('dir/3_lang_a.xml')//bbb/fff">
+Loop:
+<CONTENT_LOOP NAME="document('dir/3_lang_a.xml')//bbb">
+  <CONTENT_VAR NAME="fff">
+</CONTENT_LOOP>
+Footer

@@ -1,0 +1,13 @@
+Changes from 0.01 to 0.02
+=========================
+
+  * Removed MYMETA.yml and MYMETA.json from module distribution
+    per CPAN standards (RT-89121)
+
+  * Updated documentation to reflect new formatting standards
+
+Changes from 0.00 to 0.01
+=========================
+
+  * Added object pass-through regardless of the reference type
+  * Updated documentation to reflect new behavior

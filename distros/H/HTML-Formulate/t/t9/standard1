@@ -1,0 +1,11 @@
+<form method="post">
+<table cellpadding="2">
+<tr><th>Emp ID</th><td>123<input name="emp_id" type="hidden" value="123" /></td><td>&nbsp;</td></tr>
+<tr class="tr_class"><th class="th_class"><span class="error_field">Emp Name</span></th><td class="td_class"><input name="emp_name" type="text" value="Fred Flintstone" /></td><td class="td_error_class">Fred rhymes with someone else's username</td></tr>
+<tr><th style="color:red"><span class="error_field">Emp Title</span></th><td><input name="emp_title" type="text" value="CEO" /></td><td class="error">CEO's are not permitted on this forum</td></tr>
+<tr><td align="center" colspan="3">
+<input name="_submit" type="submit" value="Save" />
+<input name="_submit" type="submit" value="Cancel" />
+</td></tr>
+</table>
+</form>

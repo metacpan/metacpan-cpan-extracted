@@ -1,0 +1,13 @@
+Changes
+README
+MANIFEST
+META.yml
+lib/Hatena/Formatter.pm
+lib/Hatena/Formatter/AutoLinkHatenaID.pm
+Makefile.PL
+t/00_compile.t
+t/01-process.t
+t/02-cache.t
+t/98-pod.t
+t/99-pod-coverage.t
+

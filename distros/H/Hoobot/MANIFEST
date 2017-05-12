@@ -1,0 +1,18 @@
+AUTHORS
+Artistic
+COPYING
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+Makefile.PL
+README
+examples/article.pl
+examples/cookie.pl
+examples/edit.pl
+lib/Hoobot.pm
+lib/Hoobot/Login.pm
+lib/Hoobot/Page.pm
+t/00basic.t
+t/01hoobot.t
+t/02page.t
+t/03login.t

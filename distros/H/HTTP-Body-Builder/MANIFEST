@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/HTTP/Body/Builder.pm
+lib/HTTP/Body/Builder/MultiPart.pm
+lib/HTTP/Body/Builder/UrlEncoded.pm
+t/00_compile.t
+t/01_www_form.t
+t/02_multipart_form_data.t
+t/dat/bar
+t/dat/foo
+META.yml
+MANIFEST

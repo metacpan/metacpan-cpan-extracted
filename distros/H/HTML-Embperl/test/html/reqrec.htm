@@ -1,0 +1,25 @@
+
+<html>
+<head>
+<title>Test for $req_rec in Embperl</title>
+</head>
+
+$conf = [+ defined ($conf)?$conf:'<undef>' +] <br> 
+$_[0] = [+ defined ($_[0])?$_[0]:'<undef>' +] <br> 
+$_[1] = [+ defined ($_[1])?$_[1]:'<undef>' +] <br> 
+
+$rec_rec  = [+ $req_rec +]<br>
+$$rec_rec = [+ $$req_rec +]<br>
+
+[- $ar = Apache->request -]
+
+Apache->request    = [+ $ar +]<br>
+${Apache->request} = [+ $$ar +]<br>
+
+${Apache->request} = $$req_rec ?  [+ ($$ar == $$req_rec)?'yes':'no' +] <br>
+
+[+ $req_rec -> filename +]
+
+
+</body>
+</html>

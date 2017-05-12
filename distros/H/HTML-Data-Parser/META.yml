@@ -1,0 +1,54 @@
+---
+abstract: 'parses data embedded in HTML'
+author:
+  - 'Toby Inkster <tobyink@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  RDF::Dumper: 0.2
+  Test::More: 0.61
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+keywords:
+  - GRDDL
+  - HTML
+  - Microdata
+  - Microformats
+  - RDF
+  - RDFa
+  - 'Semantic Web'
+  - XHTML
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: HTML::Data::Parser
+name: HTML-Data-Parser
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+recommends:
+  HTML::Embedded::Turtle: 0
+  HTML::HTML5::Microdata::Parser: 0
+  HTML::HTML5::Outline: 0
+  HTML::Microformats: 0
+  XML::GRDDL: 0
+requires:
+  HTML::HTML5::Parser: 0
+  Object::AUTHORITY: 0
+  RDF::RDFa::Parser: 1.093
+  RDF::Trine: 1.000
+  Scalar::Util: 0
+  XML::LibXML: 1.60
+  perl: 5.6.0
+resources:
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=HTML-Data-Parser
+  homepage: https://metacpan.org/release/HTML-Data-Parser
+  license: http://dev.perl.org/licenses/
+  repository: https://bitbucket.org/tobyink/p5-html-data-parser
+version: 0.006

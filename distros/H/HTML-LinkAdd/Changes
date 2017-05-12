@@ -1,0 +1,8 @@
+Revision history for Perl extension HTML::LinkAdd.
+
+0.13  2011-01-02
+	- Added depends to Makefile.PL, updated POD, cleared-up old coding style,
+	  added functionality to skip certain nodes, added tests.
+
+0.12  Thu May 10 21:52:54 2001
+	- removed more code from earlier bigger analysis package

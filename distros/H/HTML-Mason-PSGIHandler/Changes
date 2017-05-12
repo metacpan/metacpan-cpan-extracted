@@ -1,0 +1,21 @@
+Revision history for HTML-Mason-PSGIHandler
+
+0.53  September 13, 2013
+  - Add new_psgi and as_psgi methods (Ricardo Signes)
+  - Fix memory leak (under certain conditions)
+  - basic test for leaks
+  - Slightly change the internal invoke_mason method for easier reuse
+    (Ask Bjørn Hansen)
+
+0.52  October 22, 2010
+  - Add streaming handler, HTML::Mason::PSGIHandler::Streamy. (Chia-liang Kao)
+
+0.51  October 18, 2010
+  - For body-less response, don't return an undef body element (Chia-liang Kao)
+  - Pass Mason -Status into psgi_header (Shawn M Moore)
+
+0.50  September 12, 2010
+  - First CPAN release
+
+0.01  September 30, 2009
+  - Original version

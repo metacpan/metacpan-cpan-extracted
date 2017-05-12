@@ -1,0 +1,41 @@
+<tmpl_include name="header.html">
+<div class="filter_settings">
+	<form method="get" action="./panoptes.pl">
+		<input type="hidden" name="rm" value="job_queue_view">
+		Job Status:&nbsp;&nbsp;<select name="status" >
+			<option <tmpl_if status_run>selected="1"</tmpl_if> value="run">Running Jobs</option>
+			<option <tmpl_if status_wait>selected="1"</tmpl_if> value="wait">Waiting Jobs</option>
+			<option <tmpl_if status_done>selected="1"</tmpl_if> value="done">Completed Jobs</option>
+		</select>&nbsp;&nbsp;
+		Time Horizon:&nbsp;&nbsp;<select name="time" >
+			<option <tmpl_if time_all>selected="1"</tmpl_if> value="">ALL</option>
+			<option <tmpl_if time_60>selected="1"</tmpl_if> value="60">1 minute</option>
+			<option <tmpl_if time_300>selected="1"</tmpl_if> value="300">5 minutes</option>
+			<option <tmpl_if time_900>selected="1"</tmpl_if> value="900">15 minutes</option>
+			<option <tmpl_if time_1800>selected="1"</tmpl_if> value="1800">30 minutes</option>
+			<option <tmpl_if time_3600>selected="1"</tmpl_if> value="3600">1 hour</option>
+			<option <tmpl_if time_7200>selected="1"</tmpl_if> value="7200">2 hours</option>
+			<option <tmpl_if time_14400>selected="1"</tmpl_if> value="14400">4 hours</option>
+			<option <tmpl_if time_28800>selected="1"</tmpl_if> value="28800">8 hours</option>
+			<option <tmpl_if time_57600>selected="1"</tmpl_if> value="57600">16 hours</option>
+			<option <tmpl_if time_86400>selected="1"</tmpl_if> value="86400">1 day</option>
+			<option <tmpl_if time_172800>selected="1"</tmpl_if> value="172800">2 days</option>
+			<option <tmpl_if time_259200>selected="1"</tmpl_if> value="259200">3 days</option>
+			<option <tmpl_if time_604800>selected="1"</tmpl_if> value="604800">1 week</option>
+		</select>
+		<input type="checkbox" name="job_detail" value="1" <tmpl_if job_detail_checked>checked="1"</tmpl_if> />&nbsp;Job Detail
+		<input type="submit" value="Refresh"  />
+	</form>
+</div>
+<br>
+<tmpl_loop job_classes>
+	<tmpl_if job_class><div class="class" id="<tmpl_var job_class>"><tmpl_var job_class> | Total: <tmpl_var job_count><tmpl_if job_count_failed><span style="color: yellow;">  FAILED: <tmpl_var job_count_failed></span></tmpl_if> </div></tmpl_if>
+	<tmpl_loop jobs>
+		<div class="job" id="">
+			<div class="job_header<tmpl_if exitstatus>_failed</tmpl_if>"><b>Job:</b> <a href="joblog.pl?jobid=<tmpl_var jobid>"><tmpl_var jobid></a>  <b>Available:</b> <tmpl_var run_after>  <tmpl_if complete_time><b>Completed:</b> <tmpl_var complete_time></tmpl_if>  <tmpl_if exitstatus><b>FAILED</b></tmpl_if></div>
+			<tmpl_if arg><div class="job_detail"><textarea class="job_args"><tmpl_var arg></textarea></div></tmpl_if>
+		</div>
+	</tmpl_loop>
+</tmpl_loop>
+
+<tmpl_include name="footer.html">

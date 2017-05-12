@@ -1,0 +1,73 @@
+@prefix cpan: <http://purl.org/NET/cpan-uri/person/> .
+@prefix cpant: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dbug: <http://ontologi.es/doap-bugs#> .
+@prefix dcs: <http://ontologi.es/doap-changeset#> .
+@prefix dist: <http://purl.org/NET/cpan-uri/dist/HTML-Zoom-Parser-HH5P/> .
+@prefix doap: <http://usefulinc.com/ns/doap#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+_:r1369745596r0 a dcs:Update ;
+	rdfs:label "HTML::Zoom changed the syntax for add_to_attribute/set_attribute methods; support newer syntax." .
+_:r1369745597r1 <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#fileName> "lib/HTML/Zoom/Parser/HH5P.pm" ;
+	<http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#programmingLanguage> "Perl" ;
+	a <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#FileDataObject>, <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#SourceCode> ;
+	rdfs:label "HTML::Zoom::Parser::HH5P" .
+_:r1369745597r2 <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#fileName> "lib/HTML/Zoom/Parser/HH5P.pm" ;
+	<http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#programmingLanguage> "Perl" ;
+	a <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#FileDataObject>, <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#SourceCode> ;
+	rdfs:label "HTML::Zoom::Parser::HH5P" .
+_:r1369745597r3 <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#fileName> "lib/HTML/Zoom/Parser/HH5P.pm" ;
+	<http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#programmingLanguage> "Perl" ;
+	a <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#FileDataObject>, <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#SourceCode> ;
+	rdfs:label "HTML::Zoom::Parser::HH5P" .
+_:rb90A6C1A2C79511E28B80C5505BF283EDr0 dcs:item _:r1369745596r0 .
+_:rb90A6C1A2C79511E28B80C5505BF283EDr1 doap:browse <https://metacpan.org/release/HTML-Zoom-Parser-HH5P> ;
+	a doap:GitRepository .
+<http://dev.perl.org/licenses/> <http://purl.org/dc/terms/title> "the same terms as the perl 5 programming language system itself" .
+dist:project cpant:perl_version_from _:r1369745597r1 ;
+	cpant:readme_from _:r1369745597r3 ;
+	cpant:requires "HTML::HTML5::Entities"^^cpant:dsWithoutVersion, "HTML::HTML5::Parser 0.206"^^cpant:dsWithVersion, "HTML::Zoom 0.009007"^^cpant:dsWithVersion, "Moo 1.000000"^^cpant:dsWithVersion, "XML::LibXML 2.00"^^cpant:dsWithVersion, "namespace::clean"^^cpant:dsWithoutVersion ;
+	cpant:test_requires "strictures 1"^^cpant:dsWithVersion ;
+	cpant:version_from _:r1369745597r2 ;
+	<http://purl.org/dc/terms/contributor> cpan:tobyink ;
+	doap:bug-database <http://rt.cpan.org/Dist/Display.html?Queue=HTML-Zoom-Parser-HH5P> ;
+	doap:created "2012-12-21"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	doap:developer cpan:tobyink ;
+	doap:download-page <https://metacpan.org/release/HTML-Zoom-Parser-HH5P> ;
+	doap:homepage <https://metacpan.org/release/HTML-Zoom-Parser-HH5P> ;
+	doap:license <http://dev.perl.org/licenses/> ;
+	doap:maintainer cpan:tobyink ;
+	doap:name "HTML-Zoom-Parser-HH5P" ;
+	doap:programming-language "Perl" ;
+	doap:release dist:v_0-000_01, dist:v_0-001, dist:v_0-002 ;
+	doap:repository _:rb90A6C1A2C79511E28B80C5505BF283EDr1 ;
+	doap:shortdesc "use HTML::HTML5::Parser with HTML::Zoom" ;
+	a doap:Project .
+dist:v_0-000_01 dcs:released-by cpan:tobyink ;
+	<http://purl.org/dc/terms/identifier> "HTML-Zoom-Parser-HH5P-0.000_01"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	<http://purl.org/dc/terms/issued> "2012-12-22"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Zoom-Parser-HH5P-0.000_01.tar.gz> ;
+	doap:revision "0.000_01"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a cpant:DeveloperRelease, doap:Version ;
+	rdfs:label "Preview / experiment" .
+dist:v_0-001 dcs:released-by cpan:tobyink ;
+	<http://purl.org/dc/terms/identifier> "HTML-Zoom-Parser-HH5P-0.001"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	<http://purl.org/dc/terms/issued> "2012-12-26"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Zoom-Parser-HH5P-0.001.tar.gz> ;
+	doap:revision "0.001"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a doap:Version ;
+	rdfs:label "Initial release" .
+dist:v_0-002 dcs:changeset _:rb90A6C1A2C79511E28B80C5505BF283EDr0 ;
+	dcs:released-by cpan:tobyink ;
+	<http://purl.org/dc/terms/identifier> "HTML-Zoom-Parser-HH5P-0.002"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	<http://purl.org/dc/terms/issued> "2013-05-28"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-Zoom-Parser-HH5P-0.002.tar.gz> ;
+	doap:revision "0.002"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a doap:Version .
+cpan:tobyink a foaf:Person ;
+	foaf:mbox <mailto:tobyink@cpan.org> ;
+	foaf:name "Toby Inkster" ;
+	foaf:nick "TOBYINK" ;
+	foaf:page <https://metacpan.org/author/TOBYINK> .

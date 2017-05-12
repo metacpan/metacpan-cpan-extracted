@@ -1,0 +1,14 @@
+<HTML><BODY>
+<H1> test expr with perl-supplied functions </H1>
+hello('dad')=<tmpl_var expr="hello('dad')">
+lc('DAD')=<tmpl_var expr="lc('DAD')">
+lc(ONE)=<tmpl_var expr="lc(ONE)">
+sprintf('1+1=%d', TWO)=<TMPL_VAR EXPR="sprintf('1+1=%d', TWO)">
+<H1> test expr with user-defined functions </H1>
+registered_func('self')=<tmpl_var expr="registered_func('self')">
+hello_string()=<tmpl_var expr="hello_string()">
+arglist()=<tmpl_var expr="arglist()">
+arglist('')=<tmpl_var expr="arglist('')">
+arglist('','')=<tmpl_var expr="arglist('','')">
+arglist('a','b')=<tmpl_var expr="arglist('a','b')">
+</body></html>

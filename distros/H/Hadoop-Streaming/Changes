@@ -1,0 +1,72 @@
+Revision history for Hadoop-Streaming
+
+0.143060  2014-11-01 20:49:57-07:00 America/Los_Angeles
+    * Switch to Moo from Any::Moose, thanks to patch from @stevecaldwell77 of Campus Explorer.
+    * update for latest versions of build deps:
+        * add some necessary newlines for PkgVersion
+        * remove duplicated repository information from dist.ini
+
+0.122420  2012-08-28 23:35:45 America/Los_Angeles
+
+0.113160  2011-11-12 15:49:32 America/Los_Angeles
+    Use Any::Moose instead of Moose.  This allows users to choose between
+    Moose and Mouse.  Is compile and start up actually faster this way?
+    As per request from Steve Caldwell @ Campus Explorer.
+
+    Pass @INC to sub-process perl processes while doing testing (so we
+    test with the new version, not installed version, of Hadoop::Streaming)
+
+    Improve pod in Hadoop::Streaming by including an example of using
+    jar command and hadoop -archives flag.
+
+0.110030  2011-01-03 12:23:21 America/Los_Angeles
+    switch build from AutoPrereq to AutoPrereqs, as per RJBS the former is EOL.
+    Correct Synopsis section in Hadoop::Streaming parent doc, thanks to error report from Frank S Fejes III
+
+0.103190  2010-11-15 02:38:55 PST8PDT
+    user patch to allow tabs in reducer input data - Steve Caldwell @ Campus Explorer
+
+0.102520  2010-09-09 10:13:02 PST8PDT
+    Fixed module documentation in Hadoop::Streaming, corrected function signatures to include $self as first arg. 
+
+0.102490  2010-09-06 09:34:59 PST8PDT
+    Added module documentation to Hadoop::Streaming.pm
+
+0.101881  2010-07-07 15:53:10 PST8PDT
+    Add PkgVersion back to dist.ini, so VERSION is properly defined for the modules.  This was included in a previous Dist::Zilla bundle.
+
+0.101880  2010-07-07 08:55:46 PST8PDT
+    Add Hadoop::Streaming.pm base module for documentation purposes
+    Switch to using Config module to get perl location for tests.
+
+0.101860  2010-07-05 13:42:34 EST5EDT
+    improve tests to catch error conditions for reporting when
+      external commands fail.
+    add support for hadoop messages: counter and status.
+    change Dist::Zilla dist.ini files
+    Add abstract headers.
+
+0.100270  2010-01-26 22:49:42 PST8PDT
+    Changed map signature.  Now called as $self->map( $line ) 
+    instead of $self->map( $key, $value ) with key always undef.
+    Add sort.pl to replace external dependency on sort.
+    Move tests to use /usr/bin/env perl instead of /usr/bin/perl.
+
+0.100060  2010-01-05 23:30:09 PST8PDT
+
+    Fixed failing tests on Solaris and FreeBSD, caused by differences
+    in sort locale.
+    Updated dist.ini
+
+0.100050  2010-01-05 04:22:37 PST8PDT
+    First CPAN release.
+
+    Cloned from naoya at github ( http://github.com/naoya/ )
+    Moved from Hadoop:: to Hadoop::Streaming::
+    Started using Dist::Zilla
+    Added documentation --> pod coverage went from 0% to 100%
+    Added tests to exercise the example code.
+      tests now require Test::Command
+    Added second example
+    Made both examples work correctly when run locally
+

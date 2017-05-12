@@ -1,0 +1,17 @@
+[14:27:57] <@mst> metaperl: make seamstress not fuck with the class tree for no good reason
+[14:28:01] <@mst> metaperl: provide an API
+[14:28:09] <@mst> metaperl: explain what it does that XSLT can't
+[14:28:13] <metaperl> yes, DBIx::Simple is quite clean and straightforward. I dont like having to tell Perl what I already told the database... I dont understand ORMs
+[14:28:16] <beland> OK...
+[14:28:19] <beland> dsn => "DBI:mysql:database=yokel;host=dba.yokel.com;port=3306",
+[14:28:28] <holoway> Hohlraum: from my knowledge, and from poking at google just now.. that doesn't appear to exist
+[14:28:28] <beland> You can check it for typos, but it doesn't work at run-time.
+[14:28:43] <@mst> beland: shadowpaste the entire class
+[14:28:52] <@castaway> beland: whats the result exactly?
+[14:28:53] <metaperl> mst: the Seamstress "API" is HTML::Element::Library... a completely Seamstress-ignorant library of tree rewriting functions
+[14:28:55] <ningu> beland: that's pure dbi though... not relevant even to Class::DBI if that's what the problem is
+[14:28:55] <beland> mst: Which class where?
+[14:28:56] <@purl> well, Which class is good for noobs?
+[14:29:10] <@mst> beland: the one in which you're failing to get a database connection :)
+[14:29:22] <beland> Well, the Catalyst app starts up, but later on I get an exception:
+[14:29:23] <@mst> metaperl: so what's the point of seamtress?

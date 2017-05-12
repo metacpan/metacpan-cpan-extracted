@@ -1,0 +1,7 @@
+Changes for HTML::WikiConverter::XWiki
+
+0.02
+- Fixed tests to reflect the improved block handling in HTML::WikiConverter
+- Render <p> elements as blocks
+
+0.01 Initial release

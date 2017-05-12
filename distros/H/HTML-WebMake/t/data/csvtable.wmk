@@ -1,0 +1,19 @@
+<webmake>
+
+<use plugin="csvtable_tag" />
+
+<out file=log/csvtable.html>
+
+<csvtable delimiter=",">
+this,is,a,test
+so,is,this
+<!-- a comment -->
+<csvfmt><tr><th>$1</th><th>$2</th><th>$3</th><th>$4</th></tr></csvfmt>
+a,title,line,cool
+<csvfmt><tr><td>$1</td><td>$2</td><td>$3</td><td>$4</td></tr></csvfmt>
+that's plenty,i,should,think
+</csvtable>
+
+</out>
+
+</webmake>

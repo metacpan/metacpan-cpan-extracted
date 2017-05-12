@@ -1,0 +1,21 @@
+<wmmeta name="Title" value="&wmdollar;(url_refs) - References to URLs" />
+<wmmeta name="Section" value="04-var_refs" />
+<wmmeta name="Score" value="20" />
+<wmmeta name="Abstract">
+references to URLs
+</wmmeta>
+
+URLs of defined &lt;out&gt; sections and &lt;media&gt; items can be inserted
+into the current content using this reference format.
+
+        **&wmdollar;(__name__)**
+
+Note that all URL references are written relatively; so a file created in the
+**foo/bar/baz** subdirectory which contains a URL reference to
+**blah/argh.html** will be rewritten to refer to **../../../blah/argh.html**.
+
+Again, if you're not sure a URL exists, a default value can be supplied,
+using this format:
+
+        **&wmdollar;(__name__?__defaultvalue__)**
+

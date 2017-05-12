@@ -1,0 +1,7 @@
+Revision history for Perl extension HTTP::Server::Simple::Bonjour
+
+0.02  Fri Aug  7 22:39:41 PDT 2008
+        - Fixed and documented service_name and service_type. (Jesse Vincent)
+
+0.01  Thu Aug  7 15:32:37 2008
+        - original version

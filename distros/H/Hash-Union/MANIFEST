@@ -1,0 +1,12 @@
+Changes
+lib/Hash/Union.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-set.t
+t/02-setif.t
+t/03-prepend.t
+t/04-append.t
+META.yml                                 Module meta-data (added by MakeMaker)

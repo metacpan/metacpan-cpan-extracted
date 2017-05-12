@@ -1,0 +1,91 @@
+
+=head1 NAME
+
+HTML::DOM::NodeList::Radio - A Perl class for representing lists of radio buttons in an HTML DOM tree
+
+=head1 VERSION
+
+Version 0.054
+
+=head1 SYNOPSIS
+
+  use HTML::DOM;
+  $doc = HTML::DOM->new;
+  $doc->write('
+      <form>
+          <input name=r type=radio value=one>
+          <input name=r type=radio value=two>
+      </form>
+  ');
+  $doc->close;
+
+  $radio_list = $doc->forms->[0]->find_input('r');
+  # returns an HTML::DOM::NodeList::Radio object
+
+  $radio_list->[0]; # get first button
+  $radio_list->item(0); # same
+
+  # also:
+  $radio_list->value('two'); # select a radio button
+  $radio-list->name; # returns 'r'
+
+=head1 DESCRIPTION
+
+An object of this class represents a list of radio buttons in an HTML::DOM 
+tree. This class inherits from L<HTML::DOM::NodeList::> and is provided 
+solely for compatibility with L<WWW::Mechanize>.
+
+=head1 METHODS
+
+In addition to those inherited from HTML::DOM::NodeList, this class 
+implements the following methods:
+
+=over
+
+=item type
+
+Returns the string 'radio'.
+
+=item name
+
+Returns the name of the set of radio buttons. If you pass an
+argument, it will become the new name of the set (all the buttons will be
+renamed), and the old name
+will be returned.
+
+=item value
+
+Returns the value attribute of the currently selected radio button. If you 
+pass a value as an
+argument, the radio button with that value will be selected, and the value
+of the previously selected one will be returned.
+
+=item possible_values
+
+Returns a list of the value attributes of all the radio buttons.
+
+=item form_name_value
+
+Returns a list of two items: (0) the name of the set of buttons and (1) the 
+value of the currently selected button.
+
+=back
+
+=begin for-me
+
+The C<other_possible_values>, C<value_name>, C<readonly>, C<disabled> and
+C<check> methods do not exist (yet).
+
+=end for-me
+
+=head1 SEE ALSO
+
+L<HTML::DOM>
+
+L<HTML::DOM::NodeList>
+
+L<HTML::DOM::Collection::Elements>
+
+L<HTML::DOM::Element::Form>
+
+The source of HTML/DOM/Element/Form.pm, where this is implemented.

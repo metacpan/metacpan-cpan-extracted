@@ -1,0 +1,93 @@
+{
+   "abstract" : "HTML::TreeBuilder and XPath compatible interface with libxml",
+   "author" : [
+      "Tokuhiro Matsuno <tokuhirom@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-TreeBuilder-LibXML",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::TreeBuilder::XPath" : "0.14",
+            "LWP::UserAgent" : "6",
+            "URI" : "0",
+            "XML::LibXML" : "1.7",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "HTML::TreeBuilder::LibXML" : {
+         "file" : "lib/HTML/TreeBuilder/LibXML.pm",
+         "version" : "0.26"
+      },
+      "HTML::TreeBuilder::LibXML::Node" : {
+         "file" : "lib/HTML/TreeBuilder/LibXML/Node.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/HTML-TreeBuilder-LibXML/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/HTML-TreeBuilder-LibXML",
+      "repository" : {
+         "url" : "git://github.com/tokuhirom/HTML-TreeBuilder-LibXML.git",
+         "web" : "https://github.com/tokuhirom/HTML-TreeBuilder-LibXML"
+      }
+   },
+   "version" : "0.26",
+   "x_contributors" : [
+      "Masahiro Chiba <nihen@megabbs.com>",
+      "kimura.hideo <kimurahideo@Administrator.local>",
+      "Tatsuhiko Miyagawa <miyagawa@bulknews.net>",
+      "Perlover <perlover@perlover.com>",
+      "John SJ Anderson <johna@farematrix.com>",
+      "Oleg G <verdrehung@gmail.com>",
+      "Stanislaw Pusep <creaktive@gmail.com>",
+      "Carlos Fernando Avila Gratz <cafe01@gmail.com>",
+      "Carlos Fernando Avila Gratz <cafe@q1software.com>",
+      "Yanick Champoux <yanick@babyl.dyndns.org>"
+   ]
+}

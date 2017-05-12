@@ -1,0 +1,17 @@
+bin/iota-update
+Build.PL
+Changes
+lib/Ham/IOTA.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-compile-pl.t
+t/00-compile-pm.t
+t/00-critic.t
+t/00-distribution.t
+t/00-pod.t
+t/00-podcoverage.t
+t/10-ham-iota.t
+t/data/iota-fulllist-short.xml
+tap-harness-junit.xml

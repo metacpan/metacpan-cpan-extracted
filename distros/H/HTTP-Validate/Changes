@@ -1,0 +1,86 @@
+Revision history for HTTP-Validate
+
+0.981   2016-09-03
+
+	- Fixed a bug in processing of 'at_most_one' and 'together' rules that refer to
+	  parameters with aliases.  The aliases were not being checked for.
+
+0.98	2016-07-29
+
+	- Fixed a bug that was mis-placing documentation strings that were specified immediately
+          after an 'allow' or 'require' rule.
+        - Fixed a bug that was making MATCH_VALUE sometimes use the wrong regular expression
+          if called more than once in a program.
+        - MATCH_VALUE now does not modify regular expressions that are specified with qr,
+          just those that are given as strings.
+        - The method 'keys' now reports parameter keys in the exact order in which they
+          were recognized.  This will be determined by the order in which the parameter
+          rules are checked.
+        - The substituted parameter names and values in error and warning messages are now
+          returned in sorted order, for consistency.
+        - The test suite has been rewritten somewhat and new tests have been added to cover
+          all functionality.
+        - Updated the documentation to match recently added functionality.
+
+0.472   2016-06-20
+
+	- Added attribute 'undocumented', which causes a parameter to be left out
+	  of documentation strings.  This is the same as starting the documentation
+          string with '!'.
+        - ENUM_VALUE now checks for the value '#' in its argument list.  If found, then
+          subsequent values will not be reported in the standard error message as acceptable
+          values.  This allows for "undocumented" values to be accepted.
+
+0.471   2015-06-21
+
+	- Fixed hash order dependency that was causing a spurious test failure.
+	- You can now define custom error messages, to replace the default ones.
+
+0.47    2015-06-09
+
+	- Rules of type 'together' and 'at_most_one' can now reference parameters
+	  defined in other rulesets.
+
+0.46    2015-05-10
+
+        - New attribute 'bad_value' for parameter rules.  If the value given for a
+          parameter is bad (or all values are bad for a multiple-valued parameter)
+          this value is returned as the parameter value.  If the value is 'ERROR',
+	  then an error is reported instead.
+	 	
+	- New method 'specified' in HTTP::Validate::Result, returns true if the
+	  parameter was specified in the request with a non-empty value.
+	
+	- The method 'keys' in HTTP::Validate::Result now returns all parameter
+	  names for which a non-empty value was specified, even if the value was bad.
+	  The result of calling 'value' on such parameter names will be undef, unless
+ 	  the 'bad_value' attribute was used.
+
+0.45    2014-09-20
+        
+        - Many fixes to the documentation
+        
+        - A few code changes so that this distribution works properly under perl 5.8.1
+
+0.44    2014-09-18
+       
+      	- New method 'list_params', which returns all parameter names accepted
+          by the given ruleset.
+        
+        - Method 'document_params' now returns undef if the specified ruleset
+          was never defined, instead of dieing.
+        
+        - Validator 'EMPTY_VALUE' has been eliminated
+        
+        - Validator 'FLAG_VALUE' now accepts boolean values
+        
+        - New rule attribute 'clean', which specifies the function that should
+          be applied to parameter values in order to clean them.
+        
+        - New validation setting 'ignore_unrecognized', which causes warnings
+          of errors when unrecognized parameters are given.
+         
+0.42    2014-06-16
+        
+        - Fixed a bug which was causing crashes with constraint rules.
+

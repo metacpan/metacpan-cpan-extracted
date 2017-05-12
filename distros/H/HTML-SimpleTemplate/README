@@ -1,0 +1,143 @@
+NAME
+    HTML::SimpleTemplate - Quick and simple template library for
+    Perl
+
+PREREQUISITES
+    Symbol package - should already be in your Perl installation
+
+INSTALL
+    perl Makefile.PL; make; make install; make test
+
+HISTORY
+    Was previously known as WWW::Template and not distributed on
+    CPAN; however quite a few people are using it. If you are an
+    ex-WWW-Templater, be aware that 1. prefixes are GONE (all
+    they ever did was append a directory name to the template
+    filename and you can just as easily do that yourself) and 2.
+    I really, really, really have fixed the nested if logic this
+    time. I know you've heard that before... :) 3. At last, you
+    don't need to edit the module itself to change the template
+    path - you can specify it when you create a SimpleTemplate
+    object.
+
+COPYRIGHT
+    May be used and distributed under the same terms as Perl
+    itself.
+
+SYNOPSIS
+      use HTML::SimpleTemplate;
+
+      # A template object referencing a particular directory
+      my $adminpages=new HTML::SimpleTemplate("/templates/admin");
+
+      # A template object referencing files in this directory
+      my $localpages=new HTML::SimpleTemplate;
+
+      # Display this template file, passing no parameters
+      $localpages->Display("welcome.tpl");
+
+      # Display this template file, passing the %account hash
+      $localpages->Display("account.tpl",\%account);
+
+      # Display this template file, with a-la-carte parameter
+      $localpages->Display("order.tpl",{product=>"Perl mug"});
+
+DESCRIPTION
+  DISPLAY METHOD
+
+            Display($file,[\%variables]);
+
+    The Display method parses the specified file according to the
+    rules specified below. It can optionally be passed a second
+    parameter, a reference to a hash, containing the variables used
+    in the template.
+
+    When the SimpleTemplate object is created a template path can
+    optionally be specified. If this is absent filenames specified
+    to Display are relative to the current directory.
+
+  TEMPLATE SYNTAX
+
+            Hello $name!
+            ?($name eq "George")
+            ?$rude
+            ..you old fool!
+            ?end
+            It's too late at night to think of witty examples!
+            ?end
+
+    A template is a text file which may contain certain variable
+    references and special commands. Variables are referenced by
+    prefixing their name with the dollar symbol, as in Perl itself.
+    Variable names must be alphanumeric, and must be followed by a
+    non-alphanumeric character (including spaces and newlines) so
+    the module knows where the name ends.
+
+    There area very small number of special commands, which all
+    involve either a ? or an ! in the first column of the line.
+
+  CONDITIONALS
+
+            ?$SomeVariable
+            The variable evaluated as true
+            ?else
+            No it didn't
+            ?end
+
+            ?($Any=~/perl evaluation that doesn't contain brackets/)
+            It was
+            ?else
+            It wasn't (else is optional by the way!)
+            ?end
+
+    You may nest conditionals to your hearts content, but the layout
+    makes it confusing if you have more than two or three. Anyway
+    that kind of complex logic belongs in Perl, not in HTML.
+
+  INCLUDES
+
+            !header.tpl
+
+            !common/header.tpl
+
+            !errors/$ErrorType.tpl
+
+    When you include another template all of the variables in your
+    current template remain available.
+
+  CALLBACKS
+
+            &InsertContent($fish)
+
+    Yes, you can call Perl inside your template. You can, of course,
+    then call templates from inside that Perl. Very powerful,
+    potentially very confusing...
+
+  COMMENTS
+
+    Saving the best for last, you can now put sensible comments in
+    your HTML - and the page viewer doesn't get to see it!
+
+            # This section for stupid people only
+            ?NameError
+            It appears you have failed to enter your name.
+            # You freakin' numbskull!
+            ?end
+
+  NOTES
+
+    Clearly you cannot embed conditionals, callbacks etc in the
+    middle of a line. You also can't have any plain content
+    following a command. However, for HTML, which this is primarily
+    designed for, that just isn't an issue.
+
+    By the way, if you're creating an HTML page, it works quite
+    nicely to put that Content-type: text/html in the template if it
+    makes you happy having it there.
+
+AUTHOR
+    A Crawford, acrawford@ieee.org
+
+SEE ALSO
+    HTML::Template
+

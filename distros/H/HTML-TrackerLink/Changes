@@ -1,0 +1,16 @@
+Revision history for Perl extension HTML::TrackerLink
+
+1.03 Mon 21 Jan 2008
+	- Updating to get a newer installer
+	- Added support for case insensitive use of the keyword
+	- Added support for optional # before the number on explicit keywords
+	- Added new parallelized-regex implementation!
+	  (Now passes all unit tests for special cases)
+	- More unit test cases
+
+0.2 Sun  7 Dec 2003
+	- ugh.. even the contructor didn't work.
+	- Added a few basic tests.
+
+0.1 Sun 29 Dec 2002
+	- original version

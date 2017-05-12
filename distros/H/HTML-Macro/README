@@ -1,0 +1,29 @@
+HTML::Macro is a macro preprocessor designed for generating web pages from
+HTMLish templates augmented with a simple tagset (<if>,<else/>,<include/>,<loop>,<define>,<eval>).
+
+HTML::Macro supports variable (macro) substitution, conditional evaluation
+(using perl expressions), file interpolation (like SSI), looping for
+repeated format blocks with varying data (like rows in a table), and
+arbitrary evaluation of perl expressions while encouraging a natural
+separation of form, code and content.
+
+It is especially convenient for filling out data-driven web pages using
+DBI.  Its use is not restricted to HTML; we have also used it for
+generating email and other text files, but the tagging syntax is derived
+from HTML/XML.
+
+Installation is totally vanilla; just unpack the distribution,
+> tar xvfz HTML-Macro-1.xx.tgz
+> cd HTML-Macro-1.xx
+> perl Makefile.PL
+> make install (prob. as root)
+
+For more info, please see the written documentation:
+> perldoc HTML::Macro
+
+There is also a web page about HTML::Macro maintained at
+http:://www.ifactory.com/htmlmacro.
+
+Copyright (c) 2001-2004 Michael Sokolov and Interactive Factory. 
+Some rights reserved. This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

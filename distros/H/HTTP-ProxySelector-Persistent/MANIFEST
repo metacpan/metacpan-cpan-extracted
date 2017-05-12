@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/HTTP/ProxySelector/Persistent.pm
+t/00-unit_tests.t
+t/01-proxied_get.t
+t/02-load_test.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

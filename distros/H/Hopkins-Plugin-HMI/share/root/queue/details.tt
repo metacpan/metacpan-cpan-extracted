@@ -1,0 +1,86 @@
+[% page.sidebar = 'default' %]
+[% page.refresh = 10 %]
+
+<h2>Queue Details for [% queue.name %]</h2>
+
+<dl>
+	<dt>Running</dt>
+	<dd class="[% queue.halted ? 'bad' : 'good' %]">
+		[% queue.status_string %]
+	</dd>
+
+	<dt>Available</dt>
+	<dd class="[% queue.frozen ? 'bad' : 'good' %]">
+		[% queue.frozen ? 'no' : 'yes' %]
+	</dd>
+
+	<dt>Concurrency</dt>
+	<dd>[% queue.concurrency %]</dd>
+</dl>
+
+<br />
+
+<h2>Contents</h2>
+
+<table id="status" class="table" width="500">
+	<thead>
+		<tr>
+			<th>Pri</th>
+			<th>Task</th>
+			<th>Status</th>
+			<th>Queued</th>
+			<th>Started</th>
+		</tr>
+	</thead>
+	<tbody>
+		[% IF queue.num_queued == 0 %]
+			<tr>
+				<td colspan="5" class="alert">
+					Queue is empty
+				</td>
+			</tr>
+		[% END %]
+		[% FOREACH work = queue.contents(executing => now) %]
+			<tr>
+				<td>[% work.priority %]</td>
+				<td>
+					<div style="float:left">[% work.task.name %]</div>
+					<div style="float:right">
+						[% IF work.worker %]
+						<a href="[% c.uri_for('/work/abort', work.queue.name, work.id) %]" title="abort [% work.task.name %]">
+							<img src="[% c.uri_for('/static/images/stop.png') %]" />
+						</a>
+						[% ELSE %]
+							<a href="[% c.uri_for('/work/abort', work.queue.name, work.id) %]" title="remove [% work.task.name %] from queue">
+								<img src="[% c.uri_for('/static/images/delete.png') %]" />
+							</a>
+						[% END %]
+					</div>
+				</td>
+				<td>
+					[% IF work.date_started %]
+						<span style="color: green">Running</span>
+					[% ELSE %]
+						<span style="color: orange">Queued</span>
+					[% END %]
+				</td>
+				<td title="[% work.date_enqueued || 'n/a' %]">
+					[% work.date_enqueued ? now - work.date_enqueued : 'n/a' %]
+				</td>
+				<td title="[% work.date_started || 'n/a' %]">
+					[% work.date_started ? now - work.date_started : 'n/a' %]
+				</td>
+			</tr>
+		[% END %]
+	</tbody>
+</table>
+
+[% IF queue.error %]
+	<h2><img src="/static/images/exclamation.png" style="margin-right: 10px" />last error</h2>
+	<div style="text-align: left;">
+		<ul style="margin-left: 0; padding-left: 0">
+			<li style="background: url([% c.uri_for('/static/images/error.png') %]) no-repeat; padding-left: 20px; list-style: none" >[% queue.error %]</li>
+		</ul>
+	</div>
+[% END %]
+

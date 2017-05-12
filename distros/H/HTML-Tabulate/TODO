@@ -1,0 +1,56 @@
++ convert t/01 to Test::More
++ add end-to-end html test to tabulate 03_merge.t
++ add field attr merge test script
++ add test script for complex field attributes (value, format, link, etc.)
++ add regex key support to field attributes
++ allow labels to be code refs (especially for regex defns)
++ add style=across test script, checking thtr in particular
++ perldoc updates
++ add explicit tests for every presentation definition attribute
++ document and test in_fields
++ add support for hashref stripes
++ convert DBIx::Recordset tests to generic iterator support
++ add dataset iterator tests
++ add convenience method of splicing additional fields into field list
++ allow tr to take a subref, returning a hashref, given the data record
++ allow td to take a subref, returning a hashref, given the data record
++ add better title/text/caption support (subrefs and/or value/format hashrefs)
++ fix label => '' to render row with empty label (aot label => undef)
++ check/revert tr subref support - should probably just be tr elements 
+  that can be subrefs, called just with data row (ditto thtr, of course)
++ add tests on tr/td subrefs returning { attribute => undef } to omit attribute
++ add support for <caption> (must go immediately after <table>)
++ add thead support
+  thead => 1     (around labels; implies tbody ||= 1)
++ add tbody support based on Brian Foley's patch
+  tbody => 1     (around all non-label rows)
+  tbody => { rows => 3 }
+  tbody => { field => 'foobar' }
++ add colspan support (at least for row_down tables)
++ document colspan behaviour
+
+- add tfoot support
+  (tbody, thead, and tfoot are containers that group series of <tr>s - tbody 
+   must occur if thead or tfoot are used, and must appear _after_ them; thead 
+   and tfoot can occur only once; tbody can occur multiple times)
+
+- look at colgroup and col elements
+- look into 'axis'
+
+- look at some meta magic like row headers and scope="col", scope="row" support
+- look at more complex tables e.g. the last example on 
+   http://www.456bereastreet.com/archive/200410/bring_on_the_tables/
+  see too: http://www.standards-schmandards.com/index.php?2004/10/11/3-information-structures-the-grouped-table
+
+- create a new branch, and refactor Tabulate into Tabulate and Tabulate::Base
+  (or Text::Tabulate? or Date::Tabulate?), pulling out the title/text/caption 
+  and non-html stuff. A CSV::Tabulate would be useful
+
+- add a HTML::Tabulate::Critic module, that critiques your table for style
+  e.g. "summary" tags, "theads"
+
+- add proper support for HTML escaping w/HTML::Entities
+- add support for link hashref e.g.
+  link => { href => 'edit.html?id=%s', class => 'foo', target => '_blank' }
+- add a better test for no data set (in both OO and procedural modes)
+- add support for anchor attributes with links

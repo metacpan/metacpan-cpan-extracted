@@ -1,0 +1,48 @@
+<ep-package name="HTML::EP::Glimpse" lib="lib">
+<ep-glimpse-load>
+<html><head><title>
+<ep-language en="Glimpse Index Preferences"
+             de="Stammdaten des Glimpse-Index"></title></head>
+<body bgcolor=#ffffff>
+  <h1><ep-language en="Glimpse Index Preferences"
+             de="Stammdaten des Glimpse-Index"></h1>
+<ep-language language="de">
+  Hier werden die für den Index relevanten Daten erfaßt.
+</ep-language>
+<ep-language language="en">
+  You may modify the index settings here.
+</ep-language>
+<div align=center>
+<form action="prefs.ep" method="POST">
+<input type=hidden name="language" value="$_ep_language$">
+<table>
+  <tr><th><ep-language de="Root-Verzeichnis des WWW-Servers"
+		       en="WWW servers root directory"></th>
+      <td><input name="glimpse_prefs_rootdir" size=30
+	         value="$glimpse_prefs->rootdir$"></td>
+  <tr><th><ep-language de="Zu durchsuchende Verzeichnisse"
+		       en="Directories being indexed"><br>
+	  <font size=-1><ep-language de="Ein Verzeichnis pro Zeile"
+		                     en="One directory per line"></font></th>
+      <td><textarea name="glimpse_prefs_dirs" rows=5 cols=30
+	  >$glimpse_prefs->dirs$</textarea></td>
+  <tr><th><ep-language de="Zu ignorierende Verzeichnisse"
+		       en="Directories being ignored"><br>
+	  <font size=-1><ep-language de="Ein Verzeichnis pro Zeile"
+		                     en="One directory per line"></font></th>
+      <td><textarea name="glimpse_prefs_dirs_ignored" rows=5 cols=30
+	  >$glimpse_prefs->dirs_ignored$</textarea></td>
+  <tr><th><ep-language de="Zu indizierende Dateiendungen"
+		       en="Suffixes of files being indexed"></th>
+      <td><input name="glimpse_prefs_suffix" size=30
+		 value="$glimpse_prefs->suffix$"></td>
+</table>
+<ep-language language="de">
+  <input type=submit name="modify" value="Daten speichern">
+</ep-language>
+<ep-language language="en">
+  <input type=submit name="modify" value="Save settings">
+</ep-language>
+</div>
+</body>
+</html>

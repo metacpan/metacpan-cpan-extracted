@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/HTML/WikiConverter/Oddmuse.pm
+t/00-load.t
+t/boilerplate.t
+t/oddmuse.t
+t/pod-coverage.t
+t/pod.t
+t/runtests.pl

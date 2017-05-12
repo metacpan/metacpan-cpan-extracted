@@ -1,0 +1,53 @@
+<html><head><title>
+<ep-language de="Benutzerverwaltung - Löschen eines Benutzers"
+             en="User administration - Deleting a user">
+</title>
+</head>
+<body><h1>
+<ep-language de="Benutzerverwaltung - Löschen eines Benutzers"
+             en="User administration - Deleting a user"></h1>
+<p>
+<ep-language de="Wollen Sie den folgenden Benutzer tatsächlich löschen:"
+             en="Do you really want to delete the following user:"></p>
+<form action="user.ep" method=GET>
+<input type=hidden name="delete" value="$user->USER->val$">
+<input type=hidden name="language" value="$_ep_language$">
+<table>
+<tr><th>Name:</th>
+    <td>$user->REALNAME->val$</td>
+<tr><th><ep-language de="Benutzername" en="Login">:</th>
+    <td>$user->USER->val$</td>
+<tr><th><ep-language de="Benutzershell" en="User shell">:</th>
+    <td>$user->SHELL->val$</td>
+<tr><th>UID:</th>
+    <td>$user->UID->val$</td>
+<tr><th><ep-language de="Homedirectory" en="Home directory">:</th>
+    <td>$user->HOMEDIR->val$</td>
+<tr><th><ep-language de="Paßwort" en="Password">:</th>
+    <td>$user->PASSWORD->val$</td>
+<tr><th>Aliases:</th>
+    <td>$user->ALIASES->val$</td>
+<tr><th><ep-language de="Mail permanent weiterleiten an:"
+                     en="Permanent mail forward to:"></th>
+    <td>$user->FORWARD->val$</td>
+<tr><th><ep-language de="Mail evtl. weiterleiten an:"
+                     en="Eventually forward email to"></th>
+    <td>$user->CUSTOM->val$</td>
+</table>
+<ep-language language="de">
+<input type=submit value="Ja" name="doit">
+</ep-language>
+<ep-language language="en">
+<input type=submit value="Yes" name="doit">
+</ep-language>
+</form>
+<br><br><br>
+<div align=center>
+  <a href="index.ep?language=$_ep_language$">
+    <ep-language de="Menü" en="Menu"></a>
+  <a href="group.ep?language=$_ep_language$">
+    <ep-language de="Gruppenverwaltung" en="Group administration"></a>
+</div>
+</body>
+</html>
+

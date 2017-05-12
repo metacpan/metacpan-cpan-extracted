@@ -1,0 +1,32 @@
+Revision history for HTML-GMap
+
+0.06    2008-01-21
+        - Update email address
+        - Explicitly specify keyattr for XML out
+
+0.05    2007-09-28
+        - Persistent color/shape for hires mode
+        - Add large zoom control
+        - Add zoom level to URL
+        - Lower zoom limit to 2
+        - More visible density icons
+        - Tableize framework, remove &nbsp; (for Safari)
+        - Parameterize center zoom level
+        - Make piechart size a method that can be overridden
+        - Temp addition to work around disappearing grid
+        - Disable grid for hires mode
+
+0.04    2007-07-03
+		- Update abstracts
+
+0.03    2007-06-01
+        - Remove debug info
+        - Remove session-based temp file cleaning
+
+0.02    2007-05-10
+        - Add prerequisites to Makefile.PL
+        - Add version numbers, abstracts to sample code/data
+         
+0.01    2007-05-09 
+        - First version.
+

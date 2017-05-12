@@ -1,0 +1,300 @@
+NAME
+    HTML::HTML5::DOM - implementation of the HTML5 DOM on top of XML::LibXML
+
+SYNOPSIS
+     use HTML::HTML5::DOM;
+ 
+     # Here $doc is an XML::LibXML::Document...
+     my $doc = HTML::HTML5::Parser->load_html(location => 'my.html');
+ 
+     # This upgrades it to an HTML::HTML5::DOM::HTMLDocument...
+     XML::LibXML::Augment->rebless($doc);
+ 
+     # What's the page title?
+     warn $doc->getElementsByTagName('title')->get_index(1)->text;
+ 
+     # Let's submit the first form on the page...
+     my $forms = $doc->getElementsByTagName('form');
+     $forms->get_index(1)->submit;
+
+DESCRIPTION
+    HTML::HTML5::DOM is a layer on top of XML::LibXML which provides a number
+    of additional classes and methods for elements. Because it wraps almost
+    every XML::LibXML method, it is not as fast as using XML::LibXML directly
+    (which is an XS module), but it is more convenient.
+
+  DOM Support
+    HTML::HTML5::DOM implements those parts of the HTML5 DOM which are
+    convenient to do so, and also supports a lot of the pre-HTML5 DOM which
+    was obsoleted by the HTML5 spec. Additionally a number of DOM extensions
+    (methods prefixed with `p5_`) are provided.
+
+    DOM events and event handlers (e.g. `onclick`) are not supported, and are
+    unlikely to be supported in the foreseeable future.
+
+    The CSS bits of DOM are not supported, but may be in the future.
+
+  Perl specifics
+    DOM attributes are typically implemented as get/set/clear methods. For
+    example:
+
+      warn $my_div->id;      # get
+      $my_div->id($new_id);  # set
+      $my_div->id(undef);    # clear
+
+    Methods which return a list usually return a normal Perl list when called
+    in list context, and an XML::LibXML::NodeList (or a subclass of that) when
+    called in list context.
+
+    Methods that return a URI generally return one blessed into the URI class.
+
+    Methods that return a datetime, generally return one blessed into the
+    DateTime class.
+
+    Methods that result in hypertext navigation (e.g. clicking a link or
+    submitting a form) generally return an HTTP::Request object (which you can
+    pass to an LWP::UserAgent or WWW::Mechanize instance).
+
+    The standard Perl `isa` method is overridden to support two additional
+    calling styles:
+
+      $elem->isa( 'h1' );                 # element tag name
+      $elem->isa( -HTMLHeadingElement );  # DOM interface name
+
+  HTML::HTML5::DOM class methods
+    While most of the interesting stuff is in HTML::HTML5::DOM::HTMLElement
+    and other classes like that, the HTML::HTML5::DOM package itself provides
+    a handful of methods of its own.
+
+    *   `XHTML_NS`
+
+        Constant. The XHTML namespace URI as a string.
+
+    *   `getDOMImplementation`
+
+        Gets a singleton object blessed into the HTML::HTML5::DOM class.
+
+    *   `hasFeature`
+
+        Given a feature and version, returns true if the feature is supported.
+
+          my $impl = HTML::HTML5::DOM->getDOMImplementation;
+          if ($impl->hasFeature('Core', '2.0')) {
+            # ... do stuff
+          }
+
+    *   `getFeature`
+
+        Given a feature and version, returns an HTML::HTML5::DOMutil::Feature
+        object.
+
+    *   `registerFeature`
+
+        Experimental method to extend HTML::HTML5::DOM.
+
+          my $monkey = HTML::HTML5::DOMutil::Feature->new(Monkey => '1.0');
+          $monkey->add_sub(
+            HTMLElement => 'talk',
+            sub { print "screech!\n" },
+          );
+          $impl->registerFeature($monkey);
+  
+          $element->talk if $impl->hasFeature(Monkey => '1.0');
+
+    *   `parse`
+
+        Given a file handle, file name or URL (as a string or URI object),
+        parses the file, returning an HTML::HTML5::DOM::HTMLDocument object.
+
+        This function uses HTML::HTML5::Parser but you can alternatively use
+        XML::LibXML's XML parser:
+
+         my $dom = HTML::HTML5::DOM->parse($fh, using => 'libxml');
+
+    *   `parseString`
+
+        As per `parse`, but parses a string.
+
+    *   `createDocument`
+
+        Returns an HTML::HTML5::DOM::HTMLDocument representing a blank page.
+
+    *   `createDocumentType`
+
+        Given a qualified name, public identifier (which might be undef) and
+        system identifier (also perhaps undef), returns a doctype tag.
+
+        This is currently returned as a string, but in an ideal world would be
+        an XML::LibXML::Dtd object.
+
+BUGS
+    <http://rt.cpan.org/Dist/Display.html?Queue=HTML-HTML5-DOM>.
+
+SEE ALSO
+    HTML::HTML5::DOM::ReleaseNotes.
+
+  General DOM information
+    HTML5 DOM Specifications: <http://www.w3.org/TR/domcore/>,
+    <http://www.w3.org/TR/html5/index.html#interfaces>.
+
+    Pre-HTML5 DOM Specifications:
+    <http://www.w3.org/TR/2000/REC-DOM-Level-2-Core-20001113/core.html>
+    <http://www.w3.org/TR/DOM-Level-2-HTML/html.html>.
+
+  Other packages in this distribution
+    *   HTML::HTML5::DOM::HTMLAnchorElement
+
+    *   HTML::HTML5::DOM::HTMLAreaElement
+
+    *   HTML::HTML5::DOM::HTMLAudioElement
+
+    *   HTML::HTML5::DOM::HTMLBRElement
+
+    *   HTML::HTML5::DOM::HTMLBaseElement
+
+    *   HTML::HTML5::DOM::HTMLBodyElement
+
+    *   HTML::HTML5::DOM::HTMLButtonElement
+
+    *   HTML::HTML5::DOM::HTMLCanvasElement
+
+    *   HTML::HTML5::DOM::HTMLCollection
+
+    *   HTML::HTML5::DOM::HTMLCommandElement
+
+    *   HTML::HTML5::DOM::HTMLDListElement
+
+    *   HTML::HTML5::DOM::HTMLDataListElement
+
+    *   HTML::HTML5::DOM::HTMLDetailsElement
+
+    *   HTML::HTML5::DOM::HTMLDivElement
+
+    *   HTML::HTML5::DOM::HTMLDocument
+
+    *   HTML::HTML5::DOM::HTMLElement
+
+    *   HTML::HTML5::DOM::HTMLEmbedElement
+
+    *   HTML::HTML5::DOM::HTMLFieldSetElement
+
+    *   HTML::HTML5::DOM::HTMLFormControlsCollection
+
+    *   HTML::HTML5::DOM::HTMLFormElement
+
+    *   HTML::HTML5::DOM::HTMLHRElement
+
+    *   HTML::HTML5::DOM::HTMLHeadElement
+
+    *   HTML::HTML5::DOM::HTMLHeadingElement
+
+    *   HTML::HTML5::DOM::HTMLHtmlElement
+
+    *   HTML::HTML5::DOM::HTMLIFrameElement
+
+    *   HTML::HTML5::DOM::HTMLImageElement
+
+    *   HTML::HTML5::DOM::HTMLInputElement
+
+    *   HTML::HTML5::DOM::HTMLKeygenElement
+
+    *   HTML::HTML5::DOM::HTMLLIElement
+
+    *   HTML::HTML5::DOM::HTMLLabelElement
+
+    *   HTML::HTML5::DOM::HTMLLegendElement
+
+    *   HTML::HTML5::DOM::HTMLLinkElement
+
+    *   HTML::HTML5::DOM::HTMLMapElement
+
+    *   HTML::HTML5::DOM::HTMLMediaElement
+
+    *   HTML::HTML5::DOM::HTMLMenuElement
+
+    *   HTML::HTML5::DOM::HTMLMetaElement
+
+    *   HTML::HTML5::DOM::HTMLMeterElement
+
+    *   HTML::HTML5::DOM::HTMLModElement
+
+    *   HTML::HTML5::DOM::HTMLOListElement
+
+    *   HTML::HTML5::DOM::HTMLObjectElement
+
+    *   HTML::HTML5::DOM::HTMLOptGroupElement
+
+    *   HTML::HTML5::DOM::HTMLOptionElement
+
+    *   HTML::HTML5::DOM::HTMLOutputElement
+
+    *   HTML::HTML5::DOM::HTMLParagraphElement
+
+    *   HTML::HTML5::DOM::HTMLParamElement
+
+    *   HTML::HTML5::DOM::HTMLPreElement
+
+    *   HTML::HTML5::DOM::HTMLProgressElement
+
+    *   HTML::HTML5::DOM::HTMLQuoteElement
+
+    *   HTML::HTML5::DOM::HTMLScriptElement
+
+    *   HTML::HTML5::DOM::HTMLSelectElement
+
+    *   HTML::HTML5::DOM::HTMLSourceElement
+
+    *   HTML::HTML5::DOM::HTMLSpanElement
+
+    *   HTML::HTML5::DOM::HTMLStyleElement
+
+    *   HTML::HTML5::DOM::HTMLTableCaptionElement
+
+    *   HTML::HTML5::DOM::HTMLTableCellElement
+
+    *   HTML::HTML5::DOM::HTMLTableColElement
+
+    *   HTML::HTML5::DOM::HTMLTableDataCellElement
+
+    *   HTML::HTML5::DOM::HTMLTableElement
+
+    *   HTML::HTML5::DOM::HTMLTableHeaderCellElement
+
+    *   HTML::HTML5::DOM::HTMLTableRowElement
+
+    *   HTML::HTML5::DOM::HTMLTableSectionElement
+
+    *   HTML::HTML5::DOM::HTMLTextAreaElement
+
+    *   HTML::HTML5::DOM::HTMLTimeElement
+
+    *   HTML::HTML5::DOM::HTMLTitleElement
+
+    *   HTML::HTML5::DOM::HTMLTrackElement
+
+    *   HTML::HTML5::DOM::HTMLUListElement
+
+    *   HTML::HTML5::DOM::HTMLVideoElement
+
+    *   HTML::HTML5::DOM::RadioNodeList
+
+  Packages external to this distribution
+    "Friends": XML::LibXML, XML::LibXML::Augment, HTML::HTML5::Parser,
+    HTML::HTML5::Writer, HTML::HTML5::ToText, HTML::HTML5::Builder.
+
+    "Rivals": HTML::DOM, HTML::Tree.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012, 2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

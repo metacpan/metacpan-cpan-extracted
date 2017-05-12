@@ -1,0 +1,38 @@
+HTML::EmbeddedPerl ver 0.91
+==============================
+
+OVERVIEW
+
+The Perl embeddings for HTML.
+
+PREREQUISITES
+
+Perl 5.008 or higher.
+(and perl5 development package)
+
+  debian and debian-based distribution:
+
+      Maybe needed libperl install, it type the following:
+
+      apt-get install libperl-dev
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+NOTICE
+
+  This is a beta version, it has been changed to new specification.
+
+COPYRIGHT
+
+  (C) 2010- TWINKLE COMPUTING All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

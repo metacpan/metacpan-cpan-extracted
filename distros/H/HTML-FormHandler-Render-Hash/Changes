@@ -1,0 +1,8 @@
+Revision history for HTML-FormHandler-Render-Hash
+
+0.02    Sun Sep 20 17:36:59 EDT 2009
+        Fixed incompatibilities with the new release of HTML::FormHandler
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

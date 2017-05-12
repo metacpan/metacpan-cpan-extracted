@@ -1,0 +1,29 @@
+$Id: README,v 1.1 2002/12/14 20:08:52 m_ilya Exp $
+
+This file contains information relevant to the tests that are run
+after building the software with "make" and testing with "make test".
+Unless you maintain this module you probably don't need to read it.
+
+Please note that cookie tests require your hostname to contain at
+least two periods (dots). Otherwise these tests will be skipped.
+
+If test script doesn't detect your hostname correctly you can set it
+with environment variable TEST_HOSTNAME.
+
+'apache_max_wait' tests can take long time. It is possible to disable
+them by setting environment variable TEST_FAST.
+
+If HTTP::WebTest changes its output then it breaks test suite tests
+because they compare HTTP::WebTest output with reference files in
+t/test.out directory. Obviously it can be caused by bug in
+HTTP::WebTest. In this case that bug should be fixed. However test
+suite tests could be broken if HTTP::WebTest changes its output due to
+changes in its plugins. The simple way to update all reference files
+in t/test.out is setting environment variable TEST_FIX during 'make
+test'.
+
+Another useful environment variable is TEST_VERBOSE. If it set then on
+'make test' it will be possible to see output from test scripts which
+helps debugging a lot. All tests that use reference files in
+t/test.out will print difference between reference files and actual
+test reports if any.

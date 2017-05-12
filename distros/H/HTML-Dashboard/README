@@ -1,0 +1,50 @@
+HTML-Dashboard version 0.03
+===========================
+
+This module tries to achive spreadsheet-like formatting for HTML tables.
+
+The following features are supported:
+- User-defined formatting of first, last, even, and odd rows or columns.
+- Conditional formatting, based on the contents of each cell.
+- Sorting (on any column or combination of cols, with user defined sort-order).
+- Pagination of the data set.
+- Definition of "views", i.e. restriction of the set of columns shown.
+- User-defined column captions.
+- On-the-fly formatting and collating of the data.
+
+Rather than having to build up an HTML table from data, row by row and
+cell by cell, applying formatting rules at every step, this module allows
+the user to specify a set of simple rules with the desired formatting
+options. The module will evaluate the rules and apply the formatting
+options as necessary.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires the standard "Carp" module.
+
+
+EXAMPLES AND WEBSITE
+
+Check the author's website at www.beyondcode.org.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Philipp K. Janert
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

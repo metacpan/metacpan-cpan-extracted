@@ -1,0 +1,10 @@
+Revision history for Perl extension HTML::SyntaxHighlighter.
+
+0.02  Wed Dec 18 19:19:55 2002
+        - Fixed inconsistencies in the documentation
+        - Removed extraneous '<br />' tags from start and end of
+          output 
+
+0.01  Thu Oct 10 18:46:40 2002
+      	- original version
+

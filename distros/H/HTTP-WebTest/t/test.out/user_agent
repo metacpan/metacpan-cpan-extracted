@@ -1,0 +1,24 @@
+Failed  Succeeded  Test Name
+   0          2    *** no name ***
+   0          2    *** no name ***
+
+
+Test Name: N/A
+URL: http://http.web.test/show-agent
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  REQUIRED TEXT
+    User agent: HTTP-WebTest/NN                                SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/show-agent
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  REQUIRED TEXT
+    User agent: Test Test                                        SUCCEED
+
+
+Total web tests failed: 0  succeeded: 4

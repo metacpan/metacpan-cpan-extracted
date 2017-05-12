@@ -1,0 +1,43 @@
+---
+abstract: 'output a DOM as HTML5'
+author:
+  - 'Toby Inkster <tobyink@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.61
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+keywords:
+  - HTML
+  - HTML5
+  - Markup
+  - Web
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: HTML::HTML5::Writer
+name: HTML-HTML5-Writer
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+recommends:
+  HTML::HTML5::Parser: 0
+  HTML::HTML5::Sanity: 0
+  XML::LibXML: 1.94
+requires:
+  Exporter: 0
+  HTML::HTML5::Entities: 0.001
+  XML::LibXML: 1.60
+  perl: 5.10.0
+resources:
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=HTML-HTML5-Writer
+  homepage: https://metacpan.org/release/HTML-HTML5-Writer
+  license: http://dev.perl.org/licenses/
+  repository: https://bitbucket.org/tobyink/p5-html-html5-writer
+version: 0.201

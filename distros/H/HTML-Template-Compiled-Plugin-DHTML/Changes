@@ -1,0 +1,4 @@
+Revision history for Perl module HTML::Template::Compiled::Plugin::DHTML.
+
+0.03 Thu Jan 10 21:53:34 CET 2013
+- Moved out of HTML-Template-Compiled distribution

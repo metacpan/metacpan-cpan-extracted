@@ -1,0 +1,43 @@
+---
+abstract: 'Pass server side data to JavaScript safety.'
+author:
+  - '/1383690938>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.8.3, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-CallJS
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  HTML::CallJS:
+    file: lib/HTML/CallJS.pm
+    version: 0.02
+requires:
+  JSON::XS: 0
+  parent: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/tokuhirom/HTML-CallJS/issues
+  homepage: https://github.com/tokuhirom/HTML-CallJS
+  repository: git://github.com/tokuhirom/HTML-CallJS.git
+version: 0.02
+x_contributors:
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'

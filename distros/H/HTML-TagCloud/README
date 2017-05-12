@@ -1,0 +1,84 @@
+NAME
+    HTML::TagCloud - Generate An HTML Tag Cloud
+
+SYNOPSIS
+      my $cloud = HTML::TagCloud->new;
+      $cloud->add($tag1, $url1, $count1);
+      $cloud->add($tag2, $url2, $count2);
+      $cloud->add($tag3, $url3, $count3);
+      my $html = $cloud->html_and_css(50);
+
+DESCRIPTION
+    The HTML::TagCloud module enables you to generate "tag clouds" in HTML.
+    Tag clouds serve as a textual way to visualize terms and topics that are
+    used most frequently. The tags are sorted alphabetically and a larger
+    font is used to indicate more frequent term usage.
+
+    Example sites with tag clouds: <http://www.43things.com/>,
+    <http://www.astray.com/recipes/> and
+    <http://www.flickr.com/photos/tags/>.
+
+    This module provides a simple interface to generating a CSS-based HTML
+    tag cloud. You simply pass in a set of tags, their URL and their count.
+    This module outputs stylesheet-based HTML. You may use the included CSS
+    or use your own.
+
+CONSTRUCTOR
+  new
+    The constructor takes one optional argument:
+
+      my $cloud = HTML::TagCloud->new(levels=>10);
+
+    if not provided, leves defaults to 24
+
+METHODS
+  add
+    This module adds a tag into the cloud. You pass in the tag name, its URL
+    and its count:
+
+      $cloud->add($tag1, $url1, $count1);
+      $cloud->add($tag2, $url2, $count2);
+      $cloud->add($tag3, $url3, $count3);
+
+  tags($limit)
+    Returns a list of hashrefs representing each tag in the cloud, sorted by
+    alphabet. each tag has the following keys; name, count, url and level.
+
+  css
+    This returns the CSS that will format the HTML returned by the html()
+    method with tags which have a high count as larger:
+
+      my $css  = $cloud->css;
+
+  html($limit)
+    This returns the tag cloud as HTML without the embedded CSS (you should
+    use both css() and html() or simply the html_and_css() method). If a
+    limit is provided, only the top $limit tags are in the cloud, otherwise
+    all the tags are in the cloud:
+
+      my $html = $cloud->html(200);
+
+  html_and_css($limit)
+    This returns the tag cloud as HTML with embedded CSS. If a limit is
+    provided, only the top $limit tags are in the cloud, otherwise all the
+    tags are in the cloud:
+
+      my $html_and_css = $cloud->html_and_css(50);
+
+AUTHOR
+    Leon Brocard, "<acme@astray.com>".
+
+SUPPORT
+
+    The current repository for this project is maintained on GitHub:
+
+      https://github.com/dennisroberts71/HTML-TagCloud
+
+    Please feel free to report any problems in the issue tracker for this
+    repository.
+
+COPYRIGHT
+    Copyright (C) 2005, Leon Brocard
+
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.

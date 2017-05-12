@@ -1,0 +1,4 @@
+0.6.1 Fri Jun 15 2012
+	- Support for proxy settings using environment variables
+0.6 Wed Dec 28 2011
+	- Initial release

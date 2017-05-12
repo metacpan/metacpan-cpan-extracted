@@ -1,0 +1,24 @@
+<h3 id="the-first-test">The first test</h3>
+<p><em>This</em> is a very conformant
+ XHTML 
+fragment. I hope you like it. I will be using it as test material
+during the development of this module. Actually not just <em>development</em>
+but subsequent <strong>support</strong> will both use this and variant 
+files for regression tests. </p><h3 id="play_havoc">Blah</h3><p>This paragraph is intended to include all the
+features permitted in our restricted subset of HTML. Therefore I need to
+include an utterly gratuitous
+<div><img alt="a gratuitous image" height="100000" src="http://www.google.co.uk" title="a gratuitous image" width="100000" /></div>
+at no extra cost.</p>
+<p>Din ve imkans&amp;#x131;z &amp;#x15F;eyler inanmak daha sorar reddeden bir&amp;ccedil;ok &amp;ouml;l&amp;uuml;m&amp;uuml;ne neden oldu.
+&amp;#x644;&amp;#x627; &amp;#x625;&amp;#x644;&amp;#x647; . &amp;#x627;&amp;#x644;&amp;#x62D;&amp;#x635;&amp;#x648;&amp;#x644; &amp;#x639;&amp;#x644;&amp;#x649; &amp;#x623;&amp;#x643;&amp;#x62B;&amp;#x631; &amp;#x645;&amp;#x646; &amp;#x630;&amp;#x644;&amp;#x643;</p>
+
+<p>This second paragraph is likely to be a bit shorter. However I cannot
+entirely guarantee that. That is I might have to revise that prediction
+once the paragraph is complete.</p>
+<h3 id="test2">The big idea</h3>
+<p>Actually I am sorry to admit it, but I am running out of ideas for 
+test material. I mean I really needed a second header and so I had to 
+have yet another paragraph. I do apologize for any inconvenience reading 
+this <strong>material may have caused you.
+
+</strong></p>

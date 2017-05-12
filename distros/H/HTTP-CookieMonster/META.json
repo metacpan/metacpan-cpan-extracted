@@ -1,0 +1,72 @@
+{
+   "abstract" : "Easy read/write access to your jar of HTTP::Cookies",
+   "author" : [
+      "Olaf Alders <olaf@wundercounter.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.021, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTTP-CookieMonster",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "HTTP::Cookies" : "0",
+            "Moo" : "1.000003",
+            "Safe::Isa" : "0",
+            "Scalar::Util" : "0",
+            "Sub::Exporter" : "0",
+            "URI::Escape" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Serializer" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/oalders/HTTP-CookieMonster/issues"
+      },
+      "homepage" : "https://github.com/oalders/http-cookiemonster",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/oalders/http-cookiemonster.git",
+         "web" : "https://github.com/oalders/http-cookiemonster"
+      },
+      "x_prepan_author" : "http://prepan.org/user/3Yz7PYrBzQ",
+      "x_prepan_module" : "http://prepan.org/module/429En4oFdi"
+   },
+   "version" : "0.09"
+}
+

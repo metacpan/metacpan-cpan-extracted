@@ -1,0 +1,30 @@
+---
+abstract: 'Handle multi-page/stage forms'
+author:
+  - 'Carl Franks <cpan@fireartist.com>'
+build_requires:
+  Test::Aggregate::Nested: 0.371
+  Test::More: 0.92
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-FormFu-MultiForm
+requires:
+  Carp: 0
+  Clone: 0.31
+  Crypt::CBC: 0
+  Crypt::DES: 0
+  HTML::FormFu: 1.00
+  List::MoreUtils: 0
+  Moose: 1.00
+  MooseX::Attribute::Chained: v1.0.1
+  Scalar::Util: 0
+  Storable: 0
+resources:
+  repository: git://github.com/fireartist/HTML-FormFu-MultiForm.git
+version: 1.00

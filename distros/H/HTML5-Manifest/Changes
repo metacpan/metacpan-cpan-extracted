@@ -1,0 +1,13 @@
+Revision history for Perl extension HTML5::Manifest
+
+0.04    2011-02-08T12:44:27+09:00
+        - added support to win32 (mattn++)
+
+0.03    2011-02-04T13:03:01+09:00
+        - sorted file lists
+
+0.02    2011-02-03T21:07:04+09:00
+        - rewrite document pod format
+
+0.01    2011-02-03T19:21:20+09:00
+        - original version

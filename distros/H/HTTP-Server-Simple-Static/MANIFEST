@@ -1,0 +1,11 @@
+Build.PL
+Changes
+example.pl
+lib/HTTP/Server/Simple/Static.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/01basic.t
+xt/02pod.t
+xt/03podcoverage.t
+META.json

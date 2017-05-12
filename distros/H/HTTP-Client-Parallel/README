@@ -1,0 +1,90 @@
+NAME
+    HTTP::Client::Parallel - A HTTP client that fetchs all URIs in parallel
+
+SYNOPSIS
+      # Create the parallising client
+      my $client = HTTP::Client::Parallel->new;
+  
+      # Simple fetching
+      my $pages = $client->get(
+        'http://www.google.com/',
+        'http://www.yapc.org/',
+        'http://www.yahoo.com/',
+      );
+  
+      # Mirroring to disk
+      my $responses = $client->mirror(
+        'http://www.google.com/' => 'mirrors/google.html',
+        'http://www.yapc.org/'   => 'mirrors/yapc.html',
+        'http://www.yahoo.com/'  => 'mirrors/yahoo.html',
+      );
+
+DESCRIPTION
+    Fetching a URI is a very common network-bound task in many types of
+    programming. Fetching more than one URI is also very common, but unless
+    the fetches are capable of entirely saturating a connection, typically
+    time is wasted because there is often no logical reason why multiple
+    requests cannot be made in parallel.
+
+    Executing IO-bound and network-bound tasks is extremely easy in any
+    event-based programming model such as POE, but these event-based systems
+    normally require complete control of the application and that the
+    program be written in a very different way.
+
+    Thus, the biggest problem preventing running HTTP requests in parallel
+    is not that it isn't possible, but that mixing procedural and event
+    programming is difficult.
+
+    The few existing mechanisms generally rely on forking or other
+    platform-specific methods.
+
+    HTTP::Client::Parallel is designed to bridge the gap between typical
+    cross-platform procedural code and typical cross-platform event-based
+    code.
+
+    It allows you to set up a series of HTTP tasks (fetching to memory,
+    fetching to disk, and mirroring to disk) and then issue a single method
+    call which will block and execute all of them in parallel.
+
+    Behind the scenes HTTP::Client::Parallel will temporarily hand over
+    control of the process to POE to execute the HTTP tasks.
+
+    Once all of the HTTP tasks are completed (using the standard
+    POE::Component::HTTP::Client module, the POE kernel will shut down and
+    hand control of the application back to the normal procedural code, and
+    thus back to your code.
+
+    As a result, a developer with no knowledge of POE or event-based
+    programming can still take advantage of the capabilities of POE and gain
+    major speed increases in HTTP-based programs with relatively little
+    work.
+
+METHODS
+    TO BE COMPLETED
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=HTTP-Client-Parallel>
+
+    For other issues, contact the author.
+
+AUTHORS
+    Marlon Bailey <mbailey@cpan.org>
+
+    Adam Kennedy <adamk@cpan.org>
+
+    Jeff Bisbee <jbisbee@cpan.org>
+
+SEE ALSO
+    LWP::Simple, POE
+
+COPYRIGHT
+    Copyright 2008 Marlon Bailey, Adam Kennedy and Jess Bisbee.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

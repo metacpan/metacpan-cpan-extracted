@@ -1,0 +1,240 @@
+<!--
+=head1 NAME
+
+thumbnail.wmk - photo-album style ''thumbnail'' links to images
+
+=head1 LOADING
+
+  < use plugin="thumbnail_tag" />
+
+=head1 HTML TAGS
+
+  < thumbnail name="filename.jpg" [text="template"]
+  	[bordercolor="black"] [borderwidth="1"] [format="jpg"] />
+
+=head1 PERL CODE
+
+  <{perl
+
+    make_thumbnail_table (3, @names_of_images);
+
+  }>
+
+=head1 DESCRIPTION
+
+This WebMake Perl library provides a quick shortcut to make thumbnail links to
+full-sized images, suitable for use in a photo album site or similar.
+
+The library provides support for a < thumbnail > tag, which creates a thumbnail
+of one image, and some helper functions for creating thumbnail pages with lots
+of images.
+
+The attributes supported by the < thumbnail > tag are as follows:
+
+=over 4
+
+=item name="imagename"
+
+The image to link to.  This should be the name of a URL reference, loaded from
+a < media > search, B<not> the filename of the image itself.
+
+=item borderwidth="n"
+
+If you wish to draw a border around the images, this specifies the border width
+(in pixels).  The default value is 1.  This can also be specified by setting
+a template content item called C<thumbnail.borderwidth>.
+
+=item bordercolor="#xxxxxx"
+
+The border colour to draw image borders in. The default value is "black" (or
+C<#000000>).  This can also be specified by setting a template content item
+called C<thumbnail.bordercolor>.
+
+=item format="fmt"
+
+The format to use for thumbnail images; default is "jpg".  Also available:
+"gif" or "png".  Any reasonable ImageMagick-supported format will work.
+
+=item text="template"
+
+The template text to be used for the thumbnail link and img tags.  The
+following content items are defined for use inside the template text. This can
+also be specified by setting a template content item called
+C<thumbnail.template>.
+
+=over 4
+
+=item thumbnail.name
+
+The name of the image (not the filename, the < media > item name).
+
+=item thumbnail.path
+
+The image file's path, with directories.
+
+=item thumbnail.filename
+
+The image file's name, without directories.
+
+=item thumbnail.href
+
+The path to the full-sized image file, relative to the current output
+file.
+
+=item thumbnail.thumb_src
+
+The path to the thumbnail-sized version of the image file, relative to the
+current output file.
+
+=item thumbnail.size_in_k
+
+The full-sized image file's size, in kilobytes (rounded up).
+
+=item thumbnail.size
+
+The full-sized image file's size, in bytes.
+
+=item thumbnail.full_height / thumbnail.full_width
+
+The full-sized image file's height and width, in pixels.
+
+=item thumbnail.height / thumbnail.width
+
+The thumbnail-sized image file's height and width, in pixels.
+
+=item thumbnail.tag_attrs
+
+The remaining attributes of the thumbnail tag.
+
+=back
+
+C<template> can be, and should often be, a $ {content_reference}.  The default
+template is:
+
+=over 4
+
+	< div align=center >
+	  < a href="$ {thumbnail.href}" >< img
+	      src="$ {thumbnail.thumb_src}" alt="[$ {thumbnail.filename}]"
+	      height="$ {thumbnail.height}" width="$ {thumbnail.width}"
+	      border="0" $ {thumbnail.tag_attrs} / >< /a >
+	  < br / >
+	  $ [$ {thumbnail.name}.title]
+	  < br / >
+	< /div >
+
+=back
+
+Note that this means that any unrecognised attributes of the thumbnail tag
+itself will become attributes of the IMG tag.
+
+=back
+
+=head1 PERL FUNCTIONS
+
+The following Perl functions are provided:
+
+=over 4
+
+=item $text = make_thumbnail_table ($pics_per_row, @names_of_images);
+
+This function will lay out a table containing thumbnails, with up to
+C<$pics_per_row> pictures on each row.  The following template content items
+can be set to customise the behaviour of this tag:
+
+=over 4
+
+=item C<$ {thumbnail.table.td}>
+
+The template used to wrap each thumbnail.  References to $
+{thumbnail.table.item} will be replaced with the output from the < thumbnail >
+tag itself. Default setting:
+
+	< td valign=top > $ {thumbnail.table.item} < /td >
+
+=item C<$ {thumbnail.table.tr}>
+
+The template used to wrap each row of thumbnails.  References to $
+{thumbnail.table.tds} will be replaced with the output from the $
+{thumbnail.table.td} templates so far for this row.  Default setting:
+
+	< tr > $ {thumbnail.table.tds} < /tr >
+
+=back
+
+Note that you will have to wrap this up in a < table > tag yourself ;)
+
+=back
+
+=head1 EXAMPLES
+
+The file C<examples/thumbnails.wmk> in the WebMake distribution.
+
+=head1 OPTIONS WHICH AFFECT THIS TAG
+
+C<FileSearchPath> - WebMake option
+
+=cut
+
+-->
+
+<{perl
+
+  use HTML::WebMake::PerlLib::ThumbnailTag;
+
+  $self->define_empty_tag ("thumbnail",
+  	\&HTML::WebMake::PerlLib::ThumbnailTag::handle_thumbnail_tag,
+	qw(name));
+
+  sub make_thumbnail_table {
+    my ($rowsize, @imagelist) = @_;
+
+    my @rows = ();
+    my @columns = ();
+    my $count = 0;
+
+    $rowsize ||= 1;
+
+    foreach my $img (@imagelist) {
+      set_content ("thumbnail.table.item",
+	      '<thumbnail name="'.$img.'" />');
+      push (@columns, get_content ("thumbnail.table.td"));
+
+      if ((++$count) % $rowsize == 0) {
+	set_content ("thumbnail.table.tds", join ('', @columns));
+	push (@rows, get_content ("thumbnail.table.tr"));
+	@columns = ();
+      }
+    }
+
+    set_content ("thumbnail.table.tds", join ('', @columns));
+    push (@rows, get_content ("thumbnail.table.tr"));
+    return join ('', @rows);
+  }
+
+  ''
+
+}>
+
+<!-- set up some default templates -->
+
+<template name="thumbnail.template">
+	<div align=center>
+	  <a href="${thumbnail.href}"><img
+	      src="${thumbnail.thumb_src}" alt="[${thumbnail.filename}]"
+	      height="${thumbnail.height}" width="${thumbnail.width}"
+	      border="0" ${thumbnail.tag_attrs} /></a>
+	  <br />
+	  $[${thumbnail.name}.title]
+	  <br />
+	</div>
+</template>
+
+<template name="thumbnail.table.td">
+        <td valign=top> ${thumbnail.table.item} </td>
+</template>
+
+<template name="thumbnail.table.tr">
+        <tr> ${thumbnail.table.tds} </tr>
+</template>
+

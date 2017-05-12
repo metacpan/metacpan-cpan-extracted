@@ -1,0 +1,43 @@
+Hi,
+
+This is the HTML::SimpleParse module.  It is a bare-bones HTML parser,
+similar to HTML::Parser, but with a couple important distinctions:
+
+
+First, HTML::Parser knows which tags can contain other tags, which start
+tags have corresponding end tags, which tags can exist only in the <HEAD>
+portion of the document, and so forth.  HTML::SimpleParse does not know any
+of these things.  It just finds tags and text in the HTML you give it, it
+does not care about the specific content of these tags (though it does
+distiguish between different _types_ of tags, such as comments, starting
+tags like <b>, ending tags like </b>, and so on).
+
+Second, HTML::SimpleParse does not create a hierarchical tree of HTML
+content, but rather a simple linear list.  It does not pay any attention to
+balancing start tags with corresponding end tags, or which pairs of tags are
+inside other pairs of tags.
+
+Because of these characteristics, you can make a very effective HTML filter
+by sub-classing HTML::SimpleParse.  For example, to remove all comments:
+
+ package NoComment;
+ use HTML::SimpleParse;
+ @ISA = qw(HTML::SimpleParse);
+ sub output_comment {}
+ 
+ package main;
+ NoComment->new($some_html)->output;
+
+
+For more specific information, please see the documentation inside
+SimpleParse.pm, by doing "pod2txt SimpleParse.pm", or "perldoc
+HTML::SimpleParse" once you've installed the module.
+
+To install the module, do the usual:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+-Ken Williams

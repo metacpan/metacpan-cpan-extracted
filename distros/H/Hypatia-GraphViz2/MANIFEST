@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.md
+dist.ini
+lib/Hypatia/GraphViz2.pm
+t/k3_isolated.t
+t/k4.t
+t/load.t
+t/petersen.t
+t/release-pod-syntax.t
+weaver.ini

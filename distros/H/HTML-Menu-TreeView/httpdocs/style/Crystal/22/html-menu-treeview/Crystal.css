@@ -1,0 +1,262 @@
+a.treeviewLink22 {
+color:#000;
+cursor:pointer;
+height:22px;
+vertical-align:top;
+}
+a.dropzone22{
+color:#000;
+cursor:pointer;
+font-family:verdana,sans-serif;
+height:22px;
+vertical-align:top;
+background-color:#d6d2d0;
+  
+}
+a.treeviewLink22:hover {
+color:blue;
+cursor:pointer;
+height:22px;
+vertical-align:top;
+}
+table.treeview22 {
+color:#000;
+white-space:nowrap;
+}
+td.caption22 {
+font-family:verdana, sans-serif;
+height:22px;
+white-space:nowrap;
+}
+td.captionBorder22 {
+border-bottom:1px;
+border-bottom-style:dashed;
+color:#000;
+font-family:verdana, sans-serif;
+height:22px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.clasicLastMinusNode22 {
+background-image:url('/style/Crystal/22/html-menu-treeview/clasicLastMinusNode.gif');
+cursor:pointer;
+vertical-align:top;
+}
+td.clasicLastPlusNode22 {
+background-image:url('/style/Crystal/22/html-menu-treeview/clasicLastPlusNode.gif');
+cursor:pointer;
+vertical-align:top;
+}
+td.clasicMinusNode22 {
+background-image:url('/style/Crystal/22/html-menu-treeview/clasicMinusNode.gif');
+cursor:pointer;
+vertical-align:top;
+}
+td.clasicPlusNode22 {
+background-image:url('/style/Crystal/22/html-menu-treeview/clasicPlusNode.gif');
+cursor:pointer;
+vertical-align:top;
+}
+td.columnsFolder22 {
+font-family:verdana, sans-serif;
+height:22px;
+vertical-align:top;
+white-space:nowrap;
+vertical-align:top;
+}
+td.columnsFolderBorder22,td.columnsNodeBorder22,td.columnsLastNodeBorder22 {
+border-left:1px;
+border-left-style:dashed;
+color:#000;
+font-family:verdana, sans-serif;
+height:22px;
+vertical-align:top;
+white-space:nowrap;
+}
+td.columnsNode22,td.columnsLastNode22 {
+font-family:verdana, sans-serif;
+height:22px;
+white-space:nowrap;
+vertical-align:top;
+}
+td.folder22 {
+background-image:url('/style/Crystal/22/html-menu-treeview/folder_open.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+height:22px;
+vertical-align:top;
+}
+td.folderClosed22 {
+background-image:url('/style/Crystal/22/html-menu-treeview/folder.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+height:22px;
+vertical-align:top;
+}
+td.folderGray22 {
+background-image:url('/style/Crystal/22/html-menu-treeview/folder_grey_open.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+height:22px;
+vertical-align:top;
+}
+td.folderGrayClosed22 {
+background-image:url('/style/Crystal/22/html-menu-treeview/folder_grey.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+height:22px;
+vertical-align:top;
+}
+td.folderGreen22 {
+background-image:url('/style/Crystal/22/html-menu-treeview/folder_green_open.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+height:22px;
+vertical-align:top;
+}
+td.folderGreenClosed22 {
+background-image:url('/style/Crystal/22/html-menu-treeview/folder_green.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+height:22px;
+vertical-align:top;
+}
+td.folderOrange22 {
+background-image:url('/style/Crystal/22/html-menu-treeview/folder_orange_open.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+height:22px;
+vertical-align:top;
+}
+td.folderOrangeClosed22 {
+background-image:url('/style/Crystal/22/html-menu-treeview/folder_orange.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+height:22px;
+vertical-align:top;
+}
+td.folderPrint22 {
+background-image:url('/style/Crystal/22/html-menu-treeview/folder_print.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+height:22px;
+vertical-align:top;
+}
+td.folderPrintClosed22 {
+background-image:url('/style/Crystal/22/html-menu-treeview/folder_print.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+height:22px;
+vertical-align:top;
+}
+td.folderRed22 {
+background-image:url('/style/Crystal/22/html-menu-treeview/folder_red_open.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+height:22px;
+vertical-align:top;
+}
+td.folderRedClosed22 {
+background-image:url('/style/Crystal/22/html-menu-treeview/folder_red.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+height:22px;
+vertical-align:top;
+}
+td.folderViolet22 {
+background-image:url('/style/Crystal/22/html-menu-treeview/folder_violet_open.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+height:22px;
+vertical-align:top;
+}
+td.folderVioletClosed22 {
+background-image:url('/style/Crystal/22/html-menu-treeview/folder_violet.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+height:22px;
+vertical-align:top;
+}
+td.folderYellow22 {
+background-image:url('/style/Crystal/22/html-menu-treeview/folder_yellow_open.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+height:22px;
+vertical-align:top;
+}
+td.folderYellowClosed22 {
+background-image:url('/style/Crystal/22/html-menu-treeview/folder_yellow.png');
+background-repeat:no-repeat;
+color:#000;
+cursor:pointer;
+height:22px;
+vertical-align:top;
+}
+td.lastMinusNode22 {
+background-image:url('/style/Crystal/22/html-menu-treeview/lastMinusNode.gif');
+background-repeat:no-repeat;
+cursor:pointer;
+vertical-align:top;
+}
+td.lastNode22 {
+background-image:url('/style/Crystal/22/html-menu-treeview/lastNode.gif');
+background-repeat:no-repeat;
+background-position:top;
+cursor:pointer;
+height:22px;
+vertical-align:top;
+}
+td.lastPlusNode22 {
+background-image:url('/style/Crystal/22/html-menu-treeview/lastPlusNode.gif');
+background-repeat:no-repeat;
+cursor:pointer;
+height:22px;
+vertical-align:top;
+}
+td.minusNode22 {
+background-image:url('/style/Crystal/22/html-menu-treeview/minusNode.gif');
+background-repeat:no-repeat;
+cursor:pointer;
+vertical-align:top;
+}
+td.node22 {
+background-image:url('/style/Crystal/22/html-menu-treeview/node.gif');
+cursor:pointer;
+height:22px;
+}
+td.plusNode22 {
+background-image:url('/style/Crystal/22/html-menu-treeview/plusNode.gif');
+background-repeat:no-repeat;
+cursor:pointer;
+vertical-align:top;
+}
+td.submenuDeco22 {
+background-image:url('/style/Crystal/22/html-menu-treeview/vertLine.gif');
+background-repeat:repeat-y;
+}
+tr.trOver{
+color:black;
+background-color:#d4d0c8;
+}
+td.img{
+background-repeat:no-repeat;
+cursor:pointer;
+background-position:0px 0px;
+padding-left:24px;
+vertical-align: top;
+}

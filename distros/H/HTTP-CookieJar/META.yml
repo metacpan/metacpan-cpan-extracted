@@ -1,0 +1,58 @@
+---
+abstract: 'A minimalist HTTP user agent cookie jar'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::Deep: '0'
+  Test::More: '0.96'
+  Test::Requires: '0'
+  Time::Local: '1.1901'
+  URI: '0'
+  lib: '0'
+  perl: '5.008001'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.008001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150001'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTTP-CookieJar
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  HTTP::CookieJar:
+    file: lib/HTTP/CookieJar.pm
+    version: '0.008'
+  HTTP::CookieJar::LWP:
+    file: lib/HTTP/CookieJar/LWP.pm
+    version: '0.008'
+recommends:
+  Mozilla::PublicSuffix: '0'
+requires:
+  Carp: '0'
+  HTTP::Date: '0'
+  Time::Local: '1.1901'
+  parent: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/HTTP-CookieJar/issues
+  homepage: https://github.com/dagolden/HTTP-CookieJar
+  repository: https://github.com/dagolden/HTTP-CookieJar.git
+version: '0.008'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Dan Book <grinnz@grinnz.com>'
+  - 'David Golden <xdg@xdg.me>'

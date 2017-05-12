@@ -1,0 +1,53 @@
+Helios::Panoptes version 1.40
+=============================
+
+Helios::Panoptes is the web administration interface for the Helios 
+job processing system.
+
+INSTALLATION
+
+To install this set of modules type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+After the modules are installed, you'll need to copy the contents of 
+the 'cgi-bin' directory to the cgi-bin of the web server (with 
+appropriate security in place!).  
+
+    cp -Rf cgi-bin/* /usr/lib/cgi-bin
+    chmod 755 /usr/lib/cgi-bin/*.pl
+    chmod 644 /usr/lib/cgi-bin/tmpl/*.html
+
+After the cgi-bin programs and templates are installed, the helios.ini
+setting file should be edited to add the location of the Helios job 
+submission CGI program to the [global] section:
+
+    job_submit_url=http://localhost/cgi-bin/submitJob.pl
+
+In addition, you'll need to set the HELIOS_INI env var in the web 
+server's configuration so Panoptes knows where to find the global 
+Helios settings file.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+CGI::Application
+CGI::Application::Plugin::DBH
+HTML::Template
+HTML::Template::Expr
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2008 by CEB Toolbox, Inc.  
+
+This library is free software; you can redistribute it and/or modify 
+it under the same terms as Perl itself, either Perl version 5.8.0 or, 
+at your option, any later version of Perl 5 you may have available.
+
+See the file LICENSE in this distribution for more information.
+
+

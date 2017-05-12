@@ -1,0 +1,142 @@
+
+=encoding utf8
+
+=for stopwords
+  YAMASHINA
+	Hio
+	ACKNOWLEDGEMENTS
+	AnnoCPAN
+	CPAN
+	RT
+
+=head1 NAME
+
+Hash::Extract - extract hash values onto lexical variables.
+J<< ja; Hash::Extract - ハッシュの値をレキシカル変数に展開 >>
+
+=head1 VERSION
+
+Version 0.02
+
+=head1 SYNOPSIS
+
+ use Hash::Extract qw(hash_extract);
+ 
+ %hash = ( red => 'apple', blue => 'sky', );
+ hash_extract( \%hash, my $blue );
+ print $blue;  # ==> 'sky'
+
+=head1 EXPORT
+
+This module can export one function.
+J<< ja;
+このモジュールにはエクスポート可能な関数が１つあります. 
+>>
+
+=head1 FUNCTIONS
+
+=head2 hash_extract(\%hash, my $xxx, my $yyy);
+
+extract value which is contained in hash into specified variable.
+hash key of that is same as variable name.
+J<< ja;
+ハッシュに格納されている値を指定された変数に
+取り出します. その時指定された変数の変数名をハッシュの
+キーとして使います. 
+>>
+
+currently, you can use lexical variables declared in same scope
+as you call this function.
+J<< ja;
+現在のところ, この関数を呼び出したのと同じスコープにある
+レキシカル変数のみが使えます. 
+>>
+
+ hash_extract( $hashref, my $xxx);
+ # ==> my $xxx = $hashref->{xxx};
+
+ hash_extract( $hashref, our $xxx);
+ # ==> die: could not detect name of variable.
+
+note: in this version, hash_extract do not check value of
+arguments. but options may be added in future release.
+it is better that variables are set undefined.
+J<< ja;
+今のところ変数の内容とか見ていないですけれど, 今後のバージョンで
+オプションとか増えるかもしれないので undef にしておいた方が
+無難と思います. 使い回ししないで. 
+>>
+
+=head1 AUTHOR
+
+YAMASHINA Hio, C<< <hio at cpan.org> >>
+J<< ja;
+山科 氷魚 (YAMASHINA Hio), C<< <hio at cpan.org> >>
+>>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+C<bug-hash-extract at rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Hash-Extract>.
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+J<< ja;
+バグや要望は C<bug-hash-extract at rt.cpan.org> 宛に
+報告してください. 若しくは
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Hash-Extract>.
+にある web インターフェースからでもかまいません.
+そこから私に通知され, そして私が変更を行うことで報告頂いたバグの進捗を
+自動的にあなたに伝えるでしょう.
+>>
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+J<< ja;
+このモジュールのドキュメントは perldoc コマンドで見ることが出来ます.
+>>
+
+    perldoc Hash::Extract
+
+You can also look for information at:
+J<< ja;
+また, 以下の場所でも見ることが出来ます:
+>>
+
+=over 4
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Hash-Extract>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Hash-Extract>
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Hash-Extract>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Hash-Extract>
+
+=back
+
+=head1 SEE ALSO
+
+L<PadWalker>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2006-2007 YAMASHINA Hio, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+J<< ja;
+このプログラムはフリーソフトウェアです。あなたは Perl と同じ
+ライセンスの 元で再配布及び変更を行うことが出来ます.
+>>
+
+=cut

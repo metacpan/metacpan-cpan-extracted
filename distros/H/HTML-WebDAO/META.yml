@@ -1,0 +1,84 @@
+---
+name: HTML-WebDAO
+version: 0.91
+author:
+  - 'Zahatski Aliaksandr, E<lt>zag@cpan.orgE<gt>'
+abstract: Perl extension for create complex web application
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  DateTime: 0.37
+  DateTime::Format::HTTP: 0.37
+  Encode: 0
+  FCGI: 0.67
+  Getopt::Long: 2.35
+  MLDBM: 0
+  XML::LibXML: 0
+provides:
+  Apache::Directives2:
+    file: lib/Apache/Directives2.pm
+  Apache::WebDAO:
+    file: lib/Apache/WebDAO.pm
+  HTML::WebDAO:
+    file: lib/HTML/WebDAO.pm
+    version: 0.91
+  HTML::WebDAO::Base:
+    file: lib/HTML/WebDAO/Base.pm
+  HTML::WebDAO::CVapache2:
+    file: lib/HTML/WebDAO/CVapache2.pm
+  HTML::WebDAO::CVcgi:
+    file: lib/HTML/WebDAO/CVcgi.pm
+  HTML::WebDAO::Comp::ListEnv:
+    file: lib/HTML/WebDAO/Comp/ListEnv.pm
+  HTML::WebDAO::Component:
+    file: lib/HTML/WebDAO/Component.pm
+  HTML::WebDAO::Container:
+    file: lib/HTML/WebDAO/Container.pm
+  HTML::WebDAO::Element:
+    file: lib/HTML/WebDAO/Element.pm
+  HTML::WebDAO::Engine:
+    file: lib/HTML/WebDAO/Engine.pm
+  HTML::WebDAO::FCGI::ProcManager:
+    file: lib/HTML/WebDAO/FCGI/ProcManager.pm
+    version: 0.17
+  HTML::WebDAO::Lex:
+    file: lib/HTML/WebDAO/Lex.pm
+  HTML::WebDAO::Lexer::Lbase:
+    file: lib/HTML/WebDAO/Lexer/Lbase.pm
+  HTML::WebDAO::Lexer::Linclude:
+    file: lib/HTML/WebDAO/Lexer/Linclude.pm
+  HTML::WebDAO::Lexer::Lmethod:
+    file: lib/HTML/WebDAO/Lexer/Lmethod.pm
+  HTML::WebDAO::Lexer::Lobject:
+    file: lib/HTML/WebDAO/Lexer/Lobject.pm
+  HTML::WebDAO::Lexer::Lobjectref:
+    file: lib/HTML/WebDAO/Lexer/Lobjectref.pm
+  HTML::WebDAO::Lexer::Lregclass:
+    file: lib/HTML/WebDAO/Lexer/Lregclass.pm
+  HTML::WebDAO::Lexer::Ltext:
+    file: lib/HTML/WebDAO/Lexer/Ltext.pm
+  HTML::WebDAO::Lib::MethodByPath:
+    file: lib/HTML/WebDAO/Lib/MethodByPath.pm
+  HTML::WebDAO::Lib::RawHTML:
+    file: lib/HTML/WebDAO/Lib/RawHTML.pm
+  HTML::WebDAO::Response:
+    file: lib/HTML/WebDAO/Response.pm
+  HTML::WebDAO::Session:
+    file: lib/HTML/WebDAO/Session.pm
+  HTML::WebDAO::SessionID:
+    file: lib/HTML/WebDAO/SessionID.pm
+  HTML::WebDAO::SessionSH:
+    file: lib/HTML/WebDAO/SessionSH.pm
+  HTML::WebDAO::Sessionco:
+    file: lib/HTML/WebDAO/Sessionco.pm
+  HTML::WebDAO::Store::Abstract:
+    file: lib/HTML/WebDAO/Store/Abstract.pm
+  HTML::WebDAO::Store::MLDBM:
+    file: lib/HTML/WebDAO/Store/MLDBM.pm
+  HTML::WebDAO::Store::Storable:
+    file: lib/HTML/WebDAO/Store/Storable.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

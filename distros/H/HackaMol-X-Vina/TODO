@@ -1,0 +1,4 @@
+1. add coercion to centers so that it taked either MVRs or array reference
+2. should ligand, receptor be required?  makes it a little annoying in scripts
+3. improve documentation in the examples.  provide protocol for carrying out virtual
+   screens with the scripts.

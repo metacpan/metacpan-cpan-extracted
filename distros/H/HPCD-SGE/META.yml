@@ -1,0 +1,59 @@
+---
+abstract: 'Please add a short description of the module here.'
+author:
+  - 'John Macdonald  <jmacdonald@oicr.on.ca>'
+build_requires:
+  Config: '0'
+  File::ShareDir: '0'
+  File::Temp: '0'
+  File::pushd: '0'
+  FindBin: '0'
+  MooseX::Types::Path::Class: '0'
+  Test::Exception: '0'
+  Test::More: '0.10'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4222, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HPCD-SGE
+provides:
+  HPCD::SGE:
+    file: lib/HPCD/SGE.pm
+    version: '0.47'
+  HPCD::SGE::DRMAACheck:
+    file: lib/HPCD/SGE/DRMAACheck.pm
+  HPCD::SGE::DRMAAJobGroup:
+    file: lib/HPCD/SGE/DRMAAJobGroup.pm
+  HPCD::SGE::DRMAARun:
+    file: lib/HPCD/SGE/DRMAARun.pm
+  HPCD::SGE::DRMAAWrapper:
+    file: lib/HPCD/SGE/DRMAAWrapper.pm
+  HPCD::SGE::Group:
+    file: lib/HPCD/SGE/Group.pm
+  HPCD::SGE::JobGroup:
+    file: lib/HPCD/SGE/JobGroup.pm
+  HPCD::SGE::Run:
+    file: lib/HPCD/SGE/Run.pm
+  HPCD::SGE::Stage:
+    file: lib/HPCD/SGE/Stage.pm
+recommends:
+  Schedule::DRMAAc: '0.81'
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  DateTime: '0'
+  HPCI: '0.40'
+  Module::Load::Conditional: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Moose::Util::TypeConstraints: '0'
+  MooseX::ClassAttribute: '0'
+  namespace::autoclean: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.47'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

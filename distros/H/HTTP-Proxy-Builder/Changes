@@ -1,0 +1,10 @@
+Revision history for HTTP-Proxy-Builder
+
+0.01 Wed Sep 24 09:55:07 CEST 2008
+        [FEATURES]
+        - HTTP::Proxy::Builder combines several proxies into one
+        - the build_proxy program gives a useful example
+        [EXAMPLES]
+        - some examples from the HTTP::Proxy distribution have been rewritten
+          and included in the eg/ directory
+

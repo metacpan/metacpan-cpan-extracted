@@ -1,0 +1,11 @@
+Revision history for Helios::App::MP3IndexerService.
+
+2.00  Fri Oct 10 01:21:04 2014
+	- Renamed distribution to Helios::App::MP3IndexerService and 
+	  updated it to use newer Helios 2.8 API.
+1.00  Sun Jan 22 20:00:00 2012
+	-first public version included in Helios 2.40 as an example app
+0.01  Mon Jan 16 00:12:09 2012
+	- original version; created by h2xs 1.23 with options
+		-XA -b 5.8.0 MP3IndexerService
+

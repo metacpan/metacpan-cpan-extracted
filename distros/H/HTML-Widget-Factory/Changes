@@ -1,0 +1,135 @@
+Revision history for HTML-Widget-Factory
+
+0.204     2015-10-16 16:06:32-04:00 America/New_York
+        - allow an individual option for a select to be disabled
+
+0.203     2014-11-17 16:52:10-05:00 America/New_York
+        - avoid uninitialized warnings in Textarea when no value is given
+
+0.202     2014-06-11 14:24:12-04:00 America/New_York
+        - in plugins that subclass Input, be sure to pass all arguments when
+          calling SUPER::rewrite_args; this should eliminate some warnings
+          when adding default classes
+
+0.201     2014-02-24 13:58:58-05:00 America/New_York
+        - fix AUTOLOAD method to skip CLONE and DESTROY
+
+0.200     2014-02-21 16:17:04-05:00 America/New_York
+        - plugins are no longer blessed into newly created, managed packages,
+          but use AUTOLOAD to dispatch to plugins
+        - plugins on the factory are stored as objects, not class names
+        - the Input, Password, and Textarea plugins have been given a
+          default_classes attribute
+
+0.101     2013-09-14 18:35:29 America/New_York
+        - fix bugs in default object caching; this code really needs to be
+          slashed, burned, and replanted
+        - fix bugs in dist metadata
+
+0.100     2013-09-12 14:53:50 America/New_York
+        - plugins are no longer exporters; the factory factory interrogates
+          them to build the new factory
+
+        - there is a private, experimental method to allow the factory factory
+          to build tweaked widget method when installing; read the source for
+          more
+
+0.083     2013-09-11 10:47:02 America/New_York
+        - repackage to update bugtracker and repo
+        - stop using -T in test shebangs
+        - use parent.pm
+
+0.082     2010-05-04
+          make "disabled" a bool arg for Checkbox
+
+0.081     2010-05-03
+          when emitting <label> for radio, assume label is literal HTML
+          for backcompat
+
+0.080     2010-05-03
+          switch from Class::ISA to MRO::Compat
+          radio inputs now produce their content as label elements, not text
+          fix "disabled" to be an attribute arg on input
+
+0.070     2009-06-30
+          add SYNOPSIS section to plugins for quick reference
+
+0.069     2008-12-18
+          radio buttons with content did not get closing tags even in XML
+          work around this
+
+0.068     2008-09-22
+          chomp the output of link widgets
+
+0.067     2008-05-06
+          add ->provides_widget and ->provided_widgets methods to Factory
+          fix docs for -tag arg to Attrs (thanks HDP)
+
+0.066     2008-05-05
+          add Attrs plugin for producing attribute strings (without the tags)
+
+0.065     2008-02-29
+          BUG FIX: do not fail t/plugins.t if there are extra plugins
+          Happy leap day!
+
+0.064     2008-02-26
+          ENHANCEMENT: add tabindex as a global attribute
+
+0.063     2007-11-29
+          BUG FIX: previously, radio value 0 could not be selected
+
+0.062     2007-10-08
+          BUG FIX: set 'multiple' attr on multiselects
+
+0.061     2007-10-02
+          BUG FIX: do not allow 'id' attribute to trickle from widget params to
+          each radio input repeatedly; now supplying id outside of options gets
+          a warning
+
+0.060     2007-09-04
+          BUG FIX: the error for an invalid "value" for select now lists the
+          given value, rather than 0
+
+          no longer use base.pm
+
+0.059     2007-09-04
+          BUG FIX: fix confused attribute args for Link
+          FEATURE: title is now a Link attribute arg
+
+0.058     2007-07-19
+          add ->plugins method to factory
+          do not auto-load plugins under ::Plugin::Debug
+
+0.057     2007-05-01
+          fix stupidity in checkbox design, which conflated "checked" and
+          "value"
+
+0.056     2007-02-28
+          change Button "content" arg to text/html, to match Link
+
+0.055     2007-02-28
+          add Submit, Image, and Button plugins
+          allow html instead of link text
+          plans for all test files
+          a few other little tweaks
+
+0.050     2007-02-24
+          allow return of individual radio widget parts
+          allow per-radio-option ids
+          allow ignore_invalid for radio buttons
+          fix errors in error messages from radio buttons
+          skip ->require on (__)?GENERATED(__)? plugin classes
+
+0.04      2006-06-06
+          implement per-factory classes
+
+0.03      2005-12-21
+          add prereqs (thanks to BSMITH for bug report)
+          reenable taint mode in tests (thanks to newer M::Pluggable)
+          for cumulative methods, skip classes that don't implement them
+
+0.02      2005-11-29
+          added textarea and link
+
+0.01      2005-11-19
+          first release. share and enjoy

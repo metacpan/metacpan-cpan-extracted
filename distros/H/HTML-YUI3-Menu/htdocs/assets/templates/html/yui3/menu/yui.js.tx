@@ -1,0 +1,11 @@
+YUI().use('node-menunav', function(Y)
+{
+	var menu = Y.one("#<: $id :>");
+	menu.plug(Y.Plugin.NodeMenuNav, {mouseOutHideDisplay: 0});
+
+	// Show the menu now that it is ready.
+
+	menu.get("ownerDocument").get("documentElement").removeClass("yui3-loading");
+
+<: $switch_statement :>
+});

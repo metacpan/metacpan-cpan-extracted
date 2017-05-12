@@ -1,0 +1,5 @@
+=== PERSON ===
+<& SELF:name &>
+<& SELF:extras &>
+<%method name>Bob</%method>
+<%method extras></%method>

@@ -1,0 +1,35 @@
+<html>
+
+<head>
+<title>Nuova pagina 1</title>
+</head>
+
+<body>
+  <table border="0" width="150" bgcolor="#FFFFCC">
+    <tr>
+      <td align="center"><font size="1"><b><TMPL_VAR NAME="section_title">Section Title</TMPL_VAR></b></font></td>
+    </tr>
+    <tr>
+      <td bgcolor="#FFFFFF">
+        <div align="center">
+          <table border="0" width="100%" cellspacing="0">
+	<TMPL_LOOP name="items">
+            <tr>
+              <td width="100%"><font size="1"><font color="#FF9933"><TMPL_VAR name="Date">Date</TMPL_VAR></font>
+                - <a href="%link%"><TMPL_VAR NAME="title">Item title</TMPL_VAR></a><br>
+                <TMPL_VAR NAME="txt_short">Short text</TMPL_VAR><br>
+                Do you wanna know more <a href="%link%">&gt;&gt;</a>?</font></td>
+            </tr>
+            <tr>
+              <td width="100%"><img border="0" src="tr_line.gif" width="140" height="2"></td>
+            </tr>
+	</TMPL_LOOP>
+          </table>
+        </div>
+      </td>
+    </tr>
+  </table>
+</body>
+
+</html>
+

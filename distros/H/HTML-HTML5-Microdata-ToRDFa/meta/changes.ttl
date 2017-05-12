@@ -1,0 +1,55 @@
+@prefix :        <http://usefulinc.com/ns/doap#> .
+@prefix dcs:     <http://ontologi.es/doap-changeset#> .
+@prefix dc:      <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix my:      <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Microdata-ToRDFa/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix toby:    <http://tobyinkster.co.uk/#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+my:project :release my:v_0-01 .
+my:v_0-01
+	a               :Version ;
+	dc:issued       "2010-01-29"^^xsd:date ;
+	:revision       "0.01"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Microdata-ToRDFa-0.01.tar.gz> ;
+	rdfs:comment    "Original version"@en .
+
+my:project :release my:v_0-02 .
+my:v_0-02
+	a               :Version ;
+	dc:issued       "2010-02-07"^^xsd:date ;
+	:revision       "0.02"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Microdata-ToRDFa-0.02.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-01 ;
+		dcs:item [ rdfs:label "Correct dependencies in Makefile.PL"@en ; a dcs:Bugfix ]
+		] .
+
+my:project :release my:v_0-030 .
+my:v_0-030
+	a               :Version ;
+	rdfs:label      "We're not dead yet!"@en ;
+	dc:issued       "2011-02-09"^^xsd:date ;
+	:revision       "0.030"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Microdata-ToRDFa-0.030.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-02 ;
+		dcs:item [ rdfs:label "Copyright 2011."@en ; a dcs:Update, dcs:Documentation ] ;
+		dcs:item [ rdfs:label "Use RDF::Prefix to perform URI->CURIE conversion. It doesn't yet do a fantastic job, but it can evolve more rapidly on its own."@en ] ;
+		dcs:item [ rdfs:label "Use HTML::HTML5::Writer for output - it outputs more text/html-compatible XHTML than XML::LibXML can on its own."@en ]
+		] .
+
+my:project :release my:v_0-100 .
+my:v_0-100
+	a               :Version ;
+	dc:issued       "2011-11-09"^^xsd:date ;
+	:revision       "0.100"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/HTML-HTML5-Microdata-ToRDFa-0.100.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-030 ;
+		dcs:item [ rdfs:label "use 5.010"@en ; a dcs:Update ] ;
+		dcs:item [ rdfs:label "Module::Package::RDF"@en ; a dcs:Packaging ] ;
+		dcs:item [ rdfs:label "use HTML::HTML5::Microdata::Parser 0.100"@en ; a dcs:Update ] ;
+		dcs:item [ rdfs:label "Use the 'Strategy' modules provided with newer HTML::HTML5::Microdata::Parser to generate predicate URIs."@en ]
+		] .

@@ -1,0 +1,65 @@
+<wmmeta name="Title" value="&wmdollar;{content_refs} - References to Content Chunks" />
+<wmmeta name="Section" value="04-var_refs" />
+<wmmeta name="Score" value="10" />
+<wmmeta name="Abstract">
+references to content chunks
+</wmmeta>
+
+Content chunks and variables can be referred to using this format.  This is
+evaluated before any other variable reference is.
+
+	**&wmdollar;{__name__}**
+
+Content chunks can refer to other chunks, URLs, or use deferred references,
+up to 30 levels deep.
+
+Default Values
+~~~~~~~~~~~~~~
+
+If you wish to refer to a content item or variable, but are not sure if it
+exists, you can provide a default value by following the content name
+with a question mark and the default value.
+
+	**&wmdollar;{__name__?__defaultvalue__}**
+
+Parameterized References
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Content references can also be __parameterised__ references; this means
+that they act like function calls, in a way, allowing you to pass
+in parameters.  They look like this:
+
+	**&wmdollar;{__name__: __parameter__="__value__" ...}**
+
+The parameters are declared in the XML style.
+
+	**Note:** the parameters' values must not contain further content
+	references, due to a limitation in the way WebMake parses
+	content refs.  If you want to refer to a content item from
+	within a template, pass in the **name** of the content item,
+	and get the template to expand it; see the example below.
+
+For example, if you set up a template item like this:
+
+<safe>
+	<template name="mytemplate">
+		You passed in ${name}, and its value is \"${${name}}\".
+	</template>
+</safe>
+
+and a content item like this:
+
+<safe>
+	<content name="foo">
+		Hi, I'm foo!
+	</content>
+</safe>
+
+Then a reference to:
+
+	**&wmdollar;{mytemplate: name="foo"}**
+
+will expand to:
+
+	**You passed in foo, and its value is \"Hi, I'm foo!\".
+

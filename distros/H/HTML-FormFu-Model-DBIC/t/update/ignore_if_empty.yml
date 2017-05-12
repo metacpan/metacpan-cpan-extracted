@@ -1,0 +1,9 @@
+---
+model_config:
+  resultset: User
+
+elements:
+  - type: Password
+    name: name
+    model_config:
+      ignore_if_empty: 1

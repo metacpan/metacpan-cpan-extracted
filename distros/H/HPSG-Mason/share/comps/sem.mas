@@ -1,0 +1,17 @@
+<%args>
+$mode
+$index
+@restr
+</%args>\
+<%init>
+my @predication = map {
+   if(ref $_ eq 'HASH'){
+   (exists $_->{tag} ? "\\\@{$_->{tag}} " : '') . $m->scomp( '/predication.mas', %$_ )
+   }else{ "\\\@{$_}" }
+} @restr;
+</%init>\
+\[ {\it sem-cat}\\ 
+   MODE  & <% $mode %>\\ 
+   INDEX & <% $index %>\\ 
+   RESTR & <& '/list.mas', join => ' $\\oplus$ ', element => \@predication &>
+\]

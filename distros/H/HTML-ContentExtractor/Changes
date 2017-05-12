@@ -1,0 +1,9 @@
+Revision history for HTML-ContentExtractor
+
+0.03    2007-06-23/09:00:00
+		use HTML::TableExtract to display tables in plain text, thanks Jorg Meltzer 
+0.02    2007-03-26/21:00:00
+        pod added, README changed
+0.01    2007-03-23/21:00:00
+        First version, released on an unsuspecting world.
+

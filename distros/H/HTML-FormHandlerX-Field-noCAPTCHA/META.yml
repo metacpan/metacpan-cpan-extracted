@@ -1,0 +1,38 @@
+---
+abstract: "Google's noCAPTCHA reCAPTCHA for HTML::FormHandler"
+author:
+  - 'Chuck Larson'
+build_requires:
+  HTML::FormHandler: '0'
+  Test::Mock::Class: '0'
+  Test::More: '0.88'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-FormHandlerX-Field-noCAPTCHA
+provides:
+  HTML::FormHandlerX::Field::noCAPTCHA:
+    file: lib/HTML/FormHandlerX/Field/noCAPTCHA.pm
+    version: '0.10'
+  HTML::FormHandlerX::Widget::Field::noCAPTCHA:
+    file: lib/HTML/FormHandlerX/Widget/Field/noCAPTCHA.pm
+    version: '0.10'
+requires:
+  Captcha::noCAPTCHA: '0.12'
+  HTML::FormHandler::Field: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Moose::Util::TypeConstraints: '0'
+  namespace::autoclean: '0'
+resources:
+  bugtracker: https://github.com/clarson/html-formhandlerx-field-nocaptcha/issues
+  homepage: https://github.com/clarson/html-formhandlerx-field-nocaptcha
+  repository: https://github.com/clarson/html-formhandlerx-field-nocaptcha.git
+version: '0.10'

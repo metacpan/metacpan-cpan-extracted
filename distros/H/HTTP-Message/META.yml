@@ -1,0 +1,46 @@
+---
+abstract: 'HTTP style messages'
+author:
+  - 'Gisle Aas <gisle@activestate.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.08, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTTP-Message
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Compress::Raw::Zlib: '0'
+  Encode: '2.21'
+  Encode::Locale: '1'
+  Exporter: '5.57'
+  HTTP::Date: '6'
+  IO::Compress::Bzip2: '2.021'
+  IO::Compress::Deflate: '0'
+  IO::Compress::Gzip: '0'
+  IO::HTML: '0'
+  IO::Uncompress::Bunzip2: '2.021'
+  IO::Uncompress::Gunzip: '0'
+  IO::Uncompress::Inflate: '0'
+  IO::Uncompress::RawInflate: '0'
+  LWP::MediaTypes: '6'
+  MIME::Base64: '2.1'
+  MIME::QuotedPrint: '0'
+  URI: '1.10'
+  perl: '5.008001'
+resources:
+  IRC: irc://irc.perl.org/#lwp
+  MailingList: mailto:libwww@perl.org
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=HTTP-Message
+  repository: https://github.com/libwww-perl/HTTP-Message.git
+version: '6.11'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.017'

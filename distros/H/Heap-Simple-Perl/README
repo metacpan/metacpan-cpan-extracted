@@ -1,0 +1,43 @@
+Heap::Simple::Perl
+==================
+
+DESCRIPTION
+
+This module provides a pure perl implementation of the interface described
+in L<Heap::Simple|Heap::Simple>. Look there for a description.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+To install this module into a specific directory, do:
+   perl Makefile.PL PREFIX=/name/of/the/directory
+   ...the rest is the same...
+
+Please also read the perlmodinstall man page, if available.
+
+DEPENDENCIES
+
+This module requires these other modules:
+
+  Heap::Simple		Switch module that selects a particular Heap::Simple
+                        implementation.
+  Test::More		Only in order to run the tests.
+
+AUTHOR
+
+Ton Hospel, E<lt>Heap-Simple@ton.iguana.beE<gt>
+
+Parts are based on code by Joseph N. Hall (http://www.perlfaq.com/faqs/id/196)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Ton Hospel
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

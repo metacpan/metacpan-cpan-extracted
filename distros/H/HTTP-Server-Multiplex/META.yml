@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:                HTTP-Server-Multiplex
+version:             0.11
+abstract:            Single process rich HTTP/1.1 daemon
+license:             perl
+author:              
+    - Mark Overmeer
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    File::Spec:                    3.12
+    IO::Multiplex:                 1.09
+    List::Util:                    1.18
+    Log::Report:                   0.18
+    LWP:                           5.806
+    LWP::MediaTypes:               1.33
+    Net::CIDR:                     0.11
+    Storable:                      2.15
+    Sys::Hostname:                 1.11
+    Test::More:                    0.47
+    Test::Pod:                     1.00
+    URI:                           1.35
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

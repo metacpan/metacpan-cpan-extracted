@@ -1,0 +1,53 @@
+========================================================================
+
+HTML::Defaultify 1.0.1  (released June 17, 2002)
+
+Copyright 1996, 1997, 2002, James Marshall (james@jmarshall.com)
+
+For the latest, see http://www.jmarshall.com/tools/defaultify/
+
+========================================================================
+
+This Perl module is used to populate HTML forms with default values.  Unlike
+other tools that fill a similar niche, this module can handle any existing
+HTML page; this approach allows a clean separation of HTML development from
+Perl program development.
+
+For more complete documentation, run "perldoc HTML::Defaultify", or to run
+perldoc on the Defaultify.pm file before installing it, run
+"perldoc -F Defaultify.pm".  If your perldoc fails and says it "cannot find
+blib", then run perldoc from a directory with no Makefile.PL-- it's an
+apparent bug in some perldoc's.
+
+
+COPYRIGHT
+
+This software is copyright (c) 1996, 1997, 2002, James Marshall.  All rights
+reserved.  This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+
+REQUIRES
+
+HTML::Defaultify prefers to use HTML::Entities.  If HTML::Entities is not
+available, HTML::Defaultify works without it but slightly less reliably when
+character entity references are used.  Install HTML::Entities if you can.
+
+
+INSTALLATION
+
+Like most Perl modules, HTML::Defaultify is installed by unpacking the
+distribution and running these commands:
+
+  perl Makefile.PL
+  make
+  make test       (optional)
+  make install    (normally must be done as root)
+
+That should be sufficient.  For documentation on usage, run
+"perldoc HTML::Defaultify".
+
+
+========================================================================
+http://www.jmarshall.com/tools/defaultify/
+

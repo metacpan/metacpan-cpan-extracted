@@ -1,0 +1,34 @@
+2010-01-26 14:33  cvs
+
+	* MANIFEST, Makefile.PL, bin/htmlclean, lib/HTML/Clean/Human.pm,
+	  lib/HTML/Clean/Human.pod: Cleaned up documentation, made mention
+	  of HTML::Tidy Moved doc to pod file.
+
+2008-11-14 12:11  cvs
+
+	* MANIFEST, Makefile.PL, bin/html2txt, lib/HTML/Clean/Human.pm,
+	  t/01.t: changed the script to be called htmlclean instead of
+	  html2txt which was misleading.  This still needs a lot of work.
+	  If I get requests I will add them.
+
+2008-05-22 14:39  cvs
+
+	* bin/html2txt, lib/HTML/Clean/Human.pm: added form stuff ripping
+
+2008-05-21 13:48  cvs
+
+	* bin/html2txt, lib/HTML/Clean/Human.pm: fixed table ripping to add
+	  tbody
+
+2008-05-19 16:17  cvs
+
+	* MANIFEST, Makefile.PL, bin/htmlcleanhuman,
+	  lib/HTML/Clean/Human.pm, t/00.t, t/0_in.html, t/1_in.html,
+	  t/2_in.html: Initial revision
+
+2008-05-19 16:17  cvs
+
+	* MANIFEST, Makefile.PL, bin/htmlcleanhuman,
+	  lib/HTML/Clean/Human.pm, t/00.t, t/0_in.html, t/1_in.html,
+	  t/2_in.html: init
+

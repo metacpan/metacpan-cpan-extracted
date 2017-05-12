@@ -1,0 +1,19 @@
+Revision history for Perl module HTML::Transmorgify
+
+0.12 2013/10/07
+
+ - Add github link to Build.PM
+ - Fix github link in docs
+
+0.11 2013/10/01
+
+ - bugfixes to support more modern perls
+ - replace CHANGELOG with Changes
+ - remove debug warnings
+
+0.05 2011/01/30
+ - bugfixes
+ - documentation fixes
+ - code comments
+ - added <capture> & <playback> to Metatags.pm
+ 

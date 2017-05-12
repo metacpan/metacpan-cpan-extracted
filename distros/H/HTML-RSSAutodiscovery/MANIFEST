@@ -1,0 +1,10 @@
+Changes
+lib/HTML/RSSAutodiscovery.pm
+Makefile.PL
+MANIFEST
+META.yml
+t/001-parse.t
+t/002-locate.t
+t/003-noparse.t
+t/004-embedded.t
+t/005-syndic8.t

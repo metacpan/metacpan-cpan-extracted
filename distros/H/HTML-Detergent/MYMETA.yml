@@ -1,0 +1,33 @@
+---
+abstract: 'Clean the gunk off an HTML document'
+author:
+  - 'Dorian Taylor, C<< <dorian at cpan.org> >>'
+  - 'Dorian Taylor <dorian@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06, CPAN::Meta::Converter version 2.120921'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-Detergent
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  HTML::HTML5::Parser: 0
+  Moose: 0
+  MooseX::Types: 0
+  XML::LibXML: 0
+  XML::LibXML::LazyBuilder: 0
+  XML::LibXSLT: 0
+  namespace::autoclean: 0
+  perl: 5.010
+resources:
+  license: http://apache.org/licenses/LICENSE-2.0
+version: 0.06

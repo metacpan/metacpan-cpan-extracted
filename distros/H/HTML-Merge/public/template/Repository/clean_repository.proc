@@ -1,0 +1,33 @@
+<$RDB='SYSTEM'>
+
+<$RQ='SELECT * FROM templates_t'>
+<$RLOOP>
+<$RPERL.B>
+unless( -r '<$RCFG.TEMPLATE_PATH>/<$RSQL.templatename>' )
+{
+	setvar('delete',1);
+}
+</$RPERL>
+<$RIF.' "<$RVAR.delete>" '>
+	<$RS='DELETE FROM templates_t WHERE id=<$RSQL.id>'>
+	<$RSQL.id> <$RSQL.templatename>
+</$RIF>
+<$RSET.delete=''>
+</$RLOOP>
+
+<$RQ="SELECT a.rid FROM repository_t a 
+      LEFT JOIN templates_t b ON b.id = a.template_id
+      WHERE b.id is null
+      AND a.template_id not in(0,'')">
+<$RLOOP>
+<$RSQL.rid>
+<$RS='DELETE FROM repository_t WHERE rid=<$RSQL.rid>'>
+<$RS='DELETE FROM repository_language_matrix WHERE repository_id=<$RSQL.rid>'>
+</$RLOOP>
+
+<$RQ="SELECT a.rid FROM repository_language_matrix a
+      LEFT JOIN repository_t b ON a.repository_id = b.rid
+      WHERE b.rid is null">
+<$RLOOP>
+<$RS='DELETE FROM repository_language_matrix WHERE rid=<$RSQL.rid>'>
+</$RLOOP>

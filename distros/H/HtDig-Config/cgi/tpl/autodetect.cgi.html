@@ -1,0 +1,28 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <%$style_sheet_link%>
+    <title>ConfigDig: An ht://Dig Admin Tool</title>
+  </head>
+
+  <body>
+    <h1 align=center>ConfigDig</h1>
+    <h2 align=center>Indexed Site Administration<BR>Configuration File Autodetection</h2>
+<center>
+<form action="autodetect.cgi" method="POST">
+<center><font color="#FF0000"><%$status_msg%></font></center>
+<table align=center border=1>
+<tr>
+	  <td colspan=2 align="center"><a href="index.cgi">Back to Main</a></td>
+</tr>
+<tr>
+	  <td colspan=2 align="center">Enter extra paths to search here:<BR><textarea name="search_paths" cols="40" rows="2"></textarea><BR>(Separate paths with spaces)</td>
+</tr>
+<tr>
+	  <td align="center" colspan="2"><input type="submit" value="Perform Autodetection" name="action"></td>
+</tr>
+</table>
+</form>
+</center>
+  </body>
+</html>

@@ -1,0 +1,17 @@
+# These files are in the repository but not in the CPAN distribution.
+^build\.pl$
+^get-tags\.pl$
+^mozilla\.txt$
+# The repository files.
+\.git
+# The build files.
+blib
+# Build files
+MYMETA\.
+^Makefile$
+# Template for POD doesn't need to go to CPAN
+^lib/HTML/Make\.pod\.tmpl$
+# Author tests don't need to go to CPAN.
+^xt/.*$
+# Example outputs shouldn't go to CPAN
+^examples/.*-out\.txt$

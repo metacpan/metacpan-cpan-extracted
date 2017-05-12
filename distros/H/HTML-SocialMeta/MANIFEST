@@ -1,0 +1,19 @@
+Changes
+lib/HTML/SocialMeta.pm
+lib/HTML/SocialMeta/Base.pm
+lib/HTML/SocialMeta/OpenGraph.pm
+lib/HTML/SocialMeta/Twitter.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
+README
+README.md
+t/00-load.t
+t/01-base.t
+t/02-twitter.t
+t/03-opengraph.t
+t/04-create.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

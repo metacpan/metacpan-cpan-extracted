@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/Heap/Simple.pm
+lib/Heap/Simple/Package.pm
+md5-versions
+t/Heap-Simple.t
+META.yml                                 Module meta-data (added by MakeMaker)

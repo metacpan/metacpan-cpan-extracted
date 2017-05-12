@@ -1,0 +1,23 @@
+---
+abstract: 'Avoid error when IO::Socket::INET6 is around'
+author:
+  - 'Steven Haryanto <stevenharyanto@gmail.com>'
+build_requires:
+  Module::Build: 0.3601
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300015, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTTP-Daemon-Patch-IPv6
+requires:
+  HTTP::Daemon: 6.01
+  Module::Patch: 0.12
+  perl: 5.010001
+resources:
+  homepage: http://search.cpan.org/dist/HTTP-Daemon-Patch-IPv6/
+  repository: http://github.com/sharyanto/perl-HTTP-Daemon-Patch-IPv6
+version: 0.06

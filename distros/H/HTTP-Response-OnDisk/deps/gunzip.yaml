@@ -1,0 +1,6 @@
+---
+name: 'Gunzip Support'
+default: 0
+depends:
+    'IO::Uncompress::Gunzip': 0
+

@@ -1,0 +1,335 @@
+BRICKS SITE BUILDER 
+Copyright (C) 2001, Peter McDermott
+For licensing information, see /bricks/LICENSE
+
+------------------------------------------------------------------------
+
+This manual is horribly incomplete.  
+
+If you would like to contribute to this manual (please! please!) e-mail 
+me at peter@pmcdermott.com.  And don't forget to update the CREDITS file
+if you make what you feel is a worthy contribution.
+
+------------------------------------------------------------------------
+
+
+TABLE OF CONTENTS
+
+1.  Introduction
+2.  How stable is Bricks Site Builder?
+3.  Downloading and Installing Bricks Site Builder
+4.  Using it
+4.1 Logging in 
+4.2 authorbar: open
+4.3 authorbar: mappings
+4.4 authorbar: edit/view mode
+
+X.  Todo list
+
+
+1. INTRODUCTION
+
+Bricks Site Builder, a DHTML layout tool running on Apache + mod_perl + Mason 
+(www.masonhq.com), enables rapid web-site design.  It provides a standardized 
+component architecture so that a user can easily add functionality (photo 
+albums, web logs, etc.) to their web site.  But it is not a content management 
+system, per se.  
+
+Components using this interface are called bricks, hence the name.  A central 
+part of Bricks Site Builder is an integrated layout tool that allows the site 
+administrator to add, move, delete, and copy bricks in a assemblies (pages).
+This layout tool consists of a tool-bar at the top of a web-page.  It's not 
+drag and drop; it's select and submit.
+
+An assembly by itself can be rendered as a web page, or it can be a 
+sub-assembly of another assembly.  Only the top-level assembly renders 
+page properties (title, body tag, etc), but those properties can be inherited 
+from children if the site designer so desires.
+
+The fundamental bricks are assembly, column, table, and text.  A page 
+contains a column.  A column may contain any number of bricks in sequential 
+order.  A table contains rows and columns of cells, which, in turn, contain 
+more columns.  The text brick is as simple as it gets -- it just outputs text. 
+
+For example, I've written a photo album brick that takes as input a title, 
+description, and a source directory (these values are input via a web form).  
+Then, depending on user input it will render a thumbnail page, a page of four 
+300x300 photos, a single 700x700 photo, or a full-size photo.  On each page 
+it allows easy navigation of the photos.  If files are added or removed from 
+the directory, it automatically updates its database.
+
+This brick can easily be inserted into an assembly by selecting "add photoalbum 
+to position n" where n is a page position (something like 5 for the fifth item 
+in a column, or 2.4.2 for cell at row 4, col 2, in the table that's the second 
+item in the page).
+
+In addition to providing a component architecture, Bricks parses and routes 
+incoming html arguments (both from HTTP POSTs and in the URI) to appropriate 
+bricks.  This way, a single page can contain two identical bricks and the 
+user's input to one brick will not be routed to the other.  You can have two 
+photo albums side-by-side on the same page without worrying about input to the 
+left album affecting the right one.
+
+Multiple assemblies can map to a given URI.  For examle, the first assembly 
+might be a header and footer, the second a right-hand menu, and the third a 
+page containing a web-log.  
+
+The site designer can attach an assembly to all requests for a folder (and 
+possibly its sub-folders), and a virtual filename or a perl regular expression.
+
+The primary benefit of Bricks Site Builder is not the rapid layout of web-pages 
+or a flexible mapping of URIs to assemblies.  Instead, it is the ability to 
+easily leverage the bricks other people have written to create a kick-ass, 
+data-driven web-site. 
+
+-Peter McDermott
+ March, 23  2001
+
+Bricks Site Builder is at http://bricks.sourceforge.net
+
+
+2. HOW STABLE IS BRICKS SITE BUILDER?
+
+Bricks Site Builder is >> ALPHA << software.  (Alpha is before beta.)
+
+There are there no guarantees that this software won't blow up your 
+computer, ruin your life, or even -- as improbable as it may seem -- rip 
+a hole in the very fabric of space and time that sucks you into an alternate
+dimension where no one ever heard of Open Source Software -- AND NEVER
+WILL! (The horror. The horror.)
+
+That being said, there are no reports of it causing any of the above
+catastrophes.
+
+So then why would you use it?
+
+Bricks Site Builder is Open Source Software.  It will only improve if 
+people like YOU download, test, offer feedback, bug fixes, and additions.  
+Thanks for coming this far.
+
+
+3. DOWNLOADING AND INSTALLING BRICKS SITE BUILDER
+
+
+3.1 OTHER THINGS YOU NEED
+
+Bricks Site Builder requires the following tools:
+
+  The Perl scripting language
+  The Apache web server
+  mod_perl
+  Mason
+
+These tools are all open source and free of charge.
+
+Perl is a powerful 'C'-like programming languge which lies at the heart
+of Bricks Site Builder. Perl ships with most unices; the most recent 
+version can be obtained from www.perl.com.  
+
+You should have a relatively recent version of Perl (I run 5.6.0).  To
+see which version of Perl you have installed, type 'perl --version' at
+a shell prompt.
+
+Additionally, you should make sure that you have the following Perl
+modules and libraries installed:
+
+  Apache::Session
+  DBI
+  Digest::MD5
+  HTML::Parser
+  HTML::Tagset
+  MD5
+  Mime::Base64
+  Storable
+  URI
+ 
+  libnet
+  libwww
+
+  (if you needed one that wasn't here, please write it up as a bug)
+
+These modules can be obtained from the Comprehensive Perl Archive Network,
+CPAN, at search.cpan.org.
+
+An easy way to see if you have a perl module installed is to type 
+'perldoc name-of-module' at a shell prompt (this won't work for lib* above).
+
+After you're sure you have Perl installed and running, you need to get perl
+integrated into the Apache Web Server.  This requires that you download
+the Apache sources as well as the Perl intergration module for Apache, known
+as mod_perl.  Apache and mod_perl can be obtained from www.apache.org
+and perl.apache.org.  You can also find pre-compiled versions of Apache
+with mod_perl if you search.
+
+Once you have Apache and mod_perl, follow the instructions to compile the
+two together.  It might take a few times to get the configuration right. 
+Don't forget to do a 'make test'.
+
+Mason is a Perl module that facilitates the authoring of HTML documents
+containing Perl code.  As such, Mason separates the tasks of web-programming
+and web-authoring, allowing both programmers and designers to do what they
+do best without getting in the way of each other.  Mason is available from
+www.masonhq.com.  
+
+Download Mason from www.masonhq.com and follow the installation instructions.
+
+You're almost done.  Take a break, because next we need to configure Apache
+and install Bricks Site Builder.
+
+Well rested?  OK.
+
+You need to install Bricks so that it intercepts (handles) accesses to 
+web-pages.  To do this, put the following section at the appropriate
+point in httpd.conf.
+
+<Location />
+  SetHandler perl-script         # This is an important line
+  PerlHandler HTML::Bricks       # This is also an important line
+</Location>
+
+It's also useful to modified the "DefaultType" parameter in httpd.conf to
+be text/html instead of text/plain.  If you get a page with lots of HTML
+tags in the text, then this is your problem. 
+
+If everything has worked you should get the "CONGRATULATIONS!" page
+when accessing /index.html on your web-site.
+
+X. USING BRICKS SITE BUILDER
+
+You can always login by accessing /bricks_login.html
+
+The best advice now is to login and then press the edit button.  Play
+around with creating and editing assemblies.  The next brick simply
+means "link to the next assembly."  The list of assemblies for a given
+URI can be controlled by /bricks_mappings.html.
+
+I usually have at least two assemblies for a given URI.  The first is
+header_and_footer.  It contains the "welcome" text at the top, a 
+menu at the right, and a copyright message at the bottom.  This 
+assembly is set to match every URI (set it to match '.*' Perl RegExp).
+
+The second assembly, photos, a photoalbumset, will match only 
+/photos.html.  
+
+When /photos.html is accessed, a list of matching assemblies is 
+returned.  The first is header_and_footer.  The second is photos. The
+two are linked together into one data structure in the Apache handler
+and then rendered.
+
+It's kinda cool, but might take some getting used to.  Or, even better,
+when you get used to it, rewrite this section of the manual and engrave
+your name in CREDITS!
+
+
+X. WRITING YOUR OWN BRICKS
+
+I apologize for not having this section written, as it's probably the
+most important section of the manual.  It's next on my list of things
+to do.
+
+X.1  'Whassap' brick
+
+X.2  A native Mason brick
+
+X.3  Global variables: rsession, ruser, rtop_ARGS
+
+X.3  A simple Bricks Site Builder Brick
+
+process and render
+
+X.X  Processing input, and the problem with arguments
+
+  The two primary methods of passing arguments between the client and
+server in HTTP are HTML input forms and arguments attached to request 
+URIs.
+
+Route tags
+
+X.X  Editing brick properties (render redirects)
+
+X.X  Session data
+
+X.X  User information
+
+X.X  Security
+
+X.X  'Unknown' bricks
+
+If you access an assembly that references a no longer existing brick,
+the brick will be displayed in the edit view as 'unknown.'  If the 
+brick later reappears, it will be properly rendered.  Unknown bricks
+can safely be moved, copied, saved, etc..
+
+
+X. BRICK REFERENCE
+
+X.X METHODS
+
+standard set:
+
+  new      - creates a new instance of a brick
+  delete   - deletes an instance of a brick
+  process  - process arguments 
+  render   - render the brick (write output)
+
+additional:
+
+  freeze   - freezes a bricks for persistent storage
+  thaw     - thaws a frozen brick
+
+additional methods for bricks that contain other bricks:
+
+  walk     - walk a list of bricks, executing a method at each brick
+  find     - find all bricks matching specific criteria
+
+additional methods for assemblies:
+
+  get_page_props  - get title, body, meta properties
+  save     - save a brick (and any sub-bricks)
+
+miscellaneous:
+
+  get_brick_names - get a list of names of this brick for the editor
+  set_modified - set the modified flag
+
+FAQ:
+
+WHY DO I HAVE TO CONSTANTLY HIT REFRESH?
+
+Probably your web-browser is caching pages.
+
+For Internet Explorer 5.5 users:
+
+  Select Internet Options from the 'Tools' menu.  Then go to the 'General' 
+  tab and under the 'Temporary Internet Files' section, press the 'Settings' 
+  button.  Under 'Internet Explorer checks for new versions of stored pages,'
+  select 'on every visit to the page.'
+
+For Opera 5 Users:
+ 
+  Select 'Preferences' from the 'File' menu.  Under 'Check Modified,' 
+  Select 'Always' for 'Documents,' 'Images,' and 'Other.'
+
+For Netscape Users:
+
+  Select 'Preferences' from the 'Edit' menu.  Click on the '+' next
+  to 'advanced' on the left-hand menu.  Select 'Cache' from the 
+  expanded selection.  Under 'Document in cache is compared to 
+  document on network,' select 'Every time.'
+  
+X. DEBUGGING NUANCES
+
+X.X  Line numbers, or the lack thereof
+
+This is part of Mason.  The easiest thing to do is edit the 'compiled'
+mason component.  It's located in something like 
+/usr/local/bin/mason/data/obj/[some_path/something].  The line number
+reported in your apache error log will be the line number in this file.
+
+X.X  Messy HTML output (too many carriage returns)
+
+This is a 'feature' of Mason.  Bricks Site Builder uses Mason in a way
+that was probably never intended or imagined.  So I don't complain to 
+the nice Mason people.  For now, you'll have to deal with the extra 
+carriage returns.
+

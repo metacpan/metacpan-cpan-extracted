@@ -1,0 +1,10 @@
+<: PERL :>
+	my $test_var = 25;
+<: /PERL :>
+
+<:-- PERL
+	$test_var += 1;
+	$test_var .= '0';
+:>
+
+<:-- $test_var --:>

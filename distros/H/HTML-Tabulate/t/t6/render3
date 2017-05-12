@@ -1,0 +1,4 @@
+<table>
+<tr><th>Prod ID</th><th>Prod Name</th><th>Prod Create Uid</th><th>Prod Create Ts</th></tr>
+<tr><td class="default">12345</td><td class="default">Foo</td><td class="create">3</td><td class="prod_create_ts">20031015114902</td></tr>
+</table>

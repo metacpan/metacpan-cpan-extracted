@@ -1,0 +1,11 @@
+Revision history for Perl extension HTML::TreeStructured.
+
+1.00  Wed Jun  9 15:56:19 2004
+	- HTML::TreeStructured for tree structured HTML using style sheets
+
+1.01  Fri Jun 25 17:18:23 2004
+	- Added interpreted property "weight" to control presentation order at sibling level
+	- 'tooltip' is another interpreted property for popup 
+	  (See HTML::Tooltip::Javascript for details)
+	- Fixed bugs related to quoting of strings
+

@@ -1,0 +1,17 @@
+# Disk DescriptorFile
+version=1
+CID=fffffffe
+parentCID=ffffffff
+createType="twoGbMaxExtentSparse"
+
+# Extent description
+RW 209715 SPARSE "winXPPro-s001.vmdk"
+
+# The Disk Data Base 
+#DDB
+
+ddb.virtualHWVersion = "3"
+ddb.geometry.cylinders = "208"
+ddb.geometry.heads = "16"
+ddb.geometry.sectors = "63"
+ddb.adapterType = "ide"

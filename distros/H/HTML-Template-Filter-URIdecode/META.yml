@@ -1,0 +1,18 @@
+---
+name: HTML-Template-Filter-URIdecode
+version: 1.00
+author: []
+abstract: Allow tmpl_ tags to be URL-encoded.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  URI::Escape: 0
+provides:
+  HTML::Template::Filter::URIdecode:
+    file: lib/HTML/Template/Filter/URIdecode.pm
+    version: 1.00
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,101 @@
+# Below is stub documentation for your module. You'd better edit it!
+
+=head1 NAME
+
+HTML::Pen::Iterator - Creating a calendar using a Pen Iterator
+
+=head1 SYNOPSIS
+
+    <: &do( 'festival.pl' )>
+    <: &iterator( *events, $festival )>
+    <: &iterator( *active, $$festival[1] )>
+    
+    <: &block( *HEADER, 'endblock' )>
+      <td class="calendarHeader">
+        <: &iteratorValue( *active, 'weekday' )>
+      </td>
+    endblock
+    
+    <: &block( *WEEK, 'endblock' )>
+    <tr>
+    <: &undef( $#$events = 6 )>
+    <: &iterate( *events, @DAY )>
+    </tr>
+    endblock
+    
+    <: &block( *DAY, 'endblock' )>
+    <td class="calendar">
+      <div class="calendar">
+        <div class="calendarDate">
+          <: &iteratorValue( *events, 'monthday' )>
+        </div>
+    <: &iterate( *events, @HOUR )>
+      </div>
+    </td>
+    endblock
+    
+    <: &block( *HOUR, 'endblock' )>
+    
+        <div class="calendarHour"><: &iteratorValue( *events, 'timedisplay' )></div>
+    <: &iterate( *events, @EVENT )>
+    endblock
+    
+    <: &block( *EVENT, 'endblock' )>
+        <div class="calendarEvent"><: &iteratorValue( *events,'event' )></div>
+    endblock
+    
+    <!--: &comment() content starts here -->
+    <table class="calendar" cellspacing="0">
+      <tr>
+        <td colspan="7" class="monthName">
+          <: &iteratorValue( *active, 'monthname' )>
+          <: &iteratorValue( *active, 'year' )>
+        </td>
+      </tr>
+      <tr>
+    <: &iterate( *active, @HEADER )>
+      </tr>
+    
+    <: &iterate( *events, @WEEK )>
+    </table>
+
+=head1 DESCRIPTION
+
+This code generates an HTML table representing an event calendar.
+
+Here's a quick walkthrough of the Pen code:
+
+C<$festival>, defined in C<festival.pl>, (see L<HTML::Pen::Iterator::Example>) 
+is a reference to a four dimensional array.  It's structure is defined as:
+
+    \@weeks -> \@days -> \@times -> \@events -> \%eventobjects
+
+C<$festival> data is represented by the iterator C<*events>, which contains
+five weeks.  The first complete week, C<< $festival->[1] >>, is represented
+by seven days in the C<*active> iterator.  This iterator is used to look up
+the I<monthname> and I<weekday> name properties.
+
+The I<@HEADER> block, which display the weekday nmes in the second row, 
+is not recursive.  The I<@WEEK> block, which displays the remaining five rows, 
+is recursive to four blocks deep.
+
+	@WEEK -> @DAY -> @HOUR -> @EVENT
+
+=head1 OUTPUT
+
+L<http://www.tqis.com/pen/misc/iterator.htm>
+
+=head1 AUTHOR
+
+Jim Schueler, E<lt>jim@tqis.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011 by Jim Schueler
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.9 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut

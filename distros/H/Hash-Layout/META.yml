@@ -1,0 +1,29 @@
+---
+abstract: 'hashes with predefined layouts, composite keys and default values'
+author:
+  - 'Henry Van Styn <vanstyn@cpan.org>'
+build_requires:
+  FindBin: 0
+  Test::Exception: 0
+  Test::More: 0
+  lib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.016, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Hash-Layout
+requires:
+  Clone: 0
+  Hash::Merge::Simple: 0
+  Moo: 0
+  Scalar::Util: 0
+  Types::Standard: 0
+  strict: 0
+  warnings: 0
+resources:
+  repository: https://github.com/vanstyn/Hash-Layout.git
+version: 1.02

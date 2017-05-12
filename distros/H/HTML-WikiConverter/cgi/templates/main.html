@@ -1,0 +1,135 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>html2wiki - Convert HTML text to wiki markup</title>
+  <style type="text/css">
+  <TMPL_INCLUDE name="stylesheet.css">
+  </style>
+</head>
+
+<body>
+<div id="wrapper">
+
+<h1>HTML-to-wiki converter</h1>
+
+<TMPL_IF name="error">
+<div id="error">
+  <p><TMPL_VAR name="error" escape="html"></p>
+</div>
+</TMPL_IF>
+
+<form method="post" action="index.cgi">
+<fieldset style="display:none">
+  <input type="hidden" name="m" value="convert" />
+</fieldset>
+
+<TMPL_IF name="wiki_markup">
+  <h2><TMPL_VAR name="dialect" escape="html"> markup</h2>
+  <p>
+  <textarea name="wiki" rows="10" cols="75"><TMPL_VAR name="wiki_markup" escape="html"></textarea>
+  <TMPL_IF name="sandbox_url">
+    <br/>
+    <small>Try this out in a <a href="<TMPL_VAR name='sandbox_url'
+    escape='html'>"><TMPL_VAR name="dialect"> sandbox</a> for
+    kicks.</small>
+  </TMPL_IF>
+  </p>
+</TMPL_IF>
+
+<TMPL_IF name="parsed_html">
+<TMPL_IF name="show_parsed_html">
+  <h2>Parsed HTML</h2>
+  <p><textarea rows="10" cols="75"><TMPL_VAR name="parsed_html" escape="html"></textarea></p>
+</TMPL_IF>
+</TMPL_IF>
+
+<h2>HTML source</h2>
+
+<table id="html_source">
+  <tr>
+    <td>
+      <input type="radio" name="source_type" id="raw_html"
+      value="raw_html" <TMPL_IF name="raw_html">checked="checked"</TMPL_IF>
+      />
+    </td>
+    <td><label for="raw_html">Raw HTML</label></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td>
+      <textarea name="html" rows="10" cols="10"><TMPL_IF name="raw_html"><TMPL_VAR name="html" escape="html"></TMPL_IF></textarea>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <input type="radio" name="source_type" id="from_uri"
+      value="from_uri" <TMPL_IF
+      name="from_uri">checked="checked"</TMPL_IF> />
+    </td>
+    <td><label for="from_uri">Fetch from URL</label></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td>
+      <input type="text" name="uri" value="<TMPL_VAR name='uri'>" size="30" />
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <input type="radio" name="source_type" id="sample_html"
+      value="sample_html" <TMPL_IF name="sample_html">checked="checked"</TMPL_IF>
+      />
+    </td>
+    <td><label for="sample_html">Use sample HTML</label></td>
+  </tr>
+</table>
+
+<h2>Options</h2>
+
+<table>
+  <tr>
+    <td><label for="dialect">Wiki dialect</label></td>
+    <td>
+      <select name="dialect" id="dialect">
+        <TMPL_LOOP name="dialects">
+          <option value="<TMPL_VAR name='dialect'>" <TMPL_IF
+          name="selected">selected="selected"</TMPL_IF>><TMPL_VAR
+          name="dialect"></option>
+        </TMPL_LOOP>
+      </select>
+    </td>
+  </tr>
+  <tr>
+    <td><label for="base_uri">Base URL</label></td>
+    <td><input type="text" name="base_uri" id="base_uri" value="<TMPL_VAR name='base_uri'>" size="30" /></td>
+  </tr>
+  <tr>
+    <td><label for="wiki_uri">Wiki URL</label></td>
+    <td><input type="text" name="wiki_uri" id="wiki_uri" value="<TMPL_VAR name='wiki_uri'>" size="30" /></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td>
+      <input type="checkbox" name="show_parsed_html" value="yes"
+      id="show_parsed_html" <TMPL_IF name="show_parsed_html">checked="checked"</TMPL_IF>
+      /><label for="show_parsed_html">Show parsed HTML</label>
+      <br/>
+      <input type="checkbox" name="escape_entities" value="yes"
+      id="escape_entities" <TMPL_IF name="escape_entities">checked="checked"</TMPL_IF>/><label for="escape_entities">Escape
+      HTML entities</label>
+    </td>
+  </tr>
+</table>
+
+<p>
+<input type="submit" value="Convert HTML to wiki markup" />
+</p>
+
+</form>
+
+</div>
+</body>
+
+</html>

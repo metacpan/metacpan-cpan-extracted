@@ -1,0 +1,35 @@
+Revision history for HSS Prefork
+
+6.00  Mon Oct 10 11:00:00 2016
+    - HTTPS bugfix by Luigi Iotti
+
+4.00  Fri Dec 14 14:08:00 2012
+    - Net::Server::* and HTTP::Server::Simple do not communicate 
+      the client IP address when SSL is in use. This version of
+      HSS-Prefork fixes this by patching HTTP::Server::Simple which
+      in turn patches Net::Server. And the IP (peername to be exact)
+      is now handed over via $main::_realpeername.
+      Aaaargh! (but it works...)
+
+3.20  Fri Aug 03 13:00:00 2012
+    - Remove debugging output
+
+3.10  Thu Aug 02 15:50:00 2012
+    - Bugfix for the Bugfix
+
+3.00  Thu Aug 02 15:30:00 2012
+	- Fix for current Socket modules (Socket.pm changed default exports and broke my
+IPv6 handling)
+
+2.00  Tue Jun 26 11:30:00 2012
+	- Adapted for Net::Server 2.0 (with full IPv6 support)
+
+1.2  Tue Apr 17 12:00:00 2012
+	- Better handling of Chrome futility connections
+
+1.1  Mon Oct 18 10:00:00 2011
+	- Fixed some bugs
+
+1.00  Mon Oct 17 12:00:00 2011
+	- Initial version of HTTP::Server::Simple::PreFork
+

@@ -1,0 +1,117 @@
+<webmake>
+
+<content name="story_1.txt" format="text/et">
+<wmmeta name="Title" value="Story 1, blah blah" />
+<wmmeta name="Score" value="20" />
+<wmmeta name="Abstract"> Story 1, just another story.  </wmmeta>
+<wmmeta name="Section" value="Business" />
+<wmmeta name="Up" value="mymap" />
+This is story 1.
+</content>
+
+<content name="story_2.txt" format="text/et">
+<wmmeta name="Title" value="Story 2, blah blah" />
+<wmmeta name="Score" value="20" />
+<wmmeta name="Abstract"> Story 2, just another story.  </wmmeta>
+<wmmeta name="Section" value="Technology" />
+<wmmeta name="Up" value="story_1.txt" />
+This is story 2.
+</content>
+
+<content name="story_3.txt" format="text/et">
+<wmmeta name="Title" value="Hot! story 3, etc etc." />
+<wmmeta name="Score" value="10" />
+<wmmeta name="Abstract"> Story 3, the highest-scored story.  </wmmeta>
+<wmmeta name="Section" value="Technology" />
+<wmmeta name="Up" value="story_2.txt" />
+Breaking news! this is story 3.
+</content>
+
+<content name="story_4.txt" format="text/et">
+<wmmeta name="Title" value="Story 4, zzzzzzz" />
+<wmmeta name="Score" value="999" />
+<wmmeta name="Abstract"> Story 4, incredibly boring.  </wmmeta>
+<wmmeta name="Section" value="Business" />
+<wmmeta name="Up" value="story_2.txt" />
+This is story 4. It's astoundingly boring, which is why it's down here.
+</content>
+
+<content name="story_5.txt" format="text/et">
+<wmmeta name="Title" value="Story 5, zzz blah blah" />
+<wmmeta name="Score" value="21" />
+<wmmeta name="Abstract"> Story 5, nothing much here.  </wmmeta>
+<wmmeta name="Section" value="World" />
+<wmmeta name="Up" value="story_3.txt" />
+This is story 5.
+</content>
+
+<content name="story_6.txt" format="text/et">
+<wmmeta name="Title" value="Story 6, blah blah" />
+<wmmeta name="Score" value="20" />
+<wmmeta name="Abstract"> Story 6, just another story.  </wmmeta>
+<wmmeta name="Section" value="World" />
+<wmmeta name="Up" value="story_5.txt" />
+This is story 6.
+</content>
+
+
+<{perlpostdecl
+        # create a ${all_stories} variable containing the list
+        # of all text files just loaded.
+        $_ = '';
+        foreach my $pg (sorted_content_matching ("score title", "*.txt"))
+	{ $pg =~ s/\.txt$//; $_ .= "$pg "; }
+        set_content ("all_stories", $_);
+        '';
+}>
+
+<{!-- ------------------------------------------------------------------- --}>
+
+<template name=header>
+  <html><head> <title>$[this.title]</title> </head>
+  <body bgcolor=#ffffff> <h1>WebMake Breadcrumbs Test</h1> <hr />
+  $[crumbs] &nbsp; -- &nbsp; <a href=$(idx)>Map</a> <hr />
+</template>
+
+<template name=footer> </body> </html> </template>
+
+<{!-- ------------------------------------------------------------------- --}>
+
+<for name=pg values="${all_stories}">
+  <out name="${pg}" file="log/breadcrumbs2_${pg}.html">
+    ${header}${${pg}.txt}${footer}
+  </out>
+</for>
+
+<{!-- ------------------------------------------------------------------- --}>
+
+<template name=sitemapnode>
+  <li> <a href=$(url)>${title}</a>: $[${name}.abstract]<br>
+  <ul> ${list} </ul> </li>
+</template>
+
+<template name=sitemapleaf>
+  <li> <a href=$(url)>${title}</a>: $[${name}.abstract]<br> </li>
+</template>
+
+<out name=idx file=log/breadcrumbs2.html>
+  ${header}${mymap}${footer}
+</out>
+
+<{!-- tricky -- the sitemap uses *itself* as the rootname. --}>
+<sitemap name=mymap node=sitemapnode leaf=sitemapleaf rootname=mymap>
+<wmmeta name=title value="site map" />
+<wmmeta name=Abstract value="Map of the site" />
+</sitemap>
+
+<{!-- ------------------------------------------------------------------- --}>
+
+<template name=btop>[ <a href=${url}>$[${name}.title]</a> /</template>
+<template name=blevel><a href=${url}>$[${name}.title]</a> /</template>
+<template name=btail><a href=${url}>$[${name}.title]</a> ]</template>
+<breadcrumbs map=mymap name=crumbs top=btop tail=btail level=blevel />
+
+<{!-- ------------------------------------------------------------------- --}>
+
+</webmake>
+

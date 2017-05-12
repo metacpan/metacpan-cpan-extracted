@@ -1,0 +1,117 @@
+Revision history for HTML-Restrict
+
+2.2.4     2017-03-01 14:22:13-05:00 America/Toronto
+        - Updates SEE ALSO pod section (Ben Bullock)
+
+2.2.3     2016-07-26 18:00:55-04:00 America/Toronto
+        - Now with fewer non-core prerequisites (Karen Etheridge)
+
+2.2.2     2014-10-16 22:16:29-04:00 America/Toronto
+        - Fixes attribute value encoding. (Graham Knop)
+
+2.2.1     2014-08-18 17:22:05EDT-0400 America/Toronto
+        - Replace MooX::Types::MooseLike with Type::Tiny. (Samuel Kaufman)
+
+2.2.0   2014-08-15 23:01:22EDT-0400 America/Toronto
+        - Fix Changes file
+        - Bump to next minor version rather than changing the format of the
+          version numbers
+
+2.1.9   2013-12-10
+        - Swaps namespace::clean for namespace::autoclean. (Fitz Elliott)
+
+2.1.8   2013-06-06
+        - Unlike 2.1.7, This release doesn't contain a local::lib.
+
+2.1.7   2013-06-05
+        - Removes Perl6::Junction in order to squash smartmatch warnings.
+
+2.1.6   2013-05-06
+        - Fixes incorrect use of Moo's weak_ref. (Thanks to Carwyn Ellis,
+          Dagfinn Ilmari Mannsåker and Graham Knop for help with this.)
+
+2.1.5   2013-05-01
+        - Eliminates a circular reference. (Graham TerMarsch)
+
+2.1.4   2013-04-19
+        - Minor version should have been bumped in previous release. To bump it
+          now would be confusing.
+        - Require Moo 1.001000 as 1.000008 breaks this module.
+
+2.1.3   2013-04-18
+        - Add replace_img feature (David Golden).
+        - Add 'cite' to list of attributes for URI scheme checks (David
+          Golden).
+
+2.1.2   2013-03-20
+        - Fixes broken Pod in example script.
+        - Adds x_contributors to META.json.
+
+2.1.1   2013-03-08
+        - Updates Pod.
+
+2.1.0   2013-03-02
+        - Allows attributes to be validated against regexes (perlpong).
+
+2.0.0   2013-02-27
+        - Bumps version to 2.0.0 due to new features breaking backwards
+          compatibility.
+        - Forces all tag rules to be provided in lower case.  Breaks
+          backcompat, but mixed or upper case rules would have been silently
+          ignored.  So, this is really a bug fix.
+        - Strips content between script tags by default. Breaks backcompat,
+          but the default behaviour was likely not what anyone wanted.
+        - Strips content between style tags by default.  Breaks backcompat,
+          but the default behaviour was likely not what anyone wanted.
+        - Adds Pod for previously undocumented allow_comments,
+          allow_declaration and strip_enclosed_content.
+        - Ensures stripper stack is always reset (perlpong).
+        - Protects against undef string comparison (perlpong).
+        - Checks URI scheme for src attributes (perlpong).
+        - Removes accessor/mutator documentation.  Would prefer if all params
+          were set at object instatiation.
+        - Adds ridiculously basic example script.
+
+
+1.0.4   2012-05-22
+        - Explicity require MooX::Types::MooseLike rather than
+          MooX::Types::MooseLike::Base (Matt Phillips/Github #2)
+
+1.0.3   2012-03-27
+        - Replaces Moose with Moo for speed in non-persistent apps (Arthur Axel
+          'fREW' Schmidt)
+        - Adds uri scheme checking for href and src attributes
+        - Adds (undocumented) allow_comments() and allow_declartion() methods
+
+1.0.2   2011-10-11
+        - No longer emit warnings when pure HTML is supplied for processing
+            Rick Moore (RT #71553)
+
+1.0.1   2011-06-30
+        - Pod updates
+
+1.0.0   2011-06-30
+        - Bumped version to 1.0.0 This is no longer beta software.
+
+0.06    2010-03-22
+        - Fixed RT #55775 "Strings equating to boolean false returned as undef"
+            (Duncan Forsyth)
+
+0.05    2010-02-03
+        - process( undef ) returns without attempting to do anything.  Avoids
+            warnings about uninitialized vars.
+
+0.04    2009-11-19
+        - MooseX::Params::Validate 0.12 now required.  Some earlier versions do
+            not include pos_validated_list()
+
+0.03    2009-11-17
+        - process() no longer dies when passed an undef -- patch provided by
+            Mark Jubenville (ioncache)
+
+0.02    2009-09-17
+        - Improved documentation layout and clarity
+            Removed documentation for parser() method -- seems like a bad idea
+
+0.01    2009-09-17
+        - Beta release

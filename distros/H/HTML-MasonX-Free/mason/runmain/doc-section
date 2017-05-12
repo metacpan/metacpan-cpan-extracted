@@ -1,0 +1,4 @@
+<%doc>
+This is docs.
+</%doc>
+<%method main>This is the main method.</%method>

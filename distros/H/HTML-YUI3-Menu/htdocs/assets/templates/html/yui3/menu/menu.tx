@@ -1,0 +1,7 @@
+<div id="<: $id :>" class="yui3-menu<: $horizontal :><: $menu_buttons :>">
+	<div class="yui3-menu-content">
+		<ul>
+<: $entries :>
+		</ul>
+	</div>
+</div>

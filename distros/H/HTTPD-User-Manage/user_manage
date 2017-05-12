@@ -1,0 +1,1054 @@
+#!/usr/bin/perl -w
+
+use HTTPD::Realm 1.5
+$VERSION = 1.66;
+
+# Modified by Chris Davies <chris.davies@bcs.org.uk>, 1998-10-29, to
+# permit textarea boxes as well as simple text boxes. The fields tag
+# becomes 'm' followed by width "." height (eg m40.5).
+#
+##############################################################
+# User interface:
+# Called with the name of an existing (normal) user, allows
+# the user to set his password.
+# The user must already be authenticated and in the password file
+# in order for this to work.
+#
+# When called with the ID of a user in the special "administrators"
+# group, presents an interface which allows adding, deleting, and
+# modifying passwords of other users, as well as adding users to
+# particular groups.
+#
+# See user_manage.html for detailed documentation.
+#
+# Copyright 1997, Lincoln D. Stein.  All rights reserved.
+# See the accompanying HTML file for usage and distribution
+# information.  The master version can be found at:
+# http://www.genome.wi.mit.edu/~lstein/user_manage/
+##############################################################
+
+
+# >>>>>>>>>>>>>>>>>> SITE-SPECIFIC GLOBALS <<<<<<<<<<<<<<<<<
+# >>>>>>>> THESE MUST BE MODIFIED TO SUIT YOUR SITE <<<<<<<<
+
+# Path to our configuration file.  Change as appropriate for
+# your site.
+$CONFIG_FILE = './t/realms.conf';
+
+# Set this to the name of your server.  Only 'apache' is guaranteed
+# to work. 'ncsa' and 'netscape' might work too -- you'll have to try.
+$SERVER = 'apache';
+
+# Name of the administrators' group.  When members of this group
+# call up this script, they will be able to create and edit other
+# users.  Set to an empty string to disable this feature.
+$ADMIN_GROUP = 'administrators';
+
+# Set this to "1" to protect administrators from one another. 
+# Only they themselves may change their own password. Membership in the 
+# administrators' group has to be granted or revoked by the webmaster using 
+# command line tools, not by some other administrator via the web interface. 
+# This variable does not have any effect unless $ADMIN_GROUP is set.
+$PROTECT_ADMINS = 1;
+
+# Set this to the default group for new users, or an empty string
+# if you don't want there to be any.
+$DEFAULT_GROUP = 'users';
+
+# Set this to "1" to require the script to be under
+# server access control.
+$REQUIRE_ACCESS_CONTROL = 0;
+
+# Set this to "1" to require the script to perform its own
+# access control, regardless of whether it is under server
+# access control.
+$USE_OWN_ACCESS_CONTROL = 0;
+
+# By default, the password and group files are set to be world-readable,
+# owner writable (-rw-r--r--).  You may wish to change this to group-writable
+# if you wish to make this script set-gid.
+# e.g. $CREATE_MODE = 0664;
+$CREATE_MODE = 0644;		# -rw-r--r-- 
+
+# If you are using this script from the command line, you
+# may need to change $STTY to point to the position of the 
+# 'stty' program on your system (it's used to turn off line echo
+# when entering passwords.)
+$STTY = '/bin/stty';
+
+# Log file where all changes are recorded
+# If false, no audit log is kept
+#$AUDITLOG = './t/var/account.log';
+$AUDITLOG = '';
+
+###########################################################################
+# ------------------- NO USER SERVICEABLE PARTS BELOW ---------------------
+$ENV{PATH} = '/bin:/usr/bin';
+$ENV{IFS} = '';
+$MAX_SCROLL = 8;
+
+BEGIN {
+    if ($ENV{REQUEST_METHOD}) {
+	require CGI;
+	CGI->import(qw(:standard :html3 font));
+	require CGI::Carp;
+	CGI::Carp->import('fatalsToBrowser');
+    }
+}
+
+$REALMS = new HTTPD::Realm(-config_file=>$CONFIG_FILE,-mode=>$CREATE_MODE,-server=>$SERVER);
+die "Couldn't read configuration file" unless $REALMS;
+
+$DEFAULT_REALM = $REALMS->realm(); # calling realm() without arguments returns default
+
+if (!$ENV{REQUEST_METHOD}) {
+    &dbm_manage;
+    exit 0;
+}
+
+import_names('Q');
+$Q::realm = $DEFAULT_REALM->name() unless $Q::realm;
+$referer = '' || $Q::referer || referer();
+$url = '' || url();
+
+# print the HTTP header.
+print header(),
+    start_html('Change Password');
+
+if (defined($Q::action) && $Q::action eq 'about') {
+    about();
+    exit 0;
+}
+
+# Unless the user has authenticated himself, object.
+$user = remote_user();
+
+if ($REQUIRE_ACCESS_CONTROL and !$user) {
+    error_msg('No Authorization',
+	      'This script can only be accessed by users who have authenticated themselves.  ',
+	      'Please place this script under authentication restrictions (both GET and POST) and try again.');
+    exit 0;
+}
+
+undef($user) if $USE_OWN_ACCESS_CONTROL;
+
+# Check the configuration and object if not defined.
+unless ($REALMS->exists($Q::realm)) {
+    error_msg('Invalid Realm',
+	      "The provided password/group configuration, <strong>",escapeHTML($Q::realm),"</strong>, is undefined.  ",
+	      'Please define the configuration and try again.');
+    exit 0;
+}
+
+# Attempt to open the database.
+unless ( $db = $REALMS->dbm(-realm=>$Q::realm) ) {
+    error_msg('Invalid File',
+	      "Realm ",strong(escapeHTML($Q::realm))," could not be opened: ",
+	      em( HTTPD::RealmManager->error() ) );
+    exit 0;
+}
+
+# If no user is defined by access control, then prompt for it.
+$user = get_user_from_params($db) unless $user;
+unless ($user) {
+    &print_tail;
+    exit 0;
+}
+
+# Make sure that the user is in the database.
+unless ($db->passwd($user)) {
+    error_msg('Invalid User',
+	      "The user named \"",escapeHTML($user),"\" is not found within the $Q::realm password file. ",
+	      "Permission denied.");
+    exit 0;
+}
+
+# See if this user is in the magic group.
+if ($ADMIN_GROUP && $db->match_group(-user => $user,
+				     -group => $ADMIN_GROUP)) {
+    do_administration($db,$user);
+    exit 0;
+}
+
+# At this point everything seems to be copascetic, so we can present the
+# password changing screen.
+
+if (defined($Q::password1) && defined($Q::password2) && 
+    $Q::password1 && $Q::password2) {
+    &change_password ($db,$user,$Q::password1,$Q::password2);
+} else {
+    &print_password_prompt;
+}
+
+&print_tail;
+
+sub print_password_prompt {
+    print h1("Change password for $user"),
+	'Type your new password into both text fields and press "Change"',
+	p(),
+	start_form(),
+        table(
+	      TR(
+		 th("New Password"),
+		 td(password_field('password1'))
+		 ),
+	      TR(
+		 th("Type it again"),
+		 td(password_field('password2')),
+		 td(submit(-name=>'action',-value=>'Change'))
+		 )
+	      );
+    print hidden(-name=>'referer',-value=>$referer) if $referer;
+    print hidden(-name=>'realm',-value=>defined($Q::realm) ? $Q::realm : 'default');
+    print hidden(-name=>'user',-default=>$user);
+    print hidden(-name=>'passwd',-default=>'');
+    print end_form();
+}
+
+sub change_password {
+  my ($db,$user,$password1,$password2) = @_;
+
+  unless ($password1 eq $password2) {
+    error_msg('Password Mismatch',
+	      "The two passwords don't match. ",
+	      "Please retype them.");
+    print hr();
+    return;
+  }
+
+  # If we get here then it's OK to change the password.
+  if ($db->set_passwd(-user=>$user,-passwd=>$password1)) {
+    &audit_trail( "web $user: changed own password" );
+    print h2('Password changed'),
+      "Password for ",escapeHTML($user)," has been changed.",
+	hr();
+  } else {
+    print h2('Error changing password'),
+      "An error occurred while changing your password. ",
+	"Please try again.",
+	  hr();
+    warn HTTPD::RealmManager::error();
+  }
+}
+
+sub print_tail {
+    my $url = url();
+    print a({href=>$referer},"Exit the password changing pages")
+	if $referer;
+    print hr(),
+	a({href=>"$url?action=about"},"About this script"),
+	end_html();
+}
+
+sub get_user_from_params {
+    my $db = shift;
+    my $user = $Q::admin || $Q::user;
+    my $passwd = $Q::passwd;
+    if ($user && $passwd) {
+	return $user if
+	    $db->match_passwd(-user=>$user,-passwd=>$passwd);
+	error_msg('Authentication Error',
+		  'The user name and/or password you entered was incorrect.  ',
+		  'Please try again.');
+	print hr();
+    }
+
+    print h1('Enter Current Password'),
+        'Enter your current user name and password, then press ',em("Submit"),
+	start_form(),
+	table(
+	     TR(
+		th('Name'),
+		td(textfield(-name=>'user',
+			     -default=>user_name()))
+		),
+	     TR(
+		th('Password'),
+		td(password_field(-name=>'passwd')),
+		td(submit(-name=>'action',-value=>'Submit'))
+		)
+	     );
+    print hidden(-name=>'referer',-value=>$referer) if $referer;
+    print hidden(-name=>'realm',-value=>defined($Q::realm) ? $Q::realm : 'default');
+    print end_form();
+
+    return undef;
+}
+
+sub about {
+    $url=~s/action=about//;
+    print h1('About change_passwd'),
+    "This script was written by ",a({href=>'http://stein.cshl.org/~lstein/'},"Lincoln D. Stein"),'. ',
+    "You are free to modify and redistribute it, so long as this notice remains intact. ",
+    "&#169 Copyright 1997-2005, Lincoln D. Stein.  All rights reserved.",
+    hr(),
+    a({href=>$url},"Change password page.");
+}
+
+sub error_msg {
+    my ($head,@rest) = @_;
+    print h1(font({color=>'#FF0000'},$head)),@rest;
+}
+
+# --------------- Administration screens are defined here --------------
+sub do_administration {
+    my ($db, $admin) = @_;
+    $_ = '';
+    $_ = $Q::action if defined($Q::action);
+    
+    # Because of the funny way that fields are set up, we take the
+    # last member of the @user array if it is non-null.  Otherwise,
+    # the first.
+    my $user = $Q::user[$#Q::user] || $Q::user;
+
+    # do different things depending on the value of the
+    # "action" variable.
+  SWITCH:
+    {
+	/edit\/add/i    and $db->passwd($user) && generate_user_list($db),
+	                    generate_user_page($db,$user),
+	                    last SWITCH;
+
+	/delete/i       and delete_user($db,$admin,$user),
+	                    generate_user_list($db),
+	                    last SWITCH;
+
+	/set values/i   and set_user($db,$admin,$user,$Q::password1,$Q::password2,@Q::groups)
+	                    &&
+	                    generate_user_list($db,$user),
+	                    generate_user_page($db,$user),
+                            last SWITCH;
+
+	# default
+	generate_user_list($db);
+    }
+    &print_tail;
+}
+
+sub delete_user {
+    my ($db,$admin,$user) = @_;
+    if ($db->delete_user($user)) {
+    &audit_trail( "web $admin: deleted user '$user'" );
+	print h1('User Deleted'),
+          "The entry for user ",em($user)," was successfully deleted.",
+          hr();
+	return 1;
+    } else {
+	error_msg('Error Deleting User',
+		  "An error occurred while deleting user $user: ",
+		  em(HTTPD::RealmManager->error(),"."),
+		  " Please fix the error and try again. ");
+	print hr();
+	return undef;
+    }
+}
+
+sub set_user {
+    my($db,$admin,$user,$password1,$password2,@groups) = @_;
+
+    # The two passwords have to match.
+    unless ($password1 eq $password2) {
+	error_msg('Password Mismatch',
+		  "The two typed passwords don't match. ",
+		  'Please try again.'),
+	print hr();
+	return undef;
+    }
+
+    # The two passwords have to be non-null.
+    unless ($password1) {
+	error_msg('Invalid Password',
+		  'The password has to be non-empty. ',
+		  'Please type and confirm the new password.');
+	print hr();
+	return undef;
+    }
+
+    # If the passwords are different from the current entry for the user, then
+    # we need to set it.
+    my $current = $db->passwd($user);
+    if ( !$current or ( ($current ne $password1) and !$db->match_passwd(-name=>$user,-passwd=>$password1)) ) {
+	if ($PROTECT_ADMINS && $user ne $admin 
+		&& $db->match_group($user, $ADMIN_GROUP)) {
+	    error_msg('Error Changing User',
+		'User ', em($user), ' is member of group ', 
+		em($ADMIN_GROUP), ', only he/she may change the password.');
+	    print hr();
+	    return;
+	}
+	my $success = $db->set_passwd(-user=>$user,-passwd=>$password1);
+	unless ($success) {
+	    error_msg('Error Setting Password',
+		      "An error occurred while setting the password: ",
+		      em(HTTPD::RealmManager->error(),"."),
+		      " Please fix the error and try again. ");
+	    print hr();
+	    return undef;
+	}
+    &audit_trail("web $admin: changed password for user '$user'");
+    }
+
+    # If the groups are different from the current entry, then we
+    # need to set it.
+    my @current_groups = $db->group($user);
+    @groups = sort grep($_,@groups);	# get rid of nonnull entries and sort
+    if ("@current_groups" ne "@groups") {
+	if ($PROTECT_ADMINS && (grep /$ADMIN_GROUP/,@groups 
+		xor grep /$ADMIN_GROUP/,@current_groups)) {
+	    error_msg('Error Changing User',
+		'Membership of user ', em($user), ' in group ', 
+		em($ADMIN_GROUP), ' may not be changed.');
+	    print hr();
+	    return;
+	}
+	my $success = $db->set_group(-user=>$user,'-group'=>\@groups);
+	unless ($success) {
+	    error_msg('Error Setting Groups',
+		      "An error occurred while setting the groups: ",
+		      em(HTTPD::RealmManager->error(),"."),
+		      " Please fix the error and try again.");
+	    print hr();
+	    return undef;
+	}
+    &audit_trail("web $admin: changed groups for user '$user' to '".join(",",@groups)."'");
+    }
+
+    # If the info is different from the current entry, then we need
+    # to set that too.
+    if (my %fields = $db->fields) {
+	my $update = 0;
+    my @audit_info;
+	my $info = $db->get_fields(-name=>$user,-fields=>[keys %fields]);
+	foreach (keys %fields) {
+	    my $new = param("F_$_");
+	    undef $new if $fields{$_}=~/^i/ && $new!~/^-?\d+$/;
+	    undef $new if $fields{$_}=~/^f/ && $new!~/^-?[\dEe.]+$/;
+	    $update++ if defined($new)  && $new ne $info->{$_};
+	    $info->{$_} = $new;
+        push( @audit_info, "$_=$new");
+	}
+    if (   $update
+        && $db->set_passwd(-user=>$user,-fields=>$info) ) {
+
+    &audit_trail("web $admin: changed info for user '$user' to '".join(",",@audit_info)."'");
+	}
+    }
+
+    # If we get here, then all is well.
+    print h1('Edit successful'),
+          "The entry for user ",em(escapeHTML($user))," was successfully updated.",
+          hr();
+
+    1;
+}
+
+sub generate_user_list {
+    my $db = shift;
+    my $user = shift;
+    print h1("User List for Realm",em(escapeHTML($Q::realm)));
+    my @users = sort $db->users();
+    print start_form(),
+          hidden(-name=>'referer',-value=>$referer),
+          hidden(-name=>'realm',-value=>$Q::realm),
+          $REQUIRE_ACCESS_CONTROL ? '' : 
+	      ( hidden(-name=>'admin',-value=>$Q::user),
+	        hidden(-name=>'passwd',-value=>'')
+	       ),
+          table(
+		TR(
+		   th({valign=>'TOP',align=>'RIGHT'},"Existing Users"),
+		   td({valign=>'TOP',align=>'LEFT',rowspan=>2},
+		      @users > $MAX_SCROLL ? scrolling_list(-name=>'user','-values'=>\@users,-size=>$MAX_SCROLL,
+							    -default=>$Q::user[$#user]||$Q::user,
+							    -override=>1)
+		                  : popup_menu(-name=>'user','-values'=>\@users,
+					       -default=>$Q::user[$#user]||$Q::user,
+					       -override=>1)
+		      ),
+		   th({valign=>'MIDDLE',align=>'RIGHT'},"New User"),
+		   td({valign=>'MIDDLE',align=>'LEFT'},textfield(-name=>'user',-default=>'',-override=>1,-width=>16),
+		      )
+		   ),
+		TR(
+		   th(''),
+		   td(''),
+		   td(submit(-name=>'action',-value=>'Delete'),
+		      submit(-name=>'action',-value=>'Edit/Add'))
+		   )
+		),
+	  
+          end_form(),
+	  hr();
+}
+
+sub generate_user_page {
+    my $db = shift;
+    my $user = shift;
+    my $current_passwd = $db->passwd($user);
+    my @groups = $db->group($user);
+    my @all_groups = sort $db->groups();
+    @groups = ($DEFAULT_GROUP) if !@groups && $DEFAULT_GROUP;
+    @all_groups = ($DEFAULT_GROUP) if !@all_groups && $DEFAULT_GROUP;
+
+    my $u = escapeHTML($user);
+    print h1($current_passwd ? "Edit User \"$u\"" : "New User \"$u\"");
+
+    # Other fields [Turned from horizontal to vertical listing, CJD]
+    if (my %fields = $db->fields) {
+	my (@rows,@cells);
+	my $info = $db->get_fields(-name=>$user,-fields=>[keys %fields]);
+	##CJD push(@rows,th({align=>LEFT},[keys %fields]));
+	foreach (keys %fields) {
+	    @cells = (b($_));	##CJD
+	    my ($length,$height,$default);
+	    if ($fields{$_}=~/^[msif]?(\d+)/i) {
+		$length = $1;
+	    } else {
+		$length = $fields{$_}=~/^[fi]$/ ? 6 : 20;
+	    }
+	    if ($fields{$_}=~/\[(.*)\]$/) {
+		$default = $1;
+	    } else {
+		$default = ($fields{$_} =~ /^[fi]$/i) ? 0 : '';
+	    }
+	    my $ref_info = ref($info) ? $info->{$_} : $default;
+	    if ($fields{$_}=~/^c\[([^,]*(,[^,]*)*)\]$/) {
+		# Selection field
+		my @elements = split(/,/, $1);
+		my $def = ref($info) ? $info->{$_} : $elements[0];
+		push(@cells,popup_menu(-name=>"F_$_",-values=>\@elements,-default=>$def));
+	    }
+	    elsif ($fields{$_}=~/^m\d*\.(\d+)/) {
+		$height = $1;
+		# Multi-line textbox [CJD]
+		push(@cells,textarea(-name=>"F_$_",-columns=>$length,-rows=>$height,-value=>$ref_info,-default=>$ref_info));
+	    }
+	    else {
+		# Textbox
+		push(@cells,textfield(-name=>"F_$_",-size=>$length,-value=>$ref_info,-default=>$ref_info));
+	    }
+	    push(@rows,td(\@cells));	##CJD
+	}
+	##CJD push(@rows,td(\@cells));
+	$other_fields = strong('Other Information:') . table(TR(\@rows));
+    }
+
+    # sometimes the groups have to be unique, making this code even more complicated!
+    my ($group_stuff,$data); 
+    if (($data = $db->realm->SQLdata) && ($data->{usertable} eq $data->{grouptable})) {
+	$group_stuff = td(popup_menu(-name=>'groups','-values'=>\@all_groups,-default=>$groups[0]));
+    } else {
+	$group_stuff =(@all_groups <= $MAX_SCROLL) ? td(checkbox_group(-name=>'groups','-values'=>\@all_groups,
+										   -defaults=>\@groups,-linebreak=>1))
+		                                   : td(scrolling_list(-name=>'groups','-values'=>\@all_groups,
+								       -size=>$MAX_SCROLL,
+								       -defaults=>\@groups,-multiple=>1)),	
+    }
+
+    print start_form(),
+          hidden(-name=>'referer',-value=>$referer),
+          hidden(-name=>'realm',-value=>$Q::realm),
+          hidden(-name=>'user',-value=>$user),
+          $REQUIRE_ACCESS_CONTROL ? '' : 
+	    ( hidden(-name=>'admin',-value=>$Q::user),
+	      hidden(-name=>'passwd',-value=>'')
+	     ), 
+	  table({-width=>'100%',-border=>''},
+		   TR(th(['Set Groups','Set Password'])),
+		   TR({-valign=>TOP},
+		      td(
+			 table({-width=>'100%'},
+			       TR({-valign=>TOP},
+				  $group_stuff,
+				  th('Other:'),
+				  td(textfield(-name=>'groups',
+					       -default=>'',
+					       -override=>1,
+					       -size=>12))
+				  )
+			       )
+			 ),
+		      td(
+			 table({-width=>'100%'},
+			       TR(th('Enter:'),td(password_field(-name=>'password1',
+								 -default=>$current_passwd,
+								 -size=>12,
+								 -override=>1))),
+			       TR(th('Confirm:'),td(password_field(-name=>'password2',
+								   -default=>$current_passwd,
+								   -size=>12,
+								   -override=>1)))
+			       )
+			 )
+		      )
+		),
+       $other_fields ? (p(),$other_fields) : (),
+       CGI::reset(-value=>'Reset Values'),
+       submit(-name=>'action',-value=>'Set Values'),
+       end_form();
+
+    if (0) {			# dead code
+	my $back = self_url;
+	$back=~s/action=[^=&]*&?//g;
+	$back=~s/password[0-9]?=[^=&]*&?//g;
+	$back=~s/groups=[^=&]*&?//g;
+	$back=~s/user=[^=&]*&?//g;
+	$back.="user=$user";
+	print a({href=>$back},"List of Users");
+    }
+    print hr();
+}
+
+# --------------------- command line functions --------------------
+# Usage: user_manage <database> <command> <user> <value1> <value2> <value3>...
+#
+# commands: adduser deleteuser setgroup view
+#
+sub dbm_manage {
+
+    my ($realm,$help);
+    my $admin = getpwuid($<);
+
+    # process command line
+    while ($ARGV[0] && $ARGV[0] =~ /^-/) {
+	my $arg = shift @ARGV;
+	$realm = shift @ARGV if $arg eq '-r';
+	$help++ if $arg =~ /^(-h|--help)/i;
+    }
+    $realm ||= $DEFAULT_REALM;
+
+    my($command,@rest) = @ARGV;
+
+    # define $command to suppress 'undefined value' errors
+    $command = ''  unless (defined($command));
+
+    my $usage = <<USAGE;
+Usage: $0 [-r realm] <command> <user> <value1> <value2>...
+       Manage Apache databases from the command line.
+
+Arguments:
+    realm     Security realm [$DEFAULT_REALM]
+    command   One of "add" "delete" "edit" "group" "view" "realms" "format" "setup"
+
+Commands:
+    Name    Arguments                                        Description
+    ----    ----------                                       -----------
+    realms  (none)                                           List realms
+    format  (none)                                           Format an access entry for the realm
+
+    add     <user> <password> <group1,group2> <info1,info2>  Add/edit a user's password, groups, info
+    edit    <user> <password> <group1,group2> <info1,info2>  Same as "add"
+    delete  <user>                                           Delete a user
+    group   <user> <group1> <group2>                         Assign user to named group(s)
+    info    <user> <field1=value1> <field2=value2>           Edit user's other information
+
+    view    <user>                                           Get information about user
+    view    (none)                                           Dump out entire realm
+    list                                                     Same as "view"
+    setup                                                    Set up a new realm
+USAGE
+    ;
+    die $usage if $help;
+    die $usage if !$realm;
+    
+    die "Unknown database realm \"$realm\".\n",$usage unless $REALMS->exists($realm);
+    my $db;
+
+    # don't bother opening database files for the 'format' command
+    unless ($command=~/format/) {
+	$db = $REALMS->dbm(-realm=>$realm,-writable=>$command=~/add|edit|delete|group|setup/i);
+	die HTTPD::RealmManager->error() unless $db;
+    }
+
+    $_ = $command;
+  SWITCH: 
+    {
+	/add|edit/i   and  do_add($db,$admin,@rest),last SWITCH;
+	/delete/i     and  do_delete($db,$admin,@rest),last SWITCH;
+	/realm/i      and  do_realm(),last SWITCH;
+	/group/i      and  do_group($db,$admin,@rest),last SWITCH;
+	/info/i       and  do_info($db,$admin,@rest),last SWITCH;
+	/view|list/i  and  do_view($db,@rest),last SWITCH;
+        /format/i     and  do_format( $REALMS->realm($realm) ),last SWITCH;
+        /setup/i      and  do_setup( $db,$REALMS->realm($realm) ),last SWITCH;
+	die $usage;
+    }
+}
+
+sub do_info {
+    my($db,$admin,$user,@info) = @_;
+    $user = $user || prompt('User name: ');
+    my (@args);
+
+    @info = prompt("Enter comma-separated list of field=value pairs for $user: ")
+	unless @info;
+    die "No info given.\n" unless @info;
+
+    @info = map { split('\s*,\s*') } @info;
+    warn "@info";
+
+    die "$user is not in users database.\n" 
+	unless my $passwd = $db->passwd($user);
+
+    my %info = %{$db->get_fields(-name=>$user)};
+    foreach (@info) {
+	my($n,$v) = split('=');
+	$info{$n}=$v;
+    }
+	if ( $db->set_passwd(-user=>$user,-passwd=>$passwd,-fields=>\%info)) {
+    &audit_trail("cmd $admin: changed info for user '$user' to '@info'");
+    print "Info successfully changed for $user.\n"
+    }
+}
+
+sub do_add {
+  my($db,$admin,$user,$password,$groups,$info) = @_;
+  my(@args);
+  $user = $user || prompt('User name: ');
+  push(@args,'-user'=>$user);
+  
+  $password = $password || password_prompt();
+  push(@args,'-passwd'=>$password);
+
+  $info ||= '';
+
+  my @info = split(/[,]/,$info);
+  if (@info) {
+    my %info = %{$db->get_fields(-name=>$user)};
+    foreach (@info) {
+      my($n,$v) = split('=');
+      $info{$n}=$v;
+    }
+    push(@args,'-fields'=>\%info);
+  }
+
+  my $current = $db->passwd($user);
+  print "Password successfully changed for $user.\n"
+    if $db->set_passwd(@args);
+
+  $groups ||= '';
+
+  my @groups = split(/[\s,]/,$groups);
+  @groups = $DEFAULT_GROUP unless $current || @groups;
+  @groups = () if @groups && $groups[0]=~/^(-|''|"")$/;
+  print "Group set to @groups.\n"
+    if @groups && $db->set_group(-user=>$user,-group=>\@groups);
+  &audit_trail("cmd $admin: add user '$user' groups '$groups' info '$info'");
+}
+
+sub do_delete {
+  my($db,$admin,@user) = @_;
+  @user = prompt('User name: ') 
+    unless @user;
+  my $user;
+  foreach $user (@user) {
+    unless ($db->passwd($user)) {
+      print "$user is not in users database.\n" ;
+      next;
+    }
+    unless ($db->delete_user($user)) {
+      print "$user: delete unsuccessful.\n";
+      next;
+    }
+    &audit_trail("cmd $admin: deleted user '$user'");
+    print "$user deleted.\n";
+  }
+}
+
+sub do_group {
+    my($db,$admin,$user,@group) = @_;
+    $user = $user || prompt('User name: ');
+    die "$user is not in users database.\n" unless $db->passwd($user);
+
+    @group = prompt("Enter comma-separated list of groups for $user: ") 
+	unless @group;
+    die "No groups given.\n" unless @group;
+    @group = map { split('\s*,\s*') } @group;
+    @group = () if $group[0]=~/^(-|''|"")$/;
+    
+    die "Attempt to set groups failed.\n" unless $db->set_group(-user=>$user,-group=>\@group);
+    &audit_trail("cmd $admin: changed groups for user '$user' to '@group'");
+    print "Groups set for $user.\n";
+}
+
+sub do_view {
+    my($db,@user) = @_;
+    local $^W = 0; #can't stand this
+    my (@list);
+    if (@user) {
+	@list = @user;
+    } else {
+	@list = sort $db->users;
+    }
+    foreach (@list) {
+	local($user,$passwd,$fields,@groups)=($_,$db->passwd($_),$db->get_fields(-name=>$_),$db->group($_));
+	$passwd = "** unknown **" unless $passwd;
+	local($group) = join(",",@groups);
+	local(@info,$info);
+	foreach (keys %$fields) {
+	    push(@info,"$_=$fields->{$_}");
+	}
+	$info = join(',',@info);
+	write;
+	$- = 100;
+    }
+}
+
+sub do_realm {
+    $~='REALM';
+    $^='REALM_TOP';
+    local($realm,$name,$type,$password,$group);
+    foreach (sort $REALMS->list) {
+	$realm = $REALMS->realm($_);
+	($name,$type,$password,$group) =
+	    (
+	     ($_ eq "$DEFAULT_REALM" ? "*$_" : $_),
+	     $realm->usertype(),
+	     $realm->userdb(),
+	     $realm->groupdb()
+	     );
+	write;
+	$-=100;
+    }
+}
+
+sub do_format {
+    my ($realm) = shift;
+    my($usertype,$grouptype,$password,$group,$crypt) = (
+							$realm->usertype(),
+							$realm->grouptype(),
+							$realm->userdb(),
+							$realm->groupdb(),
+							$realm->crypt(),
+						 );
+    my $dbm1=$usertype  =~ /text|file/i ? '' : $usertype;
+    my $dbm2=$grouptype =~ /text|file/i ? '' : $grouptype;
+
+    print "AuthName\t",$realm,"\n";
+    print "AuthType\t",($crypt=~/MD5/i ? 'Digest' : 'Basic'),"\n";
+    my $p;
+
+    if ($realm->usertype=~/sql/i) {
+	$p = $realm->SQLdata;
+	if ($realm->driver() =~ /^mysql$/i)
+	{
+	    print <<END;
+Auth_MySQL_DB			$p->{database}
+Auth_MySQL_Password_Table	$p->{usertable}
+Auth_MySQL_Username_Field	$p->{userfield}
+Auth_MySQL_Password_Field	$p->{passwdfield}
+Auth_MySQL_Authoritative	on
+END
+    ;
+	    if ($crypt =~ /^MySQL(?:-Password)?$/i)
+	    {
+		print "Auth_MySQL_Scrambled_Passwords\ton\n";
+	    } else {
+		print "Auth_MySQL_Encrypted_Passwords\ton\n";
+	    }
+	} else {
+	    print <<END;
+Auth_MSQLHost		$p->{host}
+Auth_MSQLDatabase	$p->{database}
+Auth_MSQLpwd_table	$p->{usertable}
+Auth_MSQLuid_field 	$p->{userfield}
+Auth_MSQLpwd_field	$p->{passwdfield}
+END
+    ;
+	}
+    } 
+
+    elsif ($crypt =~ /MD5/i) {
+	print "AuthDigestFile\t$password\n";
+    }
+
+    else {
+	print "Auth${dbm1}UserFile\t$password\n";
+    }
+
+    if ($group) {
+	unless ($realm->grouptype=~/sql/i) {
+	    print "Auth${dbm2}GroupFile\t$group\n";
+	} else {
+	    if ($realm->driver() =~ /^mysql$/i)
+	    {
+		print <<END;
+Auth_MySQL_Group_Table		$p->{grouptable}
+Auth_MySQL_Group_Field		$p->{groupfield}
+END
+    ;
+	    } else {
+		print <<END;
+Auth_MSQLgrp_table	$p->{grouptable}
+Auth_MSQLgrp_field	$p->{groupfield}
+END
+    ;
+	    }
+	}
+    }
+
+    print <<END;
+<Limit GET POST PUT DELETE>
+require valid-user
+</Limit>
+END
+    ;
+}
+
+sub do_setup {
+    my ($dbase,$realm) = @_;
+    exit 0 unless my $group = prompt_default("Pick a name for the administrative group",'administrators');
+    exit 0 unless my $admin = prompt("Pick a name for the administrative account: ");
+    exit 0 unless my $pass = password_prompt();
+
+    # SQL is the hard special case
+    if ($realm->usertype=~/sql/i) {
+	$pass = $dbase->{userDB}->encrypt($pass);
+	my($p) = $realm->SQLdata;
+	my($db,$usertable,$userfield,$passwdfield,$userfieldlen,$passwdlen,$grouptable,$groupfield,$grouplen) = 
+	    @{$p}{qw(database usertable userfield passwdfield 
+                      userfield_len passwdfield_len grouptable 
+                      groupfield groupfield_len)};
+	die "Malformed Users and/or Groups directive in configuration file" 
+	    unless $usertable && $userfield && $passwdfield;
+
+	# pull in other fields
+	my(@defs);
+	if (my %fields = $dbase->fields) {
+	    foreach (keys %fields) {
+		my($length) = $fields{$_}=~/(\d+)/;
+		$length ||= 30;
+		my($type) = "char($length)";
+		$type = "int" if $fields{$_}=~/^i/;
+		$type = "real" if $fields{$_}=~/^f/;
+		push(@defs,"    $_\t" . $type . "\tnot null");
+	    }
+	}
+	unshift(@defs,"    $groupfield\tchar($grouplen)")
+	    if $usertable eq $grouptable;
+	my $defs = join(",\n",@defs);
+
+	# escape single quotes
+	$pass  =~   s/'/\\'/g;
+	$group =~   s/'/\\'/g;
+	$admin =~   s/'/\\'/g;
+	$defs  =~   s/'/\\'/g;
+
+	print STDERR "Create database $db and feed it this code:\n\n";
+	print STDOUT<<END;
+CREATE TABLE $usertable (
+   $userfield\tchar($userfieldlen)\tprimary key,
+   $passwdfield\tchar($passwdlen)\tnot null,
+$defs
+)\\g
+
+INSERT INTO $usertable ($userfield,$passwdfield)
+   VALUES('$admin','$pass')\\g
+END
+    ;
+	if ($usertable eq $grouptable) {
+	    print STDOUT <<END;
+UPDATE $usertable 
+       SET $groupfield='$group' 
+       WHERE $userfield='$admin'\\g
+END
+    ;
+	} elsif ($grouptable) {
+	    print STDOUT <<END;
+CREATE TABLE $grouptable (
+   $userfield\tchar($userfieldlen)\tnot null,
+   $groupfield\tchar($grouplen)\t not null
+)\\g
+INSERT INTO $grouptable ($userfield,$groupfield)
+   VALUES('$admin','$group')\\g
+END
+    ;
+	}
+
+    }   # all nonSQL databases
+
+    else { 
+	$dbase->set_passwd(-user=>$admin,-passwd=>$pass);
+	my %groups;
+	grep ($groups{$_}++,$dbase->group($admin));
+	$groups{$group}++;
+	$dbase->set_group(-user=>$admin,-group=>[keys %groups]);
+	print STDERR "Added $admin to database ",$realm->name," in group $group.\n";
+    }
+}
+
+sub prompt {
+    my $prompt = shift;
+    my $line;
+    do {
+	print STDERR $prompt;
+	chomp($line = <STDIN>);
+    } until $line;
+    return $line;
+}
+
+sub prompt_default {
+    my $prompt = shift;
+    my $default = shift;
+    my $line;
+    print STDERR "$prompt [$default]: ";
+    chomp($line = <STDIN>);
+    return $line || $default;
+    return $line;
+}
+
+sub password_prompt {
+    my $line;
+    my ($pw1,$pw2);
+    system "$STTY -cbreak -echo >/dev/tty" and die "$STTY: $!";	# turn off echo
+    do {
+	$pw1 = prompt("New password: ");
+	$pw2 = prompt("\nRe-type new password: ");
+	print STDERR "\n";
+	print STDERR "The two passwords don't match. Try again.\n"
+	    unless $pw1 eq $pw2;
+    } until $pw1 eq $pw2;
+    system "$STTY -cbreak echo >/dev/tty";	# turn on echo
+    return $pw1;
+}
+
+sub audit_trail {
+    return unless $AUDITLOG;
+    my $entry = shift;
+    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday) = gmtime(time);
+    $year += 1900;
+    $mon += 1;
+    my $when = sprintf("%4d-%02d-%02d %02d:%02d:%02d",
+                       $year, $mon, $mday, $hour, $min, $sec
+                       );
+    if ( open( AUDITLOG, ">>$AUDITLOG" )) {
+        print AUDITLOG "$when : $entry\n";
+        close AUDITLOG;
+    } else {
+        print STDERR "Failed to open audit log '$AUDITLOG'\n$!\n";
+    }
+}
+
+# These useless lines avoid "possible typo" warnings
+$foo = scalar(@Q::groups);
+$foo = $foo && $Q::referer && $Q::passwd;
+$foo = $Q::admin && $VERSION;
+
+format STDOUT_TOP=
+Name            Password         Groups                      Info
+----            --------         ------                      ----
+.
+format STDOUT=
+^<<<<<<<<<<<<<< ^<<<<<<<<<<<<<<< ^<<<<<<<<<<<<<<<<<<<<<<<<<~ ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<~~
+$user,$passwd,$group,$info
+.
+
+format REALM_TOP=
+Name                        Type
+----                        ----
+.
+
+format REALM=
+@<<<<<<<<<<<<<<<<<<<<<<<<<< @<<<<<<
+$name,$type
+.

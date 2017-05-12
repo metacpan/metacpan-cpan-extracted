@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               HeliosX-Logger-Syslog
+version:            1.00
+abstract:           Helios::Logger subclass implementing logging to syslogd for Helios
+author:
+    - Andrew Johnson <lajandy at cpan dotorg>
+license:            artistic_2
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Helios:       2.3
+    Sys::Syslog:  0.23
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

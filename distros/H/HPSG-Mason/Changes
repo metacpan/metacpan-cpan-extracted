@@ -1,0 +1,11 @@
+Revision history for HPSG-Mason
+
+0.01    2009-10-28/11:20
+        created package
+0.02	2009-10-28/16:00
+	added signature
+0.03    2009-10-28/17:28
+	added README
+0.04    2009-11-22/17:25
+        added dependency on File::ShareDir
+        added version back in to HPSG::Mason::Interp

@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+META.yml                                 Module meta-data (added by MakeMaker)
+Makefile.PL
+README
+lib/HTML/Persistent.pm
+lib/HTML/Persistent/DUMP.pm
+lib/HTML/Persistent/HTML.pm
+lib/HTML/Persistent/array.pm
+lib/HTML/Persistent/base.pm
+lib/HTML/Persistent/hash.pm
+lib/HTML/Persistent/sl_array.pm
+lib/HTML/Persistent/sl_base.pm
+lib/HTML/Persistent/sl_hash.pm
+t/HTML-Persistent_1.t
+t/HTML-Persistent_2.t

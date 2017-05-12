@@ -1,0 +1,33 @@
+--- #YAML:1.0
+name:               Hardware-Vhdl-Automake
+version:            1.00
+abstract:           ~
+author:
+    - Michael Attenborough <michael.attenborough at physics.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:                 0
+    Digest::MD5:          0
+    File::Basename:       0
+    File::Copy:           0
+    File::Path:           0
+    File::Spec::Functions:  0
+    File::Temp:           0
+    Hardware::Vhdl::Lexer:  1
+    List::Util:           0
+    Math::Expression:     0
+    Test::More:           0
+    YAML:                 0.62
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.52
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

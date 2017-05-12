@@ -1,0 +1,158 @@
+Revision history for HPC-Runner-Slurm
+
+2.58  2016-08-30 17:19:58 GST
+    - Getting rid of nodelist
+
+2.57  2016-03-29 13:44:56 GST
+    - Made some fixes to tests
+
+2.56  2016-03-29 10:06:49 GST
+    - Small change to reflect logging from HPC-Runner
+
+2.55  2016-03-22 13:13:05 GST
+    - Didnt add to bitbucket...
+
+2.54  2016-03-22 13:10:53 GST
+    - Added dep HPC-Runner-Scheduler to cpanfile
+
+2.53  2016-02-21 11:53:52 GST
+    - Refactoring code to extend HPC-Runner-Scheduler - able to support multiple
+      schedulers this way
+
+2.52  2016-01-24 11:07:50 GST
+    - Making change to output files with 00{$self->batch} appended
+
+2.51  2016-01-06 15:45:46 GST
+    - Bug fix in process_lines
+
+2.50  2016-01-06 14:26:15 GST
+    - Refactoring code
+
+2.49  2015-12-17 15:58:13 GST
+    - Fixed next in subroutine and updated tests
+
+2.48  2015-12-10 13:15:25 GST
+    - Ok these tests pass
+
+2.47  2015-12-10 12:22:48 GST
+    - Missed Slurp in cpanfile
+
+2.46  2015-12-09 14:42:16 GST
+    - Wrote some tests
+
+2.45  2015-11-25 09:53:47 GST
+    - Changed command counter and to match commands_per_node math
+
+2.44  2015-11-12 14:36:12 GST
+    - Fixed custom command
+
+2.43  2015-11-12 12:21:36 GST
+    - BUG FIX had 'cmd' defined twice
+
+2.42  2015-11-11 11:55:17 GST
+    - BUG FIX - made cmd_counter default at zero, and that screwed up the rest of my math
+
+2.41  2015-11-10 13:58:39 GST
+    - More support for changing job submission parameters in the submission script
+
+2.40  2015-11-10 12:40:00 GST
+    - Added a feature for changing job submission parameters in the script 
+    - #HPC THING1=THING2
+
+2.39  2015-11-08 14:07:47 GST
+    - Moved some attributes from here to base class
+
+2.38  2015-10-19 13:39:53 GST
+    - Rebasing the code a tad
+
+2.37  2015-06-18 08:43:44 AST
+    - Updated copyright
+
+2.36  2015-05-31 14:45:27 AST
+    - Added in some documentation
+
+2.35  2015-04-01 10:05:23 AST
+    - Fixing a typo
+
+2.34  2015-04-01 09:48:28 AST
+    - Adding in an option to use gnu parallel instead of MCE or threads.
+
+2.33  2015-02-22 08:29:27 AST
+    - Name is HPC::Runner::Slurm, everything up to date
+
+2.32  2015-02-18 09:28:34 AST
+    - Changing name over to HPC::Runner
+
+2.31  2015-02-15 14:14:06 AST
+    - Fixed a bug that left --procs as default
+
+2.30  2015-02-12 08:58:40 AST
+    - Added an --afterok option, same as the --afterok for slurm
+
+2.29  2015-01-21 13:24:38 AST
+    - Creating a change so everytime jobs are submitted the node list is shuffled. That way the first node on the list is not constantly hammered.
+
+2.28  2015-01-14 10:29:25 AST
+    - Added an option to run jobs serially instead of in parallel.
+
+2.27  2014-12-29 14:43:28 AST
+    - Changed the match 'wait' to match wait qr/^wait$/ instead. It was failing on any commands with the word 'wait' before. 
+
+2.26  2014-12-29 14:35:43 AST
+    More debugging
+
+2.25
+    Debugging command with arguements in _log_command
+
+2.24  2014-12-29 09:35:14 AST
+    If no outdir is specified the new default is $ENV{HOME}/hpcjobs instead of CWD
+
+2.23  2014-12-23 15:25:10 AST
+    Logging to rsyslog is a default now of slurmrunner
+
+2.22  2014-12-15 15:11:09 AST
+    More changes for logging
+
+2.21  2014-12-15 10:15:53 AST
+    Added a few changes for file paths
+
+2.1  2014-12-15 08:50:05 AST
+    Made a few changes to the logging structure
+
+2.0  2014-12-14 10:21:57 AST
+    Adding some requirements to META.
+
+1.9  2014-12-11 13:48:30 AST
+    Took Carp::Always out of script files
+
+1.8  2014-11-26 14:51:26 AST
+    Migrating back to Dist::Milla
+
+1.7       2014-11-26 10:22:19+03:00 Asia/Qatar
+    Migrating to Dist::Zilla
+
+1.6  2014-11-25 15:08:21 AST
+    Added in a few small changes
+
+1.5  2014-11-25 14:51:32 AST
+
+    - Not sure if I pushed these changes
+
+1.4  2014-08-14 13:47:03 AST
+    - Cleaned up paths some, using File::Spec to get complete path directories
+
+1.3  2014-08-14 12:57:42 AST
+    - Made change to commands per node, was subtracting one now it is ok
+
+1.2  2014-08-14 11:26:42 AST
+    - Outdirectories for prunner/mce should be in the outdir
+
+1.1  2014-08-06 14:33:55 AST
+     - Moving over to Module::Build
+
+1.0  2014-07-16 14:18:44 AST
+        - Change log entry for the next version
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

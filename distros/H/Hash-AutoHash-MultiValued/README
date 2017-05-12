@@ -1,0 +1,55 @@
+
+Hash-AutoHash-MultiValued
+
+This is a subclass of Hash::AutoHash which wraps a tied hash whose
+elements are multi-valued.  
+
+This class was inspired by Tie::Hash::MultiValue but differs from the
+original in several ways: (1) It allows access to hash elements using
+method notation. (2) It provides a 'new' constructor. (3) It lets you
+set initial values when constructing the object. (4) When assigning an
+ARRAY to an element, it flattens the reference. (5) The
+duplicate-removal function can be set after the fact. (6) It provides
+a general way to filter values.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Hash::AutoHash::MultiValued
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Hash-AutoHash-MultiValued
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Hash-AutoHash-MultiValued
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Hash-AutoHash-MultiValued
+
+    Search CPAN
+        http://search.cpan.org/dist/Hash-AutoHash-MultiValued/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Nat Goodman
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

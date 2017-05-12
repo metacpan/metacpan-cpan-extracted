@@ -1,0 +1,18 @@
+Changes in 1.01
+
+  All attribute values and option labels are HTML-escaped.
+  
+  Explained CGI.pm compatability in POD docs.
+  
+  Subroutines can now accept hash-refs, thanks to Ron Savage.
+  
+  Arguments to all functions:
+  	Added 'value' as an alias for 'values'.
+    Documented that 'defaults' is an alias for 'default'.
+  
+  Makefile.PL changed to use Module::Build
+
+Changes in 1.00
+  
+	Initial release.
+

@@ -1,0 +1,12 @@
+{
+    "ehlo": "[127.0.0.1]",
+    "mail": "kijitora@example.org",
+    "rcpt": [ "mikeneko@example.jp" ],
+    "header": {
+        "from":    "キジトラ <kijitora@example.com>",
+        "subject": "眉毛の太い猫",
+        "replyto": "straycats@cat-ml.example.org",
+        "charset": "UTF-8"
+    },
+    "body": "太眉猫、警戒してても猫じゃらしを揺らせば寄って来る。"
+}

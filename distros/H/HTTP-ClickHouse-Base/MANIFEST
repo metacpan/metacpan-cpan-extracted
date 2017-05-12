@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/HTTP-ClickHouse-Base.t
+lib/HTTP/ClickHouse/Base.pm

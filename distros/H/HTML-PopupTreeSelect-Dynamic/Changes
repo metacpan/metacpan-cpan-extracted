@@ -1,0 +1,18 @@
+Revision history for Perl extension HTML::PopupTreeSelect::Dynamic.
+
+1.2 Thu Mar 15 2007
+    - Changed the way Javascript functions are declared so that they'll
+      work in an eval()'ed context. [Michael Peters]
+    - Now works with Prototype 1.5
+
+1.1 Fri May 26 2006
+    - Added include_prototype option to control prototype javascript
+      generation. [Michael Peters]
+
+    - Fixed a bug preventing trees with multiple roots from displaying
+      correctly. [Michael Peters]
+
+1.0  Sun Aug 28 20:03:06 2005
+    - first release
+
+

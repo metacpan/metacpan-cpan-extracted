@@ -1,0 +1,30 @@
+ - Test script can be cleaned up quite a lot by using the match/no_match for 
+   all boolean tests.
+   (Robin Smidsrød - 2009-10-20)
+
+ - Consider getting more UA strings from http://www.user-agents.org/.
+   (Robin Smidsrød - 2009-10-20)
+
+ - Browsers to add: Dolphin, Avant (need user agent examples for both),
+   Cometbird, Chromium, Chromeframe, Crowsnest, Google page speed
+   insights, GSA, wOSbrowser, Deepnet explorer, CrazyBrowser,
+   wkhtmltoimage, Palemoon, Nintendo WIIU, Wordpress, pythonlib
+   (Andrew Moise - 2015-02-26)
+
+ - Support Kindle Fire tablets
+   (Andrew Moise - 2015-03-23)
+
+ - Test against other libraries (see http://neilb.org/reviews/user-agent.html)
+    * HTML::ParseBrowser
+    * HTTP::DetectUserAgent
+    * HTTP::Headers::UserAgent (deprecated)
+    * HTTP::MobileAgent (should absorb)
+    * HTTP::UserAgentString::Parser (commercial)
+    * Mobile::UserAgent (maybe should absorb)
+    * Parse::HTTP::UserAgent
+    * Woothee
+    * HTTP::UA::Parser
+    (Andrew Moise - 2015-03-15)
+
+ - Add "malware" test
+    (Andrew Moise - 2015-03-22)

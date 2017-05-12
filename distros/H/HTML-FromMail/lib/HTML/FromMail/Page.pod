@@ -1,0 +1,95 @@
+=head1 NAME
+
+HTML::FromMail::Page - base class for outputting pages
+
+=head1 INHERITANCE
+
+ HTML::FromMail::Page
+   is a HTML::FromMail::Object
+   is a Mail::Reporter
+
+ HTML::FromMail::Page is extended by
+   HTML::FromMail::Field
+   HTML::FromMail::Head
+   HTML::FromMail::Message
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 METHODS
+
+$obj-E<gt>B<lookup>(LABEL, ARGS)
+
+=over 4
+
+Look-up, in a formatter dependent way, what the value related to a certain
+LABEL is.  The location which is being produced on the moment that this
+method is called is stored somewhere in the OPTIONS.  The formatter
+(which is also in the OPTIONS) is called to get the value based on that
+location information.
+
+ Option   --Default
+ formatter  <required>
+
+. formatter => OBJECT
+
+=back
+
+HTML::FromMail::Page-E<gt>B<new>(OPTIONS)
+
+=over 4
+
+ Option  --Defined in     --Default
+ settings  HTML::FromMail::Object  {}
+ topic     HTML::FromMail::Object  <required>
+
+. settings => HASH-OF-HASHES
+
+. topic => STRING
+
+=back
+
+=head2 Attributes
+
+$obj-E<gt>B<settings>([TOPIC])
+
+=over 4
+
+See L<HTML::FromMail::Object/"Attributes">
+
+=back
+
+$obj-E<gt>B<topic>
+
+=over 4
+
+See L<HTML::FromMail::Object/"Attributes">
+
+=back
+
+=head2 Export
+
+=head2 Other methods
+
+$obj-E<gt>B<plain2html>(STRING)
+
+=over 4
+
+See L<HTML::FromMail::Object/"Other methods">
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of HTML-FromMail distribution version 0.11,
+built on June 08, 2007. Website: F<http://perl.overmeer.net/html-from-mail/>
+
+=head1 LICENSE
+
+Copyrights 2003,2004,2007 by Mark Overmeer. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

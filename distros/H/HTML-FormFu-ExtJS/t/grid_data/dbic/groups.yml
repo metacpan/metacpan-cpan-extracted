@@ -1,0 +1,8 @@
+---
+    elements:
+        - type: Text
+          name: name
+        - type: Text
+          name: producerid
+        - type: Checkboxgroup
+          name: cds

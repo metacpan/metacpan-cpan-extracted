@@ -1,0 +1,35 @@
+---
+abstract: 'Parse nice HTML files without needing a compiler'
+author:
+  - 'Ron Savage <ron@savage.net.au>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.36'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.142060'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-Parser-Simple
+provides:
+  HTML::Parser::Simple:
+    file: lib/HTML/Parser/Simple.pm
+    version: '2.02'
+  HTML::Parser::Simple::Attributes:
+    file: lib/HTML/Parser/Simple/Attributes.pm
+    version: '2.02'
+  HTML::Parser::Simple::Reporter:
+    file: lib/HTML/Parser/Simple/Reporter.pm
+    version: '2.02'
+requires:
+  File::Spec: '0'
+  Moo: '1.003001'
+  Tree::Simple: '1.22'
+  lib: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  license: http://www.perlfoundation.org/artistic_license_2_0
+version: '2.02'

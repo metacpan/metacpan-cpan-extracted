@@ -1,0 +1,9 @@
+Revision history for Perl extension HTML::Doctype.
+
+0.02  Mon Jun 30 09:55:00 2004
+	- small fixes
+
+0.01  Sun Nov  7 03:55:00 2004
+	- original version; created by h2xs 1.23 with options
+		-A -O -c -n HTML::Doctype --skip-ppport --skip-exporter -v 0.01 -b 5.8.0 -X
+

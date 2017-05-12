@@ -1,0 +1,44 @@
+Installation note for HTML::DBTable.
+====================================
+
+To install this module
+
+# perl Makefile.PL
+# make
+# make test
+# make install
+
+DBIx::DBSchema note.
+===========
+
+This module use the DBIx::DBSchema module to get DB schema. 
+But DBIx::DBSchema version 0.22 doesn't know "ENUM" MySQL type and so, 
+this module (and DBIx::DBSchema too) doesn't work with MySQL table 
+that have "ENUM" fields in its.
+
+I notify this bug to DBIx::DBSchema owner but, untill he doesn't have
+time to patch its module, you can apply my patch
+
+DBIx_DBSchema_with_enum.patch
+
+manually to DBIx::DBSchema. 
+
+Install DBIx::DBschema and then execute this command
+
+patch -P1 < DBIx_DBSchema_with_enum.patch 
+
+in the directory where DBIx::DBSchema is installed (for example this
+directory is /usr/lib/perl5/site_perl/5.8.0/DBIx/DBSchema on my system).
+
+If you use CPAN module to install DBIx::DBSchema version 0.22 you can be
+frustrating by the fact that this module doesn't install owing to test
+errors. I'm apologized about this problem by this module isn't mine.
+You can bypass this forcing installation with the command
+
+cpan> force install DBIx::DBSchema
+
+I have see no problem with this.
+
+
+
+

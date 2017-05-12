@@ -1,0 +1,19 @@
+HPCD::SGE is a driver for HPCI (High Performance Computing Interface).
+An HPCD (High Performance Computing Driver) module translates the
+standard HPCI interface into the appropriate access mechanisms for a
+specific type of cluster that is selected.
+
+In this module, the target cluster type is SGE (Sun Grid Engine).
+
+This module (and HPCI) was derived from SGE cluster-specific modules
+that were used internally at Boutros Lab.
+
+It has replaced the use of those SGE-specific modules extensively within
+Boutros Lab, so it has received a significant amount of actual use.
+
+See the notes for HPCI for most details about usage - the docs within
+this module only describe the SGE-specific differences.
+
+There is a discussion list available for HPCI.  Subscribe through:
+
+    mailto:BoutrosLabSoftware@oicr.on.ca

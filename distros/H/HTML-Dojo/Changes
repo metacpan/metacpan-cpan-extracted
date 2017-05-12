@@ -1,0 +1,50 @@
+Revision history for Perl extension HTML::Dojo.
+
+0.0403.0 2007-05-22
+
+        - Dojo 0.4.3
+        - now defaults to 'ajax' edition
+        - browserio edition no longer provided
+        - core edition no longer provided
+        - event edition no longer provided
+        - minimal edition no longer provided
+
+0.0402.0 2007-03-28
+
+        - Dojo 0.4.2
+        - dashboard edition no longer provided
+        - dojoWebsite edition no longer provided
+        - lfx edition no longer provided
+        - moxie edition no longer provided
+
+0.0401.0 2007-01-08
+
+        - Dojo 0.4.1
+        - charting edition added
+        - dojoWebsite edition added
+        - moxie edition added
+        - storage edition added
+        - xdomain-ajax edition added
+
+0.0400.0 2006-10-26 15:45
+
+        - Fixing version no. for pause indexer
+
+0.0400 2006-10-26 15:29
+
+        - Dojo 0.4.0
+        - lfx edition added
+        - ajax-xd edition no longer provided
+        - storage edition no longer provided
+
+0.0301.1 2006-08-25 16:18:00
+
+        - POD corrections only
+
+0.0301  2006-08-25 11:19:00
+        - Dojo 0.3.1
+        - ajax-xd edition added
+        - moxie edition no longer provided
+
+0.0300  2006-05-15 12:51:00
+        - Initial CPAN release, includes Dojo 0.3.0

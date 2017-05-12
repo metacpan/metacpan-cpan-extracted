@@ -1,0 +1,68 @@
+Revision history for Perl extension HTML::FormFu::ExtJS.
+
+0.090 2011-04-04
+    - FormFu 0.09 compat
+    - silenced test warnings
+
+0.077 2010-09-27
+    - fixed compat with FormFu 0.08
+
+0.076 2010-04-10
+    - Added ExtJS::TabPanel element
+    - metaData includes idProperty
+
+0.075 2009-12-19
+    - fixed tests to be YAML::XS compliant
+    - adjusted HTML::FormFu prereq accordingly
+
+0.072 2009-09-12
+    - Changed the default dateFormat to be c (ISO8601)
+
+0.071
+    - Support of custom and remote stores for Select
+    - Support for custom ExtJS elements through the + prefix
+    - Support for multiselect ux (abraxxa)
+    - Support of nested_name attribute of FieldSet (mario)
+    - cleanup tests
+    - use Dist::Zilla
+    - Checkboxes with a true value set will be rendered as checked
+    - Switched to github
+    - fixed DateTime element
+
+0.070 April 2009
+    - added ExtJS::Panel
+    - fixed handling of localised attributes
+    - deprecated HTML::FormFu::ExtJS::Grid
+    - factored out a lot of code to HTML::FormFu::Model::HashRef
+    - added support for ComboBox and DateTime
+    - added a helper for ExtJS.grid.ColumnModel (->column_model)
+    - added "x-requested-by : ExtJS" as baseParam to every form
+    - #44818 fixed (buttons use 'value' config value for text instead of 'name' like FormFu)
+    - fileUpload: true is set on the form if there is a File field
+    
+    !!!IMPORTANT!!!
+    - there have been some changes to grid_data and companions
+      some of them might change the json output. Please have
+      a look at the documentation to see what changed!
+0.06 
+    - grid_data: Checkboxes are set to true if checked
+    - grid_data: using blessed objects: fixed error when method not existing
+
+0.05 Sep 04 2008
+	- finally finally fixed deps for tests
+
+0.04 Sep 04 2008
+	- finally fixed deps for tests
+	
+0.03 Sep 04 2008
+	- fixed deps for tests
+
+0.02  Sat Sep 03 2008
+	- removed HashRefInflator dependency
+	- Grid added and documented
+	- more tests
+	- replaced _options with render_data->{options}
+	- validation_response returns a perl object instead of a JSON string
+	
+0.01  Sat Aug  27 2008 rev 1145
+	- inital release

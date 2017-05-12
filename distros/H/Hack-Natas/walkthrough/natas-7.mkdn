@@ -1,0 +1,18 @@
+Level 7
+-------
+
+Here we have a simple webpage that doesn't seem to offer us
+any clues about a vulnerability. Let's click around a bit
+to see more.
+
+Well, each of these links passes the name of the page to a
+PHP script, which seems to just stuff the contents of the
+file into the webpage. So, we should be able to change that
+URL parameter to whatever we want, in order to get the
+contents of the file containing the next password.
+
+Try `users.txt` -- that was the name of the file used in
+previous levels. Nope... well, in the intro to the wargames,
+we were told: "All passwords are also stored in
+`/etc/natas_webpass/`" so let's look in
+`/etc/natas_webpass/natas7`.

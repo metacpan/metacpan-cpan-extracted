@@ -1,0 +1,19 @@
+abstract: css inliner and converter
+author: Kazunari Komoriya <kmry1462@gmail.com>
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: HTML-MobileJpCSS
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  File::Spec: 0
+  CSS::Tiny: 0
+  YAML::Syck: 0
+  HTTP::MobileAgent: 0
+version: 0.01

@@ -1,0 +1,160 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: HTML-HTML5-Parser
+Upstream-Contact: Toby Inkster <tobyink@cpan.org>
+Source: https://metacpan.org/release/HTML-HTML5-Parser
+
+Files: CREDITS
+ Changes
+ LICENSE
+ MANIFEST.SKIP
+ META.ttl
+ Makefile.PL
+ NEWS
+ README
+ TODO
+ bin/html2xhtml
+ bin/html5debug
+ examples/charsets.pl
+ examples/html/iso-8859-15.html
+ examples/html/utf-16.html
+ examples/html/utf-8.html
+ lib/HTML/HTML5/Parser/Charset/DecodeHandle.pm
+ lib/HTML/HTML5/Parser/Charset/Info.pm
+ lib/HTML/HTML5/Parser/Charset/UnicodeChecker.pm
+ lib/HTML/HTML5/Parser/Charset/UniversalCharDet.pm
+ lib/HTML/HTML5/Parser/Charset/WebLatin1.pm
+ lib/HTML/HTML5/Parser/Charset/WebThai.pm
+ lib/HTML/HTML5/Parser/TagSoupParser.pm
+ lib/HTML/HTML5/Parser/Tokenizer.pm
+ meta/changes.ttl
+ meta/doap.ttl
+ meta/makefile.ttl
+ meta/rt-bugs.ttl
+ t/html5lib-fail/domjs-unsafe.dat
+ t/html5lib-fail/entities02.dat
+ t/html5lib-fail/plain-text-unsafe.dat
+ t/html5lib-fail/tests1.dat
+ t/html5lib-fail/tests11.dat
+ t/html5lib-fail/tests14.dat
+ t/html5lib-fail/tests16.dat
+ t/html5lib-fail/tests21.dat
+ t/html5lib-fail/tests22.dat
+ t/html5lib-fail/tests23.dat
+ t/html5lib-fail/tests5.dat
+ t/html5lib-fail/tests6.dat
+ t/html5lib-fail/tests9.dat
+ t/html5lib-fail/tests_innerHTML_1.dat
+ t/html5lib-pass/adoption01.dat
+ t/html5lib-pass/adoption02.dat
+ t/html5lib-pass/comments01.dat
+ t/html5lib-pass/doctype01.dat
+ t/html5lib-pass/entities01.dat
+ t/html5lib-pass/html5test-com.dat
+ t/html5lib-pass/inbody01.dat
+ t/html5lib-pass/isindex.dat
+ t/html5lib-pass/pending-spec-changes-plain-text-unsafe.dat
+ t/html5lib-pass/pending-spec-changes.dat
+ t/html5lib-pass/scriptdata01.dat
+ t/html5lib-pass/scripted/adoption01.dat
+ t/html5lib-pass/scripted/ark.dat
+ t/html5lib-pass/scripted/webkit01.dat
+ t/html5lib-pass/tables01.dat
+ t/html5lib-pass/tests10.dat
+ t/html5lib-pass/tests12.dat
+ t/html5lib-pass/tests15.dat
+ t/html5lib-pass/tests17.dat
+ t/html5lib-pass/tests18.dat
+ t/html5lib-pass/tests19.dat
+ t/html5lib-pass/tests2.dat
+ t/html5lib-pass/tests20.dat
+ t/html5lib-pass/tests24.dat
+ t/html5lib-pass/tests25.dat
+ t/html5lib-pass/tests26.dat
+ t/html5lib-pass/tests3.dat
+ t/html5lib-pass/tests4.dat
+ t/html5lib-pass/tests7.dat
+ t/html5lib-pass/tests8.dat
+ t/html5lib-pass/tricky01.dat
+ t/html5lib-pass/webkit01.dat
+ t/html5lib-pass/webkit02.dat
+ t/lib/Test/HTTP/Server.pm
+Copyright: Unknown
+License: Unknown
+
+Files: lib/HTML/HTML5/Parser/UA.pm
+ t/02html5.t
+ t/03html4.t
+ t/04fragments.t
+ t/05origins.t
+ t/06xlxdsln.t
+ t/07ua.t
+ t/08ua-lwp.t
+ t/99html5lib.t
+ t/rt-79019.t
+Copyright: Copyright (C) 2012 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/Module/Install.pm
+ inc/Module/Install/Include.pm
+ inc/Module/Install/Metadata.pm
+ inc/Module/Install/Scripts.pm
+Copyright: Copyright 2002 - 2012 Brian Ingerson, Audrey Tang and Adam Kennedy.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/Module/Install/TrustMetaYml.pm
+ inc/Module/Package/Dist/RDF.pm
+Copyright: This software is copyright (c) 2011-2012 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/Module/Install/Package.pm
+Copyright: Copyright (c) 2011. Ingy doet Net.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+Copyright: None
+License: public-domain
+Comment: This file! Automatically generated.
+
+Files: inc/Module/Install/Contributors.pm
+Copyright: This software is copyright (c) 2013 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/Module/Install/Base.pm
+Copyright: Copyright 2003, 2004 by Audrey Tang <autrijus@autrijus.org>.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/Module/Install/Makefile.pm
+Copyright: Copyright 2002, 2003, 2004 Audrey Tang and Brian Ingerson.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/01basic.t
+Copyright: Copyright (C) 2010-2012 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: lib/HTML/HTML5/Parser/Error.pm
+Copyright: Copyright (C) 2011-2012 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: lib/HTML/HTML5/Parser.pm
+Copyright: Copyright (C) 2007-2011 by Wakaba.
+ Copyright (C) 2009-2012 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/YAML/Tiny.pm
+Copyright: Copyright 2006 - 2012 Adam Kennedy.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2013 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2013 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989
+

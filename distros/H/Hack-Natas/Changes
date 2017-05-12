@@ -1,0 +1,14 @@
+Revision history for Perl module Hack-Natas
+
+0.003     2013-08-19
+  - Prompt interactively for the password
+  - Bump Moo dependency to 1.003000 to allow composing
+    roles that require methods provided by the other (RT#82711)
+
+0.002     2013-08-17
+  - Rewrite to hopefully be more flexible for future levels
+  - Use Moo roles to factor out common code
+  - Rename to Hack::Natas, to give a hint to its purpose
+
+0.001     2013-08-12
+  - First released version

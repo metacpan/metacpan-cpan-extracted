@@ -1,0 +1,61 @@
+{
+   "abstract" : "Perl module to clean HTML by the piece",
+   "author" : [
+      "Six Apart, Ltd. <scook@sixapart.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-Laundry",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::Entities" : "0",
+            "HTML::Parser" : "0",
+            "HTML::TreeBuilder" : "0",
+            "Scalar::Util" : "0",
+            "Test::Differences" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0",
+            "URI::Split" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/snark/html-laundry/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/snark/html-laundry",
+         "web" : "https://github.com/snark/html-laundry"
+      }
+   },
+   "version" : 0.0107,
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

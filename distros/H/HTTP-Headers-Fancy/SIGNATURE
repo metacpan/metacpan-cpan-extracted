@@ -1,0 +1,69 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 495e0978d46759ac5b71d9e14784e333fc42f797 CONTRIBUTORS
+SHA1 917b29a868259258b528cd7bf86042d363c1bc88 Changes
+SHA1 21696e04788daf443832163be15c96a621ae5381 LICENSE
+SHA1 58a6a255db9a076ed208b08e2ef9704971ea758e MANIFEST
+SHA1 12da0a4db4335d27bc088ca368c0189237b3853d META.yml
+SHA1 b17b6397b8c55528ed9ef34e858b53b2c51eb22a Makefile.PL
+SHA1 dadc90dbc1217e31a81272fb81f64df9a402941e README
+SHA1 f46b2117963fd410d4f854ca4bca3e95d78ca39f cpanfile
+SHA1 6b50b1a88a060ea9e2cb4243717892e4c48b5ae2 dist.ini
+SHA1 e903f5f2a499b2f673caa6cd11bf1c86dd0c579c lib/HTTP/Headers/Fancy.pm
+SHA1 1aa22866215fb8bb0211939910115fb62be8c96b perlcritic.rc
+SHA1 a688f9aaba4f322cfbeb5bb31a7ab87c0639b14b t/00-check-deps.t
+SHA1 461089a60f0c2926c4c57e31019264c60c7929a2 t/00-compile.t
+SHA1 f214de96cfe8b70da71201ab8859bb32cbdafe1d t/author-critic.t
+SHA1 f7da1b6be7619ef240f32747ea51447629d393d1 t/author-eol.t
+SHA1 0b4cadc510892e3c4e0572d782e173a020e5a07e t/author-no-tabs.t
+SHA1 e2e5eb2d04c4d8c1a846669ef456cf369bf1b068 t/build.t
+SHA1 70bca84a757b6b5d0c7f99a56d19ea028490ca84 t/build_field_hash.t
+SHA1 29025198598b659d36696fd49ee622abdb735c7a t/build_field_list.t
+SHA1 9a55034ed269dedd13753649a9f593c7df15b44f t/decode.t
+SHA1 a87f7f3bb3ba1b7589538b1aea98cae9961b2707 t/decode_hash.t
+SHA1 fb5feac76511424b5f39dfd68f7dadad2f556272 t/decode_key.t
+SHA1 d2480698578f192c68d861b79753a89e34dcd102 t/encode.t
+SHA1 76834c01f928cf8564dec2165cb451b04eea9106 t/encode_hash.t
+SHA1 7412805e1c829a4e5b04e7f2bca4bbd856ba9490 t/encode_key.t
+SHA1 67ad7f002429210cf04a5e29438b03e509ff393a t/etags.t
+SHA1 e7ed4e7e7e6c710bff4da741fbb3314727f5e84e t/new.t
+SHA1 68b1151ee90e3ba2187588be224a646a7187d922 t/pretty.t
+SHA1 1bf69b71b924777ef46b198af9435e8381149fc7 t/release-cpan-changes.t
+SHA1 04b1520e9a9c757e2af3ff47779d5968bfd29206 t/release-fixme.t
+SHA1 bdd52baa1a968cc0e1a577a7b073f046d563a317 t/release-kwalitee.t
+SHA1 ca37d7b91c2299a98877a6f36d3fab51e8dd906f t/release-pod-coverage.t
+SHA1 e7fc4d8f3f29ee522cb53914648393524fc7a6d4 t/release-pod-syntax.t
+SHA1 1371095af94395cbf46a01f2b45a9493871ec4d8 t/split.t
+SHA1 a59a6b4dea77ede6a3bea722714b5e388ed267b4 t/split_field_hash.t
+SHA1 8f51cc2c58983ed52428b4aca181a3cfce73e9c9 t/split_field_list.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJWsG22AAoJEJVzeMw4kNooTQgQAJheuDPgnBuE13Nc1zRbOVst
+nPX9JypIA8oF5Dk9pW3j7MOykzD/mgH7TKC6jI4WMNqYZrtsuM8opUv+OA14Kc+1
+AoXa3w6WZiK3xatWOSkYvIw+mFktnOcir/RPLJVvG5VOUAu8IqgfWNBG5V0nF2nv
+VxU/NHpBHtqTLU5YK9RDu5t4grkZUobafUFEdvd4oEl5gBrsu9kd7hEza+7HiX+T
+L1TxjNxP+d0bT06Fba5tMk9Y7x79QWRpRj6AE/ebtk4XBC7DOMnZcSpAMWUbLr4N
+hG3EHoOqyttZ2v0vAAA6GCUdSCrrz3/T/CKVo4QD+SqZjmtMa4eHXl0HdOv93kUU
+ncom8zzzQyZaoNhyetUNGeEA9D76Mps/3H7Z4kGhCu6SD9uz7l9+vzv5+ZspHE9n
+RHgxNLySS4qf2rqe0WC4Z7koXNW+LtOeJpmypkWjfckKFPRZDFRmC7ynPtX98dyr
+FVGEfhVBsUsLyVy86fLn34uXXjiek+ip9zc8rBBTpvrDZ5EusH/rD96fu/4NGPEH
+Czqq+XtLof8RbTJ/K3D5pj/w884A0CI+R0iMn5GbFzwgY1Lf5nTvf66eRqHBazCm
+wlsCF14DuCvVHvIWNcsb+VgivxuWBIDSXmB5IJQbWaiF9dpPrsIz8SDF0tkFl9zc
+db/0HmB3aAdv7Azvhlxi
+=1N5Z
+-----END PGP SIGNATURE-----

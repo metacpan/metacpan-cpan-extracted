@@ -1,0 +1,106 @@
+<?xml version="1.0" ?>
+<!-- root element WebTest
+  title: describe the purpose of this test suite
+  -->
+<WebTest version="1.0" title="Content tests">
+<!-- param element
+  contains global parameters for HTTP::WebTest and plugins
+  -->
+  <params>
+    <!-- suppress generation of default report -->
+    <param name="default_report">no</param>
+    <!-- use the following plugins (default prefix is HTTP::WebTest::Plugin) -->
+    <list name="plugins">
+      <!-- output results in xml format -->
+      <param>::XMLReport</param>
+      <!-- follow named links from previous html page -->
+      <param>::Click</param>
+    </list>
+    <param name="user_agent">Mozilla/5.0 (HTTP-WebTest)</param>
+    <!-- send to these mail addresses (element may be repeated) -->
+    <list name="mail_addresses">
+      <param>NOC &lt;noc@isp.tld&gt;</param>
+    </list>
+    <param name="mail_from">WebTest &lt;webtest@isp.tld&gt;</param>
+    <!-- do not specify the email element for now; this will break the XML report -->
+    <!-- basic auth. credentials, used if requested by http server -->
+    <list name="auth">
+      <param>user</param>
+      <param>secretpass</param>
+    </list>
+  </params>
+
+<!-- tests specify tests to apply to a html page
+  test_name: a distinctive name for the report
+  url: location of the page to test
+  method: get, post (default get)
+  -->
+  <test>
+    <comment>Test yahoo homepage</comment>
+    <param name="test_name">Yahoo Home</param>
+    <param name="url">http://www.yahoo.com/</param>
+    <list name="text_require">
+      <param><![CDATA[</html>]]></param>
+      <param>Yahoo!</param>
+    </list>
+    <list name="text_forbid">
+      <param>Internal Server Error</param>
+    </list>
+  </test>
+
+  <test>
+    <comment>Front page of Slashdot site</comment>
+    <param name="test_name">Front page of Slashdot site</param>
+    <param name="url">http://slashdot.org/</param>
+    <!-- no explicit tests (response will always be checked) -->
+    <!-- use result page for next testgroup: follow named link -->
+  </test>
+
+  <test>
+    <comment>Topmost Slashdot story</comment>
+    <param name="test_name">Slashdot 1st article</param>
+    <!-- parameter for Click plugin: request url targeted by this link -->
+    <!-- NOTE: this is interpreted as Perl regex, so be careful with special chars -->
+    <param name="click_link"><![CDATA[.*Read More\.\.\..*]]></param>
+    <!-- contrieved example: check if view modifier form is available -->
+    <list name="text_require">
+      <param>Threshold:</param>
+    </list>
+  </test>
+
+  <test>
+    <comment>Test non-existing document</comment>
+    <param name="test_name">This should fail</param>
+    <param name="url">http://www.yahoo.com/thisshouldnotexist</param>
+    <list name="text_require">
+      <param>Yahoo!</param>
+      <param>Sorry, the page you requested was not found</param>
+    </list>
+    <list name="text_forbid">
+      <param>Internal Server Error</param>
+    </list>
+  </test>
+
+  <test>
+    <!-- the list parameters below will be flattened into an Array -->
+    <!-- this is needed so that the list order wil be retained -->
+    <comment>query parameters</comment>
+    <param name="test_name">query_params</param>
+    <param name="url">http://www.yahoo.com/</param>
+    <list name="params">
+      <param name="page">1</param>
+      <param name="lang">en_US</param>
+    </list>
+    <list name="http_headers">
+      <param name="Accept">text/html,application/xml+xhtml;q=0.9,text/plain;q=0.5</param>
+      <param name="Referer">http://webtest.org/</param>
+      <param name="Accept-Encoding">gzip,deflate</param>
+      <param name="Cache-Control">max-age=300</param>
+    </list>
+    <code name="coderef">
+      return 'this is returned from code';
+    </code>
+  </test>
+
+
+</WebTest>

@@ -1,0 +1,24 @@
+<tmpl_if expr="defined(unused)">...</tmpl_if>
+<tmpl_if expr="(foo + 10) > 20">
+   Foo is greater than 10.
+</tmpl_if>
+
+<tmpl_if expr="bar && foo">
+   Bar and Foo.
+</tmpl_if>
+
+<tmpl_if expr="bar || foo">
+   Bar or Foo.
+</tmpl_if>
+
+Bar - Foo = <tmpl_var expr="bar - foo">
+
+<tmpl_if expr="((foo * foo) > (foo + foo))">
+   Math Works, Alright
+</tmpl_if>
+
+My name is <tmpl_var expr="ucfirst(fname)"> <tmpl_var expr="ucfirst(lname)">.
+
+Yo, <tmpl_var expr="ucfirst(substr(fname, 1))"> Alien is phat.
+
+<tmpl_var expr="ucfirst(substr(fname, 1))"> has <tmpl_var expr="length(ucfirst(substr(fname, 1)))"> letters, which is <tmpl_if expr="length(ucfirst(substr(fname, 1))) < 10">less than 10<tmpl_else>greater than 10</tmpl_if> and <tmpl_if expr="length(ucfirst(substr(fname, 1))) > 5">greater than 5<tmpl_else>less than 5</tmpl_if>

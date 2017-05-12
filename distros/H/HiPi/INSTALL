@@ -1,0 +1,30 @@
+
+HiPi is a Perl distribution that you install into the
+existing Perl on your Raspberry Pi.
+
+This release of HiPi is tested against the
+current Raspbian release.
+
+For a simple automated installation:
+
+  wget http:/raspberry.znix.com/hipifiles/hipi-install
+  sudo perl hipi-install
+
+For a do-it yourself you could do
+
+cpan -i HiPi
+
+or
+
+wget http:/raspberry.znix.com/hipifiles/hipi-latest.tar.gz
+tar -xvzf hipi-latest.tar.gz
+cd hipi-src
+perl Build.PL
+perl Build
+perl Build test
+sudo perl Build install
+
+You can look at the script userbin/hipi-install in the
+source to see how it installs library dependencies. It
+might save you much pain.
+

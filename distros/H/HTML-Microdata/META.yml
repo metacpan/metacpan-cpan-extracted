@@ -1,0 +1,48 @@
+---
+abstract: 'Extractor of microdata from HTML.'
+author:
+  - 'cho45 <cho45@lowreal.net>'
+build_requires:
+  ExtUtils::MakeMaker: '6.36'
+  JSON: '0'
+  Test::Differences: '0'
+  Test::More: '0'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v1.0.0, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-Microdata
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  HTML::Microdata:
+    file: lib/HTML/Microdata.pm
+    version: '0.05'
+requires:
+  HTML::TreeBuilder::LibXML: '0'
+  Hash::MultiValue: '0'
+  JSON: '0'
+  Scalar::Util: '0'
+  URI: '0'
+resources:
+  bugtracker: ssh://git@github.com/cho45/HTML-Microdata/issues
+  homepage: ssh://git@github.com/cho45/HTML-Microdata
+  repository: ssh://git@github.com/cho45/HTML-Microdata.git
+version: '0.05'
+x_contributors:
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'Vaclav Haisman <vhaisman@gmail.com>'

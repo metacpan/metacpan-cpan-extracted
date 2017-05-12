@@ -1,0 +1,11 @@
+Revision history for HackaMol-X-ExtensionRole
+
+0.01      2015-01-27 18:37:55-05:00 America/Indiana/Indianapolis
+    * first release
+
+0.00_3    2014-05-01 14:13:52EDT-0400 America/New_York
+    * simplified map_input map_output
+
+0.00_2    2014-04-30 15:31:16EDT-0400 America/New_York
+    * removed build_command and made it required.  
+

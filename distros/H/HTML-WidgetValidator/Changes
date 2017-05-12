@@ -1,0 +1,10 @@
+Revision history for HTML-WidgetValidator
+
+0.0.3  Thu Sep 20 18:00:00 2007
+       Add 35 validators.
+
+0.0.2  Fri Aug 23 23:46:00 2007
+       HTML::WidgetValidator::Widget bug fix
+
+0.0.1  Fri Aug  3 12:06:28 2007
+       Initial release.

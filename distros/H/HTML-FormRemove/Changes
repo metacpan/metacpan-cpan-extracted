@@ -1,0 +1,7 @@
+Revision history for Perl extension HTML::FormRemove.
+
+0.1   	Fri Jun 15 15:05:10 CDT 2001
+	- Initial version.  Works, but not all that well.
+
+0.2	Thu Feb 21 11:23:32 CST 2002
+	- Changed to UIUC/NCSA Open Source license.

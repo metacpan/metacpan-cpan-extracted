@@ -1,0 +1,57 @@
+NAME
+    Here::Template - heredoc templates
+
+SYNOPSIS
+        use Here::Template;
+    
+        print <<'TMPL';
+    
+            Hello, my pid is <?= $$ ?>
+            Let's count to 10: <? for (1..10) { ?>$_ <? } ?>
+    
+        TMPL
+
+DESCRIPTION
+    Simple Filter::Util::Call based implementation of heredoc templates.
+
+    To enable templates in some heredoc use quoted heredoc mark that
+    contains TMPL. Output is added to the buffer $here. You can append data
+    there as well:
+
+        print <<'TMPL';
+    
+            Hello, my pid is <?= $$ ?>
+            Let's count to 10: <? for (1..10) { $here.= "$_" } ?>
+    
+        TMPL
+
+EXPORT
+    This module doesn't export anything by default.
+
+    Special argument relaxed can be used to disable strict and warnings
+    inside templates. E.g.:
+
+        use strict;
+        use warnings; 
+    
+        use Here::Template 'relaxed';
+    
+        print <<'TMPL';
+    
+            Let's count to 10: <? 
+                for $k (1..10) { 
+                    $here .= "$k ";
+                }
+            ?>
+    
+        TMPL
+
+AUTHOR
+    Alexandr Gomoliako <zzz@zzz.org.ua>
+
+LICENSE
+    Copyright 2011-2012 Alexandr Gomoliako. All rights reserved.
+
+    This module is free software. It may be used, redistributed and/or
+    modified under the same terms as perl itself.
+

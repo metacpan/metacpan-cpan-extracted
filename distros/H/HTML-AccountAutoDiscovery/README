@@ -1,0 +1,59 @@
+NAME
+       HTML::AccountAutoDiscovery - finding online account names
+       in HTML
+
+SYNOPSIS
+         use HTML::AccountAutoDiscovery;
+         my @account = HTML::AccountAutoDiscovery->find('http://www.example.com');
+
+         ## OR
+
+         my @account = HTML::AccountAutoDiscovery->find_in_html(\$html);
+
+         print $account[0]->{account}; # account name
+         print $account[0]->{service}; # service URI or literal
+
+DESCRIPTION
+       HTML::AccountAutoDiscovery implements Account Auto-Discov-
+       ery from given a URI or a HTML document.
+
+       Account Auto-Discovery is a spec for searching account
+       names of some online services in the HTML. You can see the
+       document of the spec at
+       http://b.hatena.ne.jp/help?mode=tipjar#autodiscovery (But
+       only for Japanese.)
+
+       If you want to show your online accounts on your HTML or
+       XHTML as metadata, you can write looks like this:
+
+         <rdf:RDF
+           xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+           xmlns:foaf="http://xmlns.com/foaf/0.1/">
+         <rdf:Description rdf:about="http://d.hatena.ne.jp/naoya/20050804/1123142579">
+           <foaf:maker rdf:parseType="Resource">
+             <foaf:holdsAccount>
+               <foaf:OnlineAccount foaf:accountName="naoya">
+                 <foaf:accountServiceHomepage rdf:resource="http://www.hatena.ne.jp/" />
+               </foaf:OnlineAccount>
+             </foaf:holdsAccount>
+           </foaf:maker>
+         </rdf:Description>
+         </rdf:RDF>
+
+       HTML::AccountAutoDiscovery module can find this RDF and
+       parse it, then return account name of the service and URI.
+
+AUTHOR
+       Naoya Ito <naoya@naoya.dyndns.org>, MIZUTANI Tociyuki
+       <http://tociyuki.cool.ne.jp>
+
+       This library is free software; you can redistribute it
+       and/or modify it under the same terms as Perl itself.
+
+SEE ALSO
+       Feed::Find - The implementation of HTML::AccountAutoDis-
+       covery reffered to this module.
+
+
+
+perl v5.8.6                 2005-09-02    AccountAutoDiscovery(3)

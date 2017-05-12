@@ -1,0 +1,47 @@
+---
+abstract: 'Wrappers for various hadoop hdfs cli commands'
+author:
+  - 'Burak Gursoy <burak@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  blib: '1.01'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - hadoop
+  - cli
+  - wrapper
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Hadoop-HDFS-Command
+requires:
+  Capture::Tiny: '0'
+  Carp: '0'
+  Data::Dumper: '0'
+  DateTime: '0'
+  DateTime::Format::Strptime: '0'
+  Getopt::Long: '0'
+  IPC::Cmd: '0'
+  IPC::Open3: '0'
+  Moo: '0'
+  Ref::Util: '0'
+  Time::HiRes: '0'
+  Types::Standard: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Perl-Hadoop/Hadoop-HDFS-Command/issues
+  repository: git://github.com/Perl-Hadoop/Hadoop-HDFS-Command.git
+version: '0.002'
+x_contributors:
+  - 'Burak Gursoy <burak@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

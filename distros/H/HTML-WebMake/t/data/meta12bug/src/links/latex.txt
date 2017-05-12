@@ -1,0 +1,25 @@
+<wmmeta name="ltitle">TeX und LaTeX</wmmeta>
+<wmmeta name="stitle">TeX/LaTeX</wmmeta>
+<wmmeta name="author">J&ouml;rn Clausen</wmmeta>
+<wmmeta name="cdate">2001-04-23</wmmeta>
+<wmmeta name="mdate">2001-04-23</wmmeta>
+
+    <ul>
+      <li>
+	<a href="http://www.tug.org/">TeX Users Group</a>
+      </li>
+      <li>
+	<a href="http://www.dante.de/">DANTE, Deutschsprachige
+	  Anwendervereinigung TeX e.V.</a>
+      </li>
+      <li>
+	<a href="http://www.latex-project.org/">LaTeX Project Home page</a>
+      </li>
+      <li>
+	<a href="http://www.TechFak.Uni-Bielefeld.DE/rechner/latex/">TeX und
+	  LaTeX an der Universit&auml;t Bielefeld</a>
+      </li>
+      <li>
+	<a href="ftp://ftp.uni-bielefeld.de/pub/tex/info/lshort/german/l2kurz.pdf">LaTeX2e-Kurzbeschreibung (PDF)</a>
+      </li>
+    </ul>

@@ -1,0 +1,18 @@
+Revision history for HTTP-Tiny-ProgressAny
+
+0.03    2015-01-23 (PERLANCAR)
+
+	- [ux] Markup message so it can be elided more nicely using
+	  String::Elide::Parts.
+
+
+0.02    2015-01-22 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Forgot to insert screenshot.
+
+
+0.01     2015-01-22 (PERLANCAR)
+
+         - First release.

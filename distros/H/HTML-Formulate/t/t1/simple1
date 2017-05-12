@@ -1,0 +1,14 @@
+<form method="post">
+<table cellpadding="2">
+<tr><th>Emp ID</th><td>123<input name="emp_id" type="hidden" value="123" /></td></tr>
+<tr><th>Emp Name</th><td><input name="emp_name" type="text" value="Fred Flintstone" /></td></tr>
+<tr><th>Emp Title</th><td><input name="emp_title" type="text" value="CEO" /></td></tr>
+<tr><th>Emp Addr ID</th><td><input name="emp_addr_id" type="text" value="225" /></td></tr>
+<tr><th>Emp Birth Dt</th><td><input name="emp_birth_dt" type="text" value="20-10-55" /></td></tr>
+<tr><td align="center" colspan="2">
+<input name="_submit" type="submit" value="Submit" />
+</td></tr>
+</table>
+<input name="emp_modify_ts" type="hidden" value="" />
+<input name="emp_modify_uid" type="hidden" value="1003" />
+</form>

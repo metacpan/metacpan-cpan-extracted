@@ -1,0 +1,26 @@
+Revision history for Perl extension HTTP::MobileAgent::Plugin::SmartPhone
+
+0.03    Tue Dec 12 11:48:00 2012
+        - fix warnings when User-Agent is empty.
+
+0.021   Tue Oct 30 02:39:00 2012
+        - bundle Module::Install 1.06.
+
+0.02    Thu Apr 25 08:00:00 2012
+        - add method android(_full)?_version for detecting android version.
+
+0.014   Thu Mar 01 05:02:00 2012
+        - add missing method "is_ipod". Thanks to bokutin. fixes #1
+
+0.013   Sat Feb 21 22:44:00 2012
+        - fix pod
+
+0.012   Sat Feb 18 15:06:06 2012
+        - add requires 'HTTP::MobileAgent'
+
+0.011   Sat Feb 18 15:06:06 2012
+        - fix pod
+        - add test_requires 'Test::Base'
+
+0.01    Sun Dec 18 13:32:06 2011
+        - original version

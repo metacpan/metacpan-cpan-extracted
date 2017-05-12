@@ -1,0 +1,83 @@
+<ep-package name="HTML::EP::Glimpse" lib="admin/lib">
+<html><head><title>
+<ep-language en="Glimpse Advanced Search Page"
+             de="Erweiterte Suchseite mit Glimpse"></title></head>
+<body bgcolor=#ffffff>
+  <div align=center>
+    <a href="advanced.ep?language=de">
+      <img border=0 src="de.jpg" alt="Deutsch">
+    </a>
+    <a href="index.ep?language=en">
+      <img border=0 src="en.jpg" alt="English">
+    </a>
+  </div>
+  <h1><ep-language en="Glimpse Advanced Search Page"
+                   de="Erweiterte Suchseite mit Glimpse"></h1>
+<ep-language language="de">
+  Dies ist die erweiterte Suchseite. Auch hier können Sie nach Stichworten
+  suchen lassen, aber mit wesentlich komplexeren Möglichkeiten. Natürlich
+  können Sie auch zur <a href="index.ep?language=$_ep_language$">einfacheren
+  Suchseite</a> zurückkehren.
+</ep-language>
+<ep-language language="en">
+  This is the advanced search page, offering you lots of additional
+  possibiltities to look for keywords. Of course you can always return
+  to the <a href="index.ep?language=$_ep_language$">simple search page</a>.
+</ep-language>
+<div align=center>
+<form action=search.ep method=get>
+  <input type=hidden name=language value="$_ep_language$">
+  <table>
+    <tr>
+      <td><input size=20 name=search></td>
+      <td><select name=opt_or>
+            <option value=0><ep-language en="Find all my words"
+                                         de="Alle Worte suchen">
+            <option value=1><ep-language en="Find any word"
+                                         de="Ein Wort genügt">
+          </select>
+      </td>
+    </tr>
+    <tr>
+      <tr><td><ep-language de="Groß-/Kleinschreibung berücksichtigen"
+                           en="Case sensitive"></td>
+          <td><select name="opt_case_sensitive">
+                <option value=0><ep-language de="Nein" en="No">
+                <option value=1><ep-language de="Ja" en="Yes">
+              </select></td>
+    </tr>
+    <tr>
+      <tr><td><ep-language de="Nur komplette Worte berücksichtigen"
+                           en="Match only complete words"></td>
+          <td><select name="word_boundary">
+                <option value=0><ep-language de="Nein" en="No">
+                <option value=1><ep-language de="Ja" en="Yes">
+              </select></td>
+    </tr>
+    <tr>
+      <tr><td><ep-language de="Alle Worte auf einer Zeile"
+                           en="All words on one line"></td>
+          <td><select name="opt_whole_file">
+                <option value=0><ep-language de="Ja" en="Yes">
+                <option value=1><ep-language de="Nein" en="No">
+              </select></td>
+    </tr>
+    <tr>
+      <tr><td><ep-language de="Erlaube reguläre Ausdrücke"
+                           en="Accept regular expressions"></td>
+          <td><select name="opt_regex">
+                <option value=0><ep-language de="Nein" en="No">
+                <option value=1><ep-language de="Ja" en="Yes">
+              </select></td>
+    </tr>
+  </table>
+  <ep-language language="en">
+    <input type=submit value="Search now">
+  </ep-language>
+  <ep-language language="de">
+    <input type=submit value="Suche starten">
+  </ep-language>
+</form>
+</div>
+</body>
+</html>

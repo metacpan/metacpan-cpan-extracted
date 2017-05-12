@@ -1,0 +1,7 @@
+<%method main>
+<%args>
+$foo => ''
+</%args>
+PFOO: <% $foo %>
+HFOO: <% html_hunk($foo) %>
+</%method>

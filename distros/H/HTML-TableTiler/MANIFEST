@@ -1,0 +1,13 @@
+Changes
+Examples.html
+lib/HTML/TableTiler.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01_default_tile.t
+t/02_custom_tile.t
+t/03_custom_modes.t
+t/04_function_interface.t
+t/test_pod.t
+t/test_pod_coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,6 @@
+---
+name: 'MIME::QuotedPrint Support'
+default: 1
+depends:
+    'MIME::QuotedPrint': 0
+

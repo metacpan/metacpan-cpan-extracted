@@ -1,0 +1,12 @@
+Revision history for HTML-Template-Filter-TT2
+
+0.03    2007.10.12
+        [DIST] Added eg/ht_tt2_debug
+
+0.02    2007.10.03
+        [FEATURE] Handle default value and escape filter for variables.
+        [TESTS] Rewrote t/ht_tt2_filter.t
+
+0.01    2007.09.28
+        First version, released on an unsuspecting world.
+

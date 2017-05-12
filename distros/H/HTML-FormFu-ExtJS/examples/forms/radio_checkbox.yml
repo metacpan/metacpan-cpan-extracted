@@ -1,0 +1,14 @@
+---
+elements:
+  - type: Radio
+    name: foo
+    label: test
+  - type: Checkbox
+    name: foo2
+    default: 1
+    label: Checked
+  - type: Checkbox
+    name: foo3
+    label: Unchecked
+    
+    

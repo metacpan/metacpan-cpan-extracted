@@ -1,0 +1,57 @@
+{
+   "abstract" : "a script tag with javascript code supplied via field for HTML::FormHandler.",
+   "author" : [
+      "Charlie Garrison <garrison@zeta.org.au>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "HTML-FormHandlerX-Field-JavaScript",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::FormHandler::Field::NoValue" : "0",
+            "JSON::MaybeXS" : "0",
+            "JavaScript::Minifier::XS" : "0",
+            "Moose" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTML::FormHandler" : "0",
+            "HTML::FormHandler::Moose" : "0",
+            "Test::More" : "0",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cngarrison/HTML-FormHandlerX-Field-JavaScript/issues"
+      },
+      "homepage" : "https://github.com/cngarrison/HTML-FormHandlerX-Field-JavaScript",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/cngarrison/HTML-FormHandlerX-Field-JavaScript.git",
+         "web" : "https://github.com/cngarrison/HTML-FormHandlerX-Field-JavaScript"
+      }
+   },
+   "version" : "0.004"
+}
+

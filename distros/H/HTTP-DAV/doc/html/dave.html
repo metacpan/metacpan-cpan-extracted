@@ -1,0 +1,599 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<link rel="stylesheet" href="http://www.webdav.org/perldav/perldav_plain.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+
+<h1 id="NAME">NAME</h1>
+
+<p>dave - DAV Explorer</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    dave [OPTIONS] URL</code></pre>
+
+<p>E.g.</p>
+
+<pre><code>   $ dave -u pcollins -p mypass www.host.org/dav_dir/
+   ...
+   dave&gt; get file.txt</code></pre>
+
+<p>Use <code>dave -h</code> to get help on options.</p>
+
+<p>Use <code>perldoc dave</code> for the whole manpage.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>dave is a powerful command-line program for interacting with WebDAV-enabled webservers. With dave you can:</p>
+
+<ul>
+
+<li><p>get and put files</p>
+
+</li>
+<li><p>make directories on a remote webserver</p>
+
+</li>
+<li><p>remove files and directories from a remote webserver</p>
+
+</li>
+<li><p>edit a file on the webserver with a single command</p>
+
+</li>
+<li><p>recursively get a remote directory</p>
+
+</li>
+<li><p>recursively put a local directory</p>
+
+</li>
+<li><p>lock and unlock remote files and directories</p>
+
+</li>
+<li><p>securely transfer over https</p>
+
+</li>
+<li><p>authenticate using the safer Digest authentication</p>
+
+</li>
+</ul>
+
+<p>Dave is a part of the PerlDAV project (http://www.webdav.org/perldav/) and is built on top of the HTTP::DAV perl API.</p>
+
+<p>If you would like to script webdav interactions in Perl checkout the HTTP::DAV API as it&#39;s commands are the basis for dave&#39;s.</p>
+
+<h1 id="OPTIONS">OPTIONS</h1>
+
+<dl>
+
+<dt id="debug-N"><code>-debug N</code></dt>
+<dd>
+
+<p>Sets the debug level to N. 0=none. 3=noisy.</p>
+
+</dd>
+<dt id="h"><code>-h</code></dt>
+<dd>
+
+<p>Prints basic help and options.</p>
+
+</dd>
+<dt id="man"><code>-man</code></dt>
+<dd>
+
+<p>Prints the full manual (equivalent to perldoc dave).</p>
+
+<p>You will need to use a pager like <code>more</code> or <code>less</code>. e.g.</p>
+
+<pre><code>    dave -man |less</code></pre>
+
+</dd>
+<dt id="p-password"><code>-p &lt;password&gt;</code></dt>
+<dd>
+
+<p>Sets the password to be used for the URL. You must also supply a user. See <code>-u</code>.</p>
+
+</dd>
+<dt id="u-username"><code>-u &lt;username&gt;</code></dt>
+<dd>
+
+<p>Sets the username to be used for the URL. You must also supply a pass. See <code>-p</code>.</p>
+
+</dd>
+<dt id="tmpdir-some-path"><code>-tmpdir /some/path</code></dt>
+<dd>
+
+<p>Create temporary files in <code>/some/path</code> instead of the default <code>/tmp</code>.</p>
+
+</dd>
+</dl>
+
+<h1 id="COMMANDS">COMMANDS</h1>
+
+<dl>
+
+<dt id="cd-URL"><b>cd URL</b></dt>
+<dd>
+
+<p>changes directories</p>
+
+<pre><code>   dave&gt; open host.org/dav_dir/
+   dave&gt; cd dir1
+   dave&gt; cd ../dir2</code></pre>
+
+</dd>
+<dt id="cat-URL"><b>cat URL</b></dt>
+<dd>
+
+<p>shows the contents of a remote file</p>
+
+<pre><code>   dave&gt; open host.org/dav_dir/
+   dave&gt; cat index.html</code></pre>
+
+<p>Note: you cannot cat a directory (collection).</p>
+
+</dd>
+<dt id="cp"><b>cp</b></dt>
+<dd>
+
+</dd>
+<dt id="copy-SOURCE_URL-DEST_URL"><b>copy SOURCE_URL DEST_URL</b></dt>
+<dd>
+
+<p>copies one remote resource to another</p>
+
+<pre><code>  dave&gt; open host.org/dav_dir/</code></pre>
+
+<p>Create a copy of dir1/ as dav2/</p>
+
+<pre><code>  dave&gt; cp dir1 dav2</code></pre>
+
+<p>Create a copy of dir1/file.txt as dav2/file.txt</p>
+
+<pre><code>  dave&gt; cd dir1
+  dave&gt; copy file.txt ../dav2</code></pre>
+
+<p>Create a copy of file.txt as ../dav2/new_file.txt</p>
+
+<pre><code>  dave&gt; copy file.txt dav2/new_file.txt</code></pre>
+
+<p>Aliases: cp</p>
+
+</dd>
+<dt id="rmdir-URL"><b>rmdir URL</b></dt>
+<dd>
+
+</dd>
+<dt id="rm-URL"><b>rm URL</b></dt>
+<dd>
+
+</dd>
+<dt id="delete-URL"><b>delete URL</b></dt>
+<dd>
+
+<p>deletes a remote resource</p>
+
+<pre><code>   dave&gt; open host.org/dav_dir/
+   dave&gt; delete index.html
+   dave&gt; rmdir ./dir1
+   dave&gt; delete /dav_dir/dir2/
+   dave&gt; delete /dav_dir/*.html</code></pre>
+
+<p>This command recursively deletes directories. BE CAREFUL :)</p>
+
+<p>This command supported wildcards (globbing). See get.</p>
+
+<p>Aliases: rm, rmdir</p>
+
+</dd>
+<dt id="edit-URL"><b>edit URL</b></dt>
+<dd>
+
+<p>edits the contents of a remote file</p>
+
+<pre><code>   dave&gt; open host.org/dav_dir/
+   dave&gt; edit index.html</code></pre>
+
+<p>Edit is equivalent to the following sequence of commands:</p>
+
+<pre><code>   LOCK index.html (if allowed)
+   GET index.html /tmp/dave.perldav.421341234124
+   sh $EDITOR /tmp/dave.perldav.421341234124
+   PUT index.html (if modified)
+   UNLOCK index.html (if locked)</code></pre>
+
+<p>Where $EDITOR is determined from the environment variables DAV_EDITOR or EDITOR.</p>
+
+<p>If DAV_EDITOR is set, it will use that, otherwise it will use EDITOR. If neither variables are set, then &quot;vi&quot; will be used.</p>
+
+<p>Notes:</p>
+
+<p>The lock only lasts for 10 hours.</p>
+
+<p>You cannot edit a directory (collection).</p>
+
+<p>The temporary save directory is editable by editing dave and changing TMP_DIR</p>
+
+</dd>
+<dt id="get-URL-FILE"><b>get URL [FILE]</b></dt>
+<dd>
+
+<p>downloads the file or directory at URL</p>
+
+<p>If FILE is not specified it will be saved to your current working directory using the same name as the remote name.</p>
+
+<pre><code>  dave&gt; open host.org/dav_dir/</code></pre>
+
+<p>Recursively get remote my_dir/ to .</p>
+
+<pre><code>  dave&gt; get my_dir/  </code></pre>
+
+<p>Recursively get remote my_dir/ to /tmp/my_dir/</p>
+
+<pre><code>  dave&gt; get my_dir /tmp</code></pre>
+
+<p>Get remote my_dir/index.html to /tmp/index.html</p>
+
+<pre><code>  dave&gt; get /dav_dir/my_dir/index.html /tmp</code></pre>
+
+<p>Get remote index.html to /tmp/index1.html</p>
+
+<pre><code>  dave&gt; get index.html /tmp/index1.html</code></pre>
+
+<p>Use globs and save to /tmp</p>
+
+<pre><code>  dave&gt; get index* /tmp                   # Gets index*.html, index*.txt, etc.
+  dave&gt; get index*.html /tmp/index1.html  # Gets index*.html
+  dave&gt; get index[12].htm?                # Gets file1 and file2, .htm and .html</code></pre>
+
+</dd>
+<dt id="CMD"><b>? [CMD]</b></dt>
+<dd>
+
+</dd>
+<dt id="h-CMD"><b>h [CMD]</b></dt>
+<dd>
+
+</dd>
+<dt id="help-CMD"><b>help [CMD]</b></dt>
+<dd>
+
+<p>prints list of commands or help for CMD</p>
+
+<pre><code>  dave&gt; ?
+
+  dave&gt; help get</code></pre>
+
+<p>Aliases: ?, h</p>
+
+</dd>
+<dt id="lcd-DIR"><b>lcd [DIR]</b></dt>
+<dd>
+
+<p>changes local directory</p>
+
+<pre><code>  dave&gt; lcd /tmp</code></pre>
+
+</dd>
+<dt id="lls-DIR"><b>lls [DIR]</b></dt>
+<dd>
+
+<p>lists local directory contents</p>
+
+<pre><code>  dave&gt; lcd /tmp
+  dave&gt; lls
+  dave&gt; lls /home</code></pre>
+
+<p>This command simply execs the local ls command and is equivalent to &quot;!ls&quot;</p>
+
+</dd>
+<dt id="dir-URL"><b>dir [URL]</b></dt>
+<dd>
+
+</dd>
+<dt id="ls-URL"><b>ls [URL]</b></dt>
+<dd>
+
+<p>lists remote directory contents or file props</p>
+
+<pre><code>  dave&gt; ls
+  Listing of http://host.org/dav_dir/
+                  ./          Aug 29 02:26  &lt;dir&gt;
+     mtx_0.04.tar.gz   52640  Aug 11 11:45
+          index.html    4580  Aug 11 11:45
+      index0.04.html    4936  Nov 11  2000
+              mydir/          Aug 19 21:14  &lt;dir&gt;,&lt;locked&gt;
+
+  dave&gt; ls index.html
+  URL: http://www.webdav.org/perldav/index.html
+  Content-type: text/html
+  Creation date: Sun Aug 12 21:58:02 2001
+  Last modified:
+  Size: 4580 bytes
+  Locks supported: write/exclusive write/shared
+  Locks:</code></pre>
+
+<p>Use propfind to get a similar printout of a collection (directory).</p>
+
+<p>Aliases: dir</p>
+
+</dd>
+<dt id="lock-URL-TIMEOUT-DEPTH"><b>lock [URL [TIMEOUT] [DEPTH]]</b></dt>
+<dd>
+
+<p>locks a resource</p>
+
+<p>Without a URL you will lock the current remote collection.</p>
+
+<p>TIMEOUT can be any of the following formats: 30s 30 seconds from now 10m ten minutes from now 1h one hour from now 1d tomorrow 3M in three months 10y in ten years time 2000-02-31 00:40:33 2000-02-31</p>
+
+<p>Default is an infinite timeout</p>
+
+<p>See perldoc <code>HTTP::DAV::Resource</code> for more information about timeouts.</p>
+
+<p>DEPTH can be either &quot;0&quot; or &quot;infinity&quot; (default)</p>
+
+<p>Seeting the lock Scope and Type is not currently implemented. Let me know if you need it as it shouldn&#39;t be too much effort.</p>
+
+</dd>
+<dt id="mkdir-URL"><b>mkdir URL</b></dt>
+<dd>
+
+</dd>
+<dt id="mkcol-URL"><b>mkcol URL</b></dt>
+<dd>
+
+<p>make a remote collection (directory)</p>
+
+<pre><code>  dave&gt; open host.org/dav_dir/
+  dave&gt; mkcol new_dir
+  dave&gt; mkdir /dav_dir/new_dir</code></pre>
+
+<p>Aliases: mkdir</p>
+
+</dd>
+<dt id="mv"><b>mv</b></dt>
+<dd>
+
+</dd>
+<dt id="move-SOURCE_URL-DEST_URL"><b>move SOURCE_URL DEST_URL</b></dt>
+<dd>
+
+<p>moves a remote resource to another</p>
+
+<pre><code>  dave&gt; open host.org/dav_dir/</code></pre>
+
+<p>Move dir1/ to dav2/</p>
+
+<pre><code>  dave&gt; move dir1 dav2</code></pre>
+
+<p>Move file dir2/file.txt to ../file.txt</p>
+
+<pre><code>  dave&gt; cd dir2
+  dave&gt; move file.txt ..</code></pre>
+
+<p>Move file.txt to dav2/new_file.txt</p>
+
+<pre><code>  dave&gt; move file.txt dav2/new_file.txt</code></pre>
+
+<p>Aliases: mv</p>
+
+</dd>
+<dt id="open-URL"><b>open URL</b></dt>
+<dd>
+
+<p>connects to the WebDAV-enabled server at URL</p>
+
+<pre><code>   dave&gt; open host.org/dav_dir/</code></pre>
+
+<p>Note that if authorization details are required you will be prompted for them.</p>
+
+<p>https and Digest authorization are not currently supported. Please let me know if you need it.</p>
+
+</dd>
+<dt id="options-URL"><b>options [URL]</b></dt>
+<dd>
+
+<p>show the HTTP methods allowed for a URL</p>
+
+<pre><code>   dave&gt; options index.html
+   OPTIONS, GET, HEAD, POST, DELETE, TRACE, PROPFIND, 
+   PROPPATCH, COPY, MOVE, LOCK, UNLOCK</code></pre>
+
+<p>Note that Microsoft&#39;s IIS does not support LOCK on collections (directories). Nor does it support PROPPATCH.</p>
+
+</dd>
+<dt id="propfind-URL"><b>propfind [URL]</b></dt>
+<dd>
+
+<p>show the properties of a resource</p>
+
+<pre><code>  dave&gt; propfind test
+  URL: http://host.org/dav_dir/test/
+  Content-type: httpd/unix-directory
+  Creation date: Wed Aug 29 00:36:42 2001
+  Last modified:
+  Size:  bytes
+  Locks supported: write/exclusive write/shared
+  Locks:</code></pre>
+
+<p>Using ls will get you the same printout if you ls a file. But ls&#39;ing a collection will show you the collections contents.</p>
+
+</dd>
+<dt id="put-FILE-URL"><b>put FILE [URL]</b></dt>
+<dd>
+
+<p>uploads a local file or directory to URL or the currently opened location.</p>
+
+<p>If URL is an existing collection then the dir/file will be copied INTO that collection.</p>
+
+<pre><code>  dave&gt; open host.org/dav_dir/</code></pre>
+
+<p>Recursively put local my_dir/ to host.org/dav_dir/my_dir/:</p>
+
+<pre><code>  dave&gt; put my_dir/  </code></pre>
+
+<p>Put local index.html to host.org/dav_dir/index1.html:</p>
+
+<pre><code>  dave&gt; put /tmp/index.html index1.html</code></pre>
+
+<p>Put * to remote directory</p>
+
+<pre><code>  dave&gt; put *</code></pre>
+
+<p>Put index[12].htm? to remote directory /dav_dir (/dav_dir must exist)</p>
+
+<pre><code>  dave&gt; put index[12].htm? /dav_dir</code></pre>
+
+<p>Put index[1234].htm? to remote directory /dav_dir (/dav_dir must exist)</p>
+
+<pre><code>  dave&gt; put index[1-4].htm? /dav_dir</code></pre>
+
+<p>Glob types supported are, * (matches any characters), ? (matches any one character), [...] (matches any characters in the set ...).</p>
+
+</dd>
+<dt id="pwd"><b>pwd</b></dt>
+<dd>
+
+<p>prints the currently opened URL (working directory)</p>
+
+<pre><code> dave&gt; open host.org/dav_dir/
+ dave&gt; cd new_dir/
+ dave&gt; pwd
+ http://host.org/dav_dir/new_dir/</code></pre>
+
+</dd>
+<dt id="q"><b>q</b></dt>
+<dd>
+
+</dd>
+<dt id="bye"><b>bye</b></dt>
+<dd>
+
+</dd>
+<dt id="quit"><b>quit</b></dt>
+<dd>
+
+<p>exits dave</p>
+
+<p>Note that dave does not unlock any locks created during your session.</p>
+
+<p>Aliases: q, quit</p>
+
+</dd>
+<dt id="set-URL-PROPERTY-VALUE-NAMESPACE"><b>set URL PROPERTY VALUE [NAMESPACE]</b></dt>
+<dd>
+
+<p>sets a custom property on a resource</p>
+
+<pre><code>   dave&gt; set file.txt author &quot;Patrick Collins&quot;
+   dave&gt; set file.txt author &quot;Patrick Collins&quot; &quot;mynamespace&quot;</code></pre>
+
+<p>The NAMESPACE by default is &quot;DAV:&quot;.</p>
+
+</dd>
+<dt id="pod"><b>!</b></dt>
+<dd>
+
+</dd>
+<dt id="sh"><b>sh</b></dt>
+<dd>
+
+<p>executes a local command (alias !)</p>
+
+<pre><code>   dave&gt; sh cat localfile
+   dave&gt; !gzip localfile.gz
+   dave&gt; ! &quot;cat localfile | less&quot;</code></pre>
+
+<p>Aliases: !</p>
+
+</dd>
+<dt id="showlocks"><b>showlocks</b></dt>
+<dd>
+
+<p>show my locks on a resource</p>
+
+<p>Shows any locked resources that you&#39;ve locked in this session.</p>
+
+<p>See <code>propfind</code> if you&#39;d like to see anyone&#39;s locks held against a particular resource.</p>
+
+</dd>
+<dt id="steal-URL"><b>steal [URL]</b></dt>
+<dd>
+
+<p>remove ANY locks on a resource</p>
+
+<p>Useful if you accidentally forgot to unlock a resource from a previous session or if you think that somebody has forgotten to unlock a resource.</p>
+
+</dd>
+<dt id="unlock-URL"><b>unlock [URL]</b></dt>
+<dd>
+
+<p>unlocks a resource</p>
+
+<p>Note that unlock will only unlock locks that you have created. Use steal if you want to forcefully unlock somebody else&#39;s lock.</p>
+
+</dd>
+<dt id="unset-URL-PROPERTY-NAMESPACE"><b>unset URL PROPERTY [NAMESPACE]</b></dt>
+<dd>
+
+<p>unsets a property from a resource</p>
+
+<pre><code>   dave&gt; unset file.txt author
+   dave&gt; unset file.txt author &quot;mynamespace&quot;</code></pre>
+
+<p>The NAMESPACE by default is &quot;DAV:&quot;.</p>
+
+</dd>
+</dl>
+
+<h1 id="GETTING-HELP">GETTING HELP</h1>
+
+<p>The perldav mailing list There is a mailing list for PerlDAV and dave for use by Developers and Users. Please see http://mailman.webdav.org/mailman/listinfo/perldav</p>
+
+<h1 id="INSTALLATION">INSTALLATION</h1>
+
+<p>dave is installed to /usr/local/bin by default when you install the PerlDAV library. See http://www.webdav.org/perldav/ for installation details of PerlDAV.</p>
+
+<h1 id="WHAT-PLATFORMS-WILL-IT-WORK-ON">WHAT PLATFORMS WILL IT WORK ON?</h1>
+
+<p>dave is pure perl so only needs Perl5.003 (or later) and the <code>PerlDAV</code> library to be installed.</p>
+
+<p>I have not ported dave to Windows but would like somebody to have a shot at it.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>The <code>PerlDAV</code> perl API at http://www.webdav.org/perldav/ or by typing &quot;perldoc HTTP::DAV&quot; on your command line.</p>
+
+<h1 id="AUTHOR-AND-COPYRIGHT">AUTHOR AND COPYRIGHT</h1>
+
+<p>This module is Copyright (C) 2001 by</p>
+
+<pre><code>    Patrick Collins
+    G03 Gloucester Place, Kensington
+    Sydney, Australia
+
+    Email: pcollins@cpan.org
+    Phone: +61 2 9663 4916</code></pre>
+
+<p>All rights reserved.</p>
+
+<p>You may distribute this module under the terms of either the GNU General Public License or the Artistic License, as specified in the Perl README file.</p>
+
+<h1 id="MAINTAINER">MAINTAINER</h1>
+
+<p>Cosimo Streppone, &lt;cosimo@cpan.org&gt;</p>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,30 @@
+---
+abstract: 'Simple interface for User-Agent string parsing'
+author:
+  - 'Sean Cannon <dodger@cpan.org>'
+  - 'Neil Bowers <neilb@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  FindBin: '0'
+  JSON: '0'
+  JSON::Tiny: '0'
+  Test::More: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-ParseBrowser
+requires:
+  perl: '5.006'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/neilb/HTML-ParseBrowser
+  repository: https://github.com/neilb/HTML-ParseBrowser.git
+version: '1.13'
+x_serialization_backend: 'YAML::Tiny version 1.62'

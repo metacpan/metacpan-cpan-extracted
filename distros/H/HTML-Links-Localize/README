@@ -1,0 +1,8 @@
+This is HTML::Hard::Disk - a module that converts HTML files to be used
+within a hard-disk directory. What it does is add an index.html suffix to
+internal links to directories.
+
+It contains html-to-hd which is a standalone command line application.
+
+The author and maintainer of this module is Shlomi Fish (shlomif@cpan.org).
+

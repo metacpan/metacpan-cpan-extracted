@@ -1,0 +1,10 @@
+Makefile.PL
+MANIFEST
+Changes
+README
+LICENSE
+lib/Hash/KeyMorpher.pm
+t/000-load.t
+t/001-strings.t
+t/002-hashes.t
+META.yml                                 Module meta-data (added by MakeMaker)

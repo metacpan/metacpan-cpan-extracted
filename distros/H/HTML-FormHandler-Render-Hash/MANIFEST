@@ -1,0 +1,8 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/HTML/FormHandler/Render/Hash.pm
+t/00-load.t
+Makefile.PL
+META.yml

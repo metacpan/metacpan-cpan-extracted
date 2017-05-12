@@ -1,0 +1,33 @@
+VERSION
+
+HTML::Tmojo Version 0.300
+
+ABSTRACT
+
+Tmojo(tm) is a powerful and flexible content generation
+engine developed at Lab-01. For more information, read
+docs/nutshell.txt or visit <http://lab-01.com/>.
+
+INSTALLATION
+
+Tmojo comes with a typical Perl installation setup. The
+following commands should properly install Tmojo:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+If you have trouble installing Tmojo this way, you can
+always just make sure that the contents of the 'lib'
+directory are in Perl's @INC array.
+
+COPYRIGHT AND LICENSE
+
+Copyright 2003, 2004 Lab-01 LLC <http://lab-01.com/>
+
+Free use and distribution of this software is encouraged. Terms of such
+use and distribution is covered under Version 2.0 of the Apache License.
+Please see the included "LICENSE" file, or refer to:
+
+  http://www.apache.org/licenses/LICENSE-2.0

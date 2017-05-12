@@ -1,0 +1,3 @@
+#perl broadcast.pl example.yaml will invoke ligands_dock.pl and set of json files
+
+see the scripts and configuration example for more information!

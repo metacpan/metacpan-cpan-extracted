@@ -1,0 +1,215 @@
+<!--
+=head1 NAME
+
+navtree.wmk - WebMake tag to generate a per-page sitemap
+
+=head1 LOADING
+
+  < use plugin="navtree" />
+
+=head1 WEBMAKE TAGS
+
+  < navtree name=... sitemap=...
+  	opennode=... closednode=...
+	thisnode=... thisleaf=...
+	leaf=... depth=... />
+
+=head1 DESCRIPTION
+
+This WebMake plugin provides the C<navtree> tag.
+
+C<navtree> operates similarly to the C<sitetree> tag, but displays only a
+subset of all the site's nodes; it will map all of the top-level nodes of the
+site, the parent nodes of the current page, their direct children, and the
+current page plus it's children up to depth C<depth>.  The effect is similar to
+a tree-view-based file browser, like Windows Explorer.
+
+This differs from the C<sitetree> tag in that C<sitetree> does not support
+displaying the current page's children.
+
+So, for a site like this:
+
+=over 4
+
+=item + Section 1
+
+=over 4
+
+=item + Section 1 Subsection 1
+
+=item + Section 1 Subsection 2
+
+=back
+
+=item + Section 2
+
+=over 4
+
+=item + Section 2 Subsection 1
+
+=item + Section 2 Subsection 2
+
+=back
+
+=back
+
+A reference to the site tree on page C<Section 1> would result in
+a site tree like this:
+
+=over 4
+
+=item - Main Page
+
+=over 4
+
+=item - Section 1
+
+=over 4
+
+=item * Section 1 Subsection 1
+
+=item * Section 1 Subsection 2
+
+=back
+
+=item + Section 2
+
+=back
+
+=back
+
+Display of each page's entry in the tree is performed by expanding one of the 5
+template content items named in the tag's attributes: C<closednode>,
+C<opennode>, C<thisnode>, C<thisleaf> or C<leaf>.  See the C<sitemap> tag
+documentation for more details on how to use these (note however that the
+I<is_node> variable is not available for sitetrees).
+
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item name
+
+The name of the sitetree object.  To include a sitetree in a page, refer to it
+using this name, as a deferred reference.
+
+=item sitemap
+
+The name of the sitemap.  The sitetree requires a sitemap, as the sitemap is
+responsible for mapping out the site and defining which pages and content items
+are included.
+
+=item closednode
+
+A content item which is evaluated to display a ''closed'' node, ie. a node
+which is not on the path to the current page.
+
+=item opennode
+
+A content item which is evaluated to display an ''open'' node, one which is on
+the path to the current page.  As for the C<sitemap> tag's C<node> attribute,
+this content item must include a reference to the B<list> variable, which will
+contain all the entries for the pages beneath it in the hierarchy.
+
+=item rootnode
+
+A content item which is evaluated to display an ''open'' root node. It
+defaults to C<opennode> if not specified. It may be used to generate
+''multirooted'' tree (a forest). In that case you should create a dummy
+root content (it upsets sitemap code if you dont have one single root) and
+create C<rootnode> template to output only the list with apropriate
+decorations.
+
+=item thisnode
+
+A content item which is evaluated to display the current page if it is an
+inner node, that is it has children. Iff C<depth> > 0, C<thisnode> must include
+a reference to the B<list> variable.
+
+=item thisleaf
+
+A content item which is evaluated to display the current page if it is a
+leaf.
+
+=item leaf
+
+A content item which is evaluated to display a leaf-node page, one which has no
+pages beneath it in the hierarchy.
+
+=item depth
+
+How many levels beneath the current page should be listed. 0 means none
+(behavior of C<sitetree> tag). The default is 1 which means to list direct
+children of the current node.
+
+=back
+
+=head1 VARIABLES
+
+Following variables (content items) are defined for use in templates:
+
+=over 4
+
+=item title
+
+The C<title> metadatum of the node.
+
+=item score
+
+The C<score> metadatum of the node.
+
+=item name
+
+The name of the node.
+
+=item url
+
+The url of the node. Should be referenced using url reference (C<$ (url)>).
+
+=item level
+
+The level of the node, that is how deep it is in the tree. Root node has
+level 0, it's children 1, their children 2 and so on.
+
+=item sublvl
+
+The level under current page. This is similar to C<level>, except that
+current page is considered root. -1 for nodes not descendant from current
+page.
+
+=item left
+
+This is C<depth> above the current node and C<depth - sublvl> for the
+descendants of the current node.
+
+=item is_leaf
+
+This is 1 for leaf nodes and 0 for inner nodes (both closed and open).
+
+=item list
+
+This is the list of children, which should be output by open nodes.
+
+=back
+
+=head1 THANKS
+
+Thanks to Jan Hudec &lt;bulb /at/ ucw.cz&gt;, who provided this tag.
+
+=cut
+
+<wmmeta name="Title" value="navtree.wmk" />
+<wmmeta name="Abstract" value="WebMake tag to generate a per-page sitemap" />
+
+-->
+<{perl
+
+  use HTML::WebMake::PerlLib::NavTree;
+
+  $self->define_empty_wmk_tag ("navtree",
+  	\&HTML::WebMake::PerlLib::NavTree::handle_navtree_tag,
+ 	qw(name sitemap closednode opennode thisnode thisleaf leaf));
+
+  '';
+}>

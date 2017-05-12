@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head>
+				<title>Informations patient</title>
+
+	<meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+	<meta http-equiv="Content-Style-Type" content="text/css"/>
+	<meta http-equiv="Content-Script-Type" content="text/javascript"/>
+		
+	<link rel="stylesheet" type="text/css" href="css/base.css"/>
+</head><body>
+
+<form action="">
+<h1>Informations patient</h1>
+<div class="errorList">
+<h2 class="errorList">Des erreurs sont survenues</h2>
+<dl class="errorList">
+		<dt>Général</dt><dd>Un problème à la technique est survenu, ce n'est pas bien... Il peut s'agir d'un effet de bord d'une opération de maintenance. Si le problème ѕe produit une nouvelle fois, contactez le support.</dd>
+		<dt>adresse (Ligne 1) :</dt><dd> il en faut une. <a href="#adr1">Corriger</a> </dd>
+		<dt>Age du patient</dt>
+				<dd>L'âge ne peut être supérieur à 1000 ans </dd>
+				<dd>l'âge doit être saisi en années</dd>
+		</dl>
+</div>
+		<fieldset><legend>Identité du patient</legend>
+				<p class="float"><label for="bla" class="plabel">label1</label>
+				<input id="bla" name="bla" value="je vai!! éàüù\" type="text"/>
+				</p>
+				<p class="float"><label for="adr1">première ligne d'adresse</label>
+				<input id="adr1" name="adr1" value="2" type="text"/>
+				</p>
+				<br class="spacer"/>
+				<p class="float"><label for="bl1">Ma deuxième ligne d'adresse qui est très longue</label>
+				<input id="bl1" name="bl1" value="2" type="text"/>
+				</p>
+				<p class="float"><label for="bl2">L'âge du capitaine pour ne rien perdre</label>
+				<input id="bl2" name="bl2" value="2" type="text"/>
+				</p>
+		</fieldset>
+		<fieldset><legend>Critère annexes</legend>
+				<p class="float"><label for="bla" class="plabel">Age officiel</label>
+				<input id="bla" name="bla" value="56" type="text"/>
+				</p>
+				<br class="spacer"/>
+				<p class="float"><label for="bl2">Raison sociale principale</label>
+				<input id="bl2" name="bl2" value="SARL" type="text"/>
+				</p>
+				<br class="spacer"/>
+				<p class="float"><label for="bl4">A réglé toutes ses séances</label>
+				<input class="ckbx" id="bl4" name="bl4" value="Y" type="checkbox"/>
+				</p>
+				<br class="spacer"/>
+				<table class="dataGrid">
+						<col class="coltxt"></col>
+						<col class="coltxt"></col>
+						<col class="coltxt"></col>
+						<thead>
+								<tr>
+										<th>Nom</th>
+										<th>Prénom</th>
+										<th>Age</th>
+								</tr>
+						</thead>
+						<tfoot>
+						</tfoot>
+						<tbody>
+								<tr>
+										<td>Hassler</td>
+										<td>Jean-Christian</td>
+										<td>28</td>
+								</tr>
+								<tr>
+										<td>Daval-Hassler</td>
+										<td>Cécile</td>
+										<td>26</td>
+								</tr>
+								<tr>
+										<td>Le Guennec</td>
+										<td>Marie-Eloïse</td>
+										<td>23</td>
+								</tr>
+						</tbody>
+
+				</table>
+				<table class="dataGrid">
+						<col class="coltxt"></col>
+						<col class="colinput"></col>
+						<col class="colinput"></col>
+						<col class="colinput"></col>
+						<col class="txtOnly"></col>
+						<thead>
+								<tr>
+										<th></th>
+										<th>Résultat</th>
+										<th>Unité ou là là !!</th>
+										<th>Suggestion</th>
+										<th class="txtOnly">Sélection ?</th>
+								</tr>
+						</thead>
+						<tfoot>
+						</tfoot>
+						<tbody>
+								<tr>
+										<td>Daval-Hassler</td>
+										<td><input id="resu1" name="resu1" value="222" type="text"/></td>
+										<td><input class="ckbx" id="unite1" name="unite1" value="percentile" type="checkbox"/></td>
+										<td><input id="sug1" name="sug1" value="bof" type="text"/></td>
+										<td class="txtOnly"><input id="radio1" name="chooseLine" type="radio"/></td>
+								</tr>
+								<tr>
+										<td>Lorem ipsum</td>
+										<td><input id="resu2" name="resu2" value="10" type="text"/></td>
+										<td><input class="ckbx" id="unite2" name="unite2" value="ecart-type" type="checkbox"/></td>
+										<td><input id="sug2" name="sug2" value="" type="text"/></td>
+										<td class="txtOnly"><input id="radio2" name="chooseLine" type="radio"/></td>
+								</tr>
+								<tr>
+										<td>Decimatur</td>
+										<td><input id="resu3" name="resu3" value="5" type="text"/></td>
+										<td><input class="ckbx" id="unite3" name="unite3" value="brouzouf" type="checkbox"/></td>
+										<td><input id="sug3" name="sug3" value="rien à redire" type="text"/></td>
+										<td class="txtOnly"><input id="radio3" name="chooseLine" type="radio"/></td>
+								</tr>
+								<tr>
+										<td>Archie Kramer</td>
+										<td><input id="resu4" name="resu4" value="3" type="text"/></td>
+										<td><input class="ckbx" id="unite4" name="unite4" value="ouaich" type="checkbox"/></td>
+										<td><input id="sug4" name="sug4" value="ça pourrait " type="text"/></td>
+										<td class="txtOnly"><input id="radio4" name="chooseLine" type="radio"/></td>
+								</tr>
+						</tbody>
+
+				</table>
+		</fieldset>
+				<p class="actionBar">
+				<input class="btn" id="Valider" name="clic1" value="Valider" type="submit"/>
+				<input class="btn" id="clic2" name="clic2" value="Annuler" type="submit"/>
+				</p>
+</form>
+</body></html>

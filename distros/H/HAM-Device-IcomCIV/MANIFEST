@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/HAM-Device-IcomCIV.t
+lib/HAM/Device/IcomCIV.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,6 @@
+<table>
+<tr><th>Emp ID</th><th>Emp Name</th><th>Emp Givenname</th><th>Emp Surname</th><th>Emp Title</th><th>Emp Birth Dt</th><th>Edit</th></tr>
+<tr><td>123</td><td>Fred Flintstone</td><td>Fred</td><td>Flintstone</td><td>CEO</td><td>19710430</td><td><a href="edit.html?emp_id=123">edit</a></td></tr>
+<tr><td>456</td><td>Barney Rubble</td><td>Barney</td><td>Rubble</td><td>Lackey</td><td>19750808</td><td><a href="edit.html?emp_id=456">edit</a></td></tr>
+<tr><td>789</td><td>Dino</td><td>Dino</td><td>-</td><td>Pet</td><td>-</td><td><a href="edit.html?emp_id=789">edit</a></td></tr>
+</table>

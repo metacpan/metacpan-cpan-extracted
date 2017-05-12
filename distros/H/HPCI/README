@@ -1,0 +1,33 @@
+HPCI (High Performance Computing Interface) provides an interface to a
+range of types of computer aggregations (clusters, clouds, ...).
+
+It was derived from SGE cluster-specific modules that were used
+internally at Boutros Lab.
+
+HPCI uses an HPCD (High Performance Computing Driver) module to translate
+its standard interface into the appropriate access mechanisms for the type
+of cluster that is selected. (If you have used the DBI/DBD modules for
+accessing databases, this will seem very familiar.)
+
+This is an early public release of HPCI, and at present, there are only
+two drivers available.
+
+Only one cluster type is directly included within the HPCI package. The
+cluster type HPCD::uni runs on a "cluster" of only one machine. It simply
+uses fork to submit individual stages and has facility for retries and
+timeouts. This is the default cluster type used for testing, as it will
+work natively on all types of Unix systems. It is also possible to use
+this driver as a fallback, in cases where the only available "real"
+cluster is not accessable for some reason.
+
+Additionally, there is the HPCD::SGE driver available on CPAN. It has seen
+heavy use within Boutros Lab.
+
+It is to be hoped that drivers for additional cluster and cloud targets
+will be available in the future.
+
+There is a discussion list available.  For now, it encompasses
+all discussion - in the future, if traffic warrants, it might
+be split.  Subscribe through:
+
+    mailto:BoutrosLabSoftware@oicr.on.ca

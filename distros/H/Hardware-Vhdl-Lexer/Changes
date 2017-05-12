@@ -1,0 +1,20 @@
+Revision history for Hardware-Vhdl-Lexer
+
+1.00    15 Sept 2006
+    Refactored module according to "Perl Best Practices" book.
+    Interface has changed: arg list to new() must now be a hash ref rather
+    than a hash, and non-valid characters are now returned with new token
+    code "cu".
+
+0.06    9 June 2006
+    Added test for, and fixed, bug in character-constant recognition which
+    caused it to miss-lex things like "std_logic'('0')"
+
+0.05	April 2006
+    Documentation fixes
+    Tests for all types of linesource
+    Fixed bug: passing in a scalar or subroutine ref now works
+
+0.04    23 Feb 2006
+    First version released on CPAN.
+

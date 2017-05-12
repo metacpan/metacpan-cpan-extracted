@@ -1,0 +1,65 @@
+
+RCS file: /home/nwiger/perlmod/lib/HTML/RCS/QuickTable.pm,v
+Working file: /home/nwiger/perlmod/lib/HTML/QuickTable.pm
+head: 1.12
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 12;	selected revisions: 12
+description:
+HTML::QuickTable - Quickly create fairly complex HTML tables
+----------------------------
+revision 1.12
+date: 2005/05/10 21:10:52;  author: nwiger;  state: Exp;  lines: +227 -68
+- added XHTML-compliant tag closings
+- added 'stylesheet' and 'styleclass' options
+- included support of rotating styles via an \@array to 'styleclass'
+- updated documentation
+----------------------------
+revision 1.11
+date: 2003/10/16 00:24:43;  author: nwiger;  state: Exp;  lines: +58 -34
+fixed a couple bugs, including _expopts prototyping warning, plus docs/tests
+----------------------------
+revision 1.10
+date: 2002/08/29 18:10:57;  author: nwiger;  state: Exp;  lines: +55 -23
+CPAN
+----------------------------
+revision 1.9
+date: 2002/08/08 22:28:56;  author: nwiger;  state: Exp;  lines: +10 -6
+many minor changes and formatting bugfixes
+----------------------------
+revision 1.8
+date: 2002/07/26 22:15:33;  author: nwiger;  state: Exp;  lines: +100 -37
+many changes and new features
+----------------------------
+revision 1.7
+date: 2001/10/10 23:29:41;  author: nwiger;  state: Exp;  lines: +13 -12
+added null option
+----------------------------
+revision 1.6
+date: 2001/10/05 22:21:50;  author: nwiger;  state: Exp;  lines: +13 -6
+ready for first distribution
+----------------------------
+revision 1.5
+date: 2001/09/25 21:47:02;  author: nwiger;  state: Exp;  lines: +14 -13
+doc fixes
+----------------------------
+revision 1.4
+date: 2001/09/25 21:40:28;  author: nwiger;  state: Exp;  lines: +25 -8
+keylabel option is now supported, first stable version
+----------------------------
+revision 1.3
+date: 2001/09/25 20:25:25;  author: nwiger;  state: Exp;  lines: +38 -17
+got pre-scanning of hash->hash to work correctly; now 2-layer hashes
+are taken as rowkey => {colname => value}
+----------------------------
+revision 1.2
+date: 2001/09/24 23:12:58;  author: nwiger;  state: Exp;  lines: +18 -3
+added support for object->param and fixed bug with multi-render headings
+----------------------------
+revision 1.1
+date: 2001/09/24 22:56:47;  author: nwiger;  state: Exp;
+Initial revision
+=============================================================================

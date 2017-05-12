@@ -1,0 +1,16 @@
+[%# $Id$ %]
+[% USE hcart = Handel.Cart %]
+[% carts = hcart.search %]
+<body>
+    [% WHILE (cart = carts.next) %]
+		<cart>
+			<count>[% cart.count %]</count>
+			<description>[% cart.description %]</description>
+			<id>[% cart.id %]</id>
+			<name>[% cart.name %]</name>
+			<shopper>[% cart.shopper %]</shopper>
+			<subtotal>[% cart.subtotal.value %]</subtotal>
+			<type>[% cart.type %]</type>
+		</cart>
+    [% END %]
+</body>

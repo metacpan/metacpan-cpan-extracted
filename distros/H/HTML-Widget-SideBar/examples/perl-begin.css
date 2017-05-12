@@ -1,0 +1,133 @@
+/********************************************************
+*                                                       *
+*  This is the stylesheet used by the perl-begin site,  *
+*  http:// perl-begin.berlios.de/style.css              *
+*                                                       *
+*  License: MIT X11                                     *
+********************************************************/
+
+body { font-family : sans-serif }
+a:hover, img.highlight:hover 
+{ 
+    /* LightGreen */
+    background-color : #90EE90; 
+}
+td.navbar 
+{ 
+    /* Moccasin: FFE4B5 */
+    background-color: #FFE4B5;
+    width : 20% ; 
+    border-color : black;
+    border-width : thick;
+    border-style : double;
+    padding-top : 0.5em;
+    padding-bottom: 0.5em;
+}
+h1, h2, h3
+{
+    font-family : serif;
+    border-style : solid ; 
+    border-width : thin;
+    padding-left: 0.2em;
+}
+h1
+{
+    /* A colour like MediumOrchid only lighter and with less 
+       saturation.
+       */
+    background-color : #e187f7;
+}
+h2
+{
+    background-color : #ccffdd;
+    margin-right : 1.5em;
+}
+h2 a:hover
+{
+    background-color : #ff4f8a ;
+}
+/* Override for the navbar so it won't be highligted as red there */
+.navbar h2 a:hover
+{ 
+    /* LightGreen */
+    background-color : #90EE90; 
+}
+
+h3
+{
+    /* LemonChiffon */
+    background-color : #FFFACD;
+    margin-right : 3em;
+}
+
+td.navbar h2 { color: black ; border : none ; font-size : large ; margin-left : 0.5em ; background-color : transparent }
+p.desc { margin-left : 3em }
+ul.navbarmain { padding-left : 1em ; margin-left : 1em ; font-size : 90%}
+ul.navbarnested { padding-left : 0em ; margin-left : 2em }
+h3.newsitem { text-indent: 3em }
+p.newsitem { margin-left : 6em }
+div.indent { margin-left : 3em }
+p.indent { margin-left : 3em  }
+div.rightalign { text-align : right }
+/*
+    Make sure the links inside the navigation bar are highlited
+    with a different colour. That's CSS 2.
+    http://www.zvon.org/xxl/CSS2Tutorial/Examples/example3.html
+*/
+td.main { padding-left : 1em ; margin-left : 1em }
+
+h2.plain
+{ 
+    color : black ; 
+    border : none ; 
+    font-family : serif; 
+    background: transparent;
+}
+    
+/* Make sure it is not underlined when inside a boxed heading */
+h2 a,h3 a
+{
+    text-decoration : none
+}
+
+h1 a, h2 a, h3 a 
+{
+    font-family : sans-serif;
+}
+
+
+div.bookinfo h3
+{
+    border : none;
+    margin-top : 0em;
+    color : green;
+    padding-left : 0em;
+    background-color : transparent;
+}
+
+div.bookinfo 
+{ 
+    border-style : dotted;
+    border-width : thin;
+    /* LightYellow */
+    background-color : #FFFFE0;
+    margin-left : 1em;
+    margin-right : 1em;
+    padding-left : 1em;
+    padding-bottom : 0.3em;
+    padding-top : 0.3em;
+}
+tt { color : #8A2BE2 /* The BlueViolet Color */ }
+.news
+{
+    /* LightYellow */
+    background-color : #FFFFE0;
+    float : right;
+    width : 20%;
+    margin-left : 0.5em;
+    margin-bottom : 1em;
+    border-color : black;
+    border-width : thick;
+    border-style : double;
+}
+

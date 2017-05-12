@@ -1,0 +1,95 @@
+{
+   "abstract" : "Strip unwanted HTML tags and attributes",
+   "author" : [
+      "Olaf Alders <olaf@wundercounter.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "HTML-Restrict",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::Code::TidyAll" : "0.50",
+            "Test::More" : "0.88",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Spelling" : "0.12",
+            "Test::Synopsis" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dump" : "0",
+            "HTML::Entities" : "0",
+            "HTML::Parser" : "0",
+            "List::Util" : "1.33",
+            "Moo" : "1.002000",
+            "Scalar::Util" : "0",
+            "Sub::Quote" : "0",
+            "Types::Standard" : "1.000001",
+            "URI" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.006",
+            "strict" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/oalders/html-restrict/issues"
+      },
+      "homepage" : "https://github.com/oalders/html-restrict",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/oalders/html-restrict.git",
+         "web" : "https://github.com/oalders/html-restrict"
+      }
+   },
+   "version" : "2.2.4",
+   "x_contributors" : [
+      "Arthur Axel 'fREW' Schmidt <frioux@gmail.com>",
+      "Ben Bullock <benkasminbullock@gmail.com>",
+      "David Golden <dagolden@cpan.org>",
+      "Fitz Elliott <fitz.elliott@gmail.com>",
+      "Graham Knop <haarg@haarg.org>",
+      "Graham TerMarsch <graham@howlingfrog.com>",
+      "Karen Etheridge <ether@cpan.org>",
+      "Mark Jubenville <mark@raybec.com>",
+      "Olaf Alders <olaf@wundersolutions.com>",
+      "perlpong <calyx238@gmail.com>",
+      "skaufman <sam@socialflow.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

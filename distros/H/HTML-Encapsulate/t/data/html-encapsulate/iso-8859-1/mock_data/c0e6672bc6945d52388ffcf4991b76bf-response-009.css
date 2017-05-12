@@ -1,0 +1,12 @@
+HTTP/1.1 200 OK
+Content-Type: text/css
+
+/* /css/import.css */
+@import "subdir/extra.css";
+
+.bimage { 
+  background-image: url(background.jpg);
+}
+.bimage2 { 
+  background-image: url( 'background2.jpg' );
+}

@@ -1,0 +1,49 @@
+<html>
+
+<head>
+<title>Test HTML for Link Extractor</title>
+</head>
+
+<script src="http://www.example.com/script.js"></script>
+
+<body background="background.gif">
+
+<FRAMESET>
+<frame src="relative-frame.html">
+<frame src="/absolute-frame.html">
+<frame src="http://www.example.com/frames.html">
+</FRAMESET>
+
+<iframe class="banner" src="/Images/banners/apress/apress.html" height=68 width="468"
+	scrolling="no" marginwidth="5" marginheight="10" frameborder="0" align="right">
+</iframe>
+
+<ul>
+<li><a href="relative.html">A relative link</a>
+<li><a href="/top_level.html">A top level link</a>
+<li><a href="#fragment">a fragment</a>
+<li><a href="/cgi-bin/try?keyword">an ISINDEX query</a>
+<li><a href="/cgi-bin/try?keyword=foo&scope=bar">a query</a>
+<li><a href="http://www.example.com">domain name</a>
+<li><a href="http://www.sri.net/robots.txt">full URL</a>
+<li><a href="http://www.sri.net/robots.txt">full URL</a>
+</ul>
+
+<img src="http/dog.gif"> attractor links: shouldn't match a scheme
+<img src="https/cat.gif">
+<img src="http://www.example.com/bird.gif">
+<img src="ftp://www.example.com/otter.gif" usemap="#kelp.map">
+<img src="gecko.gif" usemap="#kelp.map">
+
+<map name="tabs">
+<area shape="Rect" coords = "554,31,598,63" href="map-1/">
+<area shape="Rect" coords = "493,31,553,63" href="map-2/">
+<area shape="Rect" coords = "420,31,492,63" href="map-3/">
+<area shape="Rect" coords = "361,31,419,63" href="https://www.lycos.com">
+<area shape="Rect" coords = "244,31,360,63" href="http://www.yahoo.com">
+<area shape="Rect" coords = "177,31,243,63" href="https://www.example.com/abs/map-6/">
+</map>
+
+<a href="mailto:foobar@example.com">mail me</a>
+</body>
+</html>

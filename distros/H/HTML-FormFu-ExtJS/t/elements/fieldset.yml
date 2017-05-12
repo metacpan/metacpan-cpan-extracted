@@ -1,0 +1,13 @@
+---
+attrs:
+  standardSubmit: 1
+elements:
+  - type: Fieldset
+    nested_name: outer
+    legend: Fieldset Label
+    elements:
+      - type: Text
+        name: test2
+        label: Test
+        constraints:
+          Required

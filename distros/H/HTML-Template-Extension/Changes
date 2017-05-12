@@ -1,0 +1,100 @@
+Revision history for Perl extension HTML::Template::Extension.
+
+0.26 (2007-01-17)
+=================
+- H::T::Extension::HEAD_BODY::header_css now return also <link...> tags 
+	with "rel" attribute equal to "stylesheet" and "type" equal to "text/css".
+	(Syncronized with H::T::Pro::Extension::HEAD_BODY.
+
+0.25 (2005-06-29)
+=================
+- Add TAG_ATTRIBUTE_NORMALIZER plugin to remove unknown HTML::Template
+  attribute.
+
+0.24 (2003-09-14)
+=================
+- Parameter passed to plugin_add can now be an object. The object must
+  implements an init method, a push_filter method and a static method
+  filter. Take a look to ObjBase.pm as an example. 
+- Add HTML::Template::Extension::ObjBase as a base object to use to
+  implements your templating filter.
+- In previuos version when you add a plugin all present plugins were
+  unloaded and then all were loaded. Now we don't unload and we only
+  load the added one.
+- Plugins_clears didn't work. Now it do.
+
+0.23 (2003-07-31)
+=================
+- Fixed an uninitialized value string in CSTART.
+- Fixed two uninitialized value strings in HTML::Template::Extension.
+
+0.22 (2003-07-26)
+=================
+- Removed a unnecessary required library in test script.
+- Plug-ins filosofy has been rearranged reducing code line number.
+- Now plugins aren't more true objects but are piece of code that 
+  will be loaded on demand. 
+- Use of AUTOLOAD mechanism to call methods in plugins.
+- Removed an useless modifier regular expression flag in IF_TERN.pm
+
+0.21 (2003-07-13)
+=================
+- Modify SLASH_VAR, CSTART, DOC, HEAD_BODY filter to be more efficient.
+- IF_TERM now use a one-pass regex algorithm to apply filter (thanks
+  PODMASTER for patch).
+- Remove every reference to $& which slows perl down
+
+0.20 (2003-04-21)
+=================
+- Header method in HEAD_BODY.pm return unconsistent values if html 
+  headers don't exist.
+
+0.19 (2003-04-04)
+=================
+- Removed a memory leak in Extension.pm when load and unload plusins
+
+0.18 (2003-04-02)
+=================
+- Added method header_tokens that return a complex structure of html
+  header in HEAD_BODY.pm
+- Added header_css that return header <STYLE> tags in HEAD_BODY.pm
+- Added body_attributes that return body attributes of template
+  in HEAD_BODY.pm
+- In HEAD_BODY.pm method js_header is now an alias for header_js
+
+0.17 (2003-01-25)
+=================
+- Test file have an unnecessary required modules for DBI e Data::Dumper.
+  Removed this required modules from test file
+
+0.16 (2003-01-24)
+=================
+- Add IF_TERN plugins. Read documentation for more info.
+- Changed MakeFile.PL to chck correctly prereq modules.
+
+0.15 (2002-10-14)
+=================
+- Problems in params when calling "html" method more time in the same istance
+  solved.
+
+0.14 (2002-08-09)
+=================
+- Remove a bug that show previous template parsed if, with the same istance,
+  you print a template via "html" method and then via the "scalarref-output"
+  methods.
+
+0.13 (2002-04-14)
+=================
+- Now Makefile.PL checks if installed HTML::Template module version is major 
+  that 2.1 because previous version don't support filter method.
+
+0.12 (2002-03-25)
+=================
+- Not in according with documentation, if CSTART plugin is loaded and in the
+template there is nothing <TMPL_CSTART> tag, an empty string is returned.
+Now is returned the whole template file.
+
+0.11 (2002-03-24)
+=================
+- First release of HTML::Template::Extension
+

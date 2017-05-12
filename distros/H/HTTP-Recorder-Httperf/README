@@ -1,0 +1,123 @@
+NAME
+    HTTP::Recorder::Httperf - An HTTP::Recorder subclass to record user
+    actions as input for httperf for load testing
+
+SYNOPSIS
+    Use it almost exactly like you would use HTTP::Recorder. In fact, this
+    synopsis comes almost exactly 'as is' from the HTTP::Recorder
+    documentation only changing 'HTTP::Recorder' to
+    'HTTP::Recorder::Httperf'.
+
+            #!/usr/bin/perl
+        
+            use HTTP::Proxy;
+            use HTTP::Recorder::Httperf;
+        
+            my $proxy = HTTP::Proxy->new();
+        
+            # create a new HTTP::Recorder::Httperf object
+            my $agent = new HTTP::Recorder::Httperf;
+        
+            # set the log file (optional)
+            $agent->file("/tmp/myfile");
+        
+            # set HTTP::Recorder as the agent for the proxy
+            $proxy->agent( $agent );
+        
+            # start the proxy
+            $proxy->start();
+        
+            1;
+
+    Now let's look at our 'file' (*/tmp/myfile*) and it might look something
+    like this...
+
+            #new session definition
+            /foo.html think=2.0
+                /pict1.gif
+                /pict2.gif
+            /foo2.html method=POST contents=’Post data’
+                /pict3.gif
+                /pict4.gif
+                
+            #new session definition
+            /foo3.html method=POST contents="Multiline\ndata"
+            /foo4.html method=HEAD
+
+    This sample httperf session file comes straight from the httperf
+    manpage. If you would like more information on the specific syntax of
+    this file or how to edit it then please see the httperf documentation.
+
+    Then you can run httperf to load test your recorded session with
+    something like this
+
+            httperf --server 192.168.1.2 --wsesslog 100,2,/tmp/myfile --max-piped-calls=5 --rate 10
+
+DESCRIPTION
+    This module is a subclass of HTTP::Recorder but instead of recording the
+    user's actions as a WWW::Mechanize script they are instead recorded into
+    a session file to be used by httperf, a load testing engine for testing
+    websevers
+    (<http://www.hpl.hp.com/personal/David_Mosberger/httperf.html>).
+
+    It's use is almost exactly the same as HTTP::Recorder. Some methods have
+    been added for convenience for httperf specific functionality. Please be
+    familiar with HTTP::Recorder and it's documentation before proceeding to
+    use this module as it will probably answer most of your questions.
+
+METHODS
+  new([%args])
+    This is the constuctor method. Any arguments passed into this method
+    will passed directly to HTTP::Recorder::new() except for the 'logger'
+    argument which will be overridden with a new
+    HTTP::Recorder::Httperf::Logger object.
+
+    In addition to the name-value pairs that HTTP::Recorder::new takes, this
+    method will also accept the following arguments.
+
+    default_think
+            This value set's the default 'think' value (time in seconds) for
+            each request in this session (see httperf documentation). If
+            this value isn't set (or undef) then HTTP::Recorder::Httperf
+            will try and estimate the think time looking at the user's
+            actual browsing. By default it is 'undef'
+
+    burst_threshold
+            This value set's the time in seconds between requests where they
+            would be considered a part of a burst. If this is not set then
+            it defaults to 1 sec.
+
+    temp_file
+            HTTP::Recorder::Httperf uses a temporary file to store data
+            about the time of requests. By default this is named
+            '.httperf_recorder_time'. You can change it as you see fit.
+
+  default_think([$value])
+    This accessor/mutator method will return the current value for the
+    'default_think' time in seconds between requests in this session. If
+    $value is given it will set the current 'default_think' first to $value
+    and then return it. If it hasn't been set, it will return undef.
+
+  burst_threshold([$value])
+    This accessor/mutator method will return the current value for the
+    'burst_threshold' time in seconds. See new(). If $value is given it will
+    set the current 'burst_threshold' first to $value and then return it.
+
+  temp_file([$value])
+    This accessor/mutator method will return the current name of the
+    'temp_file'. See new(). If $value is given it will set the current
+    'temp_file' first to $value and then return it.
+
+CAVEATS
+    *       HTTP::Recorder::Httperf will try and create files (the session
+            log and temp files) in the current directory so the user running
+            the proxy script must have appropriate permissions for the
+            current working directory.
+
+AUTHOR
+    Michael Peters <mpeters@plusthree.com>
+
+SEE ALSO
+    httperf <http://www.hpl.hp.com/personal/David_Mosberger/httperf.html>,
+    HTTP::Recorder, LWP::UserAgent, HTTP::Proxy
+

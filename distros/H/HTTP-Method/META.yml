@@ -1,0 +1,23 @@
+---
+abstract: 'HTTP Request Method and Common Properties according to RFC 7231'
+author:
+  - 'Theo van Hoesel <Th.J.v.Hoesel@THEMA-MEDIA.nl>'
+build_requires:
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTTP-Method
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  perl: '5.008009'
+version: '0.02'

@@ -1,0 +1,24 @@
+---
+name: HTML-Element-Convert
+version: 0.10
+author:
+  - 'Robert Krimen <rkrimen@cpan.org>'
+abstract: Monkeypatch content conversion methods into HTML::Element
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+  HTML::TreeBuilder: 0
+build_requires:
+  Test::More: 0
+provides:
+  HTML::Element:
+    file: lib/HTML/Element/Convert.pm
+  HTML::Element::Convert:
+    file: lib/HTML/Element/Convert.pm
+    version: 0.10
+generated_by: Module::Build version 0.28
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,74 @@
+=head1 NAME
+
+HTML::HTML5::DOM::HTMLFormControlsCollection - implementation of the HTMLFormControlsCollection interface of the HTML DOM
+
+=head1 DESCRIPTION
+
+HTML::HTML5::DOM::HTMLFormControlsCollection is an implementation of the HTMLFormControlsCollection interface of the HTML DOM. See L<HTML::HTML5::DOM> for a list of the conventions that have been used when translating the DOM to Perl.
+
+=head2 HTML Elements
+
+This class applies to the following HTML elements.
+
+=over
+
+=back
+
+=head2 Inheritance
+
+HTML::HTML5::DOM::HTMLFormControlsCollection inherits methods from the following Perl classes.
+
+=over
+
+=item * L<HTML::HTML5::DOM::HTMLCollection>
+
+=item * L<XML::LibXML::NodeList>
+
+=item * L<HTML::HTML5::DOMutil::FancyISA>
+
+=back
+
+=head2 Additional Methods
+
+As well as its inherited methods, this class provides the following methods.
+
+=over
+
+=item * C<< namedItem >>
+
+Given a name, returns a list of nodes of elements where the @id or @name attribute matches that name. In scalar context this can return a single element if there's only one match, or a HTML::HTML5::DOM::RadioNodeList if there is more than one - this is a kinda annoying feature, but it is required for DOM compliance. Best to just call it in list context.
+
+=item * C<< p5_wwwFormPairs >>
+
+Returns a list of C<< [$name => $value] >> tuples for the elements on the list.
+
+=item * C<< p5_wwwFormUrlencoded >>
+
+Returns a form-encoded (C<< foo=bar&quux=xyzzy >>) string for the elements on the list.
+
+=back
+
+=head1 BUGS
+
+L<http://rt.cpan.org/Dist/Display.html?Queue=HTML-HTML5-DOM>.
+
+=head1 SEE ALSO
+
+L<HTML::HTML5::DOM>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2012, 2014 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+
+

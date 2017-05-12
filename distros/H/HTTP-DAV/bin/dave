@@ -1,0 +1,1183 @@
+#!/usr/bin/env perl
+
+=pod
+
+=head1 NAME
+
+dave - DAV Explorer
+
+=head1 SYNOPSIS
+
+    dave [OPTIONS] URL
+
+E.g. 
+
+   $ dave -u pcollins -p mypass www.host.org/dav_dir/
+   ...
+   dave> get file.txt
+
+Use C<dave -h> to get help on options.
+
+Use C<perldoc dave> for the whole manpage.
+
+=cut
+
+use strict;
+use vars '$AUTOLOAD';
+
+use AutoLoader;
+use Cwd;
+use Getopt::Long;
+use HTTP::DAV;
+use Pod::Usage;
+use Term::ReadLine;
+use Text::ParseWords;
+use Time::Local;
+use URI::file;
+
+my $VERSION    = "2.00";
+my $TMP_DIR    = "/tmp";
+my $LOCK_OWNER = "dave/v$VERSION (pid $$)";
+my $USER_AGENT = "dave/v$VERSION (perldav)";
+
+## Setup/parse options
+## Parse options and print usage if there is a syntax error.
+## Note pod2usage comes from Pod::Usage
+my $opt_h=0;
+my $opt_man=0;
+my $user='';
+my $pass='';
+my $debug=0;
+GetOptions(
+   'help|?'         => \$opt_h, 
+   'man|?'          => \$opt_man, 
+   'debug:i'        => \$debug, 
+   'u|username=s'   => \$user,
+   'p|password=s'   => \$pass,
+   'tmpdir:s'       => \$TMP_DIR,
+) or Pod::Usage::pod2usage(2);
+
+# Basic sanity check for /tmp dir
+if (! $TMP_DIR or ! -d $TMP_DIR or ! -w $TMP_DIR) {
+    die "Can't write into temp dir '$TMP_DIR': $!\n";
+}
+
+## Setup the Terminal
+my $prompt = "dave> ";
+my $term = Term::ReadLine->new('DAV Terminal');
+$term->ornaments(0);
+# Catch ^C
+my $OUT = $term->OUT || *STDOUT;
+$SIG{INT} = sub { print $OUT "\nType q, bye or quit\n$prompt"; };
+
+## Setup the HTTP::DAV client
+my $useragent = DAVE::UserAgent->new();
+$useragent->agent($USER_AGENT);
+my $gdc = HTTP::DAV->new(-useragent=>$useragent);
+HTTP::DAV::DebugLevel($debug);
+
+## Setup the help system 
+my $help = Pod2HelpParser->new();
+$help->parse_from_filehandle(\*DATA);
+
+## Setup the valid commands and synonyms
+my @valid_commands = qw( cd cat copy delete edit get help
+   lcd lls ls lock mkcol move open options propfind put pwd
+   quit set sh showlocks steal unlock unset );
+
+my %command_synonyms = qw(
+   !     sh
+   ?     help
+   q     quit
+   bye   quit
+   h     help
+   dir   ls
+   mkdir mkcol
+   rmdir delete
+   rm    delete
+   cp    copy
+   mv    move
+);
+
+# Make a full populated hash from those given above.
+# %commands = (
+#  quit => quit,
+#  q    => quit,
+#  help => help,
+#  ?    => help,
+my %commands;
+foreach my $command (@valid_commands) {
+   $commands{$command} = $command;
+}
+
+# Invert the command_synonyms for easy lookup.
+foreach my $synonym (keys %command_synonyms ) {
+   $commands{$synonym} = $command_synonyms{$synonym};
+}
+
+###########################################################################
+# MAIN
+
+pod2usage(-verbose => 1)  if ($opt_h);
+pod2usage(-verbose => 2)  if ($opt_man);
+
+# Barf if more than one URL
+if (@ARGV > 1) {
+   pod2usage( -message => "$0: You must only specify one URL.\n")
+}
+
+print $OUT <<END;
+
+dave -- DAV Explorer (v$VERSION)
+Try "help", or "open http://host.com/dav_enabled_dir/"
+
+END
+
+# Put the credentials into HTTP::DAV for $url
+my $url=shift @ARGV;
+if ($user && $url) {
+   $gdc->credentials( -user=>$user, -pass=>$pass, -url=>$url );
+}
+&command_open($url) if ($url );
+
+######################################################################
+# WHILE dave> command
+my $line;
+while ( defined ($line = $term->readline($prompt)) ) {
+
+   # Hack. Put a space between the ! shellout command and the next arg
+   $line =~ s/^([!])/$1 /g;
+
+   # Parse the user's typed command and return a parsed list of words.
+   my @args = &shellwords($line); 
+
+   # Remove empty elements from the list
+   @args = grep( ! /^\s*$/,@args);
+
+   # If the user has entered nothing then back to while 
+   # loop and throw another command prompt.
+   next if ( ! @args );
+
+   # Get the first argument. It should be the command.
+   my $command = shift @args;
+
+   # Check the validity of the command in our lookup.
+   if ( &is_valid_command($command) ) {
+
+      # This is so we can do the ref'ed function call 
+      no strict 'refs'; 
+
+      $command = &get_command($command);
+     
+      print $OUT "Valid Command: \"$command\"\n" if $HTTP::DAV::DEBUG>2;
+
+      # Call the command. e.g. &command_put(@args)
+      my $function_name = "command_" . $command;
+      my $return_code = &$function_name(@args);
+
+   } else {
+      print $OUT "Unrecognised command. Try 'help or h' for a list of commands.\n";
+   }
+}
+
+######################################################################
+# Command implementations
+
+# This is a simple "print message" (pm) routine. 
+# Keeps things neat.
+sub pm { print $OUT "** $_[0] **\n"; }
+
+sub command_cd     { $gdc->cwd    (@_); pm($gdc->message()) }
+sub command_copy   { $gdc->copy   (@_); pm($gdc->message()) }
+
+sub command_delete { 
+   $gdc->delete(-url=> $_[0], -callback=>\&cb);
+   pm($gdc->message());
+}
+
+sub command_mkcol  { $gdc->mkcol  (@_); pm($gdc->message()) }
+sub command_move   { $gdc->move   (@_); pm($gdc->message()) }
+sub command_open   { $gdc->open   (@_); pm($gdc->message()) }
+sub command_steal  { $gdc->steal  (@_); pm($gdc->message()) }
+sub command_unlock { $gdc->unlock (@_); pm($gdc->message()) }
+
+sub command_set   { 
+   my ($url,$pn,$pv,$ns) = @_;
+   $gdc->set_prop (-url=>$url,     -namespace=>$ns, 
+                   -propname=>$pn, -propvalue=>$pv); 
+   pm($gdc->message()) 
+}
+
+sub command_unset   { 
+   my ($url,$pn,$ns) = @_;
+   $gdc->unset_prop (-url=>$url, -namespace=>$ns, -propname=>$pn); 
+   pm($gdc->message()) 
+}
+
+sub command_lock   { 
+   my ($url,$timeout,$depth ) = @_;
+   $gdc->lock (-url=>$url,
+               -timeout=>$timeout,
+               -depth=>$depth,
+               -owner=>$LOCK_OWNER); 
+   pm($gdc->message()) 
+}
+
+sub command_showlocks { 
+   my $rl = $gdc->get_lockedresourcelist();
+   if ($rl) {
+      my $l = $rl->showlocks;
+      print $OUT ($l ne "") ? $l : "No locks\n";
+   }
+}
+
+sub command_cat { 
+   my ($url) = @_;
+   $gdc->get(-url=>$url, -callback=>\&cat_callback,-chunk=>128);
+}
+
+sub command_edit { 
+   my $remote_file = shift;
+
+   my $EDITOR= $ENV{DAV_EDITOR} || $ENV{EDITOR} || 'vi';
+   my $local_file = HTTP::DAV::_tempfile('dave', $TMP_DIR);
+
+   my $resource = $gdc->propfind($remote_file);
+   if ( $resource && $resource->is_collection() ) {
+      pm("Can't edit collections");
+      return;
+   }
+
+   my $locked=0;
+   # Try a lock with a 10h timeout first. 
+   # If that doesn't work then try it without a timeout.
+   if ( $gdc->lock(-url=>$remote_file, -timeout=>"10h",-owner=>$LOCK_OWNER ) ) {
+      $locked=1;
+      pm( "Locked with 10 hour timeout" );
+   } elsif ( $gdc->lock(-url=>$remote_file, -owner=>$LOCK_OWNER) ) {
+      $locked=1;
+      pm( "Locked with infinite timeout" );
+   } else {
+      my $resp = $gdc->get_last_response();
+      if ($resp->messages =~ /Locked/ ) {
+         pm("$remote_file is locked. Can't edit.");
+         return;
+      } else {
+         pm("Couldn't lock $remote_file for editing (" . $gdc->message . ")" );
+      }
+   }
+
+
+   if ( $gdc->get($remote_file,$local_file) ) {
+      pm( $gdc->message());
+
+      pm("Using $EDITOR to edit $local_file");
+      my $file_date_at_start = (stat($local_file))[9];
+
+      sleep 2;
+      system("$EDITOR $local_file") == 0 ||
+         pm("$EDITOR $local_file failed: $!");
+
+      my $file_date_at_end   = (stat($local_file))[9];
+
+      if ( $file_date_at_start eq $file_date_at_end ) {
+         pm ("File unchanged");
+      } else {
+         $gdc->put($local_file,$remote_file);
+         pm( $gdc->message());
+      }
+
+      unlink $local_file || pm("Couldn't remove $local_file: $!");
+   }
+   else {
+      pm( $gdc->message());
+   }
+
+   if ($locked) {
+      $gdc->unlock($remote_file);
+      pm( $gdc->message());
+   }
+}
+
+
+
+sub command_get { 
+   my ($remote,$local) = @_;
+   $local ||= ".";
+   $gdc->get(-url=>$remote,
+             -to =>$local,
+             -callback=>\&cb
+            );
+}
+
+sub command_put { 
+   my ($local,$remote) = @_;
+   $remote ||= ".";
+   $gdc->put(-local=>$local,
+             -url  =>$remote,
+             -callback=>\&cb
+            );
+}
+
+# PWD
+sub command_pwd { 
+   my $uri = $gdc->get_workingurl(); 
+   if ($uri) {
+      print $OUT "$uri\n";
+      return 1;
+   } else {
+      pm("Not connected. Type \"help open\"");
+      return 0;
+   }
+}
+
+# OPTIONS
+sub command_options{ 
+   my $options = $gdc->options(@_); 
+   print $OUT "$options\n" if ($options);
+   pm($gdc->message);
+   return $options;
+}
+
+# HELP
+sub command_help {
+   my (@args) = @_;
+
+   # If they just typed help with no arguments then give them generic help
+   if ( $#args < 0 ) {
+      print $OUT "Type \"help <command>\" for more detail:\n";
+      foreach my $i (sort @valid_commands ) {
+         my($sect,$title,$first_line,$body) = $help->get_help($i);
+         if ($sect) {
+            printf $OUT (" %-10s%s\n",$i,$first_line);
+         } else {
+            printf $OUT (" %-10s%s\n",$i,"no help");
+         }
+      }
+      print $OUT "\n";
+   }
+
+   # If they type "help <topic>" then look for help on <topic>.
+   else {
+      my $help_topic = shift @args;
+      my $format =     shift @args || "verbose";
+
+      my ($sect,$title,$first_line,$help_body) = 
+         $help->get_help( &get_command($help_topic) || $help_topic );
+      my $help_text;
+      if ( defined $sect && $sect ne "" ) {
+         if ($format eq "verbose" ) {
+            $help_body =~ s/\n/\n      /gs;
+            $help_text = "\n   $title\n      $help_body\n";
+         } else {
+            $help_text = "\n   $sect - $first_line\n";
+         }
+      } else {
+            $help_text = "\nNo help for \"$help_topic\"\n";
+      }
+      print $OUT $help_text;
+   }
+}
+
+# LCD
+sub command_lcd {
+   my (@args) = @_;
+
+   my $args = join(' ', @args) || "";
+   chdir($args);
+}
+
+# LLS
+sub command_lls {
+   my (@args) = @_;
+
+   my $args = join(' ', @args) || "";
+   system("ls @args");
+}
+
+# LS (client)
+sub command_ls {
+   my $resource = $gdc->propfind(@_);
+   if ($resource) {
+      if ($resource->is_collection) {
+         print $OUT $resource->get_property('short_ls');
+      } else {
+         print $OUT $resource->get_property('long_ls');
+      }
+   } else {
+      pm($gdc->message);
+   }
+}
+
+sub command_propfind {
+   my $resource = $gdc->propfind(@_);
+   if ($resource) {
+      print $OUT $resource->get_property('long_ls');
+   } else {
+      pm($gdc->message);
+   }
+}
+
+# QUIT
+sub command_quit {
+   my (@args) = @_;
+   print $OUT "Bye\n";
+   exit;
+}
+
+# SH (!)
+sub command_sh {
+   my (@args) = @_;
+
+   my $args = join(' ', @args) || "";
+   system("$args");
+}
+
+sub AUTOLOAD {
+   my $sub = $AUTOLOAD || "";
+   #my @args = @{$_[0]} || ();
+   die "Fatal Error. No function defined $sub ?!\n";
+}
+
+######################################################################
+# CALLBACKS for cat,get and put
+{
+   my $in_transfer=0;
+   
+   sub cat_callback {
+      my($status,$mesg,$url,$so_far,$length,$data) = @_;
+      $|=1;
+      if ($status == 1) {
+         print "\n" if ($in_transfer);
+         print "**$mesg (success)\n";
+         $in_transfer=0;
+      }
+      if ($status == 0) {
+         print "**$mesg\n";
+         $in_transfer=0;
+      }
+      if ($status == -1) {
+         print $OUT $data;
+         $in_transfer++;
+      }
+   }
+
+   # Used for get and put. put doesn't support chunking though.
+   sub cb {
+      my($status,$mesg,$url,$so_far,$length,$data) = @_;
+      $|=1;
+      if ($status == 1) {
+         print "\n" if ($in_transfer);
+         print "  $mesg (success)\n";
+         $in_transfer=0;
+      }
+      if ($status == 0) {
+         print "**$mesg\n";
+         $in_transfer=0;
+      }
+      if ($status == -1) {
+         if (!$in_transfer++) {
+            print "  Transferring $url ($length bytes):\n";
+         }
+         my $width = 60;
+         if ($length>0) {
+            my $num = int($so_far/$length * $width);
+            my $space = $width-$num;
+            print "  [" . "#"x$num . " "x$space . "]";
+         }
+         print " $so_far bytes\r";
+      }
+   }
+}
+
+###########################################################################
+sub is_valid_command {
+   my ($command) = @_;
+   $command = lc($command);
+   return 1 if defined $commands{$command};
+}
+
+sub get_command {
+   my ($command) = @_;
+   $command = lc($command);
+   return $commands{$command};
+}
+
+BEGIN {
+# We make our own specialization of HTTP::DAV::UserAgent (which in turn is already a specialisation of LWP::UserAgent).
+# This user agent is able to:
+#  - interact with the user on the command line to get user/pass's
+#  - allow the user to try 3 times before failing.
+{
+    package DAVE::UserAgent;
+    use vars qw(@ISA);
+    @ISA = qw(HTTP::DAV::UserAgent);
+
+    sub new {
+       my $self = HTTP::DAV::UserAgent::new(@_);
+       #$self->agent("DAVE/v$VERSION");
+       $self->{_failed_logins} = ();
+       return $self;
+    }
+
+    sub request {
+       my($self) = shift;
+       my $resp = $self->SUPER::request(@_);
+
+       # Only if we did not get a 401 back from the server
+       # do we go and 
+       # commit the user's details to memory.
+       $self->_commit_credentials() if ($resp->code() != 401);
+       return $resp;
+    }
+
+    sub _set_credentials {shift->{_temp_credentials} = \@_; }
+    sub _commit_credentials {
+       my ($self)=@_;
+       if (defined $self->{_temp_credentials} ) {
+          $self->credentials(@{$self->{_temp_credentials}});
+          $self->{_temp_credentials} = undef;
+       }
+    }
+
+    sub get_basic_credentials {
+       my($self, $realm, $url) = @_;
+       my $userpass;
+
+       # First, try to get the details from our memory.
+       my @mem_userpass = $self->SUPER::get_basic_credentials($realm,$url);
+       return @mem_userpass if @mem_userpass;
+
+       if (-t) {
+
+          my $netloc = $url->host_port;
+          if ($self->{_failed_logins}->{$realm . $netloc}++ > 3) {
+             return (undef,undef) 
+          }
+
+          print "\nEnter username for $realm at $netloc: ";
+          my $user = <STDIN>;
+          chomp($user);
+          return (undef, undef) unless length $user;
+          print "Password: ";
+          system("stty -echo");
+          my $password = <STDIN>;
+          system("stty echo");
+          print "\n";  # because we disabled echo
+          chomp($password);
+
+          $self->_set_credentials($netloc, $realm,$user,$password);
+          #print "Returning $user, $password\n";
+          return ($user, $password);
+      } else {
+          return (undef, undef)
+      }
+   }
+}
+
+######################################################################
+# Setup our help system with this nifty Pod::Parser from the 
+# Pod at the end of this script.
+#
+{
+   package Pod2HelpParser;
+   
+   use vars qw(@ISA);
+   use Pod::Parser;
+   @ISA = qw(Pod::Parser);
+   
+   ######
+   # Pod2HelpParser - public help access methods.
+   # 
+   # get_help() will return from the pod any items 
+   # that start with $command as help
+   #
+   # For instance:
+   #    my($sect,$title,$terse,$long) = $parser->get_help("open");
+   sub get_help { 
+      my ($self,$command) = @_;
+      foreach my $sect (keys %{$self->{_help_text}} ) {
+         if ( $sect =~ /^$command\b/i ) {
+            my $title       = $self->{_title}     {$sect} ||"";
+            my $first_line  = $self->{_first_line}{$sect} ||"";
+            my $help_text   = $self->{_help_text} {$sect} ||"";
+            $help_text=~ s/\n*$//gs;
+            return ($sect,$title,$first_line,$help_text);
+         }
+      }
+      return ();
+   }
+
+   sub get_help_list {
+      my ($self) = @_;
+      my @return;
+      foreach my $sect (keys %{$self->{_help_text}} ) {
+         next if $sect eq "OTHER";
+         push (@return,$sect);
+      }
+      return @return;
+   }
+   
+   ######
+   # INIT
+   # These methods are all overriden from Pod::Parser.
+   # They are effectively call-backs to handle pod.
+   # Specifically, we're building a hash to provide convenient
+   # access to the pod data as help information.
+   sub command { 
+       my ($parser, $command, $paragraph, $line_num) = @_;
+       my $title = $parser->interpolate($paragraph, $line_num);
+   
+       # Remove extraneous whitespace
+       $title =~ s/^[\s\n]*(.*?)[\s\n]*$/$1/gis;
+       
+       my $section = $title;
+       $section =~ s/^\s*(.+?)\s.*$/$1/;
+       $section= ($command eq "item") ? $section : "OTHER";
+       $parser->{_last_section} = $section;
+       $parser->{_help_text}{$section} = "";
+       $parser->{_title}{$section} = $title; 
+   }
+   
+   # Overrriden from Pod::Parser - interprets section text
+   sub verbatim { 
+       my ($parser, $paragraph, $line_num) = @_;
+       my $expansion = $parser->interpolate($paragraph, $line_num);
+  
+       # Get the first line
+       my $first_line = $expansion;
+       $first_line =~ s/^(.*?)\n.*/$1/gis;
+   
+       my $section_head = $parser->_get_last_section;
+       $parser->{_help_text} {$section_head} .= $expansion;
+       if (!defined $parser->{_first_line}{$section_head} ) {
+          $parser->{_first_line}{$section_head} = $first_line;
+       }
+   }
+   
+   # Overrriden from Pod::Parser - do nothing with normal body text
+   sub textblock { shift->verbatim(@_); }
+   sub interior_sequence { return $_[2]; }
+   sub _get_last_section { $_[0]->{_last_section}; }
+}
+
+} # END BEGIN
+
+######################################################################
+# PERLDOC
+__END__
+
+=head1 DESCRIPTION
+
+dave is a powerful command-line program for interacting with WebDAV-enabled webservers. With dave you can:
+
+=over 4
+
+=item * get and put files
+
+=item * make directories on a remote webserver
+
+=item * remove files and directories from a remote webserver
+
+=item * edit a file on the webserver with a single command
+
+=item * recursively get a remote directory
+
+=item * recursively put a local directory
+
+=item * lock and unlock remote files and directories
+
+=item * securely transfer over https
+
+=item * authenticate using the safer Digest authentication
+
+=back
+
+Dave is a part of the PerlDAV project (http://www.webdav.org/perldav/) and is built on top of the HTTP::DAV perl API.
+
+If you would like to script webdav interactions in Perl checkout the HTTP::DAV API as it's commands are the basis for dave's.
+
+=head1 OPTIONS
+
+=over 4
+
+=item C<-debug N>
+
+Sets the debug level to N. 0=none. 3=noisy.
+
+=item C<-h>
+
+Prints basic help and options.
+
+=item C<-man>
+
+Prints the full manual (equivalent to perldoc dave).
+
+You will need to use a pager like C<more> or C<less>. e.g.
+
+    dave -man |less
+
+=item C<< -p <password> >>
+
+Sets the password to be used for the URL.
+You must also supply a user. See C<-u>.
+
+=item C<< -u <username> >>
+
+Sets the username to be used for the URL.
+You must also supply a pass. See C<-p>.
+
+=item C<-tmpdir /some/path>
+
+Create temporary files in C</some/path> instead of the default C</tmp>.
+
+=back
+
+=head1 COMMANDS
+
+=over 4
+
+=item B<cd URL>
+
+changes directories
+
+   dave> open host.org/dav_dir/
+   dave> cd dir1
+   dave> cd ../dir2
+
+=item B<cat URL>
+
+shows the contents of a remote file
+
+   dave> open host.org/dav_dir/
+   dave> cat index.html
+
+Note: you cannot cat a directory (collection).
+
+=item B<cp>
+
+=item B<copy SOURCE_URL DEST_URL>
+
+copies one remote resource to another
+
+  dave> open host.org/dav_dir/
+
+Create a copy of dir1/ as dav2/
+
+  dave> cp dir1 dav2
+
+Create a copy of dir1/file.txt as dav2/file.txt
+
+  dave> cd dir1
+  dave> copy file.txt ../dav2
+
+Create a copy of file.txt as ../dav2/new_file.txt
+
+  dave> copy file.txt dav2/new_file.txt
+
+Aliases: cp
+
+=item B<rmdir URL>
+
+=item B<rm URL>
+
+=item B<delete URL>
+
+deletes a remote resource
+
+   dave> open host.org/dav_dir/
+   dave> delete index.html
+   dave> rmdir ./dir1
+   dave> delete /dav_dir/dir2/
+   dave> delete /dav_dir/*.html
+
+This command recursively deletes directories. BE CAREFUL :)
+
+This command supported wildcards (globbing). See get.
+
+Aliases: rm, rmdir
+
+=item B<edit URL>
+
+edits the contents of a remote file
+
+   dave> open host.org/dav_dir/
+   dave> edit index.html
+
+Edit is equivalent to the following sequence of commands:
+
+   LOCK index.html (if allowed)
+   GET index.html /tmp/dave.perldav.421341234124
+   sh $EDITOR /tmp/dave.perldav.421341234124
+   PUT index.html (if modified)
+   UNLOCK index.html (if locked)
+
+Where $EDITOR is determined from the environment variables 
+DAV_EDITOR or EDITOR. 
+
+If DAV_EDITOR is set, it will use that, otherwise it will 
+use EDITOR. If neither variables are set, then "vi" will 
+be used. 
+
+Notes: 
+
+The lock only lasts for 10 hours.
+
+You cannot edit a directory (collection).
+
+The temporary save directory is editable by 
+editing dave and changing TMP_DIR
+
+=item B<get URL [FILE]>
+
+downloads the file or directory at URL
+
+If FILE is not specified it will be saved to your 
+current working directory using the same name as 
+the remote name.
+
+  dave> open host.org/dav_dir/
+
+Recursively get remote my_dir/ to .
+
+  dave> get my_dir/  
+
+Recursively get remote my_dir/ to /tmp/my_dir/
+
+  dave> get my_dir /tmp
+
+Get remote my_dir/index.html to /tmp/index.html
+
+  dave> get /dav_dir/my_dir/index.html /tmp
+
+Get remote index.html to /tmp/index1.html
+
+  dave> get index.html /tmp/index1.html
+
+Use globs and save to /tmp
+
+  dave> get index* /tmp                   # Gets index*.html, index*.txt, etc.
+  dave> get index*.html /tmp/index1.html  # Gets index*.html
+  dave> get index[12].htm?                # Gets file1 and file2, .htm and .html
+
+=item B<? [CMD]>
+
+=item B<h [CMD]>
+
+=item B<help [CMD]>
+
+prints list of commands or help for CMD
+
+  dave> ?
+
+  dave> help get
+
+Aliases: ?, h
+
+=item B<lcd [DIR]>
+
+changes local directory
+
+  dave> lcd /tmp
+
+=item B<lls [DIR]>
+
+lists local directory contents
+
+  dave> lcd /tmp
+  dave> lls
+  dave> lls /home
+
+This command simply execs the local ls command and is 
+equivalent to "!ls"
+
+=item B<dir [URL]>
+
+=item B<ls [URL]>
+
+lists remote directory contents or file props
+
+  dave> ls
+  Listing of http://host.org/dav_dir/
+                  ./          Aug 29 02:26  <dir>
+     mtx_0.04.tar.gz   52640  Aug 11 11:45
+          index.html    4580  Aug 11 11:45
+      index0.04.html    4936  Nov 11  2000
+              mydir/          Aug 19 21:14  <dir>,<locked>
+
+  dave> ls index.html
+  URL: http://www.webdav.org/perldav/index.html
+  Content-type: text/html
+  Creation date: Sun Aug 12 21:58:02 2001
+  Last modified:
+  Size: 4580 bytes
+  Locks supported: write/exclusive write/shared
+  Locks:
+
+Use propfind to get a similar printout of a 
+collection (directory).
+
+Aliases: dir
+
+=item B<lock [URL [TIMEOUT] [DEPTH]]>
+
+locks a resource 
+
+Without a URL you will lock the current remote 
+collection.
+
+TIMEOUT can be any of the following formats:
+             30s          30 seconds from now
+             10m          ten minutes from now
+             1h           one hour from now
+             1d           tomorrow
+             3M           in three months
+             10y          in ten years time
+             2000-02-31 00:40:33
+             2000-02-31
+
+Default is an infinite timeout
+
+See perldoc C<HTTP::DAV::Resource> for more information 
+about timeouts.
+
+DEPTH can be either "0" or "infinity" (default)
+
+Seeting the lock Scope and Type is not currently 
+implemented. Let me know if you need it as it shouldn't 
+be too much effort.
+
+=item B<mkdir URL>
+
+=item B<mkcol URL>
+
+make a remote collection (directory)
+
+  dave> open host.org/dav_dir/
+  dave> mkcol new_dir
+  dave> mkdir /dav_dir/new_dir
+
+Aliases: mkdir
+
+=item B<mv>
+
+=item B<move SOURCE_URL DEST_URL>
+
+moves a remote resource to another
+
+  dave> open host.org/dav_dir/
+
+Move dir1/ to dav2/
+
+  dave> move dir1 dav2
+
+Move file dir2/file.txt to ../file.txt
+
+  dave> cd dir2
+  dave> move file.txt ..
+
+Move file.txt to dav2/new_file.txt
+
+  dave> move file.txt dav2/new_file.txt
+
+Aliases: mv
+
+=item B<open URL>
+
+connects to the WebDAV-enabled server at URL
+
+   dave> open host.org/dav_dir/
+
+Note that if authorization details are required you will 
+be prompted for them.
+
+https and Digest authorization are not currently 
+supported. Please let me know if you need it.
+
+
+=item B<options [URL]>
+
+show the HTTP methods allowed for a URL
+
+   dave> options index.html
+   OPTIONS, GET, HEAD, POST, DELETE, TRACE, PROPFIND, 
+   PROPPATCH, COPY, MOVE, LOCK, UNLOCK
+
+Note that Microsoft's IIS does not support LOCK on 
+collections (directories). Nor does it support PROPPATCH.
+
+=item B<propfind [URL]>
+
+show the properties of a resource
+
+  dave> propfind test
+  URL: http://host.org/dav_dir/test/
+  Content-type: httpd/unix-directory
+  Creation date: Wed Aug 29 00:36:42 2001
+  Last modified:
+  Size:  bytes
+  Locks supported: write/exclusive write/shared
+  Locks:
+
+Using ls will get you the same printout if you ls 
+a file. But ls'ing a collection will show you the 
+collections contents.
+
+=item B<put FILE [URL]>
+
+uploads a local file or directory to URL
+or the currently opened location.
+
+If URL is an existing collection then the dir/file will
+be copied INTO that collection.
+
+  dave> open host.org/dav_dir/
+
+Recursively put local my_dir/ to host.org/dav_dir/my_dir/:
+
+  dave> put my_dir/  
+
+Put local index.html to host.org/dav_dir/index1.html:
+
+  dave> put /tmp/index.html index1.html
+
+Put * to remote directory
+
+  dave> put *
+
+Put index[12].htm? to remote directory /dav_dir (/dav_dir must exist)
+
+  dave> put index[12].htm? /dav_dir
+
+Put index[1234].htm? to remote directory /dav_dir (/dav_dir must exist)
+
+  dave> put index[1-4].htm? /dav_dir
+
+Glob types supported are, * (matches any characters), ? (matches any one character), [...] (matches any characters in the set ...). 
+
+=item B<pwd>
+
+prints the currently opened URL (working directory)
+
+ dave> open host.org/dav_dir/
+ dave> cd new_dir/
+ dave> pwd
+ http://host.org/dav_dir/new_dir/
+
+=item B<q>
+
+=item B<bye>
+
+=item B<quit>
+
+exits dave
+
+Note that dave does not unlock any locks created 
+during your session.
+
+Aliases: q, quit
+
+=item B<set URL PROPERTY VALUE [NAMESPACE]>
+
+sets a custom property on a resource
+
+   dave> set file.txt author "Patrick Collins"
+   dave> set file.txt author "Patrick Collins" "mynamespace"
+
+The NAMESPACE by default is "DAV:".
+
+=item B<!>
+
+=item B<sh>
+
+executes a local command (alias !)
+
+   dave> sh cat localfile
+   dave> !gzip localfile.gz
+   dave> ! "cat localfile | less"
+
+Aliases: !
+
+=item B<showlocks>
+
+show my locks on a resource
+
+Shows any locked resources that you've locked in this 
+session.
+
+See C<propfind> if you'd like to see anyone's locks held 
+against a particular resource.
+
+=item B<steal [URL]>
+
+remove ANY locks on a resource
+
+Useful if you accidentally forgot to unlock a resource 
+from a previous session or if you think that somebody 
+has forgotten to unlock a resource. 
+
+=item B<unlock [URL]>
+
+unlocks a resource
+
+Note that unlock will only unlock locks that you have 
+created. Use steal if you want to forcefully unlock 
+somebody else's lock.
+
+=item B<unset URL PROPERTY [NAMESPACE]>
+
+unsets a property from a resource
+
+   dave> unset file.txt author
+   dave> unset file.txt author "mynamespace"
+
+The NAMESPACE by default is "DAV:".
+
+=back
+
+=head1 GETTING HELP
+
+The perldav mailing list
+There is a mailing list for PerlDAV and dave for use by Developers and Users.
+Please see http://mailman.webdav.org/mailman/listinfo/perldav
+
+=head1 INSTALLATION
+
+dave is installed to /usr/local/bin by default when you 
+install the PerlDAV library. See 
+http://www.webdav.org/perldav/ for installation details 
+of PerlDAV.
+
+=head1 WHAT PLATFORMS WILL IT WORK ON?
+
+dave is pure perl so only needs Perl5.003 (or later) and 
+the C<PerlDAV> library to be installed. 
+
+I have not ported dave to Windows but would like somebody 
+to have a shot at it.
+
+=head1 SEE ALSO
+
+The C<PerlDAV> perl API at http://www.webdav.org/perldav/
+or by typing "perldoc HTTP::DAV" on your command line.
+
+=head1 AUTHOR AND COPYRIGHT
+
+This module is Copyright (C) 2001 by
+
+    Patrick Collins
+    G03 Gloucester Place, Kensington
+    Sydney, Australia
+
+    Email: pcollins@cpan.org
+    Phone: +61 2 9663 4916
+
+All rights reserved.
+
+You may distribute this module under the terms of either the GNU General Public License or the Artistic License, as specified in the Perl README file.
+
+=head1 MAINTAINER
+
+Cosimo Streppone, E<lt>cosimo@cpan.orgE<gt>
+
+=cut

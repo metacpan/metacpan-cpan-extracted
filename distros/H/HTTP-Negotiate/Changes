@@ -1,0 +1,15 @@
+_______________________________________________________________________________
+2012-02-18 HTTP-Negotiate 6.01
+
+Restore perl-5.8.1 compatiblity.
+
+
+
+
+_______________________________________________________________________________
+2011-02-27 HTTP-Negotiate 6.00
+
+Initial release of HTTP-Negotiate as a separate distribution. There are no code
+changes besides incrementing the version number since libwww-perl-5.837.
+
+The HTTP::Negotiate module used to be bundled with the libwww-perl distribution.

@@ -1,0 +1,22 @@
+.xprofile
+Changes
+ignore.txt
+lib/Hex/Record.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+README.pod
+t/00-load.t
+t/01-parse_intel_hex.t
+t/02-parse_srec_hex.t
+t/03-get_hex.t
+t/04-remove_hex.t
+t/05-write_hex.t
+t/06-dump_as_intel_hex.t
+t/07-dump_as_srec_hex.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

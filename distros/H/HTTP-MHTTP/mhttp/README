@@ -1,0 +1,17 @@
+   microhttp and libmhttp
+
+Copyright (c) 2003, Piers Harding. All Rights Reserved.
+This module is free software. It may be used, redistributed
+and/or modified under the same terms as Perl itself.
+
+this distribution contains a simple command line client for http (microhttp)
+and a library version of the same thing (libmhttp)
+
+simply unpack the distribution tar file (microhttp.tgz), change into the mhttp
+directory and type "make all".
+
+You may need to adjust the Makefile to suit your flavour of UNIX.
+
+
+Cheers.
+

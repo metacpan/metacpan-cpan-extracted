@@ -1,0 +1,31 @@
+<wmmeta name="Title" value="The &lt;templates&gt; Tag" />
+<wmmeta name="Section" value="02-tags_attrs" />
+<wmmeta name="Score" value="45" />
+<wmmeta name="Abstract">
+load many chunks of non-text content, such as HTML templates, from a data
+source
+</wmmeta>
+
+The &lt;templates&gt; tag is identical in most respects to the
+"&lt;contents&gt;" [$(contents)] tag.
+
+Typically, one will want to differentiate textual content, such as news
+articles, from template content, such as page templates.  This tag allows
+those semantic differences to be expressed at a high level; use
+"&lt;contents&gt;" [$(contents)] directives for textual content, and
+&lt;templates&gt; directives for template content.
+
+It is implemented as a contents directive with the ##map## attribute set to
+##false##.
+
+${datasource_attrs.inc} 
+${datasource_file_protocol.inc}
+${datasource_svfile_protocol.inc}
+
+Example
+=======
+
+<safe>
+  <templates src="file:html_templates" name=".../*.html" format="text/html" />
+</safe>
+

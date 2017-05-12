@@ -1,0 +1,62 @@
+NAME
+    HTTP::Tiny::UNIX - A subclass of HTTP::Tiny to connect to HTTP server
+    over Unix socket
+
+VERSION
+    This document describes version 0.04 of HTTP::Tiny::UNIX (from Perl
+    distribution HTTP-Tiny-UNIX), released on 2014-07-04.
+
+SYNOPSIS
+     use HTTP::Tiny::UNIX;
+
+     my $response = HTTP::Tiny::UNIX->new->get('http:/path/to/unix.sock//uri/path');
+
+     die "Failed!\n" unless $response->{success};
+     print "$response->{status} $response->{reason}\n";
+
+     while (my ($k, $v) = each %{$response->{headers}}) {
+         for (ref $v eq 'ARRAY' ? @$v : $v) {
+             print "$k: $_\n";
+         }
+     }
+
+     print $response->{content} if length $response->{content};
+
+DESCRIPTION
+    This is a subclass of HTTP::Tiny to connect to HTTP server over Unix
+    socket. URL syntax is "http:" + *path to unix socket* + "/" + *uri
+    path*. For example: "http:/var/run/apid.sock//api/v1/matches". URL not
+    matching this pattern will be passed to HTTP::Tiny.
+
+    Proxy is currently not supported.
+
+SEE ALSO
+    HTTP::Tiny
+
+    To use LWP to connect over Unix sockets, see
+    LWP::protocol::http::SocketUnixAlt.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/HTTP-Tiny-UNIX>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/sharyanto/perl-HTTP-Tiny-UNIX>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=HTTP-Tiny-UNIX>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

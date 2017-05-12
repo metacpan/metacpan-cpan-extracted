@@ -1,0 +1,23 @@
+Revision history for Perl extension HTTP-Body-Builder
+
+0.04 2015-08-21T04:21:55Z
+
+    - Only the first key/value pair passed to ->add_content ended up in the
+      body with the UrlEncoded module. Fixed by Dave Rolsky.
+
+    - Allow the constructors to accept content (and files, for MultiPart)
+      parameters. Implemented by Dave Rolsky.
+
+0.03 2013-10-08T23:32:29Z
+
+    - use binmode to keep CRLF correctly
+      (charsbar)
+
+0.02 2013-09-26T07:34:18Z
+
+    - fixed deps
+
+0.01 2013-09-21T06:52:02Z
+
+    - original version
+

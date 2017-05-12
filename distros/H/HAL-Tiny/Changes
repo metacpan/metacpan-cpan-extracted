@@ -1,0 +1,15 @@
+Revision history for Perl extension HAL-Tiny
+
+0.03 2015-05-29T09:12:49Z
+
+    - [BREAKING CHANGE] Implement as_hashref method
+      This version's as_hash returns pure hash, not hash reference.
+
+0.02 2015-03-05T14:15:06Z
+
+    - Implement Link Object by hixi
+
+0.01 2015-01-12T07:01:37Z
+
+    - original version
+

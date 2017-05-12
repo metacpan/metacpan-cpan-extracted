@@ -1,0 +1,30 @@
+# Change log for HTML::WikiConverter::MoinMoin
+
+version: 0.54
+date:    2008-10-16
+changes:
+  - (bug #40114) fix '=' counts in section headings
+  - (bug #29347) support anchors with content
+  - require H::WC 0.63, latest
+
+version: 0.53
+date:    2006-07-20
+changes:
+  - add attribute types
+  - require Params::Validate
+  - require HTML::WikiConverter 0.60
+
+version: 0.52
+date:    2006-07-07
+changes:
+  - (bug #17813) implement anchors
+
+version: 0.51
+date:    2006-03-21
+changes:
+  - (bug #18083) fix tests that used 'strip_comments' attribute, which no longer exists
+
+version: 0.50
+date:    2006-01-10
+changes:
+  - branched from main HTML::WikiConverter codebase.

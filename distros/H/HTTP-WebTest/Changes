@@ -1,0 +1,489 @@
+$Id: Changes,v 1.83 2003/09/05 20:06:12 m_ilya Exp $
+
+Revision history for Perl module HTTP::WebTest.
+
+2.04 Fri Sep  5 2003
+
+BUG FIXES:
+
+* ReportPlugin.pm had a bug that it sended out email report even if
+mail parameter was set to "errors" and all tests passed.  Thanks to
+Naoki Shima for a patch.
+
+2.03 Mon Jul 14 2003
+
+ENHANCEMENTS:
+
+* New test parameters 'mail_success_subject' and
+'mail_failure_subject' to redefine default value of Subject field in
+test report emails.  Based on patch by Amit Kaul.
+
+BUG FIXES:
+
+* HTTP::WebTest used to mangle test URLs like
+'http://website.com?http://website2.com?var=val' by URL escaping
+everything after the first question mark. Now it does modify test URL
+unless it is doing GET request and test parameter 'params' is
+specified in a test specification.  Thanks to Brian Webb for a
+bugreport.
+
+2.02 Mon Mar 24 2003
+
+BUG FIXES:
+
+* Fixed a bug when test reports were not send if multiple email
+addresses were specified as test report recipients (test parameter
+'mail_addresses').  Thanks to Amit Kaul for a bugreport and a patch.
+
+* New versions of LWP add Client-Peer header in all responses what
+breaks one of tests in the self-testing suite.  This test was supposed
+to be fixed by the previous release but apparently it wasn't.
+
+2.01 Sun Mar  2 2003
+
+ENHANCEMENTS:
+
+* Port self-testing suite from Test to Test::More.
+
+* HTTP::WebTest allows to specify non-default parser for wtscript
+files.
+
+* Now HTTP::WebTest::Parser can generate wtscript files from test
+parameters.
+
+DEPRECATIONS:
+
+* Subroutines 'start_webserver' and 'stop_webserver' was moved from
+HTTP::WebTest::SelfTest to HTTP::WebTest::Utils.  They still can be
+exported from HTTP::WebTest::SelfTest but their usage from this module
+is deprecated.
+
+BUG FIXES:
+
+* New versions of LWP add Client-Peer header in all responses what
+breaks one of tests in the self-testing suite. This test is fixed so
+it should pass ok with both new and old versions of LWP.  Thanks to
+Johannes la Poutre for bug report.
+
+* Test in the self-testing suite for 'timeout' parameter was buggy and
+could fail on some machines.  Thanks to Johannes la Poutre for bug
+report.
+
+* HTTP::WebTest::Plugin::HarnessReport produced a report output on
+STDERR what was adding some noise in 'make test' output when being
+used in Test::Harness-style test suites.
+
+2.00 Sat Dec 14 2002
+
+ENHANCEMENTS:
+
+* Allow plugins to insert tests into the test queue during test
+sequence runtime.  Inspired by Paul Hamingson's patch.
+
+* New core test parameter 'relative_urls' which enables HTTP-WebTest
+to use relative URLs in tests.
+
+* New core test parameter 'timeout' which allows to control user agent
+timeout settings while running test sequence.
+
+* Moved self-test suite support code into module
+HTTP::WebTest::SelfTest to allow reusing it in self-test suites for
+plugins maintained outside of HTTP-WebTest.
+
+INCOMPATIBILITIES:
+
+* HTTP::WebTest::Plugin::Apache plugin have been removed from
+HTTP::WebTest and will be released as independent CPAN module.  It
+will no longer be loaded by default even if it is available.
+
+* Renamed all last_xxx methods to current_xxx since the latest naming
+schema is less confusing.
+
+* HTTP::WebTest::Plugin::HarnessReport is rewritten using
+Test::Builder. As a side effect you can now freely intermix
+HTTP::WebTest based tests with tests written using other testing
+libraries like Test::More or Test::Differences. Unfortunately this
+change breaks existing test scripts which were using
+HTTP::WebTest::Plugin::HarnessReport because now number of tests in
+test scripts should be declared explictly with 'use Test::More plan =>
+NN' or 'use Test::More qw(no_plan)'.
+
+BUG FIXES:
+
+* Fixed some minor documentation bugs.  Thanks to William McKee.
+
+* Allow to use $webtest->last_xxx method calls after running test
+sequence with $webtest->run_tests.  Thanks to Kevin Baker for patch.
+
+1.99_09 Thu Aug 22 2002
+
+ENHANCEMENTS:
+
+* New core test parameter 'status_code' which allows to test HTTP
+responses for non-OK (200) status codes.  Thanks to Paul Hamingson for
+implementation.
+
+* New core test parameter 'handle_redirects' which allows to disable
+optionally automatic handling of redirects by HTTP-WebTest.
+
+* New test parameter 'form_name' in HTTP::WebTest::Plugin::Click
+plugin.  Thanks to Paul Hamingson for patch.
+
+* Test parameter 'click_button' in HTTP::WebTest::Plugin::Click plugin
+now supports image buttons (i.e. <input type="image" ...>).  Thanks to
+Paul Hamingson for patch.
+
+* Added two test parameters 'on_start' and 'on_finish' to
+HTTP::WebTest::Plugin::Hook plugin.
+
+* Extended example 'User-Defined Tests' in Cookbook.  Suggested by
+William McKee.
+
+BUG FIXES:
+
+* Previously comments inside of list parameters in wtscript files were
+not allowed.  Reported by William McKee.
+
+* Fixed 'make test' failure on Perl 5.8.0.
+
+1.99_08 Wed Jul 31 2002
+
+ENHANCEMENTS:
+
+* New plugin HTTP::WebTest::Plugin::Delay by Duncan Cameron.
+
+* License change: previously HTTP-WebTest have been licensed under
+terms of Artistic license.  Starting from this release HTTP-WebTest is
+dual licensed under terms of GPL/Artistic licenses like Perl itself.
+
+* Docs are edited for style and grammar.  Thanks to Richard Anderson.
+
+* Parser of wtscript files supports nested lists as values for list
+parameters.
+
+* 'cookies' parameter supports new named style of cookie
+specifications.  See HTTP::WebTest::Plugin::Cookies for details.
+
+* File upload tests are supported now.
+
+INCOMPATIBILITIES:
+
+* HTTP-WebTest now uses HTTP::WebTest::Request instead of
+HTTP::Request.  It is inherited from HTTP::Request and supports notion
+of query parameters.  This change simplifies writting plugins than may
+need to set or change query parameters.  However existing plugins
+which set query parameters using HTTP::Request's methods 'content' and
+'uri' are likely to be broken by this change.  If you use such plugins
+then modify them to use HTTP::WebTest::Request's method 'params'.
+
+DEPRECATIONS:
+
+* Parameter 'cookie' is deprecated. Use 'cookies' intead of it.
+
+* Old style of cookie specifications with 'cookies' parameter is
+deprecated.
+
+BUG FIXES:
+
+* HTTP-WebTest's default report plugin doesn't outputs cookies,
+headers and web page itself when any of 'show_xxx' parameters are on
+but such output is prohibited by test parameter 'terse'.  Reported by
+William McKee.
+
+* Put Algorithm::Diff back into PREREQ_PM in Makefile.PL.  It fixes
+problems with automated testing of HTTP-WebTest by CPAN and CPANPLUS.
+
+1.99_07 Sun Jun 16 2002
+
+ENHANCEMENTS:
+
+* Non-core test parameters are included in POD documentation in
+HTTP::WebTest.
+
+* Added Bundle::HTTP::WebTest file which has list of all dependanices
+including optional.
+
+* $webtest->run_wtscript accepts wtscript passed as string.
+
+* Parser for wtscript files is rewritten.  It doesn't use
+Parse::RecDescent anymore.  New parser is faster and provides better
+error diagnostics for parse errors.
+
+INCOMPATIBILITIES:
+
+* Changed syntax of wtscript files.  Parser of wtscript files expands
+Perl variables in double quoted strings.
+
+1.99_06 Sun May 12 2002
+
+ENHANCEMENTS:
+
+* New core test parameter 'http_headers'.  Allows to add additional
+HTTP headers to HTTP request or to override default HTTP headers in
+HTTP request.  Thanks to Duncan Cameron for patch.
+
+* New plugin HTTP::WebTest::Plugin::Click.  This plugin allows to use
+names of links and button on HTML pages to build test requests.
+
+BUG FIXES:
+
+* Set Content-type to 'application/x-www-form-urlencoded' for POST.
+Fixed for second time.  Apparently code to do this was lost during
+HTTP-WebTest rewrite.  Thanks to Duncan Cameron for patch.
+
+1.99_05 Mon Apr  8 2002
+
+BUG FIXES:
+
+* Fixed bug in HTTP::WebTest::Plugin::check_list.  It affected test
+parameter 'mail_addresses'.  Thanks to Duncan Cameron for patch.
+
+* Fixed bug in HTTP::WebTest::Plugin::HarnessReport.  This report
+plugin printed 'ok' even for failed tests.  Thanks to Martin Langhoff
+for patch.
+
+* Updated email address of Richard Anderson in POD docs and in
+Makefile.PL.
+
+1.99_04 Sun Feb 17 2002
+
+ENHANCEMENTS:
+
+* Improve syntax error reporting in parser of wtscript files.
+
+* Support for embeded Perl in wtscript files.
+
+* Added test parameters 'user_agent' and 'show_headers'.  Thanks to
+Markus Kucborski for patch.
+
+* Updated docs on format of wtscript files.  Thanks to Richard
+Anderson.
+
+* HTTP-WebTest does follow redirects after POST now.  Note that it
+breaks RFC but actually it is semi-standart behaviour of all browsers.
+Thanks to Thieme Geoff for bugging me about it :)
+
+* Added non-core plugin HTTP::WebTest::Plugin::Hooks which defines two
+new test parameters: 'on_request' and 'on_response'.
+
+INCOMPATIBILITIES:
+
+* Test parameters validation API have been changed.  All plugins have
+been fixed to conform new API. This change is required for proper
+support of embeded Perl in wtscript files.
+
+* Changed syntax of wtscript files.  Speaking more precisely rules for
+test parameters value quoting have been changed to be more Perl alike.
+It means that value of param should be written either as
+
+    value - any string without special chars like => or ).  It is
+    treated in same way as in old HTTP::WebTest
+
+    "value" - usual Perl string quoting rules apply (i.e sequences
+    like \n, \r, etc are treated as special and " can be escaped with
+    \").  It is new in HTTP::WebTest.
+
+    'value' - usual Perl string quoting rules apply (i.e sequences
+    like \n is not tread as special but ' can be escaped with
+    \').  This change breaks previosly allowed ''value'' style for
+    escaping quote characters.
+
+Also Perl expression in curly brackets can be
+specified instead of test parameter value. Like
+
+    url = { "http://" . 'somehost.com' }
+
+ 1.99_03 Mon Jan 28 2002
+
+   * Numerous documentation fixes.  Thanks to Richard Anderson for
+     reviewing and correcting POD docs.
+
+   * Renamed 'show_cookie' test parameter to 'show_cookies' as it was
+     in HTTP-WebTest 1.xx.
+
+   * Added 'default_report' test parameter which can be used to
+     disable test report output from default report plugin.  It can
+     be useful if it is desired to use another report plugin for test
+     output.
+
+   * Added report plugin HTTP::WebTest::Plugin::TestHarness which
+     provides report output compatible with Test::Harness.
+
+   * Renamed method HTTP::WebTest::validate_test to
+     HTTP::WebTest::validate_params.  Make it validate hash with test
+     parameters instead of test object.
+
+   * Now HTTP::WebTest does validate global test parameters.
+
+   * Names of tests specified in wtscript files was ignored.  It is
+     fixed now.
+
+   * Added some content to HTTP::WebTest::Cookbook.
+
+   * wt program will read test specification from standart input if no
+     wtscript filenames were specified as its arguments.
+
+ 1.99_02 Fri Jan 18 2002
+
+   * Moved autogenerated documentation on general module usage into
+     HTTP::WebTest. Moved code and API documentation from
+     HTTP::WebTest into HTTP::WebTest::API.  Suggested by Richard
+     Anderson <richard@richard-anderson.org>.
+
+   * Regenerate all autogenerated documentation before creation of
+     distribution. Don't create it during module build and
+     installation stage (i.e. perl Makefile.PL; make; make
+     install).  Suggested by Richard Anderson
+     <richard@richard-anderson.org>.
+
+   * Numerous documentation fixes.
+
+ 1.99_01  Sun Jan 13 2002
+
+   * Added support for third party plugins.  Added documentation on
+     writting plugins.
+
+   * Wtscript parser does check syntax of wtscript files.
+
+   * Bug fixes
+
+ 1.99_00  Mon Jan  6 2002
+
+   * Major rewrite of module.  The aim of this rewrite is plugin based
+     architecture which allows to extend module functionality with
+     plugins.
+
+ 1.07  Tue Nov 20 2001
+
+   * HTTP::WebTest now uses Config.pm to find correct shebang string
+     for script 'wt'.  It should correctly set path to perl
+     interpreter even if perl is installed in non-standart place.
+
+   * Added test parameter mail_from which allows to set From: header
+     in report e-mails.  Thanks Joe Germuska
+     <Joe.Germuska@JGSullivan.com> for the patch.
+
+ 1.06  Sat Aug 11 2001
+
+   * Some files required for local web files testing mode were missing
+     in last HTTP-WebTest distributions.
+
+ 1.05  Wed Aug  8 2001
+
+   * Installation of http-webtest directory is optional now for Unix
+     platforms.  It is completely disabled on Win32 platform.
+
+   * Mentioned in docs that this module should work on Win32
+     platform.  Bug reports from this platform would be appreciated.
+
+   * Do not use environment variable WEBTEST_LIB in 'wt' script.  It
+     seems to be needed only for debuging purposes and it was a source
+     of many Perl warnings if it was not defined.
+
+   * Sample Apache config file bundled with this module now contains
+     directives to disable usage of apache access and resource config
+     files.
+
+   * HTTP::WebTest now uses File::Temp module for secure creation of
+     temporary directories.
+
+   * Removed section 'CHANGES' from HTTP::WebTest POD docs since it
+     became too long.  Anybody interested in changes should consult
+     this file.
+
+ 1.04  Mon Jul 16 2001
+
+   * Added PREREQ_PM entry into Makefile.PL.  Thanks Britton
+     <fsblk@aurora.uaf.edu> for suggesting this.
+
+   * Fixed bug: test parameters accept_cookies and send_cookies did not
+     affected transmission and receipt of cookies at all.
+
+ 1.03  Wed Jul  4 2001
+
+   * First release by new maintainer.
+
+   * Fixed bug with passing form params with POST requests.
+
+ 1.02  Tue Jun 26 2001
+
+   * OWNERSHIP OF HTTP:WebTest HAS BEEN TRANSFERRED FROM Richard
+     Anderson <Richard.Anderson@raycosoft.com> TO Ilya Martynov
+     <ilya@martynov.org>.  PLEASE DIRECT ALL QUESTIONS AND COMMENTS 
+     TO Ilya Martynov.  So long, and thanks for all the fish.
+
+   * Change succeed/fail count so that a successful fetch of a 
+     page counts as a successful test.  (An unsuccessful fetch
+     still counts as a failed test.)
+
+   * Removed extraneous call to extract_cookies from get_response.
+
+ 1.01  Wed Jun 14 2001
+
+   * Modified cookies parameter to allow less than 10 elements.  
+     (Thanks to Thomas Ayles <tayles@arsdigita.com> for suggesting
+     this.)
+
+   * Fixed bug that caused get_response() to fail to capture all 
+     cookies returned by the webserver during redirects.  Added
+     subclass HTTP::WebTest::Cookies (a modified HTTP::Cookies
+     class).  (Thanks to Ilya Martynov <ilya@martynov.org> for
+     this fix.)
+
+   * Modified web server response time measurement to be more 
+     accurate.
+
+   * Exported run_web_test method so it can be called directly.
+
+ 1.00  Wed Jun 06 2001
+
+   * Added max_rtime and min_rtime parameters to test web server 
+     response time.  The perl module Time::HiRes is now a
+     prerequisite to install HTTP::WebTest.  (This code was
+     a collaborative effort by the author and Michael Blakeley 
+     <mike@blakeley.com>.)
+
+   * Added pauth parameter for proxy authorization.  (This code 
+     was a collaborative effort by the author and Darren Fulton 
+     <Darren.Fulton@team.telstra.com>.)
+
+   * Changed max_bytes and min_bytes paramters from test block 
+     parameters to global and/or test block parameters.
+
+   * Made format of output report more robust for max_bytes and 
+     min_bytes parameters.
+
+ 0.30  Mon Mar 05 2001
+
+   * Fixed ./t/*.t files so that "make test" runs correctly on 
+     Solaris.  (Replaced export WEBTEST_LIB= with WEBTEST_LIB= ; 
+     export WEBTEST_LIB.)  (Thanks to M. Simon Cavalletto 
+     <simonm@evolution.com> for reporting this bug.)
+
+   * Improved clarity of documentation and program output.
+
+ 0.20  Mon Feb 26 2001
+
+   * Fixed bug that caused module to abort when a HTTP-Redirect 
+     (302) is sent back with a relative URL.  Thanks to Andre 
+     Machowiak <ama@ision.net> for this fix.
+
+   * Set Content-type to 'application/x-www-form-urlencoded' 
+     for POST.  Thanks to Andre Machowiak <ama@ision.net> for
+     this fix.
+
+   * Modified Makefile.PL to get path of perl using the which 
+     command and create the wt script with this path in the 
+     she-bang line (#!).  (Thanks to Britton <fsblk@aurora.uaf.edu>
+     for reporting this bug.)
+
+   * Modified "make test" tests to write output to files in the 
+     t subdirectory.
+
+ 0.01  Sat Dec  9 2000
+
+   * Original version; created by h2xs 1.19.
+
+   * First release to CPAN by Richard Anderson
+     <Richard.Anderson@raycosoft.com>.
+

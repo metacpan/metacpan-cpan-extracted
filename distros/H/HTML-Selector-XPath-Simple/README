@@ -1,0 +1,36 @@
+
+This is HTML::Selector::XPath::Simple, which is a simple utility to
+access XML/HTML elements by using CSS selector.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+HTML::Selector::XPath
+HTML::TreeBuilder::XPath
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, Takeru INOUE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

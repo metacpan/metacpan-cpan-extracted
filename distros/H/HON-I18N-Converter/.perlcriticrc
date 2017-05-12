@@ -1,0 +1,29 @@
+#
+# Global settings
+#
+
+severity = 1
+color = 1
+
+# if tabs are to be forbidden, they should be forbidden everywhere
+[CodeLayout::ProhibitHardTabs]
+allow_leading_tabs = 0
+
+# it is fine to use camel case
+[-NamingConventions::Capitalization]
+
+# no need to check spelling
+[-Documentation::PodSpelling]
+
+# it is fine to have documentation before __END__
+[-Documentation::RequirePodAtEnd]
+
+# it is fine to use postfix controls
+[-ControlStructures::ProhibitPostfixControls]
+
+# POD section
+[Documentation::RequirePodSections]
+lib_sections = NAME | SYNOPSIS | DESCRIPTION | SUBROUTINES/METHODS | AUTHOR | BUGS AND LIMITATIONS | LICENSE AND COPYRIGHT
+
+[CodeLayout::RequireTidyCode]
+perltidyrc = .perltidyrc

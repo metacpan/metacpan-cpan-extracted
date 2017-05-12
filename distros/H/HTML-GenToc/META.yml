@@ -1,0 +1,30 @@
+---
+abstract: 'Generate a Table of Contents for HTML documents.'
+author:
+  - 'Kathryn Andersen'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.101670'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-GenToc
+requires:
+  Data::Dumper: 0
+  File::Basename: 0
+  Getopt::Long: 2.34
+  HTML::Entities: 0
+  HTML::LinkList: 0
+  HTML::SimpleParse: 0
+  Pod::Usage: 0
+resources:
+  homepage: http://github.com/rubykat/HTML-GenToc/tree
+  repository: git://github.com/rubykat/HTML-GenToc.git
+version: 3.20

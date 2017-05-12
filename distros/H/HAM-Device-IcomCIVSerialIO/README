@@ -1,0 +1,45 @@
+HAM-Device-IcomCIVSerialIO version 0.02
+=======================================
+
+This module is the basic part of a bundle of modules that supports remote
+control of Icom radios equipped with the CI-V interface. It is used mainly
+by HAM::Device::IcomCIV and it's descendants.
+To use it you need to open the serial port, send commands to the radio with
+send_civ() and receive callbacks (set with set_callback() to process received
+CI-V data.
+
+Note:
+
+This module is considered private, it will change it's interface and
+functionality in the future, when it will support multiple serial ports
+at the same time. Do not use it directly, use HAM::Device::IcomCIV or
+one of it's desceandants instead.
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Device::SerialPort
+   TimeHiRes
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2007 Ekkehard (Ekki) Plicht. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+

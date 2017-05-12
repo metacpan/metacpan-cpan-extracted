@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/HeliosX-Logger-Log4perl.t
+lib/HeliosX/Logger/Log4perl.pm
+META.yml                                 Module meta-data (added by MakeMaker)

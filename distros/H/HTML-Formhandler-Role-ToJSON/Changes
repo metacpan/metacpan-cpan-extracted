@@ -1,0 +1,7 @@
+# This file documents the revision history for Perl extension HTML-Formhandler-Role-ToJSON
+
+0.002 - 2015-11-11
+  - Fixed borked VERSION info
+
+0.001 - 2015-04-15
+  - First Release 

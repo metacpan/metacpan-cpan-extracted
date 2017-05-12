@@ -1,0 +1,25 @@
+<HTML>
+<HEAD>
+<TITLE>Automatic form example</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF>
+<$RSET.summary='"<$RVAR.summary>" + "<$RVAR.add>"'>
+<$REM Perl accepts strings as numbers. This way, a blank parameter
+will not ruin the syntax>
+<$RSUBMIT>
+<$REM 
+this is equivalent to:
+<FORM ACTION="<$RMERGE>" METHOD=POST NAME="autoform">
+<INPUT NAME="template" VALUE="<$RTEMPLATE>" TYPE=HIDDEN> 
+>
+Summary: <$RVAR.summary><BR>
+Add: <INPUT NAME="add"><BR>
+<$RTRANSFER.summary>
+<$REM 
+This is equivalent to:
+<INPUT TYPE=HIDDEN NAME="summary" VALUE="<$RVAR.summary>"> 
+>
+<INPUT TYPE=SUBMIT VALUE="Add">
+</$RSUBMIT>
+</BODY>
+</HTML>

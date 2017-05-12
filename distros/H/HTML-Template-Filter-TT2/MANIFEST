@@ -1,0 +1,13 @@
+MANIFEST
+Makefile.PL
+Build.PL
+Changes
+META.yml
+README
+lib/HTML/Template/Filter/TT2.pm
+eg/ht_tt2_debug
+t/00-load.t
+t/distchk.t
+t/pod-coverage.t
+t/pod.t
+t/ht_tt2_filter.t

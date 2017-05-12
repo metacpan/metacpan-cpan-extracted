@@ -1,0 +1,25 @@
+---
+abstract: 'Yet another HTML document parser with DOM-like methods'
+author:
+  - 'Yusuke Kawasaki'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.55
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-TagParser
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Encode: 2.13
+  Symbol: 0
+  perl: 5.008001
+version: 0.20

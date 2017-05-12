@@ -1,0 +1,6 @@
+# since Build dist always barfs on qv:
+
+use version;
+*Module::Build::ModuleInfo::_version::qv = *qv;
+
+require "Build";

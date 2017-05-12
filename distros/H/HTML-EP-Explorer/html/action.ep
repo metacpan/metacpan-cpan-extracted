@@ -1,0 +1,32 @@
+<ep-package name="HTML::EP::Explorer">
+<ep-explorer-init>
+<ep-explorer-config file="admin/config.pm">
+<ep-if cnd="'$_ep_language$' eq 'de'">
+  <ep-set var="Title" val="Ausführen der Aktion &quot;$cgi->faction$&quot;">
+<ep-else>
+  <ep-set var="Title" val="Executing action &quot;$cgi->faction$&quot;">
+</ep-if>
+<html><head><title>$Title$</title></head>
+<body bgcolor=#ffffff>
+<h1>$Title$</h1>
+<p>
+  <ep-language language="de">
+    Zur Durchführung der Aktion wird das folgende Kommando ausgeführt:
+  <ep-language language="en">
+    The following command will be performed:
+  </ep-language>
+</p>
+<pre>
+  <ep-explorer-action execute=0>
+</pre>
+<p>
+  <ep-language language="de">
+    Die Ausgabe des Kommandos sehen Sie hier:
+  <ep-language language="en">
+    The output follows:
+  </ep-language>
+</p>
+<pre>
+  <ep-explorer-action execute=1>
+</pre>
+</body></html>

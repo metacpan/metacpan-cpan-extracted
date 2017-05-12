@@ -1,0 +1,272 @@
+NAME
+    HTTP::Request::Form - Construct HTTP::Request objects for form
+    processing
+
+SYNOPSIS
+    use the following as a tool to query Altavista for "perl" from
+    the commandline:
+
+      use URI::URL;
+      use LWP::UserAgent;
+      use HTTP::Request;
+      use HTTP::Request::Common;
+      use HTTP::Request::Form;
+      use HTML::TreeBuilder 3.0;
+
+      my $ua = LWP::UserAgent->new;
+      my $url = url 'http://www.altavista.digital.com/';
+      my $res = $ua->request(GET $url);
+      my $tree = HTML::TreeBuilder->new;
+      $tree->parse($res->content);
+      $tree->eof();
+
+      my @forms = $tree->find_by_tag_name('FORM');
+      die "What, no forms in $url?" unless @forms;
+      my $f = HTTP::Request::Form->new($forms[0], $url);
+      $f->field("q", "perl");
+      my $response = $ua->request($f->press("search"));
+      print $response->content if $response->is_success;
+
+DESCRIPTION
+    This is an extension of the HTTP::Request suite. It allows easy
+    processing of forms in a user agent by filling out fields,
+    querying fields, selections and buttons and pressing buttons. It
+    uses HTML::TreeBuilder generated parse trees of documents
+    (especially the forms parts extracted with extract_links) and
+    generates it's own internal representation of forms from which
+    it then generates the request objects to process the form
+    application.
+
+CLASS METHODS
+    new($form [, $base [, $debug]])
+        The `new-method' constructs a new form processor. It get's
+        an HTML::Element object that contains a FORM element or
+        ISINDEX element as the single parameter. If an base-url is
+        given as an additional parameter, this is used to make the
+        form-url absolute in regard to the given URL.
+
+        If debugging is true, the following functions will be a bit
+        "talky" on stdio.
+
+    new_many($tree_part [, $base [, $debug]])
+        The `new_many' method returns a list of newly constructed
+        form processors. It's just like the `new' method except that
+        it can apply to any part of an HTML::Element tree, including
+        the root; it constructs a new form processor for each FORM
+        element at or under `$tree_part'.
+
+        Note that the return list might have zero, one or many new
+        objects in it, depending on how many FORM (or ISINDEX)
+        elements were found.
+
+        Form elements (like INPUT, etc.) found outside of FORM
+        elements are counted as being part of the preceding FORM
+        element. (And if there is no preceding FORM element, they
+        are ignored.) This feature is useful with the odd parse
+        trees that can result from basd HTML in or around FORM
+        elements. If you need to override that feature, then instead
+        call:
+
+          map HTTP::Request::Form->new($_), $tree->find_by_tag_name('FORM');
+
+INSTANCE METHODS
+    base()
+        This returns the parameter $base to the "new" constructor.
+
+    link()
+        This returns the action attribute of the original form
+        structure. This value is cached within the form processor,
+        so you can safely delete the form structure after you
+        created the form processor.
+
+    method()
+        This returns the method attribute of the original form
+        structure. This value is cached within the form processor,
+        so you can safely delete the form structure as soon as you
+        created the form processor.
+
+    isindex()
+        This returns true if this came from an original form
+        structure that was actually an ISINDEX element. In that
+        case, the form will hagve only one field, an input/text
+        field named "keywords".
+
+    name()
+        This returns the name attribute of the original form
+        structure. This value is cached within the form processor,
+        so you can safely delete the form structure after you
+        created the form processor.
+
+    fields()
+        This method delivers a list of fieldnames that are of "open"
+        type. This excludes the "hidden" and "submit" elements,
+        because they are already filled with a value (and as such
+        declared as "closed") or as in the case of "submit" are
+        buttons, of which only one must be used.
+
+    allfields()
+        This delivers a list of all fieldnames in the order as they
+        occured in the form-source excluding the submit fields.
+
+    field($name [, $value])
+        This method retrieves or sets a field-value. The field is
+        identified by its name. You have to be sure that you only
+        put a allowed value into the field.
+
+    field_type($name)
+        This method gives you the type of the named field, so that
+        you can distinguish on this type. (this is the only way to
+        distinguish selections and radio buttons).
+
+    is_selection($name)
+        This tests if a field is a selection or an input. Radio-
+        Buttons are used in the same way as standard selection
+        fields, so is_selection returns a true value for radio
+        buttons, too! (Of course, only one value is submitted for a
+        radio button)
+
+    field_selection($name)
+        This delivers the array of the options of a selection. The
+        element that is marked with selected in the source is given
+        as the default value. This works in the same way for radio
+        buttons, as they are just handled as a special case of
+        selections!
+
+    is_checkbox($name)
+        This tells you if a field is a checkbox. If it is, there are
+        several support methods to make use of the special features
+        of checkboxes, for example the fact that it is only sent if
+        it is checked.
+
+    checkboxes()
+        This method delivers a list of all checkbox fields much in
+        the same way as the buttons method.
+
+    checkbox_check($name)
+    checkbox_uncheck($name)
+    checkbox_toggle($name)
+        These methods set, unset or toggle the checkbox checked
+        state. Checkbox values are only added to the result if they
+        are checked.
+
+    checkbox_ischecked($name)
+        This methods tells you wether a checkbox is checked or not.
+        This is important if you want to analyze the state of fields
+        directly after the parse.
+
+    buttons()
+        This delivers a list of all defined and named buttons of a
+        form.
+
+    button($button [, $value])
+        This gets or sets the value of a button. Normally only
+        getting a button value is needed. The value of a button is a
+        reference to an array of values (because a button can exist
+        multiple times).
+
+    button_type($button)
+        This gives you the type of a button (submit/reset/image).
+        The result is an array of type names, as a button with one
+        name can exist multiple times.
+
+    button_exists($button)
+        This gives true if the named button exists, false (undef)
+        otherwise.
+
+    referer([$value])
+        This returns or sets the referer header for an request. This
+        is useful if a CGI needs a set referer for authentication.
+
+    press([$name [, $coord ] [, $number]])
+        This method creates a HTTP::Request object (via
+        HTTP::Request::Common) that sends the formdata to the server
+        with the requested method. If you give a button-name, that
+        button is used. If you give no button name, it assumes a
+        button without a name and just leaves out this last
+        parameter. If the number of the button is given, that button
+        value is delivered. If the number is not given, 0 (the first
+        button of this name) is assumed.
+
+        The "coord" parameter comes in handy if you have an image
+        button. If this is the case, the button press will simulate
+        a press at coordinates [2,2] unless you provide an anonymous
+        array with different coordinates.
+
+    dump()
+        This method dumps the form-data on stdio for debugging
+        purpose.
+
+SEE ALSO
+    the HTTP::Request manpage, the HTTP::Request::Common manpage,
+    the LWP::UserAgent manpage, the HTML::Element manpage, the
+    URI::URL manpage
+
+INSTALLATION
+      perl Makefile.PL
+      make install
+
+    or see the perlmodinstall manpage
+
+REQUIRES
+      Perl version 5.004 or later
+
+      HTTP::Request::Common
+      HTML::TreeBuilder
+      LWP::UserAgent
+
+VERSION
+    HTTP::Request::Form version 0.9, February 8th, 2001
+
+RESTRICTIONS
+    Only a subset of all possible form elements are currently
+    supported. The list of supported tags as of this version
+    includes:
+
+      INPUT/CHECKBOX
+      INPUT/HIDDEN
+      INPUT/IMAGE
+      INPUT/RADIO
+      INPUT/RESET
+      INPUT/SUBMIT
+      INPUT/FILE
+      INPUT/* (are all handled as simple text entry)
+      OPTION
+      SELECT
+      TEXTAREA
+      ISINDEX
+
+BUGS
+    There is currently no support for multiple selections (you can
+    do them yourself by setting a selection to a comma-delimited
+    list of values).
+
+    Multiple fields are not properly handled, only the last value is
+    available. Exception are buttons, they are handled in the right
+    way.
+
+    If there are several fields with the same name, you can only set
+    the value of the first of this fields (this is especially
+    problematic with checkboxes). This does work with buttons that
+    have the same name, though (you can press each instance
+    identified by number).
+
+    Error-Checking is currently very limited (not to say
+    nonexistant).
+
+    Support for HTML 4.0 optgroup tags is missing (as is with
+    allmost all current browsers, so that is not a great loss).
+
+    The button tag (HTML 4.0) is just handled as an alias for the
+    input tag - this is of course incorrect, but sufficient for
+    support of the usual button types.
+
+COPYRIGHT
+    Copyright 1998, 1999, 2000 Georg Bauer
+    <Georg_Bauer@muensterland.org>
+
+    This library is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+MAJOR CONTRIBUTORS
+    Sean M. Burke (ISINDEX, new_many)
+

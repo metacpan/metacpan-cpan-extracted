@@ -1,0 +1,456 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>
+      WebMake: Documentation: Metadata
+    </title>
+    <meta name="generator" content="WebMake/2.2" />
+    <style>
+      body {
+       background-color: #ffffff; 
+       color: #000000; 
+       font-size: medium;
+       font-family: verdana,lucida,helvetica,sans-serif;
+      }
+      code, samp, pre {
+       font-family: Courier New,courier,fixed-width,monospace;
+      }
+      H1 { font-size: x-large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFCC66; }
+      H2 { font-size: large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFDD77; }
+      H3 { font-size: medium; font-family: Garamond,Book Antiqua,Times,serif; background: #FFEE88; }
+      H4 { font-size: small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H5 { font-size: x-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H6 { font-size: xx-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      A:link {
+       font-weight: bold;
+       color: #004000;
+       text-decoration: underline; 
+      }
+      A:visited {
+       font-weight: normal;
+       color: #008000;
+       text-decoration: underline; 
+      }
+      A:active {
+       font-weight: bold;
+       color: #800000;
+       text-decoration: underline; 
+      }
+      dt {
+       font-size: medium;
+       font-weight: bold;
+       padding-top: 8px; padding-bottom: 8px;
+      }
+      dd {
+       padding-top: 8px; padding-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body bgcolor="#ffffff" text="#000000" link="#3300cc" vlink="#660066">
+    <font face="lucida,verdana,sans-serif">
+      <div align="center">
+         <img src="images/WebMakeTitle.png" alt="WebMake" width="500" height="122" />
+      </div>
+      <table width="100%">
+        <tr>
+          <td valign="top">
+             <strong><a href="http://webmake.taint.org/">WebMake</a>
+             Documentation</strong> (version 2.2)
+             
+          </td>
+          <td valign="top">
+            <div align="right">
+              
+               [ <a href="index_05-meta.html">Back</a> | <a href="wmmeta.html">Forward</a> | <a href="index.html">Index</a>
+               | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+               
+            </div>
+          </td>
+        </tr>
+      </table>
+<!-- yes, it's that Mozilla black-border code again ;) -->
+      <!-- stolen from www.mozilla.org via rc3.org -->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td bgcolor="#aaaaaa">
+            <table border="0" cellspacing="4" cellpadding="4" width="100%">
+              <tr>
+                <td bgcolor="#ffffff">
+                  <table border="0" cellspacing="4" cellpadding="4" width="100%">
+                    <tr>
+                      <td>
+                         <h1>Metadata</h1><p>
+                           <a name="What_Is_Metadata"><h3>What Is Metadata?</h3></a><p>
+                            Everyone is familiar with data, but the term <em>meta-data</em> is not so familiar.
+                            Here's a brief primer.
+                            
+                          </p>
+                          <p>
+                            To illustrate, I'll use an example familiar to most readers. Most computer
+                            operating systems nowadays have the concept of files in a filesystem. If you
+                            consider the files as <em>data</em>, then details such as file size, modification
+                            times, username of the owner etc. are <em><a href="metadata.html">metadata</a></em>, ie. data about the files.
+                            
+                          </p>
+                          <p>
+                            In WebMake, <a href="metadata.html">metadata</a> is used to refer to properties of textual content items.
+                            For example, a newspaper article may have a <em>title</em>, an <em>abstract</em> (ie. a
+                            brief summary), etc.
+                            
+                          </p>
+                          <p>
+                            This kind of data is very useful for building indices and catalogues, in the
+                            same way that Windows Explorer or the UNIX ls(1) command uses filesystem
+                            <a href="metadata.html">metadata</a> to display file listings. As a result, a good way to think of it is
+                            as "catalog data", as opposed to "narrative data", which is what a normal
+                            content item is. (thanks to Vaibhav Arya, vaibhav /at/ mymcomm.com, for that
+                            analogy.)
+                            
+                          </p>
+                          <p>
+                            To extend this metaphor, you should use <a href="metadata.html">metadata</a> for anything that would be
+                            used to describe your pages in a catalog. For example, given the page
+                            title, a quick abstract of the page, and a number to indicate its importance
+                            relative to other pages, one could easily create a list of pages
+                            automatically. In fact, this is how the indexes in the WebMake documentation
+                            are generated, and it's how sitemaps, breadcrumb trails and site trees are
+                            implemented.
+                            
+                          </p>
+                           <a name="How_to_Define_Metadata"><h3>How to Define Metadata</h3></a><p>
+                            WebMake can load <a href="metadata.html">metadata</a> from a number of sources:
+                            
+                          </p>
+                          <ul>
+                            <li>
+                              <p>
+                                <strong>Inferred from the content text itself</strong>: WebMake supports
+                                 "magic" <a href="metadata.html">metadata</a>, which contains some inferred data about the
+                                 content, such as its last modification date (which can be inferred
+                                 from the filesystem storage of the content file itself). In
+                                 addition, title <a href="metadata.html">metadata</a> can be inferred from several sources, such
+                                 as the <code>&lt;title&gt;</code> tag in HTML, or <code>=head1</code> tags in POD
+                                 text.
+                                
+                              </p>
+                            </li>
+                            <li>
+                              <p>
+                                <strong>Tags embedded within the content text</strong>: This is handled
+                                 using the <a href="wmmeta.html">&lt;wmmeta&gt;</a> tag.
+                                
+                              </p>
+                            </li>
+                            <li>
+                              <p>
+                                <strong>Set as defaults before the content items are defined</strong>: the
+                                 <a href="metadefault.html">&lt;metadefault&gt;</a> WebMake tag.
+                                
+                              </p>
+                            </li>
+                            <li>
+                              <p>
+                                <strong>Defined in bulk and "attached" to the content items</strong>: the
+                                 <a href="metatable.html">&lt;metatable&gt;</a> tag.
+                                
+                              </p>
+                            </li>
+                          </ul>
+                          <a name="Referring_to_Metadata"><h3>Referring to Metadata</h3></a><p>
+                            Metadata is referred to using the <a href="deferred_content_refs.html">deferred content ref</a> format:
+                            
+                          </p>
+                          <blockquote>
+                            <p>
+                              $[<em>content</em>.<em>metaname</em>]
+                              
+                            </p>
+                          </blockquote>
+                          <p>
+                            Where <em>content</em> is the name of the content item, and <em>metaname</em> is the
+                            name of the metadatum. So, for example, <em>$[blurb.txt.title]</em>
+                            would return the <em>title</em> metadatum from the content item <em>blurb.txt</em>.
+                            
+                          </p>
+                          <p>
+                            Meta tag names are case-insensitive, for compatibility with HTML meta tags.
+                            
+                          </p>
+                          <p>
+                            Any content chunk can access <a href="metadata.html">metadata</a> from other content chunks within the
+                            same <a href="out.html">&lt;out&gt;</a> tag, using <strong>this</strong> as the <em>content</em> name, i.e.
+                            <em>$[this.title]</em> . This is handy, for example, in setting the
+                            page title in the main content chunk, and accessing it from the header chunk.
+                            
+                          </p>
+                          <p>
+                            If more than one content item sets the same item of <a href="metadata.html">metadata</a> inside the
+                            <a href="out.html">&lt;out&gt;</a> tag, the first one will take precedence.
+                            
+                          </p>
+                          <p>
+                            The example files "news_site.wmk" and "news_site_with_sections.wmk"
+                            demonstrate how meta tags can be used to generate a SlashDot or Wired
+                            News-style news site. The index pages in those sites are generated
+                            dynamically, using the <a href="metadata.html">metadata</a> to decide which pages to link to, their
+                            ordering, and the titles and abstracts to use.
+                            
+                          </p>
+                           <a name="How_Do_I_Use_Metadata_In_WebMake"><h3>How Do I Use Metadata In WebMake?</h3></a><p>
+                            WebMake provides extra support for <a href="metadata.html">metadata</a> in an efficient way. A
+                            <em>metadatum</em> is like a normal content item, except it is exposed to all other
+                            pages in the WebMake file. This data is accessible, both to other pages in
+                            the site (as <strong>$[<em>contentname</em>.<em>metaname</em>]</strong>), and to other
+                            content items within the same page (as
+                            <strong>$[this.<em>metaname</em>]</strong>).
+                            
+                          </p>
+                          <p>
+                            In addition, WebMake caches <a href="metadata.html">metadata</a> in the site cache file between runs, so
+                            that a subsequent partial site build will not require loading all the content
+                            text, just to read a page title.
+                            
+                          </p>
+                          <p>
+                            Note that content items representing <a href="metadata.html">metadata</a> cannot, themselves, have
+                            <a href="metadata.html">metadata</a>.
+                            
+                          </p>
+                           <a name="What_Metadata_Should_I_Use"><h3>What Metadata Should I Use?</h3></a><p>
+                            The items marked <em>(built-in)</em> are supported directly inside WebMake, and used
+                            internally for functionality like building site maps and indices. All the
+                            other suggested <a href="metadata.html">metadata</a> names here are just that, suggestions, which support
+                            commonly-required functionality.
+                            
+                          </p>
+                          <p>
+                            Also note that the names are case-insensitive, they're just capitalised here
+                            for presentation.
+                            
+                          </p>
+                          <dl>
+                            <dt>
+                              <em>Title</em>
+                            </dt>
+                            <dd>
+                              <p>
+                                the title of a content item. The default title for
+                                 content items is inferred from the content text where possible,
+                                 or <em>(Untitled)</em> if no title can be found. (built-in)
+                                
+                              </p>
+                            </dd>
+                            <dt>
+                              <em>Score</em>
+                            </dt>
+                            <dd>
+                              <p>
+                                a number representing the "priority" of a content
+                                 item; used to affect how the item should be ranked in a list of
+                                 stories. The default value is <em>50</em>. Items with the same score will
+                                 be ranked alphabetically by title. (built-in)
+                                
+                              </p>
+                            </dd>
+                            <dt>
+                              <em>Abstract</em>
+                            </dt>
+                            <dd>
+                              <p>
+                                a short summary of a content item.
+                                
+                              </p>
+                            </dd>
+                            <dt>
+                              <em>Up</em>
+                            </dt>
+                            <dd>
+                              <p>
+                                used to map the site's content; this <a href="metadata.html">metadata</a> indicates the
+                                 content item that is the parent of the current content item. This metadatum
+                                 is used to generate dynamic sitemaps. (built-in)
+                                
+                              </p>
+                            </dd>
+                            <dt>
+                              <em>Section</em>
+                            </dt>
+                            <dd>
+                              <p>
+                                the section of a site under which a story should be
+                                 filed.
+                                
+                              </p>
+                            </dd>
+                            <dt>
+                              <em>Author</em>
+                            </dt>
+                            <dd>
+                              <p>
+                                who wrote the item. 
+                                
+                              </p>
+                            </dd>
+                            <dt>
+                              <em>Approved</em>
+                            </dt>
+                            <dd>
+                              <p>
+                                has this item been approved by an editor; used to
+                                 support workflow, so that content items need to be approved before
+                                 they are displayed on the site. 
+                                
+                              </p>
+                            </dd>
+                            <dt>
+                              <em>Visible_Start</em>
+                            </dt>
+                            <dd>
+                              <p>
+                                the start of an item's "visibility window",
+                                 ie. when it is listed on an index page. (TODO: define a recommended
+                                 format for this, or replace with DC.Coverage.temporal)
+                                
+                              </p>
+                            </dd>
+                            <dt>
+                              <em>Visible_End</em>
+                            </dt>
+                            <dd>
+                              <p>
+                                the end of an item's "visibility window",
+                                 ie. when it is listed on an index page.
+                                
+                              </p>
+                            </dd>
+                            <dt>
+                              <em>DC.Publisher</em>
+                            </dt>
+                            <dd>
+                              <p>
+                                a <a href="http://www.ietf.org/rfc/rfc2413.txt">Dublin Core</a> metadatum. The organisation or
+                                 individual that publishes the entire site.
+                                
+                              </p>
+                            </dd>
+                          </dl>
+                          <p>
+                            The <a href="http://www.ietf.org/rfc/rfc2413.txt">Dublin Core</a> is a whole load of suggested <a href="metadata.html">metadata</a> names and formats,
+                            which can be used either to replace or supplement the optional <a href="metadata.html">metadata</a> named
+                            above. Regardless of whether you replace or supplement the <a href="metadata.html">metadata</a> above
+                            internally, it is definitely recommended to use the DC names for <a href="metadata.html">metadata</a>
+                            that's made visible in the output HTML through conventional HTML &lt;meta&gt;
+                            tags.
+                            
+                          </p>
+                           <a name="Built_In_Metadata"><h3>Built-In Metadata</h3></a><p>
+                            These are some built-in "magic" items of <a href="metadata.html">metadata</a> that do not need to be
+                            defined manually. Instead, they are automatically inferred by WebMake itself:
+                            
+                          </p>
+                          <dl>
+                            <dt>
+                              <em>declared</em>
+                            </dt>
+                            <dd>
+                              <p>
+                                the item's declaration order. This is a number
+                                 representing when the content item was first encountered in the
+                                 WebMake file; earlier content items have a lower declaration order.
+                                 Useful for sorting.
+                                
+                              </p>
+                            </dd>
+                            <dt>
+                              <em>url</em>
+                            </dt>
+                            <dd>
+                              <p>
+                                the first &lt;out&gt; URL which contains that content
+                                 item (you should order your &lt;out&gt; tags to ensure each stories'
+                                 "primary" page is listed first, or set <em>ismainurl=false</em> on the
+                                 "alternative" output pages, if you plan to use this). See also the
+                                 <strong>get_url()</strong> method on the <a href="Content.pm.html">HTML::WebMake::Content</a> object.
+                                
+                              </p>
+                            </dd>
+                            <dt>
+                              <em>is_generated</em>
+                            </dt>
+                            <dd>
+                              <p>
+                                0 for items loaded from a &lt;content&gt; or
+                                 &lt;contents&gt; tag, 1 for items created by Perl code using the
+                                 <em>add_content()</em> function.
+                                
+                              </p>
+                            </dd>
+                            <dt>
+                              <em>mtime</em>
+                            </dt>
+                            <dd>
+                              <p>
+                                The modification date, in UNIX time_t
+                                 seconds-since-the-epoch format, of the file the content item was
+                                 loaded from. Handy for sorting.
+                                
+                              </p>
+                            </dd>
+                          </dl>
+                          <a name="Why_Use_Metadata"><h3>Why Use Metadata</h3></a><p>
+                            Support for <a href="metadata.html">metadata</a> is an important CMS feature.
+                            
+                          </p>
+                          <p>
+                            It is used by <a href="http://www.midgard-project.org/manual/contentmgmt.topic-trees.html">Midgard</a> and Microsoft's <a href="http://www.microsoft.com/technet/ecommerce/contmgt.asp">SiteServer</a>, and is available as
+                            <a href="http://zelotes.ent.iastate.edu/metadata/">user-contributed code</a> for <a href="http://manila.userland.com/">Manila</a>. It provides copious benefits
+                            for flexible index and <a href="sitemap.html">sitemap</a> generation, and, with the addition of an
+                            <em>Approved</em> tag, adds initial support for workflow.
+                            
+                          </p>
+                          <p>
+                            It allows the efficient generation of <a href="sitemap.html">site maps</a>, <a href="navlinks.html">back/forward
+                            navigation links</a>, and <a href="breadcrumbs.html">breadcrumb trails</a>, and
+                            enables index pages to be generated using Perl code easily and in a
+                            well-defined way.
+                            
+                          </p>
+                          <p>
+                            
+                          </p>
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+      <table width="100%">
+        <tr>
+          <td valign="top">
+             <strong><a href="http://webmake.taint.org/">WebMake</a>
+             Documentation</strong> (version 2.2)
+             
+          </td>
+          <td valign="top">
+            <div align="right">
+              
+               [ <a href="index_05-meta.html">Back</a> | <a href="wmmeta.html">Forward</a> | <a href="index.html">Index</a>
+               | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+               
+            </div>
+          </td>
+        </tr>
+      </table>
+      <div align="right">
+         <a href="http://webmake.taint.org/"> <img src="images/BuiltWithWebMake.png" alt="Built With WebMake" border="0" width="88" height="31" /></a>
+      </div>
+    </font>
+  </body>
+</html>

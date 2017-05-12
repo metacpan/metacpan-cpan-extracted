@@ -1,0 +1,42 @@
+TYPEMAP
+CTPP2 *         O_OBJECT
+Bytecode *	O_OBJECT
+
+#
+#
+#
+OUTPUT
+O_OBJECT
+    sv_setref_pv( $arg, CLASS, (void*)$var );
+
+O_HvRV
+    $arg = sv_bless( newRV((SV*)$var), gv_stashpv(CLASS,1) );
+
+
+#
+#
+#
+INPUT
+O_OBJECT
+    if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) )
+    {
+        $var = ($type)SvIV((SV*)SvRV( $arg ));
+    }
+    else
+    {
+        warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+        XSRETURN_UNDEF;
+    }
+
+O_HvRV
+    if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVHV) )
+    {
+        $var = (HV*)SvRV( $arg );
+    }
+    else
+    {
+        warn( \"${Package}::$func_name() -- $var is not a blessed HV reference\" );
+        XSRETURN_UNDEF;
+    }
+
+

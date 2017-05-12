@@ -1,0 +1,75 @@
+#!/usr/bin/env perl
+use 5.010;
+use lib 't/lib';
+use Any::Moose;
+use Hailo::Test;
+use Benchmark qw(:all);
+use File::Temp qw(tempfile tempdir);
+use Test::More;
+use namespace::clean -except => 'meta';
+
+# Notes:
+#   for i in $(echo 'show databases;' | mysql -u root -proot | grep hailo-test); do echo "drop database $i;" | mysql -u root -proot; done
+#   for i in $(psql -A -l | perl -pe 's/\|.*//'|grep hailo-test); do dropdb $i; done
+
+my $test_count = $ARGV[0] // 10;
+my @storages = $ARGV[1] ? (split /[\s,]+/, $ARGV[1]) : Hailo::Test::all_storages();
+my @s = map {
+    /SQLite/
+    ? ([ $_, "$_/file",   { in_memory => 0 } ],
+       [ $_, "$_/memory", { in_memory => 1 } ])
+    : ([ $_, $_, {} ]);
+} @storages;
+
+my @s_str = map { $_->[0] } @s;
+
+say "Testing @s_str";
+sleep 1;
+
+# Dir to store our training file / brains
+my $dir = tempdir( "hailo-benchmark-XXXXX", CLEANUP => 1, TMPDIR => 1 );
+
+my %hailos;
+my %test;
+
+# A uid for this test run
+my @t = "a".."z";
+my $toke = join q[], map { @t[rand @t] } 1 .. 10;
+
+for my $s (@s) {
+    my ($storage, $name, $opts) = @$s;
+    my $i = 0; for my $cnt (1 .. $test_count) { $i++;
+        my $st = $name;
+        $st =~ s/[^A-Za-z]/-/g;
+        my $tmpdir = tempdir( "$st-XXXXX", DIR => $dir, CLEANUP => 1 );
+        my $hailo = Hailo::Test->new(
+            tmpdir => $tmpdir,
+            storage => $storage,
+            brief => 1,
+            %$opts,
+            ($storage =~ /PostgreSQL|MySQL/
+             ? (brain => "hailo_benchmark_db_test_${toke}_$i")
+             : ()),
+        );
+
+        my $ok = $hailo->spawn_storage();
+
+        pass "Created storage $storage $cnt/$test_count";
+
+        # Push a hailo
+        push @{ $hailos{$name} } => $hailo;
+    }
+
+    $test{$name} = sub {
+        state $iter = 0;
+        my $hailo = $hailos{$name}->[$iter];
+
+        $hailo->test_all();
+
+        $iter++;
+    };
+}
+
+cmpthese($test_count, \%test);
+
+done_testing();

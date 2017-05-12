@@ -1,0 +1,23 @@
+This module helps in debugging HTML::Template-based programs.  Testing 
+the output of your programs is as easy as walking a hash.  Note that it 
+will only test the variables set in the template, not the design of the 
+page.  For that, you really need to use human.pl, a throughly excelent 
+peice of software that has been stable for many, many years.
+
+The prefered installation method is to use Module::Build:
+
+perl Build.PL
+./Build
+./Build test
+./Build install
+
+A Makefile.PL is also included for backwards compatibility, and is 
+thus installable using the old-school method:
+
+perl Makefile.PL
+make
+make test
+make install
+
+Note that Module::Build needs to be installed in either case.
+

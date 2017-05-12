@@ -1,0 +1,30 @@
+#!/usr/bin/perl
+
+use CGI;
+#use HTTP::File; 
+
+do "<BUILD_DIR>/File.pm";
+
+$cgi = new CGI;
+
+$upload_path='/tmp';
+
+$raw_file = $cgi->param('FILE_UPLOAD');
+$basename = HTTP::File::upload($raw_file,$upload_path);
+
+
+
+
+print $cgi->header;
+print $cgi->start_html;
+
+print "<B>$basename</B> upload successfully.<BR>Upload path: ";
+print $upload_path ? $upload_path : '/tmp';
+print "<br>The text in bold is what you should input to the HTTP::File test script";
+
+print $cgi->end_html;
+
+
+
+
+

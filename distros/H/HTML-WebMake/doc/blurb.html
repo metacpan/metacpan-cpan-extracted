@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>
+      WebMake: Documentation: The Blurb
+    </title>
+    <meta name="generator" content="WebMake/2.2" />
+    <style>
+      body {
+       background-color: #ffffff; 
+       color: #000000; 
+       font-size: medium;
+       font-family: verdana,lucida,helvetica,sans-serif;
+      }
+      code, samp, pre {
+       font-family: Courier New,courier,fixed-width,monospace;
+      }
+      H1 { font-size: x-large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFCC66; }
+      H2 { font-size: large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFDD77; }
+      H3 { font-size: medium; font-family: Garamond,Book Antiqua,Times,serif; background: #FFEE88; }
+      H4 { font-size: small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H5 { font-size: x-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H6 { font-size: xx-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      A:link {
+       font-weight: bold;
+       color: #004000;
+       text-decoration: underline; 
+      }
+      A:visited {
+       font-weight: normal;
+       color: #008000;
+       text-decoration: underline; 
+      }
+      A:active {
+       font-weight: bold;
+       color: #800000;
+       text-decoration: underline; 
+      }
+      dt {
+       font-size: medium;
+       font-weight: bold;
+       padding-top: 8px; padding-bottom: 8px;
+      }
+      dd {
+       padding-top: 8px; padding-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body bgcolor="#ffffff" text="#000000" link="#3300cc" vlink="#660066">
+    <font face="lucida,verdana,sans-serif">
+      <div align="center">
+         <img src="images/WebMakeTitle.png" alt="WebMake" width="500" height="122" />
+      </div>
+      <table width="100%">
+        <tr>
+          <td valign="top">
+             <strong><a href="http://webmake.taint.org/">WebMake</a>
+             Documentation</strong> (version 2.2)
+             
+          </td>
+          <td valign="top">
+            <div align="right">
+              
+               [ <a href="index_01-intro.html">Back</a> | <a href="concepts.html">Forward</a> | <a href="index.html">Index</a>
+               | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+               
+            </div>
+          </td>
+        </tr>
+      </table>
+<!-- yes, it's that Mozilla black-border code again ;) -->
+      <!-- stolen from www.mozilla.org via rc3.org -->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td bgcolor="#aaaaaa">
+            <table border="0" cellspacing="4" cellpadding="4" width="100%">
+              <tr>
+                <td bgcolor="#ffffff">
+                  <table border="0" cellspacing="4" cellpadding="4" width="100%">
+                    <tr>
+                      <td>
+                         <h1>The Blurb</h1><p>
+                          WebMake is a simple content management system, based around a templating
+                          system for HTML documents, with lots of built-in smarts about what a
+                          "typical" informational website needs in the way of functionality; metadata,
+                          sitemapping, navigational aids, and (of course) embedded perl code. ;)
+                          
+                        </p>
+                        <ul>
+                          <li>
+                            <p>
+                              <strong>Creates portable sites</strong>: It requires no dynamic scripting capabilities
+                               on the server; WebMake sites can be deployed to a plain old FTP site
+                               without any problems.
+                              
+                            </p>
+                          </li>
+                          <li>
+                            <p>
+                              <strong>No need to edit lots of files:</strong> A multi-level website can be generated
+                               entirely from 1 WebMake file containing content, links to content files,
+                               perl code (if needed), and output instructions. 
+                              
+                            </p>
+                          </li>
+                          <li>
+                            <p>
+                              <strong>Useful for team work:</strong> Since the file-to-page mapping is no longer
+                               required, WebMake allows the separation of responsibilities between the
+                               content editors, the HTML page designers, and the site architect. Only the
+                               site architect needs to edit the WebMake file itself, or know perl or
+                               WebMake code. Standard file access permissions can be used to restrict
+                               editing by role.
+                              
+                            </p>
+                          </li>
+                          <li>
+                            <p>
+                              <strong>Efficient:</strong> WebMake supports dependency checking, so a one-line change
+                               to one source file will not regenerate your entire site -- unless it's
+                               supposed to. Only the files that refer to that chunk of content, however
+                               indirectly, will be modified.
+                              
+                            </p>
+                          </li>
+                          <li>
+                            <p>
+                              <strong>Supports content conversion, on the fly:</strong> Text can be edited as
+                               standard HTML, converted from plain text (see below), or converted from
+                               any other format by adding a conversion method to the
+                               WebMake::FormatConvert module.
+                              
+                            </p>
+                          </li>
+                          <li>
+                            <p>
+                              <strong>Edit text as text, not as HTML:</strong> One of the built-in content conversion
+                               modules is <a href="ettext.html">Text::EtText</a>, which provides an easy-to-edit,
+                               easy-to-read and intuitive way to write HTML, based on the plain-text
+                               markup conventions we've been using for years.
+                              
+                            </p>
+                          </li>
+                          <li>
+                            <p>
+                              <strong>Rearrange your site in 30 seconds:</strong> Since URLs can be referred to
+                               symbolically, pages can be moved around and URLs changed by changing just
+                               one line. All references to that URL will then change automatically. This
+                               is vaguely <a href="http://www.sfc.keio.ac.jp/~ted/XUsurvey/xuDation.html">Xanalogical</a>.
+                              
+                            </p>
+                          </li>
+                          <li>
+                            <p>
+                              <strong>Scriptable:</strong> Content items and output URLs can be generated, altered,
+                               or read in dynamically using perl code. Perl code can even be used to
+                               generate other perl code to generate content/output URLs/etc.,
+                               recursively. New tags can be defined and interpreted in perl.
+                              
+                            </p>
+                          </li>
+                          <li>
+                            <p>
+                              <strong>Extensible:</strong> New tags (for use in content items or in the WebMake file
+                               itself) can be added from perl code, providing what amounts to a
+                               dynamically-loaded plugin API.
+                              
+                            </p>
+                          </li>
+                          <li>
+                            <p>
+                              <strong>Inclusion of text:</strong> Content can incorporate other content items, simply
+                               by referring to it's name. This is a form of <a href="http://www.sfc.keio.ac.jp/~ted/XUsurvey/xuDation.html">Xanadu-style transclusion</a>.
+                              
+                            </p>
+                          </li>
+                          <li>
+                            <p>
+                              <strong>Edit content in your web browser:</strong> WebMake now includes webmake.cgi,
+                               which provides a CGI front-end to editing and managing a WebMake site.
+                              
+                            </p>
+                          </li>
+                          <li>
+                            <p>
+                              <strong>Site replication:</strong> with webmake.cgi's CVS integration, multiple copies
+                               of the same site can be replicated, and changes made on any of the sites
+                               will be automatically replicated to all the others.
+                              
+                            </p>
+                          </li>
+                          <li>
+                            <p>
+                              <strong>Version control:</strong> changes made to sites using webmake.cgi will be kept
+                               under CVS version control, so older versions of the site can be "rolled
+                               back" if necessary.
+                              
+                            </p>
+                          </li>
+                        </ul>
+                        <p>
+                          But enough of the bulleted lists. Here's where you should start:
+                          
+                        </p>
+                        <ul>
+                          <li>
+                            <p>
+                              First of all, read <a href="concepts.html">WebMake Concepts</a> for a quick
+                               intro to the assumptions and concepts that are used in WebMake.
+                              
+                            </p>
+                          </li>
+                          <li>
+                            <p>
+                              Next, read <a href="making.html">WebMake Operation</a> for an overview
+                               of how WebMake operates.
+                              
+                            </p>
+                          </li>
+                          <li>
+                            <p>
+                              Then, read <a href="firsttime.html">How To Migrate to WebMake</a> for a guide
+                               to bringing an existing, simple web site into WebMake.
+                              
+                            </p>
+                          </li>
+                          <li>
+                            <p>
+                              After that, you just need to read the rest of the manual, which is mostly
+                               reference text. Good luck!
+                              
+                            </p>
+                          </li>
+                        </ul>
+                        <p>
+                          
+                        </p>
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+    <table width="100%">
+      <tr>
+        <td valign="top">
+           <strong><a href="http://webmake.taint.org/">WebMake</a>
+           Documentation</strong> (version 2.2)
+           
+        </td>
+        <td valign="top">
+          <div align="right">
+            
+             [ <a href="index_01-intro.html">Back</a> | <a href="concepts.html">Forward</a> | <a href="index.html">Index</a>
+             | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+             
+          </div>
+        </td>
+      </tr>
+    </table>
+    <div align="right">
+       <a href="http://webmake.taint.org/"> <img src="images/BuiltWithWebMake.png" alt="Built With WebMake" border="0" width="88" height="31" /></a>
+    </div>
+  </font>
+</body>
+</html>

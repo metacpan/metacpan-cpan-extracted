@@ -1,0 +1,47 @@
+<ep-package name=HTML::EP::Explorer accept-language="de,en">
+<ep-explorer-prefs>
+<ep-if cnd="'$_ep_language$' eq 'de'">
+  <ep-set var="Title" val="EP-Explorer: Voreinstellungen">
+  <ep-set var="Ok" val="Einstellungen speichern">
+  <ep-set var="ReturnButton" val="Speichern und zurück zur Ausgangsseite">
+<ep-else>
+  <ep-set var="Title" val="EP-Explorer: Preferences">
+  <ep-set var="Ok" val="Save these settings">
+  <ep-set var="ReturnButton" val="Save and return to the calling page">
+</ep-if>
+<html><head><title>$Title$</title></head>
+<body bgcolor=#ffffff>
+<h1>$Title$</h1>
+<p>
+  <ep-language language="de">
+    Auf dieser Seite können Sie den
+    <a href="http://www.ispsoft.de/products/ep/explorer/">EP-Explorer</a>
+    an Ihre persönlichen Wünsche anpassen. Sie werden automatisch hierher
+    geleitet, wenn Sie das System zum ersten Mal benützen. Natürlich können
+    Sie aber auch später immer wieder hierher zurückkehren.
+  <ep-language language="en">
+    This page allows you to customize the
+    <a href="http://www.ispsoft.de/products/ep/explorer/">EP-Explorer</a>.
+    You are guided to this page automatically when using the system for
+    the first time. Of course you are able to return at any later time.
+  </ep-language>
+</p>
+<div align=center>
+<p>
+  <form action="prefs.ep" method=GET>
+  <table>
+    <tr><th><ep-language de="Ihre E-Mail-Adresse:" en="Your e-mail address:">
+        </th>
+        <td><input name="explorer_prefs_email" value="$session->prefs->email$">
+        </td>
+    </tr>
+  </table>
+  <input type=submit name="save" value="$Ok$">
+  <ep-if eval="$cgi->return_to$">
+    <input type=hidden name="return_to" value="$cgi->return_to$">
+    <input type=submit name="save_and_return" value="$ReturnButton$">
+  </ep-if>
+  </form>
+</p>
+</div>
+</body></html>

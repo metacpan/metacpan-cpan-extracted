@@ -1,0 +1,8 @@
+-----INCLUDED!!!
+inc: [% blubber %]
+-----INCLUDED END!!!
+loop a:
+[% FOREACH var = loopa %]
+ item: [% var.a %]
+[% END %]
+

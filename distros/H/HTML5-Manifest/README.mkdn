@@ -1,0 +1,75 @@
+# NAME
+
+HTML5::Manifest - HTML5 application cache manifest file generator
+
+# SYNOPSIS
+
+    use HTML5::Manifest;
+    
+
+    my $manifest = HTML5::Manifest->new(
+        use_digest => 1,
+        htdocs     => './htdocs/',
+        skip       => [
+            qr{^temporary/},
+            qr{\.svn/},
+            qr{\.swp$},
+            qr{\.txt$},
+            qr{\.html$},
+            qr{\.cgi$},
+        ],
+        network => [
+            '/api',
+            '/foo/bar.cgi',
+        ],
+    );
+    
+
+    # show html5.manifest content
+    say $manifest->generate;
+
+# DESCRIPTION
+
+HTML5::Manifest is generate manifest contents of application cache in HTML5 Web application API.
+
+# METHOD
+
+## new(%args)
+
+create HTML5::Manifest instance.
+
+_%args_ are:
+
+- `htdocs => $htdocs_path`
+
+root directory of a file included to manifest is specified.
+
+- `skip => \@skip_pattern_list`
+
+The file pattern excepted from `$args{htdocs}` is described. It is the same work as `MANIFEST.SKIP`.
+
+- `network => \@network_list`
+
+NETWORK: URL specified as section is specified in manifest file.
+
+- `use_digest => $boolean`
+
+md5 checksum is created from all the contents of the file included in cache, and it writes in manifest file.
+This is useful to updating detection of manifest file.
+
+## generate()
+
+generate to html5 application cache manifest file.
+
+# AUTHOR
+
+Kazuhiro Osawa <yappo {at} shibuya {dot} pl>
+
+# SEE ALSO
+
+[http://www.w3.org/TR/html5/offline.html](http://www.w3.org/TR/html5/offline.html)
+
+# LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

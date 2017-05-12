@@ -1,0 +1,80 @@
+NAME
+     HTML::Widgets::Table - An HTML table generation class.
+
+SYNOPSIS
+     use HTML::Widgets::Table;
+     my $table = HTML::Widgets::Table->new(\%params);
+     my $html = $table->render;
+
+DESCRIPTION
+     HTML::Widgets::Table creates an HTML table from native data structures.
+
+METHODS
+  new(\%params)
+     Create a new table object.  Parameters that can be passed
+     include any legal attributes for an HTML table tag.  In
+     addition, the following parameters may be passed.
+
+         pretty_border => 1
+         pretty_border_color => '#669999'
+
+            If pretty_border is a true value, the table will be rendered
+            with a browser-independent border by putting the table inside
+            another table, allowing the background color of the outside
+            table come through as the border.  The value of pretty_border
+            will be with width of the border, and pretty_border_color
+            will be the color of the border.
+
+         alternating_row_colors => [ '#ffffff',
+                                     '#f2f2f2'
+                                   ]
+
+            You can use this to alternate the background color of the
+            rows in the table.  This is useful for making tables without
+            borders and rules easier to read.
+
+  addHeaderRow(\@data, \%cell_params, \%params)
+     Adds a header row to the table (as in the <th> tags for the
+     columns).  Header rows are also enclosed in <thead> tags.  @data
+     is an array of column values.  Any elements of the array that
+     are hash references are taken to be key/value pairs with the
+     cell contents as the value associated with the key 'data', and
+     all the other key/value pairs are attributes to be applied to
+     that cell.  These override the values in %cell_params.
+     %cell_params are default attributes for every column in the row.
+     %params are the row attributes to go in the <tr> tag.
+
+  addRow(\@data, \%cell_params, \%params)
+     Adds a new row to the table.  @data is an array of column
+     values.  Any elements of the array that are hash references are
+     taken to be key/value pairs with the cell contents as the value
+     associated with the key 'data', and all the other key/value
+     pairs are attributes to be applied to that cell.  These override
+     the values in %cell_params.  %cell_params are default attributes
+     for every column in the row.  %params are the row attributes to
+     go in the <tr> tag.
+
+  setRepeatingHeaderRow(\@data, \%cell_params, \%params, $repeat_interval)
+     Adds a header row to be repeated every $repeat_interval rows.
+     This is useful to keep the user oriented when viewing long tables.
+
+  setRepeatingRow(\@data, \%cell_params, \%params, $repeat_interval)
+     Adds a row to be repeated every $repeat_interval rows.
+     This is useful to keep the user oriented when viewing long tables.
+
+  render()
+     Returns a string containing the HTML version of the table.
+
+AUTHOR
+     Don Owens <don@owensnet.com>
+
+COPYRIGHT
+     Copyright (c) 2003 Don Owens
+
+     All rights reserved. This program is free software; you can
+     redistribute it and/or modify it under the same terms as Perl
+     itself.
+
+VERSION
+     0.01
+

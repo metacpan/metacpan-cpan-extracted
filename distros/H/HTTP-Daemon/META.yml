@@ -1,0 +1,32 @@
+--- #YAML:1.0
+name:               HTTP-Daemon
+version:            6.01
+abstract:           a simple http server class
+author:
+    - Gisle Aas <gisle@activestate.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    HTTP::Date:       6
+    HTTP::Request:    6
+    HTTP::Response:   6
+    HTTP::Status:     6
+    IO::Socket:       0
+    LWP::MediaTypes:  6
+    perl:             5.008001
+    Sys::Hostname:    0
+resources:
+    MailingList:  mailto:libwww@perl.org
+    repository:   http://github.com/gisle/http-daemon
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,15 @@
+Revision history for HTML::DTD
+
+0.04    20100411
+        - Spelling fixes in Pod.
+        - Missing ent files and friends; bug 54959; ikegami.
+        - Explicitly require newest File::ShareDir.
+
+0.03    20080831
+        - Sort dtds() to fix a test failure.
+
+0.02    20080831
+        - Added list of names to the Pod.
+
+0.01    20080831
+        - First release. Wahoo.

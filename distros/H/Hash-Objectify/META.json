@@ -1,0 +1,111 @@
+{
+   "abstract" : "Create objects from hashes on the fly",
+   "author" : [
+      "David Golden <dagolden@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Hash-Objectify",
+   "no_index" : {
+      "directory" : [
+         "corpus",
+         "examples",
+         "t",
+         "xt"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17",
+            "perl" : "5.008001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::ReleaseStatus::FromVersion" : "0",
+            "Dist::Zilla::PluginBundle::DAGOLDEN" : "0.072",
+            "English" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Pod::Wordlist" : "0",
+            "Software::License::Apache_2_0" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Portability::Files" : "0",
+            "Test::Spelling" : "0.12",
+            "Test::Version" : "1",
+            "blib" : "1.01"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::XSAccessor" : "0",
+            "Exporter" : "5.57",
+            "Scalar::Util" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0.96",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "Hash::Objectified" : {
+         "file" : "lib/Hash/Objectify.pm",
+         "version" : "0.008"
+      },
+      "Hash::Objectified::Lax" : {
+         "file" : "lib/Hash/Objectify.pm",
+         "version" : "0.008"
+      },
+      "Hash::Objectify" : {
+         "file" : "lib/Hash/Objectify.pm",
+         "version" : "0.008"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dagolden/Hash-Objectify/issues"
+      },
+      "homepage" : "https://github.com/dagolden/Hash-Objectify",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dagolden/Hash-Objectify.git",
+         "web" : "https://github.com/dagolden/Hash-Objectify"
+      }
+   },
+   "version" : "0.008",
+   "x_authority" : "cpan:DAGOLDEN",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
+}
+

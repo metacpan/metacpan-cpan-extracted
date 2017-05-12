@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>
+      WebMake: Documentation: The &lt;breadcrumbs&gt; Tag
+    </title>
+    <meta name="generator" content="WebMake/2.2" />
+    <style>
+      body {
+       background-color: #ffffff; 
+       color: #000000; 
+       font-size: medium;
+       font-family: verdana,lucida,helvetica,sans-serif;
+      }
+      code, samp, pre {
+       font-family: Courier New,courier,fixed-width,monospace;
+      }
+      H1 { font-size: x-large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFCC66; }
+      H2 { font-size: large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFDD77; }
+      H3 { font-size: medium; font-family: Garamond,Book Antiqua,Times,serif; background: #FFEE88; }
+      H4 { font-size: small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H5 { font-size: x-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H6 { font-size: xx-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      A:link {
+       font-weight: bold;
+       color: #004000;
+       text-decoration: underline; 
+      }
+      A:visited {
+       font-weight: normal;
+       color: #008000;
+       text-decoration: underline; 
+      }
+      A:active {
+       font-weight: bold;
+       color: #800000;
+       text-decoration: underline; 
+      }
+      dt {
+       font-size: medium;
+       font-weight: bold;
+       padding-top: 8px; padding-bottom: 8px;
+      }
+      dd {
+       padding-top: 8px; padding-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body bgcolor="#ffffff" text="#000000" link="#3300cc" vlink="#660066">
+    <font face="lucida,verdana,sans-serif">
+      <div align="center">
+        <img src="images/WebMakeTitle.png" alt="WebMake" width="500" height="122" />
+      </div>
+      <table width="100%">
+        <tr>
+          <td valign="top">
+            <strong><a href="http://webmake.taint.org/">WebMake</a>
+             Documentation</strong> (version 2.2)
+             
+          </td>
+          <td valign="top">
+            <div align="right">
+              
+               [ <a href="navlinks.html">Back</a> | <a href="cache.html">Forward</a> | <a href="index.html">Index</a>
+               | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+               
+            </div>
+          </td>
+        </tr>
+      </table>
+<!-- yes, it's that Mozilla black-border code again ;) -->
+      <!-- stolen from www.mozilla.org via rc3.org -->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td bgcolor="#aaaaaa">
+            <table border="0" cellspacing="4" cellpadding="4" width="100%">
+              <tr>
+                <td bgcolor="#ffffff">
+                  <table border="0" cellspacing="4" cellpadding="4" width="100%">
+                    <tr>
+                      <td>
+                        <h1>The &lt;breadcrumbs&gt; Tag</h1><p>
+                          Another common site navigation strategy is to provide what Jakob Nielsen has
+                          called a "breadcrumb trail". The &lt;breadcrumbs&gt; tag supports this.
+                          
+                        </p>
+                        <a name="WTF_Is_A_Breadcrumb_Trail"><h1>WTF Is A Breadcrumb Trail?</h1></a><p>
+                          The "breadcrumb trail" is a piece of navigation text, displaying a list of
+                          the parent pages, from the top-level page right down to the current page.
+                          You've probably seen them before; take a look at this <a href="http://dir.yahoo.com/Business_and_Economy/Shopping_and_Services/Communication_and_Information_Management/Internet_and_World_Wide_Web/Portals/Personalized/">Yahoo
+                          category</a> for an example.
+                          
+                        </p>
+                        <p>
+                          To illustrate, here's an example. Let's say you're browsing the <em>Man Bites
+                          Dog</em> story in an issue of <em>Dogbiting Monthly</em>, which in turn is part of the
+                          <em>Bizarre Periodicals</em> site. Here's a hypothetical breadcrumb trail for that
+                          page:
+                          
+                        </p>
+                        <blockquote>
+                          <p>
+                            <em>Bizarre Periodicals</em> : <em>Dogbiting Monthly</em> : <em>Issue 24</em> : <em>Man
+                             Bites Dog</em>
+                          </p>
+                        </blockquote>
+                        <p>
+                          Typically those would be links, of course, so the user can jump right back to
+                          the contents page for Issue 24 with one click.
+                          
+                        </p>
+                        <p>
+                          If you have a site that contains pages that are more than 2 levels deep from
+                          the front page, you should consider using this to aid navigation.
+                          
+                        </p>
+                        <a name="How_To_Use_It_With_WebMake"><h1>How To Use It With WebMake</h1></a><p>
+                          To use a breadcrumb trail, first define a <a href="sitemap.html">sitemap</a>. This tells WebMake how to
+                          order the page hierarchy, and which pages to include.
+                          
+                        </p>
+                        <p>
+                          Next, define a template to be used for each entry in the trail. This
+                          should contain references to <strong>${url}</strong> (note: <em>not</em><strong>$(url)</strong>), which will be replaced with the URL for the page in
+                          question; and <strong>${name}</strong>, which will be expanded to the name of the
+                          "main" content item on that page, allowing you to retrieve metadata for that
+                          content like so: <strong>$[${name}.title]</strong> .
+                          
+                        </p>
+                        <blockquote>
+                          <p>
+                            <em>Note:</em> the "main" content item is defined as the first content
+                             item on the page which is not metadata, not perl-generated code, and
+                             has the <em>map</em> attribute set to <em>"true"</em>, ie. not a template.
+                            
+                          </p>
+                        </blockquote>
+                        <p>
+                          You can also define two more templates to be used at the <em>top</em> of the
+                          breadcrumb trail, ie. the root page, and at the <em>tail</em> of it, ie. the
+                          current page being viewed. These are optional though, and if not specified,
+                          the generic template detailed above will be used as a default.
+                          
+                        </p>
+                        <p>
+                          Then add a <strong>&lt;breadcrumbs&gt;</strong> tag to the WebMake file as follows.
+                          
+                        </p>
+                        <p>
+                          <pre>
+
+	&lt;breadcrumbs name=<em>mycrumbs</em> map=<em>sitemapname</em>
+		top=<em>toptemplatename</em>
+		tail=<em>tailtemplatename</em>
+		level=<em>leveltemplatename</em> /&gt;
+                        </pre>
+                      </p>
+                      <p>
+                        The <em>top</em> and <em>tail</em> attributes are optional, as explained above.
+                        The <em>level</em> attribute, which names the "generic" breadcrumb template
+                        item to use for intermediate levels, is mandatory.
+                        
+                      </p>
+                      <p>
+                        You can then add references to <strong>$[<em>mycrumbs</em>]</strong> in
+                        other content items, and the breadcrumb-trail text will be inserted. <em>Note!</em>
+                        be sure to use a deferred reference, or the links may not appear!
+                        
+                      </p>
+                      <a name="Attribute_Reference"><h1>Attribute Reference</h1></a><p>
+                        These are the attributes accepted by the <strong>&lt;breadcrumbs&gt;</strong> tag.
+                        
+                      </p>
+                      <dl>
+                        <dt>
+                          <em>name</em>
+                        </dt>
+                        <dd>
+                          <p>
+                            the name of the breadcrumb-trail content item.
+                             Required.
+                            
+                          </p>
+                        </dd>
+                        <dt>
+                          <em>map</em>
+                        </dt>
+                        <dd>
+                          <p>
+                            the name of the sitemap used to determine page
+                             hierarchy. Required.
+                            
+                          </p>
+                        </dd>
+                        <dt>
+                          <em>level</em>
+                        </dt>
+                        <dd>
+                          <p>
+                            the name of the template used to draw links at the
+                             intermediate levels of the trail. Required.
+                            
+                          </p>
+                        </dd>
+                        <dt>
+                          <em>top</em>
+                        </dt>
+                        <dd>
+                          <p>
+                            the name of the template used to draw the link to
+                             the top-most, or root, page. Optional -- <em>level</em> will be used as a
+                             fallback.
+                            
+                          </p>
+                        </dd>
+                        <dt>
+                          <em>tail</em>
+                        </dt>
+                        <dd>
+                          <p>
+                            the name of the template used to draw the link to
+                             the bottom-most, currently-viewed page. Optional -- <em>level</em> will be
+                             used as a fallback.
+                            
+                          </p>
+                        </dd>
+                      </dl>
+                      <a name="Example"><h2>Example</h2></a><p>
+                        This will generate an extremely simple set of &lt;a href&gt; links, no frills.
+                        The sitemap it uses isn't specified here; see the <a href="sitemap.html">sitemap tag documentation</a> for details on how to generate a site map.
+                        
+                      </p>
+                      <p>
+                        <pre>
+
+  &lt;template name=btop&gt;
+  	[ &lt;a href=${url}&gt;$[${name}.title]&lt;/a&gt; /
+  &lt;/template&gt;
+  &lt;template name=blevel&gt;
+  	&lt;a href=${url}&gt;$[${name}.title]&lt;/a&gt; /
+  &lt;/template&gt;
+  &lt;template name=btail&gt;
+  	&lt;a href=${url}&gt;$[${name}.title]&lt;/a&gt; ]
+  &lt;/template&gt;
+  &lt;breadcrumbs map=<em>sitemapname</em> name=crumbs
+  	top=btop tail=btail level=blevel /&gt;
+                      </pre>
+                    </p>
+                    <p>
+                      
+                    </p>
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table width="100%">
+  <tr>
+    <td valign="top">
+      <strong><a href="http://webmake.taint.org/">WebMake</a>
+       Documentation</strong> (version 2.2)
+       
+    </td>
+    <td valign="top">
+      <div align="right">
+        
+         [ <a href="navlinks.html">Back</a> | <a href="cache.html">Forward</a> | <a href="index.html">Index</a>
+         | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+         
+      </div>
+    </td>
+  </tr>
+</table>
+<div align="right">
+  <a href="http://webmake.taint.org/"><img src="images/BuiltWithWebMake.png" alt="Built With WebMake" border="0" width="88" height="31" /></a>
+</div>
+</font>
+</body>
+</html>

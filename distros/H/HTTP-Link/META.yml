@@ -1,0 +1,27 @@
+---
+abstract: 'RFC5988 Web Linking'
+author:
+  - 'David Zurborg <zurborg@cpan.org>'
+build_requires:
+  Test::More: '0'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTTP-Link
+requires:
+  Exporter: '0'
+  MIME::EcoEncode::Param: '0'
+  perl: '5.010'
+  strictures: '2'
+resources:
+  bugtracker: https://github.com/zurborg/libhttp-link-perl/issues
+  homepage: https://github.com/zurborg/libhttp-link-perl
+  repository: https://github.com/zurborg/libhttp-link-perl.git
+version: '0.001'

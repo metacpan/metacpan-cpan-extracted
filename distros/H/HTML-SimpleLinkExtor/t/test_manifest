@@ -1,0 +1,10 @@
+compile.t
+pod.t
+pod_coverage.t
+parse.t
+tags.t
+schemes.t
+relative_links.t
+absolute_links.t
+autoload.t
+rt87288.t

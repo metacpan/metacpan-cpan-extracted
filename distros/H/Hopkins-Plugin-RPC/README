@@ -1,0 +1,15 @@
+NAME
+    Hopkins::Plugin::RPC - SOAP interface to Hopkins
+
+DESCRIPTION
+    Hopkins::Plugin::RPC encapsulates the RPC (remote procedure call) POE
+    session created by the manager session. this session uses the
+    Server::SOAP component to provide a SOAP interface to the job server.
+
+AUTHOR
+    Mike Eldridge <diz@cpan.org>
+
+LICENSE
+    This program is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself.
+

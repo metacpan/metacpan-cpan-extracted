@@ -1,0 +1,8 @@
+call comp_helper.mas a bunch
+<& comp_helper.mas &>
+<& comp_helper.mas &>
+<& comp_helper.mas &>
+<& comp_helper.mas &>
+<& comp_helper.mas &>
+<& comp_helper.mas &>
+called it

@@ -1,0 +1,16 @@
+Revision history for HTML-Miner
+
+0.01    Aug 2009
+        First version, released on an unsuspecting world.
+
+0.03    Jan 2011
+        Fixed URL parsing Bug.
+
+0.05    Jan 2011
+        Added ability to extract JS and CSS files
+
+1.02    Jan 2013
+        Fixed multiple bugs, updated POD, provided thread support
+
+1.03    Jan 2013
+        Removed 'use Data::Dump' used for debug that was causing test fails from t/

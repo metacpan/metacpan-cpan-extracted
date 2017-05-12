@@ -1,0 +1,35 @@
+severity = 2
+ 
+[Documentation::RequirePodSections]
+lib_sections = NAME | DESCRIPTION | AUTHOR | COPYRIGHT AND LICENSE
+script_sections = NAME | DESCRIPTION | SYNOPSIS | AUTHOR | COPYRIGHT AND LICENSE
+ 
+[ValuesAndExpressions::RequireNumberSeparators]
+min_value = 100000
+ 
+[Variables::ProhibitPunctuationVars]
+allow = $@ $!
+
+[Subroutines::RequireArgUnpacking]
+short_subroutine_statements = 2
+
+; I don't agree with these policies, and disabled them.
+[-Miscellanea::RequireRcsKeywords]
+[-Documentation::RequirePodAtEnd]
+[-ControlStructures::ProhibitUnlessBlocks]
+[-ControlStructures::ProhibitPostfixControls]
+[-References::ProhibitDoubleSigils]
+[-RegularExpressions::RequireExtendedFormatting]
+[-RegularExpressions::RequireLineBoundaryMatching]
+[-Subroutines::RequireFinalReturn]
+[-BuiltinFunctions::ProhibitStringyEval]
+[-Modules::RequireEndWithOne]
+[-Modules::RequireVersionVar]
+[-Modules::RequireExplicitPackage]
+[-ValuesAndExpressions::ProhibitEmptyQuotes]
+[-ValuesAndExpressions::ProhibitMagicNumbers]
+
+; Temporarily disabled
+[-ControlStructures::ProhibitCascadingIfElse]
+[-Modules::ProhibitExcessMainComplexity]
+[-Subroutines::ProhibitExcessComplexity]

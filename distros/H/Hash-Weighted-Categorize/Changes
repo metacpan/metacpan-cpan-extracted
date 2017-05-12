@@ -1,0 +1,14 @@
+Revision history for Hash-Weighted-Categorize
+
+0.002 Tue Dec 24 2013
+        [ENHANCEMENTS]
+        - added support for the != comparison operator
+        - added support for nested blocks
+
+0.001 Sat Nov 30 2013
+        [PERL IS HARD, LET'S MAKE UP A DSL]
+        - The supported DSL is really minimal for now,
+          some extensions are already planned
+        - The module was named "Fleur" during initial development,
+          but we have a serious name now
+

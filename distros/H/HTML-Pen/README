@@ -1,0 +1,61 @@
+Pen version 1.00
+================
+
+Pen's syntax was developed in the earliest days of web application 
+development, when the dominant technology for web apps was CGI
+and server-side-include technology.  The syntax is designed to minimize
+its footprint in a design-intensive consulting environment where designers, 
+not programmers, controlled and maintained the final HTML product.
+
+Inherently, all Web apps are built using MVC architecture.  The MVC View 
+consists of formatting languages HTML, XHTML and JavaScript; the MVC Model 
+is developed in a control language- if you're reading this, probably Perl.
+It follows, then, that every solution for web app development implements 
+MVC.  Given its original circumstances, the Pen solution implements the 
+View-Control integration with a stronger bias towards the View side.
+
+Originally, this solution was primarily intended for publishing database 
+content.  It's been deployed on hundreds of websites, including some
+fairly sophisticated apps.  The installed base is currently pretty small,
+but there's still a little pressure to accomodate it by publishing.
+
+This module represents a slightly different approach to the problem 
+of adding run-time logic and functionality to a website.  It's a solution
+I prefer, and hope that others may appreciate it as well.  This module
+is not a sophisticated technical implementation.  It was originally
+written in Perl 4 and still uses Regex for parsing.  I would love 
+to implement more state-of-the-art technology if that opportunity
+presents itself.
+
+The Perl community has always emphasized the language on its 
+considerable technical strengths instead of market domination or cheesey 
+gimmicks.  But unfortunately, Perl is no longer the obvious first 
+choice for web developers.  In light of that fact, this module was 
+renamed with a cute three letter acronym.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  None
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2011 by Jim Schueler Total Quality Information Systems
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.9 or,
+at your option, any later version of Perl 5 you may have available.
+
+

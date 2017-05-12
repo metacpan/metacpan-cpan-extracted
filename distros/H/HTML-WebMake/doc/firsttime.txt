@@ -1,0 +1,340 @@
+<wmmeta name="Title" value="How to Migrate to WebMake" />
+<wmmeta name="Section" value="01-intro" />
+<wmmeta name="Score" value="30" />
+<wmmeta name="Abstract">
+how to write a WebMake file
+</wmmeta>
+
+Chances are, you already have a HTML site you wish to migrate to WebMake.
+This document introduces WebMake's way of doing things, and how to go
+about a typical migration.
+
+Place The WebMake File
+~~~~~~~~~~~~~~~~~~~
+
+First, pick a top-level directory for the site; that's where you'll place your
+**.wmk** file.  All the generated files should be beneath this directory. In
+this example I'll call it **index.wmk**.
+
+Make Templates
+~~~~~~~~~~~~~~
+
+Next, identify the page templates used in the site.  To keep it simple, let's
+imagine you have only one look and feel on the pages, with the usual stuff in
+it; high-level HTML document tags, such as &lt;html&gt;, &lt;head&gt;,
+&lt;title&gt;, &lt;body&gt;, that kind of stuff.  There may also be some
+formatting, such as a &lt;table&gt; with a side column containing links, etc.,
+or a top-of-page title. All of these are good candidates for moving into a
+template. I typically call these templates something obvious like
+**page_template** or **sitename_template**, where **sitename** is the name of
+the site.
+
+For this example, let's imagine you have the HTML high-level tags and a page
+title as your typical template items.
+
+So edit the **index.wmk** file, and add a template content item, by cutting
+and pasting it from one of your pages.  Instead of cutting and pasting the
+__real__ title, use a metadata reference:
+**&wmdollar;&etsqi;this.title&etsqo;**.  Also, replace the text of the page
+with **&wmdollar;{page_text}**; the plan is that, before this content item
+will be referenced, this content item will have been set to the text you wish
+to use.
+
+::     &lt;webmake&gt;
+::     &lt;content name=page_template&gt;
+::       &lt;html&gt;&lt;head&gt;&lt;title&gt;&wmdollar;&etsqi;this.title&etsqo;&lt;/title&gt;&lt;/head&gt;
+::       &lt;body bgcolor=#ffffff&gt;&lt;h1&gt;&wmdollar;&etsqi;this.title&etsqo;&lt;/h1&gt;
+::       &lt;hr&gt;
+::         &wmdollar;{page_text}
+::       &lt;hr&gt;
+::       &lt;/body&gt;&lt;/html&gt;
+::     &lt;/content&gt;
+
+Grab The Pages' Text
+~~~~~~~~~~~~~~~~~~
+
+Next, run through the pages you wish to WebMake-ify, and either:
+
+  1. move them into a ''raw'' subdirectory, from where WebMake can read them
+  with a "&lt;contents&gt;" [$(contents)] tag, or;
+
+  2. include them into the **index.wmk** file directly.
+
+It's a matter of taste; I initially preferred to do 1, but nowadays 2 seems
+more convenient for editing, as it provides a very easy way to break up long
+pages, and it makes search-and-replace easy.  Anyway, it's up to you.  I'll
+illustrate using 2 in this example.
+
+Give each content item a name.  I generally use the name of the HTML file, but
+with a **.txt** extension instead of **.html**.  This lets me mentally
+differentiate the input from the output, but still lets me quickly see the
+relationship between input file and output file.
+
+Strip the template elements (head tag, surrounding eye-candy tables, etc.)
+from each page, leaving just the main text body behind.  Keep the titles
+around for later, though.
+
+::     &lt;content name=''document1.txt''&gt;
+::       ....your html here...
+::     &lt;/content&gt;
+::     &lt;content name=''document2.txt''&gt;
+::       ....your html here...
+::     &lt;/content&gt;
+::     &lt;content name=''document3.txt''&gt;
+::       ....your html here...
+::     &lt;/content&gt;
+
+Convert To EtText (OPTIONAL!)
+~~~~~~~~~~~~~~~~~
+
+Now, one of the best bits of WebMake (in my opinion) is EtText [$(ettext)],
+the built-in simple text markup language; to use this, run the command-line
+tool __ethtml2text__ [ethtml2text] on each of your HTML files to convert them
+to EtText, then include that text, instead of the HTML, as the content items.
+Don't forget to add **format=''text/et''** to the content tag's attributes,
+though:
+
+::     &lt;content name=''document1.txt'' format=''text/et''&gt;
+::       ....your ettext here...
+::     &lt;/content&gt;
+::     ...
+
+To keep things simple, I'll assume you haven't used EtText in the examples
+from now on.
+
+Add Titles
+~~~~~~~~~~
+
+Next, you need to set the titles in the content items, so that they can be
+used in higher-level templates, such as the **page_template** content item we
+defined earlier.
+
+To really get some power from WebMake, use metadata to do this.
+
+---------------------------------------------------------------------------
+
+<blockquote>
+
+**What is Metadata?**
+
+A __metadatum__ is like a normal content item, except it is exposed to other
+pages in the **index.wmk** file.  Normally, you cannot reliably read a dynamic
+content item that was set from another page; if one content item sets a
+variable like this:
+
+::     &lt;{set foo=''Value!''}&gt;
+
+Any content items evaluated after that variable is set can access
+**&wmdollar;{foo}**, __as long as they occur on the same output page__.
+However if they occur on another output page, they may not be able to access
+**&wmdollar;{foo}**.
+
+To get around this, WebMake includes "the **&lt;wmmeta&gt;** tag" [$(wmmeta)],
+which allows you to attach data to a content item.  This data will then be
+accessible, both to other pages in the site (as
+**&wmdollar;&etsqi;__contentname__.__metaname__&etsqo;**, and to other content
+items within the same page (as **&wmdollar;&etsqi;this.__metaname__&etsqo;**).
+
+Think of them as like size, modification time, owner etc. on files.  A good
+concept is that it's data used to generate catalogs or lists.
+
+</blockquote>
+
+---------------------------------------------------------------------------
+
+Anyway, titles of pages are a perfect fit for metadata. So convert your
+page titles into &lt;wmmeta&gt; tags like so:
+
+::     &lt;content name=''document1.txt''&gt;
+::       &lt;wmmeta name=''title''&gt;Your Title Here&lt;/wmmeta&gt;
+::       ....your ettext here...
+::     &lt;/content&gt;
+::     ...
+
+(BTW it's not required that metadata be stored in the content text; it can
+also be loaded en masse from another location, such as the WebMake file, or
+another file altogether, using the <a href=$(metatable)>&lt;metatable&gt;</a>
+directive.  Again, it's a matter of taste.)
+
+Sometimes, for example if you plan to generate index pages or a sitemap, you
+may wish to add a one-line summary of the content item as a metadatum called
+**abstract**. I'll leave it out of the examples, just to keep them simple.
+
+Metadata may seem like a lot of bother, but it's a perfect fit when you need to
+generate pages that list links to, or details about, the pages in your site.
+
+It should always be referred to in **&wmdollar;&etsqi;square
+brackets&etsqo;**. I'll explain why later on.
+
+Naming The Output URLs
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Finally, you've assembled all the content items; now to tell WebMake
+where they should go. This is accomplished using the &lt;out&gt; tag.
+
+Each output URL, in this example, requires the following content items:
+
+  - **&wmdollar;{page_template}**, which refers to:
+
+    - **&wmdollar;&etsqi;this.title&etsqo;**
+
+    - **&wmdollar;{page_text}**
+
+As you can see, both **this.title** and **page_text** rely on which output URL
+is being written, otherwise you'll wind up with lots of finished pages
+containing the same text. ;)
+
+There are several ways to deal with this.
+
+  1. Set a variable in the &lt;out&gt; text, using &lt;{set}&gt;, to the name
+  of the content item that should be used for the **page_text**.
+
+  2. Derive the correct value for **page_text** using the name of the
+  &lt;out&gt; section itself.
+
+The simplest way is the latter.  WebMake defines a built-in ''magic''
+variable, "&wmdollar;{WebMake.OutName}" [$(webmake_vars)], which contains the
+__name__ of the output URL.  (Note that output URLs have both a name __and__ a
+filename; you'll see why in the next section.)
+
+To do this, define another content item:
+
+::     &lt;content name=out_helper&gt;
+::        &lt;{set page_text=''&wmdollar;{&wmdollar;{WebMake.OutName}.txt}'' }&gt;
+::        &wmdollar;{page_template}
+::     &lt;/content&gt;
+
+What Does That Do?
+~~~~~~~~~~~~~~~~~~~~~~
+
+Line 2, in the example above, needs an explanation.
+
+This takes the name of the output URL (as discussed above), using a content
+reference: **&wmdollar;{WebMake.OutName}**.  For example, let's say the
+page was named **pageurl**.
+
+::     &lt;{set page_text=''&wmdollar;{<b>&wmdollar;{WebMake.OutName}</b>.txt}'' }&gt;
+
+<b>&wmdollar;{WebMake.OutName}</b> expands to **pageurl**:
+
+::     &lt;{set page_text=''&wmdollar;{<b>pageurl</b>.txt}'' }&gt;
+
+It then appends **.txt** to the end:
+
+::     &lt;{set page_text=''<b>&wmdollar;{pageurl.txt}</b>'' }&gt;
+
+and expands that as a <a href=$(content_refs)>content reference</a>.
+
+::     &lt;{set page_text=''<b><i>...entire text of page...</i></b>'' }&gt;
+
+Finally, it stores that in a content item called **page_text**.
+
+This looks pretty complicated -- and it is.  But the important thing is that,
+as in traditional UNIX style, it's also a very powerful way to do templating
+and variable interpolation; once you get the hang of it, there's plenty more
+stuff it can do.  
+
+BTW: you could simply skip defining this ''helper'' content item altogether,
+and just go to the top of the file and change the template to refer directly
+to **&wmdollar;{&wmdollar;{WebMake.OutName}.txt}** instead of
+**&wmdollar;{page_text}** . That's what I usually do.
+
+What's With the Square Brackets?
+~~~~~~~~~~~~~~~~~~~~~~
+
+But what about the title?  Handily, since we defined the titles as metadata,
+and referred to them as **&wmdollar;[this.title&etsqo;** in **page_template**,
+this is taken care of; once the **&wmdollar;{page_text}** reference is
+expanded, **&wmdollar;&etsqi;this.title&etsqo;** will be set.
+
+Remember I mentioned that metadata should always be referred to in
+**&wmdollar;&etsqi;square brackets&etsqo;**? Here's why.  Square bracket
+references, or "__deferred references__" [$(deferred_content_refs)], are
+evaluated only after "normal, ''squiggly bracket'' content references"
+[$(content_refs)].
+
+The example page contains the following content references:
+
+  - **&wmdollar;{page_template}**, which refers to:
+
+    - **&wmdollar;&etsqi;this.title&etsqo;**
+
+    - **&wmdollar;{page_text}**
+
+Since **&wmdollar;{page_text}** is a normal content reference, it will be
+expanded first; and when it's expanded, the &lt;wmmeta&gt; tag setting
+**title** will be encountered.  This will cause **this.title** to be set.
+
+Once all the normal content references are expanded, WebMake runs through
+the deferred references, causing **&wmdollar;&etsqi;this.title&etsqo;** to
+be expanded.
+
+If **page_template** had used a normal content reference to refer to
+**&wmdollar;{this.title}**, WebMake would have tried to expand it before
+**&wmdollar;{page_text}**, since it appeared in the file earlier.
+
+Anyway, I digress.
+
+Writing The &lt;out&gt; Tags
+~~~~~~~~~~~~~~~~~~~~~~
+
+Each output URL needs an &lt;out&gt; tag, with a __name__ and a __file__.  The
+__name__ provides a symbolic name which one can use to refer to the URL; the
+__file__ names the file that the output should be written to.
+
+Typically the name should be similar to the page's main content item's name,
+to keep things simple and allow the shortcut detailed in the previous section
+to work.
+
+Also, sites typically use a pretty similar filename to the name, for obvious
+reasons.  At least, they do, to start with; further down the line, you may
+need to move one (or more) pages around in the URL or directory hierarchy;
+since you've been referring to them by name, instead of by URL or by filename,
+this means changing only one attribute in the &lt;out&gt; tag, instead of
+trying to do a global search and replace throughout hundreds of HTML files.
+
+Anyway, here's a sample &lt;out&gt; tag:
+
+::     &lt;out name=''document1'' file=''document1.html''&gt; &wmdollar;{out_helper} &lt;/out&gt;
+
+But what about multiple outputs? Two choices:
+
+  1. Simply list all the output HTML files, one after the other.
+  Works fine for small sites, and it's simple.
+
+  2. Use a "&lt;for&gt;" [$(for)] tag.
+
+I don't think you need to see how 1. works, it's pretty obvious.
+Let's see how 2. does it:
+
+::     &lt;for name=''page'' values=''document1 document2 document3''&gt;
+::       &lt;out name=''&wmdollar;{page}'' file=''&wmdollar;{page}.html''&gt; &wmdollar;{out_helper} &lt;/out&gt;
+::     &lt;/for&gt;
+
+The important thing here, is that any references to **&wmdollar;{page}** inside
+the **&lt;for&gt;** block, will be replaced with the name of the current item
+in the **values** list.
+
+Putting &lt;out&gt; Names To Work
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+So you've named the output URLs.   However all your content items contain
+static URLs in the HREFs!  Let's fix that.
+
+This really is up to you; it's a global search-and-replace.  Let's say
+you want to fix all links to ''document1.html''.  Replace this:
+
+::     &lt;a href=''document1.html''&gt;foo&lt;/a&gt;
+
+with an "URL reference" [$(url_refs)], like this:
+
+::     &lt;a href=''&wmdollar;(document1)''&gt;foo&lt;/a&gt;
+
+Now, even if ''document1.html'' is renamed to ''blah/whatever/doc1.cgi'', you
+won't have to do a search-and-replace again.
+
+Getting Advanced - Adding Navigation and a Sitemap
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This hasn't been written yet.  Sorry!
+

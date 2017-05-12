@@ -1,0 +1,29 @@
+body {
+    background-color: #ffffff;
+}
+
+a:link {
+    color: #0000ff;
+}
+
+.title {
+    text-align: center;
+    font-size: 16px;
+}
+
+.color-red {
+    color: red;
+}
+
+.font-small {
+    font-size: 10px;
+}
+
+.line {
+    color: #ff99ff;
+    text-align: center;
+}
+
+.logo {
+    text-align: center;
+}

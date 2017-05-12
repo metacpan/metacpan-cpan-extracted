@@ -1,0 +1,8 @@
+Revision history for Perl module Javascript::Menu.
+
+1.00	Wed 14 Jan 2004 noon.
+	- First version.
+1.01.1  Sun 18 Jan 2004
+	- Removed 'use 5.008' from makefile.
+	- Fixed number of tests.
+	- Fixed the POD.

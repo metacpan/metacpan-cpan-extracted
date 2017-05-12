@@ -1,0 +1,27 @@
+Revision history for HTML-Element-Tiny
+
+0.006   2007-10-30 hdp
+
+        support for >= 5.004, minimum version test
+
+0.005   2007-10-29 hdp
+
+        add prepend
+
+0.004   2007-10-29 hdp
+
+        I suck at pod
+
+0.003   2007-10-29 hdp
+
+        fix broken pod
+        note about XML, link to XML::Tiny
+
+0.002   2007-10-28 hdp
+
+        add remove_child
+        use Clone for cloning if available
+
+0.001   2007-10-26 hdp
+
+        first draft with documentation and 'complete' functionality

@@ -1,0 +1,22 @@
+Change History
+---------------
+2012-12-30: Fixed failing tests. Moves some parts to a 21st century Perl
+
+1998-??-??:
+FormatNroff-0.11.tar.gz:
+	mention that HTML::Formatter and HTML::Parse are part of libwww-perl
+	in README.
+
+	fix tbl core dump problem - if line in table entry exceeds tbl magic
+		 size tbl will dump core. If string too long, split on space
+		 and insert a newline.
+
+	META tag is only defined for HTML header.
+		Define <DIV TYPE="NROFF_IGNORE"></DIV> to allow
+		FormatNroff to ignore HTML in BODY while still permitting
+		valid HTML.
+
+	Use MakeMaker.pm - Added MANIFEST, modified Makefile.PL
+
+---------------
+FormatNroff-0.10.tar.gz : initial version

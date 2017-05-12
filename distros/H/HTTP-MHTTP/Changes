@@ -1,0 +1,33 @@
+Thu Jan 23 13:47:17 GMT 2003
+ 0.04 - modified the C library to realloc() space for the incoming buffers
+
+Sat Jan 25 13:02:15 GMT 2003
+ 0.05 - fixed up a test that was pointing to localhost!
+
+Wed Jan 29 19:24:29 GMT 2003
+ 0.06 - change the require to 5.005 - as tested by Mike Chamberlain
+
+Thu Jan 30 12:14:46 GMT 2003
+ 0.07 - define our own herror() if we are on Solaris
+
+Fri Feb 28 15:28:43 GMT 2003
+ 0.08 - Added basic HTTP 1.1, and Keep-Alive Support
+
+Sun Mar  2 18:17:36 GMT 2003
+ 0.09 - fixed up the fudge for Solaris and herror() - I accidentally
+     deleted it, and remove reference to timeval.
+
+Mon Mar 24 09:25:25 GMT 2003
+ 0.10 - add in basic SSL support - this does not validate certificates, but enables the TLS level negotiation.
+
+Mon Mar 24 12:11:39 GMT 2003
+ 0.11 - fix a bug with empty body, and move to get SSL validating certificates properly
+
+Mon May 19 06:33:09 BST 2003
+ 0.13 - enhanced the build process to determine where openssl is installed - this was all borrowed from
+        Crypt-SSLeay
+0.14 Mon Sep 22 11:13:46 NZST 2003
+ - added -DOPENSSL_NO_KRB5 to suppress Kerberos header includes
+
+0.15 Sun Dec 14 09:47:23 NZDT 2003
+ - Change the response headers to be an array ref for mhttp_split_headers()

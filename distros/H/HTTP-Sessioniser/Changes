@@ -1,0 +1,10 @@
+Revision history for Perl extension HTTP::Sessioniser.
+
+0.05  Wed Oct 13 2010
+    - can now set what ports to monitor for HTTP
+
+0.04  Tue Mar 16 2010
+    - now sends client/server IP to callback
+
+0.01  Sat Feb 13 2010
+    - packaged for CPAN for the first time

@@ -1,0 +1,99 @@
+---
+abstract: 'A small, simple, correct HTTP/1.1 client'
+author:
+  - 'Christian Hansen <chansen@cpan.org>'
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  Data::Dumper: '0'
+  Exporter: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Dir: '0'
+  IO::File: '0'
+  IO::Socket::INET: '0'
+  IPC::Cmd: '0'
+  Test::More: '0.96'
+  lib: '0'
+  open: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTTP-Tiny
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  HTTP::Tiny:
+    file: lib/HTTP/Tiny.pm
+    version: '0.070'
+recommends:
+  HTTP::CookieJar: '0.001'
+  IO::Socket::IP: '0.32'
+  IO::Socket::SSL: '1.42'
+  Mozilla::CA: '20160104'
+  Net::SSLeay: '1.49'
+requires:
+  Carp: '0'
+  Fcntl: '0'
+  IO::Socket: '0'
+  MIME::Base64: '0'
+  Socket: '0'
+  Time::Local: '0'
+  bytes: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/chansen/p5-http-tiny/issues
+  homepage: https://github.com/chansen/p5-http-tiny
+  repository: https://github.com/chansen/p5-http-tiny.git
+version: '0.070'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Alan Gardner <gardner@pythian.com>'
+  - 'Alessandro Ghedini <al3xbio@gmail.com>'
+  - 'A. Sinan Unur <nanis@cpan.org>'
+  - 'Brad Gilbert <bgills@cpan.org>'
+  - 'brian m. carlson <sandals@crustytoothpaste.net>'
+  - 'Chris Nehren <apeiron@cpan.org>'
+  - 'Chris Weyl <cweyl@alumni.drew.edu>'
+  - 'Claes Jakobsson <claes@surfar.nu>'
+  - 'Clinton Gormley <clint@traveljury.com>'
+  - 'Craig A. Berry <craigberry@mac.com>'
+  - 'David Golden <xdg@xdg.me>'
+  - 'Dean Pearce <pearce@pythian.com>'
+  - 'Edward Zborowski <ed@rubensteintech.com>'
+  - 'James Raspass <jraspass@gmail.com>'
+  - 'Jeremy Mates <jmates@cpan.org>'
+  - 'Jess Robinson <castaway@desert-island.me.uk>'
+  - 'Karen Etheridge <ether@cpan.org>'
+  - 'Lukas Eklund <leklund@gmail.com>'
+  - 'Martin J. Evans <mjegh@ntlworld.com>'
+  - 'Martin-Louis Bright <mlbright@gmail.com>'
+  - 'Mike Doherty <doherty@cpan.org>'
+  - 'Nicolas Rochelemagne <rochelemagne@cpanel.net>'
+  - 'Olaf Alders <olaf@wundersolutions.com>'
+  - 'Olivier Mengué <dolmen@cpan.org>'
+  - 'Petr Písař <ppisar@redhat.com>'
+  - 'SkyMarshal <skymarshal1729@gmail.com>'
+  - 'Sören Kornetzki <soeren.kornetzki@delti.com>'
+  - 'Steve Grazzini <steve.grazzini@grantstreet.com>'
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+  - 'Tom Hukins <tom@eborcom.com>'
+  - 'Tony Cook <tony@develop-help.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

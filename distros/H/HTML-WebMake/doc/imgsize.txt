@@ -1,0 +1,19 @@
+<wmmeta name="Title" value="The &wmdollar;{IMGSIZE} Magic Variable" />
+<wmmeta name="Section" value="06-magic_vars" />
+<wmmeta name="Score" value="10" />
+<wmmeta name="Abstract">
+automatically add image size information to an &lt;img&gt; tag
+</wmmeta>
+
+This reference provides an easy way to automatically add image size
+information to an &lt;img&gt; tag, for example:
+
+	&lt;img src="foo.gif" &wmdollar;{IMGSIZE}&gt;
+
+Would become:
+
+	&lt;img src="foo.gif" height=30 width=11&gt;
+
+It requires the ##Image::Size## Perl module be installed, otherwise
+it does nothing.
+

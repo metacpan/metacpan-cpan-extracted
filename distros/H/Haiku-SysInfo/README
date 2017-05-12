@@ -1,0 +1,2 @@
+This module provides a simple wrapper around the Haiku-OS
+get_system_info() call for perl.

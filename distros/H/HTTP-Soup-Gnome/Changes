@@ -1,0 +1,8 @@
+Revision history for HTTP::Soup::Gnome
+
+0.02 Sat Apr  4 21:20:32 CEST 2015
+	[rt.cpan.org #102091] Remove PREREQ_FATAL.
+
+
+0.01 Sun Apr  1 16:22:10 CEST 2012
+	First version, released on an unsuspecting world.

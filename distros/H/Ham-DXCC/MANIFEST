@@ -1,0 +1,17 @@
+bin/dxcc-update
+Build.PL
+Changes
+lib/Ham/DXCC.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-compile-pl.t
+t/00-compile-pm.t
+t/00-critic.t
+t/00-distribution.t
+t/00-pod.t
+t/00-podcoverage.t
+t/10-ham-dxcc.t
+t/data/dxcc-cty-short.xml
+tap-harness-junit.xml

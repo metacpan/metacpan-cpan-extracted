@@ -1,0 +1,44 @@
+Failed  Succeeded  Test Name
+   0          2    *** no name ***
+   0          2    *** no name ***
+   0          2    *** no name ***
+   0          2    *** no name ***
+
+
+Test Name: N/A
+URL: http://http.web.test/test1.html
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  REQUIRED TEXT
+    <title>Test File 1</title>                                   SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/test1.html
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  REQUIRED TEXT
+    <title>Test File 1</title>                                   SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/test2.html
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  REQUIRED TEXT
+    <title>Test File 2</title>                                   SUCCEED
+
+
+Test Name: N/A
+URL: http://http.web.test/dir/alttest1.txt
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  REQUIRED TEXT
+    TEST TEST                                                    SUCCEED
+
+
+Total web tests failed: 0  succeeded: 8

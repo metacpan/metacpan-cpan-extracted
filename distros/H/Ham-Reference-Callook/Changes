@@ -1,0 +1,9 @@
+Revision history for Ham-Reference-Callook
+
+0.02    2011-01-08 Sat
+        - Updated pod docs to include the type() method, and other minor doc changes.
+
+0.01    2011-01-08 Sat
+        - Cloned Ham-Reference-QRZ version 0.03 to use as a base for Ham-Referenece-Callinfo.
+        - Completed conversions from QRZ version to the first release of the Callook version.
+

@@ -1,0 +1,46 @@
+This file describes the changes that you have to do in your scripts
+when migrating form FormEngine < 1.0 to FormEngine >= 1.0. Its
+possible that i forgot some things, so please tell me when you have
+problems.
+
+$form is the HTML::FormEngine object. On the left side of the '=>' is
+the old versions command, on the right is written what you have to put
+instead in the new version.
+
+$form->set_skin(NAME) => $form->set_skin_obj(OBJECT)
+
+$form->add_skin(HASHREF) => $form->get_skin_obj()->alter_templ(HASHREF)
+
+$form->add_default(HASHREF) => $form->get_skin_obj()->alter_default(HASHREF)
+
+$form->set_default(HASHREF) => $form->get_skin_obj()->set_default(HASHREF)
+
+$form->add_handler(HASHREF) => $form->get_skin_obj()->alter_handler(HASHREF)
+
+$form->set_handler(HASHREF) => $form->get_skin_obj()->set_handler(HASHREF)
+
+$form->add_checks(HASHREF) => $form->get_skin_obj()->alter_check(HASHREF)
+
+$form->set_confirm_skin(HASHREF) => $form->get_skin_obj()->set_confirm_skin(OBJECT)
+
+$form->add_confirm_skin(HASHREF) => $form->get_skin_obj()->get_confirm_skin()->alter_template(HASHREF)
+
+$form->add_confirm_handler(HASHREF) => $form->get_skin_obj()->get_confirm_skin()->alter_handler(HASHREF)
+
+$form->set_confirm_handler(HASHREF) => $form->get_skin_obj()->get_confirm_skin()->set_handler(HASHREF)
+
+Normally you have to encapsulate array references specified for
+'OPTION' or 'OPT_VAL' into two more arrays (just add '[[' on the left
+and ']]' on the right).
+
+Instead of calling 'get_skin_obj()' you can create a new skin object,
+call the needed methods on it and set it with 'set_skin_obj()'.
+
+You should never use alter_default to set template variables! Because
+when the skin is exchanged (which happens when you call the
+'confirm()' method) all these settings get lost. So always use
+'set_main_vars()' for this matter!
+
+If you also want to migrate templates resp. skins which you wrote on
+your own there are more changes todo which you can figure out by
+reading ChangeLog.

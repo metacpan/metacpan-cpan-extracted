@@ -1,0 +1,10 @@
+Revision history for Perl extension HTML::PrettyPrinter.
+
+# Version 0.03  - Fri Sep  15 23:14:20 2000
+	- added standard installation support
+	- provided simple (and very incomplete) test case
+	- fixed bug for <style> element. Thanks to Robert Bergs.
+        - definition of individual parameters cleaned up
+	- fixed bug for tabify(0)
+	- fixed small bugs with linewrapping around end tags
+	

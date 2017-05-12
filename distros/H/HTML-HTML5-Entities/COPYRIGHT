@@ -1,0 +1,58 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: HTML-HTML5-Entities
+Upstream-Contact: TOBYINK <tobyink@cpan.org> and Toby Inkster <tobyink@cpan.org>
+Source: https://metacpan.org/release/HTML-HTML5-Entities
+
+Files: Changes
+ META.json
+ META.yml
+ dist.ini
+ doap.ttl
+ t/03decoding.t
+ t/04roundtrip.t
+Copyright: Copyright 2014 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: CONTRIBUTING
+ INSTALL
+ LICENSE
+Copyright: Unknown
+License: Unknown
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: README
+ lib/HTML/HTML5/Entities.pm
+Copyright: Copyright (c) 1995-2006 by Gisle Aas.
+ Copyright (c) 2012 by Toby Inkster.
+ Copyright (c) 2004-2007 by Apple Computer Inc, Mozilla Foundation,.
+ Copyright (c) 2007-2011 by Wakaba <w@suika.fam.cx>.
+ Copyright (c) 2009-2012 by Toby Inkster <tobyink@cpan.org>.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/01basic.t
+ t/02encoding.t
+Copyright: Copyright 2011 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

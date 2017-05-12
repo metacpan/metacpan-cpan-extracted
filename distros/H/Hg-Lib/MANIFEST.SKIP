@@ -1,0 +1,12 @@
+^.hg
+^cover_db
+^hg-server-docs
+~$
+-$
+.old$
+.bak$
+^\.\#
+Makefile$
+blib/
+pm_to_blib
+blibdirs

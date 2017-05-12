@@ -1,0 +1,14 @@
+#!/usr/bin/perl
+#
+# usage: ht_tt2_debug file 
+#
+# description: manually process a template in order to check how 
+# HTML::Template::Filter::TT2 transforms it to plain HTML::Template
+#
+use strict;
+use HTML::Template::Filter::TT2;
+
+while (<>) {
+    ht_tt2_filter(\$_);
+    print
+}

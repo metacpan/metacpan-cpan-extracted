@@ -1,0 +1,88 @@
+NAME
+    Hack::Natas - solve some of the Natas server-side security war games
+
+VERSION
+    version 0.003
+
+DESCRIPTION
+    overthewire.org <http://www.overthewire.org/wargames/> has a series of
+    war games. Natas is the server-side security challenge.
+
+    This package contains some scripts to automate solving some of the
+    tedious levels, and documents walking you through all levels up to #17.
+
+    This role provides the basic attributes and methods which are generally
+    required for scripting password extraction.
+
+METHODS
+  get
+    This sets the query string of the "uri" according to the key-value pairs
+    passed in. Then, does an HTTP GET for that resource, and returns the
+    response (a hashref).
+
+  run
+    The implementation of "run" must be provided by the consuming class.
+
+    Before "run" executes, turn on autoflush for STDOUT.
+
+    After run executes, print out the final password.
+
+ATTRIBUTES
+    *   level - a read-only integer for the current level
+
+    *   http_user - the username to use to access the current level. By
+        default, "natas${level}"
+
+    *   http_pass - the password to use to access the current level.
+        Required.
+
+    *   uri - the URI for the current level. Can be coerced from a string.
+        By default, this is constructed from the level, http_user, and
+        http_pass.
+
+    *   ua - an HTTP::Tiny object. By default, the timeout is 5s, and the
+        "Host" header is set.
+
+    *   password - the password we are extracting to access the next level.
+
+    *   password_length - the length of the password. This is built by the
+        "get_password_length" method.
+
+SEE ALSO
+    *   natas15
+
+        Level 15 requires you to do blind SQL injection.
+
+    *   natas16
+
+        Level 16 requires you to do blind shell injection.
+
+    *   <https://hashbang.ca/tag/natas>
+
+    *   <http://overthewire.org>
+
+AVAILABILITY
+    The project homepage is <https://hashbang.ca/tag/natas>.
+
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see <https://metacpan.org/module/Hack::Natas/>.
+
+SOURCE
+    The development version is on github at
+    <http://github.com/doherty/Hack-Natas> and may be cloned from
+    <git://github.com/doherty/Hack-Natas.git>
+
+BUGS AND LIMITATIONS
+    You can make new bug reports, and view existing ones, through the web
+    interface at <https://github.com/doherty/Hack-Natas/issues>.
+
+AUTHOR
+    Mike Doherty <doherty@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Mike Doherty.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

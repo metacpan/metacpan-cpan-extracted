@@ -1,0 +1,33 @@
+---
+abstract: 'A system for distributed job processing applications.'
+author:
+  - 'Andrew Johnson <lajandy at cpan dotorg>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Helios
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Config::IniFiles: '2.38'
+  DBI: '1.52'
+  Data::ObjectDriver: '0.04'
+  Error: '0.17'
+  Pod::Usage: '0.01'
+  Test::Simple: '0.72'
+  TheSchwartz: '1.04'
+  XML::Simple: '2.14'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Helios
+  homepage: http://helios.logicalhelion.org
+  repository: git://github.com/logicalhelion/helios.git
+version: '2.83'

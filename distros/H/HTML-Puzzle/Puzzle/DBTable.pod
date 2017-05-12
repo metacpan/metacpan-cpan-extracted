@@ -1,0 +1,185 @@
+=head1 NAME
+
+HTML::Puzzle::DBTable - Connection module to data tables
+
+=head1 SYNOPSIS
+
+ use HTML::Puzzle::DBTable; 
+ my $comp       = new HTML::Puzzle::DBTable(    dbh     => $dbh,
+                                                name    => 'Test' 
+                                            );
+ # create data table
+ $comp->create;
+ # add an item
+ my $addItem        = {
+                        'title'         => "First title",
+                        'txt_short'     => "First short text",
+                        'txt_long'      => "First very long long text :-)",
+                        'link'          => "http://a.link.itm/",
+                        'link_img'      => "http://a.link.img/",
+                        'data'          => '2002-07-21'
+                        };
+ $comp->add($addItem);
+ # get item as an array ref
+ my $itm            = $comp->array_items();
+ # return something like 
+ # [
+ #          [
+ #            'id',
+ #            'title',
+ #            'txt_short',
+ #            'txt_long',
+ #            'link',
+ #            'link_img',
+ #            'enable',
+ #            'data',
+ #            'ts'
+ #          ], 
+ #          [
+ #            '1',
+ #            'First title',
+ #            'First short text',
+ #            'First very long long text :-)',
+ #            'http://a.link.itm/',
+ #            'http://a.link.img/',
+ #            '1',
+ #            '2002-07-21 00:00:00',
+ #            '02'
+ #          ]
+ #        ];
+ # get item as an hash ref
+ my $itm            = $comp->hash_items();
+ # return something like
+ #       [
+ #        {
+ #           'ts' => '02',
+ #           'title' => 'First title',
+ #           'txt_long' => 'First very long long text :-)',
+ #           'data' => '2002-07-21 00:00:00',
+ #           'id' => '1',
+ #           'link_img' => 'http://a.link.img/',
+ #           'txt_short' => 'First short text',
+ #           'enable' => '1',
+ #           'link' => 'http://a.link.itm/'
+ #         }
+ #       ];
+ # delete record
+ $comp->delete(2);
+ # delete group of records
+ $comp->delete([2,5,7,9]);
+ # drop table
+ $comp->table;
+ 
+From command line to create or drop table:
+
+ [root]# perl -MHTML::Puzzle::DBTable -e 'HTML::Puzzle::DBTable::create'
+ Enter the DBD driver name [mysql]:
+ Enter the database hostname [localhost]:
+ Enter database port number [3128]:
+ Enter database name: PuzzleTest
+ Enter an userid which can manage tables [root]:
+ Enter password: ********
+ Enter table name: test
+ Table test created succesful
+ [root]# perl -MHTML::Puzzle::DBTable -e 'HTML::Puzzle::DBTable::drop'
+ Enter the DBD driver name [mysql]:
+ Enter the database hostname [localhost]:
+ Enter database port number [3128]:
+ Enter database name: PuzzleTest
+ Enter an userid which can manage tables [root]:
+ Enter password: ********
+ Enter table name: test
+ Table test succesful dropped
+ 
+=head1 DESCRIPTION
+
+This module interact with a single db table containing data to be consumed by 
+other  modules of this package. With this module you can add, delete,or get data 
+present in the table further that create or drop table itself. Standard db 
+structure have some usefull fields for building every kind of web component like 
+news, forums, helpdesk, guestbook pages.
+There is an id that univocally identify the db data record, a title that you 
+could use for news title, a txt_short for a short description of data, a 
+txt_long with long description, a link and link_img for storing links,a data 
+field for datetiming and an enable field that you can use for identify old 
+news. Table also have a timestamp field ts to save time entry. Anyway db table 
+can be personalized.
+
+=head1 METHODS
+
+=head2 new()
+
+Create an instance of HTML::Puzzle::DBTable. Requires two costructor 
+parameters: dbh filled with a dbi handle to storing db and name with name of 
+table where data are saved. 
+
+With another optional parameter 'date_format' you can set the date format that
+will be returned in the date_format field of returned hash. Default date_format
+value is '%Y-%m-%d'.
+
+=head2 add(\%fieldsItem)
+
+Insert a news in the table. Reguires as single params an hash reference that 
+have db table field name for keys and field values for hash value. Obviously 
+hash must have all required db table fields.
+
+=head2 delete(\@ids) 
+
+Delete records in table. Requires a single parameter, an array ref with numerical 
+ids of records to delete.
+
+=head2 array_items($nrow,$order,\%filter) 
+
+Return an array ref of array ref of table rows. First array ref is a list of 
+fields name returned. There are three optional parameters: nrow for getting only 
+last nrow records, order is a string that must be asc or desc for ordering 
+returned data and an hash reference containing a filter hash where keys are
+fields name and values are field value over which the where sql section will be 
+built.
+
+=head2 hash_items($nrow,$order,\%filter)
+
+Return an array ref of hash ref of table rows. Every hash has field name as key 
+and field value as hash value. There are three optional parameters: nrow for 
+getting only last nrow records, order is a string that must be asc or desc for 
+ordering returned data and an hash reference containing a filter hash where keys 
+are fields name and values are field value over which the where sql section will 
+be built.
+
+Another field 'date_format' it's added to hash and is set with the same date field 
+value but formatted with 'date_format' costructor optional parameter. 
+
+=head2 create()
+
+Create the table in the database. You can call this function as an instance
+methor or as a static method. For indeed, from command line like
+
+ perl -MHTML::Puzzle::DBTable -e 'HTML::Puzzle::DBTable::create'
+
+In this case will be asked for infos for connecting to database and the name of 
+table to create.
+
+=head2 drop()
+
+Drop a table in the database. You can call this function as an instance
+methor or as a static method. For indeed, from command line like
+
+ perl -MHTML::Puzzle::DBTable -e 'HTML::Puzzle::DBTable::drop'
+
+In this case will be asked for infos for connecting to database and the name of 
+table to drop.
+
+=head1 DEBUG COMPONENT 
+
+There is also two static constants: a DEBUG_FILE_PATH and a DEBUG constant that 
+enable debug infos written on DEBUG_FILE_PATH file. 
+
+Debug is disable by default.
+
+=head1 AUTHOR
+
+Bruni Emiliano, <info@ebruni.it>
+
+=head1 SEE ALSO
+
+=cut

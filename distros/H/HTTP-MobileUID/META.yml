@@ -1,0 +1,19 @@
+--- 
+abstract: "\xE6\x90\xBA\xE5\xB8\xAF\xE7\xAB\xAF\xE6\x9C\xAB\xE3\x81\xAE\xE5\x85\xAC\xE5\xBC\x8F\xE3\x81\xAE\xE3\x83\xA6\xE3\x83\xBC\xE3\x82\xB6ID\xE3\x82\x92\xE5\x8F\x96\xE5\xBE\x97\xE3\x81\x99\xE3\x82\x8B"
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.65
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: HTTP-MobileUID
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Class::Data::Accessor: 0.03
+  HTTP::MobileAgent: 0.26
+version: 0.01

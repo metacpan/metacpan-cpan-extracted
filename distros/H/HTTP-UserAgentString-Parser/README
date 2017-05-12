@@ -1,0 +1,25 @@
+Description
+-----------
+
+HTTP::UserAgentString::Parser is a Perl API for user-agent-string.info.  It can 
+be used to parse user agent strings and determine whether the agent is a robot, 
+a normal browser, mobile browser, e-mail client.  It can also tell browser version, 
+company that makes it, home page URL.  In most of the cases it can also tell in 
+which OS the browser is running.
+
+HTTP::UserAgentString::Parser will download the .ini file provided by user-agent-string.info 
+which contains all the information to do the parsing.  The file will be cached by default
+for 7 days.  After that time, it will check whether a new version was released.  The
+default cache time can be modified, as well as the cache path (default is /tmp).  A
+cache reload can also be forced.
+
+In order to parse a string, a parse() method is provided which returns an object
+of classes HTTP::UserAgentString::Browser or HTTP::UserAgentString::Robot.  Both classes 
+have accesors to determine agent capabilities.  In case the string does not match any known 
+browser or robot, undef() is returned.
+
+
+Copyright
+---------
+
+Copyright (c) 2012 Nicolas Moldavsky (e-planning / www.e-planning.net)

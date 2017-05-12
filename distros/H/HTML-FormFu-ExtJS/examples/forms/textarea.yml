@@ -1,0 +1,12 @@
+---
+elements:
+  - type: Text
+    label: Title
+  - type: Textarea
+    label: Write it down
+  - type: Textarea
+    name: html
+    default: or as a wysiwyg editor
+    attrs_xml:
+      wysiwyg: 1
+    

@@ -1,0 +1,11 @@
+2012-02-24  SATOH Hiroh <cho45@lowreal.net>
+
+	* Fix bug with tags (fixed by onishi)
+
+
+2009-12-02  SATOH Hiroh <cho45@lowreal.net>
+
+	* original version 0.01
+
+
+# vim:set ft=changelog:

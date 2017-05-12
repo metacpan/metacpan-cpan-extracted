@@ -1,0 +1,469 @@
+--- HTML-Mason-1.25/lib/HTML/Mason/ApacheHandler.pm	2003-12-12 11:08:13.000000000 -1000
++++ HTML-Mason-ApacheHandler2/lib/HTML/Mason/ApacheHandler2.pm	2004-01-30 03:17:45.000000000 -1000
+@@ -8,9 +8,9 @@
+ #
+ # APACHE-SPECIFIC REQUEST OBJECT
+ #
+-package HTML::Mason::Request::ApacheHandler;
++package HTML::Mason::Request::ApacheHandler2;
+ 
+-use Apache::Constants qw( REDIRECT );
++use Apache::Const -compile => qw( REDIRECT );
+ 
+ use HTML::Mason::Request;
+ use Class::Container;
+@@ -25,16 +25,19 @@
+ use constant DECLINED   => -1;
+ use constant NOT_FOUND  => 404;
+ 
+-BEGIN
++if ( $mod_perl::VERSION < 1.99 )
+ {
+-    my $ap_req_class = $mod_perl::VERSION < 1.99 ? 'Apache' : 'Apache::RequestRec';
++    error "you must use mod_perl 2 (version >= 1.99)", __PACKAGE__, "\n";
++}
+ 
++BEGIN
++{
+     __PACKAGE__->valid_params
+-	( ah         => { isa => 'HTML::Mason::ApacheHandler',
+-			  descr => 'An ApacheHandler to handle web requests',
++	( ah         => { isa => 'HTML::Mason::ApacheHandler2',
++			  descr => 'An ApacheHandler2 to handle web requests',
+ 			  public => 0 },
+ 
+-	  apache_req => { isa => $ap_req_class, default => undef,
++	  apache_req => { isa => 'Apache::RequestRec', default => undef,
+ 			  descr => "An Apache request object",
+ 			  public => 0 },
+ 
+@@ -148,11 +151,12 @@
+     # if we are the top-level request. Since the out_method sends
+     # headers, this will typically only apply after $m->abort.
+     # On an error code, leave it to Apache to send the headers.
++    # not needed in mod_per2 (??)
+     if (!$self->is_subrequest
+ 	and $self->auto_send_headers
+-	and !HTML::Mason::ApacheHandler::http_header_sent($r)
++	and !HTML::Mason::ApacheHandler2::http_header_sent($r)
+ 	and (!$retval or $retval==200)) {
+-	$r->send_http_header();
++	#$r->send_http_header();
+     }
+ 
+     return defined($retval) ? $retval : OK;
+@@ -184,15 +188,15 @@
+     $self->clear_buffer;
+     $r->method('GET');
+     $r->headers_in->unset('Content-length');
+-    $r->err_header_out( Location => $url );
+-    $self->abort($status || REDIRECT);
++    $r->err_headers_out->{ Location } = $url;
++    $self->abort($status || Apache::REDIRECT);
+ }
+ 
+ #----------------------------------------------------------------------
+ #
+ # APACHE-SPECIFIC FILE RESOLVER OBJECT
+ #
+-package HTML::Mason::Resolver::File::ApacheHandler;
++package HTML::Mason::Resolver::File::ApacheHandler2;
+ 
+ use strict;
+ 
+@@ -247,7 +251,7 @@
+ #
+ # APACHEHANDLER OBJECT
+ #
+-package HTML::Mason::ApacheHandler;
++package HTML::Mason::ApacheHandler2;
+ 
+ use File::Path;
+ use File::Spec;
+@@ -258,21 +262,21 @@
+ use Params::Validate qw(:all);
+ Params::Validate::validation_options( on_fail => sub { param_error( join '', @_ ) } );
+ 
+-use Apache;
+-use Apache::Constants qw( OK DECLINED NOT_FOUND );
++use Apache::Const -compile => qw( OK DECLINED NOT_FOUND );
++use APR;
++use Apache::ServerUtil;
+ 
+-# Require a reasonably modern mod_perl - should probably be later
+-use mod_perl 1.22;
++# Require a mod_perl 2
++use mod_perl 1.99;
+ 
+ if ( $mod_perl::VERSION < 1.99 )
+ {
+-    error "mod_perl must be compiled with PERL_METHOD_HANDLERS=1 (or EVERYTHING=1) to use ", __PACKAGE__, "\n"
+-	unless Apache::perl_hook('MethodHandlers');
++    error "you must use mod_perl 2 (version >= 1.99)", __PACKAGE__, "\n";
+ }
+ 
+ use vars qw($VERSION);
+ 
+-$VERSION = 1.69;
++$VERSION = 0.01;
+ 
+ use Class::Container;
+ use base qw(Class::Container);
+@@ -341,7 +345,7 @@
+ }
+ 
+ use constant
+-    HAS_TABLE_API => $mod_perl::VERSION >= 1.99 || Apache::perl_hook('TableApi');
++    HAS_TABLE_API => $mod_perl::VERSION >= 1.99;
+ 
+ my %AH_BY_CONFIG;
+ sub make_ah
+@@ -569,23 +573,27 @@
+     my %params = @_;
+ 
+     my %defaults;
+-    $defaults{request_class}  = 'HTML::Mason::Request::ApacheHandler'
++    $defaults{request_class}  = 'HTML::Mason::Request::ApacheHandler2'
+         unless exists $params{request};
+-    $defaults{resolver_class} = 'HTML::Mason::Resolver::File::ApacheHandler'
++    $defaults{resolver_class} = 'HTML::Mason::Resolver::File::ApacheHandler2'
+         unless exists $params{resolver};
+ 
+     my $allowed_params = $class->allowed_params(%defaults, %params);
+ 
+-    if ( exists $allowed_params->{comp_root} and
+-	 my $req = $r || Apache->request )  # DocumentRoot is only available inside requests
+-    {
+-	$defaults{comp_root} = $req->document_root;
++    if ( exists $allowed_params->{comp_root} ) {
++	if ( my $req = $r ) {
++	# DocumentRoot is only available inside requests
++	    $defaults{comp_root} = $req->document_root;
++	} else {
++	    $defaults{comp_root} =
++		Apache->server->dir_config( '_MasonDefaultDocumentRoot' );
++	}
+     }
+ 
+     if (exists $allowed_params->{data_dir} and not exists $params{data_dir})
+     {
+ 	# constructs path to <server root>/mason
+-	my $def = $defaults{data_dir} = Apache->server_root_relative('mason');
++	my $def = $defaults{data_dir} = Apache->server->server_root_relative('mason');
+ 	param_error "Default data_dir (MasonDataDir) '$def' must be an absolute path"
+ 	    unless File::Spec->file_name_is_absolute($def);
+ 	  
+@@ -624,7 +632,7 @@
+     unless ( $self->interp->resolver->can('apache_request_to_comp_path') )
+     {
+ 	error "The resolver class your Interp object uses does not implement " .
+-              "the 'apache_request_to_comp_path' method.  This means that ApacheHandler " .
++              "the 'apache_request_to_comp_path' method.  This means that ApacheHandler2 " .
+               "cannot resolve requests.  Are you using a handler.pl file created ".
+ 	      "before version 1.10?  Please see the handler.pl sample " .
+               "that comes with the latest version of Mason.";
+@@ -633,7 +641,9 @@
+     # If we're running as superuser, change file ownership to http user & group
+     if (!($> || $<) && $self->interp->files_written)
+     {
+-	chown Apache->server->uid, Apache->server->gid, $self->interp->files_written
++	chown getpwnam( Apache->server->dir_config( '_MasonUser' ) ),
++	getgrnam( Apache->server->dir_config( '_MasonGroup' ) ),
++	$self->interp->files_written
+ 	    or system_error( "Can't change ownership of files written by interp object: $!\n" );
+     }
+ 
+@@ -684,8 +694,10 @@
+ 	    }
+ 
+ 	    return ["<center><h2>" . $self->apache_status_title . "</h2></center>" ,
+-		    $self->status_as_html(apache_req => $r),
+-		    $self->interp->status_as_html(ah => $self, apache_req => $r)];
++		    $self->status_as_html
++		    (apache_req => $r),
++		    $self->interp->status_as_html
++		    (ah => $self, $r) ];
+ 	};
+ 	local $^W = 0; # to avoid subroutine redefined warnings
+ 	Apache::Status->menu_item($status_name, $self->apache_status_title, $statsub);
+@@ -700,7 +712,7 @@
+ 	if $interp->compiler->can('add_allowed_globals');
+ }
+ 
+-# Generate HTML that describes ApacheHandler's current status.
++# Generate HTML that describes ApacheHandler2's current status.
+ # This is used in things like Apache::Status reports.
+ 
+ sub status_as_html {
+@@ -709,7 +721,7 @@
+     # Should I be scared about this?  =)
+ 
+     my $comp_source = <<'EOF';
+-<h3>ApacheHandler properties:</h3>
++<h3>ApacheHandler2 properties:</h3>
+ <blockquote>
+  <tt>
+ <table width="75%">
+@@ -762,7 +774,7 @@
+ </blockquote>
+ 
+ <%args>
+- $ah       # The ApacheHandler we'll elucidate
++ $ah       # The ApacheHandler2 we'll elucidate
+  %valid    # Contains default values for member data
+ </%args>
+ EOF
+@@ -807,7 +819,7 @@
+     # use multiple variables to avoid this, which is annoying.
+     my $r =
+         $r_sub->( $self->args_method eq 'mod_perl' ?
+-                  Apache::Request->instance( $_[0] ) :
++                  Apache::Request->new( $_[0] ) :
+                   $_[0]
+                 );
+ 
+@@ -826,7 +838,7 @@
+ 
+     if ($is_dir) {
+ 	if ($self->decline_dirs) {
+-	    return DECLINED;
++	    return Apache::DECLINED;
+ 	} else {
+ 	    $r->content_type(undef);
+ 	}
+@@ -880,7 +892,8 @@
+ 	my $retval = isa_mason_exception($err, 'Abort')   ? $err->aborted_value  :
+ 		     isa_mason_exception($err, 'Decline') ? $err->declined_value :
+ 		     rethrow_exception $err;
+-        $r->send_http_header unless $retval and $retval != 200;
++	# not needed in mod_perl2 (??)
++        #$r->send_http_header unless $retval and $retval != 200;
+ 	return $retval;
+     }
+ 
+@@ -897,9 +910,10 @@
+         # We use instance here because if we store $request we get a
+         # circular reference and a big memory leak.
+ 	if (!$sent_headers and HTML::Mason::Request->instance->auto_send_headers) {
+-	    unless (http_header_sent($r)) {
+-		$r->send_http_header();
+-	    }
++	    # not needed in mod_perl2 (??) - just set content type
++	    #unless (http_header_sent($r)) {
++	    #   $r->send_http_header();
++	    #}
+ 	    $sent_headers = 1;
+ 	}
+ 
+@@ -973,7 +987,7 @@
+ #
+ # Determines whether the http header has been sent.
+ #
+-sub http_header_sent { shift->header_out("Content-type") }
++sub http_header_sent { shift->headers_out->{"Content-type"} }
+ 
+ # Utility function to prepare $r before returning NOT_FOUND.
+ sub return_not_found
+@@ -984,17 +998,17 @@
+ 	$r->method('GET');
+ 	$r->headers_in->unset('Content-length');
+     }
+-    return NOT_FOUND;
++    return Apache::NOT_FOUND;
+ }
+ 
+ #
+-# PerlHandler HTML::Mason::ApacheHandler
++# PerlHandler HTML::Mason::ApacheHandler2
+ #
+ BEGIN
+ {
+-    # A method handler is prototyped differently in mod_perl 1.x than in 2.x
+-    my $handler_code = sprintf <<'EOF', $mod_perl::VERSION >= 1.99 ? ': method' : '($$)';
+-sub handler %s
++    # A mod_perl2 method handler
++    my $handler_code = <<'EOF';
++sub handler : method
+ {
+     my ($package, $r) = @_;
+ 
+@@ -1014,147 +1028,58 @@
+ 
+ =head1 NAME
+ 
+-HTML::Mason::ApacheHandler - Mason/mod_perl interface
++HTML::Mason::ApacheHandler2 - experimental (alpha) Mason/mod_perl2 interface
+ 
+ =head1 SYNOPSIS
+ 
+-    use HTML::Mason::ApacheHandler;
+-
+-    my $ah = HTML::Mason::ApacheHandler->new (..name/value params..);
++    use HTML::Mason::ApacheHandler2;
++ 
++    my $ah = HTML::Mason::ApacheHandler2->new (..name/value params..);
+     ...
+     sub handler {
+-        my $r = shift;
+-        $ah->handle_request($r);
++     my $r = shift;
++     $ah->handle_request($r);
+     }
+ 
+ =head1 DESCRIPTION
+ 
+-The ApacheHandler object links Mason to mod_perl, running components in
+-response to HTTP requests. It is controlled primarily through
+-parameters to the new() constructor.
+-
+-handle_request() is not a user method, but rather is called from the
+-HTML::Mason::handler() routine in handler.pl.
+-
+-=head1 PARAMETERS TO THE new() CONSTRUCTOR
+-
+-=over
+-
+-=item apache_status_title
+-
+-Title that you want this ApacheHandler to appear as under
+-Apache::Status.  Default is "HTML::Mason status".  This is useful if
+-you create more than one ApacheHandler object and want them all
+-visible via Apache::Status.
+-
+-=item args_method
+-
+-Method to use for unpacking GET and POST arguments. The valid options
+-are 'CGI' and 'mod_perl'; these indicate that a C<CGI.pm> or
+-C<Apache::Request> object (respectively) will be created for the
+-purposes of argument handling.
+-
+-'mod_perl' is the default and requires that you have installed the
+-C<Apache::Request> package.
+-
+-If args_method is 'mod_perl', the C<$r> global is upgraded to an
+-Apache::Request object. This object inherits all Apache methods and
+-adds a few of its own, dealing with parameters and file uploads.  See
+-C<Apache::Request> for more information.
+-
+-If the args_method is 'CGI', the Mason request object (C<$m>) will have a
+-method called C<cgi_object> available.  This method returns the CGI
+-object used for argument processing.
+-
+-While Mason will load C<Apache::Request> or C<CGI> as needed at runtime, it
+-is recommended that you preload the relevant module either in your
+-F<httpd.conf> or F<handler.pl> file, as this will save some memory.
+-
+-=item decline_dirs
+-
+-True or false, default is true. Indicates whether Mason should decline
+-directory requests, leaving Apache to serve up a directory index or a
+-C<FORBIDDEN> error as appropriate. See the L<allowing directory requests|HTML::Mason::Admin/allowing directory requests> section of the administrator's manual
+-for more information about handling directories with Mason.
+-
+-=item interp
++HTML::Mason::ApacheHandler2 is a clone of HTML::Mason::ApacheHandler
++changed to work under a pure mod_perl2 environment. The external
++interface is unchanged, see L<HTML::Mason::ApacheHandler>.
+ 
+-The interpreter object to associate with this compiler. By default a
+-new object of the specified L<interp_class|HTML::Mason::Params/interp_class> will be created.
++The actual changes I made can be found in the distribution in
++B<diff/ApacheHandler.diff> ( made with 'diff -Naru' ... ).
+ 
+-=item interp_class
++A HOTWO for HTML::Mason::ApacheHandler2 may be found at
++L<Mason-with-mod_perl2>.
+ 
+-The class to use when creating a interpreter. Defaults to
+-L<HTML::Mason::Interp|HTML::Mason::Interp>.
++=head1 PREREQUISITES
+ 
+-=back
++You must have the following packages installed:
+ 
+-=head1 ACCESSOR METHODS
++    mod_perl        => 1.9910
++    HTML::Mason'    => 1.25
++    libapreq2       => 2.02-dev
+ 
+-All of the above properties, except interp_class, have standard accessor
+-methods of the same name: no arguments retrieves the value, and one
+-argument sets it, except for args_method, which is not settable.  For
+-example:
+-
+-    my $ah = HTML::Mason::ApacheHandler->new;
+-    my $decline_dirs = $ah->decline_dirs;
+-    $ah->decline_dirs(1);
+-
+-=head1 OTHER METHODS
+-
+-The ApacheHandler object has a few other publically accessible methods
+-that may be of interest to end users.
+-
+-=over 4
+-
+-=item handle_request ($r)
+-
+-This method takes an Apache object representing a request and
+-translates that request into a form Mason can understand.  It's return
+-value is an Apache status code.
+-
+-=item prepare_request ($r)
+-
+-This method takes an Apache object representing a request and returns
+-a new Mason request object or an Apache status code.  If it is a
+-request object you can manipulate that object as you like, and then
+-call the request object's C<exec> method to have it generate output.
+-
+-If this method returns an Apache status code, that means that it could
+-not create a Mason request object.
+-
+-This method is useful if you would like to have a chance to decline a
+-request based on properties of the Mason request object or a component
+-object.  For example:
+-
+-    my $req = $ah->prepare_request($r);
+-    # $req must be an Apache status code if it's not an object
+-    return $req unless ref($req);
+-
+-    return DECLINED
+-        unless $req->request_comp->source_file =~ /\.html$/;
+-
+-    $req->exec;
+-
+-=item request_args ($r)
+-
+-Given an Apache request object, this method returns a three item list.
+-The first item is a hash reference containing the arguments passed by
+-the client's request.
+-
+-The second is an Apache request object.  This is returned for
+-backwards compatibility from when this method was responsible for
+-turning a plain Apache object into an Apache::Request object.
+-
+-The third item may be a CGI.pm object or C<undef>, depending on the
+-value of the L<args_method|HTML::Mason::Params/args_method> parameter.
+-
+-=back
++Please refer to the packages' documentation for instructions.
+ 
+ =head1 SEE ALSO
+ 
++L<Mason-with-mod_perl2>.,
++L<HTML::Mason|HTML::Mason::ApacheHandler>,
+ L<HTML::Mason|HTML::Mason>,
+ L<HTML::Mason::Admin|HTML::Mason::Admin>,
+ L<HTML::Mason::Interp|HTML::Mason::Interp>
+ 
++=head1 AUTHOR
++
++Beau E. Cox <beau@beaucox.com> L<http://beaucox.com>.
++
++The real authors (I just made mod_perl2 changes) are the Mason crew, including:
++Jonathan Swartz <swartz@pobox.com>,
++Dave Rolsky <autarch@urth.org>,
++Ken Williams <ken@mathforum.org>.
++
++Version 0.01 as of January, 2004.
++
+ =cut

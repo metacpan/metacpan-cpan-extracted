@@ -1,0 +1,18 @@
+Changes
+example/01_oo_style.pl
+example/02_functional_style.pl
+lib/Hash/Map.pm
+lib/Hash/Map/Tutorial.pod
+MANIFEST			This list of files
+README
+t/01_oo_style.t
+t/02_functional_style.t
+t/11_test_examples.t
+t/chars.t
+t/perl_critic.t
+t/pod.t
+t/pod_coverage.t
+t/prereq_build.t
+Makefile.PL
+META.yml
+META.json

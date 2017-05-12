@@ -1,0 +1,664 @@
+# 2012-01-22:  Greatly expanded tutorial.  Only the pieces marked (C) CEB
+# Toolbox were kept from the original version.  Changed all line endings so
+# lines end at column 80.
+# [2014-03-07] Updated tutorial for Helios 2.80, including using new command 
+# utilities.  Removed references to directly accessing the collective database
+# tables using SQL (yuck).
+
+=pod
+
+=head1 NAME
+
+Helios::Tutorial - a tutorial for getting started with Helios
+
+=head1 DESCRIPTION
+
+This is a short tutorial to introduce the Helios system's basic concepts and to
+show some quick examples of how to get started working with Helios.
+
+=head1 HELIOS CONCEPTS
+
+There are a few basic concepts you need to learn in order to understand the way 
+Helios works.  Once you understand these concepts, it will be simple for you to 
+create Helios applications and manage a Helios collective.
+
+=cut
+
+# the following section is Copyright (C) 2008-9 by CEB Toolbox, Inc.
+
+=head2 Jobs
+
+B<Jobs> are simply a set of parameters for services (see below) that represent 
+a discrete unit of work.  Jobs are represented by XML-style markup and can be 
+submitted either programatically via the Helios API, via the command line 
+helios_job_submit.pl program, or via HTTP request to the submitJob.pl CGI 
+program.
+
+=head2 Services
+
+B<Services> are Perl classes that define how jobs of a certain type should be 
+processed.  Service classes are subclasses of Helios::Service, and implement 
+a run() method to perform a job's operations.  The run() method marks the 
+job as successful or failed just before it ends.  Services can be configured 
+across the collective (see below) using Helios's built-in configuration 
+subsystem, which can be accessed via the Helios::Panoptes web interface or by 
+using the helios_config_* shell commands.
+
+Services are loaded into memory by the helios.pl service daemon program.  When 
+jobs are submitted to Helios for a particular service, worker processes (see 
+below) are launched to actually perform the work.
+
+=head2 Workers
+
+B<Workers> are processes launched by helios.pl service daemons to actually 
+perform jobs.  A worker will instantiate its associated service class, do some 
+preparation, and call the service object's run() method.  In normal operation, 
+a worker process performs one job and then exits, but in "OVERDRIVE" mode a 
+worker process will stay in memory and perform as many jobs as possible, until 
+1) there are no more jobs in the queue, 2) it is told to HOLD or HALT job 
+processing, or 3) it encounters an error processing a job that causes it to 
+exit.
+
+=head2 Collective
+
+A B<collective> is a group of servers running helios.pl daemons connected to 
+the same Helios database.  Services in a collective can be centrally 
+administered using the Helios::Panoptes web interface.
+
+In addition to these basics, there are a couple of other Helios concepts that 
+will not be dealt with in this tutorial but is worth knowing:
+
+# End of section covered by CEB Toolbox, Inc. copyright.
+
+=head2 Jobtypes
+
+Every job in the Helios system has a B<jobtype>, which is sort of an 
+abstraction of a queue.  For now, all you need to know is every Helios service
+has a corresponding jobtype with the same name.  When you submit a job to 
+Helios, you will set the jobtype to the name of the service you want to run 
+the job.
+
+# the following section is Copyright (C) 2008-9 by CEB Toolbox, Inc.
+
+=head2 Metajobs
+
+B<Metajobs> are large batches of jobs submitted together to Helios.  
+Bound together by XML, a metajob will be burst apart into its constituent jobs 
+when first serviced by Helios.  Metajobs can greatly decrease the time it takes 
+to submit large batches of jobs into the Helios job queue.  Also, in 
+conjunction with worker OVERDRIVE mode, metajobs allow workers to achieve 
+maximum system throughput.
+
+=cut
+
+# End of section covered by CEB Toolbox, Inc. copyright.
+
+=head1 A BASIC HELIOS SERVICE
+
+Writing a Helios service involves writing a B<service class>, a Perl class that 
+subclasses Helios::Service.  Your service class will need to implement the 
+service's run() method.  The run() method will be passed a Helios::Job object 
+representing the job to be performed.
+
+Here's a very simple sample class as an example:
+
+    package TestService;
+    use strict;
+    use warnings;
+    use base qw(Helios::Service);
+    
+    sub run 
+    {
+        my $self = shift;
+        my $job = shift;
+        my $config = $self->getConfig();
+        my $args = $self->getJobArgs($job);
+    
+        foreach my $arg (keys %$args) 
+        {
+            $self->logMsg($job, "param:".$arg." value:".$args->{$arg});
+            print '*** JOBID: '.$job->getJobid().' param: '.$arg.' value: '.$args->{$arg}." ***\n";
+        }
+
+        $self->completedJob($job);
+    }
+    
+    1;
+
+This service is extremely simple; all it does is pick up the service's 
+configuration and the given job's arguments, and logs the job's arguments in 
+the Helios log.  It will also print the arguments to the terminal.  Then it 
+calls the completedJob() method to mark the job as finished successfully.  
+Despite its simplicity, all Helios services ultimately follow this same basic 
+pattern.
+
+Let's take a closer look at this simple example.  First, let's look at the 
+package declaration and modules:
+
+    package TestService;
+    use strict;
+    use warnings;
+    use base qw(Helios::Service);
+
+In addition to declaring the service's name with the B<package> declaration, 
+we've also enabled the B<strict> and B<warnings> pragmas.  We declare our 
+service to be a subclass Helios::Service by using the B<use base> pragma.
+
+Next, we have the run() method.  This is the only required method in your 
+service class.  It starts by pulling in config parameters and job arguments 
+from the Helios system:
+
+    sub run {
+        my $self = shift;
+        my $job = shift;
+        my $config = $self->getConfig();
+        my $args = $self->getJobArgs($job);
+
+The only parameter directly passed to run() is a Helios::Job object that 
+represents the job the service needs to run.  After stashing the service in the 
+$self variable and the Helios::Job object in the $job variable, the run() 
+method does two more things before the actual job processing starts.  First, it
+grabs the service's configuration using the getConfig() method, and then gets 
+the job's arguments using the getJobArgs() method.  Both the service 
+configuration and job arguments are returned as hashrefs, so it will be easy 
+to work with them later in the run() method.
+
+Next we have the rest of the run() method:
+
+        foreach my $arg (keys %$args) 
+        {
+            $self->logMsg($job, "param:".$arg." value:".$args->{$arg});
+            print '*** JOBID: '.$job->getJobid().' param: '.$arg.' value: '.$args->{$arg}." ***\n";
+        }
+
+        $self->completedJob($job);
+    }
+
+The foreach block is just looping through all the arguments in the job 
+argument hashref and using the logMsg() method to log them in the Helios 
+system log.  It then also prints them to the terminal.  In reality, this part 
+of the run() method could be anything:  a mathematical computation, the 
+processing of a file, a call to another function or method in another Perl 
+module.  What work you actually do in your run() method is entirely up to you!
+
+I<Note: one thing you don't normally do in Helios services is print to the 
+terminal, since usually there is no terminal to print to.  But we'll be running 
+this service later in debug mode, and it will be helpful for you to see the 
+job do something on the screen.>
+
+What is important, however, is what happens when your work is done.  The last 
+thing in this run() method (and indeed, all run() methods) is the call to 
+mark the job as completed successfully or failed.  This run() method is very,
+very simple, so in this case we are going to assume the job is successful and 
+mark it as such by calling the completedJob() method.  The only parameter for 
+completedJob() is the Helios::Job object that run() was passed.  If we had 
+decided instead that the $job had failed, we would have used the failedJob() 
+method:
+
+    $self->failedJob($job,"It failed!");
+
+The failedJob() method works like completedJob() except it marks the job as 
+failed rather than succeeded in the system.  In addition, you may also specify 
+an error message that will be recorded with the job so you can see I<why> the 
+job failed.
+
+Once we've marked the job as completed or failed, the run() method is over.
+
+So that, in a nutshell, is the basics of creating a Helios service class.  All 
+Helios service classes ultimately use this design pattern.  This makes creating
+new Helios services easy, either by writing new code or adapting existing code.
+
+=head1 STARTING A HELIOS SERVICE AND SUBMITTING A JOB
+
+Having read through the last section, you may ask, "But how do I actually get 
+this TestService thing to run a job?"  If you've got your helios.ini configured
+and ready, you're almost ready to go.
+
+Make sure the path to your helios.ini is set in the HELIOS_INI environment 
+variable, and that the variable is exported.  At the command line:
+
+    export HELIOS_INI=/path/to/helios.ini
+
+Also make sure it is an absolute path; relative paths will confuse the Helios 
+service loader/daemon.  Also, for this tutorial, go ahead and enable debug mode by 
+setting the HELIOS_DEBUG environment variable:
+
+    export HELIOS_DEBUG=1
+
+This will allow you to see some extra Helios debugging messages and prevent the 
+service daemon from daemonizing, allowing you to stop it from the command line.
+
+First, we'll go ahead and submit the job we want to run by using the 
+helios_job_submit.pl program at the command line:
+
+ helios_job_submit.pl -v TestService "<job><params><myarg1>This is a test</myarg1></params></job>"
+
+This will submit a job with a I<jobtype> of TestService, meaning it is meant to 
+be run by the service named "TestService".  In the XML arguments for the job, 
+there is actually only one argument, named 'myarg1', that has the value "This 
+is a test".  Of course, you can have a large number of arguments; the limit in 
+the default Helios MySQL database schema is about 16MB, though you really 
+should not be submitting that much data as job arguments, at least while you 
+are learning the system.
+
+The -v option tells helios_job_submit.pl to return the jobid of the new job.  
+If you use the -v option or you enabled HELIOS_DEBUG, you should 
+receive a message if your Helios setup is functioning properly:
+
+ Job submit successful.  JOBID: 9
+
+(The jobid will vary depending on how many jobs you have submitted to the 
+system previously.)  If you received an error, there is most likely a problem 
+with your Helios configuration; go back to the install instructions, fix the 
+problem, and try again.
+
+So now that you have submitted a job to Helios, how do you make it run?  If you 
+saved the service we discussed above in a file called TestService.pm in the 
+current directory, you can start the service using the helios.pl service 
+loader/daemon:
+
+ helios.pl TestService
+
+If you enabled HELIOS_DEBUG, you'll see a lot of messages scroll on the screen 
+as helios.pl does some setup, attempts to load your service class, and parses 
+the configuration for the service in helios.ini and in the Helios database.  If
+that all goes well, the service daemon will look for jobs, see the job you 
+submitted earlier, and launch a worker process to run the job.  The worker 
+process will call the run() method you defined, logging the job arguments to 
+the Helios log and marking the job as completed.  You'll see the job arguments 
+printed on the screen:
+
+ *** JOBID: 9 param: myarg1 value: This is a test! ***
+
+Once all that is done, you'll see a "0 waiting TestService jobs." message.  At 
+that point you can press Ctrl-C to exit the service daemon.  You can also open 
+another terminal session and submit another job and watch it being processed 
+if you like.
+
+(If you didn't enable HELIOS_DEBUG, the service daemon will still do all the 
+things described, but you'll only see a message that your TestService class was 
+loaded, and then helios.pl will daemonize, disconnecting from your terminal in 
+the process.)
+
+If you want to check the log messages your service wrote to the log while 
+processing the job, you can use the helios_job_info command to find out a job's
+start and complete times, whether it ran successfully, and any log messages it
+recorded.  If you have the jobid from the job submitted earlier, issue a 
+command like this:
+
+ helios_job_info --jobid=9 --args --logs
+
+to see a full report on the job like the one below:
+
+ Jobid: 9
+ Jobtype: Helios::TestService
+ Submit Time: Fri Mar  7 17:12:08 2014
+ Complete Time: Fri Mar  7 17:13:00 2014
+ Exitstatus: 0
+ 
+ Args: 
+ <job><params><myarg1>This is a test</myarg1></params></job> 
+ 
+ Logs:
+ Fri Mar  7 17:13:00 2014 [localhost:13432] INFO Helios::TestService says, "Hello World!"
+ Fri Mar  7 17:13:00 2014 [localhost:13432] INFO JOBARG=myarg1 VALUE=This is a test
+
+You can also use the Helios::Panoptes web application to view and search the 
+Helios system log.  In addition to messages related to specific jobs, 
+Helios::Panoptes will also show log messages that the helios.pl 
+service daemon logged about starting up, seeing jobs, and launching processes 
+to handle those jobs.  It is worth becoming familiar with these messages so 
+will be able to understand what is happening to your jobs and services as you 
+develop, deploy, and manage services in your Helios collective.
+
+=head1 SUBMITTING JOBS
+
+In the previous section, you saw that you can submit jobs to Helios using the 
+helios_job_submit.pl command line program.  There are actually 3 ways to 
+submit jobs to Helios:
+
+=over 4
+
+=item 
+
+helios_job_submit.pl, a shell program
+
+=item
+
+over HTTP with the included submitJob.pl CGI script
+
+=item 
+
+in your own Perl programs, using the Helios::Job class
+
+=back
+
+If you want to submit jobs via the shell or over HTTP, check the perldoc for 
+helios_job_submit.pl and submitJob.pl for more information.
+
+Sometimes you need more integration than a shell or CGI script can provide, 
+especially if you're running in a persistent environment like FastCGI or 
+mod_perl.  In those cases, you should use the Helios job submission API 
+directly.
+
+To use the Helios job submission API, you initialize Helios using the 
+Helios::Service class, create a Helios::Job object, and submit it to the 
+system.  
+
+For example:
+
+ use strict;
+ use warnings;
+ use Helios::Service;
+ use Helios::Job;
+
+ # create a Helios::Service object, initialize it with prep()
+ # then get the $config hash with getConfig()
+ my $service = Helios::Service->new();
+ $service->prep() or die($service->errstr);
+ my $config = $service->getConfig();
+
+ # create your job arguments in XML
+ # then instantiate a Helios::Job object
+ # give it the Helios $config with setConfig()
+ # tell it the service class that should process the job with setJobType()
+ # set your job arguments with setArgString() 
+ my $jobxml = '<job><params><filename>Rise.mp3</filename></params></job>';
+ my $job = Helios::Job->new();
+ $job->setConfig($config);
+ $job->setJobType('MP3IndexerService');
+ $job->setArgString($jobxml);
+
+ # finally, submit the job to the system
+ my $jobid = $job->submit();
+
+The first thing to do is to instantiate a Helios::Service object, call the 
+prep() method to parse the configuration and initialize a connection to the 
+Helios collective database, and get the basic Helios configuration by calling 
+the getConfig() method. 
+
+Once you have the Helios configuration, you're ready to create your job.  
+Create an XML string specifying the job arguments in XML.  Then instantiate 
+the Helios::Job object with the new() method.  Give your job object the 
+Helios configuration you retrieved earlier (with setConfig()) and the name of 
+the service class you want to service the job (with setJobType()).  Finally, 
+set the job's arguments by using the setArgString() method.
+
+Then submit the job to Helios using the submit() method.  If the job
+submission was successful, submit() will return the jobid of the newly 
+submitted job.  If something goes wrong, submit() will throw an exception.
+
+Once the job is submitted, it goes into the Helios collective's job queue 
+marked for the service you specified.  When a service with that name starts, 
+the helios.pl daemon will see jobs for that service are available, and will 
+launch worker processes to process them.  The worker processes will pull the 
+jobs from the queue and call your service's run() method, passing it the 
+Helios::Job object.  Once your run() method has marked the job as a 
+success or failure and returned, the worker process will end or, if the 
+OVERDRIVE configuration parameter has been set, the worker process will 
+pull another job from the queue and call your service's run() method again.
+
+=head2 JOB ARGUMENT XML
+
+Helios job arguments are normally specified in XML-like markup that follow a 
+relatively simple format:
+
+ <job>
+ 	<params>
+ 		<argument_tag>argumentValue</argument_tag>
+		...
+ 	</params>
+ </job>
+
+While the markup language is definitely XML-like and must be well-formed like 
+XML, in reality there is no DTD to validate against, and the tags in the 
+<params> section are left entirely up to the user to define.  This gives you 
+maximal flexibility in determining the names and values of your job 
+arguments, and also makes it simple to parse the arguments into the job 
+argument hash for Helios services to use.  Take the following job arguments, 
+for example:
+
+ <job>
+ 	<params>
+ 		<id>456</id>
+ 		<type>blog</type>
+ 		<email>hanse@davion.gov</email>
+ 	</params>
+ </job>
+
+In the run() method of a service, calling the getJobArgs() method with a job 
+with the above arguments will yield a reference to a hash like this:
+
+ {
+  	'id'    => '456',
+  	'type'  => 'blog',
+  	'email' => 'hanse@davion.gov'
+ }
+
+So the tag names become the keys of the hash, and the enclosed strings become 
+the hash values.
+
+Keep in mind that although job argument XML can be flexible, the XML parser is 
+set up to do things relatively simply, so complex XML structures should be 
+avoided.  In Helios, "jobs" are really only parameters to "services," so job 
+arguments are best kept simple.  The logic of your application should go in 
+your Helios service class.
+
+=head1 CONFIGURING SERVICES
+
+In the previous simple TestService example, you saw that the service's 
+configuration is available via the getConfig() method.  But how is that 
+configuration set up?  The Helios configuration system provides the ability to 
+centrally configure services across an entire collective and, if necessary, 
+tailor a service's configuration on a per host basis.
+
+The first piece of the Helios configuration system is the helios.ini file.  
+All of the configuration parameters set in the [global] section of helios.ini 
+are available not just to the helios.pl service daemon, but to all Helios 
+services running in a particular collective.  You may also put configuration 
+parameters specific to your service in helios.ini by creating a section named 
+the same as the service:
+
+ [global]
+ dsn=dbi:mysql:host=hostname;db=helios_db
+ user=helios
+ password=password
+ 
+ [TestService]
+ loggers=HeliosX::Logger::File
+ logfile_path=/var/log/helios/
+ logfile_priority_threshold=6
+
+The [TestService] section here would set up the logging configuration 
+specifically for the TestService service (see below for more about the Helios 
+logging system).  While all Helios services will see the configuration 
+options set in the [global] section, only the TestService service will see the 
+configuration options set in the TestService section.
+
+While you can set the configuration options for your service in helios.ini and 
+distribute the helios.ini between all of your hosts, that is very tedious and 
+unwieldly way to manage a service's configuration.  In addition to the 
+helios.ini file, configuration parameters for a service can also be set using 
+the helios_config_set command.  The helios_config_set command takes 4 arguments:
+
+=over 4
+
+=item --service
+
+The service you are setting the config parameter for.
+
+=item --hostname
+
+The host you are setting the config parameter for.  A parameter can be set to 
+affect a service on a single host or every host in the collective.  If you 
+do not specify a --hostname, helios_config_set will assume the parameter 
+should only affect the specified service on the current host.  If you want the
+parameter to affect the service running on any host, set the hostname an
+asterisk ("*").
+
+=item --param
+
+The name of the config parameter to set.
+
+=item --value
+
+The actual value of the parameter to set.
+
+=back
+
+For example, if you want to Helios to run up to 5 TestService workers at a 
+time on the current host, you can issue the following command to set the 
+MAX_WORKERS config parameter:
+
+ helios_config_set --service=TestService --param=MAX_WORKERS --value=5
+ 
+To enable OVERDRIVE mode on TestService workers on every host in your Helios 
+collective, use the --hostname parameter and set it to '*':
+
+ helios_config_set --service=TestService --hostname=* --param=OVERDRIVE --value=1
+ 
+If you want to check your work, you can use the helios_config_get command, with 
+the same options:
+
+ helios_config_get --service=TestService --param=MAX_WORKERS
+ 
+You can also use the helios_config_unset command to delete a parameter from the
+collective database entirely.
+
+You can also use the Helios::Panoptes web application to set config parameters
+for your services.  Also, remember that though Helios defines a lot of special 
+configuration parameters itself, you can use the Helios configuration subsystem
+to specify other parameters your service might need.  For example, if you have 
+a Helios service called Indexer, which has a landing directory where it stores 
+incoming files, you can specify a "landing_zone" parameter available to all of 
+Indexer instances running on every host of your collective:
+
+ helios_config_set --service=Indexer --hostname=* --param=landing_zone --value=/mnt/SAN1/incoming"
+
+Regardless of how you set configuration parameters, when your service class 
+calls the getConfig() method, a hashref will be returned that will contain the 
+configuration options specific to the service running on that particular host.  
+The hash keys will be the parameter name, while the hash values will be the 
+values specified for that particular parameter.  The hash 
+will contain:
+
+=over 4
+
+=item 
+
+any parameters set in the helios.ini [global] section, 
+
+=item 
+
+any parameters set in helios.ini with section name matching the service's name, 
+
+=item 
+
+any parameters in Helios collective database matching the service's 
+name and a hostname set to '*'
+
+=item
+
+any parameters in collective database with the service's name and a hostname
+set to the current host. 
+
+=back
+
+Each of the above items will override the config options set by the previous 
+ones.  For example, if you set a 'log_priority_threshold' option for a service 
+for the current host, it will override any 'log_priority_threshold' options 
+set for the service globally (hostname = '*') or in helios.ini.  In this way 
+you can set configuration options for services running across the collective 
+but isolate specific instances of a service on particular hosts if necessary.
+
+=head1 LOGGING
+
+You will note in the TestService example the use of the logMsg() method to send
+messages to the Helios logging system.  The Helios logging system is an 
+extensible system to keep track of what goes on in the Helios system and 
+during job processing.
+
+Inside of your service, the logMsg() method is what you need to log messages to 
+the Helios logging system.  The logMsg() method takes 3 parameters:
+
+=over 4
+
+=item 
+
+the Helios::Job object of representing the current job (optional)
+
+=item 
+
+the priority level of the message (optional)
+
+=item
+
+a string with the message you want to add to the log
+
+=back
+
+If you pass a Helios::Job object in your call to logMsg(), the jobid will be 
+recorded along with the message.
+
+The message priority levels of messages are defined in 
+Helios::LogEntry::Levels.  If you import these levels with the ':all' tag at 
+the beginning of your service:
+
+ use Helios::LogEntry::Levels ':all';
+ 
+you can use symbols rather than integers to specify the severity of your log 
+entry.  If you don't specify a priority level, the message will default to 
+LOG_INFO priority.
+
+The default, internal Helios logging system records messages in a table in the
+Helios collective database.  You can access log messages for a specific job 
+using the helios_job_info command.  You can also use the Helios::Panoptes
+application to view log messages for particular jobs and more system-level 
+messages recorded by the helios.pl daemon.  Helios::Panoptes will also allow 
+you to filter and search for messages matching certain criteria.
+
+You can check the L<Helios::Service> man page entry for the logMsg() method for 
+information on logging, and the L<Helios::Configuration> page for more 
+information about logging configuration.  If you want to configure your Helios 
+collective to use some other logging system, check the L<Helios::Logger> man 
+page for information about creating your own Helios interfaces to other 
+logging systems. 
+
+=head1 A MORE USEFUL EXAMPLE
+
+Included in the eg/ directory of your Helios distribution is a simple sample 
+Helios application called MP3IndexerService.  Unlike the TestService service 
+class discussed in this tutorial, MP3IndexerService actually does something
+useful:  given a list of filenames of MP3s, MP3IndexerService will parse the 
+ID3 and other useful information and store it in a database table.  It can be 
+useful for finding duplicate copies of tracks or just reviewing the different 
+artists, albums, etc. that you have on your hard drive.  A look at its code 
+will reveal it uses all the major Helios subsystems (job queuing, 
+configuration, logging) in some way or another.  Though it remains a very 
+simple application, it demonstrates how easily a useful Helios application can 
+be written.
+
+=head1 SEE ALSO
+
+L<helios.pl>, L<Helios::Service>, L<Helios::Job>, L<Helios::Panoptes>
+
+=head1 AUTHOR
+
+Andrew Johnson, E<lt>lajandy at cpan dotorgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012-4 by Andrew Johnson.
+
+Portions of this document, where noted, are 
+Copyright (C) 2008-9 by CEB Toolbox, Inc.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=head1 WARRANTY
+
+This software comes with no warranty of any kind.
+
+=cut

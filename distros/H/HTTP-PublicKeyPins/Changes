@@ -1,0 +1,43 @@
+Revision history for HTTP-PublicKeyPins
+
+0.14   Thu Mar 17 20:07:00 2016
+        Updated minimum version of Crypt::PKCS10
+
+0.13   Wed Mar 16 21:37:00 2016
+        Changed from Crypt::OpenSSL::PKCS10 to Crypt::PKCS10 to get support for Win32/Solaris
+
+0.12   Tue Jan 12 21:44:00 2015
+        Adding PKCS#1 support for RSA Private Keys
+
+0.11   Sat Aug 08 18:14:00 2015
+        Adding PKCS#10 Certificate Request support
+
+0.10   Sat Aug 08 15:33:00 2015
+        Documentation fixes, improved coverage
+
+0.09   Sat Aug 08 07:50:00 2015
+        Fix tests to use $^X. RT#106294.  Thanks to Slaven Rezic
+
+0.08   Fri Aug 07 06:43:00 2015
+        Adding support for DER encoded public keys
+
+0.07   Wed Aug 05 16:25:00 2015
+        Adding support for DER encoded X509 certificates
+
+0.06   Mon Aug 03 21:48:00 2015
+        Licensing fixes. Added support for reading public keys, trusted certificates, oddly formatted X509 certificates
+
+0.05   Sun Aug 02 20:24:00 2015
+        Documentation, Licensing fixes
+
+0.04   Sun Aug 02 16:57:00 2015
+        Added command line tool hpkp_pin_sha256, and some error checking for inputs
+
+0.03   Sat Aug 01 21:01:00 2015
+        Documentation fixes
+
+0.02   Sat Aug 01 20:23:00 2015
+        Added support for non-RSA keys (such as DSA and EC keys)
+
+0.01   Sat Aug 01 15:42:00 2015
+        Initial release.

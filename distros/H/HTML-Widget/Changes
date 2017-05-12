@@ -1,0 +1,169 @@
+This file documents the revision history for Perl extension HTML::Widget.
+
+1.11 2007-03-01
+
+        - New Bool constraint.
+        - New SingleValue constraint.
+        - New $w->filter_all() and $w->constraint_all() methods add the 
+          named filters/constraints to all current form elements.
+        - $w->find_elements() now supports the same arguments as 
+          $w->get_elements().
+        - New render_errors() method on constraints, accepts a list of 
+          element names for which errors should be displayed by $r->as_xml.
+        - Elements are allowed to have no name. No id or name will be 
+          displayed in the xml output	.
+        - When an Equal constraint fails, the first named element's value is 
+          no longer considered valid.
+        - All elements associated with a failing Equal constraint receive an 
+          error. Use render_errors() to override this behaviour.
+        - New HTML::Widget::Error method no_render(), used internally by
+          $constraint->render_errors().
+        - New F.A.Q. documentation section.
+        - $result->param() carps if called with more than 1 argument (it's 
+          documented readonly).
+        - element() called on a block element now accepts the same 
+          \%attributes argument as $widget->element().
+        - Submit and Reset elements now inherit from Button element, so they 
+          share the same methods (value, content, src, type).
+        - Fixed Range constraint bug when min/max is 0 (zero).
+        - Fixed $widget->get_elements() bug, now both 'name' and 'type' 
+          arguments can be used together to limit the elements returned.
+        - In constraint fixed so empty/missing values pass.
+        - HTML::Element now escapes unicode properly - require v3.22 and 
+          stop skipping test
+        - HTMLEscape filter test skipped due to incompatible changes in 
+          HTML::Element
+        - Deprecated Maybe constraint
+
+1.10 2006-09-29
+        - RadioGroup elements are now wrapped in a fieldset tag.
+        - HTML::Widget->new() and $w->element() now accepts a hash-ref of 
+          attributes as an argument, after the name argument.
+        - $w->attributes() and $e->attributes() now accepts either a list 
+          or a hash-ref. Returns the object-ref for method chaining.
+          A hash-ref no longer overwrites existing attributes, it is now 
+          added to the existing attributes. As a special-case, the 
+          attributes hash-ref is returned if no arguments are passed.
+        - All fields elements (except Upload) have a $e->retain_default 
+          method, which if true overrides the default behaviour, so that 
+          after a field is missing from the form submission, the xml output 
+          will contain the default value, rather than be empty.
+        - $widget has new methods get_elements_ref(), get_filters_ref() 
+          and get_constraints_ref() which return an arrayref.
+        - $result has new method elements_ref() which returns an arrayref.
+
+1.09 2006-09-21
+        - Embedding completely refactored by Michael Gray.
+        - $w->embed( $e, @widgets) embeds into the supplied element.
+        - New Fieldset element.
+        - Can add elements to Fieldset elements, as an alternative to using 
+          embed.
+        - New $w->xhtml_strict accessor. When true, doesn't allow non-block 
+          elements at the top-level of a form.
+        - New $w->legend accessor. Sets the label for the top-level fieldset.
+        - process() is now called for embedded widgets.
+        - After form submission, $result->as_xml() no longer uses an elements' 
+          default value if that field wasn't submitted.
+        - Removed In constraint change added in v1.08 (in which validate 
+          automatically passed an empty in() list)
+        - Select elements no longer automatically get an implicit In constraint 
+          added. Set constrain_options() to true to get the old behaviour.
+        - RadioGroup elements no longer automatically get an implicit In 
+          constraint added. Set constrain_values to true to get the old 
+          behaviour.
+        - New $w->explicit_ids( 1 ) method, stops auto-generation of id's in 
+          the xml output.
+        - New CallbackOnce constraint
+        - New HTML::Widget::Manual::Developer.pod
+        - Added checked() as an alias for value() in RadioGroup elements.
+        - Fixed many bugs when submitted values are 0 (zero) - particularly 
+          with $result->as_xml output.
+        - Fixed bug when element names contain regex characters.
+        - Fixed Range constraints handling of missing and empty values.
+
+1.08 2006-08-10 16:07
+        - Changed $widget->action(). Instead of defaulting to "/" it is left 
+          empty. This causes browsers to submit the form to the current URI.
+        - Fixed fatal bug on an empty Select options() list
+        - Fixed bug where $result->error(..., $type) would return all errors
+          but those of $type
+        - $e->containerize now requires the container_class and dies with a
+          more helpful message if require of class fails
+        - new methods $widget->get_element(), $widget->get_constraint(), 
+          $widget->get_filter()
+        - In constraint no longer fails when the in() list is empty
+        - When multiple Checkbox elements share the same name, the element ids 
+          are given the form 'name_1', 'name_2', etc. This ensures unique ids.
+        - Regex and Number constraints now allow the empty string, for 
+          consistency with other constraints. If you need to ensure the 
+          value is present, also use the All constraint.
+        - Constraint, Element and Filter names can be prefixed with a unary 
+          plus '+' to specify a fully-qualified module name, rather than one 
+          beginning with HTML::Widget::Constraint::, etc.
+        - Fixed bug with ASCII constraint not allowing the space character.
+
+1.07 2006-04-26 10:53
+        - Added a Button element
+        - Submit and Reset values no longer default to "1"
+          (this was causing the browser to display the button label 
+          as "1" instead of "Submit" or "Reset")
+        - Added height() and width() accessors for image submit buttons
+        - Added support for <button> tags, with new content() method
+        - Added ability to customize HTML produced via 
+          H::W::Element::container_class.
+        - Can specify container_class on a per widget basis via 
+        - $w->element_container_class()
+        - Overloaded "" on Container to return as_xml
+        - All constraint counted empty strings as values
+        - AllOrNone constraint didn't treat 0 as a value
+
+1.06 2006-04-06 10:44
+        - Added Module::Pluggable::Fast preloading for PAR packaging
+          and the like
+        - Make HTML::Widget::Container->element support arrayrefs
+        - New method add_error() in HTML::Widget::Result
+        - Select elements automatically get an In constraint added,
+          corresponding to the element's option keys
+        - RadioGroup elements automatically get an In constraint added,
+          corresponding to the element's values
+        - New Number constraint
+        - New 'multiple' attribute supported on Select elements
+        - Multiple input values for a Select element is an error if the
+          multiple attribute is not true
+        - Bug fixes:
+        - Hidden element now accepts false but defined input values
+        - Fixed bug with $result->params() not returning correct results
+          when a field had multiple values
+        - Regex constraint skipped when input param not defined
+          (stops 'uninitialized value' warning)
+
+1.05 2006-03-13 10:52   
+        - New methods get_constraints(), get_elements(), get_filters
+        - add value alias for checkbox
+        - Fixed element values set to zero or the empty string not being
+          set in the xml output
+        - Added DependOn constraint
+        - Fix textarea with description.
+        - Add a src option to Submit to make it a image submit.
+
+1.04 2005-01-30 19:26:00
+        - Fixed $query in tests, fixed fetching multiple-valued params
+        - More documentation!
+        - Lots of small bug fixes
+        - Added add_valid method
+        - Added AllOrNone constraint
+
+1.03 2006-01-17 22:00:00
+        - Fixed missing files
+
+1.02 2006-01-17 22:00:00
+        - Fixed multiple value filter
+        - Pod fixes
+        - Added new filters. HTMLEscape, HTMLStrip, UpperCase, LowerCase,
+          and Callback
+
+1.01 2006-01-11 00:00:00
+        - Fixed some typos
+
+1.0  2005-11-30 22:00:00 2005
+        - first development release

@@ -1,0 +1,12 @@
+Revision history for Perl extension HTML::Persistent.
+
+0.01  Fri Jan 25 09:07:29 2013
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n Data::PHDB
+
+0.02  Sat Jan 26 01:00:53 GMT 2013
+	- have the SHA1 stuff working, and early tests.
+
+0.03  Wed Mar  1 03:06:24 GMT 2017
+	- New name to HTML::Persistent and heaps of changes.
+

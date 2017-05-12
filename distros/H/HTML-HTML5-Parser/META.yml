@@ -1,0 +1,51 @@
+---
+abstract: 'parse HTML reliably'
+author:
+  - 'Toby Inkster <tobyink@cpan.org>'
+  - Wakaba
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.61
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06'
+keywords:
+  - HTML
+  - HTML5
+  - Web
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: HTML::HTML5::Parser
+name: HTML-HTML5-Parser
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+requires:
+  HTML::HTML5::Entities: 0.002
+  HTTP::Tiny: 0
+  IO::HTML: 0
+  Scalar::Util: 0
+  Try::Tiny: 0
+  URI::file: 0
+  XML::LibXML: 1.94
+  XML::LibXML::Devel: 0
+  perl: 5.8.1
+resources:
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=HTML-HTML5-Parser
+  homepage: https://metacpan.org/release/HTML-HTML5-Parser
+  license: http://dev.perl.org/licenses/
+  repository: http://goddamn.co.uk/svn-web/perlmods/browse/HTML-HTML5-Parser/
+version: 0.301
+x_contributors:
+  - shellac
+  - 'audreyt <audreyt@cpan.org>'
+  - TOBYINK
+  - Wakaba
+  - 'Dorian Taylor'

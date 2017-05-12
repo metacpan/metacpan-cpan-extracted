@@ -1,0 +1,25 @@
+*** perl.c.orig	Mon Jan 13 16:39:23 1997
+--- perl.c	Mon Jan 13 16:41:22 1997
+***************
+*** 1724,1730 ****
+      /* We absolutely must clear out any saved ids here, so we */
+      /* exec the real perl, substituting fd script for scriptname. */
+      /* (We pass script name as "subdir" of fd, which perl will grok.) */
+!     rewind(rsfp);
+      for (which = 1; origargv[which] && origargv[which] != scriptname; which++) ;
+      if (!origargv[which])
+  	croak("Permission denied");
+--- 1724,1736 ----
+      /* We absolutely must clear out any saved ids here, so we */
+      /* exec the real perl, substituting fd script for scriptname. */
+      /* (We pass script name as "subdir" of fd, which perl will grok.) */
+!    /* Patch bug in setuid on DEC alphas lstein 1/13/97
+!       Was:
+!       rewind(rsfp); 
+!       */
+!    /* change to */
+!     lseek(fileno(rsfp),(off_t)0,0);
+! 
+      for (which = 1; origargv[which] && origargv[which] != scriptname; which++) ;
+      if (!origargv[which])
+  	croak("Permission denied");

@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuites>
+  <testsuite name="t_flux_by_year_month_t" errors="0" failures="0" skipped="0" tests="1" time="0.0279500484466553">
+    <system-out>1..1
+ok 1
+</system-out>
+    <testcase name="Unnamed test case 1" classname="t_flux_by_year_month_t" time="0.0247178077697754" />
+  </testsuite>
+  <testsuite name="t_dist_critic_t" errors="0" failures="0" skipped="0" tests="1" time="0.0645968914031982">
+    <system-out>ok - Test::Perl::Critic for &quot;blib/lib/Ham/NOAA/Sunspot.pm&quot;
+1..1
+</system-out>
+    <testcase name="Test::Perl::Critic for &quot;blib/lib/Ham/NOAA/Sunspot.pm&quot;" classname="t_dist_critic_t" time="0.000154972076416016" />
+  </testsuite>
+  <testsuite name="t_dist_distribution_t" errors="0" failures="0" skipped="0" tests="9" time="0.224669933319092">
+    <system-out>1..9
+ok 1 - Checking MANIFEST integrity
+ok 2 - use Ham::NOAA::Sunspot;
+ok 3 - Ham::NOAA::Sunspot defines a version
+ok 4 - POD test for blib/lib/Ham/NOAA/Sunspot.pm
+ok 5 - MANIFEST exists
+ok 6 - README exists
+ok 7 - Changes(.pod)? or ChangeLog(.pod)? exists
+ok 8 - Build.PL or Makefile.PL exists
+ok 9 - Pod Coverage ok
+</system-out>
+    <testcase name="Checking MANIFEST integrity" classname="t_dist_distribution_t" time="0.0331850051879883" />
+    <testcase name="use Ham::NOAA::Sunspot;" classname="t_dist_distribution_t" time="0.0878210067749023" />
+    <testcase name="Ham::NOAA::Sunspot defines a version" classname="t_dist_distribution_t" time="0.064734935760498" />
+    <testcase name="POD test for blib/lib/Ham/NOAA/Sunspot.pm" classname="t_dist_distribution_t" time="0.000219106674194336" />
+    <testcase name="MANIFEST exists" classname="t_dist_distribution_t" time="0.0333209037780762" />
+    <testcase name="README exists" classname="t_dist_distribution_t" time="0.000211000442504883" />
+    <testcase name="Changes(.pod)? or ChangeLog(.pod)? exists" classname="t_dist_distribution_t" time="0.00020599365234375" />
+    <testcase name="Build.PL or Makefile.PL exists" classname="t_dist_distribution_t" time="0.000142097473144531" />
+    <testcase name="Pod Coverage ok" classname="t_dist_distribution_t" time="0.00010991096496582" />
+  </testsuite>
+  <testsuite name="t_dist_podcoverage_t" errors="0" failures="0" skipped="0" tests="1" time="0.0948400497436523">
+    <system-out>1..1
+ok 1 - Pod coverage on Ham::NOAA::Sunspot
+</system-out>
+    <testcase name="Pod coverage on Ham::NOAA::Sunspot" classname="t_dist_podcoverage_t" time="0.0917098522186279" />
+  </testsuite>
+  <testsuite name="t_sunspot_by_year_month_t" errors="0" failures="0" skipped="0" tests="1" time="0.0211091041564941">
+    <system-out>1..1
+ok 1
+</system-out>
+    <testcase name="Unnamed test case 2" classname="t_sunspot_by_year_month_t" time="0.0184099674224854" />
+  </testsuite>
+  <testsuite name="t_dist_pod_t" errors="0" failures="0" skipped="0" tests="1" time="0.0315029621124268">
+    <system-out>1..1
+ok 1 - POD test for blib/lib/Ham/NOAA/Sunspot.pm
+</system-out>
+    <testcase name="POD test for blib/lib/Ham/NOAA/Sunspot.pm (2)" classname="t_dist_pod_t" time="0.0274639129638672" />
+  </testsuite>
+</testsuites>

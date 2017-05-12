@@ -1,0 +1,25 @@
+Changes
+Config.pm
+Site.pm
+README
+MANIFEST
+Makefile.PL
+installer.pl
+cgi/cd.css
+cgi/proc_tpl.pl
+cgi/local_inc.pl
+cgi/cgi_settings.pl
+cgi/index.cgi
+cgi/view_site.cgi
+cgi/edit_site.cgi
+cgi/new_site.cgi
+cgi/autodetect.cgi
+cgi/edit_conf.cgi
+cgi/tpl/index.cgi.html
+cgi/tpl/view_site.cgi.html
+cgi/tpl/edit_site.cgi.html
+cgi/tpl/new_site.cgi.html
+cgi/tpl/autodetect.cgi.html
+cgi/tpl/edit_conf.cgi.html
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

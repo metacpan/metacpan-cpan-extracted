@@ -1,0 +1,21 @@
+This is HTTPD-User-Manage version, a script and set of Perl modules
+for managing access control with the Apache, NCSA httpd, CERN and
+Netscape servers (and maybe some others).
+
+You can install this program as a CGI script to allow remote users to
+change their Web access passwords.  Web administrators can use it to
+remotely add, edit and delete users and their groups.  You can also
+use it from the command line as a nice all-in-one interface to access
+control databases based on text files, DBM files, and SQL databases.
+
+Please see the file user_manage.html for complete details.
+
+Lincoln Stein
+lstein@cshl.org
+
+NOTE: 6/2/02: Some versions of Perl 5.6.1 running under RedHat are
+core dumping on test number 03.dbm.  The problem seems to involve the
+NDBM_File library, but I have not been able to track it down.  If you
+encounter this problem, the best compromise would be to use the
+DB_File implementation instead.
+

@@ -1,0 +1,55 @@
+2013-10-25  Shigeki Morimoto  <shigeki.morimoto@mixi.co.jp>
+	* Changes version 0.1011 release.
+	bug fix. 'note' was parsed as 'not e'.
+
+2012-08-20  Shigeki Morimoto  <shigeki.morimoto@mixi.co.jp>
+	* Changes version 0.1010 release.
+	Dirty quich hack for Parse::RecDescent new version. ;-(
+
+2012-08-19  Shigeki Morimoto  <shigeki.morimoto@mixi.co.jp>
+	* Changes version 0.1009 release.
+	nothing changeed...
+	I uploaded empty tgz to pause. And pause doesnt allow to upload file that has same name.
+
+2012-07-31  Shigeki Morimoto  <shigeki.morimoto@mixi.co.jp>
+	* Changes version 0.1008 release.
+	bug fix. NAME shouldn't accept '${name}' format.
+
+2011-09-06  Shigeki Morimoto  <shigeki.morimoto@mixi.co.jp>
+	* Changes version 0.1007 release.
+	bug fix. H:T:Parser couldn't parser floating number.
+
+2011-07-08  Shigeki Morimoto  <shigeki.morimoto@mixi.co.jp>
+
+	* Changes version 0.1006 release.
+	bug fix. somtimes 'not (expr)' is treated as 'call function name is "not"'.
+
+2011-07-04  Shigeki Morimoto  <shigeki.morimoto@mixi.co.jp>
+
+	* Changes: version 0.1005 release.
+	suport bracketed variable name.
+
+2011-06-06  Shigeki Morimoto  <shigeki.morimoto@mixi.co.jp>
+
+	* Changes: version 0.1004 release.
+	Supress UUV warnings by @__gfx__
+	Update utilities in script/* using the newer interface by @__gfx__
+	
+2011-06-03  Shigeki Morimoto  <shigeki.morimoto@mixi.co.jp>
+
+	* Changes: version 0.1003 release.
+	Add requires YAML.
+	
+2011-06-01  Shigeki Morimoto  <shigeki.morimoto@mixi.co.jp>
+
+	* Changes: version 0.1002 release.
+	Add requires Class::Accessor::Fast.
+
+2011-05-27  Shigeki Morimoto  <shigeki.morimoto@mixi.co.jp>
+
+	* Changes: version 0.1001 relase.
+
+2011-05-27  Shigeki Morimoto  <Shigeki@Morimo.to>
+
+	* Changes: version 0.1 release.
+

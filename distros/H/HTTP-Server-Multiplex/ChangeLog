@@ -1,0 +1,14 @@
+
+=== version history of HTTP::Server::Multiplex
+
+All changes are made by Mark Overmeer, unless explicitly stated differently.
+
+version 0.11: Wed Oct  1 10:00:38 CEST 2008
+	Changes:
+	- ::Connection::readFile() renamed to load()
+	- ::Connection::saveFile() renamed to save()
+	- ::Connection needs to load str2time() from HTTP::Date
+	  rt.cpan.org#39555 [hachiman]
+
+version 0.10: Wed Sep 10 22:59:48 CEST 2008
+	- initial release

@@ -1,0 +1,52 @@
+HTTP-LRDD
+=========
+
+Created:      2010-01-30
+Home page:    <https://metacpan.org/release/HTTP-LRDD>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=HTTP-LRDD>
+Maintainer:   Toby Inkster <mailto:tobyink@cpan.org>
+
+0.106  2012-12-12
+
+ - (Update) General update/modernisation.
+ - (Update) Replace RDF::TrineShortcuts with RDF::TrineX::Function.
+
+0.105  2011-12-04
+
+ - (Bugfix Packaging) Newer version of Module::Package::RDF.
+ - (Update) Replace UNIVERSAL::AUTHORITY with Object::AUTHORITY.
+
+0.104  2011-11-27
+
+ - (Addition) Support wdrs:describedby predicate by default.
+ - (Packaging) Module::Package::RDF
+ - (Update) use 5.010
+ - Minor tidy
+
+0.103  2010-07-25
+
+ - (Bugfix) process_all() would fail in the case where the target URI
+   itself could not be parsed as RDF or XRD.
+
+0.102  2010-07-07
+
+ - Add examples to documentation.
+ - Cache host-meta files.
+ - Improved Atom support.
+
+0.101  2010-07-03
+
+ - (Bugfix) Possibly this will fix some cpan-tester fails, though I'm not
+   entirely sure.
+
+0.100  2010-06-30
+
+ - (Addition) Add a parse method to actually do something with a descriptor
+   URI once it's been found.
+ - (Addition) Add process and process_all methods which combine discover
+   and parse stages.
+ - Minor bugfixes and cleanups.
+
+0.01  2010-02-01  # First release
+
+

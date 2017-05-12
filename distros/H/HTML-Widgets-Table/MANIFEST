@@ -1,0 +1,8 @@
+README
+MANIFEST
+Makefile.PL
+Table.pm
+Table/Row.pm
+Table/Cell.pm
+Table/Core.pm
+t/00use.t

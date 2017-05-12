@@ -1,0 +1,5 @@
+o  Support for nested tables.
+o  Use separate package for stored elements - TableContentParser::Table, e.g.
+o  Add support for thead, tfoot, tbody, col, & colgroup elements.
+o  More validation of element layout (tbody must come after tfoot, which must
+come after thead, for example)

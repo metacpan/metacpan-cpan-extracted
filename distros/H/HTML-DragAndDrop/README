@@ -1,0 +1,29 @@
+HTML-DragAndDrop version 0.01
+=============================
+
+The HTML::DragAndDrop module provides a Perl interface to Walter Zorn's 
+Javascript Drag and Drop library.  See 
+http://www.walterzorn.com/dragdrop/dragdrop_e.htm.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Becky Alcorn
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

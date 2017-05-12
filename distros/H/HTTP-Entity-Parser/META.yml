@@ -1,0 +1,60 @@
+---
+abstract: 'PSGI compliant HTTP Entity Parser'
+author:
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
+build_requires:
+  Cwd: '0'
+  File::Spec::Functions: '0'
+  HTTP::Message: '6'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTTP-Entity-Parser
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  HTTP::Entity::Parser:
+    file: lib/HTTP/Entity/Parser.pm
+    version: '0.19'
+  HTTP::Entity::Parser::JSON:
+    file: lib/HTTP/Entity/Parser/JSON.pm
+  HTTP::Entity::Parser::MultiPart:
+    file: lib/HTTP/Entity/Parser/MultiPart.pm
+  HTTP::Entity::Parser::OctetStream:
+    file: lib/HTTP/Entity/Parser/OctetStream.pm
+  HTTP::Entity::Parser::UrlEncoded:
+    file: lib/HTTP/Entity/Parser/UrlEncoded.pm
+requires:
+  Encode: '0'
+  File::Temp: '0'
+  HTTP::MultiPartParser: '0'
+  Hash::MultiValue: '0'
+  JSON::MaybeXS: '1.003007'
+  Module::Load: '0'
+  Stream::Buffered: '0'
+  WWW::Form::UrlEncoded: '0.23'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/kazeburo/HTTP-Entity-Parser/issues
+  homepage: https://github.com/kazeburo/HTTP-Entity-Parser
+  repository: git://github.com/kazeburo/HTTP-Entity-Parser.git
+version: '0.19'
+x_contributors:
+  - 'moznion <moznion@gmail.com>'
+  - 'Karen Etheridge <ether@cpan.org>'
+  - 'Todd Rinaldo <toddr@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

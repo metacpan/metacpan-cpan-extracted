@@ -1,0 +1,19 @@
+Revision history for Perl extension HTML-FillInForm-ForceUTF8
+
+0.03 2014-05-08T14:43:34Z
+
+    - fixed Bug #95342 for HTML-FillInForm-ForceUTF8: perl 5.19.11: Modification of a read only value
+    - re-packaging with Minilla
+
+0.02 2006-05-22T22:07:10Z
+
+    - remove Mac OS X metafiles
+
+0.01 2006-04-10T13:41:27Z
+
+    -  original version; created by h2xs 1.23 with options
+       -XAn HTML::FillInForm::ForceUTF8
+
+
+
+

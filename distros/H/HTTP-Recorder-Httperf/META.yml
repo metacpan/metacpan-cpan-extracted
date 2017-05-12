@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name: HTTP-Recorder-Httperf
+version: 0.02
+author:
+  - Michael Peters <mpeters@plusthree.com>
+abstract: ! >-
+  An HTTP::Recorder subclass to record user actions as input for httperf for
+  load testing
+license: perl
+requires:
+  File::Temp: 0
+  HTTP::Proxy: 0.13
+  HTTP::Recorder: 0.03
+provides:
+  HTTP::Recorder::Httperf:
+    file: lib/HTTP/Recorder/Httperf.pm
+    version: 0.02
+  HTTP::Recorder::Httperf::Logger:
+    file: lib/HTTP/Recorder/Httperf/Logger.pm
+    version: 0.01
+generated_by: Module::Build version 0.25

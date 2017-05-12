@@ -1,0 +1,49 @@
+HTML-FromArrayref
+
+The previously existing HTML generation modules, such as HTML:LoL, don't
+make it easy to programmatically skip a tag or an attribute, so here's a
+simple module that takes a list of arrayrefs and renders them as HTML
+elements, replacing any whose tag names are false with their contents.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc HTML::FromArrayref
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-FromArrayref
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/HTML-FromArrayref
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/HTML-FromArrayref
+
+    Search CPAN
+        http://search.cpan.org/dist/HTML-FromArrayref/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Nic Wolff
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,33 @@
+<h3>The first<br/> test</h3 class="really_end">
+<em>This</em> is a very conformant
+<a href="/xhtml#def">XHTML</a>
+fragment. <span class="outrageous">I hope you like it</span>. I will be using it as test material</em>
+during the development of this module. Actually not just <em>development</em>
+but subsequent <strong>support</strong> will both use this and variant 
+files for regression tests. <h3 id="play_havoc">Blah<p>This paragraph is intended to include <br/>all the<br/>
+features permitted in our restricted subset of HTML. Therefore I need to
+include an utterly gratuitous
+<img alt="a gratuitous image" src="http://www.google.co.uk" height="100000" title="a gratuitous image" width="100000"><a id="/blah" title="Woo I;m invisible">   
+</a>
+at no extra cost.</p><p>
+
+
+
+
+
+
+
+
+
+
+</p>
+<h3 id="second_paragraph"></h3>
+<p>This second paragraph is likely to be a bit shorter. However I cannot
+entirely guarantee that. That is I might have to revise that prediction
+once the paragraph is complete.</p>
+<h3 id="test2">The big idea</h3>
+<p>Actually I am sorry to <span class="invisible">admit</span> it, but I am running out of ideas for 
+test material. I mean I really needed a second header and so I had to 
+have yet another paragraph. I do apologize for any inconvenience reading 
+this <strong>material may have caused you.
+<br/>

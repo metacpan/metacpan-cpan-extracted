@@ -1,0 +1,4 @@
+severity = 3
+[-Subroutines::RequireArgUnpacking]
+[-ControlStructures::ProhibitPostfixControls]
+[-Miscellanea::RequireRcsKeywords]

@@ -1,0 +1,105 @@
+ Hardware::iButton - talk to DalSemi iButtons through a serial interface
+
+     The source files in this distribution are 
+     Copyright (C) 1998, Brian Warner, and are licensed 
+     for use under the same terms as Perl itself.
+
+     by  Brian Warner <warner@lothar.com>
+
+
+This module attempts to provide a convenient interface to iButtons. It uses
+any DS2480-based widget (the "active" serial interfaces, including the DS9097U
+and the DS1411) plugged in to a free serial port.
+
+Once you create a connection object associated with a specific serial port,
+you can ask it to scan the iButton One-Wire bus (with the Search ROM command),
+and it will return a list of device objects. These device objects have
+different subclasses for the different models of iButtons, and respond to
+various methods that represent everything you can do with a given button: read
+and write memory, read the clock (on clock buttons), read the temperature (on
+DS1920 temperature buttons), etc.
+
+Software Requirements (all available from CPAN):
+ perl5 (perl5.004 should do)
+ IO
+ Time::HiRes
+ Gtk (only for examples/buttonmaster.pl)
+
+Hardware Requirements (sold by Dallas Semiconductor: http://www.ibutton.com)
+ a DS2480-based serial interface widget (DS9097U or DS1411)
+  (note: both of these devices have solder-mount iButton chips built in.
+   Don't be surprised when examples/listids.pl gives you one more device than
+   you expected)
+ some iButtons to play with
+
+Tested on:
+ perl5.005_02 on ppc-linux 2.1.115 .. 2.1.129
+ (perl5.004_04,perl5.005_02) on i386-linux 2.1.110 .. 2.2.0-pre5
+
+
+More verbose description:
+
+This is a perl module to use the DS2480 serial widget to talk to Dallas
+Semiconductor iButtons. It encapsulates most of the "One-Wire" protocol into a
+collection of methods sent to a "Connection" object or a "Device" object. You
+create the connection, send it a query to get a list of devices on the one
+wire bus, then send those device objects various messages to read/write
+memory, perform temperature conversions, and to do the various other special
+things that iButtons can do.
+
+There are a variety of physical interfaces to talk to iButtons. The DS2480 is
+the fundamental part of the so-called "active" serial interface: it handles
+the low-level signalling protocol and presents a simple byte-at-a-time RS232
+serial interface to the host. It does not require any clever pin-level
+trickery or special timing. With the included "futz.pl" program, which simply
+reads and writes bytes to the serial port one at a time, you can send a simple
+slow sequence such as 0xc1 0xe1 0x33 0xff 0xff 0xff 0xff 0xff 0xff 0xff 0xff
+0xe3 0xc1 (straight out of the DS2480 datasheet) to read out the ID code of a
+single device on the bus. The DS2480 is just the interface chip: it is
+packaged in a widget that includes a low-power regulator, protection diodes,
+serial connector, iButton connector, etc. One of the common DS2480 widgets is
+the DS9097U: this is built into a full-size DB9 shell and has an RJ11 on the
+other end, used to plug into one of the accessories provided in the DS9092K
+starter kit (which includes a wand-like "touch probe" and a four-button bus
+strip). The other widget is the DS1411: this is a DB9 dongle, basically a DB9
+shell with a cavity just large enough for a single iButton (very cute).
+
+Helpful hints:
+ The DS2480 widgets seem to contain solder-mount iButton devices embedded 
+ inside. I don't know why.. maybe to give your code something to talk to if you
+ only bought the widget and forgot to buy any iButtons. Anyway the 1411K
+ dongle contains something like a DS2401 id-only device (family code 0x01),
+ while the 9097U includes a DS2502 1k-eprom-add-only device (code 0x09) or
+ equivalent. So don't be surprised when you list the devices on the bus and
+ find more than you expect. And don't put two devices on the bus and expect
+ the Connection::readrom method to return useful data: remember it is a
+ wired-OR bus.
+
+ The serial port needs to be in the right mood/mode when you begin. I'm working
+ on adding code for this into the module itself but I can't quite figure out
+ how. I use the following on my linux box. Sometimes I have to use the futz.pl
+ script and send an 0xe3 0xc1 a few times. You may find the data sheet for the
+ DS2480 to be helpful in figure out what magic to send to it. That data sheet
+ is available in PDF format from Dallas's web site. I frequently have success
+ if I chant something like this before starting:
+
+ stty 9600 raw -onlcr -iexten -echo -echoe -echok -echoctl -echoke < /dev/ttyS0
+
+The term "iButton" is probably a trademark of Dallas Semiconductor.
+
+I'm slowly adding pieces to this module. The interface is subject to change,
+as is the name (Hardware::iButton for now, but open for discussion).
+
+Look for the latest version as well as other geeky stuff at
+
+ <http://www.lothar.com/tech/perl/>
+
+cheers,
+ -Brian Warner
+  warner@lothar.com
+
+History:
+
+version 0.02: basic functionality works. The stty setting/restoring code is
+ roughly in place but doesn't do anything yet. Help with this is greatly
+ appreciated.

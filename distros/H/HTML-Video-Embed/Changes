@@ -1,0 +1,74 @@
+Revision history for perl module HTML::Video::Embed
+
+0.016000 2014-10-30
+    - Added secure mode - if in secure mode use https if supported, or return undef if not supported
+    - Added version to modules, and check to not load modules with a missing/mismatched version
+    - Deleted kontraband module as it's gone now
+    - Delete yahoo screen module as it wasn't working properly
+
+0.015003 2014-02-22
+    - Changed github repo url
+
+0.015002 2013-07-29
+    - Reformatted Changes file as per CPAN::Changes::Spec
+    - Changed issue tracker to github
+
+0.015001 2013-07-27
+    - Added github repo to Makefile.PL
+
+0.015000 2013-07-08
+    - Youtube timecode fixed (now uses start query param instead of t)
+
+0.014000 2013-06-25
+    - Youtube uses nocookie site, https & html5
+    - Fullscreen should work properly now
+    - Changed metacafe embed to use iframe
+
+0.013000 2013-04-18
+    - Added support for youtube query timecode, as well as fragment timecode (&t=1h2m3s)
+    - Added support for liveleak ?f=$vid urls (if someone copies the url from the embed code, instead of the page url)
+
+0.012001 2013-04-18
+    (hopefully) fixed regex compile error in perl < 5.12 that was causing test failures. thanks CPAN Testers! :)
+
+0.012 2013-04-17
+    - Added support for youtube timecodes (#t=1h2m3s in url)
+
+0.011 2013-04-10
+    - Fixed regex not matching in some cases where there was extra data on string (eg ebaumsworld has dropped the last / off the url and was no longer matching)
+    - Added support for viemo mobile urls (has a /m before the video id)
+
+0.010 2013-04-01
+    - Fixed missing META.yml
+
+0.009 2013-04-01
+    - Removed video sites no longer avaiable (google, spiked humour, megavideo and yahoo (replaced with yahoo-screen)
+    - Changed embed codes to use iframe (where avaiable) instead of embed
+    - Tided up code
+    - Changed from Moose to Moo
+    - Added t/bin/create_test_html.pl script, will output html test page for visual inspection of functioning embedder
+
+0.008 2012-08-27
+    - Changed to take css class instead of height and width
+    - Added support for screen.yahoo.com
+
+0.007 2012-01-19
+    - Forgot to update MANIFEST to include youtu.be module :/
+
+0.006 2012-01-19
+    - Added support for youtu.be
+
+0.005 2011-08-27
+    - Fixed invalid html on youtube embed
+
+0.004 2011-05-17
+    - Forgot to update MANIFEST to include ebaumsworld module :/
+
+0.003 2011-05-17
+    - Added support for ebaumsworld
+
+0.002 2011-05-15
+    - Fixed pod
+
+0.001 2011-05-15
+    - First version

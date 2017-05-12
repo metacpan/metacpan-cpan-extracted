@@ -1,0 +1,21 @@
+<wmmeta name="ltitle">Standard Generalized Markup Language (SGML)</wmmeta>
+<wmmeta name="stitle">SGML</wmmeta>
+<wmmeta name="author">J&ouml;rn Clausen</wmmeta>
+<wmmeta name="cdate">2001-04-23</wmmeta>
+<wmmeta name="mdate">2001-04-23</wmmeta>
+
+    <ul>
+      <li>
+	<a href="http://www.oasis-open.org/cover/">The XML Cover Pages</a>
+      </li>
+      <li>
+	<a href="http://www-tei.uic.edu/orgs/tei/sgml/teip3sg/index.html">
+	  A Gentle Introduction to SGML</a>
+      </li>
+      <li>
+	<a href="http://www.arbortext.com/data/getting_started_with_SGML/getting_started_with_sgml.html">SGML: Getting Started</a>
+      </li>
+      <li>
+	<a href="http://www.jclark.com/">James Clark's Home Page</a>
+      </li>
+    </ul>

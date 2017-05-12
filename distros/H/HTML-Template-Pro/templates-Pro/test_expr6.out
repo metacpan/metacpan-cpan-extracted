@@ -1,0 +1,18 @@
+<HTML><BODY>
+<H1> test_expr14 (built-in functions) </H1>
+int(5.1)=5
+abs(-2)=2
+abs(-2.0)=2
+defined(0)=1
+length(1)=1
+length('abc')=3
+length('ab\'c')=4
+
+hex(123)=291
+oct(123)=83
+
+allowed by current rules - but should not crash
+int()=0
+oct()=0
+hex()=0
+</body></html>

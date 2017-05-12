@@ -1,0 +1,121 @@
+package HTML::FormHandler::Manual
+# ABSTRACT: index of the manual
+
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+HTML::FormHandler::Manual - index of the manual
+
+=head1 VERSION
+
+version 0.40067
+
+=head1 DESCRIPTION
+
+This is the L<HTML::FormHandler> users manual. HTML::FormHandler is
+an HTML form handling class written in Moose. It provides facilities
+to write classes that represent HTML forms, and retrieves and loads
+data from the database.
+
+=head1 SECTIONS
+
+=head2 L<HTML::FormHandler::Manual::Intro>
+
+Creating FormHandler forms and interfacing them
+with your controllers.
+
+=head2 L<HTML::FormHandler::Manual::Fields>
+
+Organized list of FormHandler fields, with links to specific
+documentation.
+
+=head2 L<HTML::FormHandler::Manual::Defaults>
+
+Description of the various ways of setting defaults.
+
+=head2 L<HTML::FormHandler::Manual::InflationDeflation>
+
+Inflation and deflation of fields
+
+=head2 L<HTML::FormHandler::Manual::Validation>
+
+Validation of fields
+
+=head2 L<HTML::FormHandler::Manual::Errors>
+
+Errors: setting them, getting them.
+
+=head2 L<HTML::FormHandler::Manual::Rendering>
+
+Rendering options, particularly rendering with widgets
+
+=head2 L<HTML::FormHandler::Manual::Database>
+
+Issues and setup for database forms.
+
+=head2 L<HTML::FormHandler::Manual::Tutorial>
+
+Builds on the Catalyst tutorial. Step-by-step guide.
+
+=head2 L<HTML::FormHandler::Manual::Testing>
+
+Test your forms
+
+=head2 L<HTML::FormHandler::Manual::Cookbook>
+
+'Howto' recipes
+
+=head2 L<HTML::FormHandler::Manual::Templates>
+
+Cut-and-paste examples of templates to use with FormHandler
+
+=head2 L<HTML::FormHandler::Manual::Catalyst>
+
+Catalyst specific documentation
+
+=head2 L<HTML::FormHandler::Manual::Reference>
+
+Quick reference of FormHandler interface
+
+=head2 L<HTML::FormHandler::Manual::FromDFV>
+
+Info on converting from Data::FormValidator
+
+=head2 L<HTML::FormHandler::Manual::FromFF>
+
+Info on converting from HTML::FormFu
+
+=head1 SUPPORT
+
+IRC:
+
+   Join #formhandler on irc.perl.org
+
+Mailing list:
+
+  http://groups.google.com/group/formhandler
+
+=head1 AUTHOR
+
+gshank: Gerda Shank <gshank@cpan.org>
+
+=head1 AUTHOR
+
+FormHandler Contributors - see HTML::FormHandler
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Gerda Shank.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

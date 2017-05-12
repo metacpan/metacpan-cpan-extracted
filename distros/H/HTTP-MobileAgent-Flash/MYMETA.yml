@@ -1,0 +1,20 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Base: 0
+  Test::More: 0.32
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.31, CPAN::Meta::Converter version 2.112150'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTTP-MobileAgent-Flash
+requires:
+  Class::Accessor: 0
+  HTTP::MobileAgent: 0
+  perl: 5.008001
+version: 0.03

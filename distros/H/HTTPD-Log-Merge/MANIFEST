@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/HTTPD/Log/Merge.pm
+sample/access_log_1
+sample/access_log_2
+sample/access_log_3
+sample/merged_access_log
+sample/merged_squid_access_log
+sample/squid_access_log_2
+sample/squid_access_log_3
+sample/squid_access_log_1
+t/merge.t
+t/merge_squid.t

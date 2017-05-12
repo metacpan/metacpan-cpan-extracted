@@ -1,0 +1,32 @@
+Revision history for Perl extension Hash::Type.
+
+2.00 
+        - also behaves as an ordered hash (new NEXTKEY implementation)
+        - new methods: values() and each()
+        - nested loops with each()/keys()/values() are now supported
+        - some readability improvements in code
+        - modernized documentation
+
+1.09 29.07.2013
+        - fix rt #87309 : return .. or .. would never reach the "or" part
+
+1.08 05.03.2008
+	- remove {}[]() in _cmpDate
+
+1.07 05.11.2007
+        - fix on tied hash FETCH to be usable as an lvalue
+
+1.06 13.01.2006 internal release
+	- remove HTML markup in _cmpDate
+
+
+1.05 10.05.2005 
+	- better handling of wrong keys (FETCH returns undef, 
+          STORE croaks with an explicit message).
+	- added support for date comparisons in various formats
+	- fixed some details in the pod documentation.
+
+1.00  Mon Oct 11 05:28:15 2004
+	- original version; created by h2xs 1.22 with options
+		-X Hash::Type
+

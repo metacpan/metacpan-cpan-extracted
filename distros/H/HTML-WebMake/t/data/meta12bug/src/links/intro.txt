@@ -1,0 +1,22 @@
+<wmmeta name="ltitle">Literatur und Links</wmmeta>
+<wmmeta name="stitle">Literatur/Links</wmmeta>
+<wmmeta name="author">J&ouml;rn Clausen</wmmeta>
+<wmmeta name="cdate">2001-04-23</wmmeta>
+<wmmeta name="mdate">2001-04-24</wmmeta>
+
+<p>
+  Mit Hilfe der angegebenen B&uuml;cher und Links sollte ein Einstieg in
+  die jeweiligen Vortragsthemen m&ouml;glich sein. Falls jemand ein
+  interessantes Buch oder eine hilfreiche Webseite findet, bitte ich um
+  eine kurze Nachricht.
+</p>
+
+<p>
+  Innerhalb der Technischen Fakult&auml;t sind weitere Materialien im
+  Verzeichnis
+  <blockquote>
+    <code><a href="file:/vol/lehre/Dokumentenverarbeitung/">
+      /vol/lehre/Dokumentenverarbeitung/</a></code>
+  </blockquote>
+  zu finden.
+</p>

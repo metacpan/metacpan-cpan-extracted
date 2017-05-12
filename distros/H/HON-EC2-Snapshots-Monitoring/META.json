@@ -1,0 +1,48 @@
+{
+   "abstract" : "Log file monitoring",
+   "author" : [
+      "William Belle <william.belle@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4216",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HON-EC2-Snapshots-Monitoring",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::All" : "0.86",
+            "Time::Piece" : "1.31"
+         }
+      }
+   },
+   "provides" : {
+      "HON::EC2::Snapshots::Monitoring" : {
+         "file" : "lib/HON/EC2/Snapshots/Monitoring.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/healthonnet/hon-ec2-snapshots-monitoring"
+      }
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

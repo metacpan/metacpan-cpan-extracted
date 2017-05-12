@@ -1,0 +1,5 @@
+Revision history for HTML-EditableTable
+
+0.10    2010-06-28
+        Initial beta module posted to CPAN.  Most of this code has seen heavy internal use but the packaging for a CPAN-worthy module introduced a sizable number of changes to the code.
+

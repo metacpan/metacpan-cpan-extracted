@@ -1,0 +1,29 @@
+---
+abstract: 'Extract links from HTML'
+author:
+  - 'brian d foy <bdfoy@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  Test::More: 0.96
+  Test::Output: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.64
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.86, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-SimpleLinkExtor
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  HTML::LinkExtor: 1.28
+  LWP::UserAgent: 0
+  URI: 1.09
+  URI::file: 0
+resources:
+  repository: https://github.com/briandfoy/html-simplelinkextor
+version: 1.27

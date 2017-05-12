@@ -1,0 +1,25 @@
+<HTML><BODY>
+<H1> test_if2 </H1>
+<tmpl_iF VAR4> <tmpl_var naMe="VAR4"> defined (FALSE)
+<tmpl_else> <tmpl_var naMe="VAR4"> undefined (TRUE)
+</tmpl_if> (if test 1) 
+
+<tMpl_iF VAR2> <tmpl_var naMe="VAR2"> defined (TRUE)
+<tmpl_else> <tmpl_var naMe="VAR2"> undefined (FALSE)
+</tmpl_if>  (if test 2) 
+
+<tmpl_unless VAR1> <tmpl_var naMe="VAR1"> defined (if test 3 level 1) HIDDEN
+<tMpl_iF VAR2> <tmpl_var naMe="VAR2"> defined TRUE HIDDEN
+ (if test 2) </tmpl_if>
+<tmpl_else> defined (if test 3 level 1) VISIBLE
+<tmpl_if NAME="VAR2"> <tmpl_var naMe="VAR2"> VISIBLE (if test 3 level 2)
+<tmpl_if VAR2> <tmpl_var naMe="VAR2"> defined VISIBLE  (if test 3 level 3)
+<tmpl_if VAR4> <tmpl_var naMe="VAR4"> defined (if test 3 level 4 FALSE) HIDDEN
+</tmpl_if> --- visible ---
+ <tmpl_else> <tmpl_var naMe="VAR2"> (if test 3 level 3) HIDDEN
+</tmpl_if> 
+ <tmpl_else> <tmpl_var naMe="VAR2"> (if test 3 level 2) HIDDEN
+</tmpl_if> </tmpl_unless>
+
+<H1> END test_if2 </H1>
+</body></html>

@@ -1,0 +1,227 @@
+=head1 NAME
+
+HTML::Seamstress::Quickstart - A gentle introduction to HTML::Seamstress
+
+=head1 Introduction
+
+This guide is designed to get you started with dynamically generating
+and modifying ("templating") HTML with
+L<HTML::Seamstress|HTML::Seamstress>. 
+
+We will work through several examples, with each one increasing your
+ability to work with Seamstress effectively.
+
+=head2 Sample files 
+
+All the files for the samples are in the directory
+F<lib/HTML/Seamstress/Quickstart>
+
+=head1 Pure TreeBuilder
+
+Welcome to the first example. This is our bare-bones example. Let's
+say we want to dynamically modify the following HTML:
+
+<tt>pod_code 'Quickstart/html/greeting.html'</tt>
+
+Let's not use Seamstress at all in this case. Remember Seamstress just
+makes using L<HTML::Tree|HTML::Tree> more convenient when writing
+software - it is completely optional and totally non-magical. So
+here's the (admittedly verbose) pure TreeBuilder solution:
+
+<tt>pod_code 'Quickstart/greeting-treebuilder.pl'</tt>
+
+There's a convenience function in 
+L<HTML::Element::Library|HTML::Element::Library> which
+makes it easy to replace all the content of an element. This will make
+our script shorter. If we simply use Seamstress, its
+C<new_from_file()> method will bless the
+HTML tree into a class which inherits from HTML::Element::Library,
+making it easy for us to shorten our program. So let's rework the
+example using bare-bones Seamstress.
+
+=head1 Base bones Seamstress rework
+
+Since we used HTML::Seamstress instead of HTML::TreeBuilder, our
+C<$tree> was blessed as an instance of C<HTML::Seamstress>. Since
+C<HTML::Seamstress> inherits from C<HTML::TreeBuilder> and
+C<HTML::Element::Library>, we have a C<$tree> which can use the
+methods of both. 
+
+We will take advantage of the C<replace_content> method in 
+L<HTML::Element::Library|HTML::Element::Library> to shorten our
+program:
+
+<tt>pod_code 'Quickstart/greeting-seamstress-pure.pl'</tt>
+
+Now of course, this program is just itching to not repeat itself, so
+we will clean it up just a tad:
+
+<tt>pod_code 'Quickstart/greeting-seamstress-pure-mapped.pl'</tt>
+
+
+=head1 Abstract the file and our operations on it into a Perl LOOM
+
+Ok sweet, we have a nice tight program. But is this really
+application-level code? As the user of ultra-scaffolded frameworks
+such as L<Class::DBI|Class::DBI> and L<Catalyst|Catalyst>, I can say
+no. Our inline code must
+be much tighter. It must do no more than C<use>, C<new>, and C<operation()>
+whatever C<operation()> may be in this case. 
+
+The key abstraction technique of the uber-modules is a
+package. Normally a package collects together a set of methods. In our
+case, it is collecting together an HTML file and the object-oriented
+operations on it. B<alert, alert: acronym, alert> from this point
+forward, a Perl class 
+abstracting a file and tree operations on the file will be called a
+I<LOOM> - (L)ibrary (O)f (O)bject-oriented (M)ethods for HTML
+files. 
+
+On the whole, there are two ways to build a C<LOOM>. The quick and dirty
+way is to stick a F<.pm> file in the same directory as the html
+file. This is fine for most purposes and is what I like to use.
+
+However in some cases it is not desirable or possible for the 
+HTML and Perl to be in the same directory. This is the non quick and
+dirty approach. There are two ways to be squeaky 
+clean as of this writing:
+
+
+=over
+
+=item 1 Provide an absolute path to the HTML
+
+We will demonstrate this approach
+
+
+=item 2 Inline the HTML
+
+There is no Seamstress API or utility support for this. But it is an
+idea and I just wanted to mention it for completeness. You can create
+a F<.pm> with the HTML along the lines of this.
+
+ package html::hello_world;
+
+ sub new {...}
+
+ sub process {...} 
+
+ __HTML__
+ <html>
+  <head>
+    ...
+  </head>
+  <body>
+    ...
+  </body>
+
+ </html>
+
+And then you could use L<File::Slurp|File::Slurp> to read it in and 
+submit an appropriate C<HTML::Seamstress::new_from_content()> method
+to do the proper blessings.
+
+But I don't like this approach. It makes it hard to stay synchronized
+with the designer as he continually makes updates.
+
+
+=back
+
+
+=head2 Quick and dirty LOOM building: .pm and .html in same directory
+
+We have an C<html::Greeting> module like this:
+
+<tt>pod_code 'Quickstart/html/Greeting.pm'</tt>
+
+which we make nice tight application-level use of like this:
+
+<tt>pod_code 'Quickstart/callGreeting.pl'</tt>
+
+
+
+=head3 Cleaning up our Perl class
+
+We are flowing smoothly now with nice tight code in our
+application. But should we be happy with this module? I see a few
+drawbacks which require improvement:
+
+=over
+
+=item * our file name is given as a relative path name
+
+Relative paths are fine as long as we are certain to start in the same
+directory, but we cannot be sure of that when building applications,
+so we need an absolute path.
+
+=item * we had to manually create this package
+
+=back
+
+Let's fix the first problem first.
+
+=head3 Make path to HTML file absolute
+
+Again, Seamstress just happens to have a subroutine which guesses the
+name of the HTML file associated with a Seamstress-style Perl module.
+It is called C<html()> and here we see it in use to give us the path
+to our file in absolute fashion:
+
+<tt>pod_code 'Quickstart/html/GreetingAbs.pm'</tt>
+
+and main code body is still the same:
+
+<tt>pod_code 'Quickstart/callGreetingAbs.pl'</tt>
+
+
+=head2 Slow and clean LOOM building: .pm and .html in different directory
+
+Here we need to slip a class in between C<HTML::Seamstress> and our
+LOOM:
+
+<tt>pod_code 'Quickstart/lib/HTML/Seamstress/Base.pm'</tt>
+
+This class will make it easy to track down the directory of our HTML
+files. 
+
+The LOOM class inherits from it and makes use of it in its
+constructor:
+
+<tt>pod_code 'Quickstart/lib/html/Greeting.pm'</tt>
+
+And out main body code is just as tight. We have a few statements to
+make sure to use the right version of C<html::Greeting>, but other
+than that, no changes:
+
+<tt>pod_code 'Quickstart/slowClean.pl'</tt>
+
+
+=head1 Automated creation of Seamstress-style packages
+
+Instead of manually creating or copying and pasting packages to create
+Seamstress-style packages, the F<spkg.pl> script in the Seamstress
+was off use. It is designed to help build the slow-clean LOOMs not the
+quick-and-dirty ones.... it really should be updated to support either
+usage mode.
+
+=head1 Use subroutines and Params::Validate to "componentize" your operations
+
+The final phase in Seamstress best practices is to break each tree
+manipulation down into a separate subroutine whose parameters are
+specified by L<Params::Validate|Params::Validate>. 
+
+If you do this, then you can control the dynamic HTML generation by
+parameterizing your subs properly. This advice will make more
+sense as you do more complex things with Seamstress
+
+Now you're ready for the big time! Have fun!
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2002-2006 by Terrence Brannon.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=cut

@@ -1,0 +1,222 @@
+HEADER    DE NOVO PROTEIN                         25-FEB-02   1L2Y              
+TITLE     NMR STRUCTURE OF TRP-CAGE MINIPROTEIN CONSTRUCT TC5B                  
+COMPND    MOL_ID: 1;                                                            
+COMPND   2 MOLECULE: TC5B;                                                      
+COMPND   3 CHAIN: A;                                                            
+COMPND   4 ENGINEERED: YES                                                      
+SOURCE    MOL_ID: 1;                                                            
+SOURCE   2 SYNTHETIC: YES;                                                      
+SOURCE   3 OTHER_DETAILS: THE PROTEIN WAS SYNTHESIZED USING STANDARD            
+SOURCE   4 FMOC SOLID-PHASE SYNTHESIS METHODS ON AN APPLIED                     
+SOURCE   5 BIOSYSTEMS 433A PEPTIDE SYNTHESIZER.                                 
+KEYWDS    MINIPROTEIN, TWO-STATE FOLDING, TRP-CAGE, DE NOVO PROTEIN             
+EXPDTA    SOLUTION NMR                                                          
+NUMMDL    38                                                                    
+AUTHOR    J.W.NEIDIGH,R.M.FESINMEYER,N.H.ANDERSEN                               
+REVDAT   2   24-FEB-09 1L2Y    1       VERSN                                    
+REVDAT   1   29-MAY-02 1L2Y    0                                                
+JRNL        AUTH   J.W.NEIDIGH,R.M.FESINMEYER,N.H.ANDERSEN                      
+JRNL        TITL   DESIGNING A 20-RESIDUE PROTEIN.                              
+JRNL        REF    NAT.STRUCT.BIOL.              V.   9   425 2002              
+JRNL        REFN                   ISSN 1072-8368                               
+JRNL        PMID   11979279                                                     
+JRNL        DOI    10.1038/NSB798                                               
+REMARK   1                                                                      
+REMARK   2                                                                      
+REMARK   2 RESOLUTION. NOT APPLICABLE.                                          
+REMARK   3                                                                      
+REMARK   3 REFINEMENT.                                                          
+REMARK   3   PROGRAM     : AMBER 6.0                                            
+REMARK   3   AUTHORS     : KOLLMAN                                              
+REMARK   3                                                                      
+REMARK   3  OTHER REFINEMENT REMARKS: 169 NOE DISTANCE CONSTRAINTS WERE         
+REMARK   3  EMPLOYED. CNS WAS EMPLOYED FOR S.A., FOLLOWED BY MINIMIZATION       
+REMARK   3  USING THE SANDER MODULE OF AMBER.                                   
+REMARK   4                                                                      
+REMARK   4 1L2Y COMPLIES WITH FORMAT V. 3.15, 01-DEC-08                         
+REMARK 100                                                                      
+REMARK 100 THIS ENTRY HAS BEEN PROCESSED BY RCSB ON 28-FEB-02.                  
+REMARK 100 THE RCSB ID CODE IS RCSB015598.                                      
+REMARK 210                                                                      
+REMARK 210 EXPERIMENTAL DETAILS                                                 
+REMARK 210  EXPERIMENT TYPE                : NMR                                
+REMARK 210  TEMPERATURE           (KELVIN) : 282                                
+REMARK 210  PH                             : 7                                  
+REMARK 210  IONIC STRENGTH                 : NULL                               
+REMARK 210  PRESSURE                       : AMBIENT                            
+REMARK 210  SAMPLE CONTENTS                : 1.0-1.8 MM TC5B                    
+REMARK 210                                                                      
+REMARK 210  NMR EXPERIMENTS CONDUCTED      : 2D NOESY                           
+REMARK 210  SPECTROMETER FIELD STRENGTH    : 500 MHZ                            
+REMARK 210  SPECTROMETER MODEL             : DRX                                
+REMARK 210  SPECTROMETER MANUFACTURER      : BRUKER                             
+REMARK 210                                                                      
+REMARK 210  STRUCTURE DETERMINATION.                                            
+REMARK 210   SOFTWARE USED                 : XWINNMR 2.6, FELIX 95, CNS         
+REMARK 210                                   1.0, AMBER 6.0                     
+REMARK 210   METHOD USED                   : SIMULATED ANNEALING FROM           
+REMARK 210                                   RANDOM STRUCTURES FOLLOWED BY      
+REMARK 210                                   STEEPEST DESCENT MINIMIZATION      
+REMARK 210                                                                      
+REMARK 210 CONFORMERS, NUMBER CALCULATED   : 50                                 
+REMARK 210 CONFORMERS, NUMBER SUBMITTED    : 38                                 
+REMARK 210 CONFORMERS, SELECTION CRITERIA  : STRUCTURES WITH ACCEPTABLE         
+REMARK 210                                   COVALENT GEOMETRY, STRUCTURES      
+REMARK 210                                   WITH THE LEAST RESTRAINT           
+REMARK 210                                   VIOLATIONS                         
+REMARK 210                                                                      
+REMARK 210 BEST REPRESENTATIVE CONFORMER IN THIS ENSEMBLE : NULL                
+REMARK 210                                                                      
+REMARK 210 REMARK: THIS STRUCTURE WAS DETERMINED USING STANDARD 2D              
+REMARK 210  HOMONUCLEAR TECHNIQUES.                                             
+REMARK 215                                                                      
+REMARK 215 NMR STUDY                                                            
+REMARK 215 THE COORDINATES IN THIS ENTRY WERE GENERATED FROM SOLUTION           
+REMARK 215 NMR DATA.  PROTEIN DATA BANK CONVENTIONS REQUIRE THAT                
+REMARK 215 CRYST1 AND SCALE RECORDS BE INCLUDED, BUT THE VALUES ON              
+REMARK 215 THESE RECORDS ARE MEANINGLESS.                                       
+REMARK 500                                                                      
+REMARK 500 GEOMETRY AND STEREOCHEMISTRY                                         
+REMARK 500 SUBTOPIC: COVALENT BOND ANGLES                                       
+REMARK 500                                                                      
+REMARK 500 THE STEREOCHEMICAL PARAMETERS OF THE FOLLOWING RESIDUES              
+REMARK 500 HAVE VALUES WHICH DEVIATE FROM EXPECTED VALUES BY MORE               
+REMARK 500 THAN 6*RMSD (M=MODEL NUMBER; RES=RESIDUE NAME; C=CHAIN               
+REMARK 500 IDENTIFIER; SSEQ=SEQUENCE NUMBER; I=INSERTION CODE).                 
+REMARK 500                                                                      
+REMARK 500 STANDARD TABLE:                                                      
+REMARK 500 FORMAT: (10X,I3,1X,A3,1X,A1,I4,A1,3(1X,A4,2X),12X,F5.1)              
+REMARK 500                                                                      
+REMARK 500 EXPECTED VALUES PROTEIN: ENGH AND HUBER, 1999                        
+REMARK 500 EXPECTED VALUES NUCLEIC ACID: CLOWNEY ET AL 1996                     
+REMARK 500                                                                      
+REMARK 500  M RES CSSEQI ATM1   ATM2   ATM3                                     
+REMARK 500  2 ARG A  16   NE  -  CZ  -  NH1 ANGL. DEV. =   3.6 DEGREES          
+REMARK 500 13 ARG A  16   NE  -  CZ  -  NH1 ANGL. DEV. =   4.7 DEGREES          
+REMARK 500                                                                      
+REMARK 500 REMARK: NULL                                                         
+REMARK 500                                                                      
+REMARK 500 GEOMETRY AND STEREOCHEMISTRY                                         
+REMARK 500 SUBTOPIC: TORSION ANGLES                                             
+REMARK 500                                                                      
+REMARK 500 TORSION ANGLES OUTSIDE THE EXPECTED RAMACHANDRAN REGIONS:            
+REMARK 500 (M=MODEL NUMBER; RES=RESIDUE NAME; C=CHAIN IDENTIFIER;               
+REMARK 500 SSEQ=SEQUENCE NUMBER; I=INSERTION CODE).                             
+REMARK 500                                                                      
+REMARK 500 STANDARD TABLE:                                                      
+REMARK 500 FORMAT:(10X,I3,1X,A3,1X,A1,I4,A1,4X,F7.2,3X,F7.2)                    
+REMARK 500                                                                      
+REMARK 500 EXPECTED VALUES: GJ KLEYWEGT AND TA JONES (1996). PHI/PSI-           
+REMARK 500 CHOLOGY: RAMACHANDRAN REVISITED. STRUCTURE 4, 1395 - 1400            
+REMARK 500                                                                      
+REMARK 500  M RES CSSEQI        PSI       PHI                                   
+REMARK 500  5 LEU A   2      -34.83     72.95                                   
+REMARK 500  6 LEU A   2      -33.93     63.45                                   
+REMARK 500  9 LEU A   2      -18.34     57.13                                   
+REMARK 500 13 LEU A   2      -33.72     66.32                                   
+REMARK 500 18 LEU A   2       -3.11     60.50                                   
+REMARK 500 19 LEU A   2       -1.16     58.98                                   
+REMARK 500 20 LEU A   2      -32.96     68.39                                   
+REMARK 500 23 LEU A   2      -47.12     63.92                                   
+REMARK 500 28 LEU A   2       -2.46     61.26                                   
+REMARK 500 29 LEU A   2      -42.02     66.43                                   
+REMARK 500 34 PRO A  12       11.15    -66.86                                   
+REMARK 500                                                                      
+REMARK 500 REMARK: NULL                                                         
+REMARK 900                                                                      
+REMARK 900 RELATED ENTRIES                                                      
+REMARK 900 RELATED ID: 5292   RELATED DB: BMRB                                  
+REMARK 900 BMRB 5292 IS CHEMICAL SHIFTS FOR TC5B IN BUFFER AND BUFFER           
+REMARK 900 CONTAINING 30 VOL-% TFE.                                             
+REMARK 900 RELATED ID: 1JRJ   RELATED DB: PDB                                   
+REMARK 900 1JRJ IS AN ANALAGOUS C-TERMINAL STRUCTURE.                           
+DBREF  1L2Y A    1    20  PDB    1L2Y     1L2Y             1     20             
+SEQRES   1 A   20  ASN LEU TYR ILE GLN TRP LEU LYS ASP GLY GLY PRO SER          
+SEQRES   2 A   20  SER GLY ARG PRO PRO PRO SER                                  
+HELIX    1   1 ASN A    1  ASP A    9  1                                   9    
+HELIX    2   2 GLY A   10  GLY A   15  5                                   6    
+CRYST1    1.000    1.000    1.000  90.00  90.00  90.00 P 1           1          
+ORIGX1      1.000000  0.000000  0.000000        0.00000                         
+ORIGX2      0.000000  1.000000  0.000000        0.00000                         
+ORIGX3      0.000000  0.000000  1.000000        0.00000                         
+SCALE1      1.000000  0.000000  0.000000        0.00000                         
+SCALE2      0.000000  1.000000  0.000000        0.00000                         
+SCALE3      0.000000  0.000000  1.000000        0.00000                         
+MODEL        1                                                                  
+ATOM      1  N   ASN     1      -8.901   4.127  -0.555  1.00  0.00           N 1 
+ATOM      2  CA  ASN A   1      -8.608   3.135  -1.618  1.00  0.00           C  
+ATOM      3  C   ASN A   1      -7.117   2.964  -1.897  1.00  0.00           C  
+ATOM      4  O   ASN A   1      -6.634   1.849  -1.758  1.00  0.00           O  
+ATOM      5  CB  ASN A   1      -9.437   3.396  -2.889  1.00  0.00           C  
+ATOM      6  CG  ASN A   1     -10.915   3.130  -2.611  1.00  0.00           C  
+ATOM      7  OD1 ASN A   1     -11.269   2.700  -1.524  1.00  0.00           O  
+ATOM      8  ND2 ASN A   1     -11.806   3.406  -3.543  1.00  0.00           N  
+ATOM      9  H1  ASN A   1      -8.330   3.957   0.261  1.00  0.00           H  
+ATOM     10  H2  ASN A   1      -8.740   5.068  -0.889  1.00  0.00           H  
+ATOM     11  H3  ASN A   1      -9.877   4.041  -0.293  1.00  0.00           H  
+ATOM     12  HA  ASN A   1      -8.930   2.162  -1.239  1.00  0.00           H  
+ATOM     13  HB2 ASN A   1      -9.310   4.417  -3.193  1.00  0.00           H  
+ATOM     14  HB3 ASN A   1      -9.108   2.719  -3.679  1.00  0.00           H  
+ATOM     15 HD21 ASN A   1     -11.572   3.791  -4.444  1.00  0.00           H  
+ATOM     16 HD22 ASN A   1     -12.757   3.183  -3.294  1.00  0.00           H  
+ATOM     17  N   LEU A   2      -6.379   4.031  -2.228  1.00  0.00           N  
+ATOM     18  CA  LEU A   2      -4.923   4.002  -2.452  1.00  0.00           C  
+ATOM     19  C   LEU A   2      -4.136   3.187  -1.404  1.00  0.00           C  
+ATOM     20  O   LEU A   2      -3.391   2.274  -1.760  1.00  0.00           O  
+ATOM     21  CB  LEU A   2      -4.411   5.450  -2.619  1.00  0.00           C  
+ATOM     22  CG  LEU A   2      -4.795   6.450  -1.495  1.00  0.00           C  
+ATOM     23  CD1 LEU A   2      -3.612   6.803  -0.599  1.00  0.00           C  
+ATOM     24  CD2 LEU A   2      -5.351   7.748  -2.084  1.00  0.00           C  
+ATOM     25  H   LEU A   2      -6.821   4.923  -2.394  1.00  0.00           H  
+ATOM     26  HA  LEU A   2      -4.750   3.494  -3.403  1.00  0.00           H  
+ATOM     27  HB2 LEU A   2      -3.340   5.414  -2.672  1.00  0.00           H  
+ATOM     28  HB3 LEU A   2      -4.813   5.817  -3.564  1.00  0.00           H  
+ATOM     29  HG  LEU A   2      -5.568   6.022  -0.858  1.00  0.00           H  
+ATOM     30 HD11 LEU A   2      -3.207   5.905  -0.146  1.00  0.00           H  
+ATOM     31 HD12 LEU A   2      -2.841   7.304  -1.183  1.00  0.00           H  
+ATOM     32 HD13 LEU A   2      -3.929   7.477   0.197  1.00  0.00           H  
+ATOM     33 HD21 LEU A   2      -4.607   8.209  -2.736  1.00  0.00           H  
+ATOM     34 HD22 LEU A   2      -6.255   7.544  -2.657  1.00  0.00           H  
+ATOM     35 HD23 LEU A   2      -5.592   8.445  -1.281  1.00  0.00           H  
+ATOM     36  N   TYR A   3      -4.354   3.455  -0.111  1.00  0.00           N  
+TER      36      SER A  20                                                      
+ENDMDL                                                                          
+MODEL        2                                                                  
+ATOM      1  N   ASN A   1      -6.919   6.901   0.917  1.00  0.00           N  
+ATOM      2  CA  ASN A   1      -7.682   6.025  -0.010  1.00  0.00           Hg 
+ATOM      3  C   ASN A   1      -6.840   4.889  -0.589  1.00  0.00           C  
+ATOM      4  O   ASN A   1      -7.106   3.741  -0.253  1.00  0.00           O  
+ATOM      5  CB  ASN A   1      -8.428   6.847  -1.072  1.00  0.00           C  
+ATOM      6  CG  ASN A   1      -9.504   7.659  -0.362  1.00  0.00           C  
+ATOM      7  OD1 ASN A   1      -9.180   8.568   0.382  1.00  0.00           O  
+ATOM      8  ND2 ASN A   1     -10.768   7.290  -0.468  1.00  0.00           N  
+ATOM      9  H1  ASN A   1      -6.513   6.358   1.667  1.00  0.00           H  
+ATOM     10  H2  ASN A   1      -6.191   7.398   0.422  1.00  0.00           H  
+ATOM     11  H3  ASN A   1      -7.553   7.592   1.308  1.00  0.00           H  
+ATOM     12  HA  ASN A   1      -8.451   5.523   0.581  1.00  0.00           H  
+ATOM     13  HB2 ASN A   1      -7.743   7.506  -1.571  1.00  0.00           H  
+ATOM     14  HB3 ASN A   1      -8.886   6.189  -1.811  1.00  0.00           H  
+ATOM     15 HD21 ASN A   1     -11.078   6.519  -1.037  1.00  0.00           H  
+ATOM     16 HD22 ASN A   1     -11.417   7.848   0.064  1.00  0.00           H  
+ATOM     17  N   LEU A   2      -5.819   5.175  -1.412  1.00  0.00           N  
+ATOM     18  CA  LEU A   2      -5.020   4.162  -2.130  1.00  0.00           C  
+ATOM     19  C   LEU A   2      -4.244   3.179  -1.224  1.00  0.00           C  
+ATOM     20  O   LEU A   2      -3.761   2.148  -1.693  1.00  0.00           O  
+ATOM     21  CB  LEU A   2      -4.073   4.863  -3.128  1.00  0.00           C  
+ATOM     22  CG  LEU A   2      -4.831   5.608  -4.250  1.00  0.00           C  
+ATOM     23  CD1 LEU A   2      -5.010   7.109  -3.963  1.00  0.00           C  
+ATOM     24  CD2 LEU A   2      -4.110   5.465  -5.592  1.00  0.00           C  
+ATOM     25  H   LEU A   2      -5.631   6.133  -1.665  1.00  0.00           H  
+ATOM     26  HA  LEU A   2      -5.709   3.545  -2.710  1.00  0.00           H  
+ATOM     27  HB2 LEU A   2      -3.472   5.572  -2.591  1.00  0.00           H  
+ATOM     28  HB3 LEU A   2      -3.451   4.089  -3.583  1.00  0.00           H  
+ATOM     29  HG  LEU A   2      -5.820   5.160  -4.359  1.00  0.00           H  
+ATOM     30 HD11 LEU A   2      -5.173   7.303  -2.907  1.00  0.00           H  
+ATOM     31 HD12 LEU A   2      -4.124   7.663  -4.273  1.00  0.00           H  
+ATOM     32 HD13 LEU A   2      -5.867   7.480  -4.526  1.00  0.00           H  
+ATOM     33 HD21 LEU A   2      -3.114   5.904  -5.535  1.00  0.00           H  
+ATOM     34 HD22 LEU A   2      -4.023   4.410  -5.855  1.00  0.00           H  
+ATOM     35 HD23 LEU A   2      -4.683   5.969  -6.371  1.00  0.00           H  
+ATOM     36  N   TYR A   3      -4.181   3.456   0.082  1.00  0.00           N  
+TER      36      SER A  20                                                      
+ENDMDL                                                                          

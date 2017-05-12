@@ -1,0 +1,75 @@
+0.13 2010-12-03  IKEBE Tomohiro  <ikebe@livedoor.jp>
+
+        * use parent.
+	* modern layout.
+
+2003-10-08  IKEBE Tomohiro  <ikebe@edge.co.jp>
+
+	* added valid XML(XHTML) support.
+	(Thanks to Kensaku Fujiwara)
+
+2003-05-29  IKEBE Tomohiro  <ikebe@edge.co.jp>
+
+	* support boolean attributes. 
+	(Thanks to Tatsuhiko Miyagawa <miyagawa@buknews.net)
+
+2002-09-18  IKEBE Tomohiro  <ikebe@edge.co.jp>
+
+	* 0.09
+	* now accept paramable objects. 
+	(Thanks to Hiroyuki Kobayasi <kobayasi@cpan.org>)
+	* fixed docs.
+	* 0.10
+	* added sticky_keys option
+	* rewrite all test codes by Test::More
+
+2002-05-01  IKEBE Tomohiro  <ikebe@edge.co.jp>
+
+	* 0.08
+	* keep comment and declaration. 
+
+2002-01-21  IKEBE Tomohiro  <ikebe@edge.co.jp>
+
+	* 0.07
+	* default behavior, keep_original => 1.
+	* think about backward compat.
+
+2002-01-18  IKEBE Tomohiro  <ikebe@edge.co.jp>
+
+	* 0.06
+	* [API change]
+	override option was obsolete. 
+	instead, keep_original option is available.
+	(Thanks to Tatsuhiko Miyagawa <miyagawa@bulknews.net>)
+
+2001-10-19  IKEBE Tomohiro  <ikebe@edge.co.jp>
+
+	* 0.05
+	* fixed escape HTML problem.
+	* save order of attributes.
+
+2001-10-18  IKEBE Tomohiro  <ikebe@edge.co.jp>
+
+	* 0.04
+	* fixed override, when original URI has QUERY_STRING which has same key 
+	(Thanks to Tatsuhiko Miyagawa <miyagawa@bulknews.net>)
+	* fixed URI scheme handling problem.
+	* add arrayref parse.
+
+2001-10-17  IKEBE Tomohiro  <ikebe@edge.co.jp>
+
+	* 0.03
+	* use Test::Harness.
+	* add regexp support.
+	
+2001-10-17  IKEBE Tomohiro  <ikebe@edge.co.jp>
+
+	* 0.02
+	* add test code.
+
+	
+
+
+
+
+

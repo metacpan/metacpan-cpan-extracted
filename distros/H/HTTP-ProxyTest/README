@@ -1,0 +1,34 @@
+HTTP-ProxyTest version 0.11
+===========================
+
+Robots that send comment spam are often hidden behind anonymous open
+proxy servers. You can use HTTP::ProxyTest to look for open proxies
+on-the-fly and prevent such spam robots from submitting their crap.
+The module is particularly useful if you don't want to bother your
+web site visitors with CAPTCHAs etc.
+
+HTTP::ProxyTest tests certain ports of REMOTE_ADDR that are often
+used for anonymous open proxies, and denies access if an open proxy
+is found, i.e. it responds with status "403 Forbidden" and exits.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires the libwww-perl set of modules. It's strongly
+recommended that the Nmap security scanner is available.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010-2011 by Gunnar Hjalmarsson
+
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

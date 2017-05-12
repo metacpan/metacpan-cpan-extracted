@@ -1,0 +1,96 @@
+#!/usr/bin/perl 
+#
+# Module : dxspider
+# Purpose: Parse dxspider data
+# Author : B.James
+# Date   : 2012/04/03
+# Version: $Revision: 1.7 $
+#
+
+=pod
+=head1 NAME
+
+dxspider - Parse dxspider data, and also reads mail and forwards to an email mailbox
+
+=head1 SYNOPSIS
+
+dxspider
+
+=head1 DESCRIPTION
+
+This is an example of some of the functionality of Ham::Packet::DXSpider
+
+=head1 AUTHOR
+
+Bruce James (custard@cpan.org)
+
+=cut
+
+package dxspider;
+use strict;
+use warnings;
+use Ham::Packet::DXSpider;
+use Moose;
+
+# Example server: gb7djk.dxcluster.net
+use constant DXCLUSTER_ADDR => 'dx_cluster_server';
+use constant DXCLUSTER_PORT => 7300;
+use constant DXCLUSTER_USER => 'your_callsign';
+
+
+sub privateMessageHandler {
+    my %args=@_;
+        my $from=       $args{from}     || '';
+        my $to= $args{to}               || '';
+        my $body=       $args{body}     || 'no message';
+        my $subject=    $args{subject}  || 'no subject';
+        my $time=       $args{time}     || gmtime(time());
+
+    if ($subject=~/^LOG:/i) {
+        # GB4HCL Log message
+        print( "SUBJECT: $subject\n" );
+        print( "BODY: $body\n" );
+    }
+}
+
+
+sub run {
+    my $this=shift;
+    my %args;
+    my $rc=0;
+    
+    require IO::Socket::INET;
+
+    my $sock = IO::Socket::INET->new(
+            PeerAddr => DXCLUSTER_ADDR,
+            PeerPort => DXCLUSTER_PORT
+    );
+
+    die( "Cannot open socket" ) unless $sock;
+
+    my $dxs=new Ham::Packet::DXSpider( callsign => DXCLUSTER_USER, handle => $sock );
+    if ($dxs) {
+        print( "Connected to ".DXCLUSTER_ADDR.":".DXCLUSTER_PORT."\n" );
+        print( "Add stats handler...\n" );
+        $dxs->addStatsHandler(      \&Ham::Packet::DXSpider::defaultStatsHandler  );
+        print( "Add DX message handler...\n" );
+        $dxs->addDXMessageHandler(      \&Ham::Packet::DXSpider::defaultDXMessageHandler );
+        print( "Add private handler...\n" );
+        $dxs->addPrivateMessageHandler( \&privateMessageHandler ) ;
+
+#        print( "Send test private message...\n" );
+#        $dxs->sendPrivate( 'recipient_callsign', "A Test Mesage" );
+
+        print( "Start DXSpider...\n" );
+        $dxs->start();
+        print( "Ok...\n" );
+    } else {
+        warn( "Failed to connect\n" );
+        $rc=1;
+    }
+
+    return $rc;
+}
+
+my $main=new dxspider();
+exit $main->run( @ARGV );

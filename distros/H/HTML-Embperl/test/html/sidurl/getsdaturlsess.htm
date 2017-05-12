@@ -1,0 +1,38 @@
+<html>
+<head>
+<title>Tests for Embperl - Get State Session Data</title>
+</head>
+
+
+<body>
+
+
+	fdat:<br>
+	[- @ks = sort keys %fdat -]
+
+	<table>
+		<tr>
+			<td>[+ $ks[$row] +]</td><td>[+ $fdat{$ks[$row] || ''} +]</td>
+		</tr>
+	</table>
+
+	sdat:<br> 
+	[- $off = 0 ; $off-- if ($HTML::Embperl::SessionMgnt == 2 && !defined (tied (%sdat) -> getid)) ; -]
+	[- @ks = grep (!/^_/, sort (keys %sdat)) ; $num = keys (%sdat) - $#ks - 1 + $off -]
+
+	<table>
+		<tr>
+			<td>[+ $ks[$row] +]</td><td>[+ $sdat{$ks[$row] || ''} +]</td>
+		</tr>
+	</table>
+
+	[+ $num > 0?"ok (num=$num)":"Not a session hash (num=$num)" +]<p>
+
+	<a href="cont.htm">continue</a>
+	<a href="cont.htm?q=1">continue</a>
+	<a href="cont.htm?q=1&b=2">continue</a>
+	<form action="cont.htm">
+	</form>
+
+</body>
+</html>

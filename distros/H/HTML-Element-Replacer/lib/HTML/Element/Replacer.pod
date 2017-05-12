@@ -1,0 +1,81 @@
+=head1 NAME
+
+  HTML::Element::Replacer - Simplify the HTML::Element clone() - push_content() ritual
+
+=head1 SYNOPSIS
+
+  use HTML::Element::Replacer;
+
+  {
+   my $replacer = HTML::Element::Replacer->new(tree => $tree, look_down => [ scla => 'mid' ]);
+ 
+   for my $data (@data) {
+     $replacer->push_clone->defmap(attr_name => $data); # clone and push onto @temp_list
+   }
+  }
+  # by default Replacer replaces... so it removes the element you were push_clone()ing
+ 
+ 
+=head1 DESCRIPTION
+
+Let's say you have this HTML:
+
+ <table>
+
+   <tr scla="top"/> 
+
+   <tr scla="mid"> 
+     <td kmap="brand"> blah </td>
+     <td kmap="age"> blah </td>
+   </tr>
+
+   <tr scla="bot"/> 
+
+ </table>
+
+Now let's say you have 5 data rows that you wish to display using the middle C<tr> as your sample.
+The pure HTML::Tree way to do this would be:
+
+ my $sample_tr = $tree->look_down(scla => 'mid');
+
+ my @c;
+ for my $data (@data) {
+    my $c = $sample_tr->clone; 
+    $c->defmap(kmap => $data);
+    push @c, $c;
+ }
+
+ $sample->replace_with(@c);
+
+We did cheat a bit by using C<defmap()> from L<HTML::Element::Library|HTML::Element::Library>.
+Now, with this class, we can do this:
+
+ { 	
+    my $replacer = HTML::Element::Replacer->new(look_down => [ scla => 'mid' ]);
+ 
+    for my $data (@data) {
+	my $clone = $replacer->push_clone->defmap(kmap => $data); # clone and push onto @temp_list
+    }
+
+ } # replacer goes out of scope and then replaces sample_tr
+
+
+=head1 AUTHOR
+
+Maintained by Mike Accardo since 2014.
+
+Orignally written by Terrence Brannon, C<< <tbone at cpan.org> >>
+
+Many thanks to Dave Rolsky in #moose on irc.perl.org
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2009 Terrence Brannon, Copyright 2014 by Mike Accardo, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+=cut
+
+1; # End of HTML::Element::Replacer

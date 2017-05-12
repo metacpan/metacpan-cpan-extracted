@@ -1,0 +1,47 @@
+---
+abstract: 'handle many HTTP response possibilities'
+author:
+  - 'Alex Peters <lxp@cpan.org>'
+build_requires:
+  File::Temp: 0
+  HTTP::Response: 0
+  Module::Loaded: 0
+  Scalar::Util: 0
+  Test::Exception: 0
+  Test::More: 0
+  Test::Routine: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTTP-Response-Switch
+no_index:
+  directory:
+    - t
+provides:
+  HTTP::Response::Switch:
+    file: lib/HTTP/Response/Switch.pm
+    version: v1.1.1
+  HTTP::Response::Switch::Handler:
+    file: lib/HTTP/Response/Switch/Handler.pm
+    version: v1.1.1
+  HTTP::Response::Switch::HandlerDeclinedResponse:
+    file: lib/HTTP/Response/Switch/HandlerDeclinedResponse.pm
+    version: v1.1.1
+requires:
+  Module::Find: 0
+  Module::Load: 0
+  Moose: 0
+  Throwable: 0.200001
+  TryCatch: 1.001000
+  namespace::autoclean: 0
+  perl: 5.006
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=HTTP-Response-Switch
+  homepage: https://metacpan.org/release/HTTP-Response-Switch
+  repository: git://github.com/lx/perl5-HTTP-Response-Switch
+version: 1.1.1

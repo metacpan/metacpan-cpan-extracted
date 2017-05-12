@@ -1,0 +1,39 @@
+Changelog file for HTML::DBTable
+================================
+
+Version 00.05 (2004-01-11)
+==========================
+- Add public method strip_tablename that set a boolean param that set fields
+  name with tablename if param is false. Default is to strip table name.
+- Add public method begin_form and end_form that set two boolean param passed
+  to template (form.begin and form.end) that can be use to add the html FORM
+  start and end tag
+- Add public methods cb_rows_pre, cb_rows_post, cb_row_pre,cd_row_post to 
+  set a Callback object called respectively before rows, after rows, before
+  every row and after every row. The return of these callbacks is used to 
+  set template parm rows.pre, rows.post, row.pre and row.post.
+
+Version 00.04 (2004-01-08)
+==========================
+- Missing DBIx_DBSchema_with_enum.patch.
+- Add notes about other problem during DBIx::DBSchema installation.
+- Separate DBSchema unpatched tests from DBSchema patched tests that runs
+  only if you have installed DBIx::DBSchema patch.
+
+Version 00.03 (2004-01-08)
+==========================
+- Add public method values to set field values.
+- Add DBIx_DBSchema_with_enum.patch that is the patch for DBIx::DBSchema
+  support of "ENUM" MySQL data type.
+- Add an INSTALL file whith information on how and why apply the DBIx::DBSchema
+  patch
+
+Version 00.02 (2004-01-07)
+==========================
+- Add public method 'template' which set/return a string template. If 
+unitialized or set to undef, it returns the default template string.
+- Add a (very poor) pod file.
+
+Version 00.01 (2003-12-23)
+==========================
+- First pre-release

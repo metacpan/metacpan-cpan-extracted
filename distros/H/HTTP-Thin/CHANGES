@@ -1,0 +1,118 @@
+==================================================
+Changes from 2013-04-21 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.005 at 2014-04-21 18:31:36 +0000
+------------------------------------------
+
+  Change: ae58413248b73a78b2bf1fc26582975aa4f25e9c
+  Author: Chris Prather <chris@prather.org>
+  Date : 2014-04-21 13:31:36 +0000
+
+    clean up dzil related fluffery 
+
+  Change: ad9294d58cdedf4ccce9c26a29fa702b741b0f77
+  Author: Chris Prather <chris@prather.org>
+  Date : 2014-04-21 14:06:44 +0000
+
+    Merge pull request #3 from bluefeet/master
+
+    Remove Perl 5.12 dependency. 
+
+  Change: 7241a3681c881cc392f3e9ebc520309a97b4c830
+  Author: Aran Deltac <aran@ziprecruiter.com>
+  Date : 2014-04-21 11:00:37 +0000
+
+    Remove Perl 5.12 dependency. 
+
+  Change: 3131e6945ad12272254e447e2aea934690128d33
+  Author: Chris Prather <chris@prather.org>
+  Date : 2013-06-14 01:26:21 +0000
+
+    create META.json file 
+
+  Change: 7914e5758062b822b4d866b3b6da34032f845147
+  Author: Chris Prather <chris@prather.org>
+  Date : 2013-06-14 01:26:08 +0000
+
+    grab github metadata 
+
+  Change: ebe7640033f97f153efc49e9dcde8de87f10569c
+  Author: Chris Prather <chris@prather.org>
+  Date : 2013-06-14 01:25:50 +0000
+
+    auto bump version 
+
+  Change: 010891a948a44d8f18202feac29364e9ab0a5903
+  Author: Chris Prather <chris@prather.org>
+  Date : 2013-06-14 01:09:06 +0000
+
+    generate changes and contributors section 
+
+------------------------------------------
+version 0.003 at 2013-06-14 00:29:40 +0000
+------------------------------------------
+
+  Change: eeccb0c9f859f706672fc2df172afe99b2870024
+  Author: Chris Prather <chris@prather.org>
+  Date : 2013-06-13 20:29:40 +0000
+
+    v0.003 
+
+  Change: 111d5ead02c219e758a2a71e83a161abd813b227
+  Author: Chris Prather <chris@prather.org>
+  Date : 2013-06-13 06:11:37 +0000
+
+    Merge pull request #1 from miyagawa/more-tiny
+
+    Misc fix ported from Plack 
+
+  Change: 39ed4dba9806e8820e3f5ea56add63e4feac776f
+  Author: Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+  Date : 2013-06-12 22:33:23 +0000
+
+    check length of the content since content=0 is valid 
+
+  Change: 75e3d1fcc6feacf8a9c3a4dd6f6246892976573b
+  Author: Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+  Date : 2013-06-12 22:33:10 +0000
+
+    Fix synopsis 
+
+  Change: a0f7157424f63841dbd3acf84ae01ed9ef2c83ea
+  Author: Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+  Date : 2013-06-12 22:32:10 +0000
+
+    Flatten HTTP::Tiny response into LWP HTTP headers 
+
+------------------------------------------
+version 0.002 at 2013-06-12 21:58:38 +0000
+------------------------------------------
+
+  Change: c07b122ecad4cf5061a1e67fa4e4254333846519
+  Author: Chris Prather <chris@prather.org>
+  Date : 2013-06-12 17:58:38 +0000
+
+    bump version number 
+
+  Change: a271fcec2319ff390b7957952b7172e7286f7731
+  Author: Chris Prather <chris@prather.org>
+  Date : 2013-06-12 17:51:43 +0000
+
+    unflatten headers
+
+    miyagawa found that you could run into cases where what LWP expects
+    and what HTTP::Tiny expects in the case of headers doesn't match up.
+    He had a neat hack to fix that, and this totally steals that neat
+    hack. 
+
+  Change: 2e7299a7a3dfeecfa21e7cfaa2779904b91cc466
+  Author: Chris Prather <chris@prather.org>
+  Date : 2013-06-12 17:45:25 +0000
+
+    fix the synopsis 
+
+===============================================
+Plus 1 release after 2013-04-21 00:00:00 +0000.
+===============================================

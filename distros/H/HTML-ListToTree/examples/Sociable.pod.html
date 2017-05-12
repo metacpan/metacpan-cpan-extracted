@@ -1,0 +1,1345 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<title>Thread::Sociable</title>
+<link rel="stylesheet" type="text/css" href="..\podstyle.css" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <script type="text/javascript">
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  </script></head>
+<body>
+<div class="box">
+  <h1 class="t1">Thread::Sociable</h1>
+  <table>
+    <tr>
+      <td class="label">Description</td>
+      <td class="cell">Enhanced replacement for threads::shared</td>
+    </tr>
+  </table>
+</div>
+<div class="path">
+  <a href="..\index.html">Thread::Sociable</a> &gt; Perl Manuals &gt;
+  Thread-Sociable
+</div>
+<div>
+<a href="..\src\Thread\Sociable.pod">Source</a>
+</div>
+
+
+<div class="pod">
+<!-- INDEX START -->
+<h3 id="TOP">Index</h3>
+<ul>
+	<li><a href="#NAME">NAME</a></li>
+	<li><a href="#VERSION">VERSION</a></li>
+	<li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+	<li><a href="#DESCRIPTION">DESCRIPTION</a><br />
+<ul>
+	<li><a href="#Background">Background</a></li>
+	<li><a href="#An_Inconvenient_Alternative">An Inconvenient Alternative</a><br />
+<ul>
+	<li><a href="#Drawbacks">Drawbacks</a><br />
+<ul>
+	<li><a href="#Requires_more_internal_code_to_manag">Requires more internal code to manage variables</a></li>
+	<li><a href="#Requires_explicit_declaration_of_loc">Requires explicit declaration of lockable variables</a></li>
+	<li><a href="#Requires_explicit_destruction_to_fre">Requires explicit destruction to free resources</a></li>
+</ul>
+</li>
+	<li><a href="#Benefits">Benefits</a><br />
+<ul>
+	<li><a href="#Performance">Performance</a></li>
+	<li><a href="#Optimized_Scalar_Reads">Optimized Scalar Reads</a></li>
+	<li><a href="#code_splice_code_Support"><code>splice()</code> Support</a></li>
+	<li><a href="#Optimized_Resource_Allocation">Optimized Resource Allocation</a></li>
+	<li><a href="#Integrated_Queueing_Solution">Integrated Queueing Solution</a></li>
+	<li><a href="#Transient_Sociables">Transient Sociables</a></li>
+	<li><a href="#Interthread_code_tie_code_Support">Interthread <code>tie()</code> Support</a></li>
+	<li><a href="#Software_Transactional_Memory_i_aka_">Software Transactional Memory <i>(aka</i> STM) Support</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+	<li><a href="#ATTRIBUTES">ATTRIBUTES</a><br />
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+	<li><a href="#i_VARIABLE_i_Sociable"><i>VARIABLE</i> : Sociable</a></li>
+	<li><a href="#i_VARIABLE_i_Lockable"><i>VARIABLE</i> : Lockable</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+	<li><a href="#METHODS">METHODS</a><br />
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+	<li><a href="#strong_socialize_strong_i_VARIABLE_i"><strong>socialize</strong>(<i>VARIABLE</i>)</a></li>
+	<li><a href="#strong_socialize_with_lock_strong_i_"><strong>socialize_with_lock</strong>(<i>VARIABLE</i>)</a></li>
+	<li><a href="#i_id_i_strong_is_sociable_strong_i_V"><i>$id</i> = <strong>is_sociable</strong>(<i>VARIABLE</i>)</a></li>
+	<li><a href="#i_id_i_strong_is_lockable_strong_i_V"><i>$id</i> = <strong>is_lockable</strong>(<i>VARIABLE</i>)</a></li>
+	<li><a href="#strong_sociable_discard_strong_i_VAR"><strong>sociable_discard</strong>(<i>VARIABLE</i>)</a></li>
+	<li><a href="#strong_sociable_enable_debug_strong"><strong>sociable_enable_debug</strong>()</a></li>
+	<li><a href="#strong_sociable_disable_debug_strong"><strong>sociable_disable_debug</strong>()</a></li>
+	<li><a href="#strong_sociable_enable_warnings_stro"><strong>sociable_enable_warnings</strong>()</a></li>
+	<li><a href="#strong_sociable_disable_warnings_str"><strong>sociable_disable_warnings</strong>()</a></li>
+	<li><a href="#i_extent_himark_i_strong_sociable_de"><i>($extent, $himark)</i> = <strong>sociable_default_extent()</strong></a></li>
+	<li><a href="#i_extent_himark_i_strong_sociable_de-2"><i>($extent, $himark)</i> = <strong>sociable_default_extent($new_extent)</strong></a></li>
+	<li><a href="#i_extent_himark_i_strong_sociable_de-3"><i>($extent, $himark)</i> = <strong>sociable_default_extent($new_extent, $new_himark)</strong></a></li>
+	<li><a href="#i_extent_himark_i_strong_sociable_ex"><i>($extent, $himark)</i> = <strong>sociable_extent(@array)</strong></a></li>
+	<li><a href="#i_extent_himark_i_strong_sociable_ex-2"><i>($extent, $himark)</i> = <strong>sociable_extent(%hash)</strong></a></li>
+	<li><a href="#i_extent_himark_i_strong_sociable_ex-3"><i>($extent, $himark)</i> = <strong>sociable_extent(@array, $new_extent)</strong></a></li>
+	<li><a href="#i_extent_himark_i_strong_sociable_ex-4"><i>($extent, $himark)</i> = <strong>sociable_extent(%hash, $new_extent)</strong></a></li>
+	<li><a href="#i_extent_himark_i_strong_sociable_ex-5"><i>($extent, $himark)</i> = <strong>sociable_extent(@array, $new_extent, $new_himark)</strong></a></li>
+	<li><a href="#i_extent_himark_i_strong_sociable_ex-6"><i>($extent, $himark)</i> = <strong>sociable_extent(%hash, $new_extent, $new_himark)</strong></a></li>
+	<li><a href="#strong_sociable_begin_work_strong_i_"><strong>sociable_begin_work</strong>(<i>\&amp;xaction_sub [, onCommit =&gt; \&amp;commit_sub ] [, onRestart =&gt; \&amp;restart_sub ] [, onRollback =&gt; \&amp;rollback_sub ]</i>)</a></li>
+	<li><a href="#i_oldlimit_i_strong_sociable_stm_lim"><i>$oldlimit</i> = <strong>sociable_stm_limit</strong>( [ <i>$newlimit</i> ] )</a></li>
+	<li><a href="#i_oldtimeout_i_strong_sociable_stm_t"><i>$oldtimeout</i> = <strong>sociable_stm_timeout</strong>( [ <i>$newtimeout</i> ] )</a></li>
+	<li><a href="#strong_lock_strong_i_VARIABLE_i"><strong>lock</strong>(<i>VARIABLE</i>)</a></li>
+	<li><a href="#strong_cond_wait_strong_i_VARIABLE_i"><strong>cond_wait</strong>(<i>VARIABLE</i>)</a></li>
+	<li><a href="#strong_cond_wait_strong_i_CONDVAR_LO"><strong>cond_wait</strong>(<i>CONDVAR, LOCKVAR</i>)</a></li>
+	<li><a href="#strong_cond_timedwait_strong_i_VARIA"><strong>cond_timedwait</strong>(<i>VARIABLE, ABS_TIMEOUT</i>)</a></li>
+	<li><a href="#strong_cond_timedwait_strong_i_CONDV"><strong>cond_timedwait</strong>(<i>CONDVAR, ABS_TIMEOUT, LOCKVAR</i>)</a></li>
+	<li><a href="#strong_cond_signal_strong_i_VARIABLE"><strong>cond_signal</strong>(<i>VARIABLE</i>)</a></li>
+	<li><a href="#strong_cond_broadcast_strong_i_VARIA"><strong>cond_broadcast</strong>(<i>VARIABLE</i>)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+	<li><a href="#OBJECTS">OBJECTS</a></li>
+	<li><a href="#NOTES">NOTES</a></li>
+	<li><a href="#Using_Sociably_code_tie_code_d_Varia">Using Sociably <code>tie()</code>'d Variables</a></li>
+	<li><a href="#Using_STM">Using STM</a></li>
+	<li><a href="#STM_Implementation_Details">STM Implementation Details</a></li>
+	<li><a href="#BUGS_AND_LIMITATIONS">BUGS AND LIMITATIONS</a></li>
+	<li><a href="#Benchmarks">Benchmarks</a><br />
+<ul>
+<li>
+<ul>
+	<li><a href="#Single_2_4_GHz_WinXP_AS_Perl_5_8_6">Single 2.4 GHz, WinXP, AS Perl 5.8.6</a></li>
+	<li><a href="#Single_100MHz_SPARC_Solaris_10_Perl_">Single 100MHz SPARC, Solaris 10, Perl 5.8.6</a></li>
+	<li><a href="#Single_1_5GHz_PPC_OS_X_10_4_9_Perl_5">Single 1.5GHz PPC, OS X 10.4.9, Perl 5.8.6</a></li>
+	<li><a href="#Dual_3GHz_Xeon_Win2000_Server_AS_Per">Dual 3GHz Xeon, Win2000 Server, AS Perl 5.8.8</a></li>
+	<li><a href="#Dual_3GHz_Xeon_Linux_Perl_5_8_8">Dual 3GHz Xeon, Linux, Perl 5.8.8</a></li>
+	<li><a href="#Dual_3GHz_Xeon_Solaris_10_Perl_5_8_8">Dual 3GHz Xeon, Solaris 10, Perl 5.8.8</a></li>
+	<li><a href="#Quad_700MHz_Xeon_Win2000_Server_AS_P">Quad 700MHz Xeon, Win2000 Server, AS Perl 5.8.8</a></li>
+</ul>
+</li>
+</ul>
+</li>
+	<li><a href="#TO_DO">TO DO</a><br />
+<ul>
+<li>
+<ul>
+	<li><a href="#IPC_Support">IPC Support</a></li>
+</ul>
+</li>
+</ul>
+</li>
+	<li><a href="#SEE_ALSO">SEE ALSO</a></li>
+	<li><a href="#AUTHOR">AUTHOR</a></li>
+</ul>
+<hr />
+<!-- INDEX END -->
+
+<h1 id="NAME">NAME <a href="#TOP" class="toplink"><img alt="^" src="..\up.gif" /></a></h1>
+
+<p>Thread::Sociable - Less restrictive replacement for threads::shared</p>
+
+<h1 id="VERSION">VERSION <a href="#TOP" class="toplink"><img alt="^" src="..\up.gif" /></a></h1>
+
+<p>0.10</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS <a href="#TOP" class="toplink"><img alt="^" src="..\up.gif" /></a></h1>
+
+<pre>  use threads;
+  use Thread::Sociable;
+
+  my $var : Sociable;
+  my $lockvar : Lockable;
+  $var = $scalar_value;
+  $var = $sociable_ref_value;
+  $var = socialize($simple_unshared_ref_value);
+  $lockvar = socialize_with_lock($simple_unshared_ref_value);
+
+  my($scalar, @array, %hash);
+  socialize($scalar);
+  socialize(@array);
+  socialize_with_lock(%hash);
+  my $bar = &amp;socialize([]);
+  $hash{bar} = &amp;socialize({});
+
+  { lock(%hash); ...  }
+
+  cond_wait($scalar);
+  cond_timedwait($scalar, time() + 30);
+  cond_broadcast(@array);
+  cond_signal(%hash);
+
+  my $lockvar : Lockable;
+  # condition var != lock var
+  cond_wait($var, $lockvar);
+  cond_timedwait($var, time()+30, $lockvar);
+  #
+  # verify the variable is sociable
+  #
+  print &quot;\$lockvar is sociable\n&quot;
+      if is_sociable($lockvar);
+  #
+  # verify the variable is lockable
+  #
+  print &quot;\$lockvar is lockable\n&quot;
+      if is_lockable($lockvar);
+  #
+  #    discard the sociable variable; causes
+  # $lockvar to be come private again, and
+  # all other references in other threads
+  # will also become private
+  #
+  sociable_discard($lockvar);
+
+  print &quot;\$lockvar is not sociable\n&quot;
+      unless is_sociable($lockvar);
+  #
+  #    set default extents
+  #
+  my ($old_extend, $old_himark) =
+      sociable_default_extent($new_extent, $new_himark);
+  #
+  #    set extents on individual array or hash
+  #
+  my ($old_extend, $old_himark) =
+      sociable_extent(@array, $new_extent, $new_himark);
+
+  my ($old_extend, $old_himark) =
+      sociable_extent(%hash, $new_extent, $new_himark);
+  #
+  # tie a sociable using a Thread::Sociable::Apartment closure container
+  #
+  sociable_tie $sociable, $tsa_closure;
+  #
+  # execute a transaction
+  #
+  sociable_begin_work(sub {
+      },
+      onCommit =&gt; sub {
+          print &quot;We're in like Flynn!\n&quot;;
+      },
+      onRestart =&gt; sub {
+          print &quot;Curses, foiled again!\n&quot;;
+      },
+      onRollback =&gt; sub {
+          print &quot;OOOOPS!! We're hosed!\n&quot;;
+      }
+  );
+
+</pre><h1 id="DESCRIPTION">DESCRIPTION <a href="#TOP" class="toplink"><img alt="^" src="..\up.gif" /></a></h1>
+
+<p>Within Perl's current ithreads implementation, variables are private to each thread,
+and each newly created thread gets a private copy of each existing variable.
+Thread::Sociable permits sharing of variables between threads (and pseudoforks on Win32).
+While the interface is largely based on <a href="http://search.cpan.org/perldoc?threads%3A%3Ashared">threads::shared</a>,
+a modified backend is provided that minimizes the performance penalty of the
+highly pessimistic/contentious global shared interpretter locking upon which <a href="threads:shared">threads:shared</a>
+is heavily reliant.</p>
+
+<p>Additionally, Thread::Sociable provides</p>
+
+<ul>
+	<li>array splicing</li>
+	<li>inter-thread <a href="http://search.cpan.org/perldoc?tie()">tie()</a> capability</li>
+	<li>an <a href="Sociable\DuplexQueue.pm.html">integrated queueing</a> solution</li>
+	<li>an <a href="Sociable\Apartment.pm.html">apartment threading</a> solution</li>
+	<li>software transactional memory <i>aka</i> <strong>STM</strong></li>
+</ul>
+
+<h2 id="Background">Background</h2>
+
+<p>The current solution for sharing variables between threads, <a href="http://search.cpan.org/perldoc?threads%3A%3Ashared">threads::shared</a>,
+imposes a significant burden: since all threads::shared variables are managed within
+a shared Perl interpretter context, a single global lock on that context must
+be acquired before <strong>any</strong> thread can do <strong>anything</strong> to <strong>any</strong> thread::shared
+variable. No matter if each thread is referencing completely different variables,
+and is only doing read operations, they <strong>all</strong> must first <strong>exclusively</strong> acquire
+the global lock before accessing the shared variables <i>(Frankly, it calls into
+question the point of providing application-level locking primitives...)</i>. The
+problem is exacerbated by the frequent reference count adjustments applied
+to the shared variables as various threads create and destroy proxy versions
+and references.</p>
+
+<p>While such overhead may not be significant for a few threads making infrequent
+accesses to shared variables, for large scale threaded applications,
+especially those which frequently pass data amongst themselves via either
+<a href="http://search.cpan.org/perldoc?Thread%3A%3AQueue">Thread::Queue</a> or <a href="http://search.cpan.org/perldoc?Thread%3A%3AQueue%3A%3ADuplex">Thread::Queue::Duplex</a> (e.g., <a href="http://search.cpan.org/perldoc?Thread%3A%3AApartment">Thread::Apartment</a>
+based applications), the performance penalty can be very severe (so much so
+that using process-based concurrency with, e.g., <a href="http://search.cpan.org/perldoc?IPC%3A%3AMmap">IPC::Mmap</a> and <a href="http://search.cpan.org/perldoc?Storable">Storable</a>
+becomes a viable alternative).</p>
+
+<p><a href="http://search.cpan.org/perldoc?threads%3A%3Ashared">threads::shared</a>'s design seems to stem from a &quot;give me convenience or give me
+death&quot; approach: by reusing the Perl variable management code already available
+in the shared interpretter, minimal additional code is required. In addition,
+it preserves the convenience of reference counted reclamation which
+Perl applications have come to rely on. Alas, to paraphrase,
+&quot;The wages of convenience is death&quot;, or at least performance closely resembling
+a moribund state.</p>
+
+<h2 id="An_Inconvenient_Alternative">An Inconvenient Alternative</h2>
+
+<p>Thread::Sociable is based on a more pragmatic view of sharing data between threads.
+By definition <i>(with a few exceptional platforms most users will never encounter)</i>,
+all threads have access to all other threads' memory. Assuming an internal structure
+to manage variable state between threads, and support for standard application
+level locking primitives, there's little need for the heavyweight solution
+provided by threads::shared...except for the convenience of reusing Perl variable
+management and reclamation code, and automatic lock structure creation and
+destruction. Lets look at the drawbacks and benefits of Thread::Sociable:</p>
+
+<h3 id="Drawbacks">Drawbacks</h3>
+
+<h4 id="Requires_more_internal_code_to_manag">Requires more internal code to manage variables</h4>
+
+<p>Since it uses its own context structures allocated from
+the process's native (rather than Perl's) heap, Thread::Sociable cannot
+simply delegate variable management to a shared interpretter.
+Fortunately, much of the additional code is simply cut/paste from Perl core (e.g.,
+hash management). The advantage of this approach is that, by careful coding,
+global locking can be avoided except for variable creation and destruction;
+beyond that, application of concurrency control to individual variables is at
+the sole discretion of the application.</p>
+
+<p>Another benefit is that it provides opportunities to add
+new capabilities, and/or exploit additional external libraries (e.g.,
+Hoard).</p>
+
+<h4 id="Requires_explicit_declaration_of_loc">Requires explicit declaration of lockable variables</h4>
+
+<p>Thread::Sociable requires explicit declaration of variables that
+are to be subjected to locking.</p>
+
+<p>This feature helps avoid the need for frequent interstitial global locks,
+since the additional locking resources can be established within the global
+lock during variable creation, rather than at some subsequent arbitrary point
+in time. In most (nearly all ?) instances, an application will have a priori
+knowledge whether a variable will need to negotiate concurrent access during
+its lifetime, so imposing this requirement shouldn't be too much of a burden
+(and may even be considered a beneficial annotation).</p>
+
+<h4 id="Requires_explicit_destruction_to_fre">Requires explicit destruction to free resources</h4>
+
+<p>Sociable variables must be explicitly destroyed to free their resources.</p>
+
+<p>Like all sociable beings, sociable variables enjoy a good party, and
+don't respond to hints that the party is over: they must be politely told
+to get out.</p>
+
+<p>Thread::Sociable <strong>does not perform reference counting</strong> as variables are passed
+between threads, thereby avoiding the repeated need for locking/unlocking
+a global context to perform the refcount, and possible destruction when a
+refcount drops to zero. Instead,
+applications are responsible for determining when a sociable variable can be
+discarded. Explicit destruction is a minor
+inconvenience paid to improve scalability and performance, and likewise may
+be considered a useful annotation. Furthermore, in many instances, shared
+variables are intended to be long lived, and thus all the overhead
+of reference counting - including the global locking - is a waste of time.
+In fact, many consider the pre-allocation and pooling of a fixed number of such shared
+resources to be best practice (much like creating a pool of reusable threads).</p>
+
+<p>Note that explicit destruction is <strong>NOT</strong> required on process exit <i>(or at all)</i>,
+but only when an application determines a sociable variable is no longer needed,
+and its resources might be recycled for a future variable.</p>
+
+<p>Also note that in the event of an inadvertant access to a discarded sociable
+variable, the operation will cause the sociable variable to revert to an empty private
+version. The resource slot for each sociable variable contains a recycle count
+signature which is verified for each attempted access; if the recycle counts
+do not match, the proxy variable's &quot;magic&quot; is removed, and the current
+private contents are then used. However, the <code>sociable_enable_warnings()</code> method
+can be called to cause a Perl warning to be issued whenever such an inadvertant
+access occurs.</p>
+
+<h3 id="Benefits">Benefits</h3>
+
+<p>Despite these inconveniences, Thread::Sociable provides some benefits
+(aside from the performance improvment):</p>
+
+<h4 id="Performance">Performance</h4>
+
+<p>By avoiding the frequent global locking required by threads::shared,
+Thread::Sociable achieves significant performance improvements.
+<a href="http://search.cpan.org/perldoc?Benchmarks">Benchmarks</a> indicate that, in the simplest single CPU, single threaded case,
+sociable variables are twice as fast to read and 3x faster to write
+than threads::shared equivalents. When that benchmark is expanded
+to multithreaded operations, the performance improvement becomes more
+dramatic, ranging from 4x for a few concurrent threads, to 8x or more
+for 20+ threads. Finally, when benchmarked on multi-CPU/multicore
+platforms, the performance differences can be Ax to Bx.</p>
+
+<h4 id="Optimized_Scalar_Reads">Optimized Scalar Reads</h4>
+
+<p>An additional optimization is provided to exploit the manner in which
+Perl's internal scalar data is stored. A sequence counter is maintained
+for scalar sociables that is incremented each time the variable is written, and
+is copied to the private proxy version on every read operation. When a proxy
+read is initiated, the proxy's sequence number is compared to the sociable
+version, and if the same, no copy operation is performed. While the impact
+on small size scalars is negligible, access speeds for larger size scalars can be
+greatly improved by avoiding an unneccesary buffer copy - which may be very
+useful for certain operations (e.g., complex regular expression evaluation, etc.)</p>
+
+<h4 id="code_splice_code_Support"><code>splice()</code> Support</h4>
+
+<p>Thread::Sociable supports array splicing; <a href="http://search.cpan.org/perldoc?threads%3A%3Ashared">threads::shared</a> does not.</p>
+
+<h4 id="Optimized_Resource_Allocation">Optimized Resource Allocation</h4>
+
+<p>Thread::Sociable allocates sociable context resources in clusters.</p>
+
+<p>In addition, Thread::Sociable supports tunable &quot;extents&quot; for aggregate
+sociable variables (arrays and hashes). Extents are per-variable pools
+of sociable scalar elements, and consist of 2 adjustable control values:</p>
+
+<ul>
+	<li>allocation cluster size <i>aka &quot;extent&quot;</i>
+<br /><br />the number of elements allocated and added to a sociable variable's
+pool when its pool is empty and a new element is added to the array or hash
+
+
+</li>
+	<li>high water mark <i>aka &quot;himark&quot;</i>
+<br /><br />the maximum number of elements permitted
+in the variable's pool. When an element is deleted from an array or hash, its
+context is placed in the variable's pool; if the pool's size reaches the himark,
+the (himark - extent) number of elements are returned to the global free
+pool. By deallocating multiple elements inside a single global context lock,
+<i>(instead of single element deallocations)</i>, global contention can be minimized.</li>
+</ul>
+
+<p>By maintaining a small pool of scalar elements
+attached individual arrays/hashes, most additions/deletions
+to/from the aggregate variable can be managed without acquiring the global
+context lock, thereby reducing thread contention and improving overall
+performance. A global default extent and himark are applied when the
+variable is created; the variable's value may then be individually
+adjusted if needed. Methods are provided to adjust both the global default extent
+and the per-variable extent. The default extent is 10, and the default himark
+is 20.</p>
+
+<p>To illustrate the purpose of extents, consider the following examples:</p>
+
+<ul>
+	<li>Loading a large hash
+<br /><br />Assume an application needs to load 5000 elements into a hash.
+Using the threads::shared approach, the addition of each element requires
+acquiring the global context lock, allocating the scalar element context,
+and the releasing the global context lock. If other threads are running
+and using threads::shared resources, significant contention occurs as
+the array load operation acquires and releases the global lock 5000 times.
+<br /><br />In contrast, using Thread::Sociable and setting the extent to 5000 after
+the hash is created, then loading the hash, then restoring the extent to
+the defaults, only incurs a single global context lock acquire/release cycle.
+
+
+</li>
+	<li>Using an array as an interthread queue
+<br /><br />Assume an application uses a threads::shared array as an interthread
+communication queue <i>(e.g.,</i> <a href="http://search.cpan.org/perldoc?Thread%3A%3AQueue">Thread::Queue</a> <i>)</i>. As elements are
+enqueued and dequeued, the global context lock is repeatedly acquired
+and releases, potentially causing thread contention.
+<br /><br />By using Thread::Sociable, a suitable extent and himark can be applied
+to the array, so that the queue seldom, if ever, needs to acquire the
+global context lock.</li>
+</ul>
+
+<h4 id="Integrated_Queueing_Solution">Integrated Queueing Solution</h4>
+
+<p>Thread::Sociable incorporates significant portions of the
+Thread::Sociable::DuplexQueue module within its
+XS code, thereby achieving significant performance improvements for some
+common uses of thread-shared data, i.e., passing the data between
+threads. Additionally, the queue management context is optimized for the
+duplex queueing operations used by <a href="Sociable\Apartment.pm.html">Thread::Sociable::Apartment</a> thereby
+improving performance of inter-apartment method calls.
+<a href="http://search.cpan.org/perldoc?Benchmarks">Benchmarks</a> indicate that Thread::Sociable::DuplexQueue is X times
+faster than the <a href="http://search.cpan.org/perldoc?Thread%3A%3AQueue">Thread::Queue</a> equivalent operations, and Y times
+faster the the equivalent <a href="http://search.cpan.org/perldoc?Thread%3A%3AQueue%3A%3ADuplex">Thread::Queue::Duplex</a> and
+<a href="http://search.cpan.org/perldoc?Thread%3A%3AQueue%3A%3AMultiplex">Thread::Queue::Multiplex</a>. Furthermore, tests on round trip times
+for calls between apartment threaded objects indicate Thread::Sociable::Apartment
+is Z times faster than <a href="http://search.cpan.org/perldoc?Thread%3A%3AApartment">Thread::Apartment</a>.</p>
+
+<h4 id="Transient_Sociables">Transient Sociables</h4>
+
+<p>Thread::Sociable supports <strong>transient</strong> sociables.</p>
+
+<p>In certain instances
+<i>(primarily for passing data between threads over a Thread::Sociable::DuplexQueue)</i>,
+a variable only needs to be sociable for a brief time while it is referenced
+by another sociable variable. Once the reference to the transient sociable variable
+is removed, the variable is immediately made private in the dereferencing thread,
+and its sociable resources are freed.</p>
+
+<h4 id="Interthread_code_tie_code_Support">Interthread <code>tie()</code> Support</h4>
+
+<p>Thread::Sociable and <a href="Sociable\Apartment.pm.html">Thread::Sociable::Apartment</a> provide an inter-thread
+<code>tie</code> capability</p>
+
+<p>One drawback of <a href="http://search.cpan.org/perldoc?threads%3A%3Ashared">threads::shared</a> is the inability to apply <code>tie</code>'s
+to the variables. However, the fault may not lie entirely with <a href="http://search.cpan.org/perldoc?threads%3A%3Ashared">threads::shared</a>,
+as the behavior of a <code>tie</code>'d variable with respect to all the threads
+referencing the variable is nebulous at best. E.g., if Thread A tie's
+$x, then executes its STORE() method, how should $x's reference in Thread
+B behave ?</p>
+
+<p>Thread::Sociable (along with <a href="Sociable\Apartment.pm.html">Thread::Sociable::Apartment</a> attempts to provide
+a partial solution, primarily to address issues with apartment threaded versions
+of DBI (<a href="http://search.cpan.org/perldoc?DBIx%3A%3AThreaded">DBIx::Threaded</a>) and Perl/Tk (<a href="http://search.cpan.org/perldoc?Tk%3A%3AThreaded">Tk::Threaded</a>), both of which rely on
+tie's for important interfaces.</p>
+
+<p>Thread::Sociable introduces the notion of a <strong>shadow</strong> variable. Essentially,
+the shadow variable is a <i>private</i> variable within a thread (specifically,
+an apartment thread in a <a href="Sociable\Apartment.pm.html">Thread::Sociable::Apartment</a> container) that is
+associated with a sociable variable. Thread::Sociable tracks information
+regarding the shadowed sociable variable in its internal structures that is
+used to initiate a proxied closure call to the thread with the private shadow
+variable whenever the shadowed variable is accessed.</p>
+
+<p>E.g., consider the <code>-textvariable</code> attribute of a Perl/Tk Tk::Entry() widget.
+In a nonthreaded application, Perl/Tk uses a form of <code>tie</code> to set or update the
+Entry contents automatically, so an application can simply read or assign to
+the variable, and the entry's contents are immediately returned or set.</p>
+
+<p>Alas, <a href="http://search.cpan.org/perldoc?thread%3A%3Ashared">thread::shared</a> variables can't be tie'd, and so this convenient interface
+is not available to <a href="http://search.cpan.org/perldoc?Tk%3A%3AThreaded">Tk::Threaded</a>. However, by using shadow variables,
+and a simple wrapper around the relevant widget constructors, Thread::Sociable
+can</p>
+
+<p>1. replace the sociable <code>-textvariable</code> value with a private shadow variable</p>
+
+<p>2. create a <a href="Sociable\Apartment.pm.html">Thread::Sociable::Apartment</a>::Shadow object to wrap the shadow
+variable</p>
+
+<p>3. provide a proxy for the Shadow object to Thread::Sociable to associate
+with the sociable variable.</p>
+
+<p>E.g., assuming Tk::Threaded is resident in Thread B,
+and Thread A creates an Entry widget with <code>-textvariable =</code> \$x&gt; <i>(where $x is sociable)</i>,
+Thread B will</p>
+
+<p>- translate the <code>-textvariable</code> value into a private <code>$x_shadow</code></p>
+
+<p>- create a Shadow object to contain <code>$x_shadow</code></p>
+
+<p>- associate the Shadow object with <code>$x</code></p>
+
+<p>- Tk can then tie and otherwise manipulate <code>$x_shadow</code> as needed.</p>
+
+<p>When Thread A later needs to read the entry widget contents, it simply
+reads $x, which Thread::Sociable detects as shadowed, and then queues up a proxied
+closure call to Thread B to <code>FETCH()</code> the current value of the shadow, which in turn
+causes Tk to perform any processing needed to retrieve the contents of the widget.</p>
+
+<p>Likewise, if Thread A writes to $x, Thread::Sociable detects the shadow, and queues a proxied
+closure call to Thread B to <code>STORE()</code> the current value to the shadow, which in turn
+causes Tk to fill/replace the current contents of the widget.</p>
+
+<p>Similar operations can be performed for tie'd array and hash objects
+(via tie's PUSH(), POP(), etc. interfaces). In addition, the shadowed behavior
+is available to <strong>all</strong> threads, i.e., Threads C, D, and E can also
+get/set the shadowed $x. <i>Currently, a sociable variable can only be
+tied by a single thread; a future release will remove this restriction.</i></p>
+
+<h4 id="Software_Transactional_Memory_i_aka_">Software Transactional Memory <i>(aka</i> STM) Support</h4>
+
+<p>Thread::Sociable provides an STM implementation (currently
+supporting x86, x64, SPARC, and PowerPC platforms) to simplify
+development of concurrent applications.</p>
+
+<h1 id="ATTRIBUTES">ATTRIBUTES <a href="#TOP" class="toplink"><img alt="^" src="..\up.gif" /></a></h1>
+
+<p>The following variable attributes are provided:</p>
+
+<h4 id="i_VARIABLE_i_Sociable"><i>VARIABLE</i> : Sociable</h4>
+
+<h4 id="i_VARIABLE_i_Lockable"><i>VARIABLE</i> : Lockable</h4>
+
+<p><code>Sociable</code> creates the specified <i>VARIABLE</i>, and applies <code>socialize()</code> to it. Likewise,
+<code>Lockable</code> creates the specified <i>VARIABLE</i>, and applies <code>socialize_with_lock()</code> to it.</p>
+
+<h1 id="METHODS">METHODS <a href="#TOP" class="toplink"><img alt="^" src="..\up.gif" /></a></h1>
+
+<p><i>Note that all these methods are exported into the</i> <code>use</code><i>'ing package</i>.</p>
+
+<h4 id="strong_socialize_strong_i_VARIABLE_i"><strong>socialize</strong>(<i>VARIABLE</i>)</h4>
+
+<h4 id="strong_socialize_with_lock_strong_i_"><strong>socialize_with_lock</strong>(<i>VARIABLE</i>)</h4>
+
+<p><code>socialize</code> takes a value and marks it as shared. You can share a scalar, array,
+hash, scalar ref, array ref, or hash ref.  <code>socialize</code> will return the shared
+rvalue, but always as a reference. <code>socialize_with_lock</code> is the same as socialize,
+but also creates lock structures for the sociable variable. All descriptions of
+sociable() apply equally to sociable_with_lock().</p>
+
+<p>A variable can also be marked as <strong>sociable</strong> at compile time by using the
+<code>: Sociable</code> attribute, e.g., <code>my $var : Sociable;</code>, or sociably lockable
+via the <code>: Lockable</code> attribute: e.g., <code>my $var : Lockable;</code>.</p>
+
+<p>Due to problems with Perl's prototyping, if you want to socialize a newly created
+reference, you need to use the <code>&amp;socialize([])</code> and <code>&amp;socialize({})</code> syntax.</p>
+
+<p>The only values that can be assigned to a sociable scalar are other scalar
+values, or sociable refs:</p>
+
+<pre>  my $var : Sociable;
+  $var = 1;              # ok
+  $var = [];             # error
+  $var = &amp;socialize([]);     # ok
+
+</pre><p><code>socialize</code> will traverse up references exactly <i>one</i> level.  <code>socialize(\$a)</code> is
+equivalent to <code>socialize($a)</code>, while <code>socialize(\\$a)</code> is not.  This means that you
+must create nested sociable data structures by first creating individual sociable
+leaf nodes, and then adding them to a sociable hash or array.</p>
+
+<pre>  my %hash : Sociable;
+  $hash{'meaning'} = &amp;socialize([]);
+  $hash{'meaning'}[0] = &amp;socialize({});
+  $hash{'meaning'}[0]{'life'} = 42;
+
+</pre><h4 id="i_id_i_strong_is_sociable_strong_i_V"><i>$id</i> = <strong>is_sociable</strong>(<i>VARIABLE</i>)</h4>
+
+<p><code>is_sociable</code> checks if the specified variable is sociable or not.  If sociable,
+returns the variable's internal ID (similar to
+<a href="http://search.cpan.org/perldoc?Scalar%3A%3AUtil#&quot;refaddr EXPR&quot;">refaddr()</a>).  Otherwise, returns <code>undef</code>.</p>
+
+<pre>  if (is_sociable($var)) {
+      print(&quot;\$var is sociable\n&quot;);
+  } else {
+      print(&quot;\$var is not sociable\n&quot;);
+  }
+
+</pre><h4 id="i_id_i_strong_is_lockable_strong_i_V"><i>$id</i> = <strong>is_lockable</strong>(<i>VARIABLE</i>)</h4>
+
+<p><code>is_lockable</code> checks if the specified variable is lockable or not.  If lockable,
+returns the variable's internal ID (similar to
+<a href="http://search.cpan.org/perldoc?Scalar%3A%3AUtil#&quot;refaddr EXPR&quot;">refaddr()</a>).  Otherwise, returns <code>undef</code>.</p>
+
+<pre>  if (is_lockable($var)) {
+      print(&quot;\$var is lockable\n&quot;);
+  } else {
+      print(&quot;\$var is not lockable\n&quot;);
+  }
+
+</pre><h4 id="strong_sociable_discard_strong_i_VAR"><strong>sociable_discard</strong>(<i>VARIABLE</i>)</h4>
+
+<p>Explicitly destroys the specified sociable variable, returning its
+resources to the sociable pool to be recycled for any future
+sociable variable creation. Removes the &quot;magic&quot; from the private proxy
+version of the variable and clears it, so that any future attempt to reference the
+variable will use the existing private version. Likewise, any subsequent
+reference the sociable in another thread will remove the magic from that thread's
+private proxy.</p>
+
+<p>If <code>sociable_enable_warnings()</code>
+has been called, any subsequent reference to the sociable in any thread
+will also cause a Perl warning to be generated.</p>
+
+<h4 id="strong_sociable_enable_debug_strong"><strong>sociable_enable_debug</strong>()</h4>
+
+<h4 id="strong_sociable_disable_debug_strong"><strong>sociable_disable_debug</strong>()</h4>
+
+<p>Enable/disable copious diagnostic messages from Thread::Sociable internals.
+Only useful if Thread::Sociable has been compiled with the SOCIABLE_DEBUG
+preprocessor symbol defined.</p>
+
+<h4 id="strong_sociable_enable_warnings_stro"><strong>sociable_enable_warnings</strong>()</h4>
+
+<h4 id="strong_sociable_disable_warnings_str"><strong>sociable_disable_warnings</strong>()</h4>
+
+<p>Enable/disable generation of Perl warnings on attempts to reference a
+sociable that has been discarded.</p>
+
+<h4 id="i_extent_himark_i_strong_sociable_de"><i>($extent, $himark)</i> = <strong>sociable_default_extent()</strong></h4>
+
+<h4 id="i_extent_himark_i_strong_sociable_de-2"><i>($extent, $himark)</i> = <strong>sociable_default_extent($new_extent)</strong></h4>
+
+<h4 id="i_extent_himark_i_strong_sociable_de-3"><i>($extent, $himark)</i> = <strong>sociable_default_extent($new_extent, $new_himark)</strong></h4>
+
+<p>Read or set the global default extent values. The first form simply reads
+the current values. The second form sets the default extent to the specified
+value, and sets the himark to <code>max(10, $new_extent * 1.1)</code>. The last
+form sets both the default extent and himark to the specified values. If
+<code>$new_himark</code> is less than <code>$new_extent</code>, the specified value is ignored,
+and the himark is set to <code>max(10, $new_extent * 1.1)</code>. Setting extent
+to zero turns off the extent optimization behavior. These default values
+are applied to sociable hashes and arrays when they are created; the values
+of individual variables may then be altered using the <code>sociable_extent()</code>
+method. The initial default values are (10, 20).</p>
+
+<h4 id="i_extent_himark_i_strong_sociable_ex"><i>($extent, $himark)</i> = <strong>sociable_extent(@array)</strong></h4>
+
+<h4 id="i_extent_himark_i_strong_sociable_ex-2"><i>($extent, $himark)</i> = <strong>sociable_extent(%hash)</strong></h4>
+
+<h4 id="i_extent_himark_i_strong_sociable_ex-3"><i>($extent, $himark)</i> = <strong>sociable_extent(@array, $new_extent)</strong></h4>
+
+<h4 id="i_extent_himark_i_strong_sociable_ex-4"><i>($extent, $himark)</i> = <strong>sociable_extent(%hash, $new_extent)</strong></h4>
+
+<h4 id="i_extent_himark_i_strong_sociable_ex-5"><i>($extent, $himark)</i> = <strong>sociable_extent(@array, $new_extent, $new_himark)</strong></h4>
+
+<h4 id="i_extent_himark_i_strong_sociable_ex-6"><i>($extent, $himark)</i> = <strong>sociable_extent(%hash, $new_extent, $new_himark)</strong></h4>
+
+<p>Read or set the extent values on the specified array or hash. The first form
+simply reads the current values. The second form sets the extent to the specified
+value, and sets the himark to <code>max(10, $new_extent * 1.1)</code>. The last
+form sets both the extent and himark to the specified values. If
+<code>$new_himark</code> is less than <code>$new_extent</code>, the specified value is ignored,
+and the himark is set to <code>max(10, $new_extent * 1.1)</code>. If the specified
+hash or array is <strong>not</strong> sociable, the operation is silently ignored,
+unless the <code>sociable_enable_warnings()</code> is in effect, in which case
+a warning will be generated.  Setting extent
+to zero turns off the extent optimization behavior.</p>
+
+<h4 id="strong_sociable_begin_work_strong_i_"><strong>sociable_begin_work</strong>(<i>\&amp;xaction_sub [, onCommit =&gt; \&amp;commit_sub ] [, onRestart =&gt; \&amp;restart_sub ] [, onRollback =&gt; \&amp;rollback_sub ]</i>)</h4>
+
+<p>Execute <code>&amp;xaction_sub</code> in a STM transaction. All sociable variable references executed
+within <code>&amp;xaction_sub</code> will be performed as &quot;dirty&quot; reads, and logged writes, with a final
+reconcile and commit applied upon return from <code>&amp;xaction_sub</code>. At commit time, if any
+read-first variable's sequence number has changed since its initial read, or any written
+variable cannot be acquired for write, the
+transaction will be restarted; otherwise, all logged write operations will be
+applied. If any fatal error occurs within <code>&amp;xaction_sub</code>, the transaction will be rolled
+back and <strong>not</strong> restarted. Rollback can be initiated by any general Perl error,
+including by explicitly executing a <code>die</code> <i>(or croak)</i> statement.</p>
+
+<p>During commit processing, if an <code>onCommit</code> closure is provided, it will be called
+<strong>after</strong> the reconcile step has completed without causing restart, but <strong>before</strong>
+any writes are committed. An <code>onCommit</code> closure may induce restart or rollback.</p>
+
+<p>At any time during the transaction, if a restart is required, any provided
+<code>onRestart</code> closure will be called after any acquired variables are released,
+to permit the application to perform any private state cleanup. <code>onRestart</code> closures may
+induce rollback.</p>
+
+<p>Likewise, if a rollback is initiated, any provided <code>onRollback</code> closure will be called
+after any acquired variables are released, with the associated <code>die</code> message passed as a parameter.</p>
+
+<h4 id="i_oldlimit_i_strong_sociable_stm_lim"><i>$oldlimit</i> = <strong>sociable_stm_limit</strong>( [ <i>$newlimit</i> ] )</h4>
+
+<p>Adjust the maximum permitted number of concurrent transactions. Thread::Sociable maintains
+a pre-allocated pool of transaction context structures in order to avoid memory faults
+in the event of thread death or other logic errors. The number of contexts created in the
+pool is determined by this limit. If a new transaction is started, and
+no free transaction context is available, the transaction treats the condition
+as a restart with some random backoff period. This limit can be used to throttle the
+amount of contention. The default limit is 100. If the <i>$newlimit</i> argument is omitted, the
+current limit is returned; otherwise, contexts are added or removed to satisfy the $newlimit,
+and the $oldlimit value is returned. Note that, if $newlimit is less than the current
+number of inuse contexts, the in-use contexts will not be discarded until they are freed.</p>
+
+<h4 id="i_oldtimeout_i_strong_sociable_stm_t"><i>$oldtimeout</i> = <strong>sociable_stm_timeout</strong>( [ <i>$newtimeout</i> ] )</h4>
+
+<p>Adjust the maximum lifetime of a transaction. In future, Thread::Sociable will provide
+a transaction lifetime monitor to kill transactions that have not completed within
+this timeout (in order to detect and remove hung threads). If the <i>$newtimeout</i> argument
+is omitted, the current timeout limit is returned; otherwise, the timeout is set to
+$newtimeout, and the previous timeout value is returned. The timeout values have seconds
+precision; the default value is 1 minute. A value of zero indicates no timeout (i.e.,
+infinite transaction lifetime permitted).</p>
+
+<h4 id="strong_lock_strong_i_VARIABLE_i"><strong>lock</strong>(<i>VARIABLE</i>)</h4>
+
+<h4 id="strong_cond_wait_strong_i_VARIABLE_i"><strong>cond_wait</strong>(<i>VARIABLE</i>)</h4>
+
+<h4 id="strong_cond_wait_strong_i_CONDVAR_LO"><strong>cond_wait</strong>(<i>CONDVAR, LOCKVAR</i>)</h4>
+
+<h4 id="strong_cond_timedwait_strong_i_VARIA"><strong>cond_timedwait</strong>(<i>VARIABLE, ABS_TIMEOUT</i>)</h4>
+
+<h4 id="strong_cond_timedwait_strong_i_CONDV"><strong>cond_timedwait</strong>(<i>CONDVAR, ABS_TIMEOUT, LOCKVAR</i>)</h4>
+
+<h4 id="strong_cond_signal_strong_i_VARIABLE"><strong>cond_signal</strong>(<i>VARIABLE</i>)</h4>
+
+<h4 id="strong_cond_broadcast_strong_i_VARIA"><strong>cond_broadcast</strong>(<i>VARIABLE</i>)</h4>
+
+<p>These methods are identical to their <a href="http://search.cpan.org/perldoc?threads%3A%3Ashared">threads::shared</a> counterparts,
+except</p>
+
+<ul>
+	<li>locking an individual element of an array or hash (e.g.,
+<code>lock($array[23]);</code>) is not currently supported.</li>
+	<li>Only variables created with socialize_with_lock() or via
+the Lockable attribute can be lock()'d.</li>
+</ul>
+
+<h1 id="OBJECTS">OBJECTS <a href="#TOP" class="toplink"><img alt="^" src="..\up.gif" /></a></h1>
+
+<p><a href="Sociable.pm.html">Thread::Sociable</a> exports a version of <a href="http://search.cpan.org/perldoc?perlfunc#&quot;bless REF&quot;">bless()</a> that
+works on shared objects such that <i>blessings</i> propagate across threads.</p>
+
+<pre>  # Create a shared 'foo' object
+  my $foo;
+  socialize($foo);
+  $foo = &amp;socialize({});
+  bless($foo, 'foo');
+
+  # Create a shared 'bar' object
+  my $bar;
+  socialize($bar);
+  $bar = &amp;socialize({});
+  bless($bar, 'bar');
+
+  # Put 'bar' inside 'foo'
+  $foo-&gt;{'bar'} = $bar;
+
+  # Rebless the objects via a thread
+  threads-&gt;create(sub {
+      # Rebless the outer object
+      bless($foo, 'yin');
+
+      # Cannot directly rebless the inner object
+      #bless($foo-&gt;{'bar'}, 'yang');
+
+      # Retrieve and rebless the inner object
+      my $obj = $foo-&gt;{'bar'};
+      bless($obj, 'yang');
+      $foo-&gt;{'bar'} = $obj;
+
+  })-&gt;join();
+
+  print(ref($foo),          &quot;\n&quot;);    # Prints 'yin'
+  print(ref($foo-&gt;{'bar'}), &quot;\n&quot;);    # Prints 'yang'
+  print(ref($bar),          &quot;\n&quot;);    # Also prints 'yang'
+
+</pre><h1 id="NOTES">NOTES <a href="#TOP" class="toplink"><img alt="^" src="..\up.gif" /></a></h1>
+
+<p>Thread::Sociable is designed to disable itself silently if threads are not
+available. If you want access to threads, you must <code>use threads</code> before you
+<code>use Thread::Sociable</code>.</p>
+
+<h1 id="Using_Sociably_code_tie_code_d_Varia">Using Sociably <code>tie()</code>'d Variables <a href="#TOP" class="toplink"><img alt="^" src="..\up.gif" /></a></h1>
+
+<p>A future release will permit multiple threads to sociably tie
+a single variable. In that scenario, when a thread writes to the
+variable, a &quot;multicast&quot; operation is performed, wherein the
+STORE operation to applied to <strong>all</strong> the tying threads.</p>
+
+<p>Read operations are a bit more problematic, due to the need to
+merge the FETCHed values from multiple threads into a single
+return value. In order to address this need, Thread::Sociable
+uses the read context to determine how to return the result.
+If a tied variable is read in list context, a hash mapping
+thread ID's to returned values is returned; in scalar context,
+only the returned value of the last responding thread is returned.</p>
+
+<p>Applications using sociably tied variables must be vigilant
+regarding locking schemes: if a thread initiating a STORE/FETCH
+operation holds a lock which must be acquired by any of the
+tying threads, deadlock will result, and the STORE/FETCH operation
+will hang.</p>
+
+<p>As noted in the following section, operations on sociably tied variables
+are <strong>not</strong> restartable/abortable inside STM transactions. However,
+as for thread-private variable, it may be possible to provide some
+level of recoverability via the onRestart/onRollback closures.</p>
+
+<h1 id="Using_STM">Using STM <a href="#TOP" class="toplink"><img alt="^" src="..\up.gif" /></a></h1>
+
+<p>Currently, STM is only supported on x86, x64, SPARC, and PowerPC
+CPU platforms (due to the availability of spinlock code).
+Support for other CPUs may be possible, assuming appropriate
+spinlock code is provided <i>(patches welcome)</i>.</p>
+
+<p>An STM transaction will be restarted if any of the following
+occur during the transaction:</p>
+
+<ul>
+	<li>Another thread modifies a scalar previously read by the current
+thread (including an individual array or hash element)</li>
+	<li>Another thread adds or deletes elements from a sociable array previously
+read by the current thread, regardless whether the current transaction
+accesses the added/removed elements, due to potential
+conflict with a prior <code>scalar @array</code> or <code>$#array</code> reference.</li>
+	<li>Another thread adds or deletes an element from a sociable hash
+previously read by the current thread, regardless whether the current transaction
+accesses the added/removed elements, due to potential
+conflict with a prior <code>keys %hash</code> reference.</li>
+	<li>The transaction explicitly <code>die</code>'s with the message
+&quot;Thread::Sociable STM RESTART&quot;.</li>
+	<li>The contention manager forces a restart to avoid livelocks <i>See &quot;STM Implementation Details&quot;
+below</i>.</li>
+</ul>
+
+<p>Restart and rollback <strong>cannot</strong> rollback any external effects of,
+or changes to, thread-private variables or I/O operations. E.g.,
+if an application writes to a file during a transaction which later restarts
+or rolls back, the file write operation is not rolled back. Applications
+can, however, provide logic to perform such rollbacks via
+the <code>onRestart</code> and <code>onRollback</code> closure arguments.</p>
+
+<p>Threads spawned within a transaction <strong>do not</strong> inherit the
+transaction state.</p>
+
+<p>Processes forked within a transaction will inherit any current transactions
+within the current threads; however, as the new process's address space
+is completely separate from parent process, the transactions
+of one process <strong>do not</strong> effect the transactions of another.</p>
+
+<p><code>onCommit</code> closures may induce either restart or rollback by executing
+an appropriate <code>die</code>. <code>onRestart</code> closures may induce rollback by executing a <code>die</code>.
+<code>onRollback</code> closures <strong>cannot</strong> induce a restart.</p>
+
+<p>Attempting to open a new transaction in <code>onCommit</code>, <code>onRestart</code>, or <code>onRollback</code>
+closures will generate a fatal error. Any access to sociable variables within those
+closures will <strong>not</strong> be transactional, and will reference the sociable value,
+<strong>not</strong> any existing private transactional value.</p>
+
+<p>Transactions may be nested; however,</p>
+
+<ul>
+	<li>Commits of sequential inner transactions
+are <strong>not</strong> applied until the outermost transaction commits.</li>
+	<li>Restarts or rollbacks of inner transactions will cascade to <strong>all</strong>
+transactions within the thread, including previously completed, but
+uncommitted, preceding and inner transactions.</li>
+</ul>
+
+<p>As each pending transaction is committed, restarted, or rolled back,
+any associated <code>onCmmit</code>, <code>onRestart</code>, or <code>onRollback</code> closures will be invoked.</p>
+
+<p>If a transaction's <code>onCommit</code> closure induces restart or rollback,
+or if a transaction's <code>onRestart</code> closure induces rollback,
+the <code>onRestart</code> or <code>onRollback</code> closures of <strong>all</strong> pending transactions will be executed,
+including</p>
+
+<ul>
+	<li>prior completed, but uncommitted, transactions</li>
+	<li>inner transactions</li>
+	<li>transactions which have already executed their <code>onCommit</code> or <code>onRestart</code> closures</li>
+</ul>
+
+<p>Note that certain pathological constructs should be avoided, e.g., consider</p>
+
+<pre>    sub lots_of_pending_xactions {
+        for (1..1000) {
+            sociable_begin_work(sub {
+                #
+                # do some stuff
+                #
+                },
+                onRestart =&gt; sub {
+                #
+                #    do some restart stuff
+                #
+                },
+                onRollback =&gt; sub {
+                #
+                #    do some rollback stuff
+                #
+                }
+            );
+        }
+    }
+
+    sociable_begin_work(sub {
+        lots_of_pending_xactions()
+        #
+        #    do some stuff
+        #
+        }
+    );
+
+</pre><p>This code would cause up to 1000 inner transactions to be completed, but not committed.
+More importantly, each iteration would add an additional onRestart and onRollback
+closure to the transaction log; if a restart or rollback occurs, <strong>each of the
+registered closure instances will be executed</strong>.</p>
+
+<p>In such cases, applications should use a more conservative strategy if possible, e.g.</p>
+
+<pre>    sub lots_of_pending_xactions {
+        my $already_registered = 0;
+        for (1..1000) {
+            sociable_begin_work(sub {
+                #
+                # do some stuff
+                #
+                },
+                onRestart =&gt; $already_registered ?
+                    sub {
+                    #
+                    #    do some restart stuff
+                    #
+                    } : undef,
+                onRollback =&gt;  $already_registered ?
+                    sub {
+                    #
+                    #    do some rollback stuff
+                    #
+                    } : undef
+            );
+            $already_registered = 1;
+        }
+    }
+
+</pre><p>This modification results in only adding a single instance of
+the closures.</p>
+
+<p>Certain sociable objects may be safely used with the classic locking/critical
+section technique while inside an STM transaction (notably, TSDQ's used for
+TSA interfaces). In general, however, mingling classic locking with
+STM is probably a very bad idea.</p>
+
+<p>Operations on sociably <code>tie()</code>'d variables are not logged within
+a transaction, and therefore cannot be restarted/rolled back.</p>
+
+<p>Transactional access to arrays or hashes is problematic:
+some applications may only access a few elements of a given array or hash,
+while others may iterate over the entire array or hash. The former scenario
+is reasonably well tolerated within an STM, with a restart probability
+comparable to accessing simple scalars. The latter
+scenario, however, can lead to restart starvation for large arrays
+or hashes which are subject to frequent updates, with significant heap
+thrashing and spinlocking congestion. STM users are advised to keep these
+issues in mind, and seek alternative designs where possible.
+Performing large splices on arrays, especially with a replacement list, is a
+particularly &quot;heavyweight&quot; operation within a transaction, and should be avoided if
+possible.</p>
+
+<p>Currently, creation of sociable variables within a transaction is <strong>not</strong>
+transactional, i.e., if the transaction restarts or rolls back, the sociable
+variable will not be discarded until an explicit <code>sociable_discard()</code> call.</p>
+
+<p>Creating or accessing references to sociable variables is <strong>not</strong> considered transactional access;
+an access is only logged on a read or write of a sociable variable's contents.</p>
+
+<p>Passing a sociable reference to, or receiving a sociable reference from,
+another thread (e.g., via a TSDQ operation) does not convey any transactional
+context to the recipient/sender. Subsequent accesses to the sociable variable
+within the transaction will be logged as usual, but no notification is
+provided to the sender/receiver upon commit/restart/rollback, nor is any
+&quot;two phase commit&quot; protocol provided to coordinate such activities of
+communicationg threads.</p>
+
+<p>Two different conflict detection protocols are supported:</p>
+
+<dl>
+	<dt>Eager</dt>
+		<dd><p>Eager detection attempts to detect conflicts on each access to
+sociable variables during the transaction, and will initiate
+restart as early as possible. This protocol may be preferable in
+highly contentions environments by avoiding additional STM operations
+which would later be discarded due to restart at commit.</p></dd>
+	<dt>Lazy</dt>
+		<dd><p>Lazy detection ignores conflicts until commit. In so doing, the
+overhead of variable access during the transaction is reduced, which may
+be preferable in minimal contention environments with short transactions.</p></dd>
+</dl>
+<p>Likewise, two commit protocols are supported:</p>
+
+<dl>
+	<dt>Locked</dt>
+		<dd><p>Locked commit first acquires a global mutex <i>(not a spinlock)</i> before acquiring
+the spinlocks of all accessed sociable variables. Once the spinlocks are acquired
+(or a conflict is detected), the mutex is released, and commit (or rollback)
+can proceed. The mutex is required to avoid deadlock between concurrently committing
+transactions which may attempt to spinlock the same variables, but in different
+orders. By requiring the mutex, only one transaction at a time can ever hold more
+than 1 spinlock at a time. However, the mutex may impede progress of non-overlapping
+transactions.</p></dd>
+	<dt>Lockfree</dt>
+		<dd><p>Prior to acquiring spinlocks, Lockfree commit first applies a sort to the
+addresses of the accessed sociable variables. By acquiring spinlocks in a sorted
+order, competing commits are guaranteed to avoid deadlock. For very
+large transactions, the sort overhead may be significant; however, other non-overlapping
+transactions are not impeded (as for the Locked commit).</p></dd>
+</dl>
+<p>The detection protocol is set using the <code>sociable_stm_eager()</code> and
+<code>sociable_stm_lazy()</code> methods; <code>sociable_stm_locked()</code> and <code>sociable_stm_lockfree()</code>
+are used to select the commit protocol. Note that the conflict and commit protocol
+settings are <strong>global</strong>, i.e., changing the protocol in any thread changes it for
+all threads (as the complementary protocols are not compatible).</p>
+
+<p>The current protocol settings can be determined by
+calling <code>sociable_stm_protocol()</code>, which return a hashref
+with keys <strong>Commits</strong> (set to either &quot;locked&quot; or &quot;lockfree&quot;),
+and <strong>Conflicts</strong> (set to either &quot;eager&quot; or &quot;lazy&quot;).</p>
+
+<p>The advantages of any protocol combination are not as yet empirically known. Locked
+commit may help avoid restarts for long duration transactions by avoiding
+competition for spinlocks at commit time; but highly concurrent environments
+using small non-overlapping transactions may benefit from the ability to
+concurrently commit.</p>
+
+<p>A lazy copy algorithm is used to acquire array or hash contents.
+Individual elements of a structure are only copied from the sociable version
+when they are first referenced, thereby avoiding significant copy overhead for
+transactions which only reference a few elements. However, this approach may be
+detrimental for transactions which iterate over an entire array or hash (due to
+possibly increased the probability of restarts).
+A future release may provide selectable lazy or eager copy support.</p>
+
+<h1 id="STM_Implementation_Details">STM Implementation Details <a href="#TOP" class="toplink"><img alt="^" src="..\up.gif" /></a></h1>
+
+<p>Thread::Sociable currently uses invisible reads, with selectable eager or lazy conflict detection,
+and selectable locked or lockfree commits (default is eager, lockfree).
+Eager conflict detection is implemented using
+a modified &quot;Polka&quot; Contention Manager dubbed <i>&quot;Sociable Contention Manager&quot;</i>:</p>
+
+<ul>
+	<li>Each thread has a &quot;karma&quot; counter in its transaction context, which is incremented
+for each first access to a sociable variable within a transaction, and
+cleared on commit or rollback, but <strong>retained</strong> across a restart.</li>
+	<li>Each sociable variable has both a sequence number, and an &quot;owner&quot; pointer field,
+which points to the transaction context of the current owner of the variable.</li>
+	<li>On first access to a sociable variable, the accessing thread attempts to acquire ownership.
+If the variable is not owned, <strong>or</strong> the current owner's karma is less than the
+current thread's karma, then the variable is acquired by the current thread.
+If the variable is acquired <strong>or</strong> the current operation is a read, the transaction
+proceeds; otherwise, a restart is initiated. Note that read operations do not require ownership,
+but will attempt ownership in order to avoid future restarts induced by a shorter
+duration writer. Should the thread fail to acquire the variable on a read operation,
+it will once again attempt to acquire ownership on any subsequent write operation, and
+induce restart if the variable cannot be acquired at that time.
+<br /><br />Additionally, the current sequence number of the variable is recorded.</li>
+	<li>Sociable references require an additional mapping within the transaction.
+Since different sociable variables may reference the same sociable
+variable, the thread-private transactional versions of the reference
+variables must be mapped to the same private version of the referent
+(in order for any updates through one reference to be reflected
+in any read through a different reference).
+Therefore, a hash is used to map the referent sociable's address to
+thread private copy.
+<br /><br />Consider<pre>	my $a : Sociable;
+	my $b : Sociable;
+	my @ary : Sociable;
+	$a = \@ary;
+	$b = \@ary;
+
+	sociable_begin_work(
+		sub {
+			$a-&gt;[1] = 20;
+			$b-&gt;[2] = 30;
+			if ($a-&gt;[2] == 30) {
+				print &quot;proper update&quot;;
+			}
+			else {
+				print &quot;improper update&quot;;
+			}
+		}
+	);
+
+</pre>
+<br /><br />On the first reference to $a, a private copy of its contents - a reference to <code>@ary</code> -
+is made. The dereference of the private copy will then create a (shallow) private copy
+of @ary. Then the reference to $b creates a private copy of its contents
+ - again, a reference to <code>@ary</code> -, and the dereference would cause another private
+copy of @ary. With 2 different copies of @ary, the conditional would indicate
+&quot;improper copy&quot;. Keeping an additional map of the private copy of the referent,
+keyed by the sociable version's address, assures that the updates are applied to
+the same private version.
+
+
+</li>
+	<li>In order to commit, a thread must have ownership of any variables which it has written,
+and, for variables which were only read, the sequence number must not have changed
+since the first access (i.e., has not yet been written by another transaction).
+If those conditions hold at commit, the sequence numbers of variables which are written are
+incremented, the writes are copied to the sociable versions, and ownership is released. If those
+conditions are violated, a restart is initiated.</li>
+	<li>Eager conflict detection is implemented for readonly variables by testing the sequence
+number of each accessed variable (or structure element) each time it is read (though
+only the thread-private value of the variable - created on first access - is used).
+If the sequence number has changed since first access, the transaction is restarted immediately.
+<strong>Note</strong> that variables that are written before any read access are not subject to eager restart.
+For variables which have been written, the ownership of the variable is tested and a restart
+initiated if the current thread is no longer the owner.
+<br /><br />For highly concurrent environments with medium to high probability of transaction restarts,
+eager detection may be preferable to lazy detection, as the eager method's
+overhead is not significant relative to the normal overhead of Perl
+and Thread::Sociable variable manipulation. The eager method
+may improve performance by avoiding additional read/write operations that would later be
+discarded under the lazy method.</li>
+	<li>Lazy conflict detection simply skips the sequence number and ownership checks until
+the commit phase. Lazy detection may perform better in environments with low concurrency
+and low restart probability.</li>
+	<li>Commits are applied using the selected protocol <i>(see above)</i>. If a locked protocol
+is selected, a global mutex is acquired before acquiring the spinlocks of each referenced
+variable, after which the mutex is released. If the lockfree protocol is selected,
+then the entries in the WAL are sorted in ascending order before spinlocks are acquired.
+The sequence number and ownership tests
+described above occur while the spinlocks are held; the spinlocks are released when all
+variables have been committed, or a restart is initiated.</li>
+	<li>On a transaction restart, a thread <code>yield()</code> is executed to provide a pseudo-random
+restart backoff delay, which various studies indicate improve performance/reduce
+contention. While such studies usually rely on exponential backoff spinlocks, yield()
+should provide a similar delay mechanism that automatically adapts to the processing
+load of the system.</li>
+</ul>
+
+<p>The Sociable contention manager helps avoid livelock* with minimal access overhead.
+Sociable CM approximates the &quot;Polka&quot; Contention Manager described
+in <a href="http://www.cs.rochester.edu/u/scott/papers/2005_PODC_CM.pdf">http://www.cs.rochester.edu/u/scott/papers/2005_PODC_CM.pdf</a>, which
+indicates that Polka provides near optimal contention management
+across various types of contention.</p>
+
+<p>The Sociable Contention Manager differs from the Polka implementation in that</p>
+
+<ul>
+	<li>Polka uses a more complex conflict resolution algorithm: if the number
+of attempts by the current thread to acquire a variable exceeds the
+<i>difference between the current thread's karma and the current owner's karma</i>,
+then the current thread will acquire the variable. Sociable CM simply compares the
+karma values, with ownership granted if the current thread's karma is greater than
+the current owner's. The current thread increments its karma regardless whether
+the acquisition succeeds, so the accumulation effect is similar.</li>
+	<li>Polka uses exponential backoff spinlocks to delay transaction restarts,
+whereas Sociable relies on <code>threads-</code>yield()&gt; to inject a pseudorandom
+delay, which frees CPU resources for other threads to execute.</li>
+</ul>
+
+<p><i>* Livelock occurs when some threads' (usually long-duration) transactions
+are repeatedly restarted due to conflicts created by other thread's
+(usually short duration) transactions modifying variables referenced by the
+livelocked transaction. </i></p>
+
+<h1 id="BUGS_AND_LIMITATIONS">BUGS AND LIMITATIONS <a href="#TOP" class="toplink"><img alt="^" src="..\up.gif" /></a></h1>
+
+<p>When <code>socialize</code> is used on arrays, hashes, array refs or hash refs, any data
+they contain will be lost.</p>
+
+<pre>  my @arr = qw(foo bar baz);
+  socialize(@arr);
+  # @arr is now empty (i.e., == ());
+
+  # Create a 'foo' object
+  my $foo = { 'data' =&gt; 99 };
+  bless($foo, 'foo');
+
+  # Share the object
+  socialize($foo);        # Contents are now wiped out
+  print(&quot;ERROR: \$foo is empty\n&quot;)
+      if (! exists($foo-&gt;{'data'}));
+
+</pre><p>Therefore, populate such variables <strong>after</strong> declaring them as sociable.  (Scalar
+and scalar refs are not affected by this problem.)</p>
+
+<p>Care must be exersized when socializing an object. Unless the class itself has been
+written to support socialization, an object's destructor may get called
+multiple times, once for each thread's scope exit.  Additionally,
+the contents of hash or array based objects will be lost (due to the above
+limitation) if the object is socialized after its members have been
+populated.</p>
+
+<p>Due to significant performance impact, taking refs of individual array or hash elements (e.g.,
+$x = \$ary[34]; $y = \$hash{SomeKey};) is not fully supported. While the reference may be
+returned, it will <strong>not</strong> be a reference to a sociable value, and any future dereference
+through such references will not apply to the sociable values, but only to the thread local
+copy of the data. A future release will support a <strong>Refable</strong> attribute and associated
+<strong>sociable_refable()</strong> method to declare arrays and hashes that will return shared references
+for elements, with an associated performance impact.</p>
+
+<p><strong>slice()</strong> of a sociable array or hash does <strong>not</strong> produce a sociable variable. A future
+Refable support may add support for sociable slices.</p>
+
+<p>Taking references to the elements of sociable arrays and hashes does not
+autovivify the elements, and neither does slicing a sociable array/hash over
+non-existent indices/keys autovivify the elements.</p>
+
+<p><code>socialize()</code> allows you to <code>socialize($hashref-&gt;{key})</code> without giving any
+error message.  But the <code>$hashref-&gt;{key}</code> is <strong>not</strong> sociable, causing the
+error &quot;locking can only be used on sociable values&quot; to occur when you attempt to
+<code>lock($hasref-&gt;{key})</code>.</p>
+
+<p>Mixing <code>lock()</code> and STM is probably a <strong>very, very,</strong> <i>very</i> bad idea.</p>
+
+<p>View existing bug reports at, and submit any new bugs, problems, patches, etc.
+to: <a href="http://rt.cpan.org/NoAuth/Bugs.html?Dist=Thread-Sociable">http://rt.cpan.org/NoAuth/Bugs.html?Dist=Thread-Sociable</a></p>
+
+<h1 id="Benchmarks">Benchmarks <a href="#TOP" class="toplink"><img alt="^" src="..\up.gif" /></a></h1>
+
+<p>A set of simple benchmark test scripts (included in the <i>./bench</i> directory)
+were executed against both this version of Thread::Sociable and threads::shared 1.03.
+The following table provides the results for various operations, using
+the specified number of threads on the specified platforms:</p>
+
+<h3 id="Single_2_4_GHz_WinXP_AS_Perl_5_8_6">Single 2.4 GHz, WinXP, AS Perl 5.8.6</h3>
+
+<h3 id="Single_100MHz_SPARC_Solaris_10_Perl_">Single 100MHz SPARC, Solaris 10, Perl 5.8.6</h3>
+
+<h3 id="Single_1_5GHz_PPC_OS_X_10_4_9_Perl_5">Single 1.5GHz PPC, OS X 10.4.9, Perl 5.8.6</h3>
+
+<h3 id="Dual_3GHz_Xeon_Win2000_Server_AS_Per">Dual 3GHz Xeon, Win2000 Server, AS Perl 5.8.8</h3>
+
+<h3 id="Dual_3GHz_Xeon_Linux_Perl_5_8_8">Dual 3GHz Xeon, Linux, Perl 5.8.8</h3>
+
+<h3 id="Dual_3GHz_Xeon_Solaris_10_Perl_5_8_8">Dual 3GHz Xeon, Solaris 10, Perl 5.8.8</h3>
+
+<h3 id="Quad_700MHz_Xeon_Win2000_Server_AS_P">Quad 700MHz Xeon, Win2000 Server, AS Perl 5.8.8</h3>
+
+<h1 id="TO_DO">TO DO <a href="#TOP" class="toplink"><img alt="^" src="..\up.gif" /></a></h1>
+
+<h3 id="IPC_Support">IPC Support</h3>
+
+<p>Thread::Sociable could be extended to provide an interprocess shared variable
+solution by replacing the CRT heap with a shared memory heap manager.</p>
+
+<h1 id="SEE_ALSO">SEE ALSO <a href="#TOP" class="toplink"><img alt="^" src="..\up.gif" /></a></h1>
+
+<p><a href="Sociable\DuplexQueue.pm.html">Thread::Sociable::DuplexQueue</a></p>
+
+<p><a href="Sociable\Apartment.pm.html">Thread::Sociable::Apartment</a></p>
+
+<p><a href="http://search.cpan.org/perldoc?threads%3A%3Ashared">threads::shared</a></p>
+
+<p><a href="http://search.cpan.org/perldoc?threads">threads</a></p>
+
+<p><a href="http://search.cpan.org/perldoc?perlthrtut">perlthrtut</a></p>
+
+<p>Some spinlock code was borrowed from <a href="http://search.cpan.org/perldoc?Parrot">Parrot</a>, which also provides an STM implementation.</p>
+
+<p>Perl threads mailing list:
+<a href="http://lists.cpan.org/showlist.cgi?name=iThreads">http://lists.cpan.org/showlist.cgi?name=iThreads</a></p>
+
+<p>For in-depth information regarding, STM, I recommend the
+University of Rochester Synchronization Group's Publication
+list at <a href="http://www.cs.rochester.edu/research/synchronization/pubs.shtml">http://www.cs.rochester.edu/research/synchronization/pubs.shtml</a>.</p>
+
+<h1 id="AUTHOR">AUTHOR <a href="#TOP" class="toplink"><img alt="^" src="..\up.gif" /></a></h1>
+
+<p>Dean Arnold <a href="mailto:darnold@presicient.com">mailto:darnold@presicient.com</a></p>
+
+<p>Based on <a href="http://search.cpan.org/perldoc?threads%3A%3Ashared">threads::shared</a> by</p>
+
+<p>Artur Bergman &lt;sky AT crucially DOT net&gt;</p>
+
+<p>and its CPAN version produced by Jerry D. Hedden &lt;jdhedden AT cpan DOT org&gt;.</p>
+
+<p>Permission is granted to use this software under the same terms as Perl itself.
+Refer to the <a href="http://search.cpan.org/perldoc?perlartistic">Perl Artistic License</a> for details.</p>
+
+
+</div><div class="footer">generated by <a href="http://search.cpan.org/perldoc?Pod%3A%3AProjectDocs">Pod::ProjectDocs</a></div></body>
+</html>

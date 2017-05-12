@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>
+      WebMake: Documentation: HTML::WebMake::Main
+    </title>
+    <meta name="generator" content="WebMake/2.2" />
+    <style>
+      body {
+       background-color: #ffffff; 
+       color: #000000; 
+       font-size: medium;
+       font-family: verdana,lucida,helvetica,sans-serif;
+      }
+      code, samp, pre {
+       font-family: Courier New,courier,fixed-width,monospace;
+      }
+      H1 { font-size: x-large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFCC66; }
+      H2 { font-size: large; font-family: Garamond,Book Antiqua,Times,serif; background: #FFDD77; }
+      H3 { font-size: medium; font-family: Garamond,Book Antiqua,Times,serif; background: #FFEE88; }
+      H4 { font-size: small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H5 { font-size: x-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      H6 { font-size: xx-small; font-family: Garamond,Book Antiqua,Times,serif; }
+      A:link {
+       font-weight: bold;
+       color: #004000;
+       text-decoration: underline; 
+      }
+      A:visited {
+       font-weight: normal;
+       color: #008000;
+       text-decoration: underline; 
+      }
+      A:active {
+       font-weight: bold;
+       color: #800000;
+       text-decoration: underline; 
+      }
+      dt {
+       font-size: medium;
+       font-weight: bold;
+       padding-top: 8px; padding-bottom: 8px;
+      }
+      dd {
+       padding-top: 8px; padding-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body bgcolor="#ffffff" text="#000000" link="#3300cc" vlink="#660066">
+    <font face="lucida,verdana,sans-serif">
+      <div align="center">
+         <img src="images/WebMakeTitle.png" alt="WebMake" width="500" height="122" />
+      </div>
+      <table width="100%">
+        <tr>
+          <td valign="top">
+             <strong><a href="http://webmake.taint.org/">WebMake</a>
+             Documentation</strong> (version 2.2)
+             
+          </td>
+          <td valign="top">
+            <div align="right">
+              
+               [ <a href="Content.pm.html">Back</a> | <a href="PerlCodeLibrary.pm.html">Forward</a> | <a href="index.html">Index</a>
+               | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+               
+            </div>
+          </td>
+        </tr>
+      </table>
+<!-- yes, it's that Mozilla black-border code again ;) -->
+      <!-- stolen from www.mozilla.org via rc3.org -->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td bgcolor="#aaaaaa">
+            <table border="0" cellspacing="4" cellpadding="4" width="100%">
+              <tr>
+                <td bgcolor="#ffffff">
+                  <table border="0" cellspacing="4" cellpadding="4" width="100%">
+                    <tr>
+                      <td>
+                         <h1>HTML::WebMake::Main</h1><!-- INDEX BEGIN -->
+                        <ul>
+                          <li>
+                            <a href="#NAME">NAME</a><li>
+                              <a href="#SYNOPSIS">SYNOPSIS</a><li>
+                                <a href="#DESCRIPTION">DESCRIPTION</a><li>
+                                  <a href="#METHODS">METHODS</a><li>
+                                    <a href="#MORE_DOCUMENTATION">MORE DOCUMENTATION</a><li>
+                                      <a href="#SEE_ALSO">SEE ALSO</a><li>
+                                        <a href="#AUTHOR">AUTHOR</a><li>
+                                          <a href="#COPYRIGHT">COPYRIGHT</a><li>
+                                            <a href="#AVAILABILITY">AVAILABILITY</a>
+                                          </ul>
+<!-- INDEX END -->
+                                                                                    <hr />
+                                           <h1><a name="NAME">NAME</a></h1><p>
+                                            
+                                            HTML::WebMake - a simple web site management system, allowing an entire
+                                            site to be created from a set of text and markup files and one WebMake
+                                            file.
+                                            <hr />
+                                             <h1><a name="SYNOPSIS">SYNOPSIS</a></h1><p>
+                                              <pre>  my $f = new HTML::WebMake::Main ();
+  $f-&gt;readfile ($filename);
+  $f-&gt;make();
+  my $failures = $f-&gt;finish();
+  exit $failures;
+</pre><hr />
+                                               <h1><a name="DESCRIPTION">DESCRIPTION</a></h1><p>
+                                                
+                                                WebMake is a simple web site management system, allowing an entire site to
+                                                be created from a set of text and markup files and one WebMake file.
+                                                <p>
+                                                  
+                                                  It requires no dynamic scripting capabilities on the server; WebMake sites
+                                                  can be deployed to a plain old FTP site without any problems.
+                                                  <p>
+                                                    
+                                                    It allows the separation of responsibilities between the content editors,
+                                                    the HTML page designers, and the site architect; only the site architect
+                                                    needs to edit the WebMake file itself, or know perl or WebMake code.
+                                                    <p>
+                                                      
+                                                      A multi-level website can be generated entirely from 1 or more WebMake
+                                                      files containing content, links to content files, perl code (if needed),
+                                                      and output instructions. Since the file-to-page mapping no longer applies,
+                                                      and since elements of pages can be loaded from different files, this means
+                                                      that standard file access permissions can be used to restrict editing by
+                                                      role.
+                                                      <p>
+                                                        
+                                                        Since WebMake is written in perl, it is not limited to command-line
+                                                        invocation; using the <code>HTML::WebMake::Main</code> module directly allows WebMake to be run from other Perl scripts, or even
+                                                        mod_perl (WebMake uses <code>use strict</code> throughout, and temporary globals are used only where strictly necessary).
+                                                        <hr />
+                                                         <h1><a name="METHODS">METHODS</a></h1><dl>
+                                                          <dt>
+                                                            <strong><a name="item__f">$f = new HTML::WebMake::Main</a></strong>
+                                                          </dt>
+                                                          <dd>
+                                                            <p>
+                                                              
+                                                              Constructs a new <code>HTML::WebMake::Main</code> object. You may pass the following attribute-value pairs to the
+                                                              constructor.
+                                                              <dl>
+                                                                
+                                                              </dd>
+                                                              <dt>
+                                                                <strong><a name="item_force_output">force_output</a></strong>
+                                                              </dt>
+                                                              <dd>
+                                                                <p>
+                                                                  
+                                                                  Force output. Normally if a file is already up to date, it is not modified.
+                                                                  This will force the file to be re-made.
+                                                                  
+                                                                </dd>
+                                                                <dt>
+                                                                  <strong><a name="item_force_cache_rebuild">force_cache_rebuild</a></strong>
+                                                                </dt>
+                                                                <dd>
+                                                                  <p>
+                                                                    
+                                                                    Force the cached metadata and dependency data for the site to be rebuilt.
+                                                                    Normally this is used to speed up partial rebuilds of the site. This option
+                                                                    implies <a href="#item_force_output">force_output</a>.
+                                                                    
+                                                                  </dd>
+                                                                  <dt>
+                                                                    <strong><a name="item_risky_fast_rebuild">risky_fast_rebuild</a></strong>
+                                                                  </dt>
+                                                                  <dd>
+                                                                    <p>
+                                                                      
+                                                                      Run more quickly, but take more risks. Normally, dynamic content, such as
+                                                                      Perl sections, sitemaps, or navigation links, are always considered to be
+                                                                      in need of rebuilding, as mapping their dependencies is often very
+                                                                      difficult or impossible. This switch forces them to be ignored for
+                                                                      dependency-tracking purposes, and so an output file that depends on them
+                                                                      will not be rebuilt unless a normal content item on that page changes.
+                                                                      
+                                                                    </dd>
+                                                                    <dt>
+                                                                      <strong><a name="item_base_href">base_href</a></strong>
+                                                                    </dt>
+                                                                    <dd>
+                                                                      <p>
+                                                                        
+                                                                        Rewrite links to be absolute URLs based at this URL. By default, links are
+                                                                        specified as relative wherever possible.
+                                                                        
+                                                                      </dd>
+                                                                      <dt>
+                                                                        <strong><a name="item_base_dir">base_dir</a></strong>
+                                                                      </dt>
+                                                                      <dd>
+                                                                        <p>
+                                                                          
+                                                                          Generate output, and look for support files (images etc.), relative to this
+                                                                          directory.
+                                                                          
+                                                                        </dd>
+                                                                        <dt>
+                                                                          <strong><a name="item_paranoid">paranoid</a></strong>
+                                                                        </dt>
+                                                                        <dd>
+                                                                          <p>
+                                                                            
+                                                                            Paranoid mode; do not allow perl code evaluation or accesses to directories
+                                                                            above the WebMake file.
+                                                                            
+                                                                          </dd>
+                                                                          <dt>
+                                                                            <strong><a name="item_debug">debug</a></strong>
+                                                                          </dt>
+                                                                          <dd>
+                                                                            <p>
+                                                                              
+                                                                              Debug mode; more output.
+                                                                              
+                                                                            </dd>
+                                                                          </dl>
+                                                                        </dd>
+                                                                        <dt>
+                                                                          <strong><a name="item__f_set_option">$f-&gt;set_option ($optname, $optval);</a></strong>
+                                                                        </dt>
+                                                                        <dd>
+                                                                          <p>
+                                                                            
+                                                                            Set a WebMake option. Currently supported options are:
+                                                                            <dl>
+                                                                              
+                                                                            </dd>
+                                                                            <dt>
+                                                                              <strong><a name="item__f_readfile">$f-&gt;readfile ($filename)</a></strong>
+                                                                            </dt>
+                                                                            <dd>
+                                                                              <p>
+                                                                                
+                                                                                Read and parse the given WebMake file.
+                                                                                
+                                                                              </dd>
+                                                                              <dt>
+                                                                                <strong><a name="item__f_readstring">$f-&gt;readstring ($string)</a></strong>
+                                                                              </dt>
+                                                                              <dd>
+                                                                                <p>
+                                                                                  
+                                                                                  Read and parse the given WebMake configuration (as a string).
+                                                                                  
+                                                                                </dd>
+                                                                                <dt>
+                                                                                  <strong><a name="item__f_make">$f-&gt;make (@fnames)</a></strong>
+                                                                                </dt>
+                                                                                <dd>
+                                                                                  <p>
+                                                                                    
+                                                                                    Make either the files named by <code>$fnames</code> (or all outputs if
+                                                                                    <code>$fname</code> is not supplied), based on the WebMake files read
+                                                                                    earlier.
+                                                                                    
+                                                                                  </dd>
+                                                                                  <dt>
+                                                                                    <strong><a name="item__pagetext">$pagetext = $f-&gt;make_to_string ($fname)</a></strong>
+                                                                                  </dt>
+                                                                                  <dd>
+                                                                                    <p>
+                                                                                      
+                                                                                      Make the file named by $fname, and output its text to STDOUT, based on the
+                                                                                      WebMake files read earlier.
+                                                                                      
+                                                                                    </dd>
+                                                                                    <dt>
+                                                                                      <strong><a name="item__ok">$ok = $f-&gt;can_build($fname);</a></strong>
+                                                                                    </dt>
+                                                                                    <dd>
+                                                                                      <p>
+                                                                                        
+                                                                                        Returns 1 if WebMake can build the named file, 0 otherwise.
+                                                                                        
+                                                                                      </dd>
+                                                                                      <dt>
+                                                                                        <strong><a name="item__num_failures">$num_failures = $f-&gt;finish();</a></strong>
+                                                                                      </dt>
+                                                                                      <dd>
+                                                                                        <p>
+                                                                                          
+                                                                                          Finish with a WebMake object and dispose of its internal open files etc.
+                                                                                          Returns the number of serious failure conditions that occurred (files that
+                                                                                          could not be created, etc.).
+                                                                                          
+                                                                                        </dd>
+                                                                                      </dl>
+                                                                                      <hr />
+                                                                                       <h1><a name="MORE_DOCUMENTATION">MORE DOCUMENTATION</a></h1><p>
+                                                                                        
+                                                                                        See also <a href="http://webmake.taint.org/">http://webmake.taint.org/</a>
+                                                                                        for more information.
+                                                                                        <hr />
+                                                                                         <h1><a name="SEE_ALSO">SEE ALSO</a></h1><p>
+                                                                                           <code>webmake</code> <code>ettext2html</code> <code>ethtml2text</code> <code>HTML::WebMake</code> <code>Text::EtText::EtText2HTML</code> <code>Text::EtText::EtHTML2Text</code><hr />
+                                                                                           <h1><a name="AUTHOR">AUTHOR</a></h1><p>
+                                                                                            
+                                                                                            Justin Mason &lt;jm /at/ jmason.org&gt;
+                                                                                            <hr />
+                                                                                             <h1><a name="COPYRIGHT">COPYRIGHT</a></h1><p>
+                                                                                              
+                                                                                              WebMake is distributed under the terms of the GNU Public License.
+                                                                                              <hr />
+                                                                                               <h1><a name="AVAILABILITY">AVAILABILITY</a></h1><p>
+                                                                                                
+                                                                                                The latest version of this library is likely to be available from CPAN as
+                                                                                                well as:
+                                                                                                <p>
+                                                                                                  <pre>  <a href="http://webmake.taint.org/">http://webmake.taint.org/</a>
+</pre>
+                                                                                                </td>
+                                                                                              </tr>
+                                                                                            </table>
+                                                                                          </td>
+                                                                                        </tr>
+                                                                                      </table>
+                                                                                    </td>
+                                                                                  </tr>
+                                                                                </table>
+                                                                                <table width="100%">
+                                                                                  <tr>
+                                                                                    <td valign="top">
+                                                                                       <strong><a href="http://webmake.taint.org/">WebMake</a>
+                                                                                       Documentation</strong> (version 2.2)
+                                                                                       
+                                                                                    </td>
+                                                                                    <td valign="top">
+                                                                                      <div align="right">
+                                                                                        
+                                                                                         [ <a href="Content.pm.html">Back</a> | <a href="PerlCodeLibrary.pm.html">Forward</a> | <a href="index.html">Index</a>
+                                                                                         | <a href="allinone.html">All&nbsp;In&nbsp;One</a> ]
+                                                                                         
+                                                                                      </div>
+                                                                                    </td>
+                                                                                  </tr>
+                                                                                </table>
+                                                                                <div align="right">
+                                                                                   <a href="http://webmake.taint.org/"> <img src="images/BuiltWithWebMake.png" alt="Built With WebMake" border="0" width="88" height="31" /></a>
+                                                                                </div>
+                                                                              </font>
+                                                                            </body>
+                                                                          </html>

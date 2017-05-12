@@ -1,0 +1,16 @@
+# $Id: borked2.wt,v 1.2 2002/06/15 19:41:11 m_ilya Exp $
+
+test_name = Some name here
+    # another comment here
+    url = www.dot.com
+    regex_require = (
+                      'Quoted text " test'
+                      "We can => quote '" )
+    let's break test here
+    regex_forbid =  ( More = tests
+                      Some @#$%^&* chars
+                      "more" => tests and fun
+                      abcdef 1234 => " a b c d ' e f "
+                    )
+    auth = ( name => value )
+end_test

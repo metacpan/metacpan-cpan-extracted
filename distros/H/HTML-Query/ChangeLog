@@ -1,0 +1,68 @@
+0.01	2008-10-07	Andy Wardley <cpan@wardley.org>>
+
+	* Initial release to the world.
+
+0.02	2009-06-15	Andy Wardley <cpan@wardley.org>>
+
+	* Update code to catch ids/classes
+	* Adjust AUTOLOAD to properly pass arguments
+	* Rework tests to catch cases where id and classes have minus character in them
+
+0.03	2010-09-27	Kevin Kamel <kamelkev@mailermailer.com>
+
+	* Adjustment of Makefile to allow for release from non-author
+	* Added patch from Michael Peters <wonko@cpan.org> to enable combinator support
+	* Added patch contributed from Vivek Khera <vivek@khera.org> to enable fuzzy attribute matching
+	* Updated documentation with contributions from Michael Peters regarding combinators 	
+	* Updated documentation to reflect fuzzy attribute matching
+	* Add tests to verify combinators, fuzzy attributes
+	* Add "acidtest" test from Chelsea Rio to test complex selectors
+
+0.04	2010-10-12	Kevin Kamel <kamelkev@mailermailer.com>
+
+	* Add support for Universal Selector, explicitely differentiating the behaviour from the 
+	  grandchild descendant selector (which is also a "*")
+	* Add code to explicitely dedupe some edge cases
+	* Add code to support flag for error suppression, add method to get error if you need it
+	* Rework selector parser to support complex tag stacking (exa span.class#id.class2#id2[attr])
+	* Add more tests for granchild descendant selector
+	* Add tests for universal selector
+	* Add tests for combinators without spaces (div>em)
+	* Add tests for complex tag stacking
+	
+0.05	2010-10-21	Kevin Kamel <kamelkev@mailermailer.com>
+
+	* Added patch from Vivek Khera <vivek@khera.org>
+		- Converts HTML::Query references to hash objects
+		- fixes issues with report error
+		- fixes bug reported on RT whereby iterative queries returned incorrect results
+	* Added patch to correct issues found during heavier testing of 0.04
+		- Universal / Grandchild operator now are now better supported
+		- Selectors that involve , are now deduped, previously duplicate results were sneaking in
+		- Results sets are now sorted to match what firefox returns, if for no other reason than to
+		  assist with validation
+		- Universal tests now cover a wider variety of selectors
+
+0.06	2010-10-27	Kevin Kamel <kamelkev@mailermailer.com>
+
+	* Added skipping for '* html' hack sequence frequently used by IE6, should return nothing
+
+0.07	2010-11-02	Kevin Kamel <kamelkev@mailermailer.com>
+
+	* Merge in specificity calculation. This code was ripped out of CSS::Inliner, HTML::Query is a more
+	  appropriate place to do this calculation.
+	* Added optimizations so that the specificity calculation doesn't need a tree in order to operate
+	  nor does it need a prior query to have occurred.
+	* Merge in tests from CSS::Inliner for specificity calculations
+
+0.08	2012-08-01	Kevin Kamel <kamelkev@mailermailer.com>
+	* Added patch from Sebastian Paaske Torholm <spt@jobindex.dk>
+		- Adds support for -child pseudo-classes including proper specificity calculation
+		- Adds tests for verifying specificity calculation and proper selection of -child pseudo classes
+	* Updated documentation with sections for pseudo-classes and psuedo-elements detailing 
+	  current support for those features.
+
+0.09	2014-08-27	Kevin Kamel <kamelkev@mailermailer.com>
+	* Add proper filtering for CSS3 double-colon psuedo-selectors
+		- Update pseudo-class test to exercise updated filtering regex
+	* Correct typo within documentation

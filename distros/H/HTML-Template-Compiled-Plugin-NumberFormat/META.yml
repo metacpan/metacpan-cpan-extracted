@@ -1,0 +1,31 @@
+---
+abstract: 'Number::Format plugin for HTML::Template::Compiled'
+author:
+  - 'Tina Mueller'
+build_requires:
+  Module::Build: 0.28
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.28
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-Template-Compiled-Plugin-NumberFormat
+provides:
+  HTML::Template::Compiled::Plugin::NumberFormat:
+    file: lib/HTML/Template/Compiled/Plugin/NumberFormat.pm
+    version: 0.02
+requires:
+  Carp: 0
+  Class::Accessor: 0
+  HTML::Template::Compiled: 1
+  Number::Format: 1.73
+  Test::More: 0
+  perl: v5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/perlpunk/HTML-Template-Compiled-Plugin-NumberFormat
+version: 0.02

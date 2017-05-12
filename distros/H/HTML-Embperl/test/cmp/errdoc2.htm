@@ -1,0 +1,42 @@
+<html>
+<head>
+<title>Tests for Embperl - ErrorDocument</title>
+</head>
+
+<body>
+
+This page is shown due to an ErrorDocument redirection<p>
+
+
+main: 
+^prev: Apache=SCALAR
+next: 
+^last: Apache=SCALAR
+^There are 1(0|2|3|5) errormessages:
+
+<table border=1>
+^	<tr><td>\[\d+\]ERR:  32:  Warning in Perl code: Use of uninitialized value
+
+^	<tr><td>\[\d+\]ERR:  32:  Warning in Perl code: Use of uninitialized value 
+
+^	<tr><td>\[\d+\]ERR:  32:  Warning in Perl code: Use of uninitialized value 
+
+^	<tr><td>\[\d+\]ERR:  32:  Warning in Perl code: Use of uninitialized value 
+
+^	<tr><td>\[\d+\]ERR:  32:  Warning in Perl code: Use of uninitialized value 
+
+^-	<tr><td>\[\d+\]ERR:  32:  Warning in Perl code: Unquoted string &quot;qqqqqqqqqqqqqq&quot; may clash with future reserved word at 
+^	<tr><td>\[\d+\]ERR:  24:  Error in Perl code: syntax error at 
+^	<tr><td>\[\d+\]ERR:  24:  Error in Perl code: syntax error at 
+^	<tr><td>\[\d+\]ERR:  24:  Error in Perl code: Can't call method &quot;qq2&quot; without a package or object reference at 
+^	<tr><td>\[\d+\]ERR:  32:  Warning in Perl code: Use of uninitialized value 
+^-	<tr><td>\[\d+\]ERR:  32:  Warning in Perl code: Bareword found where operator expected at 
+^-	<tr><td>\[\d+\]ERR:  32:  Warning in Perl code: 	\(Missing operator before is\?\)</td></tr>
+^	<tr><td>\[\d+\]ERR:  24:  Error in Perl code: syntax error at 
+^Missing right.*?bracket at 
+^syntax error at 
+</table>
+
+</body>
+</html>
+

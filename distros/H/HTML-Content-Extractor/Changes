@@ -1,0 +1,51 @@
+0.17    2013-11-01
+    Fixed:
+        - bus error
+    Change:
+        + method get_main_images
+
+0.16    2013-05-07
+    Fixed:
+        - signal 11 in large html
+    Add:
+        + C lib files
+
+--------------------------------------------------
+0.15    2013-04-17
+    Fixed:
+        - ANSI period for DEFAULT_TAG_ID
+        - bad parse tag <!...>
+    Add:
+        + methods: get_tag_info_by_name, get_element_by_name_in_level
+        + methods: set_tag_ai, set_tag_type, set_tag_extra, set_tag_family, set_tag_option, set_tag_priority
+        + constants: AI_*, TYPE_*, EXTRA_*, FAMILY_*, OPTION_*
+    Change:
+        | Keys of tag parameter convert to lower case.
+        | Values of tag parameter are not converted to lower case.
+
+--------------------------------------------------
+0.14    
+    Fixed:
+        - terminated by signal 11 error
+        - logical errors in build html tree
+    Add:
+        + methods: build_tree, get_tree, get_tree_by_element_id
+        + methods: get_element_by_name, get_stat_by_element_id
+        + methods: get_child, get_parent, get_curr_element
+        + methods: get_next_element_curr_level, get_prev_element_curr_level
+        + methods: get_prev_element, set_position
+        + more testcases
+
+--------------------------------------------------
+0.13    2013-02-03
+    Fixed:
+        - build error in OpenBSD
+        - build error in Windows
+    Add:
+        + method get_raw_text
+        + method get_main_text_with_elements
+        + more testcases.
+
+--------------------------------------------------
+0.12    2013-01-31
+    Release 0.12

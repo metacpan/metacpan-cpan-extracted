@@ -1,0 +1,50 @@
+<html>
+<head>
+<title>Tests for Embperl - Nesting of html and meta commands</title>
+</head>
+
+
+<body>
+
+[-
+$fdat{aa} = 11 ;
+$fdat{bb} = 22 ;
+$fdat{cc} = 33 ;
+$fdat{dd} = 44 ;
+
+$t = 1 ;
+$f = 0 ;
+
+-]
+[- @ks = sort keys %fdat -]
+
+<table>
+	<tr>
+		<td>[+ $ks[$row] +]</td><td>[+ $fdat{$ks[$row] || ''} +]</td>
+	</tr>
+</table>
+
+
+[$if $t $]
+<table>
+	<tr>
+[$endif$]
+		<td>[+ $ks[$row] +]</td><td>[+ $fdat{$ks[$row] || ''} +]</td>
+[$if $t $]
+	</tr>
+</table>
+[$endif$]
+
+
+[$if $f $]
+<table>
+	<tr>
+[$endif$]
+		<td>[+ $ks[$row] +]</td><td>[+ $fdat{$ks[$row] || ''} +]</td>
+[$if $f $]
+	</tr>
+</table>
+[$endif$]
+
+</body>
+</html>

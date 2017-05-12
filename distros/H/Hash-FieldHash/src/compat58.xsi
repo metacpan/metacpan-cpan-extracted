@@ -1,0 +1,82 @@
+# vim: set filetype=XS:
+
+
+void
+fieldhash(HV* hash, SV* name = NULL, SV* package = NULL)
+PROTOTYPE: \%;$
+PREINIT:
+	MAGIC* tied_mg;
+CODE:
+	tied_mg = SvTIED_mg((SV*)hash, PERL_MAGIC_tied);
+	if(!tied_mg || !sv_derived_from(SvTIED_obj((SV*)hash, tied_mg), PACKAGE)){
+		SV* const self = newRV_noinc((SV*)newHV());
+		hv_clear(hash);
+
+		sv_bless(self, gv_stashpvs(PACKAGE, GV_ADD));
+
+		if(tied_mg) sv_unmagic((SV*)hash, PERL_MAGIC_tied); /* untie */
+
+		sv_magic((SV*)hash, self, PERL_MAGIC_tied, NULL, 0); /* tie */
+		SvREFCNT_dec(self); /* refcnt++ in sv_magic() */
+
+		sv_magicext(SvRV(self), NULL, PERL_MAGIC_ext, &fieldhash_vtbl, NULL, 0);
+
+		hf_add_field(aTHX_ hash, name, package);
+	}
+
+SV*
+FETCH(HV* self, SV* key, SV* val = &PL_sv_undef)
+ALIAS:
+	FETCH  = HV_FETCH
+	STORE  = HV_FETCH_ISSTORE
+	EXISTS = HV_FETCH_ISEXISTS
+	DELETE = HV_DELETE
+CODE:
+	key = hf_replace_key(aTHX_ self, key, ix /* action */);
+
+	switch(ix){
+	default:{ /* FETCH */
+		HE* const he = hv_fetch_ent(self, key, 0, 0U);
+		RETVAL = he ? HeVAL(he) : NULL;
+		break;
+	}
+
+	case HV_FETCH_ISSTORE:
+		(void)hv_store_ent(self, key, newSVsv(val), 0U);
+		RETVAL = val;
+		break;
+
+	case HV_FETCH_ISEXISTS:
+		RETVAL = boolSV(hv_exists_ent(self, key, 0U));
+		break;
+
+	case HV_DELETE:
+		RETVAL = hv_delete_ent(self, key, 0, 0U);
+		break;
+	}
+
+	ST(0) = RETVAL ? RETVAL : &PL_sv_undef;
+	XSRETURN(1);
+
+
+void
+FIRSTKEY(HV* self, ...)
+ALIAS:
+	FIRSTKEY = 0
+	NEXTKEY  = 1
+PREINIT:
+	HE* he;
+CODE:
+	if(ix == 0){ /* FIRSTKEY */
+		hv_iterinit(self);
+	}
+	he = hv_iternext(self);
+	ST(0) = he ? hv_iterkeysv(he) : &PL_sv_undef;
+	XSRETURN(1);
+
+
+void
+CLEAR(HV* self)
+CODE:
+	hv_clear(self);
+

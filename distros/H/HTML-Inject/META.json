@@ -1,0 +1,77 @@
+{
+   "abstract" : "inject content from one HTML file into another",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Moose::Meta::Class::__ANON__::SERIAL::8 version , CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-Inject",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "HTML::HTML5::Writer" : "0",
+            "XML::LibXML::PrettyPrint" : "0"
+         },
+         "requires" : {
+            "HTML::HTML5::Parser" : "0.200",
+            "IO::Detect" : "0",
+            "Moo" : "1.000000",
+            "Scalar::Does" : "0.002",
+            "XML::LibXML" : "1.94",
+            "namespace::sweep" : "0.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.61",
+            "XML::LibXML::PrettyPrint" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "HTML::Inject" : {
+         "file" : "lib/HTML/Inject.pm",
+         "version" : "0.004"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/HTML-Inject/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=HTML-Inject"
+      },
+      "homepage" : "https://metacpan.org/release/HTML-Inject",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-html-inject.git",
+         "web" : "https://github.com/tobyink/p5-html-inject"
+      }
+   },
+   "version" : "0.004"
+}

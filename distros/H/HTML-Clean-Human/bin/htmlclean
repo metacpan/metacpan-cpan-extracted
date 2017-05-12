@@ -1,0 +1,214 @@
+#!/usr/bin/perl
+use lib './lib';
+use strict;
+use base 'LEOCHARRE::CLI';
+use HTML::Clean::Human ':all';
+use vars qw($INPUT $OUTPUT $VERSION);
+$VERSION = sprintf "%d.%02d", q$Revision: 1.2 $ =~ /(\d+)/g;
+
+
+# call it html2txt ??
+
+my $o = gopts('io:');
+
+$INPUT = resolve_input() 
+   or die("missing args"); 
+
+$OUTPUT = rip($INPUT);
+
+if ($o->{o}){
+   open(FILE,'>',$o->{o}) or die("cant open $$o{o} for writing, $!");
+   print FILE $OUTPUT;
+   close FILE;
+   exit;
+}
+
+print $OUTPUT;
+exit;
+
+
+
+
+
+sub resolve_input { # we want to return a text blurp
+   
+   my $input;
+   
+   #while(<>){
+   #   $input.=$_;
+   #   print STDERR '.';
+   #}
+
+   
+   for my $arg (@ARGV){
+      
+      #file or url???
+
+      if ($arg=~/^http\:/i){
+         
+         require File::Which;
+         File::Which::which('wget') or die("you don't have wget installed?");
+         
+         my $tmp = '/tmp/tmpfile.'.rand(1000).time().(int rand 1000);
+         
+         system( 'wget', $arg, '-O', $tmp ) == 0 
+            or die('bad wget '.$?);
+
+         $input .= slurp($tmp);
+         unlink $tmp;
+         debug("url $arg");
+      }
+
+
+      else {
+         -f $arg or die("file $arg is not file on disk");
+         $input .= slurp($arg);
+         debug("file $arg");
+      }
+   }
+
+   $input or return;
+   
+
+
+   #my $okchars= q/1234567890,.<>{}[]()-_=+\|/;
+
+
+   require HTML::Entities;
+   $input = HTML::Entities::decode($input);
+
+
+
+   # force utf8
+   require Encode;
+   $input = Encode::encode("utf8", $input);
+
+   $input=~s/©/(c)/sig;
+   $input=~s/||/'/sig;
+
+   
+
+   return $input;
+}
+
+
+
+
+
+
+
+
+
+sub rip {
+   my $html = shift;
+
+   $html    = rip_tables($html);
+   $html    = rip_lists($html);
+   $html    = rip_fonts($html);
+   $html    = rip_forms($html);
+
+   $html    = rip_tag($html,qw(img a)) 
+      unless $o->{i};
+
+   $html    = rip_comments($html);
+
+   $html    = rip_formatting($html);
+
+   $html    = rip_headers($html);
+   $html    = fix_whitespace($html);
+
+   return $html;
+}
+
+
+
+
+
+
+sub slurp {
+   my $in = shift;
+   
+   local $/;
+   open(FI,'<',$in) or die;
+   
+   my $t = <FI>;
+   close FI;
+   return $t;
+}
+
+
+sub usage {q{htmlclean [OPTION].. [FILE|URL]
+Html syntax reformatter and cleaner filter for human beings.
+
+   -i          do not rip out img and link tags
+   -o path     output file destination (instead of stdout)
+   -h          help
+   -d          debug
+   -v          version
+
+Try 'man htmlclean' for more info.
+}}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+htmlclean - Html syntax reformatter and cleaner filter for human beings.
+
+=head1 DESCRIPTION
+
+Argument is stdin, url, or file on disk (that has html).
+Outputs cleaned html to stdout.
+This is basically something to get rid of messy html, and same some of what might be 
+of use.
+
+=head1 USAGE
+
+   -i          do not rip out img and link tags
+   -o path     output file destination (instead of stdout)
+   -h          help
+   -d          debug
+   -v          version
+
+=head2 USAGE EXAMPLES
+
+   htmlclean ./infile.html > outfile.html
+   htmlclean http://thisthat.com/page.html > outfile.html
+   cat file.html | htmlclean > outfile.html
+   htmlclean -o output.html http://news.bbc.co.uk
+
+=head1 CAVEATS
+
+You can provide multiple inputs at the same time, but it would be messy.
+
+=head1 SEE ALSO
+
+HTML::Clean::Human - parent package
+
+tidy
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=head1 COPYRIGHT
+
+Copyright (c) 2010 Leo Charre. All rights reserved.
+
+=head1 LICENSE
+
+This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, i.e., under the terms of the "Artistic License" or the "GNU General Public License".
+
+=head1 DISCLAIMER
+
+This package is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the "GNU General Public License" for more details.
+   
+=cut
+
+
+
+

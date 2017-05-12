@@ -1,0 +1,59 @@
+README for Hook::Queue 1.21
+
+=head1 NAME
+
+Hook::Queue - define a queue of handlers
+
+=head1 SYNOPSIS
+
+  # define a Liar class which always claims to be what you're asking
+  # about
+  package Liar;
+  use Hook::Queue 'UNIVERSAL::isa' => sub {
+      my $what  = shift;
+      my $class = shift;
+      return 1 if (ref $what || $what) eq "Liar";
+      # it's not my call, pass it down the chain
+      return Hook::Queue->defer;
+  };
+
+
+=head1 DEPENDENCIES
+
+This module has external dependencies on the following modules:
+
+ perl	5.006
+
+=head1 INSTALLATION
+
+ perl Build.PL
+ perl Build test
+
+and if all goes well
+
+ perl Build install
+
+=head1 HISTORY
+
+What changed over the last 3 revisions
+
+=over
+
+=item 1.21	Friday 30th April, 2004
+
+	Initial CPAN release
+=back
+
+=head1 AUTHOR
+
+Richard Clamp <richardc@unixbeard.net>
+
+Copyright Richard Clamp 2004.  All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<SUPER>, L<NEXT> - for similar idioms for OO programming
+

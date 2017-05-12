@@ -1,0 +1,10 @@
+lib/HTML/TagCloud/Centred.pm
+CHANGES
+MANIFEST			This list of files
+MANIFEST.skip
+t/all.t
+t/manifest.t
+Makefile.PL
+examples/sample.html
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

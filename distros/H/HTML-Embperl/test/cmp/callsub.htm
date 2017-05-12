@@ -1,0 +1,89 @@
+<html>
+<head>
+<title>Tests for Embperl - Embperl sub Metacommand</title>
+</head>
+
+
+<body>
+
+<h1>Tests for Embperl - Embperl sub Metacommand</h1>
+
+Now we call the first sub via Execute:
+
+
+*txt* 
+*txt* <h2>Here goes some normal html text <h2>
+*txt* 
+
+And now the second via Execute:
+
+
+*perl_code* 
+*perl_code* Here comes some perl:
+*perl_code* 
+*perl_code* *perl_code* 
+*perl_code* foo = Hello world<br>
+*perl_code* testdata = abcd<br>
+*perl_code* 
+
+Now we call the first sub via Perl:
+
+
+*txt* 
+*txt* <h2>Here goes some normal html text <h2>
+*txt* 
+And now the second via Perl:
+
+
+*perl_code* 
+*perl_code* Here comes some perl:
+*perl_code* 
+*perl_code* *perl_code* 
+*perl_code* foo = Hello world<br>
+*perl_code* testdata = abcd<br>
+*perl_code* 
+-> Second time, other order:
+
+And now the second via Perl:
+
+
+*perl_code* 
+*perl_code* Here comes some perl:
+*perl_code* 
+*perl_code* *perl_code* 
+*perl_code* foo = Hello world<br>
+*perl_code* testdata = abcd<br>
+*perl_code* 
+Now we call the first sub via Perl:
+
+
+*txt* 
+*txt* <h2>Here goes some normal html text <h2>
+*txt* 
+-> And Execute again, but other order
+
+And now the second via Execute:
+
+
+*perl_code* 
+*perl_code* Here comes some perl:
+*perl_code* 
+*perl_code* *perl_code* 
+*perl_code* foo = Hello world<br>
+*perl_code* testdata = abcd<br>
+*perl_code* 
+
+Now we call the first sub via Execute:
+
+
+*txt* 
+*txt* <h2>Here goes some normal html text <h2>
+*txt* 
+
+And done!
+
+
+
+</body>
+</html>
+

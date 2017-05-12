@@ -1,0 +1,10 @@
+Revision history for HPC-Runner-Command-Utils-ManyConfigs
+
+0.03  2017-03-29 10:39:20 GST
+	Put parsing in before_build
+
+0.02  2017-03-12 14:45:02 GST
+	- Bug fix in dependencies
+
+0.01  2017-03-12 10:07:29 GST
+        - Initial release

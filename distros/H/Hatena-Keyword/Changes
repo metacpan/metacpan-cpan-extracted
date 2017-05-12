@@ -1,0 +1,21 @@
+Revision history for Hatena-Keyword
+
+0.05    2008-02-11T12:12:00+09:00
+        - fix PREREQ for adding Cache::File
+
+0.04    2006-05-01T11:09:04+09:00
+        - RPC response caching support for extract() and
+          markup_as_html().
+        - Hacked for utf-8 flagged text.
+        - Fixed typo in SYNOPSYS.
+
+0.03    2006-04-29T17:58:33+09:00
+        - Changed method name from retrieve() to extract().
+        - Rewriting the pod document.
+        - Released to CPAN.
+
+0.02    2006-04-29T17:56:33+09:00
+        - Added markup_as_html() method.
+
+0.01    2006-04-29T16:41:23+09:00
+        - First version, released on an unsuspecting world.

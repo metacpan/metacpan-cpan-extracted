@@ -1,0 +1,17 @@
+---
+
+elements:
+  - type: Text
+    name: test
+    id: test_id
+  - type: Blank
+    name: Test html with <code>
+  - type: Blank
+    attrs:
+      html: Test html with <code>
+    
+  - type: Blank
+    attrs_xml:
+      html: Test html with <code>
+    
+    

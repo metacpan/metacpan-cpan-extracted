@@ -1,0 +1,31 @@
+@prefix :        <http://usefulinc.com/ns/doap#> .
+@prefix dcs:     <http://ontologi.es/doap-changeset#> .
+@prefix dc:      <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix my:	 <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Microdata-ToRDFa/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix toby:    <http://tobyinkster.co.uk/#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+my:project
+	a               :Project ;
+	:name           "HTML-HTML5-Microdata-ToRDFa" ;
+	:shortdesc      "rewrite HTML5+Microdata into XHTML+RDFa"@en ;
+	:programming-language  "Perl" ;
+	:homepage       <https://metacpan.org/release/HTML-HTML5-Microdata-ToRDFa> ;
+	:download-page  <https://metacpan.org/release/HTML-HTML5-Microdata-ToRDFa> ;
+	:bug-database   <http://rt.cpan.org/Dist/Display.html?Queue=HTML-HTML5-Microdata-ToRDFa> ;
+	:repository     [ a :SVNRepository ; :browse <http://goddamn.co.uk/svn-web/perlmods/browse/HTML-HTML5-Microdata-ToRDFa/> ] ;
+	:maintainer     toby:i ;
+	:developer      toby:i ;
+	:documenter     toby:i ;
+	:tester         toby:i ;
+	:created        "2010-01-29"^^xsd:date ;
+	:license        <http://dev.perl.org/licenses/> .
+
+toby:i
+	a               foaf:Person ;
+	foaf:name       "Toby Inkster" ;
+	foaf:homepage   <http://tobyinkster.co.uk/> ;
+	foaf:page       <https://metacpan.org/author/TOBYINK> ;
+	foaf:mbox       <mailto:tobyink@cpan.org> .

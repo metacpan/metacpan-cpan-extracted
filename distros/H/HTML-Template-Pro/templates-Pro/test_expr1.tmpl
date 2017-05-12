@@ -1,0 +1,26 @@
+<HTML><BODY>
+<H1> test numeric expr </H1>
+<tmpl_if EXPR="0">not ok<tmpl_else>ok</tmpl_if> 
+<tmpl_if EXPR="2">true<tmpl_else>false</tmpl_if> 
+<tmpl_if EXPR="2+2">true<tmpl_else>false</tmpl_if> 
+<tmpl_if EXPR="3>5">not ok<tmpl_else>ok</tmpl_if> 
+<tmpl_if EXPR="2>=2">true<tmpl_else>false</tmpl_if> 
+<tmpl_if EXPR="ONE>2">not ok<tmpl_else>ok</tmpl_if> 
+2+2=<tmpl_var expr="2+2">
+ONE+2=<tmpl_var expr="ONE+2">
+ONE + TWO=<tmpl_var expr="ONE + TWO">
+THREE=<tmpl_var expr="THREE">
+(ONE+TWO)==THREE=<tmpl_var expr="(ONE+TWO)==THREE">
+ONE+TWO == THREE=<tmpl_var expr="ONE+TWO == THREE">
+(ONE+TWO == THREE) and (THREE && TWO) and sin(ONE)=<tmpl_var expr="(ONE+TWO == THREE) and (THREE && TWO) and sin(ONE)">
+sin(ONE)=<tmpl_var expr="sin(ONE)">
+111.111 + 222.333555=<tmpl_var expr="111.111 + 222.333555">
+7%3=<tmpl_var expr="7%3">
+(70*5)%33-20=<tmpl_var expr="(70*5)%33-20">
+7 && 3=<tmpl_var expr="7 && 3">
+strings are true: 
+'aaa' && 'bbb'=<tmpl_var expr="'aaa' && 'bbb'">
+'aaa' || 0=<tmpl_var expr="'aaa' || 0">
+minus is handled properly:
+MINUSTEN+8=<tmpl_var expr="MINUSTEN+8">
+</body></html>

@@ -1,0 +1,51 @@
+* JOSEPHUS PROBLEM - PRINT EXECUTION ORDER
+N          EQU  24
+M          EQU  11
+PRINTER    EQU  18
+BUF        EQU  2000
+
+           ORIG 1000
+START      IOC  0(PRINTER)
+           ENT1 1
+           ENT2 0
+FINDNEXT   CMP1 =N=
+           JG   PRINT   
+           ENT3 M
+2H         INC2 1
+           CMP2 =N=
+           JLE  3F
+           ENT2 1
+3H         LDA  BUF,2
+           JANZ 2B
+           DEC3 1
+           J3NZ 2B
+           ST1  BUF,2
+           INC1 1
+           JMP  FINDNEXT
+
+PRINT      ENTA N
+           CHAR
+           STX  NN(4:5)
+           ENTA M
+           CHAR
+           STX  MM(4:5)
+           OUT  TITLE(PRINTER)
+           ENT1 N
+1H         LDA  BUF,1
+           CHAR
+           STX  BUF,1(4:5)
+           DEC1 1
+           J1NZ 1B
+           OUT  BUF+1(PRINTER)
+           HLT
+                       
+TITLE      ALF  JOSEP
+           ALF  HUS (
+           ALF  N =  
+NN         CON  0    
+           ALF  , M = 
+MM         CON  0    
+           ALF  )    
+           ORIG TITLE+25
+
+           END  START

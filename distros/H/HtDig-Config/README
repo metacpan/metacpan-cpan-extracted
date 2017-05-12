@@ -1,0 +1,72 @@
+How to install Version 1.01 of ConfigDig:
+
+1. Verify that you have the pre-requisite perl modules installed:
+
+	Net::SMTP
+	Date::Manip
+	Text::Template
+	File::Spec (this should be part of base perl installation)
+
+You can pick these up at your closest CPAN (www.cpan.org has a
+list of sites).
+
+2. Install the the ConfigDig modules by entering the following commands:
+	tar xvfz HtDig-Config-1.01.tar.gz
+	cd HtDig-Config-1.01.tar.gz
+	perl Makefile.PL  (enter PREFIX=dir if you wish to install the
+				modules in "dir" instead of the main
+				perl library directory)
+	make
+	make install
+	perl installer.pl
+
+When installer.pl is run, it will install the cgi scripts into the
+directory of your choice and will initialize the ConfigDig registry. In
+addition, it allows you to configure the CGI scripts if you have installed
+the modules into a custom directory.
+
+For those of you who prefer to know what is going on behind the scenes,
+the installer.pl script does the following:
+
+	*Gathers information on the location of the ht://Dig base
+		install directory, the ht://Dig conf directory, and 
+		an acceptable location for ConfigDig to store its log
+		files.
+	*Creates a ConfigDig registry file (configdig_sites.pl) in
+		your ht://Dig conf directory.  It presets the values for
+		the ConfigDig log directory, and the ht://Dig base
+		directory to the paths provided earlier in the
+		installation process.
+	*Moves the contents of the ./cgi subdirectory into the
+		designated CGI directory.  The destination directory
+		 must be configured by your web server to be CGI 
+		executible.  Refer to your server documentation for how to
+		do this.
+	*Modifies cgi_settings.pl in the cgi directory so that the
+		perl variable $conf_path contains the path to
+		configdig_sites.pl
+	*Optionally modifies local_inc.pl in the cgi directory so that it
+		adds a custom ConfigDig modules location to perl's
+		module search path.
+
+3. Test the installation by running the index.cgi page on your web
+site using your web browser.
+
+4. As soon as you see the application is running successfully, click into
+the "Modify Global Settings" area and verify that your base ht://Dig
+installation directory is correct, as well as ConfigDig log files
+location.  The ConfigDig log files can be referred to later to view the
+outcome of index generation and dig processes that you have initiated from
+the web application.
+
+FURTHER ASSISTANCE:  Problems can be logged on the ConfigDig web site's
+bug tracking system at configdig.sourceforge.net and will be addressed as
+quickly as possible.
+
+Suggestions are welcome and can be sent to the email address below.
+
+I hope you find ConfigDig useful!
+
+James Tillman
+jtillman@bigfoot.com
+	

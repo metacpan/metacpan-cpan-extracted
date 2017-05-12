@@ -1,0 +1,47 @@
+Mon Jan 11 00:06:08 1999  Brian Warner  <warner@lothar.com>
+
+	* Makefile.PL: release version 0.2
+
+Sun Jan 10 23:12:23 1999  Brian Warner  <warner@lothar.com>
+
+	* everything: rename from iButton to Hardware::iButton. Move
+	Connection.pm and Device.pm to a lib directory. Change test.pl and
+	all examples to use the new names.
+
+	* examples/buttonmaster.pl: remove a clist_set_policy call that
+	went away in gtk-1.1
+	
+1998-08-14  Brian Warner  <warner@lothar.com>
+
+	* examples/buttonmaster.pl (inspect): added basic inspectors: NVRAM 
+	display, temperature conversion
+
+	* Device.pm:
+	remove a single quote in the POD docs that messed up fontification
+
+1998-08-14  Brian Warner  <warner@lothar.com>
+
+	* futz.pl: tool to futz with serial port
+
+1998-08-08  Brian Warner  <warner@lothar.com>
+
+	* examples/buttonmaster.pl: use Gtk->main_quit instead of Gtk->exit to
+	let the object DESTROY methods run (so stty settings can get restored).
+	Add real iButton::Connection calls instead of faking button data. Add
+	lots of notes to myself at the end about gtk objects and callbacks.
+
+	* examples/readtemp.pl: convert C to F differently
+
+	* iButton/Device.pm (read_temperature): change f/c conversion tip
+
+	* iButton/Connection.pm: add framework for doing stty/restore stuff
+
+1998-07-27  Brian Warner  <warner@lothar.com>
+
+	* Makefile.PL: released version 0.01
+
+1998-07-25  Brian Warner  <warner@lothar.com>
+
+	* created by h2xs 1.18
+
+

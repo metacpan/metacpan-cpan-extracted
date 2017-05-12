@@ -1,0 +1,42 @@
+<wmmeta name="Title" value="The POD Format Converter" />
+<wmmeta name="Section" value="07-fmt_converters" />
+<wmmeta name="Score" value="20" />
+<wmmeta name="Abstract">
+Perl ''plain old documentation'' support (format: <em>text/pod</em>)
+</wmmeta>
+
+This converter converts from POD to HTML, using Tom Christiansen's
+**Pod::Html** module.
+
+POD is a powerful, but simple, editable-text format for marking up
+manual-page-style documentation.  See the ''perlpod'' manual page in your Perl
+documentation for more information on the POD format.
+
+Things to watch out for in WebMake's support for POD:
+
+  * Anything before the &lt;BODY&gt; tag, or after the &lt;/BODY&gt;
+  tag, in the generated output is stripped, so that the POD output can be
+  embedded in HTML pages without requiring a page of its own.
+
+  * WebMake allows options to **pod2html** to be specified using
+  the __podargs__ attribute of the &lt;content&gt; tag; see below.
+
+  * If you are reading POD documentation embedded inside other files,
+  you should probably use the ''asis'' attribute on the content items in
+  question, otherwise all sorts of wierd things could happen as WebMake tries
+  to interpret Perl variable references and so on! See the "&lt;content&gt;"
+  [content] documentation for details on ''asis''.
+
+Specifying Options to the POD Translator
+----------------------------------------
+
+If you want to specify **pod2html** options to the converter, just
+put them in a string as a __podargs__ attribute of the &lt;content&gt; tag,
+like so:
+
+   &lt;content name="some_pod" podargs="--noindex"&gt;
+   ...
+   &lt;/content&gt;
+
+
+	[content]: $(content)

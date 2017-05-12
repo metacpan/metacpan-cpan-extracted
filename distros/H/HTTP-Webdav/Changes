@@ -1,0 +1,62 @@
+0.1.18
+
+   - Works now with and include new functions of neon 0.17.1
+
+0.1.17
+
+   - make lock an i/o parameter in ne_lock, so the lock token is returned.
+     Problem reported by Arun Garg.
+
+0.1.16
+
+    - Works now with neon 0.16.1
+    - ne_xml_validate_cb callback is now available in Perl
+    - lock_discover callback now gets the lock data structure as hash
+    - added eg/lock.pl example for locking and lock_discover
+
+0.1.15
+
+    - Make return parameter from options methods available
+    - Turn ne_lock from object to a hash, so locks are usable
+
+0.1.14
+
+    - Add DESTROY methods for all classes (before we had only
+      DESTROY for classes that calls ne_destroy_xxx), so we
+      are sure memory and internal data structures are cleaned
+      up correctly.
+
+0.1.13
+
+    - tested against neon 0.15.1
+
+0.1.12
+
+    - remove request_ prefix for HTTP::Webdav::Request methods
+    - all *destroy* methods are now called DESTROY, so they are
+      called automaticly when the Perl variables that holds the
+      object goes out of scope.
+    - DESTORY methods now clears up some internaly datastructures
+      to avoid memory leaks.   
+
+0.1.11
+
+    - compiles and works on Windows
+    - clenaup of Constants.pm, so everything is correctly defined
+
+0.1.10
+
+    - Works now with neon 0.15.0
+    - Function and namespace renames due to renames in neon
+    - fixed compiler warnings
+
+0.1.9
+
+    - change PV to void * to make it work with Perl 5.6.0+.
+      Spotted by Brian Wallis.
+
+0.1.8
+
+    - rename to HTTP::Webdav to fit better into CPAN
+
+

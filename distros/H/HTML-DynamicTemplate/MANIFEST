@@ -1,0 +1,15 @@
+Changes
+DynamicTemplate.pm
+INSTALL
+MANIFEST
+Makefile.PL
+README
+t/nominal.t
+t/nominal_expected.txt
+t/selective.t
+t/selective_expected.txt
+t/templates/include.tmpl
+t/templates/include2.tmpl
+t/templates/include3.tmpl
+t/templates/infinite.tmpl
+t/templates/test.tmpl

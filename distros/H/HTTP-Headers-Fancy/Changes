@@ -1,0 +1,18 @@
+Revision history for HTTP-Headers-Fancy
+
+1.001 2016-02-02
+ - New function: prettify_key
+
+1.000 2015-07-23
+ [API CHANGES]
+
+ [BUG FIXES]
+
+ [DOCUMENTATION]
+
+ [ENHANCEMENTS]
+
+0.001 2015-05-18
+ - Initial release
+
+0.000 0000-00-00

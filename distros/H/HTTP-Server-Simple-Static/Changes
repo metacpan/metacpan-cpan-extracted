@@ -1,0 +1,83 @@
+Revision history for Perl extension HTTP::Server::Simple::Static
+
+0.12  Thu, 28 Apr 2016 06:30:00 +0100
+
+        - Moved POD tests to xt/ directory so they are not run for
+          normal user installs.
+
+0.11  Wed, 27 Apr 2016 16:01:00 +0100
+
+        - Added a mapping for *.js files to a Content-Type of
+            application/javascript
+
+0.10  Wed, 27 Apr 2016 14:45:00 +0100
+
+        - Reworked how the value for the Content-Type header is
+            selected. Simple regexp matching on the path suffix is
+            used for *.html?, *.css and *.txt files. Any other files
+            are checked using File::LibMagic as before. Closes:
+            https://rt.cpan.org/Ticket/Display.html?id=113980 and
+            https://rt.cpan.org/Ticket/Display.html?id=91321
+
+0.09  Thu, 15 Aug 2013 09:08:00 +0100
+
+        - Added support for clients which send an If-Modified-Since
+            HTTP header in the request. We return a 304 if the file
+            has not been changed.
+
+0.08  Wed, 14 Aug 2013 17:00:00 +0100
+
+        - Replaced File::MMagic and MIME::Types with File::LibMagic
+            which should be more reliable.
+            Closes: http://rt.cpan.org/Public/Bug/Display.html?id=39598
+        - Improved docs and code example.
+            Closes: http://rt.cpan.org/Public/Bug/Display.html?id=37701
+        - Added support for the Last-Modified and Date HTTP headers,
+            this consequently adds a new dependency on HTTP::Date.
+	- Added support for not sending the content when the request
+            method is HEAD.
+
+0.07  Wed, 19 Mar 2008 18:41:56 +0000
+
+        - Only serve files not directories, thanks to Bradley Bailey
+          for the report.
+          Closes http://rt.cpan.org/Public/Bug/Display.html?id=34068
+        - Fixed url handling for requests from IE/
+          Closes http://rt.cpan.org/Public/Bug/Display.html?id=27650
+          
+0.06  Mon, 23 Jul 2007 10:42:37 +0100
+
+        - Fixed problem with handling empty files where they have no
+          file extension or it is not recognised by MIME::Types.
+          Thanks to Mark Stosberg for the report
+
+0.05  Mon,  6 Nov 2006 09:29:42 +0000
+
+        - Applied patch from Max Maischein to use the binmode function
+          rather than the binmode method of IO::File, which only exists
+          in newer versions of that module which we were not requiring.
+
+0.04  Thu, 20 Jul 2006 12:03:21 +0100
+
+        - Applied patch from Tom Hukins to make
+          HTTP::Server::Simple::Static RFC compliant. Section 4.1 of
+          RFC 2616, "Message Types", states that header fields should
+          be separated by CRLF. This is done in the manner recommended
+          in perlport(1).
+        - Also applied patch from Tom Hukins to add the "use bytes"
+          pragma to ensure Content-Length contains the number of bytes
+          in the response body, not the number of characters.
+        
+0.03  Tue, 13 Jun 2006 11:00:58 +0100
+        - Fixed documentation to show that HTTP::Server::Simple::CGI
+          should be used as the base class.
+          Closes: http://rt.cpan.org/Public/Bug/Display.html?id=18682
+        - Switched to using IO::File for the file handling, also
+          turned on binmode to help those on Windows serve images, etc.
+
+0.02  Wed Mar 29 12:00:00 2005
+	- close fh after reading content. (Max Maischein)
+	- fixed content-type header (Kang-min Liu & Max)
+	
+0.01  Thu Jan 06 21:40:02 2005
+	- forked from patch to HTTP::Server::Simple

@@ -1,0 +1,7 @@
+CHANGELOG
+Makefile.PL
+MANIFEST
+README
+lib/HTML/PullParser/Nested.pm
+t/basic.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,33 @@
+Revision history for Perl extension HTML::FormWizard.
+
+0.1.09	20020212
+		-Minor Bug Fix: Chopped last char in some conditions
+
+0.1.08  20020206
+		-Major Bug Fix: Didn't compile with -w
+
+0.1.07 	20020205
+		- Added the datatype property to the fields
+		- Defined standard validations to:
+			- Phone numbers;
+			- Emails;
+			- IPv4 address;
+			- Credit Cards;
+			- Portuguese and American Postal Codes
+
+0.1.06  20020129
+		- Change on documentation (CGI::Apache become CGI)
+		- Some string on 0.1.05 were in Portuguese and are now in English.
+		- The Error System was changed.
+		- Validate System was changed too: in previous release Validate
+			functions should set $@ and return 1 on sucess. Now validate
+			functions must return the error message or 0 on sucess.
+		- FileTemplate included. This modules (HTML::FormWizard::FileTemplate)
+			can be used to include a HTML header and a HTML footer to the
+			form.
+
+0.1.05	20020116
+		- orignal version. Powered by VIm.
+		- this is a 0.1.05 because, in true this is a instable version, but
+			it is already working before some minor changes (so the .05)
+		- Have Fun. Any bug please report to merlin@camelot.co.pt

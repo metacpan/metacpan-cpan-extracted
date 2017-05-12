@@ -1,0 +1,37 @@
+@prefix :        <http://usefulinc.com/ns/doap#> .
+@prefix dcs:     <http://ontologi.es/doap-changeset#> .
+@prefix dc:      <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix my:      <http://purl.org/NET/cpan-uri/dist/HTML-HTML5-Writer/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix toby:    <http://tobyinkster.co.uk/#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+my:project
+	a               :Project ;
+	:name           "HTML-HTML5-Writer" ;
+	:shortdesc      "output a DOM as HTML5"@en ;
+	:programming-language  "Perl" ;
+	:homepage       <https://metacpan.org/release/HTML-HTML5-Writer> ;
+	:download-page  <https://metacpan.org/release/HTML-HTML5-Writer> ;
+	:bug-database   <http://rt.cpan.org/Dist/Display.html?Queue=HTML-HTML5-Writer> ;
+	:repository     [ a :HgRepository ; :browse <https://bitbucket.org/tobyink/p5-html-html5-writer> ] ;
+	:maintainer     toby:i ;
+	:developer      toby:i ;
+	:documenter     toby:i ;
+	:tester         toby:i ;
+	:created        "2010-05-02"^^xsd:date ;
+	:license        <http://dev.perl.org/licenses/> ;
+	:category
+		[ rdfs:label "HTML"@en ] ,
+		[ rdfs:label "HTML5"@en ] ,
+		[ rdfs:label "Markup"@en ] ,
+		[ rdfs:label "Web"@en ] .
+
+toby:i
+	a               foaf:Person ;
+	foaf:name       "Toby Inkster" ;
+	foaf:homepage   <http://tobyinkster.co.uk/> ;
+	foaf:page       <https://metacpan.org/author/TOBYINK> ;
+	foaf:mbox       <mailto:tobyink@cpan.org> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://purl.org/NET/cpan-uri/person/tobyink>.

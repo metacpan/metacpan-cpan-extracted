@@ -1,0 +1,64 @@
+Revision history for HTML-Table-FromDatabase
+
+1.11    2016-06-14
+        Lowercase column names before prettifying them, so that Oracle users get
+        same niceness (e.g. FIRST_NAME => 'First Name', not 'FIRST NAME')
+        - thanks to Jared Still (jkstill) for this in GH PR-1 (hurrah, first
+          pull request :)
+
+1.10    2012-02-05
+        New -auto_pretty_headers option, automatically prettifies column names -
+        for example, "first_name" => "First Name"
+
+1.03    2012-01-16
+        Avoid uninitialised value warnings
+
+1.02    2011-11-30
+        Automatically add '&nbsp;' to empty cells to ensure browsers render them
+        normally, unless the new '-pad_empty_cells' option is set to a false
+        value.  This stops empty cells looking odd with no borders in many
+        browsers.
+
+1.01    2011-10-10
+        Use HTML::Entities instead of CGI to encode HTML entities.
+
+1.00    2011-05-24
+        Add new -row_callbacks feature - allows you to define callbacks which
+        are called once per row, given the hashref of row data which they may
+        modify if required.
+        Large version bump for the advantage of anyone who considers 0.xx
+        software unready for production usage.
+
+0.07    2010-01-29
+        Very minor release, finally applying patch kindly provided in RT ticket
+        #51752 by by Frank Wiegand - thanks Frank!
+
+0.06    2009-10-03
+        Make the -override_headers and -rename_headers options work by applying
+        patch supplied by Ireneusz Pluta in RT ticket #50164.
+        Thanks Ireneusz!
+        Also improved mock.t testes slightly.
+
+0.05    2009-07-23
+        Improve documentation, including the new -override_headers &
+        -rename_headers options added earlier.
+
+0.04    2009-07-23
+        Add -override_headers and -rename_headers options, to allow the table
+        headings to be customised easily.
+        Pass the row hashref to callbacks, in case they need to look at the rest
+        of the row in order to apply their transformation properly (this should
+        not break existing code).
+
+0.03    2008-11-19
+        Add -html option, to allow HTML fetched from the database to be
+        automatically stripped or encoded.
+
+0.02    2008-08-21
+        Add ability to provide callbacks to modify data on the fly
+        as the table is being constructed.
+
+0.01    2008-08-20
+        First version, released on an unsuspecting world.
+
+$Id$

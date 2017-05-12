@@ -1,0 +1,12 @@
+0.03:
+	- fixed cleandata() bug(s)
+	- fixed csrf handling bug
+	- changed the way the csrf token will be created
+	  now only once per process and only containing random
+	  data
+
+0.02:
+	- renamed from Dancer::Forms to HTML::FormsDj
+
+0.01:
+	- initial version

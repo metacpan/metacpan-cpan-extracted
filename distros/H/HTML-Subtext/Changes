@@ -1,0 +1,20 @@
+Revision history for Perl extension HTML::Subtext.
+
+1.03  Sun Mar  7 13:21:44 PST 1999  kaelin
+
+	Cleaned up gratuitous package dependancies. First version uploaded
+	to CPAN.
+
+1.02  Thu Feb 25 01:35:12 PST 1999  kaelin
+
+	Added ability to parse template into a string array (or a scalar) in
+	memory or to a file other than STDOUT by passing an 'OUTPUT' keyword
+	argument to HTML::Subtext->new().
+
+	Added test cases for distribution.
+
+1.01  Tue Feb 23 22:35:09 PST 1999  kaelin
+
+	Initial packaged-for-distribution version of HTML::Subtext. Previous
+	versions were internal-use-only.
+

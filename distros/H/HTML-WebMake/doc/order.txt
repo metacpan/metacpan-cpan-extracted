@@ -1,0 +1,51 @@
+<wmmeta name="Title" value="The Order of Processing" />
+<wmmeta name="Section" value="03-proc_logic" />
+<wmmeta name="Score" value="10" />
+<wmmeta name="Abstract">
+the order of processing
+</wmmeta>
+
+In order to fully control the WebMake file processing using Perl code, it's
+important to know the order in which the tags and so on are parsed.
+
+Parsing of the WebMake File
+===========================
+
+Initially, WebMake used a set order of tag parsing, but this proved to be
+unwieldy and confusing.  Now, it uses the order in which the tags are defined
+in the .wmk file, so if you want tag A to be interpreted before tag B, put A
+before B and the right thing will happen.
+
+Perl code embedded inside the WebMake file, using <a
+href=$(perl)>&lt;{perl}&gt;</a> processing directives, will be evaluated there
+and then (unless the &lt;{perl}&gt; block is embedded in another block, such
+as a content item or <a href=$(out)>&lt;out&gt;</a> file block).
+
+This means that you can define content items by hand, search for other content
+items using a <a href=$(contents)>&lt;contents&gt;</a> tag, and then use a <a
+href=$(perl)>&lt;{perl}&gt;</a> section to define a list of all content items
+which satisfy a particular set of criteria.
+
+This list can then be used in later <a
+href=$(perl)>&lt;{perl}&gt;</a> blocks, content references, or <a
+href=$(for)>&lt;for&gt;</a> tags.
+
+Processing the &lt;out&gt; Tags
+===============================
+
+Once the file is fully parsed, the <a href=$(out)>&lt;out&gt;</a> tags are
+processed, one by one.
+
+At this point, content references, <a href=$(set)>&lt;{set}&gt;</a> tags, and
+<a href=$(perl)>&lt;{perl}&gt;</a> processing directives will be interpreted,
+if they are found within content chunks.  Finally, deferred content references
+and metadata references are expanded.
+
+Eventually, no content references, <a href=$(set)>&lt;{set}&gt;</a> tags, <a
+href=$(perl)>&lt;{perl}&gt;</a> processing directives, metadata references, or
+URL references are left in the file text.  At this point, the file is written
+to disk under a temporary name, and the next output file is processed.
+
+Once all output files are processed, the entire set of files which have
+been modified are moved into place, replacing any previous versions.
+

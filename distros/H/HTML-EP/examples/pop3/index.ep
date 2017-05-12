@@ -1,0 +1,58 @@
+<ep-package name="HTML::EP::Locale">
+<html><head><title><ep-language de="Der POP3-Client" en="The POP3 Client">
+</title></head>
+<body bgcolor="#ffffff">
+<h1><ep-language de="Der POP3-Client" en="The POP3 Client"></h1>
+<p>
+  <ep-language language="de">
+    Dies ist der Web-POP3-Client von ISPsoft. Die Funktion ist ganz
+    einfach: POP3-Server, Benutzername und Paßwort eingeben und
+    los geht's.
+  </ep-language>
+  <ep-language language="en">
+    This is the web based POP3 client of ISPsoft. It's working extremely
+    simple: Enter your POP server, user name, password below and go on.
+  </ep-language>
+</p>
+<form action="list.ep" method=post>
+  <div align=center>
+  <table>
+    <tr>
+      <th><ep-language de="POP3-Server:" en="POP3 server:"></th>
+      <td><input size=30 name=pop3server></td>
+    </tr>
+    <tr>
+      <th><ep-language de="Benutzername:" en="User name:"></th>
+      <td><input size=30 name=pop3user></td>
+    </tr>
+    <tr>
+      <th><ep-language de="Paßwort:" en="Password:"></th>
+      <td><input type=password size=30 name=pop3password></td>
+    </tr>
+  </table>
+  </div>
+  <p>
+    <ep-language language="de">
+      <b>Bitte beachten Sie:</b> Alle hier eingegebenen Informationen,
+      insbesondere Ihr Paßwort und die Inhalte Ihrer Mails werden
+      unverschlüsselt übertragen und können evtl. von unerwünschten
+      Personen gelesen werden. Sie benützen dieses System auf eigenes Risiko!
+    </ep-language>
+    <ep-language language="en">
+      <b>Please note:</b> Any information you submit or receive is
+      transferred unencrypted. In particular your password will be
+      sent and your mail contents will be received without any protection
+      and insecure. You are using this system on your own risk!
+    </ep-language>
+  </p>
+  <div align=center>
+    <ep-language language="en">
+      <input type=submit value="Thanks for the hint, but I agree.">
+    </ep-language>
+    <ep-language language="de">
+      <input type=submit value="Ist mir bekannt, ich stimme zu.">
+    </ep-language>
+  </div>
+</form>
+</body>
+</html>

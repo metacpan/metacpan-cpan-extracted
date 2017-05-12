@@ -1,0 +1,18 @@
+text1
+<b>in</b>
+text2
+</pre>
+<pre>
+    Some <tags>.
+    <table>
+        <tr>
+            <td>
+            content
+            </td>
+        </tr>
+    </table>
+</pre>
+<pre>
+text3
+<i>in</i>
+text4

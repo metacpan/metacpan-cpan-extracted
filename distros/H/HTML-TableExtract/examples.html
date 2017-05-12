@@ -1,0 +1,143 @@
+<html>
+<head><title>HTML::TableExtract Examples</title></head>
+<body>
+<h2>HTML::TableExtract Examples</h2>
+<p>
+Each table is labeled in the first row with coordinates in terms of
+<i>depth</i> and <i>count</i>, which both start at 0. Some of the tables 
+have <i>headers</i> in the second row; although in this example these header
+cells are in fact &lt;th> tags, header cells can be either 
+&lt;th> or &lt;td>. The remaining cells in the table indicate <i>row</i>
+and <i>column</i> information from that cell, along with the table 
+coordinates: <i>depth,count:row,column</i>. Rows and columns begin at 0 as
+well, so the table label and headers, if present, will affect 
+these cell coordinates.
+</p>
+<p>In the illustrations of what is extracted from these tables, content in <em>italics</em> is notational in nature; it was not actually extracted from the tables. In particular, whenever <em>headers</em> are used for extraction, the order in which the headers were provided is noted by listing the headers, but the header row is not actually extracted from the target table.</p>
+<p>It might be helpful to open a new browser window with this table visible so that the table can be easily examined when scrolling through the examples.
+</p>
+<table border=1 width="100%"><tr bgcolor="#33CCFF" valign="top"><td bgcolor="#33CCFF" colspan=2 valign="top">Table (0,0)</td></tr><tr bgcolor="#33CCFF" valign="top"><td bgcolor="#33CCFF" valign="top">0,0:1,0<table bgcolor="#66FF99" border=1 width="97%"><tr valign="top"><td colspan=3 valign="top">Table (1,0)</td></tr><tr valign="top"><th valign="top">East</th><th valign="top">Central</th><th valign="top">West</th></tr><tr valign="top"><td valign="top">1,0:2,0</td><td rowspan=3 valign="top">1,0:2,1</td><td valign="top">1,0:2,2</td></tr><tr valign="top"><td valign="top">1,0:3,0</td><td valign="top">1,0:3,2</td></tr><tr valign="top"><td valign="top">1,0:4,0</td><td valign="top">1,0:4,2</td></tr><tr valign="top"><td valign="top">1,0:5,0</td><td valign="top">1,0:5,1</td><td valign="top">1,0:5,2</td></tr></table></td><td bgcolor="#33CCFF" valign="top">0,0:1,1<table bgcolor="#66FF99" border=1 width="97%"><tr valign="top"><td colspan=3 valign="top">Table (1,1)</td></tr><tr valign="top"><th valign="top">Left</th><th valign="top">Middle</th><th valign="top">Right</th></tr><tr valign="top"><td valign="top">1,1:2,0</td><td valign="top">1,1:2,1</td><td valign="top">1,1:2,2</td></tr><tr valign="top"><td valign="top">1,1:3,0</td><td valign="top">1,1:3,1</td><td valign="top">1,1:3,2</td></tr><tr valign="top"><td valign="top">1,1:4,0</td><td valign="top">1,1:4,1</td><td valign="top">1,1:4,2</td></tr><tr valign="top"><td valign="top">1,1:5,0</td><td valign="top">1,1:5,1</td><td valign="top">1,1:5,2</td></tr></table></td></tr><tr bgcolor="#33CCFF" valign="top"><td bgcolor="#33CCFF" valign="top">0,0:2,0<table bgcolor="#66FF99" border=1 width="97%"><tr valign="top"><td colspan=2 valign="top">Table (1,2)</td></tr><tr valign="top"><th valign="top">Left</th><th valign="top">Right</th></tr><tr valign="top"><td valign="top">1,2:2,0<table bgcolor="#FFCC33" border=1 width="97%"><tr valign="top"><td colspan=2 valign="top">Table (2,0)</td></tr><tr valign="top"><th valign="top">Pacific</th><th valign="top">Atlantic</th></tr><tr valign="top"><td valign="top">2,0:2,0</td><td valign="top">2,0:2,1</td></tr><tr valign="top"><td valign="top">2,0:3,0</td><td valign="top">2,0:3,1</td></tr></table></td><td valign="top">1,2:2,1<table bgcolor="#FFCC33" border=1 width="97%"><tr valign="top"><td colspan=2 valign="top">Table (2,1)</td></tr><tr valign="top"><th valign="top">Lefty</th><th valign="top">Righty</th></tr><tr valign="top"><td valign="top">2,1:2,0</td><td valign="top">2,1:2,1</td></tr><tr valign="top"><td valign="top">2,1:3,0</td><td valign="top">2,1:3,1</td></tr></table></td></tr><tr valign="top"><td valign="top">1,2:3,0</td><td valign="top">1,2:3,1</td></tr><tr valign="top"><td valign="top">1,2:4,0</td><td valign="top">1,2:4,1</td></tr><tr valign="top"><td valign="top">1,2:5,0</td><td valign="top">1,2:5,1</td></tr></table></td><td bgcolor="#33CCFF" valign="top">0,0:2,1<table bgcolor="#66FF99" border=1 width="97%"><tr valign="top"><td colspan=3 valign="top">Table (1,3)</td></tr><tr valign="top"><th valign="top">Pacific</th><th valign="top">Plains</th><th valign="top">Atlantic</th></tr><tr valign="top"><td rowspan=2 valign="top">1,3:2,0</td><td valign="top">1,3:2,1</td><td valign="top">1,3:2,2</td></tr><tr valign="top"><td rowspan=2 valign="top">1,3:3,1</td><td valign="top">1,3:3,2</td></tr><tr valign="top"><td valign="top">1,3:4,0</td><td valign="top">1,3:4,2</td></tr><tr valign="top"><td colspan=2 valign="top">1,3:5,0</td><td valign="top">1,3:5,2</td></tr></table></td></tr></table>
+
+<hr>
+<strong>Example 1</strong>
+<br>
+<table bgcolor="#000000" border=0 cellpadding=0 cellspacing=0><tr><td><table bgcolor="#FFFFCC" border=0 cellpadding=5 cellspacing=1><tr><td><pre>$te = new HTML::TableExtract( headers =&gt; [qw(Right Left)] );
+$te-&gt;parse($html_string);
+</pre></td></tr></table></td></tr></table>
+
+<br>
+Result:
+<br>
+<table border=0 cellpadding=5><tr valign="top"><td valign="top"><table bgcolor="#DDDDDD" border=1><tr><td colspan=2><font size="-1">Extracted from table (1,1)</font></td></tr><tr><td colspan=2><font size="-1"><em>Order: Right, Left</em></font></td></tr><tr><td>1,1:2,2</td><td>1,1:2,0</td></tr><tr><td>1,1:3,2</td><td>1,1:3,0</td></tr><tr><td>1,1:4,2</td><td>1,1:4,0</td></tr><tr><td>1,1:5,2</td><td>1,1:5,0</td></tr></table></td><td valign="top"><table bgcolor="#DDDDDD" border=1><tr><td colspan=2><font size="-1">Extracted from table (2,1)</font></td></tr><tr><td colspan=2><font size="-1"><em>Order: Right, Left</em></font></td></tr><tr><td>2,1:2,1</td><td>2,1:2,0</td></tr><tr><td>2,1:3,1</td><td>2,1:3,0</td></tr></table></td><td valign="top"><table bgcolor="#DDDDDD" border=1><tr><td colspan=2><font size="-1">Extracted from table (1,2)</font></td></tr><tr><td colspan=2><font size="-1"><em>Order: Right, Left</em></font></td></tr><tr><td>1,2:2,1</td><td>1,2:2,0</td></tr><tr><td>1,2:3,1</td><td>1,2:3,0</td></tr><tr><td>1,2:4,1</td><td>1,2:4,0</td></tr><tr><td>1,2:5,1</td><td>1,2:5,0</td></tr></table></td></tr></table>
+
+<br>
+
+<br>
+With headers, <i>depth</i> and <i>count</i> are irrelevant; all tables with columns matching those headers are extracted. Matches are accomplished as case-insensitive, non-anchored regular expressions. Columns are automatically rearranged in the same order as the headers were provided, so in this case we have reversed left and right. Rows above and including the rows where the headers were found are ignored; only the rows beneath the headers are extracted. Only the columns that line up with specific headers are retained.
+<hr>
+<strong>Example 2</strong>
+<br>
+<table bgcolor="#000000" border=0 cellpadding=0 cellspacing=0><tr><td><table bgcolor="#FFFFCC" border=0 cellpadding=5 cellspacing=1><tr><td><pre>$te = new HTML::TableExtract( headers =&gt; [qw(Lefty Righty)] );
+$te-&gt;parse($html_string);
+</pre></td></tr></table></td></tr></table>
+
+<br>
+Result:
+<br>
+<table border=0 cellpadding=5><tr valign="top"><td valign="top"><table bgcolor="#DDDDDD" border=1><tr><td colspan=2><font size="-1">Extracted from table (2,1)</font></td></tr><tr><td colspan=2><font size="-1"><em>Order: Lefty, Righty</em></font></td></tr><tr><td>2,1:2,0</td><td>2,1:2,1</td></tr><tr><td>2,1:3,0</td><td>2,1:3,1</td></tr></table></td></tr></table>
+
+<br>
+
+<br>
+Using basic header extraction, tables can be reliably extracted from a document no matter how the HTML changes around them or deeply nested they are.
+<hr>
+<strong>Example 3</strong>
+<br>
+<table bgcolor="#000000" border=0 cellpadding=0 cellspacing=0><tr><td><table bgcolor="#FFFFCC" border=0 cellpadding=5 cellspacing=1><tr><td><pre>@tes = (
+	new HTML::TableExtract( headers =&gt; [qw(Pacific Plains Atlantic)] ),
+	new HTML::TableExtract( headers =&gt; [qw(Atlantic Pacific Plains)] ),
+	new HTML::TableExtract( headers =&gt; [qw(Atlantic Plains)] ),
+	new HTML::TableExtract( headers =&gt; [qw(Plains Pacific)] )
+       );
+grep($_-&gt;parse($html_string), @tes);
+</pre></td></tr></table></td></tr></table>
+
+<br>
+Result:
+<br>
+<table border=0 cellpadding=5><tr valign="top"><td valign="top"><table bgcolor="#DDDDDD" border=1><tr><td colspan=3><font size="-1">Extracted from table (1,3)</font></td></tr><tr><td colspan=3><font size="-1"><em>Order: Pacific, Plains, Atlantic</em></font></td></tr><tr><td>1,3:2,0</td><td>1,3:2,1</td><td>1,3:2,2</td></tr><tr><td></td><td>1,3:3,1</td><td>1,3:3,2</td></tr><tr><td>1,3:4,0</td><td></td><td>1,3:4,2</td></tr><tr><td>1,3:5,0</td><td></td><td>1,3:5,2</td></tr></table></td><td valign="top"><table bgcolor="#DDDDDD" border=1><tr><td colspan=3><font size="-1">Extracted from table (1,3)</font></td></tr><tr><td colspan=3><font size="-1"><em>Order: Atlantic, Pacific, Plains</em></font></td></tr><tr><td>1,3:2,2</td><td>1,3:2,0</td><td>1,3:2,1</td></tr><tr><td>1,3:3,2</td><td></td><td>1,3:3,1</td></tr><tr><td>1,3:4,2</td><td>1,3:4,0</td><td></td></tr><tr><td>1,3:5,2</td><td>1,3:5,0</td><td></td></tr></table></td><td valign="top"><table bgcolor="#DDDDDD" border=1><tr><td colspan=2><font size="-1">Extracted from table (1,3)</font></td></tr><tr><td colspan=2><font size="-1"><em>Order: Atlantic, Plains</em></font></td></tr><tr><td>1,3:2,2</td><td>1,3:2,1</td></tr><tr><td>1,3:3,2</td><td>1,3:3,1</td></tr><tr><td>1,3:4,2</td><td></td></tr><tr><td>1,3:5,2</td><td></td></tr></table></td><td valign="top"><table bgcolor="#DDDDDD" border=1><tr><td colspan=2><font size="-1">Extracted from table (1,3)</font></td></tr><tr><td colspan=2><font size="-1"><em>Order: Plains, Pacific</em></font></td></tr><tr><td>1,3:2,1</td><td>1,3:2,0</td></tr><tr><td>1,3:3,1</td><td></td></tr><tr><td></td><td>1,3:4,0</td></tr><tr><td></td><td>1,3:5,0</td></tr></table></td></tr></table>
+
+<br>
+
+<br>
+The tables above represent different ways of extracting information from the same table using headers; notice how the column order is automatically adjusted to reflect the order in which the headers were provided. <i>Gridmapping</i> preserves the columns that you see in a browser. Tables are actually HTML tree structures, so when cell spans are involved, the "grid" is an illusion. <i>Gridmapping</i> superimposes a grid structure of 1x1 cells over the table, and reports columns intuitively. (note that the cell coordinates in this case represent these grid coordinates, rather than tree coordinates).
+<hr>
+<strong>Example 4</strong>
+<br>
+<table bgcolor="#000000" border=0 cellpadding=0 cellspacing=0><tr><td><table bgcolor="#FFFFCC" border=0 cellpadding=5 cellspacing=1><tr><td><pre>@tes = (
+	new HTML::TableExtract( depth =&gt; 1, count =&gt; 3 ),
+	new HTML::TableExtract( depth =&gt; 1, count =&gt; 3, gridmap =&gt; 0 )
+       );
+grep($_-&gt;parse($html_string), @tes);
+</pre></td></tr></table></td></tr></table>
+
+<br>
+Result:
+<br>
+<table border=0 cellpadding=5><tr valign="top"><td valign="top"><table bgcolor="#DDDDDD" border=1><tr><td colspan=3><font size="-1">Extracted from table (1,3)</font></td></tr><tr><td>Table (1,3)</td><td></td><td></td></tr><tr><td>Pacific</td><td>Plains</td><td>Atlantic</td></tr><tr><td>1,3:2,0</td><td>1,3:2,1</td><td>1,3:2,2</td></tr><tr><td></td><td>1,3:3,1</td><td>1,3:3,2</td></tr><tr><td>1,3:4,0</td><td></td><td>1,3:4,2</td></tr><tr><td>1,3:5,0</td><td></td><td>1,3:5,2</td></tr></table></td><td valign="top"><table bgcolor="#DDDDDD" border=1><tr><td colspan=3><font size="-1">Extracted from table (1,3)</font></td></tr><tr><td>Table (1,3)</td><td></td><td></td></tr><tr><td>Pacific</td><td>Plains</td><td>Atlantic</td></tr><tr><td>1,3:2,0</td><td>1,3:2,1</td><td>1,3:2,2</td></tr><tr><td>1,3:3,1</td><td>1,3:3,2</td><td></td></tr><tr><td>1,3:4,0</td><td>1,3:4,2</td><td></td></tr><tr><td>1,3:5,0</td><td>1,3:5,2</td><td></td></tr></table></td></tr></table>
+
+<br>
+
+<br>
+Here we target the same table using <i>depth</i> and <i>count</i>. Taken together, <i>depth</i> and <i>count</i> uniquely specify at table in an HTML document, though it does introduce more context than using <i>headers</i>. Notice also that the entire table is retrieved, not just the columns beneath the headers. In the first example, <i>gridmapping</i> is enabled by default. In the second, it is explicity disabled in order to illustrate the tree ordering of cells.
+<hr>
+<strong>Example 5</strong>
+<br>
+<table bgcolor="#000000" border=0 cellpadding=0 cellspacing=0><tr><td><table bgcolor="#FFFFCC" border=0 cellpadding=5 cellspacing=1><tr><td><pre>$te = new HTML::TableExtract( depth =&gt; 2 );
+$te-&gt;parse($html_string);
+</pre></td></tr></table></td></tr></table>
+
+<br>
+Result:
+<br>
+<table border=0 cellpadding=5><tr valign="top"><td valign="top"><table bgcolor="#DDDDDD" border=1><tr><td colspan=2><font size="-1">Extracted from table (2,0)</font></td></tr><tr><td>Table (2,0)</td><td></td></tr><tr><td>Pacific</td><td>Atlantic</td></tr><tr><td>2,0:2,0</td><td>2,0:2,1</td></tr><tr><td>2,0:3,0</td><td>2,0:3,1</td></tr></table></td><td valign="top"><table bgcolor="#DDDDDD" border=1><tr><td colspan=2><font size="-1">Extracted from table (2,1)</font></td></tr><tr><td>Table (2,1)</td><td></td></tr><tr><td>Lefty</td><td>Righty</td></tr><tr><td>2,1:2,0</td><td>2,1:2,1</td></tr><tr><td>2,1:3,0</td><td>2,1:3,1</td></tr></table></td></tr></table>
+
+<br>
+
+<br>
+When only a <i>depth</i> is specified, all tables at that depth are returned.
+<hr>
+<strong>Example 6</strong>
+<br>
+<table bgcolor="#000000" border=0 cellpadding=0 cellspacing=0><tr><td><table bgcolor="#FFFFCC" border=0 cellpadding=5 cellspacing=1><tr><td><pre>$te = new HTML::TableExtract( count =&gt; 1 );
+$te-&gt;parse($html_string);
+</pre></td></tr></table></td></tr></table>
+
+<br>
+Result:
+<br>
+<table border=0 cellpadding=5><tr valign="top"><td valign="top"><table bgcolor="#DDDDDD" border=1><tr><td colspan=3><font size="-1">Extracted from table (1,1)</font></td></tr><tr><td>Table (1,1)</td><td></td><td></td></tr><tr><td>Left</td><td>Middle</td><td>Right</td></tr><tr><td>1,1:2,0</td><td>1,1:2,1</td><td>1,1:2,2</td></tr><tr><td>1,1:3,0</td><td>1,1:3,1</td><td>1,1:3,2</td></tr><tr><td>1,1:4,0</td><td>1,1:4,1</td><td>1,1:4,2</td></tr><tr><td>1,1:5,0</td><td>1,1:5,1</td><td>1,1:5,2</td></tr></table></td><td valign="top"><table bgcolor="#DDDDDD" border=1><tr><td colspan=2><font size="-1">Extracted from table (2,1)</font></td></tr><tr><td>Table (2,1)</td><td></td></tr><tr><td>Lefty</td><td>Righty</td></tr><tr><td>2,1:2,0</td><td>2,1:2,1</td></tr><tr><td>2,1:3,0</td><td>2,1:3,1</td></tr></table></td></tr></table>
+
+<br>
+
+<br>
+When only a <i>count</i> is specified, all tables at that <i>count</i> from each depth are returned. In this example, the second table within each <i>depth</i> is extracted (both <i>depth</i> and <i>count</i> begin with 0).
+<hr>
+<strong>Example 7</strong>
+<br>
+<table bgcolor="#000000" border=0 cellpadding=0 cellspacing=0><tr><td><table bgcolor="#FFFFCC" border=0 cellpadding=5 cellspacing=1><tr><td><pre>$te = new HTML::TableExtract( count =&gt; 1, headers =&gt; [qw(Left Middle Right)] );
+$te-&gt;parse($html_string);
+</pre></td></tr></table></td></tr></table>
+
+<br>
+Result:
+<br>
+<table border=0 cellpadding=5><tr valign="top"><td valign="top"><table bgcolor="#DDDDDD" border=1><tr><td colspan=3><font size="-1">Extracted from table (1,1)</font></td></tr><tr><td colspan=3><font size="-1"><em>Order: Left, Middle, Right</em></font></td></tr><tr><td>1,1:2,0</td><td>1,1:2,1</td><td>1,1:2,2</td></tr><tr><td>1,1:3,0</td><td>1,1:3,1</td><td>1,1:3,2</td></tr><tr><td>1,1:4,0</td><td>1,1:4,1</td><td>1,1:4,2</td></tr><tr><td>1,1:5,0</td><td>1,1:5,1</td><td>1,1:5,2</td></tr></table></td></tr></table>
+
+<br>
+
+<br>
+When constraints are specified together, they each have a veto power on whether to extract the table. In this case, the same two tables in the prior example matched on this <i>count</i>, but the <i>header</i> constraint discarded the one without the proper headers.
+<hr>
+</body>
+</html>

@@ -1,0 +1,46 @@
+HTML::Calendar::Monthly
+
+This is a very simple module which will make an HTML representation of
+a given month. You can add links to individual days.
+
+Yes, the inspiration for this came out of me looking at
+HTML::Calendar::Simple, and thinking 'Hmmm. A bit too complicated for
+what I want. I know, I will write a simplified version.' So I did.
+
+Along with the module comes a flexible program to generate monthly
+calendars for inclusion in web sites.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc HTML::Calendar::Monthly
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-Calendar-Monthly
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/HTML-Calendar-Monthly
+
+    Search CPAN
+        http://search.cpan.org/dist/HTML-Calendar-Monthly
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Johan Vromans
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

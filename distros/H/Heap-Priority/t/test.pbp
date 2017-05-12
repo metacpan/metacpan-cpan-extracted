@@ -1,0 +1,23 @@
+[Settings]
+script=c:\windows\desktop\heap-priority-0.01\t\test.t
+args=
+pathinfo=
+exec_dir=c:\windows\desktop\heap-priority-0.01\t
+chainto=<not specified>
+itype=0
+brwstest=0
+brwtst_path=*.htm
+
+[Wizard]
+form=
+errout=
+dout=
+rout=
+parse=0
+out=0
+dolog=0
+logrepnl=1
+logfile=log.txt
+logrec=
+nlchar=
+logdelim=0

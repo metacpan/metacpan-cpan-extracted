@@ -1,0 +1,73 @@
+Revision history for Perl extension HTML::Entities::Interpolate.
+
+1.10  2016-08-14T11:33:00
+	- Stop using Test::Stream. Use Test::More shipped in the Test::Simple distro.
+		See RT#116935. Thanx to Chad Granum.
+	- Update version #s in pre-reqs.
+	- Adopt new repo structure. For details, see
+		http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html.
+	- Update .gitignore and MANIFEST.SKIP.
+	- Change licence from Artistic to Perl.
+	- Move File::Spec, Test::Pod and Test::Simple to TEST_REQUIRES within Makefile.PL.
+
+1.09  2015-11-29T10:08:00
+	- Replace "\t" with \s{4} in scripts/synopsis.pl and t/synopsis.html in an attempt to fix
+		the large number of failures reported by CPAN Testers.
+	- Patch t/test.t to use File::Spec to join a dir to a file name.
+	- Use $^X rather than 'perl' to invoke Perl in t/test.t.
+	- Make some pre-req version #s explicit.
+
+1.08  2015-11-26T14:26:00
+	- In V 1.07 I patched t/test.t to use Test::Stream instead of Test::More, but did not patch
+		Makefile.PL to match. Test::More is still used for xt/author/pod.t.
+
+1.07  2015-11-24T08:47:00
+	- Apologies: Forgot to release V 1.06 to CPAN.
+	- Add scripts/synopsis.pl and its output t/synopsis.html.
+	- Copy scripts/synopsis.pl into docs.
+	- Add t/test.t to run scripts/synopsis.pl and compare the output to t/synopsis.html.
+	- Update pre-reqs to add Capture::Tiny and File::Slurper, which are used in t/test.t.
+	- Add .gitignore to MANIFEST.SKIP.
+	- Remove Build.PL.
+	- Remove t/load.t.
+	- Reformat the dates in this file.
+
+1.06  2015-02-18T16:32:00
+	- Add use strict and use warnings to Build.PL and Makefile.PL.
+	- Add github repo to Build.PL, Makefile.PL and docs.
+	- Move t/pod.t to xt/author/.
+	- Patch Build.PL to handle xt/author/*.t.
+
+1.05  2013-07-09T08:56:00
+	- No code changes.
+	- Rename CHANGES to Changes as per CPAN::Changes::SPEC.
+	- Recreate META.* files so they say licence is artistic_2 rather than artistic_1.
+		Build.PL and Makefile.PL already said artistic_2, but the META.* files didn't.
+		There is no reference to licences in the source of the module itself.
+		This was requested by Christopher Meng who packages stuff for Fedora.
+
+1.04  2011-02-15T17:02:00
+	- Replace /usr/bin/perl with /usr/bin/env perl.
+	- Replace common::sense with use strict and use warnings, to get uninit var warnings.
+	- Update MANIFEST.SKIP, MYMETA.json.
+	- Add META.json.
+
+1.03  2010-02-21T12:55:15
+	- Remove text 'All rights reserved' (for Debian licensing).
+	- Remove POD heads 'Required Modules' and 'Changes'.
+
+1.02  2010-02-10T14:02:07
+	- MANIFEST.SKIP updated to exclude MYMETA.yml. Add MYMETA.yml.
+
+1.01  2009-11-13T13:20:00
+	- Run dos2unix
+	- Rename Changes.txt to CHANGES
+
+1.00  2004-11-09T15:30:45
+	- Original version
+	- Source code author: David Nicol
+	- I (Ron Savage) am releasing this module, which David emailed to me,
+		because it is a pre-requisite for my module DBIx::Admin
+	- This module was recently released under the name HTML::Entitize, but
+		I've changed this name so it will be found more easily via CPAN searches.
+		The name HTML::Entitize was just a bit too obscure for its own good

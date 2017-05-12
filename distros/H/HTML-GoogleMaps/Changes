@@ -1,0 +1,45 @@
+Revision history for Perl extension HTML::GoogleMaps.
+
+1     Jul 3, 2005
+	- original version
+
+2     Aug 18, 2005
+	By default, the map will now center itself at the center of any markers
+	Added support for additional icons
+	Took out strange 5.8.6 requirement added by h2xs
+	Thanks to Suresh Govindachar for his input
+
+3     Jan 18, 2006
+        By default, wrap popup html in a 350px by 250px
+        Split up the output of render into three parts to help IE support
+
+4     April 29, 2006
+        Switched over to the new v2 map API
+        Added v2_zoom method to access the new hi-res zoom levels.  The old
+          zoom method is deprecated and will probably be replace by v2_zoom 
+          in a future release.
+
+5     June 17, 2006
+        Added support for geocoding with Geo::Coder::Google.  Geo::Coder::US 
+          support is deprecated.
+
+6     December 5, 2006
+        Finally got around to putting out a new version
+        Check the version for Geo::Coder::Google, require .02 or greater
+        If not passed a key, die with the registration URL
+        Added ->map_id to set the ID for the map div
+        Respect ->dragging
+        Try to output something closer to XHTML
+
+8     November 15, 2008
+	Several fixes from Manni Heumann:
+	  Documentation improvements
+	  You can now have single quotes in marker HTML
+
+9     December 6, 2009
+	Fixed RT #39258, courtesy Rodney Webster
+	Fixed RT #17232, courtesy of Simon Flack
+
+10    December 7, 2009
+	Deprecated ->render and replaced it with ->onload_render.  Should
+	  give better browser performance and support.

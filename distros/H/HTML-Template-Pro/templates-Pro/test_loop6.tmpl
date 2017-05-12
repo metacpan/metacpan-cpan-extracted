@@ -1,0 +1,15 @@
+<H1> test_loop6: global vars inside a loop </H1>
+
+Inside a Loop
+<TMPL_LOOP NAME="OUTER">
+<TMPL_VAR NAME="TEST">
+<TMPL_LOOP NAME="INNER">
+<TMPL_VAR NAME="TST">
+</TMPL_LOOP>
+</TMPL_LOOP>
+Outside a Loop
+<TMPL_LOOP NAME="INNER">
+<TMPL_VAR NAME="TST">
+</TMPL_LOOP>
+
+<H1> end test_loop6 </H1>

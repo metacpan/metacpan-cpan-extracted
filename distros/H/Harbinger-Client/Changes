@@ -1,0 +1,12 @@
+Revision history for Harbinger-Client
+
+0.001002  2015-04-25 13:53:59-05:00 America/Chicago
+ - Add missing dep
+
+0.001001  2014-11-20 18:02:21-06:00 America/Chicago
+ - Fix a warning that did not respect the HARBINGER_WARNINGS flag
+  (thanks Wes Malone!)
+
+
+0.001000  2014-03-25 18:33:43-05:00 America/Chicago
+ - Initial Release

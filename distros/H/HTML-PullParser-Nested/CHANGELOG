@@ -1,0 +1,9 @@
+0.04 2010-03-09
+	- More pod fixes.
+	- Add PREREQ, LICENSE, AUTHOR and ABSTRACT to META.yml.
+
+0.03 2010-03-09
+	- Fix pod documentation.
+
+0.02 2010-03-09
+	- First public release.

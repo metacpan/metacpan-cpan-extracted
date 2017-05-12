@@ -1,0 +1,46 @@
+---
+abstract: 'Object-oriented access to hash with multi-valued elements'
+author:
+  - 'Nat Goodman <natg@shore.net>'
+build_requires:
+  Carp: 1.2
+  Exporter: 5.68
+  File::Spec: 3.4
+  Hash::AutoHash: 1.17
+  List::MoreUtils: 0.33
+  Test::Deep: 0.11
+  Test::More: 0.98
+  Test::Pod: 1.48
+  Test::Pod::Content: v0.0.6
+configure_requires:
+  Module::Build: 0.4007
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.120351'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Hash-AutoHash-MultiValued
+provides:
+  Hash::AutoHash::MultiValued:
+    file: lib/Hash/AutoHash/MultiValued.pm
+    version: 1.17
+  Hash::AutoHash::MultiValued::helper:
+    file: lib/Hash/AutoHash/MultiValued.pm
+    version: 0
+  Hash::AutoHash::MultiValued::tie:
+    file: lib/Hash/AutoHash/MultiValued.pm
+    version: 0
+requires:
+  Carp: 1.2
+  Cwd: 3.4
+  Exporter: 5.68
+  Hash::AutoHash: 1.17
+  List::MoreUtils: 0.33
+  List::Util: 1.32
+  Tie::Hash: 1.04
+  Tie::ToObject: 0.03
+  XSLoader: 0.15
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.17

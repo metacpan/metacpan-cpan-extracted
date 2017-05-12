@@ -1,0 +1,54 @@
+Revision history for Perl extension HTML::LinkExtractor.
+
+0.13  Fri Jan  7 00:47:13 2005
+    - bugs 9468, 7828
+
+0.121 Thu Sep 30 05:34:26 2004
+    - forgot to update changes file
+
+0.12  Thu Sep 30 05:34:26 2004
+    - abandoned HTML::TokeParser::Simple after taking http://rt.cpan.org/NoAuth/Bug.html?id=7811
+
+0.11  Fri Mar 19 06:48:31 2004
+    - fixed bug#5723 (shouldn've happened in version 0.10) 
+
+0.10  Fri Feb 27 22:04:38 2004
+    - fixed bug#5470 where tags (img..) inside @TAGS_IN_NEED didn't get
+      passed to callback
+
+0.09  Sun Nov 30 06:33:41 2003
+    - took in a patch from Frederic Krueger
+    - changed pod a tad, added license
+
+0.08  Wed Sep  3 19:12:51 2003
+    - bumped required HTML::TokeParser version and changed 
+      deprecated $T->return_text calls to $T->as_is after
+      a few users notified me
+
+0.07  Wed Apr  9 00:57:20 2003
+    - small fix in meta refresh handling prompted by "Bengt Neiss" -- thanks dude
+
+0.06  Fri Oct 11 10:12:41 2002
+    - fixed a stupid typo, added '!doctype' (a process instruction) to the tags
+      list
+    - added one more cool example (calculate download size of a page)
+
+0.05  Wed Aug 28 07:57:12 2002
+    - *sigh* added prerequisites to Makefile.PL, edited Changes/Readme
+    - No new features or nothing
+
+0.04  Mon Aug 26 04:00:55 2002
+    - Converted to use HTML::TokeParser::Simple
+    - Added a strip and appropriate pod
+    - Release on CPAN (don't expect to ever need to upload a new version)
+
+0.03  Mon Aug 19 03:30:55 2002
+    - And then polished up ( and added pod )
+
+0.02  Mon Aug 19 01:27:55 2002
+    - The first incarnation is written (ugly)
+
+0.01  Mon Aug 19 00:47:55 2002
+	- original version; created by h2xs 1.21 with options
+		-AX -p 5.000 -n HTML::LinkExtractor
+

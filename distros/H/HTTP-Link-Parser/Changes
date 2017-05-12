@@ -1,0 +1,62 @@
+HTTP-Link-Parser
+================
+
+Created:      2009-10-09
+Home page:    <https://metacpan.org/release/HTTP-Link-Parser>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=HTTP-Link-Parser>
+Maintainer:   Toby Inkster <tobyink@cpan.org>
+
+0.200	2014-01-18
+
+ [ Documentation ]
+ - Copyright 2014.
+
+ [ Packaging ]
+ - use Dist::Inkt.
+
+ [ Other ]
+ - Make RDF::Trine dependency optional.
+
+0.103	2011-12-04
+
+ [ Bug Fixes ]
+ - Newer version of Module::Package::RDF.
+
+0.102	2011-11-27
+
+ [ Packaging ]
+ - Module::Package::RDF
+
+ [ Other ]
+ - Minor tidy
+ - Updated: use 5.010
+
+0.101	2011-02-19
+
+ - Minor cleanups.
+ - Updated: Copyright 2011.
+
+0.100	2010-06-26
+
+ - Updated: Let the Content-Language header provide a default language for
+   the 'title' property.
+
+0.05	2010-02-07
+
+ - Clean up @EXPORT and @EXPORT_OK.
+ - General documentation improvements.
+ - Rename parse_header to parse_single_link, and document this.
+ - Updated: Copyright 2010.
+ - Updated: Use my new build system.
+
+0.04	2009-12-15
+
+ - Added: Support the 'title*' parameter.
+
+0.03	2009-11-28
+
+ - Added: Provide an RDF::Trine::Model
+
+0.02	2009-11-24
+
+0.01	2009-10-09	First release

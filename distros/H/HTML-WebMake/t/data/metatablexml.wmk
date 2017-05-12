@@ -1,0 +1,42 @@
+<webmake>
+
+<media src="data/contentsfind.data" name=".../*.txt" />
+
+<metatable format="xml">
+  <metaset>
+    <target id="foo.txt">
+      <meta name=section>sec1</meta>
+      <meta name=score>50</meta>
+      <meta name=title>This is Foo</meta>
+    </target>
+    <target id="dir1/bar.txt">
+      <meta name=section>sec2</meta>
+      <meta name=score>30</meta>
+      <meta name=title>This is Bar</meta>
+    </target>
+    <target id="dir2/dir2a/baz.txt">
+      <meta name=section>sec1</meta>
+      <meta name=score>20</meta>
+      <meta name=title>This is Baz</meta>
+    </target>
+  </metaset>
+</metatable>
+
+<out file=log/metatablexml.html>
+Name: foo
+Title: $[foo.txt.title]
+Section: $[foo.txt.section]
+Score: $[foo.txt.score]
+
+Name: dir1/bar
+Title: $[dir1/bar.txt.title]
+Section: $[dir1/bar.txt.section]
+Score: $[dir1/bar.txt.score]
+
+Name: dir2/dir2a/baz
+Title: $[dir2/dir2a/baz.txt.title]
+Section: $[dir2/dir2a/baz.txt.section]
+Score: $[dir2/dir2a/baz.txt.score]
+</out>
+
+</webmake>

@@ -1,0 +1,15 @@
+Changes
+heliosx_logger_hires_search
+lib/HeliosX/Logger/HiRes.pm
+lib/HeliosX/Logger/HiRes/LogEntry.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+sql/heliosx_logger_hires_mysql.sql
+sql/heliosx_logger_hires_oracle.sql
+sql/heliosx_logger_hires_sqlite.sql
+t/1.t
+t/2.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

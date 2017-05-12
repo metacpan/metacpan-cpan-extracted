@@ -1,0 +1,112 @@
+Revision history for HTML-SocialMedia
+
+0.27	Tue Dec 27 12:50:54 EST 2016
+	Look in the correct place in the cache
+	Include twitter http / https changes
+
+0.26	Sat Oct 29 10:51:49 EDT 2016
+	Use https URLs when host is on HTTPS
+	Used latest 'tweet this' code from Twitter
+	Added align argument to as_string()
+	Upgrade to Facebook API v2.8
+	Added facebook_share_button
+	Remove newline before twitter handle
+	Remember the facebook language on later calls to as_string()
+	Test the cache handler
+
+0.25	Sun Aug 16 20:24:43 EDT 2015
+	Fix the Facebook like code
+
+0.24	Fri Jul 24 12:41:18 EDT 2015
+	Added LWP::Protocol::https as a prerequisite
+
+0.23	Thu Jul 23 20:57:49 EDT 2015
+	Fallback to the default location if there is a problem talking to
+		Facebook
+	Use latest Facebook JavaScript
+
+0.22	Thu Feb  5 13:22:43 EST 2015
+	Fixed call to wrong object for language variant
+	Performance enhancement
+	Fixed uninitialized value in lc
+
+0.21	Tue Nov 11 08:50:50 EST 2014
+	Fix t/rt100242 failing when IP::Country is installed
+	Added optional CGI::Lingua argument to new()
+
+0.20	Mon Nov 10 10:48:23 EST 2014
+	Simplified the cache key
+	Don't instantiate a CGI::Info object, we can use a class method
+	Fix unitialised variable
+	Accept logger to new()
+
+0.19	Fri Apr 27 13:36:21 BST 2012
+	Handle https://rt.cpan.org/Ticket/Display.html?id=57479
+	Timeout after 10 seconds attempting to connect to Facebook
+
+0.18
+	Improved caching use with Twitter
+
+0.17	Sat Feb 11 21:47:15 EST 2012
+	Only do kwalitee test in author environment because it throws too
+		many false positives
+
+0.16
+	Added the optional cache parameter
+
+0.15	Wed Jan 11 10:39:20 GMT 2012
+	Google PlusOne: use http or https as needed rather than always using
+		https
+	Fix as_string test if Facebook supports fr_US
+
+0.14	Thu Dec 29 21:40:15 EST 2011
+	Added some author tests
+	Fixed dependancy
+	Changed to new Google plusone code, including multi-lingual support
+
+0.13	Mon Oct 24 14:26:23 EDT 2011
+	Ensured consistent spacecing between LinkedIn and Google plus1 on
+		Firefox and IE
+	Added Reddit
+
+0.12	Wed Oct  5 13:42:51 EDT 2011
+	Added support for LinkedIn's share button
+	Added render: synonym for as_string() added for compatability with
+		HTML::Adsense
+
+0.11	Thu Sep 15 12:55:58 EDT 2011
+	If the brower's chosen language isn't supported by Facebook, then
+		fallback to en_GB.  It would be nice to try more sensible
+		choices, perhaps later.
+
+0.10	Wed Sep 14 15:20:20 EDT 2011
+	Fixed twitter follow button internationalisation
+
+0.09	Sun Sep 11 13:10:35 EDT 2011
+	Better handling of unlikely internationalisation scenarios
+
+0.08	Sat Sep 10 11:48:17 EDT 2011
+	Even more internationlisation support
+
+0.07	Sat Sep 10 11:46:38 EDT 2011
+	Beefed up the example in the documentation
+	Improved internationalisation support
+
+0.06	Thu Sep  8 18:28:35 EDT 2011
+	Fixed some line up issues
+
+0.05
+	Google plus one wasn't being emitted in as_string()
+
+0.04	Tue Sep  6 11:02:09 EDT 2011
+	Added twitter_related option to new
+	Renamed HTML-SocialMedia
+
+0.03	Mon Sep  5 12:14:32 EDT 2011
+	Fixed Facebook button language localisation
+
+0.02	Mon Sep  5 07:19:32 EDT 2011
+	Fixed the Facebook like button
+
+0.01	Sun Sep  4 23:25:47 EDT 2011
+        First draft

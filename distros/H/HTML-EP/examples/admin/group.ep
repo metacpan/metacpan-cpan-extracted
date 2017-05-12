@@ -1,0 +1,222 @@
+<ep-package name="HTML::EP::Locale">
+<ep-perl>
+    #
+    #   Assuming the following table structure:
+    #
+    #   CREATE TABLE GROUPS (
+    #       GROUPNAME VARCHAR(20) NOT NULL,
+    #       MEMBER VARCHAR(20) NOT NULL
+    #   )
+    #     
+    my $self = $_;
+
+    sub FindGroup {
+ 	my $self = shift; my $group = shift;
+ 	my $dbh = $self->{'dbh'};
+ 	my $query = sprintf('SELECT * FROM GROUPS WHERE GROUPNAME = %s',
+ 			    $dbh->quote($group));
+ 	$self->_ep_query({'statement' => $query, 'result' => 'group'});
+ 	my $groupRef = delete $self->{'group'};
+	my $members = '';
+	foreach my $ref (@$groupRef) {
+	     $members .= ($members ? "," : "" ) . $ref->{'MEMBER'};
+	}
+	return {
+	    'GROUPNAME' => { 'val' => $group, 'type' => 't',
+			     'col' => 'GROUPNAME' },
+	    'MEMBERS' => { 'val' => $members, 'type' => 't',
+			   'col' => 'MEMBERS' }
+	}
+    }
+
+    sub VerifyGroup {
+	my $self = shift; my $group = shift; my $insert = shift;
+	my $groupname = $group->{'GROUPNAME'}->{'val'};
+	if ($groupname !~ /^[a-z0-9_]+$/) {
+	    die "Invalid group name: $groupname"
+	        . " (group names must have lowercased or numeric characters only)";
+	}
+
+	my $dbh = $self->{'dbh'};
+        my $sth;
+	if ($insert) {
+	    $sth = $dbh->prepare("SELECT * FROM GROUPS WHERE GROUPNAME = "
+				 . $dbh->quote($groupname));
+	    $sth->execute();
+	    if (my $ref = $sth->fetchrow_arrayref()) {
+	        die "A group $groupname already exists.";
+	    }
+	    $sth->finish();
+        }
+
+	my $members = [];
+	foreach my $member (split(",", $group->{'MEMBERS'}->{'val'})) {
+	    $member =~ s/^\s+//;
+	    $member =~ s/\s+$//;
+	    if ($member  &&  $member !~ /\@/) {
+		$sth = $dbh->prepare("SELECT * FROM USERS WHERE USER = "
+				     . $dbh->quote($member));
+		$sth->execute();
+		if (!$sth->fetchrow_arrayref()) {
+		    die "Unknown user: $member";
+		}
+		push(@$members, $member);
+	    }
+	}
+	$self->{'members'} = $members;
+    }
+
+    sub InsertMembers {
+	my $self = shift; my $group = shift; my $members = shift;
+	my $dbh = $self->{'dbh'};
+	foreach my $member (@$members) {
+	    if ($self->{'debug'}) {
+	        $self->print("Inserting member $member into group $group");
+	    }
+	    $dbh->do("INSERT INTO GROUPS VALUES (?, ?)",
+		     undef, $group, $member);
+	}
+    }
+
+    my $cgi = $self->{'cgi'};
+    my $group;
+    my $modified;
+    $self->_ep_database({'dsn' => 'DBI:mysql:user',
+			 'user' => 'nobody',
+#			 'password' => 'my_name_is_nobody'});
+			 'password' => ''});
+    my $dbh = $self->{'dbh'};
+    my $query;
+    if ($group = $cgi->param('delete')) {
+	if ($cgi->param('doit')) {
+	    $query = "DELETE FROM GROUPS WHERE GROUPNAME = "
+		. $dbh->quote($group);
+	    $self->_ep_query({'statement' => $query});
+	    $modified = 1;
+	} else {
+	    $self->{'group'} = FindGroup($self, $group);
+	    $self->{'_ep_output'} .=
+		$self->_ep_include({'file' => '/admin/rmgroup.ep'});
+	    $self->_ep_exit({});
+	}
+    } elsif ($group = $cgi->param('edit')) {
+	if ($cgi->param('doit')) {
+	    $group = $cgi->param('group_t_GROUPNAME');
+	    $self->_ep_input({'prefix' => 'group', 'dest' => 'group',
+			      'sqlquery' => 1});
+	    VerifyGroup($self, $self->{'group'});
+	    $dbh->do("DELETE FROM GROUPS WHERE GROUPNAME = "
+		     . $dbh->quote($group));
+	    InsertMembers($self, $group, $self->{'members'});
+	    $modified = 1;
+	    delete $self->{'group'};
+	} else {
+	    $self->{'group'} = FindGroup($self, $group);
+	}
+    } elsif ($cgi->param('insert')) {
+	$self->_ep_input({'prefix' => 'group', 'dest' => 'group',
+			  'sqlquery' => 1});
+	my $group = $self->{'group'}->{'GROUPNAME'}->{'val'};
+	VerifyGroup($self, $self->{'group'}, 1);
+	InsertMembers($self, $group, $self->{'members'});
+	delete $self->{'group'};
+	$modified = 1;
+    }
+    if ($modified) {
+	$self->{'output'} = `/usr/local/bin/usersModified 2>&1`;
+    }
+    my $query = "SELECT * FROM GROUPS ORDER BY GROUPNAME";
+    $self->_ep_query({'statement' => $query, 'result' => 'groups'});
+    {
+	my %groups;
+	foreach my $ref (@{$self->{'groups'}}) {
+	    if ($self->{'debug'}) {
+	        $self->print("Group: $ref (", %$ref, ")\n");
+	    }
+	    if (!exists($groups{$ref->{'GROUPNAME'}})) {
+		$groups{$ref->{'GROUPNAME'}} = $ref->{'MEMBER'};
+	    } else {
+		$groups{$ref->{'GROUPNAME'}} .= "," . $ref->{'MEMBER'};
+	    }
+	}
+	my $groupList = [];
+	foreach my $group (keys(%groups)) {
+	     push(@$groupList, { 'GROUPNAME' => $group,
+				 'MEMBERS' => $groups{$group} });
+	}
+	$self->{'groups'} = $groupList;
+    }
+    '';
+</ep-perl>
+<html><head><title>
+<ep-language de="Gruppenverwaltung" en="Group administration"></title></head>
+<body><h1><ep-language de="Gruppenverwaltung" en="Group administration"></h1>
+<ep-if eval="defined($_->{'output'})">
+<H2><ep-language de="Kommandoausgabe" en="Command output"></H2>
+<ep-language language=de>
+<p>Ihr letztes Kommando erzeugte die folgende Ausgabe:</p>
+</ep-language>
+<ep-language language=en>
+<p>This is the output of your last command:</p>
+</ep-language>
+<pre>
+$output$
+</pre>
+</ep-if>
+<ep-if eval="$@group$">
+<h2><ep-language de="Modifikation einer Gruppe" en="Group modification"></h2>
+<ep-else>
+<h2><ep-language de="Anlegen einer Gruppe" en="Group creation"></h2>
+</ep-if>
+<form action="group.ep" method=GET>
+<input type=hidden name="language" value="$_ep_language$">
+<table>
+<tr><th><ep-language de="Gruppenname" en="Group name">:</th>
+<ep-if eval="$@group$">
+    <td>$group->GROUPNAME->val$</td>
+    <input type=hidden name="group_t_GROUPNAME"
+           value="$group->GROUPNAME->val$">
+<ep-else>
+    <td><input name="group_t_GROUPNAME" value="$group->GROUPNAME->val$"></td>
+</ep-if>
+<tr><th><ep-language de="Mitglieder" en="Members">:</th>
+    <td><textarea name="group_t_MEMBERS">$group->MEMBERS->val$</textarea></td>
+</table>
+<ep-if eval="$@group$">
+<ep-language language=de>
+<input type=submit value="Gruppe ändern" name="edit">
+</ep-language>
+<ep-language language=en>
+<input type=submit value="Modify Group" name="edit">
+</ep-language>
+<input type=hidden name="doit" value=1>
+<ep-else>
+<ep-language language=de>
+<input type=submit value="Gruppe erzeugen" name="insert">
+</ep-language>
+<ep-language language=en>
+<input type=submit value="Create Group" name="insert">
+</ep-language>
+</ep-if>
+</form>
+<h2><ep-language de="Vorhandene Gruppen" en="Existing groups"></h2>
+<table border=1>
+  <tr><th>Name</th><th><ep-language de="Mitglieder" en="Members"></th>
+      <th>&nbsp;</th>
+  <ep-list items="groups" item="g">
+    <tr><td><a href="group.ep?language=$_ep_language$&edit=$g->GROUPNAME$">
+	      $g->GROUPNAME$</a></td>
+        <td>$g->MEMBERS$</td>
+        <td><a href="group.ep?language=$_ep_language$&delete=$g->GROUPNAME$">
+	      <ep-language de="Löschen" en="Delete"></a></td>
+  </ep-list>
+</table>
+<br><br><br>
+<div align=center>
+  <a href="index.ep?language=$_ep_language$">
+    <ep-language de="Menü" en="Menu"></a>
+  <a href="user.ep?language=$_ep_language$">
+    <ep-language de="Benutzerverwaltung" en="User administration"></a>
+</div>
+</body>
+</html>

@@ -1,0 +1,14 @@
+TODO:
+
+- Adicionar alguma entrada no useragent de modo que fique registrado o RESPONSE HEADERS e REQUEST HEADERS
+
+- Criar extensão para usar Web::Scraper::LibXML ao invés de Treebuilderxpath
+
+- trocar passed_key_values para req_storage
+
+- criar um webserver fake com o do mechanize, e fazer ele responder alguns html e criar um bot que faz crawl nesse html.
+  o html pode ser uns markup mesmo tudo num arquivo apenas pra facilitar.
+
+- criar validações do tipo.. useragent->url pra ver se está mudando corretamente.. e verificar outras variáveis dessas de ambiente... verificar se estão se comportando como deveriam
+
+- evitar o uso de encode::guess.. ao invés disso, verificar o content type via headers e tratar... e caso o content type não venha, ai sim utilizaro encode::guess

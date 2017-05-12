@@ -1,0 +1,12 @@
+Header
+<CONTENT_VAR NAME="document('foo.xml')bbb">
+<CONTENT_VAR NAME="/ddd/aaa/@bbb">
+<CONTENT_VAR NAME="/ddd/eEe">
+<CONTENT_VAR NAME="eEe">
+<CONTENT_LOOP NAME="/ddd/fFf">
+	<CONTENT_VAR NAME="@ttt">
+	<CONTENT_VAR NAME="ggg">
+	<CONTENT_VAR NAME="hhh"> <CONTENT_VAR NAME="hhh/@qqq">
+	<CONTENT_VAR NAME="iii">
+</CONTENT_LOOP>
+Footer

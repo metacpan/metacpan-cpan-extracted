@@ -1,0 +1,13 @@
+TODO list for Perl module HTTPD::APS
+
+- Performance enhancement: Make a better, more transparent caching layer for Class::DBI for use
+  with read-mostly classes that will intercept read querires and
+  install a trigger on write operations to update the cache.
+
+- HTTPD::ADS::AbuseNotify is a stub. Flesh it out.
+
+- HTTPD::ADS::OpenProxyDetector is a stub . Flesh it out.
+
+ 
+
+

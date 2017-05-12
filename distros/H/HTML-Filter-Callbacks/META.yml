@@ -1,0 +1,45 @@
+---
+abstract: 'modify HTML with callbacks'
+author:
+  - 'Kenichi Ishigaki, <ishigaki@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.0.53, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTML-Filter-Callbacks
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  HTML::Filter::Callbacks:
+    file: lib/HTML/Filter/Callbacks.pm
+    version: 0.10
+  HTML::Filter::Callbacks::Tag:
+    file: lib/HTML/Filter/Callbacks/Tag.pm
+requires:
+  HTML::Parser: 3
+  Test::More: 0.47
+  Test::UseAllModules: 0.10
+resources:
+  bugtracker: https://github.com/charsbar/html-filter-callbacks/issues
+  homepage: https://github.com/charsbar/html-filter-callbacks
+  repository: git://github.com/charsbar/html-filter-callbacks.git
+version: 0.10
+x_contributors:
+  - 'ishigaki <ishigaki@localhost.localdomain>'
+  - 'cos31 <cos31@ymail.com>'
+  - 'xaicron <xaicron@gmail.com>'

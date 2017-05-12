@@ -1,0 +1,29 @@
+Hardware-Vhdl-Automake
+
+This set of modules is designed to aid in VHDL design work by recompiling only
+only those design units that need to be compiled, and also by providing preprocessing
+and automatic component declaration insertions.
+
+Requires a working installation of ModelSim (tested with version 6.2c).
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SUPPORT AND DOCUMENTATION
+
+See the tutorial included in the distribution archive.  The instructions are in
+tutorial/Tutorial.pdf.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Michael Attenborough
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

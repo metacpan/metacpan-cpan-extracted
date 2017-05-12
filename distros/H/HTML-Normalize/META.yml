@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                HTML-Normalize
+version:             1.0003
+abstract:            HTML light weight cleanup
+license:             ~
+author:              
+    - Peter Jaquiery (grandpa@cpan.org)
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    HTML::Entities:                1.35
+    HTML::Tagset:                  3.1
+    HTML::TreeBuilder:             3.23
+    Test::Simple:                  0.44
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

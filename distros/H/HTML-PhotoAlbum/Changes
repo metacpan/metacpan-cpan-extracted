@@ -1,0 +1,95 @@
+
+RCS file: /home/nwiger/perlmod/lib/HTML/RCS/PhotoAlbum.pm,v
+Working file: /home/nwiger/perlmod/lib/HTML/PhotoAlbum.pm
+head: 1.20
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 20;	selected revisions: 20
+description:
+HTML::ImageAlbum - Easily create web image albums dynamically
+----------------------------
+revision 1.20
+date: 2005/07/13 20:48:42;  author: nwiger;  state: Exp;  lines: +92 -140
+many improvements for mod_perl compat
+----------------------------
+revision 1.19
+date: 2005/02/02 23:00:54;  author: nwiger;  state: Exp;  lines: +51 -50
+fixed mod_perl bugs with $cgi not being reset properly
+----------------------------
+revision 1.18
+date: 2002/01/11 23:25:32;  author: nwiger;  state: Exp;  lines: +107 -53
+- completely redid the mini/full management
+- more docs on examples, link to my albums
+----------------------------
+revision 1.17
+date: 2002/01/08 01:44:05;  author: nwiger;  state: Exp;  lines: +5 -5
+*really* fixed it this time!!!!!!!!
+----------------------------
+revision 1.16
+date: 2002/01/08 01:40:53;  author: nwiger;  state: Exp;  lines: +4 -4
+div fix
+----------------------------
+revision 1.15
+date: 2002/01/08 01:38:54;  author: nwiger;  state: Exp;  lines: +10 -10
+ok, really fixed the mod this time...
+----------------------------
+revision 1.14
+date: 2002/01/08 01:37:05;  author: nwiger;  state: Exp;  lines: +13 -10
+fixed "annoying message" at the end so it always prints
+----------------------------
+revision 1.13
+date: 2002/01/08 01:32:01;  author: nwiger;  state: Exp;  lines: +13 -14
+docs updates
+----------------------------
+revision 1.12
+date: 2002/01/08 01:06:15;  author: nwiger;  state: Exp;  lines: +37 -23
+several major bug fixes with hashref form of HTML attr setting
+----------------------------
+revision 1.11
+date: 2002/01/08 00:47:39;  author: nwiger;  state: Exp;  lines: +3 -3
+major typo - caption.txt should be captions.txt
+----------------------------
+revision 1.10
+date: 2002/01/08 00:45:32;  author: nwiger;  state: Exp;  lines: +28 -26
+docs updates and HTML cleanup
+----------------------------
+revision 1.9
+date: 2002/01/08 00:09:23;  author: nwiger;  state: Exp;  lines: +80 -17
+much more documentation, added filename option to albums argument
+----------------------------
+revision 1.8
+date: 2002/01/07 23:42:02;  author: nwiger;  state: Exp;  lines: +30 -17
+docs updates, cleanup of some errors
+----------------------------
+revision 1.7
+date: 2002/01/07 23:29:37;  author: nwiger;  state: Exp;  lines: +29 -22
+more docs updates, docs are short and sweet
+----------------------------
+revision 1.6
+date: 2002/01/07 23:16:48;  author: nwiger;  state: Exp;  lines: +21 -6
+added navfull
+----------------------------
+revision 1.5
+date: 2002/01/07 23:08:07;  author: nwiger;  state: Exp;  lines: +3 -1
+oops, forgot $VERSION somehow???!
+----------------------------
+revision 1.4
+date: 2002/01/07 23:06:35;  author: nwiger;  state: Exp;  lines: +9 -3
+updated docs w/ intro.html option added several revs ago
+----------------------------
+revision 1.3
+date: 2002/01/07 23:01:14;  author: nwiger;  state: Exp;  lines: +174 -88
+many changed, added ->selected, updated documentation lots
+----------------------------
+revision 1.2
+date: 2002/01/07 19:04:03;  author: nwiger;  state: Exp;  lines: +434 -247
+massive changes to functionality, rename to PhotoAlbum from ImageAlbum
+next rev will include all docs updated
+----------------------------
+revision 1.1
+date: 2001/01/03 21:47:21;  author: nwiger;  state: Exp;
+Initial revision
+=============================================================================

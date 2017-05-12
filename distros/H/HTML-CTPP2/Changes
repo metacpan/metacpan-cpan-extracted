@@ -1,0 +1,102 @@
+Revision history for Perl extension HTML::CTPP2.
+
+2.6.7  Thu Nov 18 12:02:00 2010
+	- Fixes for Perl 5.12
+
+2.6.1  Thu Jun 15 20:08:00 2010
+	- New minor version of library
+
+2.5.12 Fri Nov  6 12:22:00 2009
+	- Fixes in SVt_IV/SVt_NV data types
+
+2.5.11 Sun Oct 18 21:30:00 2009
+	- Port to ActiveState Perl
+
+2.5.10 Tue Aug 18 13:25:00 2009
+	- Fixes for multithreaded Perl
+
+2.5.9  Sat Jul 18 21:26:00 2009
+	- Fixes for Perl 5.8.9 & Perl 5.10 API
+
+2.5.8  Thu Jul 16 19:29:00 2009
+	- Fixes for newXS macros
+
+2.5.7  Tue Jul 14 18:32:00 2009
+	- Fixes in SVt_PVMG
+	  Thanks a lot to Ilia Vinokurov.
+
+2.5.3  Wed May 28 19:28:00 2009
+	- Fixes in SVt_PV parser for undef values.
+	  Thanks to Ilia Vinokurov.
+
+2.5.1  Wed May 20 15:00:00 2009
+	- Switch to new branch of CTPP library: 2.5.
+
+2.4.17  Sat Jul 18 21:26:00 2009
+	- Fixes for Perl 5.8.9 & Perl 5.10 API
+
+2.4.16  Thu Jul 16 19:29:00 2009
+	- Fixes for newXS macros
+
+2.4.15  Tue Jul 14 18:32:00 2009
+	- Fixes in SVt_PVMG
+	  Thanks a lot to Ilia Vinokurov.
+
+2.4.14 Thu May 28 13:14:00 2009
+	- Fixes in SVt_PV parser for undef values.
+	  Thanks to Ilia Vinokurov.
+
+2.4.13 Wed May 20 14:44:00 2009
+	- Fixes in SVt_PV parser for undef values.
+	  Thanks to Andrew 'alf' Fedorov.
+	- SvPV changed to SvPV_const
+
+2.4.12 Mon Apr 20 20:00:00 2009
+	- Fixes in SVt_PV parser, new method: parse_text
+
+2.4.11 Thu Apr 16 19:32:00 2009
+	- SvROK(pParams) in SVt_PVMG parser bug fix
+
+2.4.10 Fri Apr 10 20:15:00 2009
+	- Support of stringificated objects
+
+2.4.8  Thu Apr  2 18:50:00 2009
+	- Fixed "Use of uninitialized value in subroutine entry" warning
+
+2.4.7  Mon Mar 16 15:50:00 2009
+	- On-the-fly charset recoder, improved version
+
+2.4.6  Mon Mar  9 18:26:00 2008
+	- On-the-fly charset recoder
+
+2.4.2  Thu Jan 29 13:46:00 2008
+	- Fixes in array iterator and error reporting
+
+2.4.1  Thu Jan 15 15:15:00 2008
+	- Fixes for new library version
+
+2.3.11 Tue Sep 30 15:12:00 2008
+	- Port to Perl 5.10.0
+
+2.3.10 Tue Sep 16 13:00:00 2008
+	- Fixes in hash iteration
+
+2.3.9  Tue Sep 16 13:00:00 2008
+	- Fixes in hash iteration
+
+2.3.6  Tue Aug 12 16:40:00 2008
+	- Fixes for new library version
+
+2.1.2  Thu Apr 24 16:40:00 2008
+	- New method: json_param
+
+2.1.1  Thu Mar 20 15:36:00 2008
+	- Bug fixes, expressions in <TMPL_if and in <TMPL_var
+
+2.0.5  Tue Feb 27 16:51:00 2008
+	- Access to subproperties, need CTPP version 2.0.5 or later.
+
+2.0.4  Fri Feb 22 16:33:03 2008
+	- original version; created by h2xs 1.23 with options
+		-A -n HTML::CTPP2
+

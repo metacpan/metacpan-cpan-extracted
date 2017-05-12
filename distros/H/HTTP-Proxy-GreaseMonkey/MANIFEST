@@ -1,0 +1,23 @@
+Changes
+examples/cpansearch.user.js
+examples/gmproxy
+examples/net.hexten.gmproxy.plist
+helper/patchbin.PL
+lib/App/GreaseMonkeyProxy.pm
+lib/HTTP/Proxy/GreaseMonkey.pm
+lib/HTTP/Proxy/GreaseMonkey/Redirector.pm
+lib/HTTP/Proxy/GreaseMonkey/Script.pm
+lib/HTTP/Proxy/GreaseMonkey/ScriptHome.pm
+Makefile.PL
+MANIFEST
+README
+t/00.load.t
+t/gmproxy.t
+t/pod-coverage.t
+t/pod.t
+t/script.t
+t/scripthome.t
+t/scripts/u1.js
+t/scripts/u2.js
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

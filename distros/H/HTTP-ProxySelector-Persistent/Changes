@@ -1,0 +1,20 @@
+Revision history for HTTP-ProxySelector-Persistent
+
+0.01    29 July 2007
+        Initial release
+0.02	28 Aug 07
+	- Redid the error structure to make it more perl-
+	  friendly.  Most functions return 1 upon success
+	  or 0 upon failure, so you can now use them like:
+	    $out = $select->method() or die $select->error()
+	- Added proxied_get() method.  This for quick single
+	  gets that have to same persistence and reliability
+	  as the useragent proxy setting method.
+	- Changed up the proxy server lists for the tests
+	  to make sure that my tests are testing my module,
+	  not someone else's list of proxy servers.
+	- Made the test 1/2 as tolerant as the useragent for
+	  timeouts.  This means that if you set your useragent
+	  to time out at 4 seconds, the test times out at 2
+	  seconds to be extra sure that the useragent this
+	  module returns will perform to the specs you need.

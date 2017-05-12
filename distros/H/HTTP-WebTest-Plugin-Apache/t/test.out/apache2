@@ -1,0 +1,23 @@
+Failed  Succeeded  Test Name
+   0          9    *** no name ***
+
+
+Test Name: N/A
+URL: http://http.web.test/test.shtml
+
+  STATUS CODE CHECK
+    Expected '200' and got: 200 OK                               SUCCEED
+  FORBIDDEN TEXT
+    #include                                                     SUCCEED
+    virtual                                                      SUCCEED
+    error                                                        SUCCEED
+  REQUIRED TEXT
+    abcde                                                        SUCCEED
+    123                                                          SUCCEED
+    begin                                                        SUCCEED
+    644                                                          SUCCEED
+  APACHE ERROR LOG TEST
+    Number of messages in Apache error log is zero ?             SUCCEED
+
+
+Total web tests failed: 0  succeeded: 9

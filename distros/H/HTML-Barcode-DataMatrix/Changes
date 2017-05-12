@@ -1,0 +1,19 @@
+Revision history for HTML-Barcode-DataMatrix
+
+0.05    Fri Mar 25 09:58:25 CDT 2016
+        - Distribution tweaks: Fixed RT #113332 and #108997
+
+0.04    Thu Mar 24 15:19:43 CDT 2016
+        - Switched from Any::Moose to Moo
+
+0.03    Thu Jun 21 09:30:22 CDT 2012
+        - Use Module::Install::Repository because metacpan doesn't
+          display the repository correctly as set by GithubMeta.
+        - Do not auto_include(), and do not include Test::More.
+
+0.02    Mon Jul  4 01:53:04 CDT 2011
+        - Move author tests to xt to avoid failed tests.
+
+0.01    Sun Jul  3
+        - First version, released on an unsuspecting world.
+

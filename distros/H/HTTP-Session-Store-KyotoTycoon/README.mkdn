@@ -1,0 +1,68 @@
+# NAME
+
+HTTP::Session::Store::KyotoTycoon - HTTP::Session with Cache::KyotoTycoon
+
+# SYNOPSIS
+
+    use HTTP::Session::Store::KyotoTycoon;
+
+    HTTP::Session->new(
+        store => HTTP::Session::Store::KyotoTycoon->new(
+            host => 'localhost',
+            port => 1978,
+            db   => 0,
+        ),
+        state => ...,
+        request => ...,
+    );
+
+# DESCRIPTION
+
+HTTP::Session::Store::KyotoTycoon is [Cache::KyotoTycoon](http://search.cpan.org/perldoc?Cache::KyotoTycoon) bindings for [Cache::KyotoTycoon](http://search.cpan.org/perldoc?Cache::KyotoTycoon).
+
+__THIS MODULE IS IN ITS BETA QUALITY. THE API MAY CHANGE IN THE FUTURE__.
+
+# CONFIGURATION
+
+- host
+
+host name of the server(Default: '127.0.0.1')
+
+- port
+
+Port number of the server(Default: 1978)
+
+- db
+
+The name of database or the number of database(Default: 0)
+
+- expires
+
+session expire time(in seconds)
+
+# METHODS
+
+- select
+
+- update
+
+- delete
+
+- insert
+
+for internal use only
+
+# AUTHOR
+
+Tokuhiro Matsuno <tokuhirom AAJKLFJEF GMAIL COM>
+
+# SEE ALSO
+
+[Cache::KyotoTycoon](http://search.cpan.org/perldoc?Cache::KyotoTycoon), [HTTP::Session](http://search.cpan.org/perldoc?HTTP::Session)
+
+# LICENSE
+
+Copyright (C) Tokuhiro Matsuno
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

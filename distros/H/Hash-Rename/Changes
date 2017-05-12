@@ -1,0 +1,25 @@
+Revision history for Perl extension Hash-Rename
+
+2.00  2013-12-31 11:15:52 CET
+    [New Features]
+        - Added "recurse" option (thanks @songmu)
+    [Improvements]
+        - converted to Dist::Milla
+
+1.100860  2010-03-27 11:32:21 Europe/Vienna
+    [Improvements]
+        - converted the distribution to Dist::Zilla-style
+
+0.03  Wed 2010.02.10 10:52:05 CET (Marcel Gruenauer <marcel@cpan.org>)
+    [Improvements]
+        - Changed dist style and Changes back to standard.
+        - Added standard test files; this will also help with CPANTS.
+
+0.02  Thu, 29 May 2008 12:05:38 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    [Improvements]
+        - updated t/perlcriticrc
+        - .shipit: fixed svk.tagpattern
+
+0.01  Tue, 20 Nov 2007 10:39:20 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    [New Features]
+        - original version

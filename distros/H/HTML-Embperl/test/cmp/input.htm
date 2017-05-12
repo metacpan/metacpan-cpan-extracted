@@ -1,0 +1,545 @@
+<html>
+
+<head>
+<title>Test for interpretation of input tag</title>
+</head>
+
+<form action="inhalt.htm" method="POST">
+    <p>&nbsp;</p>
+
+    <input name=neu1 value="no" >
+    <input name=undef value="no">
+
+    <input>
+    <input  >
+    <input name="feld1">
+    <input name="feld5" value="Wert5">
+    <input name="feld1" value="Wert1">
+    <input name="feld5" value="Wert15">
+    <input name="feld1" value="">
+    <input name="feld5" value="">
+    <input type="text">
+    <input type = "text">
+    <input typo="text2">
+    <input typo = "text2" >
+    <input foo>
+    <input foo >
+  
+    <input name=neu2 value="">
+    <input name='neu3' value=">>">
+  
+    <input type="text" name="feld1" value="Wert1">
+    <input type="text" name="feld2">
+    <input type="text" size=10 name="feld3">
+    <input type="text" name="feld4" size=10>
+    
+	<input type="text" name="feld5" value="Wert5">
+    <input type="text" name="feld6" value="Wert6">
+    <input type="text" size=10 name="feld7" value="Wert7">
+    <input type="text" name="feld8" size=10 value="Wert8">
+    
+	
+	<input type="checkbox" value="cbv1" name="cb1" checked>
+    <input type="checkbox" checked name="cb2" value="cbv2">
+    <input type="checkbox" name="cb3" value="cbv3">
+    <input type="checkbox" value="cbv4" name="cb4">
+    
+	<input type="checkbox" value="cbv5" name="cb5" checked>
+    <input type="checkbox" checked name="cb6" value="cbv6">
+    <input type="checkbox" name="cb7" value="cbv7" checked>
+    <input type="checkbox" value="cbv8" name="cb8" checked>
+    
+	<input type="checkbox" value="cbv9" name="cb9" >
+	<input type="checkbox"  name="cb10" value="cbv10">
+    <input type="checkbox" name="cb11"  value="cbv11">
+
+
+    <input type="checkbox" name="dec" checked value="a & b">
+    <input type="checkbox" name="dec" checked value="a &amp; b">
+
+
+    <textarea Name=feld1></textarea>
+    <textarea Name=feld5>Wert5</textarea>
+
+    <textarea Name=feld1>text1</textarea>
+    <textarea Name=feld5>text5</textarea>
+
+
+    <table border="0" width="100%">
+        <tr>
+            <td><table border="0">
+                <tr>
+                    <td valign="top"><input type="checkbox"
+                    name="Region"
+                    value="Pfalz"><a 
+                    href="inhalt.htm?Region=Pfalz">Pfalz</a></td>
+                </tr>
+            
+                <tr>
+                    <td valign="top"><input type="checkbox"
+                    name="Region"
+                    value="Rheinhessen"><a 
+                    href="inhalt.htm?Region=Rheinhessen">Rheinhessen</a></td>
+                </tr>
+            </table>
+            </td>
+            <td><table border="0">
+                <tr>
+                    <td valign="top"><p align="left"><input  
+                    type="checkbox" name="Kategorie"
+                    value="Kultur"><a 
+                    href="inhalt.htm?Kategorie=Kultur">Kultur</a></p>
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td valign="top"><p align="left"><input  
+                    type="checkbox" name="Kategorie"
+                    value="Sport"><a 
+                    href="inhalt.htm?Kategorie=Sport">Sport</a></p>
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td valign="top"><p align="left"><input  
+                    type="checkbox" name="Kategorie"
+                    value="Veranstaltungen"><a 
+                    href="inhalt.htm?Kategorie=Veranstaltungen">Veranstaltungen</a></p>
+                    </td>
+                </tr>
+            </table>
+            </td>
+        </tr>
+    </table>
+
+	<select name="foo">
+		<option value="feld1">feld1</option>
+		<option value="feld2">feld2</option>
+		<option value="feld3">feld3</option>
+		<option value="feld4">feld4</option>
+		<option value="feld5">feld5</option>
+		<option value="feld6">feld6</option>
+		<option value="feld7">feld7</option>
+		<option value="feld8">feld8</option>
+	</select>
+
+	<select name="feld5">
+		<option value="Wert1">Wert1</option>
+		<option value="Wert2">Wert2</option>
+		<option value="Wert3">Wert3</option>
+		<option value="Wert4">Wert4</option>
+		<option value="Wert5" selected>Wert5</option>
+		<option value="Wert6">Wert6</option>
+		<option value="Wert7">Wert7</option>
+		<option value="Wert8">Wert8</option>
+	</select>
+
+	<select name="feld5">
+		<option value="Wert3">Wert3
+		<option value="Wert4">Wert4
+		<option value="Wert5" selected>Wert5
+	</select>
+
+	<select name="feld5">
+		<option>Wert3</option>
+		<option>Wert4</option>
+		<option>Wert5</option>
+	</select>
+
+	<select name="feld5">
+		<option>Wert3
+		<option>Wert4
+		<option>Wert5
+	</select>
+
+	<select name="mult" multiple>
+		<option value="Wert1">Wert1</option>
+		<option value="Wert2">Wert2</option>
+		<option value="Wert3" selected>Wert3</option>
+		<option value="Wert4">Wert4</option>
+		<option value="Wert5">Wert5</option>
+		<option value="Wert6" selected>Wert6</option>
+		<option value="Wert7">Wert7</option>
+		<option value="Wert8">Wert8</option>
+	</select>
+
+	<select name="mult" multiple>
+		<option value="Wert1" >Wert1</option>
+		<option value="Wert2" >Wert2</option>
+		<option value="Wert3" selected>Wert3</option>
+		<option value="Wert4" >Wert4</option>
+		<option value="Wert5" >Wert5</option>
+		<option value="Wert6" selected>Wert6</option>
+		<option value="Wert7" >Wert7</option>
+		<option value="Wert8" >Wert8</option>
+	</select>
+
+	
+	ks = Kategorie Region cb1 cb10 cb11 cb2 cb3 cb4 cb5 cb6 cb7 cb8 cb9 dec feld1 feld5 feld6 feld7 feld8 mult neu1 neu2 neu3 undef<p>
+
+	<table border=9>
+		<tr>
+			<td>Kategorie</td><td>Veranstaltungen</td>
+		</tr>
+	
+		<tr>
+			<td>Region</td><td>Rheinhessen</td>
+		</tr>
+	
+		<tr>
+			<td>cb1</td><td>cbv1</td>
+		</tr>
+	
+		<tr>
+			<td>cb10</td><td>ncbv10</td>
+		</tr>
+	
+		<tr>
+			<td>cb11</td><td>ncbv11</td>
+		</tr>
+	
+		<tr>
+			<td>cb2</td><td>cbv2</td>
+		</tr>
+	
+		<tr>
+			<td>cb3</td><td>cbv3</td>
+		</tr>
+	
+		<tr>
+			<td>cb4</td><td>cbv4</td>
+		</tr>
+	
+		<tr>
+			<td>cb5</td><td>cbv5</td>
+		</tr>
+	
+		<tr>
+			<td>cb6</td><td>cbv6</td>
+		</tr>
+	
+		<tr>
+			<td>cb7</td><td>cbv7</td>
+		</tr>
+	
+		<tr>
+			<td>cb8</td><td>cbv8</td>
+		</tr>
+	
+		<tr>
+			<td>cb9</td><td>ncbv9</td>
+		</tr>
+	
+		<tr>
+			<td>dec</td><td>a &amp; b</td>
+		</tr>
+	
+		<tr>
+			<td>feld1</td><td>text1</td>
+		</tr>
+	
+		<tr>
+			<td>feld5</td><td>Wert5</td>
+		</tr>
+	
+		<tr>
+			<td>feld6</td><td>Wert6</td>
+		</tr>
+	
+		<tr>
+			<td>feld7</td><td>Wert7</td>
+		</tr>
+	
+		<tr>
+			<td>feld8</td><td>Wert8</td>
+		</tr>
+	
+		<tr>
+			<td>mult</td><td>Wert6</td>
+		</tr>
+	
+		<tr>
+			<td>neu1</td><td>no</td>
+		</tr>
+	
+		<tr>
+			<td>neu2</td><td>value=&quot;&quot;</td>
+		</tr>
+	
+		<tr>
+			<td>neu3</td><td>value=&quot;</td>
+		</tr>
+	
+		<tr>
+			<td>undef</td><td>no</td>
+		</tr>
+	</table>
+
+
+
+	<select name="feld5">
+		<option value="Wert1">Wert1</option>
+		<option value="Wert2">Wert2</option>
+		<option value="Wert3">Wert3</option>
+		<option value="Wert4">Wert4</option>
+		<option value="Wert5" selected>Wert5</option>
+		<option value="Wert6">Wert6</option>
+		<option value="Wert7">Wert7</option>
+		<option value="Wert8">Wert8</option>
+	</select>
+
+	<select name="feld5">
+		<option value="Wert1">Wert1</option>
+		<option value="Wert2">Wert2</option>
+		<option value="Wert3">Wert3</option>
+		<option value="Wert4">Wert4</option>
+		<option value="Wert5" selected>Wert5</option>
+		<option value="Wert6">Wert6</option>
+		<option value="Wert7">Wert7</option>
+		<option value="Wert8">Wert8</option>
+	</select>
+
+	<input type="checkbox" value="Wert1" name="mult" >
+	<input type="checkbox" value="Wert1" name="mult">
+	<input type="checkbox" value="Wert2" name="mult" >
+	<input type="checkbox" value="Wert2" name="mult">
+	<input type="checkbox" value="Wert3" name="mult" checked>
+	<input type="checkbox" value="Wert3" name="mult" checked>
+	<input type="checkbox" value="Wert4" name="mult" >
+	<input type="checkbox" value="Wert4" name="mult">
+	<input type="checkbox" value="Wert5" name="mult" >
+	<input type="checkbox" value="Wert5" name="mult">
+	<input type="checkbox" value="Wert6" name="mult" checked>
+	<input type="checkbox" value="Wert6" name="mult" checked>
+	<input type="checkbox" value="Wert7" name="mult" >
+	<input type="checkbox" value="Wert7" name="mult">
+    
+
+	<input type="checkbox" value="cbv1" name="cb1">
+		<input type="checkbox" value="cbv1" name="cb1">
+		<input type="checkbox" value="cbv2" name="cb1">
+		<input type="checkbox" value="cbv3" name="cb1">
+		<input type="checkbox" value="cbv4" name="cb1">
+		<input type="checkbox" value="cbv5" name="cb1">
+		<input type="checkbox" value="cbv6" name="cb1">
+	<input type="checkbox" value="cbv5" name="cb5" checked>
+		<input type="checkbox" value="cbv1" name="cb5">
+		<input type="checkbox" value="cbv2" name="cb5">
+		<input type="checkbox" value="cbv3" name="cb5">
+		<input type="checkbox" value="cbv4" name="cb5">
+		<input type="checkbox" value="cbv5" name="cb5" checked>
+		<input type="checkbox" value="cbv6" name="cb5">
+
+
+	<input type="CHECKBOX" value="cbv1" name="cb1">
+		<input type="CHECKBOX" value="cbv1" name="cb1">
+		<input type="CHECKBOX" value="cbv2" name="cb1">
+		<input type="CHECKBOX" value="cbv3" name="cb1">
+		<input type="CHECKBOX" value="cbv4" name="cb1">
+		<input type="CHECKBOX" value="cbv5" name="cb1">
+		<input type="CHECKBOX" value="cbv6" name="cb1">
+	<input type="CHECKBOX" value="cbv5" name="cb5" checked>
+		<input type="CHECKBOX" value="cbv1" name="cb5">
+		<input type="CHECKBOX" value="cbv2" name="cb5">
+		<input type="CHECKBOX" value="cbv3" name="cb5">
+		<input type="CHECKBOX" value="cbv4" name="cb5">
+		<input type="CHECKBOX" value="cbv5" name="cb5" checked>
+		<input type="CHECKBOX" value="cbv6" name="cb5">
+
+
+
+	<input type="checkbox" value="cbv2" name="cb2">
+		<input type="checkbox" value="cbv1" name="cb2">
+		<input type="checkbox" value="cbv2" name="cb2">
+		<input type="checkbox" value="cbv3" name="cb2">
+		<input type="checkbox" value="cbv4" name="cb2">
+		<input type="checkbox" value="cbv5" name="cb2">
+		<input type="checkbox" value="cbv6" name="cb2">
+	<input type="checkbox" value="cbv6" name="cb6" checked>
+		<input type="checkbox" value="cbv1" name="cb6">
+		<input type="checkbox" value="cbv2" name="cb6">
+		<input type="checkbox" value="cbv3" name="cb6">
+		<input type="checkbox" value="cbv4" name="cb6">
+		<input type="checkbox" value="cbv5" name="cb6">
+		<input type="checkbox" value="cbv6" name="cb6" checked>
+
+
+	<input type="checkbox" value="cbv1" name="cb1">
+		<input type="checkbox" value="cbv1" name="cb1">
+		<input type="checkbox" value="cbv2" name="cb1">
+		<input type="checkbox" value="cbv3" name="cb1">
+		<input type="checkbox" value="cbv4" name="cb1">
+		<input type="checkbox" value="cbv5" name="cb1">
+		<input type="checkbox" value="cbv6" name="cb1">
+		<input type="text"     name="feld1" value="">
+        <input type="text"     name="feld1">
+
+	
+		<input type="checkbox" value="cbv5" name="cb5" checked>
+		<input type="checkbox" value="cbv1" name="cb5">
+		<input type="checkbox" value="cbv2" name="cb5">
+		<input type="checkbox" value="cbv3" name="cb5">
+		<input type="checkbox" value="cbv4" name="cb5">
+		<input type="checkbox" value="cbv5" name="cb5" checked>
+		<input type="checkbox" value="cbv6" name="cb5">
+		<input type="text"     name="feld5" value="feld5">
+        <input type="text"     name="feld5" value="Wert5">
+
+	
+		<input type="checkbox" value="cbv2" name="cb2">
+		<input type="checkbox" value="cbv1" name="cb2">
+		<input type="checkbox" value="cbv2" name="cb2">
+		<input type="checkbox" value="cbv3" name="cb2">
+		<input type="checkbox" value="cbv4" name="cb2">
+		<input type="checkbox" value="cbv5" name="cb2">
+		<input type="checkbox" value="cbv6" name="cb2">
+		<input type="text"     name="feld2" value="">
+        <input type="text"     name="feld2">
+
+	
+		<input type="checkbox" value="cbv6" name="cb6" checked>
+		<input type="checkbox" value="cbv1" name="cb6">
+		<input type="checkbox" value="cbv2" name="cb6">
+		<input type="checkbox" value="cbv3" name="cb6">
+		<input type="checkbox" value="cbv4" name="cb6">
+		<input type="checkbox" value="cbv5" name="cb6">
+		<input type="checkbox" value="cbv6" name="cb6" checked>
+		<input type="text"     name="feld6" value="feld6">
+        <input type="text"     name="feld6" value="Wert6">
+
+	<p>
+        i = 5 fdat{feld5} Wert5<br>
+		<input type="checkbox" value="cbv5" name="cb5" checked>
+		<input type="text"     name="feld5" value="feld5">
+		<input type="text"     name="feld5" value="Wert5">
+        </p>
+	
+        <p>
+        i = 2 fdat{feld5} Wert5<br>
+		<input type="checkbox" value="cbv2" name="cb2">
+		<input type="text"     name="feld2" value="">
+		<input type="text"     name="feld2">
+        </p>
+	
+        <p>
+        i = 6 fdat{feld5} Wert5<br>
+		<input type="checkbox" value="cbv6" name="cb6" checked>
+		<input type="text"     name="feld6" value="feld6">
+		<input type="text"     name="feld6" value="Wert6">
+        </p>
+	
+        <p>
+        i = 1 fdat{feld5} Wert5<br>
+		<input type="checkbox" value="cbv1" name="cb1">
+		<input type="text"     name="feld1" value="">
+		<input type="text"     name="feld1">
+        </p>
+	ks = Kategorie Region cb1 cb10 cb11 cb2 cb3 cb4 cb5 cb6 cb7 cb8 cb9 dec feld1 feld2 feld5 feld6 feld7 feld8 mult neu1 neu2 neu3 undef<p>
+
+	<table border=10>
+		<tr>
+			<td>Kategorie</td><td>Veranstaltungen</td>
+		</tr>
+	
+		<tr>
+			<td>Region</td><td>Rheinhessen</td>
+		</tr>
+	
+		<tr>
+			<td>cb1</td><td>cbv1</td>
+		</tr>
+	
+		<tr>
+			<td>cb10</td><td>ncbv10</td>
+		</tr>
+	
+		<tr>
+			<td>cb11</td><td>ncbv11</td>
+		</tr>
+	
+		<tr>
+			<td>cb2</td><td>cbv2</td>
+		</tr>
+	
+		<tr>
+			<td>cb3</td><td>cbv3</td>
+		</tr>
+	
+		<tr>
+			<td>cb4</td><td>cbv4</td>
+		</tr>
+	
+		<tr>
+			<td>cb5</td><td>cbv5</td>
+		</tr>
+	
+		<tr>
+			<td>cb6</td><td>cbv6</td>
+		</tr>
+	
+		<tr>
+			<td>cb7</td><td>cbv7</td>
+		</tr>
+	
+		<tr>
+			<td>cb8</td><td>cbv8</td>
+		</tr>
+	
+		<tr>
+			<td>cb9</td><td>ncbv9</td>
+		</tr>
+	
+		<tr>
+			<td>dec</td><td>a &amp; b</td>
+		</tr>
+	
+		<tr>
+			<td>feld1</td><td>value=&quot;&quot;</td>
+		</tr>
+	
+		<tr>
+			<td>feld2</td><td>value=&quot;&quot;</td>
+		</tr>
+
+		<tr>
+			<td>feld5</td><td>Wert5</td>
+		</tr>
+	
+		<tr>
+			<td>feld6</td><td>Wert6</td>
+		</tr>
+	
+		<tr>
+			<td>feld7</td><td>Wert7</td>
+		</tr>
+	
+		<tr>
+			<td>feld8</td><td>Wert8</td>
+		</tr>
+	
+		<tr>
+			<td>mult</td><td>Wert3	Wert6</td>
+		</tr>
+	
+		<tr>
+			<td>neu1</td><td>no</td>
+		</tr>
+	
+		<tr>
+			<td>neu2</td><td>value=&quot;&quot;</td>
+		</tr>
+	
+		<tr>
+			<td>neu3</td><td>value=&quot;</td>
+		</tr>
+	
+		<tr>
+			<td>undef</td><td>no</td>
+		</tr>
+	</table>
+
+</form>
+
+</body>
+</html>
+

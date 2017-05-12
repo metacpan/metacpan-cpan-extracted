@@ -1,0 +1,116 @@
+#!/usr/bin/env perl
+
+use v5.10;
+use strict;
+use warnings;
+use utf8;
+
+my $usage = <<"...";
+Usage:
+    hither [<hither-opt>…] <hither-command> [<cmd-opt>…] [<cmd-arg>…]
+
+Hither Options:
+  -q, --quiet     - Suppress normal output
+  -v, --verbose   - Print detailed info
+  -D, --debug     - Print maximum info
+  -h, --help      - Show basic command usage
+
+For more help/info, try these commands:
+
+  hither help             - Browse Hither documentation manual
+  hither help commands    - List all hither commands
+  hither help <command>   - Show help for a command
+
+...
+
+# Hither general command options. We put these in environment variables, since
+# this program will exec the worker command.
+$ENV{HITHER_QUIET} = 0;
+$ENV{HITHER_VERBOSE} = 0;
+$ENV{HITHER_DEBUG} = 0;
+
+          use XXX;
+sub run {
+  my ($self) = @_;
+  $self->check_help and return 0;
+  $self->get_options or return 1;
+  $self->exec_hither_command or return 1;
+}
+
+sub check_help {
+  my ($self) = @_;
+  my $argv = $self->{argv};
+  for (@$argv) {
+    if ( /^ ( -h | --help ) $/x ) {
+      print $usage;
+      return 1;
+    }
+    return if /^\w/;
+  }
+}
+
+sub get_options {
+  my ($self) = @_;
+  my $argv = $self->{argv};
+  while (@$argv) {
+    $_ = shift @$argv;
+    if (/^\w/) {
+      $self->{cmd} = $_;
+      $self->{args} = [ @$argv ];
+      return 1;
+    }
+    elsif (/^ ( -q | --quiet ) $/x) {
+      $ENV{HITHER_QUIET} = 1;
+    }
+    elsif (/^ ( -v | --verbose ) $/x) {
+      $ENV{HITHER_VERBOSE} = 1;
+    }
+    elsif (/^ ( -D | --debug ) $/x) {
+      $ENV{HITHER_DEBUG} = 1;
+    }
+    else {
+      warn "Unknown hither option: '$_'\n";
+      return;
+    }
+  }
+  $self->{cmd} = 'shell';
+  return 1;
+}
+
+sub exec_hither_command {
+  my ($self) = @_;
+  my $command = $self->{cmd} or die;
+  my $command_path = `which hither-$command` or do {
+    warn "Unknown hither command: '$command'\n";
+    return;
+  };
+  chomp $command_path;
+  my $args = $self->{args} or die;
+  unshift @$args, $command_path;
+  exec { $command_path } @$args or do {
+    warn "Bad hither command: '$command':\n$!\n";
+    return;
+  }
+}
+
+my %options = (
+  verbose => 0,
+  quiet => 0,
+  quiet => 0,
+);
+
+if ($ENV{HITHER_TEST_MODE}) {
+  # TODO Run according to test harness rules.
+}
+else {
+  my $self = bless {
+    argv => [ @ARGV ],
+    opts => {},
+    cmd => '',
+    args => [],
+  }, __PACKAGE__;
+
+  exit $self->run();
+}
+
+# vim: set sw=2:

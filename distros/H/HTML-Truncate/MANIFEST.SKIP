@@ -1,0 +1,15 @@
+NOTES
+\.svn
+\bCVS\b
+\.cvs
+~
+.tar$
+.gz$
+.bak$
+Makefile$
+MANIFEST.perl$
+\.old$
+^blib/
+^pm_to_blib
+.DS_Store
+\#

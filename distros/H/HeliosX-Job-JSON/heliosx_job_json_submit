@@ -1,0 +1,200 @@
+#!/usr/bin/env perl
+
+use 5.010;
+use strict;
+use warnings;
+use Getopt::Long;
+
+use JSON::Tiny qw(decode_json);
+$JSON::Tiny::TRUE  = 1;
+$JSON::Tiny::FALSE = 0;
+
+use Helios;
+use Helios::Config;
+use HeliosX::Job::JSON;
+
+our $VERSION = '1.00';
+
+our $OPT_HELP = 0;
+our $OPT_VERSION = 0;
+our $OPT_QUIET = 0;
+our $Job_Type = '';
+our $Job_Args = '';
+
+## GET THE COMMAND LINE OPTIONS ##
+
+# if first arg starts with '-', parse with Getopt::Long
+# otherwise, we'll have to shift off the args and hope for the best
+if ( @ARGV && $ARGV[0] !~ /^-/ ) {
+	if (@ARGV > 1 ) {
+		$Job_Type = shift @ARGV;
+		$Job_Args = shift @ARGV;		
+	} else {
+		$Job_Args = shift @ARGV;
+	}
+} else {
+	GetOptions(
+		'jobtype=s' => \$Job_Type,
+		'args=s'    => \$Job_Args,
+		'help'      => \$OPT_HELP,
+		'version'   => \$OPT_VERSION,
+		'quiet'     => \$OPT_QUIET,
+	);
+}
+
+# if --help, use Pod::Usage to display help
+if ($OPT_HELP) {
+	require Pod::Usage;
+	Pod::Usage::pod2usage(-verbose => 2, -exitstatus => 0);
+}
+
+# if --version, display our version, Helios, and HeliosX::Job::JSON's
+if ($OPT_VERSION) {
+	print "helios_job_submit_json $VERSION\n";
+	print "HeliosX::Job::JSON ", HeliosX::Job::JSON->VERSION,"\n";
+	print "Using Helios version ",Helios->VERSION,"\n";
+	exit(0);
+}
+
+# if we still don't have $Job_Args, read them from STDIN
+unless ($Job_Args) {
+	while (<>) { $Job_Args .= $_; }	
+}
+
+# at this point, if we do not have the job arguments, we need to stop
+unless ($Job_Args) {
+	print STDERR "ERROR: No job arguments specified.  Use the --args switch or STDIN.\n";
+	exit(1);
+}
+
+# now, use JSON::Tiny to parse the JSON string
+my $job_args_struct;
+eval {
+	$job_args_struct = decode_json($Job_Args);
+	1;
+} or do {
+	my $E = $@;
+	print STDERR "ERROR: JSON parsing failed: $E";
+	exit(1);
+};
+
+# Either $Job_Type was specified or we should be able to get it from the 
+# parsed JSON string.  If not, we need to stop.
+if ( !$Job_Type ) {
+	# see if "jobtype" was specifed in the JSON
+	if ( $job_args_struct->{jobtype} ) {
+		$Job_Type = $job_args_struct->{jobtype};
+	} else {
+		# no jobtype either place, so we have to stop
+		print STDERR 'ERROR: No jobtype specified.  Use the --jobtype switch or specify a "jobtype" string in your JSON job args.',"\n";
+		exit(1);
+	}
+}
+
+## NOW, SUBMIT THE JOB ##
+
+my $jobid;
+eval {
+	my $conf = Helios::Config->parseConfig();
+	my $job = HeliosX::Job::JSON->new();
+	$job->setConfig($conf);
+	$job->setJobType($Job_Type);
+	$job->setArgString($Job_Args);
+	$jobid = $job->submit();
+	1;
+} or do {
+	my $E = $@;
+	print STDERR "ERROR: Job submission error: $@\n";
+	exit(1);
+};
+
+# if we're here, it all worked!
+print "Jobid: $jobid SUBMITTED.\n";
+
+exit(0);
+
+=head1 NAME
+
+heliosx_job_json_submit - tool to submit Helios jobs with JSON arguments from the command line
+
+=head1 SYNOPSIS
+
+ # full syntax
+ heliosx_job_json_submit [--jobtype=<jobtype>] [--args=<json arg string>]
+
+ # example with full switches
+ heliosx_job_json_submit --jobtype=MyService --args='{ "args": {"arg1": "value1", "arg2": 30} }'
+
+ # you can omit the switch names
+ heliosx_job_json_submit MyService '{ "args": {"arg1": "value1", "arg2": 30} }'
+
+=head1 DESCRIPTION
+
+The heliosx_job_json_submit command can be used to submit jobs specified in 
+JSON format to a Helios collective from the command line.  It is is more or 
+less a substitute for helios_job_submit.pl using JSON instead of Helios's 
+default job argument XML.
+
+=head1 OPTIONS
+
+=head2 --jobtype
+
+The jobtype of the job.  If not specified, the command will use the "jobtype" 
+attribute of the specified JSON object string.
+
+=head2 --args
+
+The job argument string, in JSON format.  If not specified, the command will 
+will read it from STDIN.
+
+=head2 --version
+
+Displays the versions of the command, HeliosX::Job::JSON, and the Helios 
+system version.
+
+=head2 --help
+
+Displays this help page.
+
+=head1 JOB ARGUMENT JSON
+
+Helios job argument JSON should describe a JSON object:
+
+ {
+     "jobtype" : "<Helios jobtype name>",
+     "args" : {
+         "<arg1 name>" : "<arg1 value>",
+         "<arg2 name>" : "<arg2 value>",
+         ...etc...
+     }
+ }
+
+For example, for a job of type MyService with 2 arguments, filename and 
+thumbnail_size:
+
+ {
+     "jobtype" : "MyService",
+     "args" : {
+               "filename" : "photo.jpg",
+               "thumbnail_size" : "100x100"
+              }
+ }
+
+
+=head1 AUTHOR
+
+Andrew Johnson, E<lt>lajandy at cpan dot orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014 by Logical Helion, LLC.
+
+This library is free software; you can redistribute it and/or modify it under 
+the terms of the Artistic License 2.0.  See the included LICENSE file for 
+details.
+
+=head1 WARRANTY
+
+This software comes with no warranty of any kind.
+
+=cut

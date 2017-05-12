@@ -1,0 +1,176 @@
+=head1 Design dilemma in HTML::Seamstress (solved!)
+
+=head1 Overview
+
+HTML::Seamstress is a Perl module which supports HTML templating via
+tree-manipulations. It is based on HTML::Tree. The latest version of
+this module was inspired by the amazingly concise code that one can
+write with Class::DBI after setting up an object-oriented hierarchy. 
+
+Here are two samples of tree-based templating as the module is
+developed now:
+
+=head2  Text substitution
+
+In our first example, we want to perform simple text substitution on the
+HTML template document. The HTML file html/hello_world.htm has klass
+attributes which serve as compiler (kompiler?) hints to Seamstress:
+
+     <html>
+     <head>
+       <title>Hello World</title>
+     </head>
+     <body>
+     <h1>Hello World</h1>
+       <p>Hello, my name is <klass=content span id="name">dummy_name</span>.
+       <p>Today's date is <klass=content span id="date">dummy_date</span>.
+     </body>
+     </html>
+
+=head3   Seamstress compiles HTML to "html::hello_world"
+     shell> seamc html/hello_world.htm
+     Seamstress v2.91 generating html::hello_world from html/hello_world.htm
+
+Now you simply use the compiled version of HTML with object-oriented
+accessors.
+
+     use html::hello_world; 
+ 
+     my $tree = html::hello_world->new; 
+     $tree->name('terrence brannon')->date('5/11/1969')->as_HTML;
+
+=head2  If-then-else with the highlander kompiler hint
+
+The "highlander" kompiler hint is used to mark a subtree of HTML in
+which only one child should survive:
+
+     <span klass="highlander" id="age_dialog">
+        <span id="under10">
+           Hello, does your mother know you're 
+           using her AOL account?
+        </span>
+        <span id="under18">
+           Sorry, you're not old enough to enter 
+           (and too dumb to lie about your age)
+        </span>
+        <span id="welcome">
+           Welcome
+        </span>
+     </span>
+
+=head3   Compile and use the module:
+
+     use html::highlander;
+
+     my $tree = html::highlander->new;
+
+     $tree->age_dialog
+        (
+         [
+          under10 => sub { $_[0] < 10} , 
+          under18 => sub { $_[0] < 18} ,
+          welcome => sub { 1 }
+         ],
+         $age
+        )->as_HTML;
+
+      # will only output one of the 3 dialogues based on which closure 
+      # fires first 
+
+=head1 The dilemmas
+
+=head2 Use of the klass tag as a kompiler hint
+
+The biggest dilemma I have is whether to alter the HTML by use of the 
+C<klass> attribute as a kompiler hint. The original reason for writing
+Seamstress was to provide HTML templating via pure Perl and pure
+HTML. The original connection between the two was the C<id> tag, a
+standard HTML attribute which must be unique for every element within
+an HTML4.01 document. The Java framework which inspired the
+development of Seamstress, XMLC, uses only standard C<class> and C<id>
+tags to generate Java accessors the HTML documents.
+
+If I wanted to eliminate the C<klass> attribute, then I would have to
+provide command line arguments to the Seamstress compiler to generate
+certain types of methods:
+
+$> ./seamc -klass="name content" -klass="date content" hello_world.html
+
+But that would get tedious when dealing with a ton of files. 
+
+So, even though the HTML would be slightly modified with the use of
+the C<klass> tag, I think I would prefer that over having to supply
+kompiler hints at the shell.
+
+=head2 Use of any magic whatsoever
+
+Currently, Seamstress supplies accessors which are "intelligent" in
+two ways. One, they acts as getters or setters based on whether or not
+they are supplied arguments:
+
+  $tree->name ; # returns $tree->look_down(id => 'name');
+  $tree->name(12); # will call a setter method based on compiler hint
+
+Two, they act as specialized setters based on compiler hints. Since
+there are numerous ways to "set" a node in a tree (you can set its
+contents, you can set its children's contents, you can set an
+attribute, you can delete all but one of the children, etc.), the
+tree operation that is called is based on the compiler hint.
+
+However, it is not clear that all the extra work to make the inline
+code succint is worthwhile. The "magical" version of the
+hello_world.pm program is:
+
+  $tree->name('terrence brannon')->date('5/11/1969')->as_HTML;
+
+The "plain Jane" version is:
+
+  $tree->get_name->replace_content('terrence brannon')
+       ->get_date->replace_conent('5/11/69);
+
+The plain version would simply have the Seamstress compiler create
+accessors for any HTML element in the document with an id tag. This
+plain version is very attractive for a number of reasons:
+
+=over 4
+
+=item * the HTML file has zero shock value to the HTML designer
+
+=item * no kompiler hints need to be written
+
+=item * no worry about needing to expand the kompiler hints into a
+mini-langauge
+
+Over time, mini-languages tend to need more and more. If all
+shortcuts and idioms are handled by library methods, then the full
+power of Perl can be brought to bear on any situation.
+
+=item * Similar to the way XMLC works for Java
+
+XMLC does not use any extra tags when creating DOM accessor classes to
+HTML files. The widespread success and usage of XMLC implies that none
+are necessary.
+
+If I wanted 100% compatibility with XMLC I would be using Terrence
+Mather's XML::DOM. However, HTML::ElementTable is an excellent module
+for imperative tree-building in Perl.
+
+=back
+
+=head1 Conclusion
+
+It is very depressing to have to rip out my compiler's guts. I spent a
+good amount of time building the compiler and code-generator and
+creating tests for it. Now, the compiler is going to be much simpler
+and all of the idiomatic processing will exist in standalone
+tree-processing libraries such as L<HTML::Element::Library> (to be
+uploaded) or L<HTML::ElementTable>.
+
+However, I think this is a change for the better. In fact, it is nice
+to know that all tree processing actions will be handled like this:
+
+  $tree->$id_name->$library_method(@method_args);
+
+instead of
+
+  $tree->$id_name(@args_to_magic_method)

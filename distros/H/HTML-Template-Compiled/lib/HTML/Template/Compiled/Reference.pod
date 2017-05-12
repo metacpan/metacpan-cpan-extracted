@@ -1,0 +1,181 @@
+=pod
+
+=head1 NAME
+
+HTML::Template::Compiled::Reference - A quick reference for HTML::Template::Compiled syntax
+
+=head1 TAGSTYLES
+
+    <TMPL_IF var><TMPL_VAR foo></tmpl_if var>
+    <!-- TMPL_IF var --><!-- TMPL_VAR foo --><!-- /tmpl_if var -->
+    <%if var %><%= foo %><%/if var %>
+
+Optional tagstyle 'tt':
+
+    [%if var %][%= foo %][%/if var %]
+
+=head1 ACCESSING VARIABLES
+
+    <%= _.foo %>
+    outputs foo in the cuurent position of the stash and is the same as
+    <%= foo %>
+
+    <%= .config.url %>
+    goes to root of parameter stash; like $params->{config}->{url}
+
+    <%= ..foo %>
+    goes one level up in stash
+
+    <%= list[3].keyname.method %>
+    acts like: $stash->[3]->{keyname}->method
+
+=head1 TAGS
+
+=over 4
+
+=item VAR
+
+    <%var foo%> or <%= foo%>
+
+=item IF, IF_DEFINED, UNLESS, ELSIF, ELSE
+
+conditions like in Perl
+
+=item LOOP, WHILE, EACH
+
+for-loop and while-loop like in Perl.
+
+    <%loop cds%><%= __counter__%>. Title: <%= _.title%><%/loop cds%>
+    <%loop cds join=", " %><%= _.title%><%/loop cds%>
+    <%while resultset.next%><%= __counter__%>. <%= _.foo %><%/while %>
+    <%each hashref%><%= __key__ %>=<%= __value__ %><%/each %> (sorted alphanumeric)
+    <%each hashref sort=alpha %><%= __key__ %>=<%= __value__ %><%/each %> (sorted alphanumeric)
+    <%each hashref sort=num %><%= __key__ %>=<%= __value__ %><%/each %> (sorted numeric)
+    <%each hashref sort=0 %><%= __key__ %>=<%= __value__ %><%/each %> (not sorted)
+
+
+=item WITH
+
+    <%with cds[0].artist.fanclub%><%= _.address%><%= _.homepage%><%/with %>
+
+=item INCLUDE, INCLUDE_VAR
+
+    <%include template.htc%>
+    <%include_var param_with_template_name%>
+
+=item COMMENT, VERBATIM, NOPARSE
+
+    <%comment explanation %>
+    This will not appear in the rendered template.
+    blah blah...
+    <%/comment explanation %>
+
+=item SWITCH, CASE
+
+    <%switch .config.language%>
+    <%case de%>Hallo
+    <%case es%>Hola
+    <%case en,default%>Hello
+    <%/switch .config.language%>
+
+=item PERL
+
+See section Perl in L<HTML::Template::Compiled>
+
+=back
+
+=head1 ATTRIBUTES
+
+Each attribute can be written as
+
+    attribute=foo
+    attribute="some thing"
+    attribute='some "thing"'
+
+=over 4
+
+=item NAME
+
+You can omit the C<'name='> here.
+
+    <%if var%>var<%elsif name=var2%>var4<%/if%>
+
+Can be used in all tags.
+
+=item ESCAPE
+
+    <%= message escape=html %>
+    <%= params escape=url %>
+    <%= params escape=js %>
+    <%= some_var escape=dump|html%>
+
+Can be used in C<VAR>-tags.
+
+=item DEFAULT
+
+    <%= this.var.might_be_undef default="my fault" %>
+
+Can be used in C<VAR>-tags.
+
+=item ALIAS
+
+    <%loop cds alias="cd" %><%= $cd.title %><%/loop cds %>
+
+Can be used in C<LOOP> and C<WHILE>. Works like L<"SET_VAR"> and is short for
+
+    <%loop cds %><%set_var cd value=_ %><%= cd.title %><%/loop cds %>
+
+Useful for nested loops.
+
+=item SET_VAR
+
+    <%set_var myvar value=.another.var %>
+    <%set_var myvar2 expr="60 * 60 * 24" %>
+
+This creates a variable similar to a package var with local() in perl.
+
+=item USE_VARS
+
+    <!-- recognize myvar and myvar2 as variables not parameter stash -->
+    <%use_vars myvar,myvar2 %>
+    myvar: <%= myvar %>
+
+=item JOIN
+
+    <%loop cds join=", " %><%= _.title%><%/loop cds%>
+
+can be used in C<LOOP>
+
+=item BREAK
+
+    <%loop cds break="3" %>
+    <%= _.title%><%if __break__ %>\n</%if %>
+    <%/loop cds%>
+
+Sets C<__break__> to 1 every xth loop.
+Can be used in C<LOOP>, C<WHILE> and C<EACH>
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item (loop)_context_vars
+
+    <%= __index__         %> the current loop index starting at 0
+    <%= __counter__       %> the current loop index starting at 1
+    <%= __first__         %> true if first iteration
+    <%= __last__          %> true if last iteration
+    <%= __odd__           %> true if __counter__ is odd
+    <%= __inner__         %> true if not last or first iteration
+    <%= __key__           %> the key of an EACH iteration
+    <%= __value__         %> the value of an EACH iteration
+    <%= __break__         %> see L<"BREAK"> above
+    <%= __filename__      %> filename of current template (since 0.91_001)
+    <%= __filenameshort__ %> short filename of current template (since 0.91_001)
+
+=back
+
+=cut
+

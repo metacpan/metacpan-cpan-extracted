@@ -1,0 +1,28 @@
+Revision history for Perl extension HTTP::Daemon::App.
+
+0.0.1  Thu Nov  9 12:31:06 2006
+	- original version; created by h2xs 1.23 with options
+		-AXc -n HTTP::Daemon::App
+0.0.2
+	- added missing ! when setting pid_ext, made --stop give similar output as --start, uninit warning with no args quieted and 
+
+0.0.3  Mon Nov 13 17:22:25 2006
+    - better output when already running @ --start or not running @ --stop, fixed option check (restart to --restart)
+    
+0.0.4  Tue Nov 14 10:37:28 2006
+    - added send_basic_auth_request() and header grabbing to decode_basic_auth(), passed $conf to handler
+    
+0.0.5 Tue Nov 14 14:30:16 2006
+    - added additional fork in run() to properly do children and place nice when child is "suexec"edified
+    
+0.0.6  Tue Nov 14 16:01:48 2006
+    - --stop/--restart cleanup kids from 0.0.5 change 
+    
+0.0.7  Wed Nov 15 06:35:21 2006
+    - make close() 'SSL_no_shutdown' => 1 if Daemon is SSL
+
+0.0.8  Wed Nov 15 17:59:45 2006
+	- added pst_fork, pre_fork hooks. made send_basic_auth_request() do is_error() and error_as_HTML()
+
+0.0.9  Fri Nov 17 16:38:29 2006 
+	- no $c cleanup in child. large file support errata in readme

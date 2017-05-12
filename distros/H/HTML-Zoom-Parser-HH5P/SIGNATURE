@@ -1,0 +1,68 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 294505f858f11dd062e9916e3f50d88210a9ef54 CONTRIBUTING
+SHA1 0f2c242e7cb50f34f2dd311a1c60fe5e42ae9dd4 COPYRIGHT
+SHA1 9e307a5415ca4fa0a76a08bd7236f23f15544ea8 CREDITS
+SHA1 8d9862047af37b0cdf242bf999ea30c7d4eac65f Changes
+SHA1 937d452c5c4069f4cda9ffaf45a33f1eb5f060e8 LICENSE
+SHA1 0ff8cea48fe8d0443d62b4c7b3c57a5b01a50983 MANIFEST
+SHA1 039c76d89a1759157231e46f056abf7032229bb2 META.ttl
+SHA1 aaecaf1f7c40d0e715454b0d239b3e753ae800b0 META.yml
+SHA1 b9d5dd0b476253d37384aed42664179605286153 Makefile.PL
+SHA1 9d4a65cddb637b86ec04976ecb66c0fa46ff77f3 README
+SHA1 06c410f05488c1612ed66b06d3a86b2580581e4a inc/Module/AutoInstall.pm
+SHA1 8a924add836b60fb23b25c8506d45945e02f42f4 inc/Module/Install.pm
+SHA1 61ab1dd37e33ddbe155907ce51df8a3e56ac8bbf inc/Module/Install/AutoInstall.pm
+SHA1 c04f94f91fa97b9f8cfb5a36071098ab0e6c78e3 inc/Module/Install/AutoManifest.pm
+SHA1 2d0fad3bf255f8c1e7e1e34eafccc4f595603ddc inc/Module/Install/Base.pm
+SHA1 f0e01fff7d73cd145fbf22331579918d4628ddb0 inc/Module/Install/Can.pm
+SHA1 7328966e4fda0c8451a6d3850704da0b84ac1540 inc/Module/Install/Fetch.pm
+SHA1 66d3d335a03492583a3be121a7d888f63f08412c inc/Module/Install/Include.pm
+SHA1 b62ca5e2d58fa66766ccf4d64574f9e1a2250b34 inc/Module/Install/Makefile.pm
+SHA1 1aa925be410bb3bfcd84a16985921f66073cc1d2 inc/Module/Install/Metadata.pm
+SHA1 3b9281ddf7dd6d6f5de0a9642c69333023193c80 inc/Module/Install/Package.pm
+SHA1 41f76ff6b39368a65da86377e43b34bacc2fb0eb inc/Module/Install/TrustMetaYml.pm
+SHA1 e4196994fa75e98bdfa2be0bdeeffef66de88171 inc/Module/Install/Win32.pm
+SHA1 c3a6d0d5b84feb3280622e9599e86247d58b0d18 inc/Module/Install/WriteAll.pm
+SHA1 26d58a041cd6b3d21db98b32e8fd1841aae21204 inc/Module/Package.pm
+SHA1 5a2f84a7a82eee0d1e5ed3628fe503a608efc10f inc/Module/Package/Dist/RDF.pm
+SHA1 feb933cefe2e3762e8322bd6071a2499f3440da1 inc/YAML/Tiny.pm
+SHA1 b5d04494a15a3e5c5aa2699e6eb10b1da513de1e lib/HTML/Zoom/Parser/HH5P.pm
+SHA1 5769e5d1a308b625ce242c44a24338453e3d3936 meta/changes.pret
+SHA1 8210f81dc9b0efe4b57771cc8dcefa563c1b9995 meta/doap.pret
+SHA1 124abd87e583210c0a8a2eafd3d16b9baac513a7 meta/makefile.pret
+SHA1 a151cff74b5f29c00381a14d4ec8726e3763b6b2 meta/people.pret
+SHA1 ac2f5d5f080dcca9626991d80d71c7b0a1fc19fb t/hzphp-00-compile.t
+SHA1 d8383e5fd47dfe52ac28f612aade494fe9e07806 t/hzphp-actions.t
+SHA1 eed4720b85e8a250e785766e7bda7392abb02260 t/hzphp-apply.t
+SHA1 9cc980d6654b90bf790c2a52dfba9d48bf122713 t/hzphp-balance.t
+SHA1 aaf7c7d7ddb2d5ba3c5f20267637802d5a727668 t/hzphp-doctype.t
+SHA1 78dc53aada585703a8157300659201cb93699d9b t/hzphp-dwim-autoload.t
+SHA1 a9f88db17847db73a46aefee0bfb9497b7186305 t/hzphp-flush.t
+SHA1 eb87d33aff3b905424f0290995134b1b2f2f0ea6 t/hzphp-forms.t
+SHA1 5854afaa7d796f904598aac1c92279e80f535893 t/hzphp-parser_weirdness.t
+SHA1 85a86bb8d2739b6eb304215984cec84f956bee51 t/hzphp-repeat_bugfixes.t
+SHA1 5e422d6be4d4a0a34058b0faa1eca84a862ba69a t/hzphp-selectors.t
+SHA1 68b2bcf7770e3ff2b15557a52b07596eb557e8e6 t/hzphp-span.t
+SHA1 5e85632399b1bb3b222a2f72fa4e8e01729a27ad t/hzphp-todo-repeat.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iEYEARECAAYFAlGkqNsACgkQzr+BKGoqfTl+NwCeN8z50vtYoU7ftEb5uVZFJTZL
+xpQAnjEWW5K/VD0EJJc+NCodT1sh3Hnq
+=8hBs
+-----END PGP SIGNATURE-----

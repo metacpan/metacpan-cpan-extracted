@@ -1,0 +1,309 @@
+<table border=1>
+  <caption>Table "public.arg_strings"</caption>
+  <tr>
+    <th align=center>Column</th>
+    <th align=center>Type</th>
+    <th align=center>Modifiers</th>
+  </tr>
+  <tr valign=top>
+    <td align=left>argid</td>
+    <td align=left>integer</td>
+    <td align=left>not null default nextval('public.arg_strings_argid_seq'::text)</td>
+  </tr>
+  <tr valign=top>
+    <td align=left>arg_string</td>
+    <td align=left>character varying(16)</td>
+    <td align=left>not null</td>
+  </tr>
+</table>
+Indexes: arg_strings_pkey primary key btree (arg_string),<br>
+         arg_strings_argid_key unique btree (argid)<br>
+
+<table border=1>
+  <caption>Table "public.usernames"</caption>
+  <tr>
+    <th align=center>Column</th>
+    <th align=center>Type</th>
+    <th align=center>Modifiers</th>
+  </tr>
+  <tr valign=top>
+    <td align=left>userid</td>
+    <td align=left>integer</td>
+    <td align=left>not null default nextval('public.usernames_userid_seq'::text)</td>
+  </tr>
+  <tr valign=top>
+    <td align=left>username</td>
+    <td align=left>character varying(32)</td>
+    <td align=left>not null</td>
+  </tr>
+</table>
+Indexes: usernames_pkey primary key btree (username),<br>
+         usernames_userid_key unique btree (userid)<br>
+
+<table border=1>
+  <caption>Table "public.request_strings"</caption>
+  <tr>
+    <th align=center>Column</th>
+    <th align=center>Type</th>
+    <th align=center>Modifiers</th>
+  </tr>
+  <tr valign=top>
+    <td align=left>requestid</td>
+    <td align=left>integer</td>
+    <td align=left>not null default nextval('public.request_strings_requestid_seq'::text)</td>
+  </tr>
+  <tr valign=top>
+    <td align=left>request_string</td>
+    <td align=left>character varying(64)</td>
+    <td align=left>not null</td>
+  </tr>
+</table>
+Indexes: request_strings_pkey primary key btree (request_string),<br>
+         request_strings_requestid_key unique btree (requestid)<br>
+
+<table border=1>
+  <caption>Table "public.whitelist"</caption>
+  <tr>
+    <th align=center>Column</th>
+    <th align=center>Type</th>
+    <th align=center>Modifiers</th>
+  </tr>
+  <tr valign=top>
+    <td align=left>ip</td>
+    <td align=left>inet</td>
+    <td align=left>not null</td>
+  </tr>
+</table>
+Indexes: whitelist_pkey primary key btree (ip)<br>
+
+<table border=1>
+  <caption>Table "public.hosts"</caption>
+  <tr>
+    <th align=center>Column</th>
+    <th align=center>Type</th>
+    <th align=center>Modifiers</th>
+  </tr>
+  <tr valign=top>
+    <td align=left>ip</td>
+    <td align=left>inet</td>
+    <td align=left>not null</td>
+  </tr>
+  <tr valign=top>
+    <td align=left>score</td>
+    <td align=left>integer</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=left>score_ts</td>
+    <td align=left>timestamp without time zone</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+</table>
+Indexes: hosts_pkey primary key btree (ip)<br>
+
+<table border=1>
+  <caption>Table "public.notice_templates"</caption>
+  <tr>
+    <th align=center>Column</th>
+    <th align=center>Type</th>
+    <th align=center>Modifiers</th>
+  </tr>
+  <tr valign=top>
+    <td align=left>id</td>
+    <td align=left>integer</td>
+    <td align=left>not null default nextval('public.notice_templates_id_seq'::text)</td>
+  </tr>
+  <tr valign=top>
+    <td align=left>name</td>
+    <td align=left>character(8)</td>
+    <td align=left>not null</td>
+  </tr>
+  <tr valign=top>
+    <td align=left>template</td>
+    <td align=left>text</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+</table>
+Indexes: notice_templates_pkey primary key btree (name)<br>
+
+<table border=1>
+  <caption>Table "public.notified"</caption>
+  <tr>
+    <th align=center>Column</th>
+    <th align=center>Type</th>
+    <th align=center>Modifiers</th>
+  </tr>
+  <tr valign=top>
+    <td align=left>ip</td>
+    <td align=left>inet</td>
+    <td align=left>not null</td>
+  </tr>
+  <tr valign=top>
+    <td align=left>nic_handle_notified</td>
+    <td align=left>character varying(16)</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=left>notice_ts</td>
+    <td align=left>timestamp without time zone</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=left>notice_name</td>
+    <td align=left>character(8)</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+</table>
+Indexes: notified_pkey primary key btree (ip)<br>
+Foreign Key constraints: $1 FOREIGN KEY (notice_name) REFERENCES notice_templates(name) ON UPDATE NO ACTION ON DELETE NO ACTION,<br>
+                         $2 FOREIGN KEY (ip) REFERENCES hosts(ip) ON UPDATE NO ACTION ON DELETE NO ACTION<br>
+
+<table border=1>
+  <caption>Table "public.proxy_tests"</caption>
+  <tr>
+    <th align=center>Column</th>
+    <th align=center>Type</th>
+    <th align=center>Modifiers</th>
+  </tr>
+  <tr valign=top>
+    <td align=left>ip</td>
+    <td align=left>inet</td>
+    <td align=left>not null</td>
+  </tr>
+  <tr valign=top>
+    <td align=left>open_proxy</td>
+    <td align=left>boolean</td>
+    <td align=left>default false</td>
+  </tr>
+  <tr valign=top>
+    <td align=left>open_proxy_tested_at</td>
+    <td align=left>timestamp without time zone</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+</table>
+Indexes: proxy_tests_pkey primary key btree (ip)<br>
+Foreign Key constraints: $1 FOREIGN KEY (ip) REFERENCES hosts(ip) ON UPDATE NO ACTION ON DELETE NO ACTION<br>
+
+<table border=1>
+  <caption>Table "public.blacklist"</caption>
+  <tr>
+    <th align=center>Column</th>
+    <th align=center>Type</th>
+    <th align=center>Modifiers</th>
+  </tr>
+  <tr valign=top>
+    <td align=left>ip</td>
+    <td align=left>inet</td>
+    <td align=left>not null</td>
+  </tr>
+  <tr valign=top>
+    <td align=left>active</td>
+    <td align=left>boolean</td>
+    <td align=left>default false</td>
+  </tr>
+  <tr valign=top>
+    <td align=left>first_event</td>
+    <td align=left>integer</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=left>block_reason</td>
+    <td align=left>smallint</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=left>blocked_at</td>
+    <td align=left>timestamp without time zone</td>
+    <td align=left>not null default now()</td>
+  </tr>
+  <tr valign=top>
+    <td align=left>unblocked_at</td>
+    <td align=left>timestamp without time zone</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=left>unblock_reason</td>
+    <td align=left>smallint</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+</table>
+Indexes: blacklist_pkey primary key btree (ip, blocked_at)<br>
+Foreign Key constraints: $1 FOREIGN KEY (first_event) REFERENCES eventrecords(eventid) ON UPDATE NO ACTION ON DELETE NO ACTION,<br>
+                         $2 FOREIGN KEY (ip) REFERENCES hosts(ip) ON UPDATE NO ACTION ON DELETE NO ACTION<br>
+
+<table border=1>
+  <caption>Table "public.eventrecords"</caption>
+  <tr>
+    <th align=center>Column</th>
+    <th align=center>Type</th>
+    <th align=center>Modifiers</th>
+  </tr>
+  <tr valign=top>
+    <td align=left>eventid</td>
+    <td align=left>integer</td>
+    <td align=left>not null default nextval('public.eventrecords_eventid_seq'::text)</td>
+  </tr>
+  <tr valign=top>
+    <td align=left>ts</td>
+    <td align=left>timestamp without time zone</td>
+    <td align=left>default now()</td>
+  </tr>
+  <tr valign=top>
+    <td align=left>status</td>
+    <td align=left>smallint</td>
+    <td align=left>not null</td>
+  </tr>
+  <tr valign=top>
+    <td align=left>userid</td>
+    <td align=left>integer</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+  <tr valign=top>
+    <td align=left>ip</td>
+    <td align=left>inet</td>
+    <td align=left>not null</td>
+  </tr>
+  <tr valign=top>
+    <td align=left>requestid</td>
+    <td align=left>integer</td>
+    <td align=left>not null</td>
+  </tr>
+  <tr valign=top>
+    <td align=left>argid</td>
+    <td align=left>integer</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+</table>
+Indexes: eventrecords_pkey primary key btree (eventid),<br>
+         event_ts_ip_index btree (ts, ip)<br>
+Foreign Key constraints: $1 FOREIGN KEY (ip) REFERENCES hosts(ip) ON UPDATE NO ACTION ON DELETE NO ACTION,<br>
+                         $2 FOREIGN KEY (requestid) REFERENCES request_strings(requestid) ON UPDATE NO ACTION ON DELETE NO ACTION,<br>
+                         $3 FOREIGN KEY (argid) REFERENCES arg_strings(argid) ON UPDATE NO ACTION ON DELETE NO ACTION,<br>
+                         $4 FOREIGN KEY (userid) REFERENCES usernames(userid) ON UPDATE NO ACTION ON DELETE NO ACTION<br>
+
+<table border=1>
+  <caption>Table "public.freq401"</caption>
+  <tr>
+    <th align=center>Column</th>
+    <th align=center>Type</th>
+    <th align=center>Modifiers</th>
+  </tr>
+  <tr valign=top>
+    <td align=left>ip</td>
+    <td align=left>inet</td>
+    <td align=left>not null</td>
+  </tr>
+  <tr valign=top>
+    <td align=left>freq401</td>
+    <td align=left>double precision</td>
+    <td align=left>default 0</td>
+  </tr>
+  <tr valign=top>
+    <td align=left>last_freq_computed_at</td>
+    <td align=left>timestamp without time zone</td>
+    <td align=left>&nbsp;</td>
+  </tr>
+</table>
+Indexes: freq401_pkey primary key btree (ip)<br>
+Foreign Key constraints: $1 FOREIGN KEY (ip) REFERENCES hosts(ip) ON UPDATE NO ACTION ON DELETE NO ACTION<br>
+

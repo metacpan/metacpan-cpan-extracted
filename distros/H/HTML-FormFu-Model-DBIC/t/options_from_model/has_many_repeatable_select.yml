@@ -1,0 +1,29 @@
+---
+auto_fieldset: 1
+
+elements:
+  - type: Hidden
+    name: id
+
+  - type: Text
+    name: name
+
+  - type: Hidden
+    name: count
+
+  - type: Repeatable
+    nested_name: bands
+    counter_name: count
+    elements:
+      - type: Hidden
+        name: id
+
+      - name: band
+
+      - type: Checkboxgroup
+        name: users
+        model_config:
+          resultset: User
+
+  - type: Submit
+    name: submit

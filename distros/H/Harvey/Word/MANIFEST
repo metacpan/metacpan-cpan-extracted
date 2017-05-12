@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+test.pl
+Word.pm
+adjective.txt
+adverb.txt
+noun.txt
+verb.txt
+word.txt
+word.db
+system.dat

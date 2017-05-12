@@ -1,0 +1,14 @@
+---
+auto_fieldset: 1
+
+elements:
+  - type: Hidden
+    name: count
+  - type: Repeatable
+    nested_name: rep
+    counter_name: count
+    elements:
+      - name: foo_0
+      - name: bar_0
+    constraints:
+      - Required

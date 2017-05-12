@@ -1,0 +1,54 @@
+{
+   "abstract" : "HTML to text conversion with links as footnotes",
+   "author" : [
+      "Struan Donald. E<lt>struan@cpan.orgE<gt>",
+      "Ian Malpass E<lt>ian@indecorous.comE<gt> was responsible for the custom \nformatting bits and the nudge to release the code.",
+      "Simon Dassow E<lt>janus@errornet.de<gt> for the anchor_links option plus \na few bugfixes and optimisations",
+      "Thomas Sibley E<lt>trs@bestpractical.comE<gt> patches for skipping links that are their urls and to change the delimiters for bold and italic text.."
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-FormatText-WithLinks",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::FormatText" : "2",
+            "HTML::TreeBuilder" : 0,
+            "URI::WithBase" : 0
+         }
+      }
+   },
+   "provides" : {
+      "HTML::FormatText::WithLinks" : {
+         "file" : "lib/HTML/FormatText/WithLinks.pm",
+         "version" : "0.15"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/struan/html-formattext-withlinks"
+      }
+   },
+   "version" : "0.15"
+}

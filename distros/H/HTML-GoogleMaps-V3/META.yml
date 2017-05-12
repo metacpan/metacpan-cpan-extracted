@@ -1,0 +1,33 @@
+---
+abstract: unknown
+author:
+  - 'Lee Johnson <leejo@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.001014'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-GoogleMaps-V3
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Geo::Coder::Google: '0.16'
+  Template: '2'
+  perl: '5.005'
+resources:
+  bugtracker: https://github.com/Humanstate/html-googlemaps-v3/issues
+  homepage: https://metacpan.org/module/HTML/GoogleMaps/V3
+  license: http://dev.perl.org/licenses/
+version: '0.10'
+x_repository:
+  type: git
+  url: https://github.com/Humanstate/html-googlemaps-v3.git
+  web: https://github.com/Humanstate/html-googlemaps-v3

@@ -1,0 +1,33 @@
+---
+abstract: 'Simple HTTP Proxy which serves some paths from locations on local disk.'
+author:
+  - 'Tomas Doran, <bobtfish@bobtfish.net>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::MockObject: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: HTTP::Proxy::Selective
+name: HTTP-Proxy-Selective
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Config::Tiny: 0
+  File::Slurp: 0
+  File::Temp: 0
+  HTTP::Headers: 1.64
+  HTTP::Proxy: 0.22
+  IO::Socket::SSL: 0
+  Net::SSLeay: 0
+  Path::Class: 0
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+version: 0.004

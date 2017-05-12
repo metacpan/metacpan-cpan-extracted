@@ -1,0 +1,67 @@
+{
+   "abstract" : "Call HTML::Entities::encode_entities, via a hash, within a string",
+   "author" : [
+      "Ron Savage (ron@savage.net.au)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-Entities-Interpolate",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0.44",
+            "HTML::Entities" : "3.69",
+            "Tie::Function" : "0.02",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Slurper" : "0.009",
+            "File::Spec" : "0",
+            "Test::Pod" : "1.51",
+            "Test::Simple" : "1.302052"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-Entities-Interpolate"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ronsavage/HTML-Entities-Interpolate.git",
+         "web" : "https://github.com/ronsavage/HTML-Entities-Interpolate"
+      }
+   },
+   "version" : "1.10",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

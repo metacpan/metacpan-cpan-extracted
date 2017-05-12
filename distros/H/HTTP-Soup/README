@@ -1,0 +1,65 @@
+HTTP::Soup
+==========
+
+This module provides the Perl bindings for the C library "libsoup", which in
+turn provides a HTTP client/server library for GNOME.
+
+Lisoup is an HTTP client/server library for GNOME. It uses GObjects and the glib
+main loop, to integrate well with GNOME applications, and also has a synchronous
+API, for use in threaded applications.
+
+Libsoup is used in many GNOME projects and other software including gtk-webkit.
+
+Features include:
+
+	- Both asynchronous (GMainLoop and callback-based) and synchronous APIs
+	- Automatically caches connections
+	- SSL Support using GnuTLS
+	- Proxy support, including authentication and SSL tunneling
+	- Client support for Digest, NTLM, and Basic authentication
+	- Server support for Digest and Basic authentication
+	- Client and server support for XML-RPC
+
+For more information about libsoup refer to the library's web site:
+
+	http://live.gnome.org/LibSoup
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing you can find documentation for this module with the
+perldoc command.
+
+	perldoc HTTP::Soup
+
+For any kind of help or support simply send a mail to the gtk-perl mailing
+list (gtk-perl-list@gnome.org).
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 Emmanuel Rodriguez
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the GNU Library General Public License as published by the Free
+Software Foundation; either version 2.1 of the License, or (at your option)
+any later version; or the Artistic License, version 2.0.
+
+This library is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU Library General Public License for more
+details.
+
+You should have received a copy of the GNU Library General Public License along
+with this library; if not, write to the Free Software Foundation, Inc., 59
+Temple Place - Suite 330, Boston, MA  02111-1307  USA.

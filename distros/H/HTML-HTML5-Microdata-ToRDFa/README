@@ -1,0 +1,60 @@
+NAME
+    HTML::HTML5::Microdata::ToRDFa - rewrite HTML5+Microdata into XHTML+RDFa
+
+SYNOPSIS
+     use HTML::HTML5::Microdata::ToRDFa;
+     my $rdfa = HTML::HTML5::Microdata::ToRDFa->new($html, $baseuri);
+     print $rdfa->get_string;
+
+DESCRIPTION
+    This module may be used to convert HTML documents marked up with
+    Microdata into XHTML+RDFa 1.0 (which is more widely implemented by
+    consuming software).
+
+    If the input document uses a mixture of Microdata and RDFa, the
+    semantics of the output document may be incorrect.
+
+  Constructor
+    "$rdfa = HTML::HTML5::Microdata::ToRDFa->new($html, $baseuri)"
+        $html may be an HTML document (as a string) or an
+        XML::LibXML::Document object.
+
+        $baseuri is the base URI for resolving relative URI references. If
+        $html is undefined, then this module will fetch $baseuri to obtain
+        the document to be converted.
+
+  Public Methods
+    "$rdfa->get_string"
+        Get the document converted to RDFa as a string. This will be
+        well-formed XML, but not necessarily valid XHTML.
+
+    "$rdfa->get_dom"
+        Get the document converted to XHTML+RDFa as an XML::LibXML::Document
+        object.
+
+        Note that each time "get_string" and "get_dom" are called, the
+        conversion process is run from scratch. Repeatedly calling these
+        methods is wasteful.
+
+BUGS
+    Please report any bugs to <http://rt.cpan.org/>.
+
+SEE ALSO
+    HTML::HTML5::Microdata::Parser, RDF::RDFa::Parser.
+
+    <http://www.perlrdf.org/>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    Copyright 2010-2011 Toby Inkster
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

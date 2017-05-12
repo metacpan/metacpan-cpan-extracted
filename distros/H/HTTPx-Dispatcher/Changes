@@ -1,0 +1,44 @@
+Revision history for Perl extension HTTPx::Dispatcher
+
+0.10
+
+    - fixed test deps
+
+0.09
+
+    - modernized packaging
+
+0.08
+
+    - DEPRECATED.
+
+0.07
+
+    - inherit Exporter for export_to_level
+
+0.06
+
+    - integrate with Plack
+    - fixed test
+    - support URI Templates(by masaki++)
+    - support head slash(by masaki++)
+
+0.05
+
+    - added deps: URI
+
+0.04
+
+    - no feature changes.
+
+0.03
+
+    - BUG FIXED: oops. HTTP::Request->uri returns absolute uri.
+
+0.02
+
+    - fixed deps.
+    - added new feature: Dispatcher->uri_for({ 'controller' => 'Foo', 'action' => 'bar' })
+
+0.01    Thu Apr 24 20:38:18 2008
+        - original version

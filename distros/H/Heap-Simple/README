@@ -1,0 +1,132 @@
+Heap::Simple version 0.13
+=========================
+
+DESCRIPTION
+
+A heap is a partially sorted structure where it's always easy to extract the
+smallest element. If the collection of elements is changing dynamically, a
+heap has less overhead than keeping the collection fully sorted.
+
+The order in which equal elements get extracted is unspecified.
+
+The main order relations supported by this module are "<" (numeric compare)
+and "lt" (string compare).
+
+The module allows you to manage data where the elements are of several
+allowed types, in particular array references, hash references, objects
+or just the keys themselves.
+
+The internals of the module do nothing with the elements inserted except
+inspecting the key. This means that if you for example store a blessed
+object, that's what you will get back on extract. It's also ok to keep
+references to the elements around and make changes to them while they are
+in the heap as long as you don't change the key.
+
+SYNOPSIS
+
+    use Heap::Simple;
+
+    # Create a heap
+    my $heap = Heap::Simple->new;
+    my $heap = Heap::Simple->new(%options);
+
+    # Put data in the heap
+    $heap->insert($element);
+    # Put data in a "Object" or "Any" heap with a given key
+    $heap->key_insert($key, $element);
+
+    # Extract the top value
+    $element = $heap->extract_top;	# croaks on an empty heap
+    $element = $heap->extract_first;	# returns undef on an empty heap
+
+    # Get the top value but leave it in the heap
+    $element = $heap->top;		# croaks on an empty heap
+    $element = $heap->first;		# returns undef on an empty heap
+
+    # Find the top key in the heap
+    $top_key = $heap->top_key;	  	# return infinity on an empty heap
+					# croaks if there's no infinity
+    $top_key = $heap->first_key;  	# returns undef   on an empty heap
+
+    # Extract all data whose key is not above a given value
+    @elements = $heap->extract_upto($max_key);
+
+    # Find the number of elements
+    $count = $heap->count;
+
+    # Empty the heap
+    $heap->clear;
+
+    # Get all keys (not sorted)
+    @keys = $heap->keys;
+    # Get all values (not sorted)
+    @values = $heap->values;
+
+    # Find the key corresponding to a value
+    $key = $heap->key($value);
+
+    # Get/Set user_data
+    $user_data  = $heap->user_data;
+    $old_data   = $heap->user_data($new_data);
+
+    # Get/Set infinity
+    $infinity     = $heap->infinity;
+    $old_infinity = $heap->infinity($new_data);
+
+    # Get the position of a key in an element
+    $key_index    = $heap->key_index;
+    $key_name     = $heap->key_name;
+    $key_method   = $heap->key_method;
+    $key_function = $heap->key_function;
+
+    # Return the value of several things that were set in new:
+    $wrapped      = $heap->wrapped;
+    $max_count    = $heap->max_count;
+    $can_die      = $heap->can_die;
+    $dirty        = $heap->dirty;
+    $order	  = $heap->order;
+    @elements     = $heap->elements;
+    $elements     = $heap->elements;
+
+    # Move all elements from $heap2 to $heap1
+    $heap1->absorb($heap2);	# As if doing a repeated $heap1->insert
+    $heap1->key_absorb($heap2);	# As if doing a repeated $heap1->key_insert
+
+    # Which class does the actual work ?
+    $implementation = Heap::Simple->implementation;
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+To install this module into a specific directory, do:
+   perl Makefile.PL PREFIX=/name/of/the/directory
+   ...the rest is the same...
+
+Please also read the perlmodinstall man page, if available.
+
+DEPENDENCIES
+
+This module doesn't do anything on itself. It needs a plugin actually
+implementing the interfaced described above. You can use:
+
+  Heap::Simple::Perl	A pure perl implementation, quite fast actually
+  Heap::Simple::XS	An even faster XS implementation, but it needs your
+			setup to be able to compile perl modules or you must
+			be able to get a binary package for your system
+
+AUTHOR
+
+Ton Hospel, <Heap-Simple@ton.iguana.be>
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Ton Hospel
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

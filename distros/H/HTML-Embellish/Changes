@@ -1,0 +1,46 @@
+Revision history for HTML::Embellish
+
+1.002  2016-01-09
+	- Add 'ay & 'y as special cases
+
+1.001  2015-04-11
+	- Add 'angman, 'ave, 'igh, & 'onour as special cases
+
+1.000  2014-02-01
+	- No functional changes
+	- Add a few more test cases
+
+0.08   2012-08-18
+	- Add 'Nam as special case
+
+0.07   2012-04-20
+	- Add 'gainst, 'nuff, 'rithmetic, 'spect, & 'tweren't as special cases
+	- New tests: 00-all_prereqs.t & 30-special.t
+
+0.06   2011-11-11
+	- Add 'scuse as a special case
+
+0.05   2010-11-11
+	- Call normalize_content before processing an element node
+	- Try to avoid exceeding the complex regular subexpression
+	  recursion limit
+
+0.04   2010-09-25
+	- Convert any whitespace between a period and an ending
+	  punctuation mark to &nbsp;
+	  (Previously, only an actual space was accepted)
+	- Fixed tests to work with HTML-Tree 4 (trailing whitespace issue)
+
+0.03   2010-03-15
+	- Make the (" and ") rules higher priority
+	- Use utf8::upgrade to avoid malformed UTF-8 bug
+	- Renamed curlyquote to processTextRefs (private method)
+	- Convert space to nbsp around ellipses when appropriate
+	- Add 'cause, 'cept, 'd, 'ee, 'er, 'fraid, 'im, 'm, 'n,
+	  'nother, 'r, 're, 's, 't, 'ud & 'un as special cases
+
+0.02   2007-07-07
+	- Fixed README
+
+0.01   2007-07-07
+	- Initial release

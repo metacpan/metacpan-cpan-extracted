@@ -1,0 +1,284 @@
+NAME
+    HTML::Truncate - (beta software) truncate HTML by percentage or
+    character count while preserving well-formedness.
+
+VERSION
+    0.20
+
+ABSTRACT
+    When working with text it is common to want to truncate strings to make
+    them fit a desired context. E.g., you might have a menu that is only
+    100px wide and prefer text doesn't wrap so you'd truncate it around
+    15-30 characters, depending on preference and typeface size. This is
+    trivial with plain text using substr but with HTML it is somewhat
+    difficult because whitespace has fluid significance and open tags that
+    are not properly closed destroy well-formedness and can wreck an entire
+    layout.
+
+    HTML::Truncate attempts to account for those two problems by padding
+    truncation for spacing and entities and closing any tags that remain
+    open at the point of truncation.
+
+SYNOPSIS
+     use strict;
+     use HTML::Truncate;
+
+     my $html = '<p><i>We</i> have to test <b>something</b>.</p>';
+     my $readmore = '... <a href="/full-article">[readmore]</a>';
+
+     my $html_truncate = HTML::Truncate->new();
+     $html_truncate->chars(20);
+     $html_truncate->ellipsis($readmore);
+     print $html_truncate->truncate($html);
+
+     # or
+
+     use Encode;
+     my $ht = HTML::Truncate->new( utf8_mode => 1,
+                                   chars => 1_000,
+                                  );
+     print Encode::encode_utf8( $ht->truncate($html) );
+
+XHTML
+    This module is designed to work with XHTML-style nested tags. More
+    below.
+
+WHITESPACE AND ENTITIES
+    Repeated natural whitespace (i.e., "\s+" and not " &nbsp; ") in HTML --
+    with rare exception (pre tags or user defined styles) -- is not
+    meaningful. Therefore it is normalized when truncating. Entities are
+    also normalized. The following is only counted 14 chars long.
+
+      \n<p>\nthis     is   &#8216;text&#8217;\n\n</p>
+      ^^^^^^^12345----678--9------01234------^^^^^^^^
+
+METHODS
+    new Can take all the methods as hash style args. "percent" and "chars"
+        are incompatible so don't use them both. Whichever is set most
+        recently will erase the other.
+
+         my $ht = HTML::Truncate->new(utf8_mode => 1,
+                                      chars => 500, # default is 100
+                                      );
+
+    utf8_mode
+        Set/get, true/false. If "utf8_mode" is set, utf8_mode(1) is also set
+        in the underlying HTML::Parser, entities will be transformed with
+        decode and the default ellipsis will be a literal ellipsis and not
+        the default of "&#8230;".
+
+    chars
+        Set/get. The number of characters remaining after truncation,
+        excluding the "ellipsis".
+
+        Entities are counted as single characters. E.g., "&copy;" is one
+        character for truncation counts.
+
+        Default is "100." Side-effect: clears any "percent" that has been
+        set.
+
+    percent
+        Set/get. A percentage to keep while truncating the rest. For a
+        document of 1,000 chars, percent('15%') and chars(150) would be
+        equivalent. The actual amount of character that the percent
+        represents cannot be known until the given HTML is parsed.
+
+        Side-effect: clears any "chars" that has been set.
+
+    ellipsis
+        Set/get. Ellipsis in this case means --
+
+            The omission of a word or phrase necessary for a complete
+            syntactical construction but not necessary for understanding.
+                                 http://www.answers.com/topic/ellipsis
+
+        What it will probably mean in most real applications is "read more."
+        The default is "&#8230;" which if the utf8 flag is true will render
+        as a literal ellipsis, "chr(8230)".
+
+        The reason the default is "&#8230;" and not "..." is this is meant
+        for use in HTML environments, not plain text, and "..."
+        (dot-dot-dot) is not typographically correct or equivalent to a real
+        horizontal ellipsis character.
+
+    truncate
+        It returns the truncated XHTML if asked for a return value.
+
+         my $truncated = $ht->truncate($html);
+
+        It will truncate the string in place if no return value is expected
+        (wantarray is not defined).
+
+           $ht->truncate($html);
+           print $html;
+
+        Also can be called with inline arguments-
+
+           print $ht->truncate( $html,
+                                $chars_or_percent,
+                                $ellipsis );
+
+        No arguments are strictly required. Without HTML to operate upon it
+        returns undef. The two optional arguments may be preset with the
+        methods "chars" (or "percent") and "ellipsis".
+
+        Valid nesting of tags is required (alla XHTML). Therefore some old
+        HTML habits like <p> without a </p> are not supported and may cause
+        a fatal error. See "repair" for help with badly formed HTML.
+
+        Certain tags are omitted by default from the truncated output.
+
+        *   Skipped tags
+
+            These will not be included in truncated output by default.
+
+               <head>...</head> <script>...</script> <form>...</form>
+               <iframe></iframe> <title>...</title> <style>...</style>
+               <base/> <link/> <meta/>
+
+        *   Tags allowed to self-close
+
+            See emptyElement in HTML::Tagset.
+
+    add_skip_tags( qw( tag list ) )
+        Put one or more new tags into the list of those to be omitted from
+        truncated output. An example of when you might like to use this is
+        if you're thumb-nailing articles and they start with
+        "<h1>title</h1>" or such before the article body. The heading level
+        would be absurd with a list of excerpts so you could drop it
+        completely this way--
+
+         $ht->add_skip_tags( 'h1' );
+
+    dont_skip_tags( qw( tag list ) )
+        Takes tags out of the current list to be omitted from truncated
+        output.
+
+    repair
+        Set/get, true/false. If true, will attempt to repair unclosed HTML
+        tags by adding close-tags as late as possible (eg.
+        "<i><b>foobar</i>" becomes "<i><b>foobar</b></i>"). Unmatched close
+        tags are dropped ("foobar</b>" becomes "foobar").
+
+    on_space
+        This will make the truncation back up to the first space it finds so
+        it doesn't truncate in the the middle of a word. "on_space" runs
+        before "cleanly" if both are set.
+
+    cleanly
+        Set/get -- a regular expression. This is on by default and the
+        default cleaning regular expression is
+        "cleanly(qr/[\s[:punct:]]+\z/)". It will make the truncation strip
+        any trailing spacing and punctuation so you don't get things like
+        "The End...." or "What? ..." You can cancel it with
+        "$ht->cleanly(undef)" or provide your own regular expression.
+
+COOKBOOK (well, a recipe)
+  Template Toolkit filter
+    For excerpting HTML in your Templates. Note the "add_skip_tags" which is
+    set to drop any images from the truncated output.
+
+     use Template;
+     use HTML::Truncate;
+
+     my %config =
+        (
+         FILTERS => {
+             truncate_html => [ \&truncate_html_filter_factory, 1 ],
+         },
+         );
+
+     my $tt = Template->new(\%config) or die $Template::ERROR;
+
+     # ... etc ...
+
+     sub truncate_html_filter_factory {
+         my ( $context, $len, $ellipsis ) = @_;
+         $len = 32 unless $len;
+         $ellipsis = chr(8230) unless defined $ellipsis;
+         my $ht = HTML::Truncate->new();
+         $ht->add_skip_tags(qw( img ));
+         return sub {
+             my $html = shift || return '';
+             return $ht->truncate( $html, $len, $ellipsis );
+         }
+     }
+
+    Then in your templates you can do things like this:
+
+     [% FOR item IN search_results %]
+       <div class="searchResult">
+         <a href="[% item.uri %]">[% item.title %]</a><br />
+         [% item.body | truncate_html(200) %]
+       </div>
+     [% END %]
+
+    See also Template::Filters.
+
+AUTHOR
+    Ashley Pond V, "<ashley@cpan.org>".
+
+LIMITATIONS
+    There may be places where this will break down right now. I'll pad out
+    possible edge cases as I find them or they are sent to me via the CPAN
+    bug ticket system.
+
+  This is not an HTML filter
+    Although this happens to do some crude HTML filtering to achieve its
+    end, it is not a fully featured filter. If you are looking for one,
+    check out HTML::Scrubber and HTML::Sanitizer.
+
+BUGS, FEEDBACK, PATCHES
+    Please report any bugs or feature requests to
+    "bug-html-truncate@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=HTML-Truncate>. I will
+    get the ticket, and then you'll automatically be notified of progress as
+    I make changes.
+
+  TO DO
+    Write a couple more tests (percent and skip stuff) then take out beta
+    notice. Try to make the 5.6 stuff work without decode...? Try a
+    "drop_tags" method?
+
+    Write an XML::LibXML based version to load when possible...? Or make
+    that part of XHTML::Util?
+
+THANKS TO
+    Kevin Riggle for the "repair" functionality; patch, Pod, and tests.
+
+    Lorenzo Iannuzzi for the "on_space" functionality.
+
+SEE ALSO
+    HTML::Entities, HTML::TokeParser, the "truncate" filter in Template, and
+    Text::Truncate.
+
+    HTML::Scrubber and HTML::Sanitizer.
+
+COPYRIGHT & LICENSE
+    Copyright (©) 2005-2009 Ashley Pond V.
+
+    This program is free software; you can redistribute it or modify it or
+    both under the same terms as Perl itself.
+
+DISCLAIMER OF WARRANTY
+    Because this software is licensed free of charge, there is no warranty
+    for the software, to the extent permitted by applicable law. Except when
+    otherwise stated in writing the copyright holders or other parties
+    provide the software "as is" without warranty of any kind, either
+    expressed or implied, including, but not limited to, the implied
+    warranties of merchantability and fitness for a particular purpose. The
+    entire risk as to the quality and performance of the software is with
+    you. Should the software prove defective, you assume the cost of all
+    necessary servicing, repair, or correction.
+
+    In no event unless required by applicable law or agreed to in writing
+    will any copyright holder, or any other party who may modify and/or
+    redistribute the software as permitted by the above licence, be liable
+    to you for damages, including any general, special, incidental, or
+    consequential damages arising out of the use or inability to use the
+    software (including but not limited to loss of data or data being
+    rendered inaccurate or losses sustained by you or third parties or a
+    failure of the software to operate with any other software), even if
+    such holder or other party has been advised of the possibility of such
+    damages.
+

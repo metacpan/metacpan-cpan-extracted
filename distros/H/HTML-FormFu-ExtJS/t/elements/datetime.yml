@@ -1,0 +1,6 @@
+---
+elements:
+  - type: DateTime
+    name: test
+    label: datetime
+    default_natural: today

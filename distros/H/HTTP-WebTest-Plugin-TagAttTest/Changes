@@ -1,0 +1,6 @@
+Revision history for Perl extension HTTP::WebTest::Plugin::TagAttTest.
+
+0.01  Mon Feb 24 19:24:19 2003
+	- original version; created by h2xs 1.22 with options
+		-AX HTTP::WebTest::Plugin::TagAttTest
+

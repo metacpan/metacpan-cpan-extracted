@@ -1,0 +1,14 @@
+---
+abstract: 'methods for getting body params in the order they were sent'
+author:
+  - 'Paul Driver'
+generated_by: 'Dist::Zilla version 1.100160'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTTP-Body-Pairs
+requires:
+  ExtUtils::MakeMaker: 6.11
+  HTTP::Body: 0
+version: 0.3

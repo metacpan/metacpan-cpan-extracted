@@ -1,0 +1,6 @@
+declar accessors as my above new
+then bind in new
+
+# content_accessors
+my $name = $tree->look_down(id => q/name/);
+my $date = $tree->look_down(id => q/date/);

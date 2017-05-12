@@ -1,0 +1,19 @@
+#              _   _     _        __       
+#   __ _ _   _| |_| |__ (_)_ __  / _| ___  
+#  / _` | | | | __| '_ \| | '_ \| |_ / _ \ 
+# | (_| | |_| | |_| | | | | | | |  _| (_) |
+#  \__,_|\__,_|\__|_| |_|_|_| |_|_|  \___/ 
+#                                          
+# Desciption: authinfo provide credentials for client side authentication 
+#             information. Credentials defined in this file are used at relaying
+#             an email to external SMTP server.
+# Syntax:
+#   key:
+#     username: Username for SMTP-AUTH
+#     password: Password for the user
+#
+# Example:
+#   kijitora-smtpd:
+#       username: 'kijitora'
+#       password: 'nekochan'
+#

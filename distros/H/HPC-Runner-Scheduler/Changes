@@ -1,0 +1,27 @@
+Revision history for HPC-Runner-Scheduler
+
+0.09  2016-08-31 14:15:14 GST
+    - Bug fix for --wall
+    - Bug fix for logname in MCE
+
+0.08  2016-08-30 20:13:27 GST
+    - Added options for mem and walltime in slurm
+
+0.07  2016-08-30 17:20:17 GST
+    - Removed nodelist, and bug fix check_hpc_meta
+    - Added deps in cpanfile
+
+0.05  2016-04-12 11:25:28 GST
+    - Added in node count variable
+
+0.04  2016-03-29 13:48:56 GST
+    - Added in some things for stats of jobs
+
+0.03  2016-03-29 10:05:05 GST
+    - Small changes to logging
+
+0.02  2016-02-21 11:50:59 GST
+    - Still initial release
+
+0.01  2016-02-21 11:48:33 GST
+        - Initial release

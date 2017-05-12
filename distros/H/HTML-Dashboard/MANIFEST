@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01sanity.t
+t/02html.t
+t/03text.t
+lib/HTML/Dashboard.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,101 @@
+Revision history for Perl extension HTML::TokeParser::Simple.
+
+3.16  2013-06-26
+      Fix POD errors and move POD tests to XT directory.
+      Fix spelling errors.
+
+3.15  2005-11-29
+      Fixed bug where rewrite_tag would unescape entities.  Thanks to "Paul
+      Bijnens" <paul.bijnens@xplanation.com> for the bug report and fix.
+
+3.14  2005-10-08
+      Added POD tests
+      Converted to Module::Build
+      All classes now state which methods they override
+      Carp is now only loaded on demand
+      peek() now allows you to peek at the next tokens
+
+3.13  Sat Set 25, 2004
+      Corrected @INC paths in the tests.
+      Fixed still more embarrassing POD issues.
+      Sigh.
+
+3.12  Mon Sep 20, 2004
+      Corrected minor, but embarrassing, POD issue.
+
+3.11  Sun Sep 19, 2004
+      Broke start and end tags out into their own classes.  D'oh!
+
+3.1   Sun Sep 19, 2004
+      Added subclasses for each token type.
+
+      Massive POD update.
+
+      Test class for internals.
+
+3.0   Sat Sep 18, 2004
+      'get_foo' methods replace the older 'return_foo' methods.  'return_foo'
+      methods now call the new 'get_foo' methods and are deprecated (though
+      they do not yet issue warnings.)
+
+      The constructor has been overloaded to allow users to explicitly state
+      the source type of the HTML, if necessary.  Also, if LWP::Simple is
+      installed, the HTML may now be fetched from a URL.
+
+      $token->set_attr($token->return_attr) now works.
+
+      Added is_pi().  A shorthand for is_process_instruction().
+
+      Broke out HTML::TokeParser::Simple::Token into its own file.  I may
+      eventually refactor this into separate classes.
+
+2.2   Sat Jan 31, 2004
+      'return_attr' now takes and optional argument.  If supplied, will return
+      just that attribute value.
+      Updated POD.
+
+2.1   Mon Jun 9, 2003
+      Made 'rewrite_tag' a public method.  
+
+      Fixed some formatting.  
+
+      Fixed bug where get_attrseq returned a hashref instead of an arrayref
+      upon failure.
+      
+      Updated POD.
+      
+      Broke all HTML munging tests out into their own test and added some tests
+
+2.0   Sun Jun 1, 2003
+      is_tag, is_start_tag, and is_end_tag now can take regexes.
+      Added set_attr and delete_attr methods to rewrite tags on the fly
+      Converted to Test::More and doubled the number of tests
+      Updated POD
+      Updated Makefile.PL to list Test::More as a requirement
+      Deprecated 'return_text' now carps
+
+1.4   Wed Nov 13, 2002
+      Tokens are now blessed into a separate class to prevent people from
+      trying to call parser methods on them.  return_text() has been deprecated 
+      in favor of as_is().  Tests and POD updated.
+
+      Updated Makefile.PL to list HTML::TokeParser as a requirement (whoops!)
+
+1.3   Fri July 5 13:11:00 2002
+      Added is_tag() method and made the leading slash on an end tag optional.
+      Updated the POD and and tests.
+
+1.2   Fri Jun 21 08:05:00 2002
+      Turns out the the POD had more errors than I though.  There
+      are no changes in the code or the tests, but the POD has been
+      updated.
+
+1.1   Fri Mar  1 15:52:00 2002
+      Finally got off my duff and added support for the get_tag()
+      method.  Also overloaded the is_/(start|end)/_tag methods
+      to allow testing for the tag and tag type at the same time.
+
+0.01  Mon Feb  4 09:31:52 2002
+      - original version; created by h2xs 1.21 with options
+      -AX -n HTML::TokeParser::Simple
+

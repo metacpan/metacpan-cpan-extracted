@@ -1,0 +1,21 @@
+Revision history for Perl extension HTTP-BrowserDetect-isRobot
+
+0.06    2013.04.10
+        add more spiders/bots to regex (Renee)
+
+0.05    2013.04.10
+        for ^Java/ (John Simpson)
+
+0.04    2013.04.09
+        fixes for ^silk (John Simpson)
+
+0.03    2013.02.04
+        POD fix
+
+0.02    2013.02.04
+        doc improvements by Michael Stevens (mstevens)
+        regexp updates
+        add sub is_program_robot/is_site_robot
+
+0.01    2013.02.04
+        a start

@@ -1,0 +1,10 @@
+<%args>
+@spr   => ()
+@comps => ()
+@mod   => ()
+</%args>
+\[ {\it val-cat}\\ 
+   SPR   & <& '/list.mas', element => \@spr &>\\ 
+   COMPS & <& '/list.mas', element => \@comps &>\\ 
+   MOD   & <& '/list.mas', element => \@mod &>
+\]

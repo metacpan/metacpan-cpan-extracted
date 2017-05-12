@@ -1,0 +1,14 @@
+<wmmeta name="Title" value="The &wmdollar;(TOP/) Magic Variable" />
+<wmmeta name="Section" value="06-magic_vars" />
+<wmmeta name="Score" value="20" />
+<wmmeta name="Abstract">
+a relative path to the top-level of the site, for URLs
+</wmmeta>
+
+This URL reference always evaluates to a relative path to the top-level of the
+site, for URLs.
+
+Note that setting the **EtTextHrefsRelativeToTop** option will cause all URLs
+in Text::EtText blocks, which don't start with a slash or a protocol
+specification, to be made relative to the top-level of the site.
+

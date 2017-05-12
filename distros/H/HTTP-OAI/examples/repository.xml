@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Repository xmlns="http://www.openarchives.org/OAI/2.0/static-repository" 
+            xmlns:oai="http://www.openarchives.org/OAI/2.0/" 
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+            xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/static-repository 
+                                http://www.openarchives.org/OAI/2.0/static-repository.xsd">
+  <Identify>
+    <oai:repositoryName>Demo repository</oai:repositoryName>
+	<oai:baseURL>file:examples/repository.xml</oai:baseURL>
+    <oai:protocolVersion>2.0</oai:protocolVersion>
+    <oai:adminEmail>jondoe@oai.org</oai:adminEmail>
+    <oai:earliestDatestamp>2002-09-19</oai:earliestDatestamp>
+    <oai:deletedRecord>no</oai:deletedRecord>
+    <oai:granularity>YYYY-MM-DD</oai:granularity>
+  </Identify>
+  <ListMetadataFormats>
+    <oai:metadataFormat>
+      <oai:metadataPrefix>oai_dc</oai:metadataPrefix>
+      <oai:schema>http://www.openarchives.org/OAI/2.0/oai_dc.xsd</oai:schema>
+      <oai:metadataNamespace>http://www.openarchives.org/OAI/2.0/oai_dc/</oai:metadataNamespace>
+    </oai:metadataFormat>
+    <oai:metadataFormat>
+      <oai:metadataPrefix>oai_rfc1807</oai:metadataPrefix>
+      <oai:schema>http://www.openarchives.org/OAI/1.1/rfc1807.xsd</oai:schema>
+      <oai:metadataNamespace>http://info.internet.isi.edu:80/in-notes/rfc/files/rfc1807.txt</oai:metadataNamespace>
+    </oai:metadataFormat>
+  </ListMetadataFormats>
+  <ListRecords metadataPrefix="oai_dc">
+    <oai:record> 
+      <oai:header>
+        <oai:identifier>oai:arXiv:cs/0112017</oai:identifier> 
+        <oai:datestamp>2001-12-14</oai:datestamp>
+      </oai:header>
+      <oai:metadata>
+        <oai_dc:dc 
+            xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" 
+            xmlns:dc="http://purl.org/dc/elements/1.1/" 
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+            xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ 
+                                http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+          <dc:title>Using Structural Metadata to Localize Experience of 
+                    Digital Content</dc:title> 
+          <dc:creator>Dushay, Naomi</dc:creator>
+          <dc:subject>Digital Libraries</dc:subject> 
+          <dc:description>With the increasing technical sophistication of 
+            both information consumers and providers, there is 
+            increasing demand for more meaningful experiences of digital 
+            information. We present a framework that separates digital 
+            object experience, or rendering, from digital object storage 
+            and manipulation, so the rendering can be tailored to 
+            particular communities of users.
+          </dc:description> 
+          <dc:description>Comment: 23 pages including 2 appendices, 
+            8 figures</dc:description> 
+          <dc:date>2001-12-14</dc:date>
+        </oai_dc:dc>
+      </oai:metadata>
+    </oai:record>  
+    <oai:record>
+      <oai:header>
+        <oai:identifier>oai:perseus:Perseus:text:1999.02.0084</oai:identifier>
+        <oai:datestamp>2002-05-01</oai:datestamp>
+      </oai:header>
+      <oai:metadata>
+        <oai_dc:dc 
+            xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" 
+            xmlns:dc="http://purl.org/dc/elements/1.1/" 
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+            xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ 
+                                http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+          <dc:title>Germany and its Tribes</dc:title>
+          <dc:creator>Tacitus</dc:creator>
+          <dc:type>text</dc:type>
+          <dc:source>Complete Works of Tacitus. Tacitus. Alfred John Church. 
+            William Jackson Brodribb. Lisa Cerrato. edited for Perseus. 
+            New York: Random House, Inc. Random House, Inc. reprinted 1942.
+          </dc:source>
+          <dc:identifier>http://www.perseus.tufts.edu/cgi-bin/ptext?
+            doc=Perseus:text:1999.02.0083</dc:identifier>
+        </oai_dc:dc>
+      </oai:metadata>
+    </oai:record>
+  </ListRecords>
+  <ListRecords metadataPrefix="oai_rfc1807">
+    <oai:record>
+      <oai:header>
+        <oai:identifier>oai:arXiv:cs/0112017</oai:identifier>
+        <oai:datestamp>2001-12-14</oai:datestamp>
+      </oai:header>
+      <oai:metadata>
+        <rfc1807 
+            xmlns="http://info.internet.isi.edu:80/in-notes/rfc/files/rfc1807.txt" 
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+            xsi:schemaLocation="http://info.internet.isi.edu:80/in-notes/rfc/files/rfc1807.txt
+                                http://www.openarchives.org/OAI/1.1/rfc1807.xsd">
+          <bib-version>v2</bib-version>
+          <id>cs/0112017</id>
+          <entry>December 23, 2001</entry>
+          <title>Using Structural Metadata to Localize Experience of 
+             Digital Content</title>
+          <author>Naomi Dushay</author>
+          <date>December 14, 2001</date>
+        </rfc1807>
+      </oai:metadata>
+      <oai:about>
+        <oai_dc:dc 
+            xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" 
+            xmlns:dc="http://purl.org/dc/elements/1.1/" 
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+            xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ 
+                                http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+          <dc:publisher>Los Alamos arXiv</dc:publisher>
+          <dc:rights>Metadata may be used without restrictions as long as 
+            the oai identifier remains attached to it.</dc:rights>
+        </oai_dc:dc>
+      </oai:about>
+    </oai:record>
+  </ListRecords>
+</Repository>

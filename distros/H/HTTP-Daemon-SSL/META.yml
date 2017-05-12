@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+name:         HTTP-Daemon-SSL
+version:      1.04
+version_from: SSL.pm
+installdirs:  site
+license:      perl
+requires:
+    HTTP::Daemon:                  1
+    IO::Socket::SSL:               0.93
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

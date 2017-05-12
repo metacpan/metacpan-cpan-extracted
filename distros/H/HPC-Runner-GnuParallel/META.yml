@@ -1,0 +1,53 @@
+---
+abstract: 'Run arbitrary bash commands using GNU parallel. Can be used on its own or as a part of HPC::Runner::Slurm.'
+author:
+  - 'Jillian Rowe <jillian.e.rowe@gmail.com>'
+build_requires:
+  Module::Build: '0.28'
+  Test::More: '0.96'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HPC-Runner-GnuParallel
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Carp: '0'
+  Cwd: '0'
+  Data::Dumper: '0'
+  DateTime: '0'
+  DateTime::Format::Duration: '0'
+  File::Path: '0'
+  File::Temp: '0'
+  HPC::Runner: '0'
+  HPC::Runner::MCE: '0'
+  IO::File: '0'
+  IO::Select: '0'
+  IPC::Open3: '0'
+  Log::Log4perl: '0'
+  Moose: '0'
+  Moose::Util::TypeConstraints: '0'
+  MooseX::Getopt: '0'
+  MooseX::Getopt::Usage::Role::Man: '0'
+  MooseX::SimpleConfig: '0'
+  Symbol: '0'
+  Template: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://bitbucket.org/jerowe/hpc-runner-gnuparallel/issues
+  homepage: https://bitbucket.org/jerowe/hpc-runner-gnuparallel
+  repository: git://git@bitbucket.org:jerowe/hpc-runner-gnuparallel.git
+version: '0.07'
+x_contributors:
+  - 'Jillian Rowe <jir2004@qatar-med.cornell.edu>'

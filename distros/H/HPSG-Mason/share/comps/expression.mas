@@ -1,0 +1,12 @@
+<%args>
+$expr_type
+%syn_arg
+%sem_arg => ()
+</%args>
+\[ {\it <% $expr_type %>}\\ 
+   SYN & <& '/syn.mas', %syn_arg &>\
+% if( %sem_arg ){
+\\ 
+   SEM & <& '/sem.mas', %sem_arg &>
+% }
+\]

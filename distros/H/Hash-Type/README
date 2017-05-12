@@ -1,0 +1,40 @@
+Hash/Type version 1.05
+======================
+
+Hash::Type - pseudo-hashes as arrays tied to a "type" (list of fields)
+
+A Hash::Type is a collection of field names.
+Internally, an index is associated with each name.
+Such collections are created dynamically and can be extended.
+They are used to build tied hashes, either through C<tie>
+or through object-oriented method calls; such tied hashes :
+
+- are 'restricted' (will only accept operations on names previously 
+  declared in their Hash::Type)
+
+- are implemented internally as arrays (so they use less memory)
+
+- can be sorted efficiently through comparison functions generated
+  and compiled by the class
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004, 2005 Laurent Dami
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

@@ -1,0 +1,30 @@
+---
+abstract: 'Handling mobile location information plugin for HTTP::MobileAgent'
+author:
+  - 'Yoshiki Kurihara <kurihara __at__ cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+  Test::Requires: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: HTTP-MobileAgent-Plugin-Locator
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Geo::Coordinates::Converter: 0.10
+  Geo::Coordinates::Converter::iArea: 0.11
+  HTTP::MobileAgent: 0.31
+  UNIVERSAL::can: 0
+  UNIVERSAL::require: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.04

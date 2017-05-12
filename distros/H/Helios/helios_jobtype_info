@@ -1,0 +1,127 @@
+#!/usr/bin/env perl
+
+use 5.008;
+use strict;
+use warnings;
+use Getopt::Long;
+use Sys::Hostname;
+use File::Basename;
+
+use Helios::Config;
+use Helios::Error;
+use Helios::LogEntry::Levels ':all';
+use Helios::JobType;
+
+our $VERSION = '2.82';
+
+our $Help_Mode  = 0;
+our $Debug_Mode = 0;
+
+our $JobType_Name = '';
+our $JobTypeid;
+our $JobType_Obj;
+our $Config;
+
+# if they didn't use '--name' or '-n', that's OK
+if ($ARGV[0] !~ /^-/) {
+	$JobType_Name = shift @ARGV;
+}
+
+GetOptions (
+	"name=s"      => \$JobType_Name,
+	"jobtypeid=i" => \$JobTypeid,
+	"help"        => \$Help_Mode,
+	"debug"       => \$Debug_Mode
+);
+
+# debug mode
+if ($Debug_Mode) { Helios::Config->debug(1); }
+
+# help mode
+if ($Help_Mode) {
+	require Pod::Usage;
+	Pod::Usage::pod2usage(-verbose => 2, -exitstatus => 0);
+}
+
+# stop if we were not given at least service and param
+unless ($JobType_Name || $JobTypeid ) {
+	warn "$0: Either a jobtype name (--name) or jobtypeid (--jobtypeid) is required.\n";
+	exit(1);
+}
+
+# parse the global config; we'll need it
+eval {
+	$Config = Helios::Config->parseConfig();
+	1;	
+} or do {
+	my $E = $@;
+	warn "$0: Helios::Config ERROR: $E\n";
+	exit(1);
+};
+
+# OK, now use Helios::JobType to attempt to find the jobtype in the database
+# --name overrides --jobtypeid
+eval {
+	if ( $JobType_Name ) {
+		$JobType_Obj = Helios::JobType->lookup(name => $JobType_Name, config => $Config);
+	} else {
+		$JobType_Obj = Helios::JobType->lookup(jobtypeid => $JobTypeid, config => $Config);
+	}
+	1;	
+} or do {
+	my $E = $@;
+	warn "$0: Helios::JobType ERROR: $E\n";
+	exit(1);
+};
+
+if ( $JobType_Obj ) {
+	print "Jobtypeid: ",$JobType_Obj->getJobtypeid(),"\n";
+	print "Name: ",$JobType_Obj->getName(),"\n";
+}
+
+exit(0);
+
+
+=head1 NAME
+
+helios_jobtype_info - Get info about a jobtype from the Helios collective database
+
+=head1 SYNOPSIS
+
+ # jobtypes can be looked up by name
+ helios_jobtype_info --name=MyService
+ --OR--
+ # jobtypes can be looked up by jobtypeid also
+ helios_jobtype_info --jobtypeid=2 
+
+ # if you have a jobtype's name, you can drop the '--name=' portion
+ helios_jobtype_info MyService
+
+=head1 DESCRIPTION
+
+Use the helios_jobtype_info command to view information on a particular Helios 
+jobtype.  This command allows you to find out the jobtypeid of a jobtype (or 
+vice versa) without resorting to querying the collective database directly with 
+SQL commands.
+
+=head1 SEE ALSO
+
+L<Helios::JobType>
+
+=head1 AUTHOR
+
+Andrew Johnson, E<lt>lajandy at cpan dot orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014 by Logical Helion, LLC.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=head1 WARRANTY
+
+This software comes with no warranty of any kind.
+
+=cut

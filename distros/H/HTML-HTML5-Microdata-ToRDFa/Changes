@@ -1,0 +1,32 @@
+HTML-HTML5-Microdata-ToRDFa
+===========================
+
+Created:      2010-01-29
+Home page:    <https://metacpan.org/release/HTML-HTML5-Microdata-ToRDFa>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=HTML-HTML5-Microdata-ToRDFa>
+Maintainer:   Toby Inkster <mailto:tobyink@cpan.org>
+
+0.100  2011-11-09
+
+ - Use the 'Strategy' modules provided with newer
+   HTML::HTML5::Microdata::Parser to generate predicate URIs.
+ - (Update) use 5.010
+ - (Packaging) Module::Package::RDF
+ - (Update) use HTML::HTML5::Microdata::Parser 0.100
+
+0.030  2011-02-09
+# We're not dead yet!
+
+ - Use HTML::HTML5::Writer for output - it outputs more
+   text/html-compatible XHTML than XML::LibXML can on its own.
+ - Use RDF::Prefix to perform URI->CURIE conversion. It doesn't yet do a
+   fantastic job, but it can evolve more rapidly on its own.
+ - (Documentation Update) Copyright 2011.
+
+0.02  2010-02-07
+
+ - (Bugfix) Correct dependencies in Makefile.PL
+
+0.01  2010-01-29
+
+

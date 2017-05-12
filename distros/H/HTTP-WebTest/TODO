@@ -1,0 +1,28 @@
+$Id: TODO,v 1.29 2002/12/13 00:55:51 m_ilya Exp $
+
+My current TODO:
+
+* Consider using XPath expressions (in Click plugin and on their own)
+
+* support hidden fields in Click plugin
+
+* automated tests for mail sending (even better unit tests for all
+code)
+
+* plugin for page validation with HTML::Validator (HTML::Lint ? or both ?)
+
+* Generator of Perl and wtscript code from test objects
+
+* HTTP proxy which autogenerates skeleton of test file (consider using
+HTTP::RecorderSession framework)
+
+* HTML formated reports
+
+* Report plugin which stores all responses as local files.
+
+* Support including of test scripts into other test scripts
+
+* More work on cookbook. Probably I need one example of very simple
+plugin.
+
+* Add test name into errors text

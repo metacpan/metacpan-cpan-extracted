@@ -1,0 +1,55 @@
+Revision history for Perl extension HTML::HTMLDoc.
+
+0.01  Wed Apr 16 19:14:31 2003
+	- original version; created by h2xs 1.21 with options
+		-AX -n HTML::HTMLDoc
+
+0.02  Apr 17 16:02:20 CEST 2003
+	- added most of the htmldoc-parameters as methods
+	- generation of the PDF-Document
+
+0.03  Apr 20 15:35:41 CEST 2003
+	- changing the call of htmldoc to IPC::Open3
+
+0.04  Mit Apr 23 16:05:55 CEST 2003
+	- bug in mod-perl env. regarding IPC::Open3. Fixed with a new method using filemode
+
+0.05  Mon Apr 28 14:24:03 CEST 2003
+	- updated documentation
+	- updated pod
+	- added checking for installed htmldoc in makefiles
+
+0.06  Die Apr 29 13:51:51 CEST 2003
+	- fix of bug that let content appear twice in target-document (thanks Rajat Bhatia)
+	- licence-stuff added to pod
+
+0.07  Don Mai 29 20:04:44 CEST 2003
+	- extended internal structure for structure for storing parameters
+	- extended permission-features, multiple permissions possible now
+	- some intelligence implemented dealing with permissions
+	- extended pod
+	- implemented methods for setting header and footer
+	- test suite added. Most methods testet
+	- better color-method with possibility of hex- rgb- or named color-input
+	- bug in switching between landscape and portrait fixed (Keith W. Sheffield, Christoffer Landtman)
+	- turn link processing on/off (Keith W. Sheffield)
+	- use files for input instead of scalar (Keith W. Sheffield)
+	- set the default font size - set_fontsize addes (Keith W. Sheffield)
+        
+0.08  Sun Jun  6 21:45:45 CEST 2004
+	- Bugfix in error-Handling while generating PDF (patch from Aleksey Serba)
+	- added set_logoimage() and get_logoimage() dealing with images for the header/footer.
+	  Added Tests for this.
+	  
+0.09  01.03.2005 00:15
+	- Fixed problems caused by new HTMLDOC 1.8.24
+	- Set Env-Var HTMLDOC_NOCGI true before calling htmldoc (Najib)
+	- fixed comments (Helen Hamster)
+	- fixed compression-bug (Helen Hamster)
+	- fixed embedding fonts (Helen Hamster)
+	
+0.10  2005-10-26
+	- Added support for jpeg-compression
+	- new section FAQ in POD
+	
+	

@@ -1,0 +1,54 @@
+{
+   "abstract" : "an HTTP URI field",
+   "author" : [
+      "Roman F. <romanf@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-FormHandlerX-Field-URI-HTTP",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::NoTabs" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::FormHandler::Field::Text" : "0",
+            "HTML::FormHandler::Moose" : "0",
+            "Regexp::Common" : "0",
+            "URI" : "0",
+            "namespace::autoclean" : "0",
+            "version" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/moltar/HTML-FormHandlerX-Field-URI-HTTP.git",
+         "web" : "https://github.com/moltar/HTML-FormHandlerX-Field-URI-HTTP"
+      }
+   },
+   "version" : "v0.4"
+}
+

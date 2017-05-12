@@ -1,0 +1,6 @@
+wrapper:
+<%wrapper wrapper.html %>
+wrapped in wrapper.html: foo: <%= foo %>
+  <%wrapper wrapper2.html %>wrapped in wrapper2.html: foo2: <%= foo %><%/wrapper %>
+    <%wrapper wrapper.html %>wrapped in wrapper1.html: foo1: <%= foo %><%/wrapper %>
+<%/wrapper %>

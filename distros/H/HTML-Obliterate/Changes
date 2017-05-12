@@ -1,0 +1,17 @@
+Revision history for Perl extension HTML::Obliterate.
+
+0.3  Sun Apr 12 20:33:46 2009
+    - regex 'o' flag to only compile once
+    - handle tags w/ out \w inside them
+    - handle comments w/ HTML inside them (Thanks Lee.M for bringing this to my attention)
+    - handle broken HTML (Thanks Lee.M for bringing this to my attention)
+    - rt 44007: add defenestrate_html() alias
+    - use integer version x.x instead of x.x.x (i.e. 0.000002 to 0.3)
+    
+0.0.2  Sun Jul 20 14:06:47 2008
+    - Remove HTML character entities (finally!)
+    
+0.0.1  Tue Dec  5 18:16:37 2006
+	- original version; created by h2xs 1.23 with options
+		-AXc -n HTML::Obliterate
+

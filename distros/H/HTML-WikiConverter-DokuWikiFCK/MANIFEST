@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/HTML-WikiConverter-DokuWikiFCK.t
+lib/HTML/WikiConverter/DokuWikiFCK.pm
+lib/HTML/WikiConverter/DokuWikiFCKN.pm
+lib/HTML/WikiConverter/DokuWikiFCK.pod
+dwfckg/dwfckg.tgz

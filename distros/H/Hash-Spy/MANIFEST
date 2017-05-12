@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+Spy.xs
+t/Hash-Spy.t
+lib/Hash/Spy.pm
+t/pods.t
+t/pods.t
+META.yml                                 Module meta-data (added by MakeMaker)

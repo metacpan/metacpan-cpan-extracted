@@ -1,0 +1,36 @@
+---
+abstract: "generate syntax-highlighted examples for codes with a markup compatible with jQueryUI's tab widgets."
+author:
+  - 'Shlomi Fish <shlomif@cpan.org>'
+build_requires:
+  Module::Build: '0.28'
+  Test::Differences: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-TabbedExamples-Generate
+provides:
+  HTML::TabbedExamples::Generate:
+    file: lib/HTML/TabbedExamples/Generate.pm
+    version: v0.0.6
+requires:
+  CGI: '0'
+  Carp: '0'
+  MooX: '0'
+  MooX::Types::MooseLike::Base: '0'
+  MooX::late: '0.007'
+  Text::VimColor: '0'
+  perl: '5.014'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-TabbedExamples-Generate
+  repository: ssh://hg@bitbucket.org/shlomif/perl-HTML-TabbedExamples-Generate
+version: 0.0.6

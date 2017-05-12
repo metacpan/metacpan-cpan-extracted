@@ -1,0 +1,79 @@
+NAME
+
+    HPC::Runner::GnuParallel - Run arbitrary bash commands using GNU
+    parallel. Can be used on its own or as a part of HPC::Runner::Slurm.
+
+SYNOPSIS
+
+      package Main;
+    
+      use Moose;
+    
+      extends 'HPC::Runner::GnuParallel';
+    
+      Main->new_with_options()->go;
+    
+      1;
+
+    Run straight as :
+
+      cat stuff.cmd | parallelparser.pl | parallel --joblog `pwd`/runtasks.log --gnu -N 1 -q  gnuparallelrunner.pl --command `echo {}` --outdir `pwd`/gnulogs/ --seq {#}
+    
+      Where stuff.cmd is a file with the commands you need run.
+    
+      Or as a part or HPC::Runner::Slurm distro.
+
+DESCRIPTION
+
+    HPC::Runner::GnuParallel is a part of a suite of tools to make HPC
+    easy.
+
+Attributes
+
+ using_gnuparallel
+
+    Indicate whether or not to use gnu parallel
+
+ infile
+
+    disable infile and read directly from the stream
+
+ go
+
+    Initialize MCE things and use HPC::Runner to parse and exec commands
+
+ parse_file_gnuparallel
+
+    Parse the file of commands and send each command off to the queue.
+
+Acknowledgements
+
+    Before version 0.05
+
+    This module was originally developed at and for Weill Cornell Medical
+    College in Qatar within ITS Advanced Computing Team. With approval from
+    WCMC-Q, this information was generalized and put on github, for which
+    the authors would like to express their gratitude.
+
+    As of version 0.05:
+
+    This modules continuing development is supported by NYU Abu Dhabi in
+    the Center for Genomics and Systems Biology. With approval from NYUAD,
+    this information was generalized and put on bitbucket, for which the
+    authors would like to express their gratitude.
+
+AUTHOR
+
+    Jillian Rowe <jillian.e.rowe@gmail.com>
+
+COPYRIGHT
+
+    Copyright 2015- Weill Cornell Medical College in Qatar
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+

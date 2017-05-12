@@ -1,0 +1,35 @@
+Revision history for Perl extension HTML::FormatData
+
+0.10  Mon May 16 2005 
+	- cleaned up docs for CPAN release
+
+0.09  Wed Apr 20 2005 
+	- fixed bug in format_text() that would run jobs out of proper order
+
+0.08  Tue Mar 29 2005 
+	- broke out MasonX::App::Format into seperate package, HTML::FormatData
+	- implemented OO interface
+	- added reformat_date() from MasonX/App.pm
+
+0.07  Mon Feb 7 2005  
+	- shortcut for RFC-822 date format added
+
+0.06  Thu Nov 4 2004
+	- added new text cleaning routines; fixed a bug in clean_whitespace
+
+0.05  Mon Aug 23 2004
+	- renamed FormatText.pm to Format.pmin preparation of adding new functions
+	- changed args passed to format_text from hashref to hash
+	- added parse_date and format_date functions
+
+0.04  Wed Apr 21 2004
+	-added clean_high_ascii() to convert problem characters in Word docs
+
+0.03  Mon Apr 12 2004
+	- removed dependence on XML::Comma for XML encode and decode
+
+0.02 Fri Apr 9 2004
+	- added truncate_no_ellipses job
+
+0.01  Wed Feb 25 2004
+	- first packaged release. O-O rewrite of old WebApp package.

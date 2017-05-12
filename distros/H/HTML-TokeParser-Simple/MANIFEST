@@ -1,0 +1,24 @@
+Build.PL
+Changes
+lib/HTML/TokeParser/Simple.pm
+lib/HTML/TokeParser/Simple/Token.pm
+lib/HTML/TokeParser/Simple/Token/Comment.pm
+lib/HTML/TokeParser/Simple/Token/Declaration.pm
+lib/HTML/TokeParser/Simple/Token/ProcessInstruction.pm
+lib/HTML/TokeParser/Simple/Token/Tag.pm
+lib/HTML/TokeParser/Simple/Token/Tag/End.pm
+lib/HTML/TokeParser/Simple/Token/Tag/Start.pm
+lib/HTML/TokeParser/Simple/Token/Text.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/get_tag.t
+t/get_token.t
+t/munge_html.t
+t/constructor.t
+t/internals.t
+t/data/test.html
+xt/pod-coverage.t
+xt/pod.t
+META.json
