@@ -1,0 +1,42 @@
+<html>
+<head><title>Test Services Web Editique</title></head>
+<body>
+	<h1>Test Service Web Editions</h1>
+	<P>
+	<form method="post" enctype="multipart/form-data" action="/cgi-bin/edtk.cgi">
+		Selection du fichier :
+		<input type="file" id="xmlfile" name="xmlfile" size="20"/>
+		- type de document : 
+		<select id="app" name="app">
+			<option>APP_1</option>
+			<option>APP_2</option>
+			<option>APP_3</option>
+			<option>APP_4</option>
+			<option>TST-SRVWEB</option>
+		</select>
+		<P>
+		GED - mode identifiant de document :
+		<input type="checkbox" name="ged"/> => 
+		<input type="submit" value="Send"/>
+	</form>
+	<BR>
+<P>
+	<BR>
+	<h1>Test Service Web GED</h1>
+	<P>
+	<form method="post" enctype="multipart/form-data" action="/cgi-bin/edtk_ged.cgi">
+		Identifiant de documents : <input type="text" name="idldocpg"/> 
+		- Groupe utilisateur :
+		<select id="owner" name="owner"/> 
+		<option>group_1</option>
+		</select> 
+		- Mode affichage :
+		<select id="view" name="view"/> 
+		<option>1</option>
+		<option>2</option>
+		</select> 
+		=> 
+		<input type="submit" value="Send"/>
+	</form>
+</body>
+</html>

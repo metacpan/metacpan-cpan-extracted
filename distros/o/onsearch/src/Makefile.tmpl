@@ -1,0 +1,43 @@
+# $Id: Makefile.tmpl,v 1.3 2005/07/18 19:47:49 kiesling Exp $ 
+
+#
+# BINDIR, DATADIR, and ONSEARCHDIR must be the same as in onsearch.cfg.
+#
+BINDIR=@bindir@
+DATADIR=@datadir@
+ONSEARCHDIR=@onsearchdir@
+
+ADMINSCRIPT=onindex
+ADMINSCRIPTDIR=/usr/local/etc/init.d
+
+PROG=onindex
+
+#
+# Edit CC and CFLAGS if necessary for compilers other than GCC.
+#
+CC=gcc
+
+CFLAGS=-g -Wall -DBINDIR=\"$(BINDIR)\" -DDATADIR=\"$(DATADIR)\" -DONSEARCHDIR=\"$(ONSEARCHDIR)\"
+
+SOURCES=onindex.c logentry.c
+
+INCLUDES=onindex.h
+
+all: $(PROG) 
+
+$(PROG): $(SOURCES) $(INCLUDES)
+	$(CC) $(CFLAGS) $(SOURCES) -o $(PROG)
+
+install: $(PROG) 
+	if [ ! -d $(BINDIR) ]; then mkdir -p $(BINDIR); fi ; \
+		cp $(PROG) $(BINDIR) ; \
+	if [ ! -d $(ADMINSCRIPTDIR) ]; then mkidr -p $(ADMINSCRIPTDIR); fi; \
+		sed -e 's|@inst_onsearchbindir@|$(BINDIR)|' $(ADMINSCRIPT).sh \
+			> $(ADMINSCRIPTDIR)/$(ADMINSCRIPT) && \
+			chmod 0755 $(ADMINSCRIPTDIR)/$(ADMINSCRIPT)
+
+tags:
+	etags *.c
+
+clean: 
+	rm -f TAGS *.o *~ $(PROG) $(CTLPROG) Makefile

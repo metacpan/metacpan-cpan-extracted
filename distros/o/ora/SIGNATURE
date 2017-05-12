@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 f4cd95ec622e9511b10d0b5867d54c1e025b9129 CHANGES.md
+SHA1 a6adc13d0c809ab8cb68e6e3b6eb7571bd0e2920 LICENSE.md
+SHA1 6a7ba130521b02ebd685308ab3df04ef1a4d96eb MANIFEST
+SHA1 8cc123e0c48e8e8cb7c10b2e359aa9b91713b32c Makefile.PL
+SHA1 ea9453a97ce58f1567c00eaf7894c33a9d2a6178 README.md
+SHA1 3d84ddced84757d72f4144b65644c2b539bd75b6 lib/Bio/ORA.pm
+SHA1 7752bd38411a8da3a15b49b7cbf2008577cdd6ce scripts/or.fasta
+SHA1 5e91a5d5f633cc48c9afe0f3a7163c0864bc34ea scripts/or.hmm
+SHA1 1aaf970ef6ae1d8ab6b467976a5790a39aa66763 scripts/or.hmm.h3f
+SHA1 729d17b6deb4640a6d8f56c9640e257fd08b13a4 scripts/or.hmm.h3i
+SHA1 30cd761073a4b1a701dd9b8e838d7310b6db9b21 scripts/or.hmm.h3m
+SHA1 e2f4f0c01fa000cad9173d51380973b1104407a2 scripts/or.hmm.h3p
+SHA1 b373a50ed004d792193d73ca3ffd5dbd50d2f6f4 scripts/or.pl
+SHA1 67a63f6b74ffdc595953375d30beef953e1e892d t/test.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJXYCikAAoJEEa2olXs2ZZ6v2EQAINT0026EPAgA0QshLsIk7zi
+5YDT0o/uB4siM5o/5qyap3zIa4DeT0vWArAELHyAUW1m/fXuNEpy2s34rtotYrXp
+4KO/p9CxZBEFEiXfwkism5ZDiq9UR7WGqYXY8IOlVbIyiw2X8pf+dhAWpGM041+F
+mBXFJPgeZXlOIBx2tB7IUoRLLmvxhXugnm20S/jzMvnhrfH+ay6B7Gm2s1Dj81W9
+aLw4W4EdBNyEzHiS+HAj6aCsJw4i9SXEQLmMD3OqC92KH/rAL7MQ6lbNPiJJb1TG
+88jniCCgB9MH9fP8bKzMsIPEvqypAadw3Lze8yYF9QU6QrTPTsZXjUtArGV4AnBk
+X8x0iLElBod5iSH+N/vS27ybOf0FMlPWTps4D5H07gRU7fsJ6MnOBTxPV1Zx+XNq
+TkrTtyRAiBMwN1phzNACNbjmLx8KRFIX0xN40kezjxd97ZecG3ZZFD8eBrsU1vBv
+mvQqKyg7+IcjqgbiXhqI3tolQHMbm8L1ojsMCOrrQdstBadMpk8u/ndgPz+1zZTH
+rBs5SyGBeulM8lw45GhTpXTk4shEV1R74I1gH8ZxQlZ3FfvhzSPQs4vhVhWO8vz1
+6Cwu+/mng7gDKt84wIMnIduUsybjIcJoVi+YS+PHlXNNbzWcgGvPTCFoaiFsfu2B
+586eUYcBbwvWBHhZj+k2
+=HwLr
+-----END PGP SIGNATURE-----

@@ -1,0 +1,446 @@
+#!/usr/bin/perl
+# $Id: o2sms4w 290 2006-08-10 22:45:00Z mackers $
+
+use strict;
+use warnings;
+
+use Win32::GUI;
+use WWW::SMS::IE::iesms;
+use WWW::SMS::IE::o2sms;
+use WWW::SMS::IE::vodasms;
+use WWW::SMS::IE::meteorsms;
+use WWW::SMS::IE::threesms;
+use Getopt::Long 2.33;
+use vars qw( $VERSION );
+use Data::Dumper;
+
+$VERSION = sprintf("1.%02d", q$Revision: 290 $ =~ /(\d+)/);
+my $last_changed_date = $& if (q$LastChangedDate: 2006-08-11 00:45:00 +0200 (Fri, 11 Aug 2006) $ =~ /\d{4}-\d{2}-\d{2}/);
+
+# ..
+
+# TODO
+# - callbacks
+# - save username/password
+# - address book
+
+# Global Variables
+
+my $username;
+my $password;
+my $debug = 0;
+my $carrier;
+
+# Process options
+
+GetOptions("debug|verbose|d" => \$debug);
+print "Starting debug mode\n" if $debug;
+
+# MAIN Window Definition
+
+my $mainWin = Win32::GUI::Window->new(
+	-name		=> 'MainWin',
+	-text		=> "o2sms",
+	-width		=> 500,
+	-height		=> 500,
+	-hashelp	=> 0,
+	-resizable	=> 0,
+	-hasmaximize	=> 0,
+	-dialogui	=> 1,
+	);
+
+$mainWin->AddTextfield(
+	-name		=> 'NumberTxt',
+	-left		=> 5,
+	-top		=> 5,
+	-width		=> 190,
+	-height		=> 20,
+	-prompt 	=> [ "Recipient:", 50 ],
+	-tabstop	=> 1,
+	);
+
+$mainWin->AddTextfield(
+	-name		=> 'MessageTxt',
+	-left		=> 5,
+	-top		=> 30,
+	-width		=> 240,
+	-height 	=> 80,
+	-multiline	=> 1,
+	-tabstop	=> 1,
+	);
+
+$mainWin->AddButton(
+	-name		=> 'CloseBut',
+	-cancel		=> 1,
+	-tabstop	=> 0,
+	-visible	=> 0,
+	);
+
+$mainWin->AddButton(
+	-name		=> 'SendBut',
+	-text		=> 'Send Message',
+	-left		=> 75,
+	-top		=> 115,
+	-width		=> 100,
+	-height		=> 20,
+	-ok		=> 1,
+	-tabstop	=> 1,
+	-disabled	=> 1,
+	);
+
+$mainWin->Resize(
+	250 + $mainWin->Width() - $mainWin->ScaleWidth(),
+	160 + $mainWin->Height() - $mainWin->ScaleHeight(),
+	);
+
+my $sb = $mainWin->AddStatusBar(
+	-text		=> "Version $VERSION ($last_changed_date) by mackers"
+	);
+
+$mainWin->Center();
+
+# LOGIN Window Definition
+
+my $loginWin = Win32::GUI::DialogBox->new(
+	-name		=> 'LoginWin',
+	-text		=> 'o2sms',
+	-width		=> 110,
+	-height		=> 65,
+	-hashelp	=> 0,
+	-parent		=> $mainWin,
+	);
+
+$loginWin->AddTextfield(
+	-name		=> 'UsernameTxt',
+	-left		=> 5,
+	-top		=> 5,
+	-width		=> 100,
+	-height		=> 20,
+	-prompt 	=> [ "Username:", 55 ],
+	-tabstop	=> 1,
+	);
+
+$loginWin->AddTextfield(
+	-name		=> 'PasswordTxt',
+	-left		=> 5,
+	-top		=> 30,
+	-width		=> 100,
+	-height		=> 20,
+	-prompt 	=> [ "Password:", 55 ],
+	-tabstop	=> 1,
+	-password	=> 1,
+	);
+
+$loginWin->AddLabel(
+	-text		=> 'Provider:',
+	-left		=> 5,
+	-top		=> 58,
+	-width		=> 55,
+	-height		=> 20,
+	-align		=> 'left',
+	);
+
+$loginWin->AddCombobox(
+	-name		=> 'CarrierLst',
+	-left		=> 60,
+	-top		=> 55,
+	-width		=> 100,
+	-height		=> 100,
+	-tabstop	=> 1,
+	-dropdown	=> 0,
+	-dropdownlist	=> 1,
+	 -nointegraleheight => 0,
+	-hasstring	=> 0,
+	-simple		=> 1,
+	);
+
+$loginWin->CarrierLst->Add('o2.ie', 'vodafone.ie', 'meteor.ie', 'three.ie');
+$loginWin->CarrierLst->Select(0);
+
+$loginWin->AddButton(
+	-name		=> 'LoginBut',
+	-text		=> 'Login',
+	-left		=> 22,
+	-top		=> 90,
+	-width		=> 50,
+	-height		=> 20,
+	-ok		=> 1,
+	-tabstop	=> 1,
+	-disabled	=> 1,
+	);
+
+$loginWin->AddButton(
+	-name		=> 'CancelBut',
+	-text		=> 'Cancel',
+	-left		=> 94,
+	-top		=> 90,
+	-width		=> 50,
+	-height		=> 20,
+	-cancel		=> 1,
+	-tabstop	=> 1,
+	);
+
+$loginWin->Resize(
+	165 + $loginWin->Width() - $loginWin->ScaleWidth(),
+	120 + $loginWin->Height() - $loginWin->ScaleHeight(),
+	);
+
+$loginWin->Center();
+
+# Show the login or main window
+
+if (defined($username)) # || $carrier->is_logged_in())
+{
+	$mainWin->Show();
+	$mainWin->NumberTxt->SetFocus();
+}
+else
+{
+	$loginWin->Show();
+	$loginWin->UsernameTxt->SetFocus();
+}
+
+# GUI Loop
+
+Win32::GUI::Dialog();
+exit(0);
+
+# MAIN Window Events
+
+sub MainWin_Terminate
+{
+	return -1;
+}
+
+sub NumberTxt_Change
+{
+	Check_MainWin_Enablings();
+	return 1;
+}
+
+sub MessageTxt_Change
+{
+	Check_MainWin_Enablings();
+	return 1;
+}
+
+sub CloseBut_Click
+{
+	print "here\n";
+	return -1;
+}
+
+sub SendBut_Click
+{
+	return Send_Message();
+}
+
+sub MessageTxt_KeyDown()
+{
+	# need to handle our own keyboard events in this multiline textfield for some reason.
+
+	if ($_[1] == 27)
+	{
+		exit(0);
+	}
+	elsif ($_[1] == 13)
+	{
+		Send_Message();
+		return 0;
+	}
+	elsif ($_[1] == 9)
+	{
+		my $key = Win32::GUI::GetKeyboardState;
+
+		if ($key->[0x10])
+		{
+			$mainWin->NumberTxt->SetFocus();
+			$mainWin->NumberTxt->SelectAll();
+		}
+		else
+		{
+			$mainWin->SendBut->SetFocus();
+		}
+
+		return 0;
+	}
+
+	return 1;
+}
+
+# LOGIN Window Events
+
+sub CancelBut_Click
+{
+	return -1;
+}
+
+sub LoginBut_Click
+{
+	$username = $loginWin->UsernameTxt->Text();
+	$password = $loginWin->PasswordTxt->Text();
+
+#	if ($username eq "" || $password eq "")
+#	{
+#		Error_MessageBox("Please enter a username and password", $loginWin);
+#		$loginWin->UsernameTxt->SetFocus();
+#		return 0;
+#	}
+
+	# select carrier
+	my $carrierSel = $loginWin->CarrierLst->GetCurSel();
+
+	if ($carrierSel == 0)
+	{
+		$carrier = new WWW::SMS::IE::o2sms;
+	}
+	elsif ($carrierSel == 1)
+	{
+		$carrier = new WWW::SMS::IE::vodasms;
+	}
+	elsif ($carrierSel == 2)
+	{
+		$carrier = new WWW::SMS::IE::meteorsms;
+	}
+	elsif ($carrierSel == 3)
+	{
+		$carrier = new WWW::SMS::IE::threesms;
+	}
+		
+	# set up carrier
+	$carrier->debug($debug);
+
+	# set up main window
+	$loginWin->Hide();
+	$mainWin->Show();
+	$mainWin->NumberTxt->SetFocus();
+	$mainWin->MessageTxt->MaxLength($carrier->max_length());
+
+	return 0;
+}
+
+sub PasswordTxt_Change
+{
+	Check_LoginWin_Enablings();
+	return 1;
+}
+
+sub UsernameTxt_Change
+{
+	Check_LoginWin_Enablings();
+	return 1;
+}
+
+# Misc methods
+
+sub Send_Message
+{
+	my $number = $mainWin->NumberTxt->Text();
+	my $message = $mainWin->MessageTxt->Text();
+
+	if (($number = $carrier->validate_number($number)) == -1)
+	{
+		Error_MessageBox($carrier->validate_number_error());
+		return 0;
+	}
+
+#	if (length($message) > $carrier->max_length())
+#	{
+#		Error_MessageBox("Message is " . length($message) . " characters.\nThe maximum length for a message is " . $carrier->max_length() . ".");
+#		return 0;
+#	}
+
+	$mainWin->NumberTxt->Disable();
+	$mainWin->MessageTxt->Disable();
+	$mainWin->CloseBut->Disable();
+	$mainWin->SendBut->Disable();
+
+	my $logged_in = $carrier->is_logged_in();
+
+	if ($logged_in)
+	{
+		$sb->Text("Reusing last login for $username\@" . $carrier->domain_name() . " ...");
+	}
+	else
+	{
+		$sb->Text("Logging in to $username\@" . $carrier->domain_name() . " ...");
+
+		if ($logged_in = $carrier->login($username, $password))
+		{
+			$sb->Text("Login successful");
+		}
+	}
+
+	if ($logged_in)
+	{
+		sleep(1);
+		$sb->Text("Sending message to $number ...");
+
+		my $retval = $carrier->send($number, $message);
+
+		if (!$retval)
+		{
+			print $carrier->error() . "\n";
+			Error_MessageBox("Message sending failed:\n\n" . $carrier->error());
+			$sb->Text("Ready");
+		}
+		else
+		{
+			$sb->Text("Message sent, " . $carrier->remaining_messages() . " remaining this month");
+		}
+	}
+	else
+	{
+		Error_MessageBox("Login failed:\n\n" . $carrier->error());
+		$sb->Text("Ready");
+	}
+
+	$mainWin->NumberTxt->Enable();
+	$mainWin->MessageTxt->Enable();
+	$mainWin->CloseBut->Enable();
+	$mainWin->SendBut->Enable();
+	$mainWin->NumberTxt->SetFocus();
+	$mainWin->NumberTxt->SelectAll();
+
+	return 0;
+}
+
+sub Check_LoginWin_Enablings
+{
+	if ($loginWin->UsernameTxt->Text() ne "" && $loginWin->PasswordTxt->Text() ne "")
+	{
+		$loginWin->LoginBut->Enable();
+	}
+	else
+	{
+		$loginWin->LoginBut->Disable();
+	}
+}
+
+sub Check_MainWin_Enablings
+{
+	if ($mainWin->NumberTxt->Text() ne "" && $mainWin->MessageTxt->Text() ne "")
+	{
+		$mainWin->SendBut->Enable();
+	}
+	else
+	{
+		$mainWin->SendBut->Disable();
+	}
+}
+
+sub Error_MessageBox
+{
+	my $form;
+
+	if (defined($_[1]))
+	{
+		$form = $_[1];
+	}
+	else
+	{
+		$form = $mainWin;
+	}
+	
+	Win32::GUI::MessageBox($form, $_[0], 'Error', MB_ICONHAND);
+}

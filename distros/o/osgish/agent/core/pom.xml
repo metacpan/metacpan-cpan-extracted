@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.jolokia.osgish</groupId>
+  <artifactId>osgish-core</artifactId>
+  <version>0.3.1</version>
+  <name>osgish-core</name>
+  <packaging>bundle</packaging>
+  <description>osgish-core - Osgish core</description>
+
+  <parent>
+    <groupId>org.jolokia.osgish</groupId>
+    <artifactId>osgish-parent</artifactId>
+    <version>0.3.1</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.jolokia</groupId>
+      <artifactId>jolokia-osgi</artifactId>
+    </dependency>
+
+    <!-- Serialization required -->
+    <dependency>
+      <groupId>com.googlecode.json-simple</groupId>
+      <artifactId>json-simple</artifactId>
+    </dependency>
+
+    <!-- Aries implementation of EEG JMX -->
+    <dependency>
+      <groupId>org.apache.aries.jmx</groupId>
+      <artifactId>org.apache.aries.jmx</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.aries</groupId>
+      <artifactId>org.apache.aries.util</artifactId>
+    </dependency>
+
+    <!-- Dependencies for file-upload -->
+    <dependency>
+      <groupId>commons-fileupload</groupId>
+      <artifactId>commons-fileupload</artifactId>
+        </dependency>
+
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
+
+    <!-- Runtime dependencies -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.4</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.ops4j.pax.web</groupId>
+      <artifactId>pax-web-jetty-bundle</artifactId>
+      <version>1.0.8</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>org.jolokia.osgish</Bundle-SymbolicName>
+            <Bundle-Description>Osgish Core</Bundle-Description>
+            <Bundle-Version>${project.version}</Bundle-Version>
+            <Bundle-Activator>org.jolokia.osgish.OsgishActivator</Bundle-Activator>
+            <Bundle-Name>Osgish Core</Bundle-Name>
+            <Embed-Directory>lib</Embed-Directory>
+            <Embed-Dependency>
+              commons-io;inline=false,
+              commons-fileupload;inline=false
+            </Embed-Dependency>
+            <Import-Package>
+              !javax.portlet,
+              javax.servlet.*;version=2.5,
+              *
+            </Import-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
+
+
+</project>

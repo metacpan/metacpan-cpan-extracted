@@ -1,0 +1,88 @@
+o2sms
+    o2sms - A perl script to send SMS messages using .ie websites.
+
+DESCRIPTION
+    "o2sms" is a script to send SMS messages via the command line using the
+    websites of Irish mobile operators. This is done by simulating a web
+    browser's interaction with those websites. This script requires a valid
+    web account with O2 Ireland, Vodafone Ireland or Meteor Ireland.
+
+    The author accepts no responsibility nor liability for your use of this
+    software. Please read the terms and conditions of the website of your
+    mobile provider before using the program.
+
+SYNOPSIS
+    o2sms [options] <number|alias|group> [<number|alias|group> ...]
+
+OPTIONS
+    -u, --username=STRING
+            Use this username (defaults to unix username)
+
+    -p, --password=STRING
+            Use this password (it omitted, will prompt for password)
+
+    -c, --config-file=FILE
+            Use this configuration file (defaults to ~/.o2sms/config)
+
+    -r, --reuse-cookies
+            Reuse cookies if possible (the default)
+
+    -s, --split-messages
+            Allow message to be split in multiple SMSs (the default)
+
+    -k, --hard-split
+            Allow message to be split in the middle of a word
+
+    -z, --squeeze-text
+            Squeezes text (e.g. mak txt msg as smal as psble)
+
+    -t9, --emulate-t9
+            Emulate t9 behaviour
+
+    -P, --http-proxy=URL
+            Use this HTTP proxy (defaults to the HTTP_PROXY environment
+            variable, if present)
+
+    --https-proxy=URL
+            Use this HTTPS proxy (defaults to the HTTP proxy or HTTPS_PROXY
+            environment variable, if present)
+
+    -s, --sig=STRING
+            Append this text to every message
+
+    -C, --carrier=NAME
+            Force the carrier to be this ("o2", "vodafone" or "meteor")
+
+    -m, --message=STRING
+            Don't wait for STDIN, send this message
+
+    --embedded
+            Embedded mode, turn off input and output
+
+    -v, --version
+            Print version and exits
+
+    -h, --help
+            Prints this help message and exits
+
+    -d, --debug
+            Debug mode (use twice for more verbose output)
+
+CONFIGURATION FILE
+    TODO
+
+SEE ALSO
+    WWW::SMS::IE::iesms, WWW::SMS::IE::o2sms, WWW::SMS::IE::vodasms,
+    WWW::SMS::IE::meteorsms, WWW::SMS::IE::threesms
+
+    <http://www.mackers.com/projects/o2sms>
+
+AUTHOR
+    David McNamara (me.at.mackers.dot.com) et al
+
+COPYRIGHT
+    Copyright 2000-2006 David McNamara
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

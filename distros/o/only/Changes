@@ -1,0 +1,75 @@
+# Revision history for Perl extension only.
+
+---
+version: 0.28
+date:    Mon Apr 25 08:09:01 PDT 2005
+cahnges:
+  - missing Makefile.PL due to SKIP error
+---
+version: 0.27
+date:    Tue Mar 15 08:52:11 PST 2005
+cahnges:
+  - Damian's patch for x.x.x versions
+  - Alias told me to dump $DEBUG::single
+---
+version: 0.26
+date:    Sun Mar  2 21:22:26 PST 2003
+cahnges:
+  - Switched from CPAN::MakeMaker to Module::Install
+---
+version: 0.26
+date:    Thu Feb 27 01:10:45 PST 2003
+changes:
+  - Changed versions of CPAN/MakeMaker to 0.11 because of the insidious
+    CPAN.pm related bug.
+---
+version: 0.25
+date:    Mon Feb 24 00:31:46 PST 2003
+changes:
+  - Added a public object oriented interface
+  - Refactored the internals to use the same interface.
+  - Much cleaner :)
+---
+version: 0.21
+date:    Sat Feb 22 14:46:08 PST 2003
+changes:
+  - Refactored the term "package" out of code. I was using it to mean
+    distribution, but that clashes with Perl terminology.
+---
+version: 0.20
+date:    Sat Feb 22 11:31:16 PST 2003
+changes:
+  - Now works on mswin32 (and cygwin)
+  - Changed metadata schema. Not compatible with 0.10.
+---
+version: 0.11
+date:    Fri Feb 21 13:36:11 PST 2003
+changes:
+  - Added a faux path to @INC when module can't be found, for purposes of the
+    @INC dump. More understandable.
+  - Test for error message
+---
+version: 0.11
+date:    Fri Feb 21 09:24:09 PST 2003
+changes:
+  - Tests for Module::Build
+  - Test for alternate installation versionlib
+  - Test for alternate installation version
+---
+version: 0.11
+date:    Fri Feb 21 08:34:02 PST 2003
+changes:
+  - Refactored the test suite. Generate the modules now. More Flexible.
+---
+version: 0.11
+date:    Thu Feb 20 01:01:07 PST 2003
+changes:
+  - Split only.pm into only and only::install
+  - Fixed Makefile.PL bug
+  - Condensed versionarch to be relative from versionlib
+---
+version: 0.10
+date:    Thu Feb  6 14:34:39 PST 2003
+changes:
+  - original version; created by h2xs 1.22 with options
+    -b 5.5.3 -PAXn only

@@ -1,0 +1,12 @@
+Makefile.PL
+README
+MANIFEST
+Changes
+lib/optimize.pm
+lib/optimize/int.pm
+lib/optimize/tie.pm
+t/02-register.t
+t/10-int.t
+t/11-integer.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

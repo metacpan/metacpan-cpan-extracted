@@ -1,0 +1,40 @@
+Revision history for Perl extension opts
+
+0.07 2014-02-21T10:42:14Z
+        - fix pod (thanks neilbowers)
+
+0.06 2013-08-12T10:28:14Z
+        - this module is deprecated
+
+0.05    Thu Feb 24 11:49:27 2011
+        - show usage when no comment
+        - fixed pod
+
+0.042   Wed Oct 20 14:15:18 2010
+        - remove debug code too
+
+0.041   Tue Oct 19 15:03:32 2010
+        - remove debug code
+
+0.04    Sat Oct 16 13:44:00 2010
+        - support show usage (use --help)
+
+0.03    Mon Sep 13 01:16:00 2010
+        - add useful function (Chris Weyl)
+         - coderef as default support
+         - undercore to dash for var name
+         - add "Multiple" subtype
+         - use Carp
+
+0.022   Mon Nov 16 11:24:51 2009
+        - remove Moose/Mouse dependencies
+
+0.021   Wed Nov 11 15:48:41 2009
+        - fixed Makefile.PL
+
+0.02    Wed Nov 11 15:21:49 2009
+        - support alias
+        - support coerce
+
+0.01    Thu Oct 22 00:28:22 2009
+        - original version

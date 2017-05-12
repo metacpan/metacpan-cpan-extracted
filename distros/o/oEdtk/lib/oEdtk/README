@@ -1,0 +1,222 @@
+	***************************************************************************
+	***************************************************************************
+						oEdtk v 0.6123			17/12/2011  
+	***************************************************************************
+	***************************************************************************
+		
+	oEdtk IS A PROJECT FOR PRINTING PROCESSING specialized namespace for 
+	enhancement of data tracking and knowledge for industrial printing 
+	processing.
+
+	oEdtk is a group of methods that allow the user to quickly 
+	develop application for parsing data stream. Those methods allow
+	the user to prepare the data so that printing application build 
+	documents with these data.
+	
+	This module is a toolkit for developping parsing application
+	dedicated to DSC Compuset or Excel and Latex. 
+	You would create application by loading stream documentation (such as
+	Cobol CopyBooks). Developpers will customize their application. 
+	Then the core (basics functions) of this module is used by the 
+	applications to product documents such as mailings, invoices, banking 
+	statement, etc. 
+	
+	In the future, we would like to add a user interface.
+	You can contact us at 
+		edtk at free.fr
+	reference site is cpan.org
+	
+	
+	INSTALLATION
+	***************************************************************************
+	With ActivPerl distribution, you can use PPM to install oEdtk module.
+	With all perl distributions you can use CPAN to install oEdtk module.
+	At least, you can download the last release from http://www.cpan.org/
+	
+	BEFORE installation, you have to setup XML-LibXML :
+	- windows : you have to setup XML-LibXML with PPM
+				you should also install dmake utils with PPM
+	- Linux   : you have to setup XML-LibXML with your distribution's  
+				package installer (or apt-get install)
+	
+	Command line for manual installation :
+	perl Makefile.PL
+	make                # use 'dmake' on Win32 (install it with cpan or ppm)
+	make test
+	make install
+	make clean
+
+	
+	CONTENT OF THIS ARCHIVE
+	***************************************************************************
+	/lib/oEdtk.pm					main module dedicated for documentation
+	/lib/oEdtk/libEdtkC7.pm			methods for DSC Compuset integration
+	/lib/oEdtk/libEdtkDev.pm			general methods for developpements only
+	/lib/oEdtk/prodEdtk.pm			main methods used for production
+	/lib/oEdtk/prodEdtkXls.pm		methods used for excel docs production
+	/lib/oEdtk/trackEdtk.pm			module planned for production statistics
+	/lib/oEdtk/tuiEdtk.pm			text user interface for libEdtkDev
+	/lib/oEdtk/iniEdtk/tplate.edtk.ini	main configuration file template
+	/lib/oEdtk/logger.pm			module for logging (could be replaced by Log4perl)
+	/lib/oEdtk/dataEdtk.pm			Tests - copy group analysis for generator
+	/lib/oEdtk/README				this file
+	/lib/oEdtk/COPYING				GNU GENERAL PUBLIC LICENSE
+
+	/t/test.t						test plan for installation
+	/t/test_fixe_oEdtk.pl			simple test application for installation
+	/t/cp_fr_fixe.dat				test file for simple Excel test
+	/t/cp_fr.dat					test file for simple Excel test 2 (planned)
+
+	Makefile.PL					Makefile for installation
+	MANIFEST						Manifest for installation
+	MANIFEST.SKIP					Skip files
+	README						extract of this file
+
+
+	DEPENDENCIES
+	***************************************************************************
+
+	Config::IniFiles		(for develoments and tracking)
+	DBI					(for database : settings, Outputmanagement, tracking...)
+	List::MoreUtils
+	List::Util
+	Sys::Hostname
+
+	Term::ReadKey			(for developments only - used for tuiEdtk)
+
+	Spreadsheet::WriteExcel	(for excel document only)
+	OLE::Storage_Lite		(for Spreadsheet::WriteExcel only)
+	Parse::RecDescent		(for Spreadsheet::WriteExcel only)
+
+	Archive::Zip			(for Output management packaging)
+	charnames
+	Cwd
+	Date::Calc
+	Digest::MD5
+	File::Basename
+	File::Copy
+	File::Path
+	Net::FTP
+	Text::CSV
+	
+	Email::Sender::Simple
+	Email::Sender::Transport::SMTP
+	Encode
+	
+	Math::Round
+	overload
+	Scalar::Util
+
+	XML::LibXML			(for XML data inputs)
+	XML::XPath
+	XML::Writer
+
+	
+	TODO
+	***************************************************************************
+		- documentation
+		- integrer les polices dans les flux PDF plutot que les vectoriser.
+		- Optimiser les flux continues (omgr).
+		- Aplatir les PDF pour que ce ne soit pas un assemblage de cadre (omgr).
+		- move_table : s'assurer que la table n'est pas vide avant de la bouger
+		- gestion épurement glissant des bases
+		- chargement de la configuration, revenir au chargement multi-sections (attention passage appname)
+		- configuration en contexte ciblé (livraisons, chargement paramètres, tests) sans modification edtk.ini
+		- omgr_stats / index_Statistics impact passage idlot sur 7 ok, mais màj id sur \d{6}
+		- contrôler utilisation des alias plutôt que les noms de tables (index/tracking)
+		- normalisation des principales clefs tracking/paramétrage (automat)
+		- reprise prévisu en fin de runEdtk.pl => bug gestion compteur de fichiers xls non pris en compte
+		- AC016 : éditions avec duplicata, utiliser ED_POSTCOMP pour sélectionner le tex de postcomposition
+		- acqCheck lier l'envoi du mail à index_Run_lot
+		- clean up process assemblage des pages in ged (exit pdfmaker)
+		- dans tracking ajouter une colonne message
+		- dans tracking ajouter une k5 sur tous les enviro de façon à suivre le type d'index
+		- DIE : bien remonter toutes les erreurs dans le plan d'éxécution (les échecs d'insertion dans lotissement doivent tout bloquer !!!)
+		- ED_IDMANUFACT : vérifier bonne prise en compte de ED_IDMANUFACT
+		- EDTK_MAIL_TO : ajouter gestion mail façonnier
+		- EDTK_MAIL_TO : devrait être défini au niveau des filières, ou du façonnier (manufacturer)
+		- EDTK_MAIL_TO : scinder mail prod façonnier par mail façonnier
+		- envoi des statistiques mensuelles lors index_Purge
+		- externaliser table des caractères à cleaner (char_dico.ini) => clean addr
+		- gestion des entêtes d'enregistrement (Descriptors) mettre en place une valeur par défaut dans edtk.ini sinon définir dans le Descriptor pos_key, length_key, offset_record
+		- gestion des paragraphes
+		- index_Block : RESET doit réinitialiser la filière à la filière de base du lot
+		- interfaçage graphique Descriptors / Maquettage
+		- liste des pré imprimés incomplètes sur PG de garde
+		- normalisation des noms de colonnes tracking / index
+		- normaliser colonnes SGBD (tracking)
+		- opération de remove / ANO de lot ou de seqlot (ràf trace dans tracking)
+		- pagination / foliotage à remettre dans le lotissement
+		- params_export ko à debugger
+		- perl packaging des dist => 0.6 11 n
+		- quand un lot n'est pas encore loti, il faut pouvoir identifier les lots en attente de lotissement (purges éventuelles, cf script de stats/Purge)
+		- reprise procédure livraison sur dév
+		- revoir le mode Excel sur exemple mode Tex
+		- sysdate : prévoir la version psg 
+
+
+	HISTORY
+	***************************************************************************
+	version 0.612x
+		contrôle d'exécution sur cgi
+		dictionnaire iso des codes pays
+		controle retour d'acquittement au façonnier pour vérification
+		foliotage technique dans le lotissement 	
+
+	version 0.6115
+		SGBD connexion retry (3 times)
+		correcting bug in FIFO configuration	
+	
+	version 0.6000
+		ajout ed_host dans check ini
+		ALTER table edtk_index modify ED_SEQLOT VARCHAR2(7); => modifier les seqlot pour rajouter l'année '391123' => '1391123'
+		intégrer les contraintes de lotissement (ed_cpdest => ed_constraint (ex de val : "ED_CODRUPT = 'NOUVEL_ER'" ou "ED_CPDEST like '75%' and ED_CODRUPT = 'NOUVEL_ER'" ou "ED_HOST ='SRVPROD'" ))
+		nettoyer Main.pm => oEUser.pm
+		passer CodRupt sur 8 caractères 
+		regrouper les .tar dans le même repertoire de mep
+		reprise prévisu en fin de runEdtk.pl
+		gestion des arrondis oEdtk::Main::oe_round		
+
+	version 0.5000
+		LaTeX integration
+		Output management integration
+		Electronic Documents Management and Sharing integration
+	
+	version 0.400
+		File configuration for developpements
+		Developpement application launcher
+		Integration of DSC Compuset launcher
+		Beta text user interface for developpements
+		Records methods for production
+		Excel file spliting
+		tracking module
+		Documentation
+	
+	version 0.30
+		Optimized for production version.
+
+	version 0.21
+		Production test version.
+
+	version 0.10
+		Functionnal version.
+
+	version 0.01
+		Original beta version.
+	
+	
+	COPYRIGHT AND LICENCE
+	***************************************************************************
+	These modules are under GNU GENERAL PUBLIC LICENSE (see COPYING file)
+	 Everyone is permitted to copy and distribute verbatim copies
+	 of this license document, but changing it is not allowed.
+	You can use these modules as you want without any warranty.
+
+	You can contact us at edtk at free.fr 	
+	reference site is cpan.org
+
+
+	AUTHORS
+	***************************************************************************
+	D Aunay, G Chaillou Domingo, M Henrion, G Ballin 2005-2013
+	  		

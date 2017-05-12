@@ -1,0 +1,6 @@
+Revision history for Perl extension openStatisticalServices.
+
+0.01  Thu May 15 17:20:50 2008
+	- original version; created by h2xs 1.23 with options
+		-AXc -n openStatisticalServices
+

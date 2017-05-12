@@ -1,0 +1,11 @@
+# Edit the <Directory> wrapper with the name of the directory where
+# OnSearch is installed.  This should be a subdirectory of DocumentRoot
+# in httpd.conf and OnSearchDir in onsearch.cfg.
+# For example, /usr/local/apache/htdocs/onsearch.
+
+<Directory /onsearch-directory>
+    Options ExecCGI Includes
+    AddHandler cgi-script .cgi
+    AddType text/html .shtml
+    AddHandler server-parsed .shtml
+</Directory>

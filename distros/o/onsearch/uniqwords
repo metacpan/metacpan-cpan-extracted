@@ -1,0 +1,40 @@
+#!/usr/bin/perl -w
+# $Id: uniqwords,v 1.1.1.1 2005/07/03 06:02:18 kiesling Exp $
+use Fcntl;
+
+if ($#ARGV < 0) {
+    print STDERR "usage: uniqwords <file>\n";
+    exit 1;
+}
+
+my ($c, $word, $inword, @words);
+
+sysopen (FILE, "$ARGV[0]", O_RDONLY) or die "$ARGV[0]: $!\n";
+
+$inword = 0; $word = '';
+while (sysread FILE, $c, 1) {
+    if (($c =~ /\w/) && (! $inword)) {
+	$inword = 1;
+	$word = $c;
+    } elsif ($inword && ($c =~ /\w/)) {
+	$word .= $c;
+    } elsif ($c !~ /\w/) {
+	if ($inword && (length ($word) > 1)) {
+	    add_word ($word);
+	}
+	$word = '';
+	$inword = 0;
+    }
+}
+
+close FILE;
+
+sub add_word {
+    my $w = $_[0];
+    foreach my $i (@words) {
+	return if $i eq $w 
+    }
+    push @words, ($w);
+}
+
+foreach (@words) { print "$_\n"; }

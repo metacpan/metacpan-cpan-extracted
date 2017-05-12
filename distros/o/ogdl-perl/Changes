@@ -1,0 +1,46 @@
+20040515 \
+  Graph.pm: added function isempty and printnodes.
+20040326 \
+  Parser.pm: dirToGraph function which turns a directory tree into and OGDL::Graph object
+  pgpath: if the ogdl file given is actually a directory, it parses the directory instead as an ogdl graph.
+20040315 \
+  Graph.pm: the Graph object now has a parent link. Try to implement a double linked list structure such as used in libXML, 
+    and finall gave up as I find it so difficult. (In C is so easy ::sigh)
+  Graph.pm: new functions: splitPath, glist, gremove, gadd, unlink (unlinks the node from its parent)
+  Graph.pm: print function now only prints with -r. To print without -r, just print from its subnode(s).
+  pgpath: Now only uses the get function which only return a single node.
+  pglist: new program. print nodes that matches a path like construction
+  pgadd: new program. Creates new nodes according a path like construction
+  pgremove: new program. Removes existing nodes that matches a path like construction
+
+20040301 \
+  Parser.pm: Dropped ';', changed ',' to have higher precedence than ' '; Stripping trailing spaces for a input lines (is that OK?). 
+	     Comment start with '# '. 
+  Parser.pm: Currently always treats parentheses and ',' as special thus dropping spaces around them is OK and need quote to include them in the node string.
+  Graph.pm: OGDL::Graph->print support option to print nodes in single line
+  Graph.pm: OGDL::Graph->grep method. It is similar to get, but supports wildcards (regex) and returns fulnodes.
+  pgpath: Added options -g n and -p n. -g n will print nodes below level n in one line; -p n will print parent nodes up to n level
+
+20040224 \
+  Wrapped it into a module installation package. It consists of two modules OGDL::Parser and OGDL::Graph. `make install' will also install pgpath (Hui)
+  A few bug fixes to get rid of all(I hope/wish)  warning messages. (Hui)
+  
+20040219 \
+  Ogdl.pm: modified sub new(), filetoGraph(), stringtoGraph(), added sub read(), append(). (Hui)
+  Graph.pm: modified sub print(), _print(), and _print_str(). 
+  pgpath: added option -d, -n, -c. Now it has the same behaviour as gpath (hopefully). (Hui)
+20040217 \
+  Ogdl.pm: bugfix -- in _block, change _eos() to _eos($p). Why this bug only shows up on some files? (Hui)
+  pgpath: a perl implementation that is functionally equivalent to gpath. If path is missing, pgpath will print the whold tree.(Hui)
+  Ogdl.pm: the top node will named after the file name or "string" for string(Hui)
+  Ogdl.pm: fileToGraph() return undef if the parse failed.(Hui)
+  Ogdl.pm: bash style comment (#) will be stripped and \t will be expanded to 8 spaces before entering the parser(Hui)
+  Ogdl.pm: On reading a quoted block, the backslash '\"' will be stripped(Hui)
+  Ogdl.pm: On reading a \ block, the trailing newline will be stripped, which behaves more likely when it is in double quote form.(Hui)
+  Ogdl.pm: On reading a quoted block, the indentation are stripped per discussion in the mailinglist(Hui)
+  Graph.pm: Now the print and printRoot will print blocks in '\' form only when it is the single leaf node.  Otherwise, all node with space or newline will be printed in double quote form, in which, the char '"' will be quoted as \". (Hui)
+  Graph.pm: addGraph() will return the new node(Hui)
+  
+20040210 \
+  Ogdl.pm: 96: s/break/last (Hui Zhou).
+  Graph.pm: added Graph->printRoot()

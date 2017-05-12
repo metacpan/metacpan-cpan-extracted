@@ -1,0 +1,12 @@
+
+****
+
+optimize framework, read POD
+
+* Requires
+
+optimizer 0.02
+B::Generate 1.03
+Hook::Scope 0.02
+
+

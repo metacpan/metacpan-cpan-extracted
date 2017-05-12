@@ -1,0 +1,49 @@
+---
+abstract: unknown
+author:
+  - 'oEdtk group <oedtk@free.fr>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.112621'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: oEdtk
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Archive::Zip: 0
+  Config::IniFiles: 2.30
+  Cwd: 0
+  DBI: 1.60
+  Data::Dumper: 0
+  Date::Calc: 0
+  Digest::MD5: 0
+  Email::Sender::Simple: 0
+  Email::Sender::Transport::SMTP: 0
+  Encode: 0
+  File::Basename: 0
+  File::Copy: 0
+  File::Path: 0
+  List::MoreUtils: 0
+  List::Util: 0
+  Math::Round: 0.06
+  Net::FTP: 0
+  Roman: 0
+  Scalar::Util: 0
+  Spreadsheet::WriteExcel: 1.00
+  Sys::Hostname: 0
+  Term::ReadKey: 0
+  Text::CSV: 1.20
+  XML::LibXML: 1.70
+  XML::Writer: 0
+  XML::XPath: 1.13
+  charnames: 0
+  overload: 0
+version: 0.8052

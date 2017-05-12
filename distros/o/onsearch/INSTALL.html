@@ -1,0 +1,844 @@
+<h2>OnSearch Installation</h2>
+
+<a name="contents">
+<h3>Contents</h3>
+<ol>
+<li><a href="#introduction">Introduction</a>
+<li><a href="#systemconfig">System Requirements</a>
+<li><a href="#autoinstall">Automatic Installation</a>
+<li><a href="#manualinstall">Manual Installation</a>
+<li><a href="#appendices">Appendices</a>
+<ol type="A">
+<li><a href="#perl">Perl Configuration</a>
+<li><a href="#apacheinstall">Apache Installation</a>
+<ol type="i">
+<li><a href="#apache13install">Apache 1.3</a>
+<li><a href="#apache2install">Apache 2.0</a>
+</ol>
+<li><a href="#apacheconfig">Configuring Apache</a>
+<ol type="i">
+<li><a href="#apache13config">Apache 1.3</a>
+<ol type="a">
+<li><a href="#loadmodules">Load Modules</a>
+<li><a href="#enablehandlers">Enable Handlers</a>
+<li><a href="#addpermissions">Add Permissions</a>
+<li><a href="#createpasswdfile">Create Password and Group Files</a>
+<li><a href="#restartserver">Restart the Server</a>
+</ol>
+<li><a href="#apache20config">Apache 2.0</a>
+</ol>
+<li><a href="#acknowledgements">Acknowledgements</a>
+</ol>
+</ol>
+<a name="introduction">
+<h3>Introduction</h3>
+This document describes how to install OnSearch.  If the
+system already has the features needed by OnSearch
+(described in, "<a href="#systemconfig">System
+Requirements</a>,") 
+then you should be able to install OnSearch by entering 
+the following commands.
+
+<blockquote><pre>
+  $ su            # Log in as the system administrator.
+  Password:
+  # perl install  # Follow the prompts.
+</pre></blockquote>
+
+The <tt>install</tt> script tells you if the World Wide Web server
+is missing a feature, that OnSearch needs.  The section,
+"<a href="#apacheconfig">Configuring Apache</a>," describes
+the changes to <tt>httpd.conf</tt> that OnSearch needs.
+<p>
+The section, "<a
+href="#autoinstall">Automatic Installation</a>," describes
+each step of the automatic installation process in detail.
+
+<a name="systemconfig">
+<h3>System Requirements</h3>
+<ol>
+<li>You must be able to log in as the superuser ("root") or
+      set permissions using Web server's user ID.
+<p>
+<li>The file systems where OnSearch is installed 
+      (/usr/local and the Apache
+      <tt>DocumentRoot</tt> directory) need to be writable;
+      e.g. they are not mounted read-only locally or via a 
+      network.  If the system does not have a /usr/local file 
+      system, the installation process will create one.
+<p>
+<li>The system must have sufficient disk space for the
+indexes.  They can add significantly to a Web site's storage.
+<p>
+<li>An Apache Web server, version 1.3 or later.
+      If you don't have Apache, you can find it at 
+      <a href="http://www.apache.org/">http://www.apache.org</a>.
+<p>
+      The Web server must have:
+      <ol type="a">
+       <li>Handlers to Run Common Gateway Interface scripts outside 
+      <tt>ScriptAlias</tt> directories.</dd>
+      <li>Handlers to execute CGI scripts using Server Side
+      Include <tt>shtml</tt> files.</dd>
+      <li>The ability to write to the document directories.  
+      <li>Unique user and group IDs for the Web
+      server in order to index from within OnSearch.
+      </ol>
+<p>
+The section, <a href="apacheconfig">Apache
+Configuration</a>, describes how to add these features.
+<p>
+If these requirements present security problems, you can limit 
+<strong>OnSearch</strong> to only a portion of the Web
+site, or create a symlink to OnSearch's directories.  The
+Apache document <tt>manual/misc/security_tips.xml</tt>
+discusses these issues.
+<li>Perl, version 5.6.1 or later.  OnSearch can work
+      with earlier versions, but its HTML filtering relies on
+      the Unicode support of later versions.  See 
+      <a href="#perl">Perl Configuration.</a>
+      <p>
+      If you need to install or upgrade Perl, you can
+      find it at: 
+      <a href="http://www.perl.org">http://www.perl.org/.</a>
+      <p>
+      The Perl interpreter, or a symlink to the interpreter,
+      must be <tt>/usr/bin/perl.</tt>
+      <p>
+      <strong>Note:</strong> OnSearch does not yet use the 
+      Perl I/O abstraction layer.  One symptom of I/O layer
+      incompatibility is excessive memory usage.  
+      To determine if Perl was built with the abstraction
+      layer, and how to cope with it, see 
+      <a href="#perl">Perl Configuration.</a>
+<p>
+<li>A C compiler.  The C part of OnSearch was built 
+      with the GNU C compiler, GCC 2.95.  Other ANSI C compilers should
+      also be able to build the binary programs with minimal effort.
+      The GCC Web site is <a
+      href="http://www.gnu.org">http://www.gnu.org</a>, 
+      but most operating systems offer GCC as an optional
+      free software package.
+<p>
+<li>Web browser(s) that can handle cookies and CSS 2 style
+    sheets; e.g., Mozilla and Netscape, versions 5 and later, and recent
+    versions of Internet Explorer.  Although OnSearch
+    is compatible with earlier browsers and text mode
+    programs like <tt>lynx</tt>, the pages are much more readable
+    when viewed with recent browsers.  
+<p>
+<li>To index and search documents other than text files,
+      OnSearch's plugins rely on helper applications.  The Postscript
+      plugin uses GNU Ghostscript to translate Postscript to text. 
+      The PDF plugin uses the <tt>pdftotext</tt> utility.  The gzip plugin
+      requires the <tt>gzip</tt> utility.  You can find ghostscript at 
+      <a href="http://mirror.cs.wisc.edu/pub/mirrors/ghost">
+      http://mirror.cs.wisc.edu/pub/mirrors/ghost</a>.  Pdftotext is part 
+      of the xpdf distribution which is downloadable from 
+      <a href="http://www.foolabs.com/xpdf">http://www.foolabs.com/xpdf</a>.
+      The main gzip site is <a href="http://www.gnu.org">
+      http://www.gnu.org</a>.  Many operating systems also provide 
+      ghostscript, xpdf, and gzip packages.  
+</ol>
+
+<a name="autoinstall">
+<h3>Automatic Installation</h3>
+
+If for some reason the automatic installation doesn't work,
+refer to "<a href="#manualinstall">Manual Installation</a>."
+<p>
+The examples here show an Apache server installed
+as described in, <a href="#apacheinstall">Apache Installation</a>, and,
+<a href="#apacheconfig">Configuring Apache</a>.  The host name,
+directories, and user and group names may be different.
+
+<ol>
+<li>Log in as the superuser and start the <tt>install</tt> script.
+<blockquote><pre>
+$ su
+Password:
+# perl install
+</pre></blockquote>
+<li>The <tt>install</tt> script will search for the Web
+server and its configuration If the system has more than one Web
+server the install script will ask which to use.  This step
+can take several minutes.
+
+<blockquote><pre>
+OnSearch installation.  If this program can't determine the site
+configuration, read INSTALL.html.
+
+NOTE: If you've already installed OnSearch, make a backup copy.
+Press [Ctrl-C] to exit now if necessary.
+
+The Web server is /usr/local/apache2/bin/httpd.  Is this correct (y/n)?
+y
+The Web server's configuration file is /usr/local/apache2/conf/httpd.conf.  
+Is this correct (y/n)?
+y
+Configuring for /usr/local/apache2/bin/httpd and /usr/local/apache2/conf/httpd.conf.
+</pre></blockquote>
+
+<li>The install script finds the settings it needs from the 
+      Web server's configuration.
+      If you're not certain that the settings are correct, 
+      determine that the settings in <tt>httpd.conf</tt> are
+      also correct.
+      <p>
+      <strong>Note:</strong> The install script will also
+      warn you if the Web server is not configured to handle
+      CGI scripts and Server Side Includes.  You must
+      make the necessary changes to <tt>httpd.conf</tt>
+      before using OnSearch.
+
+<blockquote><pre>
+The following values were found:
+The Web site's name is owl.local.net.
+The Web site's document directory is /usr/local/apache2/htdocs.
+The Web server's version is 2.0.54.
+The Web server's directory is /usr/local/apache2.
+The Web server's process owner is apache. 
+The Web server's port is 8090.
+</pre></blockquote>
+
+<li>The install script then verifies the directory where it
+should install OnSearch.  Refer to <a
+href="#manualinstall">Manual Installation</a> if you want to
+install OnSearch elsewhere.
+
+<blockquote><pre>
+I'm going to install OnSearch in /usr/local/apache2/htdocs/onsearch.  Is this okay (y/n)?
+y
+</pre></blockquote>
+
+<li>The install script installs the OnSearch program,
+documentation, and libraries, and verifies the location of
+the top-level document directory.
+
+<blockquote><pre>
+OnSearch will use /usr/local/apache2/htdocs as its top-level document directory.  
+Is this okay (y/n)?
+y
+</pre></blockquote>
+
+
+<li>The install script then checks for Perl and the GNU C Compiler.
+      They must be present or the script will not continue.
+
+<li>The installation script then creates the necessary directories, 
+      configures and builds the program files, and sets the
+      application's file and directory permissions.
+<blockquote><pre>
+Creating directories.
+Copying files.
+Building indexing daemon.
+Setting permissions.
+</blockquote></pre>
+
+<li>Then the install script asks if you want add directory
+wrappers for the OnSearch directories.  They are necessary
+to set the correct permissions for OnSearch and enable
+passwords for the, <strong>"Admin,"</strong> page.
+<p>
+<stron>Note:</strong> The installation's administrator user
+name is, "onsearch,"  password, "onsearch."  You should
+change them to your own user name and password by editing 
+<tt>/usr/local/etc/onpasswd</tt> and
+<tt>/usr/local/etc/ongroup.</tt>  Refer to the manual page
+for Apache's <tt>htpasswd</tt> program for instructions to
+set the password.
+
+<blockquote><pre>
+I'm going to add OnSearch's configuration to /usr/local/apache2/conf/httpd.conf.
+I'll copy the original httpd.conf file to httpd.conf.onsearch-save.
+
+You can skip this step, and then configure the Web server
+manually, using the template in doc/conf.tmpl.
+Should I continue (y/n)?
+y
+
+I'm going to add password authentication information to your Web
+server configuration and then try to restart the server.
+
+With authentication enabled, users must enter a user name and password
+to perform administrative tasks.  For passwords to work the Web server
+must include mod_auth in its configuration.
+
+During the process, the installation will copy your old 
+/usr/local/apache2/conf/httpd.conf to /usr/local/apache2/conf/httpd.conf.onsearch-save, 
+so you can restore your previous configuration if necessary.
+
+You can skip this step, but then you will not have password protection
+for administrative tasks.
+
+Should I continue (y/n)?
+y
+</pre></blockquote>
+
+<blockquote><pre>
+
+.
+.
+.
+
+Done. If the installation was correct, you should be able to browse to
+
+http://owl.local.net:8090/onsearch/index.shtml
+
+The OnSearch User Guide, 
+
+http://owl.local.net/onsearch/doc/userguide.html
+
+describes how to index files and start using OnSearch.
+
+</pre></blockquote>
+
+<li>You should now be able to browse the URL given by the 
+      install script (which uses your Web server's name instead
+      of the server given in the example above).  If the Web 
+      server's configuration is correct, you should see OnSearch's
+      main Web page.  If you encounter an error, refer to 
+      <a href="#manualinstall">Manual Installation</a> and 
+      <a href="apacheconfig">Configuring Apache</a>.
+</ol>
+<p>
+Refer to the </i>OnSearch User Guide,</i> which you can open
+from the, <b>"About,"</b> page for instructions on how to 
+configure OnSearch and index documents.
+
+<a name="manualinstall">
+<h3>Manual Installation</h3>
+<ol>
+<li>Find the settings of the following variables in the Apache
+   <tt>httpd.conf</tt> file.
+<blockquote><pre>
+ServerName
+DocumentRoot
+User
+</pre></blockquote>
+
+Note: Some Web servers set the site name name using
+<tt>Listen</tt> instead of <tt>ServerName.</tt>
+<p>
+If you can't find <tt>http.conf</tt>, try this command.
+
+<blockquote><pre>
+# find / -name "httpd.conf"
+</pre></blockquote>
+
+If <tt>find</tt> can't locate the file, then check the Apache 
+installation before continuing.
+
+To find the settings mentioned above, either view the file
+with a text editor or <tt>more</tt>, or use a shell command
+something like this.
+
+<blockquote><pre>
+# egrep '^(ServerName|DocumentRoot|User|Listen}' /path/of/httpd.conf
+</pre></blockquote>
+
+Substitute the actual path of <tt>httpd.conf</tt> in the example.
+
+<p>
+<li>Decide where you want to install
+<strong>OnSearch</strong>.  OnSearch's working
+   directory should be a subdirectory of <tt>DocumentRoot</tt>, and the
+   name of the subdirectory is the value of
+   <tt>OnSearchDir</tt> in <tt>onsearch.cfg</tt>, normally <tt>onsearch</tt>.  The
+   complete path to the OnSearch directory
+   is <tt><i>(DocumentRoot)</i>/onsearch</tt>.
+
+<blockquote>
+For example, if <tt>DocumentRoot</tt> is 
+<tt>/usr/local/apache/htdocs</tt>, then OnSearch's working
+directory will be
+<tt>/usr/local/apache/htdocs/onsearch</tt>.  The 
+following instructions use this example.
+</blockquote>
+
+If you want to install <strong>OnSearch</strong> in a
+different subdirectory, open <tt>onsearch.cfg</tt> in a text
+editor and edit the value of <tt>OnSearchDir</tt> with the
+name of the subdirectory.
+<p>
+<li>Using a text editor, edit <tt>onsearch.cfg's</tt>
+values for <tt>SearchRoot</tt>, <tt>ServerName</tt>, and
+<tt>User</tt> with the values you found in step 1.
+<p>
+<li>Edit <tt>WebLogDir</tt>, <tt>BinDir</tt>, and <tt>DataDir</tt> in
+<tt>onsearch.cfg</tt> if you need to change them from the
+default <tt>/usr/local/spool/onsearch</tt>, <tt>/usr/local/sbin</tt>, and 
+<tt>/usr/local/var/run/onsearch</tt>
+<p>
+<li>Create the OnSearch directories.
+<blockquote><pre>
+# mkdir /usr/local/htdocs/onsearch
+# mkdir /usr/local/htdocs/onsearch/admin
+# mkdir /usr/local/htdocs/onsearch/cache
+# mkdir /usr/local/htdocs/onsearch/doc
+# mkdir /usr/local/htdocs/onsearch/images
+# mkdir /usr/local/htdocs/onsearch/plugins
+# mkdir /usr/local/htdocs/onsearch/webpages
+# mkdir /usr/local/htdocs/onsearch/uploads
+# mkdir -p /usr/local/spool/onsearch
+# mkdir -p /usr/local/var/run/onsearch
+</pre></blockquote>
+<p>
+<li>Copy the Web pages and CGI scripts to OnSearch's working 
+directories.
+<blockquote><pre>
+# cp onsearch.cfg /usr/local/htdocs/onsearch
+# cp -R html/* /usr/local/htdocs/onsearch
+# cp images/* /usr/local/htdocs/onsearch/images
+# cp -R cgi/* /usr/local/htdocs/onsearch
+# cp doc/* /usr/local/htdocs/onsearch/doc
+# cp plugins/* /usr/local/htdocs/onsearch/plugins
+</pre></blockquote>
+<p>
+<li>Set the file and directory ownership and permissions.
+<blockquote><pre>
+# chown -R nobody /usr/local/htdocs/onsearch
+# chown -R nobody /usr/local/spool/onsearch
+# chown -R nobody /usr/local/var/run/onsearch
+# chmod 0755 /usr/local/htdocs/onsearch/*.cgi
+# chmod 0755 /usr/local/htdocs/onsearch/admin/adminform.cgi
+# chmod 0755 /usr/local/htdocs/onsearch/plugins/*
+# chmod 0700 /usr/local/var/run/onsearch
+</pre></blockquote>
+<p>
+<li>Build and install the Perl libraries.
+<blockquote><pre>
+# cd lib && (perl Makefile.PL LIB="/usr/local/apache/htdocs/onsearch/lib" && make install)
+# make clean
+# cd ..
+</pre></blockquote>
+<p>
+
+<li>Copy <tt>src/Makefile.tmpl</tt> to
+<tt>src/Makefile</tt>, and edit <tt>BINDIR</tt> and
+<tt>DATADIR</tt> to the <tt>BinDir</tt> and <tt>DataDir</tt>
+in <tt>onsearch.cfg.</tt>  Edit the value of
+<tt>ONSEARCHDIR</tt> to OnSearch's installation directory.
+<p>
+Also edit the values of <tt>CC</tt> and <tt>CFLAGS</tt> if
+necessary for compilers other than GCC.
+<p>
+Then build and install onindex.
+<blockquote><pre>
+# cd src && make install
+# make clean
+# cd ..
+</pre></blockquote>
+<p>
+<li>Copy <tt>doc/Makefile.tmpl</tt> to <tt>doc/Makefile</tt>
+and edit <tt>APPDIR</tt> to the directory where
+OnSearch is installed, and
+<tt>WEBLOGDIR</tt> and <tt>DATADIR</tt> with the values of 
+<tt>WebLogDir</tt> and <tt>DataDir</tt> in
+<tt>onsearch.cfg</tt>.
+<p>
+Also edit the <tt>TROFF</tt> variable if necessary.
+<p>
+Then install the man page for onindex.
+<blockquote><pre>
+# cd doc && make all
+# make clean
+# cd ..
+</pre></blockquote>
+<p>
+<li>Create the OnSearch authorization files
+<tt>onpasswd</tt> and <tt>ongroup.</tt>
+<blockquote><pre>
+# /usr/local/apache/bin/htpasswd -nb onsearch onsearch >/usr/local/etc/onpasswd
+# echo "onsearch: onsearch" >/usr/local/etc/ongroup
+</pre></blockquote>
+This creates a default administrator user name
+<i>onsearch,</i> password <i>onsearch.</i>  You can change
+the password, or add users by adding them with
+<tt>htpasswd</tt> and adding the users to <tt>ongroup.</tt>
+<p>
+Refer to the <tt>htpasswd</tt> manual page for further information.
+<p>
+<li>Edit <tt>doc/conf.tmpl</tt> with the name of OnSearch's
+working directory, and add its contents to
+<tt>httpd.conf.</tt>
+<blockquote><pre>
+&lt;Directory /usr/local/apache/htdocs/onsearch&gt;
+    Options ExecCGI Includes
+    AddHandler cgi-script .cgi
+    AddType text/html .shtml
+    AddHandler server-parsed .shtml
+&lt;/Directory&gt;
+</pre></blockquote>
+<p>
+<li>Edit <tt>doc/auth.tmpl</tt> with the name of OnSearch's
+<tt>admin</tt> subdirectory, and add its contents to <tt>httpd.conf.</tt>
+<blockquote><pre>
+&lt;Directory /usr/local/apache/htdocs/onsearch/admin&gt;
+    AuthType Basic
+    AuthName OnSearch
+    AuthUserFile /usr/local/etc/onpasswd
+    AuthGroupFile /usr/local/etc/ongroup
+    require group onsearch
+&lt;/Directory&gt;
+</ol>
+<p>
+Refer to the <i>OnSearch User Guide,</i> which you can open
+from the, <b>"About,"</b> page, for information about
+configuring OnSearch and indexing documents.
+
+<a name="appendices">
+<h3>Appendices</h3>
+
+<a name="perl">
+<h4>Perl Configuration</h4>
+
+<h5>Unicode Support</h5>
+
+OnSearch's HTML filtering relies on Unicode support which was
+first built into Perl in version 5.6.1.  If you have an
+earlier version of Perl, change the <tt>Plugin</tt> entries in
+<tt>onsearch.cfg</tt> for the <tt>text/html</tt> and
+<tt>text/xml</tt> MIME types from, <tt>plugins/html,</tt>
+to, <tt>plugins/text.</tt> You will be able to index
+HTML and XML documents, but OnSearch will not recognize 
+international characters.
+
+<h5>Perl I/O Abstraction Layer</h5>
+
+In some early releases of Perl version 5.8, OnSearch's
+background processing causes increased memory usage and
+reduced search times if Perl is configured with the I/O
+abstraction layer.  If you can not upgrade Perl, the
+following workarounds help avoid the abstraction layer
+incompatibilities.
+<p>
+To determine if Perl uses the I/O abstraction layer, use
+the following shell command.
+
+<blockquote><pre>
+# perl -V | grep 'useperlio'
+</pre></blockquote>
+
+ The value of, <tt>"useperlio,"</tt> should be,
+ <tt>"undef."</tt>
+
+If the value is, <tt>"define,"</tt> then you can get Perl to
+use normal (Unix) I/O with either of the following methods.
+
+<ul>
+<li>Set the <tt>PERLIO</tt> environment variable to use the
+I/O protocol you want.  For OnSearch, the value, <tt>":unix,"</tt>
+seems to provide the most efficiency. 
+<p>
+To do this, add the following line to <tt>httpd.conf,</tt>
+outside of any directory wrappers.
+
+<blockquote><pre>
+SetEnv PERLIO :unix
+</pre></blockquote>
+<p>
+This workaround assumes that Apache was build with
+<tt>mod_env.</tt>  You can verify this by typing at 
+the shell prompt:
+<blockquote><pre>
+# <i>/path-to-httpd</i>/httpd -l
+</pre></blockquote>
+<p>
+The <tt>perlrun(1)</tt>
+manual page describes the <tt>PERLIO</tt> options.
+
+<li>Or&mdash;as a more reliable solution&mdash;you 
+can build Perl without the I/O abstraction
+layer.  
+
+<blockquote><pre>
+sh Configure -Uuseperlio -des
+</blockquote></pre>
+
+Then build and install Perl as usual.
+
+</ul>
+
+<a name="apacheinstall">
+<h4>Apache Installation</h4>
+
+<a name="apache13install">
+<h5>Apache 1.3</h5>
+
+This section describes how to build and install Apache 1.3.19 from the
+source code distribution, from 
+<a href="http://www.apache.org/">http://www.apache.org</a>, and configure it
+to work with <strong>OnSearch</strong>.
+<p>
+Following the instructions in <tt>README.configure</tt>,
+build and install Apache with support for the
+standard modules and Dynamic Shared Object support, and
+install the server in <tt>/usr/local/apache</tt>:
+<blockquote><pre>
+# ./configure --prefix=/usr/local/apache \
+> --enable-module=most \
+> --enable-shared=max
+# make
+# make install
+</pre></blockquote>
+
+<tt>README.configure</tt> also describes many other configurations.
+To use <strong>OnSearch</strong>, you must enable at least
+<tt>mod_cgi</tt>, <tt>mod_auth</tt>, and <tt>mod_include</tt>.
+Building them should be enabled by default, but this example 
+shows how to enable them explicitly.
+
+<blockquote><pre>
+# ./configure --prefix=/usr/local/apache \
+> --enable-module=cgi \
+> --enable-module=include \
+> --enable-module=auth
+# make
+# make install
+</pre></blockquote>
+Start the Apache server:
+<blockquote><pre>
+# /usr/local/apache/bin/apachectl start
+</pre></blockquote>
+<strong>NOTE:</strong> This configuration omits many
+standard features and is recommended only if you plan 
+to use the Web server with OnSearch.
+<p>
+If Apache is working correctly, you can view the manual at the
+following URL:
+<blockquote>
+http://<i>&lt;your-host-name&gt;</i>/manual/
+</blockquote>
+
+You should then be able to view the Apache home page at the following
+URL:
+<blockquote>
+http://<i>&lt;your-host-name&gt;</i>/
+</blockquote>
+
+<a name="apache2install">
+<h5>Apache 2.0</h5>
+
+OnSearch can use the default installation of Apache versions
+2.0.<i>x</i>.  To build and install the Web server, use the
+following shell commands.
+
+<blockquote><pre>
+# ./configure
+# make
+# make install
+</pre></blockquote>
+
+Then edit the <tt>Listen</tt> and <tt>ServerName</tt> lines
+as described in <tt>httpd.conf</tt>, and start the
+server.  
+
+<blockquote><pre>
+# /usr/local/apache2/bin/apachectl start
+</pre></blockquote>
+
+Browsing to the Web server's address should display
+the Apache default home page.
+<p>
+The section, <a href="#apache20config">Apache 2.0 Configuration</a>,
+describes configuring the Web server for OnSearch.
+
+<a name="apacheconfig">
+<h4>Configuring Apache</h4>
+
+<strong>Note:</strong> In all versions of Apache, it may be
+necessary to add a unique user and group ID for the Web
+server, in order index from within OnSearch. You will also need to
+<tt>adduser</tt> and <tt>addgroup</tt> (or <tt>useradd</tt>
+and <tt>groupadd</tt>) the Web server's unique user and group.
+
+<a name="apache13config">
+<h5>Apache 1.3</h4>
+
+Configuring Apache requires several steps:
+<ol>
+<li>Determine that the Web server has loaded the necessary modules.
+<li>Enable the handlers for CGI scripts and server side
+includes.
+<li>Add the permissions that OnSearch needs.
+<li>Create the password and group files.
+<li>Restart the Server.
+</ol>
+
+<a name="loadmodules">
+<h5>Load Modules</h5>
+
+If you installed Apache with the configuration described in 
+<a href="#apacheinstall">Apache Installation</a>, you will
+need to load modules by using <tt>LoadModule</tt> statements
+in <tt>httpd.conf,</tt> as described below.
+
+However, if the Web server does not have Dynamic Shared
+Object support enabled, you can determine which modules are
+already loaded with the following shell command.
+
+<blockquote><pre>
+# /usr/local/apache/bin/httpd -l
+Compiled-in modules:
+  http_core.c
+  mod_env.c
+  mod_log_config.c
+  mod_mime.c
+  mod_negotiation.c
+  mod_status.c
+  mod_include.c
+  mod_autoindex.c
+  mod_dir.c
+  mod_cgi.c
+  mod_asis.c
+  mod_imap.c
+  mod_actions.c
+  mod_userdir.c
+  mod_alias.c
+  mod_access.c
+  mod_auth.c
+  mod_setenvif.c
+suexec: disabled; invalid wrapper /usr/local/apache/bin/suexec
+</pre></blockquote>
+
+The modules that OnSearch needs are: <tt>mod_cgi,</tt>
+<tt>mod_include,</tt> and <tt>mod_auth.</tt> If any of these
+are not compiled into the Web server, you'll need to load
+them dynamically by adding the following lines to
+<tt>httpd.conf</tt> if they are not already present.
+
+<blockquote><pre>
+LoadModule auth_module /usr/local/apache/libexec/mod_auth.so
+LoadModule cgi_module /usr/local/apache/libexec/mod_cgi.so
+LoadModule includes_module /usr/local/apache/libexec/mod_include.so
+</pre></blockquote>
+
+The file paths in the examples are those of a standard
+Apache directory layout used in <a
+href="#apacheinstall">Apache Installation</a>.  You may need
+to adjust the paths depending on the Web server's
+configuration.
+<p>
+If any of these modules are missing, consult
+<tt>INSTALL</tt> in the Apache source code archive.
+
+<a name="enablehandlers">
+<h5>Enable Handlers</h5>
+
+To enable the handlers for CGI scripts and server side
+includes, uncomment the relevant lines in
+<tt>httpd.conf.</tt>
+<p>
+Change the lines:
+<blockquote><pre>
+    #AddHandler cgi-script .cgi
+    .
+    .
+    .
+    #AddType text/html .shtml
+    #AddHandler server-parsed .shtml
+</pre></blockquote>
+So that they look like the following:
+<blockquote><pre>
+    AddHandler cgi-script .cgi
+    .
+    .
+    .
+    AddType text/html .shtml
+    AddHandler server-parsed .shtml
+</pre></blockquote>
+
+<a name="addpermissions">
+<h5>Add Permissions</h5>
+The easiest way to add permissions for OnSearch is to add the
+following sections to <tt>httpd.conf.</tt>
+<blockquote><pre>
+&lt;Directory /usr/local/apache/htdocs/onsearch&gt;
+    Options ExecCGI Includes
+    AddHandler cgi-script .cgi
+    AddType text/html .shtml
+    AddHandler server-parsed .shtml
+&lt;/Directory&gt;
+</pre></blockquote>
+This template is contained in the file
+<tt>doc/conf.tmpl.</tt> 
+You must edit the <tt>&lt;Directory ...&gt;</tt> line with
+the name of the directory where OnSearch is installed.
+<p>
+You can also add these options for the entire Web site.  The 
+comments in <tt>http.conf</tt> and the Apache manual provide
+further information.
+<p>
+The following section configures the OnSearch admin
+page to use passwords.
+<blockquote><pre>
+&lt;Directory /usr/local/apache/htdocs/onsearch/admin&gt;
+    AuthType Basic
+    AuthName OnSearch
+    AuthUserFile /usr/local/etc/onpasswd
+    AuthGroupFile /usr/local/etc/ongroup
+    require group onsearch
+&lt;/Directory&gt;
+</pre></blockquote>
+This template is contained in the file
+<tt>doc/auth.tmpl</tt>.  It must be added in this format if
+you want to use passwords with OnSearch.
+Again, you must edit the
+<tt>&lt;Directory...&gt;</tt> line with the name of the
+OnSearch <tt>admin</tt> subdirectory.
+
+<a name="createpasswdfile">
+<h5>Create <tt>onpasswd</tt> and <tt>ongroup</tt> Files</h5>
+
+This step requires the <tt>htpasswd</tt> utility, which
+should be installed with the Apache server (in
+<tt>/usr/local/apache/bin</tt> in these examples).
+<p>
+The <tt>install</tt> script creates <tt>onpasswd</tt> with
+the user name, "onsearch," password, "onsearch," but you can
+select any user name and password you like.
+
+To create the <tt>onpasswd</tt> file, use the following
+shell command.
+<blockquote><pre>
+# htpasswd -nb onsearch onsearch >/usr/local/etc/onpasswd
+</pre></blockquote>
+Create the <tt>ongroup</tt> file with the following command.
+<blockquote><pre>
+# echo 'onsearch: onsearch' > /usr/local/etc/ongroup
+</pre></blockquote>
+To change the user name or password, or add and delete
+users, consult the Apache documentation.
+
+<a name="restartserver">
+<h5>Restart the Server</h5>
+
+The final step is to restart the server.
+<blockquote><pre>
+# /usr/local/apache/bin/apachectl restart
+</pre></blockquote>
+
+<a name="apache20config">
+<h5>Apache 2.0 Configuration</h5>
+
+Install Apache as described in <a
+href="#apache2install">Apache Installation</a>, and make certain
+the Web server is operating correctly.
+<p>
+Then uncomment the following lines in <tt>httpd.conf</tt>.
+
+<blockquote><pre>
+AddHandler cgi-script .cgi
+
+AddType text/html .shtml
+AddOutputFilter INCLUDES .shtml
+</pre></blockquote>
+
+Also add <tt>doc/auth.tmpl</tt> and <tt>doc/conf.tmpl</tt>
+to </tt>httpd.conf</tt> and create the password and group
+files as described in the <a href="#apache13install">Apache
+1.3</tt> installation section.
+
+
+$Id: INSTALL.html,v 1.26 2005/08/13 22:46:40 kiesling Exp $

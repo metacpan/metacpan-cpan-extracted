@@ -1,0 +1,153 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+osgish - A OSGi Shell
+
+=cut
+
+use Getopt::Long qw(GetOptionsFromArray);
+use strict;
+use JMX::Jmx4Perl::Config;
+use Config::General;
+use OSGi::Osgish;
+use Data::Dumper;
+
+=head1 SYNOPSIS
+
+  osgish [options] <server>
+
+  osgish --help
+
+  osgish --version
+
+ Options:
+   --user <user>           Credential used for authentication   
+   --password <pwd>  
+   --proxy <url>           URL to proxy
+   --proxy-user <user>     Authentication information for a proxy
+   --proxy-password <pwd>
+   --config <cfg-file>     Path to an optional configuration file (default: ~/.osgish)
+   --color [yes|no]        Color option (default: yes)
+
+An optional argument can be used to directly connect to an agent URL or
+symbolic name as defined in the configuration file. If not given, the shell
+does no initial connect.
+
+=head1 DESCRIPTION
+
+B<Osgish> is the administrator's shell for OSGi. It's focus is on simple usage
+for common administrative tasks. There are many other shells for OSGi as well,
+most (if not all) implemented in Java. Osgish unique features are
+
+=over 4
+
+=item *
+
+Readline and history support based on GNU Readline/History as known from other
+shells like 'bash'. When GNU Readline is not available, a pure Perl Module is
+used instead.
+
+=item *
+
+Context sensitive argument completion, e.g. on bundle symbolic names. 
+
+=item * 
+
+Colored output (can be switched off)
+
+=item *
+
+Multi-Server support
+
+=item * 
+
+Remote operation via HTTP(S)
+
+=back
+
+=cut
+
+my %opts = ();
+my $result = GetOptions(\%opts,
+                        "user|u=s","password|p=s",
+                        "proxy=s",
+                        "proxy-user=s","proxy-password=s",
+                        "config=s",
+                        "version!",
+                        "color=s",
+                        "help|h!" => sub { &Getopt::Long::HelpMessage() }
+                       );
+
+my $server = shift;
+
+if ($opts{version}) {
+    print "osgish ",$OSGi::Osgish::VERSION,"\n";
+    exit(0);
+}
+
+# Parse configuration files
+my $jmx_config = new JMX::Jmx4Perl::Config(&get_config($opts{config}));
+
+# Create global context object
+my $osgish = new OSGi::Osgish(initial_server => $server, config => $jmx_config,args => \%opts);
+
+# Let the shell run
+$osgish->run;
+
+sub get_config {
+    my $file = shift || $ENV{HOME} . "/.osgish";
+    my $ret = {};
+
+    # Merge if servers from ~/.j4p
+    my $default =  {};
+    $default = { new Config::General(-ConfigFile => $ENV{HOME} . "/.j4p",-LowerCaseNames => 1)->getall } 
+      if -e $ENV{HOME} . "/.j4p";
+    if ($file && -e $file) {
+        $ret = { new Config::General(-ConfigFile => $file,-LowerCaseNames => 1,-DefaultConfig => $default)->getall };        
+    } else {
+        $ret = $default;
+    }
+#    print Dumper($ret);
+    return $ret;
+}
+
+
+=head1 LICENSE
+
+This file is part of osgish.
+
+Osgish is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+(at your option) any later version.
+
+osgish is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with osgish.  If not, see <http://www.gnu.org/licenses/>.
+
+A commercial license is available as well. Please contact roland@cpan.org for
+further details.
+
+=head1 PROFESSIONAL SERVICES
+
+Just in case you need professional support for this module (or JMX or OSGi in
+general), you might want to have a look at www.consol.com Contact
+roland.huss@consol.de for further information (or use the contact form at
+http://www.consol.com/contact/)
+
+=head1 AUTHOR
+
+roland@cpan.org
+
+=cut
+
+1;
+
+
+
+

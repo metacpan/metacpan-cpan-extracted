@@ -1,0 +1,48 @@
+#!/usr/bin/perl -w
+
+# $Id: jpeg,v 1.1.1.1 2005/07/03 06:02:18 kiesling Exp $
+
+# Write empty output file even if the JPEG doesn't contain a 
+# comment.  If the byte at offset 21 in the JPEG file is 0xfe, 
+# then the comment string begins at byte offset 24 and continues
+# until a null terminator.  Even if there's no comment, we still
+# want to create a zero-length temorary file, so that the JPEG 
+# filename is entered in the index.  
+#
+# If there are random characters following the comment, and they
+# interfere with indexing and searching, then add extra, trailing 
+# space characters in the comment.
+
+use Fcntl;
+
+if ($#ARGV != 1) {
+    print STDERR "Usage: jpeg infile outfile\n";
+    exit 1;
+}
+
+my ($fn, $tmpfn, $cmtchr, $c, $comment);
+
+$fn = $ARGV[0];
+$tmpfn = $ARGV[1];
+$c = '';
+$comment = '';
+
+sysopen (IN, $fn, O_RDONLY) or die "jpeg sysopen $fn: $!\n";
+sysseek (IN, 21, 0);
+sysread (IN, $cmtchr, 1);
+if (ord($cmtchr) == 0xfe) {
+    sysseek (IN, 2, 1);
+    while (1) {
+	sysread (IN, $c, 1);
+	last if ord($c) == 0;
+	$comment .= $c;
+    }
+}
+close IN;
+
+sysopen (OUT, $tmpfn, O_WRONLY | O_CREAT | O_TRUNC) or 
+    die "$tmpfn: $!\n";
+syswrite (OUT, $comment, length ($comment));
+close OUT;
+
+exit 0;

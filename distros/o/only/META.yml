@@ -1,0 +1,12 @@
+name: only
+version: 0.28
+abstract: Load specific module versions; Install many
+author: Brian Ingerson <ingy@cpan.org>
+license: perl
+distribution_type: module
+requires:
+  perl: 5.004
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

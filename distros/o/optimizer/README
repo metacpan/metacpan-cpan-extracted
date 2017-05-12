@@ -1,0 +1,96 @@
+NAME
+    optimizer - Write your own Perl optimizer, in Perl
+
+SYNOPSIS
+      # Use Perl's default optimizer
+      use optimizer 'C';
+
+      # Use a Perl implementation of the default optimizer
+      use optimizer 'perl';
+
+      # Use an extension of the default optimizer
+      use optimizer extend => sub {
+            warn "goto considered harmful" if $_[0]-1>name eq "goto"
+      }
+
+      # Use a simple optimizer with callbacks for each op
+      use optimizer callback => sub { .. }
+
+      # Completely implement your own optimizre
+      use optimizer mine => sub { ... }
+
+      # use the standard optimizer with an extra callback
+      # this is the most compatible optimizer version
+      use optimizer 'extend-c' => sub { print $_[0]->name() };
+
+      # don't provide a peep optimizer, rather get a callback
+      # after we are finished with every code block
+      use optimizer 'sub-detect' => sub { print $_[0]->name() };
+
+      no optimizer; # Use the simplest working optimizer
+
+DESCRIPTION
+    This module allows you to replace the default Perl optree optimizer,
+    "peep", with a Perl function of your own devising.
+
+    It requires a Perl patched with the patch supplied with the module
+    distribution; this patch allows the optimizer to be pluggable and
+    replaceable with a C function pointer. This module provides the glue
+    between the C function and a Perl subroutine. It is hoped that the patch
+    will be integrated into the Perl core at some point soon. This patch is
+    integrated as of perl 5.8.
+
+    Your optimizer subroutine will be handed a "B::OP"-derived object
+    representing the first (NOT the root) op in the program. You are
+    expected to be fluent with the "B" module to know what to do with this.
+    You can use "B::Generate" to fiddle around with the optree you are
+    given, while traversing it in execution order.
+
+    If you choose complete control over your optimizer, you must assign
+    sequence numbers to operations. This can be done via the
+    "optimizer::op_seqmax_inc" function, which supplies a new incremented
+    sequence number. Do something like this:
+
+        while ($$op) {
+            $op->seq(optimizer::op_seqmax_inc);
+
+            ... more optimizations ...
+
+            $op = $op->next;
+            last unless $op->can("next"); # Shouldn't get here
+        }
+
+    The "callback" option to this module will essentially do the above,
+    calling your given subroutine with each op.
+
+    If you just want to use this function to get a callback after every code
+    block is compiled so you can do any arbitrary work on it use the
+    "sub-detect" option, you will be passed LEAVE* ops after the standard
+    peep optimizer has been run, this minimises the risk for bugs as we use
+    the standard one. The op tree you are handed is also stable so you are
+    free to work on it. This is usefull if you are limited by "CHECK" and
+    "INIT" blocks as this works with string eval and "require" aswell. Only
+    one callback per package is allowed.
+
+STATUS
+    relocatetopad() fails with threaded perls.
+
+5.10 Changes
+    Since Perl 5.10 there are no op_seqmax and op_seq numbers in CORE
+    anymore, so we add a package global op_seqmax for the op-tree numbering,
+    for $B::OP::seq also. This is not thread-safe.
+
+AUTHOR
+      Simon Cozens, C<simon@cpan.org>
+
+    Extended functionality and current maintainer:
+
+      Arthur Bergman, C<abergman@cpan.org>
+
+    5.10 support by Reini Urban:
+
+      Reini Urban, C<rurban@cpan.org>
+
+SEE ALSO
+    B::Generate, optimize
+

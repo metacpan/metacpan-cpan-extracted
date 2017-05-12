@@ -1,0 +1,79 @@
+#!/usr/bin/perl
+use oEdtk::prodEdtk		0.42; 
+use strict;
+
+#################################################################################
+# v0.11 28/04/2009 10:36:10 du squelette d'extraction de donnees pour C7
+#################################################################################
+# METHODOLOGIE DE DEVELOPPEMENT :
+#
+# 1- préparation DET (description des enregistrements techniques)
+# 2- génération de l'application Perl (récupération des noms de balises)
+# 3- description de la cinématique des données
+# 4- report de la cinématique des données sur la maquette
+# 5- positionnement des balises de données sur la maquette
+# 6- description résumée des règles fonctionnelles (qq phrases)
+# 7- création de la maquette
+# 8- mise à jour de la structure de document dans la feuille de style (balises de structure)
+# 9- désignation des clefs de rupture
+#10- description de l'application d'extraction sous forme d'arbre algorythmique
+#11- développement et mise à jour de la feuille de style et de l'application d'extraction de données
+#12- validation - recette 
+#
+
+#################################################################################
+# CORPS PRINCIPAL DE L'APPLICATION :
+#################################################################################
+
+	# DECLARATIONS DES VARIABLES PROPRES A L'APPLICATION (use strict)
+	# our $typEnr=0;
+
+
+sub main() {
+	if ($#ARGV <1) { prodEdtkAppUsage(); }
+	# OUVERTURE DES FLUX
+	prodEdtkOpen($ARGV[0],$ARGV[1]);
+
+	# INITIALISATION ET CARTOGRAPHIE DE L'APPLICATION
+	# avec initialisation propre au document
+	&init_App();
+
+	while (my $ligne=<IN>) {
+		chomp ($ligne);
+		c7Flux($ligne); 	# si les flux ne sont pas nettoyés par l'exploitation (remplacement '<' et '>') 
+# point insertion appels trt enregistrements
+
+		} else {
+			# TYPE D'ENREGISTREMENT INCONNU
+			warn "INFO IGNORE REC. line $.\n";
+		}
+	}
+
+	prodEdtkClose($ARGV[0],$ARGV[1]);
+1;
+}
+
+
+
+#################################################################################
+# FONCTIONS SPECIFIQUES A L'APPLICATION
+#################################################################################
+
+sub init_App(){
+	# intialisation des définitions d'enregistrements
+
+	# INITIALISATION PROPRE AU DOCUMENT
+	&init_Doc();
+1;
+}
+
+sub init_Doc(){
+	# INITIALISATION DES VARIABLES PROPRES AU DOCUMENT
+
+1;
+}
+
+# point insertion trt enregistrements
+
+main;
+1;

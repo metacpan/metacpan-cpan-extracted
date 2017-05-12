@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<tg4w version="1.0.2">
+   <datasets>
+   </datasets>
+   <actions>
+       <action type="goto" refresh="." window="." step="0">
+           <xpath><![CDATA[window.location.href]]></xpath>
+           <value><![CDATA[http://webtext.three.ie/login.jsp]]></value>
+       </action>
+       <action type="click" refresh="." window="." step="1">
+           <xpath><![CDATA[*/FORM[@NAME="!!dummy"]/]]></xpath>
+           <value><![CDATA[http://webtext.three.ie/processLogin.jsp?mobile={username}&pin={password}&serviceId=19088&originCountryPrefix=353]]></value>
+       </action>
+       <action type="assert-text-exists" window="." step="2">
+           <xpath><![CDATA[*]]></xpath>
+           <value><![CDATA[send.jsp]]></value>
+       </action>
+       <action type="goto" refresh="." window="." step="3">
+           <xpath><![CDATA[*]]></xpath>
+	   <value><![CDATA[http://webtext.three.ie/processSendMessage.jsp?command=send&group=&Msg1={message}&grpSTR=&ConSTR=&msisdn={recipient}&country=353&NumMessages=]]></value>
+       </action>
+       <action type="assert-text-exists" window="." step="4">
+           <xpath><![CDATA[*]]></xpath>
+           <value><![CDATA[You can send *(\d+) more messages]]></value>
+       </action>
+   </actions>
+</tg4w>

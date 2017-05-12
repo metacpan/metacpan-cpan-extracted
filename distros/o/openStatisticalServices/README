@@ -1,0 +1,30 @@
+openStatisticalServices version 0.01
+====================================
+
+This is version 0.012 of OpenStatisticalServices
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  None at this time.
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2004-2008 Rich Haney
+
+This library is distributed under GPL license.
+
+
+

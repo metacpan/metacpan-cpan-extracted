@@ -1,0 +1,29 @@
+--- #YAML:1.0
+name:               o2sms
+version:            3.36
+abstract:           A module to send SMS messages using .ie websites
+author:
+    - mackers
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Crypt::SSLeay:        0
+    Getopt::Long:         2.33
+    IO::Socket::SSL:      0
+    Net::SSLeay:          0
+    Storable:             0
+    Term::ReadLine:       0
+    TestGen4Web::Runner:  0.11
+    URI:                  1.26
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

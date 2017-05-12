@@ -1,0 +1,159 @@
+.TH ONINDEX 8 "2005-08-06"
+.SH NAME
+onindex - Daemon to Index Document Files
+.SH SYNOPSIS
+.B onindex [-h] | [-d] [-D] [-f <\fIpath\fP>] [-o <\fIpath\fP>] 
+.B [-N] [-q] [-s <\fIsecs\fP>] [-v] [-vv] [-u]
+.SH DESCRIPTION
+The primary application of 
+.B onindex
+is to create text indexes that can be read by the 
+.IR OnSearch "(3)"
+document search program.  
+The 
+daemon can be started by itself as a shell command, 
+from within 
+.IR OnSearch "(3)"\fP,
+or via an init shell script.
+.P
+Onindex logs its information to the OnSearch log file.
+The section, FILES, below, describes the location of 
+the log, configuration, and run-time files.
+
+.SH OPTIONS
+
+.TP 8
+.I -d
+Also index words that contain only digits.
+.TP 8
+.I -f <path>
+Use configuration file \fIpath.\fP
+.TP 8
+.I -h
+Print a help message and exit.
+.TP 8
+.I -N
+Do not back up indexes.
+.TP 8
+.I -o <path>
+Use \fIpath\fP as the output file.
+.TP 8
+.I -q
+Do not print status information.
+.TP 8
+.I -s <secs>
+Wait \fIsecs\fP seconds between indexing runs.
+.TP 8
+.I -v
+Log progress information while indexing.
+.TP 8
+.I -vv
+Log even more information while indexing.
+.TP 8
+.I -u
+Delete old indexes and exit.
+
+.SH SIGNALS
+
+The daemon takes the following actions for each signal
+described below.
+
+.TP 8
+.I SIGHUP
+Re-read the configuration file.
+.TP 8
+.I SIGUSR1
+Begin indexing immediately.
+.TP 8
+.I SIGTERM, SIGINT
+Terminate the onindex process.
+
+.SH PLUGIN FILTERS
+
+The 
+.I plugins
+subdirectory (normally \fIonsearch/plugins\fP) contains
+filters for various document types.  All plugins take two
+arguments: the name of the input file, and the name of the
+translated text/plain output file.
+
+Documents of the MIME type text/plain receive no
+translation.  The filter for text/html and text/xml files
+removes HTML and XML tags and translates character entities.
+
+Postscript files use GNU 
+.B ghostscript
+for translation.
+
+Files of type PDF use 
+.B pdftotext
+for filtering.
+
+The 
+.B ongzip 
+plugin filters files compressed with GNU 
+.B gzip.
+
+The 
+.B jpeg 
+plugin extracts image/jpeg file comments without the use
+of a helper application.
+
+Not all MIME types have plugins, and during the indexing process
+.B onindex
+notes the presence of these file types,
+if they are not excluded, using the 
+.B null
+plugin.  For example, GIF image
+files do not contain indexable text, and Java 
+.I .jar
+files and 
+.B Pkzip 
+files, use the 
+.B null
+plugin, because the PKZip utilities do not operate 
+as filters.
+
+To determine file types,
+.B onindex,
+like 
+.B OnSearch,
+uses "magic" number file signatures, similar to the Unix
+.IR file "(1)"
+command.  The 
+.I onsearch.cfg
+file contains entries for the file types that 
+.B onindex 
+recognizes.  See FILES, below.
+
+.SH FILES
+.TP 8
+.I @onsearchcfg@
+Configuration file for the OnSearch program.  The value
+is normally 
+.I onsearch/onsearch.cfg
+below the Web site's 
+.I DocumentRoot 
+directory.
+.TP 8
+.I @onsearchlog@
+OnSearch log file.  Normally the value of 
+.I (WebLogDir)/onsearch.log
+in
+.I onsearch.cfg.
+.TP 8
+.I @rundir@
+Contains OnSearch and onindex run-time data.
+.TP 8
+.I /usr/local/etc/init.d/onindex
+Init shell script.
+
+.SH BUGS
+
+Onindex uses too much memory.
+
+.SH SEE ALSO
+.IR OnSearch "(3)"
+
+
+

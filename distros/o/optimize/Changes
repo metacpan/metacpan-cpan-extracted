@@ -1,0 +1,33 @@
+Revision history for Perl extension optimize
+
+0.05 2011-09-08 rurban
+    - remove unused B::OP::safenext - pause indexer problem
+
+0.04 2011-09-07 rurban
+    - remove B::Hooks::EndOfScope::on_scope_end dependency, not needed
+    - fix threaded (const PV->GV): tests pass now, only some older perls fail.
+    - remove unneeded Build.PL and META.yml
+    - dbgprint rewordings, 
+    - adjust t/02-register.t for testcover
+
+0.03_03 2011-08-18 rurban
+    - replace failing Hook::Scope::POST with 
+      B::Hooks::EndOfScope::on_scope_end
+    - fix Artur's name
+
+0.03_02 2011-03-01 rurban
+    - added missing requirements
+
+0.03_01 2011-02-19 rurban
+    - enabled register/unregister
+    - stabilized 11-integer left shift test
+
+0.03 Sun Aug 11 23:45:10 CEST 2002 abergman
+    - Fixed bug when a constant was a AV in which we would get bizare
+      copy of Array
+
+
+0.02 Fri Jun 28 00:22:01 CEST 2002
+    - Added register() and unregister() functions to 
+      allow third party modules to hook into
+      optimize

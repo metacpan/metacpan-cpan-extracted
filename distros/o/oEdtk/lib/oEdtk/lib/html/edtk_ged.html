@@ -1,0 +1,58 @@
+<html>
+<head><title>Test Service Web Editique</title></head>
+<body>
+	<h1>Test Service Web insertion GED</h1>
+	<P>
+	<form method="post" enctype="multipart/form-data" action="/cgi-bin/edtk_inged.cgi">
+	<TABLE BORDER="0">
+		<TD><B>Fichier &agrave; archiver* :</B></TD><TD>
+		<input type="file" id="ED_FILENAME" name="ED_FILENAME" size="20"/></TD>
+		<TR>
+		<TD><B>R&eacute;f&eacute;rence document* : </B></TD>
+		<TD><select id="ED_REFIDDOC" name="ED_REFIDDOC"/> 
+		<option>APP_1</option>
+		<option>APP_2</option>
+		<option>scan facture</option>
+		<option>scan autre</option>
+		</select></TD>
+		<TR>
+		<TD><B>Entit&eacute; Juridique* : </B></TD>
+		<TD><select id="ED_CORP" name="ED_CORP"/> 
+		<option>CORP_1</option>
+		<option>CORP_2</option>
+		<option>CORP_3</option>
+		<option>CORP_4</option>
+		</select></TD>
+		<TR>
+		<TD><B>Domaine m&eacute;tier* : <B></TD>
+		<TD><select id="ED_SOURCE" name="ED_SOURCE"/> 
+		<option>SANTE</option>
+		<option>PREV</option>
+		<option>AUTRE</option>
+		</select></TD>
+		<TR>
+		<TD><B>ID emetteur* : </B></TD><TD><input type="text" name="ED_IDEMET"/></TD> 
+		<TR>
+		<TD><B>Groupe utilisateur* : </B></TD><TD><input type="text" name="ED_OWNER"/></TD> 
+		<TR>
+
+		<TD><B>ID destinataire* : </B></TD><TD><input type="text" name="ED_IDDEST"/></TD> 
+		<TR>
+		<TD><B>Nom destinataire* : </B></TD><TD><input type="text" name="ED_NOMDEST"/></TD>
+		<TR>
+		<TD>Ville destinataire : </TD><TD><input type="text" name="ED_VILLDEST"/></TD> 
+		<TR>
+		<TD>Code contrat : </TD><TD><input type="text" name="ED_CLEGED1"/></TD>
+		<TR>
+		<TD>D&eacute;but p&eacute;riode acte : </TD><TD><input type="text" name="ED_CLEGED2"/></TD> 
+		<TR>
+		<TD>Fin p&eacute;riode acte : </TD><TD><input type="text" name="ED_CLEGED3"/></TD>
+		<TR>
+		<TD></TD><TD><input type="submit" value="Send"/></TD>
+
+	</TABLE>
+	</form>
+	<P>
+	<a href="./index.html">Test Services Web Editique</a>
+</body>
+</html>

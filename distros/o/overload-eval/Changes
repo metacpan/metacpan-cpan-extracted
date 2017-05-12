@@ -1,0 +1,40 @@
+Revision history for overload::ref
+
+0.01    Mar 27, 2007
+        First version, released on an unsuspecting world.
+
+0.02    Mar 28, 2007
+        Added the -print import option.
+
+0.03    Mar 28, 2007
+        Fixed a memory leak by mortalizing my return values.
+        Silenced a warning in t/basic.t
+
+0.04    Mar 28, 2007
+        Added the uneval installable program.
+
+0.05    Mar 29, 2007
+        Marked the prerequisite for perl 5.9+.
+
+0.06    Oct ..., 2007
+        Set 5.9.4 dependency and license in Makefile.PL
+
+0.07    Nov 9, 2007
+        Fixed for threads. Ought to compile on threaded
+        perls now. No promises for being threadsafe.
+
+0.08    Jul 1, 2010
+        - call_sv doesn't accept THX argument
+        - Applied Devel::PPPort
+
+0.09    Mar 20, 2011
+        - Use v5.13.7+ hinthash API [RT #62904]
+        - Renamed "evil" functions to "overload"
+        - Factored away some C globals
+        - The op hook installer is callable as a regular function
+        - Remove dead code
+        - Build with Dist::Zilla
+
+0.10    Apr 18, 2011
+        - Fix decl for v5.14.0..v5.14.6
+

@@ -1,0 +1,113 @@
+#!/usr/bin/perl
+use OGDL::Parser;
+use Getopt::Std;
+%options=();
+getopts("d:g:n:p:chro",\%options);
+
+if($#ARGV <0 ||defined $options{h}) {
+    print <<END_USAGE;
+    $0 [options] path [ogdlfile]
+    Print the nodes in ogdlfile selected by path. Path "." will select the whole graph.
+    Options:
+	-d n Depth of output graph
+	-g n Print nodes below depth n in one line
+	-n n Number of spaces used for indentation (default 4).
+	-p n Print parent node up to n level
+        -r   Include the root node.
+	-c   Output in canonical form. 
+	     Blocks will always be printed in double quotes.
+	-h   Print this text and exit.
+
+END_USAGE
+
+exit;
+}
+
+
+my $g;
+my $root="root";
+if($#ARGV>0){
+    $root=$ARGV[1];
+    if(-d $root){
+	$g=OGDL::Parser::dirToGraph($root);
+	goto GotGraph;
+    }
+}
+
+my $ogdl=OGDL::Parser->new($root);
+if(!$ARGV[1]){
+    $ogdl->read(*STDIN);
+}
+else{
+    open my $input, "<$ARGV[1]"  or die "Can't open $ARGV[1]\n";
+    $ogdl->read($input);
+}
+ 
+$g=$ogdl->parse; 
+
+if(!$g){die "Coundn't parse file: $ARGV[1]\n";}
+
+GotGraph:
+my $path=$ARGV[0];
+my @subnodes;
+
+    my $s=$g->get($path);
+    if($s){
+	if($options{r}){
+	    push @subnodes,$s;
+	}
+	else{
+	    my $l=$s->{list};
+	    push @subnodes,@$l;
+	}
+    }
+
+if($options{p}){GroupNodes(\@subnodes,$options{p});}
+if(!@subnodes){die "Path $ARGV[0] not found.\n";}
+
+PRINT:
+my $depth=0;
+my $root=0;
+my $indent=4;
+my $singlequote=0;
+my $noblockquote=0;
+my $group=-1;
+if($options{d}){$depth=$options{d};}
+if(exists $options{g}){$group=$options{g};}
+if($options{n}){$indent=$options{n};}
+if($options{c}){$singlequote=1;$noblockquote=1;}
+#my $parent=0;
+#if($options{p}){$parent=$options{p};}
+foreach(@subnodes){
+    $_->print("group"=>$group,"depth"=>$depth, "indentwidth"=>$indent,"singlequote"=>$singlequote,"noblockquote"=>$noblockquote);
+}
+
+sub GroupNodes{
+    my ($r_nodes,$p)=@_;
+    if(!defined $p){$p=-1;}
+    while($p!=0){
+	$try=0;
+	my @t_nodes;
+	my $n;
+	my $parent=undef;
+	my $psudo;
+	while($n=shift @$r_nodes){
+            my $temp=$n->{parent};
+	    if(!defined $temp){
+	        unshift @$r_nodes,$n;
+		return;
+	    }
+	    if($temp!=$parent){
+		$parent=$temp;
+		$psudo=OGDL::Graph->new($$parent{"name"});
+		push @t_nodes,$psudo;
+	    }
+	    my $l=$psudo->{list};
+	    my $len=$#$l+1;
+	    $$l[$len]=$n;
+	}
+	push @$r_nodes,@t_nodes;
+	$p--;
+    }
+}
+

@@ -1,0 +1,43 @@
+{
+   "abstract" : "overload Perl's C<substr()> function",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.113640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "overload-substr",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : 0,
+            "Test::More" : 0,
+            "Test::NoWarnings" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "XSLoader" : 0
+         }
+      }
+   },
+   "provides" : {
+      "overload::substr" : {
+         "file" : "lib/overload/substr.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.03"
+}

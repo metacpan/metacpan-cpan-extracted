@@ -1,0 +1,58 @@
+NAME
+    once - Execute code only once throughout the program's lifetime
+
+VERSION
+    version 1.101420
+
+SYNOPSIS
+        use once;
+
+        sub setup {
+            my $self = shift;
+            ONCE {
+                print "run only once however often setup() is called"
+            };
+            # other_things();
+        }
+
+DESCRIPTION
+    This module provides a way to run code only once, no matter how often
+    the surrounding code is called.
+
+METHODS
+  ONCE
+    This subroutine is exported automatically. It takes a code block and
+    executes it only the first time that this specific call of "ONCE" is
+    encountered. This might be useful, for example, in a situation where you
+    initialize an object but only want to do it the first time any object of
+    that class is initialized, perhaps to install methods or setup some
+    other data.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=once>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see <http://search.cpan.org/dist/once/>.
+
+    The development version lives at <http://github.com/hanekomu/once/>.
+    Instead of sending patches, please fork this project using the standard
+    git and github infrastructure.
+
+AUTHOR
+      Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2009 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

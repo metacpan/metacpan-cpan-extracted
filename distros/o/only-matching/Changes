@@ -1,0 +1,9 @@
+Revision history for Perl extension only-matching
+
+0.02 Wed 11 Dec 2007
+	- Removing a negative assertion test incompatible with 5.10
+	- Updating to Module::Install 0.68
+	- Updating to newer bundled tests
+
+0.01 Tue 10 Oct 2006
+	- Creating initial implementation

@@ -1,0 +1,998 @@
+# $Id: install,v 1.23 2005/08/13 22:41:38 kiesling Exp $
+
+###
+### TO DO
+### 1. Add check for server run from inetd (ServerType directive).
+### 2. Test for valid non-numeric user and group id's.
+### 3. Make sure that the script can find htpasswd, etc.
+### 4. Make sure that group ownership is set correctly if $group_ok.
+###
+
+
+use IO::Handle;
+use warnings;
+
+my ($l, $ans, $label, $s);
+
+my $handle = new IO::Handle;
+if (! $handle -> fdopen (fileno(STDIN), "r")) {
+    print "install: couldn't read standard input: $!\n";
+    exit 1;
+}
+
+print <<EOI;
+
+OnSearch installation.  If this program can't determine the site
+configuration, read INSTALL.html.
+
+NOTE: If you've already installed OnSearch, make a backup copy.
+Press [Ctrl-C] to exit now if necessary.
+
+EOI
+
+my $httpd = find_httpd ();
+my $httpd_version = get_httpd_version ();
+my $httpd_conf = find_httpd_conf ();
+
+my $Port = get_port ();
+
+chomp $httpd_conf;
+print "Configuring for $httpd and $httpd_conf.\n\n";
+
+###
+###  Values from http.conf.  Also check for mod_ssi and mod_perl.
+### 
+
+my ($cgi_ok, $serverparsed_ok, $mod_auth_ok, $group_ok);
+$cgi_ok = $serverparsed_ok = $mod_auth_ok = $group_ok = 0;
+my $add_handlers_ok = 0;
+my $ServerName = '';
+my $DocumentRoot = '';
+my $ServerRoot = '';
+my $User = '';
+my $Group = '';
+
+open HTTPD_CONF, "$httpd_conf" or die "$httpd_conf: $!\n";
+while (defined ($l =<HTTPD_CONF>)) {
+    if ($l =~ /^\s*ServerName/) {
+	($label, $ServerName) = split /\s/, $l;
+	$ServerName =~ s/\"//g;
+    }
+    if ($l =~ /^DocumentRoot/) {
+	($label, $DocumentRoot) = split /\s/, $l;
+	$DocumentRoot =~ s/\"//g;
+    }
+    if ($l =~ /^ServerRoot/) {
+	($label, $ServerRoot) = split /\s/, $l;
+	$ServerRoot =~ s/\"//g;
+    }
+    if ($l =~ /^\s*User\s+/) { ($label, $User) = split /\s/, $l; }
+    if ($l =~ /^Group/) { 
+        ($label, $Group) = split /\s/, $l; 
+        $group_ok = 1 if $Group =~ /^\d+$/; 
+    }
+    if ($l =~ /^Port\s/) { ($Port) = ($l =~ /\w+\s+(\d+)/); }
+    $cgi_ok = 1 if $l =~ m/^\s*AddHandler\s?cgi-script/ 
+       && check_module ('mod_cgi', 'cgi_module');
+    if ($httpd_version =~ /^1\.3/) {
+        $serverparsed_ok = 1 if ($l =~ /^\s*AddHandler\s?server-parsed/
+           && check_module ('mod_include', 'includes_module'));
+    } elsif ($httpd_version =~ /^2\./) {
+        $serverparsed_ok = 1 if ($l =~ /^\s*AddOutputFilter INCLUDES \.shtml/
+           && check_module ('mod_include', 'includes_module'));
+    }
+    $mod_auth_ok = 1 if check_module ('mod_auth', 'auth_module');
+}
+close HTTPD_CONF;
+
+note_missing_confs ();
+
+##
+##  Values from onsearch.cfg.
+##
+my @conf;
+my $WebLogDir = '';
+my $DataDir = '';
+
+open CONF, "onsearch.cfg" or die "onsearch.cfg: $!\n";
+while (defined ($l = <CONF>)) {
+    push @conf, ($l);
+}
+close CONF;
+
+($s) = grep /^WebLogDir/, @conf;
+($label, $WebLogDir) = split /\s+/, $s;
+
+($s) = grep /^DataDir/, @conf;
+($label, $DataDir) = split /\s+/, $s;
+
+print <<EOT;
+The following values were found:
+The Web site's name is $ServerName.
+The Web site's document directory is $DocumentRoot.
+The Web server's version is $httpd_version.
+The Web server's directory is $ServerRoot.
+The Web server's process owner is $User. 
+The Web server's port is $Port.
+EOT
+
+###
+### Create subdirectories.
+###
+
+my ($subdir) = grep /^OnSearchDir/, @conf;
+chomp $subdir;
+$subdir =~ s/^OnSearchDir\W?(.*)/$1/;
+my $onsearchdir = "$DocumentRoot/$subdir";
+my $onsearchbindir = $onsearchdatadir = '';
+print <<DIROK;
+
+I'm going to install OnSearch in $onsearchdir.  Is this okay (y/n)?
+DIROK
+$ans = getkey ();
+if ($ans !~ /y/i) {
+print <<DIRNOTOK;
+
+If you want to install OnSearch in a different directory, edit the
+value of "OnSearchDir" in onsearch.cfg and then restart the
+installation.  Exiting
+
+DIRNOTOK
+exit 1; 
+}
+
+
+print "Creating OnSearch's program and data directories.\n";
+mkdirtree ($WebLogDir, 0755);
+mkdirtree ($DataDir, 0755);
+mkdirtree ($onsearchdir, 0755);
+mkdirtree ("$onsearchdir/admin", 0755);
+mkdirtree ("$onsearchdir/doc", 0755);
+mkdirtree ("$onsearchdir/images", 0755);
+mkdirtree ("$onsearchdir/cache", 0755);
+mkdirtree ("$onsearchdir/plugins", 0755);
+mkdirtree ("$onsearchdir/webpages", 0755);
+mkdirtree ("$onsearchdir/uploads", 0755);
+
+
+###
+### Copy the files.
+###
+print "Installing program files.\n";
+`cp -R html/* $onsearchdir >/dev/null 2>&1`;
+`cp images/* "$onsearchdir/images" >/dev/null 2>&1`;
+`cp -R cgi/* $onsearchdir >/dev/null 2>&1`;
+`cp doc/* "$onsearchdir/doc" >/dev/null 2>&1`;
+`cp plugins/* "$onsearchdir/plugins" >/dev/null 2>&1`;
+
+###
+### Install Perl libraries.
+###
+
+print "Installing Perl libraries.\n";
+`cd lib && (perl Makefile.PL LIB="$onsearchdir/lib" && make install && make clean)`;
+`chown -R $User "$onsearchdir/lib"`;
+`chgrp $Group "$onsearchdir/lib"` if $group_ok;
+
+###
+### Install OnSearchIO under PerlIO
+###
+`cd lib/OnSearch/OnSearchIO && (perl Makefile.PL && make install && make clean)`;
+
+###
+### Set permissions.
+###
+
+print "Setting permissions.\n";
+
+`chown -R $User $onsearchdir`;
+`chgrp -R $Group $onsearchdir` if $group_ok;
+`chown $User $WebLogDir`;
+`chgrp $Group $WebLogDir` if $group_ok;
+`chmod 0775 $WebLogDir`;
+`chmod 0755 $onsearchdir`;
+`chown $User $DataDir`;
+`chgrp $Group $DataDir` if $group_ok;
+`chmod 0700 $DataDir`;
+
+foreach (qw/ alert.cgi error.cgi main.cgi search.cgi archive.cgi 
+	results.cgi filters.cgi	index.cgi/) {
+	`chmod 0755 "$onsearchdir/$_"`;
+}
+foreach (qw/adminform.cgi/) {
+	`chmod 0755 "$onsearchdir/admin/$_"`;
+}	
+
+foreach (qw/jpeg null ongzip pdf postscript text html/) {
+         `chmod +x "$onsearchdir/plugins/$_"`;
+}
+
+
+###
+### Find top-level document directories.
+###
+
+my @tldirs;
+push @tldirs, ($DocumentRoot);
+
+print <<TDS1;
+
+OnSearch will use $DocumentRoot as its top-level document directory.  
+Is this okay (y/n)?
+TDS1
+$ans = getkey ();
+if ($ans !~ /y/i) {
+
+tlds:
+$#tldirs = -1;
+
+print <<TDS2;
+
+You need to enter the top-level directories, one per line.  After
+entering the directory names, hit <Enter> on a blank line.
+
+TDS2
+     while (1) {
+         $ans = getkey ();
+         last if (! length ($ans));
+         push @tldirs, ($ans);
+     }
+
+print <<TDS3;
+
+You entered:
+
+TDS3
+foreach (@tldirs) {print "$_\n" if length ($_); }
+
+print <<TDS4;
+
+Is this okay (y/n)?
+TDS4
+
+$ans = getkey ();
+if ($ans !~ /y/i) {
+   print "Okay, trying again.\n";
+   goto tlds;
+}
+
+}
+
+###
+### Edit onsearch.cfg
+###
+print "Updating OnSearch's configuration.\n";
+open NEWCONFIG, ">$onsearchdir/onsearch.cfg" or die "onsearch.cfg: $!\n";
+
+foreach my $o (@conf) {
+
+      if ($o =~ /^BinDir/) {
+         ($label, $onsearchbindir) = split /\s+/, $o;
+         chomp $onsearchbindir;
+      }
+	
+      if ($o =~ /^DataDir/) {
+         ($label, $onsearchdatadir) = split /\s+/, $o;
+         chomp $onsearchdatadir;
+      }
+
+      if ($o =~ /^ServerName/) {
+	chomp $ServerName;
+	print NEWCONFIG "ServerName $ServerName\n";
+	next;
+      }	
+      if ($o =~ /^SearchRoot/) { 
+         foreach my $t (@tldirs) {
+            chomp $t;
+            print NEWCONFIG "SearchRoot $t\n" if length ($t);
+         }
+         next;
+      }
+      if ($o =~ /^ExcludeDir/) { 
+          print NEWCONFIG "ExcludeDir $onsearchdir/cache\n";
+          print NEWCONFIG "ExcludeDir $onsearchdir/lib\n";
+	  next;
+      }
+      if ($o =~ /^User/) {
+          chomp $User;
+          print NEWCONFIG "User $User\n";
+          next;
+      }
+      print NEWCONFIG $o;
+}
+
+close NEWCONFIG;
+`chown $User "$onsearchdir/onsearch.cfg"`;
+`chgrp $Group "$onsearchdir/onsearch.cfg"` if $group_ok;
+
+###
+### Find perl, modules, and version.
+###
+
+my ($perl_bin);
+
+chomp ($perl_bin = `which perl`);
+if (!length ($perl_bin)) {
+print <<PB;
+
+I can't locate the Perl interpreter.  Make sure that it is 
+installed in your search path and is named "perl."
+
+PB
+exit 1;
+}
+print "Perl is $perl_bin\n";
+if ($^V lt v5.6.0) {
+print <<PV;
+OnSearch was written using Perl version 5.6.0.  You should consider
+upgrading, especially if the Perl version is earlier than 5.4.
+PV
+}
+
+###
+### Find gcc and version.
+###
+
+my ($gcc_bin, $gcc_version);
+chomp ($gcc_bin = `which gcc`);
+if (!length ($gcc_bin)) {
+print <<GB;
+I can't locate GCC.  Make sure that it is installed in your search
+path and is named "gcc."
+GB
+exit 1;
+}
+print "GCC is $gcc_bin\n";
+chomp ($gcc_version = `gcc --version`);
+if ($gcc_version lt '2.7.2') {
+print <<GV;
+OnSearch was written using GCC version 2.95.4.  You should consider
+upgrading, especially if the compiler version is earlier than 2.7.2.
+GV
+}
+print "GCC version is $gcc_version.\n";
+
+open MAKETMPL, "src/Makefile.tmpl" or die "src/Makefile.tmpl: $!\n";
+open MAKE, ">src/Makefile" or die "src/Makefile: $!\n";
+
+while (defined ($l = <MAKETMPL>)) {
+    if ($l =~ /\@bindir\@/) {
+        $l =~ s"\@bindir\@"$onsearchbindir";
+    }
+    if ($l =~ /\@datadir\@/) {
+        $l =~ s"\@datadir\@"$onsearchdatadir";
+    }
+    if ($l =~ /\@onsearchdir\@/) {
+        $l =~ s"\@onsearchdir\@"$onsearchdir";
+    }
+    print MAKE $l;
+}
+
+close MAKE;
+close MAKETMPL;
+
+`rm -f /tmp/.onsearch.sock*`;
+
+print "Building the indexing daemon.\n";
+`cd src && make install >/tmp/onsearch.bld 2>&1`;
+
+if (! -f 'src/onindex') {
+
+    print <<MAKEERR;
+
+There was an error building the onsearch index program.  The output of 
+"make" is:
+
+MAKEERR
+    open ERR, "/tmp/onsearch.bld" or die "/tmp/onsearch.bld: $!\n";
+    undef $/;
+    print <ERR>;
+    close ERR;
+    unlink '/tmp/onsearch.bld';
+    print "\nCleaning up....\n";
+    `sh -c "rm -rf $onsearchdir /usr/local/etc/init.d/onindex"`;
+    exit 1;
+} else {
+    unlink '/tmp/onsearch.bld';
+    `cd src && make clean`;
+}
+
+print "Installing man pages.\n";
+
+open MAKETMPL, "doc/Makefile.tmpl" or die "src/Makefile.tmpl: $!\n";
+open MAKE, ">doc/Makefile" or die "src/Makefile: $!\n";
+
+while (defined ($l = <MAKETMPL>)) {
+    if ($l =~ /\@bindir\@/) {
+        $l =~ s"\@bindir\@"$onsearchbindir";
+    }
+    if ($l =~ /\@datadir\@/) {
+        $l =~ s"\@datadir\@"$onsearchdatadir";
+    }
+    if ($l =~ /\@onsearchdir\@/) {
+        $l =~ s"\@onsearchdir\@"$onsearchdir";
+    }
+    if ($l =~ /\@weblogdir\@/) {
+        $l =~ s"\@weblogdir\@"$WebLogDir";
+    }
+    print MAKE $l;
+}
+
+close MAKE;
+close MAKETMPL;
+# Don't need to cd back because these run in a subshell.
+`cd doc && (make all >/dev/null 2>&1)`;
+`cd doc && make clean >/dev/null 2>&1`;
+
+###
+### OnSearch Directory Wrapper
+###
+print <<EOT;
+I'm going to add OnSearch's configuration to $httpd_conf.
+I'll copy the original httpd.conf file to httpd.conf.onsearch-save.
+
+You can skip this step, and then configure the Web server
+manually, using the template in doc/conf.tmpl.
+Should I continue (y/n)?
+EOT
+$ans = getkey ();
+if ($ans !~ /y/i) {
+   print "Okay, skipping.\n";
+   goto auth;
+}
+
+`cp "$httpd_conf" "$httpd_conf.onsearch-save"`;
+my $t1 = dir_wrapper_template ($onsearchdir);
+`echo "$t1" >>"$httpd_conf"`;
+
+
+###
+###  Authentication
+###
+auth:
+print <<EOT;
+
+I'm going to add password authentication information to your Web
+server configuration and then try to restart the server.
+
+With authentication enabled, users must enter a user name and password
+to perform administrative tasks.  For passwords to work the Web server
+must include mod_auth in its configuration.
+
+During the process, the installation will copy your old 
+$httpd_conf to $httpd_conf.onsearch-save, 
+so you can restore your previous configuration if necessary.
+
+You can skip this step, but then you will not have password protection
+for administrative tasks.
+
+Should I continue (y/n)?
+EOT
+$ans = getkey ();
+if ($ans !~ /y/i) {
+   print "Okay, skipping.\n";
+   goto done;
+}
+
+my ($apachectl_prog, $htpasswd_prog);
+
+$apachectl_prog = "$ServerRoot/bin/apachectl";
+if (! -x $apachectl_prog) {
+    $apachectl_prog = `which apachectl`;
+    chomp $apachectl_prog;
+    if (! -x $apachectl_prog) {
+print <<EOT;
+
+I can't find the apachectl utility.  Try to determine that it is in 
+either $ServerRoot/bin or in a directory named in the operating 
+system's search path.
+
+EOT
+    goto done;
+    }
+}
+
+$htpasswd_prog = "$ServerRoot/bin/htpasswd";
+if (! -x $htpasswd_prog) {
+    $htpasswd_prog = `which htpasswd`;
+    chomp $htpasswd_prog;
+    if (! -x $htpasswd_prog) {
+print <<EOT;
+
+I can't find the htpasswd utility.  Try to determine that it is in 
+either $ServerRoot/bin or in a directory named in the operating 
+system's search path.
+
+EOT
+    goto done;
+    }
+}
+
+print <<EOT;
+Saving the Web server's configuration.
+EOT
+`cp "$httpd_conf" "$httpd_conf.onsearch-save"` 
+    if (! -f "$httpd_conf.onsearch-save");
+
+print <<EOT;
+Adding authentication information to $httpd_conf.
+EOT
+
+my $p1 = auth_template ($onsearchdir);
+`echo "$p1" >>"$httpd_conf"`;
+
+print <<EOT;
+Creating the OnSearch group file.
+EOT
+$p1 = group_template ();
+`echo "$p1" >/usr/local/etc/ongroup`;
+
+print <<EOT;
+Creating the OnSearch password file.  
+
+NOTE: INSTALL.html tells you how to log in for the first time.  
+EOT
+`$htpasswd_prog -nb onsearch onsearch >/usr/local/etc/onpasswd`;
+
+print <<EOT;
+
+Now restarting the Web server...
+
+EOT
+`$apachectl_prog restart`;
+
+done:
+
+my ($starturl, $docurl);
+if ($Port eq '80') {
+	$starturl = "http://$ServerName/$subdir/index.shtml";
+	$docurl = "http://$ServerName/$subdir/doc/userguide.html#admin"
+} else {
+	$starturl = "http://$ServerName:$Port/$subdir/index.shtml";
+	$docurl = "http://$ServerName:$Port/$subdir/doc/userguide.html#admin"
+}
+print <<EOT;
+
+Done. If the installation was correct, you should be able to browse to
+
+$starturl
+
+The OnSearch User Guide's administration chapter,
+
+$docurl
+
+and the onindex(8) manual page, describe how to index files and start
+using OnSearch.
+
+EOT
+
+$handle -> close;
+
+exit 0;
+
+##
+## Create directories
+##
+
+sub mkdir_wrap {
+    my $d =$_[0];
+    my $a;
+    if (($a = `mkdir -p $d 2>&1`) =~ /cannot create directory/i) {
+	print STDERR "$a\n";
+	return -1;
+    }
+    return 0;
+}
+
+
+
+##
+##  Keyboard input.
+##
+
+sub getkey {
+    my $key;
+    $key = $handle -> getline;
+    chomp $key;
+    return $key;
+}
+
+###
+###  Make subdirs
+###
+
+sub mkdirtree {
+    my ($dir, $mask) = @_;
+    my ($parent) = 
+	($dir =~ /(.*)\/.*$/);
+    if (! -d $parent) {
+	mkdirtree ($parent, $mask);
+    } 
+    if (! -d $dir) {
+	print "$dir.\n";
+        mkdir ($dir, $mask) or die "Could not make directory $dir: $!\n";
+    }
+}
+
+##
+## Missing Conf Variable
+##
+
+sub missing_conf {
+    my $c = $_[0];
+
+print <<EOT;
+
+I can't locate the "$c" directive.
+EOT
+}
+
+sub dir_wrapper_template {
+    my ($progdir) = @_;
+my $f = qq|
+# Added by OnSearch installation.
+
+<Directory $progdir>
+    Options ExecCGI Includes
+    AddHandler cgi-script .cgi
+    AddType text/html .shtml
+    AddHandler server-parsed .shtml
+</Directory>
+|;
+return $f
+}
+
+sub auth_template {
+	my ($progdir) = @_;
+my $f = qq|
+# Added by OnSearch installation.
+
+<Directory $progdir/admin>
+    AuthType Basic
+    AuthName OnSearch
+    AuthUserFile /usr/local/etc/onpasswd
+    AuthGroupFile /usr/local/etc/ongroup
+    require group onsearch
+</Directory>
+|;
+return $f
+}
+
+sub group_template {
+my $f = qq|onsearch: onsearch|;
+return $f;
+}
+
+###
+### First check the httpd settings.
+### Then check normal locations.
+### Then search.
+### Then warn user.
+###
+
+sub find_httpd_conf {
+
+    my @HTTP_CONF_PATHS = qw(/etc/apache/httpd.conf 
+			     /usr/local/apache/conf/httpd.conf
+			     /usr/local/apache2/conf/httpd.conf);
+
+    my @conffiles = ();
+    my @httpdroots = ();
+    my ($httpdroot, $conffile, $ans, $i, $altconf);
+
+    ###
+    ### First check the server's configuration.
+    ###
+
+    my @conflines = grep /httpd.conf/, split /\n/, `$httpd -V`;
+    ($conffile) = ($conflines[0] =~ /SERVER_CONFIG_FILE=\"(.*?)\"/);
+
+    @httpdroots = grep /HTTPD_ROOT/, split /\n/, `$httpd -V`;
+    ($httpdroot) = ($httpdroots[0] =~ /HTTPD_ROOT=\"(.*?)\"/);
+
+
+    if (-f $conffile) {
+	print <<EOT;
+The Web server's configuration file is $conffile.  Is this correct (y/n)?
+EOT
+        $ans = getkey ();
+	if ($ans =~ /y/i) {
+	    return $conffile;
+	}
+    }
+
+    if (-f "$httpdroot/$conffile") {
+	print <<EOT;
+The Web server's configuration file is $httpdroot/$conffile.  
+Is this correct (y/n)?
+EOT
+        $ans = getkey ();
+	if ($ans =~ /y/i) {
+	    return "$httpdroot/$conffile";
+	}
+    }
+
+   ###
+   ### Next, scan standard directories.
+   ###
+
+    foreach my $f (@HTTP_CONF_PATHS) {
+	if (-f $f) {
+	    push @conffiles, ($f);
+	}
+    }
+
+    ###
+    ### Found one standard httpd.conf file.
+    ###
+    if ($#conffiles == 0) {
+	$conffile = $conffiles[0];
+	print <<EOT;
+The Web server's configuration file is $conffile.  Is this correct (y/n)?
+EOT
+        $ans = getkey ();
+	if ($ans =~ /y/i) {
+	    return $conffiles[0];
+	} else {
+	    goto HTTPD_CONF_SEARCH;
+	}
+    ###
+    ### Found multiple standard httpd.conf files.
+    ###
+    } elsif ($#conffiles > 0) {
+	print <<EOT;
+You have several configuration files.
+EOT
+        $i = 1;
+	print $i++ . ". $_\n" foreach (@conffiles);
+	print "$i. Search for other httpd.conf files.\n";
+	print <<EOT;
+Which should I use?
+EOT
+        $ans = getkey ();
+	chomp $ans;
+	if (($ans - 1) <= $#conffiles) {
+	    $conffile = $conffiles[$ans-1];
+	    return $conffile;
+	} else {
+	    goto HTTPD_CONF_SEARCH;
+	}
+    }
+
+  HTTPD_CONF_SEARCH:
+    print <<EOT;
+
+Searching for Web server configuration files in non-standard directories.
+This may take several minutes.
+
+EOT
+
+    @conffiles = split /\n/, `find / -name "httpd.conf"`;
+
+    if ($#conffiles >= 0) {
+	print <<EOT;
+The system has the following httpd.conf files:
+EOT
+        $i = 1;
+	print $i++ . ". $_\n" foreach (@conffiles);
+	print <<EOT;
+Which should I use?
+EOT
+        $ans = getkey ();
+	chomp $ans;
+    } else {
+	print <<EOT;
+
+Whoa, dude!  OnSearch requires Apache, and it doesn't seem to be
+installed here.  You can download Apache from http://www.apache.org/.
+
+If you are certain, absolutely CERTAIN, that Apache is installed
+and operating correctly on this system, read the fine INSTALL.html
+manual installation instructions and install OnSearch manually.
+
+Bye....
+EOT
+
+exit 1;
+    }
+
+}
+
+sub note_missing_confs {
+
+    return if ($ServerName && $ServerRoot && $DocumentRoot &&
+	       $User && $Group && $cgi_ok && 
+	       $serverparsed_ok && $mod_auth_ok);
+
+    missing_conf ('ServerName') unless $ServerName;
+    missing_conf ('ServerRoot') unless $ServerRoot;
+    missing_conf ('DocumentRoot') unless $DocumentRoot;
+    missing_conf ('User') unless $User;
+    missing_conf ('Group') unless $Group;
+    missing_conf ('AddHandler cgi-script') unless $cgi_ok;
+    missing_conf ('AddHandler server-parsed') unless $serverparsed_ok;
+    missing_conf ('LoadModule auth_module') unless $mod_auth_ok;
+
+print <<EOT;
+
+You need to determine that these values are set correctly. 
+
+If this program still can't determine your Web site's configuration,
+INSTALL.html, "doc/conf.tmpl," and "doc/auth.tmpl" contain example
+handlers.
+
+EOT
+}
+
+###
+### First check ps output for running httpd.  (Make sure the ps
+### entry lists the httpd path.)
+### Then search binary directories.
+### Then if httpd hasn't been found, ask user.
+### Note: Some vendors install httpd as "apache," so check that
+### name also.
+###
+sub find_httpd {
+
+    my @bindirs = qw|/usr/sbin /usr/local/sbin /usr/local/apache/bin
+	/usr/local/apache2/bin|;
+    my ($ps_prog, $httpd_prog);
+    my (@httpdprocs, @psfields, @dups) ;
+
+    open PS, "ps -ax 2>&1|" or die "ps: $!.";
+    @httpd_procs = grep /httpd|apache/, <PS>;
+    close PS;
+
+    PROC: foreach my $h (@httpd_procs) {
+	chomp $h;
+	@psfields = split /\s+/, $h;
+	foreach my $p (@psfields) {
+	    if (-x $p) {
+		next PROC if scalar grep /$p/, @dups;
+		$ps_prog = $p;
+		push @dups, ($ps_prog);
+	    }
+	}
+
+	if ($ps_prog) {
+	    print "The Web server is $ps_prog.  Is this correct (y/n)?\n";
+	    $ans = getkey ();
+	    if ($ans =~ /y/i) {
+		$httpd_prog = $ps_prog;
+		last PROC;
+	    } else {
+		next PROC;
+	    }
+	}
+    }
+    return $httpd_prog if $httpd_prog; 
+
+    ###
+    ### Next, search bin directories.
+    ###
+
+    foreach my $bindir (@bindirs) {
+	next if scalar grep m"$bindir\/(apache|httpd)", @dups;
+	if (-x "$bindir/apache") {
+	    $httpd_prog = "$bindir/apache";
+	} elsif (-x "$bindir/httpd") {
+	    $httpd_prog = "$bindir/httpd" if -x "$bindir/httpd";
+	} else {
+	    undef $httpd_prog;
+	}
+
+	if ($httpd_prog) {
+	    print "The Web server is $httpd_prog.  Is this correct (y/n)?\n";
+	    $ans = getkey ();
+	    if ($ans =~ /y/i) {
+		return $httpd_prog;
+	    } else {
+		next;
+	    }
+	}
+    }
+
+    print <<EOT;
+Whoa, dude!  I can't find your Web in anything like a normal directory.
+Is Apache installed somewhere else?  If so, type in its path name.
+EOT
+
+$httpd_prog = getkey ();
+chomp $httpd_prog;
+return $httpd_prog;
+}
+
+sub get_httpd_version {
+    my ($version) = (`$httpd -v` =~ m'Apache/(.*?)\s+'sm);
+    return $version;
+}
+
+sub check_module {
+    my ($module_name, $module_label) = @_;
+
+    my $l;
+    my $mod_ok = 0;
+    my @compiled_in = grep /$module_name/, split /\n/, `$httpd -l`;
+    return 1 if $compiled_in[0] && $compiled_in[0] =~ /$module_name/;
+
+    open CONF, "$httpd_conf" or die "$httpd_conf: $!\n";
+    while (defined ($l = <CONF>)) {
+	if ($l =~ m"^\s*LoadModule\s?$module_label") { $mod_ok = 1; last; }
+    }
+    close CONF;
+    return $mod_ok;
+}
+
+sub get_port {
+
+    my ($l, @lines, $pline, $label, $ipaddr, $port);
+
+    open CONF, $httpd_conf || die "Can't open $httpd_conf: $!.";
+
+    while (defined ($l = <CONF>)) {
+	chomp $l;
+	push @lines, ($l);
+    }
+    close CONF;
+
+    ###
+    ### Check for a Port directive.
+    ###
+    if (scalar grep /^\s*Port/, @lines) {
+	($pline) = grep /^\s*Port/, @lines;
+	if (length ($pline)) {
+	    ($label, $port) = split /\s+/, $pline;
+	    return $port;
+	}
+    }
+
+    ###
+    ### Check for a Listen directive, which could also have an
+    ### IP address.
+    ###
+    if (scalar grep /^\s*Listen/, @lines) {
+	($pline) = grep /^\s*Listen/, @lines;
+	if (length ($pline)) {
+	    if ($pline =~ m/\:/) {
+		($label, $ipaddr, $port) = 
+		    ($pline =~ /^\s*(\w+)\s+(\S+):(\d+)/);
+	    } else {
+		($label, $port) = split /\s+/, $pline;
+	    }
+	    return $port;
+	}
+    }
+
+    ###
+    ### If not there, check the ServerName directive for a 
+    ### Port number.
+    ###
+    if (scalar grep /^\s*ServerName/, @lines) {
+	($pline) = grep /^\s*ServerName/, @lines;
+	if (length ($pline)) {
+	    if ($pline =~ m/\:/) {
+		($label, $ipaddr, $port) = 
+		    ($pline =~ /^\s*(\w+)\s+(\S+):(\d+)/);
+	    } else {
+		($label, $port) = split /\s+/, $pline;
+	    }
+	    return $port;
+	}
+    }
+
+    print <<EOT;
+I can't determine the Web server's network port.  I'll assume 
+that the port number is 80.  Is that okay (y/n)
+EOT
+    $ans = getkey ();
+    if ($ans =~ /y/i) {
+        $port = 80;
+        return $port;
+    } else {
+print <<EOT;
+You might want to determine that the port number is specified
+correctly in http.conf before proceeding.  Exiting....
+EOT
+     exit 1;
+    }
+}

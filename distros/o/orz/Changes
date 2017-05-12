@@ -1,0 +1,47 @@
+0.24 Sat Aug 16 14:10:04 PDT 2014
+ - Remove =travis section
+
+0.23 Sat Aug 16 11:44:16 PDT 2014
+ - Meta 0.0.2
+
+0.22 Sat Aug 16 03:51:49 PDT 2014
+ - Eliminate spurious trailing whitespace
+
+0.21 Sat Aug 16 02:27:15 PDT 2014
+ - Eliminate File::Basename from test/
+
+0.20 Fri Aug 15 16:08:28 PDT 2014
+ - Add t/000-compile-modules.t
+ - CPAN Day 2014 - 21 Release Salute!
+
+0.19 Tue Aug  5 10:09:29 PDT 2014
+ - Add badges to doc
+
+0.18 Sun Aug  3 23:28:50 PDT 2014
+ - Remove (c) from Copyright
+
+0.17 Wed Jul 30 15:58:26 PDT 2014
+ - Switch IRC to
+
+0.16 Thu Jul 24 10:21:48 PDT 2014
+ - Update email in Meta
+
+0.15 Mon Jul 21 17:12:39 PDT 2014
+ - Committed a test artifact. Fixed.
+
+0.14 Mon Jul 21 17:02:36 PDT 2014
+ - Switch to Zilla::Dist
+
+0.13 Fri Jun 10 22:03:52 EST 2011
+ - Fix bug caused by Module::Compile change
+ - Upgrade to Module::Package
+
+0.12 Mon Jun 26 14:43:01 CDT 2006
+ - Better testing.
+
+0.11 Sun Mar 12 21:15:07 PST 2006
+ - Patch from ISHIGAKI Kenichi. orz...
+
+0.10 Sun Mar 12 10:05:28 PST 2006
+ - Maiden voyage
+

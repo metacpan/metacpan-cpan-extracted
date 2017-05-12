@@ -1,0 +1,21 @@
+OGDL-Parser version 0.01
+======================
+
+This package includes two modules: OGDL::Parser and OGDL::Graph and a 
+perl program pgpath. They are used to parse an OGDL file.
+
+For information on OGDL, see http://ogdl.sourceforge.net/.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module works with standard perl distribution.
+

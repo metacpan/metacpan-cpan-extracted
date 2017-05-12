@@ -1,0 +1,21 @@
+BODY                { background-color: white; 
+                      font-family: helvetica, arial, sans-serif; 
+                      font-size: 12px; }
+IMG                 { border: none; }
+TD                  { font-family: helvetica, arial, sans-serif; 
+                      font-size: 12px; 
+                      padding-left: 2px; 
+                      padding-right: 2px; 
+	              text-align: left; }
+INPUT               { font-family: helvetica, arial, sans-serif; 
+                      font-size: 12px; }
+A                   { color: black;
+                      text-decoration: none; }
+FONT.body           { font-family: helvetica, arial, sans-serif; 
+                      font-size: 12px; }
+FONT.onsearch       { font-family: avantgarde, sans-serif; 
+                      font-weight: bold; }
+LABEL.admintitle    { font-family: helvetica, sans-serif; 
+	              font-size: 18px; }
+
+

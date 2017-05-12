@@ -1,0 +1,91 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<tg4w version="0.51.0">
+    <datasets>
+    </datasets>
+    <actions>
+        <action type="goto" refresh="." window="." step="0">
+            <xpath><![CDATA[window.location.href]]></xpath>
+            <value><![CDATA[https://www.mymeteor.ie/]]></value>
+        </action>
+        <action type="verify-title" window="." step="1">
+            <xpath><![CDATA[*]]></xpath>
+            <value><![CDATA[Meteor: MyMeteor Login]]></value>
+        </action>
+        <action type="fill" window="." step="2">
+            <xpath><![CDATA[*/FORM[1]/*/INPUT[@ID="username"]]]></xpath>
+            <value><![CDATA[{username}]]></value>
+        </action>
+        <action type="fill" window="." step="3">
+            <xpath><![CDATA[*/FORM[1]/*/INPUT[@ID="userpass"]]]></xpath>
+            <value><![CDATA[{password}]]></value>
+        </action>
+       <action type="click" refresh="true" window="." step="4">
+            <xpath><![CDATA[*/FORM[1]/*/INPUT[@TYPE="image" and @VALUE=""]]]></xpath>
+            <value><![CDATA[null]]></value>
+        </action>
+        <action type="verify-title" window="." step="5">
+            <xpath><![CDATA[*]]></xpath>
+            <value><![CDATA[Meteor: Postpay Functions]]></value>
+        </action>
+        <action type="assert-text-exists" step="6">
+            <xpath><![CDATA[*]]></xpath>
+            <value><![CDATA[My Meteor]]></value>
+        </action>
+
+        <action type="goto" refresh="true" window="." step="7">
+            <xpath><![CDATA[window.location.href]]></xpath>
+            <value><![CDATA[https://www.mymeteor.ie/go/freewebtext]]></value>
+        </action>
+        <action type="var" window="." step="8"> <!-- TODO implement this -->
+            <xpath><![CDATA[var CFID = (\d+);]]></xpath>
+            <value><![CDATA[CFID]]></value>
+        </action>
+        <action type="var" window="." step="9">
+            <xpath><![CDATA[var CFTOKEN = (\d+);]]></xpath>
+            <value><![CDATA[CFTOKEN]]></value>
+        </action>
+        <action type="fill" window="." step="10">
+            <xpath><![CDATA[*/FORM[@NAME="!!ajax1"]/*/INPUT[@NAME="ajaxRequest"]]]></xpath> <!-- TODO implement this -->
+            <value><![CDATA[addEnteredMSISDNs]]></value>
+        </action>
+        <action type="fill" window="." step="11">
+            <xpath><![CDATA[*/FORM[@NAME="!!ajax1"]/*/INPUT[@NAME="remove"]]]></xpath>
+            <value><![CDATA[-]]></value>
+        </action>
+        <action type="fill" window="." step="12">
+            <xpath><![CDATA[*/FORM[@NAME="!!ajax1"]/*/INPUT[@NAME="add"]]]></xpath>
+            <value><![CDATA[0|{recipient}]]></value>
+        </action>
+        <action type="click" refresh="true" step="13">
+            <xpath><![CDATA[*/FORM[@NAME="!!ajax1"]/]]></xpath>
+            <value><![CDATA[https://www.mymeteor.ie/mymeteorapi/index.cfm?event=smsAjax&CFID={CFID}&CFTOKEN={CFTOKEN}&func=addEnteredMsisdns]]></value> 
+        </action>
+
+        <action type="fill" window="." step="14">
+            <xpath><![CDATA[*/FORM[@NAME="!!ajax2"]/*/INPUT[@NAME="ajaxRequest"]]]></xpath>
+            <value><![CDATA[sendSMS]]></value>
+        </action>
+        <action type="fill" window="." step="15">
+            <xpath><![CDATA[*/FORM[@NAME="!!ajax2"]/*/INPUT[@NAME="messageText"]]]></xpath>
+            <value><![CDATA[{message}]]></value>
+        </action>
+        <action type="click" refresh="true" step="16">
+            <xpath><![CDATA[*/FORM[@NAME="!!ajax2"]/]]></xpath>
+            <value><![CDATA[https://www.mymeteor.ie/mymeteorapi/index.cfm?event=smsAjax&func=sendSMS&CFID={CFID}&CFTOKEN={CFTOKEN}]]></value>
+        </action>
+
+        <action type="assert-text-exists" window="." step="17">
+            <xpath><![CDATA[*]]></xpath>
+            <value><![CDATA[switchPane\("fwtSent"\)]]></value>
+        </action>
+
+        <action type="goto" refresh="true" window="." step="18">
+            <xpath><![CDATA[window.location.href]]></xpath>
+            <value><![CDATA[https://www.mymeteor.ie/go/freewebtext]]></value>
+        </action>
+	<action type="assert-text-exists" step="19">
+            <xpath><![CDATA[*]]></xpath>
+            <value><![CDATA[Free web texts left <input type="text" value="(\d+)"]]></value>
+        </action>
+    </actions>
+</tg4w>

@@ -1,0 +1,763 @@
+<html>
+<head><title>OnSearch User Guide</title>
+<style type="text/css">
+H1               { font-family: sans-serif; } 
+H2               { font-family: sans-serif; } 
+H3               { font-family: sans-serif; } 
+H4               { font-family: sans-serif; } 
+H5               { font-family: sans-serif; } 
+DIV.footer       { text-align: right; }
+FONT.onsearch    { font-family: avant-garde, sans-serif; }
+</style>
+</head><body bgcolor="white">
+<div class="body">
+<center>
+<h1>User Guide</h1>
+<h1><font class="onsearch">OnSearch</font></h1>
+<h2>World Wide Web Searches</h2>
+</center>
+<p>
+<a name="contents">
+<h3>Table of Contents</h3>
+<ol>
+<li><a href="#starting">Starting <font class="onsearch">OnSearch</font></a>
+<li><a href="#searching">Searches</a>
+<li><a href="#viewing">Viewing Results</a>
+<li><a href="#adding">Adding Files and Web Pages To Be Searched</a>
+<li><a href="#volumes">Volume Filters</a>
+<li><a href="#admin">OnSearch Administration</a>
+<li><a href="#copyright">Copyright</a>
+</ol>
+
+<a name="starting">
+<h3>Starting <font class="onsearch">OnSearch</font></h3>
+You can browse to the <font class="onsearch">OnSearch</font>
+search page by entering the following URL in your World Wide
+Web browser.
+<blockquote>
+http://<i>server-name</i>/onsearch/index.shtml
+</blockquote>
+You need to substitute <i>server-name</i> with the name of
+the Web server where <font
+class="onsearch">OnSearch</font> is installed.
+<p>
+<div class="footer">
+<a href="#contents">Return to the Table of Contents.</a>
+</div>
+
+<a name="searching">
+<h3>Searches</h3> 
+Figure 1 shows the <font
+class="onsearch">OnSearch</font> search page.
+From this page,
+you can enter search terms, define options for the search,
+and begin searching.
+<p>
+<center>
+<img src="searchpage.jpg" alt="OnSearch Search Page">
+<p>
+Figure 1.  The <font class="onsearch">OnSearch</font> search page.
+</center>
+<a name="searchingtext">
+<p>
+Enter the search terms, and click on, "Search."  Search
+terms are words composed of letters, numbers, and
+underscores ('_').  
+<p>
+The phrase, "To be, or not to be," for example, is treated as 
+six separate words: "To," "be," "or," "not," "to," "be."  
+<p>
+Similarly, a technical term like, "Tk::MainWindow," the name
+of a Perl library module, is treated as two words: "Tk," and
+"MainWindow."
+<p>
+The search options determine whether <font
+class="onsearch">OnSearch</font>
+searches for documents that contain any or all of the search
+terms, or the exact phrase.  <font
+class="onsearch">OnSearch</font> can match documents that
+contain words of the exact case of the search terms, or
+search for matches without regard for case.  It can also 
+search for partial word matches. For example, "be" can 
+also match, "best," and, "not," can match, "knot."  
+<p>
+<h4>Speeding Up Searches</h4> 
+Exact search terms allow <font
+class="onsearch">OnSearch</font> to perform its searches
+more quickly.  Searches for documents that contain exact
+phrases like, "To be, or not to be," or, "X Window System,"
+require only slightly more time than searches for single words.
+<p>
+Selecting, "Match text within words," causes searches to
+take much longer than exact word searches.  The inexact
+terms match more words in each document, the process of
+determining each inexact match takes longer, and OnSearch
+has more results to handle.
+<p>
+Searches for words consisting of a single letter, when you
+have selected the option, "Match text within words," are the
+least efficient of all search types.  In these cases, <font
+class="onsearch">OnSearch</font> matches documents with
+<i>every</i> indexed word that contains the letter.
+<p>
+Later searches, however, require
+less time if the results are already cached.
+<p>
+<h4>Search Preferences</h4> <font
+class="onsearch">OnSearch</font> records search
+preferences, including the type of match, whether to match
+both upper and lower case letters, text within words, the
+number of matching terms to display from each document, and
+the number of documents to display on each page of results.
+<p>
+<font class="onsearch">OnSearch</font> also records if
+users have selected a specific volume or volumes (see, 
+<a href="#volumes">Volumes</a>), and preferences for 
+indexing Web pages from other sites.
+<p>
+The Web browser
+must allow cookies from the OnSearch Web site in order to
+record the search information.
+<p>
+Once <font class="OnSearch">OnSearch</font> begins
+searching, it displays the first page of
+matching documents as soon as they are retrieved.  The next
+section, <a href="#viewing">Viewing Results,</a> describes
+how to view matching documents.
+
+<div class="footer">
+<a href="#contents">Return to the Table of Contents.</a>
+</div>
+
+<a name="viewing">
+<h3>Viewing Results</h3>
+Figure 2 shows a typical page of results.
+<p>
+<center>
+<img src="resultspage.jpg" alt="OnSearch Results Page">
+<p>
+Figure 2.  An <font class="onsearch">OnSearch</font> results page.
+</center>
+<p>
+You can page backward and forward through the results by
+clicking on the page numbers at the top and bottom of the
+page.  The total number of documents matched is the total
+found by a search in progress and could change as you
+view the results.
+
+<div class="footer">
+<a href="#contents">Return to the Table of Contents.</a>
+</div>
+
+<a name="adding">
+<h3>Adding Files and Web Pages To Be Searched</h3>
+Clicking <strong>"Archive"</strong> on the menu takes you to
+the Archive page, as in Figure 3, where you can upload
+documents or retrieve individual Web pages or the pages of 
+Web sites to be indexed and then searched by <font
+class="onsearch">OnSearch.</font>
+<p>
+<center>
+<img src="indexpage.jpg" alt="OnSearch Archive Page">
+<p>
+Figure 3.  The archive upload and indexing page.
+</center>
+<p>
+<i>Adding Web pages.</i>  You can upload either a single Web
+page or all of the Web pages from another site.  When you click on, 
+"Update," <font
+class="onsearch">OnSearch</font> 
+sends
+the request to the Web indexer, which begins to process your
+request as a background task, and then returns to the
+Archive page.
+<p>
+The pages are searchable as soon as <font
+class="onsearch">OnSearch</font> has indexed them.
+<p>
+<font class="onsearch">OnSearch</font> is able to handle URL
+redirection and content negotiation. So, for example, to retrieve
+the English language home page of a site that offers
+multiple languages, it's possible to enter just the
+Web server name without the <tt>index.html.</tt>  The
+other Web server should send the actual English language page,
+which will be archived by <font
+class="onsearch">OnSearch</font> as, for example,
+<tt>index.html.en.</tt>
+<p>
+<font class="OnSearch">OnSearch</font> does not retrieve Web
+pages that are on Web servers different than the Web server
+you entered, unless the <font
+class="OnSearch">OnSearch</font>administrator enables that
+capability.  Nor does it index Web pages that the remote site
+requested to be excluded from indexing.
+<p>
+<font class="onsearch">OnSearch</font> records the 
+progress of the Web page retrieval process in its Web log
+if the administrator enables this option.
+<p>
+<i>Uploading files.</i> When uploading files, <font
+class="onsearch">OnSearch</font> opens a file selection
+dialog.  Choose the file to upload.  Then, click on,
+"Update," and <font
+class="onsearch">OnSearch</font> processes the request in
+the background.
+<p>
+The file will be searchable and viewable as
+soon as <font class="onsearch">OnSearch</font> indexes
+it.
+<p>
+<font class="onsearch">OnSearch</font> can index document types
+other that text and HTML.  For example, if the administrator
+has enabled filters for Postscript and PDF documents, you
+can upload documents of those types also to be searched and 
+retrieved.  See, <a href="#admin">"OnSearch
+Administration,"</a> or consult with the system administrator.
+
+<div class="footer">
+<a href="#contents">Return to the Table of Contents.</a>
+</div>
+
+<a name="volumes">
+<h3>Volume Filters</h3>
+
+Without any further configuration, OnSearch searches all of
+the documents on your Web site, and the name of the search
+volume, "Default," is visible on the Search page.  However,
+if the administrator has configured alternate search volumes
+for the site, you can select which parts of the Web site you 
+want to search.
+<p>
+For example, if the Web site's technical documentation is in
+a subdirectory called, <tt>"docs,"</tt> the administrator
+can create a volume called, "Documentation," that specifies
+this subdirectory.  When searching, if you select only the
+volume, "Documentation," OnSearch searches only those
+documents.
+<p>
+OnSearch records your volume preferences.  Like other
+preferences, your Web browser must allow cookies from the
+OnSearch Web site for OnSearch to save your personal data.
+
+<div class="footer">
+<a href="#contents">Return to the Table of Contents.</a>
+</div>
+
+<a name="admin">
+<h3>OnSearch Administration</h3>
+
+<h4>Administration Table of Contents</h4>
+<ol>
+<li><a href="#indexing">Indexing</a>
+<li><a href="#docperms">Document Permissions</a>
+<li><a href="#logging">The OnSearch Web Log</a>
+<li><a href="#adminuser">Administrator User IDs and Passwords</a>
+<li><a href="#onsearchcfg"><tt>Onsearch.cfg</tt> Configuration</a>
+</ol>
+
+<a name="indexing">
+<h4>Indexing</h4>
+
+The <tt>onindex</tt> program performs the work of indexing
+the Web site's documents.  <tt>Onindex</tt> runs as a
+background process, and indexes files at the interval given
+by <tt>IndexInterval</tt> in <tt>onsearch.cfg,</tt> normally
+every four hours.
+<p>
+<tt>Onindex</tt> indexes only those directories that have
+been updated since the previous indexing task.  Although
+the first time that you index a Web site might take minutes or
+even hours for a large site, later indexing is much faster.
+<p>
+Before indexing, make sure that you have edited
+<tt>onsearch.cfg</tt> with the <tt>ExcludeDir</tt> and
+<tt>ExcludeGlob</tt> values that will prevent onindex 
+from indexing anything that you don't need indexed, like 
+PHP and Java library files, or OnSearch's cache directory.
+See <a href="#onsearchcfg"><tt>onsearch.cfg</tt>
+Configuration.</a> 
+<p>
+OnSearch does not run <tt>onindex</tt> automatically.  You
+can start it from the <strong>Admin</strong> page by
+checking the, "Index Now," box, or as the system
+administrator from the command line using either of these 
+shell commands.
+
+<blockquote><pre>
+# /usr/local/sbin/onindex
+# /usr/local/etc/init.d/onindex start
+</pre></blockquote>
+
+<p>
+If <tt>onindex</tt> is idle, the system administrator can start indexing
+immediately with the following shell command.
+
+<blockquote><pre>
+# /usr/local/etc/init.d/onindex index
+</pre></blockquote>
+
+<p>
+To stop <tt>onindex</tt>, the system administrator can use
+the following command.
+
+<blockquote><pre>
+# /usr/local/etc/init.d/onindex stop
+</pre></blockquote>
+
+<p>
+<tt>Onindex</tt> records its activity in the 
+<a href="#logging">OnSearch Web log.</a>  For testing or 
+monitoring, the administrator can tell 
+<tt>onindex</tt> to provide more detailed information with
+the following shell commands.
+
+<blockquote><pre>
+# /usr/local/sbin/onindex -v
+</pre></blockquote>
+Or,
+<blockquote><pre>
+# /usr/local/sbin/onindex -vv
+</pre></blockquote>
+
+<p>
+<strong>Note:</strong> To run <tt>onindex</tt> from the,
+<strong>"Admin,"</strong> page, the Web server must have its
+own unique user and group ID, for example, user
+<tt>apache,</tt> group, <tt>apache,</tt> in order for the
+program to have the necessary permissions to start as a
+background process.
+
+<p>
+The <tt>onindex(8)</tt> manual page contains detailed
+information about <tt>onindex</tt> options and run-time
+files.  
+<div class="footer">
+<a href="#admin">Return to the Administration Table of Contents.</a>
+</div>
+
+<a name="docperms">
+<h4>Document Permissions</h4>
+<tt>Onindex</tt> writes indexes in each document's
+directory.  In order to do this, it is necessary that the
+site's documents and document directories be writable by
+the Web server.
+<p>
+The Web server's <tt>httpd.conf</tt> file contains the user
+and group information as the values of the, <tt>"User,"</tt>
+and, <tt>"Group,",</tt> directives.  
+<p>
+The system administrator needs to set the site's document permissions to
+these values.  Initially the following shell commands change
+the ownership of the Web site's documents and document
+directories, assuming the administrator has configured the
+Web server to run as user, <tt>apache,</tt> group, <tt>apache.</tt>
+
+<blockquote><pre>
+# chown -R apache /usr/local/apache2/htdocs
+# chgrp -R apache /usr/local/apache2/htdocs
+</pre></blockquote>
+
+<strong>Note:</strong> Giving the Web server the ability to
+write to the document directories can be a security risk.
+The Apache manual document,
+<tt>manual/misc/security_tips.xml</tt> discusses these
+issues.
+
+<div class="footer">
+<a href="#admin">Return to the Administration Table of Contents.</a>
+</div>
+
+<a name="logging">
+<h4>The OnSearch Web Log</h4> OnSearch and <tt>onindex</tt>
+record their activity, and any warnings or errors, in their
+Web log, which is normally
+<tt>/usr/local/spool/onsearch/onsearch.log.</tt> The log
+uses a format similar to Apache's default Common Log Format,
+so you can parse the log for information as you would one of
+Apache's logs.
+
+<p>
+OnSearch's administrator can configure OnSearch and
+<tt>onindex</tt> to log extra information about local and
+remote indexing activity, and caching.
+<tt>Onsearch.cfg</tt> contains these options, which are
+described in <a href="#onsearchcfg"><tt>OnSearch.cfg</tt>
+Configuration.</a>
+
+<p>
+The system administrator can rotate the OnSearch log with the
+<tt>rotatelogs(8)</tt> utility that is distributed with the
+Apache server.
+
+<div class="footer">
+<a href="#admin">Return to the Administration Table of Contents.</a>
+</div>
+
+<a name="adminuser">
+<h4>Administrator User IDs and Passwords</h4>
+In a normal installation, OnSearch maintains its
+administrator user IDs, passwords, and groups in the
+following files.
+
+<blockquote><pre>
+/usr/local/etc/onpasswd
+/usr/local/etc/ongroup
+</pre></blockquote>
+
+<p>
+Refer to the <tt>htpasswd(8)</tt> manual page for
+information about adding users and passwords, and to the 
+Apache documentation for <tt>mod_auth</tt> for information
+about configuring authorization with Apache.
+
+<p>
+<strong>Note:</strong>  The installation user name of the
+OnSearch administrator is, "onsearch," password, "onsearch."
+You should change these values after installation.
+
+<div class="footer">
+<a href="#admin">Return to the Administration Table of Contents.</a>
+</div>
+
+
+<a name="onsearchcfg">
+<h4><tt>Onsearch.cfg</tt> Configuration</h4>
+
+This section describes the <tt>onsearch.cfg</tt> options.
+
+<ul>
+<li><a href="#backupindexes">BackupIndexes</a>
+<li><a href="#bindir">BinDir</a>
+<li><a href="#cacheresults">CacheResults</a>
+<li><a href="#cachereports">CacheReports</a>
+<li><a href="#datadir">DataDir</a>
+<li><a href="#digitsonly">DigitsOnly</a>
+<li><a href="#excludedir">ExcludeDir</a>
+<li><a href="#excludeglob">ExcludeGlob</a>
+<li><a href="#hassymlinks">HasSymLinks</a>
+<li><a href="#indexinterval">IndexInterval</a>
+<li><a href="#indexnontargeturls">IndexNontargetURLs</a>
+<li><a href="#onsearchdir">OnSearchDir</a>
+<li><a href="#pagesize">PageSize</a>
+<li><a href="#partialwordmatch">PartialWordMatch</a>
+<li><a href="#plugin">Plugin</a>
+<li><a href="#resultsperfile">ResultsPerFile</a>
+<li><a href="#resultspersist">ResultsPersist</a>
+<li><a href="#searchcontext">SearchContext</a>
+<li><a href="#searchroot">SearchRoot</a>
+<li><a href="#servername">ServerName</a>
+<li><a href="#singleletterwords">SingleLetterWords</a>
+<li><a href="#user">User</a>
+<li><a href="#verbosewebindexer">VerboseWebIndexer</a>
+<li><a href="#volume">Volume</a>
+<li><a href="#weblogdir">WebLogDir</a>
+</ul>
+
+<div class="footer">
+<a href="#admin">Return to the Administration Table of Contents.</a>
+</div>
+
+<a name="backupindexes">
+<h5><tt>BackupIndexes</tt></h5>
+If this value is non-zero, OnSearch makes backup copies of
+the indexes.
+
+<a name="bindir">
+<h5><tt>BinDir</tt></h5>
+This is the directory where <tt>onindex</tt> is located.
+Its value is normally <tt>/usr/local/sbin.</tt>
+
+<a name="cacheresults">
+<h5><tt>CacheResults</tt></h5>
+If non-zero, OnSearch caches the results of each search.
+This option should be enabled for normal use.  Caching
+should only be disabled when testing OnSearch.
+
+<a name="cachereports">
+<h5><tt>CacheReports</tt></h5>
+If set to a non-zero value, <tt>CacheReports</tt> logs extra
+information about cache activity.
+
+<a name="datadir">
+<h5><tt>DataDir</tt></h5>
+This is the directory where OnSearch and <tt>onindex</tt>
+store their run time information.  In OnSearch's normal
+configuration, its value is <tt>/usr/local/var/run/onsearch.</tt>
+
+<a name="digitsonly">
+<h5><tt>DigitsOnly</tt></h5>
+This option, if non-zero, tells <tt>onindex</tt> to also
+index words that contain only digits.
+
+<a name="excludedir">
+<h5><tt>ExcludeDir</tt></h5>
+The value of each <tt>ExcludeDir</tt> entry is a directory that you
+don't want to be indexed or searched.  <tt>Onsearch.cfg</tt>
+can have as many <tt>ExcludeDir</tt> entries as necessary.  
+<p>
+At the least, you should exclude OnSearch's cache directory
+from searching, as in this example.
+
+<blockquote><pre>
+ExcludeDir /usr/local/apache2/htdocs/onsearch/cache
+</pre></blockquote>
+
+<p>
+If you add or delete <tt>ExcludeDir</tt> entries, the index
+contents could become invalid, and you should
+reindex the site.  The <tt>onindex(8)</tt> manual page
+describes how to delete old indexes.
+
+<a name="excludeglob">
+<h5><tt>ExcludeGlob</tt></h5> 
+The value of each <tt>ExcludeGlob</tt>
+directive is a wild-card pattern. <font
+class="onsearch">OnSearch</font> excludes files with 
+names that match the entry's pattern from indexing and searching.
+
+<p>
+For example, because GIF image files contain no text,
+<font class="onsearch">OnSearch</font> excludes them with 
+the following entries.
+
+<blockquote><pre>
+ExcludeGlob *.gif
+ExcludeGlob *.GIF
+</pre></blockquote>
+
+<p>
+If the operating system distinguishes between upper and
+lower case file names, you should include
+<tt>ExcludeGlob</tt> entries for both.
+
+<p>
+OnSearch's normal configuration excludes Postscript and PDF
+documents from indexing and searching, because it can
+significantly slow the search process.  If you want to index
+and search documents of these types, comment out or remove
+these <tt>ExcludeGlob</tt> entries, as in the following example.
+
+<blockquote><pre>
+# ExcludeGlob  *.ps
+# ExcludeGlob  *.PS
+# ExcludeGlob  *.pdf
+# ExludeGlob   *.PDF
+</pre></blockquote>
+
+<p>
+You can also determine which files <font
+class="onsearch">OnSearch</font>
+indexes and searches based on the files' MIME types.
+See <a href="#plugin"><tt>PlugIn.</tt></a>
+
+<p>
+After adding or deleting <tt>ExcludeGlob</tt> entries, the
+index contents are invalid, and it is necessary to
+re-index the site.  The <tt>onindex(8)</tt> manual page
+contains instructions for deleting old indexes.
+
+<a name="hassymlinks">
+<h5><tt>HasSymLinks</tt></h5>
+Set this value to non-zero if the operating system provides
+symlinks.  It should not be necessary to change this value.
+
+<a name="indexinterval">
+<h5><tt>IndexInterval</tt></h5>
+The interval, in seconds between the times that
+<tt>onindex</tt> reindexes the files and directories that
+have changed.  In a normal configuration, its value is
+14400 seconds, or four hours.
+
+<a name="indexnontargeturls">
+<h5><tt>IndexNontargetURLs</tt></h5>
+If set to non-zero OnSearch also indexes remote site URLs that are
+linked to by the site being indexed.
+
+<p>
+<strong>Warning:</strong> You should use this option with
+extreme caution, because the Web indexer can retrieve many
+more Web pages (and Web sites) than the site the user requested.
+
+<a name="onsearchdir">
+<h5><tt>OnSearchDir</tt></h5>
+The value of <tt>OnSearchDir</tt> is the name of the
+subdirectory where OnSearch is installed.  It is normally a
+subdirectory of the Web server's <tt>DocumentRoot</tt>
+directory, as in this example.
+
+<blockquote><pre>
+OnSearchDir /usr/local/apache2/htdocs/onsearch
+</pre></blockquote>
+
+<p>In normal use, you should not need to change this value.
+
+<a name="pagesize">
+<h5><tt>PageSize</tt></h5>
+The default number of documents to display on each page of
+results.  This value is normally saved as a user preference.
+
+<a name="partialwordmatch">
+<h5><tt>PartialWordMatch</tt></h5>
+This is the default value of the, "Partial Word Match,"
+search option, which is saved as a user preference.
+
+<a name="plugin">
+<h5><tt>PlugIn</tt></h5>
+Each <tt>PlugIn</tt> entry defines a plugin filter for a
+MIME type that filters the text for that file type.
+
+<p>
+Plugins are filter programs that run helper applications,
+like <i>xpdf,</i> <i>ghostscript,</i> and <i>gzip</i>,
+reading the document to be indexed as standard input and
+writing the searchable text to standard output.
+
+<p>
+Plugins are located in the <tt>plugins</tt> subdirectory of 
+<tt>OnSearchDir.</tt>
+
+<p>
+OnSearch includes plugins for the following MIME types.
+<ul>
+<li><tt>text/plain</tt>
+<li><tt>text/html</tt>
+<li><tt>application/postscript</tt>
+<li><tt>application/pdf</tt>
+<li><tt>image/jpeg</tt>
+</ul> 
+
+<p>
+Each <tt>PlugIn</tt> entry contains the MIME type of the
+document and the name of the plugin.  If a file does not
+contain text, or you don't want to index a certain file
+type, you can specify the <tt>null</tt> plugin as the second
+argument.  
+
+<p>
+You can also exclude document types from searching based on
+their file extension.  See <a href="#excludeglob"><tt>ExcludeGlob.</tt></a>
+
+<p>
+After adding or deleting <tt>PlugIn</tt> entries, the
+index contents could become invalid, and you should
+reindex the site.  The <tt>onindex(8)</tt> manual page
+contains instructions for deleting old indexes.
+
+<a name="resultsperfile">
+<h5><tt>ResultsPerFile</tt></h5>
+This is the default value of the, "Results per file," user
+option, which is saved as a user preference.
+
+<a name="resultspersist">
+<h5><tt>ResultsPersist</tt></h5>
+The value is the amount of time, in seconds, that OnSearch
+keeps search results.
+
+<a name="searchcontext">
+<h5><tt>SearchContext</tt></h5>
+The value is the number of characters to display on either
+side of a matched word or phrase.
+
+<a name="searchroot">
+<h5><tt>SearchRoot</tt></h5>
+If there is only one <tt>SearchRoot</tt> entry, its value is normally 
+the Web server's document directory, the
+value of <tt>DocumentRoot</tt> in <tt>httpd.conf</tt>.
+
+<p>
+If the administrator has not configured any volumes, it is
+also the value of the volume, "Default."  See <a
+href="#volume">Volume.</a>
+
+<p>
+You can change this value to a subdirectory of
+<tt>DocumentRoot,</tt> if necessary, to limit searching to
+only a part of the site.  In that case, you should also add
+<tt>SearchRoot</tt> entries for <font class="onsearch">
+OnSearch's</font> <tt>websites</tt> and <tt>uploads</tt>
+subdirectories.
+
+<a name="servername">
+<h5><tt>ServerName</tt></h5> The fully qualified domain name
+of the Web server, or its numeric IP address.  The value is
+the same as the value of <tt>ServerName</tt> in
+<tt>httpd.conf.</tt>
+
+<a name="singleletterwords">
+<h5><tt>SingleLetterWords</tt></h5>
+If set to non-zero, this option instructs <tt>onindex</tt> to also index
+single letter words.
+
+<p>
+You should leave this option enabled, because OnSearch uses
+several sets of rules to try to avoid retrieving, for
+example, every instance of the letter, "x," or, "c," when
+searching, for example, for, "X Window System," and "C
+Language."
+
+<a name="user">
+<h5><tt>User</tt></h5>
+The user name of the Web server process owner.  This is the same
+as the value of <tt>User</tt> in <tt>httpd.conf</tt>
+
+<a name="verbosewebindexer">
+<h5><tt>VerboseWebIndexer</tt></h5>
+If the value is non-zero, OnSearch records information about
+individual URLs that users have requested to be retrieved
+and indexed. 
+
+<p>
+<tt>VerboseWebIndexer</tt> also enables the logging of HTTP
+redirects and content negotiation, and notes URLs that are
+disallowed from retrieval.
+
+<a name="volume">
+<h5><tt>Volume</tt></h5>
+The value of each <tt>Volume</tt> entry is the label of a
+volume and the subdirectory of the Web site that the entry refers
+to.  
+
+<p>
+If the administrator has not configured any volumes, the
+volume, "Default," refers to the <tt>SearchRoot</tt>
+directory.
+
+<p>
+OnSearch saves users' volume selections as part of his or her preferences.
+
+<a name="weblogdir">
+<h5><tt>WebLogDir</tt></h5>
+The value is the subdirectory where OnSearch keeps its Web
+log.  Its value is normally <tt>/usr/local/spool/onsearch.</tt> 
+
+<div class="footer">
+<a href="#onsearchcfg">Return to the <tt>onsearch.cfg</tt> options.</a>
+</div>
+
+
+<a name="copyright">
+<h4>Copyright</h4>
+<font class="onsearch">OnSearch</font> is copyright &copy;
+2004-2005 by Robert Kiesling, and is distributed 
+under the terms of the Perl Artistic License.
+Refer to the file, "Artistic," for information.
+<p>
+<h5>Credits</h5>
+<li>The name, <font class="onsearch">"OnSearch,"</font> its
+index file format, and much information about search
+strategies in general, are from the articles, "On
+Search," by Tim Bray.
+<li>The vector search subroutines use an 
+adaptation of the algorithms described in the Perl.com
+article, "Building a Vector Space Search Engine in
+Perl," by Maciej Ceglowski. 
+<li>The string search libraries use strategies of the
+Boyer-Moore search algorithm, as described in Michael
+Abrash's <i>Graphics Programming Black Book.</i>
+<p>
+<div class="footer">
+<a href="#contents">Return to the Table of Contents.</a>
+</div>
+</div> 
+</body> 
+</html>

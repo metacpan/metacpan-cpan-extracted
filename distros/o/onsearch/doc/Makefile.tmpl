@@ -1,0 +1,37 @@
+# $Id: Makefile.tmpl,v 1.3 2005/07/14 23:20:50 kiesling Exp $
+
+MAN8=onindex.man
+MAN8DIR=/usr/local/man/man8
+
+#
+# Edit to the name of the directory where OnSearch will be installed.
+#
+APPDIR=@onsearchdir@
+#
+# LOGDIR must be the same as WebLogDir in onsearch.cfg.
+#
+WEBLOGDIR=@weblogdir@
+#
+# DATADIR must be the same as DataDir in onsearch.cfg
+#
+DATADIR=@datadir@
+
+TROFF=groff -man -Tascii
+
+all : man8
+
+subs: 
+	cat onindex.man | \
+	sed 's|@onsearchcfg@|$(APPDIR)/onsearch.cfg|' | \
+	sed 's|@onsearchlog@|$(WEBLOGDIR)/onsearch.log|' | \
+	sed 's|@rundir@|$(DATADIR)|' > onindex.tmp
+
+man8 :  subs
+	mkdir -p $(MAN8DIR) && \
+	$(TROFF) onindex.tmp > onindex.8 && \
+	mv onindex.8 $(MAN8DIR) && \
+	mandb $(MAN8DIR)
+
+clean: 
+	rm -f *~ *.tmp Makefile
+

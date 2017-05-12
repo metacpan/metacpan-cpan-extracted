@@ -1,0 +1,12 @@
+#!/usr/bin/perl -w
+#$Id: pdf,v 1.1.1.1 2005/07/03 06:02:18 kiesling Exp $
+if (($#ARGV != 1) || ($ARGV[0] eq '-h')) {
+    print STDERR "usage: pdf infile outfile\n";
+    exit 1;
+}
+
+$ENV{PATH} = '/bin:/usr/bin:/usr/local/bin';
+
+`pdftotext $ARGV[0] $ARGV[1]`;
+
+exit 0;

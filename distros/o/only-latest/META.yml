@@ -1,0 +1,13 @@
+name: only-latest
+version: 0.01
+abstract: Always use the latest version of a module in @INC
+author: Autrijus Tang (autrijus@autrijus.org)
+license: perl
+distribution_type: module
+no_index:
+  directory:
+    - inc
+private:
+  directory:
+    - inc
+generated_by: Module::Install version 0.27

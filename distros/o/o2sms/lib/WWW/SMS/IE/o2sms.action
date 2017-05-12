@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<tg4w version="1.0.1">
+    <datasets>
+    </datasets>
+    <actions>
+        <action type="goto" refresh=".,." window="." step="0">
+            <xpath><![CDATA[window.location.href]]></xpath>
+            <value><![CDATA[http://messaging.o2online.ie/ssomanager.osp?APIID=AUTH-WEBSSO&TargetApp=o2om_smscenter_new.osp%3FMsgContentID%3D-1%26SID%3D_&utm_source=dashboard_webtext_link&utm_medium=link&utm_campaign=o2_dashboard]]></value>
+        </action>
+        <action type="assert-text-exists" window="." step="1">
+            <xpath><![CDATA[*]]></xpath>
+            <value><![CDATA[Already registered then just login]]></value>
+        </action>
+        <action type="assert-text-exists" window="." step="2">
+            <xpath><![CDATA[*]]></xpath>
+            <value><![CDATA[Already registered then just login]]></value>
+        </action>
+        <action type="fill" window="." step="3">
+            <xpath><![CDATA[*/FORM[@NAME="Login"]/*/INPUT[@NAME="IDToken1"]]]></xpath>
+            <value><![CDATA[{username}]]></value>
+        </action>
+        <action type="fill" window="." step="4">
+            <xpath><![CDATA[*/FORM[@NAME="Login"]/*/INPUT[@NAME="IDToken2"]]]></xpath>
+            <value><![CDATA[{password}]]></value>
+        </action>
+        <action type="click" refresh="." window="." step="5">
+            <xpath><![CDATA[*/FORM[@NAME="Login"]/*/INPUT[@NAME="Go"]]]></xpath>
+            <value><![CDATA[Go]]></value>
+        </action>
+        <action type="goto" refresh=".,." window="." step="6">
+            <xpath><![CDATA[window.location.href]]></xpath>
+            <value><![CDATA[http://messaging.o2online.ie/ssomanager.osp?APIID=AUTH-WEBSSO&TargetApp=o2om_smscenter_new.osp%3FMsgContentID%3D-1%26SID%3D_&utm_source=dashboard_webtext_link&utm_medium=link&utm_campaign=o2_dashboard]]></value>
+        </action>
+	<action type="verify-title" window="." step="7">
+            <xpath><![CDATA[*]]></xpath>
+            <value><![CDATA[Messaging : Mobile Phones and Broadband : Telefónica O2 : Ireland]]></value>
+        </action>
+        <action type="goto" refresh=".,." window="." step="8">
+            <xpath><![CDATA[window.location.href]]></xpath>
+            <value><![CDATA[http://messaging.o2online.ie/o2om_smscenter_new.osp?MsgContentID=-1&SID=_&SID=8240509_utusnutl]]></value>
+        </action>
+        <action type="assert-text-exists" refresh="true" step="9">
+            <xpath><![CDATA[*]]></xpath>
+            <value><![CDATA[<span id="spn_WebtextFree">(\d+)</span> free texts left for this month]]></value>
+        </action>
+        <action type="verify-title" window="." step="10">
+            <xpath><![CDATA[*]]></xpath>
+            <value><![CDATA[Messaging : Mobile Phones and Broadband : Telefónica O2 : Ireland]]></value>
+        </action>
+        <action type="fill" window="." step="11">
+            <xpath><![CDATA[*/FORM[@NAME="form_WebtextSend"]/*/INPUT[@NAME="SMSTo"]]]></xpath>
+            <value><![CDATA[{recipient}]]></value>
+        </action>
+        <action type="fill" window="." step="12">
+            <xpath><![CDATA[*/FORM[@NAME="form_WebtextSend"]/*/INPUT[@ID="SMSText"]]]></xpath>
+            <value><![CDATA[{message}]]></value>
+        </action>
+        <action type="click" refresh="true" step="13">
+            <xpath><![CDATA[*/FORM[@NAME="form_WebtextSend"]/]]></xpath>
+            <value><![CDATA[http://messaging.o2online.ie/smscenter_send.osp]]></value>
+        </action>
+        <action type="goto" refresh=".,." window="." step="14">
+            <xpath><![CDATA[window.location.href]]></xpath>
+            <value><![CDATA[http://messaging.o2online.ie/o2om_smscenter_new.osp?MsgContentID=-1&SID=_&SID=8240509_utusnutl]]></value>
+        </action>
+        <action type="assert-text-exists" refresh="true" step="15">
+            <xpath><![CDATA[*]]></xpath>
+            <value><![CDATA[<span id="spn_WebtextFree">(\d+)</span> free texts left for this month]]></value>
+        </action>
+    </actions>
+</tg4w>

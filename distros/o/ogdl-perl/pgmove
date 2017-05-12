@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+use OGDL::Parser;
+use Getopt::Std;
+%options=();
+getopts("d:g:n:p:chro",\%options);
+
+if($#ARGV <0 ||defined $options{h}) {
+    print <<END_USAGE;
+    $0 [options] path1 path2 [ogdlfile]
+    delete nodes that qualified by path.
+END_USAGE
+
+exit;
+}
+
+
+my $g;
+my $root="root";
+if($#ARGV>0){
+    $root=$ARGV[2];
+}
+
+my $ogdl=OGDL::Parser->new($root);
+if(!$ARGV[1]){
+    $ogdl->read(*STDIN);
+}
+else{
+    open my $input, "<$ARGV[2]"  or die "Can't open $ARGV[2]\n";
+    $ogdl->read($input);
+}
+ 
+$g=$ogdl->parse; 
+
+if(!$g){die "Coundn't parse file: $ARGV[1]\n";}
+my $path1=$ARGV[0];
+my $path2=$ARGV[1];
+$g->gmove($path1, $path2);
+
+
+my $depth=0;
+my $indent=4;
+my $singlequote=1;
+my $noblockquote=1;
+my $group=-1;
+if(exists $options{g}){$group=$options{g};}
+if($options{n}){$indent=$options{n};}
+
+$g->print("group"=>$group, "indentwidth"=>$indent,"singlequote"=>$singlequote,"noblockquote"=>$noblockquote);
+#open my $output, ">$ARGV[1]" or die "Can't write to $ARGV[1]\n";
+#my $l=$g->{"list"};
+#foreach (@$l){
+#$_->print("filehandle"=>$output,"group"=>$group, "indentwidth"=>$indent,"singlequote"=>$singlequote,"noblockquote"=>$noblockquote);
+#}
+

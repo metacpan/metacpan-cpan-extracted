@@ -1,0 +1,111 @@
+{
+   "abstract" : "A readline shell for OSGi",
+   "author" : [
+      "Roland Huss (roland@cpan.org)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110580",
+   "license" : [
+      "gpl_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "osgish",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Copy" : 0,
+            "Module::Build" : "0.35",
+            "Test" : 0,
+            "Test::Deep" : 0,
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.35"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Term::ANSIColor" : "2.02",
+            "Term::ReadLine::Gnu" : "0.27"
+         },
+         "requires" : {
+            "Carp" : 0,
+            "Config::General" : 0,
+            "Data::Dumper" : 0,
+            "Getopt::Long" : 0,
+            "JMX::Jmx4Perl" : "0.60",
+            "Pod::Usage" : 0,
+            "Term::Clui" : 0,
+            "Term::ReadLine" : 0,
+            "Term::ReadLine::Perl" : 0,
+            "Term::ShellUI" : "0.86"
+         }
+      }
+   },
+   "provides" : {
+      "OSGi::Osgish" : {
+         "file" : "lib/OSGi/Osgish.pm",
+         "version" : "v0.3.1"
+      },
+      "OSGi::Osgish::Agent" : {
+         "file" : "lib/OSGi/Osgish/Agent.pm",
+         "version" : 0
+      },
+      "OSGi::Osgish::Agent::Upload" : {
+         "file" : "lib/OSGi/Osgish/Agent/Upload.pm",
+         "version" : 0
+      },
+      "OSGi::Osgish::Command" : {
+         "file" : "lib/OSGi/Osgish/Command.pm",
+         "version" : 0
+      },
+      "OSGi::Osgish::Command::Bundle" : {
+         "file" : "lib/OSGi/Osgish/Command/Bundle.pm",
+         "version" : 0
+      },
+      "OSGi::Osgish::Command::Global" : {
+         "file" : "lib/OSGi/Osgish/Command/Global.pm",
+         "version" : 0
+      },
+      "OSGi::Osgish::Command::Server" : {
+         "file" : "lib/OSGi/Osgish/Command/Server.pm",
+         "version" : 0
+      },
+      "OSGi::Osgish::Command::Service" : {
+         "file" : "lib/OSGi/Osgish/Command/Service.pm",
+         "version" : 0
+      },
+      "OSGi::Osgish::Command::Upload" : {
+         "file" : "lib/OSGi/Osgish/Command/Upload.pm",
+         "version" : 0
+      },
+      "OSGi::Osgish::CommandHandler" : {
+         "file" : "lib/OSGi/Osgish/CommandHandler.pm",
+         "version" : 0
+      },
+      "OSGi::Osgish::CompletionHandler" : {
+         "file" : "lib/OSGi/Osgish/CompletionHandler.pm",
+         "version" : 0
+      },
+      "OSGi::Osgish::ServerHandler" : {
+         "file" : "lib/OSGi/Osgish/ServerHandler.pm",
+         "version" : 0
+      },
+      "OSGi::Osgish::Shell" : {
+         "file" : "lib/OSGi/Osgish/Shell.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt"
+      ]
+   },
+   "version" : "v0.3.1"
+}

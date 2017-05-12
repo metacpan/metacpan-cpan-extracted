@@ -1,0 +1,11 @@
+01 'servers save'
+06 Configuration handling and per server
+09 command line completion for install
+10 color themes configurable
+11 check color consistency
+12 better online help
+13 search for a given package
+14 list content of a bundle (needs extra JMX support)
+15 extract part of a bundle (needs extra JMX support)
+16 download a bundle (needs extra JMX support)
+17 dynamic registration of bundles + plugin lookupRERE

@@ -1,0 +1,15 @@
+CHANGES.md
+lib/Bio/ORA.pm
+LICENSE.md
+Makefile.PL
+MANIFEST			This list of files
+README.md
+scripts/or.fasta
+scripts/or.hmm
+scripts/or.hmm.h3f
+scripts/or.hmm.h3i
+scripts/or.hmm.h3m
+scripts/or.hmm.h3p
+scripts/or.pl
+t/test.t
+SIGNATURE

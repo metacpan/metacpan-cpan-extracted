@@ -1,0 +1,59 @@
+Revision history for Perl extension optimizer.
+
+0.08  2012-02-28 <rurban@cpan.org>
+        - for 5.15 set CopARYBASE_get(PL_curcop) to 0 (there's no ppport for this)
+
+0.07  2011-09-02 Reini Urban <rurban@cpan.org>
+        - prepend "_" to private subs
+	- disable relocatetopad as the op_sv is wrong and the cv looks strange
+	- added testcover to Makefile
+
+0.06_07  2011-08-18 Reini Urban <rurban@cpan.org>
+        - fix Artur's name
+
+0.06_06  2011-08-17 Reini Urban <rurban@cpan.org>
+        - t/04-use.t: 7-8 fail threaded at pad_alloc (TODO)
+
+0.06_05  2010-08-28 Reini Urban <rurban@cpan.org>
+	- explain CPAN test failures with B::Generate and PERL_DL_NONLAZY=1
+	  If you want it, use it without PERL_DL_NONLAZY being set.
+	- remove PERL_DL_NONLAZY=1 from our tests.
+
+0.06_04  2010-08-24 Reini Urban <rurban@cpan.org>
+	- added pod documentation
+	- fix z_ tests
+	- fix MANIFEST
+
+0.06_03  2010-08-24 Reini Urban <rurban@cpan.org>
+	all tests pass but 04-use.t 7+8 with threads in relocatetopad
+	- fix compiler warnings
+	- added eg/and_not.pl
+	- add some minor patches from Jim Cromie (not his 0.06_02)
+	- simplify OP_SUBST in c_extend_peep
+
+0.06  2008-07-13 19:44:57 Reini Urban <rurban@cpan.org>
+	- 5.10 and 5.11 patch, fixes for 5.8.8
+	- Iop_seqmax and B::OP::seq workaround for 5.10 callbacks
+	- added eg/pad.pl
+	- added t/04-use.t
+
+0.05  Mon Dec 30 09:45:09 CET 2002 Artur Bergman
+	- Applied patch from greg that removes debugging prints
+	  [rt.cpan.org 1475] http://rt.cpan.org/NoAuth/Bug.html?id=1475
+
+0.04  Sun Dec 29 17:29:05 CET 2002 Artur Bergman
+	- Add support for multiple 'sub-detect' callbacks
+
+0.03  Sat Dec 28 23:13:02 CET 2002 Artur Bergman
+        - Added support for use optimizer 'sub-detect', which
+	  callbacks on every code block it finds after that
+	  block has been compiled.
+
+0.02  Wed Jun 26 19:44:29 CEST 2002 Artur Bergman
+	- Added support use optimizer 'extend-c', which extends
+	  perls default C based optimizer.
+
+0.01  Sat Jul 28 13:55:06 2001 Simon Cozens
+	- original version; created by h2xs 1.21 with options
+		-A -n optimizer
+

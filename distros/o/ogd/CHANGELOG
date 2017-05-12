@@ -1,0 +1,19 @@
+0.03	31 March 2012
+	Added some pod.  Made sure it runs with 5.14.2, threaded and unthreaded.
+
+0.02	4 December 2004
+	Added a real test-suite.
+
+	Added THEORY OF OPERATION section, as well as documentation of all
+	the new features.
+
+	Added simple debugging output, activated with the OGD_DEBUG
+	environment variable.
+
+	Added configurable cleanup interval with OGD_CLEANUP environment
+	variable.
+
+	Fixed problem with cleanup interfering with weakening of references.
+
+0.01	3 December 2004
+	First version of ogd.

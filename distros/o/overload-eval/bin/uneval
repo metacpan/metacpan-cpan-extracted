@@ -1,0 +1,2 @@
+#!perl
+exec $^X, '-Moverload::eval=-p', @ARGV;

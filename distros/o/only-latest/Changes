@@ -1,0 +1,6 @@
+____________________________________________________________________________
+[  8643] By: autrijus                              on 2003/11/01  06:14:05
+        Log: * 0.01, initial CPAN release.
+	   + MANIFEST Makefile.PL README
+	   + lib/only/latest.pm t/0-signature.t
+	   + t/1-basic.t

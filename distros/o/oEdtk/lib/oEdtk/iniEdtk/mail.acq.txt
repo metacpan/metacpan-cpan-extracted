@@ -1,0 +1,25 @@
+Bonjour,
+
+voici l'état d'avancement des éditions produites à ce jour, transmises pour façonnage et remises en poste.
+
+Cordialement
+
+
+____________________________________________________________________________________
+CODIFICATIONS
+
+DTPOST	: est la date de remise en poste communiquée par le façonnier
+DTPOST2	: est la date de remise en poste lorsque le façonnier effectue une reprise
+
+____________________________________________________________________________________
+STATUTS
+
+Pending 	: en cours de traitement
+Sent		: remise en poste effectuée
+Ano		: documents en anomalie et écartés
+Duple 	: documents doublons écartés
+Lack		: différences entre volumétrie DSI et volumétrie Faconnier
+Reset 	: documents recyclés en attente de re traitement
+Stop		: documents bloqués et écartés
+
+____________________________________________________________________________________

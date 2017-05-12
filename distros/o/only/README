@@ -1,0 +1,438 @@
+NAME
+    only - Load specific module versions; Install many
+
+SYNOPSIS
+        # Install version 0.30 of MyModule
+        cd MyModule-0.30
+        perl Makefile.PL
+        make test
+        perl -Monly=install    # substitute for 'make install' 
+        perl -Monly=install - version=0.33 versionlib=/home/ingy/perlmods
+    
+        # Only use MyModule version 0.30
+        use only MyModule => 0.30;
+
+        # Only use MyModule if version is between 0.30 and 0.50
+        # but not 0.36; or if version is >= to 0.55.
+        use only MyModule => '0.30-0.50 !0.36 0.55-', qw(:all);
+
+        # Don't export anything!
+        use only MyModule => 0.30, [];
+
+        # Version dependent arguments
+        use only MyModule =>
+            [ '0.20-0.27', qw(f1 f2 f3 f4) ],
+            [ '0.30-',     qw(:all) ];
+
+        # Override versionlib
+        use only {versionlib => '/home/ingy/perlmods'},
+            MyModule => 0.33;
+    
+        # Override versionlib globally
+        use only {versionlib => '/home/ingy/perlmods'};
+        use only MyModule => 0.33;
+
+        # Object Oriented Interface
+        use only;
+        $only = only->new;
+        $only->module('MyModule');
+        $only->condition('0.30');
+        $only->include;
+        require MyModule;
+        $only->remove;
+    
+USAGE
+        # Note: <angle brackets> mean "optional".
+
+        # To load a specific module
+        use only MODULE => 'CONDITION SPEC' <, ARGUMENTS>;
+
+        # To set options
+        use only < { OPTIONS HASH } >, MODULE => 'CONDITION SPEC';
+
+        # To set options globally
+        use only < { OPTIONS HASH } >;
+
+        # For multiple argument sets
+        use only MODULE => 
+            ['CONDITION SPEC 1' <, ARGUMENTS1>],
+            ['CONDITION SPEC 2' <, ARGUMENTS2>],
+            ...
+            ;
+
+        # To install an alternate version of a module
+        perl -Monly=install <- ARGUMENTS>        # instead of 'make install'
+
+DESCRIPTION
+    The "only.pm" facility allows you to load a MODULE only if it satisfies
+    a given CONDITION. Normally that condition is a version. If you just
+    specify a single version, 'only' will only load the module matching that
+    version. If you specify multiple versions, the module can be any of
+    those versions. See below for all the different conditions you can use
+    with "only".
+
+    "only.pm" will also allow you to load a particular version of a module,
+    when many versions of the same module are installed. See below for
+    instructions on how to easily install many different versions of the
+    same module.
+
+CONDITION SPECS
+    A condition specification is a single string containing a list of zero
+    or more conditions. The list of conditions is separated by spaces. Each
+    condition can take one of the following forms:
+
+    * plain version
+        This is the most basic form. The loaded module must match this
+        version string or be loaded from a version directory that uses the
+        version string. Mulitiple versions means one or the other.
+
+            use only MyModule => '0.11';
+            use only MyModule => '0.11 0.15';
+
+    * version range
+        This is two single versions separated by a dash. The end points are
+        inclusive in the range. If either end of the range is ommitted, then
+        the range is open ended on that side.
+
+            use only MyModule => '0.11-0.12';
+            use only MyModule => '0.13-';
+            use only MyModule => '-0.10';
+            use only MyModule => '-';       # Means any version
+
+        Note that a completely open range (any version) is not the same as
+        just saying:
+
+            use MyModule;
+
+        because the "only" module will search all the various version libs
+        before searhing in the regular @INC paths.
+
+        Also note that an empty string or no string means the same thing as
+        '-'.
+
+            # All of these mean "use any version"
+            use only MyModule => '-';
+            use only MyModule => '';
+            use only 'MyModule';
+
+    * complement version or range
+        Any version or range beginning with a '!' is considered to mean the
+        inverse of that specification. A complement takes precedence over
+        all other specifications. If a module version matches a complement,
+        that version is immediately rejected without further inspection.
+
+            use only MyModule => '!0.31';
+            use only MyModule => '0.30-0.40 !0.31-0.33';
+
+    The search works by searching the version-lib directories (found in
+    "only::config") for a module that meets the condition specification. If
+    more than one version is found, the highest version is used. If no
+    module meets the specification, then a normal @INC style "require" is
+    performed.
+
+    If the condition is a subroutine reference, that subroutine will be
+    called and passed an "only" object. If the subroutine returns a false
+    value, the program will die. See below for a list of public methods that
+    may be used upon the "only" object.
+
+ARGUMENTS
+    All of the arguments following the CONDITION specification, will be
+    passed to the module being loaded.
+
+    Normally you can pass an empty list to "use" to turn off Exporting. To
+    do this with "only", use an empty array ref.
+
+        use only MyModule => '0.30';       # Default exporting
+        use only MyModule => '0.30', [];   # No exporting
+        use only MyModule => '0.30', qw(export list);  # Specific export
+
+    If you need pass different arguments depending on which version is used,
+    simply wrap each condition spec and arguments with an array ref.
+
+        use only MyModule =>
+            [ '0.20-0.27', qw(f1 f2 f3 f4) ],
+            [ '0.30-',     qw(:all) ];
+
+OPTIONS
+    Options to "only" are specified as a hash reference placed before the
+    module name. If there is no module name, the options become global, and
+    affect all other calls to only (even ones from other modules, so be
+    aware).
+
+    Currently, the only option is "versionlib".
+
+    Sometimes you need to tell "only" to use a specific version library to
+    load from. Use the "versionlib" option to do this.
+
+        use only { versionlib => '/home/ingy/modules' },
+            MyModule => 0.33;
+
+INSTALLING MULTIPLE MODULE VERSIONS
+    The "only.pm" module also has a facility for installing more than one
+    version of a particular module. Using this facility you can install an
+    older version of a module and use it with the 'use only' syntax.
+
+    It works like this; when installing a module, do the familiar:
+
+        perl Makefile.PL
+        make
+        make test
+
+    But instead of "make install", do this:
+
+        perl -Monly=install
+
+    This will attempt to determine what version the module should be
+    installed under. In some cases you may need to specify the version
+    yourself. Do the following:
+
+        perl -Monly=install - version=0.55
+
+    By default, everything will be installed in versionlib directory stored
+    in "only::config". To override the installation location, do this:
+
+        perl -Monly=install - versionlib=/home/ingy/modules
+
+    NOTE: Also works with "Module::Build" style modules.
+
+    NOTE: The "perl" you use for this must be the same "perl" as the one
+    used to do "perl Makefile.PL" or "perl Build.PL". While this seems
+    obvious, you may run into problems with "sudo perl -Monly=install",
+    since the "root" account may have a different "perl" in its path. If
+    this happens, just use the full path to your "perl".
+
+  Installing with Module::Build
+    When installing modules distributed with Module::Build, you can use the
+    following commands to install into version specific libraries:
+
+        perl Build.PL
+        ./Build
+        ./Build versioninstall
+ 
+    For overrides:
+
+        perl Build.PL version=1.23 versionlib=/home/ingy/modules
+        ./Build
+        ./Build versioninstall
+
+    NOTE: The Module::Build verion install does not suffer from the same
+    "sudo" problem outlined above. Module::Build remembers the original perl
+    path.
+
+INSTALLATION LOCATION
+    When you install the "only" module, you can tell it where to install
+    alternate versions of modules. These paths get stored into
+    "only::config". The default location to install things is parallel to
+    your sitelib. For instance if your sitelib was:
+
+        /usr/lib/perl5/site_perl
+
+    "only" would default to:
+
+        /usr/lib/perl5/version
+
+    This keeps your normal install trees free from any potential
+    complication with version modules.
+
+    If you install version 0.24 and 0.26 of MyModule and version 0.26 of
+    Your::Module, they will end up here:
+
+        /usr/lib/perl5/version/0.24/My/Module.pm
+        /usr/lib/perl5/version/0.26/My/Module.pm
+        /usr/lib/perl5/version/0.26/Your/Module.pm
+
+HOW IT WORKS
+    "only.pm" is kind of like "lib.pm" on Koolaid! Instead of adding a
+    search path to @INC, it adds a search object to @INC. This object is
+    actually the "only.pm" object itself. The object keeps track of all of
+    the modules related to a given module distribution installation, and
+    takes responsibility for loading those modules. This is very important
+    because if you say:
+
+        use only Goodness => '0.23';
+
+    and then later:
+
+        require Goodness::Gracious;
+
+    you want to be sure that the correct version of the second module gets
+    loaded. Especially when another module is doing the loading.
+
+OBJECT ORIENTED API
+    "only" is implemented internally using Object Oriented Programming. You
+    yourself can also make use of "only" objects directly in your program.
+    Instead of saying something like this:
+
+        use only MyModule => '0.30', qw(foo bar);
+
+    You could say:
+
+        my $only;
+        BEGIN {
+            $only = only->new;
+            $only->module('MyModule')->condition('0.30');
+            $only->include;
+        }
+        use MyModule qw(foo bar);
+
+    The cool thing here is that we just used a normal "use" statement to
+    load a particular module.
+
+    This gives you more control and you may be able to do some interesting
+    stuff this way.
+
+    The following sections detail the Object Oriented API.
+
+  Class Methods
+    There are three class methods available:
+
+    * new
+        This simply constucts a new "only" object. It takes no arguments.
+
+            my $only = only->new;
+
+    * versionlib
+        When call as a class method, "versionlib" sets the global default
+        versionlib for all future "only" processing. This takes one
+        argument.
+
+            only->versionlib('/home/ingy/modules');
+
+    * fix_INC
+        There is a bug in Perl 5.6.1 that sometimes leaves an incorrect
+        value in %INC after loading a module from an "only" object. If you
+        call this method after a "use" or "require" the values will be
+        fixed.
+
+  Object Methods
+    All of the following methods return themselves when used as
+    store-accessors. This lets you chain calls together:
+
+        only->new->module('MyModule)->version('0.30')->include;
+
+    When used as fetch-accessors they, of course, return their values.
+
+    * module
+        You pass this method the name of any one module from a particular
+        installed module distribution. The object becomes responsible for
+        loading any and all modules associated with the one you specified.
+
+            $only->module('MyModule');
+
+    * condition
+        Sets the version condition specification.
+
+            $only->condition('0.30-0.50');
+
+    * versionlib
+        When called as an object method, "versionlib" sets the versionlib
+        that will be used by this object.
+
+            $only->versionlib('/home/ingy/modules');
+
+    * include
+        This simply puts the object at the front of @INC. It also makes sure
+        that no other references to the same object are in @INC.
+
+            $only->include;
+
+        Remember that your object will only have an effect on the Perl's
+        "require" process, if it is in @INC.
+
+    * remove
+        This method removes any references to the object from @INC.
+
+            $only->remove;
+
+    * search
+        You won't normally need to call this method yourself. Search
+        determines whether a matching copy of the module exists for the
+        current values of "module", "condition" and "versionlib". It doesn't
+        actually load anything though.
+
+            if ($only->search) {
+                ...
+            }
+
+        "search" is called automatically when a "use" or "require" hits your
+        object.
+
+    * distribution_version
+        After a successful "search" (or "use" or "require"), this method
+        will return the version that was found.
+
+            my $version = $only->distribution_version;
+
+THE FINE PRINT ON VERSIONING
+    The "only.pm" module loads a module by the following process:
+
+     1) Look for the highest suitable version of the module in the version
+        libraries specified in only::config.
+ 
+     else:
+ 
+     2) Do a normal require() of the module, and check to make sure the 
+        version is in the range specified.
+
+    It is important to understand that the versions used in these two
+    different steps come from different places and might not be the same.
+
+    In the first step the version used is the version of the "distribution"
+    that the module was installed from. This is grepped out of the Makefile
+    and saved as metadata for that module.
+
+    In the second step, the version is taken from $VERSION of that module.
+    This is the same process used when you do something like:
+
+         use MyModule '0.50';
+
+    Unfortunately, there is no way to know what the distribution version is
+    for a normally installed module.
+
+    Fortunately, $VERSION is usually the same as the distribution version.
+    That's because the popular "VERSION_FROM" Makefile.PL option makes it
+    happen. Authors are encouraged to use this option.
+
+    The conclusion here is that "only.pm" usually gets things right. Always
+    check %INC, if you suspect that the wrong versions are being pulled in.
+    If this happens, use more 'use only' statements to pull in the right
+    versions.
+
+    One failsafe solution is to make sure that all module versions in
+    question are installed into the version libraries.
+
+LOADING MULTIPLE MODULE VERSIONS (at the same time)
+    You can't do that! Are you crazy? Well I am. I can't do this yet but I'd
+    really like to. I'm working on it. If you have ideas on how this might
+    be accomplished, send me an email. If you don't have a good idea, send
+    me some coffee.
+
+BUGS AND CAVEATS
+    *   This module only works with Perl 5.6.1 and higher. That's because
+        earlier versions of Perl don't support putting objects in @INC.
+
+    *   There is currently no way to install documentation for multiple
+        modules. It wouldn't make much sense anyway, because "perldoc"
+        wouldn't have support for reading the doc.
+
+    *   You can't use "only" to load a specific version of "only" itself,
+        because the default version gets loaded before it can do any
+        trickery.
+
+        If you had both versions 1.23 and 3.21 installed:
+
+            use only only => '1.23';
+
+        would load up 3.21 and then fail because it wasn't 1.23.
+
+AUTHOR
+    Brian Ingerson <INGY@cpan.org>
+
+COPYRIGHT
+    Copyright (c) 2003. Brian Ingerson. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

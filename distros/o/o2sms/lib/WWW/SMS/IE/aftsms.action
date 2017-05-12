@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<tg4w version="0.40.0">
+    <actions>
+        <action type="goto" refresh="true" step="0">
+            <xpath><![CDATA[window.location.href]]></xpath>
+            <value><![CDATA[http://www.mackers.com/projects/o2sms/aft-form.html]]></value>
+        </action>
+        <action type="verify-title" refresh="true" step="1">
+            <xpath><![CDATA[*]]></xpath>
+            <value><![CDATA[AFT Form]]></value>
+        </action>
+        <action type="verify-title" step="2">
+            <xpath><![CDATA[*]]></xpath>
+            <value><![CDATA[AFT Form]]></value>
+        </action>
+        <action type="fill" step="3">
+            <xpath><![CDATA[*/FORM[1]/INPUT[@TYPE="text" and @NAME="u"]]]></xpath>
+            <value><![CDATA[{username}]]></value>
+        </action>
+        <action type="fill" step="4">
+            <xpath><![CDATA[*/FORM[1]/INPUT[@TYPE="text" and @NAME="p"]]]></xpath>
+            <value><![CDATA[{password}]]></value>
+        </action>
+        <action type="fill" step="5">
+            <xpath><![CDATA[*/FORM[1]/INPUT[@TYPE="text" and @NAME="d"]]]></xpath>
+            <value><![CDATA[{recipient}]]></value>
+        </action>
+        <action type="fill" step="6">
+            <xpath><![CDATA[*/FORM[1]/INPUT[@TYPE="text" and @NAME="m"]]]></xpath>
+            <value><![CDATA[{message}]]></value>
+        </action>
+        <action type="click" refresh="true" step="7">
+            <xpath><![CDATA[*/FORM[1]/INPUT[@TYPE="submit"and @VALUE=""]]]></xpath>
+            <value><![CDATA[null]]></value>
+        </action>
+        <action type="verify-title" step="8">
+            <xpath><![CDATA[*]]></xpath>
+            <value><![CDATA[]]></value>
+        </action>
+        <action type="assert-text-exists" step="9">
+            <xpath><![CDATA[*]]></xpath>
+            <value><![CDATA[^[^\-](\d\d\d?)\s*$]]></value>
+        </action>
+    </actions>
+</tg4w>

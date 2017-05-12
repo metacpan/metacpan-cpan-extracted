@@ -1,0 +1,16 @@
+OnSearch README
+
+The Perl script, "install," builds and configures OnSearch based on
+the site's Apache Web server configuration.  The following command
+should install OnSearch.
+
+ # perl install
+
+INSTALL.html contains detailed installation instructions, including
+system requirements and manual installation procedures.  
+
+After installation, the User Guide's administration chapter,
+doc/userguide.html#admin, and the onindex(8) manual page, describe
+how to administer OnSearch and index documents.
+
+

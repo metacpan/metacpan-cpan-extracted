@@ -1,0 +1,11 @@
+
+# Edit the <Directory> wrapper with the name of the OnSearch admin 
+# subdirectory.
+
+<Directory <onsearch-directory>/admin>
+    AuthType Basic
+    AuthName OnSearch
+    AuthUserFile /usr/local/etc/onpasswd
+    AuthGroupFile /usr/local/etc/ongroup
+    require group onsearch
+</Directory>

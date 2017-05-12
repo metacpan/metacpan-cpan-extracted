@@ -1,0 +1,12 @@
+#!/usr/bin/perl -w
+# $Id: postscript,v 1.1.1.1 2005/07/03 06:02:18 kiesling Exp $
+
+if (($#ARGV != 1) || ($ARGV[0] eq '-h')) {
+    print STDERR "usage: postscript infile outfile\n";
+    exit 1;
+}
+$options = '-q -dNODISPLAY -dSAFER -dNOBIND -dWRITESYSTEMDICT -dSIMPLE';
+`gs $options -c save -f ps2ascii.ps $ARGV[0] -c quit > $ARGV[1]`;
+
+exit 0;
+

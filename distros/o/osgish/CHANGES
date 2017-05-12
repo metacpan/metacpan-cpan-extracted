@@ -1,0 +1,18 @@
+0.3.1 (2012-1-2)
+  * Fixed listing of export/import 
+  * Updated dependencies
+  * Updated README
+
+0.2.0
+  * Updated to Aries 0.3
+  * Splitted up OSGi bundles in a pure (core) bundle and an 
+    all-in-one bundle (bundle)
+
+0.1.0 
+  * Upload bundles to server and manage it
+  * Tuned context sensitive completions, added options to 'ls' of
+    services/bundles ('-s' show symbolic names, '-u <bid>' only
+    services used by bundle <bid>, '-b <bid>' services owned by 
+    bundle <bid>
+  * Start to add online help
+  * Initial release

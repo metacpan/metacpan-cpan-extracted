@@ -1,0 +1,23 @@
+Revision history for overload-substr
+
+0.03    CHANGES:
+         * Fix for OPfSUBSTR_REPL_FIRST behaviour of perl 5.15.5 onwards
+           (RT74888)
+
+0.02    First non-beta release
+
+---
+
+0.01_004 CHANGES:
+         * Use ppport.h for hopefully-better back-compat.
+
+0.01_003 CHANGES:
+         * Implement LVALUE context, in both get and set forms
+
+0.01_002 CHANGES:
+         * Support bare name for substr method
+         * Croak on attempts to be called in LVALUE context
+           - TODO: actually implement LVALUE context
+
+0.01_001 First version, released on an unsuspecting world.
+

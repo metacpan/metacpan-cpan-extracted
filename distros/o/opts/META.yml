@@ -1,0 +1,52 @@
+---
+abstract: '(DEPRECATED) simple command line option parser'
+author:
+  - 'Kan Fushihara <kan.fushihara at gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::Exception: 0
+  Test::Module::Used: 0
+  Test::Perl::Critic: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.11.0, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: opts
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  opts:
+    file: lib/opts.pm
+    version: 0.07
+requires:
+  Filter::Util::Call: 0
+  Getopt::Long: 2.37
+  PadWalker: 1.9
+  Text::Table: 0
+resources:
+  bugtracker: https://github.com/kan/p5-opts/issues
+  homepage: https://github.com/kan/p5-opts
+  repository: git://github.com/kan/p5-opts.git
+version: 0.07
+x_contributors:
+  - 'Kan Fushihara <kan@kan-loox.(none)>'
+  - 'Kan Fushihara <kan@mobilefactory.jp>'
+  - 'Chris Weyl <cweyl@alumni.drew.edu>'
+  - 'Keiji, Yoshimi <walf443@gmail.com>'
+  - 'Kan Fushihara <kan@mfac.jp>'
+  - 'Neil Bowers <neil@bowers.com>'
+  - 'kan fushihara <kan.fushihara@gmail.com>'

@@ -1,0 +1,130 @@
+Only needed < 5.8
+
+--- thrdvar.h~	Sat Jul 28 11:21:46 2001
++++ thrdvar.h	Sat Jul 28 11:33:34 2001
+@@ -211,6 +211,8 @@
+ PERLVARI(Treg_poscache, char *, Nullch)	/* cache of pos of WHILEM */
+ PERLVAR(Treg_poscache_size, STRLEN)	/* size of pos cache of WHILEM */
+ 
++PERLVARI(Tpeepp,	peep_t, MEMBER_TO_FPTR(Perl_peep))
++					/* Pointer to peephole optimizer */
+ PERLVARI(Tregcompp,	regcomp_t, MEMBER_TO_FPTR(Perl_pregcomp))
+ 					/* Pointer to REx compiler */
+ PERLVARI(Tregexecp,	regexec_t, MEMBER_TO_FPTR(Perl_regexec_flags))
+--- perl.c~	Sat Jul 28 11:22:18 2001
++++ perl.c	Sat Jul 28 11:24:03 2001
+@@ -3804,6 +3804,7 @@
+     (void) find_threadsv("@");	/* Ensure $@ is initialised early */
+ 
+     PL_maxscream = -1;
++    PL_peepp = MEMBER_TO_FPTR(Perl_peep);
+     PL_regcompp = MEMBER_TO_FPTR(Perl_pregcomp);
+     PL_regexecp = MEMBER_TO_FPTR(Perl_regexec_flags);
+     PL_regint_start = MEMBER_TO_FPTR(Perl_re_intuit_start);
+--- perl.h~	Sat Jul 28 11:24:11 2001
++++ perl.h	Sat Jul 28 11:26:00 2001
+@@ -2970,6 +2970,7 @@
+ #define RsRECORD(sv)  (SvROK(sv) && (SvIV(SvRV(sv)) > 0))
+ 
+ /* Enable variables which are pointers to functions */
++typedef void (CPERLscope(*peep_t))(pTHX_ OP* o);
+ typedef regexp*(CPERLscope(*regcomp_t)) (pTHX_ char* exp, char* xend, PMOP* pm);
+ typedef I32 (CPERLscope(*regexec_t)) (pTHX_ regexp* prog, char* stringarg,
+ 				      char* strend, char* strbeg, I32 minend,
+--- sv.c~	Sat Jul 28 11:26:31 2001
++++ sv.c	Sat Jul 28 11:27:13 2001
+@@ -10265,6 +10265,9 @@
+     PL_reginterp_cnt	= 0;
+     PL_reg_starttry	= 0;
+ 
++    /* Pluggable optimizer */
++    PL_peepp		= proto_perl->Tpeepp;
++
+     if (!(flags & CLONEf_KEEP_PTR_TABLE)) {
+         ptr_table_free(PL_ptr_table);
+         PL_ptr_table = NULL;
+--- util.c~	Sat Jul 28 11:27:22 2001
++++ util.c	Sat Jul 28 11:27:47 2001
+@@ -3000,6 +3000,8 @@
+     PL_reg_start_tmpl = 0;
+     PL_reg_poscache = Nullch;
+ 
++    PL_peepp = MEMBER_TO_FPTR(Perl_peep);
++
+     /* parent thread's data needs to be locked while we make copy */
+     MUTEX_LOCK(&t->mutex);
+ 
+--- op.c~	Sat Jul 28 11:27:56 2001
++++ op.c	Sat Jul 28 11:30:46 2001
+@@ -20,6 +20,8 @@
+ #include "perl.h"
+ #include "keywords.h"
+ 
++#define CALL_PEEP(o) CALL_FPTR(PL_peepp)(o)
++
+ /* #define PL_OP_SLAB_ALLOC */
+ 
+ #ifdef PL_OP_SLAB_ALLOC
+@@ -2174,7 +2176,7 @@
+ 	PL_eval_root->op_private |= OPpREFCOUNTED;
+ 	OpREFCNT_set(PL_eval_root, 1);
+ 	PL_eval_root->op_next = 0;
+-	peep(PL_eval_start);
++	CALL_PEEP(PL_eval_start);
+     }
+     else {
+ 	if (!o)
+@@ -2185,7 +2187,7 @@
+ 	PL_main_root->op_private |= OPpREFCOUNTED;
+ 	OpREFCNT_set(PL_main_root, 1);
+ 	PL_main_root->op_next = 0;
+-	peep(PL_main_start);
++	CALL_PEEP(PL_main_start);
+ 	PL_compcv = 0;
+ 
+ 	/* Register with debugger */
+@@ -2369,7 +2371,7 @@
+ 
+     PL_op = curop = LINKLIST(o);
+     o->op_next = 0;
+-    peep(curop);
++    CALL_PEEP(curop);
+     pp_pushmark();
+     CALLRUNOPS(aTHX);
+     PL_op = curop;
+@@ -4809,7 +4811,7 @@
+     OpREFCNT_set(CvROOT(cv), 1);
+     CvSTART(cv) = LINKLIST(CvROOT(cv));
+     CvROOT(cv)->op_next = 0;
+-    peep(CvSTART(cv));
++    CALL_PEEP(CvSTART(cv));
+ 
+     /* now that optimizer has done its work, adjust pad values */
+     if (CvCLONE(cv)) {
+@@ -5150,7 +5152,7 @@
+     OpREFCNT_set(CvROOT(cv), 1);
+     CvSTART(cv) = LINKLIST(CvROOT(cv));
+     CvROOT(cv)->op_next = 0;
+-    peep(CvSTART(cv));
++    CALL_PEEP(CvSTART(cv));
+     op_free(o);
+     PL_copline = NOLINE;
+     LEAVE_SCOPE(floor);
+@@ -6323,7 +6325,7 @@
+ 		    kid->op_next = 0;		/* just disconnect the leave */
+ 		k = kLISTOP->op_first;
+ 	    }
+-	    peep(k);
++	    CALL_PEEP(k);
+ 
+ 	    kid = firstkid;
+ 	    if (o->op_type == OP_SORT) {
+@@ -6853,7 +6855,7 @@
+ 	    o->op_seq = PL_op_seqmax++;
+ 	    while (cLOGOP->op_other->op_type == OP_NULL)
+ 		cLOGOP->op_other = cLOGOP->op_other->op_next;
+-	    peep(cLOGOP->op_other);
++	    peep(cLOGOP->op_other); /* Recursive calls are not replaced by fptr calls */
+ 	    break;
+ 
+ 	case OP_ENTERLOOP:

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.jolokia.osgish</groupId>
+  <artifactId>osgish-parent</artifactId>
+  <version>0.3.1</version>
+  <packaging>pom</packaging>
+  <name>osgish-parent</name>
+  <description>osgish - Parent</description>
+
+  <modules>
+    <module>core</module>
+    <module>bundle</module>
+  </modules>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <jolokia.version>1.0.1</jolokia.version>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.jolokia</groupId>
+        <artifactId>jolokia-osgi</artifactId>
+        <version>${jolokia.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.googlecode.json-simple</groupId>
+        <artifactId>json-simple</artifactId>
+        <version>1.1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.core</artifactId>
+        <version>4.2.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.compendium</artifactId>
+        <version>4.2.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>org.apache.felix.http.jetty</artifactId>
+        <version>2.2.0</version>
+      </dependency>
+
+      <!-- Aries implementation of EEG JMX -->
+      <dependency>
+        <groupId>org.apache.aries.jmx</groupId>
+        <artifactId>org.apache.aries.jmx</artifactId>
+        <version>0.3</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.aries</groupId>
+        <artifactId>org.apache.aries.util</artifactId>
+        <version>0.3</version>
+      </dependency>
+
+      <!-- Dependencies for file-upload -->
+      <dependency>
+        <groupId>commons-fileupload</groupId>
+        <artifactId>commons-fileupload</artifactId>
+        <version>1.2.1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>2.1</version>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>2.3.2</version>
+          <configuration>
+            <source>1.5</source>
+            <target>1.5</target>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.felix</groupId>
+          <artifactId>maven-bundle-plugin</artifactId>
+          <version>2.3.6</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+
+  </build>
+
+  <repositories>
+    <repository>
+      <id>apache.snapshot</id>
+      <url>http://repository.apache.org/snapshots</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>consol-labs-snapshots</id>
+      <url>http://labs.consol.de/maven/snapshots-repository/</url>
+      <snapshots>
+        <enabled>true</enabled>
+        <!-- Policy: always, daily, interval:xxx (xxx=#minutes, 60*24*7=10080), never -->
+        <updatePolicy>daily</updatePolicy>
+      </snapshots>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+    </repository>
+  </repositories>
+
+  <!-- For deploying to our maven repository -->
+  <profiles>
+    <profile>
+      <id>dist-labs</id>
+      <distributionManagement>
+        <repository>
+          <id>consol-labs-release</id>
+          <url>scpexe://labs.consol.de/home/maven-repository/www/htdocs/repository</url>
+        </repository>
+        <snapshotRepository>
+          <id>consol-labs-snapshots</id>
+          <url>scpexe://labs.consol.de/home/maven-repository/www/htdocs/snapshots-repository</url>
+        </snapshotRepository>
+      </distributionManagement>
+    </profile>
+  </profiles>
+
+</project>
